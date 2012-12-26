@@ -1,0 +1,274 @@
+/* Copyright (c) 2010-2012 Jesper Öqvist <jesper@llbit.se>
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+aspect ASTConstructor {
+	public NamedTag.NamedTag(String name, SpecificTag tag) {
+		this(new StringTag(name), tag);
+	}
+	
+	public void CompoundTag.addItem(String name, SpecificTag tag) {
+		addItem(new NamedTag(new StringTag(name), tag));
+	}
+}
+
+aspect NBTParsing {
+
+	public static AnyTag NamedTag.read(DataInputStream in) {
+		try {
+			byte type = in.readByte();
+			if (type == 0) {
+				return new EndTag();
+			} else {
+				SpecificTag name = StringTag.read(in);
+				SpecificTag payload = SpecificTag.read(type, in);
+				return new NamedTag(name, payload);
+			}
+		} catch (IOException e) {
+			return new ErrorTag("IOException while reading tag type:\n"+
+					e.getMessage());
+		}
+	}
+
+	public static SpecificTag SpecificTag.read(byte type, DataInputStream in) {
+		switch (type) {
+			case Tag.TAG_BYTE:
+				return ByteTag.read(in);
+			case Tag.TAG_SHORT:
+				return ShortTag.read(in);
+			case Tag.TAG_INT:
+				return IntTag.read(in);
+			case Tag.TAG_LONG:
+				return LongTag.read(in);
+			case Tag.TAG_FLOAT:
+				return FloatTag.read(in);
+			case Tag.TAG_DOUBLE:
+				return DoubleTag.read(in);
+			case Tag.TAG_BYTEARRAY:
+				return ByteArrayTag.read(in);
+			case Tag.TAG_STRING:
+				return StringTag.read(in);
+			case Tag.TAG_LIST:
+				return ListTag.read(in);
+			case Tag.TAG_COMPOUND:
+				return CompoundTag.read(in);
+			case Tag.TAG_INTARRAY:
+				return IntArrayTag.read(in);
+			default:
+				return new ErrorTag("Unknown tag type: "+type);
+		}
+	}
+
+	public static SpecificTag ByteTag.read(DataInputStream in) {
+		try {
+			return new ByteTag(in.readByte());
+		} catch (IOException e) {
+			return new ErrorTag("IOException while reading TAG_Byte:\n"+
+					e.getMessage());
+		}
+	}
+
+	public static SpecificTag ShortTag.read(DataInputStream in) {
+		try {
+			return new ShortTag(in.readShort());
+		} catch (IOException e) {
+			return new ErrorTag("IOException while reading TAG_Short:\n"+
+					e.getMessage());
+		}
+	}
+
+	public static SpecificTag IntTag.read(DataInputStream in) {
+		try {
+			return new IntTag(in.readInt());
+		} catch (IOException e) {
+			return new ErrorTag("IOException while reading TAG_Int:\n"+
+					e.getMessage());
+		}
+	}
+
+	public static SpecificTag LongTag.read(DataInputStream in) {
+		try {
+			return new LongTag(in.readLong());
+		} catch (IOException e) {
+			return new ErrorTag("IOException while reading TAG_Long:\n"+
+					e.getMessage());
+		}
+	}
+
+	public static SpecificTag FloatTag.read(DataInputStream in) {
+		try {
+			return new FloatTag(in.readFloat());
+		} catch (IOException e) {
+			return new ErrorTag("IOException while reading TAG_Float:\n"+
+					e.getMessage());
+		}
+	}
+
+	public static SpecificTag DoubleTag.read(DataInputStream in) {
+		try {
+			return new DoubleTag(in.readDouble());
+		} catch (IOException e) {
+			return new ErrorTag("IOException while reading TAG_Double:\n"+
+					e.getMessage());
+		}
+	}
+
+	public static SpecificTag ByteArrayTag.read(DataInputStream in) {
+		try {
+			int length = in.readInt();
+			byte[] data = new byte[length];
+			in.readFully(data, 0, length);
+			return new ByteArrayTag(data);
+		} catch (IOException e) {
+			return new ErrorTag("IOException while reading TAG_Byte_Array:\n"+
+					e.getMessage());
+		}
+	}
+	
+	public static SpecificTag IntArrayTag.read(DataInputStream in) {
+		try {
+			int length = in.readInt();
+			int[] data = new int[length];
+			for (int i = 0; i < length; ++i)
+				data[i] = in.readInt();
+			return new IntArrayTag(data);
+		} catch (IOException e) {
+			return new ErrorTag("IOException while reading TAG_Int_Array:\n"+
+					e.getMessage());
+		}
+	}
+
+	public static SpecificTag StringTag.read(DataInputStream in) {
+		try {
+			// NB: This is not exactly following the minecraft.net spec
+			// since the string length is there specified to be a two
+			// bytes unsigned integer, but readUTF uses readUnsignedShort
+			// for the string length.
+			return new StringTag(in.readUTF());
+		} catch (IOException e) {
+			return new ErrorTag("IOException while reading TAG_String:\n"+
+					e.getMessage());
+		}
+	}
+
+	public static SpecificTag ListTag.read(DataInputStream in) {
+		try {
+			byte itemType = in.readByte();
+			if (itemType == Tag.TAG_END)
+				return new ErrorTag("Cannot create list of TAG_End");
+			int nitems = in.readInt();
+			ListTag tagThis = new ListTag(itemType, new List<SpecificTag>());
+			for (int i = 0; i < nitems; ++i) {
+				SpecificTag last = SpecificTag.read(itemType, in);
+				tagThis.addItem(last);
+			}
+			return tagThis;
+		} catch (IOException e) {
+			return new ErrorTag("IOException while reading TAG_List:\n"+
+					e.getMessage());
+		}
+	}
+
+	public static SpecificTag CompoundTag.read(DataInputStream in) {
+		CompoundTag tagThis = new CompoundTag(new List<AnyTag>());
+		while (true) {
+			AnyTag last = NamedTag.read(in);
+			if (last.isEnd())
+				break;
+				
+			tagThis.addItem(last);
+		}
+		return tagThis;
+	}
+}
+
+aspect NBTWriter {
+
+	public abstract void AnyTag.write(DataOutputStream out) throws IOException;
+	public void SpecificTag.writeType(DataOutputStream out) throws IOException {
+		out.writeByte(tagType());
+	}
+
+	public void NamedTag.write(DataOutputStream out) throws IOException {
+		getTag().writeType(out);
+		getName().write(out);
+		getTag().write(out);
+	}
+
+	public void ErrorTag.write(DataOutputStream out) {
+		throw new RuntimeException("Cannot write an error tag to NBT stream ("+getError()+")");
+	}
+
+	public void EndTag.write(DataOutputStream out) throws IOException {
+		writeType(out);
+	}
+
+	public void ByteTag.write(DataOutputStream out) throws IOException {
+		out.writeByte(getData());
+	}
+
+	public void ShortTag.write(DataOutputStream out) throws IOException {
+		out.writeShort(getData());
+	}
+
+	public void IntTag.write(DataOutputStream out) throws IOException {
+		out.writeInt(getData());
+	}
+
+	public void LongTag.write(DataOutputStream out) throws IOException {
+		out.writeLong(getData());
+	}
+
+	public void FloatTag.write(DataOutputStream out) throws IOException {
+		out.writeFloat(getData());
+	}
+
+	public void DoubleTag.write(DataOutputStream out) throws IOException {
+		out.writeDouble(getData());
+	}
+
+	public void ByteArrayTag.write(DataOutputStream out) throws IOException {
+		out.writeInt(getData().length);
+		out.write(getData());
+	}
+	
+	public void IntArrayTag.write(DataOutputStream out) throws IOException {
+		out.writeInt(getData().length);
+		for (int i = 0; i < getData().length; ++i)
+			out.writeInt(getData()[i]);
+	}
+
+	public void StringTag.write(DataOutputStream out) throws IOException {
+		out.writeUTF(getData());
+	}
+
+	public void ListTag.write(DataOutputStream out) throws IOException {
+		out.writeByte(getType());
+		out.writeInt(getNumItem());
+		for (SpecificTag item: getItemList())
+			item.write(out);
+	}
+
+	public void CompoundTag.write(DataOutputStream out) throws IOException {
+		for (AnyTag item: getItemList())
+			item.write(out);
+		out.writeByte(Tag.TAG_END);
+	}
+}
+

@@ -1,0 +1,316 @@
+1.1.1 - 2012-11-19
+    * Don't warn when not able to load the world of the loaded scene
+    * Fixed door rendering issues
+    * Implemented new blocks from Minecraft 1.4.2:
+      + Carrot Block
+      + Potato Block
+      + Wooden Button
+      + Beacon (Placeholder: Glass Block)
+      + Command Block
+      + Cobblestone Walls
+
+1.1.0 - 2012-09-21
+    * The Moved By Piston block is not rendered
+    * Unknown block types are not rendered (used to be rendered as
+      question mark blocks)
+    * Increased the maximum sun intensity for the sun intensity slider
+    * Improved vine rendering: draw top vines
+    * Improved underwater rendering & various water rendering issues
+    * Fixed ice block rendering issue
+    * Fixed error causing cobblestone stairs to render with the smooth
+      stone texture
+    * Fixed crash when viewing chunks with certain blocks in the map view
+    * Don't treat water as part of a cave in cave view
+    * Added benchmark mode
+    * Deleting chunks now correctly updates the map view
+
+1.0.15 - 2012-08-07
+    * Fixed activated detector rail rendering bug
+    * Canvas size should update correctly when loading a new scene now
+      even on Mac
+    * The octree is saved with the scene description in order
+      to accelerate scene loading and simplify sharing of scenes
+      between different machines
+    * Fixed error when saving render dump for a scene with width
+      and height not equal
+
+1.0.14 - 2012-08-05
+    * Silverfish blocks are now rendered with the correct texture
+    * Fixed a case where blocks behind chests would be replaced by
+      stone blocks
+    * Redstone wire is now rendered with correct color and direction in
+      most cases
+    * Redstone repeater is rendered with correct direction and with the
+      two attached redstone torches
+    * Fixed possible deadlock when changing canvas size
+    * Removed revision number from main window title
+    * Fixed canvas size sometimes not affecting window size for the
+      preview window
+    * Fixed crash when saving a scene with no loaded chunks
+    * Added button to set the default SPP target
+
+1.0.13 - 2012-08-02
+    * Chunky does not crash if it can not locate the default
+      Minecraft saves directory
+    * Fixed error that caused a large redundant image to be allocated for
+      the map view
+    * Opening a world that was saved in an unsupported format will
+      cause a warning message to be displayed
+    * The user can select the directory where Chunky looks for
+      Minecraft worlds in the World Selector dialog
+    * Small stability improvements
+    * Fixed block highlight rendering bug
+    * Improved the responsiveness of the 3D render preview
+    * When a render is dumped the saved frame represents the current
+      state of the render (was bugged in 1.0.11 and 1.0.12)
+    * The scene description file is automatically backed up when a manual
+      scene save is performed
+    * The renderer will stop at a user selected target SPP count.
+      Render progress is now tracked relative to this SPP count, rather
+      than the intermediate render dumps.
+
+1.0.12 - 2012-07-30
+    * Render progress bar displays the chunk finalization progress when
+      loading a new set of chunks
+    * Added directional Wood blocks from Minecraft pre-release 1.3
+    * The following blocks are now rendered correctly by Chunky:
+      + Tripwire Hook
+      + Tripwire
+      + Cocoa Plant
+      + Ender Dragon Egg
+      + Brewing Stand
+      + Spruce Stairs
+      + Birch Stairs
+      + Jungle Wood Stairs
+      + Directional Wood Blocks (from the 1.3 pre-release)
+    * Rendering of the following blocks has been improved:
+      + Sign Post
+      + Flowing Lava (fixed texturing issues)
+
+1.0.11 - 2012-07-26
+    * Added button to load scene in the 3D Render tab of the main window
+    * Increased size of the world selection dialog
+    * Increased size of the scene selection dialog
+    * Mouse wheel controls camera zoom in the 3D view
+    * Added credits dialog (accessed through the About tab)
+    * Added render progress bar to visualize progress to next render dump
+    * Added ETA display which displays estimated time to next render dump
+    * Added button to load selected chunks in the Render Controls dialog
+    * Chunky always asks the user to choose the name for the scene when a
+      new scene is created
+    * The 3D preview window always displays to the right of the
+      Render Controls dialog
+    * The Render Controls dialog can no longer be pushed offscreen by the
+      preview window due to a large canvas size
+    * Fixed workbench texturing error
+    * Improved water rendering for flowing water
+    * Save the current render mode with the scene description
+    * Moved the water world option to the Advanced tab of the Render Controls
+      dialog
+    * Wall torches now connect better to other blocks
+
+1.0.10 - 2012-07-13
+    * Slightly improved world loading speed (poll for regions rather than
+      scanning the world directory)
+    * Added separate button in the Render Controls dialog to save the current
+      canvas size as the default canvas size
+    * The log4j library is now used for logging
+    * The user is asked to select where to save scene descriptions and
+      render dumps (the old "Scenes" directory)
+    * The settings.cfg file is stored in the .chunky directory in the user home
+      directory
+    * Progress renders are saved in the scenes directory
+    * Improved rendering of levers and cauldrons
+    * Brought back the gamma slider, it now lives on the Advanced tab
+    * Added button to open the scene directory in the system file browser
+    * Remember skymap rotation
+
+1.0.9 - 2012-07-05
+    * Fixed flipped texture on the right hand side of stair blocks
+    * Added atmospheric effects
+    * Save canvas size when using the Halve and Double buttons
+    * Made renderer more robust in the handling of transparent textures
+    * Preview images are rendered with a quick gamma adjustment (not correct,
+      but close enough and much quicker)
+    * Removed gamma adjustment options from Render Controls dialog
+    * Improved skymap loading times (multithreaded texture preprocessing)
+    * In order to save space in the Render Controls dialog the
+      sun color changer was replaced with a button that opens the same tool in
+      a new dialog
+
+1.0.8 - 2012-07-04
+    * Fixed error causing submerged objects to be too well lit by sunlight
+    * When loading a scene the saved gamma setting is used to
+      display the saved render dump
+    * Fixed error causing all objects to receive too little light at low
+      incident angles
+    * Fixed lava rendering error
+    * X/Z coordinates now update when clicking in the minimap
+    * A smaller buffer is used to cache the map view. This improves map
+      view responsiveness at large zoom values.
+    * Some minor minimap rendering issues were fixed
+    * Chunky now saves a file (settings.cfg) with user preferences
+    * Selected chunks are now also highlighted in the minimap
+    * Changed orientation of map view so that north is up
+    * Display player and spawn position in minimap
+    * Chunky remembers the last loaded world and will attempt to load the
+      same world next time it starts
+    * Chunky remembers the last used texture pack
+    * Chunky remembers the last used canvas size
+    * Made render status text field non-editable
+    * Pressing Ctrl while dragging a selection rectangle causes the chunks
+      within the rectangle to be deselected
+    * Added zoom level 0 (same as minimap) to 2d map view
+    * Removed buttons to select all chunks and invert selection (this will
+      no longer be supported since future versions of Chunky will avoid
+      scanning all chunks in the map - it takes too long time!)
+    * Fixed rare bug that caused preview rendering to hang
+    * Fixed crash due to corrupt metadata in pumpkin blocks
+    * Fixed incorrect top/bottom texture for melon blocks
+    * Chunky now loads large maps much faster
+    * Added Reload button under the minimap which reloads the current world
+    * Added button to load default Minecraft texture pack in the Options tab
+    * Chunky falls back on minecraft.jar to provide texture files missing in
+      loaded texture packs
+    * Chunky remembers the last skymap used
+    * Chunky uses the sun texture from the current texture pack to draw the sun
+    * Fixed rare bug when rendering iron bars or glass panes with certain
+      textures that caused the renderer to hang
+    * Fixed soft shadow rendering error due to incorrect sampling of sunlight
+
+1.0.7 - 2012-06-15
+    * Default number of render threads is set equal to the number of
+      available CPU cores
+    * Added slider to control emitter intensity
+    * When saving a dump the saved frame PNG file is named using the
+      scene name and the current number of samples per pixel
+    * Added button to unload current skymap under the Sky tab in the
+      Render Controls dialog
+    * Render the full water world ocean in preview render mode
+
+1.0.6 - 2012-06-14
+    * Implemented proper gamma correction (textures are decoded from
+      sRGB to a linear color space for rendering, then encode back to sRGB
+      using gamma correction)
+    * Use the system look and feel. Makes Chunky look more native.
+    * Fixed corrupt normal causing "dead pixels" - bug in rendering code for
+      falling water
+    * Pressing enter when editing either canvas width or height will instantly
+      update the canvas size
+    * Changing the scene name field now directly updates the scene name,
+      without requiring the scene to be manually saved
+    * The default scene name is now the same as the current world's name
+    * Added water height option to Render tab which affects the water generated
+      in "Water World" mode
+    * Added a slider for sun intensity under the Sun tab in the Render Controls
+      dialog
+
+1.0.5 - 2012-06-13
+    * Render dumps are now compressed. NB: render dumps saved with
+      version 1.0.4 or earlier can no longer be loaded!
+    * Show message in 3D view that warns when no chunks have been loaded
+    * Changed default 2D zoom level to 4
+    * Fixed rendering error in preview rendering mode when the camera was
+      inside a block
+    * Don't include paused time in total rendering time
+    * Display camera coordinates in preview renders
+    * Added sun specular reflection (sun glare)
+    * Allow DoF and Focal Offset to be set to values greater than their maximum
+      slider stops
+    * Use flat shading in preview render
+    * Added Water World Mode option in the Render tab
+    * Fixed lily pad rendering with incorrect color and removed offset from
+      the water surface
+    * Added coordinate fields to View tab that can be used to move
+      the 2D map view
+    * Made skymap orientation adjustable with a new slider in the Sky tab
+    * Added "clear water" option to disable the water fog effect in
+      the General tab of the Render Controls dialog
+    * Render sky color using a physically based skylight model if no skymap
+      has been loaded (this replaces the previous default skymap)
+
+1.0.4 - 2012-06-09
+    * Removed tearing artifacts when changing render parameters
+    * Fit octree to loaded chunks - improves render performance and
+      allows loading an arbitrary number of chunks
+    * Fixed error in octree initialization
+    * The preview window no longer renders completely transparent
+      surfaces as black
+    * Full texture pack support (Chunky loads chest textures from their own
+      texture rather than using the obsolete terrain.png tiles)
+    * Increased maximum relative sun intensity
+    * Fixed bug that caused render threads to keep rendering after the
+      Render Controls dialog had been closed
+    * Added Autofocus function in the Camera tab of the Render Controls dialog
+    * Use normal map for water rendering
+    * Tweaked water specular coefficient and visibility depth
+    * Save the current world in the scene description
+    * Implemented correct rendering of chest, ender chest, large chest,
+      huge mushrooms (brown & red), mycelium, end portal frame, emerald
+      block, emerald ore and nether wart
+    * Postprocessing effects are now turned off by default, but can be enabled
+      using a check box in the General tab of the Render Controls dialog
+    * Crosshairs are now rendered in the 3D view in preview mode
+    * Some debug info is shown in the 3D view in preview mode
+    * Added buttons to halve and double canvas size
+    * Hide the HALT button when it is not needed
+    * Changed layout of Camera tab
+
+1.0.3 - 2012-06-06
+    * Added method for changing sun color
+    * Implemented sandstone stairs
+    * Fixed some minor interface issues
+    * Added an "Advanced" tab in the Render Controls dialog
+    * Added a ray depth option in the Advanced tab
+    * Changed default sun position. Sun position is no longer offset by
+      the default angles - sun position is now different to 1.0.2 scenes
+    * Set default ray depth to 5 (was 6)
+    * Modified water displacement function
+    * Added option to disable biome colors
+    * It is now possible to pause the renderer
+    * When loading a saved scene the renderer will start in the paused mode
+    * Slight render performance increase
+    * Increased responsiveness of the preview render (using interlacing)
+    * Jack-O-Lantern now emits light
+    * Center Octree on loaded chunks - allows loading chunks far from spawn
+    * Log warnings and errors in  render worker and render controller threads
+
+1.0.2 - 20120602
+    * Added a default sky texture (currently just a simple color gradient)
+    * Fixed wooden slab rendering (from snapshot 12w08a)
+    * Made a small improvement to brewing stand rendering (still not
+      rendered correctly)
+    * Implemented melon and pumpkin stem rendering
+    * Attempt to load default texture pack from minecraft.jar
+    * Updated piston extension texturing to match Minecraft
+    * Made skymap rotation independent of sun angle
+    * The user can now select, in the Render Controls dialog, if and when
+      render dumps should be saved
+    * Scene descriptions (CVF files) and render dumps are now saved in
+      the "Scenes" directory
+    * Revamped the scene saving and loading UI interaction
+    * Don't fail loading scene description if the saved skymap is missing
+
+1.0.1 - 20120531
+    * Fixed cactus rendering
+    * The top lava block renders with a slightly lower height (same as water)
+    * Renamed some UI elements in the Render Controls dialog
+    * Camera is centered above the loaded chunks when the 3D view is opened
+    * The camera can be moved to the player position using a new button in
+      the Camera tab in the Render Controls dialog
+    * Made the default textures slightly less horrible
+    * Fixed rendering error affecting blocks rendered as sprites
+      (flowers, cobweb, fire, etc.)
+
+1.0.0 - 20120526
+    * Added 3D chunk rendering using a new path tracing renderer
+    * Support for texture packs
+    * Fixed selection color bug making the selections opaque
+    * Fixed selection off-by one error that showed some unselected chunks
+      as being selected
+    * Fixed player and spawn position display off-by one error
+    * Removed the application global hotkey for chunk deletion
+    * Draw the North indicator at the correct side of the minimap
+    * Various small interface improvements, including a new About tab
+      in the main view
+

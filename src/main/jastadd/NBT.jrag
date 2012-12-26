@@ -1,0 +1,187 @@
+/* Copyright (c) 2010-2012 Jesper Öqvist <jesper@llbit.se>
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+aspect NBT {
+
+	syn String AnyTag.name();
+	eq NamedTag.name() = "TAG:named";
+	eq EndTag.name() = "TAG_End";
+	eq ByteTag.name() = "TAG_Byte";
+	eq ShortTag.name() = "TAG_Short";
+	eq IntTag.name() = "TAG_Int";
+	eq LongTag.name() = "TAG_Long";
+	eq FloatTag.name() = "TAG_Float";
+	eq DoubleTag.name() = "TAG_Double";
+	eq ByteArrayTag.name() = "TAG_Byte_Array";
+	eq IntArrayTag.name() = "TAG_Int_Array";
+	eq StringTag.name() = "TAG_String";
+	eq ListTag.name() = "TAG_List";
+	eq CompoundTag.name() = "TAG_Compound";
+	
+	public static final int Tag.TAG_END = 0;
+	public static final int Tag.TAG_BYTE = 1;
+	public static final int Tag.TAG_SHORT = 2;
+	public static final int Tag.TAG_INT = 3;
+	public static final int Tag.TAG_LONG = 4;
+	public static final int Tag.TAG_FLOAT = 5;
+	public static final int Tag.TAG_DOUBLE = 6;
+	public static final int Tag.TAG_BYTEARRAY = 7;
+	public static final int Tag.TAG_STRING = 8;
+	public static final int Tag.TAG_LIST = 9;
+	public static final int Tag.TAG_COMPOUND = 10;
+	public static final int Tag.TAG_INTARRAY = 11;
+
+	syn int SpecificTag.tagType();
+	eq ErrorTag.tagType() {
+		throw new RuntimeException("Cannot write an error tag to NBT stream ("+getError()+")");
+	}
+	eq EndTag.tagType() = Tag.TAG_END;
+	eq ByteTag.tagType() = Tag.TAG_BYTE;
+	eq ShortTag.tagType() = Tag.TAG_SHORT;
+	eq IntTag.tagType() = Tag.TAG_INT;
+	eq LongTag.tagType() = Tag.TAG_LONG;
+	eq FloatTag.tagType() = Tag.TAG_FLOAT;
+	eq DoubleTag.tagType() = Tag.TAG_DOUBLE;
+	eq ByteArrayTag.tagType() = Tag.TAG_BYTEARRAY;
+	eq StringTag.tagType() = Tag.TAG_STRING;
+	eq ListTag.tagType() = Tag.TAG_LIST;
+	eq CompoundTag.tagType() = Tag.TAG_COMPOUND;
+	eq IntArrayTag.tagType() = Tag.TAG_INTARRAY;
+
+	syn boolean AnyTag.isEnd() = false;
+	eq ErrorTag.isEnd() = true;
+	eq EndTag.isEnd() = true;
+
+	syn boolean Tag.isError() = false;
+	eq ErrorTag.isError() = true;
+
+	syn AnyTag AnyTag.unpack() = this;
+	eq NamedTag.unpack() = getTag();
+
+	syn String AnyTag.error() = "";
+	eq ErrorTag.error() = getError();
+
+	syn int AnyTag.byteValue() = 0;
+	eq ByteTag.byteValue() = getData();
+
+	syn int AnyTag.byteValue(int defaultValue) = defaultValue;
+	eq ByteTag.byteValue(int defaultValue) = getData();
+
+	syn short AnyTag.shortValue() = 0;
+	eq ShortTag.shortValue() = getData();
+
+	syn short AnyTag.shortValue(short defaultValue) = defaultValue;
+	eq ShortTag.shortValue(short defaultValue) = getData();
+
+	syn int AnyTag.intValue() = 0;
+	eq IntTag.intValue() = getData();
+
+	syn int AnyTag.intValue(int defaultValue) = defaultValue;
+	eq IntTag.intValue(int defaultValue) = getData();
+
+	syn long AnyTag.longValue() = 0;
+	eq LongTag.longValue() = getData();
+
+	syn long AnyTag.longValue(long defaultValue) = defaultValue;
+	eq LongTag.longValue(long defaultValue) = getData();
+
+	syn float AnyTag.floatValue() = 0;
+	eq FloatTag.floatValue() = getData();
+
+	syn float AnyTag.floatValue(float defaultValue) = defaultValue;
+	eq FloatTag.floatValue(float defaultValue) = getData();
+
+	syn double AnyTag.doubleValue() = 0;
+	eq DoubleTag.doubleValue() = getData();
+
+	syn double AnyTag.doubleValue(double defaultValue) = defaultValue;
+	eq DoubleTag.doubleValue(double defaultValue) = getData();
+
+	syn String AnyTag.stringValue() = "";
+	eq StringTag.stringValue() = getData();
+
+	syn String AnyTag.stringValue(String defaultValue) = defaultValue;
+	eq StringTag.stringValue(String defaultValue) = getData();
+
+	syn byte[] AnyTag.byteArray() = new byte[0];
+	eq ByteArrayTag.byteArray() = getData();
+
+	syn byte[] AnyTag.byteArray(byte[] defaultValue) = defaultValue;
+	eq ByteArrayTag.byteArray(byte[] defaultValue) = getData();
+	
+	syn int[] AnyTag.intArray() = new int[0];
+	eq IntArrayTag.intArray() = getData();
+
+	syn int[] AnyTag.intArray(int[] defaultValue) = defaultValue;
+	eq IntArrayTag.intArray(int[] defaultValue) = getData();
+	
+	syn boolean AnyTag.isCompoundTag() = false;
+	eq CompoundTag.isCompoundTag() = true;
+
+	syn boolean AnyTag.isList() = false;
+	eq ListTag.isList() = true;
+
+	/**
+ 	 * @param size the minimum array length
+ 	 * @return true if this is a TAG_ByteArray with at least size elements
+ 	 */
+	syn boolean AnyTag.isByteArray(int size) = false;
+	eq ByteArrayTag.isByteArray(int size) = getData().length >= size;
+	
+	/**
+ 	 * @param size the minimum array length
+ 	 * @return true if this is a TAG_IntArray with at least size elements
+ 	 */
+	syn boolean AnyTag.isIntArray(int size) = false;
+	eq IntArrayTag.isIntArray(int size) = getData().length >= size;
+
+	syn Object AnyTag.payload() = this;
+	eq ByteTag.payload() = getData();
+	eq ShortTag.payload() = getData();
+	eq IntTag.payload() = getData();
+	eq LongTag.payload() = getData();
+	eq FloatTag.payload() = getData();
+	eq DoubleTag.payload() = getData();
+	eq StringTag.payload() = getData();
+	eq ByteArrayTag.payload() = getData();
+
+	// Name lookup
+	syn AnyTag AnyTag.get(String name) =
+		new ErrorTag("No child tag named \""+name+"\"");
+	eq CompoundTag.get(String name) {
+		for (AnyTag item : getItemList()) {
+			if (item.isNamed(name))
+				return item.unpack();
+		}
+		return super.get(name);
+	}
+
+	// Index lookup
+	syn AnyTag AnyTag.get(int i) =
+		new ErrorTag("No child tag at index "+i);
+	eq ListTag.get(int i) {
+		if (i < 0 || i >= getNumItem())
+			return super.get(i);
+		return getItemList().getChild(i);
+	}
+
+	syn boolean Tag.isNamed(String name) = false;
+	eq NamedTag.isNamed(String name) = getName().same(name);
+
+	syn boolean Tag.same(String name) = false;
+	eq StringTag.same(String name) = getData().equals(name);
+}

@@ -1,0 +1,203 @@
+<project name="se.llbit.chunky.nbt" default="build">
+
+	<property name="debug"			value="false"/>
+	<property name="src.dir"		value="src"/>
+	<property name="bin.dir"		value="bin"/>
+	<property name="tools.dir"		value="tools"/>
+	<property name="nbt.package"	value="se.llbit.nbt"/>
+	
+	<property file="${src.dir}/main/res/se/llbit/chunky/main/messages.properties"/>
+
+	<taskdef name="jastadd" classname="jastadd.JastAddTask" classpath="${tools.dir}/jastadd2.jar"/>
+
+	<target name="clean">
+		<delete dir="${bin.dir}"/>
+		<delete dir="${src.dir}/gen">
+			<exclude name="**/test/*"/>
+		</delete>
+		<delete file="Chunky.jar" />
+		<delete file="Chunky-tmp.dmg" />
+		<delete file="Chunky.dmg" />
+		<delete dir="Chunky.app" />
+		<!--delete file="NBTDump.jar" /-->
+	</target>
+	
+	<target name="gen">
+		<mkdir dir="${src.dir}/gen/java"/>
+		<jastadd
+			outdir="${src.dir}/gen/java"
+			package="${nbt.package}"
+			rewrite="false"
+			novisitcheck="false"
+			debug="false">
+			<fileset dir="${src.dir}/main/jastadd">
+				<include name="*.ast"/>
+				<include name="*.jrag"/>
+				<include name="*.jadd"/>
+			</fileset>
+		</jastadd>
+		<mkdir dir="${bin.dir}"/>
+		<copy todir="${bin.dir}">
+			<fileset dir="${src.dir}/main/res" />
+		</copy>
+	</target>
+
+	<target name="build" depends="gen">
+		<mkdir dir="${bin.dir}"/>
+		<javac
+			encoding="utf-8"
+			debug="${debug}"
+			nowarn="true"
+			destdir="${bin.dir}"
+			includes="**/*.java"
+			includeantruntime="false">
+			<classpath>
+				<pathelement path="lib/log4j-1.2.17.jar"/>
+				<pathelement path="lib/beaver-rt.jar"/>
+				<pathelement path="lib/j99.jar"/>
+				<pathelement path="lib/JOCL-0.1.7.jar"/>
+			</classpath>
+			<src path="${src.dir}/main/java"/>
+			<src path="${src.dir}/gen/java"/>
+		</javac>
+	</target>
+
+	<target name="jar" depends="build">
+		<mkdir dir="build"/>
+		<!--jar destfile="build/NBTDump.jar">
+			<fileset dir="${bin.dir}" includes="se/llbit/nbt/*.class" />
+			<fileset dir="${bin.dir}" includes="se/llbit/nbt/test/NBTDump.class" />
+			<manifest>
+				<attribute name="Main-Class" value="se.llbit.nbt.test.NBTDump" />
+			</manifest>
+		</jar-->
+		<mkdir dir="${bin.dir}/lib"/>
+		<jar destfile="${bin.dir}/lib/ChunkyCore.jar">
+			<fileset dir="${bin.dir}">
+				<exclude name="lib/**/*"/>
+				<exclude name="se/llbit/chunky/launcher/**/*"/>
+			</fileset>
+		</jar>
+		<jar destfile="build/Chunky.jar">
+			<fileset dir="${bin.dir}">
+				<include name="lib/**/*"/>
+				<include name="se/llbit/chunky/launcher/**/*"/>
+			</fileset>
+			<fileset dir=".">
+				<include name="lib/**/*"/>
+			</fileset>
+			<manifest>
+				<attribute name="Main-Class"
+					value="se.llbit.chunky.launcher.ChunkyLauncher" />
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="release" description="build a release">
+		<antcall target="clean"/>
+		<antcall target="jar"/>
+		<zip destfile="build/Chunky-${Chunky.version}.zip">
+			<zipfileset dir="." prefix="Chunky">
+				<include name="README.txt"/>
+				<include name="ChangeLog.txt"/>
+				<include name="LICENSE.txt"/>
+				<include name="JOCL.txt"/>
+				<include name="MWC64X.txt"/>
+				<include name="NOTICE.txt"/>
+				<include name="LOG4J.txt"/>
+				<include name="Chunky.bat"/>
+				<include name="Chunky.sh"/>
+			</zipfileset>
+			<zipfileset dir="build" prefix="Chunky">
+				<include name="Chunky.jar"/>
+			</zipfileset>
+		</zip>
+	</target>
+
+	<target name="macapp" description="Create an .app package for Chunky">
+			<property name="Chunky.app" value="build"/>
+			<property name="app.name" value="Chunky"/>
+			<property name="macosx.resrc" value="Resources"/>
+			<property name="app.resrc" value="${src.dir}/main/res"/>
+			<property name="macosx.stubfile" value="${macosx.resrc}/JavaApplicationStub"/>
+			<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
+			<jarbundler dir="."
+									name="${app.name}"
+									bundleid="se.llbit.chunky"
+									shortname="${app.name}"
+									version="${version}"
+									mainclass="se.llbit.chunky.launcher.ChunkyLauncher"
+									icon="${macosx.resrc}/chunky.icns"
+									infostring="${app.name}"
+									stubfile="${macosx.stubfile}"
+									workingdirectory="$APP_PACKAGE/Contents/Resources/Java"
+									vmoptions="-Xms512m -Xmx2048m">		
+				<javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
+				<javaproperty name="apple.awt.textantialiasing" value="true" />
+				<resourcefileset dir="${app.resrc}">
+						<include name="chunky.icns" />
+				</resourcefileset>
+				<jarfileset dir="build">
+					<include name="Chunky.jar"/>
+				</jarfileset>	
+			</jarbundler>
+	</target>
+	
+	<target name="macdmg" description="Create a DMG package for Chunky">
+		<property name="mountdir" value="/tmp"/>
+		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+			<arg value="create"/>
+			<arg value="-srcfolder"/>
+			<arg value="Chunky.app"/>
+			<arg value="-volname"/>
+			<arg value="Chunky"/>
+			<arg value="-ov"/>
+			<arg value="Chunky-tmp.dmg"/>
+			<arg value="-format"/>
+			<arg value="UDRW"/>
+		</exec>
+		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+			<arg value="attach"/>
+			<arg value="Chunky-tmp.dmg"/>
+			<arg value="-mountroot"/>
+			<arg value="${mountdir}/"/>
+		</exec>
+		<mkdir dir="${mountdir}/Chunky/.background"/>
+		<copy file="${src.dir}/main/res/chunky-dmg.png" tofile="${mountdir}/Chunky/.background/background.png" overwrite="true"/>
+		<copy file="${src.dir}/main/res/chunky-dmg.icns" tofile="${mountdir}/Chunky/.VolumeIcon.icns" overwrite="true"/>
+		<copy file="${src.dir}/main/res/DS_Store" tofile="${mountdir}/Chunky/.DS_Store" overwrite="true"/>
+		<exec executable="/usr/bin/Setfile" os="Mac OS X">
+			<arg value="-a"/>
+			<arg value="C"/>
+			<arg value="${mountdir}/Chunky"/>
+		</exec>
+		<symlink link="${mountdir}/Chunky" resource="/Applications"/>
+		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+			<arg value="detach"/>
+			<arg value="${mountdir}/Chunky"/>
+		</exec>
+		<delete file="${app.name}-tmp.dmg" quiet="yes" failonerror="false"/>
+		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+			<arg value="convert"/>
+			<arg value="Chunky-tmp.dmg"/>
+			<arg value="-format"/>
+			<arg value="UDZO"/>
+			<arg value="-o"/>
+			<arg value="Chunky.dmg"/>
+		</exec>
+		<delete file="Chunky-tmp.dmg" />
+		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
+			<arg value="internet-enable"/>
+			<arg value="-yes"/>
+			<arg value="Chunky.dmg"/>
+		</exec>
+	</target>
+
+	<target name="mac" description="Create and Bundle Chunky for OS X">
+		<antcall target="clean"/>
+		<antcall target="jar"/>
+		<antcall target="macapp"/>
+		<antcall target="macdmg"/>
+	</target>
+	
+</project>
