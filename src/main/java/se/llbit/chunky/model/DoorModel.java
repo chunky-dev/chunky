@@ -100,11 +100,22 @@ public class DoorModel {
 
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
+		
 		int data = ray.currentMaterial;
-		int top = 7 & (data >> BlockData.DOOR_TOP);
-		int bottom = 7 & (data >> BlockData.DOOR_BOTTOM);
-		int rotation = ((bottom & 3) + (bottom >> 2)) % 4;
-		int mirror = ((top & 1) + ((bottom >> 2) & 1)) % 2;
+		int top = 0xF & (data >> BlockData.DOOR_TOP);
+		int bottom = 0xF & (data >> BlockData.DOOR_BOTTOM);
+		
+		int open = 1 & (bottom>>2);
+		int mirrored = 1 & top;
+		int direction = 3 & bottom;
+		
+		int rotation;
+		if (open != 0 && mirrored != 0)
+			rotation = (direction + 3)%4;
+		else
+			rotation = (direction + open)%4;
+		int mirror = (mirrored + open) % 2;
+		
 		ray.t = Double.POSITIVE_INFINITY;
 		for (Quad quad : rot[mirror][rotation]) {
 			if (quad.intersect(ray)) {

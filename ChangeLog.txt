@@ -1,6 +1,7 @@
 2012-12-27  Jesper Öqvist <jesper@llbit.se>
 
     * Pressure plates now have the correct size
+    * Fixed some door rendering issues (incorrect rotation)
 
 1.1.1 - 2012-11-19
     * Don't warn when not able to load the world of the loaded scene

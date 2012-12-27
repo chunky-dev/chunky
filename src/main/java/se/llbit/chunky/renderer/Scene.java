@@ -1600,6 +1600,7 @@ public class Scene implements Refreshable {
 								if (cy > 0) {
 									bottom = 0xFF & data[Chunk.chunkIndex(cx, cy-1, cz)/2];
 									bottom >>= (cx % 2) * 4;// extract metadata
+									bottom &= 0xF;
 								}
 							} else {
 								// this is the bottom part of the door
@@ -1607,6 +1608,7 @@ public class Scene implements Refreshable {
 								if (cy < 255) {
 									top = 0xFF & data[Chunk.chunkIndex(cx, cy+1, cz)/2];
 									top >>= (cx % 2) * 4;// extract metadata
+									top &= 0xF;
 								}
 							}
 							type |= (top << BlockData.DOOR_TOP);
