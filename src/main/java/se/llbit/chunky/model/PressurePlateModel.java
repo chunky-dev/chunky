@@ -26,28 +26,28 @@ import se.llbit.math.Vector4d;
 public class PressurePlateModel {
 	private static Quad[] quads = {
 		// front
-		new Quad(new Vector3d(.8, 0, .2), new Vector3d(.2, 0, .2),
-				new Vector3d(.8, .1, .2), new Vector4d(.8, .2, 0, .1)),
+		new Quad(new Vector3d(15/16., 0, 1/16.), new Vector3d(1/16., 0, 1/16.),
+				new Vector3d(15/16., 1/16., 1/16.), new Vector4d(15/16., 1/16., 0, 1/16.)),
 
 		// back
-		new Quad(new Vector3d(.2, 0, .8), new Vector3d(.8, 0, .8),
-				new Vector3d(.2, .1, .8), new Vector4d(.2, .8, 0, .1)),
+		new Quad(new Vector3d(1/16., 0, 15/16.), new Vector3d(15/16., 0, 15/16.),
+				new Vector3d(1/16., 1/16., 15/16.), new Vector4d(1/16., 15/16., 0, 1/16.)),
 		
 		// right
-		new Quad(new Vector3d(.2, 0, .2), new Vector3d(.2, 0, .8),
-				new Vector3d(.2, .1, .2), new Vector4d(.2, .8, 0, .1)),
+		new Quad(new Vector3d(1/16., 0, 1/16.), new Vector3d(1/16., 0, 15/16.),
+				new Vector3d(1/16., 1/16., 1/16.), new Vector4d(1/16., 15/16., 0, 1/16.)),
 
 		// left
-		new Quad(new Vector3d(.8, 0, .8), new Vector3d(.8, 0, .2),
-				new Vector3d(.8, .1, .8), new Vector4d(.8, .2, 0, .1)),
+		new Quad(new Vector3d(15/16., 0, 15/16.), new Vector3d(15/16., 0, 1/16.),
+				new Vector3d(15/16., 1/16., 15/16.), new Vector4d(15/16., 1/16., 0, 1/16.)),
 
 		// top
-		new Quad(new Vector3d(.8, .1, .2), new Vector3d(.2, .1, .2),
-				new Vector3d(.8, .1, .8), new Vector4d(.8, .2, 0, .8)),
+		new Quad(new Vector3d(15/16., 1/16., 1/16.), new Vector3d(1/16., 1/16., 1/16.),
+				new Vector3d(15/16., 1/16., 15/16.), new Vector4d(15/16., 1/16., 15/16., 1/16.)),
 		
 		// bottom
-		new Quad(new Vector3d(.2, 0, .2), new Vector3d(.8, 0, .2),
-				new Vector3d(.2, 0, .8), new Vector4d(.2, .8, 0, .8)),
+		new Quad(new Vector3d(1/16., 0, 1/16.), new Vector3d(15/16., 0, 1/16.),
+				new Vector3d(1/16., 0, 15/16.), new Vector4d(1/16., 15/16., 1/16., 15/16.)),
 				
 		};
 
