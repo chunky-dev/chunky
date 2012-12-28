@@ -53,7 +53,11 @@ public class SceneManager extends Thread {
 		/**
 		 * Load chunks
 		 */
-		LOAD_CHUNKS
+		LOAD_CHUNKS,
+		/**
+		 * Reload chunks
+		 */
+		RELOAD_CHUNKS
 	}
 	
 	private static final Logger logger =
@@ -110,6 +114,9 @@ public class SceneManager extends Thread {
 					case LOAD_CHUNKS:
 						renderManager.loadChunks(world, chunksToLoad);
 						break;
+					case RELOAD_CHUNKS:
+						renderManager.reloadChunks();
+						break;
 					default:
 						break;
 					}
@@ -147,6 +154,14 @@ public class SceneManager extends Thread {
 		chunksToLoad = chunks;
 		this.world = world;
 		action = Action.LOAD_CHUNKS;
+		notify();
+	}
+	
+	/**
+	 * Reload all chunks
+	 */
+	public synchronized void reloadChunks() {
+		action = Action.RELOAD_CHUNKS;
 		notify();
 	}
 	

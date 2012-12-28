@@ -481,6 +481,14 @@ public class RenderManager extends Thread implements IRenderManager, Renderer {
 		scene.moveCameraToCenter();
 		renderListener.chunksLoaded();
 	}
+	
+	/**
+	 * Attempts to reload all loaded chunks
+	 */
+	public void reloadChunks() {
+		scene.reloadChunks(renderListener);
+		renderListener.chunksLoaded();
+	}
 
 	@Override
 	public Scene bufferedScene() {

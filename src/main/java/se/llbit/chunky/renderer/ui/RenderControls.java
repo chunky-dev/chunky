@@ -515,6 +515,15 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
+		JButton reloadChunksBtn = new JButton("Reload Chunks");
+		reloadChunksBtn.setToolTipText("Reload all chunks in the scene");
+		reloadChunksBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sceneManager.reloadChunks();
+			}
+		});
+		
 		JButton openSceneDirBtn = new JButton("Open Scene Directory");
 		openSceneDirBtn.setToolTipText("Open the directory where Chunky stores scene descriptions and renders");
 		openSceneDirBtn.addActionListener(new ActionListener() {
@@ -623,7 +632,10 @@ public class RenderControls extends JDialog implements ViewListener,
 							.addComponent(loadSceneBtn)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(openSceneDirBtn))
-						.addComponent(loadSelectedChunksBtn)
+						.addGroup(layout.createSequentialGroup()
+							.addComponent(loadSelectedChunksBtn)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(reloadChunksBtn))
 						.addComponent(sep1)
 						.addGroup(layout.createSequentialGroup()
 							.addGroup(layout.createParallelGroup()
@@ -663,7 +675,9 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(loadSceneBtn)
 					.addComponent(openSceneDirBtn))
 				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(loadSelectedChunksBtn)
+				.addGroup(layout.createParallelGroup()
+					.addComponent(loadSelectedChunksBtn)
+					.addComponent(reloadChunksBtn))
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(sep1)
 				.addPreferredGap(ComponentPlacement.UNRELATED)

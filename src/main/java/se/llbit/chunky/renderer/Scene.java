@@ -1422,15 +1422,26 @@ public class Scene implements Refreshable {
 	private final boolean kill(Ray ray, Random random) {
 		return ray.depth >= rayDepth && random.nextDouble() < .5f;
 	}
+	
+	public synchronized void reloadChunks(ProgressListener progressListener) {
+		if (loadedWorld == null) {
+			logger.warn("Can not reload chunks -- unknown world file!");
+		}
+		
+		loadedWorld.setDimension(loadedDimension);
+		loadedWorld.reload();
+		loadChunks(progressListener, loadedWorld, loadedChunks);
+		refresh();
+	}
 
 	/**
 	 * Load chunks into the Octree
-	 * @param controls 
+	 * @param progressListener 
 	 * @param world
 	 * @param chunksToLoad
 	 */
 	public synchronized void loadChunks(
-			ProgressListener controls,
+			ProgressListener progressListener,
 			World world,
 			Collection<ChunkPosition> chunksToLoad) {
 		
@@ -1438,7 +1449,7 @@ public class Scene implements Refreshable {
 			return;
 		
 		String task = "Loading regions";
-		controls.setProgress(task, 0, 0, 1);
+		progressListener.setProgress(task, 0, 0, 1);
 		
 		loadedWorld = world;
 		loadedDimension = world.currentDimension();
@@ -1490,7 +1501,7 @@ public class Scene implements Refreshable {
 		int target = chunksToLoad.size()-1;
 		for (ChunkPosition cp : chunksToLoad) {
 			
-			controls.setProgress(task, done, 0, target);
+			progressListener.setProgress(task, done, 0, target);
 			done += 1;
 			
 			if (loadedChunks.contains(cp))
@@ -1635,7 +1646,7 @@ public class Scene implements Refreshable {
 		done = 0;
 		for (ChunkPosition cp : chunksToLoad) {
 			
-			controls.setProgress(task, done, 0, target);
+			progressListener.setProgress(task, done, 0, target);
 			done += 1;
 			
 			for (int cy = 0-origin.y; cy < Chunk.Y_MAX-origin.y; ++cy) {
