@@ -518,6 +518,7 @@ public class Controls extends JPanel {
 		JRadioButton layerModeBtn = new JRadioButton();
 		JRadioButton surfaceModeBtn = new JRadioButton();
 		JRadioButton caveModeBtn = new JRadioButton();
+		JRadioButton biomeModeBtn = new JRadioButton();
 		JSeparator sep1 = new JSeparator();
 		JLabel scaleLabel = new JLabel();
 		scaleField = new JFormattedTextField(NumberFormat.getInstance());
@@ -596,6 +597,14 @@ public class Controls extends JPanel {
 			}
 		});
 		
+		buttonGroup1.add(biomeModeBtn);
+		biomeModeBtn.setText("Biomes");
+		biomeModeBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				chunky.setRenderer(Chunk.biomeRenderer);
+			}
+		});
 
 		scaleLabel.setText(Messages.getString("Controls.Scale_lbl")); //$NON-NLS-1$
 
@@ -655,17 +664,18 @@ public class Controls extends JPanel {
 				.addGroup(layout.createParallelGroup(Alignment.LEADING)
 					.addComponent(sep1, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
 					.addGroup(layout.createSequentialGroup()
-							.addGroup(layout.createParallelGroup(Alignment.LEADING)
-									.addComponent(viewLabel)
-									.addComponent(layerModeBtn)
-									.addComponent(surfaceModeBtn)
-									.addComponent(caveModeBtn))
-							.addGap(18)
-							.addGroup(layout.createParallelGroup(Alignment.LEADING)
-									.addComponent(dimLabel)
-									.addComponent(earthBtn)
-									.addComponent(netherBtn)
-									.addComponent(endBtn)))
+						.addGroup(layout.createParallelGroup(Alignment.LEADING)
+							.addComponent(viewLabel)
+							.addComponent(layerModeBtn)
+							.addComponent(surfaceModeBtn)
+							.addComponent(caveModeBtn)
+							.addComponent(biomeModeBtn))
+						.addGap(18)
+						.addGroup(layout.createParallelGroup(Alignment.LEADING)
+							.addComponent(dimLabel)
+							.addComponent(earthBtn)
+							.addComponent(netherBtn)
+							.addComponent(endBtn)))
 					.addGroup(layout.createSequentialGroup()
 						.addGroup(layout.createParallelGroup(Alignment.TRAILING, false)
 							.addComponent(scaleField, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
@@ -708,6 +718,9 @@ public class Controls extends JPanel {
 				.addPreferredGap(ComponentPlacement.RELATED)
 				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(caveModeBtn)
+						.addComponent(endBtn))
+				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(biomeModeBtn)
 						.addComponent(endBtn))
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(sep1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)

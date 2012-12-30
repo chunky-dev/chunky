@@ -138,12 +138,36 @@ public class Layer {
 		}
 	};
 	
+	/**
+	 * Creates a new tile layer
+	 * @param data tile data
+	 */
 	private Layer(byte[] data) {
 		blocks = data;
 	}
 	
+	/**
+	 * Creates a new bitmap layer
+	 * @param data bitmap data
+	 */
 	private Layer(int[] data) {
 		bitmap = data;
+		avgColor = avgBitmapColor();
+	}
+
+	private int avgBitmapColor() {
+		float[] avg = new float[3];
+		float[] frgb = new float[3];
+		for (int i = 0; i < 16*16; ++i) {
+			Color.getRGBComponents(bitmap[i], frgb);
+			avg[0] += frgb[0];
+			avg[1] += frgb[1];
+			avg[2] += frgb[2];
+		}
+		return Color.getRGB(
+				avg[0] / (16 * 16),
+				avg[1] / (16 * 16),
+				avg[2] / (16 * 16));
 	}
 
 	/**
@@ -335,6 +359,21 @@ public class Layer {
 		}
 		return new Layer(data);
 	}
+	
+	/**
+	 * Load biome IDs into layer
+	 * @param chunkBiomes
+	 * @return
+	 */
+	public static Layer loadBiomes(byte[] chunkBiomes) {
+		int[]	surface = new int[16*16];
+		for (int x = 0; x < 16; ++x) {
+			for (int z = 0; z < 16; ++z) {
+				surface[x*16+z] = Biomes.getColor(chunkBiomes[Chunk.chunkXZIndex(x, z)]);
+			}
+		}
+		return new Layer(surface);
+	}
 
 	/**
 	 * Generate the surface bitmap.
@@ -349,7 +388,6 @@ public class Layer {
 	public static Layer loadSurface(int dim, ChunkPosition position,
 			byte[] blocksArray, byte[] biomes, byte[] blockData) {
 		
-		float[] avg = new float[3];
 		int[] surface = new int[16*16];
 		for (int x = 0; x < 16; ++x) {
 			for (int z = 0; z < 16; ++z) {
@@ -462,19 +500,10 @@ public class Layer {
 				}
 				
 				surface[x*16+z] = Color.getRGBA(color[0], color[1], color[2], color[3]);
-				
-				avg[0] += color[0];
-				avg[1] += color[1];
-				avg[2] += color[2];
 			}
 		}
 		
-		Layer layer = new Layer(surface);
-		layer.avgColor = Color.getRGB(
-				avg[0] / (16 * 16),
-				avg[1] / (16 * 16),
-				avg[2] / (16 * 16));
-		return layer;
+		return new Layer(surface);
 	}
 	
 	/**

@@ -69,6 +69,7 @@ public class Chunk {
     protected Layer layer = Layer.unknownLayer;
     protected Layer surface = Layer.unknownLayer;
     protected Layer caves = Layer.unknownLayer;
+    protected Layer biomes = Layer.unknownLayer;
     
     private final World world;
     
@@ -102,6 +103,15 @@ public class Chunk {
 	public static Renderer caveRenderer = new Renderer() {
 		public void render(Chunk chunk, RenderBuffer rbuff, int cx, int cz) {
 			chunk.renderCaves(rbuff, cx, cz);
+		}
+	};
+	
+	/**
+	 * Renders caves and other underground caverns
+	 */
+	public static Renderer biomeRenderer = new Renderer() {
+		public void render(Chunk chunk, RenderBuffer rbuff, int cx, int cz) {
+			chunk.renderBiomes(rbuff, cx, cz);
 		}
 	};
 	
@@ -143,6 +153,10 @@ public class Chunk {
 
 	protected void renderCaves(RenderBuffer rbuff, int cx, int cz) {
 		caves.render(rbuff, cx, cz);
+	}
+	
+	protected void renderBiomes(RenderBuffer rbuff, int cx, int cz) {
+		biomes.render(rbuff, cx, cz);
 	}
 	
 	/**
@@ -251,6 +265,7 @@ public class Chunk {
 					surface = Layer.loadSurface(world.currentDimension(), position,
 							chunkData, chunkBiomes, blockData);
 					layer = Layer.loadLayer(chunkData, requestedLayer);
+					biomes = Layer.loadBiomes(chunkBiomes);
 					renderTopography();
 				} else if (surface == Layer.unknownLayer) {
 				    layer = Layer.emptyLayer;
