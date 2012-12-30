@@ -363,7 +363,7 @@ public class Layer {
 	/**
 	 * Load biome IDs into layer
 	 * @param chunkBiomes
-	 * @return
+	 * @return The loaded layer
 	 */
 	public static Layer loadBiomes(byte[] chunkBiomes) {
 		int[]	surface = new int[16*16];
