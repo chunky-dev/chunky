@@ -1,6 +1,7 @@
 2012-12-30  Jesper Öqvist <jesper@llbit.se>
 
     * Added biome map mode - renders a map color coded by biome ID
+    * Lily pads render with the correct rotation (same as in-game)
 
 2012-12-28  Jesper Öqvist <jesper@llbit.se>
 
