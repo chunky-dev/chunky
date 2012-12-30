@@ -3,6 +3,12 @@ Chunky
 
 Chunky is a Minecraft mapping and rendering tool.
 
+Quick links:
+
+* [Wiki](http://chunky.llbit.se)
+* [Subreddit](http://www.reddit.com/r/chunky)
+* [Dev Blog](http://llbit.se)
+
 Copyright & License
 -------------------
 
