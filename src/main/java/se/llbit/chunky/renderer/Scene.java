@@ -1423,6 +1423,10 @@ public class Scene implements Refreshable {
 		return ray.depth >= rayDepth && random.nextDouble() < .5f;
 	}
 	
+	/**
+	 * Reload all loaded chunks.
+	 * @param progressListener
+	 */
 	public synchronized void reloadChunks(ProgressListener progressListener) {
 		if (loadedWorld == null) {
 			logger.warn("Can not reload chunks -- unknown world file!");
