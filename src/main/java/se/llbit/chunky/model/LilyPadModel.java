@@ -17,6 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Color;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
@@ -32,25 +33,33 @@ public class LilyPadModel {
 	private static final Quad quad =
 			new DoubleSidedQuad(new Vector3d(1, .875, 0), new Vector3d(0, .875, 0),
 				new Vector3d(1, .875, 1), new Vector4d(1, 0, 0, 1));
-
+	
+	private static final Quad[] rot = new Quad[4];
+	
 	private static final int COLOR = 0x009218;
 	private static final float[] lilyPadColor = new float[4];
+	
 	static {
+		rot[0] = quad;
+		rot[3] = rot[0].getYRotated();
+		rot[2] = rot[3].getYRotated();
+		rot[1] = rot[2].getYRotated();
 		Color.getRGBAComponents(COLOR, lilyPadColor);
 	}
 	
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray) {
 		ray.t = Double.POSITIVE_INFINITY;
-		if (quad.intersect(ray)) {
+		int	dir = 3 & (ray.currentMaterial >> BlockData.LILY_PAD_ROTATION);
+		if (rot[dir].intersect(ray)) {
 			float[] color = Texture.lilyPad.getColor(ray.u, ray.v);
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
 				ray.color.x *= lilyPadColor[0];
 				ray.color.y *= lilyPadColor[1];
 				ray.color.z *= lilyPadColor[2];
-				ray.n.set(quad.n);
-				ray.n.scale(-Math.signum(ray.d.dot(quad.n)));
+				ray.n.set(0, 1, 0);
+				ray.n.scale(-Math.signum(ray.d.y));
 				ray.distance += ray.tNear;
 				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
 				return true;

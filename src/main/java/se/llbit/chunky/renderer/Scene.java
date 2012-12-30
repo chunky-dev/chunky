@@ -1568,9 +1568,16 @@ public class Scene implements Refreshable {
 								index = Chunk.chunkIndex(cx, cy+1, cz);
 								Block above = Block.values[0xFF & blocks[index]];
 								if (above.isWater()) {
-									type = type | (1<<WaterModel.FULL_BLOCK);
+									type |= (1<<WaterModel.FULL_BLOCK);
 								} else if (above == Block.LILY_PAD) {
-									type = type | (1<<13);
+									type |= (1<<BlockData.LILY_PAD);
+									long wx = cp.x * 16L + cx;
+									long wy = cy + 1;
+									long wz = cp.z * 16L + cz;
+									long pr = (wx * 3129871L) ^ (wz * 116129781L) ^ ((long) wy);
+							        pr = pr * pr * 42317861L + pr * 11L;
+							        int dir = 3 & (int)(pr >> 16);
+									type |= (dir<<BlockData.LILY_PAD_ROTATION);
 								}
 							}
 							break;

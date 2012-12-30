@@ -29,6 +29,16 @@ public interface BlockData {
 	int VINE_TOP = 12;
 	
 	/**
+	 * The water block has a lily pad floating on it
+	 */
+	int LILY_PAD = 13;
+	
+	/**
+	 * Rotation of the lily pad
+	 */
+	int LILY_PAD_ROTATION = 14;
+	
+	/**
 	 * Offset to bottom door metadata
 	 */
 	int DOOR_BOTTOM = 12;
