@@ -265,7 +265,7 @@ public class Ray {
 	 */
 	public final float[] getBiomeColor() {
 		int biomeId = 0xFF & (currentMaterial >> 24);
-		return Biomes.getColorCorrected(biomeId);
+		return Biomes.getGrassColorCorrected(biomeId);
 	}
 
 	/**

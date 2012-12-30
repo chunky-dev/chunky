@@ -433,7 +433,7 @@ public class Layer {
 					case Block.GRASS_ID:
 					case Block.TALLGRASS_ID:
 						int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
-						Color.getRGBComponents(Biomes.getColor(biomeId), blockColor);
+						Color.getRGBComponents(Biomes.getGrassColor(biomeId), blockColor);
 						blockColor[3] = 1.f;// grass colors don't include alpha
 						
 						y -= 1;

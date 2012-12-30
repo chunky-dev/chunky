@@ -25,6 +25,31 @@ import se.llbit.math.Color;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Biomes {
+	private static final int[] biomeColor = {
+			0x000070,// ocean
+			0x8DB360,// plains
+			0xFA9418,// desert
+			0x606060,// extreme hills
+			0x056621,// forest
+			0x00DD2D,// taiga
+			0x07F9B2,// swampland
+			0x0000FF,// river
+			0xFF0000,// hell
+			0x8080FF,// sky
+			0x9090A0,// frozen ocean
+			0xA0A0FF,// frozen river
+			0xFFFFFF,// ice plains
+			0xA0A0A0,// ice mountains
+			0xFF00FF,// mushroom island
+			0xA000FF,// mushroom island shore
+			0xFADE55,// beach
+			0xD25F12,// desert hills
+			0x22551C,// forest hills
+			0x163933,// taiga hills
+			0x72789A,// extreme hills edge
+			0x537B09,// jungle
+			0x2C4205,// jungle hills
+	};
 	private static final int[] grassColor = {
 			0x75B646,// ocean
 			0x8DB84A,// plains
@@ -80,6 +105,16 @@ public class Biomes {
 	public static final int getColor(int biomeId) {
 		if (biomeId > grassColor.length)
 			return UNKNOWN_COLOR;
+		return biomeColor[biomeId];
+	}
+	
+	/**
+	 * @param biomeId
+	 * @return Biome color for given biome ID
+	 */
+	public static final int getGrassColor(int biomeId) {
+		if (biomeId > grassColor.length)
+			return UNKNOWN_COLOR;
 		return grassColor[biomeId];
 	}
 	
@@ -87,7 +122,7 @@ public class Biomes {
 	 * @param biomeId
 	 * @return Linear biome color for given biome ID
 	 */
-	public static final float[] getColorCorrected(int biomeId) {
+	public static final float[] getGrassColorCorrected(int biomeId) {
 		if (!biomeColorsEnabled)
 			return gammaCorrected[0];
 		if (biomeId > gammaCorrected.length)
