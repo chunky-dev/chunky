@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.Sun;
+import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.Icon;
 import se.llbit.util.ProgramProperties;
@@ -52,6 +53,7 @@ public class TexturePackLoader {
 		SUN,
 		SIGN,
 		CLOUDS,
+		GRASSCOLOR,
 	}
 	
 	/**
@@ -128,6 +130,15 @@ public class TexturePackLoader {
 						loadCloudsTexture(imageStream);
 					}
 					break;
+					
+				case GRASSCOLOR:
+					imageStream = tpZip.getInputStream(new ZipEntry("misc/grasscolor.png"));
+					if (imageStream == null) {
+						logger.info("Could not load file misc/grasscolor.png from default texture pack!");
+					} else {
+						loadGrassColorTexture(imageStream);
+					}
+					
 				}
 			}
 			
@@ -207,6 +218,14 @@ public class TexturePackLoader {
 				loadCloudsTexture(imageStream);
 			}
 			
+			imageStream = tpZip.getInputStream(new ZipEntry("misc/grasscolor.png"));
+			if (imageStream == null) {
+				logger.info("Could not load file misc/grasscolor.png from texture pack!");
+				defaultTextures.add(TextureFile.GRASSCOLOR);
+			} else {
+				loadGrassColorTexture(imageStream);
+			}
+			
 			tpZip.close();
 			
 			ProgramProperties.setProperty("lastTexturePack", tpFile.getAbsolutePath());
@@ -244,6 +263,13 @@ public class TexturePackLoader {
 				Clouds.setCloud(x, y, v);
 			}
 		}
+	}
+	
+	private static void loadGrassColorTexture(InputStream imageStream)
+			throws IOException {
+		
+		Texture grasscolor = new Texture(ImageIO.read(imageStream));
+		Biomes.loadGrassColors(grasscolor);
 	}
 	
 	private static void loadChestTextures(InputStream imageStream)

@@ -52,4 +52,9 @@ public interface BlockData {
 	 * Offset for stone wall data
 	 */
 	int STONEWALL_CONN = 9;
+	
+	/**
+	 * Offset for biome ID
+	 */
+	int BIOME_ID = 24;
 }

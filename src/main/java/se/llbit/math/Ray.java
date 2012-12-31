@@ -18,6 +18,7 @@ package se.llbit.math;
 
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Block;
+import se.llbit.chunky.world.BlockData;
 
 /**
  * The ray representation used for ray tracing.
@@ -263,9 +264,8 @@ public class Ray {
 	/**
 	 * @return Biome color of current block
 	 */
-	public final float[] getBiomeColor() {
-		int biomeId = 0xFF & (currentMaterial >> 24);
-		return Biomes.getGrassColorCorrected(biomeId);
+	public final float[] getBiomeGrassColor() {
+		return Biomes.getGrassColorCorrected(currentMaterial >> BlockData.BIOME_ID);
 	}
 
 	/**

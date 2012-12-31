@@ -36,7 +36,7 @@ public class TallGrassModel extends SpriteModel {
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
 					if (kind != 0) {
-						float[] biomeColor = ray.getBiomeColor();
+						float[] biomeColor = ray.getBiomeGrassColor();
 						ray.color.x *= biomeColor[0];
 						ray.color.y *= biomeColor[1];
 						ray.color.z *= biomeColor[2];
