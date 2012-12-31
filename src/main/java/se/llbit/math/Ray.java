@@ -262,10 +262,17 @@ public class Ray {
 	}
 
 	/**
-	 * @return Biome color of current block
+	 * @return Biome grass color of current block
 	 */
 	public final float[] getBiomeGrassColor() {
-		return Biomes.getGrassColorCorrected(currentMaterial >> BlockData.BIOME_ID);
+		return Biomes.getGrassColorLinear(currentMaterial >> BlockData.BIOME_ID);
+	}
+
+	/**
+	 * @return Biome foliage color of current block
+	 */
+	public final float[] getBiomeFoliageColor() {
+		return Biomes.getFoliageColorLinear(currentMaterial >> BlockData.BIOME_ID);
 	}
 
 	/**

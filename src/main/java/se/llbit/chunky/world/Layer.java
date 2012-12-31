@@ -426,13 +426,19 @@ public class Layer {
 					int blockId = 0xFF & blocksArray[Chunk.chunkIndex(x, y, z)];
 					Block block = Block.values[blockId];
 					float[] blockColor = new float[4];
+					int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
 					
 					switch (block.id) {
 					
 					case Block.LEAVES_ID:
+						Color.getRGBComponents(Biomes.getFoliageColor(biomeId), blockColor);
+						blockColor[3] = 1.f;// grass colors don't include alpha
+						
+						y -= 1;
+						break;
+						
 					case Block.GRASS_ID:
 					case Block.TALLGRASS_ID:
-						int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
 						Color.getRGBComponents(Biomes.getGrassColor(biomeId), blockColor);
 						blockColor[3] = 1.f;// grass colors don't include alpha
 						

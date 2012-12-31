@@ -54,6 +54,7 @@ public class TexturePackLoader {
 		SIGN,
 		CLOUDS,
 		GRASSCOLOR,
+		FOLIAGECOLOR,
 	}
 	
 	/**
@@ -137,6 +138,14 @@ public class TexturePackLoader {
 						logger.info("Could not load file misc/grasscolor.png from default texture pack!");
 					} else {
 						loadGrassColorTexture(imageStream);
+					}
+					
+				case FOLIAGECOLOR:
+					imageStream = tpZip.getInputStream(new ZipEntry("misc/foliagecolor.png"));
+					if (imageStream == null) {
+						logger.info("Could not load file misc/foliagecolor.png from default texture pack!");
+					} else {
+						loadFoliageColorTexture(imageStream);
 					}
 					
 				}
@@ -226,6 +235,14 @@ public class TexturePackLoader {
 				loadGrassColorTexture(imageStream);
 			}
 			
+			imageStream = tpZip.getInputStream(new ZipEntry("misc/foliagecolor.png"));
+			if (imageStream == null) {
+				logger.info("Could not load file misc/foliagecolor.png from texture pack!");
+				defaultTextures.add(TextureFile.FOLIAGECOLOR);
+			} else {
+				loadFoliageColorTexture(imageStream);
+			}
+			
 			tpZip.close();
 			
 			ProgramProperties.setProperty("lastTexturePack", tpFile.getAbsolutePath());
@@ -268,8 +285,21 @@ public class TexturePackLoader {
 	private static void loadGrassColorTexture(InputStream imageStream)
 			throws IOException {
 		
-		Texture grasscolor = new Texture(ImageIO.read(imageStream));
+		BufferedImage grasscolor = ImageIO.read(imageStream);
+		if (grasscolor.getWidth() != 256 || grasscolor.getHeight() != 256) {
+			throw new IOException("Error: Grass color texture must be 256 by 256 pixels!");
+		}
 		Biomes.loadGrassColors(grasscolor);
+	}
+	
+	private static void loadFoliageColorTexture(InputStream imageStream)
+			throws IOException {
+		
+		BufferedImage grasscolor = ImageIO.read(imageStream);
+		if (grasscolor.getWidth() != 256 || grasscolor.getHeight() != 256) {
+			throw new IOException("Error: Foliage color texture must be 256 by 256 pixels!");
+		}
+		Biomes.loadFoliageColors(grasscolor);
 	}
 	
 	private static void loadChestTextures(InputStream imageStream)

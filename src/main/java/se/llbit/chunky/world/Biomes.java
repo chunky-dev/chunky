@@ -16,8 +16,9 @@
  */
 package se.llbit.chunky.world;
 
+import java.awt.image.BufferedImage;
+
 import se.llbit.chunky.renderer.Scene;
-import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Color;
 
 /**
@@ -26,6 +27,7 @@ import se.llbit.math.Color;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Biomes {
+	private static final int SWAMP_ID = 6;
 	/**
 	 * Temperature and rain values, clamped to [0,1]
 	 */
@@ -81,7 +83,9 @@ public class Biomes {
 	};
 	
 	private static int[] grassColor = new int[256];
-	private static float[][] grassColorCorrected = new float[grassColor.length][3];
+	private static int[] foliageColor = new int[256];
+	private static float[][] grassColorLinear = new float[grassColor.length][3];
+	private static float[][] foliageColorLinear = new float[grassColor.length][3];
 	private static final int UNKNOWN_COLOR = 0x7E7E7E;
 	
 	static {
@@ -91,7 +95,7 @@ public class Biomes {
 		grassColor[3] = 0x75B646;// extreme hills
 		grassColor[4] = 0x4A8F3A;// forest
 		grassColor[5] = 0x478852;// taiga
-		grassColor[6] = 0x3e5226;// swampland
+		grassColor[SWAMP_ID] = 0x3e5226;// swampland
 		grassColor[7] = 0x75B646;// river
 		grassColor[8] = 0x75B646;// hell
 		grassColor[9] = 0x75B646;// sky
@@ -109,10 +113,19 @@ public class Biomes {
 		grassColor[21] = 0x3A8B25;// jungle
 		grassColor[22] = 0x3A8B25;// jungle hills
 		
-		for (int i = 23; i < 256; ++i)
+		for (int i = 23; i < 256; ++i) {
 			grassColor[i] = UNKNOWN_COLOR;
+		}
 		
-		gammaCorrectColors();
+		gammaCorrectColors(grassColor, grassColorLinear);
+		
+		for (int i = 0; i < 256; ++i) {
+			foliageColor[i] = grassColor[i];
+			foliageColorLinear[i][0] = grassColorLinear[i][0];
+			foliageColorLinear[i][1] = grassColorLinear[i][1];
+			foliageColorLinear[i][2] = grassColorLinear[i][2];
+		}
+		
 	}
 	
 	/**
@@ -132,34 +145,45 @@ public class Biomes {
 	 * Loads grass colors from a grass color texture
 	 * @param texture
 	 */
-	public static void loadGrassColors(Texture texture) {
-		double	temp, rain;
-		float[]	rgba;
-		for (int i = 0; i < tempAndRain.length; ++i) {
-			temp = tempAndRain[i][0];
-			rain = tempAndRain[i][1];
-			rain *= temp;
-			rgba = texture.getColor(1.0-temp, rain);
-			grassColorCorrected[i][0] = rgba[0];
-			grassColorCorrected[i][1] = rgba[1];
-			grassColorCorrected[i][2] = rgba[2];
-			grassColor[i] = Color.getRGB(grassColorCorrected[i]);
-		}
+	public static void loadGrassColors(BufferedImage texture) {
+		loadColorsFromTexture(grassColor, texture);
+		gammaCorrectColors(grassColor, grassColorLinear);
 	}
 	
-	private static void gammaCorrectColors() {
+	/**
+	 * Loads foliage colors from a grass color texture
+	 * @param texture
+	 */
+	public static void loadFoliageColors(BufferedImage texture) {
+		loadColorsFromTexture(foliageColor, texture);
+		gammaCorrectColors(foliageColor, foliageColorLinear);
+	}
+	
+	private static void loadColorsFromTexture(int[] dest, BufferedImage texture) {
+		for (int i = 0; i < tempAndRain.length; ++i) {
+			double temp = tempAndRain[i][0];
+			double rain = tempAndRain[i][1];
+			rain *= temp;
+			int	color = texture.getRGB((int) ((1-temp) * 255), (int) ((1-rain) * 255));
+			dest[i] = color;
+		}
+		// swamp get special treatment
+		dest[SWAMP_ID] = ((dest[SWAMP_ID] & 0xFEFEFE) + 0x4E0E4E) / 2;
+	}
+
+	private static void gammaCorrectColors(int[] src, float[][] dest) {
 		float[] frgb = new float[3];
-		for (int i = 0; i < grassColor.length; ++i) {
-			Color.getRGBComponents(grassColor[i], frgb);
-			grassColorCorrected[i][0] = (float) Math.pow(frgb[0], Scene.DEFAULT_GAMMA);
-			grassColorCorrected[i][1] = (float) Math.pow(frgb[1], Scene.DEFAULT_GAMMA);
-			grassColorCorrected[i][2] = (float) Math.pow(frgb[2], Scene.DEFAULT_GAMMA);
+		for (int i = 0; i < src.length; ++i) {
+			Color.getRGBComponents(src[i], frgb);
+			dest[i][0] = (float) Math.pow(frgb[0], Scene.DEFAULT_GAMMA);
+			dest[i][1] = (float) Math.pow(frgb[1], Scene.DEFAULT_GAMMA);
+			dest[i][2] = (float) Math.pow(frgb[2], Scene.DEFAULT_GAMMA);
 		}
 	}
 
 	/**
 	 * @param biomeId
-	 * @return Biome color for given biome ID
+	 * @return Grass color for the given biome ID
 	 */
 	public static final int getGrassColor(int biomeId) {
 		return grassColor[0xFF & biomeId];
@@ -167,11 +191,29 @@ public class Biomes {
 	
 	/**
 	 * @param biomeId
-	 * @return Linear biome color for given biome ID
+	 * @return Foliage color for the given biome ID
 	 */
-	public static final float[] getGrassColorCorrected(int biomeId) {
+	public static final int getFoliageColor(int biomeId) {
+		return foliageColor[0xFF & biomeId];
+	}
+	
+	/**
+	 * @param biomeId
+	 * @return Linear biome color for the given biome ID
+	 */
+	public static final float[] getGrassColorLinear(int biomeId) {
 		if (!biomeColorsEnabled)
-			return grassColorCorrected[0];
-		return grassColorCorrected[biomeId];
+			return grassColorLinear[0];
+		return grassColorLinear[biomeId];
+	}
+	
+	/**
+	 * @param biomeId
+	 * @return Linear foliage color for the given biome ID
+	 */
+	public static final float[] getFoliageColorLinear(int biomeId) {
+		if (!biomeColorsEnabled)
+			return foliageColorLinear[0];
+		return foliageColorLinear[biomeId];
 	}
 }
