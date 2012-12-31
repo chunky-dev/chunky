@@ -1548,6 +1548,7 @@ public class Scene implements Refreshable {
 						else if (block == Block.STATIONARYLAVA)
 							block = Block.LAVA;
 						
+						int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(cx, cz)];
 						int type = block.id;
 						// store metadata
 						switch (block.id) {
@@ -1560,6 +1561,8 @@ public class Scene implements Refreshable {
 									type = type | (1<<BlockData.VINE_TOP);
 								}
 							}
+							// save biome ID
+							type |= biomeId << BlockData.BIOME_ID;
 							break;
 							
 						case Block.WATER_ID:
@@ -1607,8 +1610,7 @@ public class Scene implements Refreshable {
 						case Block.TALLGRASS_ID:
 						case Block.LEAVES_ID:
 							// save biome ID
-							int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(cx, cz)];
-							type |= biomeId << 24;
+							type |= biomeId << BlockData.BIOME_ID;
 							break;
 							
 						case Block.WOODENDOOR_ID:
