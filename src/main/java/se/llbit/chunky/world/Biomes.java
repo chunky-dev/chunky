@@ -198,7 +198,7 @@ public class Biomes {
 	}
 	
 	/**
-	 * @param biomeId
+	 * @param biomeId Must be in the range [0,255]
 	 * @return Linear biome color for the given biome ID
 	 */
 	public static final float[] getGrassColorLinear(int biomeId) {
@@ -208,7 +208,7 @@ public class Biomes {
 	}
 	
 	/**
-	 * @param biomeId
+	 * @param biomeId Must be in the range [0,255]
 	 * @return Linear foliage color for the given biome ID
 	 */
 	public static final float[] getFoliageColorLinear(int biomeId) {

@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.model;
 
+import se.llbit.chunky.renderer.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
@@ -24,13 +25,13 @@ import se.llbit.math.Ray;
 public class LeafModel {
 	private static final AABB block = new AABB(0, 1, 0, 1, 0, 1);
 	
-	public static boolean intersect(Ray ray) {
+	public static boolean intersect(Ray ray, Scene scene) {
 		ray.t = Double.POSITIVE_INFINITY;
 		if (block.intersect(ray)) {
 			float[] color = Texture.leaves[ray.getBlockData() & 3].getColor(ray.u, ray.v);
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
-				float[] biomeColor = ray.getBiomeFoliageColor();
+				float[] biomeColor = ray.getBiomeFoliageColor(scene);
 				ray.color.x *= biomeColor[0];
 				ray.color.y *= biomeColor[1];
 				ray.color.z *= biomeColor[2];

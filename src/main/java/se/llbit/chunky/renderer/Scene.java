@@ -44,7 +44,9 @@ import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.WorldTexture;
 import se.llbit.math.Color;
 import se.llbit.math.Octree;
 import se.llbit.math.QuickMath;
@@ -200,6 +202,9 @@ public class Scene implements Refreshable {
 	private int dumpFrequency = DEFAULT_DUMP_FREQUENCY;
 	
 	private int waterHeight = 0;
+	
+	private WorldTexture grassTexture = new WorldTexture();
+	private WorldTexture foliageTexture = new WorldTexture();
 
 	/**
 	 * Current SPP for the scene
@@ -278,6 +283,8 @@ public class Scene implements Refreshable {
 		// the octree reference is overwritten to save time
 		// when the other scene is changed it must create a new octree
 		octree = other.octree;
+		grassTexture = other.grassTexture;
+		foliageTexture = other.foliageTexture;
 		origin.set(other.origin);
 		
 		loadedChunks = other.loadedChunks;
@@ -761,7 +768,7 @@ public class Scene implements Refreshable {
 					return exitWater(ray);
 				}
 
-				if (currentBlock.intersect(ray)) {
+				if (currentBlock.intersect(ray, this)) {
 					if (prevBlock != currentBlock)
 						return true;
 
@@ -841,7 +848,7 @@ public class Scene implements Refreshable {
 		double distance;
 		
 		while (true) {
-			Block.WATER.intersect(ray);
+			Block.WATER.intersect(ray, this);
 			ray.n.x = -ray.n.x;
 			ray.n.y = -ray.n.y;
 			ray.n.z = -ray.n.z;
@@ -893,7 +900,7 @@ public class Scene implements Refreshable {
 			
 			if (currentBlock.localIntersect) {
 				
-				if (!currentBlock.intersect(ray)) {
+				if (!currentBlock.intersect(ray, this)) {
 					ray.currentMaterial = Block.AIR.id;
 					return true;
 				}
@@ -1500,6 +1507,7 @@ public class Scene implements Refreshable {
 			world.getRegion(region).parse();
 		}
 
+		Heightmap biomeIdMap = new Heightmap();
 		task = "Loading chunks";
 		int done = 0;
 		int target = chunksToLoad.size()-1;
@@ -1515,6 +1523,15 @@ public class Scene implements Refreshable {
 
 			world.getChunk(cp).getBlockData(blocks, data, biomes);
 			chunks += 1;
+			
+			for (int cz = 0; cz < 16; ++cz) {
+				int wz = cz + cp.z*16;
+				for (int cx = 0; cx < 16; ++cx) {
+					int wx = cx + cp.x*16;
+					int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(cx, cz)];
+					biomeIdMap.set(biomeId, wx, wz);
+				}
+			}
 			
 			for (int cy = 0; cy < 256; ++cy) {
 				for (int cz = 0; cz < 16; ++cz) {
@@ -1548,7 +1565,6 @@ public class Scene implements Refreshable {
 						else if (block == Block.STATIONARYLAVA)
 							block = Block.LAVA;
 						
-						int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(cx, cz)];
 						int type = block.id;
 						// store metadata
 						switch (block.id) {
@@ -1561,8 +1577,6 @@ public class Scene implements Refreshable {
 									type = type | (1<<BlockData.VINE_TOP);
 								}
 							}
-							// save biome ID
-							type |= biomeId << BlockData.BIOME_ID;
 							break;
 							
 						case Block.WATER_ID:
@@ -1607,12 +1621,6 @@ public class Scene implements Refreshable {
 							}
 							// fallthrough!
 							
-						case Block.TALLGRASS_ID:
-						case Block.LEAVES_ID:
-							// save biome ID
-							type |= biomeId << BlockData.BIOME_ID;
-							break;
-							
 						case Block.WOODENDOOR_ID:
 						case Block.IRONDOOR_ID:
 						{
@@ -1655,9 +1663,57 @@ public class Scene implements Refreshable {
 			}
 		}
 		
+		grassTexture = new WorldTexture();
+		foliageTexture = new WorldTexture();
+		
+		Set<ChunkPosition> chunkSet = new HashSet<ChunkPosition>(chunksToLoad);
+		
 		task = "Finalizing octree";
 		done = 0;
 		for (ChunkPosition cp : chunksToLoad) {
+			
+			// finalize grass and foliage textures
+			// box blur 3x3
+			for (int x = 0; x < 16; ++x) {
+				for (int z = 0; z < 16; ++z) {
+					
+					int nsum = 0;
+					float[] grassMix = { 0, 0, 0 };
+					float[] foliageMix = { 0, 0, 0 };
+					for (int sx = x-1; sx <= x+1; ++sx) {
+						int wx = cp.x*16 + sx;
+						for (int sz = z-1; sz <= z+1; ++sz) {
+							int wz = cp.z*16 + sz;
+							
+							ChunkPosition ccp = ChunkPosition.get(wx / 16, wz / 16);
+							if (chunkSet.contains(ccp)) {
+								nsum += 1;
+								int biomeId = 0xFF & biomeIdMap.get(wx, wz);
+								float[] grassColor = Biomes.getGrassColorLinear(biomeId);
+								grassMix[0] += grassColor[0];
+								grassMix[1] += grassColor[1];
+								grassMix[2] += grassColor[2];
+								float[] foliageColor = Biomes.getFoliageColorLinear(biomeId);
+								foliageMix[0] += foliageColor[0];
+								foliageMix[1] += foliageColor[1];
+								foliageMix[2] += foliageColor[2];
+							}
+						}
+					}
+					
+					grassMix[0] /= nsum;
+					grassMix[1] /= nsum;
+					grassMix[2] /= nsum;
+					grassTexture.set(cp.x*16 + x - origin.x,
+							cp.z*16 + z - origin.z, grassMix);
+					
+					foliageMix[0] /= nsum;
+					foliageMix[1] /= nsum;
+					foliageMix[2] /= nsum;
+					foliageTexture.set(cp.x*16 + x - origin.x,
+							cp.z*16 + z - origin.z, foliageMix);
+				}
+			}
 			
 			progressListener.setProgress(task, done, 0, target);
 			done += 1;
@@ -2974,6 +3030,24 @@ public class Scene implements Refreshable {
 	 */
 	public void softRefresh() {
 		refresh = true;
+	}
+
+	/**
+	 * @param x X coordinate in octree space
+	 * @param z Z coordinate in octree space
+	 * @return Foliage color for the given coordinates
+	 */
+	public float[] getFoliageColor(int x, int z) {
+		return foliageTexture.get(x, z);
+	}
+
+	/**
+	 * @param x X coordinate in octree space
+	 * @param z Z coordinate in octree space
+	 * @return Grass color for the given coordinates
+	 */
+	public float[] getGrassColor(int x, int z) {
+		return grassTexture.get(x, z);
 	}
 
 }

@@ -69,6 +69,7 @@ import se.llbit.chunky.model.VineModel;
 import se.llbit.chunky.model.WallSignModel;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.model.WoodModel;
+import se.llbit.chunky.renderer.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
@@ -98,8 +99,8 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
-			return GrassModel.intersect(ray);
+		public boolean intersect(Ray ray, Scene scene) {
+			return GrassModel.intersect(ray, scene);
 		}
 	};
 	public static final Block DIRT = new Block(0x03, "Dirt", Texture.dirt) {
@@ -122,7 +123,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray,
 					Texture.woodPlank[ray.getBlockData() % 4]);
 		}
@@ -134,7 +135,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return SaplingModel.intersect(ray);
 		}
 	};
@@ -149,7 +150,7 @@ public class Block {
 			ior = 1.333f;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return WaterModel.intersect(ray);
 		}
 	};
@@ -163,7 +164,7 @@ public class Block {
 			ior = 1.333f;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return WaterModel.intersect(ray);
 		}
 	};
@@ -176,7 +177,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return LavaModel.intersect(ray);
 		}
 	};
@@ -188,7 +189,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return LavaModel.intersect(ray);
 		}
 	};
@@ -230,7 +231,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return WoodModel.intersect(ray);
 		}
 	};
@@ -242,8 +243,8 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
-			return LeafModel.intersect(ray);
+		public boolean intersect(Ray ray, Scene scene) {
+			return LeafModel.intersect(ray, scene);
 		}
 	};
 	public static final Block SPONGE = new Block(0x13, "Sponge", Texture.sponge) {
@@ -287,7 +288,7 @@ public class Block {
 				Texture.furnaceTop,
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return FurnaceModel.intersect(ray, tex);
 		}
 	};
@@ -329,7 +330,7 @@ public class Block {
 			},
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray,
 					tex[ray.getBlockData() % 3]);
 		}
@@ -347,7 +348,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return BedModel.intersect(ray);
 		}
 	};
@@ -358,7 +359,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return RailModel.intersect(ray,
 					Texture.poweredRails[ray.getBlockData() >>> 3],
 					(ray.getBlockData() & 7) % 6);
@@ -371,7 +372,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return RailModel.intersect(ray, Texture.detectorRails,
 					(ray.getBlockData() & 7) % 6);
 		}
@@ -383,7 +384,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return PistonModel.intersect(ray, 1);
 		}
 	};
@@ -394,7 +395,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return SpriteModel.intersect(ray, Texture.cobweb);
 		}
 	};
@@ -406,8 +407,8 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
-			return TallGrassModel.intersect(ray);
+		public boolean intersect(Ray ray, Scene scene) {
+			return TallGrassModel.intersect(ray, scene);
 		}
 	};
 	public static final Block DEADBUSH = new Block(0x20, "Dead Bush", Texture.deadBush) {
@@ -417,7 +418,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return SpriteModel.intersect(ray, Texture.deadBush);
 		}
 	};
@@ -428,7 +429,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return PistonModel.intersect(ray, 0);
 		}
 	};
@@ -439,7 +440,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return PistonExtensionModel.intersect(ray);
 		}
 	};
@@ -451,7 +452,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray,
 					Texture.wool[ray.getBlockData()]);
 		}
@@ -472,7 +473,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return SpriteModel.intersect(ray, Texture.yellowFlower);
 		}
 	};
@@ -483,7 +484,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return SpriteModel.intersect(ray, Texture.redRose);
 		}
 	};
@@ -494,7 +495,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return SpriteModel.intersect(ray, Texture.brownMushroom);
 		}
 	};
@@ -505,7 +506,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return SpriteModel.intersect(ray, Texture.redMushroom);
 		}
 	};
@@ -585,7 +586,7 @@ public class Block {
 		};
 		
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			switch (ray.getBlockData() & 7) {
 			case 1:
 				return TexturedBlockModel.intersect(ray, sandstone);
@@ -610,7 +611,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			switch (ray.getBlockData() & 7) {
 			case 1:
 				return SlabModel.intersect(ray, Texture.sandstoneSide, Texture.sandstoneTop);
@@ -649,7 +650,7 @@ public class Block {
 			Texture.tntBottom,
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex);
 		}
 	};
@@ -668,7 +669,7 @@ public class Block {
 			Texture.oakPlanks,
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex);
 		}
 	};
@@ -693,7 +694,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TorchModel.intersect(ray, Texture.torch);
 		}
 	};
@@ -705,7 +706,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return SpriteModel.intersect(ray, Texture.fire);
 		}
 	};
@@ -722,7 +723,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.oakPlanks);
 		}
 	};
@@ -776,7 +777,7 @@ public class Block {
 				}
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return ChestModel.intersect(ray, tex[(ray.currentMaterial >> 16) % 3]);
 		}
 	};
@@ -789,7 +790,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return RedstoneWireModel.intersect(ray);
 		}
 	};
@@ -822,7 +823,7 @@ public class Block {
 		};
 		
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex);
 		}
 	};
@@ -833,7 +834,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return CropsModel.intersect(ray,
 					Texture.wheat[ray.getBlockData() % 8]);
 		}
@@ -845,7 +846,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return FarmlandModel.intersect(ray);
 		}
 	};
@@ -864,7 +865,7 @@ public class Block {
 				Texture.furnaceTop,
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return FurnaceModel.intersect(ray, tex);
 		}
 	};
@@ -883,7 +884,7 @@ public class Block {
 				Texture.furnaceTop,
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return FurnaceModel.intersect(ray, tex);
 		}
 	};
@@ -894,7 +895,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return SignPostModel.intersect(ray);
 		}
 	};
@@ -907,7 +908,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return DoorModel.intersect(ray,
 					Texture.woodenDoor[ray.getBlockData() >>> 3]);
 		}
@@ -919,7 +920,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return LadderModel.intersect(ray);
 		}
 	};
@@ -930,7 +931,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			int type = ray.getBlockData() % 10;
 			return RailModel.intersect(ray, Texture.railsType[type], type);
 		}
@@ -942,7 +943,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.cobblestone);
 		}
 	};
@@ -953,7 +954,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return WallSignModel.intersect(ray);
 		}
 	};
@@ -964,7 +965,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return LeverModel.intersect(ray);
 		}
 	};
@@ -975,7 +976,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return PressurePlateModel.intersect(ray, Texture.stone);
 		}
 	};
@@ -988,7 +989,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return DoorModel.intersect(ray,
 					Texture.ironDoor[ray.getBlockData() >>> 3]);
 		}
@@ -1000,7 +1001,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return PressurePlateModel.intersect(ray, Texture.oakPlanks);
 		}
 	};
@@ -1024,7 +1025,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TorchModel.intersect(ray, Texture.redstoneTorchOff);
 		}
 	};
@@ -1037,7 +1038,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TorchModel.intersect(ray, Texture.redstoneTorchOn);
 		}
 	};
@@ -1049,7 +1050,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return ButtonModel.intersect(ray, Texture.stone);
 		}
 	};
@@ -1060,7 +1061,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return SnowModel.intersect(ray);
 		}
 	};
@@ -1085,7 +1086,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return CactusModel.intersect(ray);
 		}
 	};
@@ -1102,7 +1103,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return SpriteModel.intersect(ray, Texture.sugarCane);
 		}
 	};
@@ -1122,7 +1123,7 @@ public class Block {
 		};
 		
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex);
 		}
 	};
@@ -1134,7 +1135,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return FenceModel.intersect(ray, Texture.oakPlanks);
 		}
 	};
@@ -1154,7 +1155,7 @@ public class Block {
 				Texture.pumpkinTop,
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return PumpkinModel.intersect(ray, tex);
 		}
 	};
@@ -1199,7 +1200,7 @@ public class Block {
 				Texture.pumpkinTop,
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return PumpkinModel.intersect(ray, tex);
 		}
 	};
@@ -1210,7 +1211,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return CakeModel.intersect(ray);
 		}
 	};
@@ -1221,7 +1222,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return RedstoneRepeaterModel.intersect(ray, 0);
 		}
 	};
@@ -1232,7 +1233,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return RedstoneRepeaterModel.intersect(ray, 1);
 		}
 	};
@@ -1256,7 +1257,7 @@ public class Block {
 				Texture.chestLock,
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return ChestModel.intersect(ray, tex);
 		}
 	};
@@ -1267,7 +1268,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TrapdoorModel.intersect(ray);
 		}
 	};
@@ -1283,7 +1284,7 @@ public class Block {
 			Texture.stoneBrick
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray,
 					tex[ray.getBlockData() % tex.length]);
 		}
@@ -1295,7 +1296,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray,
 					Texture.stoneBrickType[(ray.currentMaterial>>8)&3]);
 		}
@@ -1385,7 +1386,7 @@ public class Block {
 				},
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex[ray.getBlockData() % 11]);
 		}
 	};
@@ -1474,7 +1475,7 @@ public class Block {
 				},
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex[ray.getBlockData() % 11]);
 		}
 	};
@@ -1485,7 +1486,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return GlassPaneModel.intersect(ray, Texture.ironBars, Texture.ironBars);
 		}
 	};
@@ -1498,7 +1499,7 @@ public class Block {
 			ior = 1.520f;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return GlassPaneModel.intersect(ray, Texture.glass, Texture.glassPaneSide);
 		}
 	};
@@ -1515,7 +1516,7 @@ public class Block {
 		};
 		
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex);
 		}
 	};
@@ -1526,7 +1527,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return MelonStemModel.intersect(ray);
 		}
 	};
@@ -1538,7 +1539,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return MelonStemModel.intersect(ray);
 		}
 	};
@@ -1551,8 +1552,8 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
-			return VineModel.intersect(ray);
+		public boolean intersect(Ray ray, Scene scene) {
+			return VineModel.intersect(ray, scene);
 		}
 	};
 	public static final Block FENCEGATE = new Block(0x6B, "Fence Gate", Texture.unknown) {
@@ -1562,7 +1563,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return FenceGateModel.intersect(ray);
 		}
 	};
@@ -1573,7 +1574,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.brick);
 		}
 	};
@@ -1584,7 +1585,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.stoneBrick);
 		}
 	};
@@ -1601,7 +1602,7 @@ public class Block {
 		};
 		
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex);
 		}
 	};
@@ -1614,7 +1615,7 @@ public class Block {
 			isInvisible = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return PancakeModel.intersect(ray, Texture.lilyPad);
 		}
 	};
@@ -1632,7 +1633,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return FenceModel.intersect(ray, Texture.netherBrick);
 		}
 	};
@@ -1643,7 +1644,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.netherBrick);
 		}
 	};
@@ -1654,7 +1655,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return CropsModel.intersect(ray,
 					Texture.netherWart[ray.getBlockData() & 3]);
 		}
@@ -1666,7 +1667,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return EnchantmentTableModel.intersect(ray);
 		}
 	};
@@ -1677,7 +1678,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return BrewingStandModel.intersect(ray);
 		}
 	};
@@ -1688,7 +1689,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return CauldronModel.intersect(ray);
 		}
 	};
@@ -1699,7 +1700,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return EndPortalModel.intersect(ray);
 		}
 	};
@@ -1710,7 +1711,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return EndPortalFrameModel.intersect(ray);
 		}
 	};
@@ -1728,7 +1729,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return DragonEggModel.intersect(ray);
 		}
 	};
@@ -1752,7 +1753,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			switch (ray.getBlockData() & 7) {
 			case 1:
 				return SlabModel.intersect(ray, Texture.sprucePlanks, Texture.sprucePlanks);
@@ -1773,7 +1774,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			switch (ray.getBlockData() & 7) {
 			case 1:
 				return SlabModel.intersect(ray, Texture.sprucePlanks, Texture.sprucePlanks);
@@ -1795,7 +1796,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return CocoaPlantModel.intersect(ray);
 		}
 	};
@@ -1806,7 +1807,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.sandstoneSide,
 					Texture.sandstoneTop, Texture.sandstoneBottom);
 		}
@@ -1837,7 +1838,7 @@ public class Block {
 				Texture.enderChestLock,
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return ChestModel.intersect(ray, tex);
 		}
 	};
@@ -1849,7 +1850,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TripwireHookModel.intersect(ray);
 		}
 	};
@@ -1860,7 +1861,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return TripwireModel.intersection(ray);
 		}
 	};
@@ -1878,7 +1879,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.sprucePlanks);
 		}
 	};
@@ -1889,7 +1890,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.birchPlanks);
 		}
 	};
@@ -1900,7 +1901,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.jungleTreePlanks);
 		}
 	};
@@ -1931,7 +1932,7 @@ public class Block {
 				Texture.mossStone
 		};
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return StoneWallModel.intersect(ray, tex[ray.getBlockData() & 1]);
 		}
 	};
@@ -1951,7 +1952,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return CropsModel.intersect(ray,
 					Texture.carrots[ray.getBlockData() % 8]);
 		}
@@ -1964,7 +1965,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return CropsModel.intersect(ray,
 					Texture.potatoes[ray.getBlockData() % 8]);
 		}
@@ -1977,7 +1978,7 @@ public class Block {
 			localIntersect = true;
 		}
 		@Override
-		public boolean intersect(Ray ray) {
+		public boolean intersect(Ray ray, Scene scene) {
 			return ButtonModel.intersect(ray, Texture.oakPlanks);
 		}
 	};
@@ -2955,7 +2956,7 @@ public class Block {
 		frontTexture = newTexture;
 	}
 	
-	public boolean intersect(Ray ray) {
+	public boolean intersect(Ray ray, Scene scene) {
 		return TexturedBlockModel.intersect(ray, frontTexture);
 	}
 

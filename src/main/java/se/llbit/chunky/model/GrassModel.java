@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.model;
 
+import se.llbit.chunky.renderer.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
@@ -51,7 +52,7 @@ public class GrassModel {
 				
 	};
 
-	public static boolean intersect(Ray ray) {
+	public static boolean intersect(Ray ray, Scene scene) {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
 		for (Quad quad : quads) {
@@ -80,7 +81,7 @@ public class GrassModel {
 					color = Texture.grassSide.getColor(ray.u, ray.v);
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
-					float[] biomeColor = ray.getBiomeGrassColor();
+					float[] biomeColor = ray.getBiomeGrassColor(scene);
 					ray.color.x *= biomeColor[0];
 					ray.color.y *= biomeColor[1];
 					ray.color.z *= biomeColor[2];

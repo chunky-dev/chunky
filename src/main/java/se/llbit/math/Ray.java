@@ -16,6 +16,7 @@
  */
 package se.llbit.math;
 
+import se.llbit.chunky.renderer.Scene;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
@@ -262,20 +263,6 @@ public class Ray {
 	}
 
 	/**
-	 * @return Biome grass color of current block
-	 */
-	public final float[] getBiomeGrassColor() {
-		return Biomes.getGrassColorLinear(currentMaterial >> BlockData.BIOME_ID);
-	}
-
-	/**
-	 * @return Biome foliage color of current block
-	 */
-	public final float[] getBiomeFoliageColor() {
-		return Biomes.getFoliageColorLinear(currentMaterial >> BlockData.BIOME_ID);
-	}
-
-	/**
 	 * @return Biome id of current block
 	 */
 	public final int getBiomeId() {
@@ -417,4 +404,19 @@ public class Ray {
 		}
 	}
 
+	/**
+	 * @param scene
+	 * @return Foliage color for the current block
+	 */
+	public float[] getBiomeFoliageColor(Scene scene) {
+		return scene.getFoliageColor((int) (x.x + d.x * OFFSET), (int) (x.z + d.z * OFFSET));
+	}
+
+	/**
+	 * @param scene
+	 * @return Grass color for the current block
+	 */
+	public float[] getBiomeGrassColor(Scene scene) {
+		return scene.getGrassColor((int) (x.x + d.x * OFFSET), (int) (x.z + d.z * OFFSET));
+	}
 }
