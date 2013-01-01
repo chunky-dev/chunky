@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -38,7 +38,7 @@ public class WorldTexture {
      * @param frgb RGB color components
      */
     public void set(int x, int z, float[] frgb) {
-        ChunkPosition cp = ChunkPosition.get(x >> 5, z >> 5);
+        ChunkPosition cp = ChunkPosition.get(x >> 4, z >> 4);
         ChunkTexture ct = map.get(cp);
         if (ct == null) {
             ct = new ChunkTexture();
@@ -53,7 +53,7 @@ public class WorldTexture {
      * @return RGB color components at (x, z)
      */
     public float[] get(int x, int z) {
-        ChunkPosition cp = ChunkPosition.get(x >> 5, z >> 5);
+        ChunkPosition cp = ChunkPosition.get(x >> 4, z >> 4);
         ChunkTexture ct = map.get(cp);
         if (ct == null) {
             ct = new ChunkTexture();

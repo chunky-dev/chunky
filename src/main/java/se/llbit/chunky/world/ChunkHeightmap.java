@@ -17,7 +17,9 @@
 package se.llbit.chunky.world;
 
 /**
- * Chunk heightmap
+ * Chunk heightmap.
+ * This class actually has a misleading name since it stores
+ * height values for a two by two square of chunks.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkHeightmap {
