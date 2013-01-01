@@ -474,7 +474,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(gammaSlider)
 				.addComponent(gammaField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep1)
+			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(waterWorldLbl)
 			.addPreferredGap(ComponentPlacement.RELATED)
@@ -483,7 +483,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addGroup(layout.createParallelGroup()
 				.addComponent(waterHeightLbl, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 				.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-			.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+			.addContainerGap()
 		);
 		return panel;
 	}
