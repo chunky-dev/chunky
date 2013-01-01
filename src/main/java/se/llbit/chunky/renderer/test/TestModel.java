@@ -17,11 +17,14 @@
 package se.llbit.chunky.renderer.test;
 
 import se.llbit.chunky.model.BrewingStandModel;
+import se.llbit.chunky.model.FenceGateModel;
+import se.llbit.chunky.model.FenceModel;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.model.RedstoneRepeaterModel;
 import se.llbit.chunky.model.RedstoneWireModel;
 import se.llbit.chunky.model.SignPostModel;
 import se.llbit.chunky.model.SpriteModel;
+import se.llbit.chunky.model.TorchModel;
 import se.llbit.chunky.model.TripwireHookModel;
 import se.llbit.chunky.model.VineModel;
 import se.llbit.chunky.model.WaterModel;
@@ -78,18 +81,8 @@ public class TestModel {
 	 * @param ray
 	 */
 	public void intersect(Ray ray) {
-		int c0 = 4;
-		int c1 = 0;
-		int c2 = 0;
-		int c3 = 0;
-		int isFull = 1;
-		int level = 0;
-		ray.currentMaterial = (level << 8) | (isFull << 12) |
-				(c0 << 16) | (c1 << 20) | (c2 << 24) | (c3 << 28);
-		if (WaterModel.intersect(ray)) {
-			double dot = -ray.n.dot(ray.d);
-			ray.color.scale(dot);
-		}
+		ray.currentMaterial = 1 << 8;
+		TorchModel.intersect(ray, Texture.torch);
 	}
 
 }
