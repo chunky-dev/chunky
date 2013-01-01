@@ -336,19 +336,19 @@ public class Scene implements Refreshable {
 	/**
 	 * Save the scene description
 	 * @param context 
-	 * @param renderListener 
+	 * @param progressListener 
 	 * @param fileName 
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
 	public synchronized void saveSceneDescription(
 			RenderContext context,
-			RenderStatusListener renderListener,
+			RenderStatusListener progressListener,
 			String fileName)
 		throws IOException, InterruptedException {
 		
 		String task = "Saving scene";
-		renderListener.setProgress(task, 0, 0, 2);
+		progressListener.setProgress(task, 0, 0, 2);
 		
 		name = getFrameName(fileName);
 		DataOutputStream out = new DataOutputStream(
@@ -410,11 +410,13 @@ public class Scene implements Refreshable {
 		rootTag.write(out);
 		out.close();
 		
-		saveOctree(context, renderListener);
+		saveOctree(context, progressListener);
+		saveGrassTexture(context, progressListener);
+		saveFoliageTexture(context, progressListener);
 		
-		saveDump(context, renderListener);
+		saveDump(context, progressListener);
 		
-		renderListener.sceneSaved();
+		progressListener.sceneSaved();
 	}
 	
 	/**
@@ -553,6 +555,9 @@ public class Scene implements Refreshable {
 		if (loadOctree(context, renderListener)) {
 			calculateOctreeOrigin(chunksToLoad);
 			loadedChunks = new HashSet<ChunkPosition>(chunksToLoad);
+			
+			loadGrassTexture(context, renderListener);
+			loadFoliageTexture(context, renderListener);
 		} else {
 			// Could not load stored octree
 			// Load the chunks from the world
@@ -2766,6 +2771,64 @@ public class Scene implements Refreshable {
 			}
 		}
 	}
+		
+	private synchronized void saveGrassTexture(
+			RenderContext context,
+			ProgressListener progressListener) {
+		
+		String fileName = name + ".grass";
+		DataOutputStream out = null;
+		try {
+			String task = "Saving grass texture";
+			progressListener.setProgress(task, 0, 0, 1);
+			logger.info("Saving grass texture " + fileName);
+			out = new DataOutputStream(new GZIPOutputStream(
+					context.getSceneFileOutputStream(fileName)));
+			
+			grassTexture.store(out);
+			
+			progressListener.setProgress(task, 1, 0, 1);
+			logger.info("Grass texture saved");
+		} catch (IOException e) {
+			logger.warn("IO exception while saving octree!", e);
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+	
+	private synchronized void saveFoliageTexture(
+			RenderContext context,
+			ProgressListener progressListener) {
+		
+		String fileName = name + ".foliage";
+		DataOutputStream out = null;
+		try {
+			String task = "Saving foliage texture";
+			progressListener.setProgress(task, 0, 0, 1);
+			logger.info("Saving foliage texture " + fileName);
+			out = new DataOutputStream(new GZIPOutputStream(
+					context.getSceneFileOutputStream(fileName)));
+			
+			foliageTexture.store(out);
+			
+			progressListener.setProgress(task, 1, 0, 1);
+			logger.info("Foliage texture saved");
+		} catch (IOException e) {
+			logger.warn("IO exception while saving octree!", e);
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
 	
 	private synchronized void saveDump(
 			RenderContext context,
@@ -2824,6 +2887,68 @@ public class Scene implements Refreshable {
 			return true;
 		} catch (IOException e) {
 			logger.info("Failed to load chunk octree: Missing file or incorrect format!", e);
+			return false;
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+		
+	private synchronized boolean loadGrassTexture(
+			RenderContext context,
+			RenderStatusListener renderListener) {
+		
+		String fileName = name + ".grass";
+		
+		DataInputStream in = null;
+		try {
+			String task = "Loading grass texture";
+			renderListener.setProgress(task, 0, 0, 1);
+			logger.info("Loading grass texture " + fileName);
+			in = new DataInputStream(new GZIPInputStream(
+					context.getSceneFileInputStream(fileName)));
+			
+			grassTexture = WorldTexture.load(in);
+			
+			logger.info("Grass texture loaded");
+			return true;
+		} catch (IOException e) {
+			logger.info("Failed to load grass texture!", e);
+			return false;
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+		
+	private synchronized boolean loadFoliageTexture(
+			RenderContext context,
+			RenderStatusListener renderListener) {
+		
+		String fileName = name + ".foliage";
+		
+		DataInputStream in = null;
+		try {
+			String task = "Loading foliage texture";
+			renderListener.setProgress(task, 0, 0, 1);
+			logger.info("Loading foliage texture " + fileName);
+			in = new DataInputStream(new GZIPInputStream(
+					context.getSceneFileInputStream(fileName)));
+			
+			foliageTexture = WorldTexture.load(in);
+			
+			logger.info("Foliage texture loaded");
+			return true;
+		} catch (IOException e) {
+			logger.info("Failed to load foliage texture!", e);
 			return false;
 		} finally {
 			if (in != null) {

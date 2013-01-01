@@ -16,13 +16,17 @@
  */
 package se.llbit.chunky.world;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 /**
  * Chunk texture
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkTexture {
     
-    float[][] data = new float[4 * Chunk.X_MAX * Chunk.Z_MAX][3];
+    float[][] data = new float[Chunk.X_MAX * Chunk.Z_MAX][3];
     
     /**
      * Create new texture
@@ -37,7 +41,7 @@ public class ChunkTexture {
      * @param frgb RGB color components to set
      */
     public void set(int x, int z, float[] frgb) {
-    	int index = x + 2 * z * Chunk.X_MAX;
+    	int index = x + z * Chunk.X_MAX;
         data[index][0] = frgb[0];
         data[index][1] = frgb[1];
         data[index][2] = frgb[2];
@@ -49,8 +53,37 @@ public class ChunkTexture {
      * @return RGB color components at (x, z)
      */
     public float[] get(int x, int z) {
-    	int index = x + 2 * z * Chunk.X_MAX;
+    	int index = x + z * Chunk.X_MAX;
         return data[index];
     }
+
+	/**
+	 * Write this chunk texture to an output stream
+	 * @param out
+	 * @throws IOException 
+	 */
+	public void store(DataOutputStream out) throws IOException {
+		for (int i = 0; i < Chunk.X_MAX * Chunk.Z_MAX; ++i) {
+			out.writeFloat(data[i][0]);
+			out.writeFloat(data[i][1]);
+			out.writeFloat(data[i][2]);
+		}
+	}
+
+	/**
+	 * Load a chunk texture from an input stream
+	 * @param in
+	 * @return The loaded texture
+	 * @throws IOException 
+	 */
+	public static ChunkTexture load(DataInputStream in) throws IOException {
+		ChunkTexture texture = new ChunkTexture();
+		for (int i = 0; i < Chunk.X_MAX * Chunk.Z_MAX; ++i) {
+			texture.data[i][0] = in.readFloat();
+			texture.data[i][1] = in.readFloat();
+			texture.data[i][2] = in.readFloat();
+		}
+		return texture;
+	}
 
 }

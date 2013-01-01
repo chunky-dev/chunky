@@ -16,6 +16,9 @@
  */
 package se.llbit.chunky.world;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +44,7 @@ public class WorldTexture {
             ct = new ChunkTexture();
             map.put(cp, ct);
         }
-        ct.set(x & 0x1F, z & 0x1F, frgb);
+        ct.set(x & 0xF, z & 0xF, frgb);
     }
 
     /**
@@ -56,7 +59,41 @@ public class WorldTexture {
             ct = new ChunkTexture();
             map.put(cp, ct);
         }
-        return ct.get(x & 0x1F, z & 0x1F);
+        return ct.get(x & 0xF, z & 0xF);
     }
+
+    /**
+     * Write the world texture to the output stream
+     * @param out
+     * @throws IOException 
+     */
+	public void store(DataOutputStream out) throws IOException {
+		out.writeInt(map.size());
+		for (Map.Entry<ChunkPosition, ChunkTexture> entry : map.entrySet()) {
+			ChunkPosition pos = entry.getKey();
+			ChunkTexture texture = entry.getValue();
+			out.writeInt(pos.x);
+			out.writeInt(pos.z);
+			texture.store(out);
+		}
+	}
+
+	/**
+	 * Load world texture from the input stream
+	 * @param in
+	 * @return Loaded texture
+	 * @throws IOException 
+	 */
+	public static WorldTexture load(DataInputStream in) throws IOException {
+		WorldTexture texture = new WorldTexture();
+		int ntiles = in.readInt();
+		for (int i = 0; i < ntiles; ++i) {
+			int x = in.readInt();
+			int z = in.readInt();
+			ChunkTexture tile = ChunkTexture.load(in);
+			texture.map.put(ChunkPosition.get(x, z), tile);
+		}
+		return texture;
+	}
 
 }
