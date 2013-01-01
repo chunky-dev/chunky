@@ -432,12 +432,13 @@ public class Layer {
 					
 					case Block.LEAVES_ID:
 						Color.getRGBComponents(Biomes.getFoliageColor(biomeId), blockColor);
-						blockColor[3] = 1.f;// grass colors don't include alpha
+						blockColor[3] = 1.f;// foliage colors don't include alpha
 						
 						y -= 1;
 						break;
 						
 					case Block.GRASS_ID:
+					case Block.VINES_ID:
 					case Block.TALLGRASS_ID:
 						Color.getRGBComponents(Biomes.getGrassColor(biomeId), blockColor);
 						blockColor[3] = 1.f;// grass colors don't include alpha
