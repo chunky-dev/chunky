@@ -1690,7 +1690,7 @@ public class Scene implements Refreshable {
 						for (int sz = z-1; sz <= z+1; ++sz) {
 							int wz = cp.z*16 + sz;
 							
-							ChunkPosition ccp = ChunkPosition.get(wx / 16, wz / 16);
+							ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
 							if (chunkSet.contains(ccp)) {
 								nsum += 1;
 								int biomeId = 0xFF & biomeIdMap.get(wx, wz);
