@@ -3163,7 +3163,10 @@ public class Scene implements Refreshable {
 	 * @return Foliage color for the given coordinates
 	 */
 	public float[] getFoliageColor(int x, int z) {
-		return foliageTexture.get(x, z);
+		if (biomeColors)
+			return foliageTexture.get(x, z);
+		else
+			return Biomes.getFoliageColorLinear(0);
 	}
 
 	/**
@@ -3172,7 +3175,10 @@ public class Scene implements Refreshable {
 	 * @return Grass color for the given coordinates
 	 */
 	public float[] getGrassColor(int x, int z) {
-		return grassTexture.get(x, z);
+		if (biomeColors)
+			return grassTexture.get(x, z);
+		else
+			return Biomes.getGrassColorLinear(0);
 	}
 
 }
