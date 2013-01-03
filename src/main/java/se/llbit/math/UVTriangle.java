@@ -125,10 +125,6 @@ public class UVTriangle {
 					ray.tNear = t;
 					ray.u = alpha * sa.x + beta * sb.x + gamma * sc.x;
 					ray.v = alpha * sa.y + beta * sb.y + gamma * sc.y;
-					if (ray.u > 1)
-						ray.u = 1;
-					if (ray.v > 1)
-						ray.v = 1;
 					return true;
 				}
 			}
