@@ -35,6 +35,8 @@ import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Triangle;
+import se.llbit.math.UVTriangle;
+import se.llbit.math.Vector2d;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 
@@ -47,30 +49,45 @@ public class TestModel {
 	private AABB[] boxes;
 	private Quad[] quads;
 	private Triangle[] triangles;
+	private UVTriangle[] uvtriangles;
 	private Vector3d light;
 	
 	/**
 	 * Set up the model
 	 */
 	public void setUp() {
-		// north east
-		quads = new Quad[] {
-		// east
-		new Quad(new Vector3d(1, 1, 0), new Vector3d(1, 0, 0),
-			new Vector3d(1, 1, 1), new Vector4d(1, 0, 1, 0)),
+		uvtriangles = new UVTriangle[4];
 		
-		// west
-		new Quad(new Vector3d(0, 1, 1), new Vector3d(0, 0, 1),
-			new Vector3d(0, 1, 0), new Vector4d(1, 0, 1, 0)),
-		
-		// north
-		new Quad(new Vector3d(0, 1, 0), new Vector3d(0, 0, 0),
-			new Vector3d(1, 1, 0), new Vector4d(1, 0, 1, 0)),
-		
-		// south
-		new Quad(new Vector3d(1, 1, 1), new Vector3d(1, 0, 1),
-			new Vector3d(0, 1, 1), new Vector4d(1, 0, 1, 0)),
-		};
+		// facing south
+		uvtriangles[0] = new UVTriangle(
+				new Vector3d(17/16., 3/16., 9/16.),
+				new Vector3d(15/16., 3/16., 9/16.),
+				new Vector3d(12/16., 13/16., 9/16.),
+				new Vector2d(9/16., 0),
+				new Vector2d(7/16., 0),
+				new Vector2d(7/16., 10/16.));
+		uvtriangles[1] = new UVTriangle(
+				new Vector3d(12/16., 13/16., 9/16.),
+				new Vector3d(14/16., 13/16., 9/16.),
+				new Vector3d(17/16., 3/16., 9/16.),
+				new Vector2d(7/16., 10/16.),
+				new Vector2d(9/16., 10/16.),
+				new Vector2d(9/16., 0));
+		// facing north
+		uvtriangles[2] = new UVTriangle(
+				new Vector3d(17/16., 3/16., 7/16.),
+				new Vector3d(15/16., 3/16., 7/16.),
+				new Vector3d(12/16., 13/16., 7/16.),
+				new Vector2d(9/16., 0),
+				new Vector2d(7/16., 0),
+				new Vector2d(7/16., 10/16.));
+		uvtriangles[3] = new UVTriangle(
+				new Vector3d(12/16., 13/16., 7/16.),
+				new Vector3d(14/16., 13/16., 7/16.),
+				new Vector3d(17/16., 3/16., 7/16.),
+				new Vector2d(7/16., 10/16.),
+				new Vector2d(9/16., 10/16.),
+				new Vector2d(9/16., 0));
 		
 		light = new Vector3d(.1, 1, -.1);
 		light.normalize();
@@ -82,7 +99,13 @@ public class TestModel {
 	 */
 	public void intersect(Ray ray) {
 		ray.currentMaterial = 1 << 8;
-		TorchModel.intersect(ray, Texture.torch);
+		
+		for (int i = 0; i < uvtriangles.length; ++i) {
+			if (uvtriangles[i].intersect(ray)) {
+				Texture.torch.getColor(ray);
+				ray.t = ray.tNear;
+			}
+		}
 	}
 
 }
