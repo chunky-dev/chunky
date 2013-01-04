@@ -33,6 +33,7 @@ import se.llbit.chunky.world.BlockData;
 import se.llbit.math.AABB;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Triangle;
 import se.llbit.math.UVTriangle;
