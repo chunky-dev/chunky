@@ -93,7 +93,7 @@ public class UVTriangle {
 		
 		// test that the ray is heading toward the plane
 		double denom = ray.d.dot(n);
-		if (Math.abs(denom) > Ray.EPSILON) {
+		if (denom < -Ray.EPSILON) {
 			
 			// test for intersection with the plane at origin
 			double t = - (px*n.x + py*n.y + pz*n.z + d) / denom;

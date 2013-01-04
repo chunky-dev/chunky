@@ -124,12 +124,14 @@ public class TexturePackLoader {
 					break;
 					
 				case CLOUDS:
+					// TODO implement cloud rendering
+					/*
 					imageStream = tpZip.getInputStream(new ZipEntry("environment/clouds.png"));
 					if (imageStream == null) {
 						logger.info("Could not load file environment/clouds.png from default texture pack!");
 					} else {
 						loadCloudsTexture(imageStream);
-					}
+					}*/
 					break;
 					
 				case GRASSCOLOR:
@@ -152,8 +154,6 @@ public class TexturePackLoader {
 			}
 			
 			tpZip.close();
-			
-			ProgramProperties.setProperty("lastTexturePack", tpFile.getAbsolutePath());
 		} catch (IOException e) {
 			logger.warn("Failed to load default texture pack", e);
 		}
@@ -219,13 +219,14 @@ public class TexturePackLoader {
 				loadSignTexture(imageStream);
 			}
 			
-			imageStream = tpZip.getInputStream(new ZipEntry("environment/clouds.png"));
+			// TODO implement cloud rendering
+			/*imageStream = tpZip.getInputStream(new ZipEntry("environment/clouds.png"));
 			if (imageStream == null) {
 				logger.info("Could not load file environment/clouds.png from texture pack!");
 				defaultTextures.add(TextureFile.CLOUDS);
 			} else {
 				loadCloudsTexture(imageStream);
-			}
+			}*/
 			
 			imageStream = tpZip.getInputStream(new ZipEntry("misc/grasscolor.png"));
 			if (imageStream == null) {
@@ -265,6 +266,8 @@ public class TexturePackLoader {
 		Sun.texture = new Texture(image);
 	}
 	
+	// TODO implement cloud rendering
+	@SuppressWarnings("unused")
 	private static void loadCloudsTexture(InputStream imageStream)
 			throws IOException {
 		

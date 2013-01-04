@@ -60,22 +60,22 @@ public class TestModel {
 		quads = new Quad[4];
 		
 		// west
-		quads[0] = new Quad(new Vector3d(15/16., 3/16., 7/16.),
-				new Vector3d(15/16., 3/16., 9/16.),
-				new Vector3d(11/16., 13/16., 7/16.),
-				new Vector4d(7/16., 9/16., 0, 10/16.));
+		quads[0] = new Quad(new Vector3d(15/16., 3/16., 0),
+				new Vector3d(15/16., 3/16., 1),
+				new Vector3d((11-12/10.)/16., 1, 0),
+				new Vector4d(0, 1, 0, 13/16.));
 		
 		// east
-		quads[1] = new Quad(new Vector3d(13/16., 13/16., 7/16.),
-				new Vector3d(13/16., 13/16., 9/16.),
-				new Vector3d(17/16., 3/16., 7/16.),
-				new Vector4d(9/16., 7/16., 10/16., 0));
+		quads[1] = new Quad(new Vector3d((13-12/10.)/16., 1, 0),
+				new Vector3d((13-12/10.)/16., 1, 1),
+				new Vector3d(17/16., 3/16., 0),
+				new Vector4d(1, 0, 13/16., 0));
 		
 		// top
 		quads[2] = new Quad(
-				new Vector3d(13/16., 13/16., 7/16.),
-				new Vector3d(11/16., 13/16., 7/16.),
 				new Vector3d(13/16., 13/16., 9/16.),
+				new Vector3d(13/16., 13/16., 7/16.),
+				new Vector3d(11/16., 13/16., 9/16.),
 				new Vector4d(9/16., 7/16., 10/16., 8/16.));
 		
 		// bottom
@@ -84,41 +84,40 @@ public class TestModel {
 				new Vector3d(17/16., 3/16., 7/16.),
 				new Vector3d(15/16., 3/16., 9/16.),
 				new Vector4d(7/16., 9/16., 0/16., 2/16.));
+		
 		uvtriangles = new UVTriangle[4];
 		
 		// facing south
 		uvtriangles[0] = new UVTriangle(
-				new Vector3d(17/16., 3/16., 9/16.),
-				new Vector3d(15/16., 3/16., 9/16.),
-				new Vector3d(11/16., 13/16., 9/16.),
-				new Vector2d(9/16., 0),
-				new Vector2d(7/16., 0),
-				new Vector2d(7/16., 10/16.));
+				new Vector3d(8/16., 3/16., 9/16.),
+				new Vector3d(24/16., 3/16., 9/16.),
+				new Vector3d((4-12/10.)/16., 1, 9/16.),
+				new Vector2d(0, 0),
+				new Vector2d(1, 0),
+				new Vector2d(0., 13/16.));
 		uvtriangles[1] = new UVTriangle(
-				new Vector3d(11/16., 13/16., 9/16.),
-				new Vector3d(13/16., 13/16., 9/16.),
-				new Vector3d(17/16., 3/16., 9/16.),
-				new Vector2d(7/16., 10/16.),
-				new Vector2d(9/16., 10/16.),
-				new Vector2d(9/16., 0));
+				new Vector3d((20-12/10.)/16., 1, 9/16.),
+				new Vector3d((4-12/10.)/16., 1, 9/16.),
+				new Vector3d(24/16., 3/16., 9/16.),
+				new Vector2d(1, 13/16.),
+				new Vector2d(0, 13/16.),
+				new Vector2d(1, 0));
+		
 		// facing north
 		uvtriangles[2] = new UVTriangle(
-				new Vector3d(17/16., 3/16., 7/16.),
-				new Vector3d(15/16., 3/16., 7/16.),
-				new Vector3d(11/16., 13/16., 7/16.),
-				new Vector2d(7/16., 0),
-				new Vector2d(9/16., 0),
-				new Vector2d(9/16., 10/16.));
+				new Vector3d(24/16., 3/16., 7/16.),
+				new Vector3d(8/16., 3/16., 7/16.),
+				new Vector3d((4-12/10.)/16., 1, 7/16.),
+				new Vector2d(1, 0),
+				new Vector2d(0, 0),
+				new Vector2d(0, 13/16.));
 		uvtriangles[3] = new UVTriangle(
-				new Vector3d(11/16., 13/16., 7/16.),
-				new Vector3d(13/16., 13/16., 7/16.),
-				new Vector3d(17/16., 3/16., 7/16.),
-				new Vector2d(9/16., 10/16.),
-				new Vector2d(7/16., 10/16.),
-				new Vector2d(7/16., 0));
-		
-		quads = Model.rotateY(quads);
-		uvtriangles = Model.rotateY(uvtriangles);
+				new Vector3d((4-12/10.)/16., 1, 7/16.),
+				new Vector3d((20-12/10.)/16., 1, 7/16.),
+				new Vector3d(24/16., 3/16., 7/16.),
+				new Vector2d(0, 13/16.),
+				new Vector2d(1, 13/16.),
+				new Vector2d(1, 0));
 		
 		light = new Vector3d(.1, 1, -.1);
 		light.normalize();
@@ -135,16 +134,22 @@ public class TestModel {
 		float[] color = null;
 		for (int i = 0; i < quads.length; ++i) {
 			if (quads[i].intersect(ray)) {
-				color = Texture.torch.getColor(ray.u, ray.v);
-				ray.t = ray.tNear;
-				hit = true;
+				float[] c = Texture.torch.getColor(ray.u, ray.v);
+				if (c[3] > Ray.EPSILON) {
+					color = c;
+					ray.t = ray.tNear;
+					hit = true;
+				}
 			}
 		}
 		for (int i = 0; i < uvtriangles.length; ++i) {
 			if (uvtriangles[i].intersect(ray)) {
-				color = Texture.torch.getColor(ray.u, ray.v);
-				ray.t = ray.tNear;
-				hit = true;
+				float[] c = Texture.torch.getColor(ray.u, ray.v);
+				if (c[3] > Ray.EPSILON) {
+					color = c;
+					ray.t = ray.tNear;
+					hit = true;
+				}
 			}
 		}
 		if (hit) {

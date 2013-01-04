@@ -29,24 +29,25 @@ import static se.llbit.chunky.model.Model.*;
 
 @SuppressWarnings("javadoc")
 public class TorchModel {
+	// facing west
 	private static final Quad[] quads = {
 		// west
-		new Quad(new Vector3d(15/16., 3/16., 7/16.),
-				new Vector3d(15/16., 3/16., 9/16.),
-				new Vector3d(11/16., 13/16., 7/16.),
-				new Vector4d(7/16., 9/16., 0, 10/16.)),
+		new Quad(new Vector3d(15/16., 3/16., 0),
+				new Vector3d(15/16., 3/16., 1),
+				new Vector3d((11-12/10.)/16., 1, 0),
+				new Vector4d(0, 1, 0, 13/16.)),
 		
 		// east
-		new Quad(new Vector3d(13/16., 13/16., 7/16.),
-				new Vector3d(13/16., 13/16., 9/16.),
-				new Vector3d(17/16., 3/16., 7/16.),
-				new Vector4d(9/16., 7/16., 10/16., 0)),
+		new Quad(new Vector3d((13-12/10.)/16., 1, 0),
+				new Vector3d((13-12/10.)/16., 1, 1),
+				new Vector3d(17/16., 3/16., 0),
+				new Vector4d(1, 0, 13/16., 0)),
 		
 		// top
 		new Quad(
-				new Vector3d(13/16., 13/16., 7/16.),
-				new Vector3d(11/16., 13/16., 7/16.),
 				new Vector3d(13/16., 13/16., 9/16.),
+				new Vector3d(13/16., 13/16., 7/16.),
+				new Vector3d(11/16., 13/16., 9/16.),
 				new Vector4d(9/16., 7/16., 10/16., 8/16.)),
 		
 		// bottom
@@ -57,41 +58,41 @@ public class TorchModel {
 				new Vector4d(7/16., 9/16., 0/16., 2/16.))
 	};
 	
+	// facing west
 	private static final UVTriangle[] uvtriangles = {
 		// facing south
 		new UVTriangle(
-				new Vector3d(17/16., 3/16., 9/16.),
-				new Vector3d(15/16., 3/16., 9/16.),
-				new Vector3d(11/16., 13/16., 9/16.),
-				new Vector2d(9/16., 0),
-				new Vector2d(7/16., 0),
-				new Vector2d(7/16., 10/16.)),
-				
+				new Vector3d(8/16., 3/16., 9/16.),
+				new Vector3d(24/16., 3/16., 9/16.),
+				new Vector3d((4-12/10.)/16., 1, 9/16.),
+				new Vector2d(0, 0),
+				new Vector2d(1, 0),
+				new Vector2d(0., 13/16.)),
 		new UVTriangle(
-				new Vector3d(11/16., 13/16., 9/16.),
-				new Vector3d(13/16., 13/16., 9/16.),
-				new Vector3d(17/16., 3/16., 9/16.),
-				new Vector2d(7/16., 10/16.),
-				new Vector2d(9/16., 10/16.),
-				new Vector2d(9/16., 0)),
-				
+				new Vector3d((20-12/10.)/16., 1, 9/16.),
+				new Vector3d((4-12/10.)/16., 1, 9/16.),
+				new Vector3d(24/16., 3/16., 9/16.),
+				new Vector2d(1, 13/16.),
+				new Vector2d(0, 13/16.),
+				new Vector2d(1, 0)),
+		
 		// facing north
 		new UVTriangle(
-				new Vector3d(17/16., 3/16., 7/16.),
-				new Vector3d(15/16., 3/16., 7/16.),
-				new Vector3d(11/16., 13/16., 7/16.),
-				new Vector2d(7/16., 0),
-				new Vector2d(9/16., 0),
-				new Vector2d(9/16., 10/16.)),
-				
+				new Vector3d(24/16., 3/16., 7/16.),
+				new Vector3d(8/16., 3/16., 7/16.),
+				new Vector3d((4-12/10.)/16., 1, 7/16.),
+				new Vector2d(1, 0),
+				new Vector2d(0, 0),
+				new Vector2d(0, 13/16.)),
 		new UVTriangle(
-				new Vector3d(11/16., 13/16., 7/16.),
-				new Vector3d(13/16., 13/16., 7/16.),
-				new Vector3d(17/16., 3/16., 7/16.),
-				new Vector2d(9/16., 10/16.),
-				new Vector2d(7/16., 10/16.),
-				new Vector2d(7/16., 0))
+				new Vector3d((4-12/10.)/16., 1, 7/16.),
+				new Vector3d((20-12/10.)/16., 1, 7/16.),
+				new Vector3d(24/16., 3/16., 7/16.),
+				new Vector2d(0, 13/16.),
+				new Vector2d(1, 13/16.),
+				new Vector2d(1, 0))
 	};
+	
 	private static Quad[] onGround = {
 		new Quad(new Vector3d(.75, 0, .4375), new Vector3d(.25, 0, .4375),
 				new Vector3d(.75, 1, .4375), new Vector4d(.75, .25, 0, 1)),
