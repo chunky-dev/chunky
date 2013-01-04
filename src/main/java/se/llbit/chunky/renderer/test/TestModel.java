@@ -117,6 +117,9 @@ public class TestModel {
 				new Vector2d(7/16., 10/16.),
 				new Vector2d(7/16., 0));
 		
+		quads = Model.rotateY(quads);
+		uvtriangles = Model.rotateY(uvtriangles);
+		
 		light = new Vector3d(.1, 1, -.1);
 		light.normalize();
 	}

@@ -138,4 +138,23 @@ public class UVTriangle {
 		return false;
 	}
 
+	/**
+	 * @return Rotated copy of this triangle
+	 */
+	public UVTriangle getYRotated() {
+		Vector3d ar = new Vector3d(a);
+		ar.add(-0.5, -0.5, -0.5);
+		Transform.rotateY.rotate(ar);
+		ar.add(0.5, 0.5, 0.5);
+		Vector3d br = new Vector3d(b);
+		br.add(-0.5, -0.5, -0.5);
+		Transform.rotateY.rotate(br);
+		br.add(0.5, 0.5, 0.5);
+		Vector3d cr = new Vector3d(c);
+		cr.add(-0.5, -0.5, -0.5);
+		Transform.rotateY.rotate(cr);
+		cr.add(0.5, 0.5, 0.5);
+		return new UVTriangle(ar, br, cr, sa, sb, sc);
+	}
+
 }
