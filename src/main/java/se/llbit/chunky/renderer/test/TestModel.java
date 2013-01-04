@@ -131,16 +131,29 @@ public class TestModel {
 	public void intersect(Ray ray) {
 		ray.currentMaterial = 1 << 8;
 		
+		boolean hit = false;
+		float[] color = null;
 		for (int i = 0; i < quads.length; ++i) {
 			if (quads[i].intersect(ray)) {
-				Texture.torch.getColor(ray);
+				color = Texture.torch.getColor(ray.u, ray.v);
 				ray.t = ray.tNear;
+				hit = true;
 			}
 		}
 		for (int i = 0; i < uvtriangles.length; ++i) {
 			if (uvtriangles[i].intersect(ray)) {
-				Texture.torch.getColor(ray);
+				color = Texture.torch.getColor(ray.u, ray.v);
 				ray.t = ray.tNear;
+				hit = true;
+			}
+		}
+		if (hit) {
+			double px = ray.x.x - QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET) + ray.d.x * ray.tNear;
+			double py = ray.x.y - QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET) + ray.d.y * ray.tNear;
+			double pz = ray.x.z - QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET) + ray.d.z * ray.tNear;
+			if (px >= 0 && px <= 1 && py >= 0 && py <= 1 && pz >= 0 && pz <= 1) {
+				ray.color.set(color);
+				ray.color.w = 1;
 			}
 		}
 	}

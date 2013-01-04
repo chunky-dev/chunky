@@ -18,7 +18,10 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.UVTriangle;
+import se.llbit.math.Vector2d;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 
@@ -26,7 +29,70 @@ import static se.llbit.chunky.model.Model.*;
 
 @SuppressWarnings("javadoc")
 public class TorchModel {
-	private static Quad[] faces = {
+	private static final Quad[] quads = {
+		// west
+		new Quad(new Vector3d(15/16., 3/16., 7/16.),
+				new Vector3d(15/16., 3/16., 9/16.),
+				new Vector3d(11/16., 13/16., 7/16.),
+				new Vector4d(7/16., 9/16., 0, 10/16.)),
+		
+		// east
+		new Quad(new Vector3d(13/16., 13/16., 7/16.),
+				new Vector3d(13/16., 13/16., 9/16.),
+				new Vector3d(17/16., 3/16., 7/16.),
+				new Vector4d(9/16., 7/16., 10/16., 0)),
+		
+		// top
+		new Quad(
+				new Vector3d(13/16., 13/16., 7/16.),
+				new Vector3d(11/16., 13/16., 7/16.),
+				new Vector3d(13/16., 13/16., 9/16.),
+				new Vector4d(9/16., 7/16., 10/16., 8/16.)),
+		
+		// bottom
+		new Quad(
+				new Vector3d(15/16., 3/16., 7/16.),
+				new Vector3d(17/16., 3/16., 7/16.),
+				new Vector3d(15/16., 3/16., 9/16.),
+				new Vector4d(7/16., 9/16., 0/16., 2/16.))
+	};
+	
+	private static final UVTriangle[] uvtriangles = {
+		// facing south
+		new UVTriangle(
+				new Vector3d(17/16., 3/16., 9/16.),
+				new Vector3d(15/16., 3/16., 9/16.),
+				new Vector3d(11/16., 13/16., 9/16.),
+				new Vector2d(9/16., 0),
+				new Vector2d(7/16., 0),
+				new Vector2d(7/16., 10/16.)),
+				
+		new UVTriangle(
+				new Vector3d(11/16., 13/16., 9/16.),
+				new Vector3d(13/16., 13/16., 9/16.),
+				new Vector3d(17/16., 3/16., 9/16.),
+				new Vector2d(7/16., 10/16.),
+				new Vector2d(9/16., 10/16.),
+				new Vector2d(9/16., 0)),
+				
+		// facing north
+		new UVTriangle(
+				new Vector3d(17/16., 3/16., 7/16.),
+				new Vector3d(15/16., 3/16., 7/16.),
+				new Vector3d(11/16., 13/16., 7/16.),
+				new Vector2d(7/16., 0),
+				new Vector2d(9/16., 0),
+				new Vector2d(9/16., 10/16.)),
+				
+		new UVTriangle(
+				new Vector3d(11/16., 13/16., 7/16.),
+				new Vector3d(13/16., 13/16., 7/16.),
+				new Vector3d(17/16., 3/16., 7/16.),
+				new Vector2d(9/16., 10/16.),
+				new Vector2d(7/16., 10/16.),
+				new Vector2d(7/16., 0))
+	};
+	private static Quad[] onGround = {
 		new Quad(new Vector3d(.75, 0, .4375), new Vector3d(.25, 0, .4375),
 				new Vector3d(.75, 1, .4375), new Vector4d(.75, .25, 0, 1)),
 
@@ -44,45 +110,73 @@ public class TorchModel {
 				new Vector3d(.4375, .625, .4375), new Vector4d(.4375, .5625, .5, .625)),
 	};
 	
-	private static Quad[][] rot = new Quad[6][];
+	private static Quad[][] rotQuads = new Quad[6][];
+	private static UVTriangle[][] rotTriangles = new UVTriangle[6][];
 	
 	static {
-		rot[0] = new Quad[0];
+		rotQuads[0] = new Quad[0];
+		rotTriangles[0] = new UVTriangle[0];
 
-		// on ground
-		rot[5] = faces;
-		
-		// pointing east
-		rot[1] = translate(rotateZ(faces, -Math.PI/4), -.1, 0, 0);
-		
 		// pointing west
-		rot[2] = translate(rotateZ(faces, Math.PI/4), .1, 0, 0);
-		
-		// pointing south
-		rot[3] = translate(rotateX(faces, Math.PI/4), 0, 0, -.1);
+		rotQuads[2] = quads;
+		rotTriangles[2] = uvtriangles;
 		
 		// pointing north
-		rot[4] = translate(rotateX(faces, -Math.PI/4), 0, 0, .1);
+		rotQuads[4] = rotateY(rotQuads[2]);
+		rotTriangles[4] = rotateY(rotTriangles[2]);
+		
+		// pointing east
+		rotQuads[1] = rotateY(rotQuads[4]);
+		rotTriangles[1] = rotateY(rotTriangles[4]);
+		
+		// pointing south
+		rotQuads[3] = rotateY(rotQuads[1]);
+		rotTriangles[3] = rotateY(rotTriangles[1]);
+		
+		// on ground
+		rotQuads[5] = onGround;
+		rotTriangles[5] = new UVTriangle[0];
+		
 	}
 
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
-		for (Quad quad : rot[ray.getBlockData() % 6]) {
+		float[] color = null;
+		int rot = ray.getBlockData() % 6;
+		for (Quad quad : rotQuads[rot]) {
 			if (quad.intersect(ray)) {
-				float[] color = texture.getColor(ray.u, ray.v);
-				if (color[3] > Ray.EPSILON) {
-					ray.color.set(color);
+				float[] c = texture.getColor(ray.u, ray.v);
+				if (c[3] > Ray.EPSILON) {
+					color = c;
 					ray.n.set(quad.n);
 					ray.t = ray.tNear;
 					hit = true;
 				}
 			}
 		}
-		if (hit) {
-			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d, ray.x);
+		for (UVTriangle triangle : rotTriangles[rot]) {
+			if (triangle.intersect(ray)) {
+				float[] c = texture.getColor(ray.u, ray.v);
+				if (c[3] > Ray.EPSILON) {
+					color = c;
+					ray.n.set(triangle.n);
+					ray.t = ray.tNear;
+					hit = true;
+				}
+			}
 		}
-		return hit;
+		if (hit) {
+			double px = ray.x.x - QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET) + ray.d.x * ray.tNear;
+			double py = ray.x.y - QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET) + ray.d.y * ray.tNear;
+			double pz = ray.x.z - QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET) + ray.d.z * ray.tNear;
+			if (px >= 0 && px <= 1 && py >= 0 && py <= 1 && pz >= 0 && pz <= 1) {
+				ray.color.set(color);
+				ray.distance += ray.t;
+				ray.x.scaleAdd(ray.t, ray.d, ray.x);
+				return true;
+			}
+		}
+		return false;
 	}
 }

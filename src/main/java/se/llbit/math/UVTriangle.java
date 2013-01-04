@@ -104,9 +104,6 @@ public class UVTriangle {
 				py = py + ray.d.y * t;
 				pz = pz + ray.d.z * t;
 				
-				if (px > 1 || px < 0 || py > 1 || py < 0 || pz > 1 || pz < 0)
-					return false;
-				
 				// calculate barycentric coordinates
 				double nax = c_b.y*(pz-b.z) - c_b.z*(py-b.y);
 				double nay = c_b.z*(px-b.x) - c_b.x*(pz-b.z);
