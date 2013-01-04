@@ -56,19 +56,46 @@ public class TestModel {
 	 * Set up the model
 	 */
 	public void setUp() {
+		quads = new Quad[4];
+		
+		// west
+		quads[0] = new Quad(new Vector3d(15/16., 3/16., 7/16.),
+				new Vector3d(15/16., 3/16., 9/16.),
+				new Vector3d(11/16., 13/16., 7/16.),
+				new Vector4d(7/16., 9/16., 0, 10/16.));
+		
+		// east
+		quads[1] = new Quad(new Vector3d(13/16., 13/16., 7/16.),
+				new Vector3d(13/16., 13/16., 9/16.),
+				new Vector3d(17/16., 3/16., 7/16.),
+				new Vector4d(9/16., 7/16., 10/16., 0));
+		
+		// top
+		quads[2] = new Quad(
+				new Vector3d(13/16., 13/16., 7/16.),
+				new Vector3d(11/16., 13/16., 7/16.),
+				new Vector3d(13/16., 13/16., 9/16.),
+				new Vector4d(9/16., 7/16., 10/16., 8/16.));
+		
+		// bottom
+		quads[3] = new Quad(
+				new Vector3d(15/16., 3/16., 7/16.),
+				new Vector3d(17/16., 3/16., 7/16.),
+				new Vector3d(15/16., 3/16., 9/16.),
+				new Vector4d(7/16., 9/16., 0/16., 2/16.));
 		uvtriangles = new UVTriangle[4];
 		
 		// facing south
 		uvtriangles[0] = new UVTriangle(
 				new Vector3d(17/16., 3/16., 9/16.),
 				new Vector3d(15/16., 3/16., 9/16.),
-				new Vector3d(12/16., 13/16., 9/16.),
+				new Vector3d(11/16., 13/16., 9/16.),
 				new Vector2d(9/16., 0),
 				new Vector2d(7/16., 0),
 				new Vector2d(7/16., 10/16.));
 		uvtriangles[1] = new UVTriangle(
-				new Vector3d(12/16., 13/16., 9/16.),
-				new Vector3d(14/16., 13/16., 9/16.),
+				new Vector3d(11/16., 13/16., 9/16.),
+				new Vector3d(13/16., 13/16., 9/16.),
 				new Vector3d(17/16., 3/16., 9/16.),
 				new Vector2d(7/16., 10/16.),
 				new Vector2d(9/16., 10/16.),
@@ -77,17 +104,17 @@ public class TestModel {
 		uvtriangles[2] = new UVTriangle(
 				new Vector3d(17/16., 3/16., 7/16.),
 				new Vector3d(15/16., 3/16., 7/16.),
-				new Vector3d(12/16., 13/16., 7/16.),
-				new Vector2d(9/16., 0),
+				new Vector3d(11/16., 13/16., 7/16.),
 				new Vector2d(7/16., 0),
-				new Vector2d(7/16., 10/16.));
+				new Vector2d(9/16., 0),
+				new Vector2d(9/16., 10/16.));
 		uvtriangles[3] = new UVTriangle(
-				new Vector3d(12/16., 13/16., 7/16.),
-				new Vector3d(14/16., 13/16., 7/16.),
+				new Vector3d(11/16., 13/16., 7/16.),
+				new Vector3d(13/16., 13/16., 7/16.),
 				new Vector3d(17/16., 3/16., 7/16.),
-				new Vector2d(7/16., 10/16.),
 				new Vector2d(9/16., 10/16.),
-				new Vector2d(9/16., 0));
+				new Vector2d(7/16., 10/16.),
+				new Vector2d(7/16., 0));
 		
 		light = new Vector3d(.1, 1, -.1);
 		light.normalize();
@@ -100,6 +127,12 @@ public class TestModel {
 	public void intersect(Ray ray) {
 		ray.currentMaterial = 1 << 8;
 		
+		for (int i = 0; i < quads.length; ++i) {
+			if (quads[i].intersect(ray)) {
+				Texture.torch.getColor(ray);
+				ray.t = ray.tNear;
+			}
+		}
 		for (int i = 0; i < uvtriangles.length; ++i) {
 			if (uvtriangles[i].intersect(ray)) {
 				Texture.torch.getColor(ray);

@@ -104,6 +104,7 @@ public class UVTriangle {
 				py = py + ray.d.y * t;
 				pz = pz + ray.d.z * t;
 				
+				// calculate barycentric coordinates
 				double nax = c_b.y*(pz-b.z) - c_b.z*(py-b.y);
 				double nay = c_b.z*(px-b.x) - c_b.x*(pz-b.z);
 				double naz = c_b.x*(py-b.y) - c_b.y*(px-b.x);
@@ -116,6 +117,7 @@ public class UVTriangle {
 				double ncy = b_a.z*(px-a.x) - b_a.x*(pz-a.z);
 				double ncz = b_a.x*(py-a.y) - b_a.y*(px-a.x);
 				
+				// alpha, beta, gamma are the barycentric coordinates
 				double alpha = (n.x*nax + n.y*nay + n.z*naz) * rn;
 				double beta =  (n.x*nbx + n.y*nby + n.z*nbz) * rn;
 				double gamma = (n.x*ncx + n.y*ncy + n.z*ncz) * rn;
