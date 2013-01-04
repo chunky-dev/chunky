@@ -17,6 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.math.Quad;
+import se.llbit.math.UVTriangle;
 
 /**
  * Utility methods for quads and triangles.
@@ -42,6 +43,18 @@ public class Model {
 	 */
 	public static final Quad[] rotateY(Quad[] src) {
 		Quad[] rot = new Quad[src.length];
+		for (int i = 0; i < src.length; ++i) {
+			rot[i] = src[i].getYRotated();
+		}
+		return rot;
+	}
+	
+	/**
+	 * @param src
+	 * @return UVTriangles rotated about the Y axis
+	 */
+	public static final UVTriangle[] rotateY(UVTriangle[] src) {
+		UVTriangle[] rot = new UVTriangle[src.length];
 		for (int i = 0; i < src.length; ++i) {
 			rot[i] = src[i].getYRotated();
 		}
