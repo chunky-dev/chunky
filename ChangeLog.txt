@@ -1,24 +1,12 @@
-2013-01-05 Jesper Öqvist <jesper@llbit.se>
+1.1.2 - 2013-01-05
 
     * Fixed error that could cause Chunky to not remember the last used
       texture pack
     * Improved torch rendering - torches now render exactly like in-game
-
-2013-01-01 Jesper Öqvist <jesper@llbit.se>
-
     * Biome colors are now blurred - improves visibly sharp biome edges
-
-2012-12-30  Jesper Öqvist <jesper@llbit.se>
-
     * Added biome map mode - renders a map color coded by biome ID
     * Lily pads render with the correct rotation (same as in-game)
-
-2012-12-28  Jesper Öqvist <jesper@llbit.se>
-
     * Added button to reload all chunks in the scene
-
-2012-12-27  Jesper Öqvist <jesper@llbit.se>
-
     * Pressure plates now have the correct size
     * Fixed some door rendering issues (incorrect rotation)
 
