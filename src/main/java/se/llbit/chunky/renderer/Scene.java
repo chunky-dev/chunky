@@ -556,8 +556,11 @@ public class Scene implements Refreshable {
 			calculateOctreeOrigin(chunksToLoad);
 			loadedChunks = new HashSet<ChunkPosition>(chunksToLoad);
 			
-			loadGrassTexture(context, renderListener);
-			loadFoliageTexture(context, renderListener);
+			boolean haveGrass = loadGrassTexture(context, renderListener);
+			boolean haveFoliage = loadFoliageTexture(context, renderListener);
+			if (!haveGrass || !haveFoliage) {
+				biomeColors = false;
+			}
 		} else {
 			// Could not load stored octree
 			// Load the chunks from the world
