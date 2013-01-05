@@ -5,20 +5,20 @@ Chunky is Copyright 2010-2012 Jesper Öqvist
 
 Permission to modify and redistribute is granted under the terms of
 the GPLv3 license.
-See the file LICENSE.txt for the full license.
+See the file license/LICENSE.txt for the full license.
 
 Chunky uses the library JOCL by Marco Hutter.
 JOCL is covered by the MIT/X11 license.
-See the file JOCL.txt for the full license and copyright notice.
+See the file license/JOCL.txt for the full license and copyright notice.
 
 Chunky uses the MWC64X random number generator by David Thomas.
 MWC64X is covered by the BSD license.
-See the file MWC64X.txt for the full license and copyright notice.
+See the file license/MWC64X.txt for the full license and copyright notice.
 
 Chunky uses the log4j library by the Apche Software Foundation.
 The log4j library is covered by the Apache License, version 2.0.
-See the file LOG4J.txt for the full license.
-See the file NOTICE for the copyright notice.
+See the file license/LOG4J.txt for the full license.
+See the file license/NOTICE for the copyright notice.
 
 BUILDING
 ========

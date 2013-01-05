@@ -100,13 +100,15 @@
 			<zipfileset dir="." prefix="Chunky">
 				<include name="README.txt"/>
 				<include name="ChangeLog.txt"/>
+				<include name="Chunky.bat"/>
+				<include name="Chunky.sh"/>
+			</zipfileset>
+			<zipfileset dir="license" prefix="Chunky/license">
 				<include name="LICENSE.txt"/>
 				<include name="JOCL.txt"/>
 				<include name="MWC64X.txt"/>
 				<include name="NOTICE.txt"/>
 				<include name="LOG4J.txt"/>
-				<include name="Chunky.bat"/>
-				<include name="Chunky.sh"/>
 			</zipfileset>
 			<zipfileset dir="build" prefix="Chunky">
 				<include name="Chunky.jar"/>
