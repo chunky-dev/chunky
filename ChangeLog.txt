@@ -1,3 +1,9 @@
+2013-01-05 Jesper Öqvist <jesper@llbit.se>
+
+    * Fixed error that could cause Chunky to not remember the last used
+      texture pack
+    * Improved torch rendering - torches now render exactly like in-game
+
 2013-01-01 Jesper Öqvist <jesper@llbit.se>
 
     * Biome colors are now blurred - improves visibly sharp biome edges
