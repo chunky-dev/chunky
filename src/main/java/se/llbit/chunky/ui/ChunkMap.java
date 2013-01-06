@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.RenderBuffer;
+import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.World;
@@ -81,10 +82,6 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		private void setMotionOrigin(MouseEvent e) {
 			ox = e.getX();
 			oy = e.getY();
-			double scale = (double) view.chunkScale;
-			int cx = (int) Math.floor(view.x + (ox - getWidth()/2) / scale);
-			int cz = (int) Math.floor(view.z + (oy - getHeight()/2) / scale);
-			chunky.setHoveredChunk(cx, cz);
 		}
 
 		private void onDrag(MouseEvent e) {
@@ -158,6 +155,14 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
+			double scale = (double) view.chunkScale;
+			int cx = (int) Math.floor(view.x + (e.getX() - getWidth()/2) / scale);
+			int cz = (int) Math.floor(view.z + (e.getY() - getHeight()/2) / scale);
+			Chunk prevHovered = chunky.getHoveredChunk();
+			chunky.setHoveredChunk(cx, cz);
+			Chunk hovered = chunky.getHoveredChunk();
+			if (prevHovered != hovered)
+				repaint();
 		}
 
 		@Override

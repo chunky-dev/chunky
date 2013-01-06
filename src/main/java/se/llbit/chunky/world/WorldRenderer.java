@@ -29,6 +29,8 @@ import se.llbit.chunky.resources.MiscImages;
  */
 public class WorldRenderer {
 
+	private static final Font font = new Font("Sans serif", Font.BOLD, 11);
+	
 	private boolean highlightEnabled;
 	private Block hlBlock = Block.DIAMONDORE;
 	private Color hlColor = Color.red;
@@ -157,15 +159,26 @@ public class WorldRenderer {
 			g.drawImage(MiscImages.clock, view.width-32, 0, 32, 32, null);
 		}
 		
-		if (world.havePlayerPos())
+		if (world.havePlayerPos()) {
 			renderPlayer(world, g, view,
 					renderer == Chunk.surfaceRenderer
 					|| world.playerLocY() == world.currentLayer());
+		}
 		
-		if (world.haveSpawnPos())
+		if (world.haveSpawnPos()) {
 			renderSpawn(world, g, view,
 			        renderer == Chunk.surfaceRenderer
 			        || world.spawnPosY() == world.currentLayer());
+		}
+		
+		Chunk hoveredChunk = chunky.getHoveredChunk();
+		if (!hoveredChunk.isEmpty()) {
+			
+			g.setFont(font);
+			g.setColor(Color.white);
+			g.drawString("Chunk: " + hoveredChunk.getPosition(),
+					5, view.height - 5);
+		}
 	}
 
 	private void renderPlayer(World world, Graphics g, ChunkView view, boolean sameLayer) {
