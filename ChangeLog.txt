@@ -1,4 +1,5 @@
 1.1.3 - TBD
+    * Clicking in the map with max zoom will select an entire region
     * Chunk coordinates for the currently hovered chunk is displayed
       in the bottom right corner of the map view
 

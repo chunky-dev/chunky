@@ -137,8 +137,16 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 					double scale = (double) view.chunkScale;
 					int cx = (int) Math.floor(view.x + (x - getWidth()/2) / scale);
 					int cz = (int) Math.floor(view.z + (y - getHeight()/2) / scale);
-					chunky.selectChunk(cx, cz);
-					renderBuffer.updateChunk(cx, cz);
+					
+					if (view.chunkScale > 1) {
+						chunky.selectChunk(cx, cz);
+						renderBuffer.updateChunk(cx, cz);
+					} else {
+						int rx = cx >> 5;
+						int rz = cz >> 5;
+						chunky.selectChunks(rx*32, (rx+1)*32, rz*32, (rz+1)*32);
+						renderBuffer.updateChunks(rx*32, (rx+1)*32, rz*32, (rz+1)*32);
+					}
 				}
 
 			} else {
