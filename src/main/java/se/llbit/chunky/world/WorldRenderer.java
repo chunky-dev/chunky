@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.RenderBuffer;
 import se.llbit.chunky.resources.MiscImages;
 
@@ -139,16 +140,17 @@ public class WorldRenderer {
 	
 	/**
 	 * Render overlay icons
-	 * @param world
-	 * @param selection
-	 * @param g
-	 * @param renderBuffer
-	 * @param renderer
-	 * @param loadIndicator
+	 * @param world 
+	 * @param chunky 
+	 * @param g 
+	 * @param renderBuffer 
 	 */
-	public void renderHUD(World world, ChunkSelectionTracker selection,
-			Graphics g, RenderBuffer renderBuffer,
-			Chunk.Renderer renderer, boolean loadIndicator) {
+	public void renderHUD(World world, Chunky chunky, 
+			Graphics g, RenderBuffer renderBuffer) {
+		
+		boolean loadIndicator = chunky.isLoading();
+		Chunk.Renderer renderer = chunky.getChunkRenderer();
+		
 		ChunkView view = renderBuffer.getView();
 		
 		if (loadIndicator) {

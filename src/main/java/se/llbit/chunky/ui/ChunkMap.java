@@ -81,6 +81,10 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		private void setMotionOrigin(MouseEvent e) {
 			ox = e.getX();
 			oy = e.getY();
+			double scale = (double) view.chunkScale;
+			int cx = (int) Math.floor(view.x + (ox - getWidth()/2) / scale);
+			int cz = (int) Math.floor(view.z + (oy - getHeight()/2) / scale);
+			chunky.setHoveredChunk(cx, cz);
 		}
 
 		private void onDrag(MouseEvent e) {
@@ -213,9 +217,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		chunky.getWorldRenderer().render(world, renderBuffer,
 						chunky.getChunkRenderer(), chunky.getChunkSelection());
 		renderBuffer.renderBuffered(g);
-		chunky.getWorldRenderer().renderHUD(world,
-				chunky.getChunkSelection(), g, renderBuffer,
-				chunky.getChunkRenderer(), chunky.isLoading());
+		chunky.getWorldRenderer().renderHUD(world, chunky, g, renderBuffer);
 		drawSelectionRect(g);
 	}
 	
