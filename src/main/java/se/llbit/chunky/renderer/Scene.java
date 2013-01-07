@@ -84,6 +84,8 @@ public class Scene implements Refreshable {
 	
 	private static final int DEFAULT_SPP_TARGET = 1000;
 	
+	private static final double fSubSurface = 0.3;
+	
 	/**
 	 * Minimum canvas width
 	 */
@@ -1137,7 +1139,14 @@ public class Scene implements Refreshable {
 
 							double directLight = 0;
 							
-							if (reflected.d.dot(ray.n) > 0) {
+							boolean frontLight = reflected.d.dot(ray.n) > 0;
+
+							if (frontLight || (currentBlock.subSurfaceScattering &&
+									random.nextDouble() < fSubSurface)) {
+								
+								if (!frontLight) {
+									reflected.x.scaleAdd(-Ray.OFFSET, ray.n, reflected.x);
+								}
 							
 								reflected.currentMaterial = ray.prevMaterial;
 		
@@ -1145,12 +1154,13 @@ public class Scene implements Refreshable {
 								
 								if (attenuation > 0) {
 									directLight = attenuation * reflected.d.dot(ray.n);
+									if (!frontLight)
+										directLight = -directLight;
 									ray.hit = true;
 								}
 							}
-	
+								
 							getDiffuseReflectedRay(ray, reflected, random);
-							
 							pathTrace(reflected, rayPool, vectorPool, random, 0, false);
 							ray.hit = ray.hit || reflected.hit;
 							if (ray.hit) {
@@ -1164,6 +1174,7 @@ public class Scene implements Refreshable {
 									* (emittance + directLight * sun.emittance.z
 										+ (reflected.color.z + reflected.emittance.z));
 							}
+							
 						} else {
 							getDiffuseReflectedRay(ray, reflected, random);
 							

@@ -241,6 +241,7 @@ public class Block {
 			isOpaque = false;
 			isSolid = true;
 			localIntersect = true;
+			subSurfaceScattering = true;
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
@@ -405,6 +406,7 @@ public class Block {
 			isOpaque = false;
 			isSolid = false;
 			localIntersect = true;
+			subSurfaceScattering = true;
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
@@ -471,6 +473,7 @@ public class Block {
 			isOpaque = false;
 			isSolid = false;
 			localIntersect = true;
+			subSurfaceScattering = true;
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
@@ -482,6 +485,7 @@ public class Block {
 			isOpaque = false;
 			isSolid = false;
 			localIntersect = true;
+			subSurfaceScattering = true;
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
@@ -2888,6 +2892,11 @@ public class Block {
 	 * Emitter blocks emit light.
 	 */
 	public boolean isEmitter = false;
+	
+	/**
+	 * Subsurface scattering property.
+	 */
+	public boolean subSurfaceScattering = false;
 	
 	private Texture frontTexture;
 	private Texture icon;
