@@ -16,11 +16,16 @@
  */
 package se.llbit.chunky.ui;
 
+import java.awt.Toolkit;
+import java.net.URL;
+
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 /**
  * Credits dialog.
@@ -36,6 +41,12 @@ public class Credits extends JDialog {
 	public Credits(JFrame parent) {
 		super(parent, "Chunky Credits");
 		
+		JLabel chunkyIcon = new JLabel();
+		URL url = getClass().getResource("/chunky.png");
+		if (url != null) {
+			chunkyIcon.setIcon(new ImageIcon(
+					Toolkit.getDefaultToolkit().getImage(url)));
+		}
 		JLabel creditsLbl = new JLabel(
 			"<html><b>Programming:</b><br>" +
 			"Jesper Öqvist<br>" +
@@ -58,12 +69,17 @@ public class Credits extends JDialog {
 		panel.setLayout(layout);
 		layout.setHorizontalGroup(layout.createSequentialGroup()
 			.addContainerGap()
+			.addComponent(chunkyIcon)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(creditsLbl)
 			.addContainerGap()
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
-			.addComponent(creditsLbl)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(chunkyIcon)
+				.addComponent(creditsLbl)
+			)
 			.addContainerGap()
 		);
 		setContentPane(panel);
