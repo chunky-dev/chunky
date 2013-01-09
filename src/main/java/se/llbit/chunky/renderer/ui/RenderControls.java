@@ -1191,7 +1191,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	ActionListener saveFrameListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			renderManager.saveFrame();
+			renderManager.saveFrame(RenderControls.this);
 		}
 	};
 	ActionListener loadSceneListener = new ActionListener() {

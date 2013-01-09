@@ -2738,12 +2738,21 @@ public class Scene implements Refreshable {
 	/**
 	 * @param targetFile
 	 * @param watermark 
+	 * @param progressListener 
 	 * @throws IOException 
 	 */
-	public synchronized void saveFrame(File targetFile, boolean watermark) throws IOException {
+	public synchronized void saveFrame(File targetFile, boolean watermark,
+			ProgressListener progressListener) throws IOException {
+		
+		for (int x = 0; x < width; ++x) {
+			progressListener.setProgress("Finalizing frame", x, 0, width-1);
+			for (int y = 0; y < height; ++y) {
+				finalizePixel(x, y);
+			}
+		}
 		if (watermark)
 			addWatermark();
-		ImageIO.write(buffer, "png", targetFile);
+		ImageIO.write(backBuffer, "png", targetFile);
 	}
 
 	/**

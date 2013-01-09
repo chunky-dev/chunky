@@ -402,8 +402,9 @@ public class RenderManager extends Thread implements IRenderManager, Renderer {
 	
 	/**
 	 * Save the current frame as a PNG image.
+	 * @param progressListener
 	 */
-	public synchronized void saveFrame() {
+	public synchronized void saveFrame(ProgressListener progressListener) {
 		
 		CenteredFileDialog fileDialog =
 				new CenteredFileDialog(null, "Save Current Frame", FileDialog.SAVE);
@@ -437,7 +438,8 @@ public class RenderManager extends Thread implements IRenderManager, Renderer {
 					return;
 			}
 			try {
-				bufferedScene.saveFrame(targetFile, useWatermark);
+				bufferedScene.saveFrame(targetFile, useWatermark,
+						progressListener);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
