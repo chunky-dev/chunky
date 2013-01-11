@@ -530,12 +530,15 @@ public class RenderControls extends JDialog implements ViewListener,
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					Desktop.getDesktop().open(context.getSceneDirectory());
+					if (Desktop.isDesktopSupported()) {
+						Desktop.getDesktop().open(context.getSceneDirectory());
+					}
 				} catch (IOException e) {
 					logger.warn("Failed to open scene directory", e);
 				}
 			}
 		});
+		openSceneDirBtn.setVisible(Desktop.isDesktopSupported());
 		
 		loadSceneBtn.setToolTipText("This replaces the current scene!");
 		JButton setCanvasSizeBtn = new JButton("Set Canvas Size");
