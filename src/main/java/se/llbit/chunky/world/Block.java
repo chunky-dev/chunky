@@ -241,7 +241,6 @@ public class Block {
 			isOpaque = false;
 			isSolid = true;
 			localIntersect = true;
-			subSurfaceScattering = true;
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
