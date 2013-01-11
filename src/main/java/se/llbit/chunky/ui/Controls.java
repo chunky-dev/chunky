@@ -51,10 +51,13 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.log4j.Logger;
+
 import se.llbit.chunky.main.BlockTypeListCellRenderer;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.Messages;
 import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.ui.SceneDirectoryPicker;
 import se.llbit.chunky.resources.MiscImages;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.world.Block;
@@ -70,6 +73,9 @@ import se.llbit.chunky.world.World;
  */
 @SuppressWarnings("serial")
 public class Controls extends JPanel {
+	
+	private static final Logger logger =
+			Logger.getLogger(Controls.class);
 	
 	private static final int WIDTH_BIG = 300;
 
@@ -386,6 +392,32 @@ public class Controls extends JPanel {
 			}
 		});
 		
+		JButton openSceneDirBtn = new JButton("Open Scene Directory");
+		openSceneDirBtn.setVisible(Desktop.isDesktopSupported());
+		openSceneDirBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					if (Desktop.isDesktopSupported()) {
+						File sceneDir = SceneDirectoryPicker.getCurrentSceneDirectory();
+						if (sceneDir != null) {
+							Desktop.getDesktop().open(sceneDir);
+						}
+					}
+				} catch (IOException e) {
+					logger.warn("Failed to open scene directory", e);
+				}
+			}
+		});
+		
+		JButton changeSceneDirBtn = new JButton("Change Scene Directory");
+		changeSceneDirBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				SceneDirectoryPicker.changeSceneDirectory(chunky.getFrame());
+			}
+		});
+		
 		GroupLayout layout = new GroupLayout(renderPanel);
 		renderPanel.setLayout(layout);
 		layout.setHorizontalGroup(layout.createSequentialGroup()
@@ -402,6 +434,8 @@ public class Controls extends JPanel {
 				)
 				.addComponent(testCLBtn)
 				.addComponent(benchmarkBtn)
+				.addComponent(openSceneDirBtn)
+				.addComponent(changeSceneDirBtn)
 			)
 			.addContainerGap()
 		);
@@ -422,6 +456,10 @@ public class Controls extends JPanel {
 			.addComponent(testCLBtn)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(benchmarkBtn)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(openSceneDirBtn)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addComponent(changeSceneDirBtn)
 			.addContainerGap()
 		);
 		

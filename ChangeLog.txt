@@ -2,8 +2,9 @@
     * Clicking in the map with max zoom will select an entire region
     * Chunk coordinates for the currently hovered chunk is displayed
       in the bottom right corner of the map view
-    * Saving current frame actually saves the current frame now, not
-      the last displayed frame!
+    * Saving current frame actually saves the current frame, not the
+      last displayed frame!
+    * Added buttons to open and change scene directory in 3D Render tab
 
 1.1.2 - 2013-01-05
 
