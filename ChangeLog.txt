@@ -5,6 +5,8 @@
     * Saving current frame actually saves the current frame, not the
       last displayed frame!
     * Added buttons to open and change scene directory in 3D Render tab
+    * It is now possible to select postprocessing mode in the Render Controls
+      window
 
 1.1.2 - 2013-01-05
 

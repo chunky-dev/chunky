@@ -58,6 +58,7 @@ import org.apache.log4j.Logger;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.Camera;
+import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.RenderStatusListener;
@@ -596,13 +597,18 @@ public class RenderControls extends JDialog implements ViewListener,
 		biomeColorsCB = new JCheckBox("enable biome colors");
 		updateBiomeColorsCB();
 		
-		JCheckBox gammaCorrectionCB = new JCheckBox("enable gamma correction");
-		gammaCorrectionCB.setSelected(renderManager.scene().getGammaCorrectionEnabled());
-		gammaCorrectionCB.addActionListener(new ActionListener() {
+		JLabel postprocessLbl = new JLabel("postprocessing:");
+		JComboBox postprocessCB = new JComboBox();
+		for (Postprocess pp : Postprocess.values) {
+			postprocessCB.addItem("" + pp);
+		}
+		postprocessCB.setSelectedIndex(renderManager.scene().getPostprocess().ordinal());
+		postprocessCB.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JCheckBox source = (JCheckBox) e.getSource();
-				renderManager.scene().setGammaCorrectionEnabled(source.isSelected());
+				JComboBox source = (JComboBox) e.getSource();
+				renderManager.scene().setPostprocess(
+						Postprocess.get(source.getSelectedIndex()));
 			}
 		});
 		
@@ -656,7 +662,10 @@ public class RenderControls extends JDialog implements ViewListener,
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(makeDefaultBtn))
 						.addComponent(sep2)
-						.addComponent(gammaCorrectionCB)
+						.addGroup(layout.createSequentialGroup()
+							.addComponent(postprocessLbl)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(postprocessCB))
 						.addComponent(stillWaterCB)
 						.addComponent(clearWaterCB)
 						.addComponent(biomeColorsCB)
@@ -699,7 +708,9 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(sep2)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(gammaCorrectionCB)
+				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+					.addComponent(postprocessLbl)
+					.addComponent(postprocessCB))
 				.addComponent(stillWaterCB)
 				.addComponent(clearWaterCB)
 				.addComponent(biomeColorsCB)

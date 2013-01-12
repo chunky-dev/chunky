@@ -183,17 +183,14 @@ public class Scene implements Refreshable {
 	private boolean pathTrace = false;
 	private boolean pauseRender = true;
 	
+	private Postprocess postprocess = Postprocess.GAMMA;
+	
 	/**
  	 * Preview frame interlacing counter.
  	 */
 	int previewCount;
 	
 	private boolean clearWater = false;
-	
-	/**
-	 * Gamma correction flag.
-	 */
-	private boolean gammaCorrection = true;
 	
 	private double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
 	private boolean atmosphereEnabled = false;
@@ -477,6 +474,7 @@ public class Scene implements Refreshable {
 			int height = tag.get("height").intValue();
 			setCanvasSize(width, height);
 			gamma = tag.get("gamma").doubleValue(DEFAULT_GAMMA);
+			postprocess = Postprocess.get(tag.get("postprocess"));
 		}
 		
 		if (result.containsKey(cvf_camera))  {
@@ -2545,18 +2543,18 @@ public class Scene implements Refreshable {
 	}
 	
 	/**
-	 * @return <code>true</code> if gamma correction is enabled
+	 * @return The current postprocessing mode
 	 */
-	public boolean getGammaCorrectionEnabled() {
-		return gammaCorrection;
+	public Postprocess getPostprocess() {
+		return postprocess;
 	}
 
 	/**
-	 * Set the gamma correction flag
-	 * @param value
+	 * Change the postprocessing mode
+	 * @param p The new postprocessing mode
 	 */
-	public synchronized void setGammaCorrectionEnabled(boolean value) {
-		gammaCorrection  = value;
+	public synchronized void setPostprocess(Postprocess p) {
+		postprocess = p;
 		if (!pathTrace)
 			refresh();
 	}
@@ -2668,7 +2666,7 @@ public class Scene implements Refreshable {
 	 * @param other
 	 */
 	public void copyTransients(Scene other) {
-		gammaCorrection = other.gammaCorrection;
+		postprocess = other.postprocess;
 		gamma = other.gamma;
 		saveDumps = other.saveDumps;
 		dumpFrequency = other.dumpFrequency;
@@ -2750,6 +2748,7 @@ public class Scene implements Refreshable {
 				finalizePixel(x, y);
 			}
 		}
+		
 		if (watermark)
 			addWatermark();
 		ImageIO.write(backBuffer, "png", targetFile);
@@ -3037,8 +3036,8 @@ public class Scene implements Refreshable {
 	}
 
 	/**
-	 * Finalize the job. Fills in raster image with RGB color values
-	 * corresponding to the collected samples.
+	 * Finalize a pixel. Calculates the resulting RGB color values for
+	 * the pixel and sets these in the bitmap image.
 	 * @param jobId
 	 */
 	void finalizePixel(int x, int y) {
@@ -3049,11 +3048,24 @@ public class Scene implements Refreshable {
 		double b = samples[x][y][2];
 		
 		if (pathTrace()) {
-			if (gammaCorrection) {
+			switch (postprocess) {
+			case NONE:
+				break;
+			case TONEMAP1:
+				// http://filmicgames.com/archives/75
+				r = Math.max(0, r-0.004);
+				r = (r*(6.2*r + .5)) / (r * (6.2*r + 1.7) + 0.06);
+				g = Math.max(0, g-0.004);
+				g = (g*(6.2*g + .5)) / (g * (6.2*g + 1.7) + 0.06);
+				b = Math.max(0, b-0.004);
+				b = (b*(6.2*b + .5)) / (b * (6.2*b + 1.7) + 0.06);
+				break;
+			case GAMMA:
 				double corr = 1/gamma;
 				r = Math.pow(r, corr);
 				g = Math.pow(g, corr);
 				b = Math.pow(b, corr);
+				break;
 			}
 		} else {
 			r = Math.sqrt(r);
