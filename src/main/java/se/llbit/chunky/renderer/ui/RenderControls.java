@@ -501,6 +501,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		exposureSlider.addChangeListener(exposureListener);
 		updateExposureSlider();
 
+		JLabel postprocessDescLbl = new JLabel("<html>Post processing affects rendering performance<br>when the preview window is visible");
 		JLabel postprocessLbl = new JLabel("Post-processing mode:");
 		JComboBox postprocessCB = new JComboBox();
 		for (Postprocess pp : Postprocess.values) {
@@ -532,6 +533,7 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(postprocessCB)
 				)
+				.addComponent(postprocessDescLbl)
 			)
 			.addContainerGap()
 		);
@@ -540,11 +542,16 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addGroup(layout.createParallelGroup()
 				.addComponent(exposureLbl)
 				.addComponent(exposureSlider)
-				.addComponent(exposureField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+				.addComponent(exposureField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(postprocessLbl)
-				.addComponent(postprocessCB))
+				.addComponent(postprocessCB)
+			)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addComponent(postprocessDescLbl)
 			.addContainerGap()
 		);
 		return panel;
