@@ -61,8 +61,8 @@ public interface BlockData {
 	
 	int CORNER_OFFSET = 24;
 	
-	int SOUTH_EAST = 7;
-	int SOUTH_WEST = 6;
-	int NORTH_EAST = 5;
-	int NORTH_WEST = 4;
+	int SOUTH_EAST = 4;
+	int SOUTH_WEST = 5;
+	int NORTH_EAST = 6;
+	int NORTH_WEST = 7;
 }
