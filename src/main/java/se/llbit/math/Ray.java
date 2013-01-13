@@ -18,6 +18,7 @@ package se.llbit.math;
 
 import se.llbit.chunky.renderer.Scene;
 import se.llbit.chunky.world.Block;
+import se.llbit.chunky.world.BlockData;
 
 /**
  * The ray representation used for ray tracing.
@@ -246,7 +247,7 @@ public class Ray {
 	 * @return Current block data (sometimes called metadata)
 	 */
 	public final int getBlockData() {
-		return 0xF & (currentMaterial >> 8);
+		return 0xF & (currentMaterial >> BlockData.BLOCK_DATA_OFFSET);
 	}
 
 	/**
@@ -258,13 +259,6 @@ public class Ray {
 		setDefault();
 		this.x.set(o);
 		this.d.set(d);
-	}
-
-	/**
-	 * @return Biome id of current block
-	 */
-	public final int getBiomeId() {
-		return 0xFF & (currentMaterial >> 24);
 	}
 
 	/**

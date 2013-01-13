@@ -17,6 +17,8 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.BlockData;
+import se.llbit.math.AABB;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
@@ -24,6 +26,53 @@ import se.llbit.math.Vector4d;
 
 @SuppressWarnings("javadoc")
 public class StairModel {
+	private static AABB[][][] corners = {
+		{
+			{
+				// s-e
+				new AABB(0, 1, 0, 0.5, 0, 1),
+				new AABB(0, 0.5, 0.5, 1, 0, 0.5),
+			},
+			{
+				// s-w
+				new AABB(0, 1, 0, 0.5, 0, 1),
+				new AABB(0.5, 1, 0.5, 1, 0, 0.5),
+			},
+			{
+				// n-e
+				new AABB(0, 1, 0, 0.5, 0, 1),
+				new AABB(0, 0.5, 0.5, 1, 0.5, 1),
+			},
+			{
+				// n-w
+				new AABB(0, 1, 0, 0.5, 0, 1),
+				new AABB(0.5, 1, 0.5, 1, 0.5, 1),
+			},
+		},
+		{
+			{
+				// s-e
+				new AABB(0, 1, 0.5, 1, 0, 1),
+				new AABB(0, 0.5, 0, 0.5, 0, 0.5),
+			},
+			{
+				// s-w
+				new AABB(0, 1, 0.5, 1, 0, 1),
+				new AABB(0.5, 1, 0, 0.5, 0, 0.5),
+			},
+			{
+				// n-e
+				new AABB(0, 1, 0.5, 1, 0, 1),
+				new AABB(0, 0.5, 0, 0.5, 0.5, 1),
+			},
+			{
+				// n-w
+				new AABB(0, 1, 0.5, 1, 0, 1),
+				new AABB(0.5, 1, 0, 0.5, 0.5, 1),
+			},
+		},
+	};
+	// ascending south
 	private static Quad[] quads = {
 		// lower front
 		new Quad(new Vector3d(0, .5, 0), new Vector3d(1, .5, 0),
@@ -87,30 +136,44 @@ public class StairModel {
 		boolean hit = false;
 		Quad[] rotated = null;
 		int flipped = (ray.getBlockData() & 4) >> 2;
-		switch (ray.getBlockData() & 3) {
-		case 0:
-			rotated = rot[flipped][3];
-			break;
-		case 1:
-			rotated = rot[flipped][1];
-			break;
-		case 2:
-			rotated = rot[flipped][0];
-			break;
-		case 3:
-			rotated = rot[flipped][2];
-			break;
-		}
-
+		int corner = 7 & (ray.currentMaterial >> BlockData.CORNER_OFFSET);
+		
 		ray.t = Double.POSITIVE_INFINITY;
-		for (Quad quad : rotated) {
-			if (quad.intersect(ray)) {
-				texture.getColor(ray);
-				ray.n.set(quad.n);
-				ray.t = ray.tNear;
-				hit = true;
+		
+		if (corner != 0) {
+			for (AABB box : corners[flipped][3 & corner]) {
+				if (box.intersect(ray)) {
+					texture.getColor(ray);
+					ray.t = ray.tNear;
+					hit = true;
+				}
+			}
+		} else {
+			switch (ray.getBlockData() & 3) {
+			case 0:
+				rotated = rot[flipped][3];
+				break;
+			case 1:
+				rotated = rot[flipped][1];
+				break;
+			case 2:
+				rotated = rot[flipped][0];
+				break;
+			case 3:
+				rotated = rot[flipped][2];
+				break;
+			}
+	
+			for (Quad quad : rotated) {
+				if (quad.intersect(ray)) {
+					texture.getColor(ray);
+					ray.n.set(quad.n);
+					ray.t = ray.tNear;
+					hit = true;
+				}
 			}
 		}
+		
 		if (hit) {
 			ray.x.scaleAdd(ray.t, ray.d, ray.x);
 		}
@@ -124,7 +187,11 @@ public class StairModel {
 		
 		boolean hit = false;
 		int flipped = (ray.getBlockData() & 4) >> 2;
+		int corner = (ray.currentMaterial & 7) >> BlockData.CORNER_OFFSET;
 		Quad[] rotated = rot[flipped][index[ray.getBlockData() & 3]];
+		
+		if (corner != 0)
+			return false;
 
 		ray.t = Double.POSITIVE_INFINITY;
 		for (Quad quad : rotated) {

@@ -2183,6 +2183,98 @@ public class Scene implements Refreshable {
 							octree.set(type, x, cy, z);
 							fence++;
 							break;
+						case Block.OAKWOODSTAIRS_ID:
+						case Block.STONESTAIRS_ID:
+						case Block.BRICKSTAIRS_ID:
+						case Block.STONEBRICKSTAIRS_ID:
+						case Block.NETHERBRICKSTAIRS_ID:
+						case Block.SANDSTONESTAIRS_ID:
+						case Block.SPRUCEWOODSTAIRS_ID:
+						case Block.BIRCHWOODSTAIRS_ID:
+						case Block.JUNGLEWOODSTAIRS_ID:
+							// check if this is a corner stair block
+							int rotation = 3 & (type >> BlockData.BLOCK_DATA_OFFSET);
+							int bd;
+							Block behind;
+							switch (rotation) {
+							case 0:
+								// ascending east
+								bd = octree.get(x+1, cy, z);
+								behind = Block.get(bd);
+								if (behind.isStair()) {
+									switch (3 & (bd >> BlockData.BLOCK_DATA_OFFSET)) {
+									case 2:
+										// if behind ascends south we have s-e corner
+										type |= BlockData.SOUTH_EAST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+										break;
+									case 3:
+										// if behind ascends north we have n-e corner
+										type |= BlockData.NORTH_EAST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+										break;
+									}
+								}
+								break;
+							case 1:
+								// ascending west
+								bd = octree.get(x-1, cy, z);
+								behind = Block.get(bd);
+								if (behind.isStair()) {
+									switch (3 & (bd >> BlockData.BLOCK_DATA_OFFSET)) {
+									case 2:
+										// if behind ascends south we have s-w corner
+										type |= BlockData.SOUTH_WEST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+										break;
+									case 3:
+										// if behind ascends north we have n-w corner
+										type |= BlockData.NORTH_WEST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+										break;
+									}
+								}
+								break;
+							case 2:
+								// ascending south
+								bd = octree.get(x, cy, z+1);
+								behind = Block.get(bd);
+								if (behind.isStair()) {
+									switch (3 & (bd >> BlockData.BLOCK_DATA_OFFSET)) {
+									case 0:
+										// if behind ascends east we have s-e corner
+										type |= BlockData.SOUTH_EAST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+										break;
+									case 1:
+										// if behind ascends west we have s-w corner
+										type |= BlockData.SOUTH_WEST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+										break;
+									}
+								}
+								break;
+							case 3:
+								// ascending north
+								bd = octree.get(x, cy, z-1);
+								behind = Block.get(bd);
+								if (behind.isStair()) {
+									switch (3 & (bd >> BlockData.BLOCK_DATA_OFFSET)) {
+									case 0:
+										// if behind ascends east we have n-e corner
+										type |= BlockData.NORTH_EAST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+										break;
+									case 1:
+										// if behind ascends west we have n-w corner
+										type |= BlockData.NORTH_WEST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+										break;
+									}
+								}
+								break;
+							}
+							break;
 						default:
 							break;
 						}

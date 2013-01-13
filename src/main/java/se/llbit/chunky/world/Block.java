@@ -719,7 +719,8 @@ public class Block {
 			isSolid = true;
 		}
 	};
-	public static final Block WOODENSTAIRS = new Block(0x35, "Wooden Stairs", Icon.woodenStairs, Texture.oakPlanks) {
+	public static final int OAKWOODSTAIRS_ID = 0x35;
+	public static final Block OAKWOODSTAIRS = new Block(OAKWOODSTAIRS_ID, "Wooden Stairs", Icon.woodenStairs, Texture.oakPlanks) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -939,7 +940,8 @@ public class Block {
 			return RailModel.intersect(ray, Texture.railsType[type], type);
 		}
 	};
-	public static final Block STONESTAIRS = new Block(0x43, "Cobblestone Stairs", Icon.stoneStairs, Texture.stone) {
+	public static final int STONESTAIRS_ID = 0x43;
+	public static final Block STONESTAIRS = new Block(STONESTAIRS_ID, "Cobblestone Stairs", Icon.stoneStairs, Texture.stone) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1570,7 +1572,8 @@ public class Block {
 			return FenceGateModel.intersect(ray);
 		}
 	};
-	public static final Block BRICKSTAIRS = new Block(0x6C, "Brick Stairs", Texture.unknown) {
+	public static final int BRICKSTAIRS_ID = 0x6C;
+	public static final Block BRICKSTAIRS = new Block(BRICKSTAIRS_ID, "Brick Stairs", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1581,7 +1584,8 @@ public class Block {
 			return StairModel.intersect(ray, Texture.brick);
 		}
 	};
-	public static final Block STONEBRICKSTAIRS = new Block(0x6D, "Stone Brick Stairs", Icon.stoneBrickStairs) {
+	public static final int STONEBRICKSTAIRS_ID = 0x6D;
+	public static final Block STONEBRICKSTAIRS = new Block(STONEBRICKSTAIRS_ID, "Stone Brick Stairs", Icon.stoneBrickStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1640,7 +1644,8 @@ public class Block {
 			return FenceModel.intersect(ray, Texture.netherBrick);
 		}
 	};
-	public static final Block NETHERBRICKSTAIRS = new Block(0x72, "Nether Brick Stairs", Texture.unknown) {
+	public static final int NETHERBRICKSTAIRS_ID = 0x72;
+	public static final Block NETHERBRICKSTAIRS = new Block(NETHERBRICKFENCE_ID, "Nether Brick Stairs", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1803,7 +1808,8 @@ public class Block {
 			return CocoaPlantModel.intersect(ray);
 		}
 	};
-	public static final Block SANDSTONESTAIRS = new Block(0x80, "Sandstone Stairs", Texture.sandstoneSide) {
+	public static final int SANDSTONESTAIRS_ID = 0x80;
+	public static final Block SANDSTONESTAIRS = new Block(SANDSTONESTAIRS_ID, "Sandstone Stairs", Texture.sandstoneSide) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1875,7 +1881,8 @@ public class Block {
 			isShiny = true;
 		}
 	};
-	public static final Block SPRUCEWOODSTAIRS = new Block(0x86, "Spruce Wood Stairs", Texture.sprucePlanks) {
+	public static final int SPRUCEWOODSTAIRS_ID = 0x86;
+	public static final Block SPRUCEWOODSTAIRS = new Block(SPRUCEWOODSTAIRS_ID, "Spruce Wood Stairs", Texture.sprucePlanks) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1886,7 +1893,8 @@ public class Block {
 			return StairModel.intersect(ray, Texture.sprucePlanks);
 		}
 	};
-	public static final Block BIRCHWOODSTAIRS = new Block(0x87, "Birch Wood Stairs", Texture.birchPlanks) {
+	public static final int BIRCHWOODSTAIRS_ID = 0x87;
+	public static final Block BIRCHWOODSTAIRS = new Block(BIRCHWOODSTAIRS_ID, "Birch Wood Stairs", Texture.birchPlanks) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1897,7 +1905,8 @@ public class Block {
 			return StairModel.intersect(ray, Texture.birchPlanks);
 		}
 	};
-	public static final Block JUNGLEWOODSTAIRS = new Block(0x88, "Jungle Wood Stairs", Texture.jungleTreePlanks) {
+	public static final int JUNGLEWOODSTAIRS_ID = 0x88;
+	public static final Block JUNGLEWOODSTAIRS = new Block(JUNGLEWOODSTAIRS_ID, "Jungle Wood Stairs", Texture.jungleTreePlanks) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2786,7 +2795,7 @@ public class Block {
 		REDMUSHROOM, GOLDBLOCK, IRONBLOCK, DOUBLESLAB,
 		SLAB, BRICKS, TNT, BOOKSHELF,
 		MOSSSTONE, OBSIDIAN, TORCH, FIRE,
-		MONSTERSPAWNER, WOODENSTAIRS, CHEST, REDSTONEWIRE,
+		MONSTERSPAWNER, OAKWOODSTAIRS, CHEST, REDSTONEWIRE,
 		DIAMONDORE, DIAMONDBLOCK, WORKBENCH, CROPS,
 		SOIL, FURNACEUNLIT, FURNACELIT, SIGNPOST,
 		WOODENDOOR, LADDER, MINECARTTRACKS, STONESTAIRS,
@@ -3006,5 +3015,21 @@ public class Block {
 
 	public boolean isCave() {
 		return !isSolid && !this.isWater();
+	}
+	
+	public boolean isStair() {
+		return id == OAKWOODSTAIRS_ID ||
+				id == STONESTAIRS_ID ||
+				id == BRICKSTAIRS_ID ||
+				id == STONEBRICKSTAIRS_ID ||
+				id == NETHERBRICKSTAIRS_ID ||
+				id == SANDSTONESTAIRS_ID ||
+				id == SPRUCEWOODSTAIRS_ID ||
+				id == BIRCHWOODSTAIRS_ID ||
+				id == JUNGLEWOODSTAIRS_ID;
+	}
+
+	public static Block get(int id) {
+		return values[0xFF & id];
 	}
 }

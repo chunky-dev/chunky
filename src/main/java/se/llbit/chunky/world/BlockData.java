@@ -18,6 +18,12 @@ package se.llbit.chunky.world;
 
 @SuppressWarnings("javadoc")
 public interface BlockData {
+	
+	/**
+	 * Offset to block metadata
+	 */
+	int BLOCK_DATA_OFFSET = 8;
+	
 	int RSW_EAST_CONNECTION = 12;
 	int RSW_WEST_CONNECTION = 13;
 	int RSW_NORTH_CONNECTION = 14;
@@ -52,4 +58,11 @@ public interface BlockData {
 	 * Offset for stone wall data
 	 */
 	int STONEWALL_CONN = 9;
+	
+	int CORNER_OFFSET = 24;
+	
+	int SOUTH_EAST = 7;
+	int SOUTH_WEST = 6;
+	int NORTH_EAST = 5;
+	int NORTH_WEST = 4;
 }

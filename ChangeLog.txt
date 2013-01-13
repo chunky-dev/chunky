@@ -10,6 +10,7 @@
       tab. This replaces the "gamma enabled" check box.
     * Added an exposure slider under the Post-Processing tab. This replaces
       the old gamma slider.
+    * Implemented corner stairs rendering
 
 1.1.2 - 2013-01-05
 

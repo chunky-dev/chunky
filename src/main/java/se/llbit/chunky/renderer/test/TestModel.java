@@ -57,6 +57,62 @@ public class TestModel {
 	 * Set up the model
 	 */
 	public void setUp() {
+		boxes = new AABB[] {
+				// n-w
+				//new AABB(0, 1, 0, 0.5, 0, 1),
+				//new AABB(0.5, 1, 0.5, 1, 0.5, 1),
+				// s-w
+				//new AABB(0, 1, 0, 0.5, 0, 1),
+				//new AABB(0.5, 1, 0.5, 1, 0, 0.5),
+				// n-e
+				new AABB(0, 1, 0, 0.5, 0, 1),
+				new AABB(0, 0.5, 0.5, 1, 0.5, 1),
+				// s-e
+				//new AABB(0, 1, 0, 0.5, 0, 1),
+				//new AABB(0, 0.5, 0.5, 1, 0, 0.5),
+		};
+		quads = new Quad[] {
+			// lower front
+			new Quad(new Vector3d(0, .5, 0), new Vector3d(1, .5, 0),
+						new Vector3d(0, 0, 0), new Vector4d(0, 1, .5, 0)),
+	
+			// upper front ?
+			new Quad(new Vector3d(0, 1, .5), new Vector3d(1, 1, .5),
+					new Vector3d(0, .5, .5), new Vector4d(0, 1, 1, .5)),
+	
+			// lower top ?
+			new Quad(new Vector3d(0, .5, .5), new Vector3d(1, .5, .5),
+					new Vector3d(0, .5, 0), new Vector4d(0, 1, .5, 0)),
+	
+			// upper top ?
+			new Quad(new Vector3d(0, 1, 1), new Vector3d(1, 1, 1),
+					new Vector3d(0, 1, .5), new Vector4d(0, 1, 1, .5)),
+	
+			// lower left side ?
+			new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
+					new Vector3d(0, .5, 0), new Vector4d(0, 1, 0, .5)),
+	
+			// upper left side ?
+			new Quad(new Vector3d(0, .5, .5), new Vector3d(0, .5, 1),
+					new Vector3d(0, 1, .5), new Vector4d(.5, 1, .5, 1)),
+	
+			// lower right side ?
+			new Quad(new Vector3d(1, .5, 0), new Vector3d(1, .5, 1),
+					new Vector3d(1, 0, 0), new Vector4d(1, 0, .5, 0)),
+	
+			// upper right side ?
+			new Quad(new Vector3d(1, 1, .5), new Vector3d(1, 1, 1),
+					new Vector3d(1, .5, .5), new Vector4d(.5, 1, 1, .5)),
+	
+			new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
+					new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
+	
+			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
+					new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
+		};
+	}
+	
+	private void setUpTorch() {
 		quads = new Quad[4];
 		
 		// west
@@ -130,7 +186,16 @@ public class TestModel {
 	public void intersect(Ray ray) {
 		ray.currentMaterial = 1 << 8;
 		
-		boolean hit = false;
+		for (int i = 0; i < boxes.length; ++i) {
+			if (boxes[i].intersect(ray)) {
+				Texture.stone.getColor(ray);
+				ray.color.w = 1;
+				ray.t = ray.tNear;
+			}
+		}
+		
+		// TORCH
+		/*
 		float[] color = null;
 		for (int i = 0; i < quads.length; ++i) {
 			if (quads[i].intersect(ray)) {
@@ -161,6 +226,7 @@ public class TestModel {
 				ray.color.w = 1;
 			}
 		}
+		*/
 	}
 
 }
