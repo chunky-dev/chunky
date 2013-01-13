@@ -138,7 +138,7 @@ public class Biomes {
 	 * @return Biome color for given biome ID
 	 */
 	public static final int getColor(int biomeId) {
-		if (biomeId > biomeColor.length)
+		if (biomeId >= biomeColor.length)
 			return UNKNOWN_COLOR;
 		return biomeColor[biomeId];
 	}
