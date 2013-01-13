@@ -1362,10 +1362,11 @@ public class RenderControls extends JDialog implements ViewListener,
 			JSlider source = (JSlider) e.getSource();
 			double value = (double) (source.getValue() - source.getMinimum())
 					/ (source.getMaximum() - source.getMinimum());
-			double scale = Scene.MAX_EXPOSURE
-				- Scene.MIN_EXPOSURE;
+			double logMin = Math.log10(Scene.MIN_EXPOSURE);
+			double logMax = Math.log10(Scene.MAX_EXPOSURE);
+			double scale = logMax - logMin;
 			renderManager.scene().setExposure(
-					value * scale + Scene.MIN_EXPOSURE);
+					Math.pow(10, value * scale + logMin));
 			updateExposureField();
 		}
 	};
@@ -1605,9 +1606,10 @@ public class RenderControls extends JDialog implements ViewListener,
 	
 	protected void updateExposureSlider() {
 		exposureSlider.removeChangeListener(exposureListener);
-		double value = (renderManager.scene().getExposure()
-				- Scene.MIN_EXPOSURE)
-				/ (Scene.MAX_EXPOSURE - Scene.MIN_EXPOSURE);
+		double logMin = Math.log10(Scene.MIN_EXPOSURE);
+		double logMax = Math.log10(Scene.MAX_EXPOSURE);
+		double value = (Math.log10(renderManager.scene().getExposure()) -
+				logMin) / (logMax - logMin);
 		double scale = exposureSlider.getMaximum() - exposureSlider.getMinimum();
 		exposureSlider.setValue((int) (value * scale + exposureSlider.getMinimum()));
 		exposureSlider.addChangeListener(exposureListener);
