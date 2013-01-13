@@ -5,8 +5,11 @@
     * Saving current frame actually saves the current frame, not the
       last displayed frame!
     * Added buttons to open and change scene directory in 3D Render tab
-    * It is now possible to select postprocessing mode in the Render Controls
-      window
+    * Added Post-Processing tab in the Render Controls window
+    * Added a combo box for post-processing mode under the Post-Processing
+      tab. This replaces the "gamma enabled" check box.
+    * Added an exposure slider under the Post-Processing tab. This replaces
+      the old gamma slider.
 
 1.1.2 - 2013-01-05
 

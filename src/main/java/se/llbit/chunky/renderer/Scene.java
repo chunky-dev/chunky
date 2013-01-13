@@ -108,14 +108,19 @@ public class Scene implements Refreshable {
 	public static final float WATER_SPECULAR = 0.46f;
 	
 	/**
-	 * Minimum gamma
+	 * Minimum exposure
 	 */
-	public static final double MIN_GAMMA = 1;
+	public static final double MIN_EXPOSURE = 0.001;
 	
 	/**
-	 * Maximum gamma
+	 * Maximum exposure
 	 */
-	public static final double MAX_GAMMA = 4;
+	public static final double MAX_EXPOSURE = 1000.0;
+	
+	/**
+	 * Default exposure
+	 */
+	public static final double DEFAULT_EXPOSURE = 1.0;
 	
 	/**
 	 * Default gamma
@@ -166,7 +171,7 @@ public class Scene implements Refreshable {
  	 */
 	private Octree octree;
 
-	private double gamma = DEFAULT_GAMMA;
+	private double exposure = DEFAULT_EXPOSURE;
 	private boolean stillWater = false;
 	private boolean biomeColors = true;
 	private boolean sunEnabled = true;
@@ -288,7 +293,7 @@ public class Scene implements Refreshable {
 		
 		loadedChunks = other.loadedChunks;
 
-		gamma = other.gamma;
+		exposure = other.exposure;
 		name = other.name;
 		skymapFileName = other.skymapFileName;
 		
@@ -361,7 +366,7 @@ public class Scene implements Refreshable {
 		
 		canvas.addItem("width", new IntTag(width));
 		canvas.addItem("height", new IntTag(height));
-		canvas.addItem("gamma", new DoubleTag(gamma));
+		canvas.addItem("exposure", new DoubleTag(exposure));
 		
 		if (loadedWorld != null) {
 			worldTag.addItem("worldDirectoryPath",
@@ -473,7 +478,7 @@ public class Scene implements Refreshable {
 			int width = tag.get("width").intValue();
 			int height = tag.get("height").intValue();
 			setCanvasSize(width, height);
-			gamma = tag.get("gamma").doubleValue(DEFAULT_GAMMA);
+			exposure = tag.get("exposure").doubleValue(DEFAULT_EXPOSURE);
 			postprocess = Postprocess.get(tag.get("postprocess"));
 		}
 		
@@ -575,20 +580,20 @@ public class Scene implements Refreshable {
 	}
 
 	/**
-	 * Set the gamma value
+	 * Set the exposure value
 	 * @param value
 	 */
-	public synchronized void setGamma(double value) {
-		gamma = value;
+	public synchronized void setExposure(double value) {
+		exposure = value;
 		if (!pathTrace)
 			refresh();
 	}
 
 	/**
-	 * @return Current gamma value
+	 * @return Current exposure value
 	 */
-	public double getGamma() {
-		return gamma;
+	public double getExposure() {
+		return exposure;
 	}
 
 	/**
@@ -2667,7 +2672,7 @@ public class Scene implements Refreshable {
 	 */
 	public void copyTransients(Scene other) {
 		postprocess = other.postprocess;
-		gamma = other.gamma;
+		exposure = other.exposure;
 		saveDumps = other.saveDumps;
 		dumpFrequency = other.dumpFrequency;
 		sppTarget = other.sppTarget;
@@ -3047,6 +3052,10 @@ public class Scene implements Refreshable {
 		double g = samples[x][y][1];
 		double b = samples[x][y][2];
 		
+		r *= exposure;
+		g *= exposure;
+		b *= exposure;
+		
 		if (pathTrace()) {
 			switch (postprocess) {
 			case NONE:
@@ -3061,10 +3070,9 @@ public class Scene implements Refreshable {
 				b = (b*(6.2*b + .5)) / (b * (6.2*b + 1.7) + 0.06);
 				break;
 			case GAMMA:
-				double corr = 1/gamma;
-				r = Math.pow(r, corr);
-				g = Math.pow(g, corr);
-				b = Math.pow(b, corr);
+				r = Math.pow(r, 1/DEFAULT_GAMMA);
+				g = Math.pow(g, 1/DEFAULT_GAMMA);
+				b = Math.pow(b, 1/DEFAULT_GAMMA);
 				break;
 			}
 		} else {
