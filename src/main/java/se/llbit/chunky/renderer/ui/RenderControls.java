@@ -389,12 +389,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	private Component buildAdvancedPane() {
-		JLabel exposureLbl = new JLabel("exposure: ");
-
-		exposureField = new JTextField(5);
-		exposureField.addActionListener(exposureFieldListener);
-		updateExposureField();
-
 		exposureSlider = new JSlider(1, 100);
 		exposureSlider.addChangeListener(exposureListener);
 		updateExposureSlider();
@@ -450,10 +444,6 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(rayDepthLbl)
 					.addComponent(rayDepthSlider)
 					.addComponent(rayDepthField))
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(exposureLbl)
-					.addComponent(exposureSlider)
-					.addComponent(exposureField))
 				.addComponent(sep1)
 				.addComponent(waterWorldLbl)
 				.addComponent(waterWorldCB)
@@ -470,11 +460,6 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(rayDepthLbl)
 				.addComponent(rayDepthSlider)
 				.addComponent(rayDepthField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(exposureLbl)
-				.addComponent(exposureSlider)
-				.addComponent(exposureField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
