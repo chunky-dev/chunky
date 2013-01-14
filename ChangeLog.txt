@@ -1,13 +1,15 @@
-1.1.3 - TBD
-    * Clicking in the map with max zoom will select an entire region
-    * Chunk coordinates for the currently hovered chunk is displayed
+1.1.3 - 2013-01-14
+    * Clicking in the map when it is maximally zoomed out will select an
+      entire region rather than just a single chunk
+    * The coordinates coordinates of the chunk under the cursor are displayed
       in the bottom left corner of the map view
-    * Saving current frame actually saves the current frame, not the
-      last displayed frame!
-    * Added buttons to open and change scene directory in 3D Render tab
+    * The "Save Current Frame" button should now actually save the current
+      frame, not the last displayed frame
+    * Added buttons to open and change the scene directory in 3D Render tab.
+      The button to open the scene directory is only available on some systems.
     * Added Post-Processing tab in the Render Controls window
-    * Added a combo box for post-processing mode under the Post-Processing
-      tab. This replaces the "gamma enabled" check box.
+    * Added a combo box for post-processing mode under the Post-Processing tab.
+      This replaces the "gamma enabled" check box.
     * Added an exposure slider under the Post-Processing tab. This replaces
       the old gamma slider.
     * Implemented corner stairs rendering
