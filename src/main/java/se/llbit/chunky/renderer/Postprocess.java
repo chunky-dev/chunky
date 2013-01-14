@@ -8,17 +8,16 @@ import se.llbit.nbt.AnyTag;
  */
 @SuppressWarnings("javadoc")
 public enum Postprocess {
-	// default (index 0)
-	GAMMA {
-		@Override
-		public String toString() {
-			return "Gamma correction";
-		}
-	},
 	NONE {
 		@Override
 		public String toString() {
 			return "None";
+		}
+	},
+	GAMMA {
+		@Override
+		public String toString() {
+			return "Gamma correction";
 		}
 	},
 	TONEMAP1 {
@@ -27,6 +26,8 @@ public enum Postprocess {
 			return "Tonemap op1";
 		}
 	};
+	
+	public static final int DEFAULT = GAMMA.ordinal();
 	
 	public static final Postprocess[] values = values();
 
@@ -37,6 +38,6 @@ public enum Postprocess {
 	}
 	
 	public static Postprocess get(AnyTag tag) {
-		return get(tag.intValue());
+		return get(tag.intValue(DEFAULT));
 	}
 }
