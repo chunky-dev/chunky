@@ -58,18 +58,18 @@ public class TestModel {
 	 */
 	public void setUp() {
 		boxes = new AABB[] {
-				// n-w
-				//new AABB(0, 1, 0, 0.5, 0, 1),
-				//new AABB(0.5, 1, 0.5, 1, 0.5, 1),
-				// s-w
-				//new AABB(0, 1, 0, 0.5, 0, 1),
-				//new AABB(0.5, 1, 0.5, 1, 0, 0.5),
-				// n-e
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0, 0.5, 0.5, 1, 0.5, 1),
-				// s-e
-				//new AABB(0, 1, 0, 0.5, 0, 1),
-				//new AABB(0, 0.5, 0.5, 1, 0, 0.5),
+			// ascending east
+			//new AABB(0, 1, 0, 0.5, 0, 1),
+			//new AABB(0.5, 1, 0.5, 1, 0, 1),
+			// ascending west
+			//new AABB(0, 1, 0, 0.5, 0, 1),
+			//new AABB(0, 0.5, 0.5, 1, 0, 1),
+			// ascending south
+			//new AABB(0, 1, 0, 0.5, 0, 1),
+			//new AABB(0, 1, 0.5, 1, 0.5, 1),
+			// ascending north
+			new AABB(0, 1, 0, 0.5, 0, 1),
+			new AABB(0, 1, 0.5, 1, 0, 0.5),
 		};
 		quads = new Quad[] {
 			// lower front
