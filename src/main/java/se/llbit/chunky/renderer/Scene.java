@@ -367,6 +367,7 @@ public class Scene implements Refreshable {
 		canvas.addItem("width", new IntTag(width));
 		canvas.addItem("height", new IntTag(height));
 		canvas.addItem("exposure", new DoubleTag(exposure));
+		canvas.addItem("postprocess", new IntTag(postprocess.ordinal()));
 		
 		if (loadedWorld != null) {
 			worldTag.addItem("worldDirectoryPath",
@@ -473,13 +474,13 @@ public class Scene implements Refreshable {
 		name = getFrameName(fileName);
 		
 		if (result.containsKey(cvf_canvas)) {
-			CompoundTag tag = (CompoundTag) result.get(cvf_canvas);
+			CompoundTag canvasTag = (CompoundTag) result.get(cvf_canvas);
 			
-			int width = tag.get("width").intValue();
-			int height = tag.get("height").intValue();
+			int width = canvasTag.get("width").intValue();
+			int height = canvasTag.get("height").intValue();
 			setCanvasSize(width, height);
-			exposure = tag.get("exposure").doubleValue(DEFAULT_EXPOSURE);
-			postprocess = Postprocess.get(tag.get("postprocess"));
+			exposure = canvasTag.get("exposure").doubleValue(DEFAULT_EXPOSURE);
+			postprocess = Postprocess.get(canvasTag.get("postprocess"));
 		}
 		
 		if (result.containsKey(cvf_camera))  {

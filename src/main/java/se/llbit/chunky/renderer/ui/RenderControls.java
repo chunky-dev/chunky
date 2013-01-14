@@ -133,6 +133,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JLabel sppLbl;
 	private JProgressBar progressBar;
 	private JLabel progressLbl;
+	private JComboBox postprocessCB = new JComboBox();
 
 	private JLabel etaLbl;
 
@@ -488,11 +489,10 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		JLabel postprocessDescLbl = new JLabel("<html>Post processing affects rendering performance<br>when the preview window is visible");
 		JLabel postprocessLbl = new JLabel("Post-processing mode:");
-		JComboBox postprocessCB = new JComboBox();
 		for (Postprocess pp : Postprocess.values) {
 			postprocessCB.addItem("" + pp);
 		}
-		postprocessCB.setSelectedIndex(renderManager.scene().getPostprocess().ordinal());
+		updatePostprocessCB();
 		postprocessCB.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1654,6 +1654,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		sppTargetField.setText("" + renderManager.scene().getTargetSPP());
 		sppTargetField.getDocument().addDocumentListener(sppTargetListener);
 	}
+	
+	protected void updatePostprocessCB() {
+		postprocessCB.setSelectedIndex(renderManager.scene().getPostprocess().ordinal());
+	}
 
 	/**
 	 * Load the scene with the given name
@@ -1803,6 +1807,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateDumpFrequencyField();
 		updateSPPTargetField();
 		updateSceneNameField();
+		updatePostprocessCB();
 		enableEmitters.setSelected(renderManager.scene().getEmittersEnabled());
 		directLight.setSelected(renderManager.scene().getDirectLight());
 		startRenderBtn.setText("RESUME");
