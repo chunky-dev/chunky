@@ -66,6 +66,4 @@ Additional Information
 ----------------------
 
 More information about Chunky, including a short getting started guide and
-rendering tips are available at the Chunky Wiki:
-
-    http://chunky.llbit.se/
+rendering tips are available at the [Chunky Wiki](http://chunky.llbit.se/).
