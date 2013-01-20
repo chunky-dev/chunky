@@ -48,6 +48,20 @@ you can run Chunky from the command line with for example
 
 This will start with 512 MiB minimum heap size and 4 GiB maximum.
 
+Rendering using the command line
+--------------------------------
+
+It is possible to render a scene from the command line. First set up a scene
+using the GUI. Don't forget to save the scene. Then run the following on the
+command line:
+
+    java -jar ~/Chunky/Chunky.jar -render SceneName.cvf
+
+Where SceneName is the name of the scene to render. When run this way Chunky
+will not shut down, it will just keep rendering. You can press `Ctrl-C` to
+force Chunky to quit. The renders will be saved periodically in the scene
+directory.
+
 Additional Information
 ----------------------
 
