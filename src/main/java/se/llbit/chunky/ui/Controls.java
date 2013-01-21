@@ -273,8 +273,6 @@ public class Controls extends JPanel {
 		
 		JComponent optionsPanel = new JPanel();
 		
-		JButton skySettingsBtn = new JButton("Sky Settings");
-		
 		JButton loadTexturePackBtn = new JButton("Load Texture Pack");
 		loadTexturePackBtn.setToolTipText("Load a custom texture pack");
 		loadTexturePackBtn.addActionListener(new ActionListener() {
@@ -318,7 +316,6 @@ public class Controls extends JPanel {
 				.addGroup(layout.createParallelGroup(Alignment.LEADING)
 					.addComponent(loadTexturePackBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
 					.addComponent(loadDefaultTexturesBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
-					.addComponent(skySettingsBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
 				)
 				.addContainerGap()
 			)
@@ -329,8 +326,6 @@ public class Controls extends JPanel {
 			.addComponent(loadTexturePackBtn)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addComponent(loadDefaultTexturesBtn)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(skySettingsBtn)
 			.addContainerGap(10, 10))
 		);
 		
