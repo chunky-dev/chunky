@@ -21,7 +21,7 @@ import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
 /**
- * A beacon block.
+ * Beacon block.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class BeaconModel {
@@ -43,17 +43,21 @@ public class BeaconModel {
 	 * @return <code>true</code> if the ray intersected the block
 	 */
 	public static boolean intersect(Ray ray) {
+		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < boxes.length; ++i) {
 			if (boxes[i].intersect(ray)) {
 				float[] color = tex[i].getColor(ray.u, ray.v);
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
-					ray.distance += ray.tNear;
-					ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
-					return true;
+					hit = true;
 				}
 			}
+		}
+		if (hit) {
+			ray.distance += ray.tNear;
+			ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
+			return true;
 		}
 		return false;
 	}
