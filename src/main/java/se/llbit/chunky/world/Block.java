@@ -19,6 +19,7 @@ package se.llbit.chunky.world;
 import java.util.HashSet;
 import java.util.Set;
 
+import se.llbit.chunky.model.BeaconModel;
 import se.llbit.chunky.model.BedModel;
 import se.llbit.chunky.model.BrewingStandModel;
 import se.llbit.chunky.model.ButtonModel;
@@ -1930,6 +1931,11 @@ public class Block {
 			isOpaque = false;
 			isSolid = true;
 			ior = 1.520f;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return BeaconModel.intersect(ray);
 		}
 	};
 	public static final int STONEWALL_ID = 0x8B;

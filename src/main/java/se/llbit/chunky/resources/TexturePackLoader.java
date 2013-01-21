@@ -551,7 +551,7 @@ public class TexturePackLoader {
 		Texture.grassSide.setTexture(texture[0x26]);
 		Texture.tallGrass.setTexture(texture[0x27]);
 		// skip 28
-		// skip 29
+		Texture.beacon.setTexture(texture[0x29]);
 		// skip 2A
 		Texture.workbenchTop.setTexture(texture[0x2B]);
 		Texture.furnaceUnlitFront.setTexture(texture[0x2C]);

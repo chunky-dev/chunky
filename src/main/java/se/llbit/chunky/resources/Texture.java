@@ -245,6 +245,7 @@ public class Texture {
 	public static final Texture carrotsPotatoes3 = new Texture();
 	public static final Texture carrotsMature = new Texture();
 	public static final Texture potatoesMature = new Texture();
+	public static final Texture beacon = new Texture();
 	public static final Texture unknown = new Texture("unknown");
 	
 	public static final Texture signPost = new Texture();
