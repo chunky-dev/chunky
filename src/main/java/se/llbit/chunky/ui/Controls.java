@@ -273,6 +273,8 @@ public class Controls extends JPanel {
 		
 		JComponent optionsPanel = new JPanel();
 		
+		JButton skySettingsBtn = new JButton("Sky Settings");
+		
 		JButton loadTexturePackBtn = new JButton("Load Texture Pack");
 		loadTexturePackBtn.setToolTipText("Load a custom texture pack");
 		loadTexturePackBtn.addActionListener(new ActionListener() {
@@ -310,23 +312,26 @@ public class Controls extends JPanel {
 		
 		GroupLayout layout = new GroupLayout(optionsPanel);
 		optionsPanel.setLayout(layout);
-		layout.setHorizontalGroup(
-				layout.createParallelGroup(Alignment.LEADING)
-				.addGroup(layout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(layout.createParallelGroup(Alignment.LEADING)
-						.addComponent(loadTexturePackBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
-						.addComponent(loadDefaultTexturesBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE))
-					.addContainerGap())
-			);
-		layout.setVerticalGroup(
-			layout.createParallelGroup(Alignment.LEADING)
+		layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
 			.addGroup(layout.createSequentialGroup()
 				.addContainerGap()
-				.addComponent(loadTexturePackBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(loadDefaultTexturesBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				.addContainerGap(10, 10))
+				.addGroup(layout.createParallelGroup(Alignment.LEADING)
+					.addComponent(loadTexturePackBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
+					.addComponent(loadDefaultTexturesBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
+					.addComponent(skySettingsBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
+				)
+				.addContainerGap()
+			)
+		);
+		layout.setVerticalGroup(layout.createParallelGroup(Alignment.LEADING)
+		.addGroup(layout.createSequentialGroup()
+			.addContainerGap()
+			.addComponent(loadTexturePackBtn)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addComponent(loadDefaultTexturesBtn)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(skySettingsBtn)
+			.addContainerGap(10, 10))
 		);
 		
 		return optionsPanel;
