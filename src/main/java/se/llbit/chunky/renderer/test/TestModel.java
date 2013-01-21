@@ -58,57 +58,10 @@ public class TestModel {
 	 */
 	public void setUp() {
 		boxes = new AABB[] {
-			// ascending east
-			//new AABB(0, 1, 0, 0.5, 0, 1),
-			//new AABB(0.5, 1, 0.5, 1, 0, 1),
-			// ascending west
-			//new AABB(0, 1, 0, 0.5, 0, 1),
-			//new AABB(0, 0.5, 0.5, 1, 0, 1),
-			// ascending south
-			//new AABB(0, 1, 0, 0.5, 0, 1),
-			//new AABB(0, 1, 0.5, 1, 0.5, 1),
-			// ascending north
-			new AABB(0, 1, 0, 0.5, 0, 1),
-			new AABB(0, 1, 0.5, 1, 0, 0.5),
-		};
-		quads = new Quad[] {
-			// lower front
-			new Quad(new Vector3d(0, .5, 0), new Vector3d(1, .5, 0),
-						new Vector3d(0, 0, 0), new Vector4d(0, 1, .5, 0)),
-	
-			// upper front ?
-			new Quad(new Vector3d(0, 1, .5), new Vector3d(1, 1, .5),
-					new Vector3d(0, .5, .5), new Vector4d(0, 1, 1, .5)),
-	
-			// lower top ?
-			new Quad(new Vector3d(0, .5, .5), new Vector3d(1, .5, .5),
-					new Vector3d(0, .5, 0), new Vector4d(0, 1, .5, 0)),
-	
-			// upper top ?
-			new Quad(new Vector3d(0, 1, 1), new Vector3d(1, 1, 1),
-					new Vector3d(0, 1, .5), new Vector4d(0, 1, 1, .5)),
-	
-			// lower left side ?
-			new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
-					new Vector3d(0, .5, 0), new Vector4d(0, 1, 0, .5)),
-	
-			// upper left side ?
-			new Quad(new Vector3d(0, .5, .5), new Vector3d(0, .5, 1),
-					new Vector3d(0, 1, .5), new Vector4d(.5, 1, .5, 1)),
-	
-			// lower right side ?
-			new Quad(new Vector3d(1, .5, 0), new Vector3d(1, .5, 1),
-					new Vector3d(1, 0, 0), new Vector4d(1, 0, .5, 0)),
-	
-			// upper right side ?
-			new Quad(new Vector3d(1, 1, .5), new Vector3d(1, 1, 1),
-					new Vector3d(1, .5, .5), new Vector4d(.5, 1, 1, .5)),
-	
-			new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
-					new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
-	
-			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
-					new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
+			new AABB(3/16., 13/16., 10/16., 1, 0, 1),
+			new AABB(2/16., 14/16., 0, 4/16., 2/16., 14/16.),
+			new AABB(4/16., 12/16., 4/16., 5/16., 3/16., 13/16.),
+			new AABB(6/16., 10/16., 5/16., 10/16., 4/16., 12/16.),
 		};
 	}
 	
@@ -188,7 +141,7 @@ public class TestModel {
 		
 		for (int i = 0; i < boxes.length; ++i) {
 			if (boxes[i].intersect(ray)) {
-				Texture.stone.getColor(ray);
+				Texture.anvilSide.getColor(ray);
 				ray.color.w = 1;
 				ray.t = ray.tNear;
 			}

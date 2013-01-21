@@ -727,7 +727,9 @@ public class TexturePackLoader {
 		Texture.redstoneLampOn.setTexture(texture[0xD4]);
 		Texture.circleStoneBrick.setTexture(texture[0xD5]);
 		Texture.birchPlanks.setTexture(texture[0xD6]);
-		// skip D7-DF
+		Texture.anvilSide.setTexture(texture[0xD7]);
+		Texture.anvilTop2.setTexture(texture[0xD8]);
+		// skip D9-DF
 		
 		Texture.netherBrick.setTexture(texture[0xE0]);
 		Texture.lightGrayWool.setTexture(texture[0xE1]);
@@ -736,7 +738,9 @@ public class TexturePackLoader {
 		Texture.netherWart3.setTexture(texture[0xE4]);
 		Texture.sandstoneDecorated.setTexture(texture[0xE5]);
 		Texture.sandstoneSmooth.setTexture(texture[0xE6]);
-		// skip E7-EC
+		Texture.anvilTop1.setTexture(texture[0xE7]);
+		Texture.anvilTop3.setTexture(texture[0xE8]);
+		// skip E9-EC
 		Texture.lava.setTexture(texture[0xED]);
 		// skip EE, EF
 		

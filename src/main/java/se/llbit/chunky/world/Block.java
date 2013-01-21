@@ -19,6 +19,7 @@ package se.llbit.chunky.world;
 import java.util.HashSet;
 import java.util.Set;
 
+import se.llbit.chunky.model.AnvilModel;
 import se.llbit.chunky.model.BeaconModel;
 import se.llbit.chunky.model.BedModel;
 import se.llbit.chunky.model.BrewingStandModel;
@@ -2013,8 +2014,13 @@ public class Block {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = false;
+			localIntersect = true;
 		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return AnvilModel.intersect(ray);
+		};
 	};
 	public static final Block UNKNOWN0x92 = new Block(0x92, "Unknown Block 0x92", Texture.unknown) {
 		{
