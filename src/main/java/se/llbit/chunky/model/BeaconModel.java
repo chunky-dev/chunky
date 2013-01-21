@@ -50,15 +50,15 @@ public class BeaconModel {
 				float[] color = tex[i].getColor(ray.u, ray.v);
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
+					ray.t = ray.tNear;
 					hit = true;
 				}
 			}
 		}
 		if (hit) {
-			ray.distance += ray.tNear;
-			ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
-			return true;
+			ray.distance += ray.t;
+			ray.x.scaleAdd(ray.t, ray.d, ray.x);
 		}
-		return false;
+		return hit;
 	}
 }
