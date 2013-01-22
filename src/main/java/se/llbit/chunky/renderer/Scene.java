@@ -44,6 +44,7 @@ import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
@@ -138,6 +139,8 @@ public class Scene implements Refreshable {
 	public static final int CVF_VERSION = 1;
 	
 	private static final double DEFAULT_WATER_VISIBILITY = 9;
+
+	private static final double CLOUD_HEIGHT = 712;
 	//private static final double MIN_WATER_VISIBILITY = 0;
 	//private static final double MAX_WATER_VISIBILITY = 62;
 	
@@ -1039,6 +1042,20 @@ public class Scene implements Refreshable {
 		while (true) {
 
 			if (!intersect(ray)) {
+				if (ray.d.y != 0) {
+					ray.t = (CLOUD_HEIGHT - ray.x.y) / ray.d.y;
+					if (ray.t > Ray.EPSILON) {
+						double u = ray.x.x + ray.d.x * ray.t;
+						double v = ray.x.z + ray.d.z * ray.t;
+						if (Clouds.getCloud((int) (u/16), (int) (v/16)) != 0) {
+							ray.color.set(1, 1, 1, 1);
+							ray.x.scaleAdd(ray.t, ray.d, ray.x);
+							ray.distance += ray.t;
+							ray.hit = true;
+							break;
+						}
+					}
+				}
 				if (waterHeight > 0 &&
 						ray.d.y < 0 && ray.x.y > waterHeight-.125) {
 					

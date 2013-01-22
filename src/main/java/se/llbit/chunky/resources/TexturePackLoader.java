@@ -124,14 +124,12 @@ public class TexturePackLoader {
 					break;
 					
 				case CLOUDS:
-					// TODO implement cloud rendering
-					/*
 					imageStream = tpZip.getInputStream(new ZipEntry("environment/clouds.png"));
 					if (imageStream == null) {
 						logger.info("Could not load file environment/clouds.png from default texture pack!");
 					} else {
 						loadCloudsTexture(imageStream);
-					}*/
+					}
 					break;
 					
 				case GRASSCOLOR:
@@ -219,14 +217,13 @@ public class TexturePackLoader {
 				loadSignTexture(imageStream);
 			}
 			
-			// TODO implement cloud rendering
-			/*imageStream = tpZip.getInputStream(new ZipEntry("environment/clouds.png"));
+			imageStream = tpZip.getInputStream(new ZipEntry("environment/clouds.png"));
 			if (imageStream == null) {
 				logger.info("Could not load file environment/clouds.png from texture pack!");
 				defaultTextures.add(TextureFile.CLOUDS);
 			} else {
 				loadCloudsTexture(imageStream);
-			}*/
+			}
 			
 			imageStream = tpZip.getInputStream(new ZipEntry("misc/grasscolor.png"));
 			if (imageStream == null) {
@@ -266,8 +263,11 @@ public class TexturePackLoader {
 		Sun.texture = new Texture(image);
 	}
 	
-	// TODO implement cloud rendering
-	@SuppressWarnings("unused")
+	/**
+	 * Loads the cloud texture
+	 * @param imageStream
+	 * @throws IOException
+	 */
 	private static void loadCloudsTexture(InputStream imageStream)
 			throws IOException {
 		
@@ -279,7 +279,7 @@ public class TexturePackLoader {
 
 		for (int y = 0; y < 256; ++y) {
 			for (int x = 0; x < 256; ++x) {
-				int v = texture.getRGB(x, y) & 1;
+				int v = texture.getRGB(x, y) >>> 31;
 				Clouds.setCloud(x, y, v);
 			}
 		}
