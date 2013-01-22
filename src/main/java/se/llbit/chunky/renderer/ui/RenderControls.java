@@ -95,7 +95,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			NumberFormat.getInstance();
 	
 	private JSlider sunYawSlider;
-	private JSlider skyRotation;
+	private JSlider skyRotationSlider;
 	private JSlider sunPitchSlider;
 	private JSlider focalOffsetSlider;
 	private JSlider fovSlider;
@@ -850,8 +850,9 @@ public class RenderControls extends JDialog implements ViewListener,
 	private Component buildSkyPane() {
 		
 		JLabel skyRotationLbl = new JLabel("Skymap rotation:");
-		skyRotation = new JSlider(0, 100);
-		skyRotation.addChangeListener(skyRotationListener);
+		skyRotationSlider = new JSlider(0, 100);
+		skyRotationSlider.addChangeListener(skyRotationListener);
+		skyRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
 		updateSkyRotation();
 		
 		loadSkymapBtn = new JButton("Load Skymap");
@@ -884,7 +885,7 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addGroup(layout.createParallelGroup()
 						.addGroup(layout.createSequentialGroup()
 							.addComponent(skyRotationLbl)
-							.addComponent(skyRotation))
+							.addComponent(skyRotationSlider))
 						.addGroup(layout.createSequentialGroup()
 							.addComponent(loadSkymapBtn)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -901,7 +902,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 					.addComponent(skyRotationLbl)
-					.addComponent(skyRotation))
+					.addComponent(skyRotationSlider))
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(atmosphereEnabled)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -1534,10 +1535,10 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 	
 	protected void updateSkyRotation() {
-		skyRotation.removeChangeListener(skyRotationListener);
-		skyRotation.setValue((int) Math.round(
+		skyRotationSlider.removeChangeListener(skyRotationListener);
+		skyRotationSlider.setValue((int) Math.round(
 				100 * renderManager.scene().sky().getRotation() / (2 * Math.PI)));
-		skyRotation.addChangeListener(skyRotationListener);
+		skyRotationSlider.addChangeListener(skyRotationListener);
 	}
 	
 	protected void updateSunPitchSlider() {
