@@ -23,6 +23,15 @@ package se.llbit.chunky.world;
 public class Clouds {
 	private static long[][] clouds = new long[32][32];
 	
+	static {
+		// zero the cloud data
+		for (int i = 0; i < 32; ++i) {
+			for (int j = 0; j < 32; ++j) {
+				clouds[i][j] = 0L;
+			}
+		}
+	}
+	
 	/**
 	 * Get cloud bit at position (x, y)
 	 * @param x
