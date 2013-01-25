@@ -52,6 +52,6 @@ public class Clouds {
 		int tiley = y / 8;
 		int subx = x & 7;
 		int suby = y & 7;
-		clouds[tilex][tiley] |= (v & 1) << (suby*8 + subx);
+		clouds[tilex][tiley] |= ((long) (v & 1)) << (suby*8 + subx);
 	}
 }
