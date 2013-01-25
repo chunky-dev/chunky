@@ -55,6 +55,7 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.DeleteChunksJob;
+import se.llbit.chunky.world.EmptyChunk;
 import se.llbit.chunky.world.EmptyChunkView;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Region;
@@ -114,6 +115,8 @@ public class Chunky implements ChunkDiscoveryListener {
 	
 	private int minimapWidth = Minimap.DEFAULT_WIDTH;
 	private int minimapHeight = Minimap.DEFAULT_HEIGHT;
+	
+	private Chunk hoveredChunk = EmptyChunk.instance;
 
 	/**
 	 * Whether or not OpenCL rendering is enabled
@@ -460,6 +463,22 @@ public class Chunky implements ChunkDiscoveryListener {
 		}
 	}
 
+	/**
+	 * Set the hovered chunk by chunk coordinates
+	 * @param cx
+	 * @param cz
+	 */
+	public synchronized void setHoveredChunk(int cx, int cz) {
+		hoveredChunk = world.getChunk(ChunkPosition.get(cx, cz));
+	}
+	
+	/**
+	 * @return The currently hovered chunk
+	 */
+	public synchronized Chunk getHoveredChunk() {
+		return hoveredChunk;
+	}
+	
 	/**
 	 * Select specific chunk
 	 * @param cx

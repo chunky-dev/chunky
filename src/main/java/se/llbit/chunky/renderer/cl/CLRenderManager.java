@@ -196,8 +196,8 @@ public class CLRenderManager extends Thread implements Renderer,
         	case Block.LEAVES_ID:
         	case Block.GRASS_ID:
         	case Block.TALLGRASS_ID:
-        		color = Biomes.getColorCorrected(0);
-        		System.out.print(String.format("\t0x%08X,", Biomes.getColor(0)));
+        		color = Biomes.getGrassColorLinear(0);
+        		System.out.print(String.format("\t0x%08X,", Biomes.getGrassColor(0)));
         		break;
     		default:
 	        	color = block.getTexture().getAvgColorLinear();

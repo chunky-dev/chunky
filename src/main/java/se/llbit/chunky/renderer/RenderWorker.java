@@ -137,7 +137,6 @@ public class RenderWorker extends Thread {
 			
 			if (scene.finalizeBuffer())
 				scene.finalizePixel(x, y);
-			
 			}}
 				
 		} else {

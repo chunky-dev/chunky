@@ -245,6 +245,11 @@ public class Texture {
 	public static final Texture carrotsPotatoes3 = new Texture();
 	public static final Texture carrotsMature = new Texture();
 	public static final Texture potatoesMature = new Texture();
+	public static final Texture beacon = new Texture();
+	public static final Texture anvilSide = new Texture();
+	public static final Texture anvilTop1 = new Texture();
+	public static final Texture anvilTop2 = new Texture();
+	public static final Texture anvilTop3 = new Texture();
 	public static final Texture unknown = new Texture("unknown");
 	
 	public static final Texture signPost = new Texture();
@@ -315,6 +320,9 @@ public class Texture {
 	
 	public static final Texture[] stoneBrickType =
 		{ stoneBrick, mossyStoneBrick, crackedStoneBrick, circleStoneBrick };
+	
+	public static final Texture[] anvilTop =
+		{ anvilTop1, anvilTop2, anvilTop3, anvilTop3 };
 	
 	protected BufferedImage image;
 	protected int width;

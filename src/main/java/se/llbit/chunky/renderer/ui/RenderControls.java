@@ -58,6 +58,7 @@ import org.apache.log4j.Logger;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.Camera;
+import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.RenderStatusListener;
@@ -94,7 +95,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			NumberFormat.getInstance();
 	
 	private JSlider sunYawSlider;
-	private JSlider skyRotation;
+	private JSlider skyRotationSlider;
 	private JSlider sunPitchSlider;
 	private JSlider focalOffsetSlider;
 	private JSlider fovSlider;
@@ -123,8 +124,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JSlider emitterIntensitySlider;
 	private JCheckBox atmosphereEnabled;
 	private JCheckBox volumetricFogEnabled;
-	private JSlider gammaSlider;
-	private JTextField gammaField;
+	private JSlider exposureSlider;
+	private JTextField exposureField;
 	private RenderContext context;
 	private JButton showPreviewBtn;
 	private JLabel renderTimeLbl;
@@ -132,6 +133,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JLabel sppLbl;
 	private JProgressBar progressBar;
 	private JLabel progressLbl;
+	private JComboBox postprocessCB = new JComboBox();
 
 	private JLabel etaLbl;
 
@@ -217,6 +219,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		tabbedPane.addTab("Lighting", buildLightingPane());
 		tabbedPane.addTab("Sky", buildSkyPane());
 		tabbedPane.addTab("Camera", buildCameraPane());
+		tabbedPane.addTab("Post-processing", buildPostProcessingPane());
 		tabbedPane.addTab("Advanced", buildAdvancedPane());
 		
 		JLabel sppTargetLbl = new JLabel("SPP Target: ");
@@ -387,15 +390,9 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	private Component buildAdvancedPane() {
-		JLabel gammaLbl = new JLabel("gamma: ");
-
-		gammaField = new JTextField(5);
-		gammaField.addActionListener(gammaFieldListener);
-		updateGammaField();
-
-		gammaSlider = new JSlider(1, 100);
-		gammaSlider.addChangeListener(gammaListener);
-		updateGammaSlider();
+		exposureSlider = new JSlider(1, 100);
+		exposureSlider.addChangeListener(exposureListener);
+		updateExposureSlider();
 
 		JLabel rayDepthLbl = new JLabel("Ray depth: ");
 		rayDepthField = new JTextField(5);
@@ -448,10 +445,6 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(rayDepthLbl)
 					.addComponent(rayDepthSlider)
 					.addComponent(rayDepthField))
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(gammaLbl)
-					.addComponent(gammaSlider)
-					.addComponent(gammaField))
 				.addComponent(sep1)
 				.addComponent(waterWorldLbl)
 				.addComponent(waterWorldCB)
@@ -469,12 +462,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(rayDepthSlider)
 				.addComponent(rayDepthField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(gammaLbl)
-				.addComponent(gammaSlider)
-				.addComponent(gammaField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep1)
+			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(waterWorldLbl)
 			.addPreferredGap(ComponentPlacement.RELATED)
@@ -483,7 +471,73 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addGroup(layout.createParallelGroup()
 				.addComponent(waterHeightLbl, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 				.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-			.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+			.addContainerGap()
+		);
+		return panel;
+	}
+	
+	private Component buildPostProcessingPane() {
+		JLabel exposureLbl = new JLabel("exposure: ");
+
+		exposureField = new JTextField(5);
+		exposureField.addActionListener(exposureFieldListener);
+		updateExposureField();
+
+		exposureSlider = new JSlider(1, 100);
+		exposureSlider.addChangeListener(exposureListener);
+		updateExposureSlider();
+
+		JLabel postprocessDescLbl = new JLabel("<html>Post processing affects rendering performance<br>when the preview window is visible");
+		JLabel postprocessLbl = new JLabel("Post-processing mode:");
+		for (Postprocess pp : Postprocess.values) {
+			postprocessCB.addItem("" + pp);
+		}
+		updatePostprocessCB();
+		postprocessCB.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JComboBox source = (JComboBox) e.getSource();
+				renderManager.scene().setPostprocess(
+						Postprocess.get(source.getSelectedIndex()));
+			}
+		});
+		
+		JPanel panel = new JPanel();
+		GroupLayout layout = new GroupLayout(panel);
+		panel.setLayout(layout);
+		layout.setHorizontalGroup(layout.createSequentialGroup()
+			.addContainerGap()
+			.addGroup(layout.createParallelGroup()
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(exposureLbl)
+					.addComponent(exposureSlider)
+					.addComponent(exposureField)
+				)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(postprocessLbl)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(postprocessCB)
+				)
+				.addComponent(postprocessDescLbl)
+			)
+			.addContainerGap()
+		);
+		layout.setVerticalGroup(layout.createSequentialGroup()
+			.addContainerGap()
+			.addGroup(layout.createParallelGroup()
+				.addComponent(exposureLbl)
+				.addComponent(exposureSlider)
+				.addComponent(exposureField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+				.addComponent(postprocessLbl)
+				.addComponent(postprocessCB)
+			)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addComponent(postprocessDescLbl)
+			.addContainerGap()
 		);
 		return panel;
 	}
@@ -530,12 +584,15 @@ public class RenderControls extends JDialog implements ViewListener,
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					Desktop.getDesktop().open(context.getSceneDirectory());
+					if (Desktop.isDesktopSupported()) {
+						Desktop.getDesktop().open(context.getSceneDirectory());
+					}
 				} catch (IOException e) {
 					logger.warn("Failed to open scene directory", e);
 				}
 			}
 		});
+		openSceneDirBtn.setVisible(Desktop.isDesktopSupported());
 		
 		loadSceneBtn.setToolTipText("This replaces the current scene!");
 		JButton setCanvasSizeBtn = new JButton("Set Canvas Size");
@@ -593,16 +650,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		biomeColorsCB = new JCheckBox("enable biome colors");
 		updateBiomeColorsCB();
 		
-		JCheckBox gammaCorrectionCB = new JCheckBox("enable gamma correction");
-		gammaCorrectionCB.setSelected(renderManager.scene().getGammaCorrectionEnabled());
-		gammaCorrectionCB.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JCheckBox source = (JCheckBox) e.getSource();
-				renderManager.scene().setGammaCorrectionEnabled(source.isSelected());
-			}
-		});
-		
 		saveDumpsCB = new JCheckBox("save dump once every ");
 		saveDumpsCB.addActionListener(saveDumpsListener);
 		updateSaveDumpsCheckBox();
@@ -653,7 +700,6 @@ public class RenderControls extends JDialog implements ViewListener,
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(makeDefaultBtn))
 						.addComponent(sep2)
-						.addComponent(gammaCorrectionCB)
 						.addComponent(stillWaterCB)
 						.addComponent(clearWaterCB)
 						.addComponent(biomeColorsCB)
@@ -696,7 +742,6 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(sep2)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(gammaCorrectionCB)
 				.addComponent(stillWaterCB)
 				.addComponent(clearWaterCB)
 				.addComponent(biomeColorsCB)
@@ -805,8 +850,9 @@ public class RenderControls extends JDialog implements ViewListener,
 	private Component buildSkyPane() {
 		
 		JLabel skyRotationLbl = new JLabel("Skymap rotation:");
-		skyRotation = new JSlider(0, 100);
-		skyRotation.addChangeListener(skyRotationListener);
+		skyRotationSlider = new JSlider(0, 100);
+		skyRotationSlider.addChangeListener(skyRotationListener);
+		skyRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
 		updateSkyRotation();
 		
 		loadSkymapBtn = new JButton("Load Skymap");
@@ -839,7 +885,7 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addGroup(layout.createParallelGroup()
 						.addGroup(layout.createSequentialGroup()
 							.addComponent(skyRotationLbl)
-							.addComponent(skyRotation))
+							.addComponent(skyRotationSlider))
 						.addGroup(layout.createSequentialGroup()
 							.addComponent(loadSkymapBtn)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -856,7 +902,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 					.addComponent(skyRotationLbl)
-					.addComponent(skyRotation))
+					.addComponent(skyRotationSlider))
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(atmosphereEnabled)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -1191,7 +1237,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	ActionListener saveFrameListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			renderManager.saveFrame();
+			renderManager.saveFrame(RenderControls.this);
 		}
 	};
 	ActionListener loadSceneListener = new ActionListener() {
@@ -1311,29 +1357,30 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateFovField();
 		}
 	};
-	ChangeListener gammaListener = new ChangeListener() {
+	ChangeListener exposureListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
 			double value = (double) (source.getValue() - source.getMinimum())
 					/ (source.getMaximum() - source.getMinimum());
-			double scale = Scene.MAX_GAMMA
-				- Scene.MIN_GAMMA;
-			renderManager.scene().setGamma(
-					value * scale + Scene.MIN_GAMMA);
-			updateGammaField();
+			double logMin = Math.log10(Scene.MIN_EXPOSURE);
+			double logMax = Math.log10(Scene.MAX_EXPOSURE);
+			double scale = logMax - logMin;
+			renderManager.scene().setExposure(
+					Math.pow(10, value * scale + logMin));
+			updateExposureField();
 		}
 	};
-	ActionListener gammaFieldListener = new ActionListener() {
+	ActionListener exposureFieldListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JTextField source = (JTextField) e.getSource();
 			try {
 				double value = numberFormat.parse(source.getText()).doubleValue();
-				value = Math.max(value, Scene.MIN_GAMMA);
-				value = Math.min(value, Scene.MAX_GAMMA);
-				renderManager.scene().setGamma(value);
-				updateGammaSlider();
+				value = Math.max(value, Scene.MIN_EXPOSURE);
+				value = Math.min(value, Scene.MAX_EXPOSURE);
+				renderManager.scene().setExposure(value);
+				updateExposureSlider();
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
 			}
@@ -1488,10 +1535,10 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 	
 	protected void updateSkyRotation() {
-		skyRotation.removeChangeListener(skyRotationListener);
-		skyRotation.setValue((int) Math.round(
+		skyRotationSlider.removeChangeListener(skyRotationListener);
+		skyRotationSlider.setValue((int) Math.round(
 				100 * renderManager.scene().sky().getRotation() / (2 * Math.PI)));
-		skyRotation.addChangeListener(skyRotationListener);
+		skyRotationSlider.addChangeListener(skyRotationListener);
 	}
 	
 	protected void updateSunPitchSlider() {
@@ -1552,20 +1599,21 @@ public class RenderControls extends JDialog implements ViewListener,
 		fovSlider.addChangeListener(fovListener);
 	}
 
-	protected void updateGammaField() {
-		gammaField.removeActionListener(gammaFieldListener);
-		gammaField.setText(String.format("%.2f", renderManager.scene().getGamma()));
-		gammaField.addActionListener(gammaFieldListener);
+	protected void updateExposureField() {
+		exposureField.removeActionListener(exposureFieldListener);
+		exposureField.setText(String.format("%.2f", renderManager.scene().getExposure()));
+		exposureField.addActionListener(exposureFieldListener);
 	}
 	
-	protected void updateGammaSlider() {
-		gammaSlider.removeChangeListener(gammaListener);
-		double value = (renderManager.scene().getGamma()
-				- Scene.MIN_GAMMA)
-				/ (Scene.MAX_GAMMA - Scene.MIN_GAMMA);
-		double scale = gammaSlider.getMaximum() - gammaSlider.getMinimum();
-		gammaSlider.setValue((int) (value * scale + gammaSlider.getMinimum()));
-		gammaSlider.addChangeListener(gammaListener);
+	protected void updateExposureSlider() {
+		exposureSlider.removeChangeListener(exposureListener);
+		double logMin = Math.log10(Scene.MIN_EXPOSURE);
+		double logMax = Math.log10(Scene.MAX_EXPOSURE);
+		double value = (Math.log10(renderManager.scene().getExposure()) -
+				logMin) / (logMax - logMin);
+		double scale = exposureSlider.getMaximum() - exposureSlider.getMinimum();
+		exposureSlider.setValue((int) (value * scale + exposureSlider.getMinimum()));
+		exposureSlider.addChangeListener(exposureListener);
 	}
 
 	protected void updateWidthField() {
@@ -1606,6 +1654,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		sppTargetField.getDocument().removeDocumentListener(sppTargetListener);
 		sppTargetField.setText("" + renderManager.scene().getTargetSPP());
 		sppTargetField.getDocument().addDocumentListener(sppTargetListener);
+	}
+	
+	protected void updatePostprocessCB() {
+		postprocessCB.setSelectedIndex(renderManager.scene().getPostprocess().ordinal());
 	}
 
 	/**
@@ -1750,12 +1802,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateAtmosphereCheckBox();
 		updateVolumetricFogCheckBox();
 		updateTitle();
-		updateGammaField();
-		updateGammaSlider();
+		updateExposureField();
+		updateExposureSlider();
 		updateSaveDumpsCheckBox();
 		updateDumpFrequencyField();
 		updateSPPTargetField();
 		updateSceneNameField();
+		updatePostprocessCB();
 		enableEmitters.setSelected(renderManager.scene().getEmittersEnabled());
 		directLight.setSelected(renderManager.scene().getDirectLight());
 		startRenderBtn.setText("RESUME");

@@ -44,7 +44,10 @@ import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.Clouds;
+import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.WorldTexture;
 import se.llbit.math.Color;
 import se.llbit.math.Octree;
 import se.llbit.math.QuickMath;
@@ -82,6 +85,8 @@ public class Scene implements Refreshable {
 	
 	private static final int DEFAULT_SPP_TARGET = 1000;
 	
+	private static final double fSubSurface = 0.3;
+	
 	/**
 	 * Minimum canvas width
 	 */
@@ -104,14 +109,19 @@ public class Scene implements Refreshable {
 	public static final float WATER_SPECULAR = 0.46f;
 	
 	/**
-	 * Minimum gamma
+	 * Minimum exposure
 	 */
-	public static final double MIN_GAMMA = 1;
+	public static final double MIN_EXPOSURE = 0.001;
 	
 	/**
-	 * Maximum gamma
+	 * Maximum exposure
 	 */
-	public static final double MAX_GAMMA = 4;
+	public static final double MAX_EXPOSURE = 1000.0;
+	
+	/**
+	 * Default exposure
+	 */
+	public static final double DEFAULT_EXPOSURE = 1.0;
 	
 	/**
 	 * Default gamma
@@ -129,6 +139,8 @@ public class Scene implements Refreshable {
 	public static final int CVF_VERSION = 1;
 	
 	private static final double DEFAULT_WATER_VISIBILITY = 9;
+
+	private static final double CLOUD_HEIGHT = 712;
 	//private static final double MIN_WATER_VISIBILITY = 0;
 	//private static final double MAX_WATER_VISIBILITY = 62;
 	
@@ -162,7 +174,7 @@ public class Scene implements Refreshable {
  	 */
 	private Octree octree;
 
-	private double gamma = DEFAULT_GAMMA;
+	private double exposure = DEFAULT_EXPOSURE;
 	private boolean stillWater = false;
 	private boolean biomeColors = true;
 	private boolean sunEnabled = true;
@@ -179,17 +191,14 @@ public class Scene implements Refreshable {
 	private boolean pathTrace = false;
 	private boolean pauseRender = true;
 	
+	private Postprocess postprocess = Postprocess.GAMMA;
+	
 	/**
  	 * Preview frame interlacing counter.
  	 */
 	int previewCount;
 	
 	private boolean clearWater = false;
-	
-	/**
-	 * Gamma correction flag.
-	 */
-	private boolean gammaCorrection = true;
 	
 	private double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
 	private boolean atmosphereEnabled = false;
@@ -200,6 +209,9 @@ public class Scene implements Refreshable {
 	private int dumpFrequency = DEFAULT_DUMP_FREQUENCY;
 	
 	private int waterHeight = 0;
+	
+	private WorldTexture grassTexture = new WorldTexture();
+	private WorldTexture foliageTexture = new WorldTexture();
 
 	/**
 	 * Current SPP for the scene
@@ -278,11 +290,13 @@ public class Scene implements Refreshable {
 		// the octree reference is overwritten to save time
 		// when the other scene is changed it must create a new octree
 		octree = other.octree;
+		grassTexture = other.grassTexture;
+		foliageTexture = other.foliageTexture;
 		origin.set(other.origin);
 		
 		loadedChunks = other.loadedChunks;
 
-		gamma = other.gamma;
+		exposure = other.exposure;
 		name = other.name;
 		skymapFileName = other.skymapFileName;
 		
@@ -329,19 +343,19 @@ public class Scene implements Refreshable {
 	/**
 	 * Save the scene description
 	 * @param context 
-	 * @param renderListener 
+	 * @param progressListener 
 	 * @param fileName 
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
 	public synchronized void saveSceneDescription(
 			RenderContext context,
-			RenderStatusListener renderListener,
+			RenderStatusListener progressListener,
 			String fileName)
 		throws IOException, InterruptedException {
 		
 		String task = "Saving scene";
-		renderListener.setProgress(task, 0, 0, 2);
+		progressListener.setProgress(task, 0, 0, 2);
 		
 		name = getFrameName(fileName);
 		DataOutputStream out = new DataOutputStream(
@@ -355,7 +369,8 @@ public class Scene implements Refreshable {
 		
 		canvas.addItem("width", new IntTag(width));
 		canvas.addItem("height", new IntTag(height));
-		canvas.addItem("gamma", new DoubleTag(gamma));
+		canvas.addItem("exposure", new DoubleTag(exposure));
+		canvas.addItem("postprocess", new IntTag(postprocess.ordinal()));
 		
 		if (loadedWorld != null) {
 			worldTag.addItem("worldDirectoryPath",
@@ -403,11 +418,13 @@ public class Scene implements Refreshable {
 		rootTag.write(out);
 		out.close();
 		
-		saveOctree(context, renderListener);
+		saveOctree(context, progressListener);
+		saveGrassTexture(context, progressListener);
+		saveFoliageTexture(context, progressListener);
 		
-		saveDump(context, renderListener);
+		saveDump(context, progressListener);
 		
-		renderListener.sceneSaved();
+		progressListener.sceneSaved();
 	}
 	
 	/**
@@ -460,12 +477,13 @@ public class Scene implements Refreshable {
 		name = getFrameName(fileName);
 		
 		if (result.containsKey(cvf_canvas)) {
-			CompoundTag tag = (CompoundTag) result.get(cvf_canvas);
+			CompoundTag canvasTag = (CompoundTag) result.get(cvf_canvas);
 			
-			int width = tag.get("width").intValue();
-			int height = tag.get("height").intValue();
+			int width = canvasTag.get("width").intValue();
+			int height = canvasTag.get("height").intValue();
 			setCanvasSize(width, height);
-			gamma = tag.get("gamma").doubleValue(DEFAULT_GAMMA);
+			exposure = canvasTag.get("exposure").doubleValue(DEFAULT_EXPOSURE);
+			postprocess = Postprocess.get(canvasTag.get("postprocess"));
 		}
 		
 		if (result.containsKey(cvf_camera))  {
@@ -546,6 +564,12 @@ public class Scene implements Refreshable {
 		if (loadOctree(context, renderListener)) {
 			calculateOctreeOrigin(chunksToLoad);
 			loadedChunks = new HashSet<ChunkPosition>(chunksToLoad);
+			
+			boolean haveGrass = loadGrassTexture(context, renderListener);
+			boolean haveFoliage = loadFoliageTexture(context, renderListener);
+			if (!haveGrass || !haveFoliage) {
+				biomeColors = false;
+			}
 		} else {
 			// Could not load stored octree
 			// Load the chunks from the world
@@ -560,20 +584,20 @@ public class Scene implements Refreshable {
 	}
 
 	/**
-	 * Set the gamma value
+	 * Set the exposure value
 	 * @param value
 	 */
-	public synchronized void setGamma(double value) {
-		gamma = value;
+	public synchronized void setExposure(double value) {
+		exposure = value;
 		if (!pathTrace)
 			refresh();
 	}
 
 	/**
-	 * @return Current gamma value
+	 * @return Current exposure value
 	 */
-	public double getGamma() {
-		return gamma;
+	public double getExposure() {
+		return exposure;
 	}
 
 	/**
@@ -761,7 +785,7 @@ public class Scene implements Refreshable {
 					return exitWater(ray);
 				}
 
-				if (currentBlock.intersect(ray)) {
+				if (currentBlock.intersect(ray, this)) {
 					if (prevBlock != currentBlock)
 						return true;
 
@@ -841,7 +865,7 @@ public class Scene implements Refreshable {
 		double distance;
 		
 		while (true) {
-			Block.WATER.intersect(ray);
+			Block.WATER.intersect(ray, this);
 			ray.n.x = -ray.n.x;
 			ray.n.y = -ray.n.y;
 			ray.n.z = -ray.n.z;
@@ -893,7 +917,7 @@ public class Scene implements Refreshable {
 			
 			if (currentBlock.localIntersect) {
 				
-				if (!currentBlock.intersect(ray)) {
+				if (!currentBlock.intersect(ray, this)) {
 					ray.currentMaterial = Block.AIR.id;
 					return true;
 				}
@@ -1018,6 +1042,20 @@ public class Scene implements Refreshable {
 		while (true) {
 
 			if (!intersect(ray)) {
+				if (ray.d.y != 0) {
+					ray.t = (CLOUD_HEIGHT - ray.x.y) / ray.d.y;
+					if (ray.t > Ray.EPSILON) {
+						double u = ray.x.x + ray.d.x * ray.t;
+						double v = ray.x.z + ray.d.z * ray.t;
+						if (Clouds.getCloud((int) (u/16), (int) (v/16)) != 0) {
+							ray.color.set(1, 1, 1, 1);
+							ray.x.scaleAdd(ray.t, ray.d, ray.x);
+							ray.distance += ray.t;
+							ray.hit = true;
+							break;
+						}
+					}
+				}
 				if (waterHeight > 0 &&
 						ray.d.y < 0 && ray.x.y > waterHeight-.125) {
 					
@@ -1122,7 +1160,14 @@ public class Scene implements Refreshable {
 
 							double directLight = 0;
 							
-							if (reflected.d.dot(ray.n) > 0) {
+							boolean frontLight = reflected.d.dot(ray.n) > 0;
+
+							if (frontLight || (currentBlock.subSurfaceScattering &&
+									random.nextDouble() < fSubSurface)) {
+								
+								if (!frontLight) {
+									reflected.x.scaleAdd(-Ray.OFFSET, ray.n, reflected.x);
+								}
 							
 								reflected.currentMaterial = ray.prevMaterial;
 		
@@ -1130,12 +1175,13 @@ public class Scene implements Refreshable {
 								
 								if (attenuation > 0) {
 									directLight = attenuation * reflected.d.dot(ray.n);
+									if (!frontLight)
+										directLight = -directLight;
 									ray.hit = true;
 								}
 							}
-	
+								
 							getDiffuseReflectedRay(ray, reflected, random);
-							
 							pathTrace(reflected, rayPool, vectorPool, random, 0, false);
 							ray.hit = ray.hit || reflected.hit;
 							if (ray.hit) {
@@ -1149,6 +1195,7 @@ public class Scene implements Refreshable {
 									* (emittance + directLight * sun.emittance.z
 										+ (reflected.color.z + reflected.emittance.z));
 							}
+							
 						} else {
 							getDiffuseReflectedRay(ray, reflected, random);
 							
@@ -1423,6 +1470,10 @@ public class Scene implements Refreshable {
 		return ray.depth >= rayDepth && random.nextDouble() < .5f;
 	}
 	
+	/**
+	 * Reload all loaded chunks.
+	 * @param progressListener
+	 */
 	public synchronized void reloadChunks(ProgressListener progressListener) {
 		if (loadedWorld == null) {
 			logger.warn("Can not reload chunks -- unknown world file!");
@@ -1455,8 +1506,6 @@ public class Scene implements Refreshable {
 		loadedDimension = world.currentDimension();
 		
 		int emitters = 0;
-		int fence = 0;
-		int walls = 0;
 		int chunks = 0;
 		
 		if (chunksToLoad.isEmpty()) {
@@ -1496,6 +1545,7 @@ public class Scene implements Refreshable {
 			world.getRegion(region).parse();
 		}
 
+		Heightmap biomeIdMap = new Heightmap();
 		task = "Loading chunks";
 		int done = 0;
 		int target = chunksToLoad.size()-1;
@@ -1511,6 +1561,15 @@ public class Scene implements Refreshable {
 
 			world.getChunk(cp).getBlockData(blocks, data, biomes);
 			chunks += 1;
+			
+			for (int cz = 0; cz < 16; ++cz) {
+				int wz = cz + cp.z*16;
+				for (int cx = 0; cx < 16; ++cx) {
+					int wx = cx + cp.x*16;
+					int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(cx, cz)];
+					biomeIdMap.set(biomeId, wx, wz);
+				}
+			}
 			
 			for (int cy = 0; cy < 256; ++cy) {
 				for (int cz = 0; cz < 16; ++cz) {
@@ -1564,9 +1623,16 @@ public class Scene implements Refreshable {
 								index = Chunk.chunkIndex(cx, cy+1, cz);
 								Block above = Block.values[0xFF & blocks[index]];
 								if (above.isWater()) {
-									type = type | (1<<WaterModel.FULL_BLOCK);
+									type |= (1<<WaterModel.FULL_BLOCK);
 								} else if (above == Block.LILY_PAD) {
-									type = type | (1<<13);
+									type |= (1<<BlockData.LILY_PAD);
+									long wx = cp.x * 16L + cx;
+									long wy = cy + 1;
+									long wz = cp.z * 16L + cz;
+									long pr = (wx * 3129871L) ^ (wz * 116129781L) ^ ((long) wy);
+							        pr = pr * pr * 42317861L + pr * 11L;
+							        int dir = 3 & (int)(pr >> 16);
+									type |= (dir<<BlockData.LILY_PAD_ROTATION);
 								}
 							}
 							break;
@@ -1592,13 +1658,6 @@ public class Scene implements Refreshable {
 								}
 							}
 							// fallthrough!
-							
-						case Block.TALLGRASS_ID:
-						case Block.LEAVES_ID:
-							// save biome ID
-							int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(cx, cz)];
-							type |= biomeId << 24;
-							break;
 							
 						case Block.WOODENDOOR_ID:
 						case Block.IRONDOOR_ID:
@@ -1642,467 +1701,66 @@ public class Scene implements Refreshable {
 			}
 		}
 		
+		grassTexture = new WorldTexture();
+		foliageTexture = new WorldTexture();
+		
+		Set<ChunkPosition> chunkSet = new HashSet<ChunkPosition>(chunksToLoad);
+		
 		task = "Finalizing octree";
 		done = 0;
 		for (ChunkPosition cp : chunksToLoad) {
 			
+			// finalize grass and foliage textures
+			// box blur 3x3
+			for (int x = 0; x < 16; ++x) {
+				for (int z = 0; z < 16; ++z) {
+					
+					int nsum = 0;
+					float[] grassMix = { 0, 0, 0 };
+					float[] foliageMix = { 0, 0, 0 };
+					for (int sx = x-1; sx <= x+1; ++sx) {
+						int wx = cp.x*16 + sx;
+						for (int sz = z-1; sz <= z+1; ++sz) {
+							int wz = cp.z*16 + sz;
+							
+							ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
+							if (chunkSet.contains(ccp)) {
+								nsum += 1;
+								int biomeId = 0xFF & biomeIdMap.get(wx, wz);
+								float[] grassColor = Biomes.getGrassColorLinear(biomeId);
+								grassMix[0] += grassColor[0];
+								grassMix[1] += grassColor[1];
+								grassMix[2] += grassColor[2];
+								float[] foliageColor = Biomes.getFoliageColorLinear(biomeId);
+								foliageMix[0] += foliageColor[0];
+								foliageMix[1] += foliageColor[1];
+								foliageMix[2] += foliageColor[2];
+							}
+						}
+					}
+					
+					grassMix[0] /= nsum;
+					grassMix[1] /= nsum;
+					grassMix[2] /= nsum;
+					grassTexture.set(cp.x*16 + x - origin.x,
+							cp.z*16 + z - origin.z, grassMix);
+					
+					foliageMix[0] /= nsum;
+					foliageMix[1] /= nsum;
+					foliageMix[2] /= nsum;
+					foliageTexture.set(cp.x*16 + x - origin.x,
+							cp.z*16 + z - origin.z, foliageMix);
+				}
+			}
+			
 			progressListener.setProgress(task, done, 0, target);
 			done += 1;
 			
-			for (int cy = 0-origin.y; cy < Chunk.Y_MAX-origin.y; ++cy) {
-				for (int cz = 0; cz < 16; ++cz) {
-					int z = cz + cp.z*16 - origin.z;
-					for (int cx = 0; cx < 16; ++cx) {
-						int x = cx + cp.x*16 - origin.x;
-						int type = octree.get(x, cy, z);
-						Block block = Block.values[type & 0xFF];
-						
-						// set non-visible blocks to be stone, in order to merge large patches
-						if ((cx == 0 || cx == 15 || cz == 0 || cz == 15) &&
-								cy > -origin.y && cy < Chunk.Y_MAX-origin.y-1 &&
-								block != Block.STONE && block.isOpaque) {
-							if (Block.values[0xFF & octree.get(x-1, cy, z)].isOpaque &&
-									Block.values[0xFF & octree.get(x+1, cy, z)].isOpaque &&
-									Block.values[0xFF & octree.get(x, cy-1, z)].isOpaque &&
-									Block.values[0xFF & octree.get(x, cy+1, z)].isOpaque &&
-									Block.values[0xFF & octree.get(x, cy, z-1)].isOpaque &&
-									Block.values[0xFF & octree.get(x, cy, z+1)].isOpaque) {
-								octree.set(Block.STONE.id, x, cy, z);
-								continue;
-							}
-						}
-						
-						int fullBlock;
-						int data;
-						int level0;
-						int level;
-						int corner0;
-						int corner1;
-						int corner2;
-						int corner3;
-						
-						Block other;
-						switch (block.id) {
-						case Block.WATER_ID:
-							fullBlock = (type >> WaterModel.FULL_BLOCK) & 1;
-							if (fullBlock != 0) break;
-							
-							level0 = 8 - (0xF & (type >> 8));
-							corner0 = level0;
-							corner1 = level0;
-							corner2 = level0;
-							corner3 = level0;
-							
-							data = octree.get(x-1, cy, z);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.WATER) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner3 += level;
-							corner0 += level;
-							
-							data = octree.get(x-1, cy, z+1);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.WATER) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner0 += level;
-							
-							data = octree.get(x, cy, z+1);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.WATER) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner0 += level;
-							corner1 += level;
-							
-							data = octree.get(x+1, cy, z+1);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.WATER) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner1 += level;
-							
-							data = octree.get(x+1, cy, z);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.WATER) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner1 += level;
-							corner2 += level;
-							
-							data = octree.get(x+1, cy, z-1);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.WATER) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner2 += level;
-							
-							data = octree.get(x, cy, z-1);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.WATER) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner2 += level;
-							corner3 += level;
-							
-							data = octree.get(x-1, cy, z-1);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.WATER) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner3 += level;
-							
-							corner0 = Math.min(7, 8 - (corner0 / 4));
-							corner1 = Math.min(7, 8 - (corner1 / 4));
-							corner2 = Math.min(7, 8 - (corner2 / 4));
-							corner3 = Math.min(7, 8 - (corner3 / 4));
-							type |= (corner0 << 16);
-							type |= (corner1 << 20);
-							type |= (corner2 << 24);
-							type |= (corner3 << 28);
-							octree.set(type, x, cy, z);
-							break;
-						case Block.LAVA_ID:
-							fullBlock = (type >> WaterModel.FULL_BLOCK) & 1;
-							if (fullBlock != 0) break;
-							
-							level0 = 8 - (0xF & (type >> 8));
-							corner0 = level0;
-							corner1 = level0;
-							corner2 = level0;
-							corner3 = level0;
-							
-							data = octree.get(x-1, cy, z);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.LAVA) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner3 += level;
-							corner0 += level;
-							
-							data = octree.get(x-1, cy, z+1);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.LAVA) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner0 += level;
-							
-							data = octree.get(x, cy, z+1);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.LAVA) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner0 += level;
-							corner1 += level;
-							
-							data = octree.get(x+1, cy, z+1);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.LAVA) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner1 += level;
-							
-							data = octree.get(x+1, cy, z);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.LAVA) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner1 += level;
-							corner2 += level;
-							
-							data = octree.get(x+1, cy, z-1);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.LAVA) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner2 += level;
-							
-							data = octree.get(x, cy, z-1);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.LAVA) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner2 += level;
-							corner3 += level;
-							
-							data = octree.get(x-1, cy, z-1);
-							level = level0;
-							if (Block.values[0xFF & data] == Block.LAVA) {
-								fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
-								level = 8 - (1-fullBlock) * (7 & (data >> 8));
-							} else if (!Block.values[0xFF & data].isSolid) {
-								level = 0;
-							}
-							corner3 += level;
-							
-							corner0 = Math.min(7, 8 - (corner0 / 4));
-							corner1 = Math.min(7, 8 - (corner1 / 4));
-							corner2 = Math.min(7, 8 - (corner2 / 4));
-							corner3 = Math.min(7, 8 - (corner3 / 4));
-							type |= (corner0 << 16);
-							type |= (corner1 << 20);
-							type |= (corner2 << 24);
-							type |= (corner3 << 28);
-							octree.set(type, x, cy, z);
-							break;
-						case Block.TRIPWIRE_ID:
-							other = Block.values[0xFF & octree.get(x - 1, cy, z)];
-							if (other == Block.TRIPWIRE || other == Block.TRIPWIREHOOK) {
-								type |= 1 << 12;
-							} else {
-								other = Block.values[0xFF & octree.get(x + 1, cy, z)];
-								if (other == Block.TRIPWIRE || other == Block.TRIPWIREHOOK) {
-									type |= 1 << 12;
-								}
-							}
-							octree.set(type, x, cy, z);
-							break;
-						case Block.REDSTONEWIRE_ID:
-							Block above = Block.values[0xFF & octree.get(x, cy + 1, z)];
-							Block west = Block.values[0xFF & octree.get(x - 1, cy, z)];
-							Block east = Block.values[0xFF & octree.get(x + 1, cy, z)];
-							Block north = Block.values[0xFF & octree.get(x, cy, z - 1)];
-							Block south = Block.values[0xFF & octree.get(x, cy, z + 1)];
-							
-							if (above == Block.AIR) {
-								Block westAbove = Block.values[0xFF & octree.get(x - 1, cy + 1, z)];
-								if (west.isSolid && westAbove == Block.REDSTONEWIRE) {
-									// wire on west block side
-									type |= 1 << BlockData.RSW_WEST_CONNECTION;
-									type |= 1 << BlockData.RSW_WEST_SIDE;
-								}
-								Block eastAbove = Block.values[0xFF & octree.get(x + 1, cy + 1, z)];
-								if (east.isSolid && eastAbove == Block.REDSTONEWIRE) {
-									// wire on east block side
-									type |= 1 << BlockData.RSW_EAST_CONNECTION;
-									type |= 1 << BlockData.RSW_EAST_SIDE;
-								}
-								Block northAbove = Block.values[0xFF & octree.get(x, cy + 1, z - 1)];
-								if (north.isSolid && northAbove == Block.REDSTONEWIRE) {
-									// wire on north block side
-									type |= 1 << BlockData.RSW_NORTH_CONNECTION;
-									type |= 1 << BlockData.RSW_NORTH_SIDE;
-								}
-								Block southAbove = Block.values[0xFF & octree.get(x, cy + 1, z + 1)];
-								if (south.isSolid && southAbove == Block.REDSTONEWIRE) {
-									// wire on south block side
-									type |= 1 << BlockData.RSW_SOUTH_CONNECTION;
-									type |= 1 << BlockData.RSW_SOUTH_SIDE;
-								}
-							}
-							
-							if (west.isRedstoneWireConnector()) {
-								type |= 1 << BlockData.RSW_WEST_CONNECTION;
-							} else if (west == Block.AIR) {
-								Block westBelow = Block.values[0xFF & octree.get(x - 1, cy - 1, z)];
-								if (westBelow == Block.REDSTONEWIRE) {
-									type |= 1 << BlockData.RSW_WEST_CONNECTION;
-								}
-							}
-							
-							if (east.isRedstoneWireConnector()) {
-								type |= 1 << BlockData.RSW_EAST_CONNECTION;
-							} else if (east == Block.AIR) {
-								Block eastBelow = Block.values[0xFF & octree.get(x + 1, cy - 1, z)];
-								if (eastBelow == Block.REDSTONEWIRE) {
-									type |= 1 << BlockData.RSW_EAST_CONNECTION;
-								}
-							}
-							
-							if (north.isRedstoneWireConnector() || south.isRedstoneWireConnector()) {
-								type |= 1 << BlockData.RSW_NORTH_CONNECTION;
-							} else if (north == Block.AIR) {
-								Block northBelow = Block.values[0xFF & octree.get(x, cy - 1, z - 1)];
-								if (northBelow == Block.REDSTONEWIRE) {
-									type |= 1 << BlockData.RSW_NORTH_CONNECTION;
-								}
-							}
-							
-							if (south.isRedstoneWireConnector()) {
-								type |= 1 << BlockData.RSW_SOUTH_CONNECTION;
-							} else if (south == Block.AIR) {
-								Block southBelow = Block.values[0xFF & octree.get(x, cy - 1, z + 1)];
-								if (southBelow == Block.REDSTONEWIRE) {
-									type |= 1 << BlockData.RSW_SOUTH_CONNECTION;
-								}
-							}
-							
-							octree.set(type, x, cy, z);
-							break;
-						case Block.MELONSTEM_ID:
-							if (Block.values[0xFF & octree.get(x - 1, cy, z)] == Block.MELON)
-								type |= 1 << 16;
-							else if (Block.values[0xFF & octree.get(x + 1, cy, z)] == Block.MELON)
-								type |= 2 << 16;
-							else if (Block.values[0xFF & octree.get(x, cy, z - 1)] == Block.MELON)
-								type |= 3 << 16;
-							else if (Block.values[0xFF & octree.get(x, cy, z + 1)] == Block.MELON)
-								type |= 4 << 16;
-							octree.set(type, x, cy, z);
-							break;
-						case Block.PUMPKINSTEM_ID:
-							if (Block.values[0xFF & octree.get(x - 1, cy, z)] == Block.PUMPKIN)
-								type |= 1 << 16;
-							else if (Block.values[0xFF & octree.get(x + 1, cy, z)] == Block.PUMPKIN)
-								type |= 2 << 16;
-							else if (Block.values[0xFF & octree.get(x, cy, z - 1)] == Block.PUMPKIN)
-								type |= 3 << 16;
-							else if (Block.values[0xFF & octree.get(x, cy, z + 1)] == Block.PUMPKIN)
-								type |= 4 << 16;
-							octree.set(type, x, cy, z);
-							break;
-						case Block.CHEST_ID:
-							int dir = type >> 8;
-							int tex = 0;
-							if (dir < 4) {
-								if (Block.values[0xFF & octree.get(x - 1, cy, z)] == Block.CHEST)
-									tex = 1 + (dir-1) % 2;
-								else if (Block.values[0xFF & octree.get(x + 1, cy, z)] == Block.CHEST)
-									tex = 1 + dir % 2;
-							} else {
-								if (Block.values[0xFF & octree.get(x, cy, z - 1)] == Block.CHEST)
-									tex = 1 + dir % 2;
-								else if (Block.values[0xFF & octree.get(x, cy, z + 1)] == Block.CHEST)
-									tex = 1 + (dir-1) % 2;
-							}
-							type |= tex << 16;
-							octree.set(type, x, cy, z);
-							break;
-						case Block.IRONBARS_ID:
-							other = Block.values[0xFF & octree.get(x, cy, z - 1)];
-							if (other.isIronBarsConnector())
-								type |= 1 << 8;
-							other = Block.values[0xFF & octree.get(x, cy, z + 1)];
-							if (other.isIronBarsConnector())
-								type |= 2 << 8;
-							other = Block.values[0xFF & octree.get(x + 1, cy, z)];
-							if (other.isIronBarsConnector())
-								type |= 4 << 8;
-							other = Block.values[0xFF & octree.get(x - 1, cy, z)];
-							if (other.isIronBarsConnector())
-								type |= 8 << 8;
-							octree.set(type, x, cy, z);
-							break;
-						case Block.GLASSPANE_ID:
-							other = Block.values[0xFF & octree.get(x, cy, z - 1)];
-							if (other.isGlassPaneConnector())
-								type |= 1 << 8;
-							other = Block.values[0xFF & octree.get(x, cy, z + 1)];
-							if (other.isGlassPaneConnector())
-								type |= 2 << 8;
-							other = Block.values[0xFF & octree.get(x + 1, cy, z)];
-							if (other.isGlassPaneConnector())
-								type |= 4 << 8;
-							other = Block.values[0xFF & octree.get(x - 1, cy, z)];
-							if (other.isGlassPaneConnector())
-								type |= 8 << 8;
-							octree.set(type, x, cy, z);
-							break;
-						case Block.STONEWALL_ID:
-							other = Block.values[0xFF & octree.get(x, cy, z - 1)];
-							if (other.isStoneWallConnector())
-								type |= 1 << BlockData.STONEWALL_CONN;
-							other = Block.values[0xFF & octree.get(x, cy, z + 1)];
-							if (other.isStoneWallConnector())
-								type |= 2 << BlockData.STONEWALL_CONN;
-							other = Block.values[0xFF & octree.get(x + 1, cy, z)];
-							if (other.isStoneWallConnector())
-								type |= 4 << BlockData.STONEWALL_CONN;
-							other = Block.values[0xFF & octree.get(x - 1, cy, z)];
-							if (other.isStoneWallConnector())
-								type |= 8 << BlockData.STONEWALL_CONN;
-							octree.set(type, x, cy, z);
-							walls++;
-							break;
-						case Block.FENCE_ID:
-							other = Block.values[0xFF & octree.get(x, cy, z - 1)];
-							if (other.isFenceConnector())
-								type |= 1 << 8;
-							other = Block.values[0xFF & octree.get(x, cy, z + 1)];
-							if (other.isFenceConnector())
-								type |= 2 << 8;
-							other = Block.values[0xFF & octree.get(x + 1, cy, z)];
-							if (other.isFenceConnector())
-								type |= 4 << 8;
-							other = Block.values[0xFF & octree.get(x - 1, cy, z)];
-							if (other.isFenceConnector())
-								type |= 8 << 8;
-							octree.set(type, x, cy, z);
-							fence++;
-							break;
-						case Block.NETHERBRICKFENCE_ID:
-							other = Block.values[0xFF & octree.get(x, cy, z - 1)];
-							if (other.isNetherBrickFenceConnector())
-								type |= 1 << 8;
-							other = Block.values[0xFF & octree.get(x, cy, z + 1)];
-							if (other.isNetherBrickFenceConnector())
-								type |= 2 << 8;
-							other = Block.values[0xFF & octree.get(x + 1, cy, z)];
-							if (other.isNetherBrickFenceConnector())
-								type |= 4 << 8;
-							other = Block.values[0xFF & octree.get(x - 1, cy, z)];
-							if (other.isNetherBrickFenceConnector())
-								type |= 8 << 8;
-							octree.set(type, x, cy, z);
-							fence++;
-							break;
-						default:
-							break;
-						}
-					}
-				}
-			}
+			OctreeFinalizer.finalizeChunk(octree, origin, cp);
 		}
 		
-		logger.info(
-				String.format("Loaded %d chunks, %d emitters, %d fence posts, %d walls",
-						chunks, emitters, fence, walls));
+		logger.info(String.format("Loaded %d chunks (%d emitters)",
+				chunks, emitters));
 	}
 
 	private int calculateOctreeOrigin(Collection<ChunkPosition> chunksToLoad) {
@@ -2457,18 +2115,18 @@ public class Scene implements Refreshable {
 	}
 	
 	/**
-	 * @return <code>true</code> if gamma correction is enabled
+	 * @return The current postprocessing mode
 	 */
-	public boolean getGammaCorrectionEnabled() {
-		return gammaCorrection;
+	public Postprocess getPostprocess() {
+		return postprocess;
 	}
 
 	/**
-	 * Set the gamma correction flag
-	 * @param value
+	 * Change the postprocessing mode
+	 * @param p The new postprocessing mode
 	 */
-	public synchronized void setGammaCorrectionEnabled(boolean value) {
-		gammaCorrection  = value;
+	public synchronized void setPostprocess(Postprocess p) {
+		postprocess = p;
 		if (!pathTrace)
 			refresh();
 	}
@@ -2580,8 +2238,8 @@ public class Scene implements Refreshable {
 	 * @param other
 	 */
 	public void copyTransients(Scene other) {
-		gammaCorrection = other.gammaCorrection;
-		gamma = other.gamma;
+		postprocess = other.postprocess;
+		exposure = other.exposure;
 		saveDumps = other.saveDumps;
 		dumpFrequency = other.dumpFrequency;
 		sppTarget = other.sppTarget;
@@ -2650,12 +2308,22 @@ public class Scene implements Refreshable {
 	/**
 	 * @param targetFile
 	 * @param watermark 
+	 * @param progressListener 
 	 * @throws IOException 
 	 */
-	public synchronized void saveFrame(File targetFile, boolean watermark) throws IOException {
+	public synchronized void saveFrame(File targetFile, boolean watermark,
+			ProgressListener progressListener) throws IOException {
+		
+		for (int x = 0; x < width; ++x) {
+			progressListener.setProgress("Finalizing frame", x, 0, width-1);
+			for (int y = 0; y < height; ++y) {
+				finalizePixel(x, y);
+			}
+		}
+		
 		if (watermark)
 			addWatermark();
-		ImageIO.write(buffer, "png", targetFile);
+		ImageIO.write(backBuffer, "png", targetFile);
 	}
 
 	/**
@@ -2686,6 +2354,64 @@ public class Scene implements Refreshable {
 			
 			progressListener.setProgress(task, 1, 0, 1);
 			logger.info("Octree saved");
+		} catch (IOException e) {
+			logger.warn("IO exception while saving octree!", e);
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+		
+	private synchronized void saveGrassTexture(
+			RenderContext context,
+			ProgressListener progressListener) {
+		
+		String fileName = name + ".grass";
+		DataOutputStream out = null;
+		try {
+			String task = "Saving grass texture";
+			progressListener.setProgress(task, 0, 0, 1);
+			logger.info("Saving grass texture " + fileName);
+			out = new DataOutputStream(new GZIPOutputStream(
+					context.getSceneFileOutputStream(fileName)));
+			
+			grassTexture.store(out);
+			
+			progressListener.setProgress(task, 1, 0, 1);
+			logger.info("Grass texture saved");
+		} catch (IOException e) {
+			logger.warn("IO exception while saving octree!", e);
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+	
+	private synchronized void saveFoliageTexture(
+			RenderContext context,
+			ProgressListener progressListener) {
+		
+		String fileName = name + ".foliage";
+		DataOutputStream out = null;
+		try {
+			String task = "Saving foliage texture";
+			progressListener.setProgress(task, 0, 0, 1);
+			logger.info("Saving foliage texture " + fileName);
+			out = new DataOutputStream(new GZIPOutputStream(
+					context.getSceneFileOutputStream(fileName)));
+			
+			foliageTexture.store(out);
+			
+			progressListener.setProgress(task, 1, 0, 1);
+			logger.info("Foliage texture saved");
 		} catch (IOException e) {
 			logger.warn("IO exception while saving octree!", e);
 		} finally {
@@ -2765,6 +2491,68 @@ public class Scene implements Refreshable {
 			}
 		}
 	}
+		
+	private synchronized boolean loadGrassTexture(
+			RenderContext context,
+			RenderStatusListener renderListener) {
+		
+		String fileName = name + ".grass";
+		
+		DataInputStream in = null;
+		try {
+			String task = "Loading grass texture";
+			renderListener.setProgress(task, 0, 0, 1);
+			logger.info("Loading grass texture " + fileName);
+			in = new DataInputStream(new GZIPInputStream(
+					context.getSceneFileInputStream(fileName)));
+			
+			grassTexture = WorldTexture.load(in);
+			
+			logger.info("Grass texture loaded");
+			return true;
+		} catch (IOException e) {
+			logger.info("Failed to load grass texture!", e);
+			return false;
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+		
+	private synchronized boolean loadFoliageTexture(
+			RenderContext context,
+			RenderStatusListener renderListener) {
+		
+		String fileName = name + ".foliage";
+		
+		DataInputStream in = null;
+		try {
+			String task = "Loading foliage texture";
+			renderListener.setProgress(task, 0, 0, 1);
+			logger.info("Loading foliage texture " + fileName);
+			in = new DataInputStream(new GZIPInputStream(
+					context.getSceneFileInputStream(fileName)));
+			
+			foliageTexture = WorldTexture.load(in);
+			
+			logger.info("Foliage texture loaded");
+			return true;
+		} catch (IOException e) {
+			logger.info("Failed to load foliage texture!", e);
+			return false;
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
 
 	private synchronized void loadDump(
 			RenderContext context,
@@ -2820,8 +2608,8 @@ public class Scene implements Refreshable {
 	}
 
 	/**
-	 * Finalize the job. Fills in raster image with RGB color values
-	 * corresponding to the collected samples.
+	 * Finalize a pixel. Calculates the resulting RGB color values for
+	 * the pixel and sets these in the bitmap image.
 	 * @param jobId
 	 */
 	void finalizePixel(int x, int y) {
@@ -2831,12 +2619,28 @@ public class Scene implements Refreshable {
 		double g = samples[x][y][1];
 		double b = samples[x][y][2];
 		
+		r *= exposure;
+		g *= exposure;
+		b *= exposure;
+		
 		if (pathTrace()) {
-			if (gammaCorrection) {
-				double corr = 1/gamma;
-				r = Math.pow(r, corr);
-				g = Math.pow(g, corr);
-				b = Math.pow(b, corr);
+			switch (postprocess) {
+			case NONE:
+				break;
+			case TONEMAP1:
+				// http://filmicgames.com/archives/75
+				r = Math.max(0, r-0.004);
+				r = (r*(6.2*r + .5)) / (r * (6.2*r + 1.7) + 0.06);
+				g = Math.max(0, g-0.004);
+				g = (g*(6.2*g + .5)) / (g * (6.2*g + 1.7) + 0.06);
+				b = Math.max(0, b-0.004);
+				b = (b*(6.2*b + .5)) / (b * (6.2*b + 1.7) + 0.06);
+				break;
+			case GAMMA:
+				r = Math.pow(r, 1/DEFAULT_GAMMA);
+				g = Math.pow(g, 1/DEFAULT_GAMMA);
+				b = Math.pow(b, 1/DEFAULT_GAMMA);
+				break;
 			}
 		} else {
 			r = Math.sqrt(r);
@@ -2961,6 +2765,30 @@ public class Scene implements Refreshable {
 	 */
 	public void softRefresh() {
 		refresh = true;
+	}
+
+	/**
+	 * @param x X coordinate in octree space
+	 * @param z Z coordinate in octree space
+	 * @return Foliage color for the given coordinates
+	 */
+	public float[] getFoliageColor(int x, int z) {
+		if (biomeColors)
+			return foliageTexture.get(x, z);
+		else
+			return Biomes.getFoliageColorLinear(0);
+	}
+
+	/**
+	 * @param x X coordinate in octree space
+	 * @param z Z coordinate in octree space
+	 * @return Grass color for the given coordinates
+	 */
+	public float[] getGrassColor(int x, int z) {
+		if (biomeColors)
+			return grassTexture.get(x, z);
+		else
+			return Biomes.getGrassColorLinear(0);
 	}
 
 }

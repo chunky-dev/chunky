@@ -16,8 +16,9 @@
  */
 package se.llbit.math;
 
-import se.llbit.chunky.world.Biomes;
+import se.llbit.chunky.renderer.Scene;
 import se.llbit.chunky.world.Block;
+import se.llbit.chunky.world.BlockData;
 
 /**
  * The ray representation used for ray tracing.
@@ -246,7 +247,7 @@ public class Ray {
 	 * @return Current block data (sometimes called metadata)
 	 */
 	public final int getBlockData() {
-		return 0xF & (currentMaterial >> 8);
+		return 0xF & (currentMaterial >> BlockData.BLOCK_DATA_OFFSET);
 	}
 
 	/**
@@ -258,21 +259,6 @@ public class Ray {
 		setDefault();
 		this.x.set(o);
 		this.d.set(d);
-	}
-
-	/**
-	 * @return Biome color of current block
-	 */
-	public final float[] getBiomeColor() {
-		int biomeId = 0xFF & (currentMaterial >> 24);
-		return Biomes.getColorCorrected(biomeId);
-	}
-
-	/**
-	 * @return Biome id of current block
-	 */
-	public final int getBiomeId() {
-		return 0xFF & (currentMaterial >> 24);
 	}
 
 	/**
@@ -410,4 +396,19 @@ public class Ray {
 		}
 	}
 
+	/**
+	 * @param scene
+	 * @return Foliage color for the current block
+	 */
+	public float[] getBiomeFoliageColor(Scene scene) {
+		return scene.getFoliageColor((int) (x.x + d.x * OFFSET), (int) (x.z + d.z * OFFSET));
+	}
+
+	/**
+	 * @param scene
+	 * @return Grass color for the current block
+	 */
+	public float[] getBiomeGrassColor(Scene scene) {
+		return scene.getGrassColor((int) (x.x + d.x * OFFSET), (int) (x.z + d.z * OFFSET));
+	}
 }

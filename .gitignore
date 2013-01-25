@@ -1,3 +1,5 @@
 /bin
 /src/gen
 /test
+/build
+/chunky.map

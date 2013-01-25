@@ -18,6 +18,12 @@ package se.llbit.chunky.world;
 
 @SuppressWarnings("javadoc")
 public interface BlockData {
+	
+	/**
+	 * Offset to block metadata
+	 */
+	int BLOCK_DATA_OFFSET = 8;
+	
 	int RSW_EAST_CONNECTION = 12;
 	int RSW_WEST_CONNECTION = 13;
 	int RSW_NORTH_CONNECTION = 14;
@@ -27,6 +33,16 @@ public interface BlockData {
 	int RSW_NORTH_SIDE = 18;
 	int RSW_SOUTH_SIDE = 19;
 	int VINE_TOP = 12;
+	
+	/**
+	 * The water block has a lily pad floating on it
+	 */
+	int LILY_PAD = 13;
+	
+	/**
+	 * Rotation of the lily pad
+	 */
+	int LILY_PAD_ROTATION = 14;
 	
 	/**
 	 * Offset to bottom door metadata
@@ -42,4 +58,11 @@ public interface BlockData {
 	 * Offset for stone wall data
 	 */
 	int STONEWALL_CONN = 9;
+	
+	int CORNER_OFFSET = 24;
+	
+	int SOUTH_EAST = 4;
+	int SOUTH_WEST = 5;
+	int NORTH_EAST = 6;
+	int NORTH_WEST = 7;
 }

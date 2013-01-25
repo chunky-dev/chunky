@@ -1,13 +1,34 @@
-2012-12-30  Jesper Öqvist <jesper@llbit.se>
+1.1.4 - TBD
 
+    * Improved rendering of the Beacon block
+    * Implemented Anvil rendering
+
+1.1.3 - 2013-01-14
+    * Clicking in the map when it is maximally zoomed out will select an
+      entire region rather than just a single chunk
+    * The coordinates coordinates of the chunk under the cursor are displayed
+      in the bottom left corner of the map view
+    * The "Save Current Frame" button should now actually save the current
+      frame, not the last displayed frame
+    * Added buttons to open and change the scene directory in 3D Render tab.
+      The button to open the scene directory is only available on some systems.
+    * Added Post-Processing tab in the Render Controls window
+    * Added a combo box for post-processing mode under the Post-Processing tab.
+      This replaces the "gamma enabled" check box.
+    * Added an exposure slider under the Post-Processing tab. This replaces
+      the old gamma slider.
+    * Implemented corner stairs rendering
+    * Fixed possible off-by-one error in the chunk parser
+
+1.1.2 - 2013-01-05
+
+    * Fixed error that could cause Chunky to not remember the last used
+      texture pack
+    * Improved torch rendering - torches now render exactly like in-game
+    * Biome colors are now blurred - improves visibly sharp biome edges
     * Added biome map mode - renders a map color coded by biome ID
-
-2012-12-28  Jesper Öqvist <jesper@llbit.se>
-
+    * Lily pads render with the correct rotation (same as in-game)
     * Added button to reload all chunks in the scene
-
-2012-12-27  Jesper Öqvist <jesper@llbit.se>
-
     * Pressure plates now have the correct size
     * Fixed some door rendering issues (incorrect rotation)
 

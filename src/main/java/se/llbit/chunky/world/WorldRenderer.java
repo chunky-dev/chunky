@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.RenderBuffer;
 import se.llbit.chunky.resources.MiscImages;
 
@@ -28,6 +29,8 @@ import se.llbit.chunky.resources.MiscImages;
  */
 public class WorldRenderer {
 
+	private static final Font font = new Font("Sans serif", Font.BOLD, 11);
+	
 	private boolean highlightEnabled;
 	private Block hlBlock = Block.DIAMONDORE;
 	private Color hlColor = Color.red;
@@ -139,31 +142,43 @@ public class WorldRenderer {
 	
 	/**
 	 * Render overlay icons
-	 * @param world
-	 * @param selection
-	 * @param g
-	 * @param renderBuffer
-	 * @param renderer
-	 * @param loadIndicator
+	 * @param world 
+	 * @param chunky 
+	 * @param g 
+	 * @param renderBuffer 
 	 */
-	public void renderHUD(World world, ChunkSelectionTracker selection,
-			Graphics g, RenderBuffer renderBuffer,
-			Chunk.Renderer renderer, boolean loadIndicator) {
+	public void renderHUD(World world, Chunky chunky, 
+			Graphics g, RenderBuffer renderBuffer) {
+		
+		boolean loadIndicator = chunky.isLoading();
+		Chunk.Renderer renderer = chunky.getChunkRenderer();
+		
 		ChunkView view = renderBuffer.getView();
 		
 		if (loadIndicator) {
 			g.drawImage(MiscImages.clock, view.width-32, 0, 32, 32, null);
 		}
 		
-		if (world.havePlayerPos())
+		if (world.havePlayerPos()) {
 			renderPlayer(world, g, view,
 					renderer == Chunk.surfaceRenderer
 					|| world.playerLocY() == world.currentLayer());
+		}
 		
-		if (world.haveSpawnPos())
+		if (world.haveSpawnPos()) {
 			renderSpawn(world, g, view,
 			        renderer == Chunk.surfaceRenderer
 			        || world.spawnPosY() == world.currentLayer());
+		}
+		
+		Chunk hoveredChunk = chunky.getHoveredChunk();
+		if (!hoveredChunk.isEmpty()) {
+			
+			g.setFont(font);
+			g.setColor(Color.white);
+			g.drawString("Chunk: " + hoveredChunk.getPosition(),
+					5, view.height - 5);
+		}
 	}
 
 	private void renderPlayer(World world, Graphics g, ChunkView view, boolean sameLayer) {

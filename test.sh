@@ -5,7 +5,11 @@
 #    -XX:CompileCommand=print,Octree.intersect
 #JAVA_OPTS=-XX:+PrintCompilation
 
+if [ ! -d test ]; then
+	mkdir test
+fi
+
 if ant clean && ant -Ddebug=true jar; then
-    java $JAVA_OPTS -jar build/Chunky.jar
+    (cd test; java $JAVA_OPTS -jar ../build/Chunky.jar)
 fi
 

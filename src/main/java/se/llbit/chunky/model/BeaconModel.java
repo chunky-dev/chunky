@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,34 +16,40 @@
  */
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.renderer.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Quad;
+import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
-@SuppressWarnings("javadoc")
-public class TallGrassModel extends SpriteModel {
-
+/**
+ * Beacon block.
+ * @author Jesper Öqvist <jesper@llbit.se>
+ */
+public class BeaconModel {
+	private static final AABB[] boxes = {
+		new AABB(0, 1, 0, 1, 0, 1),
+		new AABB(3/16., 13/16., 3/16., 13/16., 3/16., 13/16.),
+		new AABB(2/16., 14/16., 0, 3/16., 2/16., 14/16.),
+	};
+	
 	private static final Texture[] tex = {
-		Texture.deadBush, Texture.tallGrass, Texture.fern };
+		Texture.glass,
+		Texture.beacon,
+		Texture.obsidian,
+	};
 
-	public static boolean intersect(Ray ray, Scene scene) {
+	/**
+	 * Find intersection between ray and block
+	 * @param ray
+	 * @return <code>true</code> if the ray intersected the block
+	 */
+	public static boolean intersect(Ray ray) {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
-		for (Quad quad : quads) {
-			if (quad.intersect(ray)) {
-				int kind = ray.getBlockData() % 3;
-				float[] color = tex[kind].getColor(ray.u, ray.v);
+		for (int i = 0; i < boxes.length; ++i) {
+			if (boxes[i].intersect(ray)) {
+				float[] color = tex[i].getColor(ray.u, ray.v);
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
-					if (kind != 0) {
-						float[] biomeColor = ray.getBiomeGrassColor(scene);
-						ray.color.x *= biomeColor[0];
-						ray.color.y *= biomeColor[1];
-						ray.color.z *= biomeColor[2];
-					}
-					ray.n.set(quad.n);
-					ray.n.scale(-Math.signum(ray.d.dot(quad.n)));
 					ray.t = ray.tNear;
 					hit = true;
 				}

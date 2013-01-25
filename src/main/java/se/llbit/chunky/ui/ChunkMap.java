@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.RenderBuffer;
+import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.World;
@@ -136,8 +137,16 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 					double scale = (double) view.chunkScale;
 					int cx = (int) Math.floor(view.x + (x - getWidth()/2) / scale);
 					int cz = (int) Math.floor(view.z + (y - getHeight()/2) / scale);
-					chunky.selectChunk(cx, cz);
-					renderBuffer.updateChunk(cx, cz);
+					
+					if (view.chunkScale > 1) {
+						chunky.selectChunk(cx, cz);
+						renderBuffer.updateChunk(cx, cz);
+					} else {
+						int rx = cx >> 5;
+						int rz = cz >> 5;
+						chunky.selectChunks(rx*32, (rx+1)*32, rz*32, (rz+1)*32);
+						renderBuffer.updateChunks(rx*32, (rx+1)*32, rz*32, (rz+1)*32);
+					}
 				}
 
 			} else {
@@ -154,6 +163,14 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
+			double scale = (double) view.chunkScale;
+			int cx = (int) Math.floor(view.x + (e.getX() - getWidth()/2) / scale);
+			int cz = (int) Math.floor(view.z + (e.getY() - getHeight()/2) / scale);
+			Chunk prevHovered = chunky.getHoveredChunk();
+			chunky.setHoveredChunk(cx, cz);
+			Chunk hovered = chunky.getHoveredChunk();
+			if (prevHovered != hovered)
+				repaint();
 		}
 
 		@Override
@@ -213,9 +230,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		chunky.getWorldRenderer().render(world, renderBuffer,
 						chunky.getChunkRenderer(), chunky.getChunkSelection());
 		renderBuffer.renderBuffered(g);
-		chunky.getWorldRenderer().renderHUD(world,
-				chunky.getChunkSelection(), g, renderBuffer,
-				chunky.getChunkRenderer(), chunky.isLoading());
+		chunky.getWorldRenderer().renderHUD(world, chunky, g, renderBuffer);
 		drawSelectionRect(g);
 	}
 	

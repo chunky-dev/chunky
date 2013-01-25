@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.Sun;
+import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.Icon;
 import se.llbit.util.ProgramProperties;
@@ -52,6 +53,8 @@ public class TexturePackLoader {
 		SUN,
 		SIGN,
 		CLOUDS,
+		GRASSCOLOR,
+		FOLIAGECOLOR,
 	}
 	
 	/**
@@ -128,12 +131,27 @@ public class TexturePackLoader {
 						loadCloudsTexture(imageStream);
 					}
 					break;
+					
+				case GRASSCOLOR:
+					imageStream = tpZip.getInputStream(new ZipEntry("misc/grasscolor.png"));
+					if (imageStream == null) {
+						logger.info("Could not load file misc/grasscolor.png from default texture pack!");
+					} else {
+						loadGrassColorTexture(imageStream);
+					}
+					
+				case FOLIAGECOLOR:
+					imageStream = tpZip.getInputStream(new ZipEntry("misc/foliagecolor.png"));
+					if (imageStream == null) {
+						logger.info("Could not load file misc/foliagecolor.png from default texture pack!");
+					} else {
+						loadFoliageColorTexture(imageStream);
+					}
+					
 				}
 			}
 			
 			tpZip.close();
-			
-			ProgramProperties.setProperty("lastTexturePack", tpFile.getAbsolutePath());
 		} catch (IOException e) {
 			logger.warn("Failed to load default texture pack", e);
 		}
@@ -207,6 +225,22 @@ public class TexturePackLoader {
 				loadCloudsTexture(imageStream);
 			}
 			
+			imageStream = tpZip.getInputStream(new ZipEntry("misc/grasscolor.png"));
+			if (imageStream == null) {
+				logger.info("Could not load file misc/grasscolor.png from texture pack!");
+				defaultTextures.add(TextureFile.GRASSCOLOR);
+			} else {
+				loadGrassColorTexture(imageStream);
+			}
+			
+			imageStream = tpZip.getInputStream(new ZipEntry("misc/foliagecolor.png"));
+			if (imageStream == null) {
+				logger.info("Could not load file misc/foliagecolor.png from texture pack!");
+				defaultTextures.add(TextureFile.FOLIAGECOLOR);
+			} else {
+				loadFoliageColorTexture(imageStream);
+			}
+			
 			tpZip.close();
 			
 			ProgramProperties.setProperty("lastTexturePack", tpFile.getAbsolutePath());
@@ -229,6 +263,11 @@ public class TexturePackLoader {
 		Sun.texture = new Texture(image);
 	}
 	
+	/**
+	 * Loads the cloud texture
+	 * @param imageStream
+	 * @throws IOException
+	 */
 	private static void loadCloudsTexture(InputStream imageStream)
 			throws IOException {
 		
@@ -240,10 +279,30 @@ public class TexturePackLoader {
 
 		for (int y = 0; y < 256; ++y) {
 			for (int x = 0; x < 256; ++x) {
-				int v = texture.getRGB(x, y) & 1;
+				int v = texture.getRGB(x, y) >>> 31;
 				Clouds.setCloud(x, y, v);
 			}
 		}
+	}
+	
+	private static void loadGrassColorTexture(InputStream imageStream)
+			throws IOException {
+		
+		BufferedImage grasscolor = ImageIO.read(imageStream);
+		if (grasscolor.getWidth() != 256 || grasscolor.getHeight() != 256) {
+			throw new IOException("Error: Grass color texture must be 256 by 256 pixels!");
+		}
+		Biomes.loadGrassColors(grasscolor);
+	}
+	
+	private static void loadFoliageColorTexture(InputStream imageStream)
+			throws IOException {
+		
+		BufferedImage grasscolor = ImageIO.read(imageStream);
+		if (grasscolor.getWidth() != 256 || grasscolor.getHeight() != 256) {
+			throw new IOException("Error: Foliage color texture must be 256 by 256 pixels!");
+		}
+		Biomes.loadFoliageColors(grasscolor);
 	}
 	
 	private static void loadChestTextures(InputStream imageStream)
@@ -492,7 +551,7 @@ public class TexturePackLoader {
 		Texture.grassSide.setTexture(texture[0x26]);
 		Texture.tallGrass.setTexture(texture[0x27]);
 		// skip 28
-		// skip 29
+		Texture.beacon.setTexture(texture[0x29]);
 		// skip 2A
 		Texture.workbenchTop.setTexture(texture[0x2B]);
 		Texture.furnaceUnlitFront.setTexture(texture[0x2C]);
@@ -668,7 +727,9 @@ public class TexturePackLoader {
 		Texture.redstoneLampOn.setTexture(texture[0xD4]);
 		Texture.circleStoneBrick.setTexture(texture[0xD5]);
 		Texture.birchPlanks.setTexture(texture[0xD6]);
-		// skip D7-DF
+		Texture.anvilSide.setTexture(texture[0xD7]);
+		Texture.anvilTop2.setTexture(texture[0xD8]);
+		// skip D9-DF
 		
 		Texture.netherBrick.setTexture(texture[0xE0]);
 		Texture.lightGrayWool.setTexture(texture[0xE1]);
@@ -677,7 +738,9 @@ public class TexturePackLoader {
 		Texture.netherWart3.setTexture(texture[0xE4]);
 		Texture.sandstoneDecorated.setTexture(texture[0xE5]);
 		Texture.sandstoneSmooth.setTexture(texture[0xE6]);
-		// skip E7-EC
+		Texture.anvilTop1.setTexture(texture[0xE7]);
+		Texture.anvilTop3.setTexture(texture[0xE8]);
+		// skip E9-EC
 		Texture.lava.setTexture(texture[0xED]);
 		// skip EE, EF
 		

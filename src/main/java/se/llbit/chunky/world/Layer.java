@@ -363,13 +363,13 @@ public class Layer {
 	/**
 	 * Load biome IDs into layer
 	 * @param chunkBiomes
-	 * @return
+	 * @return The loaded layer
 	 */
 	public static Layer loadBiomes(byte[] chunkBiomes) {
 		int[]	surface = new int[16*16];
 		for (int x = 0; x < 16; ++x) {
 			for (int z = 0; z < 16; ++z) {
-				surface[x*16+z] = Biomes.getColor(chunkBiomes[Chunk.chunkXZIndex(x, z)]);
+				surface[x*16+z] = Biomes.getColor(0xFF & chunkBiomes[Chunk.chunkXZIndex(x, z)]);
 			}
 		}
 		return new Layer(surface);
@@ -426,14 +426,21 @@ public class Layer {
 					int blockId = 0xFF & blocksArray[Chunk.chunkIndex(x, y, z)];
 					Block block = Block.values[blockId];
 					float[] blockColor = new float[4];
+					int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
 					
 					switch (block.id) {
 					
 					case Block.LEAVES_ID:
+						Color.getRGBComponents(Biomes.getFoliageColor(biomeId), blockColor);
+						blockColor[3] = 1.f;// foliage colors don't include alpha
+						
+						y -= 1;
+						break;
+						
 					case Block.GRASS_ID:
+					case Block.VINES_ID:
 					case Block.TALLGRASS_ID:
-						int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
-						Color.getRGBComponents(Biomes.getColor(biomeId), blockColor);
+						Color.getRGBComponents(Biomes.getGrassColor(biomeId), blockColor);
 						blockColor[3] = 1.f;// grass colors don't include alpha
 						
 						y -= 1;

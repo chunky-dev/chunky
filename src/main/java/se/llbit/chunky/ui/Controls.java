@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -51,10 +51,13 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.log4j.Logger;
+
 import se.llbit.chunky.main.BlockTypeListCellRenderer;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.Messages;
 import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.ui.SceneDirectoryPicker;
 import se.llbit.chunky.resources.MiscImages;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.world.Block;
@@ -70,6 +73,9 @@ import se.llbit.chunky.world.World;
  */
 @SuppressWarnings("serial")
 public class Controls extends JPanel {
+	
+	private static final Logger logger =
+			Logger.getLogger(Controls.class);
 	
 	private static final int WIDTH_BIG = 300;
 
@@ -304,23 +310,23 @@ public class Controls extends JPanel {
 		
 		GroupLayout layout = new GroupLayout(optionsPanel);
 		optionsPanel.setLayout(layout);
-		layout.setHorizontalGroup(
-				layout.createParallelGroup(Alignment.LEADING)
-				.addGroup(layout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(layout.createParallelGroup(Alignment.LEADING)
-						.addComponent(loadTexturePackBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
-						.addComponent(loadDefaultTexturesBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE))
-					.addContainerGap())
-			);
-		layout.setVerticalGroup(
-			layout.createParallelGroup(Alignment.LEADING)
+		layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
 			.addGroup(layout.createSequentialGroup()
 				.addContainerGap()
-				.addComponent(loadTexturePackBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(loadDefaultTexturesBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				.addContainerGap(10, 10))
+				.addGroup(layout.createParallelGroup(Alignment.LEADING)
+					.addComponent(loadTexturePackBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
+					.addComponent(loadDefaultTexturesBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
+				)
+				.addContainerGap()
+			)
+		);
+		layout.setVerticalGroup(layout.createParallelGroup(Alignment.LEADING)
+		.addGroup(layout.createSequentialGroup()
+			.addContainerGap()
+			.addComponent(loadTexturePackBtn)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addComponent(loadDefaultTexturesBtn)
+			.addContainerGap(10, 10))
 		);
 		
 		return optionsPanel;
@@ -386,6 +392,32 @@ public class Controls extends JPanel {
 			}
 		});
 		
+		JButton openSceneDirBtn = new JButton("Open Scene Directory");
+		openSceneDirBtn.setVisible(Desktop.isDesktopSupported());
+		openSceneDirBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					if (Desktop.isDesktopSupported()) {
+						File sceneDir = SceneDirectoryPicker.getCurrentSceneDirectory();
+						if (sceneDir != null) {
+							Desktop.getDesktop().open(sceneDir);
+						}
+					}
+				} catch (IOException e) {
+					logger.warn("Failed to open scene directory", e);
+				}
+			}
+		});
+		
+		JButton changeSceneDirBtn = new JButton("Change Scene Directory");
+		changeSceneDirBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				SceneDirectoryPicker.changeSceneDirectory(chunky.getFrame());
+			}
+		});
+		
 		GroupLayout layout = new GroupLayout(renderPanel);
 		renderPanel.setLayout(layout);
 		layout.setHorizontalGroup(layout.createSequentialGroup()
@@ -402,27 +434,34 @@ public class Controls extends JPanel {
 				)
 				.addComponent(testCLBtn)
 				.addComponent(benchmarkBtn)
+				.addComponent(openSceneDirBtn)
+				.addComponent(changeSceneDirBtn)
 			)
 			.addContainerGap()
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
-				.addContainerGap()
-				.addComponent(clearSelectionBtn1)
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(sep1)
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(newSceneBtn)
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(loadSceneBtn)
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addGroup(layout.createParallelGroup()
-					.addComponent(numThreadsLbl, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addComponent(numThreadsField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(testCLBtn)
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(benchmarkBtn)
-				.addContainerGap());
+			.addContainerGap()
+			.addComponent(clearSelectionBtn1)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(newSceneBtn)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(loadSceneBtn)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(numThreadsLbl, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				.addComponent(numThreadsField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(testCLBtn)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(benchmarkBtn)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(openSceneDirBtn)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addComponent(changeSceneDirBtn)
+			.addContainerGap()
+		);
 		
 		return renderPanel;
 	}
