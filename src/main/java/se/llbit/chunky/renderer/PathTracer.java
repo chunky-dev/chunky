@@ -75,7 +75,7 @@ public class PathTracer {
 					if (ray.t > Ray.EPSILON) {
 						double u = ray.x.x + ray.d.x * ray.t;
 						double v = ray.x.z + ray.d.z * ray.t;
-						if (Clouds.getCloud((int) (u/16), (int) (v/16)) != 0) {
+						if (Clouds.getCloud((int) (u/128), (int) (v/128)) != 0) {
 							ray.color.set(1, 1, 1, 1);
 							ray.x.scaleAdd(ray.t, ray.d, ray.x);
 							ray.distance += ray.t;

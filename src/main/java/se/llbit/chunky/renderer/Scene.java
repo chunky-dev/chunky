@@ -1482,7 +1482,16 @@ public class Scene implements Refreshable {
 		xmax *= 16;
 		zmin *= 16;
 		zmax *= 16;
-		return new Vector3d((xmax + xmin)/2, 128, (zmax + zmin)/2);
+		int xcenter = (xmax + xmin)/2;
+		int zcenter = (zmax + zmin)/2;
+		for (int y = Chunk.Y_MAX-1; y >= 0; --y) {
+			int block = octree.get(xcenter - origin.x, y - origin.y,
+					zcenter - origin.z);
+			if (Block.get(block) != Block.AIR) {
+				return new Vector3d(xcenter, y+5, zcenter);
+			}
+		}
+		return new Vector3d(xcenter, 128, zcenter);
 	}
 
 	/**
