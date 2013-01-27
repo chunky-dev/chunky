@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -44,7 +44,6 @@ import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
@@ -85,7 +84,7 @@ public class Scene implements Refreshable {
 	
 	private static final int DEFAULT_SPP_TARGET = 1000;
 	
-	private static final double fSubSurface = 0.3;
+	protected static final double fSubSurface = 0.3;
 	
 	/**
 	 * Minimum canvas width
@@ -101,7 +100,7 @@ public class Scene implements Refreshable {
 	/**
 	 * Default specular reflection coefficient
 	 */
-	private static final float SPECULAR_COEFF = 0.31f;
+	protected static final float SPECULAR_COEFF = 0.31f;
 	
 	/**
 	 * Default water specular reflection coefficient
@@ -140,11 +139,11 @@ public class Scene implements Refreshable {
 	
 	private static final double DEFAULT_WATER_VISIBILITY = 9;
 
-	private static final double CLOUD_HEIGHT = 712;
+	static final double CLOUD_HEIGHT = 712;
 	//private static final double MIN_WATER_VISIBILITY = 0;
 	//private static final double MAX_WATER_VISIBILITY = 62;
 	
-	private double waterVisibility = DEFAULT_WATER_VISIBILITY;
+	protected double waterVisibility = DEFAULT_WATER_VISIBILITY;
 
 	/**
 	 * Recursive ray depth limit (not including RR)
@@ -154,9 +153,9 @@ public class Scene implements Refreshable {
 	private String name = "default";
 	private String skymapFileName;
 
-	private final Sky sky = new Sky(this);
+	protected final Sky sky = new Sky(this);
 	private final Camera camera = new Camera(this);
-	private final Sun sun = new Sun(this);
+	protected final Sun sun = new Sun(this);
 	
 	/**
  	 * World
@@ -175,10 +174,10 @@ public class Scene implements Refreshable {
 	private Octree octree;
 
 	private double exposure = DEFAULT_EXPOSURE;
-	private boolean stillWater = false;
+	protected boolean stillWater = false;
 	private boolean biomeColors = true;
-	private boolean sunEnabled = true;
-	private boolean emittersEnabled = true;
+	protected boolean sunEnabled = true;
+	protected boolean emittersEnabled = true;
 
 	private Set<ChunkPosition> loadedChunks = new HashSet<ChunkPosition>();
 
@@ -198,17 +197,17 @@ public class Scene implements Refreshable {
  	 */
 	int previewCount;
 	
-	private boolean clearWater = false;
+	protected boolean clearWater = false;
 	
-	private double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
-	private boolean atmosphereEnabled = false;
-	private boolean volumetricFogEnabled = false;
+	protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
+	protected boolean atmosphereEnabled = false;
+	protected boolean volumetricFogEnabled = false;
 	
 	private boolean saveDumps = true;
 	
 	private int dumpFrequency = DEFAULT_DUMP_FREQUENCY;
 	
-	private int waterHeight = 0;
+	protected int waterHeight = 0;
 	
 	private WorldTexture grassTexture = new WorldTexture();
 	private WorldTexture foliageTexture = new WorldTexture();
@@ -997,7 +996,7 @@ public class Scene implements Refreshable {
 		ray.x.y -= origin.y;
 		ray.x.z -= origin.z;
 		
-		pathTrace(ray, pool, vectorPool, random, 1, true);
+		PathTracer.pathTrace(this, ray, pool, vectorPool, random);
 	}
 
 	private void getIntersectionColor(Ray ray) {
@@ -1019,365 +1018,8 @@ public class Scene implements Refreshable {
 		block.getTexture().getColor(ray.u, ray.v, ray.color);
 	}
 	
-	/**
-	 * Path trace the ray in this scene
-	 * @param ray
-	 * @param rayPool
-	 * @param vectorPool
-	 * @param random
-	 * @param addEmitted
-	 * @param first
-	 */
-	public void pathTrace(Ray ray, RayPool rayPool,
-			VectorPool vectorPool, Random random, int addEmitted,
-			boolean first) {
-		
-		Ray reflected = rayPool.get();
-		Ray transmitted = rayPool.get();
-		Ray refracted = rayPool.get();
-		Vector3d ox = vectorPool.get(ray.x);
-		Vector3d od = vectorPool.get(ray.d);
-		double s = 0;
-		
-		while (true) {
 
-			if (!intersect(ray)) {
-				if (ray.d.y != 0) {
-					ray.t = (CLOUD_HEIGHT - ray.x.y) / ray.d.y;
-					if (ray.t > Ray.EPSILON) {
-						double u = ray.x.x + ray.d.x * ray.t;
-						double v = ray.x.z + ray.d.z * ray.t;
-						if (Clouds.getCloud((int) (u/16), (int) (v/16)) != 0) {
-							ray.color.set(1, 1, 1, 1);
-							ray.x.scaleAdd(ray.t, ray.d, ray.x);
-							ray.distance += ray.t;
-							ray.hit = true;
-							break;
-						}
-					}
-				}
-				if (waterHeight > 0 &&
-						ray.d.y < 0 && ray.x.y > waterHeight-.125) {
-					
-					ray.t = (waterHeight-.125-ray.x.y) / ray.d.y;
-					ray.distance += ray.t;
-					ray.x.scaleAdd(ray.t, ray.d, ray.x);
-					ray.currentMaterial = Block.WATER.id;
-					ray.prevMaterial = 0;
-					WaterModel.intersect(ray);
-					
-					if (first) {
-						s = ray.distance;
-						first = false;
-					}
-				} else {
-					if (ray.depth == 0) {
-						// direct sky hit
-						sky.getSkyColorInterpolated(ray, waterHeight > 0);
-						
-					} else if (ray.specular) {
-						// sky color
-						sky.getSkySpecularColor(ray, waterHeight > 0);
-					} else {
-						sky.getSkyDiffuseColor(ray, waterHeight > 0);
-					}
-					break;
-				}
-			}
-
-			double pSpecular = 0;
-			
-			Block currentBlock = ray.getCurrentBlock();
-			Block prevBlock = ray.getPrevBlock();
-			
-			if (!stillWater && ray.n.y != 0 &&
-					((currentBlock == Block.WATER && prevBlock == Block.AIR) ||
-					(currentBlock == Block.AIR && prevBlock == Block.WATER))) {
-				
-				WaterModel.doWaterDisplacement(ray);
-				
-				if (currentBlock == Block.AIR) {
-					ray.n.y = -ray.n.y;
-				}
-			}
-
-			if (currentBlock.isShiny) {
-				if (currentBlock == Block.WATER) {
-					pSpecular = WATER_SPECULAR;
-				} else {
-					pSpecular = SPECULAR_COEFF;
-				}
-			}
-
-			double pDiffuse = ray.color.w;
-			
-			float n1 = prevBlock.ior;
-			float n2 = currentBlock.ior;
-			
-			if (pDiffuse + pSpecular < Ray.EPSILON && n1 == n2)
-				continue;
-			
-			if (first) {
-				s = ray.distance;
-				first = false;
-			}
-			
-			if (currentBlock.isShiny &&
-					random.nextDouble() < pSpecular) {
-
-				getSpecularReflectedRay(ray, reflected);
-
-				if (!kill(reflected, random)) {
-					pathTrace(reflected, rayPool, vectorPool, random, 1, false);
-					if (reflected.hit) {
-						ray.color.x *= reflected.color.x;
-						ray.color.y *= reflected.color.y;
-						ray.color.z *= reflected.color.z;
-						ray.hit = true;
-					}
-				}
-
-			} else {
-
-				if (random.nextDouble() < pDiffuse) {
-
-					reflected.set(ray);
-					if (!kill(reflected, random)) {
-
-						double emittance = 0;
-
-						if (emittersEnabled && currentBlock.isEmitter) {
-
-							emittance = addEmitted;
-							ray.emittance.x = ray.color.x * ray.color.x * emitterIntensity;
-							ray.emittance.y = ray.color.y * ray.color.y * emitterIntensity;
-							ray.emittance.z = ray.color.z * ray.color.z * emitterIntensity;
-							ray.hit = true;
-						}
-
-						if (sunEnabled) {
-							sun.getRandomSunDirection(reflected, random, vectorPool);
-
-							double directLight = 0;
-							
-							boolean frontLight = reflected.d.dot(ray.n) > 0;
-
-							if (frontLight || (currentBlock.subSurfaceScattering &&
-									random.nextDouble() < fSubSurface)) {
-								
-								if (!frontLight) {
-									reflected.x.scaleAdd(-Ray.OFFSET, ray.n, reflected.x);
-								}
-							
-								reflected.currentMaterial = ray.prevMaterial;
-		
-								double attenuation = getDirectLightAttenuation(reflected);
-								
-								if (attenuation > 0) {
-									directLight = attenuation * reflected.d.dot(ray.n);
-									if (!frontLight)
-										directLight = -directLight;
-									ray.hit = true;
-								}
-							}
-								
-							getDiffuseReflectedRay(ray, reflected, random);
-							pathTrace(reflected, rayPool, vectorPool, random, 0, false);
-							ray.hit = ray.hit || reflected.hit;
-							if (ray.hit) {
-								ray.color.x = ray.color.x
-									* (emittance + directLight * sun.emittance.x
-										+ (reflected.color.x + reflected.emittance.x));
-								ray.color.y = ray.color.y
-									* (emittance + directLight * sun.emittance.y
-										+ (reflected.color.y + reflected.emittance.y));
-								ray.color.z = ray.color.z
-									* (emittance + directLight * sun.emittance.z
-										+ (reflected.color.z + reflected.emittance.z));
-							}
-							
-						} else {
-							getDiffuseReflectedRay(ray, reflected, random);
-							
-							pathTrace(reflected, rayPool, vectorPool, random, 0, false);
-							ray.hit = ray.hit || reflected.hit;
-							if (ray.hit) {
-								ray.color.x = ray.color.x
-									* (emittance + (reflected.color.x + reflected.emittance.x));
-								ray.color.y = ray.color.y
-									* (emittance + (reflected.color.y + reflected.emittance.y));
-								ray.color.z = ray.color.z
-									* (emittance + (reflected.color.z + reflected.emittance.z));
-							}
-						}
-					}
-				} else if (n1 != n2) {
-					
-					boolean doRefraction =
-							currentBlock == Block.WATER ||
-							prevBlock == Block.WATER ||
-							currentBlock == Block.ICE ||
-							prevBlock == Block.ICE;
-					
-					// refraction
-					float n1n2 = n1 / n2;
-					double cosTheta = - ray.n.dot(ray.d);
-					double radicand = 1 - n1n2*n1n2 * (1 - cosTheta*cosTheta);
-					if (doRefraction && radicand < Ray.EPSILON) {
-						// total internal reflection
-						getSpecularReflectedRay(ray, reflected);
-						if (!kill(reflected, random)) {
-							pathTrace(reflected, rayPool, vectorPool, random, 1, false);
-							if (reflected.hit) {
-								
-								ray.color.x = reflected.color.x;
-								ray.color.y = reflected.color.y;
-								ray.color.z = reflected.color.z;
-								ray.hit = true;
-							}
-						}
-					} else {
-						refracted.set(ray);
-						if (!kill(refracted, random)) {
-							
-							// Calculate angle-dependent reflectance using
-							// Fresnel equation approximation
-							// R(theta) = R0 + (1 - R0) * (1 - cos(theta))^5
-							float a = (n1n2 - 1);
-							float b = (n1n2 + 1);
-							double R0 = a*a/(b*b);
-							double c = 1 - cosTheta;
-							double Rtheta = R0 + (1-R0) * c*c*c*c*c;
-							
-							if (random.nextDouble() < Rtheta) {
-								getSpecularReflectedRay(ray, reflected);
-								pathTrace(reflected, rayPool, vectorPool, random, 1, false);
-								if (reflected.hit) {
-									ray.color.x = reflected.color.x;
-									ray.color.y = reflected.color.y;
-									ray.color.z = reflected.color.z;
-									ray.hit = true;
-								}
-							} else {
-								if (doRefraction) {
-									
-									double t2 = Math.sqrt(radicand);
-									if (cosTheta > 0) {
-										refracted.d.x = n1n2*ray.d.x + (n1n2*cosTheta - t2)*ray.n.x;
-										refracted.d.y = n1n2*ray.d.y + (n1n2*cosTheta - t2)*ray.n.y;
-										refracted.d.z = n1n2*ray.d.z + (n1n2*cosTheta - t2)*ray.n.z;
-									} else {
-										refracted.d.x = n1n2*ray.d.x - (n1n2*cosTheta - t2)*ray.n.x;
-										refracted.d.y = n1n2*ray.d.y - (n1n2*cosTheta - t2)*ray.n.y;
-										refracted.d.z = n1n2*ray.d.z - (n1n2*cosTheta - t2)*ray.n.z;
-									}
-									
-									refracted.d.normalize();
-									
-									refracted.x.scaleAdd(Ray.OFFSET,
-											refracted.d, refracted.x);
-								}
-								
-								pathTrace(refracted, rayPool, vectorPool, random, 1, false);
-								if (refracted.hit) {
-									ray.color.x = ray.color.x * pDiffuse + (1-pDiffuse);
-									ray.color.y = ray.color.y * pDiffuse + (1-pDiffuse);
-									ray.color.z = ray.color.z * pDiffuse + (1-pDiffuse);
-									ray.color.x *= refracted.color.x;
-									ray.color.y *= refracted.color.y;
-									ray.color.z *= refracted.color.z;
-									ray.hit = true;
-								}
-							}
-						}
-					}
-
-				} else {
-
-					transmitted.set(ray);
-					transmitted.x.scaleAdd(Ray.OFFSET, transmitted.d,
-							transmitted.x);
-
-					pathTrace(transmitted, rayPool, vectorPool, random, 1, false);
-					if (transmitted.hit) {
-						ray.color.x = ray.color.x * pDiffuse + (1-pDiffuse);
-						ray.color.y = ray.color.y * pDiffuse + (1-pDiffuse);
-						ray.color.z = ray.color.z * pDiffuse + (1-pDiffuse);
-						ray.color.x *= transmitted.color.x;
-						ray.color.y *= transmitted.color.y;
-						ray.color.z *= transmitted.color.z;
-						ray.hit = true;
-					}
-				}
-			}
-			
-			// do water fog
-			if (!clearWater && prevBlock == Block.WATER) {
-				double a = ray.distance / waterVisibility;
-				double attenuation = 1 - Math.min(1, a*a);
-				ray.color.scale(attenuation);
-				/*ray.color.x *= attenuation;
-				ray.color.y *= attenuation;
-				ray.color.z *= attenuation;
-				float[] wc = Texture.water.getAvgColorLinear();
-				ray.color.x += (1-attenuation) * wc[0];
-				ray.color.y += (1-attenuation) * wc[1];
-				ray.color.z += (1-attenuation) * wc[2];
-				ray.color.w = attenuation;*/
-				ray.hit = true;
-			}
-			
-			break;
-		}
-		if (!ray.hit) {
-			ray.color.set(0, 0, 0, 1);
-			if (first)
-				s = ray.distance;
-		}
-		
-		if (s > 0) {
-			
-			if (atmosphereEnabled) {
-				double Fex = sun.extinction(s);
-				ray.color.x *= Fex;
-				ray.color.y *= Fex;
-				ray.color.z *= Fex;
-				
-				if (!volumetricFogEnabled) {
-					double Fin = sun.inscatter(Fex, sun.theta(ray.d));
-					
-					ray.color.x += Fin * sun.emittance.x * sun.getIntensity();
-					ray.color.y += Fin * sun.emittance.y * sun.getIntensity();
-					ray.color.z += Fin * sun.emittance.z * sun.getIntensity();
-				}
-			}
-			
-			if (volumetricFogEnabled) {
-				s = (s - Ray.OFFSET) * random.nextDouble();
-				
-				reflected.x.scaleAdd(s, od, ox);
-				sun.getRandomSunDirection(reflected, random, vectorPool);
-				reflected.currentMaterial = 0;
-				
-				double attenuation = getDirectLightAttenuation(reflected);
-				
-				double Fex = sun.extinction(s);
-				double Fin = sun.inscatter(Fex, sun.theta(ray.d));
-				
-				ray.color.x += 50 * attenuation * Fin * sun.emittance.x * sun.getIntensity();
-				ray.color.y += 50 * attenuation * Fin * sun.emittance.y * sun.getIntensity();
-				ray.color.z += 50 * attenuation * Fin * sun.emittance.z * sun.getIntensity();
-			}
-		}
-		
-		rayPool.dispose(reflected);
-		rayPool.dispose(transmitted);
-		rayPool.dispose(refracted);
-		vectorPool.dispose(ox);
-		vectorPool.dispose(od);
-	}
-
-	private double getDirectLightAttenuation(Ray ray) {
+	protected double getDirectLightAttenuation(Ray ray) {
 		double attenuation = 1;
 		while (attenuation > 0) {
 			ray.x.scaleAdd(Ray.OFFSET,
@@ -1466,7 +1108,7 @@ public class Scene implements Refreshable {
 		reflected.currentMaterial = reflected.prevMaterial;
 	}
 	
-	private final boolean kill(Ray ray, Random random) {
+	protected final boolean kill(Ray ray, Random random) {
 		return ray.depth >= rayDepth && random.nextDouble() < .5f;
 	}
 	
