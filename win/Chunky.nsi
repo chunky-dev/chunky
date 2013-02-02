@@ -1,6 +1,9 @@
 ; NSIS script for Chunky
 ; Copyright (c) 2013, Jesper Öqvist <jesper@llbit.se>
 
+; Use Modern UI
+!include "MUI2.nsh"
+
 Name "Chunky"
 OutFile "Chunky.exe"
 
@@ -12,18 +15,22 @@ InstallDirRegKey HKLM "Software\Chunky" "Install_Dir"
 ; request admin privileges
 RequestExecutionLevel admin
 
-LicenseText "Chunky is released as free software under the terms of the following license agreement. You must accept these terms in order to continue:"
-LicenseData ../license/LICENSE.txt
+; Warn on abort
+!define MUI_ABORTWARNING
 
-Page license
-Page components
-Page directory
-Page instfiles
+; Pages
+!insertmacro MUI_PAGE_LICENSE ../license/LICENSE.txt
+!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
 
-UninstPage uninstConfirm
-UninstPage instfiles
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
 
-Section "Chunky (required)"
+; Language
+!insertmacro MUI_LANGUAGE "English"
+
+Section "Chunky (required)" SecChunky
 
 	SectionIn RO
 
@@ -46,13 +53,25 @@ Section "Chunky (required)"
 
 SectionEnd
 
-Section "Start Menu Shortcuts"
+Section "Start Menu Shortcuts" SecSM
 
 	CreateDirectory "$SMPROGRAMS\Chunky"
 	CreateShortCut "$SMPROGRAMS\Chunky\Chunky.lnk" "$INSTDIR\Chunky.jar"
 	CreateShortCut "$SMPROGRAMS\Chunky\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
 
 SectionEnd
+
+;Descriptions
+
+	;Language strings
+	LangString DESC_SecChunky ${LANG_ENGLISH} "Installs Chunky"
+	LangString DESC_SecSM ${LANG_ENGLISH} "Adds shortcuts to your start menu"
+
+	;Assign language strings to sections
+	!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+		!insertmacro MUI_DESCRIPTION_TEXT ${SecChunky} $(DESC_SecChunky)
+		!insertmacro MUI_DESCRIPTION_TEXT ${SecSM} $(DESC_SecSM)
+	!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ; Uninstaller
 
