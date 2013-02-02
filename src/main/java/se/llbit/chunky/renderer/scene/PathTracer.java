@@ -70,20 +70,6 @@ public class PathTracer {
 		while (true) {
 
 			if (!scene.intersect(ray)) {
-				if (ray.d.y != 0) {
-					ray.t = (Scene.CLOUD_HEIGHT - ray.x.y) / ray.d.y;
-					if (ray.t > Ray.EPSILON) {
-						double u = ray.x.x + ray.d.x * ray.t;
-						double v = ray.x.z + ray.d.z * ray.t;
-						if (Clouds.getCloud((int) (u/128), (int) (v/128)) != 0) {
-							ray.color.set(1, 1, 1, 1);
-							ray.x.scaleAdd(ray.t, ray.d, ray.x);
-							ray.distance += ray.t;
-							ray.hit = true;
-							break;
-						}
-					}
-				}
 				if (scene.waterHeight > 0 &&
 						ray.d.y < 0 && ray.x.y > scene.waterHeight-.125) {
 					
