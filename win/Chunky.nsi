@@ -12,6 +12,10 @@ InstallDirRegKey HKLM "Software\Chunky" "Install_Dir"
 ; request admin privileges
 RequestExecutionLevel admin
 
+LicenseText "Chunky is released as free software under the terms of the following license agreement. You must accept these terms in order to continue:"
+LicenseData ../license/LICENSE.txt
+
+Page license
 Page components
 Page directory
 Page instfiles
