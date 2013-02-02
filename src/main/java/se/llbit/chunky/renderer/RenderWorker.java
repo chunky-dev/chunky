@@ -20,6 +20,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray.RayPool;
 import se.llbit.math.Vector3d;

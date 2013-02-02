@@ -45,10 +45,10 @@ import org.jocl.cl_mem;
 import org.jocl.cl_platform_id;
 import org.jocl.cl_program;
 
-import se.llbit.chunky.renderer.Camera;
 import se.llbit.chunky.renderer.ProgressListener;
 import se.llbit.chunky.renderer.Renderer;
-import se.llbit.chunky.renderer.Scene;
+import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.ui.Chunk3DView;
 import se.llbit.chunky.renderer.ui.ViewListener;
 import se.llbit.chunky.world.Biomes;

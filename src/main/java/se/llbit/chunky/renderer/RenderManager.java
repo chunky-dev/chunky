@@ -31,6 +31,8 @@ import org.apache.log4j.Logger;
 
 import se.llbit.chunky.main.Messages;
 import se.llbit.chunky.renderer.RenderWorker;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;

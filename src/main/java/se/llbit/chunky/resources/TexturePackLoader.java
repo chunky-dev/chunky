@@ -30,7 +30,7 @@ import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.renderer.Sun;
+import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.Icon;

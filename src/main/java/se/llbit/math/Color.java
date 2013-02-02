@@ -16,7 +16,7 @@
  */
 package se.llbit.math;
 
-import se.llbit.chunky.renderer.Scene;
+import se.llbit.chunky.renderer.scene.Scene;
 
 /**
  * Color utility methods.

@@ -22,6 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.renderer.RenderWorker;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.SceneLoadingError;
 
 /**
  * Benchmarks the renderer.

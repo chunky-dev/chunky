@@ -71,7 +71,7 @@ import se.llbit.chunky.model.VineModel;
 import se.llbit.chunky.model.WallSignModel;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.model.WoodModel;
-import se.llbit.chunky.renderer.Scene;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 

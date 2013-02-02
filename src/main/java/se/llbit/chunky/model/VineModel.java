@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.model;
 
-import se.llbit.chunky.renderer.Scene;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.math.DoubleSidedQuad;

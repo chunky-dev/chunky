@@ -20,7 +20,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
-import se.llbit.chunky.renderer.Scene;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Color;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;

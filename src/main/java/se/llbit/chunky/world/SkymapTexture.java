@@ -22,7 +22,7 @@ import java.awt.image.DataBufferInt;
 
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.renderer.Scene;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Color;
 import se.llbit.math.QuickMath;

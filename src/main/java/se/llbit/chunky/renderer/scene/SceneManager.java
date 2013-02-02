@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer;
+package se.llbit.chunky.renderer.scene;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +25,8 @@ import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.main.Messages;
+import se.llbit.chunky.renderer.RenderContext;
+import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 

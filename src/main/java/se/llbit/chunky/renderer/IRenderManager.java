@@ -16,6 +16,9 @@
  */
 package se.llbit.chunky.renderer;
 
+import se.llbit.chunky.renderer.scene.Scene;
+
+
 /**
  * Interface for render managers
  * @author Jesper Öqvist <jesper@llbit.se>

@@ -33,7 +33,7 @@ import se.llbit.chunky.renderer.ConsoleRenderListener;
 import se.llbit.chunky.renderer.PlaceholderRenderCanvas;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
-import se.llbit.chunky.renderer.SceneLoadingError;
+import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.renderer.ui.BenchmarkDialog;
 import se.llbit.chunky.renderer.ui.CLDeviceSelector;
 import se.llbit.chunky.renderer.ui.NewSceneDialog;

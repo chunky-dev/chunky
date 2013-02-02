@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer;
+package se.llbit.chunky.renderer.scene;
 
 import java.util.Random;
 
+import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.world.World;
 import se.llbit.math.Matrix3d;
 import se.llbit.math.Ray;

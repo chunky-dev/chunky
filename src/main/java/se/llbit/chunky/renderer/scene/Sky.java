@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer;
+package se.llbit.chunky.renderer.scene;
 
 import java.io.File;
 import java.io.IOException;

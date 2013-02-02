@@ -57,14 +57,14 @@ import javax.swing.text.Document;
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.renderer.Camera;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.RenderStatusListener;
-import se.llbit.chunky.renderer.Scene;
-import se.llbit.chunky.renderer.SceneManager;
-import se.llbit.chunky.renderer.Sun;
+import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.SceneManager;
+import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;

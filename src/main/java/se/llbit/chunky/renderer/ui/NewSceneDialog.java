@@ -34,7 +34,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.SceneManager;
+import se.llbit.chunky.renderer.scene.SceneManager;
 
 /**
  * A dialog box that asks the user to name a new 3D scene.

@@ -18,7 +18,7 @@ package se.llbit.chunky.world;
 
 import java.awt.image.BufferedImage;
 
-import se.llbit.chunky.renderer.Scene;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Color;
 
 /**

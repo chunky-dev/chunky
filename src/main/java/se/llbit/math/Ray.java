@@ -16,7 +16,7 @@
  */
 package se.llbit.math;
 
-import se.llbit.chunky.renderer.Scene;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
 

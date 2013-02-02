@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer;
+package se.llbit.chunky.renderer.scene;
 
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -39,6 +39,13 @@ import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.model.WaterModel;
+import se.llbit.chunky.renderer.Postprocess;
+import se.llbit.chunky.renderer.ProgressListener;
+import se.llbit.chunky.renderer.Refreshable;
+import se.llbit.chunky.renderer.RenderContext;
+import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.RenderStatusListener;
+import se.llbit.chunky.renderer.RenderableCanvas;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
@@ -195,7 +202,7 @@ public class Scene implements Refreshable {
 	/**
  	 * Preview frame interlacing counter.
  	 */
-	int previewCount;
+	public int previewCount;
 	
 	protected boolean clearWater = false;
 	
@@ -215,7 +222,7 @@ public class Scene implements Refreshable {
 	/**
 	 * Current SPP for the scene
 	 */
-	int spp = 0;
+	public int spp = 0;
 	
 	/**
 	 * Target SPP for the scene
@@ -225,7 +232,7 @@ public class Scene implements Refreshable {
 	/**
 	 * Total rendering time in milliseconds.
 	 */
-	long renderTime = 0;
+	public long renderTime = 0;
 	
 	private BufferedImage buffer;
 	
@@ -1562,7 +1569,10 @@ public class Scene implements Refreshable {
 		refresh();
 	}
 	
-	synchronized void waitOnRefreshRequest() throws InterruptedException {
+	/**
+	 * @throws InterruptedException
+	 */
+	public synchronized void waitOnRefreshRequest() throws InterruptedException {
 		while ((!pathTrace || pauseRender) && !refresh)
 			wait();
 		refresh = false;
@@ -1572,7 +1582,7 @@ public class Scene implements Refreshable {
 	 * @return <code>true</code> if the rendering of this scene should be
 	 * restarted
 	 */
-	boolean shouldRefresh() {
+	public boolean shouldRefresh() {
 		return refresh;
 	}
 	
@@ -2261,9 +2271,11 @@ public class Scene implements Refreshable {
 	/**
 	 * Finalize a pixel. Calculates the resulting RGB color values for
 	 * the pixel and sets these in the bitmap image.
+	 * @param x 
+	 * @param y 
 	 * @param jobId
 	 */
-	void finalizePixel(int x, int y) {
+	public void finalizePixel(int x, int y) {
 		finalized = true;
 		
 		double r = samples[x][y][0];
@@ -2306,7 +2318,12 @@ public class Scene implements Refreshable {
 		bufferData[x + y * width] = Color.getRGB(r, g, b);
 	}
 	
-	void copyPixel(int jobId, int offset) {
+	/**
+	 * Copies a pixel in-buffer
+	 * @param jobId
+	 * @param offset
+	 */
+	public void copyPixel(int jobId, int offset) {
 		bufferData[jobId + offset] = bufferData[jobId];
 	}
 	
