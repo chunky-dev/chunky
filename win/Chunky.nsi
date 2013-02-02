@@ -82,14 +82,16 @@ Section "Uninstall"
   DeleteRegKey HKLM SOFTWARE\Chunky
 
   ; Delete installed files
-  Delete $INSTDIR\example2.nsi
+  Delete $INSTDIR\Chunky.jar
+  Delete $INSTDIR\README.txt
+  Delete $INSTDIR\LICENSE.txt
   Delete $INSTDIR\Uninstall.exe
 
   ; Delete shortcuts
   Delete "$SMPROGRAMS\Chunky\*.*"
 
   ; Remove directories used
-  RMDir "$SMPROGRAMS\Example2"
+  RMDir "$SMPROGRAMS\Chunky"
   RMDir "$INSTDIR"
 
 SectionEnd
