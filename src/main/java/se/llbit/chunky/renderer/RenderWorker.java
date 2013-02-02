@@ -105,16 +105,8 @@ public class RenderWorker extends Thread {
 			double sb = 0;
 			
 			for (int i = 0; i < RenderManager.SPP; ++i) {
-				double oy = 2 * random.nextDouble();
-				double ox = 2 * random.nextDouble();
-				if (oy < 1)
-					oy = Math.sqrt(oy) - 1;
-				else
-					oy = 1 - Math.sqrt(2 - oy);
-				if (ox < 1)
-					ox = Math.sqrt(ox) - 1;
-				else
-					ox = 1 - Math.sqrt(2 - ox);
+				double oy = random.nextDouble();
+				double ox = random.nextDouble();
 				
 				scene.camera().calcViewRay(ray, d, o,
 						random, aspect,
