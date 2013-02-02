@@ -40,6 +40,7 @@ Section "Chunky (required)" SecChunky
 	File ..\build\Chunky.jar
 	File ..\README.txt
 	File ..\ChangeLog.txt
+	File chunky.ico
 	
 	; Write install dir to registry
 	WriteRegStr HKLM "Software\Chunky" "Install_Dir" "$INSTDIR"
@@ -56,7 +57,7 @@ SectionEnd
 Section "Start Menu Shortcuts" SecSM
 
 	CreateDirectory "$SMPROGRAMS\Chunky"
-	CreateShortCut "$SMPROGRAMS\Chunky\Chunky.lnk" "$INSTDIR\Chunky.jar"
+	CreateShortCut "$SMPROGRAMS\Chunky\Chunky.lnk" "$INSTDIR\Chunky.jar" "" "$INSTDIR\chunky.ico"
 	CreateShortCut "$SMPROGRAMS\Chunky\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
 
 SectionEnd
