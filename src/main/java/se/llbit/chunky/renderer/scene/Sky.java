@@ -24,7 +24,6 @@ import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.SkymapTexture;
 import se.llbit.math.Ray;
 import se.llbit.nbt.AnyTag;
@@ -109,8 +108,6 @@ public class Sky {
 	 * @param blackBelowHorizon
 	 */
 	public void getSkyDiffuseColor(Ray ray, boolean blackBelowHorizon) {
-		if (getCloudColor(ray))
-			return;
 		if (blackBelowHorizon && ray.d.y < 0) {
 			ray.color.set(0, 0, 0, 1);
 			ray.hit = true;
@@ -137,32 +134,12 @@ public class Sky {
 		ray.hit = true;
 	}
 	
-	private boolean getCloudColor(Ray ray) {
-		if (ray.d.y != 0) {
-			ray.t = (Scene.CLOUD_HEIGHT - ray.x.y) / ray.d.y;
-			if (ray.t > Ray.EPSILON) {
-				double u = ray.x.x + ray.d.x * ray.t;
-				double v = ray.x.z + ray.d.z * ray.t;
-				if (Clouds.getCloud((int) (u/128), (int) (v/128)) != 0) {
-					ray.color.set(1, 1, 1, 1);
-					ray.x.scaleAdd(ray.t, ray.d, ray.x);
-					ray.distance += ray.t;
-					ray.hit = true;
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 	/**
 	 * Bilinear interpolated panoramic skymap color
 	 * @param ray
 	 * @param blackBelowHorizon
 	 */
 	public void getSkyColorInterpolated(Ray ray, boolean blackBelowHorizon) {
-		if (getCloudColor(ray))
-			return;
 		if (blackBelowHorizon && ray.d.y < 0) {
 			ray.color.set(0, 0, 0, 1);
 			

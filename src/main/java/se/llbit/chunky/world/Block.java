@@ -87,7 +87,8 @@ public class Block {
 			isInvisible = true;
 		}
 	};
-	public static final Block STONE = new Block(0x01, "Stone", Texture.stone) {
+	public static final int STONE_ID = 0x01;
+	public static final Block STONE = new Block(STONE_ID, "Stone", Texture.stone) {
 		{
 			isOpaque = true;
 			isSolid = true;
