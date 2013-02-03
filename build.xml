@@ -114,8 +114,8 @@
 				<include name="Chunky.jar"/>
 			</zipfileset>
 		</zip>
-		<copy file="win/Chunky.nsi.templ"
-			toFile="win/Chunky-${Chunky.version}.nsi" overwrite="true">
+		<copy file="win/Chunky.nsi.templ" toFile="win/Chunky.nsi"
+			overwrite="true">
 			<filterset>
 				<filter token="VERSION" value="${Chunky.version}"/>
 			</filterset>
@@ -130,16 +130,16 @@
 			<property name="macosx.stubfile" value="${macosx.resrc}/JavaApplicationStub"/>
 			<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
 			<jarbundler dir="."
-									name="${app.name}"
-									bundleid="se.llbit.chunky"
-									shortname="${app.name}"
-									version="${version}"
-									mainclass="se.llbit.chunky.launcher.ChunkyLauncher"
-									icon="${macosx.resrc}/chunky.icns"
-									infostring="${app.name}"
-									stubfile="${macosx.stubfile}"
-									workingdirectory="$APP_PACKAGE/Contents/Resources/Java"
-									vmoptions="-Xms512m -Xmx2048m">		
+						name="${app.name}"
+						bundleid="se.llbit.chunky"
+						shortname="${app.name}"
+						version="${version}"
+						mainclass="se.llbit.chunky.launcher.ChunkyLauncher"
+						icon="${macosx.resrc}/chunky.icns"
+						infostring="${app.name}"
+						stubfile="${macosx.stubfile}"
+						workingdirectory="$APP_PACKAGE/Contents/Resources/Java"
+						vmoptions="-Xms512m -Xmx2048m">		
 				<javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
 				<javaproperty name="apple.awt.textantialiasing" value="true" />
 				<resourcefileset dir="${app.resrc}">
