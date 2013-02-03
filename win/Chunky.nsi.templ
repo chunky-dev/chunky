@@ -5,7 +5,7 @@
 !include "MUI2.nsh"
 
 Name "Chunky"
-OutFile "Chunky.exe"
+OutFile "Chunky-@VERSION@.exe"
 
 InstallDir $PROGRAMFILES\Chunky
 
@@ -34,19 +34,21 @@ Function .onInit
 
 	Var /GLOBAL JavaExe
 	
-	; Check for available JRE
+	; First check for 64 bit JRE
 	SetRegView 64
 	ReadRegStr $0 HKLM "Software\JavaSoft\Java Runtime Environment" "CurrentVersion"
 	StrCmp $0 "" FindJDK64
 	ReadRegStr $1 HKLM "Software\JavaSoft\Java Runtime Environment\$0" "JavaHome"
 	StrCmp $1 "" FindJDK64 FoundJava
 	
+	; 64 bit JDK
 	FindJDK64:
 	ReadRegStr $0 HKLM "Software\JavaSoft\Java Development Kit" "CurrentVersion"
 	StrCmp $0 "" FindJRE32
 	ReadRegStr $1 HKLM "Software\JavaSoft\Java Development Kit\$0" "JavaHome"
 	StrCmp $1 "" FindJRE32 FoundJava
 	
+	; 32 bit JRE
 	FindJRE32:
 	SetRegView 32
 	ReadRegStr $0 HKLM "Software\JavaSoft\Java Runtime Environment" "CurrentVersion"
@@ -54,6 +56,7 @@ Function .onInit
 	ReadRegStr $1 HKLM "Software\JavaSoft\Java Runtime Environment\$0" "JavaHome"
 	StrCmp $1 "" FindJDK32 FoundJava
 	
+	; 32 bit JDK
 	FindJDK32:
 	ReadRegStr $0 HKLM "Software\JavaSoft\Java Development Kit" "CurrentVersion"
 	StrCmp $0 "" NoJava

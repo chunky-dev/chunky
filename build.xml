@@ -114,6 +114,12 @@
 				<include name="Chunky.jar"/>
 			</zipfileset>
 		</zip>
+		<copy file="win/Chunky.nsi.templ"
+			toFile="win/Chunky-${Chunky.version}.nsi" overwrite=true>
+			<filterset>
+				<filter token="VERSION" value="${Chunky.version}"/>
+			</filterset>
+		</copy>
 	</target>
 
 	<target name="macapp" description="Create an .app package for Chunky">
