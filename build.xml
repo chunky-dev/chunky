@@ -93,6 +93,10 @@
 		</jar>
 	</target>
 	
+	<target name="clean-builds" description="Removes the build folder">
+		<delete dir="build"/>
+	</target>
+	
 	<target name="release" description="build a release">
 		<antcall target="clean"/>
 		<antcall target="jar"/>
