@@ -115,7 +115,7 @@
 			</zipfileset>
 		</zip>
 		<copy file="win/Chunky.nsi.templ"
-			toFile="win/Chunky-${Chunky.version}.nsi" overwrite=true>
+			toFile="win/Chunky-${Chunky.version}.nsi" overwrite="true">
 			<filterset>
 				<filter token="VERSION" value="${Chunky.version}"/>
 			</filterset>
