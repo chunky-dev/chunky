@@ -1,7 +1,7 @@
 LICENSE
 =======
 
-Chunky is Copyright 2010-2012 Jesper Öqvist
+Chunky is Copyright (c) 2010-2013, Jesper Öqvist <jesper@llbit.se>
 
 Permission to modify and redistribute is granted under the terms of
 the GPLv3 license.
