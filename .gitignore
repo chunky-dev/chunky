@@ -4,3 +4,4 @@
 /build
 /chunky.map
 /win/*.exe
+/win/*.nsi
