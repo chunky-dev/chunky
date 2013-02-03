@@ -96,7 +96,7 @@ SectionEnd
 Section "Start Menu Shortcuts" SecSM
 
 	CreateDirectory "$SMPROGRAMS\Chunky"
-	CreateShortCut "$SMPROGRAMS\Chunky\Chunky (More Memory).lnk" "$JavaExe" " -Xms512m -Xmx2g -jar $\"$INSTDIR\Chunky.jar$\"" "$INSTDIR\chunky.ico"
+	CreateShortCut "$SMPROGRAMS\Chunky\Chunky (more memory).lnk" "$JavaExe" " -Xms512m -Xmx2g -jar $\"$INSTDIR\Chunky.jar$\"" "$INSTDIR\chunky.ico"
 	CreateShortCut "$SMPROGRAMS\Chunky\Chunky.lnk" "$INSTDIR\Chunky.jar" "" "$INSTDIR\chunky.ico"
 	CreateShortCut "$SMPROGRAMS\Chunky\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
 
