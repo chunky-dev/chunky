@@ -146,7 +146,7 @@ public class Scene implements Refreshable {
 	
 	private static final double DEFAULT_WATER_VISIBILITY = 9;
 
-	static final double CLOUD_HEIGHT = 712;
+	static final double CLOUD_HEIGHT = 30;
 	//private static final double MIN_WATER_VISIBILITY = 0;
 	//private static final double MAX_WATER_VISIBILITY = 62;
 	

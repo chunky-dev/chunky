@@ -184,7 +184,7 @@ public class PathTracer {
 							
 								reflected.currentMaterial = ray.prevMaterial;
 		
-								double attenuation = RayTracer.getDirectLightAttenuation(scene, reflected);
+								double attenuation = getDirectLightAttenuation(scene, reflected, rayPool);
 								
 								if (attenuation > 0) {
 									directLight = attenuation * reflected.d.dot(ray.n);
@@ -372,7 +372,7 @@ public class PathTracer {
 				scene.sun.getRandomSunDirection(reflected, random, vectorPool);
 				reflected.currentMaterial = 0;
 				
-				double attenuation = RayTracer.getDirectLightAttenuation(scene, reflected);
+				double attenuation = getDirectLightAttenuation(scene, reflected, rayPool);
 				
 				double Fex = scene.sun.extinction(s);
 				double Fin = scene.sun.inscatter(Fex, scene.sun.theta(ray.d));
@@ -388,6 +388,30 @@ public class PathTracer {
 		rayPool.dispose(refracted);
 		vectorPool.dispose(ox);
 		vectorPool.dispose(od);
+	}
+
+	/**
+	 * @param scene
+	 * @param ray
+	 * @param rayPool 
+	 * @return The direct lighting attenuation
+	 */
+	public static final double getDirectLightAttenuation(Scene scene, Ray ray,
+			RayPool rayPool) {
+		
+		double attenuation = 1;
+		while (attenuation > 0) {
+			ray.x.scaleAdd(Ray.OFFSET,
+					ray.d, ray.x);
+			if (!RayTracer.nextIntersection(scene, ray, rayPool))
+				break;
+			attenuation *= 1 - ray.color.w;
+			if (!scene.clearWater && ray.getPrevBlock() == Block.WATER) {
+				double a = ray.distance / scene.waterVisibility;
+				attenuation *= 1 - Math.min(1, a*a);
+			}
+		}
+		return attenuation;
 	}
 
 }
