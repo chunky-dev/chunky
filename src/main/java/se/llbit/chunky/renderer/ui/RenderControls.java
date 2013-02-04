@@ -32,6 +32,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Collection;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -94,63 +95,63 @@ public class RenderControls extends JDialog implements ViewListener,
 	private NumberFormat numberFormat =
 			NumberFormat.getInstance();
 	
-	private JSlider sunYawSlider;
-	private JSlider skyRotationSlider;
-	private JSlider sunPitchSlider;
-	private JSlider focalOffsetSlider;
-	private JSlider fovSlider;
-	private JButton loadSkymapBtn;
-	private JTextField widthField;
-	private JTextField heightField;
-	private JSlider dofSlider;
-	private JTextField fovField;
-	private JTextField dofField;
-	private JTextField focalOffsetField;
-	private JButton startRenderBtn = new JButton();
-	private JCheckBox enableEmitters;
-	private JCheckBox directLight;
-	private JButton saveSceneBtn;
-	private JButton loadSceneBtn;
-	private JButton saveFrameBtn;
-	private JCheckBox stillWaterCB;
-	private JTextField sceneNameField;
-	private JTextField rayDepthField;
-	private JSlider rayDepthSlider;
-	private JLabel sceneNameLbl;
-	private JCheckBox biomeColorsCB;
-	private JButton stopRenderBtn = new JButton();
-	private JCheckBox clearWaterCB;
-	private JSlider sunIntensitySlider;
-	private JSlider emitterIntensitySlider;
-	private JCheckBox atmosphereEnabled;
-	private JCheckBox volumetricFogEnabled;
+	private final JSlider sunYawSlider = new JSlider();
+	private final JSlider skyRotationSlider = new JSlider();
+	private final JSlider sunPitchSlider = new JSlider();
+	private final JSlider focalOffsetSlider = new JSlider();
+	private final JSlider fovSlider = new JSlider();
+	private final JButton loadSkymapBtn = new JButton();
+	private final JTextField widthField = new JTextField();
+	private final JTextField heightField = new JTextField();
+	private final JSlider dofSlider = new JSlider();
+	private final JTextField fovField = new JTextField();
+	private final JTextField dofField = new JTextField();
+	private final JTextField focalOffsetField = new JTextField();
+	private final JButton startRenderBtn = new JButton();
+	private final JCheckBox enableEmitters = new JCheckBox();
+	private final JCheckBox directLight = new JCheckBox();
+	private final JButton saveSceneBtn = new JButton();
+	private final JButton loadSceneBtn = new JButton();
+	private final JButton saveFrameBtn = new JButton();
+	private final JCheckBox stillWaterCB = new JCheckBox();
+	private final JTextField sceneNameField = new JTextField();
+	private final JTextField rayDepthField = new JTextField();
+	private final JSlider rayDepthSlider = new JSlider();
+	private final JLabel sceneNameLbl = new JLabel();
+	private final JCheckBox biomeColorsCB = new JCheckBox();
+	private final JButton stopRenderBtn = new JButton();
+	private final JCheckBox clearWaterCB = new JCheckBox();
+	private final JSlider sunIntensitySlider = new JSlider();
+	private final JSlider emitterIntensitySlider = new JSlider();
+	private final JCheckBox atmosphereEnabled = new JCheckBox();
+	private final JCheckBox volumetricFogEnabled = new JCheckBox();
 	private final JCheckBox cloudsEnabled = new JCheckBox();
 	private final JSlider cloudHeightSlider = new JSlider();
 	private final JTextField cloudHeightField = new JTextField();
-	private JSlider exposureSlider;
-	private JTextField exposureField;
-	private RenderContext context;
-	private JButton showPreviewBtn;
-	private JLabel renderTimeLbl;
-	private JLabel samplesPerSecondLbl;
-	private JLabel sppLbl;
-	private JProgressBar progressBar;
-	private JLabel progressLbl;
-	private JComboBox postprocessCB = new JComboBox();
+	private final JSlider exposureSlider = new JSlider();
+	private final JTextField exposureField = new JTextField();
+	private final RenderContext context;
+	private final JButton showPreviewBtn = new JButton();
+	private final JLabel renderTimeLbl = new JLabel();
+	private final JLabel samplesPerSecondLbl = new JLabel();
+	private final JLabel sppLbl = new JLabel();
+	private final JProgressBar progressBar;
+	private final JLabel progressLbl = new JLabel();
+	private final JComboBox postprocessCB = new JComboBox();
 
-	private JLabel etaLbl;
+	private final JLabel etaLbl = new JLabel();
 
-	private JCheckBox waterWorldCB;
+	private final JCheckBox waterWorldCB = new JCheckBox();
 
-	private JTextField waterHeightField;
+	private final JTextField waterHeightField = new JTextField();
 	
-	private final DecimalFormat decimalFormat;
+	private final DecimalFormat decimalFormat = new DecimalFormat();
 
-	private JCheckBox saveDumpsCB;
+	private final JCheckBox saveDumpsCB = new JCheckBox();
 
-	private JComboBox dumpFrequency;
+	private final JComboBox dumpFrequency = new JComboBox();
 
-	private JTextField sppTargetField;
+	private final JTextField sppTargetField = new JTextField();
 
 	/**
 	 * Create a new Render Controls dialog.
@@ -161,7 +162,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		
 		super(chunkyInstance.getFrame());
 		
-		decimalFormat = new DecimalFormat();
 		decimalFormat.setGroupingSize(3);
 		decimalFormat.setGroupingUsed(true);
 		
@@ -239,14 +239,13 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
-		sppTargetField = new JTextField(10);
+		sppTargetField.setColumns(10);
 		sppTargetField.getDocument().addDocumentListener(sppTargetListener);
 		
 		updateSPPTargetField();
 		
 		JLabel renderLbl = new JLabel("Render: ");
 		
-		showPreviewBtn = new JButton();
 		setViewVisible(false);
 		showPreviewBtn.addActionListener(new ActionListener() {
 			@Override
@@ -298,13 +297,10 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
-		saveFrameBtn = new JButton("Save Current Frame");
+		saveFrameBtn.setText("Save Current Frame");
 		saveFrameBtn.addActionListener(saveFrameListener);
 		
-		renderTimeLbl = new JLabel();
-		samplesPerSecondLbl = new JLabel();
 		samplesPerSecondLbl.setToolTipText("Samples Per Second");
-		sppLbl = new JLabel();
 		sppLbl.setToolTipText("Samples Per Pixel");
 		
 		setRenderTime(0);
@@ -314,9 +310,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		
 		progressBar = new JProgressBar();
 		
-		progressLbl = new JLabel("Progress:");
+		progressLbl.setText("Progress:");
 		
-		etaLbl = new JLabel("ETA:");
+		etaLbl.setText("ETA:");
 		
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
@@ -393,15 +389,13 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	private Component buildAdvancedPane() {
-		exposureSlider = new JSlider(1, 100);
-		exposureSlider.addChangeListener(exposureListener);
-		updateExposureSlider();
-
 		JLabel rayDepthLbl = new JLabel("Ray depth: ");
-		rayDepthField = new JTextField(5);
+		rayDepthField.setColumns(5);
 		rayDepthField.addActionListener(rayDepthFieldListener);
 		updateRayDepthField();
-		rayDepthSlider = new JSlider(1, 10);
+		
+		rayDepthSlider.setMinimum(1);
+		rayDepthSlider.setMaximum(100);
 		rayDepthSlider.addChangeListener(rayDepthListener);
 		updateRayDepthSlider();
 		
@@ -409,7 +403,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		
 		JLabel waterWorldLbl = new JLabel("Note: Chunks must be reloaded after toggling the water world mode!");
 		JLabel waterHeightLbl = new JLabel("Water height: ");
-		waterHeightField = new JTextField(5);
+		waterHeightField.setColumns(5);
 		waterHeightField.setText("" + World.SEA_LEVEL);
 		waterHeightField.setEnabled(false);
 		waterHeightField.addActionListener(new ActionListener() {
@@ -421,7 +415,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
-		waterWorldCB = new JCheckBox("Water World Mode");
+		waterWorldCB.setText("Water World Mode");
 		waterWorldCB.setSelected(false);
 		waterWorldCB.addActionListener(new ActionListener() {
 			@Override
@@ -486,11 +480,12 @@ public class RenderControls extends JDialog implements ViewListener,
 	private Component buildPostProcessingPane() {
 		JLabel exposureLbl = new JLabel("exposure: ");
 
-		exposureField = new JTextField(5);
+		exposureField.setColumns(5);
 		exposureField.addActionListener(exposureFieldListener);
 		updateExposureField();
 
-		exposureSlider = new JSlider(1, 100);
+		exposureSlider.setMinimum(1);
+		exposureSlider.setMaximum(100);
 		exposureSlider.addChangeListener(exposureListener);
 		updateExposureSlider();
 
@@ -553,18 +548,18 @@ public class RenderControls extends JDialog implements ViewListener,
 		JLabel widthLbl = new JLabel("Canvas width: ");
 		JLabel heightLbl = new JLabel("Canvas height: ");
 		
-		widthField = new JTextField(10);
+		widthField.setColumns(10);
 		widthField.addActionListener(canvasSizeListener);
-		heightField = new JTextField(10);
+		heightField.setColumns(10);
 		heightField.addActionListener(canvasSizeListener);
 		
 		updateWidthField();
 		updateHeightField();
 		
-		saveSceneBtn = new JButton("Save Scene");
+		saveSceneBtn.setText("Save Scene");
 		saveSceneBtn.addActionListener(saveSceneListener);
 		
-		loadSceneBtn = new JButton("Load Scene");
+		loadSceneBtn.setText("Load Scene");
 		loadSceneBtn.addActionListener(loadSceneListener);
 		
 		JButton loadSelectedChunksBtn = new JButton("Load Selected Chunks");
@@ -641,23 +636,23 @@ public class RenderControls extends JDialog implements ViewListener,
 		JSeparator sep1 = new JSeparator();
 		JSeparator sep2 = new JSeparator();
 		
-		sceneNameLbl = new JLabel("Scene name: ");
-		sceneNameField = new JTextField(15); 
+		sceneNameLbl.setText("Scene name: ");
+		sceneNameField.setColumns(15); 
 		sceneNameField.getDocument().addDocumentListener(sceneNameListener);
 		updateSceneNameField();
 		
-		stillWaterCB = new JCheckBox("still water");
+		stillWaterCB.setText("still water");
 		stillWaterCB.addActionListener(stillWaterListener);
 		updateStillWater();
 		
-		clearWaterCB = new JCheckBox("clear water");
+		clearWaterCB.setText("clear water");
 		stillWaterCB.addActionListener(clearWaterListener);
 		updateClearWater();
 		
-		biomeColorsCB = new JCheckBox("enable biome colors");
+		biomeColorsCB.setText("enable biome colors");
 		updateBiomeColorsCB();
 		
-		saveDumpsCB = new JCheckBox("save dump once every ");
+		saveDumpsCB.setText("save dump once every ");
 		saveDumpsCB.addActionListener(saveDumpsListener);
 		updateSaveDumpsCheckBox();
 		
@@ -665,7 +660,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		String[] frequencyStrings = new String[dumpFrequencies.length];
 		for (int i = 0; i < dumpFrequencies.length; ++i)
 			frequencyStrings[i] = dumpFrequencies[i] + "th";
-		dumpFrequency = new JComboBox(frequencyStrings);
+		dumpFrequency.setModel(new DefaultComboBoxModel(frequencyStrings));
 		dumpFrequency.setEditable(false);
 		dumpFrequency.addActionListener(dumpFrequencyListener);
 		updateDumpFrequencyField();
@@ -774,11 +769,11 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
-		directLight = new JCheckBox("enable sunlight");
+		directLight.setText("enable sunlight");
 		directLight.setSelected(renderManager.scene().getDirectLight());
 		directLight.addActionListener(directLightListener);
 		
-		enableEmitters = new JCheckBox("enable emitters");
+		enableEmitters.setText("enable emitters");
 		enableEmitters.setSelected(renderManager.scene().getEmittersEnabled());
 		enableEmitters.addActionListener(emittersListener);
 		
@@ -786,19 +781,23 @@ public class RenderControls extends JDialog implements ViewListener,
 		JLabel sunPitchLbl = new JLabel("Sun pitch: ");
 
 		JLabel emitterIntensityLbl = new JLabel("Emitter intensity: ");
-		emitterIntensitySlider = new JSlider(1, 100);
+		emitterIntensitySlider.setMinimum(1);
+		emitterIntensitySlider.setMaximum(100);
 		emitterIntensitySlider.addChangeListener(emitterIntensityListener);
 		updateEmitterIntensitySlider();
 		
 		JLabel sunIntensityLbl = new JLabel("Sun intensity: ");
-		sunIntensitySlider = new JSlider(0, 100);
+		sunIntensitySlider.setMinimum(1);
+		sunIntensitySlider.setMaximum(100);
 		sunIntensitySlider.addChangeListener(sunIntensityListener);
 		updateSunIntensitySlider();
 		
-		sunYawSlider = new JSlider(0, 100);
+		sunYawSlider.setMinimum(1);
+		sunYawSlider.setMaximum(100);
 		sunYawSlider.addChangeListener(sunYawListener);
 		
-		sunPitchSlider = new JSlider(0, 100);
+		sunPitchSlider.setMinimum(1);
+		sunPitchSlider.setMaximum(100);
 		sunPitchSlider.addChangeListener(sunPitchListener);
 		
 		updateSunYawSlider();
@@ -857,12 +856,13 @@ public class RenderControls extends JDialog implements ViewListener,
 	private Component buildSkyPane() {
 		
 		JLabel skyRotationLbl = new JLabel("Skymap rotation:");
-		skyRotationSlider = new JSlider(0, 100);
+		skyRotationSlider.setMinimum(1);
+		skyRotationSlider.setMaximum(100);
 		skyRotationSlider.addChangeListener(skyRotationListener);
 		skyRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
 		updateSkyRotation();
 		
-		loadSkymapBtn = new JButton("Load Skymap");
+		loadSkymapBtn.setText("Load Skymap");
 		loadSkymapBtn.setToolTipText("Use a panoramic skymap");
 		loadSkymapBtn.addActionListener(loadSkymapListener);
 		
@@ -875,11 +875,11 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
-		atmosphereEnabled = new JCheckBox("enable atmosphere");
+		atmosphereEnabled.setText("enable atmosphere");
 		atmosphereEnabled.addActionListener(atmosphereListener);
 		updateAtmosphereCheckBox();
 		
-		volumetricFogEnabled = new JCheckBox("enable volumetric fog");
+		volumetricFogEnabled.setText("enable volumetric fog");
 		volumetricFogEnabled.addActionListener(volumetricFogListener);
 		updateVolumetricFogCheckBox();
 		
@@ -958,27 +958,30 @@ public class RenderControls extends JDialog implements ViewListener,
 		JLabel dofLbl = new JLabel("Depth of Field: ");
 		JLabel focalOffsetLbl = new JLabel("Focal Offset: ");
 
-		dofSlider = new JSlider(1, 1000);
+		dofSlider.setMinimum(1);
+		dofSlider.setMaximum(1000);
 		dofSlider.addChangeListener(dofListener);
 		updateDofSlider();
 		
-		fovSlider = new JSlider(1, 1000);
+		fovSlider.setMinimum(1);
+		fovSlider.setMaximum(1000);
 		fovSlider.addChangeListener(fovListener);
 		updateFovSlider();
 		
-		focalOffsetSlider = new JSlider(1, 1000);
+		focalOffsetSlider.setMinimum(1);
+		focalOffsetSlider.setMaximum(1000);
 		focalOffsetSlider.addChangeListener(focalOffsetListener);
 		updateFocalOffsetSlider();
 		
-		fovField = new JTextField(5);
+		fovField.setColumns(5);
 		fovField.addActionListener(fovFieldListener);
 		updateFovField();
 		
-		dofField = new JTextField(5);
+		dofField.setColumns(5);
 		dofField.addActionListener(dofFieldListener);
 		updateDofField();
 		
-		focalOffsetField = new JTextField(5);
+		focalOffsetField.setColumns(5);
 		focalOffsetField.addActionListener(focalOffsetFieldListener);
 		updateFocalOffsetField();
 		
