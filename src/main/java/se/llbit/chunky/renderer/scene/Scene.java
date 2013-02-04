@@ -146,9 +146,12 @@ public class Scene implements Refreshable {
 	
 	private static final double DEFAULT_WATER_VISIBILITY = 9;
 
-	static final double CLOUD_HEIGHT = 30;
 	//private static final double MIN_WATER_VISIBILITY = 0;
 	//private static final double MAX_WATER_VISIBILITY = 62;
+	
+	private static final int DEFAULT_CLOUD_HEIGHT = 128;
+	
+	int cloudHeight = DEFAULT_CLOUD_HEIGHT;
 	
 	protected double waterVisibility = DEFAULT_WATER_VISIBILITY;
 
@@ -312,6 +315,7 @@ public class Scene implements Refreshable {
 		biomeColors = other.biomeColors;
 		sunEnabled = other.sunEnabled;
 		cloudsEnabled = other.cloudsEnabled;
+		cloudHeight = other.cloudHeight;
 		emittersEnabled = other.emittersEnabled;
 		emitterIntensity = other.emitterIntensity;
 		atmosphereEnabled = other.atmosphereEnabled;
@@ -392,6 +396,7 @@ public class Scene implements Refreshable {
 				new ByteTag(sunEnabled ? 1 : 0));
 		worldTag.addItem("cloudsEnabled",
 				new ByteTag(cloudsEnabled ? 1 : 0));
+		worldTag.addItem("cloudHeight", new IntTag(cloudHeight));
 		worldTag.addItem("stillWater",
 				new ByteTag(stillWater ? 1 : 0));
 		worldTag.addItem("clearWater",
@@ -529,6 +534,7 @@ public class Scene implements Refreshable {
 				worldTag.get("emittersEnabled").byteValue() != 0;
 			sunEnabled = worldTag.get("sunEnabled").byteValue() != 0;
 			cloudsEnabled = worldTag.get("cloudsEnabled").byteValue(0) != 0;
+			cloudHeight = worldTag.get("cloudHeight").intValue(DEFAULT_CLOUD_HEIGHT);
 			stillWater = worldTag.get("stillWater").byteValue() != 0;
 			clearWater = worldTag.get("clearWater").byteValue() != 0;
 			biomeColors =
@@ -2065,6 +2071,7 @@ public class Scene implements Refreshable {
 	}
 
 	/**
+	 * Enable/disable clouds rendering
 	 * @param value
 	 */
 	public void setCloudsEnabled(boolean value) {
@@ -2072,6 +2079,25 @@ public class Scene implements Refreshable {
 			cloudsEnabled = value;
 			refresh();
 		}
+	}
+	
+	/**
+	 * Change the cloud height
+	 * @param value
+	 */
+	public void setCloudHeight(int value) {
+		if (value != cloudHeight) {
+			cloudHeight = value;
+			if (cloudsEnabled)
+				refresh();
+		}
+	}
+
+	/**
+	 * @return The current cloud height
+	 */
+	public int getCloudHeight() {
+		return cloudHeight;
 	}
 
 }

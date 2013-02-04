@@ -75,7 +75,7 @@ public class RayTracer {
 	public static boolean nextIntersection(Scene scene, Ray ray,
 			RayPool rayPool) {
 		
-		if (scene.cloudsEnabled && cloudIntersection(ray)) {
+		if (scene.cloudsEnabled && cloudIntersection(scene, ray)) {
 			Ray oct = rayPool.get(ray);
 			if (scene.intersect(oct) &&
 					oct.distance <= (ray.tNear + ray.distance)) {
@@ -100,9 +100,9 @@ public class RayTracer {
 		}
 	}
 
-	private static boolean cloudIntersection(Ray ray) {
+	private static boolean cloudIntersection(Scene scene, Ray ray) {
 		if (ray.d.y != 0) {
-			ray.t = (Scene.CLOUD_HEIGHT - ray.x.y) / ray.d.y;
+			ray.t = (scene.cloudHeight - ray.x.y) / ray.d.y;
 			if (ray.t > Ray.EPSILON) {
 				double u = ray.x.x + ray.d.x * ray.t;
 				double v = ray.x.z + ray.d.z * ray.t;

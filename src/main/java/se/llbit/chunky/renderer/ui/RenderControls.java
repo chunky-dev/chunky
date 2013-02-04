@@ -125,6 +125,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JCheckBox atmosphereEnabled;
 	private JCheckBox volumetricFogEnabled;
 	private JCheckBox cloudsEnabled;
+	private final JSlider cloudHeightSlider = new JSlider();
+	private final JTextField cloudHeightField = new JTextField();
 	private JSlider exposureSlider;
 	private JTextField exposureField;
 	private RenderContext context;
@@ -445,14 +447,16 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(rayDepthLbl)
 					.addComponent(rayDepthSlider)
-					.addComponent(rayDepthField))
+					.addComponent(rayDepthField)
+				)
 				.addComponent(sep1)
 				.addComponent(waterWorldLbl)
 				.addComponent(waterWorldCB)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(waterHeightLbl)
 					.addGap(0, 0, Short.MAX_VALUE)
-					.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				)
 			)
 			.addContainerGap()
 		);
@@ -461,7 +465,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addGroup(layout.createParallelGroup()
 				.addComponent(rayDepthLbl)
 				.addComponent(rayDepthSlider)
-				.addComponent(rayDepthField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+				.addComponent(rayDepthField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -471,7 +476,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
 				.addComponent(waterHeightLbl, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+				.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			)
 			.addContainerGap()
 		);
 		return panel;
@@ -881,6 +887,17 @@ public class RenderControls extends JDialog implements ViewListener,
 		cloudsEnabled.addActionListener(cloudsEnabledListener);
 		updateCloudsEnabledCheckBox();
 		
+		JLabel cloudHeightLbl = new JLabel("cloud height: ");
+		
+		cloudHeightSlider.setMinimum(-128);
+		cloudHeightSlider.setMaximum(512);
+		cloudHeightSlider.addChangeListener(cloudHeightListener);
+		updateCloudHeightSlider();
+		
+		cloudHeightField.setColumns(5);
+		cloudHeightField.addActionListener(cloudHeightFieldListener);
+		updateCloudHeightField();
+		
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -899,6 +916,11 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(atmosphereEnabled)
 				.addComponent(volumetricFogEnabled)
 				.addComponent(cloudsEnabled)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(cloudHeightLbl)
+					.addComponent(cloudHeightSlider)
+					.addComponent(cloudHeightField)
+				)
 			)
 			.addContainerGap()
 		);
@@ -917,7 +939,14 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addComponent(atmosphereEnabled)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(volumetricFogEnabled)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(cloudsEnabled)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(cloudHeightLbl)
+				.addComponent(cloudHeightSlider)
+				.addComponent(cloudHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			)
 			.addContainerGap()
 		);
 		return panel;
@@ -1293,6 +1322,14 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateRayDepthField();
 		}
 	};
+	ChangeListener cloudHeightListener = new ChangeListener() {
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			JSlider source = (JSlider) e.getSource();
+			renderManager.scene().setCloudHeight(source.getValue());
+			updateCloudHeightField();
+		}
+	};
 	ActionListener rayDepthFieldListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -1301,6 +1338,18 @@ public class RenderControls extends JDialog implements ViewListener,
 				int value = Integer.parseInt(source.getText());
 				renderManager.scene().setRayDepth(Math.max(1, value));
 				updateRayDepthSlider();
+			} catch (NumberFormatException ex) {
+			}
+		}
+	};
+	ActionListener cloudHeightFieldListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JTextField source = (JTextField) e.getSource();
+			try {
+				int value = Integer.parseInt(source.getText());
+				renderManager.scene().setRayDepth(value);
+				updateCloudHeightSlider();
 			} catch (NumberFormatException ex) {
 			}
 		}
@@ -1526,10 +1575,22 @@ public class RenderControls extends JDialog implements ViewListener,
 		waterHeightField.setEnabled(height > 0);
 	}
 	
+	protected void updateCloudHeightSlider() {
+		cloudHeightSlider.removeChangeListener(cloudHeightListener);
+		cloudHeightSlider.setValue(renderManager.scene().getCloudHeight());
+		cloudHeightSlider.addChangeListener(cloudHeightListener);
+	}
+	
 	protected void updateRayDepthSlider() {
 		rayDepthSlider.removeChangeListener(rayDepthListener);
 		rayDepthSlider.setValue(renderManager.scene().getRayDepth());
 		rayDepthSlider.addChangeListener(rayDepthListener);
+	}
+	
+	protected void updateCloudHeightField() {
+		cloudHeightField.removeActionListener(cloudHeightFieldListener);
+		cloudHeightField.setText("" + renderManager.scene().getCloudHeight());
+		cloudHeightField.addActionListener(cloudHeightFieldListener);
 	}
 	
 	protected void updateRayDepthField() {
@@ -1835,6 +1896,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateSPPTargetField();
 		updateSceneNameField();
 		updatePostprocessCB();
+		updateCloudHeightSlider();
+		updateCloudHeightField();
+		updateRayDepthSlider();
+		updateRayDepthField();
 		enableEmitters.setSelected(renderManager.scene().getEmittersEnabled());
 		directLight.setSelected(renderManager.scene().getDirectLight());
 		startRenderBtn.setText("RESUME");
