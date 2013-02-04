@@ -364,7 +364,7 @@ public class Controls extends JPanel {
 			}
 		});
 		
-		JButton benchmarkBtn = new JButton("Benchmark");
+		JButton benchmarkBtn = new JButton("Benchmark Renderer");
 		benchmarkBtn.setToolTipText("Benchmark the renderer.");
 		benchmarkBtn.addActionListener(new ActionListener() {
 			@Override
