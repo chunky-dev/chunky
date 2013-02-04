@@ -80,7 +80,8 @@ import se.llbit.math.Ray;
  */
 @SuppressWarnings("javadoc")
 public class Block {
-	public static final Block AIR = new Block(0x00, "Air", Texture.air) {
+	public static final int AIR_ID = 0x00;
+	public static final Block AIR = new Block(AIR_ID, "Air", Texture.air) {
 		{
 			isOpaque = false;
 			isSolid = false;
