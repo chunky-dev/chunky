@@ -124,6 +124,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JSlider emitterIntensitySlider;
 	private JCheckBox atmosphereEnabled;
 	private JCheckBox volumetricFogEnabled;
+	private JCheckBox cloudsEnabled;
 	private JSlider exposureSlider;
 	private JTextField exposureField;
 	private RenderContext context;
@@ -876,38 +877,49 @@ public class RenderControls extends JDialog implements ViewListener,
 		volumetricFogEnabled.addActionListener(volumetricFogListener);
 		updateVolumetricFogCheckBox();
 		
+		cloudsEnabled = new JCheckBox("enable clouds");
+		cloudsEnabled.addActionListener(cloudsEnabledListener);
+		updateCloudsEnabledCheckBox();
+		
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
-		layout.setHorizontalGroup(
-				layout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(layout.createParallelGroup()
-						.addGroup(layout.createSequentialGroup()
-							.addComponent(skyRotationLbl)
-							.addComponent(skyRotationSlider))
-						.addGroup(layout.createSequentialGroup()
-							.addComponent(loadSkymapBtn)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(unloadSkymapBtn))
-						.addComponent(atmosphereEnabled)
-						.addComponent(volumetricFogEnabled))
-					.addContainerGap());
-		layout.setVerticalGroup(
-			layout.createSequentialGroup()
-				.addContainerGap()
-				.addGroup(layout.createParallelGroup()
-					.addComponent(loadSkymapBtn)
-					.addComponent(unloadSkymapBtn))
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+		layout.setHorizontalGroup(layout.createSequentialGroup()
+			.addContainerGap()
+			.addGroup(layout.createParallelGroup()
+				.addGroup(layout.createSequentialGroup()
 					.addComponent(skyRotationLbl)
-					.addComponent(skyRotationSlider))
-				.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(skyRotationSlider)
+				)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(loadSkymapBtn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(unloadSkymapBtn)
+				)
 				.addComponent(atmosphereEnabled)
-				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(volumetricFogEnabled)
-				.addContainerGap());
+				.addComponent(cloudsEnabled)
+			)
+			.addContainerGap()
+		);
+		layout.setVerticalGroup(layout.createSequentialGroup()
+			.addContainerGap()
+			.addGroup(layout.createParallelGroup()
+				.addComponent(loadSkymapBtn)
+				.addComponent(unloadSkymapBtn)
+			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+				.addComponent(skyRotationLbl)
+				.addComponent(skyRotationSlider)
+			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(atmosphereEnabled)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(volumetricFogEnabled)
+			.addComponent(cloudsEnabled)
+			.addContainerGap()
+		);
 		return panel;
 	}
 	
@@ -1134,8 +1146,14 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateVolumetricFogCheckBox() {
 		volumetricFogEnabled.removeActionListener(volumetricFogListener);
-		volumetricFogEnabled.addActionListener(volumetricFogListener);
 		volumetricFogEnabled.setSelected(renderManager.scene().volumetricFogEnabled());
+		volumetricFogEnabled.addActionListener(volumetricFogListener);
+	}
+	
+	protected void updateCloudsEnabledCheckBox() {
+		cloudsEnabled.removeActionListener(cloudsEnabledListener);
+		cloudsEnabled.setSelected(renderManager.scene().cloudsEnabled());
+		cloudsEnabled.addActionListener(cloudsEnabledListener);
 	}
 	
 	private void updateTitle() {
@@ -1421,6 +1439,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
 			renderManager.scene().setVolumetricFogEnabled(source.isSelected());
+		}
+	};
+	ActionListener cloudsEnabledListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JCheckBox source = (JCheckBox) e.getSource();
+			renderManager.scene().setCloudsEnabled(source.isSelected());
 		}
 	};
 	ActionListener biomeColorsCBListener = new ActionListener() {
@@ -1801,6 +1826,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateBiomeColorsCB();
 		updateAtmosphereCheckBox();
 		updateVolumetricFogCheckBox();
+		updateCloudsEnabledCheckBox();
 		updateTitle();
 		updateExposureField();
 		updateExposureSlider();

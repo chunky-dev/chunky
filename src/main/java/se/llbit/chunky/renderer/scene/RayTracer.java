@@ -75,7 +75,7 @@ public class RayTracer {
 	public static boolean nextIntersection(Scene scene, Ray ray,
 			RayPool rayPool) {
 		
-		if (cloudIntersection(ray)) {
+		if (scene.cloudsEnabled && cloudIntersection(ray)) {
 			Ray oct = rayPool.get(ray);
 			if (scene.intersect(oct) &&
 					oct.distance <= (ray.tNear + ray.distance)) {

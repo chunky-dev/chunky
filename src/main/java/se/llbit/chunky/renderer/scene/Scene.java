@@ -184,6 +184,7 @@ public class Scene implements Refreshable {
 	protected boolean stillWater = false;
 	private boolean biomeColors = true;
 	protected boolean sunEnabled = true;
+	protected boolean cloudsEnabled = false;
 	protected boolean emittersEnabled = true;
 
 	private Set<ChunkPosition> loadedChunks = new HashSet<ChunkPosition>();
@@ -310,6 +311,7 @@ public class Scene implements Refreshable {
 		clearWater = other.clearWater;
 		biomeColors = other.biomeColors;
 		sunEnabled = other.sunEnabled;
+		cloudsEnabled = other.cloudsEnabled;
 		emittersEnabled = other.emittersEnabled;
 		emitterIntensity = other.emitterIntensity;
 		atmosphereEnabled = other.atmosphereEnabled;
@@ -388,6 +390,8 @@ public class Scene implements Refreshable {
 				new ByteTag(emittersEnabled ? 1 : 0));
 		worldTag.addItem("sunEnabled",
 				new ByteTag(sunEnabled ? 1 : 0));
+		worldTag.addItem("cloudsEnabled",
+				new ByteTag(cloudsEnabled ? 1 : 0));
 		worldTag.addItem("stillWater",
 				new ByteTag(stillWater ? 1 : 0));
 		worldTag.addItem("clearWater",
@@ -524,6 +528,7 @@ public class Scene implements Refreshable {
 			emittersEnabled =
 				worldTag.get("emittersEnabled").byteValue() != 0;
 			sunEnabled = worldTag.get("sunEnabled").byteValue() != 0;
+			cloudsEnabled = worldTag.get("cloudsEnabled").byteValue(0) != 0;
 			stillWater = worldTag.get("stillWater").byteValue() != 0;
 			clearWater = worldTag.get("clearWater").byteValue() != 0;
 			biomeColors =
@@ -2050,6 +2055,23 @@ public class Scene implements Refreshable {
 			return grassTexture.get(x, z);
 		else
 			return Biomes.getGrassColorLinear(0);
+	}
+
+	/**
+	 * @return <code>true</code> if cloud rendering is enabled
+	 */
+	public boolean cloudsEnabled() {
+		return cloudsEnabled;
+	}
+
+	/**
+	 * @param value
+	 */
+	public void setCloudsEnabled(boolean value) {
+		if (value != cloudsEnabled) {
+			cloudsEnabled = value;
+			refresh();
+		}
 	}
 
 }
