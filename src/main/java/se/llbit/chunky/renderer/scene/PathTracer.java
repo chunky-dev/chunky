@@ -138,7 +138,7 @@ public class PathTracer {
 			if (currentBlock.isShiny &&
 					random.nextDouble() < pSpecular) {
 
-				Scene.getSpecularReflectedRay(ray, reflected);
+				reflected.specularReflection(ray);
 
 				if (!scene.kill(reflected, random)) {
 					pathTrace(scene, reflected, rayPool, vectorPool, random, 1, false);
@@ -184,7 +184,7 @@ public class PathTracer {
 							
 								reflected.currentMaterial = ray.prevMaterial;
 		
-								double attenuation = scene.getDirectLightAttenuation(reflected);
+								double attenuation = RayTracer.getDirectLightAttenuation(scene, reflected);
 								
 								if (attenuation > 0) {
 									directLight = attenuation * reflected.d.dot(ray.n);
@@ -194,7 +194,7 @@ public class PathTracer {
 								}
 							}
 								
-							Scene.getDiffuseReflectedRay(ray, reflected, random);
+							reflected.diffuseReflection(ray, random);
 							pathTrace(scene, reflected, rayPool, vectorPool, random, 0, false);
 							ray.hit = ray.hit || reflected.hit;
 							if (ray.hit) {
@@ -210,7 +210,7 @@ public class PathTracer {
 							}
 							
 						} else {
-							Scene.getDiffuseReflectedRay(ray, reflected, random);
+							reflected.diffuseReflection(ray, random);
 							
 							pathTrace(scene, reflected, rayPool, vectorPool, random, 0, false);
 							ray.hit = ray.hit || reflected.hit;
@@ -238,7 +238,7 @@ public class PathTracer {
 					double radicand = 1 - n1n2*n1n2 * (1 - cosTheta*cosTheta);
 					if (doRefraction && radicand < Ray.EPSILON) {
 						// total internal reflection
-						Scene.getSpecularReflectedRay(ray, reflected);
+						reflected.specularReflection(ray);
 						if (!scene.kill(reflected, random)) {
 							pathTrace(scene, reflected, rayPool, vectorPool, random, 1, false);
 							if (reflected.hit) {
@@ -263,7 +263,7 @@ public class PathTracer {
 							double Rtheta = R0 + (1-R0) * c*c*c*c*c;
 							
 							if (random.nextDouble() < Rtheta) {
-								Scene.getSpecularReflectedRay(ray, reflected);
+								reflected.specularReflection(ray);
 								pathTrace(scene, reflected, rayPool, vectorPool, random, 1, false);
 								if (reflected.hit) {
 									ray.color.x = reflected.color.x;
@@ -372,7 +372,7 @@ public class PathTracer {
 				scene.sun.getRandomSunDirection(reflected, random, vectorPool);
 				reflected.currentMaterial = 0;
 				
-				double attenuation = scene.getDirectLightAttenuation(reflected);
+				double attenuation = RayTracer.getDirectLightAttenuation(scene, reflected);
 				
 				double Fex = scene.sun.extinction(s);
 				double Fin = scene.sun.inscatter(Fex, scene.sun.theta(ray.d));

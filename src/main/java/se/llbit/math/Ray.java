@@ -16,6 +16,8 @@
  */
 package se.llbit.math;
 
+import java.util.Random;
+
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
@@ -411,4 +413,75 @@ public class Ray {
 	public float[] getBiomeGrassColor(Scene scene) {
 		return scene.getGrassColor((int) (x.x + d.x * OFFSET), (int) (x.z + d.z * OFFSET));
 	}
+	
+	/**
+	 * Set this ray to a random diffuse reflection of the input ray.
+	 * @param ray
+	 * @param random
+	 */
+	public final void diffuseReflection(Ray ray, Random random) {
+		set(ray);
+
+		// get random point on unit disk
+		double x1 = random.nextDouble();
+		double x2 = random.nextDouble();
+		double r = Math.sqrt(x1);
+		double theta = 2 * Math.PI * x2;
+		
+		// project to point on hemisphere in tangent space
+		double tx = r * Math.cos(theta);
+		double ty = r * Math.sin(theta);
+		double tz = Math.sqrt(1 - x1);
+		
+		// transform from tangent space to world space
+		double xx, xy, xz;
+		double ux, uy, uz;
+		double vx, vy, vz;
+		
+		if (Math.abs(n.x) > .1) {
+			xx = 0;
+			xy = 1;
+			xz = 0;
+		} else {
+			xx = 1;
+			xy = 0;
+			xz = 0;
+		}
+		
+		ux = xy * n.z - xz * n.y;
+		uy = xz * n.x - xx * n.z;
+		uz = xx * n.y - xy * n.x;
+		
+		r = 1/Math.sqrt(ux*ux + uy*uy + uz*uz);
+		
+		ux *= r;
+		uy *= r;
+		uz *= r;
+		
+		vx = uy * n.z - uz * n.y;
+		vy = uz * n.x - ux * n.z;
+		vz = ux * n.y - uy * n.x;
+		
+		d.x = ux * tx + vx * ty + n.x * tz;
+		d.y = uy * tx + vy * ty + n.y * tz;
+		d.z = uz * tx + vz * ty + n.z * tz;
+		
+		x.scaleAdd(Ray.OFFSET, d, x);
+		currentMaterial = prevMaterial;
+		specular = false;
+	}
+	
+	/**
+	 * Set this ray to the specular reflection of the input ray.
+	 * @param ray
+	 */
+	public final void specularReflection(Ray ray) {
+		set(ray);
+		d.scaleAdd(
+				- 2 * ray.d.dot(ray.n),
+				ray.n, ray.d);
+		x.scaleAdd(Ray.OFFSET, d, x);
+		currentMaterial = prevMaterial;
+	}
+	
 }

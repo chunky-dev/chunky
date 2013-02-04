@@ -115,4 +115,25 @@ public class RayTracer {
 		return false;
 	}
 	
+	/**
+	 * @param scene
+	 * @param ray
+	 * @return The direct lighting attenuation
+	 */
+	public static final double getDirectLightAttenuation(Scene scene, Ray ray) {
+		double attenuation = 1;
+		while (attenuation > 0) {
+			ray.x.scaleAdd(Ray.OFFSET,
+					ray.d, ray.x);
+			if (!scene.intersect(ray))
+				break;
+			attenuation *= 1 - ray.color.w;
+			if (!scene.clearWater && ray.getPrevBlock() == Block.WATER) {
+				double a = ray.distance / scene.waterVisibility;
+				attenuation *= 1 - Math.min(1, a*a);
+			}
+		}
+		return attenuation;
+	}
+
 }
