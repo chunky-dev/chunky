@@ -20,7 +20,6 @@ import java.util.Random;
 
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.world.Block;
-import se.llbit.chunky.world.Clouds;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray.RayPool;
 import se.llbit.math.Vector3d;
@@ -69,7 +68,7 @@ public class PathTracer {
 		
 		while (true) {
 
-			if (!nextIntersection(scene, ray, rayPool)) {
+			if (!RayTracer.nextIntersection(scene, ray, rayPool)) {
 				if (scene.waterHeight > 0 &&
 						ray.d.y < 0 && ray.x.y > scene.waterHeight-.125) {
 					
@@ -391,46 +390,4 @@ public class PathTracer {
 		vectorPool.dispose(od);
 	}
 
-	private static boolean nextIntersection(Scene scene, Ray ray,
-			RayPool rayPool) {
-		
-		if (cloudIntersection(ray)) {
-			Ray oct = rayPool.get(ray);
-			if (scene.intersect(oct) &&
-					oct.distance <= (ray.tNear + ray.distance)) {
-				ray.distance = oct.distance;
-				ray.x.set(oct.x);
-				ray.n.set(oct.n);
-				ray.color.set(oct.color);
-				ray.prevMaterial = oct.prevMaterial;
-				ray.currentMaterial = oct.currentMaterial;
-			} else {
-				ray.color.set(1, 1, 1, 1);
-				ray.prevMaterial = ray.currentMaterial;
-				ray.currentMaterial = Block.GRASS_ID;
-				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
-				ray.n.set(0, -Math.signum(ray.d.y), 0);
-				ray.distance += ray.tNear;
-			}
-			rayPool.dispose(oct);
-			return true;
-		} else {
-			return scene.intersect(ray);
-		}
-	}
-
-	private static boolean cloudIntersection(Ray ray) {
-		if (ray.d.y != 0) {
-			ray.t = (Scene.CLOUD_HEIGHT - ray.x.y) / ray.d.y;
-			if (ray.t > Ray.EPSILON) {
-				double u = ray.x.x + ray.d.x * ray.t;
-				double v = ray.x.z + ray.d.z * ray.t;
-				if (Clouds.getCloud((int) (u/128), (int) (v/128)) != 0) {
-					ray.tNear = ray.t;
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 }

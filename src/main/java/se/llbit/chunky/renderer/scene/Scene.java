@@ -173,7 +173,7 @@ public class Scene implements Refreshable {
 	/**
  	 * Octree origin
  	 */
-	private Vector3i origin = new Vector3i();
+	protected Vector3i origin = new Vector3i();
 	
 	/**
  	 * Octree
@@ -953,40 +953,10 @@ public class Scene implements Refreshable {
 
 	/**
 	 * @param ray
+	 * @param rayPool 
 	 */
-	public void quickTrace(Ray ray) {
-		
-		ray.x.x -= origin.x;
-		ray.x.y -= origin.y;
-		ray.x.z -= origin.z;
-
-		while (true) {
-			if (!intersect(ray)) {
-				if (waterHeight > 0 &&
-						ray.d.y < 0 && ray.x.y > waterHeight-.125) {
-					
-					ray.t = (waterHeight-.125-ray.x.y) / ray.d.y;
-					ray.distance += ray.t;
-					ray.x.scaleAdd(ray.t, ray.d, ray.x);
-					ray.currentMaterial = Block.WATER.id;
-					ray.prevMaterial = 0;
-					WaterModel.intersect(ray);
-				}
-				break;
-			} else if (ray.getCurrentBlock() == Block.WATER) {
-				break;
-			} else if (ray.currentMaterial != 0 && ray.color.w > 0) {
-				break;
-			} else {
-				ray.x.scaleAdd(Ray.OFFSET, ray.d, ray.x);
-			}
-		}
-		
-		if (ray.currentMaterial == 0) {
-			sky.getSkySpecularColor(ray, false);
-		} else {
-			sun.flatShading(ray);
-		}
+	public void quickTrace(Ray ray, RayPool rayPool) {
+		RayTracer.quickTrace(this, ray, rayPool);
 	}
 
 	/**

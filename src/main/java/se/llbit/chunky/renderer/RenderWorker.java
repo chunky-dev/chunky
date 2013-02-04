@@ -160,7 +160,7 @@ public class RenderWorker extends Thread {
 			scene.camera().transform(ray.d);
 			
 			ray.x.set(scene.camera().getPosition());
-			scene.quickTrace(ray);
+			scene.quickTrace(ray, rayPool);
 				
 			samples[x][y][0] = ray.color.x;
 			samples[x][y][1] = ray.color.y;
