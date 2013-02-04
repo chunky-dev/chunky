@@ -124,7 +124,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JSlider emitterIntensitySlider;
 	private JCheckBox atmosphereEnabled;
 	private JCheckBox volumetricFogEnabled;
-	private JCheckBox cloudsEnabled;
+	private final JCheckBox cloudsEnabled = new JCheckBox();
 	private final JSlider cloudHeightSlider = new JSlider();
 	private final JTextField cloudHeightField = new JTextField();
 	private JSlider exposureSlider;
@@ -883,7 +883,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		volumetricFogEnabled.addActionListener(volumetricFogListener);
 		updateVolumetricFogCheckBox();
 		
-		cloudsEnabled = new JCheckBox("enable clouds");
+		cloudsEnabled.setText("enable clouds");
 		cloudsEnabled.addActionListener(cloudsEnabledListener);
 		updateCloudsEnabledCheckBox();
 		
