@@ -1935,6 +1935,7 @@ public class Block {
 			isSolid = true;
 			ior = 1.520f;
 			localIntersect = true;
+			isEmitter = true;
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
