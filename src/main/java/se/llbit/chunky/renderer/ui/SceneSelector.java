@@ -21,6 +21,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -99,7 +102,11 @@ public class SceneSelector extends JDialog implements ListSelectionListener {
 				return name.endsWith(".cvf");
 			}
 		});
-		for (File sceneFile : sceneFiles) {
+		List<File> fileList = new ArrayList<File>(sceneFiles.length);
+		for (File file: sceneFiles)
+			fileList.add(file);
+		Collections.sort(fileList);
+		for (File sceneFile : fileList) {
 			String name = sceneFile.getName();
 			listModel.addElement(name.substring(0, name.length()-4));
 		}
