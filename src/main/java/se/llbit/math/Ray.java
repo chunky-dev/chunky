@@ -253,7 +253,7 @@ public class Ray {
 	}
 
 	/**
-	 * Set origin and direction
+	 * Initialize a ray with origin and direction.
 	 * @param o Origin
 	 * @param d Direction
 	 */

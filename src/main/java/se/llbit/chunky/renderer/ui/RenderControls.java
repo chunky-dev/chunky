@@ -108,6 +108,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JTextField widthField = new JTextField();
 	private final JTextField heightField = new JTextField();
 	private final JSlider dofSlider = new JSlider();
+	private final JCheckBox parallelProjectionCB = new JCheckBox();
 	private final JTextField fovField = new JTextField();
 	private final JTextField dofField = new JTextField();
 	private final JTextField focalOffsetField = new JTextField();
@@ -1023,11 +1024,10 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 	
 	private Component buildCameraPane() {
-		
 		JLabel fovLbl = new JLabel("Field of View (zoom): ");
 		JLabel dofLbl = new JLabel("Depth of Field: ");
 		JLabel focalOffsetLbl = new JLabel("Focal Offset: ");
-
+		
 		dofSlider.setMinimum(1);
 		dofSlider.setMaximum(1000);
 		dofSlider.addChangeListener(dofListener);
@@ -1042,6 +1042,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		focalOffsetSlider.setMaximum(1000);
 		focalOffsetSlider.addChangeListener(focalOffsetListener);
 		updateFocalOffsetSlider();
+		
+		parallelProjectionCB.setText("Parallel Projection");
+		parallelProjectionCB.addChangeListener(parallelProjectionListener);
+		updateParallelProjectionCheckBox();
 		
 		fovField.setColumns(5);
 		fovField.addActionListener(fovFieldListener);
@@ -1176,6 +1180,7 @@ public class RenderControls extends JDialog implements ViewListener,
 						.addComponent(dofLbl)
 						.addComponent(focalOffsetLbl))
 					.addGroup(layout.createParallelGroup()
+						.addComponent(parallelProjectionCB)
 						.addComponent(fovSlider)
 						.addComponent(dofSlider)
 						.addComponent(focalOffsetSlider))
@@ -1203,6 +1208,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(parallelProjectionCB))
 			.addGroup(layout.createParallelGroup()
 				.addComponent(fovLbl)
 				.addComponent(fovSlider)
@@ -1511,6 +1518,13 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateDofField();
 		}
 	};
+	ChangeListener parallelProjectionListener = new ChangeListener() {
+		@Override
+		public void stateChanged( ChangeEvent e ) {
+			renderManager.scene().camera().setParallelProjection( ((JCheckBox)e.getSource()).isSelected() );
+			updateParallelProjectionCheckBox();
+		}
+	};
 	ChangeListener fovListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
@@ -1681,8 +1695,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				double value = numberFormat.parse(source.getText()).doubleValue();
-				value = Math.max(value, Camera.MIN_FOV);
-				value = Math.min(value, Camera.MAX_FOV);
 				renderManager.scene().camera().setFoV(value);
 				updateFovSlider();
 			} catch (NumberFormatException ex) {
@@ -1847,7 +1859,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		focalOffsetSlider.setValue((int) (value * scale + focalOffsetSlider.getMinimum()));
 		focalOffsetSlider.addChangeListener(focalOffsetListener);
 	}
-
+	
+	protected void updateParallelProjectionCheckBox() {
+		parallelProjectionCB.removeChangeListener(parallelProjectionListener);
+		parallelProjectionCB.setSelected(renderManager.scene().camera().isUsingParallelProjection());
+		parallelProjectionCB.addChangeListener(parallelProjectionListener);
+	}
+	
 	protected void updateFovSlider() {
 		fovSlider.removeChangeListener(fovListener);
 		double value = (renderManager.scene().camera().getFoV() - Camera.MIN_FOV)
@@ -2071,6 +2089,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateFovField();
 		updateFocalOffsetField();
 		updateDofSlider();
+		updateParallelProjectionCheckBox();
 		updateFovSlider();
 		updateFocalOffsetSlider();
 		updateWidthField();

@@ -679,6 +679,10 @@ public class Scene implements Refreshable {
 	 * @param rayPool 
 	 */
 	public void quickTrace(Ray ray, RayPool rayPool) {
+		ray.x.x -= origin.x;
+		ray.x.y -= origin.y;
+		ray.x.z -= origin.z;
+		
 		RayTracer.quickTrace(this, ray, rayPool);
 	}
 
