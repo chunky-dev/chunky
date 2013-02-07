@@ -1895,6 +1895,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateFovField();
 		updateFocalOffsetField();
 		updateDofSlider();
+		updateParallelProjectionCheckBox();
 		updateFovSlider();
 		updateFocalOffsetSlider();
 		updateWidthField();
