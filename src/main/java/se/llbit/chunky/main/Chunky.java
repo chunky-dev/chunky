@@ -150,6 +150,19 @@ public class Chunky implements ChunkDiscoveryListener {
 				Chunky.class.getResource("/log4j.properties"));
 	}
 	
+	public static final String USAGE =
+		"Usage: chunky [<options>] [<world directory>]\n" +
+		"Options:\n" +
+		"  -texture <pack file> ; use the specified texture pack.\n" +
+		"  -watermark           ; draw watermark.png over saved frames.\n" +
+		"  -render <scene file> ; render the specified scene (name of .cfv file,\n" +
+		"                       ; relative to the scenes directory) and exit.\n" +
+		"  -scene-dir <dir>     ; use the specified directory for loading/saving scenes.\n" +
+		"  -benchmark           ; run the benchmark and exit.\n" +
+		"  -threads <num>       ; use the specified number of threads for rendering.\n" +
+		"  -opencl              ; use OpenCL for rendering.\n" +
+		"  -help                ; show this text.";
+	
 	/**
 	 * Constructor
 	 */
@@ -160,9 +173,9 @@ public class Chunky implements ChunkDiscoveryListener {
 	 * Create a new instance of the application GUI.
 	 * @param args
 	 */
-	public void run(String[] args) {
-		
+	public int run(String[] args) {
 		boolean selectedWorld = false;
+		File sceneDir = ProgramProperties.getPreferredSceneDirectory();
 		String sceneName = null;
 		String texturePack = null;
 		int renderThreads = Runtime.getRuntime().availableProcessors();
@@ -170,23 +183,29 @@ public class Chunky implements ChunkDiscoveryListener {
 		boolean doBench = false;
 		for (int i = 0; i < args.length; ++i) {
 			if (args[i].equals("-texture") && args.length > i+1) {
-				i += 1;
-				texturePack = args[i];
+				texturePack = args[++i];
 			} else if (args[i].equals("-watermark")) {
 				RenderManager.useWatermark = true;
+			} else if (args[i].equals("-scene-dir")) {
+				sceneDir = new File(args[++i]);
 			} else if (args[i].equals("-render")) {
-				i += 1;
-				sceneName = args[i];
+				sceneName = args[++i];
 			} else if (args[i].equals("-benchmark")) {
 				doBench = true;
 			} else if (args[i].equals("-threads")) {
-				i += 1;
-				renderThreads = Math.max(1, Integer.parseInt(args[i]));
+				renderThreads = Math.max(1, Integer.parseInt(args[++i]));
 				renderThreads = Math.min(1, 20);
 			} else if (args[i].equals("-opencl")) {
 				openCLEnabled = true;
-			} else if (!selectedWorld) {
+			} else if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("-help") || args[i].equals("--help")) {
+				System.out.println(USAGE);
+				return 0;
+			} else if (!args[i].startsWith("-") && !selectedWorld) {
 				worldDir = new File(args[i]);
+			} else {
+				System.err.println("Unrecognised argument: "+args[i]);
+				System.err.println(USAGE);
+				return 1;
 			}
 		}
 		
@@ -202,16 +221,12 @@ public class Chunky implements ChunkDiscoveryListener {
 		
 		if (doBench) {
 			doBenchmark(renderThreads);
-			return;
+			return 0;
 		}
 		
 		if (sceneName != null) {
 			// start headless mode
 			System.setProperty("java.awt.headless", "true");
-			
-			// use the current working directory as scene directory
-			// TODO: use command-line flag to specify scene directory
-			File sceneDir = new File(System.getProperty("user.dir"));
 			
 			RenderContext renderContext = new RenderContext(sceneDir, renderThreads);
 			RenderManager renderManager = new RenderManager(
@@ -233,7 +248,7 @@ public class Chunky implements ChunkDiscoveryListener {
 			} catch (InterruptedException e) {
 				logger.error("Interrupted while loading scene", e);
 			}
-			return;
+			return 0;
 		}
 		
 		// load the world
@@ -272,6 +287,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		}
 		
 		refreshLoop();
+		return 0;
 	}
 	
 	/**
@@ -410,7 +426,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	 */
 	public static void main(final String[] args) {
 		Chunky chunky = new Chunky();
-		chunky.run(args);
+		System.exit(chunky.run(args));
 	}
 	
 	/**
