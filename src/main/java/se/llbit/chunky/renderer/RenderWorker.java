@@ -111,7 +111,7 @@ public class RenderWorker extends Thread {
 				
 				scene.camera().calcViewRay(ray, d, o,
 						random, aspect,
-						(.5 - (x + ox) / canvasWidth),
+						( .5 - (x + ox) / canvasWidth ),
 						(-.5 + (y + oy) / canvasHeight));
 				
 				scene.pathTrace(ray, rayPool, vectorPool, random);

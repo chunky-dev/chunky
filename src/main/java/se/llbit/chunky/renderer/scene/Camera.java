@@ -82,6 +82,12 @@ public class Camera {
 	 */
 	public double fovTan;
 	
+	/**
+	 * If true, a parallel projection is used, and fov is interpreted as height of the sensor
+	 * in meters rather than degrees.
+	 */
+	private boolean parallelProjection = false;
+	
 	private double focalOffset = 2;
 	private boolean infDof = true;
 
@@ -106,6 +112,7 @@ public class Camera {
 		pitch = other.pitch;
 		transform.set(other.transform);
 		dof = other.dof;
+		parallelProjection = other.parallelProjection;
 		fov = other.fov;
 		focalOffset = other.focalOffset;
 		infDof = other.infDof;
@@ -124,6 +131,7 @@ public class Camera {
 		camera.addItem("z", new DoubleTag(pos.z));
 		camera.addItem("pitch", new DoubleTag(pitch));
 		camera.addItem("yaw", new DoubleTag(yaw));
+		camera.addItem("parallel", new ByteTag(parallelProjection ? 1 : 0));
 		camera.addItem("fov", new DoubleTag(fov));
 		camera.addItem("dof", new DoubleTag(dof));
 		camera.addItem("infDof", new ByteTag(infDof ? 1 : 0));
@@ -145,6 +153,7 @@ public class Camera {
 		dof = tag.get("dof").doubleValue();
 		fov = tag.get("fov").doubleValue();
 		focalOffset = tag.get("focalOffset").doubleValue();
+		parallelProjection = tag.get("parallel").byteValue() != 0;
 		infDof = tag.get("infDof").byteValue() != 0;
 		calcFovTan();
 		updateTransform();
@@ -196,6 +205,15 @@ public class Camera {
 	 */
 	public boolean getInfDof() {
 		return infDof;
+	}
+	
+	public boolean isUsingParallelProjection() {
+		return parallelProjection;
+	}
+	
+	public synchronized void setParallelProjection(boolean p) {
+		parallelProjection = p;
+		scene.refresh();
 	}
 	
 	/**
@@ -367,18 +385,25 @@ public class Camera {
 
 	/**
 	 * Calculate a ray shooting out of the camera
-	 * @param ray
-	 * @param d
-	 * @param o
-	 * @param random
-	 * @param aspect
-	 * @param x
-	 * @param y
+	 * @param ray destination
+	 * @param d scratch vector
+	 * @param o scratch vector
+	 * @param random random number generator to use for whatever
+	 * @param aspect width / height of output image
+	 * @param x point within the output image, from -0.5, to 0.5
+	 * @param y point within the output image, from -0.5, to 0.5
 	 */
 	public void calcViewRay(Ray ray, Vector3d d, Vector3d o, Random random,
 			double aspect, double x, double y) {
 		
-		if (infDof) {
+		if (parallelProjection) {
+			d.set( 0, -1, 0 );
+			transform.transform(d);
+			o.set( y*fov, 0, x*fov*aspect );
+			transform.transform(o);
+			o.add(pos);
+			ray.set( o, d );
+		} else 	if (infDof) {
 			d.set(fovTan * y, -1, fovTan * aspect * x);
 			d.normalize();
 			transform.transform(d);
