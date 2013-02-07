@@ -954,7 +954,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 	
 	private Component buildCameraPane() {
-		//JLabel parallelLbl = new JLabel("Parallel Projection");
 		JLabel fovLbl = new JLabel("Field of View (zoom): ");
 		JLabel dofLbl = new JLabel("Depth of Field: ");
 		JLabel focalOffsetLbl = new JLabel("Focal Offset: ");

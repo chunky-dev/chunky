@@ -412,7 +412,7 @@ public class Camera {
 			transform.transform(o);
 			o.add(pos);
 			ray.set( o, d );
-		} else 	if (infDof) {
+		} else if (infDof) {
 			d.set(fovTan * y, -1, fovTan * aspect * x);
 			d.normalize();
 			transform.transform(d);
