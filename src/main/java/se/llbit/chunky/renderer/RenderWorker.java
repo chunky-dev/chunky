@@ -20,6 +20,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 
+import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray.RayPool;
@@ -96,6 +97,7 @@ public class RenderWorker extends Thread {
 		
 		double aspect = canvasWidth / (double) canvasHeight;
 		double[][][] samples = scene.getSampleBuffer();
+		final Camera cam = scene.camera();
 		
 		if (scene.pathTrace()) {
 			for (int x = x0; x < x1; ++x) {
@@ -109,7 +111,7 @@ public class RenderWorker extends Thread {
 				double oy = random.nextDouble();
 				double ox = random.nextDouble();
 				
-				scene.camera().calcViewRay(ray, d, o,
+				cam.calcViewRay(ray, d, o,
 						random, aspect,
 						( .5 - (x + ox) / canvasWidth ),
 						(-.5 + (y + oy) / canvasHeight));
@@ -149,19 +151,13 @@ public class RenderWorker extends Thread {
 				}
 			}
 			
-			double rayx = scene.camera().fovTan * aspect *
-					(.5 - (double) (x) / canvasWidth);
+			cam.calcViewRay(ray, d, o,
+					random, aspect,
+					( .5 - (double)x / canvasWidth ),
+					(-.5 + (double)y / canvasHeight));
 			
-			ray.setDefault();
-			ray.d.set(scene.camera().fovTan *
-					(-.5 + (double) (y) / canvasHeight),
-					-1, rayx);
-			ray.d.normalize();
-			scene.camera().transform(ray.d);
-			
-			ray.x.set(scene.camera().getPosition());
 			scene.quickTrace(ray, rayPool);
-				
+			
 			samples[x][y][0] = ray.color.x;
 			samples[x][y][1] = ray.color.y;
 			samples[x][y][2] = ray.color.z;

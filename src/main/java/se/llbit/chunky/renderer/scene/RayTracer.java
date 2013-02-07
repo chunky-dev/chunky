@@ -32,11 +32,6 @@ public class RayTracer {
 	 * @param rayPool
 	 */
 	public static void quickTrace(Scene scene, Ray ray, RayPool rayPool) {
-		
-		ray.x.x -= scene.origin.x;
-		ray.x.y -= scene.origin.y;
-		ray.x.z -= scene.origin.z;
-
 		while (true) {
 			if (!nextIntersection(scene, ray, rayPool)) {
 				if (scene.waterHeight > 0 &&

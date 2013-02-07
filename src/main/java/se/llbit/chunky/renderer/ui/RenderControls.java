@@ -1540,8 +1540,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				double value = numberFormat.parse(source.getText()).doubleValue();
-				value = Math.max(value, Camera.MIN_FOV);
-				value = Math.min(value, Camera.MAX_FOV);
 				renderManager.scene().camera().setFoV(value);
 				updateFovSlider();
 			} catch (NumberFormatException ex) {

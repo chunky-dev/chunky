@@ -44,12 +44,12 @@ public class Camera {
 	public static final double MAX_DOF = 500;
 	
 	/**
-	 * Minimum FOV
+	 * Minimum FOV for perspective projection
 	 */
 	public static final double MIN_FOV = 1;
 	
 	/**
-	 * Maximum FOV
+	 * Maximum FOV for perspective projection
 	 */
 	public static final double MAX_FOV = 110;
 	
@@ -158,9 +158,18 @@ public class Camera {
 		calcFovTan();
 		updateTransform();
 	}
-
+	
+	protected double getClampedFoV() {
+		double value = fov;
+		if( !parallelProjection ) {
+			value = Math.max(value, Camera.MIN_FOV);
+			value = Math.min(value, Camera.MAX_FOV);
+		}
+		return value;
+	}
+	
 	private void calcFovTan() {
-		fovTan = 2 * (Math.tan((fov / 360) * Math.PI));
+		fovTan = 2 * (Math.tan((getClampedFoV() / 360) * Math.PI));
 	}
 
 	/**
@@ -381,10 +390,10 @@ public class Camera {
 			scene.refresh();
 		}
 	}
-
-
+	
 	/**
-	 * Calculate a ray shooting out of the camera
+	 * Calculate a ray shooting out of the camera.
+	 * 
 	 * @param ray destination
 	 * @param d scratch vector
 	 * @param o scratch vector
