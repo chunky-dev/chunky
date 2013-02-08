@@ -1877,7 +1877,6 @@ public class Scene implements Refreshable {
 	 * the pixel and sets these in the bitmap image.
 	 * @param x 
 	 * @param y 
-	 * @param jobId
 	 */
 	public void finalizePixel(int x, int y) {
 		finalized = true;
