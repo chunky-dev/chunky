@@ -696,11 +696,10 @@ public class Controls extends JPanel {
 		
 		GroupLayout layout = new GroupLayout(viewPanel);
 		viewPanel.setLayout(layout);
-		layout.setHorizontalGroup(
-			layout.createParallelGroup(Alignment.LEADING)
+		layout.setHorizontalGroup(layout.createParallelGroup()
 			.addGroup(layout.createSequentialGroup()
 				.addContainerGap()
-				.addGroup(layout.createParallelGroup(Alignment.LEADING)
+				.addGroup(layout.createParallelGroup()
 					.addComponent(sep1, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
 					.addGroup(layout.createSequentialGroup()
 						.addGroup(layout.createParallelGroup(Alignment.LEADING)
@@ -729,16 +728,17 @@ public class Controls extends JPanel {
 						.addComponent(layerSlider, GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE))
 					.addComponent(coordinatesLbl)
 					.addGroup(layout.createSequentialGroup()
-						.addGroup(layout.createParallelGroup()
-							.addComponent(xLbl)
-							.addComponent(zLbl))
-						.addGroup(layout.createParallelGroup()
-							.addComponent(xField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(zField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))))
-				.addContainerGap())
+						.addComponent(xLbl)
+						.addComponent(xField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(zLbl)
+						.addComponent(zField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					)
+				)
+				.addContainerGap()
+			)
 		);
-		layout.setVerticalGroup(
-			layout.createParallelGroup(Alignment.LEADING)
+		layout.setVerticalGroup(layout.createParallelGroup()
 			.addGroup(layout.createSequentialGroup()
 				.addContainerGap()
 				.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -782,10 +782,12 @@ public class Controls extends JPanel {
 				.addPreferredGap(ComponentPlacement.RELATED)
 				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 					.addComponent(xLbl)
-					.addComponent(xField))
-				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+					.addComponent(xField)
 					.addComponent(zLbl)
-					.addComponent(zField)))
+					.addComponent(zField)
+				)
+				.addContainerGap()
+			)
 		);
 		
 		return viewPanel;
