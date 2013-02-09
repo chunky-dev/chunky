@@ -969,7 +969,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(unloadSkymapBtn)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+			.addGroup(layout.createParallelGroup()
 				.addComponent(skyRotationLbl)
 				.addComponent(skyRotationSlider)
 			)
