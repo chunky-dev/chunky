@@ -3,6 +3,7 @@
     * Improved rendering of the Beacon block
     * Beacon blocks now emit light
     * Implemented Anvil rendering
+    * Partially implemented flower pot rendering
     * Removed spatial filtering in sample selection (improves performance)
     * Added option to enable rendering clouds
     * Horizontal coordinates are now used for sun position

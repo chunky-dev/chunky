@@ -58,10 +58,16 @@ public class TestModel {
 	 */
 	public void setUp() {
 		boxes = new AABB[] {
-			new AABB(3/16., 13/16., 10/16., 1, 0, 1),
-			new AABB(2/16., 14/16., 0, 4/16., 2/16., 14/16.),
-			new AABB(4/16., 12/16., 4/16., 5/16., 3/16., 13/16.),
-			new AABB(6/16., 10/16., 5/16., 10/16., 4/16., 12/16.),
+			// east
+			new AABB(10/16., 11/16., 0, 6/16., 5/16., 11/16.),
+			// west
+			new AABB(5/16., 6/16., 0, 6/16., 5/16., 11/16.),
+			// north
+			new AABB(5/16., 11/16., 0, 6/16., 5/16., 6/16.),
+			// south
+			new AABB(5/16., 11/16., 0, 6/16., 10/16., 11/16.),
+			// center
+			new AABB(6/16., 10/16., 0, 4/16., 6/16., 10/16.),
 		};
 	}
 	
@@ -141,7 +147,10 @@ public class TestModel {
 		
 		for (int i = 0; i < boxes.length; ++i) {
 			if (boxes[i].intersect(ray)) {
-				Texture.anvilSide.getColor(ray);
+				if (i == 4)
+					Texture.dirt.getColor(ray);
+				else
+					Texture.flowerPot.getColor(ray);
 				ray.color.w = 1;
 				ray.t = ray.tNear;
 			}

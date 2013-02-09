@@ -38,6 +38,7 @@ import se.llbit.chunky.model.EndPortalModel;
 import se.llbit.chunky.model.FarmlandModel;
 import se.llbit.chunky.model.FenceGateModel;
 import se.llbit.chunky.model.FenceModel;
+import se.llbit.chunky.model.FlowerPotModel;
 import se.llbit.chunky.model.FurnaceModel;
 import se.llbit.chunky.model.GlassPaneModel;
 import se.llbit.chunky.model.GrassModel;
@@ -1963,7 +1964,11 @@ public class Block {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return FlowerPotModel.intersect(ray);
 		}
 	};
 	public static final int CARROTS_ID = 0x8D;

@@ -250,6 +250,7 @@ public class Texture {
 	public static final Texture anvilTop1 = new Texture();
 	public static final Texture anvilTop2 = new Texture();
 	public static final Texture anvilTop3 = new Texture();
+	public static final Texture flowerPot = new Texture();
 	public static final Texture unknown = new Texture("unknown");
 	
 	public static final Texture signPost = new Texture();

@@ -703,6 +703,7 @@ public class TexturePackLoader {
 		Texture.enchantmentTableSide.setTexture(texture[0xB6]);
 		Texture.enchantmentTableBottom.setTexture(texture[0xB7]);
 		Texture.commandBlock.setTexture(texture[0xB8]);
+		Texture.flowerPot.setTexture(texture[0xBA]);
 		
 		Texture.sandstoneSide.setTexture(texture[0xC0]);
 		Texture.purpleWool.setTexture(texture[0xC1]);

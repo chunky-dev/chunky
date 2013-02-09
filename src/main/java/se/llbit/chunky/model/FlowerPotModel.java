@@ -17,30 +17,33 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
 /**
- * Anvil block.
+ * Flower pot block.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class AnvilModel {
-	private static final AABB[][] boxes = {
-		// north-south
-		{
-			new AABB(3/16., 13/16., 10/16., 1, 0, 1),
-			new AABB(2/16., 14/16., 0, 4/16., 2/16., 14/16.),
-			new AABB(4/16., 12/16., 4/16., 5/16., 3/16., 13/16.),
-			new AABB(6/16., 10/16., 5/16., 10/16., 4/16., 12/16.),
-		},
-		// east-west
-		{
-			new AABB(0, 1, 10/16., 1, 3/16., 13/16.),
-			new AABB(2/16., 14/16., 0, 4/16., 2/16., 14/16.),
-			new AABB(3/16., 13/16., 4/16., 5/16., 4/16., 12/16.),
-			new AABB(4/16., 12/16., 5/16., 10/16., 6/16., 10/16.),
-		},
+public class FlowerPotModel {
+	private static final AABB[] boxes = {
+		// east
+		new AABB(10/16., 11/16., 0, 6/16., 5/16., 11/16.),
+		// west
+		new AABB(5/16., 6/16., 0, 6/16., 5/16., 11/16.),
+		// north
+		new AABB(5/16., 11/16., 0, 6/16., 5/16., 6/16.),
+		// south
+		new AABB(5/16., 11/16., 0, 6/16., 10/16., 11/16.),
+		// center
+		new AABB(6/16., 10/16., 0, 4/16., 6/16., 10/16.),
+	};
+	
+	private static final Texture[] tex = {
+		Texture.flowerPot,
+		Texture.flowerPot,
+		Texture.flowerPot,
+		Texture.flowerPot,
+		Texture.dirt,
 	};
 	
 	/**
@@ -49,21 +52,11 @@ public class AnvilModel {
 	 * @return <code>true</code> if the ray intersected the block
 	 */
 	public static boolean intersect(Ray ray) {
-		int data = ray.currentMaterial >> BlockData.BLOCK_DATA_OFFSET;
-		int orientation = 1 & data;
-		int damage = 3 & (data >> 2);
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
-		for (int i = 0; i < boxes[0].length; ++i) {
-			if (boxes[orientation][i].intersect(ray)) {
-				if (i == 0 && ray.n.y > 0) {
-					double tmp = ray.v;
-					ray.v = ray.u * orientation + tmp * (1-orientation);
-					ray.u = tmp * orientation + ray.u * (1-orientation);
-					Texture.anvilTop[damage].getColor(ray);
-				} else {
-					Texture.anvilSide.getColor(ray);
-				}
+		for (int i = 0; i < boxes.length; ++i) {
+			if (boxes[i].intersect(ray)) {
+				tex[i].getColor(ray);
 				ray.t = ray.tNear;
 				hit = true;
 			}
