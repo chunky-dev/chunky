@@ -1229,8 +1229,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateMirroSkyCB() {
 		mirrorSkyCB.removeActionListener(mirrorSkyListener);
-		// TODO
-		//mirrorSkyCB.setSelected(renderManager.scene().atmosphereEnabled());
+		mirrorSkyCB.setSelected(renderManager.scene().sky().isMirrored());
 		mirrorSkyCB.addActionListener(mirrorSkyListener);
 	}
 
@@ -1634,8 +1633,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	ActionListener mirrorSkyListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO
-			//JCheckBox source = (JCheckBox) e.getSource();
+			JCheckBox source = (JCheckBox) e.getSource();
+			renderManager.scene().sky().setMirrored(source.isSelected());
 		}
 	};
 	ActionListener biomeColorsCBListener = new ActionListener() {

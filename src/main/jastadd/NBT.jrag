@@ -17,6 +17,10 @@
 
 aspect NBT {
 
+	public IntTag.IntTag(boolean boolValue) {
+		this(boolValue ? 1 : 0);
+	}
+
 	syn String AnyTag.name();
 	eq NamedTag.name() = "TAG:named";
 	eq EndTag.name() = "TAG_End";
@@ -74,6 +78,18 @@ aspect NBT {
 
 	syn String AnyTag.error() = "";
 	eq ErrorTag.error() = getError();
+	
+	syn boolean AnyTag.boolValue() = false;
+	eq ByteTag.boolValue() = getData() != 0;
+	eq ShortTag.boolValue() = getData() != 0;
+	eq IntTag.boolValue() = getData() != 0;
+	eq LongTag.boolValue() = getData() != 0;
+
+	syn boolean AnyTag.boolValue(boolean defaultValue) = defaultValue;
+	eq ByteTag.boolValue(boolean defaultValue) = getData() != 0;
+	eq ShortTag.boolValue(boolean defaultValue) = getData() != 0;
+	eq IntTag.boolValue(boolean defaultValue) = getData() != 0;
+	eq LongTag.boolValue(boolean defaultValue) = getData() != 0;
 
 	syn int AnyTag.byteValue() = 0;
 	eq ByteTag.byteValue() = getData();

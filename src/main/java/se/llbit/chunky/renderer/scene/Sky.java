@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -29,6 +29,7 @@ import se.llbit.math.Ray;
 import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.DoubleTag;
+import se.llbit.nbt.IntTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.util.ProgramProperties;
 
@@ -45,6 +46,7 @@ public class Sky {
 	private String skymapFileName = "";
 	private Scene scene;
 	private double rotation;
+	private boolean mirrored = true;
 	
 	/**
 	 * @param scene
@@ -90,6 +92,7 @@ public class Sky {
 		skymapFileName = other.skymapFileName;
 		skymap = other.skymap;
 		rotation = other.rotation;
+		mirrored = other.mirrored;
 	}
 	
 	/**
@@ -110,6 +113,10 @@ public class Sky {
 	public void getSkyDiffuseColor(Ray ray, boolean blackBelowHorizon) {
 		if (blackBelowHorizon && ray.d.y < 0) {
 			ray.color.set(0, 0, 0, 1);
+			ray.hit = true;
+			return;
+		} else if (!mirrored && ray.d.y < 0) {
+			ray.color.set(0, 0, 1, 1);
 			ray.hit = true;
 			return;
 		} else if (skymap == null) {
@@ -230,8 +237,9 @@ public class Sky {
 			loadSkyMap(skymapNameTag.stringValue());
 		AnyTag rotationTag = worldTag.get("skyYaw");
 		if (!rotationTag.isError()) {
-			rotation = rotationTag.doubleValue();;
+			rotation = rotationTag.doubleValue();
 		}
+		mirrored = worldTag.get("skyMirrored").boolValue(true);
 	}
 
 	/**
@@ -242,5 +250,24 @@ public class Sky {
 		if (skymap != null)
 			worldTag.addItem("skymapFileName", new StringTag(skymapFileName));
 		worldTag.addItem("skyYaw", new DoubleTag(rotation));
+		worldTag.addItem("skyMirrored", new IntTag(mirrored));
+	}
+	
+	/**
+	 * Set sky mirroring at the horizon
+	 * @param b
+	 */
+	public void setMirrored(boolean b) {
+		if (b != mirrored) {
+			mirrored = b;
+			scene.refresh();
+		}
+	}
+	
+	/**
+	 * @return <code>true</code> if the sky is mirrored at the horizon
+	 */
+	public boolean isMirrored() {
+		return mirrored;
 	}
 }
