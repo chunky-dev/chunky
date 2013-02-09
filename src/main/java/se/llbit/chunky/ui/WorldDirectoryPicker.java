@@ -18,10 +18,13 @@ package se.llbit.chunky.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 
+import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -29,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import org.apache.log4j.Logger;
@@ -57,6 +61,15 @@ public class WorldDirectoryPicker extends JDialog {
 		super(parent, "World Directory Picker");
 		
 		setModalityType(ModalityType.APPLICATION_MODAL);
+		
+		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Close Dialog");
+		getRootPane().getActionMap().put("Close Dialog", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				closeDialog();
+			}
+		});
 		
 		JLabel lbl = new JLabel("Please select the directory where your Minecraft worlds are stored:");
 		
@@ -89,7 +102,7 @@ public class WorldDirectoryPicker extends JDialog {
 		cancelBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				WorldDirectoryPicker.this.dispose();
+				closeDialog();
 			}
 		});
 		
@@ -108,6 +121,8 @@ public class WorldDirectoryPicker extends JDialog {
 				}
 			}
 		});
+		
+		getRootPane().setDefaultButton(okBtn);
 		
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
@@ -147,6 +162,10 @@ public class WorldDirectoryPicker extends JDialog {
 		pack();
 		
 		setLocationRelativeTo(parent);
+	}
+
+	protected void closeDialog() {
+		dispose();
 	}
 
 	/**
