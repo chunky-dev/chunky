@@ -104,6 +104,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JSlider focalOffsetSlider = new JSlider();
 	private final JSlider fovSlider = new JSlider();
 	private final JButton loadSkymapBtn = new JButton();
+	private final JCheckBox mirrorSkyCB = new JCheckBox();
 	private final JTextField widthField = new JTextField();
 	private final JTextField heightField = new JTextField();
 	private final JSlider dofSlider = new JSlider();
@@ -732,7 +733,7 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(loadSelectedChunksBtn)
 					.addComponent(reloadChunksBtn))
 				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(sep1)
+				.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 					.addComponent(widthLbl)
@@ -747,7 +748,7 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(doubleCanvasSizeBtn)
 					.addComponent(makeDefaultBtn))
 				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(sep2)
+				.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(stillWaterCB)
 				.addComponent(clearWaterCB)
@@ -904,6 +905,12 @@ public class RenderControls extends JDialog implements ViewListener,
 		loadSkymapBtn.setToolTipText("Use a panoramic skymap");
 		loadSkymapBtn.addActionListener(loadSkymapListener);
 		
+		JSeparator sep1 = new JSeparator();
+		
+		mirrorSkyCB.setText("Mirror sky at horizon");
+		mirrorSkyCB.addActionListener(mirrorSkyListener);
+		updateMirroSkyCB();
+		
 		JButton unloadSkymapBtn = new JButton("Unload Skymap");
 		unloadSkymapBtn.setToolTipText("Use the default sky");
 		unloadSkymapBtn.addActionListener(new ActionListener() {
@@ -951,6 +958,8 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(unloadSkymapBtn)
 				)
+				.addComponent(mirrorSkyCB)
+				.addComponent(sep1)
 				.addComponent(atmosphereEnabled)
 				.addComponent(volumetricFogEnabled)
 				.addComponent(cloudsEnabled)
@@ -973,6 +982,10 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(skyRotationLbl)
 				.addComponent(skyRotationSlider)
 			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(mirrorSkyCB)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(atmosphereEnabled)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -1169,7 +1182,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(znegBtn)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep1)
+			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
 				.addComponent(fovLbl)
@@ -1185,7 +1198,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(focalOffsetField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(autoFocusBtn)
-			.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+			.addContainerGap()
 		);
 		return panel;
 	}
@@ -1212,6 +1225,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		atmosphereEnabled.removeActionListener(atmosphereListener);
 		atmosphereEnabled.setSelected(renderManager.scene().atmosphereEnabled());
 		atmosphereEnabled.addActionListener(atmosphereListener);
+	}
+
+	protected void updateMirroSkyCB() {
+		mirrorSkyCB.removeActionListener(mirrorSkyListener);
+		// TODO
+		//mirrorSkyCB.setSelected(renderManager.scene().atmosphereEnabled());
+		mirrorSkyCB.addActionListener(mirrorSkyListener);
 	}
 
 	protected void updateVolumetricFogCheckBox() {
@@ -1609,6 +1629,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
 			renderManager.scene().setCloudsEnabled(source.isSelected());
+		}
+	};
+	ActionListener mirrorSkyListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO
+			//JCheckBox source = (JCheckBox) e.getSource();
 		}
 	};
 	ActionListener biomeColorsCBListener = new ActionListener() {
@@ -2035,10 +2062,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateSunIntensitySlider();
 		updateSunIntensityField();
 		updateSunAzimuthSlider();
+		updateSunAzimuthField();
 		updateSunAltitudeSlider();
+		updateSunAltitudeField();
 		updateStillWater();
 		updateClearWater();
 		updateSkyRotation();
+		updateMirroSkyCB();
 		updateBiomeColorsCB();
 		updateAtmosphereCheckBox();
 		updateVolumetricFogCheckBox();
