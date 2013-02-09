@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -45,8 +45,9 @@ public class WorldDirectoryPicker extends JDialog {
 	private static final Logger logger =
 			Logger.getLogger(WorldDirectoryPicker.class);
 	
-	private File selectedDirectory;
 	private boolean accepted = false;
+	
+	private final JTextField pathField = new JTextField(40);
 	
 	/**
 	 * Constructor
@@ -59,27 +60,27 @@ public class WorldDirectoryPicker extends JDialog {
 		
 		JLabel lbl = new JLabel("Please select the directory where your Minecraft worlds are stored:");
 		
-		final JTextField scenePath = new JTextField(40);
+		File initialDirectory = null;
 		if (ProgramProperties.containsKey("worldDirectory")) {
-			selectedDirectory = new File(ProgramProperties.getProperty("worldDirectory"));
+			initialDirectory = new File(ProgramProperties.getProperty("worldDirectory"));
 		}
 		
-		if (!isValidSelection(selectedDirectory)) {
-			selectedDirectory = Chunky.getSavesDirectory();
+		if (!isValidSelection(initialDirectory)) {
+			initialDirectory = Chunky.getSavesDirectory();
 		}
-		scenePath.setText(selectedDirectory.getAbsolutePath());
+		pathField.setText(initialDirectory.getAbsolutePath());
 		
 		JButton browseBtn = new JButton("Browse...");
 		browseBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = new JFileChooser(selectedDirectory);
+				JFileChooser fileChooser = new JFileChooser(getSelectedDirectory());
 				fileChooser.setDialogTitle("Select Scene Directory");
 				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				int result = fileChooser.showOpenDialog(null);
 				if (result == JFileChooser.APPROVE_OPTION) {
-					selectedDirectory = fileChooser.getSelectedFile();
-					scenePath.setText(selectedDirectory.getAbsolutePath());
+					File selectedDirectory = fileChooser.getSelectedFile();
+					pathField.setText(selectedDirectory.getAbsolutePath());
 				}
 			}
 		});
@@ -96,11 +97,11 @@ public class WorldDirectoryPicker extends JDialog {
 		okBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (!isValidSelection(selectedDirectory)) {
+				if (!isValidSelection(getSelectedDirectory())) {
 					logger.warn("Please select a valid directory!");
 				} else {
 					ProgramProperties.setProperty("worldDirectory",
-							selectedDirectory.getAbsolutePath());
+							getSelectedDirectory().getAbsolutePath());
 					ProgramProperties.saveProperties();
 					accepted = true;
 					WorldDirectoryPicker.this.dispose();
@@ -117,7 +118,7 @@ public class WorldDirectoryPicker extends JDialog {
 				.addGroup(layout.createParallelGroup(Alignment.LEADING)
 					.addComponent(lbl)
 					.addGroup(layout.createSequentialGroup()
-						.addComponent(scenePath)
+						.addComponent(pathField)
 						.addPreferredGap(ComponentPlacement.RELATED)
 						.addComponent(browseBtn))
 					.addGroup(layout.createSequentialGroup()
@@ -134,7 +135,7 @@ public class WorldDirectoryPicker extends JDialog {
 				.addComponent(lbl)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addGroup(layout.createParallelGroup()
-					.addComponent(scenePath)
+					.addComponent(pathField)
 					.addComponent(browseBtn))
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addGroup(layout.createParallelGroup()
@@ -152,7 +153,7 @@ public class WorldDirectoryPicker extends JDialog {
 	 * @return The selected world saves directory
 	 */
 	public File getSelectedDirectory() {
-		return selectedDirectory;
+		return new File(pathField.getText());
 	}
 	
 	/**

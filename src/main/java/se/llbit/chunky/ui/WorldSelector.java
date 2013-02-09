@@ -20,24 +20,26 @@ import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
-import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.Messages;
@@ -57,9 +59,10 @@ public class WorldSelector extends JDialog implements ListSelectionListener {
 	private static final Logger logger =
 			Logger.getLogger(WorldSelector.class);
 	
-	private Chunky chunky;
-	private DefaultListModel listModel;
-	private JList worldList;
+	private final List<World> worlds = new ArrayList<World>();
+	private final Chunky chunky;
+	private DefaultTableModel tableModel;
+	private final JTable worldTbl = new JTable();
 
 	/**
 	 * Constructor 
@@ -69,17 +72,17 @@ public class WorldSelector extends JDialog implements ListSelectionListener {
 		super(chunky.getFrame());
 		this.chunky = chunky;
 		
-		initComponents();
-
+		setTitle(Messages.getString("WorldSelector.0")); //$NON-NLS-1$
+		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setModalityType(Dialog.ModalityType.MODELESS);
 		
-		setTitle(Messages.getString("WorldSelector.0")); //$NON-NLS-1$
+		initComponents();
+		fillWorldList();
+		
 		pack();
 		setLocationRelativeTo(chunky.getFrame());
 		setVisible(true);
-		
-		fillWorldList();
 	}
 	
 	private void fillWorldList() {
@@ -87,23 +90,30 @@ public class WorldSelector extends JDialog implements ListSelectionListener {
 	}
 
 	private void fillWorldList(File worldSavesDir) {
-		listModel.clear();
-		File[] worldDirs = null;
+		
+		tableModel = new DefaultTableModel();
+		tableModel.addColumn("World");
+		tableModel.addColumn("Directory");
+		tableModel.addColumn("Mode");
+		
+		worlds.clear();
 		if (worldSavesDir != null) {
-			worldDirs = worldSavesDir.listFiles(new FileFilter() {
-				@Override
-				public boolean accept(File file) {
-					return file.isDirectory();
-				}
-			});
-		}
-		if (worldDirs != null) {
-			for (File worldDir : worldDirs) {
-				if (World.isWorldDir(worldDir)) {
-					listModel.addElement(new World(worldDir, false));
+			for (File dir: worldSavesDir.listFiles()) {
+				if (World.isWorldDir(dir)) {
+					worlds.add(new World(dir, false));
 				}
 			}
 		}
+		Collections.sort(worlds);
+		for (World world : worlds) {
+			Object[] row = {
+					world.levelName(),
+					world.getWorldDirectory().getName(),
+					world.gameMode() };
+			tableModel.addRow(row);
+		}
+		
+		worldTbl.setModel(tableModel);
 		pack();
 	}
 
@@ -125,12 +135,9 @@ public class WorldSelector extends JDialog implements ListSelectionListener {
 		JButton browseBtn = new JButton();
 		JSeparator sep1 = new JSeparator();
 
-		listModel = new DefaultListModel();
-		worldList = new JList(listModel);
-		worldList.setVisibleRowCount(15);
-		worldList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		worldList.addListSelectionListener(this);
-		JScrollPane scrollPane = new JScrollPane(worldList);
+		worldTbl.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		worldTbl.getSelectionModel().addListSelectionListener(this);
+		JScrollPane scrollPane = new JScrollPane(worldTbl);
 		
 		selectWorldLbl.setText(Messages.getString("WorldSelector.1")); //$NON-NLS-1$
 
@@ -155,12 +162,12 @@ public class WorldSelector extends JDialog implements ListSelectionListener {
 		layout.setHorizontalGroup(layout.createParallelGroup()
 			.addGroup(layout.createSequentialGroup()
 				.addContainerGap()
-				.addGroup(layout.createParallelGroup(Alignment.LEADING)
-					.addComponent(selectWorldLbl, GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
-					.addComponent(browseBtn, GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
-					.addComponent(sep1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
-					.addComponent(selectWorldDirBtn, GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
+				.addGroup(layout.createParallelGroup()
+					.addComponent(selectWorldLbl, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+					.addComponent(browseBtn, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+					.addComponent(sep1)
+					.addComponent(selectWorldDirBtn, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
 				)
 				.addContainerGap()
 			)
@@ -170,9 +177,9 @@ public class WorldSelector extends JDialog implements ListSelectionListener {
 				.addContainerGap()
 				.addComponent(selectWorldLbl)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addComponent(scrollPane)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(sep1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+				.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 				.addPreferredGap(ComponentPlacement.RELATED)
 				.addComponent(browseBtn)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -187,8 +194,9 @@ public class WorldSelector extends JDialog implements ListSelectionListener {
 	@Override
 	public void valueChanged(ListSelectionEvent event) {
 		int selected = event.getFirstIndex();
-		World world = (World) listModel.get(selected);
-		chunky.loadWorld(world);
-		WorldSelector.this.dispose();
+		if (selected >= 0 && selected < worlds.size()) {
+			chunky.loadWorld(worlds.get(selected));
+			WorldSelector.this.dispose();
+		}
 	}
 }

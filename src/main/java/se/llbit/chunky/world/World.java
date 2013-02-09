@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -51,9 +51,9 @@ import se.llbit.util.Pair;
  * It has a map of all chunks in the world and is responsible for parsing
  * chunks when needed. All rendering is done through the WorldRenderer class.
  * 
- * @author Jesper Öqvist (jesper@llbit.se)
+ * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class World {
+public class World implements Comparable<World> {
 	
 	private static final Logger logger =
 			Logger.getLogger(World.class);
@@ -116,6 +116,8 @@ public class World {
     private int spawnX;
     private int spawnY;
     private int spawnZ;
+
+	private int gameMode = 0;
 	
 	/**
 	 * Create new world.
@@ -207,6 +209,7 @@ public class World {
             request.add(".Data.Player.SpawnY");
             request.add(".Data.Player.SpawnZ");
 			request.add(".Data.LevelName");
+			request.add(".Data.GameType");
 			Map<String, AnyTag> result = NamedTag.quickParse(in, request);
 			
 			AnyTag dim = result.get(".Data.Player.Dimension"); 
@@ -226,6 +229,9 @@ public class World {
 			AnyTag spawnX = result.get(".Data.Player.SpawnX");
             AnyTag spawnY = result.get(".Data.Player.SpawnY");
             AnyTag spawnZ = result.get(".Data.Player.SpawnZ");
+            AnyTag gameType = result.get(".Data.GameType");
+            
+            gameMode  = gameType.intValue(0);
 			
 			playerX = posX.doubleValue();
 			playerY = posY.doubleValue();
@@ -240,9 +246,7 @@ public class World {
 			if (havePlayerPos())
 			    currentLayer = playerLocY();
 			
-			AnyTag levelNameTag = result.get(".Data.LevelName");
-			if (!levelNameTag.isError())
-			    levelName = levelNameTag.stringValue();
+			levelName = result.get(".Data.LevelName").stringValue(levelName);
 			
 			in.close();
 			
@@ -806,7 +810,7 @@ public class World {
 	 * contains a level.dat file
 	 */
 	public static boolean isWorldDir(File worldDir) {
-		if (worldDir.exists() && worldDir.isDirectory()) {
+		if (worldDir.isDirectory()) {
 			File levelDat = new File(worldDir, "level.dat");
 			return levelDat.exists() && levelDat.isFile();
 		}
@@ -874,5 +878,27 @@ public class World {
 	public void reload() {
 		regionMap.clear();
 		loadAdditionalData(true);
+	}
+
+	/**
+	 * @return String describing the game-mode of this world
+	 */
+	public String gameMode() {
+		switch (gameMode) {
+		case 0:
+			return "Survival";
+		case 1:
+			return "Creative";
+		case 2:
+			return "Adventure";
+		default:
+			return "Unknown";
+		}
+	}
+
+	@Override
+	public int compareTo(World o) {
+		// just compare the world names
+		return toString().compareToIgnoreCase(o.toString());
 	}
 }
