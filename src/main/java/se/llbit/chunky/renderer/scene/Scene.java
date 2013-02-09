@@ -140,6 +140,16 @@ public class Scene implements Refreshable {
 	public static final double DEFAULT_EMITTER_INTENSITY = 13;
 	
 	/**
+	 * Minimum emitter intensity
+	 */
+	public static final double MIN_EMITTER_INTENSITY = 0.01;
+	
+	/**
+	 * Maximum emitter intensity
+	 */
+	public static final double MAX_EMITTER_INTENSITY = 1000;
+	
+	/**
 	 * Current CVF file format version
 	 */
 	public static final int CVF_VERSION = 1;

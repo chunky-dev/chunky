@@ -41,12 +41,12 @@ public class Sun {
 	/**
 	 * Maximum sun intensity
 	 */
-	public static final double MAX_INTENSITY = 10;
+	public static final double MAX_INTENSITY = 50;
 	
 	/**
 	 * Minimum sun intensity
 	 */
-	public static final double MIN_INTENSITY = 0;
+	public static final double MIN_INTENSITY = 0.1;
 	
 	private static final double xZenithChroma[][] = {
 		{0.00166, -0.00375, 0.00209, 0},

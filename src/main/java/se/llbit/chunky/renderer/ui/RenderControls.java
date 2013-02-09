@@ -1361,17 +1361,26 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
-			renderManager.scene().setEmitterIntensity(source.getValue()*2);
+			double value = (double) (source.getValue() - source.getMinimum())
+					/ (source.getMaximum() - source.getMinimum());
+			double logMin = Math.log10(Scene.MIN_EMITTER_INTENSITY);
+			double logMax = Math.log10(Scene.MAX_EMITTER_INTENSITY);
+			double scale = logMax - logMin;
+			renderManager.scene().setEmitterIntensity(
+					Math.pow(10, value * scale + logMin));
 		}
 	};
 	ChangeListener sunIntensityListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
-			double value = (double) (source.getValue() - source.getMinimum()) /
-					(source.getMaximum() - source.getMinimum());
-			double scale = Sun.MAX_INTENSITY - Sun.MIN_INTENSITY;
-			renderManager.scene().sun().setIntensity(value * scale + Sun.MIN_INTENSITY);
+			double value = (double) (source.getValue() - source.getMinimum())
+					/ (source.getMaximum() - source.getMinimum());
+			double logMin = Math.log10(Sun.MIN_INTENSITY);
+			double logMax = Math.log10(Sun.MAX_INTENSITY);
+			double scale = logMax - logMin;
+			renderManager.scene().sun().setIntensity(
+					Math.pow(10, value * scale + logMin));
 		}
 	};
 	ChangeListener sunYawListener = new ChangeListener() {
@@ -1638,15 +1647,24 @@ public class RenderControls extends JDialog implements ViewListener,
 	
 	protected void updateEmitterIntensitySlider() {
 		emitterIntensitySlider.removeChangeListener(emitterIntensityListener);
-		emitterIntensitySlider.setValue((int) (renderManager.scene().getEmitterIntensity()/2));
+		double logMin = Math.log10(Scene.MIN_EMITTER_INTENSITY);
+		double logMax = Math.log10(Scene.MAX_EMITTER_INTENSITY);
+		double value = (Math.log10(renderManager.scene().getEmitterIntensity()) -
+				logMin) / (logMax - logMin);
+		double scale = emitterIntensitySlider.getMaximum() -
+				emitterIntensitySlider.getMinimum();
+		emitterIntensitySlider.setValue((int) (value * scale + emitterIntensitySlider.getMinimum()));
 		emitterIntensitySlider.addChangeListener(emitterIntensityListener);
 	}
 	
 	protected void updateSunIntensitySlider() {
 		sunIntensitySlider.removeChangeListener(sunIntensityListener);
-		double value = (renderManager.scene().sun().getIntensity() - Sun.MIN_INTENSITY) /
-				(Sun.MAX_INTENSITY - Sun.MIN_INTENSITY);
-		double scale = sunIntensitySlider.getMaximum() - sunIntensitySlider.getMinimum();
+		double logMin = Math.log10(Sun.MIN_INTENSITY);
+		double logMax = Math.log10(Sun.MAX_INTENSITY);
+		double value = (Math.log10(renderManager.scene().sun().getIntensity()) -
+				logMin) / (logMax - logMin);
+		double scale = sunIntensitySlider.getMaximum() -
+				sunIntensitySlider.getMinimum();
 		sunIntensitySlider.setValue((int) (value * scale + sunIntensitySlider.getMinimum()));
 		sunIntensitySlider.addChangeListener(sunIntensityListener);
 	}
