@@ -69,6 +69,7 @@ import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
+import se.llbit.math.QuickMath;
 import se.llbit.util.ProgramProperties;
 
 /**
@@ -804,7 +805,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		emitterIntensityField.addActionListener(emitterIntensityFieldListener);
 		updateEmitterIntensityField();
 		
-		sunAzimuthSlider.setMinimum(1);
+		sunAzimuthSlider.setMinimum(0);
 		sunAzimuthSlider.setMaximum(100);
 		sunAzimuthSlider.addChangeListener(sunAzimuthListener);
 		updateSunAzimuthSlider();
@@ -813,7 +814,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		sunAzimuthField.addActionListener(sunAzimuthFieldListener);
 		updateSunAzimuthField();
 		
-		sunAltitudeSlider.setMinimum(1);
+		sunAltitudeSlider.setMinimum(0);
 		sunAltitudeSlider.setMaximum(100);
 		sunAltitudeSlider.addChangeListener(sunAltitudeListener);
 		updateSunAltitudeSlider();
@@ -846,6 +847,8 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addGroup(layout.createParallelGroup()
 						.addComponent(emitterIntensityField)
 						.addComponent(sunIntensityField)
+						.addComponent(sunAzimuthField)
+						.addComponent(sunAltitudeField)
 					)
 				)
 				.addComponent(changeSunColorBtn)
@@ -873,11 +876,13 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addGroup(layout.createParallelGroup()
 				.addComponent(sunAzimuthLbl)
 				.addComponent(sunAzimuthSlider)
+				.addComponent(sunAzimuthField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 			)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
 				.addComponent(sunAltitudeLbl)
 				.addComponent(sunAltitudeSlider)
+				.addComponent(sunAltitudeField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(changeSunColorBtn)
@@ -1422,14 +1427,22 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
-			renderManager.scene().sun().setAzimuth(source.getValue() * Math.PI / 50);
+			double value = (double) (source.getValue() - source.getMinimum())
+					/ (source.getMaximum() - source.getMinimum());
+			double scale = Math.PI * 2;
+			renderManager.scene().sun().setAzimuth(value * scale);
+			updateSunAzimuthField();
 		}
 	};
 	ChangeListener sunAltitudeListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
-			renderManager.scene().sun().setAltitude(source.getValue() * Math.PI / 200);
+			double value = (double) (source.getValue() - source.getMinimum())
+					/ (source.getMaximum() - source.getMinimum());
+			double scale = Math.PI / 2;
+			renderManager.scene().sun().setAltitude(value * scale);
+			updateSunAltitudeField();
 		}
 	};
 	ChangeListener dofListener = new ChangeListener() {
@@ -1532,8 +1545,9 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				double value = numberFormat.parse(source.getText()).doubleValue();
-				renderManager.scene().sun().setAzimuth(value);
+				renderManager.scene().sun().setAzimuth(QuickMath.degToRad(value));
 				updateSunAzimuthField();
+				updateSunAzimuthSlider();
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
 			}
@@ -1545,8 +1559,9 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				double value = numberFormat.parse(source.getText()).doubleValue();
-				renderManager.scene().sun().setAltitude(value);
+				renderManager.scene().sun().setAltitude(QuickMath.degToRad(value));
 				updateSunAltitudeField();
+				updateSunAltitudeSlider();
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
 			}
@@ -1728,7 +1743,9 @@ public class RenderControls extends JDialog implements ViewListener,
 	
 	protected void updateSunAltitudeSlider() {
 		sunAltitudeSlider.removeChangeListener(sunAltitudeListener);
-		sunAltitudeSlider.setValue((int) (renderManager.scene().sun().getAltitude() * 200 / Math.PI));
+		double value = renderManager.scene().sun().getAltitude() / (Math.PI / 2);
+		double scale = sunAltitudeSlider.getMaximum() - sunAltitudeSlider.getMinimum();
+		sunAltitudeSlider.setValue((int) (value * scale + sunAltitudeSlider.getMinimum()));
 		sunAltitudeSlider.addChangeListener(sunAltitudeListener);
 	}
 	
@@ -1758,7 +1775,9 @@ public class RenderControls extends JDialog implements ViewListener,
 	
 	protected void updateSunAzimuthSlider() {
 		sunAzimuthSlider.removeChangeListener(sunAzimuthListener);
-		sunAzimuthSlider.setValue((int) (renderManager.scene().sun().getAzimuth() * 50 / Math.PI));
+		double value = renderManager.scene().sun().getAzimuth() / (Math.PI * 2);
+		double scale = sunAzimuthSlider.getMaximum() - sunAzimuthSlider.getMinimum();
+		sunAzimuthSlider.setValue((int) (value * scale + sunAzimuthSlider.getMinimum()));
 		sunAzimuthSlider.addChangeListener(sunAzimuthListener);
 	}
 	
@@ -1801,13 +1820,15 @@ public class RenderControls extends JDialog implements ViewListener,
 	
 	protected void updateSunAzimuthField() {
 		sunAzimuthField.removeActionListener(sunAzimuthFieldListener);
-		sunAzimuthField.setText(String.format("%.2f", renderManager.scene().getExposure()));
+		sunAzimuthField.setText(String.format("%.2f",
+				QuickMath.radToDeg(renderManager.scene().sun().getAzimuth())));
 		sunAzimuthField.addActionListener(sunAzimuthFieldListener);
 	}
 	
 	protected void updateSunAltitudeField() {
 		sunAltitudeField.removeActionListener(sunAltitudeFieldListener);
-		sunAltitudeField.setText(String.format("%.2f", renderManager.scene().sun().getAltitude()));
+		sunAltitudeField.setText(String.format("%.2f",
+				QuickMath.radToDeg(renderManager.scene().sun().getAltitude())));
 		sunAltitudeField.addActionListener(sunAltitudeFieldListener);
 	}
 	

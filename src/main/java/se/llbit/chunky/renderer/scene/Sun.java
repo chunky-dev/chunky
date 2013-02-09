@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.util.Random;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
@@ -291,7 +292,7 @@ public class Sun {
 	 * @param value
 	 */
 	public void setAzimuth(double value) {
-		azimuth = value;
+		azimuth = QuickMath.modulo(value, Math.PI*2);
 		initSun();
 		scene.refresh();
 	}
@@ -301,7 +302,7 @@ public class Sun {
 	 * @param value
 	 */
 	public void setAltitude(double value) {
-		altitude = value;
+		altitude = QuickMath.clamp(value, 0, Math.PI/2);
 		initSun();
 		scene.refresh();
 	}
