@@ -122,7 +122,9 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JButton stopRenderBtn = new JButton();
 	private final JCheckBox clearWaterCB = new JCheckBox();
 	private final JSlider sunIntensitySlider = new JSlider();
+	private final JTextField sunIntensityField = new JTextField();
 	private final JSlider emitterIntensitySlider = new JSlider();
+	private final JTextField emitterIntensityField = new JTextField();
 	private final JCheckBox atmosphereEnabled = new JCheckBox();
 	private final JCheckBox volumetricFogEnabled = new JCheckBox();
 	private final JCheckBox cloudsEnabled = new JCheckBox();
@@ -792,6 +794,14 @@ public class RenderControls extends JDialog implements ViewListener,
 		sunIntensitySlider.addChangeListener(sunIntensityListener);
 		updateSunIntensitySlider();
 		
+		sunIntensityField.setColumns(5);
+		sunIntensityField.addActionListener(sunIntensityFieldListener);
+		updateSunIntensityField();
+		
+		emitterIntensityField.setColumns(5);
+		emitterIntensityField.addActionListener(emitterIntensityFieldListener);
+		updateEmitterIntensityField();
+		
 		sunYawSlider.setMinimum(1);
 		sunYawSlider.setMaximum(100);
 		sunYawSlider.addChangeListener(sunYawListener);
@@ -816,40 +826,54 @@ public class RenderControls extends JDialog implements ViewListener,
 						.addComponent(emitterIntensityLbl)
 						.addComponent(sunIntensityLbl)
 						.addComponent(sunYawLbl)
-						.addComponent(sunPitchLbl))
+						.addComponent(sunPitchLbl)
+					)
 					.addGroup(layout.createParallelGroup()
 						.addComponent(emitterIntensitySlider)
 						.addComponent(sunIntensitySlider)
 						.addComponent(sunYawSlider)
-						.addComponent(sunPitchSlider)))
+						.addComponent(sunPitchSlider)
+					)
+					.addGroup(layout.createParallelGroup()
+						.addComponent(emitterIntensityField)
+						.addComponent(sunIntensityField)
+					)
+				)
 				.addComponent(changeSunColorBtn)
 			)
 			.addContainerGap()
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
-				.addContainerGap()
-				.addComponent(enableEmitters)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(layout.createParallelGroup()
-					.addComponent(emitterIntensityLbl)
-					.addComponent(emitterIntensitySlider))
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(directLight)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(layout.createParallelGroup()
-					.addComponent(sunIntensityLbl)
-					.addComponent(sunIntensitySlider))
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addGroup(layout.createParallelGroup()
-					.addComponent(sunYawLbl)
-					.addComponent(sunYawSlider))
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(layout.createParallelGroup()
-					.addComponent(sunPitchLbl)
-					.addComponent(sunPitchSlider))
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(changeSunColorBtn)
-				.addContainerGap());
+			.addContainerGap()
+			.addComponent(enableEmitters)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(emitterIntensityLbl)
+				.addComponent(emitterIntensitySlider)
+				.addComponent(emitterIntensityField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(directLight)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(sunIntensityLbl)
+				.addComponent(sunIntensitySlider)
+				.addComponent(sunIntensityField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(sunYawLbl)
+				.addComponent(sunYawSlider)
+			)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(sunPitchLbl)
+				.addComponent(sunPitchSlider)
+			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(changeSunColorBtn)
+			.addContainerGap()
+		);
 		return panel;
 	}
 	
@@ -1368,6 +1392,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			double scale = logMax - logMin;
 			renderManager.scene().setEmitterIntensity(
 					Math.pow(10, value * scale + logMin));
+			updateEmitterIntensityField();
 		}
 	};
 	ChangeListener sunIntensityListener = new ChangeListener() {
@@ -1381,6 +1406,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			double scale = logMax - logMin;
 			renderManager.scene().sun().setIntensity(
 					Math.pow(10, value * scale + logMin));
+			updateSunIntensityField();
 		}
 	};
 	ChangeListener sunYawListener = new ChangeListener() {
@@ -1460,6 +1486,32 @@ public class RenderControls extends JDialog implements ViewListener,
 				value = Math.min(value, Scene.MAX_EXPOSURE);
 				renderManager.scene().setExposure(value);
 				updateExposureSlider();
+			} catch (NumberFormatException ex) {
+			} catch (ParseException ex) {
+			}
+		}
+	};
+	ActionListener sunIntensityFieldListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JTextField source = (JTextField) e.getSource();
+			try {
+				double value = numberFormat.parse(source.getText()).doubleValue();
+				renderManager.scene().sun().setIntensity(value);
+				updateSunIntensitySlider();
+			} catch (NumberFormatException ex) {
+			} catch (ParseException ex) {
+			}
+		}
+	};
+	ActionListener emitterIntensityFieldListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JTextField source = (JTextField) e.getSource();
+			try {
+				double value = numberFormat.parse(source.getText()).doubleValue();
+				renderManager.scene().setEmitterIntensity(value);
+				updateEmitterIntensitySlider();
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
 			}
@@ -1712,6 +1764,18 @@ public class RenderControls extends JDialog implements ViewListener,
 		exposureField.addActionListener(exposureFieldListener);
 	}
 	
+	protected void updateSunIntensityField() {
+		sunIntensityField.removeActionListener(sunIntensityFieldListener);
+		sunIntensityField.setText(String.format("%.2f", renderManager.scene().sun().getIntensity()));
+		sunIntensityField.addActionListener(sunIntensityFieldListener);
+	}
+	
+	protected void updateEmitterIntensityField() {
+		emitterIntensityField.removeActionListener(emitterIntensityFieldListener);
+		emitterIntensityField.setText(String.format("%.2f", renderManager.scene().getEmitterIntensity()));
+		emitterIntensityField.addActionListener(emitterIntensityFieldListener);
+	}
+	
 	protected void updateExposureSlider() {
 		exposureSlider.removeChangeListener(exposureListener);
 		double logMin = Math.log10(Scene.MIN_EXPOSURE);
@@ -1899,7 +1963,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateWidthField();
 		updateHeightField();
 		updateEmitterIntensitySlider();
+		updateEmitterIntensityField();
 		updateSunIntensitySlider();
+		updateSunIntensityField();
 		updateSunYawSlider();
 		updateSunPitchSlider();
 		updateStillWater();
