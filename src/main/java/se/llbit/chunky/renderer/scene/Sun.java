@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -139,8 +139,8 @@ public class Sun {
 	
 	private double intensity = DEFAULT_INTENSITY;
 	
-	private double polarAngle = Math.PI / 2.5;
-	private double thetaZ = Math.PI / 3;
+	private double azimuth = Math.PI / 2.5;
+	private double altitude = Math.PI / 3;
 	
 	private Vector3d su = new Vector3d();
 	private Vector3d sv = new Vector3d();
@@ -210,16 +210,16 @@ public class Sun {
 	 * @param other
 	 */
 	public void set(Sun other) {
-		polarAngle = other.polarAngle;
-		thetaZ = other.thetaZ;
+		azimuth = other.azimuth;
+		altitude = other.altitude;
 		color.set(other.color);
 		intensity = other.intensity;
 		initSun();
 	}
 	
 	private void initSun() {
-		double theta = polarAngle;
-		double phi = thetaZ;
+		double theta = azimuth;
+		double phi = altitude;
 		
 		sw.x = Math.cos(theta);
 		sw.y = Math.sin(phi);
@@ -250,8 +250,8 @@ public class Sun {
 	 */
 	public CompoundTag store() {
 		CompoundTag sunTag = new CompoundTag();
-		sunTag.addItem("pitch", new DoubleTag(thetaZ));
-		sunTag.addItem("yaw", new DoubleTag(polarAngle));
+		sunTag.addItem("altitude", new DoubleTag(altitude));
+		sunTag.addItem("azimuth", new DoubleTag(azimuth));
 		sunTag.addItem("intensity", new DoubleTag(intensity));
 		CompoundTag colorTag = new CompoundTag();
 		colorTag.addItem("red", new DoubleTag(color.x));
@@ -266,8 +266,14 @@ public class Sun {
 	 * @param tag
 	 */
 	public void load(CompoundTag tag) {
-		thetaZ = tag.get("pitch").doubleValue();
-		polarAngle = tag.get("yaw").doubleValue();
+		if (!tag.get("pitch").isError())
+			altitude = tag.get("pitch").doubleValue();
+		else
+			altitude = tag.get("altitude").doubleValue();
+		if (!tag.get("yaw").isError())
+			azimuth = tag.get("yaw").doubleValue();
+		else
+			azimuth = tag.get("azimuth").doubleValue();
 		intensity = tag.get("intensity").doubleValue(DEFAULT_INTENSITY);
 
 		if (tag.get("color").isCompoundTag()) {
@@ -281,21 +287,21 @@ public class Sun {
 	}
 
 	/**
-	 * Set the sun polar angle
+	 * Angle of the sun around the horizon, measured from north
 	 * @param value
 	 */
-	public void setPolarAngle(double value) {
-		polarAngle = value;
+	public void setAzimuth(double value) {
+		azimuth = value;
 		initSun();
 		scene.refresh();
 	}
 
 	/**
-	 * Set the sun zenith angle
+	 * Sun altitude from the horizon
 	 * @param value
 	 */
-	public void setTheta(double value) {
-		thetaZ = value;
+	public void setAltitude(double value) {
+		altitude = value;
 		initSun();
 		scene.refresh();
 	}
@@ -303,15 +309,15 @@ public class Sun {
 	/**
 	 * @return Zenith angle
 	 */
-	public double getTheta() {
-		return thetaZ;
+	public double getAltitude() {
+		return altitude;
 	}
 
 	/**
-	 * @return Polar angle
+	 * @return Azimuth
 	 */
-	public double getPolarAngle() {
-		return polarAngle;
+	public double getAzimuth() {
+		return azimuth;
 	}
 
 	/**
@@ -375,7 +381,7 @@ public class Sun {
 	}
 	
 	private void updateSkylightValues() {
-		double sunTheta = Math.PI/2 - thetaZ;
+		double sunTheta = Math.PI/2 - altitude;
 		double cosTheta = Math.cos(sunTheta);
 		double cos2Theta = cosTheta*cosTheta;
 		double chi = (4.0/9.0 - turb/120.0)*(Math.PI - 2*sunTheta);

@@ -95,9 +95,11 @@ public class RenderControls extends JDialog implements ViewListener,
 	private NumberFormat numberFormat =
 			NumberFormat.getInstance();
 	
-	private final JSlider sunYawSlider = new JSlider();
+	private final JSlider sunAzimuthSlider = new JSlider();
+	private final JTextField sunAzimuthField = new JTextField();
 	private final JSlider skyRotationSlider = new JSlider();
-	private final JSlider sunPitchSlider = new JSlider();
+	private final JSlider sunAltitudeSlider = new JSlider();
+	private final JTextField sunAltitudeField = new JTextField();
 	private final JSlider focalOffsetSlider = new JSlider();
 	private final JSlider fovSlider = new JSlider();
 	private final JButton loadSkymapBtn = new JButton();
@@ -779,8 +781,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		enableEmitters.setSelected(renderManager.scene().getEmittersEnabled());
 		enableEmitters.addActionListener(emittersListener);
 		
-		JLabel sunYawLbl = new JLabel("Sun yaw: ");
-		JLabel sunPitchLbl = new JLabel("Sun pitch: ");
+		JLabel sunAzimuthLbl = new JLabel("Sun azimuth: ");
+		JLabel sunAltitudeLbl = new JLabel("Sun altitude: ");
 
 		JLabel emitterIntensityLbl = new JLabel("Emitter intensity: ");
 		emitterIntensitySlider.setMinimum(1);
@@ -802,16 +804,23 @@ public class RenderControls extends JDialog implements ViewListener,
 		emitterIntensityField.addActionListener(emitterIntensityFieldListener);
 		updateEmitterIntensityField();
 		
-		sunYawSlider.setMinimum(1);
-		sunYawSlider.setMaximum(100);
-		sunYawSlider.addChangeListener(sunYawListener);
+		sunAzimuthSlider.setMinimum(1);
+		sunAzimuthSlider.setMaximum(100);
+		sunAzimuthSlider.addChangeListener(sunAzimuthListener);
+		updateSunAzimuthSlider();
 		
-		sunPitchSlider.setMinimum(1);
-		sunPitchSlider.setMaximum(100);
-		sunPitchSlider.addChangeListener(sunPitchListener);
+		sunAzimuthField.setColumns(5);
+		sunAzimuthField.addActionListener(sunAzimuthFieldListener);
+		updateSunAzimuthField();
 		
-		updateSunYawSlider();
-		updateSunPitchSlider();
+		sunAltitudeSlider.setMinimum(1);
+		sunAltitudeSlider.setMaximum(100);
+		sunAltitudeSlider.addChangeListener(sunAltitudeListener);
+		updateSunAltitudeSlider();
+		
+		sunAltitudeField.setColumns(5);
+		sunAltitudeField.addActionListener(sunAltitudeFieldListener);
+		updateSunAltitudeField();
 		
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
@@ -825,14 +834,14 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addGroup(layout.createParallelGroup()
 						.addComponent(emitterIntensityLbl)
 						.addComponent(sunIntensityLbl)
-						.addComponent(sunYawLbl)
-						.addComponent(sunPitchLbl)
+						.addComponent(sunAzimuthLbl)
+						.addComponent(sunAltitudeLbl)
 					)
 					.addGroup(layout.createParallelGroup()
 						.addComponent(emitterIntensitySlider)
 						.addComponent(sunIntensitySlider)
-						.addComponent(sunYawSlider)
-						.addComponent(sunPitchSlider)
+						.addComponent(sunAzimuthSlider)
+						.addComponent(sunAltitudeSlider)
 					)
 					.addGroup(layout.createParallelGroup()
 						.addComponent(emitterIntensityField)
@@ -862,13 +871,13 @@ public class RenderControls extends JDialog implements ViewListener,
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
-				.addComponent(sunYawLbl)
-				.addComponent(sunYawSlider)
+				.addComponent(sunAzimuthLbl)
+				.addComponent(sunAzimuthSlider)
 			)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
-				.addComponent(sunPitchLbl)
-				.addComponent(sunPitchSlider)
+				.addComponent(sunAltitudeLbl)
+				.addComponent(sunAltitudeSlider)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(changeSunColorBtn)
@@ -1409,18 +1418,18 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateSunIntensityField();
 		}
 	};
-	ChangeListener sunYawListener = new ChangeListener() {
+	ChangeListener sunAzimuthListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
-			renderManager.scene().sun().setPolarAngle(source.getValue() * Math.PI / 50);
+			renderManager.scene().sun().setAzimuth(source.getValue() * Math.PI / 50);
 		}
 	};
-	ChangeListener sunPitchListener = new ChangeListener() {
+	ChangeListener sunAltitudeListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
-			renderManager.scene().sun().setTheta(source.getValue() * Math.PI / 200);
+			renderManager.scene().sun().setAltitude(source.getValue() * Math.PI / 200);
 		}
 	};
 	ChangeListener dofListener = new ChangeListener() {
@@ -1512,6 +1521,32 @@ public class RenderControls extends JDialog implements ViewListener,
 				double value = numberFormat.parse(source.getText()).doubleValue();
 				renderManager.scene().setEmitterIntensity(value);
 				updateEmitterIntensitySlider();
+			} catch (NumberFormatException ex) {
+			} catch (ParseException ex) {
+			}
+		}
+	};
+	ActionListener sunAzimuthFieldListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JTextField source = (JTextField) e.getSource();
+			try {
+				double value = numberFormat.parse(source.getText()).doubleValue();
+				renderManager.scene().sun().setAzimuth(value);
+				updateSunAzimuthField();
+			} catch (NumberFormatException ex) {
+			} catch (ParseException ex) {
+			}
+		}
+	};
+	ActionListener sunAltitudeFieldListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JTextField source = (JTextField) e.getSource();
+			try {
+				double value = numberFormat.parse(source.getText()).doubleValue();
+				renderManager.scene().sun().setAltitude(value);
+				updateSunAltitudeField();
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
 			}
@@ -1691,10 +1726,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		skyRotationSlider.addChangeListener(skyRotationListener);
 	}
 	
-	protected void updateSunPitchSlider() {
-		sunPitchSlider.removeChangeListener(sunPitchListener);
-		sunPitchSlider.setValue((int) (renderManager.scene().sun().getTheta() * 200 / Math.PI));
-		sunPitchSlider.addChangeListener(sunPitchListener);
+	protected void updateSunAltitudeSlider() {
+		sunAltitudeSlider.removeChangeListener(sunAltitudeListener);
+		sunAltitudeSlider.setValue((int) (renderManager.scene().sun().getAltitude() * 200 / Math.PI));
+		sunAltitudeSlider.addChangeListener(sunAltitudeListener);
 	}
 	
 	protected void updateEmitterIntensitySlider() {
@@ -1721,10 +1756,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		sunIntensitySlider.addChangeListener(sunIntensityListener);
 	}
 	
-	protected void updateSunYawSlider() {
-		sunYawSlider.removeChangeListener(sunYawListener);
-		sunYawSlider.setValue((int) (renderManager.scene().sun().getPolarAngle() * 50 / Math.PI));
-		sunYawSlider.addChangeListener(sunYawListener);
+	protected void updateSunAzimuthSlider() {
+		sunAzimuthSlider.removeChangeListener(sunAzimuthListener);
+		sunAzimuthSlider.setValue((int) (renderManager.scene().sun().getAzimuth() * 50 / Math.PI));
+		sunAzimuthSlider.addChangeListener(sunAzimuthListener);
 	}
 	
 	protected void updateDofSlider() {
@@ -1762,6 +1797,18 @@ public class RenderControls extends JDialog implements ViewListener,
 		exposureField.removeActionListener(exposureFieldListener);
 		exposureField.setText(String.format("%.2f", renderManager.scene().getExposure()));
 		exposureField.addActionListener(exposureFieldListener);
+	}
+	
+	protected void updateSunAzimuthField() {
+		sunAzimuthField.removeActionListener(sunAzimuthFieldListener);
+		sunAzimuthField.setText(String.format("%.2f", renderManager.scene().getExposure()));
+		sunAzimuthField.addActionListener(sunAzimuthFieldListener);
+	}
+	
+	protected void updateSunAltitudeField() {
+		sunAltitudeField.removeActionListener(sunAltitudeFieldListener);
+		sunAltitudeField.setText(String.format("%.2f", renderManager.scene().sun().getAltitude()));
+		sunAltitudeField.addActionListener(sunAltitudeFieldListener);
 	}
 	
 	protected void updateSunIntensityField() {
@@ -1966,8 +2013,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateEmitterIntensityField();
 		updateSunIntensitySlider();
 		updateSunIntensityField();
-		updateSunYawSlider();
-		updateSunPitchSlider();
+		updateSunAzimuthSlider();
+		updateSunAltitudeSlider();
 		updateStillWater();
 		updateClearWater();
 		updateSkyRotation();
