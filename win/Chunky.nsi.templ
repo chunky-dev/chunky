@@ -98,10 +98,13 @@ SectionEnd
 
 Section "Start Menu Shortcuts" SecSM
 
+	WriteINIStr "$INSTDIR\Wiki.URL" "InternetShortcut" "URL" "http://chunky.llbit.se"
+
 	CreateDirectory "$SMPROGRAMS\Chunky"
 	CreateShortCut "$SMPROGRAMS\Chunky\Chunky (more memory).lnk" "$JavaExe" " -Xms512m -Xmx2g -jar $\"$INSTDIR\Chunky.jar$\"" "$INSTDIR\chunky.ico"
 	CreateShortCut "$SMPROGRAMS\Chunky\Chunky.lnk" "$INSTDIR\Chunky.jar" "" "$INSTDIR\chunky.ico"
 	CreateShortCut "$SMPROGRAMS\Chunky\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
+	CreateShortCut "$SMPROGRAMS\Chunky\Wiki.lnk" "$INSTDIR\Wiki.URL"
 
 SectionEnd
 
