@@ -407,7 +407,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		
 		JSeparator sep1 = new JSeparator();
 		
-		JLabel waterWorldLbl = new JLabel("Note: Chunks must be reloaded after toggling the water world mode!");
+		JLabel waterWorldLbl = new JLabel(
+				"Note: All chunks will be reloaded after changing the water world options!");
 		JLabel waterHeightLbl = new JLabel("Water height: ");
 		waterHeightField.setColumns(5);
 		waterHeightField.setText("" + World.SEA_LEVEL);
@@ -417,6 +418,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				JTextField source = (JTextField) e.getSource();
 				renderManager.scene().setWaterHeight(Integer.parseInt(source.getText()));
+				sceneManager.reloadChunks();
 				updateWaterHeight();
 			}
 		});
@@ -433,10 +435,10 @@ public class RenderControls extends JDialog implements ViewListener,
 				} else {
 					renderManager.scene().setWaterHeight(0);
 				}
+				sceneManager.reloadChunks();
 				updateWaterHeight();
 			}
 		});
-		
 		
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
@@ -475,7 +477,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addComponent(waterWorldCB)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
-				.addComponent(waterHeightLbl, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				.addComponent(waterHeightLbl)
 				.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 			)
 			.addContainerGap()
