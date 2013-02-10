@@ -97,7 +97,13 @@ public class RegionFile {
                 lastModified = path.lastModified();
             }
 
-            file = new RandomAccessFile(path, "rw");
+            try {
+	            file = new RandomAccessFile(path, "rw");
+            } catch (FileNotFoundException e) {
+            	// llbit 2013-02-10:
+            	// could not open in rw mode, try to open in r mode
+            	file = new RandomAccessFile(path, "r");
+            }
 
             if (file.length() < SECTOR_BYTES) {
                 /* we need to write the chunk offset table */
