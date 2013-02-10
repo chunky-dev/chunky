@@ -45,4 +45,17 @@ public class SlabModel {
 		}
 		return false;
 	}
+	
+	public static boolean intersect(Ray ray, Texture texture) {
+		int which = (ray.getBlockData() & 0x8) >> 3;
+		ray.t = Double.POSITIVE_INFINITY;
+		if (aabb[which].intersect(ray)) {
+			texture.getColor(ray);
+			ray.color.w = 1;
+			ray.distance += ray.tNear;
+			ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
+			return true;
+		}
+		return false;
+	}
 }

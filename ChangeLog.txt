@@ -7,6 +7,10 @@
     * Removed spatial filtering in sample selection (improves performance)
     * Added option to enable rendering clouds
     * Horizontal coordinates are now used for sun position
+    * Added nether brick half slab and double slab
+    * Added quartz half slab and double slab
+    * Added double smooth stone slab
+    * Added double smooth sandstone slab
 
 1.1.3 - 2013-01-14
     * Clicking in the map when it is maximally zoomed out will select an

@@ -548,7 +548,7 @@ public class Block {
 			Texture.sandstoneTop,
 		};
 		
-		final Texture[] planks = {
+		final Texture[] wood = {
 			Texture.oakPlanks,
 			Texture.oakPlanks,
 			Texture.oakPlanks,
@@ -584,7 +584,16 @@ public class Block {
 			Texture.stoneBrick,
 		};
 		
-		final Texture[] slab = {
+		final Texture[] netherBrick = {
+			Texture.netherBrick,
+			Texture.netherBrick,
+			Texture.netherBrick,
+			Texture.netherBrick,
+			Texture.netherBrick,
+			Texture.netherBrick,
+		};
+		
+		final Texture[] stone = {
 			Texture.slabSide,
 			Texture.slabSide,
 			Texture.slabSide,
@@ -593,22 +602,56 @@ public class Block {
 			Texture.slabTop,
 		};
 		
+		final Texture[] quartz = {
+			Texture.quartz,
+			Texture.quartz,
+			Texture.quartz,
+			Texture.quartz,
+			Texture.quartz,
+			Texture.quartz,
+		};
+		
+		final Texture[] smoothStone = {
+			Texture.slabTop,
+			Texture.slabTop,
+			Texture.slabTop,
+			Texture.slabTop,
+			Texture.slabTop,
+			Texture.slabTop,
+		};
+		
+		final Texture[] smoothSandstone = {
+			Texture.sandstoneTop,
+			Texture.sandstoneTop,
+			Texture.sandstoneTop,
+			Texture.sandstoneTop,
+			Texture.sandstoneTop,
+			Texture.sandstoneTop,
+		};
+		
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			switch (ray.getBlockData() & 7) {
+			switch (ray.getBlockData()) {
+			default: case 0:
+				return TexturedBlockModel.intersect(ray, stone);
 			case 1:
 				return TexturedBlockModel.intersect(ray, sandstone);
-			case 2:
-				return TexturedBlockModel.intersect(ray, planks);
-			case 3:
+			case 2: case 10:
+				return TexturedBlockModel.intersect(ray, wood);
+			case 3: case 11:
 				return TexturedBlockModel.intersect(ray, cobble);
-			case 4:
+			case 4: case 12:
 				return TexturedBlockModel.intersect(ray, brick);
-			case 5:
+			case 5: case 13:
 				return TexturedBlockModel.intersect(ray, stoneBrick);
-			case 0:
-			default:
-				return TexturedBlockModel.intersect(ray, slab);
+			case 6: case 14:
+				return TexturedBlockModel.intersect(ray, netherBrick);
+			case 7: case 15:
+				return TexturedBlockModel.intersect(ray, quartz);
+			case 8:
+				return TexturedBlockModel.intersect(ray, smoothStone);
+			case 9:
+				return TexturedBlockModel.intersect(ray, smoothSandstone);
 			}
 		}
 	};
@@ -621,19 +664,22 @@ public class Block {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			switch (ray.getBlockData() & 7) {
+			default: case 0:
+				return SlabModel.intersect(ray, Texture.slabSide, Texture.slabTop);
 			case 1:
 				return SlabModel.intersect(ray, Texture.sandstoneSide, Texture.sandstoneTop);
 			case 2:
-				return SlabModel.intersect(ray, Texture.oakPlanks, Texture.oakPlanks);
+				return SlabModel.intersect(ray, Texture.oakPlanks);
 			case 3:
-				return SlabModel.intersect(ray, Texture.cobblestone, Texture.cobblestone);
+				return SlabModel.intersect(ray, Texture.cobblestone);
 			case 4:
-				return SlabModel.intersect(ray, Texture.brick, Texture.brick);
+				return SlabModel.intersect(ray, Texture.brick);
 			case 5:
-				return SlabModel.intersect(ray, Texture.stoneBrick, Texture.stoneBrick);
-			case 0:
-			default:
-				return SlabModel.intersect(ray, Texture.slabSide, Texture.slabTop);
+				return SlabModel.intersect(ray, Texture.stoneBrick);
+			case 6:
+				return SlabModel.intersect(ray, Texture.netherBrick);
+			case 7:
+				return SlabModel.intersect(ray, Texture.quartz);
 			}
 		}
 	};
