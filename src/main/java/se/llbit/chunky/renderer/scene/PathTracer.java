@@ -69,33 +69,17 @@ public class PathTracer {
 		while (true) {
 
 			if (!RayTracer.nextIntersection(scene, ray, rayPool)) {
-				if (scene.waterHeight > 0 &&
-						ray.d.y < 0 && ray.x.y > scene.waterHeight-.125) {
+				if (ray.depth == 0) {
+					// direct sky hit
+					scene.sky.getSkyColorInterpolated(ray, scene.waterHeight > 0);
 					
-					ray.t = (scene.waterHeight-.125-ray.x.y) / ray.d.y;
-					ray.distance += ray.t;
-					ray.x.scaleAdd(ray.t, ray.d, ray.x);
-					ray.currentMaterial = Block.WATER_ID;
-					ray.prevMaterial = 0;
-					WaterModel.intersect(ray);
-					
-					if (first) {
-						s = ray.distance;
-						first = false;
-					}
+				} else if (ray.specular) {
+					// sky color
+					scene.sky.getSkySpecularColor(ray, scene.waterHeight > 0);
 				} else {
-					if (ray.depth == 0) {
-						// direct sky hit
-						scene.sky.getSkyColorInterpolated(ray, scene.waterHeight > 0);
-						
-					} else if (ray.specular) {
-						// sky color
-						scene.sky.getSkySpecularColor(ray, scene.waterHeight > 0);
-					} else {
-						scene.sky.getSkyDiffuseColor(ray, scene.waterHeight > 0);
-					}
-					break;
+					scene.sky.getSkyDiffuseColor(ray, scene.waterHeight > 0);
 				}
+				break;
 			}
 
 			double pSpecular = 0;
