@@ -96,13 +96,22 @@
 	<target name="clean-builds" description="Removes the build folder">
 		<delete dir="build"/>
 	</target>
+
+	<target name="gendoc">
+		<mkdir dir="build"/>
+		<exec executable="perl" failonerror="true"
+			output="build/ReadMe.html">
+			<arg value="${tools.dir}/Markdown.pl"/>
+			<arg value="README.md"/>
+		</exec>
+	</target>
 	
 	<target name="release" description="build a release">
 		<antcall target="clean"/>
 		<antcall target="jar"/>
+		<antcall target="gendoc"/>
 		<zip destfile="build/Chunky-${Chunky.version}.zip">
 			<zipfileset dir="." prefix="Chunky">
-				<include name="README.txt"/>
 				<include name="ChangeLog.txt"/>
 				<include name="Chunky.bat"/>
 				<include name="Chunky.sh"/>
@@ -113,9 +122,11 @@
 				<include name="MWC64X.txt"/>
 				<include name="NOTICE.txt"/>
 				<include name="LOG4J.txt"/>
+				<include name="Markdown"/>
 			</zipfileset>
 			<zipfileset dir="build" prefix="Chunky">
 				<include name="Chunky.jar"/>
+				<include name="ReadMe.html"/>
 			</zipfileset>
 		</zip>
 		<copy file="win/Chunky.nsi.templ" toFile="win/Chunky.nsi"

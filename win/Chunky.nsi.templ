@@ -80,7 +80,7 @@ Section "Chunky (required)" SecChunky
 	SetOutPath $INSTDIR
 	
 	File ..\build\Chunky.jar
-	File ..\README.txt
+	File ..\build\ReadMe.html
 	File ..\ChangeLog.txt
 	File chunky.ico
 	
@@ -103,6 +103,7 @@ Section "Start Menu Shortcuts" SecSM
 	CreateDirectory "$SMPROGRAMS\Chunky"
 	CreateShortCut "$SMPROGRAMS\Chunky\Chunky (more memory).lnk" "$JavaExe" " -Xms512m -Xmx2g -jar $\"$INSTDIR\Chunky.jar$\"" "$INSTDIR\chunky.ico"
 	CreateShortCut "$SMPROGRAMS\Chunky\Chunky.lnk" "$INSTDIR\Chunky.jar" "" "$INSTDIR\chunky.ico"
+	CreateShortCut "$SMPROGRAMS\Chunky\ReadMe.lnk" "$INSTDIR\ReadMe.html"
 	CreateShortCut "$SMPROGRAMS\Chunky\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
 	CreateShortCut "$SMPROGRAMS\Chunky\Wiki.lnk" "$INSTDIR\Wiki.URL"
 
@@ -130,7 +131,7 @@ Section "Uninstall"
 
   ; Delete installed files
   Delete $INSTDIR\Chunky.jar
-  Delete $INSTDIR\README.txt
+  Delete $INSTDIR\ReadMe.html
   Delete $INSTDIR\LICENSE.txt
   Delete $INSTDIR\Uninstall.exe
 
