@@ -151,7 +151,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	}
 	
 	public static final String USAGE =
-		"Usage: chunky [<options>] [<world directory>]\n" +
+		"Usage: chunky [options] [world directory]\n" +
 		"Options:\n" +
 		"  -texture <pack file> ; use the specified texture pack.\n" +
 		"  -watermark           ; draw watermark.png over saved frames.\n" +
