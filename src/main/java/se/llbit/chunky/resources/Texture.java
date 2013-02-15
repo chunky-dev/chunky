@@ -251,7 +251,9 @@ public class Texture {
 	public static final Texture anvilTop2 = new Texture();
 	public static final Texture anvilTop3 = new Texture();
 	public static final Texture flowerPot = new Texture();
-	public static final Texture quartz = new Texture();
+	public static final Texture quartzSide = new Texture();
+	public static final Texture quartzTop = new Texture();
+	public static final Texture quartzBottom = new Texture();
 	public static final Texture unknown = new Texture("unknown");
 	
 	public static final Texture signPost = new Texture();

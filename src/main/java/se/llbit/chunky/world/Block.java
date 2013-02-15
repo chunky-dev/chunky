@@ -603,12 +603,12 @@ public class Block {
 		};
 		
 		final Texture[] quartz = {
-			Texture.quartz,
-			Texture.quartz,
-			Texture.quartz,
-			Texture.quartz,
-			Texture.quartz,
-			Texture.quartz,
+			Texture.quartzSide,
+			Texture.quartzSide,
+			Texture.quartzSide,
+			Texture.quartzSide,
+			Texture.quartzTop,
+			Texture.quartzBottom,
 		};
 		
 		final Texture[] smoothStone = {
@@ -679,7 +679,7 @@ public class Block {
 			case 6:
 				return SlabModel.intersect(ray, Texture.netherBrick);
 			case 7:
-				return SlabModel.intersect(ray, Texture.quartz);
+				return SlabModel.intersect(ray, Texture.quartzSide, Texture.quartzTop);
 			}
 		}
 	};
