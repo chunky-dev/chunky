@@ -240,16 +240,16 @@ public class Texture {
 	public static final Texture emeraldBlock = new Texture();
 	public static final Texture tripwireHook = new Texture();
 	public static final Texture tripwire = new Texture();
+	public static final Texture carrotsPotatoes0 = new Texture();
 	public static final Texture carrotsPotatoes1 = new Texture();
 	public static final Texture carrotsPotatoes2 = new Texture();
-	public static final Texture carrotsPotatoes3 = new Texture();
 	public static final Texture carrotsMature = new Texture();
 	public static final Texture potatoesMature = new Texture();
 	public static final Texture beacon = new Texture();
 	public static final Texture anvilSide = new Texture();
-	public static final Texture anvilTop1 = new Texture();
-	public static final Texture anvilTop2 = new Texture();
-	public static final Texture anvilTop3 = new Texture();
+	public static final Texture anvilTop = new Texture();
+	public static final Texture anvilTopDamaged1 = new Texture();
+	public static final Texture anvilTopDamaged2 = new Texture();
 	public static final Texture flowerPot = new Texture();
 	public static final Texture quartzSide = new Texture();
 	public static final Texture quartzTop = new Texture();
@@ -293,12 +293,12 @@ public class Texture {
 		{ crops0, crops1, crops2, crops3, crops4, crops5, crops6, crops7 };
 	
 	public static final Texture[] carrots =
-		{ carrotsPotatoes1, carrotsPotatoes1, carrotsPotatoes2, carrotsPotatoes2,
-		carrotsPotatoes3, carrotsPotatoes3, carrotsPotatoes3, carrotsMature };
+		{ carrotsPotatoes0, carrotsPotatoes0, carrotsPotatoes1, carrotsPotatoes1,
+		carrotsPotatoes2, carrotsPotatoes2, carrotsPotatoes2, carrotsMature };
 	
 	public static final Texture[] potatoes =
-		{ carrotsPotatoes1, carrotsPotatoes1, carrotsPotatoes2, carrotsPotatoes2,
-		carrotsPotatoes3, carrotsPotatoes3, carrotsPotatoes3, potatoesMature };
+		{ carrotsPotatoes0, carrotsPotatoes0, carrotsPotatoes1, carrotsPotatoes1,
+		carrotsPotatoes2, carrotsPotatoes2, carrotsPotatoes2, potatoesMature };
 	
 	public static final Texture[] netherWart =
 		{ netherWart0, netherWart1, netherWart1, netherWart2 };
@@ -325,8 +325,8 @@ public class Texture {
 	public static final Texture[] stoneBrickType =
 		{ stoneBrick, mossyStoneBrick, crackedStoneBrick, circleStoneBrick };
 	
-	public static final Texture[] anvilTop =
-		{ anvilTop1, anvilTop2, anvilTop3, anvilTop3 };
+	public static final Texture[] anvilTopTexture =
+		{ anvilTop, anvilTopDamaged1, anvilTopDamaged2, anvilTopDamaged2 };
 	
 	protected BufferedImage image;
 	protected int width;

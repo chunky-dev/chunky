@@ -60,7 +60,7 @@ public class AnvilModel {
 					double tmp = ray.v;
 					ray.v = ray.u * orientation + tmp * (1-orientation);
 					ray.u = tmp * orientation + ray.u * (1-orientation);
-					Texture.anvilTop[damage].getColor(ray);
+					Texture.anvilTopTexture[damage].getColor(ray);
 				} else {
 					Texture.anvilSide.getColor(ray);
 				}

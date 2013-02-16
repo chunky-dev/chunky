@@ -269,9 +269,9 @@ public class TexturePackLoader {
 		textures.add(new IndexedTexture("textures/blocks/leaves_jungle", Texture.jungleTreeLeaves, 0xC4));
 		textures.add(new IndexedTexture("textures/blocks/wood_spruce", Texture.sprucePlanks, 0xC6));
 		textures.add(new IndexedTexture("textures/blocks/wood_jungle", Texture.jungleTreePlanks, 0xC7));
-		textures.add(new IndexedTexture("textures/blocks/carrots_0", Texture.carrotsPotatoes1, 0xC8));
-		textures.add(new IndexedTexture("textures/blocks/carrots_1", Texture.carrotsPotatoes2, 0xC9));
-		textures.add(new IndexedTexture("textures/blocks/carrots_2", Texture.carrotsPotatoes3, 0xCA));
+		textures.add(new IndexedTexture("textures/blocks/carrots_0", Texture.carrotsPotatoes0, 0xC8));
+		textures.add(new IndexedTexture("textures/blocks/carrots_1", Texture.carrotsPotatoes1, 0xC9));
+		textures.add(new IndexedTexture("textures/blocks/carrots_2", Texture.carrotsPotatoes2, 0xCA));
 		textures.add(new IndexedTexture("textures/blocks/carrots_3", Texture.carrotsMature, 0xCB));
 		textures.add(new IndexedTexture("textures/blocks/potatoes_3", Texture.potatoesMature, 0xCC));
 		// TODO: textures.add(new IndexedTexture("textures/blocks/", Texture.water, 0xCD));
@@ -284,7 +284,7 @@ public class TexturePackLoader {
 		textures.add(new IndexedTexture("textures/blocks/stonebricksmooth_carved", Texture.circleStoneBrick, 0xD5));
 		textures.add(new IndexedTexture("textures/blocks/wood_birch", Texture.birchPlanks, 0xD6));
 		textures.add(new IndexedTexture("textures/blocks/anvil_base", Texture.anvilSide, 0xD7));
-		textures.add(new IndexedTexture("textures/blocks/anvil_top_damaged_1", Texture.anvilTop2, 0xD8));
+		textures.add(new IndexedTexture("textures/blocks/anvil_top_damaged_1", Texture.anvilTopDamaged1, 0xD8));
 		
 		textures.add(new IndexedTexture("textures/blocks/netherBrick", Texture.netherBrick, 0xE0));
 		textures.add(new IndexedTexture("textures/blocks/cloth_8", Texture.lightGrayWool, 0xE1));
@@ -294,7 +294,7 @@ public class TexturePackLoader {
 		textures.add(new IndexedTexture("textures/blocks/sandstone_carved", Texture.sandstoneDecorated, 0xE5));
 		textures.add(new IndexedTexture("textures/blocks/sandstone_smooth", Texture.sandstoneSmooth, 0xE6));
 		textures.add(new IndexedTexture("textures/blocks/anvil_top", Texture.anvilTop1, 0xE7));
-		textures.add(new IndexedTexture("textures/blocks/anvil_top_damaged_2", Texture.anvilTop3, 0xE8));
+		textures.add(new IndexedTexture("textures/blocks/anvil_top_damaged_2", Texture.anvilTopDamaged2, 0xE8));
 		// TODO: textures.add(new IndexedTexture("textures/blocks/", Texture.lava, 0xED));
 		
 		textures.add(new SimpleTexture("textures/blocks/quartzblock_side", Texture.quartzSide));
