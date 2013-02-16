@@ -150,14 +150,14 @@ public class Texture {
 	public static final Texture tallGrass = new Texture("tall-grass");
 	public static final Texture fern = new Texture();
 	public static final Texture vines = new Texture("vines");
-	public static final Texture wheat1 = new Texture();
-	public static final Texture wheat2 = new Texture();
-	public static final Texture wheat3 = new Texture();
-	public static final Texture wheat4 = new Texture();
-	public static final Texture wheat5 = new Texture();
-	public static final Texture wheat6 = new Texture();
-	public static final Texture wheat7 = new Texture();
-	public static final Texture wheat8 = new Texture();
+	public static final Texture crops0 = new Texture();
+	public static final Texture crops1 = new Texture();
+	public static final Texture crops2 = new Texture();
+	public static final Texture crops3 = new Texture();
+	public static final Texture crops4 = new Texture();
+	public static final Texture crops5 = new Texture();
+	public static final Texture crops6 = new Texture();
+	public static final Texture crops7 = new Texture();
 	public static final Texture rails = new Texture("minecart-track");
 	public static final Texture railsCurved = new Texture();
 	public static final Texture poweredRailsOn = new Texture();
@@ -183,10 +183,10 @@ public class Texture {
 	public static final Texture lapislazuliOre = new Texture("lapis-lazuli-ore");
 	public static final Texture lapislazuliBlock = new Texture("lapis-lazuli-block");
 	public static final Texture pistonSide = new Texture("piston");
-	public static final Texture pistonFront = new Texture();
-	public static final Texture pistonBack = new Texture();
-	public static final Texture pistonArm = new Texture("piston-extension");
-	public static final Texture stickyPistonArm = new Texture();
+	public static final Texture pistonInnerTop = new Texture();
+	public static final Texture pistonBottom = new Texture();
+	public static final Texture pistonTop = new Texture("piston-extension");
+	public static final Texture pistonTopSticky = new Texture();
 	public static final Texture fire = new Texture("fire");
 	public static final Texture redstoneRepeaterOn = new Texture("redstone-repeater-off");
 	public static final Texture redstoneRepeaterOff = new Texture("redstone-repeater-on");
@@ -208,15 +208,15 @@ public class Texture {
 	public static final Texture mushroomPores = new Texture();
 	public static final Texture melonSide = new Texture();
 	public static final Texture melonTop = new Texture();
-	public static final Texture melonStem = new Texture();
-	public static final Texture stemWithMelon = new Texture();
+	public static final Texture stemStraight = new Texture();
+	public static final Texture stemBent = new Texture();
 	public static final Texture myceliumTop = new Texture();
 	public static final Texture myceliumSide = new Texture();
 	public static final Texture lilyPad = new Texture("lily-pad");
 	public static final Texture netherBrick = new Texture();
+	public static final Texture netherWart0 = new Texture();
 	public static final Texture netherWart1 = new Texture();
 	public static final Texture netherWart2 = new Texture();
-	public static final Texture netherWart3 = new Texture();
 	public static final Texture largeChestFrontLeft = new Texture();
 	public static final Texture largeChestFrontRight = new Texture();
 	public static final Texture largeChestBackLeft = new Texture();
@@ -266,7 +266,7 @@ public class Texture {
 	public static final Texture jungleTreeLeaves = new Texture("leaves");// TODO: variants
 	
 	public static final Texture oakSapling = new Texture("sapling");// TODO: variants
-	public static final Texture pineSapling = new Texture("sapling");// TODO: variants
+	public static final Texture spruceSapling = new Texture("sapling");// TODO: variants
 	public static final Texture birchSapling = new Texture("sapling");// TODO: variants
 	public static final Texture jungleTreeSapling = new Texture("sapling");// TODO: variants
 	
@@ -287,10 +287,10 @@ public class Texture {
 		{ oakLeaves, spruceLeaves, birchLeaves, jungleTreeLeaves };
 	
 	public static final Texture[] sapling = {
-		oakSapling, pineSapling, birchSapling, jungleTreeSapling };
+		oakSapling, spruceSapling, birchSapling, jungleTreeSapling };
 	
 	public static final Texture[] wheat =
-		{ wheat1, wheat2, wheat3, wheat4, wheat5, wheat6, wheat7, wheat8 };
+		{ crops0, crops1, crops2, crops3, crops4, crops5, crops6, crops7 };
 	
 	public static final Texture[] carrots =
 		{ carrotsPotatoes1, carrotsPotatoes1, carrotsPotatoes2, carrotsPotatoes2,
@@ -301,7 +301,7 @@ public class Texture {
 		carrotsPotatoes3, carrotsPotatoes3, carrotsPotatoes3, potatoesMature };
 	
 	public static final Texture[] netherWart =
-		{ netherWart1, netherWart2, netherWart2, netherWart3 };
+		{ netherWart0, netherWart1, netherWart1, netherWart2 };
 	
 	public static final Texture[] woodenDoor =
 		{ woodenDoorBottom, woodenDoorTop };

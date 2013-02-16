@@ -382,7 +382,7 @@ public class Block {
 					(ray.getBlockData() & 7) % 6);
 		}
 	};
-	public static final Block STICKYPISTON = new Block(0x1D, "Sticky Piston", Texture.stickyPistonArm) {
+	public static final Block STICKYPISTON = new Block(0x1D, "Sticky Piston", Texture.pistonTopSticky) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -428,7 +428,7 @@ public class Block {
 			return SpriteModel.intersect(ray, Texture.deadBush);
 		}
 	};
-	public static final Block PISTON = new Block(0x21, "Piston", Texture.pistonArm) {
+	public static final Block PISTON = new Block(0x21, "Piston", Texture.pistonTop) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -439,7 +439,7 @@ public class Block {
 			return PistonModel.intersect(ray, 0);
 		}
 	};
-	public static final Block PISTONEXTENSION = new Block(0x22, "Piston Extension", Texture.pistonArm) {
+	public static final Block PISTONEXTENSION = new Block(0x22, "Piston Extension", Texture.pistonTop) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -882,7 +882,7 @@ public class Block {
 			return TexturedBlockModel.intersect(ray, tex);
 		}
 	};
-	public static final Block CROPS = new Block(0x3B, "Wheat", Texture.wheat8) {
+	public static final Block CROPS = new Block(0x3B, "Wheat", Texture.crops7) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1576,7 +1576,7 @@ public class Block {
 			return TexturedBlockModel.intersect(ray, tex);
 		}
 	};
-	public static final Block PUMPKINSTEM = new Block(PUMPKINSTEM_ID, "Pumpkin Stem", Texture.melonStem) {
+	public static final Block PUMPKINSTEM = new Block(PUMPKINSTEM_ID, "Pumpkin Stem", Texture.stemStraight) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1588,7 +1588,7 @@ public class Block {
 		}
 	};
 	public static final int MELONSTEM_ID = 0x69;
-	public static final Block MELONSTEM = new Block(MELONSTEM_ID, "Melon Stem", Texture.melonStem) {
+	public static final Block MELONSTEM = new Block(MELONSTEM_ID, "Melon Stem", Texture.stemStraight) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1707,7 +1707,7 @@ public class Block {
 			return StairModel.intersect(ray, Texture.netherBrick);
 		}
 	};
-	public static final Block NETHERWART = new Block(0x73, "Nether Wart", Texture.netherWart3) {
+	public static final Block NETHERWART = new Block(0x73, "Nether Wart", Texture.netherWart2) {
 		{
 			isOpaque = false;
 			isSolid = false;

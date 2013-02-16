@@ -73,7 +73,7 @@ public class MelonStemModel {
 			int height = ray.getBlockData() & 7;
 			for (Quad quad : growth[height]) {
 				if (quad.intersect(ray)) {
-					float[] color = Texture.melonStem.getColor(ray.u, ray.v);
+					float[] color = Texture.stemStraight.getColor(ray.u, ray.v);
 					if (color[3] > Ray.EPSILON) {
 						ray.color.set(color);
 						ray.color.x *= stemColor[height][0];
@@ -89,7 +89,7 @@ public class MelonStemModel {
 		} else {
 			for (Quad quad : growth[3]) {
 				if (quad.intersect(ray)) {
-					float[] color = Texture.melonStem.getColor(ray.u, ray.v);
+					float[] color = Texture.stemStraight.getColor(ray.u, ray.v);
 					if (color[3] > Ray.EPSILON) {
 						ray.color.set(color);
 						ray.color.x *= stemColor[7][0];
@@ -104,7 +104,7 @@ public class MelonStemModel {
 			}
 			Quad quad = ripe[connected-1];
 			if (quad.intersect(ray)) {
-				float[] color = Texture.stemWithMelon.getColor(ray.u, ray.v);
+				float[] color = Texture.stemBent.getColor(ray.u, ray.v);
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
 					ray.color.x *= stemColor[7][0];

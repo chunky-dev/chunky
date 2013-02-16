@@ -119,8 +119,8 @@ public class PistonExtensionModel {
 	
 	static final Texture[][] texture = {
 		{
-			Texture.pistonArm,
-			Texture.pistonArm,
+			Texture.pistonTop,
+			Texture.pistonTop,
 			Texture.pistonSide,
 			Texture.pistonSide,
 			Texture.pistonSide,
@@ -132,8 +132,8 @@ public class PistonExtensionModel {
 		},
 		
 		{
-			Texture.stickyPistonArm,
-			Texture.pistonArm,
+			Texture.pistonTopSticky,
+			Texture.pistonTop,
 			Texture.pistonSide,
 			Texture.pistonSide,
 			Texture.pistonSide,

@@ -169,8 +169,8 @@ public class PistonModel {
 	static final Texture[][][] texture = {
 		{
 			{
-				Texture.pistonArm,
-				Texture.pistonBack,
+				Texture.pistonTop,
+				Texture.pistonBottom,
 				Texture.pistonSide,
 				Texture.pistonSide,
 				Texture.pistonSide,
@@ -182,8 +182,8 @@ public class PistonModel {
 			},
 			
 			{
-				Texture.stickyPistonArm,
-				Texture.pistonBack,
+				Texture.pistonTopSticky,
+				Texture.pistonBottom,
 				Texture.pistonSide,
 				Texture.pistonSide,
 				Texture.pistonSide,
@@ -197,8 +197,8 @@ public class PistonModel {
 		
 		{
 			{
-				Texture.pistonFront,
-				Texture.pistonBack,
+				Texture.pistonInnerTop,
+				Texture.pistonBottom,
 				Texture.pistonSide,
 				Texture.pistonSide,
 				Texture.pistonSide,
@@ -210,8 +210,8 @@ public class PistonModel {
 			},
 			
 			{
-				Texture.pistonFront,
-				Texture.pistonBack,
+				Texture.pistonInnerTop,
+				Texture.pistonBottom,
 				Texture.pistonSide,
 				Texture.pistonSide,
 				Texture.pistonSide,

@@ -133,7 +133,7 @@ public class TexturePackLoader {
 		textures.add(new IndexedTexture("textures/blocks/workbench_front", Texture.workbenchFront, 0x3C));
 		textures.add(new IndexedTexture("textures/blocks/furnace_front_lit", Texture.furnaceLitFront, 0x3D));
 		textures.add(new IndexedTexture("textures/blocks/furnace_top", Texture.furnaceTop, 0x3E));
-		textures.add(new IndexedTexture("textures/blocks/sapling_spruce", Texture.pineSapling, 0x3F));
+		textures.add(new IndexedTexture("textures/blocks/sapling_spruce", Texture.spruceSapling, 0x3F));
 		
 		textures.add(new IndexedTexture("textures/blocks/cloth_0", Texture.whiteWool, 0x40));
 		textures.add(new IndexedTexture("textures/blocks/mobSpawner", Texture.monsterSpawner, 0x41));
@@ -160,14 +160,14 @@ public class TexturePackLoader {
 		textures.add(new IndexedTexture("textures/blocks/fenceIron", Texture.ironBars, 0x55));
 		textures.add(new IndexedTexture("textures/blocks/farmland_wet", Texture.farmlandWet, 0x56));
 		textures.add(new IndexedTexture("textures/blocks/farmland_dry", Texture.farmlandDry, 0x57));
-		textures.add(new IndexedTexture("textures/blocks/crops_0", Texture.wheat1, 0x58));
-		textures.add(new IndexedTexture("textures/blocks/crops_1", Texture.wheat2, 0x59));
-		textures.add(new IndexedTexture("textures/blocks/crops_2", Texture.wheat3, 0x5A));
-		textures.add(new IndexedTexture("textures/blocks/crops_3", Texture.wheat4, 0x5B));
-		textures.add(new IndexedTexture("textures/blocks/crops_4", Texture.wheat5, 0x5C));
-		textures.add(new IndexedTexture("textures/blocks/crops_5", Texture.wheat6, 0x5D));
-		textures.add(new IndexedTexture("textures/blocks/crops_6", Texture.wheat7, 0x5E));
-		textures.add(new IndexedTexture("textures/blocks/crops_7", Texture.wheat8, 0x5F));
+		textures.add(new IndexedTexture("textures/blocks/crops_0", Texture.crops0, 0x58));
+		textures.add(new IndexedTexture("textures/blocks/crops_1", Texture.crops1, 0x59));
+		textures.add(new IndexedTexture("textures/blocks/crops_2", Texture.crops2, 0x5A));
+		textures.add(new IndexedTexture("textures/blocks/crops_3", Texture.crops3, 0x5B));
+		textures.add(new IndexedTexture("textures/blocks/crops_4", Texture.crops4, 0x5C));
+		textures.add(new IndexedTexture("textures/blocks/crops_5", Texture.crops5, 0x5D));
+		textures.add(new IndexedTexture("textures/blocks/crops_6", Texture.crops6, 0x5E));
+		textures.add(new IndexedTexture("textures/blocks/crops_7", Texture.crops7, 0x5F));
 
 		textures.add(new IndexedTexture("textures/blocks/lever", Texture.lever, 0x60));
 		textures.add(new IndexedTexture("textures/blocks/doorWood_lower", Texture.woodenDoorBottom, 0x61));
@@ -179,12 +179,12 @@ public class TexturePackLoader {
 		textures.add(new IndexedTexture("textures/blocks/hellrock", Texture.netherrack, 0x67));
 		textures.add(new IndexedTexture("textures/blocks/hellsand", Texture.soulsand, 0x68));
 		textures.add(new IndexedTexture("textures/blocks/lightgem", Texture.glowstone, 0x69));
-		textures.add(new IndexedTexture("textures/blocks/piston_top_sticky", Texture.stickyPistonArm, 0x6A));
-		textures.add(new IndexedTexture("textures/blocks/piston_top", Texture.pistonArm, 0x6B));
+		textures.add(new IndexedTexture("textures/blocks/piston_top_sticky", Texture.pistonTopSticky, 0x6A));
+		textures.add(new IndexedTexture("textures/blocks/piston_top", Texture.pistonTop, 0x6B));
 		textures.add(new IndexedTexture("textures/blocks/piston_side", Texture.pistonSide, 0x6C));
-		textures.add(new IndexedTexture("textures/blocks/piston_bottom", Texture.pistonBack, 0x6D));
-		textures.add(new IndexedTexture("textures/blocks/piston_inner_top", Texture.pistonFront, 0x6E));
-		textures.add(new IndexedTexture("textures/blocks/stem_straight", Texture.melonStem, 0x6F));
+		textures.add(new IndexedTexture("textures/blocks/piston_bottom", Texture.pistonBottom, 0x6D));
+		textures.add(new IndexedTexture("textures/blocks/piston_inner_top", Texture.pistonInnerTop, 0x6E));
+		textures.add(new IndexedTexture("textures/blocks/stem_straight", Texture.stemStraight, 0x6F));
 		
 		textures.add(new IndexedTexture("textures/blocks/rail_turn", Texture.railsCurved, 0x70));
 		textures.add(new IndexedTexture("textures/blocks/cloth_15", Texture.blackWool, 0x71));
@@ -201,7 +201,7 @@ public class TexturePackLoader {
 		textures.add(new IndexedTexture("textures/blocks/cake_bottom", Texture.cakeBottom, 0x7C));
 		textures.add(new IndexedTexture("textures/blocks/mushroom_skin_red", Texture.hugeRedMushroom, 0x7D));
 		textures.add(new IndexedTexture("textures/blocks/mushroom_skin_brown", Texture.hugeBrownMushroom, 0x7E));
-		textures.add(new IndexedTexture("textures/blocks/stem_bent", Texture.stemWithMelon, 0x7F));
+		textures.add(new IndexedTexture("textures/blocks/stem_bent", Texture.stemBent, 0x7F));
 		
 		textures.add(new IndexedTexture("textures/blocks/rail", Texture.rails, 0x80));
 		textures.add(new IndexedTexture("textures/blocks/cloth_14", Texture.redWool, 0x81));
@@ -288,9 +288,9 @@ public class TexturePackLoader {
 		
 		textures.add(new IndexedTexture("textures/blocks/netherBrick", Texture.netherBrick, 0xE0));
 		textures.add(new IndexedTexture("textures/blocks/cloth_8", Texture.lightGrayWool, 0xE1));
-		textures.add(new IndexedTexture("textures/blocks/netherStalk_0", Texture.netherWart1, 0xE2));
-		textures.add(new IndexedTexture("textures/blocks/netherStalk_1", Texture.netherWart2, 0xE3));
-		textures.add(new IndexedTexture("textures/blocks/netherStalk_2", Texture.netherWart3, 0xE4));
+		textures.add(new IndexedTexture("textures/blocks/netherStalk_0", Texture.netherWart0, 0xE2));
+		textures.add(new IndexedTexture("textures/blocks/netherStalk_1", Texture.netherWart1, 0xE3));
+		textures.add(new IndexedTexture("textures/blocks/netherStalk_2", Texture.netherWart2, 0xE4));
 		textures.add(new IndexedTexture("textures/blocks/sandstone_carved", Texture.sandstoneDecorated, 0xE5));
 		textures.add(new IndexedTexture("textures/blocks/sandstone_smooth", Texture.sandstoneSmooth, 0xE6));
 		textures.add(new IndexedTexture("textures/blocks/anvil_top", Texture.anvilTop1, 0xE7));
