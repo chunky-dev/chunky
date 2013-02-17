@@ -2018,7 +2018,7 @@ public class Block {
 		}
 	};
 	public static final int CARROTS_ID = 0x8D;
-	public static final Block CARROTS = new Block(CARROTS_ID, "Carrots", Texture.carrotsMature) {
+	public static final Block CARROTS = new Block(CARROTS_ID, "Carrots", Texture.carrots3) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2031,7 +2031,7 @@ public class Block {
 		}
 	};
 	public static final int POTATOES_ID = 0x8E;
-	public static final Block POTATOES = new Block(POTATOES_ID, "Potatoes", Texture.potatoesMature) {
+	public static final Block POTATOES = new Block(POTATOES_ID, "Potatoes", Texture.potatoes3) {
 		{
 			isOpaque = false;
 			isSolid = false;

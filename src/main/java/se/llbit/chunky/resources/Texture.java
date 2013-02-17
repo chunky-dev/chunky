@@ -240,11 +240,14 @@ public class Texture {
 	public static final Texture emeraldBlock = new Texture();
 	public static final Texture tripwireHook = new Texture();
 	public static final Texture tripwire = new Texture();
-	public static final Texture carrotsPotatoes0 = new Texture();
-	public static final Texture carrotsPotatoes1 = new Texture();
-	public static final Texture carrotsPotatoes2 = new Texture();
-	public static final Texture carrotsMature = new Texture();
-	public static final Texture potatoesMature = new Texture();
+	public static final Texture carrots0 = new Texture();
+	public static final Texture carrots1 = new Texture();
+	public static final Texture carrots2 = new Texture();
+	public static final Texture carrots3 = new Texture();
+	public static final Texture potatoes0 = new Texture();
+	public static final Texture potatoes1 = new Texture();
+	public static final Texture potatoes2 = new Texture();
+	public static final Texture potatoes3 = new Texture();
 	public static final Texture beacon = new Texture();
 	public static final Texture anvilSide = new Texture();
 	public static final Texture anvilTop = new Texture();
@@ -293,12 +296,12 @@ public class Texture {
 		{ crops0, crops1, crops2, crops3, crops4, crops5, crops6, crops7 };
 	
 	public static final Texture[] carrots =
-		{ carrotsPotatoes0, carrotsPotatoes0, carrotsPotatoes1, carrotsPotatoes1,
-		carrotsPotatoes2, carrotsPotatoes2, carrotsPotatoes2, carrotsMature };
+		{ carrots0, carrots0, carrots1, carrots1,
+		carrots2, carrots2, carrots2, carrots3 };
 	
 	public static final Texture[] potatoes =
-		{ carrotsPotatoes0, carrotsPotatoes0, carrotsPotatoes1, carrotsPotatoes1,
-		carrotsPotatoes2, carrotsPotatoes2, carrotsPotatoes2, potatoesMature };
+		{ potatoes0, potatoes0, potatoes1, potatoes1,
+		potatoes2, potatoes2, potatoes2, potatoes3 };
 	
 	public static final Texture[] netherWart =
 		{ netherWart0, netherWart1, netherWart1, netherWart2 };

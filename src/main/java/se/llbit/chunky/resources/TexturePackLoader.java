@@ -269,11 +269,14 @@ public class TexturePackLoader {
 		textures.add(new IndexedTexture("textures/blocks/leaves_jungle", Texture.jungleTreeLeaves, 0xC4));
 		textures.add(new IndexedTexture("textures/blocks/wood_spruce", Texture.sprucePlanks, 0xC6));
 		textures.add(new IndexedTexture("textures/blocks/wood_jungle", Texture.jungleTreePlanks, 0xC7));
-		textures.add(new IndexedTexture("textures/blocks/carrots_0", Texture.carrotsPotatoes0, 0xC8));
-		textures.add(new IndexedTexture("textures/blocks/carrots_1", Texture.carrotsPotatoes1, 0xC9));
-		textures.add(new IndexedTexture("textures/blocks/carrots_2", Texture.carrotsPotatoes2, 0xCA));
-		textures.add(new IndexedTexture("textures/blocks/carrots_3", Texture.carrotsMature, 0xCB));
-		textures.add(new IndexedTexture("textures/blocks/potatoes_3", Texture.potatoesMature, 0xCC));
+		textures.add(new IndexedTexture("textures/blocks/carrots_0", Texture.carrots0, 0xC8));
+		textures.add(new IndexedTexture("textures/blocks/potatoes_0", Texture.potatoes0, 0xC8));
+		textures.add(new IndexedTexture("textures/blocks/carrots_1", Texture.carrots1, 0xC9));
+		textures.add(new IndexedTexture("textures/blocks/potatoes_1", Texture.potatoes1, 0xC9));
+		textures.add(new IndexedTexture("textures/blocks/carrots_2", Texture.carrots2, 0xCA));
+		textures.add(new IndexedTexture("textures/blocks/potatoes_2", Texture.potatoes2, 0xCA));
+		textures.add(new IndexedTexture("textures/blocks/carrots_3", Texture.carrots3, 0xCB));
+		textures.add(new IndexedTexture("textures/blocks/potatoes_3", Texture.potatoes3, 0xCC));
 		// TODO: textures.add(new IndexedTexture("textures/blocks/", Texture.water, 0xCD));
 		
 		textures.add(new IndexedTexture("textures/blocks/sandstone_bottom", Texture.sandstoneBottom, 0xD0));
