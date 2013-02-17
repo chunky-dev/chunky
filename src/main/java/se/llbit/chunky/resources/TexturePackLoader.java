@@ -293,7 +293,7 @@ public class TexturePackLoader {
 		textures.add(new IndexedTexture("textures/blocks/netherStalk_2", Texture.netherWart2, 0xE4));
 		textures.add(new IndexedTexture("textures/blocks/sandstone_carved", Texture.sandstoneDecorated, 0xE5));
 		textures.add(new IndexedTexture("textures/blocks/sandstone_smooth", Texture.sandstoneSmooth, 0xE6));
-		textures.add(new IndexedTexture("textures/blocks/anvil_top", Texture.anvilTop1, 0xE7));
+		textures.add(new IndexedTexture("textures/blocks/anvil_top", Texture.anvilTop, 0xE7));
 		textures.add(new IndexedTexture("textures/blocks/anvil_top_damaged_2", Texture.anvilTopDamaged2, 0xE8));
 		// TODO: textures.add(new IndexedTexture("textures/blocks/", Texture.lava, 0xED));
 		
