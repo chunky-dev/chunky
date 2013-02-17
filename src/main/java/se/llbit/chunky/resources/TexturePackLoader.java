@@ -68,7 +68,7 @@ public class TexturePackLoader {
 				Texture.enderChestRight, Texture.enderChestFront,
 				Texture.enderChestBack));
 		textures.add(new LargeChestTexture("item/largechest"));
-		textures.add(new AlternateTextures(
+		textures.add(new AlternateTextures("sun texture",
 				new SunTexture("environment/sun"),
 				new SunTexture("terrain/sun")));
 		textures.add(new SignTexture("item/sign"));
