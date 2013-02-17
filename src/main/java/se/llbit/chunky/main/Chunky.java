@@ -150,18 +150,21 @@ public class Chunky implements ChunkDiscoveryListener {
 				Chunky.class.getResource("/log4j.properties"));
 	}
 	
-	public static final String USAGE =
-		"Usage: chunky [options] [world directory]\n" +
+	/**
+	 * The help string
+	 */
+	private static final String USAGE =
+		"Usage: chunky [OPTIONS] [WORLD DIRECTORY]\n" +
 		"Options:\n" +
-		"  -texture <pack file> ; use the specified texture pack.\n" +
-		"  -watermark           ; draw watermark.png over saved frames.\n" +
-		"  -render <scene file> ; render the specified scene (name of .cfv file,\n" +
-		"                       ; relative to the scenes directory) and exit.\n" +
-		"  -scene-dir <dir>     ; use the specified directory for loading/saving scenes.\n" +
-		"  -benchmark           ; run the benchmark and exit.\n" +
-		"  -threads <num>       ; use the specified number of threads for rendering.\n" +
-		"  -opencl              ; use OpenCL for rendering.\n" +
-		"  -help                ; show this text.";
+		"  -texture <FILE>        use FILE as the texture pack (must be a zip file)\n" +
+		"  -watermark             add a watermark to saved frame\n" +
+		"  -render <SCENE>        render the specified scene (name of .cfv file,\n" +
+		"                         relative to the scenes directory) in headless mode\n" +
+		"  -scene-dir <DIR>       use the directory DIR for loading/saving scenes\n" +
+		"  -benchmark             run the benchmark and exit\n" +
+		"  -threads <NUM>         use the specified number of threads for rendering\n" +
+		"  -opencl                enables OpenCL rendering in the GUI\n" +
+		"  -help                  show this text";
 	
 	/**
 	 * Constructor
@@ -172,6 +175,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	/**
 	 * Create a new instance of the application GUI.
 	 * @param args
+	 * @return Program exit code (0 = success)
 	 */
 	public int run(String[] args) {
 		boolean selectedWorld = false;
