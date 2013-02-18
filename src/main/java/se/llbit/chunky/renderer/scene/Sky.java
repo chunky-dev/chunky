@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 
@@ -26,6 +27,7 @@ import org.apache.log4j.Logger;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.SkymapTexture;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3d;
 import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.DoubleTag;
@@ -47,6 +49,9 @@ public class Sky {
 	private Scene scene;
 	private double rotation;
 	private boolean mirrored = true;
+	
+	// final to ensure that we don't do a lot of redundant re-allocation
+	private final Vector3d groundColor = new Vector3d(0, 0, 1);
 	
 	/**
 	 * @param scene
@@ -94,6 +99,7 @@ public class Sky {
 		skymap = other.skymap;
 		rotation = other.rotation;
 		mirrored = other.mirrored;
+		groundColor.set(other.groundColor);
 	}
 	
 	/**
@@ -112,13 +118,7 @@ public class Sky {
 	 * @param blackBelowHorizon
 	 */
 	public void getSkyDiffuseColor(Ray ray, boolean blackBelowHorizon) {
-		if (blackBelowHorizon && ray.d.y < 0) {
-			ray.color.set(0, 0, 0, 1);
-			ray.hit = true;
-			return;
-		} else if (!mirrored && ray.d.y < 0) {
-			ray.color.set(0, 0, 1, 1);
-			ray.hit = true;
+		if (getGroundColor(ray, blackBelowHorizon)) {
 			return;
 		} else if (skymap == null) {
 			scene.sun().skylight(ray);
@@ -142,14 +142,27 @@ public class Sky {
 		ray.hit = true;
 	}
 	
+	private boolean getGroundColor(Ray ray, boolean blackBelowHorizon) {
+		if (blackBelowHorizon && ray.d.y < 0) {
+			ray.color.set(0, 0, 0, 1);
+			ray.hit = true;
+			return true;
+		} else if (!mirrored && ray.d.y < 0) {
+			ray.color.set(groundColor.x, groundColor.y, groundColor.z, 1);
+			ray.hit = true;
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Bilinear interpolated panoramic skymap color
 	 * @param ray
 	 * @param blackBelowHorizon
 	 */
 	public void getSkyColorInterpolated(Ray ray, boolean blackBelowHorizon) {
-		if (blackBelowHorizon && ray.d.y < 0) {
-			ray.color.set(0, 0, 0, 1);
+		if (getGroundColor(ray, blackBelowHorizon)) {
+			return;
 			
 		} else if (scene.sunEnabled && scene.sun().intersect(ray)) {
 			double r = ray.color.x;
@@ -241,6 +254,13 @@ public class Sky {
 			rotation = rotationTag.doubleValue();
 		}
 		mirrored = worldTag.get("skyMirrored").boolValue(true);
+		
+		if (worldTag.get("groundColor").isCompoundTag()) {
+			CompoundTag colorTag = (CompoundTag) worldTag.get("groundColor");
+			groundColor.x = colorTag.get("red").doubleValue(1);
+			groundColor.y = colorTag.get("green").doubleValue(1);
+			groundColor.z = colorTag.get("blue").doubleValue(1);
+		}
 	}
 
 	/**
@@ -252,6 +272,11 @@ public class Sky {
 			worldTag.addItem("skymapFileName", new StringTag(skymapFileName));
 		worldTag.addItem("skyYaw", new DoubleTag(rotation));
 		worldTag.addItem("skyMirrored", new IntTag(mirrored));
+		CompoundTag groundColorTag = new CompoundTag();
+		groundColorTag.addItem("red", new DoubleTag(groundColor.x));
+		groundColorTag.addItem("green", new DoubleTag(groundColor.y));
+		groundColorTag.addItem("blue", new DoubleTag(groundColor.z));
+		worldTag.addItem("groundColor", groundColorTag);
 	}
 	
 	/**
@@ -270,5 +295,26 @@ public class Sky {
 	 */
 	public boolean isMirrored() {
 		return mirrored;
+	}
+
+	/**
+	 * @return The current ground color
+	 */
+	public Color getGroundColor() {
+		return new Color(
+				(float) Math.min(1, groundColor.x),
+				(float) Math.min(1, groundColor.y),
+				(float) Math.min(1, groundColor.z));
+	}
+
+	/**
+	 * Set a new ground color
+	 * @param color
+	 */
+	public void setGroundColor(Color color) {
+		groundColor.x = Math.pow(color.getRed() / 255., Scene.DEFAULT_GAMMA);
+		groundColor.y = Math.pow(color.getGreen() / 255., Scene.DEFAULT_GAMMA);
+		groundColor.z = Math.pow(color.getBlue() / 255., Scene.DEFAULT_GAMMA);
+		scene.refresh();
 	}
 }

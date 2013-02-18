@@ -143,11 +143,13 @@ public class Sun {
 	private double azimuth = Math.PI / 2.5;
 	private double altitude = Math.PI / 3;
 	
-	private Vector3d su = new Vector3d();
-	private Vector3d sv = new Vector3d();
-	private Vector3d sw = new Vector3d();
+	private final Vector3d su = new Vector3d();
+	private final Vector3d sv = new Vector3d();
+	private final Vector3d sw = new Vector3d();
 	
-	final Vector3d emittance = new Vector3d(1, 1, 1);
+	protected final Vector3d emittance = new Vector3d(1, 1, 1);
+	
+	// final to ensure that we don't do a lot of redundant re-allocation
 	private final Vector3d color = new Vector3d(1, 1, 1);
 	
 	/**

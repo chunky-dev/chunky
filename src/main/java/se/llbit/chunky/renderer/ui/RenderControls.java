@@ -144,6 +144,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JProgressBar progressBar;
 	private final JLabel progressLbl = new JLabel();
 	private final JComboBox postprocessCB = new JComboBox();
+	private final JButton changeSunColorBtn = new JButton();
+	private final JButton changeGroundColorBtn = new JButton();
 
 	private final JLabel etaLbl = new JLabel();
 
@@ -763,15 +765,16 @@ public class RenderControls extends JDialog implements ViewListener,
 	
 	private Component buildLightingPane() {
 		
-		JButton changeSunColorBtn = new JButton("Change Sun Color");
+		changeSunColorBtn.setText("Change Sun Color");
 		changeSunColorBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				java.awt.Color newColor = JColorChooser.showDialog(
 						RenderControls.this, "Choose Sun Color",
 						renderManager.scene().sun().getAwtColor());
-				if (newColor != null)
+				if (newColor != null) {
 					renderManager.scene().sun().setColor(newColor);
+				}
 			}
 		});
 		
@@ -911,6 +914,19 @@ public class RenderControls extends JDialog implements ViewListener,
 		mirrorSkyCB.addActionListener(mirrorSkyListener);
 		updateMirroSkyCB();
 		
+		changeGroundColorBtn.setText("Change Ground Color");
+		changeGroundColorBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				java.awt.Color newColor = JColorChooser.showDialog(
+						RenderControls.this, "Choose Ground Color",
+						renderManager.scene().sky().getGroundColor());
+				if (newColor != null) {
+					renderManager.scene().sky().setGroundColor(newColor);
+				}
+			}
+		});
+		
 		JButton unloadSkymapBtn = new JButton("Unload Skymap");
 		unloadSkymapBtn.setToolTipText("Use the default sky");
 		unloadSkymapBtn.addActionListener(new ActionListener() {
@@ -959,6 +975,7 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(unloadSkymapBtn)
 				)
 				.addComponent(mirrorSkyCB)
+				.addComponent(changeGroundColorBtn)
 				.addComponent(sep1)
 				.addComponent(atmosphereEnabled)
 				.addComponent(volumetricFogEnabled)
@@ -984,6 +1001,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(mirrorSkyCB)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(changeGroundColorBtn)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
