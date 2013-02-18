@@ -360,7 +360,7 @@ public class Block {
 			return BedModel.intersect(ray);
 		}
 	};
-	public static final Block POWEREDRAIL = new Block(0x1B, "Powered Rail", Texture.poweredRailsOn) {
+	public static final Block POWEREDRAIL = new Block(0x1B, "Powered Rail", Texture.poweredRailOn) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -373,7 +373,7 @@ public class Block {
 					(ray.getBlockData() & 7) % 6);
 		}
 	};
-	public static final Block DETECTORRAIL = new Block(0x1C, "Detector Rail", Texture.detectorRails) {
+	public static final Block DETECTORRAIL = new Block(0x1C, "Detector Rail", Texture.detectorRail) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -381,7 +381,7 @@ public class Block {
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return RailModel.intersect(ray, Texture.detectorRails,
+			return RailModel.intersect(ray, Texture.detectorRail,
 					(ray.getBlockData() & 7) % 6);
 		}
 	};
@@ -2165,11 +2165,17 @@ public class Block {
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0x9D = new Block(0x9D, "Unknown Block 0x9D", Texture.unknown) {
+	public static final Block ACTIVATORRAIL = new Block(0x9D, "Activator Rail", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return RailModel.intersect(ray,
+					Texture.activatorRails[ray.getBlockData() >>> 3],
+					(ray.getBlockData() & 7) % 6);
 		}
 	};
 	public static final Block DROPPER = new Block(0x9E, "Dropper", Texture.dropperFront) {
@@ -2911,7 +2917,7 @@ public class Block {
 		HEAD, ANVIL, UNKNOWN0x92, UNKNOWN0x93,
 		UNKNOWN0x94, UNKNOWN0x95, UNKNOWN0x96, UNKNOWN0x97,
 		REDSTONEBLOCK, NETHERQUARTZORE, UNKNOWN0x9A, QUARTZ,
-		UNKNOWN0x9C, UNKNOWN0x9D, DROPPER, UNKNOWN0x9F,
+		UNKNOWN0x9C, ACTIVATORRAIL, DROPPER, UNKNOWN0x9F,
 		UNKNOWN0xA0, UNKNOWN0xA1, UNKNOWN0xA2, UNKNOWN0xA3,
 		UNKNOWN0xA4, UNKNOWN0xA5, UNKNOWN0xA6, UNKNOWN0xA7,
 		UNKNOWN0xA8, UNKNOWN0xA9, UNKNOWN0xAA, UNKNOWN0xAB,

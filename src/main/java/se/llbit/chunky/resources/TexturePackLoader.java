@@ -241,7 +241,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/oreLapis", Texture.lapislazuliOre, 0xA0));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_12", Texture.brownWool, 0xA1));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_4", Texture.yellowWool, 0xA2));
-		allTextures.add(new IndexedTexture("textures/blocks/goldenRail", Texture.poweredRailsOff, 0xA3));
+		allTextures.add(new IndexedTexture("textures/blocks/goldenRail", Texture.poweredRailOff, 0xA3));
 		allTextures.add(new IndexedTexture("textures/blocks/redstoneDust_cross", Texture.redstoneWireCross, 0xA4));
 		allTextures.add(new IndexedTexture("textures/blocks/redstoneDust_line", Texture.redstoneWire, 0xA5));
 		allTextures.add(new IndexedTexture("textures/blocks/enchantment_top", Texture.enchantmentTableTop, 0xA6));
@@ -258,7 +258,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/sandstone_top", Texture.sandstoneTop, 0xB0));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_11", Texture.blueWool, 0xB1));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_3", Texture.lightBlueWool, 0xB2));
-		allTextures.add(new IndexedTexture("textures/blocks/goldenRail_powered", Texture.poweredRailsOn, 0xB3));
+		allTextures.add(new IndexedTexture("textures/blocks/goldenRail_powered", Texture.poweredRailOn, 0xB3));
 		allTextures.add(new IndexedTexture("textures/blocks/enchantment_side", Texture.enchantmentTableSide, 0xB6));
 		allTextures.add(new IndexedTexture("textures/blocks/enchantment_bottom", Texture.enchantmentTableBottom, 0xB7));
 		allTextures.add(new IndexedTexture("textures/blocks/commandBlock", Texture.commandBlock, 0xB8));
@@ -268,7 +268,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/sandstone_side", Texture.sandstoneSide, 0xC0));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_10", Texture.purpleWool, 0xC1));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_2", Texture.magentaWool, 0xC2));
-		allTextures.add(new IndexedTexture("textures/blocks/detectorRail", Texture.detectorRails, 0xC3));
+		allTextures.add(new IndexedTexture("textures/blocks/detectorRail", Texture.detectorRail, 0xC3));
 		allTextures.add(new IndexedTexture("textures/blocks/leaves_jungle", Texture.jungleTreeLeaves, 0xC4));
 		allTextures.add(new IndexedTexture("textures/blocks/wood_spruce", Texture.sprucePlanks, 0xC6));
 		allTextures.add(new IndexedTexture("textures/blocks/wood_jungle", Texture.jungleTreePlanks, 0xC7));
@@ -311,6 +311,8 @@ public class TexturePackLoader {
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_lines", Texture.quartzPillar));
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_lines_top", Texture.quartzPillarTop));
 		allTextures.add(new SimpleTexture("textures/blocks/dropper_front", Texture.dropperFront));
+		allTextures.add(new SimpleTexture("textures/blocks/activatorRail", Texture.activatorRail));
+		allTextures.add(new SimpleTexture("textures/blocks/activatorRail_powered", Texture.activatorRailPowered));
 	}
 	
 	/**

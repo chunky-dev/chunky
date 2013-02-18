@@ -162,9 +162,11 @@ public class Texture {
 	public static final Texture crops7 = new Texture();
 	public static final Texture rails = new Texture("minecart-track");
 	public static final Texture railsCurved = new Texture();
-	public static final Texture poweredRailsOn = new Texture();
-	public static final Texture poweredRailsOff = new Texture();
-	public static final Texture detectorRails = new Texture();
+	public static final Texture poweredRailOn = new Texture();
+	public static final Texture poweredRailOff = new Texture();
+	public static final Texture detectorRail = new Texture();
+	public static final Texture activatorRail = new Texture();
+	public static final Texture activatorRailPowered = new Texture();
 	public static final Texture whiteWool = new Texture("wool");// TODO: variants
 	public static final Texture orangeWool = new Texture("wool");// TODO: variants
 	public static final Texture magentaWool = new Texture("wool");// TODO: variants
@@ -320,7 +322,10 @@ public class Texture {
 		{ ironDoorBottom, ironDoorTop };
 	
 	public static final Texture[] poweredRails =
-		{ poweredRailsOff, poweredRailsOn };
+		{ poweredRailOff, poweredRailOn };
+	
+	public static final Texture[] activatorRails =
+		{ activatorRail, activatorRailPowered };
 	
 	public static final Texture[] railsType =
 		{ rails, rails, rails, rails, rails, rails,
