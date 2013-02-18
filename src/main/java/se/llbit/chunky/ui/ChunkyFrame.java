@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.Messages;
 import se.llbit.chunky.world.World;
-import se.llbit.util.ProgramProperties;
 
 /**
  * Main window of the Chunky application.
@@ -103,7 +102,6 @@ public class ChunkyFrame extends JFrame {
 			}
 			@Override
 			public void windowClosing(WindowEvent e) {
-				ProgramProperties.saveProperties();
 				rootLogger.removeAppender(uiAppender);
 			}
 			@Override

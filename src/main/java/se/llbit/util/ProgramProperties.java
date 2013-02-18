@@ -39,7 +39,6 @@ public final class ProgramProperties {
 	private static final String SETTINGS_DIR = ".chunky";
 	private static final String SETTINGS_FILE = "settings.cfg";
 	private static Properties properties = new Properties();
-	private static boolean modified = false;
 	private static String path = SETTINGS_FILE;
 	private static File settingsDir;
 	
@@ -91,15 +90,13 @@ public final class ProgramProperties {
 	/**
 	 * Save settings to file.
 	 */
-	public static void saveProperties() {
-		if (modified) {
-			try {
-				OutputStream out = new FileOutputStream(path);
-				properties.store(out, "Chunky preferences");
-				logger.info("Saved property file " + path);
-			} catch (IOException e1) {
-				logger.warn("Exception occurred when saving property file " + path, e1);
-			}
+	private static void saveProperties() {
+		try {
+			OutputStream out = new FileOutputStream(path);
+			properties.store(out, "Chunky preferences");
+			logger.info("Saved property file " + path);
+		} catch (IOException e1) {
+			logger.warn("Exception occurred when saving property file " + path, e1);
 		}
 	}
 	
@@ -139,8 +136,8 @@ public final class ProgramProperties {
 		if ((value == null && properties.getProperty(name) != null)
 				|| (!value.equals(properties.getProperty(name)))) {
 			
-			modified = true;
 			properties.setProperty(name, value);
+			saveProperties();
 		}
 	}
 
@@ -160,7 +157,7 @@ public final class ProgramProperties {
 	public static void removeProperty(String name) {
 		if (properties.containsKey(name)) {
 			properties.remove(name);
-			modified = true;
+			saveProperties();
 		}
 	}
 

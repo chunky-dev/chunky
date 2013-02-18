@@ -98,7 +98,6 @@ public class SceneDirectoryPicker extends JDialog {
 					if (nopester.isSelected()) {
 						ProgramProperties.setProperty("sceneDirectory",
 								selectedDirectory.getAbsolutePath());
-						ProgramProperties.saveProperties();
 					}
 					accepted = true;
 					SceneDirectoryPicker.this.dispose();

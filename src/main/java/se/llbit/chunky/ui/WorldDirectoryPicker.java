@@ -115,7 +115,6 @@ public class WorldDirectoryPicker extends JDialog {
 				} else {
 					ProgramProperties.setProperty("worldDirectory",
 							getSelectedDirectory().getAbsolutePath());
-					ProgramProperties.saveProperties();
 					accepted = true;
 					WorldDirectoryPicker.this.dispose();
 				}

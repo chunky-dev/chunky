@@ -241,7 +241,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				ProgramProperties.setProperty("sppTargetDefault",
 						"" + renderManager.scene().getTargetSPP());
-				ProgramProperties.saveProperties();
 			}
 		});
 		
@@ -637,7 +636,6 @@ public class RenderControls extends JDialog implements ViewListener,
 						"" + renderManager.scene().canvasWidth());
 				ProgramProperties.setProperty("3dcanvas.height",
 						"" + renderManager.scene().canvasHeight());
-				ProgramProperties.saveProperties();
 			}
 		});
 		
