@@ -12,6 +12,7 @@
     * Added double smooth stone slab
     * Added double smooth sandstone slab
     * Added redstone block
+    * Added dropper block
     * Allow opening read-only region files
     * If sunlight is disabled the sun will not be rendered
     * It is now possible to disable mirroring the sky at the horizon

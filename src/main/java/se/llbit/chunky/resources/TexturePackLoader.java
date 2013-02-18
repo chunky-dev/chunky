@@ -305,6 +305,7 @@ public class TexturePackLoader {
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_side", Texture.quartzSide));
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_top", Texture.quartzTop));
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_bottom", Texture.quartzBottom));
+		allTextures.add(new SimpleTexture("textures/blocks/dropper_front", Texture.dropperFront));
 	}
 	
 	/**

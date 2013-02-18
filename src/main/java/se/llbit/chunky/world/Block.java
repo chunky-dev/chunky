@@ -2168,11 +2168,23 @@ public class Block {
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0x9E = new Block(0x9E, "Unknown Block 0x9E", Texture.unknown) {
+	public static final Block DROPPER = new Block(0x9E, "Dropper", Texture.dropperFront) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = true;
+			isOpaque = true;
+			isSolid = true;
+			localIntersect = true;
+		}
+		final Texture[] tex = {
+			Texture.dropperFront,
+			Texture.furnaceSide,
+			Texture.furnaceSide,
+			Texture.furnaceSide,
+			Texture.furnaceTop,
+			Texture.furnaceTop,
+		};
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return FurnaceModel.intersect(ray, tex);
 		}
 	};
 	public static final Block UNKNOWN0x9F = new Block(0x9F, "Unknown Block 0x9F", Texture.unknown) {
@@ -2895,7 +2907,7 @@ public class Block {
 		HEAD, ANVIL, UNKNOWN0x92, UNKNOWN0x93,
 		UNKNOWN0x94, UNKNOWN0x95, UNKNOWN0x96, UNKNOWN0x97,
 		REDSTONEBLOCK, UNKNOWN0x99, UNKNOWN0x9A, UNKNOWN0x9B,
-		UNKNOWN0x9C, UNKNOWN0x9D, UNKNOWN0x9E, UNKNOWN0x9F,
+		UNKNOWN0x9C, UNKNOWN0x9D, DROPPER, UNKNOWN0x9F,
 		UNKNOWN0xA0, UNKNOWN0xA1, UNKNOWN0xA2, UNKNOWN0xA3,
 		UNKNOWN0xA4, UNKNOWN0xA5, UNKNOWN0xA6, UNKNOWN0xA7,
 		UNKNOWN0xA8, UNKNOWN0xA9, UNKNOWN0xAA, UNKNOWN0xAB,
