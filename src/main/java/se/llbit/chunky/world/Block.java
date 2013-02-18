@@ -2135,8 +2135,8 @@ public class Block {
 	};
 	public static final Block NETHERQUARTZORE = new Block(0x99, "Nether Quartz Ore", Texture.netherQuartzOre) {
 		{
-			isOpaque = false;
-			isSolid = false;
+			isOpaque = true;
+			isSolid = true;
 		}
 	};
 	public static final Block UNKNOWN0x9A = new Block(0x9A, "Unknown Block 0x9A", Texture.unknown) {
