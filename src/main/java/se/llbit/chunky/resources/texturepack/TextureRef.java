@@ -46,10 +46,9 @@ public abstract class TextureRef {
 	/**
 	 * Attempt to load a texture from a texture pack
 	 * @param texturePack Reference to the texture pack zip file
-	 * @param texPack Description of the texture pack
 	 * @return <code>true</code> if the texture was successfully loaded
 	 */
-	public boolean load(ZipFile texturePack, String texPack) {
+	public boolean load(ZipFile texturePack) {
 		try {
 			InputStream in = texturePack.getInputStream(
 					new ZipEntry(file + ".png"));
@@ -74,4 +73,11 @@ public abstract class TextureRef {
 	
 	abstract boolean load(InputStream imageStream) throws IOException,
 			TextureFormatError;
+
+	/**
+	 * @return The symbolic name of this texture reference
+	 */
+	public String getName() {
+		return file;
+	}
 }

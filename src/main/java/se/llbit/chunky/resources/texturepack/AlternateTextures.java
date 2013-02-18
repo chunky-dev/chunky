@@ -18,8 +18,7 @@ package se.llbit.chunky.resources.texturepack;
 
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.log4j.Logger;
+import java.util.zip.ZipFile;
 
 /**
  * An alternate texture will try loading several textures,
@@ -28,9 +27,6 @@ import org.apache.log4j.Logger;
  */
 public class AlternateTextures extends TextureRef {
 	
-	private static final Logger logger =
-			Logger.getLogger(AlternateTextures.class);
-
 	private TextureRef[] alternatives;
 
 	/**
@@ -42,21 +38,20 @@ public class AlternateTextures extends TextureRef {
 		
 		this.alternatives = alternatives;
 	}
-
+	
 	@Override
-	boolean load(InputStream imageStream) throws IOException {
+	public boolean load(ZipFile texturePack) {
 		for (TextureRef alternative: alternatives) {
-			try {
-				if (alternative.load(imageStream)) {
-					return true;
-				}
-			} catch (TextureFormatError e) {
-				logger.info(e.getMessage());
-			} catch (IOException e) {
-				// failed to load texture - try next alternative
+			if (alternative.load(texturePack)) {
+				return true;
 			}
 		}
 		return false;
+	}
+
+	@Override
+	boolean load(InputStream imageStream) throws IOException {
+		throw new UnsupportedOperationException("Call load(ZipFile) instead!");
 	}
 
 }
