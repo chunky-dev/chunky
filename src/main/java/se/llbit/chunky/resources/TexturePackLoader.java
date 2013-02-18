@@ -104,6 +104,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/blockGold", Texture.goldBlock, 0x17));
 		allTextures.add(new IndexedTexture("textures/blocks/blockDiamond", Texture.diamondBlock, 0x18));
 		allTextures.add(new IndexedTexture("textures/blocks/blockEmerald", Texture.emeraldBlock, 0x19));
+		allTextures.add(new IndexedTexture("textures/blocks/blockRedstone", Texture.redstoneBlock, 0x1A));
 		allTextures.add(new IndexedTexture("textures/blocks/mushroom_red", Texture.redMushroom, 0x1C));
 		allTextures.add(new IndexedTexture("textures/blocks/mushroom_brown", Texture.brownMushroom, 0x1D));
 		allTextures.add(new IndexedTexture("textures/blocks/sapling_jungle", Texture.jungleTreeSapling, 0x1E));

@@ -2127,11 +2127,10 @@ public class Block {
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0x98 = new Block(0x98, "Unknown Block 0x98", Texture.unknown) {
+	public static final Block REDSTONEBLOCK = new Block(0x98, "Block of Redstone", Texture.redstoneBlock) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = true;
+			isOpaque = true;
+			isSolid = true;
 		}
 	};
 	public static final Block UNKNOWN0x99 = new Block(0x99, "Unknown Block 0x99", Texture.unknown) {
@@ -2895,7 +2894,7 @@ public class Block {
 		FLOWERPOT, CARROTS, POTATOES, WOODENBUTTON,
 		HEAD, ANVIL, UNKNOWN0x92, UNKNOWN0x93,
 		UNKNOWN0x94, UNKNOWN0x95, UNKNOWN0x96, UNKNOWN0x97,
-		UNKNOWN0x98, UNKNOWN0x99, UNKNOWN0x9A, UNKNOWN0x9B,
+		REDSTONEBLOCK, UNKNOWN0x99, UNKNOWN0x9A, UNKNOWN0x9B,
 		UNKNOWN0x9C, UNKNOWN0x9D, UNKNOWN0x9E, UNKNOWN0x9F,
 		UNKNOWN0xA0, UNKNOWN0xA1, UNKNOWN0xA2, UNKNOWN0xA3,
 		UNKNOWN0xA4, UNKNOWN0xA5, UNKNOWN0xA6, UNKNOWN0xA7,

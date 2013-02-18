@@ -238,6 +238,7 @@ public class Texture {
 	public static final Texture cocoaPlantLarge = new Texture();
 	public static final Texture emeraldOre = new Texture();
 	public static final Texture emeraldBlock = new Texture();
+	public static final Texture redstoneBlock = new Texture();
 	public static final Texture tripwireHook = new Texture();
 	public static final Texture tripwire = new Texture();
 	public static final Texture carrots0 = new Texture();
