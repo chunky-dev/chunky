@@ -1,4 +1,4 @@
-1.1.4 - TBD
+1.1.4 - 2013-02-18
 
     * Implemented rendering of several new blocks:
         + Anvil
@@ -22,6 +22,7 @@
     * Allow opening read-only region files
     * If sunlight is disabled the sun will not be rendered
     * It is now possible to disable the sky horizon mirroring
+    * Added support for new texture pack layout (individual block texture files)
 
 1.1.3 - 2013-01-14
     * Clicking in the map when it is maximally zoomed out will select an
