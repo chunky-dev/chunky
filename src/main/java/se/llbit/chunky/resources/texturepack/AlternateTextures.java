@@ -19,12 +19,17 @@ package se.llbit.chunky.resources.texturepack;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.log4j.Logger;
+
 /**
  * An alternate texture will try loading several textures,
  * and only fail if none of them could be loaded.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class AlternateTextures extends TextureRef {
+	
+	private static final Logger logger =
+			Logger.getLogger(AlternateTextures.class);
 
 	private TextureRef[] alternatives;
 
@@ -45,8 +50,10 @@ public class AlternateTextures extends TextureRef {
 				if (alternative.load(imageStream)) {
 					return true;
 				}
+			} catch (TextureFormatError e) {
+				logger.info(e.getMessage());
 			} catch (IOException e) {
-				// TODO
+				// failed to load texture - try next alternative
 			}
 		}
 		return false;

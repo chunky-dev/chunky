@@ -37,10 +37,11 @@ public class FoliageColorTexture extends TextureRef {
 	}
 
 	@Override
-	boolean load(InputStream imageStream) throws IOException {
+	boolean load(InputStream imageStream) throws IOException, TextureFormatError {
 		BufferedImage grasscolor = ImageIO.read(imageStream);
 		if (grasscolor.getWidth() != 256 || grasscolor.getHeight() != 256) {
-			throw new IOException("Error: Foliage color texture must be 256 by 256 pixels!");
+			throw new TextureFormatError(
+					"Foliage color texture must be 256 by 256 pixels!");
 		}
 		Biomes.loadFoliageColors(grasscolor);
 		return true;

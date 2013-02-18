@@ -24,23 +24,23 @@ import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.resources.TexturePackLoader;
-
 /**
  * Reference to a texture file in a Minecraft texture pack
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public abstract class TextureRef {
+	
 	private static final Logger logger =
-			Logger.getLogger(TexturePackLoader.class);
+			Logger.getLogger(TextureRef.class);
+	
 	private String file;
 	
 	/**
 	 * Constructor
-	 * @param file The path to the texture file (excluding extension)
+	 * @param file The path to the texture file (excluding file extension)
 	 */
 	public TextureRef(String file) {
-		this.file = file + ".png";
+		this.file = file;
 	}
 	
 	/**
@@ -51,16 +51,14 @@ public abstract class TextureRef {
 	 */
 	public boolean load(ZipFile texturePack, String texPack) {
 		try {
-			InputStream in = texturePack.getInputStream(new ZipEntry(file));
-			if (in == null) {
-				logger.info("Could not load " + file + " from " + texPack + "!");
-				return false;
-			} else {
+			InputStream in = texturePack.getInputStream(
+					new ZipEntry(file + ".png"));
+			if (in != null) {
 				return load(in);
 			}
+		} catch (TextureFormatError e) {
+			logger.info(e.getMessage());
 		} catch (IOException e) {
-			// TODO
-			logger.info("Failed to load " + texPack);
 		}
 		return false;
 	}
@@ -74,5 +72,6 @@ public abstract class TextureRef {
 		return false;
 	}
 	
-	abstract boolean load(InputStream imageStream) throws IOException;
+	abstract boolean load(InputStream imageStream) throws IOException,
+			TextureFormatError;
 }

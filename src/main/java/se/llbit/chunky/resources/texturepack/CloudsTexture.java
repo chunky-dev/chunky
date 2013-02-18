@@ -37,12 +37,13 @@ public class CloudsTexture extends TextureRef {
 	}
 
 	@Override
-	boolean load(InputStream imageStream) throws IOException {
+	boolean load(InputStream imageStream) throws IOException, TextureFormatError {
 	
 		BufferedImage texture = ImageIO.read(imageStream);
 		if (texture.getWidth() != texture.getHeight() ||
 				texture.getWidth() != 256) {
-			throw new IOException("Error: Clouds texture size must be 256 by 256 pixels!");
+			throw new TextureFormatError(
+					"Clouds texture size must be 256 by 256 pixels!");
 		}
 
 		for (int y = 0; y < 256; ++y) {

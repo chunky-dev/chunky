@@ -338,8 +338,9 @@ public class TexturePackLoader {
 		
 		Set<TextureRef> notLoaded = new HashSet<TextureRef>(textures);
 		
+		ZipFile texturePack = null;
 		try {
-			ZipFile texturePack = new ZipFile(tpFile);
+			texturePack = new ZipFile(tpFile);
 			for (TextureRef tex: textures) {
 				if (tex.load(texturePack, "texture pack " + tpFile)) {
 					notLoaded.remove(tex);
@@ -349,11 +350,16 @@ public class TexturePackLoader {
 			// fall back on terrain.png
 			loadTerrainTextures(texturePack, notLoaded);
 			
-			texturePack.close();
-			
 			ProgramProperties.setProperty("lastTexturePack", tpFile.getAbsolutePath());
 		} catch (IOException e) {
 			logger.warn("Failed to load texture pack: " + tpFile.getPath(), e);
+		} finally {
+			if (texturePack != null) {
+				try {
+					texturePack.close();
+				} catch (IOException e) {
+				}
+			}
 		}
 		
 		if (!notLoaded.isEmpty()) {
@@ -362,20 +368,21 @@ public class TexturePackLoader {
 	}
 	
 	private static void loadTerrainTextures(ZipFile texturePack,
-			Set<TextureRef> notLoaded) throws IOException {
+			Set<TextureRef> notLoaded) {
 		
-		InputStream in = texturePack.getInputStream(new ZipEntry("terrain.png"));
-		if (in != null) {
-			BufferedImage spritemap = ImageIO.read(in);
-			BufferedImage[] texture = getTerrainTextures(spritemap);
-			
-			for (TextureRef tex: textures) {
-				if (notLoaded.contains(tex) && tex.loadFromTerrain(texture)) {
-					notLoaded.remove(tex);
+		try {
+			InputStream in = texturePack.getInputStream(new ZipEntry("terrain.png"));
+			if (in != null) {
+				BufferedImage spritemap = ImageIO.read(in);
+				BufferedImage[] texture = getTerrainTextures(spritemap);
+				
+				for (TextureRef tex: textures) {
+					if (notLoaded.contains(tex) && tex.loadFromTerrain(texture)) {
+						notLoaded.remove(tex);
+					}
 				}
 			}
-		} else {
-			// TODO
+		} catch (IOException e) {
 		}
 	}
 

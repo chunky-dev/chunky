@@ -37,10 +37,11 @@ public class LargeChestTexture extends TextureRef {
 	}
 	
 	@Override
-	boolean load(InputStream imageStream) throws IOException {
+	boolean load(InputStream imageStream) throws IOException, TextureFormatError {
 		BufferedImage spritemap = ImageIO.read(imageStream);
 		if (spritemap.getWidth() % 16 != 0 || spritemap.getHeight() % 16 != 0) {
-			throw new IOException("Error: Large chest texture file must have width and height divisible by 16!");
+			throw new TextureFormatError(
+					"Large chest texture file must have width and height divisible by 16!");
 		}
 
 		int imgW = spritemap.getWidth();
