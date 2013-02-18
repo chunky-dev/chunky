@@ -2086,7 +2086,7 @@ public class Block {
 			return AnvilModel.intersect(ray);
 		};
 	};
-	public static final Block TRAPPEDCHEST = new Block(0x92, "Trapped Chest", Texture.unknown) {
+	public static final Block TRAPPEDCHEST = new Block(0x92, "Trapped Chest", Texture.chestFront) {
 		{
 			isOpaque = false;
 			isSolid = false;
