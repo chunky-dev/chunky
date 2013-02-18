@@ -2090,7 +2090,53 @@ public class Block {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+		}
+		final Texture[][] tex = {
+			// single
+			{
+				Texture.chestFront,
+				Texture.chestBack,
+				Texture.chestLeft,
+				Texture.chestRight,
+				Texture.chestTop,
+				Texture.chestBottom,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+			},
+			
+			// left
+			{
+				Texture.largeChestFrontLeft,
+				Texture.largeChestBackLeft,
+				Texture.largeChestLeft,
+				Texture.largeChestTopLeft,
+				Texture.largeChestBottomLeft,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+			},
+			
+			// right
+			{
+				Texture.largeChestFrontRight,
+				Texture.largeChestBackRight,
+				Texture.largeChestRight,
+				Texture.largeChestTopRight,
+				Texture.largeChestBottomRight,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+			}
+		};
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return ChestModel.intersect(ray, tex[(ray.currentMaterial >> 16) % 3]);
 		}
 	};
 	public static final Block WEIGHTEDPRESSUREPLATELIGHT = new Block(0x93, "Weighted Pressure Plate (Light)", Texture.unknown) {
