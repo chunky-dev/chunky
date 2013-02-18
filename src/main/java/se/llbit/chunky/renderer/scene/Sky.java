@@ -150,7 +150,7 @@ public class Sky {
 		if (blackBelowHorizon && ray.d.y < 0) {
 			ray.color.set(0, 0, 0, 1);
 			
-		} else if (scene.sun().intersect(ray)) {
+		} else if (scene.sunEnabled && scene.sun().intersect(ray)) {
 			double r = ray.color.x;
 			double g = ray.color.y;
 			double b = ray.color.z;
@@ -196,7 +196,7 @@ public class Sky {
 	 * @param blackBelowHorizon
 	 */
 	public void getSkySpecularColor(Ray ray, boolean blackBelowHorizon) {
-		if (scene.sun().intersect(ray)) {
+		if (scene.sunEnabled && scene.sun().intersect(ray)) {
 			double r = ray.color.x;
 			double g = ray.color.y;
 			double b = ray.color.z;
