@@ -310,12 +310,15 @@ public class TexturePackLoader {
 	 * If some textures files are not found they will be loaded from
 	 * the default texture pack.
 	 * @param tpFile
+	 * @param rememberTP Decides if this texture pack should be saved as the
+	 * last used texture pack
 	 */
-	public static void loadTexturePack(File tpFile) {
-		loadTexturePack(tpFile, allTextures);
+	public static void loadTexturePack(File tpFile, boolean rememberTP) {
+		loadTexturePack(tpFile, allTextures, rememberTP);
 	}
 		
-	private static void loadTexturePack(File tpFile, Collection<TextureRef> toLoad) {
+	private static void loadTexturePack(File tpFile,
+			Collection<TextureRef> toLoad, boolean rememberTP) {
 		
 		File defaultTP = Chunky.getMinecraftJar();
 		boolean isDefault = tpFile.equals(defaultTP);
@@ -336,8 +339,9 @@ public class TexturePackLoader {
 			// fall back on terrain.png
 			loadTerrainTextures(texturePack, notLoaded);
 			
-			if (!isDefault) {
-				ProgramProperties.setProperty("lastTexturePack", tpFile.getAbsolutePath());
+			if (rememberTP) {
+				ProgramProperties.setProperty("lastTexturePack",
+						tpFile.getAbsolutePath());
 			}
 		} catch (IOException e) {
 			logger.warn("Failed to open " + tpName, e);
@@ -360,7 +364,8 @@ public class TexturePackLoader {
 			logger.info(msg.toString());
 			
 			if (!isDefault) {
-				loadTexturePack(defaultTP, notLoaded);
+				// fall back on default TP
+				loadTexturePack(defaultTP, notLoaded, false);
 			}
 		}
 	}

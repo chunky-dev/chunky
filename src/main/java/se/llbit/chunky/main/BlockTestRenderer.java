@@ -35,9 +35,9 @@ public class BlockTestRenderer {
 	public static void main(String[] args) {
 		String lastTexturePack = ProgramProperties.getProperty("lastTexturePack");
 		if (lastTexturePack != null)
-			TexturePackLoader.loadTexturePack(new File(lastTexturePack));
+			TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
 		else
-			TexturePackLoader.loadTexturePack(Chunky.getMinecraftJar());
+			TexturePackLoader.loadTexturePack(Chunky.getMinecraftJar(), false);
 		TestRenderer renderer = new TestRenderer(null);
 		renderer.start();
 	}

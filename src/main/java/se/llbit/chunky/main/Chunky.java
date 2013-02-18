@@ -214,13 +214,13 @@ public class Chunky implements ChunkDiscoveryListener {
 		}
 		
 		if (texturePack != null) {
-			TexturePackLoader.loadTexturePack(new File(texturePack));
+			TexturePackLoader.loadTexturePack(new File(texturePack), false);
 		} else {
 			String lastTexturePack = ProgramProperties.getProperty("lastTexturePack");
 			if (lastTexturePack != null)
-				TexturePackLoader.loadTexturePack(new File(lastTexturePack));
+				TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
 			else
-				TexturePackLoader.loadTexturePack(getMinecraftJar());
+				TexturePackLoader.loadTexturePack(getMinecraftJar(), false);
 		}
 		
 		if (doBench) {

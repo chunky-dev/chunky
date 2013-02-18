@@ -292,7 +292,7 @@ public class Controls extends JPanel {
 				fileDialog.setVisible(true);
 				File selectedFile = fileDialog.getSelectedFile();
 				if (selectedFile != null) {
-					TexturePackLoader.loadTexturePack(selectedFile);
+					TexturePackLoader.loadTexturePack(selectedFile, true);
 					chunky.reloadWorld();
 				}
 			}
@@ -303,7 +303,7 @@ public class Controls extends JPanel {
 		loadDefaultTexturesBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				TexturePackLoader.loadTexturePack(Chunky.getMinecraftJar());
+				TexturePackLoader.loadTexturePack(Chunky.getMinecraftJar(), true);
 				chunky.reloadWorld();
 			}
 		});
