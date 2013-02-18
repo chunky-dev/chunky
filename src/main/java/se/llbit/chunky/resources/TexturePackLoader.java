@@ -306,6 +306,10 @@ public class TexturePackLoader {
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_side", Texture.quartzSide));
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_top", Texture.quartzTop));
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_bottom", Texture.quartzBottom));
+		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_chiseled", Texture.quartzChiseled));
+		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_chiseled_top", Texture.quartzChiseledTop));
+		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_lines", Texture.quartzPillar));
+		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_lines_top", Texture.quartzPillarTop));
 		allTextures.add(new SimpleTexture("textures/blocks/dropper_front", Texture.dropperFront));
 	}
 	

@@ -14,6 +14,7 @@
     * Added redstone block
     * Added dropper block
     * Added nether quartz ore block
+    * Added quartz block
     * Allow opening read-only region files
     * If sunlight is disabled the sun will not be rendered
     * It is now possible to disable mirroring the sky at the horizon

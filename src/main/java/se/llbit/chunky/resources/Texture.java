@@ -260,6 +260,10 @@ public class Texture {
 	public static final Texture quartzSide = new Texture();
 	public static final Texture quartzTop = new Texture();
 	public static final Texture quartzBottom = new Texture();
+	public static final Texture quartzChiseled = new Texture();
+	public static final Texture quartzChiseledTop = new Texture();
+	public static final Texture quartzPillar = new Texture();
+	public static final Texture quartzPillarTop = new Texture();
 	public static final Texture unknown = new Texture("unknown");
 	
 	public static final Texture signPost = new Texture();

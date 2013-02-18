@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -23,10 +23,11 @@ import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 
 /**
- * A block of wood.
+ * A block of quartz. Similar to a block of wood in that the pillar
+ * version can be horizontally placed.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class WoodModel {
+public class QuartzModel {
 	private static final Quad[] sides = {
 		// north
 		new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
@@ -55,31 +56,33 @@ public class WoodModel {
 	};
 	
 	private static final Texture[][] texture = {
-		{ Texture.oakWood, Texture.woodTop },
-		{ Texture.spruceWood, Texture.woodTop },
-		{ Texture.birchWood, Texture.woodTop },
-		{ Texture.jungleTreeWood, Texture.woodTop }
+		{ Texture.quartzSide, Texture.quartzTop, Texture.quartzBottom },
+		{ Texture.quartzChiseled, Texture.quartzChiseledTop, Texture.quartzChiseledTop },
+		{ Texture.quartzPillar, Texture.quartzPillarTop, Texture.quartzPillarTop },
+		{ Texture.quartzPillar, Texture.quartzPillarTop, Texture.quartzPillarTop },
+		{ Texture.quartzPillar, Texture.quartzPillarTop, Texture.quartzPillarTop },
 	};
 	
 	private static final int[][] textureIndex = {
-		{ 0, 0, 0, 0, 1, 1 },
-		{ 0, 0, 1, 1, 0, 0 },
-		{ 1, 1, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0 }
+		{ 0, 0, 0, 0, 1, 2 },// vertical
+		{ 0, 0, 0, 0, 1, 2 },// vertical
+		{ 0, 0, 0, 0, 1, 2 },// vertical
+		{ 0, 0, 1, 2, 0, 0 },// east-west
+		{ 1, 2, 0, 0, 0, 0 },// north-south
 	};
 	
 	private static final int[][] uv = {
-		{ 0, 0, 0, 0, 0, 0 },
-		{ 1, 1, 0, 0, 1, 1 },
-		{ 0, 0, 1, 1, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0 },// vertical
+		{ 0, 0, 0, 0, 0, 0 },// vertical
+		{ 0, 0, 0, 0, 0, 0 },// vertical
+		{ 1, 1, 0, 0, 1, 1 },// east-west
+		{ 0, 0, 1, 1, 0, 0 },// north-south
 	};
 
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray) {
 		int data = ray.getBlockData();
-		int direction = data >> 2;
-		int type = data & 3;
+		int type = data % 5;
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < sides.length; ++i) {
@@ -88,10 +91,10 @@ public class WoodModel {
 			if (side.intersect(ray)) {
 				
 				double u = ray.u;
-				int uv_x = uv[direction][i];
+				int uv_x = uv[type][i];
 				ray.u = (1-uv_x) * ray.u + uv_x * ray.v;
 				ray.v = uv_x * u  + (1-uv_x) * ray.v;
-				texture[type][textureIndex[direction][i]].getColor(ray);
+				texture[type][textureIndex[type][i]].getColor(ray);
 				ray.n.set(side.n);
 				ray.t = ray.tNear;
 				hit = true;

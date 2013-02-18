@@ -52,6 +52,7 @@ import se.llbit.chunky.model.PistonExtensionModel;
 import se.llbit.chunky.model.PistonModel;
 import se.llbit.chunky.model.PressurePlateModel;
 import se.llbit.chunky.model.PumpkinModel;
+import se.llbit.chunky.model.QuartzModel;
 import se.llbit.chunky.model.RailModel;
 import se.llbit.chunky.model.RedstoneRepeaterModel;
 import se.llbit.chunky.model.RedstoneWireModel;
@@ -2146,11 +2147,15 @@ public class Block {
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0x9B = new Block(0x9B, "Unknown Block 0x9B", Texture.unknown) {
+	public static final Block QUARTZ = new Block(0x9B, "Block of Quartz", Texture.quartzSide) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = true;
+			isOpaque = true;
+			isSolid = true;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return QuartzModel.intersect(ray);
 		}
 	};
 	public static final Block UNKNOWN0x9C = new Block(0x9C, "Unknown Block 0x9C", Texture.unknown) {
@@ -2905,7 +2910,7 @@ public class Block {
 		FLOWERPOT, CARROTS, POTATOES, WOODENBUTTON,
 		HEAD, ANVIL, UNKNOWN0x92, UNKNOWN0x93,
 		UNKNOWN0x94, UNKNOWN0x95, UNKNOWN0x96, UNKNOWN0x97,
-		REDSTONEBLOCK, NETHERQUARTZORE, UNKNOWN0x9A, UNKNOWN0x9B,
+		REDSTONEBLOCK, NETHERQUARTZORE, UNKNOWN0x9A, QUARTZ,
 		UNKNOWN0x9C, UNKNOWN0x9D, DROPPER, UNKNOWN0x9F,
 		UNKNOWN0xA0, UNKNOWN0xA1, UNKNOWN0xA2, UNKNOWN0xA3,
 		UNKNOWN0xA4, UNKNOWN0xA5, UNKNOWN0xA6, UNKNOWN0xA7,
