@@ -216,10 +216,17 @@ public class Camera {
 		return infDof;
 	}
 	
+	/**
+	 * @return <code>true</code> if parallel projection is enabled
+	 */
 	public boolean isUsingParallelProjection() {
 		return parallelProjection;
 	}
 	
+	/**
+	 * Toggle parallel projection
+	 * @param p
+	 */
 	public synchronized void setParallelProjection(boolean p) {
 		parallelProjection = p;
 		scene.refresh();
