@@ -1786,7 +1786,7 @@ public class Scene implements Refreshable {
 			logger.info("Grass texture loaded");
 			return true;
 		} catch (IOException e) {
-			logger.info("Failed to load grass texture!", e);
+			logger.info("Failed to load grass texture!");
 			return false;
 		} finally {
 			if (in != null) {
@@ -1817,7 +1817,7 @@ public class Scene implements Refreshable {
 			logger.info("Foliage texture loaded");
 			return true;
 		} catch (IOException e) {
-			logger.info("Failed to load foliage texture!", e);
+			logger.info("Failed to load foliage texture!");
 			return false;
 		} finally {
 			if (in != null) {
