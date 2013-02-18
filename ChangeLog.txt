@@ -15,7 +15,8 @@
     * Improved rendering of the Beacon block
     * Beacon block now emits light
     * Partially implemented flower pot rendering
-    * Removed spatial filtering in sample selection (improves performance)
+    * Removed spatial filtering in sample selection (slightly improves
+      rendering performance)
     * Added option to enable rendering clouds
     * Horizontal coordinates are now used for sun position
     * Allow opening read-only region files
