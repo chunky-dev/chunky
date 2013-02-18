@@ -1,5 +1,7 @@
-1.1.4 - 2013-02-18
+1.1.5 - TBD
+    * Added parallel projection (TOGoS)
 
+1.1.4 - 2013-02-18
     * Implemented rendering of several new blocks:
         + Anvil
         + Nether Brick Slab
