@@ -2139,18 +2139,26 @@ public class Block {
 			return ChestModel.intersect(ray, tex[(ray.currentMaterial >> 16) % 3]);
 		}
 	};
-	public static final Block WEIGHTEDPRESSUREPLATELIGHT = new Block(0x93, "Weighted Pressure Plate (Light)", Texture.unknown) {
+	public static final Block WEIGHTEDPRESSUREPLATELIGHT = new Block(0x93, "Weighted Pressure Plate (Light)", Texture.goldBlock) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return PressurePlateModel.intersect(ray, Texture.goldBlock);
 		}
 	};
-	public static final Block WEIGHTEDPRESSUREPLATEHEAVY = new Block(0x94, "Weighted Pressure Plate (Heavy)", Texture.unknown) {
+	public static final Block WEIGHTEDPRESSUREPLATEHEAVY = new Block(0x94, "Weighted Pressure Plate (Heavy)", Texture.ironBlock) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return PressurePlateModel.intersect(ray, Texture.ironBlock);
 		}
 	};
 	public static final Block REDSTONECOMPARATOR = new Block(0x95, "Redstone Comparator (inactive)", Texture.unknown) {
