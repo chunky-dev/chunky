@@ -55,7 +55,8 @@ public class Sky {
 		this.scene = scene;
 		
 		try {
-			rotation = Double.parseDouble(ProgramProperties.getProperty("skymapRotation", "0"));
+			rotation = Double.parseDouble(ProgramProperties.getProperty(
+					"skymapRotation", "0"));
 		} catch (NumberFormatException e) {
 			rotation = 0;
 		}
