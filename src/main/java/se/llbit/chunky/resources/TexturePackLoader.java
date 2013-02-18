@@ -263,6 +263,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/enchantment_bottom", Texture.enchantmentTableBottom, 0xB7));
 		allTextures.add(new IndexedTexture("textures/blocks/commandBlock", Texture.commandBlock, 0xB8));
 		allTextures.add(new IndexedTexture("textures/blocks/flowerPot", Texture.flowerPot, 0xBA));
+		allTextures.add(new IndexedTexture("textures/blocks/netherquartz", Texture.netherQuartzOre, 0xBF));
 		
 		allTextures.add(new IndexedTexture("textures/blocks/sandstone_side", Texture.sandstoneSide, 0xC0));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_10", Texture.purpleWool, 0xC1));

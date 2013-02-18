@@ -82,6 +82,7 @@ public class Texture {
 	public static final Texture goldOre = new Texture("gold-ore");
 	public static final Texture ironOre = new Texture("iron-ore");
 	public static final Texture coalOre = new Texture("coal-ore");
+	public static final Texture netherQuartzOre = new Texture();
 	public static final Texture bookshelf = new Texture("bookshelf");
 	public static final Texture mossStone = new Texture("moss-stone");
 	public static final Texture obsidian = new Texture("obsidian");
