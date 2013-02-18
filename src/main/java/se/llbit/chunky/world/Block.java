@@ -795,46 +795,46 @@ public class Block {
 			localIntersect = true;
 		}
 		final Texture[][] tex = {
-				// single
-				{
-					Texture.chestFront,
-					Texture.chestBack,
-					Texture.chestLeft,
-					Texture.chestRight,
-					Texture.chestTop,
-					Texture.chestBottom,
-					Texture.chestLock,
-					Texture.chestLock,
-					Texture.chestLock,
-					Texture.chestLock,
-					Texture.chestLock,
-				},
-				
-				// left
-				{
-					Texture.largeChestFrontLeft,
-					Texture.largeChestBackLeft,
-					Texture.largeChestLeft,
-					Texture.largeChestTopLeft,
-					Texture.largeChestBottomLeft,
-					Texture.chestLock,
-					Texture.chestLock,
-					Texture.chestLock,
-					Texture.chestLock,
-				},
-				
-				// right
-				{
-					Texture.largeChestFrontRight,
-					Texture.largeChestBackRight,
-					Texture.largeChestRight,
-					Texture.largeChestTopRight,
-					Texture.largeChestBottomRight,
-					Texture.chestLock,
-					Texture.chestLock,
-					Texture.chestLock,
-					Texture.chestLock,
-				}
+			// single
+			{
+				Texture.chestFront,
+				Texture.chestBack,
+				Texture.chestLeft,
+				Texture.chestRight,
+				Texture.chestTop,
+				Texture.chestBottom,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+			},
+			
+			// left
+			{
+				Texture.largeChestFrontLeft,
+				Texture.largeChestBackLeft,
+				Texture.largeChestLeft,
+				Texture.largeChestTopLeft,
+				Texture.largeChestBottomLeft,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+			},
+			
+			// right
+			{
+				Texture.largeChestFrontRight,
+				Texture.largeChestBackRight,
+				Texture.largeChestRight,
+				Texture.largeChestTopRight,
+				Texture.largeChestBottomRight,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+				Texture.chestLock,
+			}
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
@@ -2086,42 +2086,42 @@ public class Block {
 			return AnvilModel.intersect(ray);
 		};
 	};
-	public static final Block UNKNOWN0x92 = new Block(0x92, "Unknown Block 0x92", Texture.unknown) {
+	public static final Block TRAPPEDCHEST = new Block(0x92, "Trapped Chest", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0x93 = new Block(0x93, "Unknown Block 0x93", Texture.unknown) {
+	public static final Block WEIGHTEDPRESSUREPLATELIGHT = new Block(0x93, "Weighted Pressure Plate (Light)", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0x94 = new Block(0x94, "Unknown Block 0x94", Texture.unknown) {
+	public static final Block WEIGHTEDPRESSUREPLATEHEAVY = new Block(0x94, "Weighted Pressure Plate (Heavy)", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0x95 = new Block(0x95, "Unknown Block 0x95", Texture.unknown) {
+	public static final Block REDSTONECOMPARATOR = new Block(0x95, "Redstone Comparator (inactive)", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0x96 = new Block(0x96, "Unknown Block 0x96", Texture.unknown) {
+	public static final Block REDSTONECOMPARATORACTIVE = new Block(0x96, "Redstone Comparator (active)", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0x97 = new Block(0x97, "Unknown Block 0x97", Texture.unknown) {
+	public static final Block DAYLIGHTSENSOR = new Block(0x97, "Daylight Sensor", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2140,7 +2140,7 @@ public class Block {
 			isSolid = true;
 		}
 	};
-	public static final Block UNKNOWN0x9A = new Block(0x9A, "Unknown Block 0x9A", Texture.unknown) {
+	public static final Block HOPPER = new Block(0x9A, "Hopper", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2919,9 +2919,9 @@ public class Block {
 		TRIPWIRE, EMERALDBLOCK, SPRUCEWOODSTAIRS, BIRCHWOODSTAIRS,
 		JUNGLEWOODSTAIRS, COMMANDBLOCK, BEACON, STONEWALL,
 		FLOWERPOT, CARROTS, POTATOES, WOODENBUTTON,
-		HEAD, ANVIL, UNKNOWN0x92, UNKNOWN0x93,
-		UNKNOWN0x94, UNKNOWN0x95, UNKNOWN0x96, UNKNOWN0x97,
-		REDSTONEBLOCK, NETHERQUARTZORE, UNKNOWN0x9A, QUARTZ,
+		HEAD, ANVIL, TRAPPEDCHEST, WEIGHTEDPRESSUREPLATELIGHT,
+		WEIGHTEDPRESSUREPLATEHEAVY, REDSTONECOMPARATOR, REDSTONECOMPARATORACTIVE, DAYLIGHTSENSOR,
+		REDSTONEBLOCK, NETHERQUARTZORE, HOPPER, QUARTZ,
 		QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, UNKNOWN0x9F,
 		UNKNOWN0xA0, UNKNOWN0xA1, UNKNOWN0xA2, UNKNOWN0xA3,
 		UNKNOWN0xA4, UNKNOWN0xA5, UNKNOWN0xA6, UNKNOWN0xA7,
