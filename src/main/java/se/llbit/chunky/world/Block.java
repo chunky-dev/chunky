@@ -179,6 +179,7 @@ public class Block {
 			isOpaque = false;
 			isSolid = false;
 			isEmitter = true;
+			emittance = 1.0;
 			localIntersect = true;
 		}
 		@Override
@@ -191,6 +192,7 @@ public class Block {
 			isOpaque = false;
 			isSolid = false;
 			isEmitter = true;
+			emittance = 1.0;
 			localIntersect = true;
 		}
 		@Override
@@ -745,6 +747,7 @@ public class Block {
 			isOpaque = false;
 			isSolid = false;
 			isEmitter = true;
+			emittance = 1.0;
 			localIntersect = true;
 		}
 		@Override
@@ -757,6 +760,7 @@ public class Block {
 			isOpaque = false;
 			isSolid = false;
 			isEmitter = true;
+			emittance = 1.0;
 			localIntersect = true;
 		}
 		@Override
@@ -1091,6 +1095,7 @@ public class Block {
 			isOpaque = false;
 			isSolid = false;
 			isEmitter = true;
+			emittance = 1.0;
 			localIntersect = true;
 		}
 		@Override
@@ -1232,6 +1237,7 @@ public class Block {
 			isOpaque = true;
 			isSolid = true;
 			isEmitter = true;
+			emittance = 1.0;
 		}
 	};
 	public static final Block PORTAL = new Block(0x5A, "Portal", Texture.portal) {
@@ -1245,6 +1251,7 @@ public class Block {
 			isOpaque = true;
 			isSolid = true;
 			isEmitter = true;
+			emittance = 1.0;
 			localIntersect = true;
 		}
 		final Texture[] tex = {
@@ -1803,6 +1810,7 @@ public class Block {
 			isOpaque = true;
 			isSolid = true;
 			isEmitter = true;
+			emittance = 1.0;
 		}
 	};
 	public static final Block DOUBLEWOODENSLAB = new Block(0x7D, "Double Wooden Slab", Texture.oakPlanks) {
@@ -1983,6 +1991,7 @@ public class Block {
 			ior = 1.520f;
 			localIntersect = true;
 			isEmitter = true;
+			emittance = 1.0;
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
@@ -2966,6 +2975,8 @@ public class Block {
 	 * Emitter blocks emit light.
 	 */
 	public boolean isEmitter = false;
+	
+	public double emittance = 0.0;
 	
 	/**
 	 * Subsurface scattering property.

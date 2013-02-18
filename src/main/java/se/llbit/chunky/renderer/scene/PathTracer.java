@@ -146,9 +146,12 @@ public class PathTracer {
 						if (scene.emittersEnabled && currentBlock.isEmitter) {
 
 							emittance = addEmitted;
-							ray.emittance.x = ray.color.x * ray.color.x * scene.emitterIntensity;
-							ray.emittance.y = ray.color.y * ray.color.y * scene.emitterIntensity;
-							ray.emittance.z = ray.color.z * ray.color.z * scene.emitterIntensity;
+							ray.emittance.x = ray.color.x * ray.color.x *
+									currentBlock.emittance * scene.emitterIntensity;
+							ray.emittance.y = ray.color.y * ray.color.y *
+									currentBlock.emittance * scene.emitterIntensity;
+							ray.emittance.z = ray.color.z * ray.color.z *
+									currentBlock.emittance * scene.emitterIntensity;
 							ray.hit = true;
 						}
 
