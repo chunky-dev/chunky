@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer.scene;
 import java.util.Random;
 
 import se.llbit.chunky.renderer.Refreshable;
+import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.World;
 import se.llbit.math.Matrix3d;
 import se.llbit.math.Ray;
@@ -78,6 +79,11 @@ public class Camera {
 	private double fov = 70;
 	
 	/**
+	 * Maximum diagonal width of the world
+	 */
+	private double worldWidth = 100;
+	
+	/**
 	 * Tangens of the FoV angle
 	 */
 	public double fovTan;
@@ -116,6 +122,7 @@ public class Camera {
 		fov = other.fov;
 		focalOffset = other.focalOffset;
 		infDof = other.infDof;
+		worldWidth = other.worldWidth;
 		calcFovTan();
 		updateTransform();
 	}
@@ -415,10 +422,10 @@ public class Camera {
 		if (parallelProjection) {
 			d.set( 0, -1, 0 );
 			transform.transform(d);
-			o.set( y*fov, 0, x*fov*aspect );
+			o.set( y*fov, worldWidth, x*fov*aspect );
 			transform.transform(o);
 			o.add(pos);
-			ray.set( o, d );
+			ray.set(o, d);
 		} else if (infDof) {
 			d.set(fovTan * y, -1, fovTan * aspect * x);
 			d.normalize();
@@ -495,5 +502,12 @@ public class Camera {
 	 */
 	public double getPitch() {
 		return pitch;
+	}
+
+	/**
+	 * @param size
+	 */
+	public void setWorldSize(double size) {
+		worldWidth = Math.sqrt(size*size + Chunk.Y_MAX*Chunk.Y_MAX);
 	}
 }

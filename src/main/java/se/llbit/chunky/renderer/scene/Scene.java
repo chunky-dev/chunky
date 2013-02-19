@@ -1026,6 +1026,8 @@ public class Scene implements Refreshable {
 			OctreeFinalizer.finalizeChunk(octree, origin, cp);
 		}
 		
+		camera.setWorldSize(1<<octree.depth);
+		
 		logger.info(String.format("Loaded %d chunks (%d emitters)",
 				chunks, emitters));
 	}
