@@ -1862,7 +1862,12 @@ public class RenderControls extends JDialog implements ViewListener,
 	
 	protected void updateParallelProjectionCheckBox() {
 		parallelProjectionCB.removeChangeListener(parallelProjectionListener);
-		parallelProjectionCB.setSelected(renderManager.scene().camera().isUsingParallelProjection());
+		boolean selected = renderManager.scene().camera().isUsingParallelProjection();
+		parallelProjectionCB.setSelected(selected);
+		dofSlider.setEnabled(!selected);
+		dofField.setEnabled(!selected);
+		focalOffsetSlider.setEnabled(!selected);
+		focalOffsetField.setEnabled(!selected);
 		parallelProjectionCB.addChangeListener(parallelProjectionListener);
 	}
 	
