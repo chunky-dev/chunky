@@ -748,7 +748,7 @@ public class Block {
 			isOpaque = false;
 			isSolid = false;
 			isEmitter = true;
-			emittance = 1.0;
+			emittance = 50.0;
 			localIntersect = true;
 		}
 		@Override
