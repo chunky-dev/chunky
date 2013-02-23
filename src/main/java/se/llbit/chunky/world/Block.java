@@ -30,6 +30,7 @@ import se.llbit.chunky.model.CauldronModel;
 import se.llbit.chunky.model.ChestModel;
 import se.llbit.chunky.model.CocoaPlantModel;
 import se.llbit.chunky.model.CropsModel;
+import se.llbit.chunky.model.DaylightSensorModel;
 import se.llbit.chunky.model.DoorModel;
 import se.llbit.chunky.model.DragonEggModel;
 import se.llbit.chunky.model.EnchantmentTableModel;
@@ -2175,11 +2176,15 @@ public class Block {
 			isInvisible = true;
 		}
 	};
-	public static final Block DAYLIGHTSENSOR = new Block(0x97, "Daylight Sensor", Texture.unknown) {
+	public static final Block DAYLIGHTSENSOR = new Block(0x97, "Daylight Sensor", Texture.daylightDetectorTop) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return DaylightSensorModel.intersect(ray);
 		}
 	};
 	public static final Block REDSTONEBLOCK = new Block(0x98, "Block of Redstone", Texture.redstoneBlock) {

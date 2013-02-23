@@ -1,5 +1,6 @@
 1.1.5 - TBD
     * Added parallel projection (TOGoS)
+    * Added Daylight Sensor
 
 1.1.4 - 2013-02-18
     * Implemented rendering of several new blocks:

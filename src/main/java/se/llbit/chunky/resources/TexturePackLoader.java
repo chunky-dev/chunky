@@ -313,6 +313,8 @@ public class TexturePackLoader {
 		allTextures.add(new SimpleTexture("textures/blocks/dropper_front", Texture.dropperFront));
 		allTextures.add(new SimpleTexture("textures/blocks/activatorRail", Texture.activatorRail));
 		allTextures.add(new SimpleTexture("textures/blocks/activatorRail_powered", Texture.activatorRailPowered));
+		allTextures.add(new SimpleTexture("textures/blocks/daylightDetector_top", Texture.daylightDetectorTop));
+		allTextures.add(new SimpleTexture("textures/blocks/daylightDetector_side", Texture.daylightDetectorSide));
 	}
 	
 	/**
