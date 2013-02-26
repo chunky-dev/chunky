@@ -18,7 +18,6 @@
 		<delete file="build/Chunky.jar" />
 		<delete file="build/Chunky.app" />
 		<delete file="build/Chunky.dmg" />
-		<!--delete file="NBTDump.jar" /-->
 	</target>
 	
 	<target name="gen">
