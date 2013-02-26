@@ -50,19 +50,21 @@ public class Credits extends JDialog {
 		JLabel creditsLbl = new JLabel(
 			"<html><b>Programming:</b><br>" +
 			"Jesper Öqvist<br>" +
+			"TOGoS (parallel projection)<br>" +
 			"<br>" +
 			"<b>OSX Bundling:</b><br>" +
 			"Ben Phelps<br>" +
 			"<br>" +
-			"<b>Special thanks to:</b><br>" +
+			"<b>Special Thanks:</b><br>" +
 			"oldshoesbro<br>" +
 			"SmilyOrg<br>" +
 			"r/Minecraft<br>" +
 			"<br>" +
-			"<b>Libraries used:</b><br>" +
+			"<b>Tools and Libraries:</b><br>" +
 			"Apache log4j<br>" +
 			"JOCL (http://www.jocl.org)<br>" +
-			"MWC64X<br>"
+			"MWC64X<br>" +
+			"Markdown<br>"
 		);
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
