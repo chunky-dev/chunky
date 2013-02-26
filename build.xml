@@ -15,10 +15,9 @@
 		<delete dir="${src.dir}/gen">
 			<exclude name="**/test/*"/>
 		</delete>
-		<delete file="Chunky.jar" />
-		<delete file="Chunky-tmp.dmg" />
-		<delete file="Chunky.dmg" />
-		<delete dir="Chunky.app" />
+		<delete file="build/Chunky.jar" />
+		<delete file="build/Chunky.app" />
+		<delete file="build/Chunky.dmg" />
 		<!--delete file="NBTDump.jar" /-->
 	</target>
 	
@@ -138,32 +137,32 @@
 	</target>
 
 	<target name="macapp" description="Create an .app package for Chunky">
-			<property name="Chunky.app" value="build"/>
-			<property name="app.name" value="Chunky"/>
-			<property name="macosx.resrc" value="Resources"/>
-			<property name="app.resrc" value="${src.dir}/main/res"/>
-			<property name="macosx.stubfile" value="${macosx.resrc}/JavaApplicationStub"/>
-			<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
-			<jarbundler dir="."
-						name="${app.name}"
-						bundleid="se.llbit.chunky"
-						shortname="${app.name}"
-						version="${version}"
-						mainclass="se.llbit.chunky.launcher.ChunkyLauncher"
-						icon="${macosx.resrc}/chunky.icns"
-						infostring="${app.name}"
-						stubfile="${macosx.stubfile}"
-						workingdirectory="$APP_PACKAGE/Contents/Resources/Java"
-						vmoptions="-Xms512m -Xmx2048m">		
-				<javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
-				<javaproperty name="apple.awt.textantialiasing" value="true" />
-				<resourcefileset dir="${app.resrc}">
-						<include name="chunky.icns" />
-				</resourcefileset>
-				<jarfileset dir="build">
-					<include name="Chunky.jar"/>
-				</jarfileset>	
-			</jarbundler>
+		<property name="Chunky.app" value="build"/>
+		<property name="app.name" value="Chunky"/>
+		<property name="macosx.resrc" value="Resources"/>
+		<property name="app.resrc" value="${src.dir}/main/res"/>
+		<property name="macosx.stubfile" value="${macosx.resrc}/JavaApplicationStub"/>
+		<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
+		<jarbundler dir="."
+				name="${app.name}"
+				bundleid="se.llbit.chunky"
+				shortname="${app.name}"
+				version="${version}"
+				mainclass="se.llbit.chunky.launcher.ChunkyLauncher"
+				icon="${macosx.resrc}/chunky.icns"
+				infostring="${app.name}"
+				stubfile="${macosx.stubfile}"
+				workingdirectory="$APP_PACKAGE/Contents/Resources/Java"
+				vmoptions="-Xms512m -Xmx2048m">
+			<javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
+			<javaproperty name="apple.awt.textantialiasing" value="true" />
+			<resourcefileset dir="${app.resrc}">
+				<include name="chunky.icns" />
+			</resourcefileset>
+			<jarfileset dir="build">
+				<include name="Chunky.jar"/>
+			</jarfileset>	
+		</jarbundler>
 	</target>
 	
 	<target name="macdmg" description="Create a DMG package for Chunky">
@@ -175,13 +174,13 @@
 			<arg value="-volname"/>
 			<arg value="Chunky"/>
 			<arg value="-ov"/>
-			<arg value="Chunky-tmp.dmg"/>
+			<arg value="build/Chunky-tmp.dmg"/>
 			<arg value="-format"/>
 			<arg value="UDRW"/>
 		</exec>
 		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 			<arg value="attach"/>
-			<arg value="Chunky-tmp.dmg"/>
+			<arg value="build/Chunky-tmp.dmg"/>
 			<arg value="-mountroot"/>
 			<arg value="${mountdir}/"/>
 		</exec>
@@ -202,17 +201,17 @@
 		<delete file="${app.name}-tmp.dmg" quiet="yes" failonerror="false"/>
 		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 			<arg value="convert"/>
-			<arg value="Chunky-tmp.dmg"/>
+			<arg value="build/Chunky-tmp.dmg"/>
 			<arg value="-format"/>
 			<arg value="UDZO"/>
 			<arg value="-o"/>
-			<arg value="Chunky.dmg"/>
+			<arg value="build/Chunky-${Chunky.version}.dmg"/>
 		</exec>
-		<delete file="Chunky-tmp.dmg" />
+		<delete file="build/Chunky-tmp.dmg" />
 		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 			<arg value="internet-enable"/>
 			<arg value="-yes"/>
-			<arg value="Chunky.dmg"/>
+			<arg value="build/Chunky-${Chunky.version}.dmg"/>
 		</exec>
 	</target>
 
