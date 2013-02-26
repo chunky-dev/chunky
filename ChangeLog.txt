@@ -2,6 +2,7 @@
     * Added parallel projection (TOGoS)
     * Added Daylight Sensor
     * Fixed issue causing Nether Brick Stairs to render as Nether Brick Fences
+    * Increased default torch emittance
 
 1.1.4 - 2013-02-18
     * Implemented rendering of several new blocks:
