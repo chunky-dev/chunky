@@ -1705,7 +1705,7 @@ public class Block {
 		}
 	};
 	public static final int NETHERBRICKSTAIRS_ID = 0x72;
-	public static final Block NETHERBRICKSTAIRS = new Block(NETHERBRICKFENCE_ID, "Nether Brick Stairs", Icon.stoneStairs, Texture.netherBrick) {
+	public static final Block NETHERBRICKSTAIRS = new Block(NETHERBRICKSTAIRS_ID, "Nether Brick Stairs", Icon.stoneStairs, Texture.netherBrick) {
 		{
 			isOpaque = false;
 			isSolid = false;

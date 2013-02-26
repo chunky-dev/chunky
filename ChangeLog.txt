@@ -1,6 +1,7 @@
 1.1.5 - TBD
     * Added parallel projection (TOGoS)
     * Added Daylight Sensor
+    * Fixed issue causing Nether Brick Stairs to render as Nether Brick Fences
 
 1.1.4 - 2013-02-18
     * Implemented rendering of several new blocks:
