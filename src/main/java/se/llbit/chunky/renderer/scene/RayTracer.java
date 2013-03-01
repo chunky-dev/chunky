@@ -131,7 +131,7 @@ public class RayTracer {
 
 	private static boolean cloudIntersection(Scene scene, Ray ray) {
 		if (ray.d.y != 0) {
-			ray.t = (scene.cloudHeight - ray.x.y) / ray.d.y;
+			ray.t = (scene.cloudHeight - scene.origin.y - ray.x.y) / ray.d.y;
 			if (ray.t > Ray.EPSILON) {
 				double u = ray.x.x + ray.d.x * ray.t;
 				double v = ray.x.z + ray.d.z * ray.t;

@@ -1,6 +1,7 @@
 1.1.6 - TBD
     * Added Comparator block
     * Render flowers in flower pots
+    * Cloud height is now relative to the scene origin
 
 1.1.5 - 2013-02-26
     * Added parallel projection (TOGoS)
