@@ -315,6 +315,8 @@ public class TexturePackLoader {
 		allTextures.add(new SimpleTexture("textures/blocks/activatorRail_powered", Texture.activatorRailPowered));
 		allTextures.add(new SimpleTexture("textures/blocks/daylightDetector_top", Texture.daylightDetectorTop));
 		allTextures.add(new SimpleTexture("textures/blocks/daylightDetector_side", Texture.daylightDetectorSide));
+		allTextures.add(new SimpleTexture("textures/blocks/comparator", Texture.comparator));
+		allTextures.add(new SimpleTexture("textures/blocks/comparator_lit", Texture.comparatorLit));
 	}
 	
 	/**

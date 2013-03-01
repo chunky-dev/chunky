@@ -1,3 +1,6 @@
+1.1.6 - TBD
+    * Added Comparator block
+
 1.1.5 - 2013-02-26
     * Added parallel projection (TOGoS)
     * Added Daylight Sensor block

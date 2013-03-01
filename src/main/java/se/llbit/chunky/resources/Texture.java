@@ -268,6 +268,8 @@ public class Texture {
 	public static final Texture quartzPillarTop = new Texture();
 	public static final Texture daylightDetectorTop = new Texture();
 	public static final Texture daylightDetectorSide = new Texture();
+	public static final Texture comparator = new Texture();
+	public static final Texture comparatorLit = new Texture();
 	public static final Texture unknown = new Texture("unknown");
 	
 	public static final Texture signPost = new Texture();

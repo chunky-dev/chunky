@@ -29,6 +29,7 @@ import se.llbit.chunky.model.CakeModel;
 import se.llbit.chunky.model.CauldronModel;
 import se.llbit.chunky.model.ChestModel;
 import se.llbit.chunky.model.CocoaPlantModel;
+import se.llbit.chunky.model.ComparatorModel;
 import se.llbit.chunky.model.CropsModel;
 import se.llbit.chunky.model.DaylightSensorModel;
 import se.llbit.chunky.model.DoorModel;
@@ -2166,14 +2167,22 @@ public class Block {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return ComparatorModel.intersect(ray, 0);
 		}
 	};
-	public static final Block REDSTONECOMPARATORACTIVE = new Block(0x96, "Redstone Comparator (active)", Texture.unknown) {
+	public static final Block REDSTONECOMPARATORLIT = new Block(0x96, "Redstone Comparator (active)", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return ComparatorModel.intersect(ray, 1);
 		}
 	};
 	public static final Block DAYLIGHTSENSOR = new Block(0x97, "Daylight Sensor", Texture.daylightDetectorTop) {
@@ -2979,7 +2988,7 @@ public class Block {
 		JUNGLEWOODSTAIRS, COMMANDBLOCK, BEACON, STONEWALL,
 		FLOWERPOT, CARROTS, POTATOES, WOODENBUTTON,
 		HEAD, ANVIL, TRAPPEDCHEST, WEIGHTEDPRESSUREPLATELIGHT,
-		WEIGHTEDPRESSUREPLATEHEAVY, REDSTONECOMPARATOR, REDSTONECOMPARATORACTIVE, DAYLIGHTSENSOR,
+		WEIGHTEDPRESSUREPLATEHEAVY, REDSTONECOMPARATOR, REDSTONECOMPARATORLIT, DAYLIGHTSENSOR,
 		REDSTONEBLOCK, NETHERQUARTZORE, HOPPER, QUARTZ,
 		QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, UNKNOWN0x9F,
 		UNKNOWN0xA0, UNKNOWN0xA1, UNKNOWN0xA2, UNKNOWN0xA3,
@@ -3082,6 +3091,8 @@ public class Block {
 		redstoneConnectors.add(STONEBUTTON);
 		redstoneConnectors.add(TRIPWIREHOOK);
 		redstoneConnectors.add(TRIPWIREHOOK);
+		redstoneConnectors.add(REDSTONECOMPARATOR);
+		redstoneConnectors.add(REDSTONECOMPARATORLIT);
 	}
 
 	Block(int id, String name, Texture texture) {
