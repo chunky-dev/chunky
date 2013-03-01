@@ -18,7 +18,11 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
+import se.llbit.math.DoubleSidedQuad;
+import se.llbit.math.Quad;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3d;
+import se.llbit.math.Vector4d;
 
 /**
  * Flower pot block.
@@ -38,6 +42,17 @@ public class FlowerPotModel {
 		new AABB(6/16., 10/16., 0, 4/16., 6/16., 10/16.),
 	};
 	
+	private static final AABB cactus =
+		new AABB(6/16., 10/16., 4/16., 1, 6/16., 10/16.);
+	
+	protected static Quad[] flower = {
+		new DoubleSidedQuad(new Vector3d(0, 4/16., 0), new Vector3d(1, 4/16., 1),
+					new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 12/16.)),
+					
+		new DoubleSidedQuad(new Vector3d(1, 4/16., 0), new Vector3d(0, 4/16., 1),
+				new Vector3d(1, 1, 0), new Vector4d(0, 1, 0, 12/16.)),
+	};
+	
 	private static final Texture[] tex = {
 		Texture.flowerPot,
 		Texture.flowerPot,
@@ -53,6 +68,7 @@ public class FlowerPotModel {
 	 */
 	public static boolean intersect(Ray ray) {
 		boolean hit = false;
+		int flower = ray.getBlockData();
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < boxes.length; ++i) {
 			if (boxes[i].intersect(ray)) {
@@ -61,11 +77,80 @@ public class FlowerPotModel {
 				hit = true;
 			}
 		}
+		switch (flower) {
+		case 0:
+		default:
+			break;
+		case 1:
+			hit |= flower(ray, Texture.redRose);
+			break;
+		case 2:
+			hit |= flower(ray, Texture.yellowFlower);
+			break;
+		case 3:
+			hit |= flower(ray, Texture.oakSapling);
+			break;
+		case 4:
+			hit |= flower(ray, Texture.spruceSapling);
+			break;
+		case 5:
+			hit |= flower(ray, Texture.birchSapling);
+			break;
+		case 6:
+			hit |= flower(ray, Texture.jungleTreeSapling);
+			break;
+		case 7:
+			hit |= flower(ray, Texture.redMushroom);
+			break;
+		case 8:
+			hit |= flower(ray, Texture.brownMushroom);
+			break;
+		case 9:
+			hit |= cactus(ray);
+			break;
+		case 10:
+			hit |= flower(ray, Texture.deadBush);
+			break;
+		case 11:
+			hit |= flower(ray, Texture.fern);
+			break;
+		}
 		if (hit) {
 			ray.color.w = 1;
 			ray.distance += ray.t;
 			ray.x.scaleAdd(ray.t, ray.d, ray.x);
 		}
 		return hit;
+	}
+
+	private static boolean flower(Ray ray, Texture texture) {
+		boolean hit = false;
+		for (Quad quad : flower) {
+			if (quad.intersect(ray)) {
+				float[] color = texture.getColor(ray.u, ray.v);
+				if (color[3] > Ray.EPSILON) {
+					ray.color.set(color);
+					ray.t = ray.tNear;
+					ray.n.set(quad.n);
+					ray.n.scale(-Math.signum(ray.d.dot(quad.n)));
+					hit = true;
+				}
+			}
+		}
+		return hit;
+	}
+
+	private static boolean cactus(Ray ray) {
+		if (cactus.intersect(ray)) {
+			if (ray.n.y > 0) {
+				Texture.cactusTop.getColor(ray);
+			} else {
+				Texture.cactusSide.getColor(ray);
+			}
+			ray.color.w = 1;
+			ray.t = ray.tNear;
+			return true;
+		}
+		return false;
 	}
 }

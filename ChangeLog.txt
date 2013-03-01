@@ -1,5 +1,6 @@
 1.1.6 - TBD
     * Added Comparator block
+    * Render flowers in flower pots
 
 1.1.5 - 2013-02-26
     * Added parallel projection (TOGoS)
