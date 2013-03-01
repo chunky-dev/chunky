@@ -3093,6 +3093,7 @@ public class Block {
 		redstoneConnectors.add(TRIPWIREHOOK);
 		redstoneConnectors.add(REDSTONECOMPARATOR);
 		redstoneConnectors.add(REDSTONECOMPARATORLIT);
+		redstoneConnectors.add(DAYLIGHTSENSOR);
 	}
 
 	Block(int id, String name, Texture texture) {
