@@ -41,18 +41,18 @@ public class OctreeFinalizer {
 				for (int cx = 0; cx < 16; ++cx) {
 					int x = cx + cp.x*16 - origin.x;
 					int type = octree.get(x, cy, z);
-					Block block = Block.values[type & 0xFF];
+					Block block = Block.get(type);
 					
 					// set non-visible blocks to be stone, in order to merge large patches
 					if ((cx == 0 || cx == 15 || cz == 0 || cz == 15) &&
 							cy > -origin.y && cy < Chunk.Y_MAX-origin.y-1 &&
 							block != Block.STONE && block.isOpaque) {
 						if (Block.values[0xFF & octree.get(x-1, cy, z)].isOpaque &&
-								Block.values[0xFF & octree.get(x+1, cy, z)].isOpaque &&
-								Block.values[0xFF & octree.get(x, cy-1, z)].isOpaque &&
-								Block.values[0xFF & octree.get(x, cy+1, z)].isOpaque &&
-								Block.values[0xFF & octree.get(x, cy, z-1)].isOpaque &&
-								Block.values[0xFF & octree.get(x, cy, z+1)].isOpaque) {
+								Block.get(octree.get(x+1, cy, z)).isOpaque &&
+								Block.get(octree.get(x, cy-1, z)).isOpaque &&
+								Block.get(octree.get(x, cy+1, z)).isOpaque &&
+								Block.get(octree.get(x, cy, z-1)).isOpaque &&
+								Block.get(octree.get(x, cy, z+1)).isOpaque) {
 							octree.set(Block.STONE.id, x, cy, z);
 							continue;
 						}
@@ -431,18 +431,30 @@ public class OctreeFinalizer {
 						octree.set(type, x, cy, z);
 						break;
 					case Block.STONEWALL_ID:
-						other = Block.values[0xFF & octree.get(x, cy, z - 1)];
+						other = Block.get(octree.get(x, cy, z - 1));
+						int connections = 0;
 						if (other.isStoneWallConnector())
-							type |= 1 << BlockData.STONEWALL_CONN;
-						other = Block.values[0xFF & octree.get(x, cy, z + 1)];
+							connections |= 1;
+						other = Block.get(octree.get(x, cy, z + 1));
 						if (other.isStoneWallConnector())
-							type |= 2 << BlockData.STONEWALL_CONN;
-						other = Block.values[0xFF & octree.get(x + 1, cy, z)];
+							connections |= 2;
+						other = Block.get(octree.get(x + 1, cy, z));
 						if (other.isStoneWallConnector())
-							type |= 4 << BlockData.STONEWALL_CONN;
-						other = Block.values[0xFF & octree.get(x - 1, cy, z)];
+							connections |= 4;
+						other = Block.get(octree.get(x - 1, cy, z));
 						if (other.isStoneWallConnector())
-							type |= 8 << BlockData.STONEWALL_CONN;
+							connections |= 8;
+						type |= connections << BlockData.STONEWALL_CONN;
+						if (connections != 3 && connections != 12) {
+							type |= 1 << BlockData.STONEWALL_CORNER;
+						} else if (cy+1 < Chunk.Y_MAX) {
+							other =  Block.get(octree.get(x, cy+1, z));
+							if (other == Block.TORCH
+									|| other == Block.REDSTONETORCHON 
+									|| other == Block.REDSTONETORCHOFF) {
+								type |= 1 << BlockData.STONEWALL_CORNER;
+							}
+						}
 						octree.set(type, x, cy, z);
 						break;
 					case Block.FENCE_ID:

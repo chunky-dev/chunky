@@ -35,9 +35,10 @@ public class StoneWallModel {
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
-		int data = 0xF & (ray.currentMaterial >>> BlockData.STONEWALL_CONN);
+		int connections = 0xF & (ray.currentMaterial >>> BlockData.STONEWALL_CONN);
+		int midsection = 1 & (ray.currentMaterial >>> BlockData.STONEWALL_CORNER);
 		// figure out if we should draw the center post
-		if (data != 3 && data != 12) {
+		if (midsection != 0) {
 			if (post.intersect(ray)) {
 				texture.getColor(ray);
 				ray.t = ray.tNear;
@@ -45,7 +46,7 @@ public class StoneWallModel {
 			}
 		}
 		for (int i = 0; i < 4; ++i) {
-			if ((data & (1 << i)) != 0) {
+			if ((connections & (1 << i)) != 0) {
 				if (plank[i].intersect(ray)) {
 					texture.getColor(ray);
 					ray.t = ray.tNear;

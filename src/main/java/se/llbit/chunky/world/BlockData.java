@@ -59,6 +59,11 @@ public interface BlockData {
 	 */
 	int STONEWALL_CONN = 9;
 	
+	/**
+	 * One bit telling if the stone wall is a corner section
+	 */
+	int STONEWALL_CORNER = 14;
+	
 	int CORNER_OFFSET = 24;
 	
 	int SOUTH_EAST = 4;
