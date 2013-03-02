@@ -18,49 +18,64 @@ package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.renderer.scene.Scene;
 
-
 /**
  * Interface for render managers
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public interface IRenderManager {
+public abstract class AbstractRenderManager extends Thread {
+	
+	/**
+	 * Constructor
+	 * @param numThreads
+	 * @param tileWidth
+	 */
+	public AbstractRenderManager(int numThreads, int tileWidth) {
+		super("Render Manager");
+		
+		this.numThreads = numThreads;
+		this.tileWidth = tileWidth;
+	}
 	
 	/**
 	 * Minimum number of worker threads
 	 */
-	int NUM_RENDER_THREADS_MIN = 1;
+	public static int NUM_RENDER_THREADS_MIN = 1;
 	
 	/**
 	 * Maximum number of worker threads
 	 */
-	int NUM_RENDER_THREADS_MAX = 10000;
+	public static int NUM_RENDER_THREADS_MAX = 10000;
 	
 	/**
-	 * Maximum width of render tile
+	 * Default tile width
 	 */
-	int TILE_WIDTH = 8;
+	public static int TILE_WIDTH_DEFAULT = 8;
 	
 	/**
-	 * Maximum height of render tile
+	 * Number of render threads
 	 */
-	int TILE_HEIGHT = TILE_WIDTH;
+	protected final int numThreads;
 	
-
+	/**
+	 * Tile width
+	 */
+	protected final int tileWidth;
+	
 	/**
 	 * Get a job from the job queue
 	 * @return Next job Id
 	 * @throws InterruptedException
 	 */
-	public int getNextJob() throws InterruptedException;
+	public abstract int getNextJob() throws InterruptedException;
 	
 	/**
 	 * Report finished job
 	 */
-	public void jobDone();
+	public abstract void jobDone();
 	
 	/**
 	 * @return The buffered scene object
 	 */
-	public Scene bufferedScene();
+	public abstract Scene bufferedScene();
 
 }

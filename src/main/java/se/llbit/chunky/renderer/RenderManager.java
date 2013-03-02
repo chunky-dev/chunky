@@ -43,7 +43,7 @@ import se.llbit.resources.ImageLoader;
  * 
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class RenderManager extends Thread implements IRenderManager, Renderer {
+public class RenderManager extends AbstractRenderManager implements Renderer {
 	
 	/**
 	 * Default number of worker threads.
@@ -53,7 +53,6 @@ public class RenderManager extends Thread implements IRenderManager, Renderer {
 			Runtime.getRuntime().availableProcessors();
 	
 	static final int SPP = 1;
-	private final int numThreads;
 	
 	private static final Logger logger =
 			Logger.getLogger(RenderManager.class);
@@ -112,9 +111,8 @@ public class RenderManager extends Thread implements IRenderManager, Renderer {
 	public RenderManager(RenderableCanvas canvas, RenderContext context,
 			RenderStatusListener controls) {
 		
-		super("Render Manager");
+		super(context.numRenderThreads(), TILE_WIDTH_DEFAULT);
 		
-		this.numThreads = context.numRenderThreads();
 		this.canvas = canvas;
 		this.context = context;
 		renderListener = controls;
@@ -306,8 +304,8 @@ public class RenderManager extends Thread implements IRenderManager, Renderer {
 		
 		int canvasWidth = bufferedScene.canvasWidth();
 		int canvasHeight = bufferedScene.canvasHeight();
-		numJobs = ((canvasWidth+(TILE_WIDTH-1)) / TILE_WIDTH) *
-				((canvasHeight+(TILE_HEIGHT-1)) / TILE_HEIGHT);
+		numJobs = ((canvasWidth+(tileWidth-1)) / tileWidth) *
+				((canvasHeight+(tileWidth-1)) / tileWidth);
 		nextJob.set(0);
 		finishedJobs.set(0);
 		notifyAll();

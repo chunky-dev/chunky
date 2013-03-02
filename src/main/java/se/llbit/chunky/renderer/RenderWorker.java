@@ -37,7 +37,7 @@ public class RenderWorker extends Thread {
 			Logger.getLogger(RenderWorker.class);
 	
 	private int id;
-	private IRenderManager manager;
+	private AbstractRenderManager manager;
 	
 	private final Vector3d d = new Vector3d();
 	private final Vector3d o = new Vector3d();
@@ -52,7 +52,7 @@ public class RenderWorker extends Thread {
 	 * @param id
 	 * @param seed 
 	 */
-	public RenderWorker(IRenderManager manager, int id, long seed) {
+	public RenderWorker(AbstractRenderManager manager, int id, long seed) {
 		super("3D Render Worker " + id);
 		
 		this.manager = manager;
@@ -89,11 +89,11 @@ public class RenderWorker extends Thread {
 		int canvasWidth = scene.canvasWidth();
 		int canvasHeight = scene.canvasHeight();
 		
-		int xjobs = (canvasWidth+(RenderManager.TILE_WIDTH-1))/RenderManager.TILE_WIDTH;
-		int x0 = RenderManager.TILE_WIDTH * (jobId % xjobs);
-		int x1 = Math.min(x0 + RenderManager.TILE_WIDTH, canvasWidth);
-		int y0 = RenderManager.TILE_HEIGHT * (jobId / xjobs);
-		int y1 = Math.min(y0 + RenderManager.TILE_HEIGHT, canvasHeight);
+		int xjobs = (canvasWidth+(manager.tileWidth-1))/manager.tileWidth;
+		int x0 = manager.tileWidth * (jobId % xjobs);
+		int x1 = Math.min(x0 + manager.tileWidth, canvasWidth);
+		int y0 = manager.tileWidth * (jobId / xjobs);
+		int y1 = Math.min(y0 + manager.tileWidth, canvasHeight);
 		
 		double aspect = canvasWidth / (double) canvasHeight;
 		double[][][] samples = scene.getSampleBuffer();

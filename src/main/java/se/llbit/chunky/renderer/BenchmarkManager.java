@@ -29,15 +29,13 @@ import se.llbit.chunky.renderer.scene.SceneLoadingError;
  * Benchmarks the renderer.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class BenchmarkManager extends Thread implements IRenderManager {
+public class BenchmarkManager extends AbstractRenderManager {
 	/**
 	 * Default number of worker threads.
 	 * Is set to the number of available CPU cores.
 	 */
 	public static final int NUM_RENDER_THREADS_DEFAULT =
 			Runtime.getRuntime().availableProcessors();
-	
-	private final int numThreads;
 	
 	private static final Logger logger =
 			Logger.getLogger(BenchmarkManager.class);
@@ -75,9 +73,8 @@ public class BenchmarkManager extends Thread implements IRenderManager {
 	public BenchmarkManager(RenderContext context,
 			RenderStatusListener renderStatusListener) {
 		
-		super("Render Manager");
+		super(context.numRenderThreads(), TILE_WIDTH_DEFAULT);
 		
-		numThreads = context.numRenderThreads();
 		renderListener = renderStatusListener;
 		
 		context = new EmbeddedResourceContext(context);
@@ -98,8 +95,8 @@ public class BenchmarkManager extends Thread implements IRenderManager {
 		
 		int canvasWidth = scene.canvasWidth();
 		int canvasHeight = scene.canvasHeight();
-		numJobs = ((canvasWidth+(TILE_WIDTH-1)) / TILE_WIDTH) *
-				((canvasHeight+(TILE_HEIGHT-1)) / TILE_HEIGHT);
+		numJobs = ((canvasWidth+(tileWidth-1)) / tileWidth) *
+				((canvasHeight+(tileWidth-1)) / tileWidth);
 		nextJob = new AtomicInteger(0);
 		finishedJobs = new AtomicInteger(0);
 			
