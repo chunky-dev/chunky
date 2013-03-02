@@ -1081,7 +1081,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
-		JButton xposBtn = new JButton("+X");
+		JLabel lookAtLbl = new JLabel("Skybox views:");
+		JButton xposBtn = new JButton("East");
 		xposBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1091,7 +1092,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
-		JButton xnegBtn = new JButton("-X");
+		JButton xnegBtn = new JButton("West");
 		xnegBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1101,7 +1102,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
-		JButton yposBtn = new JButton("+Y");
+		JButton yposBtn = new JButton("Up");
 		yposBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1111,7 +1112,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
-		JButton ynegBtn = new JButton("-Y");
+		JButton ynegBtn = new JButton("Down");
 		ynegBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1121,7 +1122,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
-		JButton zposBtn = new JButton("+Z");
+		JButton zposBtn = new JButton("South");
 		zposBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1131,7 +1132,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
-		JButton znegBtn = new JButton("-Z");
+		JButton znegBtn = new JButton("North");
 		znegBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1160,7 +1161,9 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addGroup(layout.createParallelGroup()
 				.addComponent(cameraToPlayerBtn)
 				.addComponent(centerCameraBtn)
+				.addComponent(lookAtLbl)
 				.addGroup(layout.createSequentialGroup()
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(xposBtn)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(xnegBtn)
@@ -1197,6 +1200,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addComponent(centerCameraBtn)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(lookAtLbl)
+			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
 				.addComponent(xposBtn)
 				.addComponent(xnegBtn)
