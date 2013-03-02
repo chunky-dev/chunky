@@ -844,18 +844,18 @@ public class Scene implements Refreshable {
 					for (int cx = 0; cx < 16; ++cx) {
 						int x = cx + cp.x*16 - origin.x;
 						int index = Chunk.chunkIndex(cx, cy, cz);
-						Block block = Block.values[0xFF & blocks[index]];
+						Block block = Block.get(blocks[index]);
 						
 						if (cx > 0 && cx < 15 && cz > 0 && cz < 15 && cy > 0 && cy < 255 &&
 								block != Block.STONE && block.isOpaque) {
 							
 							// set obscured blocks to stone
-							if (Block.values[0xFF & blocks[index-1]].isOpaque &&
-									Block.values[0xFF & blocks[index+1]].isOpaque &&
-									Block.values[0xFF & blocks[index-Chunk.X_MAX]].isOpaque &&
-									Block.values[0xFF & blocks[index+Chunk.X_MAX]].isOpaque &&
-									Block.values[0xFF & blocks[index-Chunk.X_MAX*Chunk.Z_MAX]].isOpaque &&
-									Block.values[0xFF & blocks[index+Chunk.X_MAX*Chunk.Z_MAX]].isOpaque) {
+							if (Block.get(blocks[index-1]).isOpaque &&
+									Block.get(blocks[index+1]).isOpaque &&
+									Block.get(blocks[index-Chunk.X_MAX]).isOpaque &&
+									Block.get(blocks[index+Chunk.X_MAX]).isOpaque &&
+									Block.get(blocks[index-Chunk.X_MAX*Chunk.Z_MAX]).isOpaque &&
+									Block.get(blocks[index+Chunk.X_MAX*Chunk.Z_MAX]).isOpaque) {
 								octree.set(Block.STONE.id, x, cy - origin.y, z);
 								continue;
 							}
@@ -877,7 +877,7 @@ public class Scene implements Refreshable {
 							if (cy < 255) {
 								// is this the top vine block?
 								index = Chunk.chunkIndex(cx, cy+1, cz);
-								Block above = Block.values[0xFF & blocks[index]];
+								Block above = Block.get(blocks[index]);
 								if (above.isSolid) {
 									type = type | (1<<BlockData.VINE_TOP);
 								}
@@ -888,7 +888,7 @@ public class Scene implements Refreshable {
 							if (cy < 255) {
 								// is there water above?
 								index = Chunk.chunkIndex(cx, cy+1, cz);
-								Block above = Block.values[0xFF & blocks[index]];
+								Block above = Block.get(blocks[index]);
 								if (above.isWater()) {
 									type |= (1<<WaterModel.FULL_BLOCK);
 								} else if (above == Block.LILY_PAD) {
@@ -908,7 +908,7 @@ public class Scene implements Refreshable {
 							if (cy < 255) {
 								// is there lava above?
 								index = Chunk.chunkIndex(cx, cy+1, cz);
-								Block above = Block.values[0xFF & blocks[index]];
+								Block above = Block.get(blocks[index]);
 								if (above.isLava()) {
 									type = type | (1<<WaterModel.FULL_BLOCK);
 								}

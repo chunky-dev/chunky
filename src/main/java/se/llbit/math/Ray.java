@@ -219,14 +219,14 @@ public class Ray {
 	 * @return Previous block
 	 */
 	public final Block getPrevBlock() {
-		return Block.values[prevMaterial & 0xFF];
+		return Block.get(prevMaterial);
 	}
 
 	/**
 	 * @return Current block
 	 */
 	public final Block getCurrentBlock() {
-		return Block.values[currentMaterial & 0xFF];
+		return Block.get(currentMaterial);
 	}
 	
 	/**

@@ -408,8 +408,8 @@ public class Octree {
 				ray.currentMaterial = node.type;
 			}
 
-			Block currentBlock = Block.values[node.type & 0xFF];
-			Block prevBlock = Block.values[ray.currentMaterial & 0xFF];
+			Block currentBlock = Block.get(node.type);
+			Block prevBlock = Block.get(ray.currentMaterial);
 			
 			ray.prevMaterial = ray.currentMaterial;
 			ray.currentMaterial = node.type;
@@ -551,8 +551,8 @@ public class Octree {
 				node = node.children[((lx&1)<<2) | ((ly&1)<<1) | (lz&1)];
 			}
 
-			Block currentBlock = Block.values[node.type & 0xFF];
-			Block prevBlock = Block.values[ray.currentMaterial & 0xFF];
+			Block currentBlock = Block.get(node.type);
+			Block prevBlock = Block.get(ray.currentMaterial);
 			
 			ray.prevMaterial = ray.currentMaterial;
 			ray.currentMaterial = node.type;

@@ -190,7 +190,7 @@ public class CLRenderManager extends Thread implements Renderer,
         
         float[] blockColor = new float[256*3];
         for (int j = 0; j < 256; ++j) {
-        	Block block = Block.values[j];
+        	Block block = Block.get(j);
         	float[] color;
         	switch (block.id) {
         	case Block.LEAVES_ID:

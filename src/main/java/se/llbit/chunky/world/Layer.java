@@ -267,7 +267,7 @@ public class Layer {
 					if (block == Block.AIR.id) {
 						rbuff.setRGB(xp, yp, 0xFFFFFFFF);
 					} else {
-						rbuff.setRGB(xp, yp, Block.values[block & 0xFF].getAvgRGB());
+						rbuff.setRGB(xp, yp, Block.get(block).getAvgRGB());
 					}
 				}
 			}
@@ -285,7 +285,7 @@ public class Layer {
 						rbuff.fillRect(xp0, yp0, blockScale, blockScale, 0xFFFFFFFF);
 					} else {
 						rbuff.fillRect(xp0, yp0, blockScale, blockScale,
-								Block.values[block & 0xFF].getAvgRGB());
+								Block.get(block).getAvgRGB());
 					}
 				}
 			}
@@ -302,7 +302,7 @@ public class Layer {
 						continue;
 					}
 					
-					int[] tex = ((DataBufferInt) Block.values[block & 0xFF].getTexture().getScaledImage(blockScale).getRaster().getDataBuffer()).getData();
+					int[] tex = ((DataBufferInt) Block.get(block).getTexture().getScaledImage(blockScale).getRaster().getDataBuffer()).getData();
 					for (int i = 0; i < blockScale; ++i) {
 						for (int j = 0; j < blockScale; ++j) {
 							rbuff.setRGB(xp0 + j, yp0 + i, tex[j + blockScale * i]); 
@@ -423,8 +423,7 @@ public class Layer {
 				
 				colorloop:
 				for (; y >= 0 && color[3] < 1.f;) {
-					int blockId = 0xFF & blocksArray[Chunk.chunkIndex(x, y, z)];
-					Block block = Block.values[blockId];
+					Block block = Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
 					float[] blockColor = new float[4];
 					int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
 					
@@ -463,7 +462,7 @@ public class Layer {
 						y -= 1;
 						
 						for (; y >= 0; --y) {
-							if (Block.values[0xFF & blocksArray[Chunk.chunkIndex(x, y, z)]].isOpaque) {
+							if (Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]).isOpaque) {
 								Color.getRGBAComponents(block.getAvgTopRGB(), blockColor);
 								break;
 							}
@@ -475,7 +474,7 @@ public class Layer {
 						int depth = 1;
 						y -= 1;
 						for (; y >= 0; --y) {
-							Block block1 = Block.values[0xFF & blocksArray[Chunk.chunkIndex(x, y, z)]];
+							Block block1 = Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
 							if (!block1.isWater())
 								break;
 							depth += 1;
@@ -602,10 +601,10 @@ public class Layer {
 				// find caves
 				int luftspalt = 0; 
 				for (; y > 1; --y) {
-					Block block = Block.values[blocksArray[Chunk.chunkIndex(x, y, z)] & 0xFF];
+					Block block = Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
 					if (block.isCave()) {
 						y -= 1;
-						Block block1 = Block.values[blocksArray[Chunk.chunkIndex(x, y, z)] & 0xFF];
+						Block block1 = Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
 						if (block1.isCave()) {
 							luftspalt++;
 							y -= 1;
@@ -641,7 +640,7 @@ public class Layer {
 				int y = chunkHeightmap[z*16+x];
 				y = Math.max(1, y-1);
 				for (; y > 1; --y) {
-					Block block = Block.values[0xFF & blocksArray[Chunk.chunkIndex(x, y, z)]];
+					Block block = Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
 					if (block != Block.AIR && !block.isWater())
 						break;
 				}
