@@ -3,6 +3,9 @@
     * Render flowers in flower pots
     * Cloud height is now relative to the scene origin
     * Stone wall sections with a torch above render as corner sections
+    * Added command-line option for specifying job tile width
+    * Fixed error in command-line option parsing - if render thread count was
+    specified, it was always set to 1 regardless of the actual value
 
 1.1.5 - 2013-02-26
     * Added parallel projection (TOGoS)
