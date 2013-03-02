@@ -70,6 +70,7 @@ import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 import se.llbit.math.QuickMath;
+import se.llbit.math.Vector3d;
 import se.llbit.util.ProgramProperties;
 
 /**
@@ -147,20 +148,18 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JComboBox postprocessCB = new JComboBox();
 	private final JButton changeSunColorBtn = new JButton();
 	private final JButton changeGroundColorBtn = new JButton();
-
 	private final JLabel etaLbl = new JLabel();
-
 	private final JCheckBox waterWorldCB = new JCheckBox();
-
 	private final JTextField waterHeightField = new JTextField();
-	
 	private final DecimalFormat decimalFormat = new DecimalFormat();
-
 	private final JCheckBox saveDumpsCB = new JCheckBox();
-
 	private final JComboBox dumpFrequency = new JComboBox();
-
 	private final JTextField sppTargetField = new JTextField();
+	private final JTextField posX = new JTextField();
+	private final JTextField posY = new JTextField();
+	private final JTextField posZ = new JTextField();
+	private final JTextField dirYaw = new JTextField();
+	private final JTextField dirPitch = new JTextField();
 
 	/**
 	 * Create a new Render Controls dialog.
@@ -1081,6 +1080,17 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
+		JLabel posLbl = new JLabel("Position:");
+		posX.setColumns(10);
+		posY.setColumns(10);
+		posZ.setColumns(10);
+		updateCameraPosition();
+		
+		JLabel dirLbl = new JLabel("Direction:");
+		dirYaw.setColumns(10);
+		dirPitch.setColumns(10);
+		updateCameraDirection();
+		
 		JLabel lookAtLbl = new JLabel("Skybox views:");
 		JButton xposBtn = new JButton("East");
 		xposBtn.addActionListener(new ActionListener() {
@@ -1159,8 +1169,27 @@ public class RenderControls extends JDialog implements ViewListener,
 		layout.setHorizontalGroup(layout.createSequentialGroup()
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
-				.addComponent(cameraToPlayerBtn)
-				.addComponent(centerCameraBtn)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(posLbl)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(posX, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(posY, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(posZ, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(dirLbl)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(dirYaw, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(dirPitch, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(cameraToPlayerBtn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(centerCameraBtn)
+				)
 				.addComponent(lookAtLbl)
 				.addGroup(layout.createSequentialGroup()
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -1196,9 +1225,23 @@ public class RenderControls extends JDialog implements ViewListener,
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
-			.addComponent(cameraToPlayerBtn)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(posLbl)
+				.addComponent(posX)
+				.addComponent(posY)
+				.addComponent(posZ)
+			)
 			.addPreferredGap(ComponentPlacement.RELATED)
-			.addComponent(centerCameraBtn)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(dirLbl)
+				.addComponent(dirYaw)
+				.addComponent(dirPitch)
+			)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(cameraToPlayerBtn)
+				.addComponent(centerCameraBtn)
+			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(lookAtLbl)
 			.addPreferredGap(ComponentPlacement.RELATED)
@@ -1971,6 +2014,20 @@ public class RenderControls extends JDialog implements ViewListener,
 	protected void updatePostprocessCB() {
 		postprocessCB.setSelectedIndex(renderManager.scene().getPostprocess().ordinal());
 	}
+		
+	protected void updateCameraPosition() {
+		Vector3d pos = renderManager.scene().camera().getPosition();
+		posX.setText(decimalFormat.format(pos.x));
+		posY.setText(decimalFormat.format(pos.y));
+		posZ.setText(decimalFormat.format(pos.z));
+	}
+	
+	protected void updateCameraDirection() {
+		dirPitch.setText(decimalFormat.format(
+				renderManager.scene().camera().getPitch()));
+		dirYaw.setText(decimalFormat.format(
+				renderManager.scene().camera().getYaw()));
+	}
 
 	/**
 	 * Load the scene with the given name
@@ -1991,52 +2048,54 @@ public class RenderControls extends JDialog implements ViewListener,
 	public void onStrafeLeft() {
         renderManager.scene().camera().strafeLeft(
         		chunky.getShiftModifier() ? .1 : 1);
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onStrafeRight() {
         renderManager.scene().camera().strafeRight(
         		chunky.getShiftModifier() ? .1 : 1);
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveForward() {
         renderManager.scene().camera().moveForward(
         		chunky.getShiftModifier() ? .1 : 1);
-		
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveBackward() {
         renderManager.scene().camera().moveBackward(
         		chunky.getShiftModifier() ? .1 : 1);
-		
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveForwardFar() {
 	    renderManager.scene().camera().moveForward(100);
-		
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveBackwardFar() {
         renderManager.scene().camera().moveBackward(100);
-		
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveUp() {
         renderManager.scene().camera().moveUp(
         		chunky.getShiftModifier() ? .1 : 1);
-		
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveDown() {
         renderManager.scene().camera().moveDown(
         		chunky.getShiftModifier() ? .1 : 1);
-		
+		updateCameraPosition();
 	}
 
 	@Override
@@ -2044,7 +2103,7 @@ public class RenderControls extends JDialog implements ViewListener,
         renderManager.scene().camera().rotateView(
                 - (Math.PI / 250) * dx,
                 (Math.PI / 250) * dy);
-		
+        updateCameraDirection();
 	}
 
 	/**
