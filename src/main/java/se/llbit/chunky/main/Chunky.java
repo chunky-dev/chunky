@@ -202,7 +202,7 @@ public class Chunky implements ChunkDiscoveryListener {
 				doBench = true;
 			} else if (args[i].equals("-threads")) {
 				renderThreads = Math.max(1, Integer.parseInt(args[++i]));
-			} else if (args[i].equals("-tileWidth")) {
+			} else if (args[i].equals("-tile-width")) {
 				tileWidth = Math.max(1, Integer.parseInt(args[++i]));
 			} else if (args[i].equals("-opencl")) {
 				openCLEnabled = true;
