@@ -73,7 +73,7 @@ public class BenchmarkManager extends AbstractRenderManager {
 	public BenchmarkManager(RenderContext context,
 			RenderStatusListener renderStatusListener) {
 		
-		super(context.numRenderThreads(), TILE_WIDTH_DEFAULT);
+		super(context);
 		
 		renderListener = renderStatusListener;
 		

@@ -29,15 +29,18 @@ import java.io.InputStream;
 public class RenderContext {
 	private final File sceneDirectory;
 	private final int numThreads;
+	private int tileWidth;
 
 	/**
 	 * Construct a new render context.
 	 * @param sceneDir The scene directory
 	 * @param renderThreads 
+	 * @param tileWidth 
 	 */
-	public RenderContext(File sceneDir, int renderThreads) {
+	public RenderContext(File sceneDir, int renderThreads, int tileWidth) {
 		sceneDirectory = sceneDir;
 		numThreads = renderThreads;
+		this.tileWidth = tileWidth;
 	}
 	
 	/**
@@ -74,5 +77,12 @@ public class RenderContext {
 			throws FileNotFoundException {
 		
 		return new FileOutputStream(new File(sceneDirectory, fileName));
+	}
+
+	/**
+	 * @return The tile width
+	 */
+	public int tileWidth() {
+		return tileWidth;
 	}
 }

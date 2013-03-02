@@ -30,7 +30,8 @@ public class EmbeddedResourceContext extends RenderContext {
 	 * @param parent 
 	 */
 	public EmbeddedResourceContext(RenderContext parent) {
-		super(parent.getSceneDirectory(), parent.numRenderThreads());
+		super(parent.getSceneDirectory(), parent.numRenderThreads(),
+				parent.tileWidth());
 	}
 
 	@Override

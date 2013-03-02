@@ -111,7 +111,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	public RenderManager(RenderableCanvas canvas, RenderContext context,
 			RenderStatusListener controls) {
 		
-		super(context.numRenderThreads(), TILE_WIDTH_DEFAULT);
+		super(context);
 		
 		this.canvas = canvas;
 		this.context = context;

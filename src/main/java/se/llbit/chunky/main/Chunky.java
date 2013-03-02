@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import se.llbit.chunky.renderer.AbstractRenderManager;
 import se.llbit.chunky.renderer.BenchmarkManager;
 import se.llbit.chunky.renderer.ConsoleRenderListener;
 import se.llbit.chunky.renderer.PlaceholderRenderCanvas;
@@ -150,6 +151,8 @@ public class Chunky implements ChunkDiscoveryListener {
 				Chunky.class.getResource("/log4j.properties"));
 	}
 	
+	private int tileWidth = AbstractRenderManager.TILE_WIDTH_DEFAULT;
+	
 	/**
 	 * The help string
 	 */
@@ -232,7 +235,8 @@ public class Chunky implements ChunkDiscoveryListener {
 			// start headless mode
 			System.setProperty("java.awt.headless", "true");
 			
-			RenderContext renderContext = new RenderContext(sceneDir, renderThreads);
+			RenderContext renderContext = new RenderContext(sceneDir,
+					renderThreads, tileWidth);
 			RenderManager renderManager = new RenderManager(
 					new PlaceholderRenderCanvas(),
 					renderContext, new ConsoleRenderListener());
@@ -302,7 +306,8 @@ public class Chunky implements ChunkDiscoveryListener {
 		System.setProperty("java.awt.headless", "true");
 		
 		File sceneDir = ProgramProperties.getPreferredSceneDirectory();
-		RenderContext renderContext = new RenderContext(sceneDir, renderThreads);
+		RenderContext renderContext = new RenderContext(sceneDir,
+				renderThreads, tileWidth);
 		BenchmarkManager benchmark = new BenchmarkManager(renderContext,
 				new ConsoleRenderListener());
 		benchmark.start();
@@ -470,7 +475,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		if (renderControls == null || !renderControls.isDisplayable()) {
 			File sceneDir = SceneDirectoryPicker.getSceneDirectory(frame);
 			RenderContext context = new RenderContext(sceneDir,
-					getControls().getNumThreads());
+					getControls().getNumThreads(), tileWidth);
 			if (sceneDir != null) {
 				NewSceneDialog dialog = new NewSceneDialog(getFrame(),
 						context, world.levelName());
@@ -980,7 +985,8 @@ public class Chunky implements ChunkDiscoveryListener {
 		if (renderControls == null || !renderControls.isDisplayable()) {
 			File sceneDir = SceneDirectoryPicker.getSceneDirectory(frame);
 			if (sceneDir != null) {
-				RenderContext context = new RenderContext(sceneDir, getControls().getNumThreads());
+				RenderContext context = new RenderContext(sceneDir,
+						getControls().getNumThreads(), tileWidth);
 				SceneSelector sceneSelector = new SceneSelector(null, context);
 				sceneSelector.setLocationRelativeTo(frame);
 				if (sceneSelector.isAccepted()) {
@@ -1011,7 +1017,8 @@ public class Chunky implements ChunkDiscoveryListener {
 	 * Benchmark the path tracing renderer.
 	 */
 	public void runBenchmark() {
-		RenderContext context = new RenderContext(null, getControls().getNumThreads());
+		RenderContext context = new RenderContext(null,
+				getControls().getNumThreads(), tileWidth);
 		new BenchmarkDialog(getFrame(), context);
 	}
 }

@@ -26,14 +26,13 @@ public abstract class AbstractRenderManager extends Thread {
 	
 	/**
 	 * Constructor
-	 * @param numThreads
-	 * @param tileWidth
+	 * @param context 
 	 */
-	public AbstractRenderManager(int numThreads, int tileWidth) {
+	public AbstractRenderManager(RenderContext context) {
 		super("Render Manager");
 		
-		this.numThreads = numThreads;
-		this.tileWidth = tileWidth;
+		this.numThreads = context.numRenderThreads();
+		this.tileWidth = context.tileWidth();
 	}
 	
 	/**
