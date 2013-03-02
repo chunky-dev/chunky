@@ -325,6 +325,8 @@ public class Chunky implements ChunkDiscoveryListener {
 		
 		if (world.isEmptyWorld())
 			getControls().openWorldSelector();
+		else
+			updateView();
 		
 	}
 	
@@ -368,13 +370,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		// dimension must be set before chunks are loaded
 		world.setDimension(currentDimension);
 		
-		if (world.havePlayerPos()) {
-			setView(
-					world.playerPosX() / 16,
-					world.playerPosZ() / 16);
-		} else {
-			setView(0, 0);
-		}
+		updateView();
 		
 		ProgramProperties.setProperty("lastWorld",
 				world.getWorldDirectory().getAbsolutePath());
@@ -387,6 +383,16 @@ public class Chunky implements ChunkDiscoveryListener {
 		}
 	}
 	
+	private void updateView() {
+		if (world.havePlayerPos()) {
+			setView(
+					world.playerPosX() / 16,
+					world.playerPosZ() / 16);
+		} else {
+			setView(0, 0);
+		}
+	}
+
 	/**
 	 * Called when the map view has changed.
 	 */
