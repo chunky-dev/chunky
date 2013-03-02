@@ -166,6 +166,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		"  -scene-dir <DIR>       use the directory DIR for loading/saving scenes\n" +
 		"  -benchmark             run the benchmark and exit\n" +
 		"  -threads <NUM>         use the specified number of threads for rendering\n" +
+		"  -tile-width <NUM>      use the specified job tile width\n" +
 		"  -opencl                enables OpenCL rendering in the GUI\n" +
 		"  -help                  show this text";
 	
@@ -202,6 +203,8 @@ public class Chunky implements ChunkDiscoveryListener {
 			} else if (args[i].equals("-threads")) {
 				renderThreads = Math.max(1, Integer.parseInt(args[++i]));
 				renderThreads = Math.min(1, 20);
+			} else if (args[i].equals("-tileWidth")) {
+				tileWidth = Math.max(1, Integer.parseInt(args[++i]));
 			} else if (args[i].equals("-opencl")) {
 				openCLEnabled = true;
 			} else if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("-help") || args[i].equals("--help")) {
