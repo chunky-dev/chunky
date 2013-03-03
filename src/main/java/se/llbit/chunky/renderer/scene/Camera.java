@@ -368,8 +368,8 @@ public class Camera {
 
 	/**
 	 * Set the view direction
-	 * @param yaw
-	 * @param pitch
+	 * @param yaw Yaw in radians
+	 * @param pitch Pitch in radians
 	 */
 	public synchronized void setView(double yaw, double pitch) {
 		this.yaw = yaw;

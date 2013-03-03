@@ -6,6 +6,7 @@
     * Added command-line option for specifying job tile width
     * Fixed error in command-line option parsing - if render thread count was
     specified, it was always set to 1 regardless of the actual value
+    * It is now possible to manually input the camera position and direction
 
 1.1.5 - 2013-02-26
     * Added parallel projection (TOGoS)

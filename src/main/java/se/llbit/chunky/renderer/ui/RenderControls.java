@@ -155,11 +155,11 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox saveDumpsCB = new JCheckBox();
 	private final JComboBox dumpFrequency = new JComboBox();
 	private final JTextField sppTargetField = new JTextField();
-	private final JTextField posX = new JTextField();
-	private final JTextField posY = new JTextField();
-	private final JTextField posZ = new JTextField();
-	private final JTextField dirYaw = new JTextField();
-	private final JTextField dirPitch = new JTextField();
+	private final JTextField cameraX = new JTextField();
+	private final JTextField cameraY = new JTextField();
+	private final JTextField cameraZ = new JTextField();
+	private final JTextField cameraYaw = new JTextField();
+	private final JTextField cameraPitch = new JTextField();
 
 	/**
 	 * Create a new Render Controls dialog.
@@ -1081,19 +1081,24 @@ public class RenderControls extends JDialog implements ViewListener,
 		});
 		
 		JLabel posLbl = new JLabel("Position:");
-		posX.setColumns(10);
-		posX.setHorizontalAlignment(JTextField.RIGHT);
-		posY.setColumns(10);
-		posY.setHorizontalAlignment(JTextField.RIGHT);
-		posZ.setColumns(10);
-		posZ.setHorizontalAlignment(JTextField.RIGHT);
+		cameraX.setColumns(10);
+		cameraX.setHorizontalAlignment(JTextField.RIGHT);
+		cameraX.addActionListener(cameraPositionListener);
+		cameraY.setColumns(10);
+		cameraY.setHorizontalAlignment(JTextField.RIGHT);
+		cameraY.addActionListener(cameraPositionListener);
+		cameraZ.setColumns(10);
+		cameraZ.setHorizontalAlignment(JTextField.RIGHT);
+		cameraZ.addActionListener(cameraPositionListener);
 		updateCameraPosition();
 		
 		JLabel dirLbl = new JLabel("Direction:");
-		dirYaw.setColumns(10);
-		dirYaw.setHorizontalAlignment(JTextField.RIGHT);
-		dirPitch.setColumns(10);
-		dirPitch.setHorizontalAlignment(JTextField.RIGHT);
+		cameraYaw.setColumns(10);
+		cameraYaw.setHorizontalAlignment(JTextField.RIGHT);
+		cameraYaw.addActionListener(cameraDirectionListener);
+		cameraPitch.setColumns(10);
+		cameraPitch.setHorizontalAlignment(JTextField.RIGHT);
+		cameraPitch.addActionListener(cameraDirectionListener);
 		updateCameraDirection();
 		
 		JLabel lookAtLbl = new JLabel("Skybox views:");
@@ -1181,17 +1186,17 @@ public class RenderControls extends JDialog implements ViewListener,
 					)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(layout.createParallelGroup()
-						.addComponent(posX, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(dirYaw, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(cameraX, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(cameraYaw, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 					)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(layout.createParallelGroup()
-						.addComponent(posY, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(dirPitch, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(cameraY, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(cameraPitch, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 					)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(layout.createParallelGroup()
-						.addComponent(posZ, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(cameraZ, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 					)
 				)
 				.addGroup(layout.createSequentialGroup()
@@ -1236,15 +1241,15 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(posLbl)
-				.addComponent(posX)
-				.addComponent(posY)
-				.addComponent(posZ)
+				.addComponent(cameraX)
+				.addComponent(cameraY)
+				.addComponent(cameraZ)
 			)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(dirLbl)
-				.addComponent(dirYaw)
-				.addComponent(dirPitch)
+				.addComponent(cameraYaw)
+				.addComponent(cameraPitch)
 			)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
@@ -1687,6 +1692,48 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateFocalOffsetField();
 		}
 	};
+	ActionListener cameraPositionListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Vector3d pos = new Vector3d(renderManager.scene().camera().getPosition());
+			try {
+				pos.x = numberFormat.parse(cameraX.getText()).doubleValue();
+			} catch (NumberFormatException ex) {
+			} catch (ParseException ex) {
+			}
+			try {
+				pos.y = numberFormat.parse(cameraY.getText()).doubleValue();
+			} catch (NumberFormatException ex) {
+			} catch (ParseException ex) {
+			}
+			try {
+				pos.z = numberFormat.parse(cameraZ.getText()).doubleValue();
+			} catch (NumberFormatException ex) {
+			} catch (ParseException ex) {
+			}
+			renderManager.scene().camera().setPosition(pos);
+			updateCameraPosition();
+		}
+	};
+	ActionListener cameraDirectionListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			double yaw = renderManager.scene().camera().getYaw();
+			double pitch = renderManager.scene().camera().getPitch();
+			try {
+				pitch = QuickMath.degToRad(numberFormat.parse(cameraPitch.getText()).doubleValue());
+			} catch (NumberFormatException ex) {
+			} catch (ParseException ex) {
+			}
+			try {
+				yaw = QuickMath.degToRad(numberFormat.parse(cameraYaw.getText()).doubleValue());
+			} catch (NumberFormatException ex) {
+			} catch (ParseException ex) {
+			}
+			renderManager.scene().camera().setView(yaw, pitch);
+			updateCameraDirection();
+		}
+	};
 	ActionListener stillWaterListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -2025,17 +2072,31 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 		
 	protected void updateCameraPosition() {
+		cameraX.removeActionListener(cameraPositionListener);
+		cameraY.removeActionListener(cameraPositionListener);
+		cameraZ.removeActionListener(cameraPositionListener);
+		
 		Vector3d pos = renderManager.scene().camera().getPosition();
-		posX.setText(decimalFormat.format(pos.x));
-		posY.setText(decimalFormat.format(pos.y));
-		posZ.setText(decimalFormat.format(pos.z));
+		cameraX.setText(decimalFormat.format(pos.x));
+		cameraY.setText(decimalFormat.format(pos.y));
+		cameraZ.setText(decimalFormat.format(pos.z));
+		
+		cameraX.addActionListener(cameraPositionListener);
+		cameraY.addActionListener(cameraPositionListener);
+		cameraZ.addActionListener(cameraPositionListener);
 	}
 	
 	protected void updateCameraDirection() {
-		dirPitch.setText(decimalFormat.format(
+		cameraPitch.removeActionListener(cameraDirectionListener);
+		cameraYaw.removeActionListener(cameraDirectionListener);
+		
+		cameraPitch.setText(decimalFormat.format(
 				QuickMath.radToDeg(renderManager.scene().camera().getPitch())));
-		dirYaw.setText(decimalFormat.format(
+		cameraYaw.setText(decimalFormat.format(
 				QuickMath.radToDeg(renderManager.scene().camera().getYaw())));
+		
+		cameraPitch.addActionListener(cameraDirectionListener);
+		cameraYaw.addActionListener(cameraDirectionListener);
 	}
 
 	/**
