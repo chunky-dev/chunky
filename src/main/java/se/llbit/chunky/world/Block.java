@@ -44,6 +44,7 @@ import se.llbit.chunky.model.FlowerPotModel;
 import se.llbit.chunky.model.FurnaceModel;
 import se.llbit.chunky.model.GlassPaneModel;
 import se.llbit.chunky.model.GrassModel;
+import se.llbit.chunky.model.HeadModel;
 import se.llbit.chunky.model.LadderModel;
 import se.llbit.chunky.model.LavaModel;
 import se.llbit.chunky.model.LeafModel;
@@ -2072,7 +2073,12 @@ public class Block {
 		{
 			isOpaque = false;
 			isSolid = false;
+			localIntersect = true;
 			isInvisible = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return HeadModel.intersect(ray, Texture.oakPlanks);
 		}
 	};
 	public static final int ANVIL_ID = 0x91;
