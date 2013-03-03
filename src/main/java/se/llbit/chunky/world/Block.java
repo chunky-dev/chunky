@@ -2027,7 +2027,7 @@ public class Block {
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return FlowerPotModel.intersect(ray);
+			return FlowerPotModel.intersect(ray, scene);
 		}
 	};
 	public static final int CARROTS_ID = 0x8D;

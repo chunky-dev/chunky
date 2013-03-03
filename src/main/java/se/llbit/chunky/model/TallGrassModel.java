@@ -43,7 +43,6 @@ public class TallGrassModel extends SpriteModel {
 						ray.color.z *= biomeColor[2];
 					}
 					ray.n.set(quad.n);
-					ray.n.scale(-Math.signum(ray.d.dot(quad.n)));
 					ray.t = ray.tNear;
 					hit = true;
 				}

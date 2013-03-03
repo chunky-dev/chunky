@@ -16,9 +16,9 @@
  */
 package se.llbit.chunky.model;
 
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
@@ -46,11 +46,17 @@ public class FlowerPotModel {
 		new AABB(6/16., 10/16., 4/16., 1, 6/16., 10/16.);
 	
 	protected static Quad[] flower = {
-		new DoubleSidedQuad(new Vector3d(0, 4/16., 0), new Vector3d(1, 4/16., 1),
-					new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 12/16.)),
+		new Quad(new Vector3d(0, 4/16., 0), new Vector3d(1, 4/16., 1),
+				new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 12/16.)),
 					
-		new DoubleSidedQuad(new Vector3d(1, 4/16., 0), new Vector3d(0, 4/16., 1),
+		new Quad(new Vector3d(1, 4/16., 1), new Vector3d(0, 4/16., 0),
+				new Vector3d(1, 1, 1), new Vector4d(0, 1, 0, 12/16.)),
+					
+		new Quad(new Vector3d(1, 4/16., 0), new Vector3d(0, 4/16., 1),
 				new Vector3d(1, 1, 0), new Vector4d(0, 1, 0, 12/16.)),
+				
+		new Quad(new Vector3d(0, 4/16., 1), new Vector3d(1, 4/16., 0),
+				new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 12/16.)),
 	};
 	
 	private static final Texture[] tex = {
@@ -64,9 +70,10 @@ public class FlowerPotModel {
 	/**
 	 * Find intersection between ray and block
 	 * @param ray
+	 * @param scene 
 	 * @return <code>true</code> if the ray intersected the block
 	 */
-	public static boolean intersect(Ray ray) {
+	public static boolean intersect(Ray ray, Scene scene) {
 		boolean hit = false;
 		int flower = ray.getBlockData();
 		ray.t = Double.POSITIVE_INFINITY;
@@ -112,7 +119,13 @@ public class FlowerPotModel {
 			hit |= flower(ray, Texture.deadBush);
 			break;
 		case 11:
-			hit |= flower(ray, Texture.fern);
+			if (flower(ray, Texture.fern)) {
+				float[] biomeColor = ray.getBiomeGrassColor(scene);
+				ray.color.x *= biomeColor[0];
+				ray.color.y *= biomeColor[1];
+				ray.color.z *= biomeColor[2];
+				hit = true;
+			}
 			break;
 		}
 		if (hit) {
@@ -132,7 +145,6 @@ public class FlowerPotModel {
 					ray.color.set(color);
 					ray.t = ray.tNear;
 					ray.n.set(quad.n);
-					ray.n.scale(-Math.signum(ray.d.dot(quad.n)));
 					hit = true;
 				}
 			}
