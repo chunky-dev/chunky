@@ -17,7 +17,6 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
@@ -26,13 +25,19 @@ import se.llbit.math.Vector4d;
 @SuppressWarnings("javadoc")
 public class SpriteModel {
 	protected static Quad[] quads = {
-		new DoubleSidedQuad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 1),
-					new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
+		new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 1),
+				new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
 					
-		new DoubleSidedQuad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 1),
+		new Quad(new Vector3d(1, 0, 1), new Vector3d(0, 0, 0),
+				new Vector3d(1, 1, 1), new Vector4d(0, 1, 0, 1)),
+					
+		new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 1),
 				new Vector3d(1, 1, 0), new Vector4d(0, 1, 0, 1)),
+				
+		new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 0),
+				new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
 	};
-		
+
 	public static boolean intersect(Ray ray, Texture material) {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
@@ -43,7 +48,6 @@ public class SpriteModel {
 					ray.color.set(color);
 					ray.t = ray.tNear;
 					ray.n.set(quad.n);
-					ray.n.scale(-Math.signum(ray.d.dot(quad.n)));
 					hit = true;
 				}
 			}
