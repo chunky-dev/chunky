@@ -1721,7 +1721,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			double yaw = renderManager.scene().camera().getYaw();
 			double pitch = renderManager.scene().camera().getPitch();
 			try {
-				pitch = QuickMath.degToRad(numberFormat.parse(cameraPitch.getText()).doubleValue());
+				double value = numberFormat.parse(cameraPitch.getText()).doubleValue();
+				pitch = QuickMath.degToRad(-value-90);
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
 			}
@@ -2090,8 +2091,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		cameraPitch.removeActionListener(cameraDirectionListener);
 		cameraYaw.removeActionListener(cameraDirectionListener);
 		
-		cameraPitch.setText(decimalFormat.format(
-				QuickMath.radToDeg(renderManager.scene().camera().getPitch())));
+		double pitch = QuickMath.radToDeg(renderManager.scene().camera().getPitch());
+		cameraPitch.setText(decimalFormat.format(-pitch-90));
 		cameraYaw.setText(decimalFormat.format(
 				QuickMath.radToDeg(renderManager.scene().camera().getYaw())));
 		
