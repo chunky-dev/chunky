@@ -2261,6 +2261,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateCloudHeightField();
 		updateRayDepthSlider();
 		updateRayDepthField();
+		updateCameraDirection();
+		updateCameraPosition();
 		enableEmitters.setSelected(renderManager.scene().getEmittersEnabled());
 		directLight.setSelected(renderManager.scene().getDirectLight());
 		startRenderBtn.setText("RESUME");
@@ -2372,6 +2374,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	@Override
 	public void chunksLoaded() {
+		updateCameraPosition();
 		show3DView();
 	}
 }
