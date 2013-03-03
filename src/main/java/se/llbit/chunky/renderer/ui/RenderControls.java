@@ -1082,13 +1082,18 @@ public class RenderControls extends JDialog implements ViewListener,
 		
 		JLabel posLbl = new JLabel("Position:");
 		posX.setColumns(10);
+		posX.setHorizontalAlignment(JTextField.RIGHT);
 		posY.setColumns(10);
+		posY.setHorizontalAlignment(JTextField.RIGHT);
 		posZ.setColumns(10);
+		posZ.setHorizontalAlignment(JTextField.RIGHT);
 		updateCameraPosition();
 		
 		JLabel dirLbl = new JLabel("Direction:");
 		dirYaw.setColumns(10);
+		dirYaw.setHorizontalAlignment(JTextField.RIGHT);
 		dirPitch.setColumns(10);
+		dirPitch.setHorizontalAlignment(JTextField.RIGHT);
 		updateCameraDirection();
 		
 		JLabel lookAtLbl = new JLabel("Skybox views:");
@@ -1170,20 +1175,24 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
 				.addGroup(layout.createSequentialGroup()
-					.addComponent(posLbl)
+					.addGroup(layout.createParallelGroup()
+						.addComponent(posLbl)
+						.addComponent(dirLbl)
+					)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(posX, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGroup(layout.createParallelGroup()
+						.addComponent(posX, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(dirYaw, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(posY, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGroup(layout.createParallelGroup()
+						.addComponent(posY, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(dirPitch, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(posZ, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(dirLbl)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(dirYaw, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(dirPitch, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGroup(layout.createParallelGroup()
+						.addComponent(posZ, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					)
 				)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(cameraToPlayerBtn)
@@ -1225,14 +1234,14 @@ public class RenderControls extends JDialog implements ViewListener,
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(posLbl)
 				.addComponent(posX)
 				.addComponent(posY)
 				.addComponent(posZ)
 			)
 			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(layout.createParallelGroup()
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(dirLbl)
 				.addComponent(dirYaw)
 				.addComponent(dirPitch)
