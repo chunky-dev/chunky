@@ -2033,9 +2033,9 @@ public class RenderControls extends JDialog implements ViewListener,
 	
 	protected void updateCameraDirection() {
 		dirPitch.setText(decimalFormat.format(
-				renderManager.scene().camera().getPitch()));
+				QuickMath.radToDeg(renderManager.scene().camera().getPitch())));
 		dirYaw.setText(decimalFormat.format(
-				renderManager.scene().camera().getYaw()));
+				QuickMath.radToDeg(renderManager.scene().camera().getYaw())));
 	}
 
 	/**
