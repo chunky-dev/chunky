@@ -70,4 +70,9 @@ public interface BlockData {
 	int SOUTH_WEST = 5;
 	int NORTH_EAST = 6;
 	int NORTH_WEST = 7;
+	
+	/**
+	 * Fence gate is three pixels lower
+	 */
+	int FENCEGATE_LOW = 20;
 }

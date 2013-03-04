@@ -1623,7 +1623,8 @@ public class Block {
 			return VineModel.intersect(ray, scene);
 		}
 	};
-	public static final Block FENCEGATE = new Block(0x6B, "Fence Gate", Texture.unknown) {
+	public static final int FENCEGATE_ID = 0x6B;
+	public static final Block FENCEGATE = new Block(FENCEGATE_ID, "Fence Gate", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;

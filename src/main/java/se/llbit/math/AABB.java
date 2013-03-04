@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -149,5 +149,18 @@ public class AABB {
 				1 - zmax, 1 - zmin,
 				ymin, ymax,
 				xmin, xmax);
+	}
+	
+	/**
+	 * @param x X translation
+	 * @param y Y translation
+	 * @param z Z translation
+	 * @return A translated copy of this AABB
+	 */
+	public AABB getTranslated(double x, double y, double z) {
+		return new AABB(
+				xmin + x, xmax + x,
+				ymin + y, ymax + y,
+				zmin + z, zmax + z);
 	}
 }

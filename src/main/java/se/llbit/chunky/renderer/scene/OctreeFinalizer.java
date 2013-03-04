@@ -66,8 +66,15 @@ public class OctreeFinalizer {
 					int corner1;
 					int corner2;
 					int corner3;
+					int connections;
+					int dir;
 					
 					Block other;
+					Block above;
+					Block west;
+					Block east;
+					Block north;
+					Block south;
 					switch (block.id) {
 					case Block.WATER_ID:
 						fullBlock = (type >> WaterModel.FULL_BLOCK) & 1;
@@ -290,11 +297,11 @@ public class OctreeFinalizer {
 						octree.set(type, x, cy, z);
 						break;
 					case Block.REDSTONEWIRE_ID:
-						Block above = Block.get(octree.get(x, cy + 1, z));
-						Block west = Block.get(octree.get(x - 1, cy, z));
-						Block east = Block.get(octree.get(x + 1, cy, z));
-						Block north = Block.get(octree.get(x, cy, z - 1));
-						Block south = Block.get(octree.get(x, cy, z + 1));
+						above = Block.get(octree.get(x, cy + 1, z));
+						west = Block.get(octree.get(x - 1, cy, z));
+						east = Block.get(octree.get(x + 1, cy, z));
+						north = Block.get(octree.get(x, cy, z - 1));
+						south = Block.get(octree.get(x, cy, z + 1));
 						
 						if (above == Block.AIR) {
 							Block westAbove = Block.get(octree.get(x - 1, cy + 1, z));
@@ -384,7 +391,7 @@ public class OctreeFinalizer {
 						octree.set(type, x, cy, z);
 						break;
 					case Block.CHEST_ID:
-						int dir = type >> 8;
+						dir = type >> 8;
 						int tex = 0;
 						if (dir < 4) {
 							if (Block.get(octree.get(x - 1, cy, z)) == Block.CHEST)
@@ -432,7 +439,7 @@ public class OctreeFinalizer {
 						break;
 					case Block.STONEWALL_ID:
 						other = Block.get(octree.get(x, cy, z - 1));
-						int connections = 0;
+						connections = 0;
 						if (other.isStoneWallConnector())
 							connections |= 1;
 						other = Block.get(octree.get(x, cy, z + 1));
@@ -486,6 +493,26 @@ public class OctreeFinalizer {
 						if (other.isNetherBrickFenceConnector())
 							type |= 8 << 8;
 						octree.set(type, x, cy, z);
+						break;
+					case Block.FENCEGATE_ID:
+						dir = 3 & (type >> BlockData.BLOCK_DATA_OFFSET);
+						if (dir == 0 || dir == 2) {
+							// facing north or south
+							west = Block.get(octree.get(x - 1, cy, z));
+							east = Block.get(octree.get(x + 1, cy, z));
+							if (west == Block.STONEWALL && east == Block.STONEWALL) {
+								type |= 1 << BlockData.FENCEGATE_LOW;
+								octree.set(type, x, cy, z);
+							}
+						} else {
+							// facing east or west
+							north = Block.get(octree.get(x, cy, z - 1));
+							south = Block.get(octree.get(x, cy, z + 1));
+							if (north == Block.STONEWALL && south == Block.STONEWALL) {
+								type |= 1 << BlockData.FENCEGATE_LOW;
+								octree.set(type, x, cy, z);
+							}
+						}
 						break;
 					case Block.OAKWOODSTAIRS_ID:
 					case Block.STONESTAIRS_ID:

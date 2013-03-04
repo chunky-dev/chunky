@@ -17,6 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.BlockData;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
@@ -44,20 +45,28 @@ public class FenceGateModel {
 		new AABB(.875, 1, .375, .9375, .8125, .9375),
 };
 	
-	private static AABB[][][] rot = new AABB[2][4][];
+	private static AABB[][][][] rot = new AABB[2][2][4][];
 	
 	static {
-		rot[0][0] = closed;
-		rot[0][1] = new AABB[closed.length];
-		rot[0][2] = rot[0][0];
-		rot[0][3] = rot[0][1];
+		rot[0][0][0] = closed;
+		rot[0][0][1] = new AABB[closed.length];
+		rot[0][0][2] = rot[0][0][0];
+		rot[0][0][3] = rot[0][0][1];
 		for (int i = 0; i < closed.length; ++i)
-			rot[0][1][i] = closed[i].getYRotated();
-		rot[1][0] = open;
+			rot[0][0][1][i] = closed[i].getYRotated();
+		rot[0][1][0] = open;
 		for (int j = 1; j < 4; ++j) {
-			rot[1][j] = new AABB[rot[1][j-1].length];
-			for (int i = 0; i < rot[1][j-1].length; ++i)
-				rot[1][j][i] = rot[1][j-1][i].getYRotated();
+			rot[0][1][j] = new AABB[rot[0][1][j-1].length];
+			for (int i = 0; i < rot[0][1][j-1].length; ++i)
+				rot[0][1][j][i] = rot[0][1][j-1][i].getYRotated();
+		}
+		for (int i = 0; i < rot[1].length; ++i) {
+			for (int j = 0; j < rot[1][i].length; ++j) {
+				rot[1][i][j] = new AABB[rot[0][i][j].length];
+				for (int k = 0; k < rot[1][i][j].length; ++k) {
+					rot[1][i][j][k] = rot[0][i][j][k].getTranslated(0, -3/16., 0);
+				}
+			}
 		}
 	}
 
@@ -65,8 +74,9 @@ public class FenceGateModel {
 		boolean hit = false;
 		int isOpen = (ray.getBlockData() >> 2) & 1;
 		int direction = ray.getBlockData() & 3;
+		int isLow = (ray.currentMaterial >> BlockData.FENCEGATE_LOW) & 1;
 		ray.t = Double.POSITIVE_INFINITY;
-		for (AABB box : rot[isOpen][direction]) {
+		for (AABB box : rot[isLow][isOpen][direction]) {
 			if (box.intersect(ray)) {
 				Texture.oakPlanks.getColor(ray);
 				ray.t = ray.tNear;
