@@ -59,15 +59,21 @@ public class TestModel {
 	public void setUp() {
 		boxes = new AABB[] {
 			// east
-			new AABB(10/16., 11/16., 0, 6/16., 5/16., 11/16.),
+			new AABB(14/16., 1, 10/16., 1, 0, 1),
 			// west
-			new AABB(5/16., 6/16., 0, 6/16., 5/16., 11/16.),
+			new AABB(0, 2/16., 10/16., 1, 0, 1),
 			// north
-			new AABB(5/16., 11/16., 0, 6/16., 5/16., 6/16.),
+			new AABB(2/16., 14/16., 10/16., 1, 0, 2/16.),
 			// south
-			new AABB(5/16., 11/16., 0, 6/16., 10/16., 11/16.),
+			new AABB(2/16., 14/16., 10/16., 1, 14/16., 1),
 			// center
+			new AABB(4/16., 12/16., 4/16., 10/16., 4/16., 12/16.),
+			// bottom
 			new AABB(6/16., 10/16., 0, 4/16., 6/16., 10/16.),
+		};
+		quads = new Quad[] {
+			new DoubleSidedQuad(new Vector3d(2/16., 10/16., 2/16.), new Vector3d(14/16., 10/16., 2/16.),
+					new Vector3d(2/16., 10/16., 14/16.), new Vector4d(2/16., 14/16., 2/16., 14/16.)),
 		};
 	}
 	
@@ -147,11 +153,23 @@ public class TestModel {
 		
 		for (int i = 0; i < boxes.length; ++i) {
 			if (boxes[i].intersect(ray)) {
-				if (i == 4)
-					Texture.dirt.getColor(ray);
+				if (ray.n.y > 0)
+					Texture.hopperInside.getColor(ray);
 				else
-					Texture.flowerPot.getColor(ray);
+					Texture.hopper.getColor(ray);
 				ray.color.w = 1;
+				ray.t = ray.tNear;
+			}
+		}
+		
+		for (int i = 0; i < quads.length; ++i) {
+			if (quads[i].intersect(ray)) {
+				ray.n.set(quads[i].n);
+				ray.n.scale(-Math.signum(ray.d.dot(quads[i].n)));
+				if (ray.n.y > 0)
+					Texture.hopperInside.getColor(ray);
+				else
+					Texture.hopper.getColor(ray);
 				ray.t = ray.tNear;
 			}
 		}

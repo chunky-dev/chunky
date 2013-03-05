@@ -317,6 +317,8 @@ public class TexturePackLoader {
 		allTextures.add(new SimpleTexture("textures/blocks/daylightDetector_side", Texture.daylightDetectorSide));
 		allTextures.add(new SimpleTexture("textures/blocks/comparator", Texture.comparator));
 		allTextures.add(new SimpleTexture("textures/blocks/comparator_lit", Texture.comparatorLit));
+		allTextures.add(new SimpleTexture("textures/blocks/hopper", Texture.hopper));
+		allTextures.add(new SimpleTexture("textures/blocks/hopper_inside", Texture.hopperInside));
 	}
 	
 	/**

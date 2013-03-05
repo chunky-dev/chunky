@@ -270,6 +270,8 @@ public class Texture {
 	public static final Texture daylightDetectorSide = new Texture();
 	public static final Texture comparator = new Texture();
 	public static final Texture comparatorLit = new Texture();
+	public static final Texture hopper = new Texture();
+	public static final Texture hopperInside = new Texture();
 	public static final Texture unknown = new Texture("unknown");
 	
 	public static final Texture signPost = new Texture();

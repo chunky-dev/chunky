@@ -8,6 +8,7 @@
     specified, it was always set to 1 regardless of the actual value
     * It is now possible to manually input the camera position and direction
     * Fence gates set between wall sections are rendered at correct height
+    * Added Hopper block
 
 1.1.5 - 2013-02-26
     * Added parallel projection (TOGoS)

@@ -45,6 +45,7 @@ import se.llbit.chunky.model.FurnaceModel;
 import se.llbit.chunky.model.GlassPaneModel;
 import se.llbit.chunky.model.GrassModel;
 import se.llbit.chunky.model.HeadModel;
+import se.llbit.chunky.model.HopperModel;
 import se.llbit.chunky.model.LadderModel;
 import se.llbit.chunky.model.LavaModel;
 import se.llbit.chunky.model.LeafModel;
@@ -2219,7 +2220,11 @@ public class Block {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return HopperModel.intersect(ray);
 		}
 	};
 	public static final Block QUARTZ = new Block(0x9B, "Block of Quartz", Texture.quartzSide) {
