@@ -1,6 +1,6 @@
-1.1.6 - TBD
+1.1.6 - 2013-03-06
     * Added Comparator block
-    * Render flowers in flower pots
+    * Render the flowers in flower pots
     * Cloud height is now relative to the scene origin
     * Stone wall sections with a torch above render as corner sections
     * Added command-line option for specifying job tile width
