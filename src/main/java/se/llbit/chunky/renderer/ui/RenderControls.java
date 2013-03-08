@@ -146,6 +146,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JProgressBar progressBar;
 	private final JLabel progressLbl = new JLabel();
 	private final JComboBox postprocessCB = new JComboBox();
+	private final JComboBox skyModeCB = new JComboBox();
 	private final JButton changeSunColorBtn = new JButton();
 	private final JButton changeGroundColorBtn = new JButton();
 	private final JLabel etaLbl = new JLabel();
@@ -897,6 +898,12 @@ public class RenderControls extends JDialog implements ViewListener,
 	
 	private Component buildSkyPane() {
 		
+		JLabel skyModeLbl = new JLabel("Sky mode:");
+		skyModeCB.addItem("gradient");
+		skyModeCB.addItem("simulated sky");
+		skyModeCB.addItem("skymap");
+		skyModeCB.addItem("skybox");
+		
 		JLabel skyRotationLbl = new JLabel("Skymap rotation:");
 		skyRotationSlider.setMinimum(1);
 		skyRotationSlider.setMaximum(100);
@@ -966,6 +973,10 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
 				.addGroup(layout.createSequentialGroup()
+					.addComponent(skyModeLbl)
+					.addComponent(skyModeCB)
+				)
+				.addGroup(layout.createSequentialGroup()
 					.addComponent(skyRotationLbl)
 					.addComponent(skyRotationSlider)
 				)
@@ -990,6 +1001,11 @@ public class RenderControls extends JDialog implements ViewListener,
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+				.addComponent(skyModeLbl)
+				.addComponent(skyModeCB)
+			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
 				.addComponent(loadSkymapBtn)
 				.addComponent(unloadSkymapBtn)
