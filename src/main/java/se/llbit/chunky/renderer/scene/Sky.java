@@ -41,6 +41,29 @@ import se.llbit.util.ProgramProperties;
  */
 public class Sky {
 	
+	/**
+	 * Sky rendering mode
+	 * @author Jesper Öqvist <jesper@llbit.se>
+	 */
+	public enum SkyMode {
+		/**
+		 * Use simulated sky
+		 */
+		SIMULATED,
+		/**
+		 * Use a panormaic skymap
+		 */
+		SKYMAP,
+		/**
+		 * Use a gradient
+		 */
+		GRADIENT,
+		/**
+		 * Use a skybox
+		 */
+		SKYBOX
+	};
+	
 	private static final Logger logger =
 			Logger.getLogger(Sky.class);
 	

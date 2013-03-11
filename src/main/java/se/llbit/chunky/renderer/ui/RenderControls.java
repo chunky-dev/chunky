@@ -903,6 +903,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		skyModeCB.addItem("simulated sky");
 		skyModeCB.addItem("skymap");
 		skyModeCB.addItem("skybox");
+		skyModeCB.addActionListener(skyModeListener);
+		updateSkyMode();
 		
 		JLabel skyRotationLbl = new JLabel("Skymap rotation:");
 		skyRotationSlider.setMinimum(1);
@@ -1604,6 +1606,12 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateParallelProjectionCheckBox();
 		}
 	};
+	ActionListener skyModeListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+		}
+	};
 	ChangeListener fovListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
@@ -1993,6 +2001,12 @@ public class RenderControls extends JDialog implements ViewListener,
 		parallelProjectionCB.addChangeListener(parallelProjectionListener);
 	}
 	
+	protected void updateSkyMode() {
+		skyModeCB.removeActionListener(skyModeListener);
+		// TODO
+		skyModeCB.addActionListener(skyModeListener);
+	}
+	
 	protected void updateFovSlider() {
 		fovSlider.removeChangeListener(fovListener);
 		double value = (renderManager.scene().camera().getFoV() - Camera.MIN_FOV)
@@ -2247,6 +2261,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateFocalOffsetField();
 		updateDofSlider();
 		updateParallelProjectionCheckBox();
+		updateSkyMode();
 		updateFovSlider();
 		updateFocalOffsetSlider();
 		updateWidthField();
