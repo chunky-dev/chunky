@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Run the benchmark with a number of different tile sizes to evaluate
+# optimum tile size. Note that the optimum tile size depends on the actual
+# canvas size and this benchmark only uses 400 by 400 canvas size.
+
 interrupted()
 {
     exit $?
@@ -7,7 +11,7 @@ interrupted()
 
 trap interrupted SIGINT
 
-JAVA_OPTS=-Xmx4g -Xms512m
+JAVA_OPTS="-Xmx4g -Xms512m"
 
 if [ ! -d test ]; then
 	mkdir test
