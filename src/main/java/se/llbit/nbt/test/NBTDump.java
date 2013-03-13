@@ -22,38 +22,64 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
+import se.llbit.chunky.world.storage.RegionFile;
 import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.NamedTag;
 
 @SuppressWarnings("javadoc")
 public class NBTDump {
 	
-	public static void main(String[] args) {
-		if (args.length < 1) {
-			System.out.println("arguments: <NBT file>");
+	static final Pattern REGION_PATTERN = Pattern.compile("^region-chunk:(\\d+),(\\d+):(.*)$");
+	
+	protected static AnyTag read( String filename ) throws IOException {
+		Matcher m = REGION_PATTERN.matcher(filename);
+		DataInputStream in = null;
+		RegionFile rf = null;
+		try {
+			if (m.matches()) {
+				rf = new RegionFile(new File(m.group(3)));
+				in = rf.getChunkDataInputStream( Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)) );
+			} else {
+				in = new DataInputStream(new GZIPInputStream(new FileInputStream(new File(filename))));
+			}
+			return NamedTag.read(in);
+		} finally {
+			if (in != null) in.close();
+			if (rf != null) rf.close();
+		}
+	}
+	
+	protected static final String USAGE =
+		"Usage: NBTDump <file>\n"+
+		"\n"+
+		"<file> may be an NBT-formatted file (gzipped),\n"+
+		"or of the form 'region-chunk:<x>,<y>:<region-file>',\n" +
+		"which will dump the specified chunk in the given region file.";
+	
+	public static void main(String[] args) throws Exception {
+		if (args.length != 1) {
+			System.err.println(USAGE);
 			System.exit(1);
+		}
+		if ("-?".equals(args[0]) || "-h".equals(args[0])) {
+			System.out.println(USAGE);
+			System.exit(0);			
 		}
 		
 		String fn = args[0];
-		String outFn = fn+".out";
-		try {
-			System.out.println("parsing "+fn);
-			DataInputStream in = new DataInputStream(new GZIPInputStream(new FileInputStream(fn)));
-			AnyTag tag = NamedTag.read(in);
-			System.out.println("writing output to "+outFn);
-			PrintStream out = new PrintStream(new File(outFn));
-			out.print(tag.dumpTree());
-			out.close();
-			System.out.println("done");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+		//String outFn = fn+".out";
+		//System.out.println("parsing "+fn);
+		//System.out.println("writing output to "+outFn);
+		//PrintStream out = new PrintStream(new File(outFn));
+		AnyTag tag = read(fn);
+		PrintStream out = System.out;
+		out.print(tag.dumpTree());
+		out.close();
+		System.out.println("done");
 	}
 
 }
