@@ -129,11 +129,6 @@ public class Biomes {
 	}
 	
 	/**
-	 * Global biome color flag
-	 */
-	public static boolean biomeColorsEnabled = true;// TODO: make non-global?
-	
-	/**
 	 * @param biomeId
 	 * @return Biome color for given biome ID
 	 */
@@ -204,8 +199,6 @@ public class Biomes {
 	 * @return Linear biome color for the given biome ID
 	 */
 	public static final float[] getGrassColorLinear(int biomeId) {
-		if (!biomeColorsEnabled)
-			return grassColorLinear[0];
 		return grassColorLinear[biomeId];
 	}
 	
@@ -214,8 +207,6 @@ public class Biomes {
 	 * @return Linear foliage color for the given biome ID
 	 */
 	public static final float[] getFoliageColorLinear(int biomeId) {
-		if (!biomeColorsEnabled)
-			return foliageColorLinear[0];
 		return foliageColorLinear[biomeId];
 	}
 }

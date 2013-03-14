@@ -354,8 +354,6 @@ public class Scene implements Refreshable {
 			samples = other.samples;
 			bufferData = other.bufferData;
 		}
-		
-		Biomes.biomeColorsEnabled = biomeColors;
 	}
 	
 	private String getFrameName(String fileName) {
@@ -1132,13 +1130,6 @@ public class Scene implements Refreshable {
 		}
 	}
 	
-	/**
-	 * @return <code>true</code> if biome colors are enabled
-	 */
-	public boolean getBiomeColorsEnabled() {
-		return Biomes.biomeColorsEnabled;
-	}
-
 	/**
 	 * Center the camera over the loaded chunks
 	 */
