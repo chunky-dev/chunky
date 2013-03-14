@@ -118,7 +118,7 @@ public class TestRenderer extends Thread implements ViewListener,
 		
 		camera = new Camera(this);
 		camera.setPosition(new Vector3d(.5, .5, 2));
-		camera.setView(-Math.PI/2, -Math.PI/2);
+		camera.setView(-3*Math.PI/4, -5*Math.PI/16);
 		
 		view = new Chunk3DView(this, parent);
 		view.setRenderer(this);
