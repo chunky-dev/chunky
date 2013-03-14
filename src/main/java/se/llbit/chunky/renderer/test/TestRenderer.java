@@ -32,6 +32,7 @@ import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.RenderableCanvas;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.ui.Chunk3DView;
 import se.llbit.chunky.renderer.ui.RenderCanvas;
 import se.llbit.chunky.renderer.ui.ViewListener;
@@ -69,6 +70,12 @@ public class TestRenderer extends Thread implements ViewListener,
 	private Matrix3d rot = new Matrix3d();
 	private Matrix3d tmpRot = new Matrix3d();
 	private double distance = 1.5;
+	private final int blockId;
+	
+	/**
+	 * Mock scene object required by some block renderers
+	 */
+	private final Scene scene;
 	
 	private static final Texture[] tex = {
 		new Texture("east"),
@@ -91,6 +98,19 @@ public class TestRenderer extends Thread implements ViewListener,
 	 * @param parent 
 	 */
 	public TestRenderer(JFrame parent) {
+		this(parent, -1);
+	}
+	
+	/**
+	 * Constructor
+	 * @param parent
+	 * @param blockId
+	 */
+	public TestRenderer(JFrame parent, int blockId) {
+		this.blockId = blockId;
+		scene = new Scene();
+		scene.setBiomeColorsEnabled(false);
+		
 		width = RenderableCanvas.DEFAULT_WIDTH;
 		height = RenderableCanvas.DEFAULT_HEIGHT;
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -104,7 +124,7 @@ public class TestRenderer extends Thread implements ViewListener,
 		view.setRenderer(this);
 		view.setVisible(true);
 	}
-	
+
 	@Override
 	public void run() {
 		
@@ -172,10 +192,44 @@ public class TestRenderer extends Thread implements ViewListener,
 	}
 	
 	private void raytrace(Ray ray) {
+		double[] nearfar = new double[2];
+		enterBlock(ray, nearfar);
+		double tNear = nearfar[0];
+		double tFar = nearfar[1];
+		
+		ray.color.set(1, 1, 1, 1);
+		
+		if (tNear <= tFar && tFar >= 0) {
+			ray.x.scaleAdd(tNear, ray.d, ray.x);
+			ray.distance += tNear;
+			
+			if (blockId == -1) {
+				renderTestModel(ray);
+			} else {
+				ray.prevMaterial = 0;
+				ray.currentMaterial = blockId;
+				Block.get(blockId).intersect(ray, scene);
+			}
+		}
+	}
+	private void renderTestModel(Ray ray) {
+		ray.t = Double.POSITIVE_INFINITY;
+		for (int i = 0; i < quads.length; ++i) {
+			if (quads[i].intersect(ray)) {
+				ray.t = ray.tNear;
+				tex[i].getColor(ray);
+			}
+		}
+		
+		ray.t = Double.POSITIVE_INFINITY;
+		testModel.intersect(ray);
+	}
+
+	private void enterBlock(Ray ray, double[] nearfar) {
 		int level = 0;
+		double t1, t2;
 		double tNear = Double.NEGATIVE_INFINITY;
 		double tFar = Double.POSITIVE_INFINITY;
-		double t1, t2;
 		Vector3d d = ray.d;
 		Vector3d o = ray.x;
 		
@@ -221,23 +275,8 @@ public class TestRenderer extends Thread implements ViewListener,
 			if (t2 < tFar) tFar = t2;
 		}
 		
-		ray.color.set(1, 1, 1, 1);
-		
-		if (tNear <= tFar && tFar >= 0) {
-			ray.x.scaleAdd(tNear, d, ray.x);
-			ray.distance += tNear;
-			
-			ray.t = Double.POSITIVE_INFINITY;
-			for (int i = 0; i < quads.length; ++i) {
-				if (quads[i].intersect(ray)) {
-					ray.t = ray.tNear;
-					tex[i].getColor(ray);
-				}
-			}
-			
-			ray.t = Double.POSITIVE_INFINITY;
-			testModel.intersect(ray);
-		}
+		nearfar[0] = tNear;
+		nearfar[1] = tFar;
 	}
 
 	@Override
