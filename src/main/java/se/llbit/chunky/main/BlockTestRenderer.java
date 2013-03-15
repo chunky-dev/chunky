@@ -21,6 +21,7 @@ import java.io.PrintStream;
 
 import se.llbit.chunky.renderer.test.TestRenderer;
 import se.llbit.chunky.resources.TexturePackLoader;
+import se.llbit.chunky.world.BlockData;
 import se.llbit.util.ProgramProperties;
 
 /**
@@ -61,13 +62,22 @@ public class BlockTestRenderer {
 		if (!block.isEmpty()) {
 			int sep = block.indexOf(':');
 			String blockPart;
+			String metadataPart = "";
 			if (sep == -1) {
 				blockPart = block;
 			} else {
 				blockPart = block.substring(0, sep);
+				if (sep+1 < block.length()) {
+					metadataPart = block.substring(sep+1);
+				}
 			}
 			int blockId = Integer.parseInt(blockPart);
-			renderer = new TestRenderer(null, blockId);
+			int metadata = 0;
+			if (!metadataPart.isEmpty()) {
+				metadata = Integer.parseInt(metadataPart);
+			}
+			renderer = new TestRenderer(null,
+					blockId | (metadata << BlockData.BLOCK_DATA_OFFSET));
 		} else {
 			renderer = new TestRenderer(null);
 		}
