@@ -17,7 +17,9 @@
 package se.llbit.chunky.renderer.ui;
 
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
@@ -30,8 +32,11 @@ import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 
 import se.llbit.chunky.renderer.Renderer;
 
@@ -65,6 +70,16 @@ public class Chunk3DView extends JDialog {
         
         pack();
         
+		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_W, Event.CTRL_MASK), "Close Dialog");
+		getRootPane().getActionMap().put("Close Dialog", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// close the view
+            	setVisible(false);
+			}
+		});
+		
         addComponentListener(new ComponentListener() {
 			@Override
 			public void componentShown(ComponentEvent e) {
