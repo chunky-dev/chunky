@@ -20,8 +20,15 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+
+import org.apache.log4j.Logger;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.model.LeverModel;
@@ -56,6 +63,8 @@ import se.llbit.util.VectorPool;
 @SuppressWarnings("unused")
 public class TestRenderer extends Thread implements ViewListener,
 	Renderer, Refreshable, ImageObserver {
+	
+	private static final Logger logger = Logger.getLogger(TestRenderer.class);
 
 	private Chunk3DView view;
 	private BufferedImage buffer;
@@ -92,6 +101,7 @@ public class TestRenderer extends Thread implements ViewListener,
 	};
 	
 	private TestModel testModel = new TestModel();
+	private final String targetFile;
 
 	/**
 	 * Constructor
@@ -107,7 +117,18 @@ public class TestRenderer extends Thread implements ViewListener,
 	 * @param blockId
 	 */
 	public TestRenderer(JFrame parent, int blockId) {
+		this(parent, blockId, "");
+	}
+	
+	/**
+	 * Render a block and write the image to a target file
+	 * @param parent
+	 * @param blockId
+	 * @param targetFile
+	 */
+	public TestRenderer(JFrame parent, int blockId, String targetFile) {
 		this.blockId = blockId;
+		this.targetFile = targetFile;
 		scene = new Scene();
 		scene.setBiomeColorsEnabled(false);
 		
@@ -120,9 +141,11 @@ public class TestRenderer extends Thread implements ViewListener,
 		camera.setPosition(new Vector3d(.5, .5, 2));
 		camera.setView(-3*Math.PI/4, -5*Math.PI/16);
 		
-		view = new Chunk3DView(this, parent);
-		view.setRenderer(this);
-		view.setVisible(true);
+		if (targetFile.isEmpty()) {
+			view = new Chunk3DView(this, parent);
+			view.setRenderer(this);
+			view.setVisible(true);
+		}
 	}
 
 	@Override
@@ -137,16 +160,31 @@ public class TestRenderer extends Thread implements ViewListener,
 				synchronized (backBuffer) {
 					raytrace();
 					
-					// flip buffers
-					BufferedImage tmp = backBuffer;
-					backBuffer = buffer;
-					buffer = tmp;
+					if (!targetFile.isEmpty()) {
+						writeBufferToFile(targetFile);
+						return;
+					} else {
+						// flip buffers
+						BufferedImage tmp = backBuffer;
+						backBuffer = buffer;
+						buffer = tmp;
+					}
 				}
 				
 				view.getCanvas().repaint();
 				
 			}
 		} catch (InterruptedException e) {
+		}
+	}
+
+	private void writeBufferToFile(String fileName) {
+		try {
+			ImageIO.write(buffer, "png", new FileOutputStream(fileName));
+		} catch (FileNotFoundException e) {
+			logger.error(e);
+		} catch (IOException e) {
+			logger.error(e);
 		}
 	}
 

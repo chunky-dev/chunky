@@ -42,16 +42,27 @@ public class BlockTestRenderer {
 			TexturePackLoader.loadTexturePack(Chunky.getMinecraftJar(), false);
 		
 		String block = "";
+		String targetFile = "";
 		for (int i = 0; i < args.length; ++i) {
 			String arg = args[i];
 			if (arg.equals("-help") || arg.equals("-h")) {
 				printHelp(System.out);
 				return;
+			} else if (arg.equals("-o")) {
+				if (i+1 >= args.length) {
+					System.err.println("Missing target file argument!");
+					printHelp(System.out);
+					System.exit(1);
+				} else {
+					targetFile = args[i+1];
+					i += 1;
+				}
 			} else {
 				if (block.isEmpty()) {
 					block = arg;
 				} else {
 					System.err.println("Too many arguments!");
+					printHelp(System.out);
 					System.exit(1);
 				}
 			}
@@ -77,17 +88,21 @@ public class BlockTestRenderer {
 				metadata = Integer.parseInt(metadataPart);
 			}
 			renderer = new TestRenderer(null,
-					blockId | (metadata << BlockData.BLOCK_DATA_OFFSET));
+					blockId | (metadata << BlockData.BLOCK_DATA_OFFSET),
+					targetFile);
 		} else {
-			renderer = new TestRenderer(null);
+			renderer = new TestRenderer(null, -1, targetFile);
 		}
 		
 		renderer.start();
 	}
 
 	private static void printHelp(PrintStream out) {
-		out.println("Usage: BlockTestRenderer [ID[:METADATA]]");
+		out.println("Usage: BlockTestRenderer [ID[:METADATA]] [OPTIONS]");
 		out.println("    ID         is the id of the block to render");
 		out.println("    METADATA   specifies the metadata (TBD)");
+		out.println("");
+		out.println("Options:");
+		out.println("    -o ARG     write rendered image to file ARG");
 	}
 }

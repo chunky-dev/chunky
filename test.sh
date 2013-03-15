@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -lt "1" ]; then
-    echo "Usage: $0 <BLOCK ID[:METADATA]>"
+    echo "Usage: $0 <BLOCK ID[:METADATA]> [OPTIONS]"
     exit 1
 fi
 
@@ -13,6 +13,6 @@ if ant -Ddebug=true build; then
 	fi
 
 	cd test
-    java $JAVA_OPTS -cp ../bin:../lib/j99.jar:../lib/JOCL-0.1.7.jar:../lib/log4j-1.2.17.jar se.llbit.chunky.main.BlockTestRenderer $1
+    java $JAVA_OPTS -cp ../bin:../lib/j99.jar:../lib/JOCL-0.1.7.jar:../lib/log4j-1.2.17.jar se.llbit.chunky.main.BlockTestRenderer $*
 fi
 
