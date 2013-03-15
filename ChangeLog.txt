@@ -1,3 +1,6 @@
+1.1.7 - TBD
+    * Ctrl+W now closes the 3D preview window
+
 1.1.6 - 2013-03-06
     * Added Comparator block
     * Render the flowers in flower pots
