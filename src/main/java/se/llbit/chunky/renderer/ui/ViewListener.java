@@ -78,6 +78,6 @@ public interface ViewListener {
 	 * Zoom the camera in/out
 	 * @param diff
 	 */
-	void zoom(int diff);
+	void onZoom(int diff);
 
 }

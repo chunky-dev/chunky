@@ -224,7 +224,7 @@ public class Chunk3DView extends JDialog {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				int rotation = e.getWheelRotation();
-				listener.zoom(rotation);
+				listener.onZoom(rotation);
 			}
 		});
     }

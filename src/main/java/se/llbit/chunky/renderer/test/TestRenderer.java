@@ -382,7 +382,7 @@ public class TestRenderer extends Thread implements ViewListener,
 	}
 
 	@Override
-	public void zoom(int diff) {
+	public void onZoom(int diff) {
 		distance += .1 * diff;
 		distance = Math.max(.1, distance);
 		refresh();

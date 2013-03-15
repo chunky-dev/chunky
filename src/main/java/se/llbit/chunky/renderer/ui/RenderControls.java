@@ -2372,7 +2372,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	@Override
-	public void zoom(int diff) {
+	public void onZoom(int diff) {
 		double value = renderManager.scene().camera().getFoV();
 		double scale = Camera.MAX_FOV - Camera.MIN_FOV;
 		value = value + diff * scale/20;
