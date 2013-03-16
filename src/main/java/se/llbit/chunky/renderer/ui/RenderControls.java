@@ -1128,6 +1128,9 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderManager.scene().camera();
 				camera.setFoV(90);
 				camera.setView(Math.PI, -Math.PI/2);
+				updateFovField();
+				updateFovSlider();
+				updateCameraDirection();
 			}
 		});
 		
@@ -1138,6 +1141,9 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderManager.scene().camera();
 				camera.setFoV(90);
 				camera.setView(0, -Math.PI/2);
+				updateFovField();
+				updateFovSlider();
+				updateCameraDirection();
 			}
 		});
 		
@@ -1148,6 +1154,9 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderManager.scene().camera();
 				camera.setFoV(90);
 				camera.setView(-Math.PI/2, Math.PI);
+				updateFovField();
+				updateFovSlider();
+				updateCameraDirection();
 			}
 		});
 		
@@ -1158,6 +1167,9 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderManager.scene().camera();
 				camera.setFoV(90);
 				camera.setView(-Math.PI/2, 0);
+				updateFovField();
+				updateFovSlider();
+				updateCameraDirection();
 			}
 		});
 		
@@ -1168,6 +1180,9 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderManager.scene().camera();
 				camera.setFoV(90);
 				camera.setView(Math.PI/2, -Math.PI/2);
+				updateFovField();
+				updateFovSlider();
+				updateCameraDirection();
 			}
 		});
 		
@@ -1178,6 +1193,9 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderManager.scene().camera();
 				camera.setFoV(90);
 				camera.setView(-Math.PI/2, -Math.PI/2);
+				updateFovField();
+				updateFovSlider();
+				updateCameraDirection();
 			}
 		});
 		
