@@ -52,7 +52,7 @@ public class Camera {
 	/**
 	 * Maximum FOV for perspective projection
 	 */
-	public static final double MAX_FOV = 110;
+	public static final double MAX_FOV = 175;
 	
 	/**
 	 * Minimum Focal Offset
