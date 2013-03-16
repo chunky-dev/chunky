@@ -166,17 +166,14 @@ public class Camera {
 		updateTransform();
 	}
 	
-	protected double getClampedFoV() {
-		double value = fov;
-		if( !parallelProjection ) {
-			value = Math.max(value, Camera.MIN_FOV);
-			value = Math.min(value, Camera.MAX_FOV);
-		}
+	protected static double getClampedFoV(double value) {
+		value = Math.max(value, Camera.MIN_FOV);
+		value = Math.min(value, Camera.MAX_FOV);
 		return value;
 	}
 	
 	private void calcFovTan() {
-		fovTan = 2 * (Math.tan((getClampedFoV() / 360) * Math.PI));
+		fovTan = 2 * (Math.tan((getClampedFoV(fov) / 360) * Math.PI));
 	}
 
 	/**
@@ -232,11 +229,16 @@ public class Camera {
 	
 	/**
 	 * Toggle parallel projection
-	 * @param p
+	 * @param enabled
 	 */
-	public synchronized void setParallelProjection(boolean p) {
-		parallelProjection = p;
-		scene.refresh();
+	public synchronized void setParallelProjection(boolean enabled) {
+		if (enabled != parallelProjection) {
+			parallelProjection = enabled;
+			if (!parallelProjection) {
+				fov = getClampedFoV(fov);
+			}
+			scene.refresh();
+		}
 	}
 	
 	/**
@@ -245,9 +247,13 @@ public class Camera {
 	 * @param value
 	 */
 	public synchronized void setFoV(double value) {
-		fov = value;
-		calcFovTan();
-		scene.refresh();
+		double clamped = parallelProjection ? value : getClampedFoV(value);
+		clamped = Math.max(Ray.EPSILON, clamped);
+		if (clamped != fov) {
+			fov = clamped;
+			calcFovTan();
+			scene.refresh();
+		}
 	}
 	
 	/**
@@ -351,7 +357,7 @@ public class Camera {
 	 * @param pitch
 	 */
 	public synchronized void rotateView(double yaw, double pitch) {
-		double fovRad = (fov / 360) * Math.PI;
+		double fovRad = (getClampedFoV(fov) / 360) * Math.PI;
 		this.yaw += yaw * fovRad;
 		this.pitch += pitch * fovRad;
 		
