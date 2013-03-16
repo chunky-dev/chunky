@@ -1190,6 +1190,22 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		
+		JLabel isometricLbl = new JLabel("Isometric views:");
+		
+		JButton isometric1Btn = new JButton("Isometric1");
+		isometric1Btn.setToolTipText("Set isometric view");
+		isometric1Btn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Camera camera = renderManager.scene().camera();
+				camera.setView(-Math.PI/4, -Math.PI/4);
+				camera.setParallelProjection(true);
+				updateParallelProjectionCheckBox();
+				updateCameraDirection();
+			}
+		});
+		
+		JSeparator sep2 = new JSeparator();
 		JSeparator sep1 = new JSeparator();
 		
 		JPanel panel = new JPanel();
@@ -1239,6 +1255,12 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(znegBtn)
 				)
 				.addComponent(sep1)
+				.addComponent(isometricLbl)
+				.addGroup(layout.createSequentialGroup()
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(isometric1Btn)
+				)
+				.addComponent(sep2)
 				.addGroup(layout.createSequentialGroup()
 					.addGroup(layout.createParallelGroup()
 						.addComponent(fovLbl)
@@ -1276,6 +1298,8 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(centerCameraBtn)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(lookAtLbl)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
@@ -1287,7 +1311,13 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(znegBtn)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+			.addComponent(isometricLbl)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(isometric1Btn)
+			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
 				.addComponent(parallelProjectionCB))
