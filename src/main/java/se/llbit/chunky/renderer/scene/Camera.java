@@ -50,6 +50,11 @@ public class Camera {
 	public static final double MIN_FOV = 1;
 	
 	/**
+	 * Default FoV value for perspective projection
+	 */
+	public static final double DEFAULT_FOV = 70;
+	
+	/**
 	 * Maximum FOV for perspective projection
 	 */
 	public static final double MAX_FOV = 175;
@@ -90,7 +95,7 @@ public class Camera {
 	private Matrix3d tmpTransform = new Matrix3d();
 
 	private double dof = 8;
-	private double fov = 70;
+	private double fov = DEFAULT_FOV;
 	
 	/**
 	 * Maximum diagonal width of the world
@@ -249,10 +254,19 @@ public class Camera {
 		if (enabled != parallelProjection) {
 			parallelProjection = enabled;
 			if (!parallelProjection) {
-				fov = getClampedFoV(fov);
+				fov = DEFAULT_FOV;
+			} else {
+				fov = worldWidth/2;
 			}
 			scene.refresh();
 		}
+	}
+	
+	/**
+	 * @return Parallel projection flag
+	 */
+	public synchronized boolean getParallelProjection() {
+		return parallelProjection;
 	}
 	
 	/**
@@ -262,7 +276,7 @@ public class Camera {
 	 */
 	public synchronized void setFoV(double value) {
 		double clamped = parallelProjection ? value : getClampedFoV(value);
-		clamped = Math.max(Ray.EPSILON, clamped);
+		clamped = Math.max(MIN_FOV, clamped);
 		if (clamped != fov) {
 			fov = clamped;
 			calcFovTan();
@@ -545,9 +559,23 @@ public class Camera {
 	}
 
 	/**
-	 * @param size
+	 * @param size World size
 	 */
 	public void setWorldSize(double size) {
 		worldWidth = Math.sqrt(size*size + Chunk.Y_MAX*Chunk.Y_MAX);
+	}
+	
+	/**
+	 * @return Maximum world diagonal size
+	 */
+	public double getWorldSize() {
+		return worldWidth;
+	}
+	
+	/**
+	 * @return Maximum FoV value, depending on ParallelProjection
+	 */
+	public double getMaxFoV() {
+		return parallelProjection ? worldWidth : MAX_FOV;
 	}
 }

@@ -3,6 +3,7 @@
     * Ctrl+W now closes the 3D preview window
     * Added buttons for quick isometric camera setup
     * Improved camera controls in parallel projection mode
+    * Increased FoV slider range (especially in parallel projection mode)
 
 1.1.6 - 2013-03-06
     * Added Comparator block
