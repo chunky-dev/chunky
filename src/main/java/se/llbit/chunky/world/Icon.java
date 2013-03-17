@@ -41,6 +41,10 @@ public class Icon extends Texture {
 	public static final Icon woodenDoor = new Icon("wooden-door");
 	public static final Icon woodenPressurePlate = new Icon("wooden-pressure-plate");
 	public static final Icon woodenStairs = new Icon("wooden-stairs");
+	public static final Icon isoNE = new Icon("iso-ne");
+	public static final Icon isoWN = new Icon("iso-wn");
+	public static final Icon isoSW = new Icon("iso-sw");
+	public static final Icon isoES = new Icon("iso-es");
 
 	public Icon(String resourceName) {
 		setTexture(ImageLoader.get("icons/" + resourceName + ".png"));

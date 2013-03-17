@@ -34,6 +34,7 @@ import java.util.Collection;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
@@ -68,6 +69,7 @@ import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3d;
@@ -1210,13 +1212,56 @@ public class RenderControls extends JDialog implements ViewListener,
 		
 		JLabel isometricLbl = new JLabel("Isometric views:");
 		
-		JButton isometric1Btn = new JButton("Isometric1");
-		isometric1Btn.setToolTipText("Set isometric view");
-		isometric1Btn.addActionListener(new ActionListener() {
+		JButton isoWNBtn = new JButton("west-north");
+		isoWNBtn.setIcon(new ImageIcon(Icon.isoWN.getImage()));
+		isoWNBtn.setToolTipText("Set isometric view");
+		isoWNBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderManager.scene().camera();
 				camera.setView(-Math.PI/4, -Math.PI/4);
+				camera.setParallelProjection(true);
+				updateParallelProjectionCheckBox();
+				updateCameraDirection();
+			}
+		});
+		
+		JButton isoNEBtn = new JButton("north-east");
+		isoNEBtn.setIcon(new ImageIcon(Icon.isoNE.getImage()));
+		isoNEBtn.setToolTipText("Set isometric view");
+		isoNEBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Camera camera = renderManager.scene().camera();
+				camera.setView(-3*Math.PI/4, -Math.PI/4);
+				camera.setParallelProjection(true);
+				updateParallelProjectionCheckBox();
+				updateCameraDirection();
+			}
+		});
+		
+		JButton isoESBtn = new JButton("east-south");
+		isoESBtn.setIcon(new ImageIcon(Icon.isoES.getImage()));
+		isoESBtn.setToolTipText("Set isometric view");
+		isoESBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Camera camera = renderManager.scene().camera();
+				camera.setView(-5*Math.PI/4, -Math.PI/4);
+				camera.setParallelProjection(true);
+				updateParallelProjectionCheckBox();
+				updateCameraDirection();
+			}
+		});
+		
+		JButton isoSWBtn = new JButton("south-west");
+		isoSWBtn.setIcon(new ImageIcon(Icon.isoSW.getImage()));
+		isoSWBtn.setToolTipText("Set isometric view");
+		isoSWBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Camera camera = renderManager.scene().camera();
+				camera.setView(-7*Math.PI/4, -Math.PI/4);
 				camera.setParallelProjection(true);
 				updateParallelProjectionCheckBox();
 				updateCameraDirection();
@@ -1276,7 +1321,13 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(isometricLbl)
 				.addGroup(layout.createSequentialGroup()
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(isometric1Btn)
+					.addComponent(isoWNBtn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(isoNEBtn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(isoESBtn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(isoSWBtn)
 				)
 				.addComponent(sep2)
 				.addGroup(layout.createSequentialGroup()
@@ -1332,7 +1383,10 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addComponent(isometricLbl)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
-				.addComponent(isometric1Btn)
+				.addComponent(isoWNBtn)
+				.addComponent(isoNEBtn)
+				.addComponent(isoESBtn)
+				.addComponent(isoSWBtn)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
