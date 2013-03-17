@@ -1,4 +1,4 @@
-1.1.7 - TBD
+1.1.7 - 20130317
     * Increased maximum FoV value to 175 degrees
     * Ctrl+W now closes the 3D preview window
     * Added buttons for quick isometric camera setup
