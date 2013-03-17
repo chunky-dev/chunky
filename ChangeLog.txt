@@ -1,9 +1,10 @@
 1.1.7 - 20130317
-    * Increased maximum FoV value to 175 degrees
+    * Increased maximum FoV value to 175 degrees for perspective projection
+    * Increased FoV slider range in parallel projection mode
     * Ctrl+W now closes the 3D preview window
     * Added buttons for quick isometric camera setup
-    * Improved camera controls in parallel projection mode
-    * Increased FoV slider range (especially in parallel projection mode)
+    * Improved camera controls in parallel projection mode (WASD work more
+    intuitively)
 
 1.1.6 - 2013-03-06
     * Added Comparator block
