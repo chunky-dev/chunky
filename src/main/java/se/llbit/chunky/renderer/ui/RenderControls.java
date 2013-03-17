@@ -900,6 +900,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	
 	private Component buildSkyPane() {
 		
+		@SuppressWarnings("unused")
 		JLabel skyModeLbl = new JLabel("Sky mode:");
 		skyModeCB.addItem("gradient");
 		skyModeCB.addItem("simulated sky");
@@ -976,11 +977,11 @@ public class RenderControls extends JDialog implements ViewListener,
 		layout.setHorizontalGroup(layout.createSequentialGroup()
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
-				.addGroup(layout.createSequentialGroup()
+				/*.addGroup(layout.createSequentialGroup()
 					.addComponent(skyModeLbl)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(skyModeCB, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				)
+				)*/
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(skyRotationLbl)
 					.addComponent(skyRotationSlider)
@@ -1006,10 +1007,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+			/*.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(skyModeLbl)
 				.addComponent(skyModeCB)
-			)
+			)*/
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
 				.addComponent(loadSkymapBtn)
