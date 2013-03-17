@@ -68,8 +68,22 @@ public class Camera {
 
 	Vector3d pos = new Vector3d(0, 0, 0);
 	private Vector3d up = new Vector3d(0, 1, 0);
+	
+	/**
+	 * Scratch vector
+	 */
 	private Vector3d right = new Vector3d();
+	
+	/**
+	 * Scratch vector
+	 */
 	private Vector3d d = new Vector3d();
+	
+	/**
+	 * Scratch vector
+	 */
+	private Vector3d u = new Vector3d();
+	
 	private double yaw = - Math.PI / 2;
 	private double pitch = 0;
 	private Matrix3d transform = new Matrix3d();
@@ -284,10 +298,20 @@ public class Camera {
 	 * @param v
 	 */
 	public synchronized void moveForward(double v) {
-		d.set(0, -1, 0);
-		transform.transform(d);
-		pos.scaleAdd(v, d, pos);
-		
+		if (!parallelProjection) {
+			d.set(0, -1, 0);
+			transform.transform(d);
+			pos.scaleAdd(v, d, pos);
+		} else {
+			d.set(1, 0, 0);
+			tmpTransform.rotY(yaw);
+			tmpTransform.transform(d);
+			right.cross(up, d);
+			d.set(0, -1, 0);
+			transform.transform(d);
+			u.cross(right, d);
+			pos.scaleAdd(v, u, pos);
+		}
 		scene.refresh();
 	}
 	
@@ -296,10 +320,20 @@ public class Camera {
 	 * @param v
 	 */
 	public synchronized void moveBackward(double v) {
-		d.set(0, -1, 0);
-		transform.transform(d);
-		pos.scaleAdd(-v, d, pos);
-		
+		if (!parallelProjection) {
+			d.set(0, -1, 0);
+			transform.transform(d);
+			pos.scaleAdd(-v, d, pos);
+		} else {
+			d.set(1, 0, 0);
+			tmpTransform.rotY(yaw);
+			tmpTransform.transform(d);
+			right.cross(up, d);
+			d.set(0, -1, 0);
+			transform.transform(d);
+			u.cross(right, d);
+			pos.scaleAdd(-v, u, pos);
+		}
 		scene.refresh();
 	}
 	
