@@ -16,10 +16,12 @@
  */
 package se.llbit.nbt.test;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,6 +36,18 @@ public class NBTDump {
 	
 	static final Pattern REGION_PATTERN = Pattern.compile("^region-chunk:(\\d+),(\\d+):(.*)$");
 	
+	protected static boolean isGzipped( InputStream is ) throws IOException {
+		is.mark(10);
+		byte[] gzipHeader = new byte[10];
+		int r = 0, s;
+		while( r < 10 && (s = is.read(gzipHeader, r, 10-r)) > 0) {
+			r += s;
+		}
+		is.reset();
+		
+		return r >= 10 && gzipHeader[0] == (byte)0x1f && gzipHeader[1] == (byte)0x8b;
+	}
+	
 	protected static AnyTag read( String filename ) throws IOException {
 		Matcher m = REGION_PATTERN.matcher(filename);
 		DataInputStream in = null;
@@ -43,7 +57,8 @@ public class NBTDump {
 				rf = new RegionFile(new File(m.group(3)));
 				in = rf.getChunkDataInputStream( Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)) );
 			} else {
-				in = new DataInputStream(new GZIPInputStream(new FileInputStream(new File(filename))));
+				InputStream fis = new BufferedInputStream(new FileInputStream(new File(filename)));
+				in = new DataInputStream(isGzipped(fis) ? new GZIPInputStream(fis) : fis);
 			}
 			return NamedTag.read(in);
 		} finally {
@@ -55,7 +70,7 @@ public class NBTDump {
 	protected static final String USAGE =
 		"Usage: NBTDump <file>\n"+
 		"\n"+
-		"<file> may be an NBT-formatted file (gzipped),\n"+
+		"<file> may be an NBT-formatted file (gzipped or uncompressed),\n"+
 		"or of the form 'region-chunk:<x>,<y>:<region-file>',\n" +
 		"which will dump the specified chunk in the given region file.";
 	
