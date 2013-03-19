@@ -61,6 +61,7 @@ import se.llbit.chunky.main.Messages;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.ui.SceneDirectoryPicker;
 import se.llbit.chunky.resources.MiscImages;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
@@ -135,8 +136,8 @@ public class Controls extends JPanel {
 		addTab("Chunks", Icon.workbench.createIcon(), buildEditPanel(), "Chunk operations");
 		addTab("Highlight", Icon.redTorchOn.createIcon(), buildHighlightPanel(), "Change block highlight settings");
 		addTab("Options", Icon.wrench.createIcon(), buildOptionsPanel(), "Configure Chunky");
-		addTab("3D Render", Icon.rose.createIcon(), buildRenderPanel(), "Render chunks in 3D");
-		addTab("About", Icon.cake.createIcon(), buildAboutPanel(), "About Chunky");
+		addTab("3D Render", Icon.chunky.createIcon(), buildRenderPanel(), "Render chunks in 3D");
+		addTab("About", Texture.unknown.createIcon(), buildAboutPanel(), "About Chunky");
 		
 		JButton selectWorldBtn = new JButton();
 		selectWorldBtn.setText(Messages.getString("Controls.SelectWorld_lbl")); //$NON-NLS-1$
