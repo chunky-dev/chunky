@@ -17,15 +17,20 @@
 package se.llbit.chunky.ui;
 
 import java.awt.AWTEvent;
+import java.awt.Event;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.net.URL;
 
+import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle;
 
 import org.apache.log4j.Logger;
@@ -60,6 +65,17 @@ public class ChunkyFrame extends JFrame {
 	 * Initialize the UI components
 	 */
 	public void initComponents() {
+		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_Q, Event.CTRL_MASK), "Exit");
+		getRootPane().getActionMap().put("Exit", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// dispatch window closing event
+				JFrame frame = ChunkyFrame.this;
+				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+			}
+		});
+		
 		minimap = new Minimap(chunky);
 		map = new ChunkMap(chunky);
 		controls = new Controls(chunky, minimap);
@@ -117,8 +133,9 @@ public class ChunkyFrame extends JFrame {
 		setLocationByPlatform(true);
 		
 		URL url = getClass().getResource(Messages.getString("Chunky.icon")); //$NON-NLS-1$
-		if (url != null)
+		if (url != null) {
 			setIconImage(Toolkit.getDefaultToolkit().getImage(url));
+		}
 		
 		InputListener listener = new InputListener();
 		Toolkit.getDefaultToolkit().addAWTEventListener(listener, AWTEvent.KEY_EVENT_MASK);
