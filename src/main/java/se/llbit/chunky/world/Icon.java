@@ -48,7 +48,7 @@ public class Icon extends Texture {
 	public static final Icon wrench = new Icon("wrench");
 	public static final Texture redTorchOn = new Texture("redstone-torch-on");
 	public static final Texture workbench = new Texture("workbench");
-	public static final Texture trapdoor = new Texture("trapdoor");
+	public static final Icon map = new Icon("map");
 	public static final Icon chunky = new Icon("chunky");
 
 	public Icon(String resourceName) {
