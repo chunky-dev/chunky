@@ -133,7 +133,7 @@ public class Controls extends JPanel {
 		tabbedPane = new JTabbedPane();
 		
 		addTab("View", Icon.map.createIcon(), buildViewPanel(), "Change map view");
-		addTab("Chunks", Icon.workbench.createIcon(), buildEditPanel(), "Chunk operations");
+		addTab("Chunks", Icon.mapSelected.createIcon(), buildEditPanel(), "Chunk operations");
 		addTab("Highlight", Icon.redTorchOn.createIcon(), buildHighlightPanel(), "Change block highlight settings");
 		addTab("Options", Icon.wrench.createIcon(), buildOptionsPanel(), "Configure Chunky");
 		addTab("3D Render", Icon.chunky.createIcon(), buildRenderPanel(), "Render chunks in 3D");
