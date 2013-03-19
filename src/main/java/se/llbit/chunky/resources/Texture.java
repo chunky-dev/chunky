@@ -20,6 +20,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
+import javax.swing.ImageIcon;
+
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Color;
 import se.llbit.math.QuickMath;
@@ -505,8 +507,18 @@ public class Texture {
 		return avgColorLinear;
 	}
 
+	/**
+	 * @return Internal BufferedImage object
+	 */
 	public BufferedImage getImage() {
 		return image;
+	}
+	
+	/**
+	 * @return An ImageIcon containing this texture's internal image
+	 */
+	public ImageIcon createIcon() {
+		return new ImageIcon(image);
 	}
 	
 	/**

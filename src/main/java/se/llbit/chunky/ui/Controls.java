@@ -17,6 +17,7 @@
 package se.llbit.chunky.ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FileDialog;
@@ -48,6 +49,7 @@ import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -62,6 +64,7 @@ import se.llbit.chunky.resources.MiscImages;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
+import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 
 /**
@@ -128,12 +131,12 @@ public class Controls extends JPanel {
 		
 		tabbedPane = new JTabbedPane();
 		
-		tabbedPane.addTab("View", buildViewPanel());
-		tabbedPane.addTab("Chunks", buildEditPanel());
-		tabbedPane.addTab("Highlight", buildHighlightPanel());
-		tabbedPane.addTab("Options", buildOptionsPanel());
-		tabbedPane.addTab("3D Render", buildRenderPanel());
-		tabbedPane.addTab("About", buildAboutPanel());
+		addTab("View", Icon.trapdoor.createIcon(), buildViewPanel(), "Change map view");
+		addTab("Chunks", Icon.workbench.createIcon(), buildEditPanel(), "Chunk operations");
+		addTab("Highlight", Icon.redTorchOn.createIcon(), buildHighlightPanel(), "Change block highlight settings");
+		addTab("Options", Icon.wrench.createIcon(), buildOptionsPanel(), "Configure Chunky");
+		addTab("3D Render", Icon.rose.createIcon(), buildRenderPanel(), "Render chunks in 3D");
+		addTab("About", Icon.cake.createIcon(), buildAboutPanel(), "About Chunky");
 		
 		JButton selectWorldBtn = new JButton();
 		selectWorldBtn.setText(Messages.getString("Controls.SelectWorld_lbl")); //$NON-NLS-1$
@@ -176,6 +179,27 @@ public class Controls extends JPanel {
 			.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 			.addContainerGap()
 		);
+	}
+
+	/**
+	 * Add a tab and ensure that the icon is to the left of the text in the
+	 * tab label.
+	 * 
+	 * @param title
+	 * @param icon
+	 * @param component
+	 * @param tip
+	 */
+	private void addTab(String title, ImageIcon icon, Component component, String tip) {
+		int index = tabbedPane.getTabCount();
+		
+		tabbedPane.add(component);
+		
+		JLabel lbl = new JLabel(title, icon, SwingConstants.RIGHT);
+		lbl.setIconTextGap(5);
+		
+		tabbedPane.setTabComponentAt(index, lbl);
+		tabbedPane.setToolTipTextAt(index, tip);
 	}
 
 	/**

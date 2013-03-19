@@ -1,4 +1,5 @@
 1.1.8 - TBD
+    * Added icons to the tabs in the main window
     * Increased depth of field effect
 
 1.1.7 - 20130317

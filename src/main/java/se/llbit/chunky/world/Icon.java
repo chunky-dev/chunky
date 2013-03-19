@@ -45,6 +45,11 @@ public class Icon extends Texture {
 	public static final Icon isoWN = new Icon("iso-wn");
 	public static final Icon isoSW = new Icon("iso-sw");
 	public static final Icon isoES = new Icon("iso-es");
+	public static final Icon wrench = new Icon("wrench");
+	public static final Texture redTorchOn = new Texture("redstone-torch-on");
+	public static final Texture workbench = new Texture("workbench");
+	public static final Texture trapdoor = new Texture("trapdoor");
+	public static final Texture rose = new Texture("rose");
 
 	public Icon(String resourceName) {
 		setTexture(ImageLoader.get("icons/" + resourceName + ".png"));
