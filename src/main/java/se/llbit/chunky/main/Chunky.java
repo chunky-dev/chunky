@@ -161,14 +161,19 @@ public class Chunky implements ChunkDiscoveryListener {
 		"Options:\n" +
 		"  -texture <FILE>        use FILE as the texture pack (must be a zip file)\n" +
 		"  -watermark             add a watermark to saved frame\n" +
-		"  -render <SCENE>        render the specified scene (name of .cfv file,\n" +
-		"                         relative to the scenes directory) in headless mode\n" +
+		"  -render <SCENE.cvf>    render the specified scene (see notes)\n" +
 		"  -scene-dir <DIR>       use the directory DIR for loading/saving scenes\n" +
 		"  -benchmark             run the benchmark and exit\n" +
 		"  -threads <NUM>         use the specified number of threads for rendering\n" +
 		"  -tile-width <NUM>      use the specified job tile width\n" +
 		"  -opencl                enables OpenCL rendering in the GUI\n" +
-		"  -help                  show this text";
+		"  -help                  show this text\n" +
+		"\n" +
+		"Notes:\n" +
+		"If -render <SCENE> is specified and SCENE is a path to an existing file\n" +
+		"and -scene-dir <DIR> is not given, SCENE's parent directory will be used\n" +
+		"as the scene directory.  Otherwise, SCENE is interpreted as the name of\n" +
+		"a .cvf file within the scene directory.";
 	
 	/**
 	 * Constructor
@@ -183,7 +188,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	 */
 	public int run(String[] args) {
 		boolean selectedWorld = false;
-		File sceneDir = ProgramProperties.getPreferredSceneDirectory();
+		File sceneDir = null;
 		String sceneName = null;
 		String texturePack = null;
 		int renderThreads = Runtime.getRuntime().availableProcessors();
@@ -208,6 +213,8 @@ public class Chunky implements ChunkDiscoveryListener {
 				openCLEnabled = true;
 			} else if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("-help") || args[i].equals("--help")) {
 				System.out.println(USAGE);
+				System.out.println();
+				System.out.println("The default scene directory is " + ProgramProperties.getPreferredSceneDirectory());
 				return 0;
 			} else if (!args[i].startsWith("-") && !selectedWorld) {
 				worldDir = new File(args[i]);
@@ -215,6 +222,16 @@ public class Chunky implements ChunkDiscoveryListener {
 				System.err.println("Unrecognised argument: "+args[i]);
 				System.err.println(USAGE);
 				return 1;
+			}
+		}
+		
+		if (sceneDir == null) {
+			File possibleSceneFile = new File(sceneName);
+			if (possibleSceneFile.exists()) {
+				sceneDir = possibleSceneFile.getParentFile();
+				sceneName = possibleSceneFile.getName();
+			} else {
+				sceneDir = ProgramProperties.getPreferredSceneDirectory();
 			}
 		}
 		
