@@ -1,4 +1,5 @@
-/* Copyright (c) 2010 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2013 Jesper Öqvist <jesper@llbit.se>
+ *                    2013 TOGoS
  *
  * This file is part of Chunky.
  *
@@ -36,29 +37,29 @@ public class NBTDump {
 	
 	static final Pattern REGION_PATTERN = Pattern.compile("^region-chunk:(\\d+),(\\d+):(.*)$");
 	
-	protected static boolean isGzipped( InputStream is ) throws IOException {
-		is.mark(10);
-		byte[] gzipHeader = new byte[10];
-		int r = 0, s;
-		while( r < 10 && (s = is.read(gzipHeader, r, 10-r)) > 0) {
-			r += s;
-		}
+	protected static boolean isGzipped(InputStream is) throws IOException {
+		is.mark(2);
+		boolean isGZ = is.read() == 0x1F && is.read() == 0x8B;
 		is.reset();
-		
-		return r >= 10 && gzipHeader[0] == (byte)0x1f && gzipHeader[1] == (byte)0x8b;
+		return isGZ;
 	}
 	
-	protected static AnyTag read( String filename ) throws IOException {
+	protected static AnyTag read(String filename) throws IOException {
 		Matcher m = REGION_PATTERN.matcher(filename);
 		DataInputStream in = null;
 		RegionFile rf = null;
 		try {
 			if (m.matches()) {
 				rf = new RegionFile(new File(m.group(3)));
-				in = rf.getChunkDataInputStream( Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)) );
+				in = rf.getChunkDataInputStream(Integer.parseInt(m.group(1)),
+						Integer.parseInt(m.group(2)));
 			} else {
-				InputStream fis = new BufferedInputStream(new FileInputStream(new File(filename)));
-				in = new DataInputStream(isGzipped(fis) ? new GZIPInputStream(fis) : fis);
+				InputStream is = new BufferedInputStream(
+						new FileInputStream(new File(filename)));
+				if (isGzipped(is)) {
+					is = new GZIPInputStream(is);
+				}
+				in = new DataInputStream(is);
 			}
 			return NamedTag.read(in);
 		} finally {
