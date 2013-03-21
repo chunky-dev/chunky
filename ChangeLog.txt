@@ -1,3 +1,8 @@
+1.1.8 - TBD
+    * Ctrl+Q in the main window exits Chunky
+    * Added icons to the tabs in the main window
+    * Increased depth of field effect
+
 1.1.7 - 20130317
     * Increased maximum FoV value to 175 degrees for perspective projection
     * Increased FoV slider range in parallel projection mode

@@ -44,7 +44,6 @@ import se.llbit.chunky.resources.texturepack.SignTexture;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.chunky.resources.texturepack.SunTexture;
 import se.llbit.chunky.resources.texturepack.TextureRef;
-import se.llbit.chunky.world.Icon;
 import se.llbit.util.ProgramProperties;
 
 /**
@@ -216,7 +215,6 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/melon_top", Texture.melonTop, 0x89));
 		allTextures.add(new IndexedTexture("textures/blocks/cauldron_top", Texture.cauldronTop, 0x8A));
 		allTextures.add(new IndexedTexture("textures/blocks/cauldron_inner", Texture.cauldronInside, 0x8B));
-		allTextures.add(new IndexedTexture("textures/items/cake", Icon.cake, 0x8C));
 		allTextures.add(new IndexedTexture("textures/blocks/mushroom_skin_stem", Texture.mushroomStem, 0x8D));
 		allTextures.add(new IndexedTexture("textures/blocks/mushroom_inside", Texture.mushroomPores, 0x8E));
 		allTextures.add(new IndexedTexture("textures/blocks/vine", Texture.vines, 0x8F));

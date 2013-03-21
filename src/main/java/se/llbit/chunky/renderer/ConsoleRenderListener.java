@@ -23,10 +23,10 @@ import java.text.DecimalFormat;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ConsoleRenderListener implements RenderStatusListener {
-	
+
 	private boolean first = true;
 	private final DecimalFormat decimalFormat;
-	
+
 	/**
 	 * Constructor
 	 */
@@ -44,22 +44,22 @@ public class ConsoleRenderListener implements RenderStatusListener {
 		System.out.print(String.format("%s: %.1f%% (%s of %s)",
 				task, 100 * done / (float) target,
 				decimalFormat.format(done), decimalFormat.format(target)));
-		
+
 		if (done == target) {
 			System.out.println();
 			first = true;
 		}
 	}
-	
+
 	@Override
 	public void setProgress(String task, int done, int start, int target, String eta) {
 		if (!first)
 			System.out.print("\r");
 		first = false;
-		System.out.print(String.format("%s: %s of %s (ETA=%s)",
-				task, done / (float) target,
+		System.out.print(String.format("%s: %.1f%% (%s of %s) [ETA=%s]",
+				task, 100 * done / (float) target,
 				decimalFormat.format(done), decimalFormat.format(target), eta));
-		
+
 		if (done == target) {
 			System.out.println();
 			first = true;

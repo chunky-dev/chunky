@@ -509,7 +509,7 @@ public class Camera {
 		d.scale(focalOffset);
 		
 		// at the focal offset we want the distance to a CoC of X to be equal to dof
-		double X = .01;
+		double X = 1.0;
 		double aperture = Math.sqrt((X / dof) * focalOffset);
 		
 		double rx, rz;
