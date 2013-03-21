@@ -56,8 +56,8 @@ public class ConsoleRenderListener implements RenderStatusListener {
 		if (!first)
 			System.out.print("\r");
 		first = false;
-		System.out.print(String.format("%s: %s of %s (ETA=%s)",
-				task, done / (float) target,
+		System.out.print(String.format("%s: %.1f%% (%s of %s) [ETA=%s]",
+				task, 100 * done / (float) target,
 				decimalFormat.format(done), decimalFormat.format(target), eta));
 
 		if (done == target) {
