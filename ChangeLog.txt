@@ -1,4 +1,5 @@
 1.1.8 - TBD
+    * Fixed some errors in the UI
     * Ctrl+Q in the main window exits Chunky
     * Added icons to the tabs in the main window
     * Increased depth of field effect

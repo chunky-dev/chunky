@@ -264,6 +264,10 @@ public class Scene implements Refreshable {
 	
 	private boolean finalizeBuffer = false;
 	
+	static {
+		rayDepth = ProgramProperties.getIntProperty("rayDepth", rayDepth);
+	}
+	
 	/**
 	 * Create an empty scene with default canvas width and height.
 	 */
@@ -1290,8 +1294,10 @@ public class Scene implements Refreshable {
 	 * @param value
 	 */
 	public synchronized void setRayDepth(int value) {
+		value = Math.max(1, value);
 		if (rayDepth != value) {
 			rayDepth = value;
+			ProgramProperties.setProperty("rayDepth", "" + value);
 			refresh();
 		}
 	}
