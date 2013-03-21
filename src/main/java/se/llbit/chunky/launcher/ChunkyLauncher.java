@@ -108,8 +108,6 @@ public class ChunkyLauncher {
 	private static URL unpackJar(ClassLoader parentCL, String name, File tmpDir)
 			throws IOException {
 		
-		System.out.println("Unpacking library: " + name);
-		
 		File tmpFile = File.createTempFile("lib", ".jar", tmpDir);
 		tmpFile.deleteOnExit();
 		tmpFile.setReadable(true, false);
