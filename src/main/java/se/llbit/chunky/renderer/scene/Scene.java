@@ -1755,6 +1755,7 @@ public class Scene implements Refreshable {
 			
 			octree = Octree.load(in);
 			
+			renderListener.setProgress(task, 1, 0, 1);
 			logger.info("Octree loaded");
 			return true;
 		} catch (IOException e) {
@@ -1786,6 +1787,7 @@ public class Scene implements Refreshable {
 			
 			grassTexture = WorldTexture.load(in);
 			
+			renderListener.setProgress(task, 1, 0, 1);
 			logger.info("Grass texture loaded");
 			return true;
 		} catch (IOException e) {
@@ -1817,6 +1819,7 @@ public class Scene implements Refreshable {
 			
 			foliageTexture = WorldTexture.load(in);
 			
+			renderListener.setProgress(task, 1, 0, 1);
 			logger.info("Foliage texture loaded");
 			return true;
 		} catch (IOException e) {
