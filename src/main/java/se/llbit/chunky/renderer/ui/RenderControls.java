@@ -1626,7 +1626,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				int value = Integer.parseInt(source.getText());
-				renderManager.scene().setRayDepth(value);
+				renderManager.scene().setCloudHeight(value);
 				updateCloudHeightSlider();
 			} catch (NumberFormatException ex) {
 			}
