@@ -1246,6 +1246,7 @@ public class Scene implements Refreshable {
  	 */
 	public synchronized void pauseRender() {
 		pauseRender = true;
+		notifyAll();
 	}
 	
 	/**
