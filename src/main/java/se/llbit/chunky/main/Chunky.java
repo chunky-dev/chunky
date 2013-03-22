@@ -461,7 +461,10 @@ public class Chunky implements ChunkDiscoveryListener {
 	 */
 	public static void main(final String[] args) {
 		Chunky chunky = new Chunky();
-		System.exit(chunky.run(args));
+		int exitVal = chunky.run(args);
+		if (exitVal != 0) {
+			System.exit(exitVal);
+		}
 	}
 	
 	/**
