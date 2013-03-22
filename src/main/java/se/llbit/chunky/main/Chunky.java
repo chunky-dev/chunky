@@ -34,6 +34,7 @@ import se.llbit.chunky.renderer.ConsoleRenderListener;
 import se.llbit.chunky.renderer.PlaceholderRenderCanvas;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.renderer.ui.BenchmarkDialog;
 import se.llbit.chunky.renderer.ui.CLDeviceSelector;
@@ -186,7 +187,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	 * @param args
 	 * @return Program exit code (0 = success)
 	 */
-	public int run(String[] args) {
+	public int run(String[] args) throws Exception {
 		boolean selectedWorld = false;
 		File sceneDir = null;
 		String sceneName = null;
@@ -264,10 +265,17 @@ public class Chunky implements ChunkDiscoveryListener {
 		
 			try {
 				renderManager.loadScene(sceneName);
-				if (!renderManager.scene().pathTrace()) {
-					renderManager.scene().startRender();
+				Scene scene = renderManager.scene();
+				
+				if (!scene.pathTrace()) {
+					scene.startRender();
 				} else {
-					renderManager.scene().resumeRender();
+					scene.resumeRender();
+				}
+				synchronized( scene ) {
+					// When rendering is complete, the rendermanager will save the dump and then
+					// pause the scene, which will notifyAll() so that we can then exit.
+					while( !scene.isPaused() ) scene.wait();
 				}
 			} catch (IOException e) {
 				logger.error("IO error while loading scene", e);
@@ -459,7 +467,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	 * 
 	 * @param args
 	 */
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws Exception {
 		Chunky chunky = new Chunky();
 		System.exit(chunky.run(args));
 	}
