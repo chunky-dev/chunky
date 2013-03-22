@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -64,6 +65,7 @@ import se.llbit.chunky.world.Region;
 import se.llbit.chunky.world.RegionParser;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldRenderer;
+import se.llbit.nbt.test.NBTDump;
 import se.llbit.util.ProgramProperties;
 
 /**
@@ -204,6 +206,9 @@ public class Chunky implements ChunkDiscoveryListener {
 				sceneDir = new File(args[++i]);
 			} else if (args[i].equals("-render")) {
 				sceneName = args[++i];
+			} else if (args[i].equals("-dump")) {
+				NBTDump.main( Arrays.copyOfRange(args, i+1, args.length) );
+				System.exit(0);
 			} else if (args[i].equals("-benchmark")) {
 				doBench = true;
 			} else if (args[i].equals("-threads")) {
