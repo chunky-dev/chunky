@@ -32,33 +32,33 @@ public class BrewingStandModel {
 		new AABB(2/16., 8/16., 0, 2/16., 9/16., 15/16.),
 		new AABB(2/16., 8/16., 0, 2/16., 1/16., 7/16.),
 	};
-	
+
 	private static final Texture[] tex = {
 		Texture.brewingStandSide,
 		Texture.brewingStandBase,
 		Texture.brewingStandBase,
 		Texture.brewingStandBase,
 	};
-	
+
 	private static final Quad[] quads = new Quad[] {
 		// east
 		new DoubleSidedQuad(new Vector3d(9/16., 0, .5), new Vector3d(1, 0, .5),
 			new Vector3d(.5, 1, .5), new Vector4d(9/16., 1, 0, 1)),
-			
+
 		// southwest 210
 		new DoubleSidedQuad(new Vector3d(.46, 0, 9/16.), new Vector3d(.25, 0, .933),
 			new Vector3d(.46, 1, 9/16.), new Vector4d(9/16., 1, 0, 1)),
-			
+
 		// northwest 330
 		new DoubleSidedQuad(new Vector3d(.46, 0, 7/16.), new Vector3d(.25, 0, .067),
 			new Vector3d(.46, 1, 7/16.), new Vector4d(9/16., 1, 0, 1)),
 	};
-	
+
 	public static boolean intersect(Ray ray) {
 		int data = ray.getBlockData();
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
-		
+
 		for (int i = 0; i < boxes.length; ++i) {
 			if (boxes[i].intersect(ray)) {
 				ray.t = ray.tNear;

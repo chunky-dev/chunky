@@ -28,9 +28,9 @@ import org.apache.log4j.spi.LoggingEvent;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkyLogAppender extends AppenderSkeleton {
-	
+
 	private ChunkyErrorDialog errorDialog = new ChunkyErrorDialog();
-	
+
 	@Override
 	public void close() {
 		// do nothing

@@ -28,14 +28,14 @@ public class Quad {
 	protected Vector3d xv = new Vector3d();
 	protected Vector3d yv = new Vector3d();
 	protected Vector4d uv = new Vector4d();
-	
+
 	/**
 	 * Normal vector
 	 */
 	public Vector3d n = new Vector3d();
-	
+
 	protected double d, xvl, yvl;
-	
+
 	/**
 	 * Create new Quad
 	 * @param other
@@ -62,7 +62,7 @@ public class Quad {
 		d = - n.dot(o);
 		uv.set(other.uv);
 	}
-	
+
 	/**
 	 * Create transformed Quad
 	 * @param other
@@ -109,7 +109,7 @@ public class Quad {
 		this.uv.y -= uv.x;
 		this.uv.w -= uv.z;
 	}
-	
+
 	/**
 	 * Find intersection between the given ray and this quad
 	 * @param ray
@@ -117,19 +117,19 @@ public class Quad {
 	 */
 	public boolean intersect(Ray ray) {
 		double u, v;
-		
+
 		double ix = ray.x.x - QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
 		double iy = ray.x.y - QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
 		double iz = ray.x.z - QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
-		
+
 		// test that the ray is heading toward the plane
 		double denom = ray.d.dot(n);
 		if (denom < -Ray.EPSILON) {
-			
+
 			// test for intersection with the plane at origin
 			double t = - (ix*n.x + iy*n.y + iz*n.z + d) / denom;
 			if (t > -Ray.EPSILON && t < ray.t) {
-				
+
 				// plane intersection confirmed
 				// translate to get hit point relative to the quad origin
 				ix = ix + ray.d.x * t - o.x;
@@ -156,37 +156,37 @@ public class Quad {
 	public Quad getYRotated() {
 		return new Quad(this, Transform.rotateY);
 	}
-	
+
 	/**
 	 * @return A copy of this quad, rotated around the X axis
 	 */
 	public Quad getXRotated() {
 		return new Quad(this, Transform.rotateX);
 	}
-	
+
 	/**
 	 * @return A copy of this quad, rotated around the negative X axis
 	 */
 	public Quad getNegXRotated() {
 		return new Quad(this, Transform.rotateNegX);
 	}
-	
+
 	/**
 	 * @return A copy of this quad, rotated around the Z axis
 	 */
 	public Quad getZRotated() {
 		return new Quad(this, Transform.rotateZ);
 	}
-	
+
 	/**
 	 * @return A copy of this quad, rotated around the negative Z axis
 	 */
 	public Quad getNegZRotated() {
 		return new Quad(this, Transform.rotateNegZ);
 	}
-	
+
 	/**
-	 * @param angle 
+	 * @param angle
 	 * @return A copy of this quad, rotated around the X axis by some angle
 	 */
 	public Quad getXRotated(double angle) {
@@ -194,9 +194,9 @@ public class Quad {
 		transform.rotX(angle);
 		return new Quad(this, transform);
 	}
-	
+
 	/**
-	 * @param angle 
+	 * @param angle
 	 * @return A copy of this quad, rotated around the Y axis by some angle
 	 */
 	public Quad getYRotated(double angle) {
@@ -204,9 +204,9 @@ public class Quad {
 		transform.rotY(angle);
 		return new Quad(this, transform);
 	}
-	
+
 	/**
-	 * @param angle 
+	 * @param angle
 	 * @return A copy of this quad, rotated around the Z axis by some angle
 	 */
 	public Quad getZRotated(double angle) {
@@ -214,24 +214,24 @@ public class Quad {
 		transform.rotZ(angle);
 		return new Quad(this, transform);
 	}
-	
+
 	/**
-	 * @param x 
-	 * @param y 
-	 * @param z 
+	 * @param x
+	 * @param y
+	 * @param z
 	 * @return A translated copy of this quad
 	 */
 	public Quad getTranslated(double x, double y, double z) {
 		return new Quad(this, new Translation(x, y, z));
 	}
-	
+
 	/**
 	 * @return A flipped copy of this quad
 	 */
 	public Quad getFlipped() {
 		return new Quad(this, Transform.flipY);
 	}
-	
+
 	/**
 	 * @return A mirrored copy of this quad
 	 */

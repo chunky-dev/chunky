@@ -21,7 +21,7 @@ package se.llbit.math;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Vector2d {
-	
+
 	@SuppressWarnings("javadoc")
 	public double x, y;
 
@@ -31,7 +31,7 @@ public class Vector2d {
 	public Vector2d() {
 		this(0, 0);
 	}
-	
+
 	/**
 	 * Creates a new vector (i, j)
 	 * @param i
@@ -41,7 +41,7 @@ public class Vector2d {
 		x = i;
 		y = j;
 	}
-	
+
 	/**
 	 * Create a new vector equal to the given vector
 	 * @param o
@@ -59,7 +59,7 @@ public class Vector2d {
 		x = o.x;
 		y = o.y;
 	}
-	
+
 	/**
 	 * Set this vector equal to (d, e)
 	 * @param d
@@ -146,8 +146,8 @@ public class Vector2d {
 	/**
 	 * Add vector (a, b, c) to this vector
 	 * @param a
-	 * @param b 
-	 * @param c 
+	 * @param b
+	 * @param c
 	 */
 	public final void add(double a, double b, double c) {
 		x += a;
@@ -180,7 +180,7 @@ public class Vector2d {
 		x = a.x;
 		y = a.y;
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("(%f, %f)", x, y);

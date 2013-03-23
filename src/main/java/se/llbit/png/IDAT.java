@@ -32,10 +32,10 @@ public class IDAT extends PngChunk {
 	 * Output stream
 	 */
 	public class IDATOutputStream extends OutputStream {
-		
+
 		ByteArrayOutputStream bos;
 		DeflaterOutputStream out;
-		
+
 		/**
 		 * @throws IOException
 		 */
@@ -43,14 +43,14 @@ public class IDAT extends PngChunk {
 			bos = new ByteArrayOutputStream();
 			out = new DeflaterOutputStream(bos);
 		}
-		
+
 		/**
 		 * Flush the written data
 		 */
 		public void finishChunk() {
 		    compressedData = bos.toByteArray();
 		}
-		
+
 		@Override
 		public void close() throws IOException {
 		    out.finish();
@@ -92,16 +92,16 @@ public class IDAT extends PngChunk {
 	 * PNG chunk type ID
 	 */
 	public static final int CHUNK_TYPE = 0x49444154;
-	
+
 	/**
 	 * Filter type
 	 */
 	public static final int FILTER_TYPE_NONE = 0;// the filter type for no filter
-	
+
 	private int crc;
 	private byte[] compressedData;
 	private IDATOutputStream idatOut;
-	
+
 	/**
 	 * @return The output stream of this chunk
 	 * @throws IOException
@@ -125,10 +125,10 @@ public class IDAT extends PngChunk {
 		DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
 
 		crcOut.writeInt(CHUNK_TYPE);
-		
+
 		crcOut.write(compressedData);
 		out.write(compressedData);
-		
+
 		crc = crcOutputStream.getCRC();
 		crcOut.close();
 	}
@@ -142,6 +142,6 @@ public class IDAT extends PngChunk {
 	public int getChunkCRC() {
 		return crc;
 	}
-	
+
 
 }

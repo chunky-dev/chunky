@@ -23,7 +23,7 @@ import se.llbit.math.Color;
 
 /**
  * Biome constants and utility methods.
- * 
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Biomes {
@@ -81,13 +81,13 @@ public class Biomes {
 			0x537B09,// jungle
 			0x2C4205,// jungle hills
 	};
-	
+
 	private static int[] grassColor = new int[256];
 	private static int[] foliageColor = new int[256];
 	private static float[][] grassColorLinear = new float[grassColor.length][3];
 	private static float[][] foliageColorLinear = new float[grassColor.length][3];
 	private static final int UNKNOWN_COLOR = 0x7E7E7E;
-	
+
 	static {
 		grassColor[0] = 0x75B646;// ocean
 		grassColor[1] = 0x8DB84A;// plains
@@ -112,22 +112,22 @@ public class Biomes {
 		grassColor[20] = 0x75B646;// extreme hills edge
 		grassColor[21] = 0x3A8B25;// jungle
 		grassColor[22] = 0x3A8B25;// jungle hills
-		
+
 		for (int i = 23; i < 256; ++i) {
 			grassColor[i] = UNKNOWN_COLOR;
 		}
-		
+
 		gammaCorrectColors(grassColor, grassColorLinear);
-		
+
 		for (int i = 0; i < 256; ++i) {
 			foliageColor[i] = grassColor[i];
 			foliageColorLinear[i][0] = grassColorLinear[i][0];
 			foliageColorLinear[i][1] = grassColorLinear[i][1];
 			foliageColorLinear[i][2] = grassColorLinear[i][2];
 		}
-		
+
 	}
-	
+
 	/**
 	 * @param biomeId
 	 * @return Biome color for given biome ID
@@ -137,7 +137,7 @@ public class Biomes {
 			return UNKNOWN_COLOR;
 		return biomeColor[biomeId];
 	}
-	
+
 	/**
 	 * Loads grass colors from a grass color texture
 	 * @param texture
@@ -146,7 +146,7 @@ public class Biomes {
 		loadColorsFromTexture(grassColor, texture);
 		gammaCorrectColors(grassColor, grassColorLinear);
 	}
-	
+
 	/**
 	 * Loads foliage colors from a grass color texture
 	 * @param texture
@@ -155,7 +155,7 @@ public class Biomes {
 		loadColorsFromTexture(foliageColor, texture);
 		gammaCorrectColors(foliageColor, foliageColorLinear);
 	}
-	
+
 	private static void loadColorsFromTexture(int[] dest, BufferedImage texture) {
 		for (int i = 0; i < tempAndRain.length; ++i) {
 			double temp = tempAndRain[i][0];
@@ -185,7 +185,7 @@ public class Biomes {
 	public static final int getGrassColor(int biomeId) {
 		return grassColor[0xFF & biomeId];
 	}
-	
+
 	/**
 	 * @param biomeId
 	 * @return Foliage color for the given biome ID
@@ -193,7 +193,7 @@ public class Biomes {
 	public static final int getFoliageColor(int biomeId) {
 		return foliageColor[0xFF & biomeId];
 	}
-	
+
 	/**
 	 * @param biomeId Must be in the range [0,255]
 	 * @return Linear biome color for the given biome ID
@@ -201,7 +201,7 @@ public class Biomes {
 	public static final float[] getGrassColorLinear(int biomeId) {
 		return grassColorLinear[biomeId];
 	}
-	
+
 	/**
 	 * @param biomeId Must be in the range [0,255]
 	 * @return Linear foliage color for the given biome ID

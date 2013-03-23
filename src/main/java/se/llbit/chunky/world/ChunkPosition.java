@@ -21,21 +21,21 @@ import java.util.Map;
 
 /**
  * A chunk position consists of two integer coordinates x and z.
- * 
+ *
  * The filename of a chunk is uniquely defined by it's position.
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 @SuppressWarnings("javadoc")
 public final class ChunkPosition {
 	public int x, z;
-	
+
 
 	private ChunkPosition(int x, int z) {
 		this.x = x;
 		this.z = z;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "["+x+", "+z+"]";
@@ -47,23 +47,23 @@ public final class ChunkPosition {
 
 	private final static Map<Integer, Map<Integer, ChunkPosition>> map =
 	        new HashMap<Integer, Map<Integer,ChunkPosition>>();
-	
+
 	public synchronized static ChunkPosition get(int x, int z) {
 	    Map<Integer, ChunkPosition> submap = map.get(x);
 	    if (submap == null) {
 	        submap = new HashMap<Integer, ChunkPosition>();
 	        map.put(x, submap);
 	    }
-	    
+
 	    ChunkPosition chunkPosition = submap.get(z);
 	    if (chunkPosition == null) {
 	        chunkPosition = new ChunkPosition(x, z);
 	        submap.put(z, chunkPosition);
 	    }
-	    
+
 	    return chunkPosition;
 	}
-	
+
 	/**
 	 * @return The .mca name for the region with this position
 	 */
@@ -92,7 +92,7 @@ public final class ChunkPosition {
 	public int getInt() {
 		return (((int) x) << 16) | (0xFFFF & z);
 	}
-	
+
 	/**
 	 * @param x
 	 * @param z

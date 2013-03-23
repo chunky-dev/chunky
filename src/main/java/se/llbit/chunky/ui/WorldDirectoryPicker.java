@@ -45,23 +45,23 @@ import se.llbit.util.ProgramProperties;
  */
 @SuppressWarnings("serial")
 public class WorldDirectoryPicker extends JDialog {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(WorldDirectoryPicker.class);
-	
+
 	private boolean accepted = false;
-	
+
 	private final JTextField pathField = new JTextField(40);
-	
+
 	/**
 	 * Constructor
-	 * @param parent 
+	 * @param parent
 	 */
 	public WorldDirectoryPicker(JFrame parent) {
 		super(parent, "World Directory Picker");
-		
+
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		
+
 		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Close Dialog");
 		getRootPane().getActionMap().put("Close Dialog", new AbstractAction() {
@@ -70,19 +70,19 @@ public class WorldDirectoryPicker extends JDialog {
 				closeDialog();
 			}
 		});
-		
+
 		JLabel lbl = new JLabel("Please select the directory where your Minecraft worlds are stored:");
-		
+
 		File initialDirectory = null;
 		if (ProgramProperties.containsKey("worldDirectory")) {
 			initialDirectory = new File(ProgramProperties.getProperty("worldDirectory"));
 		}
-		
+
 		if (!isValidSelection(initialDirectory)) {
 			initialDirectory = Chunky.getSavesDirectory();
 		}
 		pathField.setText(initialDirectory.getAbsolutePath());
-		
+
 		JButton browseBtn = new JButton("Browse...");
 		browseBtn.addActionListener(new ActionListener() {
 			@Override
@@ -97,7 +97,7 @@ public class WorldDirectoryPicker extends JDialog {
 				}
 			}
 		});
-		
+
 		JButton cancelBtn = new JButton("Cancel");
 		cancelBtn.addActionListener(new ActionListener() {
 			@Override
@@ -105,7 +105,7 @@ public class WorldDirectoryPicker extends JDialog {
 				closeDialog();
 			}
 		});
-		
+
 		JButton okBtn = new JButton("OK");
 		okBtn.addActionListener(new ActionListener() {
 			@Override
@@ -120,9 +120,9 @@ public class WorldDirectoryPicker extends JDialog {
 				}
 			}
 		});
-		
+
 		getRootPane().setDefaultButton(okBtn);
-		
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -159,7 +159,7 @@ public class WorldDirectoryPicker extends JDialog {
 		);
 		setContentPane(panel);
 		pack();
-		
+
 		setLocationRelativeTo(parent);
 	}
 
@@ -173,7 +173,7 @@ public class WorldDirectoryPicker extends JDialog {
 	public File getSelectedDirectory() {
 		return new File(pathField.getText());
 	}
-	
+
 	/**
 	 * @return <code>true</code> if the OK button was clicked
 	 */
@@ -194,7 +194,7 @@ public class WorldDirectoryPicker extends JDialog {
     	} else {
 			worldDir = Chunky.getSavesDirectory();
     	}
-    	
+
     	if (!isValidSelection(worldDir)) {
     		WorldDirectoryPicker sceneDirPicker =
     				new WorldDirectoryPicker(parent);
@@ -203,13 +203,13 @@ public class WorldDirectoryPicker extends JDialog {
     			return null;
     		worldDir = sceneDirPicker.getSelectedDirectory();
     	}
-    	
+
     	if (isValidSelection(worldDir))
     		return worldDir;
     	else
     		return null;
 	}
-    
+
     private static boolean isValidSelection(File worldDir) {
     	return worldDir != null && worldDir.exists() && worldDir.isDirectory();
     }

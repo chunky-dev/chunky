@@ -23,9 +23,9 @@ import se.llbit.chunky.renderer.scene.Scene;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public final class Color {
-    
+
     private Color() { }
-    
+
     /**
      * @param c RGB color vector
      * @return INT RGB value corresponding to the given color vector
@@ -38,9 +38,9 @@ public final class Color {
     }
 
     /**
-     * @param r 
-     * @param g 
-     * @param b 
+     * @param r
+     * @param g
+     * @param b
      * @return INT RGB value corresponding to the given color
      */
     public static final int getRGB(float r, float g, float b) {
@@ -49,7 +49,7 @@ public final class Color {
             ((int)(255 * g + .5f) << 8) |
             (int)(255 * b + .5f);
     }
-    
+
     /**
      * @param r
      * @param g
@@ -62,7 +62,7 @@ public final class Color {
             ((int)(255 * g + .5) << 8) |
             (int)(255 * b + .5);
     }
-    
+
     /**
      * @param r
      * @param g
@@ -76,7 +76,7 @@ public final class Color {
             ((int)(255 * g + .5f) << 8) |
             (int)(255 * b + .5f);
     }
-    
+
     /**
      * @param c RGBA color vector
      * @return INT ARGB value corresponding to the given color vector
@@ -87,7 +87,7 @@ public final class Color {
             ((int)(255 * c.y + .5f) << 8) |
             (int)(255 * c.z + .5f);
     }
-    
+
     /**
      * @param c RGB color vector
      * @return INT RGB value corresponding to the given color vector
@@ -98,7 +98,7 @@ public final class Color {
             ((int)(255 * c.y + .5f) << 8) |
             (int)(255 * c.z + .5f);
     }
-    
+
     /**
      * @param r
      * @param g
@@ -123,7 +123,7 @@ public final class Color {
         frgb[1] = (0xFF & (irgb >> 8)) / 255.f;
         frgb[2] = (0xFF & irgb) / 255.f;
     }
-    
+
     /**
      * Get the RGB color components from an INT RGB value
      * @param irgb
@@ -134,7 +134,7 @@ public final class Color {
         v.y = (0xFF & (irgb >> 8)) / 255.f;
         v.z = (0xFF & irgb) / 255.f;
     }
-    
+
     /**
      * Get the RGB color components from an INT RGB value
      * @param irgb
@@ -145,7 +145,7 @@ public final class Color {
         frgb[1] = (0xFF & (irgb >> 8)) / 255.0;
         frgb[2] = (0xFF & irgb) / 255.0;
     }
-    
+
     /**
      * Get the RGBA color components from an INT ARGB value
      * @param irgb
@@ -192,7 +192,7 @@ public final class Color {
             ((int)(255 * frgb[1] + .5f) << 8) |
             (int)(255 * frgb[2] + .5f);
     }
-    
+
     /**
      * @param frgb
      * @return Get INT RGB value corresponding to the given color
@@ -219,7 +219,7 @@ public final class Color {
     	out.z = (1 - in.x - in.y) * f;
     	out.y = in.z;
     }
-    
+
     /**
      * http://www.w3.org/Graphics/Color/sRGB
      * @param in

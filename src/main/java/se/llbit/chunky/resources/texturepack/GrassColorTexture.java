@@ -47,3 +47,4 @@ public class GrassColorTexture extends TextureRef {
 		return true;
 	}
 }
+

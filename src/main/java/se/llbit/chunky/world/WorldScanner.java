@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class WorldScanner {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(WorldScanner.class);
 
@@ -44,7 +44,7 @@ public class WorldScanner {
 	     */
 	    void foundRegion(File worldDirectory, int x, int z);
 	}
-	
+
 	private static final Pattern anvilPattern =
 			Pattern.compile("r\\.([^\\.]+)\\.([^\\.]+)\\.mca");
 
@@ -56,19 +56,19 @@ public class WorldScanner {
 	public static void findExistingChunks(File regionDirectory, Operator operator) {
 	    if (!regionDirectory.exists())
 	        return;
-	    
+
 		if (!regionDirectory.isDirectory()) {
 			logger.warn(String.format("Failed to read region directory for world %s!",
 							regionDirectory.getPath()));
 			return;
 		}
-		
+
 		for (File anvilFile : regionDirectory.listFiles()) {
-			
+
 			Matcher matcher = anvilPattern.matcher(anvilFile.getName());
-			
+
 			if (!anvilFile.isDirectory() && matcher.matches()) {
-				
+
 				String x = matcher.group(1);
 				String z = matcher.group(2);
 				if (x != null && z != null) {

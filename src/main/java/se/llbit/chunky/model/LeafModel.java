@@ -24,7 +24,7 @@ import se.llbit.math.Ray;
 @SuppressWarnings("javadoc")
 public class LeafModel {
 	private static final AABB block = new AABB(0, 1, 0, 1, 0, 1);
-	
+
 	public static boolean intersect(Ray ray, Scene scene) {
 		ray.t = Double.POSITIVE_INFINITY;
 		if (block.intersect(ray)) {

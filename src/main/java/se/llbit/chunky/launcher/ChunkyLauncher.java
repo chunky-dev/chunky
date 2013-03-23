@@ -21,7 +21,7 @@ import java.util.zip.ZipInputStream;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkyLauncher {
-	
+
 	/**
 	 * Chunky launcher entry point
 	 * @param args Command line arguments
@@ -29,19 +29,19 @@ public class ChunkyLauncher {
 	public static void main(String[] args) {
 		try {
 			ClassLoader parentCL = ChunkyLauncher.class.getClassLoader();
-			
+
 			// build list of library jar files
 			CodeSource src = ChunkyLauncher.class
 					.getProtectionDomain().getCodeSource();
 			List<URL> jars = new ArrayList<URL>();
-			
+
 			if (src != null) {
 				URL jar = src.getLocation();
 				ZipInputStream in = new ZipInputStream(jar.openStream());
 				ZipEntry entry = null;
-				
+
 				File tmpDir = null;
-				
+
 				while ( (entry = in.getNextEntry()) != null ) {
 					String name = entry.getName();
 					if (name.startsWith("lib") && name.endsWith(".jar")) {
@@ -52,12 +52,12 @@ public class ChunkyLauncher {
 					}
 				}
 			}
-			
+
 			URL[] urls = new URL[jars.size()];
 			for (int i = 0; i < jars.size(); ++i)
 				urls[i] = jars.get(i);
 			URLClassLoader childCL = new URLClassLoader(urls, parentCL);
-			
+
 			Class<?> mainClass = Class.forName(
 					"se.llbit.chunky.main.Chunky", true, childCL);
 			Object instance = mainClass.newInstance();
@@ -103,11 +103,11 @@ public class ChunkyLauncher {
 	 * Unpack the jar file to a temporary directory. Idea is from JDotSoft's JarClassLoader.
 	 * @param name
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private static URL unpackJar(ClassLoader parentCL, String name, File tmpDir)
 			throws IOException {
-		
+
 		File tmpFile = File.createTempFile("lib", ".jar", tmpDir);
 		tmpFile.deleteOnExit();
 		tmpFile.setReadable(true, false);

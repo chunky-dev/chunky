@@ -35,7 +35,7 @@ import se.llbit.chunky.world.World;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class SceneManager extends Thread {
-	
+
 	/**
 	 * Describes which action is required of the scene manager
 	 */
@@ -61,37 +61,37 @@ public class SceneManager extends Thread {
 		 */
 		RELOAD_CHUNKS
 	}
-	
+
 	private static final Logger logger =
 			Logger.getLogger(SceneManager.class);
-	
+
 	private final RenderManager renderManager;
 	private String sceneName = "";
 	private Action action = Action.NONE;
 	private Collection<ChunkPosition> chunksToLoad;
 	private World world;
-	
+
 	/**
 	 * Create new scene manager
 	 * @param manager
 	 */
 	public SceneManager(RenderManager manager) {
 		super("Scene Manager");
-		
+
 		this.renderManager = manager;
 	}
-	
+
 	public void run() {
 		try {
 			while (!isInterrupted()) {
 				synchronized (this) {
-					
+
 					while (action == Action.NONE)
 						wait();
-					
+
 					Action currentAction = action;
 					action = Action.NONE;
-					
+
 					switch (currentAction) {
 					case LOAD_SCENE:
 						try {
@@ -127,7 +127,7 @@ public class SceneManager extends Thread {
 		} catch (InterruptedException e) {
 		}
 	}
-	
+
 	/**
 	 * Load the given scene
 	 * @param name The name of the scene to load
@@ -137,7 +137,7 @@ public class SceneManager extends Thread {
 		action = Action.LOAD_SCENE;
 		notify();
 	}
-	
+
 	/**
 	 * Save the current scene with the given name
 	 * @param name The name to save the scene with
@@ -147,9 +147,9 @@ public class SceneManager extends Thread {
 		action = Action.SAVE_SCENE;
 		notify();
 	}
-	
+
 	/**
-	 * @param world 
+	 * @param world
 	 * @param chunks
 	 */
 	public synchronized void loadChunks(World world, Collection<ChunkPosition> chunks) {
@@ -158,7 +158,7 @@ public class SceneManager extends Thread {
 		action = Action.LOAD_CHUNKS;
 		notify();
 	}
-	
+
 	/**
 	 * Reload all chunks
 	 */
@@ -166,10 +166,10 @@ public class SceneManager extends Thread {
 		action = Action.RELOAD_CHUNKS;
 		notify();
 	}
-	
+
 	/**
 	 * Lets the user decide whether or not to overwrite existing scenes
-	 * @param context 
+	 * @param context
 	 * @param sceneName
 	 * @return <code>true</code> if the user accepts a possible overwrite of an existing scene
 	 */
@@ -177,9 +177,9 @@ public class SceneManager extends Thread {
 		File targetFile = new File(
 				context.getSceneDirectory(),
 				sceneName + ".cvf");
-		
+
 		if (targetFile.exists()) {
-			
+
 			if (targetFile.isDirectory()) {
 				logger.warn(String.format("Can not create a scene with the name %s.\n" +
 						"A directory with that name already exists!", sceneName));
@@ -197,11 +197,11 @@ public class SceneManager extends Thread {
 					null,
 					options,
 					options[0]);
-			
+
 			return n == 1;
-			
+
 		} else {
-			
+
 			return true;
 		}
 	}

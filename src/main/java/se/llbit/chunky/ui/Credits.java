@@ -33,14 +33,14 @@ import javax.swing.LayoutStyle.ComponentPlacement;
  */
 @SuppressWarnings("serial")
 public class Credits extends JDialog {
-	
+
 	/**
 	 * Constructor
 	 * @param parent
 	 */
 	public Credits(JFrame parent) {
 		super(parent, "Chunky Credits");
-		
+
 		JLabel chunkyIcon = new JLabel();
 		URL url = getClass().getResource("/chunky.png");
 		if (url != null) {

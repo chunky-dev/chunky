@@ -35,61 +35,61 @@ public class RailModel {
 			new DoubleSidedQuad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
 		},
-				
+
 		// flat east/west
 		{
 			new DoubleSidedQuad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
 					new Vector3d(1, 0, 0), new Vector4d(0, 1, 0, 1)),
 		},
-		
+
 		// ascending east
 		{
 			new DoubleSidedQuad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
 					new Vector3d(1, 1, 0), new Vector4d(0, 1, 0, 1)),
 		},
-		
+
 		// ascending west
 		{
 			new DoubleSidedQuad(new Vector3d(0, 1, 0), new Vector3d(0, 1, 1),
 					new Vector3d(1, 0, 0), new Vector4d(0, 1, 0, 1)),
 		},
-				
+
 		// ascending north
 		{
 			new DoubleSidedQuad(new Vector3d(0, 1, 0), new Vector3d(1, 1, 0),
 					new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
 		},
-		
+
 		// ascending south
 		{
 			new DoubleSidedQuad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
 		},
-		
+
 		// nw corner
 		{
 			new DoubleSidedQuad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 0, 1), new Vector4d(0, 1, 1, 0)),
 		},
-		
+
 		// ne corner
 		{
 			new DoubleSidedQuad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 0, 1), new Vector4d(1, 0, 1, 0)),
 		},
-		
+
 		// se corner
 		{
 			new DoubleSidedQuad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 0, 1), new Vector4d(1, 0, 0, 1)),
 		},
-		
+
 		// sw corner
 		{
 			new DoubleSidedQuad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
 		},
-		
+
 	};
 
 	@SuppressWarnings("javadoc")

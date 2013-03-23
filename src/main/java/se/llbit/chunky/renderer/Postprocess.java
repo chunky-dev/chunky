@@ -26,9 +26,9 @@ public enum Postprocess {
 			return "Tonemap op1";
 		}
 	};
-	
+
 	public static final int DEFAULT = GAMMA.ordinal();
-	
+
 	public static final Postprocess[] values = values();
 
 	public static Postprocess get(int index) {
@@ -36,7 +36,7 @@ public enum Postprocess {
 		index = Math.min(values.length-1, index);
 		return values[index];
 	}
-	
+
 	public static Postprocess get(AnyTag tag) {
 		return get(tag.intValue(DEFAULT));
 	}

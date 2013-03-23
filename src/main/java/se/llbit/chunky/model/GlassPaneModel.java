@@ -24,54 +24,54 @@ import se.llbit.math.Vector4d;
 
 @SuppressWarnings("javadoc")
 public class GlassPaneModel {
-	
+
 	private static Quad cap =
 			new Quad(new Vector3d(.5625, 1, .5), new Vector3d(.4375, 1, .5),
 				new Vector3d(.4375, 0, .5), new Vector4d(.5625, .4375, 1, 0));
-	
+
 	private static Quad[][] connector = {
 		// front
 		{
 			// left
 			new Quad(new Vector3d(.4375, 1, .5), new Vector3d(.4375, 1, 0),
 					new Vector3d(.4375, 0, .5), new Vector4d(.5, 0, 1, 0)),
-	
+
 			// right
 			new Quad(new Vector3d(.5625, 1, 0), new Vector3d(.5625, 1, .5),
 					new Vector3d(.5625, 0, 0), new Vector4d(0, .5, 1, 0)),
-		
+
 			// top
 			new Quad(new Vector3d(.5625, 1, 0), new Vector3d(.4375, 1, 0),
 					new Vector3d(.5625, 1, .5), new Vector4d(.5625, .4375, 0, .5)),
-					
+
 			// bottom
 			new Quad(new Vector3d(.4375, 0, 0), new Vector3d(.5625, 0, 0),
 					new Vector3d(.4375, 0, .5), new Vector4d(.4375, .5625, 0, .5)),
-			
+
 		},
 		// back
 		{
 			// left
 			new Quad(new Vector3d(.4375, 1, 1), new Vector3d(.4375, 1, .5),
 					new Vector3d(.4375, 0, 1), new Vector4d(1, .5, 1, 0)),
-	
+
 			// right
 			new Quad(new Vector3d(.5625, 1, .5), new Vector3d(.5625, 1, 1),
 					new Vector3d(.5625, 0, .5), new Vector4d(.5, 1, 1, 0)),
-		
+
 			// top
 			new Quad(new Vector3d(.5625, 1, .5), new Vector3d(.4375, 1, .5),
 					new Vector3d(.5625, 1, 1), new Vector4d(.5625, .4375, .5, 1)),
-					
+
 			// bottom
 			new Quad(new Vector3d(.4375, 0, .5), new Vector3d(.5625, 0, .5),
 					new Vector3d(.4375, 0, 1), new Vector4d(.4375, .5625, .5, 1)),
 		},
 	};
-	
+
 	private static Quad[][] panes = new Quad[4][];
 	private static Quad[] rotCap = new Quad[4];
-	
+
 	static {
 		panes[0] = connector[0];
 		panes[1] = connector[1];

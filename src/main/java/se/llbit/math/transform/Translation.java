@@ -40,11 +40,11 @@ public class Translation extends Transform {
 		this.y = y;
 		this.z = z;
 	}
-	
+
 	@Override
 	public void rotate(Vector3d o) {
 	}
-	
+
 	@Override
 	public void translate(Vector3d o) {
 		o.x += x;

@@ -22,7 +22,7 @@ package se.llbit.chunky.world;
  */
 public class Clouds {
 	private static long[][] clouds = new long[32][32];
-	
+
 	static {
 		// zero the cloud data
 		for (int i = 0; i < 32; ++i) {
@@ -31,7 +31,7 @@ public class Clouds {
 			}
 		}
 	}
-	
+
 	/**
 	 * Get cloud bit at position (x, y)
 	 * @param x
@@ -47,7 +47,7 @@ public class Clouds {
 		int suby = y & 7;
 		return (int) ((clouds[tilex][tiley] >>> (suby*8 + subx)) & 1);
 	}
-	
+
 	/**
 	 * Set cloud bit at position (x, y)
 	 * @param x

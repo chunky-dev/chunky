@@ -41,31 +41,31 @@ import se.llbit.util.ProgramProperties;
  */
 @SuppressWarnings("serial")
 public class SceneDirectoryPicker extends JDialog {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(SceneDirectoryPicker.class);
-	
+
 	private File selectedDirectory;
 	private boolean accepted = false;
-	
+
 	/**
 	 * Constructor
-	 * @param parent 
+	 * @param parent
 	 */
 	public SceneDirectoryPicker(JFrame parent) {
 		super(parent, "Scene Directory Picker");
-		
+
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		
+
 		JLabel lbl = new JLabel("Please select a directory where Chunky should store scene description files and renders:");
-		
+
 		final JTextField scenePath = new JTextField(40);
 		selectedDirectory = ProgramProperties.getPreferredSceneDirectory();
 		scenePath.setText(selectedDirectory.getAbsolutePath());
-		
+
 		final JCheckBox nopester =
 				new JCheckBox("Use this as the default and do not ask again");
-		
+
 		JButton browseBtn = new JButton("Browse...");
 		browseBtn.addActionListener(new ActionListener() {
 			@Override
@@ -80,7 +80,7 @@ public class SceneDirectoryPicker extends JDialog {
 				}
 			}
 		});
-		
+
 		JButton cancelBtn = new JButton("Cancel");
 		cancelBtn.addActionListener(new ActionListener() {
 			@Override
@@ -88,7 +88,7 @@ public class SceneDirectoryPicker extends JDialog {
 				SceneDirectoryPicker.this.dispose();
 			}
 		});
-		
+
 		JButton okBtn = new JButton("OK");
 		okBtn.addActionListener(new ActionListener() {
 			@Override
@@ -104,7 +104,7 @@ public class SceneDirectoryPicker extends JDialog {
 				}
 			}
 		});
-		
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -144,7 +144,7 @@ public class SceneDirectoryPicker extends JDialog {
 		);
 		setContentPane(panel);
 		pack();
-		
+
 		setLocationRelativeTo(parent);
 	}
 
@@ -154,14 +154,14 @@ public class SceneDirectoryPicker extends JDialog {
 	public File getSelectedDirectory() {
 		return selectedDirectory;
 	}
-	
+
 	/**
 	 * @return <code>true</code> if the OK button was clicked
 	 */
 	public boolean isAccepted() {
 		return accepted;
 	}
-	
+
 	/**
 	 * @return A reference to a file object representing the current scene directory,
 	 * or <code>null</code> if the scene directory was not set or could not be opened
@@ -183,7 +183,7 @@ public class SceneDirectoryPicker extends JDialog {
      */
     public static File getSceneDirectory(JFrame parent) {
     	File sceneDir = getCurrentSceneDirectory();
-    	
+
     	if (sceneDir != null)
     		return sceneDir;
     	else
@@ -196,7 +196,7 @@ public class SceneDirectoryPicker extends JDialog {
      * @return The file representing the selected directory
      */
     public static File changeSceneDirectory(JFrame parent) {
-    	
+
     	while (true) {
     		SceneDirectoryPicker sceneDirPicker =
     				new SceneDirectoryPicker(parent);
@@ -214,7 +214,7 @@ public class SceneDirectoryPicker extends JDialog {
     		sceneDir.mkdir();
     	if (sceneDir.exists() && sceneDir.isDirectory() && sceneDir.canWrite())
     		return true;
-    	
+
 		logger.warn("Could not open or create the scene directory " + sceneDir.getAbsolutePath());
     	return false;
 	}

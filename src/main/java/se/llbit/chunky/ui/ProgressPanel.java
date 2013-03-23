@@ -31,16 +31,16 @@ import javax.swing.border.TitledBorder;
 
 /**
  * A panel to display job progress.
- * 
+ *
  * <p>Jobs that use the progress panel can be interrupted
  * if they use the isInterrupted method to check the interrupted
  * status of the progress panel.
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 @SuppressWarnings({"serial", "javadoc"})
 public class ProgressPanel extends JPanel {
-	
+
 	private JProgressBar progress;
 	private TitledBorder border;
 	private JButton cancelBtn;
@@ -60,11 +60,11 @@ public class ProgressPanel extends JPanel {
 		border = BorderFactory.createTitledBorder("Job progress:");
 		border.setTitleColor(Color.gray);
 	    setBorder(border);
-	    
+
 		progress = new JProgressBar(0, 1);
 		progress.setValue(1);
 		progress.setEnabled(false);
-		
+
 	    cancelBtn = new JButton();
 	    cancelBtn.setText("Cancel");
 	    cancelBtn.setEnabled(false);
@@ -74,12 +74,12 @@ public class ProgressPanel extends JPanel {
 				setInterrupted();
 			}
 		});
-	    
+
 	    setLayout(new BorderLayout());
 		add(progress, BorderLayout.NORTH);
 		add(cancelBtn, BorderLayout.SOUTH);
 	}
-	
+
 	protected synchronized void setInterrupted() {
 		interrupted = true;
 	}
@@ -87,12 +87,12 @@ public class ProgressPanel extends JPanel {
 	public synchronized boolean isInterrupted() {
 		return interrupted;
 	}
-	
+
 	public synchronized void setJobName(String jobName) {
 		border.setTitle(jobName);
 		repaint();
 	}
-	
+
 	public synchronized void setJobSize(int size) {
 		progress.setMaximum(size);
 	}

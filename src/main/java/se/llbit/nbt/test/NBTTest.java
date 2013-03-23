@@ -29,7 +29,7 @@ import se.llbit.nbt.NamedTag;
 
 @SuppressWarnings("javadoc")
 public class NBTTest {
-	
+
 	public static void main(String[] args) {
 		String fn = "test.chunk";
 		try {

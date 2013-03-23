@@ -32,7 +32,7 @@ public class PressurePlateModel {
 		// back
 		new Quad(new Vector3d(1/16., 0, 15/16.), new Vector3d(15/16., 0, 15/16.),
 				new Vector3d(1/16., 1/16., 15/16.), new Vector4d(1/16., 15/16., 0, 1/16.)),
-		
+
 		// right
 		new Quad(new Vector3d(1/16., 0, 1/16.), new Vector3d(1/16., 0, 15/16.),
 				new Vector3d(1/16., 1/16., 1/16.), new Vector4d(1/16., 15/16., 0, 1/16.)),
@@ -44,11 +44,11 @@ public class PressurePlateModel {
 		// top
 		new Quad(new Vector3d(15/16., 1/16., 1/16.), new Vector3d(1/16., 1/16., 1/16.),
 				new Vector3d(15/16., 1/16., 15/16.), new Vector4d(15/16., 1/16., 15/16., 1/16.)),
-		
+
 		// bottom
 		new Quad(new Vector3d(1/16., 0, 1/16.), new Vector3d(15/16., 0, 1/16.),
 				new Vector3d(1/16., 0, 15/16.), new Vector4d(1/16., 15/16., 1/16., 15/16.)),
-				
+
 		};
 
 	public static boolean intersect(Ray ray, Texture texture) {

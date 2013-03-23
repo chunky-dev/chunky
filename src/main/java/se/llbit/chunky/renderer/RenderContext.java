@@ -34,48 +34,48 @@ public class RenderContext {
 	/**
 	 * Construct a new render context.
 	 * @param sceneDir The scene directory
-	 * @param renderThreads 
-	 * @param tileWidth 
+	 * @param renderThreads
+	 * @param tileWidth
 	 */
 	public RenderContext(File sceneDir, int renderThreads, int tileWidth) {
 		sceneDirectory = sceneDir;
 		numThreads = renderThreads;
 		this.tileWidth = tileWidth;
 	}
-	
+
 	/**
 	 * @return File handle to the scene directory
 	 */
 	public File getSceneDirectory() {
 		return sceneDirectory;
 	}
-	
+
 	/**
 	 * @return The preferred number of rendering threads
 	 */
 	public int numRenderThreads() {
 		return numThreads;
 	}
-	
+
 	/**
 	 * @param fileName
 	 * @return Input stream for the given scene file
-	 * @throws FileNotFoundException 
+	 * @throws FileNotFoundException
 	 */
 	public InputStream getSceneFileInputStream(String fileName)
 			throws FileNotFoundException {
-		
+
 		return new FileInputStream(new File(sceneDirectory, fileName));
 	}
-	
+
 	/**
 	 * @param fileName
 	 * @return Output stream for the given scene file
-	 * @throws FileNotFoundException 
+	 * @throws FileNotFoundException
 	 */
 	public FileOutputStream getSceneFileOutputStream(String fileName)
 			throws FileNotFoundException {
-		
+
 		return new FileOutputStream(new File(sceneDirectory, fileName));
 	}
 

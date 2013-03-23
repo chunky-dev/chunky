@@ -28,31 +28,31 @@ import org.apache.log4j.Logger;
 
 /**
  * Utility class for managing program properties.
- * 
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public final class ProgramProperties {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(ProgramProperties.class);
-	
+
 	private static final String SETTINGS_DIR = ".chunky";
 	private static final String SETTINGS_FILE = "settings.cfg";
 	private static Properties properties = new Properties();
 	private static String path = SETTINGS_FILE;
 	private static File settingsDir;
-	
+
 	private ProgramProperties() { }
-	
+
 	/**
 	 * @return The directory where program settings are stored
 	 */
 	public static File getSettingsDirectory() {
 		return settingsDir;
 	}
-	
+
 	static {
-		
+
 		String userHome = System.getProperty("user.home");
 		if (userHome != null && !userHome.isEmpty()) {
 			settingsDir = new File(userHome, SETTINGS_DIR);
@@ -60,16 +60,16 @@ public final class ProgramProperties {
 				settingsDir.mkdir();
 			if (settingsDir.exists() && settingsDir.isDirectory() &&
 					settingsDir.canWrite()) {
-				
+
 				path = new File(settingsDir, SETTINGS_FILE).getAbsolutePath();
 			}
 		}
-		
+
 		if (path == SETTINGS_FILE) {
 			settingsDir = new File(System.getProperty("user.dir"));
 			path = new File(settingsDir, SETTINGS_FILE).getAbsolutePath();
 		}
-		
+
 		loadProperties();
 	}
 
@@ -86,7 +86,7 @@ public final class ProgramProperties {
 					" - defaults will be used");
 		}
 	}
-	
+
 	/**
 	 * Save settings to file.
 	 */
@@ -99,7 +99,7 @@ public final class ProgramProperties {
 			logger.warn("Exception occurred when saving property file " + path, e1);
 		}
 	}
-	
+
 	/**
 	 * Get a property value
 	 * @param name Property name
@@ -110,7 +110,7 @@ public final class ProgramProperties {
 	public static String getProperty(String name, String defValue) {
 		return properties.getProperty(name, defValue);
 	}
-	
+
 	/**
 	 * Get the integer value of a property
 	 * @param name Property name
@@ -125,7 +125,7 @@ public final class ProgramProperties {
 			return defValue;
 		}
 	}
-	
+
 	/**
 	 * Set the value of a property
 	 * @param name Property name
@@ -135,7 +135,7 @@ public final class ProgramProperties {
 		// only set the property if the value has changed
 		if ((value == null && properties.getProperty(name) != null)
 				|| (!value.equals(properties.getProperty(name)))) {
-			
+
 			properties.setProperty(name, value);
 			saveProperties();
 		}
@@ -181,3 +181,4 @@ public final class ProgramProperties {
 		}
 	}
 }
+

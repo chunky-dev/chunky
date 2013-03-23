@@ -20,10 +20,10 @@ package se.llbit.chunky.renderer;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class PlaceholderRenderCanvas implements RenderableCanvas {
-	
+
 	private int width = RenderableCanvas.DEFAULT_WIDTH;
 	private int height = RenderableCanvas.DEFAULT_HEIGHT;
-	
+
 	@Override
 	public int getWidth() {
 		return width;

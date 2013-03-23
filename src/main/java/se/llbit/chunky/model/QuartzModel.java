@@ -36,7 +36,7 @@ public class QuartzModel {
 		// south
 		new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
 				new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
-		
+
 		// west
 		new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
 				new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
@@ -48,13 +48,13 @@ public class QuartzModel {
 		// top
 		new Quad(new Vector3d(1, 1, 0), new Vector3d(0, 1, 0),
 				new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, 1)),
-		
+
 		// bottom
 		new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 				new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
-				
+
 	};
-	
+
 	private static final Texture[][] texture = {
 		{ Texture.quartzSide, Texture.quartzTop, Texture.quartzBottom },
 		{ Texture.quartzChiseled, Texture.quartzChiseledTop, Texture.quartzChiseledTop },
@@ -62,7 +62,7 @@ public class QuartzModel {
 		{ Texture.quartzPillar, Texture.quartzPillarTop, Texture.quartzPillarTop },
 		{ Texture.quartzPillar, Texture.quartzPillarTop, Texture.quartzPillarTop },
 	};
-	
+
 	private static final int[][] textureIndex = {
 		{ 0, 0, 0, 0, 1, 2 },// vertical
 		{ 0, 0, 0, 0, 1, 2 },// vertical
@@ -70,7 +70,7 @@ public class QuartzModel {
 		{ 0, 0, 1, 2, 0, 0 },// east-west
 		{ 1, 2, 0, 0, 0, 0 },// north-south
 	};
-	
+
 	private static final int[][] uv = {
 		{ 0, 0, 0, 0, 0, 0 },// vertical
 		{ 0, 0, 0, 0, 0, 0 },// vertical
@@ -87,9 +87,9 @@ public class QuartzModel {
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < sides.length; ++i) {
 			Quad side = sides[i];
-			
+
 			if (side.intersect(ray)) {
-				
+
 				double u = ray.u;
 				int uv_x = uv[type][i];
 				ray.u = (1-uv_x) * ray.u + uv_x * ray.v;

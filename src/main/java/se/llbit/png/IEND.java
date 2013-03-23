@@ -30,7 +30,7 @@ public class IEND extends PngChunk {
 	 */
 	public static final int CHUNK_TYPE = 0x49454E44;
 	private int crc;
-	
+
 	/**
 	 * @throws IOException
 	 */
@@ -60,6 +60,6 @@ public class IEND extends PngChunk {
 	public int getChunkCRC() {
 		return crc;
 	}
-	
+
 
 }

@@ -29,19 +29,19 @@ import org.apache.log4j.Logger;
 
 /**
  * Utility class for image loading.
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public final class ImageLoader {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(ImageLoader.class);
-	
+
 	private final static HashMap<String, BufferedImage> map = new HashMap<String, BufferedImage>();
 	private final static BufferedImage missingImage;
-	
+
 	private ImageLoader() { }
-	
+
 	static {
 		missingImage = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
 		Graphics g = missingImage.getGraphics();
@@ -55,12 +55,12 @@ public final class ImageLoader {
 		g.dispose();
 		map.put("missing-image", missingImage);
 	}
-	
+
 	/**
 	 * Attempt to load an image with the given resource name.
 	 * If no image is found for that resource name the default
 	 * missing image is returned.
-	 * 
+	 *
 	 * @param resourceName
 	 * @return Image for the given resource name
 	 */
@@ -70,11 +70,11 @@ public final class ImageLoader {
 		}
 		return map.get(resourceName);
 	}
-	
+
 	/**
 	 * Attempt to load an image with a given resource name.
 	 * The Class loader is used to find the image resource.
-	 * 
+	 *
 	 * @param resourceName
 	 */
 	private static synchronized void loadImage(String resourceName) {

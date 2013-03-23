@@ -21,14 +21,14 @@ package se.llbit.math;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Matrix3d {
-	
+
 	@SuppressWarnings("javadoc")
 	public double m11, m12, m13;
 	@SuppressWarnings("javadoc")
 	public double m21, m22, m23;
 	@SuppressWarnings("javadoc")
 	public double m31, m32, m33;
-	
+
 	/**
 	 * Set the matrix to be a rotation matrix for rotation
 	 * around the X axis
@@ -47,7 +47,7 @@ public class Matrix3d {
 		m32 = sint;
 		m33 = cost;
 	}
-	
+
 	/**
 	 * Set the matrix to be a rotation matrix for rotation
 	 * around the Y axis
@@ -66,7 +66,7 @@ public class Matrix3d {
 		m32 = 0;
 		m33 = cost;
 	}
-	
+
 	/**
 	 * Set the matrix to be a rotation matrix for rotation
 	 * around the X axis

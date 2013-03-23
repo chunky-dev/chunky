@@ -27,7 +27,7 @@ import java.io.InputStream;
 public class EmbeddedResourceContext extends RenderContext {
 
 	/**
-	 * @param parent 
+	 * @param parent
 	 */
 	public EmbeddedResourceContext(RenderContext parent) {
 		super(parent.getSceneDirectory(), parent.numRenderThreads(),

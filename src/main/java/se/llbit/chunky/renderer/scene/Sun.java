@@ -33,22 +33,22 @@ import se.llbit.util.VectorPool;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Sun {
-	
+
 	/**
 	 * Default sun intensity
 	 */
 	public static final double DEFAULT_INTENSITY = 1.5;
-	
+
 	/**
 	 * Maximum sun intensity
 	 */
 	public static final double MAX_INTENSITY = 50;
-	
+
 	/**
 	 * Minimum sun intensity
 	 */
 	public static final double MIN_INTENSITY = 0.1;
-	
+
 	private static final double xZenithChroma[][] = {
 		{0.00166, -0.00375, 0.00209, 0},
 		{-0.02903, 0.06377, -0.03203, 0.00394},
@@ -77,7 +77,7 @@ public class Sun {
 		{ -0.0227,  5.3251 },
 		{  0.1206, -2.5771 },
 		{ -0.0670,  0.3703 } };
-	
+
 	private static double turb = 2.5;
 	private static double turb2 = turb*turb;
 	private static Vector3d A = new Vector3d();
@@ -90,27 +90,27 @@ public class Sun {
 	 * Sun texture
 	 */
 	public static Texture texture = new Texture();
-	
+
 	static {
 		A.x = mdx[0][0] * turb + mdx[0][1];
 		B.x = mdx[1][0] * turb + mdx[1][1];
 		C.x = mdx[2][0] * turb + mdx[2][1];
 		D.x = mdx[3][0] * turb + mdx[3][1];
 		E.x = mdx[4][0] * turb + mdx[4][1];
-		
+
 		A.y = mdy[0][0] * turb + mdy[0][1];
 		B.y = mdy[1][0] * turb + mdy[1][1];
 		C.y = mdy[2][0] * turb + mdy[2][1];
 		D.y = mdy[3][0] * turb + mdy[3][1];
 		E.y = mdy[4][0] * turb + mdy[4][1];
-		
+
 		A.z = mdY[0][0] * turb + mdY[0][1];
 		B.z = mdY[1][0] * turb + mdY[1][1];
 		C.z = mdY[2][0] * turb + mdY[2][1];
 		D.z = mdY[3][0] * turb + mdY[3][1];
 		E.z = mdY[4][0] * turb + mdY[4][1];
 	}
-	
+
 	private double zenith_Y;
 	private double zenith_x;
 	private double zenith_y;
@@ -119,7 +119,7 @@ public class Sun {
 	private double f0_y;
 
 	private final Scene scene;
-	
+
 	/**
 	 * Sun radius
 	 */
@@ -137,28 +137,28 @@ public class Sun {
 		1 - Math.sqrt(1 - RADIUS_SIN*RADIUS_SIN);
 
 	private static final double AMBIENT = .3;
-	
+
 	private double intensity = DEFAULT_INTENSITY;
-	
+
 	private double azimuth = Math.PI / 2.5;
 	private double altitude = Math.PI / 3;
-	
+
 	private final Vector3d su = new Vector3d();
 	private final Vector3d sv = new Vector3d();
 	private final Vector3d sw = new Vector3d();
-	
+
 	protected final Vector3d emittance = new Vector3d(1, 1, 1);
-	
+
 	// final to ensure that we don't do a lot of redundant re-allocation
 	private final Vector3d color = new Vector3d(1, 1, 1);
-	
+
 	/**
 	 * Calculate skylight for ray
 	 * @param ray
 	 */
 	public void skylight(Ray ray) {
 		Vector4d c = ray.color;
-		
+
 		if (ray.d.y < 0)
 			ray.d.y = -ray.d.y;
 		double cosTheta = ray.d.y;
@@ -180,14 +180,14 @@ public class Sun {
 				c.y = -0.9692*c.x + 1.8760*c.y + 0.0416*c.z,
 				0.0556*c.x - 0.2040*c.y + 1.0570*c.z, 1);
 	}
-	
+
 	private double chroma(double turb, double turb2, double sunTheta,
 			double[][] matrix) {
-		
+
 		double t1 = sunTheta;
 		double t2 = t1*t1;
 		double t3 = t1*t2;
-		
+
 		return turb2 * (matrix[0][0]*t3 + matrix[0][1]*t2 + matrix[0][2]*t1 + matrix[0][3]) +
 				turb * (matrix[1][0]*t3 + matrix[1][1]*t2 + matrix[1][2]*t1 + matrix[1][3]) +
 				(matrix[2][0]*t3 + matrix[2][1]*t2 + matrix[2][2]*t1 + matrix[2][3]);
@@ -195,10 +195,10 @@ public class Sun {
 
 	private static double perezF(double cosTheta, double gamma, double cos2Gamma,
 			double A, double B, double C, double D, double E) {
-		
+
 		return (1 + A * Math.exp(B / cosTheta)) * (1 + C * Math.exp(D*gamma) + E * cos2Gamma);
 	}
-	
+
 	/**
 	 * Create new sun model
 	 * @param scene
@@ -207,7 +207,7 @@ public class Sun {
 		this.scene = scene;
 		initSun();
 	}
-	
+
 	/**
 	 * Set equal to other sun model
 	 * @param other
@@ -219,21 +219,21 @@ public class Sun {
 		intensity = other.intensity;
 		initSun();
 	}
-	
+
 	private void initSun() {
 		double theta = azimuth;
 		double phi = altitude;
-		
+
 		sw.x = Math.cos(theta);
 		sw.y = Math.sin(phi);
 		sw.z = Math.sin(theta);
 
 		double r = Math.sqrt(sw.x*sw.x + sw.z*sw.z);
 		r = Math.abs(Math.cos(phi) / r);
-		
+
 		sw.x *= r;
 		sw.z *= r;
-		
+
 		if (Math.abs(sw.x) > .1)
 			su.set(0, 1, 0);
 		else
@@ -241,13 +241,13 @@ public class Sun {
 		sv.cross(sw, su);
 		sv.normalize();
 		su.cross(sv, sw);
-		
+
 		emittance.set(color);
 		emittance.scale(Math.pow(intensity, Scene.DEFAULT_GAMMA));
-		
+
 		updateSkylightValues();
 	}
-	
+
 	/**
 	 * @return CompoundTag containing serialized sun model
 	 */
@@ -263,7 +263,7 @@ public class Sun {
 		sunTag.addItem("color", colorTag);
 		return sunTag;
 	}
-	
+
 	/**
 	 * Deserialize the sun model from CompoundTag
 	 * @param tag
@@ -285,7 +285,7 @@ public class Sun {
 			color.y = colorTag.get("green").doubleValue(1);
 			color.z = colorTag.get("blue").doubleValue(1);
 		}
-		
+
 		initSun();
 	}
 
@@ -337,10 +337,10 @@ public class Sun {
 			ray.hit = true;
 			return true;
 		}*/
-		
+
 		if (ray.d.dot(sw) < .5)
 			return false;
-		
+
 		double WIDTH = RADIUS*4;
 		double WIDTH2 = WIDTH*2;
 		double a;
@@ -356,10 +356,10 @@ public class Sun {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Calculate flat shading for ray
 	 * @param ray
@@ -371,7 +371,7 @@ public class Sun {
 		ray.color.y *= emittance.y * shading;
 		ray.color.z *= emittance.z * shading;
 	}
-	
+
 	/**
 	 * @param color
 	 */
@@ -382,7 +382,7 @@ public class Sun {
 		initSun();
 		scene.refresh();
 	}
-	
+
 	private void updateSkylightValues() {
 		double sunTheta = Math.PI/2 - altitude;
 		double cosTheta = Math.cos(sunTheta);
@@ -438,7 +438,7 @@ public class Sun {
 		reflected.d.add(u, v);
 		reflected.d.add(w);
 		reflected.d.normalize();
-		
+
 		vectorPool.dispose(u);
 		vectorPool.dispose(v);
 		vectorPool.dispose(w);
@@ -447,8 +447,8 @@ public class Sun {
 	/**
 	 * Atmospheric extinction and inscattering of ray.
 	 * @param ray
-	 * @param s 
-	 * @param attenuation 
+	 * @param s
+	 * @param attenuation
 	 */
 	public void doAtmos(Ray ray, double s, double attenuation) {
 		double Br = 0.00002*10;
@@ -483,7 +483,7 @@ public class Sun {
 	private static final double Br = 0.0002;
 	private static final double Bm = 0.0009;
 	private static final double g = -.0007;
-	
+
 	/**
 	 * @param s
 	 * @return Extinction factor
@@ -491,7 +491,7 @@ public class Sun {
 	public double extinction(double s) {
 		return Math.exp(-(Br + Bm) * s);
 	}
-	
+
 	/**
 	 * @param Fex
 	 * @param theta

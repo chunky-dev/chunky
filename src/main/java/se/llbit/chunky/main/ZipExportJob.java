@@ -29,11 +29,11 @@ import se.llbit.chunky.world.World;
 
 /**
  * Exports chunks to a Zip file.
- * 
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ZipExportJob extends Thread {
-	
+
 	private World world;
 	private File targetFile;
 	private ProgressPanel progress;
@@ -49,7 +49,7 @@ public class ZipExportJob extends Thread {
 	public ZipExportJob(World world, Collection<ChunkPosition> selected,
 	        File target, ProgressPanel progress) {
 	    super("Zip Export Job");
-	    
+
 		this.world = world;
 		this.selected = selected;
 		this.targetFile = target;

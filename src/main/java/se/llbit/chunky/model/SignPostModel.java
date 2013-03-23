@@ -32,7 +32,7 @@ public class SignPostModel {
 		// front
 		new Quad(new Vector3d(0, .5, 9/16.), new Vector3d(1, .5, 9/16.),
 				new Vector3d(0, 1, 9/16.), new Vector4d(2/64., 26/64., 18/32., 30/32.)),
-		
+
 		// back
 		new Quad(new Vector3d(1, .5, 7/16.), new Vector3d(0, .5, 7/16.),
 				new Vector3d(1, 1, 7/16.), new Vector4d(28/64., 52/64., 18/32., 30/32.)),
@@ -48,15 +48,15 @@ public class SignPostModel {
 		// top
 		new Quad(new Vector3d(1, 1, 7/16.), new Vector3d(0, 1, 7/16.),
 				new Vector3d(1, 1, 9/16.), new Vector4d(2/64., 26/64., 1, 30/32.)),
-		
+
 		// bottom
 		new Quad(new Vector3d(0, .5, 7/16.), new Vector3d(1, .5, 7/16.),
 				new Vector3d(0, .5, 9/16.), new Vector4d(26/64., 50/64., 1, 30/32.)),
-				
+
 		// post front
 		new Quad(new Vector3d(7/16., 0, 9/16.), new Vector3d(9/16., 0, 9/16.),
 				new Vector3d(7/16., .5, 9/16.), new Vector4d(2/64., 4/64., 2/32., 16/32.)),
-		
+
 		// post back
 		new Quad(new Vector3d(9/16., 0, 7/16.), new Vector3d(7/16., 0, 7/16.),
 				new Vector3d(9/16., .5, 7/16.), new Vector4d(4/64., 6/64., 2/32., 16/32.)),
@@ -72,11 +72,11 @@ public class SignPostModel {
 		// post bottom
 		new Quad(new Vector3d(7/16., 0, 7/16.), new Vector3d(9/16., 0, 7/16.),
 				new Vector3d(7/16., 0, 9/16.), new Vector4d(4/64., 6/64., 16/32., 18/32.)),
-				
+
 	};
 
 	private static final Quad[][] rot = new Quad[16][];
-	
+
 	static {
 		// rotate the sign post to face the correct direction
 		rot[0] = sides;

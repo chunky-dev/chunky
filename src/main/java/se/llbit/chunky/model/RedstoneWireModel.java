@@ -30,68 +30,68 @@ public class RedstoneWireModel {
 		// 0000 no connection
 		new Quad(new Vector3d(11/16., 0, 5/16.), new Vector3d(5/16., 0, 5/16.),
 			new Vector3d(11/16., 0, 11/16.), new Vector4d(11/16., 5/16., 11/16., 5/16.)),
-		
+
 		// 0001 east
 		new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
 			new Vector3d(1, 0, 1), new Vector4d(1, 0, 1, 0)),
-		
+
 		// 0010 west
 		new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
 			new Vector3d(1, 0, 1), new Vector4d(1, 0, 1, 0)),
-		
-		// 0011 east west 
+
+		// 0011 east west
 		new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
 			new Vector3d(1, 0, 1), new Vector4d(1, 0, 1, 0)),
-		
+
 		// 0100 north
 		new Quad(new Vector3d(1, 0, 1), new Vector3d(1, 0, 0),
 			new Vector3d(0, 0, 1), new Vector4d(1, 0, 1, 0)),
-		
+
 		// 0101 north east
 		new Quad(new Vector3d(1, 0, 0), new Vector3d(5/16., 0, 0),
 			new Vector3d(1, 0, 11/16.), new Vector4d(1, 5/16., 1, 5/16.)),
-		
+
 		// 0110 north west
 		new Quad(new Vector3d(11/16., 0, 0), new Vector3d(0, 0, 0),
 			new Vector3d(11/16., 0, 11/16.), new Vector4d(11/16., 0, 1, 5/16.)),
-		
+
 		// 0111 north east west
 		new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
 			new Vector3d(1, 0, 11/16.), new Vector4d(1, 0/16., 1, 5/16.)),
-		
+
 		// 1000 south
 		new Quad(new Vector3d(1, 0, 1), new Vector3d(1, 0, 0),
 			new Vector3d(0, 0, 1), new Vector4d(1, 0, 1, 0)),
-		
+
 		// 1001 south east
 		new Quad(new Vector3d(1, 0, 5/16.), new Vector3d(5/16., 0, 5/16.),
 			new Vector3d(1, 0, 1), new Vector4d(1, 5/16., 11/16., 0)),
-		
+
 		// 1010 south west
 		new Quad(new Vector3d(11/16., 0, 5/16.), new Vector3d(0, 0, 5/16.),
 			new Vector3d(11/16., 0, 1), new Vector4d(11/16., 0, 11/16., 0)),
-		
+
 		// 1011 south east west
 		new Quad(new Vector3d(16/16., 0, 5/16.), new Vector3d(0/16., 0, 5/16.),
 			new Vector3d(16/16., 0, 1), new Vector4d(16/16., 0/16., 11/16., 0)),
-		
+
 		// 1100 north south
 		new Quad(new Vector3d(1, 0, 1), new Vector3d(1, 0, 0),
 			new Vector3d(0, 0, 1), new Vector4d(1, 0, 1, 0)),
-		
+
 		// 1101 north south east
 		new Quad(new Vector3d(1, 0, 0), new Vector3d(5/16., 0, 0),
 			new Vector3d(1, 0, 1), new Vector4d(1, 5/16., 1, 0)),
-		
+
 		// 1110 north south west
 		new Quad(new Vector3d(11/16., 0, 0), new Vector3d(0, 0, 0),
 			new Vector3d(11/16., 0, 1), new Vector4d(11/16., 0, 1, 0)),
-		
+
 		// 1111 north south east west
 		new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
 			new Vector3d(1, 0, 1), new Vector4d(1, 0, 1, 0)),
 	};
-	
+
 	private static final Quad eastSide = new Quad(
 			new Vector3d(1, 1, 0), new Vector3d(1, 0, 0),
 			new Vector3d(1, 1, 1), new Vector4d(1, 0, 1, 0));
@@ -104,7 +104,7 @@ public class RedstoneWireModel {
 	private static final Quad southSide = new Quad(
 			new Vector3d(1, 1, 1), new Vector3d(1, 0, 1),
 			new Vector3d(0, 1, 1), new Vector4d(1, 0, 1, 0));
-	
+
 	private static final Texture[] tex = {
 		Texture.redstoneWireCross,
 		Texture.redstoneWire,
@@ -123,9 +123,9 @@ public class RedstoneWireModel {
 		Texture.redstoneWireCross,
 		Texture.redstoneWireCross,
 	};
-	
+
 	private static final float[][] wireColor = new float[16][3];
-	
+
 	static {
 		float[] color0 = new float[3];
 		float[] color1 = new float[3];

@@ -275,82 +275,82 @@ public class Texture {
 	public static final Texture hopper = new Texture();
 	public static final Texture hopperInside = new Texture();
 	public static final Texture unknown = new Texture("unknown");
-	
+
 	public static final Texture signPost = new Texture();
-	
+
 	// Tree variants
-	
+
 	public static final Texture oakLeaves = new Texture("leaves");// TODO: variants
 	public static final Texture spruceLeaves = new Texture("leaves");// TODO: variants
 	public static final Texture birchLeaves = oakLeaves;
 	public static final Texture jungleTreeLeaves = new Texture("leaves");// TODO: variants
-	
+
 	public static final Texture oakSapling = new Texture("sapling");// TODO: variants
 	public static final Texture spruceSapling = new Texture("sapling");// TODO: variants
 	public static final Texture birchSapling = new Texture("sapling");// TODO: variants
 	public static final Texture jungleTreeSapling = new Texture("sapling");// TODO: variants
-	
+
 	public static final Texture oakPlanks = new Texture("wooden-planks");// TODO: variants
 	public static final Texture sprucePlanks = new Texture("wooden-planks");// TODO: variants
 	public static final Texture birchPlanks = new Texture("wooden-planks");// TODO: variants
 	public static final Texture jungleTreePlanks = new Texture("wooden-planks");// TODO: variants
-	
+
 	public static final Texture oakWood = new Texture("wood");// TODO: variants
 	public static final Texture spruceWood = new Texture("wood");// TODO: variants
 	public static final Texture birchWood = new Texture("wood");// TODO: variants
 	public static final Texture jungleTreeWood = new Texture("wood");// TODO: variants
-	
+
 	public static final Texture[] woodPlank =
 		{ oakPlanks, sprucePlanks, birchPlanks, jungleTreePlanks };
-	
+
 	public static final Texture[] leaves =
 		{ oakLeaves, spruceLeaves, birchLeaves, jungleTreeLeaves };
-	
+
 	public static final Texture[] sapling = {
 		oakSapling, spruceSapling, birchSapling, jungleTreeSapling };
-	
+
 	public static final Texture[] wheat =
 		{ crops0, crops1, crops2, crops3, crops4, crops5, crops6, crops7 };
-	
+
 	public static final Texture[] carrots =
 		{ carrots0, carrots0, carrots1, carrots1,
 		carrots2, carrots2, carrots2, carrots3 };
-	
+
 	public static final Texture[] potatoes =
 		{ potatoes0, potatoes0, potatoes1, potatoes1,
 		potatoes2, potatoes2, potatoes2, potatoes3 };
-	
+
 	public static final Texture[] netherWart =
 		{ netherWart0, netherWart1, netherWart1, netherWart2 };
-	
+
 	public static final Texture[] woodenDoor =
 		{ woodenDoorBottom, woodenDoorTop };
-	
+
 	public static final Texture[] ironDoor =
 		{ ironDoorBottom, ironDoorTop };
-	
+
 	public static final Texture[] poweredRails =
 		{ poweredRailOff, poweredRailOn };
-	
+
 	public static final Texture[] activatorRails =
 		{ activatorRail, activatorRailPowered };
-	
+
 	public static final Texture[] railsType =
 		{ rails, rails, rails, rails, rails, rails,
 		railsCurved, railsCurved, railsCurved, railsCurved };
-	
+
 	public static final Texture[] wool =
 		{ whiteWool, orangeWool, magentaWool, lightBlueWool,
 		yellowWool, limeWool, pinkWool, grayWool, lightGrayWool,
 		cyanWool, purpleWool, blueWool, brownWool, greenWool,
 		redWool, blackWool };
-	
+
 	public static final Texture[] stoneBrickType =
 		{ stoneBrick, mossyStoneBrick, crackedStoneBrick, circleStoneBrick };
-	
+
 	public static final Texture[] anvilTopTexture =
 		{ anvilTop, anvilTopDamaged1, anvilTopDamaged2, anvilTopDamaged2 };
-	
+
 	protected BufferedImage image;
 	protected int width;
 	protected int height;
@@ -359,19 +359,19 @@ public class Texture {
 	private float[][] linear;
 	private BufferedImage prescaled;
 	private int bufferedScale = -1;
-	
+
 	public Texture() {
 		this(ImageLoader.get("missing-image"));
 	}
-	
+
 	public Texture(String resourceName) {
 		setTexture(ImageLoader.get("textures/" + resourceName + ".png"));
 	}
-	
+
 	public Texture(BufferedImage img) {
 		setTexture(img);
 	}
-	
+
 	public void setTexture(BufferedImage newImage) {
 		if (newImage.getType() == BufferedImage.TYPE_INT_ARGB) {
 			image = newImage;
@@ -383,10 +383,10 @@ public class Texture {
 			g.drawImage(newImage, 0, 0, null);
 			g.dispose();
 		}
-		
+
 		// gamma correct the texture
 		avgColorLinear = new float[] { 0, 0, 0, 0 };
-		
+
 		DataBufferInt dataBuffer = (DataBufferInt) image.getRaster().getDataBuffer();
 		int[] data = dataBuffer.getData();
 		width = image.getWidth();
@@ -405,12 +405,12 @@ public class Texture {
 				avgColorLinear[3] += linear[index][3];
 			}
 		}
-		
+
 		avgColorLinear[0] /= width*height;
 		avgColorLinear[1] /= width*height;
 		avgColorLinear[2] /= width*height;
 		avgColorLinear[3] /= width*height;
-		
+
 		avgColor = Color.getRGBA(Math.pow(avgColorLinear[0], 1/Scene.DEFAULT_GAMMA),
 				Math.pow(avgColorLinear[1], 1/Scene.DEFAULT_GAMMA),
 				Math.pow(avgColorLinear[2], 1/Scene.DEFAULT_GAMMA), avgColorLinear[3]);
@@ -425,7 +425,7 @@ public class Texture {
 	public void getColor(double u, double v, Vector4d c) {
 		c.set(getColor(u, v));
 	}
-	
+
 	/**
 	 * Get linear color values
 	 * @param ray
@@ -433,17 +433,17 @@ public class Texture {
 	public void getColor(Ray ray) {
 		getColor(ray.u, ray.v, ray.color);
 	}
-	
+
 	public float[] getColor(double u, double v) {
 		return getColor(
 				(int) (u * width - Ray.EPSILON),
 				(int) ((1-v) * height - Ray.EPSILON));
 	}
-	
+
 	private final float[] getColor(int x, int y) {
 		return linear[width*y + x];
 	}
-	
+
 	/**
 	 * Get bilinear interpolated color value
 	 * @param u
@@ -459,7 +459,7 @@ public class Texture {
 		int cx = QuickMath.ceil(x);
 		int fy = QuickMath.floor(y);
 		int cy = QuickMath.ceil(y);
-		
+
 		float[] rgb = getColor(fx % width, fy);
 		weight = (1 - (y-fy)) * (1 - (x-fx));
 		c.x = weight * rgb[0];
@@ -481,25 +481,25 @@ public class Texture {
 		c.y += weight * rgb[1];
 		c.z += weight * rgb[2];
 	}
-	
+
 	public int getColorWrapped(int u, int v) {
 		return image.getRGB((u + width) % width, (v + height) % height);
 	}
-	
+
 	/**
 	 * @return The average color of this texture
 	 */
 	public int getAvgColor() {
 		return avgColor;
 	}
-	
+
 	/**
 	 * Get the average linear color of this texture
 	 */
 	public void getAvgColorLinear(Vector4d c) {
 		c.set(avgColorLinear);
 	}
-	
+
 	/**
 	 * @return The average color of this texture
 	 */
@@ -513,14 +513,14 @@ public class Texture {
 	public BufferedImage getImage() {
 		return image;
 	}
-	
+
 	/**
 	 * @return An ImageIcon containing this texture's internal image
 	 */
 	public ImageIcon createIcon() {
 		return new ImageIcon(image);
 	}
-	
+
 	/**
 	 * Get a scaled version of the texture
 	 * @param scale

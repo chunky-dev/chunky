@@ -35,7 +35,7 @@ public class WoodModel {
 		// south
 		new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
 				new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
-		
+
 		// west
 		new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
 				new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
@@ -47,27 +47,27 @@ public class WoodModel {
 		// top
 		new Quad(new Vector3d(1, 1, 0), new Vector3d(0, 1, 0),
 				new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, 1)),
-		
+
 		// bottom
 		new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 				new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
-				
+
 	};
-	
+
 	private static final Texture[][] texture = {
 		{ Texture.oakWood, Texture.woodTop },
 		{ Texture.spruceWood, Texture.woodTop },
 		{ Texture.birchWood, Texture.woodTop },
 		{ Texture.jungleTreeWood, Texture.woodTop }
 	};
-	
+
 	private static final int[][] textureIndex = {
 		{ 0, 0, 0, 0, 1, 1 },
 		{ 0, 0, 1, 1, 0, 0 },
 		{ 1, 1, 0, 0, 0, 0 },
 		{ 0, 0, 0, 0, 0, 0 }
 	};
-	
+
 	private static final int[][] uv = {
 		{ 0, 0, 0, 0, 0, 0 },
 		{ 1, 1, 0, 0, 1, 1 },
@@ -84,9 +84,9 @@ public class WoodModel {
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < sides.length; ++i) {
 			Quad side = sides[i];
-			
+
 			if (side.intersect(ray)) {
-				
+
 				double u = ray.u;
 				int uv_x = uv[direction][i];
 				ray.u = (1-uv_x) * ray.u + uv_x * ray.v;

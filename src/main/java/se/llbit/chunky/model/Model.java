@@ -36,7 +36,7 @@ public class Model {
 		}
 		return rot;
 	}
-	
+
 	/**
 	 * @param src
 	 * @return Quads rotated about the Y axis
@@ -48,7 +48,7 @@ public class Model {
 		}
 		return rot;
 	}
-	
+
 	/**
 	 * @param src
 	 * @return UVTriangles rotated about the Y axis
@@ -60,10 +60,10 @@ public class Model {
 		}
 		return rot;
 	}
-	
+
 	/**
 	 * @param src
-	 * @param angle 
+	 * @param angle
 	 * @return Quads rotated about the Y axis by some angle
 	 */
 	public static final Quad[] rotateY(Quad[] src, double angle) {
@@ -73,7 +73,7 @@ public class Model {
 		}
 		return rot;
 	}
-	
+
 	/**
 	 * @param src
 	 * @return Quads rotated about the Z axis
@@ -85,7 +85,7 @@ public class Model {
 		}
 		return rot;
 	}
-	
+
 	/**
 	 * @param src
 	 * @param angle
@@ -98,7 +98,7 @@ public class Model {
 		}
 		return rot;
 	}
-	
+
 	/**
 	 * @param src
 	 * @param x Distance to translate along the X axis

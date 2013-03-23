@@ -41,7 +41,7 @@ import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 
 /**
  * UI component that draws a 2D Minecraft map.
- * 
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 @SuppressWarnings("serial")
@@ -51,21 +51,21 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	 * Default width of the chunk map.
 	 */
 	public static final int DEFAULT_WIDTH = 800;
-	
+
 	/**
 	 * Default height of the chunk map.
 	 */
 	public static final int DEFAULT_HEIGHT = 600;
-	
+
 	private Chunky chunky;
 	private boolean selectRect = false;
-	
+
 	// selection rectangle
 	private int rx;
 	private int ry;
 	private int rw;
 	private int rh;
-	
+
 	private RenderBuffer renderBuffer;
 	private ChunkView view;
 
@@ -137,7 +137,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 					double scale = (double) view.chunkScale;
 					int cx = (int) Math.floor(view.x + (x - getWidth()/2) / scale);
 					int cz = (int) Math.floor(view.z + (y - getHeight()/2) / scale);
-					
+
 					if (view.chunkScale > 1) {
 						chunky.selectChunk(cx, cz);
 						renderBuffer.updateChunk(cx, cz);
@@ -211,7 +211,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			public void componentHidden(ComponentEvent e) {
 			}
 		});
-		
+
 		view = chunky.getMapView();
 		renderBuffer = new RenderBuffer(view);
 	}
@@ -224,7 +224,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		super.paintComponent(g);
 
 		World world = chunky.getWorld();
-		
+
 		renderBuffer.updateView(view, chunky.getChunkRenderer(),
 				world.currentLayer());
 		chunky.getWorldRenderer().render(world, renderBuffer,
@@ -233,7 +233,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		chunky.getWorldRenderer().renderHUD(world, chunky, g, renderBuffer);
 		drawSelectionRect(g);
 	}
-	
+
 	protected void setSelectionRect(int ox, int oy, int dx, int dy) {
 		rx = Math.min(ox, ox+dx);
 		ry = Math.min(oy, oy+dy);
@@ -241,7 +241,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		rh = Math.abs(dy);
 		selectRect = true;
 	}
-	
+
 	protected synchronized void selectWithinRect() {
 		if (selectRect) {
 			ChunkView view = chunky.getMapView();
@@ -252,7 +252,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			int cx1 = (int) Math.floor(view.x + (rx - width/2 + rw) / scale);
 			int cz0 = (int) Math.floor(view.z + (ry - height/2) / scale);
 			int cz1 = (int) Math.floor(view.z + (ry - height/2 + rh) / scale);
-			
+
 			chunky.selectChunks(cx0, cx1, cz0, cz1);
 			renderBuffer.updateChunks(cx0, cx1, cz0, cz1);
 		}
@@ -264,7 +264,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			repaint();
 		}
 	}
-	
+
 	/**
 	 * Draw the selection rectangle
 	 * @param g

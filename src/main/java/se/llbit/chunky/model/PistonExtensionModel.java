@@ -24,70 +24,70 @@ import se.llbit.math.Vector4d;
 
 /**
  * Piston
- * 
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class PistonExtensionModel {
 	protected static Quad[][] extension = {
 		// down
 		{},
-		
+
 		// up
 		{},
-		
+
 		// facing north
 		{
 			// north
 			new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
 					new Vector3d(1, 1, 0), new Vector4d(1, 0, 0, 1)),
-	
+
 			// south
 			new Quad(new Vector3d(0, 0, .25), new Vector3d(1, 0, .25),
 					new Vector3d(0, 1, .25), new Vector4d(0, 1, 0, 1)),
-			
+
 			// west
 			new Quad(new Vector3d(0, 1, 0), new Vector3d(0, 0, 0),
 					new Vector3d(0, 1, .25), new Vector4d(0, 1, 1, .75)),
-	
+
 			// east
 			new Quad(new Vector3d(1, 1, .25), new Vector3d(1, 0, .25),
 					new Vector3d(1, 1, 0), new Vector4d(1, 0, .75, 1)),
-	
+
 			// top
 			new Quad(new Vector3d(1, 1, 0), new Vector3d(0, 1, 0),
 					new Vector3d(1, 1, .25), new Vector4d(1, 0, 1, .75)),
-			
+
 			// bottom
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 0, .25), new Vector4d(0, 1, 1, .75)),
-					
+
 			// extension west
 			new Quad(new Vector3d(.375, .375, .25), new Vector3d(.375, .375, 1),
 					new Vector3d(.375, .625, .25), new Vector4d(1, .25, .75, 1)),
-	
+
 			// extension east
 			new Quad(new Vector3d(.625, .375, 1), new Vector3d(.625, .375, .25),
 					new Vector3d(.625, .625, 1), new Vector4d(.25, 1, .75, 1)),
-	
+
 			// extension top
 			new Quad(new Vector3d(.375, .625, .25), new Vector3d(.375, .625, 1),
 					new Vector3d(.625, .625, .25), new Vector4d(1, .25, .75, 1)),
-			
+
 			// extension bottom
 			new Quad(new Vector3d(.375, .375, 1), new Vector3d(.375, .375, .25),
 					new Vector3d(.625, .375, 1), new Vector4d(.25, 1, .75, 1)),
 		},
-		
+
 		// facing south
 		{},
-		
+
 		//facing west
 		{},
-		
+
 		// facing east
 		{},
 	};
-	
+
 	static {
 		rotateFaceNegX(extension, 2, 0);
 		rotateFaceX(extension, 2, 1);
@@ -95,28 +95,28 @@ public class PistonExtensionModel {
 		rotateFaceY(extension, 5, 3);
 		rotateFaceY(extension, 3, 4);
 	}
-	
+
 	private static void rotateFaceX(Quad[][] quads, int i, int j) {
 		quads[j] = new Quad[quads[i].length];
 		for (int k = 0; k < quads[i].length; ++k) {
 			quads[j][k] = quads[i][k].getXRotated();
 		}
 	}
-	
+
 	private static void rotateFaceNegX(Quad[][] quads, int i, int j) {
 		quads[j] = new Quad[quads[i].length];
 		for (int k = 0; k < quads[i].length; ++k) {
 			quads[j][k] = quads[i][k].getNegXRotated();
 		}
 	}
-	
+
 	private static void rotateFaceY(Quad[][] quads, int i, int j) {
 		quads[j] = new Quad[quads[i].length];
 		for (int k = 0; k < quads[i].length; ++k) {
 			quads[j][k] = quads[i][k].getYRotated();
 		}
 	}
-	
+
 	static final Texture[][] texture = {
 		{
 			Texture.pistonTop,
@@ -130,7 +130,7 @@ public class PistonExtensionModel {
 			Texture.pistonSide,
 			Texture.pistonSide,
 		},
-		
+
 		{
 			Texture.pistonTopSticky,
 			Texture.pistonTop,
@@ -144,7 +144,7 @@ public class PistonExtensionModel {
 			Texture.pistonSide,
 		},
 	};
-	
+
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray) {
 		boolean hit = false;

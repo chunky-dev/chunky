@@ -43,3 +43,4 @@ public class SignTexture extends TextureRef {
 		return true;
 	}
 }
+

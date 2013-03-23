@@ -28,23 +28,23 @@ public class CakeModel {
 		// front
 		new Quad(new Vector3d(.9375, 0, .0625), new Vector3d(.0625, 0, .0625),
 				new Vector3d(.9375, .5, .0625), new Vector4d(.9375, .0625, 0, .5)),
-	
+
 		// back
 		new Quad(new Vector3d(.0625, 0, .9375), new Vector3d(.9375, 0, .9375),
 				new Vector3d(.0625, .5, .9375), new Vector4d(.0625, .9375, 0, .5)),
-		
+
 		// right
 		new Quad(new Vector3d(.0625, 0, .0625), new Vector3d(.0625, 0, .9375),
 				new Vector3d(.0625, .5, .0625), new Vector4d(.0625, .9375, 0, .5)),
-	
+
 		// left
 		new Quad(new Vector3d(.9375, 0, .9375), new Vector3d(.9375, 0, .0625),
 				new Vector3d(.9375, .5, .9375), new Vector4d(.9375, .0625, 0, .5)),
-	
+
 		// top
 		new Quad(new Vector3d(.9375, .5, .0625), new Vector3d(.0625, .5, .0625),
 				new Vector3d(.9375, .5, .9375), new Vector4d(.9375, .0625, .0625, .9375)),
-		
+
 		// bottom
 		new Quad(new Vector3d(.0625, 0, .0625), new Vector3d(.9375, 0, .0625),
 				new Vector3d(.0625, 0, .9375), new Vector4d(.0625, .9375, .0625, .9375)),

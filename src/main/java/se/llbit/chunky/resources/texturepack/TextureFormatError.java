@@ -28,7 +28,7 @@ public class TextureFormatError extends Exception {
 	public TextureFormatError(String message) {
 		super(message);
 	}
-	
+
 	@Override
 	public String getMessage() {
 		return "Texture format error: " + super.getMessage();

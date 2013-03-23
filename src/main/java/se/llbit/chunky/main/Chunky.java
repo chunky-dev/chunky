@@ -68,32 +68,32 @@ import se.llbit.util.ProgramProperties;
 /**
  * Chunky is a Minecraft mapping and rendering tool created by
  * Jesper Öqvist.
- * 
+ *
  * There is a Wiki for Chunky at http://chunky.llbit.se
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class Chunky implements ChunkDiscoveryListener {
-	
+
 	/**
 	 * Minimum block scale for the map view
 	 */
 	public static final int BLOCK_SCALE_MIN = 0;
-	
+
 	/**
 	 * Maximum block scale for the map view
 	 */
 	public static final int BLOCK_SCALE_MAX = 32;
-	
+
 	/**
 	 * Default block scale for the map view
 	 */
 	public static final int DEFAULT_BLOCK_SCALE = 4;
-	
+
 	private int chunkScale = DEFAULT_BLOCK_SCALE*16;
-	
+
 	private World world = EmptyWorld.instance;
-	
+
 	private ChunkParser chunkParser = new ChunkParser();
 	private RegionParser regionParser = new RegionParser();
 
@@ -110,20 +110,20 @@ public class Chunky implements ChunkDiscoveryListener {
 
 	private ChunkView map = EmptyChunkView.instance;
 	private ChunkView minimap = EmptyChunkView.instance;
-	
+
 	private int mapWidth = ChunkMap.DEFAULT_WIDTH;
 	private int mapHeight = ChunkMap.DEFAULT_HEIGHT;
-	
+
 	private int minimapWidth = Minimap.DEFAULT_WIDTH;
 	private int minimapHeight = Minimap.DEFAULT_HEIGHT;
-	
+
 	private Chunk hoveredChunk = EmptyChunk.instance;
 
 	/**
 	 * Whether or not OpenCL rendering is enabled
 	 */
 	public boolean openCLEnabled = false;
-	
+
 	/**
 	 * Logger object.
 	 */
@@ -137,22 +137,22 @@ public class Chunky implements ChunkDiscoveryListener {
 			Messages.getString("Chunky.appname"), //$NON-NLS-1$
 			Messages.getString("Chunky.version")); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * @return Chunky revision
 	 */
 	public static final String getRevision() {
 		return Messages.getString("Chunky.revision"); //$NON-NLS-1$
 	}
-	
+
 	static {
 		// Configure the logger
 		PropertyConfigurator.configure(
 				Chunky.class.getResource("/log4j.properties"));
 	}
-	
+
 	private int tileWidth = AbstractRenderManager.TILE_WIDTH_DEFAULT;
-	
+
 	/**
 	 * The help string
 	 */
@@ -174,13 +174,13 @@ public class Chunky implements ChunkDiscoveryListener {
 		"and -scene-dir <DIR> is not given, SCENE's parent directory will be used\n" +
 		"as the scene directory.  Otherwise, SCENE is interpreted as the name of\n" +
 		"a .cvf file within the scene directory.";
-	
+
 	/**
 	 * Constructor
 	 */
 	public Chunky() {
 	}
-	
+
 	/**
 	 * Create a new instance of the application GUI.
 	 * @param args
@@ -224,7 +224,7 @@ public class Chunky implements ChunkDiscoveryListener {
 				return 1;
 			}
 		}
-		
+
 		if (sceneDir == null && sceneName != null) {
 			File possibleSceneFile = new File(sceneName);
 			if (possibleSceneFile.isFile()) {
@@ -234,7 +234,7 @@ public class Chunky implements ChunkDiscoveryListener {
 				sceneDir = ProgramProperties.getPreferredSceneDirectory();
 			}
 		}
-		
+
 		if (texturePack != null) {
 			TexturePackLoader.loadTexturePack(new File(texturePack), false);
 		} else {
@@ -245,23 +245,23 @@ public class Chunky implements ChunkDiscoveryListener {
 				TexturePackLoader.loadTexturePack(getMinecraftJar(), false);
 			}
 		}
-		
+
 		if (doBench) {
 			doBenchmark(renderThreads);
 			return 0;
 		}
-		
+
 		if (sceneName != null) {
 			// start headless mode
 			System.setProperty("java.awt.headless", "true");
-			
+
 			RenderContext renderContext = new RenderContext(sceneDir,
 					renderThreads, tileWidth);
 			RenderManager renderManager = new RenderManager(
 					new PlaceholderRenderCanvas(),
 					renderContext, new ConsoleRenderListener());
 			renderManager.start();
-		
+
 			try {
 				renderManager.loadScene(sceneName);
 				if (!renderManager.scene().pathTrace()) {
@@ -278,7 +278,7 @@ public class Chunky implements ChunkDiscoveryListener {
 			}
 			return 0;
 		}
-		
+
 		// load the world
 		if (worldDir != null && World.isWorldDir(worldDir)) {
 			loadWorld(new World(worldDir, false));
@@ -289,11 +289,11 @@ public class Chunky implements ChunkDiscoveryListener {
 				loadWorld(new World(lastWorldDir, false));
 			}
 		}
-		
+
 		// Start the worker threads
 		chunkParser.start();
 		regionParser.start();
-		
+
 		// Create UI in the event dispatch thread
 		try {
 			try {
@@ -301,7 +301,7 @@ public class Chunky implements ChunkDiscoveryListener {
 			} catch (Exception e) {
 				logger.warn("Failed to set native Look and Feel");
 			}
-		
+
 			SwingUtilities.invokeAndWait(new Runnable() {
 				@Override
 				public void run() {
@@ -313,25 +313,25 @@ public class Chunky implements ChunkDiscoveryListener {
 		} catch (InvocationTargetException e) {
 			logger.fatal("Failed to initialize UI", e);
 		}
-		
+
 		refreshLoop();
 		return 0;
 	}
-	
+
 	/**
 	 * Perform a benchmark in headless mode
-	 * @param renderThreads 
+	 * @param renderThreads
 	 */
 	private void doBenchmark(int renderThreads) {
 		System.setProperty("java.awt.headless", "true");
-		
+
 		File sceneDir = ProgramProperties.getPreferredSceneDirectory();
 		RenderContext renderContext = new RenderContext(sceneDir,
 				renderThreads, tileWidth);
 		BenchmarkManager benchmark = new BenchmarkManager(renderContext,
 				new ConsoleRenderListener());
 		benchmark.start();
-		
+
 		try {
 			benchmark.join();
 			BenchmarkDialog.recordBenchmarkScore(benchmark.getSceneName(),
@@ -347,23 +347,23 @@ public class Chunky implements ChunkDiscoveryListener {
 		frame = new ChunkyFrame(this);
 		frame.initComponents();
 		frame.setVisible(true);
-		
+
 		if (world.isEmptyWorld())
 			getControls().openWorldSelector();
 		else
 			updateView();
-		
+
 	}
-	
+
 	/**
 	 * Flush all cached chunks and regions, forcing them to be reloaded
 	 * for the current world.
 	 */
 	public synchronized void reloadWorld() {
 		chunkSelection.clearSelection();
-		
+
 		world.reload();
-		
+
 		if (frame != null) {
 			viewUpdated();
 			frame.getMap().redraw();
@@ -373,33 +373,33 @@ public class Chunky implements ChunkDiscoveryListener {
 
 	/**
 	 * Load a new world.
-	 * 
+	 *
 	 * @param newWorld
 	 */
 	public synchronized void loadWorld(World newWorld) {
-		
+
 		newWorld.reload();
-		
+
 		regionParser.clearQueue();
 		chunkParser.clearQueue();
-		
+
 		chunkSelection.clearSelection();
-		
+
 		// dispose old world
 		world.dispose();
-		
+
 		world = newWorld;
 		world.addChunkDeletionListener(chunkSelection);
 		world.addChunkDiscoveryListener(this);
 
 		// dimension must be set before chunks are loaded
 		world.setDimension(currentDimension);
-		
+
 		updateView();
-		
+
 		ProgramProperties.setProperty("lastWorld",
 				world.getWorldDirectory().getAbsolutePath());
-		
+
 		if (frame != null) {
 			frame.worldLoaded(world);
 			viewUpdated();
@@ -407,7 +407,7 @@ public class Chunky implements ChunkDiscoveryListener {
 			frame.getMinimap().redraw();
 		}
 	}
-	
+
 	private void updateView() {
 		if (world.havePlayerPos()) {
 			setView(
@@ -423,18 +423,18 @@ public class Chunky implements ChunkDiscoveryListener {
 	 */
 	public synchronized void viewUpdated() {
 		minimap = new ChunkView(map.x, map.z, minimapWidth, minimapHeight, 1);
-		
+
 		// clear the region and chunk parse queues
 		regionParser.clearQueue();
 		chunkParser.clearQueue();
-		
+
 		// enqueue visible regions and chunks
 		for (int rx = Math.min(minimap.rx0, map.prx0);
 				rx <= Math.max(minimap.rx1, map.prx1); ++rx) {
-			
+
 			for (int rz = Math.min(minimap.rz0, map.prz0);
 					rz <= Math.max(minimap.rz1, map.prz1); ++rz) {
-				
+
 				Region region = world.getRegion(ChunkPosition.get(rx, rz));
 				if (!region.isEmpty()
 						&& (map.isVisible(region) || minimap.isVisible(region))) {
@@ -447,7 +447,7 @@ public class Chunky implements ChunkDiscoveryListener {
 				}
 			}
 		}
-		
+
 		if (frame != null) {
 			frame.getMap().viewUpdated(map);
 			frame.getMinimap().viewUpdated(minimap);
@@ -456,7 +456,7 @@ public class Chunky implements ChunkDiscoveryListener {
 
 	/**
 	 * Entry point for Chunky
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(final String[] args) {
@@ -466,7 +466,7 @@ public class Chunky implements ChunkDiscoveryListener {
 			System.exit(exitVal);
 		}
 	}
-	
+
 	/**
 	 * Periodically check for changes in the world state and
 	 * refresh the view if necessary.
@@ -483,7 +483,7 @@ public class Chunky implements ChunkDiscoveryListener {
 
 	/**
 	 * Set the current map renderer
-	 * 
+	 *
 	 * @param renderer
 	 */
 	public synchronized void setRenderer(Chunk.Renderer renderer) {
@@ -525,14 +525,14 @@ public class Chunky implements ChunkDiscoveryListener {
 	public synchronized void setHoveredChunk(int cx, int cz) {
 		hoveredChunk = world.getChunk(ChunkPosition.get(cx, cz));
 	}
-	
+
 	/**
 	 * @return The currently hovered chunk
 	 */
 	public synchronized Chunk getHoveredChunk() {
 		return hoveredChunk;
 	}
-	
+
 	/**
 	 * Select specific chunk
 	 * @param cx
@@ -542,7 +542,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		chunkSelection.selectChunk(world, cx, cz);
 		getControls().setChunksSelected(chunkSelection.numSelectedChunks() > 0);
 	}
-	
+
 	/**
 	 * Set the map view
 	 * @param cx
@@ -567,13 +567,13 @@ public class Chunky implements ChunkDiscoveryListener {
 			world.setCurrentLayer(layerNew);
 			if (chunkRenderer == Chunk.layerRenderer)
 				getMap().redraw();
-			
+
 			// force the chunks to redraw
 			viewUpdated();
 		}
 		getControls().setLayer(world.currentLayer());
 	}
-	
+
 	/**
 	 * @return The currently viewed layer
 	 */
@@ -624,14 +624,14 @@ public class Chunky implements ChunkDiscoveryListener {
 		chunkSelection.clearSelection();
 		getControls().setChunksSelected(chunkSelection.numSelectedChunks() > 0);
 	}
-	
+
 	/**
 	 * @return The directory of the local Minecraft installation
 	 */
 	public static File getMinecraftDirectory() {
 		String home = System.getProperty("user.home", ".");   //$NON-NLS-1$ //$NON-NLS-2$
 		String os = System.getProperty("os.name").toLowerCase();  //$NON-NLS-1$
-		
+
 		if (os.contains("win")) {  //$NON-NLS-1$
 			String appdata = System.getenv("APPDATA");	//$NON-NLS-1$
 			if (appdata != null)
@@ -651,21 +651,21 @@ public class Chunky implements ChunkDiscoveryListener {
 	public static File getSavesDirectory() {
 		return new File(getMinecraftDirectory(), "saves");
 	}
-	
+
 	/**
 	 * @return The texture pack directory of the local Minecraft installation
 	 */
 	public static File getTexturePacksDirectory() {
 		return new File(getMinecraftDirectory(), "texturepacks");
 	}
-	
+
 	/**
 	 * @return The current highlight color
 	 */
 	public Color getHighlightColor() {
 		return worldRenderer.getHighlightColor();
 	}
-	
+
 	/**
 	 * @return The currently highlighted block type
 	 */
@@ -679,12 +679,12 @@ public class Chunky implements ChunkDiscoveryListener {
 	 */
 	public void setHighlightEnable(boolean value) {
 		if (value != worldRenderer.isHighlightEnabled()) {
-		
+
 			worldRenderer.setHighlightEnabled(value);
 			getMap().redraw();
 		}
 	}
-	
+
 	/**
 	 * @return <code>true</code> if block type highlighting is currently active
 	 */
@@ -767,7 +767,7 @@ public class Chunky implements ChunkDiscoveryListener {
 				if (n != 1)
 					return;
 			}
-			
+
 			if (progress.tryStartJob()) {
 				progress.setJobName("PNG export");
 				progress.setJobSize(1);
@@ -776,7 +776,7 @@ public class Chunky implements ChunkDiscoveryListener {
 			}
 		}
 	}
-	
+
 	/**
 	 * @return The current world
 	 */
@@ -817,7 +817,7 @@ public class Chunky implements ChunkDiscoveryListener {
 			chunkSelection.selectChunks(world, cx0, cz0, cx1, cz1);
 		else
 			chunkSelection.deselectChunks(world, cx0, cz0, cx1, cz1);
-		
+
 		getControls().setChunksSelected(chunkSelection.numSelectedChunks() > 0);
 	}
 
@@ -885,7 +885,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	public Minimap getMinimap() {
 		return frame.getMinimap();
 	}
-	
+
 	@Override
 	public void chunksDiscovered(Collection<Chunk> chunks) {
 		for (Chunk chunk: chunks) {
@@ -900,7 +900,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	public boolean isLoading() {
 		return chunkParser.isWorking() || regionParser.isWorking();
 	}
-	
+
 	/**
 	 * Modify the block scale of the map view
 	 * @param blockScale
@@ -932,7 +932,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		moveView(dx / (double) chunkScale,
 				dy / (double) chunkScale);
 	}
-	
+
 	/**
 	 * Move the map view
 	 * @param dx

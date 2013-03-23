@@ -21,7 +21,7 @@ package se.llbit.math;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class QuickMath {
-	
+
 	/**
 	 * @param d
 	 * @return The floor of d
@@ -30,7 +30,7 @@ public class QuickMath {
 		int i = (int) d;
 		return d < i ? i-1 : i;
 	}
-	
+
 	/**
 	 * @param d
 	 * @return The ceil of d
@@ -39,7 +39,7 @@ public class QuickMath {
 		int i = (int) d;
 		return d > i ? i+1 : i;
 	}
-	
+
 	/**
 	 * Get the next power of two.
 	 * @param x
@@ -54,7 +54,7 @@ public class QuickMath {
 		x |= x >> 16;
 		return x+1;
 	}
-	
+
 	/**
 	 * @param x
 	 * @return 2-logarithm of x
@@ -66,7 +66,7 @@ public class QuickMath {
 		}
 		return v;
 	}
-	
+
 	/**
 	 * @param x
 	 * @return The sign of x
@@ -74,7 +74,7 @@ public class QuickMath {
 	public static final int signum(double x) {
 		return x < 0 ? -1 : 1;
 	}
-	
+
 	/**
 	 * Convert radians to degrees
 	 * @param rad Radians
@@ -83,7 +83,7 @@ public class QuickMath {
 	public static final double radToDeg(double rad) {
 		return 180 * (rad / Math.PI);
 	}
-	
+
 	/**
 	 * @param value
 	 * @param mod

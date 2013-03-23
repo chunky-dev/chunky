@@ -54,10 +54,10 @@ public class TexturePackLoader {
 
 	private static final Logger logger =
 			Logger.getLogger(TexturePackLoader.class);
-	
+
 	private static Collection<TextureRef> allTextures =
 		new LinkedList<TextureRef>();
-	
+
 	static {
 		allTextures.add(new ChestTexture("item/chest", Texture.chestLock,
 				Texture.chestTop, Texture.chestBottom, Texture.chestLeft,
@@ -75,7 +75,7 @@ public class TexturePackLoader {
 		allTextures.add(new CloudsTexture("environment/clouds"));
 		allTextures.add(new GrassColorTexture("misc/grasscolor"));
 		allTextures.add(new FoliageColorTexture("misc/foliagecolor"));
-		
+
 		allTextures.add(new IndexedTexture("textures/blocks/grass_top", Texture.grassTop, 0x00));
 		allTextures.add(new IndexedTexture("textures/blocks/stone", Texture.stone, 0x01));
 		allTextures.add(new IndexedTexture("textures/blocks/dirt", Texture.dirt, 0x02));
@@ -92,7 +92,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/flower", Texture.yellowFlower, 0x0D));
 		allTextures.add(new AnimatedIndexedTexture("textures/blocks/portal", Texture.portal, 0x0E));
 		allTextures.add(new IndexedTexture("textures/blocks/sapling", Texture.oakSapling, 0x0F));
-		
+
 		allTextures.add(new IndexedTexture("textures/blocks/stonebrick", Texture.cobblestone, 0x10));
 		allTextures.add(new IndexedTexture("textures/blocks/bedrock", Texture.bedrock, 0x11));
 		allTextures.add(new IndexedTexture("textures/blocks/sand", Texture.sand, 0x12));
@@ -107,7 +107,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/mushroom_red", Texture.redMushroom, 0x1C));
 		allTextures.add(new IndexedTexture("textures/blocks/mushroom_brown", Texture.brownMushroom, 0x1D));
 		allTextures.add(new IndexedTexture("textures/blocks/sapling_jungle", Texture.jungleTreeSapling, 0x1E));
-		
+
 		allTextures.add(new IndexedTexture("textures/blocks/oreGold", Texture.goldOre, 0x20));
 		allTextures.add(new IndexedTexture("textures/blocks/oreIron", Texture.ironOre, 0x21));
 		allTextures.add(new IndexedTexture("textures/blocks/oreCoal", Texture.coalOre, 0x22));
@@ -121,7 +121,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/furnace_front", Texture.furnaceUnlitFront, 0x2C));
 		allTextures.add(new IndexedTexture("textures/blocks/furnace_side", Texture.furnaceSide, 0x2D));
 		allTextures.add(new IndexedTexture("textures/blocks/dispenser_front", Texture.dispenserFront, 0x2E));
-		
+
 		allTextures.add(new IndexedTexture("textures/blocks/sponge", Texture.sponge, 0x30));
 		allTextures.add(new IndexedTexture("textures/blocks/glass", Texture.glass, 0x31));
 		allTextures.add(new IndexedTexture("textures/blocks/oreDiamond", Texture.diamondOre, 0x32));
@@ -135,7 +135,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/furnace_front_lit", Texture.furnaceLitFront, 0x3D));
 		allTextures.add(new IndexedTexture("textures/blocks/furnace_top", Texture.furnaceTop, 0x3E));
 		allTextures.add(new IndexedTexture("textures/blocks/sapling_spruce", Texture.spruceSapling, 0x3F));
-		
+
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_0", Texture.whiteWool, 0x40));
 		allTextures.add(new IndexedTexture("textures/blocks/mobSpawner", Texture.monsterSpawner, 0x41));
 		allTextures.add(new IndexedTexture("textures/blocks/snow", Texture.snowBlock, 0x42));
@@ -152,7 +152,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/mycel_side", Texture.myceliumSide, 0x4D));
 		allTextures.add(new IndexedTexture("textures/blocks/mycel_top", Texture.myceliumTop, 0x4E));
 		allTextures.add(new IndexedTexture("textures/blocks/sapling_birch", Texture.birchSapling, 0x4F));
-		
+
 		allTextures.add(new IndexedTexture("textures/blocks/torch", Texture.torch, 0x50));
 		allTextures.add(new IndexedTexture("textures/blocks/doorWood_upper", Texture.woodenDoorTop, 0x51));
 		allTextures.add(new IndexedTexture("textures/blocks/doorIron_upper", Texture.ironDoorTop, 0x52));
@@ -186,7 +186,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/piston_bottom", Texture.pistonBottom, 0x6D));
 		allTextures.add(new IndexedTexture("textures/blocks/piston_inner_top", Texture.pistonInnerTop, 0x6E));
 		allTextures.add(new IndexedTexture("textures/blocks/stem_straight", Texture.stemStraight, 0x6F));
-		
+
 		allTextures.add(new IndexedTexture("textures/blocks/rail_turn", Texture.railsCurved, 0x70));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_15", Texture.blackWool, 0x71));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_7", Texture.grayWool, 0x72));
@@ -203,7 +203,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/mushroom_skin_red", Texture.hugeRedMushroom, 0x7D));
 		allTextures.add(new IndexedTexture("textures/blocks/mushroom_skin_brown", Texture.hugeBrownMushroom, 0x7E));
 		allTextures.add(new IndexedTexture("textures/blocks/stem_bent", Texture.stemBent, 0x7F));
-		
+
 		allTextures.add(new IndexedTexture("textures/blocks/rail", Texture.rails, 0x80));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_14", Texture.redWool, 0x81));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_6", Texture.pinkWool, 0x82));
@@ -252,7 +252,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/tripWire", Texture.tripwire, 0xAD));
 		allTextures.add(new IndexedTexture("textures/blocks/endframe_eye", Texture.eyeOfTheEnder, 0xAE));
 		allTextures.add(new IndexedTexture("textures/blocks/whiteStone", Texture.endStone, 0xAF));
-		
+
 		allTextures.add(new IndexedTexture("textures/blocks/sandstone_top", Texture.sandstoneTop, 0xB0));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_11", Texture.blueWool, 0xB1));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_3", Texture.lightBlueWool, 0xB2));
@@ -262,7 +262,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/commandBlock", Texture.commandBlock, 0xB8));
 		allTextures.add(new IndexedTexture("textures/blocks/flowerPot", Texture.flowerPot, 0xBA));
 		allTextures.add(new IndexedTexture("textures/blocks/netherquartz", Texture.netherQuartzOre, 0xBF));
-		
+
 		allTextures.add(new IndexedTexture("textures/blocks/sandstone_side", Texture.sandstoneSide, 0xC0));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_10", Texture.purpleWool, 0xC1));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_2", Texture.magentaWool, 0xC2));
@@ -279,7 +279,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/carrots_3", Texture.carrots3, 0xCB));
 		allTextures.add(new IndexedTexture("textures/blocks/potatoes_3", Texture.potatoes3, 0xCC));
 		allTextures.add(new AnimatedIndexedTexture("textures/blocks/water", Texture.water, 0xCD));
-		
+
 		allTextures.add(new IndexedTexture("textures/blocks/sandstone_bottom", Texture.sandstoneBottom, 0xD0));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_9", Texture.cyanWool, 0xD1));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_1", Texture.orangeWool, 0xD2));
@@ -289,7 +289,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/wood_birch", Texture.birchPlanks, 0xD6));
 		allTextures.add(new IndexedTexture("textures/blocks/anvil_base", Texture.anvilSide, 0xD7));
 		allTextures.add(new IndexedTexture("textures/blocks/anvil_top_damaged_1", Texture.anvilTopDamaged1, 0xD8));
-		
+
 		allTextures.add(new IndexedTexture("textures/blocks/netherBrick", Texture.netherBrick, 0xE0));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_8", Texture.lightGrayWool, 0xE1));
 		allTextures.add(new IndexedTexture("textures/blocks/netherStalk_0", Texture.netherWart0, 0xE2));
@@ -300,7 +300,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/anvil_top", Texture.anvilTop, 0xE7));
 		allTextures.add(new IndexedTexture("textures/blocks/anvil_top_damaged_2", Texture.anvilTopDamaged2, 0xE8));
 		allTextures.add(new AnimatedIndexedTexture("textures/blocks/lava", Texture.lava, 0xED));
-		
+
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_side", Texture.quartzSide));
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_top", Texture.quartzTop));
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_bottom", Texture.quartzBottom));
@@ -318,7 +318,7 @@ public class TexturePackLoader {
 		allTextures.add(new SimpleTexture("textures/blocks/hopper", Texture.hopper));
 		allTextures.add(new SimpleTexture("textures/blocks/hopper_inside", Texture.hopperInside));
 	}
-	
+
 	/**
 	 * Attempt to load the specified texture pack.
 	 * If some textures files are not found they will be loaded from
@@ -330,17 +330,17 @@ public class TexturePackLoader {
 	public static void loadTexturePack(File tpFile, boolean rememberTP) {
 		loadTexturePack(tpFile, allTextures, rememberTP);
 	}
-		
+
 	private static void loadTexturePack(File tpFile,
 			Collection<TextureRef> toLoad, boolean rememberTP) {
-		
+
 		File defaultTP = Chunky.getMinecraftJar();
 		boolean isDefault = tpFile.equals(defaultTP);
 		String tpName = isDefault ? "default texture pack"
 				: "texture pack " + tpFile.getName();
-		
+
 		Set<TextureRef> notLoaded = new HashSet<TextureRef>(toLoad);
-		
+
 		ZipFile texturePack = null;
 		try {
 			texturePack = new ZipFile(tpFile);
@@ -349,10 +349,10 @@ public class TexturePackLoader {
 					notLoaded.remove(tex);
 				}
 			}
-			
+
 			// fall back on terrain.png
 			loadTerrainTextures(texturePack, notLoaded);
-			
+
 			if (rememberTP) {
 				ProgramProperties.setProperty("lastTexturePack",
 						tpFile.getAbsolutePath());
@@ -367,7 +367,7 @@ public class TexturePackLoader {
 				}
 			}
 		}
-		
+
 		if (!notLoaded.isEmpty()) {
 			StringBuffer msg = new StringBuffer();
 			msg.append("Failed to load textures from " + tpName + ":\n");
@@ -376,25 +376,25 @@ public class TexturePackLoader {
 				msg.append("\n");
 			}
 			logger.info(msg.toString());
-			
+
 			if (!isDefault) {
 				// fall back on default TP
 				loadTexturePack(defaultTP, notLoaded, false);
 			}
 		}
 	}
-	
+
 	private static void loadTerrainTextures(ZipFile texturePack,
 			Set<TextureRef> notLoaded) {
-		
+
 		Collection<TextureRef> toLoad = new LinkedList<TextureRef>(notLoaded);
-		
+
 		try {
 			InputStream in = texturePack.getInputStream(new ZipEntry("terrain.png"));
 			if (in != null) {
 				BufferedImage spritemap = ImageIO.read(in);
 				BufferedImage[] texture = getTerrainTextures(spritemap);
-				
+
 				for (TextureRef tex: toLoad) {
 					if (notLoaded.contains(tex) && tex.loadFromTerrain(texture)) {
 						notLoaded.remove(tex);
@@ -413,16 +413,16 @@ public class TexturePackLoader {
 	 */
 	private static BufferedImage[] getTerrainTextures(BufferedImage spritemap)
 			throws IOException {
-		
+
 		if (spritemap.getWidth() != spritemap.getHeight() ||
 				spritemap.getWidth() % 16 != 0) {
 			throw new IOException("Error: terrain.png file must have equal width and height, divisible by 16!");
 		}
-		
+
 		int imgW = spritemap.getWidth();
 		int spriteW = imgW / 16;
 		BufferedImage[] tex = new BufferedImage[256];
-		
+
 		for (int i = 0; i < 256; ++i)
 			tex[i] = new BufferedImage(spriteW, spriteW,
 					BufferedImage.TYPE_INT_ARGB);

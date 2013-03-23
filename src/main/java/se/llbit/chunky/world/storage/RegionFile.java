@@ -11,12 +11,12 @@
 
 /*
  * 2011 February 16
- * 
+ *
  * This source code is based on the work of Scaevolus (see notice above).
  * It has been slightly modified by Mojang AB (constants instead of magic
  * numbers, a chunk timestamp header, and auto-formatted according to our
  * formatter template).
- * 
+ *
  */
 
 // Interfaces with region files on the disk
@@ -267,7 +267,7 @@ public class RegionFile {
             RegionFile.this.write(x, z, buf, count);
         }
     }
-    
+
     public synchronized void deleteChunk(int x, int z) {
         try {
             int offset = getOffset(x, z);
@@ -277,13 +277,13 @@ public class RegionFile {
             /* mark the sectors previously used for this chunk as free */
             for (int i = 0; i < sectorsAllocated; ++i)
                 sectorFree.set(sectorNumber + i, true);
-            
+
             setOffset(x, z, 0);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Write the region to another output stream.
      * @param out target output stream
@@ -302,12 +302,12 @@ public class RegionFile {
                 nextFree += offset & 0xFF;
             }
         }
-        
+
         // write offset table
         for (int i = 0; i < SECTOR_INTS; ++i) {
             out.writeInt(offsets_out[i]);
         }
-        
+
         // write timestamp table
         for (int i = 0; i < SECTOR_INTS; ++i) {
             out.writeInt(chunkTimestamps[i]);
@@ -321,12 +321,12 @@ public class RegionFile {
             int offset = offsets[i];
             int sectorNumber = offset >> 8;
             int numSectors = offset & 0xFF;
-    
+
             if (sectorNumber + numSectors > sectorFree.size()) {
                 debugln("READ", -1, -1, "invalid sector");
                 return;
             }
-    
+
             file.seek(sectorNumber * SECTOR_BYTES);
             byte[] buffer = new byte[SECTOR_BYTES];
             for (int j = 0; j < numSectors; ++j) {
@@ -461,7 +461,7 @@ public class RegionFile {
             // debugln("READ", x, z, "miss");
             return false;
         }
-        
+
         return true;
 	}
 }

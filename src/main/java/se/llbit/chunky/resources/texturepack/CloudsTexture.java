@@ -38,7 +38,7 @@ public class CloudsTexture extends TextureRef {
 
 	@Override
 	boolean load(InputStream imageStream) throws IOException, TextureFormatError {
-	
+
 		BufferedImage texture = ImageIO.read(imageStream);
 		if (texture.getWidth() != texture.getHeight() ||
 				texture.getWidth() != 256) {
@@ -55,3 +55,4 @@ public class CloudsTexture extends TextureRef {
 		return true;
 	}
 }
+

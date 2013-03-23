@@ -46,13 +46,13 @@ import se.llbit.math.Vector4d;
  */
 @SuppressWarnings("unused")
 public class TestModel {
-	
+
 	private AABB[] boxes;
 	private Quad[] quads;
 	private Triangle[] triangles;
 	private UVTriangle[] uvtriangles;
 	private Vector3d light;
-	
+
 	/**
 	 * Set up the model
 	 */
@@ -76,38 +76,38 @@ public class TestModel {
 					new Vector3d(2/16., 10/16., 14/16.), new Vector4d(2/16., 14/16., 2/16., 14/16.)),
 		};
 	}
-	
+
 	private void setUpTorch() {
 		quads = new Quad[4];
-		
+
 		// west
 		quads[0] = new Quad(new Vector3d(15/16., 3/16., 0),
 				new Vector3d(15/16., 3/16., 1),
 				new Vector3d((11-12/10.)/16., 1, 0),
 				new Vector4d(0, 1, 0, 13/16.));
-		
+
 		// east
 		quads[1] = new Quad(new Vector3d((13-12/10.)/16., 1, 0),
 				new Vector3d((13-12/10.)/16., 1, 1),
 				new Vector3d(17/16., 3/16., 0),
 				new Vector4d(1, 0, 13/16., 0));
-		
+
 		// top
 		quads[2] = new Quad(
 				new Vector3d(13/16., 13/16., 9/16.),
 				new Vector3d(13/16., 13/16., 7/16.),
 				new Vector3d(11/16., 13/16., 9/16.),
 				new Vector4d(9/16., 7/16., 10/16., 8/16.));
-		
+
 		// bottom
 		quads[3] = new Quad(
 				new Vector3d(15/16., 3/16., 7/16.),
 				new Vector3d(17/16., 3/16., 7/16.),
 				new Vector3d(15/16., 3/16., 9/16.),
 				new Vector4d(7/16., 9/16., 0/16., 2/16.));
-		
+
 		uvtriangles = new UVTriangle[4];
-		
+
 		// facing south
 		uvtriangles[0] = new UVTriangle(
 				new Vector3d(8/16., 3/16., 9/16.),
@@ -123,7 +123,7 @@ public class TestModel {
 				new Vector2d(1, 13/16.),
 				new Vector2d(0, 13/16.),
 				new Vector2d(1, 0));
-		
+
 		// facing north
 		uvtriangles[2] = new UVTriangle(
 				new Vector3d(24/16., 3/16., 7/16.),
@@ -139,18 +139,18 @@ public class TestModel {
 				new Vector2d(0, 13/16.),
 				new Vector2d(1, 13/16.),
 				new Vector2d(1, 0));
-		
+
 		light = new Vector3d(.1, 1, -.1);
 		light.normalize();
 	}
-	
+
 	/**
 	 * Ray-model intersection
 	 * @param ray
 	 */
 	public void intersect(Ray ray) {
 		ray.currentMaterial = 1 << 8;
-		
+
 		for (int i = 0; i < boxes.length; ++i) {
 			if (boxes[i].intersect(ray)) {
 				if (ray.n.y > 0)
@@ -161,7 +161,7 @@ public class TestModel {
 				ray.t = ray.tNear;
 			}
 		}
-		
+
 		for (int i = 0; i < quads.length; ++i) {
 			if (quads[i].intersect(ray)) {
 				ray.n.set(quads[i].n);
@@ -173,7 +173,7 @@ public class TestModel {
 				ray.t = ray.tNear;
 			}
 		}
-		
+
 		// TORCH
 		/*
 		float[] color = null;

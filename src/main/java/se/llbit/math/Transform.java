@@ -27,14 +27,14 @@ public abstract class Transform {
 	 * @param o The vector to rotate
 	 */
 	public abstract void rotate(Vector3d o);
-	
+
 	/**
 	 * Apply the translation part of this transform to a vector
 	 * @param o The vector to translate
 	 */
 	public void translate(Vector3d o) {
 	}
-	
+
 	/**
 	 * Rotation by 90 degrees around the Y axis
 	 */
@@ -46,7 +46,7 @@ public abstract class Transform {
 	        o.z = tmp;
 	    }
 	};
-	
+
 	/**
 	 * Rotation by 90 degrees around the X axis
 	 */
@@ -58,7 +58,7 @@ public abstract class Transform {
 	        o.z = tmp;
 	    }
 	};
-	
+
 	/**
 	 * Rotation by 90 degrees around the negative X axis
 	 */
@@ -70,7 +70,7 @@ public abstract class Transform {
 	        o.z = -tmp;
 	    }
 	};
-	
+
 	/**
 	 * Rotation by 90 degrees around the Z axis
 	 */
@@ -82,7 +82,7 @@ public abstract class Transform {
 	        o.y = tmp;
 	    }
 	};
-	
+
 	/**
 	 * Rotation by 90 degrees around the negative Z axis
 	 */
@@ -94,7 +94,7 @@ public abstract class Transform {
 	        o.y = -tmp;
 	    }
 	};
-	
+
 	/**
 	 * Mirror in Y axis
 	 */
@@ -105,7 +105,7 @@ public abstract class Transform {
 	        o.y = -o.y;
 	    }
 	};
-	
+
 	/**
 	 * Mirror in X axis
 	 */

@@ -21,13 +21,13 @@ package se.llbit.chunky.world;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class EmptyRegion extends Region {
-	
+
 	/**
 	 * Singleton instance
 	 */
 	public static final EmptyRegion instance =
 			new EmptyRegion();
-	
+
 	/**
 	 * Create the empty region.
 	 */
@@ -44,7 +44,7 @@ public class EmptyRegion extends Region {
 	public boolean isEmpty() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean isParsed() {
 		return true;

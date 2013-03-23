@@ -83,10 +83,10 @@ import se.llbit.math.Vector3d;
 @SuppressWarnings("javadoc")
 public class CLRenderManager extends Thread implements Renderer,
 	ProgressListener, ViewListener {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(CLRenderManager.class);
-	
+
 	private int workItems;
 	private long[] globalWorkSize;
 	private long[] localWorkSize;
@@ -114,11 +114,11 @@ public class CLRenderManager extends Thread implements Renderer,
 	private int numSamples = 0;
 	private long renderTime = 0;
 	private double fov = 100;
-	
+
 	public CLRenderManager(JFrame parent) {
-		
+
 		super("Render Manager");
-		
+
 		view = new Chunk3DView(this, parent);
 		bufferWidth = 400;
 		bufferHeight = 400;
@@ -135,16 +135,16 @@ public class CLRenderManager extends Thread implements Renderer,
 		backBuffer = new BufferedImage(bufferWidth, bufferHeight,
 				BufferedImage.TYPE_INT_ARGB);
 	}
-	
+
 	public void setupOpenCL(cl_platform_id platform_id, cl_device_id device_id,
 			World world, Collection<ChunkPosition> chunks) {
 		cl_context_properties contextProps = new cl_context_properties();
 		contextProps.addProperty(CL_CONTEXT_PLATFORM, platform_id);
-		
+
 		cl_context context = clCreateContext(contextProps, 1, new cl_device_id[] { device_id },
 				null, null, null);
 		commandQueue = clCreateCommandQueue(context, device_id, 0, null);
-		
+
 		String kernelSource = processKernel();
 		cl_program program = clCreateProgramWithSource(context, 1,
 				new String[] {kernelSource}, null, null);
@@ -152,20 +152,20 @@ public class CLRenderManager extends Thread implements Renderer,
 		kernel = clCreateKernel(program, "path_trace", null);
 		sampleBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE,
 				3 * bufferWidth * bufferHeight * Sizeof.cl_float, null, null);
-		
+
 		Scene scene = new Scene();
 		world.setDimension(0);
 		scene.loadChunks(this, world, chunks);
 		octree = scene.getOctree();
 		origin.set(scene.calcCenterCamera());
 		origin.sub(scene.getOrigin());
-        int[] octreeData = octree.toDataBuffer();
-        logger.info("octree size: " + (4 * octreeData.length) + " bytes");
+		int[] octreeData = octree.toDataBuffer();
+		logger.info("octree size: " + (4 * octreeData.length) + " bytes");
 		octreeBuffer = clCreateBuffer(context, CL_MEM_READ_ONLY,
 				octreeData.length * Sizeof.cl_uint, null, null);
 		clEnqueueWriteBuffer(commandQueue, octreeBuffer, CL_TRUE, 0,
 				octreeData.length * Sizeof.cl_int, Pointer.to(octreeData),
-        		0, null, null);
+				0, null, null);
 		blockColorBuffer = clCreateBuffer(context, CL_MEM_READ_ONLY,
 				3 * 256 * Sizeof.cl_float, null, null);
 		transformBuffer = clCreateBuffer(context, CL_MEM_READ_ONLY,
@@ -174,45 +174,45 @@ public class CLRenderManager extends Thread implements Renderer,
 				3 * Sizeof.cl_float, null, null);
 		seedBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE,
 				workItems * Sizeof.cl_uint2, null, null);
-		
+
 		Random random = new Random(System.currentTimeMillis());
 		// seed the RNGs
-        int[] buf = new int[workItems*2];
-        for (int y = 0; y < globalWorkSize[1]; ++y) {
-        	for (int x = 0; x < globalWorkSize[0]; ++x) {
-        		buf[(int) ((x + y*globalWorkSize[0])*2)] = random.nextInt();
-        		buf[(int) ((x + y*globalWorkSize[1])*2 + 1)] = random.nextInt();
-        	}
-        }
-        clEnqueueWriteBuffer(commandQueue, seedBuffer, CL_TRUE, 0,
-        		workItems * Sizeof.cl_uint2, Pointer.to(buf),
-        		0, null, null);
-        
-        float[] blockColor = new float[256*3];
-        for (int j = 0; j < 256; ++j) {
-        	Block block = Block.get(j);
-        	float[] color;
-        	switch (block.id) {
-        	case Block.LEAVES_ID:
-        	case Block.GRASS_ID:
-        	case Block.TALLGRASS_ID:
-        		color = Biomes.getGrassColorLinear(0);
-        		System.out.print(String.format("\t0x%08X,", Biomes.getGrassColor(0)));
-        		break;
-    		default:
-	        	color = block.getTexture().getAvgColorLinear();
-	        	System.out.print(String.format("\t0x%08X,", block.getTexture().getAvgColor()));
-        	}
-        	if (j > 0 && j % 8 == 0)
-        		System.out.println();
-        	blockColor[j*3] = color[0];
-        	blockColor[j*3 + 1] = color[1];
-        	blockColor[j*3 + 2] = color[2];
-        }
-        clEnqueueWriteBuffer(commandQueue, blockColorBuffer, CL_TRUE, 0,
-        		3 * 256 * Sizeof.cl_float, Pointer.to(blockColor),
-        		0, null, null);
-        
+		int[] buf = new int[workItems*2];
+		for (int y = 0; y < globalWorkSize[1]; ++y) {
+			for (int x = 0; x < globalWorkSize[0]; ++x) {
+				buf[(int) ((x + y*globalWorkSize[0])*2)] = random.nextInt();
+				buf[(int) ((x + y*globalWorkSize[1])*2 + 1)] = random.nextInt();
+			}
+		}
+		clEnqueueWriteBuffer(commandQueue, seedBuffer, CL_TRUE, 0,
+				workItems * Sizeof.cl_uint2, Pointer.to(buf),
+				0, null, null);
+
+		float[] blockColor = new float[256*3];
+		for (int j = 0; j < 256; ++j) {
+			Block block = Block.get(j);
+			float[] color;
+			switch (block.id) {
+			case Block.LEAVES_ID:
+			case Block.GRASS_ID:
+			case Block.TALLGRASS_ID:
+				color = Biomes.getGrassColorLinear(0);
+				System.out.print(String.format("\t0x%08X,", Biomes.getGrassColor(0)));
+				break;
+			default:
+				color = block.getTexture().getAvgColorLinear();
+				System.out.print(String.format("\t0x%08X,", block.getTexture().getAvgColor()));
+			}
+			if (j > 0 && j % 8 == 0)
+				System.out.println();
+			blockColor[j*3] = color[0];
+			blockColor[j*3 + 1] = color[1];
+			blockColor[j*3 + 2] = color[2];
+		}
+		clEnqueueWriteBuffer(commandQueue, blockColorBuffer, CL_TRUE, 0,
+				3 * 256 * Sizeof.cl_float, Pointer.to(blockColor),
+				0, null, null);
+
 		updateTransform();
 		updateOrigin();
 	}
@@ -252,12 +252,12 @@ public class CLRenderManager extends Thread implements Renderer,
 					new se.llbit.j99.pp.List<se.llbit.j99.pp.Token>()));*/
 
 			IFragment processed = preprocess(fragmenter, state, resourceName, basePath);
-			
+
 			in.close();
 
 			CompileProblem.reportProblems(problems);
 			if (!CompileProblem.isCritical(problems)) {
-				
+
 				Reader reader = new FragmentReader(processed);
 
 				while (reader.ready())
@@ -276,7 +276,7 @@ public class CLRenderManager extends Thread implements Renderer,
 
 		return null;
 	}
-	
+
 	private static IFragment preprocess(IFragmenter in, PPState state, String fn, String basePath) {
 		Identifier name = new Identifier("__FILE__");
 		StringLit filename = new StringLit("\""+fn+"\"");
@@ -292,48 +292,48 @@ public class CLRenderManager extends Thread implements Renderer,
 		root.accept(visitor);
 		return new CompositeFragment(visitor.getResult());
 	}
-	
+
 	public void run() {
 		float[] samples;
 		long frameStart;
 
 		while (!isInterrupted()) {
-	        synchronized (this) {
-	        
-	        	frameStart = System.currentTimeMillis();
-		        clSetKernelArg(kernel, 0, Sizeof.cl_mem, Pointer.to(sampleBuffer));
-		        clSetKernelArg(kernel, 1, Sizeof.cl_mem, Pointer.to(originBuffer));
-		        clSetKernelArg(kernel, 2, Sizeof.cl_mem, Pointer.to(octreeBuffer));
-		        clSetKernelArg(kernel, 3, Sizeof.cl_uint, Pointer.to(new int[] {octree.depth}));
-		        clSetKernelArg(kernel, 4, Sizeof.cl_mem, Pointer.to(transformBuffer));
-		        clSetKernelArg(kernel, 5, Sizeof.cl_float, Pointer.to(new float[] { (float) fov }));
-		        clSetKernelArg(kernel, 6, Sizeof.cl_mem, Pointer.to(seedBuffer));
-		        clSetKernelArg(kernel, 7, Sizeof.cl_uint, Pointer.to(new int[] {numSamples}));
-		        clSetKernelArg(kernel, 8, Sizeof.cl_mem, Pointer.to(blockColorBuffer));
-	
-		        clEnqueueNDRangeKernel(commandQueue, kernel, 2, null, 
-		                globalWorkSize, localWorkSize, 0, null, null);
-		        samples = new float[bufferWidth*bufferHeight*3];
-		        clEnqueueReadBuffer(commandQueue, sampleBuffer, CL_TRUE, 0,
-		        		3 * bufferWidth * bufferHeight * Sizeof.cl_float, Pointer.to(samples),
-		        		0, null, null);
-		        
-		        renderTime += System.currentTimeMillis() - frameStart;
-	        }
-	        
-	        numSamples += 1;
-	        if (numSamples % 10 == 0) {
-	        	logger.info("SPS: " + (int) ((numSamples * workItems) / Math.max(1, (renderTime/1000.))));
-	        }
-	        updateCanvas(samples);
+			synchronized (this) {
+
+				frameStart = System.currentTimeMillis();
+				clSetKernelArg(kernel, 0, Sizeof.cl_mem, Pointer.to(sampleBuffer));
+				clSetKernelArg(kernel, 1, Sizeof.cl_mem, Pointer.to(originBuffer));
+				clSetKernelArg(kernel, 2, Sizeof.cl_mem, Pointer.to(octreeBuffer));
+				clSetKernelArg(kernel, 3, Sizeof.cl_uint, Pointer.to(new int[] {octree.depth}));
+				clSetKernelArg(kernel, 4, Sizeof.cl_mem, Pointer.to(transformBuffer));
+				clSetKernelArg(kernel, 5, Sizeof.cl_float, Pointer.to(new float[] { (float) fov }));
+				clSetKernelArg(kernel, 6, Sizeof.cl_mem, Pointer.to(seedBuffer));
+				clSetKernelArg(kernel, 7, Sizeof.cl_uint, Pointer.to(new int[] {numSamples}));
+				clSetKernelArg(kernel, 8, Sizeof.cl_mem, Pointer.to(blockColorBuffer));
+
+				clEnqueueNDRangeKernel(commandQueue, kernel, 2, null,
+						globalWorkSize, localWorkSize, 0, null, null);
+				samples = new float[bufferWidth*bufferHeight*3];
+				clEnqueueReadBuffer(commandQueue, sampleBuffer, CL_TRUE, 0,
+						3 * bufferWidth * bufferHeight * Sizeof.cl_float, Pointer.to(samples),
+						0, null, null);
+
+				renderTime += System.currentTimeMillis() - frameStart;
+			}
+
+			numSamples += 1;
+			if (numSamples % 10 == 0) {
+				logger.info("SPS: " + (int) ((numSamples * workItems) / Math.max(1, (renderTime/1000.))));
+			}
+			updateCanvas(samples);
 		}
 	}
-	
+
 	public synchronized void refresh() {
 		numSamples = 0;
 		renderTime = 0;
 	}
-	
+
 	public synchronized void updateTransform() {
 		tmpTransform.rotZ(pitch);
 		transform.rotY(yaw);
@@ -350,9 +350,9 @@ public class CLRenderManager extends Thread implements Renderer,
 		mat[8] = (float) transform.m33;
 		clEnqueueWriteBuffer(commandQueue, transformBuffer, CL_TRUE, 0,
 				mat.length * Sizeof.cl_float, Pointer.to(mat),
-        		0, null, null);
+				0, null, null);
 	}
-	
+
 	public synchronized void updateOrigin() {
 		float[] o = new float[3];
 		o[0] = (float) origin.x;
@@ -360,29 +360,29 @@ public class CLRenderManager extends Thread implements Renderer,
 		o[2] = (float) origin.z;
 		clEnqueueWriteBuffer(commandQueue, originBuffer, CL_TRUE, 0,
 				o.length * Sizeof.cl_float, Pointer.to(o),
-        		0, null, null);
+				0, null, null);
 	}
 
 	private void updateCanvas(float[] samples) {
 		try {
-	        synchronized (buffer) {
+			synchronized (buffer) {
 				DataBufferInt dataBuffer =
 						(DataBufferInt) backBuffer.getRaster().getDataBuffer();
-		        int[] imgData = dataBuffer.getData();
-		        
+				int[] imgData = dataBuffer.getData();
+
 				// paint the back buffer
-		        for (int i = 0; i < bufferWidth*bufferHeight; ++i) {
-		        	imgData[i] = Color.getRGB(
-		        			Math.min(1, Math.pow(samples[i*3], 1/2.2)),
-		        			Math.min(1, Math.pow(samples[i*3+1], 1/2.2)),
-	    					Math.min(1, Math.pow(samples[i*3+2], 1/2.2)));
-		        }
-	        
-	        	// flip buffers
-		        BufferedImage tmp = buffer;
-		        buffer = backBuffer;
-		        backBuffer = tmp;
-	        }
+				for (int i = 0; i < bufferWidth*bufferHeight; ++i) {
+					imgData[i] = Color.getRGB(
+							Math.min(1, Math.pow(samples[i*3], 1/2.2)),
+							Math.min(1, Math.pow(samples[i*3+1], 1/2.2)),
+							Math.min(1, Math.pow(samples[i*3+2], 1/2.2)));
+				}
+
+				// flip buffers
+				BufferedImage tmp = buffer;
+				buffer = backBuffer;
+				backBuffer = tmp;
+			}
 			view.getCanvas().repaint();
 		} catch (IllegalStateException e) {
 			logger.error("Unexpected exception while rendering back buffer", e);
@@ -481,15 +481,15 @@ public class CLRenderManager extends Thread implements Renderer,
 		double fovRad = (fov / 360) * Math.PI;
 		this.yaw += dyaw * fovRad;
 		this.pitch += dpitch * fovRad;
-		
+
 		this.pitch = Math.min(0, this.pitch);
 		this.pitch = Math.max(-Math.PI, this.pitch);
-		
+
 		if (this.yaw > Math.PI * 2)
 			this.yaw -= Math.PI * 2;
 		else if (this.yaw < -Math.PI * 2)
 			this.yaw += Math.PI * 2;
-		
+
 		updateTransform();
 		refresh();
 	}

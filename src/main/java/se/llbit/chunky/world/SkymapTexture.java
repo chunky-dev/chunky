@@ -36,10 +36,10 @@ import se.llbit.util.ImageTools;
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class SkymapTexture extends Texture {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(SkymapTexture.class);
-	
+
 	class TexturePreprocessor extends Thread {
 		private int x0;
 		private int x1;
@@ -48,13 +48,13 @@ public class SkymapTexture extends Texture {
 
 		TexturePreprocessor(int x0, int x1, int y0, int y1) {
 			super("Texture Preprocessor");
-			
+
 			this.x0 = x0;
 			this.x1 = x1;
 			this.y0 = y0;
 			this.y1 = y1;
 		}
-		
+
 		@Override
 		public void run() {
 			float[] c = new float[4];
@@ -84,7 +84,7 @@ public class SkymapTexture extends Texture {
 
 	@Override
 	public void setTexture(BufferedImage newImage) {
-		
+
 		if (newImage.getType() == BufferedImage.TYPE_INT_ARGB) {
 			image = newImage;
 		} else {
@@ -95,19 +95,19 @@ public class SkymapTexture extends Texture {
 			g.drawImage(newImage, 0, 0, null);
 			g.dispose();
 		}
-		
+
 		DataBufferInt dataBuffer = (DataBufferInt) image.getRaster().getDataBuffer();
 		data = dataBuffer.getData();
-		
+
 		width = image.getWidth();
 		height = image.getHeight();
 		avgColor = ImageTools.calcAvgColor(image);
-		
+
 		logger.info("Preprocessing skymap texture");
 		long start = System.currentTimeMillis();
-		
+
 		// gamma correct the texture
-		
+
 		int segX = 4;
 		int segY = 4;
 		if (width < segX)
@@ -133,7 +133,7 @@ public class SkymapTexture extends Texture {
 				preprocessor[i][j].start();
 			}
 		}
-		
+
 		for (int i = 0; i < segX; ++i) {
 			for (int j = 0; j < segY; ++j) {
 				try {
@@ -142,11 +142,11 @@ public class SkymapTexture extends Texture {
 				}
 			}
 		}
-		
+
 		long time = System.currentTimeMillis() - start;
-		
+
 		logger.info("Skymap preprocessing took " + time + "ms");
-		
+
 	}
 
 	@Override
@@ -156,7 +156,7 @@ public class SkymapTexture extends Texture {
 				width * (int) ((1-v) * height - Ray.EPSILON)],
 				c);
 	}
-	
+
 	/**
 	 * Get skymap color at (x, y)
 	 * @param x
@@ -186,7 +186,7 @@ public class SkymapTexture extends Texture {
 		int cx = QuickMath.ceil(x);
 		int fy = QuickMath.floor(y);
 		int cy = QuickMath.ceil(y);
-		
+
 		double r, g, b;
 		getColor(fx % width, fy, c);
 		weight = (1 - (y-fy)) * (1 - (x-fx));
@@ -240,6 +240,6 @@ public class SkymapTexture extends Texture {
 	public int getWidth() {
 		return super.getWidth();
 	}
-	
-	
+
+
 }

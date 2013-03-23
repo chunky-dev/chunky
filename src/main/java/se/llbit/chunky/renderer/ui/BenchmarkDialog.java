@@ -52,10 +52,10 @@ import se.llbit.util.ProgramProperties;
  */
 @SuppressWarnings("serial")
 public class BenchmarkDialog extends JDialog implements RenderStatusListener {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(BenchmarkDialog.class);
-	
+
 	private JProgressBar progressBar = new JProgressBar();
 	private JButton startBtn = new JButton();
 	private JButton stopBtn = new JButton();
@@ -64,23 +64,23 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 	private JLabel statusLbl = new JLabel();
 	private JLabel scoreLbl = new JLabel();
 	private final DecimalFormat decimalFormat;
-	
+
 	/**
 	 * Constructor
-	 * @param parent 
-	 * @param context 
+	 * @param parent
+	 * @param context
 	 */
 	public BenchmarkDialog(JFrame parent, RenderContext context) {
 		super(parent, "Benchmark");
-		
+
 		decimalFormat = new DecimalFormat();
 		decimalFormat.setGroupingSize(3);
 		decimalFormat.setGroupingUsed(true);
-		
+
 		this.context = context;
-		
+
 		setModalityType(ModalityType.MODELESS);
-		
+
 		startBtn.setText("Start");
 		startBtn.addActionListener(new ActionListener() {
 			@Override
@@ -88,7 +88,7 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 				startBenchmark();
 			}
 		});
-		
+
 		stopBtn.setText("Stop");
 		stopBtn.addActionListener(new ActionListener() {
 			@Override
@@ -97,12 +97,12 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 			}
 		});
 		stopBtn.setEnabled(false);
-		
+
 		setStatus("not started");
 		setScore("N/A");
-		
+
 		progressBar.setPreferredSize(new Dimension(400, 25));
-		
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -139,7 +139,7 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 		pack();
 		setLocationRelativeTo(parent);
 		setVisible(true);
-		
+
 		addWindowListener(new WindowListener() {
 			@Override
 			public void windowOpened(WindowEvent e) {
@@ -167,7 +167,7 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 			}
 		});
 	}
-	
+
 	private synchronized void startBenchmark() {
 		if (benchmark == null) {
 			benchmark = new BenchmarkManager(context, BenchmarkDialog.this);
@@ -190,7 +190,7 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 			progressBar.setValue(0);
 		}
 	}
-	
+
 	private void setStatus(String statusText) {
 		statusLbl.setText("Status: " + statusText);
 	}
@@ -212,7 +212,7 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 			stopBtn.setEnabled(false);
 			setStatus("completed");
 			setScore(decimalFormat.format(score));
-			
+
 			recordBenchmarkScore(benchmarkScene, score);
 		} else {
 			setStatus("running (" + ((done*100)/target) + "%)");
@@ -249,42 +249,42 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 	@Override
 	public void chunksLoaded() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setRenderTime(long time) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setSamplesPerSecond(int sps) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setSPP(int spp) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void sceneSaved() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void sceneLoaded() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void renderStateChanged(boolean pathTrace, boolean paused) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

@@ -29,13 +29,13 @@ import se.llbit.math.Triangle;
  */
 public class LavaModel {
 	private static AABB fullBlock = new AABB(0, 1, 0, 1, 0, 1);
-	
+
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray) {
 		ray.t = Double.POSITIVE_INFINITY;
 		int data = ray.currentMaterial;
 		int isFull = (data >> WaterModel.FULL_BLOCK) & 1;
-		
+
 		if (isFull != 0) {
 			if (fullBlock.intersect(ray)) {
 				Texture.lava.getColor(ray);
@@ -45,7 +45,7 @@ public class LavaModel {
 			}
 			return false;
 		}
-		
+
 		int c0 = (0xF & (data >> 16)) % 8;
 		int c1 = (0xF & (data >> 20)) % 8;
 		int c2 = (0xF & (data >> 24)) % 8;

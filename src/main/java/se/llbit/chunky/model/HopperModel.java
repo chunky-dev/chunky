@@ -43,7 +43,7 @@ public class HopperModel {
 		// center
 		new AABB(4/16., 12/16., 4/16., 10/16., 4/16., 12/16.),
 	};
-	
+
 	private static final AABB[] pipe = new AABB[] {
 		// bottom
 		new AABB(6/16., 10/16., 0, 4/16., 6/16., 10/16.),
@@ -62,7 +62,7 @@ public class HopperModel {
 		// bottom
 		new AABB(6/16., 10/16., 0, 4/16., 6/16., 10/16.),
 	};
-	
+
 	private static final Quad bottom = new DoubleSidedQuad(
 			new Vector3d(2/16., 10/16., 2/16.), new Vector3d(14/16., 10/16., 2/16.),
 			new Vector3d(2/16., 10/16., 14/16.), new Vector4d(2/16., 14/16., 2/16., 14/16.));

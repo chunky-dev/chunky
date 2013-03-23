@@ -36,20 +36,20 @@ public class TorchModel {
 				new Vector3d(15/16., 3/16., 1),
 				new Vector3d((11-12/10.)/16., 1, 0),
 				new Vector4d(0, 1, 0, 13/16.)),
-		
+
 		// east
 		new Quad(new Vector3d((13-12/10.)/16., 1, 0),
 				new Vector3d((13-12/10.)/16., 1, 1),
 				new Vector3d(17/16., 3/16., 0),
 				new Vector4d(1, 0, 13/16., 0)),
-		
+
 		// top
 		new Quad(
 				new Vector3d(13/16., 13/16., 9/16.),
 				new Vector3d(13/16., 13/16., 7/16.),
 				new Vector3d(11/16., 13/16., 9/16.),
 				new Vector4d(9/16., 7/16., 10/16., 8/16.)),
-		
+
 		// bottom
 		new Quad(
 				new Vector3d(15/16., 3/16., 7/16.),
@@ -57,7 +57,7 @@ public class TorchModel {
 				new Vector3d(15/16., 3/16., 9/16.),
 				new Vector4d(7/16., 9/16., 0/16., 2/16.))
 	};
-	
+
 	// facing west
 	private static final UVTriangle[] uvtriangles = {
 		// facing south
@@ -75,7 +75,7 @@ public class TorchModel {
 				new Vector2d(1, 13/16.),
 				new Vector2d(0, 13/16.),
 				new Vector2d(1, 0)),
-		
+
 		// facing north
 		new UVTriangle(
 				new Vector3d(24/16., 3/16., 7/16.),
@@ -92,28 +92,28 @@ public class TorchModel {
 				new Vector2d(1, 13/16.),
 				new Vector2d(1, 0))
 	};
-	
+
 	private static Quad[] onGround = {
 		new Quad(new Vector3d(.75, 0, .4375), new Vector3d(.25, 0, .4375),
 				new Vector3d(.75, 1, .4375), new Vector4d(.75, .25, 0, 1)),
 
 		new Quad(new Vector3d(.25, 0, .5625), new Vector3d(.75, 0, .5625),
 				new Vector3d(.25, 1, .5625), new Vector4d(.25, .75, 0, 1)),
-				
+
 		new Quad(new Vector3d(.4375, 0, .25), new Vector3d(.4375, 0, .75),
 				new Vector3d(.4375, 1, .25), new Vector4d(.25, .75, 0, 1)),
 
 		new Quad(new Vector3d(.5625, 0, .75), new Vector3d(.5625, 0, .25),
 				new Vector3d(.5625, 1, .75), new Vector4d(.75, .25, 0, 1)),
-				
+
 		// top
 		new Quad(new Vector3d(.4375, .625, .5625), new Vector3d(.5625, .625, .5625),
 				new Vector3d(.4375, .625, .4375), new Vector4d(.4375, .5625, .5, .625)),
 	};
-	
+
 	private static Quad[][] rotQuads = new Quad[6][];
 	private static UVTriangle[][] rotTriangles = new UVTriangle[6][];
-	
+
 	static {
 		rotQuads[0] = new Quad[0];
 		rotTriangles[0] = new UVTriangle[0];
@@ -121,23 +121,23 @@ public class TorchModel {
 		// pointing west
 		rotQuads[2] = quads;
 		rotTriangles[2] = uvtriangles;
-		
+
 		// pointing north
 		rotQuads[4] = rotateY(rotQuads[2]);
 		rotTriangles[4] = rotateY(rotTriangles[2]);
-		
+
 		// pointing east
 		rotQuads[1] = rotateY(rotQuads[4]);
 		rotTriangles[1] = rotateY(rotTriangles[4]);
-		
+
 		// pointing south
 		rotQuads[3] = rotateY(rotQuads[1]);
 		rotTriangles[3] = rotateY(rotTriangles[1]);
-		
+
 		// on ground
 		rotQuads[5] = onGround;
 		rotTriangles[5] = new UVTriangle[0];
-		
+
 	}
 
 	public static boolean intersect(Ray ray, Texture texture) {

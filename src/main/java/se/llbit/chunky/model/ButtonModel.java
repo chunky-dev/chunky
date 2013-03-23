@@ -32,7 +32,7 @@ public class ButtonModel {
 		// back
 		new Quad(new Vector3d(.3125, .375, 1), new Vector3d(.6875, .375, 1),
 				new Vector3d(.3125, .625, 1), new Vector4d(.3125, .6875, .375, .625)),
-		
+
 		// right
 		new Quad(new Vector3d(.3125, .375, .875), new Vector3d(.3125, .375, 1),
 				new Vector3d(.3125, .625, .875), new Vector4d(.875, 1, .375, .625)),
@@ -44,16 +44,16 @@ public class ButtonModel {
 		// top
 		new Quad(new Vector3d(.6875, .625, .875), new Vector3d(.3125, .625, .875),
 				new Vector3d(.6875, .625, 1), new Vector4d(.6875, .3125, .875, 1)),
-		
+
 		// bottom
 		new Quad(new Vector3d(.3125, .375, .875), new Vector3d(.6875, .375, .875),
 				new Vector3d(.3125, .375, 1), new Vector4d(.3125, .6875, .875, 1)),
-				
+
 	};
-	
+
 	private static Quad[][] rot = new Quad[4][];
 	private static final int[] index = { 0, 1, 3, 2 };
-	
+
 	static {
 		rot[0] = quads;
 		for (int angle = 1; angle < 4; ++angle) {

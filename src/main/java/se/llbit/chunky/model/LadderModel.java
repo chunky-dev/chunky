@@ -40,7 +40,7 @@ public class LadderModel {
 		// south
 		new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 				new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
-				
+
 
 	};
 

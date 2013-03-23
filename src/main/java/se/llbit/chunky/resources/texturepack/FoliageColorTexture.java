@@ -47,3 +47,4 @@ public class FoliageColorTexture extends TextureRef {
 		return true;
 	}
 }
+

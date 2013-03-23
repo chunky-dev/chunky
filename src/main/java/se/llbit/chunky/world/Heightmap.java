@@ -24,7 +24,7 @@ import java.util.Map;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Heightmap {
-    
+
     private Map<ChunkPosition, ChunkHeightmap> map =
             new HashMap<ChunkPosition, ChunkHeightmap>();
 

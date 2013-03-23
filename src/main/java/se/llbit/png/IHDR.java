@@ -23,12 +23,12 @@ import java.io.IOException;
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
 public class IHDR extends PngChunk {
-	
+
 	/**
 	 * The PNG chunk type identifier
 	 */
 	public static final int CHUNK_TYPE = 0x49484452;
-	
+
 	private static final int BIT_DEPTH = 8;
 	private static final int COLOUR_TYPE = 2;
 	private static final int COMPRESSION_METHOD = 0;
@@ -37,7 +37,7 @@ public class IHDR extends PngChunk {
 	private int crc;
 	private int width;
 	private int height;
-	
+
 	/**
 	 * @param width
 	 * @param height
@@ -58,16 +58,16 @@ public class IHDR extends PngChunk {
 		DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
 
 		crcOut.writeInt(CHUNK_TYPE);
-		
+
 		crcOut.writeInt(width);
 		out.writeInt(width);
-		
+
 		crcOut.writeInt(height);
 		out.writeInt(height);
-		
+
 		crcOut.writeByte(BIT_DEPTH);
 		out.writeByte(BIT_DEPTH);
-		
+
 		crcOut.writeByte(COLOUR_TYPE);
 		out.writeByte(COLOUR_TYPE);
 
@@ -79,7 +79,7 @@ public class IHDR extends PngChunk {
 
 		crcOut.writeByte(INTERLACE_METHOD);
 		out.writeByte(INTERLACE_METHOD);
-		
+
 		crc = crcOutputStream.getCRC();
 		crcOut.close();
 	}
@@ -93,6 +93,6 @@ public class IHDR extends PngChunk {
 	public int getChunkCRC() {
 		return crc;
 	}
-	
+
 
 }

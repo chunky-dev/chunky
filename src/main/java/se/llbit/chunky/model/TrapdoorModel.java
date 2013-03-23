@@ -30,28 +30,28 @@ public class TrapdoorModel {
 			// front
 			new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
 					new Vector3d(1, .1875, 0), new Vector4d(1, 0, 0, .1875)),
-		
+
 			// back
 			new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
 					new Vector3d(0, .1875, 1), new Vector4d(0, 1, 0, .1875)),
-			
+
 			// right
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
 					new Vector3d(0, .1875, 0), new Vector4d(0, 1, 0, .1875)),
-		
+
 			// left
 			new Quad(new Vector3d(1, 0, 1), new Vector3d(1, 0, 0),
 					new Vector3d(1, .1875, 1), new Vector4d(1, 0, 0, .1875)),
-		
+
 			// top
 			new Quad(new Vector3d(1, .1875, 0), new Vector3d(0, .1875, 0),
 					new Vector3d(1, .1875, 1), new Vector4d(1, 0, 0, 1)),
-			
+
 			// bottom
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
 		},
-		
+
 		// facing north
 		{
 			// north
@@ -61,7 +61,7 @@ public class TrapdoorModel {
 			// south
 			new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
 					new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
-			
+
 			// west
 			new Quad(new Vector3d(0, 0, .8125), new Vector3d(0, 0, 1),
 					new Vector3d(0, 1, .8125), new Vector4d(.8125, 1, 0, 1)),
@@ -73,12 +73,12 @@ public class TrapdoorModel {
 			// top
 			new Quad(new Vector3d(1, 1, .8125), new Vector3d(0, 1, .8125),
 					new Vector3d(1, 1, 1), new Vector4d(1, 0, .8125, 1)),
-			
+
 			// bottom
 			new Quad(new Vector3d(0, 0, .8125), new Vector3d(1, 0, .8125),
 					new Vector3d(0, 0, 1), new Vector4d(0, 1, .8125, 1)),
 		},
-		
+
 		// facing south
 		{
 			// north
@@ -88,7 +88,7 @@ public class TrapdoorModel {
 			// south
 			new Quad(new Vector3d(0, 0, .1875), new Vector3d(1, 0, .1875),
 					new Vector3d(0, 1, .1875), new Vector4d(0, 1, 0, 1)),
-			
+
 			// west
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, .1875),
 					new Vector3d(0, 1, 0), new Vector4d(0, .1875, 0, 1)),
@@ -100,7 +100,7 @@ public class TrapdoorModel {
 			// top
 			new Quad(new Vector3d(1, 1, 0), new Vector3d(0, 1, 0),
 					new Vector3d(1, 1, .1875), new Vector4d(1, 0, 0, .1875)),
-			
+
 			// bottom
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 0, .1875), new Vector4d(0, 1, 0, .1875)),
@@ -115,7 +115,7 @@ public class TrapdoorModel {
 			// south
 			new Quad(new Vector3d(.8125, 0, 1), new Vector3d(1, 0, 1),
 					new Vector3d(.8125, 1, 1), new Vector4d(.8125, 1, 0, 1)),
-			
+
 			// west
 			new Quad(new Vector3d(.8125, 0, 0), new Vector3d(.8125, 0, 1),
 					new Vector3d(.8125, 1, 0), new Vector4d(0, 1, 0, 1)),
@@ -127,12 +127,12 @@ public class TrapdoorModel {
 			// top
 			new Quad(new Vector3d(1, 1, 0), new Vector3d(.8125, 1, 0),
 					new Vector3d(1, 1, 1), new Vector4d(1, .8125, 0, 1)),
-			
+
 			// bottom
 			new Quad(new Vector3d(.8125, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(.8125, 0, 1), new Vector4d(.8125, 1, 0, 1)),
 		},
-		
+
 		// facing east
 		{
 			// north
@@ -142,7 +142,7 @@ public class TrapdoorModel {
 			// south
 			new Quad(new Vector3d(0, 0, 1), new Vector3d(.1875, 0, 1),
 					new Vector3d(0, 1, 1), new Vector4d(0, .1875, 0, 1)),
-			
+
 			// west
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
 					new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
@@ -154,7 +154,7 @@ public class TrapdoorModel {
 			// top
 			new Quad(new Vector3d(.1875, 1, 0), new Vector3d(0, 1, 0),
 					new Vector3d(.1875, 1, 1), new Vector4d(.1875, 0, 0, 1)),
-			
+
 			// bottom
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(.1875, 0, 0),
 					new Vector3d(0, 0, 1), new Vector4d(0, .1875, 0, 1)),

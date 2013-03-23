@@ -23,9 +23,9 @@ package se.llbit.chunky.world;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkHeightmap {
-    
+
     short[] data = new short[4 * Chunk.X_MAX * Chunk.Z_MAX];
-    
+
     /**
      * Create new heightmap
      */
@@ -43,7 +43,7 @@ public class ChunkHeightmap {
     public void set(int y, int x, int z) {
         data[x + 2 * z * Chunk.X_MAX] = (short) y;
     }
-    
+
     /**
      * @param x
      * @param z

@@ -27,13 +27,13 @@ public class SpriteModel {
 	protected static Quad[] quads = {
 		new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 1),
 				new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
-					
+
 		new Quad(new Vector3d(1, 0, 1), new Vector3d(0, 0, 0),
 				new Vector3d(1, 1, 1), new Vector4d(0, 1, 0, 1)),
-					
+
 		new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 1),
 				new Vector3d(1, 1, 0), new Vector4d(0, 1, 0, 1)),
-				
+
 		new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 0),
 				new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
 	};

@@ -41,38 +41,38 @@ public class FlowerPotModel {
 		// center
 		new AABB(6/16., 10/16., 0, 4/16., 6/16., 10/16.),
 	};
-	
+
 	private static final AABB cactus =
 		new AABB(6/16., 10/16., 4/16., 1, 6/16., 10/16.);
-	
+
 	protected static Quad[] flower = {
 		new Quad(new Vector3d(0, 4/16., 0), new Vector3d(1, 4/16., 1),
 				new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 12/16.)),
-					
+
 		new Quad(new Vector3d(1, 4/16., 1), new Vector3d(0, 4/16., 0),
 				new Vector3d(1, 1, 1), new Vector4d(0, 1, 0, 12/16.)),
-					
+
 		new Quad(new Vector3d(1, 4/16., 0), new Vector3d(0, 4/16., 1),
 				new Vector3d(1, 1, 0), new Vector4d(0, 1, 0, 12/16.)),
-				
+
 		new Quad(new Vector3d(0, 4/16., 1), new Vector3d(1, 4/16., 0),
 				new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 12/16.)),
 	};
-	
+
 	protected static Quad[] flowerSmall = {
 		new Quad(new Vector3d(2/16., 4/16., 2/16.), new Vector3d(14/16., 4/16., 14/16.),
 				new Vector3d(2/16., 1, 2/16.), new Vector4d(0, 1, 0, 1)),
-					
+
 		new Quad(new Vector3d(14/16., 4/16., 14/16.), new Vector3d(2/16., 4/16., 2/16.),
 				new Vector3d(14/16., 1, 14/16.), new Vector4d(0, 1, 0, 1)),
-					
+
 		new Quad(new Vector3d(14/16., 4/16., 2/16.), new Vector3d(2/16., 4/16., 14/16.),
 				new Vector3d(14/16., 1, 2/16.), new Vector4d(0, 1, 0, 1)),
-				
+
 		new Quad(new Vector3d(2/16., 4/16., 14/16.), new Vector3d(14/16., 4/16., 2/16.),
 				new Vector3d(2/16., 1, 14/16.), new Vector4d(0, 1, 0, 1)),
 	};
-	
+
 	private static final Texture[] tex = {
 		Texture.flowerPot,
 		Texture.flowerPot,
@@ -80,11 +80,11 @@ public class FlowerPotModel {
 		Texture.flowerPot,
 		Texture.dirt,
 	};
-	
+
 	/**
 	 * Find intersection between ray and block
 	 * @param ray
-	 * @param scene 
+	 * @param scene
 	 * @return <code>true</code> if the ray intersected the block
 	 */
 	public static boolean intersect(Ray ray, Scene scene) {

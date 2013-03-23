@@ -35,7 +35,7 @@ public class LargeChestTexture extends TextureRef {
 	public LargeChestTexture(String file) {
 		super(file);
 	}
-	
+
 	@Override
 	boolean load(InputStream imageStream) throws IOException, TextureFormatError {
 		BufferedImage spritemap = ImageIO.read(imageStream);
@@ -59,85 +59,86 @@ public class LargeChestTexture extends TextureRef {
 		Texture.largeChestBackRight.setTexture(loadLargeChestTexture(spritemap, scale, 5, 2));
 		return true;
 	}
-	
-private static BufferedImage loadLargeChestTexture(BufferedImage spritemap, int scale, int u, int v) {
-	BufferedImage img = new BufferedImage(scale*16, scale*16,
-			BufferedImage.TYPE_INT_ARGB);
-	
-	int x0 = 14*u*scale;
-	int x1 = 14*(u+1)*scale;
-	int xo = 0;
-	int[][][] offsets = {
-			// v == 0
-			{
-				{0, 0, 0},
-				{0, 1, 0},
-				{1, 2, -1},
-			},
-			// v == 1
-			{
-				{0, 0, 0},
-				{0, 1, 0},
-				{1, 2, -1},
-				{2, 3, 0},
-				{3, 4, -1},
-			},
-			// v == 2
-			{
-				{0, 0, 0},
-				{0, 1, 0},
-				{1, 2, -1},
-				{2, 2, 0},
-				{2, 3, 0},
-				{3, 4, -1},
-			},
-	};
-	x0 += offsets[v][u][0]*scale;
-	x1 += offsets[v][u][1]*scale;
-	xo += offsets[v][u][2]*scale;
-	
-	if (v == 0) {
-		int y0 = 0;
-		int y1 = 14*scale;
-		for (int y = y0; y < y1; ++y) {
-			int sy = y - y0 + scale;
-			for (int x = x0; x < x1; ++x) {
-				int sx = x - x0 + scale + xo;
-				img.setRGB(sx, sy, spritemap.getRGB(x, y));
+
+	private static BufferedImage loadLargeChestTexture(BufferedImage spritemap, int scale, int u, int v) {
+		BufferedImage img = new BufferedImage(scale*16, scale*16,
+				BufferedImage.TYPE_INT_ARGB);
+
+		int x0 = 14*u*scale;
+		int x1 = 14*(u+1)*scale;
+		int xo = 0;
+		int[][][] offsets = {
+				// v == 0
+				{
+					{0, 0, 0},
+					{0, 1, 0},
+					{1, 2, -1},
+				},
+				// v == 1
+				{
+					{0, 0, 0},
+					{0, 1, 0},
+					{1, 2, -1},
+					{2, 3, 0},
+					{3, 4, -1},
+				},
+				// v == 2
+				{
+					{0, 0, 0},
+					{0, 1, 0},
+					{1, 2, -1},
+					{2, 2, 0},
+					{2, 3, 0},
+					{3, 4, -1},
+				},
+		};
+		x0 += offsets[v][u][0]*scale;
+		x1 += offsets[v][u][1]*scale;
+		xo += offsets[v][u][2]*scale;
+
+		if (v == 0) {
+			int y0 = 0;
+			int y1 = 14*scale;
+			for (int y = y0; y < y1; ++y) {
+				int sy = y - y0 + scale;
+				for (int x = x0; x < x1; ++x) {
+					int sx = x - x0 + scale + xo;
+					img.setRGB(sx, sy, spritemap.getRGB(x, y));
+				}
 			}
-		}
-	} else if (v == 1) {
-		int y0 = (14+5)*scale;
-		int y1 = (14*2+5)*scale;
-		for (int y = y0; y < y1; ++y) {
-			int sy = y - y0 + scale;
-			for (int x = x0; x < x1; ++x) {
-				int sx = x - x0 + scale + xo;
-				img.setRGB(sx, sy, spritemap.getRGB(x, y));
+		} else if (v == 1) {
+			int y0 = (14+5)*scale;
+			int y1 = (14*2+5)*scale;
+			for (int y = y0; y < y1; ++y) {
+				int sy = y - y0 + scale;
+				for (int x = x0; x < x1; ++x) {
+					int sx = x - x0 + scale + xo;
+					img.setRGB(sx, sy, spritemap.getRGB(x, y));
+				}
 			}
-		}
-	} else /*if (v == 2)*/ {
-		int y0 = 14*scale;
-		int y1 = (14+5)*scale;
-		for (int y = y0; y < y1; ++y) {
-			int sy = y - y0 + scale;
-			for (int x = x0; x < x1; ++x) {
-				int sx = x - x0 + scale + xo;
-				img.setRGB(sx, sy, spritemap.getRGB(x, y));
+		} else /*if (v == 2)*/ {
+			int y0 = 14*scale;
+			int y1 = (14+5)*scale;
+			for (int y = y0; y < y1; ++y) {
+				int sy = y - y0 + scale;
+				for (int x = x0; x < x1; ++x) {
+					int sx = x - x0 + scale + xo;
+					img.setRGB(sx, sy, spritemap.getRGB(x, y));
+				}
 			}
-		}
-		y0 = (14*2+6)*scale;
-		y1 = (14*3+1)*scale;
-		for (int y = y0; y < y1; ++y) {
-			int sy = y - y0 + 6*scale;
-			for (int x = x0; x < x1; ++x) {
-				int sx = x - x0 + scale + xo;
-				img.setRGB(sx, sy, spritemap.getRGB(x, y));
+			y0 = (14*2+6)*scale;
+			y1 = (14*3+1)*scale;
+			for (int y = y0; y < y1; ++y) {
+				int sy = y - y0 + 6*scale;
+				for (int x = x0; x < x1; ++x) {
+					int sx = x - x0 + scale + xo;
+					img.setRGB(sx, sy, spritemap.getRGB(x, y));
+				}
 			}
+
 		}
-		
+		return img;
 	}
-	return img;
-}
 
 }
+

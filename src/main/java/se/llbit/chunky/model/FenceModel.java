@@ -23,7 +23,7 @@ import se.llbit.math.Ray;
 @SuppressWarnings("javadoc")
 public class FenceModel {
 	private static AABB post = new AABB(.375, .625, 0, 1, .375, .625);
-	
+
 	private static AABB[][] plank = {
 		{
 			new AABB(7/16.0, 9/16.0, 6/16.0, 9/16.0, 0, .4),
@@ -42,7 +42,7 @@ public class FenceModel {
 			new AABB(0, .4, 12/16.0, 15/16.0, 7/16.0, 9/16.0),
 		},
 	};
-	
+
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;

@@ -35,7 +35,7 @@ public class FarmlandModel {
 		Texture.farmlandWet,
 		Texture.farmlandWet,
 	};
-	
+
 	public static boolean intersect(Ray ray) {
 		ray.t = Double.POSITIVE_INFINITY;
 		if (block.intersect(ray)) {

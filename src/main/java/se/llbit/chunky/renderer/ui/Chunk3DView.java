@@ -47,29 +47,29 @@ import se.llbit.chunky.renderer.Renderer;
  */
 @SuppressWarnings("serial")
 public class Chunk3DView extends JDialog {
-	
+
     private RenderCanvas canvas;
-    
+
     private int x0, y0;
 
     /**
      * Create the 3D view window
      * @param listener
-     * @param parentFrame 
+     * @param parentFrame
      */
     public Chunk3DView(final ViewListener listener, JFrame parentFrame) {
-    	
+
     	super(parentFrame, "Render Preview");
-        
+
         canvas = new RenderCanvas();
-        
+
         setContentPane(canvas);
-        
+
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         setModalityType(ModalityType.MODELESS);
-        
+
         pack();
-        
+
 		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_W, Event.CTRL_MASK), "Close Dialog");
 		getRootPane().getActionMap().put("Close Dialog", new AbstractAction() {
@@ -79,7 +79,7 @@ public class Chunk3DView extends JDialog {
             	setVisible(false);
 			}
 		});
-		
+
         addComponentListener(new ComponentListener() {
 			@Override
 			public void componentShown(ComponentEvent e) {
@@ -95,7 +95,7 @@ public class Chunk3DView extends JDialog {
 			public void componentHidden(ComponentEvent e) {
 			}
 		});
-        
+
         addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -141,7 +141,7 @@ public class Chunk3DView extends JDialog {
                 }
             }
         });
-        
+
         canvas.addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -155,7 +155,7 @@ public class Chunk3DView extends JDialog {
                 y0 = e.getY();
             }
         });
-        
+
         canvas.addMouseListener(new MouseListener() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -175,7 +175,7 @@ public class Chunk3DView extends JDialog {
             public void mouseClicked(MouseEvent e) {
             }
         });
-        
+
         addWindowListener(new WindowListener() {
 			@Override
 			public void windowOpened(WindowEvent e) {
@@ -200,7 +200,7 @@ public class Chunk3DView extends JDialog {
 			public void windowActivated(WindowEvent e) {
 			}
 		});
-        
+
         addComponentListener(new ComponentListener() {
 			@Override
 			public void componentShown(ComponentEvent e) {
@@ -219,7 +219,7 @@ public class Chunk3DView extends JDialog {
 				listener.setViewVisible(false);
 			}
 		});
-        
+
         canvas.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -228,7 +228,7 @@ public class Chunk3DView extends JDialog {
 			}
 		});
     }
-    
+
     /**
      * Set the renderer for the canvas.
      * @param renderer
@@ -243,7 +243,7 @@ public class Chunk3DView extends JDialog {
 	public RenderCanvas getCanvas() {
 		return canvas;
 	}
-	
+
 	/**
 	 * Displays the 3D view window and places it to the right of
 	 * the parent window.

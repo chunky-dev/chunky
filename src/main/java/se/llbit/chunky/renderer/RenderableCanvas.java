@@ -24,17 +24,17 @@ public interface RenderableCanvas {
 	 * Default canvas width
 	 */
 	int DEFAULT_WIDTH = 400;
-	
+
 	/**
 	 * Default canvas height
 	 */
 	int DEFAULT_HEIGHT = 400;
-	
+
 	/**
 	 * @return The canvas width
 	 */
 	int getWidth();
-	
+
 	/**
 	 * @return The canvas height
 	 */

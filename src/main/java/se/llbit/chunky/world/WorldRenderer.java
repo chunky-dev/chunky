@@ -30,11 +30,11 @@ import se.llbit.chunky.resources.MiscImages;
 public class WorldRenderer {
 
 	private static final Font font = new Font("Sans serif", Font.BOLD, 11);
-	
+
 	private boolean highlightEnabled;
 	private Block hlBlock = Block.DIAMONDORE;
 	private Color hlColor = Color.red;
-	
+
 	private boolean mapUpdated = false;
 
 	private void renderEmpty(Graphics g, int width, int height) {
@@ -51,7 +51,7 @@ public class WorldRenderer {
 	 */
 	public void renderMinimap(World world, RenderBuffer renderBuffer,
 			ChunkSelectionTracker selection) {
-		
+
 		ChunkView view = renderBuffer.getView();
 		int width = view.width;
 		int height = view.height;
@@ -61,7 +61,7 @@ public class WorldRenderer {
 			renderEmpty(g, width, height);
 			return;
 		}
-		
+
 		g.setColor(Color.white);
 		g.fillRect(0, 0, width, height);
 
@@ -89,10 +89,10 @@ public class WorldRenderer {
 				}
 			}
 		}
-		
+
 		if (world.havePlayerPos())
 			renderPlayer(world, g, view, true);
-		
+
 		if (world.haveSpawnPos())
 			renderSpawn(world, g, view, true);
 	}
@@ -106,18 +106,18 @@ public class WorldRenderer {
 	 */
 	public void render(World world, RenderBuffer renderBuffer,
 			Chunk.Renderer renderer, ChunkSelectionTracker selection) {
-		
+
 		int width = renderBuffer.getWidth();
 		int height = renderBuffer.getHeight();
-		
+
 		Graphics g = renderBuffer.getGraphics();
 		if (world.isEmptyWorld()) {
 			renderEmpty(g, width, height);
 			return;
 		}
-		
+
 		ChunkView view = renderBuffer.getView();
-		
+
 		ChunkIterator iter = renderBuffer.getChunkIterator();
 		while (iter.hasNext()) {
 			ChunkPosition pos = iter.next();
@@ -125,9 +125,9 @@ public class WorldRenderer {
 			int z = pos.z;
 			if (!view.isChunkVisible(x, z))
 				continue;
-			
+
 			Chunk chunk = world.getChunk(pos);
-			
+
 			renderer.render(chunk, renderBuffer, x, z);
 			if (highlightEnabled)
 				chunk.renderHighlight(renderBuffer, x, z,
@@ -139,41 +139,41 @@ public class WorldRenderer {
 			}
 		}
 	}
-	
+
 	/**
 	 * Render overlay icons
-	 * @param world 
-	 * @param chunky 
-	 * @param g 
-	 * @param renderBuffer 
+	 * @param world
+	 * @param chunky
+	 * @param g
+	 * @param renderBuffer
 	 */
-	public void renderHUD(World world, Chunky chunky, 
+	public void renderHUD(World world, Chunky chunky,
 			Graphics g, RenderBuffer renderBuffer) {
-		
+
 		boolean loadIndicator = chunky.isLoading();
 		Chunk.Renderer renderer = chunky.getChunkRenderer();
-		
+
 		ChunkView view = renderBuffer.getView();
-		
+
 		if (loadIndicator) {
 			g.drawImage(MiscImages.clock, view.width-32, 0, 32, 32, null);
 		}
-		
+
 		if (world.havePlayerPos()) {
 			renderPlayer(world, g, view,
 					renderer == Chunk.surfaceRenderer
 					|| world.playerLocY() == world.currentLayer());
 		}
-		
+
 		if (world.haveSpawnPos()) {
 			renderSpawn(world, g, view,
 			        renderer == Chunk.surfaceRenderer
 			        || world.spawnPosY() == world.currentLayer());
 		}
-		
+
 		Chunk hoveredChunk = chunky.getHoveredChunk();
 		if (!hoveredChunk.isEmpty()) {
-			
+
 			g.setFont(font);
 			g.setColor(Color.white);
 			g.drawString("Chunk: " + hoveredChunk.getPosition(),
@@ -190,7 +190,7 @@ public class WorldRenderer {
 		int pw = (int) Math.max(8, Math.min(16, blockScale * 2));
 		ppx = Math.min(view.width-pw, Math.max(0, ppx-pw/2));
 		ppy = Math.min(view.height-pw, Math.max(0, ppy-pw/2));
-		
+
 		if (sameLayer)
 			g.drawImage(MiscImages.face, ppx, ppy, pw, pw, null);
 		else
@@ -206,7 +206,7 @@ public class WorldRenderer {
         int pw = (int) Math.max(8, Math.min(16, blockScale * 2));
         ppx = Math.min(view.width-pw, Math.max(0, ppx-pw/2));
 		ppy = Math.min(view.height-pw, Math.max(0, ppy-pw/2));
-        
+
         if (sameLayer)
             g.drawImage(MiscImages.home, ppx, ppy, pw, pw, null);
         else
@@ -236,7 +236,7 @@ public class WorldRenderer {
 	public synchronized void setHighlightColor(Color newColor) {
 		hlColor = newColor;
 	}
-	
+
 	/**
 	 * @return <code>true</code> if block highlighting is enabled
 	 */
@@ -257,7 +257,7 @@ public class WorldRenderer {
 	public synchronized Color getHighlightColor() {
 		return hlColor;
 	}
-	
+
 	/**
 	 * @return <code>true</code> if the map has been updated
 	 */

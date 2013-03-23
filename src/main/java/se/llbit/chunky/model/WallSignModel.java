@@ -24,13 +24,13 @@ import se.llbit.math.Vector4d;
 
 @SuppressWarnings("javadoc")
 public class WallSignModel {
-	
+
 	// distance the sign is offset from the wall (mimic minecraft)
 	private static final double offset = 0.02;
-	
+
 	private static Quad[][] faces = {
 		{}, {},
-		
+
 		// facing north
 		{
 			// north
@@ -40,7 +40,7 @@ public class WallSignModel {
 			// south
 			new Quad(new Vector3d(0, .2, 1-offset), new Vector3d(1, .2, 1-offset),
 					new Vector3d(0, .8, 1-offset), new Vector4d(0, 1, .2, .8)),
-			
+
 			// west
 			new Quad(new Vector3d(0, .2, .875+offset), new Vector3d(0, .2, 1-offset),
 					new Vector3d(0, .8, .875+offset), new Vector4d(.875+offset, 1-offset, .2, .8)),
@@ -52,28 +52,28 @@ public class WallSignModel {
 			// top
 			new Quad(new Vector3d(1, .8, .875+offset), new Vector3d(0, .8, .875+offset),
 					new Vector3d(1, .8, 1-offset), new Vector4d(1, 0, .875+offset, 1-offset)),
-			
+
 			// bottom
 			new Quad(new Vector3d(0, .2, .875+offset), new Vector3d(1, .2, .875+offset),
 					new Vector3d(0, .2, 1-offset), new Vector4d(0, 1, .875+offset, 1-offset)),
 		},
-		
+
 		// facing south
 		{},
 
 		// facing west
 		{},
-		
+
 		// facing east
 		{},
 	};
-	
+
 	static {
 		rotateFaceY(2, 5);
 		rotateFaceY(5, 3);
 		rotateFaceY(3, 4);
 	}
-	
+
 	private static void rotateFaceY(int i, int j) {
 		faces[j] = new Quad[faces[i].length];
 		for (int k = 0; k < faces[i].length; ++k) {

@@ -21,7 +21,7 @@ package se.llbit.chunky.world;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkViewIterator implements ChunkIterator {
-	
+
 	private ChunkView view;
 	private int x;
 	private int z;

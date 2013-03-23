@@ -31,9 +31,9 @@ import se.llbit.math.Vector4d;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class WaterModel {
-	
+
 	private static final double WATER_OPACITY = .42;
-	
+
 	private static Quad[] fullBlock = {
 		// bottom
 		new DoubleSidedQuad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
@@ -54,7 +54,7 @@ public class WaterModel {
 		new DoubleSidedQuad(new Vector3d(0, 1, 1), new Vector3d(1, 1, 1),
 			new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
 	};
-	
+
 	static final DoubleSidedQuad bot = new DoubleSidedQuad(
 			new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 			new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1));
@@ -68,17 +68,17 @@ public class WaterModel {
 	static final Triangle[] eastb = new Triangle[8];
 	static final Triangle[][] southt = new Triangle[8][8];
 	static final Triangle[] southb = new Triangle[8];
-	
+
 	/**
 	 * Water height levels
 	 */
 	static final double height[] = {
 		14/16., 12.25/16., 10.5/16, 8.75/16, 7./16, 5.25/16, 3.5/16, 1.75/16
 	};
-	
+
 	private static final float[][][] normalMap;
 	private static final int normalMapW;
-	
+
 	/**
 	 * Block data offset for water above flag
 	 */
@@ -91,7 +91,7 @@ public class WaterModel {
 		normalMap = new float[normalMapW][normalMapW][2];
 		for (int u = 0; u < normalMapW; ++u) {
 			for (int v = 0; v < normalMapW; ++v) {
-				
+
 				float hx0 = (waterHeight.getColorWrapped(u, v) & 0xFF) / 255.f;
 				float hx1 = (waterHeight.getColorWrapped(u+1, v) & 0xFF) / 255.f;
 				float hz0 = (waterHeight.getColorWrapped(u, v) & 0xFF) / 255.f;
@@ -100,7 +100,7 @@ public class WaterModel {
 				normalMap[u][v][1] = hz1-hz0;
 			}
 		}
-		
+
 		// precompute water triangles
 		for (int i = 0; i < 8; ++i) {
 			double c0 = height[i];
@@ -181,11 +181,11 @@ public class WaterModel {
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray) {
 		ray.t = Double.POSITIVE_INFINITY;
-		
+
 		int data = ray.currentMaterial;
 		int isFull = (data >> FULL_BLOCK) & 1;
 		//int level = data >> 8;
-		
+
 		if (isFull != 0) {
 			boolean hit = false;
 			for (Quad quad: fullBlock) {
@@ -201,7 +201,7 @@ public class WaterModel {
 				ray.distance += ray.t;
 				ray.x.scaleAdd(ray.t, ray.d, ray.x);
 				ray.color.w = WATER_OPACITY;
-				
+
 				/*if ((level&8) != 0) {
 					// falling water
 					if (ray.n.x != 0) {
@@ -217,13 +217,13 @@ public class WaterModel {
 			}
 			return hit;
 		}
-		
+
 		// lily pad test
 		if (((ray.currentMaterial >> 13) & 1) != 0) {
 			if (LilyPadModel.intersect(ray))
 				return true;
 		}
-		
+
 		boolean hit = false;
 		if (bot.intersect(ray)) {
 			ray.n.set(bot.n);
@@ -231,7 +231,7 @@ public class WaterModel {
 			ray.t = ray.tNear;
 			hit = true;
 		}
-			
+
 		int c0 = (0xF & (data >> 16)) % 8;
 		int c1 = (0xF & (data >> 20)) % 8;
 		int c2 = (0xF & (data >> 24)) % 8;

@@ -27,15 +27,15 @@ public class CLPlatform {
 	public cl_platform_id id;
 	public String name;
 	public String version;
-	
+
 	public CLPlatform(cl_platform_id platformId,
 			String name, String version) {
-		
+
 		this.id = platformId;
 		this.name = name;
 		this.version = version;
 	}
-	
+
 	@Override
 	public String toString() {
 		return name + " " + version;

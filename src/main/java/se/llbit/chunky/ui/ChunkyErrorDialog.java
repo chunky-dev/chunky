@@ -43,14 +43,14 @@ import org.apache.log4j.spi.ThrowableInformation;
 
 /**
  * Dedicated error reporting dialog.
- * 
+ *
  * Used to display critical errors in a nicer way.
- * 
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 @SuppressWarnings("serial")
 public class ChunkyErrorDialog extends JDialog {
-	
+
 	private JTabbedPane tabbedPane;
 	private int errorCount = 0;
 
@@ -61,15 +61,15 @@ public class ChunkyErrorDialog extends JDialog {
 		super();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		
+
 		setTitle("Error Summary");
 		setLocationRelativeTo(null);
-		
+
 		tabbedPane = new JTabbedPane();
 		JPanel panel = new JPanel();
 		JLabel lbl = new JLabel("<html>Oops! An unexpected error occurred.<br><br>" +
 				"Below is a detailed description of what went wrong.");
-		
+
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
 		layout.setHorizontalGroup(
@@ -86,18 +86,18 @@ public class ChunkyErrorDialog extends JDialog {
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(tabbedPane)
 				.addContainerGap());
-		
+
 		getContentPane().add(panel);
 		pack();
 	}
-	
+
 	/**
 	 * Add a log record to be displayed by this error dialog.
 	 * @param event
 	 */
 	public synchronized void addRecord(LoggingEvent event) {
 		errorCount += 1;
-		
+
 		final JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		final JTextArea textArea = new JTextArea(10, 60);
@@ -114,7 +114,7 @@ public class ChunkyErrorDialog extends JDialog {
 				for (Action action: actions) {
 					if (action.getValue(Action.NAME).equals(
 							DefaultEditorKit.selectAllAction))
-						
+
 						action.actionPerformed(null);
 				}
 			}
@@ -128,23 +128,23 @@ public class ChunkyErrorDialog extends JDialog {
 			public void mouseClicked(MouseEvent e) {
 			}
 		});
-		
+
 		ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
 		PrintStream out = new PrintStream(byteOut);
 		out.println(event.getMessage());
 		out.println();
-		
+
 		ThrowableInformation throwableInfo = event.getThrowableInformation();
 		if (throwableInfo != null) {
 			Throwable thrown = throwableInfo.getThrowable();
 			thrown.printStackTrace(out);
 		}
 		out.close();
-		
+
 		textArea.setText(new String(byteOut.toByteArray()));
-		
+
 		final JScrollPane textScrollPane = new JScrollPane(textArea);
-		
+
 		JButton dismissBtn = new JButton("Dismiss");
 		dismissBtn.addActionListener(new ActionListener() {
 			@Override
@@ -154,7 +154,7 @@ public class ChunkyErrorDialog extends JDialog {
 					ChunkyErrorDialog.this.dispose();
 			}
 		});
-		
+
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
 		layout.setHorizontalGroup(
@@ -171,11 +171,11 @@ public class ChunkyErrorDialog extends JDialog {
 				.addPreferredGap(ComponentPlacement.RELATED)
 				.addComponent(dismissBtn)
 				.addContainerGap());
-		
+
 		tabbedPane.addTab("Error " + errorCount, panel);
 		tabbedPane.setSelectedComponent(panel);
 		pack();
-		
+
 		setVisible(true);
 		textArea.requestFocus();
 	}

@@ -23,55 +23,55 @@ import se.llbit.chunky.renderer.scene.Scene;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public abstract class AbstractRenderManager extends Thread {
-	
+
 	/**
 	 * Constructor
-	 * @param context 
+	 * @param context
 	 */
 	public AbstractRenderManager(RenderContext context) {
 		super("Render Manager");
-		
+
 		this.numThreads = context.numRenderThreads();
 		this.tileWidth = context.tileWidth();
 	}
-	
+
 	/**
 	 * Minimum number of worker threads
 	 */
 	public static int NUM_RENDER_THREADS_MIN = 1;
-	
+
 	/**
 	 * Maximum number of worker threads
 	 */
 	public static int NUM_RENDER_THREADS_MAX = 10000;
-	
+
 	/**
 	 * Default tile width
 	 */
 	public static int TILE_WIDTH_DEFAULT = 8;
-	
+
 	/**
 	 * Number of render threads
 	 */
 	protected final int numThreads;
-	
+
 	/**
 	 * Tile width
 	 */
 	protected final int tileWidth;
-	
+
 	/**
 	 * Get a job from the job queue
 	 * @return Next job Id
 	 * @throws InterruptedException
 	 */
 	public abstract int getNextJob() throws InterruptedException;
-	
+
 	/**
 	 * Report finished job
 	 */
 	public abstract void jobDone();
-	
+
 	/**
 	 * @return The buffered scene object
 	 */

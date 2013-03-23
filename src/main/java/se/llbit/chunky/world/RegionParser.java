@@ -33,7 +33,7 @@ public class RegionParser extends Thread {
 	public RegionParser() {
 	    super("Region Parser");
 	}
-	
+
 	public void run() {
 		try {
 			while (!isInterrupted()) {
@@ -43,25 +43,25 @@ public class RegionParser extends Thread {
 		} catch (InterruptedException e) {
 		}
 	}
-	
+
 	/**
 	 * Get next region from the parse queue
 	 * @return
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	private synchronized Region getNext() throws InterruptedException {
 		while (queue.isEmpty())
 			wait();
 		return queue.poll();
 	}
-	
+
 	/**
 	 * Clear the parse queue
 	 */
 	public synchronized void clearQueue() {
 		queue.clear();
 	}
-	
+
 	/**
 	 * Add a region to the parse queue
 	 * @param region
@@ -70,7 +70,7 @@ public class RegionParser extends Thread {
 		queue.add(region);
 		notify();
 	}
-	
+
 	/**
 	 * @return <code>true</code> if the work queue is not empty
 	 */

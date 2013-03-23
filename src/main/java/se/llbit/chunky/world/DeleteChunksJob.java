@@ -22,7 +22,7 @@ import se.llbit.chunky.ui.ProgressPanel;
 
 /**
  * A job for deleting selected chunks.
- * 
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class DeleteChunksJob extends Thread {
@@ -38,12 +38,12 @@ public class DeleteChunksJob extends Thread {
 	 */
 	public DeleteChunksJob(World world, Collection<ChunkPosition> selected,
 			ProgressPanel progress) {
-		
+
 		this.world = world;
 		this.selected = selected;
 		this.progress = progress;
 	}
-	
+
 	public void run() {
 		if (progress.tryStartJob()) {
 			progress.setJobName("Deleting chunks");

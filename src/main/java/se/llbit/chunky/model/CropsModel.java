@@ -31,14 +31,14 @@ public class CropsModel {
 
 		new DoubleSidedQuad(new Vector3d(0, 0, .75), new Vector3d(1, 0, .75),
 				new Vector3d(0, 1, .75), new Vector4d(0, 1, 0, 1)),
-				
+
 		new DoubleSidedQuad(new Vector3d(.25, 0, 0), new Vector3d(.25, 0, 1),
 				new Vector3d(.25, 1, 0), new Vector4d(0, 1, 0, 1)),
 
 		new DoubleSidedQuad(new Vector3d(.75, 0, 1), new Vector3d(.75, 0, 0),
 				new Vector3d(.75, 1, 1), new Vector4d(1, 0, 0, 1)),
 	};
-	
+
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;

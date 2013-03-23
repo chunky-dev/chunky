@@ -22,14 +22,14 @@ import se.llbit.math.Color;
 
 /**
  * Image manipulation utility methods.
- * 
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ImageTools {
 
 	/**
 	 * Calculate the average color across an image.
-	 * 
+	 *
 	 * @param img
 	 * @return average color value
 	 */
@@ -50,7 +50,7 @@ public class ImageTools {
 				ba += alpha * (0xFF & cv)/255.f;
 			}
 		}
-		
+
 		if (aa == 0.f)
 		    return 0;
 		else

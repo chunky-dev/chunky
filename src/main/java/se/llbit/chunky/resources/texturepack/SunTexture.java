@@ -44,3 +44,4 @@ public class SunTexture extends TextureRef {
 		return true;
 	}
 }
+

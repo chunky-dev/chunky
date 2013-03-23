@@ -32,14 +32,14 @@ import se.llbit.util.ProgramProperties;
  */
 @SuppressWarnings("serial")
 public class RenderCanvas extends JPanel implements RenderableCanvas {
-	
+
 	private Renderer renderer;
-	
+
     /**
      * Create new canvas
      */
     public RenderCanvas() {
-    	
+
         setBackground(Color.white);
         // apparently setting the same preferred size twice will cancel all
         // other calls to setPreferredSize
@@ -58,7 +58,7 @@ public class RenderCanvas extends JPanel implements RenderableCanvas {
 			renderer.drawBufferedImage(g, getWidth(), getHeight());
 		}
 	}
-	
+
 	/**
 	 * Set new renderer
 	 * @param newRenderer
@@ -70,7 +70,7 @@ public class RenderCanvas extends JPanel implements RenderableCanvas {
 
 	/**
 	 * Set the update buffer flag for the renderer
-	 * @param flag 
+	 * @param flag
 	 */
 	public void setBufferFinalization(final boolean flag) {
 		if (renderer != null) {

@@ -21,12 +21,12 @@ package se.llbit.chunky.world;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class EmptyChunkView extends ChunkView {
-	
+
 	/**
 	 * Singleton instance
 	 */
 	public static final EmptyChunkView instance = new EmptyChunkView();
-	
+
 	protected EmptyChunkView() { }
 
 	@Override

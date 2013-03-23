@@ -49,7 +49,7 @@ import se.llbit.chunky.world.World;
  * The world selection dialog box. It displays a list of worlds
  * and a browse button for loading a world outside the standard
  * save directory.
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 @SuppressWarnings("serial")
@@ -58,44 +58,44 @@ public class WorldSelector extends JDialog implements ListSelectionListener {
 	@SuppressWarnings("unused")
 	private static final Logger logger =
 			Logger.getLogger(WorldSelector.class);
-	
+
 	private final List<World> worlds = new ArrayList<World>();
 	private final Chunky chunky;
 	private DefaultTableModel tableModel;
 	private final JTable worldTbl = new JTable();
 
 	/**
-	 * Constructor 
+	 * Constructor
 	 * @param chunky
 	 */
 	public WorldSelector(Chunky chunky) {
 		super(chunky.getFrame());
 		this.chunky = chunky;
-		
+
 		setTitle(Messages.getString("WorldSelector.0")); //$NON-NLS-1$
-		
+
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setModalityType(Dialog.ModalityType.MODELESS);
-		
+
 		initComponents();
 		fillWorldList();
-		
+
 		pack();
 		setLocationRelativeTo(chunky.getFrame());
 		setVisible(true);
 	}
-	
+
 	private void fillWorldList() {
 		fillWorldList(WorldDirectoryPicker.getWorldDirectory(chunky.getFrame()));
 	}
 
 	private void fillWorldList(File worldSavesDir) {
-		
+
 		tableModel = new DefaultTableModel();
 		tableModel.addColumn("World");
 		tableModel.addColumn("Directory");
 		tableModel.addColumn("Mode");
-		
+
 		worlds.clear();
 		if (worldSavesDir != null) {
 			for (File dir: worldSavesDir.listFiles()) {
@@ -112,7 +112,7 @@ public class WorldSelector extends JDialog implements ListSelectionListener {
 					world.gameMode() };
 			tableModel.addRow(row);
 		}
-		
+
 		worldTbl.setModel(tableModel);
 		pack();
 	}
@@ -138,12 +138,12 @@ public class WorldSelector extends JDialog implements ListSelectionListener {
 		worldTbl.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		worldTbl.getSelectionModel().addListSelectionListener(this);
 		JScrollPane scrollPane = new JScrollPane(worldTbl);
-		
+
 		selectWorldLbl.setText(Messages.getString("WorldSelector.1")); //$NON-NLS-1$
 
 		browseBtn.setText(Messages.getString("WorldSelector.2")); //$NON-NLS-1$
 		browseBtn.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fileChooser = new JFileChooser(Chunky.getSavesDirectory());

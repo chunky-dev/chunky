@@ -34,50 +34,50 @@ import se.llbit.nbt.SpecificTag;
 
 /**
  * This class represents a loaded or not-yet-loaded chunk in the world.
- * 
+ *
  * If the chunk is not yet loaded the loadedLayer field is equal to -1.
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class Chunk {
-	
+
 	private static final String LEVEL_HEIGHT_MAP = ".Level.HeightMap";
 	private static final String LEVEL_SECTIONS = ".Level.Sections";
 	private static final String LEVEL_BIOMES = ".Level.Biomes";
-	
+
 	/**
 	 * Chunk width
 	 */
 	public static final int X_MAX = 16;
-	
+
 	/**
 	 * Chunk height
 	 */
 	public static final int Y_MAX = 256;
-	
+
 	/**
 	 * Chunk depth
 	 */
 	public static final int Z_MAX = 16;
-	
+
 	private static final int SECTION_Y_MAX = 16;
 	private static final int SECTION_BYTES = X_MAX*SECTION_Y_MAX*Z_MAX;
 	private static final int SECTION_HALF_BYTES = SECTION_BYTES / 2;
-	
+
 	private final ChunkPosition position;
     private int loadedLayer = -1;
     protected Layer layer = Layer.unknownLayer;
     protected Layer surface = Layer.unknownLayer;
     protected Layer caves = Layer.unknownLayer;
     protected Layer biomes = Layer.unknownLayer;
-    
+
     private final World world;
-    
+
     private SoftReference<Map<String, AnyTag>> chunkData =
     		new SoftReference<Map<String,AnyTag>>(null);
-    
+
     private int neighbors = 0;
-    
+
     // neighbor matrix
     private static final int[] nx = { -1, 0, 1, 0, -1, 1, 1, -1 };
 	private static final int[] nz = { 0, 1, 0, -1, 1, 1, -1, -1 };
@@ -96,7 +96,7 @@ public class Chunk {
 		 */
 		public void render(Chunk chunk, RenderBuffer rbuff, int cx, int cz);
 	}
-	
+
 	/**
 	 * Renders caves and other underground caverns
 	 */
@@ -105,7 +105,7 @@ public class Chunk {
 			chunk.renderCaves(rbuff, cx, cz);
 		}
 	};
-	
+
 	/**
 	 * Renders caves and other underground caverns
 	 */
@@ -114,7 +114,7 @@ public class Chunk {
 			chunk.renderBiomes(rbuff, cx, cz);
 		}
 	};
-	
+
 	/**
 	 * Renders the default surface view
 	 */
@@ -123,7 +123,7 @@ public class Chunk {
 			chunk.renderSurface(rbuff, cx, cz);
 		}
 	};
-	
+
 	/**
 	 * Renders a single layer
 	 */
@@ -132,7 +132,7 @@ public class Chunk {
 			chunk.renderLayer(rbuff, cx, cz);
 		}
 	};
-	
+
 	/**
 	 * Create a new chunk
 	 * @param pos
@@ -142,7 +142,7 @@ public class Chunk {
 		this.world = world;
 		this.position = pos;
 	}
-	
+
 	protected void renderLayer(RenderBuffer rbuff, int cx, int cz) {
 		layer.render(rbuff, cx, cz);
 	}
@@ -154,18 +154,18 @@ public class Chunk {
 	protected void renderCaves(RenderBuffer rbuff, int cx, int cz) {
 		caves.render(rbuff, cx, cz);
 	}
-	
+
 	protected void renderBiomes(RenderBuffer rbuff, int cx, int cz) {
 		biomes.render(rbuff, cx, cz);
 	}
-	
+
 	/**
 	 * @return The currently loaded layer
 	 */
 	public synchronized int getLoadedLayer() {
 		return loadedLayer;
 	}
-	
+
 	private DataInputStream getDataInputStream() {
 		return RegionFileCache.getChunkDataInputStream(world.getRegionDirectory(),
 				position.x, position.z);
@@ -206,14 +206,14 @@ public class Chunk {
 	 * layer, surface and cave maps.
 	 */
 	public synchronized void parse() {
-		
+
         int requestedLayer = world.currentLayer();
         Heightmap heightmap = world.heightmap();
-	    
+
 	    loadedLayer = requestedLayer;
 		if (layer == Layer.corruptLayer)
 			return;
-		
+
 		try {
 			Set<String> request = new HashSet<String>();
 			request.add(LEVEL_SECTIONS);
@@ -222,25 +222,25 @@ public class Chunk {
 				request.add(LEVEL_HEIGHT_MAP);
 
 			Map<String, AnyTag> result = chunkData.get();
-			
+
 			if (result == null) {
-			
+
     			DataInputStream in = getDataInputStream();
     			if (in == null) {
                     layer = Layer.corruptLayer;
                     return;
                 }
-    			
+
     			result = NamedTag.quickParse(in, request);
     			chunkData = new SoftReference<Map<String,AnyTag>>(result);
     			in.close();
 			}
-			
-			AnyTag sections = result.get(LEVEL_SECTIONS); 
+
+			AnyTag sections = result.get(LEVEL_SECTIONS);
 			if (sections.isList()) {
 				byte[] chunkData = new byte[X_MAX * Y_MAX * Z_MAX];
 				byte[] blockData = new byte[X_MAX * Y_MAX * Z_MAX];
-				
+
 				for (SpecificTag section : ((ListTag) sections).getItemList()) {
 					AnyTag yTag = section.get("Y");
 					AnyTag blocks = section.get("Blocks");
@@ -251,13 +251,13 @@ public class Chunk {
 						System.arraycopy(data.byteArray(), 0, blockData, SECTION_HALF_BYTES*yOffset, SECTION_HALF_BYTES);
 					}
 				}
-				
+
 				AnyTag heightmapTag = result.get(LEVEL_HEIGHT_MAP);
 				AnyTag biomesTag = result.get(LEVEL_BIOMES);
 				if (surface == Layer.unknownLayer
 				        && heightmapTag.isIntArray(X_MAX*Z_MAX)
 						&& biomesTag.isByteArray(X_MAX*Z_MAX)) {
-					
+
 				    int[] chunkHeightmap = heightmapTag.intArray();
 					byte[] chunkBiomes = biomesTag.byteArray();
 					caves = Layer.loadCaves(chunkData, chunkHeightmap);
@@ -286,10 +286,10 @@ public class Chunk {
 			surface = Layer.corruptLayer;
 			caves = Layer.corruptLayer;
 		}
-		
+
 		world.chunkUpdated(this);
 	}
-	
+
 	/**
 	 * @return <code>true</code> if this is an empty (non-existing) chunk
 	 */
@@ -312,7 +312,7 @@ public class Chunk {
 
 		neighborsUpdated();
 	}
-	
+
 	private synchronized void neighborsUpdated() {
 		if (neighbors == 255) {
 			surface.renderTopography(position, world.heightmap());
@@ -348,45 +348,45 @@ public class Chunk {
      */
     public synchronized void getBlockData(
     		byte[] blocks, byte[] data, byte[] biomes) {
-        
+
         for (int i = 0; i < X_MAX * Y_MAX * Z_MAX; ++i)
             blocks[i] = 0;
-        
+
         for (int i = 0; i < X_MAX * Z_MAX; ++i)
             biomes[i] = 0;
-        
+
         for (int i = 0; i < (X_MAX * Y_MAX * Z_MAX) / 2; ++i)
             data[i] = 0;
-        
+
         try {
             Set<String> request = new HashSet<String>();
             request.add(LEVEL_SECTIONS);
             request.add(LEVEL_BIOMES);
             if (surface == Layer.unknownLayer)
                 request.add(LEVEL_HEIGHT_MAP);
-            
+
             Map<String, AnyTag> result = this.chunkData.get();
-            
+
             if (result == null) {
-            
+
                 DataInputStream in = getDataInputStream();
                 if (in == null) {
                     layer = Layer.corruptLayer;
                     return;
                 }
-                
+
                 result = NamedTag.quickParse(in, request);
                 this.chunkData = new SoftReference<Map<String,AnyTag>>(result);
                 in.close();
             }
-            
-            AnyTag sections = result.get(LEVEL_SECTIONS); 
+
+            AnyTag sections = result.get(LEVEL_SECTIONS);
             AnyTag biomesTag = result.get(LEVEL_BIOMES);
             if (sections.isList() && biomesTag.isByteArray(X_MAX*Z_MAX)) {
-            	
+
             	byte[] chunkBiomes = biomesTag.byteArray();
             	System.arraycopy(chunkBiomes, 0, biomes, 0, chunkBiomes.length);
-                
+
                 for (SpecificTag section : ((ListTag) sections).getItemList()) {
                     AnyTag yTag = section.get("Y");
                     AnyTag blocksTag = section.get("Blocks");
@@ -412,7 +412,7 @@ public class Chunk {
 	public void writePngLine(int scanline, OutputStream out) throws IOException {
 		surface.writePngLine(scanline, out);
 	}
-	
+
 
     /**
      * @param x
@@ -421,7 +421,7 @@ public class Chunk {
      * @return Integer index into a chunk YXZ array
      */
     public static final int chunkIndex(int x, int y, int z) {
-        return x + Chunk.X_MAX * ( z + Chunk.Z_MAX * y ); 
+        return x + Chunk.X_MAX * ( z + Chunk.Z_MAX * y );
     }
 
     /**
@@ -432,12 +432,12 @@ public class Chunk {
     public static final int chunkXZIndex(int x, int z) {
         return x + Chunk.X_MAX * z;
     }
-    
+
     @Override
     public String toString() {
     	return "Chunk " + position.toString();
     }
-    
+
     /**
      * @return <code>true</code> if this chunk has been parsed
      */

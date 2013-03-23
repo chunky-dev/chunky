@@ -21,7 +21,7 @@ package se.llbit.math;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Vector3d {
-	
+
 	@SuppressWarnings("javadoc")
 	public double x, y, z;
 
@@ -31,7 +31,7 @@ public class Vector3d {
 	public Vector3d() {
 		this(0, 0, 0);
 	}
-	
+
 	/**
 	 * Creates a new vector (i, j, k)
 	 * @param i
@@ -43,7 +43,7 @@ public class Vector3d {
 		y = j;
 		z = k;
 	}
-	
+
 	/**
 	 * Create a new vector equal to the given vector
 	 * @param o
@@ -63,7 +63,7 @@ public class Vector3d {
 		y = o.y;
 		z = o.z;
 	}
-	
+
 	/**
 	 * Set this vector equal to (d, e, f)
 	 * @param d
@@ -101,7 +101,7 @@ public class Vector3d {
 	public final double lengthSquared() {
 		return x*x + y*y + z*z;
 	}
-	
+
 	/**
 	 * @return Length of this vector
 	 */
@@ -176,8 +176,8 @@ public class Vector3d {
 	/**
 	 * Add vector (a, b, c) to this vector
 	 * @param a
-	 * @param b 
-	 * @param c 
+	 * @param b
+	 * @param c
 	 */
 	public final void add(double a, double b, double c) {
 		x += a;
@@ -214,7 +214,7 @@ public class Vector3d {
 		y = a.y;
 		z = a.z;
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("(%f, %f, %f)", x, y, z);

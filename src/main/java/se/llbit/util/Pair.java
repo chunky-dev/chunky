@@ -18,7 +18,7 @@ package se.llbit.util;
 
 /**
  * Custom Pair class.
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  *
  * @param <U>
@@ -29,12 +29,12 @@ public class Pair<U, V> {
 	 * Thing one
 	 */
 	public U thing1;
-	
+
 	/**
 	 * Thing two
 	 */
 	public V thing2;
-	
+
 	/**
 	 * Create a new tuple of two things.
 	 * @param one Thing one

@@ -320,7 +320,7 @@ public class Block {
 				Texture.sandstoneTop,
 				Texture.sandstoneBottom,
 			},
-			
+
 			// decorated
 			{
 				Texture.sandstoneDecorated,
@@ -330,7 +330,7 @@ public class Block {
 				Texture.sandstoneTop,
 				Texture.sandstoneBottom,
 			},
-			
+
 			// smooth
 			{
 				Texture.sandstoneSmooth,
@@ -470,7 +470,7 @@ public class Block {
 					Texture.wool[ray.getBlockData()]);
 		}
 	};
-	
+
 	public static final int MOVEDBYPISTON_ID = 0x24;
 	public static final Block MOVEDBYPISTON = new Block(MOVEDBYPISTON_ID, "Block moved by Piston", Texture.unknown) {
 		{
@@ -545,7 +545,7 @@ public class Block {
 			isSolid = true;
 			localIntersect = true;
 		}
-		
+
 		final Texture[] sandstone = {
 			Texture.sandstoneSide,
 			Texture.sandstoneSide,
@@ -554,7 +554,7 @@ public class Block {
 			Texture.sandstoneTop,
 			Texture.sandstoneTop,
 		};
-		
+
 		final Texture[] wood = {
 			Texture.oakPlanks,
 			Texture.oakPlanks,
@@ -563,7 +563,7 @@ public class Block {
 			Texture.oakPlanks,
 			Texture.oakPlanks,
 		};
-		
+
 		final Texture[] cobble = {
 			Texture.cobblestone,
 			Texture.cobblestone,
@@ -572,7 +572,7 @@ public class Block {
 			Texture.cobblestone,
 			Texture.cobblestone,
 		};
-		
+
 		final Texture[] brick = {
 			Texture.brick,
 			Texture.brick,
@@ -581,7 +581,7 @@ public class Block {
 			Texture.brick,
 			Texture.brick,
 		};
-		
+
 		final Texture[] stoneBrick = {
 			Texture.stoneBrick,
 			Texture.stoneBrick,
@@ -590,7 +590,7 @@ public class Block {
 			Texture.stoneBrick,
 			Texture.stoneBrick,
 		};
-		
+
 		final Texture[] netherBrick = {
 			Texture.netherBrick,
 			Texture.netherBrick,
@@ -599,7 +599,7 @@ public class Block {
 			Texture.netherBrick,
 			Texture.netherBrick,
 		};
-		
+
 		final Texture[] stone = {
 			Texture.slabSide,
 			Texture.slabSide,
@@ -608,7 +608,7 @@ public class Block {
 			Texture.slabTop,
 			Texture.slabTop,
 		};
-		
+
 		final Texture[] quartz = {
 			Texture.quartzSide,
 			Texture.quartzSide,
@@ -617,7 +617,7 @@ public class Block {
 			Texture.quartzTop,
 			Texture.quartzBottom,
 		};
-		
+
 		final Texture[] smoothStone = {
 			Texture.slabTop,
 			Texture.slabTop,
@@ -626,7 +626,7 @@ public class Block {
 			Texture.slabTop,
 			Texture.slabTop,
 		};
-		
+
 		final Texture[] smoothSandstone = {
 			Texture.sandstoneTop,
 			Texture.sandstoneTop,
@@ -635,7 +635,7 @@ public class Block {
 			Texture.sandstoneTop,
 			Texture.sandstoneTop,
 		};
-		
+
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			switch (ray.getBlockData()) {
@@ -813,7 +813,7 @@ public class Block {
 				Texture.chestLock,
 				Texture.chestLock,
 			},
-			
+
 			// left
 			{
 				Texture.largeChestFrontLeft,
@@ -826,7 +826,7 @@ public class Block {
 				Texture.chestLock,
 				Texture.chestLock,
 			},
-			
+
 			// right
 			{
 				Texture.largeChestFrontRight,
@@ -845,7 +845,7 @@ public class Block {
 			return ChestModel.intersect(ray, tex[(ray.currentMaterial >> 16) % 3]);
 		}
 	};
-	
+
 	public static final int REDSTONEWIRE_ID = 0x37;
 	public static final Block REDSTONEWIRE = new Block(REDSTONEWIRE_ID, "Redstone Wire", Texture.redstoneWireCross) {
 		{
@@ -885,7 +885,7 @@ public class Block {
 			Texture.workbenchTop,
 			Texture.oakPlanks,
 		};
-		
+
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex);
@@ -963,7 +963,7 @@ public class Block {
 			return SignPostModel.intersect(ray);
 		}
 	};
-	
+
 	public static final int WOODENDOOR_ID = 0x40;
 	public static final Block WOODENDOOR = new Block(WOODENDOOR_ID, "Wooden Door", Icon.woodenDoor) {
 		{
@@ -1045,7 +1045,7 @@ public class Block {
 			return PressurePlateModel.intersect(ray, Texture.stone);
 		}
 	};
-	
+
 	public static final int IRONDOOR_ID = 0x47;
 	public static final Block IRONDOOR = new Block(IRONDOOR_ID, "Iron Door", Icon.ironDoor) {
 		{
@@ -1187,7 +1187,7 @@ public class Block {
 			Texture.jukeboxTop,
 			Texture.jukeboxSide,
 		};
-		
+
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex);
@@ -1382,70 +1382,70 @@ public class Block {
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores
 				},
-				
+
 				// cap on top, west, north
 				{
 					Texture.hugeBrownMushroom, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.hugeBrownMushroom,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, north
 				{
 					Texture.hugeBrownMushroom, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, east, north
 				{
 					Texture.hugeBrownMushroom, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, west
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.hugeBrownMushroom,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, east
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, west, south
 				{
 					Texture.mushroomPores, Texture.hugeBrownMushroom,
 					Texture.mushroomPores, Texture.hugeBrownMushroom,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, south
 				{
 					Texture.mushroomPores, Texture.hugeBrownMushroom,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, east, south
 				{
 					Texture.mushroomPores, Texture.hugeBrownMushroom,
 					Texture.hugeBrownMushroom, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
-				
+
 				// stem
 				{
 					Texture.mushroomStem, Texture.mushroomStem,
@@ -1471,70 +1471,70 @@ public class Block {
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores
 				},
-				
+
 				// cap on top, west, north
 				{
 					Texture.hugeRedMushroom, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.hugeRedMushroom,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, north
 				{
 					Texture.hugeRedMushroom, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, east, north
 				{
 					Texture.hugeRedMushroom, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, west
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.hugeRedMushroom,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, east
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, west, south
 				{
 					Texture.mushroomPores, Texture.hugeRedMushroom,
 					Texture.mushroomPores, Texture.hugeRedMushroom,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, south
 				{
 					Texture.mushroomPores, Texture.hugeRedMushroom,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
-				
+
 				// cap on top, east, south
 				{
 					Texture.mushroomPores, Texture.hugeRedMushroom,
 					Texture.hugeRedMushroom, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
-				
+
 				// stem
 				{
 					Texture.mushroomStem, Texture.mushroomStem,
@@ -1582,7 +1582,7 @@ public class Block {
 				Texture.melonSide, Texture.melonSide,
 				Texture.melonTop, Texture.melonTop
 		};
-		
+
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex);
@@ -1611,7 +1611,7 @@ public class Block {
 			return MelonStemModel.intersect(ray);
 		}
 	};
-	
+
 	public static final int VINES_ID = 0x6A;
 	public static final Block VINES = new Block(VINES_ID, "Vines", Texture.vines) {
 		{
@@ -1671,7 +1671,7 @@ public class Block {
 				Texture.myceliumSide, Texture.myceliumSide,
 				Texture.myceliumTop, Texture.dirt
 		};
-		
+
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex);
@@ -2117,7 +2117,7 @@ public class Block {
 				Texture.chestLock,
 				Texture.chestLock,
 			},
-			
+
 			// left
 			{
 				Texture.largeChestFrontLeft,
@@ -2130,7 +2130,7 @@ public class Block {
 				Texture.chestLock,
 				Texture.chestLock,
 			},
-			
+
 			// right
 			{
 				Texture.largeChestFrontRight,
@@ -3028,47 +3028,47 @@ public class Block {
 		UNKNOWN0xF8, UNKNOWN0xF9, UNKNOWN0xFA, UNKNOWN0xFB,
 		UNKNOWN0xFC, UNKNOWN0xFD, UNKNOWN0xFE, UNKNOWN0xFF,
 	};
-	
+
 	/**
 	 * Block ID
 	 */
 	public final int id;
-	
+
 	/**
 	 * Block name
 	 */
 	private final String name;
-	
+
 	/**
 	 * Index of refraction.
 	 * Default value is equal to the IoR for air.
 	 */
 	public float ior = 1.000293f;
-	
+
 	/**
 	 * True if there is a specific local intersection model
 	 * for this block
 	 */
 	public boolean localIntersect = false;
-	
+
 	/**
 	 * A block is opaque if it occupies an entire voxel
 	 * and no light can pass through it.
-	 * 
+	 *
 	 * @return {@code true} if the block is solid
 	 */
 	public boolean isOpaque = false;
-	
+
 	/**
 	 * A block is solid if the block occupies an entire voxel.
 	 */
 	public boolean isSolid = true;
-	
+
 	/**
 	 * A block is shiny if it has a specular reflection.
 	 */
 	public boolean isShiny = false;
-	
+
 	/**
 	 * Invisible blocks are not added to the voxel octree, and thus
 	 * they are not rendered. This is only used for special blocks
@@ -3076,22 +3076,22 @@ public class Block {
 	 * such as the lily pad, or are not implemented.
 	 */
 	public boolean isInvisible = false;
-	
+
 	/**
 	 * Emitter blocks emit light.
 	 */
 	public boolean isEmitter = false;
-	
+
 	public double emittance = 0.0;
-	
+
 	/**
 	 * Subsurface scattering property.
 	 */
 	public boolean subSurfaceScattering = false;
-	
+
 	private Texture frontTexture;
 	private Texture icon;
-	
+
 	private static final Set<Block> redstoneConnectors = new HashSet<Block>();
 	static {
 		redstoneConnectors.add(REDSTONEWIRE);
@@ -3111,45 +3111,45 @@ public class Block {
 	Block(int id, String name, Texture texture) {
 		this(id, name, texture, texture);
 	}
-	
+
 	Block(int id, String name, Texture icon, Texture texture) {
 
 		this.id = id;
 		this.name = name;
 		this.icon = icon;
-		
+
 		setTexture(texture);
 	}
 
 	/**
 	 * The name of the block.
-	 * 
+	 *
 	 * @return
 	 */
 	public String getBlockName() {
 		return name;
 	}
-	
+
 	/**
 	 * Get the average color for the block texture as an
 	 * RGB value.
-	 * 
+	 *
 	 * @return average color (RGB)
 	 */
 	public int getAvgRGB() {
 		return frontTexture.getAvgColor();
 	}
-	
+
 	/**
 	 * Get the average color for the block texture as an
 	 * RGB value.
-	 * 
+	 *
 	 * @return average color (RGB)
 	 */
 	public int getAvgTopRGB() {
 		return icon.getAvgColor();
 	}
-	
+
 	@Override
 	public String toString() {
 		return getBlockName();
@@ -3158,7 +3158,7 @@ public class Block {
 	public void setTexture(Texture newTexture) {
 		frontTexture = newTexture;
 	}
-	
+
 	public boolean intersect(Ray ray, Scene scene) {
 		return TexturedBlockModel.intersect(ray, frontTexture);
 	}
@@ -3166,35 +3166,35 @@ public class Block {
 	public Texture getTexture() {
 		return frontTexture;
 	}
-	
+
 	public boolean isWater() {
 		return this == WATER || this == STATIONARYWATER;
 	}
-	
+
 	public boolean isLava() {
 		return this == LAVA || this == STATIONARYLAVA;
 	}
-	
+
 	public boolean isNetherBrickFenceConnector() {
 		return isSolid || this == FENCEGATE || this == NETHERBRICKFENCE;
 	}
-	
+
 	public boolean isFenceConnector() {
 		return isSolid || this == FENCEGATE || this == FENCE;
 	}
-	
+
 	public boolean isStoneWallConnector() {
 		return isSolid || this == FENCEGATE || this == STONEWALL;
 	}
-	
+
 	public boolean isGlassPaneConnector() {
 		return isSolid || this == GLASSPANE;
 	}
-	
+
 	public boolean isIronBarsConnector() {
 		return isSolid || this == IRONBARS;
 	}
-	
+
 	public boolean isRedstoneWireConnector() {
 		return redstoneConnectors.contains(this);
 	}
@@ -3202,7 +3202,7 @@ public class Block {
 	public boolean isCave() {
 		return !isSolid && !this.isWater();
 	}
-	
+
 	public boolean isStair() {
 		return id == OAKWOODSTAIRS_ID ||
 				id == STONESTAIRS_ID ||

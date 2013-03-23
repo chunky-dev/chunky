@@ -33,7 +33,7 @@ public class GrassModel {
 		// back
 		new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
 				new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
-		
+
 		// right
 		new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
 				new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
@@ -45,11 +45,11 @@ public class GrassModel {
 		// top
 		new Quad(new Vector3d(1, 1, 0), new Vector3d(0, 1, 0),
 				new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, 1)),
-		
+
 		// bottom
 		new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 				new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
-				
+
 	};
 
 	public static boolean intersect(Ray ray, Scene scene) {
@@ -66,7 +66,7 @@ public class GrassModel {
 					continue;
 				} else if (quad.n.y == 0 &&
 						(ray.currentMaterial & (1<<8)) != 0) {
-					
+
 					// snow side texture
 					Texture.snowSide.getColor(ray);
 					ray.n.set(quad.n);

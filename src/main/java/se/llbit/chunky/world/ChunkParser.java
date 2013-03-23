@@ -22,13 +22,13 @@ import java.util.Queue;
 /**
  * ChunkParser parses chunks after they have been read from
  * the filesystem by WorldLoader.
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class ChunkParser extends Thread {
-	
+
 	private Queue<Chunk> queue = new LinkedList<Chunk>();
-	
+
 	/**
 	 * Create new chunk parser
 	 */
@@ -45,25 +45,25 @@ public class ChunkParser extends Thread {
 		} catch (InterruptedException e) {
 		}
 	}
-	
+
 	/**
 	 * Get next chunk from the parse queue
 	 * @return
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	private synchronized Chunk getNext() throws InterruptedException {
 		while (queue.isEmpty())
 			wait();
 		return queue.poll();
 	}
-	
+
 	/**
 	 * Clear the parse queue
 	 */
 	public synchronized void clearQueue() {
 		queue.clear();
 	}
-	
+
 	/**
 	 * Add a chunk to the parse queue
 	 * @param chunk

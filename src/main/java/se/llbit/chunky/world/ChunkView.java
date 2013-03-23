@@ -27,50 +27,50 @@ public class ChunkView {
 
 	public final double x;
 	public final double z;
-	
+
 	// visible chunks
 	public final double x0;
 	public final double z0;
 	public final double x1;
 	public final double z1;
-	
+
 	// visible chunks [integer coordinates]
 	public final int ix0;
 	public final int iz0;
 	public final int ix1;
 	public final int iz1;
-	
+
 	// preloaded chunks
 	public final int px0;
 	public final int pz0;
 	public final int px1;
 	public final int pz1;
-	
+
 	// visible regions
 	public final int rx0;
 	public final int rz0;
 	public final int rx1;
 	public final int rz1;
-	
+
 	// preloaded regions
 	public final int prx0;
 	public final int prz0;
 	public final int prx1;
 	public final int prz1;
-	
+
 	public final int width;
 	public final int height;
 	public final int chunkScale;
 
-	
+
 	public ChunkView() {
 		this(0, 0, 0, 0);
 	}
-	
+
 	public ChunkView(double x, double z, int width, int height) {
 		this(x, z, width, height, 16);
 	}
-	
+
 	public ChunkView(double x, double z, int width, int height, int scale) {
 		this.x = x;
 		this.z = z;
@@ -100,12 +100,12 @@ public class ChunkView {
 		prz1 = pz1>>5;
 		this.chunkScale = scale;
 	}
-	
+
 	public boolean shouldPreload(Chunk chunk) {
 		ChunkPosition pos = chunk.getPosition();
 		return shouldPreloadChunk(pos.x, pos.z);
 	}
-	
+
 	public boolean shouldPreloadChunk(int x, int z) {
 		return px0 <= x && px1 >= x &&
 				pz0 <= z && pz1 >= z;
@@ -129,7 +129,7 @@ public class ChunkView {
 					&& iz1 == other.iz1)
 				return true;
 		}
-		
+
 		return false;
 	}
 
@@ -142,17 +142,17 @@ public class ChunkView {
 		ChunkPosition pos = region.getPosition();
 		return isRegionVisible(pos.x, pos.z);
 	}
-	
+
 	public boolean isRegionVisible(int x, int z) {
 		return rx0 <= x && rx1 >= x &&
 				rz0 <= z && rz1 >= z;
 	}
-	
+
 	public boolean shouldPreload(Region region) {
 		ChunkPosition pos = region.getPosition();
 		return shouldPreloadRegion(pos.x, pos.z);
 	}
-	
+
 	public boolean shouldPreloadRegion(int x, int z) {
 		return prx0 <= x && prx1 >= x &&
 				prz0 <= z && prz1 >= z;

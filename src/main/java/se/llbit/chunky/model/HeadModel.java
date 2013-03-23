@@ -34,7 +34,7 @@ public class HeadModel {
 		// back
 		new Quad(new Vector3d(4/16., 4/16., 12/16.), new Vector3d(12/16., 4/16., 12/16.),
 				new Vector3d(4/16., 12/16., 12/16.), new Vector4d(4/16., 12/16., 4/16., 12/16.)),
-		
+
 		// right
 		new Quad(new Vector3d(4/16., 4/16., 4/16.), new Vector3d(4/16., 4/16., 12/16.),
 				new Vector3d(4/16., 12/16., 4/16.), new Vector4d(4/16., 12/16., 4/16., 12/16.)),
@@ -46,7 +46,7 @@ public class HeadModel {
 		// top
 		new Quad(new Vector3d(12/16., 12/16., 4/16.), new Vector3d(4/16., 12/16., 4/16.),
 				new Vector3d(12/16., 12/16., 12/16.), new Vector4d(12/16., 4/16., 4/16., 12/16.)),
-		
+
 		// bottom
 		new Quad(new Vector3d(4/16., 4/16., 4/16.), new Vector3d(1, 4/16., 4/16.),
 				new Vector3d(4/16., 4/16., 1), new Vector4d(4/16., 1, 4/16., 1)),

@@ -31,7 +31,7 @@ public class FenceGateModel {
 			new AABB(.125, .875, .375, .5625, .4375, .5625),
 			new AABB(.125, .875, .75, .9375, .4375, .5625),
 	};
-	
+
 	private static AABB[] open = {
 		new AABB(0, .125, .3125, 1, .4375, .5625),
 		new AABB(.875, 1, .3125, 1, .4375, .5625),
@@ -39,14 +39,14 @@ public class FenceGateModel {
 		new AABB(0, .125, .375, .5625, .5625, .8125),
 		new AABB(0, .125, .75, .9375, .5625, .8125),
 		new AABB(0, .125, .375, .9375, .8125, .9375),
-		
+
 		new AABB(.875, 1, .375, .5625, .5625, .8125),
 		new AABB(.875, 1, .75, .9375, .5625, .8125),
 		new AABB(.875, 1, .375, .9375, .8125, .9375),
 };
-	
+
 	private static AABB[][][][] rot = new AABB[2][2][4][];
-	
+
 	static {
 		rot[0][0][0] = closed;
 		rot[0][0][1] = new AABB[closed.length];

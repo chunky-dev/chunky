@@ -25,7 +25,7 @@ public interface RenderStatusListener extends ProgressListener {
 	 * Called when chunks have been loaded.
 	 */
 	public void chunksLoaded();
-	
+
 	/**
 	 * Update render time status label
 	 * @param time Total render time in milliseconds
@@ -54,7 +54,7 @@ public interface RenderStatusListener extends ProgressListener {
 	 * Causes canvas size to be updated.
 	 */
 	public void sceneLoaded();
-	
+
 	/**
 	 * Called when the rendering activity has changed state
 	 * @param pathTrace

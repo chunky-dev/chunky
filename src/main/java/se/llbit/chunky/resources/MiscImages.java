@@ -23,7 +23,7 @@ import se.llbit.resources.ImageLoader;
 
 /**
  * Miscellaneous images used by Chunky.
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 @SuppressWarnings("javadoc")

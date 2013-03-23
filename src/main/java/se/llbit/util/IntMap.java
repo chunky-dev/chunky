@@ -20,7 +20,7 @@ import java.util.Iterator;
 
 /**
  * A hash map that uses integer keys
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  *
  * @param <V>
@@ -31,18 +31,18 @@ public class IntMap<V> implements Iterable<V> {
 		int key;
 		V value;
 		Entry<V> next;
-		
+
 		Entry(int key, V value) {
 			this.key = key;
 			this.value = value;
 		}
 	}
-	
+
 	private static class EntryIterator<V> implements Iterator<V>{
 		private int bucket = 0;
 		private Entry<V> entry;
 		private Entry<V>[] buckets;
-		
+
 		EntryIterator(Entry<V>[] buckets) {
 			this.buckets = buckets;
 		}
@@ -70,15 +70,15 @@ public class IntMap<V> implements Iterable<V> {
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}
-		
+
 	}
-	
+
 	private static final int NUM_BUCKETS = 10000;
 	private int size = 0;
-	
+
 	@SuppressWarnings("unchecked")
 	private Entry<V>[] buckets = new Entry[NUM_BUCKETS];
-	
+
 	/**
 	 * @return Number of key-value pairs in the map
 	 */
@@ -131,7 +131,7 @@ public class IntMap<V> implements Iterable<V> {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param key
 	 * @return The value corresponding to the given key,

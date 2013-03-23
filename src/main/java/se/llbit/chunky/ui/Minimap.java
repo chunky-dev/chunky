@@ -47,14 +47,14 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 	 * Default width of the minimap
 	 */
 	public static final int DEFAULT_WIDTH = 300;
-	
+
 	/**
 	 * Default height of the minimap
 	 */
 	public static final int DEFAULT_HEIGHT = 150;
 
 	private static final Font font = new Font("Sans serif", Font.BOLD, 11);
-	
+
 	private RenderBuffer renderBuffer;
 	private Chunky chunky;
 	private ChunkView view;
@@ -68,10 +68,10 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 		setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		setMinimumSize(new Dimension(100, 100));
 		setIgnoreRepaint(false);
-		
+
 		view = chunky.getMinimapView();
 		renderBuffer = new RenderBuffer(view);
-		
+
 		addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -91,7 +91,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 			public void mouseClicked(MouseEvent e) {
 			}
 		});
-		
+
 		addComponentListener(new ComponentListener() {
 			@Override
 			public void componentShown(ComponentEvent e) {
@@ -108,21 +108,21 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 			}
 		});
 	}
-	
+
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		
+
 		ChunkView mapView = chunky.getMapView();
-		
+
 		WorldRenderer renderer = chunky.getWorldRenderer();
 		World world = chunky.getWorld();
 		ChunkSelectionTracker selection = chunky.getChunkSelection();
-		
+
 		renderBuffer.updateView(view, null, 0);
 		renderer.renderMinimap(world, renderBuffer, selection);
 		renderBuffer.renderBuffered(g);
-		
+
 		// draw view rectangle
 		g.setColor(Color.orange);
 		g.drawRect(
@@ -130,12 +130,12 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 				(int) Math.round(mapView.z0 - view.z0),
 				(int) Math.round(mapView.width / (float) mapView.chunkScale),
 				(int) Math.round(mapView.height / (float) mapView.chunkScale));
-		
+
 		// draw North indicator
 		g.setFont(font);
 		g.setColor(Color.red);
 		g.drawString("N", view.width/2-4, 12);
-		
+
 		g.setColor(Color.black);
 		g.drawString(world.levelName(), 10, view.height-10);
 	}
@@ -160,7 +160,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 	public void chunksUpdated(Collection<ChunkPosition> chunks) {
 		renderBuffer.chunksUpdated(chunks);
 	}
-	
+
 	/**
 	 * Called when the minimap view has changed.
 	 * @param newView

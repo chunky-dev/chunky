@@ -26,12 +26,12 @@ public interface ChunkIterator {
 	 * @return <code>true</code> if the iterator has another chunk position
 	 */
 	boolean hasNext();
-	
+
 	/**
 	 * @return The next chunk position
 	 */
 	ChunkPosition next();
-	
+
 	/**
 	 * @param chunk Add a chunk position to be iterated over
 	 */

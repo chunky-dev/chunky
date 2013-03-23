@@ -24,56 +24,56 @@ import se.llbit.math.Vector4d;
 
 /**
  * Furnaces, chests, dispensers
- * 
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class FurnaceModel {
 	protected static Quad[][] sides = {
 		{}, {},
-		
+
 		// facing north
 		{
 			// north
 			new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
 					new Vector3d(1, 1, 0), new Vector4d(1, 0, 0, 1)),
-	
+
 			// south
 			new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
 					new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
-			
+
 			// west
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
 					new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
-	
+
 			// east
 			new Quad(new Vector3d(1, 0, 1), new Vector3d(1, 0, 0),
 					new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, 1)),
-	
+
 			// top
 			new Quad(new Vector3d(1, 1, 0), new Vector3d(0, 1, 0),
 					new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, 1)),
-			
+
 			// bottom
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
 		},
-		
+
 		// facing south
 		{},
-		
+
 		//facing west
 		{},
-		
+
 		// facing east
 		{},
 	};
-	
+
 	static {
 		rotateFaceY(2, 5);
 		rotateFaceY(5, 3);
 		rotateFaceY(3, 4);
 	}
-	
+
 	private static void rotateFaceY(int i, int j) {
 		sides[j] = new Quad[sides[i].length];
 		for (int k = 0; k < sides[i].length; ++k) {

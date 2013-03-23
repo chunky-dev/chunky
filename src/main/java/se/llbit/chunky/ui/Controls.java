@@ -70,21 +70,21 @@ import se.llbit.chunky.world.World;
 
 /**
  * This is the toolbox that's shown in the left part of the main Chunky GUI.
- * 
+ *
  * It has a tabbed pane which currently contains three tabs; View, Edit, Highlight
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 @SuppressWarnings("serial")
 public class Controls extends JPanel {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(Controls.class);
-	
+
 	private static final int WIDTH_BIG = 300;
 
 	private static final int RENDER_TAB_INDEX = 4;
-	
+
 	private Chunky chunky;
 	private JTextField scaleField;
 	private JSlider scaleSlider;
@@ -110,7 +110,7 @@ public class Controls extends JPanel {
 	private JTextField zField;
 
 	private JTabbedPane tabbedPane;
-	
+
 	/**
 	 * @param chunky
 	 * @param minimap
@@ -118,27 +118,27 @@ public class Controls extends JPanel {
 	public Controls(Chunky chunky, Minimap minimap) {
 		this.chunky = chunky;
 		this.minimap = minimap;
-		
+
 		faceIcon = new ImageIcon(MiscImages.face);
-		
+
 		initComponents();
 	}
-	
+
 	/**
 	 * Set up the Swing GUI.
 	 */
 	private void initComponents() {
 		setMinimumSize(new Dimension(257, 500));
-		
+
 		tabbedPane = new JTabbedPane();
-		
+
 		addTab("View", Icon.map.createIcon(), buildViewPanel(), "Change map view");
 		addTab("Chunks", Icon.mapSelected.createIcon(), buildEditPanel(), "Chunk operations");
 		addTab("Highlight", Icon.redTorchOn.createIcon(), buildHighlightPanel(), "Change block highlight settings");
 		addTab("Options", Icon.wrench.createIcon(), buildOptionsPanel(), "Configure Chunky");
 		addTab("3D Render", Icon.chunky.createIcon(), buildRenderPanel(), "Render chunks in 3D");
 		addTab("About", Texture.unknown.createIcon(), buildAboutPanel(), "About Chunky");
-		
+
 		JButton selectWorldBtn = new JButton();
 		selectWorldBtn.setText(Messages.getString("Controls.SelectWorld_lbl")); //$NON-NLS-1$
 		selectWorldBtn.addActionListener(new ActionListener() {
@@ -147,7 +147,7 @@ public class Controls extends JPanel {
 				openWorldSelector();
 			}
 		});
-		
+
 		JButton reloadWorldBtn = new JButton("Reload");
 		reloadWorldBtn.addActionListener(new ActionListener() {
 			@Override
@@ -155,7 +155,7 @@ public class Controls extends JPanel {
 				chunky.reloadWorld();
 			}
 		});
-		
+
 		GroupLayout layout = new GroupLayout(this);
 		setLayout(layout);
 		layout.setHorizontalGroup(layout.createSequentialGroup()
@@ -185,7 +185,7 @@ public class Controls extends JPanel {
 	/**
 	 * Add a tab and ensure that the icon is to the left of the text in the
 	 * tab label.
-	 * 
+	 *
 	 * @param title
 	 * @param icon
 	 * @param component
@@ -193,12 +193,12 @@ public class Controls extends JPanel {
 	 */
 	private void addTab(String title, ImageIcon icon, Component component, String tip) {
 		int index = tabbedPane.getTabCount();
-		
+
 		tabbedPane.add(component);
-		
+
 		JLabel lbl = new JLabel(title, icon, SwingConstants.RIGHT);
 		lbl.setIconTextGap(5);
-		
+
 		tabbedPane.setTabComponentAt(index, lbl);
 		tabbedPane.setToolTipTextAt(index, tip);
 	}
@@ -210,15 +210,15 @@ public class Controls extends JPanel {
 	 * @return the highlight tab component
 	 */
 	private JComponent buildHighlightPanel() {
-		
+
 		JLabel highlightLbl = new JLabel(
 				"<html>Highlights blocks of the selected type.<br>" +
 				"Only blocks in the current layer are highlighted!");
-		
+
 		JComponent highlightPanel = new JPanel();
-		
+
 		JButton colorChooserBtn = new JButton();
-		
+
 		colorChooserBtn.setText("Change Color");
 		colorChooserBtn.setToolTipText("Change the highlight color");
 		colorChooserBtn.addActionListener(new ActionListener() {
@@ -230,7 +230,7 @@ public class Controls extends JPanel {
 					chunky.setHighlightColor(color);
 			}
 		});
-		
+
 		JCheckBox enableHighlight = new JCheckBox();
 		enableHighlight.setText("Enable Highlight");
 		enableHighlight.setSelected(chunky.isHighlightEnabled());
@@ -241,7 +241,7 @@ public class Controls extends JPanel {
 				chunky.setHighlightEnable(s.isSelected());
 			}
 		});
-		
+
 		Block[] highlightBlocks = new Block[] {
 				Block.DIRT,
 				Block.GRASS,
@@ -268,7 +268,7 @@ public class Controls extends JPanel {
 			}
 		});
 		blockTypeBox.setRenderer(new BlockTypeListCellRenderer());
-		
+
 		GroupLayout layout = new GroupLayout(highlightPanel);
 		highlightPanel.setLayout(layout);
 		layout.setHorizontalGroup(layout.createSequentialGroup()
@@ -290,14 +290,14 @@ public class Controls extends JPanel {
 			.addComponent(colorChooserBtn)
 			.addContainerGap(10, 10)
 		);
-		
+
 		return highlightPanel;
 	}
-	
+
 	private JComponent buildOptionsPanel() {
-		
+
 		JComponent optionsPanel = new JPanel();
-		
+
 		JButton loadTexturePackBtn = new JButton("Load Texture Pack");
 		loadTexturePackBtn.setToolTipText("Load a custom texture pack");
 		loadTexturePackBtn.addActionListener(new ActionListener() {
@@ -322,7 +322,7 @@ public class Controls extends JPanel {
 				}
 			}
 		});
-		
+
 		JButton loadDefaultTexturesBtn = new JButton("Load Default Textures");
 		loadDefaultTexturesBtn.setToolTipText("Attempt to load the default Minecraft textures");
 		loadDefaultTexturesBtn.addActionListener(new ActionListener() {
@@ -332,7 +332,7 @@ public class Controls extends JPanel {
 				chunky.reloadWorld();
 			}
 		});
-		
+
 		GroupLayout layout = new GroupLayout(optionsPanel);
 		optionsPanel.setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
@@ -353,14 +353,14 @@ public class Controls extends JPanel {
 			.addComponent(loadDefaultTexturesBtn)
 			.addContainerGap(10, 10))
 		);
-		
+
 		return optionsPanel;
 	}
-	
+
 	private JComponent buildRenderPanel() {
-		
+
 		JComponent renderPanel = new JPanel();
-		
+
 		JButton newSceneBtn = new JButton();
 		newSceneBtn.setText("New Scene");
 		newSceneBtn.addActionListener(new ActionListener() {
@@ -369,7 +369,7 @@ public class Controls extends JPanel {
 				chunky.open3DView();
 			}
 		});
-		
+
 		JLabel numThreadsLbl = new JLabel("Render threads: ");
 		numThreadsField = new JTextField(5);
 		numThreadsField.setText("" + RenderManager.NUM_RENDER_THREADS_DEFAULT);
@@ -379,7 +379,7 @@ public class Controls extends JPanel {
 				numThreadsField.setText("" + getNumThreads());
 			}
 		});
-		
+
 		JButton testCLBtn = new JButton("Test OpenCL");
 		testCLBtn.setVisible(chunky.openCLEnabled);
 		testCLBtn.addActionListener(new ActionListener() {
@@ -388,7 +388,7 @@ public class Controls extends JPanel {
 				chunky.openCLTestRenderer();
 			}
 		});
-		
+
 		JButton benchmarkBtn = new JButton("Benchmark Renderer");
 		benchmarkBtn.setToolTipText("Benchmark the renderer.");
 		benchmarkBtn.addActionListener(new ActionListener() {
@@ -397,7 +397,7 @@ public class Controls extends JPanel {
 				chunky.runBenchmark();
 			}
 		});
-		
+
 		JButton loadSceneBtn = new JButton("Load Scene");
 		loadSceneBtn.addActionListener(new ActionListener() {
 			@Override
@@ -405,9 +405,9 @@ public class Controls extends JPanel {
 				chunky.loadScene();
 			}
 		});
-		
+
 		JSeparator sep1 = new JSeparator();
-		
+
 		clearSelectionBtn1.setText(Messages.getString("Controls.ClearSelected_lbl")); //$NON-NLS-1$
 		clearSelectionBtn1.setEnabled(false);
 		clearSelectionBtn1.addActionListener(new ActionListener() {
@@ -416,7 +416,7 @@ public class Controls extends JPanel {
 				chunky.clearSelectedChunks();
 			}
 		});
-		
+
 		JButton openSceneDirBtn = new JButton("Open Scene Directory");
 		openSceneDirBtn.setVisible(Desktop.isDesktopSupported());
 		openSceneDirBtn.addActionListener(new ActionListener() {
@@ -434,7 +434,7 @@ public class Controls extends JPanel {
 				}
 			}
 		});
-		
+
 		JButton changeSceneDirBtn = new JButton("Change Scene Directory");
 		changeSceneDirBtn.addActionListener(new ActionListener() {
 			@Override
@@ -442,7 +442,7 @@ public class Controls extends JPanel {
 				SceneDirectoryPicker.changeSceneDirectory(chunky.getFrame());
 			}
 		});
-		
+
 		GroupLayout layout = new GroupLayout(renderPanel);
 		renderPanel.setLayout(layout);
 		layout.setHorizontalGroup(layout.createSequentialGroup()
@@ -487,17 +487,17 @@ public class Controls extends JPanel {
 			.addComponent(changeSceneDirBtn)
 			.addContainerGap()
 		);
-		
+
 		return renderPanel;
 	}
-	
+
 	private JComponent buildAboutPanel() {
-		
+
 		JComponent aboutPanel = new JPanel();
 
 		JLabel aboutLbl = new JLabel();
 		aboutLbl.setText(Messages.getString("Controls.AboutText")); //$NON-NLS-1$
-		
+
 		JButton visitWikiBtn = new JButton("Visit the Wiki");
 		visitWikiBtn.addActionListener(new ActionListener() {
 			@Override
@@ -513,7 +513,7 @@ public class Controls extends JPanel {
 				}
 			}
 		});
-		
+
 		JButton visitDevBlogBtn = new JButton("Visit Online Community");
 		visitDevBlogBtn.addActionListener(new ActionListener() {
 			@Override
@@ -529,7 +529,7 @@ public class Controls extends JPanel {
 				}
 			}
 		});
-		
+
 		JButton showCreditsBtn = new JButton("View Credits");
 		showCreditsBtn.addActionListener(new ActionListener() {
 			@Override
@@ -538,7 +538,7 @@ public class Controls extends JPanel {
 				credits.setVisible(true);
 			}
 		});
-		
+
 		GroupLayout layout = new GroupLayout(aboutPanel);
 		aboutPanel.setLayout(layout);
 		layout.setHorizontalGroup(
@@ -565,7 +565,7 @@ public class Controls extends JPanel {
 				.addComponent(showCreditsBtn, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 				.addContainerGap())
 		);
-		
+
 		return aboutPanel;
 	}
 
@@ -574,9 +574,9 @@ public class Controls extends JPanel {
 	 * @return the view tab component
 	 */
 	private JComponent buildViewPanel() {
-		
+
 		JComponent viewPanel = new JPanel();
-		
+
 		ButtonGroup buttonGroup1 = new ButtonGroup();
 		JLabel viewLabel = new JLabel();
 		JRadioButton layerModeBtn = new JRadioButton();
@@ -592,14 +592,14 @@ public class Controls extends JPanel {
 		layerField = new JFormattedTextField(NumberFormat.getInstance());
 		layerSlider = new JSlider(0, Chunk.Y_MAX);
 		JLabel dimLabel = new JLabel();
-		
+
 		ButtonGroup buttonGroup2 = new ButtonGroup();
 		earthBtn = new JRadioButton();
 		netherBtn = new JRadioButton();
 		endBtn = new JRadioButton();
-		
+
 		dimLabel.setText(Messages.getString("Controls.Dimension_lbl")); //$NON-NLS-1$
-		
+
 		buttonGroup2.add(earthBtn);
 		earthBtn.setText(Messages.getString("Controls.Earth_lbl")); //$NON-NLS-1$
 		earthBtn.setSelected(true);
@@ -610,7 +610,7 @@ public class Controls extends JPanel {
 				chunky.setDimension(World.OVERWORLD_DIMENSION);
 			}
 		});
-		
+
 		buttonGroup2.add(netherBtn);
 		netherBtn.setText(Messages.getString("Controls.Nether_lbl")); //$NON-NLS-1$
 		netherBtn.setEnabled(false);
@@ -620,7 +620,7 @@ public class Controls extends JPanel {
 				chunky.setDimension(World.NETHER_DIMENSION);
 			}
 		});
-		
+
 		buttonGroup2.add(endBtn);
 		endBtn.setText(Messages.getString("Controls.End_lbl")); //$NON-NLS-1$
 		endBtn.setEnabled(false);
@@ -660,7 +660,7 @@ public class Controls extends JPanel {
 				chunky.setRenderer(Chunk.caveRenderer);
 			}
 		});
-		
+
 		buttonGroup1.add(biomeModeBtn);
 		biomeModeBtn.setText("Biomes");
 		biomeModeBtn.addActionListener(new ActionListener() {
@@ -683,7 +683,7 @@ public class Controls extends JPanel {
 				}
 			}
 		});
-		
+
 		scaleSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -694,7 +694,7 @@ public class Controls extends JPanel {
 
 		layerLabel.setText(Messages.getString("Controls.Layer_lbl")); //$NON-NLS-1$
 
-		layerField.setText(""+chunky.getLayer()); 
+		layerField.setText(""+chunky.getLayer());
 		layerField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -702,7 +702,7 @@ public class Controls extends JPanel {
 				chunky.setLayer(Integer.parseInt(text));
 			}
 		});
-		
+
 		layerSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -710,7 +710,7 @@ public class Controls extends JPanel {
 				chunky.setLayer(source.getValue());
 			}
 		});
-		
+
 		JLabel coordinatesLbl = new JLabel("Coordinates:");
 		JLabel xLbl = new JLabel("X=");
 		JLabel zLbl = new JLabel("Z=");
@@ -718,7 +718,7 @@ public class Controls extends JPanel {
 		xField.addActionListener(coordinateActionListener);
 		zField = new JTextField(5);
 		zField.addActionListener(coordinateActionListener);
-		
+
 		GroupLayout layout = new GroupLayout(viewPanel);
 		viewPanel.setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup()
@@ -814,7 +814,7 @@ public class Controls extends JPanel {
 				.addContainerGap()
 			)
 		);
-		
+
 		return viewPanel;
 	}
 
@@ -850,7 +850,7 @@ public class Controls extends JPanel {
 					chunky.exportZip(selectedFile, progressPanel);
 			}
 		});
-		
+
 		JButton renderViewBtn = new JButton();
 		renderViewBtn.setText("Render View to PNG");
 		renderViewBtn.setToolTipText(
@@ -876,7 +876,7 @@ public class Controls extends JPanel {
 					chunky.renderView(selectedFile, progressPanel);
 			}
 		});
-		
+
 		/*JButton renderDimensionBtn = new JButton();
 		renderDimensionBtn.setText("Render Dimension to PNG");
 		renderDimensionBtn.setToolTipText(
@@ -902,7 +902,7 @@ public class Controls extends JPanel {
 					chunky.renderDimension(selectedFile, progressPanel);
 			}
 		});*/
-		
+
 		deleteChunksBtn.setText(Messages.getString("Controls.DeleteSelected_lbl")); //$NON-NLS-1$
 		deleteChunksBtn.setEnabled(false);
 		deleteChunksBtn.addActionListener(new ActionListener() {
@@ -911,7 +911,7 @@ public class Controls extends JPanel {
 				chunky.deleteSelectedChunks();
 			}
 		});
-		
+
 		clearSelectionBtn2.setText(Messages.getString("Controls.ClearSelected_lbl")); //$NON-NLS-1$
 		clearSelectionBtn2.setEnabled(false);
 		clearSelectionBtn2.addActionListener(new ActionListener() {
@@ -920,7 +920,7 @@ public class Controls extends JPanel {
 				chunky.clearSelectedChunks();
 			}
 		});
-		
+
 		GroupLayout layout = new GroupLayout(editPanel);
 		editPanel.setLayout(layout);
 		layout.setHorizontalGroup(
@@ -953,17 +953,17 @@ public class Controls extends JPanel {
 				.addComponent(progressPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 				.addContainerGap(10, 10))
 		);
-		
+
 		return editPanel;
 	}
-	
+
 	/**
 	 * Set the current layer
 	 * @param y
 	 */
 	public void setLayer(int y) {
-		layerField.setText(""+y); 
-		layerSlider.setValue(y);		
+		layerField.setText(""+y);
+		layerSlider.setValue(y);
 	}
 
 	/**
@@ -977,16 +977,16 @@ public class Controls extends JPanel {
 		xField.setText(""+(int) (cx*16));
 		zField.setText(""+(int) (cz*16));
 	}
-	
+
 	/**
 	 * Set the map scale
 	 * @param scale
 	 */
 	public void setScale(int scale) {
-		scaleField.setText(""+scale); 
+		scaleField.setText(""+scale);
 		scaleSlider.setValue(scale);
 	}
-	
+
 	/**
 	 * Called when the chunk selection has changed to notify
 	 * the toolbox if chunks are selected or not
@@ -1000,7 +1000,7 @@ public class Controls extends JPanel {
 		if (selected && tabbedPane.getSelectedIndex() == 0)
 			tabbedPane.setSelectedIndex(RENDER_TAB_INDEX);
 	}
-	
+
 	/**
 	 * Set the player Y position
 	 * @param layer
@@ -1056,7 +1056,7 @@ public class Controls extends JPanel {
 			return RenderManager.NUM_RENDER_THREADS_DEFAULT;
 		}
 	}
-	
+
 	/**
 	 * Open the World Selector dialog.
 	 */

@@ -27,7 +27,7 @@ public class ChunkListIterator implements ChunkIterator {
 
 	List<ChunkPosition> list = new ArrayList<ChunkPosition>();
 	int index = 0;
-	
+
 	@Override
 	public boolean hasNext() {
 		return index < list.size();

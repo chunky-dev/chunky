@@ -26,7 +26,7 @@ public class VectorPool {
     private int limit = 10;
     private int size = 0;
     private Vector3d[] pool = new Vector3d[limit];
-    
+
     /**
      * @param other
      * @return A new vector initialized to be equal to the supplied vector.
@@ -41,7 +41,7 @@ public class VectorPool {
         vec.set(other);
         return vec;
     }
-    
+
     /**
      * @param x
      * @param y
@@ -58,7 +58,7 @@ public class VectorPool {
         vec.set(x, y, z);
         return vec;
     }
-    
+
     /**
      * @return A new, uninitialized, vector.
      */

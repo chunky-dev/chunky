@@ -25,7 +25,7 @@ public class SlabModel {
 	private static AABB[] aabb = {
 		// lower half-block
 		new AABB(0, 1, 0, .5, 0, 1),
-		
+
 		// upper half-block
 		new AABB(0, 1, .5, 1, 0, 1),
 	};
@@ -45,7 +45,7 @@ public class SlabModel {
 		}
 		return false;
 	}
-	
+
 	public static boolean intersect(Ray ray, Texture texture) {
 		int which = (ray.getBlockData() & 0x8) >> 3;
 		ray.t = Double.POSITIVE_INFINITY;

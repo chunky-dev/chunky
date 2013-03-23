@@ -32,13 +32,13 @@ import se.llbit.util.VectorPool;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class RenderWorker extends Thread {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(RenderWorker.class);
-	
+
 	private int id;
 	private AbstractRenderManager manager;
-	
+
 	private final Vector3d d = new Vector3d();
 	private final Vector3d o = new Vector3d();
 	private final Ray ray;
@@ -50,11 +50,11 @@ public class RenderWorker extends Thread {
 	 * Create a new render worker, slave to a given render manager.
 	 * @param manager
 	 * @param id
-	 * @param seed 
+	 * @param seed
 	 */
 	public RenderWorker(AbstractRenderManager manager, int id, long seed) {
 		super("3D Render Worker " + id);
-		
+
 		this.manager = manager;
 		this.id = id;
 		vectorPool = new VectorPool();
@@ -62,7 +62,7 @@ public class RenderWorker extends Thread {
 		ray = rayPool.get();
 		random = new Random(seed);
 	}
-	
+
 	public void run() {
 		try {
 			try {
@@ -77,7 +77,7 @@ public class RenderWorker extends Thread {
 					" crashed with uncaught exception.", e);
 		}
 	}
-	
+
 	/**
 	 * Perform work
 	 * @param jobId
@@ -85,37 +85,37 @@ public class RenderWorker extends Thread {
 	private final void work(int jobId) {
 
 		Scene scene = manager.bufferedScene();
-		
+
 		int canvasWidth = scene.canvasWidth();
 		int canvasHeight = scene.canvasHeight();
-		
+
 		int xjobs = (canvasWidth+(manager.tileWidth-1))/manager.tileWidth;
 		int x0 = manager.tileWidth * (jobId % xjobs);
 		int x1 = Math.min(x0 + manager.tileWidth, canvasWidth);
 		int y0 = manager.tileWidth * (jobId / xjobs);
 		int y1 = Math.min(y0 + manager.tileWidth, canvasHeight);
-		
+
 		double aspect = canvasWidth / (double) canvasHeight;
 		double[][][] samples = scene.getSampleBuffer();
 		final Camera cam = scene.camera();
-		
+
 		if (scene.pathTrace()) {
 			for (int x = x0; x < x1; ++x) {
 			for (int y = y0; y < y1; ++y) {
-				
+
 			double sr = 0;
 			double sg = 0;
 			double sb = 0;
-			
+
 			for (int i = 0; i < RenderManager.SPP; ++i) {
 				double oy = random.nextDouble();
 				double ox = random.nextDouble();
-				
+
 				cam.calcViewRay(ray, d, o,
 						random, aspect,
 						( .5 - (x + ox) / canvasWidth ),
 						(-.5 + (y + oy) / canvasHeight));
-				
+
 				scene.pathTrace(ray, rayPool, vectorPool, random);
 
 				sr += ray.color.x;
@@ -129,16 +129,16 @@ public class RenderWorker extends Thread {
 					scene.spp + sg) * sinv;
 			samples[x][y][2] = (samples[x][y][2] *
 					scene.spp + sb) * sinv;
-			
+
 			if (scene.finalizeBuffer())
 				scene.finalizePixel(x, y);
 			}}
-				
+
 		} else {
-			
+
 			for (int x = x0; x < x1; ++x) {
 			for (int y = y0; y < y1; ++y) {
-				
+
 			boolean firstFrame = scene.previewCount > 1;
 			if (firstFrame) {
 				if (((x+y)%2) == 0) {
@@ -150,20 +150,20 @@ public class RenderWorker extends Thread {
 					continue;
 				}
 			}
-			
+
 			cam.calcViewRay(ray, d, o,
 					random, aspect,
 					( .5 - (double)x / canvasWidth ),
 					(-.5 + (double)y / canvasHeight));
-			
+
 			scene.quickTrace(ray, rayPool);
-			
+
 			samples[x][y][0] = ray.color.x;
 			samples[x][y][1] = ray.color.y;
 			samples[x][y][2] = ray.color.z;
 
 			scene.finalizePixel(x, y);
-			
+
 			if (firstFrame) {
 				if (y%2 == 0 && x < (canvasWidth-1)) {
 					// copy forward
@@ -173,10 +173,10 @@ public class RenderWorker extends Thread {
 					scene.copyPixel(x + y * canvasWidth, -1);
 				}
 			}
-			
+
 			}}
 		}
-		
+
 	}
 
 }

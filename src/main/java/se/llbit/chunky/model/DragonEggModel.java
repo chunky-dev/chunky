@@ -32,7 +32,7 @@ public class DragonEggModel {
 		new AABB(5/16., 11/16., 14/16., 15/16., 5/16., 11/16.),
 		new AABB(6/16., 10/16., 15/16., 16/16., 6/16., 10/16.),
 	};
-	
+
 	public static boolean intersect(Ray ray) {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;

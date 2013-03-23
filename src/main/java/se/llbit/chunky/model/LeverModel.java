@@ -34,27 +34,27 @@ public class LeverModel {
 		// front
 		new Quad(new Vector3d(.75, 0, .3125), new Vector3d(.25, 0, .3125),
 				new Vector3d(.75, .1875, .3125), new Vector4d(.75, .25, 0, .1875)),
-				
+
 		// back
 		new Quad(new Vector3d(.25, 0, .6875), new Vector3d(.75, 0, .6875),
 				new Vector3d(.25, .1875, .6875), new Vector4d(.25, .75, 0, .1875)),
-					
+
 		// right
 		new Quad(new Vector3d(.25, 0, .3125), new Vector3d(.25, 0, .6875),
 				new Vector3d(.25, .1875, .3125), new Vector4d(.3125, .6875, 0, .1875)),
-	
+
 		// left
 		new Quad(new Vector3d(.75, 0, .6875), new Vector3d(.75, 0, .3125),
 				new Vector3d(.75, .1875, .6875), new Vector4d(.6875, .3125, 0, .1875)),
-	
+
 		// top
 		new Quad(new Vector3d(.75, .1875, .3125), new Vector3d(.25, .1875, .3125),
 				new Vector3d(.75, .1875, .6875), new Vector4d(.75, 0, .3125, .6875)),
-		
+
 		// bottom
 		/*new Quad(new Vector3d(.25, 0, .3125), new Vector3d(.75, 0, .3125),
 				new Vector3d(.25, 0, .6875), new Vector4d(.25, .75, .3125, .6875)),*/
-		
+
 	};
 
 	private static Quad[] lever = {
@@ -63,13 +63,13 @@ public class LeverModel {
 
 		new Quad(new Vector3d(.4375, 0, .5625), new Vector3d(.5625, 0, .5625),
 				new Vector3d(.4375, .625, .5625), new Vector4d(.4375, .5625, 0, .625)),
-				
+
 		new Quad(new Vector3d(.4375, 0, .4375), new Vector3d(.4375, 0, .5625),
 				new Vector3d(.4375, .625, .4375), new Vector4d(.4375, .5625, 0, .625)),
 
 		new Quad(new Vector3d(.5625, 0, .5625), new Vector3d(.5625, 0, .4375),
 				new Vector3d(.5625, .625, .5625), new Vector4d(.5625, .4375, 0, .625)),
-				
+
 		// top
 		new Quad(new Vector3d(.4375, .625, .5625), new Vector3d(.5625, .625, .5625),
 				new Vector3d(.4375, .625, .4375), new Vector4d(.4375, .5625, .5, .625)),
@@ -79,7 +79,7 @@ public class LeverModel {
 	private static Quad[][][] leverRotated = new Quad[8][2][];
 
 	static {
-		
+
 		Quad[] groundEW = base;
 		Quad[] groundNS = rotateY(groundEW);
 		Quad[] wallWest = rotateZ(groundEW);
@@ -88,7 +88,7 @@ public class LeverModel {
 		Quad[] wallSouth = rotateY(wallEast);
 		Quad[] ceilingEW = rotateZ(wallWest);
 		Quad[] ceilingNS = rotateY(ceilingEW);
-		
+
 		baseRotated[0][0] = ceilingEW;
 		baseRotated[0][1] = ceilingEW;
 		baseRotated[1][0] = wallEast;
@@ -105,28 +105,28 @@ public class LeverModel {
 		baseRotated[6][1] = groundEW;
 		baseRotated[7][0] = ceilingNS;
 		baseRotated[7][1] = ceilingNS;
-		
+
 		Quad[] leverEWOff = translate(rotateZ(lever, -Math.PI/4), .35, 0, 0);
 		Quad[] leverEWOn = translate(rotateZ(lever, Math.PI/4), -.35, 0, 0);
 		Quad[] leverNSOn = rotateY(leverEWOn);
 		Quad[] leverNSOff = rotateY(leverEWOff);
-		
+
 		Quad[] leverWallWestOff = rotateZ(leverEWOff);
 		Quad[] leverWallNorthOff = rotateY(leverWallWestOff);
 		Quad[] leverWallEastOff = rotateY(leverWallNorthOff);
 		Quad[] leverWallSouthOff = rotateY(leverWallEastOff);
-		
+
 		Quad[] leverWallWestOn = rotateZ(leverEWOn);
 		Quad[] leverWallNorthOn = rotateY(leverWallWestOn);
 		Quad[] leverWallEastOn = rotateY(leverWallNorthOn);
 		Quad[] leverWallSouthOn = rotateY(leverWallEastOn);
-		
+
 		Quad[] leverCeilingEWOff = rotateZ(leverWallWestOn);
 		Quad[] leverCeilingEWOn = rotateZ(leverWallWestOff);
-		
+
 		Quad[] leverCeilingNSOff = rotateY(leverCeilingEWOff);
 		Quad[] leverCeilingNSOn = rotateY(leverCeilingEWOn);
-		
+
 		leverRotated[0][0] = leverCeilingEWOff;
 		leverRotated[0][1] = leverCeilingEWOn;
 		leverRotated[1][0] = leverWallEastOff;
@@ -149,11 +149,11 @@ public class LeverModel {
 	public static boolean intersect(Ray ray) {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
-		
+
 		int metadata = ray.getBlockData();
 		int activated = (metadata >> 3) & 1;
 		int direction = (metadata & 7);
-		
+
 		for (Quad quad : baseRotated[direction][activated]) {
 			if (quad.intersect(ray)) {
 				Texture.cobblestone.getColor(ray);
@@ -162,7 +162,7 @@ public class LeverModel {
 				hit = true;
 			}
 		}
-		
+
 		for (Quad quad : leverRotated[direction][activated]) {
 			if (quad.intersect(ray)) {
 				Texture.lever.getColor(ray);
@@ -171,7 +171,7 @@ public class LeverModel {
 				hit = true;
 			}
 		}
-		
+
 		if (hit) {
 			ray.color.w = 1;
 			ray.distance += ray.t;

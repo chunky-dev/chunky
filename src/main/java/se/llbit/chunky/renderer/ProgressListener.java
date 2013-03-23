@@ -30,7 +30,7 @@ public interface ProgressListener {
 	 * @param target
 	 */
 	void setProgress(String task, int done, int start, int target);
-	
+
 	/**
 	 * Update progress
 	 * @param task

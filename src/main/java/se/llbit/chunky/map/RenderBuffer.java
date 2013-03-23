@@ -38,11 +38,11 @@ import se.llbit.chunky.world.ChunkViewIterator;
  * Keeps a buffered image of rendered chunks. Only re-render chunks when
  * they are not buffered. The buffer contains all visible chunks, plus some
  * outside of the view.
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class RenderBuffer implements ChunkUpdateListener {
-	
+
 	private BufferedImage buffer;
 	private int buffW;
 	private int buffH;
@@ -54,7 +54,7 @@ public class RenderBuffer implements ChunkUpdateListener {
 	private int[] data;
 	private Graphics graphics;
 	private ChunkIterator iterator = new ChunkListIterator();
-	
+
 	/**
 	 * Create a new render buffer for the provided view
 	 * @param view
@@ -70,7 +70,7 @@ public class RenderBuffer implements ChunkUpdateListener {
 		data = dataBuffer.getData();
 		flushCache();
 	}
-	
+
 	/**
 	 * Force all visible chunks to be redrawn
 	 */
@@ -79,7 +79,7 @@ public class RenderBuffer implements ChunkUpdateListener {
 		graphics.fillRect(0, 0, buffW, buffH);
 		redrawAllChunks(view);
 	}
-	
+
 	/**
 	 * Called when this render buffer should buffer another view.
 	 * @param newView
@@ -88,12 +88,12 @@ public class RenderBuffer implements ChunkUpdateListener {
 	 */
 	public synchronized void updateView(ChunkView newView, Renderer renderer,
 			int layer) {
-		
+
 		boolean bufferedMode = buffMode == renderer
 				&& (buffMode != Chunk.layerRenderer || buffLayer == layer);
-		
+
 		if (!newView.equals(view) || !bufferedMode) {
-			
+
 			BufferedImage prev = buffer;
 			buffW = (int) (newView.chunkScale * (newView.ix1 - newView.ix0 + 1));
 			buffH = (int) (newView.chunkScale * (newView.iz1 - newView.iz0 + 1));
@@ -114,21 +114,21 @@ public class RenderBuffer implements ChunkUpdateListener {
 						(int) (newView.chunkScale * (view.iz1 - view.iz0 + 1)), null);
 			else
 				graphics.drawImage(prev, ix0, iz0, null);
-			
+
 			if (!bufferedMode || view.chunkScale != newView.chunkScale)
 				redrawAllChunks(newView);
 			else
 				redrawNewChunks(newView);
 		}
-		
+
 		buffMode = renderer;
 		buffLayer = layer;
-		
+
 		view = newView;
 		x_offset = (int) (view.chunkScale * (view.ix0 - view.x0));
 		y_offset = (int) (view.chunkScale * (view.iz0 - view.z0));
 	}
-	
+
 	private synchronized void redrawAllChunks(ChunkView newView) {
 		iterator = new ChunkViewIterator(newView);
 	}
@@ -150,7 +150,7 @@ public class RenderBuffer implements ChunkUpdateListener {
 	public final synchronized void renderBuffered(Graphics g) {
 		renderBuffered1(g);
 	}
-	
+
 	/**
 	 * Debug method
 	 * @param g
@@ -173,7 +173,7 @@ public class RenderBuffer implements ChunkUpdateListener {
 			graphics = buffer.getGraphics();
 		}
 	}
-	
+
 	/**
 	 * Default buffer rendering
 	 * @param g
@@ -206,7 +206,7 @@ public class RenderBuffer implements ChunkUpdateListener {
 	public synchronized int getHeight() {
 		return buffH;
 	}
-	
+
 	/**
 	 * Set a pixel in the buffer to a specific color
 	 * @param x
@@ -248,7 +248,7 @@ public class RenderBuffer implements ChunkUpdateListener {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * @return An iterator for chunks that need to be redrawn
 	 */

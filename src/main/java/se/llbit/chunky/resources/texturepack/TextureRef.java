@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public abstract class TextureRef {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(TextureRef.class);
-	
+
 	private String file;
-	
+
 	/**
 	 * Constructor
 	 * @param file The path to the texture file (excluding file extension)
@@ -42,7 +42,7 @@ public abstract class TextureRef {
 	public TextureRef(String file) {
 		this.file = file;
 	}
-	
+
 	/**
 	 * Attempt to load a texture from a texture pack
 	 * @param texturePack Reference to the texture pack zip file
@@ -61,16 +61,16 @@ public abstract class TextureRef {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Load this texture from the terrain spritemap
-	 * @param terrain 
+	 * @param terrain
 	 * @return <code>true</code> if the texture was successfully loaded
 	 */
 	public boolean loadFromTerrain(BufferedImage[] terrain) {
 		return false;
 	}
-	
+
 	abstract boolean load(InputStream imageStream) throws IOException,
 			TextureFormatError;
 
@@ -81,3 +81,4 @@ public abstract class TextureRef {
 		return file;
 	}
 }
+

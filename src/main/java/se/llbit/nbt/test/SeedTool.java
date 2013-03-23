@@ -31,14 +31,14 @@ import se.llbit.nbt.NamedTag;
 
 @SuppressWarnings("javadoc")
 public class SeedTool {
-	
+
 	public static void main(String[] args) {
-		
+
 		if (args.length < 3) {
 			System.out.println("arguments: <level.dat> <new seed> <output file>");
 			System.exit(0);
 		}
-		
+
 		String fn = args[0];
 		Long seed = Long.parseLong(args[1]);
 		try {
@@ -57,6 +57,6 @@ public class SeedTool {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 	}
 }

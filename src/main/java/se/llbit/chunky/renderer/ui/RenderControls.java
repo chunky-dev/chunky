@@ -82,23 +82,23 @@ import se.llbit.util.ProgramProperties;
 @SuppressWarnings("serial")
 public class RenderControls extends JDialog implements ViewListener,
 	RenderStatusListener {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(RenderControls.class);
-	
+
 	private static final int[] dumpFrequencies = { 50, 100, 500, 1000 };
-	
+
 	private final RenderManager renderManager;
 	private final SceneManager sceneManager;
 	private final Chunk3DView view;
 	private final Chunky chunky;
-	
+
 	/**
 	 * Number format for current locale.
 	 */
 	private NumberFormat numberFormat =
 			NumberFormat.getInstance();
-	
+
 	private final JSlider sunAzimuthSlider = new JSlider();
 	private final JTextField sunAzimuthField = new JTextField();
 	private final JSlider skyRotationSlider = new JSlider();
@@ -166,33 +166,33 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	/**
 	 * Create a new Render Controls dialog.
-	 * @param chunkyInstance 
-	 * @param renderContext 
+	 * @param chunkyInstance
+	 * @param renderContext
 	 */
 	public RenderControls(Chunky chunkyInstance, RenderContext renderContext) {
-		
+
 		super(chunkyInstance.getFrame());
-		
+
 		decimalFormat.setGroupingSize(3);
 		decimalFormat.setGroupingUsed(true);
-		
+
 		context = renderContext;
 		chunky = chunkyInstance;
-		
+
 		view = new Chunk3DView(this, chunkyInstance.getFrame());
-		
+
 		renderManager = new RenderManager(
 				view.getCanvas(), renderContext, this);
 		renderManager.start();
-		
+
 		view.setRenderer(renderManager);
-		
+
 		sceneManager = new SceneManager(renderManager);
 		sceneManager.start();
-		
+
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		setModalityType(ModalityType.MODELESS);
-		
+
 		addWindowListener(new WindowListener() {
 			@Override
 			public void windowOpened(WindowEvent e) {
@@ -215,7 +215,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void windowClosed(WindowEvent e) {
 				// halt rendering
 				renderManager.interrupt();
-				
+
 				// dispose of the 3D view
 				view.setVisible(false);
 				view.dispose();
@@ -224,21 +224,21 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void windowActivated(WindowEvent e) {
 			}
 		});
-		
+
 		updateTitle();
-		
+
 		JTabbedPane tabbedPane = new JTabbedPane();
-		
+
 		tabbedPane.addTab("General", buildGeneralPane());
 		tabbedPane.addTab("Lighting", buildLightingPane());
 		tabbedPane.addTab("Sky", buildSkyPane());
 		tabbedPane.addTab("Camera", buildCameraPane());
 		tabbedPane.addTab("Post-processing", buildPostProcessingPane());
 		tabbedPane.addTab("Advanced", buildAdvancedPane());
-		
+
 		JLabel sppTargetLbl = new JLabel("SPP Target: ");
 		sppTargetLbl.setToolTipText("The render will be paused at this SPP count");
-		
+
 		JButton setDefaultBtn = new JButton("Set Default");
 		setDefaultBtn.setToolTipText("Make the current SPP target the default");
 		setDefaultBtn.addActionListener(new ActionListener() {
@@ -248,14 +248,14 @@ public class RenderControls extends JDialog implements ViewListener,
 						"" + renderManager.scene().getTargetSPP());
 			}
 		});
-		
+
 		sppTargetField.setColumns(10);
 		sppTargetField.getDocument().addDocumentListener(sppTargetListener);
-		
+
 		updateSPPTargetField();
-		
+
 		JLabel renderLbl = new JLabel("Render: ");
-		
+
 		setViewVisible(false);
 		showPreviewBtn.addActionListener(new ActionListener() {
 			@Override
@@ -267,7 +267,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				}
 			}
 		});
-		
+
 		startRenderBtn.setText("START");
 		startRenderBtn.addActionListener(new ActionListener() {
 			@Override
@@ -290,7 +290,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				stopRenderBtn.setEnabled(true);
 			}
 		});
-		
+
 		stopRenderBtn.setText("HALT");
 		stopRenderBtn.setToolTipText("<html>Warning: this will discard the " +
 				"current rendered image!<br>Make sure to save your image " +
@@ -306,24 +306,24 @@ public class RenderControls extends JDialog implements ViewListener,
 				stopRenderBtn.setEnabled(false);
 			}
 		});
-		
+
 		saveFrameBtn.setText("Save Current Frame");
 		saveFrameBtn.addActionListener(saveFrameListener);
-		
+
 		samplesPerSecondLbl.setToolTipText("Samples Per Second");
 		sppLbl.setToolTipText("Samples Per Pixel");
-		
+
 		setRenderTime(0);
 		setSamplesPerSecond(0);
 		setSPP(0);
 		setProgress("Progress:", 0, 0, 1);
-		
+
 		progressBar = new JProgressBar();
-		
+
 		progressLbl.setText("Progress:");
-		
+
 		etaLbl.setText("ETA:");
-		
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -390,11 +390,11 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addContainerGap()
 		);
 		setContentPane(panel);
-		
+
 		pack();
-		
+
 		setLocationRelativeTo(chunky.getFrame());
-		
+
 		setVisible(true);
 	}
 
@@ -403,14 +403,14 @@ public class RenderControls extends JDialog implements ViewListener,
 		rayDepthField.setColumns(5);
 		rayDepthField.addActionListener(rayDepthFieldListener);
 		updateRayDepthField();
-		
+
 		rayDepthSlider.setMinimum(1);
 		rayDepthSlider.setMaximum(100);
 		rayDepthSlider.addChangeListener(rayDepthListener);
 		updateRayDepthSlider();
-		
+
 		JSeparator sep1 = new JSeparator();
-		
+
 		JLabel waterWorldLbl = new JLabel(
 				"Note: All chunks will be reloaded after changing the water world options!");
 		JLabel waterHeightLbl = new JLabel("Water height: ");
@@ -426,7 +426,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateWaterHeight();
 			}
 		});
-		
+
 		waterWorldCB.setText("Water World Mode");
 		waterWorldCB.setSelected(false);
 		waterWorldCB.addActionListener(new ActionListener() {
@@ -443,7 +443,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateWaterHeight();
 			}
 		});
-		
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -488,7 +488,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		);
 		return panel;
 	}
-	
+
 	private Component buildPostProcessingPane() {
 		JLabel exposureLbl = new JLabel("exposure: ");
 
@@ -515,7 +515,7 @@ public class RenderControls extends JDialog implements ViewListener,
 						Postprocess.get(source.getSelectedIndex()));
 			}
 		});
-		
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -559,21 +559,21 @@ public class RenderControls extends JDialog implements ViewListener,
 	private Component buildGeneralPane() {
 		JLabel widthLbl = new JLabel("Canvas width: ");
 		JLabel heightLbl = new JLabel("Canvas height: ");
-		
+
 		widthField.setColumns(10);
 		widthField.addActionListener(canvasSizeListener);
 		heightField.setColumns(10);
 		heightField.addActionListener(canvasSizeListener);
-		
+
 		updateWidthField();
 		updateHeightField();
-		
+
 		saveSceneBtn.setText("Save Scene");
 		saveSceneBtn.addActionListener(saveSceneListener);
-		
+
 		loadSceneBtn.setText("Load Scene");
 		loadSceneBtn.addActionListener(loadSceneListener);
-		
+
 		JButton loadSelectedChunksBtn = new JButton("Load Selected Chunks");
 		loadSelectedChunksBtn.setToolTipText("Load the chunks that are currently selected in the map view");
 		loadSelectedChunksBtn.addActionListener(new ActionListener() {
@@ -582,7 +582,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				loadChunks(chunky.getWorld(), chunky.getSelectedChunks());
 			}
 		});
-		
+
 		JButton reloadChunksBtn = new JButton("Reload Chunks");
 		reloadChunksBtn.setToolTipText("Reload all chunks in the scene");
 		reloadChunksBtn.addActionListener(new ActionListener() {
@@ -591,7 +591,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				sceneManager.reloadChunks();
 			}
 		});
-		
+
 		JButton openSceneDirBtn = new JButton("Open Scene Directory");
 		openSceneDirBtn.setToolTipText("Open the directory where Chunky stores scene descriptions and renders");
 		openSceneDirBtn.addActionListener(new ActionListener() {
@@ -607,7 +607,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		openSceneDirBtn.setVisible(Desktop.isDesktopSupported());
-		
+
 		loadSceneBtn.setToolTipText("This replaces the current scene!");
 		JButton setCanvasSizeBtn = new JButton("Set Canvas Size");
 		setCanvasSizeBtn.addActionListener(canvasSizeListener);
@@ -631,7 +631,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				setCanvasSize(width, height);
 			}
 		});
-		
+
 		JButton makeDefaultBtn = new JButton("Make Default");
 		makeDefaultBtn.setToolTipText("Make the current canvas size the default");
 		makeDefaultBtn.addActionListener(new ActionListener() {
@@ -643,30 +643,30 @@ public class RenderControls extends JDialog implements ViewListener,
 						"" + renderManager.scene().canvasHeight());
 			}
 		});
-		
+
 		JSeparator sep1 = new JSeparator();
 		JSeparator sep2 = new JSeparator();
-		
+
 		sceneNameLbl.setText("Scene name: ");
-		sceneNameField.setColumns(15); 
+		sceneNameField.setColumns(15);
 		sceneNameField.getDocument().addDocumentListener(sceneNameListener);
 		updateSceneNameField();
-		
+
 		stillWaterCB.setText("still water");
 		stillWaterCB.addActionListener(stillWaterListener);
 		updateStillWater();
-		
+
 		clearWaterCB.setText("clear water");
 		stillWaterCB.addActionListener(clearWaterListener);
 		updateClearWater();
-		
+
 		biomeColorsCB.setText("enable biome colors");
 		updateBiomeColorsCB();
-		
+
 		saveDumpsCB.setText("save dump once every ");
 		saveDumpsCB.addActionListener(saveDumpsListener);
 		updateSaveDumpsCheckBox();
-		
+
 		JLabel dumpFrequencyLbl = new JLabel(" frame");
 		String[] frequencyStrings = new String[dumpFrequencies.length];
 		for (int i = 0; i < dumpFrequencies.length; ++i)
@@ -675,7 +675,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		dumpFrequency.setEditable(false);
 		dumpFrequency.addActionListener(dumpFrequencyListener);
 		updateDumpFrequencyField();
-		
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -765,9 +765,9 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addContainerGap());
 		return panel;
 	}
-	
+
 	private Component buildLightingPane() {
-		
+
 		changeSunColorBtn.setText("Change Sun Color");
 		changeSunColorBtn.addActionListener(new ActionListener() {
 			@Override
@@ -780,15 +780,15 @@ public class RenderControls extends JDialog implements ViewListener,
 				}
 			}
 		});
-		
+
 		directLight.setText("enable sunlight");
 		directLight.setSelected(renderManager.scene().getDirectLight());
 		directLight.addActionListener(directLightListener);
-		
+
 		enableEmitters.setText("enable emitters");
 		enableEmitters.setSelected(renderManager.scene().getEmittersEnabled());
 		enableEmitters.addActionListener(emittersListener);
-		
+
 		JLabel sunAzimuthLbl = new JLabel("Sun azimuth: ");
 		JLabel sunAltitudeLbl = new JLabel("Sun altitude: ");
 
@@ -797,39 +797,39 @@ public class RenderControls extends JDialog implements ViewListener,
 		emitterIntensitySlider.setMaximum(100);
 		emitterIntensitySlider.addChangeListener(emitterIntensityListener);
 		updateEmitterIntensitySlider();
-		
+
 		JLabel sunIntensityLbl = new JLabel("Sun intensity: ");
 		sunIntensitySlider.setMinimum(1);
 		sunIntensitySlider.setMaximum(100);
 		sunIntensitySlider.addChangeListener(sunIntensityListener);
 		updateSunIntensitySlider();
-		
+
 		sunIntensityField.setColumns(5);
 		sunIntensityField.addActionListener(sunIntensityFieldListener);
 		updateSunIntensityField();
-		
+
 		emitterIntensityField.setColumns(5);
 		emitterIntensityField.addActionListener(emitterIntensityFieldListener);
 		updateEmitterIntensityField();
-		
+
 		sunAzimuthSlider.setMinimum(0);
 		sunAzimuthSlider.setMaximum(100);
 		sunAzimuthSlider.addChangeListener(sunAzimuthListener);
 		updateSunAzimuthSlider();
-		
+
 		sunAzimuthField.setColumns(5);
 		sunAzimuthField.addActionListener(sunAzimuthFieldListener);
 		updateSunAzimuthField();
-		
+
 		sunAltitudeSlider.setMinimum(0);
 		sunAltitudeSlider.setMaximum(100);
 		sunAltitudeSlider.addChangeListener(sunAltitudeListener);
 		updateSunAltitudeSlider();
-		
+
 		sunAltitudeField.setColumns(5);
 		sunAltitudeField.addActionListener(sunAltitudeFieldListener);
 		updateSunAltitudeField();
-		
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -897,9 +897,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		);
 		return panel;
 	}
-	
+
 	private Component buildSkyPane() {
-		
+
 		@SuppressWarnings("unused")
 		JLabel skyModeLbl = new JLabel("Sky mode:");
 		skyModeCB.addItem("gradient");
@@ -908,24 +908,24 @@ public class RenderControls extends JDialog implements ViewListener,
 		skyModeCB.addItem("skybox");
 		skyModeCB.addActionListener(skyModeListener);
 		updateSkyMode();
-		
+
 		JLabel skyRotationLbl = new JLabel("Skymap rotation:");
 		skyRotationSlider.setMinimum(1);
 		skyRotationSlider.setMaximum(100);
 		skyRotationSlider.addChangeListener(skyRotationListener);
 		skyRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
 		updateSkyRotation();
-		
+
 		loadSkymapBtn.setText("Load Skymap");
 		loadSkymapBtn.setToolTipText("Use a panoramic skymap");
 		loadSkymapBtn.addActionListener(loadSkymapListener);
-		
+
 		JSeparator sep1 = new JSeparator();
-		
+
 		mirrorSkyCB.setText("Mirror sky at horizon");
 		mirrorSkyCB.addActionListener(mirrorSkyListener);
 		updateMirroSkyCB();
-		
+
 		changeGroundColorBtn.setText("Change Ground Color");
 		changeGroundColorBtn.addActionListener(new ActionListener() {
 			@Override
@@ -938,7 +938,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				}
 			}
 		});
-		
+
 		JButton unloadSkymapBtn = new JButton("Unload Skymap");
 		unloadSkymapBtn.setToolTipText("Use the default sky");
 		unloadSkymapBtn.addActionListener(new ActionListener() {
@@ -947,30 +947,30 @@ public class RenderControls extends JDialog implements ViewListener,
 				renderManager.scene().sky().unloadSkymap();
 			}
 		});
-		
+
 		atmosphereEnabled.setText("enable atmosphere");
 		atmosphereEnabled.addActionListener(atmosphereListener);
 		updateAtmosphereCheckBox();
-		
+
 		volumetricFogEnabled.setText("enable volumetric fog");
 		volumetricFogEnabled.addActionListener(volumetricFogListener);
 		updateVolumetricFogCheckBox();
-		
+
 		cloudsEnabled.setText("enable clouds");
 		cloudsEnabled.addActionListener(cloudsEnabledListener);
 		updateCloudsEnabledCheckBox();
-		
+
 		JLabel cloudHeightLbl = new JLabel("cloud height: ");
-		
+
 		cloudHeightSlider.setMinimum(-128);
 		cloudHeightSlider.setMaximum(512);
 		cloudHeightSlider.addChangeListener(cloudHeightListener);
 		updateCloudHeightSlider();
-		
+
 		cloudHeightField.setColumns(5);
 		cloudHeightField.addActionListener(cloudHeightFieldListener);
 		updateCloudHeightField();
-		
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -1043,43 +1043,43 @@ public class RenderControls extends JDialog implements ViewListener,
 		);
 		return panel;
 	}
-	
+
 	private Component buildCameraPane() {
 		JLabel fovLbl = new JLabel("Field of View (zoom): ");
 		JLabel dofLbl = new JLabel("Depth of Field: ");
 		JLabel focalOffsetLbl = new JLabel("Focal Offset: ");
-		
+
 		dofSlider.setMinimum(1);
 		dofSlider.setMaximum(1000);
 		dofSlider.addChangeListener(dofListener);
 		updateDofSlider();
-		
+
 		fovSlider.setMinimum(1);
 		fovSlider.setMaximum(1000);
 		fovSlider.addChangeListener(fovListener);
 		updateFovSlider();
-		
+
 		focalOffsetSlider.setMinimum(1);
 		focalOffsetSlider.setMaximum(1000);
 		focalOffsetSlider.addChangeListener(focalOffsetListener);
 		updateFocalOffsetSlider();
-		
+
 		parallelProjectionCB.setText("Parallel Projection");
 		parallelProjectionCB.addChangeListener(parallelProjectionListener);
 		updateParallelProjectionCheckBox();
-		
+
 		fovField.setColumns(5);
 		fovField.addActionListener(fovFieldListener);
 		updateFovField();
-		
+
 		dofField.setColumns(5);
 		dofField.addActionListener(dofFieldListener);
 		updateDofField();
-		
+
 		focalOffsetField.setColumns(5);
 		focalOffsetField.addActionListener(focalOffsetFieldListener);
 		updateFocalOffsetField();
-		
+
 		JButton autoFocusBtn = new JButton("Autofocus");
 		autoFocusBtn.setToolTipText("Focuses on the object right in the center, under the crosshairs");
 		autoFocusBtn.addActionListener(new ActionListener() {
@@ -1092,7 +1092,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateFocalOffsetSlider();
 			}
 		});
-		
+
 		JButton cameraToPlayerBtn = new JButton("Camera to player");
 		cameraToPlayerBtn.setToolTipText("Move camera to player position");
 		cameraToPlayerBtn.addActionListener(new ActionListener() {
@@ -1101,7 +1101,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				renderManager.scene().moveCameraToPlayer();
 			}
 		});
-		
+
 		JLabel posLbl = new JLabel("Position:");
 		cameraX.setColumns(10);
 		cameraX.setHorizontalAlignment(JTextField.RIGHT);
@@ -1113,7 +1113,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		cameraZ.setHorizontalAlignment(JTextField.RIGHT);
 		cameraZ.addActionListener(cameraPositionListener);
 		updateCameraPosition();
-		
+
 		JLabel dirLbl = new JLabel("Direction:");
 		cameraYaw.setColumns(10);
 		cameraYaw.setHorizontalAlignment(JTextField.RIGHT);
@@ -1122,7 +1122,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		cameraPitch.setHorizontalAlignment(JTextField.RIGHT);
 		cameraPitch.addActionListener(cameraDirectionListener);
 		updateCameraDirection();
-		
+
 		JLabel lookAtLbl = new JLabel("Skybox views:");
 		JButton xposBtn = new JButton("East");
 		xposBtn.addActionListener(new ActionListener() {
@@ -1136,7 +1136,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateCameraDirection();
 			}
 		});
-		
+
 		JButton xnegBtn = new JButton("West");
 		xnegBtn.addActionListener(new ActionListener() {
 			@Override
@@ -1149,7 +1149,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateCameraDirection();
 			}
 		});
-		
+
 		JButton yposBtn = new JButton("Up");
 		yposBtn.addActionListener(new ActionListener() {
 			@Override
@@ -1162,7 +1162,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateCameraDirection();
 			}
 		});
-		
+
 		JButton ynegBtn = new JButton("Down");
 		ynegBtn.addActionListener(new ActionListener() {
 			@Override
@@ -1175,7 +1175,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateCameraDirection();
 			}
 		});
-		
+
 		JButton zposBtn = new JButton("South");
 		zposBtn.addActionListener(new ActionListener() {
 			@Override
@@ -1188,7 +1188,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateCameraDirection();
 			}
 		});
-		
+
 		JButton znegBtn = new JButton("North");
 		znegBtn.addActionListener(new ActionListener() {
 			@Override
@@ -1201,7 +1201,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateCameraDirection();
 			}
 		});
-		
+
 		JButton centerCameraBtn = new JButton("Center camera");
 		centerCameraBtn.setToolTipText("Center camera above loaded chunks");
 		centerCameraBtn.addActionListener(new ActionListener() {
@@ -1210,9 +1210,9 @@ public class RenderControls extends JDialog implements ViewListener,
 				renderManager.scene().moveCameraToCenter();
 			}
 		});
-		
+
 		JLabel isometricLbl = new JLabel("Isometric views:");
-		
+
 		JButton isoWNBtn = new JButton("west-north");
 		isoWNBtn.setIcon(new ImageIcon(Icon.isoWN.getImage()));
 		isoWNBtn.setToolTipText("Set isometric view");
@@ -1228,7 +1228,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateCameraDirection();
 			}
 		});
-		
+
 		JButton isoNEBtn = new JButton("north-east");
 		isoNEBtn.setIcon(new ImageIcon(Icon.isoNE.getImage()));
 		isoNEBtn.setToolTipText("Set isometric view");
@@ -1244,7 +1244,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateCameraDirection();
 			}
 		});
-		
+
 		JButton isoESBtn = new JButton("east-south");
 		isoESBtn.setIcon(new ImageIcon(Icon.isoES.getImage()));
 		isoESBtn.setToolTipText("Set isometric view");
@@ -1260,7 +1260,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateCameraDirection();
 			}
 		});
-		
+
 		JButton isoSWBtn = new JButton("south-west");
 		isoSWBtn.setIcon(new ImageIcon(Icon.isoSW.getImage()));
 		isoSWBtn.setToolTipText("Set isometric view");
@@ -1276,10 +1276,10 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateCameraDirection();
 			}
 		});
-		
+
 		JSeparator sep2 = new JSeparator();
 		JSeparator sep1 = new JSeparator();
-		
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -1426,19 +1426,19 @@ public class RenderControls extends JDialog implements ViewListener,
 		stillWaterCB.setSelected(renderManager.scene().stillWaterEnabled());
 		stillWaterCB.addActionListener(stillWaterListener);
 	}
-	
+
 	protected void updateClearWater() {
 		clearWaterCB.removeActionListener(clearWaterListener);
 		clearWaterCB.setSelected(renderManager.scene().getClearWater());
 		clearWaterCB.addActionListener(clearWaterListener);
 	}
-	
+
 	protected void updateBiomeColorsCB() {
 		biomeColorsCB.removeActionListener(biomeColorsCBListener);
 		biomeColorsCB.addActionListener(biomeColorsCBListener);
 		biomeColorsCB.setSelected(renderManager.scene().biomeColorsEnabled());
 	}
-	
+
 	protected void updateAtmosphereCheckBox() {
 		atmosphereEnabled.removeActionListener(atmosphereListener);
 		atmosphereEnabled.setSelected(renderManager.scene().atmosphereEnabled());
@@ -1456,17 +1456,17 @@ public class RenderControls extends JDialog implements ViewListener,
 		volumetricFogEnabled.setSelected(renderManager.scene().volumetricFogEnabled());
 		volumetricFogEnabled.addActionListener(volumetricFogListener);
 	}
-	
+
 	protected void updateCloudsEnabledCheckBox() {
 		cloudsEnabled.removeActionListener(cloudsEnabledListener);
 		cloudsEnabled.setSelected(renderManager.scene().cloudsEnabled());
 		cloudsEnabled.addActionListener(cloudsEnabledListener);
 	}
-	
+
 	private void updateTitle() {
 		setTitle("Render Controls - " + renderManager.scene().name());
 	}
-	
+
 	ActionListener dumpFrequencyListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -1480,7 +1480,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateDumpFrequencyField();
 		}
 	};
-	
+
 	ActionListener saveDumpsListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -1502,7 +1502,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	
+
 	DocumentListener sceneNameListener = new DocumentListener() {
 		@Override
 		public void removeUpdate(DocumentEvent e) {
@@ -1526,7 +1526,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	
+
 	DocumentListener sppTargetListener = new DocumentListener() {
 		@Override
 		public void removeUpdate(DocumentEvent e) {
@@ -1552,7 +1552,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	
+
 	ActionListener saveSceneListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -1979,7 +1979,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	
+
 	protected void updateWaterHeight() {
 		int height = renderManager.scene().getWaterHeight();
 		boolean waterWorld = height > 0;
@@ -1989,31 +1989,31 @@ public class RenderControls extends JDialog implements ViewListener,
 		waterWorldCB.setSelected(height > 0);
 		waterHeightField.setEnabled(height > 0);
 	}
-	
+
 	protected void updateCloudHeightSlider() {
 		cloudHeightSlider.removeChangeListener(cloudHeightListener);
 		cloudHeightSlider.setValue(renderManager.scene().getCloudHeight());
 		cloudHeightSlider.addChangeListener(cloudHeightListener);
 	}
-	
+
 	protected void updateRayDepthSlider() {
 		rayDepthSlider.removeChangeListener(rayDepthListener);
 		rayDepthSlider.setValue(renderManager.scene().getRayDepth());
 		rayDepthSlider.addChangeListener(rayDepthListener);
 	}
-	
+
 	protected void updateCloudHeightField() {
 		cloudHeightField.removeActionListener(cloudHeightFieldListener);
 		cloudHeightField.setText("" + renderManager.scene().getCloudHeight());
 		cloudHeightField.addActionListener(cloudHeightFieldListener);
 	}
-	
+
 	protected void updateRayDepthField() {
 		rayDepthField.removeActionListener(rayDepthFieldListener);
 		rayDepthField.setText("" + renderManager.scene().getRayDepth());
 		rayDepthField.addActionListener(rayDepthFieldListener);
 	}
-	
+
 	protected void updateDofField() {
 		dofField.removeActionListener(dofFieldListener);
 		if (renderManager.scene().camera().getInfDof())
@@ -2022,7 +2022,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			dofField.setText(String.format("%.2f", renderManager.scene().camera().getDof()));
 		dofField.addActionListener(dofFieldListener);
 	}
-	
+
 	protected void updateFocalOffsetField() {
 		focalOffsetField.removeActionListener(focalOffsetFieldListener);
 		focalOffsetField.setText(String.format("%.2f", renderManager.scene().camera().getFocalOffset()));
@@ -2034,14 +2034,14 @@ public class RenderControls extends JDialog implements ViewListener,
 		fovField.setText(String.format("%.2f", renderManager.scene().camera().getFoV()));
 		fovField.addActionListener(fovFieldListener);
 	}
-	
+
 	protected void updateSkyRotation() {
 		skyRotationSlider.removeChangeListener(skyRotationListener);
 		skyRotationSlider.setValue((int) Math.round(
 				100 * renderManager.scene().sky().getRotation() / (2 * Math.PI)));
 		skyRotationSlider.addChangeListener(skyRotationListener);
 	}
-	
+
 	protected void updateSunAltitudeSlider() {
 		sunAltitudeSlider.removeChangeListener(sunAltitudeListener);
 		double value = renderManager.scene().sun().getAltitude() / (Math.PI / 2);
@@ -2049,7 +2049,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		sunAltitudeSlider.setValue((int) (value * scale + sunAltitudeSlider.getMinimum()));
 		sunAltitudeSlider.addChangeListener(sunAltitudeListener);
 	}
-	
+
 	protected void updateEmitterIntensitySlider() {
 		emitterIntensitySlider.removeChangeListener(emitterIntensityListener);
 		double logMin = Math.log10(Scene.MIN_EMITTER_INTENSITY);
@@ -2061,7 +2061,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		emitterIntensitySlider.setValue((int) (value * scale + emitterIntensitySlider.getMinimum()));
 		emitterIntensitySlider.addChangeListener(emitterIntensityListener);
 	}
-	
+
 	protected void updateSunIntensitySlider() {
 		sunIntensitySlider.removeChangeListener(sunIntensityListener);
 		double logMin = Math.log10(Sun.MIN_INTENSITY);
@@ -2073,7 +2073,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		sunIntensitySlider.setValue((int) (value * scale + sunIntensitySlider.getMinimum()));
 		sunIntensitySlider.addChangeListener(sunIntensityListener);
 	}
-	
+
 	protected void updateSunAzimuthSlider() {
 		sunAzimuthSlider.removeChangeListener(sunAzimuthListener);
 		double value = renderManager.scene().sun().getAzimuth() / (Math.PI * 2);
@@ -2081,7 +2081,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		sunAzimuthSlider.setValue((int) (value * scale + sunAzimuthSlider.getMinimum()));
 		sunAzimuthSlider.addChangeListener(sunAzimuthListener);
 	}
-	
+
 	protected void updateDofSlider() {
 		dofSlider.removeChangeListener(dofListener);
 		if (renderManager.scene().camera().getInfDof()) {
@@ -2094,7 +2094,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 		dofSlider.addChangeListener(dofListener);
 	}
-	
+
 	protected void updateFocalOffsetSlider() {
 		focalOffsetSlider.removeChangeListener(focalOffsetListener);
 		double value = (renderManager.scene().camera().getFocalOffset() - Camera.MIN_FOCAL_OFFSET)
@@ -2103,7 +2103,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		focalOffsetSlider.setValue((int) (value * scale + focalOffsetSlider.getMinimum()));
 		focalOffsetSlider.addChangeListener(focalOffsetListener);
 	}
-	
+
 	protected void updateParallelProjectionCheckBox() {
 		parallelProjectionCB.removeChangeListener(parallelProjectionListener);
 		boolean selected = renderManager.scene().camera().isUsingParallelProjection();
@@ -2114,13 +2114,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		focalOffsetField.setEnabled(!selected);
 		parallelProjectionCB.addChangeListener(parallelProjectionListener);
 	}
-	
+
 	protected void updateSkyMode() {
 		skyModeCB.removeActionListener(skyModeListener);
 		// TODO
 		skyModeCB.addActionListener(skyModeListener);
 	}
-	
+
 	protected void updateFovSlider() {
 		fovSlider.removeChangeListener(fovListener);
 		Camera camera = renderManager.scene().camera();
@@ -2136,33 +2136,33 @@ public class RenderControls extends JDialog implements ViewListener,
 		exposureField.setText(String.format("%.2f", renderManager.scene().getExposure()));
 		exposureField.addActionListener(exposureFieldListener);
 	}
-	
+
 	protected void updateSunAzimuthField() {
 		sunAzimuthField.removeActionListener(sunAzimuthFieldListener);
 		sunAzimuthField.setText(String.format("%.2f",
 				QuickMath.radToDeg(renderManager.scene().sun().getAzimuth())));
 		sunAzimuthField.addActionListener(sunAzimuthFieldListener);
 	}
-	
+
 	protected void updateSunAltitudeField() {
 		sunAltitudeField.removeActionListener(sunAltitudeFieldListener);
 		sunAltitudeField.setText(String.format("%.2f",
 				QuickMath.radToDeg(renderManager.scene().sun().getAltitude())));
 		sunAltitudeField.addActionListener(sunAltitudeFieldListener);
 	}
-	
+
 	protected void updateSunIntensityField() {
 		sunIntensityField.removeActionListener(sunIntensityFieldListener);
 		sunIntensityField.setText(String.format("%.2f", renderManager.scene().sun().getIntensity()));
 		sunIntensityField.addActionListener(sunIntensityFieldListener);
 	}
-	
+
 	protected void updateEmitterIntensityField() {
 		emitterIntensityField.removeActionListener(emitterIntensityFieldListener);
 		emitterIntensityField.setText(String.format("%.2f", renderManager.scene().getEmitterIntensity()));
 		emitterIntensityField.addActionListener(emitterIntensityFieldListener);
 	}
-	
+
 	protected void updateExposureSlider() {
 		exposureSlider.removeChangeListener(exposureListener);
 		double logMin = Math.log10(Scene.MIN_EXPOSURE);
@@ -2177,11 +2177,11 @@ public class RenderControls extends JDialog implements ViewListener,
 	protected void updateWidthField() {
 		widthField.setText("" + renderManager.scene().canvasWidth());
 	}
-	
+
 	protected void updateHeightField() {
 		heightField.setText("" + renderManager.scene().canvasHeight());
 	}
-	
+
 	protected void updateSaveDumpsCheckBox() {
 		saveDumpsCB.removeActionListener(saveDumpsListener);
 		saveDumpsCB.setSelected(renderManager.scene().saveDumps());
@@ -2201,47 +2201,47 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 		dumpFrequency.addActionListener(dumpFrequencyListener);
 	}
-	
+
 	protected void updateSceneNameField() {
 		sceneNameField.getDocument().removeDocumentListener(sceneNameListener);
 		sceneNameField.setText(renderManager.scene().name());
 		sceneNameField.getDocument().addDocumentListener(sceneNameListener);
 	}
-	
+
 	protected void updateSPPTargetField() {
 		sppTargetField.getDocument().removeDocumentListener(sppTargetListener);
 		sppTargetField.setText("" + renderManager.scene().getTargetSPP());
 		sppTargetField.getDocument().addDocumentListener(sppTargetListener);
 	}
-	
+
 	protected void updatePostprocessCB() {
 		postprocessCB.setSelectedIndex(renderManager.scene().getPostprocess().ordinal());
 	}
-		
+
 	protected void updateCameraPosition() {
 		cameraX.removeActionListener(cameraPositionListener);
 		cameraY.removeActionListener(cameraPositionListener);
 		cameraZ.removeActionListener(cameraPositionListener);
-		
+
 		Vector3d pos = renderManager.scene().camera().getPosition();
 		cameraX.setText(decimalFormat.format(pos.x));
 		cameraY.setText(decimalFormat.format(pos.y));
 		cameraZ.setText(decimalFormat.format(pos.z));
-		
+
 		cameraX.addActionListener(cameraPositionListener);
 		cameraY.addActionListener(cameraPositionListener);
 		cameraZ.addActionListener(cameraPositionListener);
 	}
-	
+
 	protected void updateCameraDirection() {
 		cameraPitch.removeActionListener(cameraDirectionListener);
 		cameraYaw.removeActionListener(cameraDirectionListener);
-		
+
 		double pitch = QuickMath.radToDeg(renderManager.scene().camera().getPitch());
 		cameraPitch.setText(decimalFormat.format(pitch));
 		cameraYaw.setText(decimalFormat.format(
 				QuickMath.radToDeg(renderManager.scene().camera().getYaw())));
-		
+
 		cameraPitch.addActionListener(cameraDirectionListener);
 		cameraYaw.addActionListener(cameraDirectionListener);
 	}
@@ -2253,7 +2253,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	public void loadScene(String sceneName) {
 		sceneManager.loadScene(sceneName);
 	}
-	
+
 	/**
 	 * Called when the current scene has been saved
 	 */
@@ -2332,11 +2332,11 @@ public class RenderControls extends JDialog implements ViewListener,
 		sceneNameField.setText(renderManager.scene().name());
 		updateTitle();
 	}
-	
+
 	/**
 	 * Load the given chunks.
 	 * @param world
-	 * @param chunks 
+	 * @param chunks
 	 */
 	public void loadChunks(World world, Collection<ChunkPosition> chunks) {
 		sceneManager.loadChunks(world, chunks);
@@ -2356,7 +2356,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			showPreviewBtn.setToolTipText("Show the preview window");
 		}
 	}
-	
+
 	protected void setCanvasSize(int width, int height) {
 		renderManager.scene().setCanvasSize(width, height);
 		int canvasWidth = renderManager.scene().canvasWidth();
@@ -2415,7 +2415,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		directLight.setSelected(renderManager.scene().getDirectLight());
 		startRenderBtn.setText("RESUME");
 		stopRenderBtn.setEnabled(true);
-		
+
 		show3DView();
 	}
 
@@ -2426,7 +2426,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	public void setRenderTime(long time) {
 		if (renderTimeLbl == null)
 			return;
-		
+
 		int seconds = (int) ((time / 1000) % 60);
 		int minutes = (int) ((time / 60000) % 60);
 		int hours = (int) (time / 3600000);
@@ -2442,7 +2442,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	public void setSamplesPerSecond(int sps) {
 		if (samplesPerSecondLbl == null)
 			return;
-		
+
 		samplesPerSecondLbl.setText("SPS: " + decimalFormat.format(sps));
 	}
 
@@ -2453,10 +2453,10 @@ public class RenderControls extends JDialog implements ViewListener,
 	public void setSPP(int spp) {
 		if (sppLbl == null)
 			return;
-		
+
 		sppLbl.setText("SPP: " + decimalFormat.format(spp));
 	}
-	
+
 	@Override
 	public void setProgress(String task, int done, int start, int target) {
 		if (progressBar != null && progressLbl != null && etaLbl != null) {
@@ -2468,7 +2468,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			etaLbl.setText("ETA: N/A");
 		}
 	}
-	
+
 	@Override
 	public void setProgress(String task, int done, int start, int target, String eta) {
 		if (progressBar != null && progressLbl != null && etaLbl != null) {

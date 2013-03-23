@@ -21,7 +21,7 @@ package se.llbit.math;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Vector3i {
-	
+
 	@SuppressWarnings("javadoc")
 	public int x, y, z;
 
@@ -31,7 +31,7 @@ public class Vector3i {
 	public Vector3i() {
 		this(0, 0, 0);
 	}
-	
+
 	/**
 	 * Creates a new vector (i, j, k)
 	 * @param i
@@ -53,7 +53,7 @@ public class Vector3i {
 		y = o.y;
 		z = o.z;
 	}
-	
+
 	/**
 	 * Set this vector equal to (d, e, f)
 	 * @param d

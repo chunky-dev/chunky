@@ -35,26 +35,26 @@ import se.llbit.nbt.CompoundTag;
 
 @SuppressWarnings("javadoc")
 public class PlayerExtractor {
-	
+
 	public static void main(String[] args) {
 		if (args.length < 1) {
 			System.out.println("arguments: <NBT file>");
 			System.exit(1);
 		}
-		
+
 		String fn = args[0];
 		String outFn = "player.dat";
 		try {
 			System.out.println("parsing "+fn);
 			DataInputStream in = new DataInputStream(new GZIPInputStream(new FileInputStream(fn)));
-			
+
 			Set<String> request = new HashSet<String>();
             request.add(".Data.Player");
             Map<String, AnyTag> result = NamedTag.quickParse(in, request);
             in.close();
 
             AnyTag playerTag = result.get(".Data.Player");
-            
+
 			System.out.println("writing output to "+outFn);
 			DataOutputStream out = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(outFn)));
 			NamedTag rootTag = new NamedTag(new StringTag(""), (CompoundTag) playerTag);
@@ -67,7 +67,7 @@ public class PlayerExtractor {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 	}
 
 }

@@ -33,12 +33,12 @@ public class LilyPadModel {
 	private static final Quad quad =
 			new DoubleSidedQuad(new Vector3d(1, .875, 0), new Vector3d(0, .875, 0),
 				new Vector3d(1, .875, 1), new Vector4d(1, 0, 0, 1));
-	
+
 	private static final Quad[] rot = new Quad[4];
-	
+
 	private static final int COLOR = 0x009218;
 	private static final float[] lilyPadColor = new float[4];
-	
+
 	static {
 		rot[0] = quad;
 		rot[3] = rot[0].getYRotated();
@@ -46,7 +46,7 @@ public class LilyPadModel {
 		rot[1] = rot[2].getYRotated();
 		Color.getRGBAComponents(COLOR, lilyPadColor);
 	}
-	
+
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray) {
 		ray.t = Double.POSITIVE_INFINITY;

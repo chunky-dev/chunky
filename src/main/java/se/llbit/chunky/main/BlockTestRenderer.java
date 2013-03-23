@@ -40,7 +40,7 @@ public class BlockTestRenderer {
 			TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
 		else
 			TexturePackLoader.loadTexturePack(Chunky.getMinecraftJar(), false);
-		
+
 		String block = "";
 		String targetFile = "";
 		for (int i = 0; i < args.length; ++i) {
@@ -67,9 +67,9 @@ public class BlockTestRenderer {
 				}
 			}
 		}
-		
+
 		TestRenderer renderer;
-		
+
 		if (!block.isEmpty()) {
 			int sep = block.indexOf(':');
 			String blockPart;
@@ -93,7 +93,7 @@ public class BlockTestRenderer {
 		} else {
 			renderer = new TestRenderer(null, -1, targetFile);
 		}
-		
+
 		renderer.start();
 	}
 

@@ -21,11 +21,11 @@ package se.llbit.math;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class AABB {
-	
+
 	double xmin, xmax;
 	double ymin, ymax;
 	double zmin, zmax;
-	
+
 	/**
 	 * @param xmin
 	 * @param xmax
@@ -44,7 +44,7 @@ public class AABB {
 		this.zmin = zmin;
 		this.zmax = zmax;
 	}
-	
+
 	/**
 	 * Find intersection between the given ray and this AABB
 	 * @param ray
@@ -57,7 +57,7 @@ public class AABB {
 		double t;
 		double u, v;
 		boolean hit = false;
-		
+
 		ray.tNear = ray.t;
 
 		t = (xmin - ix) / ray.d.x;
@@ -140,7 +140,7 @@ public class AABB {
 		}
 		return hit;
 	}
-	
+
 	/**
 	 * @return AABB rotated about the Y axis
 	 */
@@ -150,7 +150,7 @@ public class AABB {
 				ymin, ymax,
 				xmin, xmax);
 	}
-	
+
 	/**
 	 * @param x X translation
 	 * @param y Y translation

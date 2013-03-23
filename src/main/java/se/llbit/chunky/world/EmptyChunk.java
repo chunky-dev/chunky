@@ -26,12 +26,12 @@ import se.llbit.chunky.map.RenderBuffer;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class EmptyChunk extends Chunk {
-	
+
 	/**
 	 * Singleton instance
 	 */
 	public static final EmptyChunk instance = new EmptyChunk();
-	
+
 	@Override
 	public boolean isEmpty() {
 		return true;
@@ -43,19 +43,19 @@ public class EmptyChunk extends Chunk {
 		caves = Layer.corruptLayer;
 		layer = Layer.corruptLayer;
 	}
-	
+
 	@Override
     public synchronized void getBlockData(byte[] blocks, byte[] data, byte[] biomes) {
 	    for (int i = 0; i < X_MAX * Y_MAX * Z_MAX; ++i)
 	        blocks[i] = 0;
-	    
+
 	    for (int i = 0; i < X_MAX * Z_MAX; ++i)
             biomes[i] = 0;
-	    
+
 	    for (int i = 0; i < (X_MAX * Y_MAX * Z_MAX) / 2; ++i)
             data[i] = 0;
     }
-	
+
 	@Override
 	protected void renderLayer(RenderBuffer rbuff, int cx, int cz) {
 		renderEmpty(rbuff, cx, cz);
@@ -81,7 +81,7 @@ public class EmptyChunk extends Chunk {
 		} else {
 			int blockScale = view.chunkScale / 16;
 			rbuff.fillRect(x0, z0, view.chunkScale, view.chunkScale, 0xFFFFFFFF);
-			
+
 			Graphics g = rbuff.getGraphics();
 			g.setColor(Color.black);
 			g.drawLine(x0, z0+8*blockScale, x0+8*blockScale, z0+view.chunkScale);

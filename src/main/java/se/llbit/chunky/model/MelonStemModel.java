@@ -28,7 +28,7 @@ import se.llbit.math.Vector4d;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class MelonStemModel {
-	
+
 	private static final Quad[][] growth = new Quad[8][2];
 	private static final Quad[] ripe = {
 		new DoubleSidedQuad(new Vector3d(0, 0, .5), new Vector3d(1, 0, .5),
@@ -50,7 +50,7 @@ public class MelonStemModel {
 		{ 0xA0 / 255., 0xB8 / 255., 0 },
 		{ 0xBF / 255., 0xB6 / 255., 0 },
 	};
-	
+
 	static {
 		for (int height = 0; height < 8; ++height) {
 			growth[height][0] = new DoubleSidedQuad(
@@ -63,7 +63,7 @@ public class MelonStemModel {
 					new Vector4d(0, 1, (7-height)/8., 1));
 		}
 	}
-		
+
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray) {
 		boolean hit = false;

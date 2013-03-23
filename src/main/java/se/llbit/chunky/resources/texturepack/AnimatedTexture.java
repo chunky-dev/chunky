@@ -35,11 +35,11 @@ public class AnimatedTexture extends TextureRef {
 	/**
 	 * Constructor
 	 * @param file
-	 * @param texture 
+	 * @param texture
 	 */
 	public AnimatedTexture(String file, Texture texture) {
 		super(file);
-		
+
 		this.texture = texture;
 	}
 
@@ -48,7 +48,7 @@ public class AnimatedTexture extends TextureRef {
 		BufferedImage image = ImageIO.read(imageStream);
 		int frameW = image.getWidth();
 		int frameH = Math.min(frameW, image.getHeight());
-		
+
 		BufferedImage frame0 = new BufferedImage(frameW, frameH,
 					BufferedImage.TYPE_INT_ARGB);
 		for (int y = 0; y < frameH; ++y) {
@@ -56,7 +56,7 @@ public class AnimatedTexture extends TextureRef {
 				frame0.setRGB(x, y, image.getRGB(x, y));
 			}
 		}
-		
+
 		texture.setTexture(frame0);
 		return true;
 	}

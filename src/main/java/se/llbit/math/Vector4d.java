@@ -21,7 +21,7 @@ package se.llbit.math;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Vector4d {
-	
+
 	@SuppressWarnings("javadoc")
 	public double x, y, z, w;
 
@@ -31,7 +31,7 @@ public class Vector4d {
 	public Vector4d() {
 		this(0, 0, 0, 0);
 	}
-	
+
 	/**
 	 * @param i
 	 * @param j

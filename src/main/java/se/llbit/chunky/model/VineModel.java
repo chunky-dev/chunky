@@ -31,7 +31,7 @@ public class VineModel {
 		// south
 		new DoubleSidedQuad(new Vector3d(1, 0, 15/16.), new Vector3d(0, 0, 15/16.),
 				new Vector3d(1, 1, 15/16.), new Vector4d(1, 0, 0, 1)),
-				
+
 		// west
 		new DoubleSidedQuad(new Vector3d(1/16., 0, 1), new Vector3d(1/16., 0, 0),
 				new Vector3d(1/16., 1, 1), new Vector4d(1, 0, 0, 1)),
@@ -39,7 +39,7 @@ public class VineModel {
 		// north
 		new DoubleSidedQuad(new Vector3d(0, 0, 1/16.), new Vector3d(1, 0, 1/16.),
 				new Vector3d(0, 1, 1/16.), new Vector4d(0, 1, 0, 1)),
-		
+
 		// east
 		new DoubleSidedQuad(new Vector3d(15/16., 0, 0), new Vector3d(15/16., 0, 1),
 				new Vector3d(15/16., 1, 0), new Vector4d(0, 1, 0, 1)),
@@ -47,7 +47,7 @@ public class VineModel {
 		// top
 		new Quad(new Vector3d(0, 1, 0), new Vector3d(1, 1, 0),
 				new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
-				
+
 	};
 
 	public static boolean intersect(Ray ray, Scene scene) {

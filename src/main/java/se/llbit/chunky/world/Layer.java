@@ -29,10 +29,10 @@ import se.llbit.util.ImageTools;
 
 /**
  * A layer describes the visible part of a chunk.
- * 
+ *
  * A chunk typically stores three layers;
  * current layer, cave layer and surface layer.
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class Layer {
@@ -41,12 +41,12 @@ public class Layer {
 	private int[] bitmap = null;
 	private int avgColor = 0xFF;
 	static int selectionColor = 0x75FF0000;
-	
+
 	/**
 	 * Singleton instance of empty layer.
 	 */
 	public static final Layer emptyLayer = new Layer() {
-		
+
 		@Override
 		public synchronized void renderTopography(ChunkPosition position,
 				Heightmap heightmap) {
@@ -57,28 +57,28 @@ public class Layer {
 			ChunkView view = rbuff.getView();
 			int x0 = view.chunkScale * (cx - view.ix0);
 			int z0 = view.chunkScale * (cz - view.iz0);
-			
+
 			if (view.chunkScale == 1) {
 				rbuff.setRGB(x0, z0, averageColor);
 			} else {
 				rbuff.fillRect(x0, z0, view.chunkScale, view.chunkScale, averageColor);
 			}
 		}
-		
+
 		private int averageColor = 0xFF000000;
-		
+
 		@Override
 		public int getAvgColor() {
 			return averageColor;
 		}
-		
+
 	};
-	
+
 	/**
 	 * An unknown layer is a layer that has not yet been parsed
 	 */
 	public static final Layer unknownLayer = new Layer() {
-		
+
 		@Override
 		public synchronized void renderTopography(ChunkPosition position,
 				Heightmap heightmap) {
@@ -98,15 +98,15 @@ public class Layer {
 						view.chunkScale, view.chunkScale, null);
 			}
 		}
-		
+
 		private int averageColor = ImageTools.calcAvgColor(MiscImages.load);
-		
+
 		@Override
 		public int getAvgColor() {
 			return averageColor;
 		}
 	};
-	
+
 	/**
 	 * Represents corrupt chunk data
 	 */
@@ -129,7 +129,7 @@ public class Layer {
 						x0, z0, view.chunkScale, view.chunkScale, null);
 			}
 		}
-		
+
 		private int averageColor = ImageTools.calcAvgColor(MiscImages.corruptLayer);
 
 		@Override
@@ -137,7 +137,7 @@ public class Layer {
 			return averageColor;
 		}
 	};
-	
+
 	/**
 	 * Creates a new tile layer
 	 * @param data tile data
@@ -145,7 +145,7 @@ public class Layer {
 	private Layer(byte[] data) {
 		blocks = data;
 	}
-	
+
 	/**
 	 * Creates a new bitmap layer
 	 * @param data bitmap data
@@ -186,27 +186,27 @@ public class Layer {
 	 */
 	public synchronized void renderHighlight(RenderBuffer rbuff, int cx, int cz,
 			Block hlBlock, java.awt.Color highlight) {
-		
+
 		ChunkView view = rbuff.getView();
 		int x0 = view.chunkScale * (cx - view.ix0);
 		int z0 = view.chunkScale * (cz - view.iz0);
-		
+
 		if (blocks == null)
 			return;
-		
+
 		Graphics g = rbuff.getGraphics();
 		g.setColor(new java.awt.Color(1,1,1,0.35f));
 		g.fillRect(x0, z0, view.chunkScale, view.chunkScale);
 		g.setColor(highlight);
-		
+
 		if (view.chunkScale == 16) {
-			
+
 			for (int x = 0; x < 16; ++x) {
 				int xp = x0 + x;
 
 				for (int z = 0; z < 16; ++z) {
 					int yp = z0 + z;
-					
+
 					if (hlBlock.id == (0xFF & blocks[x * 16 + z])) {
 						rbuff.setRGB(xp, yp, highlight.getRGB());
 					}
@@ -214,7 +214,7 @@ public class Layer {
 			}
 		} else {
 			int blockScale = view.chunkScale / 16;
-			
+
 			for (int x = 0; x < 16; ++x) {
 				int xp0 = x0 + x * blockScale;
 				int xp1 = xp0 + blockScale;
@@ -238,7 +238,7 @@ public class Layer {
 	 * @param cz
 	 */
 	public synchronized void render(RenderBuffer rbuff, int cx, int cz) {
-		
+
 		if (blocks != null) {
 			renderTiles(rbuff, cx, cz);
 		} else if (bitmap != null) {
@@ -252,17 +252,17 @@ public class Layer {
 		int blockScale = view.chunkScale / 16;
 		int x0 = view.chunkScale * (cx - view.ix0);
 		int z0 = view.chunkScale * (cz - view.iz0);
-		
+
 		if (view.chunkScale == 1) {
-			
+
 		} else if (blockScale == 1) {
-			
+
 			for (int z = 0; z < 16; ++z) {
 				int yp = z0 + z;
 
 				for (int x = 0; x < 16; ++x) {
 					int xp = x0 + x;
-					
+
 					byte block = blocks[x * 16 + z];
 					if (block == Block.AIR.id) {
 						rbuff.setRGB(xp, yp, 0xFFFFFFFF);
@@ -272,7 +272,7 @@ public class Layer {
 				}
 			}
 		} else if (blockScale < 12) {
-			
+
 
 			for (int z = 0; z < 16; ++z) {
 				int yp0 = z0 + z * blockScale;
@@ -301,11 +301,11 @@ public class Layer {
 						rbuff.fillRect(xp0, yp0, blockScale, blockScale, 0xFFFFFFFF);
 						continue;
 					}
-					
+
 					int[] tex = ((DataBufferInt) Block.get(block).getTexture().getScaledImage(blockScale).getRaster().getDataBuffer()).getData();
 					for (int i = 0; i < blockScale; ++i) {
 						for (int j = 0; j < blockScale; ++j) {
-							rbuff.setRGB(xp0 + j, yp0 + i, tex[j + blockScale * i]); 
+							rbuff.setRGB(xp0 + j, yp0 + i, tex[j + blockScale * i]);
 						}
 					}
 				}
@@ -314,7 +314,7 @@ public class Layer {
 	}
 
 	private void renderBitmap(RenderBuffer rbuff, int cx, int cz) {
-		
+
 		ChunkView view = rbuff.getView();
 		int x0 = view.chunkScale * (cx - view.ix0);
 		int z0 = view.chunkScale * (cz - view.iz0);
@@ -322,22 +322,22 @@ public class Layer {
 		if (view.chunkScale == 1) {
 			rbuff.setRGB(x0, z0, avgColor);
 		} else if (view.chunkScale == 16) {
-			
+
 			for (int z = 0; z < 16; ++z) {
 				for (int x = 0; x < 16; ++x) {
 					rbuff.setRGB(x0 + x, z0 + z, bitmap[z + x*16]);
 				}
 			}
 		} else {
-			
+
 			int blockScale = view.chunkScale / 16;
-			
+
 			for (int z = 0; z < 16; ++z) {
 				int yp0 = z0 + z * blockScale;
-				
+
 				for (int x = 0; x < 16; ++x) {
 					int xp0 = x0 + x * blockScale;
-	
+
 					rbuff.fillRect(xp0, yp0, blockScale, blockScale, bitmap[z + x*16]);
 				}
 			}
@@ -359,7 +359,7 @@ public class Layer {
 		}
 		return new Layer(data);
 	}
-	
+
 	/**
 	 * Load biome IDs into layer
 	 * @param chunkBiomes
@@ -377,21 +377,21 @@ public class Layer {
 
 	/**
 	 * Generate the surface bitmap.
-	 * 
-	 * @param dim current dimension 
+	 *
+	 * @param dim current dimension
 	 * @param position Chunk position
 	 * @param blocksArray block id array
-	 * @param biomes 
-	 * @param blockData 
+	 * @param biomes
+	 * @param blockData
 	 * @return the generated bitmap layer
 	 */
 	public static Layer loadSurface(int dim, ChunkPosition position,
 			byte[] blocksArray, byte[] biomes, byte[] blockData) {
-		
+
 		int[] surface = new int[16*16];
 		for (int x = 0; x < 16; ++x) {
 			for (int z = 0; z < 16; ++z) {
-				
+
 				// find the topmost non-empty block
 				int y = Chunk.Y_MAX-1;
 				if (dim != -1) {
@@ -418,49 +418,49 @@ public class Layer {
 							break;
 					}
 				}
-				
+
 				float[] color = new float[4];
-				
+
 				colorloop:
 				for (; y >= 0 && color[3] < 1.f;) {
 					Block block = Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
 					float[] blockColor = new float[4];
 					int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
-					
+
 					switch (block.id) {
-					
+
 					case Block.LEAVES_ID:
 						Color.getRGBComponents(Biomes.getFoliageColor(biomeId), blockColor);
 						blockColor[3] = 1.f;// foliage colors don't include alpha
-						
+
 						y -= 1;
 						break;
-						
+
 					case Block.GRASS_ID:
 					case Block.VINES_ID:
 					case Block.TALLGRASS_ID:
 						Color.getRGBComponents(Biomes.getGrassColor(biomeId), blockColor);
 						blockColor[3] = 1.f;// grass colors don't include alpha
-						
+
 						y -= 1;
 						break;
-						
+
 					case Block.WOOL_ID:
 						int woolType = 0xFF & blockData[Chunk.chunkIndex(x, y, z)/2];
 						woolType >>= (x % 2) * 4;
 						woolType &= 0xF;
-						
+
 						Color.getRGBComponents(Texture.wool[woolType].getAvgColor(), blockColor);
 						blockColor[3] = 1.f;// wool colors don't include alpha
-						
+
 						y -= 1;
 						break;
-						
+
 					case Block.ICE_ID:
 						Color.getRGBAComponents(Block.ICE.getAvgTopRGB(), blockColor);
 						color = blend(color, blockColor);
 						y -= 1;
-						
+
 						for (; y >= 0; --y) {
 							if (Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]).isOpaque) {
 								Color.getRGBAComponents(block.getAvgTopRGB(), blockColor);
@@ -468,7 +468,7 @@ public class Layer {
 							}
 						}
 						break;
-						
+
 					case Block.WATER_ID:
 					case Block.STATIONARYWATER_ID:
 						int depth = 1;
@@ -483,10 +483,10 @@ public class Layer {
 						Color.getRGBAComponents(Block.WATER.getAvgTopRGB(), blockColor);
 						blockColor[3] = Math.max(.5f, 1.f - depth/32.f);
 						break;
-						
+
 					default:
 						Color.getRGBAComponents(block.getAvgTopRGB(), blockColor);
-						
+
 						if (block.isOpaque && y > 64) {
 							float fade = Math.min(0.6f, (y-World.SEA_LEVEL) / 60.f);
 							fade = Math.max(0.f, fade);
@@ -494,24 +494,24 @@ public class Layer {
 							blockColor[1] = (1-fade)*blockColor[1] + fade;
 							blockColor[2] = (1-fade)*blockColor[2] + fade;
 						}
-						
+
 						y -= 1;
 						break;
 					}
-					
+
 					color = blend(color, blockColor);
-					
+
 					if (block.isOpaque)
 						break colorloop;
 				}
-				
+
 				surface[x*16+z] = Color.getRGBA(color[0], color[1], color[2], color[3]);
 			}
 		}
-		
+
 		return new Layer(surface);
 	}
-	
+
 	/**
 	 * Blend the two argb colors a and b. Result is stored in the array a.
 	 * @param src
@@ -533,17 +533,17 @@ public class Layer {
 	 */
 	public synchronized void renderTopography(ChunkPosition position,
 			Heightmap heightmap) {
-		
+
 		int cx = position.x * Chunk.X_MAX;
 		int cz = position.z * Chunk.Z_MAX;
-		
+
 		float[] rgb = new float[3];
 		for (int x = 0; x < 16; ++x) {
-			
+
 			for (int z = 0; z < 16; ++z) {
-				
+
 				Color.getRGBComponents(bitmap[x*16 + z], rgb);
-				
+
 				float gradient = (
 						  heightmap.get(cx+x,	cz+z)
 						+ heightmap.get(cx+x+1, cz+z)
@@ -553,11 +553,11 @@ public class Layer {
 						- heightmap.get(cx+x-1, cz+z-1)
 						);
 				gradient = (float) ( (Math.atan(gradient / 15) / (Math.PI/1.7) ) + 1 );
-				
+
 				rgb[0] *= gradient;
 				rgb[1] *= gradient;
 				rgb[2] *= gradient;
-				
+
 				// clip the result
 				rgb[0] = Math.max(0.f, rgb[0]);
 				rgb[0] = Math.min(1.f, rgb[0]);
@@ -565,7 +565,7 @@ public class Layer {
 				rgb[1] = Math.min(1.f, rgb[1]);
 				rgb[2] = Math.max(0.f, rgb[2]);
 				rgb[2] = Math.min(1.f, rgb[2]);
-				
+
 				bitmap[x*16 + z] = Color.getRGB(rgb[0], rgb[1], rgb[2]);
 			}
 		}
@@ -575,9 +575,9 @@ public class Layer {
 	 * Generate the cave map. Only holes which are large enough to have mobs spawn
 	 * in them are counted towards the color of a cave. The color is then determined
 	 * by the number of unoccupied blocks beneath the topmost (surface) block.
-	 * 
+	 *
 	 * The more empty space, the deeper the cave color.
-	 * 
+	 *
 	 * @param blocksArray
 	 * @param heightmap
 	 * @return The loaded layer
@@ -597,9 +597,9 @@ public class Layer {
 							&& block != Block.WOOD.id)
 						break;
 				}
-				
+
 				// find caves
-				int luftspalt = 0; 
+				int luftspalt = 0;
 				for (; y > 1; --y) {
 					Block block = Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
 					if (block.isCave()) {
@@ -611,7 +611,7 @@ public class Layer {
 						}
 					}
 				}
-				
+
 				if (luftspalt == 0) {
 					caves[x*16+z] = 0xFFFFFFFF;
 				} else {
@@ -627,7 +627,7 @@ public class Layer {
 	/**
 	 * Load heightmap information from a chunk heightmap array
 	 * and insert into a quadtree.
-	 * 
+	 *
 	 * @param heightmap
 	 * @param pos
 	 * @param blocksArray

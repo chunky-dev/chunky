@@ -21,7 +21,7 @@ package se.llbit.math;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class DoubleSidedQuad extends Quad {
-	
+
 	/**
 	 * @param other
 	 * @param t

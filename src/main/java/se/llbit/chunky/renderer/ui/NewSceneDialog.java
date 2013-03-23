@@ -42,29 +42,29 @@ import se.llbit.chunky.renderer.scene.SceneManager;
  */
 @SuppressWarnings("serial")
 public class NewSceneDialog extends JDialog {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(NewSceneDialog.class);
-	
+
 	private boolean accepted;
 	private String sceneName;
 	private final RenderContext renderContext;
 
 	/**
 	 * Constructor
-	 * @param parent 
-	 * @param context 
-	 * @param defaultSceneName 
+	 * @param parent
+	 * @param context
+	 * @param defaultSceneName
 	 */
 	public NewSceneDialog(JFrame parent, RenderContext context,
 			String defaultSceneName) {
-		
+
 		renderContext = context;
-		
+
 		setTitle("Create New Scene");
-		
+
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		
+
 		JLabel lbl = new JLabel("Enter name for the new 3D scene:");
 		final JTextField sceneNameField = new JTextField(20);
 		sceneNameField.setText(defaultSceneName);
@@ -105,7 +105,7 @@ public class NewSceneDialog extends JDialog {
 				tryAccept(sceneNameField.getText());
 			}
 		});
-		
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -136,11 +136,11 @@ public class NewSceneDialog extends JDialog {
 			.addContainerGap()
 		);
 		setContentPane(panel);
-		
+
 		pack();
 		setLocationRelativeTo(parent);
 	}
-	
+
 	protected void tryAccept(String text) {
 		sceneName = text.trim();
 		if (!sceneName.isEmpty()) {
@@ -160,7 +160,7 @@ public class NewSceneDialog extends JDialog {
 	public boolean isAccepted() {
 		return accepted;
 	}
-	
+
 	/**
 	 * @return The user selecte scene name
 	 */

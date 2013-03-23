@@ -38,32 +38,32 @@ public class Camera {
 	 * Minimum DoF
 	 */
 	public static final double MIN_DOF = .5;
-	
+
 	/**
 	 * Maximum DoF
 	 */
 	public static final double MAX_DOF = 500;
-	
+
 	/**
 	 * Minimum FOV for perspective projection
 	 */
 	public static final double MIN_FOV = 1;
-	
+
 	/**
 	 * Default FoV value for perspective projection
 	 */
 	public static final double DEFAULT_FOV = 70;
-	
+
 	/**
 	 * Maximum FOV for perspective projection
 	 */
 	public static final double MAX_FOV = 175;
-	
+
 	/**
 	 * Minimum Focal Offset
 	 */
 	public static final double MIN_FOCAL_OFFSET = 1;
-	
+
 	/**
 	 * Maximum Focal Offset
 	 */
@@ -73,22 +73,22 @@ public class Camera {
 
 	Vector3d pos = new Vector3d(0, 0, 0);
 	private Vector3d up = new Vector3d(0, 1, 0);
-	
+
 	/**
 	 * Scratch vector
 	 */
 	private Vector3d right = new Vector3d();
-	
+
 	/**
 	 * Scratch vector
 	 */
 	private Vector3d d = new Vector3d();
-	
+
 	/**
 	 * Scratch vector
 	 */
 	private Vector3d u = new Vector3d();
-	
+
 	private double yaw = - Math.PI / 2;
 	private double pitch = 0;
 	private Matrix3d transform = new Matrix3d();
@@ -96,23 +96,23 @@ public class Camera {
 
 	private double dof = 8;
 	private double fov = DEFAULT_FOV;
-	
+
 	/**
 	 * Maximum diagonal width of the world
 	 */
 	private double worldWidth = 100;
-	
+
 	/**
 	 * Tangens of the FoV angle
 	 */
 	public double fovTan;
-	
+
 	/**
 	 * If true, a parallel projection is used, and fov is interpreted as height of the sensor
 	 * in meters rather than degrees.
 	 */
 	private boolean parallelProjection = false;
-	
+
 	private double focalOffset = 2;
 	private boolean infDof = true;
 
@@ -126,7 +126,7 @@ public class Camera {
 		calcFovTan();
 		updateTransform();
 	}
-	
+
 	/**
 	 * Copy configuration from other camera
 	 * @param other
@@ -164,7 +164,7 @@ public class Camera {
 		camera.addItem("focalOffset", new DoubleTag(focalOffset));
 		return camera;
 	}
-	
+
 	/**
 	 * Load the camera from a CompoundTag
 	 * @param tag
@@ -184,13 +184,13 @@ public class Camera {
 		calcFovTan();
 		updateTransform();
 	}
-	
+
 	protected static double getClampedFoV(double value) {
 		value = Math.max(value, Camera.MIN_FOV);
 		value = Math.min(value, Camera.MAX_FOV);
 		return value;
 	}
-	
+
 	private void calcFovTan() {
 		fovTan = 2 * (Math.tan((getClampedFoV(fov) / 360) * Math.PI));
 	}
@@ -206,21 +206,21 @@ public class Camera {
 
 	/**
 	 * Set depth of field.
-	 * 
+	 *
 	 * @param value
 	 */
 	public synchronized void setDof(double value) {
 		dof = value;
 		scene.refresh();
 	}
-	
+
 	/**
 	 * @return Current Depth of Field
 	 */
 	public double getDof() {
 		return dof;
 	}
-	
+
 	/**
 	 * Set infinite Depth of Field
 	 * @param value
@@ -238,14 +238,14 @@ public class Camera {
 	public boolean getInfDof() {
 		return infDof;
 	}
-	
+
 	/**
 	 * @return <code>true</code> if parallel projection is enabled
 	 */
 	public boolean isUsingParallelProjection() {
 		return parallelProjection;
 	}
-	
+
 	/**
 	 * Toggle parallel projection
 	 * @param enabled
@@ -261,17 +261,17 @@ public class Camera {
 			scene.refresh();
 		}
 	}
-	
+
 	/**
 	 * @return Parallel projection flag
 	 */
 	public synchronized boolean getParallelProjection() {
 		return parallelProjection;
 	}
-	
+
 	/**
 	 * Set field of view in degrees.
-	 * 
+	 *
 	 * @param value
 	 */
 	public synchronized void setFoV(double value) {
@@ -283,14 +283,14 @@ public class Camera {
 			scene.refresh();
 		}
 	}
-	
+
 	/**
 	 * @return Current field of view
 	 */
 	public double getFoV() {
 		return fov;
 	}
-	
+
 	/**
 	 * Set the focal offset
 	 * @param value
@@ -299,7 +299,7 @@ public class Camera {
 		focalOffset = value;
 		scene.refresh();
 	}
-	
+
 	/**
 	 * @return Current focal offset
 	 */
@@ -328,7 +328,7 @@ public class Camera {
 		}
 		scene.refresh();
 	}
-	
+
 	/**
 	 * Move camera backward
 	 * @param v
@@ -350,27 +350,27 @@ public class Camera {
 		}
 		scene.refresh();
 	}
-	
+
 	/**
 	 * Move camera up
 	 * @param v
 	 */
 	public synchronized void moveUp(double v) {
 		pos.scaleAdd(v, up, pos);
-		
+
 		scene.refresh();
 	}
-	
+
 	/**
 	 * Move camera down
 	 * @param v
 	 */
 	public synchronized void moveDown(double v) {
 		pos.scaleAdd(-v, up, pos);
-		
+
 		scene.refresh();
 	}
-	
+
 	/**
 	 * Strafe camera left
 	 * @param v
@@ -381,10 +381,10 @@ public class Camera {
 		tmpTransform.transform(d);
 		right.cross(up, d);
 		pos.scaleAdd(-v, right, pos);
-		
+
 		scene.refresh();
 	}
-	
+
 	/**
 	 * Strafe camera right
 	 * @param v
@@ -395,10 +395,10 @@ public class Camera {
 		tmpTransform.transform(d);
 		right.cross(up, d);
 		pos.scaleAdd(v, right, pos);
-		
+
 		scene.refresh();
 	}
-	
+
 	/**
 	 * Rotate the camera
 	 * @param yaw
@@ -408,15 +408,15 @@ public class Camera {
 		double fovRad = (getClampedFoV(fov) / 360) * Math.PI;
 		this.yaw += yaw * fovRad;
 		this.pitch += pitch * fovRad;
-		
+
 		this.pitch = Math.min(0, this.pitch);
 		this.pitch = Math.max(-Math.PI, this.pitch);
-		
+
 		if (this.yaw > Math.PI * 2)
 			this.yaw -= Math.PI * 2;
 		else if (this.yaw < -Math.PI * 2)
 			this.yaw += Math.PI * 2;
-		
+
 		updateTransform();
 	}
 
@@ -428,7 +428,7 @@ public class Camera {
 	public synchronized void setView(double yaw, double pitch) {
 		this.yaw = yaw;
 		this.pitch = pitch;
-		
+
 		updateTransform();
 	}
 
@@ -439,13 +439,13 @@ public class Camera {
 		tmpTransform.rotZ(pitch);
 		transform.rotY(yaw);
 		transform.mul(tmpTransform);
-		
+
 		scene.refresh();
 	}
 
 	/**
 	 * Attempt to move the camera to the player position.
-	 * @param world 
+	 * @param world
 	 */
 	public void moveToPlayer(World world) {
 		if (world != null && world.havePlayerPos()) {
@@ -458,10 +458,10 @@ public class Camera {
 			scene.refresh();
 		}
 	}
-	
+
 	/**
 	 * Calculate a ray shooting out of the camera.
-	 * 
+	 *
 	 * @param ray destination
 	 * @param d scratch vector
 	 * @param o scratch vector
@@ -472,7 +472,7 @@ public class Camera {
 	 */
 	public void calcViewRay(Ray ray, Vector3d d, Vector3d o, Random random,
 			double aspect, double x, double y) {
-		
+
 		if (parallelProjection) {
 			d.set( 0, -1, 0 );
 			transform.transform(d);
@@ -496,10 +496,10 @@ public class Camera {
 			ray.set(o, d);
 		}
 	}
-	
+
 	/**
 	 * Simple lens simulation
-	 * 
+	 *
 	 * @param d
 	 * @param x x-coordinate of ray origin
 	 * @param z z-coordinate of ray origin
@@ -507,11 +507,11 @@ public class Camera {
 	private void doLens(Random random, Vector3d d, Vector3d i, double x, double z) {
 		d.set(-x, -1, -z);
 		d.scale(focalOffset);
-		
+
 		// at the focal offset we want the distance to a CoC of X to be equal to dof
 		double X = 1.0;
 		double aperture = Math.sqrt((X / dof) * focalOffset);
-		
+
 		double rx, rz;
 		while (true) {
 			rx = 2 * random.nextDouble() - 1;
@@ -550,7 +550,7 @@ public class Camera {
 	public double getYaw() {
 		return yaw;
 	}
-	
+
 	/**
 	 * @return The current pitch angle
 	 */
@@ -564,14 +564,14 @@ public class Camera {
 	public void setWorldSize(double size) {
 		worldWidth = Math.sqrt(size*size + Chunk.Y_MAX*Chunk.Y_MAX);
 	}
-	
+
 	/**
 	 * @return Maximum world diagonal size
 	 */
 	public double getWorldSize() {
 		return worldWidth;
 	}
-	
+
 	/**
 	 * @return Maximum FoV value, depending on ParallelProjection
 	 */

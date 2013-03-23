@@ -24,14 +24,14 @@ import se.llbit.math.Ray;
 @SuppressWarnings("javadoc")
 public class StoneWallModel {
 	private static AABB post = new AABB(4/16.0, 12/16.0, 0, 1, 4/16.0, 12/16.0);
-	
+
 	private static AABB[] plank = {
 		new AABB(5/16.0, 11/16.0, 0, 13/16.0, 0, .5),
 		new AABB(5/16.0, 11/16.0, 0, 13/16.0, .5, 1),
 		new AABB(.5, 1, 0, 13/16.0, 5/16.0, 11/16.0),
 		new AABB(0, .5, 0, 13/16.0, 5/16.0, 11/16.0)
 	};
-	
+
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;

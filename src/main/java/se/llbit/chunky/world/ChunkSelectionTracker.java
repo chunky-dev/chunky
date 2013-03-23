@@ -29,11 +29,11 @@ import se.llbit.chunky.world.listeners.ChunkUpdateListener;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkSelectionTracker implements ChunkDeletionListener {
-    
+
     private Set<ChunkPosition> selected = new HashSet<ChunkPosition>();
     private Collection<ChunkUpdateListener> chunkUpdateListeners =
             new LinkedList<ChunkUpdateListener>();
-    
+
 
     /**
      * Add a chunk update listener to listen for selection changes
@@ -44,7 +44,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
     		chunkUpdateListeners.add(listener);
     	}
     }
-    
+
     /**
      * Remove a chunk update listener
      * @param listener
@@ -54,7 +54,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
     		chunkUpdateListeners.remove(listener);
     	}
     }
-    
+
     /**
      * Notify the chunk update listeners that chunks have been updated
      * @param chunks the updated chunks
@@ -65,7 +65,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 	            listener.chunksUpdated(chunks);
     	}
     }
-    
+
    /**
     * Notify the chunk update listeners that a chunk has been updated.
     * @param chunk the updated chunk
@@ -81,10 +81,10 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
         selected.remove(chunk);
         fireChunkUpdated(chunk);
     }
-    
+
     /**
      * Toggle the selected status of the chunk at the given coordinates.
-     * @param world 
+     * @param world
      * @param cx
      * @param cz
      */
@@ -105,7 +105,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
     public synchronized int numSelectedChunks() {
         return selected.size();
     }
-    
+
     /**
      * Select chunks within rectangle
      * @param world
@@ -128,7 +128,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
         }
         fireChunksUpdated(updated);
     }
-    
+
     /**
      * Deselect chunks within rectangle
      * @param world

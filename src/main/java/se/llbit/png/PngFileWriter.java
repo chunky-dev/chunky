@@ -25,12 +25,12 @@ import java.io.IOException;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class PngFileWriter {
-	
+
 	/**
 	 * PNG magic value
 	 */
 	public static final long PNG_SIGNATURE = 0x89504E470D0A1A0AL;
-	
+
 	private DataOutputStream out;
 
 	/**
@@ -41,7 +41,7 @@ public class PngFileWriter {
 		out = new DataOutputStream(new FileOutputStream(file));
 		out.writeLong(PNG_SIGNATURE);
 	}
-	
+
 	/**
 	 * @param chunk
 	 * @throws IOException

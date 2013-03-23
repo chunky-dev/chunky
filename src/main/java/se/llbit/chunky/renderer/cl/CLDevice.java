@@ -34,14 +34,14 @@ public class CLDevice {
 	public CLDevice(cl_device_id deviceId,
 			String type, String name, int computeUnits,
 			int workGroupSize) {
-		
+
 		this.id = deviceId;
 		this.type = type;
 		this.name = name.trim();
 		this.computeUnits = computeUnits;
 		this.workGroupSize = workGroupSize;
 	}
-	
+
 	@Override
 	public String toString() {
 		return name;

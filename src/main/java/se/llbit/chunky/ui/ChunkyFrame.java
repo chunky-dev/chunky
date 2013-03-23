@@ -57,10 +57,10 @@ public class ChunkyFrame extends JFrame {
 	 */
 	public ChunkyFrame(Chunky chunky) {
 		super(Chunky.getAppName());
-		
+
 		this.chunky = chunky;
 	}
-	
+
 	/**
 	 * Initialize the UI components
 	 */
@@ -75,13 +75,13 @@ public class ChunkyFrame extends JFrame {
 				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 			}
 		});
-		
+
 		minimap = new Minimap(chunky);
 		map = new ChunkMap(chunky);
 		controls = new Controls(chunky, minimap);
 		chunky.getChunkSelection().addChunkUpdateListener(map);
 		chunky.getChunkSelection().addChunkUpdateListener(minimap);
-		
+
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		layout.setHorizontalGroup(
@@ -98,11 +98,11 @@ public class ChunkyFrame extends JFrame {
 		);
 
 		pack();
-		
+
 		final ChunkyLogAppender uiAppender = new ChunkyLogAppender();
 		final Logger rootLogger = Logger.getRootLogger();
 		rootLogger.addAppender(uiAppender);
-		
+
 		addWindowListener(new WindowListener() {
 			@Override
 			public void windowOpened(WindowEvent e) {
@@ -127,27 +127,27 @@ public class ChunkyFrame extends JFrame {
 			public void windowActivated(WindowEvent e) {
 			}
 		});
-		
+
 		setResizable(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationByPlatform(true);
-		
+
 		URL url = getClass().getResource(Messages.getString("Chunky.icon")); //$NON-NLS-1$
 		if (url != null) {
 			setIconImage(Toolkit.getDefaultToolkit().getImage(url));
 		}
-		
+
 		InputListener listener = new InputListener();
 		Toolkit.getDefaultToolkit().addAWTEventListener(listener, AWTEvent.KEY_EVENT_MASK);
-		
+
 		map.repaint();
 		minimap.repaint();
-		
+
 		requestFocus();
 
 		worldLoaded(chunky.getWorld());
 	}
-	
+
 	/**
 	 * Chunky input listener
 	 */
@@ -166,7 +166,7 @@ public class ChunkyFrame extends JFrame {
 				break;*/
 			}
 		}
-		
+
 		private void keyReleased(KeyEvent e) {
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_CONTROL:
@@ -203,7 +203,7 @@ public class ChunkyFrame extends JFrame {
 	public void refresh() {
 		if (map != null && map.haveUpdatedChunks())
 			map.repaint();
-		
+
 		if (minimap != null && minimap.haveUpdatedChunks())
 			minimap.repaint();
 	}
@@ -215,7 +215,7 @@ public class ChunkyFrame extends JFrame {
 	public void worldLoaded(final World world) {
 		world.addChunkUpdateListener(minimap);
 		world.addChunkUpdateListener(map);
-		
+
 		controls.setPlayerY(world.playerLocY());
 		controls.enableDimension(0, world.haveDimension(0));
 		controls.enableDimension(-1, world.haveDimension(-1));

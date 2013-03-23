@@ -25,22 +25,22 @@ import se.llbit.chunky.resources.Texture;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class IndexedTexture extends SimpleTexture {
-	
+
 	private int index;
 
 	/**
 	 * Constructor
 	 * @param name The texture file name (excluding extension and directory
 	 * parts)
-	 * @param texture 
+	 * @param texture
 	 * @param index Index of the texture in the terrain file
 	 */
 	public IndexedTexture(String name, Texture texture, int index) {
 		super(name, texture);
-		
+
 		this.index = index;
 	}
-	
+
 	@Override
 	public boolean loadFromTerrain(BufferedImage[] terrain) {
 		texture.setTexture(terrain[index]);

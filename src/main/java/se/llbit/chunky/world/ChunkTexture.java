@@ -25,9 +25,9 @@ import java.io.IOException;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkTexture {
-    
+
     float[][] data = new float[Chunk.X_MAX * Chunk.Z_MAX][3];
-    
+
     /**
      * Create new texture
      */
@@ -46,7 +46,7 @@ public class ChunkTexture {
         data[index][1] = frgb[1];
         data[index][2] = frgb[2];
     }
-    
+
     /**
      * @param x
      * @param z
@@ -60,7 +60,7 @@ public class ChunkTexture {
 	/**
 	 * Write this chunk texture to an output stream
 	 * @param out
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void store(DataOutputStream out) throws IOException {
 		for (int i = 0; i < Chunk.X_MAX * Chunk.Z_MAX; ++i) {
@@ -74,7 +74,7 @@ public class ChunkTexture {
 	 * Load a chunk texture from an input stream
 	 * @param in
 	 * @return The loaded texture
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static ChunkTexture load(DataInputStream in) throws IOException {
 		ChunkTexture texture = new ChunkTexture();

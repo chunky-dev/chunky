@@ -78,105 +78,105 @@ import se.llbit.util.VectorPool;
  * Scene description.
  */
 public class Scene implements Refreshable {
-	
+
 	private static final Logger logger =
 			Logger.getLogger(Scene.class);
-	
+
 	private static final Font infoFont = new Font("Sans serif", Font.BOLD, 11);
 	private static FontMetrics fontMetrics;
-	
+
 	private RayPool rayPool = new RayPool();
-	
+
 	private static final int DEFAULT_DUMP_FREQUENCY = 500;
-	
+
 	private static final int DEFAULT_SPP_TARGET = 1000;
-	
+
 	protected static final double fSubSurface = 0.3;
-	
+
 	/**
 	 * Minimum canvas width
 	 */
 	public static final int MIN_CANVAS_WIDTH = 20;
-	
+
 	/**
 	 * Minimum canvas height
 	 */
 	public static final int MIN_CANVAS_HEIGHT = 20;
 
-	
+
 	/**
 	 * Default specular reflection coefficient
 	 */
 	protected static final float SPECULAR_COEFF = 0.31f;
-	
+
 	/**
 	 * Default water specular reflection coefficient
 	 */
 	public static final float WATER_SPECULAR = 0.46f;
-	
+
 	/**
 	 * Minimum exposure
 	 */
 	public static final double MIN_EXPOSURE = 0.001;
-	
+
 	/**
 	 * Maximum exposure
 	 */
 	public static final double MAX_EXPOSURE = 1000.0;
-	
+
 	/**
 	 * Default exposure
 	 */
 	public static final double DEFAULT_EXPOSURE = 1.0;
-	
+
 	/**
 	 * Default gamma
 	 */
 	public static final double DEFAULT_GAMMA = 2.2;
-	
+
 	/**
 	 * Default emitter intensity
 	 */
 	public static final double DEFAULT_EMITTER_INTENSITY = 13;
-	
+
 	/**
 	 * Minimum emitter intensity
 	 */
 	public static final double MIN_EMITTER_INTENSITY = 0.01;
-	
+
 	/**
 	 * Maximum emitter intensity
 	 */
 	public static final double MAX_EMITTER_INTENSITY = 1000;
-	
+
 	/**
 	 * Current CVF file format version
 	 */
 	public static final int CVF_VERSION = 1;
-	
+
 	private static final double DEFAULT_WATER_VISIBILITY = 9;
 
 	//private static final double MIN_WATER_VISIBILITY = 0;
 	//private static final double MAX_WATER_VISIBILITY = 62;
-	
+
 	private static final int DEFAULT_CLOUD_HEIGHT = 128;
-	
+
 	int cloudHeight = DEFAULT_CLOUD_HEIGHT;
-	
+
 	protected double waterVisibility = DEFAULT_WATER_VISIBILITY;
 
 	/**
 	 * Recursive ray depth limit (not including RR)
 	 */
 	public static int rayDepth = 5;
-	
+
 	private String name = "default";
 	private String skymapFileName;
 
 	protected final Sky sky = new Sky(this);
 	private final Camera camera = new Camera(this);
 	protected final Sun sun = new Sun(this);
-	
+
 	/**
  	 * World
  	 */
@@ -187,7 +187,7 @@ public class Scene implements Refreshable {
  	 * Octree origin
  	 */
 	protected Vector3i origin = new Vector3i();
-	
+
 	/**
  	 * Octree
  	 */
@@ -210,26 +210,26 @@ public class Scene implements Refreshable {
 	private boolean refresh = false;
 	private boolean pathTrace = false;
 	private boolean pauseRender = true;
-	
+
 	private Postprocess postprocess = Postprocess.GAMMA;
-	
+
 	/**
  	 * Preview frame interlacing counter.
  	 */
 	public int previewCount;
-	
+
 	protected boolean clearWater = false;
-	
+
 	protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
 	protected boolean atmosphereEnabled = false;
 	protected boolean volumetricFogEnabled = false;
-	
+
 	private boolean saveDumps = true;
-	
+
 	private int dumpFrequency = DEFAULT_DUMP_FREQUENCY;
-	
+
 	protected int waterHeight = 0;
-	
+
 	private WorldTexture grassTexture = new WorldTexture();
 	private WorldTexture foliageTexture = new WorldTexture();
 
@@ -237,57 +237,57 @@ public class Scene implements Refreshable {
 	 * Current SPP for the scene
 	 */
 	public int spp = 0;
-	
+
 	/**
 	 * Target SPP for the scene
 	 */
 	private int sppTarget;
-	
+
 	/**
 	 * Total rendering time in milliseconds.
 	 */
 	public long renderTime = 0;
-	
+
 	private BufferedImage buffer;
-	
+
 	private BufferedImage backBuffer;
-	
+
 	private double[][][] samples;
-	
+
 	private int[] bufferData;
-	
+
 	private int width;
-	
+
 	private int height;
-	
+
 	private boolean finalized = false;
-	
+
 	private boolean finalizeBuffer = false;
-	
+
 	static {
 		rayDepth = ProgramProperties.getIntProperty("rayDepth", rayDepth);
 	}
-	
+
 	/**
 	 * Create an empty scene with default canvas width and height.
 	 */
 	public Scene() {
 		octree = new Octree(1);// empty octree
-		
+
         width = ProgramProperties.getIntProperty("3dcanvas.width",
         		RenderableCanvas.DEFAULT_WIDTH);
         height = ProgramProperties.getIntProperty("3dcanvas.height",
         		RenderableCanvas.DEFAULT_HEIGHT);
-        
+
         sppTarget = ProgramProperties.getIntProperty("sppTargetDefault",
         		DEFAULT_SPP_TARGET);
-		
+
 		initBuffers();
-		
+
 		if (ProgramProperties.getProperty("skymap") != null)
 			sky.loadSkyMap(ProgramProperties.getProperty("skymap"));
 	}
-	
+
 	private synchronized void initBuffers() {
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		backBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -317,13 +317,13 @@ public class Scene implements Refreshable {
 		grassTexture = other.grassTexture;
 		foliageTexture = other.foliageTexture;
 		origin.set(other.origin);
-		
+
 		loadedChunks = other.loadedChunks;
 
 		exposure = other.exposure;
 		name = other.name;
 		skymapFileName = other.skymapFileName;
-		
+
 		stillWater = other.stillWater;
 		clearWater = other.clearWater;
 		biomeColors = other.biomeColors;
@@ -334,22 +334,22 @@ public class Scene implements Refreshable {
 		emitterIntensity = other.emitterIntensity;
 		atmosphereEnabled = other.atmosphereEnabled;
 		volumetricFogEnabled = other.volumetricFogEnabled;
-		
+
 		camera.set(other.camera);
 		sky.set(other.sky);
 		sun.set(other.sun);
-		
+
 		waterHeight = other.waterHeight;
-		
+
 		spp = other.spp;
 		renderTime = other.renderTime;
-		
+
 		pathTrace = other.pathTrace;
 		pauseRender = other.pauseRender;
 		refresh = other.refresh;
-		
+
 		finalized = false;
-		
+
 		if (samples != other.samples) {
 			width = other.width;
 			height = other.height;
@@ -359,16 +359,16 @@ public class Scene implements Refreshable {
 			bufferData = other.bufferData;
 		}
 	}
-	
+
 	private String getFrameName(String fileName) {
 		return fileName.split("\\.")[0];
 	}
 
 	/**
 	 * Save the scene description
-	 * @param context 
-	 * @param progressListener 
-	 * @param fileName 
+	 * @param context
+	 * @param progressListener
+	 * @param fileName
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
@@ -377,25 +377,25 @@ public class Scene implements Refreshable {
 			RenderStatusListener progressListener,
 			String fileName)
 		throws IOException, InterruptedException {
-		
+
 		String task = "Saving scene";
 		progressListener.setProgress(task, 0, 0, 2);
-		
+
 		name = getFrameName(fileName);
 		DataOutputStream out = new DataOutputStream(
 				context.getSceneFileOutputStream(fileName));
-		
+
 		CompoundTag chunkView = new CompoundTag();
 		chunkView.addItem(new NamedTag("version", new IntTag(CVF_VERSION)));
-		
+
 		CompoundTag canvas = new CompoundTag();
 		CompoundTag worldTag = new CompoundTag();
-		
+
 		canvas.addItem("width", new IntTag(width));
 		canvas.addItem("height", new IntTag(height));
 		canvas.addItem("exposure", new DoubleTag(exposure));
 		canvas.addItem("postprocess", new IntTag(postprocess.ordinal()));
-		
+
 		if (loadedWorld != null) {
 			worldTag.addItem("worldDirectoryPath",
 					new StringTag(loadedWorld.getWorldDirectory().getAbsolutePath()));
@@ -434,31 +434,31 @@ public class Scene implements Refreshable {
 		for (ChunkPosition cp : loadedChunks) {
 			chunkList.addItem(new LongTag(cp.getLong()));
 		}
-		
+
 		chunkView.addItem("canvas", canvas);
 		chunkView.addItem("camera", camera.store());
 		chunkView.addItem("sun", sun.store());
 		chunkView.addItem("world", worldTag);
 		chunkView.addItem("chunkList", chunkList);
-		
+
 		NamedTag rootTag = new NamedTag("chunkView", chunkView);
 		rootTag.write(out);
 		out.close();
-		
+
 		saveOctree(context, progressListener);
 		saveGrassTexture(context, progressListener);
 		saveFoliageTexture(context, progressListener);
-		
+
 		saveDump(context, progressListener);
-		
+
 		progressListener.sceneSaved();
 	}
-	
+
 	/**
 	 * Load scene description
-	 * @param context 
+	 * @param context
 	 * @param renderListener
-	 * @param fileName 
+	 * @param fileName
 	 * @throws IOException
 	 * @throws SceneLoadingError
 	 * @throws InterruptedException
@@ -468,16 +468,16 @@ public class Scene implements Refreshable {
 			RenderStatusListener renderListener,
 			String fileName)
 			throws IOException, SceneLoadingError, InterruptedException {
-		
+
 		DataInputStream in = new DataInputStream(context.getSceneFileInputStream(fileName));
-		
+
 		String cvf_ver = "chunkView.version";
 		String cvf_canvas = "chunkView.canvas";
 		String cvf_camera = "chunkView.camera";
 		String cvf_world = "chunkView.world";
 		String cvf_sun = "chunkView.sun";
 		String cvf_chunkList = "chunkView.chunkList";
-		
+
 		Set<String> request = new HashSet<String>();
 		request.add(cvf_ver);
 		request.add(cvf_canvas);
@@ -487,11 +487,11 @@ public class Scene implements Refreshable {
 		request.add(cvf_chunkList);
 		Map<String, AnyTag> result = NamedTag.quickParse(in, request);
 		in.close();
-		
+
 		if (!result.containsKey(cvf_ver) ||
 				result.get(cvf_ver).isError() ||
 				result.get(cvf_ver).intValue() != CVF_VERSION) {
-			
+
 			if (result.containsKey(cvf_ver) &&
 					!result.get(cvf_ver).isError())
 				throw new SceneLoadingError("Incorrect CVF version! " +
@@ -500,27 +500,27 @@ public class Scene implements Refreshable {
 			else
 				throw new SceneLoadingError("Could not read CVF version!");
 		}
-		
+
 		name = getFrameName(fileName);
-		
+
 		if (result.containsKey(cvf_canvas)) {
 			CompoundTag canvasTag = (CompoundTag) result.get(cvf_canvas);
-			
+
 			int width = canvasTag.get("width").intValue();
 			int height = canvasTag.get("height").intValue();
 			setCanvasSize(width, height);
 			exposure = canvasTag.get("exposure").doubleValue(DEFAULT_EXPOSURE);
 			postprocess = Postprocess.get(canvasTag.get("postprocess"));
 		}
-		
+
 		if (result.containsKey(cvf_camera))  {
-			
+
 			camera.load((CompoundTag) result.get(cvf_camera));
 		}
-		
+
 		if (result.containsKey(cvf_world))  {
 			CompoundTag worldTag = (CompoundTag) result.get(cvf_world);
-			
+
 			String worldDirectoryPath = worldTag.get("worldDirectoryPath").stringValue();
 			int dimension = worldTag.get("dimension").intValue();
 			if (!worldDirectoryPath.isEmpty()) {
@@ -529,14 +529,14 @@ public class Scene implements Refreshable {
 					if (loadedWorld == null ||
 							loadedWorld.getWorldDirectory() == null ||
 							!loadedWorld.getWorldDirectory().getAbsolutePath().equals(worldDirectoryPath)) {
-						
+
 						loadedWorld = new World(worldDirectory, true);
 						loadedWorld.setDimension(dimension);
-						
+
 					} else if (loadedWorld.currentDimension() != dimension) {
-						
+
 						loadedWorld.setDimension(dimension);
-						
+
 					}
 				} else {
 					logger.debug("Could not load world: " + worldDirectoryPath);
@@ -565,35 +565,35 @@ public class Scene implements Refreshable {
 							DEFAULT_SPP_TARGET));
 			sky.load(worldTag);
 		}
-		
+
 		if (result.containsKey(cvf_sun))  {
-			
+
 			sun.load((CompoundTag) result.get(cvf_sun));
 		}
 
 		if (pathTrace)
 			pauseRender = true;
-		
+
 		refresh = false;
-		
+
 		loadDump(context, renderListener);
-		
+
 		Collection<ChunkPosition> chunksToLoad =
 				new LinkedList<ChunkPosition>();
-		
+
 		if (result.containsKey(cvf_chunkList)) {
 			ListTag chunkList = (ListTag) result.get(cvf_chunkList);
-			
+
 				for (int i = 0; i < chunkList.getNumItem(); ++i) {
 					chunksToLoad.add(ChunkPosition.get(
 								chunkList.getItem(i).longValue()));
 				}
 		}
-		
+
 		if (loadOctree(context, renderListener)) {
 			calculateOctreeOrigin(chunksToLoad);
 			loadedChunks = new HashSet<ChunkPosition>(chunksToLoad);
-			
+
 			boolean haveGrass = loadGrassTexture(context, renderListener);
 			boolean haveFoliage = loadFoliageTexture(context, renderListener);
 			if (!haveGrass || !haveFoliage) {
@@ -608,7 +608,7 @@ public class Scene implements Refreshable {
 				loadChunks(renderListener, loadedWorld, chunksToLoad);
 			}
 		}
-		
+
 		notifyAll();
 	}
 
@@ -668,7 +668,7 @@ public class Scene implements Refreshable {
 			refresh();
 		}
 	}
-	
+
 	/**
 	 * @return <code>true</code> if emitters are enabled
 	 */
@@ -678,13 +678,13 @@ public class Scene implements Refreshable {
 
 	/**
 	 * @param ray
-	 * @param rayPool 
+	 * @param rayPool
 	 */
 	public void quickTrace(Ray ray, RayPool rayPool) {
 		ray.x.x -= origin.x;
 		ray.x.y -= origin.y;
 		ray.x.z -= origin.z;
-		
+
 		RayTracer.quickTrace(this, ray, rayPool);
 	}
 
@@ -701,7 +701,7 @@ public class Scene implements Refreshable {
 		ray.x.x -= origin.x;
 		ray.x.y -= origin.y;
 		ray.x.z -= origin.z;
-		
+
 		PathTracer.pathTrace(this, ray, pool, vectorPool, random);
 	}
 
@@ -726,7 +726,7 @@ public class Scene implements Refreshable {
 		Block block = ray.getCurrentBlock();
 		block.getTexture().getColor(ray.u, ray.v, ray.color);
 	}
-	
+
 	/**
 	 * @param ray
 	 * @return <code>true</code> if an intersection was found
@@ -738,7 +738,7 @@ public class Scene implements Refreshable {
 	protected final boolean kill(Ray ray, Random random) {
 		return ray.depth >= rayDepth && random.nextDouble() < .5f;
 	}
-	
+
 	/**
 	 * Reload all loaded chunks.
 	 * @param progressListener
@@ -747,7 +747,7 @@ public class Scene implements Refreshable {
 		if (loadedWorld == null) {
 			logger.warn("Can not reload chunks -- unknown world file!");
 		}
-		
+
 		loadedWorld.setDimension(loadedDimension);
 		loadedWorld.reload();
 		loadChunks(progressListener, loadedWorld, loadedChunks);
@@ -756,7 +756,7 @@ public class Scene implements Refreshable {
 
 	/**
 	 * Load chunks into the Octree
-	 * @param progressListener 
+	 * @param progressListener
 	 * @param world
 	 * @param chunksToLoad
 	 */
@@ -764,30 +764,30 @@ public class Scene implements Refreshable {
 			ProgressListener progressListener,
 			World world,
 			Collection<ChunkPosition> chunksToLoad) {
-		
+
 		if (world == null)
 			return;
-		
+
 		String task = "Loading regions";
 		progressListener.setProgress(task, 0, 0, 1);
-		
+
 		loadedWorld = world;
 		loadedDimension = world.currentDimension();
-		
+
 		int emitters = 0;
 		int chunks = 0;
-		
+
 		if (chunksToLoad.isEmpty()) {
 			return;
 		}
-		
+
 		loadedChunks = new HashSet<ChunkPosition>();
-		
+
 		int requiredDepth = calculateOctreeOrigin(chunksToLoad);
-		
+
 		// create new octree to fit all chunks
 		octree = new Octree(requiredDepth);
-		
+
 		if (waterHeight > 0) {
 			for (int x = 0; x < (1<<octree.depth); ++x) {
 				for (int z = 0; z < (1<<octree.depth); ++z) {
@@ -802,13 +802,13 @@ public class Scene implements Refreshable {
 				}
 			}
 		}
-		
+
 		// parse the regions first - force chunk lists to be populated!
 		Set<ChunkPosition> regions = new HashSet<ChunkPosition>();
 		for (ChunkPosition cp: chunksToLoad) {
 			regions.add(cp.getRegionPosition());
 		}
-		
+
 		for (ChunkPosition region: regions) {
 			world.regionDiscovered(region);
 			world.getRegion(region).parse();
@@ -819,10 +819,10 @@ public class Scene implements Refreshable {
 		int done = 0;
 		int target = chunksToLoad.size()-1;
 		for (ChunkPosition cp : chunksToLoad) {
-			
+
 			progressListener.setProgress(task, done, 0, target);
 			done += 1;
-			
+
 			if (loadedChunks.contains(cp))
 				continue;
 
@@ -830,7 +830,7 @@ public class Scene implements Refreshable {
 
 			world.getChunk(cp).getBlockData(blocks, data, biomes);
 			chunks += 1;
-			
+
 			for (int cz = 0; cz < 16; ++cz) {
 				int wz = cz + cp.z*16;
 				for (int cx = 0; cx < 16; ++cx) {
@@ -839,7 +839,7 @@ public class Scene implements Refreshable {
 					biomeIdMap.set(biomeId, wx, wz);
 				}
 			}
-			
+
 			for (int cy = 0; cy < 256; ++cy) {
 				for (int cz = 0; cz < 16; ++cz) {
 					int z = cz + cp.z*16 - origin.z;
@@ -847,10 +847,10 @@ public class Scene implements Refreshable {
 						int x = cx + cp.x*16 - origin.x;
 						int index = Chunk.chunkIndex(cx, cy, cz);
 						Block block = Block.get(blocks[index]);
-						
+
 						if (cx > 0 && cx < 15 && cz > 0 && cz < 15 && cy > 0 && cy < 255 &&
 								block != Block.STONE && block.isOpaque) {
-							
+
 							// set obscured blocks to stone
 							if (Block.get(blocks[index-1]).isOpaque &&
 									Block.get(blocks[index+1]).isOpaque &&
@@ -862,16 +862,16 @@ public class Scene implements Refreshable {
 								continue;
 							}
 						}
-						
+
 						int metadata = 0xFF & data[index/2];
 						metadata >>= (cx % 2) * 4;
 						metadata &= 0xF;
-						
+
 						if (block == Block.STATIONARYWATER)
 							block = Block.WATER;
 						else if (block == Block.STATIONARYLAVA)
 							block = Block.LAVA;
-						
+
 						int type = block.id;
 						// store metadata
 						switch (block.id) {
@@ -885,7 +885,7 @@ public class Scene implements Refreshable {
 								}
 							}
 							break;
-							
+
 						case Block.WATER_ID:
 							if (cy < 255) {
 								// is there water above?
@@ -905,7 +905,7 @@ public class Scene implements Refreshable {
 								}
 							}
 							break;
-							
+
 						case Block.LAVA_ID:
 							if (cy < 255) {
 								// is there lava above?
@@ -916,7 +916,7 @@ public class Scene implements Refreshable {
 								}
 							}
 							break;
-							
+
 						case Block.GRASS_ID:
 							if (cy < 255) {
 								// is it snow covered?
@@ -927,7 +927,7 @@ public class Scene implements Refreshable {
 								}
 							}
 							// fallthrough!
-							
+
 						case Block.WOODENDOOR_ID:
 						case Block.IRONDOOR_ID:
 						{
@@ -954,7 +954,7 @@ public class Scene implements Refreshable {
 							type |= (bottom << BlockData.DOOR_BOTTOM);
 							break;
 						}
-							
+
 						default:
 							break;
 						}
@@ -969,21 +969,21 @@ public class Scene implements Refreshable {
 				}
 			}
 		}
-		
+
 		grassTexture = new WorldTexture();
 		foliageTexture = new WorldTexture();
-		
+
 		Set<ChunkPosition> chunkSet = new HashSet<ChunkPosition>(chunksToLoad);
-		
+
 		task = "Finalizing octree";
 		done = 0;
 		for (ChunkPosition cp : chunksToLoad) {
-			
+
 			// finalize grass and foliage textures
 			// box blur 3x3
 			for (int x = 0; x < 16; ++x) {
 				for (int z = 0; z < 16; ++z) {
-					
+
 					int nsum = 0;
 					float[] grassMix = { 0, 0, 0 };
 					float[] foliageMix = { 0, 0, 0 };
@@ -991,7 +991,7 @@ public class Scene implements Refreshable {
 						int wx = cp.x*16 + sx;
 						for (int sz = z-1; sz <= z+1; ++sz) {
 							int wz = cp.z*16 + sz;
-							
+
 							ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
 							if (chunkSet.contains(ccp)) {
 								nsum += 1;
@@ -1007,13 +1007,13 @@ public class Scene implements Refreshable {
 							}
 						}
 					}
-					
+
 					grassMix[0] /= nsum;
 					grassMix[1] /= nsum;
 					grassMix[2] /= nsum;
 					grassTexture.set(cp.x*16 + x - origin.x,
 							cp.z*16 + z - origin.z, grassMix);
-					
+
 					foliageMix[0] /= nsum;
 					foliageMix[1] /= nsum;
 					foliageMix[2] /= nsum;
@@ -1021,21 +1021,21 @@ public class Scene implements Refreshable {
 							cp.z*16 + z - origin.z, foliageMix);
 				}
 			}
-			
+
 			progressListener.setProgress(task, done, 0, target);
 			done += 1;
-			
+
 			OctreeFinalizer.finalizeChunk(octree, origin, cp);
 		}
-		
+
 		camera.setWorldSize(1<<octree.depth);
-		
+
 		logger.info(String.format("Loaded %d chunks (%d emitters)",
 				chunks, emitters));
 	}
 
 	private int calculateOctreeOrigin(Collection<ChunkPosition> chunksToLoad) {
-		
+
 		int xmin = Integer.MAX_VALUE;
 		int xmax = Integer.MIN_VALUE;
 		int zmin = Integer.MAX_VALUE;
@@ -1050,21 +1050,21 @@ public class Scene implements Refreshable {
 			if (cp.z > zmax)
 				zmax = cp.z;
 		}
-		
+
 		xmax += 1;
 		zmax += 1;
 		xmin *= 16;
 		xmax *= 16;
 		zmin *= 16;
 		zmax *= 16;
-		
+
 		int maxDimension = Math.max(Chunk.Y_MAX, Math.max(xmax-xmin, zmax-zmin));
 		int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
-		
+
 		int xroom = (1<<requiredDepth)-(xmax-xmin);
 		int yroom = (1<<requiredDepth)-Chunk.Y_MAX;
 		int zroom = (1<<requiredDepth)-(zmax-zmin);
-		
+
 		origin.set(xmin - xroom/2, -yroom/2, zmin - zroom/2);
 		return requiredDepth;
 	}
@@ -1075,7 +1075,7 @@ public class Scene implements Refreshable {
 	public Collection<ChunkPosition> loadedChunks() {
 		return loadedChunks;
 	}
-	
+
 	/**
 	 * @return <code>true</code> if the scene has loaded chunks
 	 */
@@ -1090,7 +1090,7 @@ public class Scene implements Refreshable {
 	public Vector3d calcCenterCamera() {
 		if (loadedChunks.isEmpty())
 			return new Vector3d(0, 128, 0);
-		
+
 		int xmin = Integer.MAX_VALUE;
 		int xmax = Integer.MIN_VALUE;
 		int zmin = Integer.MAX_VALUE;
@@ -1133,7 +1133,7 @@ public class Scene implements Refreshable {
 			refresh();
 		}
 	}
-	
+
 	/**
 	 * Center the camera over the loaded chunks
 	 */
@@ -1154,7 +1154,7 @@ public class Scene implements Refreshable {
 	public String name() {
 		return name;
 	}
-	
+
 	/**
 	 * @return <code>true</code> if this scene is to be Monte Carlo path traced
 	 */
@@ -1175,7 +1175,7 @@ public class Scene implements Refreshable {
 	public Sun sun() {
 		return sun;
 	}
-	
+
 	/**
 	 * Toggle Monte Carlo path tracing.
 	 */
@@ -1183,7 +1183,7 @@ public class Scene implements Refreshable {
 		pathTrace = !pathTrace;
 		refresh();
 	}
-	
+
 	/**
 	 * @throws InterruptedException
 	 */
@@ -1192,7 +1192,7 @@ public class Scene implements Refreshable {
 			wait();
 		refresh = false;
 	}
-	
+
 	/**
 	 * @return <code>true</code> if the rendering of this scene should be
 	 * restarted
@@ -1200,7 +1200,7 @@ public class Scene implements Refreshable {
 	public boolean shouldRefresh() {
 		return refresh;
 	}
-	
+
 	/**
 	 * Called when the scene description has been altered in a way that
 	 * forces the rendering to restart.
@@ -1222,7 +1222,7 @@ public class Scene implements Refreshable {
 		while (pauseRender)
 			wait();
 	}
-	
+
 	/**
 	 * @return <code>true</code> if the rendering is paused
 	 */
@@ -1240,14 +1240,14 @@ public class Scene implements Refreshable {
 			refresh();
 		}
 	}
-	
+
 	/**
  	 * Pause the renderer.
  	 */
 	public synchronized void pauseRender() {
 		pauseRender = true;
 	}
-	
+
 	/**
  	 * Resume a paused render.
  	 */
@@ -1267,7 +1267,7 @@ public class Scene implements Refreshable {
 			refresh();
 		}
 	}
-	
+
 	/**
 	 * Move the camera to the player position, if available.
 	 */
@@ -1281,7 +1281,7 @@ public class Scene implements Refreshable {
 	public boolean stillWaterEnabled() {
 		return stillWater;
 	}
-	
+
 	/**
 	 * @return <code>true</code> if biome colors are enabled
 	 */
@@ -1375,7 +1375,7 @@ public class Scene implements Refreshable {
 			refresh();
 		}
 	}
-	
+
 	/**
 	 * @return <code>true</code> if clear water is enabled
 	 */
@@ -1391,7 +1391,7 @@ public class Scene implements Refreshable {
 		if (text.length() > 0)
 			name = text;
 	}
-	
+
 	/**
 	 * @return The current postprocessing mode
 	 */
@@ -1415,7 +1415,7 @@ public class Scene implements Refreshable {
 	public double getEmitterIntensity() {
 		return emitterIntensity;
 	}
-	
+
 	/**
 	 * Set the emitter intensity
 	 * @param value
@@ -1435,7 +1435,7 @@ public class Scene implements Refreshable {
 			refresh();
 		}
 	}
-	
+
 	/**
 	 * Set the volumetric fog flag
 	 * @param value
@@ -1460,7 +1460,7 @@ public class Scene implements Refreshable {
 	public boolean volumetricFogEnabled() {
 		return volumetricFogEnabled;
 	}
-	
+
 	/**
 	 * Set the ocean water height
 	 * @param value
@@ -1536,7 +1536,7 @@ public class Scene implements Refreshable {
 	public void setTargetSPP(int value) {
 		sppTarget = value;
 	}
-	
+
 	/**
 	 * Change the canvas size
 	 * @param canvasWidth
@@ -1555,21 +1555,21 @@ public class Scene implements Refreshable {
 	public int canvasWidth() {
 		return width;
 	}
-	
+
 	/**
 	 * @return Canvas height
 	 */
 	public int canvasHeight() {
 		return height;
 	}
-	
+
 	/**
 	 * Save a snapshot
-	 * @param directory 
-	 * @param watermark 
+	 * @param directory
+	 * @param watermark
 	 */
 	public void saveSnapshot(File directory, boolean watermark) {
-		
+
 		try {
 			String fileName = name + "-" + spp + ".png";
 			logger.info("Saving frame " + fileName);
@@ -1582,23 +1582,23 @@ public class Scene implements Refreshable {
 				e.getMessage(), e);
 		}
 	}
-	
+
 	/**
 	 * @param targetFile
-	 * @param watermark 
-	 * @param progressListener 
-	 * @throws IOException 
+	 * @param watermark
+	 * @param progressListener
+	 * @throws IOException
 	 */
 	public synchronized void saveFrame(File targetFile, boolean watermark,
 			ProgressListener progressListener) throws IOException {
-		
+
 		for (int x = 0; x < width; ++x) {
 			progressListener.setProgress("Finalizing frame", x, 0, width-1);
 			for (int y = 0; y < height; ++y) {
 				finalizePixel(x, y);
 			}
 		}
-		
+
 		if (watermark)
 			addWatermark();
 		ImageIO.write(backBuffer, "png", targetFile);
@@ -1618,7 +1618,7 @@ public class Scene implements Refreshable {
 	private synchronized void saveOctree(
 			RenderContext context,
 			ProgressListener progressListener) {
-		
+
 		String fileName = name + ".octree";
 		DataOutputStream out = null;
 		try {
@@ -1627,9 +1627,9 @@ public class Scene implements Refreshable {
 			logger.info("Saving octree " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
 					context.getSceneFileOutputStream(fileName)));
-			
+
 			octree.store(out);
-			
+
 			progressListener.setProgress(task, 1, 0, 1);
 			logger.info("Octree saved");
 		} catch (IOException e) {
@@ -1643,11 +1643,11 @@ public class Scene implements Refreshable {
 			}
 		}
 	}
-		
+
 	private synchronized void saveGrassTexture(
 			RenderContext context,
 			ProgressListener progressListener) {
-		
+
 		String fileName = name + ".grass";
 		DataOutputStream out = null;
 		try {
@@ -1656,9 +1656,9 @@ public class Scene implements Refreshable {
 			logger.info("Saving grass texture " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
 					context.getSceneFileOutputStream(fileName)));
-			
+
 			grassTexture.store(out);
-			
+
 			progressListener.setProgress(task, 1, 0, 1);
 			logger.info("Grass texture saved");
 		} catch (IOException e) {
@@ -1672,11 +1672,11 @@ public class Scene implements Refreshable {
 			}
 		}
 	}
-	
+
 	private synchronized void saveFoliageTexture(
 			RenderContext context,
 			ProgressListener progressListener) {
-		
+
 		String fileName = name + ".foliage";
 		DataOutputStream out = null;
 		try {
@@ -1685,9 +1685,9 @@ public class Scene implements Refreshable {
 			logger.info("Saving foliage texture " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
 					context.getSceneFileOutputStream(fileName)));
-			
+
 			foliageTexture.store(out);
-			
+
 			progressListener.setProgress(task, 1, 0, 1);
 			logger.info("Foliage texture saved");
 		} catch (IOException e) {
@@ -1701,11 +1701,11 @@ public class Scene implements Refreshable {
 			}
 		}
 	}
-	
+
 	private synchronized void saveDump(
 			RenderContext context,
 			ProgressListener progressListener) {
-		
+
 		String fileName = name + ".dump";
 		DataOutputStream out = null;
 		try {
@@ -1738,13 +1738,13 @@ public class Scene implements Refreshable {
 			}
 		}
 	}
-	
+
 	private synchronized boolean loadOctree(
 			RenderContext context,
 			RenderStatusListener renderListener) {
-		
+
 		String fileName = name + ".octree";
-		
+
 		DataInputStream in = null;
 		try {
 			String task = "Loading octree";
@@ -1752,9 +1752,9 @@ public class Scene implements Refreshable {
 			logger.info("Loading octree " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
-			
+
 			octree = Octree.load(in);
-			
+
 			renderListener.setProgress(task, 1, 0, 1);
 			logger.info("Octree loaded");
 			return true;
@@ -1770,13 +1770,13 @@ public class Scene implements Refreshable {
 			}
 		}
 	}
-		
+
 	private synchronized boolean loadGrassTexture(
 			RenderContext context,
 			RenderStatusListener renderListener) {
-		
+
 		String fileName = name + ".grass";
-		
+
 		DataInputStream in = null;
 		try {
 			String task = "Loading grass texture";
@@ -1784,9 +1784,9 @@ public class Scene implements Refreshable {
 			logger.info("Loading grass texture " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
-			
+
 			grassTexture = WorldTexture.load(in);
-			
+
 			renderListener.setProgress(task, 1, 0, 1);
 			logger.info("Grass texture loaded");
 			return true;
@@ -1802,13 +1802,13 @@ public class Scene implements Refreshable {
 			}
 		}
 	}
-		
+
 	private synchronized boolean loadFoliageTexture(
 			RenderContext context,
 			RenderStatusListener renderListener) {
-		
+
 		String fileName = name + ".foliage";
-		
+
 		DataInputStream in = null;
 		try {
 			String task = "Loading foliage texture";
@@ -1816,9 +1816,9 @@ public class Scene implements Refreshable {
 			logger.info("Loading foliage texture " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
-			
+
 			foliageTexture = WorldTexture.load(in);
-			
+
 			renderListener.setProgress(task, 1, 0, 1);
 			logger.info("Foliage texture loaded");
 			return true;
@@ -1838,14 +1838,14 @@ public class Scene implements Refreshable {
 	private synchronized void loadDump(
 			RenderContext context,
 			RenderStatusListener renderListener) {
-		
+
 		String fileName = name + ".dump";
-		
+
 		DataInputStream in = null;
 		try {
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
-			
+
 			String task = "Loading render dump";
 			renderListener.setProgress(task, 0, 0, 1);
 			logger.info("Loading render dump " + fileName);
@@ -1858,14 +1858,14 @@ public class Scene implements Refreshable {
 			}
 			spp = in.readInt();
 			renderTime = in.readLong();
-			
+
 			// Update render status
 			renderListener.setSPP(spp);
 			renderListener.setRenderTime(renderTime);
 			long totalSamples = spp * ((long) (width * height));
 			renderListener.setSamplesPerSecond(
 					(int) (totalSamples / (renderTime / 1000.0)));
-			
+
 			for (int x = 0; x < width; ++x) {
 				renderListener.setProgress(task, x, 0, width-1);
 				for (int y = 0; y < height; ++y) {
@@ -1891,20 +1891,20 @@ public class Scene implements Refreshable {
 	/**
 	 * Finalize a pixel. Calculates the resulting RGB color values for
 	 * the pixel and sets these in the bitmap image.
-	 * @param x 
-	 * @param y 
+	 * @param x
+	 * @param y
 	 */
 	public void finalizePixel(int x, int y) {
 		finalized = true;
-		
+
 		double r = samples[x][y][0];
 		double g = samples[x][y][1];
 		double b = samples[x][y][2];
-		
+
 		r *= exposure;
 		g *= exposure;
 		b *= exposure;
-		
+
 		if (pathTrace()) {
 			switch (postprocess) {
 			case NONE:
@@ -1929,14 +1929,14 @@ public class Scene implements Refreshable {
 			g = Math.sqrt(g);
 			b = Math.sqrt(b);
 		}
-		
+
 		r = Math.min(1, r);
 		g = Math.min(1, g);
 		b = Math.min(1, b);
-		
+
 		bufferData[x + y * width] = Color.getRGB(r, g, b);
 	}
-	
+
 	/**
 	 * Copies a pixel in-buffer
 	 * @param jobId
@@ -1945,22 +1945,22 @@ public class Scene implements Refreshable {
 	public void copyPixel(int jobId, int offset) {
 		bufferData[jobId + offset] = bufferData[jobId];
 	}
-	
+
 	/**
 	 * Update the canvas - draw the latest rendered frame
 	 * @param warningText
 	 */
 	public synchronized void updateCanvas(String warningText) {
 		finalized = false;
-		
+
 		try {
 			// flip buffers
 			BufferedImage tmp = buffer;
 			buffer = backBuffer;
 			backBuffer = tmp;
-	
+
 			bufferData = ((DataBufferInt) backBuffer.getRaster().getDataBuffer()).getData();
-			
+
 			Graphics g = buffer.getGraphics();
 
 			if (!warningText.isEmpty()) {
@@ -1974,7 +1974,7 @@ public class Scene implements Refreshable {
 				g.drawString(warningText,
 						x0 - fontMetrics.stringWidth(warningText)/2, y0);
 			} else {
-			
+
 				if (!pathTrace()) {
 					int x0 = width/2;
 					int y0 = height/2;
@@ -1997,7 +1997,7 @@ public class Scene implements Refreshable {
 					rayPool.dispose(ray);
 				}
 			}
-			
+
 			g.dispose();
 		} catch (IllegalStateException e) {
 			logger.error("Unexpected exception while rendering back buffer", e);
@@ -2095,7 +2095,7 @@ public class Scene implements Refreshable {
 			refresh();
 		}
 	}
-	
+
 	/**
 	 * Change the cloud height
 	 * @param value

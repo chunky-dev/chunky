@@ -28,12 +28,12 @@ public class TripwireModel {
 		// north-south
 		new Quad(new Vector3d(8.25/16, 1/16., 1), new Vector3d(8.25/16, 1/16., 0),
 				new Vector3d(7.75/16, 1/16., 1), new Vector4d(0, 1, 14/16., 1)),
-				
+
 		// east-west
 		new Quad(new Vector3d(1, 1/16., 7.75/16), new Vector3d(0, 1/16., 7.75/16),
 				new Vector3d(1, 1/16., 8.25/16), new Vector4d(0, 1, 14/16., 1)),
 	};
-	
+
 	public static boolean intersection(Ray ray) {
 		int direction = (ray.currentMaterial >> 12) & 1;
 		ray.t = Double.POSITIVE_INFINITY;
@@ -54,3 +54,4 @@ public class TripwireModel {
 	}
 
 }
+

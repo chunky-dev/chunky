@@ -33,10 +33,10 @@ public class CenteredFileDialog extends FileDialog {
 	 */
 	public CenteredFileDialog(Frame parent, String title, int mode) {
 		super(parent, title, mode);
-		
+
 		setLocationRelativeTo(parent);
 	}
-	
+
 	/**
 	 * @return The selected File
 	 */
@@ -51,7 +51,7 @@ public class CenteredFileDialog extends FileDialog {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * @param extension
 	 * @return Enforce an extension for the selected file

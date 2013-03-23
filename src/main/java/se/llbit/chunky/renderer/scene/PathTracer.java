@@ -27,11 +27,11 @@ import se.llbit.util.VectorPool;
 
 /**
  * Static methods for path tracing
- * 
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class PathTracer {
-	
+
 	/**
 	 * Path trace the ray
 	 * @param scene
@@ -58,21 +58,21 @@ public class PathTracer {
 	public static final void pathTrace(Scene scene, Ray ray, RayPool rayPool,
 			VectorPool vectorPool, Random random, int addEmitted,
 			boolean first) {
-		
+
 		Ray reflected = rayPool.get();
 		Ray transmitted = rayPool.get();
 		Ray refracted = rayPool.get();
 		Vector3d ox = vectorPool.get(ray.x);
 		Vector3d od = vectorPool.get(ray.d);
 		double s = 0;
-		
+
 		while (true) {
 
 			if (!RayTracer.nextIntersection(scene, ray, rayPool)) {
 				if (ray.depth == 0) {
 					// direct sky hit
 					scene.sky.getSkyColorInterpolated(ray, scene.waterHeight > 0);
-					
+
 				} else if (ray.specular) {
 					// sky color
 					scene.sky.getSkySpecularColor(ray, scene.waterHeight > 0);
@@ -83,16 +83,16 @@ public class PathTracer {
 			}
 
 			double pSpecular = 0;
-			
+
 			Block currentBlock = ray.getCurrentBlock();
 			Block prevBlock = ray.getPrevBlock();
-			
+
 			if (!scene.stillWater && ray.n.y != 0 &&
 					((currentBlock == Block.WATER && prevBlock == Block.AIR) ||
 					(currentBlock == Block.AIR && prevBlock == Block.WATER))) {
-				
+
 				WaterModel.doWaterDisplacement(ray);
-				
+
 				if (currentBlock == Block.AIR) {
 					ray.n.y = -ray.n.y;
 				}
@@ -107,18 +107,18 @@ public class PathTracer {
 			}
 
 			double pDiffuse = ray.color.w;
-			
+
 			float n1 = prevBlock.ior;
 			float n2 = currentBlock.ior;
-			
+
 			if (pDiffuse + pSpecular < Ray.EPSILON && n1 == n2)
 				continue;
-			
+
 			if (first) {
 				s = ray.distance;
 				first = false;
 			}
-			
+
 			if (currentBlock.isShiny &&
 					random.nextDouble() < pSpecular) {
 
@@ -159,20 +159,20 @@ public class PathTracer {
 							scene.sun.getRandomSunDirection(reflected, random, vectorPool);
 
 							double directLight = 0;
-							
+
 							boolean frontLight = reflected.d.dot(ray.n) > 0;
 
 							if (frontLight || (currentBlock.subSurfaceScattering &&
 									random.nextDouble() < Scene.fSubSurface)) {
-								
+
 								if (!frontLight) {
 									reflected.x.scaleAdd(-Ray.OFFSET, ray.n, reflected.x);
 								}
-							
+
 								reflected.currentMaterial = ray.prevMaterial;
-		
+
 								double attenuation = getDirectLightAttenuation(scene, reflected, rayPool);
-								
+
 								if (attenuation > 0) {
 									directLight = attenuation * reflected.d.dot(ray.n);
 									if (!frontLight)
@@ -180,7 +180,7 @@ public class PathTracer {
 									ray.hit = true;
 								}
 							}
-								
+
 							reflected.diffuseReflection(ray, random);
 							pathTrace(scene, reflected, rayPool, vectorPool, random, 0, false);
 							ray.hit = ray.hit || reflected.hit;
@@ -195,10 +195,10 @@ public class PathTracer {
 									* (emittance + directLight * scene.sun.emittance.z
 										+ (reflected.color.z + reflected.emittance.z));
 							}
-							
+
 						} else {
 							reflected.diffuseReflection(ray, random);
-							
+
 							pathTrace(scene, reflected, rayPool, vectorPool, random, 0, false);
 							ray.hit = ray.hit || reflected.hit;
 							if (ray.hit) {
@@ -212,13 +212,13 @@ public class PathTracer {
 						}
 					}
 				} else if (n1 != n2) {
-					
+
 					boolean doRefraction =
 							currentBlock == Block.WATER ||
 							prevBlock == Block.WATER ||
 							currentBlock == Block.ICE ||
 							prevBlock == Block.ICE;
-					
+
 					// refraction
 					float n1n2 = n1 / n2;
 					double cosTheta = - ray.n.dot(ray.d);
@@ -229,7 +229,7 @@ public class PathTracer {
 						if (!scene.kill(reflected, random)) {
 							pathTrace(scene, reflected, rayPool, vectorPool, random, 1, false);
 							if (reflected.hit) {
-								
+
 								ray.color.x = reflected.color.x;
 								ray.color.y = reflected.color.y;
 								ray.color.z = reflected.color.z;
@@ -239,7 +239,7 @@ public class PathTracer {
 					} else {
 						refracted.set(ray);
 						if (!scene.kill(refracted, random)) {
-							
+
 							// Calculate angle-dependent reflectance using
 							// Fresnel equation approximation
 							// R(theta) = R0 + (1 - R0) * (1 - cos(theta))^5
@@ -248,7 +248,7 @@ public class PathTracer {
 							double R0 = a*a/(b*b);
 							double c = 1 - cosTheta;
 							double Rtheta = R0 + (1-R0) * c*c*c*c*c;
-							
+
 							if (random.nextDouble() < Rtheta) {
 								reflected.specularReflection(ray);
 								pathTrace(scene, reflected, rayPool, vectorPool, random, 1, false);
@@ -260,7 +260,7 @@ public class PathTracer {
 								}
 							} else {
 								if (doRefraction) {
-									
+
 									double t2 = Math.sqrt(radicand);
 									if (cosTheta > 0) {
 										refracted.d.x = n1n2*ray.d.x + (n1n2*cosTheta - t2)*ray.n.x;
@@ -271,13 +271,13 @@ public class PathTracer {
 										refracted.d.y = n1n2*ray.d.y - (n1n2*cosTheta - t2)*ray.n.y;
 										refracted.d.z = n1n2*ray.d.z - (n1n2*cosTheta - t2)*ray.n.z;
 									}
-									
+
 									refracted.d.normalize();
-									
+
 									refracted.x.scaleAdd(Ray.OFFSET,
 											refracted.d, refracted.x);
 								}
-								
+
 								pathTrace(scene, refracted, rayPool, vectorPool, random, 1, false);
 								if (refracted.hit) {
 									ray.color.x = ray.color.x * pDiffuse + (1-pDiffuse);
@@ -310,7 +310,7 @@ public class PathTracer {
 					}
 				}
 			}
-			
+
 			// do water fog
 			if (!scene.clearWater && prevBlock == Block.WATER) {
 				double a = ray.distance / scene.waterVisibility;
@@ -326,7 +326,7 @@ public class PathTracer {
 				ray.color.w = attenuation;*/
 				ray.hit = true;
 			}
-			
+
 			break;
 		}
 		if (!ray.hit) {
@@ -334,42 +334,42 @@ public class PathTracer {
 			if (first)
 				s = ray.distance;
 		}
-		
+
 		if (s > 0) {
-			
+
 			if (scene.atmosphereEnabled) {
 				double Fex = scene.sun.extinction(s);
 				ray.color.x *= Fex;
 				ray.color.y *= Fex;
 				ray.color.z *= Fex;
-				
+
 				if (!scene.volumetricFogEnabled) {
 					double Fin = scene.sun.inscatter(Fex, scene.sun.theta(ray.d));
-					
+
 					ray.color.x += Fin * scene.sun.emittance.x * scene.sun.getIntensity();
 					ray.color.y += Fin * scene.sun.emittance.y * scene.sun.getIntensity();
 					ray.color.z += Fin * scene.sun.emittance.z * scene.sun.getIntensity();
 				}
 			}
-			
+
 			if (scene.volumetricFogEnabled) {
 				s = (s - Ray.OFFSET) * random.nextDouble();
-				
+
 				reflected.x.scaleAdd(s, od, ox);
 				scene.sun.getRandomSunDirection(reflected, random, vectorPool);
 				reflected.currentMaterial = 0;
-				
+
 				double attenuation = getDirectLightAttenuation(scene, reflected, rayPool);
-				
+
 				double Fex = scene.sun.extinction(s);
 				double Fin = scene.sun.inscatter(Fex, scene.sun.theta(ray.d));
-				
+
 				ray.color.x += 50 * attenuation * Fin * scene.sun.emittance.x * scene.sun.getIntensity();
 				ray.color.y += 50 * attenuation * Fin * scene.sun.emittance.y * scene.sun.getIntensity();
 				ray.color.z += 50 * attenuation * Fin * scene.sun.emittance.z * scene.sun.getIntensity();
 			}
 		}
-		
+
 		rayPool.dispose(reflected);
 		rayPool.dispose(transmitted);
 		rayPool.dispose(refracted);
@@ -380,12 +380,12 @@ public class PathTracer {
 	/**
 	 * @param scene
 	 * @param ray
-	 * @param rayPool 
+	 * @param rayPool
 	 * @return The direct lighting attenuation
 	 */
 	public static final double getDirectLightAttenuation(Scene scene, Ray ray,
 			RayPool rayPool) {
-		
+
 		double attenuation = 1;
 		while (attenuation > 0) {
 			ray.x.scaleAdd(Ray.OFFSET,

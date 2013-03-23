@@ -36,49 +36,49 @@ public class BenchmarkManager extends AbstractRenderManager {
 	 */
 	public static final int NUM_RENDER_THREADS_DEFAULT =
 			Runtime.getRuntime().availableProcessors();
-	
+
 	private static final Logger logger =
 			Logger.getLogger(BenchmarkManager.class);
-	
+
 	private Thread[] workers;
-	
+
 	private final int numJobs;
-	
+
 	/**
  	 * The benchmark scene.
  	 */
 	private Scene scene;
-	
+
 	/**
 	 * Next job on the job queue.
 	 */
 	private final AtomicInteger nextJob;
-	
+
 	/**
 	 * Number of completed jobs.
 	 */
 	private final AtomicInteger finishedJobs;
-	
+
 	private final RenderStatusListener renderListener;
-	
+
 	private final String benchmarkName = "outdoors-1";
 
 	private int score;
-	
+
 	/**
 	 * Constructor
-	 * @param context 
-	 * @param renderStatusListener 
+	 * @param context
+	 * @param renderStatusListener
 	 */
 	public BenchmarkManager(RenderContext context,
 			RenderStatusListener renderStatusListener) {
-		
+
 		super(context);
-		
+
 		renderListener = renderStatusListener;
-		
+
 		context = new EmbeddedResourceContext(context);
-		
+
 		scene = new Scene();
 		try {
 			scene.loadSceneDescription(context,
@@ -90,16 +90,16 @@ public class BenchmarkManager extends AbstractRenderManager {
 		} catch (InterruptedException e) {
 			logger.warn("Interrupted while loading benchmark scene");
 		}
-		
+
 		scene.setBufferFinalization(false);
-		
+
 		int canvasWidth = scene.canvasWidth();
 		int canvasHeight = scene.canvasHeight();
 		numJobs = ((canvasWidth+(tileWidth-1)) / tileWidth) *
 				((canvasHeight+(tileWidth-1)) / tileWidth);
 		nextJob = new AtomicInteger(0);
 		finishedJobs = new AtomicInteger(0);
-			
+
 		// start worker threads
 		long seed = System.currentTimeMillis();
 		workers = new Thread[numThreads];
@@ -113,10 +113,10 @@ public class BenchmarkManager extends AbstractRenderManager {
 		try {
 
 			long millis;
-			
+
 			String task = "Benchmarking";
 			renderListener.setProgress(task, 0, 0, 120);
-			
+
 			// warm up ten iterations with JIT enabled
 			java.lang.Compiler.enable();
 			scene.refresh();
@@ -125,7 +125,7 @@ public class BenchmarkManager extends AbstractRenderManager {
 				giveTickets();
 				waitOnWorkers();
 			}
-			
+
 			// warm up ten iterations with JIT disabled
 			java.lang.Compiler.disable();
 			scene.refresh();
@@ -134,7 +134,7 @@ public class BenchmarkManager extends AbstractRenderManager {
 				giveTickets();
 				waitOnWorkers();
 			}
-			
+
 			// time 100 iterations with JIT disabled
 			millis = System.currentTimeMillis();
 			scene.refresh();
@@ -144,31 +144,31 @@ public class BenchmarkManager extends AbstractRenderManager {
 				waitOnWorkers();
 			}
 			millis = System.currentTimeMillis() - millis;
-			
+
 			int canvasWidth = scene.canvasWidth();
 			int canvasHeight = scene.canvasHeight();
 			long pixelsPerFrame = (long) (canvasWidth * canvasHeight);
 			score = (int) ((100 * pixelsPerFrame) / (millis / 1000.0));
-			
+
 			renderListener.setProgress(task, 120, 0, 120);
-				
+
 		} catch (InterruptedException e) {
 			// 3D view was closed
 		} catch (Throwable e) {
 			logger.error("Uncaught exception in render manager", e);
 		}
-		
+
 		// Halt all worker threads
 		for (int i = 0; i < numThreads; ++i) {
 			workers[i].interrupt();
 		}
 	}
-	
+
 	private synchronized void waitOnWorkers() throws InterruptedException {
 		while (finishedJobs.get() < numJobs)
 			wait();
 	}
-	
+
 	private synchronized void giveTickets() {
 		nextJob.set(0);
 		finishedJobs.set(0);
@@ -188,7 +188,7 @@ public class BenchmarkManager extends AbstractRenderManager {
 		}
 		return jobId;
 	}
-	
+
 	@Override
 	public void jobDone() {
 		int finished = finishedJobs.incrementAndGet();
@@ -203,7 +203,7 @@ public class BenchmarkManager extends AbstractRenderManager {
 	public Scene bufferedScene() {
 		return scene;
 	}
-	
+
 	/**
 	 * @return The benchmark score
 	 */

@@ -40,7 +40,7 @@ import se.llbit.util.ProgramProperties;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Sky {
-	
+
 	/**
 	 * Sky rendering mode
 	 * @author Jesper Öqvist <jesper@llbit.se>
@@ -63,25 +63,25 @@ public class Sky {
 		 */
 		SKYBOX
 	};
-	
+
 	private static final Logger logger =
 			Logger.getLogger(Sky.class);
-	
+
 	private Texture skymap = null;
 	private String skymapFileName = "";
 	private Scene scene;
 	private double rotation;
 	private boolean mirrored = true;
-	
+
 	// final to ensure that we don't do a lot of redundant re-allocation
 	private final Vector3d groundColor = new Vector3d(0, 0, 1);
-	
+
 	/**
 	 * @param scene
 	 */
 	public Sky(Scene scene) {
 		this.scene = scene;
-		
+
 		try {
 			rotation = Double.parseDouble(ProgramProperties.getProperty(
 					"skymapRotation", "0"));
@@ -89,7 +89,7 @@ public class Sky {
 			rotation = 0;
 		}
 	}
-	
+
 	/**
 	 * Load a panoramic skymap texture
 	 * @param fileName
@@ -112,7 +112,7 @@ public class Sky {
 		}
 		scene.refresh();
 	}
-	
+
 	/**
 	 * Set the sky equal to other sky
 	 * @param other
@@ -124,7 +124,7 @@ public class Sky {
 		mirrored = other.mirrored;
 		groundColor.set(other.groundColor);
 	}
-	
+
 	/**
 	 * Unload the skymap texture and use the default sky instead
 	 */
@@ -134,7 +134,7 @@ public class Sky {
 		ProgramProperties.removeProperty("skymap");
 		scene.refresh();
 	}
-	
+
 	/**
 	 * Panormaic skymap color
 	 * @param ray
@@ -164,7 +164,7 @@ public class Sky {
 		skymap.getColor(theta / (2*Math.PI), (2 * phi / Math.PI), ray.color);
 		ray.hit = true;
 	}
-	
+
 	private boolean getGroundColor(Ray ray, boolean blackBelowHorizon) {
 		if (blackBelowHorizon && ray.d.y < 0) {
 			ray.color.set(0, 0, 0, 1);
@@ -186,7 +186,7 @@ public class Sky {
 	public void getSkyColorInterpolated(Ray ray, boolean blackBelowHorizon) {
 		if (getGroundColor(ray, blackBelowHorizon)) {
 			return;
-			
+
 		} else if (scene.sunEnabled && scene.sun().intersect(ray)) {
 			double r = ray.color.x;
 			double g = ray.color.y;
@@ -195,9 +195,9 @@ public class Sky {
 			ray.color.x = ray.color.x + r;
 			ray.color.y = ray.color.y + g;
 			ray.color.z = ray.color.z + b;
-			
+
 		} else {
-			
+
 			getPanoramaColorInterpolated(ray);
 		}
 		ray.hit = true;
@@ -242,7 +242,7 @@ public class Sky {
 			ray.color.y = ray.color.y + g;
 			ray.color.z = ray.color.z + b;
 			ray.hit = true;
-			
+
 		} else {
 			getSkyDiffuseColor(ray, blackBelowHorizon);
 		}
@@ -256,7 +256,7 @@ public class Sky {
 		rotation = value;
 		scene.refresh();
 	}
-	
+
 	/**
 	 * @return The polar offset of the skymap
 	 */
@@ -277,7 +277,7 @@ public class Sky {
 			rotation = rotationTag.doubleValue();
 		}
 		mirrored = worldTag.get("skyMirrored").boolValue(true);
-		
+
 		if (worldTag.get("groundColor").isCompoundTag()) {
 			CompoundTag colorTag = (CompoundTag) worldTag.get("groundColor");
 			groundColor.x = colorTag.get("red").doubleValue(1);
@@ -301,7 +301,7 @@ public class Sky {
 		groundColorTag.addItem("blue", new DoubleTag(groundColor.z));
 		worldTag.addItem("groundColor", groundColorTag);
 	}
-	
+
 	/**
 	 * Set sky mirroring at the horizon
 	 * @param b
@@ -312,7 +312,7 @@ public class Sky {
 			scene.refresh();
 		}
 	}
-	
+
 	/**
 	 * @return <code>true</code> if the sky is mirrored at the horizon
 	 */

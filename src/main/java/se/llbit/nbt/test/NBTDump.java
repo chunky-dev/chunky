@@ -34,16 +34,16 @@ import se.llbit.nbt.NamedTag;
 
 @SuppressWarnings("javadoc")
 public class NBTDump {
-	
+
 	static final Pattern REGION_PATTERN = Pattern.compile("^region-chunk:(\\d+),(\\d+):(.*)$");
-	
+
 	protected static boolean isGzipped(InputStream is) throws IOException {
 		is.mark(2);
 		boolean isGZ = is.read() == 0x1F && is.read() == 0x8B;
 		is.reset();
 		return isGZ;
 	}
-	
+
 	protected static AnyTag read(String filename) throws IOException {
 		Matcher m = REGION_PATTERN.matcher(filename);
 		DataInputStream in = null;
@@ -67,14 +67,14 @@ public class NBTDump {
 			if (rf != null) rf.close();
 		}
 	}
-	
+
 	protected static final String USAGE =
 		"Usage: NBTDump <file>\n"+
 		"\n"+
 		"<file> may be an NBT-formatted file (gzipped or uncompressed),\n"+
 		"or of the form 'region-chunk:<x>,<y>:<region-file>',\n" +
 		"which will dump the specified chunk in the given region file.";
-	
+
 	public static void main(String[] args) throws Exception {
 		if (args.length != 1) {
 			System.err.println(USAGE);
@@ -82,9 +82,9 @@ public class NBTDump {
 		}
 		if ("-?".equals(args[0]) || "-h".equals(args[0])) {
 			System.out.println(USAGE);
-			System.exit(0);			
+			System.exit(0);
 		}
-		
+
 		String fn = args[0];
 		//String outFn = fn+".out";
 		//System.out.println("parsing "+fn);

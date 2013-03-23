@@ -63,7 +63,7 @@ import se.llbit.util.VectorPool;
 @SuppressWarnings("unused")
 public class TestRenderer extends Thread implements ViewListener,
 	Renderer, Refreshable, ImageObserver {
-	
+
 	private static final Logger logger = Logger.getLogger(TestRenderer.class);
 
 	private Chunk3DView view;
@@ -80,37 +80,37 @@ public class TestRenderer extends Thread implements ViewListener,
 	private Matrix3d tmpRot = new Matrix3d();
 	private double distance = 1.5;
 	private final int blockId;
-	
+
 	/**
 	 * Mock scene object required by some block renderers
 	 */
 	private final Scene scene;
-	
+
 	private static final Texture[] tex = {
 		new Texture("east"),
 		new Texture("west"),
 		new Texture("north"),
 		new Texture("south"),
 	};
-	
+
 	private final Quad[] quads = {
 			new Quad(new Vector3d(1, 0, 0), new Vector3d(1, 0, 1), new Vector3d(1, 1, 0), new Vector4d(0, 1, 0, 1)),
 			new Quad(new Vector3d(0, 0, 1), new Vector3d(0, 0, 0), new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0), new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
 			new Quad(new Vector3d(1, 0, 1), new Vector3d(0, 0, 1), new Vector3d(1, 1, 1), new Vector4d(0, 1, 0, 1)),
 	};
-	
+
 	private TestModel testModel = new TestModel();
 	private final String targetFile;
 
 	/**
 	 * Constructor
-	 * @param parent 
+	 * @param parent
 	 */
 	public TestRenderer(JFrame parent) {
 		this(parent, -1);
 	}
-	
+
 	/**
 	 * Constructor
 	 * @param parent
@@ -119,7 +119,7 @@ public class TestRenderer extends Thread implements ViewListener,
 	public TestRenderer(JFrame parent, int blockId) {
 		this(parent, blockId, "");
 	}
-	
+
 	/**
 	 * Render a block and write the image to a target file
 	 * @param parent
@@ -131,16 +131,16 @@ public class TestRenderer extends Thread implements ViewListener,
 		this.targetFile = targetFile;
 		scene = new Scene();
 		scene.setBiomeColorsEnabled(false);
-		
+
 		width = RenderableCanvas.DEFAULT_WIDTH;
 		height = RenderableCanvas.DEFAULT_HEIGHT;
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		backBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		
+
 		camera = new Camera(this);
 		camera.setPosition(new Vector3d(.5, .5, 2));
 		camera.setView(-3*Math.PI/4, -5*Math.PI/16);
-		
+
 		if (targetFile.isEmpty()) {
 			view = new Chunk3DView(this, parent);
 			view.setRenderer(this);
@@ -150,16 +150,16 @@ public class TestRenderer extends Thread implements ViewListener,
 
 	@Override
 	public void run() {
-		
+
 		try {
 			while (!isInterrupted()) {
-				
+
 				testModel.setUp();
 				waitRefresh();
-				
+
 				synchronized (backBuffer) {
 					raytrace();
-					
+
 					if (!targetFile.isEmpty()) {
 						writeBufferToFile(targetFile);
 						return;
@@ -170,9 +170,9 @@ public class TestRenderer extends Thread implements ViewListener,
 						buffer = tmp;
 					}
 				}
-				
+
 				view.getCanvas().repaint();
-				
+
 			}
 		} catch (InterruptedException e) {
 		}
@@ -192,35 +192,35 @@ public class TestRenderer extends Thread implements ViewListener,
 	 * Raytrace one frame.
 	 */
 	private void raytrace() {
-		
+
 		double aspect = width / (double) height;
-		
+
 		Ray ray = rayPool.get();
-		
+
 		camPos.set(0, 0, distance);
 		tmpRot.rotX(-camera.getPitch() - Math.PI / 2);
 		rot.rotY(camera.getYaw() + Math.PI / 2);
 		rot.mul(tmpRot);
 		rot.transform(camPos);
 		camPos.add(.5, .5, .5);
-		
+
 		for (int x = 0; x < width; ++x) {
-			
+
 			double rayx = camera.fovTan * aspect *
 					(.5 - ((double) x) / width);
-			
+
 			for (int y = 0; y < height; ++y) {
-				
+
 				ray.setDefault();
 				ray.d.set(camera.fovTan *
 						(-.5 + ((double) y) / height),
 						-1, rayx);
 				ray.d.normalize();
 				camera.transform(ray.d);
-				
+
 				ray.x.set(camPos);
 				raytrace(ray);
-					
+
 				ray.color.x = Math.min(1, Math.sqrt(ray.color.x));
 				ray.color.y = Math.min(1, Math.sqrt(ray.color.y));
 				ray.color.z = Math.min(1, Math.sqrt(ray.color.z));
@@ -228,19 +228,19 @@ public class TestRenderer extends Thread implements ViewListener,
 			}
 		}
 	}
-	
+
 	private void raytrace(Ray ray) {
 		double[] nearfar = new double[2];
 		enterBlock(ray, nearfar);
 		double tNear = nearfar[0];
 		double tFar = nearfar[1];
-		
+
 		ray.color.set(1, 1, 1, 1);
-		
+
 		if (tNear <= tFar && tFar >= 0) {
 			ray.x.scaleAdd(tNear, ray.d, ray.x);
 			ray.distance += tNear;
-			
+
 			if (blockId == -1) {
 				renderTestModel(ray);
 			} else {
@@ -258,7 +258,7 @@ public class TestRenderer extends Thread implements ViewListener,
 				tex[i].getColor(ray);
 			}
 		}
-		
+
 		ray.t = Double.POSITIVE_INFINITY;
 		testModel.intersect(ray);
 	}
@@ -270,49 +270,49 @@ public class TestRenderer extends Thread implements ViewListener,
 		double tFar = Double.POSITIVE_INFINITY;
 		Vector3d d = ray.d;
 		Vector3d o = ray.x;
-		
+
 		if (d.x != 0) {
 			t1 = -o.x / d.x;
 			t2 = ((1<<level) - o.x) / d.x;
-			
+
 			if (t1 > t2) {
 				double t = t1;
 				t1 = t2;
 				t2 = t;
 			}
-			
+
 			if (t1 > tNear) tNear = t1;
 			if (t2 < tFar) tFar = t2;
 		}
-		
+
 		if (d.y != 0) {
 			t1 = -o.y / d.y;
 			t2 = ((1<<level) - o.y) / d.y;
-			
+
 			if (t1 > t2) {
 				double t = t1;
 				t1 = t2;
 				t2 = t;
 			}
-			
+
 			if (t1 > tNear) tNear = t1;
 			if (t2 < tFar) tFar = t2;
 		}
-		
+
 		if (d.z != 0) {
 			t1 = -o.z / d.z;
 			t2 = ((1<<level) - o.z) / d.z;
-			
+
 			if (t1 > t2) {
 				double t = t1;
 				t1 = t2;
 				t2 = t;
 			}
-			
+
 			if (t1 > tNear) tNear = t1;
 			if (t2 < tFar) tFar = t2;
 		}
-		
+
 		nearfar[0] = tNear;
 		nearfar[1] = tFar;
 	}
@@ -322,7 +322,7 @@ public class TestRenderer extends Thread implements ViewListener,
         camera.strafeLeft(.5);
         refresh();
 	}
-	
+
 	@Override
 	public void onStrafeRight() {
         camera.strafeRight(.5);
@@ -405,7 +405,7 @@ public class TestRenderer extends Thread implements ViewListener,
 		refresh = true;
 		notifyAll();
 	}
-	
+
 	private synchronized void waitRefresh() throws InterruptedException {
 		while (!refresh)
 			wait();

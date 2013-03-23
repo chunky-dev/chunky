@@ -35,11 +35,11 @@ public class SimpleTexture extends TextureRef {
 	/**
 	 * Constructor
 	 * @param file
-	 * @param texture 
+	 * @param texture
 	 */
 	public SimpleTexture(String file, Texture texture) {
 		super(file);
-		
+
 		this.texture = texture;
 	}
 

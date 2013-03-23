@@ -31,97 +31,97 @@ public class CauldronModel {
 		// front
 		new Quad(new Vector3d(1, 3/16., 0), new Vector3d(0, 3/16., 0),
 				new Vector3d(1, 1, 0), new Vector4d(1, 0, 3/16., 1)),
-				
+
 		// back
 		new Quad(new Vector3d(0, 3/16., 1), new Vector3d(1, 3/16., 1),
 				new Vector3d(0, 1, 1), new Vector4d(0, 1, 3/16., 1)),
-					
+
 		// right
 		new Quad(new Vector3d(0, 3/16., 0), new Vector3d(0, 3/16., 1),
 				new Vector3d(0, 1, 0), new Vector4d(0, 1, 3/16., 1)),
-	
+
 		// left
 		new Quad(new Vector3d(1, 3/16., 1), new Vector3d(1, 3/16., 0),
 				new Vector3d(1, 1, 1), new Vector4d(1, 0, 3/16., 1)),
-	
+
 		// top front
 		new Quad(new Vector3d(1-1/8., 1, 0), new Vector3d(1/8., 1, 0),
 				new Vector3d(1-1/8., 1, 1/8.), new Vector4d(1-1/8., 1/8., 0, 1/8.)),
-				
+
 		// top back
 		new Quad(new Vector3d(1-1/8., 1, 1-1/8.), new Vector3d(1/8., 1, 1-1/8.),
 				new Vector3d(1-1/8., 1, 1), new Vector4d(1-1/8., 1/8., 1-1/8., 1)),
-			
+
 		// top left
 		new Quad(new Vector3d(1, 1, 0), new Vector3d(1-1/8., 1, 0),
 				new Vector3d(1, 1, 1), new Vector4d(1, 1-1/8., 0, 1)),
-				
+
 		// top right
 		new Quad(new Vector3d(1/8., 1, 0), new Vector3d(0, 1, 0),
 				new Vector3d(1/8., 1, 1), new Vector4d(1/8., 0, 0, 1)),
-				
+
 		// inside back
 		new Quad(new Vector3d(1-1/8., 1/4., 1-1/8.), new Vector3d(1/8., 1/4., 1-1/8.),
 				new Vector3d(1-1/8., 1, 1-1/8.), new Vector4d(1-1/8., 1/8., 1/4., 1)),
-				
+
 		// inside frontt
 		new Quad(new Vector3d(1/8., 1/4., 1/8.), new Vector3d(1-1/8., 1/4., 1/8.),
 				new Vector3d(1/8., 1, 1/8.), new Vector4d(1/8., 1-1/8., 1/4., 1)),
-					
+
 		// inside left
 		new Quad(new Vector3d(1-1/8., 1/4., 1/8.), new Vector3d(1-1/8., 1/4., 1-1/8.),
 				new Vector3d(1-1/8., 1, 1/8.), new Vector4d(1/8., 1-1/8., 1/4., 1)),
-	
+
 		// inside right
 		new Quad(new Vector3d(1/8., 1/4., 1-1/8.), new Vector3d(1/8., 1/4., 1/8.),
 				new Vector3d(1/8., 1, 1-1/8.), new Vector4d(1-1/8., 1/8., 1/4., 1)),
-				
+
 		// inside center
 		new Quad(new Vector3d(1-1/8., 1/4., 1/8.), new Vector3d(1/8., 1/4., 1/8.),
 				new Vector3d(1-1/8., 1/4., 1-1/8.), new Vector4d(1-1/8., 1/8., 1/8., 1-1/8.)),
-				
+
 		// front left leg
 		new Quad(new Vector3d(1, 0, 0), new Vector3d(1-1/4., 0, 0),
 				new Vector3d(1, 3/16., 0), new Vector4d(1, 1-1/4., 0, 3/16.)),
-				
+
 		// front right leg
 		new Quad(new Vector3d(1/4., 0, 0), new Vector3d(0, 0, 0),
 				new Vector3d(1/4., 3/16., 0), new Vector4d(1/4., 0, 0, 3/16.)),
-				
+
 		// back left leg
 		new Quad(new Vector3d(1-1/4., 0, 1), new Vector3d(1, 0, 1),
 				new Vector3d(1-1/4., 3/16., 1), new Vector4d(1-1/4., 1, 0, 3/16.)),
-	
+
 		// back right leg
 		new Quad(new Vector3d(0, 0, 1), new Vector3d(1/4., 0, 1),
 				new Vector3d(0, 3/16., 1), new Vector4d(0, 1/4., 0, 3/16.)),
-				
+
 		// right front leg
 		new Quad(new Vector3d(0, 0, 1-1/4.), new Vector3d(0, 0, 1),
 				new Vector3d(0, 3/16., 1-1/4.), new Vector4d(1-1/4., 1, 3/16., 1)),
-	
+
 		// right back leg
 		new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1/4.),
 				new Vector3d(0, 3/16., 0), new Vector4d(0, 1/4., 3/16., 1)),
-	
+
 		// left front leg
 		new Quad(new Vector3d(1, 0, 1), new Vector3d(1, 0, 1-1/4.),
 				new Vector3d(1, 3/16., 1), new Vector4d(1, 1-1/4., 0, 3/16.)),
-	
+
 		// left back leg
 		new Quad(new Vector3d(1, 0, 1/4.), new Vector3d(1, 0, 0),
 				new Vector3d(1, 3/16., 1/4.), new Vector4d(1/4., 0, 0, 3/16.)),
-				
+
 		// below
 		new Quad(new Vector3d(0, 3/16., 0), new Vector3d(1, 3/16., 0),
 				new Vector3d(0, 3/16., 1), new Vector4d(0, 1, 0, 1)),
-				
+
 /*		// bottom
 		new Quad(new Vector3d(0, 0, 0), new Vector3d(1., 0, 0),
 				new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),*/
-	
+
 	};
-	
+
 	private static final Texture[] tex = {
 		Texture.cauldronSide,
 		Texture.cauldronSide,
@@ -146,7 +146,7 @@ public class CauldronModel {
 		Texture.cauldronSide,
 		Texture.cauldronInside,
 	};
-	
+
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray) {
 		boolean hit = false;

@@ -50,7 +50,7 @@ public class TexturedBlockModel {
 				color = texture[4].getColor(ray.u, ray.v);
 			else
 				color = texture[5].getColor(ray.u, ray.v);
-			
+
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
 				ray.distance += ray.tNear;
@@ -60,7 +60,7 @@ public class TexturedBlockModel {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Find intersection between ray and block
 	 * @param ray

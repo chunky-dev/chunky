@@ -24,7 +24,7 @@ import java.io.IOException;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public abstract class PngChunk {
-	
+
 	/**
 	 * Write the chunk to the given output stream
 	 * @param out
@@ -37,19 +37,19 @@ public abstract class PngChunk {
 			writeChunkData(out);
 		out.writeInt(getChunkCRC());
 	}
-	
+
 	protected abstract void writeChunkData(DataOutputStream out) throws IOException;
-	
+
 	/**
 	 * @return The chunk length, in bytes
 	 */
 	public abstract int getChunkLength();
-	
+
 	/**
 	 * @return The chunk type identifier
 	 */
 	public abstract int getChunkType();
-	
+
 	/**
 	 * @return The chunk CRC
 	 */

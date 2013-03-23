@@ -29,22 +29,22 @@ import se.llbit.chunky.world.storage.RegionFileCache;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Region {
-	
+
 	/**
 	 * Region X chunk width
 	 */
 	public static final int CHUNKS_X = 32;
-	
+
 	/**
 	 * Region Z chunk width
 	 */
 	public static final int CHUNKS_Z = 32;
-	
+
 	private Chunk[][] chunks = new Chunk[CHUNKS_X][CHUNKS_Z];
 	private final ChunkPosition position;
 	private final World world;
 	private boolean parsed = false;
-	
+
 	/**
 	 * Create new region
 	 * @param pos
@@ -68,7 +68,7 @@ public class Region {
 	public Chunk getChunk(int x, int z) {
 		return chunks[z&31][x&31];
 	}
-	
+
 	/**
 	 * @param pos Chunk position
 	 * @return Chunk at given position
@@ -76,7 +76,7 @@ public class Region {
 	public Chunk getChunk(ChunkPosition pos) {
 		return chunks[pos.z&31][pos.x&31];
 	}
-	
+
 	/**
 	 * Set chunk at given position
 	 * @param pos
@@ -94,7 +94,7 @@ public class Region {
 	 */
 	public void updateChunk(ChunkPosition pos, int currentLayer,
 			Queue<Chunk> parseQueue) {
-		
+
 		Chunk chunk = getChunk(pos);
 		if (chunk.isEmpty())
 			return;
@@ -116,7 +116,7 @@ public class Region {
 			world.chunkDeleted(pos);
 		}
 	}
-	
+
 	/**
 	 * @return <code>true</code> if this region has been parsed
 	 */
@@ -131,7 +131,7 @@ public class Region {
 		if (parsed)
 			return;
 		parsed = true;
-		
+
 		Collection<Chunk> discovered = new LinkedList<Chunk>();
 		RegionFile regionFile = RegionFileCache.getRegionFile(
 				world.getRegionDirectory(), position.x<<5, position.z<<5);
@@ -162,7 +162,7 @@ public class Region {
 	public final ChunkPosition getPosition() {
 		return position;
 	}
-	
+
 	@Override
     public String toString() {
     	return "Region " + position.toString();
@@ -179,7 +179,7 @@ public class Region {
 				Chunk chunk = getChunk(x, z);
 				if (!chunk.isEmpty() && !chunk.isLayerParsed() &&
 						view.shouldPreload(chunk)) {
-					
+
 					chunkParser.addChunk(chunk);
 				}
 			}

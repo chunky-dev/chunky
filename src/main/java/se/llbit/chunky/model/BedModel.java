@@ -28,46 +28,46 @@ public class BedModel {
 		// end
 		new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
 				new Vector3d(1, .5, 0), new Vector4d(1, 0, 0, .5)),
-		
+
 		// right side
 		new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
 				new Vector3d(0, .5, 0), new Vector4d(0, 1, 0, .5)),
-	
+
 		// left side
 		new Quad(new Vector3d(1, 0, 1), new Vector3d(1, 0, 0),
 				new Vector3d(1, .5, 1), new Vector4d(1, 0, 0, .5)),
-	
+
 		// top
 		new Quad(new Vector3d(1, .5, 0), new Vector3d(0, .5, 0),
 				new Vector3d(1, .5, 1), new Vector4d(1, 0, 0, 1)),
-		
+
 		// bottom
 		new Quad(new Vector3d(0, .25, 0), new Vector3d(1, .25, 0),
 				new Vector3d(0, .25, 1), new Vector4d(0, 1, 0, 1)),
 	};
-	
+
 	private static Quad[] head = {
 		// end
 		new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
 				new Vector3d(0, .5, 1), new Vector4d(0, 1, 0, .5)),
-		
+
 		// right side
 		new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
 				new Vector3d(0, .5, 0), new Vector4d(0, 1, 0, .5)),
-	
+
 		// left side
 		new Quad(new Vector3d(1, 0, 1), new Vector3d(1, 0, 0),
 				new Vector3d(1, .5, 1), new Vector4d(1, 0, 0, .5)),
-	
+
 		// top
 		new Quad(new Vector3d(1, .5, 0), new Vector3d(0, .5, 0),
 				new Vector3d(1, .5, 1), new Vector4d(1, 0, 0, 1)),
-		
+
 		// bottom
 		new Quad(new Vector3d(0, .25, 0), new Vector3d(1, .25, 0),
 				new Vector3d(0, .25, 1), new Vector4d(0, 1, 0, 1)),
 	};
-	
+
 	private static Quad[][][] rot = new Quad[2][4][];
 	static {
 		rot[0][0] = foot;
@@ -78,7 +78,7 @@ public class BedModel {
 				for (int i = 0; i < rot[isHead][angle-1].length; ++i) {
 					rot[isHead][angle][i] = rot[isHead][angle-1][i].getYRotated();
 				}
-				
+
 			}
 		}
 	}

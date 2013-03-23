@@ -26,7 +26,7 @@ import java.util.zip.ZipFile;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class AlternateTextures extends TextureRef {
-	
+
 	private TextureRef[] alternatives;
 
 	/**
@@ -35,10 +35,10 @@ public class AlternateTextures extends TextureRef {
 	 */
 	public AlternateTextures(String name, TextureRef... alternatives) {
 		super(name);
-		
+
 		this.alternatives = alternatives;
 	}
-	
+
 	@Override
 	public boolean load(ZipFile texturePack) {
 		for (TextureRef alternative: alternatives) {

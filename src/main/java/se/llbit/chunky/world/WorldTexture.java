@@ -27,7 +27,7 @@ import java.util.Map;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class WorldTexture {
-    
+
     private Map<ChunkPosition, ChunkTexture> map =
             new HashMap<ChunkPosition, ChunkTexture>();
 
@@ -65,7 +65,7 @@ public class WorldTexture {
     /**
      * Write the world texture to the output stream
      * @param out
-     * @throws IOException 
+     * @throws IOException
      */
 	public void store(DataOutputStream out) throws IOException {
 		out.writeInt(map.size());
@@ -82,7 +82,7 @@ public class WorldTexture {
 	 * Load world texture from the input stream
 	 * @param in
 	 * @return Loaded texture
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static WorldTexture load(DataInputStream in) throws IOException {
 		WorldTexture texture = new WorldTexture();

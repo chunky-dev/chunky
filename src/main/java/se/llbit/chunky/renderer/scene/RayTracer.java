@@ -36,7 +36,7 @@ public class RayTracer {
 			if (!nextIntersection(scene, ray, rayPool)) {
 				if (scene.waterHeight > 0 &&
 						ray.d.y < 0 && ray.x.y > scene.waterHeight-.125) {
-					
+
 					ray.t = (scene.waterHeight-.125-ray.x.y) / ray.d.y;
 					ray.distance += ray.t;
 					ray.x.scaleAdd(ray.t, ray.d, ray.x);
@@ -53,7 +53,7 @@ public class RayTracer {
 				ray.x.scaleAdd(Ray.OFFSET, ray.d, ray.x);
 			}
 		}
-		
+
 		if (ray.currentMaterial == 0) {
 			scene.sky.getSkySpecularColor(ray, false);
 		} else {
@@ -69,7 +69,7 @@ public class RayTracer {
 	 */
 	public static boolean nextIntersection(Scene scene, Ray ray,
 			RayPool rayPool) {
-		
+
 		if (scene.cloudsEnabled && cloudIntersection(scene, ray)) {
 			Ray oct = rayPool.get(ray);
 			if (nextWorldIntersection(scene, oct, rayPool) &&
@@ -95,10 +95,10 @@ public class RayTracer {
 			return nextWorldIntersection(scene, ray, rayPool);
 		}
 	}
-	
+
 	private static boolean nextWorldIntersection(Scene scene, Ray ray,
 			RayPool rayPool) {
-		
+
 		boolean hit = false;
 		Ray oct = rayPool.get(ray);
 		if (scene.intersect(oct)) {
@@ -111,7 +111,7 @@ public class RayTracer {
 			hit = true;
 		} else if (scene.waterHeight > 0 &&
 				ray.d.y < 0 && ray.x.y > scene.waterHeight-.125) {
-				
+
 			// infinite water intersection
 			ray.t = (scene.waterHeight-.125-ray.x.y) / ray.d.y;
 			ray.distance += ray.t;
@@ -119,9 +119,9 @@ public class RayTracer {
 			ray.currentMaterial = Block.WATER_ID;
 			ray.prevMaterial = 0;
 			WaterModel.intersect(ray);
-			
+
 			hit = true;
-			
+
 		} else {
 			ray.currentMaterial = Block.AIR_ID;
 		}
@@ -143,5 +143,5 @@ public class RayTracer {
 		}
 		return false;
 	}
-	
+
 }

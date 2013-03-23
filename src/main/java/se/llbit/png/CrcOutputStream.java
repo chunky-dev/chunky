@@ -26,7 +26,7 @@ import java.util.zip.CRC32;
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class CrcOutputStream extends OutputStream {
-	
+
 	CRC32 crc = new CRC32();
 
 	@Override
@@ -43,7 +43,7 @@ public class CrcOutputStream extends OutputStream {
 	public void write(byte[] b) throws IOException {
 		crc.update(b);
 	}
-	
+
 	/**
 	 * @return The calculated CRC value
 	 */

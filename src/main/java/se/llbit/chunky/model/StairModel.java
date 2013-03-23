@@ -117,15 +117,15 @@ public class StairModel {
 			},
 		},
 	};
-		
+
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 		int flipped = (ray.getBlockData() & 4) >> 2;
 		int corner = 7 & (ray.currentMaterial >> BlockData.CORNER_OFFSET);
 		int rotation = 3 & ray.getBlockData();
-		
+
 		ray.t = Double.POSITIVE_INFINITY;
-		
+
 		if (corner != 0) {
 			for (AABB box : corners[flipped][3 & corner]) {
 				if (box.intersect(ray)) {
@@ -143,16 +143,16 @@ public class StairModel {
 				}
 			}
 		}
-		
+
 		if (hit) {
 			ray.x.scaleAdd(ray.t, ray.d, ray.x);
 		}
 		return hit;
 	}
-	
+
 	public static boolean intersect(Ray ray, Texture texture,
 			Texture textureTop, Texture textureBottom) {
-		
+
 		boolean hit = intersect(ray, texture);
 		if (hit) {
 			if (ray.n.y > 0) {

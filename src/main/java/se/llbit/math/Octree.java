@@ -25,7 +25,7 @@ import se.llbit.chunky.world.Block;
 
 /**
  * A simple voxel Octree.
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class Octree {
@@ -38,7 +38,7 @@ public class Octree {
 		 * The node type. Type is -1 if it's a non-leaf node.
 		 */
 		public int type;
-		
+
 		/**
 		 * Child array
 		 */
@@ -113,7 +113,7 @@ public class Octree {
 		/**
 		 * Serialize this node
 		 * @param out
-		 * @throws IOException 
+		 * @throws IOException
 		 */
 		public void store(DataOutputStream out) throws IOException {
 			out.writeInt(type);
@@ -127,7 +127,7 @@ public class Octree {
 		/**
 		 * Deserialize node
 		 * @param in
-		 * @throws IOException 
+		 * @throws IOException
 		 */
 		public void load(DataInputStream in) throws IOException {
 			type = in.readInt();
@@ -145,12 +145,12 @@ public class Octree {
 	 * Recursive depth of the octree
 	 */
 	public final int depth;
-	
+
 	/**
 	 * Root node
 	 */
 	public final Node root;
-	
+
 	private final Node[] parents;
 	private final Node[] cache;
 	private int cx = 0;
@@ -174,7 +174,7 @@ public class Octree {
 
 	/**
 	 * Set the voxel type at the given coordinates.
-	 * 
+	 *
 	 * @param type The new voxel type to be set
 	 * @param x
 	 * @param y
@@ -282,10 +282,10 @@ public class Octree {
 		tree.root.load(in);
 		return tree;
 	}
-	
+
 	/**
 	 * Test whether the ray intersects any voxel before exiting the Octree.
-	 * @param scene 
+	 * @param scene
 	 * @param ray the ray
 	 * @return <code>true</code> if the ray intersects a voxel
 	 */
@@ -301,26 +301,26 @@ public class Octree {
 		double tNear = Double.POSITIVE_INFINITY;
 		double t;
 		Vector3d d = ray.d;
-		
+
 		while (true) {
-			
+
 			// add small offset past the intersection to avoid
 			// recursion to the same octree node!
 			x = QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
 			y = QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
 			z = QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
-			
+
 			node = root;
 			level = depth;
 			lx = x >>> level;
 			ly = y >>> level;
 			lz = z >>> level;
-			
+
 			if (lx != 0 || ly != 0 || lz != 0) {
-				
+
 				// ray origin is outside octree!
 				ray.currentMaterial = Block.AIR_ID;
-				
+
 				// only check octree intersection if this is the first iteration
 				if (first) {
 					// test if it is entering the octree
@@ -360,7 +360,7 @@ public class Octree {
 						nz = -1;
 						nx = ny = 0;
 					}
-					
+
 					if (tNear < Double.MAX_VALUE) {
 						ray.x.scaleAdd(tNear, d, ray.x);
 						ray.n.set(nx, ny, nz);
@@ -374,9 +374,9 @@ public class Octree {
 					return false;// outside of octree!
 				}
 			}
-			
+
 			first = false;
-			
+
 			while (node.type == -1) {
 				level -= 1;
 				lx = x >>> level;
@@ -384,7 +384,7 @@ public class Octree {
 				lz = z >>> level;
 				node = node.children[((lx&1)<<2) | ((ly&1)<<1) | (lz&1)];
 			}
-			
+
 			// old octree visualization code
 			/*double w = .1 * (1 + level);
 			w*=w;
@@ -410,13 +410,13 @@ public class Octree {
 
 			Block currentBlock = Block.get(node.type);
 			Block prevBlock = Block.get(ray.currentMaterial);
-			
+
 			ray.prevMaterial = ray.currentMaterial;
 			ray.currentMaterial = node.type;
-				
+
 
 			if (currentBlock.localIntersect) {
-				
+
 				if (currentBlock == Block.WATER &&
 						prevBlock == Block.WATER) {
 					return exitWater(scene, ray);
@@ -431,7 +431,7 @@ public class Octree {
 				} else {
 					// exit ray from this local block
 					ray.currentMaterial = 0;// current material is air
-					
+
 					ray.exitBlock(x, y, z);
 					continue;
 				}
@@ -453,7 +453,7 @@ public class Octree {
 					ny = nz = 0;
 				}
 			}
-			
+
 			t = ((ly<<level) - ray.x.y) / d.y;
 			if (t < tNear && t > Ray.EPSILON) {
 				tNear = t;
@@ -467,7 +467,7 @@ public class Octree {
 					nx = nz = 0;
 				}
 			}
-			
+
 			t = ((lz<<level) - ray.x.z) / d.z;
 			if (t < tNear && t > Ray.EPSILON) {
 				tNear = t;
@@ -488,7 +488,7 @@ public class Octree {
 			tNear = Double.POSITIVE_INFINITY;
 		}
 	}
-	
+
 	/**
 	 * @param scene
 	 * @param ray
@@ -500,18 +500,18 @@ public class Octree {
 
 		int lx, ly, lz;
 		int x, y, z;
-		
+
 		double nx, ny, nz;
 		double xx, xy, xz;
 		double cx, cy, cz, cw;
 		double distance;
-		
+
 		while (true) {
 			Block.WATER.intersect(ray, scene);
 			ray.n.x = -ray.n.x;
 			ray.n.y = -ray.n.y;
 			ray.n.z = -ray.n.z;
-			
+
 			xx = ray.x.x;
 			xy = ray.x.y;
 			xz = ray.x.z;
@@ -523,26 +523,26 @@ public class Octree {
 			cz = ray.color.z;
 			cw = ray.color.w;
 			distance = ray.distance;
-			
+
 			// add small offset past the intersection to avoid
 			// recursion to the same octree node!
 			x = QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
 			y = QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
 			z = QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
-			
+
 			node = root;
 			level = depth;
 			lx = x >>> level;
 			ly = y >>> level;
 			lz = z >>> level;
-			
+
 			if (lx != 0 || ly != 0 || lz != 0) {
-				
+
 				// ray origin is outside octree!
 				ray.currentMaterial = Block.AIR.id;
 				return true;
 			}
-			
+
 			while (node.type == -1) {
 				level -= 1;
 				lx = x >>> level;
@@ -553,17 +553,17 @@ public class Octree {
 
 			Block currentBlock = Block.get(node.type);
 			Block prevBlock = Block.get(ray.currentMaterial);
-			
+
 			ray.prevMaterial = ray.currentMaterial;
 			ray.currentMaterial = node.type;
-			
+
 			if (currentBlock.localIntersect) {
-				
+
 				if (!currentBlock.intersect(ray, scene)) {
 					ray.currentMaterial = Block.AIR.id;
 					return true;
 				}
-				
+
 				if (ray.distance > distance) {
 					ray.x.set(xx, xy, xz);
 					ray.n.set(nx, ny, nz);

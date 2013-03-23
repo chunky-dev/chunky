@@ -60,25 +60,25 @@ public class SceneSelector extends JDialog implements ListSelectionListener {
 	 * Creates a new scene selector dialog.
 	 * If the controls parameter is <code>null</code> the dialog
 	 * will be application modal.
-	 * @param controls 
-	 * @param context 
+	 * @param controls
+	 * @param context
 	 */
 	public SceneSelector(RenderControls controls, RenderContext context) {
 		super(controls, "Load Scene");
-		
+
 		this.controls = controls;
 		this.context = context;
-		
+
 		initComponents();
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		
+
 		if (controls != null) {
 			setModalityType(Dialog.ModalityType.MODELESS);
 		} else {
 			setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 		}
-		
+
 		pack();
 		setLocationRelativeTo(controls);
 		setVisible(true);
@@ -111,7 +111,7 @@ public class SceneSelector extends JDialog implements ListSelectionListener {
 			listModel.addElement(name.substring(0, name.length()-4));
 		}
 		JScrollPane scrollPane = new JScrollPane(sceneList);
-		
+
 		listDescription.setText("Select 3D scene:");
 
 		cancelBtn.addActionListener(new ActionListener() {

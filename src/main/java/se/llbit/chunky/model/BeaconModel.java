@@ -30,7 +30,7 @@ public class BeaconModel {
 		new AABB(3/16., 13/16., 3/16., 13/16., 3/16., 13/16.),
 		new AABB(2/16., 14/16., 0, 3/16., 2/16., 14/16.),
 	};
-	
+
 	private static final Texture[] tex = {
 		Texture.glass,
 		Texture.beacon,

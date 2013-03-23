@@ -26,7 +26,7 @@ public class EmptyWorld extends World {
 	 * Singleton instance
 	 */
 	public static final EmptyWorld instance = new EmptyWorld();
-	
+
 	private EmptyWorld() {
 		super();
 	}
@@ -40,7 +40,7 @@ public class EmptyWorld extends World {
 	public String toString() {
 		return "[empty world]";
 	}
-	
+
 	@Override
 	public boolean haveDimension(int i) {
 		return false;

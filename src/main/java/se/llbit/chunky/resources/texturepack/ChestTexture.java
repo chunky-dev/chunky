@@ -35,7 +35,7 @@ public class ChestTexture extends TextureRef {
 	private Texture right;
 	private Texture front;
 	private Texture back;
-	
+
 	/**
 	 * Constructor
 	 * @param file
@@ -58,7 +58,7 @@ public class ChestTexture extends TextureRef {
 		this.front = front;
 		this.back = back;
 	}
-	
+
 	@Override
 	boolean load(InputStream imageStream) throws IOException, TextureFormatError {
 		BufferedImage spritemap = ImageIO.read(imageStream);
@@ -70,7 +70,7 @@ public class ChestTexture extends TextureRef {
 
 		int imgW = spritemap.getWidth();
 		int scale = imgW / (16 * 4);
-		
+
 		lock.setTexture(loadChestTexture(spritemap, scale, 0, 0));
 		top.setTexture(loadChestTexture(spritemap, scale, 1, 0));
 		bottom.setTexture(loadChestTexture(spritemap, scale, 2, 1));
@@ -80,10 +80,10 @@ public class ChestTexture extends TextureRef {
 		back.setTexture(loadChestTexture(spritemap, scale, 3, 2));
 		return true;
 	}
-	
+
 	private static BufferedImage loadChestTexture(
 			BufferedImage spritemap, int scale, int u, int v) {
-		
+
 		BufferedImage img = new BufferedImage(scale*16, scale*16,
 				BufferedImage.TYPE_INT_ARGB);
 		int x0 = 14*u*scale;
@@ -127,9 +127,10 @@ public class ChestTexture extends TextureRef {
 					img.setRGB(sx, sy, spritemap.getRGB(x, y));
 				}
 			}
-			
+
 		}
 		return img;
 	}
-	
+
 }
+

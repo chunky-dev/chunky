@@ -42,7 +42,7 @@ public class AnvilModel {
 			new AABB(4/16., 12/16., 5/16., 10/16., 6/16., 10/16.),
 		},
 	};
-	
+
 	/**
 	 * Find intersection between ray and block
 	 * @param ray

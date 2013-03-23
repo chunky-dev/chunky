@@ -29,11 +29,11 @@ import se.llbit.chunky.world.Block;
 
 /**
  * Renderer for cells in a block type list.
- * 
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class BlockTypeListCellRenderer extends JLabel implements ListCellRenderer {
-	
+
     private static final long serialVersionUID = -4916737793036321488L;
 
     /**
@@ -46,7 +46,7 @@ public class BlockTypeListCellRenderer extends JLabel implements ListCellRendere
 		setPreferredSize(new Dimension(200, 34));
 		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 	}
-	
+
 	@Override
 	public Component getListCellRendererComponent(JList list, Object value,
 			int index, boolean isSelected, boolean hasFocus) {
@@ -60,7 +60,7 @@ public class BlockTypeListCellRenderer extends JLabel implements ListCellRendere
 			setBackground(list.getBackground());
 			setForeground(list.getForeground());
 		}
-		
+
 		ImageIcon icon = new ImageIcon(selected.getTexture().getImage());
 		setIcon(icon);
 		setText(selected.toString());

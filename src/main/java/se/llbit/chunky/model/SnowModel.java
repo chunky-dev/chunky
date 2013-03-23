@@ -28,16 +28,16 @@ public class SnowModel {
 	static {
 		for (int i = 0; i < 8; ++i) {
 			double height = (i+1) * .125;
-			
+
 			quads[i] = new Quad[6];
-			
+
 			// front
 			quads[i][0] = new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
 					new Vector3d(1, height, 0), new Vector4d(1, 0, 0, height));
 			// back
 			quads[i][1] = new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
 					new Vector3d(0, height, 1), new Vector4d(0, 1, 0, height));
-			
+
 			// right
 			quads[i][2] = new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
 					new Vector3d(0, height, 0), new Vector4d(0, 1, 0, height));
@@ -49,7 +49,7 @@ public class SnowModel {
 			// top
 			quads[i][4] = new Quad(new Vector3d(1, height, 0), new Vector3d(0, height, 0),
 					new Vector3d(1, height, 1), new Vector4d(1, 0, 0, 1));
-			
+
 			// bottom
 			quads[i][5] = new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1));

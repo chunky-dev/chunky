@@ -11,14 +11,14 @@
 
 /*
  * 2011 February 16
- * 
+ *
  * This source code is based on the work of Scaevolus (see notice above).
  * It has been slightly modified by Mojang AB to limit the maximum cache
  * size (relevant to extremely big worlds on Linux systems with limited
  * number of file handles). The region files are postfixed with ".mcr"
  * (Minecraft region file) instead of ".data" to differentiate from the
  * original McRegion files.
- * 
+ *
  */
 
 // A simple cache and wrapper for efficiently multiple RegionFiles simultaneously.

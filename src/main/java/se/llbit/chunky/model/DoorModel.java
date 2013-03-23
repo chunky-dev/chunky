@@ -30,69 +30,69 @@ public class DoorModel {
 			// front
 			new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
 					new Vector3d(1, 1, 0), new Vector4d(0, 1, 0, 1)),
-	
+
 			// back
 			new Quad(new Vector3d(0, 0, .1875), new Vector3d(1, 0, .1875),
 					new Vector3d(0, 1, .1875), new Vector4d(1, 0, 0, 1)),
-			
+
 			// right
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, .1875),
 					new Vector3d(0, 1, 0), new Vector4d(0, .1875, 0, 1)),
-	
+
 			// left
 			new Quad(new Vector3d(1, 0, .1875), new Vector3d(1, 0, 0),
 					new Vector3d(1, 1, .1875), new Vector4d(0, .1875, 0, 1)),
-	
+
 			// top
 			new Quad(new Vector3d(0, 1, 0), new Vector3d(0, 1, .1875),
 					new Vector3d(1, 1, 0), new Vector4d(0, .1875, 0, 1)),
-			
+
 			// bottom
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 0, .1875), new Vector4d(0, 1, 0, .1875)),
 		},
-		
+
 		{
 			// front
 			new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
 					new Vector3d(1, 1, 0), new Vector4d(1, 0, 0, 1)),
-	
+
 			// back
 			new Quad(new Vector3d(0, 0, .1875), new Vector3d(1, 0, .1875),
 					new Vector3d(0, 1, .1875), new Vector4d(0, 1, 0, 1)),
-			
+
 			// right
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, .1875),
 					new Vector3d(0, 1, 0), new Vector4d(0, .1875, 0, 1)),
-	
+
 			// left
 			new Quad(new Vector3d(1, 0, .1875), new Vector3d(1, 0, 0),
 					new Vector3d(1, 1, .1875), new Vector4d(0, .1875, 0, 1)),
-	
+
 			// top
 			new Quad(new Vector3d(0, 1, 0), new Vector3d(0, 1, .1875),
 					new Vector3d(1, 1, 0), new Vector4d(0, .1875, 0, 1)),
-			
+
 			// bottom
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
 					new Vector3d(0, 0, .1875), new Vector4d(0, 1, 0, .1875)),
 		},
 	};
-	
+
 	private static Quad[][][] rot = new Quad[2][4][];
-	
+
 	static {
 		rot[0][1] = faces[0];
 		rot[1][1] = faces[1];
-		
+
 		for (int mirror = 0; mirror < 2; ++mirror) {
 			rot[mirror][2] = Model.rotateY(rot[mirror][1]);
 		}
-		
+
 		for (int mirror = 0; mirror < 2; ++mirror) {
 			rot[mirror][3] = Model.rotateY(rot[mirror][2]);
 		}
-		
+
 		for (int mirror = 0; mirror < 2; ++mirror) {
 			rot[mirror][0] = Model.rotateY(rot[mirror][3]);
 		}
@@ -100,22 +100,22 @@ public class DoorModel {
 
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
-		
+
 		int data = ray.currentMaterial;
 		int top = 0xF & (data >> BlockData.DOOR_TOP);
 		int bottom = 0xF & (data >> BlockData.DOOR_BOTTOM);
-		
+
 		int open = 1 & (bottom>>2);
 		int mirrored = 1 & top;
 		int direction = 3 & bottom;
-		
+
 		int rotation;
 		if (open != 0 && mirrored != 0)
 			rotation = (direction + 3)%4;
 		else
 			rotation = (direction + open)%4;
 		int mirror = (mirrored + open) % 2;
-		
+
 		ray.t = Double.POSITIVE_INFINITY;
 		for (Quad quad : rot[mirror][rotation]) {
 			if (quad.intersect(ray)) {
