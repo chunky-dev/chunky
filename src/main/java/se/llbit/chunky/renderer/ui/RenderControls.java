@@ -405,7 +405,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateRayDepthField();
 
 		rayDepthSlider.setMinimum(1);
-		rayDepthSlider.setMaximum(100);
+		rayDepthSlider.setMaximum(25);
 		rayDepthSlider.addChangeListener(rayDepthListener);
 		updateRayDepthSlider();
 
@@ -1615,6 +1615,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			try {
 				int value = Integer.parseInt(source.getText());
 				renderManager.scene().setRayDepth(value);
+				updateRayDepthField();
 				updateRayDepthSlider();
 			} catch (NumberFormatException ex) {
 			}

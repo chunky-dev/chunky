@@ -1298,7 +1298,6 @@ public class Scene implements Refreshable {
 		if (rayDepth != value) {
 			rayDepth = value;
 			ProgramProperties.setProperty("rayDepth", "" + value);
-			refresh();
 		}
 	}
 
