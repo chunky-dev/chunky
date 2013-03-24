@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.resources.texturepack.AlternateTextures;
-import se.llbit.chunky.resources.texturepack.AnimatedIndexedTexture;
 import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.CloudsTexture;
 import se.llbit.chunky.resources.texturepack.FoliageColorTexture;
@@ -90,7 +89,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/web", Texture.cobweb, 0x0B));
 		allTextures.add(new IndexedTexture("textures/blocks/rose", Texture.redRose, 0x0C));
 		allTextures.add(new IndexedTexture("textures/blocks/flower", Texture.yellowFlower, 0x0D));
-		allTextures.add(new AnimatedIndexedTexture("textures/blocks/portal", Texture.portal, 0x0E));
+		allTextures.add(new IndexedTexture("textures/blocks/portal", Texture.portal, 0x0E));
 		allTextures.add(new IndexedTexture("textures/blocks/sapling", Texture.oakSapling, 0x0F));
 
 		allTextures.add(new IndexedTexture("textures/blocks/stonebrick", Texture.cobblestone, 0x10));
@@ -278,7 +277,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/potatoes_2", Texture.potatoes2, 0xCA));
 		allTextures.add(new IndexedTexture("textures/blocks/carrots_3", Texture.carrots3, 0xCB));
 		allTextures.add(new IndexedTexture("textures/blocks/potatoes_3", Texture.potatoes3, 0xCC));
-		allTextures.add(new AnimatedIndexedTexture("textures/blocks/water", Texture.water, 0xCD));
+		allTextures.add(new IndexedTexture("textures/blocks/water", Texture.water, 0xCD));
 
 		allTextures.add(new IndexedTexture("textures/blocks/sandstone_bottom", Texture.sandstoneBottom, 0xD0));
 		allTextures.add(new IndexedTexture("textures/blocks/cloth_9", Texture.cyanWool, 0xD1));
@@ -299,7 +298,7 @@ public class TexturePackLoader {
 		allTextures.add(new IndexedTexture("textures/blocks/sandstone_smooth", Texture.sandstoneSmooth, 0xE6));
 		allTextures.add(new IndexedTexture("textures/blocks/anvil_top", Texture.anvilTop, 0xE7));
 		allTextures.add(new IndexedTexture("textures/blocks/anvil_top_damaged_2", Texture.anvilTopDamaged2, 0xE8));
-		allTextures.add(new AnimatedIndexedTexture("textures/blocks/lava", Texture.lava, 0xED));
+		allTextures.add(new IndexedTexture("textures/blocks/lava", Texture.lava, 0xED));
 
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_side", Texture.quartzSide));
 		allTextures.add(new SimpleTexture("textures/blocks/quartzblock_top", Texture.quartzTop));
