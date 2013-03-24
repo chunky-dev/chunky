@@ -221,7 +221,6 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				bufferedScene.saveSnapshot(context.getSceneDirectory(), useWatermark);
 
 				backupFile(scene.name() + ".dump");
-				backupFile(scene.name() + ".cvf");
 
 				// save scene description and render dump
 				saveScene(scene.name() + ".cvf");
