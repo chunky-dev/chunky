@@ -502,5 +502,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	 */
 	public void mergeDump(File dumpFile) {
 		bufferedScene.mergeDump(dumpFile, renderListener);
+		bufferedScene.updateCanvas();
+		canvas.repaint();
 	}
 }
