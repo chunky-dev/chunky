@@ -30,7 +30,6 @@ import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.main.Messages;
-import se.llbit.chunky.renderer.RenderWorker;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.ui.CenteredFileDialog;
@@ -60,21 +59,21 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	private boolean updateBuffer = false;
 	private boolean dumpNextFrame = false;
 
-	private RenderableCanvas canvas;
-	private Thread[] workers;
+	private final RenderableCanvas canvas;
+	private final Thread[] workers;
 
 	private int numJobs;
 
 	/**
  	 * The modifiable scene.
  	 */
-	private Scene scene;
+	private final Scene scene;
 
 	/**
  	 * The buffered scene is only updated between
  	 * render jobs.
  	 */
-	private Scene bufferedScene;
+	private final Scene bufferedScene;
 
 	/**
 	 * Next job on the job queue.
@@ -100,7 +99,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 	private final RenderStatusListener renderListener;
 
-	private Object bufferMonitor = new Object();
+	private final Object bufferMonitor = new Object();
 
 	/**
 	 * Constructor
@@ -133,6 +132,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		}
 	}
 
+	@Override
 	public void run() {
 		try {
 
@@ -196,7 +196,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 			int canvasWidth = bufferedScene.canvasWidth();
 			int canvasHeight = bufferedScene.canvasHeight();
-			long pixelsPerFrame = (long) (canvasWidth * canvasHeight);
+			long pixelsPerFrame = canvasWidth * canvasHeight;
 			double samplesPerSecond = (bufferedScene.spp * pixelsPerFrame) /
 					(bufferedScene.renderTime / 1000.0);
 
@@ -495,5 +495,13 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	@Override
 	public Scene bufferedScene() {
 		return bufferedScene;
+	}
+
+	/**
+	 * Merge a render dump into the current render
+	 * @param dumpFile
+	 */
+	public void mergeDump(File dumpFile) {
+		bufferedScene.mergeDump(dumpFile, renderListener);
 	}
 }

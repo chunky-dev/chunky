@@ -60,7 +60,7 @@ public class SceneDirectoryPicker extends JDialog {
 		JLabel lbl = new JLabel("Please select a directory where Chunky should store scene description files and renders:");
 
 		final JTextField scenePath = new JTextField(40);
-		selectedDirectory = ProgramProperties.getPreferredSceneDirectory();
+		selectedDirectory = ProgramProperties.getSceneDirectory();
 		scenePath.setText(selectedDirectory.getAbsolutePath());
 
 		final JCheckBox nopester =

@@ -18,8 +18,6 @@ package se.llbit.chunky.renderer.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -28,13 +26,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.SceneManager;
+import se.llbit.chunky.ui.SelectAllFocusListener;
 
 /**
  * A dialog box that asks the user to name a new 3D scene.
@@ -75,21 +73,7 @@ public class NewSceneDialog extends JDialog {
 				tryAccept(source.getText());
 			}
 		});
-		sceneNameField.addFocusListener(new FocusListener() {
-			@Override
-			public void focusLost(FocusEvent e) {
-			}
-			@Override
-			public void focusGained(FocusEvent e) {
-				final JTextField source = (JTextField) e.getSource();
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						source.selectAll();
-					}
-				});
-			}
-		});
+		sceneNameField.addFocusListener(new SelectAllFocusListener());
 		JButton cancelBtn = new JButton("Cancel");
 		cancelBtn.addActionListener(new ActionListener() {
 			@Override

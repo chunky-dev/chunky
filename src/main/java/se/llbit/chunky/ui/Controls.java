@@ -85,17 +85,17 @@ public class Controls extends JPanel {
 
 	private static final int RENDER_TAB_INDEX = 4;
 
-	private Chunky chunky;
+	private final Chunky chunky;
 	private JTextField scaleField;
 	private JSlider scaleSlider;
 	private JTextField layerField;
 	private JSlider layerSlider;
 	private JButton deleteChunksBtn;
-	private ImageIcon faceIcon;
-	private JButton clearSelectionBtn1 = new JButton();
-	private JButton clearSelectionBtn2 = new JButton();
+	private final ImageIcon faceIcon;
+	private final JButton clearSelectionBtn1 = new JButton();
+	private final JButton clearSelectionBtn2 = new JButton();
 	private ProgressPanel progressPanel;
-	private Minimap minimap;
+	private final Minimap minimap;
 	private JButton exportZipBtn;
 	private JRadioButton earthBtn;
 	private JRadioButton netherBtn;

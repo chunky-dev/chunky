@@ -24,6 +24,7 @@ import java.awt.image.DataBufferInt;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -85,7 +86,7 @@ public class Scene implements Refreshable {
 	private static final Font infoFont = new Font("Sans serif", Font.BOLD, 11);
 	private static FontMetrics fontMetrics;
 
-	private RayPool rayPool = new RayPool();
+	private final RayPool rayPool = new RayPool();
 
 	private static final int DEFAULT_DUMP_FREQUENCY = 500;
 
@@ -203,9 +204,9 @@ public class Scene implements Refreshable {
 	private Set<ChunkPosition> loadedChunks = new HashSet<ChunkPosition>();
 
 	// chunk loading buffers
-	private byte[] blocks = new byte[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
-	private byte[] biomes = new byte[Chunk.X_MAX * Chunk.Z_MAX];
-	private byte[] data = new byte[(Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX) / 2];
+	private final byte[] blocks = new byte[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
+	private final byte[] biomes = new byte[Chunk.X_MAX * Chunk.Z_MAX];
+	private final byte[] data = new byte[(Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX) / 2];
 
 	private boolean refresh = false;
 	private boolean pathTrace = false;
@@ -365,7 +366,8 @@ public class Scene implements Refreshable {
 	}
 
 	/**
-	 * Save the scene description
+	 * Save the scene description, render dump, and foliage
+	 * and grass textures.
 	 * @param context
 	 * @param progressListener
 	 * @param fileName
@@ -898,7 +900,7 @@ public class Scene implements Refreshable {
 									long wx = cp.x * 16L + cx;
 									long wy = cy + 1;
 									long wz = cp.z * 16L + cz;
-									long pr = (wx * 3129871L) ^ (wz * 116129781L) ^ ((long) wy);
+									long pr = (wx * 3129871L) ^ (wz * 116129781L) ^ (wy);
 							        pr = pr * pr * 42317861L + pr * 11L;
 							        int dir = 3 & (int)(pr >> 16);
 									type |= (dir<<BlockData.LILY_PAD_ROTATION);
@@ -2112,6 +2114,71 @@ public class Scene implements Refreshable {
 	 */
 	public int getCloudHeight() {
 		return cloudHeight;
+	}
+
+	/**
+	 * Merge a render dump into this scene
+	 * @param dumpFile
+	 * @param renderListener
+	 * @param dumpSpp
+	 */
+	public void mergeDump(File dumpFile, RenderStatusListener renderListener) {
+		int dumpSpp;
+		long dumpTime;
+		DataInputStream in = null;
+		try {
+			in = new DataInputStream(new GZIPInputStream(
+					new FileInputStream(dumpFile)));
+
+			String task = "Loading render dump";
+			renderListener.setProgress(task, 0, 0, 1);
+			logger.info("Loading render dump " + dumpFile.getAbsolutePath());
+			int dumpWidth = in.readInt();
+			int dumpHeight= in.readInt();
+			if (dumpWidth != width || dumpHeight != height) {
+				logger.warn("Render dump discarded: incorrect widht or height!");
+				in.close();
+				return;
+			}
+			dumpSpp = in.readInt();
+			dumpTime = in.readLong();
+
+			double sa = spp / (double) (spp + dumpSpp);
+			double sb = 1 - sa;
+
+			for (int x = 0; x < width; ++x) {
+				renderListener.setProgress(task, x, 0, width-1);
+				for (int y = 0; y < height; ++y) {
+					samples[x][y][0] = samples[x][y][0] * sa
+							+ in.readDouble() * sb;
+					samples[x][y][1] = samples[x][y][1] * sa
+							+ in.readDouble() * sb;
+					samples[x][y][2] = samples[x][y][2] * sa
+							+ in.readDouble() * sb;
+					finalizePixel(x, y);
+				}
+			}
+			logger.info("Render dump loaded");
+
+			// Update render status
+			spp += dumpSpp;
+			renderTime += dumpTime;
+			renderListener.setSPP(spp);
+			renderListener.setRenderTime(renderTime);
+			long totalSamples = spp * ((long) (width * height));
+			renderListener.setSamplesPerSecond(
+					(int) (totalSamples / (renderTime / 1000.0)));
+
+		} catch (IOException e) {
+			logger.info("Render dump not loaded");
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+				}
+			}
+		}
 	}
 
 }

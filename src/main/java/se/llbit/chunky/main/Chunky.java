@@ -214,7 +214,7 @@ public class Chunky implements ChunkDiscoveryListener {
 			} else if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("-help") || args[i].equals("--help")) {
 				System.out.println(USAGE);
 				System.out.println();
-				System.out.println("The default scene directory is " + ProgramProperties.getPreferredSceneDirectory());
+				System.out.println("The default scene directory is " + ProgramProperties.getSceneDirectory());
 				return 0;
 			} else if (!args[i].startsWith("-") && !selectedWorld) {
 				worldDir = new File(args[i]);
@@ -231,7 +231,7 @@ public class Chunky implements ChunkDiscoveryListener {
 				sceneDir = possibleSceneFile.getParentFile();
 				sceneName = possibleSceneFile.getName();
 			} else {
-				sceneDir = ProgramProperties.getPreferredSceneDirectory();
+				sceneDir = ProgramProperties.getSceneDirectory();
 			}
 		}
 
@@ -325,7 +325,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	private void doBenchmark(int renderThreads) {
 		System.setProperty("java.awt.headless", "true");
 
-		File sceneDir = ProgramProperties.getPreferredSceneDirectory();
+		File sceneDir = ProgramProperties.getSceneDirectory();
 		RenderContext renderContext = new RenderContext(sceneDir,
 				renderThreads, tileWidth);
 		BenchmarkManager benchmark = new BenchmarkManager(renderContext,

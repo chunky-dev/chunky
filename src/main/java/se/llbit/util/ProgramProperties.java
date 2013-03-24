@@ -173,7 +173,7 @@ public final class ProgramProperties {
 	/**
 	 * @return The default scene directory
 	 */
-	public static File getPreferredSceneDirectory() {
+	public static File getSceneDirectory() {
 		if (containsKey("sceneDirectory")) {
 			return new File(getProperty("sceneDirectory"));
 		} else {

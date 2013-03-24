@@ -34,20 +34,20 @@ import java.util.Collection;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -96,7 +96,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	/**
 	 * Number format for current locale.
 	 */
-	private NumberFormat numberFormat =
+	private final NumberFormat numberFormat =
 			NumberFormat.getInstance();
 
 	private final JSlider sunAzimuthSlider = new JSlider();
@@ -410,6 +410,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateRayDepthSlider();
 
 		JSeparator sep1 = new JSeparator();
+		JSeparator sep2 = new JSeparator();
 
 		JLabel waterWorldLbl = new JLabel(
 				"Note: All chunks will be reloaded after changing the water world options!");
@@ -444,6 +445,32 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 
+		JButton mergeDumpBtn = new JButton("Merge Render Dump");
+		mergeDumpBtn.setToolTipText(
+				"Merge an existing render dump with the current render");
+		mergeDumpBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CenteredFileDialog fileDialog =
+						new CenteredFileDialog(null,
+								"Select Render Dump", FileDialog.LOAD);
+				fileDialog.setFilenameFilter(
+						new FilenameFilter() {
+							@Override
+							public boolean accept(File dir, String name) {
+								return name.toLowerCase().endsWith(".zip");
+							}
+						});
+				fileDialog.setDirectory(ProgramProperties.
+						getSceneDirectory().getAbsolutePath());
+				fileDialog.setVisible(true);
+				File selectedFile = fileDialog.getSelectedFile();
+				if (selectedFile != null) {
+					renderManager.mergeDump(selectedFile);
+				}
+			}
+		});
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -463,6 +490,8 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addGap(0, 0, Short.MAX_VALUE)
 					.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 				)
+				.addComponent(sep2)
+				.addComponent(mergeDumpBtn)
 			)
 			.addContainerGap()
 		);
@@ -484,6 +513,10 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(waterHeightLbl)
 				.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(mergeDumpBtn)
 			.addContainerGap()
 		);
 		return panel;
@@ -2258,6 +2291,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	/**
 	 * Called when the current scene has been saved
 	 */
+	@Override
 	public void sceneSaved() {
 		updateTitle();
 	}
@@ -2371,6 +2405,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	 * Method to notify the render controls dialog that a scene has been loaded.
 	 * Causes canvas size to be updated.
 	 */
+	@Override
 	public synchronized void sceneLoaded() {
 		updateDofField();
 		updateFovField();
@@ -2424,6 +2459,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	 * Update render time status label
 	 * @param time Total render time in milliseconds
 	 */
+	@Override
 	public void setRenderTime(long time) {
 		if (renderTimeLbl == null)
 			return;
@@ -2440,6 +2476,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	 * Update samples per second status label
 	 * @param sps Samples per second
 	 */
+	@Override
 	public void setSamplesPerSecond(int sps) {
 		if (samplesPerSecondLbl == null)
 			return;
@@ -2451,6 +2488,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	 * Update SPP status label
 	 * @param spp Samples per pixel
 	 */
+	@Override
 	public void setSPP(int spp) {
 		if (sppLbl == null)
 			return;
