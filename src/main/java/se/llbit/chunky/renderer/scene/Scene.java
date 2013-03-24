@@ -2130,7 +2130,7 @@ public class Scene implements Refreshable {
 			in = new DataInputStream(new GZIPInputStream(
 					new FileInputStream(dumpFile)));
 
-			String task = "Loading render dump";
+			String task = "Merging render dump";
 			renderListener.setProgress(task, 0, 0, 1);
 			logger.info("Loading render dump " + dumpFile.getAbsolutePath());
 			int dumpWidth = in.readInt();
