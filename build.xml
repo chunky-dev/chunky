@@ -44,6 +44,7 @@
 		<mkdir dir="${bin.dir}"/>
 		<javac
 			encoding="utf-8"
+			target="1.6"
 			debug="${debug}"
 			nowarn="true"
 			destdir="${bin.dir}"
