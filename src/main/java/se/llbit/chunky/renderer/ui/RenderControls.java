@@ -458,7 +458,7 @@ public class RenderControls extends JDialog implements ViewListener,
 						new FilenameFilter() {
 							@Override
 							public boolean accept(File dir, String name) {
-								return name.toLowerCase().endsWith(".zip");
+								return name.toLowerCase().endsWith(".dump");
 							}
 						});
 				fileDialog.setDirectory(ProgramProperties.
