@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -56,13 +56,13 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 	private static final Logger logger =
 			Logger.getLogger(BenchmarkDialog.class);
 
-	private JProgressBar progressBar = new JProgressBar();
-	private JButton startBtn = new JButton();
-	private JButton stopBtn = new JButton();
+	private final JProgressBar progressBar = new JProgressBar();
+	private final JButton startBtn = new JButton();
+	private final JButton stopBtn = new JButton();
 	private BenchmarkManager benchmark = null;
-	private RenderContext context;
-	private JLabel statusLbl = new JLabel();
-	private JLabel scoreLbl = new JLabel();
+	private final RenderContext context;
+	private final JLabel statusLbl = new JLabel();
+	private final JLabel scoreLbl = new JLabel();
 	private final DecimalFormat decimalFormat;
 
 	/**
@@ -286,5 +286,10 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 	public void renderStateChanged(boolean pathTrace, boolean paused) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void renderJobFinished(long time, int sps) {
+		// TODO Auto-generated method stub
 	}
 }

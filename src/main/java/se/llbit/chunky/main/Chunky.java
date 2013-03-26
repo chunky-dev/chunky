@@ -21,12 +21,13 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import se.llbit.chunky.renderer.AbstractRenderManager;
 import se.llbit.chunky.renderer.BenchmarkManager;
@@ -50,7 +51,6 @@ import se.llbit.chunky.ui.ProgressPanel;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.Chunk.Renderer;
-import se.llbit.chunky.world.listeners.ChunkDiscoveryListener;
 import se.llbit.chunky.world.ChunkParser;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
@@ -63,6 +63,7 @@ import se.llbit.chunky.world.Region;
 import se.llbit.chunky.world.RegionParser;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldRenderer;
+import se.llbit.chunky.world.listeners.ChunkDiscoveryListener;
 import se.llbit.util.ProgramProperties;
 
 /**
@@ -94,12 +95,12 @@ public class Chunky implements ChunkDiscoveryListener {
 
 	private World world = EmptyWorld.instance;
 
-	private ChunkParser chunkParser = new ChunkParser();
-	private RegionParser regionParser = new RegionParser();
+	private final ChunkParser chunkParser = new ChunkParser();
+	private final RegionParser regionParser = new RegionParser();
 
 	private int currentDimension = 0;
 	private Chunk.Renderer chunkRenderer = Chunk.surfaceRenderer;
-	private WorldRenderer worldRenderer = new WorldRenderer();
+	private final WorldRenderer worldRenderer = new WorldRenderer();
 	protected ChunkSelectionTracker chunkSelection = new ChunkSelectionTracker();
 
 	protected boolean ctrlModifier = false;
@@ -259,7 +260,7 @@ public class Chunky implements ChunkDiscoveryListener {
 					renderThreads, tileWidth);
 			RenderManager renderManager = new RenderManager(
 					new PlaceholderRenderCanvas(),
-					renderContext, new ConsoleRenderListener());
+					renderContext, new ConsoleRenderListener(), true);
 			renderManager.start();
 
 			try {

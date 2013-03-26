@@ -1,4 +1,5 @@
 1.1.8 - TBD
+    * Chunky now exits after completing a render in command-line mode
     * Chunky now remembers the "ray depth" setting
     * Fixed some errors in the UI
     * Ctrl+Q in the main window exits Chunky

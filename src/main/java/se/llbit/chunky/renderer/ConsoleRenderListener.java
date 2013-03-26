@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -94,4 +94,15 @@ public class ConsoleRenderListener implements RenderStatusListener {
 	public void renderStateChanged(boolean pathTrace, boolean paused) {
 	}
 
+	@Override
+	public void renderJobFinished(long time, int sps) {
+		System.out.println("Render job finished.");
+		int seconds = (int) ((time / 1000) % 60);
+		int minutes = (int) ((time / 60000) % 60);
+		int hours = (int) (time / 3600000);
+		System.out.println(String.format(
+				"Total rendering time: %d hours, %d minutes, %d seconds",
+				hours, minutes, seconds));
+		System.out.println("Average samples per second (SPS): " + sps);
+	}
 }

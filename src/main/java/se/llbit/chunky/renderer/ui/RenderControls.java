@@ -2563,4 +2563,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateCameraPosition();
 		show3DView();
 	}
+
+	@Override
+	public void renderJobFinished(long time, int sps) {
+	}
 }

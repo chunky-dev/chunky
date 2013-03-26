@@ -101,20 +101,36 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 	private final Object bufferMonitor = new Object();
 
+	private final boolean oneshot;
+
 	/**
 	 * Constructor
 	 * @param canvas
 	 * @param context
-	 * @param controls
+	 * @param statusListener
 	 */
 	public RenderManager(RenderableCanvas canvas, RenderContext context,
-			RenderStatusListener controls) {
+			RenderStatusListener statusListener) {
+		this(canvas, context, statusListener, false);
+	}
+
+	/**
+	 * Constructor
+	 * @param canvas
+	 * @param context
+	 * @param statusListener
+	 * @param oneshot <code>true</code> if rendering threads should be shut
+	 * down after meeting the render target
+	 */
+	public RenderManager(RenderableCanvas canvas, RenderContext context,
+			RenderStatusListener statusListener, boolean oneshot) {
 
 		super(context);
 
 		this.canvas = canvas;
 		this.context = context;
-		renderListener = controls;
+		this.oneshot = oneshot;
+		renderListener = statusListener;
 
 		scene = new Scene();
 		bufferedScene = new Scene(scene);
@@ -151,6 +167,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 					previewLoop();
 				}
 
+				if (oneshot) {
+					break;
+				}
 			}
 		} catch (InterruptedException e) {
 			// 3D view was closed
@@ -229,6 +248,11 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			if (bufferedScene.spp >= bufferedScene.getTargetSPP()) {
 				scene.pauseRender();
 				renderListener.renderStateChanged(scene.pathTrace(), scene.isPaused());
+				renderListener.renderJobFinished(bufferedScene.renderTime,
+						(int) samplesPerSecond);
+				if (oneshot) {
+					return;
+				}
 			}
 		}
 

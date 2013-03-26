@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -61,4 +61,11 @@ public interface RenderStatusListener extends ProgressListener {
 	 * @param paused
 	 */
 	void renderStateChanged(boolean pathTrace, boolean paused);
+
+	/**
+	 * Called when the current render job has completed.
+	 * @param time Total rendering time
+	 * @param sps Average SPS
+	 */
+	void renderJobFinished(long time, int sps);
 }
