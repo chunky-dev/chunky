@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -31,7 +31,7 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 
 /**
- * Scene manager that loads and saves scenes upon request.
+ * Perform synchronized scene actions without locking the GUI.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class SceneManager extends Thread {
@@ -59,7 +59,11 @@ public class SceneManager extends Thread {
 		/**
 		 * Reload chunks
 		 */
-		RELOAD_CHUNKS
+		RELOAD_CHUNKS,
+		/**
+		 * Merge render dump
+		 */
+		MERGE_DUMP
 	}
 
 	private static final Logger logger =
@@ -67,6 +71,7 @@ public class SceneManager extends Thread {
 
 	private final RenderManager renderManager;
 	private String sceneName = "";
+	private File renderDump;
 	private Action action = Action.NONE;
 	private Collection<ChunkPosition> chunksToLoad;
 	private World world;
@@ -81,6 +86,7 @@ public class SceneManager extends Thread {
 		this.renderManager = manager;
 	}
 
+	@Override
 	public void run() {
 		try {
 			while (!isInterrupted()) {
@@ -118,6 +124,9 @@ public class SceneManager extends Thread {
 						break;
 					case RELOAD_CHUNKS:
 						renderManager.reloadChunks();
+						break;
+					case MERGE_DUMP:
+						renderManager.mergeDump(renderDump);
 						break;
 					default:
 						break;
@@ -164,6 +173,16 @@ public class SceneManager extends Thread {
 	 */
 	public synchronized void reloadChunks() {
 		action = Action.RELOAD_CHUNKS;
+		notify();
+	}
+
+	/**
+	 * Merge render dump
+	 * @param renderDump
+	 */
+	public synchronized void mergeRenderDump(File renderDump) {
+		this.renderDump = renderDump;
+		action = Action.MERGE_DUMP;
 		notify();
 	}
 

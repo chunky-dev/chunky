@@ -466,7 +466,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				fileDialog.setVisible(true);
 				File selectedFile = fileDialog.getSelectedFile();
 				if (selectedFile != null) {
-					renderManager.mergeDump(selectedFile);
+					sceneManager.mergeRenderDump(selectedFile);
 				}
 			}
 		});
