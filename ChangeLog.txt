@@ -1,4 +1,4 @@
-1.1.8 - TBD
+1.1.8 - 2013-03-27
     * Chunky now exits after completing a render in command-line mode
     * Chunky now remembers the "ray depth" setting, and changing the value
     does not reset the render
@@ -8,7 +8,7 @@
     * Increased depth of field effect
     * Fixed animated texture loading (only load first animation frame)
 
-1.1.7 - 20130317
+1.1.7 - 2013-03-17
     * Increased maximum FoV value to 175 degrees for perspective projection
     * Increased FoV slider range in parallel projection mode
     * Ctrl+W now closes the 3D preview window
