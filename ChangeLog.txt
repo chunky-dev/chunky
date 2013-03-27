@@ -7,6 +7,8 @@
     * Added icons to the tabs in the main window
     * Increased depth of field effect
     * Fixed animated texture loading (only load first animation frame)
+    * Added option to merge render dump under the Advanced tab in the Render
+    Controls dialog
 
 1.1.7 - 2013-03-17
     * Increased maximum FoV value to 175 degrees for perspective projection
