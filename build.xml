@@ -62,7 +62,8 @@
 		</javac>
 	</target>
 
-	<target name="jar" depends="build">
+	<target name="jar" depends="build"
+		description="builds Chunky and creates build/Chunky.jar">
 		<mkdir dir="build"/>
 		<!--jar destfile="build/NBTDump.jar">
 			<fileset dir="${bin.dir}" includes="se/llbit/nbt/*.class" />
