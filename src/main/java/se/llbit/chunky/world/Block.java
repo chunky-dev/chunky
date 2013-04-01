@@ -67,8 +67,8 @@ import se.llbit.chunky.model.SnowModel;
 import se.llbit.chunky.model.SpriteModel;
 import se.llbit.chunky.model.StairModel;
 import se.llbit.chunky.model.StoneWallModel;
-import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.TallGrassModel;
+import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.TorchModel;
 import se.llbit.chunky.model.TrapdoorModel;
 import se.llbit.chunky.model.TripwireHookModel;
@@ -1829,14 +1829,14 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			switch (ray.getBlockData() & 7) {
 			case 1:
-				return SlabModel.intersect(ray, Texture.sprucePlanks, Texture.sprucePlanks);
+				return TexturedBlockModel.intersect(ray, Texture.sprucePlanks);
 			case 2:
-				return SlabModel.intersect(ray, Texture.birchPlanks, Texture.birchPlanks);
+				return TexturedBlockModel.intersect(ray, Texture.birchPlanks);
 			case 3:
-				return SlabModel.intersect(ray, Texture.jungleTreePlanks, Texture.jungleTreePlanks);
+				return TexturedBlockModel.intersect(ray, Texture.jungleTreePlanks);
 			case 0:
 			default:
-				return SlabModel.intersect(ray, Texture.oakPlanks, Texture.oakPlanks);
+				return TexturedBlockModel.intersect(ray, Texture.oakPlanks);
 			}
 		}
 	};
@@ -3090,7 +3090,7 @@ public class Block {
 	public boolean subSurfaceScattering = false;
 
 	private Texture frontTexture;
-	private Texture icon;
+	private final Texture icon;
 
 	private static final Set<Block> redstoneConnectors = new HashSet<Block>();
 	static {
