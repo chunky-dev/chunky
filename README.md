@@ -46,7 +46,7 @@ Running
 Chunky uses a lot of memory. In order to give Chunky extra memory to work with
 you can run Chunky from the command line with for example
 
-    java -jar Chunky.jar -Xmx4g -Xms512m
+    java -Xmx4g -Xms512m -jar Chunky.jar
 
 This will start with 512 MiB minimum heap size and 4 GiB maximum.
 
