@@ -167,7 +167,7 @@ public class Scene implements Refreshable {
 	protected double waterVisibility = DEFAULT_WATER_VISIBILITY;
 
 	/**
-	 * Recursive ray depth limit (not including RR)
+	 * Recursive ray depth limit (not including Russian Roulette)
 	 */
 	public static int rayDepth = 5;
 
