@@ -88,8 +88,8 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	private static final int[] dumpFrequencies = { 50, 100, 500, 1000 };
 
-	private final RenderManager renderManager;
-	private final SceneManager sceneManager;
+	private final RenderManager renderMan;
+	private final SceneManager sceneMan;
 	private final Chunk3DView view;
 	private final Chunky chunky;
 
@@ -181,14 +181,14 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		view = new Chunk3DView(this, chunkyInstance.getFrame());
 
-		renderManager = new RenderManager(
+		renderMan = new RenderManager(
 				view.getCanvas(), renderContext, this);
-		renderManager.start();
+		renderMan.start();
 
-		view.setRenderer(renderManager);
+		view.setRenderer(renderMan);
 
-		sceneManager = new SceneManager(renderManager);
-		sceneManager.start();
+		sceneMan = new SceneManager(renderMan);
+		sceneMan.start();
 
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		setModalityType(ModalityType.MODELESS);
@@ -208,13 +208,13 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 			@Override
 			public void windowClosing(WindowEvent e) {
-				sceneManager.interrupt();
+				sceneMan.interrupt();
 				RenderControls.this.dispose();
 			}
 			@Override
 			public void windowClosed(WindowEvent e) {
 				// halt rendering
-				renderManager.interrupt();
+				renderMan.interrupt();
 
 				// dispose of the 3D view
 				view.setVisible(false);
@@ -245,7 +245,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ProgramProperties.setProperty("sppTargetDefault",
-						"" + renderManager.scene().getTargetSPP());
+						"" + renderMan.scene().getTargetSPP());
 			}
 		});
 
@@ -272,17 +272,17 @@ public class RenderControls extends JDialog implements ViewListener,
 		startRenderBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!renderManager.scene().pathTrace()) {
-					renderManager.scene().startRender();
+				if (!renderMan.scene().pathTrace()) {
+					renderMan.scene().startRender();
 					startRenderBtn.setText("PAUSE");
 					startRenderBtn.repaint();
 				} else {
-					if (renderManager.scene().isPaused()) {
-						renderManager.scene().resumeRender();
+					if (renderMan.scene().isPaused()) {
+						renderMan.scene().resumeRender();
 						startRenderBtn.setText("PAUSE");
 						startRenderBtn.repaint();
 					} else {
-						renderManager.scene().pauseRender();
+						renderMan.scene().pauseRender();
 						startRenderBtn.setText("RESUME");
 						startRenderBtn.repaint();
 					}
@@ -300,7 +300,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		stopRenderBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				renderManager.scene().haltRender();
+				renderMan.scene().haltRender();
 				startRenderBtn.setText("START");
 				startRenderBtn.repaint();
 				stopRenderBtn.setEnabled(false);
@@ -422,8 +422,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JTextField source = (JTextField) e.getSource();
-				renderManager.scene().setWaterHeight(Integer.parseInt(source.getText()));
-				sceneManager.reloadChunks();
+				renderMan.scene().setWaterHeight(Integer.parseInt(source.getText()));
+				sceneMan.reloadChunks();
 				updateWaterHeight();
 			}
 		});
@@ -435,12 +435,12 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				JCheckBox source = (JCheckBox) e.getSource();
 				if (source.isSelected()) {
-					renderManager.scene().setWaterHeight(
+					renderMan.scene().setWaterHeight(
 							Integer.parseInt(waterHeightField.getText()));
 				} else {
-					renderManager.scene().setWaterHeight(0);
+					renderMan.scene().setWaterHeight(0);
 				}
-				sceneManager.reloadChunks();
+				sceneMan.reloadChunks();
 				updateWaterHeight();
 			}
 		});
@@ -466,7 +466,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				fileDialog.setVisible(true);
 				File selectedFile = fileDialog.getSelectedFile();
 				if (selectedFile != null) {
-					sceneManager.mergeRenderDump(selectedFile);
+					sceneMan.mergeRenderDump(selectedFile);
 				}
 			}
 		});
@@ -544,7 +544,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox) e.getSource();
-				renderManager.scene().setPostprocess(
+				renderMan.scene().setPostprocess(
 						Postprocess.get(source.getSelectedIndex()));
 			}
 		});
@@ -621,7 +621,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		reloadChunksBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				sceneManager.reloadChunks();
+				sceneMan.reloadChunks();
 			}
 		});
 
@@ -649,8 +649,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		halveCanvasSizeBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int width = renderManager.scene().canvasWidth() / 2;
-				int height = renderManager.scene().canvasHeight() / 2;
+				int width = renderMan.scene().canvasWidth() / 2;
+				int height = renderMan.scene().canvasHeight() / 2;
 				setCanvasSize(width, height);
 			}
 		});
@@ -659,8 +659,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		doubleCanvasSizeBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int width = renderManager.scene().canvasWidth() * 2;
-				int height = renderManager.scene().canvasHeight() * 2;
+				int width = renderMan.scene().canvasWidth() * 2;
+				int height = renderMan.scene().canvasHeight() * 2;
 				setCanvasSize(width, height);
 			}
 		});
@@ -671,9 +671,9 @@ public class RenderControls extends JDialog implements ViewListener,
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				ProgramProperties.setProperty("3dcanvas.width",
-						"" + renderManager.scene().canvasWidth());
+						"" + renderMan.scene().canvasWidth());
 				ProgramProperties.setProperty("3dcanvas.height",
-						"" + renderManager.scene().canvasHeight());
+						"" + renderMan.scene().canvasHeight());
 			}
 		});
 
@@ -807,19 +807,19 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				java.awt.Color newColor = JColorChooser.showDialog(
 						RenderControls.this, "Choose Sun Color",
-						renderManager.scene().sun().getAwtColor());
+						renderMan.scene().sun().getAwtColor());
 				if (newColor != null) {
-					renderManager.scene().sun().setColor(newColor);
+					renderMan.scene().sun().setColor(newColor);
 				}
 			}
 		});
 
 		directLight.setText("enable sunlight");
-		directLight.setSelected(renderManager.scene().getDirectLight());
+		directLight.setSelected(renderMan.scene().getDirectLight());
 		directLight.addActionListener(directLightListener);
 
 		enableEmitters.setText("enable emitters");
-		enableEmitters.setSelected(renderManager.scene().getEmittersEnabled());
+		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
 		enableEmitters.addActionListener(emittersListener);
 
 		JLabel sunAzimuthLbl = new JLabel("Sun azimuth: ");
@@ -965,9 +965,9 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				java.awt.Color newColor = JColorChooser.showDialog(
 						RenderControls.this, "Choose Ground Color",
-						renderManager.scene().sky().getGroundColor());
+						renderMan.scene().sky().getGroundColor());
 				if (newColor != null) {
-					renderManager.scene().sky().setGroundColor(newColor);
+					renderMan.scene().sky().setGroundColor(newColor);
 				}
 			}
 		});
@@ -977,7 +977,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		unloadSkymapBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				renderManager.scene().sky().unloadSkymap();
+				renderMan.scene().sky().unloadSkymap();
 			}
 		});
 
@@ -1010,6 +1010,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		layout.setHorizontalGroup(layout.createSequentialGroup()
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
+				// TODO
 				/*.addGroup(layout.createSequentialGroup()
 					.addComponent(skyModeLbl)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -1040,6 +1041,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
+			// TODO
 			/*.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(skyModeLbl)
 				.addComponent(skyModeCB)
@@ -1118,7 +1120,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		autoFocusBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				renderManager.scene().autoFocus();
+				renderMan.scene().autoFocus();
 				updateDofField();
 				updateDofSlider();
 				updateFocalOffsetField();
@@ -1131,7 +1133,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		cameraToPlayerBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				renderManager.scene().moveCameraToPlayer();
+				renderMan.scene().moveCameraToPlayer();
 			}
 		});
 
@@ -1161,7 +1163,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		xposBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderManager.scene().camera();
+				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
 				camera.setView(Math.PI, -Math.PI/2);
 				updateFovField();
@@ -1174,7 +1176,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		xnegBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderManager.scene().camera();
+				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
 				camera.setView(0, -Math.PI/2);
 				updateFovField();
@@ -1187,7 +1189,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		yposBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderManager.scene().camera();
+				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
 				camera.setView(-Math.PI/2, Math.PI);
 				updateFovField();
@@ -1200,7 +1202,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		ynegBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderManager.scene().camera();
+				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
 				camera.setView(-Math.PI/2, 0);
 				updateFovField();
@@ -1213,7 +1215,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		zposBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderManager.scene().camera();
+				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
 				camera.setView(Math.PI/2, -Math.PI/2);
 				updateFovField();
@@ -1226,7 +1228,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		znegBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderManager.scene().camera();
+				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
 				camera.setView(-Math.PI/2, -Math.PI/2);
 				updateFovField();
@@ -1240,7 +1242,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		centerCameraBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				renderManager.scene().moveCameraToCenter();
+				renderMan.scene().moveCameraToCenter();
 			}
 		});
 
@@ -1252,7 +1254,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		isoWNBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderManager.scene().camera();
+				Camera camera = renderMan.scene().camera();
 				camera.setView(-Math.PI/4, -Math.PI/4);
 				camera.setParallelProjection(true);
 				updateParallelProjectionCheckBox();
@@ -1268,7 +1270,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		isoNEBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderManager.scene().camera();
+				Camera camera = renderMan.scene().camera();
 				camera.setView(-3*Math.PI/4, -Math.PI/4);
 				camera.setParallelProjection(true);
 				updateParallelProjectionCheckBox();
@@ -1284,7 +1286,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		isoESBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderManager.scene().camera();
+				Camera camera = renderMan.scene().camera();
 				camera.setView(-5*Math.PI/4, -Math.PI/4);
 				camera.setParallelProjection(true);
 				updateParallelProjectionCheckBox();
@@ -1300,7 +1302,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		isoSWBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderManager.scene().camera();
+				Camera camera = renderMan.scene().camera();
 				camera.setView(-7*Math.PI/4, -Math.PI/4);
 				camera.setParallelProjection(true);
 				updateParallelProjectionCheckBox();
@@ -1456,48 +1458,48 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateStillWater() {
 		stillWaterCB.removeActionListener(stillWaterListener);
-		stillWaterCB.setSelected(renderManager.scene().stillWaterEnabled());
+		stillWaterCB.setSelected(renderMan.scene().stillWaterEnabled());
 		stillWaterCB.addActionListener(stillWaterListener);
 	}
 
 	protected void updateClearWater() {
 		clearWaterCB.removeActionListener(clearWaterListener);
-		clearWaterCB.setSelected(renderManager.scene().getClearWater());
+		clearWaterCB.setSelected(renderMan.scene().getClearWater());
 		clearWaterCB.addActionListener(clearWaterListener);
 	}
 
 	protected void updateBiomeColorsCB() {
 		biomeColorsCB.removeActionListener(biomeColorsCBListener);
 		biomeColorsCB.addActionListener(biomeColorsCBListener);
-		biomeColorsCB.setSelected(renderManager.scene().biomeColorsEnabled());
+		biomeColorsCB.setSelected(renderMan.scene().biomeColorsEnabled());
 	}
 
 	protected void updateAtmosphereCheckBox() {
 		atmosphereEnabled.removeActionListener(atmosphereListener);
-		atmosphereEnabled.setSelected(renderManager.scene().atmosphereEnabled());
+		atmosphereEnabled.setSelected(renderMan.scene().atmosphereEnabled());
 		atmosphereEnabled.addActionListener(atmosphereListener);
 	}
 
 	protected void updateMirroSkyCB() {
 		mirrorSkyCB.removeActionListener(mirrorSkyListener);
-		mirrorSkyCB.setSelected(renderManager.scene().sky().isMirrored());
+		mirrorSkyCB.setSelected(renderMan.scene().sky().isMirrored());
 		mirrorSkyCB.addActionListener(mirrorSkyListener);
 	}
 
 	protected void updateVolumetricFogCheckBox() {
 		volumetricFogEnabled.removeActionListener(volumetricFogListener);
-		volumetricFogEnabled.setSelected(renderManager.scene().volumetricFogEnabled());
+		volumetricFogEnabled.setSelected(renderMan.scene().volumetricFogEnabled());
 		volumetricFogEnabled.addActionListener(volumetricFogListener);
 	}
 
 	protected void updateCloudsEnabledCheckBox() {
 		cloudsEnabled.removeActionListener(cloudsEnabledListener);
-		cloudsEnabled.setSelected(renderManager.scene().cloudsEnabled());
+		cloudsEnabled.setSelected(renderMan.scene().cloudsEnabled());
 		cloudsEnabled.addActionListener(cloudsEnabledListener);
 	}
 
 	private void updateTitle() {
-		setTitle("Render Controls - " + renderManager.scene().name());
+		setTitle("Render Controls - " + renderMan.scene().name());
 	}
 
 	ActionListener dumpFrequencyListener = new ActionListener() {
@@ -1507,7 +1509,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				int index = dumpFrequency.getSelectedIndex();
 				index = Math.max(0, index);
 				index = Math.min(dumpFrequencies.length-1, index);
-				renderManager.scene().setDumpFrequency(dumpFrequencies[index]);
+				renderMan.scene().setDumpFrequency(dumpFrequencies[index]);
 			} catch (NumberFormatException e1) {
 			}
 			updateDumpFrequencyField();
@@ -1518,7 +1520,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			boolean enabled = saveDumpsCB.isSelected();
-			renderManager.scene().setSaveDumps(enabled);
+			renderMan.scene().setSaveDumps(enabled);
 			dumpFrequency.setEnabled(enabled);
 		}
 	};
@@ -1552,7 +1554,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		private void updateName(DocumentEvent e) {
 			try {
 				Document d = e.getDocument();
-				renderManager.scene().setName(d.getText(0, d.getLength()));
+				renderMan.scene().setName(d.getText(0, d.getLength()));
 				updateTitle();
 			} catch (BadLocationException e1) {
 				e1.printStackTrace();
@@ -1577,7 +1579,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			try {
 				Document d = e.getDocument();
 				String value = d.getText(0, d.getLength());
-				renderManager.scene().setTargetSPP(Integer.parseInt(value));
+				renderMan.scene().setTargetSPP(Integer.parseInt(value));
 				updateTitle();
 			} catch (NumberFormatException e1) {
 			} catch (BadLocationException e1) {
@@ -1589,13 +1591,13 @@ public class RenderControls extends JDialog implements ViewListener,
 	ActionListener saveSceneListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			sceneManager.saveScene(sceneNameField.getText());
+			sceneMan.saveScene(sceneNameField.getText());
 		}
 	};
 	ActionListener saveFrameListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			renderManager.saveFrame(RenderControls.this);
+			renderMan.saveFrame(RenderControls.this);
 		}
 	};
 	ActionListener loadSceneListener = new ActionListener() {
@@ -1621,7 +1623,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			fileDialog.setVisible(true);
 			File selectedFile = fileDialog.getSelectedFile();
 			if (selectedFile != null) {
-				renderManager.scene().sky().loadSkyMap(selectedFile.getAbsolutePath());
+				renderMan.scene().sky().loadSkyMap(selectedFile.getAbsolutePath());
 			}
 		}
 	};
@@ -1629,7 +1631,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
-			renderManager.scene().setRayDepth(source.getValue());
+			renderMan.scene().setRayDepth(source.getValue());
 			updateRayDepthField();
 		}
 	};
@@ -1637,7 +1639,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
-			renderManager.scene().setCloudHeight(source.getValue());
+			renderMan.scene().setCloudHeight(source.getValue());
 			updateCloudHeightField();
 		}
 	};
@@ -1647,7 +1649,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				int value = Integer.parseInt(source.getText());
-				renderManager.scene().setRayDepth(value);
+				renderMan.scene().setRayDepth(value);
 				updateRayDepthField();
 				updateRayDepthSlider();
 			} catch (NumberFormatException ex) {
@@ -1660,7 +1662,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				int value = Integer.parseInt(source.getText());
-				renderManager.scene().setCloudHeight(value);
+				renderMan.scene().setCloudHeight(value);
 				updateCloudHeightSlider();
 			} catch (NumberFormatException ex) {
 			}
@@ -1675,7 +1677,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			double logMin = Math.log10(Scene.MIN_EMITTER_INTENSITY);
 			double logMax = Math.log10(Scene.MAX_EMITTER_INTENSITY);
 			double scale = logMax - logMin;
-			renderManager.scene().setEmitterIntensity(
+			renderMan.scene().setEmitterIntensity(
 					Math.pow(10, value * scale + logMin));
 			updateEmitterIntensityField();
 		}
@@ -1689,7 +1691,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			double logMin = Math.log10(Sun.MIN_INTENSITY);
 			double logMax = Math.log10(Sun.MAX_INTENSITY);
 			double scale = logMax - logMin;
-			renderManager.scene().sun().setIntensity(
+			renderMan.scene().sun().setIntensity(
 					Math.pow(10, value * scale + logMin));
 			updateSunIntensityField();
 		}
@@ -1701,7 +1703,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			double value = (double) (source.getValue() - source.getMinimum())
 					/ (source.getMaximum() - source.getMinimum());
 			double scale = Math.PI * 2;
-			renderManager.scene().sun().setAzimuth(value * scale);
+			renderMan.scene().sun().setAzimuth(value * scale);
 			updateSunAzimuthField();
 		}
 	};
@@ -1712,7 +1714,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			double value = (double) (source.getValue() - source.getMinimum())
 					/ (source.getMaximum() - source.getMinimum());
 			double scale = Math.PI / 2;
-			renderManager.scene().sun().setAltitude(value * scale);
+			renderMan.scene().sun().setAltitude(value * scale);
 			updateSunAltitudeField();
 		}
 	};
@@ -1721,13 +1723,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
 			if (source.getValue() == source.getMaximum()) {
-				renderManager.scene().camera().setInfDof(true);
+				renderMan.scene().camera().setInfDof(true);
 			} else {
-				renderManager.scene().camera().setInfDof(false);
+				renderMan.scene().camera().setInfDof(false);
 				double value = (double) (source.getValue() - source.getMinimum())
 						/ (source.getMaximum() - source.getMinimum());
 				double scale = Camera.MAX_DOF - Camera.MIN_DOF;
-				renderManager.scene().camera().setDof(value * scale + Camera.MIN_DOF);
+				renderMan.scene().camera().setDof(value * scale + Camera.MIN_DOF);
 			}
 			updateDofField();
 		}
@@ -1739,7 +1741,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			double value = (double) (source.getValue() - source.getMinimum())
 					/ (source.getMaximum() - source.getMinimum());
 			double rotation = value * 2 * Math.PI;
-			renderManager.scene().sky().setRotation(rotation);
+			renderMan.scene().sky().setRotation(rotation);
 			ProgramProperties.setProperty("skymapRotation", Double.toString(rotation));
 			updateDofField();
 		}
@@ -1747,7 +1749,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	ChangeListener parallelProjectionListener = new ChangeListener() {
 		@Override
 		public void stateChanged( ChangeEvent e ) {
-			renderManager.scene().camera().setParallelProjection( ((JCheckBox)e.getSource()).isSelected() );
+			renderMan.scene().camera().setParallelProjection( ((JCheckBox)e.getSource()).isSelected() );
 			updateParallelProjectionCheckBox();
 			updateFovField();
 			updateFovSlider();
@@ -1763,7 +1765,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
-			Camera camera = renderManager.scene().camera();
+			Camera camera = renderMan.scene().camera();
 			double value = (double) (source.getValue() - source.getMinimum())
 					/ (source.getMaximum() - source.getMinimum());
 			double scale = camera.getMaxFoV() - Camera.MIN_FOV;
@@ -1780,7 +1782,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			double logMin = Math.log10(Scene.MIN_EXPOSURE);
 			double logMax = Math.log10(Scene.MAX_EXPOSURE);
 			double scale = logMax - logMin;
-			renderManager.scene().setExposure(
+			renderMan.scene().setExposure(
 					Math.pow(10, value * scale + logMin));
 			updateExposureField();
 		}
@@ -1793,7 +1795,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				double value = numberFormat.parse(source.getText()).doubleValue();
 				value = Math.max(value, Scene.MIN_EXPOSURE);
 				value = Math.min(value, Scene.MAX_EXPOSURE);
-				renderManager.scene().setExposure(value);
+				renderMan.scene().setExposure(value);
 				updateExposureSlider();
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
@@ -1806,7 +1808,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				double value = numberFormat.parse(source.getText()).doubleValue();
-				renderManager.scene().sun().setIntensity(value);
+				renderMan.scene().sun().setIntensity(value);
 				updateSunIntensitySlider();
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
@@ -1819,7 +1821,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				double value = numberFormat.parse(source.getText()).doubleValue();
-				renderManager.scene().setEmitterIntensity(value);
+				renderMan.scene().setEmitterIntensity(value);
 				updateEmitterIntensitySlider();
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
@@ -1832,7 +1834,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				double value = numberFormat.parse(source.getText()).doubleValue();
-				renderManager.scene().sun().setAzimuth(QuickMath.degToRad(value));
+				renderMan.scene().sun().setAzimuth(QuickMath.degToRad(value));
 				updateSunAzimuthField();
 				updateSunAzimuthSlider();
 			} catch (NumberFormatException ex) {
@@ -1846,7 +1848,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				double value = numberFormat.parse(source.getText()).doubleValue();
-				renderManager.scene().sun().setAltitude(QuickMath.degToRad(value));
+				renderMan.scene().sun().setAltitude(QuickMath.degToRad(value));
 				updateSunAltitudeField();
 				updateSunAltitudeSlider();
 			} catch (NumberFormatException ex) {
@@ -1861,14 +1863,14 @@ public class RenderControls extends JDialog implements ViewListener,
 			double value = (double) (source.getValue() - source.getMinimum())
 					/ (source.getMaximum() - source.getMinimum());
 			double scale = Camera.MAX_FOCAL_OFFSET - Camera.MIN_FOCAL_OFFSET;
-			renderManager.scene().camera().setFocalOffset(value * scale + Camera.MIN_FOCAL_OFFSET);
+			renderMan.scene().camera().setFocalOffset(value * scale + Camera.MIN_FOCAL_OFFSET);
 			updateFocalOffsetField();
 		}
 	};
 	ActionListener cameraPositionListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			Vector3d pos = new Vector3d(renderManager.scene().camera().getPosition());
+			Vector3d pos = new Vector3d(renderMan.scene().camera().getPosition());
 			try {
 				pos.x = numberFormat.parse(cameraX.getText()).doubleValue();
 			} catch (NumberFormatException ex) {
@@ -1884,15 +1886,15 @@ public class RenderControls extends JDialog implements ViewListener,
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
 			}
-			renderManager.scene().camera().setPosition(pos);
+			renderMan.scene().camera().setPosition(pos);
 			updateCameraPosition();
 		}
 	};
 	ActionListener cameraDirectionListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			double yaw = renderManager.scene().camera().getYaw();
-			double pitch = renderManager.scene().camera().getPitch();
+			double yaw = renderMan.scene().camera().getYaw();
+			double pitch = renderMan.scene().camera().getPitch();
 			try {
 				double value = numberFormat.parse(cameraPitch.getText()).doubleValue();
 				pitch = QuickMath.degToRad(value);
@@ -1904,67 +1906,67 @@ public class RenderControls extends JDialog implements ViewListener,
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
 			}
-			renderManager.scene().camera().setView(yaw, pitch);
+			renderMan.scene().camera().setView(yaw, pitch);
 			updateCameraDirection();
 		}
 	};
 	ActionListener stillWaterListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			renderManager.scene().setStillWater(stillWaterCB.isSelected());
+			renderMan.scene().setStillWater(stillWaterCB.isSelected());
 		}
 	};
 	ActionListener clearWaterListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			renderManager.scene().setClearWater(clearWaterCB.isSelected());
+			renderMan.scene().setClearWater(clearWaterCB.isSelected());
 		}
 	};
 	ActionListener atmosphereListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
-			renderManager.scene().setAtmosphereEnabled(source.isSelected());
+			renderMan.scene().setAtmosphereEnabled(source.isSelected());
 		}
 	};
 	ActionListener volumetricFogListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
-			renderManager.scene().setVolumetricFogEnabled(source.isSelected());
+			renderMan.scene().setVolumetricFogEnabled(source.isSelected());
 		}
 	};
 	ActionListener cloudsEnabledListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
-			renderManager.scene().setCloudsEnabled(source.isSelected());
+			renderMan.scene().setCloudsEnabled(source.isSelected());
 		}
 	};
 	ActionListener mirrorSkyListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
-			renderManager.scene().sky().setMirrored(source.isSelected());
+			renderMan.scene().sky().setMirrored(source.isSelected());
 		}
 	};
 	ActionListener biomeColorsCBListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
-			renderManager.scene().setBiomeColorsEnabled(source.isSelected());
+			renderMan.scene().setBiomeColorsEnabled(source.isSelected());
 		}
 	};
 	ActionListener emittersListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			renderManager.scene().setEmittersEnabled(enableEmitters.isSelected());
+			renderMan.scene().setEmittersEnabled(enableEmitters.isSelected());
 		}
 	};
 	ActionListener directLightListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			renderManager.scene().setDirectLight(directLight.isSelected());
+			renderMan.scene().setDirectLight(directLight.isSelected());
 		}
 	};
 	ActionListener fovFieldListener = new ActionListener() {
@@ -1973,7 +1975,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				double value = numberFormat.parse(source.getText()).doubleValue();
-				renderManager.scene().camera().setFoV(value);
+				renderMan.scene().camera().setFoV(value);
 				updateFovSlider();
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
@@ -1985,13 +1987,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		public void actionPerformed(ActionEvent e) {
 			JTextField source = (JTextField) e.getSource();
 			if (source.getText().equals("inf")) {
-				renderManager.scene().camera().setInfDof(true);
+				renderMan.scene().camera().setInfDof(true);
 			} else {
 				try {
 					double value = numberFormat.parse(source.getText()).doubleValue();
 					value = Math.max(value, Camera.MIN_DOF);
-					renderManager.scene().camera().setInfDof(false);
-					renderManager.scene().camera().setDof(value);
+					renderMan.scene().camera().setInfDof(false);
+					renderMan.scene().camera().setDof(value);
 					updateDofSlider();
 				} catch (NumberFormatException ex) {
 				} catch (ParseException ex) {
@@ -2006,7 +2008,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			try {
 				double value = numberFormat.parse(source.getText()).doubleValue();
 				value = Math.max(value, Camera.MIN_FOCAL_OFFSET);
-				renderManager.scene().camera().setFocalOffset(value);
+				renderMan.scene().camera().setFocalOffset(value);
 				updateFocalOffsetSlider();
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
@@ -2015,7 +2017,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	};
 
 	protected void updateWaterHeight() {
-		int height = renderManager.scene().getWaterHeight();
+		int height = renderMan.scene().getWaterHeight();
 		boolean waterWorld = height > 0;
 		if (waterWorld) {
 			waterHeightField.setText("" + height);
@@ -2026,59 +2028,59 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateCloudHeightSlider() {
 		cloudHeightSlider.removeChangeListener(cloudHeightListener);
-		cloudHeightSlider.setValue(renderManager.scene().getCloudHeight());
+		cloudHeightSlider.setValue(renderMan.scene().getCloudHeight());
 		cloudHeightSlider.addChangeListener(cloudHeightListener);
 	}
 
 	protected void updateRayDepthSlider() {
 		rayDepthSlider.removeChangeListener(rayDepthListener);
-		rayDepthSlider.setValue(renderManager.scene().getRayDepth());
+		rayDepthSlider.setValue(renderMan.scene().getRayDepth());
 		rayDepthSlider.addChangeListener(rayDepthListener);
 	}
 
 	protected void updateCloudHeightField() {
 		cloudHeightField.removeActionListener(cloudHeightFieldListener);
-		cloudHeightField.setText("" + renderManager.scene().getCloudHeight());
+		cloudHeightField.setText("" + renderMan.scene().getCloudHeight());
 		cloudHeightField.addActionListener(cloudHeightFieldListener);
 	}
 
 	protected void updateRayDepthField() {
 		rayDepthField.removeActionListener(rayDepthFieldListener);
-		rayDepthField.setText("" + renderManager.scene().getRayDepth());
+		rayDepthField.setText("" + renderMan.scene().getRayDepth());
 		rayDepthField.addActionListener(rayDepthFieldListener);
 	}
 
 	protected void updateDofField() {
 		dofField.removeActionListener(dofFieldListener);
-		if (renderManager.scene().camera().getInfDof())
+		if (renderMan.scene().camera().getInfDof())
 			dofField.setText("inf");
 		else
-			dofField.setText(String.format("%.2f", renderManager.scene().camera().getDof()));
+			dofField.setText(String.format("%.2f", renderMan.scene().camera().getDof()));
 		dofField.addActionListener(dofFieldListener);
 	}
 
 	protected void updateFocalOffsetField() {
 		focalOffsetField.removeActionListener(focalOffsetFieldListener);
-		focalOffsetField.setText(String.format("%.2f", renderManager.scene().camera().getFocalOffset()));
+		focalOffsetField.setText(String.format("%.2f", renderMan.scene().camera().getFocalOffset()));
 		focalOffsetField.addActionListener(focalOffsetFieldListener);
 	}
 
 	protected void updateFovField() {
 		fovField.removeActionListener(fovFieldListener);
-		fovField.setText(String.format("%.2f", renderManager.scene().camera().getFoV()));
+		fovField.setText(String.format("%.2f", renderMan.scene().camera().getFoV()));
 		fovField.addActionListener(fovFieldListener);
 	}
 
 	protected void updateSkyRotation() {
 		skyRotationSlider.removeChangeListener(skyRotationListener);
 		skyRotationSlider.setValue((int) Math.round(
-				100 * renderManager.scene().sky().getRotation() / (2 * Math.PI)));
+				100 * renderMan.scene().sky().getRotation() / (2 * Math.PI)));
 		skyRotationSlider.addChangeListener(skyRotationListener);
 	}
 
 	protected void updateSunAltitudeSlider() {
 		sunAltitudeSlider.removeChangeListener(sunAltitudeListener);
-		double value = renderManager.scene().sun().getAltitude() / (Math.PI / 2);
+		double value = renderMan.scene().sun().getAltitude() / (Math.PI / 2);
 		double scale = sunAltitudeSlider.getMaximum() - sunAltitudeSlider.getMinimum();
 		sunAltitudeSlider.setValue((int) (value * scale + sunAltitudeSlider.getMinimum()));
 		sunAltitudeSlider.addChangeListener(sunAltitudeListener);
@@ -2088,7 +2090,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		emitterIntensitySlider.removeChangeListener(emitterIntensityListener);
 		double logMin = Math.log10(Scene.MIN_EMITTER_INTENSITY);
 		double logMax = Math.log10(Scene.MAX_EMITTER_INTENSITY);
-		double value = (Math.log10(renderManager.scene().getEmitterIntensity()) -
+		double value = (Math.log10(renderMan.scene().getEmitterIntensity()) -
 				logMin) / (logMax - logMin);
 		double scale = emitterIntensitySlider.getMaximum() -
 				emitterIntensitySlider.getMinimum();
@@ -2100,7 +2102,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		sunIntensitySlider.removeChangeListener(sunIntensityListener);
 		double logMin = Math.log10(Sun.MIN_INTENSITY);
 		double logMax = Math.log10(Sun.MAX_INTENSITY);
-		double value = (Math.log10(renderManager.scene().sun().getIntensity()) -
+		double value = (Math.log10(renderMan.scene().sun().getIntensity()) -
 				logMin) / (logMax - logMin);
 		double scale = sunIntensitySlider.getMaximum() -
 				sunIntensitySlider.getMinimum();
@@ -2110,7 +2112,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateSunAzimuthSlider() {
 		sunAzimuthSlider.removeChangeListener(sunAzimuthListener);
-		double value = renderManager.scene().sun().getAzimuth() / (Math.PI * 2);
+		double value = renderMan.scene().sun().getAzimuth() / (Math.PI * 2);
 		double scale = sunAzimuthSlider.getMaximum() - sunAzimuthSlider.getMinimum();
 		sunAzimuthSlider.setValue((int) (value * scale + sunAzimuthSlider.getMinimum()));
 		sunAzimuthSlider.addChangeListener(sunAzimuthListener);
@@ -2118,10 +2120,10 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateDofSlider() {
 		dofSlider.removeChangeListener(dofListener);
-		if (renderManager.scene().camera().getInfDof()) {
+		if (renderMan.scene().camera().getInfDof()) {
 			dofSlider.setValue(dofSlider.getMaximum());
 		} else {
-			double value = (renderManager.scene().camera().getDof() - Camera.MIN_DOF)
+			double value = (renderMan.scene().camera().getDof() - Camera.MIN_DOF)
 					/ (Camera.MAX_DOF - Camera.MIN_DOF);
 			double scale = dofSlider.getMaximum() - dofSlider.getMinimum();
 			dofSlider.setValue((int) (value * scale + dofSlider.getMinimum()));
@@ -2131,7 +2133,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateFocalOffsetSlider() {
 		focalOffsetSlider.removeChangeListener(focalOffsetListener);
-		double value = (renderManager.scene().camera().getFocalOffset() - Camera.MIN_FOCAL_OFFSET)
+		double value = (renderMan.scene().camera().getFocalOffset() - Camera.MIN_FOCAL_OFFSET)
 				/ (Camera.MAX_FOCAL_OFFSET - Camera.MIN_FOCAL_OFFSET);
 		double scale = focalOffsetSlider.getMaximum() - focalOffsetSlider.getMinimum();
 		focalOffsetSlider.setValue((int) (value * scale + focalOffsetSlider.getMinimum()));
@@ -2140,7 +2142,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateParallelProjectionCheckBox() {
 		parallelProjectionCB.removeChangeListener(parallelProjectionListener);
-		boolean selected = renderManager.scene().camera().isUsingParallelProjection();
+		boolean selected = renderMan.scene().camera().isUsingParallelProjection();
 		parallelProjectionCB.setSelected(selected);
 		dofSlider.setEnabled(!selected);
 		dofField.setEnabled(!selected);
@@ -2157,7 +2159,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateFovSlider() {
 		fovSlider.removeChangeListener(fovListener);
-		Camera camera = renderManager.scene().camera();
+		Camera camera = renderMan.scene().camera();
 		double value = (camera.getFoV() - Camera.MIN_FOV)
 				/ (camera.getMaxFoV() - Camera.MIN_FOV);
 		double scale = fovSlider.getMaximum() - fovSlider.getMinimum();
@@ -2167,33 +2169,33 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateExposureField() {
 		exposureField.removeActionListener(exposureFieldListener);
-		exposureField.setText(String.format("%.2f", renderManager.scene().getExposure()));
+		exposureField.setText(String.format("%.2f", renderMan.scene().getExposure()));
 		exposureField.addActionListener(exposureFieldListener);
 	}
 
 	protected void updateSunAzimuthField() {
 		sunAzimuthField.removeActionListener(sunAzimuthFieldListener);
 		sunAzimuthField.setText(String.format("%.2f",
-				QuickMath.radToDeg(renderManager.scene().sun().getAzimuth())));
+				QuickMath.radToDeg(renderMan.scene().sun().getAzimuth())));
 		sunAzimuthField.addActionListener(sunAzimuthFieldListener);
 	}
 
 	protected void updateSunAltitudeField() {
 		sunAltitudeField.removeActionListener(sunAltitudeFieldListener);
 		sunAltitudeField.setText(String.format("%.2f",
-				QuickMath.radToDeg(renderManager.scene().sun().getAltitude())));
+				QuickMath.radToDeg(renderMan.scene().sun().getAltitude())));
 		sunAltitudeField.addActionListener(sunAltitudeFieldListener);
 	}
 
 	protected void updateSunIntensityField() {
 		sunIntensityField.removeActionListener(sunIntensityFieldListener);
-		sunIntensityField.setText(String.format("%.2f", renderManager.scene().sun().getIntensity()));
+		sunIntensityField.setText(String.format("%.2f", renderMan.scene().sun().getIntensity()));
 		sunIntensityField.addActionListener(sunIntensityFieldListener);
 	}
 
 	protected void updateEmitterIntensityField() {
 		emitterIntensityField.removeActionListener(emitterIntensityFieldListener);
-		emitterIntensityField.setText(String.format("%.2f", renderManager.scene().getEmitterIntensity()));
+		emitterIntensityField.setText(String.format("%.2f", renderMan.scene().getEmitterIntensity()));
 		emitterIntensityField.addActionListener(emitterIntensityFieldListener);
 	}
 
@@ -2201,7 +2203,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		exposureSlider.removeChangeListener(exposureListener);
 		double logMin = Math.log10(Scene.MIN_EXPOSURE);
 		double logMax = Math.log10(Scene.MAX_EXPOSURE);
-		double value = (Math.log10(renderManager.scene().getExposure()) -
+		double value = (Math.log10(renderMan.scene().getExposure()) -
 				logMin) / (logMax - logMin);
 		double scale = exposureSlider.getMaximum() - exposureSlider.getMinimum();
 		exposureSlider.setValue((int) (value * scale + exposureSlider.getMinimum()));
@@ -2209,23 +2211,23 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	protected void updateWidthField() {
-		widthField.setText("" + renderManager.scene().canvasWidth());
+		widthField.setText("" + renderMan.scene().canvasWidth());
 	}
 
 	protected void updateHeightField() {
-		heightField.setText("" + renderManager.scene().canvasHeight());
+		heightField.setText("" + renderMan.scene().canvasHeight());
 	}
 
 	protected void updateSaveDumpsCheckBox() {
 		saveDumpsCB.removeActionListener(saveDumpsListener);
-		saveDumpsCB.setSelected(renderManager.scene().saveDumps());
+		saveDumpsCB.setSelected(renderMan.scene().saveDumps());
 		saveDumpsCB.addActionListener(saveDumpsListener);
 	}
 
 	protected void updateDumpFrequencyField() {
 		dumpFrequency.removeActionListener(dumpFrequencyListener);
-		dumpFrequency.setEnabled(renderManager.scene().saveDumps());
-		int frequency = renderManager.scene().getDumpFrequency();
+		dumpFrequency.setEnabled(renderMan.scene().saveDumps());
+		int frequency = renderMan.scene().getDumpFrequency();
 		dumpFrequency.setSelectedIndex(0);
 		for (int i = 0; i < dumpFrequencies.length; ++i) {
 			if (frequency == dumpFrequencies[i]) {
@@ -2238,18 +2240,18 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateSceneNameField() {
 		sceneNameField.getDocument().removeDocumentListener(sceneNameListener);
-		sceneNameField.setText(renderManager.scene().name());
+		sceneNameField.setText(renderMan.scene().name());
 		sceneNameField.getDocument().addDocumentListener(sceneNameListener);
 	}
 
 	protected void updateSPPTargetField() {
 		sppTargetField.getDocument().removeDocumentListener(sppTargetListener);
-		sppTargetField.setText("" + renderManager.scene().getTargetSPP());
+		sppTargetField.setText("" + renderMan.scene().getTargetSPP());
 		sppTargetField.getDocument().addDocumentListener(sppTargetListener);
 	}
 
 	protected void updatePostprocessCB() {
-		postprocessCB.setSelectedIndex(renderManager.scene().getPostprocess().ordinal());
+		postprocessCB.setSelectedIndex(renderMan.scene().getPostprocess().ordinal());
 	}
 
 	protected void updateCameraPosition() {
@@ -2257,7 +2259,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		cameraY.removeActionListener(cameraPositionListener);
 		cameraZ.removeActionListener(cameraPositionListener);
 
-		Vector3d pos = renderManager.scene().camera().getPosition();
+		Vector3d pos = renderMan.scene().camera().getPosition();
 		cameraX.setText(decimalFormat.format(pos.x));
 		cameraY.setText(decimalFormat.format(pos.y));
 		cameraZ.setText(decimalFormat.format(pos.z));
@@ -2271,10 +2273,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		cameraPitch.removeActionListener(cameraDirectionListener);
 		cameraYaw.removeActionListener(cameraDirectionListener);
 
-		double pitch = QuickMath.radToDeg(renderManager.scene().camera().getPitch());
+		double pitch = QuickMath.radToDeg(renderMan.scene().camera().getPitch());
 		cameraPitch.setText(decimalFormat.format(pitch));
 		cameraYaw.setText(decimalFormat.format(
-				QuickMath.radToDeg(renderManager.scene().camera().getYaw())));
+				QuickMath.radToDeg(renderMan.scene().camera().getYaw())));
 
 		cameraPitch.addActionListener(cameraDirectionListener);
 		cameraYaw.addActionListener(cameraDirectionListener);
@@ -2285,7 +2287,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	 * @param sceneName The name of the scene to load
 	 */
 	public void loadScene(String sceneName) {
-		sceneManager.loadScene(sceneName);
+		sceneMan.loadScene(sceneName);
 	}
 
 	/**
@@ -2298,61 +2300,61 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	@Override
 	public void onStrafeLeft() {
-        renderManager.scene().camera().strafeLeft(
+        renderMan.scene().camera().strafeLeft(
         		chunky.getShiftModifier() ? .1 : 1);
 		updateCameraPosition();
 	}
 
 	@Override
 	public void onStrafeRight() {
-        renderManager.scene().camera().strafeRight(
+        renderMan.scene().camera().strafeRight(
         		chunky.getShiftModifier() ? .1 : 1);
 		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveForward() {
-        renderManager.scene().camera().moveForward(
+        renderMan.scene().camera().moveForward(
         		chunky.getShiftModifier() ? .1 : 1);
 		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveBackward() {
-        renderManager.scene().camera().moveBackward(
+        renderMan.scene().camera().moveBackward(
         		chunky.getShiftModifier() ? .1 : 1);
 		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveForwardFar() {
-	    renderManager.scene().camera().moveForward(100);
+	    renderMan.scene().camera().moveForward(100);
 		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveBackwardFar() {
-        renderManager.scene().camera().moveBackward(100);
+        renderMan.scene().camera().moveBackward(100);
 		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveUp() {
-        renderManager.scene().camera().moveUp(
+        renderMan.scene().camera().moveUp(
         		chunky.getShiftModifier() ? .1 : 1);
 		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveDown() {
-        renderManager.scene().camera().moveDown(
+        renderMan.scene().camera().moveDown(
         		chunky.getShiftModifier() ? .1 : 1);
 		updateCameraPosition();
 	}
 
 	@Override
 	public void onMouseDragged(int dx, int dy) {
-        renderManager.scene().camera().rotateView(
+        renderMan.scene().camera().rotateView(
                 - (Math.PI / 250) * dx,
                 (Math.PI / 250) * dy);
         updateCameraDirection();
@@ -2363,8 +2365,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	 * @param sceneName
 	 */
 	public void setSceneName(String sceneName) {
-		renderManager.scene().setName(sceneName);
-		sceneNameField.setText(renderManager.scene().name());
+		renderMan.scene().setName(sceneName);
+		sceneNameField.setText(renderMan.scene().name());
 		updateTitle();
 	}
 
@@ -2374,7 +2376,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	 * @param chunks
 	 */
 	public void loadChunks(World world, Collection<ChunkPosition> chunks) {
-		sceneManager.loadChunks(world, chunks);
+		sceneMan.loadChunks(world, chunks);
 	}
 
 	/**
@@ -2393,9 +2395,9 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	protected void setCanvasSize(int width, int height) {
-		renderManager.scene().setCanvasSize(width, height);
-		int canvasWidth = renderManager.scene().canvasWidth();
-		int canvasHeight = renderManager.scene().canvasHeight();
+		renderMan.scene().setCanvasSize(width, height);
+		int canvasWidth = renderMan.scene().canvasWidth();
+		int canvasHeight = renderMan.scene().canvasHeight();
 		widthField.setText("" + canvasWidth);
 		heightField.setText("" + canvasHeight);
 		view.setCanvasSize(canvasWidth, canvasHeight);
@@ -2447,8 +2449,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateRayDepthField();
 		updateCameraDirection();
 		updateCameraPosition();
-		enableEmitters.setSelected(renderManager.scene().getEmittersEnabled());
-		directLight.setSelected(renderManager.scene().getDirectLight());
+		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
+		directLight.setSelected(renderMan.scene().getDirectLight());
 		startRenderBtn.setText("RESUME");
 		stopRenderBtn.setEnabled(true);
 
@@ -2520,18 +2522,18 @@ public class RenderControls extends JDialog implements ViewListener,
 	 * Show the 3D view window
 	 */
 	public void show3DView() {
-		view.setCanvasSize(renderManager.scene().canvasWidth(),
-				renderManager.scene().canvasHeight());
+		view.setCanvasSize(renderMan.scene().canvasWidth(),
+				renderMan.scene().canvasHeight());
 		view.displayRightOf(this);
 	}
 
 	@Override
 	public void onZoom(int diff) {
-		Camera camera = renderManager.scene().camera();
-		double value = renderManager.scene().camera().getFoV();
+		Camera camera = renderMan.scene().camera();
+		double value = renderMan.scene().camera().getFoV();
 		double scale = camera.getMaxFoV() - Camera.MIN_FOV;
 		value = value + diff * scale/20;
-		renderManager.scene().camera().setFoV(value);
+		renderMan.scene().camera().setFoV(value);
 		updateFovField();
 		updateFovSlider();
 	}
