@@ -62,6 +62,38 @@ public class TexturedBlockModel {
 	}
 
 	/**
+	 * @param ray
+	 * @param texture
+	 * @param index
+	 * @return <code>true</code> if the ray intersected the block
+	 */
+	public static boolean intersect(Ray ray, Texture[] texture, int[] index) {
+		ray.t = Double.POSITIVE_INFINITY;
+		if (block.intersect(ray)) {
+			float[] color;
+			if (ray.n.z < 0)
+				color = texture[index[0]].getColor(ray.u, ray.v);
+			else if (ray.n.z > 0)
+				color = texture[index[1]].getColor(ray.u, ray.v);
+			else if (ray.n.x > 0)
+				color = texture[index[2]].getColor(1 - ray.u, ray.v);
+			else if (ray.n.x < 0)
+				color = texture[index[3]].getColor(1 - ray.u, ray.v);
+			else if (ray.n.y > 0)
+				color = texture[index[4]].getColor(ray.u, ray.v);
+			else
+				color = texture[index[5]].getColor(ray.u, ray.v);
+
+			if (color[3] > Ray.EPSILON) {
+				ray.color.set(color);
+				ray.distance += ray.tNear;
+				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
+				return true;
+			}
+		}
+		return false;
+	}
+	/**
 	 * Find intersection between ray and block
 	 * @param ray
 	 * @param texture Block texture

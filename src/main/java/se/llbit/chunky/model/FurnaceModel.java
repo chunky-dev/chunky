@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -17,10 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Quad;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
 
 /**
  * Furnaces, chests, dispensers
@@ -28,78 +25,29 @@ import se.llbit.math.Vector4d;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class FurnaceModel {
-	protected static Quad[][] sides = {
-		{}, {},
+	private static final int texindices[][] = {
+		// undirectional
+		{ 2, 2, 2, 2, 4, 5 },
+
+		// undirectional
+		{ 2, 2, 2, 2, 4, 5 },
 
 		// facing north
-		{
-			// north
-			new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
-					new Vector3d(1, 1, 0), new Vector4d(1, 0, 0, 1)),
-
-			// south
-			new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
-					new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
-
-			// west
-			new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
-					new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
-
-			// east
-			new Quad(new Vector3d(1, 0, 1), new Vector3d(1, 0, 0),
-					new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, 1)),
-
-			// top
-			new Quad(new Vector3d(1, 1, 0), new Vector3d(0, 1, 0),
-					new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, 1)),
-
-			// bottom
-			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
-					new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
-		},
+		{ 0, 1, 2, 2, 4, 5 },
 
 		// facing south
-		{},
+		{ 1, 0, 2, 2, 4, 5 },
 
-		//facing west
-		{},
+		// facing west
+		{ 2, 2, 1, 0, 4, 5 },
 
 		// facing east
-		{},
+		{ 2, 2, 0, 1, 4, 5 },
 	};
-
-	static {
-		rotateFaceY(2, 5);
-		rotateFaceY(5, 3);
-		rotateFaceY(3, 4);
-	}
-
-	private static void rotateFaceY(int i, int j) {
-		sides[j] = new Quad[sides[i].length];
-		for (int k = 0; k < sides[i].length; ++k) {
-			sides[j][k] = sides[i][k].getYRotated();
-		}
-	}
 
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray, Texture[] texture) {
-		boolean hit = false;
-		Quad[] rot = sides[ray.getBlockData() % 6];
-		ray.t = Double.POSITIVE_INFINITY;
-		for (int i = 0; i < rot.length; ++i) {
-			Quad side = rot[i];
-			if (side.intersect(ray)) {
-				texture[i].getColor(ray);
-				ray.n.set(side.n);
-				ray.t = ray.tNear;
-				hit = true;
-			}
-		}
-		if (hit) {
-			ray.color.w = 1;
-			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d, ray.x);
-		}
-		return hit;
+		int rot = ray.getBlockData() % 6;
+		return TexturedBlockModel.intersect(ray, texture, texindices[rot]);
 	}
 }
