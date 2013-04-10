@@ -123,8 +123,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JButton saveFrameBtn = new JButton();
 	private final JCheckBox stillWaterCB = new JCheckBox();
 	private final JTextField sceneNameField = new JTextField();
-	private final JTextField rayDepthField = new JTextField();
-	private final JSlider rayDepthSlider = new JSlider();
 	private final JLabel sceneNameLbl = new JLabel();
 	private final JCheckBox biomeColorsCB = new JCheckBox();
 	private final JButton stopRenderBtn = new JButton();
@@ -163,6 +161,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JTextField cameraZ = new JTextField();
 	private final JTextField cameraYaw = new JTextField();
 	private final JTextField cameraPitch = new JTextField();
+
+	private Adjuster rayDepth;
 
 	/**
 	 * Create a new Render Controls dialog.
@@ -399,15 +399,15 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	private Component buildAdvancedPane() {
-		JLabel rayDepthLbl = new JLabel("Ray depth: ");
-		rayDepthField.setColumns(5);
-		rayDepthField.addActionListener(rayDepthFieldListener);
-		updateRayDepthField();
-
-		rayDepthSlider.setMinimum(1);
-		rayDepthSlider.setMaximum(25);
-		rayDepthSlider.addChangeListener(rayDepthListener);
-		updateRayDepthSlider();
+		rayDepth = new Adjuster("Ray depth",
+				"Sets the recursive ray depth",
+				1, 25) {
+			@Override
+			public void valueChanged(double newValue) {
+				renderMan.scene().setRayDepth((int) newValue);
+			}
+		};
+		updateRayDepth();
 
 		JSeparator sep1 = new JSeparator();
 		JSeparator sep2 = new JSeparator();
@@ -477,11 +477,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		layout.setHorizontalGroup(layout.createSequentialGroup()
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(rayDepthLbl)
-					.addComponent(rayDepthSlider)
-					.addComponent(rayDepthField)
-				)
+				.addGroup(rayDepth.horizontalGroup(layout))
 				.addComponent(sep1)
 				.addComponent(waterWorldLbl)
 				.addComponent(waterWorldCB)
@@ -497,11 +493,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
-				.addComponent(rayDepthLbl)
-				.addComponent(rayDepthSlider)
-				.addComponent(rayDepthField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-			)
+			.addGroup(rayDepth.verticalGroup(layout))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -1627,33 +1619,12 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	ChangeListener rayDepthListener = new ChangeListener() {
-		@Override
-		public void stateChanged(ChangeEvent e) {
-			JSlider source = (JSlider) e.getSource();
-			renderMan.scene().setRayDepth(source.getValue());
-			updateRayDepthField();
-		}
-	};
 	ChangeListener cloudHeightListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
 			renderMan.scene().setCloudHeight(source.getValue());
 			updateCloudHeightField();
-		}
-	};
-	ActionListener rayDepthFieldListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JTextField source = (JTextField) e.getSource();
-			try {
-				int value = Integer.parseInt(source.getText());
-				renderMan.scene().setRayDepth(value);
-				updateRayDepthField();
-				updateRayDepthSlider();
-			} catch (NumberFormatException ex) {
-			}
 		}
 	};
 	ActionListener cloudHeightFieldListener = new ActionListener() {
@@ -2032,22 +2003,14 @@ public class RenderControls extends JDialog implements ViewListener,
 		cloudHeightSlider.addChangeListener(cloudHeightListener);
 	}
 
-	protected void updateRayDepthSlider() {
-		rayDepthSlider.removeChangeListener(rayDepthListener);
-		rayDepthSlider.setValue(renderMan.scene().getRayDepth());
-		rayDepthSlider.addChangeListener(rayDepthListener);
-	}
-
 	protected void updateCloudHeightField() {
 		cloudHeightField.removeActionListener(cloudHeightFieldListener);
 		cloudHeightField.setText("" + renderMan.scene().getCloudHeight());
 		cloudHeightField.addActionListener(cloudHeightFieldListener);
 	}
 
-	protected void updateRayDepthField() {
-		rayDepthField.removeActionListener(rayDepthFieldListener);
-		rayDepthField.setText("" + renderMan.scene().getRayDepth());
-		rayDepthField.addActionListener(rayDepthFieldListener);
+	protected void updateRayDepth() {
+		rayDepth.set(renderMan.scene().getRayDepth());
 	}
 
 	protected void updateDofField() {
@@ -2445,8 +2408,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updatePostprocessCB();
 		updateCloudHeightSlider();
 		updateCloudHeightField();
-		updateRayDepthSlider();
-		updateRayDepthField();
+		updateRayDepth();
 		updateCameraDirection();
 		updateCameraPosition();
 		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
