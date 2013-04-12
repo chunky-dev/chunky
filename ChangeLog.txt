@@ -1,4 +1,5 @@
 1.1.9 - TBD
+    * Add suffix to scene name to avoid scene name collisions
     * Fixed undirectional furnaces being invisible
     * Fixed error causing double wooden slabs to render as single slabs
 

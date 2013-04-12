@@ -187,6 +187,29 @@ public class SceneManager extends Thread {
 	}
 
 	/**
+ 	 * Find a preferred scene name by attempting to avoid name collisions
+ 	 * @param name
+ 	 * @return the preferred scene name
+ 	 */
+	public static String preferredSceneName(RenderContext context, String name) {
+		String suffix = "";
+		int count = 0;
+		do {
+			String targetName = name + suffix;
+			File targetFile = new File(
+					context.getSceneDirectory(),
+					targetName + ".cvf");
+			if (!targetFile.exists()) {
+				return targetName;
+			}
+			count += 1;
+			suffix = ""+count;
+		} while (count < 256);
+		// give up
+		return name;
+	}
+
+	/**
 	 * Lets the user decide whether or not to overwrite existing scenes
 	 * @param context
 	 * @param sceneName

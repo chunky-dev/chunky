@@ -65,7 +65,7 @@ public class NewSceneDialog extends JDialog {
 
 		JLabel lbl = new JLabel("Enter name for the new 3D scene:");
 		final JTextField sceneNameField = new JTextField(20);
-		sceneNameField.setText(defaultSceneName);
+		sceneNameField.setText(SceneManager.preferredSceneName(context, defaultSceneName));
 		sceneNameField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
