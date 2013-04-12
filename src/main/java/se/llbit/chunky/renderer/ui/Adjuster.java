@@ -19,6 +19,9 @@ package se.llbit.chunky.renderer.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JLabel;
@@ -40,6 +43,12 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	private final double min;
 	private final double max;
 	private final boolean integerMode;
+
+	/**
+	 * Number format for current locale.
+	 */
+	private static final NumberFormat numberFormat =
+			NumberFormat.getInstance();
 
 	/**
 	 * Create new double value adjuster
@@ -105,9 +114,19 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-
+		JTextField source = (JTextField) e.getSource();
+		try {
+			double value = numberFormat.parse(source.getText()).doubleValue();
+			value = Math.max(value, min);
+			value = Math.min(value, max);
+			setSlider(value);
+			valueChanged(value);
+		} catch (NumberFormatException ex) {
+		} catch (ParseException ex) {
+			// TODO warn user that the value was not updated
+		}
 	}
+
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		JSlider source = (JSlider) e.getSource();
@@ -122,14 +141,22 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	 * @param value
 	 */
 	public void set(double value) {
+		setSlider(value);
+		setTextField(value);
+	}
+
+	private void setSlider(double value) {
 		slider.removeChangeListener(this);
 		double scale = (slider.getMaximum() - slider.getMinimum()) / (max - min);
 		int sliderValue = (int) ((value - min) * scale + 0.5 + slider.getMinimum());
 		slider.setValue(sliderValue);
 		slider.addChangeListener(this);
-		setTextField(value);
 	}
 
+	/**
+ 	 * Update the text field
+ 	 * @param value new value
+ 	 */
 	private void setTextField(double value) {
 		textField.removeActionListener(this);
 		if (integerMode) {
