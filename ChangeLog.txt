@@ -1,4 +1,5 @@
 1.1.9 - TBD
+    * Disabled painting of slider values above slider knob in GTK/Snyth L&F
     * Add suffix to scene name to avoid scene name collisions
     * Removed need to pick scene name if scene name collision can be
 	automatically avoided

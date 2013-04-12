@@ -300,6 +300,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		try {
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				UIManager.put("Slider.paintValue", Boolean.FALSE);
 			} catch (Exception e) {
 				logger.warn("Failed to set native Look and Feel");
 			}
