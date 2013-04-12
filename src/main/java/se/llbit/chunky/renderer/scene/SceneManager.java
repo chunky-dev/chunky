@@ -196,10 +196,7 @@ public class SceneManager extends Thread {
 		int count = 0;
 		do {
 			String targetName = name + suffix;
-			File targetFile = new File(
-					context.getSceneDirectory(),
-					targetName + ".cvf");
-			if (!targetFile.exists()) {
+			if (sceneNameAvailable(context, targetName)) {
 				return targetName;
 			}
 			count += 1;
@@ -210,41 +207,54 @@ public class SceneManager extends Thread {
 	}
 
 	/**
-	 * Lets the user decide whether or not to overwrite existing scenes
+	 * Lets the user decide whether or not to overwrite an existing scene, in case of
+	 * scene name collision
 	 * @param context
 	 * @param sceneName
 	 * @return <code>true</code> if the user accepts a possible overwrite of an existing scene
 	 */
 	public static boolean acceptSceneName(RenderContext context, String sceneName) {
+		if (sceneNameAvailable(context, sceneName)) {
+			return true;
+		}
+
 		File targetFile = new File(
 				context.getSceneDirectory(),
 				sceneName + ".cvf");
 
-		if (targetFile.exists()) {
-
-			if (targetFile.isDirectory()) {
-				logger.warn(String.format("Can not create a scene with the name %s.\n" +
-						"A directory with that name already exists!", sceneName));
-				return false;
-			}
-			Object[] options = { Messages.getString("Chunky.Cancel_lbl"), //$NON-NLS-1$
-					Messages.getString("Chunky.AcceptOverwrite_lbl") }; //$NON-NLS-1$
-			int n = JOptionPane.showOptionDialog(null,
-					String.format("A scene already exists with the name %s. " +
-							"Are you sure you want to overwrite this scene?",
-							targetFile.getName()),
-					"Confirm Scene Overwrite",
-					JOptionPane.YES_NO_OPTION,
-					JOptionPane.WARNING_MESSAGE,
-					null,
-					options,
-					options[0]);
-
-			return n == 1;
-
-		} else {
-
-			return true;
+		if (targetFile.isDirectory()) {
+			logger.warn(String.format("Can not create a scene with the name %s.\n" +
+					"A directory with that name already exists!", sceneName));
+			return false;
 		}
+		Object[] options = { Messages.getString("Chunky.Cancel_lbl"), //$NON-NLS-1$
+				Messages.getString("Chunky.AcceptOverwrite_lbl") }; //$NON-NLS-1$
+		int n = JOptionPane.showOptionDialog(null,
+				String.format("A scene already exists with the name %s. " +
+						"Are you sure you want to overwrite this scene?",
+						targetFile.getName()),
+				"Confirm Scene Overwrite",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE,
+				null,
+				options,
+				options[0]);
+
+		return n == 1;
+	}
+
+	/**
+	 * Check for scene name collision
+	 * @param context
+	 * @param sceneName
+	 * @return <code>true</code> if the scene name does not collide with an
+	 * already existing scene
+	 */
+	public static boolean sceneNameAvailable(RenderContext context, String sceneName) {
+		File targetFile = new File(
+				context.getSceneDirectory(),
+				sceneName + ".cvf");
+
+		return !targetFile.exists();
 	}
 }

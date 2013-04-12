@@ -36,6 +36,7 @@ import se.llbit.chunky.renderer.PlaceholderRenderCanvas;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.SceneLoadingError;
+import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.ui.BenchmarkDialog;
 import se.llbit.chunky.renderer.ui.CLDeviceSelector;
 import se.llbit.chunky.renderer.ui.NewSceneDialog;
@@ -501,20 +502,33 @@ public class Chunky implements ChunkDiscoveryListener {
 			RenderContext context = new RenderContext(sceneDir,
 					getControls().getNumThreads(), tileWidth);
 			if (sceneDir != null) {
-				NewSceneDialog dialog = new NewSceneDialog(getFrame(),
-						context, world.levelName());
-				dialog.setVisible(true);
-				if (dialog.isAccepted()) {
-					renderControls = new RenderControls(Chunky.this, context);
-					renderControls.setSceneName(dialog.getSceneName());
-					Collection<ChunkPosition> selection =
-							chunkSelection.getSelection();
-					if (!selection.isEmpty())
-						renderControls.loadChunks(world, selection);
-					else
-						renderControls.show3DView();
+				String name = world.levelName();
+				String preferredName = SceneManager.preferredSceneName(
+														context, name);
+
+				if (SceneManager.sceneNameAvailable(context, preferredName)) {
+					create3DScene(context, preferredName);
+				} else {
+					NewSceneDialog dialog = new NewSceneDialog(getFrame(),
+							context, world.levelName());
+					dialog.setVisible(true);
+					if (dialog.isAccepted()) {
+						create3DScene(context, dialog.getSceneName());
+					}
 				}
 			}
+		}
+	}
+
+	private void create3DScene(RenderContext context, String sceneName) {
+		renderControls = new RenderControls(Chunky.this, context);
+		renderControls.setSceneName(sceneName);
+		Collection<ChunkPosition> selection =
+				chunkSelection.getSelection();
+		if (!selection.isEmpty()) {
+			renderControls.loadChunks(world, selection);
+		} else {
+			renderControls.show3DView();
 		}
 	}
 
