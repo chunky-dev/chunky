@@ -1483,7 +1483,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		setTitle("Render Controls - " + renderMan.scene().name());
 	}
 
-	ActionListener dumpFrequencyListener = new ActionListener() {
+	private final ActionListener dumpFrequencyListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
@@ -1497,7 +1497,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
-	ActionListener saveDumpsListener = new ActionListener() {
+	private final ActionListener saveDumpsListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			boolean enabled = saveDumpsCB.isSelected();
@@ -1506,7 +1506,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
-	ActionListener canvasSizeListener = new ActionListener() {
+	private final ActionListener canvasSizeListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
@@ -1519,7 +1519,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
-	DocumentListener sceneNameListener = new DocumentListener() {
+	private final DocumentListener sceneNameListener = new DocumentListener() {
 		@Override
 		public void removeUpdate(DocumentEvent e) {
 			updateName(e);
@@ -1543,7 +1543,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
-	DocumentListener sppTargetListener = new DocumentListener() {
+	private final DocumentListener sppTargetListener = new DocumentListener() {
 		@Override
 		public void removeUpdate(DocumentEvent e) {
 			updateName(e);
@@ -1569,25 +1569,25 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
-	ActionListener saveSceneListener = new ActionListener() {
+	private final ActionListener saveSceneListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			sceneMan.saveScene(sceneNameField.getText());
 		}
 	};
-	ActionListener saveFrameListener = new ActionListener() {
+	private final ActionListener saveFrameListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			renderMan.saveFrame(RenderControls.this);
 		}
 	};
-	ActionListener loadSceneListener = new ActionListener() {
+	private final ActionListener loadSceneListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			new SceneSelector(RenderControls.this, context);
 		}
 	};
-	ActionListener loadSkymapListener = new ActionListener() {
+	private final ActionListener loadSkymapListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			CenteredFileDialog fileDialog =
@@ -1608,7 +1608,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	ChangeListener emitterIntensityListener = new ChangeListener() {
+	private final ChangeListener emitterIntensityListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
@@ -1622,7 +1622,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateEmitterIntensityField();
 		}
 	};
-	ChangeListener sunIntensityListener = new ChangeListener() {
+	private final ChangeListener sunIntensityListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
@@ -1636,7 +1636,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateSunIntensityField();
 		}
 	};
-	ChangeListener sunAzimuthListener = new ChangeListener() {
+	private final ChangeListener sunAzimuthListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
@@ -1647,7 +1647,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateSunAzimuthField();
 		}
 	};
-	ChangeListener sunAltitudeListener = new ChangeListener() {
+	private final ChangeListener sunAltitudeListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
@@ -1658,7 +1658,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateSunAltitudeField();
 		}
 	};
-	ChangeListener dofListener = new ChangeListener() {
+	private final ChangeListener dofListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
@@ -1674,7 +1674,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateDofField();
 		}
 	};
-	ChangeListener skyRotationListener = new ChangeListener() {
+	private final ChangeListener skyRotationListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
@@ -1686,7 +1686,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateDofField();
 		}
 	};
-	ChangeListener parallelProjectionListener = new ChangeListener() {
+	private final ChangeListener parallelProjectionListener = new ChangeListener() {
 		@Override
 		public void stateChanged( ChangeEvent e ) {
 			renderMan.scene().camera().setParallelProjection( ((JCheckBox)e.getSource()).isSelected() );
@@ -1695,13 +1695,13 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateFovSlider();
 		}
 	};
-	ActionListener skyModeListener = new ActionListener() {
+	private final ActionListener skyModeListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
 		}
 	};
-	ChangeListener fovListener = new ChangeListener() {
+	private final ChangeListener fovListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
@@ -1713,7 +1713,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateFovField();
 		}
 	};
-	ChangeListener exposureListener = new ChangeListener() {
+	private final ChangeListener exposureListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
@@ -1727,7 +1727,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateExposureField();
 		}
 	};
-	ActionListener exposureFieldListener = new ActionListener() {
+	private final ActionListener exposureFieldListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JTextField source = (JTextField) e.getSource();
@@ -1742,7 +1742,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	ActionListener sunIntensityFieldListener = new ActionListener() {
+	private final ActionListener sunIntensityFieldListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JTextField source = (JTextField) e.getSource();
@@ -1755,7 +1755,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	ActionListener emitterIntensityFieldListener = new ActionListener() {
+	private final ActionListener emitterIntensityFieldListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JTextField source = (JTextField) e.getSource();
@@ -1768,7 +1768,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	ActionListener sunAzimuthFieldListener = new ActionListener() {
+	private final ActionListener sunAzimuthFieldListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JTextField source = (JTextField) e.getSource();
@@ -1782,7 +1782,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	ActionListener sunAltitudeFieldListener = new ActionListener() {
+	private final ActionListener sunAltitudeFieldListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JTextField source = (JTextField) e.getSource();
@@ -1796,7 +1796,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	ChangeListener focalOffsetListener = new ChangeListener() {
+	private final ChangeListener focalOffsetListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider) e.getSource();
@@ -1807,7 +1807,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateFocalOffsetField();
 		}
 	};
-	ActionListener cameraPositionListener = new ActionListener() {
+	private final ActionListener cameraPositionListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Vector3d pos = new Vector3d(renderMan.scene().camera().getPosition());
@@ -1830,7 +1830,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateCameraPosition();
 		}
 	};
-	ActionListener cameraDirectionListener = new ActionListener() {
+	private final ActionListener cameraDirectionListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			double yaw = renderMan.scene().camera().getYaw();
@@ -1850,66 +1850,66 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateCameraDirection();
 		}
 	};
-	ActionListener stillWaterListener = new ActionListener() {
+	private final ActionListener stillWaterListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			renderMan.scene().setStillWater(stillWaterCB.isSelected());
 		}
 	};
-	ActionListener clearWaterListener = new ActionListener() {
+	private final ActionListener clearWaterListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			renderMan.scene().setClearWater(clearWaterCB.isSelected());
 		}
 	};
-	ActionListener atmosphereListener = new ActionListener() {
+	private final ActionListener atmosphereListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
 			renderMan.scene().setAtmosphereEnabled(source.isSelected());
 		}
 	};
-	ActionListener volumetricFogListener = new ActionListener() {
+	private final ActionListener volumetricFogListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
 			renderMan.scene().setVolumetricFogEnabled(source.isSelected());
 		}
 	};
-	ActionListener cloudsEnabledListener = new ActionListener() {
+	private final ActionListener cloudsEnabledListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
 			renderMan.scene().setCloudsEnabled(source.isSelected());
 		}
 	};
-	ActionListener mirrorSkyListener = new ActionListener() {
+	private final ActionListener mirrorSkyListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
 			renderMan.scene().sky().setMirrored(source.isSelected());
 		}
 	};
-	ActionListener biomeColorsCBListener = new ActionListener() {
+	private final ActionListener biomeColorsCBListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
 			renderMan.scene().setBiomeColorsEnabled(source.isSelected());
 		}
 	};
-	ActionListener emittersListener = new ActionListener() {
+	private final ActionListener emittersListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			renderMan.scene().setEmittersEnabled(enableEmitters.isSelected());
 		}
 	};
-	ActionListener directLightListener = new ActionListener() {
+	private final ActionListener directLightListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			renderMan.scene().setDirectLight(directLight.isSelected());
 		}
 	};
-	ActionListener fovFieldListener = new ActionListener() {
+	private final ActionListener fovFieldListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JTextField source = (JTextField) e.getSource();
@@ -1922,7 +1922,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	ActionListener dofFieldListener = new ActionListener() {
+	private final ActionListener dofFieldListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JTextField source = (JTextField) e.getSource();
@@ -1941,7 +1941,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	ActionListener focalOffsetFieldListener = new ActionListener() {
+	private final ActionListener focalOffsetFieldListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JTextField source = (JTextField) e.getSource();
