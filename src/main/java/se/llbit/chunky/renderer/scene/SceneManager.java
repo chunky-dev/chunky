@@ -188,6 +188,7 @@ public class SceneManager extends Thread {
 
 	/**
  	 * Find a preferred scene name by attempting to avoid name collisions
+	 * @param context
  	 * @param name
  	 * @return the preferred scene name
  	 */
