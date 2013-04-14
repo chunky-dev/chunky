@@ -42,6 +42,10 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	private final double min;
 	private final double max;
 	private final boolean integerMode;
+
+	/**
+	 * logarithmic slider
+	 */
 	private boolean logarithmic = false;
 
 	/**
@@ -60,7 +64,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	public Adjuster(String label, String tip, double min, double max) {
 		this.min = min;
 		this.max = max;
-		lbl = new JLabel(label);
+		lbl = new JLabel(label + ":");
 		slider = new JSlider(1, 100);
 		slider.setToolTipText(tip);
 		slider.addChangeListener(this);
