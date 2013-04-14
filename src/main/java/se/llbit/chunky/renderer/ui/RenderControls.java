@@ -129,8 +129,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox clearWaterCB = new JCheckBox();
 	private final JSlider sunIntensitySlider = new JSlider();
 	private final JTextField sunIntensityField = new JTextField();
-	private final JSlider emitterIntensitySlider = new JSlider();
-	private final JTextField emitterIntensityField = new JTextField();
 	private final JCheckBox atmosphereEnabled = new JCheckBox();
 	private final JCheckBox volumetricFogEnabled = new JCheckBox();
 	private final JCheckBox cloudsEnabled = new JCheckBox();
@@ -162,6 +160,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	private Adjuster rayDepth;
 	private Adjuster cloudHeight;
+	private Adjuster emitterIntensity;
 
 	/**
 	 * Create a new Render Controls dialog.
@@ -816,11 +815,17 @@ public class RenderControls extends JDialog implements ViewListener,
 		JLabel sunAzimuthLbl = new JLabel("Sun azimuth: ");
 		JLabel sunAltitudeLbl = new JLabel("Sun altitude: ");
 
-		JLabel emitterIntensityLbl = new JLabel("Emitter intensity: ");
-		emitterIntensitySlider.setMinimum(1);
-		emitterIntensitySlider.setMaximum(100);
-		emitterIntensitySlider.addChangeListener(emitterIntensityListener);
-		updateEmitterIntensitySlider();
+		emitterIntensity = new Adjuster("Emitter intensity",
+				"The light intensity modifier for emitters",
+				Scene.MIN_EMITTER_INTENSITY,
+				Scene.MAX_EMITTER_INTENSITY) {
+			@Override
+			public void valueChanged(double newValue) {
+				renderMan.scene().setEmitterIntensity((int) newValue);
+			}
+		};
+		emitterIntensity.setLogarithmicMode(true);
+		updateEmitterIntensity();
 
 		JLabel sunIntensityLbl = new JLabel("Sun intensity: ");
 		sunIntensitySlider.setMinimum(1);
@@ -831,10 +836,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		sunIntensityField.setColumns(5);
 		sunIntensityField.addActionListener(sunIntensityFieldListener);
 		updateSunIntensityField();
-
-		emitterIntensityField.setColumns(5);
-		emitterIntensityField.addActionListener(emitterIntensityFieldListener);
-		updateEmitterIntensityField();
 
 		sunAzimuthSlider.setMinimum(0);
 		sunAzimuthSlider.setMaximum(100);
@@ -864,19 +865,19 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(enableEmitters)
 				.addGroup(layout.createSequentialGroup()
 					.addGroup(layout.createParallelGroup()
-						.addComponent(emitterIntensityLbl)
+						.addComponent(emitterIntensity.getLabel())
 						.addComponent(sunIntensityLbl)
 						.addComponent(sunAzimuthLbl)
 						.addComponent(sunAltitudeLbl)
 					)
 					.addGroup(layout.createParallelGroup()
-						.addComponent(emitterIntensitySlider)
+						.addComponent(emitterIntensity.getSlider())
 						.addComponent(sunIntensitySlider)
 						.addComponent(sunAzimuthSlider)
 						.addComponent(sunAltitudeSlider)
 					)
 					.addGroup(layout.createParallelGroup()
-						.addComponent(emitterIntensityField)
+						.addComponent(emitterIntensity.getField())
 						.addComponent(sunIntensityField)
 						.addComponent(sunAzimuthField)
 						.addComponent(sunAltitudeField)
@@ -890,11 +891,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addContainerGap()
 			.addComponent(enableEmitters)
 			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(emitterIntensityLbl)
-				.addComponent(emitterIntensitySlider)
-				.addComponent(emitterIntensityField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-			)
+			.addGroup(emitterIntensity.verticalGroup(layout))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(directLight)
 			.addPreferredGap(ComponentPlacement.RELATED)
@@ -1608,20 +1605,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	private final ChangeListener emitterIntensityListener = new ChangeListener() {
-		@Override
-		public void stateChanged(ChangeEvent e) {
-			JSlider source = (JSlider) e.getSource();
-			double value = (double) (source.getValue() - source.getMinimum())
-					/ (source.getMaximum() - source.getMinimum());
-			double logMin = Math.log10(Scene.MIN_EMITTER_INTENSITY);
-			double logMax = Math.log10(Scene.MAX_EMITTER_INTENSITY);
-			double scale = logMax - logMin;
-			renderMan.scene().setEmitterIntensity(
-					Math.pow(10, value * scale + logMin));
-			updateEmitterIntensityField();
-		}
-	};
 	private final ChangeListener sunIntensityListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
@@ -1750,19 +1733,6 @@ public class RenderControls extends JDialog implements ViewListener,
 				double value = numberFormat.parse(source.getText()).doubleValue();
 				renderMan.scene().sun().setIntensity(value);
 				updateSunIntensitySlider();
-			} catch (NumberFormatException ex) {
-			} catch (ParseException ex) {
-			}
-		}
-	};
-	private final ActionListener emitterIntensityFieldListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JTextField source = (JTextField) e.getSource();
-			try {
-				double value = numberFormat.parse(source.getText()).doubleValue();
-				renderMan.scene().setEmitterIntensity(value);
-				updateEmitterIntensitySlider();
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
 			}
@@ -2010,18 +1980,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		sunAltitudeSlider.addChangeListener(sunAltitudeListener);
 	}
 
-	protected void updateEmitterIntensitySlider() {
-		emitterIntensitySlider.removeChangeListener(emitterIntensityListener);
-		double logMin = Math.log10(Scene.MIN_EMITTER_INTENSITY);
-		double logMax = Math.log10(Scene.MAX_EMITTER_INTENSITY);
-		double value = (Math.log10(renderMan.scene().getEmitterIntensity()) -
-				logMin) / (logMax - logMin);
-		double scale = emitterIntensitySlider.getMaximum() -
-				emitterIntensitySlider.getMinimum();
-		emitterIntensitySlider.setValue((int) (value * scale + emitterIntensitySlider.getMinimum()));
-		emitterIntensitySlider.addChangeListener(emitterIntensityListener);
-	}
-
 	protected void updateSunIntensitySlider() {
 		sunIntensitySlider.removeChangeListener(sunIntensityListener);
 		double logMin = Math.log10(Sun.MIN_INTENSITY);
@@ -2117,10 +2075,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		sunIntensityField.addActionListener(sunIntensityFieldListener);
 	}
 
-	protected void updateEmitterIntensityField() {
-		emitterIntensityField.removeActionListener(emitterIntensityFieldListener);
-		emitterIntensityField.setText(String.format("%.2f", renderMan.scene().getEmitterIntensity()));
-		emitterIntensityField.addActionListener(emitterIntensityFieldListener);
+	protected void updateEmitterIntensity() {
+		emitterIntensity.set(renderMan.scene().getEmitterIntensity());
 	}
 
 	protected void updateExposureSlider() {
@@ -2343,8 +2299,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateFocalOffsetSlider();
 		updateWidthField();
 		updateHeightField();
-		updateEmitterIntensitySlider();
-		updateEmitterIntensityField();
+		updateEmitterIntensity();
 		updateSunIntensitySlider();
 		updateSunIntensityField();
 		updateSunAzimuthSlider();
