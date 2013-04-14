@@ -134,8 +134,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox atmosphereEnabled = new JCheckBox();
 	private final JCheckBox volumetricFogEnabled = new JCheckBox();
 	private final JCheckBox cloudsEnabled = new JCheckBox();
-	private final JSlider cloudHeightSlider = new JSlider();
-	private final JTextField cloudHeightField = new JTextField();
 	private final JSlider exposureSlider = new JSlider();
 	private final JTextField exposureField = new JTextField();
 	private final RenderContext context;
@@ -163,6 +161,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JTextField cameraPitch = new JTextField();
 
 	private Adjuster rayDepth;
+	private Adjuster cloudHeight;
 
 	/**
 	 * Create a new Render Controls dialog.
@@ -985,16 +984,14 @@ public class RenderControls extends JDialog implements ViewListener,
 		cloudsEnabled.addActionListener(cloudsEnabledListener);
 		updateCloudsEnabledCheckBox();
 
-		JLabel cloudHeightLbl = new JLabel("cloud height: ");
-
-		cloudHeightSlider.setMinimum(-128);
-		cloudHeightSlider.setMaximum(512);
-		cloudHeightSlider.addChangeListener(cloudHeightListener);
-		updateCloudHeightSlider();
-
-		cloudHeightField.setColumns(5);
-		cloudHeightField.addActionListener(cloudHeightFieldListener);
-		updateCloudHeightField();
+		cloudHeight = new Adjuster("cloud height", "The height of the cloud layer",
+				-128, 512) {
+			@Override
+			public void valueChanged(double newValue) {
+				renderMan.scene().setCloudHeight((int) newValue);
+			}
+		};
+		updateCloudHeight();
 
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
@@ -1023,11 +1020,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(atmosphereEnabled)
 				.addComponent(volumetricFogEnabled)
 				.addComponent(cloudsEnabled)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(cloudHeightLbl)
-					.addComponent(cloudHeightSlider)
-					.addComponent(cloudHeightField)
-				)
+				.addGroup(cloudHeight.horizontalGroup(layout))
 			)
 			.addContainerGap()
 		);
@@ -1061,11 +1054,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(cloudsEnabled)
 			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(cloudHeightLbl)
-				.addComponent(cloudHeightSlider)
-				.addComponent(cloudHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-			)
+			.addGroup(cloudHeight.verticalGroup(layout))
 			.addContainerGap()
 		);
 		return panel;
@@ -1619,26 +1608,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	ChangeListener cloudHeightListener = new ChangeListener() {
-		@Override
-		public void stateChanged(ChangeEvent e) {
-			JSlider source = (JSlider) e.getSource();
-			renderMan.scene().setCloudHeight(source.getValue());
-			updateCloudHeightField();
-		}
-	};
-	ActionListener cloudHeightFieldListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JTextField source = (JTextField) e.getSource();
-			try {
-				int value = Integer.parseInt(source.getText());
-				renderMan.scene().setCloudHeight(value);
-				updateCloudHeightSlider();
-			} catch (NumberFormatException ex) {
-			}
-		}
-	};
 	ChangeListener emitterIntensityListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
@@ -1997,16 +1966,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		waterHeightField.setEnabled(height > 0);
 	}
 
-	protected void updateCloudHeightSlider() {
-		cloudHeightSlider.removeChangeListener(cloudHeightListener);
-		cloudHeightSlider.setValue(renderMan.scene().getCloudHeight());
-		cloudHeightSlider.addChangeListener(cloudHeightListener);
-	}
-
-	protected void updateCloudHeightField() {
-		cloudHeightField.removeActionListener(cloudHeightFieldListener);
-		cloudHeightField.setText("" + renderMan.scene().getCloudHeight());
-		cloudHeightField.addActionListener(cloudHeightFieldListener);
+	protected void updateCloudHeight() {
+		cloudHeight.set(renderMan.scene().getCloudHeight());
 	}
 
 	protected void updateRayDepth() {
@@ -2406,8 +2367,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateSPPTargetField();
 		updateSceneNameField();
 		updatePostprocessCB();
-		updateCloudHeightSlider();
-		updateCloudHeightField();
+		updateCloudHeight();
 		updateRayDepth();
 		updateCameraDirection();
 		updateCameraPosition();
