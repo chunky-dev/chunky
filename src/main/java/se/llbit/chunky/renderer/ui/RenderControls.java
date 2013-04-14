@@ -1939,11 +1939,11 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	protected void updateSunAzimuth() {
-		sunAzimuth.set(renderMan.scene().sun().getAzimuth());
+		sunAzimuth.set(QuickMath.radToDeg(renderMan.scene().sun().getAzimuth()));
 	}
 
 	protected void updateSunAltitude() {
-		sunAltitude.set(renderMan.scene().sun().getAltitude());
+		sunAltitude.set(QuickMath.radToDeg(renderMan.scene().sun().getAltitude()));
 	}
 
 	protected void updateSunIntensity() {

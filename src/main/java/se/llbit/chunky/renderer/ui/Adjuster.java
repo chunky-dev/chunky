@@ -193,7 +193,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 		if (integerMode) {
 			textField.setText("" + (int) value);
 		} else {
-			textField.setText("" + value);
+			textField.setText(String.format("%.2f", value));
 		}
 		textField.addActionListener(this);
 	}
