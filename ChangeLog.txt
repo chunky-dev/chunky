@@ -1,3 +1,6 @@
+1.1.10 - TBD
+    * Added Emerald Ore and Nether Quartz Ore to the block highlight list
+
 1.1.9 - 2013-04-15
     * Disabled painting of slider values above slider knob in GTK/Snyth L&F
     * Add suffix to scene name to avoid scene name collisions

@@ -256,7 +256,9 @@ public class Controls extends JPanel {
 				Block.MONSTERSPAWNER,
 				Block.BRICKS,
 				Block.CLAY,
-				Block.LAPISLAZULIORE
+				Block.LAPISLAZULIORE,
+				Block.EMERALDORE,
+				Block.NETHERQUARTZORE
 			};
 		JComboBox blockTypeBox = new JComboBox(highlightBlocks);// BLAWK TYPE BAWKS
 		blockTypeBox.setSelectedItem(chunky.getHighlightBlock());
