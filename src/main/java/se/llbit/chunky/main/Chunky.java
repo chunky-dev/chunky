@@ -202,15 +202,35 @@ public class Chunky implements ChunkDiscoveryListener {
 			} else if (args[i].equals("-watermark")) {
 				RenderManager.useWatermark = true;
 			} else if (args[i].equals("-scene-dir")) {
-				sceneDir = new File(args[++i]);
+				if (i+1 == args.length) {
+					logger.error("Missing argument for -scene-dir option");
+					return 1;
+				} else {
+					sceneDir = new File(args[++i]);
+				}
 			} else if (args[i].equals("-render")) {
-				sceneName = args[++i];
+				if (i+1 == args.length) {
+					logger.error("Missing argument for -render option");
+					return 1;
+				} else {
+					sceneName = args[++i];
+				}
 			} else if (args[i].equals("-benchmark")) {
 				doBench = true;
 			} else if (args[i].equals("-threads")) {
-				renderThreads = Math.max(1, Integer.parseInt(args[++i]));
+				if (i+1 == args.length) {
+					logger.error("Missing argument for -threads option");
+					return 1;
+				} else {
+					renderThreads = Math.max(1, Integer.parseInt(args[++i]));
+				}
 			} else if (args[i].equals("-tile-width")) {
-				tileWidth = Math.max(1, Integer.parseInt(args[++i]));
+				if (i+1 == args.length) {
+					logger.error("Missing argument for -tile-width option");
+					return 1;
+				} else {
+					tileWidth = Math.max(1, Integer.parseInt(args[++i]));
+				}
 			} else if (args[i].equals("-opencl")) {
 				openCLEnabled = true;
 			} else if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("-help") || args[i].equals("--help")) {

@@ -5,6 +5,7 @@
 	automatically avoided
     * Fixed undirectional furnaces being invisible
     * Fixed error causing double wooden slabs to render as single slabs
+    * Improved command-line error checking
 
 1.1.8 - 2013-03-27
     * Chunky now exits after completing a render in command-line mode
