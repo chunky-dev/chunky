@@ -168,6 +168,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		"  -benchmark             run the benchmark and exit\n" +
 		"  -threads <NUM>         use the specified number of threads for rendering\n" +
 		"  -tile-width <NUM>      use the specified job tile width\n" +
+		"  -target <NUM>          override target SPP to be NUM in headless mode\n" +
 		"  -opencl                enables OpenCL rendering in the GUI\n" +
 		"  -help                  show this text\n" +
 		"\n" +
@@ -196,6 +197,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		int renderThreads = Runtime.getRuntime().availableProcessors();
 		File worldDir = null;
 		boolean doBench = false;
+		int target = -1;
 		for (int i = 0; i < args.length; ++i) {
 			if (args[i].equals("-texture") && args.length > i+1) {
 				texturePack = args[++i];
@@ -217,6 +219,13 @@ public class Chunky implements ChunkDiscoveryListener {
 				}
 			} else if (args[i].equals("-benchmark")) {
 				doBench = true;
+			} else if (args[i].equals("-target")) {
+				if (i+1 == args.length) {
+					logger.error("Missing argument for -target option");
+					return 1;
+				} else {
+					target = Math.max(1, Integer.parseInt(args[++i]));
+				}
 			} else if (args[i].equals("-threads")) {
 				if (i+1 == args.length) {
 					logger.error("Missing argument for -threads option");
@@ -286,6 +295,9 @@ public class Chunky implements ChunkDiscoveryListener {
 
 			try {
 				renderManager.loadScene(sceneName);
+				if (target != -1) {
+					renderManager.scene().setTargetSPP(target);
+				}
 				if (!renderManager.scene().pathTrace()) {
 					renderManager.scene().startRender();
 				} else {
