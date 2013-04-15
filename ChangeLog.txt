@@ -1,4 +1,4 @@
-1.1.9 - TBD
+1.1.9 - 2013-04-15
     * Disabled painting of slider values above slider knob in GTK/Snyth L&F
     * Add suffix to scene name to avoid scene name collisions
     * Removed need to pick scene name if scene name collision can be
@@ -7,6 +7,8 @@
     * Fixed error causing double wooden slabs to render as single slabs
     * Improved command-line error checking
     * Added command-line option to override SPP target in headless mode
+    * Fixed corner stair rendering errors (inner corners and quartz corner
+    stairs rendered as non-corner stairs)
 
 1.1.8 - 2013-03-27
     * Chunky now exits after completing a render in command-line mode

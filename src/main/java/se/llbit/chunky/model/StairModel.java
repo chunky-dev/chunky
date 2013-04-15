@@ -45,6 +45,30 @@ public class StairModel {
 				new AABB(0, 1, 0, 0.5, 0, 1),
 				new AABB(0, 0.5, 0.5, 1, 0, 0.5),
 			},
+			{
+				// inner s-e
+				new AABB(0, 1, 0, 0.5, 0, 1),
+				new AABB(0, 1, 0.5, 1, 0.5, 1),
+				new AABB(0.5, 1, 0.5, 1, 0, 0.5),
+			},
+			{
+				// inner s-w
+				new AABB(0, 1, 0, 0.5, 0, 1),
+				new AABB(0.5, 1, 0.5, 1, 0.5, 1),
+				new AABB(0, 0.5, 0.5, 1, 0, 1),
+			},
+			{
+				// inner n-e
+				new AABB(0, 1, 0, 0.5, 0, 1),
+				new AABB(0.5, 1, 0.5, 1, 0, 1),
+				new AABB(0, 0.5, 0.5, 1, 0, 0.5),
+			},
+			{
+				// inner n-w
+				new AABB(0, 1, 0, 0.5, 0, 1),
+				new AABB(0, 1, 0.5, 1, 0, 0.5),
+				new AABB(0, 0.5, 0.5, 1, 0.5, 1),
+			},
 		},
 		{
 			// flipped
@@ -67,6 +91,30 @@ public class StairModel {
 				// n-w
 				new AABB(0, 1, 0.5, 1, 0, 1),
 				new AABB(0, 0.5, 0, 0.5, 0, 0.5),
+			},
+			{
+				// inner s-e
+				new AABB(0, 1, 0.5, 1, 0, 1),
+				new AABB(0, 1, 0, 0.5, 0.5, 1),
+				new AABB(0.5, 1, 0, 0.5, 0, 0.5),
+			},
+			{
+				// inner s-w
+				new AABB(0, 1, 0.5, 1, 0, 1),
+				new AABB(0.5, 1, 0, 0.5, 0.5, 1),
+				new AABB(0, 0.5, 0, 0.5, 0, 1),
+			},
+			{
+				// inner n-e
+				new AABB(0, 1, 0.5, 1, 0, 1),
+				new AABB(0.5, 1, 0, 0.5, 0, 1),
+				new AABB(0, 0.5, 0, 0.5, 0, 0.5),
+			},
+			{
+				// inner n-w
+				new AABB(0, 1, 0.5, 1, 0, 1),
+				new AABB(0, 1, 0, 0.5, 0, 0.5),
+				new AABB(0, 0.5, 0, 0.5, 0.5, 1),
 			},
 		},
 	};
@@ -121,13 +169,13 @@ public class StairModel {
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 		int flipped = (ray.getBlockData() & 4) >> 2;
-		int corner = 7 & (ray.currentMaterial >> BlockData.CORNER_OFFSET);
+		int corner = 15 & (ray.currentMaterial >> BlockData.CORNER_OFFSET);
 		int rotation = 3 & ray.getBlockData();
 
 		ray.t = Double.POSITIVE_INFINITY;
 
 		if (corner != 0) {
-			for (AABB box : corners[flipped][3 & corner]) {
+			for (AABB box : corners[flipped][7 & corner]) {
 				if (box.intersect(ray)) {
 					texture.getColor(ray);
 					ray.t = ray.tNear;

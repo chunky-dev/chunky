@@ -2238,7 +2238,8 @@ public class Block {
 			return QuartzModel.intersect(ray);
 		}
 	};
-	public static final Block QUARTZSTAIRS = new Block(0x9C, "Quartz Stairs", Icon.stoneStairs, Texture.quartzSide) {
+	public static final int QUARTZSTAIRS_ID = 0x9C;
+	public static final Block QUARTZSTAIRS = new Block(QUARTZSTAIRS_ID, "Quartz Stairs", Icon.stoneStairs, Texture.quartzSide) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -3212,7 +3213,8 @@ public class Block {
 				id == SANDSTONESTAIRS_ID ||
 				id == SPRUCEWOODSTAIRS_ID ||
 				id == BIRCHWOODSTAIRS_ID ||
-				id == JUNGLEWOODSTAIRS_ID;
+				id == JUNGLEWOODSTAIRS_ID ||
+				id == QUARTZSTAIRS_ID;
 	}
 
 	public static Block get(int id) {

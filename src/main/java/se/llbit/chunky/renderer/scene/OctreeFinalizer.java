@@ -68,8 +68,11 @@ public class OctreeFinalizer {
 					int corner3;
 					int connections;
 					int dir;
+					int bd;
+					int bd_alt;
 
 					Block other;
+					Block other_alt;
 					Block above;
 					Block west;
 					Block east;
@@ -523,25 +526,39 @@ public class OctreeFinalizer {
 					case Block.SPRUCEWOODSTAIRS_ID:
 					case Block.BIRCHWOODSTAIRS_ID:
 					case Block.JUNGLEWOODSTAIRS_ID:
+					case Block.QUARTZSTAIRS_ID:
 						// check if this is a corner stair block
 						int rotation = 3 & (type >> BlockData.BLOCK_DATA_OFFSET);
-						int bd;
-						Block behind;
 						switch (rotation) {
 						case 0:
 							// ascending east
-							bd = octree.get(x+1, cy, z);
-							behind = Block.get(bd);
-							if (behind.isStair()) {
+							bd = octree.get(x+1, cy, z);// behind
+							other = Block.get(bd);
+							bd_alt = octree.get(x-1, cy, z);// in front of
+							other_alt = Block.get(bd_alt);
+							if (other.isStair()) {
 								switch (3 & (bd >> BlockData.BLOCK_DATA_OFFSET)) {
 								case 2:
-									// if behind ascends south we have s-e corner
+									// if behind ascends south we have outer s-e corner
 									type |= BlockData.SOUTH_EAST << BlockData.CORNER_OFFSET;
 									octree.set(type, x, cy, z);
 									break;
 								case 3:
-									// if behind ascends north we have n-e corner
+									// if behind ascends north we have outer n-e corner
 									type |= BlockData.NORTH_EAST << BlockData.CORNER_OFFSET;
+									octree.set(type, x, cy, z);
+									break;
+								}
+							} else if (other_alt.isStair()) {
+								switch (3 & (bd_alt >> BlockData.BLOCK_DATA_OFFSET)) {
+								case 2:
+									// if behind ascends south we have outer s-e corner
+									type |= BlockData.INNER_SOUTH_EAST << BlockData.CORNER_OFFSET;
+									octree.set(type, x, cy, z);
+									break;
+								case 3:
+									// if behind ascends north we have outer n-e corner
+									type |= BlockData.INNER_NORTH_EAST << BlockData.CORNER_OFFSET;
 									octree.set(type, x, cy, z);
 									break;
 								}
@@ -549,18 +566,33 @@ public class OctreeFinalizer {
 							break;
 						case 1:
 							// ascending west
-							bd = octree.get(x-1, cy, z);
-							behind = Block.get(bd);
-							if (behind.isStair()) {
+							bd = octree.get(x-1, cy, z);// behind
+							other = Block.get(bd);
+							bd_alt = octree.get(x+1, cy, z);// in front of
+							other_alt = Block.get(bd_alt);
+							if (other.isStair()) {
 								switch (3 & (bd >> BlockData.BLOCK_DATA_OFFSET)) {
 								case 2:
-									// if behind ascends south we have s-w corner
+									// if behind ascends south we have outer s-w corner
 									type |= BlockData.SOUTH_WEST << BlockData.CORNER_OFFSET;
 									octree.set(type, x, cy, z);
 									break;
 								case 3:
-									// if behind ascends north we have n-w corner
+									// if behind ascends north we have outer n-w corner
 									type |= BlockData.NORTH_WEST << BlockData.CORNER_OFFSET;
+									octree.set(type, x, cy, z);
+									break;
+								}
+							} else if (other_alt.isStair()) {
+								switch (3 & (bd_alt >> BlockData.BLOCK_DATA_OFFSET)) {
+								case 2:
+									// if behind ascends south we have outer s-w corner
+									type |= BlockData.INNER_SOUTH_WEST << BlockData.CORNER_OFFSET;
+									octree.set(type, x, cy, z);
+									break;
+								case 3:
+									// if behind ascends north we have outer n-w corner
+									type |= BlockData.INNER_NORTH_WEST << BlockData.CORNER_OFFSET;
 									octree.set(type, x, cy, z);
 									break;
 								}
@@ -568,9 +600,11 @@ public class OctreeFinalizer {
 							break;
 						case 2:
 							// ascending south
-							bd = octree.get(x, cy, z+1);
-							behind = Block.get(bd);
-							if (behind.isStair()) {
+							bd = octree.get(x, cy, z+1);// behind
+							other = Block.get(bd);
+							bd_alt = octree.get(x, cy, z-1);// in front of
+							other_alt = Block.get(bd_alt);
+							if (other.isStair()) {
 								switch (3 & (bd >> BlockData.BLOCK_DATA_OFFSET)) {
 								case 0:
 									// if behind ascends east we have s-e corner
@@ -583,13 +617,28 @@ public class OctreeFinalizer {
 									octree.set(type, x, cy, z);
 									break;
 								}
+							} else if (other_alt.isStair()) {
+								switch (3 & (bd_alt >> BlockData.BLOCK_DATA_OFFSET)) {
+								case 0:
+									// if behind ascends east we have s-e corner
+									type |= BlockData.INNER_SOUTH_EAST << BlockData.CORNER_OFFSET;
+									octree.set(type, x, cy, z);
+									break;
+								case 1:
+									// if behind ascends west we have s-w corner
+									type |= BlockData.INNER_SOUTH_WEST << BlockData.CORNER_OFFSET;
+									octree.set(type, x, cy, z);
+									break;
+								}
 							}
 							break;
 						case 3:
 							// ascending north
-							bd = octree.get(x, cy, z-1);
-							behind = Block.get(bd);
-							if (behind.isStair()) {
+							bd = octree.get(x, cy, z-1);// behind
+							other = Block.get(bd);
+							bd_alt = octree.get(x, cy, z+1);// in front of
+							other_alt = Block.get(bd_alt);
+							if (other.isStair()) {
 								switch (3 & (bd >> BlockData.BLOCK_DATA_OFFSET)) {
 								case 0:
 									// if behind ascends east we have n-e corner
@@ -599,6 +648,19 @@ public class OctreeFinalizer {
 								case 1:
 									// if behind ascends west we have n-w corner
 									type |= BlockData.NORTH_WEST << BlockData.CORNER_OFFSET;
+									octree.set(type, x, cy, z);
+									break;
+								}
+							} else if (other_alt.isStair()) {
+								switch (3 & (bd_alt >> BlockData.BLOCK_DATA_OFFSET)) {
+								case 0:
+									// if behind ascends east we have n-e corner
+									type |= BlockData.INNER_NORTH_EAST << BlockData.CORNER_OFFSET;
+									octree.set(type, x, cy, z);
+									break;
+								case 1:
+									// if behind ascends west we have n-w corner
+									type |= BlockData.INNER_NORTH_WEST << BlockData.CORNER_OFFSET;
 									octree.set(type, x, cy, z);
 									break;
 								}

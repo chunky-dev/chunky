@@ -16,24 +16,9 @@
  */
 package se.llbit.chunky.renderer.test;
 
-import se.llbit.chunky.model.BrewingStandModel;
-import se.llbit.chunky.model.FenceGateModel;
-import se.llbit.chunky.model.FenceModel;
-import se.llbit.chunky.model.Model;
-import se.llbit.chunky.model.RedstoneRepeaterModel;
-import se.llbit.chunky.model.RedstoneWireModel;
-import se.llbit.chunky.model.SignPostModel;
-import se.llbit.chunky.model.SpriteModel;
-import se.llbit.chunky.model.TorchModel;
-import se.llbit.chunky.model.TripwireHookModel;
-import se.llbit.chunky.model.VineModel;
-import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.math.AABB;
-import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
-import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Triangle;
 import se.llbit.math.UVTriangle;
@@ -58,23 +43,24 @@ public class TestModel {
 	 */
 	public void setUp() {
 		boxes = new AABB[] {
-			// east
-			new AABB(14/16., 1, 10/16., 1, 0, 1),
-			// west
-			new AABB(0, 2/16., 10/16., 1, 0, 1),
-			// north
-			new AABB(2/16., 14/16., 10/16., 1, 0, 2/16.),
-			// south
-			new AABB(2/16., 14/16., 10/16., 1, 14/16., 1),
-			// center
-			new AABB(4/16., 12/16., 4/16., 10/16., 4/16., 12/16.),
-			// bottom
-			new AABB(6/16., 10/16., 0, 4/16., 6/16., 10/16.),
+				// s-e
+//				new AABB(0, 1, 0, 0.5, 0, 1),
+//				new AABB(0, 1, 0.5, 1, 0.5, 1),
+//				new AABB(0.5, 1, 0.5, 1, 0, 0.5),
+//				new AABB(0, 1, 0, 0.5, 0, 1),
+//				new AABB(0.5, 1, 0.5, 1, 0.5, 1),
+//				new AABB(0, 0.5, 0.5, 1, 0, 1),
+//				new AABB(0, 1, 0, 0.5, 0, 1),
+//				new AABB(0.5, 1, 0.5, 1, 0, 1),
+//				new AABB(0, 0.5, 0.5, 1, 0, 0.5),
+				new AABB(0, 1, 0, 0.5, 0, 1),
+				new AABB(0, 1, 0.5, 1, 0, 0.5),
+				new AABB(0, 0.5, 0.5, 1, 0.5, 1),
 		};
-		quads = new Quad[] {
+		/*quads = new Quad[] {
 			new DoubleSidedQuad(new Vector3d(2/16., 10/16., 2/16.), new Vector3d(14/16., 10/16., 2/16.),
 					new Vector3d(2/16., 10/16., 14/16.), new Vector4d(2/16., 14/16., 2/16., 14/16.)),
-		};
+		};*/
 	}
 
 	private void setUpTorch() {
@@ -153,23 +139,8 @@ public class TestModel {
 
 		for (int i = 0; i < boxes.length; ++i) {
 			if (boxes[i].intersect(ray)) {
-				if (ray.n.y > 0)
-					Texture.hopperInside.getColor(ray);
-				else
-					Texture.hopper.getColor(ray);
+				Texture.stone.getColor(ray);
 				ray.color.w = 1;
-				ray.t = ray.tNear;
-			}
-		}
-
-		for (int i = 0; i < quads.length; ++i) {
-			if (quads[i].intersect(ray)) {
-				ray.n.set(quads[i].n);
-				ray.n.scale(-Math.signum(ray.d.dot(quads[i].n)));
-				if (ray.n.y > 0)
-					Texture.hopperInside.getColor(ray);
-				else
-					Texture.hopper.getColor(ray);
 				ray.t = ray.tNear;
 			}
 		}

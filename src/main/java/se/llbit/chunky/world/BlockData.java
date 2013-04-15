@@ -66,10 +66,14 @@ public interface BlockData {
 
 	int CORNER_OFFSET = 24;
 
-	int SOUTH_EAST = 4;
-	int SOUTH_WEST = 5;
-	int NORTH_EAST = 6;
-	int NORTH_WEST = 7;
+	int SOUTH_EAST = 8 + 0;
+	int SOUTH_WEST = 8 + 1;
+	int NORTH_EAST = 8 + 2;
+	int NORTH_WEST = 8 + 3;
+	int INNER_SOUTH_EAST = 8 + 4;
+	int INNER_SOUTH_WEST = 8 + 5;
+	int INNER_NORTH_EAST = 8 + 6;
+	int INNER_NORTH_WEST = 8 + 7;
 
 	/**
 	 * Fence gate is three pixels lower
