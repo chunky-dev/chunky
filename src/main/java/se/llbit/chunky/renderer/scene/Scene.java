@@ -1572,6 +1572,10 @@ public class Scene implements Refreshable {
 	public void saveSnapshot(File directory, boolean watermark) {
 
 		try {
+			if (directory == null) {
+				logger.error("Fatal error: bad scene directory!");
+				return;
+			}
 			String fileName = name + "-" + spp + ".png";
 			logger.info("Saving frame " + fileName);
 			if (watermark)
