@@ -83,7 +83,7 @@ public class Camera
 			double x, double y, Random random, Vector3d o, Vector3d d
 		) {
 			d.set( 0, -1, 0 );
-			o.set( fov * y, worldWidth, fov * x );
+			o.set( fov * y, 0, fov * x );
 		}
 		
 		public double getMinRecommendedFoV() {  return 0.01;  }
@@ -677,6 +677,14 @@ public class Camera
 		transform.transform(ray.d);
 		transform.transform(ray.x);
 		ray.x.add(pos);
+		
+		if( projectionMode == ProjectionMode.PARALLEL ) {
+			// Then we want to 'back up' the ray so it's outside the world.
+			// (though maybe this should be a separate option)
+			ray.d.scale(worldWidth);
+			ray.x.sub(ray.d);
+			ray.d.normalize();
+		}
 		
 		// Even though we've implicitly set ray.d and x, we need to
 		// call ray.set(...) to reset its other values.
