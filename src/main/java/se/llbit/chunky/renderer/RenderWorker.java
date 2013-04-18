@@ -24,7 +24,6 @@ import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray.RayPool;
-import se.llbit.math.Vector3d;
 import se.llbit.util.VectorPool;
 
 /**
@@ -39,8 +38,6 @@ public class RenderWorker extends Thread {
 	private int id;
 	private AbstractRenderManager manager;
 
-	private final Vector3d d = new Vector3d();
-	private final Vector3d o = new Vector3d();
 	private final Ray ray;
 	private final RayPool rayPool;
 	private final VectorPool vectorPool;
@@ -111,7 +108,7 @@ public class RenderWorker extends Thread {
 				double oy = random.nextDouble();
 				double ox = random.nextDouble();
 
-				cam.calcViewRay(ray, d, o,
+				cam.calcViewRay(ray,
 						random, aspect,
 						( .5 - (x + ox) / canvasWidth ),
 						(-.5 + (y + oy) / canvasHeight));
@@ -151,7 +148,7 @@ public class RenderWorker extends Thread {
 				}
 			}
 
-			cam.calcViewRay(ray, d, o,
+			cam.calcViewRay(ray,
 					random, aspect,
 					( .5 - (double)x / canvasWidth ),
 					(-.5 + (double)y / canvasHeight));

@@ -32,6 +32,7 @@ import se.llbit.nbt.StringTag;
 /**
  * Camera model for 3D rendering
  * @author Jesper Öqvist <jesper@llbit.se>
+ * @author TOGoS (projection code) 
  */
 public class Camera
 {
@@ -50,44 +51,72 @@ public class Camera
 		return fovTan( clamp(0, fov, 175) );
 	}
 	
-	//// Direction mappers
+	//// Projectors ////
 	
-	/**
-	 * Used by non-parallel projections to initialize a ray's direction
-	 * before modifying it to simulate depth-of-focus and positioning
-	 * it in the world.
-	 */
-	interface PixelDirectionMapper {
-		public void calcRayDirection( double x, double y, Vector3d dest );
+	interface Projector {
+		/**
+		 * @param x pixel X coordinate, where 0 = center and +-0.5 = edges
+		 * @param y pixel Y coordinate, where 0 = center and +-0.5 = edges
+		 * @param pos will be populated with camera-relative ray origin position
+		 * @param direction will be populated with camera-relative ray direction
+		 */
+		public void apply( double x, double y, Random random, Vector3d pos, Vector3d direction );
 		public double getMinRecommendedFoV();
 		public double getMaxRecommendedFoV();
 		public double getDefaultFoV();
 	}
 	
-	static class PlanarPixelDirectionMapper implements PixelDirectionMapper {
-		final double fovTan;
-		public PlanarPixelDirectionMapper( double fov ) {
-			this.fovTan = clampedFovTan(fov);
+	/**
+	 * Casts parallel rays from different origin points on a plane
+	 */
+	static class ParallelProjector implements Projector {
+		final double worldWidth;
+		final double fov;
+		
+		public ParallelProjector( double worldWidth, double fov ) {
+			this.worldWidth = worldWidth;
+			this.fov = fov;
 		}
 		
 		@Override
-		public void calcRayDirection( double x, double y, Vector3d dest ) {
-			dest.set(fovTan * y, -1, fovTan * x);
+		public void apply(
+			double x, double y, Random random, Vector3d o, Vector3d d
+		) {
+			d.set( 0, -1, 0 );
+			o.set( fov * y, worldWidth, fov * x );
+		}
+		
+		public double getMinRecommendedFoV() {  return 0.01;  }
+		public double getMaxRecommendedFoV() {  return worldWidth;  }
+		public double getDefaultFoV() {  return worldWidth/2;  }
+	};
+	
+	/**
+	 * Casts rays like a pinhole camera
+	 */
+	static class PlanarProjector implements Projector {
+		final double fovTan;
+		public PlanarProjector( double fov ) {
+			this.fovTan = clampedFovTan(fov);
+		}
+		
+		public void apply( double x, double y, Random random, Vector3d pos, Vector3d direction ) {
+			pos.set(0, 0, 0);
+			direction.set(fovTan * y, -1, fovTan * x);
 		}
 		
 		public double getMinRecommendedFoV() {   return 1; }
 		public double getMaxRecommendedFoV() { return 175; }
 		public double getDefaultFoV() { return 70; }
 	}
-
-	static class SphericalPixelDirectionMapper implements PixelDirectionMapper {
+	
+	static class SphericalProjector implements Projector {
 		final double fov;
-		public SphericalPixelDirectionMapper( double fov ) {
+		public SphericalProjector( double fov ) {
 			this.fov = fov;
 		}
-
-		@Override
-        public void calcRayDirection( double x, double y, Vector3d dest ) {
+		
+        public void apply( double x, double y, Random random, Vector3d pos, Vector3d direction ) {
 			double ay = y * fov * Math.PI / 180;
 			double ax = x * fov * Math.PI / 180;
 			double avSquared = ay*ay + ax*ax;
@@ -101,30 +130,36 @@ public class Camera
 				dx = dv * (ax/angleFromCenter);
 				dy = dv * (ay/angleFromCenter);
 			}
-			dest.set( dy, -dz, dx );
+			pos.set( 0, 0, 0 );
+			direction.set( dy, -dz, dx );
         }
 		
 		public double getMinRecommendedFoV() { return   1; }
 		public double getMaxRecommendedFoV() { return 180; }
 		public double getDefaultFoV() { return 120; }
 	}
-
-	static class CyllindricalPixelDirectionMapper implements PixelDirectionMapper {
+	
+	/**
+	 * Behaves like a pinhole camera in the vertical direction,
+	 * but like a spherical one in the horizontal direction.
+	 */
+	static class CyllindricalProjector implements Projector {
 		final double fov;
 		final double fovTan;
-		public CyllindricalPixelDirectionMapper( double fov ) {
+		public CyllindricalProjector( double fov ) {
 			this.fov = fov;
 			this.fovTan = clampedFovTan(fov);
 		}
 		
 		@Override
-		public void calcRayDirection( double x, double y, Vector3d dest ) {
+		public void apply( double x, double y, Random random, Vector3d position, Vector3d direction ) {
 			double ax = x * fov * Math.PI / 180;
 			double dz = Math.cos(ax);
 			double dx = Math.sin(ax);
 			double dy = fovTan * y;
 			
-			dest.set( dy, -dz, dx );
+			position.set( 0, 0, 0 );
+			direction.set( dy, -dz, dx );
 		}
 		
 		public double getMinRecommendedFoV() { return 1;  }
@@ -132,116 +167,64 @@ public class Camera
 		public double getDefaultFoV() { return 90; }
 	}
 	
-	//// Projectors
-	
-	interface Projector {
-		public void calcViewRay(
-			Ray ray, Vector3d pos, Matrix3d transform, Vector3d d, Vector3d o, Random random, double x, double y
-		);
-		
-		public double getMinRecommendedFoV();
-		public double getMaxRecommendedFoV();
-		public double getDefaultFoV();
-	}
-	
-	static abstract class DirectionalProjector implements Projector {
-		final PixelDirectionMapper pdm;
-		public DirectionalProjector( PixelDirectionMapper pdm ) {
-			this.pdm = pdm;
-		}
-		public double getMinRecommendedFoV() { return pdm.getMinRecommendedFoV(); }
-		public double getMaxRecommendedFoV() { return pdm.getMaxRecommendedFoV(); }
-		public double getDefaultFoV() { return pdm.getDefaultFoV(); }
-	}
-	
-	static class NonFocusedDirectionalProjector extends DirectionalProjector {
-		public NonFocusedDirectionalProjector( PixelDirectionMapper pdm ) {
-			super(pdm);
-		}
-
-		@Override
-		public void calcViewRay(
-			Ray ray, Vector3d pos, Matrix3d transform, Vector3d d, Vector3d o, Random random, double x, double y
-		) {
-			pdm.calcRayDirection( x, y, d );
-			d.normalize();
-			
-			transform.transform(d);
-			ray.set(pos, d);
-		}
-	}
-	
-	static class FocusedDirectionalProjector extends DirectionalProjector {
-		final double dof;
+	/**
+	 * Simulates a non-point aperture to produce depth-of-focus effects.
+	 * Delegates calculation of base offset/direction to another projector.
+	 * If apertureSize is 0 this will still work, but it will not have any
+	 * effect.  In that case you should use the wrapped Projector directly.
+	 */
+	static class ApertureProjector implements Projector {
+		final Projector wrapped;
+		final double apertureSize;
 		final double focalOffset;
 		
-		public FocusedDirectionalProjector( PixelDirectionMapper pdm, double dof, double focalOffset ) {
-			super(pdm);
-			this.dof = dof;
+		ThreadLocal<Vector3d> apertureScrachVectorVar = new ThreadLocal<Vector3d>() {
+			@Override protected Vector3d initialValue() {
+				return new Vector3d();
+			}
+		};
+		
+		public ApertureProjector( Projector wrapped, double apertureSize, double focalOffset ) {
+			this.wrapped = wrapped;
+			this.apertureSize = apertureSize;
 			this.focalOffset = focalOffset;
 		}
 		
 		/**
-		 * Find a random point within a circular aperature and put it in dest.x, z
+		 * Find a random point within a circular aperture and put it in dest.x, z
 		 */
-		protected void randomAperaturePoint( Random random, double aperatureSize, Vector3d dest ) {
+		protected static void randomAperturePoint( Random random, double apertureSize, Vector3d dest ) {
 			double rx, rz;
 			while (true) {
 				rx = 2 * random.nextDouble() - 1;
 				rz = 2 * random.nextDouble() - 1;
 				double s = rx*rx + rz*rz;
 				if (s > Ray.EPSILON && s <= 1) {
-					dest.set( rx *= aperatureSize, 0, rz *= aperatureSize );
+					dest.set( rx *= apertureSize, 0, rz *= apertureSize );
 					return;
 				}
 			}
 		}
 		
-		@Override
-		public void calcViewRay(
-			Ray ray, Vector3d pos, Matrix3d transform, Vector3d d, Vector3d o, Random random, double x, double y
+		public void apply(
+			double x, double y, Random random, Vector3d o, Vector3d d
 		) {
-			pdm.calcRayDirection( x, y, d );
+			wrapped.apply( x, y, random, o, d );
 			d.normalize();
 			
-			randomAperaturePoint( random, focalOffset / dof, o );
+			Vector3d apertureScratchVector = apertureScrachVectorVar.get();
+			
+			randomAperturePoint( random, apertureSize, apertureScratchVector );
+			o.add( apertureScrachVectorVar.get() ); // Shift ray origin
 			
 			d.scale( focalOffset );
-			d.sub( o ); // Change direction of d to point at focal point even when origin offset by o
-			
-			d.normalize();
-			transform.transform(d);
-			transform.transform(o);
-			o.add(pos);
-			ray.set(o, d);
+			d.sub( apertureScratchVector ); // Change direction of d to compensate for origin shift
 		}
+		
+		public double getMinRecommendedFoV() { return wrapped.getMinRecommendedFoV(); }
+		public double getMaxRecommendedFoV() { return wrapped.getMaxRecommendedFoV(); }
+		public double getDefaultFoV() { return wrapped.getDefaultFoV(); }
 	}
-	
-	static class ParallelProjector implements Projector {
-		final double worldWidth;
-		final double fov;
-		
-		public ParallelProjector( double worldWidth, double fov ) {
-			this.worldWidth = worldWidth;
-			this.fov = fov;
-		}
-		
-		@Override
-		public void calcViewRay(
-			Ray ray, Vector3d pos, Matrix3d transform, Vector3d d, Vector3d o, Random random, double x, double y
-		) {
-			d.set( 0, -1, 0 );
-			transform.transform(d);
-			o.set( fov * y, worldWidth, fov * x );
-			transform.transform(o);
-			o.add(pos);
-			ray.set(o, d);
-		}
-		
-		public double getMinRecommendedFoV() {  return 0.01;  }
-		public double getMaxRecommendedFoV() {  return worldWidth;  }
-		public double getDefaultFoV() {  return worldWidth/2;  }
-	};	
 
 	////
 	
@@ -396,10 +379,8 @@ public class Camera
 		updateTransform();
 	}
 
-	private Projector applyDoF( PixelDirectionMapper pdm ) {
-		return infDof ?
-			new NonFocusedDirectionalProjector(pdm) :
-			new FocusedDirectionalProjector(pdm, dof, focalOffset);
+	private Projector applyDoF( Projector p ) {
+		return infDof ? p : new ApertureProjector(p, focalOffset/dof, focalOffset);
 	}
 	
 	/**
@@ -409,18 +390,17 @@ public class Camera
 	private Projector createProjector() {
 		switch (projectionMode) {
 		case PARALLEL:
-			return new ParallelProjector( worldWidth, fov );
+			return applyDoF( new ParallelProjector( worldWidth, fov ) );
 		case PLANAR:
-			return applyDoF( new PlanarPixelDirectionMapper(fov) );
+			return applyDoF( new PlanarProjector(fov) );
 		case SPHERICAL:
-			return applyDoF( new SphericalPixelDirectionMapper(fov) );
+			return applyDoF( new SphericalProjector(fov) );
 		case CYLLINDRICAL:
-			return applyDoF( new CyllindricalPixelDirectionMapper(fov) );
+			return applyDoF( new CyllindricalProjector(fov) );
 		default:
 			System.err.println("Error: Undefined projection mode: "+projectionMode+", defaulting to planar");
-			return applyDoF( new PlanarPixelDirectionMapper(fov) );
+			return applyDoF( new PlanarProjector(fov) );
 		}
-
 	}
 
 	private void initProjector() {
@@ -472,15 +452,15 @@ public class Camera
 	}
 
 	/**
-	 * @return <code>true</code> if parallel projection is enabled
+	 * @return the projection mode
 	 */
 	public ProjectionMode getProjectionMode() {
 		return projectionMode;
 	}
 
 	/**
-	 * Toggle parallel projection
-	 * @param enabled
+	 * Set the projection mode
+	 * @param mode
 	 */
 	public synchronized void setProjectionMode(ProjectionMode mode) {
 		if (projectionMode != mode) {
@@ -688,9 +668,19 @@ public class Camera
 	 * @param x point within the output image, from -0.5, to 0.5
 	 * @param y point within the output image, from -0.5, to 0.5
 	 */
-	public void calcViewRay(Ray ray, Vector3d d, Vector3d o, Random random,
-			double aspect, double x, double y) {
-		projector.calcViewRay(ray, pos, transform, d, o, random, x * aspect, y);
+	public void calcViewRay(
+		Ray ray, Random random, double aspect, double x, double y
+	) {
+		projector.apply( x * aspect, y, random, ray.x, ray.d );
+		
+		ray.d.normalize();
+		transform.transform(ray.d);
+		transform.transform(ray.x);
+		ray.x.add(pos);
+		
+		// Even though we've implicitly set ray.d and x, we need to
+		// call ray.set(...) to reset its other values.
+		ray.set(ray.x, ray.d);
 	}
 
 	/**
