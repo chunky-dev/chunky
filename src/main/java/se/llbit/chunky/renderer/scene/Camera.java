@@ -143,10 +143,10 @@ public class Camera
 	 * Behaves like a pinhole camera in the vertical direction,
 	 * but like a spherical one in the horizontal direction.
 	 */
-	static class CyllindricalProjector implements Projector {
+	static class CylindricalProjector implements Projector {
 		final double fov;
 		final double fovTan;
-		public CyllindricalProjector( double fov ) {
+		public CylindricalProjector( double fov ) {
 			this.fov = fov;
 			this.fovTan = clampedFovTan(fov);
 		}
@@ -232,7 +232,7 @@ public class Camera
 		PARALLEL("Parallel"),
 		PLANAR("Planar"),
 		SPHERICAL("Spherical"),
-		CYLLINDRICAL("Cyllindrical");
+		CYLINDRICAL("Cylindrical");
 		
 		public final String niceName;
 		private ProjectionMode( String niceName ) {
@@ -395,8 +395,8 @@ public class Camera
 			return applyDoF( new PlanarProjector(fov) );
 		case SPHERICAL:
 			return applyDoF( new SphericalProjector(fov) );
-		case CYLLINDRICAL:
-			return applyDoF( new CyllindricalProjector(fov) );
+		case CYLINDRICAL:
+			return applyDoF( new CylindricalProjector(fov) );
 		default:
 			System.err.println("Error: Undefined projection mode: "+projectionMode+", defaulting to planar");
 			return applyDoF( new PlanarProjector(fov) );
