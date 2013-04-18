@@ -1917,7 +1917,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	protected void updateProjectionModeField() {
 		projectionMode.removeActionListener(projectionModeListener);
 		projectionMode.setSelectedIndex( renderMan.scene().camera().getProjectionMode().ordinal() );
-		// TODO: Update fov sliders?
 		projectionMode.addActionListener(projectionModeListener);
 	}
 
