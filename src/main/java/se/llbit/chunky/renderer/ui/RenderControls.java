@@ -107,7 +107,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JTextField widthField = new JTextField();
 	private final JTextField heightField = new JTextField();
 	private final JSlider dofSlider = new JSlider();
-	private final JCheckBox parallelProjectionCB = new JCheckBox();
+	private final JComboBox projectionMode = new JComboBox();
 	private final JTextField fovField = new JTextField();
 	private final JTextField dofField = new JTextField();
 	private final JTextField focalOffsetField = new JTextField();
@@ -1046,6 +1046,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	private Component buildCameraPane() {
+		JLabel projectionModeLbl = new JLabel("Projection");
 		JLabel fovLbl = new JLabel("Field of View (zoom): ");
 		JLabel dofLbl = new JLabel("Depth of Field: ");
 		JLabel focalOffsetLbl = new JLabel("Focal Offset: ");
@@ -1064,10 +1065,15 @@ public class RenderControls extends JDialog implements ViewListener,
 		focalOffsetSlider.setMaximum(1000);
 		focalOffsetSlider.addChangeListener(focalOffsetListener);
 		updateFocalOffsetSlider();
-
-		parallelProjectionCB.setText("Parallel Projection");
-		parallelProjectionCB.addChangeListener(parallelProjectionListener);
-		updateParallelProjectionCheckBox();
+		
+		Camera.ProjectionMode[] projectionModes = Camera.ProjectionMode.class.getEnumConstants();
+		String[] projectionModeNames = new String[projectionModes.length];
+		for( int i=0; i<projectionModes.length; ++i ) {
+			projectionModeNames[i] = projectionModes[i].niceName;
+		}
+		projectionMode.setModel(new DefaultComboBoxModel(projectionModeNames));
+		projectionMode.addActionListener(projectionModeListener);
+		updateProjectionModeField();
 
 		fovField.setColumns(5);
 		fovField.addActionListener(fovFieldListener);
@@ -1222,8 +1228,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setView(-Math.PI/4, -Math.PI/4);
-				camera.setParallelProjection(true);
-				updateParallelProjectionCheckBox();
+				camera.setProjectionMode(Camera.ProjectionMode.PARALLEL);
+				updateProjectionModeField();
 				updateFovField();
 				updateFovSlider();
 				updateCameraDirection();
@@ -1238,8 +1244,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setView(-3*Math.PI/4, -Math.PI/4);
-				camera.setParallelProjection(true);
-				updateParallelProjectionCheckBox();
+				camera.setProjectionMode(Camera.ProjectionMode.PARALLEL);
+				updateProjectionModeField();
 				updateFovField();
 				updateFovSlider();
 				updateCameraDirection();
@@ -1254,8 +1260,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setView(-5*Math.PI/4, -Math.PI/4);
-				camera.setParallelProjection(true);
-				updateParallelProjectionCheckBox();
+				camera.setProjectionMode(Camera.ProjectionMode.PARALLEL);
+				updateProjectionModeField();
 				updateFovField();
 				updateFovSlider();
 				updateCameraDirection();
@@ -1270,8 +1276,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setView(-7*Math.PI/4, -Math.PI/4);
-				camera.setParallelProjection(true);
-				updateParallelProjectionCheckBox();
+				camera.setProjectionMode(Camera.ProjectionMode.PARALLEL);
+				updateProjectionModeField();
 				updateFovField();
 				updateFovSlider();
 				updateCameraDirection();
@@ -1342,11 +1348,12 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(sep2)
 				.addGroup(layout.createSequentialGroup()
 					.addGroup(layout.createParallelGroup()
+						.addComponent(projectionModeLbl)
 						.addComponent(fovLbl)
 						.addComponent(dofLbl)
 						.addComponent(focalOffsetLbl))
 					.addGroup(layout.createParallelGroup()
-						.addComponent(parallelProjectionCB)
+						.addComponent(projectionMode)
 						.addComponent(fovSlider)
 						.addComponent(dofSlider)
 						.addComponent(focalOffsetSlider))
@@ -1402,7 +1409,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
-				.addComponent(parallelProjectionCB))
+				.addComponent(projectionModeLbl)
+				.addComponent(projectionMode))
 			.addGroup(layout.createParallelGroup()
 				.addComponent(fovLbl)
 				.addComponent(fovSlider)
@@ -1621,13 +1629,14 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateDofField();
 		}
 	};
-	private final ChangeListener parallelProjectionListener = new ChangeListener() {
+	private final ActionListener projectionModeListener = new ActionListener() {
 		@Override
-		public void stateChanged( ChangeEvent e ) {
-			renderMan.scene().camera().setParallelProjection( ((JCheckBox)e.getSource()).isSelected() );
-			updateParallelProjectionCheckBox();
-			updateFovField();
+		public void actionPerformed(ActionEvent e) {
+			Camera.ProjectionMode m = Camera.ProjectionMode.class.getEnumConstants()[projectionMode.getSelectedIndex()];
+			renderMan.scene().camera().setProjectionMode(m);
+			updateProjectionModeField();
 			updateFovSlider();
+			updateFovField();
 		}
 	};
 	private final ActionListener skyModeListener = new ActionListener() {
@@ -1643,8 +1652,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			Camera camera = renderMan.scene().camera();
 			double value = (double) (source.getValue() - source.getMinimum())
 					/ (source.getMaximum() - source.getMinimum());
-			double scale = camera.getMaxFoV() - Camera.MIN_FOV;
-			camera.setFoV(value * scale + Camera.MIN_FOV);
+			double scale = camera.getMaxFoV() - camera.getMinFoV();
+			camera.setFoV(value * scale + camera.getMinFoV());
 			updateFovField();
 		}
 	};
@@ -1905,15 +1914,11 @@ public class RenderControls extends JDialog implements ViewListener,
 		focalOffsetSlider.addChangeListener(focalOffsetListener);
 	}
 
-	protected void updateParallelProjectionCheckBox() {
-		parallelProjectionCB.removeChangeListener(parallelProjectionListener);
-		boolean selected = renderMan.scene().camera().isUsingParallelProjection();
-		parallelProjectionCB.setSelected(selected);
-		dofSlider.setEnabled(!selected);
-		dofField.setEnabled(!selected);
-		focalOffsetSlider.setEnabled(!selected);
-		focalOffsetField.setEnabled(!selected);
-		parallelProjectionCB.addChangeListener(parallelProjectionListener);
+	protected void updateProjectionModeField() {
+		projectionMode.removeActionListener(projectionModeListener);
+		projectionMode.setSelectedIndex( renderMan.scene().camera().getProjectionMode().ordinal() );
+		// TODO: Update fov sliders?
+		projectionMode.addActionListener(projectionModeListener);
 	}
 
 	protected void updateSkyMode() {
@@ -1925,8 +1930,10 @@ public class RenderControls extends JDialog implements ViewListener,
 	protected void updateFovSlider() {
 		fovSlider.removeChangeListener(fovListener);
 		Camera camera = renderMan.scene().camera();
-		double value = (camera.getFoV() - Camera.MIN_FOV)
-				/ (camera.getMaxFoV() - Camera.MIN_FOV);
+		fovSlider.setMinimum((int)camera.getMinFoV());
+		fovSlider.setMaximum((int)camera.getMaxFoV());
+		double value = (camera.getFoV() - camera.getMinFoV())
+				/ (camera.getMaxFoV() - camera.getMinFoV());
 		double scale = fovSlider.getMaximum() - fovSlider.getMinimum();
 		fovSlider.setValue((int) (value * scale + fovSlider.getMinimum()));
 		fovSlider.addChangeListener(fovListener);
@@ -2168,7 +2175,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateFovField();
 		updateFocalOffsetField();
 		updateDofSlider();
-		updateParallelProjectionCheckBox();
+		updateProjectionModeField();
 		updateSkyMode();
 		updateFovSlider();
 		updateFocalOffsetSlider();
@@ -2280,7 +2287,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	public void onZoom(int diff) {
 		Camera camera = renderMan.scene().camera();
 		double value = renderMan.scene().camera().getFoV();
-		double scale = camera.getMaxFoV() - Camera.MIN_FOV;
+		double scale = camera.getMaxFoV() - camera.getMinFoV();
 		value = value + diff * scale/20;
 		renderMan.scene().camera().setFoV(value);
 		updateFovField();

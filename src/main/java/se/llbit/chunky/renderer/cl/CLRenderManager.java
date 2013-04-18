@@ -503,10 +503,7 @@ public class CLRenderManager extends Thread implements Renderer,
 
 	@Override
 	public void onZoom(int diff) {
-		double scale = Camera.MAX_FOV - Camera.MIN_FOV;
-		fov = fov + diff * scale/20;
-		fov = Math.max(Camera.MIN_FOV, fov);
-		fov = Math.min(Camera.MAX_FOV, fov);
+		fov = Math.min( 175, Math.max( 1, fov + diff * 18 ) );
 		refresh();
 	}
 }

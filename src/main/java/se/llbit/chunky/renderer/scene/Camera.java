@@ -27,13 +27,236 @@ import se.llbit.math.Vector3d;
 import se.llbit.nbt.ByteTag;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.DoubleTag;
+import se.llbit.nbt.StringTag;
 
 /**
  * Camera model for 3D rendering
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class Camera {
+public class Camera
+{
+	static double clamp( double min, double v, double max ) {
+		return v < min ? min : v > max ? max : v;
+	}
+	
+	static double fovTan( double fov ) {
+		if( fov < 0 || fov >= 180 ) {
+			throw new RuntimeException("FoV should have been clamped between [0,180), but is outside that range: "+fov);
+		}
+		return 2 * (Math.tan((fov / 360) * Math.PI));
+	}
+	
+	static double clampedFovTan( double fov ) {
+		return fovTan( clamp(0, fov, 175) );
+	}	
+	
+	public enum ProjectionMode {
+		PARALLEL("Parallel"),
+		PLANAR("Planar"),
+		SPHERICAL("Spherical"),
+		CYLLINDRICAL("Cyllindrical");
+		
+		public final String niceName;
+		private ProjectionMode( String niceName ) {
+			this.niceName = niceName;
+		}
+	}
+	
+	interface Projector {
+		public void calcViewRay(
+			Ray ray, Vector3d pos, Matrix3d transform, Vector3d d, Vector3d o, Random random, double x, double y
+		);
+		
+		public double getMinRecommendedFoV();
+		public double getMaxRecommendedFoV();
+		public double getDefaultFov();
+	}
+	
+	interface PreFocalProjector {
+		
+	}
+	
+	static abstract class FocalProjector {
+		final double dof;
+		final double focalOffset;
+		
+		public FocalProjector( double dof, double focalOffset ) {
+			this.dof = dof;
+			this.focalOffset = focalOffset;
+		}
+		
+		/**
+		 * Simple lens simulation
+		 *
+		 * @param d
+		 * @param x x-coordinate of ray origin
+		 * @param z z-coordinate of ray origin
+		 */
+		protected void doLens(Random random, Vector3d d, Vector3d i, double x, double z) {
+			d.set(-x, -1, -z);
+			d.scale(focalOffset);
 
+			// at the focal offset we want the distance to a CoC of X to be equal to dof
+			double X = 1.0;
+			double aperture = Math.sqrt((X / dof) * focalOffset);
+
+			double rx, rz;
+			while (true) {
+				rx = 2 * random.nextDouble() - 1;
+				rz = 2 * random.nextDouble() - 1;
+				double s = rx*rx + rz*rz;
+				if (s > Ray.EPSILON && s <= 1) {
+					rx *= aperture;
+					rz *= aperture;
+					break;
+				}
+			}
+
+			i.set(rx, 0, rz);
+			d.sub(i);
+			d.normalize();
+		}
+	}
+	
+	static class ParallelProjector implements Projector {
+		final double worldWidth;
+		final double fov;
+		
+		public ParallelProjector( double worldWidth, double fov ) {
+			this.worldWidth = worldWidth;
+			this.fov = fov;
+		}
+		
+		@Override
+		public void calcViewRay(
+			Ray ray, Vector3d pos, Matrix3d transform, Vector3d d, Vector3d o, Random random, double x, double y
+		) {
+			d.set( 0, -1, 0 );
+			transform.transform(d);
+			o.set( fov * y, worldWidth, fov * x );
+			transform.transform(o);
+			o.add(pos);
+			ray.set(o, d);
+		}
+		
+		public double getMinRecommendedFoV() {  return 0.01;  }
+		public double getMaxRecommendedFoV() {  return worldWidth;  }
+		public double getDefaultFov() {  return worldWidth/2;  }
+	};
+	
+	static class PlanarProjector implements Projector {
+		final double fovTan;
+		
+		public PlanarProjector( double fov ) {
+			this.fovTan = clampedFovTan(fov);
+		}
+		
+		@Override
+		public void calcViewRay(
+			Ray ray, Vector3d pos, Matrix3d transform, Vector3d d, Vector3d o, Random random, double x, double y
+		) {
+			d.set(fovTan * y, -1, fovTan * x);
+			d.normalize();
+			transform.transform(d);
+			ray.set(pos, d);
+		}
+		
+		public double getMinRecommendedFoV() {   return 1; }
+		public double getMaxRecommendedFoV() { return 175; }
+		public double getDefaultFov() { return 70; }
+	}
+	
+	static class FocalPlanarProjector extends FocalProjector implements Projector {
+		final double fovTan;
+		
+		public FocalPlanarProjector( double fov, double dof, double focalOffset ) {
+			super( dof, focalOffset );
+			fovTan = clampedFovTan(fov);
+		}
+		
+		@Override
+		public void calcViewRay(
+			Ray ray, Vector3d pos, Matrix3d transform, Vector3d d, Vector3d o, Random random, double x, double y
+		) {
+			d.set(fovTan * y, -1, fovTan * x);
+			doLens(random, d, o, - fovTan * y, - fovTan * x);
+			
+			transform.transform(d);
+			transform.transform(o);
+			o.add(pos);
+			ray.set(o, d);
+		}
+		
+		public double getMinRecommendedFoV() {   return 1; }
+		public double getMaxRecommendedFoV() { return 175; }
+		public double getDefaultFov() { return 70; }
+	}
+	
+	static class SphericalProjector implements Projector {
+		final double fov;
+		public SphericalProjector( double fov ) {
+			this.fov = fov;
+		}
+		
+		@Override
+		public void calcViewRay(
+			Ray ray, Vector3d pos, Matrix3d transform, Vector3d d, Vector3d o, Random random, double x, double y
+		) {
+			double ay = y * fov * Math.PI / 180;
+			double ax = x * fov * Math.PI / 180;
+			double avSquared = ay*ay + ax*ax;
+			double angleFromCenter = Math.sqrt(avSquared);
+			double dz = Math.cos(angleFromCenter);
+			double dv = Math.sin(angleFromCenter);
+			double dy, dx;
+			if( angleFromCenter == 0 ) {
+				dx = dy = 0;
+			} else {
+				dx = dv * (ax/angleFromCenter);
+				dy = dv * (ay/angleFromCenter);
+			}
+			d.set( dy, -dz, dx );
+			
+			d.normalize();
+			transform.transform(d);
+			ray.set(pos, d);
+		}
+		
+		public double getMinRecommendedFoV() { return   1; }
+		public double getMaxRecommendedFoV() { return 180; }
+		public double getDefaultFov() { return 120; }
+	}
+
+	static class CyllindricalProjector implements Projector {
+		final double fov;
+		final double fovTan;
+		public CyllindricalProjector( double fov ) {
+			this.fov = fov;
+			this.fovTan = clampedFovTan(fov);
+		}
+		
+		@Override
+		public void calcViewRay(
+			Ray ray, Vector3d pos, Matrix3d transform, Vector3d d, Vector3d o, Random random, double x, double y
+		) {
+			double ax = x * fov * Math.PI / 180;
+			double dz = Math.cos(ax);
+			double dx = Math.sin(ax);
+			double dy = fovTan * y;
+			
+			d.set( dy, -dz, dx );
+			
+			d.normalize();
+			transform.transform(d);
+			ray.set(pos, d);
+		}
+		
+		public double getMinRecommendedFoV() { return 1;  }
+		public double getMaxRecommendedFoV() { return 90; }
+		public double getDefaultFov() { return 90; }
+	}
+	
+	
 	/**
 	 * Minimum DoF
 	 */
@@ -43,21 +266,6 @@ public class Camera {
 	 * Maximum DoF
 	 */
 	public static final double MAX_DOF = 500;
-
-	/**
-	 * Minimum FOV for perspective projection
-	 */
-	public static final double MIN_FOV = 1;
-
-	/**
-	 * Default FoV value for perspective projection
-	 */
-	public static final double DEFAULT_FOV = 70;
-
-	/**
-	 * Maximum FOV for perspective projection
-	 */
-	public static final double MAX_FOV = 175;
 
 	/**
 	 * Minimum Focal Offset
@@ -94,8 +302,11 @@ public class Camera {
 	private Matrix3d transform = new Matrix3d();
 	private Matrix3d tmpTransform = new Matrix3d();
 
+	private ProjectionMode projectionMode = ProjectionMode.PLANAR;
+	private Projector projector = createProjector();
+
 	private double dof = 8;
-	private double fov = DEFAULT_FOV;
+	private double fov = projector.getDefaultFov();
 
 	/**
 	 * Maximum diagonal width of the world
@@ -106,13 +317,7 @@ public class Camera {
 	 * Tangens of the FoV angle
 	 */
 	public double fovTan;
-
-	/**
-	 * If true, a parallel projection is used, and fov is interpreted as height of the sensor
-	 * in meters rather than degrees.
-	 */
-	private boolean parallelProjection = false;
-
+	
 	private double focalOffset = 2;
 	private boolean infDof = true;
 
@@ -123,7 +328,7 @@ public class Camera {
 	public Camera(Refreshable scene) {
 		this.scene = scene;
 		transform.setIdentity();
-		calcFovTan();
+		initProjector();
 		updateTransform();
 	}
 
@@ -137,12 +342,12 @@ public class Camera {
 		pitch = other.pitch;
 		transform.set(other.transform);
 		dof = other.dof;
-		parallelProjection = other.parallelProjection;
+		projectionMode = other.projectionMode;
 		fov = other.fov;
 		focalOffset = other.focalOffset;
 		infDof = other.infDof;
 		worldWidth = other.worldWidth;
-		calcFovTan();
+		initProjector();
 		updateTransform();
 	}
 
@@ -157,7 +362,7 @@ public class Camera {
 		camera.addItem("z", new DoubleTag(pos.z));
 		camera.addItem("pitch", new DoubleTag(pitch));
 		camera.addItem("yaw", new DoubleTag(yaw));
-		camera.addItem("parallel", new ByteTag(parallelProjection ? 1 : 0));
+		camera.addItem("projectionMode", new StringTag(projectionMode.name()));
 		camera.addItem("fov", new DoubleTag(fov));
 		camera.addItem("dof", new DoubleTag(dof));
 		camera.addItem("infDof", new ByteTag(infDof ? 1 : 0));
@@ -179,20 +384,39 @@ public class Camera {
 		dof = tag.get("dof").doubleValue();
 		fov = tag.get("fov").doubleValue();
 		focalOffset = tag.get("focalOffset").doubleValue();
-		parallelProjection = tag.get("parallel").byteValue() != 0;
+		try {
+			projectionMode = ProjectionMode.valueOf( tag.get("projectionMode").stringValue() );
+		} catch( IllegalArgumentException e ) {
+			projectionMode = tag.get("parallel").byteValue() != 0 ? ProjectionMode.PARALLEL : ProjectionMode.PLANAR;
+		}
 		infDof = tag.get("infDof").byteValue() != 0;
-		calcFovTan();
+		initProjector();
 		updateTransform();
 	}
 
-	protected static double getClampedFoV(double value) {
-		value = Math.max(value, Camera.MIN_FOV);
-		value = Math.min(value, Camera.MAX_FOV);
-		return value;
+	/**
+	 * Creates, but does not otherwise use, a projector object
+	 * based on the current camera settings. 
+	 */
+	private Projector createProjector() {
+		switch (projectionMode) {
+		case PARALLEL:
+			return new ParallelProjector( worldWidth, fov );
+		case PLANAR:
+			return infDof ? new PlanarProjector(fov) : new FocalPlanarProjector(fov, dof, focalOffset);
+		case SPHERICAL:
+			return new SphericalProjector(fov);
+		case CYLLINDRICAL:
+			return new CyllindricalProjector(fov);
+		default:
+			System.err.println("Error: Undefined projection mode: "+projectionMode+", defaulting to planar");
+			return new PlanarProjector(fov);
+		}
+
 	}
 
-	private void calcFovTan() {
-		fovTan = 2 * (Math.tan((getClampedFoV(fov) / 360) * Math.PI));
+	private void initProjector() {
+		projector = createProjector();
 	}
 
 	/**
@@ -242,46 +466,32 @@ public class Camera {
 	/**
 	 * @return <code>true</code> if parallel projection is enabled
 	 */
-	public boolean isUsingParallelProjection() {
-		return parallelProjection;
+	public ProjectionMode getProjectionMode() {
+		return projectionMode;
 	}
 
 	/**
 	 * Toggle parallel projection
 	 * @param enabled
 	 */
-	public synchronized void setParallelProjection(boolean enabled) {
-		if (enabled != parallelProjection) {
-			parallelProjection = enabled;
-			if (!parallelProjection) {
-				fov = DEFAULT_FOV;
-			} else {
-				fov = worldWidth/2;
-			}
+	public synchronized void setProjectionMode(ProjectionMode mode) {
+		if (projectionMode != mode) {
+			projectionMode = mode;
+			initProjector();
+			fov = projector.getDefaultFov();
 			scene.refresh();
 		}
 	}
-
-	/**
-	 * @return Parallel projection flag
-	 */
-	public synchronized boolean getParallelProjection() {
-		return parallelProjection;
-	}
-
+	
 	/**
 	 * Set field of view in degrees.
 	 *
 	 * @param value
 	 */
 	public synchronized void setFoV(double value) {
-		double clamped = parallelProjection ? value : getClampedFoV(value);
-		clamped = Math.max(MIN_FOV, clamped);
-		if (clamped != fov) {
-			fov = clamped;
-			calcFovTan();
-			scene.refresh();
-		}
+		fov = value;
+		initProjector();
+		scene.refresh();
 	}
 
 	/**
@@ -312,7 +522,7 @@ public class Camera {
 	 * @param v
 	 */
 	public synchronized void moveForward(double v) {
-		if (!parallelProjection) {
+		if (projectionMode != ProjectionMode.PARALLEL) {
 			d.set(0, -1, 0);
 			transform.transform(d);
 			pos.scaleAdd(v, d, pos);
@@ -334,7 +544,7 @@ public class Camera {
 	 * @param v
 	 */
 	public synchronized void moveBackward(double v) {
-		if (!parallelProjection) {
+		if (projectionMode != ProjectionMode.PARALLEL) {
 			d.set(0, -1, 0);
 			transform.transform(d);
 			pos.scaleAdd(-v, d, pos);
@@ -405,7 +615,7 @@ public class Camera {
 	 * @param pitch
 	 */
 	public synchronized void rotateView(double yaw, double pitch) {
-		double fovRad = (getClampedFoV(fov) / 360) * Math.PI;
+		double fovRad = (fov / 360) * Math.PI;
 		this.yaw += yaw * fovRad;
 		this.pitch += pitch * fovRad;
 
@@ -458,7 +668,7 @@ public class Camera {
 			scene.refresh();
 		}
 	}
-
+	
 	/**
 	 * Calculate a ray shooting out of the camera.
 	 *
@@ -472,61 +682,7 @@ public class Camera {
 	 */
 	public void calcViewRay(Ray ray, Vector3d d, Vector3d o, Random random,
 			double aspect, double x, double y) {
-
-		if (parallelProjection) {
-			d.set( 0, -1, 0 );
-			transform.transform(d);
-			o.set( y*fov, worldWidth, x*fov*aspect );
-			transform.transform(o);
-			o.add(pos);
-			ray.set(o, d);
-		} else if (infDof) {
-			d.set(fovTan * y, -1, fovTan * aspect * x);
-			d.normalize();
-			transform.transform(d);
-			ray.set(pos, d);
-		} else {
-			// image plane coordinates flipped to account for
-			// the flipped image through lens simulation
-			d.set(fovTan * y, -1, aspect * x);
-			doLens(random, d, o, - fovTan * y, - aspect * fovTan * x);
-			transform.transform(d);
-			transform.transform(o);
-			o.add(pos);
-			ray.set(o, d);
-		}
-	}
-
-	/**
-	 * Simple lens simulation
-	 *
-	 * @param d
-	 * @param x x-coordinate of ray origin
-	 * @param z z-coordinate of ray origin
-	 */
-	private void doLens(Random random, Vector3d d, Vector3d i, double x, double z) {
-		d.set(-x, -1, -z);
-		d.scale(focalOffset);
-
-		// at the focal offset we want the distance to a CoC of X to be equal to dof
-		double X = 1.0;
-		double aperture = Math.sqrt((X / dof) * focalOffset);
-
-		double rx, rz;
-		while (true) {
-			rx = 2 * random.nextDouble() - 1;
-			rz = 2 * random.nextDouble() - 1;
-			double s = rx*rx + rz*rz;
-			if (s > Ray.EPSILON && s <= 1) {
-				rx *= aperture;
-				rz *= aperture;
-				break;
-			}
-		}
-
-		i.set(rx, 0, rz);
-		d.sub(i);
-		d.normalize();
+		projector.calcViewRay(ray, pos, transform, d, o, random, x * aspect, y);
 	}
 
 	/**
@@ -564,18 +720,18 @@ public class Camera {
 	public void setWorldSize(double size) {
 		worldWidth = Math.sqrt(size*size + Chunk.Y_MAX*Chunk.Y_MAX);
 	}
-
+	
 	/**
-	 * @return Maximum world diagonal size
+	 * @return Minimum FoV value, depending on projection
 	 */
-	public double getWorldSize() {
-		return worldWidth;
+	public double getMinFoV() {
+		return projector.getMinRecommendedFoV();
 	}
-
+	
 	/**
-	 * @return Maximum FoV value, depending on ParallelProjection
+	 * @return Maximum FoV value, depending on projection
 	 */
 	public double getMaxFoV() {
-		return parallelProjection ? worldWidth : MAX_FOV;
+		return projector.getMaxRecommendedFoV();
 	}
 }
