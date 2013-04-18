@@ -62,7 +62,7 @@ public class Camera {
 	/**
 	 * Minimum Focal Offset
 	 */
-	public static final double MIN_FOCAL_OFFSET = 1;
+	public static final double MIN_FOCAL_OFFSET = 0.01;
 
 	/**
 	 * Maximum Focal Offset
