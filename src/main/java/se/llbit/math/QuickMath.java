@@ -109,6 +109,6 @@ public class QuickMath {
 	 * @return value clamped to min and max
 	 */
 	public static double clamp(double value, double min, double max) {
-		return Math.max(Math.min(value, max), min);
+		return value < min ? min : value > max ? max : value;
 	}
 }
