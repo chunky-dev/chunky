@@ -112,7 +112,7 @@
 		<antcall target="jar"/>
 		<antcall target="gendoc"/>
 		<zip destfile="build/Chunky-${Chunky.version}.zip">
-			<zipfileset dir="." prefix="Chunky">
+			<zipfileset dir="." prefix="Chunky-${Chunky.version}">
 				<include name="ChangeLog.txt"/>
 				<include name="Chunky.bat"/>
 				<include name="Chunky.sh"/>
