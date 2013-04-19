@@ -94,9 +94,9 @@ public class Camera
 	/**
 	 * Casts rays like a pinhole camera
 	 */
-	static class PlanarProjector implements Projector {
+	static class PinholeProjector implements Projector {
 		final double fovTan;
-		public PlanarProjector( double fov ) {
+		public PinholeProjector( double fov ) {
 			this.fovTan = clampedFovTan(fov);
 		}
 		
@@ -110,9 +110,9 @@ public class Camera
 		public double getDefaultFoV() { return 70; }
 	}
 	
-	static class SphericalProjector implements Projector {
+	static class FisheyeProjector implements Projector {
 		final double fov;
-		public SphericalProjector( double fov ) {
+		public FisheyeProjector( double fov ) {
 			this.fov = fov;
 		}
 		
@@ -140,13 +140,38 @@ public class Camera
 	}
 	
 	/**
+	 * Panoramic equirectangular projector.
+	 * x is mapped to yaw, y is mapped to pitch.
+	 */
+	static class PanoramicProjector implements Projector {
+		final double fov;
+		public PanoramicProjector( double fov ) {
+			this.fov = fov;
+		}
+		
+        public void apply( double x, double y, Random random, Vector3d pos, Vector3d direction ) {
+			double ay = y * fov * Math.PI / 180;
+			double ax = x * fov * Math.PI / 180;
+			
+			double vv = Math.cos(ay);
+			
+        	pos.set( 0, 0, 0 );
+        	direction.set( Math.sin(ay), -vv*Math.cos(ax), vv*Math.sin(ax) );
+        }
+		
+		public double getMinRecommendedFoV() { return   1; }
+		public double getMaxRecommendedFoV() { return 180; }
+		public double getDefaultFoV() { return 120; }
+	}
+
+	/**
 	 * Behaves like a pinhole camera in the vertical direction,
 	 * but like a spherical one in the horizontal direction.
 	 */
-	static class CylindricalProjector implements Projector {
+	static class PanoramicSlotProjector implements Projector {
 		final double fov;
 		final double fovTan;
-		public CylindricalProjector( double fov ) {
+		public PanoramicSlotProjector( double fov ) {
 			this.fov = fov;
 			this.fovTan = clampedFovTan(fov);
 		}
@@ -263,9 +288,10 @@ public class Camera
 	
 	public enum ProjectionMode {
 		PARALLEL("Parallel"),
-		PLANAR("Planar"),
-		SPHERICAL("Spherical"),
-		CYLINDRICAL("Cylindrical");
+		PINHOLE("Pinhole"),
+		FISHEYE("Fisheye"),
+		PANORAMIC("Panoramic (equirectangular)"),
+		PANORAMIC_SLOT("Panoramic (slot)");
 		
 		public final String niceName;
 		private ProjectionMode( String niceName ) {
@@ -320,7 +346,7 @@ public class Camera
 	private Matrix3d transform = new Matrix3d();
 	private Matrix3d tmpTransform = new Matrix3d();
 
-	private ProjectionMode projectionMode = ProjectionMode.PLANAR;
+	private ProjectionMode projectionMode = ProjectionMode.PINHOLE;
 	private Projector projector = createProjector();
 
 	private double dof = 8;
@@ -405,7 +431,7 @@ public class Camera
 		try {
 			projectionMode = ProjectionMode.valueOf( tag.get("projectionMode").stringValue() );
 		} catch( IllegalArgumentException e ) {
-			projectionMode = tag.get("parallel").byteValue() != 0 ? ProjectionMode.PARALLEL : ProjectionMode.PLANAR;
+			projectionMode = tag.get("parallel").byteValue() != 0 ? ProjectionMode.PARALLEL : ProjectionMode.PINHOLE;
 		}
 		infDof = tag.get("infDof").byteValue() != 0;
 		initProjector();
@@ -424,15 +450,17 @@ public class Camera
 		switch (projectionMode) {
 		case PARALLEL:
 			return new ForwardDisplacementProjector( applyDoF( new ParallelProjector( worldWidth, fov ) ), -worldWidth );
-		case PLANAR:
-			return applyDoF( new PlanarProjector(fov) );
-		case SPHERICAL:
-			return applyDoF( new SphericalProjector(fov) );
-		case CYLINDRICAL:
-			return applyDoF( new CylindricalProjector(fov) );
+		case PINHOLE:
+			return applyDoF( new PinholeProjector(fov) );
+		case FISHEYE:
+			return applyDoF( new FisheyeProjector(fov) );
+		case PANORAMIC_SLOT:
+			return applyDoF( new PanoramicSlotProjector(fov) );
+		case PANORAMIC:
+			return applyDoF( new PanoramicProjector(fov) );
 		default:
 			System.err.println("Error: Undefined projection mode: "+projectionMode+", defaulting to planar");
-			return applyDoF( new PlanarProjector(fov) );
+			return applyDoF( new PinholeProjector(fov) );
 		}
 	}
 
