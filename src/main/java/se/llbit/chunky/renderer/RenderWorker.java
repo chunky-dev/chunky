@@ -35,8 +35,8 @@ public class RenderWorker extends Thread {
 	private static final Logger logger =
 			Logger.getLogger(RenderWorker.class);
 
-	private int id;
-	private AbstractRenderManager manager;
+	private final int id;
+	private final AbstractRenderManager manager;
 
 	private final Ray ray;
 	private final RayPool rayPool;
@@ -60,6 +60,7 @@ public class RenderWorker extends Thread {
 		random = new Random(seed);
 	}
 
+	@Override
 	public void run() {
 		try {
 			try {
@@ -86,6 +87,7 @@ public class RenderWorker extends Thread {
 		int canvasWidth = scene.canvasWidth();
 		int canvasHeight = scene.canvasHeight();
 
+		// calculate pixel bounds for this job
 		int xjobs = (canvasWidth+(manager.tileWidth-1))/manager.tileWidth;
 		int x0 = manager.tileWidth * (jobId % xjobs);
 		int x1 = Math.min(x0 + manager.tileWidth, canvasWidth);
@@ -97,6 +99,8 @@ public class RenderWorker extends Thread {
 		final Camera cam = scene.camera();
 
 		if (scene.pathTrace()) {
+
+			// this is intentionally incorrectly indented for readability
 			for (int x = x0; x < x1; ++x) {
 			for (int y = y0; y < y1; ++y) {
 
@@ -133,6 +137,7 @@ public class RenderWorker extends Thread {
 
 		} else {
 
+			// this is intentionally incorrectly indented for readability
 			for (int x = x0; x < x1; ++x) {
 			for (int y = y0; y < y1; ++y) {
 
