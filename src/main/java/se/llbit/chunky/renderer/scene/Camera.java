@@ -58,7 +58,7 @@ public class Camera
 		 * @param x pixel X coordinate, where 0 = center and +-0.5 = edges
 		 * @param y pixel Y coordinate, where 0 = center and +-0.5 = edges
 		 * @param pos will be populated with camera-relative ray origin position
-		 * @param direction will be populated with camera-relative ray direction
+		 * @param direction will be populated with camera-relative ray direction (not necessarily normalized)
 		 */
 		public void apply( double x, double y, Random random, Vector3d pos, Vector3d direction );
 		public double getMinRecommendedFoV();
@@ -219,6 +219,39 @@ public class Camera
 			
 			d.scale( focalOffset );
 			d.sub( apertureScratchVector ); // Change direction of d to compensate for origin shift
+		}
+		
+		public double getMinRecommendedFoV() { return wrapped.getMinRecommendedFoV(); }
+		public double getMaxRecommendedFoV() { return wrapped.getMaxRecommendedFoV(); }
+		public double getDefaultFoV() { return wrapped.getDefaultFoV(); }
+	}
+	
+	/**
+	 * Moves the ray origin forward (if displacement is positive) along
+	 * the direction vector.
+	 */
+	static class ForwardDisplacementProjector implements Projector {
+		final Projector wrapped;
+		final double displacement;
+		
+		public ForwardDisplacementProjector( Projector wrapped, double displacement ) {
+			this.wrapped = wrapped;
+			this.displacement = displacement;
+		}
+		
+		public void apply(
+			double x, double y, Random random, Vector3d o, Vector3d d
+		) {
+			wrapped.apply( x, y, random, o, d );
+
+			// Rather than use a separate scratch vector, scale d
+			// and then revert it (if it's been reversed) when done
+			
+			d.normalize();
+			d.scale( displacement );
+			o.add( d );
+			
+			if( displacement < 0 ) d.scale( -1 );
 		}
 		
 		public double getMinRecommendedFoV() { return wrapped.getMinRecommendedFoV(); }
@@ -390,7 +423,7 @@ public class Camera
 	private Projector createProjector() {
 		switch (projectionMode) {
 		case PARALLEL:
-			return applyDoF( new ParallelProjector( worldWidth, fov ) );
+			return new ForwardDisplacementProjector( applyDoF( new ParallelProjector( worldWidth, fov ) ), -worldWidth );
 		case PLANAR:
 			return applyDoF( new PlanarProjector(fov) );
 		case SPHERICAL:
@@ -677,14 +710,6 @@ public class Camera
 		transform.transform(ray.d);
 		transform.transform(ray.x);
 		ray.x.add(pos);
-		
-		if( projectionMode == ProjectionMode.PARALLEL ) {
-			// Then we want to 'back up' the ray so it's outside the world.
-			// (though maybe this should be a separate option)
-			ray.d.scale(worldWidth);
-			ray.x.sub(ray.d);
-			ray.d.normalize();
-		}
 		
 		// Even though we've implicitly set ray.d and x, we need to
 		// call ray.set(...) to reset its other values.
