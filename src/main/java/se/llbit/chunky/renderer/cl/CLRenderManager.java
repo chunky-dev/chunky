@@ -16,7 +16,20 @@
  */
 package se.llbit.chunky.renderer.cl;
 
-import static org.jocl.CL.*;
+import static org.jocl.CL.CL_CONTEXT_PLATFORM;
+import static org.jocl.CL.CL_MEM_READ_ONLY;
+import static org.jocl.CL.CL_MEM_READ_WRITE;
+import static org.jocl.CL.CL_TRUE;
+import static org.jocl.CL.clBuildProgram;
+import static org.jocl.CL.clCreateBuffer;
+import static org.jocl.CL.clCreateCommandQueue;
+import static org.jocl.CL.clCreateContext;
+import static org.jocl.CL.clCreateKernel;
+import static org.jocl.CL.clCreateProgramWithSource;
+import static org.jocl.CL.clEnqueueNDRangeKernel;
+import static org.jocl.CL.clEnqueueReadBuffer;
+import static org.jocl.CL.clEnqueueWriteBuffer;
+import static org.jocl.CL.clSetKernelArg;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -47,7 +60,6 @@ import org.jocl.cl_program;
 
 import se.llbit.chunky.renderer.ProgressListener;
 import se.llbit.chunky.renderer.Renderer;
-import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.ui.Chunk3DView;
 import se.llbit.chunky.renderer.ui.ViewListener;
@@ -55,7 +67,6 @@ import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
-
 import se.llbit.j99.castor.Symbol;
 import se.llbit.j99.fragment.CommentFragmenter;
 import se.llbit.j99.fragment.CompositeFragment;
@@ -87,9 +98,9 @@ public class CLRenderManager extends Thread implements Renderer,
 	private static final Logger logger =
 			Logger.getLogger(CLRenderManager.class);
 
-	private int workItems;
-	private long[] globalWorkSize;
-	private long[] localWorkSize;
+	private final int workItems;
+	private final long[] globalWorkSize;
+	private final long[] localWorkSize;
 
 	private cl_kernel kernel;
 	private cl_mem sampleBuffer;
@@ -99,8 +110,8 @@ public class CLRenderManager extends Thread implements Renderer,
 	private cl_mem originBuffer;
 	private cl_mem seedBuffer;
 	private cl_command_queue commandQueue;
-	private int bufferWidth;
-	private int bufferHeight;
+	private final int bufferWidth;
+	private final int bufferHeight;
 	private BufferedImage buffer;
 	private BufferedImage backBuffer;
 	private final Chunk3DView view;
@@ -293,6 +304,7 @@ public class CLRenderManager extends Thread implements Renderer,
 		return new CompositeFragment(visitor.getResult());
 	}
 
+	@Override
 	public void run() {
 		float[] samples;
 		long frameStart;

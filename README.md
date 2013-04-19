@@ -62,6 +62,13 @@ command line:
 Where SceneName is the name of the scene to render. You can read more about
 [headless rendering on the Wiki](http://chunky.llbit.se/index.php?title=Headless_Rendering).
 
+Code Style
+----------
+
+The standard Eclipse Java style is used, with slight modifications. If you
+want to contribute code to Chunky please make your code look similar to the
+rest of the code.
+
 Additional Information
 ----------------------
 
