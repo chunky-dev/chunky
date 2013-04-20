@@ -1,3 +1,7 @@
+1.1.11 - TBD
+    * Fixed error causing emitter and sun intensity values below one to
+    be equal to zero
+
 1.1.10 - 2013-04-20
     * Added Emerald Ore and Nether Quartz Ore to the block highlight list
     * Added new projection modes (TOGoS)

@@ -1,2 +1,3 @@
-*.java  text
-*.txt	eol=crlf
+*.properties    text
+*.java          text
+*.txt	        eol=crlf

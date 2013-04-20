@@ -1422,7 +1422,7 @@ public class Scene implements Refreshable {
 	 * @param value
 	 */
 	public void setEmitterIntensity(double value) {
-		emitterIntensity  = value;
+		emitterIntensity = value;
 		refresh();
 	}
 

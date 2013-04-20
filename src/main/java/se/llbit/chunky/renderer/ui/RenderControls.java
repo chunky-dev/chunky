@@ -815,7 +815,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				Scene.MAX_EMITTER_INTENSITY) {
 			@Override
 			public void valueChanged(double newValue) {
-				renderMan.scene().setEmitterIntensity((int) newValue);
+				renderMan.scene().setEmitterIntensity(newValue);
 			}
 		};
 		emitterIntensity.setLogarithmicMode(true);
@@ -827,7 +827,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				Sun.MAX_INTENSITY) {
 			@Override
 			public void valueChanged(double newValue) {
-				renderMan.scene().sun().setIntensity((int) newValue);
+				renderMan.scene().sun().setIntensity(newValue);
 			}
 		};
 		sunIntensity.setLogarithmicMode(true);
@@ -1065,7 +1065,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		focalOffsetSlider.setMaximum(1000);
 		focalOffsetSlider.addChangeListener(focalOffsetListener);
 		updateFocalOffsetSlider();
-		
+
 		Camera.ProjectionMode[] projectionModes = Camera.ProjectionMode.class.getEnumConstants();
 		String[] projectionModeNames = new String[projectionModes.length];
 		for( int i=0; i<projectionModes.length; ++i ) {
