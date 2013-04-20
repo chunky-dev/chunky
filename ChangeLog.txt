@@ -1,4 +1,4 @@
-1.1.10 - TBD
+1.1.10 - 2013-04-20
     * Added Emerald Ore and Nether Quartz Ore to the block highlight list
     * Added new projection modes (TOGoS)
 
