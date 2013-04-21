@@ -395,8 +395,6 @@ public class Chunky implements ChunkDiscoveryListener {
 	 * for the current world.
 	 */
 	public synchronized void reloadWorld() {
-		chunkSelection.clearSelection();
-
 		world.reload();
 
 		if (frame != null) {

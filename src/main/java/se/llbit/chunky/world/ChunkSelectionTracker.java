@@ -30,8 +30,8 @@ import se.llbit.chunky.world.listeners.ChunkUpdateListener;
  */
 public class ChunkSelectionTracker implements ChunkDeletionListener {
 
-    private Set<ChunkPosition> selected = new HashSet<ChunkPosition>();
-    private Collection<ChunkUpdateListener> chunkUpdateListeners =
+    private final Set<ChunkPosition> selected = new HashSet<ChunkPosition>();
+    private final Collection<ChunkUpdateListener> chunkUpdateListeners =
             new LinkedList<ChunkUpdateListener>();
 
 
