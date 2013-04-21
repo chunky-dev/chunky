@@ -1,4 +1,5 @@
 1.1.11 - TBD
+    * Windows installer skips overwriting the (more memory) shortcut
     * Fixed error causing emitter and sun intensity values below one to
     be equal to zero
 
