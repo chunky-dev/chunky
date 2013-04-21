@@ -26,6 +26,7 @@ import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Camera;
 
 /**
+ * Adjuster specialized for DoF.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class DoFAdjuster extends Adjuster {
@@ -39,6 +40,7 @@ public class DoFAdjuster extends Adjuster {
 		super("Depth of Field", "Depth of Field",
 				Camera.MIN_DOF, Camera.MAX_DOF);
 		this.renderMan = renderManager;
+		setLogarithmicMode(true);
 	}
 
 	@Override
@@ -70,10 +72,7 @@ public class DoFAdjuster extends Adjuster {
 		renderMan.scene().camera().setDof(newValue);
 	}
 
-	/**
-	 * Update the adjuster with the current value
-	 */
-	// TODO add as abstract prototype in Adjuster
+	@Override
 	public void update() {
 		Camera camera = renderMan.scene().camera();
 		if (camera.getInfDof()) {

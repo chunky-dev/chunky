@@ -226,6 +226,11 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	public abstract void valueChanged(double newValue);
 
 	/**
+	 * Update the adjuster with the current value
+	 */
+	public abstract void update();
+
+	/**
 	 * @return The label
 	 */
 	public JLabel getLabel() {

@@ -155,7 +155,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private Adjuster sunAzimuth;
 	private Adjuster sunAltitude;
 	private Adjuster fov;
-	private DoFAdjuster dof;
+	private Adjuster dof;
 
 	/**
 	 * Create a new Render Controls dialog.
@@ -399,8 +399,12 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void valueChanged(double newValue) {
 				renderMan.scene().setRayDepth((int) newValue);
 			}
+			@Override
+			public void update() {
+				rayDepth.set(renderMan.scene().getRayDepth());
+			}
 		};
-		updateRayDepth();
+		rayDepth.update();
 
 		JSeparator sep1 = new JSeparator();
 		JSeparator sep2 = new JSeparator();
@@ -815,9 +819,13 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void valueChanged(double newValue) {
 				renderMan.scene().setEmitterIntensity(newValue);
 			}
+			@Override
+			public void update() {
+				emitterIntensity.set(renderMan.scene().getEmitterIntensity());
+			}
 		};
 		emitterIntensity.setLogarithmicMode(true);
-		updateEmitterIntensity();
+		emitterIntensity.update();
 
 		sunIntensity = new Adjuster("Sun intensity",
 				"Light intensity modifier for sun",
@@ -827,9 +835,13 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void valueChanged(double newValue) {
 				renderMan.scene().sun().setIntensity(newValue);
 			}
+			@Override
+			public void update() {
+				sunIntensity.set(renderMan.scene().sun().getIntensity());
+			}
 		};
 		sunIntensity.setLogarithmicMode(true);
-		updateSunIntensity();
+		sunIntensity.update();
 
 		sunAzimuth = new Adjuster("Sun azimuth",
 				"The angle towards the sun from north",
@@ -839,8 +851,12 @@ public class RenderControls extends JDialog implements ViewListener,
 				renderMan.scene().sun().setAzimuth(
 						QuickMath.degToRad(newValue));
 			}
+			@Override
+			public void update() {
+				sunAzimuth.set(QuickMath.radToDeg(renderMan.scene().sun().getAzimuth()));
+			}
 		};
-		updateSunAzimuth();
+		sunAzimuth.update();
 
 		sunAltitude = new Adjuster("Sun altitude",
 				"The angle of the sun above the horizon",
@@ -850,8 +866,12 @@ public class RenderControls extends JDialog implements ViewListener,
 				renderMan.scene().sun().setAltitude(
 						QuickMath.degToRad(newValue));
 			}
+			@Override
+			public void update() {
+				sunAltitude.set(QuickMath.radToDeg(renderMan.scene().sun().getAltitude()));
+			}
 		};
-		updateSunAltitude();
+		sunAltitude.update();
 
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
@@ -973,8 +993,12 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void valueChanged(double newValue) {
 				renderMan.scene().setCloudHeight((int) newValue);
 			}
+			@Override
+			public void update() {
+				cloudHeight.set(renderMan.scene().getCloudHeight());
+			}
 		};
-		updateCloudHeight();
+		cloudHeight.update();
 
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
@@ -1056,11 +1080,15 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void valueChanged(double newValue) {
 				renderMan.scene().camera().setFoV(newValue);
 			}
+			@Override
+			public void update() {
+				Camera camera = renderMan.scene().camera();
+				fov.set(camera.getFoV(), camera.getMinFoV(), camera.getMaxFoV());
+			}
 		};
-		updateFoV();
+		fov.update();
 
 		dof = new DoFAdjuster(renderMan);
-		dof.setLogarithmicMode(true);
 		dof.update();
 
 		focalOffsetSlider.setMinimum(1);
@@ -1771,14 +1799,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		waterHeightField.setEnabled(height > 0);
 	}
 
-	protected void updateCloudHeight() {
-		cloudHeight.set(renderMan.scene().getCloudHeight());
-	}
-
-	protected void updateRayDepth() {
-		rayDepth.set(renderMan.scene().getRayDepth());
-	}
-
 	protected void updateFocalOffsetField() {
 		focalOffsetField.removeActionListener(focalOffsetFieldListener);
 		focalOffsetField.setText(String.format("%.2f", renderMan.scene().camera().getFocalOffset()));
@@ -1814,30 +1834,12 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	protected void updateFoV() {
-		Camera camera = renderMan.scene().camera();
-		fov.set(camera.getFoV(), camera.getMinFoV(), camera.getMaxFoV());
 	}
 
 	protected void updateExposureField() {
 		exposureField.removeActionListener(exposureFieldListener);
 		exposureField.setText(String.format("%.2f", renderMan.scene().getExposure()));
 		exposureField.addActionListener(exposureFieldListener);
-	}
-
-	protected void updateSunAzimuth() {
-		sunAzimuth.set(QuickMath.radToDeg(renderMan.scene().sun().getAzimuth()));
-	}
-
-	protected void updateSunAltitude() {
-		sunAltitude.set(QuickMath.radToDeg(renderMan.scene().sun().getAltitude()));
-	}
-
-	protected void updateSunIntensity() {
-		sunIntensity.set(renderMan.scene().sun().getIntensity());
-	}
-
-	protected void updateEmitterIntensity() {
-		emitterIntensity.set(renderMan.scene().getEmitterIntensity());
 	}
 
 	protected void updateExposureSlider() {
@@ -2058,10 +2060,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateFocalOffsetSlider();
 		updateWidthField();
 		updateHeightField();
-		updateEmitterIntensity();
-		updateSunIntensity();
-		updateSunAzimuth();
-		updateSunAltitude();
+		emitterIntensity.update();
+		sunIntensity.update();
+		sunAzimuth.update();
+		sunAltitude.update();
 		updateStillWater();
 		updateClearWater();
 		updateSkyRotation();
@@ -2078,8 +2080,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateSPPTargetField();
 		updateSceneNameField();
 		updatePostprocessCB();
-		updateCloudHeight();
-		updateRayDepth();
+		cloudHeight.update();
+		rayDepth.update();
 		updateCameraDirection();
 		updateCameraPosition();
 		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
