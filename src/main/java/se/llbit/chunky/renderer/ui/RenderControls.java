@@ -105,9 +105,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox mirrorSkyCB = new JCheckBox();
 	private final JTextField widthField = new JTextField();
 	private final JTextField heightField = new JTextField();
-	private final JSlider dofSlider = new JSlider();
 	private final JComboBox projectionMode = new JComboBox();
-	private final JTextField dofField = new JTextField();
 	private final JTextField focalOffsetField = new JTextField();
 	private final JButton startRenderBtn = new JButton();
 	private final JCheckBox enableEmitters = new JCheckBox();
@@ -157,6 +155,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private Adjuster sunAzimuth;
 	private Adjuster sunAltitude;
 	private Adjuster fov;
+	private DoFAdjuster dof;
 
 	/**
 	 * Create a new Render Controls dialog.
@@ -1046,13 +1045,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	private Component buildCameraPane() {
 		JLabel projectionModeLbl = new JLabel("Projection");
-		JLabel dofLbl = new JLabel("Depth of Field: ");
 		JLabel focalOffsetLbl = new JLabel("Focal Offset: ");
-
-		dofSlider.setMinimum(1);
-		dofSlider.setMaximum(1000);
-		dofSlider.addChangeListener(dofListener);
-		updateDofSlider();
 
 		fov = new Adjuster(
 				"Field of View (zoom)",
@@ -1065,6 +1058,10 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		};
 		updateFoV();
+
+		dof = new DoFAdjuster(renderMan);
+		dof.setLogarithmicMode(true);
+		dof.update();
 
 		focalOffsetSlider.setMinimum(1);
 		focalOffsetSlider.setMaximum(1000);
@@ -1080,10 +1077,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		projectionMode.addActionListener(projectionModeListener);
 		updateProjectionModeField();
 
-		dofField.setColumns(5);
-		dofField.addActionListener(dofFieldListener);
-		updateDofField();
-
 		focalOffsetField.setColumns(5);
 		focalOffsetField.addActionListener(focalOffsetFieldListener);
 		updateFocalOffsetField();
@@ -1094,8 +1087,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				renderMan.scene().autoFocus();
-				updateDofField();
-				updateDofSlider();
+				dof.update();
 				updateFocalOffsetField();
 				updateFocalOffsetSlider();
 			}
@@ -1341,16 +1333,16 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addGroup(layout.createParallelGroup()
 						.addComponent(projectionModeLbl)
 						.addComponent(fov.getLabel())
-						.addComponent(dofLbl)
+						.addComponent(dof.getLabel())
 						.addComponent(focalOffsetLbl))
 					.addGroup(layout.createParallelGroup()
 						.addComponent(projectionMode)
 						.addComponent(fov.getSlider())
-						.addComponent(dofSlider)
+						.addComponent(dof.getSlider())
 						.addComponent(focalOffsetSlider))
 					.addGroup(layout.createParallelGroup()
 						.addComponent(fov.getField())
-						.addComponent(dofField)
+						.addComponent(dof.getField())
 						.addComponent(focalOffsetField)))
 				.addComponent(autoFocusBtn))
 			.addContainerGap()
@@ -1403,10 +1395,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(projectionModeLbl)
 				.addComponent(projectionMode))
 			.addGroup(fov.verticalGroup(layout))
-			.addGroup(layout.createParallelGroup()
-				.addComponent(dofLbl)
-				.addComponent(dofSlider)
-				.addComponent(dofField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+			.addGroup(dof.verticalGroup(layout))
 			.addGroup(layout.createParallelGroup()
 				.addComponent(focalOffsetLbl)
 				.addComponent(focalOffsetSlider)
@@ -1589,22 +1578,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
-	private final ChangeListener dofListener = new ChangeListener() {
-		@Override
-		public void stateChanged(ChangeEvent e) {
-			JSlider source = (JSlider) e.getSource();
-			if (source.getValue() == source.getMaximum()) {
-				renderMan.scene().camera().setInfDof(true);
-			} else {
-				renderMan.scene().camera().setInfDof(false);
-				double value = (double) (source.getValue() - source.getMinimum())
-						/ (source.getMaximum() - source.getMinimum());
-				double scale = Camera.MAX_DOF - Camera.MIN_DOF;
-				renderMan.scene().camera().setDof(value * scale + Camera.MIN_DOF);
-			}
-			updateDofField();
-		}
-	};
 	private final ChangeListener skyRotationListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
@@ -1614,7 +1587,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			double rotation = value * 2 * Math.PI;
 			renderMan.scene().sky().setRotation(rotation);
 			ProgramProperties.setProperty("skymapRotation", Double.toString(rotation));
-			updateDofField();
 		}
 	};
 	private final ActionListener projectionModeListener = new ActionListener() {
@@ -1774,25 +1746,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			renderMan.scene().setDirectLight(directLight.isSelected());
 		}
 	};
-	private final ActionListener dofFieldListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JTextField source = (JTextField) e.getSource();
-			if (source.getText().equals("inf")) {
-				renderMan.scene().camera().setInfDof(true);
-			} else {
-				try {
-					double value = numberFormat.parse(source.getText()).doubleValue();
-					value = Math.max(value, Camera.MIN_DOF);
-					renderMan.scene().camera().setInfDof(false);
-					renderMan.scene().camera().setDof(value);
-					updateDofSlider();
-				} catch (NumberFormatException ex) {
-				} catch (ParseException ex) {
-				}
-			}
-		}
-	};
 	private final ActionListener focalOffsetFieldListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -1826,15 +1779,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		rayDepth.set(renderMan.scene().getRayDepth());
 	}
 
-	protected void updateDofField() {
-		dofField.removeActionListener(dofFieldListener);
-		if (renderMan.scene().camera().getInfDof())
-			dofField.setText("inf");
-		else
-			dofField.setText(String.format("%.2f", renderMan.scene().camera().getDof()));
-		dofField.addActionListener(dofFieldListener);
-	}
-
 	protected void updateFocalOffsetField() {
 		focalOffsetField.removeActionListener(focalOffsetFieldListener);
 		focalOffsetField.setText(String.format("%.2f", renderMan.scene().camera().getFocalOffset()));
@@ -1846,19 +1790,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		skyRotationSlider.setValue((int) Math.round(
 				100 * renderMan.scene().sky().getRotation() / (2 * Math.PI)));
 		skyRotationSlider.addChangeListener(skyRotationListener);
-	}
-
-	protected void updateDofSlider() {
-		dofSlider.removeChangeListener(dofListener);
-		if (renderMan.scene().camera().getInfDof()) {
-			dofSlider.setValue(dofSlider.getMaximum());
-		} else {
-			double value = (renderMan.scene().camera().getDof() - Camera.MIN_DOF)
-					/ (Camera.MAX_DOF - Camera.MIN_DOF);
-			double scale = dofSlider.getMaximum() - dofSlider.getMinimum();
-			dofSlider.setValue((int) (value * scale + dofSlider.getMinimum()));
-		}
-		dofSlider.addChangeListener(dofListener);
 	}
 
 	protected void updateFocalOffsetSlider() {
@@ -2119,10 +2050,9 @@ public class RenderControls extends JDialog implements ViewListener,
 	 */
 	@Override
 	public synchronized void sceneLoaded() {
-		updateDofField();
+		dof.update();
 		updateFoV();
 		updateFocalOffsetField();
-		updateDofSlider();
 		updateProjectionModeField();
 		updateSkyMode();
 		updateFocalOffsetSlider();

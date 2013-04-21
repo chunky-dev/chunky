@@ -181,7 +181,6 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	}
 
 	private void setSlider(double value) {
-		slider.removeChangeListener(this);
 		int sliderValue;
 		if (logarithmic) {
 			double logMin = Math.log10(min);
@@ -193,7 +192,12 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 			double scale = (slider.getMaximum() - slider.getMinimum()) / (max - min);
 			sliderValue = (int) ((value - min) * scale + 0.5 + slider.getMinimum());
 		}
-		slider.setValue(sliderValue);
+		setSliderValue(sliderValue);
+	}
+
+	protected void setSliderValue(int value) {
+		slider.removeChangeListener(this);
+		slider.setValue(value);
 		slider.addChangeListener(this);
 	}
 
@@ -202,12 +206,16 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
  	 * @param value new value
  	 */
 	private void setTextField(double value) {
-		textField.removeActionListener(this);
 		if (integerMode) {
-			textField.setText("" + (int) value);
+			setTextFieldText("" + (int) value);
 		} else {
-			textField.setText(String.format("%.2f", value));
+			setTextFieldText(String.format("%.2f", value));
 		}
+	}
+
+	protected void setTextFieldText(String text) {
+		textField.removeActionListener(this);
+		textField.setText(text);
 		textField.addActionListener(this);
 	}
 
