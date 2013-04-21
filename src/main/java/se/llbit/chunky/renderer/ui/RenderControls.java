@@ -1057,8 +1057,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		fov = new Adjuster(
 				"Field of View (zoom)",
 				"Field of View",
-				Sun.MIN_INTENSITY,
-				Sun.MAX_INTENSITY) {
+				1.0,
+				180.0) {
 			@Override
 			public void valueChanged(double newValue) {
 				renderMan.scene().camera().setFoV(newValue);
