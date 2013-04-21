@@ -1159,7 +1159,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
 				camera.setView(Math.PI, -Math.PI/2);
-				updateFoV();
+				fov.update();
 				updateCameraDirection();
 			}
 		});
@@ -1171,7 +1171,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
 				camera.setView(0, -Math.PI/2);
-				updateFoV();
+				fov.update();
 				updateCameraDirection();
 			}
 		});
@@ -1183,7 +1183,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
 				camera.setView(-Math.PI/2, Math.PI);
-				updateFoV();
+				fov.update();
 				updateCameraDirection();
 			}
 		});
@@ -1195,7 +1195,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
 				camera.setView(-Math.PI/2, 0);
-				updateFoV();
+				fov.update();
 				updateCameraDirection();
 			}
 		});
@@ -1207,7 +1207,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
 				camera.setView(Math.PI/2, -Math.PI/2);
-				updateFoV();
+				fov.update();
 				updateCameraDirection();
 			}
 		});
@@ -1219,7 +1219,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
 				camera.setView(-Math.PI/2, -Math.PI/2);
-				updateFoV();
+				fov.update();
 				updateCameraDirection();
 			}
 		});
@@ -1245,7 +1245,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				camera.setView(-Math.PI/4, -Math.PI/4);
 				camera.setProjectionMode(Camera.ProjectionMode.PARALLEL);
 				updateProjectionModeField();
-				updateFoV();
+				fov.update();
 				updateCameraDirection();
 			}
 		});
@@ -1260,7 +1260,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				camera.setView(-3*Math.PI/4, -Math.PI/4);
 				camera.setProjectionMode(Camera.ProjectionMode.PARALLEL);
 				updateProjectionModeField();
-				updateFoV();
+				fov.update();
 				updateCameraDirection();
 			}
 		});
@@ -1275,7 +1275,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				camera.setView(-5*Math.PI/4, -Math.PI/4);
 				camera.setProjectionMode(Camera.ProjectionMode.PARALLEL);
 				updateProjectionModeField();
-				updateFoV();
+				fov.update();
 				updateCameraDirection();
 			}
 		});
@@ -1290,7 +1290,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				camera.setView(-7*Math.PI/4, -Math.PI/4);
 				camera.setProjectionMode(Camera.ProjectionMode.PARALLEL);
 				updateProjectionModeField();
-				updateFoV();
+				fov.update();
 				updateCameraDirection();
 			}
 		});
@@ -1623,7 +1623,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			Camera.ProjectionMode m = Camera.ProjectionMode.class.getEnumConstants()[projectionMode.getSelectedIndex()];
 			renderMan.scene().camera().setProjectionMode(m);
 			updateProjectionModeField();
-			updateFoV();
+			fov.update();
 		}
 	};
 	private final ActionListener skyModeListener = new ActionListener() {
@@ -1831,9 +1831,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		skyModeCB.removeActionListener(skyModeListener);
 		// TODO
 		skyModeCB.addActionListener(skyModeListener);
-	}
-
-	protected void updateFoV() {
 	}
 
 	protected void updateExposureField() {
@@ -2053,7 +2050,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	@Override
 	public synchronized void sceneLoaded() {
 		dof.update();
-		updateFoV();
+		fov.update();
 		updateFocalOffsetField();
 		updateProjectionModeField();
 		updateSkyMode();
@@ -2169,7 +2166,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		double scale = camera.getMaxFoV() - camera.getMinFoV();
 		value = value + diff * scale/20;
 		renderMan.scene().camera().setFoV(value);
-		updateFoV();
+		fov.update();
 	}
 
 	/**
