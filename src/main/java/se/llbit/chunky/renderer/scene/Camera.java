@@ -162,6 +162,7 @@ public class Camera {
 			}
 			pos.set(0, 0, 0);
 			direction.set(dy, -dz, dx);
+			direction.normalize();
 		}
 
 		@Override
@@ -262,8 +263,14 @@ public class Camera {
 
 	/**
 	 * Simulates a non-point aperture to produce depth-of-focus effects.
-	 * Delegates calculation of base offset/direction to another projector. If
-	 * apertureSize is 0 this will still work, but it will not have any effect.
+	 * Delegates calculation of base offset/direction to another projector.
+	 * 
+	 * The magnitude of the direction calculated by the wrapped projector will 
+	 * be used to indicate the distance from the camera origin to the sensor
+	 * and thereby affects the shape of the focal surface (e.g. if the vector
+	 * is normalized, it will be a sphere rather than a plane). 
+	 * 
+	 * If apertureSize is 0 this will still work, but it will not have any effect.
 	 * In that case you should use the wrapped Projector directly.
 	 */
 	static class ApertureProjector implements Projector {
@@ -308,7 +315,9 @@ public class Camera {
 				Vector3d d) {
 
 			wrapped.apply(x, y, random, o, d);
-			d.normalize();
+			// d now indicates the vector from the pixel on the sensor
+			// to the camera origin, thereby defining the shape of the
+			// sensor with its magnitude.
 
 			Vector3d apertureScratchVector = apertureScrachVectorVar.get();
 
