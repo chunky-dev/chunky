@@ -20,7 +20,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,28 +29,20 @@ import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.model.LeverModel;
-import se.llbit.chunky.model.SignPostModel;
-import se.llbit.chunky.model.TorchModel;
-import se.llbit.chunky.model.WallSignModel;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.RenderableCanvas;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.ui.Chunk3DView;
-import se.llbit.chunky.renderer.ui.RenderCanvas;
 import se.llbit.chunky.renderer.ui.ViewListener;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Block;
-import se.llbit.math.AABB;
 import se.llbit.math.Color;
 import se.llbit.math.Matrix3d;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray.RayPool;
-import se.llbit.math.Triangle;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 import se.llbit.util.VectorPool;
@@ -75,9 +66,9 @@ public class TestRenderer extends Thread implements ViewListener,
 	private final RayPool rayPool = new RayPool();
 	private final Camera camera;
 	private boolean refresh = true;
-	private Vector3d camPos = new Vector3d();
-	private Matrix3d rot = new Matrix3d();
-	private Matrix3d tmpRot = new Matrix3d();
+	private final Vector3d camPos = new Vector3d();
+	private final Matrix3d rot = new Matrix3d();
+	private final Matrix3d tmpRot = new Matrix3d();
 	private double distance = 1.5;
 	private final int blockId;
 
@@ -100,7 +91,7 @@ public class TestRenderer extends Thread implements ViewListener,
 			new Quad(new Vector3d(1, 0, 1), new Vector3d(0, 0, 1), new Vector3d(1, 1, 1), new Vector4d(0, 1, 0, 1)),
 	};
 
-	private TestModel testModel = new TestModel();
+	private final TestModel testModel = new TestModel();
 	private final String targetFile;
 
 	/**
@@ -206,13 +197,14 @@ public class TestRenderer extends Thread implements ViewListener,
 
 		for (int x = 0; x < width; ++x) {
 
-			double rayx = camera.fovTan * aspect *
+			double fovTan = Camera.clampedFovTan(70);
+			double rayx = fovTan * aspect *
 					(.5 - ((double) x) / width);
 
 			for (int y = 0; y < height; ++y) {
 
 				ray.setDefault();
-				ray.d.set(camera.fovTan *
+				ray.d.set(fovTan *
 						(-.5 + ((double) y) / height),
 						-1, rayx);
 				ray.d.normalize();

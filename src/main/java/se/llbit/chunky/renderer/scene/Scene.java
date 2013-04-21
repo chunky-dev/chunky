@@ -1345,8 +1345,8 @@ public class Scene implements Refreshable {
 		if (!ray.hit) {
 			camera.setInfDof(true);
 		} else {
-			camera.setFocalOffset(ray.distance);
-			camera.setDof(ray.distance);
+			camera.setSubjectDistance(ray.distance);
+			camera.setDof(ray.distance*ray.distance);
 			camera.setInfDof(false);
 		}
 		RayPool.getDefaultRayPool().dispose(ray);

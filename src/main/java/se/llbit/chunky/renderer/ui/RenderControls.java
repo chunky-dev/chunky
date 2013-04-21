@@ -1667,8 +1667,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			JSlider source = (JSlider) e.getSource();
 			double value = (double) (source.getValue() - source.getMinimum())
 					/ (source.getMaximum() - source.getMinimum());
-			double scale = Camera.MAX_FOCAL_OFFSET - Camera.MIN_FOCAL_OFFSET;
-			renderMan.scene().camera().setFocalOffset(value * scale + Camera.MIN_FOCAL_OFFSET);
+			double scale = Camera.MAX_SUBJECT_DISTANCE - Camera.MIN_SUBJECT_DISTANCE;
+			renderMan.scene().camera().setSubjectDistance(value * scale + Camera.MIN_SUBJECT_DISTANCE);
 			updateFocalOffsetField();
 		}
 	};
@@ -1780,8 +1780,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			JTextField source = (JTextField) e.getSource();
 			try {
 				double value = numberFormat.parse(source.getText()).doubleValue();
-				value = Math.max(value, Camera.MIN_FOCAL_OFFSET);
-				renderMan.scene().camera().setFocalOffset(value);
+				value = Math.max(value, Camera.MIN_SUBJECT_DISTANCE);
+				renderMan.scene().camera().setSubjectDistance(value);
 				updateFocalOffsetSlider();
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
@@ -1801,7 +1801,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateFocalOffsetField() {
 		focalOffsetField.removeActionListener(focalOffsetFieldListener);
-		focalOffsetField.setText(String.format("%.2f", renderMan.scene().camera().getFocalOffset()));
+		focalOffsetField.setText(String.format("%.2f", renderMan.scene().camera().getSubjectDistance()));
 		focalOffsetField.addActionListener(focalOffsetFieldListener);
 	}
 
@@ -1814,8 +1814,8 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateFocalOffsetSlider() {
 		focalOffsetSlider.removeChangeListener(focalOffsetListener);
-		double value = (renderMan.scene().camera().getFocalOffset() - Camera.MIN_FOCAL_OFFSET)
-				/ (Camera.MAX_FOCAL_OFFSET - Camera.MIN_FOCAL_OFFSET);
+		double value = (renderMan.scene().camera().getSubjectDistance() - Camera.MIN_SUBJECT_DISTANCE)
+				/ (Camera.MAX_SUBJECT_DISTANCE - Camera.MIN_SUBJECT_DISTANCE);
 		double scale = focalOffsetSlider.getMaximum() - focalOffsetSlider.getMinimum();
 		focalOffsetSlider.setValue((int) (value * scale + focalOffsetSlider.getMinimum()));
 		focalOffsetSlider.addChangeListener(focalOffsetListener);

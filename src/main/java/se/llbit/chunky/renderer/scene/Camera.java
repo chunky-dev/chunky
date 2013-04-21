@@ -18,6 +18,8 @@ package se.llbit.chunky.renderer.scene;
 
 import java.util.Random;
 
+import org.apache.log4j.Logger;
+
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.World;
@@ -31,19 +33,24 @@ import se.llbit.nbt.DoubleTag;
 import se.llbit.nbt.StringTag;
 
 /**
- * Camera model for 3D rendering
+ * Camera model for 3D rendering.
+ *
+ * The camera space has x as right vector and z as up vector.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  * @author TOGoS (projection code)
  */
 public class Camera {
 
+	private static final Logger logger = Logger.getLogger(Camera.class);
+
 	/**
 	 * @param fov Field of view, in degrees. Maximum 180.
-	 * @return tan(fov)
+	 * @return tan(fov/2)
 	 */
-	static double clampedFovTan(double fov) {
-		double clampedFov = QuickMath.clamp(fov, 0, 180);
-		return 2 * (Math.tan((clampedFov / 360) * Math.PI));
+	public static double clampedFovTan(double fov) {
+		double clampedFoV = QuickMath.clamp(fov, 0, 180);
+		return 2 * Math.tan(QuickMath.degToRad(clampedFoV / 2));
 	}
 
 	/**
@@ -114,11 +121,10 @@ public class Camera {
 		}
 
 		@Override
-		public void apply(double x, double y, Random random, Vector3d pos,
-				Vector3d direction) {
-
-			pos.set(0, 0, 0);
-			direction.set(fovTan * y, -1, fovTan * x);
+		public void apply(double x, double y, Random random, Vector3d o,
+				Vector3d d) {
+			o.set(0, 0, 0);
+			d.set(fovTan * y, -1, fovTan * x);
 		}
 
 		@Override
@@ -145,8 +151,8 @@ public class Camera {
 		}
 
 		@Override
-		public void apply(double x, double y, Random random, Vector3d pos,
-				Vector3d direction) {
+		public void apply(double x, double y, Random random, Vector3d o,
+				Vector3d d) {
 			double ay = y * fov * Math.PI / 180;
 			double ax = x * fov * Math.PI / 180;
 			double avSquared = ay * ay + ax * ax;
@@ -160,8 +166,8 @@ public class Camera {
 				dx = dv * (ax / angleFromCenter);
 				dy = dv * (ay / angleFromCenter);
 			}
-			pos.set(0, 0, 0);
-			direction.set(dy, -dz, dx);
+			o.set(0, 0, 0);
+			d.set(dy, -dz, dx);
 		}
 
 		@Override
@@ -192,15 +198,15 @@ public class Camera {
 		}
 
 		@Override
-		public void apply(double x, double y, Random random, Vector3d pos,
-				Vector3d direction) {
+		public void apply(double x, double y, Random random, Vector3d o,
+				Vector3d d) {
 			double ay = y * fov * Math.PI / 180;
 			double ax = x * fov * Math.PI / 180;
 
 			double vv = Math.cos(ay);
 
-			pos.set(0, 0, 0);
-			direction.set(Math.sin(ay), -vv * Math.cos(ax), vv * Math.sin(ax));
+			o.set(0, 0, 0);
+			d.set(Math.sin(ay), -vv * Math.cos(ax), vv * Math.sin(ax));
 		}
 
 		@Override
@@ -233,15 +239,15 @@ public class Camera {
 		}
 
 		@Override
-		public void apply(double x, double y, Random random, Vector3d position,
-				Vector3d direction) {
+		public void apply(double x, double y, Random random, Vector3d o,
+				Vector3d d) {
 			double ax = x * fov * Math.PI / 180;
 			double dz = Math.cos(ax);
 			double dx = Math.sin(ax);
 			double dy = fovTan * y;
 
-			position.set(0, 0, 0);
-			direction.set(dy, -dz, dx);
+			o.set(0, 0, 0);
+			d.set(dy, -dz, dx);
 		}
 
 		@Override
@@ -261,63 +267,43 @@ public class Camera {
 	}
 
 	/**
-	 * Simulates a non-point aperture to produce depth-of-focus effects.
+	 * Simulates a non-point aperture to produce a depth-of-field effect.
 	 * Delegates calculation of base offset/direction to another projector. If
 	 * apertureSize is 0 this will still work, but it will not have any effect.
 	 * In that case you should use the wrapped Projector directly.
 	 */
 	static class ApertureProjector implements Projector {
 		final Projector wrapped;
-		final double apertureSize;
-		final double focalOffset;
-
-		ThreadLocal<Vector3d> apertureScrachVectorVar = new ThreadLocal<Vector3d>() {
-			@Override
-			protected Vector3d initialValue() {
-				return new Vector3d();
-			}
-		};
+		final double aperture;
+		final double subjectDistance;
 
 		public ApertureProjector(Projector wrapped, double apertureSize,
-				double focalOffset) {
+				double subjectDistance) {
 			this.wrapped = wrapped;
-			this.apertureSize = apertureSize;
-			this.focalOffset = focalOffset;
+			this.aperture = apertureSize;
+			this.subjectDistance = subjectDistance;
 		}
 
-		/**
-		 * Find a random point within a circular aperture and put it in dest.x,
-		 * z
-		 */
-		protected static void randomAperturePoint(Random random,
-				double apertureSize, Vector3d dest) {
+		@Override
+		public void apply(double x, double y, Random random, Vector3d o,
+				Vector3d d) {
+			wrapped.apply(x, y, random, o, d);
+
+			d.scale(-subjectDistance/d.y);
+
+			// find random point in aperture
 			double rx, rz;
 			while (true) {
 				rx = 2 * random.nextDouble() - 1;
 				rz = 2 * random.nextDouble() - 1;
 				double s = rx * rx + rz * rz;
 				if (s > Ray.EPSILON && s <= 1) {
-					dest.set(rx *= apertureSize, 0, rz *= apertureSize);
-					return;
+					o.set(rx * aperture, 0, rz * aperture);
+					break;
 				}
 			}
-		}
 
-		@Override
-		public void apply(double x, double y, Random random, Vector3d o,
-				Vector3d d) {
-
-			wrapped.apply(x, y, random, o, d);
-			d.normalize();
-
-			Vector3d apertureScratchVector = apertureScrachVectorVar.get();
-
-			randomAperturePoint(random, apertureSize, apertureScratchVector);
-			o.add(apertureScrachVectorVar.get()); // Shift ray origin
-
-			d.scale(focalOffset);
-			d.sub(apertureScratchVector); // Change direction of d to compensate
-											// for origin shift
+			d.sub(o);
 		}
 
 		@Override
@@ -342,12 +328,14 @@ public class Camera {
 	 */
 	static class ForwardDisplacementProjector implements Projector {
 		final Projector wrapped;
-		final double displacement;
+		final double displacementValue;
+		final double displacementSign;
 
 		public ForwardDisplacementProjector(Projector wrapped,
 				double displacement) {
 			this.wrapped = wrapped;
-			this.displacement = displacement;
+			this.displacementValue = Math.abs(displacement);
+			this.displacementSign = Math.signum(displacement);
 		}
 
 		@Override
@@ -355,15 +343,9 @@ public class Camera {
 				Vector3d d) {
 			wrapped.apply(x, y, random, o, d);
 
-			// Rather than use a separate scratch vector, scale d
-			// and then revert it (if it's been reversed) when done
-
 			d.normalize();
-			d.scale(displacement);
-			o.add(d);
-
-			if (displacement < 0)
-				d.scale(-1);
+			d.scale(displacementValue);
+			o.scaleAdd(displacementSign, d, o);
 		}
 
 		@Override
@@ -388,7 +370,7 @@ public class Camera {
 	@SuppressWarnings("javadoc")
 	public enum ProjectionMode {
 		PARALLEL("Parallel"),
-		PINHOLE("Pinhole"),
+		STANDARD("Standard"),
 		FISHEYE("Fisheye"),
 		PANORAMIC("Panoramic (equirectangular)"),
 		PANORAMIC_SLOT("Panoramic (slot)");
@@ -408,17 +390,17 @@ public class Camera {
 	/**
 	 * Maximum DoF
 	 */
-	public static final double MAX_DOF = 500;
+	public static final double MAX_DOF = 5000;
 
 	/**
-	 * Minimum Focal Offset
+	 * Minimum recommended subject distance
 	 */
-	public static final double MIN_FOCAL_OFFSET = 0.01;
+	public static final double MIN_SUBJECT_DISTANCE = 0.01;
 
 	/**
-	 * Maximum Focal Offset
+	 * Maximum recommended subject distance
 	 */
-	public static final double MAX_FOCAL_OFFSET = 1000;
+	public static final double MAX_SUBJECT_DISTANCE = 1000;
 
 	private final Refreshable scene;
 
@@ -445,10 +427,16 @@ public class Camera {
 
 	private double yaw = - Math.PI / 2;
 	private double pitch = 0;
+
+	/**
+	 * Transform to rotate from camera space to world space (not including
+	 * translation).
+	 */
 	private final Matrix3d transform = new Matrix3d();
+
 	private final Matrix3d tmpTransform = new Matrix3d();
 
-	private ProjectionMode projectionMode = ProjectionMode.PINHOLE;
+	private ProjectionMode projectionMode = ProjectionMode.STANDARD;
 	private Projector projector = createProjector();
 
 	private double dof = 8;
@@ -459,12 +447,7 @@ public class Camera {
 	 */
 	private double worldWidth = 100;
 
-	/**
-	 * Tangens of the FoV angle
-	 */
-	public double fovTan;
-
-	private double focalOffset = 2;
+	private double subjectDistance = 2;
 	private boolean infDof = true;
 
 	/**
@@ -490,7 +473,7 @@ public class Camera {
 		dof = other.dof;
 		projectionMode = other.projectionMode;
 		fov = other.fov;
-		focalOffset = other.focalOffset;
+		subjectDistance = other.subjectDistance;
 		infDof = other.infDof;
 		worldWidth = other.worldWidth;
 		initProjector();
@@ -512,7 +495,7 @@ public class Camera {
 		camera.addItem("fov", new DoubleTag(fov));
 		camera.addItem("dof", new DoubleTag(dof));
 		camera.addItem("infDof", new ByteTag(infDof ? 1 : 0));
-		camera.addItem("focalOffset", new DoubleTag(focalOffset));
+		camera.addItem("focalOffset", new DoubleTag(subjectDistance));
 		return camera;
 	}
 
@@ -529,11 +512,13 @@ public class Camera {
 		yaw = tag.get("yaw").doubleValue();
 		dof = tag.get("dof").doubleValue();
 		fov = tag.get("fov").doubleValue();
-		focalOffset = tag.get("focalOffset").doubleValue();
+		subjectDistance = tag.get("focalOffset").doubleValue();
 		try {
-			projectionMode = ProjectionMode.valueOf( tag.get("projectionMode").stringValue() );
-		} catch( IllegalArgumentException e ) {
-			projectionMode = tag.get("parallel").byteValue() != 0 ? ProjectionMode.PARALLEL : ProjectionMode.PINHOLE;
+			projectionMode = ProjectionMode.valueOf(
+					tag.get("projectionMode").stringValue());
+		} catch (IllegalArgumentException e) {
+			projectionMode = tag.get("parallel").byteValue() != 0 ?
+					ProjectionMode.PARALLEL : ProjectionMode.STANDARD;
 		}
 		infDof = tag.get("infDof").byteValue() != 0;
 		initProjector();
@@ -541,7 +526,8 @@ public class Camera {
 	}
 
 	private Projector applyDoF( Projector p ) {
-		return infDof ? p : new ApertureProjector(p, focalOffset/dof, focalOffset);
+		return infDof ? p : new ApertureProjector(p,
+				Math.sqrt((1.0/dof) * subjectDistance), subjectDistance);
 	}
 
 	/**
@@ -551,18 +537,21 @@ public class Camera {
 	private Projector createProjector() {
 		switch (projectionMode) {
 		case PARALLEL:
-			return new ForwardDisplacementProjector( applyDoF( new ParallelProjector( worldWidth, fov ) ), -worldWidth );
-		case PINHOLE:
-			return applyDoF( new PinholeProjector(fov) );
+			return new ForwardDisplacementProjector(
+					applyDoF(new ParallelProjector(worldWidth, fov)),
+					-worldWidth);
+		case STANDARD:
+			return applyDoF(new PinholeProjector(fov));
 		case FISHEYE:
-			return applyDoF( new FisheyeProjector(fov) );
+			return applyDoF(new FisheyeProjector(fov));
 		case PANORAMIC_SLOT:
-			return applyDoF( new PanoramicSlotProjector(fov) );
+			return applyDoF(new PanoramicSlotProjector(fov));
 		case PANORAMIC:
-			return applyDoF( new PanoramicProjector(fov) );
+			return applyDoF(new PanoramicProjector(fov));
 		default:
-			System.err.println("Error: Undefined projection mode: "+projectionMode+", defaulting to planar");
-			return applyDoF( new PinholeProjector(fov) );
+			logger.error("Unknown projection mode: "
+					+ projectionMode + ", using standard mode");
+			return applyDoF(new PinholeProjector(fov));
 		}
 	}
 
@@ -653,19 +642,19 @@ public class Camera {
 	}
 
 	/**
-	 * Set the focal offset
+	 * Set the subject distance
 	 * @param value
 	 */
-	public synchronized void setFocalOffset(double value) {
-		focalOffset = value;
+	public synchronized void setSubjectDistance(double value) {
+		subjectDistance = value;
 		scene.refresh();
 	}
 
 	/**
-	 * @return Current focal offset
+	 * @return Current subject distance
 	 */
-	public double getFocalOffset() {
-		return focalOffset;
+	public double getSubjectDistance() {
+		return subjectDistance;
 	}
 
 	/**
@@ -821,33 +810,34 @@ public class Camera {
 	}
 
 	/**
-	 * Calculate a ray shooting out of the camera.
-	 *
-	 * @param ray destination
-	 * @param d scratch vector
-	 * @param o scratch vector
-	 * @param random random number generator to use for whatever
+	 * Calculate a ray shooting out of the camera based on normalized
+	 * image coordinates.
+	 * @param ray result ray
+	 * @param random random number stream
 	 * @param aspect width / height of output image
-	 * @param x point within the output image, from -0.5, to 0.5
-	 * @param y point within the output image, from -0.5, to 0.5
+	 * @param x normalized image coordinate [-0.5, 0.5]
+	 * @param y normalized image coordinate [-0.5, 0.5]
 	 */
 	public void calcViewRay(Ray ray, Random random, double aspect, double x,
 			double y) {
-		projector.apply( x * aspect, y, random, ray.x, ray.d );
+
+		// reset the ray properties - current material etc.
+		ray.setDefault();
+
+		projector.apply(x * aspect, y, random, ray.x, ray.d);
 
 		ray.d.normalize();
+
+		// from camera space to world space
 		transform.transform(ray.d);
 		transform.transform(ray.x);
 		ray.x.add(pos);
-
-		// Even though we've implicitly set ray.d and x, we need to
-		// call ray.set(...) to reset its other values.
-		ray.set(ray.x, ray.d);
 	}
 
 	/**
-	 * Transform vector from camera space to world space
-	 * @param d
+	 * Rotate vector from camera space to world space (does not translate
+	 * the vector)
+	 * @param d Vector to rotate
 	 */
 	public void transform(Vector3d d) {
 		transform.transform(d);
