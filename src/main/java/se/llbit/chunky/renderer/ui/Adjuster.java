@@ -39,8 +39,8 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	private final JLabel lbl;
 	private final JSlider slider;
 	private final JTextField textField;
-	private final double min;
-	private final double max;
+	private double min;
+	private double max;
 	private final boolean integerMode;
 
 	/**
@@ -163,6 +163,19 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	 * @param value
 	 */
 	public void set(double value) {
+		setSlider(value);
+		setTextField(value);
+	}
+
+	/**
+	 * Set parameter value and new min/max limits
+	 * @param value
+	 * @param min New minimum value
+	 * @param max New maximum value
+	 */
+	public void set(double value, double min, double max) {
+		this.min = min;
+		this.max = max;
 		setSlider(value);
 		setTextField(value);
 	}
