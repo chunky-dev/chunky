@@ -145,16 +145,138 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JTextField cameraYaw = new JTextField();
 	private final JTextField cameraPitch = new JTextField();
 
-	private Adjuster rayDepth;
-	private Adjuster cloudHeight;
-	private Adjuster emitterIntensity;
-	private Adjuster sunIntensity;
-	private Adjuster sunAzimuth;
-	private Adjuster sunAltitude;
-	private Adjuster fov;
+	private final Adjuster rayDepth = new Adjuster(
+			"Ray depth",
+			"Sets the recursive ray depth",
+			1, 25) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().setRayDepth((int) newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().getRayDepth());
+		}
+	};
+	private final Adjuster cloudHeight = new Adjuster(
+			"Cloud Height",
+			"Height of the cloud layer", -128, 512) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().setCloudHeight((int) newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().getCloudHeight());
+		}
+	};
+	private final Adjuster emitterIntensity = new Adjuster(
+			"Emitter intensity",
+			"Light intensity modifier for emitters",
+			Scene.MIN_EMITTER_INTENSITY,
+			Scene.MAX_EMITTER_INTENSITY) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().setEmitterIntensity(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().getEmitterIntensity());
+		}
+	};
+	private final Adjuster sunIntensity = new Adjuster(
+			"Sun intensity",
+			"Light intensity modifier for sun",
+			Sun.MIN_INTENSITY,
+			Sun.MAX_INTENSITY) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().sun().setIntensity(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().sun().getIntensity());
+		}
+	};
+	private final Adjuster sunAzimuth = new Adjuster(
+			"Sun azimuth",
+			"The angle towards the sun from north",
+			0.0, 360.0) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().sun().setAzimuth(QuickMath.degToRad(newValue));
+		}
+
+		@Override
+		public void update() {
+			set(QuickMath.radToDeg(renderMan.scene().sun().getAzimuth()));
+		}
+	};
+	private final Adjuster sunAltitude = new Adjuster(
+			"Sun altitude",
+			"Angle of the sun above the horizon",
+			0.0, 90.0) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().sun().setAltitude(QuickMath.degToRad(newValue));
+		}
+
+		@Override
+		public void update() {
+			set(QuickMath.radToDeg(renderMan.scene().sun().getAltitude()));
+		}
+	};
+	private final Adjuster fov = new Adjuster(
+			"Field of View (zoom)",
+			"Field of View",
+			1.0,
+			180.0) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().camera().setFoV(newValue);
+		}
+
+		@Override
+		public void update() {
+			Camera camera = renderMan.scene().camera();
+			set(camera.getFoV(), camera.getMinFoV(), camera.getMaxFoV());
+		}
+	};
 	private Adjuster dof;
-	private Adjuster subjectDistance;
-	private Adjuster exposure;
+	private final Adjuster subjectDistance = new Adjuster(
+			"Subject Distance",
+			"Distance to focal plane",
+			Camera.MIN_SUBJECT_DISTANCE,
+			Camera.MAX_SUBJECT_DISTANCE) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().camera().setSubjectDistance(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().camera().getSubjectDistance());
+		}
+	};
+	private final Adjuster exposure = new Adjuster(
+			"exposure",
+			"exposure",
+			Scene.MIN_EXPOSURE,
+			Scene.MAX_EXPOSURE) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().setExposure(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().getExposure());
+		}
+	};
 
 	/**
 	 * Create a new Render Controls dialog.
@@ -391,18 +513,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	private Component buildAdvancedPane() {
-		rayDepth = new Adjuster("Ray depth",
-				"Sets the recursive ray depth",
-				1, 25) {
-			@Override
-			public void valueChanged(double newValue) {
-				renderMan.scene().setRayDepth((int) newValue);
-			}
-			@Override
-			public void update() {
-				set(renderMan.scene().getRayDepth());
-			}
-		};
 		rayDepth.update();
 
 		JSeparator sep1 = new JSeparator();
@@ -511,20 +621,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	private Component buildPostProcessingPane() {
-		exposure = new Adjuster(
-				"exposure",
-				"exposure",
-				Scene.MIN_EXPOSURE,
-				Scene.MAX_EXPOSURE) {
-			@Override
-			public void valueChanged(double newValue) {
-				renderMan.scene().setExposure(newValue);
-			}
-			@Override
-			public void update() {
-				set(renderMan.scene().getExposure());
-			}
-		};
 		exposure.setLogarithmicMode(true);
 		exposure.update();
 
@@ -808,66 +904,14 @@ public class RenderControls extends JDialog implements ViewListener,
 		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
 		enableEmitters.addActionListener(emittersListener);
 
-		emitterIntensity = new Adjuster("Emitter intensity",
-				"Light intensity modifier for emitters",
-				Scene.MIN_EMITTER_INTENSITY,
-				Scene.MAX_EMITTER_INTENSITY) {
-			@Override
-			public void valueChanged(double newValue) {
-				renderMan.scene().setEmitterIntensity(newValue);
-			}
-			@Override
-			public void update() {
-				set(renderMan.scene().getEmitterIntensity());
-			}
-		};
 		emitterIntensity.setLogarithmicMode(true);
 		emitterIntensity.update();
 
-		sunIntensity = new Adjuster("Sun intensity",
-				"Light intensity modifier for sun",
-				Sun.MIN_INTENSITY,
-				Sun.MAX_INTENSITY) {
-			@Override
-			public void valueChanged(double newValue) {
-				renderMan.scene().sun().setIntensity(newValue);
-			}
-			@Override
-			public void update() {
-				set(renderMan.scene().sun().getIntensity());
-			}
-		};
 		sunIntensity.setLogarithmicMode(true);
 		sunIntensity.update();
 
-		sunAzimuth = new Adjuster("Sun azimuth",
-				"The angle towards the sun from north",
-				0.0, 360.0) {
-			@Override
-			public void valueChanged(double newValue) {
-				renderMan.scene().sun().setAzimuth(
-						QuickMath.degToRad(newValue));
-			}
-			@Override
-			public void update() {
-				set(QuickMath.radToDeg(renderMan.scene().sun().getAzimuth()));
-			}
-		};
 		sunAzimuth.update();
 
-		sunAltitude = new Adjuster("Sun altitude",
-				"The angle of the sun above the horizon",
-				0.0, 90.0) {
-			@Override
-			public void valueChanged(double newValue) {
-				renderMan.scene().sun().setAltitude(
-						QuickMath.degToRad(newValue));
-			}
-			@Override
-			public void update() {
-				set(QuickMath.radToDeg(renderMan.scene().sun().getAltitude()));
-			}
-		};
 		sunAltitude.update();
 
 		JPanel panel = new JPanel();
@@ -984,17 +1028,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		cloudsEnabled.addActionListener(cloudsEnabledListener);
 		updateCloudsEnabledCheckBox();
 
-		cloudHeight = new Adjuster("cloud height", "The height of the cloud layer",
-				-128, 512) {
-			@Override
-			public void valueChanged(double newValue) {
-				renderMan.scene().setCloudHeight((int) newValue);
-			}
-			@Override
-			public void update() {
-				set(renderMan.scene().getCloudHeight());
-			}
-		};
 		cloudHeight.update();
 
 		JPanel panel = new JPanel();
@@ -1067,40 +1100,11 @@ public class RenderControls extends JDialog implements ViewListener,
 	private Component buildCameraPane() {
 		JLabel projectionModeLbl = new JLabel("Projection");
 
-		fov = new Adjuster(
-				"Field of View (zoom)",
-				"Field of View",
-				1.0,
-				180.0) {
-			@Override
-			public void valueChanged(double newValue) {
-				renderMan.scene().camera().setFoV(newValue);
-			}
-			@Override
-			public void update() {
-				Camera camera = renderMan.scene().camera();
-				set(camera.getFoV(), camera.getMinFoV(), camera.getMaxFoV());
-			}
-		};
 		fov.update();
 
 		dof = new DoFAdjuster(renderMan);
 		dof.update();
 
-		subjectDistance = new Adjuster(
-				"Subject Distance",
-				"Distance to focal plane",
-				Camera.MIN_SUBJECT_DISTANCE,
-				Camera.MAX_SUBJECT_DISTANCE) {
-			@Override
-			public void valueChanged(double newValue) {
-				renderMan.scene().camera().setSubjectDistance(newValue);
-			}
-			@Override
-			public void update() {
-				set(renderMan.scene().camera().getSubjectDistance());
-			}
-		};
 		subjectDistance.setLogarithmicMode(true);
 		subjectDistance.update();
 
