@@ -121,8 +121,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox atmosphereEnabled = new JCheckBox();
 	private final JCheckBox volumetricFogEnabled = new JCheckBox();
 	private final JCheckBox cloudsEnabled = new JCheckBox();
-	private final JSlider exposureSlider = new JSlider();
-	private final JTextField exposureField = new JTextField();
 	private final RenderContext context;
 	private final JButton showPreviewBtn = new JButton();
 	private final JLabel renderTimeLbl = new JLabel();
@@ -156,6 +154,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private Adjuster fov;
 	private Adjuster dof;
 	private Adjuster subjectDistance;
+	private Adjuster exposure;
 
 	/**
 	 * Create a new Render Controls dialog.
@@ -512,16 +511,22 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	private Component buildPostProcessingPane() {
-		JLabel exposureLbl = new JLabel("exposure: ");
-
-		exposureField.setColumns(5);
-		exposureField.addActionListener(exposureFieldListener);
-		updateExposureField();
-
-		exposureSlider.setMinimum(1);
-		exposureSlider.setMaximum(100);
-		exposureSlider.addChangeListener(exposureListener);
-		updateExposureSlider();
+		exposure = new Adjuster(
+				"exposure",
+				"exposure",
+				Scene.MIN_EXPOSURE,
+				Scene.MAX_EXPOSURE) {
+			@Override
+			public void valueChanged(double newValue) {
+				renderMan.scene().setExposure(newValue);
+			}
+			@Override
+			public void update() {
+				set(renderMan.scene().getExposure());
+			}
+		};
+		exposure.setLogarithmicMode(true);
+		exposure.update();
 
 		JLabel postprocessDescLbl = new JLabel("<html>Post processing affects rendering performance<br>when the preview window is visible");
 		JLabel postprocessLbl = new JLabel("Post-processing mode:");
@@ -544,11 +549,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		layout.setHorizontalGroup(layout.createSequentialGroup()
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(exposureLbl)
-					.addComponent(exposureSlider)
-					.addComponent(exposureField)
-				)
+				.addGroup(exposure.horizontalGroup(layout))
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(postprocessLbl)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -560,11 +561,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
-				.addComponent(exposureLbl)
-				.addComponent(exposureSlider)
-				.addComponent(exposureField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-			)
+			.addGroup(exposure.verticalGroup(layout))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
@@ -1635,35 +1632,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			// TODO Auto-generated method stub
 		}
 	};
-	private final ChangeListener exposureListener = new ChangeListener() {
-		@Override
-		public void stateChanged(ChangeEvent e) {
-			JSlider source = (JSlider) e.getSource();
-			double value = (double) (source.getValue() - source.getMinimum())
-					/ (source.getMaximum() - source.getMinimum());
-			double logMin = Math.log10(Scene.MIN_EXPOSURE);
-			double logMax = Math.log10(Scene.MAX_EXPOSURE);
-			double scale = logMax - logMin;
-			renderMan.scene().setExposure(
-					Math.pow(10, value * scale + logMin));
-			updateExposureField();
-		}
-	};
-	private final ActionListener exposureFieldListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JTextField source = (JTextField) e.getSource();
-			try {
-				double value = numberFormat.parse(source.getText()).doubleValue();
-				value = Math.max(value, Scene.MIN_EXPOSURE);
-				value = Math.min(value, Scene.MAX_EXPOSURE);
-				renderMan.scene().setExposure(value);
-				updateExposureSlider();
-			} catch (NumberFormatException ex) {
-			} catch (ParseException ex) {
-			}
-		}
-	};
 	private final ActionListener cameraPositionListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -1796,23 +1764,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		skyModeCB.removeActionListener(skyModeListener);
 		// TODO
 		skyModeCB.addActionListener(skyModeListener);
-	}
-
-	protected void updateExposureField() {
-		exposureField.removeActionListener(exposureFieldListener);
-		exposureField.setText(String.format("%.2f", renderMan.scene().getExposure()));
-		exposureField.addActionListener(exposureFieldListener);
-	}
-
-	protected void updateExposureSlider() {
-		exposureSlider.removeChangeListener(exposureListener);
-		double logMin = Math.log10(Scene.MIN_EXPOSURE);
-		double logMax = Math.log10(Scene.MAX_EXPOSURE);
-		double value = (Math.log10(renderMan.scene().getExposure()) -
-				logMin) / (logMax - logMin);
-		double scale = exposureSlider.getMaximum() - exposureSlider.getMinimum();
-		exposureSlider.setValue((int) (value * scale + exposureSlider.getMinimum()));
-		exposureSlider.addChangeListener(exposureListener);
 	}
 
 	protected void updateWidthField() {
@@ -2034,8 +1985,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateVolumetricFogCheckBox();
 		updateCloudsEnabledCheckBox();
 		updateTitle();
-		updateExposureField();
-		updateExposureSlider();
+		exposure.update();
 		updateSaveDumpsCheckBox();
 		updateDumpFrequencyField();
 		updateSPPTargetField();
