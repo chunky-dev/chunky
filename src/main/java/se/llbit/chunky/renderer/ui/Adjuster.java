@@ -250,4 +250,14 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	public JTextField getField() {
 		return textField;
 	}
+
+	/**
+	 * Enable or disable the controls of this adjuster
+	 * @param enabled
+	 */
+	public void setEnabled(boolean enabled) {
+		lbl.setEnabled(enabled);
+		slider.setEnabled(enabled);
+		textField.setEnabled(enabled);
+	}
 }

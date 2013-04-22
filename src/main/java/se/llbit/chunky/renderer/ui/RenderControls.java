@@ -1100,7 +1100,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		ProjectionMode[] projectionModes = ProjectionMode.values();
 		projectionMode.setModel(new DefaultComboBoxModel(projectionModes));
 		projectionMode.addActionListener(projectionModeListener);
-		updateProjectionModeField();
+		updateProjectionMode();
 
 		focalOffsetField.setColumns(5);
 		focalOffsetField.addActionListener(focalOffsetFieldListener);
@@ -1241,7 +1241,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderMan.scene().camera();
 				camera.setView(-Math.PI/4, -Math.PI/4);
 				camera.setProjectionMode(ProjectionMode.PARALLEL);
-				updateProjectionModeField();
+				updateProjectionMode();
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1256,7 +1256,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderMan.scene().camera();
 				camera.setView(-3*Math.PI/4, -Math.PI/4);
 				camera.setProjectionMode(ProjectionMode.PARALLEL);
-				updateProjectionModeField();
+				updateProjectionMode();
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1271,7 +1271,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderMan.scene().camera();
 				camera.setView(-5*Math.PI/4, -Math.PI/4);
 				camera.setProjectionMode(ProjectionMode.PARALLEL);
-				updateProjectionModeField();
+				updateProjectionMode();
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1286,7 +1286,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				Camera camera = renderMan.scene().camera();
 				camera.setView(-7*Math.PI/4, -Math.PI/4);
 				camera.setProjectionMode(ProjectionMode.PARALLEL);
-				updateProjectionModeField();
+				updateProjectionMode();
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1622,7 +1622,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			if (selected != null) {
 				renderMan.scene().camera().setProjectionMode(
 						(ProjectionMode) selected);
-				updateProjectionModeField();
+				updateProjectionMode();
 				fov.update();
 			}
 		}
@@ -1822,9 +1822,11 @@ public class RenderControls extends JDialog implements ViewListener,
 		focalOffsetSlider.addChangeListener(focalOffsetListener);
 	}
 
-	protected void updateProjectionModeField() {
+	protected void updateProjectionMode() {
 		projectionMode.removeActionListener(projectionModeListener);
-		projectionMode.setSelectedIndex( renderMan.scene().camera().getProjectionMode().ordinal() );
+		ProjectionMode mode = renderMan.scene().camera().getProjectionMode();
+		projectionMode.setSelectedItem(mode);
+		dof.setEnabled(mode != ProjectionMode.PARALLEL);
 		projectionMode.addActionListener(projectionModeListener);
 	}
 
@@ -2053,7 +2055,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		dof.update();
 		fov.update();
 		updateFocalOffsetField();
-		updateProjectionModeField();
+		updateProjectionMode();
 		updateSkyMode();
 		updateFocalOffsetSlider();
 		updateWidthField();

@@ -530,7 +530,7 @@ public class Camera {
 		updateTransform();
 	}
 
-	private Projector applyDoF( Projector p ) {
+	private Projector applyDoF(Projector p) {
 		return infDof ? p : new ApertureProjector(p,
 				Math.sqrt((1.0/dof) * subjectDistance), subjectDistance);
 	}
@@ -543,7 +543,7 @@ public class Camera {
 		switch (projectionMode) {
 		case PARALLEL:
 			return new ForwardDisplacementProjector(
-					applyDoF(new ParallelProjector(worldWidth, fov)),
+					new ParallelProjector(worldWidth, fov),
 					-worldWidth);
 		case PINHOLE:
 			return applyDoF(new PinholeProjector(fov));
