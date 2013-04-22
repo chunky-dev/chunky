@@ -64,6 +64,7 @@ import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.Camera.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.Sun;
@@ -1096,12 +1097,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		focalOffsetSlider.addChangeListener(focalOffsetListener);
 		updateFocalOffsetSlider();
 
-		Camera.ProjectionMode[] projectionModes = Camera.ProjectionMode.class.getEnumConstants();
-		String[] projectionModeNames = new String[projectionModes.length];
-		for( int i=0; i<projectionModes.length; ++i ) {
-			projectionModeNames[i] = projectionModes[i].niceName;
-		}
-		projectionMode.setModel(new DefaultComboBoxModel(projectionModeNames));
+		ProjectionMode[] projectionModes = ProjectionMode.values();
+		projectionMode.setModel(new DefaultComboBoxModel(projectionModes));
 		projectionMode.addActionListener(projectionModeListener);
 		updateProjectionModeField();
 
@@ -1243,7 +1240,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setView(-Math.PI/4, -Math.PI/4);
-				camera.setProjectionMode(Camera.ProjectionMode.PARALLEL);
+				camera.setProjectionMode(ProjectionMode.PARALLEL);
 				updateProjectionModeField();
 				fov.update();
 				updateCameraDirection();
@@ -1258,7 +1255,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setView(-3*Math.PI/4, -Math.PI/4);
-				camera.setProjectionMode(Camera.ProjectionMode.PARALLEL);
+				camera.setProjectionMode(ProjectionMode.PARALLEL);
 				updateProjectionModeField();
 				fov.update();
 				updateCameraDirection();
@@ -1273,7 +1270,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setView(-5*Math.PI/4, -Math.PI/4);
-				camera.setProjectionMode(Camera.ProjectionMode.PARALLEL);
+				camera.setProjectionMode(ProjectionMode.PARALLEL);
 				updateProjectionModeField();
 				fov.update();
 				updateCameraDirection();
@@ -1288,7 +1285,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setView(-7*Math.PI/4, -Math.PI/4);
-				camera.setProjectionMode(Camera.ProjectionMode.PARALLEL);
+				camera.setProjectionMode(ProjectionMode.PARALLEL);
 				updateProjectionModeField();
 				fov.update();
 				updateCameraDirection();
@@ -1620,10 +1617,14 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final ActionListener projectionModeListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			Camera.ProjectionMode m = Camera.ProjectionMode.class.getEnumConstants()[projectionMode.getSelectedIndex()];
-			renderMan.scene().camera().setProjectionMode(m);
-			updateProjectionModeField();
-			fov.update();
+			JComboBox source = (JComboBox) e.getSource();
+			Object selected = source.getSelectedItem();
+			if (selected != null) {
+				renderMan.scene().camera().setProjectionMode(
+						(ProjectionMode) selected);
+				updateProjectionModeField();
+				fov.update();
+			}
 		}
 	};
 	private final ActionListener skyModeListener = new ActionListener() {

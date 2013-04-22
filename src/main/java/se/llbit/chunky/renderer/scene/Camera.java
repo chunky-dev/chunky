@@ -369,16 +369,21 @@ public class Camera {
 	 */
 	@SuppressWarnings("javadoc")
 	public enum ProjectionMode {
+		PINHOLE("Standard"),
 		PARALLEL("Parallel"),
-		STANDARD("Standard"),
 		FISHEYE("Fisheye"),
 		PANORAMIC("Panoramic (equirectangular)"),
 		PANORAMIC_SLOT("Panoramic (slot)");
 
-		public final String niceName;
+		private final String niceName;
 
 		private ProjectionMode(String niceName) {
 			this.niceName = niceName;
+		}
+
+		@Override
+		public String toString() {
+			return niceName;
 		}
 	}
 
@@ -436,7 +441,7 @@ public class Camera {
 
 	private final Matrix3d tmpTransform = new Matrix3d();
 
-	private ProjectionMode projectionMode = ProjectionMode.STANDARD;
+	private ProjectionMode projectionMode = ProjectionMode.PINHOLE;
 	private Projector projector = createProjector();
 
 	private double dof = 8;
@@ -518,7 +523,7 @@ public class Camera {
 					tag.get("projectionMode").stringValue());
 		} catch (IllegalArgumentException e) {
 			projectionMode = tag.get("parallel").byteValue() != 0 ?
-					ProjectionMode.PARALLEL : ProjectionMode.STANDARD;
+					ProjectionMode.PARALLEL : ProjectionMode.PINHOLE;
 		}
 		infDof = tag.get("infDof").byteValue() != 0;
 		initProjector();
@@ -540,7 +545,7 @@ public class Camera {
 			return new ForwardDisplacementProjector(
 					applyDoF(new ParallelProjector(worldWidth, fov)),
 					-worldWidth);
-		case STANDARD:
+		case PINHOLE:
 			return applyDoF(new PinholeProjector(fov));
 		case FISHEYE:
 			return applyDoF(new FisheyeProjector(fov));
