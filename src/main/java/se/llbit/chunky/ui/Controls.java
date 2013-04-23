@@ -409,6 +409,7 @@ public class Controls extends JPanel {
 		});
 
 		JSeparator sep1 = new JSeparator();
+		JSeparator sep2 = new JSeparator();
 
 		clearSelectionBtn1.setText(Messages.getString("Controls.ClearSelected_lbl")); //$NON-NLS-1$
 		clearSelectionBtn1.setEnabled(false);
@@ -459,6 +460,7 @@ public class Controls extends JPanel {
 					.addGap(0, 0, Short.MAX_VALUE)
 					.addComponent(numThreadsField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 				)
+				.addComponent(sep2)
 				.addComponent(testCLBtn)
 				.addComponent(benchmarkBtn)
 				.addComponent(openSceneDirBtn)
@@ -479,6 +481,8 @@ public class Controls extends JPanel {
 			.addGroup(layout.createParallelGroup()
 				.addComponent(numThreadsLbl, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 				.addComponent(numThreadsField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(testCLBtn)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
