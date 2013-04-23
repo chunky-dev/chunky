@@ -291,7 +291,6 @@ public class Chunky implements ChunkDiscoveryListener {
 			RenderManager renderManager = new RenderManager(
 					new PlaceholderRenderCanvas(),
 					renderContext, new ConsoleRenderListener(), true);
-			renderManager.start();
 
 			try {
 				renderManager.loadScene(sceneName);
@@ -299,6 +298,8 @@ public class Chunky implements ChunkDiscoveryListener {
 					renderManager.scene().setTargetSPP(target);
 				}
 				renderManager.scene().goHeadless();
+
+				renderManager.start();
 			} catch (IOException e) {
 				logger.error("IO error while loading scene", e);
 			} catch (SceneLoadingError e) {
