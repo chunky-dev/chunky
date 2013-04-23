@@ -1757,7 +1757,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		projectionMode.removeActionListener(projectionModeListener);
 		ProjectionMode mode = renderMan.scene().camera().getProjectionMode();
 		projectionMode.setSelectedItem(mode);
-		//dof.setEnabled(mode != ProjectionMode.PARALLEL);
 		projectionMode.addActionListener(projectionModeListener);
 	}
 
