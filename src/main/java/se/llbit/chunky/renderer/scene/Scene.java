@@ -1187,6 +1187,15 @@ public class Scene implements Refreshable {
 	}
 
 	/**
+	 * Start or resume path tracing
+	 */
+	public synchronized void goHeadless() {
+		pathTrace = true;
+		pauseRender = false;
+		notifyAll();
+	}
+
+	/**
 	 * @throws InterruptedException
 	 */
 	public synchronized void waitOnRefreshRequest() throws InterruptedException {

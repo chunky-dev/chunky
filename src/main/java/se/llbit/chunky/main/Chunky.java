@@ -298,11 +298,7 @@ public class Chunky implements ChunkDiscoveryListener {
 				if (target != -1) {
 					renderManager.scene().setTargetSPP(target);
 				}
-				if (!renderManager.scene().pathTrace()) {
-					renderManager.scene().startRender();
-				} else {
-					renderManager.scene().resumeRender();
-				}
+				renderManager.scene().goHeadless();
 			} catch (IOException e) {
 				logger.error("IO error while loading scene", e);
 			} catch (SceneLoadingError e) {
