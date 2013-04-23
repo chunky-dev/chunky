@@ -67,6 +67,8 @@ import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Camera.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneManager;
+import se.llbit.chunky.renderer.scene.Sky;
+import se.llbit.chunky.renderer.scene.Sky.SkyMode;
 import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.ChunkPosition;
@@ -968,12 +970,8 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	private Component buildSkyPane() {
 
-		@SuppressWarnings("unused")
-		JLabel skyModeLbl = new JLabel("Sky mode:");
-		skyModeCB.addItem("gradient");
-		skyModeCB.addItem("simulated sky");
-		skyModeCB.addItem("skymap");
-		skyModeCB.addItem("skybox");
+		JLabel skyModeLbl = new JLabel("Sky Mode:");
+		skyModeCB.setModel(new DefaultComboBoxModel(Sky.SkyMode.values()));
 		skyModeCB.addActionListener(skyModeListener);
 		updateSkyMode();
 
@@ -1036,12 +1034,11 @@ public class RenderControls extends JDialog implements ViewListener,
 		layout.setHorizontalGroup(layout.createSequentialGroup()
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
-				// TODO
-				/*.addGroup(layout.createSequentialGroup()
+				.addGroup(layout.createSequentialGroup()
 					.addComponent(skyModeLbl)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(skyModeCB, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				)*/
+				)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(skyRotationLbl)
 					.addComponent(skyRotationSlider)
@@ -1063,11 +1060,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
-			// TODO
-			/*.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(skyModeLbl)
 				.addComponent(skyModeCB)
-			)*/
+			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
 				.addComponent(loadSkymapBtn)
@@ -1633,7 +1629,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final ActionListener skyModeListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
+			JComboBox source = (JComboBox) e.getSource();
+			renderMan.scene().sky().setSkyMode((SkyMode) source.getSelectedItem());
 		}
 	};
 	private final ActionListener cameraPositionListener = new ActionListener() {
@@ -1760,13 +1757,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		projectionMode.removeActionListener(projectionModeListener);
 		ProjectionMode mode = renderMan.scene().camera().getProjectionMode();
 		projectionMode.setSelectedItem(mode);
-		dof.setEnabled(mode != ProjectionMode.PARALLEL);
+		//dof.setEnabled(mode != ProjectionMode.PARALLEL);
 		projectionMode.addActionListener(projectionModeListener);
 	}
 
 	protected void updateSkyMode() {
 		skyModeCB.removeActionListener(skyModeListener);
-		// TODO
+		skyModeCB.setSelectedItem(renderMan.scene().sky().getSkyMode());
 		skyModeCB.addActionListener(skyModeListener);
 	}
 

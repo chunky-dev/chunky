@@ -69,12 +69,17 @@ public class Sky {
 
 	private Texture skymap = null;
 	private String skymapFileName = "";
-	private Scene scene;
+	private final Scene scene;
 	private double rotation;
 	private boolean mirrored = true;
 
 	// final to ensure that we don't do a lot of redundant re-allocation
 	private final Vector3d groundColor = new Vector3d(0, 0, 1);
+
+	/**
+	 * Current rendering mode
+	 */
+	private SkyMode mode = SkyMode.SIMULATED;
 
 	/**
 	 * @param scene
@@ -339,5 +344,20 @@ public class Sky {
 		groundColor.y = Math.pow(color.getGreen() / 255., Scene.DEFAULT_GAMMA);
 		groundColor.z = Math.pow(color.getBlue() / 255., Scene.DEFAULT_GAMMA);
 		scene.refresh();
+	}
+
+	/**
+	 * Set the sky rendering mode
+	 * @param mode
+	 */
+	public void setSkyMode(SkyMode mode) {
+		this.mode = mode;
+	}
+
+	/**
+	 * @return Current sky rendering mode
+	 */
+	public SkyMode getSkyMode() {
+		return mode;
 	}
 }

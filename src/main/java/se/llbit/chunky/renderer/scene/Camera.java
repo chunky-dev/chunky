@@ -298,12 +298,14 @@ public class Camera {
 				rz = 2 * random.nextDouble() - 1;
 				double s = rx * rx + rz * rz;
 				if (s > Ray.EPSILON && s <= 1) {
-					o.set(rx * aperture, 0, rz * aperture);
+					rx *= aperture;
+					rz *= aperture;
 					break;
 				}
 			}
 
-			d.sub(o);
+			d.sub(rx, 0, rz);
+			o.add(rx, 0, rz);
 		}
 
 		@Override
@@ -530,7 +532,7 @@ public class Camera {
 		updateTransform();
 	}
 
-	private Projector applyDoF(Projector p) {
+	private Projector applyDoF(Projector p, double subjectDistance) {
 		return infDof ? p : new ApertureProjector(p,
 				Math.sqrt((1.0/dof) * subjectDistance), subjectDistance);
 	}
@@ -541,22 +543,21 @@ public class Camera {
 	 */
 	private Projector createProjector() {
 		switch (projectionMode) {
-		case PARALLEL:
-			return new ForwardDisplacementProjector(
-					new ParallelProjector(worldWidth, fov),
-					-worldWidth);
-		case PINHOLE:
-			return applyDoF(new PinholeProjector(fov));
-		case FISHEYE:
-			return applyDoF(new FisheyeProjector(fov));
-		case PANORAMIC_SLOT:
-			return applyDoF(new PanoramicSlotProjector(fov));
-		case PANORAMIC:
-			return applyDoF(new PanoramicProjector(fov));
 		default:
 			logger.error("Unknown projection mode: "
 					+ projectionMode + ", using standard mode");
-			return applyDoF(new PinholeProjector(fov));
+		case PINHOLE:
+			return applyDoF(new PinholeProjector(fov), subjectDistance);
+		case PARALLEL:
+			return applyDoF(new ForwardDisplacementProjector(
+					new ParallelProjector(worldWidth, fov),
+					-worldWidth), subjectDistance+worldWidth);
+		case FISHEYE:
+			return applyDoF(new FisheyeProjector(fov), subjectDistance);
+		case PANORAMIC_SLOT:
+			return applyDoF(new PanoramicSlotProjector(fov), subjectDistance);
+		case PANORAMIC:
+			return applyDoF(new PanoramicProjector(fov), subjectDistance);
 		}
 	}
 

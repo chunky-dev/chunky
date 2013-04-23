@@ -196,6 +196,18 @@ public class Vector3d {
 	}
 
 	/**
+	 * Subtract vector (a, b, c) from this vector
+	 * @param a
+	 * @param b
+	 * @param c
+	 */
+	public final void sub(double a, double b, double c) {
+		x -= a;
+		y -= b;
+		z -= c;
+	}
+
+	/**
 	 * Subtract a from this vector
 	 * @param a
 	 */
