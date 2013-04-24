@@ -125,13 +125,13 @@ public class Matrix3d {
 	 * @param o
 	 */
 	public final void mul(Matrix3d o) {
-		double t11 = m11*o.m11 + m12*o.m21 + m13*o.m23;
+		double t11 = m11*o.m11 + m12*o.m21 + m13*o.m31;
 		double t12 = m11*o.m12 + m12*o.m22 + m13*o.m32;
 		double t13 = m11*o.m13 + m12*o.m23 + m13*o.m33;
-		double t21 = m21*o.m11 + m22*o.m21 + m23*o.m23;
+		double t21 = m21*o.m11 + m22*o.m21 + m23*o.m31;
 		double t22 = m21*o.m12 + m22*o.m22 + m23*o.m32;
 		double t23 = m21*o.m13 + m22*o.m23 + m23*o.m33;
-		double t31 = m31*o.m11 + m32*o.m21 + m33*o.m23;
+		double t31 = m31*o.m11 + m32*o.m21 + m33*o.m31;
 		double t32 = m31*o.m12 + m32*o.m22 + m33*o.m32;
 		double t33 = m31*o.m13 + m32*o.m23 + m33*o.m33;
 		m11 = t11;
