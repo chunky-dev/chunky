@@ -534,7 +534,7 @@ public class Camera {
 
 	private Projector applyDoF(Projector p, double subjectDistance) {
 		return infDof ? p : new ApertureProjector(p,
-				Math.sqrt((1.0/dof) * subjectDistance), subjectDistance);
+				subjectDistance/dof, subjectDistance);
 	}
 
 	/**
