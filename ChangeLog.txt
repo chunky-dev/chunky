@@ -4,6 +4,7 @@
     * Fixed error causing emitter and sun intensity values below one to
     be equal to zero
     * Fixed error in headless mode that prevented rendering to start
+    * Fixed crash when rendering in Water World mode
 
 1.1.10 - 2013-04-20
     * Added Emerald Ore and Nether Quartz Ore to the block highlight list
