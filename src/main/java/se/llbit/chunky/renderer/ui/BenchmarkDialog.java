@@ -204,7 +204,7 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 		progressBar.setMaximum(target);
 		progressBar.setMinimum(start);
 		progressBar.setValue(done);
-		if (done == target) {
+		if (done == target && benchmark != null) {
 			String benchmarkScene = benchmark.getSceneName();
 			int score = benchmark.getScore();
 			benchmark = null;
