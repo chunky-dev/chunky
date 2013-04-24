@@ -5,6 +5,7 @@
     be equal to zero
     * Fixed error in headless mode that prevented rendering to start
     * Fixed crash when rendering in Water World mode
+    * Water World check-box is correctly updated to reflect the current setting
 
 1.1.10 - 2013-04-20
     * Added Emerald Ore and Nether Quartz Ore to the block highlight list

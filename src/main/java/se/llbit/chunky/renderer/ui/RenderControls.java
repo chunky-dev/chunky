@@ -525,7 +525,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		JLabel waterHeightLbl = new JLabel("Water height: ");
 		waterHeightField.setColumns(5);
 		waterHeightField.setText("" + World.SEA_LEVEL);
-		waterHeightField.setEnabled(false);
+		waterHeightField.setEnabled(renderMan.scene().getWaterHeight() != 0);
 		waterHeightField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
