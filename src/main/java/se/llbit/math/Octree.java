@@ -306,9 +306,9 @@ public class Octree {
 
 			// add small offset past the intersection to avoid
 			// recursion to the same octree node!
-			x = QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
-			y = QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
-			z = QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
+			x = (int) QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
+			y = (int) QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
+			z = (int) QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
 
 			node = root;
 			level = depth;
@@ -526,9 +526,9 @@ public class Octree {
 
 			// add small offset past the intersection to avoid
 			// recursion to the same octree node!
-			x = QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
-			y = QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
-			z = QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
+			x = (int) QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
+			y = (int) QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
+			z = (int) QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
 
 			node = root;
 			level = depth;

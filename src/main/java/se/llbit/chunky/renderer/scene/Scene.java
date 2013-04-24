@@ -720,9 +720,9 @@ public class Scene implements Refreshable {
 			return;
 		}
 
-		int x = QuickMath.floor(ray.x.x);
-		int y = QuickMath.floor(ray.x.y);
-		int z = QuickMath.floor(ray.x.z);
+		int x = (int) QuickMath.floor(ray.x.x);
+		int y = (int) QuickMath.floor(ray.x.y);
+		int z = (int) QuickMath.floor(ray.x.z);
 		ray.calcUVCoords(x, y, z);
 
 		Block block = ray.getCurrentBlock();
@@ -2133,7 +2133,6 @@ public class Scene implements Refreshable {
 	 * Merge a render dump into this scene
 	 * @param dumpFile
 	 * @param renderListener
-	 * @param dumpSpp
 	 */
 	public void mergeDump(File dumpFile, RenderStatusListener renderListener) {
 		int dumpSpp;

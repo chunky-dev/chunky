@@ -26,8 +26,8 @@ public class QuickMath {
 	 * @param d
 	 * @return The floor of d
 	 */
-	public static final int floor(double d) {
-		int i = (int) d;
+	public static final long floor(double d) {
+		long i = (long) d;
 		return d < i ? i-1 : i;
 	}
 
@@ -35,8 +35,8 @@ public class QuickMath {
 	 * @param d
 	 * @return The ceil of d
 	 */
-	public static final int ceil(double d) {
-		int i = (int) d;
+	public static final long ceil(double d) {
+		long i = (long) d;
 		return d > i ? i+1 : i;
 	}
 

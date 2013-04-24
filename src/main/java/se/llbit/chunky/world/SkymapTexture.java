@@ -41,10 +41,10 @@ public class SkymapTexture extends Texture {
 			Logger.getLogger(SkymapTexture.class);
 
 	class TexturePreprocessor extends Thread {
-		private int x0;
-		private int x1;
-		private int y0;
-		private int y1;
+		private final int x0;
+		private final int x1;
+		private final int y0;
+		private final int y1;
 
 		TexturePreprocessor(int x0, int x1, int y0, int y1) {
 			super("Texture Preprocessor");
@@ -182,10 +182,10 @@ public class SkymapTexture extends Texture {
 		double x = u * width;
 		double y = v * (height-1);
 		double weight;
-		int fx = QuickMath.floor(x);
-		int cx = QuickMath.ceil(x);
-		int fy = QuickMath.floor(y);
-		int cy = QuickMath.ceil(y);
+		int fx = (int) QuickMath.floor(x);
+		int cx = (int) QuickMath.ceil(x);
+		int fy = (int) QuickMath.floor(y);
+		int cy = (int) QuickMath.ceil(y);
 
 		double r, g, b;
 		getColor(fx % width, fy, c);
