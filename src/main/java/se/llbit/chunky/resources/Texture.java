@@ -455,10 +455,10 @@ public class Texture {
 		double x = u * width;
 		double y = v * (height-1);
 		double weight;
-		int fx = QuickMath.floor(x);
-		int cx = QuickMath.ceil(x);
-		int fy = QuickMath.floor(y);
-		int cy = QuickMath.ceil(y);
+		int fx = (int) QuickMath.floor(x);
+		int cx = (int) QuickMath.ceil(x);
+		int fy = (int) QuickMath.floor(y);
+		int cy = (int) QuickMath.ceil(y);
 
 		float[] rgb = getColor(fx % width, fy);
 		weight = (1 - (y-fy)) * (1 - (x-fx));
