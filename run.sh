@@ -5,6 +5,6 @@ if [ ! -d test ]; then
 fi
 
 if ant -Ddebug=true jar; then
-    (cd test; java -jar ../build/Chunky.jar)
+    (cd test; java -jar ../build/Chunky.jar $@)
 fi
 
