@@ -49,19 +49,30 @@ public class Sky {
 		/**
 		 * Use simulated sky
 		 */
-		SIMULATED,
+		SIMULATED("Simulated"),
 		/**
 		 * Use a panormaic skymap
 		 */
-		SKYMAP,
+		SKYMAP("Panoramic Skymap (above horizon)"),
 		/**
 		 * Use a gradient
 		 */
-		GRADIENT,
+		GRADIENT("Color Gradient"),
 		/**
 		 * Use a skybox
 		 */
-		SKYBOX
+		SKYBOX("Skybox");
+
+		private String name;
+
+		SkyMode(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
 	};
 
 	private static final Logger logger =
