@@ -87,6 +87,8 @@ public class RenderWorker extends Thread {
 		int canvasWidth = scene.canvasWidth();
 		int canvasHeight = scene.canvasHeight();
 
+		double halfWidth = canvasWidth/(2.0*canvasHeight);
+
 		// calculate pixel bounds for this job
 		int xjobs = (canvasWidth+(manager.tileWidth-1))/manager.tileWidth;
 		int x0 = manager.tileWidth * (jobId % xjobs);
@@ -94,7 +96,6 @@ public class RenderWorker extends Thread {
 		int y0 = manager.tileWidth * (jobId / xjobs);
 		int y1 = Math.min(y0 + manager.tileWidth, canvasHeight);
 
-		double aspect = canvasWidth / (double) canvasHeight;
 		double[][][] samples = scene.getSampleBuffer();
 		final Camera cam = scene.camera();
 
@@ -112,9 +113,8 @@ public class RenderWorker extends Thread {
 				double oy = random.nextDouble();
 				double ox = random.nextDouble();
 
-				cam.calcViewRay(ray,
-						random, aspect,
-						( .5 - (x + ox) / canvasWidth ),
+				cam.calcViewRay(ray, random,
+						(-halfWidth + (x + ox) / canvasHeight),
 						(-.5 + (y + oy) / canvasHeight));
 
 				scene.pathTrace(ray, rayPool, vectorPool, random);
@@ -153,9 +153,8 @@ public class RenderWorker extends Thread {
 				}
 			}
 
-			cam.calcViewRay(ray,
-					random, aspect,
-					( .5 - (double)x / canvasWidth ),
+			cam.calcViewRay(ray, random,
+					(-halfWidth + (double)x / canvasHeight),
 					(-.5 + (double)y / canvasHeight));
 
 			scene.quickTrace(ray, rayPool);

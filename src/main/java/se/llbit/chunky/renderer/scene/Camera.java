@@ -90,8 +90,8 @@ public class Camera {
 		@Override
 		public void apply(double x, double y, Random random, Vector3d o,
 				Vector3d d) {
-			d.set(0, -1, 0);
-			o.set(fov * y, 0, fov * x);
+			o.set(fov * x, fov * y, 0);
+			d.set(0, 0, 1);
 		}
 
 		@Override
@@ -124,7 +124,7 @@ public class Camera {
 		public void apply(double x, double y, Random random, Vector3d o,
 				Vector3d d) {
 			o.set(0, 0, 0);
-			d.set(fovTan * y, -1, fovTan * x);
+			d.set(fovTan * x, fovTan * y, 1);
 		}
 
 		@Override
@@ -167,7 +167,7 @@ public class Camera {
 				dy = dv * (ay / angleFromCenter);
 			}
 			o.set(0, 0, 0);
-			d.set(dy, -dz, dx);
+			d.set(dx, dy, dz);
 		}
 
 		@Override
@@ -206,7 +206,7 @@ public class Camera {
 			double vv = Math.cos(ay);
 
 			o.set(0, 0, 0);
-			d.set(Math.sin(ay), -vv * Math.cos(ax), vv * Math.sin(ax));
+			d.set(vv * Math.sin(ax), Math.sin(ay), vv * Math.cos(ax));
 		}
 
 		@Override
@@ -247,7 +247,7 @@ public class Camera {
 			double dy = fovTan * y;
 
 			o.set(0, 0, 0);
-			d.set(dy, -dz, dx);
+			d.set(dx, dy, dz);
 		}
 
 		@Override
@@ -289,23 +289,23 @@ public class Camera {
 				Vector3d d) {
 			wrapped.apply(x, y, random, o, d);
 
-			d.scale(-subjectDistance/d.y);
+			d.scale(subjectDistance/d.z);
 
 			// find random point in aperture
-			double rx, rz;
+			double rx, ry;
 			while (true) {
 				rx = 2 * random.nextDouble() - 1;
-				rz = 2 * random.nextDouble() - 1;
-				double s = rx * rx + rz * rz;
+				ry = 2 * random.nextDouble() - 1;
+				double s = rx * rx + ry * ry;
 				if (s > Ray.EPSILON && s <= 1) {
 					rx *= aperture;
-					rz *= aperture;
+					ry *= aperture;
 					break;
 				}
 			}
 
-			d.sub(rx, 0, rz);
-			o.add(rx, 0, rz);
+			d.sub(rx, ry, 0);
+			o.add(rx, ry, 0);
 		}
 
 		@Override
@@ -412,19 +412,6 @@ public class Camera {
 	private final Refreshable scene;
 
 	Vector3d pos = new Vector3d(0, 0, 0);
-	private final Vector3d up = new Vector3d(0, 1, 0);
-
-	/**
-	 * Scratch vector
-	 * NB: protected by synchronized methods (no concurrent modification)
-	 */
-	private final Vector3d right = new Vector3d();
-
-	/**
-	 * Scratch vector
-	 * NB: protected by synchronized methods (no concurrent modification)
-	 */
-	private final Vector3d d = new Vector3d();
 
 	/**
 	 * Scratch vector
@@ -669,19 +656,12 @@ public class Camera {
 	 */
 	public synchronized void moveForward(double v) {
 		if (projectionMode != ProjectionMode.PARALLEL) {
-			d.set(0, -1, 0);
-			transform.transform(d);
-			pos.scaleAdd(v, d, pos);
+			u.set(0, 0, 1);
 		} else {
-			d.set(1, 0, 0);
-			tmpTransform.rotY(yaw);
-			tmpTransform.transform(d);
-			right.cross(up, d);
-			d.set(0, -1, 0);
-			transform.transform(d);
-			u.cross(right, d);
-			pos.scaleAdd(v, u, pos);
+			u.set(0, -1, 0);
 		}
+		transform.transform(u);
+		pos.scaleAdd(v, u, pos);
 		scene.refresh();
 	}
 
@@ -691,19 +671,12 @@ public class Camera {
 	 */
 	public synchronized void moveBackward(double v) {
 		if (projectionMode != ProjectionMode.PARALLEL) {
-			d.set(0, -1, 0);
-			transform.transform(d);
-			pos.scaleAdd(-v, d, pos);
+			u.set(0, 0, 1);
 		} else {
-			d.set(1, 0, 0);
-			tmpTransform.rotY(yaw);
-			tmpTransform.transform(d);
-			right.cross(up, d);
-			d.set(0, -1, 0);
-			transform.transform(d);
-			u.cross(right, d);
-			pos.scaleAdd(-v, u, pos);
+			u.set(0, -1, 0);
 		}
+		transform.transform(u);
+		pos.scaleAdd(-v, u, pos);
 		scene.refresh();
 	}
 
@@ -712,8 +685,8 @@ public class Camera {
 	 * @param v
 	 */
 	public synchronized void moveUp(double v) {
-		pos.scaleAdd(v, up, pos);
-
+		u.set(0, 1, 0);
+		pos.scaleAdd(v, u, pos);
 		scene.refresh();
 	}
 
@@ -722,8 +695,8 @@ public class Camera {
 	 * @param v
 	 */
 	public synchronized void moveDown(double v) {
-		pos.scaleAdd(-v, up, pos);
-
+		u.set(0, 1, 0);
+		pos.scaleAdd(-v, u, pos);
 		scene.refresh();
 	}
 
@@ -732,12 +705,9 @@ public class Camera {
 	 * @param v
 	 */
 	public synchronized void strafeLeft(double v) {
-		d.set(1, 0, 0);
-		tmpTransform.rotY(yaw);
-		tmpTransform.transform(d);
-		right.cross(up, d);
-		pos.scaleAdd(-v, right, pos);
-
+		u.set(1, 0, 0);
+		transform.transform(u);
+		pos.scaleAdd(-v, u, pos);
 		scene.refresh();
 	}
 
@@ -746,12 +716,9 @@ public class Camera {
 	 * @param v
 	 */
 	public synchronized void strafeRight(double v) {
-		d.set(1, 0, 0);
-		tmpTransform.rotY(yaw);
-		tmpTransform.transform(d);
-		right.cross(up, d);
-		pos.scaleAdd(v, right, pos);
-
+		u.set(1, 0, 0);
+		transform.transform(u);
+		pos.scaleAdd(v, u, pos);
 		scene.refresh();
 	}
 
@@ -768,10 +735,11 @@ public class Camera {
 		this.pitch = Math.min(0, this.pitch);
 		this.pitch = Math.max(-Math.PI, this.pitch);
 
-		if (this.yaw > Math.PI * 2)
+		if (this.yaw > Math.PI * 2) {
 			this.yaw -= Math.PI * 2;
-		else if (this.yaw < -Math.PI * 2)
+		} else if (this.yaw < -Math.PI * 2) {
 			this.yaw += Math.PI * 2;
+		}
 
 		updateTransform();
 	}
@@ -792,8 +760,8 @@ public class Camera {
 	 * Update the camera transformation matrix.
 	 */
 	synchronized void updateTransform() {
-		tmpTransform.rotZ(pitch);
-		transform.rotY(yaw);
+		tmpTransform.rotX(Math.PI/2 - pitch);
+		transform.rotY(Math.PI/2 + yaw);
 		transform.mul(tmpTransform);
 
 		scene.refresh();
@@ -820,17 +788,16 @@ public class Camera {
 	 * image coordinates.
 	 * @param ray result ray
 	 * @param random random number stream
-	 * @param aspect width / height of output image
 	 * @param x normalized image coordinate [-0.5, 0.5]
 	 * @param y normalized image coordinate [-0.5, 0.5]
 	 */
-	public void calcViewRay(Ray ray, Random random, double aspect, double x,
+	public void calcViewRay(Ray ray, Random random, double x,
 			double y) {
 
 		// reset the ray properties - current material etc.
 		ray.setDefault();
 
-		projector.apply(x * aspect, y, random, ray.x, ray.d);
+		projector.apply(x, y, random, ray.x, ray.d);
 
 		ray.d.normalize();
 
