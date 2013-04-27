@@ -50,6 +50,8 @@ public class Icon extends Texture {
 	public static final Icon map = new Icon("map");
 	public static final Icon mapSelected = new Icon("map-selected");
 	public static final Icon chunky = new Icon("chunky");
+	public static final Icon locked = new Icon("locked");
+	public static final Icon unlocked = new Icon("unlocked");
 
 	public Icon(String resourceName) {
 		setTexture(ImageLoader.get("icons/" + resourceName + ".png"));

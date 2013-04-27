@@ -48,7 +48,7 @@ import se.llbit.chunky.renderer.Renderer;
 @SuppressWarnings("serial")
 public class Chunk3DView extends JDialog {
 
-    private RenderCanvas canvas;
+    private final RenderCanvas canvas;
 
     private int x0, y0;
 

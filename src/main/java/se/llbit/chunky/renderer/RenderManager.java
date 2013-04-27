@@ -190,7 +190,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		while (true) {
 
 			if (scene.isPaused()) {
+				renderListener.renderStateChanged(scene.pathTrace(), scene.isPaused());
 				scene.pauseWait();
+				renderListener.renderStateChanged(scene.pathTrace(), scene.isPaused());
 			}
 
 			if (scene.shouldRefresh()) {

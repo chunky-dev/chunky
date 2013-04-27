@@ -31,6 +31,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
@@ -113,6 +115,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox directLight = new JCheckBox();
 	private final JButton saveSceneBtn = new JButton();
 	private final JButton loadSceneBtn = new JButton();
+	private final JButton openSceneDirBtn = new JButton();
 	private final JButton saveFrameBtn = new JButton();
 	private final JCheckBox stillWaterCB = new JCheckBox();
 	private final JTextField sceneNameField = new JTextField();
@@ -123,6 +126,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox atmosphereEnabled = new JCheckBox();
 	private final JCheckBox volumetricFogEnabled = new JCheckBox();
 	private final JCheckBox cloudsEnabled = new JCheckBox();
+	private final JCheckBox autoLock = new JCheckBox();
+	private final JButton lockBtn = new JButton();
 	private final RenderContext context;
 	private final JButton showPreviewBtn = new JButton();
 	private final JLabel renderTimeLbl = new JLabel();
@@ -140,12 +145,22 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final DecimalFormat decimalFormat = new DecimalFormat();
 	private final JCheckBox saveDumpsCB = new JCheckBox();
 	private final JComboBox dumpFrequency = new JComboBox();
+	private final JLabel dumpFrequencyLbl = new JLabel(" frame");
 	private final JTextField sppTargetField = new JTextField();
 	private final JTextField cameraX = new JTextField();
 	private final JTextField cameraY = new JTextField();
 	private final JTextField cameraZ = new JTextField();
 	private final JTextField cameraYaw = new JTextField();
 	private final JTextField cameraPitch = new JTextField();
+	private final JButton mergeDumpBtn = new JButton("Merge Render Dump");
+
+	private boolean controlsLocked = false;
+
+	private JPanel generalPane;
+	private JPanel cameraPane;
+	private JPanel lightingPane;
+	private JPanel skyPane;
+	private JPanel advancedPane;
 
 	private final Adjuster rayDepth = new Adjuster(
 			"Ray depth",
@@ -280,6 +295,22 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
+	Set<Component> safeComponents = new HashSet<Component>();
+	{
+		// initialize safe component set
+		safeComponents.add(saveSceneBtn);
+		safeComponents.add(sceneNameField);
+		safeComponents.add(sceneNameLbl);
+		safeComponents.add(openSceneDirBtn);
+		safeComponents.add(rayDepth.getLabel());
+		safeComponents.add(rayDepth.getSlider());
+		safeComponents.add(rayDepth.getField());
+		safeComponents.add(mergeDumpBtn);
+		safeComponents.add(saveDumpsCB);
+		safeComponents.add(dumpFrequency);
+		safeComponents.add(dumpFrequencyLbl);
+	}
+
 	/**
 	 * Create a new Render Controls dialog.
 	 * @param chunkyInstance
@@ -345,12 +376,12 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		JTabbedPane tabbedPane = new JTabbedPane();
 
-		tabbedPane.addTab("General", buildGeneralPane());
-		tabbedPane.addTab("Lighting", buildLightingPane());
-		tabbedPane.addTab("Sky", buildSkyPane());
-		tabbedPane.addTab("Camera", buildCameraPane());
+		tabbedPane.addTab("General", generalPane = buildGeneralPane());
+		tabbedPane.addTab("Lighting", lightingPane = buildLightingPane());
+		tabbedPane.addTab("Sky", skyPane = buildSkyPane());
+		tabbedPane.addTab("Camera", cameraPane = buildCameraPane());
 		tabbedPane.addTab("Post-processing", buildPostProcessingPane());
-		tabbedPane.addTab("Advanced", buildAdvancedPane());
+		tabbedPane.addTab("Advanced", advancedPane = buildAdvancedPane());
 
 		JLabel sppTargetLbl = new JLabel("SPP Target: ");
 		sppTargetLbl.setToolTipText("The render will be paused at this SPP count");
@@ -390,20 +421,37 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				if (!renderMan.scene().pathTrace()) {
 					renderMan.scene().startRender();
-					startRenderBtn.setText("PAUSE");
-					startRenderBtn.repaint();
 				} else {
 					if (renderMan.scene().isPaused()) {
 						renderMan.scene().resumeRender();
-						startRenderBtn.setText("PAUSE");
-						startRenderBtn.repaint();
 					} else {
 						renderMan.scene().pauseRender();
-						startRenderBtn.setText("RESUME");
-						startRenderBtn.repaint();
 					}
 				}
 				stopRenderBtn.setEnabled(true);
+			}
+		});
+
+		autoLock.setText("auto lock");
+		autoLock.setSelected(ProgramProperties.getProperty("autoLock", "true").equals("true"));
+		autoLock.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JCheckBox source = (JCheckBox) e.getSource();
+				ProgramProperties.setProperty("autoLock", "" + source.isSelected());
+			}
+		});
+
+		lockBtn.setIcon(Icon.locked.createIcon());
+		lockBtn.setToolTipText("Lock or unlock the render controls");
+		lockBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (controlsLocked) {
+					unlockControls();
+				} else {
+					lockControls();
+				}
 			}
 		});
 
@@ -417,9 +465,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				renderMan.scene().haltRender();
-				startRenderBtn.setText("START");
-				startRenderBtn.repaint();
-				stopRenderBtn.setEnabled(false);
 			}
 		});
 
@@ -462,8 +507,11 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(stopRenderBtn)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(saveFrameBtn)
+					.addComponent(autoLock)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lockBtn)
 				)
+				.addComponent(saveFrameBtn)
 				.addComponent(renderTimeLbl)
 				.addComponent(samplesPerSecondLbl)
 				.addComponent(sppLbl)
@@ -491,8 +539,11 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(renderLbl)
 				.addComponent(startRenderBtn)
 				.addComponent(stopRenderBtn)
-				.addComponent(saveFrameBtn)
+				.addComponent(autoLock)
+				.addComponent(lockBtn)
 			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(saveFrameBtn)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(renderTimeLbl)
 			.addComponent(samplesPerSecondLbl)
@@ -514,7 +565,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		setVisible(true);
 	}
 
-	private Component buildAdvancedPane() {
+	private JPanel buildAdvancedPane() {
 		rayDepth.update();
 
 		JSeparator sep1 = new JSeparator();
@@ -553,7 +604,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 
-		JButton mergeDumpBtn = new JButton("Merge Render Dump");
 		mergeDumpBtn.setToolTipText(
 				"Merge an existing render dump with the current render");
 		mergeDumpBtn.addActionListener(new ActionListener() {
@@ -622,7 +672,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		return panel;
 	}
 
-	private Component buildPostProcessingPane() {
+	private JPanel buildPostProcessingPane() {
 		exposure.setLogarithmicMode(true);
 		exposure.update();
 
@@ -673,7 +723,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		return panel;
 	}
 
-	private Component buildGeneralPane() {
+	private JPanel buildGeneralPane() {
 		JLabel widthLbl = new JLabel("Canvas width: ");
 		JLabel heightLbl = new JLabel("Canvas height: ");
 
@@ -709,7 +759,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 
-		JButton openSceneDirBtn = new JButton("Open Scene Directory");
+		openSceneDirBtn.setText("Open Scene Directory");
 		openSceneDirBtn.setToolTipText("Open the directory where Chunky stores scene descriptions and renders");
 		openSceneDirBtn.addActionListener(new ActionListener() {
 			@Override
@@ -784,7 +834,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		saveDumpsCB.addActionListener(saveDumpsListener);
 		updateSaveDumpsCheckBox();
 
-		JLabel dumpFrequencyLbl = new JLabel(" frame");
 		String[] frequencyStrings = new String[dumpFrequencies.length];
 		for (int i = 0; i < dumpFrequencies.length; ++i)
 			frequencyStrings[i] = dumpFrequencies[i] + "th";
@@ -883,7 +932,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		return panel;
 	}
 
-	private Component buildLightingPane() {
+	private JPanel buildLightingPane() {
 
 		changeSunColorBtn.setText("Change Sun Color");
 		changeSunColorBtn.addActionListener(new ActionListener() {
@@ -968,7 +1017,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		return panel;
 	}
 
-	private Component buildSkyPane() {
+	private JPanel buildSkyPane() {
 
 		JLabel skyModeLbl = new JLabel("Sky Mode:");
 		skyModeCB.setModel(new DefaultComboBoxModel(Sky.SkyMode.values()));
@@ -1093,7 +1142,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		return panel;
 	}
 
-	private Component buildCameraPane() {
+	private JPanel buildCameraPane() {
 		JLabel projectionModeLbl = new JLabel("Projection");
 
 		fov.update();
@@ -1997,7 +2046,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateCameraPosition();
 		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
 		directLight.setSelected(renderMan.scene().getDirectLight());
-		startRenderBtn.setText("RESUME");
 		stopRenderBtn.setEnabled(true);
 
 		show3DView();
@@ -2092,7 +2140,9 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	@Override
 	public void renderStateChanged(boolean pathTrace, boolean paused) {
+		boolean lock = false;
 		if (pathTrace) {
+			lock = true;
 			if (paused) {
 				startRenderBtn.setText("RESUME");
 			} else {
@@ -2102,6 +2152,47 @@ public class RenderControls extends JDialog implements ViewListener,
 		} else {
 			startRenderBtn.setText("START");
 			stopRenderBtn.setEnabled(false);
+		}
+		if (lock && autoLock.isSelected()) {
+			lockControls();
+		} else if (!lock) {
+			unlockControls();
+		}
+	}
+
+	private void lockControls() {
+		lockPane(generalPane);
+		lockPane(cameraPane);
+		lockPane(skyPane);
+		lockPane(lightingPane);
+		lockPane(advancedPane);
+		lockBtn.setIcon(Icon.unlocked.createIcon());
+		controlsLocked = true;
+	}
+
+	private void unlockControls() {
+		unlockPane(generalPane);
+		unlockPane(cameraPane);
+		unlockPane(skyPane);
+		unlockPane(lightingPane);
+		unlockPane(advancedPane);
+		lockBtn.setIcon(Icon.locked.createIcon());
+		controlsLocked = false;
+	}
+
+	private void lockPane(JPanel pane) {
+		for (Component component: pane.getComponents()) {
+			if (!safeComponents.contains(component)) {
+				component.setEnabled(false);
+			}
+		}
+	}
+
+	private void unlockPane(JPanel pane) {
+		for (Component component: pane.getComponents()) {
+			if (!safeComponents.contains(component)) {
+				component.setEnabled(true);
+			}
 		}
 	}
 

@@ -569,12 +569,12 @@ public class Scene implements Refreshable {
 		}
 
 		if (result.containsKey(cvf_sun))  {
-
 			sun.load((CompoundTag) result.get(cvf_sun));
 		}
 
-		if (pathTrace)
+		if (pathTrace) {
 			pauseRender = true;
+		}
 
 		refresh = false;
 
@@ -1230,8 +1230,9 @@ public class Scene implements Refreshable {
 	 * @throws InterruptedException
 	 */
 	public synchronized void pauseWait() throws InterruptedException {
-		while (pauseRender)
+		while (pauseRender) {
 			wait();
+		}
 	}
 
 	/**
