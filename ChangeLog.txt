@@ -1,10 +1,13 @@
 1.1.11 - TBD
     * It is now possible to lock the render controls to avoid inadvertent
     render restarts.  The locking can be either manual or automatic.
-    * Renamed "Focal Offset" setting to "Subject Distance"
-    * Windows installer skips overwriting the (more memory) shortcut
+    * Adjusted the depth of field effect - depth of field is now planar again.
+    This reverts the spherical depth of field effect from 1.1.10
+    * Renamed the "Focal Offset" setting to "Subject Distance"
+    * The Windows installer skips overwriting the (more memory) shortcut if
+    it already exists
     * Fixed error causing emitter and sun intensity values below one to
-    be equal to zero
+    be equal to be forced to zero
     * Fixed error in headless mode that prevented rendering to start
     * Fixed crash when rendering in Water World mode
     * Water World check-box is correctly updated to reflect the current setting
