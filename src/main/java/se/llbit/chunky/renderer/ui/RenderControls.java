@@ -133,7 +133,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JLabel renderTimeLbl = new JLabel();
 	private final JLabel samplesPerSecondLbl = new JLabel();
 	private final JLabel sppLbl = new JLabel();
-	private final JProgressBar progressBar;
+	private final JProgressBar progressBar = new JProgressBar();
 	private final JLabel progressLbl = new JLabel();
 	private final JComboBox postprocessCB = new JComboBox();
 	private final JComboBox skyModeCB = new JComboBox();
@@ -330,13 +330,18 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		renderMan = new RenderManager(
 				view.getCanvas(), renderContext, this);
+
+		buildUI();
+
 		renderMan.start();
 
 		view.setRenderer(renderMan);
 
 		sceneMan = new SceneManager(renderMan);
 		sceneMan.start();
+	}
 
+	private void buildUI() {
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		setModalityType(ModalityType.MODELESS);
 
@@ -478,8 +483,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		setSamplesPerSecond(0);
 		setSPP(0);
 		setProgress("Progress:", 0, 0, 1);
-
-		progressBar = new JProgressBar();
 
 		progressLbl.setText("Progress:");
 
