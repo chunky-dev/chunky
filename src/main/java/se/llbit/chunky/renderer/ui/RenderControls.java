@@ -1905,64 +1905,82 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	@Override
 	public void onStrafeLeft() {
-        renderMan.scene().camera().strafeLeft(
-        		chunky.getShiftModifier() ? .1 : 1);
-		updateCameraPosition();
+		if (!controlsLocked) {
+	        renderMan.scene().camera().strafeLeft(
+	        		chunky.getShiftModifier() ? .1 : 1);
+			updateCameraPosition();
+		}
 	}
 
 	@Override
 	public void onStrafeRight() {
-        renderMan.scene().camera().strafeRight(
-        		chunky.getShiftModifier() ? .1 : 1);
-		updateCameraPosition();
+		if (!controlsLocked) {
+	        renderMan.scene().camera().strafeRight(
+	        		chunky.getShiftModifier() ? .1 : 1);
+			updateCameraPosition();
+		}
 	}
 
 	@Override
 	public void onMoveForward() {
-        renderMan.scene().camera().moveForward(
-        		chunky.getShiftModifier() ? .1 : 1);
-		updateCameraPosition();
+		if (!controlsLocked) {
+	        renderMan.scene().camera().moveForward(
+	        		chunky.getShiftModifier() ? .1 : 1);
+			updateCameraPosition();
+		}
 	}
 
 	@Override
 	public void onMoveBackward() {
-        renderMan.scene().camera().moveBackward(
-        		chunky.getShiftModifier() ? .1 : 1);
-		updateCameraPosition();
+		if (!controlsLocked) {
+	        renderMan.scene().camera().moveBackward(
+	        		chunky.getShiftModifier() ? .1 : 1);
+			updateCameraPosition();
+		}
 	}
 
 	@Override
 	public void onMoveForwardFar() {
-	    renderMan.scene().camera().moveForward(100);
-		updateCameraPosition();
+		if (!controlsLocked) {
+		    renderMan.scene().camera().moveForward(100);
+			updateCameraPosition();
+		}
 	}
 
 	@Override
 	public void onMoveBackwardFar() {
-        renderMan.scene().camera().moveBackward(100);
-		updateCameraPosition();
+		if (!controlsLocked) {
+	        renderMan.scene().camera().moveBackward(100);
+			updateCameraPosition();
+		}
 	}
 
 	@Override
 	public void onMoveUp() {
-        renderMan.scene().camera().moveUp(
-        		chunky.getShiftModifier() ? .1 : 1);
-		updateCameraPosition();
+		if (!controlsLocked) {
+	        renderMan.scene().camera().moveUp(
+	        		chunky.getShiftModifier() ? .1 : 1);
+			updateCameraPosition();
+		}
 	}
 
 	@Override
 	public void onMoveDown() {
-        renderMan.scene().camera().moveDown(
-        		chunky.getShiftModifier() ? .1 : 1);
-		updateCameraPosition();
+		if (!controlsLocked) {
+	        renderMan.scene().camera().moveDown(
+	        		chunky.getShiftModifier() ? .1 : 1);
+			updateCameraPosition();
+		}
 	}
 
 	@Override
 	public void onMouseDragged(int dx, int dy) {
-        renderMan.scene().camera().rotateView(
-                - (Math.PI / 250) * dx,
-                (Math.PI / 250) * dy);
-        updateCameraDirection();
+		if (!controlsLocked) {
+	        renderMan.scene().camera().rotateView(
+	                - (Math.PI / 250) * dx,
+	                (Math.PI / 250) * dy);
+	        updateCameraDirection();
+		}
 	}
 
 	/**
@@ -2123,12 +2141,14 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	@Override
 	public void onZoom(int diff) {
-		Camera camera = renderMan.scene().camera();
-		double value = renderMan.scene().camera().getFoV();
-		double scale = camera.getMaxFoV() - camera.getMinFoV();
-		value = value + diff * scale/20;
-		renderMan.scene().camera().setFoV(value);
-		fov.update();
+		if (!controlsLocked) {
+			Camera camera = renderMan.scene().camera();
+			double value = renderMan.scene().camera().getFoV();
+			double scale = camera.getMaxFoV() - camera.getMinFoV();
+			value = value + diff * scale/20;
+			renderMan.scene().camera().setFoV(value);
+			fov.update();
+		}
 	}
 
 	/**
