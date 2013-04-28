@@ -117,7 +117,7 @@
 				<include name="Chunky.bat"/>
 				<include name="Chunky.sh"/>
 			</zipfileset>
-			<zipfileset dir="license" prefix="Chunky/license">
+			<zipfileset dir="license" prefix="Chunky-${Chunky.version}/license">
 				<include name="LICENSE.txt"/>
 				<include name="JOCL.txt"/>
 				<include name="MWC64X.txt"/>
@@ -125,7 +125,7 @@
 				<include name="LOG4J.txt"/>
 				<include name="Markdown"/>
 			</zipfileset>
-			<zipfileset dir="build" prefix="Chunky">
+			<zipfileset dir="build" prefix="Chunky-${Chunky.version}">
 				<include name="Chunky.jar"/>
 				<include name="ReadMe.html"/>
 			</zipfileset>
