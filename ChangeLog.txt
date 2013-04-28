@@ -1,4 +1,4 @@
-1.1.11 - TBD
+1.1.11 - 2013-04-28
     * It is now possible to lock the render controls to avoid inadvertent
     render restarts.  The locking can be either manual or automatic.
     * Adjusted the depth of field effect - depth of field is now planar again.
