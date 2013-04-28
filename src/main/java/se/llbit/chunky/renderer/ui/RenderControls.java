@@ -1022,6 +1022,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		JLabel skyModeLbl = new JLabel("Sky Mode:");
 		skyModeCB.setModel(new DefaultComboBoxModel(Sky.SkyMode.values()));
 		skyModeCB.addActionListener(skyModeListener);
+		// TODO implement sky modes
+		skyModeLbl.setVisible(false);
+		skyModeCB.setVisible(false);
 		updateSkyMode();
 
 		JLabel skyRotationLbl = new JLabel("Skymap rotation:");
