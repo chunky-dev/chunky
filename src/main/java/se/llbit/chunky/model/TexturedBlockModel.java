@@ -102,6 +102,8 @@ public class TexturedBlockModel {
 	public static boolean intersect(Ray ray, Texture texture) {
 		ray.t = Double.POSITIVE_INFINITY;
 		if (block.intersect(ray)) {
+			if (ray.n.x > 0 || ray.n.z < 0)
+				ray.u = 1-ray.u;
 			float[] color = texture.getColor(ray.u, ray.v);
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
