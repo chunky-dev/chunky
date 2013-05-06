@@ -40,7 +40,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.main.Chunky;
+import se.llbit.chunky.main.Version;
 import se.llbit.chunky.renderer.BenchmarkManager;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderStatusListener;
@@ -232,7 +232,7 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 			PrintStream out = new PrintStream(new FileOutputStream(benchmarkFile, true));
 			SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
 			out.println(String.format("%s,%s,%s,%d",
-					fmt.format(new Date()), Chunky.getRevision(),
+					fmt.format(new Date()), Version.getVersion(),
 					benchmarkScene, score));
 			out.close();
 		} catch (IOException e) {

@@ -6,7 +6,7 @@
 	<property name="tools.dir"		value="tools"/>
 	<property name="nbt.package"	value="se.llbit.nbt"/>
 	
-	<property file="${src.dir}/main/res/se/llbit/chunky/main/messages.properties"/>
+	<property file="${src.dir}/main/res/Version.properties" prefix="Chunky"/>
 
 	<taskdef name="jastadd" classname="jastadd.JastAddTask" classpath="${tools.dir}/jastadd2.jar"/>
 

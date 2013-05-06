@@ -135,16 +135,8 @@ public class Chunky implements ChunkDiscoveryListener {
 	 * @return The name of this application
 	 */
 	public static final String getAppName() {
-		return String.format("%s %s", //$NON-NLS-1$
-			Messages.getString("Chunky.appname"), //$NON-NLS-1$
-			Messages.getString("Chunky.version")); //$NON-NLS-1$
-	}
-
-	/**
-	 * @return Chunky revision
-	 */
-	public static final String getRevision() {
-		return Messages.getString("Chunky.revision"); //$NON-NLS-1$
+		return Messages.getString("Chunky.appname") + " " +
+				Version.getVersion();
 	}
 
 	static {
