@@ -40,13 +40,13 @@ public class TexturedBlockModel {
 		if (block.intersect(ray)) {
 			float[] color;
 			if (ray.n.z < 0)
-				color = texture[0].getColor(ray.u, ray.v);
+				color = texture[0].getColor(1 - ray.u, ray.v);
 			else if (ray.n.z > 0)
 				color = texture[1].getColor(ray.u, ray.v);
 			else if (ray.n.x > 0)
 				color = texture[2].getColor(1 - ray.u, ray.v);
 			else if (ray.n.x < 0)
-				color = texture[3].getColor(1 - ray.u, ray.v);
+				color = texture[3].getColor(ray.u, ray.v);
 			else if (ray.n.y > 0)
 				color = texture[4].getColor(ray.u, ray.v);
 			else
@@ -73,13 +73,13 @@ public class TexturedBlockModel {
 		if (block.intersect(ray)) {
 			float[] color;
 			if (ray.n.z < 0)
-				color = texture[index[0]].getColor(ray.u, ray.v);
+				color = texture[index[0]].getColor(1 - ray.u, ray.v);
 			else if (ray.n.z > 0)
 				color = texture[index[1]].getColor(ray.u, ray.v);
 			else if (ray.n.x > 0)
 				color = texture[index[2]].getColor(1 - ray.u, ray.v);
 			else if (ray.n.x < 0)
-				color = texture[index[3]].getColor(1 - ray.u, ray.v);
+				color = texture[index[3]].getColor(ray.u, ray.v);
 			else if (ray.n.y > 0)
 				color = texture[index[4]].getColor(ray.u, ray.v);
 			else
