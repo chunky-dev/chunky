@@ -223,5 +223,15 @@
 		<antcall target="macapp"/>
 		<antcall target="macdmg"/>
 	</target>
-	
+
+	<target name="update-version-string">
+		<echo message="Updating version string..."/>
+		<exec executable="git" outputproperty="version">
+			<arg value="describe"/>
+		</exec>
+		<echo message="version=${version}"/>
+		<propertyfile file="${src.dir}/main/res/Version.properties">
+			<entry key="version" value="${version}"/>
+		</propertyfile>
+	</target>
 </project>

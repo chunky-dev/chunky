@@ -5,6 +5,7 @@ echo PATH=%PATH%
 java -version
 javac -version
 cd ..
+call ant update-version-string
 call ant release
 cd win
 call makensis Chunky.nsi
