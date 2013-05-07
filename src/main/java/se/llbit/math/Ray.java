@@ -321,25 +321,6 @@ public class Ray {
 		distance += tNear;
 	}
 
-	/**
- 	 * Calculate the UV coordinates for the ray on the given block.
- 	 * @param bx block x coordinate
- 	 * @param by block y coordinate
- 	 * @param bz block z coordinate
- 	 */
-	public final void calcUVCoords(int bx, int by, int bz) {
-		if (n.y != 0) {
-			u = x.x - bx;
-			v = x.z - bz;
-		} else if (n.x != 0) {
-			u = x.z - bz;
-			v = x.y - by;
-		} else {
-			u = x.x - bx;
-			v = x.y - by;
-		}
-	}
-
 	private static final String[] torchDir = {
 		"", "east", "west", "south", "north", "on floor"
 	};

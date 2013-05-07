@@ -18,6 +18,7 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 
 /**
@@ -114,4 +115,46 @@ public class TexturedBlockModel {
 		}
 		return false;
 	}
+
+	/**
+	 * Find the color of the object at the intersection point
+	 * @param ray
+	 */
+	public static void getIntersectionColor(Ray ray) {
+
+		if (ray.currentMaterial == 0) {
+			ray.color.x = 1;
+			ray.color.y = 1;
+			ray.color.z = 1;
+			ray.color.w = 0;
+			return;
+		}
+
+		calcUVCoords(ray);
+
+		ray.getCurrentBlock().getTexture().getColor(ray);
+	}
+
+	/**
+ 	 * Calculate the UV coordinates for the ray on the intersected block.
+ 	 * @param ray
+ 	 */
+	private static void calcUVCoords(Ray ray) {
+		int bx = (int) QuickMath.floor(ray.x.x);
+		int by = (int) QuickMath.floor(ray.x.y);
+		int bz = (int) QuickMath.floor(ray.x.z);
+		if (ray.n.y != 0) {
+			ray.u = ray.x.x - bx;
+			ray.v = ray.x.z - bz;
+		} else if (ray.n.x != 0) {
+			ray.u = ray.x.z - bz;
+			ray.v = ray.x.y - by;
+		} else {
+			ray.u = ray.x.x - bx;
+			ray.v = ray.x.y - by;
+		}
+		if (ray.n.x > 0 || ray.n.z < 0)
+			ray.u = 1-ray.u;
+	}
+
 }

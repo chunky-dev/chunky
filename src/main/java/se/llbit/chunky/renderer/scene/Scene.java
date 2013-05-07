@@ -709,28 +709,6 @@ public class Scene implements Refreshable {
 
 	/**
 	 * @param ray
-	 */
-	public static void getIntersectionColor(Ray ray) {
-
-		if (ray.currentMaterial == 0) {
-			ray.color.x = 1;
-			ray.color.y = 1;
-			ray.color.z = 1;
-			ray.color.w = 0;
-			return;
-		}
-
-		int x = (int) QuickMath.floor(ray.x.x);
-		int y = (int) QuickMath.floor(ray.x.y);
-		int z = (int) QuickMath.floor(ray.x.z);
-		ray.calcUVCoords(x, y, z);
-
-		Block block = ray.getCurrentBlock();
-		block.getTexture().getColor(ray.u, ray.v, ray.color);
-	}
-
-	/**
-	 * @param ray
 	 * @return <code>true</code> if an intersection was found
 	 */
 	public boolean intersect(Ray ray) {

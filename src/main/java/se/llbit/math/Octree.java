@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Block;
 
@@ -436,7 +437,7 @@ public class Octree {
 					continue;
 				}
 			} else if (currentBlock != prevBlock) {
-				Scene.getIntersectionColor(ray);
+				TexturedBlockModel.getIntersectionColor(ray);
 				return true;
 			}
 
@@ -580,7 +581,7 @@ public class Octree {
 			}
 
 			if (currentBlock != prevBlock) {
-				Scene.getIntersectionColor(ray);
+				TexturedBlockModel.getIntersectionColor(ray);
 				ray.n.scale(-1);
 				return true;
 			}
