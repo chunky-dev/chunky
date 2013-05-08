@@ -40,11 +40,11 @@ public class TexturedBlockModel {
 		if (block.intersect(ray)) {
 			float[] color;
 			if (ray.n.z < 0)
-				color = texture[0].getColor(1 - ray.u, ray.v);
+				color = texture[0].getColor(ray.u, ray.v);
 			else if (ray.n.z > 0)
 				color = texture[1].getColor(ray.u, ray.v);
 			else if (ray.n.x > 0)
-				color = texture[2].getColor(1 - ray.u, ray.v);
+				color = texture[2].getColor(ray.u, ray.v);
 			else if (ray.n.x < 0)
 				color = texture[3].getColor(ray.u, ray.v);
 			else if (ray.n.y > 0)
@@ -73,11 +73,11 @@ public class TexturedBlockModel {
 		if (block.intersect(ray)) {
 			float[] color;
 			if (ray.n.z < 0)
-				color = texture[index[0]].getColor(1 - ray.u, ray.v);
+				color = texture[index[0]].getColor(ray.u, ray.v);
 			else if (ray.n.z > 0)
 				color = texture[index[1]].getColor(ray.u, ray.v);
 			else if (ray.n.x > 0)
-				color = texture[index[2]].getColor(1 - ray.u, ray.v);
+				color = texture[index[2]].getColor(ray.u, ray.v);
 			else if (ray.n.x < 0)
 				color = texture[index[3]].getColor(ray.u, ray.v);
 			else if (ray.n.y > 0)
@@ -103,8 +103,6 @@ public class TexturedBlockModel {
 	public static boolean intersect(Ray ray, Texture texture) {
 		ray.t = Double.POSITIVE_INFINITY;
 		if (block.intersect(ray)) {
-			if (ray.n.x > 0 || ray.n.z < 0)
-				ray.u = 1-ray.u;
 			float[] color = texture.getColor(ray.u, ray.v);
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);

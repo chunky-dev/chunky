@@ -81,7 +81,7 @@ public class AABB {
 					v >= ymin && v <= ymax) {
 				hit = true;
 				ray.tNear = t;
-				ray.u = u;
+				ray.u = 1-u;
 				ray.v = v;
 				ray.n.set(1, 0, 0);
 			}
@@ -120,7 +120,7 @@ public class AABB {
 					v >= ymin && v <= ymax) {
 				hit = true;
 				ray.tNear = t;
-				ray.u = u;
+				ray.u = 1-u;
 				ray.v = v;
 				ray.n.set(0, 0, -1);
 			}
