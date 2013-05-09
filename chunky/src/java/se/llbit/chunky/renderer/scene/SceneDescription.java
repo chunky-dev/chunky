@@ -48,7 +48,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	/**
 	 * The current Scene Description Format (SDF) version
 	 */
-	public static final int SDF_VERSION = 2;
+	public static final int SDF_VERSION = 3;
 
 	public int sdfVersion = -1;
 	public String name = "default";
@@ -98,8 +98,6 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	protected boolean emittersEnabled = true;
 	protected double emitterIntensity = Scene.DEFAULT_EMITTER_INTENSITY;
 	protected boolean sunEnabled = true;
-	protected boolean cloudsEnabled = false;
-	protected int cloudHeight = Scene.DEFAULT_CLOUD_HEIGHT;
 	protected boolean stillWater = false;
 	protected boolean clearWater = false;
 	protected boolean biomeColors = true;
@@ -157,8 +155,6 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		desc.add("emittersEnabled", emittersEnabled);
 		desc.add("emitterIntensity", emitterIntensity);
 		desc.add("sunEnabled", sunEnabled);
-		desc.add("cloudsEnabled", cloudsEnabled);
-		desc.add("cloudHeight", cloudHeight);
 		desc.add("stillWater", stillWater);
 		desc.add("clearWater", clearWater);
 		desc.add("biomeColorsEnabled", biomeColors);
@@ -211,8 +207,6 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		emittersEnabled = desc.get("emittersEnabled").boolValue(true);
 		emitterIntensity = desc.get("emitterIntensity").doubleValue(Scene.DEFAULT_EMITTER_INTENSITY);
 		sunEnabled = desc.get("sunEnabled").boolValue(true);
-		cloudsEnabled = desc.get("cloudsEnabled").boolValue(false);
-		cloudHeight = desc.get("cloudHeight").intValue(Scene.DEFAULT_CLOUD_HEIGHT);
 		stillWater = desc.get("stillWater").boolValue(false);
 		clearWater = desc.get("clearWater").boolValue(false);
 		biomeColors = desc.get("biomeColorsEnabled").boolValue(true);

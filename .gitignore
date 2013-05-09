@@ -22,6 +22,7 @@
 /latest.json
 /snapshot.json
 /snapshot
+/credentials.json
 
 # IntelliJ IDEA Project files
 .idea/*

@@ -1,0 +1,90 @@
+/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package se.llbit.chunky.resources;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.Scanner;
+
+public class PFMTexture extends AbstractHDRITexture {
+
+	public PFMTexture(File file) {
+		try {
+			FileInputStream in = new FileInputStream(file);
+			Scanner scan = new Scanner(in);
+			String fmt = scan.next();
+			int components = 3;
+			if (fmt.equals("PF")) {
+				components = 3;
+			} else if (fmt.equals("Pf")) {
+				components = 1;
+			} else {
+				System.err.println("Warning: unknown PFM format!");
+			}
+			System.out.println(fmt);
+			width = Integer.parseInt(scan.next());
+			System.out.println(width);
+			height = Integer.parseInt(scan.next());
+			System.out.println(height);
+			float endianScale = Float.parseFloat(scan.next());
+			boolean bigEndian = true;
+			float scale;// not used yet
+			if (endianScale < 0) {
+				scale = -endianScale;
+				bigEndian = false;
+			} else {
+				scale = endianScale;
+			}
+			System.out.println(endianScale);
+			scan.close();
+			RandomAccessFile f = new RandomAccessFile(file, "r");
+			long len = f.length();
+			long start = len - width*height*components*4;
+			buf = new float[width*height*3];
+			int offset = 0;
+
+			FileChannel channel = f.getChannel();
+			MappedByteBuffer byteBuf = channel.map(FileChannel.MapMode.READ_ONLY, start, buf.length*4);
+			if (bigEndian) {
+				byteBuf.order(ByteOrder.BIG_ENDIAN);
+			} else {
+				byteBuf.order(ByteOrder.LITTLE_ENDIAN);
+			}
+			while (offset < buf.length) {
+				if (components == 3) {
+					buf[offset+0] = byteBuf.getFloat();
+					buf[offset+1] = byteBuf.getFloat();
+					buf[offset+2] = byteBuf.getFloat();
+				} else {
+					buf[offset+0] =
+					buf[offset+1] =
+					buf[offset+2] = byteBuf.getFloat();
+				}
+				offset += 3;
+			}
+			f.close();
+		} catch (IOException e) {
+			System.err.println("Error loading PFM: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+}

@@ -73,7 +73,7 @@ public class PathTracer {
 					// sky color
 					scene.sky.getSkySpecularColor(ray, scene.waterHeight > 0);
 				} else {
-					scene.sky.getSkyDiffuseColor(ray, scene.waterHeight > 0);
+					scene.sky.getSkyColor(ray, scene.waterHeight > 0);
 				}
 				break;
 			}

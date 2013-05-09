@@ -18,6 +18,8 @@ package se.llbit.math;
 
 import org.apache.commons.math3.util.FastMath;
 
+import se.llbit.json.JsonObject;
+
 /**
  * A 3D vector of doubles.
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -145,6 +147,18 @@ public class Vector3d {
 	}
 
 	/**
+	 * Add s*d to this vector
+	 * @param s
+	 * @param d
+	 * @param o
+	 */
+	public final void scaleAdd(double s, Vector3d d) {
+		x += s*d.x;
+		y += s*d.y;
+		z += s*d.z;
+	}
+
+	/**
 	 * Scale this vector by s
 	 * @param s
 	 */
@@ -232,5 +246,27 @@ public class Vector3d {
 	@Override
 	public String toString() {
 		return String.format("(%f, %f, %f)", x, y, z);
+	}
+
+	/**
+	 * De-serialize
+	 * @param object
+	 */
+	public void fromJson(JsonObject object) {
+		x = object.get("x").doubleValue(0);
+		y = object.get("y").doubleValue(0);
+		z = object.get("z").doubleValue(0);
+	}
+
+	/**
+	 * Serialize
+	 * @return JSON object
+	 */
+	public JsonObject toJson() {
+		JsonObject object = new JsonObject();
+		object.add("x", x);
+		object.add("y", y);
+		object.add("z", z);
+		return object;
 	}
 }

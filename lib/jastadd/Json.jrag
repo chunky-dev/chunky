@@ -155,9 +155,73 @@ aspect Json {
 	eq JsonTrue.boolValue(boolean undefined) = true;
 	eq JsonFalse.boolValue(boolean undefined) = false;
 
+	/**
+	 * Produce a compact string representation of this JSON object.
+	 * @return compact string
+	 */
+	public abstract String JsonValue.toCompactString();
+
+	public String JsonUnknown.toCompactString() {
+		return "\"<unknown value>\"";
+	}
+
+	public String JsonMember.toCompactString() {
+		return "\"" + getName() + "\":" + getValue().toCompactString();
+	}
+
+	public String JsonTrue.toCompactString() {
+		return "true";
+	}
+
+	public String JsonFalse.toCompactString() {
+		return "false";
+	}
+
+	public String JsonNull.toCompactString() {
+		return "null";
+	}
+
+	public String JsonNumber.toCompactString() {
+		return getValue();
+	}
+
+	public String JsonString.toCompactString() {
+		return "\"" + getValue() + "\"";
+	}
+
+	public String JsonObject.toCompactString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{");
+		boolean first = true;
+		for (JsonMember member: getMemberList()) {
+			if (!first) {
+				sb.append(",");
+			}
+			first = false;
+			sb.append(member.toCompactString());
+		}
+		sb.append("}");
+		return sb.toString();
+	}
+
+	public String JsonArray.toCompactString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		boolean first = true;
+		for (JsonValue element: getElementList()) {
+			if (!first) {
+				sb.append(",");
+			}
+			first = false;
+			sb.append(element.toCompactString());
+		}
+		sb.append("]");
+		return sb.toString();
+	}
+
 	@Override
 	public String JsonMember.toString() {
-		return getName() + " : " + getValue().toString();
+		return "\"" + getName() + "\" : " + getValue().toString();
 	}
 
 	@Override

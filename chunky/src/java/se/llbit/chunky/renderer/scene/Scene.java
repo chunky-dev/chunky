@@ -149,8 +149,6 @@ public class Scene extends SceneDescription {
 	 */
 	public static final double DEFAULT_EXPOSURE = 1.0;
 
-	protected static final int DEFAULT_CLOUD_HEIGHT = 128;
-
 	protected double waterVisibility = DEFAULT_WATER_VISIBILITY;
 
 	/**
@@ -249,8 +247,6 @@ public class Scene extends SceneDescription {
 		clearWater = other.clearWater;
 		biomeColors = other.biomeColors;
 		sunEnabled = other.sunEnabled;
-		cloudsEnabled = other.cloudsEnabled;
-		cloudHeight = other.cloudHeight;
 		emittersEnabled = other.emittersEnabled;
 		emitterIntensity = other.emitterIntensity;
 		atmosphereEnabled = other.atmosphereEnabled;
@@ -326,7 +322,7 @@ public class Scene extends SceneDescription {
 		loadDescription(context.getSceneDescriptionInputStream(sceneName));
 
 		// load the configured skymap file
-		sky.loadSkyMap();
+		sky.loadSkymap();
 
 		if (sdfVersion < SDF_VERSION) {
 			logger.warn("Old scene version detected! The scene may not have loaded correctly.");
@@ -1791,43 +1787,6 @@ public class Scene extends SceneDescription {
 		} else {
 			return Biomes.getGrassColorLinear(0);
 		}
-	}
-
-	/**
-	 * @return <code>true</code> if cloud rendering is enabled
-	 */
-	public boolean cloudsEnabled() {
-		return cloudsEnabled;
-	}
-
-	/**
-	 * Enable/disable clouds rendering
-	 * @param value
-	 */
-	public void setCloudsEnabled(boolean value) {
-		if (value != cloudsEnabled) {
-			cloudsEnabled = value;
-			refresh();
-		}
-	}
-
-	/**
-	 * Change the cloud height
-	 * @param value
-	 */
-	public void setCloudHeight(int value) {
-		if (value != cloudHeight) {
-			cloudHeight = value;
-			if (cloudsEnabled)
-				refresh();
-		}
-	}
-
-	/**
-	 * @return The current cloud height
-	 */
-	public int getCloudHeight() {
-		return cloudHeight;
 	}
 
 	/**

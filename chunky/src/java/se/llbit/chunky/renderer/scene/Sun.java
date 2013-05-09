@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import java.awt.Color;
 import java.util.Random;
 
 import org.apache.commons.math3.util.FastMath;
@@ -27,7 +26,6 @@ import se.llbit.json.JsonObject;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
 import se.llbit.util.JSONifiable;
 import se.llbit.util.VectorPool;
 
@@ -164,30 +162,37 @@ public class Sun implements JSONifiable {
 	 * Calculate skylight for ray
 	 * @param ray
 	 */
-	public void skylight(Ray ray) {
-		Vector4d c = ray.color;
-
-		if (ray.d.y < 0) {
-			ray.d.y = -ray.d.y;
-		}
+	public void calcSkyLight(Ray ray, double horizonOffset) {
 		double cosTheta = ray.d.y;
+		cosTheta += horizonOffset * (1 - cosTheta);
+		if (cosTheta < 0) cosTheta = 0;
 		double cosGamma = ray.d.dot(sw);
 		double gamma = FastMath.acos(cosGamma);
 		double cos2Gamma = cosGamma * cosGamma;
-		c.x = zenith_x * perezF(cosTheta, gamma, cos2Gamma, A.x, B.x, C.x, D.x, E.x) * f0_x;
-		c.y = zenith_y * perezF(cosTheta, gamma, cos2Gamma, A.y, B.y, C.y, D.y, E.y) * f0_y;
-		c.z = zenith_Y * perezF(cosTheta, gamma, cos2Gamma, A.z, B.z, C.z, D.z, E.z) * f0_Y;
-		c.z = 1 - FastMath.exp(-(1/17.) * c.z);
-		//c.z /= 20;
-		if (c.y <= Ray.EPSILON) {
-			c.set(0, 0, 0, 1);
+		double x = zenith_x * perezF(cosTheta, gamma, cos2Gamma, A.x, B.x, C.x, D.x, E.x) * f0_x;
+		double y = zenith_y * perezF(cosTheta, gamma, cos2Gamma, A.y, B.y, C.y, D.y, E.y) * f0_y;
+		double z = zenith_Y * perezF(cosTheta, gamma, cos2Gamma, A.z, B.z, C.z, D.z, E.z) * f0_Y;
+		if (y <= Ray.EPSILON) {
+			ray.color.set(0, 0, 0, 1);
 		} else {
-			double f = (c.z / c.y);
-			c.set(c.x * f, c.z, (1 - c.x - c.y) * f, 1);
+			double f = (z / y);
+			double x2 = x * f;
+			double y2 = z;
+			double z2 = (1-x-y) * f;
+			// Old CIE-to-RGB matrix
+			/*ray.color.set(
+					3.2410*x2 - 1.5374*y2 - 0.4986*z2,
+					-0.9692*x2 + 1.8760*y2 + 0.0416*z2,
+					0.0556*x2 - 0.2040*y2 + 1.0570*z2,
+					1);*/
+			// new CIE to RGB M^-1 matrix from http://www.brucelindbloom.com/Eqn_RGB_XYZ_Matrix.html
+			ray.color.set(
+					2.3706743*x2 - 0.9000405*y2 - 0.4706338*z2,
+					-0.513885*x2 + 1.4253036*y2 + 0.0885814*z2,
+					0.0052982*x2 - 0.0146949*y2 + 1.0093968*z2,
+					1);
+			ray.color.scale(0.045);
 		}
-		c.set(3.2410*c.x - 1.5374*c.y - 0.4986*c.z,
-				c.y = -0.9692*c.x + 1.8760*c.y + 0.0416*c.z,
-				0.0556*c.x - 0.2040*c.y + 1.0570*c.z, 1);
 	}
 
 	private double chroma(double turb, double turb2, double sunTheta,
@@ -340,12 +345,10 @@ public class Sun implements JSONifiable {
 	}
 
 	/**
-	 * @param color
+	 * @param newColor
 	 */
-	public void setColor(java.awt.Color color) {
-		this.color.x = FastMath.pow(color.getRed() / 255., Scene.DEFAULT_GAMMA);
-		this.color.y = FastMath.pow(color.getGreen() / 255., Scene.DEFAULT_GAMMA);
-		this.color.z = FastMath.pow(color.getBlue() / 255., Scene.DEFAULT_GAMMA);
+	public void setColor(Vector3d newColor) {
+		this.color.set(newColor);
 		initSun();
 		scene.refresh();
 	}
@@ -472,16 +475,6 @@ public class Sun implements JSONifiable {
 		return ((Brt + Bmt) / (Br + Bm)) * (1 - Fex);
 	}
 
-	/**
-	 * @return An AWT Color object representing the current sun color
-	 */
-	public Color getAwtColor() {
-		return new Color(
-				(float) QuickMath.min(1, color.x),
-				(float) QuickMath.min(1, color.y),
-				(float) QuickMath.min(1, color.z));
-	}
-
 	@Override
 	public JsonObject toJson() {
 		JsonObject sun = new JsonObject();
@@ -506,5 +499,12 @@ public class Sun implements JSONifiable {
 		color.x = colorObj.get("red").doubleValue(1);
 		color.y = colorObj.get("green").doubleValue(1);
 		color.z = colorObj.get("blue").doubleValue(1);
+	}
+
+	/**
+	 * @return sun color
+	 */
+	public Vector3d getColor() {
+		return new Vector3d(color);
 	}
 }

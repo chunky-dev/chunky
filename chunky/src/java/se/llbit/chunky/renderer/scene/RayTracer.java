@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -20,7 +20,6 @@ import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Clouds;
-import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray.RayPool;
 
@@ -28,6 +27,8 @@ import se.llbit.math.Ray.RayPool;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class RayTracer {
+	private static final double CLOUD_OPACITY = 0.9;
+
 	/**
 	 * @param scene
 	 * @param state
@@ -70,7 +71,7 @@ public class RayTracer {
 	 */
 	public static boolean nextIntersection(Scene scene, Ray ray, WorkerState state) {
 
-		if (scene.cloudsEnabled && cloudIntersection(scene, ray)) {
+		if (scene.sky().cloudsEnabled() && cloudIntersection(scene, ray)) {
 			Ray oct = state.rayPool.get(ray);
 			if (nextWorldIntersection(scene, oct, state.rayPool) &&
 					oct.distance <= ray.distance) {
@@ -81,12 +82,9 @@ public class RayTracer {
 				ray.prevMaterial = oct.prevMaterial;
 				ray.currentMaterial = oct.currentMaterial;
 			} else {
-				ray.color.set(1, 1, 1, 1);
 				ray.prevMaterial = ray.currentMaterial;
 				ray.currentMaterial = Block.GRASS_ID;
-				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
-				ray.n.set(0, -QuickMath.signum(ray.d.y), 0);
-				ray.distance += ray.tNear;
+				ray.x.scaleAdd(ray.tNear + Ray.EPSILON, ray.d);
 			}
 			state.rayPool.dispose(oct);
 			return true;
@@ -130,18 +128,167 @@ public class RayTracer {
 	}
 
 	private static boolean cloudIntersection(Scene scene, Ray ray) {
-		if (ray.d.y != 0) {
-			ray.t = (scene.cloudHeight - scene.origin.y - ray.x.y) / ray.d.y;
-			if (ray.t > Ray.EPSILON) {
-				double u = ray.x.x + ray.d.x * ray.t;
-				double v = ray.x.z + ray.d.z * ray.t;
-				if (Clouds.getCloud((int) (u/128), (int) (v/128)) != 0) {
-					ray.distance += ray.t;
-					return true;
+		double offsetX = scene.sky().cloudXOffset();
+		double offsetY = scene.sky().cloudYOffset();
+		double offsetZ = scene.sky().cloudZOffset();
+		double inv_size = 1/scene.sky().cloudSize();
+		double cloudBot = offsetY - scene.origin.y;
+		double cloudTop = offsetY - scene.origin.y + 5;
+		int target = 1;
+		double t_offset = 0;
+		ray.tNear = Double.POSITIVE_INFINITY;
+		if (ray.x.y < cloudBot || ray.x.y > cloudTop) {
+			if (ray.d.y > 0) {
+				t_offset = (cloudBot - ray.x.y) / ray.d.y;
+			} else {
+				t_offset = (cloudTop - ray.x.y) / ray.d.y;
+			}
+			if (t_offset < 0) {
+				return false;
+			}
+			// ray is entering cloud
+			if (inCloud((ray.d.x*t_offset + ray.x.x)*inv_size + offsetX, (ray.d.z*t_offset + ray.x.z)*inv_size + offsetZ)) {
+				ray.tNear = t_offset;
+				ray.distance += t_offset;
+				ray.n.set(0, -Math.signum(ray.d.y), 0);
+				ray.color.set(1,1,1,CLOUD_OPACITY);
+				return true;
+			}
+		} else if (inCloud(ray.x.x*inv_size + offsetX, ray.x.z*inv_size + offsetZ)) {
+			target = 0;
+			return false;
+		}
+		double tExit = Double.MAX_VALUE;
+		if (ray.d.y > 0) {
+			tExit = (cloudTop - ray.x.y) / ray.d.y - t_offset;
+		} else {
+			tExit = (cloudBot - ray.x.y) / ray.d.y - t_offset;
+		}
+		double x0 = (ray.x.x + ray.d.x*t_offset)*inv_size + offsetX;
+		double z0 = (ray.x.z + ray.d.z*t_offset)*inv_size + offsetZ;
+		double xp = x0;
+		double zp = z0;
+		int ix = (int) Math.floor(xp);
+		int iz = (int) Math.floor(zp);
+		int xmod = (int)Math.signum(ray.d.x), zmod = (int)Math.signum(ray.d.z);
+		double dx = Math.abs(ray.d.x)*inv_size;
+		double dz = Math.abs(ray.d.z)*inv_size;
+		double t = 0;
+		int i = 0;
+		int nx = 0, nz = 0;
+		if (dx > dz) {
+			double m = dz/dx;
+			double xrem = xmod * (ix+0.5*(1+xmod) - xp);
+			double zlimit = xrem*m;
+			while (t < tExit) {
+				double zrem = zmod * (iz+0.5*(1+zmod) - zp);
+				zp = z0 + zmod * (i+1) * m;
+				if (zrem < zlimit) {
+					iz += zmod;
+					if (Clouds.getCloud(ix, iz) == target) {
+						t = i/dx + zrem/dz;
+						nx = 0;
+						nz = -zmod;
+						break;
+					}
+					ix += xmod;
+					if (Clouds.getCloud(ix, iz) == target) {
+						t = (i+xrem)/dx;
+						nx = -xmod;
+						nz = 0;
+						break;
+					}
+				} else {
+					ix += xmod;
+					if (Clouds.getCloud(ix, iz) == target) {
+						t = (i+xrem)/dx;
+						nx = -xmod;
+						nz = 0;
+						break;
+					}
+					if (zrem <= m) {
+						iz += zmod;
+						if (Clouds.getCloud(ix, iz) == target) {
+							t = i/dx + zrem/dz;
+							nx = 0;
+							nz = -zmod;
+							break;
+						}
+					}
 				}
+				t = i/dx;
+				i+=1;
+			}
+		} else {
+			double m = dx/dz;
+			double zrem = zmod * (iz+0.5*(1+zmod) - zp);
+			double xlimit = zrem*m;
+			while (t < tExit) {
+				double xrem = xmod * (ix+0.5*(1+xmod) - xp);
+				xp = x0 + xmod * (i+1) * m;
+				if (xrem < xlimit) {
+					ix += xmod;
+					if (Clouds.getCloud(ix, iz) == target) {
+						t = i/dz + xrem/dx;
+						nx = -xmod;
+						nz = 0;
+						break;
+					}
+					iz += zmod;
+					if (Clouds.getCloud(ix, iz) == target) {
+						t = (i+zrem)/dz;
+						nx = 0;
+						nz = -zmod;
+						break;
+					}
+				} else {
+					iz += zmod;
+					if (Clouds.getCloud(ix, iz) == target) {
+						t = (i+zrem)/dz;
+						nx = 0;
+						nz = -zmod;
+						break;
+					}
+					if (xrem <= m) {
+						ix += xmod;
+						if (Clouds.getCloud(ix, iz) == target) {
+							t = i/dz + xrem/dx;
+							nx = -xmod;
+							nz = 0;
+							break;
+						}
+					}
+				}
+				t = i/dz;
+				i+=1;
 			}
 		}
-		return false;
+		int ny = 0;
+		if (target == 1) {
+			if (t > tExit) {
+				return false;
+			}
+		} else {
+			if (t > tExit) {
+				nx = 0;
+				ny = (int) Math.signum(ray.d.y);
+				nz = 0;
+				t = tExit;
+			} else {
+				nx = -nx;
+				nz = -nz;
+			}
+		}
+		ray.n.set(nx, ny, nz);
+		ray.tNear = t + t_offset;
+		ray.distance += ray.tNear;
+		ray.color.set(1, 1, 1, CLOUD_OPACITY);
+		return true;
 	}
+
+	private static boolean inCloud(double x, double z) {
+		return Clouds.getCloud((int)Math.floor(x), (int)Math.floor(z)) == 1;
+	}
+
 
 }

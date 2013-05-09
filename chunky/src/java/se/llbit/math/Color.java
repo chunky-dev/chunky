@@ -174,6 +174,17 @@ public final class Color {
 	/**
 	 * Get the RGBA color components from an INT ARGB value
 	 * @param irgb
+	 * @param v
+	 */
+	public static final void getRGBAComponents(int irgb, Vector3d v) {
+		v.x = (0xFF & (irgb >> 16)) / 255.f;
+		v.y = (0xFF & (irgb >> 8)) / 255.f;
+		v.z = (0xFF & irgb) / 255.f;
+	}
+
+	/**
+	 * Get the RGBA color components from an INT ARGB value
+	 * @param irgb
 	 * @param frgb
 	 */
 	public static final void getRGBAComponents(int irgb, double[] frgb) {
@@ -240,5 +251,48 @@ public final class Color {
 		for (int i = 0; i < components.length; ++i) {
 			components[i] = (float) FastMath.pow(components[i], Scene.DEFAULT_GAMMA);
 		}
+	}
+
+	public static String toString(double r, double g, double b) {
+		int rgb = getRGB(r, g, b);
+		return String.format("%02X%02X%02X", (rgb>>16)&0xFF, (rgb>>8)&0xFF, rgb&0xFF);
+	}
+
+	public static String toString(Vector3d color) {
+		int rgb = getRGB(color.x, color.y, color.z);
+		return String.format("%02X%02X%02X", (rgb>>16)&0xFF, (rgb>>8)&0xFF, rgb&0xFF);
+	}
+
+	public static void RGBfromHSL(Vector3d rgb, double hue,
+			double saturation, double lightness) {
+		double c = Math.min(1, (1 - Math.abs(2*lightness - 1)) * saturation);
+		double h = hue*6;
+		double x = c * (1 - Math.abs(h%2 - 1));
+		if (h < 1) {
+			rgb.set(c, x, 0);
+		} else if (h < 2) {
+			rgb.set(x, c, 0);
+		} else if (h < 3) {
+			rgb.set(0, c, x);
+		} else if (h < 4) {
+			rgb.set(0, x, c);
+		} else if (h < 5) {
+			rgb.set(x, 0, c);
+		} else {
+			rgb.set(c, 0, x);
+		}
+		double m = Math.max(0, lightness - 0.5*c);
+		rgb.x += m;
+		rgb.y += m;
+		rgb.z += m;
+	}
+
+	public static java.awt.Color toAWT(Vector3d color) {
+		return new java.awt.Color((float)color.x, (float)color.y, (float)color.z);
+	}
+
+	public static void fromString(String text, int radix, Vector3d color) throws NumberFormatException {
+		int rgb = Integer.parseInt(text, radix);
+		Color.getRGBAComponents(rgb, color);
 	}
 }

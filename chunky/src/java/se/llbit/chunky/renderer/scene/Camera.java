@@ -860,11 +860,7 @@ public class Camera implements JSONifiable {
 	public JsonObject toJson() {
 		JsonObject camera = new JsonObject();
 
-		JsonObject position = new JsonObject();
-		position.add("x", pos.x);
-		position.add("y", pos.y);
-		position.add("z", pos.z);
-		camera.add("position", position);
+		camera.add("position", pos.toJson());
 
 		JsonObject orientation = new JsonObject();
 		orientation.add("roll", roll);
@@ -885,10 +881,7 @@ public class Camera implements JSONifiable {
 
 	@Override
 	public void fromJson(JsonObject obj) {
-		JsonObject position = obj.get("position").object();
-		pos.x = position.get("x").doubleValue(0);
-		pos.y = position.get("y").doubleValue(0);
-		pos.z = position.get("z").doubleValue(0);
+		pos.fromJson(obj.get("position").object());
 
 		JsonObject orientation = obj.get("orientation").object();
 		roll = orientation.get("roll").doubleValue(0);

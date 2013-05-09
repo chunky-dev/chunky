@@ -26,7 +26,7 @@ import se.llbit.chunky.world.Icon;
  */
 abstract public class CameraPreset {
 
-	public static CameraPreset NONE = new CameraPreset("None") {
+	public static CameraPreset NONE = new CameraPreset("None", null) {
 		@Override
 		public void apply(Camera camera) {
 		}
@@ -36,31 +36,29 @@ abstract public class CameraPreset {
 		}
 	};
 	public static CameraPreset ISO_WEST_NORTH = new Isometric("West-North",
-			Icon.isoWN.createIcon(), -Math.PI/4, -Math.PI/4);
+			Icon.isoWN.imageIcon(), -Math.PI/4, -Math.PI/4);
 	public static CameraPreset ISO_NORTH_EAST = new Isometric("North-East",
-			Icon.isoNE.createIcon(), -3*Math.PI/4, -Math.PI/4);
+			Icon.isoNE.imageIcon(), -3*Math.PI/4, -Math.PI/4);
 	public static CameraPreset ISO_EAST_SOUTH = new Isometric("East-South",
-			Icon.isoES.createIcon(), -5*Math.PI/4, -Math.PI/4);
+			Icon.isoES.imageIcon(), -5*Math.PI/4, -Math.PI/4);
 	public static CameraPreset ISO_SOUTH_WEST = new Isometric("South-West",
-			Icon.isoSW.createIcon(), -7*Math.PI/4, -Math.PI/4);
-	public static CameraPreset SKYBOX_EAST = new Skybox("East", Math.PI, -Math.PI/2);
-	public static CameraPreset SKYBOX_WEST = new Skybox("West", 0, -Math.PI/2);
-	public static CameraPreset SKYBOX_UP = new Skybox("Up", -Math.PI/2, Math.PI);
-	public static CameraPreset SKYBOX_DOWN = new Skybox("Down", -Math.PI/2, 0);
-	public static CameraPreset SKYBOX_NORTH = new Skybox("North", -Math.PI/2, -Math.PI/2);
-	public static CameraPreset SKYBOX_SOUTH = new Skybox("South", Math.PI/2, -Math.PI/2);
+			Icon.isoSW.imageIcon(), -7*Math.PI/4, -Math.PI/4);
+	public static CameraPreset SKYBOX_RIGHT = new Skybox("Right", Icon.skyboxRight.imageIcon(), Math.PI, -Math.PI/2);
+	public static CameraPreset SKYBOX_LEFT = new Skybox("Left", Icon.skyboxLeft.imageIcon(), 0, -Math.PI/2);
+	public static CameraPreset SKYBOX_UP = new Skybox("Up", Icon.skyboxUp.imageIcon(), -Math.PI/2, Math.PI);
+	public static CameraPreset SKYBOX_DOWN = new Skybox("Down", Icon.skyboxDown.imageIcon(), -Math.PI/2, 0);
+	public static CameraPreset SKYBOX_FRONT = new Skybox("Front (North)", Icon.skyboxFront.imageIcon(), -Math.PI/2, -Math.PI/2);
+	public static CameraPreset SKYBOX_BACK = new Skybox("Back", Icon.skyboxBack.imageIcon(), Math.PI/2, -Math.PI/2);
 
 	public static class Isometric extends CameraPreset {
 
 		private final double yaw;
 		private final double pitch;
-		private final ImageIcon icon;
 
 		public Isometric(String name, ImageIcon icon, double yaw, double pitch) {
-			super("Isometric " + name);
+			super("Isometric " + name, icon);
 			this.yaw = yaw;
 			this.pitch = pitch;
-			this.icon = icon;
 		}
 
 		@Override
@@ -68,22 +66,19 @@ abstract public class CameraPreset {
 			camera.setView(yaw, pitch, 0);
 			camera.setProjectionMode(ProjectionMode.PARALLEL);
 		}
-
-		@Override
-		public ImageIcon getIcon() {
-			return icon;
-		}
 	}
 
 	public static class Skybox extends CameraPreset {
 
 		private final double yaw;
 		private final double pitch;
+		private final ImageIcon icon;
 
-		public Skybox(String name, double yaw, double pitch) {
-			super("Skybox " + name);
+		public Skybox(String name, ImageIcon icon, double yaw, double pitch) {
+			super("Skybox " + name, icon);
 			this.yaw = yaw;
 			this.pitch = pitch;
+			this.icon = icon;
 		}
 
 		@Override
@@ -95,14 +90,16 @@ abstract public class CameraPreset {
 
 		@Override
 		public ImageIcon getIcon() {
-			return null;
+			return icon;
 		}
 	}
 
 	private final String name;
+	private ImageIcon icon;
 
-	public CameraPreset(String name) {
+	public CameraPreset(String name, ImageIcon icon) {
 		this.name = name;
+		this.icon = icon;
 	}
 
 	@Override
@@ -116,5 +113,7 @@ abstract public class CameraPreset {
 	 */
 	abstract public void apply(Camera camera);
 
-	abstract public ImageIcon getIcon();
+	public ImageIcon getIcon() {
+		return icon;
+	}
 }

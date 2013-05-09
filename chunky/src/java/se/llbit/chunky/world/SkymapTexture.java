@@ -179,8 +179,8 @@ public class SkymapTexture extends Texture {
 
 	@Override
 	public void getColorInterpolated(double u, double v, Vector4d c) {
-		double x = u * width;
-		double y = v * (height-1);
+		double x = u * (width-1);
+		double y = (1-v) * (height-1);
 		double weight;
 		int fx = (int) QuickMath.floor(x);
 		int cx = (int) QuickMath.ceil(x);
@@ -188,22 +188,22 @@ public class SkymapTexture extends Texture {
 		int cy = (int) QuickMath.ceil(y);
 
 		double r, g, b;
-		getColor(fx % width, fy, c);
+		getColor(fx, fy, c);
 		weight = (1 - (y-fy)) * (1 - (x-fx));
 		r = weight * c.x;
 		g = weight * c.y;
 		b = weight * c.z;
-		getColor(cx % width, fy, c);
+		getColor(cx, fy, c);
 		weight = (1 - (y-fy)) * (1 - (cx-x));
 		r += weight * c.x;
 		g += weight * c.y;
 		b += weight * c.z;
-		getColor(fx % width, cy, c);
+		getColor(fx, cy, c);
 		weight = (1 - (cy-y)) * (1 - (x-fx));
 		r += weight * c.x;
 		g += weight * c.y;
 		b += weight * c.z;
-		getColor(cx % width, cy, c);
+		getColor(cx, cy, c);
 		weight = (1 - (cy-y)) * (1 - (cx-x));
 		r += weight * c.x;
 		g += weight * c.y;

@@ -33,17 +33,18 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -92,6 +93,7 @@ import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3d;
+import se.llbit.math.Vector4d;
 import se.llbit.ui.Adjuster;
 
 /**
@@ -118,8 +120,13 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final NumberFormat numberFormat =
 			NumberFormat.getInstance();
 
-	private final JSlider skyRotationSlider = new JSlider();
+	private final JSlider skymapRotationSlider = new JSlider();
+	private final JSlider skyboxRotationSlider = new JSlider();
 	private final JButton loadSkymapBtn = new JButton();
+	private final JPanel simulatedSkyPanel = new JPanel();
+	private final JPanel skymapPanel = new JPanel();
+	private final JPanel skyGradientPanel = new JPanel();
+	private final JPanel skyboxPanel = new JPanel();
 	private final JCheckBox mirrorSkyCB = new JCheckBox();
 	private final JComboBox canvasSizeCB = new JComboBox();
 	private final JComboBox cameraPreset = new JComboBox();
@@ -152,7 +159,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JComboBox postprocessCB = new JComboBox();
 	private final JComboBox skyModeCB = new JComboBox();
 	private final JButton changeSunColorBtn = new JButton();
-	private final JButton changeGroundColorBtn = new JButton();
 	private final JLabel etaLbl = new JLabel();
 	private final JCheckBox waterWorldCB = new JCheckBox();
 	private final JTextField waterHeightField = new JTextField();
@@ -181,11 +187,29 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JPanel skyPane;
 	private JPanel advancedPane;
 
+	private final Adjuster skyHorizonOffset = new Adjuster(
+			"Horizon offset",
+			"Moves the horizon below the actual horizon",
+			0.0, 1.0) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().sky().setHorizonOffset(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().sky().getHorizonOffset());
+		}
+	};
+
 	private final Adjuster numThreads = new Adjuster(
 			"Render threads",
 			"Number of rendering threads",
 			RenderConstants.NUM_RENDER_THREADS_MIN,
 			20) {
+		{
+			setClampMax(false);
+		}
 		@Override
 		public void valueChanged(double newValue) {
 			int value = (int) newValue;
@@ -230,24 +254,14 @@ public class RenderControls extends JDialog implements ViewListener,
 			set(renderMan.scene().getRayDepth());
 		}
 	};
-	private final Adjuster cloudHeight = new Adjuster(
-			"Cloud Height",
-			"Height of the cloud layer", -128, 512) {
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().setCloudHeight((int) newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().getCloudHeight());
-		}
-	};
 	private final Adjuster emitterIntensity = new Adjuster(
 			"Emitter intensity",
 			"Light intensity modifier for emitters",
 			Scene.MIN_EMITTER_INTENSITY,
 			Scene.MAX_EMITTER_INTENSITY) {
+		{
+			setLogarithmicMode();
+		}
 		@Override
 		public void valueChanged(double newValue) {
 			renderMan.scene().setEmitterIntensity(newValue);
@@ -258,11 +272,32 @@ public class RenderControls extends JDialog implements ViewListener,
 			set(renderMan.scene().getEmitterIntensity());
 		}
 	};
+	private final Adjuster skyLight = new Adjuster(
+			"Sky Light",
+			"Sky light intensity modifier",
+			Sky.MIN_INTENSITY,
+			Sky.MAX_INTENSITY) {
+		{
+			setLogarithmicMode();
+		}
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().sky().setSkyLight(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().sky().getSkyLight());
+		}
+	};
 	private final Adjuster sunIntensity = new Adjuster(
-			"Sun intensity",
-			"Light intensity modifier for sun",
+			"Sun Intensity",
+			"Sunlight intensity modifier",
 			Sun.MIN_INTENSITY,
 			Sun.MAX_INTENSITY) {
+		{
+			setLogarithmicMode();
+		}
 		@Override
 		public void valueChanged(double newValue) {
 			renderMan.scene().sun().setIntensity(newValue);
@@ -306,6 +341,9 @@ public class RenderControls extends JDialog implements ViewListener,
 			"Field of View",
 			1.0,
 			180.0) {
+		{
+			setClampMax(false);
+		}
 		@Override
 		public void valueChanged(double newValue) {
 			renderMan.scene().camera().setFoV(newValue);
@@ -323,6 +361,9 @@ public class RenderControls extends JDialog implements ViewListener,
 			"Distance to focal plane",
 			Camera.MIN_SUBJECT_DISTANCE,
 			Camera.MAX_SUBJECT_DISTANCE) {
+		{
+			setLogarithmicMode();
+		}
 		@Override
 		public void valueChanged(double newValue) {
 			renderMan.scene().camera().setSubjectDistance(newValue);
@@ -338,6 +379,9 @@ public class RenderControls extends JDialog implements ViewListener,
 			"exposure",
 			Scene.MIN_EXPOSURE,
 			Scene.MAX_EXPOSURE) {
+		{
+			setLogarithmicMode();
+		}
 		@Override
 		public void valueChanged(double newValue) {
 			renderMan.scene().setExposure(newValue);
@@ -348,8 +392,69 @@ public class RenderControls extends JDialog implements ViewListener,
 			set(renderMan.scene().getExposure());
 		}
 	};
+	private final Adjuster cloudSize = new Adjuster(
+			"Cloud Size",
+			"Cloud Size",
+			1.0, 128.0) {
+		{
+			setLogarithmicMode();
+		}
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().sky().setCloudSize(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().sky().cloudSize());
+		}
+	};
+	private final Adjuster cloudXOffset = new Adjuster(
+			"Cloud X",
+			"Cloud X Offset",
+			1.0, 100.0) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().sky().setCloudXOffset(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().sky().cloudXOffset());
+		}
+	};
+	private final Adjuster cloudYOffset = new Adjuster(
+			"Cloud Y",
+			"Height of the cloud layer",
+			-128.0, 512.0) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().sky().setCloudYOffset(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().sky().cloudYOffset());
+		}
+	};
+	private final Adjuster cloudZOffset = new Adjuster(
+			"Cloud Z",
+			"Cloud Z Offset",
+			1.0, 100.0) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().sky().setCloudZOffset(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().sky().cloudZOffset());
+		}
+	};
 
 	Set<Component> safeComponents = new HashSet<Component>();
+
+	private GradientEditor gradientEditor;
 
 	{
 		// initialize safe component set
@@ -448,9 +553,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateTitle();
 
 		addTab("General", Icon.wrench, generalPane = buildGeneralPane());
-		addTab("Lighting", null, lightingPane = buildLightingPane());
-		addTab("Sky", null, skyPane = buildSkyPane());
-		addTab("Camera", null, cameraPane = buildCameraPane());
+		addTab("Lighting", Icon.colors, lightingPane = buildLightingPane());
+		addTab("Sky", Icon.sky, skyPane = buildSkyPane());
+		addTab("Camera", Icon.camera, cameraPane = buildCameraPane());
 		addTab("Post-processing", null, buildPostProcessingPane());
 		addTab("Advanced", null, advancedPane = buildAdvancedPane());
 		addTab("Help", Texture.unknown, buildHelpPane());
@@ -487,7 +592,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		});
 
 		startRenderBtn.setText("START");
-		startRenderBtn.setIcon(Icon.play.createIcon());
+		startRenderBtn.setIcon(Icon.play.imageIcon());
 		startRenderBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -514,7 +619,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 
-		lockBtn.setIcon(Icon.lock.createIcon());
+		lockBtn.setIcon(Icon.lock.imageIcon());
 		lockBtn.setToolTipText("Lock or unlock the render controls");
 		lockBtn.addActionListener(new ActionListener() {
 			@Override
@@ -528,7 +633,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		});
 
 		stopRenderBtn.setText("RESET");
-		stopRenderBtn.setIcon(Icon.stop.createIcon());
+		stopRenderBtn.setIcon(Icon.stop.imageIcon());
 		stopRenderBtn.setToolTipText("<html>Warning: this will discard the " +
 				"current rendered image!<br>Make sure to save your image " +
 				"before stopping the renderer!");
@@ -563,7 +668,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateSceneNameField();
 
 		saveSceneBtn.setText("Save");
-		saveSceneBtn.setIcon(Icon.disk.createIcon());
+		saveSceneBtn.setIcon(Icon.disk.imageIcon());
 		saveSceneBtn.addActionListener(saveSceneListener);
 
 		JPanel panel = new JPanel();
@@ -677,7 +782,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		tabbedPane.add(title, component);
 
 		if (icon != null) {
-			JLabel lbl = new JLabel(title, icon.createIcon(), SwingConstants.RIGHT);
+			JLabel lbl = new JLabel(title, icon.imageIcon(), SwingConstants.RIGHT);
 			lbl.setIconTextGap(5);
 			tabbedPane.setTabComponentAt(index, lbl);
 		}
@@ -690,7 +795,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		JSeparator sep2 = new JSeparator();
 		JSeparator sep3 = new JSeparator();
 
-		numThreads.setClampMax(false);
 		numThreads.update();
 
 		cpuLoad.update();
@@ -809,7 +913,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	private JPanel buildPostProcessingPane() {
-		exposure.setLogarithmicMode();
 		exposure.update();
 
 		JLabel postprocessDescLbl = new JLabel("<html>Post processing affects rendering performance<br>when the preview window is visible");
@@ -873,6 +976,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateCanvasSizeField();
 
 		loadSceneBtn.setText("Load Scene");
+		loadSceneBtn.setIcon(Icon.load.imageIcon());
 		loadSceneBtn.addActionListener(loadSceneListener);
 
 		JButton loadSelectedChunksBtn = new JButton("Load Selected Chunks");
@@ -885,7 +989,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		});
 
 		JButton reloadChunksBtn = new JButton("Reload Chunks");
-		reloadChunksBtn.setIcon(Icon.reload.createIcon());
+		reloadChunksBtn.setIcon(Icon.reload.imageIcon());
 		reloadChunksBtn.setToolTipText("Reload all chunks in the scene");
 		reloadChunksBtn.addActionListener(new ActionListener() {
 			@Override
@@ -1069,15 +1173,17 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JPanel buildLightingPane() {
 
 		changeSunColorBtn.setText("Change Sun Color");
+		changeSunColorBtn.setIcon(Icon.colors.imageIcon());
 		changeSunColorBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				java.awt.Color newColor = JColorChooser.showDialog(
-						RenderControls.this, "Choose Sun Color",
-						renderMan.scene().sun().getAwtColor());
-				if (newColor != null) {
-					renderMan.scene().sun().setColor(newColor);
-				}
+				ColorPicker picker = new ColorPicker(changeSunColorBtn, renderMan.scene().sun().getColor());
+				picker.addColorListener(new ColorListener() {
+					@Override
+					public void onColorPicked(Vector3d color) {
+						renderMan.scene().sun().setColor(color);
+					}
+				});
 			}
 		});
 
@@ -1089,11 +1195,11 @@ public class RenderControls extends JDialog implements ViewListener,
 		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
 		enableEmitters.addActionListener(emittersListener);
 
-		emitterIntensity.setLogarithmicMode();
 		emitterIntensity.update();
 
-		sunIntensity.setLogarithmicMode();
 		sunIntensity.update();
+
+		skyLight.update();
 
 		sunAzimuth.update();
 
@@ -1109,18 +1215,21 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(enableEmitters)
 				.addGroup(layout.createSequentialGroup()
 					.addGroup(layout.createParallelGroup()
+						.addComponent(skyLight.getLabel())
 						.addComponent(emitterIntensity.getLabel())
 						.addComponent(sunIntensity.getLabel())
 						.addComponent(sunAzimuth.getLabel())
 						.addComponent(sunAltitude.getLabel())
 					)
 					.addGroup(layout.createParallelGroup()
+						.addComponent(skyLight.getSlider())
 						.addComponent(emitterIntensity.getSlider())
 						.addComponent(sunIntensity.getSlider())
 						.addComponent(sunAzimuth.getSlider())
 						.addComponent(sunAltitude.getSlider())
 					)
 					.addGroup(layout.createParallelGroup()
+						.addComponent(skyLight.getField())
 						.addComponent(emitterIntensity.getField())
 						.addComponent(sunIntensity.getField())
 						.addComponent(sunAzimuth.getField())
@@ -1133,6 +1242,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
+			.addGroup(skyLight.verticalGroup(layout))
+			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(enableEmitters)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(emitterIntensity.verticalGroup(layout))
@@ -1156,49 +1267,162 @@ public class RenderControls extends JDialog implements ViewListener,
 		JLabel skyModeLbl = new JLabel("Sky Mode:");
 		skyModeCB.setModel(new DefaultComboBoxModel(Sky.SkyMode.values()));
 		skyModeCB.addActionListener(skyModeListener);
-		// TODO implement sky modes
-		skyModeLbl.setVisible(false);
-		skyModeCB.setVisible(false);
 		updateSkyMode();
 
-		JLabel skyRotationLbl = new JLabel("Skymap rotation:");
-		skyRotationSlider.setMinimum(1);
-		skyRotationSlider.setMaximum(100);
-		skyRotationSlider.addChangeListener(skyRotationListener);
-		skyRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
+		JLabel skymapRotationLbl = new JLabel("Skymap rotation:");
+		skymapRotationSlider.setMinimum(1);
+		skymapRotationSlider.setMaximum(100);
+		skymapRotationSlider.addChangeListener(skyRotationListener);
+		skymapRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
+		JLabel skyboxRotationLbl = new JLabel("Skybox rotation:");
+		skyboxRotationSlider.setMinimum(1);
+		skyboxRotationSlider.setMaximum(100);
+		skyboxRotationSlider.addChangeListener(skyRotationListener);
+		skyboxRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
 		updateSkyRotation();
+
+		skyHorizonOffset.update();
+		cloudSize.update();
+		cloudXOffset.update();
+		cloudYOffset.update();
+		cloudZOffset.update();
+
+		simulatedSkyPanel.setBorder(BorderFactory.createTitledBorder("Simulated Sky Settings"));
+		GroupLayout simulatedSkyLayout = new GroupLayout(simulatedSkyPanel);
+		simulatedSkyPanel.setLayout(simulatedSkyLayout);
+		simulatedSkyLayout.setAutoCreateContainerGaps(true);
+		simulatedSkyLayout.setAutoCreateGaps(true);
+		simulatedSkyLayout.setHorizontalGroup(simulatedSkyLayout.createParallelGroup()
+			.addGroup(skyHorizonOffset.horizontalGroup(simulatedSkyLayout))
+		);
+		simulatedSkyLayout.setVerticalGroup(simulatedSkyLayout.createSequentialGroup()
+			.addGroup(skyHorizonOffset.verticalGroup(simulatedSkyLayout))
+		);
+
+		skymapPanel.setBorder(BorderFactory.createTitledBorder("Skymap Settings"));
+		GroupLayout skymapLayout = new GroupLayout(skymapPanel);
+		skymapPanel.setLayout(skymapLayout);
+		skymapLayout.setAutoCreateContainerGaps(true);
+		skymapLayout.setAutoCreateGaps(true);
+		skymapLayout.setHorizontalGroup(skymapLayout.createParallelGroup()
+			.addComponent(loadSkymapBtn)
+			.addGroup(skymapLayout.createSequentialGroup()
+				.addComponent(skymapRotationLbl)
+				.addComponent(skymapRotationSlider)
+			)
+			.addComponent(mirrorSkyCB)
+		);
+		skymapLayout.setVerticalGroup(skymapLayout.createSequentialGroup()
+			.addComponent(loadSkymapBtn)
+			.addGroup(skymapLayout.createParallelGroup()
+				.addComponent(skymapRotationLbl)
+				.addComponent(skymapRotationSlider)
+			)
+			.addComponent(mirrorSkyCB)
+		);
 
 		loadSkymapBtn.setText("Load Skymap");
 		loadSkymapBtn.setToolTipText("Use a panoramic skymap");
-		loadSkymapBtn.addActionListener(loadSkymapListener);
-
-		JSeparator sep1 = new JSeparator();
+		loadSkymapBtn.addActionListener(new SkymapTextureLoader(renderMan));
 
 		mirrorSkyCB.setText("Mirror sky at horizon");
 		mirrorSkyCB.addActionListener(mirrorSkyListener);
 		updateMirroSkyCB();
 
-		changeGroundColorBtn.setText("Change Ground Color");
-		changeGroundColorBtn.addActionListener(new ActionListener() {
+		skyGradientPanel.setBorder(BorderFactory.createTitledBorder("Sky Gradient"));
+		gradientEditor = new GradientEditor();
+		updateSkyGradient();
+		skyGradientPanel.add(gradientEditor);
+		gradientEditor.addGradientListener(new GradientListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				java.awt.Color newColor = JColorChooser.showDialog(
-						RenderControls.this, "Choose Ground Color",
-						renderMan.scene().sky().getGroundColor());
-				if (newColor != null) {
-					renderMan.scene().sky().setGroundColor(newColor);
-				}
+			public void gradientChanged(List<Vector4d> newGradient) {
+				renderMan.scene().sky().setGradient(newGradient);
+			}
+			@Override
+			public void stopSelected(int index) {
+			}
+			@Override
+			public void stopModified(int index, Vector4d marker) {
 			}
 		});
 
-		JButton unloadSkymapBtn = new JButton("Unload Skymap");
-		unloadSkymapBtn.setToolTipText("Use the default sky");
-		unloadSkymapBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				renderMan.scene().sky().unloadSkymap();
-			}
-		});
+		GroupLayout skyboxLayout = new GroupLayout(skyboxPanel);
+		skyboxPanel.setLayout(skyboxLayout);
+		skyboxPanel.setBorder(BorderFactory.createTitledBorder("Skybox"));
+
+		JLabel skyboxLbl = new JLabel("Load skybox textures:");
+
+		JButton loadUpTexture = new JButton("Up");
+		loadUpTexture.setToolTipText("Load up texture");
+		loadUpTexture.setIcon(Icon.skyboxUp.imageIcon());
+		loadUpTexture.addActionListener(new SkyboxTextureLoader(renderMan, Sky.SKYBOX_UP));
+
+		JButton loadDownTexture = new JButton("Down");
+		loadDownTexture.setToolTipText("Load down texture");
+		loadDownTexture.setIcon(Icon.skyboxDown.imageIcon());
+		loadDownTexture.addActionListener(new SkyboxTextureLoader(renderMan, Sky.SKYBOX_DOWN));
+
+		JButton loadFrontTexture = new JButton("Front");
+		loadFrontTexture.setToolTipText("Load front (north) texture");
+		loadFrontTexture.setIcon(Icon.skyboxFront.imageIcon());
+		loadFrontTexture.addActionListener(new SkyboxTextureLoader(renderMan, Sky.SKYBOX_FRONT));
+
+		JButton loadBackTexture = new JButton("Back");
+		loadBackTexture.setToolTipText("Load back (south) texture");
+		loadBackTexture.setIcon(Icon.skyboxBack.imageIcon());
+		loadBackTexture.addActionListener(new SkyboxTextureLoader(renderMan, Sky.SKYBOX_BACK));
+
+		JButton loadRightTexture = new JButton("Right");
+		loadRightTexture.setToolTipText("Load right (east) texture");
+		loadRightTexture.setIcon(Icon.skyboxRight.imageIcon());
+		loadRightTexture.addActionListener(new SkyboxTextureLoader(renderMan, Sky.SKYBOX_RIGHT));
+
+		JButton loadLeftTexture = new JButton("Left");
+		loadLeftTexture.setToolTipText("Load left (west) texture");
+		loadLeftTexture.setIcon(Icon.skyboxLeft.imageIcon());
+		loadLeftTexture.addActionListener(new SkyboxTextureLoader(renderMan, Sky.SKYBOX_LEFT));
+
+		skyboxLayout.setAutoCreateContainerGaps(true);
+		skyboxLayout.setAutoCreateGaps(true);
+		skyboxLayout.setHorizontalGroup(skyboxLayout.createParallelGroup()
+			.addGroup(skyboxLayout.createSequentialGroup()
+				.addComponent(skyboxLbl)
+				.addGroup(skyboxLayout.createParallelGroup()
+					.addComponent(loadUpTexture)
+					.addComponent(loadFrontTexture)
+					.addComponent(loadRightTexture)
+				)
+				.addGroup(skyboxLayout.createParallelGroup()
+					.addComponent(loadDownTexture)
+					.addComponent(loadBackTexture)
+					.addComponent(loadLeftTexture)
+				)
+			)
+			.addGroup(skyboxLayout.createSequentialGroup()
+				.addComponent(skyboxRotationLbl)
+				.addComponent(skyboxRotationSlider)
+			)
+		);
+		skyboxLayout.setVerticalGroup(skyboxLayout.createSequentialGroup()
+			.addComponent(skyboxLbl)
+			.addGroup(skyboxLayout.createParallelGroup()
+				.addComponent(loadUpTexture)
+				.addComponent(loadDownTexture)
+			)
+			.addGroup(skyboxLayout.createParallelGroup()
+				.addComponent(loadFrontTexture)
+				.addComponent(loadBackTexture)
+			)
+			.addGroup(skyboxLayout.createParallelGroup()
+				.addComponent(loadRightTexture)
+				.addComponent(loadLeftTexture)
+			)
+			.addGroup(skyboxLayout.createParallelGroup()
+				.addComponent(skyboxRotationLbl)
+				.addComponent(skyboxRotationSlider)
+			)
+		);
+
 
 		atmosphereEnabled.setText("enable atmosphere");
 		atmosphereEnabled.addActionListener(atmosphereListener);
@@ -1212,8 +1436,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		cloudsEnabled.addActionListener(cloudsEnabledListener);
 		updateCloudsEnabledCheckBox();
 
-		cloudHeight.update();
-
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -1225,22 +1447,17 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(skyModeCB, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 				)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(skyRotationLbl)
-					.addComponent(skyRotationSlider)
-				)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(loadSkymapBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(unloadSkymapBtn)
-				)
-				.addComponent(mirrorSkyCB)
-				.addComponent(changeGroundColorBtn)
-				.addComponent(sep1)
+				.addComponent(simulatedSkyPanel)
+				.addComponent(skymapPanel)
+				.addComponent(skyGradientPanel)
+				.addComponent(skyboxPanel)
 				.addComponent(atmosphereEnabled)
 				.addComponent(volumetricFogEnabled)
 				.addComponent(cloudsEnabled)
-				.addGroup(cloudHeight.horizontalGroup(layout))
+				.addGroup(cloudSize.horizontalGroup(layout))
+				.addGroup(cloudXOffset.horizontalGroup(layout))
+				.addGroup(cloudYOffset.horizontalGroup(layout))
+				.addGroup(cloudZOffset.horizontalGroup(layout))
 			)
 			.addContainerGap()
 		);
@@ -1251,21 +1468,10 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(skyModeCB)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(loadSkymapBtn)
-				.addComponent(unloadSkymapBtn)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(skyRotationLbl)
-				.addComponent(skyRotationSlider)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(mirrorSkyCB)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(changeGroundColorBtn)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+			.addComponent(simulatedSkyPanel)
+			.addComponent(skymapPanel)
+			.addComponent(skyGradientPanel)
+			.addComponent(skyboxPanel)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(atmosphereEnabled)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -1273,7 +1479,13 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(cloudsEnabled)
 			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(cloudHeight.verticalGroup(layout))
+			.addGroup(cloudSize.verticalGroup(layout))
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(cloudXOffset.verticalGroup(layout))
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(cloudYOffset.verticalGroup(layout))
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(cloudZOffset.verticalGroup(layout))
 			.addContainerGap()
 		);
 		return panel;
@@ -1282,13 +1494,11 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JPanel buildCameraPane() {
 		JLabel projectionModeLbl = new JLabel("Projection");
 
-		fov.setClampMax(false);
 		fov.update();
 
 		dof = new DoFAdjuster(renderMan);
 		dof.update();
 
-		subjectDistance.setLogarithmicMode();
 		subjectDistance.update();
 
 		JLabel presetLbl = new JLabel("Preset:");
@@ -1296,9 +1506,9 @@ public class RenderControls extends JDialog implements ViewListener,
 			CameraPreset.NONE,
 			CameraPreset.ISO_WEST_NORTH, CameraPreset.ISO_NORTH_EAST,
 			CameraPreset.ISO_EAST_SOUTH, CameraPreset.ISO_SOUTH_WEST,
-			CameraPreset.SKYBOX_EAST, CameraPreset.SKYBOX_WEST,
+			CameraPreset.SKYBOX_RIGHT, CameraPreset.SKYBOX_LEFT,
 			CameraPreset.SKYBOX_UP, CameraPreset.SKYBOX_DOWN,
-			CameraPreset.SKYBOX_NORTH, CameraPreset.SKYBOX_SOUTH,
+			CameraPreset.SKYBOX_FRONT, CameraPreset.SKYBOX_BACK,
 		};
 		cameraPreset.setModel(new DefaultComboBoxModel(presets));
 		cameraPreset.setMaximumRowCount(presets.length);
@@ -1661,7 +1871,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateCloudsEnabledCheckBox() {
 		cloudsEnabled.removeActionListener(cloudsEnabledListener);
-		cloudsEnabled.setSelected(renderMan.scene().cloudsEnabled());
+		cloudsEnabled.setSelected(renderMan.scene().sky().cloudsEnabled());
 		cloudsEnabled.addActionListener(cloudsEnabledListener);
 	}
 
@@ -1799,27 +2009,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			new SceneSelector(RenderControls.this, context);
 		}
 	};
-	private final ActionListener loadSkymapListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			CenteredFileDialog fileDialog =
-					new CenteredFileDialog(null, "Open Skymap", FileDialog.LOAD);
-			fileDialog.setDirectory(System.getProperty("user.dir"));
-			fileDialog.setFilenameFilter(
-					new FilenameFilter() {
-						@Override
-						public boolean accept(File dir, String name) {
-							return name.toLowerCase().endsWith(".png")
-									|| name.toLowerCase().endsWith(".jpg");
-						}
-					});
-			fileDialog.setVisible(true);
-			File selectedFile = fileDialog.getSelectedFile();
-			if (selectedFile != null) {
-				renderMan.scene().sky().loadSkyMap(selectedFile.getAbsolutePath());
-			}
-		}
-	};
 	private final ChangeListener skyRotationListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
@@ -1862,6 +2051,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		public void actionPerformed(ActionEvent e) {
 			JComboBox source = (JComboBox) e.getSource();
 			renderMan.scene().sky().setSkyMode((SkyMode) source.getSelectedItem());
+			updateSkyMode();
+			RenderControls.this.pack();
 		}
 	};
 	private final ActionListener cameraPositionListener = new ActionListener() {
@@ -1945,7 +2136,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
-			renderMan.scene().setCloudsEnabled(source.isSelected());
+			renderMan.scene().sky().setCloudsEnabled(source.isSelected());
 		}
 	};
 	private final ActionListener mirrorSkyListener = new ActionListener() {
@@ -1989,10 +2180,18 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	protected void updateSkyRotation() {
-		skyRotationSlider.removeChangeListener(skyRotationListener);
-		skyRotationSlider.setValue((int) FastMath.round(
+		skymapRotationSlider.removeChangeListener(skyRotationListener);
+		skymapRotationSlider.setValue((int) FastMath.round(
 				100 * renderMan.scene().sky().getRotation() / (2 * Math.PI)));
-		skyRotationSlider.addChangeListener(skyRotationListener);
+		skymapRotationSlider.addChangeListener(skyRotationListener);
+		skyboxRotationSlider.removeChangeListener(skyRotationListener);
+		skyboxRotationSlider.setValue((int) FastMath.round(
+				100 * renderMan.scene().sky().getRotation() / (2 * Math.PI)));
+		skyboxRotationSlider.addChangeListener(skyRotationListener);
+	}
+
+	private void updateSkyGradient() {
+		gradientEditor.setGradient(renderMan.scene().sky().getGradient());
 	}
 
 	protected void updateProjectionMode() {
@@ -2004,7 +2203,12 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateSkyMode() {
 		skyModeCB.removeActionListener(skyModeListener);
-		skyModeCB.setSelectedItem(renderMan.scene().sky().getSkyMode());
+		SkyMode mode = renderMan.scene().sky().getSkyMode();
+		skyModeCB.setSelectedItem(mode);
+		simulatedSkyPanel.setVisible(mode == SkyMode.SIMULATED);
+		skymapPanel.setVisible(mode == SkyMode.SKYMAP_PANORAMIC || mode == SkyMode.SKYMAP_SPHERICAL);
+		skyGradientPanel.setVisible(mode == SkyMode.GRADIENT);
+		skyboxPanel.setVisible(mode == SkyMode.SKYBOX);
 		skyModeCB.addActionListener(skyModeListener);
 	}
 
@@ -2255,13 +2459,16 @@ public class RenderControls extends JDialog implements ViewListener,
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				skyHorizonOffset.update();
 				dof.update();
 				fov.update();
 				subjectDistance.update();
 				updateProjectionMode();
+				updateSkyGradient();
 				updateSkyMode();
 				updateCanvasSizeField();
 				emitterIntensity.update();
+				skyLight.update();
 				sunIntensity.update();
 				sunAzimuth.update();
 				sunAltitude.update();
@@ -2281,7 +2488,10 @@ public class RenderControls extends JDialog implements ViewListener,
 				updateSPPTargetField();
 				updateSceneNameField();
 				updatePostprocessCB();
-				cloudHeight.update();
+				cloudSize.update();
+				cloudXOffset.update();
+				cloudYOffset.update();
+				cloudZOffset.update();
 				rayDepth.update();
 				updateWaterHeight();
 				updateCameraDirection();
@@ -2410,16 +2620,16 @@ public class RenderControls extends JDialog implements ViewListener,
 			lock = true;
 			if (paused) {
 				startRenderBtn.setText("RESUME");
-				startRenderBtn.setIcon(Icon.play.createIcon());
+				startRenderBtn.setIcon(Icon.play.imageIcon());
 			} else {
 				startRenderBtn.setText("PAUSE");
-				startRenderBtn.setIcon(Icon.pause.createIcon());
+				startRenderBtn.setIcon(Icon.pause.imageIcon());
 			}
 			stopRenderBtn.setEnabled(true);
 			stopRenderBtn.setForeground(Color.red);
 		} else {
 			startRenderBtn.setText("START");
-			startRenderBtn.setIcon(Icon.play.createIcon());
+			startRenderBtn.setIcon(Icon.play.imageIcon());
 			stopRenderBtn.setEnabled(false);
 			stopRenderBtn.setForeground(Color.black);
 		}
@@ -2436,7 +2646,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		lockPane(skyPane);
 		lockPane(lightingPane);
 		lockPane(advancedPane);
-		lockBtn.setIcon(Icon.key.createIcon());
+		lockBtn.setIcon(Icon.key.imageIcon());
 		controlsLocked = true;
 	}
 
@@ -2446,7 +2656,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		unlockPane(skyPane);
 		unlockPane(lightingPane);
 		unlockPane(advancedPane);
-		lockBtn.setIcon(Icon.lock.createIcon());
+		lockBtn.setIcon(Icon.lock.imageIcon());
 		controlsLocked = false;
 	}
 
@@ -2498,4 +2708,83 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	}
+	static class SkymapTextureLoader implements ActionListener {
+		private final RenderManager renderMan;
+		private static String defaultDirectory = System.getProperty("user.dir");
+		public SkymapTextureLoader(RenderManager renderMan) {
+			this.renderMan = renderMan;
+		}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			CenteredFileDialog fileDialog =
+					new CenteredFileDialog(null, "Open Skymap", FileDialog.LOAD);
+			String directory;
+			synchronized (SkyboxTextureLoader.class) {
+				directory = defaultDirectory;
+			}
+			fileDialog.setDirectory(directory);
+			fileDialog.setFilenameFilter(
+					new FilenameFilter() {
+						@Override
+						public boolean accept(File dir, String name) {
+							return name.toLowerCase().endsWith(".png")
+									|| name.toLowerCase().endsWith(".jpg")
+									|| name.toLowerCase().endsWith(".hdr")
+									|| name.toLowerCase().endsWith(".pfm");
+						}
+					});
+			fileDialog.setVisible(true);
+			File selectedFile = fileDialog.getSelectedFile();
+			if (selectedFile != null) {
+				synchronized (SkyboxTextureLoader.class) {
+					File parent = selectedFile.getParentFile();
+					if (parent != null) {
+						defaultDirectory = parent.getAbsolutePath();
+					}
+				}
+				renderMan.scene().sky().loadSkymap(selectedFile.getAbsolutePath());
+			}
+		}
+	};
+
+	static class SkyboxTextureLoader implements ActionListener {
+		private final RenderManager renderMan;
+		private final int textureIndex;
+		private static String defaultDirectory = System.getProperty("user.dir");
+		public SkyboxTextureLoader(RenderManager renderMan, int textureIndex) {
+			this.renderMan = renderMan;
+			this.textureIndex = textureIndex;
+		}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			CenteredFileDialog fileDialog =
+					new CenteredFileDialog(null, "Open Skybox Texture", FileDialog.LOAD);
+			String directory;
+			synchronized (SkyboxTextureLoader.class) {
+				directory = defaultDirectory;
+			}
+			fileDialog.setDirectory(directory);
+			fileDialog.setFilenameFilter(
+					new FilenameFilter() {
+						@Override
+						public boolean accept(File dir, String name) {
+							return name.toLowerCase().endsWith(".png")
+									|| name.toLowerCase().endsWith(".jpg")
+									|| name.toLowerCase().endsWith(".hdr")
+									|| name.toLowerCase().endsWith(".pfm");
+						}
+					});
+			fileDialog.setVisible(true);
+			File selectedFile = fileDialog.getSelectedFile();
+			if (selectedFile != null) {
+				synchronized (SkyboxTextureLoader.class) {
+					File parent = selectedFile.getParentFile();
+					if (parent != null) {
+						defaultDirectory = parent.getAbsolutePath();
+					}
+				}
+				renderMan.scene().sky().loadSkyboxTexture(selectedFile.getAbsolutePath(), textureIndex);
+			}
+		}
+	};
 }

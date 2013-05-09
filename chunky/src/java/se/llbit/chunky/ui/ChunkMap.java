@@ -263,7 +263,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		});
 
 		JMenuItem createScene = new JMenuItem("New 3D scene...");
-		createScene.setIcon(Icon.chunky.createIcon());
+		createScene.setIcon(Icon.sky.imageIcon());
 		createScene.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -271,6 +271,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			}
 		});
 		JMenuItem loadScene = new JMenuItem("Load scene...");
+		loadScene.setIcon(Icon.load.imageIcon());
 		loadScene.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

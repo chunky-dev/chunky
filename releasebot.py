@@ -21,6 +21,37 @@ from datetime import datetime
 from string import join
 from launchpadlib.launchpad import Launchpad
 from os import path
+from shutil import copyfile
+
+class Credentials:
+	credentials = {}
+
+	def __init__(self):
+		if path.exists('credentials.json'):
+			with open('credentials.json', 'r') as fp:
+				self.credentials = json.load(fp)
+	
+	def get(self, key):
+		if key not in self.credentials:
+			self.credentials[key] = raw_input(key+': ')
+			self.save()
+		return self.credentials[key]
+
+	def getpass(self, key):
+		if key not in self.credentials:
+			self.credentials[key] = getpass(prompt=key+': ')
+			self.save()
+		return self.credentials[key]
+
+	def remove(self, key):
+		del self.credentials[key]
+		self.save()
+
+	def save(self):
+		with open('credentials.json', 'w') as fp:
+			json.dump(self.credentials, fp)
+
+
 
 class Version:
 	regex = re.compile('^(\d+\.\d+\.\d+)-?([a-zA-Z]*\.?\d*)$')
@@ -28,29 +59,36 @@ class Version:
 	milestone = ''
 	suffix = ''
 	series = ''
-	rc = ''
 	changelog = ''
 	release_notes = ''
 
 	def __init__(self, version):
 		self.full = version
-		regex = re.compile('^(\d+\.\d+\.\d+)-?([a-zA-Z]*\.?\d*)$')
+		regex = re.compile('^(\d+\.\d+(\.\d+)?)-?([a-zA-Z]*\.?\d*)?$')
 		r = regex.match(version)
-		assert r, "Invalid version name: %s (expected e.g. 1.2.13-rc.1)" % version
+		assert r, "Invalid version name: %s (expected e.g. 1.2.13-alpha1)" % version
 		self.milestone = r.groups()[0]
-		self.suffix = r.groups()[1]
+		self.suffix = r.groups()[2]
 		self.series = join(self.milestone.split('.')[:2], '.')
-		if self.suffix.startswith('rc.'):
-			self.rc = self.suffix[3:]
-		else:
-			notes_fn = "release_notes-%s.txt" % self.milestone
-			try:
-				with codecs.open(notes_fn, 'r', encoding='utf-8') as f:
-					self.release_notes = f.read().replace('\r', '')
-			except:
+		notes_fn = 'release_notes-%s.txt' % self.milestone
+		notes_fn2 = 'release_notes-%s.txt' % self.full
+		if not path.exists(notes_fn):
+			if path.exists(notes_fn2):
+				notes_fn = notes_fn2
+			else:
 				print "Error: release notes not found!"
 				print "Please edit release_notes-%s.txt!" % self.milestone
 				sys.exit(1)
+		if not path.exists(notes_fn2):
+			copyfile(notes_fn, notes_fn2)
+		else:
+			notes_fn = notes_fn2
+		try:
+			with codecs.open(notes_fn, 'r', encoding='utf-8') as f:
+				self.release_notes = f.read().replace('\r', '')
+		except:
+			print "Error: failed to read release notes!"
+			sys.exit(1)
 
 		try:
 			# load changelog
@@ -68,42 +106,86 @@ class Version:
 			print "Error: ChangeLog is empty!"
 			sys.exit(1)
 
-def publish(version):
+def build_release(version):
 	if raw_input('Build release? [y/n] ') == "y":
 		if call(['cmd', '/c', 'ant', '-Dversion=' + version.full, 'release']) is not 0:
 			print "Error: Ant build failed!"
 			sys.exit(1)
 		if call(['makensis', 'Chunky.nsi']) is not 0:
-			print "Error: NSIS failed!"
+			print "Error: NSIS build failed!"
 			sys.exit(1)
-	if not version.rc:
-		if raw_input('Publish files? [y/n] ') == "y":
-			(is_new, exe, zip, jar) = publish_release(version)
-			patch_url(version, jar)
-			write_markup(version, exe, zip)
-		if raw_input('Post release thread? [y/n] ') == "y":
-			post_release_thread(version)
-		if raw_input('Upload latest.json? [y/n] ') == "y":
-			ftpupload(version)
-		if raw_input('Update documentation? [y/n] ') == "y":
-			update_docs(version)
+	if raw_input('Publish to Launchpad? [y/n] ') == "y":
+		(is_new, exe, zip, jar) = publish_launchpad(version)
+		patch_url(version, jar)
+		write_release_notes(version, exe, zip)
+	if raw_input('Publish to FTP? [y/n] ') == "y":
+		publish_ftp(version)
+	if raw_input('Post release thread? [y/n] ') == "y":
+		post_release_thread(version)
+	if raw_input('Update documentation? [y/n] ') == "y":
+		update_docs(version)
 
-def ftpupload(version):
+def build_snapshot(version):
+	if raw_input('Build snapshot? [y/n] ') == "y":
+		if call(['cmd', '/c', 'git', 'tag', '-a', version.full, '-m', 'Snapshot build']) is not 0:
+			print "Error: git tag failed!"
+			sys.exit(1)
+		if call(['cmd', '/c', 'ant', '-Ddebug=true', 'dist']) is not 0:
+			print "Error: Ant build failed!"
+			sys.exit(1)
+	if raw_input('Publish snapshot to FTP? [y/n] ') == "y":
+		publish_snapshot_ftp(version)
+	if raw_input('Post snapshot thread? [y/n] ') == "y":
+		post_snapshot_thread(version)
+
+def reddit_login():
 	while True:
-		user = raw_input('ftp user: ')
-		pw = getpass(prompt='ftp password: ')
+		user = credentials.get('reddit user')
+		pw = credentials.getpass('reddit password')
+		try:
+			r = praw.Reddit(user_agent=user)
+			r.login('releasebot', pw)
+			return r
+		except praw.errors.InvalidUserPass:
+			credentials.remove('reddit user')
+			credentials.remove('reddit password')
+			print "Login failed, please try again"
+
+def ftp_login():
+	while True:
+		user = credentials.get('ftp user')
+		pw = credentials.getpass('ftp password')
 		try:
 			ftp = ftplib.FTP('ftp.llbit.se')
 			ftp.login(user, pw)
-			break
+			return ftp
 		except ftplib.error_perm:
+			credentials.remove('ftp user')
+			credentials.remove('ftp password')
 			print "Login failed, please try again"
+
+def publish_snapshot_ftp(version):
+	ftp = ftp_login()
 	ftp.cwd('chunkyupdate')
+	with open('build/ChunkyLauncher.jar', 'rb') as f:
+		ftp.storbinary('STOR ChunkyLauncher.jar', f)
+	with open('latest.json', 'rb') as f:
+		ftp.storbinary('STOR snapshot.json', f)
+	ftp.cwd('lib')
+	with open('build/chunky-core-%s.jar' % version.full, 'rb') as f:
+		ftp.storbinary('STOR chunky-core-%s.jar' % version.full, f)
+	ftp.quit()
+
+def publish_ftp(version):
+	ftp = ftp_login()
+	ftp.cwd('chunkyupdate')
+	with open('build/ChunkyLauncher.jar', 'rb') as f:
+		ftp.storbinary('STOR ChunkyLauncher.jar', f)
 	with open('latest.json', 'rb') as f:
 		ftp.storbinary('STOR latest.json', f)
 	ftp.cwd('lib')
-	with open('build/chunky-core-%s.jar' % version.milestone, 'rb') as f:
-		ftp.storbinary('STOR chunky-core-%s.jar' % version.milestone, f)
+	with open('build/chunky-core-%s.jar' % version.full, 'rb') as f:
+		ftp.storbinary('STOR chunky-core-%s.jar' % version.full, f)
 	ftp.quit()
 
 def update_docs(version):
@@ -143,7 +225,7 @@ def lp_upload_file(version, release, filename, description, content_type, file_t
 		traceback.print_exception(exc_type, exc_value, exc_traceback)
 		return None
 
-def publish_release(version):
+def publish_launchpad(version):
 	if raw_input('Publish to production? [y/n] ') == "y":
 		server = 'production'
 	else:
@@ -239,7 +321,7 @@ def publish_release(version):
 	return (is_new_release, exe_url, zip_url, jar_url)
 
 "output markdown"
-def write_markup(version, exe_url, zip_url):
+def write_release_notes(version, exe_url, zip_url):
 	text = '''###Downloads
 
 * [Windows installer](%s)
@@ -270,14 +352,35 @@ def post_release_thread(version):
 	except IOError:
 		print "Error: reddit post must be in build/release_notes-%s.md" % version.milestone
 		return
-	r = praw.Reddit(user_agent='releasebot')
-	pw = getpass(prompt='releasebot login: ')
-	r.login('releasebot', pw)
+	r = reddit_login()
 	post = r.submit('chunky', 'Chunky %s released!' % version.full,
 		text=text)
 	post.set_flair('announcement', 'announcement')
 	post.sticky()
-	print "Submitted Reddit release thread!"
+	print "Submitted release thread!"
+
+"post reddit release thread"
+def post_snapshot_thread(version):
+	r = reddit_login()
+	post = r.submit('chunky', 'Chunky Snapshot %s' % version.full,
+		text='''###Snapshot %s
+
+A new snapshot for Chunky is now available. The snapshot is mostly untested,
+so please make sure to backup your scenes before using it.
+
+[The snapshot can be downloaded using the launcher.](http://chunky.llbit.se/snapshot.html)
+
+###Notes
+
+*These are preliminary release notes for upcoming features (which may not be fully functional).*
+
+%s
+
+###ChangeLog
+
+''' % (version.full, version.release_notes) + version.changelog)
+	post.set_flair('announcement', 'announcement')
+	print "Submitted snapshot thread!"
 
 "patch url into latest.json"
 def patch_url(version, url):
@@ -304,45 +407,55 @@ def patch_url(version, url):
 
 ### MAIN
 version = None
+options = {'ftp': False, 'docs': False, 'snapshot': False}
 do_ftpupload = False
 do_update_docs = False
 for arg in sys.argv[1:]:
 	if arg == '-h' or arg == '--h' or arg == '-help' or arg == '--help':
 		print "usage: releasebot [VERSION] [COMMAND]"
 		print "commands:"
-		print "-ftp    upload latest.json to FTP server"
+		print "    -ftp         upload latest.json to FTP server"
+		print "    -docs        update documentation"
+		print "    -snapshot    build snapshot instead of release"
 		print
 		print "This utility creates a new release of Chunky"
-		print "Required Python libraries: launchpadlib, praw"
-		print "Upgrade with pip install --upgrade PKG"
+		print "Required Python libraries: launchpadlib, PRAW"
+		print "Upgrade with >pip install --upgrade <PKG>"
 		sys.exit(0)
-	elif arg == '-ftp':
-		do_ftpupload = True
-	elif arg == '-docs':
-		do_update_docs = True
 	else:
-		version = Version(arg)
+		matched = False
+		for key in options.keys():
+			if arg == '-'+key:
+				options[key] = True
+				matched = True
+				break
+		if not matched:
+			version = Version(arg)
 
-if version == None:
-	version = Version(raw_input('Enter version: '))
-
-if do_ftpupload:
-	ftpupload(version)
-	sys.exit(0)
-
-if do_update_docs:
-	update_docs(version)
-	sys.exit(0)
-
-print "Ready to build version %s!" % version.full
 try:
-	publish(version)
-	if raw_input('All done. Push git changes? [y/n] ') == "y":
-		call(['git', 'push', 'origin', 'master'])# push version bump commit
-		call(['git', 'push', 'origin', version.full])# push version tag
+	credentials = Credentials()
+
+	if version == None:
+		version = Version(raw_input('Enter version: '))
+
+	if options['ftp']:
+		publish_ftp(version)
+	elif options['docs']:
+		update_docs(version)
+	elif options['snapshot']:
+		print "Ready to build snapshot %s!" % version.full
+		build_snapshot(version)
+	else:
+		print "Ready to build version %s!" % version.full
+		build_release(version)
+		if raw_input('Push git release commit? [y/n] ') == "y":
+			call(['git', 'push', 'origin', 'master'])# push version bump commit
+			call(['git', 'push', 'origin', version.full])# push version tag
+		print "All done."
 except:
 	exc_type, exc_value, exc_traceback = sys.exc_info()
 	print "Unexpected error:"
 	traceback.print_exception(exc_type, exc_value, exc_traceback)
 	print "Release aborted."
 	raw_input()
+

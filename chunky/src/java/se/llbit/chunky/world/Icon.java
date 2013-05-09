@@ -41,6 +41,12 @@ public class Icon extends Texture {
 	public static final Icon woodenDoor = new Icon("wooden-door");
 	public static final Icon woodenPressurePlate = new Icon("wooden-pressure-plate");
 	public static final Icon woodenStairs = new Icon("wooden-stairs");
+	public static final Icon skyboxUp = new Icon("skybox-up");
+	public static final Icon skyboxDown = new Icon("skybox-down");
+	public static final Icon skyboxLeft = new Icon("skybox-left");
+	public static final Icon skyboxRight = new Icon("skybox-right");
+	public static final Icon skyboxFront = new Icon("skybox-front");
+	public static final Icon skyboxBack = new Icon("skybox-back");
 	public static final Icon isoNE = new Icon("iso-ne");
 	public static final Icon isoWN = new Icon("iso-wn");
 	public static final Icon isoSW = new Icon("iso-sw");
@@ -53,10 +59,15 @@ public class Icon extends Texture {
 	public static final Icon lock = new Icon("lock");
 	public static final Icon key = new Icon("key");
 	public static final Icon disk = new Icon("disk");
+	public static final Icon load = new Icon("load");
+	public static final Icon save = new Icon("save");
 	public static final Icon play = new Icon("play");
 	public static final Icon pause = new Icon("pause");
 	public static final Icon stop = new Icon("stop");
 	public static final Icon reload = new Icon("reload");
+	public static final Icon colors = new Icon("colors");
+	public static final Icon sky = new Icon("sky");
+	public static final Icon camera = new Icon("camera");
 
 	public Icon(String resourceName) {
 		setTexture(ImageLoader.get("icons/" + resourceName + ".png"));

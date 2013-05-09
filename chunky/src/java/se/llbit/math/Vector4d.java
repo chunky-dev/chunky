@@ -33,6 +33,13 @@ public class Vector4d {
 	}
 
 	/**
+	 * Copy constructor
+	 */
+	public Vector4d(Vector4d v) {
+		this(v.x, v.y, v.z, v.w);
+	}
+
+	/**
 	 * @param i
 	 * @param j
 	 * @param k
@@ -90,5 +97,17 @@ public class Vector4d {
 		y = v[1];
 		z = v[2];
 		w = v[3];
+	}
+
+	/**
+	 * Scale and add argument the vector
+	 * @param s
+	 * @param v
+	 */
+	public void scaleAdd(double s, Vector4d v) {
+		x += s*v.x;
+		y += s*v.y;
+		z += s*v.z;
+		w += s*v.w;
 	}
 }

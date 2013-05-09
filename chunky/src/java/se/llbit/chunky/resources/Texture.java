@@ -38,6 +38,21 @@ import se.llbit.resources.ImageLoader;
 @SuppressWarnings("javadoc")
 public class Texture {
 
+	public static final Texture EMPTY_TEXTURE = new Texture() {
+		@Override
+		public void getColor(double u, double v, Vector4d c) {
+			c.set(0,0,0,0);
+		};
+		@Override
+		public void getColorInterpolated(double u, double v, Vector4d c) {
+			c.set(0,0,0,0);
+		};
+		@Override
+		public boolean isEmptyTexture() {
+			return true;
+		};
+	};
+
 	public static final Texture air = new Texture("air");
 	public static final Texture stone = new Texture("stone");
 	public static final Texture prismarine = new Texture();
@@ -586,30 +601,30 @@ public class Texture {
 	 */
 	public void getColorInterpolated(double u, double v, Vector4d c) {
 
-		double x = u * width;
-		double y = v * (height-1);
+		double x = u * (width-1);
+		double y = (1-v) * (height-1);
 		double weight;
 		int fx = (int) QuickMath.floor(x);
 		int cx = (int) QuickMath.ceil(x);
 		int fy = (int) QuickMath.floor(y);
 		int cy = (int) QuickMath.ceil(y);
 
-		float[] rgb = getColor(fx % width, fy);
+		float[] rgb = getColor(fx, fy);
 		weight = (1 - (y-fy)) * (1 - (x-fx));
 		c.x = weight * rgb[0];
 		c.y = weight * rgb[1];
 		c.z = weight * rgb[2];
-		rgb = getColor(cx % width, fy);
+		rgb = getColor(cx, fy);
 		weight = (1 - (y-fy)) * (1 - (cx-x));
 		c.x += weight * rgb[0];
 		c.y += weight * rgb[1];
 		c.z += weight * rgb[2];
-		rgb = getColor(fx % width, cy);
+		rgb = getColor(fx, cy);
 		weight = (1 - (cy-y)) * (1 - (x-fx));
 		c.x += weight * rgb[0];
 		c.y += weight * rgb[1];
 		c.z += weight * rgb[2];
-		rgb = getColor(cx % width, cy);
+		rgb = getColor(cx, cy);
 		weight = (1 - (cy-y)) * (1 - (cx-x));
 		c.x += weight * rgb[0];
 		c.y += weight * rgb[1];
@@ -648,11 +663,16 @@ public class Texture {
 		return image;
 	}
 
+	private ImageIcon imageIcon = null;
+
 	/**
 	 * @return An ImageIcon containing this texture's internal image
 	 */
-	public ImageIcon createIcon() {
-		return new ImageIcon(image);
+	synchronized public ImageIcon imageIcon() {
+		if (imageIcon == null) {
+			imageIcon = new ImageIcon(image);
+		}
+		return imageIcon;
 	}
 
 	/**
@@ -660,5 +680,12 @@ public class Texture {
 	 */
 	public int getWidth() {
 		return width;
+	}
+
+	/**
+	 * @return {@code true} if this is the dedicated empty texture
+	 */
+	public boolean isEmptyTexture() {
+		return false;
 	}
 }

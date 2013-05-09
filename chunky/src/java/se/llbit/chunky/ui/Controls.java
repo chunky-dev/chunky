@@ -134,12 +134,12 @@ public class Controls extends JPanel {
 
 		tabbedPane = new JTabbedPane();
 
-		addTab("Map View", Icon.map.createIcon(), buildViewPanel(), "Change map view");
-		addTab("Chunks", Icon.mapSelected.createIcon(), buildEditPanel(), "Chunk operations");
-		addTab("Highlight", Icon.redTorchOn.createIcon(), buildHighlightPanel(), "Change block highlight settings");
-		addTab("Options", Icon.wrench.createIcon(), buildOptionsPanel(), "Configure Chunky");
-		addTab("3D Render", Icon.chunky.createIcon(), buildRenderPanel(), "Render chunks in 3D");
-		addTab("About", Texture.unknown.createIcon(), buildAboutPanel(), "About Chunky");
+		addTab("Map View", Icon.map.imageIcon(), buildViewPanel(), "Change map view");
+		addTab("Chunks", Icon.mapSelected.imageIcon(), buildEditPanel(), "Chunk operations");
+		addTab("Highlight", Icon.redTorchOn.imageIcon(), buildHighlightPanel(), "Change block highlight settings");
+		addTab("Options", Icon.wrench.imageIcon(), buildOptionsPanel(), "Configure Chunky");
+		addTab("3D Render", Icon.sky.imageIcon(), buildRenderPanel(), "Render chunks in 3D");
+		addTab("About", Texture.unknown.imageIcon(), buildAboutPanel(), "About Chunky");
 
 		JButton selectWorldBtn = new JButton();
 		selectWorldBtn.setText(Messages.getString("Controls.SelectWorld_lbl")); //$NON-NLS-1$
@@ -151,7 +151,7 @@ public class Controls extends JPanel {
 		});
 
 		JButton reloadWorldBtn = new JButton("Reload");
-		reloadWorldBtn.setIcon(Icon.reload.createIcon());
+		reloadWorldBtn.setIcon(Icon.reload.imageIcon());
 		reloadWorldBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -304,6 +304,7 @@ public class Controls extends JPanel {
 		JComponent optionsPanel = new JPanel();
 
 		JButton loadTexturePackBtn = new JButton("Load Resource Pack");
+		loadTexturePackBtn.setIcon(Icon.load.imageIcon());
 		loadTexturePackBtn.setToolTipText("Load a custom resource pack");
 		loadTexturePackBtn.addActionListener(new ActionListener() {
 			@Override
@@ -421,6 +422,7 @@ public class Controls extends JPanel {
 		});
 
 		JButton loadSceneBtn = new JButton("Load Scene");
+		loadSceneBtn.setIcon(Icon.load.imageIcon());
 		loadSceneBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
