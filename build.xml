@@ -106,9 +106,21 @@
 			<arg value="README.md"/>
 		</exec>
 	</target>
+
+	<target name="tarball" description="Create a source tarball">
+		<mkdir dir="${basedir}/build"/>
+		<exec executable="git">
+			<arg value="archive"/>
+			<arg value="--prefix=&quot;chunky-${Chunky.version}&quot;"/>
+			<arg value="-o"/>
+			<arg value="${basedir}/build/chunky-${Chunky.version}.tar.gz"/>
+			<arg value="master"/>
+		</exec>
+	</target>
 	
 	<target name="release" description="build a release">
 		<antcall target="clean"/>
+		<antcall target="tarball"/>
 		<antcall target="jar"/>
 		<antcall target="gendoc"/>
 		<zip destfile="build/Chunky-${Chunky.version}.zip">
