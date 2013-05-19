@@ -357,7 +357,7 @@ public class TexturePackLoader {
 						tpFile.getAbsolutePath());
 			}
 		} catch (IOException e) {
-			logger.warn("Failed to open " + tpName, e);
+			logger.warn("Failed to open " + tpName);
 		} finally {
 			if (texturePack != null) {
 				try {
