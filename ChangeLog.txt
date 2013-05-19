@@ -1,5 +1,6 @@
 1.1.12 - TBD
     * Fixed some mirrored textures
+	* Fixed autofocus not working
 
 1.1.11 - 2013-04-28
     * It is now possible to lock the render controls to avoid inadvertent

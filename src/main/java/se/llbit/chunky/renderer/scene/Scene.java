@@ -1310,7 +1310,7 @@ public class Scene implements Refreshable {
 	 * @param ray
 	 */
 	public void trace(Ray ray) {
-		ray.d.set(0, -1, 0);
+		ray.d.set(0, 0, 1);
 		ray.x.set(camera.getPosition());
 		ray.x.x -= origin.x;
 		ray.x.y -= origin.y;
