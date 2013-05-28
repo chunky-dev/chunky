@@ -5,7 +5,7 @@
 	<property name="bin.dir"		value="bin"/>
 	<property name="tools.dir"		value="tools"/>
 	<property name="nbt.package"	value="se.llbit.nbt"/>
-	
+
 	<property file="${src.dir}/main/res/Version.properties" prefix="Chunky"/>
 
 	<taskdef name="jastadd" classname="jastadd.JastAddTask" classpath="${tools.dir}/jastadd2.jar"/>
@@ -19,8 +19,8 @@
 		<delete file="build/Chunky.app" />
 		<delete file="build/Chunky.dmg" />
 	</target>
-	
-	<target name="gen">
+
+	<target name="gen" depends="update-version-string">
 		<mkdir dir="${src.dir}/gen/java"/>
 		<jastadd
 			outdir="${src.dir}/gen/java"
@@ -237,13 +237,23 @@
 	</target>
 
 	<target name="update-version-string">
-		<echo message="Updating version string..."/>
-		<exec executable="git" outputproperty="version">
+		<echo message="Updating Chunky version string..."/>
+		<exec executable="git" outputproperty="version"
+			failifexecutionfails="false">
 			<arg value="describe"/>
 		</exec>
+		<antcall target="-store-version-string"/>
+	</target>
+
+	<target name="-store-version-string" if="version">
 		<echo message="version=${version}"/>
 		<propertyfile file="${src.dir}/main/res/Version.properties">
 			<entry key="version" value="${version}"/>
 		</propertyfile>
+		<exec executable="git">
+			<arg value="update-index"/>
+			<arg value="--assume-unchanged"/>
+			<arg value="${src.dir}/main/res/Version.properties"/>
+		</exec>
 	</target>
 </project>
