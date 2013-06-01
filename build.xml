@@ -93,6 +93,11 @@
 			</manifest>
 		</jar>
 	</target>
+
+	<target name="run" depends="jar">
+		<java fork="true" classpath="build/Chunky.jar"
+			classname="se.llbit.chunky.launcher.ChunkyLauncher"/>
+	</target>
 	
 	<target name="clean-builds" description="Removes the build folder">
 		<delete dir="build"/>
