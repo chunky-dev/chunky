@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.map;
+import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;

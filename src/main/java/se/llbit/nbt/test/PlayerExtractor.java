@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.nbt.test;
+import org.apache.commons.math3.util.FastMath;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.ui;
+import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -1055,8 +1056,8 @@ public class Controls extends JPanel {
 	public int getNumThreads() {
 		try {
 			int nThreads = Integer.parseInt(numThreadsField.getText());
-			nThreads = Math.max(RenderManager.NUM_RENDER_THREADS_MIN, nThreads);
-			nThreads = Math.min(RenderManager.NUM_RENDER_THREADS_MAX, nThreads);
+			nThreads = FastMath.max(RenderManager.NUM_RENDER_THREADS_MIN, nThreads);
+			nThreads = FastMath.min(RenderManager.NUM_RENDER_THREADS_MAX, nThreads);
 			return nThreads;
 		} catch (NumberFormatException e) {
 			return RenderManager.NUM_RENDER_THREADS_DEFAULT;

@@ -23,6 +23,7 @@
 
 // A simple cache and wrapper for efficiently multiple RegionFiles simultaneously.
 package se.llbit.chunky.world.storage;
+import org.apache.commons.math3.util.FastMath;
 
 import java.io.*;
 import java.lang.ref.*;

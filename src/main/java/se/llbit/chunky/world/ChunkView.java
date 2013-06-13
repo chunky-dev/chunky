@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.world;
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.math.QuickMath;
 

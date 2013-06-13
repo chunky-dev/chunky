@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.math;
+import org.apache.commons.math3.util.FastMath;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -218,7 +219,7 @@ public class Octree {
 
 			if (allSame) {
 				parent.merge(node.type);
-				cacheLevel = Math.max(i, cacheLevel);
+				cacheLevel = FastMath.max(i, cacheLevel);
 			} else {
 				break;
 			}
