@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.ui;
-import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -39,6 +38,8 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
+
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * UI component that draws a 2D Minecraft map.

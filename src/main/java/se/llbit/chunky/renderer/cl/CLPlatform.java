@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.cl;
-import org.apache.commons.math3.util.FastMath;
 
 import org.jocl.cl_platform_id;
 

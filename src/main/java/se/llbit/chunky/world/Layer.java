@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.world;
-import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Graphics;
 import java.awt.image.DataBufferInt;
@@ -27,6 +26,8 @@ import se.llbit.chunky.resources.MiscImages;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Color;
 import se.llbit.util.ImageTools;
+
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * A layer describes the visible part of a chunk.

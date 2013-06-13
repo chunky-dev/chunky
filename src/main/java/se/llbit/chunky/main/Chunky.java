@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.main;
-import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Color;
 import java.io.File;
@@ -67,6 +66,8 @@ import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldRenderer;
 import se.llbit.chunky.world.listeners.ChunkDiscoveryListener;
 import se.llbit.util.ProgramProperties;
+
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created by

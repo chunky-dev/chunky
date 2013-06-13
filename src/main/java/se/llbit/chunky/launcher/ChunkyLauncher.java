@@ -1,5 +1,4 @@
 package se.llbit.chunky.launcher;
-import org.apache.commons.math3.util.FastMath;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

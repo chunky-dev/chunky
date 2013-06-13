@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.resources;
-import org.apache.commons.math3.util.FastMath;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
