@@ -25,7 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -88,7 +88,7 @@ public class World implements Comparable<World> {
 	@SuppressWarnings("unused")
 	private static final int PIXELS_PER_IDAT_CHUNK = 10000;
 
-	private Map<ChunkPosition, Region> regionMap = new HashMap<ChunkPosition, Region>();
+	private Map<ChunkPosition, Region> regionMap = new ConcurrentHashMap<ChunkPosition, Region>();
 
 	private int currentLayer = DEFAULT_LAYER;
 	private File worldDirectory = null;
@@ -486,7 +486,7 @@ public class World implements Comparable<World> {
 	        ProgressPanel progress) throws IOException {
 
 	    Map<ChunkPosition, Set<ChunkPosition>> regionMap =
-	            new HashMap<ChunkPosition, Set<ChunkPosition>>();
+	            new ConcurrentHashMap<ChunkPosition, Set<ChunkPosition>>();
 
 	    for (ChunkPosition chunk : chunks) {
 

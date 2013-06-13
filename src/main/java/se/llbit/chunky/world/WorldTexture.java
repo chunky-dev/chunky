@@ -20,7 +20,7 @@ import org.apache.commons.math3.util.FastMath;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 /**
@@ -30,7 +30,7 @@ import java.util.Map;
 public class WorldTexture {
 
     private Map<ChunkPosition, ChunkTexture> map =
-            new HashMap<ChunkPosition, ChunkTexture>();
+            new ConcurrentHashMap<ChunkPosition, ChunkTexture>();
 
     /**
      * Set color at (x, z)

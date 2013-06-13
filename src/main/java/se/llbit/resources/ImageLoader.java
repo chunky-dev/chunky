@@ -22,7 +22,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.imageio.ImageIO;
 
@@ -38,7 +38,7 @@ public final class ImageLoader {
 	private static final Logger logger =
 			Logger.getLogger(ImageLoader.class);
 
-	private final static HashMap<String, BufferedImage> map = new HashMap<String, BufferedImage>();
+	private final static ConcurrentHashMap<String, BufferedImage> map = new ConcurrentHashMap<String, BufferedImage>();
 	private final static BufferedImage missingImage;
 
 	private ImageLoader() { }
