@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.world;
-import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -24,6 +23,7 @@ import java.awt.Graphics;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.RenderBuffer;
 import se.llbit.chunky.resources.MiscImages;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * @author Jesper Öqvist (jesper@llbit.se)

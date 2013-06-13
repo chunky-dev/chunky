@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.test;
-import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;

@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.math.transform;
-import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3d;

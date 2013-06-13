@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.cl;
-import org.apache.commons.math3.util.FastMath;
 
 import static org.jocl.CL.CL_CONTEXT_PLATFORM;
 import static org.jocl.CL.CL_MEM_READ_ONLY;
@@ -91,6 +90,8 @@ import se.llbit.math.Color;
 import se.llbit.math.Matrix3d;
 import se.llbit.math.Octree;
 import se.llbit.math.Vector3d;
+
+import org.apache.commons.math3.util.FastMath;
 
 @SuppressWarnings("javadoc")
 public class CLRenderManager extends Thread implements Renderer,

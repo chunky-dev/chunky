@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.model;
-import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;

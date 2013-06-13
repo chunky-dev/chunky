@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.scene;
-import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.world.Block;

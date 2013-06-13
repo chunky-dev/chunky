@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.ui;
-import org.apache.commons.math3.util.FastMath;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
