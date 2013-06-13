@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.resources;
+import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Color;
 import java.awt.Graphics;

@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.model;
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.resources.Texture;
 
@@ -107,7 +108,7 @@ public class LeverModel {
 		baseRotated[7][1] = ceilingNS;
 
 		Quad[] leverEWOff = translate(rotateZ(lever, -Math.PI/4), .35, 0, 0);
-		Quad[] leverEWOn = translate(rotateZ(lever, Math.PI/4), -.35, 0, 0);
+		Quad[] leverEWOn = translate(rotateZ(lever, FastMath.PI/4), -.35, 0, 0);
 		Quad[] leverNSOn = rotateY(leverEWOn);
 		Quad[] leverNSOff = rotateY(leverEWOff);
 

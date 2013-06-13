@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.world;
+import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -183,13 +184,13 @@ public class WorldRenderer {
 
 	private void renderPlayer(World world, Graphics g, ChunkView view, boolean sameLayer) {
 		double blockScale = view.chunkScale / 16.;
-		int px = (int) Math.floor(world.playerPosX() * blockScale);
-		int pz = (int) Math.floor(world.playerPosZ() * blockScale);
-		int ppx = px - (int) Math.floor(view.x0 * view.chunkScale);
-		int ppy = pz - (int) Math.floor(view.z0 * view.chunkScale);
-		int pw = (int) Math.max(8, Math.min(16, blockScale * 2));
-		ppx = Math.min(view.width-pw, Math.max(0, ppx-pw/2));
-		ppy = Math.min(view.height-pw, Math.max(0, ppy-pw/2));
+		int px = (int) FastMath.floor(world.playerPosX() * blockScale);
+		int pz = (int) FastMath.floor(world.playerPosZ() * blockScale);
+		int ppx = px - (int) FastMath.floor(view.x0 * view.chunkScale);
+		int ppy = pz - (int) FastMath.floor(view.z0 * view.chunkScale);
+		int pw = (int) FastMath.max(8, FastMath.min(16, blockScale * 2));
+		ppx = FastMath.min(view.width-pw, FastMath.max(0, ppx-pw/2));
+		ppy = FastMath.min(view.height-pw, FastMath.max(0, ppy-pw/2));
 
 		if (sameLayer)
 			g.drawImage(MiscImages.face, ppx, ppy, pw, pw, null);
@@ -199,13 +200,13 @@ public class WorldRenderer {
 
 	private void renderSpawn(World world, Graphics g, ChunkView view, boolean sameLayer) {
 		double blockScale = view.chunkScale / 16.;
-		int px = (int) Math.floor(world.spawnPosX() * blockScale);
-		int pz = (int) Math.floor(world.spawnPosZ() * blockScale);
-		int ppx = px - (int) Math.floor(view.x0 * view.chunkScale);
-		int ppy = pz - (int) Math.floor(view.z0 * view.chunkScale);
-        int pw = (int) Math.max(8, Math.min(16, blockScale * 2));
-        ppx = Math.min(view.width-pw, Math.max(0, ppx-pw/2));
-		ppy = Math.min(view.height-pw, Math.max(0, ppy-pw/2));
+		int px = (int) FastMath.floor(world.spawnPosX() * blockScale);
+		int pz = (int) FastMath.floor(world.spawnPosZ() * blockScale);
+		int ppx = px - (int) FastMath.floor(view.x0 * view.chunkScale);
+		int ppy = pz - (int) FastMath.floor(view.z0 * view.chunkScale);
+        int pw = (int) FastMath.max(8, FastMath.min(16, blockScale * 2));
+        ppx = FastMath.min(view.width-pw, FastMath.max(0, ppx-pw/2));
+		ppy = FastMath.min(view.height-pw, FastMath.max(0, ppy-pw/2));
 
         if (sameLayer)
             g.drawImage(MiscImages.home, ppx, ppy, pw, pw, null);

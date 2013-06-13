@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.ui;
+import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -126,10 +127,10 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 		// draw view rectangle
 		g.setColor(Color.orange);
 		g.drawRect(
-				(int) Math.round(mapView.x0 - view.x0),
-				(int) Math.round(mapView.z0 - view.z0),
-				(int) Math.round(mapView.width / (float) mapView.chunkScale),
-				(int) Math.round(mapView.height / (float) mapView.chunkScale));
+				(int) FastMath.round(mapView.x0 - view.x0),
+				(int) FastMath.round(mapView.z0 - view.z0),
+				(int) FastMath.round(mapView.width / (float) mapView.chunkScale),
+				(int) FastMath.round(mapView.height / (float) mapView.chunkScale));
 
 		// draw North indicator
 		g.setFont(font);

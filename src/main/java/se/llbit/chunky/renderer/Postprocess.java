@@ -1,4 +1,5 @@
 package se.llbit.chunky.renderer;
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.nbt.AnyTag;
 
@@ -32,8 +33,8 @@ public enum Postprocess {
 	public static final Postprocess[] values = values();
 
 	public static Postprocess get(int index) {
-		index = Math.max(0, index);
-		index = Math.min(values.length-1, index);
+		index = FastMath.max(0, index);
+		index = FastMath.min(values.length-1, index);
 		return values[index];
 	}
 

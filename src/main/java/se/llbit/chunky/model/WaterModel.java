@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.model;
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.DoubleSidedQuad;
@@ -205,11 +206,11 @@ public class WaterModel {
 				/*if ((level&8) != 0) {
 					// falling water
 					if (ray.n.x != 0) {
-						double sign = Math.signum(ray.n.x);
+						double sign = FastMath.signum(ray.n.x);
 						doWaterDisplacement(ray);
 						ray.n.set(ray.n.y*sign, ray.n.x, ray.n.z);
 					} else {
-						double sign = Math.signum(ray.n.z);
+						double sign = FastMath.signum(ray.n.z);
 						doWaterDisplacement(ray);
 						ray.n.set(ray.n.x, ray.n.z, ray.n.y*sign);
 					}

@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.scene;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.Random;
 
@@ -261,7 +262,7 @@ public class PathTracer {
 							} else {
 								if (doRefraction) {
 
-									double t2 = Math.sqrt(radicand);
+									double t2 = FastMath.sqrt(radicand);
 									if (cosTheta > 0) {
 										refracted.d.x = n1n2*ray.d.x + (n1n2*cosTheta - t2)*ray.n.x;
 										refracted.d.y = n1n2*ray.d.y + (n1n2*cosTheta - t2)*ray.n.y;
@@ -314,7 +315,7 @@ public class PathTracer {
 			// do water fog
 			if (!scene.clearWater && prevBlock == Block.WATER) {
 				double a = ray.distance / scene.waterVisibility;
-				double attenuation = 1 - Math.min(1, a*a);
+				double attenuation = 1 - FastMath.min(1, a*a);
 				ray.color.scale(attenuation);
 				/*ray.color.x *= attenuation;
 				ray.color.y *= attenuation;
@@ -395,7 +396,7 @@ public class PathTracer {
 			attenuation *= 1 - ray.color.w;
 			if (!scene.clearWater && ray.getPrevBlock() == Block.WATER) {
 				double a = ray.distance / scene.waterVisibility;
-				attenuation *= 1 - Math.min(1, a*a);
+				attenuation *= 1 - FastMath.min(1, a*a);
 			}
 		}
 		return attenuation;

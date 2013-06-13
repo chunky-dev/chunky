@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.world;
+import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Graphics;
 import java.awt.image.DataBufferInt;
@@ -481,15 +482,15 @@ public class Layer {
 						}
 
 						Color.getRGBAComponents(Block.WATER.getAvgTopRGB(), blockColor);
-						blockColor[3] = Math.max(.5f, 1.f - depth/32.f);
+						blockColor[3] = FastMath.max(.5f, 1.f - depth/32.f);
 						break;
 
 					default:
 						Color.getRGBAComponents(block.getAvgTopRGB(), blockColor);
 
 						if (block.isOpaque && y > 64) {
-							float fade = Math.min(0.6f, (y-World.SEA_LEVEL) / 60.f);
-							fade = Math.max(0.f, fade);
+							float fade = FastMath.min(0.6f, (y-World.SEA_LEVEL) / 60.f);
+							fade = FastMath.max(0.f, fade);
 							blockColor[0] = (1-fade)*blockColor[0] + fade;
 							blockColor[1] = (1-fade)*blockColor[1] + fade;
 							blockColor[2] = (1-fade)*blockColor[2] + fade;
@@ -559,12 +560,12 @@ public class Layer {
 				rgb[2] *= gradient;
 
 				// clip the result
-				rgb[0] = Math.max(0.f, rgb[0]);
-				rgb[0] = Math.min(1.f, rgb[0]);
-				rgb[1] = Math.max(0.f, rgb[1]);
-				rgb[1] = Math.min(1.f, rgb[1]);
-				rgb[2] = Math.max(0.f, rgb[2]);
-				rgb[2] = Math.min(1.f, rgb[2]);
+				rgb[0] = FastMath.max(0.f, rgb[0]);
+				rgb[0] = FastMath.min(1.f, rgb[0]);
+				rgb[1] = FastMath.max(0.f, rgb[1]);
+				rgb[1] = FastMath.min(1.f, rgb[1]);
+				rgb[2] = FastMath.max(0.f, rgb[2]);
+				rgb[2] = FastMath.min(1.f, rgb[2]);
 
 				bitmap[x*16 + z] = Color.getRGB(rgb[0], rgb[1], rgb[2]);
 			}
@@ -587,7 +588,7 @@ public class Layer {
 		for (int x = 0; x < 16; ++x) {
 			for (int z = 0; z < 16; ++z) {
 				int y = heightmap[z*16+x];
-				y = Math.max(0, y-1);
+				y = FastMath.max(0, y-1);
 
 				// find ground level
 				for (; y > 1; --y) {
@@ -615,8 +616,8 @@ public class Layer {
 				if (luftspalt == 0) {
 					caves[x*16+z] = 0xFFFFFFFF;
 				} else {
-					luftspalt = Math.min(64, luftspalt*3+5);
-					float fade = Math.max(0, 1.f - luftspalt/64.f);
+					luftspalt = FastMath.min(64, luftspalt*3+5);
+					float fade = FastMath.max(0, 1.f - luftspalt/64.f);
 					caves[x*16+z] = Color.getRGB(1.f*fade, 1.f*fade, 1.f);
 				}
 			}
@@ -638,7 +639,7 @@ public class Layer {
 		for (int x = 0; x < 16; ++x) {
 			for (int z = 0; z < 16; ++z) {
 				int y = chunkHeightmap[z*16+x];
-				y = Math.max(1, y-1);
+				y = FastMath.max(1, y-1);
 				for (; y > 1; --y) {
 					Block block = Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
 					if (block != Block.AIR && !block.isWater())

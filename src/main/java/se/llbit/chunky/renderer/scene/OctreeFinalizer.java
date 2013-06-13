@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.scene;
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.world.Block;
@@ -173,10 +174,10 @@ public class OctreeFinalizer {
 						}
 						corner3 += level;
 
-						corner0 = Math.min(7, 8 - (corner0 / 4));
-						corner1 = Math.min(7, 8 - (corner1 / 4));
-						corner2 = Math.min(7, 8 - (corner2 / 4));
-						corner3 = Math.min(7, 8 - (corner3 / 4));
+						corner0 = FastMath.min(7, 8 - (corner0 / 4));
+						corner1 = FastMath.min(7, 8 - (corner1 / 4));
+						corner2 = FastMath.min(7, 8 - (corner2 / 4));
+						corner3 = FastMath.min(7, 8 - (corner3 / 4));
 						type |= (corner0 << 16);
 						type |= (corner1 << 20);
 						type |= (corner2 << 24);
@@ -277,10 +278,10 @@ public class OctreeFinalizer {
 						}
 						corner3 += level;
 
-						corner0 = Math.min(7, 8 - (corner0 / 4));
-						corner1 = Math.min(7, 8 - (corner1 / 4));
-						corner2 = Math.min(7, 8 - (corner2 / 4));
-						corner3 = Math.min(7, 8 - (corner3 / 4));
+						corner0 = FastMath.min(7, 8 - (corner0 / 4));
+						corner1 = FastMath.min(7, 8 - (corner1 / 4));
+						corner2 = FastMath.min(7, 8 - (corner2 / 4));
+						corner3 = FastMath.min(7, 8 - (corner3 / 4));
 						type |= (corner0 << 16);
 						type |= (corner1 << 20);
 						type |= (corner2 << 24);
