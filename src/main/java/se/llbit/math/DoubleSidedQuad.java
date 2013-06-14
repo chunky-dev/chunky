@@ -16,6 +16,8 @@
  */
 package se.llbit.math;
 
+import org.apache.commons.math3.util.FastMath;
+
 /**
  * A double-sided quad
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -48,7 +50,7 @@ public class DoubleSidedQuad extends Quad {
 		double denom = ray.d.dot(n);
 		double u, v;
 
-		if (Math.abs(denom) > Ray.EPSILON) {
+		if (FastMath.abs(denom) > Ray.EPSILON) {
 			double t = - (ix*n.x + iy*n.y + iz*n.z + d) / denom;
 			if (t > -Ray.EPSILON && t < ray.t) {
 				ix = ix + ray.d.x * t - o.x;

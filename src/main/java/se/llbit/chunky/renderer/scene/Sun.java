@@ -230,12 +230,12 @@ public class Sun {
 		sw.z = FastMath.sin(theta);
 
 		double r = FastMath.sqrt(sw.x*sw.x + sw.z*sw.z);
-		r = FastMath.abs(Math.cos(phi) / r);
+		r = FastMath.abs(FastMath.cos(phi) / r);
 
 		sw.x *= r;
 		sw.z *= r;
 
-		if (Math.abs(sw.x) > .1)
+		if (FastMath.abs(sw.x) > .1)
 			su.set(0, 1, 0);
 		else
 			su.set(1, 0, 0);
@@ -244,7 +244,7 @@ public class Sun {
 		su.cross(sv, sw);
 
 		emittance.set(color);
-		emittance.scale(Math.pow(intensity, Scene.DEFAULT_GAMMA));
+		emittance.scale(FastMath.pow(intensity, Scene.DEFAULT_GAMMA));
 
 		updateSkylightValues();
 	}
@@ -388,7 +388,7 @@ public class Sun {
 		double sunTheta = FastMath.PI/2 - altitude;
 		double cosTheta = FastMath.cos(sunTheta);
 		double cos2Theta = cosTheta*cosTheta;
-		double chi = (4.0/9.0 - turb/120.0)*(Math.PI - 2*sunTheta);
+		double chi = (4.0/9.0 - turb/120.0)*(FastMath.PI - 2*sunTheta);
 		zenith_Y = (4.0453*turb - 4.9710)*Math.tan(chi) - 0.2155*turb + 2.4192;
 		zenith_Y = (zenith_Y < 0) ? -zenith_Y : zenith_Y;
 		zenith_x = chroma(turb, turb2, sunTheta, xZenithChroma);
@@ -432,8 +432,8 @@ public class Sun {
 		Vector3d v = vectorPool.get(sv);
 		Vector3d w = vectorPool.get(sw);
 
-		u.scale(Math.cos(phi)*sin_a);
-		v.scale(Math.sin(phi)*sin_a);
+		u.scale(FastMath.cos(phi)*sin_a);
+		v.scale(FastMath.sin(phi)*sin_a);
 		w.scale(cos_a);
 
 		reflected.d.add(u, v);

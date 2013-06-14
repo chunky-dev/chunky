@@ -361,8 +361,8 @@ public class TestRenderer extends Thread implements ViewListener,
 	@Override
 	public void onMouseDragged(int dx, int dy) {
         camera.rotateView(
-                - (Math.PI / 250) * dx,
-                (Math.PI / 250) * dy);
+                - (FastMath.PI / 250) * dx,
+                (FastMath.PI / 250) * dy);
         refresh();
 	}
 

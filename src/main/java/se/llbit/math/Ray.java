@@ -420,7 +420,7 @@ public class Ray {
 		double ux, uy, uz;
 		double vx, vy, vz;
 
-		if (Math.abs(n.x) > .1) {
+		if (FastMath.abs(n.x) > .1) {
 			xx = 0;
 			xy = 1;
 			xz = 0;

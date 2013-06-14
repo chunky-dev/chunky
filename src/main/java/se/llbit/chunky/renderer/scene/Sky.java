@@ -177,7 +177,7 @@ public class Sky {
 			if (theta < 0)
 				theta += 2 * FastMath.PI;
 		}
-		double phi = FastMath.abs(Math.asin(ray.d.y));
+		double phi = FastMath.abs(FastMath.asin(ray.d.y));
 		skymap.getColor(theta / (2*Math.PI), (2 * phi / FastMath.PI), ray.color);
 		ray.hit = true;
 	}
@@ -236,7 +236,7 @@ public class Sky {
 				if (theta < 0)
 					theta += 2 * FastMath.PI;
 			}
-			double phi = FastMath.abs(Math.asin(ray.d.y));
+			double phi = FastMath.abs(FastMath.asin(ray.d.y));
 			theta /= 2 * FastMath.PI;
 			phi /= FastMath.PI / 2;
 			phi = 1 - phi;

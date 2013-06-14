@@ -1213,7 +1213,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
-				camera.setView(Math.PI, -Math.PI/2);
+				camera.setView(FastMath.PI, -Math.PI/2);
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1261,7 +1261,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
-				camera.setView(Math.PI/2, -Math.PI/2);
+				camera.setView(FastMath.PI/2, -Math.PI/2);
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1984,8 +1984,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	public void onMouseDragged(int dx, int dy) {
 		if (!controlsLocked) {
 	        renderMan.scene().camera().rotateView(
-	                - (Math.PI / 250) * dx,
-	                (Math.PI / 250) * dy);
+	                - (FastMath.PI / 250) * dx,
+	                (FastMath.PI / 250) * dy);
 	        updateCameraDirection();
 		}
 	}
@@ -2124,7 +2124,7 @@ public class RenderControls extends JDialog implements ViewListener,
 					task, decimalFormat.format(done), decimalFormat.format(target)));
 			progressBar.setMinimum(start);
 			progressBar.setMaximum(target);
-			progressBar.setValue(Math.min(target, done));
+			progressBar.setValue(FastMath.min(target, done));
 			etaLbl.setText("ETA: N/A");
 		}
 	}

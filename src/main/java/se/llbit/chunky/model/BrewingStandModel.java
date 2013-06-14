@@ -24,6 +24,8 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 
+import org.apache.commons.math3.util.FastMath;
+
 @SuppressWarnings("javadoc")
 public class BrewingStandModel {
 	private static final AABB[] boxes = new AABB[] {
@@ -77,7 +79,7 @@ public class BrewingStandModel {
 					ray.color.set(color);
 					ray.t = ray.tNear;
 					ray.n.set(quad.n);
-					ray.n.scale(Math.signum(-ray.d.dot(quad.n)));
+					ray.n.scale(FastMath.signum(-ray.d.dot(quad.n)));
 					hit = true;
 				}
 			}
