@@ -186,7 +186,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 		if (logarithmic) {
 			double logMin = FastMath.log10(min);
 			double logMax = FastMath.log10(max);
-			double logValue = (Math.log10(value) - logMin) / (logMax - logMin);
+			double logValue = (FastMath.log10(value) - logMin) / (logMax - logMin);
 			double scale = slider.getMaximum() - slider.getMinimum();
 			sliderValue = (int) (logValue * scale + slider.getMinimum());
 		} else {

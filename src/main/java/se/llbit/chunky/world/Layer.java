@@ -554,7 +554,7 @@ public class Layer {
 						- heightmap.get(cx+x,	cz+z-1)
 						- heightmap.get(cx+x-1, cz+z-1)
 						);
-				gradient = (float) ( (Math.atan(gradient / 15) / (Math.PI/1.7) ) + 1 );
+				gradient = (float) ( (FastMath.atan(gradient / 15) / (FastMath.PI/1.7) ) + 1 );
 
 				rgb[0] *= gradient;
 				rgb[1] *= gradient;

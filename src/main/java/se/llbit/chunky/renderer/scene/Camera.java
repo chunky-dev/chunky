@@ -761,8 +761,8 @@ public class Camera {
 	 * Update the camera transformation matrix.
 	 */
 	synchronized void updateTransform() {
-		tmpTransform.rotX(Math.PI/2 - pitch);
-		transform.rotY(Math.PI/2 + yaw);
+		tmpTransform.rotX(FastMath.PI/2 - pitch);
+		transform.rotY(FastMath.PI/2 + yaw);
 		transform.mul(tmpTransform);
 
 		scene.refresh();
@@ -774,8 +774,8 @@ public class Camera {
 	 */
 	public void moveToPlayer(World world) {
 		if (world != null && world.havePlayerPos()) {
-			pitch = (Math.PI / 2) * ( (world.playerPitch() / 90) - 1);
-			yaw = (Math.PI / 2) * ( -(world.playerYaw() / 90) + 1);
+			pitch = (FastMath.PI / 2) * ( (world.playerPitch() / 90) - 1);
+			yaw = (FastMath.PI / 2) * ( -(world.playerYaw() / 90) + 1);
 			pos.x = world.playerPosX();
 			pos.y = world.playerPosY() + 1.6;
 			pos.z = world.playerPosZ();

@@ -489,8 +489,8 @@ public class CLRenderManager extends Thread implements Renderer,
 
 	@Override
 	public void onMouseDragged(int dx, int dy) {
-		double dyaw = - (Math.PI / 250) * dx;
-		double dpitch = (Math.PI / 250) * dy;
+		double dyaw = - (FastMath.PI / 250) * dx;
+		double dpitch = (FastMath.PI / 250) * dy;
 		double fov = 70;
 		double fovRad = (fov / 360) * FastMath.PI;
 		this.yaw += dyaw * fovRad;
