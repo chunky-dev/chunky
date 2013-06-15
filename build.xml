@@ -1,9 +1,9 @@
 <project name="se.llbit.chunky.nbt" default="build">
 
 	<property name="debug"			value="false"/>
-	<property name="src.dir"		value="src"/>
-	<property name="bin.dir"		value="bin"/>
-	<property name="tools.dir"		value="tools"/>
+	<property name="src.dir"		location="src"/>
+	<property name="bin.dir"		location="bin"/>
+	<property name="tools.dir"		location="tools"/>
 	<property name="nbt.package"	value="se.llbit.nbt"/>
 
 	<property file="${src.dir}/main/res/Version.properties" prefix="Chunky"/>
