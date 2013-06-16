@@ -24,6 +24,15 @@ public class TestQuickMath {
 	}
 
 	/**
+	 * Test double NaN in minimum func.
+	 */
+	@Test
+	public void testMin_2() {
+		assertTrue(11.0 == QuickMath.min(Double.NaN, 11.0));
+		assertTrue(Double.isNaN(QuickMath.min(11.0, Double.NaN)));
+	}
+
+	/**
 	 * Test double precision minimum func.
 	 */
 	@Test
