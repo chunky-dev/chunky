@@ -19,19 +19,23 @@ the GPLv3 license. See the file license/LICENSE.txt for the full license.
 
 Chunky uses the following 3rd party libraries:
 
-* JOCL by Marco Hutter.
+* **JOCL by Marco Hutter.**
 JOCL is covered by the MIT/X11 license.
 See the file license/JOCL.txt for the full license and copyright notice.
-* MWC64X by David Thomas.
-MWC64X is covered by the BSD license.
+* **MWC64X by David Thomas.**
+MWC64X is covered by the Modified BSD License.
 See the file license/MWC64X.txt for the full license and copyright notice.
-* log4j by the Apche Software Foundation.
+* **log4j by the Apche Software Foundation.**
 The log4j library is covered by the Apache License, version 2.0.
-See the file license/LOG4J.txt for the full license.
-See the file license/NOTICE for the copyright notice.
-* Markdown by John Gruber
-Markdown is covered by a BSD-style open source license.
-See the file license/Markdown for the full license.
+See the file license/Apache-2.0.txt for the full license text.
+See the file license/log4j.txt for the copyright notice.
+* **Markdown by John Gruber.**
+Markdown is covered by the Modified BSD License.
+See the file license/Markdown.txt for the full license and copyright notice.
+* **Apache Commons Math library by the Apache Software Foundation.**
+The library is covered by the Apache License, version 2.0.
+See the file license/Apache-2.0.txt for the full license text.
+See the file license/commons-math.txt for the copyright notices.
 
 Building
 --------
