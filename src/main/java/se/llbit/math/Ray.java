@@ -15,9 +15,10 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.math;
-import org.apache.commons.math3.util.FastMath;
 
 import java.util.Random;
+
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Block;
@@ -408,7 +409,7 @@ public class Ray {
 		double x1 = random.nextDouble();
 		double x2 = random.nextDouble();
 		double r = FastMath.sqrt(x1);
-		double theta = 2 * FastMath.PI * x2;
+		double theta = 2 * Math.PI * x2;
 
 		// project to point on hemisphere in tangent space
 		double tx = r * FastMath.cos(theta);
@@ -420,7 +421,7 @@ public class Ray {
 		double ux, uy, uz;
 		double vx, vy, vz;
 
-		if (FastMath.abs(n.x) > .1) {
+		if (QuickMath.abs(n.x) > .1) {
 			xx = 0;
 			xy = 1;
 			xz = 0;
@@ -434,7 +435,7 @@ public class Ray {
 		uy = xz * n.x - xx * n.z;
 		uz = xx * n.y - xy * n.x;
 
-		r = 1/Math.sqrt(ux*ux + uy*uy + uz*uz);
+		r = 1/FastMath.sqrt(ux*ux + uy*uy + uz*uz);
 
 		ux *= r;
 		uy *= r;

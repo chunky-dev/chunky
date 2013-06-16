@@ -46,6 +46,7 @@ import java.util.Random;
 
 import javax.swing.JFrame;
 
+import org.apache.commons.math3.util.FastMath;
 import org.apache.log4j.Logger;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
@@ -89,9 +90,8 @@ import se.llbit.j99.util.DirectiveParser;
 import se.llbit.math.Color;
 import se.llbit.math.Matrix3d;
 import se.llbit.math.Octree;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3d;
-
-import org.apache.commons.math3.util.FastMath;
 
 @SuppressWarnings("javadoc")
 public class CLRenderManager extends Thread implements Renderer,
@@ -121,7 +121,7 @@ public class CLRenderManager extends Thread implements Renderer,
 	private final Vector3d origin = new Vector3d();
 	private final Vector3d up = new Vector3d(0, 1, 0);
 	private double pitch = 0;
-	private double yaw = - FastMath.PI / 2;
+	private double yaw = - Math.PI / 2;
 	private final Matrix3d transform = new Matrix3d();
 	private final Matrix3d tmpTransform = new Matrix3d();
 	private int numSamples = 0;
@@ -337,7 +337,7 @@ public class CLRenderManager extends Thread implements Renderer,
 
 			numSamples += 1;
 			if (numSamples % 10 == 0) {
-				logger.info("SPS: " + (int) ((numSamples * workItems) / FastMath.max(1, (renderTime/1000.))));
+				logger.info("SPS: " + (int) ((numSamples * workItems) / QuickMath.max(1, (renderTime/1000.))));
 			}
 			updateCanvas(samples);
 		}
@@ -387,9 +387,9 @@ public class CLRenderManager extends Thread implements Renderer,
 				// paint the back buffer
 				for (int i = 0; i < bufferWidth*bufferHeight; ++i) {
 					imgData[i] = Color.getRGB(
-							Math.min(1, FastMath.pow(samples[i*3], 1/2.2)),
-							Math.min(1, FastMath.pow(samples[i*3+1], 1/2.2)),
-							Math.min(1, FastMath.pow(samples[i*3+2], 1/2.2)));
+							QuickMath.min(1, FastMath.pow(samples[i*3], 1/2.2)),
+							QuickMath.min(1, FastMath.pow(samples[i*3+1], 1/2.2)),
+							QuickMath.min(1, FastMath.pow(samples[i*3+2], 1/2.2)));
 				}
 
 				// flip buffers
@@ -489,20 +489,20 @@ public class CLRenderManager extends Thread implements Renderer,
 
 	@Override
 	public void onMouseDragged(int dx, int dy) {
-		double dyaw = - (FastMath.PI / 250) * dx;
-		double dpitch = (FastMath.PI / 250) * dy;
+		double dyaw = - (Math.PI / 250) * dx;
+		double dpitch = (Math.PI / 250) * dy;
 		double fov = 70;
-		double fovRad = (fov / 360) * FastMath.PI;
+		double fovRad = (fov / 360) * Math.PI;
 		this.yaw += dyaw * fovRad;
 		this.pitch += dpitch * fovRad;
 
-		this.pitch = FastMath.min(0, this.pitch);
-		this.pitch = FastMath.max(-Math.PI, this.pitch);
+		this.pitch = QuickMath.min(0, this.pitch);
+		this.pitch = QuickMath.max(-Math.PI, this.pitch);
 
-		if (this.yaw > FastMath.PI * 2)
-			this.yaw -= FastMath.PI * 2;
+		if (this.yaw > Math.PI * 2)
+			this.yaw -= Math.PI * 2;
 		else if (this.yaw < -Math.PI * 2)
-			this.yaw += FastMath.PI * 2;
+			this.yaw += Math.PI * 2;
 
 		updateTransform();
 		refresh();
@@ -517,7 +517,7 @@ public class CLRenderManager extends Thread implements Renderer,
 
 	@Override
 	public void onZoom(int diff) {
-		fov = FastMath.min( 175, FastMath.max( 1, fov + diff * 18 ) );
+		fov = QuickMath.min( 175, QuickMath.max( 1, fov + diff * 18 ) );
 		refresh();
 	}
 }

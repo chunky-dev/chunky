@@ -15,10 +15,11 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.scene;
-import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Color;
 import java.util.Random;
+
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.QuickMath;
@@ -141,8 +142,8 @@ public class Sun {
 
 	private double intensity = DEFAULT_INTENSITY;
 
-	private double azimuth = FastMath.PI / 2.5;
-	private double altitude = FastMath.PI / 3;
+	private double azimuth = Math.PI / 2.5;
+	private double altitude = Math.PI / 3;
 
 	private final Vector3d su = new Vector3d();
 	private final Vector3d sv = new Vector3d();
@@ -230,12 +231,12 @@ public class Sun {
 		sw.z = FastMath.sin(theta);
 
 		double r = FastMath.sqrt(sw.x*sw.x + sw.z*sw.z);
-		r = FastMath.abs(FastMath.cos(phi) / r);
+		r = QuickMath.abs(FastMath.cos(phi) / r);
 
 		sw.x *= r;
 		sw.z *= r;
 
-		if (FastMath.abs(sw.x) > .1)
+		if (QuickMath.abs(sw.x) > .1)
 			su.set(0, 1, 0);
 		else
 			su.set(1, 0, 0);
@@ -295,7 +296,7 @@ public class Sun {
 	 * @param value
 	 */
 	public void setAzimuth(double value) {
-		azimuth = QuickMath.modulo(value, FastMath.PI*2);
+		azimuth = QuickMath.modulo(value, Math.PI*2);
 		initSun();
 		scene.refresh();
 	}
@@ -305,7 +306,7 @@ public class Sun {
 	 * @param value
 	 */
 	public void setAltitude(double value) {
-		altitude = QuickMath.clamp(value, 0, FastMath.PI/2);
+		altitude = QuickMath.clamp(value, 0, Math.PI/2);
 		initSun();
 		scene.refresh();
 	}
@@ -345,9 +346,9 @@ public class Sun {
 		double WIDTH = RADIUS*4;
 		double WIDTH2 = WIDTH*2;
 		double a;
-		a = FastMath.PI/2 - FastMath.acos(ray.d.dot(su)) + WIDTH;
+		a = Math.PI/2 - FastMath.acos(ray.d.dot(su)) + WIDTH;
 		if (a >= 0 && a < WIDTH2) {
-			double b = FastMath.PI/2 - FastMath.acos(ray.d.dot(sv)) + WIDTH;
+			double b = Math.PI/2 - FastMath.acos(ray.d.dot(sv)) + WIDTH;
 			if (b >= 0 && b < WIDTH2) {
 				texture.getColor(a / WIDTH2, b / WIDTH2, ray.color);
 				ray.color.x *= emittance.x * 10;
@@ -367,7 +368,7 @@ public class Sun {
 	 */
 	public void flatShading(Ray ray) {
 		double shading = ray.n.x * sw.x + ray.n.y * sw.y + ray.n.z * sw.z;
-		shading = FastMath.max(AMBIENT, shading);
+		shading = QuickMath.max(AMBIENT, shading);
 		ray.color.x *= emittance.x * shading;
 		ray.color.y *= emittance.y * shading;
 		ray.color.z *= emittance.z * shading;
@@ -385,10 +386,10 @@ public class Sun {
 	}
 
 	private void updateSkylightValues() {
-		double sunTheta = FastMath.PI/2 - altitude;
+		double sunTheta = Math.PI/2 - altitude;
 		double cosTheta = FastMath.cos(sunTheta);
 		double cos2Theta = cosTheta*cosTheta;
-		double chi = (4.0/9.0 - turb/120.0)*(FastMath.PI - 2*sunTheta);
+		double chi = (4.0/9.0 - turb/120.0)*(Math.PI - 2*sunTheta);
 		zenith_Y = (4.0453*turb - 4.9710)*Math.tan(chi) - 0.2155*turb + 2.4192;
 		zenith_Y = (zenith_Y < 0) ? -zenith_Y : zenith_Y;
 		zenith_x = chroma(turb, turb2, sunTheta, xZenithChroma);
@@ -426,7 +427,7 @@ public class Sun {
 		double x2 = random.nextDouble();
 		double cos_a = 1-x1 + x1*RADIUS_COS;
 		double sin_a = FastMath.sqrt(1 - cos_a*cos_a);
-		double phi = 2 * FastMath.PI * x2;
+		double phi = 2 * Math.PI * x2;
 
 		Vector3d u = vectorPool.get(su);
 		Vector3d v = vectorPool.get(sv);
@@ -511,8 +512,8 @@ public class Sun {
 	 */
 	public Color getAwtColor() {
 		return new Color(
-				(float) FastMath.min(1, color.x),
-				(float) FastMath.min(1, color.y),
-				(float) FastMath.min(1, color.z));
+				(float) QuickMath.min(1, color.x),
+				(float) QuickMath.min(1, color.y),
+				(float) QuickMath.min(1, color.z));
 	}
 }

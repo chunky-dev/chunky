@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.math;
-import org.apache.commons.math3.util.FastMath;
 
 /**
  * Quick math utility methods.
@@ -77,12 +76,20 @@ public class QuickMath {
 	}
 
 	/**
+	 * @param x
+	 * @return The sign of x
+	 */
+	public static final int signum(float x) {
+		return x < 0 ? -1 : 1;
+	}
+
+	/**
 	 * Convert radians to degrees
 	 * @param rad Radians
 	 * @return Degrees
 	 */
 	public static final double radToDeg(double rad) {
-		return 180 * (rad / FastMath.PI);
+		return 180 * (rad / Math.PI);
 	}
 
 	/**
@@ -100,7 +107,7 @@ public class QuickMath {
 	 * @return Radians
 	 */
 	public static final double degToRad(double deg) {
-		return FastMath.PI * (deg / 180);
+		return Math.PI * (deg / 180);
 	}
 
 	/**
@@ -111,5 +118,63 @@ public class QuickMath {
 	 */
 	public static double clamp(double value, double min, double max) {
 		return value < min ? min : value > max ? max : value;
+	}
+
+	/**
+	 * NB not NaN-correct
+	 * @param a
+	 * @param b
+	 * @return maximum value of a and b
+	 */
+	public static double max(double a, double b) {
+		return (a > b) ? a : b;
+	}
+
+	/**
+	 * NB not NaN-correct
+	 * @param a
+	 * @param b
+	 * @return maximum value of a and b
+	 */
+	public static float max(float a, float b) {
+		return (a > b) ? a : b;
+	}
+
+	/**
+	 * NB disregards NaN. Don't use if a or b can be NaN
+	 * @param a
+	 * @param b
+	 * @return minimum value of a and b
+	 */
+	public static double min(double a, double b) {
+		return (a < b) ? a : b;
+	}
+
+	/**
+	 * NB disregards NaN. Don't use if a or b can be NaN
+	 * @param a
+	 * @param b
+	 * @return minimum value of a and b
+	 */
+	public static float min(float a, float b) {
+		return (a < b) ? a : b;
+	}
+
+	/**
+	 * NB disregards +-0
+	 * @param x
+	 * @return absolute value of x
+	 */
+	public static float abs(float x) {
+		return (x < 0.f) ? -x : x;
+	}
+
+	/**
+	 * NB disregards +-0
+	 * @param x
+	 * @return absolute value of x
+	 */
+	public static double abs(double x) {
+		return (x < 0.0) ? -x : x;
 	}
 }

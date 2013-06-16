@@ -67,8 +67,6 @@ import se.llbit.chunky.world.WorldRenderer;
 import se.llbit.chunky.world.listeners.ChunkDiscoveryListener;
 import se.llbit.util.ProgramProperties;
 
-import org.apache.commons.math3.util.FastMath;
-
 /**
  * Chunky is a Minecraft mapping and rendering tool created by
  * Jesper Öqvist.
@@ -218,21 +216,21 @@ public class Chunky implements ChunkDiscoveryListener {
 					logger.error("Missing argument for -target option");
 					return 1;
 				} else {
-					target = FastMath.max(1, Integer.parseInt(args[++i]));
+					target = Math.max(1, Integer.parseInt(args[++i]));
 				}
 			} else if (args[i].equals("-threads")) {
 				if (i+1 == args.length) {
 					logger.error("Missing argument for -threads option");
 					return 1;
 				} else {
-					renderThreads = FastMath.max(1, Integer.parseInt(args[++i]));
+					renderThreads = Math.max(1, Integer.parseInt(args[++i]));
 				}
 			} else if (args[i].equals("-tile-width")) {
 				if (i+1 == args.length) {
 					logger.error("Missing argument for -tile-width option");
 					return 1;
 				} else {
-					tileWidth = FastMath.max(1, Integer.parseInt(args[++i]));
+					tileWidth = Math.max(1, Integer.parseInt(args[++i]));
 				}
 			} else if (args[i].equals("-opencl")) {
 				openCLEnabled = true;
@@ -453,11 +451,11 @@ public class Chunky implements ChunkDiscoveryListener {
 		chunkParser.clearQueue();
 
 		// enqueue visible regions and chunks
-		for (int rx = FastMath.min(minimap.rx0, map.prx0);
-				rx <= FastMath.max(minimap.rx1, map.prx1); ++rx) {
+		for (int rx = Math.min(minimap.rx0, map.prx0);
+				rx <= Math.max(minimap.rx1, map.prx1); ++rx) {
 
-			for (int rz = FastMath.min(minimap.rz0, map.prz0);
-					rz <= FastMath.max(minimap.rz1, map.prz1); ++rz) {
+			for (int rz = Math.min(minimap.rz0, map.prz0);
+					rz <= Math.max(minimap.rz1, map.prz1); ++rz) {
 
 				Region region = world.getRegion(ChunkPosition.get(rx, rz));
 				if (!region.isEmpty()
@@ -598,7 +596,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	 * @param value
 	 */
 	public synchronized void setLayer(int value) {
-		int layerNew = FastMath.max(0, FastMath.min(Chunk.Y_MAX-1, value));
+		int layerNew = Math.max(0, Math.min(Chunk.Y_MAX-1, value));
 		if (layerNew != world.currentLayer()) {
 			chunkParser.clearQueue();
 			world.setCurrentLayer(layerNew);
@@ -943,7 +941,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	 * @param blockScale
 	 */
 	public synchronized void setScale(int blockScale) {
-		int scaleNew = FastMath.max(BLOCK_SCALE_MIN,
+		int scaleNew = Math.max(BLOCK_SCALE_MIN,
 				Math.min(BLOCK_SCALE_MAX, blockScale));
 		scaleNew = scaleNew == 0 ? 1 : scaleNew*16;
 		if (scaleNew != chunkScale) {

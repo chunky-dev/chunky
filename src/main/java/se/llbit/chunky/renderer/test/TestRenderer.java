@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.test;
-import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -28,6 +27,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
+import org.apache.commons.math3.util.FastMath;
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.renderer.Refreshable;
@@ -42,6 +42,7 @@ import se.llbit.chunky.world.Block;
 import se.llbit.math.Color;
 import se.llbit.math.Matrix3d;
 import se.llbit.math.Quad;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray.RayPool;
 import se.llbit.math.Vector3d;
@@ -190,8 +191,8 @@ public class TestRenderer extends Thread implements ViewListener,
 		Ray ray = rayPool.get();
 
 		camPos.set(0, 0, distance);
-		tmpRot.rotX(-camera.getPitch() - FastMath.PI / 2);
-		rot.rotY(camera.getYaw() + FastMath.PI / 2);
+		tmpRot.rotX(-camera.getPitch() - Math.PI / 2);
+		rot.rotY(camera.getYaw() + Math.PI / 2);
 		rot.mul(tmpRot);
 		rot.transform(camPos);
 		camPos.add(.5, .5, .5);
@@ -214,9 +215,9 @@ public class TestRenderer extends Thread implements ViewListener,
 				ray.x.set(camPos);
 				raytrace(ray);
 
-				ray.color.x = FastMath.min(1, FastMath.sqrt(ray.color.x));
-				ray.color.y = FastMath.min(1, FastMath.sqrt(ray.color.y));
-				ray.color.z = FastMath.min(1, FastMath.sqrt(ray.color.z));
+				ray.color.x = QuickMath.min(1, FastMath.sqrt(ray.color.x));
+				ray.color.y = QuickMath.min(1, FastMath.sqrt(ray.color.y));
+				ray.color.z = QuickMath.min(1, FastMath.sqrt(ray.color.z));
 				buffer.setRGB(x, y, Color.getRGB(ray.color));
 			}
 		}
@@ -325,14 +326,14 @@ public class TestRenderer extends Thread implements ViewListener,
 	@Override
 	public void onMoveForward() {
 		distance -= .1;
-		distance = FastMath.max(.1, distance);
+		distance = QuickMath.max(.1, distance);
 		refresh();
 	}
 
 	@Override
 	public void onMoveBackward() {
 		distance += .1;
-		distance = FastMath.max(.1, distance);
+		distance = QuickMath.max(.1, distance);
 		refresh();
 	}
 
@@ -361,8 +362,8 @@ public class TestRenderer extends Thread implements ViewListener,
 	@Override
 	public void onMouseDragged(int dx, int dy) {
 		camera.rotateView(
-				- (FastMath.PI / 250) * dx,
-				(FastMath.PI / 250) * dy);
+				- (Math.PI / 250) * dx,
+				(Math.PI / 250) * dy);
 		refresh();
 	}
 
@@ -377,7 +378,7 @@ public class TestRenderer extends Thread implements ViewListener,
 	@Override
 	public void onZoom(int diff) {
 		distance += .1 * diff;
-		distance = FastMath.max(.1, distance);
+		distance = QuickMath.max(.1, distance);
 		refresh();
 	}
 

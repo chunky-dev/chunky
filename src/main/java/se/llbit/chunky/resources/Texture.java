@@ -15,13 +15,14 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.resources;
-import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 import javax.swing.ImageIcon;
+
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Color;
@@ -413,8 +414,8 @@ public class Texture {
 		avgColorLinear[3] /= width*height;
 
 		avgColor = Color.getRGBA(FastMath.pow(avgColorLinear[0], 1/Scene.DEFAULT_GAMMA),
-				Math.pow(avgColorLinear[1], 1/Scene.DEFAULT_GAMMA),
-				Math.pow(avgColorLinear[2], 1/Scene.DEFAULT_GAMMA), avgColorLinear[3]);
+				FastMath.pow(avgColorLinear[1], 1/Scene.DEFAULT_GAMMA),
+				FastMath.pow(avgColorLinear[2], 1/Scene.DEFAULT_GAMMA), avgColorLinear[3]);
 	}
 
 	/**

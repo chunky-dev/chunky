@@ -16,6 +16,8 @@
  */
 package se.llbit.math;
 
+import org.apache.commons.math3.util.FastMath;
+
 /**
  * A 3D vector of doubles.
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -99,7 +101,7 @@ public class Vector2d {
 	 * Normalize this vector (scale the vector to unit length)
 	 */
 	public final void normalize() {
-		double s = 1/Math.sqrt(lengthSquared());
+		double s = 1/FastMath.sqrt(lengthSquared());
 		x *= s;
 		y *= s;
 	}

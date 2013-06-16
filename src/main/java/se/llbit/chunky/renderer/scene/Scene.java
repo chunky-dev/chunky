@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.scene;
-import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -39,6 +38,7 @@ import java.util.zip.GZIPOutputStream;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.Postprocess;
@@ -1039,7 +1039,7 @@ public class Scene implements Refreshable {
 		zmin *= 16;
 		zmax *= 16;
 
-		int maxDimension = FastMath.max(Chunk.Y_MAX, FastMath.max(xmax-xmin, zmax-zmin));
+		int maxDimension = Math.max(Chunk.Y_MAX, Math.max(xmax-xmin, zmax-zmin));
 		int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
 
 		int xroom = (1<<requiredDepth)-(xmax-xmin);
@@ -1285,7 +1285,7 @@ public class Scene implements Refreshable {
 	 * @param value
 	 */
 	public synchronized void setRayDepth(int value) {
-		value = FastMath.max(1, value);
+		value = Math.max(1, value);
 		if (rayDepth != value) {
 			rayDepth = value;
 			ProgramProperties.setProperty("rayDepth", "" + value);
@@ -1456,8 +1456,8 @@ public class Scene implements Refreshable {
 	 * @param value
 	 */
 	public void setWaterHeight(int value) {
-		value = FastMath.max(0, value);
-		value = FastMath.min(256, value);
+		value = Math.max(0, value);
+		value = Math.min(256, value);
 		if (value != waterHeight) {
 			waterHeight = value;
 			refresh();
@@ -1482,7 +1482,7 @@ public class Scene implements Refreshable {
 	 * @param value the dumpFrequency to set
 	 */
 	public void setDumpFrequency(int value) {
-		value = FastMath.max(1, value);
+		value = Math.max(1, value);
 		if (value != dumpFrequency) {
 			dumpFrequency = value;
 		}
@@ -1533,8 +1533,8 @@ public class Scene implements Refreshable {
 	 * @param canvasHeight
 	 */
 	public synchronized void setCanvasSize(int canvasWidth, int canvasHeight) {
-		width = FastMath.max(MIN_CANVAS_WIDTH, canvasWidth);
-		height = FastMath.max(MIN_CANVAS_HEIGHT, canvasHeight);
+		width = Math.max(MIN_CANVAS_WIDTH, canvasWidth);
+		height = Math.max(MIN_CANVAS_HEIGHT, canvasHeight);
 		initBuffers();
 		refresh();
 	}
@@ -1905,11 +1905,11 @@ public class Scene implements Refreshable {
 				break;
 			case TONEMAP1:
 				// http://filmicgames.com/archives/75
-				r = FastMath.max(0, r-0.004);
+				r = QuickMath.max(0, r-0.004);
 				r = (r*(6.2*r + .5)) / (r * (6.2*r + 1.7) + 0.06);
-				g = FastMath.max(0, g-0.004);
+				g = QuickMath.max(0, g-0.004);
 				g = (g*(6.2*g + .5)) / (g * (6.2*g + 1.7) + 0.06);
-				b = FastMath.max(0, b-0.004);
+				b = QuickMath.max(0, b-0.004);
 				b = (b*(6.2*b + .5)) / (b * (6.2*b + 1.7) + 0.06);
 				break;
 			case GAMMA:
@@ -1924,9 +1924,9 @@ public class Scene implements Refreshable {
 			b = FastMath.sqrt(b);
 		}
 
-		r = FastMath.min(1, r);
-		g = FastMath.min(1, g);
-		b = FastMath.min(1, b);
+		r = QuickMath.min(1, r);
+		g = QuickMath.min(1, g);
+		b = QuickMath.min(1, b);
 
 		bufferData[x + y * width] = Color.getRGB(r, g, b);
 	}

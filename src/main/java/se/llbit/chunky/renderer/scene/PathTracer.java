@@ -15,12 +15,14 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.scene;
-import org.apache.commons.math3.util.FastMath;
 
 import java.util.Random;
 
+import org.apache.commons.math3.util.FastMath;
+
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.world.Block;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray.RayPool;
 import se.llbit.math.Vector3d;
@@ -315,7 +317,7 @@ public class PathTracer {
 			// do water fog
 			if (!scene.clearWater && prevBlock == Block.WATER) {
 				double a = ray.distance / scene.waterVisibility;
-				double attenuation = 1 - FastMath.min(1, a*a);
+				double attenuation = 1 - QuickMath.min(1, a*a);
 				ray.color.scale(attenuation);
 				/*ray.color.x *= attenuation;
 				ray.color.y *= attenuation;
@@ -396,7 +398,7 @@ public class PathTracer {
 			attenuation *= 1 - ray.color.w;
 			if (!scene.clearWater && ray.getPrevBlock() == Block.WATER) {
 				double a = ray.distance / scene.waterVisibility;
-				attenuation *= 1 - FastMath.min(1, a*a);
+				attenuation *= 1 - QuickMath.min(1, a*a);
 			}
 		}
 		return attenuation;

@@ -15,11 +15,11 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.scene;
-import org.apache.commons.math3.util.FastMath;
 
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.world.Chunk;
@@ -154,8 +154,8 @@ public class Camera {
 		@Override
 		public void apply(double x, double y, Random random, Vector3d o,
 				Vector3d d) {
-			double ay = y * fov * FastMath.PI / 180;
-			double ax = x * fov * FastMath.PI / 180;
+			double ay = y * fov * Math.PI / 180;
+			double ax = x * fov * Math.PI / 180;
 			double avSquared = ay * ay + ax * ax;
 			double angleFromCenter = FastMath.sqrt(avSquared);
 			double dz = FastMath.cos(angleFromCenter);
@@ -201,8 +201,8 @@ public class Camera {
 		@Override
 		public void apply(double x, double y, Random random, Vector3d o,
 				Vector3d d) {
-			double ay = y * fov * FastMath.PI / 180;
-			double ax = x * fov * FastMath.PI / 180;
+			double ay = y * fov * Math.PI / 180;
+			double ax = x * fov * Math.PI / 180;
 
 			double vv = FastMath.cos(ay);
 
@@ -242,7 +242,7 @@ public class Camera {
 		@Override
 		public void apply(double x, double y, Random random, Vector3d o,
 				Vector3d d) {
-			double ax = x * fov * FastMath.PI / 180;
+			double ax = x * fov * Math.PI / 180;
 			double dz = FastMath.cos(ax);
 			double dx = FastMath.sin(ax);
 			double dy = fovTan * y;
@@ -337,8 +337,8 @@ public class Camera {
 		public ForwardDisplacementProjector(Projector wrapped,
 				double displacement) {
 			this.wrapped = wrapped;
-			this.displacementValue = FastMath.abs(displacement);
-			this.displacementSign = FastMath.signum(displacement);
+			this.displacementValue = QuickMath.abs(displacement);
+			this.displacementSign = QuickMath.signum(displacement);
 		}
 
 		@Override
@@ -420,7 +420,7 @@ public class Camera {
 	 */
 	private final Vector3d u = new Vector3d();
 
-	private double yaw = - FastMath.PI / 2;
+	private double yaw = - Math.PI / 2;
 	private double pitch = 0;
 
 	/**
@@ -729,17 +729,17 @@ public class Camera {
 	 * @param pitch
 	 */
 	public synchronized void rotateView(double yaw, double pitch) {
-		double fovRad = (fov / 360) * FastMath.PI;
+		double fovRad = (fov / 360) * Math.PI;
 		this.yaw += yaw * fovRad;
 		this.pitch += pitch * fovRad;
 
-		this.pitch = FastMath.min(0, this.pitch);
-		this.pitch = FastMath.max(-Math.PI, this.pitch);
+		this.pitch = QuickMath.min(0, this.pitch);
+		this.pitch = QuickMath.max(-Math.PI, this.pitch);
 
-		if (this.yaw > FastMath.PI * 2) {
-			this.yaw -= FastMath.PI * 2;
+		if (this.yaw > Math.PI * 2) {
+			this.yaw -= Math.PI * 2;
 		} else if (this.yaw < -Math.PI * 2) {
-			this.yaw += FastMath.PI * 2;
+			this.yaw += Math.PI * 2;
 		}
 
 		updateTransform();
@@ -761,8 +761,8 @@ public class Camera {
 	 * Update the camera transformation matrix.
 	 */
 	synchronized void updateTransform() {
-		tmpTransform.rotX(FastMath.PI/2 - pitch);
-		transform.rotY(FastMath.PI/2 + yaw);
+		tmpTransform.rotX(Math.PI/2 - pitch);
+		transform.rotY(Math.PI/2 + yaw);
 		transform.mul(tmpTransform);
 
 		scene.refresh();
@@ -774,8 +774,8 @@ public class Camera {
 	 */
 	public void moveToPlayer(World world) {
 		if (world != null && world.havePlayerPos()) {
-			pitch = (FastMath.PI / 2) * ( (world.playerPitch() / 90) - 1);
-			yaw = (FastMath.PI / 2) * ( -(world.playerYaw() / 90) + 1);
+			pitch = (Math.PI / 2) * ( (world.playerPitch() / 90) - 1);
+			yaw = (Math.PI / 2) * ( -(world.playerYaw() / 90) + 1);
 			pos.x = world.playerPosX();
 			pos.y = world.playerPosY() + 1.6;
 			pos.z = world.playerPosZ();

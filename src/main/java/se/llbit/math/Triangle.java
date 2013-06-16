@@ -16,8 +16,6 @@
  */
 package se.llbit.math;
 
-import org.apache.commons.math3.util.FastMath;
-
 /**
  * A class to test intersection against a three-dimensional,
  * non-degenerate triangle.
@@ -80,7 +78,7 @@ public class Triangle {
 
 		// test that the ray is heading toward the plane
 		double denom = ray.d.dot(n);
-		if (FastMath.abs(denom) > Ray.EPSILON) {
+		if (QuickMath.abs(denom) > Ray.EPSILON) {
 
 			// test for intersection with the plane at origin
 			double t = - (ix*n.x + iy*n.y + iz*n.z + d) / denom;

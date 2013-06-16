@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Clouds;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray.RayPool;
 
@@ -85,7 +86,7 @@ public class RayTracer {
 				ray.prevMaterial = ray.currentMaterial;
 				ray.currentMaterial = Block.GRASS_ID;
 				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
-				ray.n.set(0, -Math.signum(ray.d.y), 0);
+				ray.n.set(0, -QuickMath.signum(ray.d.y), 0);
 				ray.distance += ray.tNear;
 			}
 			rayPool.dispose(oct);

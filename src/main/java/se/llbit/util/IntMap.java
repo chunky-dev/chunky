@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.util;
-import org.apache.commons.math3.util.FastMath;
 
 import java.util.Iterator;
 
@@ -106,7 +105,7 @@ public class IntMap<V> implements Iterable<V> {
 	}
 
 	private static final int hash(int key) {
-		return FastMath.abs(key % NUM_BUCKETS);
+		return Math.abs(key % NUM_BUCKETS);
 	}
 
 	/**

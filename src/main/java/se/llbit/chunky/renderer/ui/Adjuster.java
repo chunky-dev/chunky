@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.ui;
-import org.apache.commons.math3.util.FastMath;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +29,10 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.apache.commons.math3.util.FastMath;
+
+import se.llbit.math.QuickMath;
 
 /**
  * Adjusts a rendering parameter.
@@ -130,8 +133,8 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 		JTextField source = (JTextField) e.getSource();
 		try {
 			double value = numberFormat.parse(source.getText()).doubleValue();
-			value = FastMath.max(value, min);
-			value = FastMath.min(value, max);
+			value = QuickMath.max(value, min);
+			value = QuickMath.min(value, max);
 			setSlider(value);
 			valueChanged(value);
 		} catch (NumberFormatException ex) {

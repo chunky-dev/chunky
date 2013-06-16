@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.ui;
-import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -59,6 +58,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import org.apache.commons.math3.util.FastMath;
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.main.Chunky;
@@ -1213,7 +1213,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
-				camera.setView(FastMath.PI, -Math.PI/2);
+				camera.setView(Math.PI, -Math.PI/2);
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1237,7 +1237,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
-				camera.setView(-Math.PI/2, FastMath.PI);
+				camera.setView(-Math.PI/2, Math.PI);
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1261,7 +1261,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
-				camera.setView(FastMath.PI/2, -Math.PI/2);
+				camera.setView(Math.PI/2, -Math.PI/2);
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1538,8 +1538,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		public void actionPerformed(ActionEvent e) {
 			try {
 				int index = dumpFrequency.getSelectedIndex();
-				index = FastMath.max(0, index);
-				index = FastMath.min(dumpFrequencies.length-1, index);
+				index = Math.max(0, index);
+				index = Math.min(dumpFrequencies.length-1, index);
 				renderMan.scene().setDumpFrequency(dumpFrequencies[index]);
 			} catch (NumberFormatException e1) {
 			}
@@ -1664,7 +1664,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			JSlider source = (JSlider) e.getSource();
 			double value = (double) (source.getValue() - source.getMinimum())
 					/ (source.getMaximum() - source.getMinimum());
-			double rotation = value * 2 * FastMath.PI;
+			double rotation = value * 2 * Math.PI;
 			renderMan.scene().sky().setRotation(rotation);
 			ProgramProperties.setProperty("skymapRotation", Double.toString(rotation));
 		}
@@ -1805,7 +1805,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	protected void updateSkyRotation() {
 		skyRotationSlider.removeChangeListener(skyRotationListener);
 		skyRotationSlider.setValue((int) FastMath.round(
-				100 * renderMan.scene().sky().getRotation() / (2 * FastMath.PI)));
+				100 * renderMan.scene().sky().getRotation() / (2 * Math.PI)));
 		skyRotationSlider.addChangeListener(skyRotationListener);
 	}
 
@@ -1984,8 +1984,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	public void onMouseDragged(int dx, int dy) {
 		if (!controlsLocked) {
 	        renderMan.scene().camera().rotateView(
-	                - (FastMath.PI / 250) * dx,
-	                (FastMath.PI / 250) * dy);
+	                - (Math.PI / 250) * dx,
+	                (Math.PI / 250) * dy);
 	        updateCameraDirection();
 		}
 	}
@@ -2124,7 +2124,7 @@ public class RenderControls extends JDialog implements ViewListener,
 					task, decimalFormat.format(done), decimalFormat.format(target)));
 			progressBar.setMinimum(start);
 			progressBar.setMaximum(target);
-			progressBar.setValue(FastMath.min(target, done));
+			progressBar.setValue(Math.min(target, done));
 			etaLbl.setText("ETA: N/A");
 		}
 	}

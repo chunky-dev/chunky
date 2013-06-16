@@ -21,6 +21,7 @@ import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Color;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
@@ -59,7 +60,7 @@ public class LilyPadModel {
 				ray.color.y *= lilyPadColor[1];
 				ray.color.z *= lilyPadColor[2];
 				ray.n.set(0, 1, 0);
-				ray.n.scale(-Math.signum(ray.d.y));
+				ray.n.scale(-QuickMath.signum(ray.d.y));
 				ray.distance += ray.tNear;
 				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
 				return true;

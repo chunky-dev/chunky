@@ -18,6 +18,7 @@ package se.llbit.chunky.model;
 
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
@@ -33,7 +34,7 @@ public class EndPortalModel {
 		if (quad.intersect(ray)) {
 			ray.color.set(0, 0, 0, 1);
 			ray.n.set(quad.n);
-			ray.n.scale(-Math.signum(ray.d.dot(quad.n)));
+			ray.n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
 			ray.distance += ray.tNear;
 			ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
 			return true;

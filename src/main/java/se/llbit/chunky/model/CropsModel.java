@@ -19,10 +19,10 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
-import org.apache.commons.math3.util.FastMath;
 
 @SuppressWarnings("javadoc")
 public class CropsModel {
@@ -50,7 +50,7 @@ public class CropsModel {
 					ray.color.set(color);
 					ray.t = ray.tNear;
 					ray.n.set(quad.n);
-					ray.n.scale(FastMath.signum(-ray.d.dot(quad.n)));
+					ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
 					hit = true;
 				}
 			}

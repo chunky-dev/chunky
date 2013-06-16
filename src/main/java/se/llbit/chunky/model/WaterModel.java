@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.model;
-import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.DoubleSidedQuad;
@@ -194,7 +193,7 @@ public class WaterModel {
 					Texture.water.getAvgColorLinear(ray.color);
 					ray.t = ray.tNear;
 					ray.n.set(quad.n);
-					ray.n.scale(FastMath.signum(-ray.d.dot(quad.n)));
+					ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
 					hit = true;
 				}
 			}
@@ -206,11 +205,11 @@ public class WaterModel {
 				/*if ((level&8) != 0) {
 					// falling water
 					if (ray.n.x != 0) {
-						double sign = FastMath.signum(ray.n.x);
+						double sign = QuickMath.signum(ray.n.x);
 						doWaterDisplacement(ray);
 						ray.n.set(ray.n.y*sign, ray.n.x, ray.n.z);
 					} else {
-						double sign = FastMath.signum(ray.n.z);
+						double sign = QuickMath.signum(ray.n.z);
 						doWaterDisplacement(ray);
 						ray.n.set(ray.n.x, ray.n.z, ray.n.y*sign);
 					}
@@ -228,7 +227,7 @@ public class WaterModel {
 		boolean hit = false;
 		if (bot.intersect(ray)) {
 			ray.n.set(bot.n);
-			ray.n.scale(-Math.signum(ray.d.dot(bot.n)));
+			ray.n.scale(-QuickMath.signum(ray.d.dot(bot.n)));
 			ray.t = ray.tNear;
 			hit = true;
 		}
@@ -240,14 +239,14 @@ public class WaterModel {
 		Triangle triangle = t012[c0][c1][c2];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			hit = true;
 		}
 		triangle = t230[c2][c3][c0];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			ray.u = 1-ray.u;
 			ray.v = 1-ray.v;
@@ -256,14 +255,14 @@ public class WaterModel {
 		triangle = westt[c0][c3];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			hit = true;
 		}
 		triangle = westb[c0];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			ray.u = 1-ray.u;
 			ray.v = 1-ray.v;
@@ -272,14 +271,14 @@ public class WaterModel {
 		triangle = eastt[c1][c2];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			hit = true;
 		}
 		triangle = eastb[c1];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			ray.u = 1-ray.u;
 			ray.v = 1-ray.v;
@@ -288,14 +287,14 @@ public class WaterModel {
 		triangle = southt[c0][c1];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			hit = true;
 		}
 		triangle = southb[c1];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			ray.u = 1-ray.u;
 			ray.v = 1-ray.v;
@@ -304,14 +303,14 @@ public class WaterModel {
 		triangle = northt[c2][c3];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			hit = true;
 		}
 		triangle = northb[c2];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			ray.u = 1-ray.u;
 			ray.v = 1-ray.v;

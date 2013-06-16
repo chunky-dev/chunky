@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.math;
+
 import org.apache.commons.math3.util.FastMath;
 
 /**
@@ -125,7 +126,7 @@ public class Vector3d {
 	 * Normalize this vector (scale the vector to unit length)
 	 */
 	public final void normalize() {
-		double s = 1/Math.sqrt(lengthSquared());
+		double s = 1/FastMath.sqrt(lengthSquared());
 		x *= s;
 		y *= s;
 		z *= s;

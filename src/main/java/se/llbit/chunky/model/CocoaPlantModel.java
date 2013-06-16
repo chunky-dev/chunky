@@ -19,11 +19,11 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
-import org.apache.commons.math3.util.FastMath;
 
 /**
  * Renders the Cocoa Plant
@@ -152,7 +152,7 @@ public class CocoaPlantModel {
 				ray.color.set(color);
 				ray.t = ray.tNear;
 				ray.n.set(stem[direction].n);
-				ray.n.scale(FastMath.signum(-ray.d.dot(stem[direction].n)));
+				ray.n.scale(QuickMath.signum(-ray.d.dot(stem[direction].n)));
 				hit = true;
 			}
 		}

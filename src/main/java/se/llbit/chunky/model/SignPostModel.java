@@ -15,7 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.model;
-import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
@@ -82,7 +81,7 @@ public class SignPostModel {
 		// rotate the sign post to face the correct direction
 		rot[0] = sides;
 		for (int i = 1; i < 16; ++i) {
-			rot[i] = Model.rotateY(sides, - i * FastMath.PI/8);
+			rot[i] = Model.rotateY(sides, - i * Math.PI/8);
 		}
 	}
 
