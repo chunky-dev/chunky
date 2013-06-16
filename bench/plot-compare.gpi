@@ -1,0 +1,30 @@
+#!/usr/bin/gnuplot -persist
+
+col1 = "#5382A1"
+col2 = "#E76F00"
+
+set autoscale
+set xlabel 'tilewidth'
+set ylabel 'SPP'
+set grid
+set key left top
+
+set xtics right rotate by 45
+
+set auto x
+set yrange [0:1500000]
+
+set term png size 600,500
+set output 'graph.png'
+
+set style fill solid
+set boxwidth 0.25
+
+plot 'data1' using :2:xtic(1) t 'spp1' lc rgb col1 with boxes, \
+     ''      using :2:3:4 notit pt -1 lc rgb "black" with yerrorbars, \
+     'data2' using ($0+0.25):2 t 'spp2' lc rgb col2 with boxes, \
+     ''      using ($0+0.25):2:3:4 notit pt -1 lc rgb "black" with yerrorbars
+
+set term wxt
+replot
+
