@@ -51,6 +51,7 @@ public class Credits extends JDialog {
 			"<html><b>Programming:</b><br>" +
 			"Jesper Öqvist<br>" +
 			"TOGoS (projection & misc.)<br>" +
+			"twirrim (FastMath)<br>" +
 			"<br>" +
 			"<b>OSX Bundling:</b><br>" +
 			"Ben Phelps<br>" +
