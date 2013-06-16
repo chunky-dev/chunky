@@ -34,7 +34,7 @@ public class Heightmap {
      * @param x
      * @param z
      */
-    public void set(int y, int x, int z) {
+    public synchronized void set(int y, int x, int z) {
         ChunkPosition cp = ChunkPosition.get(x >> 5, z >> 5);
         ChunkHeightmap hm = map.get(cp);
         if (hm == null) {
@@ -49,7 +49,7 @@ public class Heightmap {
      * @param z
      * @return Height at (x, z)
      */
-    public int get(int x, int z) {
+    public synchronized int get(int x, int z) {
         ChunkPosition cp = ChunkPosition.get(x >> 5, z >> 5);
         ChunkHeightmap hm = map.get(cp);
         if (hm == null) {
