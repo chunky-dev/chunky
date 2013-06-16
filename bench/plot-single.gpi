@@ -19,7 +19,7 @@ set output 'graph.png'
 set style fill solid
 set boxwidth 0.25
 
-plot datafile using :2:xtic(1) t 'spp' lc rgb col1 with boxes, \
+plot datafile using :2:xtic(1) t 'sps' lc rgb col1 with boxes, \
      ''      using :2:3:4 notit pt -1 lc rgb "black" with yerrorbars
 
 set term wxt
