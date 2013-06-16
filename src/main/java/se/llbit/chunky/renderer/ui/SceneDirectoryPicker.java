@@ -167,55 +167,55 @@ public class SceneDirectoryPicker extends JDialog {
 	 * or <code>null</code> if the scene directory was not set or could not be opened
 	 */
 	public static File getCurrentSceneDirectory() {
-    	if (ProgramProperties.containsKey("sceneDirectory")) {
-    		File sceneDir = new File(ProgramProperties.getProperty("sceneDirectory"));
-    		if (tryCreateSceneDir(sceneDir))
-    			return sceneDir;
-    	}
-    	return null;
+		if (ProgramProperties.containsKey("sceneDirectory")) {
+			File sceneDir = new File(ProgramProperties.getProperty("sceneDirectory"));
+			if (tryCreateSceneDir(sceneDir))
+				return sceneDir;
+		}
+		return null;
 	}
 
-    /**
-     * Ask user for the directory to place scene descriptions and
-     * render dumps in.
-     * @param parent
-     * @return The selected scene directory
-     */
-    public static File getSceneDirectory(JFrame parent) {
-    	File sceneDir = getCurrentSceneDirectory();
+	/**
+	 * Ask user for the directory to place scene descriptions and
+	 * render dumps in.
+	 * @param parent
+	 * @return The selected scene directory
+	 */
+	public static File getSceneDirectory(JFrame parent) {
+		File sceneDir = getCurrentSceneDirectory();
 
-    	if (sceneDir != null)
-    		return sceneDir;
-    	else
-    		return changeSceneDirectory(parent);
+		if (sceneDir != null)
+			return sceneDir;
+		else
+			return changeSceneDirectory(parent);
 	}
 
-    /**
-     * Opens a dialog asking the user to specify a new scene directory
-     * @param parent
-     * @return The file representing the selected directory
-     */
-    public static File changeSceneDirectory(JFrame parent) {
+	/**
+	 * Opens a dialog asking the user to specify a new scene directory
+	 * @param parent
+	 * @return The file representing the selected directory
+	 */
+	public static File changeSceneDirectory(JFrame parent) {
 
-    	while (true) {
-    		SceneDirectoryPicker sceneDirPicker =
-    				new SceneDirectoryPicker(parent);
-    		sceneDirPicker.setVisible(true);
-    		if (!sceneDirPicker.isAccepted())
-    			return null;
-    		File sceneDir = sceneDirPicker.getSelectedDirectory();
-    		if (tryCreateSceneDir(sceneDir))
-    			return sceneDir;
-    	}
+		while (true) {
+			SceneDirectoryPicker sceneDirPicker =
+					new SceneDirectoryPicker(parent);
+			sceneDirPicker.setVisible(true);
+			if (!sceneDirPicker.isAccepted())
+				return null;
+			File sceneDir = sceneDirPicker.getSelectedDirectory();
+			if (tryCreateSceneDir(sceneDir))
+				return sceneDir;
+		}
 	}
 
 	private static boolean tryCreateSceneDir(File sceneDir) {
-    	if (!sceneDir.exists())
-    		sceneDir.mkdir();
-    	if (sceneDir.exists() && sceneDir.isDirectory() && sceneDir.canWrite())
-    		return true;
+		if (!sceneDir.exists())
+			sceneDir.mkdir();
+		if (sceneDir.exists() && sceneDir.isDirectory() && sceneDir.canWrite())
+			return true;
 
 		logger.warn("Could not open or create the scene directory " + sceneDir.getAbsolutePath());
-    	return false;
+		return false;
 	}
 }

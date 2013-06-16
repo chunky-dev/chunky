@@ -312,14 +312,14 @@ public class TestRenderer extends Thread implements ViewListener,
 
 	@Override
 	public void onStrafeLeft() {
-        camera.strafeLeft(.5);
-        refresh();
+		camera.strafeLeft(.5);
+		refresh();
 	}
 
 	@Override
 	public void onStrafeRight() {
-        camera.strafeRight(.5);
-        refresh();
+		camera.strafeRight(.5);
+		refresh();
 	}
 
 	@Override
@@ -343,27 +343,27 @@ public class TestRenderer extends Thread implements ViewListener,
 
 	@Override
 	public void onMoveBackwardFar() {
-        // do nothing
+		// do nothing
 	}
 
 	@Override
 	public void onMoveUp() {
-        camera.moveUp(.5);
-        refresh();
+		camera.moveUp(.5);
+		refresh();
 	}
 
 	@Override
 	public void onMoveDown() {
-        camera.moveDown(.5);
-        refresh();
+		camera.moveDown(.5);
+		refresh();
 	}
 
 	@Override
 	public void onMouseDragged(int dx, int dy) {
-        camera.rotateView(
-                - (FastMath.PI / 250) * dx,
-                (FastMath.PI / 250) * dy);
-        refresh();
+		camera.rotateView(
+				- (FastMath.PI / 250) * dx,
+				(FastMath.PI / 250) * dy);
+		refresh();
 	}
 
 	@Override

@@ -49,11 +49,11 @@ public class PlayerExtractor {
 			DataInputStream in = new DataInputStream(new GZIPInputStream(new FileInputStream(fn)));
 
 			Set<String> request = new HashSet<String>();
-            request.add(".Data.Player");
-            Map<String, AnyTag> result = NamedTag.quickParse(in, request);
-            in.close();
+			request.add(".Data.Player");
+			Map<String, AnyTag> result = NamedTag.quickParse(in, request);
+			in.close();
 
-            AnyTag playerTag = result.get(".Data.Player");
+			AnyTag playerTag = result.get(".Data.Player");
 
 			System.out.println("writing output to "+outFn);
 			DataOutputStream out = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(outFn)));

@@ -180,19 +180,19 @@ public class Scene implements Refreshable {
 	protected final Sun sun = new Sun(this);
 
 	/**
- 	 * World
- 	 */
+	 * World
+	 */
 	private World loadedWorld;
 	private int loadedDimension;
 
 	/**
- 	 * Octree origin
- 	 */
+	 * Octree origin
+	 */
 	protected Vector3i origin = new Vector3i();
 
 	/**
- 	 * Octree
- 	 */
+	 * Octree
+	 */
 	protected Octree octree;
 
 	private double exposure = DEFAULT_EXPOSURE;
@@ -216,8 +216,8 @@ public class Scene implements Refreshable {
 	private Postprocess postprocess = Postprocess.GAMMA;
 
 	/**
- 	 * Preview frame interlacing counter.
- 	 */
+	 * Preview frame interlacing counter.
+	 */
 	public int previewCount;
 
 	protected boolean clearWater = false;
@@ -276,13 +276,13 @@ public class Scene implements Refreshable {
 	public Scene() {
 		octree = new Octree(1);// empty octree
 
-        width = ProgramProperties.getIntProperty("3dcanvas.width",
-        		RenderableCanvas.DEFAULT_WIDTH);
-        height = ProgramProperties.getIntProperty("3dcanvas.height",
-        		RenderableCanvas.DEFAULT_HEIGHT);
+		width = ProgramProperties.getIntProperty("3dcanvas.width",
+				RenderableCanvas.DEFAULT_WIDTH);
+		height = ProgramProperties.getIntProperty("3dcanvas.height",
+				RenderableCanvas.DEFAULT_HEIGHT);
 
-        sppTarget = ProgramProperties.getIntProperty("sppTargetDefault",
-        		DEFAULT_SPP_TARGET);
+		sppTarget = ProgramProperties.getIntProperty("sppTargetDefault",
+				DEFAULT_SPP_TARGET);
 
 		initBuffers();
 
@@ -521,7 +521,7 @@ public class Scene implements Refreshable {
 			camera.load((CompoundTag) result.get(cvf_camera));
 		}
 
-		if (result.containsKey(cvf_world))  {
+		if (result.containsKey(cvf_world))	{
 			CompoundTag worldTag = (CompoundTag) result.get(cvf_world);
 
 			String worldDirectoryPath = worldTag.get("worldDirectoryPath").stringValue();
@@ -880,8 +880,8 @@ public class Scene implements Refreshable {
 									long wy = cy + 1;
 									long wz = cp.z * 16L + cz;
 									long pr = (wx * 3129871L) ^ (wz * 116129781L) ^ (wy);
-							        pr = pr * pr * 42317861L + pr * 11L;
-							        int dir = 3 & (int)(pr >> 16);
+									pr = pr * pr * 42317861L + pr * 11L;
+									int dir = 3 & (int)(pr >> 16);
 									type |= (dir<<BlockData.LILY_PAD_ROTATION);
 								}
 							}
@@ -1222,8 +1222,8 @@ public class Scene implements Refreshable {
 	}
 
 	/**
- 	 * Start rendering the scene.
- 	 */
+	 * Start rendering the scene.
+	 */
 	public synchronized void startRender() {
 		if (!pathTrace) {
 			pathTrace = true;
@@ -1233,24 +1233,24 @@ public class Scene implements Refreshable {
 	}
 
 	/**
- 	 * Pause the renderer.
- 	 */
+	 * Pause the renderer.
+	 */
 	public synchronized void pauseRender() {
 		pauseRender = true;
 	}
 
 	/**
- 	 * Resume a paused render.
- 	 */
+	 * Resume a paused render.
+	 */
 	public synchronized void resumeRender() {
 		pauseRender = false;
 		notifyAll();
 	}
 
 	/**
- 	 * Halt the rendering process.
- 	 * Puts the renderer back in preview mode.
- 	 */
+	 * Halt the rendering process.
+	 * Puts the renderer back in preview mode.
+	 */
 	public synchronized void haltRender() {
 		if (pathTrace) {
 			pathTrace = false;
@@ -1361,7 +1361,7 @@ public class Scene implements Refreshable {
 	 */
 	public void setClearWater(boolean value) {
 		if (value != clearWater) {
-			clearWater  = value;
+			clearWater	= value;
 			refresh();
 		}
 	}

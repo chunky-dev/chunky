@@ -74,7 +74,7 @@ public class WorldRenderer {
 			for (int x = 0; x < width; x++) {
 				int cx = x + view.ix0;
 				ChunkPosition pos = ChunkPosition.get(cx, cz);
-			    Chunk chunk = world.getChunk(pos);
+				Chunk chunk = world.getChunk(pos);
 				if (!chunk.isEmpty()) {
 					if (selection.isSelected(pos)) {
 						se.llbit.math.Color.getRGBComponents(chunk.avgColor(),
@@ -168,8 +168,8 @@ public class WorldRenderer {
 
 		if (world.haveSpawnPos()) {
 			renderSpawn(world, g, view,
-			        renderer == Chunk.surfaceRenderer
-			        || world.spawnPosY() == world.currentLayer());
+					renderer == Chunk.surfaceRenderer
+					|| world.spawnPosY() == world.currentLayer());
 		}
 
 		Chunk hoveredChunk = chunky.getHoveredChunk();
@@ -204,15 +204,15 @@ public class WorldRenderer {
 		int pz = (int) FastMath.floor(world.spawnPosZ() * blockScale);
 		int ppx = px - (int) FastMath.floor(view.x0 * view.chunkScale);
 		int ppy = pz - (int) FastMath.floor(view.z0 * view.chunkScale);
-        int pw = (int) FastMath.max(8, FastMath.min(16, blockScale * 2));
-        ppx = FastMath.min(view.width-pw, FastMath.max(0, ppx-pw/2));
+		int pw = (int) FastMath.max(8, FastMath.min(16, blockScale * 2));
+		ppx = FastMath.min(view.width-pw, FastMath.max(0, ppx-pw/2));
 		ppy = FastMath.min(view.height-pw, FastMath.max(0, ppy-pw/2));
 
-        if (sameLayer)
-            g.drawImage(MiscImages.home, ppx, ppy, pw, pw, null);
-        else
-            g.drawImage(MiscImages.home_t, ppx, ppy, pw, pw, null);
-    }
+		if (sameLayer)
+			g.drawImage(MiscImages.home, ppx, ppy, pw, pw, null);
+		else
+			g.drawImage(MiscImages.home_t, ppx, ppy, pw, pw, null);
+	}
 
 	/**
 	 * Set the highlight enable flag

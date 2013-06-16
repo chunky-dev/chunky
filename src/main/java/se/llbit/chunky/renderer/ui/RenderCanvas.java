@@ -35,20 +35,20 @@ public class RenderCanvas extends JPanel implements RenderableCanvas {
 
 	private Renderer renderer;
 
-    /**
-     * Create new canvas
-     */
-    public RenderCanvas() {
+	/**
+	 * Create new canvas
+	 */
+	public RenderCanvas() {
 
-        setBackground(Color.white);
-        // apparently setting the same preferred size twice will cancel all
-        // other calls to setPreferredSize
-        setPreferredSize(new Dimension(
-        		ProgramProperties.getIntProperty("3dcanvas.width", RenderableCanvas.DEFAULT_WIDTH),
-        		ProgramProperties.getIntProperty("3dcanvas.height", RenderableCanvas.DEFAULT_HEIGHT)));
-        setMinimumSize(new Dimension(100, 100));
-        setIgnoreRepaint(false);
-    }
+		setBackground(Color.white);
+		// apparently setting the same preferred size twice will cancel all
+		// other calls to setPreferredSize
+		setPreferredSize(new Dimension(
+				ProgramProperties.getIntProperty("3dcanvas.width", RenderableCanvas.DEFAULT_WIDTH),
+				ProgramProperties.getIntProperty("3dcanvas.height", RenderableCanvas.DEFAULT_HEIGHT)));
+		setMinimumSize(new Dimension(100, 100));
+		setIgnoreRepaint(false);
+	}
 
 	@Override
 	protected void paintComponent(Graphics g) {

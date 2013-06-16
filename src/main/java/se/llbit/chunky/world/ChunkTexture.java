@@ -26,36 +26,36 @@ import java.io.IOException;
  */
 public class ChunkTexture {
 
-    float[][] data = new float[Chunk.X_MAX * Chunk.Z_MAX][3];
+	float[][] data = new float[Chunk.X_MAX * Chunk.Z_MAX][3];
 
-    /**
-     * Create new texture
-     */
-    public ChunkTexture() {
-    }
+	/**
+	 * Create new texture
+	 */
+	public ChunkTexture() {
+	}
 
-    /**
-     * Set color value at (x, z)
-     * @param x
-     * @param z
-     * @param frgb RGB color components to set
-     */
-    public void set(int x, int z, float[] frgb) {
-    	int index = x + z * Chunk.X_MAX;
-        data[index][0] = frgb[0];
-        data[index][1] = frgb[1];
-        data[index][2] = frgb[2];
-    }
+	/**
+	 * Set color value at (x, z)
+	 * @param x
+	 * @param z
+	 * @param frgb RGB color components to set
+	 */
+	public void set(int x, int z, float[] frgb) {
+		int index = x + z * Chunk.X_MAX;
+		data[index][0] = frgb[0];
+		data[index][1] = frgb[1];
+		data[index][2] = frgb[2];
+	}
 
-    /**
-     * @param x
-     * @param z
-     * @return RGB color components at (x, z)
-     */
-    public float[] get(int x, int z) {
-    	int index = x + z * Chunk.X_MAX;
-        return data[index];
-    }
+	/**
+	 * @param x
+	 * @param z
+	 * @return RGB color components at (x, z)
+	 */
+	public float[] get(int x, int z) {
+		int index = x + z * Chunk.X_MAX;
+		return data[index];
+	}
 
 	/**
 	 * Write this chunk texture to an output stream

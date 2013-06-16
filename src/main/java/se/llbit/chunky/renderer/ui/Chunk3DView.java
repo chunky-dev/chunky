@@ -48,27 +48,27 @@ import se.llbit.chunky.renderer.Renderer;
 @SuppressWarnings("serial")
 public class Chunk3DView extends JDialog {
 
-    private final RenderCanvas canvas;
+	private final RenderCanvas canvas;
 
-    private int x0, y0;
+	private int x0, y0;
 
-    /**
-     * Create the 3D view window
-     * @param listener
-     * @param parentFrame
-     */
-    public Chunk3DView(final ViewListener listener, JFrame parentFrame) {
+	/**
+	 * Create the 3D view window
+	 * @param listener
+	 * @param parentFrame
+	 */
+	public Chunk3DView(final ViewListener listener, JFrame parentFrame) {
 
-    	super(parentFrame, "Render Preview");
+		super(parentFrame, "Render Preview");
 
-        canvas = new RenderCanvas();
+		canvas = new RenderCanvas();
 
-        setContentPane(canvas);
+		setContentPane(canvas);
 
-        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        setModalityType(ModalityType.MODELESS);
+		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		setModalityType(ModalityType.MODELESS);
 
-        pack();
+		pack();
 
 		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_W, Event.CTRL_MASK), "Close Dialog");
@@ -76,11 +76,11 @@ public class Chunk3DView extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// close the view
-            	setVisible(false);
+				setVisible(false);
 			}
 		});
 
-        addComponentListener(new ComponentListener() {
+		addComponentListener(new ComponentListener() {
 			@Override
 			public void componentShown(ComponentEvent e) {
 			}
@@ -96,87 +96,87 @@ public class Chunk3DView extends JDialog {
 			}
 		});
 
-        addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                onKeyDown(e);
-            }
-            @Override
-            public void keyReleased(KeyEvent e) {
-            }
-            @Override
-            public void keyPressed(KeyEvent e) {
-                onKeyDown(e);
-            }
-            private void onKeyDown(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                case KeyEvent.VK_A:
-                case KeyEvent.VK_LEFT:
-                	listener.onStrafeLeft();
-                    break;
-                case KeyEvent.VK_D:
-                case KeyEvent.VK_RIGHT:
-                	listener.onStrafeRight();
-                    break;
-                case KeyEvent.VK_W:
-                case KeyEvent.VK_UP:
-                	listener.onMoveForward();
-                    break;
-                case KeyEvent.VK_S:
-                case KeyEvent.VK_DOWN:
-                	listener.onMoveBackward();
-                    break;
-                case KeyEvent.VK_K:
-                	listener.onMoveForwardFar();
-                    break;
-                case KeyEvent.VK_J:
-                	listener.onMoveBackwardFar();
-                    break;
-                case KeyEvent.VK_R:
-                	listener.onMoveUp();
-                    break;
-                case KeyEvent.VK_F:
-                	listener.onMoveDown();
-                    break;
-                }
-            }
-        });
+		addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				onKeyDown(e);
+			}
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+			@Override
+			public void keyPressed(KeyEvent e) {
+				onKeyDown(e);
+			}
+			private void onKeyDown(KeyEvent e) {
+				switch (e.getKeyCode()) {
+				case KeyEvent.VK_A:
+				case KeyEvent.VK_LEFT:
+					listener.onStrafeLeft();
+					break;
+				case KeyEvent.VK_D:
+				case KeyEvent.VK_RIGHT:
+					listener.onStrafeRight();
+					break;
+				case KeyEvent.VK_W:
+				case KeyEvent.VK_UP:
+					listener.onMoveForward();
+					break;
+				case KeyEvent.VK_S:
+				case KeyEvent.VK_DOWN:
+					listener.onMoveBackward();
+					break;
+				case KeyEvent.VK_K:
+					listener.onMoveForwardFar();
+					break;
+				case KeyEvent.VK_J:
+					listener.onMoveBackwardFar();
+					break;
+				case KeyEvent.VK_R:
+					listener.onMoveUp();
+					break;
+				case KeyEvent.VK_F:
+					listener.onMoveDown();
+					break;
+				}
+			}
+		});
 
-        canvas.addMouseMotionListener(new MouseMotionListener() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-            }
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                int dx = e.getX() - x0;
-                int dy = e.getY() - y0;
-                listener.onMouseDragged(dx, dy);
-                x0 = e.getX();
-                y0 = e.getY();
-            }
-        });
+		canvas.addMouseMotionListener(new MouseMotionListener() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+			}
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				int dx = e.getX() - x0;
+				int dy = e.getY() - y0;
+				listener.onMouseDragged(dx, dy);
+				x0 = e.getX();
+				y0 = e.getY();
+			}
+		});
 
-        canvas.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-            @Override
-            public void mousePressed(MouseEvent e) {
-                x0 = e.getX();
-                y0 = e.getY();
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            }
-        });
+		canvas.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				x0 = e.getX();
+				y0 = e.getY();
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+			}
+			@Override
+			public void mouseEntered(MouseEvent e) {
+			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+			}
+		});
 
-        addWindowListener(new WindowListener() {
+		addWindowListener(new WindowListener() {
 			@Override
 			public void windowOpened(WindowEvent e) {
 			}
@@ -201,7 +201,7 @@ public class Chunk3DView extends JDialog {
 			}
 		});
 
-        addComponentListener(new ComponentListener() {
+		addComponentListener(new ComponentListener() {
 			@Override
 			public void componentShown(ComponentEvent e) {
 				canvas.setBufferFinalization(true);
@@ -220,19 +220,19 @@ public class Chunk3DView extends JDialog {
 			}
 		});
 
-        canvas.addMouseWheelListener(new MouseWheelListener() {
+		canvas.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				int rotation = e.getWheelRotation();
 				listener.onZoom(rotation);
 			}
 		});
-    }
+	}
 
-    /**
-     * Set the renderer for the canvas.
-     * @param renderer
-     */
+	/**
+	 * Set the renderer for the canvas.
+	 * @param renderer
+	 */
 	public void setRenderer(Renderer renderer) {
 		canvas.setRenderer(renderer);
 	}

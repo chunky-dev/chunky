@@ -28,45 +28,45 @@ import java.util.Map;
  */
 public class WorldTexture {
 
-    private Map<ChunkPosition, ChunkTexture> map =
-            new HashMap<ChunkPosition, ChunkTexture>();
+	private Map<ChunkPosition, ChunkTexture> map =
+			new HashMap<ChunkPosition, ChunkTexture>();
 
-    /**
-     * Set color at (x, z)
-     * @param x
-     * @param z
-     * @param frgb RGB color components
-     */
-    public void set(int x, int z, float[] frgb) {
-        ChunkPosition cp = ChunkPosition.get(x >> 4, z >> 4);
-        ChunkTexture ct = map.get(cp);
-        if (ct == null) {
-            ct = new ChunkTexture();
-            map.put(cp, ct);
-        }
-        ct.set(x & 0xF, z & 0xF, frgb);
-    }
+	/**
+	 * Set color at (x, z)
+	 * @param x
+	 * @param z
+	 * @param frgb RGB color components
+	 */
+	public void set(int x, int z, float[] frgb) {
+		ChunkPosition cp = ChunkPosition.get(x >> 4, z >> 4);
+		ChunkTexture ct = map.get(cp);
+		if (ct == null) {
+			ct = new ChunkTexture();
+			map.put(cp, ct);
+		}
+		ct.set(x & 0xF, z & 0xF, frgb);
+	}
 
-    /**
-     * @param x
-     * @param z
-     * @return RGB color components at (x, z)
-     */
-    public float[] get(int x, int z) {
-        ChunkPosition cp = ChunkPosition.get(x >> 4, z >> 4);
-        ChunkTexture ct = map.get(cp);
-        if (ct == null) {
-            ct = new ChunkTexture();
-            map.put(cp, ct);
-        }
-        return ct.get(x & 0xF, z & 0xF);
-    }
+	/**
+	 * @param x
+	 * @param z
+	 * @return RGB color components at (x, z)
+	 */
+	public float[] get(int x, int z) {
+		ChunkPosition cp = ChunkPosition.get(x >> 4, z >> 4);
+		ChunkTexture ct = map.get(cp);
+		if (ct == null) {
+			ct = new ChunkTexture();
+			map.put(cp, ct);
+		}
+		return ct.get(x & 0xF, z & 0xF);
+	}
 
-    /**
-     * Write the world texture to the output stream
-     * @param out
-     * @throws IOException
-     */
+	/**
+	 * Write the world texture to the output stream
+	 * @param out
+	 * @throws IOException
+	 */
 	public void store(DataOutputStream out) throws IOException {
 		out.writeInt(map.size());
 		for (Map.Entry<ChunkPosition, ChunkTexture> entry : map.entrySet()) {

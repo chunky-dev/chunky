@@ -24,33 +24,33 @@ package se.llbit.chunky.world;
  */
 public class ChunkHeightmap {
 
-    short[] data = new short[4 * Chunk.X_MAX * Chunk.Z_MAX];
+	short[] data = new short[4 * Chunk.X_MAX * Chunk.Z_MAX];
 
-    /**
-     * Create new heightmap
-     */
-    public ChunkHeightmap() {
-        for (int i = 0; i < (Chunk.X_MAX * Chunk.Z_MAX); ++i)
-            data[i] = World.SEA_LEVEL;
-    }
+	/**
+	 * Create new heightmap
+	 */
+	public ChunkHeightmap() {
+		for (int i = 0; i < (Chunk.X_MAX * Chunk.Z_MAX); ++i)
+			data[i] = World.SEA_LEVEL;
+	}
 
-    /**
-     * Set height value y at (x, z)
-     * @param y
-     * @param x
-     * @param z
-     */
-    public void set(int y, int x, int z) {
-        data[x + 2 * z * Chunk.X_MAX] = (short) y;
-    }
+	/**
+	 * Set height value y at (x, z)
+	 * @param y
+	 * @param x
+	 * @param z
+	 */
+	public void set(int y, int x, int z) {
+		data[x + 2 * z * Chunk.X_MAX] = (short) y;
+	}
 
-    /**
-     * @param x
-     * @param z
-     * @return Height at (x, z)
-     */
-    public int get(int x, int z) {
-        return data[x + 2 * z * Chunk.X_MAX];
-    }
+	/**
+	 * @param x
+	 * @param z
+	 * @return Height at (x, z)
+	 */
+	public int get(int x, int z) {
+		return data[x + 2 * z * Chunk.X_MAX];
+	}
 
 }

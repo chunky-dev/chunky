@@ -181,37 +181,37 @@ public class WorldDirectoryPicker extends JDialog {
 		return accepted;
 	}
 
-    /**
-     * Ask user for the Minecraft world saves directory.
-     * @param parent
-     * @return The selected world directory, or <code>null</code> if the
-     * user did not pick a valid world directory.
-     */
-    public static File getWorldDirectory(JFrame parent) {
-    	File worldDir;
-    	if (ProgramProperties.containsKey("worldDirectory")) {
-    		worldDir = new File(ProgramProperties.getProperty("worldDirectory"));
-    	} else {
+	/**
+	 * Ask user for the Minecraft world saves directory.
+	 * @param parent
+	 * @return The selected world directory, or <code>null</code> if the
+	 * user did not pick a valid world directory.
+	 */
+	public static File getWorldDirectory(JFrame parent) {
+		File worldDir;
+		if (ProgramProperties.containsKey("worldDirectory")) {
+			worldDir = new File(ProgramProperties.getProperty("worldDirectory"));
+		} else {
 			worldDir = Chunky.getSavesDirectory();
-    	}
+		}
 
-    	if (!isValidSelection(worldDir)) {
-    		WorldDirectoryPicker sceneDirPicker =
-    				new WorldDirectoryPicker(parent);
-    		sceneDirPicker.setVisible(true);
-    		if (!sceneDirPicker.isAccepted())
-    			return null;
-    		worldDir = sceneDirPicker.getSelectedDirectory();
-    	}
+		if (!isValidSelection(worldDir)) {
+			WorldDirectoryPicker sceneDirPicker =
+				new WorldDirectoryPicker(parent);
+			sceneDirPicker.setVisible(true);
+			if (!sceneDirPicker.isAccepted())
+				return null;
+			worldDir = sceneDirPicker.getSelectedDirectory();
+		}
 
-    	if (isValidSelection(worldDir))
-    		return worldDir;
-    	else
-    		return null;
+		if (isValidSelection(worldDir))
+			return worldDir;
+		else
+			return null;
 	}
 
-    private static boolean isValidSelection(File worldDir) {
-    	return worldDir != null && worldDir.exists() && worldDir.isDirectory();
-    }
+	private static boolean isValidSelection(File worldDir) {
+		return worldDir != null && worldDir.exists() && worldDir.isDirectory();
+	}
 
 }

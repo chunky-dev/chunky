@@ -45,16 +45,16 @@ public class EmptyChunk extends Chunk {
 	}
 
 	@Override
-    public synchronized void getBlockData(byte[] blocks, byte[] data, byte[] biomes) {
-	    for (int i = 0; i < X_MAX * Y_MAX * Z_MAX; ++i)
-	        blocks[i] = 0;
+	public synchronized void getBlockData(byte[] blocks, byte[] data, byte[] biomes) {
+		for (int i = 0; i < X_MAX * Y_MAX * Z_MAX; ++i)
+			blocks[i] = 0;
 
-	    for (int i = 0; i < X_MAX * Z_MAX; ++i)
-            biomes[i] = 0;
+		for (int i = 0; i < X_MAX * Z_MAX; ++i)
+			biomes[i] = 0;
 
-	    for (int i = 0; i < (X_MAX * Y_MAX * Z_MAX) / 2; ++i)
-            data[i] = 0;
-    }
+		for (int i = 0; i < (X_MAX * Y_MAX * Z_MAX) / 2; ++i)
+			data[i] = 0;
+	}
 
 	@Override
 	protected void renderLayer(RenderBuffer rbuff, int cx, int cz) {

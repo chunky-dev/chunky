@@ -31,72 +31,72 @@ import java.util.*;
 @SuppressWarnings("javadoc")
 public class RegionFileCache {
 
-    private static final int MAX_CACHE_SIZE = 256;
+	private static final int MAX_CACHE_SIZE = 256;
 
 
-    private static final Map<File, Reference<RegionFile>> cache = new HashMap<File, Reference<RegionFile>>();
+	private static final Map<File, Reference<RegionFile>> cache = new HashMap<File, Reference<RegionFile>>();
 
-    private RegionFileCache() {
-    }
+	private RegionFileCache() {
+	}
 
-    public static synchronized RegionFile getRegionFile(File regionDir, int chunkX, int chunkZ) {
-        File file = new File(regionDir, "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mca");
+	public static synchronized RegionFile getRegionFile(File regionDir, int chunkX, int chunkZ) {
+		File file = new File(regionDir, "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mca");
 
-        RegionFile reg;
-        Reference<RegionFile> ref = cache.get(file);
+		RegionFile reg;
+		Reference<RegionFile> ref = cache.get(file);
 
-        if (ref != null && (reg = ref.get()) != null) {
-            return reg;
-        }
+		if (ref != null && (reg = ref.get()) != null) {
+			return reg;
+		}
 
-        if (!regionDir.exists()) {
-            regionDir.mkdirs();
-        }
+		if (!regionDir.exists()) {
+			regionDir.mkdirs();
+		}
 
-        if (cache.size() >= MAX_CACHE_SIZE) {
-            RegionFileCache.clear();
-        }
+		if (cache.size() >= MAX_CACHE_SIZE) {
+			RegionFileCache.clear();
+		}
 
-        reg = new RegionFile(file);
-        cache.put(file, new SoftReference<RegionFile>(reg));
-        return reg;
-    }
+		reg = new RegionFile(file);
+		cache.put(file, new SoftReference<RegionFile>(reg));
+		return reg;
+	}
 
-    public static synchronized void clear() {
-        for (Reference<RegionFile> ref : cache.values()) {
-            try {
-                if (ref.get() != null) {
-                    ref.get().close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        cache.clear();
-    }
+	public static synchronized void clear() {
+		for (Reference<RegionFile> ref : cache.values()) {
+			try {
+				if (ref.get() != null) {
+					ref.get().close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		cache.clear();
+	}
 
-    public static int getSizeDelta(File basePath, int chunkX, int chunkZ) {
-        RegionFile r = getRegionFile(basePath, chunkX, chunkZ);
-        return r.getSizeDelta();
-    }
+	public static int getSizeDelta(File basePath, int chunkX, int chunkZ) {
+		RegionFile r = getRegionFile(basePath, chunkX, chunkZ);
+		return r.getSizeDelta();
+	}
 
-    public static DataInputStream getChunkDataInputStream(File basePath, int chunkX, int chunkZ) {
-        RegionFile r = getRegionFile(basePath, chunkX, chunkZ);
-        return r.getChunkDataInputStream(chunkX & 31, chunkZ & 31);
-    }
+	public static DataInputStream getChunkDataInputStream(File basePath, int chunkX, int chunkZ) {
+		RegionFile r = getRegionFile(basePath, chunkX, chunkZ);
+		return r.getChunkDataInputStream(chunkX & 31, chunkZ & 31);
+	}
 
-    public static DataOutputStream getChunkDataOutputStream(File basePath, int chunkX, int chunkZ) {
-        RegionFile r = getRegionFile(basePath, chunkX, chunkZ);
-        return r.getChunkDataOutputStream(chunkX & 31, chunkZ & 31);
-    }
+	public static DataOutputStream getChunkDataOutputStream(File basePath, int chunkX, int chunkZ) {
+		RegionFile r = getRegionFile(basePath, chunkX, chunkZ);
+		return r.getChunkDataOutputStream(chunkX & 31, chunkZ & 31);
+	}
 
 	public static boolean chunkExists(File basePath, int chunkX, int chunkZ) {
 		RegionFile r = getRegionFile(basePath, chunkX, chunkZ);
-        return r.chunkExists(chunkX & 31, chunkZ & 31);
+		return r.chunkExists(chunkX & 31, chunkZ & 31);
 	}
 
-    public static void deleteChunk(File basePath, int chunkX, int chunkZ) {
-        RegionFile r = getRegionFile(basePath, chunkX, chunkZ);
-        r.deleteChunk(chunkX & 31, chunkZ & 31);
-    }
+	public static void deleteChunk(File basePath, int chunkX, int chunkZ) {
+		RegionFile r = getRegionFile(basePath, chunkX, chunkZ);
+		r.deleteChunk(chunkX & 31, chunkZ & 31);
+	}
 }

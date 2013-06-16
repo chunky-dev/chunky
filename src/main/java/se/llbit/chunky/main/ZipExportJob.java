@@ -37,18 +37,18 @@ public class ZipExportJob extends Thread {
 	private World world;
 	private File targetFile;
 	private ProgressPanel progress;
-    private Collection<ChunkPosition> selected;
+	private Collection<ChunkPosition> selected;
 
-    /**
-     * Create a new Zip export job.
-     * @param world
-     * @param selected
-     * @param target
-     * @param progress
-     */
+	/**
+	 * Create a new Zip export job.
+	 * @param world
+	 * @param selected
+	 * @param target
+	 * @param progress
+	 */
 	public ZipExportJob(World world, Collection<ChunkPosition> selected,
-	        File target, ProgressPanel progress) {
-	    super("Zip Export Job");
+			File target, ProgressPanel progress) {
+		super("Zip Export Job");
 
 		this.world = world;
 		this.selected = selected;
@@ -60,14 +60,14 @@ public class ZipExportJob extends Thread {
 		if (progress.tryStartJob()) {
 			try {
 				progress.setJobName("Zip Export");
-			    if (selected.isEmpty())
-			        world.exportWorldToZip(targetFile, progress);
-			    else
-			        world.exportChunksToZip(targetFile, selected, world.currentDimension(), progress);
+				if (selected.isEmpty())
+					world.exportWorldToZip(targetFile, progress);
+				else
+					world.exportChunksToZip(targetFile, selected, world.currentDimension(), progress);
 			} catch (FileNotFoundException e) {
-			    JOptionPane.showMessageDialog(null, "Could not write zip file:\n" + e.getMessage());
+				JOptionPane.showMessageDialog(null, "Could not write zip file:\n" + e.getMessage());
 			} catch (IOException e) {
-			    JOptionPane.showMessageDialog(null, "Error while exporting to zip file:\n" + e.getMessage());
+				JOptionPane.showMessageDialog(null, "Error while exporting to zip file:\n" + e.getMessage());
 			}
 			progress.finishJob();
 		}

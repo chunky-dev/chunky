@@ -81,7 +81,7 @@ public class World implements Comparable<World> {
 	/**
 	 * Default sea level. Used to be 64.
 	 */
-    public static final int SEA_LEVEL = 63;
+	public static final int SEA_LEVEL = 63;
 	private static final int DEFAULT_LAYER = SEA_LEVEL;
 
 	@SuppressWarnings("unused")
@@ -113,9 +113,9 @@ public class World implements Comparable<World> {
 			new LinkedList<ChunkDiscoveryListener>();
 	private Collection<RegionDiscoveryListener> regionDiscoveryListeners =
 			new LinkedList<RegionDiscoveryListener>();
-    private int spawnX;
-    private int spawnY;
-    private int spawnZ;
+	private int spawnX;
+	private int spawnY;
+	private int spawnZ;
 
 	private int gameMode = 0;
 
@@ -147,43 +147,43 @@ public class World implements Comparable<World> {
 	 * Add a chunk update listener
 	 * @param listener
 	 */
-    public void addChunkUpdateListener(ChunkUpdateListener listener) {
-    	synchronized (chunkUpdateListeners) {
-    		chunkUpdateListeners.add(listener);
-    	}
-    }
+	public void addChunkUpdateListener(ChunkUpdateListener listener) {
+		synchronized (chunkUpdateListeners) {
+			chunkUpdateListeners.add(listener);
+		}
+	}
 
-    /**
-     * Add a region discovery listener
-     * @param listener
-     */
-    public void addRegionDiscoveryListener(RegionDiscoveryListener listener) {
-    	synchronized (regionDiscoveryListeners) {
-    		regionDiscoveryListeners.add(listener);
-    	}
-    }
+	/**
+	 * Add a region discovery listener
+	 * @param listener
+	 */
+	public void addRegionDiscoveryListener(RegionDiscoveryListener listener) {
+		synchronized (regionDiscoveryListeners) {
+			regionDiscoveryListeners.add(listener);
+		}
+	}
 
-    private void fireChunkDeleted(ChunkPosition chunk) {
-    	synchronized (chunkDeletionListeners) {
-	        for (ChunkDeletionListener listener : chunkDeletionListeners)
-	            listener.chunkDeleted(chunk);
-    	}
-    }
+	private void fireChunkDeleted(ChunkPosition chunk) {
+		synchronized (chunkDeletionListeners) {
+			for (ChunkDeletionListener listener : chunkDeletionListeners)
+				listener.chunkDeleted(chunk);
+		}
+	}
 
-    /**
-     * Notify the chunk update listeners that a chunk has been updated.
-     * @param chunk the updated chunk
-     */
-    private void fireChunkUpdated(Chunk chunk) {
-    	Collection<Chunk> chunks = new LinkedList<Chunk>();
-        chunks.add(chunk);
-    	fireChunksUpdated(chunks);
-    }
+	/**
+	 * Notify the chunk update listeners that a chunk has been updated.
+	 * @param chunk the updated chunk
+	 */
+	private void fireChunkUpdated(Chunk chunk) {
+		Collection<Chunk> chunks = new LinkedList<Chunk>();
+		chunks.add(chunk);
+		fireChunksUpdated(chunks);
+	}
 
-    /**
-     * Set current dimension
-     * @param dimension
-     */
+	/**
+	 * Set current dimension
+	 * @param dimension
+	 */
 	public synchronized void setDimension(int dimension) {
 		this.dimension = dimension;
 	}
@@ -206,8 +206,8 @@ public class World implements Comparable<World> {
 			request.add(".Data.Player.Rotation.0");
 			request.add(".Data.Player.Rotation.1");
 			request.add(".Data.Player.SpawnX");
-            request.add(".Data.Player.SpawnY");
-            request.add(".Data.Player.SpawnZ");
+			request.add(".Data.Player.SpawnY");
+			request.add(".Data.Player.SpawnZ");
 			request.add(".Data.LevelName");
 			request.add(".Data.GameType");
 			Map<String, AnyTag> result = NamedTag.quickParse(in, request);
@@ -227,11 +227,11 @@ public class World implements Comparable<World> {
 			AnyTag yaw = result.get(".Data.Player.Rotation.0");
 			AnyTag pitch = result.get(".Data.Player.Rotation.1");
 			AnyTag spawnX = result.get(".Data.Player.SpawnX");
-            AnyTag spawnY = result.get(".Data.Player.SpawnY");
-            AnyTag spawnZ = result.get(".Data.Player.SpawnZ");
-            AnyTag gameType = result.get(".Data.GameType");
+			AnyTag spawnY = result.get(".Data.Player.SpawnY");
+			AnyTag spawnZ = result.get(".Data.Player.SpawnZ");
+			AnyTag gameType = result.get(".Data.GameType");
 
-            gameMode  = gameType.intValue(0);
+			gameMode  = gameType.intValue(0);
 
 			playerX = posX.doubleValue();
 			playerY = posY.doubleValue();
@@ -239,12 +239,12 @@ public class World implements Comparable<World> {
 			playerYaw = yaw.floatValue();
 			playerPitch = pitch.floatValue();
 			this.spawnX = spawnX.intValue();
-            this.spawnY = spawnY.intValue();
-            this.spawnZ = spawnZ.intValue();
+			this.spawnY = spawnY.intValue();
+			this.spawnZ = spawnZ.intValue();
 			havePlayerPos = ! (posX.isError() || posY.isError() || posZ.isError());
 			haveSpawnPos = ! (spawnX.isError() || spawnY.isError() || spawnZ.isError());
 			if (havePlayerPos())
-			    currentLayer = playerLocY();
+				currentLayer = playerLocY();
 
 			levelName = result.get(".Data.LevelName").stringValue(levelName);
 
@@ -320,8 +320,8 @@ public class World implements Comparable<World> {
 	 * @return File object pointing to the data directory
 	 */
 	public synchronized File getDataDirectory() {
-        return getDataDirectory(dimension);
-    }
+		return getDataDirectory(dimension);
+	}
 
 	/**
 	 * @return File object pointing to the region file directory
@@ -349,13 +349,13 @@ public class World implements Comparable<World> {
 	/**
 	 * @return <code>true</code> if there is spawn position information
 	 */
-    public synchronized boolean haveSpawnPos() {
-        return haveSpawnPos && playerDimension == 0;
-    }
+	public synchronized boolean haveSpawnPos() {
+		return haveSpawnPos && playerDimension == 0;
+	}
 
-    /**
-     * @return The current dimension
-     */
+	/**
+	 * @return The current dimension
+	 */
 	public synchronized int currentDimension() {
 		return dimension;
 	}
@@ -452,20 +452,20 @@ public class World implements Comparable<World> {
 	 * Clear the region map and remove all listeners.
 	 */
 	public synchronized void dispose() {
-    	regionMap.clear();
+		regionMap.clear();
 
-    	synchronized (chunkUpdateListeners) {
-    		chunkUpdateListeners.clear();
-    	}
-    	synchronized (chunkDeletionListeners) {
-    		chunkDeletionListeners.clear();
-    	}
-    	synchronized (chunkDiscoveryListeners) {
-    		chunkDiscoveryListeners.clear();
-    	}
-    	synchronized (regionDiscoveryListeners) {
-    		regionDiscoveryListeners.clear();
-    	}
+		synchronized (chunkUpdateListeners) {
+			chunkUpdateListeners.clear();
+		}
+		synchronized (chunkDeletionListeners) {
+			chunkDeletionListeners.clear();
+		}
+		synchronized (chunkDiscoveryListeners) {
+			chunkDiscoveryListeners.clear();
+		}
+		synchronized (regionDiscoveryListeners) {
+			regionDiscoveryListeners.clear();
+		}
 	}
 
 	/**
@@ -480,65 +480,65 @@ public class World implements Comparable<World> {
 	 * @throws IOException
 	 */
 	public synchronized void exportChunksToZip(File target,
-	        Collection<ChunkPosition> chunks,
-	        int dimension,
-	        ProgressPanel progress) throws IOException {
+			Collection<ChunkPosition> chunks,
+			int dimension,
+			ProgressPanel progress) throws IOException {
 
-	    Map<ChunkPosition, Set<ChunkPosition>> regionMap =
-	            new HashMap<ChunkPosition, Set<ChunkPosition>>();
+		Map<ChunkPosition, Set<ChunkPosition>> regionMap =
+				new HashMap<ChunkPosition, Set<ChunkPosition>>();
 
-	    for (ChunkPosition chunk : chunks) {
+		for (ChunkPosition chunk : chunks) {
 
-	        ChunkPosition regionPosition = chunk.regionPosition();
-	        Set<ChunkPosition> chunkSet = regionMap.get(regionPosition);
-	        if (chunkSet == null) {
-	            chunkSet = new HashSet<ChunkPosition>();
-	            regionMap.put(regionPosition, chunkSet);
-	        }
-	        chunkSet.add(ChunkPosition.get(chunk.x & 31, chunk.z & 31));
-	    }
+			ChunkPosition regionPosition = chunk.regionPosition();
+			Set<ChunkPosition> chunkSet = regionMap.get(regionPosition);
+			if (chunkSet == null) {
+				chunkSet = new HashSet<ChunkPosition>();
+				regionMap.put(regionPosition, chunkSet);
+			}
+			chunkSet.add(ChunkPosition.get(chunk.x & 31, chunk.z & 31));
+		}
 
-	    int work = 0;
-        progress.setJobSize(regionMap.size()+1);
+		int work = 0;
+		progress.setJobSize(regionMap.size()+1);
 
-        ZipOutputStream zout = null;
+		ZipOutputStream zout = null;
 
-        String regionDirectory = dimension == 0 ? worldDirectory.getName()
-                : worldDirectory.getName() + "/DIM" + dimension;
-        regionDirectory += "/region";
+		String regionDirectory = dimension == 0 ? worldDirectory.getName()
+				: worldDirectory.getName() + "/DIM" + dimension;
+		regionDirectory += "/region";
 
-        try {
-            zout = new ZipOutputStream(new FileOutputStream(target));
-            writeLevelDatToZip(zout);
-            progress.setProgress(++work);
+		try {
+			zout = new ZipOutputStream(new FileOutputStream(target));
+			writeLevelDatToZip(zout);
+			progress.setProgress(++work);
 
-    	    for (Map.Entry<ChunkPosition, Set<ChunkPosition>> entry : regionMap.entrySet()) {
+			for (Map.Entry<ChunkPosition, Set<ChunkPosition>> entry : regionMap.entrySet()) {
 
-    	    	if (progress.isInterrupted())
-    	    		break;
+				if (progress.isInterrupted())
+					break;
 
-    	        ChunkPosition region = entry.getKey();
+				ChunkPosition region = entry.getKey();
 
-    	        RegionFile regionFile = RegionFileCache.getRegionFile(
-    	                getRegionDirectory(dimension),
-                        region.x << 5, region.z << 5);
-    	        appendRegionToZip(zout, regionFile,
-    	                regionDirectory + "/" + region.getMcaName(),
-    	                entry.getValue());
+				RegionFile regionFile = RegionFileCache.getRegionFile(
+						getRegionDirectory(dimension),
+						region.x << 5, region.z << 5);
+				appendRegionToZip(zout, regionFile,
+						regionDirectory + "/" + region.getMcaName(),
+						entry.getValue());
 
-                progress.setProgress(++work);
-    	    }
+				progress.setProgress(++work);
+			}
 
-    	} finally {
-    	    try {
-        	    if (zout != null)
-        	        zout.close();
-    	    } catch (IOException e) {
-    	    }
-    	}
+		} finally {
+			try {
+				if (zout != null)
+					zout.close();
+			} catch (IOException e) {
+			}
+		}
 	}
 
-    /**
+	/**
 	 * Export the world to a zip file. The chunks which are included
 	 * depends on the selected chunks. If any chunks are selected, then
 	 * only those chunks are exported. If no chunks are selected then all
@@ -550,60 +550,60 @@ public class World implements Comparable<World> {
 	 */
 	public synchronized void exportWorldToZip(File target, ProgressPanel progress) throws IOException {
 
-	    System.out.println("exporting all dimensions to " + target.getName());
+		System.out.println("exporting all dimensions to " + target.getName());
 
-	    final Collection<Pair<File, ChunkPosition>> regions =
-                new LinkedList<Pair<File, ChunkPosition>>();
-	    regions.clear();
+		final Collection<Pair<File, ChunkPosition>> regions =
+				new LinkedList<Pair<File, ChunkPosition>>();
+		regions.clear();
 
-	    WorldScanner.Operator operator = new WorldScanner.Operator() {
-            @Override
-            public void foundRegion(File regionDirectory, int x, int z) {
-                regions.add(new Pair<File, ChunkPosition>(
-                        regionDirectory, ChunkPosition.get(x, z)));
-            }
-        };
-        // TODO make this more dynamic
-        File overworld = getRegionDirectory(OVERWORLD_DIMENSION);
-	    WorldScanner.findExistingChunks(overworld, operator);
-	    WorldScanner.findExistingChunks(getRegionDirectory(NETHER_DIMENSION), operator);
-	    WorldScanner.findExistingChunks(getRegionDirectory(END_DIMENSION), operator);
+		WorldScanner.Operator operator = new WorldScanner.Operator() {
+			@Override
+			public void foundRegion(File regionDirectory, int x, int z) {
+				regions.add(new Pair<File, ChunkPosition>(
+						regionDirectory, ChunkPosition.get(x, z)));
+			}
+		};
+		// TODO make this more dynamic
+		File overworld = getRegionDirectory(OVERWORLD_DIMENSION);
+		WorldScanner.findExistingChunks(overworld, operator);
+		WorldScanner.findExistingChunks(getRegionDirectory(NETHER_DIMENSION), operator);
+		WorldScanner.findExistingChunks(getRegionDirectory(END_DIMENSION), operator);
 
-        int work = 0;
-        progress.setJobSize(regions.size()+1);
+		int work = 0;
+		progress.setJobSize(regions.size()+1);
 
-        ZipOutputStream zout = null;
-        try {
-            zout = new ZipOutputStream(new FileOutputStream(target));
-            writeLevelDatToZip(zout);
-            progress.setProgress(++work);
+		ZipOutputStream zout = null;
+		try {
+			zout = new ZipOutputStream(new FileOutputStream(target));
+			writeLevelDatToZip(zout);
+			progress.setProgress(++work);
 
-            for (Pair<File, ChunkPosition> region : regions) {
+			for (Pair<File, ChunkPosition> region : regions) {
 
-            	if (progress.isInterrupted())
-            		break;
+				if (progress.isInterrupted())
+					break;
 
-                String regionDirectory = (region.thing1 == overworld) ?
-                        worldDirectory.getName() :
-                        worldDirectory.getName() + "/" + region.thing1.getParentFile().getName();
-                regionDirectory += "/region";
-                RegionFile regionFile = RegionFileCache.getRegionFile(
-                        region.thing1,
-                        region.thing2.x * 32, region.thing2.z * 32);
-                appendRegionToZip(zout, regionFile,
-                        regionDirectory + "/" + region.thing2.getMcaName(),
-                        null);
+				String regionDirectory = (region.thing1 == overworld) ?
+						worldDirectory.getName() :
+						worldDirectory.getName() + "/" + region.thing1.getParentFile().getName();
+				regionDirectory += "/region";
+				RegionFile regionFile = RegionFileCache.getRegionFile(
+						region.thing1,
+						region.thing2.x * 32, region.thing2.z * 32);
+				appendRegionToZip(zout, regionFile,
+						regionDirectory + "/" + region.thing2.getMcaName(),
+						null);
 
-                progress.setProgress(++work);
-            }
+				progress.setProgress(++work);
+			}
 
-        } finally {
-            try {
-                if (zout != null)
-                    zout.close();
-            } catch (IOException e) {
-            }
-        }
+		} finally {
+			try {
+				if (zout != null)
+					zout.close();
+			} catch (IOException e) {
+			}
+		}
 	}
 
 	/**
@@ -612,43 +612,43 @@ public class World implements Comparable<World> {
 	 * @throws IOException
 	 */
 	private void writeLevelDatToZip(ZipOutputStream zout) throws IOException {
-	    File levelDat = new File(worldDirectory, "level.dat");
-        FileInputStream in = new FileInputStream(levelDat);
-        zout.putNextEntry(new ZipEntry(worldDirectory.getName()+"/"+"level.dat"));
-        byte[] buf = new byte[4096];
-        int len;
-        while ((len = in.read(buf)) > 0) {
-            zout.write(buf, 0, len);
-        }
-        zout.closeEntry();
-        in.close();
-    }
+		File levelDat = new File(worldDirectory, "level.dat");
+		FileInputStream in = new FileInputStream(levelDat);
+		zout.putNextEntry(new ZipEntry(worldDirectory.getName()+"/"+"level.dat"));
+		byte[] buf = new byte[4096];
+		int len;
+		while ((len = in.read(buf)) > 0) {
+			zout.write(buf, 0, len);
+		}
+		zout.closeEntry();
+		in.close();
+	}
 
 	private void appendRegionToZip(ZipOutputStream zout, RegionFile regionFile,
-	        String regionZipFileName, Set<ChunkPosition> chunks) throws IOException {
+			String regionZipFileName, Set<ChunkPosition> chunks) throws IOException {
 
-	    zout.putNextEntry(new ZipEntry(regionZipFileName));
-        regionFile.writeRegion(new DataOutputStream(zout), chunks);
-        zout.closeEntry();
-    }
+		zout.putNextEntry(new ZipEntry(regionZipFileName));
+		regionFile.writeRegion(new DataOutputStream(zout), chunks);
+		zout.closeEntry();
+	}
 
 	/**
 	 * @return <code>true</code> if this is an empty or non-existent world
 	 */
 	public boolean isEmptyWorld() {
-	    return false;
+		return false;
 	}
 
 	@Override
 	public String toString() {
-	    return levelName  + " (" + worldDirectory.getName() + ")";
+		return levelName  + " (" + worldDirectory.getName() + ")";
 	}
 
 	/**
 	 * @return The name of the world, not the actual world directory
 	 */
 	public String levelName() {
-	    return levelName;
+		return levelName;
 	}
 
 	/**
@@ -669,39 +669,39 @@ public class World implements Comparable<World> {
 		return dir.exists() && dir.isDirectory();
 	}
 
-    /**
-     * @return The spawn Z position
-     */
-    public double spawnPosZ() {
-        return spawnZ;
-    }
+	/**
+	 * @return The spawn Z position
+	 */
+	public double spawnPosZ() {
+		return spawnZ;
+	}
 
-    /**
-     * @return The spawn Y position
-     */
-    public double spawnPosY() {
-        return spawnY;
-    }
+	/**
+	 * @return The spawn Y position
+	 */
+	public double spawnPosY() {
+		return spawnY;
+	}
 
-    /**
-     * @return The spawn X position
-     */
-    public double spawnPosX() {
-        return spawnX;
-    }
+	/**
+	 * @return The spawn X position
+	 */
+	public double spawnPosX() {
+		return spawnX;
+	}
 
 	/*public synchronized void renderPng(File targetFile, ProgressPanel progress) throws InterruptedException {
 
 		progress.setJobName("Refreshing Chunks");
 
-	    Set<ChunkPosition> needRefresh = new HashSet<ChunkPosition>();
+		Set<ChunkPosition> needRefresh = new HashSet<ChunkPosition>();
 
 		int x0 = Integer.MAX_VALUE;// bottom chunk
 		int x1 = Integer.MIN_VALUE;// top chunk
 		int z0 = Integer.MAX_VALUE;// right chunk
 		int z1 = Integer.MIN_VALUE;// left chunk
 		for (Map.Entry<ChunkPosition, Chunk> entry : chunkMap.entrySet()) {
-		    ChunkPosition pos = entry.getKey();
+			ChunkPosition pos = entry.getKey();
 
 			if (pos.x < x0)
 				x0 = pos.x;
@@ -713,7 +713,7 @@ public class World implements Comparable<World> {
 				z1 = pos.z;
 
 			if (!entry.getValue().haveTopography()) {
-			    needRefresh.add(pos.regionPosition());
+				needRefresh.add(pos.regionPosition());
 			}
 		}
 		int width = (z1-z0+1) * 16;
@@ -721,29 +721,29 @@ public class World implements Comparable<World> {
 
 		int numRefresh = 0;
 		for (ChunkPosition region : needRefresh) {
-		    for (int x = 0; x < 32; ++x) {
-		        for (int z = 0; z < 32; ++z) {
-		        	ChunkPosition pos = ChunkPosition.get(
-		        			region.x * 32 + x, region.z * 32 + z);
-		            Chunk chunk = chunkMap.get(pos);
-		            if (chunk != null && !chunk.haveTopography()) {
-		                parseQueue.add(chunk);
-		                numRefresh++;
-		            }
-		        }
-		    }
+			for (int x = 0; x < 32; ++x) {
+				for (int z = 0; z < 32; ++z) {
+					ChunkPosition pos = ChunkPosition.get(
+							region.x * 32 + x, region.z * 32 + z);
+					Chunk chunk = chunkMap.get(pos);
+					if (chunk != null && !chunk.haveTopography()) {
+						parseQueue.add(chunk);
+						numRefresh++;
+					}
+				}
+			}
 		}
 
 		progress.setJobSize(numRefresh);
 
 		while (!parseQueue.isEmpty() || !topoQueue.isEmpty()) {
-		    if (progress.isInterrupted()) {
-		        parseQueue.clear();
-		        topoQueue.clear();
-		        return;
-		    }
-		    progress.setProgress(numRefresh - parseQueue.size());
-		    wait();
+			if (progress.isInterrupted()) {
+				parseQueue.clear();
+				topoQueue.clear();
+				return;
+			}
+			progress.setProgress(numRefresh - parseQueue.size());
+			wait();
 		}
 		progress.finishJob();
 		progress.setJobName("Rendering PNG");
@@ -765,16 +765,16 @@ public class World implements Comparable<World> {
 					idatOut.write(IDAT.FILTER_TYPE_NONE);
 
 					for (int z = z1; z >= z0; --z) {
-					    if (progress.isInterrupted())
-					        break render_loop;
+						if (progress.isInterrupted())
+							break render_loop;
 
 
-					    if (pixels >= PIXELS_PER_IDAT_CHUNK) {
-	                        pixels = 0;
-	                        idatOut.finishChunk();
-	                        pngWriter.writeChunk(idat);
-	                        idatOut.reset();
-	                    }
+						if (pixels >= PIXELS_PER_IDAT_CHUNK) {
+							pixels = 0;
+							idatOut.finishChunk();
+							pngWriter.writeChunk(idat);
+							idatOut.reset();
+						}
 
 						Chunk chunk = getChunk(ChunkPosition.get(x, z));
 						chunk.writePngLine(line, idatOut);
@@ -846,9 +846,9 @@ public class World implements Comparable<World> {
 			cplist.add(chunk.getPosition());
 
 		synchronized (chunkUpdateListeners) {
-	        for (ChunkUpdateListener listener : chunkUpdateListeners)
-	            listener.chunksUpdated(cplist);
-    	}
+			for (ChunkUpdateListener listener : chunkUpdateListeners)
+				listener.chunksUpdated(cplist);
+		}
 	}
 
 	/**

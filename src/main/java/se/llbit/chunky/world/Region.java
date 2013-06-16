@@ -164,9 +164,9 @@ public class Region {
 	}
 
 	@Override
-    public String toString() {
-    	return "Region " + position.toString();
-    }
+	public String toString() {
+		return "Region " + position.toString();
+	}
 
 	/**
 	 * Add preloaded chunks to chunk parse queue

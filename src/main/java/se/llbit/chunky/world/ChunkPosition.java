@@ -30,7 +30,6 @@ import java.util.Map;
 public final class ChunkPosition {
 	public int x, z;
 
-
 	private ChunkPosition(int x, int z) {
 		this.x = x;
 		this.z = z;
@@ -46,30 +45,30 @@ public final class ChunkPosition {
 	}
 
 	private final static Map<Integer, Map<Integer, ChunkPosition>> map =
-	        new HashMap<Integer, Map<Integer,ChunkPosition>>();
+			new HashMap<Integer, Map<Integer,ChunkPosition>>();
 
 	public synchronized static ChunkPosition get(int x, int z) {
-	    Map<Integer, ChunkPosition> submap = map.get(x);
-	    if (submap == null) {
-	        submap = new HashMap<Integer, ChunkPosition>();
-	        map.put(x, submap);
-	    }
+		Map<Integer, ChunkPosition> submap = map.get(x);
+		if (submap == null) {
+			submap = new HashMap<Integer, ChunkPosition>();
+			map.put(x, submap);
+		}
 
-	    ChunkPosition chunkPosition = submap.get(z);
-	    if (chunkPosition == null) {
-	        chunkPosition = new ChunkPosition(x, z);
-	        submap.put(z, chunkPosition);
-	    }
+		ChunkPosition chunkPosition = submap.get(z);
+		if (chunkPosition == null) {
+			chunkPosition = new ChunkPosition(x, z);
+			submap.put(z, chunkPosition);
+		}
 
-	    return chunkPosition;
+		return chunkPosition;
 	}
 
 	/**
 	 * @return The .mca name for the region with this position
 	 */
 	public String getMcaName() {
-        return String.format("r.%d.%d.mca", x, z);
-    }
+		return String.format("r.%d.%d.mca", x, z);
+	}
 
 	/**
 	 * @return The long representation of the chunk position

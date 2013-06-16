@@ -34,12 +34,12 @@ import se.llbit.chunky.world.Block;
  */
 public class BlockTypeListCellRenderer extends JLabel implements ListCellRenderer {
 
-    private static final long serialVersionUID = -4916737793036321488L;
+	private static final long serialVersionUID = -4916737793036321488L;
 
-    /**
-     * Create new list cell renderer
-     */
-    public BlockTypeListCellRenderer() {
+	/**
+	 * Create new list cell renderer
+	 */
+	public BlockTypeListCellRenderer() {
 		setOpaque(true);
 		setHorizontalAlignment(LEFT);
 		setVerticalAlignment(CENTER);

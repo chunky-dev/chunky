@@ -23,6 +23,6 @@ import se.llbit.chunky.world.ChunkPosition;
 @SuppressWarnings("javadoc")
 public interface ChunkUpdateListener {
 
-    void chunksUpdated(Collection<ChunkPosition> chunks);
+	void chunksUpdated(Collection<ChunkPosition> chunks);
 
 }
