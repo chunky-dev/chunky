@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.world;
+import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -63,9 +64,9 @@ public class SkymapTexture extends Texture {
 					int index =  width*y + x;
 					Color.getRGBAComponents(data[index], c);
 					Color.getRGBAComponents(image.getRGB(x, y), c);
-					c[0] = (float) Math.pow(c[0], Scene.DEFAULT_GAMMA);
-					c[1] = (float) Math.pow(c[1], Scene.DEFAULT_GAMMA);
-					c[2] = (float) Math.pow(c[2], Scene.DEFAULT_GAMMA);
+					c[0] = (float) FastMath.pow(c[0], Scene.DEFAULT_GAMMA);
+					c[1] = (float) FastMath.pow(c[1], Scene.DEFAULT_GAMMA);
+					c[2] = (float) FastMath.pow(c[2], Scene.DEFAULT_GAMMA);
 					data[index] = Color.getRGB(c);
 				}
 			}

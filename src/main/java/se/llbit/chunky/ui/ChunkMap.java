@@ -39,6 +39,8 @@ import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 
+import org.apache.commons.math3.util.FastMath;
+
 /**
  * UI component that draws a 2D Minecraft map.
  *
@@ -95,7 +97,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 				setSelectionRect(ox, oy, -dx, -dy);
 				repaint();
 			} else {
-				if (!dragging && Math.abs(dx) < 5 && Math.abs(dy) < 5)
+				if (!dragging && FastMath.abs(dx) < 5 && FastMath.abs(dy) < 5)
 					return;
 				dragging = true;
 				setMotionOrigin(e);
@@ -135,8 +137,8 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 					int y = e.getY();
 					ChunkView view = chunky.getMapView();
 					double scale = (double) view.chunkScale;
-					int cx = (int) Math.floor(view.x + (x - getWidth()/2) / scale);
-					int cz = (int) Math.floor(view.z + (y - getHeight()/2) / scale);
+					int cx = (int) FastMath.floor(view.x + (x - getWidth()/2) / scale);
+					int cz = (int) FastMath.floor(view.z + (y - getHeight()/2) / scale);
 
 					if (view.chunkScale > 1) {
 						chunky.selectChunk(cx, cz);
@@ -164,8 +166,8 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		@Override
 		public void mouseMoved(MouseEvent e) {
 			double scale = (double) view.chunkScale;
-			int cx = (int) Math.floor(view.x + (e.getX() - getWidth()/2) / scale);
-			int cz = (int) Math.floor(view.z + (e.getY() - getHeight()/2) / scale);
+			int cx = (int) FastMath.floor(view.x + (e.getX() - getWidth()/2) / scale);
+			int cz = (int) FastMath.floor(view.z + (e.getY() - getHeight()/2) / scale);
 			Chunk prevHovered = chunky.getHoveredChunk();
 			chunky.setHoveredChunk(cx, cz);
 			Chunk hovered = chunky.getHoveredChunk();
@@ -235,10 +237,10 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	}
 
 	protected void setSelectionRect(int ox, int oy, int dx, int dy) {
-		rx = Math.min(ox, ox+dx);
-		ry = Math.min(oy, oy+dy);
-		rw = Math.abs(dx);
-		rh = Math.abs(dy);
+		rx = FastMath.min(ox, ox+dx);
+		ry = FastMath.min(oy, oy+dy);
+		rw = FastMath.abs(dx);
+		rh = FastMath.abs(dy);
 		selectRect = true;
 	}
 
@@ -248,10 +250,10 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			int width = getWidth();
 			int height = getHeight();
 			double scale = (double) view.chunkScale;
-			int cx0 = (int) Math.floor(view.x + (rx - width/2) / scale);
-			int cx1 = (int) Math.floor(view.x + (rx - width/2 + rw) / scale);
-			int cz0 = (int) Math.floor(view.z + (ry - height/2) / scale);
-			int cz1 = (int) Math.floor(view.z + (ry - height/2 + rh) / scale);
+			int cx0 = (int) FastMath.floor(view.x + (rx - width/2) / scale);
+			int cx1 = (int) FastMath.floor(view.x + (rx - width/2 + rw) / scale);
+			int cz0 = (int) FastMath.floor(view.z + (ry - height/2) / scale);
+			int cz1 = (int) FastMath.floor(view.z + (ry - height/2 + rh) / scale);
 
 			chunky.selectChunks(cx0, cx1, cz0, cz1);
 			renderBuffer.updateChunks(cx0, cx1, cz0, cz1);

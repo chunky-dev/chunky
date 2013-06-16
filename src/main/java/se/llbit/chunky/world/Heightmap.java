@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.world;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 /**
@@ -26,7 +26,7 @@ import java.util.Map;
 public class Heightmap {
 
     private Map<ChunkPosition, ChunkHeightmap> map =
-            new HashMap<ChunkPosition, ChunkHeightmap>();
+            new ConcurrentHashMap<ChunkPosition, ChunkHeightmap>();
 
     /**
      * Set height y at (x, z)

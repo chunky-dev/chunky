@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.Random;
 
@@ -92,9 +93,9 @@ public class RenderWorker extends Thread {
 		// calculate pixel bounds for this job
 		int xjobs = (canvasWidth+(manager.tileWidth-1))/manager.tileWidth;
 		int x0 = manager.tileWidth * (jobId % xjobs);
-		int x1 = Math.min(x0 + manager.tileWidth, canvasWidth);
+		int x1 = FastMath.min(x0 + manager.tileWidth, canvasWidth);
 		int y0 = manager.tileWidth * (jobId / xjobs);
-		int y1 = Math.min(y0 + manager.tileWidth, canvasHeight);
+		int y1 = FastMath.min(y0 + manager.tileWidth, canvasHeight);
 
 		double[][][] samples = scene.getSampleBuffer();
 		final Camera cam = scene.camera();

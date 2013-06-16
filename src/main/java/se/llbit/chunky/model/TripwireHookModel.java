@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.model;
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
@@ -93,14 +94,14 @@ public class TripwireHookModel {
 
 		// unarmed
 		arm[0][0] = Model.translate(Model.rotateX(armQuads, -Math.PI/4), 0, 3.3/16., -1.3/16.);
-		hook[0][0] = Model.translate(Model.rotateX(hookQuads, Math.PI/4), 0, 2.3/16., -.6/16);
+		hook[0][0] = Model.translate(Model.rotateX(hookQuads, FastMath.PI/4), 0, 2.3/16., -.6/16);
 
 		// armed
-		arm[0][1] = Model.translate(Model.rotateX(armQuads, Math.PI/25), 0, -2.5/16., 0);
-		hook[0][1] = Model.translate(Model.rotateX(hookQuads, Math.PI/16), 0, -2.3/16., 1/16.);
+		arm[0][1] = Model.translate(Model.rotateX(armQuads, FastMath.PI/25), 0, -2.5/16., 0);
+		hook[0][1] = Model.translate(Model.rotateX(hookQuads, FastMath.PI/16), 0, -2.3/16., 1/16.);
 
 		// tripped
-		arm[0][2] = Model.translate(Model.rotateX(armQuads, Math.PI/8), 0, -5/16., 0);
+		arm[0][2] = Model.translate(Model.rotateX(armQuads, FastMath.PI/8), 0, -5/16., 0);
 		hook[0][2] = Model.translate(hookQuads, 0, -4.1/16., 1/16.);
 
 		arm[0][3] = arm[0][2];

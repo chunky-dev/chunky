@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.ui;
+import org.apache.commons.math3.util.FastMath;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -129,8 +130,8 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 		JTextField source = (JTextField) e.getSource();
 		try {
 			double value = numberFormat.parse(source.getText()).doubleValue();
-			value = Math.max(value, min);
-			value = Math.min(value, max);
+			value = FastMath.max(value, min);
+			value = FastMath.min(value, max);
 			setSlider(value);
 			valueChanged(value);
 		} catch (NumberFormatException ex) {
@@ -146,10 +147,10 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 		if (logarithmic) {
 			value = (double) (source.getValue() - source.getMinimum())
 					/ (source.getMaximum() - source.getMinimum());
-			double logMin = Math.log10(min);
-			double logMax = Math.log10(max);
+			double logMin = FastMath.log10(min);
+			double logMax = FastMath.log10(max);
 			double scale = logMax - logMin;
-			value = Math.pow(10, value * scale + logMin);
+			value = FastMath.pow(10, value * scale + logMin);
 		} else {
 			double scale = (max - min) / (source.getMaximum() - source.getMinimum());
 			value = (source.getValue() - source.getMinimum()) * scale + min;
@@ -183,9 +184,9 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	private void setSlider(double value) {
 		int sliderValue;
 		if (logarithmic) {
-			double logMin = Math.log10(min);
-			double logMax = Math.log10(max);
-			double logValue = (Math.log10(value) - logMin) / (logMax - logMin);
+			double logMin = FastMath.log10(min);
+			double logMax = FastMath.log10(max);
+			double logValue = (FastMath.log10(value) - logMin) / (logMax - logMin);
 			double scale = slider.getMaximum() - slider.getMinimum();
 			sliderValue = (int) (logValue * scale + slider.getMinimum());
 		} else {

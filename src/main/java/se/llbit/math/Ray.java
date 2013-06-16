@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.math;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.Random;
 
@@ -406,20 +407,20 @@ public class Ray {
 		// get random point on unit disk
 		double x1 = random.nextDouble();
 		double x2 = random.nextDouble();
-		double r = Math.sqrt(x1);
-		double theta = 2 * Math.PI * x2;
+		double r = FastMath.sqrt(x1);
+		double theta = 2 * FastMath.PI * x2;
 
 		// project to point on hemisphere in tangent space
-		double tx = r * Math.cos(theta);
-		double ty = r * Math.sin(theta);
-		double tz = Math.sqrt(1 - x1);
+		double tx = r * FastMath.cos(theta);
+		double ty = r * FastMath.sin(theta);
+		double tz = FastMath.sqrt(1 - x1);
 
 		// transform from tangent space to world space
 		double xx, xy, xz;
 		double ux, uy, uz;
 		double vx, vy, vz;
 
-		if (Math.abs(n.x) > .1) {
+		if (FastMath.abs(n.x) > .1) {
 			xx = 0;
 			xy = 1;
 			xz = 0;

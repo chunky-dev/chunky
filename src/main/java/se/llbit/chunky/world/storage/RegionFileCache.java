@@ -28,13 +28,15 @@ import java.io.*;
 import java.lang.ref.*;
 import java.util.*;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 @SuppressWarnings("javadoc")
 public class RegionFileCache {
 
     private static final int MAX_CACHE_SIZE = 256;
 
 
-    private static final Map<File, Reference<RegionFile>> cache = new HashMap<File, Reference<RegionFile>>();
+    private static final Map<File, Reference<RegionFile>> cache = new ConcurrentHashMap<File, Reference<RegionFile>>();
 
     private RegionFileCache() {
     }

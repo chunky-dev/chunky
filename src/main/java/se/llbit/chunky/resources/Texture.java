@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.resources;
+import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -396,9 +397,9 @@ public class Texture {
 			for (int x = 0; x < width; ++x) {
 				int index =  width*y + x;
 				Color.getRGBAComponents(data[index], linear[index]);
-				linear[index][0] = (float) Math.pow(linear[index][0], Scene.DEFAULT_GAMMA);
-				linear[index][1] = (float) Math.pow(linear[index][1], Scene.DEFAULT_GAMMA);
-				linear[index][2] = (float) Math.pow(linear[index][2], Scene.DEFAULT_GAMMA);
+				linear[index][0] = (float) FastMath.pow(linear[index][0], Scene.DEFAULT_GAMMA);
+				linear[index][1] = (float) FastMath.pow(linear[index][1], Scene.DEFAULT_GAMMA);
+				linear[index][2] = (float) FastMath.pow(linear[index][2], Scene.DEFAULT_GAMMA);
 				avgColorLinear[0] += linear[index][3] * linear[index][0];
 				avgColorLinear[1] += linear[index][3] * linear[index][1];
 				avgColorLinear[2] += linear[index][3] * linear[index][2];
@@ -411,7 +412,7 @@ public class Texture {
 		avgColorLinear[2] /= width*height;
 		avgColorLinear[3] /= width*height;
 
-		avgColor = Color.getRGBA(Math.pow(avgColorLinear[0], 1/Scene.DEFAULT_GAMMA),
+		avgColor = Color.getRGBA(FastMath.pow(avgColorLinear[0], 1/Scene.DEFAULT_GAMMA),
 				Math.pow(avgColorLinear[1], 1/Scene.DEFAULT_GAMMA),
 				Math.pow(avgColorLinear[2], 1/Scene.DEFAULT_GAMMA), avgColorLinear[3]);
 	}

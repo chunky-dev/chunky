@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.scene;
+import org.apache.commons.math3.util.FastMath;
 
 import java.awt.Color;
 import java.util.Random;
@@ -125,23 +126,23 @@ public class Sun {
 	 */
 	public static final double RADIUS = .03;
 	@SuppressWarnings("javadoc")
-	public static final double RADIUS_COS = Math.cos(RADIUS);
+	public static final double RADIUS_COS = FastMath.cos(RADIUS);
 	@SuppressWarnings("javadoc")
-	public static final double RADIUS_COS_2 = Math.cos(RADIUS*2);
+	public static final double RADIUS_COS_2 = FastMath.cos(RADIUS*2);
 	@SuppressWarnings("javadoc")
-	public static final double RADIUS_SIN = Math.sin(RADIUS);
+	public static final double RADIUS_SIN = FastMath.sin(RADIUS);
 	@SuppressWarnings("javadoc")
 	public static final double RADIUS_COS_SQ = RADIUS_COS * RADIUS_COS;
 	@SuppressWarnings("javadoc")
 	public static final double SUN_WEIGHT =
-		1 - Math.sqrt(1 - RADIUS_SIN*RADIUS_SIN);
+		1 - FastMath.sqrt(1 - RADIUS_SIN*RADIUS_SIN);
 
 	private static final double AMBIENT = .3;
 
 	private double intensity = DEFAULT_INTENSITY;
 
-	private double azimuth = Math.PI / 2.5;
-	private double altitude = Math.PI / 3;
+	private double azimuth = FastMath.PI / 2.5;
+	private double altitude = FastMath.PI / 3;
 
 	private final Vector3d su = new Vector3d();
 	private final Vector3d sv = new Vector3d();
@@ -163,12 +164,12 @@ public class Sun {
 			ray.d.y = -ray.d.y;
 		double cosTheta = ray.d.y;
 		double cosGamma = ray.d.dot(sw);
-		double gamma = Math.acos(cosGamma);
+		double gamma = FastMath.acos(cosGamma);
 		double cos2Gamma = cosGamma * cosGamma;
 		c.x = zenith_x * perezF(cosTheta, gamma, cos2Gamma, A.x, B.x, C.x, D.x, E.x) * f0_x;
 		c.y = zenith_y * perezF(cosTheta, gamma, cos2Gamma, A.y, B.y, C.y, D.y, E.y) * f0_y;
 		c.z = zenith_Y * perezF(cosTheta, gamma, cos2Gamma, A.z, B.z, C.z, D.z, E.z) * f0_Y;
-		c.z = 1 - Math.exp(-(1/17.) * c.z);
+		c.z = 1 - FastMath.exp(-(1/17.) * c.z);
 		//c.z /= 20;
 		if (c.y <= Ray.EPSILON) {
     		c.set(0, 0, 0, 1);
@@ -196,7 +197,7 @@ public class Sun {
 	private static double perezF(double cosTheta, double gamma, double cos2Gamma,
 			double A, double B, double C, double D, double E) {
 
-		return (1 + A * Math.exp(B / cosTheta)) * (1 + C * Math.exp(D*gamma) + E * cos2Gamma);
+		return (1 + A * FastMath.exp(B / cosTheta)) * (1 + C * FastMath.exp(D*gamma) + E * cos2Gamma);
 	}
 
 	/**
@@ -224,17 +225,17 @@ public class Sun {
 		double theta = azimuth;
 		double phi = altitude;
 
-		sw.x = Math.cos(theta);
-		sw.y = Math.sin(phi);
-		sw.z = Math.sin(theta);
+		sw.x = FastMath.cos(theta);
+		sw.y = FastMath.sin(phi);
+		sw.z = FastMath.sin(theta);
 
-		double r = Math.sqrt(sw.x*sw.x + sw.z*sw.z);
-		r = Math.abs(Math.cos(phi) / r);
+		double r = FastMath.sqrt(sw.x*sw.x + sw.z*sw.z);
+		r = FastMath.abs(FastMath.cos(phi) / r);
 
 		sw.x *= r;
 		sw.z *= r;
 
-		if (Math.abs(sw.x) > .1)
+		if (FastMath.abs(sw.x) > .1)
 			su.set(0, 1, 0);
 		else
 			su.set(1, 0, 0);
@@ -243,7 +244,7 @@ public class Sun {
 		su.cross(sv, sw);
 
 		emittance.set(color);
-		emittance.scale(Math.pow(intensity, Scene.DEFAULT_GAMMA));
+		emittance.scale(FastMath.pow(intensity, Scene.DEFAULT_GAMMA));
 
 		updateSkylightValues();
 	}
@@ -294,7 +295,7 @@ public class Sun {
 	 * @param value
 	 */
 	public void setAzimuth(double value) {
-		azimuth = QuickMath.modulo(value, Math.PI*2);
+		azimuth = QuickMath.modulo(value, FastMath.PI*2);
 		initSun();
 		scene.refresh();
 	}
@@ -304,7 +305,7 @@ public class Sun {
 	 * @param value
 	 */
 	public void setAltitude(double value) {
-		altitude = QuickMath.clamp(value, 0, Math.PI/2);
+		altitude = QuickMath.clamp(value, 0, FastMath.PI/2);
 		initSun();
 		scene.refresh();
 	}
@@ -344,9 +345,9 @@ public class Sun {
 		double WIDTH = RADIUS*4;
 		double WIDTH2 = WIDTH*2;
 		double a;
-		a = Math.PI/2 - Math.acos(ray.d.dot(su)) + WIDTH;
+		a = FastMath.PI/2 - FastMath.acos(ray.d.dot(su)) + WIDTH;
 		if (a >= 0 && a < WIDTH2) {
-			double b = Math.PI/2 - Math.acos(ray.d.dot(sv)) + WIDTH;
+			double b = FastMath.PI/2 - FastMath.acos(ray.d.dot(sv)) + WIDTH;
 			if (b >= 0 && b < WIDTH2) {
 				texture.getColor(a / WIDTH2, b / WIDTH2, ray.color);
 				ray.color.x *= emittance.x * 10;
@@ -366,7 +367,7 @@ public class Sun {
 	 */
 	public void flatShading(Ray ray) {
 		double shading = ray.n.x * sw.x + ray.n.y * sw.y + ray.n.z * sw.z;
-		shading = Math.max(AMBIENT, shading);
+		shading = FastMath.max(AMBIENT, shading);
 		ray.color.x *= emittance.x * shading;
 		ray.color.y *= emittance.y * shading;
 		ray.color.z *= emittance.z * shading;
@@ -376,18 +377,18 @@ public class Sun {
 	 * @param color
 	 */
 	public void setColor(java.awt.Color color) {
-		this.color.x = Math.pow(color.getRed() / 255., Scene.DEFAULT_GAMMA);
-		this.color.y = Math.pow(color.getGreen() / 255., Scene.DEFAULT_GAMMA);
-		this.color.z = Math.pow(color.getBlue() / 255., Scene.DEFAULT_GAMMA);
+		this.color.x = FastMath.pow(color.getRed() / 255., Scene.DEFAULT_GAMMA);
+		this.color.y = FastMath.pow(color.getGreen() / 255., Scene.DEFAULT_GAMMA);
+		this.color.z = FastMath.pow(color.getBlue() / 255., Scene.DEFAULT_GAMMA);
 		initSun();
 		scene.refresh();
 	}
 
 	private void updateSkylightValues() {
-		double sunTheta = Math.PI/2 - altitude;
-		double cosTheta = Math.cos(sunTheta);
+		double sunTheta = FastMath.PI/2 - altitude;
+		double cosTheta = FastMath.cos(sunTheta);
 		double cos2Theta = cosTheta*cosTheta;
-		double chi = (4.0/9.0 - turb/120.0)*(Math.PI - 2*sunTheta);
+		double chi = (4.0/9.0 - turb/120.0)*(FastMath.PI - 2*sunTheta);
 		zenith_Y = (4.0453*turb - 4.9710)*Math.tan(chi) - 0.2155*turb + 2.4192;
 		zenith_Y = (zenith_Y < 0) ? -zenith_Y : zenith_Y;
 		zenith_x = chroma(turb, turb2, sunTheta, xZenithChroma);
@@ -424,15 +425,15 @@ public class Sun {
 		double x1 = random.nextDouble();
 		double x2 = random.nextDouble();
 		double cos_a = 1-x1 + x1*RADIUS_COS;
-		double sin_a = Math.sqrt(1 - cos_a*cos_a);
-		double phi = 2 * Math.PI * x2;
+		double sin_a = FastMath.sqrt(1 - cos_a*cos_a);
+		double phi = 2 * FastMath.PI * x2;
 
 		Vector3d u = vectorPool.get(su);
 		Vector3d v = vectorPool.get(sv);
 		Vector3d w = vectorPool.get(sw);
 
-		u.scale(Math.cos(phi)*sin_a);
-		v.scale(Math.sin(phi)*sin_a);
+		u.scale(FastMath.cos(phi)*sin_a);
+		v.scale(FastMath.sin(phi)*sin_a);
 		w.scale(cos_a);
 
 		reflected.d.add(u, v);
@@ -454,17 +455,17 @@ public class Sun {
 		double Br = 0.00002*10;
 		double Bm = 0.0007*10;
 		double g = -.001*10000;
-		double Fex = Math.exp(-(Br + Bm) * s);
+		double Fex = FastMath.exp(-(Br + Bm) * s);
 		if (attenuation < Ray.EPSILON) {
 			ray.color.x *= Fex;
 			ray.color.y *= Fex;
 			ray.color.z *= Fex;
 		} else {
 			double theta = ray.d.dot(sw);
-			double cos_theta = Math.cos(theta);
+			double cos_theta = FastMath.cos(theta);
 			double cos2_theta = cos_theta*cos_theta;
 			double Brt = (3 / (16*Math.PI)) * Br * (1 + cos2_theta);
-			double Bmt = (1 / (4*Math.PI)) * Bm * ((1-g)*(1-g)) / Math.pow(1 + g*g + 2*g*cos_theta, 3/2.);
+			double Bmt = (1 / (4*Math.PI)) * Bm * ((1-g)*(1-g)) / FastMath.pow(1 + g*g + 2*g*cos_theta, 3/2.);
 			double Fin = ((Brt + Bmt) / (Br + Bm)) * (1 - Fex);
 			ray.color.x = ray.color.x * Fex + attenuation * Fin * emittance.x;
 			ray.color.y = ray.color.y * Fex + attenuation * Fin * emittance.y;
@@ -489,7 +490,7 @@ public class Sun {
 	 * @return Extinction factor
 	 */
 	public double extinction(double s) {
-		return Math.exp(-(Br + Bm) * s);
+		return FastMath.exp(-(Br + Bm) * s);
 	}
 
 	/**
@@ -498,10 +499,10 @@ public class Sun {
 	 * @return Inscatter factor
 	 */
 	public double inscatter(double Fex, double theta) {
-		double cos_theta = Math.cos(theta);
+		double cos_theta = FastMath.cos(theta);
 		double cos2_theta = cos_theta*cos_theta;
 		double Brt = (3 / (16*Math.PI)) * Br * (1 + cos2_theta);
-		double Bmt = (1 / (4*Math.PI)) * Bm * ((1-g)*(1-g)) / Math.pow(1 + g*g + 2*g*cos_theta, 3/2.);
+		double Bmt = (1 / (4*Math.PI)) * Bm * ((1-g)*(1-g)) / FastMath.pow(1 + g*g + 2*g*cos_theta, 3/2.);
 		return ((Brt + Bmt) / (Br + Bm)) * (1 - Fex);
 	}
 
@@ -510,8 +511,8 @@ public class Sun {
 	 */
 	public Color getAwtColor() {
 		return new Color(
-				(float) Math.min(1, color.x),
-				(float) Math.min(1, color.y),
-				(float) Math.min(1, color.z));
+				(float) FastMath.min(1, color.x),
+				(float) FastMath.min(1, color.y),
+				(float) FastMath.min(1, color.z));
 	}
 }

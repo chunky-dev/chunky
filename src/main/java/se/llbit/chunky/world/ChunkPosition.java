@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.world;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 /**
@@ -46,12 +46,12 @@ public final class ChunkPosition {
 	}
 
 	private final static Map<Integer, Map<Integer, ChunkPosition>> map =
-	        new HashMap<Integer, Map<Integer,ChunkPosition>>();
+	        new ConcurrentHashMap<Integer, Map<Integer,ChunkPosition>>();
 
 	public synchronized static ChunkPosition get(int x, int z) {
 	    Map<Integer, ChunkPosition> submap = map.get(x);
 	    if (submap == null) {
-	        submap = new HashMap<Integer, ChunkPosition>();
+	        submap = new ConcurrentHashMap<Integer, ChunkPosition>();
 	        map.put(x, submap);
 	    }
 

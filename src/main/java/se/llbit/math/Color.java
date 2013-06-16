@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.math;
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.scene.Scene;
 
@@ -237,7 +238,7 @@ public final class Color {
 	 */
 	public static void toLinear(float[] components) {
 		for (int i = 0; i < components.length; ++i) {
-			components[i] = (float) Math.pow(components[i], Scene.DEFAULT_GAMMA);
+			components[i] = (float) FastMath.pow(components[i], Scene.DEFAULT_GAMMA);
 		}
 	}
 }

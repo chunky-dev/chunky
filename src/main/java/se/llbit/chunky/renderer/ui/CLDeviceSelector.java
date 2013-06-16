@@ -22,7 +22,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +66,7 @@ public class CLDeviceSelector extends JDialog {
 	 * CL device map
 	 */
 	private Map<CLPlatform, List<CLDevice>> deviceMap =
-			new HashMap<CLPlatform, List<CLDevice>>();
+			new ConcurrentHashMap<CLPlatform, List<CLDevice>>();
 
 	private JComboBox platformList;
 	private JComboBox deviceList;

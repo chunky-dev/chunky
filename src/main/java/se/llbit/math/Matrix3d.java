@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.math;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * A three by three matrix of doubles.
@@ -35,8 +36,8 @@ public class Matrix3d {
 	 * @param theta
 	 */
 	public final void rotX(double theta) {
-		double cost = Math.cos(theta);
-		double sint = Math.sin(theta);
+		double cost = FastMath.cos(theta);
+		double sint = FastMath.sin(theta);
 		m11 = 1;
 		m12 = 0;
 		m13 = 0;
@@ -54,8 +55,8 @@ public class Matrix3d {
 	 * @param theta
 	 */
 	public final void rotY(double theta) {
-		double cost = Math.cos(theta);
-		double sint = Math.sin(theta);
+		double cost = FastMath.cos(theta);
+		double sint = FastMath.sin(theta);
 		m11 = cost;
 		m12 = 0;
 		m13 = sint;
@@ -73,8 +74,8 @@ public class Matrix3d {
 	 * @param theta
 	 */
 	public final void rotZ(double theta) {
-		double cost = Math.cos(theta);
-		double sint = Math.sin(theta);
+		double cost = FastMath.cos(theta);
+		double sint = FastMath.sin(theta);
 		m11 = cost;
 		m12 = -sint;
 		m13 = 0;

@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.world;
+import org.apache.commons.math3.util.FastMath;
 
 import java.awt.image.BufferedImage;
 
@@ -172,9 +173,9 @@ public class Biomes {
 		float[] frgb = new float[3];
 		for (int i = 0; i < src.length; ++i) {
 			Color.getRGBComponents(src[i], frgb);
-			dest[i][0] = (float) Math.pow(frgb[0], Scene.DEFAULT_GAMMA);
-			dest[i][1] = (float) Math.pow(frgb[1], Scene.DEFAULT_GAMMA);
-			dest[i][2] = (float) Math.pow(frgb[2], Scene.DEFAULT_GAMMA);
+			dest[i][0] = (float) FastMath.pow(frgb[0], Scene.DEFAULT_GAMMA);
+			dest[i][1] = (float) FastMath.pow(frgb[1], Scene.DEFAULT_GAMMA);
+			dest[i][2] = (float) FastMath.pow(frgb[2], Scene.DEFAULT_GAMMA);
 		}
 	}
 

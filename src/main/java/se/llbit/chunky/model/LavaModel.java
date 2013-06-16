@@ -22,6 +22,8 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Triangle;
 
+import org.apache.commons.math3.util.FastMath;
+
 /**
  * A lava block. The height the top lava block is slightly lower
  * than a regular block.
@@ -54,14 +56,14 @@ public class LavaModel {
 		boolean hit = false;
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(Math.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			hit = true;
 		}
 		triangle = WaterModel.t230[c2][c3][c0];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(Math.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			ray.u = 1-ray.u;
 			ray.v = 1-ray.v;
@@ -70,7 +72,7 @@ public class LavaModel {
 		triangle = WaterModel.westt[c0][c3];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(Math.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			double y = ray.t * ray.d.y + ray.x.y;
 			double z = ray.t * ray.d.z + ray.x.z;
@@ -83,7 +85,7 @@ public class LavaModel {
 		triangle = WaterModel.westb[c0];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(Math.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			double y = ray.t * ray.d.y + ray.x.y;
 			double z = ray.t * ray.d.z + ray.x.z;
@@ -96,7 +98,7 @@ public class LavaModel {
 		triangle = WaterModel.eastt[c1][c2];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(Math.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			double y = ray.t * ray.d.y + ray.x.y;
 			double z = ray.t * ray.d.z + ray.x.z;
@@ -109,7 +111,7 @@ public class LavaModel {
 		triangle = WaterModel.eastb[c1];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(Math.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			double y = ray.t * ray.d.y + ray.x.y;
 			double z = ray.t * ray.d.z + ray.x.z;
@@ -122,7 +124,7 @@ public class LavaModel {
 		triangle = WaterModel.southt[c0][c1];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(Math.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			double x = ray.t * ray.d.x + ray.x.x;
 			double y = ray.t * ray.d.y + ray.x.y;
@@ -135,7 +137,7 @@ public class LavaModel {
 		triangle = WaterModel.southb[c1];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(Math.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			double x = ray.t * ray.d.x + ray.x.x;
 			double y = ray.t * ray.d.y + ray.x.y;
@@ -148,7 +150,7 @@ public class LavaModel {
 		triangle = WaterModel.northt[c2][c3];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(Math.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			double x = ray.t * ray.d.x + ray.x.x;
 			double y = ray.t * ray.d.y + ray.x.y;
@@ -161,7 +163,7 @@ public class LavaModel {
 		triangle = WaterModel.northb[c2];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
-			ray.n.scale(Math.signum(-ray.d.dot(triangle.n)));
+			ray.n.scale(FastMath.signum(-ray.d.dot(triangle.n)));
 			ray.t = ray.tNear;
 			double x = ray.t * ray.d.x + ray.x.x;
 			double y = ray.t * ray.d.y + ray.x.y;

@@ -15,6 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.math;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * Quick math utility methods.
@@ -81,7 +82,7 @@ public class QuickMath {
 	 * @return Degrees
 	 */
 	public static final double radToDeg(double rad) {
-		return 180 * (rad / Math.PI);
+		return 180 * (rad / FastMath.PI);
 	}
 
 	/**
@@ -99,7 +100,7 @@ public class QuickMath {
 	 * @return Radians
 	 */
 	public static final double degToRad(double deg) {
-		return Math.PI * (deg / 180);
+		return FastMath.PI * (deg / 180);
 	}
 
 	/**

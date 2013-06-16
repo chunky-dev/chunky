@@ -15,7 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.Map;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -33,7 +33,7 @@ aspect QuickParse {
 	 */
 	public static Map<String, AnyTag> NamedTag.quickParse(DataInputStream in, Set<String> request) {
 		// create a tree of tags to be parsed, skip parsing for other tags
-		Map<String, AnyTag> result = new HashMap<String, AnyTag>();
+		Map<String, AnyTag> result = new ConcurrentHashMap<String, AnyTag>();
 		Set<String> prefixes = new HashSet<String>();
 
 		for (String tag : request) {
