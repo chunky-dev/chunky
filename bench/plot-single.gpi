@@ -4,7 +4,7 @@ col1 = "#5382A1"
 
 set autoscale
 set xlabel 'tilewidth'
-set ylabel 'SPP'
+set ylabel 'SPS'
 set grid
 set key left top
 
