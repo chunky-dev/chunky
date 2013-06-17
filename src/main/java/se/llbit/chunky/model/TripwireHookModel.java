@@ -16,8 +16,6 @@
  */
 package se.llbit.chunky.model;
 
-import org.apache.commons.math3.util.FastMath;
-
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.Quad;
