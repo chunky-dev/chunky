@@ -21,9 +21,9 @@ fi
 for ((i=1;i<=10;++i)); do
 	echo "benchmark run $i/10"
 	echo "writing output to log$$-$i.dat"
-	for tilewidth in 1 2 4 8 16 32 64 128 256; do
-		echo -n "$tilewidth "
-		java $JAVA_OPTS -jar ../build/Chunky.jar -benchmark -threads 8 -tile-width $tilewidth | \
+	for threads in 1 2 3 4 5 6 7 8; do
+		echo -n "$threads "
+		java $JAVA_OPTS -jar ../build/Chunky.jar -benchmark -threads $threads -tile-width 16 | \
 			grep 'Benchmark completed' | cut -d ' ' -f 5
 	done | tee log$$-$i.dat
 done
