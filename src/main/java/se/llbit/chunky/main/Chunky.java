@@ -520,7 +520,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		if (renderControls == null || !renderControls.isDisplayable()) {
 			File sceneDir = SceneDirectoryPicker.getSceneDirectory(frame);
 			RenderContext context = new RenderContext(sceneDir,
-					getControls().getNumThreads(), tileWidth);
+					ProgramProperties.getNumThreads(), tileWidth);
 			if (sceneDir != null) {
 				String name = world.levelName();
 				String preferredName = SceneManager.preferredSceneName(
@@ -1044,7 +1044,7 @@ public class Chunky implements ChunkDiscoveryListener {
 			File sceneDir = SceneDirectoryPicker.getSceneDirectory(frame);
 			if (sceneDir != null) {
 				RenderContext context = new RenderContext(sceneDir,
-						getControls().getNumThreads(), tileWidth);
+						ProgramProperties.getNumThreads(), tileWidth);
 				SceneSelector sceneSelector = new SceneSelector(null, context);
 				sceneSelector.setLocationRelativeTo(frame);
 				if (sceneSelector.isAccepted()) {
@@ -1076,7 +1076,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	 */
 	public void runBenchmark() {
 		RenderContext context = new RenderContext(null,
-				getControls().getNumThreads(), tileWidth);
+				ProgramProperties.getNumThreads(), tileWidth);
 		new BenchmarkDialog(getFrame(), context);
 	}
 }

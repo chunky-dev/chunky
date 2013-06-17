@@ -53,6 +53,16 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	private boolean logarithmic = false;
 
 	/**
+	 * Clamp values to minimum
+	 */
+	private boolean clampMin = true;
+
+	/**
+	 * Clamp values to maximum
+	 */
+	private boolean clampMax = true;
+
+	/**
 	 * Number format for current locale.
 	 */
 	private static final NumberFormat numberFormat =
@@ -105,6 +115,22 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	}
 
 	/**
+	 * Select clamping mode
+	 * @param mode <code>true</code> means clamping is enabled
+	 */
+	public void setClampMin(boolean mode) {
+		clampMin = mode;
+	}
+
+	/**
+	 * Select clamping mode
+	 * @param mode <code>true</code> means clamping is enabled
+	 */
+	public void setClampMax(boolean mode) {
+		clampMax = mode;
+	}
+
+	/**
 	 * @param layout
 	 * @return horizontal layout group
 	 */
@@ -133,9 +159,14 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 		JTextField source = (JTextField) e.getSource();
 		try {
 			double value = numberFormat.parse(source.getText()).doubleValue();
-			value = QuickMath.max(value, min);
-			value = QuickMath.min(value, max);
-			setSlider(value);
+			double sliderValue = QuickMath.clamp(value, min, max);
+			if (clampMin) {
+				value = QuickMath.max(value, min);
+			}
+			if (clampMax) {
+				value = QuickMath.min(value, max);
+			}
+			setSlider(sliderValue);
 			valueChanged(value);
 		} catch (NumberFormatException ex) {
 		} catch (ParseException ex) {

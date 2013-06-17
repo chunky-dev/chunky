@@ -26,6 +26,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import se.llbit.chunky.renderer.RenderManager;
+
 /**
  * Utility class for managing program properties.
  *
@@ -179,6 +181,32 @@ public final class ProgramProperties {
 		} else {
 			return new File(getSettingsDirectory(), "Scenes");
 		}
+	}
+
+	/**
+	 * @return Default number of render threads
+	 */
+	public static int getNumThreads() {
+		String numThreads = getProperty("numThreads", "");
+		if (numThreads.isEmpty()) {
+			return RenderManager.NUM_RENDER_THREADS_DEFAULT;
+		} else {
+			try {
+				return Integer.parseInt(numThreads);
+			} catch (NumberFormatException e) {
+				return RenderManager.NUM_RENDER_THREADS_DEFAULT;
+			}
+		}
+	}
+
+	/**
+	 * Set default number of render threads
+	 * @param numThreads
+	 */
+	public static void setNumThreads(int numThreads) {
+		numThreads = Math.max(RenderManager.NUM_RENDER_THREADS_MIN, numThreads);
+		numThreads = Math.min(RenderManager.NUM_RENDER_THREADS_MAX, numThreads);
+		setProperty("numThreads", "" + numThreads);
 	}
 }
 
