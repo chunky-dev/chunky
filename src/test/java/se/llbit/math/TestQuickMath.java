@@ -13,7 +13,7 @@ import org.junit.Test;
 public class TestQuickMath {
 
 	/**
-	 * Test double precision minimum func.
+	 * Test double precision minimum.
 	 */
 	@Test
 	public void testMin_1() {
@@ -24,12 +24,32 @@ public class TestQuickMath {
 	}
 
 	/**
-	 * Test double NaN in minimum func.
+	 * If either argument is NaN the first argument is returned.
 	 */
 	@Test
 	public void testMin_2() {
 		assertTrue(11.0 == QuickMath.min(Double.NaN, 11.0));
 		assertTrue(Double.isNaN(QuickMath.min(11.0, Double.NaN)));
+	}
+
+	/**
+	 * Test double precision maximum.
+	 */
+	@Test
+	public void testMax_1() {
+		assertTrue(132.0 == QuickMath.max(132.0, 11.0));
+		assertTrue(132.0 == QuickMath.max(11.0, 132.0));
+		assertTrue(-11.0 == QuickMath.max(-132.0, -11.0));
+		assertTrue(-11.0 == QuickMath.max(-11.0, -132.0));
+	}
+
+	/**
+	 * If either argument is NaN the first argument is returned.
+	 */
+	@Test
+	public void testMax_2() {
+		assertTrue(11.0 == QuickMath.max(Double.NaN, 11.0));
+		assertTrue(Double.isNaN(QuickMath.max(11.0, Double.NaN)));
 	}
 
 	/**
