@@ -4,7 +4,7 @@ import math
 import os
 import re
 
-# 90% confidence interval with 9 (n-1) degrees of freedom
+# 90% confidence intervals with n<30 degrees of freedom
 t = [ 6.314, 2.920, 2.353, 2.132, 2.015, 1.943, 1.895, 1.860, 1.833, 1.812,
 1.796, 1.782, 1.771, 1.761, 1.753, 1.746, 1.740, 1.734, 1.729, 1.725,
 1.721, 1.717, 1.714, 1.711, 1.708, 1.706, 1.703, 1.701, 1.699, 1.697 ]
