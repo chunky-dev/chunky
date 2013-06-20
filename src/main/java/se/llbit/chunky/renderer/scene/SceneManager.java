@@ -237,7 +237,7 @@ public class SceneManager extends Thread {
 	 * @return <code>false</code> if the character can cause problems on any
 	 * supported platform
 	 */
-	private static boolean isValidSceneNameChar(char c) {
+	public static boolean isValidSceneNameChar(char c) {
 		switch (c) {
 		case '/':// linux
 		case ':':// mac

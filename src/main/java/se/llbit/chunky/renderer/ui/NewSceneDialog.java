@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -27,6 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.text.AbstractDocument;
 
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.SceneManager;
@@ -61,6 +62,8 @@ public class NewSceneDialog extends JDialog {
 		JLabel lbl = new JLabel("Enter name for the new 3D scene:");
 		final JTextField sceneNameField = new JTextField(20);
 		sceneNameField.setText(SceneManager.preferredSceneName(context, defaultSceneName));
+		AbstractDocument document = (AbstractDocument) sceneNameField.getDocument();
+		document.setDocumentFilter(new SceneNameFilter());
 		sceneNameField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

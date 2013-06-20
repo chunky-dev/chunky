@@ -63,5 +63,8 @@ public class TestSceneManager {
 		assertEquals("Scene", SceneManager.sanitizedSceneName("   "));
 		assertEquals("Scene", SceneManager.sanitizedSceneName("\t\n\b\r"));
 		assertEquals("Scene", SceneManager.sanitizedSceneName("\u0080"));
+
+		// test that whitespace is stripped after removing control chars
+		assertEquals("Scene", SceneManager.sanitizedSceneName("\u0085 \u0085"));
 	}
 }
