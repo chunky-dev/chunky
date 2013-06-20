@@ -194,10 +194,11 @@ public class SceneManager extends Thread {
  	 */
 	public static String preferredSceneName(RenderContext context, String name) {
 		String suffix = "";
+		name = sanitizedSceneName(name);
 		int count = 0;
 		do {
 			String targetName = name + suffix;
-			if (sceneNameAvailable(context, targetName)) {
+			if (sceneNameIsAvailable(context, targetName)) {
 				return targetName;
 			}
 			count += 1;
@@ -208,6 +209,57 @@ public class SceneManager extends Thread {
 	}
 
 	/**
+	 * Remove problematic characters from scene name
+	 * @param name
+	 * @return sanitized scene name
+	 */
+	public static String sanitizedSceneName(String name) {
+		name = name.trim();
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < name.length(); ++i) {
+			char c = name.charAt(i);
+			if (isValidSceneNameChar(c)) {
+				sb.append(c);
+			} else if (c >= '\u0020' && c <= '\u007e') {
+				sb.append('_');
+			}
+		}
+		String stripped = sb.toString().trim();
+		if (stripped.isEmpty()) {
+			return "Scene";
+		} else {
+			return stripped;
+		}
+	}
+
+	/**
+	 * @param c
+	 * @return <code>false</code> if the character can cause problems on any
+	 * supported platform
+	 */
+	private static boolean isValidSceneNameChar(char c) {
+		switch (c) {
+		case '/':// linux
+		case ':':// mac
+		case '\\':// windows
+		case '*':
+		case '?':
+		case '"':
+		case '<':
+		case '>':
+		case '|':
+			return false;
+		}
+		if (c < '\u0020') {
+			return false;
+		}
+		if (c > '\u007e' && c < '\u00a0') {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Lets the user decide whether or not to overwrite an existing scene, in case of
 	 * scene name collision
 	 * @param context
@@ -215,33 +267,31 @@ public class SceneManager extends Thread {
 	 * @return <code>true</code> if the user accepts a possible overwrite of an existing scene
 	 */
 	public static boolean acceptSceneName(RenderContext context, String sceneName) {
-		if (sceneNameAvailable(context, sceneName)) {
-			return true;
-		}
-
-		File targetFile = new File(
-				context.getSceneDirectory(),
-				sceneName + ".cvf");
-
-		if (targetFile.isDirectory()) {
-			logger.warn(String.format("Can not create a scene with the name %s.\n" +
-					"A directory with that name already exists!", sceneName));
+		sceneName = sceneName.trim();
+		if (sceneName.isEmpty()) {
+			logger.warn("The scene name can not be empty!");
 			return false;
-		}
-		Object[] options = { Messages.getString("Chunky.Cancel_lbl"), //$NON-NLS-1$
-				Messages.getString("Chunky.AcceptOverwrite_lbl") }; //$NON-NLS-1$
-		int n = JOptionPane.showOptionDialog(null,
-				String.format("A scene already exists with the name %s. " +
-						"Are you sure you want to overwrite this scene?",
-						targetFile.getName()),
-				"Confirm Scene Overwrite",
-				JOptionPane.YES_NO_OPTION,
-				JOptionPane.WARNING_MESSAGE,
-				null,
-				options,
-				options[0]);
+		} else if (!sceneNameIsValid(sceneName)) {
+			logger.warn("The scene name contains illegal characters!");
+			return false;
+		} else if (sceneNameIsAvailable(context, sceneName)) {
+			return true;
+		} else {
+			Object[] options = { Messages.getString("Chunky.Cancel_lbl"), //$NON-NLS-1$
+					Messages.getString("Chunky.AcceptOverwrite_lbl") }; //$NON-NLS-1$
+			int n = JOptionPane.showOptionDialog(null,
+					String.format("A scene already exists with the name %s. " +
+							"Are you sure you want to overwrite this scene?",
+							sceneName),
+					"Confirm Scene Overwrite",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.WARNING_MESSAGE,
+					null,
+					options,
+					options[0]);
 
-		return n == 1;
+			return n == 1;
+		}
 	}
 
 	/**
@@ -251,11 +301,25 @@ public class SceneManager extends Thread {
 	 * @return <code>true</code> if the scene name does not collide with an
 	 * already existing scene
 	 */
-	public static boolean sceneNameAvailable(RenderContext context, String sceneName) {
+	public static boolean sceneNameIsAvailable(RenderContext context, String sceneName) {
 		File targetFile = new File(
 				context.getSceneDirectory(),
 				sceneName + ".cvf");
 
 		return !targetFile.exists();
+	}
+
+	/**
+	 * Check for scene name validity
+	 * @param name
+	 * @return <code>true</code> if the scene name contains only legal characters
+	 */
+	public static boolean sceneNameIsValid(String name) {
+		for (int i = 0; i < name.length(); ++i) {
+			if (!isValidSceneNameChar(name.charAt(i))) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

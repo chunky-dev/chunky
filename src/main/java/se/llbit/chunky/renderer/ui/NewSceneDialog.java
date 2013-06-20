@@ -28,8 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.ui.SelectAllFocusListener;
@@ -40,9 +38,6 @@ import se.llbit.chunky.ui.SelectAllFocusListener;
  */
 @SuppressWarnings("serial")
 public class NewSceneDialog extends JDialog {
-
-	private static final Logger logger =
-			Logger.getLogger(NewSceneDialog.class);
 
 	private boolean accepted;
 	private String sceneName;
@@ -126,15 +121,10 @@ public class NewSceneDialog extends JDialog {
 	}
 
 	protected void tryAccept(String text) {
-		sceneName = text.trim();
-		if (!sceneName.isEmpty()) {
-			if (SceneManager.acceptSceneName(renderContext, sceneName)) {
-				accepted = true;
-				setVisible(false);
-				dispose();
-			}
-		} else {
-			logger.warn("Scene name must be non-empty!");
+		if (SceneManager.acceptSceneName(renderContext, sceneName)) {
+			accepted = true;
+			setVisible(false);
+			dispose();
 		}
 	}
 
@@ -146,7 +136,7 @@ public class NewSceneDialog extends JDialog {
 	}
 
 	/**
-	 * @return The user selecte scene name
+	 * @return The user selected scene name
 	 */
 	public String getSceneName() {
 		return sceneName;

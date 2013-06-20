@@ -55,8 +55,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.DocumentFilter;
 
 import org.apache.commons.math3.util.FastMath;
 import org.apache.log4j.Logger;
@@ -820,7 +822,9 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		sceneNameLbl.setText("Scene name: ");
 		sceneNameField.setColumns(15);
-		sceneNameField.getDocument().addDocumentListener(sceneNameListener);
+		AbstractDocument document = (AbstractDocument) sceneNameField.getDocument();
+		document.setDocumentFilter(sceneNameFilter);
+		document.addDocumentListener(sceneNameListener);
 		updateSceneNameField();
 
 		stillWaterCB.setText("still water");
@@ -1567,6 +1571,21 @@ public class RenderControls extends JDialog implements ViewListener,
 				logger.info("Failed to set canvas size: invalid dimensions!");
 			}
 		}
+	};
+
+	private final DocumentFilter sceneNameFilter = new DocumentFilter() {
+		@Override
+		public void insertString(FilterBypass fb, int offset, String string, javax.swing.text.AttributeSet attr) throws BadLocationException {
+			if (string != null) {
+				fb.insertString(offset, SceneManager.sanitizedSceneName(string), attr);
+			}
+		};
+		@Override
+		public void replace(FilterBypass fb, int offset, int length, String text, javax.swing.text.AttributeSet attrs) throws BadLocationException {
+			if (text != null) {
+				fb.replace(offset, length, SceneManager.sanitizedSceneName(text), attrs);
+			}
+		};
 	};
 
 	private final DocumentListener sceneNameListener = new DocumentListener() {

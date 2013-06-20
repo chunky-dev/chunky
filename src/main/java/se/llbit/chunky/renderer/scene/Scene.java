@@ -37,8 +37,8 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.imageio.ImageIO;
 
-import org.apache.log4j.Logger;
 import org.apache.commons.math3.util.FastMath;
+import org.apache.log4j.Logger;
 
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.Postprocess;
@@ -1375,11 +1375,13 @@ public class Scene implements Refreshable {
 
 	/**
 	 * Set the scene name
-	 * @param text
+	 * @param newName
 	 */
-	public void setName(String text) {
-		if (text.length() > 0)
-			name = text;
+	public void setName(String newName) {
+		newName = SceneManager.sanitizedSceneName(newName);
+		if (newName.length() > 0) {
+			name = newName;
+		}
 	}
 
 	/**

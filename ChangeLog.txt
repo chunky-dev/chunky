@@ -3,6 +3,7 @@
 	* Fixed autofocus not working
     * Improved rendering speed by using Apache Commons Math library (twirrim)
     * Chunky now remembers the number number of render threads setting
+    * Sanitize scene names by removing problematic characters
 
 1.1.11 - 2013-04-28
     * It is now possible to lock the render controls to avoid inadvertent

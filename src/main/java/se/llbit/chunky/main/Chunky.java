@@ -526,7 +526,8 @@ public class Chunky implements ChunkDiscoveryListener {
 				String preferredName = SceneManager.preferredSceneName(
 														context, name);
 
-				if (SceneManager.sceneNameAvailable(context, preferredName)) {
+				if (SceneManager.sceneNameIsValid(preferredName) &&
+						SceneManager.sceneNameIsAvailable(context, preferredName)) {
 					create3DScene(context, preferredName);
 				} else {
 					NewSceneDialog dialog = new NewSceneDialog(getFrame(),
@@ -541,7 +542,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	}
 
 	private void create3DScene(RenderContext context, String sceneName) {
-		renderControls = new RenderControls(Chunky.this, context);
+		renderControls = new RenderControls(this, context);
 		renderControls.setSceneName(sceneName);
 		Collection<ChunkPosition> selection =
 				chunkSelection.getSelection();
@@ -1054,12 +1055,12 @@ public class Chunky implements ChunkDiscoveryListener {
 				}
 			}
 		} else {
-				SceneSelector sceneSelector = new SceneSelector(null, renderControls.getContext());
-				sceneSelector.setLocationRelativeTo(frame);
-				if (sceneSelector.isAccepted()) {
-					String scene = sceneSelector.getSelectedScene();
-					renderControls.loadScene(scene);
-				}
+			SceneSelector sceneSelector = new SceneSelector(null, renderControls.getContext());
+			sceneSelector.setLocationRelativeTo(frame);
+			if (sceneSelector.isAccepted()) {
+				String scene = sceneSelector.getSelectedScene();
+				renderControls.loadScene(scene);
+			}
 		}
 	}
 
