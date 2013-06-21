@@ -103,6 +103,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 	private final boolean oneshot;
 
+	private boolean pathTracing = false;
+	private boolean paused = true;
+
 	/**
 	 * Constructor
 	 * @param canvas
@@ -157,7 +160,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				scene.waitOnRefreshRequest();
 
 				synchronized (scene) {
-					renderListener.renderStateChanged(scene.pathTrace(), scene.isPaused());
+					updateRenderState();
 					bufferedScene.set(scene);
 				}
 
@@ -183,6 +186,14 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		}
 	}
 
+	private void updateRenderState() {
+		if (pathTracing != scene.pathTrace() || paused != scene.isPaused()) {
+			pathTracing = scene.pathTrace();
+			paused = scene.isPaused();
+			renderListener.renderStateChanged(pathTracing, paused);
+		}
+	}
+
 	private void pathTraceLoop() throws InterruptedException {
 		// enable JIT for the first frame
 		java.lang.Compiler.enable();
@@ -190,9 +201,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		while (true) {
 
 			if (scene.isPaused()) {
-				renderListener.renderStateChanged(scene.pathTrace(), scene.isPaused());
+				updateRenderState();
 				scene.pauseWait();
-				renderListener.renderStateChanged(scene.pathTrace(), scene.isPaused());
+				updateRenderState();
 			}
 
 			if (scene.shouldRefresh()) {
