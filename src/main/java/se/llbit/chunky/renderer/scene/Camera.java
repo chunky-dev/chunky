@@ -18,8 +18,8 @@ package se.llbit.chunky.renderer.scene;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.apache.commons.math3.util.FastMath;
+import org.apache.log4j.Logger;
 
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.world.Chunk;
@@ -154,8 +154,8 @@ public class Camera {
 		@Override
 		public void apply(double x, double y, Random random, Vector3d o,
 				Vector3d d) {
-			double ay = y * fov * Math.PI / 180;
-			double ax = x * fov * Math.PI / 180;
+			double ay = QuickMath.degToRad(y * fov);
+			double ax = QuickMath.degToRad(x * fov);
 			double avSquared = ay * ay + ax * ax;
 			double angleFromCenter = FastMath.sqrt(avSquared);
 			double dz = FastMath.cos(angleFromCenter);
@@ -201,8 +201,8 @@ public class Camera {
 		@Override
 		public void apply(double x, double y, Random random, Vector3d o,
 				Vector3d d) {
-			double ay = y * fov * Math.PI / 180;
-			double ax = x * fov * Math.PI / 180;
+			double ay = QuickMath.degToRad(y * fov);
+			double ax = QuickMath.degToRad(x * fov);
 
 			double vv = FastMath.cos(ay);
 
@@ -242,7 +242,7 @@ public class Camera {
 		@Override
 		public void apply(double x, double y, Random random, Vector3d o,
 				Vector3d d) {
-			double ax = x * fov * Math.PI / 180;
+			double ax = QuickMath.degToRad(x * fov);
 			double dz = FastMath.cos(ax);
 			double dx = FastMath.sin(ax);
 			double dy = fovTan * y;
@@ -729,7 +729,7 @@ public class Camera {
 	 * @param pitch
 	 */
 	public synchronized void rotateView(double yaw, double pitch) {
-		double fovRad = (fov / 360) * Math.PI;
+		double fovRad = QuickMath.degToRad(fov / 2);
 		this.yaw += yaw * fovRad;
 		this.pitch += pitch * fovRad;
 
