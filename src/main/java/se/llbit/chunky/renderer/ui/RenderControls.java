@@ -1155,6 +1155,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JPanel buildCameraPane() {
 		JLabel projectionModeLbl = new JLabel("Projection");
 
+		fov.setClampMax(false);
 		fov.update();
 
 		dof = new DoFAdjuster(renderMan);
