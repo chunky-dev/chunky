@@ -80,8 +80,8 @@ public class Camera {
 	 * Casts parallel rays from different origin points on a plane
 	 */
 	static class ParallelProjector implements Projector {
-		final double worldWidth;
-		final double fov;
+		protected final double worldWidth;
+		protected final double fov;
 
 		public ParallelProjector(double worldWidth, double fov) {
 			this.worldWidth = worldWidth;
@@ -115,7 +115,7 @@ public class Camera {
 	 * Casts rays like a pinhole camera
 	 */
 	static class PinholeProjector implements Projector {
-		final double fovTan;
+		protected final double fovTan;
 
 		public PinholeProjector(double fov) {
 			this.fovTan = clampedFovTan(fov);
@@ -145,7 +145,7 @@ public class Camera {
 	}
 
 	static class FisheyeProjector implements Projector {
-		final double fov;
+		protected final double fov;
 
 		public FisheyeProjector(double fov) {
 			this.fov = fov;
@@ -192,7 +192,7 @@ public class Camera {
 	 * pitch.
 	 */
 	static class PanoramicProjector implements Projector {
-		final double fov;
+		protected final double fov;
 
 		public PanoramicProjector(double fov) {
 			this.fov = fov;
@@ -231,8 +231,8 @@ public class Camera {
 	 * spherical one in the horizontal direction.
 	 */
 	static class PanoramicSlotProjector implements Projector {
-		final double fov;
-		final double fovTan;
+		protected final double fov;
+		protected final double fovTan;
 
 		public PanoramicSlotProjector(double fov) {
 			this.fov = fov;
@@ -274,9 +274,9 @@ public class Camera {
 	 * In that case you should use the wrapped Projector directly.
 	 */
 	static class ApertureProjector implements Projector {
-		final Projector wrapped;
-		final double aperture;
-		final double subjectDistance;
+		protected final Projector wrapped;
+		protected final double aperture;
+		protected final double subjectDistance;
 
 		public ApertureProjector(Projector wrapped, double apertureSize,
 				double subjectDistance) {
@@ -326,13 +326,47 @@ public class Camera {
 	}
 
 	/**
+	 * A projector for spherical depth of field.
+	 */
+	static class SphericalApertureProjector extends ApertureProjector {
+		public SphericalApertureProjector(Projector wrapped, double apertureSize,
+				double subjectDistance) {
+			super(wrapped, apertureSize, subjectDistance);
+		}
+
+		@Override
+		public void apply(double x, double y, Random random, Vector3d o,
+				Vector3d d) {
+			wrapped.apply(x, y, random, o, d);
+
+			d.scale(subjectDistance);
+
+			// find random point in aperture
+			double rx, ry;
+			while (true) {
+				rx = 2 * random.nextDouble() - 1;
+				ry = 2 * random.nextDouble() - 1;
+				double s = rx * rx + ry * ry;
+				if (s > Ray.EPSILON && s <= 1) {
+					rx *= aperture;
+					ry *= aperture;
+					break;
+				}
+			}
+
+			d.sub(rx, ry, 0);
+			o.add(rx, ry, 0);
+		}
+	}
+
+	/**
 	 * Moves the ray origin forward (if displacement is positive) along the
 	 * direction vector.
 	 */
 	static class ForwardDisplacementProjector implements Projector {
-		final Projector wrapped;
-		final double displacementValue;
-		final double displacementSign;
+		protected final Projector wrapped;
+		protected final double displacementValue;
+		protected final double displacementSign;
 
 		public ForwardDisplacementProjector(Projector wrapped,
 				double displacement) {
@@ -525,6 +559,11 @@ public class Camera {
 				subjectDistance/dof, subjectDistance);
 	}
 
+	private Projector applySphericalDoF(Projector p) {
+		return infDof ? p : new SphericalApertureProjector(p,
+				subjectDistance/dof, subjectDistance);
+	}
+
 	/**
 	 * Creates, but does not otherwise use, a projector object
 	 * based on the current camera settings.
@@ -541,11 +580,11 @@ public class Camera {
 					new ParallelProjector(worldWidth, fov),
 					-worldWidth), subjectDistance+worldWidth);
 		case FISHEYE:
-			return applyDoF(new FisheyeProjector(fov), subjectDistance);
+			return applySphericalDoF(new FisheyeProjector(fov));
 		case PANORAMIC_SLOT:
-			return applyDoF(new PanoramicSlotProjector(fov), subjectDistance);
+			return applySphericalDoF(new PanoramicSlotProjector(fov));
 		case PANORAMIC:
-			return applyDoF(new PanoramicProjector(fov), subjectDistance);
+			return applySphericalDoF(new PanoramicProjector(fov));
 		}
 	}
 

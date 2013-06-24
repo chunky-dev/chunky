@@ -8,6 +8,9 @@
     unlocked until rendering is re-started
     * Re-loading chunks using the "Load Selected Chunks" button does not
     move the camera
+    * Fixed warping effect in fisheye and panoramic projection modes when
+    DoF is enabled. This reverts the depth of field effect to the 1.1.10
+    behavior for fisheye and panoramic projection.
 
 1.1.11 - 2013-04-28
     * It is now possible to lock the render controls to avoid inadvertent
