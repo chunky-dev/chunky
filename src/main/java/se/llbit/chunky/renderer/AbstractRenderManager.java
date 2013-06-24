@@ -53,7 +53,7 @@ public abstract class AbstractRenderManager extends Thread {
 	/**
 	 * Number of render threads
 	 */
-	protected final int numThreads;
+	protected int numThreads;
 
 	/**
 	 * Tile width

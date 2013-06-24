@@ -58,8 +58,6 @@ import org.apache.log4j.Logger;
 import se.llbit.chunky.main.BlockTypeListCellRenderer;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.Messages;
-import se.llbit.chunky.renderer.RenderManager;
-import se.llbit.chunky.renderer.ui.Adjuster;
 import se.llbit.chunky.renderer.ui.SceneDirectoryPicker;
 import se.llbit.chunky.resources.MiscImages;
 import se.llbit.chunky.resources.Texture;
@@ -68,7 +66,6 @@ import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
-import se.llbit.util.ProgramProperties;
 
 /**
  * This is the toolbox that's shown in the left part of the main Chunky GUI.
@@ -110,22 +107,6 @@ public class Controls extends JPanel {
 	private JTextField zField;
 
 	private JTabbedPane tabbedPane;
-
-	private final Adjuster numThreads = new Adjuster(
-			"Render threads",
-			"Number of rendering threads",
-			RenderManager.NUM_RENDER_THREADS_MIN,
-			20) {
-		@Override
-		public void valueChanged(double newValue) {
-			ProgramProperties.setNumThreads((int) newValue);
-		}
-
-		@Override
-		public void update() {
-			set(ProgramProperties.getNumThreads());
-		}
-	};
 
 	/**
 	 * @param chunky
@@ -379,9 +360,6 @@ public class Controls extends JPanel {
 
 		JComponent renderPanel = new JPanel();
 
-		numThreads.setClampMax(false);
-		numThreads.update();
-
 		JButton newSceneBtn = new JButton();
 		newSceneBtn.setText("New Scene");
 		newSceneBtn.addActionListener(new ActionListener() {
@@ -464,7 +442,6 @@ public class Controls extends JPanel {
 				.addComponent(sep1)
 				.addComponent(newSceneBtn)
 				.addComponent(loadSceneBtn)
-				.addGroup(numThreads.horizontalGroup(layout))
 				.addComponent(sep2)
 				.addComponent(testCLBtn)
 				.addComponent(benchmarkBtn)
@@ -482,8 +459,6 @@ public class Controls extends JPanel {
 			.addComponent(newSceneBtn)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(loadSceneBtn)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(numThreads.verticalGroup(layout))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)

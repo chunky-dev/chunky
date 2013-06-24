@@ -60,7 +60,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	private boolean dumpNextFrame = false;
 
 	private final RenderableCanvas canvas;
-	private final Thread[] workers;
+	private Thread[] workers = {};
 
 	private int numJobs;
 
@@ -142,12 +142,27 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		nextJob = new AtomicInteger(0);
 		finishedJobs = new AtomicInteger(0);
 
-		// start worker threads
-		long seed = System.currentTimeMillis();
-		workers = new Thread[numThreads];
-		for (int i = 0; i < numThreads; ++i) {
-			workers[i] = new RenderWorker(this, i, seed + i);
-			workers[i].start();
+		manageWorkers();
+	}
+
+	private void manageWorkers() {
+		if (numThreads != workers.length) {
+			long seed = System.currentTimeMillis();
+			Thread[] pool = new Thread[numThreads];
+			int i;
+			for (i = 0; i < workers.length && i < numThreads; ++i) {
+				pool[i] = workers[i];
+			}
+			// start additional workers
+			for (; i < numThreads; ++i) {
+				pool[i] = new RenderWorker(this, i, seed+i);
+				pool[i].start();
+			}
+			// stop extra workers
+			for (; i < workers.length; ++i) {
+				workers[i].interrupt();
+			}
+			workers = pool;
 		}
 	}
 
@@ -328,6 +343,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	private synchronized void waitOnWorkers() throws InterruptedException {
 		while (finishedJobs.get() < numJobs)
 			wait();
+		// all workers finished - we can now change the number of worker threads!
+		manageWorkers();
 	}
 
 	private synchronized void giveTickets() {
@@ -553,5 +570,13 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		bufferedScene.mergeDump(dumpFile, renderListener);
 		bufferedScene.updateCanvas();
 		canvas.repaint();
+	}
+
+	/**
+	 * Change number of render workers
+	 * @param threads
+	 */
+	public void setNumThreads(int threads) {
+		numThreads = Math.max(1, threads);
 	}
 }

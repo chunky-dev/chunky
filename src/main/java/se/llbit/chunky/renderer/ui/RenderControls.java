@@ -164,6 +164,23 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JPanel skyPane;
 	private JPanel advancedPane;
 
+	private final Adjuster numThreads = new Adjuster(
+			"Render threads",
+			"Number of rendering threads",
+			RenderManager.NUM_RENDER_THREADS_MIN,
+			20) {
+		@Override
+		public void valueChanged(double newValue) {
+			ProgramProperties.setNumThreads((int) newValue);
+			renderMan.setNumThreads((int) newValue);
+		}
+
+		@Override
+		public void update() {
+			set(ProgramProperties.getNumThreads());
+		}
+	};
+
 	private final Adjuster rayDepth = new Adjuster(
 			"Ray depth",
 			"Sets the recursive ray depth",
@@ -311,6 +328,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		safeComponents.add(saveDumpsCB);
 		safeComponents.add(dumpFrequency);
 		safeComponents.add(dumpFrequencyLbl);
+		safeComponents.add(numThreads.getLabel());
+		safeComponents.add(numThreads.getSlider());
+		safeComponents.add(numThreads.getField());
 	}
 
 	/**
@@ -575,6 +595,10 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		JSeparator sep1 = new JSeparator();
 		JSeparator sep2 = new JSeparator();
+		JSeparator sep3 = new JSeparator();
+
+		numThreads.setClampMax(false);
+		numThreads.update();
 
 		JLabel waterWorldLbl = new JLabel(
 				"Note: All chunks will be reloaded after changing the water world options!");
@@ -640,8 +664,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		layout.setHorizontalGroup(layout.createSequentialGroup()
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
-				.addGroup(rayDepth.horizontalGroup(layout))
+				.addGroup(numThreads.horizontalGroup(layout))
 				.addComponent(sep1)
+				.addGroup(rayDepth.horizontalGroup(layout))
+				.addComponent(sep2)
 				.addComponent(waterWorldLbl)
 				.addComponent(waterWorldCB)
 				.addGroup(layout.createSequentialGroup()
@@ -649,16 +675,20 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addGap(0, 0, Short.MAX_VALUE)
 					.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 				)
-				.addComponent(sep2)
+				.addComponent(sep3)
 				.addComponent(mergeDumpBtn)
 			)
 			.addContainerGap()
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
-			.addGroup(rayDepth.verticalGroup(layout))
+			.addGroup(numThreads.verticalGroup(layout))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addGroup(rayDepth.verticalGroup(layout))
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(waterWorldLbl)
 			.addPreferredGap(ComponentPlacement.RELATED)
@@ -669,7 +699,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+			.addComponent(sep3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(mergeDumpBtn)
 			.addContainerGap()

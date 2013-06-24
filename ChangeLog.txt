@@ -11,6 +11,9 @@
     * Fixed warping effect in fisheye and panoramic projection modes when
     DoF is enabled. This reverts the depth of field effect to the 1.1.10
     behavior for fisheye and panoramic projection.
+    * The number of render threads can now be controlled during rendering
+    * The controls for number of render threads has been moved to the
+    Advanced tab of the Render Controls dialog
 
 1.1.11 - 2013-04-28
     * It is now possible to lock the render controls to avoid inadvertent
