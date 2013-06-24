@@ -42,6 +42,7 @@ public class RenderWorker extends Thread {
 	private final RayPool rayPool;
 	private final VectorPool vectorPool;
 	private final Random random;
+	private long jobTime = 0;
 
 	/**
 	 * Create a new render worker, slave to a given render manager.
@@ -79,8 +80,9 @@ public class RenderWorker extends Thread {
 	/**
 	 * Perform work
 	 * @param jobId
+	 * @throws InterruptedException interrupted while sleeping
 	 */
-	private final void work(int jobId) {
+	private final void work(int jobId) throws InterruptedException {
 
 		Scene scene = manager.bufferedScene();
 
@@ -98,6 +100,8 @@ public class RenderWorker extends Thread {
 
 		double[][][] samples = scene.getSampleBuffer();
 		final Camera cam = scene.camera();
+
+		long jobStart = System.nanoTime();
 
 		if (scene.pathTrace()) {
 
@@ -177,7 +181,15 @@ public class RenderWorker extends Thread {
 
 			}}
 		}
-
+		jobTime += System.nanoTime() - jobStart;
+		if (jobTime > 500000000) {
+			// sleep = jobTime * (1-utilization) / utilization
+			double utilization = 0.95;
+			double util = (1-utilization) / utilization;
+			long sleep = (int) Math.max(1, (jobTime/1000000.0) * util);
+			sleep(sleep);
+			jobTime = 0;
+		}
 	}
 
 }
