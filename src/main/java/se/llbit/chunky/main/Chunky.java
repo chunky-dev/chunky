@@ -547,7 +547,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		Collection<ChunkPosition> selection =
 				chunkSelection.getSelection();
 		if (!selection.isEmpty()) {
-			renderControls.loadChunks(world, selection);
+			renderControls.loadFreshChunks(world, selection);
 		} else {
 			renderControls.show3DView();
 		}

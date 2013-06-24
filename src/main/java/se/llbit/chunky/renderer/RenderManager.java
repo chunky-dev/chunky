@@ -511,12 +511,24 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	}
 
 	/**
+	 * Load chunks and reset camera
+	 * @param world
+	 * @param chunksToLoad
+	 */
+	public void loadFreshChunks(World world, Collection<ChunkPosition> chunksToLoad) {
+		scene.loadChunks(renderListener, world, chunksToLoad);
+		scene.moveCameraToCenter();
+		renderListener.chunksLoaded();
+	}
+
+	/**
+	 * Load chunks without moving the camera
 	 * @param world
 	 * @param chunksToLoad
 	 */
 	public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
 		scene.loadChunks(renderListener, world, chunksToLoad);
-		scene.moveCameraToCenter();
+		scene.refresh();
 		renderListener.chunksLoaded();
 	}
 

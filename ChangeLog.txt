@@ -6,6 +6,8 @@
     * Sanitize scene names by removing problematic characters
     * Manually unlocking the render lock now leaves the render controls
     unlocked until rendering is re-started
+    * Re-loading chunks using the "Load Selected Chunks" button does not
+    move the camera
 
 1.1.11 - 2013-04-28
     * It is now possible to lock the render controls to avoid inadvertent

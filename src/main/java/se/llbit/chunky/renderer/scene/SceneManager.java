@@ -53,7 +53,11 @@ public class SceneManager extends Thread {
 		 */
 		SAVE_SCENE,
 		/**
-		 * Load chunks
+		 * Load chunks and reset camera position
+		 */
+		LOAD_FRESH_CHUNKS,
+		/**
+		 * Load chunks but do not reset camera
 		 */
 		LOAD_CHUNKS,
 		/**
@@ -119,6 +123,9 @@ public class SceneManager extends Thread {
 							logger.warn("Scene saving was interrupted.");
 						}
 						break;
+					case LOAD_FRESH_CHUNKS:
+						renderManager.loadFreshChunks(world, chunksToLoad);
+						break;
 					case LOAD_CHUNKS:
 						renderManager.loadChunks(world, chunksToLoad);
 						break;
@@ -158,10 +165,25 @@ public class SceneManager extends Thread {
 	}
 
 	/**
+	 * Load chunks and reset camera
 	 * @param world
 	 * @param chunks
 	 */
-	public synchronized void loadChunks(World world, Collection<ChunkPosition> chunks) {
+	public synchronized void loadFreshChunks(World world,
+			Collection<ChunkPosition> chunks) {
+		chunksToLoad = chunks;
+		this.world = world;
+		action = Action.LOAD_FRESH_CHUNKS;
+		notify();
+	}
+
+	/**
+	 * Load chunks without moving the camera
+	 * @param world
+	 * @param chunks
+	 */
+	public synchronized void loadChunks(World world,
+			Collection<ChunkPosition> chunks) {
 		chunksToLoad = chunks;
 		this.world = world;
 		action = Action.LOAD_CHUNKS;

@@ -727,6 +727,7 @@ public class Scene implements Refreshable {
 	public synchronized void reloadChunks(ProgressListener progressListener) {
 		if (loadedWorld == null) {
 			logger.warn("Can not reload chunks -- unknown world file!");
+			return;
 		}
 
 		loadedWorld.setDimension(loadedDimension);

@@ -751,7 +751,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		loadSelectedChunksBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				loadChunks(chunky.getWorld(), chunky.getSelectedChunks());
+				sceneMan.loadChunks(chunky.getWorld(), chunky.getSelectedChunks());
 			}
 		});
 
@@ -2004,12 +2004,12 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	/**
-	 * Load the given chunks.
+	 * Load the given chunks and center the camera.
 	 * @param world
 	 * @param chunks
 	 */
-	public void loadChunks(World world, Collection<ChunkPosition> chunks) {
-		sceneMan.loadChunks(world, chunks);
+	public void loadFreshChunks(World world, Collection<ChunkPosition> chunks) {
+		sceneMan.loadFreshChunks(world, chunks);
 	}
 
 	/**
