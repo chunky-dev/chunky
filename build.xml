@@ -123,7 +123,8 @@
 		</exec>
 	</target>
 	
-	<target name="release" description="build a release">
+	<target name="release" depends="update-version-string"
+		description="build a release">
 		<property file="${src.dir}/main/res/Version.properties" prefix="Chunky"/>
 		<antcall target="clean"/>
 		<antcall target="tarball"/>

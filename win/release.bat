@@ -5,7 +5,7 @@ echo PATH=%PATH%
 java -version
 javac -version
 cd ..
-call ant release tarball
+call ant release
 cd win
 call makensis Chunky.nsi
 pause
