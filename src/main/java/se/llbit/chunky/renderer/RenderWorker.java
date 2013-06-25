@@ -32,6 +32,11 @@ import se.llbit.util.VectorPool;
  */
 public class RenderWorker extends Thread {
 
+	/**
+	 * Sleep interval (in ns)
+	 */
+	private static final int SLEEP_INTERVAL = 75000000;
+
 	private static final Logger logger =
 			Logger.getLogger(RenderWorker.class);
 
@@ -182,14 +187,11 @@ public class RenderWorker extends Thread {
 			}}
 		}
 		jobTime += System.nanoTime() - jobStart;
-		if (jobTime > 50000000) {
-			// sleep = jobTime * (1-utilization) / utilization
-			double load = (100.0 - manager.cpuLoad) / manager.cpuLoad;
-			int sleep = (int) ((jobTime/1000000.0) * load);
-			if (sleep > 0) {
-				sleep(sleep);
-			} else {
-				yield();
+		if (jobTime > SLEEP_INTERVAL) {
+			if (manager.cpuLoad < 100) {
+				// sleep = jobTime * (1-utilization) / utilization
+				double load = (100.0 - manager.cpuLoad) / manager.cpuLoad;
+				sleep((long) ((jobTime/1000000.0) * load));
 			}
 			jobTime = 0;
 		}
