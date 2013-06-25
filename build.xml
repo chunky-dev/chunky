@@ -114,9 +114,10 @@
 	<target name="tarball" description="Create a source tarball">
 		<property file="${src.dir}/main/res/Version.properties" prefix="Chunky"/>
 		<mkdir dir="${basedir}/build"/>
+		<echo message="git archive -> chunky-${Chunky.version}.tar.gz"/>
 		<exec executable="git">
 			<arg value="archive"/>
-			<arg value="--prefix=&quot;chunky-${Chunky.version}&quot;"/>
+			<arg value="--prefix=&quot;chunky-${Chunky.version}&quot;/"/>
 			<arg value="-o"/>
 			<arg value="${basedir}/build/chunky-${Chunky.version}.tar.gz"/>
 			<arg value="master"/>
