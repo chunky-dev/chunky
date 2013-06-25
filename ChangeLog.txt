@@ -1,4 +1,4 @@
-1.1.12 - TBD
+1.1.12 - 2013-06-05
     * Fixed some mirrored textures
 	* Fixed autofocus not working
     * Improved rendering speed by using Apache Commons Math library (twirrim)
