@@ -6,8 +6,6 @@
 	<property name="tools.dir"		location="tools"/>
 	<property name="nbt.package"	value="se.llbit.nbt"/>
 
-	<property file="${src.dir}/main/res/Version.properties" prefix="Chunky"/>
-
 	<taskdef name="jastadd" classname="jastadd.JastAddTask" classpath="${tools.dir}/jastadd2.jar"/>
 
 	<target name="clean">
@@ -114,6 +112,7 @@
 	</target>
 
 	<target name="tarball" description="Create a source tarball">
+		<property file="${src.dir}/main/res/Version.properties" prefix="Chunky"/>
 		<mkdir dir="${basedir}/build"/>
 		<exec executable="git">
 			<arg value="archive"/>
@@ -125,6 +124,7 @@
 	</target>
 	
 	<target name="release" description="build a release">
+		<property file="${src.dir}/main/res/Version.properties" prefix="Chunky"/>
 		<antcall target="clean"/>
 		<antcall target="tarball"/>
 		<antcall target="jar"/>
@@ -186,6 +186,7 @@
 	</target>
 	
 	<target name="macdmg" description="Create a DMG package for Chunky">
+		<property file="${src.dir}/main/res/Version.properties" prefix="Chunky"/>
 		<property name="mountdir" value="/tmp"/>
 		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 			<arg value="create"/>
