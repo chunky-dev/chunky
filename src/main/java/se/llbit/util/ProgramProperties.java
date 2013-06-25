@@ -208,5 +208,31 @@ public final class ProgramProperties {
 		numThreads = Math.min(RenderManager.NUM_RENDER_THREADS_MAX, numThreads);
 		setProperty("numThreads", "" + numThreads);
 	}
+
+	/**
+	 * @return CPU load setting
+	 */
+	public static int getCPULoad() {
+		String cpuLoad = getProperty("cpuLoad", "");
+		if (cpuLoad.isEmpty()) {
+			return RenderManager.CPU_LOAD_DEFAULT;
+		} else {
+			try {
+				return Integer.parseInt(cpuLoad);
+			} catch (NumberFormatException e) {
+				return RenderManager.CPU_LOAD_DEFAULT;
+			}
+		}
+	}
+
+	/**
+	 * Change the default CPU load
+	 * @param cpuLoad
+	 */
+	public static void setCPULoad(int cpuLoad) {
+		cpuLoad = Math.max(1, cpuLoad);
+		cpuLoad = Math.min(100, cpuLoad);
+		setProperty("cpuLoad", "" + cpuLoad);
+	}
 }
 

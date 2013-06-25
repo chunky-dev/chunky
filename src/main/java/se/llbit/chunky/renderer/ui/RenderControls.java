@@ -171,13 +171,31 @@ public class RenderControls extends JDialog implements ViewListener,
 			20) {
 		@Override
 		public void valueChanged(double newValue) {
-			ProgramProperties.setNumThreads((int) newValue);
-			renderMan.setNumThreads((int) newValue);
+			int value = (int) newValue;
+			ProgramProperties.setNumThreads(value);
+			renderMan.setNumThreads(value);
 		}
 
 		@Override
 		public void update() {
 			set(ProgramProperties.getNumThreads());
+		}
+	};
+
+	private final Adjuster cpuLoad = new Adjuster(
+			"CPU load",
+			"CPU load percentage",
+			1, 100) {
+		@Override
+		public void valueChanged(double newValue) {
+			int value = (int) newValue;
+			ProgramProperties.setCPULoad(value);
+			renderMan.setCPULoad(value);
+		}
+
+		@Override
+		public void update() {
+			set(ProgramProperties.getCPULoad());
 		}
 	};
 
@@ -331,6 +349,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		safeComponents.add(numThreads.getLabel());
 		safeComponents.add(numThreads.getSlider());
 		safeComponents.add(numThreads.getField());
+		safeComponents.add(cpuLoad.getLabel());
+		safeComponents.add(cpuLoad.getSlider());
+		safeComponents.add(cpuLoad.getField());
 	}
 
 	/**
@@ -600,6 +621,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		numThreads.setClampMax(false);
 		numThreads.update();
 
+		cpuLoad.update();
+
 		JLabel waterWorldLbl = new JLabel(
 				"Note: All chunks will be reloaded after changing the water world options!");
 		JLabel waterHeightLbl = new JLabel("Water height: ");
@@ -665,6 +688,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
 				.addGroup(numThreads.horizontalGroup(layout))
+				.addGroup(cpuLoad.horizontalGroup(layout))
 				.addComponent(sep1)
 				.addGroup(rayDepth.horizontalGroup(layout))
 				.addComponent(sep2)
@@ -683,6 +707,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
 			.addGroup(numThreads.verticalGroup(layout))
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(cpuLoad.verticalGroup(layout))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)

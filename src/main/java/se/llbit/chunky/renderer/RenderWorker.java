@@ -182,12 +182,15 @@ public class RenderWorker extends Thread {
 			}}
 		}
 		jobTime += System.nanoTime() - jobStart;
-		if (jobTime > 500000000) {
+		if (jobTime > 50000000) {
 			// sleep = jobTime * (1-utilization) / utilization
-			double utilization = 0.95;
-			double util = (1-utilization) / utilization;
-			long sleep = (int) Math.max(1, (jobTime/1000000.0) * util);
-			sleep(sleep);
+			double load = (100.0 - manager.cpuLoad) / manager.cpuLoad;
+			int sleep = (int) ((jobTime/1000000.0) * load);
+			if (sleep > 0) {
+				sleep(sleep);
+			} else {
+				yield();
+			}
 			jobTime = 0;
 		}
 	}

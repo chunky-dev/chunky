@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.util.ProgramProperties;
 
 /**
  * Interface for render managers
@@ -59,6 +60,11 @@ public abstract class AbstractRenderManager extends Thread {
 	 * Tile width
 	 */
 	protected final int tileWidth;
+
+	/**
+	 * CPU load percentage
+	 */
+	public int cpuLoad = ProgramProperties.getCPULoad();
 
 	/**
 	 * Get a job from the job queue

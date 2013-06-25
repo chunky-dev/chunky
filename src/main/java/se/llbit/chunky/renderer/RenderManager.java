@@ -56,6 +56,11 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	private static final Logger logger =
 			Logger.getLogger(RenderManager.class);
 
+	/**
+	 * Default CPU load
+	 */
+	public static final int CPU_LOAD_DEFAULT = 100;
+
 	private boolean updateBuffer = false;
 	private boolean dumpNextFrame = false;
 
@@ -578,5 +583,13 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	 */
 	public void setNumThreads(int threads) {
 		numThreads = Math.max(1, threads);
+	}
+
+	/**
+	 * Set CPU load percentage
+	 * @param value
+	 */
+	public void setCPULoad(int value) {
+		cpuLoad  = value;
 	}
 }
