@@ -12,7 +12,7 @@
     DoF is enabled. This reverts the depth of field effect to the 1.1.10
     behavior for fisheye and panoramic projection.
     * The number of render threads can now be controlled during rendering
-    * The controls for number of render threads has been moved to the
+    * The controls for number of render threads have been moved to the
     Advanced tab of the Render Controls dialog
     * Added CPU load controls in the Advanced tab of the Render Controls dialog
 
