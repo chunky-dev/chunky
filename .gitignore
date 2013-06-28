@@ -3,6 +3,7 @@
 
 # vim
 *.swp
+*.*~
 
 # chunky build files
 /build
@@ -20,3 +21,8 @@
 /latest.json
 /snapshot.json
 /snapshot
+
+# IntelliJ IDEA Project files
+.idea/*
+*.eml
+*.iml
