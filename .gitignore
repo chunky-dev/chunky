@@ -6,3 +6,8 @@
 /win/*.exe
 /win/*.nsi
 *.swp
+
+# IntelliJ IDEA Project files
+.idea/*
+*.eml
+*.iml
