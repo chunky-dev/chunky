@@ -2360,28 +2360,32 @@ public class Block {
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0xAA = new Block(0xAA, "Unknown Block 0xAA", Texture.unknown) {
+	public static final int HAY_BLOCK_ID = 0xAA;
+	public static final Block HAY_BLOCK = new Block(HAY_BLOCK_ID, "Hay Block", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0xAB = new Block(0xAB, "Unknown Block 0xAB", Texture.unknown) {
+	public static final int CARPET_ID = 0xAB;
+	public static final Block CARPET = new Block(CARPET_ID, "Carpet", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0xAC = new Block(0xAC, "Unknown Block 0xAC", Texture.unknown) {
+	public static final int HARDENED_CLAY_ID = 0xAC;
+	public static final Block HARDENED_CLAY = new Block(HARDENED_CLAY_ID, "Hardened Clay", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			isInvisible = true;
 		}
 	};
-	public static final Block UNKNOWN0xAD = new Block(0xAD, "Unknown Block 0xAD", Texture.unknown) {
+	public static final int BLOCK_OF_COAL_ID = 0xAD;
+	public static final Block BLOCK_OF_COAL = new Block(BLOCK_OF_COAL_ID, "Block of Coal", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -3006,8 +3010,8 @@ public class Block {
 		QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, UNKNOWN0x9F,
 		UNKNOWN0xA0, UNKNOWN0xA1, UNKNOWN0xA2, UNKNOWN0xA3,
 		UNKNOWN0xA4, UNKNOWN0xA5, UNKNOWN0xA6, UNKNOWN0xA7,
-		UNKNOWN0xA8, UNKNOWN0xA9, UNKNOWN0xAA, UNKNOWN0xAB,
-		UNKNOWN0xAC, UNKNOWN0xAD, UNKNOWN0xAE, UNKNOWN0xAF,
+		UNKNOWN0xA8, UNKNOWN0xA9, HAY_BLOCK, CARPET,
+		HARDENED_CLAY, BLOCK_OF_COAL, UNKNOWN0xAE, UNKNOWN0xAF,
 		UNKNOWN0xB0, UNKNOWN0xB1, UNKNOWN0xB2, UNKNOWN0xB3,
 		UNKNOWN0xB4, UNKNOWN0xB5, UNKNOWN0xB6, UNKNOWN0xB7,
 		UNKNOWN0xB8, UNKNOWN0xB9, UNKNOWN0xBA, UNKNOWN0xBB,
