@@ -2,7 +2,7 @@
     * Fixed some mirrored textures
     * Fixed autofocus not working
     * Improved rendering speed by using Apache Commons Math library (twirrim)
-    * Chunky now remembers the number number of render threads setting
+    * Chunky now remembers the number of render threads setting
     * Sanitize scene names by removing problematic characters
     * Manually unlocking the render lock now leaves the render controls
     unlocked until rendering is re-started
