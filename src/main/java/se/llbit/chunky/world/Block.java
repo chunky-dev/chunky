@@ -2392,11 +2392,16 @@ public class Block {
 		}
 	};
 	public static final int HARDENED_CLAY_ID = 0xAC;
-	public static final Block HARDENED_CLAY = new Block(HARDENED_CLAY_ID, "Hardened Clay", Texture.unknown) {
+	public static final Block HARDENED_CLAY = new Block(HARDENED_CLAY_ID, "Hardened Clay", Texture.hardenedClay) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = true;
+			isOpaque = true;
+			isSolid = true;
+			isInvisible = false;
+		}
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return TexturedBlockModel.intersect(ray, Texture.hardenedClay);
 		}
 	};
 	public static final int BLOCK_OF_COAL_ID = 0xAD;

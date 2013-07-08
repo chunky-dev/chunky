@@ -277,7 +277,8 @@ public class Texture {
 	public static final Texture hopper = new Texture();
 	public static final Texture hopperInside = new Texture();
 	public static final Texture hayBlockSide = new Texture();
-	public static final Texture hayBlockTop= new Texture();
+	public static final Texture hayBlockTop = new Texture();
+	public static final Texture hardenedClay = new Texture();
 
 	/**
 	 * Missing or unknown texture.
