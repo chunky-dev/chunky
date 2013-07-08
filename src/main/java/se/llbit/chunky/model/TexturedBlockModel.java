@@ -63,9 +63,10 @@ public class TexturedBlockModel {
 	}
 
 	/**
+	 * Find intersection between ray and block.
 	 * @param ray
-	 * @param texture
-	 * @param index
+	 * @param texture Texture array
+	 * @param index An index array used to index the texture array
 	 * @return <code>true</code> if the ray intersected the block
 	 */
 	public static boolean intersect(Ray ray, Texture[] texture, int[] index) {

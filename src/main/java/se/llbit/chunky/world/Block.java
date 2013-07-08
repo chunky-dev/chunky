@@ -2362,11 +2362,25 @@ public class Block {
 		}
 	};
 	public static final int HAY_BLOCK_ID = 0xAA;
-	public static final Block HAY_BLOCK = new Block(HAY_BLOCK_ID, "Hay Block", Texture.unknown) {
+	public static final Block HAY_BLOCK = new Block(HAY_BLOCK_ID, "Hay Block", Texture.hayBlockSide) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = true;
+			isOpaque = true;
+			isSolid = true;
+			isInvisible = false;
+		}
+
+		final Texture[] textures = {
+			Texture.hayBlockSide,
+			Texture.hayBlockSide,
+			Texture.hayBlockSide,
+			Texture.hayBlockSide,
+			Texture.hayBlockTop,
+			Texture.hayBlockTop,
+		};
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return TexturedBlockModel.intersect(ray, textures);
 		}
 	};
 	public static final int CARPET_ID = 0xAB;

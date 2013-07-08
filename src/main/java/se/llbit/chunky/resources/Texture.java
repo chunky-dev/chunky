@@ -276,6 +276,12 @@ public class Texture {
 	public static final Texture comparatorLit = new Texture();
 	public static final Texture hopper = new Texture();
 	public static final Texture hopperInside = new Texture();
+	public static final Texture hayBlockSide = new Texture();
+	public static final Texture hayBlockTop= new Texture();
+
+	/**
+	 * Missing or unknown texture.
+	 */
 	public static final Texture unknown = new Texture("unknown");
 
 	public static final Texture signPost = new Texture();
