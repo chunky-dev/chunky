@@ -1034,7 +1034,15 @@ public class Chunky implements ChunkDiscoveryListener {
 	 * @return The minecraft.jar of the local Minecraft installation
 	 */
 	public static final File getMinecraftJar() {
-		return new File(Chunky.getMinecraftDirectory(), "bin/minecraft.jar");
+		File bin = new File(Chunky.getMinecraftDirectory(), "bin");
+		for (File file : bin.listFiles())
+		{
+			if (file.getName().equalsIgnoreCase("minecraft.jar"))
+			{
+				return new File(bin, file.getName());
+			}
+		}
+		return null;
 	}
 
 	/**
