@@ -2367,6 +2367,7 @@ public class Block {
 			isOpaque = true;
 			isSolid = true;
 			isInvisible = false;
+			localIntersect = true;
 		}
 
 		final Texture[] textures = {

@@ -77,7 +77,7 @@ public class HopperModel {
 				if (ray.n.y > 0)
 					Texture.hopperInside.getColor(ray);
 				else
-					Texture.hopper.getColor(ray);
+					Texture.hopperOutside.getColor(ray);
 				ray.color.w = 1;
 				ray.t = ray.tNear;
 				hit = true;
@@ -88,7 +88,7 @@ public class HopperModel {
 			if (ray.n.y > 0)
 				Texture.hopperInside.getColor(ray);
 			else
-				Texture.hopper.getColor(ray);
+				Texture.hopperOutside.getColor(ray);
 			ray.color.w = 1;
 			ray.t = ray.tNear;
 			hit = true;
@@ -99,7 +99,7 @@ public class HopperModel {
 			if (ray.n.y > 0)
 				Texture.hopperInside.getColor(ray);
 			else
-				Texture.hopper.getColor(ray);
+				Texture.hopperOutside.getColor(ray);
 			ray.t = ray.tNear;
 			hit = true;
 		}

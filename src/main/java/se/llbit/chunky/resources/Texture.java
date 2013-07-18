@@ -272,9 +272,9 @@ public class Texture {
 	public static final Texture quartzPillarTop = new Texture();
 	public static final Texture daylightDetectorTop = new Texture();
 	public static final Texture daylightDetectorSide = new Texture();
-	public static final Texture comparator = new Texture();
-	public static final Texture comparatorLit = new Texture();
-	public static final Texture hopper = new Texture();
+	public static final Texture comparatorOff = new Texture();
+	public static final Texture comparatorOn = new Texture();
+	public static final Texture hopperOutside = new Texture();
 	public static final Texture hopperInside = new Texture();
 	public static final Texture hayBlockSide = new Texture();
 	public static final Texture hayBlockTop = new Texture();

@@ -31,7 +31,8 @@ public class AlternateTextures extends TextureRef {
 	private final TextureRef[] alternatives;
 
 	/**
-	 * @param alternatives
+	 * Attempts to load textures until one is successfully loaded.
+	 * @param alternatives List of textures to load
 	 */
 	public AlternateTextures(TextureRef... alternatives) {
 		this.alternatives = alternatives;

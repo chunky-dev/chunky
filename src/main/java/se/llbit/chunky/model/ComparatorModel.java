@@ -90,8 +90,8 @@ public class ComparatorModel {
 	private static final Quad[][] rot = new Quad[4][];
 
 	private static final Texture[] blockTex = {
-		Texture.comparator,
-		Texture.comparatorLit,
+		Texture.comparatorOff,
+		Texture.comparatorOn,
 	};
 
 	private static final Texture[] torchTex = {
