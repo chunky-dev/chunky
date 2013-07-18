@@ -33,14 +33,10 @@ public abstract class TextureRef {
 	private static final Logger logger =
 			Logger.getLogger(TextureRef.class);
 
-	private String file;
-
 	/**
-	 * Constructor
-	 * @param file The path to the texture file (excluding file extension)
+	 * Default constructor
 	 */
-	public TextureRef(String file) {
-		this.file = file;
+	protected TextureRef() {
 	}
 
 	/**
@@ -48,7 +44,15 @@ public abstract class TextureRef {
 	 * @param texturePack Reference to the texture pack zip file
 	 * @return <code>true</code> if the texture was successfully loaded
 	 */
-	public boolean load(ZipFile texturePack) {
+	public abstract boolean load(ZipFile texturePack);
+
+	/**
+	 * Attempt to load a texture from a texture pack
+	 * @param file Path of texture in texture pack
+	 * @param texturePack Reference to the texture pack zip file
+	 * @return <code>true</code> if the texture was successfully loaded
+	 */
+	protected boolean load(String file, ZipFile texturePack) {
 		try {
 			InputStream in = texturePack.getInputStream(
 					new ZipEntry(file + ".png"));
@@ -71,14 +75,7 @@ public abstract class TextureRef {
 		return false;
 	}
 
-	abstract boolean load(InputStream imageStream) throws IOException,
-			TextureFormatError;
-
-	/**
-	 * @return The symbolic name of this texture reference
-	 */
-	public String getName() {
-		return file;
-	}
+	protected abstract boolean load(InputStream imageStream)
+			throws IOException, TextureFormatError;
 }
 

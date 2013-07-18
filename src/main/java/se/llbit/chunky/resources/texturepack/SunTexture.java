@@ -19,6 +19,7 @@ package se.llbit.chunky.resources.texturepack;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.ZipFile;
 
 import javax.imageio.ImageIO;
 
@@ -29,19 +30,26 @@ import se.llbit.chunky.resources.Texture;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class SunTexture extends TextureRef {
+	private final String file;
+
 	/**
 	 * Constructor
 	 * @param file
 	 */
 	public SunTexture(String file) {
-		super(file);
+		this.file = file;
 	}
 
 	@Override
-	boolean load(InputStream imageStream) throws IOException {
+	protected boolean load(InputStream imageStream) throws IOException {
 		BufferedImage image = ImageIO.read(imageStream);
 		Sun.texture = new Texture(image);
 		return true;
+	}
+
+	@Override
+	public boolean load(ZipFile texturePack) {
+		return load(file, texturePack);
 	}
 }
 

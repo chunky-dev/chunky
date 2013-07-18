@@ -19,6 +19,7 @@ package se.llbit.chunky.resources.texturepack;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.ZipFile;
 
 import javax.imageio.ImageIO;
 
@@ -28,19 +29,26 @@ import se.llbit.chunky.resources.Texture;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class SignTexture extends TextureRef {
+	private final String file;
+
 	/**
 	 * Constructor
 	 * @param file
 	 */
 	public SignTexture(String file) {
-		super(file);
+		this.file = file;
 	}
 
 	@Override
-	boolean load(InputStream imageStream) throws IOException {
+	protected boolean load(InputStream imageStream) throws IOException {
 		BufferedImage image = ImageIO.read(imageStream);
 		Texture.signPost.setTexture(image);
 		return true;
+	}
+
+	@Override
+	public boolean load(ZipFile texturePack) {
+		return load(file, texturePack);
 	}
 }
 

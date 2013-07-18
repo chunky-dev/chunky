@@ -17,6 +17,9 @@
 package se.llbit.chunky.resources.texturepack;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.ZipFile;
 
 import se.llbit.chunky.resources.Texture;
 
@@ -24,27 +27,38 @@ import se.llbit.chunky.resources.Texture;
  * A texture that has an indexed position in terrain.pngggu
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class IndexedTexture extends SimpleTexture {
+public class IndexedTexture extends TextureRef {
 
-	private int index;
+	private final int index;
+	private final Texture texture;
 
 	/**
 	 * Constructor
+	 * @param index Index of the texture in the terrain file
+	 * @param texture The loaded image is written to this texture
 	 * @param name The texture file name (excluding extension and directory
 	 * parts)
-	 * @param texture
-	 * @param index Index of the texture in the terrain file
 	 */
-	public IndexedTexture(String name, Texture texture, int index) {
-		super(name, texture);
-
+	public IndexedTexture(int index, Texture texture) {
 		this.index = index;
+		this.texture = texture;
 	}
 
 	@Override
 	public boolean loadFromTerrain(BufferedImage[] terrain) {
 		texture.setTexture(terrain[index]);
 		return true;
+	}
+
+	@Override
+	public boolean load(ZipFile texturePack) {
+		return false;
+	}
+
+	@Override
+	protected boolean load(InputStream imageStream) throws IOException,
+			TextureFormatError {
+		return false;
 	}
 
 }

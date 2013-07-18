@@ -19,6 +19,7 @@ package se.llbit.chunky.resources.texturepack;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.ZipFile;
 
 import javax.imageio.ImageIO;
 
@@ -30,6 +31,7 @@ import se.llbit.chunky.resources.Texture;
  */
 public class SimpleTexture extends TextureRef {
 
+	private final String file;
 	protected Texture texture;
 
 	/**
@@ -38,13 +40,12 @@ public class SimpleTexture extends TextureRef {
 	 * @param texture
 	 */
 	public SimpleTexture(String file, Texture texture) {
-		super(file);
-
+		this.file = file;
 		this.texture = texture;
 	}
 
 	@Override
-	boolean load(InputStream imageStream) throws IOException {
+	protected boolean load(InputStream imageStream) throws IOException {
 		BufferedImage image = ImageIO.read(imageStream);
 
 		if (image.getHeight() > image.getWidth()) {
@@ -64,6 +65,11 @@ public class SimpleTexture extends TextureRef {
 
 		texture.setTexture(image);
 		return true;
+	}
+
+	@Override
+	public boolean load(ZipFile texturePack) {
+		return load(file, texturePack);
 	}
 
 }

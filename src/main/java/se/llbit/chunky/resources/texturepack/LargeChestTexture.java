@@ -19,6 +19,7 @@ package se.llbit.chunky.resources.texturepack;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.ZipFile;
 
 import javax.imageio.ImageIO;
 
@@ -28,16 +29,19 @@ import se.llbit.chunky.resources.Texture;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class LargeChestTexture extends TextureRef {
+	private final String file;
+
 	/**
 	 * Constructor
 	 * @param file
 	 */
 	public LargeChestTexture(String file) {
-		super(file);
+		this.file = file;
 	}
 
 	@Override
-	boolean load(InputStream imageStream) throws IOException, TextureFormatError {
+	protected boolean load(InputStream imageStream) throws IOException,
+			TextureFormatError {
 		BufferedImage spritemap = ImageIO.read(imageStream);
 		if (spritemap.getWidth() % 16 != 0 || spritemap.getHeight() % 16 != 0) {
 			throw new TextureFormatError(
@@ -140,5 +144,9 @@ public class LargeChestTexture extends TextureRef {
 		return img;
 	}
 
+	@Override
+	public boolean load(ZipFile texturePack) {
+		return load(file, texturePack);
+	}
 }
 

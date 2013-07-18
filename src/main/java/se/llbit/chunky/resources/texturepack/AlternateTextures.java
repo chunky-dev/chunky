@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
@@ -27,15 +28,12 @@ import java.util.zip.ZipFile;
  */
 public class AlternateTextures extends TextureRef {
 
-	private TextureRef[] alternatives;
+	private final TextureRef[] alternatives;
 
 	/**
-	 * @param name Name of this texture
 	 * @param alternatives
 	 */
-	public AlternateTextures(String name, TextureRef... alternatives) {
-		super(name);
-
+	public AlternateTextures(TextureRef... alternatives) {
 		this.alternatives = alternatives;
 	}
 
@@ -50,7 +48,17 @@ public class AlternateTextures extends TextureRef {
 	}
 
 	@Override
-	boolean load(InputStream imageStream) throws IOException {
+	public boolean loadFromTerrain(BufferedImage[] terrain) {
+		for (TextureRef alternative: alternatives) {
+			if (alternative.loadFromTerrain(terrain)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	protected boolean load(InputStream imageStream) throws IOException {
 		throw new UnsupportedOperationException("Call load(ZipFile) instead!");
 	}
 

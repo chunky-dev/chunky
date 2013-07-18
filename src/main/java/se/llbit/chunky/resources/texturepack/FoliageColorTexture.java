@@ -19,6 +19,7 @@ package se.llbit.chunky.resources.texturepack;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.ZipFile;
 
 import javax.imageio.ImageIO;
 
@@ -28,16 +29,19 @@ import se.llbit.chunky.world.Biomes;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class FoliageColorTexture extends TextureRef {
+	private final String file;
+
 	/**
 	 * Constructor
 	 * @param file
 	 */
 	public FoliageColorTexture(String file) {
-		super(file);
+		this.file = file;
 	}
 
 	@Override
-	boolean load(InputStream imageStream) throws IOException, TextureFormatError {
+	protected boolean load(InputStream imageStream) throws IOException,
+			TextureFormatError {
 		BufferedImage grasscolor = ImageIO.read(imageStream);
 		if (grasscolor.getWidth() != 256 || grasscolor.getHeight() != 256) {
 			throw new TextureFormatError(
@@ -45,6 +49,11 @@ public class FoliageColorTexture extends TextureRef {
 		}
 		Biomes.loadFoliageColors(grasscolor);
 		return true;
+	}
+
+	@Override
+	public boolean load(ZipFile texturePack) {
+		return load(file, texturePack);
 	}
 }
 
