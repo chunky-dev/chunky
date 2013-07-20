@@ -17,6 +17,21 @@
 package se.llbit.chunky.resources;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * Locates the Minecraft installation.
@@ -60,18 +75,95 @@ public class MinecraftFinder {
 	}
 
 	/**
-	 * @return File reference to the minecraft jar of the local Minecraft
-	 * installation, or <code>null</code> if the minecraft jar could not be
-	 * found.
+	 * @return File reference to the latest Minecraft jar of the local
+	 * Minecraft installation, or <code>null</code> if the Minecraft jar
+	 * could not be found.
 	 */
 	public static final File getMinecraftJar() {
-		File bin = new File(getMinecraftDirectory(), "bin");
-		for (File file : bin.listFiles()) {
-			if (file.getName().equalsIgnoreCase("minecraft.jar")) {
-				return new File(bin, file.getName());
+		File minecraft = getMinecraftDirectory();
+		// MC 1.6.1 and above jars located in subdirectories under versions/
+		File versions = new File(minecraft, "versions");
+		if (versions.isDirectory()) {
+			File[] dirs = versions.listFiles(new FileFilter() {
+				@Override
+				public boolean accept(File pathname) {
+					return pathname.isDirectory();
+				}
+			});
+			List<VersionDir> versionDirs = new ArrayList<VersionDir>();
+			for (int i = dirs.length-1; i >= 0; --i) {
+				File jarPath = new File(dirs[i], dirs[i].getName() + ".jar");
+				if (!jarPath.isFile()) {
+					continue;
+				}
+				JsonParser parser = new JsonParser();
+				try {
+					File jsonFile = new File(dirs[i], dirs[i].getName() + ".json");
+					JsonElement json = parser.parse(new FileReader(jsonFile));
+					JsonObject obj = json.getAsJsonObject();
+					JsonElement relTime = obj.get("releaseTime");
+					String releaseTime = relTime.getAsString();
+					versionDirs.add(new VersionDir(dirs[i], releaseTime));
+				} catch (JsonIOException e) {
+				} catch (JsonSyntaxException e) {
+				} catch (FileNotFoundException e) {
+				}
+			}
+
+			// select latest available minecraft version
+			if (!versionDirs.isEmpty()) {
+				VersionDir latest = versionDirs.get(0);
+				for (int i = 1; i < versionDirs.size()-1; ++i) {
+					if (versionDirs.get(i).compareTo(latest) > 0) {
+						latest = versionDirs.get(i);
+					}
+				}
+				return latest.dir;
+			}
+		}
+		// Backwards compatibility for pre-1.6.1:
+		File bin = new File(minecraft, "bin");
+		if (bin.isDirectory()) {
+			for (File file : bin.listFiles()) {
+				if (file.getName().equalsIgnoreCase("minecraft.jar")) {
+					return new File(bin, file.getName());
+				}
 			}
 		}
 		return null;
 	}
 
+	private static class VersionDir implements Comparable<VersionDir> {
+		private static final DateFormat dateFormat =
+				new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
+
+		private final File dir;
+		private Date timestamp;
+
+		public VersionDir(File directory, String time) {
+			dir = directory;
+			try {
+				// insert "GMT"
+				if (time.endsWith("Z")) {
+					time = time.substring(0, time.length()-1) + "GMT-00:00";
+				} else {
+					time = time.substring(0, time.length()-6) + "GMT" +
+							time.substring(time.length()-6, time.length());
+				}
+				timestamp = dateFormat.parse(time);
+			} catch (ParseException e) {
+				timestamp = new Date(0);
+			}
+		}
+
+		@Override
+		public int compareTo(VersionDir other) {
+			return timestamp.compareTo(other.timestamp);
+		}
+
+		@Override
+		public String toString() {
+			return dir.getName();
+		}
+	}
 }
