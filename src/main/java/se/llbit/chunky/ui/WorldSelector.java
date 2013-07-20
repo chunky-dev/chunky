@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -41,8 +39,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import org.apache.log4j.Logger;
+
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.Messages;
+import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.world.World;
 
 /**
@@ -146,7 +147,7 @@ public class WorldSelector extends JDialog implements ListSelectionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser fileChooser = new JFileChooser(Chunky.getSavesDirectory());
+				JFileChooser fileChooser = new JFileChooser(MinecraftFinder.getSavesDirectory());
 				fileChooser.setDialogTitle(Messages.getString("WorldSelector.0")); //$NON-NLS-1$
 				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				int result = fileChooser.showOpenDialog(null);

@@ -43,6 +43,7 @@ import se.llbit.chunky.renderer.ui.NewSceneDialog;
 import se.llbit.chunky.renderer.ui.RenderControls;
 import se.llbit.chunky.renderer.ui.SceneDirectoryPicker;
 import se.llbit.chunky.renderer.ui.SceneSelector;
+import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkMap;
 import se.llbit.chunky.ui.ChunkyFrame;
@@ -265,7 +266,7 @@ public class Chunky implements ChunkDiscoveryListener {
 			if (lastTexturePack != null) {
 				TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
 			} else {
-				TexturePackLoader.loadTexturePack(getMinecraftJar(), false);
+				TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJar(), false);
 			}
 		}
 
@@ -662,40 +663,6 @@ public class Chunky implements ChunkDiscoveryListener {
 	}
 
 	/**
-	 * @return The directory of the local Minecraft installation
-	 */
-	public static File getMinecraftDirectory() {
-		String home = System.getProperty("user.home", ".");   //$NON-NLS-1$ //$NON-NLS-2$
-		String os = System.getProperty("os.name").toLowerCase();  //$NON-NLS-1$
-
-		if (os.contains("win")) {  //$NON-NLS-1$
-			String appdata = System.getenv("APPDATA");	//$NON-NLS-1$
-			if (appdata != null)
-				return new File(appdata, ".minecraft");	//$NON-NLS-1$
-			else
-				return new File(home, ".minecraft");  //$NON-NLS-1$
-		} else if (os.contains("mac")) {  //$NON-NLS-1$
-			return new File(home, "Library/Application Support/minecraft");	//$NON-NLS-1$
-		} else {
-			return new File(home, ".minecraft");  //$NON-NLS-1$
-		}
-	}
-
-	/**
-	 * @return The saves directory of the local Minecraft installation
-	 */
-	public static File getSavesDirectory() {
-		return new File(getMinecraftDirectory(), "saves");
-	}
-
-	/**
-	 * @return The texture pack directory of the local Minecraft installation
-	 */
-	public static File getTexturePacksDirectory() {
-		return new File(getMinecraftDirectory(), "texturepacks");
-	}
-
-	/**
 	 * @return The current highlight color
 	 */
 	public Color getHighlightColor() {
@@ -1028,21 +995,6 @@ public class Chunky implements ChunkDiscoveryListener {
 			minimapHeight = height;
 			viewUpdated();
 		}
-	}
-
-	/**
-	 * @return The minecraft.jar of the local Minecraft installation
-	 */
-	public static final File getMinecraftJar() {
-		File bin = new File(Chunky.getMinecraftDirectory(), "bin");
-		for (File file : bin.listFiles())
-		{
-			if (file.getName().equalsIgnoreCase("minecraft.jar"))
-			{
-				return new File(bin, file.getName());
-			}
-		}
-		return null;
 	}
 
 	/**

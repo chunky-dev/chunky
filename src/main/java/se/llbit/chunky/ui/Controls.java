@@ -59,6 +59,7 @@ import se.llbit.chunky.main.BlockTypeListCellRenderer;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.Messages;
 import se.llbit.chunky.renderer.ui.SceneDirectoryPicker;
+import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.MiscImages;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.TexturePackLoader;
@@ -305,7 +306,8 @@ public class Controls extends JPanel {
 				CenteredFileDialog fileDialog =
 						new CenteredFileDialog(chunky.getFrame(),
 								"Load Texture Pack", FileDialog.LOAD);
-				fileDialog.setDirectory(Chunky.getTexturePacksDirectory().getAbsolutePath());
+				fileDialog.setDirectory(MinecraftFinder
+						.getTexturePacksDirectory().getAbsolutePath());
 				fileDialog.setFilenameFilter(
 						new FilenameFilter() {
 							@Override
@@ -327,7 +329,7 @@ public class Controls extends JPanel {
 		loadDefaultTexturesBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				TexturePackLoader.loadTexturePack(Chunky.getMinecraftJar(), true);
+				TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJar(), true);
 				chunky.reloadWorld();
 			}
 		});

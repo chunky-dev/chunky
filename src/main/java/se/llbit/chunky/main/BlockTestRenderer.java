@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.PrintStream;
 
 import se.llbit.chunky.renderer.test.TestRenderer;
+import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.util.ProgramProperties;
@@ -39,7 +40,7 @@ public class BlockTestRenderer {
 		if (lastTexturePack != null)
 			TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
 		else
-			TexturePackLoader.loadTexturePack(Chunky.getMinecraftJar(), false);
+			TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJar(), false);
 
 		String block = "";
 		String targetFile = "";

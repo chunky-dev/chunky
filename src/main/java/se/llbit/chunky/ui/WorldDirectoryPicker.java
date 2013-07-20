@@ -23,6 +23,7 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -31,13 +32,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.main.Chunky;
+import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.util.ProgramProperties;
 
 /**
@@ -79,7 +79,7 @@ public class WorldDirectoryPicker extends JDialog {
 		}
 
 		if (!isValidSelection(initialDirectory)) {
-			initialDirectory = Chunky.getSavesDirectory();
+			initialDirectory = MinecraftFinder.getSavesDirectory();
 		}
 		pathField.setText(initialDirectory.getAbsolutePath());
 
@@ -192,7 +192,7 @@ public class WorldDirectoryPicker extends JDialog {
 		if (ProgramProperties.containsKey("worldDirectory")) {
 			worldDir = new File(ProgramProperties.getProperty("worldDirectory"));
 		} else {
-			worldDir = Chunky.getSavesDirectory();
+			worldDir = MinecraftFinder.getSavesDirectory();
 		}
 
 		if (!isValidSelection(worldDir)) {

@@ -33,7 +33,6 @@ import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.resources.texturepack.AlternateTextures;
 import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.CloudsTexture;
@@ -775,7 +774,7 @@ public class TexturePackLoader {
 	private static void loadTexturePack(File tpFile,
 			Collection<String> toLoad, boolean rememberTP) {
 
-		File defaultTP = Chunky.getMinecraftJar();
+		File defaultTP = MinecraftFinder.getMinecraftJar();
 		boolean isDefault = tpFile.equals(defaultTP);
 		String tpName = isDefault ? "default texture pack"
 				: "texture pack " + tpFile.getName();
