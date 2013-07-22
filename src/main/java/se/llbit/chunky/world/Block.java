@@ -2287,9 +2287,15 @@ public class Block {
 	public static final int STAINED_CLAY_ID = 0x9F;
 	public static final Block STAINED_CLAY = new Block(STAINED_CLAY_ID, "Stained Clay", Texture.unknown) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = true;
+			isOpaque = true;
+			isSolid = true;
+			localIntersect = true;
+		}
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return TexturedBlockModel.intersect(ray,
+					Texture.stainedClay[ray.getBlockData()]);
 		}
 	};
 	public static final Block UNKNOWN0xA0 = new Block(0xA0, "Unknown Block 0xA0", Texture.unknown) {

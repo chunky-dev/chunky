@@ -448,6 +448,19 @@ public class Layer {
 						y -= 1;
 						break;
 
+					case Block.STAINED_CLAY_ID:
+						int clayType = 0xFF & blockData[Chunk.chunkIndex(x, y, z)/2];
+						clayType >>= (x % 2) * 4;
+						clayType &= 0xF;
+
+						Color.getRGBComponents(
+								Texture.stainedClay[clayType].getAvgColor(),
+								blockColor);
+						blockColor[3] = 1.f;// wool colors don't include alpha
+
+						y -= 1;
+						break;
+
 					case Block.CARPET_ID:
 					case Block.WOOL_ID:
 						int woolType = 0xFF & blockData[Chunk.chunkIndex(x, y, z)/2];

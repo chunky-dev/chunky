@@ -280,6 +280,23 @@ public class Texture {
 	public static final Texture hayBlockTop = new Texture();
 	public static final Texture hardenedClay = new Texture();
 
+	public static final Texture whiteClay = new Texture();
+	public static final Texture orangeClay = new Texture();
+	public static final Texture magentaClay = new Texture();
+	public static final Texture lightBlueClay = new Texture();
+	public static final Texture yellowClay = new Texture();
+	public static final Texture limeClay = new Texture();
+	public static final Texture pinkClay = new Texture();
+	public static final Texture grayClay = new Texture();
+	public static final Texture silverClay = new Texture();
+	public static final Texture cyanClay = new Texture();
+	public static final Texture purpleClay = new Texture();
+	public static final Texture blueClay = new Texture();
+	public static final Texture brownClay = new Texture();
+	public static final Texture greenClay = new Texture();
+	public static final Texture redClay = new Texture();
+	public static final Texture blackClay = new Texture();
+
 	/**
 	 * Missing or unknown texture.
 	 */
@@ -353,6 +370,12 @@ public class Texture {
 		yellowWool, limeWool, pinkWool, grayWool, lightGrayWool,
 		cyanWool, purpleWool, blueWool, brownWool, greenWool,
 		redWool, blackWool };
+
+	public static final Texture[] stainedClay =
+		{ whiteClay, orangeClay, magentaClay, lightBlueClay,
+		yellowClay, limeClay, pinkClay, grayClay, silverClay,
+		cyanClay, purpleClay, blueClay, brownClay, greenClay,
+		redClay, blackClay };
 
 	public static final Texture[] stoneBrickType =
 		{ stoneBrick, mossyStoneBrick, crackedStoneBrick, circleStoneBrick };

@@ -1013,6 +1013,38 @@ public class TexturePackLoader {
 				new SimpleTexture("assets/minecraft/textures/blocks/hay_block_top", Texture.hayBlockTop));
 		allTextures.put("hardened_clay",
 				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay", Texture.hardenedClay));
+		allTextures.put("hardened_clay_stained_black",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_black", Texture.blackClay));
+		allTextures.put("hardened_clay_stained_blue",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_blue", Texture.blueClay));
+		allTextures.put("hardened_clay_stained_brown",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_brown", Texture.brownClay));
+		allTextures.put("hardened_clay_stained_cyan",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_cyan", Texture.cyanClay));
+		allTextures.put("hardened_clay_stained_gray",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_gray", Texture.grayClay));
+		allTextures.put("hardened_clay_stained_green",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_green", Texture.greenClay));
+		allTextures.put("hardened_clay_stained_light_blue",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_light_blue", Texture.lightBlueClay));
+		allTextures.put("hardened_clay_stained_lime",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_lime", Texture.limeClay));
+		allTextures.put("hardened_clay_stained_magenta",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_magenta", Texture.magentaClay));
+		allTextures.put("hardened_clay_stained_orange",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_orange", Texture.orangeClay));
+		allTextures.put("hardened_clay_stained_pink",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_pink", Texture.pinkClay));
+		allTextures.put("hardened_clay_stained_purple",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_purple", Texture.purpleClay));
+		allTextures.put("hardened_clay_stained_red",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_red", Texture.redClay));
+		allTextures.put("hardened_clay_stained_silver",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_silver", Texture.silverClay));
+		allTextures.put("hardened_clay_stained_white",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_white", Texture.whiteClay));
+		allTextures.put("hardened_clay_stained_yellow",
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_yellow", Texture.yellowClay));
 	}
 
 	/**

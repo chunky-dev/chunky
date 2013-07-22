@@ -373,6 +373,8 @@ public class Ray {
 		case Block.WOOD_ID:
 			return woodType[data & 3];
 		case Block.WOOL_ID:
+		case Block.CARPET_ID:
+		case Block.STAINED_CLAY_ID:
 			return woolColor[data];
 		case Block.REDSTONEWIRE_ID:
 			return "power: " + data;
