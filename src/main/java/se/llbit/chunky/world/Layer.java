@@ -68,7 +68,7 @@ public class Layer {
 			}
 		}
 
-		private int averageColor = 0xFF000000;
+		private final int averageColor = 0xFF000000;
 
 		@Override
 		public int getAvgColor() {
@@ -102,7 +102,7 @@ public class Layer {
 			}
 		}
 
-		private int averageColor = ImageTools.calcAvgColor(MiscImages.load);
+		private final int averageColor = ImageTools.calcAvgColor(MiscImages.load);
 
 		@Override
 		public int getAvgColor() {
@@ -133,7 +133,7 @@ public class Layer {
 			}
 		}
 
-		private int averageColor = ImageTools.calcAvgColor(MiscImages.corruptLayer);
+		private final int averageColor = ImageTools.calcAvgColor(MiscImages.corruptLayer);
 
 		@Override
 		public int getAvgColor() {
@@ -448,6 +448,7 @@ public class Layer {
 						y -= 1;
 						break;
 
+					case Block.CARPET_ID:
 					case Block.WOOL_ID:
 						int woolType = 0xFF & blockData[Chunk.chunkIndex(x, y, z)/2];
 						woolType >>= (x % 2) * 4;

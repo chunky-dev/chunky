@@ -26,6 +26,7 @@ import se.llbit.chunky.model.BrewingStandModel;
 import se.llbit.chunky.model.ButtonModel;
 import se.llbit.chunky.model.CactusModel;
 import se.llbit.chunky.model.CakeModel;
+import se.llbit.chunky.model.CarpetModel;
 import se.llbit.chunky.model.CauldronModel;
 import se.llbit.chunky.model.ChestModel;
 import se.llbit.chunky.model.CocoaPlantModel;
@@ -2366,7 +2367,6 @@ public class Block {
 		{
 			isOpaque = true;
 			isSolid = true;
-			isInvisible = false;
 			localIntersect = true;
 		}
 
@@ -2389,7 +2389,13 @@ public class Block {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+		}
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return CarpetModel.intersect(ray,
+					Texture.wool[ray.getBlockData()]);
 		}
 	};
 	public static final int HARDENED_CLAY_ID = 0xAC;
