@@ -35,7 +35,7 @@
     * The Windows installer skips overwriting the (more memory) shortcut if
     it already exists
     * Fixed error causing emitter and sun intensity values below one to
-    be equal to be forced to zero
+    be clamped to zero
     * Fixed error in headless mode that prevented rendering to start
     * Fixed crash when rendering in Water World mode
     * Water World check-box is correctly updated to reflect the current setting
