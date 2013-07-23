@@ -97,16 +97,22 @@ public class MinecraftFinder {
 					continue;
 				}
 				JsonParser parser = new JsonParser();
+				String releaseTime = "";
 				try {
 					File jsonFile = new File(dirs[i], dirs[i].getName() + ".json");
 					JsonElement json = parser.parse(new FileReader(jsonFile));
 					JsonObject obj = json.getAsJsonObject();
 					JsonElement relTime = obj.get("releaseTime");
-					String releaseTime = relTime.getAsString();
-					versionDirs.add(new VersionDir(dirs[i], releaseTime));
+					releaseTime = relTime.getAsString();
 				} catch (JsonIOException e) {
 				} catch (JsonSyntaxException e) {
 				} catch (FileNotFoundException e) {
+				} catch (IllegalStateException e) {
+					// Json parsing failed - assume
+				} catch (NullPointerException e) {
+					// Json parsing failed
+				} finally {
+					versionDirs.add(new VersionDir(dirs[i], releaseTime));
 				}
 			}
 
@@ -140,8 +146,18 @@ public class MinecraftFinder {
 		private final File dir;
 		private Date timestamp;
 
+		/**
+		 * If time is a string less than zero, or not ISO 8601, the
+		 * timestamp is set to <code>new Date(0)</code>
+		 * @param directory
+		 * @param time
+		 */
 		public VersionDir(File directory, String time) {
 			dir = directory;
+			if (time.length() < 6) {
+				timestamp = new Date(0);
+				return;
+			}
 			try {
 				// insert "GMT"
 				if (time.endsWith("Z")) {
