@@ -1,3 +1,13 @@
+1.1.13 - TBD
+    * added support for new "resource packs" (replaces texture packs in
+    Minecraft 1.6)
+    * implemented rendering of Minecraft 1.6 blocks:
+        + Carpet
+        + Hay Bale
+        + Hardened Clay
+        + Stained Clay
+        + Coal Block
+
 1.1.12 - 2013-06-05
     * Fixed some mirrored textures
     * Fixed autofocus not working
