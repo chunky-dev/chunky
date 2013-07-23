@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
@@ -38,6 +40,8 @@ import com.google.gson.JsonSyntaxException;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class MinecraftFinder {
+	private static final Logger logger =
+			Logger.getLogger(MinecraftFinder.class);
 
 	/**
 	 * Attempts to locate the local Minecraft installation directory.
@@ -97,7 +101,7 @@ public class MinecraftFinder {
 					return pathname.isDirectory();
 				}
 			});
-			List<VersionDir> versionDirs = new ArrayList<VersionDir>();
+			List<MCVersion> versionDirs = new ArrayList<MCVersion>();
 			for (int i = dirs.length-1; i >= 0; --i) {
 				File jarPath = new File(dirs[i], dirs[i].getName() + ".jar");
 				if (!jarPath.isFile()) {
@@ -119,19 +123,21 @@ public class MinecraftFinder {
 				} catch (NullPointerException e) {
 					// Json parsing failed
 				} finally {
-					versionDirs.add(new VersionDir(dirs[i], releaseTime));
+					versionDirs.add(new MCVersion(jarPath, releaseTime));
 				}
 			}
 
 			// select latest available minecraft version
 			if (!versionDirs.isEmpty()) {
-				VersionDir latest = versionDirs.get(0);
+				MCVersion latest = versionDirs.get(0);
 				for (int i = 1; i < versionDirs.size()-1; ++i) {
 					if (versionDirs.get(i).compareTo(latest) > 0) {
 						latest = versionDirs.get(i);
 					}
 				}
-				return latest.dir;
+				logger.info("Found latest Minecraft version: " +
+					latest.jar.getAbsolutePath());
+				return latest.jar;
 			}
 		}
 		// Backwards compatibility for pre-1.6.1:
@@ -146,21 +152,21 @@ public class MinecraftFinder {
 		return null;
 	}
 
-	private static class VersionDir implements Comparable<VersionDir> {
+	private static class MCVersion implements Comparable<MCVersion> {
 		private static final DateFormat dateFormat =
 				new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
 
-		private final File dir;
+		private final File jar;
 		private Date timestamp;
 
 		/**
 		 * If time is a string less than zero, or not ISO 8601, the
 		 * timestamp is set to <code>new Date(0)</code>
-		 * @param directory
+		 * @param jarFile
 		 * @param time
 		 */
-		public VersionDir(File directory, String time) {
-			dir = directory;
+		public MCVersion(File jarFile, String time) {
+			jar = jarFile;
 			if (time.length() < 6) {
 				timestamp = new Date(0);
 				return;
@@ -180,13 +186,13 @@ public class MinecraftFinder {
 		}
 
 		@Override
-		public int compareTo(VersionDir other) {
+		public int compareTo(MCVersion other) {
 			return timestamp.compareTo(other.timestamp);
 		}
 
 		@Override
 		public String toString() {
-			return dir.getName();
+			return jar.getName();
 		}
 	}
 }

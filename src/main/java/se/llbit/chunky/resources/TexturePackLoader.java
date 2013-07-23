@@ -1067,7 +1067,8 @@ public class TexturePackLoader {
 		File defaultTP = MinecraftFinder.getMinecraftJar();
 		boolean isDefault = tpFile.equals(defaultTP);
 		String tpName = isDefault ? "default texture pack"
-				: "texture pack " + tpFile.getName();
+				: "texture pack";
+		tpName += " (" + tpFile.getName() + ")";
 
 		Set<String> notLoaded = new HashSet<String>(toLoad);
 
@@ -1089,7 +1090,7 @@ public class TexturePackLoader {
 						tpFile.getAbsolutePath());
 			}
 		} catch (IOException e) {
-			logger.warn("Failed to open " + tpName);
+			logger.warn("Failed to open " + tpName + ": " + e.getMessage());
 		} finally {
 			if (texturePack != null) {
 				try {
