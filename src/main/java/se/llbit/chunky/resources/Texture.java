@@ -276,9 +276,12 @@ public class Texture {
 	public static final Texture comparatorOn = new Texture();
 	public static final Texture hopperOutside = new Texture();
 	public static final Texture hopperInside = new Texture();
+
+	// Minecraft 1.6
 	public static final Texture hayBlockSide = new Texture();
 	public static final Texture hayBlockTop = new Texture();
 	public static final Texture hardenedClay = new Texture();
+	public static final Texture coalBlock = new Texture();
 
 	public static final Texture whiteClay = new Texture();
 	public static final Texture orangeClay = new Texture();

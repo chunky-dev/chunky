@@ -60,14 +60,14 @@ public class TexturePackLoader {
 
 	static {
 		allTextures.put("normal chest", new AlternateTextures(
-				new ChestTexture("assets/minecraft/textures/entity/chest/normal", Texture.chestLock, // MC 1.6.1
+				new ChestTexture("assets/minecraft/textures/entity/chest/normal", Texture.chestLock, // MC 1.6
 					Texture.chestTop, Texture.chestBottom, Texture.chestLeft,
 					Texture.chestRight, Texture.chestFront, Texture.chestBack),
 				new ChestTexture("item/chest", Texture.chestLock,
 					Texture.chestTop, Texture.chestBottom, Texture.chestLeft,
 					Texture.chestRight, Texture.chestFront, Texture.chestBack)));
 		allTextures.put("ender chest", new AlternateTextures(
-				new ChestTexture("assets/minecraft/textures/entity/chest/ender", // MC 1.6.1
+				new ChestTexture("assets/minecraft/textures/entity/chest/ender", // MC 1.6
 					Texture.enderChestLock, Texture.enderChestTop,
 					Texture.enderChestBottom, Texture.enderChestLeft,
 					Texture.enderChestRight, Texture.enderChestFront,
@@ -78,23 +78,23 @@ public class TexturePackLoader {
 					Texture.enderChestRight, Texture.enderChestFront,
 					Texture.enderChestBack)));
 		allTextures.put("normal double chest", new AlternateTextures(
-				new LargeChestTexture("assets/minecraft/textures/entity/chest/normal_double"), // MC 1.6.1
+				new LargeChestTexture("assets/minecraft/textures/entity/chest/normal_double"), // MC 1.6
 				new LargeChestTexture("item/largechest")));
 		allTextures.put("sun", new AlternateTextures(
-				new SunTexture("assets/minecraft/textures/environment/sun"),// MC 1.6.1
+				new SunTexture("assets/minecraft/textures/environment/sun"),// MC 1.6
 				new SunTexture("environment/sun"),// MC 1.5
 				new SunTexture("terrain/sun")));
 		allTextures.put("sign", new AlternateTextures(
-				new SignTexture("assets/minecraft/textures/items/sign"),// MC 1.6.1
+				new SignTexture("assets/minecraft/textures/items/sign"),// MC 1.6
 				new SignTexture("item/sign")));
 		allTextures.put("clouds", new AlternateTextures(
-				new CloudsTexture("assets/minecraft/textures/environment/clouds"),// MC 1.6.1
+				new CloudsTexture("assets/minecraft/textures/environment/clouds"),// MC 1.6
 				new CloudsTexture("environment/clouds")));
 		allTextures.put("grass color map", new AlternateTextures(
-				new GrassColorTexture("assets/minecraft/textures/colormap/grass"),// MC 1.6.1
+				new GrassColorTexture("assets/minecraft/textures/colormap/grass"),// MC 1.6
 				new GrassColorTexture("misc/grasscolor")));
 		allTextures.put("foliage color map", new AlternateTextures(
-				new FoliageColorTexture("assets/minecraft/textures/colormap/foliage"),// MC 1.6.1
+				new FoliageColorTexture("assets/minecraft/textures/colormap/foliage"),// MC 1.6
 				new FoliageColorTexture("misc/foliagecolor")));
 
 		allTextures.put("grass top", new AlternateTextures(
@@ -1006,13 +1006,15 @@ public class TexturePackLoader {
 				new SimpleTexture("textures/blocks/hopper_inside", Texture.hopperInside)));
 		// TODO hopper top
 
-		// MC 1.6.1
+		// MC 1.6
 		allTextures.put("hay_block_side",
 				new SimpleTexture("assets/minecraft/textures/blocks/hay_block_side", Texture.hayBlockSide));
 		allTextures.put("hay_block_top",
 				new SimpleTexture("assets/minecraft/textures/blocks/hay_block_top", Texture.hayBlockTop));
 		allTextures.put("hardened_clay",
 				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay", Texture.hardenedClay));
+		allTextures.put("coal_block",
+				new SimpleTexture("assets/minecraft/textures/blocks/coal_block", Texture.coalBlock));
 		allTextures.put("hardened_clay_stained_black",
 				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_black", Texture.blackClay));
 		allTextures.put("hardened_clay_stained_blue",

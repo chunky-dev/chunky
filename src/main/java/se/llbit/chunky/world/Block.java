@@ -2418,11 +2418,10 @@ public class Block {
 		}
 	};
 	public static final int BLOCK_OF_COAL_ID = 0xAD;
-	public static final Block BLOCK_OF_COAL = new Block(BLOCK_OF_COAL_ID, "Block of Coal", Texture.unknown) {
+	public static final Block BLOCK_OF_COAL = new Block(BLOCK_OF_COAL_ID, "Block of Coal", Texture.coalBlock) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = true;
+			isOpaque = true;
+			isSolid = true;
 		}
 	};
 	public static final Block UNKNOWN0xAE = new Block(0xAE, "Unknown Block 0xAE", Texture.unknown) {
