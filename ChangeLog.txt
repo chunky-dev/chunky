@@ -1,5 +1,5 @@
-1.1.13 - TBD
-    * added support for new "resource packs" (replaces texture packs in
+1.1.13 - 2013-07-23
+    * added support for new "resource packs" (replaced texture packs in
     Minecraft 1.6)
     * implemented rendering of Minecraft 1.6 blocks:
         + Carpet
