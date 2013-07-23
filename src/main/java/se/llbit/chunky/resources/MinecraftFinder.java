@@ -75,6 +75,13 @@ public class MinecraftFinder {
 	}
 
 	/**
+	 * @return The resource pack directory of the local Minecraft installation
+	 */
+	public static File getResourcePacksDirectory() {
+		return new File(getMinecraftDirectory(), "resourcepacks");
+	}
+
+	/**
 	 * @return File reference to the latest Minecraft jar of the local
 	 * Minecraft installation, or <code>null</code> if the Minecraft jar
 	 * could not be found.

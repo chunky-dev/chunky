@@ -298,16 +298,16 @@ public class Controls extends JPanel {
 
 		JComponent optionsPanel = new JPanel();
 
-		JButton loadTexturePackBtn = new JButton("Load Texture Pack");
-		loadTexturePackBtn.setToolTipText("Load a custom texture pack");
+		JButton loadTexturePackBtn = new JButton("Load Resource Pack");
+		loadTexturePackBtn.setToolTipText("Load a custom resource pack");
 		loadTexturePackBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				CenteredFileDialog fileDialog =
 						new CenteredFileDialog(chunky.getFrame(),
-								"Load Texture Pack", FileDialog.LOAD);
+								"Load Resource Pack", FileDialog.LOAD);
 				fileDialog.setDirectory(MinecraftFinder
-						.getTexturePacksDirectory().getAbsolutePath());
+						.getResourcePacksDirectory().getAbsolutePath());
 				fileDialog.setFilenameFilter(
 						new FilenameFilter() {
 							@Override
