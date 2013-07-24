@@ -162,8 +162,8 @@ public class TexturePackLoader {
 				new SimpleTexture("textures/blocks/sapling", Texture.oakSapling),
 				new IndexedTexture(0x0F, Texture.oakSapling)));
 
-		allTextures.put("stone brick", new AlternateTextures(
-				new SimpleTexture("assets/minecraft/textures/blocks/stonebrick", Texture.cobblestone),
+		allTextures.put("cobblestone", new AlternateTextures(
+				new SimpleTexture("assets/minecraft/textures/blocks/cobblestone", Texture.cobblestone),
 				new SimpleTexture("textures/blocks/stonebrick", Texture.cobblestone),
 				new IndexedTexture(0x10, Texture.cobblestone)));
 		allTextures.put("bedrock", new AlternateTextures(
