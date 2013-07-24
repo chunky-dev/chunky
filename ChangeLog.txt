@@ -1,7 +1,14 @@
+1.1.14 - TBD
+    * Fixed gray wool having the same texture as light gray wool
+
+1.1.13d - 2013-07-24
+    * Fixed cobblestone texture not loading correctly for Minecraft 1.6
+    * Fixed default texture pack loading error for Minecraft 1.6
+
 1.1.13 - 2013-07-23
-    * added support for new "resource packs" (replaced texture packs in
+    * Added support for new "resource packs" (replaced texture packs in
     Minecraft 1.6)
-    * implemented rendering of Minecraft 1.6 blocks:
+    * Implemented rendering of Minecraft 1.6 blocks:
         + Carpet
         + Hay Bale
         + Hardened Clay
