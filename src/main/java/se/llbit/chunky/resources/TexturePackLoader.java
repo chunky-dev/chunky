@@ -531,7 +531,7 @@ public class TexturePackLoader {
 				new SimpleTexture("textures/blocks/cloth_15", Texture.blackWool),
 				new IndexedTexture(0x71, Texture.blackWool)));
 		allTextures.put("gray wool", new AlternateTextures(
-				new SimpleTexture("assets/minecraft/textures/blocks/wool_colored_silver", Texture.grayWool),
+				new SimpleTexture("assets/minecraft/textures/blocks/wool_colored_gray", Texture.grayWool),
 				new SimpleTexture("textures/blocks/cloth_7", Texture.grayWool),
 				new IndexedTexture(0x72, Texture.grayWool)));
 		allTextures.put("redstone_torch_off", new AlternateTextures(
@@ -1042,7 +1042,7 @@ public class TexturePackLoader {
 		allTextures.put("hardened_clay_stained_red",
 				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_red", Texture.redClay));
 		allTextures.put("hardened_clay_stained_silver",
-				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_silver", Texture.silverClay));
+				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_silver", Texture.lightGrayClay));
 		allTextures.put("hardened_clay_stained_white",
 				new SimpleTexture("assets/minecraft/textures/blocks/hardened_clay_stained_white", Texture.whiteClay));
 		allTextures.put("hardened_clay_stained_yellow",

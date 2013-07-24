@@ -291,7 +291,7 @@ public class Texture {
 	public static final Texture limeClay = new Texture();
 	public static final Texture pinkClay = new Texture();
 	public static final Texture grayClay = new Texture();
-	public static final Texture silverClay = new Texture();
+	public static final Texture lightGrayClay = new Texture();
 	public static final Texture cyanClay = new Texture();
 	public static final Texture purpleClay = new Texture();
 	public static final Texture blueClay = new Texture();
@@ -376,7 +376,7 @@ public class Texture {
 
 	public static final Texture[] stainedClay =
 		{ whiteClay, orangeClay, magentaClay, lightBlueClay,
-		yellowClay, limeClay, pinkClay, grayClay, silverClay,
+		yellowClay, limeClay, pinkClay, grayClay, lightGrayClay,
 		cyanClay, purpleClay, blueClay, brownClay, greenClay,
 		redClay, blackClay };
 
