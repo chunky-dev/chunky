@@ -2,6 +2,7 @@
     * Fixed gray wool having the same texture as light gray wool
 
 1.1.13d - 2013-07-24
+    * Renamed the "Load Texture Pack" button to "Load Resource Pack"
     * Fixed cobblestone texture not loading correctly for Minecraft 1.6
     * Fixed default texture pack loading error for Minecraft 1.6
 
