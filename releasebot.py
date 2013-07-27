@@ -214,4 +214,10 @@ def post_release_thread(version, exe_url, zip_url):
 
 version = Version(raw_input('Enter version: '))
 print "Releasebot is now publishing Chunky " + version.full
-publish(version)
+try:
+	publish(version)
+	print "All done."
+	raw_input()
+except:
+	print "Release aborted."
+	raw_input()
