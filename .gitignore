@@ -3,9 +3,8 @@
 /test
 /build
 /chunky.map
-/win/*.exe
-/win/*.nsi
 *.swp
+Chunky.nsi
 
 # releasebot cache directory
 /lpcache

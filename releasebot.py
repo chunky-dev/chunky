@@ -4,12 +4,11 @@ import sys
 import praw
 import re
 import io
+from subprocess import call
 from getpass import getpass
 from datetime import datetime
 from string import join
 from launchpadlib.launchpad import Launchpad
-
-assert len(sys.argv) == 2, ("Usage: releasebot.py <version>")
 
 class Version:
 	regex = re.compile('^(\d+\.\d+\.\d+)-?([a-zA-Z]*\.?\d*)$')
@@ -47,6 +46,12 @@ class Version:
 				self.changelog += line
 
 def publish(version):
+	if call(['cmd', '/c', 'ant', '-Dversion=' + version.full, 'release']) is not 0:
+		print "Error: Ant build failed!"
+		sys.exit(1)
+	if call(['makensis', 'Chunky.nsi']) is not 0:
+		print "Error: NSIS failed!"
+		sys.exit(1)
 	if version.rc:
 		zip_url = publish_rc()
 		post_rc_thread(version, zip_url)
@@ -57,9 +62,7 @@ def publish(version):
 		
 def publish_rc():
 	# TODO automatic dropbox or FTP upload
-	# we assume arv[2] a zip file url
-	assert len(sys.argv) == 3, "Error: second argument must be zip file URL!"
-	return sys.argv[2]
+	return raw_input('Release candidate zip file URL: ')
 
 def post_rc_thread(version, zip_url):
 	r = praw.Reddit(user_agent='releasebot')
@@ -209,6 +212,6 @@ def post_release_thread(version, exe_url, zip_url):
 	post.set_flair('announcement', 'announcement')
 	print "Submitted Reddit release thread!"
 
-version = Version(sys.argv[1])
+version = Version(raw_input('Enter version: '))
 print "Releasebot is now publishing Chunky " + version.full
 publish(version)

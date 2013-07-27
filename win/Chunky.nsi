@@ -3,10 +3,10 @@
 
 ; Use Modern UI
 !include "MUI2.nsh"
-!define MUI_ICON "chunky.ico"
+!define MUI_ICON "win\chunky.ico"
 
 Name "Chunky"
-OutFile "../build/Chunky-@VERSION@.exe"
+OutFile "build\Chunky-@VERSION@.exe"
 
 InstallDir $PROGRAMFILES\Chunky
 
@@ -20,7 +20,7 @@ RequestExecutionLevel admin
 !define MUI_ABORTWARNING
 
 ; Pages
-!insertmacro MUI_PAGE_LICENSE ../license/LICENSE.txt
+!insertmacro MUI_PAGE_LICENSE license\LICENSE.txt
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -80,10 +80,10 @@ Section "Chunky (required)" SecChunky
 	; Set destination directory
 	SetOutPath $INSTDIR
 	
-	File ..\build\Chunky.jar
-	File ..\build\ReadMe.html
-	File ..\ChangeLog.txt
-	File chunky.ico
+	File build\Chunky.jar
+	File build\ReadMe.html
+	File ChangeLog.txt
+	File win\chunky.ico
 	
 	; Write install dir to registry
 	WriteRegStr HKLM "Software\Chunky" "Install_Dir" "$INSTDIR"
