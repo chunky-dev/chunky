@@ -1,4 +1,5 @@
 1.1.14 - TBD
+    * Added camera roll setting
     * Fixed gray wool having the same texture as light gray wool
 
 1.1.13d - 2013-07-24

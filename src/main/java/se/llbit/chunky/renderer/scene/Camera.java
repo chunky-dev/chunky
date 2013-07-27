@@ -456,6 +456,7 @@ public class Camera {
 
 	private double yaw = - Math.PI / 2;
 	private double pitch = 0;
+	private double roll = 0;
 
 	/**
 	 * Transform to rotate from camera space to world space (not including
@@ -498,6 +499,7 @@ public class Camera {
 		pos.set(other.pos);
 		yaw = other.yaw;
 		pitch = other.pitch;
+		roll = other.roll;
 		transform.set(other.transform);
 		dof = other.dof;
 		projectionMode = other.projectionMode;
@@ -518,6 +520,7 @@ public class Camera {
 		camera.addItem("x", new DoubleTag(pos.x));
 		camera.addItem("y", new DoubleTag(pos.y));
 		camera.addItem("z", new DoubleTag(pos.z));
+		camera.addItem("roll", new DoubleTag(roll));
 		camera.addItem("pitch", new DoubleTag(pitch));
 		camera.addItem("yaw", new DoubleTag(yaw));
 		camera.addItem("projectionMode", new StringTag(projectionMode.name()));
@@ -537,6 +540,7 @@ public class Camera {
 		double y = tag.get("y").doubleValue();
 		double z = tag.get("z").doubleValue();
 		pos.set(x, y, z);
+		roll = tag.get("roll").doubleValue();
 		pitch = tag.get("pitch").doubleValue();
 		yaw = tag.get("yaw").doubleValue();
 		dof = tag.get("dof").doubleValue();
@@ -788,10 +792,12 @@ public class Camera {
 	 * Set the view direction
 	 * @param yaw Yaw in radians
 	 * @param pitch Pitch in radians
+	 * @param roll Roll in radians
 	 */
-	public synchronized void setView(double yaw, double pitch) {
+	public synchronized void setView(double yaw, double pitch, double roll) {
 		this.yaw = yaw;
 		this.pitch = pitch;
+		this.roll = roll;
 
 		updateTransform();
 	}
@@ -800,8 +806,18 @@ public class Camera {
 	 * Update the camera transformation matrix.
 	 */
 	synchronized void updateTransform() {
+		transform.setIdentity();
+
+		// yaw (y axis rotation)
+		tmpTransform.rotY(Math.PI/2 + yaw);
+		transform.mul(tmpTransform);
+
+		// pitch (x axis rotation)
 		tmpTransform.rotX(Math.PI/2 - pitch);
-		transform.rotY(Math.PI/2 + yaw);
+		transform.mul(tmpTransform);
+
+		// roll (z axis rotation)
+		tmpTransform.rotZ(roll);
 		transform.mul(tmpTransform);
 
 		scene.refresh();
@@ -815,6 +831,7 @@ public class Camera {
 		if (world != null && world.havePlayerPos()) {
 			pitch = (Math.PI / 2) * ( (world.playerPitch() / 90) - 1);
 			yaw = (Math.PI / 2) * ( -(world.playerYaw() / 90) + 1);
+			roll = 0;
 			pos.x = world.playerPosX();
 			pos.y = world.playerPosY() + 1.6;
 			pos.z = world.playerPosZ();
@@ -875,6 +892,13 @@ public class Camera {
 	 */
 	public double getPitch() {
 		return pitch;
+	}
+
+	/**
+	 * @return The current roll angle
+	 */
+	public double getRoll() {
+		return roll;
 	}
 
 	/**

@@ -154,6 +154,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JTextField cameraZ = new JTextField();
 	private final JTextField cameraYaw = new JTextField();
 	private final JTextField cameraPitch = new JTextField();
+	private final JTextField cameraRoll = new JTextField();
 	private final JButton mergeDumpBtn = new JButton("Merge Render Dump");
 
 	private boolean controlsLocked = false;
@@ -1264,6 +1265,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		cameraPitch.setColumns(10);
 		cameraPitch.setHorizontalAlignment(JTextField.RIGHT);
 		cameraPitch.addActionListener(cameraDirectionListener);
+		cameraRoll.setColumns(10);
+		cameraRoll.setHorizontalAlignment(JTextField.RIGHT);
+		cameraRoll.addActionListener(cameraDirectionListener);
 		updateCameraDirection();
 
 		JLabel lookAtLbl = new JLabel("Skybox views:");
@@ -1273,7 +1277,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
-				camera.setView(Math.PI, -Math.PI/2);
+				camera.setView(Math.PI, -Math.PI/2, 0);
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1285,7 +1289,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
-				camera.setView(0, -Math.PI/2);
+				camera.setView(0, -Math.PI/2, 0);
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1297,7 +1301,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
-				camera.setView(-Math.PI/2, Math.PI);
+				camera.setView(-Math.PI/2, Math.PI, 0);
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1309,7 +1313,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
-				camera.setView(-Math.PI/2, 0);
+				camera.setView(-Math.PI/2, 0, 0);
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1321,7 +1325,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
-				camera.setView(Math.PI/2, -Math.PI/2);
+				camera.setView(Math.PI/2, -Math.PI/2, 0);
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1333,7 +1337,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
 				camera.setFoV(90);
-				camera.setView(-Math.PI/2, -Math.PI/2);
+				camera.setView(-Math.PI/2, -Math.PI/2, 0);
 				fov.update();
 				updateCameraDirection();
 			}
@@ -1357,7 +1361,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
-				camera.setView(-Math.PI/4, -Math.PI/4);
+				camera.setView(-Math.PI/4, -Math.PI/4, 0);
 				camera.setProjectionMode(ProjectionMode.PARALLEL);
 				updateProjectionMode();
 				fov.update();
@@ -1372,7 +1376,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
-				camera.setView(-3*Math.PI/4, -Math.PI/4);
+				camera.setView(-3*Math.PI/4, -Math.PI/4, 0);
 				camera.setProjectionMode(ProjectionMode.PARALLEL);
 				updateProjectionMode();
 				fov.update();
@@ -1387,7 +1391,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
-				camera.setView(-5*Math.PI/4, -Math.PI/4);
+				camera.setView(-5*Math.PI/4, -Math.PI/4, 0);
 				camera.setProjectionMode(ProjectionMode.PARALLEL);
 				updateProjectionMode();
 				fov.update();
@@ -1402,7 +1406,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Camera camera = renderMan.scene().camera();
-				camera.setView(-7*Math.PI/4, -Math.PI/4);
+				camera.setView(-7*Math.PI/4, -Math.PI/4, 0);
 				camera.setProjectionMode(ProjectionMode.PARALLEL);
 				updateProjectionMode();
 				fov.update();
@@ -1437,6 +1441,7 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(layout.createParallelGroup()
 						.addComponent(cameraZ, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(cameraRoll, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 					)
 				)
 				.addGroup(layout.createSequentialGroup()
@@ -1503,6 +1508,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(dirLbl)
 				.addComponent(cameraYaw)
 				.addComponent(cameraPitch)
+				.addComponent(cameraRoll)
 			)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
@@ -1777,6 +1783,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		public void actionPerformed(ActionEvent e) {
 			double yaw = renderMan.scene().camera().getYaw();
 			double pitch = renderMan.scene().camera().getPitch();
+			double roll = renderMan.scene().camera().getRoll();
 			try {
 				double value = numberFormat.parse(cameraPitch.getText()).doubleValue();
 				pitch = QuickMath.degToRad(value);
@@ -1784,11 +1791,18 @@ public class RenderControls extends JDialog implements ViewListener,
 			} catch (ParseException ex) {
 			}
 			try {
-				yaw = QuickMath.degToRad(numberFormat.parse(cameraYaw.getText()).doubleValue());
+				double value = numberFormat.parse(cameraYaw.getText()).doubleValue();
+				yaw = QuickMath.degToRad(value);
 			} catch (NumberFormatException ex) {
 			} catch (ParseException ex) {
 			}
-			renderMan.scene().camera().setView(yaw, pitch);
+			try {
+				double value = numberFormat.parse(cameraRoll.getText()).doubleValue();
+				roll = QuickMath.degToRad(value);
+			} catch (NumberFormatException ex) {
+			} catch (ParseException ex) {
+			}
+			renderMan.scene().camera().setView(yaw, pitch, roll);
 			updateCameraDirection();
 		}
 	};
@@ -1942,14 +1956,19 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	protected void updateCameraDirection() {
+		cameraRoll.removeActionListener(cameraDirectionListener);
 		cameraPitch.removeActionListener(cameraDirectionListener);
 		cameraYaw.removeActionListener(cameraDirectionListener);
 
+		double roll = QuickMath.radToDeg(renderMan.scene().camera().getRoll());
 		double pitch = QuickMath.radToDeg(renderMan.scene().camera().getPitch());
-		cameraPitch.setText(decimalFormat.format(pitch));
-		cameraYaw.setText(decimalFormat.format(
-				QuickMath.radToDeg(renderMan.scene().camera().getYaw())));
+		double yaw = QuickMath.radToDeg(renderMan.scene().camera().getYaw());
 
+		cameraRoll.setText(decimalFormat.format(roll));
+		cameraPitch.setText(decimalFormat.format(pitch));
+		cameraYaw.setText(decimalFormat.format(yaw));
+
+		cameraRoll.addActionListener(cameraDirectionListener);
 		cameraPitch.addActionListener(cameraDirectionListener);
 		cameraYaw.addActionListener(cameraDirectionListener);
 	}
