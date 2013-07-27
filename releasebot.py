@@ -216,8 +216,9 @@ version = Version(raw_input('Enter version: '))
 print "Releasebot is now publishing Chunky " + version.full
 try:
 	publish(version)
-	print "All done."
-	raw_input()
+	raw_input('All done. Press return to push git changes.')
+	call(['git', 'push', 'origin', 'master'])# push version bump commit
+	call(['git', 'push', 'origin', version.full)# push version tag
 except:
 	print "Release aborted."
 	raw_input()
