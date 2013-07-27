@@ -78,7 +78,8 @@ unsure of what you are doing please wait for the proper release.
 If you decide to try this release candidate and find a bug, please report it
 in this thread or over at [the GitHub issue tracker](https://github.com/llbit/chunky/issues).
 
-** Please back up your renders before using this software! **
+* ** Please back up your renders before using this software! **
+* Always read the change log before running a release candidate!
 
 [Download link.](%s)
 
