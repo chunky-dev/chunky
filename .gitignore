@@ -6,3 +6,6 @@
 /win/*.exe
 /win/*.nsi
 *.swp
+
+# releasebot cache directory
+/lpcache
