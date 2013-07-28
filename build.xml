@@ -162,8 +162,8 @@
 		<zip destfile="build/Chunky-${Chunky.version}.zip">
 			<zipfileset dir="." prefix="Chunky-${Chunky.version}">
 				<include name="ChangeLog.txt"/>
-				<include name="${basedir}/win/Chunky.bat"/>
-				<include name="Chunky.sh"/>
+				<include name="${basedir}/dist/Chunky.bat"/>
+				<include name="${basedir}/dist/Chunky.sh"/>
 			</zipfileset>
 			<zipfileset dir="license" prefix="Chunky-${Chunky.version}/license">
 				<include name="LICENSE.txt"/>
@@ -178,7 +178,7 @@
 				<include name="ReadMe.html"/>
 			</zipfileset>
 		</zip>
-		<copy file="${basedir}/win/Chunky.nsi"
+		<copy file="${basedir}/dist/Chunky.nsi"
 			toFile="${basedir}/Chunky.nsi"
 			overwrite="true">
 			<filterset>

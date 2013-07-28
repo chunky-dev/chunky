@@ -3,7 +3,7 @@
 
 ; Use Modern UI
 !include "MUI2.nsh"
-!define MUI_ICON "win\chunky.ico"
+!define MUI_ICON "dist\chunky.ico"
 
 Name "Chunky"
 OutFile "build\Chunky-@VERSION@.exe"
@@ -83,7 +83,7 @@ Section "Chunky (required)" SecChunky
 	File build\Chunky.jar
 	File build\ReadMe.html
 	File ChangeLog.txt
-	File win\chunky.ico
+	File dist\chunky.ico
 	
 	; Write install dir to registry
 	WriteRegStr HKLM "Software\Chunky" "Install_Dir" "$INSTDIR"
