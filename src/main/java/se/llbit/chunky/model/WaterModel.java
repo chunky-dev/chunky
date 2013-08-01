@@ -335,6 +335,14 @@ public class WaterModel {
 		double z = ray.x.z/w - QuickMath.floor(ray.x.z/w);
 		int u = (int) (x * normalMapW - Ray.EPSILON);
 		int v = (int) ((1-z) * normalMapW - Ray.EPSILON);
+
+		if (u < 0 || u >= normalMapW || v < 0 || v >= normalMapW) {
+			// This can happen at extreme distances.
+			// Pick some arbitrary value instead of crashing.
+			ray.n.set(0,1,0);
+			return;
+		}
+
 		ray.n.set(normalMap[u][v][0], .15f,
 				normalMap[u][v][1]);
 		w = (1<<1);
