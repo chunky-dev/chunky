@@ -189,7 +189,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		String texturePack = null;
 		int renderThreads = Runtime.getRuntime().availableProcessors();
 		File worldDir = null;
-		boolean doBench = false;
+		boolean runBenchmark = false;
 		int target = -1;
 		for (int i = 0; i < args.length; ++i) {
 			if (args[i].equals("-texture") && args.length > i+1) {
@@ -211,7 +211,7 @@ public class Chunky implements ChunkDiscoveryListener {
 					sceneName = args[++i];
 				}
 			} else if (args[i].equals("-benchmark")) {
-				doBench = true;
+				runBenchmark = true;
 			} else if (args[i].equals("-target")) {
 				if (i+1 == args.length) {
 					logger.error("Missing argument for -target option");
@@ -259,23 +259,25 @@ public class Chunky implements ChunkDiscoveryListener {
 			}
 		}
 
+		boolean runHeadless = sceneName != null;
+
 		if (texturePack != null) {
 			TexturePackLoader.loadTexturePack(new File(texturePack), false);
 		} else {
-			String lastTexturePack = ProgramProperties.getProperty("lastTexturePack");
-			if (lastTexturePack != null) {
+			String lastTexturePack = ProgramProperties.getProperty("lastTexturePack", "");
+			if (!lastTexturePack.isEmpty()) {
 				TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
 			} else {
 				TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJar(), false);
 			}
 		}
 
-		if (doBench) {
+		if (runBenchmark) {
 			doBenchmark(renderThreads);
 			return 0;
 		}
 
-		if (sceneName != null) {
+		if (runHeadless) {
 			// start headless mode
 			System.setProperty("java.awt.headless", "true");
 

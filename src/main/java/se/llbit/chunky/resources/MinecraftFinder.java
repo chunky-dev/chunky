@@ -29,6 +29,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import se.llbit.util.ProgramProperties;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
@@ -44,10 +46,21 @@ public class MinecraftFinder {
 			Logger.getLogger(MinecraftFinder.class);
 
 	/**
-	 * Attempts to locate the local Minecraft installation directory.
-	 * @return The directory of the local Minecraft installation
+	 * @return The configured Minecraft directory.
 	 */
 	public static File getMinecraftDirectory() {
+		String minecraftDir = ProgramProperties.getProperty("minecraftDir", "");
+		if (!minecraftDir.isEmpty()) {
+			return new File(minecraftDir);
+		} else {
+			return getDefaultMinecraftDirectory();
+		}
+	}
+
+	/**
+	 * @return The platform-dependent default Minecraft directory.
+	 */
+	public static File getDefaultMinecraftDirectory() {
 		String home = System.getProperty("user.home", ".");   //$NON-NLS-1$ //$NON-NLS-2$
 		String os = System.getProperty("os.name").toLowerCase();  //$NON-NLS-1$
 
