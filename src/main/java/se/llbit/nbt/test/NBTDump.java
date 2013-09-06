@@ -30,6 +30,7 @@ import java.util.zip.GZIPInputStream;
 
 import se.llbit.chunky.world.storage.RegionFile;
 import se.llbit.nbt.AnyTag;
+import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.NamedTag;
 
 @SuppressWarnings("javadoc")
@@ -44,16 +45,33 @@ public class NBTDump {
 		return isGZ;
 	}
 
-	protected static AnyTag read(String filename) throws IOException {
-		Matcher m = REGION_PATTERN.matcher(filename);
+	protected static AnyTag read(String arg) throws IOException {
+		Matcher m = REGION_PATTERN.matcher(arg);
 		DataInputStream in = null;
 		RegionFile rf = null;
+		String filename;
 		try {
 			if (m.matches()) {
-				rf = new RegionFile(new File(m.group(3)));
-				in = rf.getChunkDataInputStream(Integer.parseInt(m.group(1)),
-						Integer.parseInt(m.group(2)));
+				filename = m.group(3);
+				int x = Integer.parseInt(m.group(1));
+				int z = Integer.parseInt(m.group(2));
+				rf = new RegionFile(new File(filename));
+				if (!rf.hasChunk(x, z)) {
+					System.err.println("No such chunk in region: (" + x + "," + z + ")");
+					// print available chunks
+					System.err.println("available chunks in region:");
+					for (int cx = 0; cx < 32; cx++) {
+						for (int cz = 0; cz < 32; cz++) {
+							if (rf.hasChunk(cx, cz)) {
+								System.err.println("("+cx+","+cz+")");
+							}
+						}
+					}
+					return new ErrorTag();
+				}
+				in = rf.getChunkDataInputStream(x, z);
 			} else {
+				filename = arg;
 				InputStream is = new BufferedInputStream(
 						new FileInputStream(new File(filename)));
 				if (isGzipped(is)) {
@@ -61,7 +79,12 @@ public class NBTDump {
 				}
 				in = new DataInputStream(is);
 			}
-			return NamedTag.read(in);
+			if (in != null) {
+				return NamedTag.read(in);
+			} else {
+				System.err.println("Failed to open file: " + filename);
+				return new ErrorTag();
+			}
 		} finally {
 			if (in != null) in.close();
 			if (rf != null) rf.close();
