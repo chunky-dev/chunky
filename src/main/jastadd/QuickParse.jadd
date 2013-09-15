@@ -92,9 +92,9 @@ aspect QuickParse {
 
 		try {
 			byte itemType = in.readByte();
-			if (itemType == 0)
-				return result;// cannot create list of TAG_End
 			int nitems = in.readInt();
+			if (itemType == 0 && nitems > 0)
+				return result;// cannot create list of TAG_End
 			for (int i = 0; i < nitems; ++i) {
 				String tag = prefix + "." + i;
 				if (request.contains(tag)) {
@@ -240,9 +240,9 @@ aspect QuickParse {
 	static void ListTag.skip(DataInputStream in) {
 		try {
 			byte itemType = in.readByte();
+			int nitems = in.readInt();
 			if (itemType == 0)
 				return;
-			int nitems = in.readInt();
 			for (int i = 0; i < nitems; ++i)
 				SpecificTag.skip(itemType, in);
 		} catch (IOException e) {
