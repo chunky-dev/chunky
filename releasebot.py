@@ -1,5 +1,6 @@
 # coding=utf-8
 # Releasebot Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+# requires PRAW, Launchpadlib
 import sys
 import praw
 import re
@@ -219,7 +220,7 @@ try:
 	publish(version)
 	raw_input('All done. Press return to push git changes.')
 	call(['git', 'push', 'origin', 'master'])# push version bump commit
-	call(['git', 'push', 'origin', version.full)# push version tag
+	call(['git', 'push', 'origin', version.full])# push version tag
 except:
 	print "Release aborted."
 	raw_input()
