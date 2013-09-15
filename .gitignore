@@ -5,6 +5,7 @@
 /chunky.map
 *.swp
 Chunky.nsi
+/release_notes-*.txt
 
 # releasebot cache directory
 /lpcache
