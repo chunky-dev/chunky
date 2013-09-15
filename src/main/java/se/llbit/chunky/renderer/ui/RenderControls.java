@@ -2146,6 +2146,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updatePostprocessCB();
 		cloudHeight.update();
 		rayDepth.update();
+		updateWaterHeight();
 		updateCameraDirection();
 		updateCameraPosition();
 		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
