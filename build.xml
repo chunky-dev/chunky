@@ -138,7 +138,7 @@
 		<exec executable="git">
 			<arg value="commit"/>
 			<arg value="-m"/>
-			<arg value="Bumped version string"/>
+			<arg value="Release ${version}"/>
 			<arg value="${src.dir}/main/res/Version.properties"/>
 		</exec>
 		<exec executable="git">

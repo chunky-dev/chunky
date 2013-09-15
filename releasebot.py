@@ -5,6 +5,7 @@ import sys
 import praw
 import re
 import io
+import traceback
 from subprocess import call
 from getpass import getpass
 from datetime import datetime
@@ -47,18 +48,21 @@ class Version:
 				self.changelog += line
 
 def publish(version):
-	if call(['cmd', '/c', 'ant', '-Dversion=' + version.full, 'release']) is not 0:
-		print "Error: Ant build failed!"
-		sys.exit(1)
-	if call(['makensis', 'Chunky.nsi']) is not 0:
-		print "Error: NSIS failed!"
-		sys.exit(1)
-	if version.rc:
-		zip_url = publish_rc()
-		post_rc_thread(version, zip_url)
-	else:
-		(new_release, exe_url, zip_url) = publish_release(version)
-		if new_release:
+	should_build = raw_input('Build release? [y/n] ')
+	if should_build == "y":
+		if call(['cmd', '/c', 'ant', '-Dversion=' + version.full, 'release']) is not 0:
+			print "Error: Ant build failed!"
+			sys.exit(1)
+		if call(['makensis', 'Chunky.nsi']) is not 0:
+			print "Error: NSIS failed!"
+			sys.exit(1)
+	should_publish = raw_input('Publish files? [y/n] ')
+	if should_publish == "y":
+		if version.rc:
+			zip_url = publish_rc()
+			post_rc_thread(version, zip_url)
+		else:
+			(new_release, exe_url, zip_url) = publish_release(version)
 			post_release_thread(version, exe_url, zip_url)
 		
 def publish_rc():
@@ -66,6 +70,9 @@ def publish_rc():
 	return raw_input('Release candidate zip file URL: ')
 
 def post_rc_thread(version, zip_url):
+	should_post = raw_input('Post RC thread? [y/n] ')
+	if should_post != "y":
+		return
 	r = praw.Reddit(user_agent='releasebot')
 	pw = getpass(prompt='releasebot login: ')
 	r.login('releasebot', pw)
@@ -91,28 +98,31 @@ in this thread or over at [the GitHub issue tracker](https://github.com/llbit/ch
 	print "Submitted Reddit release thread!"
 
 def lp_upload_file(version, release, filename, description, content_type, file_type):
+	# TODO handle re-uploads
 	FILE_TYPES = dict(
 		tarball='Code Release Tarball',
 		readme='README File',
 		release_notes='Release Notes',
 		changelog='ChangeLog File',
-		installer='Installer File')
+		installer='Installer file')
 	print "Uploading %s..." % filename
 	try:
 		release_file = release.add_file(
 			filename=filename,
 			description=description,
 			file_content=open('build/' + filename, 'rb').read(),
-			content_type='text/plain',
+			content_type=content_type,
 			file_type=FILE_TYPES[file_type])
 		return 'https://launchpad.net/chunky/%s/%s/+download/%s' \
 			% (version.series, version.milestone, filename)
 	except:
-		print "File upload error:", sys.exc_info()[0]
+		exc_type, exc_value, exc_traceback = sys.exc_info()
+		print "File upload error:"
+		traceback.print_exception(exc_type, exc_value, exc_traceback)
 		return None
 
 def publish_release(version):
-	launchpad = Launchpad.login_with('Releasebot', 'staging', 'lpcache')
+	launchpad = Launchpad.login_with('Releasebot', 'production', 'lpcache')
 
 	chunky = launchpad.projects['chunky']
 
@@ -195,6 +205,9 @@ def publish_release(version):
 
 "post a reddit release thread"
 def post_release_thread(version, exe_url, zip_url):
+	should_post = raw_input('Post release thread? [y/n] ')
+	if should_post != "y":
+		return
 	r = praw.Reddit(user_agent='releasebot')
 	pw = getpass(prompt='releasebot login: ')
 	r.login('releasebot', pw)
@@ -218,9 +231,13 @@ version = Version(raw_input('Enter version: '))
 print "Releasebot is now publishing Chunky " + version.full
 try:
 	publish(version)
-	raw_input('All done. Press return to push git changes.')
-	call(['git', 'push', 'origin', 'master'])# push version bump commit
-	call(['git', 'push', 'origin', version.full])# push version tag
+	should_push = raw_input('All done. Push git changes? [y/n] ')
+	if should_push == "y":
+		call(['git', 'push', 'origin', 'master'])# push version bump commit
+		call(['git', 'push', 'origin', version.full])# push version tag
 except:
+	exc_type, exc_value, exc_traceback = sys.exc_info()
+	print "Unexpected error:"
+	traceback.print_exception(exc_type, exc_value, exc_traceback)
 	print "Release aborted."
 	raw_input()
