@@ -61,7 +61,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame {
 
-	private static final String LAUNCHER_VERSION = "beta 2";
+	private static final String LAUNCHER_VERSION = "beta 3";
 
 	public class UpdateThread extends Thread {
 		@Override public void run() {
@@ -581,15 +581,15 @@ public class ChunkyLauncher extends JFrame {
 		settings.load();
 
 		if (args.length > 0) {
-			// if we have cmdline args then bypass launcher and start Chunky
-			// but fitler out --nolauncher from command options
+			// If there are command line arguments then we assume that Chunky
+			// should run in headless mode, unless the --nolauncher command is found
+			// in which case we strip that and start regularly, but without launcher
 
-			// TODO SORT THIS OUT
 			settings.chunkyOptions = "";
-			boolean headless = false;
+			boolean headless = true;
 			for (String arg: args) {
-				if (arg.equals("--headless")) {
-					headless = true;
+				if (arg.equals("--nolauncher")) {
+					headless = false;
 				} else {
 					if (!settings.chunkyOptions.isEmpty()) {
 						settings.chunkyOptions += " ";
