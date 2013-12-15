@@ -523,7 +523,7 @@ public class Block {
 			isInvisible = true;
 		}
 	};
-	public static final Block YELLOWFLOWER = new Block(0x25, "Yellow Flower", Texture.yellowFlower) {
+	public static final Block DANDELION = new Block(0x25, "Dandelion", Texture.dandelion) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -532,19 +532,31 @@ public class Block {
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return SpriteModel.intersect(ray, Texture.yellowFlower);
+			return SpriteModel.intersect(ray, Texture.dandelion);
 		}
 	};
-	public static final Block REDROSE = new Block(0x26, "Red Rose", Texture.redRose) {
+	public static final int FLOWER_ID = 0x26;
+	public static final Block FLOWER = new Block(FLOWER_ID, "Flower", Texture.poppy) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			localIntersect = true;
 			subSurfaceScattering = true;
 		}
+		final Texture[] textures = {
+			Texture.poppy,
+			Texture.blueOrchid,
+			Texture.allium,
+			Texture.azureBluet,
+			Texture.redTulip,
+			Texture.orangeTulip,
+			Texture.whiteTulip,
+			Texture.pinkTulip,
+			Texture.oxeyeDaisy
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return SpriteModel.intersect(ray, Texture.redRose);
+			return SpriteModel.intersect(ray, textures[ray.getBlockData()%9]);
 		}
 	};
 	public static final Block BROWNMUSHROOM = new Block(0x27, "Brown Mushroom", Texture.brownMushroom) {
@@ -3045,7 +3057,7 @@ public class Block {
 		SANDSTONE, NOTEBLOCK, BED, POWEREDRAIL,
 		DETECTORRAIL, STICKYPISTON, COBWEB, TALLGRASS,
 		DEADBUSH, PISTON, PISTONEXTENSION, WOOL,
-		MOVEDBYPISTON, YELLOWFLOWER, REDROSE, BROWNMUSHROOM,
+		MOVEDBYPISTON, DANDELION, FLOWER, BROWNMUSHROOM,
 		REDMUSHROOM, GOLDBLOCK, IRONBLOCK, DOUBLESLAB,
 		SLAB, BRICKS, TNT, BOOKSHELF,
 		MOSSSTONE, OBSIDIAN, TORCH, FIRE,

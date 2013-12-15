@@ -150,13 +150,13 @@ public class TexturePackLoader {
 				new SimpleTexture("textures/blocks/web", Texture.cobweb),
 				new IndexedTexture(0x0B, Texture.cobweb)));
 		allTextures.put("rose", new AlternateTextures(
-				new SimpleTexture("assets/minecraft/textures/blocks/flower_rose", Texture.redRose),
-				new SimpleTexture("textures/blocks/rose", Texture.redRose),
-				new IndexedTexture(0x0C, Texture.redRose)));
+				new SimpleTexture("assets/minecraft/textures/blocks/flower_rose", Texture.poppy),
+				new SimpleTexture("textures/blocks/rose", Texture.poppy),
+				new IndexedTexture(0x0C, Texture.poppy)));
 		allTextures.put("dandelion", new AlternateTextures(
-				new SimpleTexture("assets/minecraft/textures/blocks/flower_dandelion", Texture.yellowFlower),
-				new SimpleTexture("textures/blocks/flower", Texture.yellowFlower),
-				new IndexedTexture(0x0D, Texture.yellowFlower)));
+				new SimpleTexture("assets/minecraft/textures/blocks/flower_dandelion", Texture.dandelion),
+				new SimpleTexture("textures/blocks/flower", Texture.dandelion),
+				new IndexedTexture(0x0D, Texture.dandelion)));
 		allTextures.put("nether portal", new AlternateTextures(
 				new SimpleTexture("assets/minecraft/textures/blocks/portal", Texture.portal),
 				new SimpleTexture("textures/blocks/portal", Texture.portal),
@@ -1136,6 +1136,24 @@ public class TexturePackLoader {
 		// [MC 1.7.2] Red Sand
 		allTextures.put("red_sand",
 				new SimpleTexture("assets/minecraft/textures/blocks/red_sand", Texture.redSand));
+
+		// [MC 1.7.2] Flowers
+		allTextures.put("flower_allium",
+				new SimpleTexture("assets/minecraft/textures/blocks/flower_allium", Texture.allium));
+		allTextures.put("flower_blue_orchid",
+				new SimpleTexture("assets/minecraft/textures/blocks/flower_blue_orchid", Texture.blueOrchid));
+		allTextures.put("flower_houstonia",
+				new SimpleTexture("assets/minecraft/textures/blocks/flower_houstonia", Texture.azureBluet));
+		allTextures.put("flower_oxeye_daisy",
+				new SimpleTexture("assets/minecraft/textures/blocks/flower_oxeye_daisy", Texture.oxeyeDaisy));
+		allTextures.put("flower_tulip_red",
+				new SimpleTexture("assets/minecraft/textures/blocks/flower_tulip_red", Texture.redTulip));
+		allTextures.put("flower_tulip_orange",
+				new SimpleTexture("assets/minecraft/textures/blocks/flower_tulip_orange", Texture.orangeTulip));
+		allTextures.put("flower_tulip_white",
+				new SimpleTexture("assets/minecraft/textures/blocks/flower_tulip_white", Texture.whiteTulip));
+		allTextures.put("flower_tulip_pink",
+				new SimpleTexture("assets/minecraft/textures/blocks/flower_tulip_pink", Texture.pinkTulip));
 
 	}
 

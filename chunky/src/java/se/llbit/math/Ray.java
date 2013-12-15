@@ -336,6 +336,12 @@ public class Ray {
 		"acacia", "dark oak", "unknown", "unknown"
 	};
 
+	private static final String[] flowerType = {
+		"Poppy", "Blue Orchid", "Allium", "Azure Bluet",
+		"Red Tulip", "Orange Tulip", "White Tulip", "Pink Tulip",
+		"Oxeye Daisy"
+	};
+
 	private static final String[] woolColor = {
 		"white",
 		"orange",
@@ -379,6 +385,8 @@ public class Ray {
 			return woodType[data&3];
 		case Block.LEAVES2_ID:
 			return woodType[4 + (data&3)];
+		case Block.FLOWER_ID:
+			return flowerType[data%8];
 		case Block.WOOL_ID:
 		case Block.CARPET_ID:
 		case Block.STAINED_CLAY_ID:

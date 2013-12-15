@@ -56,8 +56,6 @@ public class Texture {
 	public static final Texture tntSide = new Texture("tnt");
 	public static final Texture tntBottom = new Texture();
 	public static final Texture cobweb = new Texture("cobweb");
-	public static final Texture redRose = new Texture("rose");
-	public static final Texture yellowFlower = new Texture("yellow-flower");
 	public static final Texture portal = new Texture("nether-portal");
 	public static final Texture cobblestone = new Texture("cobblestone");
 	public static final Texture bedrock = new Texture("bedrock");
@@ -317,6 +315,18 @@ public class Texture {
 
 	public static final Texture podzolTop = new Texture();
 	public static final Texture podzolSide = new Texture();
+
+	// Flowers
+	public static final Texture dandelion = new Texture("yellow-flower");
+	public static final Texture poppy = new Texture("rose");
+	public static final Texture blueOrchid = new Texture();
+	public static final Texture allium = new Texture();
+	public static final Texture azureBluet = new Texture();
+	public static final Texture redTulip = new Texture();
+	public static final Texture orangeTulip = new Texture();
+	public static final Texture whiteTulip = new Texture();
+	public static final Texture pinkTulip = new Texture();
+	public static final Texture oxeyeDaisy = new Texture();
 
 	/**
 	 * Missing or unknown texture.

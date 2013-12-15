@@ -103,10 +103,10 @@ public class FlowerPotModel {
 		default:
 			break;
 		case 1:
-			hit |= intersect(flower, ray, Texture.redRose);
+			hit |= intersect(flower, ray, Texture.poppy);
 			break;
 		case 2:
-			hit |= intersect(flower, ray, Texture.yellowFlower);
+			hit |= intersect(flower, ray, Texture.dandelion);
 			break;
 		case 3:
 			hit |= intersect(flowerSmall, ray, Texture.oakSapling);
