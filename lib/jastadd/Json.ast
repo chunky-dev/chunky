@@ -1,0 +1,23 @@
+JsonRoot ::= Value:JsonValue;
+
+abstract JsonValue;
+
+JsonUnknown : JsonValue;
+
+abstract JsonLiteral : JsonValue;
+
+JsonFalse : JsonLiteral;
+
+JsonTrue : JsonLiteral;
+
+JsonNull : JsonLiteral;
+
+JsonObject : JsonValue ::= Member:JsonMember*;
+
+JsonArray : JsonValue ::= Element:JsonValue*;
+
+JsonNumber : JsonValue ::= <Value>;
+
+JsonString : JsonValue ::= <Value>;
+
+JsonMember ::= <Name> Value:JsonValue;

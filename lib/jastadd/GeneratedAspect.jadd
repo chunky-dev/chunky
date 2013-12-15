@@ -1,0 +1,64 @@
+aspect TemplateAspect {
+	public void JsonObject.prettyPrint(PrettyPrinter out) {
+		out.print("{");
+		out.println();
+		out.indent(1);
+		{
+			boolean first = true;
+			for (PrettyPrintable p: getMemberList()) {
+				if (!first) {
+					out.print(",");
+					out.println();
+				}
+				first = false;
+				out.print(p);
+			}
+		}
+		out.println();
+		out.print("}");
+	}
+	public void JsonUnknown.prettyPrint(PrettyPrinter out) {
+		out.print("<unknown>");
+	}
+	public void JsonTrue.prettyPrint(PrettyPrinter out) {
+		out.print("true");
+	}
+	public void JsonFalse.prettyPrint(PrettyPrinter out) {
+		out.print("false");
+	}
+	public void JsonMember.prettyPrint(PrettyPrinter out) {
+		out.print("\"");
+		out.print(getName());
+		out.print("\": ");
+		out.print(getValue());
+	}
+	public void JsonNumber.prettyPrint(PrettyPrinter out) {
+		out.print(getValue());
+	}
+	public void JsonArray.prettyPrint(PrettyPrinter out) {
+		out.print("[");
+		out.println();
+		out.indent(1);
+		{
+			boolean first = true;
+			for (PrettyPrintable p: getElementList()) {
+				if (!first) {
+					out.print(",");
+					out.println();
+				}
+				first = false;
+				out.print(p);
+			}
+		}
+		out.println();
+		out.print("]");
+	}
+	public void JsonNull.prettyPrint(PrettyPrinter out) {
+		out.print("null");
+	}
+	public void JsonString.prettyPrint(PrettyPrinter out) {
+		out.print("\"");
+		out.print(escaped());
+		out.print("\"");
+	}
+}

@@ -1,11 +1,21 @@
-/bin
-/src/gen
-/test
-/build
-/chunky.map
+# eclipse workspace metadata
+/.metadata
+
+# vim
 *.swp
+
+# chunky build files
+/build
 Chunky.nsi
 /release_notes-*.txt
 
+# benchmarking & testing
+/bench/x*
+/test
+
 # releasebot cache directory
 /lpcache
+/bin
+/latest.json
+/snapshot.json
+/snapshot

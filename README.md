@@ -36,9 +36,6 @@ See the file license/Markdown.txt for the full license and copyright notice.
 The library is covered by the Apache License, version 2.0.
 See the file license/Apache-2.0.txt for the full license text.
 See the file license/commons-math.txt for the copyright notices.
-* **Google Gson.**
-The gson library is covered by the Apache License, version 2.0.
-See the file license/Apache-2.0.txt for the full license text.
 
 Building
 --------

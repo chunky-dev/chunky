@@ -1,0 +1,390 @@
+/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package se.llbit.chunky.launcher;
+
+import java.awt.Component;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
+
+import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.launcher.VersionInfo.Library;
+import se.llbit.chunky.launcher.VersionInfo.LibraryStatus;
+import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonParser;
+import se.llbit.json.JsonParser.SyntaxError;
+import se.llbit.json.JsonValue;
+
+/**
+ * Deploys the embedded Chunky version, or launches an existing local version.
+ * @author Jesper Öqvist <jesper@llbit.se>
+ */
+public class ChunkyDeployer {
+
+	/**
+	 * Check the integrity of an installed version.
+	 * @param version
+	 * @return <code>true</code> if the version is installed locally
+	 */
+	public static boolean checkVersionIntegrity(String version) {
+		File chunkyDir = ChunkySettings.getSettingsDirectory();
+		File versionsDir = new File(chunkyDir, "versions");
+		File libDir = new File(chunkyDir, "lib");
+		if (!versionsDir.isDirectory() || !libDir.isDirectory()) {
+			return false;
+		}
+
+		File versionFile = new File(versionsDir, version + ".json");
+		if (!versionFile.isFile()) {
+			return false;
+		}
+
+		// check version
+		try {
+			FileInputStream in = new FileInputStream(versionFile);
+			JsonParser parser = new JsonParser(in);
+			JsonObject obj = parser.parse().object();
+			in.close();
+			String versionName = obj.get("name").stringValue("");
+			if (!versionName.equals(version)) {
+				System.err.println("Stored version name does not match file name");
+				return false;
+			}
+			JsonArray array = obj.get("libraries").array();
+			for (JsonValue value: array.getElementList()) {
+				VersionInfo.Library lib = new VersionInfo.Library(value.object());
+				switch (lib.testIntegrity(libDir)) {
+				case INCOMPLETE_INFO:
+					System.err.println("Missing library name or checksum");
+					return false;
+				case MD5_MISMATCH:
+					System.err.println("Library MD5 checksum mismatch");
+					return false;
+				case MISSING:
+					System.err.println("Missing library");
+					return false;
+				default:
+					break;
+				}
+			}
+			return true;
+		} catch (IOException e) {
+			System.err.println("Could not read version info file: " + e.getMessage());
+		} catch (SyntaxError e) {
+			System.err.println("Corrupted version info file: " + e.getMessage());
+		}
+		return false;
+	}
+
+	/**
+	 * Unpacks the embedded Chunky jar files.
+	 */
+	public void deploy() {
+		List<VersionInfo> versions = availableVersions();
+		VersionInfo embedded = embeddedVersion();
+		if (embedded != null && (!versions.contains(embedded) || !checkVersionIntegrity(embedded.name))) {
+			System.out.println("Deploying embedded version: " + embedded.name);
+			deployEmbeddedVersion(embedded);
+			if (!versions.contains(embedded)) {
+				versions.add(embedded);
+				Collections.sort(versions);
+			}
+		}
+	}
+
+	public static List<VersionInfo> availableVersions() {
+		File chunkyDir = ChunkySettings.getSettingsDirectory();
+		File versionsDir = new File(chunkyDir, "versions");
+		if (!versionsDir.isDirectory()) {
+			return Collections.emptyList();
+		}
+
+		List<VersionInfo> versions = new ArrayList<VersionInfo>();
+
+		for (File versionFile: versionsDir.listFiles()) {
+			if (versionFile.getName().endsWith(".json")) {
+				try {
+					FileInputStream in = new FileInputStream(versionFile);
+					JsonParser parser = new JsonParser(in);
+					versions.add(new VersionInfo(parser.parse().object()));
+				} catch (IOException e) {
+					System.err.println("Could not read version info file: " + e.getMessage());
+				} catch (SyntaxError e) {
+					System.err.println("Corrupted version info file: " + e.getMessage());
+				}
+			}
+		}
+
+		Collections.sort(versions);
+		return versions;
+	}
+
+	/**
+	 * Unpack embedded libraries and deploy the embedded Chunky version.
+	 * @param version
+	 */
+	private static void deployEmbeddedVersion(VersionInfo version) {
+		File chunkyDir = ChunkySettings.getSettingsDirectory();
+		File versionsDir = new File(chunkyDir, "versions");
+		if (!versionsDir.isDirectory()) {
+			versionsDir.mkdirs();
+		}
+		File libDir = new File(chunkyDir, "lib");
+		if (!libDir.isDirectory()) {
+			libDir.mkdirs();
+		}
+		try {
+			File versionJson = new File(versionsDir, version.name + ".json");
+			version.writeTo(versionJson);
+
+			ClassLoader parentCL = ChunkyLauncher.class.getClassLoader();
+
+			// deploy libraries that were not already installed correctly
+			for (Library lib: version.libraries) {
+				if (lib.testIntegrity(libDir) != LibraryStatus.PASSED) {
+					unpackLibrary(parentCL, "lib/" + lib.name,
+							new File(libDir, lib.name));
+				}
+			}
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Unpack the jar file to the target directory.
+	 * @param parentCL
+	 * @param name
+	 * @param dest destination file
+	 * @return the unpacked Jar file
+	 * @throws IOException
+	 */
+	private static void unpackLibrary(ClassLoader parentCL, String name, File dest)
+			throws IOException {
+
+		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest));
+		InputStream in = parentCL.getResourceAsStream(name);
+		byte[] buffer = new byte[4096];
+		int len;
+		while ((len = in.read(buffer)) != -1) {
+			out.write(buffer, 0, len);
+		}
+		out.close();
+	}
+
+	private static VersionInfo embeddedVersion() {
+		try {
+			ClassLoader parentCL = ChunkyLauncher.class.getClassLoader();
+			InputStream in = parentCL.getResourceAsStream("version.json");
+			try {
+				if (in != null) {
+					JsonParser parser = new JsonParser(in);
+					return new VersionInfo(parser.parse().object());
+				}
+			} catch (IOException e) {
+			} catch (SyntaxError e) {
+			} finally {
+				if (in != null) {
+					try {
+						in.close();
+					} catch (IOException e) {
+					}
+				}
+			}
+		} catch (SecurityException e) {
+		}
+		return null;
+	}
+
+	/**
+	 * Launch a specific Chunky version
+	 * @param parentComponent
+	 * @param settings
+	 * @return {@code true} on success
+	 */
+	public boolean launchChunky(Component parentComponent, LauncherSettings settings) {
+		List<VersionInfo> versions = availableVersions();
+		VersionInfo version = VersionInfo.LATEST;
+		for (VersionInfo info: versions) {
+			if (info.name.equals(settings.version)) {
+				version = info;
+				break;
+			}
+		}
+		if (version == VersionInfo.LATEST) {
+			if (versions.size() > 0) {
+				version = versions.get(0);
+			} else {
+				// TODO no specific version available!
+				System.err.println("No version installed");
+				if (!settings.headless) {
+					Dialogs.error(parentComponent,
+							"Failed to launch Chunky - there is no local version installed. Try updating.",
+							"Failed to Launch");
+				}
+				return false;
+			}
+		}
+		if (!ChunkyDeployer.checkVersionIntegrity(version.name)) {
+			// TODO add some way to fix this??
+			System.err.println("Version integrity check failed for version " + version.name);
+			if (!settings.headless) {
+				Dialogs.error(parentComponent,
+						"Version integrity check failed for version " + version.name + ". Try selecting another version.",
+						"Failed to Launch");
+			}
+			return false;
+		}
+		List<String> command = buildCommandLine(version, settings);
+		echoCommand(command);
+		ProcessBuilder procBuilder = new ProcessBuilder(command);
+		try {
+			final Process proc = procBuilder.start();
+			if (settings.debugConsole) {
+				final Logger logger;
+				if (settings.headless) {
+					logger = new ConsoleLogger();
+				} else {
+					DebugConsole console = new DebugConsole(null, settings.closeConsoleOnExit);
+					console.setVisible(true);
+					logger = console;
+				}
+				final Scanner stdout = new Scanner(proc.getInputStream());
+				final Scanner stderr = new Scanner(proc.getErrorStream());
+				final Thread outputScanner = new Thread("Output Logger") {
+					@Override
+					public void run() {
+						while (!isInterrupted() && stdout.hasNextLine()) {
+							String line = stdout.nextLine();
+							logger.appendLine(line);
+						}
+					}
+				};
+				outputScanner.start();
+				final Thread errorScanner = new Thread("Error Logger") {
+					@Override
+					public void run() {
+						while (!isInterrupted() && stderr.hasNextLine()) {
+							String line = stderr.nextLine();
+							logger.appendErrorLine(line);
+						}
+					}
+				};
+				errorScanner.start();
+				Thread shutdownThread = new Thread("Shutdown Listener") {
+					@Override
+					public void run() {
+						try {
+							outputScanner.join();
+						} catch (InterruptedException e) {
+						}
+						try {
+							errorScanner.join();
+						} catch (InterruptedException e) {
+						}
+						try {
+							proc.waitFor();
+							logger.processExited(proc.exitValue());
+						} catch (InterruptedException e) {
+						}
+					}
+				};
+				shutdownThread.start();
+			}
+			return true;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	private void echoCommand(List<String> command) {
+		boolean first = true;
+		for (String part: command) {
+			if (!first) {
+				System.out.print(" ");
+			}
+			first = false;
+			System.out.print(part);
+		}
+		System.out.println();
+	}
+
+	private List<String> buildCommandLine(VersionInfo version, LauncherSettings settings) {
+		List<String> cmd = new LinkedList<String>();
+
+		cmd.add(JreUtil.javaCommand(settings.jre));
+		cmd.add("-Xmx" + settings.memoryLimit + "m");
+
+		String[] parts = settings.javaOptions.split(" ");
+		for (String part: parts) {
+			if (!part.isEmpty()) {
+				cmd.add(part);
+			}
+		}
+
+		cmd.add("-classpath");
+		cmd.add(classpath(version,settings));
+
+		if (settings.verboseLogging) {
+			cmd.add("-Dlog4j.logLevel=INFO");
+		}
+
+		cmd.add("se.llbit.chunky.main.Chunky");
+
+		parts = settings.chunkyOptions.split(" ");
+		for (String part: parts) {
+			if (!part.isEmpty()) {
+				cmd.add(part);
+			}
+		}
+
+		return cmd;
+	}
+
+	private String classpath(VersionInfo version, LauncherSettings settings) {
+		File chunkyDir = ChunkySettings.getSettingsDirectory();
+		File libDir = new File(chunkyDir, "lib");
+		List<File> jars = new ArrayList<File>();
+		for (VersionInfo.Library library: version.libraries) {
+			jars.add(library.getFile(libDir));
+		}
+		String classpath = "";
+		for (File file : jars) {
+			if (!classpath.isEmpty()) {
+				classpath += File.pathSeparator;
+			}
+			classpath += file.getAbsolutePath();
+		}
+		return classpath;
+	}
+
+}

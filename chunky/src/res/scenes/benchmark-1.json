@@ -1,0 +1,87 @@
+{
+  "sdfVersion": 2,
+  "name": "benchmark-1",
+  "width": 400,
+  "height": 400,
+  "exposure": 1.0,
+  "postprocess": 1,
+  "renderTime": 88244,
+  "spp": 0,
+  "sppTarget": 1200,
+  "pathTrace": true,
+  "dumpFrequency": 0,
+  "saveSnapshots": false,
+  "emittersEnabled": true,
+  "emitterIntensity": 13.0,
+  "sunEnabled": true,
+  "cloudsEnabled": false,
+  "cloudHeight": 128,
+  "stillWater": false,
+  "clearWater": false,
+  "biomeColorsEnabled": true,
+  "atmosphereEnabled": false,
+  "volumetricFogEnabled": false,
+  "waterHeight": 0,
+  "camera": {
+    "position": {
+      "x": 37.85811442864725,
+      "y": 84.4545952312806,
+      "z": 227.10614909520558
+    },
+    "orientation": {
+      "roll": 0.0,
+      "pitch": -0.5396425530837855,
+      "yaw": 3.2616306605427083
+    },
+    "projectionMode": "PINHOLE",
+    "fov": 64.55,
+    "dof": 8.0,
+    "infDof": true,
+    "focalOffset": 2.0
+  },
+  "sun": {
+    "altitude": 1.0471975511965976,
+    "azimuth": 1.2566370614359172,
+    "intensity": 1.5,
+    "color": {
+      "red": 1.0,
+      "green": 1.0,
+      "blue": 1.0
+    }
+  },
+  "sky": {
+    "skyYaw": 0.0,
+    "skyMirrored": true,
+    "groundColor": {
+      "red": 0.0,
+      "green": 0.0,
+      "blue": 1.0
+    }
+  },
+  "chunkList": [
+    [
+      4,
+      13
+    ],
+    [
+      2,
+      14
+    ],
+    [
+      2,
+      13
+    ],
+    [
+      4,
+      14
+    ],
+    [
+      3,
+      14
+    ],
+    [
+      3,
+      13
+    ]
+  ]
+}

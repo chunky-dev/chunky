@@ -1,0 +1,48 @@
+<project name="Chunky/lib" default="build">
+
+	<!-- global build properties -->
+	<property name="home" location="${basedir}/.."/>
+	<property file="${home}/build.properties"/>
+
+	<!-- local build properties -->
+	<property file="${lib.home}/build.properties"/>
+
+	<!-- jastadd taskdef -->
+	<taskdef name="jastadd"
+		classname="org.jastadd.JastAddTask"
+		classpath="${tools.dir}/jastadd2.jar"/>
+
+	<target name="clean">
+		<delete dir="${bin.dir}"/>
+		<delete>
+			<fileset dir="${gen.dir}" includes="**/*.java"/>
+		</delete>
+	</target>
+
+	<target name="gen" description="generate source files">
+		<mkdir dir="${gen.dir}"/>
+		<jastadd
+			outdir="${gen.dir}"
+			package="se.llbit.json">
+			<fileset dir="${lib.home}/jastadd">
+				<include name="*.ast"/>
+				<include name="*.jrag"/>
+				<include name="*.jadd"/>
+			</fileset>
+		</jastadd>
+	</target>
+
+	<target name="build" depends="gen">
+		<mkdir dir="${bin.dir}"/>
+		<javac
+			encoding="utf-8"
+			source="1.6"
+			target="1.6"
+			debug="${debug}"
+			destdir="${bin.dir}"
+			includeantruntime="false">
+			<src path="${src.dir}"/>
+			<src path="${gen.dir}"/>
+		</javac>
+	</target>
+</project>

@@ -1,145 +1,83 @@
-<project name="se.llbit.chunky.nbt" default="build">
+<project name="Chunky" default="build">
 
-	<property name="debug"			value="false"/>
-	<property name="src.dir"		location="src"/>
-	<property name="bin.dir"		location="bin"/>
-	<property name="tools.dir"		location="tools"/>
-	<property name="nbt.package"	value="se.llbit.nbt"/>
+	<!-- global build properties -->
+	<property name="home" location="${basedir}"/>
+	<property file="${home}/build.properties"/>
 
-	<taskdef name="jastadd" classname="jastadd.JastAddTask" classpath="${tools.dir}/jastadd2.jar"/>
+	<property file="${chunky.home}/build.properties" prefix="chunky"/>
+	<property file="${lib.home}/build.properties" prefix="lib"/>
+	<property file="${launcher.home}/build.properties" prefix="launcher"/>
+	<property file="${releasetools.home}/build.properties" prefix="releasetools"/>
 
-	<target name="clean">
-		<delete dir="${bin.dir}"/>
-		<delete dir="${src.dir}/gen">
-			<exclude name="**/test/*"/>
-		</delete>
-		<delete file="build/Chunky.jar" />
-		<delete file="build/Chunky.app" />
-		<delete file="build/Chunky.dmg" />
+	<target name="clean" description="clean all subprojects">
+		<ant antfile="${chunky.home}/build.xml" target="clean"
+			inheritAll="false"/>
+		<ant antfile="${launcher.home}/build.xml" target="clean"
+			inheritAll="false"/>
+		<ant antfile="${lib.home}/build.xml" target="clean"
+			inheritAll="false"/>
+		<ant antfile="${releasetools.home}/build.xml" target="clean"
+			inheritAll="false"/>
 	</target>
 
-	<target name="gen" depends="update-version-string">
-		<mkdir dir="${src.dir}/gen/java"/>
-		<jastadd
-			outdir="${src.dir}/gen/java"
-			package="${nbt.package}"
-			rewrite="false"
-			novisitcheck="false"
-			debug="false">
-			<fileset dir="${src.dir}/main/jastadd">
-				<include name="*.ast"/>
-				<include name="*.jrag"/>
-				<include name="*.jadd"/>
-			</fileset>
-		</jastadd>
-		<mkdir dir="${bin.dir}"/>
-		<copy todir="${bin.dir}">
-			<fileset dir="${src.dir}/main/res" />
-		</copy>
+	<target name="build" depends="update-version-string">
+		<ant antfile="${chunky.home}/build.xml" target="build"
+			inheritAll="false"/>
+		<ant antfile="${launcher.home}/build.xml" target="build"
+			inheritAll="false"/>
+		<ant antfile="${lib.home}/build.xml" target="build"
+			inheritAll="false"/>
+		<ant antfile="${releasetools.home}/build.xml" target="build"
+			inheritAll="false"/>
 	</target>
 
-	<target name="build" depends="gen">
-		<mkdir dir="${bin.dir}"/>
-		<javac
-			encoding="utf-8"
-			source="1.6"
-			target="1.6"
-			debug="${debug}"
-			nowarn="true"
-			destdir="${bin.dir}"
-			includes="**/*.java"
-			includeantruntime="false">
-			<classpath>
-				<pathelement path="lib/log4j-1.2.17.jar"/>
-				<pathelement path="lib/beaver-rt.jar"/>
-				<pathelement path="lib/j99.jar"/>
-				<pathelement path="lib/JOCL-0.1.7.jar"/>
-				<pathelement path="lib/commons-math3-3.2.jar"/>
-				<pathelement path="lib/gson-2.2.4.jar"/>
-			</classpath>
-			<src path="${src.dir}/main/java"/>
-			<src path="${src.dir}/gen/java"/>
-		</javac>
-	</target>
-
-	<target name="jar" depends="build"
-		description="builds Chunky and creates build/Chunky.jar">
-		<mkdir dir="build"/>
-		<!--jar destfile="build/NBTDump.jar">
-			<fileset dir="${bin.dir}" includes="se/llbit/nbt/*.class" />
-			<fileset dir="${bin.dir}" includes="se/llbit/nbt/test/NBTDump.class" />
-			<manifest>
-				<attribute name="Main-Class" value="se.llbit.nbt.test.NBTDump" />
-			</manifest>
-		</jar-->
-		<mkdir dir="${bin.dir}/lib"/>
-		<jar destfile="${bin.dir}/lib/ChunkyCore.jar">
-			<fileset dir="${bin.dir}">
-				<exclude name="lib/**/*"/>
-				<exclude name="se/llbit/chunky/launcher/**/*"/>
-			</fileset>
-		</jar>
-		<jar destfile="build/Chunky.jar">
-			<fileset dir="${bin.dir}">
-				<include name="lib/**/*"/>
-				<include name="se/llbit/chunky/launcher/**/*"/>
-			</fileset>
-			<fileset dir=".">
-				<include name="lib/**/*"/>
-			</fileset>
-			<manifest>
-				<attribute name="Main-Class"
-					value="se.llbit.chunky.launcher.ChunkyLauncher" />
-			</manifest>
-		</jar>
-	</target>
-
-	<target name="run" depends="jar">
-		<java fork="true" classpath="build/Chunky.jar"
+	<target name="run" depends="dist">
+		<java fork="true" classpath="${build.dir}/Chunky.jar"
 			classname="se.llbit.chunky.launcher.ChunkyLauncher"/>
 	</target>
-	
-	<target name="clean-builds" description="Removes the build folder">
-		<delete dir="build"/>
+
+	<target name="clean-dist" description="deletes cached builds">
+		<delete dir="${build.dir}"/>
 	</target>
 
 	<target name="gendoc">
-		<mkdir dir="build"/>
+		<mkdir dir="${build.dir}"/>
 		<exec executable="perl" failonerror="true"
-			output="build/ReadMe.html">
+			output="${build.dir}/ReadMe.html">
 			<arg value="${tools.dir}/Markdown.pl"/>
-			<arg value="README.md"/>
+			<arg value="${home}/README.md"/>
 		</exec>
 	</target>
 
-	<target name="tarball" description="Create a source tarball">
-		<property file="${src.dir}/main/res/Version.properties" prefix="Chunky"/>
-		<mkdir dir="${basedir}/build"/>
-		<echo message="git archive -> chunky-${Chunky.version}.tar.gz"/>
+	<target name="tarball" depends="update-version-string"
+		description="build source tarball">
+		<mkdir dir="${build.dir}"/>
+		<echo message="git archive -> ${build.dir}/chunky-${version}.tar.gz"/>
 		<exec executable="git">
 			<arg value="archive"/>
-			<arg value="--prefix=&quot;chunky-${Chunky.version}&quot;/"/>
+			<arg value="--prefix=&quot;chunky-${version}&quot;/"/>
 			<arg value="-o"/>
-			<arg value="${basedir}/build/chunky-${Chunky.version}.tar.gz"/>
+			<arg value="${build.dir}/chunky-${version}.tar.gz"/>
 			<arg value="master"/>
 		</exec>
 	</target>
-	
-	<target name="release" if="version">
+
+	<target name="release" if="version"
+		description="build a new release (requires version property)">
 		<echo message="building release ${version}"/>
-		<propertyfile file="${src.dir}/main/res/Version.properties">
+		<propertyfile file="${chunky.res.dir}/Version.properties">
 			<entry key="version" value="${version}"/>
 		</propertyfile>
 		<exec executable="git">
 			<arg value="update-index"/>
 			<arg value="--no-assume-unchanged"/>
-			<arg value="${src.dir}/main/res/Version.properties"/>
+			<arg value="${chunky.res.dir}/Version.properties"/>
 		</exec>
 		<exec executable="git">
 			<arg value="commit"/>
 			<arg value="-m"/>
 			<arg value="Release ${version}"/>
-			<arg value="${src.dir}/main/res/Version.properties"/>
+			<arg value="${chunky.res.dir}/Version.properties"/>
 		</exec>
 		<exec executable="git">
 			<arg value="tag"/>
@@ -149,40 +87,47 @@
 			<arg value="Version ${version}"/>
 		</exec>
 		<echo message="committed and tagged version ${version}"/>
-		<antcall target="build-dist"/>
+		<antcall target="dist"/>
 	</target>
-	
-	<target name="build-dist" depends="update-version-string"
+
+	<target name="dist" depends="update-version-string"
 		description="build distribution">
-		<property file="${src.dir}/main/res/Version.properties" prefix="Chunky"/>
+
+		<!-- build subprojects -->
 		<antcall target="clean"/>
 		<antcall target="tarball"/>
-		<antcall target="jar"/>
+		<antcall target="build"/>
 		<antcall target="gendoc"/>
-		<zip destfile="build/Chunky-${Chunky.version}.zip">
-			<zipfileset dir="." prefix="Chunky-${Chunky.version}">
-				<include name="ChangeLog.txt"/>
-				<include name="${basedir}/dist/Chunky.bat"/>
-				<include name="${basedir}/dist/Chunky.sh"/>
-			</zipfileset>
-			<zipfileset dir="license" prefix="Chunky-${Chunky.version}/license">
-				<include name="LICENSE.txt"/>
-				<include name="JOCL.txt"/>
-				<include name="MWC64X.txt"/>
-				<include name="NOTICE.txt"/>
-				<include name="LOG4J.txt"/>
-				<include name="Markdown"/>
-			</zipfileset>
-			<zipfileset dir="build" prefix="Chunky-${Chunky.version}">
-				<include name="Chunky.jar"/>
-				<include name="ReadMe.html"/>
-			</zipfileset>
-		</zip>
+
+		<mkdir dir="${build.dir}"/>
+		<jar destfile="${build.dir}/chunky-core-${version}.jar">
+			<fileset dir="${chunky.bin.dir}"/>
+			<manifest>
+				<attribute name="Main-Class"
+					value="se.llbit.chunky.main.Chunky"/>
+			</manifest>
+		</jar>
+		<jar destfile="${build.dir}/ChunkyLauncher.jar">
+			<fileset dir="${launcher.bin.dir}"/>
+			<fileset dir="${lib.bin.dir}"/>
+			<manifest>
+				<attribute name="Main-Class"
+					value="se.llbit.chunky.launcher.ChunkyLauncher"/>
+			</manifest>
+		</jar>
+		<java classname="releasetools.ReleaseBuilder">
+			<classpath>
+				<pathelement path="${lib.bin.dir}"/>
+				<pathelement path="${releasetools.bin.dir}"/>
+			</classpath>
+			<arg value="${version}"/>
+			<arg value="release_notes-${version}.txt"/>
+		</java>
 		<copy file="${basedir}/dist/Chunky.nsi"
 			toFile="${basedir}/Chunky.nsi"
 			overwrite="true">
 			<filterset>
-				<filter token="VERSION" value="${Chunky.version}"/>
+				<filter token="VERSION" value="${version}"/>
 			</filterset>
 		</copy>
 	</target>
@@ -191,7 +136,7 @@
 		<property name="Chunky.app" value="build"/>
 		<property name="app.name" value="Chunky"/>
 		<property name="macosx.resrc" value="Resources"/>
-		<property name="app.resrc" value="${src.dir}/main/res"/>
+		<property name="app.resrc" value="${chunky.res.dir}"/>
 		<property name="macosx.stubfile" value="${macosx.resrc}/JavaApplicationStub"/>
 		<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
 		<jarbundler dir="."
@@ -206,18 +151,18 @@
 				workingdirectory="$APP_PACKAGE/Contents/Resources/Java"
 				vmoptions="-Xms512m -Xmx2048m">
 			<javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
-			<javaproperty name="apple.awt.textantialiasing" value="true" />
+			<javaproperty name="apple.awt.textantialiasing" value="true"/>
 			<resourcefileset dir="${app.resrc}">
-				<include name="chunky.icns" />
+				<include name="chunky.icns"/>
 			</resourcefileset>
 			<jarfileset dir="build">
 				<include name="Chunky.jar"/>
-			</jarfileset>	
+			</jarfileset>
 		</jarbundler>
 	</target>
-	
+
 	<target name="macdmg" description="Create a DMG package for Chunky">
-		<property file="${src.dir}/main/res/Version.properties" prefix="Chunky"/>
+		<property file="${chunky.res.dir}/Version.properties"/>
 		<property name="mountdir" value="/tmp"/>
 		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 			<arg value="create"/>
@@ -226,20 +171,26 @@
 			<arg value="-volname"/>
 			<arg value="Chunky"/>
 			<arg value="-ov"/>
-			<arg value="build/Chunky-tmp.dmg"/>
+			<arg value="${build.dir}/Chunky-tmp.dmg"/>
 			<arg value="-format"/>
 			<arg value="UDRW"/>
 		</exec>
 		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 			<arg value="attach"/>
-			<arg value="build/Chunky-tmp.dmg"/>
+			<arg value="${build.dir}/Chunky-tmp.dmg"/>
 			<arg value="-mountroot"/>
 			<arg value="${mountdir}/"/>
 		</exec>
 		<mkdir dir="${mountdir}/Chunky/.background"/>
-		<copy file="${src.dir}/main/res/chunky-dmg.png" tofile="${mountdir}/Chunky/.background/background.png" overwrite="true"/>
-		<copy file="${src.dir}/main/res/chunky-dmg.icns" tofile="${mountdir}/Chunky/.VolumeIcon.icns" overwrite="true"/>
-		<copy file="${src.dir}/main/res/DS_Store" tofile="${mountdir}/Chunky/.DS_Store" overwrite="true"/>
+		<copy file="${chunky.res.dir}/chunky-dmg.png"
+			tofile="${mountdir}/Chunky/.background/background.png"
+			overwrite="true"/>
+		<copy file="${chunky.res.dir}/chunky-dmg.icns"
+			tofile="${mountdir}/Chunky/.VolumeIcon.icns"
+			overwrite="true"/>
+		<copy file="${chunky.res.dir}/DS_Store"
+			tofile="${mountdir}/Chunky/.DS_Store"
+			overwrite="true"/>
 		<exec executable="/usr/bin/Setfile" os="Mac OS X">
 			<arg value="-a"/>
 			<arg value="C"/>
@@ -253,17 +204,17 @@
 		<delete file="${app.name}-tmp.dmg" quiet="yes" failonerror="false"/>
 		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 			<arg value="convert"/>
-			<arg value="build/Chunky-tmp.dmg"/>
+			<arg value="${build.dir}/Chunky-tmp.dmg"/>
 			<arg value="-format"/>
 			<arg value="UDZO"/>
 			<arg value="-o"/>
-			<arg value="build/Chunky-${Chunky.version}.dmg"/>
+			<arg value="${build.dir}/Chunky-${version}.dmg"/>
 		</exec>
-		<delete file="build/Chunky-tmp.dmg" />
+		<delete file="${build.dir}/Chunky-tmp.dmg"/>
 		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 			<arg value="internet-enable"/>
 			<arg value="-yes"/>
-			<arg value="build/Chunky-${Chunky.version}.dmg"/>
+			<arg value="${build.dir}/Chunky-${version}.dmg"/>
 		</exec>
 	</target>
 
@@ -281,17 +232,18 @@
 			<arg value="describe"/>
 		</exec>
 		<antcall target="-store-version-string"/>
+		<property file="${chunky.res.dir}/Version.properties"/>
 	</target>
 
 	<target name="-store-version-string" if="version">
 		<echo message="version=${version}"/>
-		<propertyfile file="${src.dir}/main/res/Version.properties">
+		<propertyfile file="${chunky.res.dir}/Version.properties">
 			<entry key="version" value="${version}"/>
 		</propertyfile>
 		<exec executable="git">
 			<arg value="update-index"/>
 			<arg value="--assume-unchanged"/>
-			<arg value="${src.dir}/main/res/Version.properties"/>
+			<arg value="${chunky.res.dir}/Version.properties"/>
 		</exec>
 	</target>
 </project>

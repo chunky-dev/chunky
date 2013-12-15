@@ -21,7 +21,7 @@ class Version:
 	rc = ''
 	changelog = ''
 	release_notes = ''
-	
+
 	def __init__(self, version):
 		self.full = version
 		regex = re.compile('^(\d+\.\d+\.\d+)-?([a-zA-Z]*\.?\d*)$')
@@ -64,7 +64,7 @@ def publish(version):
 		else:
 			(new_release, exe_url, zip_url) = publish_release(version)
 			post_release_thread(version, exe_url, zip_url)
-		
+
 def publish_rc():
 	# TODO automatic dropbox or FTP upload
 	return raw_input('Release candidate zip file URL: ')
@@ -136,7 +136,7 @@ def publish_release(version):
 			break
 
 	is_new_release = release is None
-			
+
 	if release is None:
 		# check if milestone exists
 		milestone = None
