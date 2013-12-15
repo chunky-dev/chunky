@@ -83,7 +83,7 @@ public class HopperModel {
 				hit = true;
 			}
 		}
-		int dir = 7 & (ray.currentMaterial >> BlockData.BLOCK_DATA_OFFSET);
+		int dir = 7 & (ray.currentMaterial >> BlockData.OFFSET);
 		if (pipe[dir].intersect(ray)) {
 			if (ray.n.y > 0)
 				Texture.hopperInside.getColor(ray);

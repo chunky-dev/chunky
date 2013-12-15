@@ -1154,6 +1154,34 @@ public class TexturePackLoader {
 				new SimpleTexture("assets/minecraft/textures/blocks/flower_tulip_white", Texture.whiteTulip));
 		allTextures.put("flower_tulip_pink",
 				new SimpleTexture("assets/minecraft/textures/blocks/flower_tulip_pink", Texture.pinkTulip));
+		allTextures.put("double_plant_fern_bottom",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_fern_bottom", Texture.largeFernBottom));
+		allTextures.put("double_plant_fern_top",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_fern_top", Texture.largeFernTop));
+		allTextures.put("double_plant_grass_bottom",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_grass_bottom", Texture.doubleTallGrassBottom));
+		allTextures.put("double_plant_grass_top",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_grass_top", Texture.doubleTallGrassTop));
+		allTextures.put("double_plant_paeonia_bottom",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_paeonia_bottom", Texture.peonyBottom));
+		allTextures.put("double_plant_paeonia_top",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_paeonia_top", Texture.peonyTop));
+		allTextures.put("double_plant_rose_bottom",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_rose_bottom", Texture.roseBushBottom));
+		allTextures.put("double_plant_rose_top",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_rose_top", Texture.roseBushTop));
+		allTextures.put("double_plant_sunflower_bottom",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_sunflower_bottom", Texture.sunflowerBottom));
+		allTextures.put("double_plant_sunflower_top",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_sunflower_top", Texture.sunflowerTop));
+		allTextures.put("double_plant_sunflower_front",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_sunflower_front", Texture.sunflowerFront));
+		allTextures.put("double_plant_sunflower_back",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_sunflower_back", Texture.sunflowerBack));
+		allTextures.put("double_plant_syringa_bottom",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_syringa_bottom", Texture.lilacBottom));
+		allTextures.put("double_plant_syringa_top",
+				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_syringa_top", Texture.lilacTop));
 
 	}
 

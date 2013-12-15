@@ -75,10 +75,11 @@ public class GrassModel {
 					continue;
 				}
 				float[] color;
-				if (quad.n.y > 0)
+				if (quad.n.y > 0) {
 					color = Texture.grassTop.getColor(ray.u, ray.v);
-				else
+				} else {
 					color = Texture.grassSide.getColor(ray.u, ray.v);
+				}
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
 					float[] biomeColor = ray.getBiomeGrassColor(scene);

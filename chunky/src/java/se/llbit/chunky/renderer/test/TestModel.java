@@ -57,10 +57,10 @@ public class TestModel {
 				new AABB(0, 1, 0.5, 1, 0, 0.5),
 				new AABB(0, 0.5, 0.5, 1, 0.5, 1),
 		};
-		/*quads = new Quad[] {
-			new DoubleSidedQuad(new Vector3d(2/16., 10/16., 2/16.), new Vector3d(14/16., 10/16., 2/16.),
-					new Vector3d(2/16., 10/16., 14/16.), new Vector4d(2/16., 14/16., 2/16., 14/16.)),
-		};*/
+		quads = new Quad[] {
+			new Quad(new Vector3d(14/16., 16/16., 2/16.), new Vector3d(2/16., 16/16., 2/16.),
+					new Vector3d(14/16., 16/16., 14/16.), new Vector4d(2/16., 14/16., 2/16., 14/16.)),
+		};
 	}
 
 	private void setUpTorch() {
@@ -137,10 +137,17 @@ public class TestModel {
 	public void intersect(Ray ray) {
 		ray.currentMaterial = 1 << 8;
 
-		for (int i = 0; i < boxes.length; ++i) {
+		/*for (int i = 0; i < boxes.length; ++i) {
 			if (boxes[i].intersect(ray)) {
 				Texture.stone.getColor(ray);
 				ray.color.w = 1;
+				ray.t = ray.tNear;
+			}
+		}*/
+
+		for (int i = 0; i < quads.length; ++i) {
+			if (quads[i].intersect(ray)) {
+				Texture.sunflowerFront.getColor(ray);
 				ray.t = ray.tNear;
 			}
 		}

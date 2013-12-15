@@ -49,6 +49,7 @@ import se.llbit.chunky.model.GrassModel;
 import se.llbit.chunky.model.HeadModel;
 import se.llbit.chunky.model.HopperModel;
 import se.llbit.chunky.model.LadderModel;
+import se.llbit.chunky.model.LargeFlowerModel;
 import se.llbit.chunky.model.LavaModel;
 import se.llbit.chunky.model.LeafModel;
 import se.llbit.chunky.model.LeverModel;
@@ -2479,11 +2480,17 @@ public class Block {
 			isSolid = true;
 		}
 	};
-	public static final Block UNKNOWN0xAF = new Block(0xAF, "Unknown Block 0xAF", Texture.unknown) {
+	public static final int LARGE_FLOWER_ID = 0xAF;
+	public static final Block LARGE_FLOWER = new Block(LARGE_FLOWER_ID, "Large Flower", Texture.dandelion) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+			subSurfaceScattering = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return LargeFlowerModel.intersect(ray, scene);
 		}
 	};
 	public static final Block UNKNOWN0xB0 = new Block(0xB0, "Unknown Block 0xB0", Texture.unknown) {
@@ -3091,7 +3098,7 @@ public class Block {
 		UNKNOWN0xA0, LEAVES2, WOOD2, UNKNOWN0xA3,
 		UNKNOWN0xA4, UNKNOWN0xA5, UNKNOWN0xA6, UNKNOWN0xA7,
 		UNKNOWN0xA8, UNKNOWN0xA9, HAY_BLOCK, CARPET,
-		HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, UNKNOWN0xAF,
+		HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, LARGE_FLOWER,
 		UNKNOWN0xB0, UNKNOWN0xB1, UNKNOWN0xB2, UNKNOWN0xB3,
 		UNKNOWN0xB4, UNKNOWN0xB5, UNKNOWN0xB6, UNKNOWN0xB7,
 		UNKNOWN0xB8, UNKNOWN0xB9, UNKNOWN0xBA, UNKNOWN0xBB,

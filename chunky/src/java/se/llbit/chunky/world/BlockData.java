@@ -22,7 +22,7 @@ public interface BlockData {
 	/**
 	 * Offset to block metadata
 	 */
-	int BLOCK_DATA_OFFSET = 8;
+	int OFFSET = 8;
 
 	int RSW_EAST_CONNECTION = 12;
 	int RSW_WEST_CONNECTION = 13;

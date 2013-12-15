@@ -328,6 +328,22 @@ public class Texture {
 	public static final Texture pinkTulip = new Texture();
 	public static final Texture oxeyeDaisy = new Texture();
 
+	// Large Flowers
+	public static final Texture sunflowerBottom = new Texture();
+	public static final Texture sunflowerTop = new Texture();
+	public static final Texture sunflowerFront = new Texture();
+	public static final Texture sunflowerBack = new Texture();
+	public static final Texture lilacBottom = new Texture();
+	public static final Texture lilacTop = new Texture();
+	public static final Texture doubleTallGrassBottom = new Texture();
+	public static final Texture doubleTallGrassTop = new Texture();
+	public static final Texture largeFernBottom = new Texture();
+	public static final Texture largeFernTop = new Texture();
+	public static final Texture roseBushBottom = new Texture();
+	public static final Texture roseBushTop = new Texture();
+	public static final Texture peonyBottom = new Texture();
+	public static final Texture peonyTop = new Texture();
+
 	/**
 	 * Missing or unknown texture.
 	 */

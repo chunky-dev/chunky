@@ -95,7 +95,7 @@ public class BlockTestRenderer {
 				metadata = Integer.parseInt(metadataPart);
 			}
 			renderer = new TestRenderer(null,
-					blockId | (metadata << BlockData.BLOCK_DATA_OFFSET),
+					blockId | (metadata << BlockData.OFFSET),
 					targetFile);
 		} else {
 			renderer = new TestRenderer(null, -1, targetFile);
