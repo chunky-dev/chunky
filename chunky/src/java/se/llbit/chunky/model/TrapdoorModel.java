@@ -25,7 +25,7 @@ import se.llbit.math.Vector4d;
 @SuppressWarnings("javadoc")
 public class TrapdoorModel {
 	private static Quad[][] faces = {
-		// on ground
+		// low
 		{
 			// front
 			new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
@@ -46,6 +46,33 @@ public class TrapdoorModel {
 			// top
 			new Quad(new Vector3d(1, .1875, 0), new Vector3d(0, .1875, 0),
 					new Vector3d(1, .1875, 1), new Vector4d(1, 0, 0, 1)),
+
+			// bottom
+			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
+					new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
+		},
+
+		// high
+		{
+			// front
+			new Quad(new Vector3d(1, .8125, 0), new Vector3d(0, .8125, 0),
+					new Vector3d(1, 1, 0), new Vector4d(1, 0, 0, .1875)),
+
+			// back
+			new Quad(new Vector3d(0, .8125, 1), new Vector3d(1, .8125, 1),
+					new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, .1875)),
+
+			// right
+			new Quad(new Vector3d(0, .8125, 0), new Vector3d(0, .8125, 1),
+					new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, .1875)),
+
+			// left
+			new Quad(new Vector3d(1, .8125, 1), new Vector3d(1, .8125, 0),
+					new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, .1875)),
+
+			// top
+			new Quad(new Vector3d(1, 1, 0), new Vector3d(0, 1, 0),
+					new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, 1)),
 
 			// bottom
 			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
@@ -164,11 +191,14 @@ public class TrapdoorModel {
 	public static boolean intersect(Ray ray) {
 		boolean hit = false;
 		Quad[] state;
+		int data = ray.getBlockData();
 		ray.t = Double.POSITIVE_INFINITY;
 		if ((ray.getBlockData() & 4) == 0) {
-			state = faces[0];
+			// not open - top or bottom?
+			state = faces[data>>3];
 		} else {
-			state = faces[(ray.getBlockData() & 3) + 1];
+			// open
+			state = faces[(data & 3) + 2];
 		}
 		for (Quad face : state) {
 			if (face.intersect(ray)) {
