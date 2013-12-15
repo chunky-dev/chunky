@@ -539,6 +539,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		AbstractDocument document = (AbstractDocument) sceneNameField.getDocument();
 		document.setDocumentFilter(new SceneNameFilter());
 		document.addDocumentListener(sceneNameListener);
+		sceneNameField.addActionListener(sceneNameActionListener);
 		updateSceneNameField();
 
 		saveSceneBtn.setText("Save");
@@ -1659,6 +1660,15 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
+	private final ActionListener sceneNameActionListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JTextField source = (JTextField) e.getSource();
+			renderMan.scene().setName(source.getText());
+			updateTitle();
+			sceneMan.saveScene();
+		}
+	};
 	private final DocumentListener sceneNameListener = new DocumentListener() {
 		@Override
 		public void removeUpdate(DocumentEvent e) {
@@ -1971,8 +1981,10 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateSceneNameField() {
 		sceneNameField.getDocument().removeDocumentListener(sceneNameListener);
+		sceneNameField.removeActionListener(sceneNameActionListener);
 		sceneNameField.setText(renderMan.scene().name());
 		sceneNameField.getDocument().addDocumentListener(sceneNameListener);
+		sceneNameField.addActionListener(sceneNameActionListener);
 	}
 
 	protected void updateSPPTargetField() {

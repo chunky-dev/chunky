@@ -1247,6 +1247,7 @@ public class Scene extends SceneDescription {
 	 * @param other
 	 */
 	public void copyTransients(Scene other) {
+		name = other.name;
 		postprocess = other.postprocess;
 		exposure = other.exposure;
 		dumpFrequency = other.dumpFrequency;
