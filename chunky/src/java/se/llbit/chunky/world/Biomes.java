@@ -29,6 +29,11 @@ import se.llbit.math.QuickMath;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Biomes {
+	/**
+	 * Mask to get valid biome IDs (removes variant bit)
+	 */
+	public static final int BIOME_MASK = 0x7F;
+
 	private static final int SWAMP_ID = 6;
 	private static final Biome biomes[] = {
 		new Biome("ocean", 0.5, 0.5, 0x000070, 0x75B646),
@@ -73,8 +78,8 @@ public class Biomes {
 		new Biome("mesa plateau", 2.0, 0.0, 0xCA8C65, 0xAEA42A),
 	};
 
-	private static int[] grassColor = new int[256];
-	private static int[] foliageColor = new int[256];
+	private static int[] grassColor = new int[128];
+	private static int[] foliageColor = new int[128];
 	private static float[][] grassColorLinear = new float[grassColor.length][3];
 	private static float[][] foliageColorLinear = new float[grassColor.length][3];
 	private static final int UNKNOWN_COLOR = 0x7E7E7E;
@@ -83,13 +88,13 @@ public class Biomes {
 		for (int i = 0; i < biomes.length; ++i) {
 			grassColor[i] = biomes[i].grassColor;
 		}
-		for (int i = biomes.length; i < 256; ++i) {
+		for (int i = biomes.length; i < 128; ++i) {
 			grassColor[i] = UNKNOWN_COLOR;
 		}
 
 		gammaCorrectColors(grassColor, grassColorLinear);
 
-		for (int i = 0; i < 256; ++i) {
+		for (int i = 0; i < 128; ++i) {
 			foliageColor[i] = grassColor[i];
 			foliageColorLinear[i][0] = grassColorLinear[i][0];
 			foliageColorLinear[i][1] = grassColorLinear[i][1];
@@ -153,7 +158,7 @@ public class Biomes {
 	 * @return Grass color for the given biome ID
 	 */
 	public static final int getGrassColor(int biomeId) {
-		return grassColor[0xFF & biomeId];
+		return grassColor[BIOME_MASK & biomeId];
 	}
 
 	/**
@@ -161,11 +166,11 @@ public class Biomes {
 	 * @return Foliage color for the given biome ID
 	 */
 	public static final int getFoliageColor(int biomeId) {
-		return foliageColor[0xFF & biomeId];
+		return foliageColor[BIOME_MASK & biomeId];
 	}
 
 	/**
-	 * @param biomeId Must be in the range [0,255]
+	 * @param biomeId Must be in the range [0,127]
 	 * @return Linear biome color for the given biome ID
 	 */
 	public static final float[] getGrassColorLinear(int biomeId) {
@@ -173,7 +178,7 @@ public class Biomes {
 	}
 
 	/**
-	 * @param biomeId Must be in the range [0,255]
+	 * @param biomeId Must be in the range [0,127]
 	 * @return Linear foliage color for the given biome ID
 	 */
 	public static final float[] getFoliageColorLinear(int biomeId) {

@@ -753,7 +753,7 @@ public class Scene extends SceneDescription {
 							ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
 							if (chunkSet.contains(ccp)) {
 								nsum += 1;
-								int biomeId = 0xFF & biomeIdMap.get(wx, wz);
+								int biomeId = Biomes.BIOME_MASK & biomeIdMap.get(wx, wz);
 								float[] grassColor = Biomes.getGrassColorLinear(biomeId);
 								grassMix[0] += grassColor[0];
 								grassMix[1] += grassColor[1];
@@ -1795,10 +1795,11 @@ public class Scene extends SceneDescription {
 	 * @return Foliage color for the given coordinates
 	 */
 	public float[] getFoliageColor(int x, int z) {
-		if (biomeColors)
+		if (biomeColors) {
 			return foliageTexture.get(x, z);
-		else
+		} else {
 			return Biomes.getFoliageColorLinear(0);
+		}
 	}
 
 	/**
@@ -1807,10 +1808,11 @@ public class Scene extends SceneDescription {
 	 * @return Grass color for the given coordinates
 	 */
 	public float[] getGrassColor(int x, int z) {
-		if (biomeColors)
+		if (biomeColors) {
 			return grassTexture.get(x, z);
-		else
+		} else {
 			return Biomes.getGrassColorLinear(0);
+		}
 	}
 
 	/**

@@ -372,7 +372,7 @@ public class Layer {
 		int[]	surface = new int[16*16];
 		for (int x = 0; x < 16; ++x) {
 			for (int z = 0; z < 16; ++z) {
-				surface[x*16+z] = Biomes.getColor(0xFF & chunkBiomes[Chunk.chunkXZIndex(x, z)]);
+				surface[x*16+z] = Biomes.getColor(0x7F & chunkBiomes[Chunk.chunkXZIndex(x, z)]);
 			}
 		}
 		return new Layer(surface);
