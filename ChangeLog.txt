@@ -1,4 +1,5 @@
 1.2.0 - TBD
+    * Added new biome color data
     * Added Red Sand
     * Trapdoors connected to the top of a block now display correctly
     * Wood logs now use the new top/bottom textures

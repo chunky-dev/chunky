@@ -15,12 +15,13 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.world;
-import org.apache.commons.math3.util.FastMath;
-
 import java.awt.image.BufferedImage;
+
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Color;
+import se.llbit.math.QuickMath;
 
 /**
  * Biome constants and utility methods.
@@ -56,7 +57,27 @@ public class Biomes {
 			{0.2f, 0.3f},// extreme hills edge
 			{1.0f, 0.9f},// jungle
 			{1.0f, 0.9f},// jungle hills
+			{0.95f, 0.8f},// jungle edge
+			{0.5f, 0.5f},// deep ocean
+			{0.2f, 0.3f},// stone beach
+			{0.05f, 0.3f},// cold beach
+			{0.7f, 0.8f},// birch forest
+			{0.7f, 0.8f},// birch forest hills
+			{0.7f, 0.8f},// roofed forest
+			{-0.5f, 0.4f},// cold taiga
+			{-0.5f, 0.4f},// cold taiga hills
+			{0.3f, 0.8f},// mega taiga
+			{0.3f, 0.8f},// mega taiga hills
+			{0.2f, 0.3f},// extreme hills+
+			{1.2f, 0.0f},// savanna
+			{1.0f, 0.0f},// savanna plateau
+			{2.0f, 0.0f},// mesa
+			{2.0f, 0.0f},// mesa plateau f
+			{2.0f, 0.0f},// mesa plateau
 	};
+	/**
+	 * Marker colors for the biome map.
+	 */
 	private static final int[] biomeColor = {
 			0x000070,// ocean
 			0x8DB360,// plains
@@ -81,6 +102,23 @@ public class Biomes {
 			0x72789A,// extreme hills edge
 			0x537B09,// jungle
 			0x2C4205,// jungle hills
+			0x628B17,// jungle edge
+			0x000030,// deep ocean
+			0xA2A284,// stone beach
+			0xFAF0C0,// cold beach
+			0x307444,// birch forest
+			0x1F5F32,// birch forest hills
+			0x40511A,// roofed forest
+			0x31554A,// cold taiga
+			0x243F36,// cold taiga hills
+			0x596651,// mega taiga
+			0x454F3E,// mega taiga hills
+			0x507050,// extreme hills+
+			0xBDB25F,// savanna
+			0xA79D64,// savanna plateau
+			0xD94515,// mesa
+			0xB09765,// mesa plateau f
+			0xCA8C65,// mesa plateau
 	};
 
 	private static int[] grassColor = new int[256];
@@ -113,8 +151,25 @@ public class Biomes {
 		grassColor[20] = 0x75B646;// extreme hills edge
 		grassColor[21] = 0x3A8B25;// jungle
 		grassColor[22] = 0x3A8B25;// jungle hills
+		grassColor[23] = 0x3EB80F;// jungle edge
+		grassColor[24] = 0x71A74D;// deep ocean
+		grassColor[25] = 0x6DA36B;// stone beach
+		grassColor[26] = 0x64A278;// cold beach
+		grassColor[27] = 0x59AE30;// birch forest
+		grassColor[28] = 0x59AE30;// birch forest hills
+		grassColor[29] = 0x59AE30;// roofed forest
+		grassColor[30] = 0x60A17B;// cold taiga
+		grassColor[31] = 0x60A17B;// cold taiga hills
+		grassColor[32] = 0x68A55F;// mega taiga
+		grassColor[33] = 0x68A55F;// mega taiga hills
+		grassColor[34] = 0x6DA36B;// extreme hills+
+		grassColor[35] = 0xAEA42A;// savanna
+		grassColor[36] = 0xAEA42A;// savanna plateau
+		grassColor[37] = 0xAEA42A;// mesa
+		grassColor[38] = 0xAEA42A;// mesa plateau f
+		grassColor[39] = 0xAEA42A;// mesa plateau
 
-		for (int i = 23; i < 256; ++i) {
+		for (int i = 40; i < 256; ++i) {
 			grassColor[i] = UNKNOWN_COLOR;
 		}
 
@@ -159,8 +214,8 @@ public class Biomes {
 
 	private static void loadColorsFromTexture(int[] dest, BufferedImage texture) {
 		for (int i = 0; i < tempAndRain.length; ++i) {
-			double temp = tempAndRain[i][0];
-			double rain = tempAndRain[i][1];
+			double temp = QuickMath.clamp(tempAndRain[i][0], 0, 1);
+			double rain = QuickMath.clamp(tempAndRain[i][1], 0, 1);
 			rain *= temp;
 			int	color = texture.getRGB((int) ((1-temp) * 255), (int) ((1-rain) * 255));
 			dest[i] = color;
