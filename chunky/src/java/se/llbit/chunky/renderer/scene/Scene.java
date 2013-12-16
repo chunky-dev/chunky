@@ -309,7 +309,7 @@ public class Scene extends SceneDescription {
 		throws IOException, InterruptedException {
 
 		String task = "Saving scene";
-		progressListener.setProgress(task, 0, 0, 2);
+		progressListener.setProgress(task, 1, 0, 2);
 
 		saveDescription(context.getSceneDescriptionOutputStream(name));
 
@@ -526,7 +526,7 @@ public class Scene extends SceneDescription {
 			return;
 
 		String task = "Loading regions";
-		progressListener.setProgress(task, 0, 0, 1);
+		progressListener.setProgress(task, 1, 0, 2);
 
 		loadedWorld = world;
 		worldPath = loadedWorld.getWorldDirectory().getAbsolutePath();
@@ -574,8 +574,8 @@ public class Scene extends SceneDescription {
 
 		Heightmap biomeIdMap = new Heightmap();
 		task = "Loading chunks";
-		int done = 0;
-		int target = chunksToLoad.size()-1;
+		int done = 1;
+		int target = chunksToLoad.size();
 		for (ChunkPosition cp : chunksToLoad) {
 
 			progressListener.setProgress(task, done, 0, target);
@@ -1308,8 +1308,9 @@ public class Scene extends SceneDescription {
 			}
 			String fileName = name + "-" + spp + ".png";
 			logger.info("Saving frame " + fileName);
-			if (watermark)
+			if (watermark) {
 				addWatermark();
+			}
 			ImageIO.write(buffer, "png", new File(directory, fileName));
 			logger.info("Frame saved");
 		} catch (IOException e) {
@@ -1328,7 +1329,7 @@ public class Scene extends SceneDescription {
 			ProgressListener progressListener) throws IOException {
 
 		for (int x = 0; x < width; ++x) {
-			progressListener.setProgress("Finalizing frame", x, 0, width-1);
+			progressListener.setProgress("Finalizing frame", x+1, 0, width);
 			for (int y = 0; y < height; ++y) {
 				finalizePixel(x, y);
 			}
@@ -1358,14 +1359,14 @@ public class Scene extends SceneDescription {
 		DataOutputStream out = null;
 		try {
 			String task = "Saving octree";
-			progressListener.setProgress(task, 0, 0, 1);
+			progressListener.setProgress(task, 1, 0, 2);
 			logger.info("Saving octree " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
 					context.getSceneFileOutputStream(fileName)));
 
 			octree.store(out);
 
-			progressListener.setProgress(task, 1, 0, 1);
+			progressListener.setProgress(task, 2, 0, 2);
 			logger.info("Octree saved");
 		} catch (IOException e) {
 			logger.warn("IO exception while saving octree!", e);
@@ -1387,14 +1388,14 @@ public class Scene extends SceneDescription {
 		DataOutputStream out = null;
 		try {
 			String task = "Saving grass texture";
-			progressListener.setProgress(task, 0, 0, 1);
+			progressListener.setProgress(task, 1, 0, 2);
 			logger.info("Saving grass texture " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
 					context.getSceneFileOutputStream(fileName)));
 
 			grassTexture.store(out);
 
-			progressListener.setProgress(task, 1, 0, 1);
+			progressListener.setProgress(task, 2, 0, 2);
 			logger.info("Grass texture saved");
 		} catch (IOException e) {
 			logger.warn("IO exception while saving octree!", e);
@@ -1416,14 +1417,14 @@ public class Scene extends SceneDescription {
 		DataOutputStream out = null;
 		try {
 			String task = "Saving foliage texture";
-			progressListener.setProgress(task, 0, 0, 1);
+			progressListener.setProgress(task, 1, 0, 2);
 			logger.info("Saving foliage texture " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
 					context.getSceneFileOutputStream(fileName)));
 
 			foliageTexture.store(out);
 
-			progressListener.setProgress(task, 1, 0, 1);
+			progressListener.setProgress(task, 2, 0, 2);
 			logger.info("Foliage texture saved");
 		} catch (IOException e) {
 			logger.warn("IO exception while saving octree!", e);
@@ -1445,7 +1446,7 @@ public class Scene extends SceneDescription {
 		DataOutputStream out = null;
 		try {
 			String task = "Saving render dump";
-			progressListener.setProgress(task, 0, 0, 1);
+			progressListener.setProgress(task, 1, 0, 2);
 			logger.info("Saving render dump " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
 					context.getSceneFileOutputStream(fileName)));
@@ -1454,7 +1455,7 @@ public class Scene extends SceneDescription {
 			out.writeInt(spp);
 			out.writeLong(renderTime);
 			for (int x = 0; x < width; ++x) {
-				progressListener.setProgress(task, x, 0, width-1);
+				progressListener.setProgress(task, x+1, 0, width);
 				for (int y = 0; y < height; ++y) {
 					out.writeDouble(samples[(y*width+x)*3+0]);
 					out.writeDouble(samples[(y*width+x)*3+1]);
@@ -1483,14 +1484,14 @@ public class Scene extends SceneDescription {
 		DataInputStream in = null;
 		try {
 			String task = "Loading octree";
-			renderListener.setProgress(task, 0, 0, 1);
+			renderListener.setProgress(task, 1, 0, 2);
 			logger.info("Loading octree " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
 
 			octree = Octree.load(in);
 
-			renderListener.setProgress(task, 1, 0, 1);
+			renderListener.setProgress(task, 2, 0, 2);
 			logger.info("Octree loaded");
 			return true;
 		} catch (IOException e) {
@@ -1515,14 +1516,14 @@ public class Scene extends SceneDescription {
 		DataInputStream in = null;
 		try {
 			String task = "Loading grass texture";
-			renderListener.setProgress(task, 0, 0, 1);
+			renderListener.setProgress(task, 1, 0, 2);
 			logger.info("Loading grass texture " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
 
 			grassTexture = WorldTexture.load(in);
 
-			renderListener.setProgress(task, 1, 0, 1);
+			renderListener.setProgress(task, 2, 0, 2);
 			logger.info("Grass texture loaded");
 			return true;
 		} catch (IOException e) {
@@ -1547,14 +1548,14 @@ public class Scene extends SceneDescription {
 		DataInputStream in = null;
 		try {
 			String task = "Loading foliage texture";
-			renderListener.setProgress(task, 0, 0, 1);
+			renderListener.setProgress(task, 1, 0, 2);
 			logger.info("Loading foliage texture " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
 
 			foliageTexture = WorldTexture.load(in);
 
-			renderListener.setProgress(task, 1, 0, 1);
+			renderListener.setProgress(task, 2, 0, 2);
 			logger.info("Foliage texture loaded");
 			return true;
 		} catch (IOException e) {
@@ -1582,7 +1583,7 @@ public class Scene extends SceneDescription {
 					context.getSceneFileInputStream(fileName)));
 
 			String task = "Loading render dump";
-			renderListener.setProgress(task, 0, 0, 1);
+			renderListener.setProgress(task, 1, 0, 2);
 			logger.info("Loading render dump " + fileName);
 			int dumpWidth = in.readInt();
 			int dumpHeight= in.readInt();
@@ -1602,7 +1603,7 @@ public class Scene extends SceneDescription {
 					(int) (totalSamples / (renderTime / 1000.0)));
 
 			for (int x = 0; x < width; ++x) {
-				renderListener.setProgress(task, x, 0, width-1);
+				renderListener.setProgress(task, x+1, 0, width);
 				for (int y = 0; y < height; ++y) {
 					samples[(y*width+x)*3+0] = in.readDouble();
 					samples[(y*width+x)*3+1] = in.readDouble();
@@ -1866,7 +1867,7 @@ public class Scene extends SceneDescription {
 					new FileInputStream(dumpFile)));
 
 			String task = "Merging render dump";
-			renderListener.setProgress(task, 0, 0, 1);
+			renderListener.setProgress(task, 1, 0, 2);
 			logger.info("Loading render dump " + dumpFile.getAbsolutePath());
 			int dumpWidth = in.readInt();
 			int dumpHeight= in.readInt();
@@ -1882,7 +1883,7 @@ public class Scene extends SceneDescription {
 			double sb = 1 - sa;
 
 			for (int x = 0; x < width; ++x) {
-				renderListener.setProgress(task, x, 0, width-1);
+				renderListener.setProgress(task, x+1, 0, width);
 				for (int y = 0; y < height; ++y) {
 					samples[(y*width+x)*3+0] = samples[(y*width+x)*3+0] * sa
 							+ in.readDouble() * sb;
