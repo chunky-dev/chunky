@@ -42,6 +42,7 @@ public class DoFAdjuster extends Adjuster {
 				Camera.MIN_DOF, Camera.MAX_DOF);
 		this.renderMan = renderManager;
 		setLogarithmicMode();
+		setClampMax(false);
 	}
 
 	@Override
