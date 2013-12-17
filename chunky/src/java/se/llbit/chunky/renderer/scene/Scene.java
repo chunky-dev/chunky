@@ -753,7 +753,7 @@ public class Scene extends SceneDescription {
 							ChunkPosition ccp = ChunkPosition.get(wx >> 4, wz >> 4);
 							if (chunkSet.contains(ccp)) {
 								nsum += 1;
-								int biomeId = Biomes.BIOME_MASK & biomeIdMap.get(wx, wz);
+								int biomeId = biomeIdMap.get(wx, wz);
 								float[] grassColor = Biomes.getGrassColorLinear(biomeId);
 								grassMix[0] += grassColor[0];
 								grassMix[1] += grassColor[1];

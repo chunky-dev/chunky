@@ -37,13 +37,14 @@ import se.llbit.util.Util;
 public class MinecraftFinder {
 
 	private static File minecraftJar = null;
+	private static boolean foundJar = false;
 
 	/**
 	 * @return The configured Minecraft directory.
 	 */
 	public static File getMinecraftDirectory() {
 		File mcDir = new File(ChunkySettings.getMinecraftDirectory());
-		if (getMinecraftJar(mcDir) == null) {
+		if (getMinecraftJar(mcDir, false) == null) {
 			mcDir = getDefaultMinecraftDirectory();
 		}
 		if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
@@ -94,24 +95,30 @@ public class MinecraftFinder {
 	}
 
 	/**
+	 * NB: This method caches it's result
 	 * @return File reference to the latest Minecraft jar of the local
 	 * Minecraft installation, or <code>null</code> if the Minecraft jar
 	 * could not be found.
 	 */
 	public static final File getMinecraftJar() {
-		if (minecraftJar == null) {
-			minecraftJar = getMinecraftJar(getMinecraftDirectory());
+		synchronized (MinecraftFinder.class) {
+			if (!foundJar) {
+				minecraftJar = getMinecraftJar(getMinecraftDirectory(),
+						System.getProperty("log4j.logLevel", "WARN").equals("INFO"));
+				foundJar = true;
+			}
+			return minecraftJar;
 		}
-		return minecraftJar;
 	}
 
 	/**
 	 * @param mcDir directory to search for Minecraft jar
+	 * @param debug print debug messages if {@code true}
 	 * @return File reference to the latest Minecraft jar of the local
 	 * Minecraft installation, or <code>null</code> if the Minecraft jar
 	 * could not be found.
 	 */
-	public static final File getMinecraftJar(File mcDir) {
+	public static final File getMinecraftJar(File mcDir, boolean debug) {
 		// MC 1.6.1 and above jars located in subdirectories under versions/
 		File versions = new File(mcDir, "versions");
 		if (versions.isDirectory()) {
@@ -151,7 +158,7 @@ public class MinecraftFinder {
 						latest = versionDirs.get(i);
 					}
 				}
-				if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
+				if (debug) {
 					System.out.println("Found latest Minecraft version: " +
 						latest.jar.getAbsolutePath());
 				}

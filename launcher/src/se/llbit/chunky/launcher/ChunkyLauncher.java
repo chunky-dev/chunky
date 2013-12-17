@@ -243,7 +243,7 @@ public class ChunkyLauncher extends JFrame {
 				int result = fileChooser.showOpenDialog(null);
 				if (result == JFileChooser.APPROVE_OPTION) {
 					File selectedDirectory = fileChooser.getSelectedFile();
-					if (MinecraftFinder.getMinecraftJar(selectedDirectory) != null) {
+					if (MinecraftFinder.getMinecraftJar(selectedDirectory, false) != null) {
 						setMinecraftDir(selectedDirectory);
 					} else {
 						Dialogs.message(ChunkyLauncher.this,

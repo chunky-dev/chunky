@@ -87,20 +87,15 @@ public class Biomes {
 	static {
 		for (int i = 0; i < biomes.length; ++i) {
 			grassColor[i] = biomes[i].grassColor;
+			foliageColor[i] = grassColor[i];
 		}
 		for (int i = biomes.length; i < 128; ++i) {
 			grassColor[i] = UNKNOWN_COLOR;
+			foliageColor[i] = grassColor[i];
 		}
 
 		gammaCorrectColors(grassColor, grassColorLinear);
-
-		for (int i = 0; i < 128; ++i) {
-			foliageColor[i] = grassColor[i];
-			foliageColorLinear[i][0] = grassColorLinear[i][0];
-			foliageColorLinear[i][1] = grassColorLinear[i][1];
-			foliageColorLinear[i][2] = grassColorLinear[i][2];
-		}
-
+		gammaCorrectColors(foliageColor, foliageColorLinear);
 	}
 
 	/**
@@ -154,7 +149,7 @@ public class Biomes {
 	}
 
 	/**
-	 * @param biomeId
+	 * @param biomeId truncated to [0,127]
 	 * @return Grass color for the given biome ID
 	 */
 	public static final int getGrassColor(int biomeId) {
@@ -162,7 +157,7 @@ public class Biomes {
 	}
 
 	/**
-	 * @param biomeId
+	 * @param biomeId truncated to [0,127]
 	 * @return Foliage color for the given biome ID
 	 */
 	public static final int getFoliageColor(int biomeId) {
@@ -170,18 +165,18 @@ public class Biomes {
 	}
 
 	/**
-	 * @param biomeId Must be in the range [0,127]
+	 * @param biomeId truncated to [0,127]
 	 * @return Linear biome color for the given biome ID
 	 */
 	public static final float[] getGrassColorLinear(int biomeId) {
-		return grassColorLinear[biomeId];
+		return grassColorLinear[BIOME_MASK & biomeId];
 	}
 
 	/**
-	 * @param biomeId Must be in the range [0,127]
+	 * @param biomeId truncated to [0,127]
 	 * @return Linear foliage color for the given biome ID
 	 */
 	public static final float[] getFoliageColorLinear(int biomeId) {
-		return foliageColorLinear[biomeId];
+		return foliageColorLinear[BIOME_MASK & biomeId];
 	}
 }
