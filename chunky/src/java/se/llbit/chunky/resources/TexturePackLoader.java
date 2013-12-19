@@ -1090,6 +1090,40 @@ public class TexturePackLoader {
 		allTextures.put("glass_yellow",
 				new SimpleTexture("assets/minecraft/textures/blocks/glass_yellow", Texture.yellowGlass));
 
+		// [MC 1.7.2] Stained glass panes
+		allTextures.put("glass_pane_top_black",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_black", Texture.blackGlassPaneSide));
+		allTextures.put("glass_pane_top_blue",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_blue", Texture.blueGlassPaneSide));
+		allTextures.put("glass_pane_top_brown",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_brown", Texture.brownGlassPaneSide));
+		allTextures.put("glass_pane_top_cyan",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_cyan", Texture.cyanGlassPaneSide));
+		allTextures.put("glass_pane_top_gray",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_gray", Texture.grayGlassPaneSide));
+		allTextures.put("glass_pane_top_green",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_green", Texture.greenGlassPaneSide));
+		allTextures.put("glass_pane_top_light_blue",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_light_blue", Texture.lightBlueGlassPaneSide));
+		allTextures.put("glass_pane_top_lime",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_lime", Texture.limeGlassPaneSide));
+		allTextures.put("glass_pane_top_magenta",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_magenta", Texture.magentaGlassPaneSide));
+		allTextures.put("glass_pane_top_orange",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_orange", Texture.orangeGlassPaneSide));
+		allTextures.put("glass_pane_top_pink",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_pink", Texture.pinkGlassPaneSide));
+		allTextures.put("glass_pane_top_purple",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_purple", Texture.purpleGlassPaneSide));
+		allTextures.put("glass_pane_top_red",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_red", Texture.redGlassPaneSide));
+		allTextures.put("glass_pane_top_silver",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_silver", Texture.lightGrayGlassPaneSide));
+		allTextures.put("glass_pane_top_white",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_white", Texture.whiteGlassPaneSide));
+		allTextures.put("glass_pane_top_yellow",
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top_yellow", Texture.yellowGlassPaneSide));
+
 		// [MC 1.7.2] Top/bottom log textures
 		allTextures.put("log_spruce_top", new AlternateTextures(
 				new SimpleTexture("assets/minecraft/textures/blocks/log_spruce_top", Texture.spruceWoodTop),

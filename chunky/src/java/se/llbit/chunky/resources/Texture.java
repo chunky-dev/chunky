@@ -43,7 +43,7 @@ public class Texture {
 	public static final Texture dirt = new Texture("dirt");
 	public static final Texture grassSideSaturated = new Texture("grass-side-saturated");
 	public static final Texture grassTop = new Texture("grass");
-	public static final Texture grassSide = new Texture("air");// TODO
+	public static final Texture grassSide = new Texture();
 	public static final Texture water = new Texture("water");
 	public static final Texture cauldronSide = new Texture();
 	public static final Texture cauldronInside = new Texture();
@@ -98,7 +98,6 @@ public class Texture {
 	public static final Texture dropperFront = new Texture();
 	public static final Texture sponge = new Texture("sponge");
 	public static final Texture glass = new Texture("glass");
-	public static final Texture glassPaneSide = new Texture();
 	public static final Texture diamondOre = new Texture("diamond-ore");
 	public static final Texture redstoneOre = new Texture("redstone-ore");
 	public static final Texture stoneBrick = new Texture("stone-bricks");
@@ -107,7 +106,7 @@ public class Texture {
 	public static final Texture circleStoneBrick = new Texture();
 	public static final Texture monsterSpawner = new Texture("spawner");
 	public static final Texture snowBlock = new Texture("snow");
-	public static final Texture snowSide = new Texture("dirt");// TODO
+	public static final Texture snowSide = new Texture();
 	public static final Texture ice = new Texture("ice");
 	public static final Texture cactusTop = new Texture();
 	public static final Texture cactusSide = new Texture();
@@ -124,8 +123,8 @@ public class Texture {
 	public static final Texture ladder = new Texture("ladder");
 	public static final Texture trapdoor = new Texture("trapdoor");
 	public static final Texture ironBars = new Texture("iron-bars");
-	public static final Texture farmlandWet = new Texture("soil");// TODO: wet variant
-	public static final Texture farmlandDry = new Texture("soil");// TODO: dry variant
+	public static final Texture farmlandWet = new Texture();
+	public static final Texture farmlandDry = new Texture();
 	public static final Texture lever = new Texture();
 	public static final Texture redstoneTorchOn = new Texture("redstone-torch-on");
 	public static final Texture redstoneTorchOff = new Texture("redstone-torch-off");
@@ -168,38 +167,22 @@ public class Texture {
 	public static final Texture detectorRail = new Texture();
 	public static final Texture activatorRail = new Texture();
 	public static final Texture activatorRailPowered = new Texture();
-	public static final Texture whiteWool = new Texture("wool");// TODO: variants
-	public static final Texture orangeWool = new Texture("wool");// TODO: variants
-	public static final Texture magentaWool = new Texture("wool");// TODO: variants
-	public static final Texture lightBlueWool = new Texture("wool");// TODO: variants
-	public static final Texture yellowWool = new Texture("wool");// TODO: variants
-	public static final Texture limeWool = new Texture("wool");// TODO: variants
-	public static final Texture pinkWool = new Texture("wool");// TODO: variants
-	public static final Texture grayWool = new Texture("wool");// TODO: variants
-	public static final Texture lightGrayWool = new Texture("wool");// TODO: variants
-	public static final Texture cyanWool = new Texture("wool");// TODO: variants
-	public static final Texture purpleWool = new Texture("wool");// TODO: variants
-	public static final Texture blueWool = new Texture("wool");// TODO: variants
-	public static final Texture brownWool = new Texture("wool");// TODO: variants
-	public static final Texture greenWool = new Texture("wool");// TODO: variants
-	public static final Texture redWool = new Texture("wool");// TODO: variants
-	public static final Texture blackWool = new Texture("wool");// TODO: variants
-	public static final Texture whiteGlass = new Texture("glass");// TODO: variants
-	public static final Texture orangeGlass = new Texture("glass");// TODO: variants
-	public static final Texture magentaGlass = new Texture("glass");// TODO: variants
-	public static final Texture lightBlueGlass = new Texture("glass");// TODO: variants
-	public static final Texture yellowGlass = new Texture("glass");// TODO: variants
-	public static final Texture limeGlass = new Texture("glass");// TODO: variants
-	public static final Texture pinkGlass = new Texture("glass");// TODO: variants
-	public static final Texture grayGlass = new Texture("glass");// TODO: variants
-	public static final Texture lightGrayGlass = new Texture("glass");// TODO: variants
-	public static final Texture cyanGlass = new Texture("glass");// TODO: variants
-	public static final Texture purpleGlass = new Texture("glass");// TODO: variants
-	public static final Texture blueGlass = new Texture("glass");// TODO: variants
-	public static final Texture brownGlass = new Texture("glass");// TODO: variants
-	public static final Texture greenGlass = new Texture("glass");// TODO: variants
-	public static final Texture redGlass = new Texture("glass");// TODO: variants
-	public static final Texture blackGlass = new Texture("glass");// TODO: variants
+	public static final Texture whiteWool = new Texture("wool");
+	public static final Texture orangeWool = new Texture("wool");
+	public static final Texture magentaWool = new Texture("wool");
+	public static final Texture lightBlueWool = new Texture("wool");
+	public static final Texture yellowWool = new Texture("wool");
+	public static final Texture limeWool = new Texture("wool");
+	public static final Texture pinkWool = new Texture("wool");
+	public static final Texture grayWool = new Texture("wool");
+	public static final Texture lightGrayWool = new Texture("wool");
+	public static final Texture cyanWool = new Texture("wool");
+	public static final Texture purpleWool = new Texture("wool");
+	public static final Texture blueWool = new Texture("wool");
+	public static final Texture brownWool = new Texture("wool");
+	public static final Texture greenWool = new Texture("wool");
+	public static final Texture redWool = new Texture("wool");
+	public static final Texture blackWool = new Texture("wool");
 	public static final Texture lava = new Texture("lava");
 	public static final Texture lapislazuliOre = new Texture("lapis-lazuli-ore");
 	public static final Texture lapislazuliBlock = new Texture("lapis-lazuli-block");
@@ -290,12 +273,13 @@ public class Texture {
 	public static final Texture hopperOutside = new Texture();
 	public static final Texture hopperInside = new Texture();
 
-	// Minecraft 1.6
+	// [1.6] Hay Block, Hardened Clay, Coal Block
 	public static final Texture hayBlockSide = new Texture();
 	public static final Texture hayBlockTop = new Texture();
 	public static final Texture hardenedClay = new Texture();
 	public static final Texture coalBlock = new Texture();
 
+	// [1.6] Colored Clay
 	public static final Texture whiteClay = new Texture();
 	public static final Texture orangeClay = new Texture();
 	public static final Texture magentaClay = new Texture();
@@ -313,10 +297,29 @@ public class Texture {
 	public static final Texture redClay = new Texture();
 	public static final Texture blackClay = new Texture();
 
+	// [1.7.2] Stained Glass
+	public static final Texture whiteGlass = new Texture("glass");
+	public static final Texture orangeGlass = new Texture("glass");
+	public static final Texture magentaGlass = new Texture("glass");
+	public static final Texture lightBlueGlass = new Texture("glass");
+	public static final Texture yellowGlass = new Texture("glass");
+	public static final Texture limeGlass = new Texture("glass");
+	public static final Texture pinkGlass = new Texture("glass");
+	public static final Texture grayGlass = new Texture("glass");
+	public static final Texture lightGrayGlass = new Texture("glass");
+	public static final Texture cyanGlass = new Texture("glass");
+	public static final Texture purpleGlass = new Texture("glass");
+	public static final Texture blueGlass = new Texture("glass");
+	public static final Texture brownGlass = new Texture("glass");
+	public static final Texture greenGlass = new Texture("glass");
+	public static final Texture redGlass = new Texture("glass");
+	public static final Texture blackGlass = new Texture("glass");
+
+	// [1.7.2] Podzol
 	public static final Texture podzolTop = new Texture();
 	public static final Texture podzolSide = new Texture();
 
-	// Flowers
+	// [1.7.2] Flowers
 	public static final Texture dandelion = new Texture("yellow-flower");
 	public static final Texture poppy = new Texture("rose");
 	public static final Texture blueOrchid = new Texture();
@@ -328,7 +331,7 @@ public class Texture {
 	public static final Texture pinkTulip = new Texture();
 	public static final Texture oxeyeDaisy = new Texture();
 
-	// Large Flowers
+	// [1.7.2] Large Flowers
 	public static final Texture sunflowerBottom = new Texture();
 	public static final Texture sunflowerTop = new Texture();
 	public static final Texture sunflowerFront = new Texture();
@@ -344,6 +347,24 @@ public class Texture {
 	public static final Texture peonyBottom = new Texture();
 	public static final Texture peonyTop = new Texture();
 
+	// [1.7.2] Colored Glass Panes
+	public static final Texture glassPaneSide = new Texture();
+	public static final Texture whiteGlassPaneSide = new Texture();
+	public static final Texture orangeGlassPaneSide = new Texture();
+	public static final Texture magentaGlassPaneSide = new Texture();
+	public static final Texture lightBlueGlassPaneSide = new Texture();
+	public static final Texture yellowGlassPaneSide = new Texture();
+	public static final Texture limeGlassPaneSide = new Texture();
+	public static final Texture pinkGlassPaneSide = new Texture();
+	public static final Texture grayGlassPaneSide = new Texture();
+	public static final Texture lightGrayGlassPaneSide = new Texture();
+	public static final Texture cyanGlassPaneSide = new Texture();
+	public static final Texture purpleGlassPaneSide = new Texture();
+	public static final Texture blueGlassPaneSide = new Texture();
+	public static final Texture brownGlassPaneSide = new Texture();
+	public static final Texture greenGlassPaneSide = new Texture();
+	public static final Texture redGlassPaneSide = new Texture();
+	public static final Texture blackGlassPaneSide = new Texture();
 	/**
 	 * Missing or unknown texture.
 	 */
@@ -445,27 +466,40 @@ public class Texture {
 	public static final Texture[] activatorRails =
 		{ activatorRail, activatorRailPowered };
 
-	public static final Texture[] railsType =
-		{ rails, rails, rails, rails, rails, rails,
-		railsCurved, railsCurved, railsCurved, railsCurved };
+	public static final Texture[] railsType = {
+		rails, rails, rails, rails, rails, rails,
+		railsCurved, railsCurved, railsCurved, railsCurved
+	};
 
-	public static final Texture[] wool =
-		{ whiteWool, orangeWool, magentaWool, lightBlueWool,
+	public static final Texture[] wool = {
+		whiteWool, orangeWool, magentaWool, lightBlueWool,
 		yellowWool, limeWool, pinkWool, grayWool, lightGrayWool,
 		cyanWool, purpleWool, blueWool, brownWool, greenWool,
-		redWool, blackWool };
+		redWool, blackWool
+	};
 
-	public static final Texture[] stainedGlass =
-		{ whiteGlass, orangeGlass, magentaGlass, lightBlueGlass,
+	public static final Texture[] stainedGlass = {
+		whiteGlass, orangeGlass, magentaGlass, lightBlueGlass,
 		yellowGlass, limeGlass, pinkGlass, grayGlass, lightGrayGlass,
 		cyanGlass, purpleGlass, blueGlass, brownGlass, greenGlass,
-		redGlass, blackGlass };
+		redGlass, blackGlass
+	};
 
-	public static final Texture[] stainedClay =
-		{ whiteClay, orangeClay, magentaClay, lightBlueClay,
+	public static final Texture[] stainedGlassPaneSide = {
+		whiteGlassPaneSide, orangeGlassPaneSide, magentaGlassPaneSide,
+		lightBlueGlassPaneSide, yellowGlassPaneSide, limeGlassPaneSide,
+		pinkGlassPaneSide, grayGlassPaneSide, lightGrayGlassPaneSide,
+		cyanGlassPaneSide, purpleGlassPaneSide, blueGlassPaneSide,
+		brownGlassPaneSide, greenGlassPaneSide, redGlassPaneSide,
+		blackGlassPaneSide
+	};
+
+	public static final Texture[] stainedClay = {
+		whiteClay, orangeClay, magentaClay, lightBlueClay,
 		yellowClay, limeClay, pinkClay, grayClay, lightGrayClay,
 		cyanClay, purpleClay, blueClay, brownClay, greenClay,
-		redClay, blackClay };
+		redClay, blackClay
+	};
 
 	public static final Texture[] stoneBrickType =
 		{ stoneBrick, mossyStoneBrick, crackedStoneBrick, circleStoneBrick };

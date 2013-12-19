@@ -257,9 +257,9 @@ public class CLRenderManager extends Thread implements Renderer,
 			state.define(new Identifier("_WIN32_"),
 					new ObjMacro(new Identifier("_WIN32_"),
 					new se.llbit.j99.pp.List<se.llbit.j99.pp.Token>()));
-			/*state.define(new Identifier("AMBIENT_OCCLUSION"),
+			state.define(new Identifier("AMBIENT_OCCLUSION"),
 					new ObjMacro(new Identifier("AMBIENT_OCCLUSION"),
-					new se.llbit.j99.pp.List<se.llbit.j99.pp.Token>()));*/
+					new se.llbit.j99.pp.List<se.llbit.j99.pp.Token>()));
 			/*state.define(new Identifier("RNGTEST"),
 					new ObjMacro(new Identifier("RNGTEST"),
 					new se.llbit.j99.pp.List<se.llbit.j99.pp.Token>()));*/

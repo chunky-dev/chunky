@@ -441,6 +441,7 @@ public class OctreeFinalizer {
 						octree.set(type, x, cy, z);
 						break;
 					case Block.GLASSPANE_ID:
+					case Block.STAINED_GLASSPANE_ID:
 						other = Block.get(octree.get(x, cy, z - 1));
 						if (other.isGlassPaneConnector())
 							type |= 1 << 8;

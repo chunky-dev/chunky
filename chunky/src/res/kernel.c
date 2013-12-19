@@ -288,8 +288,18 @@ __kernel void path_trace(
 	bool hit = false;
 	uint ray_depth = 0;
 	float3 light = 0;
+	float3 attenuation = 1;
 #ifdef AMBIENT_OCCLUSION
-	while (intersect(octree, depth, &d, &o, &n)) {
+	while (
+	
+		uint material = intersect(octree, depth, &d, &o, &n);
+		
+		if (material == 0) break;
+	
+		uint block = 0xFF & material;
+		attenuation.x *= block_color[block*3];
+		attenuation.y *= block_color[block*3+1];
+		attenuation.z *= block_color[block*3+2];
 		
 		if (kill(ray_depth, &seed)) {
 			hit = false;
@@ -301,9 +311,8 @@ __kernel void path_trace(
 
 		reflect_diffuse(&o, &d, &n, &seed);
 	}
-	if (hit) light = 1;
+	if (hit) light = attenuation;
 #else
-	float3 attenuation = 1;
 	while (1) {
 		float3 prev_o = o;
 		float3 prev_n = n;

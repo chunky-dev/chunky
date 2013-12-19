@@ -2338,11 +2338,20 @@ public class Block {
 			return Texture.stainedClay[ray.getBlockData()];
 		}
 	};
-	public static final Block UNKNOWN0xA0 = new Block(0xA0, "Unknown Block 0xA0", Texture.unknown) {
+	public static final int STAINED_GLASSPANE_ID = 0xA0;
+	public static final Block STAINED_GLASSPANE = new Block(STAINED_GLASSPANE_ID, "Stained Glass Pane", Texture.glass) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+			ior = 1.520f;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			int data = ray.getBlockData();
+			return GlassPaneModel.intersect(ray,
+					Texture.stainedGlass[data],
+					Texture.stainedGlassPaneSide[data]);
 		}
 	};
 	public static final int LEAVES2_ID = 0xA1;
@@ -3095,7 +3104,7 @@ public class Block {
 		WEIGHTEDPRESSUREPLATEHEAVY, REDSTONECOMPARATOR, REDSTONECOMPARATORLIT, DAYLIGHTSENSOR,
 		REDSTONEBLOCK, NETHERQUARTZORE, HOPPER, QUARTZ,
 		QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, STAINED_CLAY,
-		UNKNOWN0xA0, LEAVES2, WOOD2, UNKNOWN0xA3,
+		STAINED_GLASSPANE, LEAVES2, WOOD2, UNKNOWN0xA3,
 		UNKNOWN0xA4, UNKNOWN0xA5, UNKNOWN0xA6, UNKNOWN0xA7,
 		UNKNOWN0xA8, UNKNOWN0xA9, HAY_BLOCK, CARPET,
 		HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, LARGE_FLOWER,
@@ -3289,7 +3298,7 @@ public class Block {
 	}
 
 	public boolean isGlassPaneConnector() {
-		return isSolid || this == GLASSPANE;
+		return isSolid || this == GLASSPANE || this == STAINED_GLASSPANE;
 	}
 
 	public boolean isIronBarsConnector() {
@@ -3305,16 +3314,16 @@ public class Block {
 	}
 
 	public boolean isStair() {
-		return id == OAKWOODSTAIRS_ID ||
-				id == STONESTAIRS_ID ||
-				id == BRICKSTAIRS_ID ||
-				id == STONEBRICKSTAIRS_ID ||
-				id == NETHERBRICKSTAIRS_ID ||
-				id == SANDSTONESTAIRS_ID ||
-				id == SPRUCEWOODSTAIRS_ID ||
-				id == BIRCHWOODSTAIRS_ID ||
-				id == JUNGLEWOODSTAIRS_ID ||
-				id == QUARTZSTAIRS_ID;
+		return this == OAKWOODSTAIRS ||
+				this == STONESTAIRS ||
+				this == BRICKSTAIRS ||
+				this == STONEBRICKSTAIRS ||
+				this == NETHERBRICKSTAIRS ||
+				this == SANDSTONESTAIRS ||
+				this == SPRUCEWOODSTAIRS ||
+				this == BIRCHWOODSTAIRS ||
+				this == JUNGLEWOODSTAIRS ||
+				this == QUARTZSTAIRS;
 	}
 
 	public boolean isGroundBlock() {
