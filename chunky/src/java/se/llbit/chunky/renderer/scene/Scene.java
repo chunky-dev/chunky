@@ -1721,11 +1721,13 @@ public class Scene extends SceneDescription {
 					trace(ray);
 					g.setFont(infoFont);
 					if (ray.hit) {
+						Block block = ray.getCurrentBlock();
 						g.drawString(String.format("target: %.2f m", ray.distance), 5, height-18);
 						g.drawString(String.format("[0x%08X] %s (%s)",
 								ray.currentMaterial,
-								ray.getCurrentBlock(),
-								ray.getBlockExtraInfo()), 5, height-5);
+								block,
+								block.description(ray.getBlockData())),
+								5, height-5);
 					}
 					Vector3d pos = camera.getPosition();
 					g.drawString(String.format("(%.1f, %.1f, %.1f)",

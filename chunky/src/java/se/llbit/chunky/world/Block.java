@@ -163,7 +163,6 @@ public class Block {
 			isSolid = true;
 		}
 	};
-	public static final int WOOD_ID = 0x11;
 	public static final Block WOODENPLANKS = new Block(0x05, "Wooden Planks", Texture.oakPlanks) {
 		{
 			isOpaque = true;
@@ -283,6 +282,7 @@ public class Block {
 			isSolid = true;
 		}
 	};
+	public static final int WOOD_ID = 0x11;
 	public static final Block WOOD = new Block(WOOD_ID, "Wood", Texture.oakWood) {
 		{
 			isOpaque = true;
@@ -292,6 +292,13 @@ public class Block {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return WoodModel.intersect(ray, Texture.wood);
+		}
+		final String[] woodType = {
+			"oak", "spruce", "birch", "jungle",
+		};
+		@Override
+		public String description(int data) {
+			return woodType[data&3];
 		}
 	};
 	public static final int LEAVES_ID = 0x12;
@@ -304,6 +311,13 @@ public class Block {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return LeafModel.intersect(ray, scene, Texture.leaves);
+		}
+		final String[] woodType = {
+			"oak", "spruce", "birch", "jungle",
+		};
+		@Override
+		public String description(int data) {
+			return woodType[data&3];
 		}
 	};
 	public static final Block SPONGE = new Block(0x13, "Sponge", Texture.sponge) {
@@ -514,6 +528,10 @@ public class Block {
 		public Texture getTexture(Ray ray) {
 			return Texture.wool[ray.getBlockData()];
 		}
+		@Override
+		public String description(int data) {
+			return woolColor[data&15];
+		}
 	};
 
 	public static final int MOVEDBYPISTON_ID = 0x24;
@@ -558,6 +576,15 @@ public class Block {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return SpriteModel.intersect(ray, textures[ray.getBlockData()%9]);
+		}
+		final String[] flowerType = {
+			"Poppy", "Blue Orchid", "Allium", "Azure Bluet",
+			"Red Tulip", "Orange Tulip", "White Tulip", "Pink Tulip",
+			"Oxeye Daisy"
+		};
+		@Override
+		public String description(int data) {
+			return flowerType[data%8];
 		}
 	};
 	public static final Block BROWNMUSHROOM = new Block(0x27, "Brown Mushroom", Texture.brownMushroom) {
@@ -816,6 +843,13 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return TorchModel.intersect(ray, Texture.torch);
 		}
+		final String[] direction = {
+			"", "east", "west", "south", "north", "on floor"
+		};
+		@Override
+		public String description(int data) {
+			return direction[data%6];
+		};
 	};
 	public static final Block FIRE = new Block(0x33, "Fire", Texture.fire) {
 		{
@@ -914,6 +948,10 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return RedstoneWireModel.intersect(ray);
 		}
+		@Override
+		public String description(int data) {
+			return "power: " + data;
+		};
 	};
 	public static final Block DIAMONDORE = new Block(0x38, "Diamond Ore", Texture.diamondOre) {
 		{
@@ -1150,6 +1188,13 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return TorchModel.intersect(ray, Texture.redstoneTorchOff);
 		}
+		final String[] direction = {
+			"", "east", "west", "south", "north", "on floor"
+		};
+		@Override
+		public String description(int data) {
+			return direction[data%6];
+		};
 	};
 	public static final int REDSTONETORCHON_ID = 0x4C;
 	public static final Block REDSTONETORCHON = new Block(REDSTONETORCHON_ID, "Redstone Torch (on)", Texture.redstoneTorchOn) {
@@ -1164,6 +1209,13 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return TorchModel.intersect(ray, Texture.redstoneTorchOn);
 		}
+		final String[] direction = {
+			"", "east", "west", "south", "north", "on floor"
+		};
+		@Override
+		public String description(int data) {
+			return direction[data%6];
+		};
 	};
 	public static final int STONEBUTTON_ID = 0x4D;
 	public static final Block STONEBUTTON = new Block(STONEBUTTON_ID, "Stone Button", Icon.stoneButton) {
@@ -1371,6 +1423,10 @@ public class Block {
 		@Override
 		public Texture getTexture(Ray ray) {
 			return Texture.stainedGlass[ray.getBlockData()];
+		}
+		@Override
+		public String description(int data) {
+			return woolColor[data&15];
 		}
 	};
 	public static final Block TRAPDOOR = new Block(0x60, "Trapdoor", Texture.trapdoor) {
@@ -1916,6 +1972,13 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return CocoaPlantModel.intersect(ray);
 		}
+		final String[] cocoaSize = {
+			"small", "medium", "large"
+		};
+		@Override
+		public String description(int data) {
+			return cocoaSize[(data&15)>>2];
+		}
 	};
 	public static final int SANDSTONESTAIRS_ID = 0x80;
 	public static final Block SANDSTONESTAIRS = new Block(SANDSTONESTAIRS_ID, "Sandstone Stairs", Icon.stoneStairs, Texture.sandstoneSide) {
@@ -2337,6 +2400,10 @@ public class Block {
 		public Texture getTexture(Ray ray) {
 			return Texture.stainedClay[ray.getBlockData()];
 		}
+		@Override
+		public String description(int data) {
+			return woolColor[data&15];
+		}
 	};
 	public static final int STAINED_GLASSPANE_ID = 0xA0;
 	public static final Block STAINED_GLASSPANE = new Block(STAINED_GLASSPANE_ID, "Stained Glass Pane", Texture.glass) {
@@ -2353,6 +2420,10 @@ public class Block {
 					Texture.stainedGlass[data],
 					Texture.stainedGlassPaneSide[data]);
 		}
+		@Override
+		public String description(int data) {
+			return woolColor[data&15];
+		}
 	};
 	public static final int LEAVES2_ID = 0xA1;
 	public static final Block LEAVES2 = new Block(LEAVES2_ID, "Leaves", Texture.oakLeaves) {
@@ -2365,6 +2436,13 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return LeafModel.intersect(ray, scene, Texture.leaves2);
 		}
+		final String[] woodType = {
+			"acacia", "dark oak", "unknown", "unknown"
+		};
+		@Override
+		public String description(int data) {
+			return woodType[data&3];
+		}
 	};
 	public static final int WOOD2_ID = 0xA2;
 	public static final Block WOOD2 = new Block(WOOD2_ID, "Wood", Texture.oakWood) {
@@ -2376,6 +2454,13 @@ public class Block {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return WoodModel.intersect(ray, Texture.wood2);
+		}
+		final String[] woodType = {
+			"acacia", "dark oak", "unknown", "unknown"
+		};
+		@Override
+		public String description(int data) {
+			return woodType[data&3];
 		}
 	};
 	public static final Block UNKNOWN0xA3 = new Block(0xA3, "Unknown Block 0xA3", Texture.unknown) {
@@ -2456,11 +2541,14 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
-
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return CarpetModel.intersect(ray,
 					Texture.wool[ray.getBlockData()]);
+		}
+		@Override
+		public String description(int data) {
+			return woolColor[data&15];
 		}
 	};
 	public static final int HARDENED_CLAY_ID = 0xAC;
@@ -3336,5 +3424,26 @@ public class Block {
 
 	public static Block get(int id) {
 		return values[0xFF & id];
+	}
+
+	private static final String[] woolColor = {
+		"white", "orange", "magenta", "light blue", "yellow", "lime", "pink",
+		"gray", "light gray", "cyan", "purple", "blue", "brown", "green",
+		"red", "black"
+	};
+
+	private static final String[] bits = {
+		"0000", "0001", "0010", "0011",
+		"0100", "0101", "0110", "0111",
+		"1000", "1001", "1010", "1011",
+		"1100", "1101", "1110", "1111",
+	};
+
+	/**
+	 * @param data block data
+	 * @return debug info for this block
+	 */
+	public String description(int data) {
+		return bits[data&15];
 	}
 }
