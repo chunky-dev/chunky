@@ -6,8 +6,9 @@
 
 # chunky build files
 /build
-Chunky.nsi
+/Chunky.nsi
 /release_notes-*.txt
+/chunky.jar
 
 # benchmarking & testing
 /bench/x*

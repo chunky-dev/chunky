@@ -89,7 +89,7 @@ public class ReleaseBuilder {
 	}
 
 	private void buildChunkJar() {
-		buildChunkyJar("build/Chunky-"+versionName+".jar");
+		buildChunkyJar("build/chunky-"+versionName+".jar");
 	}
 
 	private void buildChunkyJar(String targetFile) {

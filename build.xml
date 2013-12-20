@@ -32,7 +32,7 @@
 	</target>
 
 	<target name="run" depends="dist">
-		<java fork="true" classpath="${build.dir}/Chunky.jar"
+		<java fork="true" classpath="${build.dir}/chunky.jar"
 			classname="se.llbit.chunky.launcher.ChunkyLauncher"/>
 	</target>
 
@@ -123,8 +123,12 @@
 			<arg value="${version}"/>
 			<arg value="release_notes-${version}.txt"/>
 		</java>
-		<copy file="${basedir}/dist/Chunky.nsi"
-			toFile="${basedir}/Chunky.nsi"
+		<!-- symlink to latest jar -->
+		<symlink overwrite="true"
+			link="${home}/chunky.jar"
+			resource="${build.dir}/chunky-core-${version}.jar"/>
+		<copy file="${home}/dist/Chunky.nsi"
+			toFile="${home}/Chunky.nsi"
 			overwrite="true">
 			<filterset>
 				<filter token="VERSION" value="${version}"/>
@@ -156,7 +160,7 @@
 				<include name="chunky.icns"/>
 			</resourcefileset>
 			<jarfileset dir="build">
-				<include name="Chunky.jar"/>
+				<include name="chunky.jar"/>
 			</jarfileset>
 		</jarbundler>
 	</target>
