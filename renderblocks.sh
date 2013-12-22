@@ -1,26 +1,33 @@
 #!/bin/bash
 
+set -e
+
 interrupted()
 {
-	echo
+    echo
     exit $?
 }
 
 trap interrupted SIGINT
 
 JAVA_OPTS="-Xmx12g -Xms512m"
+JAR="chunky.jar"
+LIB="chunky/lib"
+CLASSPATH="$JAR:$LIB/j99.jar:$LIB/JOCL-0.1.7.jar:$LIB/log4j-1.2.17.jar:$LIB/commons-math3-3.2.jar"
+BLOCKS=( 17:0 17:1 17:2 17:3 162:0 162:1 37 38:0 38:1 38:2 38:3 38:4 38:5 38:6 38:7 38:8 )
 
-if ant -Ddebug=true build; then
-	if [ ! -d test ]; then
-		mkdir test
-	fi
+if ant -Ddebug=true dist; then
+    if [ ! -e "$JAR" ]; then
+        echo "Could not find $JAR!"
+        exit 1
+    fi
+    if [ ! -d "test" ]; then
+        mkdir test
+    fi
 
-	cd test
-
-	for (( ID=1; ID <= 158; ID++ )); do
-		
-		echo Block $ID
-    	java $JAVA_OPTS -cp ../bin:../lib/j99.jar:../lib/JOCL-0.1.7.jar:../lib/log4j-1.2.17.jar \
-			se.llbit.chunky.main.BlockTestRenderer $ID -o block$ID.png > /dev/null
-	done
+    for ID in "${BLOCKS[@]}"; do
+        echo Block $ID
+        java $JAVA_OPTS -cp $CLASSPATH se.llbit.chunky.main.BlockTestRenderer \
+            $ID -o "test/block$ID.png" > /dev/null
+    done
 fi
