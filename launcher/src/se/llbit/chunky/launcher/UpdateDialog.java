@@ -95,7 +95,6 @@ public class UpdateDialog extends JDialog {
 					return;
 				}
 				try {
-					// TODO add the new version info to local installs
 					File versionFile = new File(versionsDir, version.name + ".json");
 					version.writeTo(versionFile);
 					SwingUtilities.invokeLater(new Runnable() {
@@ -280,11 +279,29 @@ public class UpdateDialog extends JDialog {
 				downloadBytes += lib.size;
 			}
 
+			// pretty print library size
+			float size = lib.size;
+			String unit = "B";
+			if (size >= 1024*1024) {
+				size /= 1024*1024;
+				unit = "MiB";
+			} else if (size >= 1024) {
+				size /= 1024;
+				unit = "KiB";
+			}
+			String libSize;
+			if (size >= 10) {
+				libSize = String.format("%d %s", (int) size, unit);
+			} else {
+				libSize = String.format("%.1f %s", size, unit);
+			}
+
 			tableModel.setValueAt(lib, i, 0);
 			tableModel.setValueAt(libStatus, i, 1);
+			tableModel.setValueAt(libSize, i, 2);
 			i += 1;
 		}
-		tableModel.setColumnIdentifiers(new String[] { "Library", "Status" });
+		tableModel.setColumnIdentifiers(new String[] { "Library", "Status", "Size" });
 		final StatusCellRenderer statusRenderer = new StatusCellRenderer();
 		status = new JTable(tableModel) {
 			@Override
