@@ -34,6 +34,8 @@ public interface BlockData {
 	int RSW_SOUTH_SIDE = 19;
 	int VINE_TOP = 12;
 
+	int GLASS_PANE_OFFSET = 12;
+
 	/**
 	 * The water block has a lily pad floating on it
 	 */

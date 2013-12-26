@@ -428,32 +428,36 @@ public class OctreeFinalizer {
 					case Block.IRONBARS_ID:
 						other = Block.get(octree.get(x, cy, z - 1));
 						if (other.isIronBarsConnector())
-							type |= 1 << 8;
+							type |= 1 << BlockData.OFFSET;
 						other = Block.get(octree.get(x, cy, z + 1));
 						if (other.isIronBarsConnector())
-							type |= 2 << 8;
+							type |= 2 << BlockData.OFFSET;
 						other = Block.get(octree.get(x + 1, cy, z));
 						if (other.isIronBarsConnector())
-							type |= 4 << 8;
+							type |= 4 << BlockData.OFFSET;
 						other = Block.get(octree.get(x - 1, cy, z));
 						if (other.isIronBarsConnector())
-							type |= 8 << 8;
+							type |= 8 << BlockData.OFFSET;
 						octree.set(type, x, cy, z);
 						break;
 					case Block.GLASSPANE_ID:
 					case Block.STAINED_GLASSPANE_ID:
 						other = Block.get(octree.get(x, cy, z - 1));
-						if (other.isGlassPaneConnector())
-							type |= 1 << 8;
+						if (other.isGlassPaneConnector()) {
+							type |= 1 << BlockData.GLASS_PANE_OFFSET;
+						}
 						other = Block.get(octree.get(x, cy, z + 1));
-						if (other.isGlassPaneConnector())
-							type |= 2 << 8;
+						if (other.isGlassPaneConnector()) {
+							type |= 2 << BlockData.GLASS_PANE_OFFSET;
+						}
 						other = Block.get(octree.get(x + 1, cy, z));
-						if (other.isGlassPaneConnector())
-							type |= 4 << 8;
+						if (other.isGlassPaneConnector()) {
+							type |= 4 << BlockData.GLASS_PANE_OFFSET;
+						}
 						other = Block.get(octree.get(x - 1, cy, z));
-						if (other.isGlassPaneConnector())
-							type |= 8 << 8;
+						if (other.isGlassPaneConnector()) {
+							type |= 8 << BlockData.GLASS_PANE_OFFSET;
+						}
 						octree.set(type, x, cy, z);
 						break;
 					case Block.STONEWALL_ID:

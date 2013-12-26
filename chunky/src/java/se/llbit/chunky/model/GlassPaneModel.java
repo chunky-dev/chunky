@@ -17,6 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
@@ -88,7 +89,7 @@ public class GlassPaneModel {
 	}
 
 	public static boolean intersect(Ray ray, Texture texture, Texture sideTexture) {
-		int metadata = ray.getBlockData();
+		int metadata = 0xF & (ray.currentMaterial >> BlockData.GLASS_PANE_OFFSET);
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < 4; ++i) {
