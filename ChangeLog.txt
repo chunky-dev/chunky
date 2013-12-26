@@ -1,4 +1,6 @@
 1.2.0 - TBD
+    * Added new icons in the Render Controls dialog
+    * Changed the title of the "HALT" button to "RESET"
     * Added stained glass panes
     * Pressing return in the scene name field now saves the scene
     * Added large flowers

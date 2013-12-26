@@ -467,6 +467,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		});
 
 		startRenderBtn.setText("START");
+		startRenderBtn.setIcon(Icon.play.createIcon());
 		startRenderBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -506,11 +507,11 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 
-		stopRenderBtn.setText("HALT");
+		stopRenderBtn.setText("RESET");
+		stopRenderBtn.setIcon(Icon.stop.createIcon());
 		stopRenderBtn.setToolTipText("<html>Warning: this will discard the " +
 				"current rendered image!<br>Make sure to save your image " +
 				"before stopping the renderer!");
-		stopRenderBtn.setForeground(Color.red);
 		stopRenderBtn.setEnabled(false);
 		stopRenderBtn.addActionListener(new ActionListener() {
 			@Override
@@ -812,6 +813,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JPanel buildGeneralPane() {
 		JLabel widthLbl = new JLabel("Canvas width: ");
 		JLabel heightLbl = new JLabel("Canvas height: ");
+		JLabel canvasSizeLbl = new JLabel("<html>Note: Actual image size may not be<br>the same as the window size!");
 
 		widthField.setColumns(10);
 		widthField.addActionListener(canvasSizeListener);
@@ -949,6 +951,8 @@ public class RenderControls extends JDialog implements ViewListener,
 						.addComponent(widthField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(heightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 					)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(canvasSizeLbl)
 				)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(setCanvasSizeBtn)
@@ -987,13 +991,18 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(widthLbl)
-				.addComponent(widthField)
-			)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(heightLbl)
-				.addComponent(heightField)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(canvasSizeLbl)
+				.addGroup(layout.createSequentialGroup()
+					.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(widthLbl)
+						.addComponent(widthField)
+					)
+					.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(heightLbl)
+						.addComponent(heightField)
+					)
+				)
 			)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
@@ -2309,13 +2318,18 @@ public class RenderControls extends JDialog implements ViewListener,
 			lock = true;
 			if (paused) {
 				startRenderBtn.setText("RESUME");
+				startRenderBtn.setIcon(Icon.play.createIcon());
 			} else {
 				startRenderBtn.setText("PAUSE");
+				startRenderBtn.setIcon(Icon.pause.createIcon());
 			}
 			stopRenderBtn.setEnabled(true);
+			stopRenderBtn.setForeground(Color.red);
 		} else {
 			startRenderBtn.setText("START");
+			startRenderBtn.setIcon(Icon.play.createIcon());
 			stopRenderBtn.setEnabled(false);
+			stopRenderBtn.setForeground(Color.black);
 		}
 		if (lock && autoLock.isSelected()) {
 			lockControls();
