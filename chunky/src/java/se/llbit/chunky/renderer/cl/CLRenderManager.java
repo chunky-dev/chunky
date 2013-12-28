@@ -38,10 +38,7 @@ import java.awt.image.DataBufferInt;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -68,25 +65,7 @@ import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
-import se.llbit.j99.castor.Symbol;
-import se.llbit.j99.fragment.CommentFragmenter;
-import se.llbit.j99.fragment.CompositeFragment;
-import se.llbit.j99.fragment.FragmentReader;
-import se.llbit.j99.fragment.IFragment;
-import se.llbit.j99.fragment.IFragmenter;
-import se.llbit.j99.fragment.LineFragment;
-import se.llbit.j99.fragment.LineFragmenter;
-import se.llbit.j99.fragment.LineSplicer;
-import se.llbit.j99.fragment.TrigraphReplacer;
-import se.llbit.j99.pp.Identifier;
-import se.llbit.j99.pp.Macro;
-import se.llbit.j99.pp.ObjMacro;
-import se.llbit.j99.pp.PPState;
-import se.llbit.j99.pp.PPVisitor;
-import se.llbit.j99.pp.SourceFile;
-import se.llbit.j99.pp.StringLit;
-import se.llbit.j99.problem.CompileProblem;
-import se.llbit.j99.util.DirectiveParser;
+import se.llbit.j99.pp.PP;
 import se.llbit.math.Color;
 import se.llbit.math.Matrix3d;
 import se.llbit.math.Octree;
@@ -245,38 +224,10 @@ public class CLRenderManager extends Thread implements Renderer,
 			}
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-			ArrayList<CompileProblem> problems = new ArrayList<CompileProblem>();
-			IFragmenter fragmenter = new CommentFragmenter(new LineSplicer(new TrigraphReplacer(
-							new LineFragmenter(resourceName, in))), problems);
-
-			PPState state = new PPState();
-			state.setProblemCollection(problems);
-			state.setIncludeDirs(new LinkedList<String>());
-			// predefined macros
-			// TODO: these need to be attached to the root tree
-			state.define(new Identifier("_WIN32_"),
-					new ObjMacro(new Identifier("_WIN32_"),
-					new se.llbit.j99.pp.List<se.llbit.j99.pp.Token>()));
-			state.define(new Identifier("AMBIENT_OCCLUSION"),
-					new ObjMacro(new Identifier("AMBIENT_OCCLUSION"),
-					new se.llbit.j99.pp.List<se.llbit.j99.pp.Token>()));
-			/*state.define(new Identifier("RNGTEST"),
-					new ObjMacro(new Identifier("RNGTEST"),
-					new se.llbit.j99.pp.List<se.llbit.j99.pp.Token>()));*/
-
-			IFragment processed = preprocess(fragmenter, state, resourceName, basePath);
-
-			in.close();
-
-			CompileProblem.reportProblems(problems);
-			if (!CompileProblem.isCritical(problems)) {
-
-				Reader reader = new FragmentReader(processed);
-
-				while (reader.ready())
-					out.write((char)reader.read());
-				reader.close();
-				out.close();
+			PP pp = new PP();
+			pp.define("AMBIENT_OCCLUSION", "AMBIENT_OCCLUSION");
+			//pp.define("RNGTEST", "RNGTEST");
+			if (pp.preprocess(resourceName, basePath, in, out, System.err)) {
 				String kernel = new String(out.toByteArray());
 				return kernel;
 			}
@@ -288,22 +239,6 @@ public class CLRenderManager extends Thread implements Renderer,
 		}
 
 		return null;
-	}
-
-	private static IFragment preprocess(IFragmenter in, PPState state, String fn, String basePath) {
-		Identifier name = new Identifier("__FILE__");
-		StringLit filename = new StringLit("\""+fn+"\"");
-		name.setToken(new Symbol(new LineFragment("@j99", 0, 0, "__FILE__")));
-		filename.setToken(new Symbol(new LineFragment("@j99", 0, 0, "\""+fn+"\"")));
-		Macro fileMacro = new ObjMacro(name,
-				new se.llbit.j99.pp.List<se.llbit.j99.pp.Token>().add(filename));// TODO: this needs to be attached to the root tree
-		state.define(name, fileMacro);
-
-		DirectiveParser parser = new DirectiveParser(in, state);
-		SourceFile root = parser.parse();
-		PPVisitor visitor = new PPVisitor(state, basePath);
-		root.accept(visitor);
-		return new CompositeFragment(visitor.getResult());
 	}
 
 	@Override

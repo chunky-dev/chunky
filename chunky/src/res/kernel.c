@@ -290,7 +290,7 @@ __kernel void path_trace(
 	float3 light = 0;
 	float3 attenuation = 1;
 #ifdef AMBIENT_OCCLUSION
-	while (
+	while (1) {
 	
 		uint material = intersect(octree, depth, &d, &o, &n);
 		
