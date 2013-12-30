@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
@@ -42,6 +43,7 @@ public class ReleaseBuilder {
 	static final String LIB_BIN = "lib/ant-bin";
 	private final String versionName;
 	private final String notes;
+	private static final String SYS_NL = System.getProperty("line.separator");
 
 	private final Set<String> jarDirs = new HashSet<String>();
 
@@ -59,12 +61,16 @@ public class ReleaseBuilder {
 		}
 		String versionName = args[0];
 
-		String changeLog = readChangeLog(args[1]);
+		String releaseNotes = readReleaseNotes(args[1]);
+		String changeLog = readChangeLog("ChangeLog.txt");
+		if (!changeLog.isEmpty()) {
+			releaseNotes += SYS_NL + "Changes:" + SYS_NL + changeLog;
+		}
 
-		new ReleaseBuilder(versionName, changeLog).buildChunkJar();
+		new ReleaseBuilder(versionName, releaseNotes).buildChunkJar();
 	}
 
-	private static String readChangeLog(String path) {
+	private static String readReleaseNotes(String path) {
 		try {
 			File file = new File(path);
 			FileInputStream in = new FileInputStream(file);
@@ -73,19 +79,42 @@ public class ReleaseBuilder {
 			in.close();
 			return new String(data, "UTF-8");
 		} catch (IOException e) {
-			System.err.println("WARNING: Failed to load ChangeLog! " + e.getMessage());
+			System.err.println("WARNING: Failed to read release notes! " + e.getMessage());
+			System.err.println("WARNING: Release notes will be empty!");
+		}
+		return "";
+	}
+
+	private static String readChangeLog(String path) {
+		try {
+			File file = new File(path);
+			Scanner in = new Scanner(new FileInputStream(file));
+			in.nextLine();
+			StringBuilder sb = new StringBuilder();
+			while (in.hasNextLine()) {
+				String line = in.nextLine();
+				if (line.isEmpty()) {
+					break;
+				}
+				sb.append(line);
+				sb.append(SYS_NL);
+			}
+			in.close();
+			return sb.toString();
+		} catch (IOException e) {
+			System.err.println("WARNING: Failed to read ChangeLog! " + e.getMessage());
 			System.err.println("WARNING: ChangeLog will be empty!");
 		}
 		return "";
 	}
 
 	private static void printHelp() {
-		System.out.println("Usage: ReleaseBuilder <version name> <ChangeLog file>");
+		System.out.println("Usage: ReleaseBuilder <version name> <release notes file>");
 	}
 
-	public ReleaseBuilder(String versionName, String changeLog) {
+	public ReleaseBuilder(String versionName, String releaseNotes) {
 		this.versionName = versionName;
-		this.notes = changeLog;
+		this.notes = releaseNotes;
 	}
 
 	private void buildChunkJar() {

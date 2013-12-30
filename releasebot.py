@@ -1,6 +1,11 @@
 # coding=utf-8
-# Releasebot Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+# Releasebot Copyright (c) 2013 Jesper Ã–qvist <jesper@llbit.se>
+
 # requires PRAW, Launchpadlib
+
+# Release Candidates are not built by this script!
+# Snapshots are currently built by proprietary script
+
 import sys
 import praw
 import re
@@ -33,19 +38,30 @@ class Version:
 		if self.suffix.startswith('rc.'):
 			self.rc = self.suffix[3:]
 		else:
-			self.release_notes = open("release_notes-%s.txt" % self.milestone, 'r').read()
+			notes_fn = "release_notes-%s.txt" % self.milestone
+			try:
+				with open(notes_fn, 'r') as f:
+					self.release_notes = f.read()
+			except:
+				print "Error: release_notes not found!"
+				print "Please edit release_notes-%s.txt!" % self.milestone
+				sys.exit(1)
 
-		# load changelog
-		lines = open('ChangeLog.txt', 'r').readlines().__iter__()
-		while True:
-			next = lines.next()
-			if not next or next.startswith(self.milestone):
-				break
-		for line in lines:
-			if not line or not line.strip():
-				break
-			else:
-				self.changelog += line
+		try:
+			# load changelog
+			with open("ChangeLog.txt", 'r') as f:
+				f.readline() # skip version line
+				while True:
+					line = f.readline()
+					if not line.rstrip(): break
+					self.changelog += line
+		except:
+			print "Error: could not read ChangeLog!"
+			sys.exit(1)
+
+		if not self.changelog:
+			print "Error: ChangeLog is empty!"
+			sys.exit(1)
 
 def publish(version):
 	should_build = raw_input('Build release? [y/n] ')
@@ -56,70 +72,17 @@ def publish(version):
 		if call(['makensis', 'Chunky.nsi']) is not 0:
 			print "Error: NSIS failed!"
 			sys.exit(1)
+		if call(['git', 'archive',
+			'--output=build/chunky-%s.tar.gz'%version.full,
+			'--prefix=chunky-%s/'%version.full,
+			version.full]) is not 0:
+			print "Error: git archiving failed!"
+			sys.exit(1)
 	should_publish = raw_input('Publish files? [y/n] ')
 	if should_publish == "y":
-		if version.rc:
-			zip_url = publish_rc()
-			post_rc_thread(version, zip_url)
-		else:
+		if not version.rc:
 			(new_release, exe_url, zip_url) = publish_release(version)
 			post_release_thread(version, exe_url, zip_url)
-
-def publish_rc():
-	# TODO automatic dropbox or FTP upload
-	return raw_input('Release candidate zip file URL: ')
-
-def post_rc_thread(version, zip_url):
-	should_post = raw_input('Post RC thread? [y/n] ')
-	if should_post != "y":
-		return
-	r = praw.Reddit(user_agent='releasebot')
-	pw = getpass(prompt='releasebot login: ')
-	r.login('releasebot', pw)
-	post = r.submit('chunky', 'Chunky %s Release Candidate %s' % (version.full, version.rc),
-		text=(
-('''Release candidates are a way of letting experienced users try out a new
-version before it is officially released in order to provide feedback. The
-goal is to improve the quality of the official releases. If you are at all
-unsure of what you are doing please wait for the proper release.
-
-If you decide to try this release candidate and find a bug, please report it
-in this thread or over at [the GitHub issue tracker](https://github.com/llbit/chunky/issues).
-
-* ** Please back up your renders before using this software! **
-* Always read the change log before running a release candidate!
-
-[Download link.](%s)
-
-###ChangeLog
-
-''' % zip_url) + version.changelog))
-	post.set_flair('announcement', 'announcement')
-	print "Submitted Reddit release thread!"
-
-def lp_upload_file(version, release, filename, description, content_type, file_type):
-	# TODO handle re-uploads
-	FILE_TYPES = dict(
-		tarball='Code Release Tarball',
-		readme='README File',
-		release_notes='Release Notes',
-		changelog='ChangeLog File',
-		installer='Installer file')
-	print "Uploading %s..." % filename
-	try:
-		release_file = release.add_file(
-			filename=filename,
-			description=description,
-			file_content=open('build/' + filename, 'rb').read(),
-			content_type=content_type,
-			file_type=FILE_TYPES[file_type])
-		return 'https://launchpad.net/chunky/%s/%s/+download/%s' \
-			% (version.series, version.milestone, filename)
-	except:
-		exc_type, exc_value, exc_traceback = sys.exc_info()
-		print "File upload error:"
-		traceback.print_exception(exc_type, exc_value, exc_traceback)
-		return None
 
 def publish_release(version):
 	launchpad = Launchpad.login_with('Releasebot', 'production', 'lpcache')
@@ -163,7 +126,6 @@ def publish_release(version):
 			print "Milestone %s created." % version.milestone
 
 		# create release
-		print "TODO: include proper changelog and release notes"
 		release = milestone.createProductRelease(
 			release_notes=version.release_notes,
 			changelog=version.changelog,
@@ -203,7 +165,7 @@ def publish_release(version):
 	print exe_url
 	return (is_new_release, exe_url, zip_url)
 
-"post a reddit release thread"
+"post reddit release thread"
 def post_release_thread(version, exe_url, zip_url):
 	should_post = raw_input('Post release thread? [y/n] ')
 	if should_post != "y":
@@ -228,7 +190,7 @@ def post_release_thread(version, exe_url, zip_url):
 	print "Submitted Reddit release thread!"
 
 version = Version(raw_input('Enter version: '))
-print "Releasebot is now publishing Chunky " + version.full
+print "Ready to build version %s" + version.full
 try:
 	publish(version)
 	should_push = raw_input('All done. Push git changes? [y/n] ')

@@ -1,4 +1,4 @@
-1.2.0 - TBD
+1.2.0 - 2013-12-30
     * Added new icons in the Render Controls dialog
     * Changed the title of the "HALT" button to "RESET"
     * Added stained glass panes

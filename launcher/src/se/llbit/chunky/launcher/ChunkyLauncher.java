@@ -61,7 +61,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame {
 
-	private static final String LAUNCHER_VERSION = "beta 3";
+	private static final String LAUNCHER_VERSION = "v1.0";
 
 	public class UpdateThread extends Thread {
 		@Override public void run() {
@@ -580,50 +580,58 @@ public class ChunkyLauncher extends JFrame {
 		LauncherSettings settings = new LauncherSettings();
 		settings.load();
 
-		if (args.length > 0) {
-			// If there are command line arguments then we assume that Chunky
-			// should run in headless mode, unless the --nolauncher command is found
-			// in which case we strip that and start regularly, but without launcher
+		/*
+		 * If there are command line arguments then we assume that Chunky should run
+		 * in headless mode, unless the --nolauncher command is present in which case
+		 * we strip that and start regularly, but without launcher. The --launcher
+		 * option overrides everything else and forces the launcher to appear.
+		 */
 
-			settings.chunkyOptions = "";
-			boolean headless = true;
+		boolean forceLauncher = false;
+		boolean headless = false;
+		String headlessOptions = "";
+
+		if (args.length > 0) {
+			headless = true;
 			for (String arg: args) {
 				if (arg.equals("--nolauncher")) {
 					headless = false;
+				} else if (arg.equals("--launcher")) {
+					forceLauncher = true;
 				} else {
-					if (!settings.chunkyOptions.isEmpty()) {
-						settings.chunkyOptions += " ";
+					if (!headlessOptions.isEmpty()) {
+						headlessOptions += " ";
 					}
-					settings.chunkyOptions += arg;
+					headlessOptions += arg;
 				}
 			}
-			if (headless) {
-				settings.debugConsole = true;
-				settings.headless = true;
-			}
+		}
+
+		if (forceLauncher) {
+			headless = false;
+		}
+
+		if (headless) {
+			settings.debugConsole = true;
+			settings.headless = true;
+			settings.chunkyOptions = headlessOptions;
 			ChunkyDeployer deployer = new ChunkyDeployer();
 			deployer.deploy();
 			deployer.launchChunky(null, settings);
 		} else {
-
-			// Create UI in the event dispatch thread
+			// Set up Look and Feel
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				UIManager.put("Slider.paintValue", Boolean.FALSE);
 			} catch (Exception e) {
 				System.out.println("Failed to set native Look and Feel");
 			}
+		}
 
-			if (firstTimeSetup()) {
-
-				ChunkyDeployer deployer = new ChunkyDeployer();
-				if (!settings.showLauncher) {
-					if (deployer.launchChunky(null, settings)) {
-						return;
-					} else {
-						// fall through to default launcher
-					}
-				}
+		if (firstTimeSetup()) {
+			ChunkyDeployer deployer = new ChunkyDeployer();
+			if (forceLauncher || settings.showLauncher ||
+				!deployer.launchChunky(null, settings)) {
 
 				deployer.deploy();
 				JFrame launcher = new ChunkyLauncher(deployer, settings);
