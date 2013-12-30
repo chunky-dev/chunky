@@ -24,7 +24,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
@@ -64,7 +63,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame {
 
-	private static final String LAUNCHER_VERSION = "v1.1";
+	private static final String LAUNCHER_VERSION = "v1.2";
 
 	public class UpdateThread extends Thread {
 		@Override public void run() {
@@ -99,7 +98,7 @@ public class ChunkyLauncher extends JFrame {
 			candidates.add(getVersion("http://chunkyupdate.llbit.se/latest.json"));
 
 			if (settings.downloadSnapshots) {
-				candidates.add(getVersion("http://chunkyupdate.llbit.se/latest.json"));
+				candidates.add(getVersion("http://chunkyupdate.llbit.se/snapshot.json"));
 			}
 
 			// filter out corrupt versions
@@ -115,20 +114,18 @@ public class ChunkyLauncher extends JFrame {
 						"The downloaded version info was corrupt. Can not update at this moment.");
 				return false;
 			} else {
-				// find latest non-installed version
-				List<VersionInfo> versions = ChunkyDeployer.availableVersions();
-				VersionInfo latest = null;
-				if (!versions.isEmpty()) {
-					latest = versions.get(0);
-				}
+				// find latest candidate
+				VersionInfo latest = candidates.get(0);
 				for (VersionInfo candidate: candidates) {
-					if ((!versions.contains(candidate) || !ChunkyDeployer.checkVersionIntegrity(candidate.name)) &&
-						(latest == null || candidate.compareTo(latest) > 0)) {
+					if (candidate.compareTo(latest) < 0) {
 						latest = candidate;
 					}
 				}
-				if (latest != null && (versions.isEmpty() || latest != versions.get(0))) {
-					// install the latest released candidate
+
+				// check if candidate is already installed
+				List<VersionInfo> versions = ChunkyDeployer.availableVersions();
+				if (!versions.contains(latest) || !ChunkyDeployer.checkVersionIntegrity(latest.name)) {
+					// candidate not already installed - install it!
 					UpdateDialog dialog = new UpdateDialog(ChunkyLauncher.this, latest);
 					dialog.setVisible(true);
 					return true;
@@ -165,7 +162,7 @@ public class ChunkyLauncher extends JFrame {
 	private final JCheckBox showAdvancedSettingsCB = new JCheckBox("Show advanced settings");
 
 	private final Object updateLock = new Object();
-	private boolean isBusy = false;
+	private volatile boolean isBusy = false;
 
 	private final Adjuster memoryLimitAdjuster = new Adjuster("Memory limit (MiB)",
 			"<html>Maximum Java heap space in megabytes (MiB)<br>"
@@ -199,27 +196,36 @@ public class ChunkyLauncher extends JFrame {
 		buildUI();
 	}
 
+	/**
+	 * Set the busy indicator
+	 * @param busy
+	 */
 	public void setBusy(final boolean busy) {
 		synchronized (updateLock) {
 			isBusy = busy;
-			try {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					@Override
-					public void run() {
-						busyLbl.setVisible(busy);
-					}
-				});
-			} catch (InterruptedException e) {
-			} catch (InvocationTargetException e) {
-			}
 		}
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				busyLbl.setVisible(isBusy);
+			}
+		});
 	}
 
+	/**
+	 * Set the busy indicator on Event Dispatch Thread.
+	 * @param busy
+	 */
 	public void setBusyEDT(final boolean busy) {
 		synchronized (updateLock) {
 			isBusy = busy;
-			busyLbl.setVisible(busy);
 		}
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				busyLbl.setVisible(isBusy);
+			}
+		});
 	}
 
 	private void buildUI() {

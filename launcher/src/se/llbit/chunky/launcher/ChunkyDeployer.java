@@ -84,7 +84,7 @@ public class ChunkyDeployer {
 					System.err.println("Library MD5 checksum mismatch");
 					return false;
 				case MISSING:
-					System.err.println("Missing library");
+					System.err.println("Missing library " + lib.name);
 					return false;
 				default:
 					break;
