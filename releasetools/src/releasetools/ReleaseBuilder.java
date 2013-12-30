@@ -64,7 +64,10 @@ public class ReleaseBuilder {
 		String releaseNotes = readReleaseNotes(args[1]);
 		String changeLog = readChangeLog("ChangeLog.txt");
 		if (!changeLog.isEmpty()) {
-			releaseNotes += SYS_NL + "Changes:" + SYS_NL + changeLog;
+			if (!releaseNotes.isEmpty()) {
+				releaseNotes += SYS_NL + SYS_NL;
+			}
+			releaseNotes += "Changes:" + SYS_NL + changeLog;
 		}
 
 		new ReleaseBuilder(versionName, releaseNotes).buildChunkJar();

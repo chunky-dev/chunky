@@ -242,7 +242,7 @@ public class UpdateDialog extends JDialog {
 
 		JLabel infoLbl = new JLabel(
 				"<html>A new version of Chunky is available for download!<br>" +
-				"<br>Version " + version.name + ", released on " + version.date() +
+				"<br>Version <b>" + version.name + "</b>, released on " + version.date() +
 				"<br>Release notes:");
 
 		okBtn = new JButton("Update to New Version");

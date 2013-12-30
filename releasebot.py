@@ -6,6 +6,7 @@
 # Release Candidates are not built by this script!
 # Snapshots are currently built by proprietary script
 
+import json
 import sys
 import praw
 import re
@@ -64,28 +65,50 @@ class Version:
 			sys.exit(1)
 
 def publish(version):
-	should_build = raw_input('Build release? [y/n] ')
-	if should_build == "y":
+	if raw_input('Build release? [y/n] ') == "y":
 		if call(['cmd', '/c', 'ant', '-Dversion=' + version.full, 'release']) is not 0:
 			print "Error: Ant build failed!"
 			sys.exit(1)
 		if call(['makensis', 'Chunky.nsi']) is not 0:
 			print "Error: NSIS failed!"
 			sys.exit(1)
-		if call(['git', 'archive',
-			'--output=build/chunky-%s.tar.gz'%version.full,
-			'--prefix=chunky-%s/'%version.full,
-			version.full]) is not 0:
-			print "Error: git archiving failed!"
-			sys.exit(1)
-	should_publish = raw_input('Publish files? [y/n] ')
-	if should_publish == "y":
-		if not version.rc:
-			(new_release, exe_url, zip_url) = publish_release(version)
+	if not version.rc and raw_input('Publish files? [y/n] ') == "y":
+		(is_new, exe_url, zip_url, jar_url) = publish_release(version)
+		patch_url(version, jar_url)
+		if raw_input('Post release thread? [y/n] ') == "y":
 			post_release_thread(version, exe_url, zip_url)
 
+def lp_upload_file(version, release, filename, description, content_type, file_type):
+	# TODO handle re-uploads
+	FILE_TYPES = dict(
+		tarball='Code Release Tarball',
+		readme='README File',
+		release_notes='Release Notes',
+		changelog='ChangeLog File',
+		installer='Installer file')
+	print "Uploading %s..." % filename
+	try:
+		release_file = release.add_file(
+			filename=filename,
+			description=description,
+			file_content=open('build/' + filename, 'rb').read(),
+			content_type=content_type,
+			file_type=FILE_TYPES[file_type])
+		return 'https://launchpad.net/chunky/%s/%s/+download/%s' \
+			% (version.series, version.milestone, filename)
+	except:
+		exc_type, exc_value, exc_traceback = sys.exc_info()
+		print "File upload error:"
+		traceback.print_exception(exc_type, exc_value, exc_traceback)
+		return None
+
 def publish_release(version):
-	launchpad = Launchpad.login_with('Releasebot', 'production', 'lpcache')
+	if raw_input('Publish to production? [y/n] ') == "y":
+		server = 'production'
+	else:
+		server = 'staging'
+
+	launchpad = Launchpad.login_with('Releasebot', server, 'lpcache')
 
 	chunky = launchpad.projects['chunky']
 
@@ -136,6 +159,15 @@ def publish_release(version):
 	assert release is not None
 
 	# upload release files
+	jar_url = lp_upload_file(
+		version,
+		release,
+		'chunky-core-%s.jar' % version.full,
+		'Core Library',
+		'application/java-archive',
+		'installer')
+	assert jar_url
+	print jar_url
 	tarball_url = lp_upload_file(
 		version,
 		release,
@@ -163,13 +195,10 @@ def publish_release(version):
 		'installer')
 	assert exe_url
 	print exe_url
-	return (is_new_release, exe_url, zip_url)
+	return (is_new_release, exe_url, zip_url, jar_url)
 
 "post reddit release thread"
 def post_release_thread(version, exe_url, zip_url):
-	should_post = raw_input('Post release thread? [y/n] ')
-	if should_post != "y":
-		return
 	r = praw.Reddit(user_agent='releasebot')
 	pw = getpass(prompt='releasebot login: ')
 	r.login('releasebot', pw)
@@ -178,6 +207,7 @@ def post_release_thread(version, exe_url, zip_url):
 
 * [Windows installer](%s)
 * [Cross-platform binaries](%s)
+* [Only launcher (win, mac, linux)](http://chunkyupdate.llbit.se/ChunkyLauncher.jar)
 
 ###Release Notes
 
@@ -189,12 +219,39 @@ def post_release_thread(version, exe_url, zip_url):
 	post.set_flair('announcement', 'announcement')
 	print "Submitted Reddit release thread!"
 
-version = Version(raw_input('Enter version: '))
-print "Ready to build version %s" + version.full
+"patch url into latest.json"
+def patch_url(version, url):
+	print "Patching latest.json"
+	j = None
+	with open('latest.json', 'r') as f:
+		j = json.load(f)
+	if not j:
+		print 'Error: could not read latest.json'
+		sys.exit(1)
+	libs = j['libraries']
+	core_lib_name = 'chunky-core-%s.jar' % version.full
+	patched = False
+	for lib in libs:
+		if lib['name'] == core_lib_name:
+			lib['url'] = url
+			patched = True
+			break
+	if not patched:
+		print 'Error: failed to patch url in latest.json: core lib not found!'
+		sys.exit(1)
+	with open('latest.json', 'w') as f:
+		json.dump(j, f)
+
+### MAIN
+if len(sys.argv) > 1:
+	version = Version(sys.argv[1])
+else:
+	version = Version(raw_input('Enter version: '))
+
+print "Ready to build version %s!" % version.full
 try:
 	publish(version)
-	should_push = raw_input('All done. Push git changes? [y/n] ')
-	if should_push == "y":
+	if raw_input('All done. Push git changes? [y/n] ') == "y":
 		call(['git', 'push', 'origin', 'master'])# push version bump commit
 		call(['git', 'push', 'origin', version.full])# push version tag
 except:

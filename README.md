@@ -68,7 +68,7 @@ Hacking on Chunky
 Chunky is split into four projects:
 
 * **chunky** - main Chunky project
-* **lib** - common code required by Chunky and the launcher
+* **lib** - common code required by the other projects
 * **launcher** - the launcher
 * **releasetools** - Ant task for building releases
 

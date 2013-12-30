@@ -25,6 +25,13 @@ RequestExecutionLevel admin
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 
+  !define MUI_FINISHPAGE_NOAUTOCLOSE
+  !define MUI_FINISHPAGE_RUN
+  !define MUI_FINISHPAGE_RUN_NOTCHECKED
+  !define MUI_FINISHPAGE_RUN_TEXT "Start Chunky"
+  !define MUI_FINISHPAGE_RUN_FUNCTION "StartChunky"
+!insertmacro MUI_PAGE_FINISH
+
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 
@@ -73,6 +80,10 @@ Function .onInit
 
 FunctionEnd
 
+Function StartChunky
+  ExecShell "" "$SMPROGRAMS\Chunky\Chunky.lnk"
+FunctionEnd
+
 Section "Chunky (required)" SecChunky
 
   SectionIn RO
@@ -109,6 +120,7 @@ Section "Start Menu Shortcuts" SecSM
 
   ; Remove more memory shortcut
   Delete "$SMPROGRAMS\Chunky\Chunky (more memory).lnk"
+
   ; Launcher Shortcut
   CreateShortCut "$SMPROGRAMS\Chunky\Chunky (Launcher).lnk" "$JavaExe" "-jar $\"$INSTDIR\chunky.jar$\" --launcher" "$INSTDIR\chunky.ico"
 

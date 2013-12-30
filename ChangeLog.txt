@@ -1,4 +1,6 @@
 1.2.0 - 2013-12-30
+    * Reduced Chunky binary size by removing some redundancies
+    (Windows installer is now 3.8 megabytes, was 8.9)
     * Added new icons in the Render Controls dialog
     * Changed the title of the "HALT" button to "RESET"
     * Added stained glass panes
