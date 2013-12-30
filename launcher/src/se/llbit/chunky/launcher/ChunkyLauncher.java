@@ -27,6 +27,9 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.AbstractAction;
@@ -61,7 +64,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame {
 
-	private static final String LAUNCHER_VERSION = "v1.0";
+	private static final String LAUNCHER_VERSION = "v1.1";
 
 	public class UpdateThread extends Thread {
 		@Override public void run() {
@@ -91,30 +94,45 @@ public class ChunkyLauncher extends JFrame {
 		}
 
 		private boolean tryUpdate() throws IOException, SyntaxError {
-			VersionInfo version;
+			List<VersionInfo> candidates = new LinkedList<VersionInfo>();
+
+			candidates.add(getVersion("http://chunkyupdate.llbit.se/latest.json"));
 
 			if (settings.downloadSnapshots) {
-				version = getVersion("http://chunkyupdate.llbit.se/snapshot.json");
-				if (version.isValid() && (!ChunkyDeployer.availableVersions().contains(version) ||
-						!ChunkyDeployer.checkVersionIntegrity(version.name))) {
-					UpdateDialog dialog = new UpdateDialog(ChunkyLauncher.this, version);
-					dialog.setVisible(true);
-					return true;
+				candidates.add(getVersion("http://chunkyupdate.llbit.se/latest.json"));
+			}
+
+			// filter out corrupt versions
+			Iterator<VersionInfo> iter = candidates.iterator();
+			while (iter.hasNext()) {
+				if (!iter.next().isValid()) {
+					iter.remove();
 				}
 			}
 
-			version = getVersion("http://chunkyupdate.llbit.se/latest.json");
-			if (!version.isValid()) {
+			if (candidates.isEmpty()) {
 				Dialogs.error(ChunkyLauncher.this,
 						"The downloaded version info was corrupt. Can not update at this moment.");
 				return false;
-			}
-
-			if (!ChunkyDeployer.availableVersions().contains(version) ||
-					!ChunkyDeployer.checkVersionIntegrity(version.name)) {
-				UpdateDialog dialog = new UpdateDialog(ChunkyLauncher.this, version);
-				dialog.setVisible(true);
-				return true;
+			} else {
+				// find latest non-installed version
+				List<VersionInfo> versions = ChunkyDeployer.availableVersions();
+				VersionInfo latest = null;
+				if (!versions.isEmpty()) {
+					latest = versions.get(0);
+				}
+				for (VersionInfo candidate: candidates) {
+					if ((!versions.contains(candidate) || !ChunkyDeployer.checkVersionIntegrity(candidate.name)) &&
+						(latest == null || candidate.compareTo(latest) > 0)) {
+						latest = candidate;
+					}
+				}
+				if (latest != null && (versions.isEmpty() || latest != versions.get(0))) {
+					// install the latest released candidate
+					UpdateDialog dialog = new UpdateDialog(ChunkyLauncher.this, latest);
+					dialog.setVisible(true);
+					return true;
+				}
 			}
 			return false;
 		}
