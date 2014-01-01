@@ -1,4 +1,6 @@
 1.2.1 - TBD
+    * Added Acacia Slabs
+    * Added Dark Oak Slabs
     * Added Acacia Stairs
     * Added Dark Oak Stairs
 

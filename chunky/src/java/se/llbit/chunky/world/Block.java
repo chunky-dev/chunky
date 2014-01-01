@@ -752,27 +752,39 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
+		final Texture[][] tex = {
+			{ Texture.slabSide, Texture.slabTop },
+			{ Texture.sandstoneSide, Texture.sandstoneTop },
+			{ Texture.oakPlanks },
+			{ Texture.cobblestone },
+			{ Texture.brick },
+			{ Texture.stoneBrick },
+			{ Texture.netherBrick },
+			{ Texture.quartzSide, Texture.quartzTop },
+		};
+		final String[] slabKind = {
+			"stone",
+			"sandstone",
+			"wood",
+			"cobble",
+			"brick",
+			"stone brick",
+			"nether brick",
+			"quartz",
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			switch (ray.getBlockData() & 7) {
-			default: case 0:
-				return SlabModel.intersect(ray, Texture.slabSide, Texture.slabTop);
-			case 1:
-				return SlabModel.intersect(ray, Texture.sandstoneSide, Texture.sandstoneTop);
-			case 2:
-				return SlabModel.intersect(ray, Texture.oakPlanks);
-			case 3:
-				return SlabModel.intersect(ray, Texture.cobblestone);
-			case 4:
-				return SlabModel.intersect(ray, Texture.brick);
-			case 5:
-				return SlabModel.intersect(ray, Texture.stoneBrick);
-			case 6:
-				return SlabModel.intersect(ray, Texture.netherBrick);
-			case 7:
-				return SlabModel.intersect(ray, Texture.quartzSide, Texture.quartzTop);
+			Texture[] textures = tex[ray.getBlockData()&7];
+			if (textures.length > 1) {
+				return SlabModel.intersect(ray, textures[0], textures[1]);
+			} else {
+				return SlabModel.intersect(ray, textures[0]);
 			}
 		}
+		@Override
+		public String description(int data) {
+			return slabKind[data&7];
+		};
 	};
 	public static final Block BRICKS = new Block(0x2D, "Bricks", Texture.brick) {
 		{
@@ -1925,19 +1937,29 @@ public class Block {
 			isSolid = true;
 			localIntersect = true;
 		}
+		final Texture[] tex = {
+			Texture.oakPlanks,
+			Texture.sprucePlanks,
+			Texture.birchPlanks,
+			Texture.jungleTreePlanks,
+			Texture.acaciaPlanks,
+			Texture.darkOakPlanks,
+		};
+		final String[] woodKind = {
+			"oak",
+			"spruce",
+			"birch",
+			"jungle",
+			"acacia",
+			"dark oak",
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			switch (ray.getBlockData() & 7) {
-			case 1:
-				return TexturedBlockModel.intersect(ray, Texture.sprucePlanks);
-			case 2:
-				return TexturedBlockModel.intersect(ray, Texture.birchPlanks);
-			case 3:
-				return TexturedBlockModel.intersect(ray, Texture.jungleTreePlanks);
-			case 0:
-			default:
-				return TexturedBlockModel.intersect(ray, Texture.oakPlanks);
-			}
+			return TexturedBlockModel.intersect(ray, tex[ray.getBlockData() % 6]);
+		}
+		@Override
+		public String description(int data) {
+			return woodKind[data % 6];
 		}
 	};
 	public static final Block SINGLEWOODENSLAB = new Block(0x7E, "Single Wooden Slab", Texture.oakPlanks) {
@@ -1946,19 +1968,29 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
+		final Texture[] tex = {
+			Texture.oakPlanks,
+			Texture.sprucePlanks,
+			Texture.birchPlanks,
+			Texture.jungleTreePlanks,
+			Texture.acaciaPlanks,
+			Texture.darkOakPlanks,
+		};
+		final String[] woodKind = {
+			"oak",
+			"spruce",
+			"birch",
+			"jungle",
+			"acacia",
+			"dark oak",
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			switch (ray.getBlockData() & 7) {
-			case 1:
-				return SlabModel.intersect(ray, Texture.sprucePlanks, Texture.sprucePlanks);
-			case 2:
-				return SlabModel.intersect(ray, Texture.birchPlanks, Texture.birchPlanks);
-			case 3:
-				return SlabModel.intersect(ray, Texture.jungleTreePlanks, Texture.jungleTreePlanks);
-			case 0:
-			default:
-				return SlabModel.intersect(ray, Texture.oakPlanks, Texture.oakPlanks);
-			}
+			return SlabModel.intersect(ray, tex[(ray.getBlockData()&7) % 6]);
+		}
+		@Override
+		public String description(int data) {
+			return woodKind[(data&7) % 6];
 		}
 	};
 	public static final int COCOAPLANT_ID = 0x7F;
