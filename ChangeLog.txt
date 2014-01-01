@@ -1,4 +1,7 @@
 1.2.1 - TBD
+    * Trapped chests now use trapped chest textures
+    * Double trapped chests now appear as they should (rather than two single
+    chests)
     * Added Acacia Slabs
     * Added Dark Oak Slabs
     * Added Acacia Stairs

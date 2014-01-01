@@ -30,13 +30,38 @@ import se.llbit.chunky.resources.Texture;
  */
 public class LargeChestTexture extends TextureRef {
 	private final String file;
+	private final Texture left;
+	private final Texture topLeft;
+	private final Texture topRight;
+	private final Texture frontLeft;
+	private final Texture frontRight;
+	private final Texture bottomLeft;
+	private final Texture right;
+	private final Texture bottomRight;
+	private final Texture backLeft;
+	private final Texture backRight;
 
 	/**
 	 * Constructor
 	 * @param file
 	 */
-	public LargeChestTexture(String file) {
+	public LargeChestTexture(String file,
+			Texture left, Texture right,
+			Texture topLeft, Texture topRight,
+			Texture frontLeft, Texture frontRight,
+			Texture bottomLeft, Texture bottomRight,
+			Texture backLeft, Texture backRight) {
 		this.file = file;
+		this.left = left;
+		this.right = right;
+		this.topLeft = topLeft;
+		this.topRight = topRight;
+		this.frontLeft = frontLeft;
+		this.frontRight = frontRight;
+		this.bottomLeft = bottomLeft;
+		this.bottomRight = bottomRight;
+		this.backLeft = backLeft;
+		this.backRight = backRight;
 	}
 
 	@Override
@@ -51,16 +76,16 @@ public class LargeChestTexture extends TextureRef {
 		int imgW = spritemap.getWidth();
 		int scale = imgW / (16 * 8);
 
-		Texture.largeChestLeft.setTexture(loadLargeChestTexture(spritemap, scale, 0, 2));
-		Texture.largeChestTopLeft.setTexture(loadLargeChestTexture(spritemap, scale, 1, 0));
-		Texture.largeChestFrontLeft.setTexture(loadLargeChestTexture(spritemap, scale, 1, 2));
-		Texture.largeChestTopRight.setTexture(loadLargeChestTexture(spritemap, scale, 2, 0));
-		Texture.largeChestFrontRight.setTexture(loadLargeChestTexture(spritemap, scale, 2, 2));
-		Texture.largeChestBottomLeft.setTexture(loadLargeChestTexture(spritemap, scale, 3, 1));
-		Texture.largeChestRight.setTexture(loadLargeChestTexture(spritemap, scale, 3, 2));
-		Texture.largeChestBottomRight.setTexture(loadLargeChestTexture(spritemap, scale, 4, 1));
-		Texture.largeChestBackLeft.setTexture(loadLargeChestTexture(spritemap, scale, 4, 2));
-		Texture.largeChestBackRight.setTexture(loadLargeChestTexture(spritemap, scale, 5, 2));
+		left.setTexture(loadLargeChestTexture(spritemap, scale, 0, 2));
+		topLeft.setTexture(loadLargeChestTexture(spritemap, scale, 1, 0));
+		frontLeft.setTexture(loadLargeChestTexture(spritemap, scale, 1, 2));
+		topRight.setTexture(loadLargeChestTexture(spritemap, scale, 2, 0));
+		frontRight.setTexture(loadLargeChestTexture(spritemap, scale, 2, 2));
+		bottomLeft.setTexture(loadLargeChestTexture(spritemap, scale, 3, 1));
+		right.setTexture(loadLargeChestTexture(spritemap, scale, 3, 2));
+		bottomRight.setTexture(loadLargeChestTexture(spritemap, scale, 4, 1));
+		backLeft.setTexture(loadLargeChestTexture(spritemap, scale, 4, 2));
+		backRight.setTexture(loadLargeChestTexture(spritemap, scale, 5, 2));
 		return true;
 	}
 

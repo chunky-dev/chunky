@@ -82,8 +82,31 @@ public class TexturePackLoader {
 					Texture.enderChestRight, Texture.enderChestFront,
 					Texture.enderChestBack)));
 		allTextures.put("normal double chest", new AlternateTextures(
-				new LargeChestTexture("assets/minecraft/textures/entity/chest/normal_double"), // MC 1.6
-				new LargeChestTexture("item/largechest")));
+				new LargeChestTexture("assets/minecraft/textures/entity/chest/normal_double", // MC 1.6
+					Texture.largeChestLeft, Texture.largeChestRight,
+					Texture.largeChestTopLeft, Texture.largeChestTopRight,
+					Texture.largeChestFrontLeft, Texture.largeChestFrontRight,
+					Texture.largeChestBottomLeft, Texture.largeChestBottomRight,
+					Texture.largeChestBackLeft, Texture.largeChestBackRight),
+				new LargeChestTexture("item/largechest",
+					Texture.largeChestLeft, Texture.largeChestRight,
+					Texture.largeChestTopLeft, Texture.largeChestTopRight,
+					Texture.largeChestFrontLeft, Texture.largeChestFrontRight,
+					Texture.largeChestBottomLeft, Texture.largeChestBottomRight,
+					Texture.largeChestBackLeft, Texture.largeChestBackRight)));
+		allTextures.put("trapped chest", new AlternateTextures(
+				new ChestTexture("assets/minecraft/textures/entity/chest/trapped", // MC 1.6
+					Texture.trappedChestLock, Texture.trappedChestTop,
+					Texture.trappedChestBottom, Texture.trappedChestLeft,
+					Texture.trappedChestRight, Texture.trappedChestFront,
+					Texture.trappedChestBack)));
+		allTextures.put("trapped double chest", new AlternateTextures(
+				new LargeChestTexture("assets/minecraft/textures/entity/chest/trapped_double", // MC 1.6
+					Texture.largeTrappedChestLeft, Texture.largeTrappedChestRight,
+					Texture.largeTrappedChestTopLeft, Texture.largeTrappedChestTopRight,
+					Texture.largeTrappedChestFrontLeft, Texture.largeTrappedChestFrontRight,
+					Texture.largeTrappedChestBottomLeft, Texture.largeTrappedChestBottomRight,
+					Texture.largeTrappedChestBackLeft, Texture.largeTrappedChestBackRight)));
 		allTextures.put("sun", new AlternateTextures(
 				new SunTexture("assets/minecraft/textures/environment/sun"),// MC 1.6
 				new SunTexture("environment/sun"),// MC 1.5

@@ -70,6 +70,7 @@ public class OctreeFinalizer {
 					int dir;
 					int bd;
 					int bd_alt;
+					int tex;
 
 					Block other;
 					Block other_alt;
@@ -408,9 +409,26 @@ public class OctreeFinalizer {
 							type |= 4 << 16;
 						octree.set(type, x, cy, z);
 						break;
+					case Block.TRAPPEDCHEST_ID:
+						dir = type >> 8;
+						tex = 0;
+						if (dir < 4) {
+							if (Block.get(octree.get(x - 1, cy, z)) == Block.TRAPPEDCHEST)
+								tex = 1 + (dir-1) % 2;
+							else if (Block.get(octree.get(x + 1, cy, z)) == Block.TRAPPEDCHEST)
+								tex = 1 + dir % 2;
+						} else {
+							if (Block.get(octree.get(x, cy, z - 1)) == Block.TRAPPEDCHEST)
+								tex = 1 + dir % 2;
+							else if (Block.get(octree.get(x, cy, z + 1)) == Block.TRAPPEDCHEST)
+								tex = 1 + (dir-1) % 2;
+						}
+						type |= tex << 16;
+						octree.set(type, x, cy, z);
+						break;
 					case Block.CHEST_ID:
 						dir = type >> 8;
-						int tex = 0;
+						tex = 0;
 						if (dir < 4) {
 							if (Block.get(octree.get(x - 1, cy, z)) == Block.CHEST)
 								tex = 1 + (dir-1) % 2;

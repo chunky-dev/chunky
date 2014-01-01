@@ -365,6 +365,27 @@ public class Texture {
 	public static final Texture greenGlassPaneSide = new Texture();
 	public static final Texture redGlassPaneSide = new Texture();
 	public static final Texture blackGlassPaneSide = new Texture();
+
+	// Trapped Chest
+	public static final Texture trappedChestTop = new Texture();
+	public static final Texture trappedChestBottom = new Texture();
+	public static final Texture trappedChestLeft = new Texture();
+	public static final Texture trappedChestRight = new Texture();
+	public static final Texture trappedChestFront = new Texture("chest");
+	public static final Texture trappedChestBack = new Texture();
+	public static final Texture trappedChestLock = new Texture();
+
+	public static final Texture largeTrappedChestFrontLeft = new Texture();
+	public static final Texture largeTrappedChestFrontRight = new Texture();
+	public static final Texture largeTrappedChestBackLeft = new Texture();
+	public static final Texture largeTrappedChestBackRight = new Texture();
+	public static final Texture largeTrappedChestTopLeft = new Texture();
+	public static final Texture largeTrappedChestTopRight = new Texture();
+	public static final Texture largeTrappedChestBottomLeft = new Texture();
+	public static final Texture largeTrappedChestBottomRight = new Texture();
+	public static final Texture largeTrappedChestLeft = new Texture();
+	public static final Texture largeTrappedChestRight = new Texture();
+
 	/**
 	 * Missing or unknown texture.
 	 */

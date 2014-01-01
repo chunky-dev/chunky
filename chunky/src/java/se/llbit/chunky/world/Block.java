@@ -2235,7 +2235,8 @@ public class Block {
 			return AnvilModel.intersect(ray);
 		};
 	};
-	public static final Block TRAPPEDCHEST = new Block(0x92, "Trapped Chest", Texture.chestFront) {
+	public static final int TRAPPEDCHEST_ID = 0x92;
+	public static final Block TRAPPEDCHEST = new Block(TRAPPEDCHEST_ID, "Trapped Chest", Texture.chestFront) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2244,43 +2245,43 @@ public class Block {
 		final Texture[][] tex = {
 			// single
 			{
-				Texture.chestFront,
-				Texture.chestBack,
-				Texture.chestLeft,
-				Texture.chestRight,
-				Texture.chestTop,
-				Texture.chestBottom,
-				Texture.chestLock,
-				Texture.chestLock,
-				Texture.chestLock,
-				Texture.chestLock,
-				Texture.chestLock,
+				Texture.trappedChestFront,
+				Texture.trappedChestBack,
+				Texture.trappedChestLeft,
+				Texture.trappedChestRight,
+				Texture.trappedChestTop,
+				Texture.trappedChestBottom,
+				Texture.trappedChestLock,
+				Texture.trappedChestLock,
+				Texture.trappedChestLock,
+				Texture.trappedChestLock,
+				Texture.trappedChestLock,
 			},
 
 			// left
 			{
-				Texture.largeChestFrontLeft,
-				Texture.largeChestBackLeft,
-				Texture.largeChestLeft,
-				Texture.largeChestTopLeft,
-				Texture.largeChestBottomLeft,
-				Texture.chestLock,
-				Texture.chestLock,
-				Texture.chestLock,
+				Texture.largeTrappedChestFrontLeft,
+				Texture.largeTrappedChestBackLeft,
+				Texture.largeTrappedChestLeft,
+				Texture.largeTrappedChestTopLeft,
+				Texture.largeTrappedChestBottomLeft,
+				Texture.trappedChestLock,
+				Texture.trappedChestLock,
+				Texture.trappedChestLock,
 				Texture.chestLock,
 			},
 
 			// right
 			{
-				Texture.largeChestFrontRight,
-				Texture.largeChestBackRight,
-				Texture.largeChestRight,
-				Texture.largeChestTopRight,
-				Texture.largeChestBottomRight,
-				Texture.chestLock,
-				Texture.chestLock,
-				Texture.chestLock,
-				Texture.chestLock,
+				Texture.largeTrappedChestFrontRight,
+				Texture.largeTrappedChestBackRight,
+				Texture.largeTrappedChestRight,
+				Texture.largeTrappedChestTopRight,
+				Texture.largeTrappedChestBottomRight,
+				Texture.trappedChestLock,
+				Texture.trappedChestLock,
+				Texture.trappedChestLock,
+				Texture.trappedChestLock,
 			}
 		};
 		@Override
