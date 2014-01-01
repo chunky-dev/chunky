@@ -1,4 +1,5 @@
 1.2.1 - TBD
+    * Removed the -watermark command-line option
     * Trapped chests now use trapped chest textures
     * Double trapped chests now appear as they should (rather than two single
     chests)

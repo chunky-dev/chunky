@@ -43,7 +43,6 @@ import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.ProgressListener;
 import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Biomes;
@@ -1297,9 +1296,8 @@ public class Scene extends SceneDescription {
 	/**
 	 * Save a snapshot
 	 * @param directory
-	 * @param watermark
 	 */
-	public void saveSnapshot(File directory, boolean watermark) {
+	public void saveSnapshot(File directory) {
 
 		try {
 			if (directory == null) {
@@ -1308,9 +1306,6 @@ public class Scene extends SceneDescription {
 			}
 			String fileName = name + "-" + spp + ".png";
 			logger.info("Saving frame " + fileName);
-			if (watermark) {
-				addWatermark();
-			}
 			ImageIO.write(buffer, "png", new File(directory, fileName));
 			logger.info("Frame saved");
 		} catch (IOException e) {
@@ -1321,11 +1316,10 @@ public class Scene extends SceneDescription {
 
 	/**
 	 * @param targetFile
-	 * @param watermark
 	 * @param progressListener
 	 * @throws IOException
 	 */
-	public synchronized void saveFrame(File targetFile, boolean watermark,
+	public synchronized void saveFrame(File targetFile,
 			ProgressListener progressListener) throws IOException {
 
 		for (int x = 0; x < width; ++x) {
@@ -1335,20 +1329,7 @@ public class Scene extends SceneDescription {
 			}
 		}
 
-		if (watermark)
-			addWatermark();
 		ImageIO.write(backBuffer, "png", targetFile);
-	}
-
-	/**
-	 * Add a watermark to the image buffer.
-	 */
-	private void addWatermark() {
-		Graphics g = buffer.getGraphics();
-		BufferedImage watermark = RenderManager.watermark;
-		g.drawImage(watermark, buffer.getWidth() - watermark.getWidth(),
-				buffer.getHeight() - watermark.getHeight(), null);
-		g.dispose();
 	}
 
 	private synchronized void saveOctree(

@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -156,7 +156,6 @@ public class Chunky implements ChunkDiscoveryListener {
 		"Usage: chunky [OPTIONS] [WORLD DIRECTORY]\n" +
 		"Options:\n" +
 		"  -texture <FILE>        use FILE as the texture pack (must be a zip file)\n" +
-		"  -watermark             add a watermark to saved frame\n" +
 		"  -render <SCENE.json>   render the specified scene (see notes)\n" +
 		"  -scene-dir <DIR>       use the directory DIR for loading/saving scenes\n" +
 		"  -benchmark             run the benchmark and exit\n" +
@@ -195,8 +194,6 @@ public class Chunky implements ChunkDiscoveryListener {
 		for (int i = 0; i < args.length; ++i) {
 			if (args[i].equals("-texture") && args.length > i+1) {
 				texturePack = args[++i];
-			} else if (args[i].equals("-watermark")) {
-				RenderManager.useWatermark = true;
 			} else if (args[i].equals("-scene-dir")) {
 				if (i+1 == args.length) {
 					logger.error("Missing argument for -scene-dir option");

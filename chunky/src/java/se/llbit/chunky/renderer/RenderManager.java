@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -18,7 +18,6 @@ package se.llbit.chunky.renderer;
 
 import java.awt.FileDialog;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -35,7 +34,6 @@ import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
-import se.llbit.resources.ImageLoader;
 
 /**
  * Manages the 3D render worker threads.
@@ -75,16 +73,6 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	 * Number of completed jobs.
 	 */
 	private final AtomicInteger finishedJobs;
-
-	/**
-	 * Render watermark image
-	 */
-	public static BufferedImage watermark = ImageLoader.get("watermark.png");
-
-	/**
-	 * Whether to use the watermark in the saved frames
-	 */
-	public static boolean useWatermark = false;
 
 	private final RenderContext context;
 
@@ -257,7 +245,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			if (dumpNextFrame) {
 				// save the current frame
 				if (scene.shouldSaveSnapshots()) {
-					bufferedScene.saveSnapshot(context.getSceneDirectory(), useWatermark);
+					bufferedScene.saveSnapshot(context.getSceneDirectory());
 				}
 
 				// save scene description and render dump
@@ -489,8 +477,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 					return;
 			}
 			try {
-				bufferedScene.saveFrame(targetFile, useWatermark,
-						progressListener);
+				bufferedScene.saveFrame(targetFile, progressListener);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
