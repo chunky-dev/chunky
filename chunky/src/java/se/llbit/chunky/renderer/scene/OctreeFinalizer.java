@@ -547,6 +547,8 @@ public class OctreeFinalizer {
 					case Block.BIRCHWOODSTAIRS_ID:
 					case Block.JUNGLEWOODSTAIRS_ID:
 					case Block.QUARTZSTAIRS_ID:
+					case Block.ACACIASTAIRS_ID:
+					case Block.DARKOAKSTAIRS_ID:
 						// check if this is a corner stair block
 						int rotation = 3 & (type >> BlockData.OFFSET);
 						switch (rotation) {

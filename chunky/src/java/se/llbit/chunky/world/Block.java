@@ -2463,18 +2463,28 @@ public class Block {
 			return woodType[data&3];
 		}
 	};
-	public static final Block UNKNOWN0xA3 = new Block(0xA3, "Unknown Block 0xA3", Texture.unknown) {
+	public static final int ACACIASTAIRS_ID = 0xA3;
+	public static final Block ACACIASTAIRS = new Block(ACACIASTAIRS_ID, "Acacia Stairs", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return StairModel.intersect(ray, Texture.acaciaPlanks);
 		}
 	};
-	public static final Block UNKNOWN0xA4 = new Block(0xA4, "Unknown Block 0xA4", Texture.unknown) {
+	public static final int DARKOAKSTAIRS_ID = 0xA4;
+	public static final Block DARKOAKSTAIRS = new Block(DARKOAKSTAIRS_ID, "Dark Oak Stairs", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return StairModel.intersect(ray, Texture.darkOakPlanks);
 		}
 	};
 	public static final Block UNKNOWN0xA5 = new Block(0xA5, "Unknown Block 0xA5", Texture.unknown) {
@@ -3192,8 +3202,8 @@ public class Block {
 		WEIGHTEDPRESSUREPLATEHEAVY, REDSTONECOMPARATOR, REDSTONECOMPARATORLIT, DAYLIGHTSENSOR,
 		REDSTONEBLOCK, NETHERQUARTZORE, HOPPER, QUARTZ,
 		QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, STAINED_CLAY,
-		STAINED_GLASSPANE, LEAVES2, WOOD2, UNKNOWN0xA3,
-		UNKNOWN0xA4, UNKNOWN0xA5, UNKNOWN0xA6, UNKNOWN0xA7,
+		STAINED_GLASSPANE, LEAVES2, WOOD2, ACACIASTAIRS,
+		DARKOAKSTAIRS, UNKNOWN0xA5, UNKNOWN0xA6, UNKNOWN0xA7,
 		UNKNOWN0xA8, UNKNOWN0xA9, HAY_BLOCK, CARPET,
 		HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, LARGE_FLOWER,
 		UNKNOWN0xB0, UNKNOWN0xB1, UNKNOWN0xB2, UNKNOWN0xB3,

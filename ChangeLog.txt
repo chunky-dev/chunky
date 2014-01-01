@@ -1,3 +1,7 @@
+1.2.1 - TBD
+    * Added Acacia Stairs
+    * Added Dark Oak Stairs
+
 1.2.0 - 2013-12-30
     * Reduced Chunky binary size by removing some redundancies
     (Windows installer is now 3.8 megabytes, was 8.9)
