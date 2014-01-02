@@ -101,6 +101,16 @@ public class Sky implements JSONifiable {
 	}
 
 	/**
+	 * Load the configured skymap file
+	 * @param fileName
+	 */
+	public void loadSkyMap() {
+		if (!skymapFileName.isEmpty()) {
+			loadSkyMap(skymapFileName);
+		}
+	}
+
+	/**
 	 * Load a panoramic skymap texture
 	 * @param fileName
 	 */
@@ -346,10 +356,7 @@ public class Sky implements JSONifiable {
 
 	@Override
 	public void fromJson(JsonObject obj) {
-		String sceneSkymapName = obj.get("skymapFileName").stringValue("");
-		if (!sceneSkymapName.isEmpty()) {
-			loadSkyMap(sceneSkymapName);
-		}
+		skymapFileName = obj.get("skymapFileName").stringValue("");
 		rotation = obj.get("skyYaw").doubleValue(0);
 		mirrored = obj.get("skyMirrored").boolValue(true);
 

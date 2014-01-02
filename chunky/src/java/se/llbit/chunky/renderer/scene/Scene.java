@@ -338,6 +338,9 @@ public class Scene extends SceneDescription {
 
 		loadDescription(context.getSceneDescriptionInputStream(sceneName));
 
+		// load the configured skymap file
+		sky.loadSkyMap();
+
 		if (sdfVersion < SDF_VERSION) {
 			logger.warn("Old scene version detected! The scene may not have loaded correctly.");
 		}
