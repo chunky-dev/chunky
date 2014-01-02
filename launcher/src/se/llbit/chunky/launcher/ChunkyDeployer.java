@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -106,7 +106,9 @@ public class ChunkyDeployer {
 		List<VersionInfo> versions = availableVersions();
 		VersionInfo embedded = embeddedVersion();
 		if (embedded != null && (!versions.contains(embedded) || !checkVersionIntegrity(embedded.name))) {
-			System.out.println("Deploying embedded version: " + embedded.name);
+			if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
+				System.out.println("Deploying embedded version: " + embedded.name);
+			}
 			deployEmbeddedVersion(embedded);
 			if (!versions.contains(embedded)) {
 				versions.add(embedded);
@@ -227,96 +229,57 @@ public class ChunkyDeployer {
 	 * Launch a specific Chunky version
 	 * @param parentComponent
 	 * @param settings
-	 * @return {@code true} on success
+	 * @return {@code true} on success, {@code false} if there is any problem
+	 * launching Chunky (waits 200ms to see if everything launched)
 	 */
-	public boolean launchChunky(Component parentComponent, LauncherSettings settings) {
-		List<VersionInfo> versions = availableVersions();
-		VersionInfo version = VersionInfo.LATEST;
-		for (VersionInfo info: versions) {
-			if (info.name.equals(settings.version)) {
-				version = info;
-				break;
-			}
-		}
-		if (version == VersionInfo.LATEST) {
-			if (versions.size() > 0) {
-				version = versions.get(0);
-			} else {
-				// TODO no specific version available!
-				System.err.println("No version installed");
-				if (!settings.headless) {
-					Dialogs.error(parentComponent,
-							"Failed to launch Chunky - there is no local version installed. Try updating.",
-							"Failed to Launch");
-				}
-				return false;
-			}
-		}
-		if (!ChunkyDeployer.checkVersionIntegrity(version.name)) {
-			// TODO add some way to fix this??
-			System.err.println("Version integrity check failed for version " + version.name);
-			if (!settings.headless) {
-				Dialogs.error(parentComponent,
-						"Version integrity check failed for version " + version.name + ". Try selecting another version.",
-						"Failed to Launch");
-			}
-			return false;
-		}
+	public boolean launchChunky(Component parentComponent, LauncherSettings settings, VersionInfo version) {
 		List<String> command = buildCommandLine(version, settings);
-		echoCommand(command);
+		if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
+			System.out.println(commandString(command));
+		}
 		ProcessBuilder procBuilder = new ProcessBuilder(command);
 		try {
 			final Process proc = procBuilder.start();
-			if (settings.debugConsole) {
-				final Logger logger;
-				if (settings.headless) {
-					logger = new ConsoleLogger();
-				} else {
-					DebugConsole console = new DebugConsole(null, settings.closeConsoleOnExit);
-					console.setVisible(true);
-					logger = console;
+			final Logger logger;
+			if (!settings.headless && settings.debugConsole) {
+				DebugConsole console = new DebugConsole(null, settings.closeConsoleOnExit);
+				console.setVisible(true);
+				logger = console;
+			} else {
+				logger = new ConsoleLogger();
+			}
+			final Scanner stdout = new Scanner(proc.getInputStream());
+			final Scanner stderr = new Scanner(proc.getErrorStream());
+			final Thread outputScanner = new Thread("Output Logger") {
+				@Override
+				public void run() {
+					while (!isInterrupted() && stdout.hasNextLine()) {
+						String line = stdout.nextLine();
+						logger.appendLine(line);
+					}
 				}
-				final Scanner stdout = new Scanner(proc.getInputStream());
-				final Scanner stderr = new Scanner(proc.getErrorStream());
-				final Thread outputScanner = new Thread("Output Logger") {
-					@Override
-					public void run() {
-						while (!isInterrupted() && stdout.hasNextLine()) {
-							String line = stdout.nextLine();
-							logger.appendLine(line);
-						}
+			};
+			outputScanner.start();
+			final Thread errorScanner = new Thread("Error Logger") {
+				@Override
+				public void run() {
+					while (!isInterrupted() && stderr.hasNextLine()) {
+						String line = stderr.nextLine();
+						logger.appendErrorLine(line);
 					}
-				};
-				outputScanner.start();
-				final Thread errorScanner = new Thread("Error Logger") {
-					@Override
-					public void run() {
-						while (!isInterrupted() && stderr.hasNextLine()) {
-							String line = stderr.nextLine();
-							logger.appendErrorLine(line);
-						}
-					}
-				};
-				errorScanner.start();
-				Thread shutdownThread = new Thread("Shutdown Listener") {
-					@Override
-					public void run() {
-						try {
-							outputScanner.join();
-						} catch (InterruptedException e) {
-						}
-						try {
-							errorScanner.join();
-						} catch (InterruptedException e) {
-						}
-						try {
-							proc.waitFor();
-							logger.processExited(proc.exitValue());
-						} catch (InterruptedException e) {
-						}
-					}
-				};
-				shutdownThread.start();
+				}
+			};
+			errorScanner.start();
+			ShutdownThread shutdownThread = new ShutdownThread(proc, logger, outputScanner, errorScanner);
+			shutdownThread.start();
+			try {
+				Thread.sleep(200);
+				int exitValue = shutdownThread.exitValue;
+				// check if process already exited with error code
+				if (exitValue != 0) {
+					return false;
+				}
+			} catch (InterruptedException e) {
 			}
 			return true;
 		} catch (IOException e) {
@@ -326,19 +289,22 @@ public class ChunkyDeployer {
 		}
 	}
 
-	private void echoCommand(List<String> command) {
-		boolean first = true;
+	/**
+	 * @param command
+	 * @return command in string form
+	 */
+	public static String commandString(List<String> command) {
+		StringBuilder sb = new StringBuilder();
 		for (String part: command) {
-			if (!first) {
-				System.out.print(" ");
+			if (sb.length() > 0) {
+				sb.append(" ");
 			}
-			first = false;
-			System.out.print(part);
+			sb.append(part);
 		}
-		System.out.println();
+		return sb.toString();
 	}
 
-	private List<String> buildCommandLine(VersionInfo version, LauncherSettings settings) {
+	public static List<String> buildCommandLine(VersionInfo version, LauncherSettings settings) {
 		List<String> cmd = new LinkedList<String>();
 
 		cmd.add(JreUtil.javaCommand(settings.jre));
@@ -370,7 +336,7 @@ public class ChunkyDeployer {
 		return cmd;
 	}
 
-	private String classpath(VersionInfo version, LauncherSettings settings) {
+	private static String classpath(VersionInfo version, LauncherSettings settings) {
 		File chunkyDir = PersistentSettings.getSettingsDirectory();
 		File libDir = new File(chunkyDir, "lib");
 		List<File> jars = new ArrayList<File>();
@@ -387,4 +353,80 @@ public class ChunkyDeployer {
 		return classpath;
 	}
 
+	private static class ShutdownThread extends Thread {
+		public volatile int exitValue = 0;
+		private final Thread outputScanner;
+		private final Thread errorScanner;
+		private final Process proc;
+		private final Logger logger;
+
+		public ShutdownThread(Process proc, Logger logger, Thread output, Thread error) {
+			this.proc = proc;
+			this.logger = logger;
+			this.outputScanner = output;
+			this.errorScanner = error;
+		}
+
+		@Override
+		public void run() {
+			try {
+				outputScanner.join();
+			} catch (InterruptedException e) {
+			}
+			try {
+				errorScanner.join();
+			} catch (InterruptedException e) {
+			}
+			try {
+				proc.waitFor();
+				exitValue = proc.exitValue();
+				logger.processExited(exitValue);
+			} catch (InterruptedException e) {
+			}
+		}
+	}
+
+	public static VersionInfo resolveVersion(String name) {
+		List<VersionInfo> versions = availableVersions();
+		VersionInfo version = VersionInfo.LATEST;
+		for (VersionInfo info: versions) {
+			if (info.name.equals(name)) {
+				version = info;
+				break;
+			}
+		}
+		if (version == VersionInfo.LATEST) {
+			if (versions.size() > 0) {
+				return versions.get(0);
+			} else {
+				return VersionInfo.NONE;
+			}
+		} else {
+			return version;
+		}
+	}
+
+	public static boolean canLaunch(VersionInfo version, ChunkyLauncher launcher, boolean reportErrors) {
+		if (version == VersionInfo.NONE) {
+			// version not available!
+			System.err.println("No version installed");
+			if (reportErrors) {
+				Dialogs.error(launcher,
+						"Failed to launch Chunky - there is no local version installed. Try updating.",
+						"Failed to Launch");
+			}
+			return false;
+		}
+		if (!ChunkyDeployer.checkVersionIntegrity(version.name)) {
+			// TODO add some way to fix this??
+			System.err.println("Version integrity check failed for version " + version.name);
+			if (reportErrors) {
+				Dialogs.error(launcher,
+						"Version integrity check failed for version " + version.name + ". Try selecting another version.",
+						"Failed to Launch");
+			}
+			return false;
+		}
+		return true;
+	}
 }

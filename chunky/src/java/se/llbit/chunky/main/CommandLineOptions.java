@@ -104,6 +104,7 @@ public class CommandLineOptions {
 			} else if (args[i].equals("-opencl")) {
 				options.openCLEnabled = true;
 			} else if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("-help") || args[i].equals("--help")) {
+				System.out.println("Chunky " + Version.getVersion());
 				System.out.println(USAGE);
 				System.out.println();
 				System.out.println("The default scene directory is " + PersistentSettings.getSceneDirectory());

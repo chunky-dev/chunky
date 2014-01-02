@@ -54,12 +54,16 @@ public final class JsonSettings {
 			JsonParser parser = new JsonParser(in);
 			json = parser.parse().object();
 			in.close();
-			System.out.println("Settings loaded from " + path);
+			if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
+				System.out.println("Settings loaded from " + path);
+			}
 		} catch (IOException e) {
-			System.out.println("Warning: Could not load settings from " + path +
-					" - defaults will be used");
+			if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
+				System.out.println("Warning: Could not load settings from " + path +
+						" - defaults will be used");
+			}
 		} catch (SyntaxError e) {
-			System.out.println("Warning: Could not load settings from " + path +
+			System.err.println("Warning: Could not load settings from " + path +
 					" (syntax error) - defaults will be used");
 		}
 	}
@@ -75,7 +79,9 @@ public final class JsonSettings {
 			PrettyPrinter pp = new PrettyPrinter("  ", new PrintStream(out));
 			json.prettyPrint(pp);
 			out.close();
-			System.out.println("Saved settings to " + path);
+			if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
+				System.out.println("Saved settings to " + path);
+			}
 		} catch (IOException e) {
 			System.err.println("Warning: Failed to save settings to " +
 					path + ": " + e.getMessage());

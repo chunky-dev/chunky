@@ -139,12 +139,12 @@ public class DebugConsole extends JDialog implements Logger {
 	public void processExited(int exitValue) {
 		if (exitValue == 0) {
 			appendLine("Chunky exited normally");
+			if (closeConsoleOnExit) {
+				setVisible(false);
+				dispose();
+			}
 		} else {
 			appendLine("Chunky exited abnormally with exit value " + exitValue);
-		}
-		if (closeConsoleOnExit) {
-			setVisible(false);
-			dispose();
 		}
 	}
 

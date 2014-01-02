@@ -30,11 +30,6 @@ public class ConsoleLogger implements Logger {
 
 	@Override
 	public void processExited(int exitValue) {
-		if (exitValue == 0) {
-			appendLine("Chunky exited normally");
-		} else {
-			appendLine("Chunky exited abnormally with exit value " + exitValue);
-		}
 	}
 
 }

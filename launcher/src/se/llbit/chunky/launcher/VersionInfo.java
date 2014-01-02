@@ -114,6 +114,8 @@ public class VersionInfo implements Comparable<VersionInfo> {
 
 	public static final VersionInfo LATEST =
 			new VersionInfo("latest", new Date());
+	public static final VersionInfo NONE =
+			new VersionInfo("none", new Date());
 
 	public final String name;
 	public Collection<Library> libraries = new LinkedList<Library>();

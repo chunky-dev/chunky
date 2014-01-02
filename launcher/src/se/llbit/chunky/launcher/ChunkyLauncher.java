@@ -51,6 +51,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.launcher.ui.LaunchErrorDialog;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.json.JsonParser;
@@ -63,7 +64,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame {
 
-	private static final String LAUNCHER_VERSION = "v1.2";
+	private static final String LAUNCHER_VERSION = "v1.4";
 
 	public class UpdateThread extends Thread {
 		@Override public void run() {
@@ -294,22 +295,29 @@ public class ChunkyLauncher extends JFrame {
 		launchBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO show error message if there is no version currently available
-				VersionInfo version = (VersionInfo) versionCB.getSelectedItem();
 				settings.jre = jreDirField.getText();
 				settings.debugConsole = debugConsoleCB.isSelected();
 				settings.verboseLogging = verboseLoggingCB.isSelected();
 				settings.closeConsoleOnExit = closeConsoleOnExitCB.isSelected();
 				settings.javaOptions = javaOptions.getText();
 				settings.chunkyOptions = chunkyOptions.getText();
-				settings.version = version.name;
+				settings.version = ((VersionInfo) versionCB.getSelectedItem()).name;
 				settings.showLauncher = alwaysShowLauncherCB.isSelected();
 				settings.showAdvancedSettings = showAdvancedSettingsCB.isSelected();
+
+				// resolve specific version
+				VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
+				if (!ChunkyDeployer.canLaunch(version, ChunkyLauncher.this, true)) {
+					return;
+				}
+
 				PersistentSettings.setMinecraftDirectory(minecraftDirField.getText());
-				if (deployer.launchChunky(ChunkyLauncher.this, settings)) {
+				if (deployer.launchChunky(ChunkyLauncher.this, settings, version)) {
 					settings.save();
 					setVisible(false);
 					dispose();
+				} else {
+					launchError(settings, version);
 				}
 			}
 		});
@@ -443,6 +451,37 @@ public class ChunkyLauncher extends JFrame {
 
 		setContentPane(panel);
 		pack();
+	}
+
+	/**
+	 * Opens the launch error dialog.
+	 * @param settings
+	 * @param version
+	 */
+	protected static void launchError(final LauncherSettings settings,
+			final VersionInfo version) {
+		if (settings.debugConsole) {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					LaunchErrorDialog dialog = new LaunchErrorDialog(
+						ChunkyDeployer.commandString(
+								ChunkyDeployer.buildCommandLine(version, settings)));
+					dialog.setVisible(true);
+				}
+			});
+		} else {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					LaunchErrorDialog dialog = new LaunchErrorDialog(
+						ChunkyDeployer.commandString(
+								ChunkyDeployer.buildCommandLine(version, settings)));
+					dialog.setVisible(true);
+				}
+			});
+		}
+
 	}
 
 	private JPanel buildAdvancedPanel() {
@@ -641,7 +680,15 @@ public class ChunkyLauncher extends JFrame {
 			settings.chunkyOptions = headlessOptions;
 			ChunkyDeployer deployer = new ChunkyDeployer();
 			deployer.deploy();
-			deployer.launchChunky(null, settings);
+			VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
+			if (ChunkyDeployer.canLaunch(version, null, false)) {
+				deployer.launchChunky(null, settings, version);
+			} else {
+				System.err.println("Failed to start Chunky. Command used:");
+				System.err.println(ChunkyDeployer.commandString(
+						ChunkyDeployer.buildCommandLine(version, settings)));
+				System.exit(1);
+			}
 			return;
 		} else {
 			// Set up Look and Feel
@@ -655,9 +702,20 @@ public class ChunkyLauncher extends JFrame {
 
 		if (firstTimeSetup()) {
 			ChunkyDeployer deployer = new ChunkyDeployer();
-			if (forceLauncher || settings.showLauncher ||
-				!deployer.launchChunky(null, settings)) {
-
+			boolean showLauncher = true;
+			if (!forceLauncher && !settings.showLauncher) {
+				// skip launcher only if we can launch this version
+				VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
+				if (ChunkyDeployer.canLaunch(version, null, false)) {
+					if (deployer.launchChunky(null, settings, version)) {
+						showLauncher = false;
+						return;
+					} else {
+						launchError(settings, version);
+					}
+				}
+			}
+			if (showLauncher) {
 				deployer.deploy();
 				JFrame launcher = new ChunkyLauncher(deployer, settings);
 				//launcher.setLocationByPlatform(true);
