@@ -213,5 +213,15 @@ public final class PersistentSettings {
 		settings.setString("minecraftDir", path);
 		save();
 	}
+
+	public static void setStringOption(String name, String value) {
+		settings.setString(name, value);
+		save();
+	}
+
+	public static void resetOption(String name) {
+		settings.removeSetting(name);
+		save();
+	}
 }
 

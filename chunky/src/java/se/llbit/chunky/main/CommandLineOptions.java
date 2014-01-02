@@ -12,7 +12,7 @@ import se.llbit.chunky.resources.TexturePackLoader.TextureLoadingError;
 public class CommandLineOptions {
 	enum Mode {
 		DEFAULT,
-		PRINT_HELP,
+		NO_OP,
 		HEADLESS_RENDER,
 		HEADLESS_BENCHMARK,
 	}
@@ -32,6 +32,7 @@ public class CommandLineOptions {
 		"  -tile-width <NUM>      use the specified job tile width\n" +
 		"  -target <NUM>          override target SPP to be NUM in headless mode\n" +
 		"  -opencl                enables OpenCL rendering in the GUI\n" +
+		"  -config <NAME> <VALUE> set a configuration option and exit\n" +
 		"  -help                  show this text\n" +
 		"\n" +
 		"Notes:\n" +
@@ -57,15 +58,19 @@ public class CommandLineOptions {
 				if (i+1 == args.length) {
 					logger.error("Missing argument for -scene-dir option");
 					confError = true;
+					break;
 				} else {
-					options.sceneDir = new File(args[++i]);
+					options.sceneDir = new File(args[i+1]);
+					i += 1;
 				}
 			} else if (args[i].equals("-render")) {
 				if (i+1 == args.length) {
 					logger.error("Missing argument for -render option");
 					confError = true;
+					break;
 				} else {
-					options.sceneName = args[++i];
+					options.sceneName = args[i+1];
+					i += 1;
 				}
 			} else if (args[i].equals("-benchmark")) {
 				mode = Mode.HEADLESS_BENCHMARK;
@@ -73,22 +78,28 @@ public class CommandLineOptions {
 				if (i+1 == args.length) {
 					logger.error("Missing argument for -target option");
 					confError = true;
+					break;
 				} else {
-					options.target = Math.max(1, Integer.parseInt(args[++i]));
+					options.target = Math.max(1, Integer.parseInt(args[i+1]));
+					i += 1;
 				}
 			} else if (args[i].equals("-threads")) {
 				if (i+1 == args.length) {
 					logger.error("Missing argument for -threads option");
 					confError = true;
+					break;
 				} else {
-					options.renderThreads = Math.max(1, Integer.parseInt(args[++i]));
+					options.renderThreads = Math.max(1, Integer.parseInt(args[i+1]));
+					i += 1;
 				}
 			} else if (args[i].equals("-tile-width")) {
 				if (i+1 == args.length) {
 					logger.error("Missing argument for -tile-width option");
 					confError = true;
+					break;
 				} else {
-					options.tileWidth = Math.max(1, Integer.parseInt(args[++i]));
+					options.tileWidth = Math.max(1, Integer.parseInt(args[i+1]));
+					i += 1;
 				}
 			} else if (args[i].equals("-opencl")) {
 				options.openCLEnabled = true;
@@ -96,13 +107,34 @@ public class CommandLineOptions {
 				System.out.println(USAGE);
 				System.out.println();
 				System.out.println("The default scene directory is " + PersistentSettings.getSceneDirectory());
-				mode = Mode.PRINT_HELP;
+				mode = Mode.NO_OP;
+			} else if (args[i].equals("-set")) {
+				if (i+2 >= args.length) {
+					logger.error("Too few arguments for -set option!");
+					confError = true;
+					break;
+				} else {
+					PersistentSettings.setStringOption(args[i+1], args[i+2]);
+					i += 2;
+					mode = Mode.NO_OP;
+				}
+			} else if (args[i].equals("-reset")) {
+				if (i+1 >= args.length) {
+					logger.error("Too few arguments for -reset option!");
+					confError = true;
+					break;
+				} else {
+					PersistentSettings.resetOption(args[i+1]);
+					i += 1;
+					mode = Mode.NO_OP;
+				}
 			} else if (!args[i].startsWith("-") && !selectedWorld) {
 				options.worldDir = new File(args[i]);
 			} else {
 				System.err.println("Unrecognised argument: "+args[i]);
 				System.err.println(USAGE);
 				confError = true;
+				break;
 			}
 		}
 

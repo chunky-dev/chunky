@@ -160,7 +160,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		}
 
 		switch (cmdline.mode) {
-		case PRINT_HELP:
+		case NO_OP:
 			break;
 		case HEADLESS_BENCHMARK:
 			doBenchmark(options.renderThreads);

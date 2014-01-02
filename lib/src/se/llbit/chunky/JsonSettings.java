@@ -169,7 +169,7 @@ public final class JsonSettings {
 	public void removeSetting(String name) {
 		for (int i = 0; i < json.getNumMember(); ++i) {
 			if (json.getMember(i).getName().equals(name)) {
-				json.removeChild(i);
+				json.getMemberList().removeChild(i);
 				break;
 			}
 		}
