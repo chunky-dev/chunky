@@ -238,16 +238,16 @@ public class ChunkyDeployer {
 			System.out.println(commandString(command));
 		}
 		ProcessBuilder procBuilder = new ProcessBuilder(command);
+		final Logger logger;
+		if (!settings.headless && settings.debugConsole) {
+			DebugConsole console = new DebugConsole(null, settings.closeConsoleOnExit);
+			console.setVisible(true);
+			logger = console;
+		} else {
+			logger = new ConsoleLogger();
+		}
 		try {
 			final Process proc = procBuilder.start();
-			final Logger logger;
-			if (!settings.headless && settings.debugConsole) {
-				DebugConsole console = new DebugConsole(null, settings.closeConsoleOnExit);
-				console.setVisible(true);
-				logger = console;
-			} else {
-				logger = new ConsoleLogger();
-			}
 			final Scanner stdout = new Scanner(proc.getInputStream());
 			final Scanner stderr = new Scanner(proc.getErrorStream());
 			final Thread outputScanner = new Thread("Output Logger") {
@@ -283,8 +283,7 @@ public class ChunkyDeployer {
 			}
 			return true;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.appendErrorLine(e.getMessage());
 			return false;
 		}
 	}
