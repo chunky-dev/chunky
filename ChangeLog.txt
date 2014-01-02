@@ -1,4 +1,6 @@
 1.2.1 - TBD
+    * Fixed error that caused a render dump to be saved each frame if the
+    "save dump" checkbox was unchecked
     * Fixed error in launcher which forced launcher to display even during
     batch/headless mode
     * Removed the -watermark command-line option

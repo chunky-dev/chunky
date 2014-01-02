@@ -1229,7 +1229,7 @@ public class Scene extends SceneDescription {
 	 * are disabled
 	 */
 	public void setDumpFrequency(int value) {
-		value = Math.max(1, value);
+		value = Math.max(0, value);
 		if (value != dumpFrequency) {
 			dumpFrequency = value;
 		}
