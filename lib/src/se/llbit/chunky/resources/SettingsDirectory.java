@@ -20,7 +20,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 
 public final class SettingsDirectory {
 	private static final String SETTINGS_DIR = ".chunky";
@@ -66,7 +66,7 @@ public final class SettingsDirectory {
 	private static boolean isSettingsDirectory(File settingsDir) {
 		if (settingsDir != null && settingsDir.exists() &&
 				settingsDir.isDirectory() && settingsDir.canWrite()) {
-			File settingsFile = new File(settingsDir, ChunkySettings.SETTINGS_FILE);
+			File settingsFile = new File(settingsDir, PersistentSettings.SETTINGS_FILE);
 			if (settingsFile.isFile() && settingsFile.canRead()) {
 				return true;
 			}

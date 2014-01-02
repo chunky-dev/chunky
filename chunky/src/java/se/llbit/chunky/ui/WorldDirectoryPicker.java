@@ -37,7 +37,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.MinecraftFinder;
 
 /**
@@ -73,7 +73,7 @@ public class WorldDirectoryPicker extends JDialog {
 
 		JLabel lbl = new JLabel("Please select the directory where your Minecraft worlds are stored:");
 
-		File initialDirectory = ChunkySettings.getLastWorld();
+		File initialDirectory = PersistentSettings.getLastWorld();
 
 		if (!isValidSelection(initialDirectory)) {
 			initialDirectory = MinecraftFinder.getSavesDirectory();
@@ -110,7 +110,7 @@ public class WorldDirectoryPicker extends JDialog {
 				if (!isValidSelection(getSelectedDirectory())) {
 					logger.warn("Please select a valid directory!");
 				} else {
-					ChunkySettings.setLastWorld(getSelectedDirectory());
+					PersistentSettings.setLastWorld(getSelectedDirectory());
 					accepted = true;
 					WorldDirectoryPicker.this.dispose();
 				}
@@ -184,7 +184,7 @@ public class WorldDirectoryPicker extends JDialog {
 	 * user did not pick a valid world directory.
 	 */
 	public static File getWorldDirectory(JFrame parent) {
-		File worldDir = ChunkySettings.getLastWorld();
+		File worldDir = PersistentSettings.getLastWorld();
 		if (worldDir == null) {
 			worldDir = MinecraftFinder.getSavesDirectory();
 		} else {

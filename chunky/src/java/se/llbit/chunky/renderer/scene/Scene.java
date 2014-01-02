@@ -38,7 +38,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.math3.util.FastMath;
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.ProgressListener;
@@ -151,7 +151,7 @@ public class Scene extends SceneDescription {
 	/**
 	 * Recursive ray depth limit (not including Russian Roulette)
 	 */
-	public static int rayDepth = ChunkySettings.DEFAULT_RAY_DEPTH;
+	public static int rayDepth = PersistentSettings.DEFAULT_RAY_DEPTH;
 
 	private String skymapFileName;
 
@@ -198,7 +198,7 @@ public class Scene extends SceneDescription {
 
 	static {
 		// TODO make non-static?
-		rayDepth = ChunkySettings.getRayDepth();
+		rayDepth = PersistentSettings.getRayDepth();
 	}
 
 	/**
@@ -207,14 +207,14 @@ public class Scene extends SceneDescription {
 	public Scene() {
 		octree = new Octree(1);// empty octree
 
-		width = ChunkySettings.get3DCanvasWidth();
-		height = ChunkySettings.get3DCanvasHeight();
+		width = PersistentSettings.get3DCanvasWidth();
+		height = PersistentSettings.get3DCanvasHeight();
 
-		sppTarget = ChunkySettings.getSppTargetDefault();
+		sppTarget = PersistentSettings.getSppTargetDefault();
 
 		initBuffers();
 
-		String skymap = ChunkySettings.getSkymap();
+		String skymap = PersistentSettings.getSkymap();
 		if (!skymap.isEmpty()) {
 			sky.loadSkyMap(skymap);
 		}
@@ -1032,7 +1032,7 @@ public class Scene extends SceneDescription {
 		value = Math.max(1, value);
 		if (rayDepth != value) {
 			rayDepth = value;
-			ChunkySettings.setRayDepth(rayDepth);
+			PersistentSettings.setRayDepth(rayDepth);
 		}
 	}
 

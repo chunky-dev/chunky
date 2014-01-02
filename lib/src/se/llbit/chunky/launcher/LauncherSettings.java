@@ -18,7 +18,7 @@ package se.llbit.chunky.launcher;
 
 import java.io.File;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.JsonSettings;
 
 public class LauncherSettings {
@@ -43,7 +43,7 @@ public class LauncherSettings {
 	public boolean downloadSnapshots = false;
 
 	public LauncherSettings() {
-		file = new File(ChunkySettings.getSettingsDirectory(), LAUNCHER_SETTINGS_FILE);
+		file = new File(PersistentSettings.getSettingsDirectory(), LAUNCHER_SETTINGS_FILE);
 	}
 
 	public void load() {

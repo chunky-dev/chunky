@@ -16,15 +16,15 @@
  */
 package se.llbit.chunky.renderer;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class PlaceholderRenderCanvas implements RenderableCanvas {
 
-	private final int width = ChunkySettings.DEFAULT_3D_CANVAS_WIDTH;
-	private final int height = ChunkySettings.DEFAULT_3D_CANVAS_HEIGHT;
+	private final int width = PersistentSettings.DEFAULT_3D_CANVAS_WIDTH;
+	private final int height = PersistentSettings.DEFAULT_3D_CANVAS_HEIGHT;
 
 	@Override
 	public int getWidth() {

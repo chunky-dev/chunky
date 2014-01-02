@@ -57,7 +57,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.VersionInfo.Library;
 import se.llbit.chunky.launcher.VersionInfo.LibraryStatus;
 
@@ -191,7 +191,7 @@ public class UpdateDialog extends JDialog {
 		this.parent = parent;
 		this.version = version;
 
-		File chunkyDir = ChunkySettings.getSettingsDirectory();
+		File chunkyDir = PersistentSettings.getSettingsDirectory();
 		libDir = new File(chunkyDir, "lib");
 		if (!libDir.isDirectory()) {
 			libDir.mkdirs();

@@ -28,7 +28,7 @@ import javax.swing.JFrame;
 import org.apache.commons.math3.util.FastMath;
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.scene.Camera;
@@ -133,8 +133,8 @@ public class TestRenderer extends Thread implements ViewListener,
 		scene = new Scene();
 		scene.setBiomeColorsEnabled(false);
 
-		width = ChunkySettings.DEFAULT_3D_CANVAS_WIDTH;
-		height = ChunkySettings.DEFAULT_3D_CANVAS_HEIGHT;
+		width = PersistentSettings.DEFAULT_3D_CANVAS_WIDTH;
+		height = PersistentSettings.DEFAULT_3D_CANVAS_HEIGHT;
 
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		backBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);

@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.renderer;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
 
 /**
@@ -49,7 +49,7 @@ public abstract class AbstractRenderManager extends Thread {
 	/**
 	 * CPU load percentage
 	 */
-	public int cpuLoad = ChunkySettings.getCPULoad();
+	public int cpuLoad = PersistentSettings.getCPULoad();
 
 	/**
 	 * Get a job from the job queue

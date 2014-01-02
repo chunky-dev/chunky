@@ -26,7 +26,7 @@ import se.llbit.chunky.resources.SettingsDirectory;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public final class ChunkySettings {
+public final class PersistentSettings {
 
 	private static JsonSettings settings = new JsonSettings();
 
@@ -50,7 +50,7 @@ public final class ChunkySettings {
 	private static File settingsDir = null;
 	private static File settingsFile = null;
 
-	private ChunkySettings() { }
+	private PersistentSettings() { }
 
 	/**
 	 * @return The directory where program settings are stored

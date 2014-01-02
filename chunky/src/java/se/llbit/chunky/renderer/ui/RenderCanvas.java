@@ -22,7 +22,7 @@ import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderableCanvas;
 import se.llbit.chunky.renderer.Renderer;
 
@@ -44,8 +44,8 @@ public class RenderCanvas extends JPanel implements RenderableCanvas {
 		// apparently setting the same preferred size twice will cancel all
 		// other calls to setPreferredSize
 		setPreferredSize(new Dimension(
-				ChunkySettings.get3DCanvasWidth(),
-				ChunkySettings.get3DCanvasHeight()));
+				PersistentSettings.get3DCanvasWidth(),
+				PersistentSettings.get3DCanvasHeight()));
 		setMinimumSize(new Dimension(100, 100));
 		setIgnoreRepaint(false);
 	}

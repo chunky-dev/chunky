@@ -19,7 +19,7 @@ package se.llbit.chunky.main;
 import java.io.File;
 import java.io.PrintStream;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.test.TestRenderer;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
@@ -37,7 +37,7 @@ public class BlockTestRenderer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String lastTexturePack = ChunkySettings.getLastTexturePack();
+		String lastTexturePack = PersistentSettings.getLastTexturePack();
 		try {
 			if (!lastTexturePack.isEmpty()) {
 				TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);

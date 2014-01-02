@@ -23,6 +23,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import se.llbit.chunky.main.ChunkyOptions;
+
 /**
  * Rendering context.
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -30,34 +32,28 @@ import java.io.OutputStream;
 public class RenderContext {
 	public static final String SCENE_DESCRIPTION_EXTENSION = ".json";
 
-	private final File sceneDirectory;
-	private final int numThreads;
-	private final int tileWidth;
+	protected final ChunkyOptions config;
 
 	/**
 	 * Construct a new render context.
-	 * @param sceneDir The scene directory
-	 * @param renderThreads
-	 * @param tileWidth
+	 * @param options
 	 */
-	public RenderContext(File sceneDir, int renderThreads, int tileWidth) {
-		sceneDirectory = sceneDir;
-		numThreads = renderThreads;
-		this.tileWidth = tileWidth;
+	public RenderContext(ChunkyOptions options) {
+		this.config = options;
 	}
 
 	/**
 	 * @return File handle to the scene directory
 	 */
 	public File getSceneDirectory() {
-		return sceneDirectory;
+		return config.sceneDir;
 	}
 
 	/**
 	 * @return The preferred number of rendering threads
 	 */
 	public int numRenderThreads() {
-		return numThreads;
+		return config.renderThreads;
 	}
 
 	/**
@@ -95,7 +91,7 @@ public class RenderContext {
 	 * @throws FileNotFoundException
 	 */
 	public File getSceneFile(String fileName) {
-		return new File(sceneDirectory, fileName);
+		return new File(config.sceneDir, fileName);
 	}
 
 	/**
@@ -122,6 +118,6 @@ public class RenderContext {
 	 * @return The tile width
 	 */
 	public int tileWidth() {
-		return tileWidth;
+		return config.tileWidth;
 	}
 }

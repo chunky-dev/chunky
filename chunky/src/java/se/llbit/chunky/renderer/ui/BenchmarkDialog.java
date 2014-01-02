@@ -40,7 +40,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Version;
 import se.llbit.chunky.renderer.BenchmarkManager;
 import se.llbit.chunky.renderer.RenderContext;
@@ -228,7 +228,7 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 	public static void recordBenchmarkScore(String benchmarkScene, int score) {
 		try {
 			// append score to benchmark log file
-			File benchmarkFile = new File(ChunkySettings.getSettingsDirectory(), "benchmark.log");
+			File benchmarkFile = new File(PersistentSettings.getSettingsDirectory(), "benchmark.log");
 			PrintStream out = new PrintStream(new FileOutputStream(benchmarkFile, true));
 			SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
 			out.println(String.format("%s,%s,%s,%d",

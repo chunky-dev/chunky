@@ -400,7 +400,7 @@ public class Controls extends JPanel {
 		});
 
 		JButton testCLBtn = new JButton("Test OpenCL");
-		testCLBtn.setVisible(chunky.openCLEnabled);
+		testCLBtn.setVisible(chunky.options.openCLEnabled);
 		testCLBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

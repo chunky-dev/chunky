@@ -33,7 +33,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.texturepack.AlternateTextures;
 import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.CloudsTexture;
@@ -1251,8 +1251,9 @@ public class TexturePackLoader {
 	 * last used texture pack
 	 */
 	public static void loadTexturePack(File tpFile, boolean rememberTP) throws TextureLoadingError {
-		if (tpFile == null || !tpFile.isFile())
+		if (tpFile == null || !tpFile.isFile()) {
 			throw new TextureLoadingError();
+		}
 		loadTexturePack(tpFile, allTextures.keySet(), rememberTP);
 	}
 
@@ -1281,7 +1282,7 @@ public class TexturePackLoader {
 			loadTerrainTextures(texturePack, notLoaded);
 
 			if (rememberTP) {
-				ChunkySettings.setLastTexturePack(tpFile.getAbsolutePath());
+				PersistentSettings.setLastTexturePack(tpFile.getAbsolutePath());
 			}
 		} catch (IOException e) {
 			logger.warn("Failed to open " + tpName + ": " + e.getMessage());

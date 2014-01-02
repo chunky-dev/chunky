@@ -62,7 +62,7 @@ import javax.swing.text.Document;
 import org.apache.commons.math3.util.FastMath;
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.RenderConstants;
@@ -176,13 +176,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void valueChanged(double newValue) {
 			int value = (int) newValue;
-			ChunkySettings.setNumThreads(value);
+			PersistentSettings.setNumThreads(value);
 			renderMan.setNumThreads(value);
 		}
 
 		@Override
 		public void update() {
-			set(ChunkySettings.getNumThreads());
+			set(PersistentSettings.getNumThreads());
 		}
 	};
 
@@ -193,13 +193,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void valueChanged(double newValue) {
 			int value = (int) newValue;
-			ChunkySettings.setCPULoad(value);
+			PersistentSettings.setCPULoad(value);
 			renderMan.setCPULoad(value);
 		}
 
 		@Override
 		public void update() {
-			set(ChunkySettings.getCPULoad());
+			set(PersistentSettings.getCPULoad());
 		}
 	};
 
@@ -443,7 +443,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		setDefaultBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ChunkySettings.setSppTargetDefault(renderMan.scene().getTargetSPP());
+				PersistentSettings.setSppTargetDefault(renderMan.scene().getTargetSPP());
 			}
 		});
 
@@ -485,12 +485,12 @@ public class RenderControls extends JDialog implements ViewListener,
 		});
 
 		autoLock.setText("auto lock");
-		autoLock.setSelected(ChunkySettings.getAutoLock());
+		autoLock.setSelected(PersistentSettings.getAutoLock());
 		autoLock.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JCheckBox source = (JCheckBox) e.getSource();
-				ChunkySettings.setAutoLock(source.isSelected());
+				PersistentSettings.setAutoLock(source.isSelected());
 			}
 		});
 
@@ -697,7 +697,7 @@ public class RenderControls extends JDialog implements ViewListener,
 								return name.toLowerCase().endsWith(".dump");
 							}
 						});
-				fileDialog.setDirectory(ChunkySettings.
+				fileDialog.setDirectory(PersistentSettings.
 						getSceneDirectory().getAbsolutePath());
 				fileDialog.setVisible(true);
 				File selectedFile = fileDialog.getSelectedFile();
@@ -889,7 +889,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		makeDefaultBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				ChunkySettings.set3DCanvasSize(
+				PersistentSettings.set3DCanvasSize(
 						renderMan.scene().canvasWidth(),
 						renderMan.scene().canvasHeight());
 			}
@@ -1783,7 +1783,7 @@ public class RenderControls extends JDialog implements ViewListener,
 					/ (source.getMaximum() - source.getMinimum());
 			double rotation = value * 2 * Math.PI;
 			renderMan.scene().sky().setRotation(rotation);
-			ChunkySettings.setSkymapRotation(rotation);
+			PersistentSettings.setSkymapRotation(rotation);
 		}
 	};
 	private final ActionListener projectionModeListener = new ActionListener() {

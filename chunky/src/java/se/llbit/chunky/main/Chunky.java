@@ -29,11 +29,10 @@ import javax.swing.UIManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.BenchmarkManager;
 import se.llbit.chunky.renderer.ConsoleRenderListener;
 import se.llbit.chunky.renderer.PlaceholderRenderCanvas;
-import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.SceneLoadingError;
@@ -44,9 +43,6 @@ import se.llbit.chunky.renderer.ui.NewSceneDialog;
 import se.llbit.chunky.renderer.ui.RenderControls;
 import se.llbit.chunky.renderer.ui.SceneDirectoryPicker;
 import se.llbit.chunky.renderer.ui.SceneSelector;
-import se.llbit.chunky.resources.MinecraftFinder;
-import se.llbit.chunky.resources.TexturePackLoader;
-import se.llbit.chunky.resources.TexturePackLoader.TextureLoadingError;
 import se.llbit.chunky.ui.ChunkMap;
 import se.llbit.chunky.ui.ChunkyFrame;
 import se.llbit.chunky.ui.Controls;
@@ -123,10 +119,7 @@ public class Chunky implements ChunkDiscoveryListener {
 
 	private Chunk hoveredChunk = EmptyChunk.instance;
 
-	/**
-	 * Whether or not OpenCL rendering is enabled
-	 */
-	public boolean openCLEnabled = false;
+	public ChunkyOptions options;
 
 	/**
 	 * Logger object.
@@ -147,30 +140,6 @@ public class Chunky implements ChunkDiscoveryListener {
 				Chunky.class.getResource("/log4j.properties"));
 	}
 
-	private int tileWidth = RenderConstants.TILE_WIDTH_DEFAULT;
-
-	/**
-	 * The help string
-	 */
-	private static final String USAGE =
-		"Usage: chunky [OPTIONS] [WORLD DIRECTORY]\n" +
-		"Options:\n" +
-		"  -texture <FILE>        use FILE as the texture pack (must be a zip file)\n" +
-		"  -render <SCENE.json>   render the specified scene (see notes)\n" +
-		"  -scene-dir <DIR>       use the directory DIR for loading/saving scenes\n" +
-		"  -benchmark             run the benchmark and exit\n" +
-		"  -threads <NUM>         use the specified number of threads for rendering\n" +
-		"  -tile-width <NUM>      use the specified job tile width\n" +
-		"  -target <NUM>          override target SPP to be NUM in headless mode\n" +
-		"  -opencl                enables OpenCL rendering in the GUI\n" +
-		"  -help                  show this text\n" +
-		"\n" +
-		"Notes:\n" +
-		"If -render <SCENE> is specified and SCENE is a path to an existing file\n" +
-		"and -scene-dir <DIR> is not given, SCENE's parent directory will be used\n" +
-		"as the scene directory.  Otherwise, SCENE is interpreted as the name of\n" +
-		"a .json file within the scene directory.";
-
 	/**
 	 * Constructor
 	 */
@@ -183,135 +152,89 @@ public class Chunky implements ChunkDiscoveryListener {
 	 * @return Program exit code (0 = success)
 	 */
 	public int run(String[] args) {
-		boolean selectedWorld = false;
-		File sceneDir = null;
-		String sceneName = null;
-		String texturePack = null;
-		int renderThreads = Runtime.getRuntime().availableProcessors();
-		File worldDir = null;
-		boolean runBenchmark = false;
-		int target = -1;
-		for (int i = 0; i < args.length; ++i) {
-			if (args[i].equals("-texture") && args.length > i+1) {
-				texturePack = args[++i];
-			} else if (args[i].equals("-scene-dir")) {
-				if (i+1 == args.length) {
-					logger.error("Missing argument for -scene-dir option");
-					return 1;
-				} else {
-					sceneDir = new File(args[++i]);
-				}
-			} else if (args[i].equals("-render")) {
-				if (i+1 == args.length) {
-					logger.error("Missing argument for -render option");
-					return 1;
-				} else {
-					sceneName = args[++i];
-				}
-			} else if (args[i].equals("-benchmark")) {
-				runBenchmark = true;
-			} else if (args[i].equals("-target")) {
-				if (i+1 == args.length) {
-					logger.error("Missing argument for -target option");
-					return 1;
-				} else {
-					target = Math.max(1, Integer.parseInt(args[++i]));
-				}
-			} else if (args[i].equals("-threads")) {
-				if (i+1 == args.length) {
-					logger.error("Missing argument for -threads option");
-					return 1;
-				} else {
-					renderThreads = Math.max(1, Integer.parseInt(args[++i]));
-				}
-			} else if (args[i].equals("-tile-width")) {
-				if (i+1 == args.length) {
-					logger.error("Missing argument for -tile-width option");
-					return 1;
-				} else {
-					tileWidth = Math.max(1, Integer.parseInt(args[++i]));
-				}
-			} else if (args[i].equals("-opencl")) {
-				openCLEnabled = true;
-			} else if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("-help") || args[i].equals("--help")) {
-				System.out.println(USAGE);
-				System.out.println();
-				System.out.println("The default scene directory is " + ChunkySettings.getSceneDirectory());
-				return 0;
-			} else if (!args[i].startsWith("-") && !selectedWorld) {
-				worldDir = new File(args[i]);
-			} else {
-				System.err.println("Unrecognised argument: "+args[i]);
-				System.err.println(USAGE);
-				return 1;
-			}
+		CommandLineOptions cmdline = new CommandLineOptions(args);
+		options = cmdline.options;
+
+		if (cmdline.confError) {
+			return 1;
 		}
 
-		if (sceneDir == null && sceneName != null) {
-			File possibleSceneFile = new File(sceneName);
-			if (possibleSceneFile.isFile()) {
-				sceneDir = possibleSceneFile.getParentFile();
-				sceneName = possibleSceneFile.getName();
-			} else {
-				sceneDir = ChunkySettings.getSceneDirectory();
-			}
+		switch (cmdline.mode) {
+		case PRINT_HELP:
+			break;
+		case HEADLESS_BENCHMARK:
+			doBenchmark(options.renderThreads);
+			break;
+		case HEADLESS_RENDER:
+			doHeadlessRender();
+			break;
+		case DEFAULT:
+			startNormally();
+			break;
 		}
+		return 0;
+	}
 
-		boolean runHeadless = sceneName != null;
+	/**
+	 * Run the benchmark in headless mode.
+	 * @param renderThreads number of threads to use for rendering
+	 */
+	private void doBenchmark(int renderThreads) {
+		System.setProperty("java.awt.headless", "true");
+
+		RenderContext renderContext = new RenderContext(options);
+		BenchmarkManager benchmark = new BenchmarkManager(renderContext,
+				new ConsoleRenderListener());
+		benchmark.start();
 
 		try {
-			if (texturePack != null) {
-				TexturePackLoader.loadTexturePack(new File(texturePack), false);
-			} else {
-				String lastTexturePack = ChunkySettings.getLastTexturePack();
-				if (!lastTexturePack.isEmpty()) {
-					TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
-				} else {
-					TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJar(), false);
-				}
+			benchmark.join();
+			BenchmarkDialog.recordBenchmarkScore(benchmark.getSceneName(),
+					benchmark.getScore());
+			System.out.println("Benchmark completed with score " + benchmark.getScore() +
+					" (" + benchmark.getSceneName() + ")");
+		} catch (InterruptedException e) {
+			logger.warn("Benchmarking interrupted");
+		}
+	}
+
+	/**
+	 * Start headless mode
+	 */
+	private void doHeadlessRender() {
+		System.setProperty("java.awt.headless", "true");
+
+		RenderContext renderContext = new RenderContext(options);
+		RenderManager renderManager = new RenderManager(
+				new PlaceholderRenderCanvas(),
+				renderContext, new ConsoleRenderListener(), true);
+
+		try {
+			renderManager.loadScene(options.sceneName);
+			if (options.target != -1) {
+				renderManager.scene().setTargetSPP(options.target);
 			}
-		} catch (TextureLoadingError e) {
-			System.err.println("Error: failed to load texture pack!");
+			renderManager.scene().goHeadless();
+
+			renderManager.start();
+		} catch (IOException e) {
+			logger.error("IO error while loading scene", e);
+		} catch (SceneLoadingError e) {
+			logger.error("Scene loading error", e);
+		} catch (InterruptedException e) {
+			logger.error("Interrupted while loading scene", e);
 		}
+	}
 
-		if (runBenchmark) {
-			doBenchmark(renderThreads);
-			return 0;
-		}
-
-		if (runHeadless) {
-			// start headless mode
-			System.setProperty("java.awt.headless", "true");
-
-			RenderContext renderContext = new RenderContext(sceneDir,
-					renderThreads, tileWidth);
-			RenderManager renderManager = new RenderManager(
-					new PlaceholderRenderCanvas(),
-					renderContext, new ConsoleRenderListener(), true);
-
-			try {
-				renderManager.loadScene(sceneName);
-				if (target != -1) {
-					renderManager.scene().setTargetSPP(target);
-				}
-				renderManager.scene().goHeadless();
-
-				renderManager.start();
-			} catch (IOException e) {
-				logger.error("IO error while loading scene", e);
-			} catch (SceneLoadingError e) {
-				logger.error("Scene loading error", e);
-			} catch (InterruptedException e) {
-				logger.error("Interrupted while loading scene", e);
-			}
-			return 0;
-		}
-
+	/**
+	 * Start Chunky normally.
+	 */
+	private void startNormally() {
 		// load the world
-		if (worldDir != null && World.isWorldDir(worldDir)) {
-			loadWorld(new World(worldDir, false));
+		if (options.worldDir != null && World.isWorldDir(options.worldDir)) {
+			loadWorld(new World(options.worldDir, false));
 		} else {
-			File lastWorldDir = ChunkySettings.getLastWorld();
+			File lastWorldDir = PersistentSettings.getLastWorld();
 			if (lastWorldDir != null && World.isWorldDir(lastWorldDir)) {
 				loadWorld(new World(lastWorldDir, false));
 			}
@@ -343,32 +266,6 @@ public class Chunky implements ChunkDiscoveryListener {
 		}
 
 		refreshLoop();
-		return 0;
-	}
-
-	/**
-	 * Perform a benchmark in headless mode
-	 * @param renderThreads
-	 */
-	private void doBenchmark(int renderThreads) {
-		System.setProperty("java.awt.headless", "true");
-
-		File sceneDir = ChunkySettings.getSceneDirectory();
-		RenderContext renderContext = new RenderContext(sceneDir,
-				renderThreads, tileWidth);
-		BenchmarkManager benchmark = new BenchmarkManager(renderContext,
-				new ConsoleRenderListener());
-		benchmark.start();
-
-		try {
-			benchmark.join();
-			BenchmarkDialog.recordBenchmarkScore(benchmark.getSceneName(),
-					benchmark.getScore());
-			System.out.println("Benchmark completed with score " + benchmark.getScore() +
-					" (" + benchmark.getSceneName() + ")");
-		} catch (InterruptedException e) {
-			logger.warn("Benchmarking interrupted");
-		}
 	}
 
 	protected void buildUI() {
@@ -423,7 +320,7 @@ public class Chunky implements ChunkDiscoveryListener {
 
 		updateView();
 
-		ChunkySettings.setLastWorld(world.getWorldDirectory());
+		PersistentSettings.setLastWorld(world.getWorldDirectory());
 
 		if (frame != null) {
 			frame.worldLoaded(world);
@@ -522,9 +419,10 @@ public class Chunky implements ChunkDiscoveryListener {
 	public synchronized void open3DView() {
 		if (renderControls == null || !renderControls.isDisplayable()) {
 			File sceneDir = SceneDirectoryPicker.getSceneDirectory(frame);
-			RenderContext context = new RenderContext(sceneDir,
-					ChunkySettings.getNumThreads(), tileWidth);
 			if (sceneDir != null) {
+				ChunkyOptions config = options.clone();
+				config.sceneDir = sceneDir;
+				RenderContext context = new RenderContext(config);
 				String name = world.levelName();
 				String preferredName = SceneManager.preferredSceneName(
 														context, name);
@@ -1006,8 +904,9 @@ public class Chunky implements ChunkDiscoveryListener {
 		if (renderControls == null || !renderControls.isDisplayable()) {
 			File sceneDir = SceneDirectoryPicker.getSceneDirectory(frame);
 			if (sceneDir != null) {
-				RenderContext context = new RenderContext(sceneDir,
-						ChunkySettings.getNumThreads(), tileWidth);
+				ChunkyOptions config = options.clone();
+				config.sceneDir = sceneDir;
+				RenderContext context = new RenderContext(config);
 				SceneSelector sceneSelector = new SceneSelector(null, context);
 				sceneSelector.setLocationRelativeTo(frame);
 				if (sceneSelector.isAccepted()) {
@@ -1038,8 +937,7 @@ public class Chunky implements ChunkDiscoveryListener {
 	 * Benchmark the path tracing renderer.
 	 */
 	public void runBenchmark() {
-		RenderContext context = new RenderContext(null,
-				ChunkySettings.getNumThreads(), tileWidth);
+		RenderContext context = new RenderContext(options);
 		new BenchmarkDialog(getFrame(), context);
 	}
 }

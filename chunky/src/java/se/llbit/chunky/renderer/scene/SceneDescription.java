@@ -25,7 +25,7 @@ import java.util.Collection;
 
 import org.jastadd.util.PrettyPrinter;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.world.ChunkPosition;
@@ -70,7 +70,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	/**
 	 * Target SPP for the scene
 	 */
-	protected int sppTarget = ChunkySettings.getSppTargetDefault();
+	protected int sppTarget = PersistentSettings.getSppTargetDefault();
 
 	protected final Sky sky = new Sky(this);
 	protected final Camera camera = new Camera(this);
@@ -188,7 +188,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		height = desc.get("height").intValue(Scene.MIN_CANVAS_HEIGHT);
 		exposure = desc.get("exposure").doubleValue(Scene.DEFAULT_EXPOSURE);
 		postprocess = Postprocess.get(desc.get("postprocess").intValue(Postprocess.DEFAULT));
-		sppTarget = desc.get("sppTarget").intValue(ChunkySettings.getSppTargetDefault());
+		sppTarget = desc.get("sppTarget").intValue(PersistentSettings.getSppTargetDefault());
 		pathTrace = desc.get("pathTrace").boolValue(false);
 		dumpFrequency = desc.get("dumpFrequency").intValue(Scene.DEFAULT_DUMP_FREQUENCY);
 		saveSnapshots = desc.get("saveSnapshots").boolValue(false);

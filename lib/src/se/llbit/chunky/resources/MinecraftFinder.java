@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
@@ -43,7 +43,7 @@ public class MinecraftFinder {
 	 * @return The configured Minecraft directory.
 	 */
 	public static File getMinecraftDirectory() {
-		File mcDir = new File(ChunkySettings.getMinecraftDirectory());
+		File mcDir = new File(PersistentSettings.getMinecraftDirectory());
 		if (getMinecraftJar(mcDir, false) == null) {
 			mcDir = getDefaultMinecraftDirectory();
 		}

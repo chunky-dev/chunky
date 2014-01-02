@@ -25,7 +25,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.math3.util.FastMath;
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.SkymapTexture;
 import se.llbit.json.JsonObject;
@@ -97,7 +97,7 @@ public class Sky implements JSONifiable {
 	public Sky(SceneDescription sceneDescription) {
 		this.scene = sceneDescription;
 
-		rotation = ChunkySettings.getSkymapRotation();
+		rotation = PersistentSettings.getSkymapRotation();
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class Sky implements JSONifiable {
 			try {
 				logger.info("Loading sky map: " + fileName);
 				skymap = new SkymapTexture(ImageIO.read(sky));
-				ChunkySettings.setSkymap(fileName);
+				PersistentSettings.setSkymap(fileName);
 			} catch (IOException e) {
 				logger.warn("Could not load skymap: " + fileName);
 			} catch (Throwable e) {
@@ -141,7 +141,7 @@ public class Sky implements JSONifiable {
 	public synchronized void unloadSkymap() {
 		skymapFileName = "";
 		skymap = null;
-		ChunkySettings.removeSetting("skymap");
+		PersistentSettings.removeSetting("skymap");
 		scene.refresh();
 	}
 

@@ -50,7 +50,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.json.JsonParser;
@@ -305,7 +305,7 @@ public class ChunkyLauncher extends JFrame {
 				settings.version = version.name;
 				settings.showLauncher = alwaysShowLauncherCB.isSelected();
 				settings.showAdvancedSettings = showAdvancedSettingsCB.isSelected();
-				ChunkySettings.setMinecraftDirectory(minecraftDirField.getText());
+				PersistentSettings.setMinecraftDirectory(minecraftDirField.getText());
 				if (deployer.launchChunky(ChunkyLauncher.this, settings)) {
 					settings.save();
 					setVisible(false);
@@ -592,7 +592,7 @@ public class ChunkyLauncher extends JFrame {
 	protected void setMinecraftDir(File directory) {
 		if (directory.isDirectory()) {
 			minecraftDirField.setText(directory.getAbsolutePath());
-			ChunkySettings.setMinecraftDirectory(directory.getAbsolutePath());
+			PersistentSettings.setMinecraftDirectory(directory.getAbsolutePath());
 		}
 	}
 

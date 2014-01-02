@@ -34,7 +34,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -60,7 +60,7 @@ public class SceneDirectoryPicker extends JDialog {
 		JLabel lbl = new JLabel("Please select a directory where Chunky should store scene description files and renders:");
 
 		final JTextField scenePath = new JTextField(40);
-		selectedDirectory = ChunkySettings.getSceneDirectory();
+		selectedDirectory = PersistentSettings.getSceneDirectory();
 		scenePath.setText(selectedDirectory.getAbsolutePath());
 
 		final JCheckBox nopester =
@@ -96,7 +96,7 @@ public class SceneDirectoryPicker extends JDialog {
 				selectedDirectory = new File(scenePath.getText());
 				if (tryCreateSceneDir(selectedDirectory)) {
 					if (nopester.isSelected()) {
-						ChunkySettings.setSceneDirectory(selectedDirectory);
+						PersistentSettings.setSceneDirectory(selectedDirectory);
 					}
 					accepted = true;
 					SceneDirectoryPicker.this.dispose();
@@ -166,8 +166,8 @@ public class SceneDirectoryPicker extends JDialog {
 	 * or <code>null</code> if the scene directory was not set or could not be opened
 	 */
 	public static File getCurrentSceneDirectory() {
-		if (ChunkySettings.containsKey("sceneDirectory")) {
-			File sceneDir = ChunkySettings.getSceneDirectory();
+		if (PersistentSettings.containsKey("sceneDirectory")) {
+			File sceneDir = PersistentSettings.getSceneDirectory();
 			if (tryCreateSceneDir(sceneDir)) {
 				return sceneDir;
 			}

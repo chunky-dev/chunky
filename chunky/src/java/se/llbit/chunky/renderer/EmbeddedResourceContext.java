@@ -21,7 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 
 /**
  * Rendering context that loads scene files from embedded resources.
@@ -33,8 +33,7 @@ public class EmbeddedResourceContext extends RenderContext {
 	 * @param parent
 	 */
 	public EmbeddedResourceContext(RenderContext parent) {
-		super(parent.getSceneDirectory(), parent.numRenderThreads(),
-				parent.tileWidth());
+		super(parent.config);
 	}
 
 	@Override
@@ -46,7 +45,7 @@ public class EmbeddedResourceContext extends RenderContext {
 	public InputStream getSceneFileInputStream(String fileName)
 			throws FileNotFoundException {
 		InputStream in = EmbeddedResourceContext.class.getResourceAsStream(
-				"/" + ChunkySettings.DEFAULT_SCENE_DIRECTORY_NAME + "/" + fileName);
+				"/" + PersistentSettings.DEFAULT_SCENE_DIRECTORY_NAME + "/" + fileName);
 		if (in == null)
 			throw new FileNotFoundException();
 		return in;

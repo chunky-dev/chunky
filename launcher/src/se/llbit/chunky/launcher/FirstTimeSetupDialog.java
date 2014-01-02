@@ -40,7 +40,7 @@ import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import se.llbit.chunky.ChunkySettings;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.SettingsDirectory;
 
 @SuppressWarnings("serial")
@@ -87,7 +87,7 @@ public class FirstTimeSetupDialog extends JFrame {
 						settingsDir.mkdirs();
 					}
 					File settingsFile = new File(settingsDir,
-							ChunkySettings.SETTINGS_FILE);
+							PersistentSettings.SETTINGS_FILE);
 					if (settingsFile.isFile() || settingsFile.createNewFile()) {
 						initialized = true;
 					}
