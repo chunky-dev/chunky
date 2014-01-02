@@ -377,6 +377,7 @@ public class Scene extends SceneDescription {
 
 		if (loadOctree(context, renderListener)) {
 			calculateOctreeOrigin(chunks);
+			camera.setWorldSize(1<<octree.depth);
 
 			boolean haveGrass = loadGrassTexture(context, renderListener);
 			boolean haveFoliage = loadFoliageTexture(context, renderListener);

@@ -859,7 +859,7 @@ public class Camera implements JSONifiable {
 	 * @param size World size
 	 */
 	public void setWorldSize(double size) {
-		worldWidth = FastMath.sqrt(size*size + Chunk.Y_MAX*Chunk.Y_MAX);
+		worldWidth = 2*Math.sqrt(2*size*size + Chunk.Y_MAX*Chunk.Y_MAX);
 	}
 
 	/**
