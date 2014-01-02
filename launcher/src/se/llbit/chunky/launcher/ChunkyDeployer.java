@@ -273,7 +273,7 @@ public class ChunkyDeployer {
 			ShutdownThread shutdownThread = new ShutdownThread(proc, logger, outputScanner, errorScanner);
 			shutdownThread.start();
 			try {
-				Thread.sleep(200);
+				Thread.sleep(400);
 				int exitValue = shutdownThread.exitValue;
 				// check if process already exited with error code
 				if (exitValue != 0) {
