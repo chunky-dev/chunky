@@ -98,7 +98,11 @@
 		<antcall target="tarball"/>
 		<antcall target="build"/>
 		<antcall target="gendoc"/>
+		<antcall target="package"/>
+	</target>
 
+	<target name="package" depends="update-version-string"
+		description="build Chunky binary packages">
 		<mkdir dir="${build.dir}"/>
 		<jar destfile="${build.dir}/chunky-core-${version}.jar">
 			<fileset dir="${chunky.bin.dir}"/>
@@ -141,6 +145,9 @@
 				includes="release_notes-${version}.txt"
 				fullpath="release_notes.txt"/>
 		</zip>
+		<symlink overwrite="true"
+			link="${home}/chunky.jar"
+			resource="${build.dir}/chunky-${version}.jar"/>
 	</target>
 
 	<!-- TODO update the Mac build targets!! -->

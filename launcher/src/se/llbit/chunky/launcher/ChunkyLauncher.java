@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -629,19 +629,20 @@ public class ChunkyLauncher extends JFrame {
 					headlessOptions += arg;
 				}
 			}
-		}
-
-		if (forceLauncher) {
-			headless = false;
+			if (forceLauncher) {
+				headless = false;
+			}
 		}
 
 		if (headless) {
+			// Chunky is being run from the console => headless
 			settings.debugConsole = true;
 			settings.headless = true;
 			settings.chunkyOptions = headlessOptions;
 			ChunkyDeployer deployer = new ChunkyDeployer();
 			deployer.deploy();
 			deployer.launchChunky(null, settings);
+			return;
 		} else {
 			// Set up Look and Feel
 			try {

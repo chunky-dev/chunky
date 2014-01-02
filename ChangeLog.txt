@@ -1,4 +1,6 @@
 1.2.1 - TBD
+    * Fixed error in launcher which forced launcher to display even during
+    batch/headless mode
     * Removed the -watermark command-line option
     * Trapped chests now use trapped chest textures
     * Double trapped chests now appear as they should (rather than two single
