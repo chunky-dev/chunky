@@ -17,14 +17,23 @@
 package se.llbit.chunky.main;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 
 import org.apache.log4j.Logger;
+import org.jastadd.util.PrettyPrinter;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.SceneDescription;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.resources.TexturePackLoader.TextureLoadingError;
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonParser;
+import se.llbit.json.JsonParser.SyntaxError;
+import se.llbit.json.JsonString;
 
 public class CommandLineOptions {
 	enum Mode {
@@ -51,6 +60,9 @@ public class CommandLineOptions {
 		"  -opencl                enables OpenCL rendering in the GUI\n" +
 		"  -set <NAME> <VALUE>    set a global configuration option and exit\n" +
 		"  -reset <NAME>          reset a global configuration option and exit\n" +
+		"  -set <NAME> <VALUE> <SCENE>\n" +
+		"                         set a configuration option for a scene and exit\n" +
+		"  -reset <NAME> <SCENE>  reset a configuration option for a scene and exit\n" +
 		"  -help                  show this text\n" +
 		"\n" +
 		"Notes:\n" +
@@ -129,24 +141,78 @@ public class CommandLineOptions {
 				System.out.println("The default scene directory is " + PersistentSettings.getSceneDirectory());
 				mode = Mode.NO_OP;
 			} else if (args[i].equals("-set")) {
-				if (i+2 >= args.length) {
+				mode = Mode.NO_OP;
+				if (args.length > i+3) {
+					options.sceneName = args[i+3];
+					try {
+						File file = getSceneFile(options);
+						JsonObject desc = readSceneJson(file);
+						String name = args[i+1];
+						String value = args[i+2];
+						System.out.println(name + " <- " + value);
+						String[] path = name.split("\\.");
+						JsonObject obj = desc;
+						for (int j = 0; j < path.length-1; ++j) {
+							obj = obj.get(path[j]).object();
+						}
+						obj.set(path[path.length-1], new JsonString(value));
+						writeSceneJson(file, desc);
+						System.out.println("Updated scene " + file.getAbsolutePath());
+					} catch (SyntaxError e) {
+						logger.error("JSON syntax error");
+					} catch (IOException e) {
+						logger.error("Failed to write/load Scene Description File: " +
+								e.getMessage());
+					}
+					i += 3;
+					return;
+				} else if (args.length > i+2) {
+					PersistentSettings.setStringOption(args[i+1], args[i+2]);
+					i += 2;
+					return;
+				} else {
 					logger.error("Too few arguments for -set option!");
 					confError = true;
 					break;
-				} else {
-					PersistentSettings.setStringOption(args[i+1], args[i+2]);
-					i += 2;
-					mode = Mode.NO_OP;
 				}
 			} else if (args[i].equals("-reset")) {
-				if (i+1 >= args.length) {
+				mode = Mode.NO_OP;
+				if (args.length > i+2) {
+					options.sceneName = args[i+2];
+					try {
+						File file = getSceneFile(options);
+						JsonObject desc = readSceneJson(file);
+						String name = args[i+1];
+						System.out.println("- " + name);
+						String[] path = name.split("\\.");
+						JsonObject obj = desc;
+						for (int j = 0; j < path.length-1; ++j) {
+							obj = obj.get(path[j]).object();
+						}
+						for (int j = 0; j < obj.getNumMember(); ++j) {
+							if (obj.getMember(j).getName().equals(name)) {
+								obj.getMemberList().removeChild(j);
+								break;
+							}
+						}
+						writeSceneJson(file, desc);
+						System.out.println("Updated scene " + file.getAbsolutePath());
+					} catch (SyntaxError e) {
+						logger.error("JSON syntax error");
+					} catch (IOException e) {
+						logger.error("Failed to write/load Scene Description File: " +
+								e.getMessage());
+					}
+					i += 2;
+					return;
+				} else if (args.length > i+1) {
+					PersistentSettings.resetOption(args[i+1]);
+					i += 1;
+					return;
+				} else {
 					logger.error("Too few arguments for -reset option!");
 					confError = true;
 					break;
-				} else {
-					PersistentSettings.resetOption(args[i+1]);
-					i += 1;
-					mode = Mode.NO_OP;
 				}
 			} else if (!args[i].startsWith("-") && !selectedWorld) {
 				options.worldDir = new File(args[i]);
@@ -195,6 +261,44 @@ public class CommandLineOptions {
 		if (options.sceneName != null) {
 			mode = Mode.HEADLESS_RENDER;
 		}
+	}
+
+	private static File getSceneFile(ChunkyOptions options) {
+		if (options.sceneName.endsWith(
+				SceneDescription.SCENE_DESCRIPTION_EXTENSION)) {
+			File possibleSceneFile = new File(options.sceneName);
+			return possibleSceneFile;
+		} else {
+			if (options.sceneDir != null) {
+				return new File(options.sceneDir, options.sceneName +
+						SceneDescription.SCENE_DESCRIPTION_EXTENSION);
+			} else {
+				return new File(PersistentSettings.getSceneDirectory(),
+						options.sceneName +
+						SceneDescription.SCENE_DESCRIPTION_EXTENSION);
+			}
+		}
+	}
+
+	private static JsonObject readSceneJson(File file) throws IOException, SyntaxError {
+		FileInputStream in = new FileInputStream(file);
+		try {
+			JsonParser parser = new JsonParser(in);
+			return parser.parse().object();
+		} finally {
+			in.close();
+		}
+	}
+
+	private static void writeSceneJson(File file, JsonObject desc) throws IOException {
+		FileOutputStream out = new FileOutputStream(file);
+		try {
+			PrettyPrinter pp = new PrettyPrinter("  ", new PrintStream(out));
+			desc.prettyPrint(pp);
+		} finally {
+			out.close();
+		}
+
 	}
 
 }

@@ -1,4 +1,5 @@
 1.2.1 - TBD
+    * Added -set and -reset command-line options
     * Removed global persistent skymap configuration option - skymap is now
       strictly a per-scene setting
     * Fixed error causing the saveSnapshot setting to be ignored
