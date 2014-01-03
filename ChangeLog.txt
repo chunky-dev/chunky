@@ -6,23 +6,21 @@
     * Snapshots are now saved when the scene hits the SPP target
     * Fixed error in world size calculation (used for parallel projector ray
       offsets) which caused clipping artifacts in isometric/parallel scenes
-    * Fixed error in the scene selector which caused all scenes to try to load
+    * Fixed error in the scene selector that caused all scenes to try to load
       their respective skymaps
-    * Made the Launcher less verbose in the absence of errors
+    * Made the Launcher less verbose (on the command-line) in the absence of
+      errors
     * The debug console now does not close automatically if the Chunky process
       exits abnormally
     * If the Chunky process fails the launcher will no longer close directly
-      and will instead display a dialog informing the user of the abnormal
-    Chunky termination
-    * Added Launch Error dialog which displays if Chunky failed to launch
+      and will instead display information about the failure to launch
     * Fixed error that caused a render dump to be saved each frame if the
       "save dump" checkbox was unchecked
-    * Fixed error in launcher which forced launcher to display even during
-      batch/headless mode
+    * Fixed error that forced the launcher to be displayed even during
+	  batch/headless mode
     * Removed the -watermark command-line option
     * Trapped chests now use trapped chest textures
-    * Double trapped chests now appear as they should (rather than two single
-      chests)
+    * Double trapped chests now appear as double chests
     * Added Acacia Slabs
     * Added Dark Oak Slabs
     * Added Acacia Stairs
