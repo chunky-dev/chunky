@@ -201,6 +201,11 @@ public final class PersistentSettings {
 		save();
 	}
 
+	public static void setIntOption(String name, int value) {
+		settings.setInt(name, value);
+		save();
+	}
+
 	public static void resetOption(String name) {
 		settings.removeSetting(name);
 		save();

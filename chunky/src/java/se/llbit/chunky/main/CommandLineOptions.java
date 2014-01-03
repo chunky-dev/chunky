@@ -30,10 +30,12 @@ import se.llbit.chunky.renderer.scene.SceneDescription;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.resources.TexturePackLoader.TextureLoadingError;
+import se.llbit.json.JsonNumber;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonString;
+import se.llbit.json.JsonValue;
 
 public class CommandLineOptions {
 	enum Mode {
@@ -155,7 +157,13 @@ public class CommandLineOptions {
 						for (int j = 0; j < path.length-1; ++j) {
 							obj = obj.get(path[j]).object();
 						}
-						obj.set(path[path.length-1], new JsonString(value));
+						JsonValue jsonValue;
+						try {
+							jsonValue = new JsonNumber(Integer.parseInt(value));
+						} catch (Exception e) {
+							jsonValue = new JsonString(value);
+						}
+						obj.set(path[path.length-1], jsonValue);
 						writeSceneJson(file, desc);
 						System.out.println("Updated scene " + file.getAbsolutePath());
 					} catch (SyntaxError e) {
@@ -167,7 +175,13 @@ public class CommandLineOptions {
 					i += 3;
 					return;
 				} else if (args.length > i+2) {
-					PersistentSettings.setStringOption(args[i+1], args[i+2]);
+					String name = args[i+1];
+					String value = args[i+2];
+					try {
+						PersistentSettings.setIntOption(name, Integer.parseInt(value));
+					} catch (Exception e) {
+						PersistentSettings.setStringOption(name, value);
+					}
 					i += 2;
 					return;
 				} else {
