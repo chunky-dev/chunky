@@ -342,7 +342,7 @@ public class Sky implements JSONifiable {
 	public JsonObject toJson() {
 		JsonObject sky = new JsonObject();
 		if (skymap != null) {
-			sky.add("skymapFileName", skymapFileName);
+			sky.add("skymap", skymapFileName);
 		}
 		sky.add("skyYaw", rotation);
 		sky.add("skyMirrored", mirrored);
@@ -356,7 +356,10 @@ public class Sky implements JSONifiable {
 
 	@Override
 	public void fromJson(JsonObject obj) {
-		skymapFileName = obj.get("skymapFileName").stringValue("");
+		skymapFileName = obj.get("skymap").stringValue("");
+		if (skymapFileName.isEmpty()) {
+			skymapFileName = obj.get("skymapFileName").stringValue("");
+		}
 		rotation = obj.get("skyYaw").doubleValue(0);
 		mirrored = obj.get("skyMirrored").boolValue(true);
 
