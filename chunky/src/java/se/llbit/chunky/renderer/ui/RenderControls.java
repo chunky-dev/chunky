@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -923,7 +923,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateDumpFrequencyField();
 
 		saveSnapshotsCB.addActionListener(saveSnapshotListener);
-		updateSaveSnapshotCB();
+		updateSaveSnapshotCheckBox();
 
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
@@ -1978,7 +1978,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	}
 
-	protected void updateSaveSnapshotCB() {
+	protected void updateSaveSnapshotCheckBox() {
 		saveSnapshotsCB.removeActionListener(saveSnapshotListener);
 		try {
 			saveSnapshotsCB.setSelected(renderMan.scene().shouldSaveSnapshots());
@@ -2205,6 +2205,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateTitle();
 		exposure.update();
 		updateSaveDumpsCheckBox();
+		updateSaveSnapshotCheckBox();
 		updateDumpFrequencyField();
 		updateSPPTargetField();
 		updateSceneNameField();
