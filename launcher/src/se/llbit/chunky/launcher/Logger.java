@@ -17,6 +17,8 @@
 package se.llbit.chunky.launcher;
 
 public interface Logger {
+	void appendStdout(byte[] buffer, int size);
+	void appendStderr(byte[] buffer, int size);
 	void appendLine(String line);
 	void appendErrorLine(String line);
 

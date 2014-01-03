@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.VersionInfo.Library;
@@ -248,14 +247,31 @@ public class ChunkyDeployer {
 		}
 		try {
 			final Process proc = procBuilder.start();
-			final Scanner stdout = new Scanner(proc.getInputStream());
-			final Scanner stderr = new Scanner(proc.getErrorStream());
+			Runtime.getRuntime().addShutdownHook(new Thread() {
+				@Override
+				public void run() {
+					// kill the subprocess
+					proc.destroy();
+				}
+			});
 			final Thread outputScanner = new Thread("Output Logger") {
 				@Override
 				public void run() {
-					while (!isInterrupted() && stdout.hasNextLine()) {
-						String line = stdout.nextLine();
-						logger.appendLine(line);
+					InputStream is = proc.getInputStream();
+					try {
+						byte[] buffer = new byte[1024];
+						while (true) {
+							int size = is.read(buffer, 0, buffer.length);
+							if (size == -1) {
+								break;
+							}
+							logger.appendStdout(buffer, size);
+						}
+					} catch (IOException e) {
+						try {
+							is.close();
+						} catch (IOException e1) {
+						}
 					}
 				}
 			};
@@ -263,9 +279,21 @@ public class ChunkyDeployer {
 			final Thread errorScanner = new Thread("Error Logger") {
 				@Override
 				public void run() {
-					while (!isInterrupted() && stderr.hasNextLine()) {
-						String line = stderr.nextLine();
-						logger.appendErrorLine(line);
+					InputStream is = proc.getErrorStream();
+					try {
+						byte[] buffer = new byte[1024];
+						while (true) {
+							int size = is.read(buffer, 0, buffer.length);
+							if (size == -1) {
+								break;
+							}
+							logger.appendStderr(buffer, size);
+						}
+					} catch (IOException e) {
+						try {
+							is.close();
+						} catch (IOException e1) {
+						}
 					}
 				}
 			};

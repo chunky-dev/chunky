@@ -19,6 +19,16 @@ package se.llbit.chunky.launcher;
 public class ConsoleLogger implements Logger {
 
 	@Override
+	public void appendStdout(byte[] buffer, int size) {
+		System.out.write(buffer, 0, size);
+	}
+
+	@Override
+	public void appendStderr(byte[] buffer, int size) {
+		System.err.write(buffer, 0, size);
+	}
+
+	@Override
 	public void appendLine(String line) {
 		System.out.println(line);
 	}

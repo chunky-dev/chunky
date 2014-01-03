@@ -126,7 +126,7 @@ public class DebugConsole extends JDialog implements Logger {
 				try {
 					statusTextDoc.insertString(
 							statusTextDoc.getLength(),
-							text + "\n",
+							text,
 							attrs);
 				} catch (BadLocationException e) {
 					System.err.println("Error updating debug console: " + e.getMessage());
@@ -149,12 +149,22 @@ public class DebugConsole extends JDialog implements Logger {
 	}
 
 	@Override
+	public void appendStdout(byte[] buffer, int size) {
+		appendStatusText(new String(buffer, 0, size), stdoutAttributes);
+	}
+
+	@Override
+	public void appendStderr(byte[] buffer, int size) {
+		appendStatusText(new String(buffer, 0, size), stderrAttributes);
+	}
+
+	@Override
 	public void appendLine(String line) {
-		appendStatusText(line, stdoutAttributes);
+		appendStatusText(line + "\n", stdoutAttributes);
 	}
 
 	@Override
 	public void appendErrorLine(String line) {
-		appendStatusText(line, stdoutAttributes);
+		appendStatusText(line + "\n", stderrAttributes);
 	}
 }
