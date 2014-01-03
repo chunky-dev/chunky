@@ -80,7 +80,7 @@ public class Sky implements JSONifiable {
 	private Texture skymap = null;
 	private String skymapFileName = "";
 	private final SceneDescription scene;
-	private double rotation;
+	private double rotation = 0;
 	private boolean mirrored = true;
 
 	// final to ensure that we don't do a lot of redundant re-allocation
@@ -96,8 +96,6 @@ public class Sky implements JSONifiable {
 	 */
 	public Sky(SceneDescription sceneDescription) {
 		this.scene = sceneDescription;
-
-		rotation = PersistentSettings.getSkymapRotation();
 	}
 
 	/**
@@ -121,7 +119,6 @@ public class Sky implements JSONifiable {
 			try {
 				logger.info("Loading sky map: " + fileName);
 				skymap = new SkymapTexture(ImageIO.read(sky));
-				PersistentSettings.setSkymap(fileName);
 			} catch (IOException e) {
 				logger.warn("Could not load skymap: " + fileName);
 			} catch (Throwable e) {

@@ -153,8 +153,6 @@ public class Scene extends SceneDescription {
 	 */
 	public static int rayDepth = PersistentSettings.DEFAULT_RAY_DEPTH;
 
-	private String skymapFileName;
-
 	/**
 	 * World
 	 */
@@ -213,11 +211,6 @@ public class Scene extends SceneDescription {
 		sppTarget = PersistentSettings.getSppTargetDefault();
 
 		initBuffers();
-
-		String skymap = PersistentSettings.getSkymap();
-		if (!skymap.isEmpty()) {
-			sky.loadSkyMap(skymap);
-		}
 	}
 
 	private synchronized void initBuffers() {
@@ -256,7 +249,6 @@ public class Scene extends SceneDescription {
 
 		exposure = other.exposure;
 		name = other.name;
-		skymapFileName = other.skymapFileName;
 
 		stillWater = other.stillWater;
 		clearWater = other.clearWater;

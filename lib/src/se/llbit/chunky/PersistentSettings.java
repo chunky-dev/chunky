@@ -148,10 +148,6 @@ public final class PersistentSettings {
 		return settings.getInt("3dcanvas.width", DEFAULT_3D_CANVAS_WIDTH);
 	}
 
-	public static String getSkymap() {
-		return settings.getString("skymap", "");
-	}
-
 	public static void setSceneDirectory(File dir) {
 		settings.setString("sceneDirectory", dir.getAbsolutePath());
 		save();
@@ -178,20 +174,6 @@ public final class PersistentSettings {
 	public static void set3DCanvasSize(int width, int height) {
 		settings.setInt("3dcanvas.width", width);
 		settings.setInt("3dcanvas.height", height);
-		save();
-	}
-
-	public static void setSkymapRotation(double rotation) {
-		settings.setDouble("skymapRotation", rotation);
-		save();
-	}
-
-	public static double getSkymapRotation() {
-		return settings.getDouble("skymapRotation", 0.0);
-	}
-
-	public static void setSkymap(String fileName) {
-		settings.setString("skymap", fileName);
 		save();
 	}
 

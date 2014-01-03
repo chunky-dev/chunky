@@ -1783,7 +1783,6 @@ public class RenderControls extends JDialog implements ViewListener,
 					/ (source.getMaximum() - source.getMinimum());
 			double rotation = value * 2 * Math.PI;
 			renderMan.scene().sky().setRotation(rotation);
-			PersistentSettings.setSkymapRotation(rotation);
 		}
 	};
 	private final ActionListener projectionModeListener = new ActionListener() {
