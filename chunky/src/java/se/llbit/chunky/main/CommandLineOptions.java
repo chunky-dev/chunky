@@ -1,3 +1,19 @@
+/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package se.llbit.chunky.main;
 
 import java.io.File;
@@ -5,6 +21,7 @@ import java.io.File;
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.scene.SceneDescription;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.resources.TexturePackLoader.TextureLoadingError;
@@ -24,8 +41,8 @@ public class CommandLineOptions {
 	private static final String USAGE =
 		"Usage: chunky [OPTIONS] [WORLD DIRECTORY]\n" +
 		"Options:\n" +
-		"  -texture <FILE>        use FILE as the texture pack (must be a zip file)\n" +
-		"  -render <SCENE.json>   render the specified scene (see notes)\n" +
+		"  -texture <FILE>        use FILE as the texture pack (must be a Zip file)\n" +
+		"  -render <SCENE>        render the specified scene (see notes)\n" +
 		"  -scene-dir <DIR>       use the directory DIR for loading/saving scenes\n" +
 		"  -benchmark             run the benchmark and exit\n" +
 		"  -threads <NUM>         use the specified number of threads for rendering\n" +
@@ -37,10 +54,11 @@ public class CommandLineOptions {
 		"  -help                  show this text\n" +
 		"\n" +
 		"Notes:\n" +
-		"If -render <SCENE> is specified and SCENE is a path to an existing file\n" +
-		"and -scene-dir <DIR> is not given, SCENEs parent directory will be used\n" +
-		"as the scene directory.  Otherwise, SCENE is interpreted as the name of\n" +
-		"a .json file within the scene directory.\n";
+		"<SCENE> can be either the path to a Scene Description File (" + SceneDescription.SCENE_DESCRIPTION_EXTENSION + "),\n" +
+		"*OR* the name of a scene relative to the scene directory (excluding extension).\n" +
+		"If the scene name is an absolute path then the scene directory will be the\n" +
+		"parent directory of the Scene Description File, otherwise the scene directory\n" +
+		"can be overridden temporarily by the -scene-dir option.";
 
 	protected boolean confError = false;
 
@@ -133,20 +151,19 @@ public class CommandLineOptions {
 			} else if (!args[i].startsWith("-") && !selectedWorld) {
 				options.worldDir = new File(args[i]);
 			} else {
-				System.err.println("Unrecognised argument: "+args[i]);
+				System.err.println("Unrecognized argument: "+args[i]);
 				System.err.println(USAGE);
 				confError = true;
 				break;
 			}
 		}
 
-		if (options.sceneDir == null && options.sceneName != null) {
+		if (options.sceneName != null &&
+				options.sceneName.endsWith(SceneDescription.SCENE_DESCRIPTION_EXTENSION)) {
 			File possibleSceneFile = new File(options.sceneName);
 			if (possibleSceneFile.isFile()) {
 				options.sceneDir = possibleSceneFile.getParentFile();
 				options.sceneName = possibleSceneFile.getName();
-			} else {
-				options.sceneDir = PersistentSettings.getSceneDirectory();
 			}
 		}
 

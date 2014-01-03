@@ -41,6 +41,8 @@ import se.llbit.util.JSONifiable;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class SceneDescription implements Refreshable, JSONifiable {
+	public static final String SCENE_DESCRIPTION_EXTENSION = ".json";
+
 	/**
 	 * The current Scene Description Format (SDF) version
 	 */

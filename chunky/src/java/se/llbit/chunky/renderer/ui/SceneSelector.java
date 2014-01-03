@@ -129,7 +129,7 @@ public class SceneSelector extends JDialog {
 				.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				return name.endsWith(RenderContext.SCENE_DESCRIPTION_EXTENSION);
+				return name.endsWith(SceneDescription.SCENE_DESCRIPTION_EXTENSION);
 			}
 		});
 		List<File> fileList = new ArrayList<File>(sceneFiles.length);

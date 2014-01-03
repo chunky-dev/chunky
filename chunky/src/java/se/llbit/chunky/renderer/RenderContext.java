@@ -24,13 +24,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import se.llbit.chunky.main.ChunkyOptions;
+import se.llbit.chunky.renderer.scene.SceneDescription;
 
 /**
  * Rendering context.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class RenderContext {
-	public static final String SCENE_DESCRIPTION_EXTENSION = ".json";
 
 	protected final ChunkyOptions config;
 
@@ -62,7 +62,8 @@ public class RenderContext {
 	 * @throws FileNotFoundException
 	 */
 	public File getSceneDescriptionFile(String sceneName) {
-		return getSceneFile(sceneName + SCENE_DESCRIPTION_EXTENSION);
+		return getSceneFile(sceneName +
+				SceneDescription.SCENE_DESCRIPTION_EXTENSION);
 	}
 
 	/**
@@ -72,7 +73,8 @@ public class RenderContext {
 	 */
 	public InputStream getSceneDescriptionInputStream(String sceneName)
 			throws FileNotFoundException {
-		return getSceneFileInputStream(sceneName + SCENE_DESCRIPTION_EXTENSION);
+		return getSceneFileInputStream(sceneName +
+				SceneDescription.SCENE_DESCRIPTION_EXTENSION);
 	}
 
 	/**
@@ -82,7 +84,8 @@ public class RenderContext {
 	 */
 	public OutputStream getSceneDescriptionOutputStream(String sceneName)
 			throws FileNotFoundException {
-		return getSceneFileOutputStream(sceneName + SCENE_DESCRIPTION_EXTENSION);
+		return getSceneFileOutputStream(sceneName +
+				SceneDescription.SCENE_DESCRIPTION_EXTENSION);
 	}
 
 	/**
