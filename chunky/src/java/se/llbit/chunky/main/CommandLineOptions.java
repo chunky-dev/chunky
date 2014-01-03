@@ -32,14 +32,15 @@ public class CommandLineOptions {
 		"  -tile-width <NUM>      use the specified job tile width\n" +
 		"  -target <NUM>          override target SPP to be NUM in headless mode\n" +
 		"  -opencl                enables OpenCL rendering in the GUI\n" +
-		"  -config <NAME> <VALUE> set a configuration option and exit\n" +
+		"  -set <NAME> <VALUE>    set a global configuration option and exit\n" +
+		"  -reset <NAME>          reset a global configuration option and exit\n" +
 		"  -help                  show this text\n" +
 		"\n" +
 		"Notes:\n" +
 		"If -render <SCENE> is specified and SCENE is a path to an existing file\n" +
 		"and -scene-dir <DIR> is not given, SCENEs parent directory will be used\n" +
 		"as the scene directory.  Otherwise, SCENE is interpreted as the name of\n" +
-		"a .json file within the scene directory.";
+		"a .json file within the scene directory.\n";
 
 	protected boolean confError = false;
 
