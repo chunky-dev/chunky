@@ -113,7 +113,10 @@ Section "Start Menu Shortcuts" SecSM
   WriteINIStr "$INSTDIR\Wiki.URL" "InternetShortcut" "URL" "http://chunky.llbit.se"
 
   CreateDirectory "$SMPROGRAMS\Chunky"
-  CreateShortCut "$SMPROGRAMS\Chunky\Chunky.lnk" "$INSTDIR\chunky.jar" "" "$INSTDIR\chunky.ico"
+
+  ; Default Chunky Shortcut
+  ;;;;CreateShortCut "$SMPROGRAMS\Chunky\Chunky.lnk" "$INSTDIR\chunky.jar" "" "$INSTDIR\chunky.ico"
+  CreateShortCut "$SMPROGRAMS\Chunky\Chunky.lnk" "$JavaExe" "-jar $\"$INSTDIR\chunky.jar$\"" "$INSTDIR\chunky.ico"
   CreateShortCut "$SMPROGRAMS\Chunky\ReadMe.lnk" "$INSTDIR\ReadMe.html"
   CreateShortCut "$SMPROGRAMS\Chunky\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
   CreateShortCut "$SMPROGRAMS\Chunky\Wiki.lnk" "$INSTDIR\Wiki.URL"
