@@ -150,6 +150,10 @@ public class CommandLineOptions {
 			}
 		}
 
+		if (options.sceneDir == null) {
+			options.sceneDir = PersistentSettings.getSceneDirectory();
+		}
+
 		if (!confError) {
 			try {
 				if (options.texturePack != null) {

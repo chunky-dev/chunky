@@ -1,4 +1,6 @@
 1.2.1 - TBD
+    * Fixed error causing the saveSnapshot setting to be ignored
+    * Snapshots are now saved when the scene hits the SPP target
     * Fixed error in world size calculation (used for parallel projector ray
       offsets) which caused clipping artifacts in isometric/parallel scenes
     * Fixed error in the scene selector which caused all scenes to try to load

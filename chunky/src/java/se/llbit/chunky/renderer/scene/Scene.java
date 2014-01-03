@@ -1254,6 +1254,7 @@ public class Scene extends SceneDescription {
 		postprocess = other.postprocess;
 		exposure = other.exposure;
 		dumpFrequency = other.dumpFrequency;
+		saveSnapshots = other.saveSnapshots;
 		sppTarget = other.sppTarget;
 	}
 

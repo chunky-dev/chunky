@@ -244,7 +244,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 			if (dumpNextFrame) {
 				// save the current frame
-				if (scene.shouldSaveSnapshots()) {
+				if (scene.shouldSaveSnapshots() ||
+						bufferedScene.spp >= bufferedScene.getTargetSPP()) {
 					bufferedScene.saveSnapshot(context.getSceneDirectory());
 				}
 
