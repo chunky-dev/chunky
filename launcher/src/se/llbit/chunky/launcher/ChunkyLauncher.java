@@ -64,7 +64,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame {
 
-	private static final String LAUNCHER_VERSION = "v1.5";
+	private static final String LAUNCHER_VERSION = "v1.6";
 
 	public class UpdateThread extends Thread {
 		@Override public void run() {

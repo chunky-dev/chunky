@@ -109,10 +109,6 @@ public class ChunkyDeployer {
 				System.out.println("Deploying embedded version: " + embedded.name);
 			}
 			deployEmbeddedVersion(embedded);
-			if (!versions.contains(embedded)) {
-				versions.add(embedded);
-				Collections.sort(versions);
-			}
 		}
 	}
 
