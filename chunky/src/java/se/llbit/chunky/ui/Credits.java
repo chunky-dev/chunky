@@ -64,6 +64,7 @@ public class Credits extends JDialog {
 			"<br>" +
 			"<b>Tools and Libraries:</b><br>" +
 			"Apache log4j<br>" +
+			"Apache Commons Math<br>" +
 			"JOCL (http://www.jocl.org)<br>" +
 			"MWC64X<br>" +
 			"Markdown<br>"
