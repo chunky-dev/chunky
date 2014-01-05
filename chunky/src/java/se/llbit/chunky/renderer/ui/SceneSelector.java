@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -36,6 +36,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -64,6 +65,8 @@ public class SceneSelector extends JDialog {
 	private final RenderContext context;
 	private boolean accepted = false;
 	private SceneDescription selectedScene;
+	protected final JButton loadSelectedBtn = new JButton("Load Selected Scene");
+	protected final JButton deleteSelectedBtn = new JButton("Delete Selected Scene");
 
 	/**
 	 * Creates a new scene selector dialog.
@@ -116,12 +119,19 @@ public class SceneSelector extends JDialog {
 
 		JLabel listDescription = new JLabel();
 		JButton cancelBtn = new JButton("Cancel");
-		final JButton loadSelectedBtn = new JButton("Load Selected Scene");
 		loadSelectedBtn.setEnabled(false);
 		loadSelectedBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				selectScene(sceneTable.getSelectedRow());
+			}
+		});
+
+		deleteSelectedBtn.setEnabled(false);
+		deleteSelectedBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deleteScene(sceneTable.getSelectedRow());
 			}
 		});
 
@@ -170,6 +180,7 @@ public class SceneSelector extends JDialog {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				loadSelectedBtn.setEnabled(true);
+				deleteSelectedBtn.setEnabled(true);
 			}
 		});
 		JScrollPane scrollPane = new JScrollPane(sceneTable);
@@ -193,7 +204,10 @@ public class SceneSelector extends JDialog {
 					.addComponent(listDescription, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
 					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
 					.addComponent(cancelBtn, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
-					.addComponent(loadSelectedBtn, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+					.addGroup(layout.createSequentialGroup()
+						.addComponent(loadSelectedBtn, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+						.addComponent(deleteSelectedBtn)
+					)
 				)
 				.addContainerGap())
 		);
@@ -205,7 +219,10 @@ public class SceneSelector extends JDialog {
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
 				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(loadSelectedBtn, GroupLayout.DEFAULT_SIZE, 40, 40)
+				.addGroup(layout.createParallelGroup()
+					.addComponent(loadSelectedBtn, GroupLayout.DEFAULT_SIZE, 40, 40)
+					.addComponent(deleteSelectedBtn, GroupLayout.DEFAULT_SIZE, 40, 40)
+				)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(cancelBtn)
 				.addContainerGap())
@@ -214,6 +231,10 @@ public class SceneSelector extends JDialog {
 		pack();
 	}
 
+	/**
+	 * Load the selected scene
+	 * @param selected index of scene to be loaded
+	 */
 	protected void selectScene(int selected) {
 		if (selected >= 0 && selected < scenes.size()) {
 			selectedScene = scenes.get(selected);
@@ -222,6 +243,37 @@ public class SceneSelector extends JDialog {
 			dispose();
 			if (controls != null) {
 				controls.loadScene(selectedScene.name);
+			}
+		}
+	}
+
+	/**
+	 * Delete the selected scene
+	 * @param selected index of scene to be deleted
+	 */
+	protected void deleteScene(int selected) {
+		if (selected >= 0 && selected < scenes.size()) {
+			SceneDescription scene = scenes.get(selected);
+			Object[] options = {
+					"Cancel",
+					"Delete Scene \"" + scene.name + "\""
+			};
+			int n = JOptionPane.showOptionDialog(null,
+					"<html>Are you sure you wish to delete the scene \"" + scene.name + "\"?<br>"
+							+ "All files for the scene, except snapshot images, will be irreversibly deleted!",
+					"Delete Scene?",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.WARNING_MESSAGE,
+					null,
+					options,
+					options[0]);
+			if (n == 1) {
+				scene.delete();
+				// remove scene from table
+				tableModel.removeRow(selected);
+				scenes.remove(selected);
+				deleteSelectedBtn.setEnabled(false);
+				loadSelectedBtn.setEnabled(false);
 			}
 		}
 	}

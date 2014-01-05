@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -264,6 +265,29 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	 */
 	public Camera camera() {
 		return camera;
+	}
+
+	/**
+	 * Delete all scene files from the scene directory, leaving only
+	 * snapshots untouched.
+	 */
+	public void delete() {
+		String[] extensions = {
+				".json",
+				".dump",
+				".octree",
+				".foliage",
+				".grass",
+				".json.backup",
+				".dump.backup",
+		};
+		File sceneDir = PersistentSettings.getSceneDirectory();
+		for (String extension: extensions) {
+			File file = new File(sceneDir, name+extension);
+			if (file.isFile()) {
+				file.delete();
+			}
+		}
 	}
 
 }
