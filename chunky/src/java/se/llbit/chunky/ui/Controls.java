@@ -848,7 +848,7 @@ public class Controls extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				CenteredFileDialog fileDialog =
-						new CenteredFileDialog(chunky.getFrame(), "Export ZIP", FileDialog.SAVE);
+						new CenteredFileDialog(chunky.getFrame(), "Export to ZIP", FileDialog.SAVE);
 				fileDialog.setDirectory(System.getProperty("user.dir"));
 				fileDialog.setFile(chunky.getWorldName()+".zip");
 				fileDialog.setFilenameFilter(
@@ -860,8 +860,9 @@ public class Controls extends JPanel {
 						});
 				fileDialog.setVisible(true);
 				File selectedFile = fileDialog.getSelectedFile(".zip");
-				if (selectedFile != null)
+				if (selectedFile != null) {
 					chunky.exportZip(selectedFile, progressPanel);
+				}
 			}
 		});
 

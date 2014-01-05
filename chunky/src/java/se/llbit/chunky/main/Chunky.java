@@ -64,6 +64,8 @@ import se.llbit.chunky.world.RegionParser;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldRenderer;
 import se.llbit.chunky.world.listeners.ChunkDiscoveryListener;
+import se.llbit.util.OSDetector;
+import se.llbit.util.OSDetector.OS;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created by
@@ -629,7 +631,8 @@ public class Chunky implements ChunkDiscoveryListener {
 	 */
 	public synchronized void exportZip(File targetFile, ProgressPanel progress) {
 		if (!progress.isBusy()) {
-			if (targetFile.exists()) {
+			if (OSDetector.getOS() != OS.WIN && targetFile.exists()) {
+				// Windows FileDialog asks for overwrite confirmation, so we don't have to
 				Object[] options = {Messages.getString("Chunky.Cancel_lbl"), //$NON-NLS-1$
 						Messages.getString("Chunky.AcceptOverwrite_lbl")}; //$NON-NLS-1$
 				int n = JOptionPane.showOptionDialog(null,
@@ -641,8 +644,9 @@ public class Chunky implements ChunkDiscoveryListener {
 						null,
 						options,
 						options[0]);
-				if (n != 1)
+				if (n != 1) {
 					return;
+				}
 			}
 			new ZipExportJob(world, chunkSelection.getSelection(), targetFile, progress).start();
 		}

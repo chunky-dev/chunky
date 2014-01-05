@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -28,6 +28,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
+import se.llbit.util.OSDetector;
 import se.llbit.util.Util;
 
 /**
@@ -58,17 +59,18 @@ public class MinecraftFinder {
 	 */
 	public static File getDefaultMinecraftDirectory() {
 		String home = System.getProperty("user.home", ".");   //$NON-NLS-1$ //$NON-NLS-2$
-		String os = System.getProperty("os.name").toLowerCase();  //$NON-NLS-1$
 
-		if (os.contains("win")) {  //$NON-NLS-1$
+		switch (OSDetector.getOS()) {
+		case WIN:
 			String appdata = System.getenv("APPDATA");	//$NON-NLS-1$
-			if (appdata != null)
+			if (appdata != null) {
 				return new File(appdata, ".minecraft");	//$NON-NLS-1$
-			else
+			} else {
 				return new File(home, ".minecraft");  //$NON-NLS-1$
-		} else if (os.contains("mac")) {  //$NON-NLS-1$
+			}
+		case MAC:
 			return new File(home, "Library/Application Support/minecraft");	//$NON-NLS-1$
-		} else {
+		default:
 			return new File(home, ".minecraft");  //$NON-NLS-1$
 		}
 	}

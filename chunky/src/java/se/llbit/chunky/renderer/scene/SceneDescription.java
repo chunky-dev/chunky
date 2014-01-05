@@ -36,6 +36,7 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
 import se.llbit.util.JSONifiable;
+import se.llbit.util.ZipExport;
 
 /**
  * Basic scene description.
@@ -288,6 +289,21 @@ public class SceneDescription implements Refreshable, JSONifiable {
 				file.delete();
 			}
 		}
+	}
+
+	/**
+	 * Export the scene to a zip file.
+	 */
+	public void exportToZip(File targetFile) {
+		String[] extensions = {
+				".json",
+				".dump",
+				".octree",
+				".foliage",
+				".grass",
+		};
+		ZipExport.zip(targetFile, PersistentSettings.getSceneDirectory(),
+				name, extensions);
 	}
 
 }

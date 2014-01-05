@@ -52,6 +52,7 @@ public class Credits extends JDialog {
 			"Jesper Öqvist<br>" +
 			"TOGoS (projection & misc.)<br>" +
 			"twirrim (FastMath)<br>" +
+			"AEnterprise (scene Zip export)<br>" +
 			"<br>" +
 			"<b>OSX Bundling:</b><br>" +
 			"Ben Phelps<br>" +

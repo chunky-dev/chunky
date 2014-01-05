@@ -15,7 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.AEnterprise.ZipForExport;
+package se.llbit.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,46 +25,54 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ZipForExport {
-		
+import org.apache.log4j.Logger;
 
-	public static void Zip (String archive, String sceneDir, String sceneName) {
+/**
+ * Utility class for exporting scenes to zip files.
+ *
+ * @author Tim De Keyser <aenterprise2@gmail.com>
+ */
+public class ZipExport {
+	private static final Logger logger = Logger.getLogger(ZipExport.class);
 
+	/**
+	 * Export a scene to a zip file.
+	 * @param archive zip file to write
+	 * @param sceneDir
+	 * @param sceneName zip prefix
+	 * @param extensions file extensions to include
+	 */
+	public static void zip(File archive, File sceneDir, String sceneName,
+			String[] extensions) {
 		try {
 			FileOutputStream fos = new FileOutputStream(archive);
 			ZipOutputStream zos = new ZipOutputStream(fos);
 
-			String file1Name = sceneDir + "/" + sceneName + ".cvf";
-			String file2Name = sceneDir + "/" + sceneName + ".dump";
-			String file3Name = sceneDir + "/" + sceneName + ".foliage";
-			String file4Name = sceneDir + "/" + sceneName + ".grass";
-			String file5Name = sceneDir + "/" + sceneName + ".octree";
-
-			addToZipFile(file1Name, zos);
-			addToZipFile(file2Name, zos);
-			addToZipFile(file3Name, zos);
-			addToZipFile(file4Name, zos);
-			addToZipFile(file5Name, zos);
+			for (String extension : extensions) {
+				addToZipFile(zos, sceneDir, sceneName, sceneName + extension);
+			}
 
 			zos.close();
 			fos.close();
 
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.error(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 
 	}
 
-	public static void addToZipFile(String fileName, ZipOutputStream zos) throws FileNotFoundException, IOException {
- 
-		File file = new File(fileName);
+	private static void addToZipFile(ZipOutputStream zos, File sceneDir,
+			String prefix, String fileName) throws FileNotFoundException,
+			IOException {
+
+		File file = new File(sceneDir, fileName);
 		FileInputStream fis = new FileInputStream(file);
-		ZipEntry zipEntry = new ZipEntry(fileName);
+		ZipEntry zipEntry = new ZipEntry(prefix + "/" + fileName);
 		zos.putNextEntry(zipEntry);
 
-		byte[] bytes = new byte[1024];
+		byte[] bytes = new byte[4096];
 		int length;
 		while ((length = fis.read(bytes)) >= 0) {
 			zos.write(bytes, 0, length);
@@ -73,5 +81,4 @@ public class ZipForExport {
 		zos.closeEntry();
 		fis.close();
 	}
-
 }

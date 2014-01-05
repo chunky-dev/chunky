@@ -59,12 +59,14 @@ public class CenteredFileDialog extends FileDialog {
 	public File getSelectedFile(String extension) {
 		String fileName = getFile();
 		if (fileName != null) {
-			if (!fileName.endsWith(extension))
+			if (!fileName.endsWith(extension)) {
 				fileName = fileName + extension;
-			if (getDirectory() != null)
+			}
+			if (getDirectory() != null) {
 				return new File(getDirectory(), fileName);
-			else
+			} else {
 				return new File(fileName);
+			}
 		} else {
 			return null;
 		}

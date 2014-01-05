@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer.ui;
 
 import java.awt.Dialog;
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -47,8 +48,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import se.llbit.chunky.main.Messages;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.SceneDescription;
+import se.llbit.chunky.ui.CenteredFileDialog;
+import se.llbit.util.OSDetector;
+import se.llbit.util.OSDetector.OS;
 
 /**
  * The scene selector dialog.
@@ -60,13 +65,16 @@ public class SceneSelector extends JDialog {
 	private final DefaultTableModel tableModel;
 	private final JTable sceneTable;
 	private final RenderControls controls;
-	private final List<SceneDescription> scenes = new ArrayList<SceneDescription>();
+	private final List<SceneDescription> scenes =
+			new ArrayList<SceneDescription>();
 	protected boolean sceneLoaded = false;
 	private final RenderContext context;
 	private boolean accepted = false;
 	private SceneDescription selectedScene;
-	protected final JButton loadSelectedBtn = new JButton("Load Selected Scene");
-	protected final JButton deleteSelectedBtn = new JButton("Delete Selected Scene");
+	protected final JButton loadSelectedBtn =
+			new JButton("Load Selected Scene");
+	protected final JButton deleteSelectedBtn = new JButton("Delete Scene");
+	protected final JButton exportSelectedBtn = new JButton("Export Scene");
 
 	/**
 	 * Creates a new scene selector dialog.
@@ -135,6 +143,14 @@ public class SceneSelector extends JDialog {
 			}
 		});
 
+		exportSelectedBtn.setEnabled(false);
+		exportSelectedBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				exportScene(sceneTable.getSelectedRow());
+			}
+		});
+
 		File[] sceneFiles = context.getSceneDirectory()
 				.listFiles(new FilenameFilter() {
 			@Override
@@ -181,6 +197,7 @@ public class SceneSelector extends JDialog {
 			public void valueChanged(ListSelectionEvent e) {
 				loadSelectedBtn.setEnabled(true);
 				deleteSelectedBtn.setEnabled(true);
+				exportSelectedBtn.setEnabled(true);
 			}
 		});
 		JScrollPane scrollPane = new JScrollPane(sceneTable);
@@ -203,10 +220,13 @@ public class SceneSelector extends JDialog {
 				.addGroup(layout.createParallelGroup()
 					.addComponent(listDescription, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
 					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
-					.addComponent(cancelBtn, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+					.addComponent(loadSelectedBtn, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
 					.addGroup(layout.createSequentialGroup()
-						.addComponent(loadSelectedBtn, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
 						.addComponent(deleteSelectedBtn)
+						.addPreferredGap(ComponentPlacement.UNRELATED)
+						.addComponent(exportSelectedBtn)
+						.addPreferredGap(ComponentPlacement.UNRELATED)
+						.addComponent(cancelBtn, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					)
 				)
 				.addContainerGap())
@@ -219,12 +239,13 @@ public class SceneSelector extends JDialog {
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
 				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(layout.createParallelGroup()
-					.addComponent(loadSelectedBtn, GroupLayout.DEFAULT_SIZE, 40, 40)
-					.addComponent(deleteSelectedBtn, GroupLayout.DEFAULT_SIZE, 40, 40)
-				)
+				.addComponent(loadSelectedBtn, GroupLayout.DEFAULT_SIZE, 40, 40)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(cancelBtn)
+				.addGroup(layout.createParallelGroup()
+					.addComponent(deleteSelectedBtn, GroupLayout.DEFAULT_SIZE, 35, 35)
+					.addComponent(exportSelectedBtn, GroupLayout.DEFAULT_SIZE, 35, 35)
+					.addComponent(cancelBtn, GroupLayout.DEFAULT_SIZE, 35, 35)
+				)
 				.addContainerGap())
 		);
 
@@ -272,8 +293,54 @@ public class SceneSelector extends JDialog {
 				// remove scene from table
 				tableModel.removeRow(selected);
 				scenes.remove(selected);
-				deleteSelectedBtn.setEnabled(false);
 				loadSelectedBtn.setEnabled(false);
+				deleteSelectedBtn.setEnabled(false);
+				exportSelectedBtn.setEnabled(false);
+			}
+		}
+	}
+
+	/**
+	 * Export the selected scene to a Zip archive
+	 * @param selected index of scene to be deleted
+	 */
+	protected void exportScene(int selected) {
+		if (selected >= 0 && selected < scenes.size()) {
+			SceneDescription scene = scenes.get(selected);
+			CenteredFileDialog fileDialog =
+					new CenteredFileDialog(null, "Export to ZIP", FileDialog.SAVE);
+			fileDialog.setDirectory(System.getProperty("user.dir"));
+			fileDialog.setFile(scene.name+".zip");
+			fileDialog.setFilenameFilter(
+				new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.toLowerCase().endsWith(".zip");
+					}
+				}
+			);
+			fileDialog.setVisible(true);
+			File selectedFile = fileDialog.getSelectedFile(".zip");
+			if (selectedFile != null) {
+				if (OSDetector.getOS() != OS.WIN && selectedFile.exists()) {
+					// Windows FileDialog asks for overwrite confirmation, so we don't have to
+					Object[] options = {
+							Messages.getString("Chunky.Cancel_lbl"), //$NON-NLS-1$
+							Messages.getString("Chunky.AcceptOverwrite_lbl")}; //$NON-NLS-1$
+					int n = JOptionPane.showOptionDialog(null,
+							String.format(Messages.getString("Chunky.Confirm_overwrite_msg"), //$NON-NLS-1$
+									selectedFile.getName()),
+							Messages.getString("Chunky.Confirm_overwrite_title"), //$NON-NLS-1$
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.WARNING_MESSAGE,
+							null,
+							options,
+							options[0]);
+					if (n != 1) {
+						return;
+					}
+				}
+				scene.exportToZip(selectedFile);
 			}
 		}
 	}
