@@ -15,7 +15,7 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.AEnterpise.ZipForExport;
+package se.AEnterprise.ZipForExport;
 
 import java.io.File;
 import java.io.FileInputStream;
