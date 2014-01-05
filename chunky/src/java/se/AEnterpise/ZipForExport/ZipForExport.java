@@ -1,3 +1,20 @@
+/* Copyright (c) 2014 Tim De Keyser <aenterprise2@gmail.com>
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package se.AEnterpise.ZipForExport;
 
 import java.io.File;
@@ -18,20 +35,16 @@ public class ZipForExport {
 			ZipOutputStream zos = new ZipOutputStream(fos);
 
 			String file1Name = sceneDir + "/" + sceneName + ".cvf";
-			String file2Name = sceneDir + "/" + sceneName + ".cvf.backup";
-			String file3Name = sceneDir + "/" + sceneName + ".dump";
-			String file4Name = sceneDir + "/" + sceneName + ".dump.backup";
-			String file5Name = sceneDir + "/" + sceneName + ".foliage";
-			String file6Name = sceneDir + "/" + sceneName + ".grass";
-			String file7Name = sceneDir + "/" + sceneName + ".octree";
+			String file2Name = sceneDir + "/" + sceneName + ".dump";
+			String file3Name = sceneDir + "/" + sceneName + ".foliage";
+			String file4Name = sceneDir + "/" + sceneName + ".grass";
+			String file5Name = sceneDir + "/" + sceneName + ".octree";
 
 			addToZipFile(file1Name, zos);
 			addToZipFile(file2Name, zos);
 			addToZipFile(file3Name, zos);
 			addToZipFile(file4Name, zos);
 			addToZipFile(file5Name, zos);
-			addToZipFile(file6Name, zos);
-			addToZipFile(file7Name, zos);
 
 			zos.close();
 			fos.close();
