@@ -224,10 +224,10 @@ public class ChunkyDeployer {
 	 * Launch a specific Chunky version
 	 * @param parentComponent
 	 * @param settings
-	 * @return {@code true} on success, {@code false} if there is any problem
+	 * @return zero on success, non-zero if there is any problem
 	 * launching Chunky (waits 200ms to see if everything launched)
 	 */
-	public boolean launchChunky(Component parentComponent, LauncherSettings settings, VersionInfo version) {
+	public int launchChunky(Component parentComponent, LauncherSettings settings, VersionInfo version) {
 		List<String> command = buildCommandLine(version, settings);
 		if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
 			System.out.println(commandString(command));
@@ -255,7 +255,7 @@ public class ChunkyDeployer {
 				public void run() {
 					InputStream is = proc.getInputStream();
 					try {
-						byte[] buffer = new byte[1024];
+						byte[] buffer = new byte[4096];
 						while (true) {
 							int size = is.read(buffer, 0, buffer.length);
 							if (size == -1) {
@@ -277,7 +277,7 @@ public class ChunkyDeployer {
 				public void run() {
 					InputStream is = proc.getErrorStream();
 					try {
-						byte[] buffer = new byte[1024];
+						byte[] buffer = new byte[4096];
 						while (true) {
 							int size = is.read(buffer, 0, buffer.length);
 							if (size == -1) {
@@ -298,17 +298,14 @@ public class ChunkyDeployer {
 			shutdownThread.start();
 			try {
 				Thread.sleep(400);
-				int exitValue = shutdownThread.exitValue;
-				// check if process already exited with error code
-				if (exitValue != 0) {
-					return false;
-				}
+				return shutdownThread.exitValue;
 			} catch (InterruptedException e) {
 			}
-			return true;
+			return 0;
 		} catch (IOException e) {
 			logger.appendErrorLine(e.getMessage());
-			return false;
+			// 3 indicates launcher error
+			return 3;
 		}
 	}
 

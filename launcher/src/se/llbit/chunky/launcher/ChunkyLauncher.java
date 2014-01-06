@@ -64,7 +64,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame {
 
-	private static final String LAUNCHER_VERSION = "v1.6";
+	private static final String LAUNCHER_VERSION = "v1.6.1";
 
 	public class UpdateThread extends Thread {
 		@Override public void run() {
@@ -312,7 +312,7 @@ public class ChunkyLauncher extends JFrame {
 				}
 
 				PersistentSettings.setMinecraftDirectory(minecraftDirField.getText());
-				if (deployer.launchChunky(ChunkyLauncher.this, settings, version)) {
+				if (deployer.launchChunky(ChunkyLauncher.this, settings, version) == 0) {
 					settings.save();
 					setVisible(false);
 					dispose();
@@ -682,7 +682,10 @@ public class ChunkyLauncher extends JFrame {
 			deployer.deploy();
 			VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
 			if (ChunkyDeployer.canLaunch(version, null, false)) {
-				deployer.launchChunky(null, settings, version);
+				int exitCode = deployer.launchChunky(null, settings, version);
+				if (exitCode != 0) {
+					System.exit(exitCode);
+				}
 			} else {
 				System.err.println("Failed to start Chunky. Command used:");
 				System.err.println(ChunkyDeployer.commandString(
@@ -707,7 +710,7 @@ public class ChunkyLauncher extends JFrame {
 				// skip launcher only if we can launch this version
 				VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
 				if (ChunkyDeployer.canLaunch(version, null, false)) {
-					if (deployer.launchChunky(null, settings, version)) {
+					if (deployer.launchChunky(null, settings, version) == 0) {
 						showLauncher = false;
 						return;
 					} else {
