@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Scanner;
@@ -70,17 +71,40 @@ public class ReleaseBuilder {
 			releaseNotes += "Changes:" + SYS_NL + changeLog;
 		}
 
+		// write composed release notes to build dir
+		PrintWriter out = null;
+		try {
+			out = new PrintWriter(new File("build", "release_notes-" + versionName + ".txt"));
+			out.print(releaseNotes);
+		} catch (IOException e) {
+			System.err.println("Failed to write release notes (" + e.getMessage() + ")");
+			System.exit(1);
+			return;
+		} finally {
+			if (out != null) {
+				out.close();
+			}
+		}
+
 		new ReleaseBuilder(versionName, releaseNotes).buildChunkJar();
 	}
 
 	private static String readReleaseNotes(String path) {
 		try {
 			File file = new File(path);
-			FileInputStream in = new FileInputStream(file);
-			byte[] data = new byte[(int) file.length()];
-			in.read(data);
+			Scanner in = new Scanner(new FileInputStream(file));
+			in.nextLine();
+			StringBuilder sb = new StringBuilder();
+			while (in.hasNextLine()) {
+				String line = in.nextLine();
+				if (line.isEmpty()) {
+					break;
+				}
+				sb.append(line);
+				sb.append(SYS_NL);
+			}
 			in.close();
-			return new String(data, "UTF-8");
+			return sb.toString();
 		} catch (IOException e) {
 			System.err.println("WARNING: Failed to read release notes! " + e.getMessage());
 			System.err.println("WARNING: Release notes will be empty!");

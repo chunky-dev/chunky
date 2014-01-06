@@ -141,7 +141,7 @@
 			<zipfileset dir="${build.dir}"
 				includes="ReadMe.html"/>
 			<zipfileset dir="${home}/license" prefix="license"/>
-			<zipfileset dir="${home}"
+			<zipfileset dir="${build.dir}"
 				includes="release_notes-${version}.txt"/>
 		</zip>
 		<symlink overwrite="true"

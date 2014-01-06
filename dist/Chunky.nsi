@@ -93,7 +93,7 @@ Section "Chunky (required)" SecChunky
 
   File /oname=chunky.jar build\chunky-@VERSION@.jar
   File build\ReadMe.html
-  File release_notes-@VERSION@.txt
+  File build\release_notes-@VERSION@.txt
   File dist\chunky.ico
 
   ; Write install dir to registry
