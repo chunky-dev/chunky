@@ -142,8 +142,7 @@
 				includes="ReadMe.html"/>
 			<zipfileset dir="${home}/license" prefix="license"/>
 			<zipfileset dir="${home}"
-				includes="release_notes-${version}.txt"
-				fullpath="release_notes.txt"/>
+				includes="release_notes-${version}.txt"/>
 		</zip>
 		<symlink overwrite="true"
 			link="${home}/chunky.jar"

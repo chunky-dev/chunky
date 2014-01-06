@@ -41,14 +41,8 @@ Launching Chunky
 ----------------
 
 Chunky uses a lot of memory. If Chunky has too little memory to work with it
-may slow down to a crawl or crash. You can give increase the memory limit in
-the Chunky Launcher, or you can run Chunky from the command line with a command
-like this:
-
-    java -Xmx4g -jar chunky.jar
-
-The above command starts Chunky with a memory limit of 4 gigabyte. Change the
-4 in `-Xmx4g` to the number of gigabyte you want Chunky to use at most.
+may slow down to a crawl or crash. The memory limit can be increased in the
+Chunky Launcher.
 
 Rendering using the command line (Headless Mode)
 ------------------------------------------------
