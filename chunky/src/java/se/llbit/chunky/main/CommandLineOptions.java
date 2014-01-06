@@ -18,9 +18,11 @@ package se.llbit.chunky.main;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,6 +40,7 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
+import se.llbit.util.MCDownloader;
 
 public class CommandLineOptions {
 	enum Mode {
@@ -66,6 +69,8 @@ public class CommandLineOptions {
 		"  -set <NAME> <VALUE> <SCENE>\n" +
 		"                         set a configuration option for a scene and exit\n" +
 		"  -reset <NAME> <SCENE>  reset a configuration option for a scene and exit\n" +
+		"  -reset <NAME> <SCENE>  reset a configuration option for a scene and exit\n" +
+		"  -download-mc <VERSION> download the given Minecraft version and exit\n" +
 		"  -help                  show this text\n" +
 		"\n" +
 		"Notes:\n" +
@@ -85,6 +90,7 @@ public class CommandLineOptions {
 		boolean selectedWorld = false;
 
 		// parse arguments
+		// TODO in serious need of refactoring
 		for (int i = 0; i < args.length; ++i) {
 			if (args[i].equals("-texture") && args.length > i+1) {
 				options.texturePack = args[++i];
@@ -240,6 +246,35 @@ public class CommandLineOptions {
 					return;
 				} else {
 					System.err.println("Too few arguments for -reset option!");
+					confError = true;
+					break;
+				}
+			} else if (args[i].equals("-download-mc")) {
+				mode = Mode.NO_OP;
+				if (args.length > i+1) {
+					String version = args[i+1];
+					try {
+						File dir = new File(PersistentSettings.getSettingsDirectory(), "resources");
+						if (!dir.exists()) {
+							dir.mkdir();
+						}
+						if (!dir.isDirectory()) {
+							System.err.println("Failed to create destination directory " +
+											dir.getAbsolutePath());
+						}
+						System.out.println("Downloading Minecraft " + version + "...");
+						MCDownloader.downloadMC(version, dir);
+						System.out.println("Done!");
+					} catch (MalformedURLException e) {
+						System.err.println("Malformed URL (" + e.getMessage() + ")");
+					} catch (FileNotFoundException e) {
+						System.err.println("File not found (" + e.getMessage() + ")");
+					} catch (IOException e) {
+						System.err.println("Download failed (" + e.getMessage() + ")");
+					}
+					i += 1;
+				} else {
+					System.err.println("Missing argument for -download-mc option");
 					confError = true;
 					break;
 				}
