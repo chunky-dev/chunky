@@ -435,6 +435,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		tabbedPane.addTab("Camera", cameraPane = buildCameraPane());
 		tabbedPane.addTab("Post-processing", buildPostProcessingPane());
 		tabbedPane.addTab("Advanced", advancedPane = buildAdvancedPane());
+		tabbedPane.addTab("Help", buildHelpPane());
 
 		JLabel sppTargetLbl = new JLabel("SPP Target: ");
 		sppTargetLbl.setToolTipText("The render will be paused at this SPP count");
@@ -1581,6 +1582,38 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addGroup(subjectDistance.verticalGroup(layout))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(autoFocusBtn)
+			.addContainerGap()
+		);
+		return panel;
+	}
+
+	private JPanel buildHelpPane() {
+		JLabel helpLbl = new JLabel(
+			"<html>Render Preview Controls:<br>" +
+			"<b>W</b> move camera forward<br>" +
+			"<b>S</b> move camera backward<br>" +
+			"<b>A</b> strafe camera left<br>" +
+			"<b>D</b> strafe camera right<br>" +
+			"<b>R</b> move camera up<br>" +
+			"<b>F</b> move camera down<br>" +
+			"<b>U</b> toggle fullscreen mode<br>" +
+			"<b>K</b> move camera forward x100<br>" +
+			"<b>J</b> move camera backward x100<br>" +
+			"<br>" +
+			"Holding <b>SHIFT</b> makes the basic movement keys so move 1/10th of the normal distance."
+		);
+
+		JPanel panel = new JPanel();
+		GroupLayout layout = new GroupLayout(panel);
+		panel.setLayout(layout);
+		layout.setHorizontalGroup(layout.createSequentialGroup()
+			.addContainerGap()
+			.addComponent(helpLbl)
+			.addContainerGap()
+		);
+		layout.setVerticalGroup(layout.createSequentialGroup()
+			.addContainerGap()
+			.addComponent(helpLbl)
 			.addContainerGap()
 		);
 		return panel;

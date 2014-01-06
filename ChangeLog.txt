@@ -1,5 +1,6 @@
 1.2.2 - TBD
-    * Pressing U in the render preview window makes it go fullscreen
+    * Added Help tab listing keyboard shortcuts in the Render Controls window
+    * Pressing U in the Render Preview window makes it go fullscreen
     * The scene selector can now to delete scenes or export scenes to Zip file
     * Fixed potential crash in the launcher from a clean install
 
