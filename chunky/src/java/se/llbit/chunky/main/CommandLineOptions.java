@@ -21,12 +21,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collections;
+import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jastadd.util.PrettyPrinter;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.SceneDescription;
+import se.llbit.chunky.renderer.ui.SceneSelector;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.resources.TexturePackLoader.TextureLoadingError;
@@ -44,7 +46,6 @@ public class CommandLineOptions {
 		HEADLESS_RENDER,
 		HEADLESS_BENCHMARK,
 	}
-	private static Logger logger = Logger.getLogger(CommandLineOptions.class);
 
 	/**
 	 * The help string
@@ -89,7 +90,7 @@ public class CommandLineOptions {
 				options.texturePack = args[++i];
 			} else if (args[i].equals("-scene-dir")) {
 				if (i+1 == args.length) {
-					logger.error("Missing argument for -scene-dir option");
+					System.err.println("Missing argument for -scene-dir option");
 					confError = true;
 					break;
 				} else {
@@ -98,7 +99,21 @@ public class CommandLineOptions {
 				}
 			} else if (args[i].equals("-render")) {
 				if (i+1 == args.length) {
-					logger.error("Missing argument for -render option");
+					System.err.println("Missing argument for -render option");
+					File sceneDir = PersistentSettings.getSceneDirectory();
+					System.err.println("Scene directory: " +
+							sceneDir.getAbsolutePath());
+					List<File> fileList = SceneSelector.getAvailableSceneFiles(sceneDir);
+					Collections.sort(fileList);
+					if (!fileList.isEmpty()) {
+						System.err.println("Available scenes:");
+						for (File file: fileList) {
+							String name = file.getName();
+							name = name.substring(0, name.length() -
+								SceneDescription.SCENE_DESCRIPTION_EXTENSION.length());
+							System.err.println("\t" + name);
+						}
+					}
 					confError = true;
 					break;
 				} else {
@@ -109,7 +124,7 @@ public class CommandLineOptions {
 				mode = Mode.HEADLESS_BENCHMARK;
 			} else if (args[i].equals("-target")) {
 				if (i+1 == args.length) {
-					logger.error("Missing argument for -target option");
+					System.err.println("Missing argument for -target option");
 					confError = true;
 					break;
 				} else {
@@ -118,7 +133,7 @@ public class CommandLineOptions {
 				}
 			} else if (args[i].equals("-threads")) {
 				if (i+1 == args.length) {
-					logger.error("Missing argument for -threads option");
+					System.err.println("Missing argument for -threads option");
 					confError = true;
 					break;
 				} else {
@@ -127,7 +142,7 @@ public class CommandLineOptions {
 				}
 			} else if (args[i].equals("-tile-width")) {
 				if (i+1 == args.length) {
-					logger.error("Missing argument for -tile-width option");
+					System.err.println("Missing argument for -tile-width option");
 					confError = true;
 					break;
 				} else {
@@ -167,9 +182,9 @@ public class CommandLineOptions {
 						writeSceneJson(file, desc);
 						System.out.println("Updated scene " + file.getAbsolutePath());
 					} catch (SyntaxError e) {
-						logger.error("JSON syntax error");
+						System.err.println("JSON syntax error");
 					} catch (IOException e) {
-						logger.error("Failed to write/load Scene Description File: " +
+						System.err.println("Failed to write/load Scene Description File: " +
 								e.getMessage());
 					}
 					i += 3;
@@ -185,7 +200,7 @@ public class CommandLineOptions {
 					i += 2;
 					return;
 				} else {
-					logger.error("Too few arguments for -set option!");
+					System.err.println("Too few arguments for -set option!");
 					confError = true;
 					break;
 				}
@@ -212,9 +227,9 @@ public class CommandLineOptions {
 						writeSceneJson(file, desc);
 						System.out.println("Updated scene " + file.getAbsolutePath());
 					} catch (SyntaxError e) {
-						logger.error("JSON syntax error");
+						System.err.println("JSON syntax error");
 					} catch (IOException e) {
-						logger.error("Failed to write/load Scene Description File: " +
+						System.err.println("Failed to write/load Scene Description File: " +
 								e.getMessage());
 					}
 					i += 2;
@@ -224,7 +239,7 @@ public class CommandLineOptions {
 					i += 1;
 					return;
 				} else {
-					logger.error("Too few arguments for -reset option!");
+					System.err.println("Too few arguments for -reset option!");
 					confError = true;
 					break;
 				}
@@ -264,7 +279,7 @@ public class CommandLineOptions {
 					}
 				}
 			} catch (TextureLoadingError e) {
-				logger.error("Failed to load texture pack!");
+				System.err.println("Failed to load texture pack!");
 			}
 		}
 

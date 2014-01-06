@@ -90,7 +90,8 @@ public class SceneSelector extends JDialog {
 		this.context = context;
 
 		tableModel = new DefaultTableModel(0, 3);
-		tableModel.setColumnIdentifiers(new String[] { "Name", "Size", "Current SPP", "Render Time" });
+		tableModel.setColumnIdentifiers(new String[] {
+				"Name", "Size", "Current SPP", "Render Time" });
 		sceneTable = new JTable(tableModel) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
@@ -151,17 +152,7 @@ public class SceneSelector extends JDialog {
 			}
 		});
 
-		File[] sceneFiles = context.getSceneDirectory()
-				.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(SceneDescription.SCENE_DESCRIPTION_EXTENSION);
-			}
-		});
-		List<File> fileList = new ArrayList<File>(sceneFiles.length);
-		for (File file: sceneFiles) {
-			fileList.add(file);
-		}
+		List<File> fileList = getAvailableSceneFiles(context.getSceneDirectory());
 		Collections.sort(fileList);
 		for (File sceneFile : fileList) {
 			String fileName = sceneFile.getName();
@@ -362,5 +353,24 @@ public class SceneSelector extends JDialog {
 	protected void closeDialog() {
 		setVisible(false);
 		dispose();
+	}
+
+	/**
+	 * @param sceneDir
+	 * @return a list of available scene description files in the given scene
+	 * directory
+	 */
+	public static final List<File> getAvailableSceneFiles(File sceneDir) {
+		File[] sceneFiles = sceneDir.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith(SceneDescription.SCENE_DESCRIPTION_EXTENSION);
+			}
+		});
+		List<File> fileList = new ArrayList<File>(sceneFiles.length);
+		for (File file: sceneFiles) {
+			fileList.add(file);
+		}
+		return fileList;
 	}
 }
