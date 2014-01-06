@@ -107,6 +107,18 @@ public class MinecraftFinder {
 			if (!foundJar) {
 				minecraftJar = getMinecraftJar(getMinecraftDirectory(),
 						System.getProperty("log4j.logLevel", "WARN").equals("INFO"));
+				if (minecraftJar == null) {
+					// Fall back on downloaded Jar if available
+					File resourceDir = new File(
+							PersistentSettings.getSettingsDirectory(),
+							"resources");
+					if (resourceDir.isDirectory()) {
+						File jar = new File(resourceDir, "minecraft.jar");
+						if (jar.isFile() && jar.canRead()) {
+							minecraftJar = jar;
+						}
+					}
+				}
 				foundJar = true;
 			}
 			return minecraftJar;
@@ -174,15 +186,6 @@ public class MinecraftFinder {
 				if (file.getName().equalsIgnoreCase("minecraft.jar")) {
 					return new File(bin, file.getName());
 				}
-			}
-		}
-		// Fall back on downloaded Jar (if present)
-		File resourceDir = new File(PersistentSettings.getSettingsDirectory(),
-				"resources");
-		if (resourceDir.isDirectory()) {
-			File jar = new File(resourceDir, "minecraft.jar");
-			if (jar.isFile() && jar.canRead()) {
-				return jar;
 			}
 		}
 		// Failed to locate Minecraft Jar

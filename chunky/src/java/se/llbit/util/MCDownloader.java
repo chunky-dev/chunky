@@ -32,7 +32,7 @@ public class MCDownloader {
 	public static final void downloadMC(String version, File destDir)
 			throws IOException {
 		String theUrl = "https://s3.amazonaws.com/Minecraft.Download/versions/" +
-				version + "/minecraft_server." + version + ".jar";
+				version + "/" + version + ".jar";
 		File destination = new File(destDir, "minecraft.jar");
 		System.out.println("url: " + theUrl);
 		System.out.println("destination: " + destination.getAbsolutePath());
