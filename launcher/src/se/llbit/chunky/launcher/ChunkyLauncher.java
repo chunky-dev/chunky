@@ -51,6 +51,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.launcher.ChunkyDeployer.Mode;
 import se.llbit.chunky.launcher.ui.LaunchErrorDialog;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.SettingsDirectory;
@@ -64,7 +65,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame {
 
-	private static final String LAUNCHER_VERSION = "v1.6.1";
+	private static final String LAUNCHER_VERSION = "v1.6.2";
 
 	public class UpdateThread extends Thread {
 		@Override public void run() {
@@ -312,7 +313,8 @@ public class ChunkyLauncher extends JFrame {
 				}
 
 				PersistentSettings.setMinecraftDirectory(minecraftDirField.getText());
-				if (deployer.launchChunky(ChunkyLauncher.this, settings, version) == 0) {
+				if (deployer.launchChunky(ChunkyLauncher.this, settings, version,
+						Mode.GUI) == 0) {
 					settings.save();
 					setVisible(false);
 					dispose();
@@ -682,7 +684,8 @@ public class ChunkyLauncher extends JFrame {
 			deployer.deploy();
 			VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
 			if (ChunkyDeployer.canLaunch(version, null, false)) {
-				int exitCode = deployer.launchChunky(null, settings, version);
+				int exitCode = deployer.launchChunky(null, settings, version,
+						Mode.HEADLESS);
 				if (exitCode != 0) {
 					System.exit(exitCode);
 				}
@@ -710,7 +713,8 @@ public class ChunkyLauncher extends JFrame {
 				// skip launcher only if we can launch this version
 				VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
 				if (ChunkyDeployer.canLaunch(version, null, false)) {
-					if (deployer.launchChunky(null, settings, version) == 0) {
+					if (deployer.launchChunky(null, settings, version,
+							Mode.GUI) == 0) {
 						showLauncher = false;
 						return;
 					} else {

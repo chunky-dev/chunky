@@ -43,6 +43,11 @@ import se.llbit.json.JsonValue;
  */
 public class ChunkyDeployer {
 
+	enum Mode {
+		GUI,
+		HEADLESS
+	};
+
 	/**
 	 * Check the integrity of an installed version.
 	 * @param version
@@ -227,7 +232,8 @@ public class ChunkyDeployer {
 	 * @return zero on success, non-zero if there is any problem
 	 * launching Chunky (waits 200ms to see if everything launched)
 	 */
-	public int launchChunky(Component parentComponent, LauncherSettings settings, VersionInfo version) {
+	public int launchChunky(Component parentComponent, LauncherSettings settings, VersionInfo version,
+			Mode mode) {
 		List<String> command = buildCommandLine(version, settings);
 		if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
 			System.out.println(commandString(command));
@@ -297,8 +303,14 @@ public class ChunkyDeployer {
 			ShutdownThread shutdownThread = new ShutdownThread(proc, logger, outputScanner, errorScanner);
 			shutdownThread.start();
 			try {
-				Thread.sleep(400);
-				return shutdownThread.exitValue;
+				if (mode == Mode.GUI) {
+					// just wait a little while to check for startup errors
+					Thread.sleep(3000);
+					return shutdownThread.exitValue;
+				} else {
+					// wait until completion so we can return correct exit code
+					return shutdownThread.exitValue();
+				}
 			} catch (InterruptedException e) {
 			}
 			return 0;
@@ -379,12 +391,20 @@ public class ChunkyDeployer {
 		private final Thread errorScanner;
 		private final Process proc;
 		private final Logger logger;
+		private boolean finished = false;
 
 		public ShutdownThread(Process proc, Logger logger, Thread output, Thread error) {
 			this.proc = proc;
 			this.logger = logger;
 			this.outputScanner = output;
 			this.errorScanner = error;
+		}
+
+		public synchronized int exitValue() throws InterruptedException {
+			while (!finished) {
+				wait();
+			}
+			return exitValue;
 		}
 
 		@Override
@@ -402,6 +422,10 @@ public class ChunkyDeployer {
 				exitValue = proc.exitValue();
 				logger.processExited(exitValue);
 			} catch (InterruptedException e) {
+			}
+			synchronized (this) {
+				finished = true;
+				notifyAll();
 			}
 		}
 	}
