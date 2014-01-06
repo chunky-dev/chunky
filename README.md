@@ -65,6 +65,10 @@ Where SceneName is the name of the scene to render. You can read more about
 Hacking on Chunky
 -----------------
 
+To build Chunky you will need Apache Ant and Perl. Chunky is built using an
+Apache Ant build script found in the project root directory. The `dist` target
+builds Chunky and outputs binaries to the `build` directory.
+
 Chunky is split into four projects:
 
 * **chunky** - main Chunky project
