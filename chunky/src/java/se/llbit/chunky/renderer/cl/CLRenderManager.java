@@ -359,6 +359,16 @@ public class CLRenderManager extends Thread implements Renderer,
 	}
 
 	@Override
+	public void taskAborted(String task) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void taskFailed(String task) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
 	public synchronized void onStrafeLeft() {
 		Vector3d d = new Vector3d(1, 0, 0);
 		tmpTransform.rotY(yaw);

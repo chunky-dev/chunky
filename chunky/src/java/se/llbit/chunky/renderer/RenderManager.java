@@ -415,8 +415,18 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 		synchronized (bufferMonitor) {
 			renderListener.setProgress("Loading scene", 0, 0, 1);
-
-			bufferedScene.loadScene(context, renderListener, sceneName);
+			try {
+				bufferedScene.loadScene(context, renderListener, sceneName);
+			} catch (InterruptedException e) {
+				renderListener.taskFailed("Loading scene");
+				throw e;
+			} catch (SceneLoadingError e) {
+				renderListener.taskFailed("Loading scene");
+				throw e;
+			} catch (IOException e) {
+				renderListener.taskFailed("Loading scene");
+				throw e;
+			}
 
 			synchronized (this) {
 				int canvasWidth = bufferedScene.canvasWidth();
@@ -572,5 +582,15 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	 */
 	public void setCPULoad(int value) {
 		cpuLoad  = value;
+	}
+
+	/**
+	 * Stop the render workers.
+	 */
+	public synchronized void stopWorkers() {
+		// Halt all worker threads
+		for (int i = 0; i < numThreads; ++i) {
+			workers[i].interrupt();
+		}
 	}
 }

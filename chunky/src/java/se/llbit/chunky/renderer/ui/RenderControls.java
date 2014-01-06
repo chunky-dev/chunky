@@ -2327,6 +2327,18 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	@Override
+	public void taskAborted(String task) {
+		// TODO add abort notice
+		etaLbl.setText("ETA: N/A");
+	}
+
+	@Override
+	public void taskFailed(String task) {
+		// TODO add abort notice
+		etaLbl.setText("ETA: N/A");
+	}
+
+	@Override
 	public void onZoom(int diff) {
 		if (!controlsLocked) {
 			Camera camera = renderMan.scene().camera();

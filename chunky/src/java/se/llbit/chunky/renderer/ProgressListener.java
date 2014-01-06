@@ -40,4 +40,16 @@ public interface ProgressListener {
 	 * @param eta
 	 */
 	void setProgress(String task, int done, int start, int target, String eta);
+
+	/**
+	 * The current task was aborted
+	 * @param task
+	 */
+	void taskAborted(String task);
+
+	/**
+	 * The current task was failed
+	 * @param task
+	 */
+	void taskFailed(String task);
 }

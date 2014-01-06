@@ -247,6 +247,16 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 	}
 
 	@Override
+	public void taskAborted(String task) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void taskFailed(String task) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
 	public void chunksLoaded() {
 		// TODO Auto-generated method stub
 

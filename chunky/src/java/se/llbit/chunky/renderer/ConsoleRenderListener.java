@@ -38,8 +38,9 @@ public class ConsoleRenderListener implements RenderStatusListener {
 
 	@Override
 	public void setProgress(String task, int done, int start, int target) {
-		if (!first)
+		if (!first) {
 			System.out.print("\r");
+		}
 		first = false;
 		System.out.print(String.format("%s: %.1f%% (%s of %s)",
 				task, 100 * done / (float) target,
@@ -47,14 +48,16 @@ public class ConsoleRenderListener implements RenderStatusListener {
 
 		if (done == target) {
 			System.out.println();
+			System.out.flush();
 			first = true;
 		}
 	}
 
 	@Override
 	public void setProgress(String task, int done, int start, int target, String eta) {
-		if (!first)
+		if (!first) {
 			System.out.print("\r");
+		}
 		first = false;
 		System.out.print(String.format("%s: %.1f%% (%s of %s) [ETA=%s]",
 				task, 100 * done / (float) target,
@@ -62,8 +65,29 @@ public class ConsoleRenderListener implements RenderStatusListener {
 
 		if (done == target) {
 			System.out.println();
+			System.out.flush();
 			first = true;
 		}
+	}
+
+	@Override
+	public void taskAborted(String task) {
+		if (!first) {
+			System.out.print("\r");
+		}
+		System.out.println(task + ": ABORTED       ");
+		System.out.flush();
+		first = true;
+	}
+
+	@Override
+	public void taskFailed(String task) {
+		if (!first) {
+			System.out.print("\r");
+		}
+		System.out.println(task + ": FAILED        ");
+		System.out.flush();
+		first = true;
 	}
 
 	@Override

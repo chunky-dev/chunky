@@ -18,6 +18,7 @@ package se.llbit.chunky.main;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
@@ -219,13 +220,17 @@ public class Chunky implements ChunkDiscoveryListener {
 			renderManager.scene().goHeadless();
 
 			renderManager.start();
+		} catch (FileNotFoundException e) {
+			System.err.println("Scene \"" + options.sceneName + "\" not found!");
 		} catch (IOException e) {
-			logger.error("IO error while loading scene", e);
+			System.err.println("IO error while loading scene (" + e.getMessage() + ")");
 		} catch (SceneLoadingError e) {
-			logger.error("Scene loading error", e);
+			System.err.println("Scene loading error (" + e.getMessage() + ")");
 		} catch (InterruptedException e) {
-			logger.error("Interrupted while loading scene", e);
+			System.err.println("Interrupted while loading scene");
 		}
+		// make sure the workers are stopped so the JVM can shut down correctly
+		renderManager.stopWorkers();
 	}
 
 	/**
