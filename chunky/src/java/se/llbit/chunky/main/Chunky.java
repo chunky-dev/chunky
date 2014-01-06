@@ -166,11 +166,9 @@ public class Chunky implements ChunkDiscoveryListener {
 		case NO_OP:
 			break;
 		case HEADLESS_BENCHMARK:
-			doBenchmark(options.renderThreads);
-			break;
+			return doBenchmark(options.renderThreads);
 		case HEADLESS_RENDER:
-			doHeadlessRender();
-			break;
+			return doHeadlessRender();
 		case DEFAULT:
 			startNormally();
 			break;
@@ -181,8 +179,9 @@ public class Chunky implements ChunkDiscoveryListener {
 	/**
 	 * Run the benchmark in headless mode.
 	 * @param renderThreads number of threads to use for rendering
+	 * @return error code
 	 */
-	private void doBenchmark(int renderThreads) {
+	private int doBenchmark(int renderThreads) {
 		System.setProperty("java.awt.headless", "true");
 
 		RenderContext renderContext = new RenderContext(options);
@@ -196,15 +195,18 @@ public class Chunky implements ChunkDiscoveryListener {
 					benchmark.getScore());
 			System.out.println("Benchmark completed with score " + benchmark.getScore() +
 					" (" + benchmark.getSceneName() + ")");
+			return 0;
 		} catch (InterruptedException e) {
-			logger.warn("Benchmarking interrupted");
+			System.err.println("Benchmarking interrupted");
+			return 1;
 		}
 	}
 
 	/**
 	 * Start headless mode
+	 * @return error code
 	 */
-	private void doHeadlessRender() {
+	private int doHeadlessRender() {
 		System.setProperty("java.awt.headless", "true");
 
 		RenderContext renderContext = new RenderContext(options);
@@ -220,18 +222,23 @@ public class Chunky implements ChunkDiscoveryListener {
 			renderManager.scene().goHeadless();
 
 			renderManager.start();
+			return 0;
 		} catch (FileNotFoundException e) {
 			System.err.println("Scene \"" + options.sceneName + "\" not found!");
 			renderManager.interrupt();
+			return 1;
 		} catch (IOException e) {
 			System.err.println("IO error while loading scene (" + e.getMessage() + ")");
 			renderManager.interrupt();
+			return 1;
 		} catch (SceneLoadingError e) {
 			System.err.println("Scene loading error (" + e.getMessage() + ")");
 			renderManager.interrupt();
+			return 1;
 		} catch (InterruptedException e) {
 			System.err.println("Interrupted while loading scene");
 			renderManager.interrupt();
+			return 1;
 		}
 	}
 
@@ -269,9 +276,9 @@ public class Chunky implements ChunkDiscoveryListener {
 				}
 			});
 		} catch (InterruptedException e) {
-			logger.fatal("Failed to initialize UI", e);
+			logger.warn("Failed to set Look and Feel", e);
 		} catch (InvocationTargetException e) {
-			logger.fatal("Failed to initialize UI", e);
+			logger.warn("Failed to set Look and Feel", e);
 		}
 
 		refreshLoop();

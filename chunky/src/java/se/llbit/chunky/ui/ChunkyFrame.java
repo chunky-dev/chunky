@@ -49,7 +49,7 @@ public class ChunkyFrame extends JFrame {
 	private ChunkMap map;
 	private Minimap minimap;
 	private Controls controls;
-	private Chunky chunky;
+	private final Chunky chunky;
 
 	/**
 	 * Create a new instance of the application GUI.
@@ -201,11 +201,13 @@ public class ChunkyFrame extends JFrame {
 	 * Refresh the map and minimap if necessary.
 	 */
 	public void refresh() {
-		if (map != null && map.haveUpdatedChunks())
+		if (map != null && map.haveUpdatedChunks()) {
 			map.repaint();
+		}
 
-		if (minimap != null && minimap.haveUpdatedChunks())
+		if (minimap != null && minimap.haveUpdatedChunks()) {
 			minimap.repaint();
+		}
 	}
 
 	/**
