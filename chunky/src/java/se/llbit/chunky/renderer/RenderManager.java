@@ -174,10 +174,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			logger.error("Uncaught exception in render manager", e);
 		}
 
-		// Halt all worker threads
-		for (int i = 0; i < numThreads; ++i) {
-			workers[i].interrupt();
-		}
+		stopWorkers();
 	}
 
 	private void updateRenderState() {
@@ -587,7 +584,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	/**
 	 * Stop the render workers.
 	 */
-	public synchronized void stopWorkers() {
+	private synchronized void stopWorkers() {
 		// Halt all worker threads
 		for (int i = 0; i < numThreads; ++i) {
 			workers[i].interrupt();

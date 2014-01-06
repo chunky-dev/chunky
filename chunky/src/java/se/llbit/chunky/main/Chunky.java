@@ -222,15 +222,17 @@ public class Chunky implements ChunkDiscoveryListener {
 			renderManager.start();
 		} catch (FileNotFoundException e) {
 			System.err.println("Scene \"" + options.sceneName + "\" not found!");
+			renderManager.interrupt();
 		} catch (IOException e) {
 			System.err.println("IO error while loading scene (" + e.getMessage() + ")");
+			renderManager.interrupt();
 		} catch (SceneLoadingError e) {
 			System.err.println("Scene loading error (" + e.getMessage() + ")");
+			renderManager.interrupt();
 		} catch (InterruptedException e) {
 			System.err.println("Interrupted while loading scene");
+			renderManager.interrupt();
 		}
-		// make sure the workers are stopped so the JVM can shut down correctly
-		renderManager.stopWorkers();
 	}
 
 	/**
