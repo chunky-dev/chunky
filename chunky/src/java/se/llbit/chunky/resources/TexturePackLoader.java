@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -1264,7 +1265,7 @@ public class TexturePackLoader {
 		boolean isDefault = tpFile.equals(defaultTP);
 		String tpName = isDefault ? "default texture pack"
 				: "texture pack";
-		tpName += " (" + tpFile.getName() + ")";
+		tpName += " (" + tpFile.getAbsolutePath() + ")";
 
 		Set<String> notLoaded = new HashSet<String>(toLoad);
 
@@ -1298,9 +1299,14 @@ public class TexturePackLoader {
 		if (!notLoaded.isEmpty()) {
 			StringBuffer msg = new StringBuffer();
 			msg.append("Failed to load textures from " + tpName + ":\n");
-			for (String id: notLoaded) {
-				msg.append(id);
+			Iterator<String> iter = notLoaded.iterator();
+			for (int count = 0; iter.hasNext() && count < 10; ++count) {
+				msg.append("\t");
+				msg.append(iter.next());
 				msg.append("\n");
+			}
+			if (notLoaded.size() > 10) {
+				msg.append("\t... plus " + (notLoaded.size()-10) + " more");
 			}
 			logger.info(msg.toString());
 
