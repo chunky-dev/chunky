@@ -162,16 +162,21 @@ public class Chunky implements ChunkDiscoveryListener {
 			return 1;
 		}
 
-		switch (cmdline.mode) {
-		case NO_OP:
-			break;
-		case HEADLESS_BENCHMARK:
-			return doBenchmark(options.renderThreads);
-		case HEADLESS_RENDER:
-			return doHeadlessRender();
-		case DEFAULT:
-			startNormally();
-			break;
+		try {
+			switch (cmdline.mode) {
+			case NO_OP:
+				break;
+			case HEADLESS_BENCHMARK:
+				return doBenchmark(options.renderThreads);
+			case HEADLESS_RENDER:
+				return doHeadlessRender();
+			case DEFAULT:
+				startNormally();
+				break;
+			}
+		} catch (Throwable t) {
+			logger.fatal("Unchecked exception caused Chunky to close: " + t.getMessage());
+			return 2;
 		}
 		return 0;
 	}
