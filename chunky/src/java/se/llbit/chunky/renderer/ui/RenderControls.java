@@ -337,6 +337,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	};
 
 	Set<Component> safeComponents = new HashSet<Component>();
+
 	{
 		// initialize safe component set
 		safeComponents.add(saveSceneBtn);
@@ -458,10 +459,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		showPreviewBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (view.isVisible()) {
-					view.setVisible(false);
+				if (view.isViewVisible()) {
+					view.hideView();
 				} else {
-					show3DView();
+					showPreviewWindow();
 				}
 			}
 		});
@@ -2219,7 +2220,16 @@ public class RenderControls extends JDialog implements ViewListener,
 		directLight.setSelected(renderMan.scene().getDirectLight());
 		stopRenderBtn.setEnabled(true);
 
-		show3DView();
+		showPreviewWindow();
+	}
+
+	/**
+	 * Make sure the preview window is visible
+	 */
+	public void showPreviewWindow() {
+		view.showView(renderMan.scene().canvasWidth(),
+				renderMan.scene().canvasHeight(),
+				this);
 	}
 
 	/**
@@ -2281,15 +2291,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			setProgress(task, done, start, target);
 			etaLbl.setText("ETA: " + eta);
 		}
-	}
-
-	/**
-	 * Show the 3D view window
-	 */
-	public void show3DView() {
-		view.setCanvasSize(renderMan.scene().canvasWidth(),
-				renderMan.scene().canvasHeight());
-		view.displayRightOf(this);
 	}
 
 	@Override
@@ -2377,7 +2378,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	@Override
 	public void chunksLoaded() {
 		updateCameraPosition();
-		show3DView();
+		showPreviewWindow();
 	}
 
 	@Override

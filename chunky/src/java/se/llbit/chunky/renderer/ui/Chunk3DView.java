@@ -18,7 +18,10 @@ package se.llbit.chunky.renderer.ui;
 
 import java.awt.Dimension;
 import java.awt.Event;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -36,6 +39,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import se.llbit.chunky.renderer.Renderer;
@@ -46,11 +50,19 @@ import se.llbit.chunky.renderer.Renderer;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 @SuppressWarnings("serial")
-public class Chunk3DView extends JDialog {
+public class Chunk3DView extends JFrame {
 
 	private final RenderCanvas canvas;
 
 	private int x0, y0;
+
+	protected boolean fullscreen = false;
+
+	private final JFrame fullscreenWindow;
+
+	private final ComponentListener componentListener;
+
+	private final ViewListener listener;
 
 	/**
 	 * Create the 3D view window
@@ -58,15 +70,15 @@ public class Chunk3DView extends JDialog {
 	 * @param parentFrame
 	 */
 	public Chunk3DView(final ViewListener listener, JFrame parentFrame) {
+		super("Render Preview");
 
-		super(parentFrame, "Render Preview");
+		this.listener = listener;
 
 		canvas = new RenderCanvas();
 
 		setContentPane(canvas);
 
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-		setModalityType(ModalityType.MODELESS);
 
 		pack();
 
@@ -80,9 +92,14 @@ public class Chunk3DView extends JDialog {
 			}
 		});
 
-		addComponentListener(new ComponentListener() {
+		fullscreenWindow = new JFrame("Fullscreen");
+		fullscreenWindow.setUndecorated(true);
+
+		componentListener = new ComponentListener() {
 			@Override
 			public void componentShown(ComponentEvent e) {
+				canvas.setBufferFinalization(true);
+				listener.setViewVisible(true);
 			}
 			@Override
 			public void componentResized(ComponentEvent e) {
@@ -93,10 +110,12 @@ public class Chunk3DView extends JDialog {
 			}
 			@Override
 			public void componentHidden(ComponentEvent e) {
+				canvas.setBufferFinalization(false);
+				listener.setViewVisible(false);
 			}
-		});
+		};
 
-		addKeyListener(new KeyListener() {
+		final KeyListener keyListener = new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				onKeyDown(e);
@@ -138,9 +157,15 @@ public class Chunk3DView extends JDialog {
 				case KeyEvent.VK_F:
 					listener.onMoveDown();
 					break;
+				case KeyEvent.VK_U:
+					setFullscreen(!fullscreen);
+					break;
 				}
 			}
-		});
+		};
+
+		fullscreenWindow.addKeyListener(keyListener);
+		addKeyListener(keyListener);
 
 		canvas.addMouseMotionListener(new MouseMotionListener() {
 			@Override
@@ -201,24 +226,7 @@ public class Chunk3DView extends JDialog {
 			}
 		});
 
-		addComponentListener(new ComponentListener() {
-			@Override
-			public void componentShown(ComponentEvent e) {
-				canvas.setBufferFinalization(true);
-				listener.setViewVisible(true);
-			}
-			@Override
-			public void componentResized(ComponentEvent e) {
-			}
-			@Override
-			public void componentMoved(ComponentEvent e) {
-			}
-			@Override
-			public void componentHidden(ComponentEvent e) {
-				canvas.setBufferFinalization(false);
-				listener.setViewVisible(false);
-			}
-		});
+		addComponentListener(componentListener);
 
 		canvas.addMouseWheelListener(new MouseWheelListener() {
 			@Override
@@ -227,6 +235,33 @@ public class Chunk3DView extends JDialog {
 				listener.onZoom(rotation);
 			}
 		});
+	}
+
+	synchronized protected void setFullscreen(boolean mode) {
+		if (mode == fullscreen) {
+			return;
+		}
+		fullscreen = mode;
+		GraphicsDevice device = GraphicsEnvironment
+				.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		if (fullscreen) {
+			Chunk3DView.this.removeComponentListener(componentListener);
+			Chunk3DView.this.setContentPane(new JPanel());
+			Chunk3DView.this.setVisible(false);
+			fullscreenWindow.setVisible(true);
+			device.setFullScreenWindow(fullscreenWindow);
+			fullscreenWindow.setContentPane(canvas);
+			fullscreenWindow.addComponentListener(componentListener);
+		} else {
+			fullscreenWindow.removeComponentListener(componentListener);
+			fullscreenWindow.setContentPane(new JPanel());
+			device.setFullScreenWindow(null);
+			fullscreenWindow.setVisible(false);
+			Chunk3DView.this.setContentPane(canvas);
+			Chunk3DView.this.setVisible(true);
+			Chunk3DView.this.addComponentListener(componentListener);
+		}
+
 	}
 
 	/**
@@ -249,7 +284,7 @@ public class Chunk3DView extends JDialog {
 	 * the parent window.
 	 * @param parent
 	 */
-	public void displayRightOf(JDialog parent) {
+	public void displayRightOf(Window parent) {
 		Point loc = parent.getLocation();
 		setLocation(loc.x + parent.getWidth(), loc.y);
 		setVisible(true);
@@ -266,5 +301,44 @@ public class Chunk3DView extends JDialog {
 			canvas.setPreferredSize(new Dimension(width, height));
 			pack();
 		}
+	}
+
+	/**
+	 * @return {@code true} if the preview window is visible
+	 */
+	public boolean isViewVisible() {
+		return isVisible() || fullscreenWindow.isVisible();
+	}
+
+	/**
+	 * Show preview window
+	 * @param window display the view to the right of this window
+	 */
+	synchronized public void showView(int width, int height, Window window) {
+		if (fullscreen) {
+			fullscreenWindow.setVisible(false);
+		} else {
+			setVisible(true);
+			setCanvasSize(width, height);
+			displayRightOf(window);
+		}
+	}
+
+	/**
+	 * Hide preview window
+	 */
+	synchronized public void hideView() {
+		if (fullscreen) {
+			fullscreenWindow.removeComponentListener(componentListener);
+			fullscreenWindow.setVisible(false);
+			fullscreenWindow.setContentPane(new JPanel());
+			Chunk3DView.this.setContentPane(canvas);
+			Chunk3DView.this.addComponentListener(componentListener);
+			fullscreen = false;
+		} else {
+			setVisible(false);
+		}
+		canvas.setBufferFinalization(false);
+		listener.setViewVisible(false);
 	}
 }

@@ -452,7 +452,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		if (!selection.isEmpty()) {
 			renderControls.loadFreshChunks(world, selection);
 		} else {
-			renderControls.show3DView();
+			renderControls.showPreviewWindow();
 		}
 	}
 
