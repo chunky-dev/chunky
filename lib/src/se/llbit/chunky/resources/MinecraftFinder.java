@@ -176,6 +176,16 @@ public class MinecraftFinder {
 				}
 			}
 		}
+		// Fall back on downloaded Jar (if present)
+		File resourceDir = new File(PersistentSettings.getSettingsDirectory(),
+				"resources");
+		if (resourceDir.isDirectory()) {
+			File jar = new File(resourceDir, "minecraft.jar");
+			if (jar.isFile() && jar.canRead()) {
+				return jar;
+			}
+		}
+		// Failed to locate Minecraft Jar
 		return null;
 	}
 
