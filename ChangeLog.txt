@@ -1,4 +1,8 @@
-1.2.1 - TBD
+1.2.2 - TBD
+    * The scene selector can now to delete scenes or export scenes to Zip file
+    * Fixed potential crash in the launcher from a clean install
+
+1.2.1 - 2014-01-03
     * Added -set and -reset command-line options
     * Removed global persistent skymap configuration option - skymap is now
       strictly a per-scene setting
