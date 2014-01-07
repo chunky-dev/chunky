@@ -93,7 +93,6 @@ public class ReleaseBuilder {
 		try {
 			File file = new File(path);
 			Scanner in = new Scanner(new FileInputStream(file));
-			in.nextLine();
 			StringBuilder sb = new StringBuilder();
 			while (in.hasNextLine()) {
 				String line = in.nextLine();
