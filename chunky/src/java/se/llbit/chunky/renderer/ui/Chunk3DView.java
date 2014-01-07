@@ -50,7 +50,7 @@ import se.llbit.chunky.renderer.Renderer;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 @SuppressWarnings("serial")
-public class Chunk3DView extends JFrame {
+public class Chunk3DView extends JDialog {
 
 	private final RenderCanvas canvas;
 
@@ -70,7 +70,7 @@ public class Chunk3DView extends JFrame {
 	 * @param parentFrame
 	 */
 	public Chunk3DView(final ViewListener listener, JFrame parentFrame) {
-		super("Render Preview");
+		super(parentFrame, "Render Preview");
 
 		this.listener = listener;
 
@@ -79,6 +79,7 @@ public class Chunk3DView extends JFrame {
 		setContentPane(canvas);
 
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		setModalityType(ModalityType.MODELESS);
 
 		pack();
 
