@@ -1,4 +1,6 @@
 1.2.2 - TBD
+    * The launcher (v1.7.0) now ignores older releases if a newer version
+      already is installed
     * Using -render without a scene name argument prints out available scenes
     * Added Help tab listing keyboard shortcuts in the Render Controls window
     * Pressing U in the Render Preview window makes it go fullscreen

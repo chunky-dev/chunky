@@ -65,7 +65,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame {
 
-	private static final String LAUNCHER_VERSION = "v1.6.2";
+	private static final String LAUNCHER_VERSION = "v1.7.0";
 
 	public class UpdateThread extends Thread {
 		@Override public void run() {
@@ -124,16 +124,23 @@ public class ChunkyLauncher extends JFrame {
 					}
 				}
 
-				// check if candidate is already installed
+				// check if more recent version than candidate is already installed
 				List<VersionInfo> versions = ChunkyDeployer.availableVersions();
-				if (!versions.contains(latest) || !ChunkyDeployer.checkVersionIntegrity(latest.name)) {
-					// candidate not already installed - install it!
-					UpdateDialog dialog = new UpdateDialog(ChunkyLauncher.this, latest);
-					dialog.setVisible(true);
-					return true;
+				iter = versions.iterator();
+				while (iter.hasNext()) {
+					VersionInfo available = iter.next();
+					if (available.compareTo(latest) <= 0 &&
+						ChunkyDeployer.checkVersionIntegrity(available.name)) {
+						// more recent version already installed and not corrupt
+						return false;
+					}
 				}
+
+				// install the candidate!
+				UpdateDialog dialog = new UpdateDialog(ChunkyLauncher.this, latest);
+				dialog.setVisible(true);
+				return true;
 			}
-			return false;
 		}
 
 		private VersionInfo getVersion(String url) throws IOException, SyntaxError {

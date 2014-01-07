@@ -159,6 +159,12 @@ public class VersionInfo implements Comparable<VersionInfo> {
 		return name;
 	}
 
+	/**
+	 * @return The value 0 if the argument version is as recent as this version; a
+	 * value less than 0 if this version is more recent than the argument version;
+	 * and a value greater than 0 if this version is older than the argument
+	 * version.
+	 */
 	@Override
 	public int compareTo(VersionInfo o) {
 		return o.date.compareTo(date);
