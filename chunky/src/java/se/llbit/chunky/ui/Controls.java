@@ -887,8 +887,9 @@ public class Controls extends JPanel {
 						});
 				fileDialog.setVisible(true);
 				File selectedFile = fileDialog.getSelectedFile(".png");
-				if (selectedFile != null)
+				if (selectedFile != null) {
 					chunky.renderView(selectedFile, progressPanel);
+				}
 			}
 		});
 

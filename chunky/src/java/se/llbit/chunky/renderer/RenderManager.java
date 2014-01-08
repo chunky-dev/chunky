@@ -24,11 +24,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.swing.JOptionPane;
-
 import org.apache.log4j.Logger;
 
-import se.llbit.chunky.main.Messages;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.ui.CenteredFileDialog;
@@ -467,27 +464,10 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		fileDialog.setVisible(true);
 		File targetFile = fileDialog.getSelectedFile(".png");
 		if (targetFile != null) {
-			if (!targetFile.getName().endsWith(".png"))
-				targetFile = new File(targetFile.getPath()+".png");
-			if (targetFile.exists()) {
-				Object[] options = {Messages.getString("Chunky.Cancel_lbl"), //$NON-NLS-1$
-						Messages.getString("Chunky.AcceptOverwrite_lbl")}; //$NON-NLS-1$
-				int n = JOptionPane.showOptionDialog(null,
-						String.format(Messages.getString("Chunky.Confirm_overwrite_msg"), //$NON-NLS-1$
-								targetFile.getName()),
-						Messages.getString("Chunky.Confirm_overwrite_title"), //$NON-NLS-1$
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE,
-						null,
-						options,
-						options[0]);
-				if (n != 1)
-					return;
-			}
 			try {
 				bufferedScene.saveFrame(targetFile, progressListener);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("Failed to save snapshot", e);
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -19,6 +19,10 @@ package se.llbit.chunky.ui;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.io.File;
+
+import javax.swing.JOptionPane;
+
+import se.llbit.chunky.main.Messages;
 
 /**
  * A sublcass of FileDialog that centers the dialog.
@@ -59,14 +63,37 @@ public class CenteredFileDialog extends FileDialog {
 	public File getSelectedFile(String extension) {
 		String fileName = getFile();
 		if (fileName != null) {
-			if (!fileName.endsWith(extension)) {
+			File selectedFile;
+			boolean extensionAdded = false;
+			if (getMode() == FileDialog.SAVE && !fileName.endsWith(extension)) {
 				fileName = fileName + extension;
+				extensionAdded = true;
 			}
 			if (getDirectory() != null) {
-				return new File(getDirectory(), fileName);
+				selectedFile =  new File(getDirectory(), fileName);
 			} else {
-				return new File(fileName);
+				selectedFile =  new File(fileName);
 			}
+
+			if (extensionAdded && selectedFile.exists()) {
+				// confirm overwrite of file (extension added - FileDialog checks for regular overwrite)
+				Object[] options = {
+						Messages.getString("Chunky.Cancel_lbl"), //$NON-NLS-1$
+						Messages.getString("Chunky.AcceptOverwrite_lbl")}; //$NON-NLS-1$
+				int n = JOptionPane.showOptionDialog(null,
+						String.format(Messages.getString("Chunky.Confirm_overwrite_msg"), //$NON-NLS-1$
+								selectedFile.getName()),
+						Messages.getString("Chunky.Confirm_overwrite_title"), //$NON-NLS-1$
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE,
+						null,
+						options,
+						options[0]);
+				if (n != 1) {
+					return null;
+				}
+			}
+			return selectedFile;
 		} else {
 			return null;
 		}

@@ -48,12 +48,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-import se.llbit.chunky.main.Messages;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.SceneDescription;
 import se.llbit.chunky.ui.CenteredFileDialog;
-import se.llbit.util.OSDetector;
-import se.llbit.util.OSDetector.OS;
 
 /**
  * The scene selector dialog.
@@ -313,24 +310,6 @@ public class SceneSelector extends JDialog {
 			fileDialog.setVisible(true);
 			File selectedFile = fileDialog.getSelectedFile(".zip");
 			if (selectedFile != null) {
-				if (OSDetector.getOS() != OS.WIN && selectedFile.exists()) {
-					// Windows FileDialog asks for overwrite confirmation, so we don't have to
-					Object[] options = {
-							Messages.getString("Chunky.Cancel_lbl"), //$NON-NLS-1$
-							Messages.getString("Chunky.AcceptOverwrite_lbl")}; //$NON-NLS-1$
-					int n = JOptionPane.showOptionDialog(null,
-							String.format(Messages.getString("Chunky.Confirm_overwrite_msg"), //$NON-NLS-1$
-									selectedFile.getName()),
-							Messages.getString("Chunky.Confirm_overwrite_title"), //$NON-NLS-1$
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.WARNING_MESSAGE,
-							null,
-							options,
-							options[0]);
-					if (n != 1) {
-						return;
-					}
-				}
 				scene.exportToZip(selectedFile);
 			}
 		}
