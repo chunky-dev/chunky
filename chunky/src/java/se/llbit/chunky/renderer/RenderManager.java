@@ -450,17 +450,18 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	 */
 	public synchronized void saveFrame(ProgressListener progressListener) {
 
-		CenteredFileDialog fileDialog =
-				new CenteredFileDialog(null, "Save Current Frame", FileDialog.SAVE);
+		CenteredFileDialog fileDialog = new CenteredFileDialog(null,
+				"Save Current Frame", FileDialog.SAVE);
 		fileDialog.setDirectory(context.getSceneDirectory().getAbsolutePath());
-		fileDialog.setFile(bufferedScene.name()+".png");
+		fileDialog.setFile(bufferedScene.name()+"-"+bufferedScene.spp+".png");
 		fileDialog.setFilenameFilter(
-				new FilenameFilter() {
-					@Override
-					public boolean accept(File dir, String name) {
-						return name.toLowerCase().endsWith(".png");
-					}
-				});
+			new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					return name.toLowerCase().endsWith(".png");
+				}
+			}
+		);
 		fileDialog.setVisible(true);
 		File targetFile = fileDialog.getSelectedFile(".png");
 		if (targetFile != null) {
