@@ -65,7 +65,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame {
 
-	private static final String LAUNCHER_VERSION = "v1.7.0";
+	private static final String LAUNCHER_VERSION = "v1.7.1";
 
 	public class UpdateThread extends Thread {
 		@Override public void run() {
@@ -303,7 +303,7 @@ public class ChunkyLauncher extends JFrame {
 		launchBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				settings.jre = jreDirField.getText();
+				settings.javaDir = jreDirField.getText();
 				settings.debugConsole = debugConsoleCB.isSelected();
 				settings.verboseLogging = verboseLoggingCB.isSelected();
 				settings.closeConsoleOnExit = closeConsoleOnExitCB.isSelected();
@@ -629,7 +629,7 @@ public class ChunkyLauncher extends JFrame {
 	}
 
 	private String getConfiguredJre() {
-		String configuredJre = settings.jre;
+		String configuredJre = settings.javaDir;
 		if (!configuredJre.isEmpty() && JreUtil.isJreDir(new File(configuredJre))) {
 			return configuredJre;
 		} else {

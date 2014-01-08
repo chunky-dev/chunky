@@ -339,7 +339,7 @@ public class ChunkyDeployer {
 	public static List<String> buildCommandLine(VersionInfo version, LauncherSettings settings) {
 		List<String> cmd = new LinkedList<String>();
 
-		cmd.add(JreUtil.javaCommand(settings.jre));
+		cmd.add(JreUtil.javaCommand(settings.javaDir));
 		cmd.add("-Xmx" + settings.memoryLimit + "m");
 
 		String[] parts = settings.javaOptions.split(" ");

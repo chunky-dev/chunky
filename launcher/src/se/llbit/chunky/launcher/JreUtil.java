@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -50,8 +50,8 @@ public class JreUtil {
 		return null;
 	}
 
-	public static String javaCommand(String jre) {
-		return javaExecutable(new File(jre)).getAbsolutePath();
+	public static String javaCommand(String javaDir) {
+		return javaExecutable(new File(javaDir)).getAbsolutePath();
 	}
 
 }

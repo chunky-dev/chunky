@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -18,14 +18,14 @@ package se.llbit.chunky.launcher;
 
 import java.io.File;
 
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.JsonSettings;
+import se.llbit.chunky.PersistentSettings;
 
 public class LauncherSettings {
 	private static final int DEFAULT_MEMORY_LIMIT = 1024;
 	private static final String LAUNCHER_SETTINGS_FILE = "chunky-launcher.json";
 
-	public String jre = "";
+	public String javaDir = "";
 	public int memoryLimit = DEFAULT_MEMORY_LIMIT;
 	public boolean debugConsole = false;
 	public boolean verboseLogging = false;
@@ -49,7 +49,10 @@ public class LauncherSettings {
 	public void load() {
 		settings.load(file);
 
-		jre = settings.getString("javaExecutable", "");
+		javaDir = settings.getString("javaDir", "");
+		if (javaDir.isEmpty()) {
+			javaDir = settings.getString("javaExecutable", "");
+		}
 		memoryLimit = settings.getInt("memoryLimit", DEFAULT_MEMORY_LIMIT);
 		debugConsole = settings.getBool("showConsole", false);
 		verboseLogging = settings.getBool("verboseLogging", false);
@@ -63,7 +66,7 @@ public class LauncherSettings {
 	}
 
 	public void save() {
-		settings.setString("javaExecutable", jre);
+		settings.setString("javaDir", javaDir);
 		settings.setInt("memoryLimit", memoryLimit);
 		settings.setBool("showConsole", debugConsole);
 		settings.setBool("verboseLogging", verboseLogging);
