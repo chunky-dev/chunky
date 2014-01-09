@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -426,7 +426,7 @@ public class UpdateDialog extends JDialog {
 		public DownloadStatus call() throws Exception {
 			DownloadStatus result = null;
 			if (!lib.url.isEmpty()) {
-				result = tryDownload(lib, lib.url);
+				result = tryDownload(libDir, lib, lib.url);
 				switch (result) {
 				case MALFORMED_URL:
 					System.err.println("Malformed URL: " + lib.url);
@@ -443,7 +443,7 @@ public class UpdateDialog extends JDialog {
 			}
 			String defaultUrl = "http://chunkyupdate.llbit.se/lib/" + lib.name;
 			if (result != DownloadStatus.SUCCESS) {
-				result = tryDownload(lib, defaultUrl);
+				result = tryDownload(libDir, lib, defaultUrl);
 			}
 			switch (result) {
 			case SUCCESS:
@@ -495,7 +495,7 @@ public class UpdateDialog extends JDialog {
 		});
 	}
 
-	public DownloadStatus tryDownload(Library lib, String theUrl) {
+	public static DownloadStatus tryDownload(File libDir, Library lib, String theUrl) {
 		try {
 			URL url = new URL(theUrl);
 			ReadableByteChannel inChannel = Channels.newChannel(url.openStream());

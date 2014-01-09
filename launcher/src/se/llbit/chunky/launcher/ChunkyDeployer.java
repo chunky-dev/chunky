@@ -43,11 +43,6 @@ import se.llbit.json.JsonValue;
  */
 public class ChunkyDeployer {
 
-	enum Mode {
-		GUI,
-		HEADLESS
-	};
-
 	/**
 	 * Check the integrity of an installed version.
 	 * @param version
@@ -233,7 +228,7 @@ public class ChunkyDeployer {
 	 * launching Chunky (waits 200ms to see if everything launched)
 	 */
 	public int launchChunky(Component parentComponent, LauncherSettings settings, VersionInfo version,
-			Mode mode) {
+			ChunkyMode mode) {
 		List<String> command = buildCommandLine(version, settings);
 		if (settings.verboseLauncher ||
 				System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
@@ -304,7 +299,7 @@ public class ChunkyDeployer {
 			ShutdownThread shutdownThread = new ShutdownThread(proc, logger, outputScanner, errorScanner);
 			shutdownThread.start();
 			try {
-				if (mode == Mode.GUI) {
+				if (mode == ChunkyMode.GUI) {
 					// just wait a little while to check for startup errors
 					Thread.sleep(3000);
 					return shutdownThread.exitValue;

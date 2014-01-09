@@ -22,13 +22,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.AbstractAction;
@@ -51,107 +45,19 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.launcher.ChunkyDeployer.Mode;
 import se.llbit.chunky.launcher.ui.LaunchErrorDialog;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.SettingsDirectory;
-import se.llbit.json.JsonParser;
-import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.ui.Adjuster;
 
 /**
+ * The main Chunky Launcher window.
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
 @SuppressWarnings("serial")
-public class ChunkyLauncher extends JFrame {
+public class ChunkyLauncher extends JFrame implements UpdateListener {
 
-	private static final String LAUNCHER_VERSION = "v1.7.4";
-
-	public class UpdateThread extends Thread {
-		@Override public void run() {
-			try {
-				if (!tryUpdate()) {
-					setBusy(false);
-				}
-			} catch (MalformedURLException e1) {
-				System.err.println("Malformed version info url");
-				Dialogs.error(ChunkyLauncher.this,
-						"Failed to fetch latest version info online.");
-				setBusy(false);
-			} catch (IOException e1) {
-				System.err.println("Failed to fetch version info " + e1.getMessage());
-				Dialogs.error(ChunkyLauncher.this,
-						"Failed to fetch latest version info online. The server may be down right now.");
-				setBusy(false);
-			} catch (SyntaxError e1) {
-				System.err.println("Version info JSON error " + e1.getMessage());
-				Dialogs.error(ChunkyLauncher.this,
-						"The downloaded version info was corrupt. Can not update at this time.");
-				setBusy(false);
-			} catch (Throwable e1) {
-				System.err.println("Uncaught exception: " + e1.getMessage());
-				setBusy(false);
-			}
-		}
-
-		private boolean tryUpdate() throws IOException, SyntaxError {
-			List<VersionInfo> candidates = new LinkedList<VersionInfo>();
-
-			candidates.add(getVersion("http://chunkyupdate.llbit.se/latest.json"));
-
-			if (settings.downloadSnapshots) {
-				candidates.add(getVersion("http://chunkyupdate.llbit.se/snapshot.json"));
-			}
-
-			// filter out corrupt versions
-			Iterator<VersionInfo> iter = candidates.iterator();
-			while (iter.hasNext()) {
-				if (!iter.next().isValid()) {
-					iter.remove();
-				}
-			}
-
-			if (candidates.isEmpty()) {
-				Dialogs.error(ChunkyLauncher.this,
-						"The downloaded version info was corrupt. Can not update at this moment.");
-				return false;
-			} else {
-				// find latest candidate
-				VersionInfo latest = candidates.get(0);
-				for (VersionInfo candidate: candidates) {
-					if (candidate.compareTo(latest) < 0) {
-						latest = candidate;
-					}
-				}
-
-				// check if more recent version than candidate is already installed
-				List<VersionInfo> versions = ChunkyDeployer.availableVersions();
-				iter = versions.iterator();
-				while (iter.hasNext()) {
-					VersionInfo available = iter.next();
-					if (available.compareTo(latest) <= 0 &&
-						ChunkyDeployer.checkVersionIntegrity(available.name)) {
-						// more recent version already installed and not corrupt
-						return false;
-					}
-				}
-
-				// install the candidate!
-				UpdateDialog dialog = new UpdateDialog(ChunkyLauncher.this, latest);
-				dialog.setVisible(true);
-				return true;
-			}
-		}
-
-		private VersionInfo getVersion(String url) throws IOException, SyntaxError {
-			URL latestJson = new URL(url);
-			InputStream in = latestJson.openStream();
-			JsonParser parser = new JsonParser(in);
-			VersionInfo version = new VersionInfo(parser.parse().object());
-			in.close();
-			return version;
-		}
-	}
+	private static final String LAUNCHER_VERSION = "v1.8";
 
 	protected String java;
 	private final ChunkyDeployer deployer;
@@ -191,7 +97,7 @@ public class ChunkyLauncher extends JFrame {
 			set(settings.memoryLimit);
 		}
 	};
-	protected UpdateThread updateThread;
+	protected UpdateChecker updateThread;
 
 
 	public ChunkyLauncher(ChunkyDeployer deployer, LauncherSettings settings) {
@@ -321,7 +227,7 @@ public class ChunkyLauncher extends JFrame {
 
 				PersistentSettings.setMinecraftDirectory(minecraftDirField.getText());
 				if (deployer.launchChunky(ChunkyLauncher.this, settings, version,
-						Mode.GUI) == 0) {
+						ChunkyMode.GUI) == 0) {
 					settings.save();
 					setVisible(false);
 					dispose();
@@ -337,7 +243,7 @@ public class ChunkyLauncher extends JFrame {
 				synchronized (updateLock) {
 					if (!isBusy) {
 						setBusyEDT(true);
-						updateThread = new UpdateThread();
+						updateThread = new UpdateChecker(settings, ChunkyLauncher.this);
 						updateThread.start();
 					}
 				}
@@ -660,18 +566,38 @@ public class ChunkyLauncher extends JFrame {
 		 */
 
 		boolean forceLauncher = false;
-		boolean headless = false;
+		ChunkyMode mode = ChunkyMode.GUI;
 		String headlessOptions = "";
 
 		if (args.length > 0) {
-			headless = true;
+			mode = ChunkyMode.HEADLESS;
 			for (String arg: args) {
 				if (arg.equals("--nolauncher")) {
-					headless = false;
+					mode = ChunkyMode.GUI;
 				} else if (arg.equals("--launcher")) {
 					forceLauncher = true;
 				} else if (arg.equals("--verbose")) {
 					settings.verboseLauncher = true;
+				} else if (arg.equals("--update")) {
+					UpdateChecker updateThread = new UpdateChecker(settings,
+							new UpdateListener() {
+								@Override
+								public void updateError(String message) {
+								}
+
+								@Override
+								public void updateAvailable(VersionInfo latest) {
+									System.out.println("Downloading Chunky " + latest + "...");
+									ConsoleUpdater.update(latest);
+								}
+
+								@Override
+								public void noUpdateAvailable() {
+									System.out.println("Chunky is up to date");
+								}
+							});
+					updateThread.start();
+					return;
 				} else {
 					if (!headlessOptions.isEmpty()) {
 						headlessOptions += " ";
@@ -680,11 +606,11 @@ public class ChunkyLauncher extends JFrame {
 				}
 			}
 			if (forceLauncher) {
-				headless = false;
+				mode = ChunkyMode.GUI;
 			}
 		}
 
-		if (headless) {
+		if (mode == ChunkyMode.HEADLESS) {
 			// Chunky is being run from the console => headless
 			settings.debugConsole = true;
 			settings.headless = true;
@@ -694,7 +620,7 @@ public class ChunkyLauncher extends JFrame {
 			VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
 			if (ChunkyDeployer.canLaunch(version, null, false)) {
 				int exitCode = deployer.launchChunky(null, settings, version,
-						Mode.HEADLESS);
+						ChunkyMode.HEADLESS);
 				if (exitCode != 0) {
 					System.exit(exitCode);
 				}
@@ -704,7 +630,6 @@ public class ChunkyLauncher extends JFrame {
 						ChunkyDeployer.buildCommandLine(version, settings)));
 				System.exit(1);
 			}
-			return;
 		} else {
 			// Set up Look and Feel
 			try {
@@ -713,30 +638,30 @@ public class ChunkyLauncher extends JFrame {
 			} catch (Exception e) {
 				System.out.println("Failed to set native Look and Feel");
 			}
-		}
 
-		if (firstTimeSetup()) {
-			ChunkyDeployer deployer = new ChunkyDeployer();
-			boolean showLauncher = true;
-			if (!forceLauncher && !settings.showLauncher) {
-				// skip launcher only if we can launch this version
-				VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
-				if (ChunkyDeployer.canLaunch(version, null, false)) {
-					if (deployer.launchChunky(null, settings, version,
-							Mode.GUI) == 0) {
-						showLauncher = false;
-						return;
-					} else {
-						launchError(settings, version);
+			if (firstTimeSetup()) {
+				ChunkyDeployer deployer = new ChunkyDeployer();
+				boolean showLauncher = true;
+				if (!forceLauncher && !settings.showLauncher) {
+					// skip launcher only if we can launch this version
+					VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
+					if (ChunkyDeployer.canLaunch(version, null, false)) {
+						if (deployer.launchChunky(null, settings, version,
+								ChunkyMode.GUI) == 0) {
+							showLauncher = false;
+							return;
+						} else {
+							launchError(settings, version);
+						}
 					}
 				}
-			}
-			if (showLauncher) {
-				deployer.deploy();
-				JFrame launcher = new ChunkyLauncher(deployer, settings);
-				//launcher.setLocationByPlatform(true);
-				launcher.setLocationRelativeTo(null);
-				launcher.setVisible(true);
+				if (showLauncher) {
+					deployer.deploy();
+					JFrame launcher = new ChunkyLauncher(deployer, settings);
+					//launcher.setLocationByPlatform(true);
+					launcher.setLocationRelativeTo(null);
+					launcher.setVisible(true);
+				}
 			}
 		}
 	}
@@ -768,5 +693,22 @@ public class ChunkyLauncher extends JFrame {
 			}
 		}
 
+	}
+
+	@Override
+	public void updateError(String message) {
+		Dialogs.error(this, message);
+		setBusy(false);
+	}
+
+	@Override
+	public void updateAvailable(VersionInfo latest) {
+		UpdateDialog dialog = new UpdateDialog(this, latest);
+		dialog.setVisible(true);
+	}
+
+	@Override
+	public void noUpdateAvailable() {
+		setBusy(false);
 	}
 }
