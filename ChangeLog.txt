@@ -1,4 +1,5 @@
 1.2.2 - TBD
+    * Added -version command-line option
     * Added --version launcher command-line option
     * Added --update launcher command-line option
     * Added --verbose launcher command-line option

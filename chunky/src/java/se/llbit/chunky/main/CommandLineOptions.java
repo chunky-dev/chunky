@@ -162,12 +162,14 @@ public class CommandLineOptions {
 					options.tileWidth = Math.max(1, Integer.parseInt(args[i+1]));
 					i += 1;
 				}
+			} else if (args[i].equals("-version")) {
+				System.out.println("Chunky " + Version.getVersion());
+				mode = Mode.NO_OP;
+				break;
 			} else if (args[i].equals("-opencl")) {
 				options.openCLEnabled = true;
 			} else if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("-help") || args[i].equals("--help")) {
-				System.out.println("Chunky " + Version.getVersion());
-				System.out.println(USAGE);
-				System.out.println();
+				printUsage();
 				System.out.println("The default scene directory is " + PersistentSettings.getSceneDirectory());
 				mode = Mode.NO_OP;
 			} else if (args[i].equals("-set")) {
@@ -289,7 +291,7 @@ public class CommandLineOptions {
 				options.worldDir = new File(args[i]);
 			} else {
 				System.err.println("Unrecognized argument: "+args[i]);
-				System.err.println(USAGE);
+				printUsage();
 				confError = true;
 				break;
 			}
@@ -332,6 +334,12 @@ public class CommandLineOptions {
 		if (options.sceneName != null) {
 			mode = Mode.HEADLESS_RENDER;
 		}
+	}
+
+	private void printUsage() {
+		System.out.println("Chunky " + Version.getVersion());
+		System.out.println(USAGE);
+		System.out.println();
 	}
 
 	private static File getSceneFile(ChunkyOptions options) {
