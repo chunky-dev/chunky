@@ -29,6 +29,9 @@ import java.util.List;
 import org.jastadd.util.PrettyPrinter;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.ConsoleRenderListener;
+import se.llbit.chunky.renderer.RenderContext;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneDescription;
 import se.llbit.chunky.renderer.ui.SceneSelector;
 import se.llbit.chunky.resources.MinecraftFinder;
@@ -58,6 +61,7 @@ public class CommandLineOptions {
 		"Options:\n" +
 		"  -texture <FILE>        use FILE as the texture pack (must be a Zip file)\n" +
 		"  -render <SCENE>        render the specified scene (see notes)\n" +
+		"  -snapshot <SCENE> <PNG> create a snapshot of the specified scene\n" +
 		"  -scene-dir <DIR>       use the directory DIR for loading/saving scenes\n" +
 		"  -benchmark             run the benchmark and exit\n" +
 		"  -threads <NUM>         use the specified number of threads for rendering\n" +
@@ -96,6 +100,8 @@ public class CommandLineOptions {
 
 	public CommandLineOptions(String[] args) {
 		boolean selectedWorld = false;
+
+		options.sceneDir = PersistentSettings.getSceneDirectory();
 
 		// parse arguments
 		// TODO in serious need of refactoring
@@ -173,6 +179,33 @@ public class CommandLineOptions {
 				printUsage();
 				System.out.println("The default scene directory is " + PersistentSettings.getSceneDirectory());
 				mode = Mode.NO_OP;
+			} else if (args[i].equals("-snapshot")) {
+				mode = Mode.NO_OP;
+				if (args.length > i+2) {
+					options.sceneName = args[i+1];
+					String pngFileName = args[i+2];
+					try {
+						File file = getSceneFile(options);
+						Scene scene = new Scene();
+						FileInputStream in = new FileInputStream(file);
+						scene.loadDescription(in);
+						RenderContext context = new RenderContext(options);
+						ConsoleRenderListener listener = new ConsoleRenderListener();
+						scene.setCanvasSize(scene.width, scene.height);
+						scene.loadDump(context, listener);
+						scene.saveFrame(new File(pngFileName), listener);
+						System.out.println("Saved snapshot to " + pngFileName);
+					} catch (IOException e) {
+						System.err.println("Failed to dump snapshot: " +
+								e.getMessage());
+					}
+					i += 2;
+					return;
+				} else {
+					System.err.println("Too few arguments for -snapshot command!");
+					confError = true;
+					break;
+				}
 			} else if (args[i].equals("-set")) {
 				mode = Mode.NO_OP;
 				if (args.length > i+3) {
@@ -305,10 +338,6 @@ public class CommandLineOptions {
 				options.sceneDir = possibleSceneFile.getParentFile();
 				options.sceneName = possibleSceneFile.getName();
 			}
-		}
-
-		if (options.sceneDir == null) {
-			options.sceneDir = PersistentSettings.getSceneDirectory();
 		}
 
 		if (!confError) {

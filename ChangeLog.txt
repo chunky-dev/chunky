@@ -1,9 +1,6 @@
 1.2.2 - TBD
-    * Added -version command-line option
-    * Added --setup launcher command-line option
-    * Added --version launcher command-line option
-    * Added --update launcher command-line option
-    * Added --verbose launcher command-line option
+    * Added Chunky commands: -snapshot, -version
+    * Added launcher commands: --setup, --update, --version, --verbose
     * Fixed error causing the launcher to crash when running in headless mode
       if the launcher GUI had not previously been run
     * The launcher (v1.7.0) now ignores older releases if a newer version

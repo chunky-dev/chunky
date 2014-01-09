@@ -1549,7 +1549,7 @@ public class Scene extends SceneDescription {
 		}
 	}
 
-	private synchronized void loadDump(
+	public synchronized void loadDump(
 			RenderContext context,
 			RenderStatusListener renderListener) {
 
