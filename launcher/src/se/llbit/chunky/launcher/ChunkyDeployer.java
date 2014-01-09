@@ -235,7 +235,8 @@ public class ChunkyDeployer {
 	public int launchChunky(Component parentComponent, LauncherSettings settings, VersionInfo version,
 			Mode mode) {
 		List<String> command = buildCommandLine(version, settings);
-		if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
+		if (settings.verboseLauncher ||
+				System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
 			System.out.println(commandString(command));
 		}
 		ProcessBuilder procBuilder = new ProcessBuilder(command);

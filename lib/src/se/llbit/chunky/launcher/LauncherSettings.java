@@ -29,6 +29,7 @@ public class LauncherSettings {
 	public int memoryLimit = DEFAULT_MEMORY_LIMIT;
 	public boolean debugConsole = false;
 	public boolean verboseLogging = false;
+	public boolean verboseLauncher = false;
 	public String javaOptions = "";
 	public String chunkyOptions = "";
 	public String version = "latest";
@@ -56,6 +57,7 @@ public class LauncherSettings {
 		memoryLimit = settings.getInt("memoryLimit", DEFAULT_MEMORY_LIMIT);
 		debugConsole = settings.getBool("showConsole", false);
 		verboseLogging = settings.getBool("verboseLogging", false);
+		verboseLauncher = settings.getBool("verboseLauncher", false);
 		closeConsoleOnExit = settings.getBool("closeConsoleOnExit", true);
 		javaOptions = settings.getString("javaOptions", "");
 		chunkyOptions = settings.getString("chunkyOptions", "");
@@ -70,6 +72,7 @@ public class LauncherSettings {
 		settings.setInt("memoryLimit", memoryLimit);
 		settings.setBool("showConsole", debugConsole);
 		settings.setBool("verboseLogging", verboseLogging);
+		settings.setBool("verboseLauncher", verboseLauncher);
 		settings.setBool("closeConsoleOnExit", closeConsoleOnExit);
 		settings.setString("javaOptions", javaOptions);
 		settings.setString("chunkyOptions", chunkyOptions);

@@ -82,7 +82,8 @@ public class CommandLineOptions {
 		"\n" +
 		"Launcher options:\n" +
 		"  --nolauncher          start Chunky as normal, but without opening launcher\n" +
-		"  --launcher            forces the launcher window to be displayed";
+		"  --launcher            forces the launcher window to be displayed\n" +
+		"  --verbose             verbose logging in the launcher\n";
 
 	protected boolean confError = false;
 

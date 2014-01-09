@@ -65,7 +65,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame {
 
-	private static final String LAUNCHER_VERSION = "v1.7.2";
+	private static final String LAUNCHER_VERSION = "v1.7.4";
 
 	public class UpdateThread extends Thread {
 		@Override public void run() {
@@ -670,6 +670,8 @@ public class ChunkyLauncher extends JFrame {
 					headless = false;
 				} else if (arg.equals("--launcher")) {
 					forceLauncher = true;
+				} else if (arg.equals("--verbose")) {
+					settings.verboseLauncher = true;
 				} else {
 					if (!headlessOptions.isEmpty()) {
 						headlessOptions += " ";
