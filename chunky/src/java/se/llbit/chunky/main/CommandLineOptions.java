@@ -78,7 +78,11 @@ public class CommandLineOptions {
 		"*OR* the name of a scene relative to the scene directory (excluding extension).\n" +
 		"If the scene name is an absolute path then the scene directory will be the\n" +
 		"parent directory of the Scene Description File, otherwise the scene directory\n" +
-		"can be overridden temporarily by the -scene-dir option.";
+		"can be overridden temporarily by the -scene-dir option.\n" +
+		"\n" +
+		"Launcher options:\n" +
+		"  --nolauncher          start Chunky as normal, but without opening launcher\n" +
+		"  --launcher            forces the launcher window to be displayed";
 
 	protected boolean confError = false;
 
