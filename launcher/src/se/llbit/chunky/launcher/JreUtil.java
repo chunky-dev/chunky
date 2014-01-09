@@ -51,7 +51,18 @@ public class JreUtil {
 	}
 
 	public static String javaCommand(String javaDir) {
-		return javaExecutable(new File(javaDir)).getAbsolutePath();
+		File executable = javaExecutable(new File(javaDir));
+		if (executable == null) {
+			// attempt to fall back on host Java runtime
+			executable = javaExecutable(
+					new File(System.getProperty("java.home")));
+		}
+		if (executable != null) {
+			return executable.getAbsolutePath();
+		} else {
+			System.err.println("Can not run Chunky! Unable to locate Java runtime!");
+			return "";
+		}
 	}
 
 }
