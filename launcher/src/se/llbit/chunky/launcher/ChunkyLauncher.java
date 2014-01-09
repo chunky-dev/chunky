@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.net.URL;
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.AbstractAction;
@@ -57,7 +58,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame implements UpdateListener {
 
-	private static final String LAUNCHER_VERSION = "v1.8.1";
+	private static final String LAUNCHER_VERSION = "v1.8.2";
 
 	protected String java;
 	private final ChunkyDeployer deployer;
@@ -601,6 +602,11 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 							});
 					updateThread.start();
 					return;
+				} else if (arg.equals("--setup")) {
+					// configure launcher settings
+					doSetup(settings);
+					settings.save();
+					return;
 				} else {
 					if (!headlessOptions.isEmpty()) {
 						headlessOptions += " ";
@@ -667,6 +673,15 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 				}
 			}
 		}
+	}
+
+	private static void doSetup(LauncherSettings settings) {
+		System.out.print("memory limit (MiB): ");
+		Scanner in = new Scanner(System.in);
+		settings.memoryLimit = in.nextInt();
+		in.nextLine();
+		System.out.print("Java options: ");
+		settings.javaOptions = in.nextLine();
 	}
 
 	private static boolean firstTimeSetup() {

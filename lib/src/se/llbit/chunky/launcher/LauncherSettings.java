@@ -54,6 +54,9 @@ public class LauncherSettings {
 		if (javaDir.isEmpty()) {
 			javaDir = settings.getString("javaExecutable", "");
 		}
+		if (javaDir.isEmpty()) {
+			javaDir = System.getProperty("java.home");
+		}
 		memoryLimit = settings.getInt("memoryLimit", DEFAULT_MEMORY_LIMIT);
 		debugConsole = settings.getBool("showConsole", false);
 		verboseLogging = settings.getBool("verboseLogging", false);
@@ -82,5 +85,9 @@ public class LauncherSettings {
 		settings.setBool("downloadSnapshots", downloadSnapshots);
 
 		settings.save(file);
+	}
+
+	public File getFile() {
+		return file;
 	}
 }

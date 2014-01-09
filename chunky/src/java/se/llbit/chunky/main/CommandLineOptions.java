@@ -82,6 +82,7 @@ public class CommandLineOptions {
 		"\n" +
 		"Launcher options:\n" +
 		"  --update              download the latest version of Chunky and exit\n" +
+		"  --setup               configure memory limit and Java options for Chunky\n" +
 		"  --nolauncher          start Chunky as normal, but without opening launcher\n" +
 		"  --launcher            forces the launcher window to be displayed\n" +
 		"  --version             print the launcher version and exit\n" +
