@@ -42,6 +42,7 @@ public class Layer {
 
 	private byte[] blocks = null;
 	private int[] bitmap = null;
+	private int[] topo = null;
 	private int avgColor = 0xFF;
 	static int selectionColor = 0x75FF0000;
 
@@ -244,8 +245,10 @@ public class Layer {
 
 		if (blocks != null) {
 			renderTiles(rbuff, cx, cz);
+		} else if (topo != null) {
+			renderBitmap(rbuff, topo, cx, cz);
 		} else if (bitmap != null) {
-			renderBitmap(rbuff, cx, cz);
+			renderBitmap(rbuff, bitmap, cx, cz);
 		}
 	}
 
@@ -316,7 +319,7 @@ public class Layer {
 		}
 	}
 
-	private void renderBitmap(RenderBuffer rbuff, int cx, int cz) {
+	private void renderBitmap(RenderBuffer rbuff, int[] rgb, int cx, int cz) {
 
 		ChunkView view = rbuff.getView();
 		int x0 = view.chunkScale * (cx - view.ix0);
@@ -328,7 +331,7 @@ public class Layer {
 
 			for (int z = 0; z < 16; ++z) {
 				for (int x = 0; x < 16; ++x) {
-					rbuff.setRGB(x0 + x, z0 + z, bitmap[z + x*16]);
+					rbuff.setRGB(x0 + x, z0 + z, rgb[z + x*16]);
 				}
 			}
 		} else {
@@ -341,7 +344,7 @@ public class Layer {
 				for (int x = 0; x < 16; ++x) {
 					int xp0 = x0 + x * blockScale;
 
-					rbuff.fillRect(xp0, yp0, blockScale, blockScale, bitmap[z + x*16]);
+					rbuff.fillRect(xp0, yp0, blockScale, blockScale, rgb[z + x*16]);
 				}
 			}
 		}
@@ -552,6 +555,9 @@ public class Layer {
 	public synchronized void renderTopography(ChunkPosition position,
 			Heightmap heightmap) {
 
+		if (topo == null) {
+			topo = new int[Chunk.X_MAX * Chunk.Z_MAX];
+		}
 		int cx = position.x * Chunk.X_MAX;
 		int cz = position.z * Chunk.Z_MAX;
 
@@ -584,7 +590,7 @@ public class Layer {
 				rgb[2] = QuickMath.max(0.f, rgb[2]);
 				rgb[2] = QuickMath.min(1.f, rgb[2]);
 
-				bitmap[x*16 + z] = Color.getRGB(rgb[0], rgb[1], rgb[2]);
+				topo[x*16 + z] = Color.getRGB(rgb[0], rgb[1], rgb[2]);
 			}
 		}
 	}

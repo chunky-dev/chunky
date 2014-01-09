@@ -55,6 +55,7 @@ import se.llbit.chunky.world.Chunk.Renderer;
 import se.llbit.chunky.world.ChunkParser;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
+import se.llbit.chunky.world.ChunkTopographyUpdater;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.DeleteChunksJob;
 import se.llbit.chunky.world.EmptyChunk;
@@ -65,6 +66,7 @@ import se.llbit.chunky.world.RegionParser;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldRenderer;
 import se.llbit.chunky.world.listeners.ChunkDiscoveryListener;
+import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.util.OSDetector;
 import se.llbit.util.OSDetector.OS;
 
@@ -76,7 +78,7 @@ import se.llbit.util.OSDetector.OS;
  *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
-public class Chunky implements ChunkDiscoveryListener {
+public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 
 	/**
 	 * Minimum block scale for the map view
@@ -99,6 +101,8 @@ public class Chunky implements ChunkDiscoveryListener {
 
 	private final ChunkParser chunkParser = new ChunkParser();
 	private final RegionParser regionParser = new RegionParser();
+	private final ChunkTopographyUpdater topographyUpdater =
+			new ChunkTopographyUpdater();
 
 	private int currentDimension = 0;
 	private Chunk.Renderer chunkRenderer = Chunk.surfaceRenderer;
@@ -264,6 +268,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		// Start the worker threads
 		chunkParser.start();
 		regionParser.start();
+		topographyUpdater.start();
 
 		// Create UI in the event dispatch thread
 		try {
@@ -294,10 +299,11 @@ public class Chunky implements ChunkDiscoveryListener {
 		frame.initComponents();
 		frame.setVisible(true);
 
-		if (world.isEmptyWorld())
+		if (world.isEmptyWorld()) {
 			getControls().openWorldSelector();
-		else
+		} else {
 			updateView();
+		}
 
 	}
 
@@ -335,6 +341,7 @@ public class Chunky implements ChunkDiscoveryListener {
 		world = newWorld;
 		world.addChunkDeletionListener(chunkSelection);
 		world.addChunkDiscoveryListener(this);
+		world.addChunkTopographyListener(this);
 
 		// dimension must be set before chunks are loaded
 		world.setDimension(currentDimension);
@@ -962,5 +969,10 @@ public class Chunky implements ChunkDiscoveryListener {
 	public void runBenchmark() {
 		RenderContext context = new RenderContext(options);
 		new BenchmarkDialog(getFrame(), context);
+	}
+
+	@Override
+	public void chunksTopographyUpdated(Chunk chunk) {
+		topographyUpdater.addChunk(chunk);
 	}
 }

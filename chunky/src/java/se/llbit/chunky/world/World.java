@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -38,6 +39,7 @@ import org.apache.log4j.Logger;
 import se.llbit.chunky.ui.ProgressPanel;
 import se.llbit.chunky.world.listeners.ChunkDeletionListener;
 import se.llbit.chunky.world.listeners.ChunkDiscoveryListener;
+import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.chunky.world.listeners.RegionDiscoveryListener;
 import se.llbit.nbt.AnyTag;
@@ -107,6 +109,8 @@ public class World implements Comparable<World> {
 			new LinkedList<ChunkDeletionListener>();
 	private final Collection<ChunkUpdateListener> chunkUpdateListeners =
 			new LinkedList<ChunkUpdateListener>();
+	private final Collection<ChunkTopographyListener> chunkTopographyListeners =
+			new LinkedList<ChunkTopographyListener>();
 	private final Collection<ChunkDiscoveryListener> chunkDiscoveryListeners =
 			new LinkedList<ChunkDiscoveryListener>();
 	private final Collection<RegionDiscoveryListener> regionDiscoveryListeners =
@@ -175,9 +179,7 @@ public class World implements Comparable<World> {
 	 * @param chunk the updated chunk
 	 */
 	private void fireChunkUpdated(Chunk chunk) {
-		Collection<Chunk> chunks = new LinkedList<Chunk>();
-		chunks.add(chunk);
-		fireChunksUpdated(chunks);
+		fireChunksUpdated(Collections.singleton(chunk));
 	}
 
 	/**
@@ -658,6 +660,26 @@ public class World implements Comparable<World> {
 	}
 
 	/**
+	 * Add a chunk discovery listener
+	 * @param listener
+	 */
+	public void addChunkTopographyListener(ChunkTopographyListener listener) {
+		synchronized (chunkTopographyListeners) {
+			chunkTopographyListeners.add(listener);
+		}
+	}
+
+	/**
+	 * Notifies listeners that the height gradient of a chunk may have changed.
+	 * @param chunk The chunk
+	 */
+	public void chunkTopographyUpdated(Chunk chunk) {
+		for (ChunkTopographyListener listener: chunkTopographyListeners) {
+			listener.chunksTopographyUpdated(chunk);
+		}
+	}
+
+	/**
 	 * @param i
 	 * @return <code>true</code> if a data directory exists for the
 	 * given dimension
@@ -840,12 +862,14 @@ public class World implements Comparable<World> {
 	 */
 	private void fireChunksUpdated(Collection<Chunk> chunks) {
 		Collection<ChunkPosition> cplist = new LinkedList<ChunkPosition>();
-		for (Chunk chunk: chunks)
+		for (Chunk chunk: chunks) {
 			cplist.add(chunk.getPosition());
+		}
 
 		synchronized (chunkUpdateListeners) {
-			for (ChunkUpdateListener listener : chunkUpdateListeners)
+			for (ChunkUpdateListener listener : chunkUpdateListeners) {
 				listener.chunksUpdated(cplist);
+			}
 		}
 	}
 

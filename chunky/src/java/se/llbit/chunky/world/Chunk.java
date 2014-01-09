@@ -75,13 +75,6 @@ public class Chunk {
 	private SoftReference<Map<String, AnyTag>> chunkData =
 			new SoftReference<Map<String,AnyTag>>(null);
 
-	private int neighbors = 0;
-
-	// neighbor matrix
-	private static final int[] nx = { -1, 0, 1, 0, -1, 1, 1, -1 };
-	private static final int[] nz = { 0, 1, 0, -1, 1, 1, -1, -1 };
-	private static final int[] opposite = { 2, 3, 0, 1, 6, 7, 4, 5 };
-
 	/**
 	 * A chunk renderer
 	 */
@@ -269,7 +262,7 @@ public class Chunk {
 							chunkData, chunkBiomes, blockData);
 					layer = Layer.loadLayer(chunkData, requestedLayer);
 					biomes = Layer.loadBiomes(chunkBiomes);
-					renderTopography();
+					queueTopography();
 				} else if (surface == Layer.unknownLayer) {
 					layer = Layer.emptyLayer;
 					caves = Layer.emptyLayer;
@@ -293,6 +286,20 @@ public class Chunk {
 		world.chunkUpdated(this);
 	}
 
+	private void queueTopography() {
+		for (int x = -1; x <= 1; ++x) {
+			for (int z = -1; z <= 1; ++z) {
+				ChunkPosition pos = ChunkPosition.get(
+						position.x + x,
+						position.z + z);
+				Chunk chunk = world.getChunk(pos);
+				if (!chunk.isEmpty()) {
+					world.chunkTopographyUpdated(chunk);
+				}
+			}
+		}
+	}
+
 	/**
 	 * @return <code>true</code> if this is an empty (non-existing) chunk
 	 */
@@ -304,36 +311,8 @@ public class Chunk {
 	 * Render the topography of this chunk.
 	 */
 	public synchronized void renderTopography() {
-		checkNeighbor(0);
-		checkNeighbor(1);
-		checkNeighbor(2);
-		checkNeighbor(3);
-		checkNeighbor(4);
-		checkNeighbor(5);
-		checkNeighbor(6);
-		checkNeighbor(7);
-
-		neighborsUpdated();
-	}
-
-	private synchronized void neighborsUpdated() {
-		if (neighbors == 255) {
-			surface.renderTopography(position, world.heightmap());
-			world.chunkUpdated(this);
-		}
-	}
-
-	private synchronized void checkNeighbor(int i) {
-		int n = 1<<i;
-		if ((neighbors & n) == 0) {
-			Chunk neighbor = world.getChunk(
-					ChunkPosition.get(position.x+nx[i], position.z+nz[i]));
-			if ((!neighbor.isEmpty()) && neighbor.isParsed()) {
-				neighbors |= n;
-				neighbor.neighbors |= (1<<opposite[i]);
-				neighbor.neighborsUpdated();
-			}
-		}
+		surface.renderTopography(position, world.heightmap());
+		world.chunkUpdated(this);
 	}
 
 	/**
