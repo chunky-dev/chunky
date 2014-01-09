@@ -40,8 +40,6 @@ import se.llbit.chunky.world.listeners.ChunkDeletionListener;
 import se.llbit.chunky.world.listeners.ChunkDiscoveryListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.chunky.world.listeners.RegionDiscoveryListener;
-import se.llbit.chunky.world.storage.RegionFile;
-import se.llbit.chunky.world.storage.RegionFileCache;
 import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.NamedTag;
 import se.llbit.util.Pair;
@@ -524,10 +522,7 @@ public class World implements Comparable<World> {
 
 				ChunkPosition region = entry.getKey();
 
-				RegionFile regionFile = RegionFileCache.getRegionFile(
-						getRegionDirectory(dimension),
-						region.x << 5, region.z << 5);
-				appendRegionToZip(zout, regionFile,
+				appendRegionToZip(zout, getRegionDirectory(dimension), region,
 						regionDirectory + "/" + region.getMcaName(),
 						entry.getValue());
 
@@ -592,10 +587,7 @@ public class World implements Comparable<World> {
 						worldDirectory.getName() :
 						worldDirectory.getName() + "/" + region.thing1.getParentFile().getName();
 				regionDirectory += "/region";
-				RegionFile regionFile = RegionFileCache.getRegionFile(
-						region.thing1,
-						region.thing2.x * 32, region.thing2.z * 32);
-				appendRegionToZip(zout, regionFile,
+				appendRegionToZip(zout, region.thing1, region.thing2,
 						regionDirectory + "/" + region.thing2.getMcaName(),
 						null);
 
@@ -629,11 +621,12 @@ public class World implements Comparable<World> {
 		in.close();
 	}
 
-	private void appendRegionToZip(ZipOutputStream zout, RegionFile regionFile,
-			String regionZipFileName, Set<ChunkPosition> chunks) throws IOException {
+	private void appendRegionToZip(ZipOutputStream zout, File regionDirectory,
+			ChunkPosition regionPos, String regionZipFileName,
+			Set<ChunkPosition> chunks) throws IOException {
 
 		zout.putNextEntry(new ZipEntry(regionZipFileName));
-		regionFile.writeRegion(new DataOutputStream(zout), chunks);
+		Region.writeRegion(regionDirectory, regionPos, new DataOutputStream(zout), chunks);
 		zout.closeEntry();
 	}
 

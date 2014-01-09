@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import se.llbit.chunky.map.RenderBuffer;
-import se.llbit.chunky.world.storage.RegionFileCache;
 import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.NamedTag;
@@ -170,16 +169,15 @@ public class Chunk {
 		return loadedLayer;
 	}
 
-	private DataInputStream getDataInputStream() {
-		return RegionFileCache.getChunkDataInputStream(world.getRegionDirectory(),
-				position.x, position.z);
+	private ChunkData getChunkData() {
+		Region region = world.getRegion(position.getRegionPosition());
+		return region.getChunkData(position);
 	}
 
 	/**
-	 * Delete this chunk from it's region file!
+	 * Reset the rendered layers in this chunk.
 	 */
-	public synchronized void delete() {
-		RegionFileCache.deleteChunk(world.getRegionDirectory(), position.x, position.z);
+	public synchronized void reset() {
 		layer = Layer.unknownLayer;
 		caves = Layer.unknownLayer;
 		surface = Layer.unknownLayer;
@@ -229,7 +227,8 @@ public class Chunk {
 
 			if (result == null) {
 
-				DataInputStream in = getDataInputStream();
+				ChunkData data = getChunkData();
+				DataInputStream in = data.inputStream;
 				if (in == null) {
 					layer = Layer.corruptLayer;
 					return;
@@ -376,7 +375,8 @@ public class Chunk {
 
 			if (result == null) {
 
-				DataInputStream in = getDataInputStream();
+				ChunkData chunkData = getChunkData();
+				DataInputStream in = chunkData.inputStream;
 				if (in == null) {
 					layer = Layer.corruptLayer;
 					return;

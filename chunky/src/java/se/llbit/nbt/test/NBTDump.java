@@ -28,7 +28,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import se.llbit.chunky.world.storage.RegionFile;
+import se.llbit.chunky.world.ChunkData;
+import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.Region;
 import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.NamedTag;
@@ -48,28 +50,19 @@ public class NBTDump {
 	protected static AnyTag read(String arg) throws IOException {
 		Matcher m = REGION_PATTERN.matcher(arg);
 		DataInputStream in = null;
-		RegionFile rf = null;
 		String filename;
 		try {
 			if (m.matches()) {
 				filename = m.group(3);
 				int x = Integer.parseInt(m.group(1));
 				int z = Integer.parseInt(m.group(2));
-				rf = new RegionFile(new File(filename));
-				if (!rf.hasChunk(x, z)) {
+				ChunkData data = Region.getChunkData(new File(filename),
+					ChunkPosition.get(x, z));
+				if (data == null) {
 					System.err.println("No such chunk in region: (" + x + "," + z + ")");
-					// print available chunks
-					System.err.println("available chunks in region:");
-					for (int cx = 0; cx < 32; cx++) {
-						for (int cz = 0; cz < 32; cz++) {
-							if (rf.hasChunk(cx, cz)) {
-								System.err.println("("+cx+","+cz+")");
-							}
-						}
-					}
 					return new ErrorTag();
 				}
-				in = rf.getChunkDataInputStream(x, z);
+				in = data.inputStream;
 			} else {
 				filename = arg;
 				InputStream is = new BufferedInputStream(
@@ -87,7 +80,6 @@ public class NBTDump {
 			}
 		} finally {
 			if (in != null) in.close();
-			if (rf != null) rf.close();
 		}
 	}
 

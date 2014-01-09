@@ -91,7 +91,7 @@ public class EmptyChunk extends Chunk {
 	}
 
 	@Override
-	public synchronized void delete() {
+	public synchronized void reset() {
 		// do nothing
 	}
 }
