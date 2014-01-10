@@ -1,4 +1,5 @@
 1.2.2 - TBD
+    * Added Granite, Diorite, and Andesite stone blocks
     * Chunky now dynamically refreshes the main map view based on
       changes to the Minecraft world in the filesystem
     * Added Chunky commands: -snapshot, -version

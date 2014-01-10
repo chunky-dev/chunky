@@ -101,7 +101,28 @@ public class Block {
 		{
 			isOpaque = true;
 			isSolid = true;
+			localIntersect = true;
 		}
+		final Texture[] tex = {
+			Texture.stone,
+			Texture.granite, Texture.smoothGranite,
+			Texture.diorite, Texture.smoothDiorite,
+			Texture.andesite, Texture.smoothAndesite,
+		};
+		final String[] stoneKind = {
+			"stone",
+			"granite", "smoothGranite",
+			"diorite", "smoothDiorite",
+			"andesite", "smoothAndesite",
+		};
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return TexturedBlockModel.intersect(ray, tex[ray.getBlockData()%7]);
+		}
+		@Override
+		public String description(int data) {
+			return stoneKind[data%7];
+		};
 	};
 	public static final int GRASS_ID = 0x02;
 	public static final Block GRASS = new Block(GRASS_ID, "Grass", Texture.grassTop) {
@@ -2519,39 +2540,40 @@ public class Block {
 			return StairModel.intersect(ray, Texture.darkOakPlanks);
 		}
 	};
-	public static final Block UNKNOWN0xA5 = new Block(0xA5, "Unknown Block 0xA5", Texture.unknown) {
+	private static final boolean UNKNOWN_INVISIBLE = true;
+	public static final Block SLIMEBLOCK = new Block(0xA5, "Slime Block", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xA6 = new Block(0xA6, "Unknown Block 0xA6", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xA7 = new Block(0xA7, "Unknown Block 0xA7", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xA8 = new Block(0xA8, "Unknown Block 0xA8", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xA9 = new Block(0xA9, "Unknown Block 0xA9", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final int HAY_BLOCK_ID = 0xAA;
@@ -2636,560 +2658,560 @@ public class Block {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xB1 = new Block(0xB1, "Unknown Block 0xB1", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xB2 = new Block(0xB2, "Unknown Block 0xB2", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xB3 = new Block(0xB3, "Unknown Block 0xB3", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xB4 = new Block(0xB4, "Unknown Block 0xB4", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xB5 = new Block(0xB5, "Unknown Block 0xB5", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xB6 = new Block(0xB6, "Unknown Block 0xB6", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xB7 = new Block(0xB7, "Unknown Block 0xB7", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xB8 = new Block(0xB8, "Unknown Block 0xB8", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xB9 = new Block(0xB9, "Unknown Block 0xB9", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xBA = new Block(0xBA, "Unknown Block 0xBA", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xBB = new Block(0xBB, "Unknown Block 0xBB", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xBC = new Block(0xBC, "Unknown Block 0xBC", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xBD = new Block(0xBD, "Unknown Block 0xBD", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xBE = new Block(0xBE, "Unknown Block 0xBE", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xBF = new Block(0xBF, "Unknown Block 0xBF", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xC0 = new Block(0xC0, "Unknown Block 0xC0", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xC1 = new Block(0xC1, "Unknown Block 0xC1", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xC2 = new Block(0xC2, "Unknown Block 0xC2", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xC3 = new Block(0xC3, "Unknown Block 0xC3", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xC4 = new Block(0xC4, "Unknown Block 0xC4", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xC5 = new Block(0xC5, "Unknown Block 0xC5", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xC6 = new Block(0xC6, "Unknown Block 0xC6", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xC7 = new Block(0xC7, "Unknown Block 0xC7", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xC8 = new Block(0xC8, "Unknown Block 0xC8", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xC9 = new Block(0xC9, "Unknown Block 0xC9", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xCA = new Block(0xCA, "Unknown Block 0xCA", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xCB = new Block(0xCB, "Unknown Block 0xCB", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xCC = new Block(0xCC, "Unknown Block 0xCC", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xCD = new Block(0xCD, "Unknown Block 0xCD", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xCE = new Block(0xCE, "Unknown Block 0xCE", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xCF = new Block(0xCF, "Unknown Block 0xCF", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xD0 = new Block(0xD0, "Unknown Block 0xD0", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xD1 = new Block(0xD1, "Unknown Block 0xD1", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xD2 = new Block(0xD2, "Unknown Block 0xD2", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xD3 = new Block(0xD3, "Unknown Block 0xD3", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xD4 = new Block(0xD4, "Unknown Block 0xD4", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xD5 = new Block(0xD5, "Unknown Block 0xD5", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xD6 = new Block(0xD6, "Unknown Block 0xD6", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xD7 = new Block(0xD7, "Unknown Block 0xD7", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xD8 = new Block(0xD8, "Unknown Block 0xD8", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xD9 = new Block(0xD9, "Unknown Block 0xD9", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xDA = new Block(0xDA, "Unknown Block 0xDA", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xDB = new Block(0xDB, "Unknown Block 0xDB", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xDC = new Block(0xDC, "Unknown Block 0xDC", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xDD = new Block(0xDD, "Unknown Block 0xDD", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xDE = new Block(0xDE, "Unknown Block 0xDE", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xDF = new Block(0xDF, "Unknown Block 0xDF", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xE0 = new Block(0xE0, "Unknown Block 0xE0", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xE1 = new Block(0xE1, "Unknown Block 0xE1", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xE2 = new Block(0xE2, "Unknown Block 0xE2", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xE3 = new Block(0xE3, "Unknown Block 0xE3", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xE4 = new Block(0xE4, "Unknown Block 0xE4", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xE5 = new Block(0xE5, "Unknown Block 0xE5", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xE6 = new Block(0xE6, "Unknown Block 0xE6", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xE7 = new Block(0xE7, "Unknown Block 0xE7", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xE8 = new Block(0xE8, "Unknown Block 0xE8", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xE9 = new Block(0xE9, "Unknown Block 0xE9", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xEA = new Block(0xEA, "Unknown Block 0xEA", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xEB = new Block(0xEB, "Unknown Block 0xEB", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xEC = new Block(0xEC, "Unknown Block 0xEC", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xED = new Block(0xED, "Unknown Block 0xED", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xEE = new Block(0xEE, "Unknown Block 0xEE", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xEF = new Block(0xEF, "Unknown Block 0xEF", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xF0 = new Block(0xF0, "Unknown Block 0xF0", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xF1 = new Block(0xF1, "Unknown Block 0xF1", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xF2 = new Block(0xF2, "Unknown Block 0xF2", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xF3 = new Block(0xF3, "Unknown Block 0xF3", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xF4 = new Block(0xF4, "Unknown Block 0xF4", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xF5 = new Block(0xF5, "Unknown Block 0xF5", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xF6 = new Block(0xF6, "Unknown Block 0xF6", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xF7 = new Block(0xF7, "Unknown Block 0xF7", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xF8 = new Block(0xF8, "Unknown Block 0xF8", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xF9 = new Block(0xF9, "Unknown Block 0xF9", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xFA = new Block(0xFA, "Unknown Block 0xFA", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xFB = new Block(0xFB, "Unknown Block 0xFB", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xFC = new Block(0xFC, "Unknown Block 0xFC", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xFD = new Block(0xFD, "Unknown Block 0xFD", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xFE = new Block(0xFE, "Unknown Block 0xFE", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 	public static final Block UNKNOWN0xFF = new Block(0xFF, "Unknown Block 0xFF", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = true;
+			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
 
@@ -3235,7 +3257,7 @@ public class Block {
 		REDSTONEBLOCK, NETHERQUARTZORE, HOPPER, QUARTZ,
 		QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, STAINED_CLAY,
 		STAINED_GLASSPANE, LEAVES2, WOOD2, ACACIASTAIRS,
-		DARKOAKSTAIRS, UNKNOWN0xA5, UNKNOWN0xA6, UNKNOWN0xA7,
+		DARKOAKSTAIRS, SLIMEBLOCK, UNKNOWN0xA6, UNKNOWN0xA7,
 		UNKNOWN0xA8, UNKNOWN0xA9, HAY_BLOCK, CARPET,
 		HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, LARGE_FLOWER,
 		UNKNOWN0xB0, UNKNOWN0xB1, UNKNOWN0xB2, UNKNOWN0xB3,

@@ -1241,6 +1241,20 @@ public class TexturePackLoader {
 		allTextures.put("double_plant_syringa_top",
 				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_syringa_top", Texture.lilacTop));
 
+		// [MC 1.8] New Stone Blocks
+		allTextures.put("stone_diorite",
+				new SimpleTexture("assets/minecraft/textures/blocks/stone_diorite", Texture.diorite));
+		allTextures.put("stone_diorite_smooth",
+				new SimpleTexture("assets/minecraft/textures/blocks/stone_diorite_smooth", Texture.smoothDiorite));
+		allTextures.put("stone_granite",
+				new SimpleTexture("assets/minecraft/textures/blocks/stone_granite", Texture.granite));
+		allTextures.put("stone_granite_smooth",
+				new SimpleTexture("assets/minecraft/textures/blocks/stone_granite_smooth", Texture.smoothGranite));
+		allTextures.put("stone_andesite",
+				new SimpleTexture("assets/minecraft/textures/blocks/stone_andesite", Texture.andesite));
+		allTextures.put("stone_andesite_smooth",
+				new SimpleTexture("assets/minecraft/textures/blocks/stone_andesite_smooth", Texture.smoothAndesite));
+
 	}
 
 	/**

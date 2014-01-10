@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -40,6 +40,12 @@ public class Texture {
 
 	public static final Texture air = new Texture("air");
 	public static final Texture stone = new Texture("stone");
+	public static final Texture granite = new Texture();
+	public static final Texture smoothGranite = new Texture();
+	public static final Texture diorite = new Texture();
+	public static final Texture smoothDiorite = new Texture();
+	public static final Texture andesite = new Texture();
+	public static final Texture smoothAndesite = new Texture();
 	public static final Texture dirt = new Texture("dirt");
 	public static final Texture grassSideSaturated = new Texture("grass-side-saturated");
 	public static final Texture grassTop = new Texture("grass");
