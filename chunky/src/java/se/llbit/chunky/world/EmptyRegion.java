@@ -49,4 +49,9 @@ public class EmptyRegion extends Region {
 	public boolean isParsed() {
 		return true;
 	}
+
+	@Override
+	public boolean hasChanged() {
+		return false;
+	}
 }

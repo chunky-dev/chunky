@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -123,6 +123,8 @@ public class World implements Comparable<World> {
 
 	private long seed;
 
+	private long timestamp = 0;
+
 	/**
 	 * Create new world.
 	 * @param worldDir
@@ -192,13 +194,18 @@ public class World implements Comparable<World> {
 
 	/**
 	 * Parse player location and level name.
+	 * @return {@code true} if the world data was loaded
 	 */
-	private void loadAdditionalData(boolean logWarnings) {
-		havePlayerPos = false;
-		haveSpawnPos = false;
+	public boolean loadAdditionalData(boolean logWarnings) {
 		try {
+			File worldFile = new File(worldDirectory, "level.dat");
+			long modtime = worldFile.lastModified();
+			if (timestamp == modtime) {
+				return false;
+			}
+			timestamp = modtime;
 			DataInputStream in = new DataInputStream(new GZIPInputStream(
-				new FileInputStream(new File(worldDirectory, "level.dat")))); //$NON-NLS-1$
+				new FileInputStream(worldFile)));
 			Set<String> request = new HashSet<String>();
 			request.add(".Data.version");
 			request.add(".Data.RandomSeed");
@@ -248,20 +255,25 @@ public class World implements Comparable<World> {
 			this.spawnZ = spawnZ.intValue();
 			havePlayerPos = ! (posX.isError() || posY.isError() || posZ.isError());
 			haveSpawnPos = ! (spawnX.isError() || spawnY.isError() || spawnZ.isError());
-			if (havePlayerPos())
+			if (havePlayerPos()) {
 				currentLayer = playerLocY();
+			}
 
 			levelName = result.get(".Data.LevelName").stringValue(levelName);
 
 			in.close();
+			return true;
 
 		} catch (FileNotFoundException e) {
-			if (logWarnings)
+			if (logWarnings) {
 				logger.warn("Could not find level.dat file for the world " + levelName + "!");
+			}
 		} catch (IOException e) {
-			if (logWarnings)
+			if (logWarnings) {
 				logger.warn("Could not read the level.dat file for the world " + levelName + "!");
+			}
 		}
+		return false;
 	}
 
 	/**
@@ -404,8 +416,9 @@ public class World implements Comparable<World> {
 	 * @return Player Y location
 	 */
 	public synchronized int playerLocY() {
-		if (havePlayerPos())
+		if (havePlayerPos()) {
 			return (int) (playerY - 0.5);
+		}
 		return -1;
 	}
 

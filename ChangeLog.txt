@@ -1,4 +1,6 @@
 1.2.2 - TBD
+    * Chunky now dynamically refreshes the main map view based on
+      changes to the Minecraft world in the filesystem
     * Added Chunky commands: -snapshot, -version
     * Added launcher commands: --setup, --update, --version, --verbose
     * Fixed error causing the launcher to crash when running in headless mode

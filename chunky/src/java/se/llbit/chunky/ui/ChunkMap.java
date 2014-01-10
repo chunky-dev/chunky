@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -58,7 +58,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	 */
 	public static final int DEFAULT_HEIGHT = 600;
 
-	private Chunky chunky;
+	private final Chunky chunky;
 	private boolean selectRect = false;
 
 	// selection rectangle
@@ -67,7 +67,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	private int rw;
 	private int rh;
 
-	private RenderBuffer renderBuffer;
+	private final RenderBuffer renderBuffer;
 	private ChunkView view;
 
 	/**
@@ -135,7 +135,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 					int x = e.getX();
 					int y = e.getY();
 					ChunkView view = chunky.getMapView();
-					double scale = (double) view.chunkScale;
+					double scale = view.chunkScale;
 					int cx = (int) QuickMath.floor(view.x + (x - getWidth()/2) / scale);
 					int cz = (int) QuickMath.floor(view.z + (y - getHeight()/2) / scale);
 
@@ -164,14 +164,15 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
-			double scale = (double) view.chunkScale;
+			double scale = view.chunkScale;
 			int cx = (int) QuickMath.floor(view.x + (e.getX() - getWidth()/2) / scale);
 			int cz = (int) QuickMath.floor(view.z + (e.getY() - getHeight()/2) / scale);
 			Chunk prevHovered = chunky.getHoveredChunk();
 			chunky.setHoveredChunk(cx, cz);
 			Chunk hovered = chunky.getHoveredChunk();
-			if (prevHovered != hovered)
+			if (prevHovered != hovered) {
 				repaint();
+			}
 		}
 
 		@Override
@@ -213,13 +214,14 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			}
 		});
 
-		view = chunky.getMapView();
+		setView(chunky.getMapView());
 		renderBuffer = new RenderBuffer(view);
 	}
 
 	/**
 	 * Redraw the map view.
 	 */
+	@Override
 	public synchronized void paintComponent(Graphics g) {
 
 		super.paintComponent(g);
@@ -248,7 +250,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			ChunkView view = chunky.getMapView();
 			int width = getWidth();
 			int height = getHeight();
-			double scale = (double) view.chunkScale;
+			double scale = view.chunkScale;
 			int cx0 = (int) QuickMath.floor(view.x + (rx - width/2) / scale);
 			int cx1 = (int) QuickMath.floor(view.x + (rx - width/2 + rw) / scale);
 			int cz0 = (int) QuickMath.floor(view.z + (ry - height/2) / scale);
@@ -311,9 +313,13 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	 * @param newView
 	 */
 	public synchronized void viewUpdated(ChunkView newView) {
-		view = newView;
+		setView(newView);
 		renderBuffer.updateView(view, chunky.getChunkRenderer(),
 				chunky.getWorld().currentLayer());
 		repaint();
+	}
+
+	private void setView(ChunkView newView) {
+		view = newView;
 	}
 }

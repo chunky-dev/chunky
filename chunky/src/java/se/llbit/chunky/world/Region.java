@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
@@ -45,11 +44,12 @@ public class Region {
 	 */
 	public static final int CHUNKS_Z = 32;
 
-	private final Chunk[][] chunks = new Chunk[CHUNKS_X][CHUNKS_Z];
+	private final Chunk[] chunks = new Chunk[CHUNKS_X*CHUNKS_Z];
 	private final ChunkPosition position;
 	private final World world;
-	private boolean parsed = false;
+	private final boolean parsed = false;
 	private final String fileName;
+	private long timestamp = 0;
 
 	/**
 	 * Create new region
@@ -62,7 +62,7 @@ public class Region {
 		position = pos;
 		for (int z = 0; z < CHUNKS_Z; ++z) {
 			for (int x = 0; x < CHUNKS_X; ++x) {
-				chunks[z][x] = EmptyChunk.instance;
+				chunks[x + z*32] = EmptyChunk.instance;
 			}
 		}
 	}
@@ -73,7 +73,7 @@ public class Region {
 	 * @return Chunk at (x, z)
 	 */
 	public Chunk getChunk(int x, int z) {
-		return chunks[z&31][x&31];
+		return chunks[(x&31) + (z&31) * 32];
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class Region {
 	 * @return Chunk at given position
 	 */
 	public Chunk getChunk(ChunkPosition pos) {
-		return chunks[pos.z&31][pos.x&31];
+		return chunks[(pos.x&31) + (pos.z&31) * 32];
 	}
 
 	/**
@@ -90,25 +90,7 @@ public class Region {
 	 * @param chunk
 	 */
 	public void setChunk(ChunkPosition pos, Chunk chunk) {
-		chunks[pos.z&31][pos.x&31] = chunk;
-	}
-
-	/**
-	 * Add chunk to parse queue, if it exists
-	 * @param pos
-	 * @param currentLayer
-	 * @param parseQueue
-	 */
-	public void updateChunk(ChunkPosition pos, int currentLayer,
-			Queue<Chunk> parseQueue) {
-
-		Chunk chunk = getChunk(pos);
-		if (chunk.isEmpty())
-			return;
-		if (chunk.getLoadedLayer() != currentLayer) {
-			parseQueue.add(chunk);
-			notifyAll();
-		}
+		chunks[(pos.x&31) + (pos.z&31) * 32] = chunk;
 	}
 
 	/**
@@ -136,14 +118,21 @@ public class Region {
 	 * Parse the region file to discover chunks
 	 */
 	public synchronized void parse() {
-		if (parsed) {
-			return;
-		}
-		parsed = true;
-
 		File regionFile = new File(world.getRegionDirectory(), fileName);
 		RandomAccessFile file = null;
 		try {
+			long modtime = regionFile.lastModified();
+			if (timestamp == modtime) {
+				Collection<Chunk> discovered = new LinkedList<Chunk>();
+				for (Chunk chunk: chunks) {
+					if (!chunk.isEmpty()) {
+						discovered.add(chunk);
+					}
+				}
+				world.chunksDiscovered(discovered);
+				return;
+			}
+			timestamp = modtime;
 			file = new RandomAccessFile(regionFile, "r");
 			long length = file.length();
 			if (length < 2*SECTOR_SIZE) {
@@ -155,13 +144,21 @@ public class Region {
 			Collection<Chunk> discovered = new LinkedList<Chunk>();
 			for (int z = 0; z < 32; ++z) {
 				for (int x = 0; x < 32; ++x) {
-					if (file.readInt() != 0) {
-						ChunkPosition pos = ChunkPosition.get(
-								(position.x<<5) + x,
-								(position.z<<5) + z);
-						Chunk chunk = new Chunk(pos, world);
-						setChunk(pos, chunk);
+					ChunkPosition pos = ChunkPosition.get(
+							(position.x<<5) + x,
+							(position.z<<5) + z);
+					Chunk chunk = getChunk(x, z);
+					int loc = file.readInt();
+					if (loc != 0) {
+						if (chunk.isEmpty()) {
+							chunk = new Chunk(pos, world);
+							setChunk(pos, chunk);
+						}
 						discovered.add(chunk);
+					} else {
+						if (!chunk.isEmpty()){
+							world.chunkDeleted(pos);
+						}
 					}
 				}
 			}
@@ -401,5 +398,34 @@ public class Region {
 				}
 			}
 		}
+	}
+
+	public boolean hasChanged() {
+		File regionFile = new File(world.getRegionDirectory(), fileName);
+		return timestamp != regionFile.lastModified();
+	}
+
+	public boolean chunkHasChanged(ChunkPosition chunkPos, int timestamp) {
+		File regionDirectory = world.getRegionDirectory();
+		File regionFile = new File(regionDirectory, fileName);
+		int x = chunkPos.x & 31;
+		int z = chunkPos.z & 31;
+		int index = x + z * 32;
+		RandomAccessFile file = null;
+		try {
+			file = new RandomAccessFile(regionFile, "r");
+			file.seek(SECTOR_SIZE + 4 * index);
+			return timestamp != file.readInt();
+		} catch (IOException e) {
+			System.err.println("Problem while reading chunk: " + e.getMessage());
+		} finally {
+			if (file != null) {
+				try {
+					file.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+		return false;
 	}
 }

@@ -62,6 +62,7 @@ import se.llbit.chunky.world.EmptyChunk;
 import se.llbit.chunky.world.EmptyChunkView;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Region;
+import se.llbit.chunky.world.RegionChangeMonitor;
 import se.llbit.chunky.world.RegionParser;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldRenderer;
@@ -103,6 +104,7 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 	private final RegionParser regionParser = new RegionParser();
 	private final ChunkTopographyUpdater topographyUpdater =
 			new ChunkTopographyUpdater();
+	private final RegionChangeMonitor refresher = new RegionChangeMonitor(this);
 
 	private int currentDimension = 0;
 	private Chunk.Renderer chunkRenderer = Chunk.surfaceRenderer;
@@ -269,6 +271,7 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 		chunkParser.start();
 		regionParser.start();
 		topographyUpdater.start();
+		refresher.start();
 
 		// Create UI in the event dispatch thread
 		try {
@@ -372,6 +375,8 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 	 * Called when the map view has changed.
 	 */
 	public synchronized void viewUpdated() {
+		refresher.setView(map);
+
 		minimap = new ChunkView(map.x, map.z, minimapWidth, minimapHeight, 1);
 
 		// clear the region and chunk parse queues
@@ -530,8 +535,9 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 		if (layerNew != world.currentLayer()) {
 			chunkParser.clearQueue();
 			world.setCurrentLayer(layerNew);
-			if (chunkRenderer == Chunk.layerRenderer)
+			if (chunkRenderer == Chunk.layerRenderer) {
 				getMap().redraw();
+			}
 
 			// force the chunks to redraw
 			viewUpdated();
@@ -746,10 +752,11 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 	 * @param cz1
 	 */
 	public void selectChunks(int cx0, int cx1, int cz0, int cz1) {
-		if (!ctrlModifier)
+		if (!ctrlModifier) {
 			chunkSelection.selectChunks(world, cx0, cz0, cx1, cz1);
-		else
+		} else {
 			chunkSelection.deselectChunks(world, cx0, cz0, cx1, cz1);
+		}
 
 		getControls().setChunksSelected(chunkSelection.numSelectedChunks() > 0);
 	}
@@ -822,8 +829,9 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 	@Override
 	public void chunksDiscovered(Collection<Chunk> chunks) {
 		for (Chunk chunk: chunks) {
-			if (map.shouldPreload(chunk))
+			if (map.shouldPreload(chunk)) {
 				chunkParser.addChunk(chunk);
+			}
 		}
 	}
 
