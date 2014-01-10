@@ -1269,6 +1269,7 @@ public class TexturePackLoader {
 		if (tpFile == null || !tpFile.isFile()) {
 			throw new TextureLoadingError();
 		}
+		logger.warn("Loading textures from " + tpFile.getAbsolutePath());
 		loadTexturePack(tpFile, allTextures.keySet(), rememberTP);
 	}
 
