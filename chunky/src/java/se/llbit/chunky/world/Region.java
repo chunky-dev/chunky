@@ -47,9 +47,9 @@ public class Region {
 	private final Chunk[] chunks = new Chunk[CHUNKS_X*CHUNKS_Z];
 	private final ChunkPosition position;
 	private final World world;
-	private final boolean parsed = false;
 	private final String fileName;
 	private long timestamp = 0;
+	private final int[] chunkTimestamps = new int[CHUNKS_X*CHUNKS_Z];
 
 	/**
 	 * Create new region
@@ -108,13 +108,6 @@ public class Region {
 	}
 
 	/**
-	 * @return <code>true</code> if this region has been parsed
-	 */
-	public synchronized boolean isParsed() {
-		return parsed;
-	}
-
-	/**
 	 * Parse the region file to discover chunks
 	 */
 	public synchronized void parse() {
@@ -162,6 +155,11 @@ public class Region {
 					}
 				}
 			}
+			for (int z = 0; z < 32; ++z) {
+				for (int x = 0; x < 32; ++x) {
+					chunkTimestamps[x+z*32] = file.readInt();
+				}
+			}
 			world.chunksDiscovered(discovered);
 
 		} catch (IOException e) {
@@ -193,24 +191,6 @@ public class Region {
 	@Override
 	public String toString() {
 		return "Region " + position.toString();
-	}
-
-	/**
-	 * Add preloaded chunks to chunk parse queue
-	 * @param view
-	 * @param chunkParser
-	 */
-	public void preloadChunks(ChunkView view, ChunkParser chunkParser) {
-		for (int z = 0; z < CHUNKS_Z; ++z) {
-			for (int x = 0; x < CHUNKS_X; ++x) {
-				Chunk chunk = getChunk(x, z);
-				if (!chunk.isEmpty() && !chunk.isLayerParsed() &&
-						view.shouldPreload(chunk)) {
-
-					chunkParser.addChunk(chunk);
-				}
-			}
-		}
 	}
 
 	/**
@@ -406,26 +386,6 @@ public class Region {
 	}
 
 	public boolean chunkHasChanged(ChunkPosition chunkPos, int timestamp) {
-		File regionDirectory = world.getRegionDirectory();
-		File regionFile = new File(regionDirectory, fileName);
-		int x = chunkPos.x & 31;
-		int z = chunkPos.z & 31;
-		int index = x + z * 32;
-		RandomAccessFile file = null;
-		try {
-			file = new RandomAccessFile(regionFile, "r");
-			file.seek(SECTOR_SIZE + 4 * index);
-			return timestamp != file.readInt();
-		} catch (IOException e) {
-			System.err.println("Problem while reading chunk: " + e.getMessage());
-		} finally {
-			if (file != null) {
-				try {
-					file.close();
-				} catch (IOException e) {
-				}
-			}
-		}
-		return false;
+		return timestamp != chunkTimestamps[(chunkPos.x&31)+(chunkPos.z&31)*32];
 	}
 }

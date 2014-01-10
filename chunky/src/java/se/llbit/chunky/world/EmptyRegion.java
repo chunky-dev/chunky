@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -42,11 +42,6 @@ public class EmptyRegion extends Region {
 
 	@Override
 	public boolean isEmpty() {
-		return true;
-	}
-
-	@Override
-	public boolean isParsed() {
 		return true;
 	}
 

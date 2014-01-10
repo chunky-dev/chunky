@@ -393,12 +393,7 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 				Region region = world.getRegion(ChunkPosition.get(rx, rz));
 				if (!region.isEmpty()
 						&& (map.isVisible(region) || minimap.isVisible(region))) {
-					if (!region.isParsed()) {
-						regionParser.addRegion(region);
-					} else {
-						// parse visible chunks
-						region.preloadChunks(map, chunkParser);
-					}
+					regionParser.addRegion(region);
 				}
 			}
 		}
