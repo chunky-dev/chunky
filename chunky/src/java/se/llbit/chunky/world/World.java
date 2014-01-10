@@ -294,14 +294,28 @@ public class World implements Comparable<World> {
 		} else {
 			// check if the region is present in the world directory
 			Region region = EmptyRegion.instance;
-			if (regionExists(pos))
+			if (regionExists(pos)) {
 				region = new Region(pos, this);
-			regionMap.put(pos, region);
+			}
+			setRegion(pos, region);
 			return region;
 		}
 	}
 
-	private boolean regionExists(ChunkPosition pos) {
+	/**
+	 * Set the region for the given position.
+	 * @param pos
+	 * @param region
+	 */
+	public synchronized void setRegion(ChunkPosition pos, Region region) {
+		regionMap.put(pos, region);
+	}
+
+	/**
+	 * @param pos region position
+	 * @return {@code true} if a region file exists for the given position
+	 */
+	public boolean regionExists(ChunkPosition pos) {
 		File regionFile = new File(getRegionDirectory(), Region.getFileName(pos));
 		return regionFile.exists();
 	}

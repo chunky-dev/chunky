@@ -25,7 +25,7 @@ import java.util.Queue;
  */
 public class RegionParser extends Thread {
 
-	private Queue<Region> queue = new LinkedList<Region>();
+	private final Queue<Region> queue = new LinkedList<Region>();
 
 	/**
 	 * Create new region parser
@@ -34,6 +34,7 @@ public class RegionParser extends Thread {
 	    super("Region Parser");
 	}
 
+	@Override
 	public void run() {
 		try {
 			while (!isInterrupted()) {
@@ -50,8 +51,9 @@ public class RegionParser extends Thread {
 	 * @throws InterruptedException
 	 */
 	private synchronized Region getNext() throws InterruptedException {
-		while (queue.isEmpty())
+		while (queue.isEmpty()) {
 			wait();
+		}
 		return queue.poll();
 	}
 

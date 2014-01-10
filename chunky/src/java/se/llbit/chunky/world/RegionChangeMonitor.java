@@ -45,7 +45,14 @@ public class RegionChangeMonitor extends Thread {
 				for (int rx = theView.prx0; rx <= theView.prx1; ++rx) {
 					for (int rz = theView.prz0; rz <= theView.prz1; ++rz) {
 						Region region = world.getRegion(ChunkPosition.get(rx, rz));
-						if (region.hasChanged()) {
+						if (region.isEmpty()) {
+							ChunkPosition pos = ChunkPosition.get(rx, rz);
+							if (world.regionExists(pos)) {
+								region = new Region(pos, world);
+							}
+							world.setRegion(pos, region);
+							region.parse();
+						} else if (region.hasChanged()) {
 							region.parse();
 						}
 					}
