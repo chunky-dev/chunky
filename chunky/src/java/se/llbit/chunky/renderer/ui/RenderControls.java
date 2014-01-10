@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer.ui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,15 +36,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
@@ -71,6 +73,7 @@ import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Camera.ProjectionMode;
+import se.llbit.chunky.renderer.scene.CameraPreset;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.Sky;
@@ -113,6 +116,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox mirrorSkyCB = new JCheckBox();
 	private final JTextField widthField = new JTextField();
 	private final JTextField heightField = new JTextField();
+	private final JComboBox cameraPreset = new JComboBox();
 	private final JComboBox projectionMode = new JComboBox();
 	private final JButton startRenderBtn = new JButton();
 	private final JCheckBox enableEmitters = new JCheckBox();
@@ -1255,6 +1259,34 @@ public class RenderControls extends JDialog implements ViewListener,
 		subjectDistance.setLogarithmicMode();
 		subjectDistance.update();
 
+		JLabel presetLbl = new JLabel("Preset:");
+		CameraPreset[] presets = {
+			CameraPreset.NONE,
+			CameraPreset.ISO_WEST_NORTH, CameraPreset.ISO_NORTH_EAST,
+			CameraPreset.ISO_EAST_SOUTH, CameraPreset.ISO_SOUTH_WEST,
+			CameraPreset.SKYBOX_EAST, CameraPreset.SKYBOX_WEST,
+			CameraPreset.SKYBOX_UP, CameraPreset.SKYBOX_DOWN,
+			CameraPreset.SKYBOX_NORTH, CameraPreset.SKYBOX_SOUTH,
+		};
+		cameraPreset.setModel(new DefaultComboBoxModel(presets));
+		cameraPreset.setMaximumRowCount(presets.length);
+		final int presetHeight = cameraPreset.getPreferredSize().height;
+		final int presetWidth = cameraPreset.getPreferredSize().width;
+		cameraPreset.setRenderer(new DefaultListCellRenderer() {
+			@Override
+			public Component getListCellRendererComponent(JList list, Object value,
+					int index, boolean isSelected, boolean cellHasFocus) {
+				JLabel label = (JLabel) super.getListCellRendererComponent(
+						list, value, index, isSelected, cellHasFocus);
+				label.setPreferredSize(new Dimension(presetWidth, presetHeight));
+				CameraPreset preset = (CameraPreset) value;
+				label.setIcon(preset.getIcon());
+				return label;
+			}
+		});
+		cameraPreset.addActionListener(cameraPresetListener);
+		//updateCameraPreset();
+
 		ProjectionMode[] projectionModes = ProjectionMode.values();
 		projectionMode.setModel(new DefaultComboBoxModel(projectionModes));
 		projectionMode.addActionListener(projectionModeListener);
@@ -1304,79 +1336,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		cameraRoll.addActionListener(cameraDirectionListener);
 		updateCameraDirection();
 
-		JLabel lookAtLbl = new JLabel("Skybox views:");
-		JButton xposBtn = new JButton("East");
-		xposBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderMan.scene().camera();
-				camera.setFoV(90);
-				camera.setView(Math.PI, -Math.PI/2, 0);
-				fov.update();
-				updateCameraDirection();
-			}
-		});
-
-		JButton xnegBtn = new JButton("West");
-		xnegBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderMan.scene().camera();
-				camera.setFoV(90);
-				camera.setView(0, -Math.PI/2, 0);
-				fov.update();
-				updateCameraDirection();
-			}
-		});
-
-		JButton yposBtn = new JButton("Up");
-		yposBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderMan.scene().camera();
-				camera.setFoV(90);
-				camera.setView(-Math.PI/2, Math.PI, 0);
-				fov.update();
-				updateCameraDirection();
-			}
-		});
-
-		JButton ynegBtn = new JButton("Down");
-		ynegBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderMan.scene().camera();
-				camera.setFoV(90);
-				camera.setView(-Math.PI/2, 0, 0);
-				fov.update();
-				updateCameraDirection();
-			}
-		});
-
-		JButton zposBtn = new JButton("South");
-		zposBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderMan.scene().camera();
-				camera.setFoV(90);
-				camera.setView(Math.PI/2, -Math.PI/2, 0);
-				fov.update();
-				updateCameraDirection();
-			}
-		});
-
-		JButton znegBtn = new JButton("North");
-		znegBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderMan.scene().camera();
-				camera.setFoV(90);
-				camera.setView(-Math.PI/2, -Math.PI/2, 0);
-				fov.update();
-				updateCameraDirection();
-			}
-		});
-
 		JButton centerCameraBtn = new JButton("Center camera");
 		centerCameraBtn.setToolTipText("Center camera above loaded chunks");
 		centerCameraBtn.addActionListener(new ActionListener() {
@@ -1386,69 +1345,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 
-		JLabel isometricLbl = new JLabel("Isometric views:");
-
-		JButton isoWNBtn = new JButton("west-north");
-		isoWNBtn.setIcon(new ImageIcon(Icon.isoWN.getImage()));
-		isoWNBtn.setToolTipText("Set isometric view");
-		isoWNBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderMan.scene().camera();
-				camera.setView(-Math.PI/4, -Math.PI/4, 0);
-				camera.setProjectionMode(ProjectionMode.PARALLEL);
-				updateProjectionMode();
-				fov.update();
-				updateCameraDirection();
-			}
-		});
-
-		JButton isoNEBtn = new JButton("north-east");
-		isoNEBtn.setIcon(new ImageIcon(Icon.isoNE.getImage()));
-		isoNEBtn.setToolTipText("Set isometric view");
-		isoNEBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderMan.scene().camera();
-				camera.setView(-3*Math.PI/4, -Math.PI/4, 0);
-				camera.setProjectionMode(ProjectionMode.PARALLEL);
-				updateProjectionMode();
-				fov.update();
-				updateCameraDirection();
-			}
-		});
-
-		JButton isoESBtn = new JButton("east-south");
-		isoESBtn.setIcon(new ImageIcon(Icon.isoES.getImage()));
-		isoESBtn.setToolTipText("Set isometric view");
-		isoESBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderMan.scene().camera();
-				camera.setView(-5*Math.PI/4, -Math.PI/4, 0);
-				camera.setProjectionMode(ProjectionMode.PARALLEL);
-				updateProjectionMode();
-				fov.update();
-				updateCameraDirection();
-			}
-		});
-
-		JButton isoSWBtn = new JButton("south-west");
-		isoSWBtn.setIcon(new ImageIcon(Icon.isoSW.getImage()));
-		isoSWBtn.setToolTipText("Set isometric view");
-		isoSWBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Camera camera = renderMan.scene().camera();
-				camera.setView(-7*Math.PI/4, -Math.PI/4, 0);
-				camera.setProjectionMode(ProjectionMode.PARALLEL);
-				updateProjectionMode();
-				fov.update();
-				updateCameraDirection();
-			}
-		});
-
-		JSeparator sep2 = new JSeparator();
 		JSeparator sep1 = new JSeparator();
 
 		JPanel panel = new JPanel();
@@ -1479,38 +1375,16 @@ public class RenderControls extends JDialog implements ViewListener,
 					)
 				)
 				.addGroup(layout.createSequentialGroup()
+					.addComponent(presetLbl)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(cameraPreset)
+				)
+				.addGroup(layout.createSequentialGroup()
 					.addComponent(cameraToPlayerBtn)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(centerCameraBtn)
 				)
-				.addComponent(lookAtLbl)
-				.addGroup(layout.createSequentialGroup()
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(xposBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(xnegBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(yposBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(ynegBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(zposBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(znegBtn)
-				)
 				.addComponent(sep1)
-				.addComponent(isometricLbl)
-				.addGroup(layout.createSequentialGroup()
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(isoWNBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(isoNEBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(isoESBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(isoSWBtn)
-				)
-				.addComponent(sep2)
 				.addGroup(layout.createSequentialGroup()
 					.addGroup(layout.createParallelGroup()
 						.addComponent(projectionModeLbl)
@@ -1532,6 +1406,11 @@ public class RenderControls extends JDialog implements ViewListener,
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+				.addComponent(presetLbl)
+				.addComponent(cameraPreset)
+			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(posLbl)
 				.addComponent(cameraX)
 				.addComponent(cameraY)
@@ -1550,33 +1429,13 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(centerCameraBtn)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+			.addComponent(sep1, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(lookAtLbl)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(xposBtn)
-				.addComponent(xnegBtn)
-				.addComponent(yposBtn)
-				.addComponent(ynegBtn)
-				.addComponent(zposBtn)
-				.addComponent(znegBtn)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(isometricLbl)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(isoWNBtn)
-				.addComponent(isoNEBtn)
-				.addComponent(isoESBtn)
-				.addComponent(isoSWBtn)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(projectionModeLbl)
-				.addComponent(projectionMode))
+				.addComponent(projectionMode)
+			)
+			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(fov.verticalGroup(layout))
 			.addGroup(dof.verticalGroup(layout))
 			.addGroup(subjectDistance.verticalGroup(layout))
@@ -1824,11 +1683,25 @@ public class RenderControls extends JDialog implements ViewListener,
 		public void actionPerformed(ActionEvent e) {
 			JComboBox source = (JComboBox) e.getSource();
 			Object selected = source.getSelectedItem();
-			if (selected != null) {
+			if (selected != null && selected instanceof ProjectionMode) {
 				renderMan.scene().camera().setProjectionMode(
 						(ProjectionMode) selected);
 				updateProjectionMode();
 				fov.update();
+			}
+		}
+	};
+	private final ActionListener cameraPresetListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JComboBox source = (JComboBox) e.getSource();
+			Object selected = source.getSelectedItem();
+			if (selected != null && selected instanceof CameraPreset) {
+				CameraPreset preset = (CameraPreset) selected;
+				preset.apply(renderMan.scene().camera());
+				updateProjectionMode();
+				fov.update();
+				updateCameraDirection();
 			}
 		}
 	};
