@@ -83,6 +83,8 @@ import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
+import se.llbit.json.JsonMember;
+import se.llbit.json.JsonObject;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3d;
 import se.llbit.ui.Adjuster;
@@ -117,6 +119,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JTextField widthField = new JTextField();
 	private final JTextField heightField = new JTextField();
 	private final JComboBox cameraPreset = new JComboBox();
+	private final JComboBox customPreset = new JComboBox();
 	private final JComboBox projectionMode = new JComboBox();
 	private final JButton startRenderBtn = new JButton();
 	private final JCheckBox enableEmitters = new JCheckBox();
@@ -1290,7 +1293,46 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		cameraPreset.addActionListener(cameraPresetListener);
-		//updateCameraPreset();
+
+		JLabel customPresetLbl = new JLabel("Custom preset:");
+		customPreset.setEditable(true);
+		updateCustomPresets();
+		JButton savePreset = new JButton("save");
+		savePreset.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String name = (String) customPreset.getSelectedItem();
+				if (name == null) {
+					name = "";
+				}
+				int index = customPreset.getItemCount() + 1;
+				if (name.trim().isEmpty()) {
+					name = "custom-" + (index);
+				}
+				outer: while (true) {
+					name = "custom-" + (index);
+					for (int i = 0; i < customPreset.getItemCount(); ++i) {
+						String item = (String) customPreset.getItemAt(i);
+						if (name.equals(item)) {
+							index += 1;
+							continue outer;
+						}
+					}
+					break;
+				}
+				customPreset.addItem(name);
+				customPreset.setSelectedIndex(customPreset.getItemCount()-1);
+				renderMan.scene().saveCameraPreset(name);
+			}
+		});
+		JButton loadPreset = new JButton("load");
+		loadPreset.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String name = "" + customPreset.getSelectedItem();
+				renderMan.scene().loadCameraPreset(name);
+			}
+		});
 
 		ProjectionMode[] projectionModes = ProjectionMode.values();
 		projectionMode.setModel(new DefaultComboBoxModel(projectionModes));
@@ -1385,6 +1427,15 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(cameraPreset)
 				)
 				.addGroup(layout.createSequentialGroup()
+					.addComponent(customPresetLbl)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(customPreset)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(savePreset)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(loadPreset)
+				)
+				.addGroup(layout.createSequentialGroup()
 					.addComponent(cameraToPlayerBtn)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(centerCameraBtn)
@@ -1413,6 +1464,13 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(presetLbl)
 				.addComponent(cameraPreset)
+			)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+				.addComponent(customPresetLbl)
+				.addComponent(customPreset)
+				.addComponent(savePreset)
+				.addComponent(loadPreset)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
@@ -1920,6 +1978,17 @@ public class RenderControls extends JDialog implements ViewListener,
 		postprocessCB.setSelectedIndex(renderMan.scene().getPostprocess().ordinal());
 	}
 
+	protected void updateCustomPresets() {
+		customPreset.removeAllItems();
+		JsonObject presets = renderMan.scene().getCameraPresets();
+		for (JsonMember member : presets.getMemberList()) {
+			String name = member.getName().trim();
+			if (!name.isEmpty()) {
+				customPreset.addItem(name);
+			}
+		}
+	}
+
 	protected void updateCameraPosition() {
 		cameraX.removeActionListener(cameraPositionListener);
 		cameraY.removeActionListener(cameraPositionListener);
@@ -2130,6 +2199,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateWaterHeight();
 		updateCameraDirection();
 		updateCameraPosition();
+		updateCustomPresets();
 		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
 		directLight.setSelected(renderMan.scene().getDirectLight());
 		stopRenderBtn.setEnabled(true);

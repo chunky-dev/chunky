@@ -1,4 +1,5 @@
 1.2.2 - TBD
+    * It is now possible to save and load custom camera presets
     * Made Render Controls dialog more compact
     * Moved camera presets to drop-down list
     * Added Granite, Diorite, and Andesite stone blocks

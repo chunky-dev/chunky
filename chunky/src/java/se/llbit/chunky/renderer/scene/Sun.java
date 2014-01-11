@@ -40,7 +40,7 @@ public class Sun implements JSONifiable {
 	/**
 	 * Default sun intensity
 	 */
-	public static final double DEFAULT_INTENSITY = 1.5;
+	public static final double DEFAULT_INTENSITY = 1.25;
 
 	/**
 	 * Maximum sun intensity

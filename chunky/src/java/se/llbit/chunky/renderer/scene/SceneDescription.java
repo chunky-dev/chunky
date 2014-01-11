@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -104,6 +104,8 @@ public class SceneDescription implements Refreshable, JSONifiable {
 
 	protected Collection<ChunkPosition> chunks = new ArrayList<ChunkPosition>();
 
+	protected JsonObject cameraPresets = new JsonObject();
+
 	/**
 	 * Parse the scene description from a JSON file.
 	 * @param in input stream - will be closed
@@ -170,6 +172,8 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		desc.add("sun", sun.toJson());
 		desc.add("sky", sky.toJson());
 
+		desc.add("cameraPresets", cameraPresets.fullCopy());
+
 		JsonArray chunkList = new JsonArray();
 		for (ChunkPosition pos: chunks) {
 			JsonArray chunk = new JsonArray();
@@ -217,6 +221,8 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		camera.fromJson(desc.get("camera").object());
 		sun.fromJson(desc.get("sun").object());
 		sky.fromJson(desc.get("sky").object());
+
+		cameraPresets = desc.get("cameraPresets").object();
 
 		// read these after loading camera, sun, sky because they refresh the scene
 		spp = desc.get("spp").intValue(0);
@@ -306,4 +312,15 @@ public class SceneDescription implements Refreshable, JSONifiable {
 				name, extensions);
 	}
 
+	public void saveCameraPreset(String name) {
+		cameraPresets.add(name, camera.toJson());
+	}
+
+	public void loadCameraPreset(String name) {
+		camera.fromJson(cameraPresets.get(name).object());
+	}
+
+	public JsonObject getCameraPresets() {
+		return cameraPresets;
+	}
 }

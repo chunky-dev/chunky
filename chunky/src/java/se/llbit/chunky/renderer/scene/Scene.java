@@ -1248,6 +1248,7 @@ public class Scene extends SceneDescription {
 		dumpFrequency = other.dumpFrequency;
 		saveSnapshots = other.saveSnapshots;
 		sppTarget = other.sppTarget;
+		cameraPresets = other.cameraPresets;
 	}
 
 	/**
