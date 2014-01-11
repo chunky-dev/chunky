@@ -139,7 +139,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final RenderContext context;
 	private final JButton showPreviewBtn = new JButton();
 	private final JLabel renderTimeLbl = new JLabel();
-	private final JLabel samplesPerSecondLbl = new JLabel();
 	private final JLabel sppLbl = new JLabel();
 	private final JProgressBar progressBar = new JProgressBar();
 	private final JLabel progressLbl = new JLabel();
@@ -529,8 +528,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		saveFrameBtn.setText("Save Current Frame");
 		saveFrameBtn.addActionListener(saveFrameListener);
 
-		samplesPerSecondLbl.setToolTipText("Samples Per Second");
-		sppLbl.setToolTipText("Samples Per Pixel");
+		sppLbl.setToolTipText("SPP = Samples Per Pixel, SPS = Samples Per Second");
 
 		setRenderTime(0);
 		setSamplesPerSecond(0);
@@ -565,7 +563,6 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(saveSceneBtn))
 				.addComponent(tabbedPane)
-				.addComponent(showPreviewBtn)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(sppTargetLbl)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -584,10 +581,16 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(lockBtn)
 				)
-				.addComponent(saveFrameBtn)
-				.addComponent(renderTimeLbl)
-				.addComponent(samplesPerSecondLbl)
-				.addComponent(sppLbl)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(saveFrameBtn)
+					.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+					.addComponent(showPreviewBtn)
+				)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(renderTimeLbl)
+					.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+					.addComponent(sppLbl)
+				)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(progressLbl)
 					.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
@@ -605,8 +608,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(tabbedPane)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(showPreviewBtn)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(sppTargetLbl)
 				.addComponent(sppTargetField)
@@ -621,11 +622,15 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(lockBtn)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(saveFrameBtn)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(saveFrameBtn)
+				.addComponent(showPreviewBtn)
+			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(renderTimeLbl)
-			.addComponent(samplesPerSecondLbl)
-			.addComponent(sppLbl)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(renderTimeLbl)
+				.addComponent(sppLbl)
+			)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
 				.addComponent(progressLbl)
@@ -1823,6 +1828,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
+	private int spp = 0;
+	private int sps = 0;
+
 	protected void updateWaterHeight() {
 		int height = renderMan.scene().getWaterHeight();
 		boolean waterWorld = height > 0;
@@ -2067,10 +2075,10 @@ public class RenderControls extends JDialog implements ViewListener,
 	@Override
 	public void setViewVisible(boolean visible) {
 		if (visible) {
-			showPreviewBtn.setText("Hide Preview");
+			showPreviewBtn.setText("Hide Preview Window");
 			showPreviewBtn.setToolTipText("Hide the preview window");
 		} else {
-			showPreviewBtn.setText("Show Preview");
+			showPreviewBtn.setText("Show Preview Window");
 			showPreviewBtn.setToolTipText("Show the preview window");
 		}
 	}
@@ -2161,10 +2169,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	 */
 	@Override
 	public void setSamplesPerSecond(int sps) {
-		if (samplesPerSecondLbl == null)
-			return;
-
-		samplesPerSecondLbl.setText("SPS: " + decimalFormat.format(sps));
+		this.sps = sps;
+		updateSPPLbl();
 	}
 
 	/**
@@ -2173,10 +2179,15 @@ public class RenderControls extends JDialog implements ViewListener,
 	 */
 	@Override
 	public void setSPP(int spp) {
-		if (sppLbl == null)
-			return;
+		this.spp = spp;
+		updateSPPLbl();
+	}
 
-		sppLbl.setText("SPP: " + decimalFormat.format(spp));
+	private void updateSPPLbl() {
+		if (sppLbl != null) {
+			sppLbl.setText(decimalFormat.format(spp) + " SPP, " +
+					decimalFormat.format(sps) + " SPS");
+		}
 	}
 
 	@Override
