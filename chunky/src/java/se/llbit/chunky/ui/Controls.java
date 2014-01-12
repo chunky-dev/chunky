@@ -1024,8 +1024,9 @@ public class Controls extends JPanel {
 		exportZipBtn.setEnabled(selected);
 		clearSelectionBtn1.setEnabled(selected);
 		clearSelectionBtn2.setEnabled(selected);
-		if (selected && tabbedPane.getSelectedIndex() == 0)
+		if (selected && tabbedPane.getSelectedIndex() == 0) {
 			tabbedPane.setSelectedIndex(RENDER_TAB_INDEX);
+		}
 	}
 
 	/**

@@ -221,17 +221,23 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	 * Redraw the map view.
 	 */
 	@Override
-	public synchronized void paintComponent(Graphics g) {
+	public void paintComponent(Graphics g) {
 
-		super.paintComponent(g);
+		// NB lock the lock ordering here is critical!
+		// we access ChunkMap via Chunky but here we also need to lock Chunky
+		synchronized (chunky) {
+		synchronized (this) {
+			super.paintComponent(g);
 
-		World world = chunky.getWorld();
+			World world = chunky.getWorld();
 
-		chunky.getWorldRenderer().render(world, renderBuffer,
-						chunky.getChunkRenderer(), chunky.getChunkSelection());
-		renderBuffer.renderBuffered(g);
-		chunky.getWorldRenderer().renderHUD(world, chunky, g, renderBuffer);
-		drawSelectionRect(g);
+			chunky.getWorldRenderer().render(world, renderBuffer,
+							chunky.getChunkRenderer(), chunky.getChunkSelection());
+			renderBuffer.renderBuffered(g);
+			chunky.getWorldRenderer().renderHUD(world, chunky, g, renderBuffer);
+			drawSelectionRect(g);
+		}
+		}
 	}
 
 	protected void setSelectionRect(int ox, int oy, int dx, int dy) {

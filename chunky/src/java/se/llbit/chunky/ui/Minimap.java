@@ -110,36 +110,42 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 	}
 
 	@Override
-	public synchronized void paintComponent(Graphics g) {
+	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		ChunkView mapView = chunky.getMapView();
+		// NB lock the lock ordering here is critical!
+		// we access ChunkMap via Chunky but here we also need to lock Chunky
+		synchronized (chunky) {
+		synchronized (this) {
+			ChunkView mapView = chunky.getMapView();
 
-		WorldRenderer renderer = chunky.getWorldRenderer();
-		World world = chunky.getWorld();
-		ChunkSelectionTracker selection = chunky.getChunkSelection();
+			WorldRenderer renderer = chunky.getWorldRenderer();
+			World world = chunky.getWorld();
+			ChunkSelectionTracker selection = chunky.getChunkSelection();
 
-		renderer.renderMinimap(world, renderBuffer, selection);
-		renderBuffer.renderBuffered(g);
+			renderer.renderMinimap(world, renderBuffer, selection);
+			renderBuffer.renderBuffered(g);
 
-		renderer.renderPlayer(world, g, view, true);
-		renderer.renderSpawn(world, g, view, true);
+			renderer.renderPlayer(world, g, view, true);
+			renderer.renderSpawn(world, g, view, true);
 
-		// draw view rectangle
-		g.setColor(Color.orange);
-		g.drawRect(
-				(int) FastMath.round(mapView.x0 - view.x0),
-				(int) FastMath.round(mapView.z0 - view.z0),
-				FastMath.round(mapView.width / (float) mapView.chunkScale),
-				FastMath.round(mapView.height / (float) mapView.chunkScale));
+			// draw view rectangle
+			g.setColor(Color.orange);
+			g.drawRect(
+					(int) FastMath.round(mapView.x0 - view.x0),
+					(int) FastMath.round(mapView.z0 - view.z0),
+					FastMath.round(mapView.width / (float) mapView.chunkScale),
+					FastMath.round(mapView.height / (float) mapView.chunkScale));
 
-		// draw North indicator
-		g.setFont(font);
-		g.setColor(Color.red);
-		g.drawString("N", view.width/2-4, 12);
+			// draw North indicator
+			g.setFont(font);
+			g.setColor(Color.red);
+			g.drawString("N", view.width/2-4, 12);
 
-		g.setColor(Color.black);
-		g.drawString(world.levelName(), 10, view.height-10);
+			g.setColor(Color.black);
+			g.drawString(world.levelName(), 10, view.height-10);
+		}
+		}
 	}
 
 	/**

@@ -498,7 +498,12 @@ public class Chunky implements ChunkTopographyListener {
 	public synchronized void setView(final double cx, final double cz) {
 		map = new ChunkView(cx, cz, mapWidth, mapHeight, chunkScale);
 		if (frame != null && getControls() != null) {
-			getControls().setPosition(cx, getLayer(), cz);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					getControls().setPosition(cx, getLayer(), cz);
+				}
+			});
 		}
 		viewUpdated();
 	}
@@ -859,7 +864,12 @@ public class Chunky implements ChunkTopographyListener {
 	public synchronized void moveView(double dx, double dz) {
 		setView(map.x + dx, map.z + dz);
 		if (frame != null && getControls() != null) {
-			getControls().stopFollowingPlayer();
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					getControls().stopFollowingPlayer();
+				}
+			});
 		}
 	}
 

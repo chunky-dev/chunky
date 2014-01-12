@@ -153,6 +153,7 @@ public class ChunkyFrame extends JFrame {
 			@Override
 			public void run() {
 				minimap.redraw();
+				map.redraw();
 			}
 		});
 	}

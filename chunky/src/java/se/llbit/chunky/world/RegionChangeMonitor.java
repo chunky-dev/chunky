@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.world;
 
+import javax.swing.SwingUtilities;
+
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
 
@@ -37,8 +39,14 @@ public class RegionChangeMonitor extends Thread {
 		try {
 			while (!isInterrupted()) {
 				sleep(3000);
-				World world = chunky.getWorld();
+				final World world = chunky.getWorld();
 				if (world.loadAdditionalData(true)) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							chunky.getControls().setPlayerY(world.playerLocY());
+						}
+					});
 					if (PersistentSettings.getFollowPlayer()) {
 						chunky.goToPlayer();
 					}
