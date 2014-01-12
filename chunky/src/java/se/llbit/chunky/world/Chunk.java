@@ -65,10 +65,10 @@ public class Chunk {
 
 	private final ChunkPosition position;
 	private int loadedLayer = -1;
-	protected Layer layer = Layer.unknownLayer;
-	protected Layer surface = Layer.unknownLayer;
-	protected Layer caves = Layer.unknownLayer;
-	protected Layer biomes = Layer.unknownLayer;
+	protected volatile Layer layer = Layer.unknownLayer;
+	protected volatile Layer surface = Layer.unknownLayer;
+	protected volatile Layer caves = Layer.unknownLayer;
+	protected volatile Layer biomes = Layer.unknownLayer;
 
 	private final World world;
 
@@ -252,7 +252,7 @@ public class Chunk {
 
 			AnyTag heightmapTag = result.get(LEVEL_HEIGHT_MAP);
 			AnyTag biomesTag = result.get(LEVEL_BIOMES);
-			if (surface == Layer.unknownLayer
+			if ((chunkChanged || surface == Layer.unknownLayer)
 					&& heightmapTag.isIntArray(X_MAX*Z_MAX)
 					&& biomesTag.isByteArray(X_MAX*Z_MAX)) {
 

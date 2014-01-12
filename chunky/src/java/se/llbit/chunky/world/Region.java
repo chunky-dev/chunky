@@ -148,6 +148,10 @@ public class Region implements Iterable<Chunk> {
 				}
 			}
 
+			for (int i = 0; i < NUM_CHUNKS; ++i) {
+				chunkTimestamps[i] = file.readInt();
+			}
+
 			world.regionUpdated(position);
 
 		} catch (IOException e) {
