@@ -53,6 +53,7 @@ import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -79,6 +80,7 @@ import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.renderer.scene.Sky.SkyMode;
 import se.llbit.chunky.renderer.scene.Sun;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Icon;
@@ -165,6 +167,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JTextField cameraPitch = new JTextField();
 	private final JTextField cameraRoll = new JTextField();
 	private final JButton mergeDumpBtn = new JButton("Merge Render Dump");
+
+	private final JTabbedPane tabbedPane = new JTabbedPane();
 
 	private boolean controlsLocked = false;
 
@@ -433,15 +437,13 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		updateTitle();
 
-		JTabbedPane tabbedPane = new JTabbedPane();
-
-		tabbedPane.addTab("General", generalPane = buildGeneralPane());
-		tabbedPane.addTab("Lighting", lightingPane = buildLightingPane());
-		tabbedPane.addTab("Sky", skyPane = buildSkyPane());
-		tabbedPane.addTab("Camera", cameraPane = buildCameraPane());
-		tabbedPane.addTab("Post-processing", buildPostProcessingPane());
-		tabbedPane.addTab("Advanced", advancedPane = buildAdvancedPane());
-		tabbedPane.addTab("Help", buildHelpPane());
+		addTab("General", Icon.wrench, generalPane = buildGeneralPane());
+		addTab("Lighting", null, lightingPane = buildLightingPane());
+		addTab("Sky", null, skyPane = buildSkyPane());
+		addTab("Camera", null, cameraPane = buildCameraPane());
+		addTab("Post-processing", null, buildPostProcessingPane());
+		addTab("Advanced", null, advancedPane = buildAdvancedPane());
+		addTab("Help", Texture.unknown, buildHelpPane());
 
 		JLabel sppTargetLbl = new JLabel("SPP Target: ");
 		sppTargetLbl.setToolTipText("The render will be paused at this SPP count");
@@ -649,6 +651,26 @@ public class RenderControls extends JDialog implements ViewListener,
 		setLocationRelativeTo(chunky.getFrame());
 
 		setVisible(true);
+	}
+
+	/**
+	 * Add a tab and ensure that the icon is to the left of the text in the
+	 * tab label.
+	 *
+	 * @param title
+	 * @param icon
+	 * @param component
+	 */
+	private void addTab(String title, Texture icon, Component component) {
+		int index = tabbedPane.getTabCount();
+
+		tabbedPane.add(title, component);
+
+		if (icon != null) {
+			JLabel lbl = new JLabel(title, icon.createIcon(), SwingConstants.RIGHT);
+			lbl.setIconTextGap(5);
+			tabbedPane.setTabComponentAt(index, lbl);
+		}
 	}
 
 	private JPanel buildAdvancedPane() {
