@@ -55,7 +55,7 @@ public class RegionParser extends Thread {
 				Region region = chunky.getWorld().getRegion(position);
 				region.parse();
 				for (Chunk chunk: region) {
-					if (map.isVisible(chunk)) {
+					if (map.shouldPreload(chunk)) {
 						chunk.parse();
 					}
 				}
