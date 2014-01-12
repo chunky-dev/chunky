@@ -27,7 +27,7 @@ import java.util.Map;
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 @SuppressWarnings("javadoc")
-public final class ChunkPosition {
+public class ChunkPosition {
 	public int x, z;
 
 	private ChunkPosition(int x, int z) {

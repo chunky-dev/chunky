@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,13 +16,10 @@
  */
 package se.llbit.chunky.world.listeners;
 
-import java.util.Collection;
-
 import se.llbit.chunky.world.ChunkPosition;
 
 @SuppressWarnings("javadoc")
 public interface ChunkUpdateListener {
-
-	void chunksUpdated(Collection<ChunkPosition> chunks);
-
+	public void regionUpdated(ChunkPosition region);
+	public void chunkUpdated(ChunkPosition region);
 }

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,8 +16,9 @@
  */
 package se.llbit.chunky.world;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import org.apache.log4j.Logger;
+
+import se.llbit.chunky.main.Chunky;
 
 /**
  * Parses regions
@@ -25,58 +26,40 @@ import java.util.Queue;
  */
 public class RegionParser extends Thread {
 
-	private final Queue<Region> queue = new LinkedList<Region>();
+	private static final Logger logger = Logger.getLogger(RegionParser.class);
+
+	private final Chunky chunky;
+	private final RegionQueue queue;
 
 	/**
 	 * Create new region parser
 	 */
-	public RegionParser() {
+	public RegionParser(Chunky chunky, RegionQueue queue) {
 	    super("Region Parser");
+	    this.chunky = chunky;
+	    this.queue = queue;
 	}
 
 	@Override
 	public void run() {
-		try {
-			while (!isInterrupted()) {
-				Region region = getNext();
-				region.parse();
+		while (!isInterrupted()) {
+			ChunkPosition position = queue.poll();
+			if (position == null) {
+				logger.warn("Region parser shutting down abnormally.");
+				return;
 			}
-		} catch (InterruptedException e) {
+			ChunkView map = chunky.getMapView();
+			ChunkView minimap = chunky.getMinimapView();
+			if (map.isRegionVisible(position) ||
+					minimap.isRegionVisible(position)) {
+				Region region = chunky.getWorld().getRegion(position);
+				region.parse();
+				for (Chunk chunk: region) {
+					if (map.isVisible(chunk)) {
+						chunk.parse();
+					}
+				}
+			}
 		}
-	}
-
-	/**
-	 * Get next region from the parse queue
-	 * @return
-	 * @throws InterruptedException
-	 */
-	private synchronized Region getNext() throws InterruptedException {
-		while (queue.isEmpty()) {
-			wait();
-		}
-		return queue.poll();
-	}
-
-	/**
-	 * Clear the parse queue
-	 */
-	public synchronized void clearQueue() {
-		queue.clear();
-	}
-
-	/**
-	 * Add a region to the parse queue
-	 * @param region
-	 */
-	public synchronized void addRegion(Region region) {
-		queue.add(region);
-		notify();
-	}
-
-	/**
-	 * @return <code>true</code> if the work queue is not empty
-	 */
-	public synchronized boolean isWorking() {
-		return !queue.isEmpty();
 	}
 }

@@ -24,7 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -38,10 +37,8 @@ import org.apache.log4j.Logger;
 
 import se.llbit.chunky.ui.ProgressPanel;
 import se.llbit.chunky.world.listeners.ChunkDeletionListener;
-import se.llbit.chunky.world.listeners.ChunkDiscoveryListener;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
-import se.llbit.chunky.world.listeners.RegionDiscoveryListener;
 import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.NamedTag;
 import se.llbit.util.Pair;
@@ -107,14 +104,10 @@ public class World implements Comparable<World> {
 
 	private final Collection<ChunkDeletionListener> chunkDeletionListeners =
 			new LinkedList<ChunkDeletionListener>();
-	private final Collection<ChunkUpdateListener> chunkUpdateListeners =
-			new LinkedList<ChunkUpdateListener>();
 	private final Collection<ChunkTopographyListener> chunkTopographyListeners =
 			new LinkedList<ChunkTopographyListener>();
-	private final Collection<ChunkDiscoveryListener> chunkDiscoveryListeners =
-			new LinkedList<ChunkDiscoveryListener>();
-	private final Collection<RegionDiscoveryListener> regionDiscoveryListeners =
-			new LinkedList<RegionDiscoveryListener>();
+	private final Collection<ChunkUpdateListener> chunkUpdateListener =
+			new LinkedList<ChunkUpdateListener>();
 	private int spawnX;
 	private int spawnY;
 	private int spawnZ;
@@ -150,22 +143,12 @@ public class World implements Comparable<World> {
 	}
 
 	/**
-	 * Add a chunk update listener
-	 * @param listener
-	 */
-	public void addChunkUpdateListener(ChunkUpdateListener listener) {
-		synchronized (chunkUpdateListeners) {
-			chunkUpdateListeners.add(listener);
-		}
-	}
-
-	/**
 	 * Add a region discovery listener
 	 * @param listener
 	 */
-	public void addRegionDiscoveryListener(RegionDiscoveryListener listener) {
-		synchronized (regionDiscoveryListeners) {
-			regionDiscoveryListeners.add(listener);
+	public void addChunkUpdateListener(ChunkUpdateListener listener) {
+		synchronized (chunkUpdateListener) {
+			chunkUpdateListener.add(listener);
 		}
 	}
 
@@ -174,14 +157,6 @@ public class World implements Comparable<World> {
 			for (ChunkDeletionListener listener : chunkDeletionListeners)
 				listener.chunkDeleted(chunk);
 		}
-	}
-
-	/**
-	 * Notify the chunk update listeners that a chunk has been updated.
-	 * @param chunk the updated chunk
-	 */
-	private void fireChunkUpdated(Chunk chunk) {
-		fireChunksUpdated(Collections.singleton(chunk));
 	}
 
 	/**
@@ -458,24 +433,22 @@ public class World implements Comparable<World> {
 		// set to non-null if this is a new region!
 		Region region = null;
 		synchronized (this) {
-			if (!regionMap.containsKey(pos)) {
+			region = regionMap.get(pos);
+			if (region == null) {
 				region = new Region(pos, this);
 				regionMap.put(pos, region);
 			}
 		}
-
-		if (region != null)
-			fireRegionDiscovered(region);
 	}
 
 	/**
-	 * Notify region discovery listeners
-	 * @param region
+	 * Notify region update listeners
+	 * @param chunk
 	 */
-	private void fireRegionDiscovered(Region region) {
-		synchronized (regionDiscoveryListeners) {
-			for (RegionDiscoveryListener listener: regionDiscoveryListeners) {
-				listener.regionDiscovered(region);
+	private void fireChunkUpdated(ChunkPosition chunk) {
+		synchronized (chunkUpdateListener) {
+			for (ChunkUpdateListener listener: chunkUpdateListener) {
+				listener.chunkUpdated(chunk);
 			}
 		}
 	}
@@ -486,17 +459,11 @@ public class World implements Comparable<World> {
 	public synchronized void dispose() {
 		regionMap.clear();
 
-		synchronized (chunkUpdateListeners) {
-			chunkUpdateListeners.clear();
-		}
 		synchronized (chunkDeletionListeners) {
 			chunkDeletionListeners.clear();
 		}
-		synchronized (chunkDiscoveryListeners) {
-			chunkDiscoveryListeners.clear();
-		}
-		synchronized (regionDiscoveryListeners) {
-			regionDiscoveryListeners.clear();
+		synchronized (chunkUpdateListener) {
+			chunkUpdateListener.clear();
 		}
 	}
 
@@ -679,10 +646,10 @@ public class World implements Comparable<World> {
 	}
 
 	/**
-	 * Called by the chunk parser when a new chunk has been discovered
+	 * Called when a chunk has been updated.
 	 * @param chunk
 	 */
-	public void chunkUpdated(Chunk chunk) {
+	public void chunkUpdated(ChunkPosition chunk) {
 		fireChunkUpdated(chunk);
 	}
 
@@ -862,54 +829,6 @@ public class World implements Comparable<World> {
 			return levelDat.exists() && levelDat.isFile();
 		}
 		return false;
-	}
-
-	/**
-	 * Add a chunk discovery listener
-	 * @param listener
-	 */
-	public void addChunkDiscoveryListener(ChunkDiscoveryListener listener) {
-		synchronized (chunkDiscoveryListeners) {
-			chunkDiscoveryListeners.add(listener);
-		}
-	}
-
-	/**
-	 * Notify listeners that chunks have been discovered
-	 * @param chunks
-	 */
-	public void chunksDiscovered(Collection<Chunk> chunks) {
-		fireChunksDiscovered(chunks);
-		fireChunksUpdated(chunks);
-	}
-
-	/**
-	 * Notify chunk update listeners
-	 * @param chunks
-	 */
-	private void fireChunksUpdated(Collection<Chunk> chunks) {
-		Collection<ChunkPosition> cplist = new LinkedList<ChunkPosition>();
-		for (Chunk chunk: chunks) {
-			cplist.add(chunk.getPosition());
-		}
-
-		synchronized (chunkUpdateListeners) {
-			for (ChunkUpdateListener listener : chunkUpdateListeners) {
-				listener.chunksUpdated(cplist);
-			}
-		}
-	}
-
-	/**
-	 * Notify chunk discovery listeners
-	 * @param chunks
-	 */
-	private void fireChunksDiscovered(Collection<Chunk> chunks) {
-		synchronized (chunkDiscoveryListeners) {
-			for (ChunkDiscoveryListener listener: chunkDiscoveryListeners) {
-				listener.chunksDiscovered(chunks);
-			}
-		}
 	}
 
 	/**

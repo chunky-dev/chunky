@@ -94,4 +94,9 @@ public class EmptyChunk extends Chunk {
 	public synchronized void reset() {
 		// do nothing
 	}
+
+	@Override
+	public synchronized void parse() {
+		// do nothing
+	}
 }

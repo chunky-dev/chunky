@@ -27,7 +27,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
-import java.util.Collection;
 
 import javax.swing.JPanel;
 
@@ -228,8 +227,6 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 		World world = chunky.getWorld();
 
-		renderBuffer.updateView(view, chunky.getChunkRenderer(),
-				world.currentLayer());
 		chunky.getWorldRenderer().render(world, renderBuffer,
 						chunky.getChunkRenderer(), chunky.getChunkSelection());
 		renderBuffer.renderBuffered(g);
@@ -288,8 +285,13 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	}
 
 	@Override
-	public void chunksUpdated(Collection<ChunkPosition> chunks) {
-		renderBuffer.chunksUpdated(chunks);
+	public void chunkUpdated(ChunkPosition chunk) {
+		renderBuffer.chunkUpdated(chunk);
+	}
+
+	@Override
+	public void regionUpdated(ChunkPosition region) {
+		renderBuffer.regionUpdated(region);
 	}
 
 	/**
@@ -297,7 +299,6 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	 */
 	public void redraw() {
 		renderBuffer.flushCache();
-		repaint();
 	}
 
 	/**
@@ -316,7 +317,6 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		setView(newView);
 		renderBuffer.updateView(view, chunky.getChunkRenderer(),
 				chunky.getWorld().currentLayer());
-		repaint();
 	}
 
 	private void setView(ChunkView newView) {

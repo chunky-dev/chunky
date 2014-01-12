@@ -56,46 +56,34 @@ public class WorldRenderer {
 		ChunkView view = renderBuffer.getView();
 		int width = view.width;
 		int height = view.height;
-		Graphics g = renderBuffer.getGraphics();
 
 		if (world.isEmptyWorld()) {
+			Graphics g = renderBuffer.getGraphics();
 			renderEmpty(g, width, height);
 			return;
 		}
 
-		g.setColor(Color.white);
-		g.fillRect(0, 0, width, height);
-
 		float[] selectionColor = new float[4];
 		float[] color = new float[4];
 		se.llbit.math.Color.getRGBAComponents(Layer.selectionColor, selectionColor);
-		for (int y = 0; y < height; y++) {
-			int cz = y + view.iz0;
-			for (int x = 0; x < width; x++) {
-				int cx = x + view.ix0;
-				ChunkPosition pos = ChunkPosition.get(cx, cz);
-				Chunk chunk = world.getChunk(pos);
-				if (!chunk.isEmpty()) {
-					if (selection.isSelected(pos)) {
-						se.llbit.math.Color.getRGBComponents(chunk.avgColor(),
-								color);
-						color[0] = color[0] * (1-selectionColor[3]) + selectionColor[0] * selectionColor[3];
-						color[1] = color[1] * (1-selectionColor[3]) + selectionColor[1] * selectionColor[3];
-						color[2] = color[2] * (1-selectionColor[3]) + selectionColor[2] * selectionColor[3];
-						color[3] = 1;
-						renderBuffer.setRGB(x, y, se.llbit.math.Color.getRGB(color));
-					} else {
-						renderBuffer.setRGB(x, y, chunk.avgColor());
-					}
+		for (ChunkPosition pos: renderBuffer) {
+			int y = pos.z - view.iz0;
+			int x = pos.x - view.ix0;
+			Chunk chunk = world.getChunk(pos);
+			if (!chunk.isEmpty()) {
+				if (selection.isSelected(pos)) {
+					se.llbit.math.Color.getRGBComponents(chunk.avgColor(),
+							color);
+					color[0] = color[0] * (1-selectionColor[3]) + selectionColor[0] * selectionColor[3];
+					color[1] = color[1] * (1-selectionColor[3]) + selectionColor[1] * selectionColor[3];
+					color[2] = color[2] * (1-selectionColor[3]) + selectionColor[2] * selectionColor[3];
+					color[3] = 1;
+					renderBuffer.setRGB(x, y, se.llbit.math.Color.getRGB(color));
+				} else {
+					renderBuffer.setRGB(x, y, chunk.avgColor());
 				}
 			}
 		}
-
-		if (world.havePlayerPos())
-			renderPlayer(world, g, view, true);
-
-		if (world.haveSpawnPos())
-			renderSpawn(world, g, view, true);
 	}
 
 	/**
@@ -111,28 +99,25 @@ public class WorldRenderer {
 		int width = renderBuffer.getWidth();
 		int height = renderBuffer.getHeight();
 
-		Graphics g = renderBuffer.getGraphics();
 		if (world.isEmptyWorld()) {
+			Graphics g = renderBuffer.getGraphics();
 			renderEmpty(g, width, height);
 			return;
 		}
 
 		ChunkView view = renderBuffer.getView();
 
-		ChunkIterator iter = renderBuffer.getChunkIterator();
-		while (iter.hasNext()) {
-			ChunkPosition pos = iter.next();
+		for (ChunkPosition pos: renderBuffer) {
 			int x = pos.x;
 			int z = pos.z;
-			if (!view.isChunkVisible(x, z))
-				continue;
 
 			Chunk chunk = world.getChunk(pos);
 
 			renderer.render(chunk, renderBuffer, x, z);
-			if (highlightEnabled)
+			if (highlightEnabled) {
 				chunk.renderHighlight(renderBuffer, x, z,
 						hlBlock, hlColor);
+			}
 			if (selection.isSelected(pos)) {
 				renderBuffer.fillRectAlpha(view.chunkScale * (x - view.ix0),
 						view.chunkScale * (z - view.iz0), view.chunkScale, view.chunkScale,
@@ -182,7 +167,7 @@ public class WorldRenderer {
 		}
 	}
 
-	private void renderPlayer(World world, Graphics g, ChunkView view, boolean sameLayer) {
+	public void renderPlayer(World world, Graphics g, ChunkView view, boolean sameLayer) {
 		double blockScale = view.chunkScale / 16.;
 		int px = (int) QuickMath.floor(world.playerPosX() * blockScale);
 		int pz = (int) QuickMath.floor(world.playerPosZ() * blockScale);
@@ -198,7 +183,7 @@ public class WorldRenderer {
 			g.drawImage(MiscImages.face_t, ppx, ppy, pw, pw, null);
 	}
 
-	private void renderSpawn(World world, Graphics g, ChunkView view, boolean sameLayer) {
+	public void renderSpawn(World world, Graphics g, ChunkView view, boolean sameLayer) {
 		double blockScale = view.chunkScale / 16.;
 		int px = (int) QuickMath.floor(world.spawnPosX() * blockScale);
 		int pz = (int) QuickMath.floor(world.spawnPosZ() * blockScale);

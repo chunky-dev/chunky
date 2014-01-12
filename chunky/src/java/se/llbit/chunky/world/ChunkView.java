@@ -118,8 +118,9 @@ public class ChunkView {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == this)
+		if (obj == this) {
 			return true;
+		}
 		if (obj instanceof ChunkView) {
 			ChunkView other = (ChunkView) obj;
 			if (chunkScale == other.chunkScale
@@ -133,13 +134,20 @@ public class ChunkView {
 		return false;
 	}
 
+	public boolean isChunkVisible(ChunkPosition chunk) {
+		return isChunkVisible(chunk.x, chunk.z);
+	}
+
 	public boolean isChunkVisible(int x, int z) {
 		return ix0 <= x && ix1 >= x &&
 				iz0 <= z && iz1 >= z;
 	}
 
 	public boolean isVisible(Region region) {
-		ChunkPosition pos = region.getPosition();
+		return isRegionVisible(region.getPosition());
+	}
+
+	public boolean isRegionVisible(ChunkPosition pos) {
 		return isRegionVisible(pos.x, pos.z);
 	}
 

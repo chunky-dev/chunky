@@ -279,10 +279,13 @@ public class Chunk {
 			caves = Layer.corruptLayer;
 		}
 
-		world.chunkUpdated(this);
+		world.chunkUpdated(position);
 	}
 
 	private boolean chunkHasChanged() {
+		if (timestamp == 0) {
+			return true;
+		}
 		Region region = world.getRegion(position.getRegionPosition());
 		return region.chunkHasChanged(position, timestamp);
 	}
@@ -321,7 +324,7 @@ public class Chunk {
 	 */
 	public synchronized void renderTopography() {
 		surface.renderTopography(position, world.heightmap());
-		world.chunkUpdated(this);
+		world.chunkUpdated(position);
 	}
 
 	/**

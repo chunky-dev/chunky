@@ -21,8 +21,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
@@ -32,7 +31,7 @@ import java.util.zip.InflaterInputStream;
  * Tracks chunks.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class Region {
+public class Region implements Iterable<Chunk> {
 
 	/**
 	 * Region X chunk width
@@ -44,12 +43,14 @@ public class Region {
 	 */
 	public static final int CHUNKS_Z = 32;
 
-	private final Chunk[] chunks = new Chunk[CHUNKS_X*CHUNKS_Z];
+	private static final int NUM_CHUNKS = CHUNKS_X * CHUNKS_Z;
+
+	private final Chunk[] chunks = new Chunk[NUM_CHUNKS];
 	private final ChunkPosition position;
 	private final World world;
 	private final String fileName;
 	private long timestamp = 0;
-	private final int[] chunkTimestamps = new int[CHUNKS_X*CHUNKS_Z];
+	private final int[] chunkTimestamps = new int[NUM_CHUNKS];
 
 	/**
 	 * Create new region
@@ -116,13 +117,6 @@ public class Region {
 		try {
 			long modtime = regionFile.lastModified();
 			if (timestamp == modtime) {
-				Collection<Chunk> discovered = new LinkedList<Chunk>();
-				for (Chunk chunk: chunks) {
-					if (!chunk.isEmpty()) {
-						discovered.add(chunk);
-					}
-				}
-				world.chunksDiscovered(discovered);
 				return;
 			}
 			timestamp = modtime;
@@ -134,7 +128,6 @@ public class Region {
 				return;
 			}
 
-			Collection<Chunk> discovered = new LinkedList<Chunk>();
 			for (int z = 0; z < 32; ++z) {
 				for (int x = 0; x < 32; ++x) {
 					ChunkPosition pos = ChunkPosition.get(
@@ -147,7 +140,6 @@ public class Region {
 							chunk = new Chunk(pos, world);
 							setChunk(pos, chunk);
 						}
-						discovered.add(chunk);
 					} else {
 						if (!chunk.isEmpty()){
 							world.chunkDeleted(pos);
@@ -155,12 +147,6 @@ public class Region {
 					}
 				}
 			}
-			for (int z = 0; z < 32; ++z) {
-				for (int x = 0; x < 32; ++x) {
-					chunkTimestamps[x+z*32] = file.readInt();
-				}
-			}
-			world.chunksDiscovered(discovered);
 
 		} catch (IOException e) {
 			System.err.println("Problem while reading chunk: " + e.getMessage());
@@ -214,7 +200,9 @@ public class Region {
 	public ChunkData getChunkData(ChunkPosition chunkPos) {
 		File regionDirectory = world.getRegionDirectory();
 		File regionFile = new File(regionDirectory, fileName);
-		return getChunkData(regionFile, chunkPos);
+		ChunkData data = getChunkData(regionFile, chunkPos);
+		chunkTimestamps[(chunkPos.x&31) + (chunkPos.z&31)*32] = data.timestamp;
+		return data;
 	}
 
 	/**
@@ -387,5 +375,27 @@ public class Region {
 
 	public boolean chunkHasChanged(ChunkPosition chunkPos, int timestamp) {
 		return timestamp != chunkTimestamps[(chunkPos.x&31)+(chunkPos.z&31)*32];
+	}
+
+	@Override
+	public Iterator<Chunk> iterator() {
+		return new Iterator<Chunk>() {
+			private int index = 0;
+			@Override
+			public boolean hasNext() {
+				return index < NUM_CHUNKS;
+			}
+
+			@Override
+			public Chunk next() {
+				return chunks[index++];
+			}
+
+			@Override
+			public void remove() {
+				chunks[index] = EmptyChunk.instance;
+			}
+
+		};
 	}
 }

@@ -21,18 +21,17 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.Chunk.Renderer;
-import se.llbit.chunky.world.listeners.ChunkUpdateListener;
-import se.llbit.chunky.world.ChunkIterator;
-import se.llbit.chunky.world.ChunkListIterator;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.ChunkViewIterator;
+import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 
 /**
  * Keeps a buffered image of rendered chunks. Only re-render chunks when
@@ -41,7 +40,7 @@ import se.llbit.chunky.world.ChunkViewIterator;
  *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
-public class RenderBuffer implements ChunkUpdateListener {
+public class RenderBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 
 	private BufferedImage buffer;
 	private int buffW;
@@ -53,7 +52,7 @@ public class RenderBuffer implements ChunkUpdateListener {
 	private int y_offset = 0;
 	private int[] data;
 	private Graphics graphics;
-	private ChunkIterator iterator = new ChunkListIterator();
+	private Set<ChunkPosition> updatedRegions = new HashSet<ChunkPosition>();
 
 	/**
 	 * Create a new render buffer for the provided view
@@ -61,8 +60,8 @@ public class RenderBuffer implements ChunkUpdateListener {
 	 */
 	public RenderBuffer(ChunkView view) {
 		this.view = view;
-		buffW = (int) (view.chunkScale * (view.ix1 - view.ix0 + 1));
-		buffH = (int) (view.chunkScale * (view.iz1 - view.iz0 + 1));
+		buffW = view.chunkScale * (view.ix1 - view.ix0 + 1);
+		buffH = view.chunkScale * (view.iz1 - view.iz0 + 1);
 		buffer = new BufferedImage(buffW, buffH,
 				BufferedImage.TYPE_INT_RGB);
 		graphics = buffer.getGraphics();
@@ -95,30 +94,33 @@ public class RenderBuffer implements ChunkUpdateListener {
 		if (!newView.equals(view) || !bufferedMode) {
 
 			BufferedImage prev = buffer;
-			buffW = (int) (newView.chunkScale * (newView.ix1 - newView.ix0 + 1));
-			buffH = (int) (newView.chunkScale * (newView.iz1 - newView.iz0 + 1));
+			buffW = newView.chunkScale * (newView.ix1 - newView.ix0 + 1);
+			buffH = newView.chunkScale * (newView.iz1 - newView.iz0 + 1);
 			buffer = new BufferedImage(buffW, buffH,
 					BufferedImage.TYPE_INT_RGB);
 			graphics = buffer.getGraphics();
 			graphics.setColor(java.awt.Color.white);
 			graphics.fillRect(0, 0, buffW, buffH);
-			DataBufferInt dataBuffer = (DataBufferInt) buffer.getRaster().getDataBuffer();
-			data = dataBuffer.getData();
 
 			int ix0 = newView.chunkScale * (view.ix0 - newView.ix0);
 			int iz0 = newView.chunkScale * (view.iz0 - newView.iz0);
 
-			if (newView.chunkScale == view.chunkScale)
+			if (newView.chunkScale == view.chunkScale) {
 				graphics.drawImage(prev, ix0, iz0,
-						(int) (newView.chunkScale * (view.ix1 - view.ix0 + 1)),
-						(int) (newView.chunkScale * (view.iz1 - view.iz0 + 1)), null);
-			else
+						newView.chunkScale * (view.ix1 - view.ix0 + 1),
+						newView.chunkScale * (view.iz1 - view.iz0 + 1), null);
+			} else {
 				graphics.drawImage(prev, ix0, iz0, null);
+			}
 
-			if (!bufferedMode || view.chunkScale != newView.chunkScale)
+			DataBufferInt dataBuffer = (DataBufferInt) buffer.getRaster().getDataBuffer();
+			data = dataBuffer.getData();
+
+			if (!bufferedMode || view.chunkScale != newView.chunkScale) {
 				redrawAllChunks(newView);
-			else
-				redrawNewChunks(newView);
+			} else {
+				redrawNewChunks(view, newView);
+			}
 		}
 
 		buffMode = renderer;
@@ -130,17 +132,30 @@ public class RenderBuffer implements ChunkUpdateListener {
 	}
 
 	private synchronized void redrawAllChunks(ChunkView newView) {
-		iterator = new ChunkViewIterator(newView);
+		updatedRegions.clear();
+		for (int x = newView.rx0; x <= newView.rx1; ++x) {
+			for (int z = newView.rz0; z <= newView.rz1; ++z) {
+				updatedRegions.add(ChunkPosition.get(x, z));
+			}
+		}
 	}
 
-	private synchronized void redrawNewChunks(ChunkView newView) {
-		for (int x = newView.ix0; x <= newView.ix1; ++x) {
-			for (int z = newView.iz0; z <= newView.iz1; ++z) {
-				if (!view.isChunkVisible(x, z)) {
-					iterator.addChunk(ChunkPosition.get(x, z));
+	private synchronized void redrawNewChunks(ChunkView prevView, ChunkView newView) {
+		Set<ChunkPosition> updated = new HashSet<ChunkPosition>();
+		for (ChunkPosition region: updatedRegions) {
+			if (newView.isRegionVisible(region)) {
+				updated.add(region);
+			}
+		}
+		for (int x = newView.rx0; x <= newView.rx1; ++x) {
+			for (int z = newView.rz0; z <= newView.rz1; ++z) {
+				ChunkPosition chunk = ChunkPosition.get(x, z);
+				if (!prevView.isChunkVisible(chunk)) {
+					updated.add(chunk);
 				}
 			}
 		}
+		updatedRegions = updated;
 	}
 
 	/**
@@ -250,15 +265,6 @@ public class RenderBuffer implements ChunkUpdateListener {
 	}
 
 	/**
-	 * @return An iterator for chunks that need to be redrawn
-	 */
-	public synchronized ChunkIterator getChunkIterator() {
-		ChunkIterator iter = iterator;
-		iterator = new ChunkListIterator();
-		return iter;
-	}
-
-	/**
 	 * Fill rect
 	 * @param x0
 	 * @param y0
@@ -299,10 +305,16 @@ public class RenderBuffer implements ChunkUpdateListener {
 	}
 
 	@Override
-	public synchronized void chunksUpdated(Collection<ChunkPosition> chunks) {
-		for (ChunkPosition chunk: chunks) {
-			if (view.isChunkVisible(chunk.x, chunk.z))
-				iterator.addChunk(chunk);
+	public synchronized void chunkUpdated(ChunkPosition chunk) {
+		if (view.isChunkVisible(chunk.x, chunk.z)) {
+			updatedRegions.add(chunk.getRegionPosition());
+		}
+	}
+
+	@Override
+	public synchronized void regionUpdated(ChunkPosition region) {
+		if (view.isRegionVisible(region)) {
+			updatedRegions.add(region);
 		}
 	}
 
@@ -311,17 +323,62 @@ public class RenderBuffer implements ChunkUpdateListener {
 	 * be redrawn
 	 */
 	public synchronized boolean haveUpdatedChunks() {
-		return iterator.hasNext();
+		return !updatedRegions.isEmpty();
 	}
 
 	/**
-	 * Force the given chunks to be redrawn
-	 * @param chunks
+	 * @return an iterator over chunks that need to be redrawn
 	 */
-	public synchronized void updateChunks(Collection<ChunkPosition> chunks) {
-		for (ChunkPosition chunk: chunks) {
-			iterator.addChunk(chunk);
-		}
+	@Override
+	public Iterator<ChunkPosition> iterator() {
+		return new Iterator<ChunkPosition>() {
+			private final ChunkView bounds;
+			private ChunkPosition next = null;
+			private int x;
+			private int z;
+
+			{
+				bounds = view;
+				x = bounds.ix0;
+				z = bounds.iz0;
+				findNext();
+			}
+
+			private void findNext() {
+				while (z <= bounds.iz1) {
+					int cx = x;
+					int cz = z;
+					x += 1;
+					if (x > bounds.ix1) {
+						x = bounds.ix0;
+						z += 1;
+					}
+					ChunkPosition region = ChunkPosition.get(cx>>5, cz>>5);
+					if (updatedRegions.contains(region)) {
+						next = ChunkPosition.get(cx, cz);
+						return;
+					}
+				}
+				next = null;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return next != null;
+			}
+
+			@Override
+			public ChunkPosition next() {
+				ChunkPosition pos = next;
+				findNext();
+				return pos;
+			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
 	}
 
 	/**
@@ -330,7 +387,7 @@ public class RenderBuffer implements ChunkUpdateListener {
 	 * @param cz
 	 */
 	public synchronized void updateChunk(int cx, int cz) {
-		iterator.addChunk(ChunkPosition.get(cx, cz));
+		regionUpdated(ChunkPosition.get(cx>>5, cz>>5));
 	}
 
 	/**
@@ -341,9 +398,10 @@ public class RenderBuffer implements ChunkUpdateListener {
 	 * @param z1
 	 */
 	public synchronized void updateChunks(int x0, int x1, int z0, int z1) {
-		for (int x = x0; x <= x1; ++x) {
-			for (int z = z0; z <= z1; ++z)
-				iterator.addChunk(ChunkPosition.get(x, z));
+		for (int x = x0; x <= x1; x += 32) {
+			for (int z = z0; z <= z1; z += 32) {
+				regionUpdated(ChunkPosition.get(x>>5, z>>5));
+			}
 		}
 	}
 

@@ -15,8 +15,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.ui;
-import org.apache.commons.math3.util.FastMath;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -25,9 +23,10 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Collection;
 
 import javax.swing.JPanel;
+
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.RenderBuffer;
@@ -56,9 +55,9 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 
 	private static final Font font = new Font("Sans serif", Font.BOLD, 11);
 
-	private RenderBuffer renderBuffer;
-	private Chunky chunky;
-	private ChunkView view;
+	private final RenderBuffer renderBuffer;
+	private final Chunky chunky;
+	private volatile ChunkView view;
 
 	/**
 	 * @param parent
@@ -111,7 +110,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 	}
 
 	@Override
-	public void paintComponent(Graphics g) {
+	public synchronized void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
 		ChunkView mapView = chunky.getMapView();
@@ -120,17 +119,24 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 		World world = chunky.getWorld();
 		ChunkSelectionTracker selection = chunky.getChunkSelection();
 
-		renderBuffer.updateView(view, null, 0);
 		renderer.renderMinimap(world, renderBuffer, selection);
 		renderBuffer.renderBuffered(g);
+
+		if (world.havePlayerPos()) {
+			renderer.renderPlayer(world, g, view, true);
+		}
+
+		if (world.haveSpawnPos()) {
+			renderer.renderSpawn(world, g, view, true);
+		}
 
 		// draw view rectangle
 		g.setColor(Color.orange);
 		g.drawRect(
 				(int) FastMath.round(mapView.x0 - view.x0),
 				(int) FastMath.round(mapView.z0 - view.z0),
-				(int) FastMath.round(mapView.width / (float) mapView.chunkScale),
-				(int) FastMath.round(mapView.height / (float) mapView.chunkScale));
+				FastMath.round(mapView.width / (float) mapView.chunkScale),
+				FastMath.round(mapView.height / (float) mapView.chunkScale));
 
 		// draw North indicator
 		g.setFont(font);
@@ -154,12 +160,16 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 	 */
 	public void redraw() {
 		renderBuffer.flushCache();
-		repaint();
 	}
 
 	@Override
-	public void chunksUpdated(Collection<ChunkPosition> chunks) {
-		renderBuffer.chunksUpdated(chunks);
+	public void chunkUpdated(ChunkPosition chunk) {
+		renderBuffer.chunkUpdated(chunk);
+	}
+
+	@Override
+	public void regionUpdated(ChunkPosition region) {
+		renderBuffer.regionUpdated(region);
 	}
 
 	/**
@@ -168,9 +178,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 	 */
 	public synchronized void viewUpdated(ChunkView newView) {
 		view = newView;
-		renderBuffer.updateView(view, chunky.getChunkRenderer(),
-				chunky.getWorld().currentLayer());
-		repaint();
+		renderBuffer.updateView(view, null, 0);
 	}
 
 }

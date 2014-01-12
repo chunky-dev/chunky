@@ -26,6 +26,7 @@ import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 
 /**
  * Tracks chunk selections.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkSelectionTracker implements ChunkDeletionListener {
@@ -34,12 +35,12 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 	private final Collection<ChunkUpdateListener> chunkUpdateListeners =
 			new LinkedList<ChunkUpdateListener>();
 
-
 	/**
 	 * Add a chunk update listener to listen for selection changes
+	 *
 	 * @param listener
 	 */
-	public void addChunkUpdateListener(ChunkUpdateListener listener) {
+	public void addRegionUpdateListener(ChunkUpdateListener listener) {
 		synchronized (chunkUpdateListeners) {
 			chunkUpdateListeners.add(listener);
 		}
@@ -47,9 +48,11 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 
 	/**
 	 * Remove a chunk update listener
+	 *
 	 * @param listener
 	 */
-	public synchronized void removeChunkUpdateListener(ChunkUpdateListener listener) {
+	public synchronized void removeRegionUpdateListener(
+			ChunkUpdateListener listener) {
 		synchronized (chunkUpdateListeners) {
 			chunkUpdateListeners.remove(listener);
 		}
@@ -57,24 +60,27 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 
 	/**
 	 * Notify the chunk update listeners that chunks have been updated
-	 * @param chunks the updated chunks
+	 *
+	 * @param chunks
+	 *            the updated chunks
 	 */
 	private void fireChunksUpdated(Collection<ChunkPosition> chunks) {
-		synchronized (chunkUpdateListeners) {
-			for (ChunkUpdateListener listener : chunkUpdateListeners)
-				listener.chunksUpdated(chunks);
+		for (ChunkPosition chunk : chunks) {
+			fireChunkUpdated(chunk);
 		}
 	}
 
-   /**
-	* Notify the chunk update listeners that a chunk has been updated.
-	* @param chunk the updated chunk
-	*/
-   private void fireChunkUpdated(ChunkPosition chunk) {
-	   Collection<ChunkPosition> chunks = new LinkedList<ChunkPosition>();
-	   chunks.add(chunk);
-	   fireChunksUpdated(chunks);
-   }
+	/**
+	 * Notify the chunk update listeners that a chunk has been updated.
+	 *
+	 * @param chunk
+	 *            the updated chunk
+	 */
+	private void fireChunkUpdated(ChunkPosition chunk) {
+		for (ChunkUpdateListener listener : chunkUpdateListeners) {
+			listener.chunkUpdated(chunk);
+		}
+	}
 
 	@Override
 	public void chunkDeleted(ChunkPosition chunk) {
@@ -84,6 +90,7 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 
 	/**
 	 * Toggle the selected status of the chunk at the given coordinates.
+	 *
 	 * @param world
 	 * @param cx
 	 * @param cz
@@ -108,47 +115,47 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 
 	/**
 	 * Select chunks within rectangle
+	 *
 	 * @param world
 	 * @param cx0
 	 * @param cz0
 	 * @param cx1
 	 * @param cz1
 	 */
-	public synchronized void selectChunks(World world, int cx0, int cz0, int cx1, int cz1) {
-		Collection<ChunkPosition> updated = new LinkedList<ChunkPosition>();
+	public synchronized void selectChunks(World world, int cx0, int cz0,
+			int cx1, int cz1) {
 		for (int cx = cx0; cx <= cx1; ++cx) {
 			for (int cz = cz0; cz <= cz1; ++cz) {
 				ChunkPosition chunk = ChunkPosition.get(cx, cz);
 				if (!selected.contains(chunk) &&
 						!world.getChunk(chunk).isEmpty()) {
 					selected.add(chunk);
-					updated.add(chunk);
+					fireChunkUpdated(chunk);
 				}
 			}
 		}
-		fireChunksUpdated(updated);
 	}
 
 	/**
 	 * Deselect chunks within rectangle
+	 *
 	 * @param world
 	 * @param cx0
 	 * @param cz0
 	 * @param cx1
 	 * @param cz1
 	 */
-	public synchronized void deselectChunks(World world, int cx0, int cz0, int cx1, int cz1) {
-		Collection<ChunkPosition> updated = new LinkedList<ChunkPosition>();
+	public synchronized void deselectChunks(World world, int cx0, int cz0,
+			int cx1, int cz1) {
 		for (int cx = cx0; cx <= cx1; ++cx) {
 			for (int cz = cz0; cz <= cz1; ++cz) {
 				ChunkPosition chunk = ChunkPosition.get(cx, cz);
 				if (selected.contains(chunk)) {
 					selected.remove(chunk);
-					updated.add(chunk);
+					fireChunkUpdated(chunk);
 				}
 			}
 		}
-		fireChunksUpdated(updated);
 	}
 
 	/**

@@ -79,8 +79,8 @@ public class ChunkyFrame extends JFrame {
 		minimap = new Minimap(chunky);
 		map = new ChunkMap(chunky);
 		controls = new Controls(chunky, minimap);
-		chunky.getChunkSelection().addChunkUpdateListener(map);
-		chunky.getChunkSelection().addChunkUpdateListener(minimap);
+		chunky.getChunkSelection().addRegionUpdateListener(map);
+		chunky.getChunkSelection().addRegionUpdateListener(minimap);
 
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);

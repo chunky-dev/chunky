@@ -1,4 +1,6 @@
 1.2.2 - TBD
+    * Made 2D map drawing more efficient
+    * Adjusted default sun intensity to 1.25
     * It is now possible to save and load custom camera presets
     * Made Render Controls dialog more compact
     * Moved camera presets to drop-down list

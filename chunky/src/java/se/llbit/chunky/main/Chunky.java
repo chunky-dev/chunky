@@ -52,7 +52,6 @@ import se.llbit.chunky.ui.ProgressPanel;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.Chunk.Renderer;
-import se.llbit.chunky.world.ChunkParser;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkTopographyUpdater;
@@ -61,12 +60,11 @@ import se.llbit.chunky.world.DeleteChunksJob;
 import se.llbit.chunky.world.EmptyChunk;
 import se.llbit.chunky.world.EmptyChunkView;
 import se.llbit.chunky.world.EmptyWorld;
-import se.llbit.chunky.world.Region;
 import se.llbit.chunky.world.RegionChangeMonitor;
 import se.llbit.chunky.world.RegionParser;
+import se.llbit.chunky.world.RegionQueue;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldRenderer;
-import se.llbit.chunky.world.listeners.ChunkDiscoveryListener;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.util.OSDetector;
 import se.llbit.util.OSDetector.OS;
@@ -79,7 +77,7 @@ import se.llbit.util.OSDetector.OS;
  *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
-public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
+public class Chunky implements ChunkTopographyListener {
 
 	/**
 	 * Minimum block scale for the map view
@@ -100,8 +98,8 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 
 	private World world = EmptyWorld.instance;
 
-	private final ChunkParser chunkParser = new ChunkParser();
-	private final RegionParser regionParser = new RegionParser();
+	private final RegionQueue regionQueue = new RegionQueue();
+
 	private final ChunkTopographyUpdater topographyUpdater =
 			new ChunkTopographyUpdater();
 	private final RegionChangeMonitor refresher = new RegionChangeMonitor(this);
@@ -117,8 +115,8 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 	private RenderControls renderControls = null;
 	private ChunkyFrame frame;
 
-	private ChunkView map = EmptyChunkView.instance;
-	private ChunkView minimap = EmptyChunkView.instance;
+	private volatile ChunkView map = EmptyChunkView.instance;
+	private volatile ChunkView minimap = EmptyChunkView.instance;
 
 	private int mapWidth = ChunkMap.DEFAULT_WIDTH;
 	private int mapHeight = ChunkMap.DEFAULT_HEIGHT;
@@ -268,8 +266,11 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 		}
 
 		// Start the worker threads
-		chunkParser.start();
-		regionParser.start();
+		RegionParser[] regionParsers = new RegionParser[3];
+		for (int i = 0; i < regionParsers.length; ++i) {
+			regionParsers[i] = new RegionParser(this, regionQueue);
+			regionParsers[i].start();
+		}
 		topographyUpdater.start();
 		refresher.start();
 
@@ -333,9 +334,6 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 
 		newWorld.reload();
 
-		regionParser.clearQueue();
-		chunkParser.clearQueue();
-
 		chunkSelection.clearSelection();
 
 		// dispose old world
@@ -343,7 +341,6 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 
 		world = newWorld;
 		world.addChunkDeletionListener(chunkSelection);
-		world.addChunkDiscoveryListener(this);
 		world.addChunkTopographyListener(this);
 
 		// dimension must be set before chunks are loaded
@@ -379,10 +376,6 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 
 		minimap = new ChunkView(map.x, map.z, minimapWidth, minimapHeight, 1);
 
-		// clear the region and chunk parse queues
-		regionParser.clearQueue();
-		chunkParser.clearQueue();
-
 		// enqueue visible regions and chunks
 		for (int rx = Math.min(minimap.rx0, map.prx0);
 				rx <= Math.max(minimap.rx1, map.prx1); ++rx) {
@@ -390,11 +383,7 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 			for (int rz = Math.min(minimap.rz0, map.prz0);
 					rz <= Math.max(minimap.rz1, map.prz1); ++rz) {
 
-				Region region = world.getRegion(ChunkPosition.get(rx, rz));
-				if (!region.isEmpty()
-						&& (map.isVisible(region) || minimap.isVisible(region))) {
-					regionParser.addRegion(region);
-				}
+				regionQueue.add(ChunkPosition.get(rx, rz));
 			}
 		}
 
@@ -528,7 +517,6 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 	public synchronized void setLayer(int value) {
 		int layerNew = Math.max(0, Math.min(Chunk.Y_MAX-1, value));
 		if (layerNew != world.currentLayer()) {
-			chunkParser.clearQueue();
 			world.setCurrentLayer(layerNew);
 			if (chunkRenderer == Chunk.layerRenderer) {
 				getMap().redraw();
@@ -821,20 +809,19 @@ public class Chunky implements ChunkDiscoveryListener, ChunkTopographyListener {
 		return frame.getMinimap();
 	}
 
-	@Override
-	public void chunksDiscovered(Collection<Chunk> chunks) {
-		for (Chunk chunk: chunks) {
-			if (map.shouldPreload(chunk)) {
-				chunkParser.addChunk(chunk);
-			}
-		}
+	/**
+	 * The region was changed.
+	 * @param region
+	 */
+	public void regionChanged(ChunkPosition region) {
+		regionQueue.add(region);
 	}
 
 	/**
 	 * @return <code>true</code> if chunks or regions are currently being parsed
 	 */
 	public boolean isLoading() {
-		return chunkParser.isWorking() || regionParser.isWorking();
+		return !regionQueue.isEmpty();
 	}
 
 	/**
