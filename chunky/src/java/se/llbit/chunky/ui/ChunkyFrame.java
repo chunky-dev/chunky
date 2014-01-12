@@ -218,6 +218,9 @@ public class ChunkyFrame extends JFrame {
 		world.addChunkUpdateListener(minimap);
 		world.addChunkUpdateListener(map);
 
+		minimap.redraw();
+		map.redraw();
+
 		controls.setPlayerY(world.playerLocY());
 		controls.enableDimension(0, world.haveDimension(0));
 		controls.enableDimension(-1, world.haveDimension(-1));

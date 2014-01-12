@@ -122,13 +122,8 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 		renderer.renderMinimap(world, renderBuffer, selection);
 		renderBuffer.renderBuffered(g);
 
-		if (world.havePlayerPos()) {
-			renderer.renderPlayer(world, g, view, true);
-		}
-
-		if (world.haveSpawnPos()) {
-			renderer.renderSpawn(world, g, view, true);
-		}
+		renderer.renderPlayer(world, g, view, true);
+		renderer.renderSpawn(world, g, view, true);
 
 		// draw view rectangle
 		g.setColor(Color.orange);

@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
 
 /**
@@ -38,6 +39,9 @@ public class RegionChangeMonitor extends Thread {
 				sleep(3000);
 				World world = chunky.getWorld();
 				if (world.loadAdditionalData(true)) {
+					if (PersistentSettings.getFollowPlayer()) {
+						chunky.goToPlayer();
+					}
 					chunky.getMap().repaint();
 					chunky.getMinimap().repaint();
 				}

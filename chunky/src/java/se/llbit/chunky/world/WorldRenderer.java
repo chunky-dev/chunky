@@ -24,6 +24,7 @@ import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.RenderBuffer;
 import se.llbit.chunky.resources.MiscImages;
 import se.llbit.math.QuickMath;
+import se.llbit.math.Vector3d;
 
 /**
  * @author Jesper Öqvist (jesper@llbit.se)
@@ -145,17 +146,13 @@ public class WorldRenderer {
 			g.drawImage(MiscImages.clock, view.width-32, 0, 32, 32, null);
 		}
 
-		if (world.havePlayerPos()) {
-			renderPlayer(world, g, view,
-					renderer == Chunk.surfaceRenderer
-					|| world.playerLocY() == world.currentLayer());
-		}
+		renderPlayer(world, g, view,
+				renderer == Chunk.surfaceRenderer
+				|| world.playerLocY() == world.currentLayer());
 
-		if (world.haveSpawnPos()) {
-			renderSpawn(world, g, view,
-					renderer == Chunk.surfaceRenderer
-					|| world.spawnPosY() == world.currentLayer());
-		}
+		renderSpawn(world, g, view,
+				renderer == Chunk.surfaceRenderer
+				|| world.spawnPosY() == world.currentLayer());
 
 		Chunk hoveredChunk = chunky.getHoveredChunk();
 		if (!hoveredChunk.isEmpty()) {
@@ -169,22 +166,30 @@ public class WorldRenderer {
 
 	public void renderPlayer(World world, Graphics g, ChunkView view, boolean sameLayer) {
 		double blockScale = view.chunkScale / 16.;
-		int px = (int) QuickMath.floor(world.playerPosX() * blockScale);
-		int pz = (int) QuickMath.floor(world.playerPosZ() * blockScale);
+		Vector3d playerPos = world.playerPos();
+		if (playerPos == null) {
+			return;
+		}
+		int px = (int) QuickMath.floor(playerPos.x * blockScale);
+		int pz = (int) QuickMath.floor(playerPos.z * blockScale);
 		int ppx = px - (int) QuickMath.floor(view.x0 * view.chunkScale);
 		int ppy = pz - (int) QuickMath.floor(view.z0 * view.chunkScale);
 		int pw = (int) QuickMath.max(8, QuickMath.min(16, blockScale * 2));
 		ppx = Math.min(view.width-pw, Math.max(0, ppx-pw/2));
 		ppy = Math.min(view.height-pw, Math.max(0, ppy-pw/2));
 
-		if (sameLayer)
+		if (sameLayer) {
 			g.drawImage(MiscImages.face, ppx, ppy, pw, pw, null);
-		else
+		} else {
 			g.drawImage(MiscImages.face_t, ppx, ppy, pw, pw, null);
+		}
 	}
 
 	public void renderSpawn(World world, Graphics g, ChunkView view, boolean sameLayer) {
 		double blockScale = view.chunkScale / 16.;
+		if (!world.haveSpawnPos()) {
+			return;
+		}
 		int px = (int) QuickMath.floor(world.spawnPosX() * blockScale);
 		int pz = (int) QuickMath.floor(world.spawnPosZ() * blockScale);
 		int ppx = px - (int) QuickMath.floor(view.x0 * view.chunkScale);
@@ -193,10 +198,11 @@ public class WorldRenderer {
 		ppx = Math.min(view.width-pw, Math.max(0, ppx-pw/2));
 		ppy = Math.min(view.height-pw, Math.max(0, ppy-pw/2));
 
-		if (sameLayer)
+		if (sameLayer) {
 			g.drawImage(MiscImages.home, ppx, ppy, pw, pw, null);
-		else
+		} else {
 			g.drawImage(MiscImages.home_t, ppx, ppy, pw, pw, null);
+		}
 	}
 
 	/**

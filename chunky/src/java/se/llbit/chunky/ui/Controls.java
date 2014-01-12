@@ -55,6 +55,7 @@ import javax.swing.event.ChangeListener;
 
 import org.apache.log4j.Logger;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.BlockTypeListCellRenderer;
 import se.llbit.chunky.main.Chunky;
@@ -102,6 +103,7 @@ public class Controls extends JPanel {
 	private JRadioButton earthBtn;
 	private JRadioButton netherBtn;
 	private JRadioButton endBtn;
+	private final JCheckBox followPlayer = new JCheckBox("follow player");
 
 	private WorldSelector worldSelector = null;
 
@@ -606,6 +608,8 @@ public class Controls extends JPanel {
 		layerField = new JFormattedTextField(NumberFormat.getInstance());
 		layerSlider = new JSlider(0, Chunk.Y_MAX);
 		JLabel dimLabel = new JLabel();
+		followPlayer.setSelected(PersistentSettings.getFollowPlayer());
+		followPlayer.addActionListener(followPlayerListener);
 
 		ButtonGroup buttonGroup2 = new ButtonGroup();
 		earthBtn = new JRadioButton();
@@ -772,6 +776,8 @@ public class Controls extends JPanel {
 						.addPreferredGap(ComponentPlacement.RELATED)
 						.addComponent(zLbl)
 						.addComponent(zField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.UNRELATED)
+						.addComponent(followPlayer)
 					)
 				)
 				.addContainerGap()
@@ -824,6 +830,7 @@ public class Controls extends JPanel {
 					.addComponent(xField)
 					.addComponent(zLbl)
 					.addComponent(zField)
+					.addComponent(followPlayer)
 				)
 				.addContainerGap()
 			)
@@ -990,8 +997,12 @@ public class Controls extends JPanel {
 	 */
 	public void setPosition(double cx, int y, double cz) {
 		setLayer(y);
+		xField.removeActionListener(coordinateActionListener);
+		zField.removeActionListener(coordinateActionListener);
 		xField.setText(""+(int) (cx*16));
 		zField.setText(""+(int) (cz*16));
+		xField.addActionListener(coordinateActionListener);
+		zField.addActionListener(coordinateActionListener);
 	}
 
 	/**
@@ -1072,15 +1083,37 @@ public class Controls extends JPanel {
 		}
 	}
 
-	ActionListener coordinateActionListener = new ActionListener() {
+	final ActionListener coordinateActionListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
 				int x = Integer.parseInt(xField.getText());
 				int z = Integer.parseInt(zField.getText());
 				chunky.setView(x/16.0, z/16.0);
+				stopFollowingPlayer();
 			} catch (NumberFormatException e1) {
 			}
 		}
 	};
+
+	final ActionListener followPlayerListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JCheckBox source = (JCheckBox) e.getSource();
+			boolean follow = source.isSelected();
+			PersistentSettings.setFollowPlayer(follow);
+			if (follow) {
+				chunky.goToPlayer();
+			}
+		}
+	};
+
+	public void stopFollowingPlayer() {
+		if (followPlayer.isSelected()) {
+			followPlayer.removeActionListener(followPlayerListener);
+			followPlayer.setSelected(false);
+			PersistentSettings.setFollowPlayer(false);
+			followPlayer.addActionListener(followPlayerListener);
+		}
+	}
 }

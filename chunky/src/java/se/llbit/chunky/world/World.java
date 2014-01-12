@@ -39,6 +39,7 @@ import se.llbit.chunky.ui.ProgressPanel;
 import se.llbit.chunky.world.listeners.ChunkDeletionListener;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
+import se.llbit.math.Vector3d;
 import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.NamedTag;
 import se.llbit.util.Pair;
@@ -171,7 +172,7 @@ public class World implements Comparable<World> {
 	 * Parse player location and level name.
 	 * @return {@code true} if the world data was loaded
 	 */
-	public boolean loadAdditionalData(boolean logWarnings) {
+	public synchronized boolean loadAdditionalData(boolean logWarnings) {
 		try {
 			File worldFile = new File(worldDirectory, "level.dat");
 			long modtime = worldFile.lastModified();
@@ -230,7 +231,7 @@ public class World implements Comparable<World> {
 			this.spawnZ = spawnZ.intValue();
 			havePlayerPos = ! (posX.isError() || posY.isError() || posZ.isError());
 			haveSpawnPos = ! (spawnX.isError() || spawnY.isError() || spawnZ.isError());
-			if (havePlayerPos()) {
+			if (havePlayerPos) {
 				currentLayer = playerLocY();
 			}
 
@@ -346,10 +347,14 @@ public class World implements Comparable<World> {
 	}
 
 	/**
-	 * @return <code>true</code> if there is player position information
+	 * @return vector with player position, nor {@code null} if not available
 	 */
-	public synchronized boolean havePlayerPos() {
-		return havePlayerPos && playerDimension == dimension;
+	public synchronized Vector3d playerPos() {
+		if (havePlayerPos && playerDimension == dimension) {
+			return new Vector3d(playerX, playerY, playerZ);
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -367,27 +372,6 @@ public class World implements Comparable<World> {
 	}
 
 	/**
-	 * @return Player X position
-	 */
-	public synchronized double playerPosX() {
-		return playerX;
-	}
-
-	/**
-	 * @return Player Y position
-	 */
-	public synchronized double playerPosY() {
-		return playerY;
-	}
-
-	/**
-	 * @return Player Z position
-	 */
-	public synchronized double playerPosZ() {
-		return playerZ;
-	}
-
-	/**
 	 * @return Player view yaw
 	 */
 	public synchronized double playerYaw() {
@@ -402,10 +386,10 @@ public class World implements Comparable<World> {
 	}
 
 	/**
-	 * @return Player Y location
+	 * @return Player Y location, or -1 if not available
 	 */
 	public synchronized int playerLocY() {
-		if (havePlayerPos()) {
+		if (havePlayerPos) {
 			return (int) (playerY - 0.5);
 		}
 		return -1;
@@ -449,6 +433,18 @@ public class World implements Comparable<World> {
 		synchronized (chunkUpdateListener) {
 			for (ChunkUpdateListener listener: chunkUpdateListener) {
 				listener.chunkUpdated(chunk);
+			}
+		}
+	}
+
+	/**
+	 * Notify region update listeners
+	 * @param region
+	 */
+	private void fireRegionUpdated(ChunkPosition region) {
+		synchronized (chunkUpdateListener) {
+			for (ChunkUpdateListener listener: chunkUpdateListener) {
+				listener.regionUpdated(region);
 			}
 		}
 	}
@@ -651,6 +647,14 @@ public class World implements Comparable<World> {
 	 */
 	public void chunkUpdated(ChunkPosition chunk) {
 		fireChunkUpdated(chunk);
+	}
+
+	/**
+	 * Called when a chunk has been updated.
+	 * @param region
+	 */
+	public void regionUpdated(ChunkPosition region) {
+		fireRegionUpdated(region);
 	}
 
 	/**

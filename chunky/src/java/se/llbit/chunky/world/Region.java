@@ -148,6 +148,8 @@ public class Region implements Iterable<Chunk> {
 				}
 			}
 
+			world.regionUpdated(position);
+
 		} catch (IOException e) {
 			System.err.println("Problem while reading chunk: " + e.getMessage());
 		} finally {

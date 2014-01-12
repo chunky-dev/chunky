@@ -66,6 +66,7 @@ import se.llbit.chunky.world.RegionQueue;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldRenderer;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
+import se.llbit.math.Vector3d;
 import se.llbit.util.OSDetector;
 import se.llbit.util.OSDetector.OS;
 
@@ -306,7 +307,8 @@ public class Chunky implements ChunkTopographyListener {
 		if (world.isEmptyWorld()) {
 			getControls().openWorldSelector();
 		} else {
-			updateView();
+			setView(0, 0);
+			goToPlayer();
 		}
 
 	}
@@ -346,7 +348,8 @@ public class Chunky implements ChunkTopographyListener {
 		// dimension must be set before chunks are loaded
 		world.setDimension(currentDimension);
 
-		updateView();
+		setView(0, 0);
+		goToPlayer();
 
 		PersistentSettings.setLastWorld(world.getWorldDirectory());
 
@@ -355,16 +358,6 @@ public class Chunky implements ChunkTopographyListener {
 			viewUpdated();
 			frame.getMap().redraw();
 			frame.getMinimap().redraw();
-		}
-	}
-
-	private void updateView() {
-		if (world.havePlayerPos()) {
-			setView(
-					world.playerPosX() / 16,
-					world.playerPosZ() / 16);
-		} else {
-			setView(0, 0);
 		}
 	}
 
@@ -504,7 +497,7 @@ public class Chunky implements ChunkTopographyListener {
 	 */
 	public synchronized void setView(final double cx, final double cz) {
 		map = new ChunkView(cx, cz, mapWidth, mapHeight, chunkScale);
-		if (frame != null) {
+		if (frame != null && getControls() != null) {
 			getControls().setPosition(cx, getLayer(), cz);
 		}
 		viewUpdated();
@@ -863,6 +856,9 @@ public class Chunky implements ChunkTopographyListener {
 	 */
 	public synchronized void moveView(double dx, double dz) {
 		setView(map.x + dx, map.z + dz);
+		if (frame != null && getControls() != null) {
+			getControls().stopFollowingPlayer();
+		}
 	}
 
 	/**
@@ -964,5 +960,13 @@ public class Chunky implements ChunkTopographyListener {
 	@Override
 	public void chunksTopographyUpdated(Chunk chunk) {
 		topographyUpdater.addChunk(chunk);
+	}
+
+	public void goToPlayer() {
+		Vector3d pos = world.playerPos();
+		if (pos != null) {
+			setView(pos.x / 16.0,
+					pos.z / 16.0);
+		}
 	}
 }

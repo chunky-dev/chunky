@@ -1,4 +1,5 @@
 1.2.2 - TBD
+    * Added "follow player" option for the 2D map
     * Made 2D map drawing more efficient
     * Adjusted default sun intensity to 1.25
     * It is now possible to save and load custom camera presets

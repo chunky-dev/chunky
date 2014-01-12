@@ -73,7 +73,7 @@ public class RenderBuffer implements ChunkUpdateListener, Iterable<ChunkPosition
 	/**
 	 * Force all visible chunks to be redrawn
 	 */
-	public void flushCache() {
+	public synchronized void flushCache() {
 		graphics.setColor(java.awt.Color.white);
 		graphics.fillRect(0, 0, buffW, buffH);
 		redrawAllChunks(view);

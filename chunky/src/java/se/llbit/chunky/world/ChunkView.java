@@ -165,4 +165,9 @@ public class ChunkView {
 		return prx0 <= x && prx1 >= x &&
 				prz0 <= z && prz1 >= z;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("[(%d, %d), (%d, %d)]", ix0, iz0, ix1, iz1);
+	}
 }

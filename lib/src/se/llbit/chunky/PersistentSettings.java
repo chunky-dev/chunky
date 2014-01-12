@@ -210,5 +210,14 @@ public final class PersistentSettings {
 		settings.removeSetting(name);
 		save();
 	}
+
+	public static boolean getFollowPlayer() {
+		return settings.getBool("followPlayer", false);
+	}
+
+	public static void setFollowPlayer(boolean value) {
+		settings.setBool("followPlayer", value);
+		save();
+	}
 }
 
