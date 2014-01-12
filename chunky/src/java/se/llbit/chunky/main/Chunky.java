@@ -611,8 +611,9 @@ public class Chunky implements ChunkTopographyListener {
 	 */
 	public void highlightBlock(Block hlBlock) {
 		worldRenderer.highlightBlock(hlBlock);
-		if (worldRenderer.isHighlightEnabled())
+		if (worldRenderer.isHighlightEnabled()) {
 			getMap().redraw();
+		}
 	}
 
 	/**
@@ -621,8 +622,9 @@ public class Chunky implements ChunkTopographyListener {
 	 */
 	public void setHighlightColor(Color newColor) {
 		worldRenderer.setHighlightColor(newColor);
-		if (worldRenderer.isHighlightEnabled())
+		if (worldRenderer.isHighlightEnabled()) {
 			getMap().redraw();
+		}
 	}
 
 	/**

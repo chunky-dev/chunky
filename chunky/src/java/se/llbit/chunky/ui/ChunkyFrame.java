@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle;
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
@@ -146,6 +147,14 @@ public class ChunkyFrame extends JFrame {
 		requestFocus();
 
 		worldLoaded(chunky.getWorld());
+
+		chunky.viewUpdated();
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				minimap.redraw();
+			}
+		});
 	}
 
 	/**
@@ -217,9 +226,6 @@ public class ChunkyFrame extends JFrame {
 	public void worldLoaded(final World world) {
 		world.addChunkUpdateListener(minimap);
 		world.addChunkUpdateListener(map);
-
-		minimap.redraw();
-		map.redraw();
 
 		controls.setPlayerY(world.playerLocY());
 		controls.enableDimension(0, world.haveDimension(0));
