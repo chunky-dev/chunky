@@ -1,19 +1,19 @@
-1.2.2 - TBD
+1.2.2 - 2014-01-13
     * Added "follow player" option for the 2D map
     * Made 2D map drawing more efficient
-    * Adjusted default sun intensity to 1.25
+    * Adjusted default Sun intensity to 1.25
     * It is now possible to save and load custom camera presets
     * Made Render Controls dialog more compact
     * Moved camera presets to drop-down list
     * Added Granite, Diorite, and Andesite stone blocks
     * Chunky now dynamically refreshes the main map view based on
-      changes to the Minecraft world in the filesystem
-    * Added Chunky commands: -snapshot, -version
+      changes to the Minecraft world as detected in the filesystem
+    * Added Chunky commands: -snapshot, -version, -download-mc
     * Added launcher commands: --setup, --update, --version, --verbose
     * Fixed error causing the launcher to crash when running in headless mode
       if the launcher GUI had not previously been run
-    * The launcher (v1.7.0) now ignores older releases if a newer version
-      already is installed
+    * The launcher (v1.7.0 and later) now ignores older releases if a newer
+      version already is installed
     * Using -render without a scene name argument prints out available scenes
     * Added Help tab listing keyboard shortcuts in the Render Controls window
     * Pressing U in the Render Preview window makes it go fullscreen
