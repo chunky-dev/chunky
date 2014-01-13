@@ -1,4 +1,4 @@
-/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -95,11 +95,7 @@ public class ReleaseBuilder {
 			Scanner in = new Scanner(new FileInputStream(file));
 			StringBuilder sb = new StringBuilder();
 			while (in.hasNextLine()) {
-				String line = in.nextLine();
-				if (line.isEmpty()) {
-					break;
-				}
-				sb.append(line);
+				sb.append(in.nextLine());
 				sb.append(SYS_NL);
 			}
 			in.close();
