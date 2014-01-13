@@ -149,28 +149,23 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 	}
 
 	/**
-	 * @return <code>true</code> if some of the visible chunks have been updated since
-	 * the render buffer was last rendered
-	 */
-	public boolean haveUpdatedChunks() {
-		return renderBuffer.haveUpdatedChunks();
-	}
-
-	/**
 	 * Redraw all visible chunks.
 	 */
 	public void redraw() {
 		renderBuffer.flushCache();
+		repaint();
 	}
 
 	@Override
 	public void chunkUpdated(ChunkPosition chunk) {
 		renderBuffer.chunkUpdated(chunk);
+		repaint();
 	}
 
 	@Override
 	public void regionUpdated(ChunkPosition region) {
 		renderBuffer.regionUpdated(region);
+		repaint();
 	}
 
 	/**
@@ -180,6 +175,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 	public synchronized void viewUpdated(ChunkView newView) {
 		view = newView;
 		renderBuffer.updateView(view, null, 0);
+		repaint();
 	}
 
 }

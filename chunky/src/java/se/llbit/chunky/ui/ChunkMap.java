@@ -290,29 +290,24 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		renderBuffer.renderPng(targetFile);
 	}
 
-	@Override
-	public void chunkUpdated(ChunkPosition chunk) {
-		renderBuffer.chunkUpdated(chunk);
-	}
-
-	@Override
-	public void regionUpdated(ChunkPosition region) {
-		renderBuffer.regionUpdated(region);
-	}
-
 	/**
 	 * Do a complete redraw of the visible chunks.
 	 */
 	public void redraw() {
 		renderBuffer.flushCache();
+		repaint();
 	}
 
-	/**
-	 * @return <code>true</code> if some of the visible chunks have been updated
-	 * since the render buffer was last rendered
-	 */
-	public boolean haveUpdatedChunks() {
-		return renderBuffer.haveUpdatedChunks();
+	@Override
+	public void chunkUpdated(ChunkPosition chunk) {
+		renderBuffer.chunkUpdated(chunk);
+		repaint();
+	}
+
+	@Override
+	public void regionUpdated(ChunkPosition region) {
+		renderBuffer.regionUpdated(region);
+		repaint();
 	}
 
 	/**
@@ -323,6 +318,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		setView(newView);
 		renderBuffer.updateView(view, chunky.getChunkRenderer(),
 				chunky.getWorld().currentLayer());
+		repaint();
 	}
 
 	private void setView(ChunkView newView) {

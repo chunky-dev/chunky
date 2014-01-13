@@ -208,19 +208,6 @@ public class ChunkyFrame extends JFrame {
 	}
 
 	/**
-	 * Refresh the map and minimap if necessary.
-	 */
-	public void refresh() {
-		if (map != null && map.haveUpdatedChunks()) {
-			map.repaint();
-		}
-
-		if (minimap != null && minimap.haveUpdatedChunks()) {
-			minimap.repaint();
-		}
-	}
-
-	/**
 	 * Called when a new world has been loaded
 	 * @param world
 	 */

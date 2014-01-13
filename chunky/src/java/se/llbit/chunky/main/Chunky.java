@@ -295,8 +295,6 @@ public class Chunky implements ChunkTopographyListener {
 		} catch (InvocationTargetException e) {
 			logger.warn("Failed to set Look and Feel", e);
 		}
-
-		refreshLoop();
 	}
 
 	protected void buildUI() {
@@ -396,20 +394,6 @@ public class Chunky implements ChunkTopographyListener {
 		int exitVal = chunky.run(args);
 		if (exitVal != 0) {
 			System.exit(exitVal);
-		}
-	}
-
-	/**
-	 * Periodically check for changes in the world state and
-	 * refresh the view if necessary.
-	 */
-	private void refreshLoop() {
-		try {
-			while (!Thread.interrupted()) {
-				frame.refresh();
-				Thread.sleep(125);
-			}
-		} catch (InterruptedException e) {
 		}
 	}
 
