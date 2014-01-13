@@ -72,11 +72,16 @@ def publish(version):
 		if call(['makensis', 'Chunky.nsi']) is not 0:
 			print "Error: NSIS failed!"
 			sys.exit(1)
-	if not version.rc and raw_input('Publish files? [y/n] ') == "y":
-		(is_new, exe_url, zip_url, jar_url) = publish_release(version)
-		patch_url(version, jar_url)
-		if raw_input('Post release thread? [y/n] ') == "y":
-			post_release_thread(version, exe_url, zip_url)
+	if not version.rc:
+		if raw_input('Publish files? [y/n] ') == "y":
+			(is_new, exe, zip, jar) = publish_release(version)
+			patch_url(version, jar)
+			if raw_input('Post release thread? [y/n] ') == "y":
+				post_release_thread(version, exe, zip)
+		elif raw_input('Post release thread? [y/n] ') == "y":
+			exe = raw_input('Exe URL: ')
+			zip = raw_input('Zip URL: ')
+			post_release_thread(version, exe, zip)
 
 def lp_upload_file(version, release, filename, description, content_type, file_type):
 	# TODO handle re-uploads
@@ -202,7 +207,7 @@ def post_release_thread(version, exe_url, zip_url):
 	r = praw.Reddit(user_agent='releasebot')
 	pw = getpass(prompt='releasebot login: ')
 	r.login('releasebot', pw)
-	post = r.submit('chunky', 'Version %s released!' % version.full,
+	post = r.submit('chunky', 'Chunky %s released!' % version.full,
 		text=('''###Downloads
 
 * [Windows installer](%s)
