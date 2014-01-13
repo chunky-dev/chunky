@@ -151,12 +151,15 @@ Section "Uninstall"
 
   ; Delete installed files
   Delete $INSTDIR\chunky.jar
+  Delete $INSTDIR\chunky.ico
   Delete $INSTDIR\ReadMe.html
   Delete $INSTDIR\LICENSE.txt
+  Delete "$INSTDIR\*.txt"
+  Delete "$INSTDIR\*.URL"
   Delete $INSTDIR\Uninstall.exe
 
   ; Delete shortcuts
-  Delete "$SMPROGRAMS\Chunky\*.*"
+  Delete "$SMPROGRAMS\Chunky\*.lnk"
 
   ; Remove directories used
   RMDir "$SMPROGRAMS\Chunky"
