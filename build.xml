@@ -9,7 +9,7 @@
 	<property file="${launcher.home}/build.properties" prefix="launcher"/>
 	<property file="${releasetools.home}/build.properties" prefix="releasetools"/>
 
-	<target name="clean" description="clean all subprojects">
+	<target name="clean" description="delete generated files">
 		<ant antfile="${chunky.home}/build.xml" target="clean"
 			inheritAll="false"/>
 		<ant antfile="${launcher.home}/build.xml" target="clean"
@@ -36,7 +36,8 @@
 			inheritAll="false"/>
 	</target>
 
-	<target name="clean-dist" description="deletes cached builds">
+	<target name="clean-dist" depends="clean"
+		description="delete build output and generated files">
 		<delete dir="${build.dir}"/>
 	</target>
 
