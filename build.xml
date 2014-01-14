@@ -39,6 +39,7 @@
 	<target name="clean-dist" depends="clean"
 		description="delete build output and generated files">
 		<delete dir="${build.dir}"/>
+		<delete file="${home}/chunky.jar"/>
 	</target>
 
 	<target name="gendoc">
