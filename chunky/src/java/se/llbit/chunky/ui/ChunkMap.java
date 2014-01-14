@@ -95,8 +95,9 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 				setSelectionRect(ox, oy, -dx, -dy);
 				repaint();
 			} else {
-				if (!dragging && Math.abs(dx) < 5 && Math.abs(dy) < 5)
+				if (!dragging && Math.abs(dx) < 5 && Math.abs(dy) < 5) {
 					return;
+				}
 				dragging = true;
 				setMotionOrigin(e);
 				chunky.viewDragged(dx, dy);

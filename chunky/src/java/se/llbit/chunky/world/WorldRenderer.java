@@ -158,7 +158,7 @@ public class WorldRenderer {
 		if (!hoveredChunk.isEmpty()) {
 
 			g.setFont(font);
-			g.setColor(Color.white);
+			g.setColor(Color.red);
 			g.drawString("Chunk: " + hoveredChunk.getPosition(),
 					5, view.height - 5);
 		}
