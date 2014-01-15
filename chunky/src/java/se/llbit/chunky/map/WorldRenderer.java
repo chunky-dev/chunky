@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -14,15 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world;
+package se.llbit.chunky.map;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.map.RenderBuffer;
 import se.llbit.chunky.resources.MiscImages;
+import se.llbit.chunky.world.Block;
+import se.llbit.chunky.world.Chunk;
+import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.ChunkSelectionTracker;
+import se.llbit.chunky.world.ChunkView;
+import se.llbit.chunky.world.World;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3d;
 
@@ -30,6 +35,8 @@ import se.llbit.math.Vector3d;
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class WorldRenderer {
+
+	public static int SELECTION_COLOR = 0x75FF0000;
 
 	private static final Font font = new Font("Sans serif", Font.BOLD, 11);
 
@@ -66,7 +73,7 @@ public class WorldRenderer {
 
 		float[] selectionColor = new float[4];
 		float[] color = new float[4];
-		se.llbit.math.Color.getRGBAComponents(Layer.selectionColor, selectionColor);
+		se.llbit.math.Color.getRGBAComponents(SELECTION_COLOR, selectionColor);
 		for (ChunkPosition pos: renderBuffer) {
 			int y = pos.z - view.iz0;
 			int x = pos.x - view.ix0;
@@ -120,9 +127,11 @@ public class WorldRenderer {
 						hlBlock, hlColor);
 			}
 			if (selection.isSelected(pos)) {
-				renderBuffer.fillRectAlpha(view.chunkScale * (x - view.ix0),
-						view.chunkScale * (z - view.iz0), view.chunkScale, view.chunkScale,
-						Layer.selectionColor);
+				renderBuffer.fillRectAlpha(
+						view.chunkScale * (x - view.ix0),
+						view.chunkScale * (z - view.iz0),
+						view.chunkScale, view.chunkScale,
+						SELECTION_COLOR);
 			}
 		}
 	}
@@ -161,6 +170,8 @@ public class WorldRenderer {
 			g.setColor(Color.red);
 			g.drawString("Chunk: " + hoveredChunk.getPosition(),
 					5, view.height - 5);
+			//g.drawString("Chunk: " + hoveredChunk.getPosition() + ", biome: " + hoveredChunk.biomeAt(),
+					//5, view.height - 5);
 		}
 	}
 

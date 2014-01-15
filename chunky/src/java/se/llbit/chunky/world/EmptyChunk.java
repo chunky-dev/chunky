@@ -19,6 +19,7 @@ package se.llbit.chunky.world;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import se.llbit.chunky.map.CorruptLayer;
 import se.llbit.chunky.map.RenderBuffer;
 
 /**
@@ -39,9 +40,9 @@ public class EmptyChunk extends Chunk {
 
 	private EmptyChunk() {
 		super(ChunkPosition.get(0, 0), EmptyWorld.instance);
-		surface = Layer.corruptLayer;
-		caves = Layer.corruptLayer;
-		layer = Layer.corruptLayer;
+		surface = CorruptLayer.INSTANCE;
+		caves = CorruptLayer.INSTANCE;
+		layer = CorruptLayer.INSTANCE;
 	}
 
 	@Override

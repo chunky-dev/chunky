@@ -30,11 +30,11 @@ import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.RenderBuffer;
+import se.llbit.chunky.map.WorldRenderer;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.World;
-import se.llbit.chunky.world.WorldRenderer;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 
 /**

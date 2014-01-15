@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.map.WorldRenderer;
 import se.llbit.chunky.renderer.BenchmarkManager;
 import se.llbit.chunky.renderer.ConsoleRenderListener;
 import se.llbit.chunky.renderer.PlaceholderRenderCanvas;
@@ -64,7 +65,6 @@ import se.llbit.chunky.world.RegionChangeMonitor;
 import se.llbit.chunky.world.RegionParser;
 import se.llbit.chunky.world.RegionQueue;
 import se.llbit.chunky.world.World;
-import se.llbit.chunky.world.WorldRenderer;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.math.Vector3d;
 import se.llbit.util.OSDetector;

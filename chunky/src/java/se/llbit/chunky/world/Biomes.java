@@ -105,7 +105,7 @@ public class Biomes {
 	public static final int getColor(int biomeId) {
 		if (biomeId >= biomes.length)
 			return UNKNOWN_COLOR;
-		return biomes[biomeId].mapColor;
+		return biomes[BIOME_MASK & biomeId].mapColor;
 	}
 
 	/**

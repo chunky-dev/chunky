@@ -25,7 +25,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import se.llbit.chunky.map.AbstractLayer;
+import se.llbit.chunky.map.BiomeLayer;
+import se.llbit.chunky.map.BlockLayer;
+import se.llbit.chunky.map.CaveLayer;
+import se.llbit.chunky.map.CorruptLayer;
+import se.llbit.chunky.map.EmptyLayer;
 import se.llbit.chunky.map.RenderBuffer;
+import se.llbit.chunky.map.SurfaceLayer;
+import se.llbit.chunky.map.UnknownLayer;
 import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.NamedTag;
@@ -40,7 +48,7 @@ import se.llbit.nbt.SpecificTag;
  */
 public class Chunk {
 
-	private static final String LEVEL_HEIGHT_MAP = ".Level.HeightMap";
+	private static final String LEVEL_HEIGHTMAP = ".Level.HeightMap";
 	private static final String LEVEL_SECTIONS = ".Level.Sections";
 	private static final String LEVEL_BIOMES = ".Level.Biomes";
 
@@ -61,14 +69,14 @@ public class Chunk {
 
 	private static final int SECTION_Y_MAX = 16;
 	private static final int SECTION_BYTES = X_MAX*SECTION_Y_MAX*Z_MAX;
-	private static final int SECTION_HALF_BYTES = SECTION_BYTES / 2;
+	private static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
 
 	private final ChunkPosition position;
 	private int loadedLayer = -1;
-	protected volatile Layer layer = Layer.unknownLayer;
-	protected volatile Layer surface = Layer.unknownLayer;
-	protected volatile Layer caves = Layer.unknownLayer;
-	protected volatile Layer biomes = Layer.unknownLayer;
+	protected volatile AbstractLayer layer = UnknownLayer.INSTANCE;
+	protected volatile AbstractLayer surface = UnknownLayer.INSTANCE;
+	protected volatile AbstractLayer caves = UnknownLayer.INSTANCE;
+	protected volatile AbstractLayer biomes = UnknownLayer.INSTANCE;
 
 	private final World world;
 
@@ -162,14 +170,14 @@ public class Chunk {
 		ChunkData data = region.getChunkData(position);
 		DataInputStream in = data.inputStream;
 		if (in == null) {
-			layer = Layer.corruptLayer;
+			layer = CorruptLayer.INSTANCE;
 			return null;
 		}
 		timestamp = data.timestamp;
 		Set<String> request = new HashSet<String>();
 		request.add(LEVEL_SECTIONS);
 		request.add(LEVEL_BIOMES);
-		request.add(LEVEL_HEIGHT_MAP);
+		request.add(LEVEL_HEIGHTMAP);
 
 		Map<String, AnyTag> result = NamedTag.quickParse(in, request);
 		chunkData = new SoftReference<Map<String,AnyTag>>(result);
@@ -184,9 +192,9 @@ public class Chunk {
 	 * Reset the rendered layers in this chunk.
 	 */
 	public synchronized void reset() {
-		layer = Layer.unknownLayer;
-		caves = Layer.unknownLayer;
-		surface = Layer.unknownLayer;
+		layer = UnknownLayer.INSTANCE;
+		caves = UnknownLayer.INSTANCE;
+		surface = UnknownLayer.INSTANCE;
 	}
 
 	/**
@@ -228,9 +236,9 @@ public class Chunk {
 		Map<String, AnyTag> result = chunkChanged ? getChunkData() : getChunkDataCached();
 		if (result == null) {
 			// Chunk failed to load
-			layer = Layer.corruptLayer;
-			surface = Layer.corruptLayer;
-			caves = Layer.corruptLayer;
+			layer = CorruptLayer.INSTANCE;
+			surface = CorruptLayer.INSTANCE;
+			caves = CorruptLayer.INSTANCE;
 			return;
 		}
 
@@ -244,42 +252,67 @@ public class Chunk {
 				AnyTag blocks = section.get("Blocks");
 				AnyTag data = section.get("Data");
 				int yOffset = yTag.byteValue() & 0xFF;
-				if (blocks.isByteArray(SECTION_BYTES) && data.isByteArray(SECTION_HALF_BYTES)) {
+				if (blocks.isByteArray(SECTION_BYTES) && data.isByteArray(SECTION_HALF_NIBBLES)) {
 					System.arraycopy(blocks.byteArray(), 0, chunkData, SECTION_BYTES*yOffset, SECTION_BYTES);
-					System.arraycopy(data.byteArray(), 0, blockData, SECTION_HALF_BYTES*yOffset, SECTION_HALF_BYTES);
+					System.arraycopy(data.byteArray(), 0, blockData, SECTION_HALF_NIBBLES*yOffset, SECTION_HALF_NIBBLES);
 				}
 			}
 
-			AnyTag heightmapTag = result.get(LEVEL_HEIGHT_MAP);
+			AnyTag heightmapTag = result.get(LEVEL_HEIGHTMAP);
 			AnyTag biomesTag = result.get(LEVEL_BIOMES);
-			if ((chunkChanged || surface == Layer.unknownLayer)
+			if ((chunkChanged || surface == UnknownLayer.INSTANCE)
 					&& heightmapTag.isIntArray(X_MAX*Z_MAX)
 					&& biomesTag.isByteArray(X_MAX*Z_MAX)) {
 
 				int[] chunkHeightmap = heightmapTag.intArray();
 				byte[] chunkBiomes = biomesTag.byteArray();
-				caves = Layer.loadCaves(chunkData, chunkHeightmap);
-				Layer.updateHeightmap(heightmap, position, chunkData, chunkHeightmap);
-				surface = Layer.loadSurface(world.currentDimension(), position,
+				caves = new CaveLayer(chunkData, chunkHeightmap);
+				updateHeightmap(heightmap, position, chunkData, chunkHeightmap);
+				surface = new SurfaceLayer(world.currentDimension(), position,
 						chunkData, chunkBiomes, blockData);
-				layer = Layer.loadLayer(chunkData, requestedLayer);
-				biomes = Layer.loadBiomes(chunkBiomes);
+				layer = new BlockLayer(chunkData, requestedLayer);
+				biomes = new BiomeLayer(chunkBiomes);
 				queueTopography();
-			} else if (surface == Layer.unknownLayer) {
-				layer = Layer.emptyLayer;
-				caves = Layer.emptyLayer;
-				surface = Layer.emptyLayer;
+			} else if (surface == UnknownLayer.INSTANCE) {
+				layer = EmptyLayer.INSTANCE;
+				caves = EmptyLayer.INSTANCE;
+				surface = EmptyLayer.INSTANCE;
 			} else {
-				layer = Layer.loadLayer(chunkData, requestedLayer);
+				layer = new BlockLayer(chunkData, requestedLayer);
 			}
 
 		} else {
-			layer = Layer.corruptLayer;
-			surface = Layer.corruptLayer;
-			caves = Layer.corruptLayer;
+			layer = CorruptLayer.INSTANCE;
+			surface = CorruptLayer.INSTANCE;
+			caves = CorruptLayer.INSTANCE;
 		}
 
 		world.chunkUpdated(position);
+	}
+
+	/**
+	 * Load heightmap information from a chunk heightmap array
+	 * and insert into a quadtree.
+	 *
+	 * @param heightmap
+	 * @param pos
+	 * @param blocksArray
+	 * @param chunkHeightmap
+	 */
+	public static void updateHeightmap(Heightmap heightmap, ChunkPosition pos,
+			byte[] blocksArray, int[] chunkHeightmap) {
+		for (int x = 0; x < 16; ++x) {
+			for (int z = 0; z < 16; ++z) {
+				int y = chunkHeightmap[z*16+x];
+				y = Math.max(1, y-1);
+				for (; y > 1; --y) {
+					Block block = Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
+					if (block != Block.AIR && !block.isWater())
+						break;
+				}
+				heightmap.set(y, pos.x*16+x, pos.z*16+z);
+			}
+		}
 	}
 
 	private boolean chunkHasChanged() {
@@ -373,9 +406,9 @@ public class Chunk {
 				AnyTag blocksTag = section.get("Blocks");
 				AnyTag dataTag = section.get("Data");
 				int yOffset = yTag.byteValue() & 0xFF;
-				if (blocksTag.isByteArray(SECTION_BYTES) && dataTag.isByteArray(SECTION_HALF_BYTES)) {
+				if (blocksTag.isByteArray(SECTION_BYTES) && dataTag.isByteArray(SECTION_HALF_NIBBLES)) {
 					System.arraycopy(blocksTag.byteArray(), 0, blocks, SECTION_BYTES*yOffset, SECTION_BYTES);
-					System.arraycopy(dataTag.byteArray(), 0, data, SECTION_HALF_BYTES*yOffset, SECTION_HALF_BYTES);
+					System.arraycopy(dataTag.byteArray(), 0, data, SECTION_HALF_NIBBLES*yOffset, SECTION_HALF_NIBBLES);
 				}
 			}
 		}
