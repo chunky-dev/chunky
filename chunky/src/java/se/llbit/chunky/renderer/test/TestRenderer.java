@@ -57,8 +57,6 @@ public class TestRenderer extends Thread implements ViewListener,
 
 	private static final Logger logger = Logger.getLogger(TestRenderer.class);
 
-	private static final double HALF_PI = Math.PI*.5;
-
 	private static final int NUM_BUFFERS = 3;
 
 	private Chunk3DView view;
@@ -141,7 +139,7 @@ public class TestRenderer extends Thread implements ViewListener,
 
 		camera = new Camera(this);
 		nextCamera = new Camera(this);
-		nextCamera.setView(-3*Math.PI/4, -4*Math.PI/5, 0);
+		nextCamera.setView(-3*Math.PI/4, -5*Math.PI/6, 0);
 
 		if (targetFile.isEmpty()) {
 			view = new Chunk3DView(this, parent);

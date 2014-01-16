@@ -1323,27 +1323,44 @@ public class RenderControls extends JDialog implements ViewListener,
 		savePreset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String name = (String) customPreset.getSelectedItem();
-				if (name == null) {
-					name = "";
-				}
-				int index = customPreset.getItemCount() + 1;
-				if (name.trim().isEmpty()) {
-					name = "custom-" + (index);
-				}
-				outer: while (true) {
-					name = "custom-" + (index);
-					for (int i = 0; i < customPreset.getItemCount(); ++i) {
-						String item = (String) customPreset.getItemAt(i);
-						if (name.equals(item)) {
-							index += 1;
-							continue outer;
+				String name = "";
+				int selected = customPreset.getSelectedIndex();
+				if (selected == -1) {
+					// select name
+					name = (String) customPreset.getEditor().getItem();
+					name = (name==null) ? "" : name.trim();
+					if (name.isEmpty()) {
+						// auto-assign name
+						int nextIndex = customPreset.getItemCount() + 1;
+						outer: while (true) {
+							name = "custom-" + (nextIndex++);
+							for (int i = 0; i < customPreset.getItemCount(); ++i) {
+								String item = (String) customPreset.getItemAt(i);
+								if (name.equals(item)) {
+									continue outer;
+								}
+							}
+							break;
+						}
+					} else {
+						for (int i = 0; i < customPreset.getItemCount(); ++i) {
+							String item = (String) customPreset.getItemAt(i);
+							if (name.equals(item)) {
+								selected = i;
+								break;
+							}
 						}
 					}
-					break;
+					if (selected == -1) {
+						// add new preset
+						selected = 	customPreset.getItemCount();
+						customPreset.addItem(name);
+
+					}
+					customPreset.setSelectedIndex(selected);
+				} else {
+					name = (String) customPreset.getSelectedItem();
 				}
-				customPreset.addItem(name);
-				customPreset.setSelectedIndex(customPreset.getItemCount()-1);
 				renderMan.scene().saveCameraPreset(name);
 			}
 		});
