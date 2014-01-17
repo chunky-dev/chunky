@@ -18,6 +18,7 @@ package se.llbit.chunky.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -35,6 +36,7 @@ import se.llbit.chunky.map.RenderBuffer;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
+import se.llbit.chunky.world.EmptyChunk;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.math.QuickMath;
@@ -57,6 +59,8 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	 */
 	public static final int DEFAULT_HEIGHT = 600;
 
+	private static final Font font = new Font("Sans serif", Font.BOLD, 11);
+
 	private final Chunky chunky;
 	private boolean selectRect = false;
 
@@ -68,6 +72,8 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 	private final RenderBuffer renderBuffer;
 	private ChunkView view;
+
+	private volatile Chunk hovered = EmptyChunk.INSTANCE;
 
 	/**
 	 * Mouse listener for the chunk map UI element.
@@ -167,10 +173,9 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			double scale = view.chunkScale;
 			int cx = (int) QuickMath.floor(view.x + (e.getX() - getWidth()/2) / scale);
 			int cz = (int) QuickMath.floor(view.z + (e.getY() - getHeight()/2) / scale);
-			Chunk prevHovered = chunky.getHoveredChunk();
-			chunky.setHoveredChunk(cx, cz);
-			Chunk hovered = chunky.getHoveredChunk();
-			if (prevHovered != hovered) {
+			Chunk newHovered = chunky.getWorld().getChunk(ChunkPosition.get(cx, cz));
+			if (newHovered != hovered) {
+				hovered = newHovered;
 				repaint();
 			}
 		}
@@ -273,13 +278,33 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	}
 
 	/**
-	 * Draw the selection rectangle
+	 * Draw the selection rectangle or chunk hover rectangle.
 	 * @param g
 	 */
 	private void drawSelectionRect(Graphics g) {
 		if (selectRect) {
 			g.setColor(Color.red);
 			g.drawRect(rx, ry, rw, rh);
+		} else {
+			Chunk hoveredChunk = hovered;
+			if (!hoveredChunk.isEmpty()) {
+
+				ChunkPosition cp = hoveredChunk.getPosition();
+
+				g.setFont(font);
+				g.setColor(Color.red);
+				g.drawString("Chunk: " + cp,
+						5, view.height - 5);
+
+				if (view.chunkScale >= 16) {
+					int x0 = (int) (view.chunkScale * (cp.x - view.x0));
+					int y0 = (int) (view.chunkScale * (cp.z - view.z0));
+					int blockScale = view.chunkScale;
+					g.drawRect(x0, y0, blockScale, blockScale);
+				}
+				//g.drawString("Chunk: " + hoveredChunk.getPosition() + ", biome: " + hoveredChunk.biomeAt(),
+						//5, view.height - 5);
+			}
 		}
 	}
 

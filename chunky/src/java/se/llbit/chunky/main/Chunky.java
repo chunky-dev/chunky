@@ -58,7 +58,6 @@ import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkTopographyUpdater;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.DeleteChunksJob;
-import se.llbit.chunky.world.EmptyChunk;
 import se.llbit.chunky.world.EmptyChunkView;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.RegionChangeMonitor;
@@ -124,8 +123,6 @@ public class Chunky implements ChunkTopographyListener {
 
 	private int minimapWidth = Minimap.DEFAULT_WIDTH;
 	private int minimapHeight = Minimap.DEFAULT_HEIGHT;
-
-	private Chunk hoveredChunk = EmptyChunk.instance;
 
 	public ChunkyOptions options;
 
@@ -446,22 +443,6 @@ public class Chunky implements ChunkTopographyListener {
 		} else {
 			renderControls.showPreviewWindow();
 		}
-	}
-
-	/**
-	 * Set the hovered chunk by chunk coordinates
-	 * @param cx
-	 * @param cz
-	 */
-	public synchronized void setHoveredChunk(int cx, int cz) {
-		hoveredChunk = world.getChunk(ChunkPosition.get(cx, cz));
-	}
-
-	/**
-	 * @return The currently hovered chunk
-	 */
-	public synchronized Chunk getHoveredChunk() {
-		return hoveredChunk;
 	}
 
 	/**

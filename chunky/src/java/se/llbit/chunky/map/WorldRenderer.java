@@ -38,8 +38,6 @@ public class WorldRenderer {
 
 	public static int SELECTION_COLOR = 0x75FF0000;
 
-	private static final Font font = new Font("Sans serif", Font.BOLD, 11);
-
 	private boolean highlightEnabled;
 	private Block hlBlock = Block.DIAMONDORE;
 	private Color hlColor = Color.red;
@@ -162,17 +160,6 @@ public class WorldRenderer {
 		renderSpawn(world, g, view,
 				renderer == Chunk.surfaceRenderer
 				|| world.spawnPosY() == world.currentLayer());
-
-		Chunk hoveredChunk = chunky.getHoveredChunk();
-		if (!hoveredChunk.isEmpty()) {
-
-			g.setFont(font);
-			g.setColor(Color.red);
-			g.drawString("Chunk: " + hoveredChunk.getPosition(),
-					5, view.height - 5);
-			//g.drawString("Chunk: " + hoveredChunk.getPosition() + ", biome: " + hoveredChunk.biomeAt(),
-					//5, view.height - 5);
-		}
 	}
 
 	public void renderPlayer(World world, Graphics g, ChunkView view, boolean sameLayer) {

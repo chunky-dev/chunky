@@ -63,7 +63,7 @@ public class Region implements Iterable<Chunk> {
 		position = pos;
 		for (int z = 0; z < CHUNKS_Z; ++z) {
 			for (int x = 0; x < CHUNKS_X; ++x) {
-				chunks[x + z*32] = EmptyChunk.instance;
+				chunks[x + z*32] = EmptyChunk.INSTANCE;
 			}
 		}
 	}
@@ -103,7 +103,7 @@ public class Region implements Iterable<Chunk> {
 		Chunk chunk = getChunk(chunkPos);
 		if (!chunk.isEmpty()) {
 			chunk.reset();
-			setChunk(chunkPos, EmptyChunk.instance);
+			setChunk(chunkPos, EmptyChunk.INSTANCE);
 			world.chunkDeleted(chunkPos);
 		}
 	}
@@ -399,7 +399,7 @@ public class Region implements Iterable<Chunk> {
 
 			@Override
 			public void remove() {
-				chunks[index] = EmptyChunk.instance;
+				chunks[index] = EmptyChunk.INSTANCE;
 			}
 
 		};

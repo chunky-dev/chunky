@@ -31,7 +31,7 @@ public class EmptyChunk extends Chunk {
 	/**
 	 * Singleton instance
 	 */
-	public static final EmptyChunk instance = new EmptyChunk();
+	public static final EmptyChunk INSTANCE = new EmptyChunk();
 
 	@Override
 	public boolean isEmpty() {
