@@ -149,11 +149,6 @@ public class Scene extends SceneDescription {
 	protected double waterVisibility = DEFAULT_WATER_VISIBILITY;
 
 	/**
-	 * Recursive ray depth limit (not including Russian Roulette)
-	 */
-	public static int rayDepth = PersistentSettings.DEFAULT_RAY_DEPTH;
-
-	/**
 	 * World
 	 */
 	private World loadedWorld;
@@ -193,11 +188,6 @@ public class Scene extends SceneDescription {
 	private boolean finalized = false;
 
 	private boolean finalizeBuffer = false;
-
-	static {
-		// TODO make non-static?
-		rayDepth = PersistentSettings.getRayDepth();
-	}
 
 	/**
 	 * Create an empty scene with default canvas width and height.
@@ -1239,6 +1229,7 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
+	 * Copy variables that do not require a render restart
 	 * @param other
 	 */
 	public void copyTransients(Scene other) {
@@ -1249,6 +1240,7 @@ public class Scene extends SceneDescription {
 		saveSnapshots = other.saveSnapshots;
 		sppTarget = other.sppTarget;
 		cameraPresets = other.cameraPresets;
+		rayDepth = other.rayDepth;
 	}
 
 	/**

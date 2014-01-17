@@ -76,6 +76,11 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	 */
 	protected int sppTarget = PersistentSettings.getSppTargetDefault();
 
+	/**
+	 * Recursive ray depth limit (not including Russian Roulette)
+	 */
+	protected int rayDepth = PersistentSettings.getRayDepthDefault();
+
 	protected final Sky sky = new Sky(this);
 	protected final Camera camera = new Camera(this);
 	protected final Sun sun = new Sun(this);
@@ -144,6 +149,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		desc.add("renderTime", renderTime);
 		desc.add("spp", spp);
 		desc.add("sppTarget", sppTarget);
+		desc.add("rayDepth", rayDepth);
 		desc.add("pathTrace", pathTrace);
 		desc.add("dumpFrequency", dumpFrequency);
 		desc.add("saveSnapshots", saveSnapshots);
@@ -197,6 +203,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		exposure = desc.get("exposure").doubleValue(Scene.DEFAULT_EXPOSURE);
 		postprocess = Postprocess.get(desc.get("postprocess").intValue(Postprocess.DEFAULT));
 		sppTarget = desc.get("sppTarget").intValue(PersistentSettings.getSppTargetDefault());
+		rayDepth = desc.get("rayDepth").intValue(PersistentSettings.getRayDepthDefault());
 		pathTrace = desc.get("pathTrace").boolValue(false);
 		dumpFrequency = desc.get("dumpFrequency").intValue(Scene.DEFAULT_DUMP_FREQUENCY);
 		saveSnapshots = desc.get("saveSnapshots").boolValue(false);

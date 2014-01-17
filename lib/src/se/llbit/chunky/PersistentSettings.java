@@ -136,7 +136,10 @@ public final class PersistentSettings {
 		return settings.getInt("sppTargetDefault", DEFAULT_SPP_TARGET);
 	}
 
-	public static int getRayDepth() {
+	/**
+	 * @return the default configured ray depth
+	 */
+	public static int getRayDepthDefault() {
 		return settings.getInt("rayDepth", DEFAULT_RAY_DEPTH);
 	}
 

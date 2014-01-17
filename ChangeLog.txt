@@ -1,4 +1,5 @@
 1.2.3 - TBD
+    * Fixed error causing rayDepth setting to not be saved for scenes
     * Fixed error preventing naming and overwriting of custom camera presets
     * Changed map status text color to red to improve visibility
 
