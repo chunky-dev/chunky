@@ -330,7 +330,9 @@ public class RenderBuffer implements ChunkUpdateListener, Iterable<ChunkPosition
 	 * @return an iterator over chunks that need to be redrawn
 	 */
 	@Override
-	public Iterator<ChunkPosition> iterator() {
+	synchronized public Iterator<ChunkPosition> iterator() {
+		final Set<ChunkPosition> regions = updatedRegions;
+		updatedRegions = new HashSet<ChunkPosition>();
 		return new Iterator<ChunkPosition>() {
 			private final ChunkView bounds;
 			private ChunkPosition next = null;
@@ -354,7 +356,7 @@ public class RenderBuffer implements ChunkUpdateListener, Iterable<ChunkPosition
 						z += 1;
 					}
 					ChunkPosition region = ChunkPosition.get(cx>>5, cz>>5);
-					if (updatedRegions.contains(region)) {
+					if (regions.contains(region)) {
 						next = ChunkPosition.get(cx, cz);
 						return;
 					}
