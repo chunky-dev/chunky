@@ -33,10 +33,8 @@ import javax.swing.JPanel;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.RenderBuffer;
-import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.EmptyChunk;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.math.QuickMath;
@@ -61,19 +59,20 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 	private static final Font font = new Font("Sans serif", Font.BOLD, 11);
 
-	private final Chunky chunky;
-	private boolean selectRect = false;
+	protected final Chunky chunky;
 
-	// selection rectangle
-	private int rx;
-	private int ry;
-	private int rw;
-	private int rh;
+	/**
+	 * Indicates whether or not the selection rectangle should be drawn.
+	 */
+	protected volatile boolean selectRect = false;
+
+	protected volatile boolean mouseInsideWindow = false;
 
 	private final RenderBuffer renderBuffer;
-	private ChunkView view;
+	private volatile ChunkView view;
 
-	private volatile Chunk hovered = EmptyChunk.INSTANCE;
+	private volatile ChunkPosition start = ChunkPosition.get(0, 0);
+	private volatile ChunkPosition end = ChunkPosition.get(0, 0);
 
 	/**
 	 * Mouse listener for the chunk map UI element.
@@ -94,16 +93,18 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			int dx = ox - e.getX();
 			int dy = oy - e.getY();
 
-			if (dx == 0 && dy == 0)
+			if (dx == 0 && dy == 0) {
 				return;
+			}
 
 			if (selectRect || !dragging && chunky.getShiftModifier()) {
-				setSelectionRect(ox, oy, -dx, -dy);
-				repaint();
-			} else {
-				if (!dragging && Math.abs(dx) < 5 && Math.abs(dy) < 5) {
-					return;
+				selectRect = true;
+				ChunkPosition chunk = getChunk(e.getX(), e.getY());
+				if (chunk != end) {
+					end = chunk;
+					repaint();
 				}
+			} else if (dragging || Math.abs(dx) >= 5 || Math.abs(dy) >= 5) {
 				dragging = true;
 				setMotionOrigin(e);
 				chunky.viewDragged(dx, dy);
@@ -116,36 +117,40 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
+			mouseInsideWindow = true;
 			setMotionOrigin(e);
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
+			mouseInsideWindow = false;
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if (e.getButton() == MouseEvent.BUTTON3)
+			if (e.getButton() == MouseEvent.BUTTON3) {
 				chunky.open3DView();
-			else
+			} else {
 				setMotionOrigin(e);
+			}
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			if (e.getButton() == MouseEvent.BUTTON3)
+			if (e.getButton() == MouseEvent.BUTTON3) {
 				return;
+			}
 
 			if (!selectRect) {
 				if (!dragging) {
 					int x = e.getX();
 					int y = e.getY();
-					ChunkView view = chunky.getMapView();
-					double scale = view.chunkScale;
-					int cx = (int) QuickMath.floor(view.x + (x - getWidth()/2) / scale);
-					int cz = (int) QuickMath.floor(view.z + (y - getHeight()/2) / scale);
+					ChunkView theView = chunky.getMapView();
+					double scale = theView.chunkScale;
+					int cx = (int) QuickMath.floor(theView.x + (x - getWidth()/2) / scale);
+					int cz = (int) QuickMath.floor(theView.z + (y - getHeight()/2) / scale);
 
-					if (view.chunkScale > 1) {
+					if (theView.chunkScale >= 16) {
 						chunky.selectChunk(cx, cz);
 						renderBuffer.updateChunk(cx, cz);
 					} else {
@@ -160,6 +165,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 				selectWithinRect();
 				clearSelectionRect();
 			}
+			start = end;
 			dragging = false;
 		}
 
@@ -170,14 +176,20 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
-			double scale = view.chunkScale;
-			int cx = (int) QuickMath.floor(view.x + (e.getX() - getWidth()/2) / scale);
-			int cz = (int) QuickMath.floor(view.z + (e.getY() - getHeight()/2) / scale);
-			Chunk newHovered = chunky.getWorld().getChunk(ChunkPosition.get(cx, cz));
-			if (newHovered != hovered) {
-				hovered = newHovered;
+			ChunkPosition chunk = getChunk(e.getX(), e.getY());
+			if (chunk != start) {
+				start = chunk;
+				end = chunk;
 				repaint();
 			}
+		}
+
+		private ChunkPosition getChunk(int x, int y) {
+			ChunkView theView = view;
+			double scale = theView.chunkScale;
+			int cx = (int) QuickMath.floor(theView.x + (x - getWidth()/2) / scale);
+			int cz = (int) QuickMath.floor(theView.z + (y - getHeight()/2) / scale);
+			return ChunkPosition.get(cx, cz);
 		}
 
 		@Override
@@ -246,27 +258,16 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		}
 	}
 
-	protected void setSelectionRect(int ox, int oy, int dx, int dy) {
-		rx = Math.min(ox, ox+dx);
-		ry = Math.min(oy, oy+dy);
-		rw = Math.abs(dx);
-		rh = Math.abs(dy);
-		selectRect = true;
-	}
-
 	protected synchronized void selectWithinRect() {
 		if (selectRect) {
-			ChunkView view = chunky.getMapView();
-			int width = getWidth();
-			int height = getHeight();
-			double scale = view.chunkScale;
-			int cx0 = (int) QuickMath.floor(view.x + (rx - width/2) / scale);
-			int cx1 = (int) QuickMath.floor(view.x + (rx - width/2 + rw) / scale);
-			int cz0 = (int) QuickMath.floor(view.z + (ry - height/2) / scale);
-			int cz1 = (int) QuickMath.floor(view.z + (ry - height/2 + rh) / scale);
-
-			chunky.selectChunks(cx0, cx1, cz0, cz1);
-			renderBuffer.updateChunks(cx0, cx1, cz0, cz1);
+			ChunkPosition cp0 = start;
+			ChunkPosition cp1 = end;
+			int x0 = Math.min(cp0.x, cp1.x);
+			int x1 = Math.max(cp0.x, cp1.x);
+			int z0 = Math.min(cp0.z, cp1.z);
+			int z1 = Math.max(cp0.z, cp1.z);
+			chunky.selectChunks(x0, x1, z0, z1);
+			renderBuffer.updateChunks(x0, x1, z0, z1);
 		}
 	}
 
@@ -282,25 +283,46 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	 * @param g
 	 */
 	private void drawSelectionRect(Graphics g) {
+		if (!mouseInsideWindow) {
+			return;
+		}
+		ChunkView cv = view;
+
+		ChunkPosition cp = end;
+		g.setFont(font);
+		g.setColor(Color.red);
+		g.drawString("Chunk: " + cp,
+				5, cv.height - 5);
+
 		if (selectRect) {
+			ChunkPosition cp0 = start;
+			ChunkPosition cp1 = end;
+			int x0 = Math.min(cp0.x, cp1.x);
+			int x1 = Math.max(cp0.x, cp1.x);
+			int z0 = Math.min(cp0.z, cp1.z);
+			int z1 = Math.max(cp0.z, cp1.z);
+			x0 = (int) (cv.chunkScale * (x0 - cv.x0));
+			z0 = (int) (cv.chunkScale * (z0 - cv.z0));
+			x1 = (int) (cv.chunkScale * (x1 - cv.x0 + 1));
+			z1 = (int) (cv.chunkScale * (z1 - cv.z0 + 1));
 			g.setColor(Color.red);
-			g.drawRect(rx, ry, rw, rh);
+			g.drawRect(x0, z0, x1-x0, z1-z0);
 		} else {
-			Chunk hoveredChunk = hovered;
-			if (!hoveredChunk.isEmpty()) {
+			// test if hovered chunk is visible
+			if (cv.isChunkVisible(cp)) {
 
-				ChunkPosition cp = hoveredChunk.getPosition();
-
-				g.setFont(font);
-				g.setColor(Color.red);
-				g.drawString("Chunk: " + cp,
-						5, view.height - 5);
-
-				if (view.chunkScale >= 16) {
-					int x0 = (int) (view.chunkScale * (cp.x - view.x0));
-					int y0 = (int) (view.chunkScale * (cp.z - view.z0));
-					int blockScale = view.chunkScale;
+				if (cv.chunkScale >= 16) {
+					int x0 = (int) (cv.chunkScale * (cp.x - cv.x0));
+					int y0 = (int) (cv.chunkScale * (cp.z - cv.z0));
+					int blockScale = cv.chunkScale;
 					g.drawRect(x0, y0, blockScale, blockScale);
+				} else {
+					// hovered region
+					int rx = cp.x >> 5;
+					int rz = cp.z >> 5;
+					int x0 = (int) (cv.chunkScale * (rx*32 - cv.x0));
+					int y0 = (int) (cv.chunkScale * (rz*32 - cv.z0));
+					g.drawRect(x0, y0, cv.chunkScale*32, cv.chunkScale*32);
 				}
 				//g.drawString("Chunk: " + hoveredChunk.getPosition() + ", biome: " + hoveredChunk.biomeAt(),
 						//5, view.height - 5);
