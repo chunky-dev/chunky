@@ -1368,8 +1368,46 @@ public class RenderControls extends JDialog implements ViewListener,
 		loadPreset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String name = "" + customPreset.getSelectedItem();
-				renderMan.scene().loadCameraPreset(name);
+				String name = "";
+				int selected = customPreset.getSelectedIndex();
+				if (selected == -1) {
+					// select name
+					name = (String) customPreset.getEditor().getItem();
+					name = (name==null) ? "" : name.trim();
+				} else {
+					name = ((String) customPreset.getSelectedItem()).trim();
+				}
+				if (!name.isEmpty()) {
+					renderMan.scene().loadCameraPreset(name);
+				}
+			}
+		});
+		JButton deletePreset = new JButton("delete");
+		deletePreset.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String name = "";
+				int selected = customPreset.getSelectedIndex();
+				if (selected == -1) {
+					// select name
+					name = (String) customPreset.getEditor().getItem();
+					name = (name==null) ? "" : name.trim();
+				} else {
+					name = ((String) customPreset.getSelectedItem()).trim();
+				}
+				if (!name.isEmpty()) {
+					renderMan.scene().deleteCameraPreset(name);
+					if (selected != -1) {
+						customPreset.removeItemAt(selected);
+					} else {
+						for (int i = 0; i < customPreset.getItemCount(); ++i) {
+							if (name.equals(customPreset.getItemAt(i))) {
+								customPreset.removeItemAt(i);
+								break;
+							}
+						}
+					}
+				}
 			}
 		});
 
@@ -1473,6 +1511,8 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(savePreset)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(loadPreset)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(deletePreset)
 				)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(cameraToPlayerBtn)
@@ -1510,6 +1550,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(customPreset)
 				.addComponent(savePreset)
 				.addComponent(loadPreset)
+				.addComponent(deletePreset)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)

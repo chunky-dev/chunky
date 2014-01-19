@@ -324,7 +324,19 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	}
 
 	public void loadCameraPreset(String name) {
-		camera.fromJson(cameraPresets.get(name).object());
+		JsonValue value = cameraPresets.get(name);
+		if (!value.isUnknown()) {
+			camera.fromJson(value.object());
+		}
+	}
+
+	public void deleteCameraPreset(String name) {
+		for (int i = 0; i < cameraPresets.getNumMember(); ++i) {
+			if (cameraPresets.getMember(i).getName().equals(name)) {
+				cameraPresets.getMemberList().removeChild(i);
+				return;
+			}
+		}
 	}
 
 	public JsonObject getCameraPresets() {
