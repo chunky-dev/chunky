@@ -401,7 +401,7 @@ public class Chunky implements ChunkTopographyListener {
 	 */
 	public synchronized void setRenderer(Chunk.Renderer renderer) {
 		this.chunkRenderer = renderer;
-		getMap().repaint();
+		getMap().redraw();
 	}
 
 	/**
