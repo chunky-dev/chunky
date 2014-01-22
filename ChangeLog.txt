@@ -1,4 +1,6 @@
 1.2.3 - TBD
+    * Fixed sign texture loading error (item icon was loaded rather than the
+      entity texture)
     * Added chunk hover indicator in 2D map
     * Fixed error causing rayDepth setting to not be saved for scenes
     * Fixed error preventing naming and overwriting of custom camera presets

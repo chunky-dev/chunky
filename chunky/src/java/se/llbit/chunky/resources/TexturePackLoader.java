@@ -113,7 +113,7 @@ public class TexturePackLoader {
 				new SunTexture("environment/sun"),// MC 1.5
 				new SunTexture("terrain/sun")));
 		allTextures.put("sign", new AlternateTextures(
-				new SignTexture("assets/minecraft/textures/items/sign"),// MC 1.6
+				new SignTexture("assets/minecraft/textures/entity/sign"),// MC 1.6
 				new SignTexture("item/sign")));
 		allTextures.put("clouds", new AlternateTextures(
 				new CloudsTexture("assets/minecraft/textures/environment/clouds"),// MC 1.6
