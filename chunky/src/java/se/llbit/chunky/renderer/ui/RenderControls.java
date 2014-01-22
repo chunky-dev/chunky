@@ -367,6 +367,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		safeComponents.add(cpuLoad.getLabel());
 		safeComponents.add(cpuLoad.getSlider());
 		safeComponents.add(cpuLoad.getField());
+		safeComponents.add(saveSnapshotsCB);
 	}
 
 	/**
@@ -910,7 +911,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		JButton doubleCanvasSizeBtn = new JButton("Double");
-		halveCanvasSizeBtn.setToolTipText("Double the canvas size");
+		doubleCanvasSizeBtn.setToolTipText("Double the canvas size");
 		doubleCanvasSizeBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
