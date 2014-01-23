@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,6 +16,7 @@
  */
 package se.llbit.ui;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
@@ -29,6 +30,8 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import se.llbit.math.QuickMath;
 
@@ -37,13 +40,16 @@ import se.llbit.math.QuickMath;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public abstract class Adjuster implements ChangeListener, ActionListener {
+public abstract class Adjuster implements ChangeListener, ActionListener,
+		DocumentListener {
 	private final JLabel lbl;
+	private final JLabel errorLbl = new JLabel();
 	private final JSlider slider;
 	private final JTextField textField;
 	private double min;
 	private double max;
 	private final boolean integerMode;
+	private final Color errBGColor = new Color(0xfff5bc);
 
 	/**
 	 * Logarithmic mode flag.
@@ -82,7 +88,12 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 		slider.addChangeListener(this);
 		textField = new JTextField(5);
 		textField.addActionListener(this);
+		textField.getDocument().addDocumentListener(this);
 		integerMode = false;
+		errorLbl.setForeground(Color.red);
+		errorLbl.setBackground(errBGColor);
+		errorLbl.setOpaque(true);
+		errorLbl.setVisible(false);
 	}
 
 	/**
@@ -95,13 +106,18 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	public Adjuster(String label, String tip, int min, int max) {
 		this.min = min;
 		this.max = max;
-		lbl = new JLabel(label);
+		lbl = new JLabel(label + ":");
 		slider = new JSlider(min, max);
 		slider.setToolTipText(tip);
 		slider.addChangeListener(this);
 		textField = new JTextField(5);
 		textField.addActionListener(this);
-		integerMode = true;
+		textField.getDocument().addDocumentListener(this);
+		integerMode = false;
+		errorLbl.setForeground(Color.red);
+		errorLbl.setBackground(errBGColor);
+		errorLbl.setOpaque(true);
+		errorLbl.setVisible(false);
 	}
 
 	/**
@@ -132,12 +148,20 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	 * @return horizontal layout group
 	 */
 	public Group horizontalGroup(GroupLayout layout) {
-		return layout.createSequentialGroup()
-				.addComponent(lbl)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(slider)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(textField);
+		return layout.createParallelGroup()
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(lbl)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(slider)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(textField)
+					.addPreferredGap(ComponentPlacement.RELATED)
+				)
+				.addGroup(layout.createSequentialGroup()
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(errorLbl)
+				)
+				;
 	}
 
 	/**
@@ -145,19 +169,52 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 	 * @return vertical layout group
 	 */
 	public Group verticalGroup(GroupLayout layout) {
-		return layout.createParallelGroup()
-				.addComponent(lbl)
-				.addComponent(slider)
-				.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+		return layout.createSequentialGroup()
+				.addGroup(layout.createParallelGroup()
+						.addComponent(lbl)
+						.addComponent(slider)
+						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				)
+				.addComponent(errorLbl);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		JTextField source = (JTextField) e.getSource();
+		onTextEdit(true);
+	}
+
+	@Override
+	public void insertUpdate(DocumentEvent e) {
+		if (onTextEdit(false)) {
+			setError("Warning: value out of bounds!");
+		}
+	}
+
+	@Override
+	public void changedUpdate(DocumentEvent e) {
+		if (onTextEdit(false)) {
+			setError("Warning: value out of bounds!");
+		}
+	}
+
+	@Override
+	public void removeUpdate(DocumentEvent e) {
+		if (onTextEdit(false)) {
+			setError("Warning: value out of bounds!");
+		}
+	}
+
+	/**
+	 * @param update whether to update the text after parsing to reflect the
+	 * current state
+	 * @return {@code true} if the value was clamped
+	 */
+	private boolean onTextEdit(boolean update) {
 		try {
-			double value = numberFormat.parse(source.getText()).doubleValue();
+			double value = numberFormat.parse(textField.getText()).doubleValue();
 			double sliderValue = QuickMath.clamp(value, min, max);
 			boolean clamped = false;
+			System.out.println("" + value);
 			if (clampMin && value < min) {
 				value = min;
 				clamped = true;
@@ -168,21 +225,35 @@ public abstract class Adjuster implements ChangeListener, ActionListener {
 			}
 			setSlider(sliderValue);
 			valueChanged(value);
-			if (clamped) {
+			if (update && clamped) {
 				if (integerMode) {
-					source.setText("" + (int) value);
+					textField.setText("" + (int) value);
 				} else {
-					source.setText("" + value);
+					textField.setText("" + value);
 				}
 			}
+			setError("");
+			errorLbl.setVisible(false);
+			return clamped;
 		} catch (NumberFormatException ex) {
 		} catch (ParseException ex) {
-			// TODO warn user that the value was not updated
+			setError("Not a valid number!");
+		}
+		return false;
+	}
+
+	private void setError(String message) {
+		if (message.isEmpty()) {
+			errorLbl.setVisible(false);
+		} else {
+			errorLbl.setText(message);
+			errorLbl.setVisible(true);
 		}
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
+		// slider value changed
 		JSlider source = (JSlider) e.getSource();
 		double value;
 		if (logarithmic) {
