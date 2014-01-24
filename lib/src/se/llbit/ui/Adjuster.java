@@ -214,7 +214,6 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 			double value = numberFormat.parse(textField.getText()).doubleValue();
 			double sliderValue = QuickMath.clamp(value, min, max);
 			boolean clamped = false;
-			System.out.println("" + value);
 			if (clampMin && value < min) {
 				value = min;
 				clamped = true;
