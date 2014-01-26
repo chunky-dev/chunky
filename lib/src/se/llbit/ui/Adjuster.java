@@ -16,9 +16,10 @@
  */
 package se.llbit.ui;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
@@ -43,13 +44,12 @@ import se.llbit.math.QuickMath;
 public abstract class Adjuster implements ChangeListener, ActionListener,
 		DocumentListener {
 	private final JLabel lbl;
-	private final JLabel errorLbl = new JLabel();
+	private ErrorLabel errorLbl;
 	private final JSlider slider;
 	private final JTextField textField;
 	private double min;
 	private double max;
 	private final boolean integerMode;
-	private final Color errBGColor = new Color(0xfff5bc);
 
 	/**
 	 * Logarithmic mode flag.
@@ -72,6 +72,21 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	private static final NumberFormat numberFormat =
 			NumberFormat.getInstance();
 
+	private Adjuster(String label, String tip, double min, double max, boolean intMode) {
+		this.min = min;
+		this.max = max;
+		lbl = new JLabel(label + ":");
+		integerMode = intMode;
+		if (intMode) {
+			slider = new JSlider((int) min, (int) max);
+		} else {
+			slider = new JSlider(1, 400);
+		}
+		slider.setToolTipText(tip);
+		textField = new JTextField(5);
+		setUp();
+	}
+
 	/**
 	 * Create new double value adjuster
 	 * @param label
@@ -80,20 +95,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	 * @param max
 	 */
 	public Adjuster(String label, String tip, double min, double max) {
-		this.min = min;
-		this.max = max;
-		lbl = new JLabel(label + ":");
-		slider = new JSlider(1, 100);
-		slider.setToolTipText(tip);
-		slider.addChangeListener(this);
-		textField = new JTextField(5);
-		textField.addActionListener(this);
-		textField.getDocument().addDocumentListener(this);
-		integerMode = false;
-		errorLbl.setForeground(Color.red);
-		errorLbl.setBackground(errBGColor);
-		errorLbl.setOpaque(true);
-		errorLbl.setVisible(false);
+		this(label, tip, min, max, false);
 	}
 
 	/**
@@ -104,19 +106,23 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	 * @param max
 	 */
 	public Adjuster(String label, String tip, int min, int max) {
-		this.min = min;
-		this.max = max;
-		lbl = new JLabel(label + ":");
-		slider = new JSlider(min, max);
-		slider.setToolTipText(tip);
+		this(label, tip, min, max, true);
+	}
+
+	private void setUp() {
 		slider.addChangeListener(this);
-		textField = new JTextField(5);
 		textField.addActionListener(this);
 		textField.getDocument().addDocumentListener(this);
-		integerMode = false;
-		errorLbl.setForeground(Color.red);
-		errorLbl.setBackground(errBGColor);
-		errorLbl.setOpaque(true);
+		textField.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent e) {
+			}
+			@Override
+			public void focusGained(FocusEvent e) {
+				textField.selectAll();
+			}
+		});
+		errorLbl = new ErrorLabel(textField);
 		errorLbl.setVisible(false);
 	}
 
@@ -148,20 +154,13 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	 * @return horizontal layout group
 	 */
 	public Group horizontalGroup(GroupLayout layout) {
-		return layout.createParallelGroup()
-				.addGroup(layout.createSequentialGroup()
+		return layout.createSequentialGroup()
 					.addComponent(lbl)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(slider)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(textField)
-					.addPreferredGap(ComponentPlacement.RELATED)
-				)
-				.addGroup(layout.createSequentialGroup()
-					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addComponent(errorLbl)
-				)
-				;
+					.addPreferredGap(ComponentPlacement.RELATED);
 	}
 
 	/**
@@ -169,13 +168,10 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	 * @return vertical layout group
 	 */
 	public Group verticalGroup(GroupLayout layout) {
-		return layout.createSequentialGroup()
-				.addGroup(layout.createParallelGroup()
+		return layout.createParallelGroup()
 						.addComponent(lbl)
 						.addComponent(slider)
-						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				)
-				.addComponent(errorLbl);
+						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
 	}
 
 	@Override
@@ -192,9 +188,6 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
-		if (onTextEdit(false)) {
-			setError("Warning: value out of bounds!");
-		}
 	}
 
 	@Override
@@ -205,11 +198,11 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	}
 
 	/**
-	 * @param update whether to update the text after parsing to reflect the
-	 * current state
+	 * @param forceUpdate whether to update the text after parsing to reflect the
+	 * current state, even if the new value is out of bounds.
 	 * @return {@code true} if the value was clamped
 	 */
-	private boolean onTextEdit(boolean update) {
+	private boolean onTextEdit(boolean forceUpdate) {
 		try {
 			double value = numberFormat.parse(textField.getText()).doubleValue();
 			double sliderValue = QuickMath.clamp(value, min, max);
@@ -222,21 +215,23 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 				value = max;
 				clamped = true;
 			}
-			setSlider(sliderValue);
-			valueChanged(value);
-			if (update && clamped) {
-				if (integerMode) {
-					textField.setText("" + (int) value);
-				} else {
-					textField.setText("" + value);
+			if (!clamped || forceUpdate) {
+				setSlider(sliderValue);
+				valueChanged(value);
+				if (clamped) {
+					if (integerMode) {
+						textField.setText("" + (int) value);
+					} else {
+						textField.setText("" + value);
+					}
 				}
+				setError("");
+				errorLbl.setVisible(false);
 			}
-			setError("");
-			errorLbl.setVisible(false);
 			return clamped;
 		} catch (NumberFormatException ex) {
 		} catch (ParseException ex) {
-			setError("Not a valid number!");
+			setError("Error: Not a valid number!");
 		}
 		return false;
 	}
