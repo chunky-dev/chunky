@@ -68,7 +68,7 @@ public class FirstTimeSetupDialog extends JFrame {
 			}
 		});
 
-		okBtn = new JButton("Use selected directory");
+		okBtn = new JButton("Use Selected Directory");
 		okBtn.setOpaque(false);
 		okBtn.addActionListener(new ActionListener() {
 			@Override

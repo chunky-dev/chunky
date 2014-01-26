@@ -58,7 +58,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame implements UpdateListener {
 
-	private static final String LAUNCHER_VERSION = "v1.8.3";
+	private static final String LAUNCHER_VERSION = "v1.8.4";
 
 	protected String java;
 	private final ChunkyDeployer deployer;
@@ -73,7 +73,7 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 	private final JTextField javaOptions = new JTextField(20);
 	private final JTextField chunkyOptions = new JTextField(20);
 	private final JComboBox versionCB = new JComboBox();
-	private final JButton checkForUpdateBtn = new JButton("Check for update");
+	private final JButton checkForUpdateBtn = new JButton("Check for Update");
 	private final JLabel busyLbl = new JLabel();
 	private final JCheckBox showAdvancedSettingsCB = new JCheckBox("Show advanced settings");
 
