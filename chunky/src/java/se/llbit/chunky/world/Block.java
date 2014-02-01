@@ -2674,19 +2674,13 @@ public class Block {
 			isSolid = true;
 			localIntersect = true;
 		}
-
-		final Texture[] textures = {
+		final Texture[] texture = {
 			Texture.hayBlockSide,
-			Texture.hayBlockSide,
-			Texture.hayBlockSide,
-			Texture.hayBlockSide,
-			Texture.hayBlockTop,
 			Texture.hayBlockTop,
 		};
-
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, textures);
+			return WoodModel.intersect(ray, texture);
 		}
 	};
 	public static final int CARPET_ID = 0xAB;

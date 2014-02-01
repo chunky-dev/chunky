@@ -70,9 +70,9 @@ public class WoodModel {
 
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray, Texture[] texture) {
+		boolean hit = false;
 		int data = ray.getBlockData();
 		int direction = data >> 2;
-		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < sides.length; ++i) {
 			Quad side = sides[i];
