@@ -131,7 +131,7 @@ public class TexturedBlockModel {
 
 		calcUVCoords(ray);
 
-		ray.getCurrentBlock().getTexture(ray).getColor(ray);
+		ray.getCurrentBlock().getTexture(ray.getBlockData()).getColor(ray);
 	}
 
 	/**

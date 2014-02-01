@@ -43,6 +43,11 @@ public class AnvilModel {
 		},
 	};
 
+	public static final Texture[] topTexture = {
+		Texture.anvilTop, Texture.anvilTopDamaged1, Texture.anvilTopDamaged2,
+		Texture.anvilTopDamaged2
+	};
+
 	/**
 	 * Find intersection between ray and block
 	 * @param ray
@@ -60,7 +65,7 @@ public class AnvilModel {
 					double tmp = ray.v;
 					ray.v = ray.u * orientation + tmp * (1-orientation);
 					ray.u = tmp * orientation + ray.u * (1-orientation);
-					Texture.anvilTopTexture[damage].getColor(ray);
+					topTexture[damage].getColor(ray);
 				} else {
 					Texture.anvilSide.getColor(ray);
 				}

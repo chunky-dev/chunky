@@ -189,11 +189,19 @@ public class Block {
 			isSolid = true;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.oakPlanks, Texture.sprucePlanks, Texture.birchPlanks,
+			Texture.jungleTreePlanks, Texture.acaciaPlanks,
+			Texture.darkOakPlanks, Texture.acaciaPlanks, Texture.darkOakPlanks
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray,
-					Texture.woodPlank[ray.getBlockData() & 7]);
+			return TexturedBlockModel.intersect(ray, getTexture(ray.getBlockData()));
 		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return texture[blockData & 7];
+		};
 	};
 	public static final Block SAPLING = new Block(0x06, "Sapling", Texture.oakSapling) {
 		{
@@ -201,10 +209,19 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.oakSapling, Texture.spruceSapling, Texture.birchSapling,
+			Texture.jungleSapling, Texture.acaciaSapling, Texture.darkOakSapling,
+			Texture.acaciaSapling, Texture.darkOakSapling
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return SaplingModel.intersect(ray);
+			return SaplingModel.intersect(ray, getTexture(ray.getBlockData()));
 		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return texture[blockData & 7];
+		};
 	};
 	public static final Block BEDROCK = new Block(0x07, "Bedrock", Texture.bedrock);
 	public static final int WATER_ID = 0x08;
@@ -268,14 +285,15 @@ public class Block {
 			isSolid = true;
 			localIntersect = true;
 		}
-
 		final Texture[] texture = { Texture.sand, Texture.redSand };
-
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray,
-					texture[ray.getBlockData()&1]);
+			return TexturedBlockModel.intersect(ray, getTexture(ray.getBlockData()));
 		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return texture[blockData&1];
+		};
 	};
 	public static final Block GRAVEL = new Block(0x0D, "Gravel", Texture.gravel) {
 		{
@@ -309,9 +327,15 @@ public class Block {
 			isSolid = true;
 			localIntersect = true;
 		}
+		final Texture[][] texture = {
+			{ Texture.oakWood, Texture.oakWoodTop },
+			{ Texture.spruceWood, Texture.spruceWoodTop },
+			{ Texture.birchWood, Texture.birchWoodTop },
+			{ Texture.jungleWood, Texture.jungleTreeTop }
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return WoodModel.intersect(ray, Texture.wood);
+			return WoodModel.intersect(ray, texture[ray.getBlockData()&3]);
 		}
 		final String[] woodType = {
 			"oak", "spruce", "birch", "jungle",
@@ -320,6 +344,10 @@ public class Block {
 		public String description(int data) {
 			return woodType[data&3];
 		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return texture[blockData&3][1];
+		};
 	};
 	public static final int LEAVES_ID = 0x12;
 	public static final Block LEAVES = new Block(LEAVES_ID, "Leaves", Texture.oakLeaves) {
@@ -328,9 +356,13 @@ public class Block {
 			isSolid = true;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.oakLeaves, Texture.spruceLeaves, Texture.birchLeaves,
+			Texture.jungleTreeLeaves
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return LeafModel.intersect(ray, scene, Texture.leaves);
+			return LeafModel.intersect(ray, scene, getTexture(ray.getBlockData()));
 		}
 		final String[] woodType = {
 			"oak", "spruce", "birch", "jungle",
@@ -339,6 +371,10 @@ public class Block {
 		public String description(int data) {
 			return woodType[data&3];
 		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return texture[blockData & 3];
+		};
 	};
 	public static final Block SPONGE = new Block(0x13, "Sponge", Texture.sponge) {
 		{
@@ -451,10 +487,13 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.poweredRailOff, Texture.poweredRailOn
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return RailModel.intersect(ray,
-					Texture.poweredRails[ray.getBlockData() >>> 3],
+					texture[ray.getBlockData() >>> 3],
 					(ray.getBlockData() & 7) % 6);
 		}
 	};
@@ -545,8 +584,8 @@ public class Block {
 			isSolid = true;
 		}
 		@Override
-		public Texture getTexture(Ray ray) {
-			return Texture.wool[ray.getBlockData()];
+		public Texture getTexture(int blockData) {
+			return Texture.wool[blockData];
 		}
 		@Override
 		public String description(int data) {
@@ -1024,10 +1063,13 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.crops0, Texture.crops1, Texture.crops2, Texture.crops3,
+			Texture.crops4, Texture.crops5, Texture.crops6, Texture.crops7
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return CropsModel.intersect(ray,
-					Texture.wheat[ray.getBlockData() % 8]);
+			return CropsModel.intersect(ray, texture[ray.getBlockData() % 8]);
 		}
 	};
 	public static final Block SOIL = new Block(0x3C, "Soil", Texture.farmlandWet) {
@@ -1098,10 +1140,13 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.woodenDoorBottom, Texture.woodenDoorTop
+		};
+
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return DoorModel.intersect(ray,
-					Texture.woodenDoor[ray.getBlockData() >>> 3]);
+			return DoorModel.intersect(ray, texture[ray.getBlockData() >>> 3]);
 		}
 	};
 	public static final Block LADDER = new Block(0x41, "Ladder", Texture.ladder) {
@@ -1121,10 +1166,15 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.rails, Texture.rails, Texture.rails, Texture.rails,
+			Texture.rails, Texture.rails, Texture.railsCurved,
+			Texture.railsCurved, Texture.railsCurved, Texture.railsCurved
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			int type = ray.getBlockData() % 10;
-			return RailModel.intersect(ray, Texture.railsType[type], type);
+			return RailModel.intersect(ray, texture[type], type);
 		}
 	};
 	public static final int STONESTAIRS_ID = 0x43;
@@ -1180,10 +1230,12 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.ironDoorBottom, Texture.ironDoorTop
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return DoorModel.intersect(ray,
-					Texture.ironDoor[ray.getBlockData() >>> 3]);
+			return DoorModel.intersect(ray, texture[ray.getBlockData() >>> 3]);
 		}
 	};
 	public static final Block WOODENPRESSUREPLATE = new Block(0x48, "Wooden Pressure Plate", Icon.woodenPressurePlate) {
@@ -1453,8 +1505,8 @@ public class Block {
 			ior = 1.520f;
 		}
 		@Override
-		public Texture getTexture(Ray ray) {
-			return Texture.stainedGlass[ray.getBlockData()];
+		public Texture getTexture(int blockData) {
+			return Texture.stainedGlass[blockData];
 		}
 		@Override
 		public String description(int data) {
@@ -1495,10 +1547,13 @@ public class Block {
 			isSolid = true;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.stoneBrick, Texture.mossyStoneBrick,
+			Texture.crackedStoneBrick, Texture.circleStoneBrick
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray,
-					Texture.stoneBrickType[(ray.currentMaterial>>8)&3]);
+			return TexturedBlockModel.intersect(ray, texture[(ray.currentMaterial>>8)&3]);
 		}
 	};
 	public static final Block HUGEBROWNMUSHROOM = new Block(0x63, "Huge Brown Mushroom", Texture.hugeBrownMushroom) {
@@ -1858,10 +1913,14 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.netherWart0, Texture.netherWart1, Texture.netherWart1,
+			Texture.netherWart2
+		};
+
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return CropsModel.intersect(ray,
-					Texture.netherWart[ray.getBlockData() & 3]);
+			return CropsModel.intersect(ray, texture[ray.getBlockData() & 3]);
 		}
 	};
 	public static final Block ENCHNATMENTTABLE = new Block(0x74, "Enchantment Table", Texture.enchantmentTableSide) {
@@ -2198,10 +2257,15 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.carrots0, Texture.carrots0, Texture.carrots1,
+			Texture.carrots1, Texture.carrots2, Texture.carrots2,
+			Texture.carrots2, Texture.carrots3
+		};
+
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return CropsModel.intersect(ray,
-					Texture.carrots[ray.getBlockData() % 8]);
+			return CropsModel.intersect(ray, texture[ray.getBlockData() % 8]);
 		}
 	};
 	public static final int POTATOES_ID = 0x8E;
@@ -2211,10 +2275,15 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.potatoes0, Texture.potatoes0, Texture.potatoes1,
+			Texture.potatoes1, Texture.potatoes2, Texture.potatoes2,
+			Texture.potatoes2, Texture.potatoes3
+		};
+
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return CropsModel.intersect(ray,
-					Texture.potatoes[ray.getBlockData() % 8]);
+			return CropsModel.intersect(ray, texture[ray.getBlockData() % 8]);
 		}
 	};
 	public static final int WOODENBUTTON_ID = 0x8F;
@@ -2417,10 +2486,13 @@ public class Block {
 			isSolid = false;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.activatorRail, Texture.activatorRailPowered
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return RailModel.intersect(ray,
-					Texture.activatorRails[ray.getBlockData() >>> 3],
+					texture[ray.getBlockData() >>> 3],
 					(ray.getBlockData() & 7) % 6);
 		}
 	};
@@ -2444,14 +2516,14 @@ public class Block {
 		}
 	};
 	public static final int STAINED_CLAY_ID = 0x9F;
-	public static final Block STAINED_CLAY = new Block(STAINED_CLAY_ID, "Stained Clay", Texture.unknown) {
+	public static final Block STAINED_CLAY = new Block(STAINED_CLAY_ID, "Stained Clay", Texture.clay) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 		@Override
-		public Texture getTexture(Ray ray) {
-			return Texture.stainedClay[ray.getBlockData()];
+		public Texture getTexture(int blockData) {
+			return Texture.stainedClay[blockData];
 		}
 		@Override
 		public String description(int data) {
@@ -2485,9 +2557,14 @@ public class Block {
 			isSolid = true;
 			localIntersect = true;
 		}
+		final Texture[] texture = {
+			Texture.acaciaLeaves, Texture.darkOakLeaves, Texture.acaciaLeaves,
+			Texture.darkOakLeaves
+		};
+
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return LeafModel.intersect(ray, scene, Texture.leaves2);
+			return LeafModel.intersect(ray, scene, getTexture(ray.getBlockData()));
 		}
 		final String[] woodType = {
 			"acacia", "dark oak", "unknown", "unknown"
@@ -2496,6 +2573,10 @@ public class Block {
 		public String description(int data) {
 			return woodType[data&3];
 		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return texture[blockData & 3];
+		};
 	};
 	public static final int WOOD2_ID = 0xA2;
 	public static final Block WOOD2 = new Block(WOOD2_ID, "Wood", Texture.oakWood) {
@@ -2504,9 +2585,15 @@ public class Block {
 			isSolid = true;
 			localIntersect = true;
 		}
+		final Texture[][] texture = {
+			{ Texture.acaciaWood, Texture.acaciaWoodTop },
+			{ Texture.darkOakWood, Texture.darkOakWoodTop },
+			{ Texture.acaciaWood, Texture.acaciaWoodTop },
+			{ Texture.darkOakWood, Texture.darkOakWoodTop }
+		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return WoodModel.intersect(ray, Texture.wood2);
+			return WoodModel.intersect(ray, texture[ray.getBlockData()&3]);
 		}
 		final String[] woodType = {
 			"acacia", "dark oak", "unknown", "unknown"
@@ -2515,6 +2602,10 @@ public class Block {
 		public String description(int data) {
 			return woodType[data&3];
 		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return texture[blockData&3][1];
+		};
 	};
 	public static final int ACACIASTAIRS_ID = 0xA3;
 	public static final Block ACACIASTAIRS = new Block(ACACIASTAIRS_ID, "Acacia Stairs", Texture.unknown) {
@@ -3418,10 +3509,10 @@ public class Block {
 
 	/**
 	 * Retrieves the texture dependent on the block data
-	 * @param ray
+	 * @param blockData [0,16]
 	 * @return the selected texture
 	 */
-	public Texture getTexture(Ray ray) {
+	public Texture getTexture(int blockData) {
 		return frontTexture;
 	}
 

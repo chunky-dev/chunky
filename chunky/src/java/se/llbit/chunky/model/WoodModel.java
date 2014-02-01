@@ -69,10 +69,9 @@ public class WoodModel {
 	};
 
 	@SuppressWarnings("javadoc")
-	public static boolean intersect(Ray ray, Texture[][] texture) {
+	public static boolean intersect(Ray ray, Texture[] texture) {
 		int data = ray.getBlockData();
 		int direction = data >> 2;
-		int type = data & 3;
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < sides.length; ++i) {
@@ -84,7 +83,7 @@ public class WoodModel {
 				int uv_x = uv[direction][i];
 				ray.u = (1-uv_x) * ray.u + uv_x * ray.v;
 				ray.v = uv_x * u  + (1-uv_x) * ray.v;
-				texture[type][textureIndex[direction][i]].getColor(ray);
+				texture[textureIndex[direction][i]].getColor(ray);
 				ray.n.set(side.n);
 				ray.t = ray.tNear;
 				hit = true;

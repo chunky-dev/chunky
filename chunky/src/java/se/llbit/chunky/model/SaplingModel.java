@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -23,12 +23,12 @@ import se.llbit.math.Ray;
 @SuppressWarnings("javadoc")
 public class SaplingModel extends SpriteModel {
 
-	public static boolean intersect(Ray ray) {
+	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
 		for (Quad quad : quads) {
 			if (quad.intersect(ray)) {
-				float[] color = Texture.sapling[ray.getBlockData() & 7].getColor(ray.u, ray.v);
+				float[] color = texture.getColor(ray.u, ray.v);
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
 					ray.n.set(quad.n);

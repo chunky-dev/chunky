@@ -21,7 +21,6 @@ import java.io.OutputStream;
 
 import org.apache.commons.math3.util.FastMath;
 
-import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
@@ -109,31 +108,6 @@ public class SurfaceLayer extends BitmapLayer {
 						y -= 1;
 						break;
 
-					case Block.STAINED_CLAY_ID:
-						int clayType = 0xFF & blockData[Chunk.chunkIndex(x, y, z)/2];
-						clayType >>= (x % 2) * 4;
-						clayType &= 0xF;
-
-						Color.getRGBComponents(
-								Texture.stainedClay[clayType].getAvgColor(),
-								blockColor);
-						blockColor[3] = 1.f;// wool colors don't include alpha
-
-						y -= 1;
-						break;
-
-					case Block.CARPET_ID:
-					case Block.WOOL_ID:
-						int woolType = 0xFF & blockData[Chunk.chunkIndex(x, y, z)/2];
-						woolType >>= (x % 2) * 4;
-						woolType &= 0xF;
-
-						Color.getRGBComponents(Texture.wool[woolType].getAvgColor(), blockColor);
-						blockColor[3] = 1.f;// wool colors don't include alpha
-
-						y -= 1;
-						break;
-
 					case Block.ICE_ID:
 						Color.getRGBAComponents(Block.ICE.getAvgTopRGB(), blockColor);
 						color = blend(color, blockColor);
@@ -163,7 +137,11 @@ public class SurfaceLayer extends BitmapLayer {
 						break;
 
 					default:
-						Color.getRGBAComponents(block.getAvgTopRGB(), blockColor);
+						int data = 0xFF & blockData[Chunk.chunkIndex(x, y, z)/2];
+						data >>= (x % 2) * 4;
+						data &= 0xF;
+
+						Color.getRGBAComponents(block.getTexture(data).getAvgColor(), blockColor);
 
 						if (block.isOpaque && y > 64) {
 							float fade = QuickMath.min(0.6f, (y-World.SEA_LEVEL) / 60.f);
@@ -179,8 +157,9 @@ public class SurfaceLayer extends BitmapLayer {
 
 					color = blend(color, blockColor);
 
-					if (block.isOpaque)
+					if (block.isOpaque) {
 						break colorloop;
+					}
 				}
 
 				bitmap[x*16+z] = Color.getRGBA(color[0], color[1], color[2], color[3]);

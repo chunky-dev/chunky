@@ -437,67 +437,6 @@ public class Texture {
 	public static final Texture acaciaWood = new Texture("wood");
 	public static final Texture darkOakWood = new Texture("wood");
 
-	public static final Texture[][] wood = {
-		{ Texture.oakWood, Texture.oakWoodTop },
-		{ Texture.spruceWood, Texture.spruceWoodTop },
-		{ Texture.birchWood, Texture.birchWoodTop },
-		{ Texture.jungleWood, Texture.jungleTreeTop }
-	};
-
-	public static final Texture[][] wood2 = {
-		{ Texture.acaciaWood, Texture.acaciaWoodTop },
-		{ Texture.darkOakWood, Texture.darkOakWoodTop },
-		{ Texture.acaciaWood, Texture.acaciaWoodTop },
-		{ Texture.darkOakWood, Texture.darkOakWoodTop }
-	};
-
-	public static final Texture[] woodPlank = {
-		oakPlanks, sprucePlanks, birchPlanks, jungleTreePlanks,
-		acaciaPlanks, darkOakPlanks, acaciaPlanks, darkOakPlanks
-	};
-
-	public static final Texture[] leaves =
-		{ oakLeaves, spruceLeaves, birchLeaves, jungleTreeLeaves };
-
-	public static final Texture[] leaves2 =
-		{ acaciaLeaves, darkOakLeaves, acaciaLeaves, darkOakLeaves };
-
-	public static final Texture[] sapling = {
-		oakSapling, spruceSapling, birchSapling, jungleSapling,
-		acaciaSapling, darkOakSapling, acaciaSapling, darkOakSapling
-	};
-
-	public static final Texture[] wheat =
-		{ crops0, crops1, crops2, crops3, crops4, crops5, crops6, crops7 };
-
-	public static final Texture[] carrots =
-		{ carrots0, carrots0, carrots1, carrots1,
-		carrots2, carrots2, carrots2, carrots3 };
-
-	public static final Texture[] potatoes =
-		{ potatoes0, potatoes0, potatoes1, potatoes1,
-		potatoes2, potatoes2, potatoes2, potatoes3 };
-
-	public static final Texture[] netherWart =
-		{ netherWart0, netherWart1, netherWart1, netherWart2 };
-
-	public static final Texture[] woodenDoor =
-		{ woodenDoorBottom, woodenDoorTop };
-
-	public static final Texture[] ironDoor =
-		{ ironDoorBottom, ironDoorTop };
-
-	public static final Texture[] poweredRails =
-		{ poweredRailOff, poweredRailOn };
-
-	public static final Texture[] activatorRails =
-		{ activatorRail, activatorRailPowered };
-
-	public static final Texture[] railsType = {
-		rails, rails, rails, rails, rails, rails,
-		railsCurved, railsCurved, railsCurved, railsCurved
-	};
-
 	public static final Texture[] wool = {
 		whiteWool, orangeWool, magentaWool, lightBlueWool,
 		yellowWool, limeWool, pinkWool, grayWool, lightGrayWool,
@@ -527,12 +466,6 @@ public class Texture {
 		cyanClay, purpleClay, blueClay, brownClay, greenClay,
 		redClay, blackClay
 	};
-
-	public static final Texture[] stoneBrickType =
-		{ stoneBrick, mossyStoneBrick, crackedStoneBrick, circleStoneBrick };
-
-	public static final Texture[] anvilTopTexture =
-		{ anvilTop, anvilTopDamaged1, anvilTopDamaged2, anvilTopDamaged2 };
 
 	protected BufferedImage image;
 	protected int width;

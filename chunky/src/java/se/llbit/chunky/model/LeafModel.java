@@ -25,10 +25,10 @@ import se.llbit.math.Ray;
 public class LeafModel {
 	private static final AABB block = new AABB(0, 1, 0, 1, 0, 1);
 
-	public static boolean intersect(Ray ray, Scene scene, Texture[] texture) {
+	public static boolean intersect(Ray ray, Scene scene, Texture texture) {
 		ray.t = Double.POSITIVE_INFINITY;
 		if (block.intersect(ray)) {
-			float[] color = texture[ray.getBlockData() & 3].getColor(ray.u, ray.v);
+			float[] color = texture.getColor(ray.u, ray.v);
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
 				float[] biomeColor = ray.getBiomeFoliageColor(scene);

@@ -107,7 +107,8 @@ public class BlockLayer extends AbstractLayer {
 						continue;
 					}
 
-					int[] tex = ((DataBufferInt) Block.get(block).getTexture().getScaledImage(blockScale).getRaster().getDataBuffer()).getData();
+					int[] tex = ((DataBufferInt) Block.get(block).getTexture()
+							.getScaledImage(blockScale).getRaster().getDataBuffer()).getData();
 					for (int i = 0; i < blockScale; ++i) {
 						for (int j = 0; j < blockScale; ++j) {
 							rbuff.setRGB(xp0 + j, yp0 + i, tex[j + blockScale * i]);
