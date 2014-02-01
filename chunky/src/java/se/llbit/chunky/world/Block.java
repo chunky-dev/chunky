@@ -3560,7 +3560,9 @@ public class Block {
 				this == SPRUCEWOODSTAIRS ||
 				this == BIRCHWOODSTAIRS ||
 				this == JUNGLEWOODSTAIRS ||
-				this == QUARTZSTAIRS;
+				this == QUARTZSTAIRS ||
+				this == ACACIASTAIRS ||
+				this == DARKOAKSTAIRS;
 	}
 
 	public boolean isGroundBlock() {
