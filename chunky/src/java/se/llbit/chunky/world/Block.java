@@ -201,7 +201,7 @@ public class Block {
 		@Override
 		public Texture getTexture(int blockData) {
 			return texture[blockData & 7];
-		};
+		}
 	};
 	public static final Block SAPLING = new Block(0x06, "Sapling", Texture.oakSapling) {
 		{
@@ -221,7 +221,7 @@ public class Block {
 		@Override
 		public Texture getTexture(int blockData) {
 			return texture[blockData & 7];
-		};
+		}
 	};
 	public static final Block BEDROCK = new Block(0x07, "Bedrock", Texture.bedrock);
 	public static final int WATER_ID = 0x08;
@@ -293,7 +293,7 @@ public class Block {
 		@Override
 		public Texture getTexture(int blockData) {
 			return texture[blockData&1];
-		};
+		}
 	};
 	public static final Block GRAVEL = new Block(0x0D, "Gravel", Texture.gravel) {
 		{
@@ -347,7 +347,7 @@ public class Block {
 		@Override
 		public Texture getTexture(int blockData) {
 			return texture[blockData&3][1];
-		};
+		}
 	};
 	public static final int LEAVES_ID = 0x12;
 	public static final Block LEAVES = new Block(LEAVES_ID, "Leaves", Texture.oakLeaves) {
@@ -363,6 +363,7 @@ public class Block {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return LeafModel.intersect(ray, scene, getTexture(ray.getBlockData()));
+
 		}
 		final String[] woodType = {
 			"oak", "spruce", "birch", "jungle",
@@ -374,7 +375,7 @@ public class Block {
 		@Override
 		public Texture getTexture(int blockData) {
 			return texture[blockData & 3];
-		};
+		}
 	};
 	public static final Block SPONGE = new Block(0x13, "Sponge", Texture.sponge) {
 		{
@@ -464,10 +465,14 @@ public class Block {
 					tex[ray.getBlockData() % 3]);
 		}
 	};
-	public static final Block NOTEBLOCK = new Block(0x19, "Note Block", Icon.noteBlock, Texture.jukeboxSide) {
+	public static final Block NOTEBLOCK = new Block(0x19, "Note Block", Icon.noteBlock) {
 		{
 			isOpaque = true;
 			isSolid = true;
+		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.jukeboxSide;
 		}
 	};
 	public static final Block BED = new Block(0x1A, "Bed", Icon.bed) {
@@ -942,7 +947,7 @@ public class Block {
 		}
 	};
 	public static final int OAKWOODSTAIRS_ID = 0x35;
-	public static final Block OAKWOODSTAIRS = new Block(OAKWOODSTAIRS_ID, "Wooden Stairs", Icon.woodenStairs, Texture.oakPlanks) {
+	public static final Block OAKWOODSTAIRS = new Block(OAKWOODSTAIRS_ID, "Wooden Stairs", Icon.woodenStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -951,6 +956,10 @@ public class Block {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.oakPlanks);
+		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.oakPlanks;
 		}
 	};
 	public static final int CHEST_ID = 0x36;
@@ -1178,7 +1187,7 @@ public class Block {
 		}
 	};
 	public static final int STONESTAIRS_ID = 0x43;
-	public static final Block STONESTAIRS = new Block(STONESTAIRS_ID, "Cobblestone Stairs", Icon.stoneStairs, Texture.stone) {
+	public static final Block STONESTAIRS = new Block(STONESTAIRS_ID, "Cobblestone Stairs", Icon.stoneStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1187,6 +1196,10 @@ public class Block {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.cobblestone);
+		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.stone;
 		}
 	};
 	public static final Block WALLSIGN = new Block(0x44, "Wall Sign", Icon.wallSign) {
@@ -1824,7 +1837,7 @@ public class Block {
 		}
 	};
 	public static final int BRICKSTAIRS_ID = 0x6C;
-	public static final Block BRICKSTAIRS = new Block(BRICKSTAIRS_ID, "Brick Stairs", Icon.stoneStairs, Texture.brick) {
+	public static final Block BRICKSTAIRS = new Block(BRICKSTAIRS_ID, "Brick Stairs", Icon.stoneStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1834,9 +1847,13 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.brick);
 		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.brick;
+		}
 	};
 	public static final int STONEBRICKSTAIRS_ID = 0x6D;
-	public static final Block STONEBRICKSTAIRS = new Block(STONEBRICKSTAIRS_ID, "Stone Brick Stairs", Icon.stoneBrickStairs, Texture.stoneBrick) {
+	public static final Block STONEBRICKSTAIRS = new Block(STONEBRICKSTAIRS_ID, "Stone Brick Stairs", Icon.stoneBrickStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1846,8 +1863,12 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.stoneBrick);
 		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.stoneBrick;
+		}
 	};
-	public static final Block MYCELIUM = new Block(0x6E, "Mycelium", Texture.myceliumSide, Texture.myceliumTop) {
+	public static final Block MYCELIUM = new Block(0x6E, "Mycelium", Texture.myceliumSide) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1858,10 +1879,13 @@ public class Block {
 				Texture.myceliumSide, Texture.myceliumSide,
 				Texture.myceliumTop, Texture.dirt
 		};
-
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray, tex);
+		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.myceliumTop;
 		}
 	};
 	public static final int LILY_PAD_ID = 0x6F;
@@ -1896,7 +1920,7 @@ public class Block {
 		}
 	};
 	public static final int NETHERBRICKSTAIRS_ID = 0x72;
-	public static final Block NETHERBRICKSTAIRS = new Block(NETHERBRICKSTAIRS_ID, "Nether Brick Stairs", Icon.stoneStairs, Texture.netherBrick) {
+	public static final Block NETHERBRICKSTAIRS = new Block(NETHERBRICKSTAIRS_ID, "Nether Brick Stairs", Icon.stoneStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1905,6 +1929,10 @@ public class Block {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.netherBrick);
+		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.netherBrick;
 		}
 	};
 	public static final Block NETHERWART = new Block(0x73, "Nether Wart", Texture.netherWart2) {
@@ -2092,7 +2120,7 @@ public class Block {
 		}
 	};
 	public static final int SANDSTONESTAIRS_ID = 0x80;
-	public static final Block SANDSTONESTAIRS = new Block(SANDSTONESTAIRS_ID, "Sandstone Stairs", Icon.stoneStairs, Texture.sandstoneSide) {
+	public static final Block SANDSTONESTAIRS = new Block(SANDSTONESTAIRS_ID, "Sandstone Stairs", Icon.stoneStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2102,6 +2130,10 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.sandstoneSide,
 					Texture.sandstoneTop, Texture.sandstoneBottom);
+		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.sandstoneSide;
 		}
 	};
 	public static final Block EMERALDORE = new Block(0x81, "Emerald Ore", Texture.emeraldOre) {
@@ -2165,7 +2197,7 @@ public class Block {
 		}
 	};
 	public static final int SPRUCEWOODSTAIRS_ID = 0x86;
-	public static final Block SPRUCEWOODSTAIRS = new Block(SPRUCEWOODSTAIRS_ID, "Spruce Wood Stairs", Icon.woodenStairs, Texture.sprucePlanks) {
+	public static final Block SPRUCEWOODSTAIRS = new Block(SPRUCEWOODSTAIRS_ID, "Spruce Wood Stairs", Icon.woodenStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2175,9 +2207,13 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.sprucePlanks);
 		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.sprucePlanks;
+		}
 	};
 	public static final int BIRCHWOODSTAIRS_ID = 0x87;
-	public static final Block BIRCHWOODSTAIRS = new Block(BIRCHWOODSTAIRS_ID, "Birch Wood Stairs", Icon.woodenStairs, Texture.birchPlanks) {
+	public static final Block BIRCHWOODSTAIRS = new Block(BIRCHWOODSTAIRS_ID, "Birch Wood Stairs", Icon.woodenStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2187,9 +2223,13 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.birchPlanks);
 		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.birchPlanks;
+		}
 	};
 	public static final int JUNGLEWOODSTAIRS_ID = 0x88;
-	public static final Block JUNGLEWOODSTAIRS = new Block(JUNGLEWOODSTAIRS_ID, "Jungle Wood Stairs", Icon.woodenStairs, Texture.jungleTreePlanks) {
+	public static final Block JUNGLEWOODSTAIRS = new Block(JUNGLEWOODSTAIRS_ID, "Jungle Wood Stairs", Icon.woodenStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2198,6 +2238,10 @@ public class Block {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.jungleTreePlanks);
+		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.jungleTreePlanks;
 		}
 	};
 	public static final int COMMANDBLOCK_ID = 0x89;
@@ -2468,7 +2512,7 @@ public class Block {
 		}
 	};
 	public static final int QUARTZSTAIRS_ID = 0x9C;
-	public static final Block QUARTZSTAIRS = new Block(QUARTZSTAIRS_ID, "Quartz Stairs", Icon.stoneStairs, Texture.quartzSide) {
+	public static final Block QUARTZSTAIRS = new Block(QUARTZSTAIRS_ID, "Quartz Stairs", Icon.stoneStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2478,6 +2522,10 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.quartzSide,
 					Texture.quartzTop, Texture.quartzBottom);
+		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.quartzSide;
 		}
 	};
 	public static final Block ACTIVATORRAIL = new Block(0x9D, "Activator Rail", Texture.unknown) {
@@ -2576,7 +2624,7 @@ public class Block {
 		@Override
 		public Texture getTexture(int blockData) {
 			return texture[blockData & 3];
-		};
+		}
 	};
 	public static final int WOOD2_ID = 0xA2;
 	public static final Block WOOD2 = new Block(WOOD2_ID, "Wood", Texture.oakWood) {
@@ -2605,10 +2653,10 @@ public class Block {
 		@Override
 		public Texture getTexture(int blockData) {
 			return texture[blockData&3][1];
-		};
+		}
 	};
 	public static final int ACACIASTAIRS_ID = 0xA3;
-	public static final Block ACACIASTAIRS = new Block(ACACIASTAIRS_ID, "Acacia Stairs", Texture.unknown) {
+	public static final Block ACACIASTAIRS = new Block(ACACIASTAIRS_ID, "Acacia Stairs", Icon.woodenStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2618,9 +2666,13 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.acaciaPlanks);
 		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.acaciaPlanks;
+		}
 	};
 	public static final int DARKOAKSTAIRS_ID = 0xA4;
-	public static final Block DARKOAKSTAIRS = new Block(DARKOAKSTAIRS_ID, "Dark Oak Stairs", Texture.unknown) {
+	public static final Block DARKOAKSTAIRS = new Block(DARKOAKSTAIRS_ID, "Dark Oak Stairs", Icon.woodenStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2629,6 +2681,10 @@ public class Block {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return StairModel.intersect(ray, Texture.darkOakPlanks);
+		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.darkOakPlanks;
 		}
 	};
 	private static final boolean UNKNOWN_INVISIBLE = true;
@@ -3427,8 +3483,7 @@ public class Block {
 	 */
 	public boolean subSurfaceScattering = false;
 
-	private Texture frontTexture;
-	private final Texture icon;
+	private final Texture texture;
 
 	private static final Set<Block> redstoneConnectors = new HashSet<Block>();
 	static {
@@ -3447,16 +3502,9 @@ public class Block {
 	}
 
 	Block(int id, String name, Texture texture) {
-		this(id, name, texture, texture);
-	}
-
-	Block(int id, String name, Texture icon, Texture texture) {
-
 		this.id = id;
 		this.name = name;
-		this.icon = icon;
-
-		setTexture(texture);
+		this.texture = texture;
 	}
 
 	/**
@@ -3468,37 +3516,17 @@ public class Block {
 		return name;
 	}
 
-	/**
-	 * Get the average color for the block texture as an
-	 * RGB value.
-	 *
-	 * @return average color (RGB)
-	 */
-	public int getAvgRGB() {
-		return frontTexture.getAvgColor();
-	}
-
-	/**
-	 * Get the average color for the block texture as an
-	 * RGB value.
-	 *
-	 * @return average color (RGB)
-	 */
-	public int getAvgTopRGB() {
-		return icon.getAvgColor();
-	}
-
 	@Override
 	public String toString() {
 		return getBlockName();
 	}
 
-	public void setTexture(Texture newTexture) {
-		frontTexture = newTexture;
+	public boolean intersect(Ray ray, Scene scene) {
+		return TexturedBlockModel.intersect(ray, texture);
 	}
 
-	public boolean intersect(Ray ray, Scene scene) {
-		return TexturedBlockModel.intersect(ray, frontTexture);
+	public Texture getIcon() {
+		return texture;
 	}
 
 	/**
@@ -3507,11 +3535,7 @@ public class Block {
 	 * @return the selected texture
 	 */
 	public Texture getTexture(int blockData) {
-		return frontTexture;
-	}
-
-	public Texture getTexture() {
-		return frontTexture;
+		return texture;
 	}
 
 	public boolean isWater() {

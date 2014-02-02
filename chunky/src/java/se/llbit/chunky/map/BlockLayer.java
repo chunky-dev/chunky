@@ -72,7 +72,7 @@ public class BlockLayer extends AbstractLayer {
 					if (block == Block.AIR.id) {
 						rbuff.setRGB(xp, yp, 0xFFFFFFFF);
 					} else {
-						rbuff.setRGB(xp, yp, Block.get(block).getAvgRGB());
+						rbuff.setRGB(xp, yp, Block.get(block).getIcon().getAvgColor());
 					}
 				}
 			}
@@ -90,7 +90,7 @@ public class BlockLayer extends AbstractLayer {
 						rbuff.fillRect(xp0, yp0, blockScale, blockScale, 0xFFFFFFFF);
 					} else {
 						rbuff.fillRect(xp0, yp0, blockScale, blockScale,
-								Block.get(block).getAvgRGB());
+								Block.get(block).getIcon().getAvgColor());
 					}
 				}
 			}
@@ -107,7 +107,7 @@ public class BlockLayer extends AbstractLayer {
 						continue;
 					}
 
-					int[] tex = ((DataBufferInt) Block.get(block).getTexture()
+					int[] tex = ((DataBufferInt) Block.get(block).getIcon()
 							.getScaledImage(blockScale).getRaster().getDataBuffer()).getData();
 					for (int i = 0; i < blockScale; ++i) {
 						for (int j = 0; j < blockScale; ++j) {

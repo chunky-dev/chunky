@@ -61,7 +61,7 @@ public class BlockTypeListCellRenderer extends JLabel implements ListCellRendere
 			setForeground(list.getForeground());
 		}
 
-		ImageIcon icon = new ImageIcon(selected.getTexture().getImage());
+		ImageIcon icon = new ImageIcon(selected.getTexture(0).getImage());
 		setIcon(icon);
 		setText(selected.toString());
 		setFont(list.getFont());

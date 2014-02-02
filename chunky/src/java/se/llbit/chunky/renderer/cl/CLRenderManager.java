@@ -192,8 +192,8 @@ public class CLRenderManager extends Thread implements Renderer,
 				System.out.print(String.format("\t0x%08X,", Biomes.getGrassColor(0)));
 				break;
 			default:
-				color = block.getTexture().getAvgColorLinear();
-				System.out.print(String.format("\t0x%08X,", block.getTexture().getAvgColor()));
+				color = block.getTexture(0).getAvgColorLinear();
+				System.out.print(String.format("\t0x%08X,", block.getTexture(0).getAvgColor()));
 			}
 			if (j > 0 && j % 8 == 0)
 				System.out.println();

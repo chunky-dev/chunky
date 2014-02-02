@@ -89,6 +89,10 @@ public class SurfaceLayer extends BitmapLayer {
 					float[] blockColor = new float[4];
 					int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
 
+					int data = 0xFF & blockData[Chunk.chunkIndex(x, y, z)/2];
+					data >>= (x % 2) * 4;
+					data &= 0xF;
+
 					switch (block.id) {
 
 					case Block.LEAVES_ID:
@@ -109,13 +113,13 @@ public class SurfaceLayer extends BitmapLayer {
 						break;
 
 					case Block.ICE_ID:
-						Color.getRGBAComponents(Block.ICE.getAvgTopRGB(), blockColor);
+						Color.getRGBAComponents(block.getTexture(data).getAvgColor(), blockColor);
 						color = blend(color, blockColor);
 						y -= 1;
 
 						for (; y >= 0; --y) {
 							if (Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]).isOpaque) {
-								Color.getRGBAComponents(block.getAvgTopRGB(), blockColor);
+								Color.getRGBAComponents(block.getTexture(data).getAvgColor(), blockColor);
 								break;
 							}
 						}
@@ -132,15 +136,11 @@ public class SurfaceLayer extends BitmapLayer {
 							depth += 1;
 						}
 
-						Color.getRGBAComponents(Block.WATER.getAvgTopRGB(), blockColor);
+						Color.getRGBAComponents(Block.WATER.getTexture(data).getAvgColor(), blockColor);
 						blockColor[3] = QuickMath.max(.5f, 1.f - depth/32.f);
 						break;
 
 					default:
-						int data = 0xFF & blockData[Chunk.chunkIndex(x, y, z)/2];
-						data >>= (x % 2) * 4;
-						data &= 0xF;
-
 						Color.getRGBAComponents(block.getTexture(data).getAvgColor(), blockColor);
 
 						if (block.isOpaque && y > 64) {
