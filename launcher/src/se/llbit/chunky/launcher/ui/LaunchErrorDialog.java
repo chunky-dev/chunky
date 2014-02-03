@@ -18,19 +18,23 @@ package se.llbit.chunky.launcher.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.DefaultEditorKit;
@@ -54,6 +58,15 @@ public class LaunchErrorDialog extends JDialog {
 		super();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setModalityType(ModalityType.APPLICATION_MODAL);
+		
+		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Close Dialog");
+		getRootPane().getActionMap().put("Close Dialog", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				closeDialog();
+			}
+		});
 
 		setTitle("Launch Error");
 		setLocationRelativeTo(null);
@@ -105,8 +118,7 @@ public class LaunchErrorDialog extends JDialog {
 		dismissBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				LaunchErrorDialog.this.setVisible(false);
-				LaunchErrorDialog.this.dispose();
+				closeDialog();
 			}
 		});
 
@@ -136,5 +148,10 @@ public class LaunchErrorDialog extends JDialog {
 
 		getContentPane().add(panel);
 		pack();
+	}
+
+	protected void closeDialog() {
+		LaunchErrorDialog.this.setVisible(false);
+		LaunchErrorDialog.this.dispose();
 	}
 }
