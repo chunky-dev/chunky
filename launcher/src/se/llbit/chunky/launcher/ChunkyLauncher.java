@@ -287,8 +287,8 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 
 		JLabel launcherVersionLbl = new JLabel(LAUNCHER_VERSION);
 
+		layout.setAutoCreateContainerGaps(true);
 		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
 				.addComponent(logo)
 				.addComponent(launcherVersionLbl)
@@ -315,8 +315,8 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 					.addComponent(browseMcBtn)
 				)
 				.addGroup(memoryLimitAdjuster.horizontalGroup(layout))
-				.addComponent(advancedPanel)
 				.addComponent(showAdvancedSettingsCB)
+				.addComponent(advancedPanel)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(alwaysShowLauncherCB)
 					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -325,10 +325,8 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 					.addComponent(cancelBtn)
 				)
 			)
-			.addContainerGap()
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(logo)
@@ -363,7 +361,6 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 					)
 				)
 			)
-			.addContainerGap()
 		);
 
 		setContentPane(panel);

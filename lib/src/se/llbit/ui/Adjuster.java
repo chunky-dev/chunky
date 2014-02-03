@@ -159,8 +159,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(slider)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(textField)
-					.addPreferredGap(ComponentPlacement.RELATED);
+					.addComponent(textField);
 	}
 
 	/**
