@@ -16,11 +16,9 @@
  */
 package se.llbit.chunky.renderer.ui;
 
-import java.awt.event.ActionEvent;
 import java.text.ParseException;
 
 import javax.swing.JSlider;
-import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 
 import se.llbit.chunky.renderer.RenderManager;
@@ -48,8 +46,8 @@ public class DoFAdjuster extends Adjuster {
 
 	@Override
 	protected double parseText(String text) throws ParseException {
-		if (text.equalsIgnoreCase("inf") || text.equalsIgnoreCase("infinite") ||
-				text.equalsIgnoreCase("infinity")) {
+		if (text.equalsIgnoreCase("inf") || text.equalsIgnoreCase("Infinite") ||
+				text.equalsIgnoreCase("Infinity")) {
 			return Double.POSITIVE_INFINITY;
 		} else {
 			return super.parseText(text);
@@ -57,24 +55,11 @@ public class DoFAdjuster extends Adjuster {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		JTextField source = (JTextField) e.getSource();
-		String text = source.getText();
-		if (text.equalsIgnoreCase("inf") || text.equalsIgnoreCase("infinite") ||
-				text.equalsIgnoreCase("infinity")) {
-			setSliderValue(getSlider().getMaximum());
-			renderMan.scene().camera().setInfDof(true);
-		} else {
-			super.actionPerformed(e);
-		}
-	}
-
-	@Override
 	public void stateChanged(ChangeEvent e) {
 		JSlider source = (JSlider) e.getSource();
 		if (source.getValue() == source.getMaximum()) {
-			setTextFieldText("inf");
-			renderMan.scene().camera().setInfDof(true);
+			setTextFieldText("Infinity");
+			renderMan.scene().camera().setDof(Double.POSITIVE_INFINITY);
 		} else {
 			super.stateChanged(e);
 		}
@@ -82,14 +67,13 @@ public class DoFAdjuster extends Adjuster {
 
 	@Override
 	public void valueChanged(double newValue) {
-		renderMan.scene().camera().setInfDof(false);
 		renderMan.scene().camera().setDof(newValue);
 	}
 
 	@Override
 	public void update() {
 		Camera camera = renderMan.scene().camera();
-		if (camera.getInfDof()) {
+		if (camera.infiniteDoF()) {
 			setTextFieldText("inf");
 			setSliderValue(getSlider().getMaximum());
 		} else {

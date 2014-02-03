@@ -470,7 +470,7 @@ public class Camera implements JSONifiable {
 	private ProjectionMode projectionMode = ProjectionMode.PINHOLE;
 	private Projector projector = createProjector();
 
-	private double dof = 8;
+	private double dof = Double.POSITIVE_INFINITY;
 	private double fov = projector.getDefaultFoV();
 
 	/**
@@ -479,7 +479,6 @@ public class Camera implements JSONifiable {
 	private double worldWidth = 100;
 
 	private double subjectDistance = 2;
-	private boolean infDof = true;
 
 	/**
 	 * Create a new camera
@@ -506,19 +505,18 @@ public class Camera implements JSONifiable {
 		projectionMode = other.projectionMode;
 		fov = other.fov;
 		subjectDistance = other.subjectDistance;
-		infDof = other.infDof;
 		worldWidth = other.worldWidth;
 		initProjector();
 		updateTransform();
 	}
 
 	private Projector applyDoF(Projector p, double subjectDistance) {
-		return infDof ? p : new ApertureProjector(p,
+		return infiniteDoF() ? p : new ApertureProjector(p,
 				subjectDistance/dof, subjectDistance);
 	}
 
 	private Projector applySphericalDoF(Projector p) {
-		return infDof ? p : new SphericalApertureProjector(p,
+		return infiniteDoF() ? p : new SphericalApertureProjector(p,
 				subjectDistance/dof, subjectDistance);
 	}
 
@@ -565,8 +563,10 @@ public class Camera implements JSONifiable {
 	 * @param value
 	 */
 	public synchronized void setDof(double value) {
-		dof = value;
-		scene.refresh();
+		if (dof != value) {
+			dof = value;
+			scene.refresh();
+		}
 	}
 
 	/**
@@ -577,21 +577,10 @@ public class Camera implements JSONifiable {
 	}
 
 	/**
-	 * Set infinite Depth of Field
-	 * @param value
-	 */
-	public synchronized void setInfDof(boolean value) {
-		if (value != infDof) {
-			infDof = value;
-			scene.refresh();
-		}
-	}
-
-	/**
 	 * @return <code>true</code> if infinite DoF is active
 	 */
-	public boolean getInfDof() {
-		return infDof;
+	public boolean infiniteDoF() {
+		return dof == Double.POSITIVE_INFINITY;
 	}
 
 	/**
@@ -897,8 +886,11 @@ public class Camera implements JSONifiable {
 
 		camera.add("projectionMode", projectionMode.name());
 		camera.add("fov", fov);
-		camera.add("dof", dof);
-		camera.add("infDof", infDof);
+		if (dof == Double.POSITIVE_INFINITY) {
+			camera.add("dof", "Infinity");
+		} else {
+			camera.add("dof", dof);
+		}
 		camera.add("focalOffset", subjectDistance);
 		return camera;
 	}
@@ -915,7 +907,6 @@ public class Camera implements JSONifiable {
 		pitch = orientation.get("pitch").doubleValue(0);
 		yaw = orientation.get("yaw").doubleValue(- HALF_PI);
 
-		dof = obj.get("dof").doubleValue(0);
 		fov = obj.get("fov").doubleValue(0);
 		subjectDistance = obj.get("focalOffset").doubleValue(0);
 		try {
@@ -924,7 +915,12 @@ public class Camera implements JSONifiable {
 		} catch (IllegalArgumentException e) {
 			projectionMode = ProjectionMode.PINHOLE;
 		}
-		infDof = obj.get("infDof").boolValue(true);
+		if (obj.get("infDof").boolValue(false)) {
+			// legacy
+			dof = Double.POSITIVE_INFINITY;
+		} else {
+			dof = obj.get("dof").doubleValue(Double.POSITIVE_INFINITY);
+		}
 		initProjector();
 		updateTransform();
 	}

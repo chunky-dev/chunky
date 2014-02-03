@@ -167,6 +167,7 @@ public class SceneSelector extends JDialog {
 						""+desc.spp, renderTime };
 				tableModel.addRow(row);
 			} catch (IOException e) {
+				System.err.println("Warning: could not load scene description: " + fileName);
 			}
 		}
 

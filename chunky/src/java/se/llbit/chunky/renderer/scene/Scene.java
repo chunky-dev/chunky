@@ -1062,11 +1062,10 @@ public class Scene extends SceneDescription {
 		Ray ray = RayPool.getDefaultRayPool().get();
 		trace(ray);
 		if (!ray.hit) {
-			camera.setInfDof(true);
+			camera.setDof(Double.POSITIVE_INFINITY);
 		} else {
 			camera.setSubjectDistance(ray.distance);
 			camera.setDof(ray.distance*ray.distance);
-			camera.setInfDof(false);
 		}
 		RayPool.getDefaultRayPool().dispose(ray);
 	}
