@@ -1,4 +1,5 @@
 1.2.3 - TBD
+    * Depth of field now only uses one scene variable (removed infDof variable)
     * Fixed corner Acacia/Dark Oak stairs rendering
     * Hay bales now render with the correct orientation
     * Improved rendering of some blocks in the 2D map
