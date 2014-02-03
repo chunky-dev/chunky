@@ -204,36 +204,42 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	 */
 	private boolean onTextEdit(boolean forceUpdate) {
 		try {
-			double value = numberFormat.parse(textField.getText()).doubleValue();
+			double value = parseText(textField.getText());
+			double clampedValue = clampValue(value);
 			double sliderValue = QuickMath.clamp(value, min, max);
-			boolean clamped = false;
-			if (clampMin && value < min) {
-				value = min;
-				clamped = true;
-			}
-			if (clampMax && value > max) {
-				value = max;
-				clamped = true;
-			}
+			boolean clamped = value != clampedValue;
 			if (!clamped || forceUpdate) {
 				setSlider(sliderValue);
-				valueChanged(value);
+				valueChanged(clampedValue);
 				if (clamped) {
 					if (integerMode) {
-						textField.setText("" + (int) value);
+						textField.setText("" + (int) clampedValue);
 					} else {
-						textField.setText("" + value);
+						textField.setText("" + clampedValue);
 					}
 				}
 				setError("");
 				errorLbl.setVisible(false);
 			}
 			return clamped;
-		} catch (NumberFormatException ex) {
 		} catch (ParseException ex) {
 			setError("Error: Not a valid number!");
 		}
 		return false;
+	}
+
+	private double clampValue(double value) {
+		if (clampMin && value < min) {
+			value = min;
+		}
+		if (clampMax && value > max) {
+			value = max;
+		}
+		return value;
+	}
+
+	protected double parseText(String text) throws ParseException {
+		return numberFormat.parse(text).doubleValue();
 	}
 
 	private void setError(String message) {

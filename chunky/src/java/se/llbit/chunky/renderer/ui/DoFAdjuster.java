@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer.ui;
 
 import java.awt.event.ActionEvent;
+import java.text.ParseException;
 
 import javax.swing.JSlider;
 import javax.swing.JTextField;
@@ -46,10 +47,21 @@ public class DoFAdjuster extends Adjuster {
 	}
 
 	@Override
+	protected double parseText(String text) throws ParseException {
+		if (text.equalsIgnoreCase("inf") || text.equalsIgnoreCase("infinite") ||
+				text.equalsIgnoreCase("infinity")) {
+			return Double.POSITIVE_INFINITY;
+		} else {
+			return super.parseText(text);
+		}
+	}
+
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		JTextField source = (JTextField) e.getSource();
 		String text = source.getText();
-		if (text.equalsIgnoreCase("inf") || text.equalsIgnoreCase("infinite")) {
+		if (text.equalsIgnoreCase("inf") || text.equalsIgnoreCase("infinite") ||
+				text.equalsIgnoreCase("infinity")) {
 			setSliderValue(getSlider().getMaximum());
 			renderMan.scene().camera().setInfDof(true);
 		} else {

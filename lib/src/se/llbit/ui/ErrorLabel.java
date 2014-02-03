@@ -17,26 +17,31 @@
 package se.llbit.ui;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 @SuppressWarnings("serial")
 public class ErrorLabel extends JPanel {
 	private final JComponent parentComponent;
-	private final JLabel lbl;
-	private JLayeredPane container;
+	private final JLabel lbl = new JLabel();
+	private JLayeredPane layeredPane;
 	private final Color errBGColor = new Color(0xfff5bc);
+	private boolean showLabel = false;
 
 	public ErrorLabel(JComponent parent) {
-		this.lbl = new JLabel("HELLO");
 		this.add(lbl);
 		setOpaque(true);
 		setBackground(errBGColor);
@@ -61,10 +66,26 @@ public class ErrorLabel extends JPanel {
 				}
 			});
 		} else {
-			container = rootPane.getLayeredPane();
-			container.setLayer(this, JLayeredPane.POPUP_LAYER);
-			container.add(this);
-			updatePosition(container);
+			layeredPane = rootPane.getLayeredPane();
+			layeredPane.setLayer(this, JLayeredPane.POPUP_LAYER);
+			layeredPane.add(this);
+			Container container = parentComponent;
+			while (container != null) {
+				if (container.getParent() instanceof JTabbedPane) {
+					container.addComponentListener(new ComponentAdapter() {
+						@Override
+						public void componentHidden(ComponentEvent e) {
+							ancestorComponentHidden();
+						}
+						@Override
+						public void componentShown(ComponentEvent e) {
+							ancestorComponentShown();
+						}
+					});
+				}
+				container = container.getParent();
+			}
+			updatePosition(layeredPane);
 		}
 	}
 
@@ -72,9 +93,10 @@ public class ErrorLabel extends JPanel {
 		Dimension containerSize = container.getSize();
 		Dimension parentSize = parentComponent.getSize();
 		Dimension size = getPreferredSize();
-		Point loc = parentComponent.getLocation();
+		Point loc = SwingUtilities.convertPoint(parentComponent,
+				getLocation(), this);
 		int x = loc.x+parentSize.width/2-size.width/2;
-		int y = loc.y+size.height;
+		int y = loc.y+parentSize.height;
 		if (x+size.width >= containerSize.width) {
 			x = containerSize.width-size.width;
 		}
@@ -83,8 +105,23 @@ public class ErrorLabel extends JPanel {
 
 	public void setText(String message) {
 		lbl.setText(message);
-		if (container != null) {
-			updatePosition(container);
+		if (layeredPane != null) {
+			updatePosition(layeredPane);
 		}
+	}
+
+	protected void ancestorComponentHidden() {
+		super.setVisible(false);
+	}
+
+	protected void ancestorComponentShown() {
+		super.setVisible(showLabel);
+		updatePosition(layeredPane);
+	}
+
+	@Override
+	public void setVisible(boolean aFlag) {
+		super.setVisible(aFlag);
+		showLabel = aFlag;
 	}
 }
