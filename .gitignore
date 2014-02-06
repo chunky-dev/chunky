@@ -3,6 +3,7 @@
 
 # vim
 *.swp
+*.*~
 
 <<<<<<< HEAD
 # chunky build files
