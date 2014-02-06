@@ -1,6 +1,7 @@
 package se.llbit.chunky.renderer.ui;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -14,6 +15,7 @@ import java.util.*;
  * Created by Austin on 2/6/14.
  */
 public class ShutdownAlert extends ProgressMonitor implements ActionListener{
+
 
 	// Time in seconds to shutdown
 	private static final int time = 30;
@@ -56,6 +58,8 @@ public class ShutdownAlert extends ProgressMonitor implements ActionListener{
 
 	private static class Shutdown{
 
+		private static final Logger logger = Logger.getLogger(ShutdownAlert.class);
+
 		// Set this to false to not actually shut down the machine
 		private static final boolean DO_SHUTDOWN = true;
 
@@ -68,10 +72,10 @@ public class ShutdownAlert extends ProgressMonitor implements ActionListener{
 				try {
 					Runtime.getRuntime().exec(getShutdownCommand());
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.trace("IOException in shutdown() on Runtime.exec()", e);
 				}
 			}else{
-				System.out.println("Shutdown command: " + getShutdownCommand());
+				logger.debug("Shutdown command: " + getShutdownCommand());
 			}
 		}
 
