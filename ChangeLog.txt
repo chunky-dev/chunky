@@ -1,4 +1,5 @@
 1.2.3 - TBD
+    * The name of the biome under the cursor is now displayed in the 2D map
     * Using the -snapshot command without arguments now prints a list of all
       available scenes in the scene directory
     * Using the -snapshot command without a destination PNG file name now

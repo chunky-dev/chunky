@@ -462,4 +462,13 @@ public class Chunk {
 	public synchronized boolean isLayerParsed() {
 		return loadedLayer == world.currentLayer();
 	}
+
+	public String biomeAt(int blockX, int blockZ) {
+		if (biomes != null && biomes instanceof BiomeLayer) {
+			BiomeLayer biomeLayer = (BiomeLayer) biomes;
+			return biomeLayer.biomeAt(blockX, blockZ);
+		} else {
+			return "unknown";
+		}
+	}
 }

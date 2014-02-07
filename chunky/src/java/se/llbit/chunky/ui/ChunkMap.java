@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.RenderBuffer;
+import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.World;
@@ -73,6 +74,8 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 	private volatile ChunkPosition start = ChunkPosition.get(0, 0);
 	private volatile ChunkPosition end = ChunkPosition.get(0, 0);
+	private volatile int blockX;
+	private volatile int blockZ;
 
 	/**
 	 * Mouse listener for the chunk map UI element.
@@ -97,13 +100,14 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 				return;
 			}
 
+			ChunkPosition chunk = getChunk(e);
+			if (chunk != end) {
+				end = chunk;
+				repaint();
+			}
+
 			if (selectRect || !dragging && chunky.getShiftModifier()) {
 				selectRect = true;
-				ChunkPosition chunk = getChunk(e.getX(), e.getY());
-				if (chunk != end) {
-					end = chunk;
-					repaint();
-				}
 			} else if (dragging || Math.abs(dx) >= 5 || Math.abs(dy) >= 5) {
 				dragging = true;
 				setMotionOrigin(e);
@@ -176,7 +180,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
-			ChunkPosition chunk = getChunk(e.getX(), e.getY());
+			ChunkPosition chunk = getChunk(e);
 			if (chunk != start) {
 				start = chunk;
 				end = chunk;
@@ -184,11 +188,22 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			}
 		}
 
-		private ChunkPosition getChunk(int x, int y) {
+		private ChunkPosition getChunk(MouseEvent e) {
 			ChunkView theView = view;
 			double scale = theView.chunkScale;
-			int cx = (int) QuickMath.floor(theView.x + (x - getWidth()/2) / scale);
-			int cz = (int) QuickMath.floor(theView.z + (y - getHeight()/2) / scale);
+			double x = theView.x + (e.getX() - getWidth()/2) / scale;
+			double z = theView.z + (e.getY() - getHeight()/2) / scale;
+			int cx = (int) QuickMath.floor(x);
+			int cz = (int) QuickMath.floor(z);
+			int bx = (int) QuickMath.floor((x-cx)*16);
+			int bz = (int) QuickMath.floor((z-cz)*16);
+			bx = Math.max(0, Math.min(Chunk.X_MAX-1, bx));
+			bz = Math.max(0, Math.min(Chunk.Z_MAX-1, bz));
+			if (bx != blockX || bz != blockZ) {
+				blockX = bx;
+				blockZ = bz;
+				repaint();
+			}
 			return ChunkPosition.get(cx, cz);
 		}
 
@@ -291,8 +306,6 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		ChunkPosition cp = end;
 		g.setFont(font);
 		g.setColor(Color.red);
-		g.drawString("Chunk: " + cp,
-				5, cv.height - 5);
 
 		if (selectRect) {
 			ChunkPosition cp0 = start;
@@ -324,8 +337,11 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 					int y0 = (int) (cv.chunkScale * (rz*32 - cv.z0));
 					g.drawRect(x0, y0, cv.chunkScale*32, cv.chunkScale*32);
 				}
-				//g.drawString("Chunk: " + hoveredChunk.getPosition() + ", biome: " + hoveredChunk.biomeAt(),
-						//5, view.height - 5);
+				Chunk hoveredChunk = chunky.getWorld().getChunk(cp);
+				g.drawString(String.format("Chunk: %s, biome: %s",
+						""+hoveredChunk.getPosition(),
+						hoveredChunk.biomeAt(blockX, blockZ)),
+						5, view.height - 5);
 			}
 		}
 	}

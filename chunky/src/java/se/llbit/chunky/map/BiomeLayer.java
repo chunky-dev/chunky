@@ -42,4 +42,8 @@ public class BiomeLayer extends BitmapLayer {
 		return Biomes.getColor(biomes[x*16+z]);
 	}
 
+	public String biomeAt(int x, int z) {
+		return Biomes.getName(biomes[x*16 + z]);
+	}
+
 }

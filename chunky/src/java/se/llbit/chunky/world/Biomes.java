@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -178,5 +178,13 @@ public class Biomes {
 	 */
 	public static final float[] getFoliageColorLinear(int biomeId) {
 		return foliageColorLinear[BIOME_MASK & biomeId];
+	}
+
+	/**
+	 * @param biomeId truncated to [0,127]
+	 * @return Biome name
+	 */
+	public static final String getName(int biomeId) {
+		return biomes[BIOME_MASK & biomeId].name;
 	}
 }
