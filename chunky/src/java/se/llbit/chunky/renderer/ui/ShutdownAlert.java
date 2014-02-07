@@ -17,16 +17,17 @@
  */
 package se.llbit.chunky.renderer.ui;
 
-import org.apache.log4j.Logger;
-
-import se.llbit.util.OSDetector;
-
-import javax.swing.*;
-
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+
+import javax.swing.ProgressMonitor;
+import javax.swing.Timer;
+
+import org.apache.log4j.Logger;
+
+import se.llbit.util.OSDetector;
 
 public class ShutdownAlert extends ProgressMonitor implements ActionListener {
 
@@ -90,13 +91,10 @@ public class ShutdownAlert extends ProgressMonitor implements ActionListener {
 	private static void shutdown() {
 		if (DO_SHUTDOWN) {
 			try {
-				String command = getShutdownCommand();
-				if (!command.isEmpty()) {
-					Process proc = Runtime.getRuntime().exec(command);
-					proc.waitFor();
-					if (0 != proc.exitValue()) {
-						logger.error("Failed to shutdown computer (command returned error code)");
-					}
+				Process proc = Runtime.getRuntime().exec(getShutdownCommand());
+				proc.waitFor();
+				if (0 != proc.exitValue()) {
+					logger.error("Failed to shutdown computer (command returned error code)");
 				}
 			} catch (IOException e) {
 				logger.error("Failed to shutdown computer", e);
@@ -120,5 +118,9 @@ public class ShutdownAlert extends ProgressMonitor implements ActionListener {
 			logger.error("Don't know how to shutdown this computer (OS unknown)");
 			return "";
 		}
+	}
+
+	public static boolean canShutdown() {
+		return !getShutdownCommand().isEmpty();
 	}
 }
