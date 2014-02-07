@@ -29,7 +29,6 @@ import java.io.IOException;
 
 public class ShutdownAlert extends ProgressMonitor implements ActionListener{
 
-
 	// Time in seconds to shutdown
 	private static final int time = 30;
 	// Message for shutdown alert. Does not change.
@@ -37,14 +36,12 @@ public class ShutdownAlert extends ProgressMonitor implements ActionListener{
 	// Note for shutdown alert, updates every second.
 	private static final String note = "Shutting down in %d seconds.";
 
-
 	public ShutdownAlert(Component parentComponent) {
 		super(parentComponent, message, note, 0, time);
 
 		timeLeft = time;
 		timer.start();
 	}
-
 
 	private final Timer timer = new Timer(1000, this);
 
@@ -94,14 +91,12 @@ public class ShutdownAlert extends ProgressMonitor implements ActionListener{
 
 		private static String getShutdownCommand(){
 			switch(OSDetector.getOS()){
-
 				case WIN:
 					return SHUTDOWN_WINDOWS;
 				case MAC:
 				case LINUX:
 				case BSD:
 					return SHUTDOWN_UNIX;
-				case OTHER:
 				default:
 					throw new RuntimeException("Operating system not recognized.");
 			}
