@@ -406,6 +406,11 @@ public class RenderControls extends JDialog implements ViewListener,
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		setModalityType(ModalityType.MODELESS);
 
+		if (!ShutdownAlert.canShutdown()) {
+			// disable the computer shutdown checkbox if we can't shutdown
+			shutdownWhenDoneCB.setEnabled(false);
+		}
+
 		addWindowListener(new WindowListener() {
 			@Override
 			public void windowOpened(WindowEvent e) {
