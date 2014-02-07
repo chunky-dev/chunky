@@ -26,3 +26,6 @@
 .idea/*
 *.eml
 *.iml
+
+# Render snapshots from testing
+/*.png
