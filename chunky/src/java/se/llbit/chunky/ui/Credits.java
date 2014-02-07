@@ -50,9 +50,12 @@ public class Credits extends JDialog {
 		JLabel creditsLbl = new JLabel(
 			"<html><b>Programming:</b><br>" +
 			"Jesper Öqvist<br>" +
+			"<br>" +
+			"<b>Contributors:</b><br>" +
 			"TOGoS (projection & misc.)<br>" +
 			"twirrim (FastMath)<br>" +
 			"AEnterprise (scene Zip export)<br>" +
+			"Austin Bonander (shutdown after render)<br>" +
 			"<br>" +
 			"<b>OSX Bundling:</b><br>" +
 			"Ben Phelps<br>" +

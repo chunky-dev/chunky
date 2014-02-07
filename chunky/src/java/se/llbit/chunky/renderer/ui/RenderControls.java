@@ -167,7 +167,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JTextField cameraPitch = new JTextField();
 	private final JTextField cameraRoll = new JTextField();
 	private final JButton mergeDumpBtn = new JButton("Merge Render Dump");
-    private final JCheckBox shutdownWhenDoneCB = new JCheckBox("Shutdown when render completes");
+	private final JCheckBox shutdownWhenDoneCB = new JCheckBox("Shutdown computer when render completes");
 
 	private final JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -794,8 +794,9 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addComponent(sep3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(mergeDumpBtn)
-			.addContainerGap()
+			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(shutdownWhenDoneCB)
+			.addContainerGap()
 		);
 		return panel;
 	}
@@ -2467,7 +2468,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	@Override
 	public void renderJobFinished(long time, int sps) {
-		if(shutdownWhenDoneCB.isSelected()){
+		if (shutdownWhenDoneCB.isSelected()) {
 			new ShutdownAlert(this);
 		}
 	}

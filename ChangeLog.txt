@@ -9,7 +9,8 @@
     * Fixed error causing rayDepth setting to not be saved for scenes
     * Fixed error preventing naming and overwriting of custom camera presets
     * Changed map status text color to red to improve visibility
-    * Checkbox in Advanced tab of Render controls: "Shutdown when render completes"
+    * Added checkbox on the Advanced tab of Render controls which enables
+      automatic shutdown of the computer after render completion
 
 1.2.2 - 2014-01-13
     * Added "follow player" option for the 2D map
