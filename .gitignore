@@ -3,7 +3,9 @@
 
 # vim
 *.swp
+*.*~
 
+<<<<<<< HEAD
 # chunky build files
 /build
 /Chunky.nsi
@@ -20,3 +22,9 @@
 /latest.json
 /snapshot.json
 /snapshot
+=======
+# IntelliJ IDEA Project files
+.idea/*
+*.eml
+*.iml
+>>>>>>> 8e83f51fbd8a0abc63ae90cadcec36b23ed7dd0c

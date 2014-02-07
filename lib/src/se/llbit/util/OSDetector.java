@@ -20,6 +20,8 @@ public class OSDetector {
 	public enum OS {
 		WIN,
 		MAC,
+		LINUX,
+		BSD,
 		OTHER
 	}
 
@@ -29,7 +31,12 @@ public class OSDetector {
 			return OS.WIN;
 		} else if (os.contains("mac")) {
 			return OS.MAC;
-		} else {
+		} else if (os.contains("linux")) {
+			return OS.LINUX;
+		} else if(os.contains("bsd")) {
+			return OS.BSD;
+		}
+		else {
 			return OS.OTHER;
 		}
 	}

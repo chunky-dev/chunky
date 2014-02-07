@@ -56,6 +56,32 @@ command line:
 Where SceneName is the name of the scene to render. You can read more about
 [headless rendering on the Wiki](http://chunky.llbit.se/index.php?title=Headless_Rendering).
 
+Enabling "Shutdown when render completes" on Unix-like Systems (Mac OS X, Linux, BSD)
+-------------------------------------------------------------------------------------
+
+In the Advanced tab of the Render Controls window, you can check the checkbox that says
+"Shutdown when render completes" to shut down your computer when the set SPP target is reached.
+(This can be toggled while rendering.)
+
+On Unix-like systems, the `shutdown` terminal command has to be run as root using `sudo`.
+For various reasons, Chunky cannot prompt for the password to `sudo`, so you must
+configure your system to allow the command to run without a password.
+
+Open a terminal (such as bash) and run `sudo visudo`, providing your password.
+
+Add the following line at the end of the file: (press Insert to type)
+
+    %user_name ALL=(ALL) NOPASSWD: /sbin/shutdown
+
+Replace `user_name` with your username.
+
+Press Escape, then type ":wq".
+
+You may need to restart or log out and in for this to take effect.
+
+This will only allow `sudo shutdown` to run without a password; 
+no other commands run with `sudo` will be affected.
+
 Hacking on Chunky
 -----------------
 
