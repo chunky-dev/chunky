@@ -1,4 +1,8 @@
 1.2.3 - TBD
+    * Using the -snapshot command without arguments now prints a list of all
+      available scenes in the scene directory
+    * Using the -snapshot command without a destination PNG file name now
+      automatically picks a filename based on the scene name and current SPP
     * Depth of field now only uses one scene variable (removed infDof variable)
     * Fixed corner Acacia/Dark Oak stairs rendering
     * Hay bales now render with the correct orientation

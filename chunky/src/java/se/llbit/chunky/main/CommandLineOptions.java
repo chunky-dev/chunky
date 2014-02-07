@@ -61,7 +61,7 @@ public class CommandLineOptions {
 		"Options:\n" +
 		"  -texture <FILE>        use FILE as the texture pack (must be a Zip file)\n" +
 		"  -render <SCENE>        render the specified scene (see notes)\n" +
-		"  -snapshot <SCENE> <PNG> create a snapshot of the specified scene\n" +
+		"  -snapshot <SCENE> [PNG] create a snapshot of the specified scene\n" +
 		"  -scene-dir <DIR>       use the directory DIR for loading/saving scenes\n" +
 		"  -benchmark             run the benchmark and exit\n" +
 		"  -threads <NUM>         use the specified number of threads for rendering\n" +
@@ -119,21 +119,8 @@ public class CommandLineOptions {
 				}
 			} else if (args[i].equals("-render")) {
 				if (i+1 == args.length) {
-					System.err.println("Missing argument for -render option");
-					File sceneDir = PersistentSettings.getSceneDirectory();
-					System.err.println("Scene directory: " +
-							sceneDir.getAbsolutePath());
-					List<File> fileList = SceneSelector.getAvailableSceneFiles(sceneDir);
-					Collections.sort(fileList);
-					if (!fileList.isEmpty()) {
-						System.err.println("Available scenes:");
-						for (File file: fileList) {
-							String name = file.getName();
-							name = name.substring(0, name.length() -
-								SceneDescription.SCENE_DESCRIPTION_EXTENSION.length());
-							System.err.println("\t" + name);
-						}
-					}
+					System.err.println("You must specify a scene name for the -render command");
+					printAvailableScenes();
 					confError = true;
 					break;
 				} else {
@@ -181,9 +168,13 @@ public class CommandLineOptions {
 				mode = Mode.NO_OP;
 			} else if (args[i].equals("-snapshot")) {
 				mode = Mode.NO_OP;
-				if (args.length > i+2) {
+				if (args.length > i+1) {
 					options.sceneName = args[i+1];
-					String pngFileName = args[i+2];
+					String pngFileName = "";
+					if (args.length > i+2) {
+						pngFileName = args[i+2];
+						i += 1;
+					}
 					try {
 						File file = getSceneFile(options);
 						Scene scene = new Scene();
@@ -193,16 +184,20 @@ public class CommandLineOptions {
 						ConsoleRenderListener listener = new ConsoleRenderListener();
 						scene.setCanvasSize(scene.width, scene.height);
 						scene.loadDump(context, listener);
+						if (pngFileName.isEmpty()) {
+							pngFileName = scene.name + "-" + scene.spp + ".png";
+						}
 						scene.saveFrame(new File(pngFileName), listener);
 						System.out.println("Saved snapshot to " + pngFileName);
 					} catch (IOException e) {
 						System.err.println("Failed to dump snapshot: " +
 								e.getMessage());
 					}
-					i += 2;
+					i += 1;
 					return;
 				} else {
-					System.err.println("Too few arguments for -snapshot command!");
+					System.err.println("You must specify a scene name for the -snapshot command!");
+					printAvailableScenes();
 					confError = true;
 					break;
 				}
@@ -363,6 +358,23 @@ public class CommandLineOptions {
 
 		if (options.sceneName != null) {
 			mode = Mode.HEADLESS_RENDER;
+		}
+	}
+
+	private void printAvailableScenes() {
+		File sceneDir = PersistentSettings.getSceneDirectory();
+		System.err.println("Scene directory: " +
+				sceneDir.getAbsolutePath());
+		List<File> fileList = SceneSelector.getAvailableSceneFiles(sceneDir);
+		Collections.sort(fileList);
+		if (!fileList.isEmpty()) {
+			System.err.println("Available scenes:");
+			for (File file: fileList) {
+				String name = file.getName();
+				name = name.substring(0, name.length() -
+					SceneDescription.SCENE_DESCRIPTION_EXTENSION.length());
+				System.err.println("\t" + name);
+			}
 		}
 	}
 
