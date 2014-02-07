@@ -115,7 +115,7 @@ public class ShutdownAlert extends ProgressMonitor implements ActionListener {
 		case BSD:
 			return SHUTDOWN_UNIX;
 		default:
-			logger.error("Don't know how to shutdown this computer (OS unknown)");
+			logger.info("Don't know how to shutdown this computer (OS unknown)");
 			return "";
 		}
 	}
