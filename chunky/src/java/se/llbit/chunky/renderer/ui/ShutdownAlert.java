@@ -17,8 +17,8 @@
  */
 package se.llbit.chunky.renderer.ui;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
+import se.llbit.util.OSDetector;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -93,12 +93,17 @@ public class ShutdownAlert extends ProgressMonitor implements ActionListener{
 		}
 
 		private static String getShutdownCommand(){
-			if(SystemUtils.IS_OS_WINDOWS){
-				return SHUTDOWN_WINDOWS;
-			} else if(SystemUtils.IS_OS_UNIX){
-				return SHUTDOWN_UNIX;
-			} else{
-				throw new RuntimeException("Operating system not recognized.");
+			switch(OSDetector.getOS()){
+
+				case WIN:
+					return SHUTDOWN_WINDOWS;
+				case MAC:
+				case LINUX:
+				case BSD:
+					return SHUTDOWN_UNIX;
+				case OTHER:
+				default:
+					throw new RuntimeException("Operating system not recognized.");
 			}
 		}
 	}
