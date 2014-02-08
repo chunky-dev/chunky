@@ -1558,7 +1558,7 @@ public class Scene extends SceneDescription {
 			int dumpWidth = in.readInt();
 			int dumpHeight= in.readInt();
 			if (dumpWidth != width || dumpHeight != height) {
-				logger.warn("Render dump discarded: incorrect widht or height!");
+				logger.warn("Render dump discarded: incorrect width or height!");
 				in.close();
 				return;
 			}
