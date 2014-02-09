@@ -71,11 +71,10 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 	private final RenderBuffer renderBuffer;
 	private volatile ChunkView view;
+	private final MapLabel errlbl = new MapLabel(this);
 
 	private volatile ChunkPosition start = ChunkPosition.get(0, 0);
 	private volatile ChunkPosition end = ChunkPosition.get(0, 0);
-	private volatile int blockX;
-	private volatile int blockZ;
 
 	/**
 	 * Mouse listener for the chunk map UI element.
@@ -128,6 +127,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		@Override
 		public void mouseExited(MouseEvent e) {
 			mouseInsideWindow = false;
+			errlbl.setVisible(false);
 		}
 
 		@Override
@@ -199,12 +199,12 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			int bz = (int) QuickMath.floor((z-cz)*16);
 			bx = Math.max(0, Math.min(Chunk.X_MAX-1, bx));
 			bz = Math.max(0, Math.min(Chunk.Z_MAX-1, bz));
-			if (bx != blockX || bz != blockZ) {
-				blockX = bx;
-				blockZ = bz;
-				repaint();
-			}
-			return ChunkPosition.get(cx, cz);
+			ChunkPosition cp = ChunkPosition.get(cx, cz);
+			Chunk hoveredChunk = chunky.getWorld().getChunk(cp);
+			errlbl.setText(String.format("Chunk: %s, biome: %s",
+					""+hoveredChunk.getPosition(),
+					hoveredChunk.biomeAt(bx, bz)));
+			return cp;
 		}
 
 		@Override
@@ -337,11 +337,6 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 					int y0 = (int) (cv.chunkScale * (rz*32 - cv.z0));
 					g.drawRect(x0, y0, cv.chunkScale*32, cv.chunkScale*32);
 				}
-				Chunk hoveredChunk = chunky.getWorld().getChunk(cp);
-				g.drawString(String.format("Chunk: %s, biome: %s",
-						""+hoveredChunk.getPosition(),
-						hoveredChunk.biomeAt(blockX, blockZ)),
-						5, view.height - 5);
 			}
 		}
 	}
