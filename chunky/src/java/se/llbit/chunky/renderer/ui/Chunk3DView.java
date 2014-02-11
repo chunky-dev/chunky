@@ -95,6 +95,14 @@ public class Chunk3DView extends JDialog {
 
 		fullscreenWindow = new JFrame("Fullscreen");
 		fullscreenWindow.setUndecorated(true);
+		fullscreenWindow.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Close Fullscreen");
+		fullscreenWindow.getRootPane().getActionMap().put("Close Fullscreen", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				setFullscreen(false);
+			}
+		});
 
 		componentListener = new ComponentListener() {
 			@Override
