@@ -246,7 +246,7 @@ public class Chunk3DView extends JDialog {
 		});
 	}
 
-	synchronized protected void setFullscreen(boolean mode) {
+	protected void setFullscreen(boolean mode) {
 		if (mode == fullscreen) {
 			return;
 		}
@@ -308,6 +308,8 @@ public class Chunk3DView extends JDialog {
 		// NB: avoid setting the same preferred size twice
 		if (width != canvas.getWidth() || height != canvas.getHeight()) {
 			canvas.setPreferredSize(new Dimension(width, height));
+			canvas.setSize(new Dimension(width, height));
+			canvas.revalidate();
 			pack();
 		}
 	}
@@ -323,7 +325,7 @@ public class Chunk3DView extends JDialog {
 	 * Show preview window
 	 * @param window display the view to the right of this window
 	 */
-	synchronized public void showView(int width, int height, Window window) {
+	public void showView(int width, int height, Window window) {
 		if (fullscreen) {
 			fullscreenWindow.setVisible(false);
 		} else {
@@ -336,7 +338,7 @@ public class Chunk3DView extends JDialog {
 	/**
 	 * Hide preview window
 	 */
-	synchronized public void hideView() {
+	public void hideView() {
 		if (fullscreen) {
 			fullscreenWindow.removeComponentListener(componentListener);
 			fullscreenWindow.setVisible(false);

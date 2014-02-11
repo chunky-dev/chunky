@@ -54,6 +54,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -2254,48 +2255,53 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	/**
 	 * Method to notify the render controls dialog that a scene has been loaded.
-	 * Causes canvas size to be updated.
+	 * Causes canvas size to be updated. Can be called from outside EDT.
 	 */
 	@Override
-	public synchronized void sceneLoaded() {
-		dof.update();
-		fov.update();
-		subjectDistance.update();
-		updateProjectionMode();
-		updateSkyMode();
-		updateWidthField();
-		updateHeightField();
-		emitterIntensity.update();
-		sunIntensity.update();
-		sunAzimuth.update();
-		sunAltitude.update();
-		updateStillWater();
-		updateClearWater();
-		updateSkyRotation();
-		updateMirroSkyCB();
-		updateBiomeColorsCB();
-		updateAtmosphereCheckBox();
-		updateVolumetricFogCheckBox();
-		updateCloudsEnabledCheckBox();
-		updateTitle();
-		exposure.update();
-		updateSaveDumpsCheckBox();
-		updateSaveSnapshotCheckBox();
-		updateDumpFrequencyField();
-		updateSPPTargetField();
-		updateSceneNameField();
-		updatePostprocessCB();
-		cloudHeight.update();
-		rayDepth.update();
-		updateWaterHeight();
-		updateCameraDirection();
-		updateCameraPosition();
-		updateCustomPresets();
-		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
-		directLight.setSelected(renderMan.scene().getDirectLight());
-		stopRenderBtn.setEnabled(true);
+	public void sceneLoaded() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				dof.update();
+				fov.update();
+				subjectDistance.update();
+				updateProjectionMode();
+				updateSkyMode();
+				updateWidthField();
+				updateHeightField();
+				emitterIntensity.update();
+				sunIntensity.update();
+				sunAzimuth.update();
+				sunAltitude.update();
+				updateStillWater();
+				updateClearWater();
+				updateSkyRotation();
+				updateMirroSkyCB();
+				updateBiomeColorsCB();
+				updateAtmosphereCheckBox();
+				updateVolumetricFogCheckBox();
+				updateCloudsEnabledCheckBox();
+				updateTitle();
+				exposure.update();
+				updateSaveDumpsCheckBox();
+				updateSaveSnapshotCheckBox();
+				updateDumpFrequencyField();
+				updateSPPTargetField();
+				updateSceneNameField();
+				updatePostprocessCB();
+				cloudHeight.update();
+				rayDepth.update();
+				updateWaterHeight();
+				updateCameraDirection();
+				updateCameraPosition();
+				updateCustomPresets();
+				enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
+				directLight.setSelected(renderMan.scene().getDirectLight());
+				stopRenderBtn.setEnabled(true);
 
-		showPreviewWindow();
+				showPreviewWindow();
+			}
+		});
 	}
 
 	/**
@@ -2467,8 +2473,13 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	@Override
 	public void chunksLoaded() {
-		updateCameraPosition();
-		showPreviewWindow();
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				updateCameraPosition();
+				showPreviewWindow();
+			}
+		});
 	}
 
 	@Override
