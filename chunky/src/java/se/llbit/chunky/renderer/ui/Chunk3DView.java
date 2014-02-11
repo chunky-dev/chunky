@@ -307,10 +307,10 @@ public class Chunk3DView extends JDialog {
 	public void setCanvasSize(int width, int height) {
 		// NB: avoid setting the same preferred size twice
 		if (width != canvas.getWidth() || height != canvas.getHeight()) {
-			canvas.setPreferredSize(new Dimension(width, height));
-			canvas.setSize(new Dimension(width, height));
-			canvas.revalidate();
-			pack();
+			if (!fullscreen) {
+				canvas.setPreferredSize(new Dimension(width, height));
+				pack();
+			}
 		}
 	}
 
@@ -329,9 +329,11 @@ public class Chunk3DView extends JDialog {
 		if (fullscreen) {
 			fullscreenWindow.setVisible(false);
 		} else {
-			setVisible(true);
 			setCanvasSize(width, height);
 			displayRightOf(window);
+			// NB: we take care to setVisible(true) after updating the
+			// canvas size in order to avoid repainting problem
+			setVisible(true);
 		}
 	}
 

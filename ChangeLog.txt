@@ -1,4 +1,6 @@
 1.2.3 - TBD
+    * Fixed issue causing the render preview window to display white after
+      being closed and re-opened
     * The name of the biome under the cursor is now displayed in the 2D map
     * Using the -snapshot command without arguments now prints a list of all
       available scenes in the scene directory
