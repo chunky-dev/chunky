@@ -31,9 +31,14 @@
 			inheritAll="false"/>
 	</target>
 
+	<target name="debug">
+		<ant antfile="${chunky.home}/build.xml" target="debug"
+			 inheritAll="false"/>
+	</target>
+
 	<target name="run">
 		<ant antfile="${chunky.home}/build.xml" target="run"
-			inheritAll="false"/>
+			 inheritAll="false"/>
 	</target>
 
 	<target name="clean-dist" depends="clean"

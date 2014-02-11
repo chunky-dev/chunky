@@ -29,3 +29,6 @@
 
 # Render snapshots from testing
 /*.png
+
+# Logs
+*.log
