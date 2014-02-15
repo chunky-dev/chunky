@@ -1255,6 +1255,9 @@ public class TexturePackLoader {
 		allTextures.put("stone_andesite_smooth",
 				new SimpleTexture("assets/minecraft/textures/blocks/stone_andesite_smooth", Texture.smoothAndesite));
 
+		// [14w07a] Iron Trapdoor
+		allTextures.put("iron_trapdoor",
+				new SimpleTexture("assets/minecraft/textures/blocks/iron_trapdoor", Texture.ironTrapdoor));
 	}
 
 	/**

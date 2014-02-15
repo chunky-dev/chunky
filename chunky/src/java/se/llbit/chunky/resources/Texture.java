@@ -128,6 +128,7 @@ public class Texture {
 	public static final Texture ironDoorBottom = new Texture();
 	public static final Texture ladder = new Texture("ladder");
 	public static final Texture trapdoor = new Texture("trapdoor");
+	public static final Texture ironTrapdoor = new Texture("trapdoor");
 	public static final Texture ironBars = new Texture("iron-bars");
 	public static final Texture farmlandWet = new Texture();
 	public static final Texture farmlandDry = new Texture();

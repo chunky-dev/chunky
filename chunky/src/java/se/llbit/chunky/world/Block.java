@@ -1534,7 +1534,7 @@ public class Block {
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TrapdoorModel.intersect(ray);
+			return TrapdoorModel.intersect(ray, Texture.trapdoor);
 		}
 	};
 	public static final Block HIDDENSILVERFISH = new Block(0x61, "Hidden Silverfish", Texture.stone) {
@@ -2702,11 +2702,15 @@ public class Block {
 			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
-	public static final Block UNKNOWN0xA7 = new Block(0xA7, "Unknown Block 0xA7", Texture.unknown) {
+	public static final Block IRON_TRAPDOOR = new Block(0xA7, "Iron Trapdoor", Texture.ironTrapdoor) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return TrapdoorModel.intersect(ray, Texture.ironTrapdoor);
 		}
 	};
 	public static final Block UNKNOWN0xA8 = new Block(0xA8, "Unknown Block 0xA8", Texture.unknown) {
@@ -3398,7 +3402,7 @@ public class Block {
 		REDSTONEBLOCK, NETHERQUARTZORE, HOPPER, QUARTZ,
 		QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, STAINED_CLAY,
 		STAINED_GLASSPANE, LEAVES2, WOOD2, ACACIASTAIRS,
-		DARKOAKSTAIRS, SLIMEBLOCK, BARRIER, UNKNOWN0xA7,
+		DARKOAKSTAIRS, SLIMEBLOCK, BARRIER, IRON_TRAPDOOR,
 		UNKNOWN0xA8, UNKNOWN0xA9, HAY_BLOCK, CARPET,
 		HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, LARGE_FLOWER,
 		UNKNOWN0xB0, UNKNOWN0xB1, UNKNOWN0xB2, UNKNOWN0xB3,

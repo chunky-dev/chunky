@@ -188,7 +188,7 @@ public class TrapdoorModel {
 		},
 	};
 
-	public static boolean intersect(Ray ray) {
+	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 		Quad[] state;
 		int data = ray.getBlockData();
@@ -202,7 +202,7 @@ public class TrapdoorModel {
 		}
 		for (Quad face : state) {
 			if (face.intersect(ray)) {
-				float[] color = Texture.trapdoor.getColor(ray.u, ray.v);
+				float[] color = texture.getColor(ray.u, ray.v);
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
 					ray.n.set(face.n);
