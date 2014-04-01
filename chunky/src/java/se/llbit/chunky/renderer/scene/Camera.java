@@ -492,15 +492,14 @@ public class Camera implements JSONifiable {
 	}
 
 	/**
-	 * Copy configuration from other camera
-	 * @param other
+	 * Copy camera configuration from another camera
+	 * @param other the camera to copy configuration from
 	 */
 	public void set(Camera other) {
 		pos.set(other.pos);
 		yaw = other.yaw;
 		pitch = other.pitch;
 		roll = other.roll;
-		transform.set(other.transform);
 		dof = other.dof;
 		projectionMode = other.projectionMode;
 		fov = other.fov;
