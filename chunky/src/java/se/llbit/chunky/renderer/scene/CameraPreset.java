@@ -18,7 +18,6 @@ package se.llbit.chunky.renderer.scene;
 
 import javax.swing.ImageIcon;
 
-import se.llbit.chunky.renderer.scene.Camera.ProjectionMode;
 import se.llbit.chunky.world.Icon;
 
 /**

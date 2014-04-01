@@ -403,29 +403,6 @@ public class Camera implements JSONifiable {
 	}
 
 	/**
-	 * Projection mode enumeration
-	 */
-	@SuppressWarnings("javadoc")
-	public enum ProjectionMode {
-		PINHOLE("Standard"),
-		PARALLEL("Parallel"),
-		FISHEYE("Fisheye"),
-		PANORAMIC("Panoramic (equirectangular)"),
-		PANORAMIC_SLOT("Panoramic (slot)");
-
-		private final String niceName;
-
-		private ProjectionMode(String niceName) {
-			this.niceName = niceName;
-		}
-
-		@Override
-		public String toString() {
-			return niceName;
-		}
-	}
-
-	/**
 	 * Minimum DoF
 	 */
 	public static final double MIN_DOF = .5;
@@ -455,8 +432,20 @@ public class Camera implements JSONifiable {
 	 */
 	private final Vector3d u = new Vector3d();
 
+	/**
+	 * Yaw angle. Down = 0, forward = -PI/2, up = -PI.
+	 */
 	private double yaw = - HALF_PI;
+
+	/**
+	 * Pitch angle. Pitch = 0 corresponds to the camera pointing along the z axis,
+	 * pitch = PI/2 corresponds to the negative x axis, etc.
+	 */
 	private double pitch = 0;
+
+	/**
+	 * Camera roll.
+	 */
 	private double roll = 0;
 
 	/**
