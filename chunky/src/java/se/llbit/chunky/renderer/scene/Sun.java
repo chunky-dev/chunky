@@ -146,8 +146,13 @@ public class Sun implements JSONifiable {
 	private double azimuth = Math.PI / 2.5;
 	private double altitude = Math.PI / 3;
 
+	// support vectors
 	private final Vector3d su = new Vector3d();
 	private final Vector3d sv = new Vector3d();
+
+	/**
+	 * Location of the sun in the sky.
+	 */
 	private final Vector3d sw = new Vector3d();
 
 	protected final Vector3d emittance = new Vector3d(1, 1, 1);
@@ -227,20 +232,19 @@ public class Sun implements JSONifiable {
 		double theta = azimuth;
 		double phi = altitude;
 
-		sw.x = FastMath.cos(theta);
-		sw.y = FastMath.sin(phi);
-		sw.z = FastMath.sin(theta);
+		double r = QuickMath.abs(FastMath.cos(phi));
 
-		double r = FastMath.sqrt(sw.x*sw.x + sw.z*sw.z);
-		r = QuickMath.abs(FastMath.cos(phi) / r);
+		sw.set(
+			FastMath.cos(theta) * r,
+			FastMath.sin(phi),
+			FastMath.sin(theta) * r
+		);
 
-		sw.x *= r;
-		sw.z *= r;
-
-		if (QuickMath.abs(sw.x) > .1)
+		if (QuickMath.abs(sw.x) > .1) {
 			su.set(0, 1, 0);
-		else
+		} else {
 			su.set(1, 0, 0);
+		}
 		sv.cross(sw, su);
 		sv.normalize();
 		su.cross(sv, sw);
