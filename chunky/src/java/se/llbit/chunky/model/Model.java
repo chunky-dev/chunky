@@ -17,6 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.math.Quad;
+import se.llbit.math.Transform;
 import se.llbit.math.UVTriangle;
 
 /**
@@ -32,7 +33,7 @@ public class Model {
 	public static final Quad[] rotateNegX(Quad[] src) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].getNegXRotated();
+			rot[i] = new Quad(src[i], Transform.NONE.rotateNegX());
 		}
 		return rot;
 	}
@@ -45,7 +46,7 @@ public class Model {
 	public static final Quad[] rotateX(Quad[] src) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].getXRotated();
+			rot[i] = new Quad(src[i], Transform.NONE.rotateX());
 		}
 		return rot;
 	}
@@ -58,7 +59,7 @@ public class Model {
 	public static final Quad[] rotateX(Quad[] src, double angle) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].getXRotated(angle);
+			rot[i] = new Quad(src[i], Transform.NONE.rotateX(angle));
 		}
 		return rot;
 	}
@@ -70,7 +71,7 @@ public class Model {
 	public static final Quad[] rotateY(Quad[] src) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].getYRotated();
+			rot[i] = new Quad(src[i], Transform.NONE.rotateY());
 		}
 		return rot;
 	}
@@ -95,7 +96,7 @@ public class Model {
 	public static final Quad[] rotateY(Quad[] src, double angle) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].getYRotated(angle);
+			rot[i] = new Quad(src[i], Transform.NONE.rotateY(angle));
 		}
 		return rot;
 	}
@@ -107,7 +108,7 @@ public class Model {
 	public static final Quad[] rotateZ(Quad[] src) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].getZRotated();
+			rot[i] = new Quad(src[i], Transform.NONE.rotateZ());
 		}
 		return rot;
 	}
@@ -120,7 +121,7 @@ public class Model {
 	public static final Quad[] rotateZ(Quad[] src, double angle) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].getZRotated(angle);
+			rot[i] = new Quad(src[i], Transform.NONE.rotateZ(angle));
 		}
 		return rot;
 	}
@@ -135,7 +136,7 @@ public class Model {
 	public static final Quad[] translate(Quad[] src, double x, double y, double z) {
 		Quad[] out = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			out[i] = src[i].getTranslated(x, y, z);
+			out[i] = new Quad(src[i], Transform.NONE.translate(x, y, z));
 		}
 		return out;
 	}

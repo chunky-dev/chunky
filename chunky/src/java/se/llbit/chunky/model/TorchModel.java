@@ -25,8 +25,6 @@ import se.llbit.math.Vector2d;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 
-import static se.llbit.chunky.model.Model.*;
-
 @SuppressWarnings("javadoc")
 public class TorchModel {
 	// facing west
@@ -123,16 +121,16 @@ public class TorchModel {
 		rotTriangles[2] = uvtriangles;
 
 		// pointing north
-		rotQuads[4] = rotateY(rotQuads[2]);
-		rotTriangles[4] = rotateY(rotTriangles[2]);
+		rotQuads[4] = Model.rotateY(rotQuads[2]);
+		rotTriangles[4] = Model.rotateY(rotTriangles[2]);
 
 		// pointing east
-		rotQuads[1] = rotateY(rotQuads[4]);
-		rotTriangles[1] = rotateY(rotTriangles[4]);
+		rotQuads[1] = Model.rotateY(rotQuads[4]);
+		rotTriangles[1] = Model.rotateY(rotTriangles[4]);
 
 		// pointing south
-		rotQuads[3] = rotateY(rotQuads[1]);
-		rotTriangles[3] = rotateY(rotTriangles[1]);
+		rotQuads[3] = Model.rotateY(rotQuads[1]);
+		rotTriangles[3] = Model.rotateY(rotTriangles[1]);
 
 		// on ground
 		rotQuads[5] = onGround;

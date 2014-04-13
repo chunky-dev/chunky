@@ -23,6 +23,7 @@ import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.Transform;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 
@@ -42,9 +43,9 @@ public class LilyPadModel {
 
 	static {
 		rot[0] = quad;
-		rot[3] = rot[0].getYRotated();
-		rot[2] = rot[3].getYRotated();
-		rot[1] = rot[2].getYRotated();
+		rot[3] = new Quad(rot[0], Transform.NONE.rotateY());
+		rot[2] = new Quad(rot[3], Transform.NONE.rotateY());
+		rot[1] = new Quad(rot[2], Transform.NONE.rotateY());
 		Color.getRGBAComponents(COLOR, lilyPadColor);
 	}
 

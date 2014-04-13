@@ -16,7 +16,6 @@
  */
 package se.llbit.math;
 
-import se.llbit.math.transform.Translation;
 
 /**
  * A quad.
@@ -46,7 +45,7 @@ public class Quad {
 		o.x -= .5;
 		o.y -= .5;
 		o.z -= .5;
-		t.rotate(o);
+		t.apply(o);
 		o.x += .5;
 		o.y += .5;
 		o.z += .5;
@@ -54,9 +53,9 @@ public class Quad {
 		xv.set(other.xv);
 		yv.set(other.yv);
 		n.set(other.n);
-		t.rotate(xv);
-		t.rotate(yv);
-		t.rotate(n);
+		t.apply(xv);
+		t.apply(yv);
+		t.apply(n);
 		xvl = other.xvl;
 		yvl = other.yvl;
 		d = - n.dot(o);
@@ -148,95 +147,6 @@ public class Quad {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * @return A copy of this quad, rotated around the Y axis
-	 */
-	public Quad getYRotated() {
-		return new Quad(this, Transform.rotateY);
-	}
-
-	/**
-	 * @return A copy of this quad, rotated around the X axis
-	 */
-	public Quad getXRotated() {
-		return new Quad(this, Transform.rotateX);
-	}
-
-	/**
-	 * @return A copy of this quad, rotated around the negative X axis
-	 */
-	public Quad getNegXRotated() {
-		return new Quad(this, Transform.rotateNegX);
-	}
-
-	/**
-	 * @return A copy of this quad, rotated around the Z axis
-	 */
-	public Quad getZRotated() {
-		return new Quad(this, Transform.rotateZ);
-	}
-
-	/**
-	 * @return A copy of this quad, rotated around the negative Z axis
-	 */
-	public Quad getNegZRotated() {
-		return new Quad(this, Transform.rotateNegZ);
-	}
-
-	/**
-	 * @param angle
-	 * @return A copy of this quad, rotated around the X axis by some angle
-	 */
-	public Quad getXRotated(double angle) {
-		Matrix3d transform = new Matrix3d();
-		transform.rotX(angle);
-		return new Quad(this, transform);
-	}
-
-	/**
-	 * @param angle
-	 * @return A copy of this quad, rotated around the Y axis by some angle
-	 */
-	public Quad getYRotated(double angle) {
-		Matrix3d transform = new Matrix3d();
-		transform.rotY(angle);
-		return new Quad(this, transform);
-	}
-
-	/**
-	 * @param angle
-	 * @return A copy of this quad, rotated around the Z axis by some angle
-	 */
-	public Quad getZRotated(double angle) {
-		Matrix3d transform = new Matrix3d();
-		transform.rotZ(angle);
-		return new Quad(this, transform);
-	}
-
-	/**
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return A translated copy of this quad
-	 */
-	public Quad getTranslated(double x, double y, double z) {
-		return new Quad(this, new Translation(x, y, z));
-	}
-
-	/**
-	 * @return A flipped copy of this quad
-	 */
-	public Quad getFlipped() {
-		return new Quad(this, Transform.flipY);
-	}
-
-	/**
-	 * @return A mirrored copy of this quad
-	 */
-	public Quad getMirrored() {
-		return new Quad(this, Transform.mirrorX);
 	}
 
 	/**

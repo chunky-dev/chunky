@@ -139,17 +139,18 @@ public class UVTriangle {
 	 * @return Rotated copy of this triangle
 	 */
 	public UVTriangle getYRotated() {
+		Transform t = Transform.NONE.rotateY();
 		Vector3d ar = new Vector3d(a);
 		ar.add(-0.5, -0.5, -0.5);
-		Transform.rotateY.rotate(ar);
+		t.apply(ar);
 		ar.add(0.5, 0.5, 0.5);
 		Vector3d br = new Vector3d(b);
 		br.add(-0.5, -0.5, -0.5);
-		Transform.rotateY.rotate(br);
+		t.apply(br);
 		br.add(0.5, 0.5, 0.5);
 		Vector3d cr = new Vector3d(c);
 		cr.add(-0.5, -0.5, -0.5);
-		Transform.rotateY.rotate(cr);
+		t.apply(cr);
 		cr.add(0.5, 0.5, 0.5);
 		return new UVTriangle(ar, br, cr, sa, sb, sc);
 	}

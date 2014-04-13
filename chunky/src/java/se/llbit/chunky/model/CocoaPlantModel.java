@@ -119,7 +119,7 @@ public class CocoaPlantModel {
 
 		stem[0] = stemNorth;
 		for (int i = 1; i < 4; ++i) {
-			stem[i] = new DoubleSidedQuad(stem[i-1], Transform.rotateY);
+			stem[i] = new DoubleSidedQuad(stem[i-1], Transform.NONE.rotateY());
 			fruit[0][i] = Model.rotateY(fruit[0][i-1]);
 			fruit[1][i] = Model.rotateY(fruit[1][i-1]);
 			fruit[2][i] = Model.rotateY(fruit[2][i-1]);

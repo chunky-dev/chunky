@@ -20,100 +20,226 @@ package se.llbit.math;
  * A transformation.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public abstract class Transform {
+public class Transform {
+	private static class TransformPair extends Transform {
+		private final Transform a;
+		private final Transform b;
+
+		protected TransformPair(Transform a, Transform b) {
+			this.a = a;
+			this.b = b;
+		}
+
+		@Override
+		public void apply(Vector3d v) {
+			a.apply(v);
+			b.apply(v);
+		}
+	}
+
+	public static final Transform NONE = new Transform();
+
+	private Transform() {
+	}
 
 	/**
-	 * Apply the rotation part of this transform to a vector
-	 * @param o The vector to rotate
+	 * Apply the transformation to a vertex.
+	 * @param v
 	 */
-	public abstract void rotate(Vector3d o);
+	public void apply(Vector3d v) {
+	}
+
+	private final Transform chain(Transform other) {
+		if (this == NONE) {
+			return other;
+		} else {
+			return new TransformPair(this, other);
+		}
+
+	}
 
 	/**
-	 * Apply the translation part of this transform to a vector
-	 * @param o The vector to translate
+	 * Translate by a vector
+	 * @param translation The translation vector
 	 */
-	public void translate(Vector3d o) {
+	public final Transform translate(final Vector3d translation) {
+		return chain(new Transform() {
+			@Override
+			public void apply(Vector3d v) {
+				v.add(translation);
+			}
+		});
+	}
+
+	/**
+	 * Translate by a vector
+	 * @param translation The translation vector
+	 */
+	public final Transform translate(final double x, final double y, final double z) {
+		return chain(new Transform() {
+			@Override
+			public void apply(Vector3d v) {
+				v.x += x;
+				v.y += y;
+				v.z += z;
+			}
+		});
+	}
+
+	/**
+	 * Scale by a scalar
+	 * @param scale
+	 */
+	public final Transform scale(final double scale) {
+		return chain(new Transform() {
+			@Override
+			public void apply(Vector3d v) {
+				v.scale(scale);
+			}
+		});
 	}
 
 	/**
 	 * Rotation by 90 degrees around the Y axis
 	 */
-	public static final Transform rotateY = new Transform() {
-		@Override
-		public void rotate(Vector3d o) {
-	        double tmp = o.x;
-	        o.x = -o.z;
-	        o.z = tmp;
-	    }
-	};
+	public final Transform rotateY() {
+		return chain(new Transform() {
+			@Override
+			public void apply(Vector3d o) {
+		        double tmp = o.x;
+		        o.x = -o.z;
+		        o.z = tmp;
+		    }
+		});
+	}
 
 	/**
 	 * Rotation by 90 degrees around the X axis
 	 */
-	public static final Transform rotateX = new Transform() {
-		@Override
-		public void rotate(Vector3d o) {
-	        double tmp = o.y;
-	        o.y = -o.z;
-	        o.z = tmp;
-	    }
-	};
+	public final Transform rotateX() {
+		return chain(new Transform() {
+			@Override
+			public void apply(Vector3d o) {
+		        double tmp = o.y;
+		        o.y = -o.z;
+		        o.z = tmp;
+		    }
+		});
+	}
 
 	/**
 	 * Rotation by 90 degrees around the negative X axis
 	 */
-	public static final Transform rotateNegX = new Transform() {
-		@Override
-		public void rotate(Vector3d o) {
-	        double tmp = o.y;
-	        o.y = o.z;
-	        o.z = -tmp;
-	    }
-	};
+	public final Transform rotateNegX() {
+		return chain(new Transform() {
+			@Override
+			public void apply(Vector3d o) {
+		        double tmp = o.y;
+		        o.y = o.z;
+		        o.z = -tmp;
+		    }
+		});
+	}
 
 	/**
 	 * Rotation by 90 degrees around the Z axis
 	 */
-	public static final Transform rotateZ = new Transform() {
-		@Override
-		public void rotate(Vector3d o) {
-	        double tmp = o.x;
-	        o.x = -o.y;
-	        o.y = tmp;
-	    }
-	};
+	public final Transform rotateZ() {
+		return chain(new Transform() {
+			@Override
+			public void apply(Vector3d o) {
+		        double tmp = o.x;
+		        o.x = -o.y;
+		        o.y = tmp;
+		    }
+		});
+	}
 
 	/**
 	 * Rotation by 90 degrees around the negative Z axis
 	 */
-	public static final Transform rotateNegZ = new Transform() {
-		@Override
-		public void rotate(Vector3d o) {
-	        double tmp = o.x;
-	        o.x = o.y;
-	        o.y = -tmp;
-	    }
-	};
+	public final Transform rotateNegZ() {
+		return chain(new Transform() {
+			@Override
+			public void apply(Vector3d o) {
+		        double tmp = o.x;
+		        o.x = o.y;
+		        o.y = -tmp;
+		    }
+		});
+	}
 
 	/**
 	 * Mirror in Y axis
 	 */
-	public static final Transform flipY = new Transform() {
-		@Override
-		public void rotate(Vector3d o) {
-	        o.x = -o.x;
-	        o.y = -o.y;
-	    }
-	};
+	public final Transform mirrorY() {
+		return chain(new Transform() {
+			@Override
+			public void apply(Vector3d o) {
+		        o.x = -o.x;
+		        o.y = -o.y;
+		    }
+		});
+	}
 
 	/**
 	 * Mirror in X axis
 	 */
-	public static final Transform mirrorX = new Transform() {
-		@Override
-		public void rotate(Vector3d o) {
-	        o.x = -o.x;
-	        o.z = -o.z;
-	    }
-	};
+	public final Transform mirrorX() {
+		return chain(new Transform() {
+			@Override
+			public void apply(Vector3d o) {
+		        o.x = -o.x;
+		        o.z = -o.z;
+		    }
+		});
+	}
+
+	/**
+	 * Rotation around the Y axis
+	 */
+	public final Transform rotateY(final double angle) {
+		return chain(new Transform() {
+			private final Matrix3d mat = new Matrix3d();
+			{
+				mat.rotY(angle);
+			}
+			@Override
+			public void apply(Vector3d v) {
+				mat.transform(v);
+		    }
+		});
+	}
+
+	/**
+	 * Rotation around the X axis
+	 */
+	public final Transform rotateX(final double angle) {
+		return chain(new Transform() {
+			private final Matrix3d mat = new Matrix3d();
+			{
+				mat.rotX(angle);
+			}
+			@Override
+			public void apply(Vector3d v) {
+				mat.transform(v);
+		    }
+		});
+	}
+
+	/**
+	 * Rotation around the Z axis
+	 */
+	public final Transform rotateZ(final double angle) {
+		return chain(new Transform() {
+			private final Matrix3d mat = new Matrix3d();
+			{
+				mat.rotZ(angle);
+			}
+			@Override
+			public void apply(Vector3d v) {
+				mat.transform(v);
+		    }
+		});
+	}
 }

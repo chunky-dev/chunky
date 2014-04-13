@@ -20,6 +20,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
+import se.llbit.math.Transform;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 
@@ -77,15 +78,12 @@ public class GlassPaneModel {
 		panes[0] = connector[0];
 		panes[1] = connector[1];
 		for (int j = 2; j < 4; ++j) {
-			panes[j] = new Quad[connector[j-2].length];
-			for (int i = 0; i < connector[j-2].length; ++i) {
-				panes[j][i] = connector[j-2][i].getYRotated();
-			}
+			panes[j] = Model.rotateY(connector[j-2]);
 		}
 		rotCap[0] = cap;
-		rotCap[2] = rotCap[0].getYRotated();
-		rotCap[1] = rotCap[2].getYRotated();
-		rotCap[3] = rotCap[1].getYRotated();
+		rotCap[2] = new Quad(rotCap[0], Transform.NONE.rotateY());
+		rotCap[1] = new Quad(rotCap[2], Transform.NONE.rotateY());
+		rotCap[3] = new Quad(rotCap[1], Transform.NONE.rotateY());
 	}
 
 	public static boolean intersect(Ray ray, Texture texture, Texture sideTexture) {
