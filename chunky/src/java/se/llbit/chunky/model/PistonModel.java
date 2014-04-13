@@ -133,37 +133,16 @@ public class PistonModel {
 	};
 
 	static {
-		rotateFaceNegX(extended, 2, 0);
-		rotateFaceX(extended, 2, 1);
-		rotateFaceY(extended, 2, 5);
-		rotateFaceY(extended, 5, 3);
-		rotateFaceY(extended, 3, 4);
-		rotateFaceNegX(retracted, 2, 0);
-		rotateFaceX(retracted, 2, 1);
-		rotateFaceY(retracted, 2, 5);
-		rotateFaceY(retracted, 5, 3);
-		rotateFaceY(retracted, 3, 4);
-	}
-
-	private static void rotateFaceX(Quad[][] quads, int i, int j) {
-		quads[j] = new Quad[quads[i].length];
-		for (int k = 0; k < quads[i].length; ++k) {
-			quads[j][k] = quads[i][k].getXRotated();
-		}
-	}
-
-	private static void rotateFaceNegX(Quad[][] quads, int i, int j) {
-		quads[j] = new Quad[quads[i].length];
-		for (int k = 0; k < quads[i].length; ++k) {
-			quads[j][k] = quads[i][k].getNegXRotated();
-		}
-	}
-
-	private static void rotateFaceY(Quad[][] quads, int i, int j) {
-		quads[j] = new Quad[quads[i].length];
-		for (int k = 0; k < quads[i].length; ++k) {
-			quads[j][k] = quads[i][k].getYRotated();
-		}
+		extended[0] = Model.rotateNegX(extended[2]);
+		extended[1] = Model.rotateX(extended[2]);
+		extended[5] = Model.rotateY(extended[2]);
+		extended[3] = Model.rotateY(extended[5]);
+		extended[4] = Model.rotateY(extended[3]);
+		retracted[0] = Model.rotateNegX(retracted[2]);
+		retracted[1] = Model.rotateX(retracted[2]);
+		retracted[5] = Model.rotateY(retracted[2]);
+		retracted[3] = Model.rotateY(retracted[5]);
+		retracted[4] = Model.rotateY(retracted[3]);
 	}
 
 	static final Texture[][][] texture = {

@@ -69,16 +69,9 @@ public class WallSignModel {
 	};
 
 	static {
-		rotateFaceY(2, 5);
-		rotateFaceY(5, 3);
-		rotateFaceY(3, 4);
-	}
-
-	private static void rotateFaceY(int i, int j) {
-		faces[j] = new Quad[faces[i].length];
-		for (int k = 0; k < faces[i].length; ++k) {
-			faces[j][k] = faces[i][k].getYRotated();
-		}
+		faces[5] = Model.rotateY(faces[2]);
+		faces[3] = Model.rotateY(faces[5]);
+		faces[4] = Model.rotateY(faces[3]);
 	}
 
 	public static boolean intersect(Ray ray) {

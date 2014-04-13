@@ -27,6 +27,32 @@ public class Model {
 	/**
 	 * @param src
 	 * @param angle
+	 * @return Quads rotated minus 90 degrees around the X axis
+	 */
+	public static final Quad[] rotateNegX(Quad[] src) {
+		Quad[] rot = new Quad[src.length];
+		for (int i = 0; i < src.length; ++i) {
+			rot[i] = src[i].getNegXRotated();
+		}
+		return rot;
+	}
+
+	/**
+	 * @param src
+	 * @param angle
+	 * @return Quads rotated 90 degrees around the X axis
+	 */
+	public static final Quad[] rotateX(Quad[] src) {
+		Quad[] rot = new Quad[src.length];
+		for (int i = 0; i < src.length; ++i) {
+			rot[i] = src[i].getXRotated();
+		}
+		return rot;
+	}
+
+	/**
+	 * @param src
+	 * @param angle
 	 * @return Quads rotated about the X axis by some angle
 	 */
 	public static final Quad[] rotateX(Quad[] src, double angle) {
@@ -39,7 +65,7 @@ public class Model {
 
 	/**
 	 * @param src
-	 * @return Quads rotated about the Y axis
+	 * @return Quads rotated 90 degrees around the Y axis
 	 */
 	public static final Quad[] rotateY(Quad[] src) {
 		Quad[] rot = new Quad[src.length];

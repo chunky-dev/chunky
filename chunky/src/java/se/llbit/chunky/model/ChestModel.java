@@ -176,10 +176,7 @@ public class ChestModel {
 
 	private static void rotateFaceY(int i, int j) {
 		for (int v = 0; v < 3; ++v) {
-			variants[v][j] = new Quad[variants[v][i].length];
-			for (int k = 0; k < variants[v][i].length; ++k) {
-				variants[v][j][k] = variants[v][i][k].getYRotated();
-			}
+			variants[v][j] = Model.rotateY(variants[v][i]);
 		}
 	}
 

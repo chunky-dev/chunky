@@ -57,10 +57,7 @@ public class ButtonModel {
 	static {
 		rot[0] = quads;
 		for (int angle = 1; angle < 4; ++angle) {
-			rot[angle] = new Quad[quads.length];
-			for (int i = 0; i < quads.length; ++i) {
-				rot[angle][i] = rot[angle-1][i].getYRotated();
-			}
+			rot[angle] = Model.rotateY(rot[angle-1]);
 		}
 	}
 

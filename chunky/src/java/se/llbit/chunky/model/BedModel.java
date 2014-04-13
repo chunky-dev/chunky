@@ -74,11 +74,7 @@ public class BedModel {
 		rot[1][0] = head;
 		for (int isHead = 0; isHead < 2; ++isHead) {
 			for (int angle = 1; angle < 4; ++angle) {
-				rot[isHead][angle] = new Quad[rot[isHead][angle-1].length];
-				for (int i = 0; i < rot[isHead][angle-1].length; ++i) {
-					rot[isHead][angle][i] = rot[isHead][angle-1][i].getYRotated();
-				}
-
+				rot[isHead][angle] = Model.rotateY(rot[isHead][angle-1]);
 			}
 		}
 	}

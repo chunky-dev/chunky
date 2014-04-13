@@ -167,8 +167,9 @@ public class Sun implements JSONifiable {
 	public void skylight(Ray ray) {
 		Vector4d c = ray.color;
 
-		if (ray.d.y < 0)
+		if (ray.d.y < 0) {
 			ray.d.y = -ray.d.y;
+		}
 		double cosTheta = ray.d.y;
 		double cosGamma = ray.d.dot(sw);
 		double gamma = FastMath.acos(cosGamma);

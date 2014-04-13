@@ -67,16 +67,9 @@ public class PumpkinModel {
 	};
 
 	static {
-		rotateFaceY(2, 3);
-		rotateFaceY(3, 0);
-		rotateFaceY(0, 1);
-	}
-
-	private static void rotateFaceY(int i, int j) {
-		sides[j] = new Quad[sides[i].length];
-		for (int k = 0; k < sides[i].length; ++k) {
-			sides[j][k] = sides[i][k].getYRotated();
-		}
+		sides[3] = Model.rotateY(sides[2]);
+		sides[0] = Model.rotateY(sides[3]);
+		sides[1] = Model.rotateY(sides[0]);
 	}
 
 	@SuppressWarnings("javadoc")
