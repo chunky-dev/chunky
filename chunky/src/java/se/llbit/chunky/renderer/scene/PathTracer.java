@@ -267,9 +267,9 @@ public class PathTracer {
 										refracted.d.y = n1n2*ray.d.y + (n1n2*cosTheta - t2)*ray.n.y;
 										refracted.d.z = n1n2*ray.d.z + (n1n2*cosTheta - t2)*ray.n.z;
 									} else {
-										refracted.d.x = n1n2*ray.d.x - (n1n2*cosTheta - t2)*ray.n.x;
-										refracted.d.y = n1n2*ray.d.y - (n1n2*cosTheta - t2)*ray.n.y;
-										refracted.d.z = n1n2*ray.d.z - (n1n2*cosTheta - t2)*ray.n.z;
+										refracted.d.x = n1n2*ray.d.x - (-n1n2*cosTheta - t2)*ray.n.x;
+										refracted.d.y = n1n2*ray.d.y - (-n1n2*cosTheta - t2)*ray.n.y;
+										refracted.d.z = n1n2*ray.d.z - (-n1n2*cosTheta - t2)*ray.n.z;
 									}
 
 									refracted.d.normalize();
