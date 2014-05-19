@@ -17,9 +17,12 @@
 package se.llbit.chunky.ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
@@ -29,7 +32,9 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
 
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.RenderBuffer;
@@ -72,6 +77,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	private final RenderBuffer renderBuffer;
 	private volatile ChunkView view;
 	private final MapLabel errlbl = new MapLabel(this);
+	private final JPopupMenu contextMenu = new JPopupMenu();
 
 	private volatile ChunkPosition start = ChunkPosition.get(0, 0);
 	private volatile ChunkPosition end = ChunkPosition.get(0, 0);
@@ -133,7 +139,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON3) {
-				chunky.open3DView();
+				contextMenu.show((Component) e.getSource(), e.getX(), e.getY());
 			} else {
 				setMotionOrigin(e);
 			}
@@ -245,6 +251,32 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			public void componentHidden(ComponentEvent e) {
 			}
 		});
+
+		JMenuItem createScene = new JMenuItem("New 3D scene...");
+		createScene.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				chunky.open3DView();
+			}
+		});
+		JMenuItem loadScene = new JMenuItem("Load scene...");
+		loadScene.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				chunky.loadScene();
+			}
+		});
+		JMenuItem clearSelection = new JMenuItem("Clear selection");
+		clearSelection.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				chunky.clearSelectedChunks();
+			}
+		});
+		contextMenu.add(createScene);
+		contextMenu.add(loadScene);
+		contextMenu.addSeparator();
+		contextMenu.add(clearSelection);
 
 		setView(chunky.getMapView());
 		renderBuffer = new RenderBuffer(view);

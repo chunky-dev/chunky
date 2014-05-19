@@ -1,4 +1,6 @@
 1.2.3 - TBD
+    * Right-clicking in the 2D map now opens a context menu with options to
+      create a new scene, load a scene, or clear the current selection
     * Added iron trapdoor
     * Fixed issue causing the render preview window to display white after
       being closed and re-opened
