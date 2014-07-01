@@ -40,14 +40,14 @@ import javax.swing.event.AncestorListener;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 @SuppressWarnings("serial")
-public class MapLabel extends JPanel {
+public class OverlayLabel extends JPanel {
 	private final JComponent parentComponent;
 	private final JLabel lbl = new JLabel();
 	private JLayeredPane layeredPane;
 	private final Color errBGColor = new Color(0xfff5bc);
 	private boolean showLabel = false;
 
-	public MapLabel(JComponent parent) {
+	public OverlayLabel(JComponent parent) {
 		this.add(lbl);
 		setOpaque(true);
 		setBackground(errBGColor);

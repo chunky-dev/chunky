@@ -1,5 +1,6 @@
 # eclipse workspace metadata
 /.metadata
+/.recommenders
 
 # vim
 *.swp

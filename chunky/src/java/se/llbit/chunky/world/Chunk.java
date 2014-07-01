@@ -31,7 +31,7 @@ import se.llbit.chunky.map.BlockLayer;
 import se.llbit.chunky.map.CaveLayer;
 import se.llbit.chunky.map.CorruptLayer;
 import se.llbit.chunky.map.EmptyLayer;
-import se.llbit.chunky.map.RenderBuffer;
+import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.chunky.map.UnknownLayer;
 import se.llbit.nbt.AnyTag;
@@ -96,7 +96,7 @@ public class Chunk {
 		 * @param cx
 		 * @param cz
 		 */
-		public void render(Chunk chunk, RenderBuffer rbuff, int cx, int cz);
+		public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz);
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class Chunk {
 	 */
 	public static Renderer caveRenderer = new Renderer() {
 		@Override
-		public void render(Chunk chunk, RenderBuffer rbuff, int cx, int cz) {
+		public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz) {
 			chunk.renderCaves(rbuff, cx, cz);
 		}
 	};
@@ -114,7 +114,7 @@ public class Chunk {
 	 */
 	public static Renderer biomeRenderer = new Renderer() {
 		@Override
-		public void render(Chunk chunk, RenderBuffer rbuff, int cx, int cz) {
+		public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz) {
 			chunk.renderBiomes(rbuff, cx, cz);
 		}
 	};
@@ -124,7 +124,7 @@ public class Chunk {
 	 */
 	public static Renderer surfaceRenderer = new Renderer() {
 		@Override
-		public void render(Chunk chunk, RenderBuffer rbuff, int cx, int cz) {
+		public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz) {
 			chunk.renderSurface(rbuff, cx, cz);
 		}
 	};
@@ -134,7 +134,7 @@ public class Chunk {
 	 */
 	public static Renderer layerRenderer = new Renderer() {
 		@Override
-		public void render(Chunk chunk, RenderBuffer rbuff, int cx, int cz) {
+		public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz) {
 			chunk.renderLayer(rbuff, cx, cz);
 		}
 	};
@@ -149,19 +149,19 @@ public class Chunk {
 		this.position = pos;
 	}
 
-	protected void renderLayer(RenderBuffer rbuff, int cx, int cz) {
+	protected void renderLayer(MapBuffer rbuff, int cx, int cz) {
 		layer.render(rbuff, cx, cz);
 	}
 
-	protected void renderSurface(RenderBuffer rbuff, int cx, int cz) {
+	protected void renderSurface(MapBuffer rbuff, int cx, int cz) {
 		surface.render(rbuff, cx, cz);
 	}
 
-	protected void renderCaves(RenderBuffer rbuff, int cx, int cz) {
+	protected void renderCaves(MapBuffer rbuff, int cx, int cz) {
 		caves.render(rbuff, cx, cz);
 	}
 
-	protected void renderBiomes(RenderBuffer rbuff, int cx, int cz) {
+	protected void renderBiomes(MapBuffer rbuff, int cx, int cz) {
 		biomes.render(rbuff, cx, cz);
 	}
 
@@ -212,7 +212,7 @@ public class Chunk {
 	 * @param hlBlock
 	 * @param highlightColor
 	 */
-	public void renderHighlight(RenderBuffer rbuff, int cx, int cz,
+	public void renderHighlight(MapBuffer rbuff, int cx, int cz,
 			Block hlBlock, Color highlightColor) {
 		layer.renderHighlight(rbuff, cx, cz, hlBlock, highlightColor);
 	}

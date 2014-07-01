@@ -53,18 +53,18 @@ public class WorldRenderer {
 	/**
 	 * Render the minimap
 	 * @param world
-	 * @param renderBuffer
+	 * @param buffer
 	 * @param selection
 	 */
-	public void renderMinimap(World world, RenderBuffer renderBuffer,
+	public void renderMinimap(World world, MapBuffer buffer,
 			ChunkSelectionTracker selection) {
 
-		ChunkView view = renderBuffer.getView();
+		ChunkView view = buffer.getView();
 		int width = view.width;
 		int height = view.height;
 
 		if (world.isEmptyWorld()) {
-			Graphics g = renderBuffer.getGraphics();
+			Graphics g = buffer.getGraphics();
 			renderEmpty(g, width, height);
 			return;
 		}
@@ -72,7 +72,7 @@ public class WorldRenderer {
 		float[] selectionColor = new float[4];
 		float[] color = new float[4];
 		se.llbit.math.Color.getRGBAComponents(SELECTION_COLOR, selectionColor);
-		for (ChunkPosition pos: renderBuffer) {
+		for (ChunkPosition pos: buffer) {
 			int y = pos.z - view.iz0;
 			int x = pos.x - view.ix0;
 			Chunk chunk = world.getChunk(pos);
@@ -84,9 +84,9 @@ public class WorldRenderer {
 					color[1] = color[1] * (1-selectionColor[3]) + selectionColor[1] * selectionColor[3];
 					color[2] = color[2] * (1-selectionColor[3]) + selectionColor[2] * selectionColor[3];
 					color[3] = 1;
-					renderBuffer.setRGB(x, y, se.llbit.math.Color.getRGB(color));
+					buffer.setRGB(x, y, se.llbit.math.Color.getRGB(color));
 				} else {
-					renderBuffer.setRGB(x, y, chunk.avgColor());
+					buffer.setRGB(x, y, chunk.avgColor());
 				}
 			}
 		}
@@ -95,37 +95,37 @@ public class WorldRenderer {
 	/**
 	 * Render the map
 	 * @param world
-	 * @param renderBuffer
+	 * @param buffer
 	 * @param renderer
 	 * @param selection
 	 */
-	public void render(World world, RenderBuffer renderBuffer,
+	public void render(World world, MapBuffer buffer,
 			Chunk.Renderer renderer, ChunkSelectionTracker selection) {
 
-		int width = renderBuffer.getWidth();
-		int height = renderBuffer.getHeight();
+		int width = buffer.getWidth();
+		int height = buffer.getHeight();
 
 		if (world.isEmptyWorld()) {
-			Graphics g = renderBuffer.getGraphics();
+			Graphics g = buffer.getGraphics();
 			renderEmpty(g, width, height);
 			return;
 		}
 
-		ChunkView view = renderBuffer.getView();
+		ChunkView view = buffer.getView();
 
-		for (ChunkPosition pos: renderBuffer) {
+		for (ChunkPosition pos: buffer) {
 			int x = pos.x;
 			int z = pos.z;
 
 			Chunk chunk = world.getChunk(pos);
 
-			renderer.render(chunk, renderBuffer, x, z);
+			renderer.render(chunk, buffer, x, z);
 			if (highlightEnabled) {
-				chunk.renderHighlight(renderBuffer, x, z,
+				chunk.renderHighlight(buffer, x, z,
 						hlBlock, hlColor);
 			}
 			if (selection.isSelected(pos)) {
-				renderBuffer.fillRectAlpha(
+				buffer.fillRectAlpha(
 						view.chunkScale * (x - view.ix0),
 						view.chunkScale * (z - view.iz0),
 						view.chunkScale, view.chunkScale,
@@ -142,7 +142,7 @@ public class WorldRenderer {
 	 * @param renderBuffer
 	 */
 	public void renderHUD(World world, Chunky chunky,
-			Graphics g, RenderBuffer renderBuffer) {
+			Graphics g, MapBuffer renderBuffer) {
 
 		boolean loadIndicator = chunky.isLoading();
 		Chunk.Renderer renderer = chunky.getChunkRenderer();

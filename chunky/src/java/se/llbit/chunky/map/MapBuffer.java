@@ -40,7 +40,7 @@ import se.llbit.chunky.world.listeners.ChunkUpdateListener;
  *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
-public class RenderBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
+public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 
 	private BufferedImage buffer;
 	private int buffW;
@@ -58,7 +58,7 @@ public class RenderBuffer implements ChunkUpdateListener, Iterable<ChunkPosition
 	 * Create a new render buffer for the provided view
 	 * @param view
 	 */
-	public RenderBuffer(ChunkView view) {
+	public MapBuffer(ChunkView view) {
 		this.view = view;
 		buffW = view.chunkScale * (view.ix1 - view.ix0 + 1);
 		buffH = view.chunkScale * (view.iz1 - view.iz0 + 1);

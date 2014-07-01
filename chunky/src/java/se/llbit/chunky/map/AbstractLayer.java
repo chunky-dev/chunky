@@ -39,7 +39,7 @@ abstract public class AbstractLayer {
 	 * @param cx
 	 * @param cz
 	 */
-	abstract public void render(RenderBuffer rbuff, int cx, int cz);
+	abstract public void render(MapBuffer rbuff, int cx, int cz);
 
 	public void renderTopography(ChunkPosition position,
 			Heightmap heightmap) {
@@ -51,7 +51,7 @@ abstract public class AbstractLayer {
 	 * @param cx
 	 * @param cz
 	 */
-	public void renderHighlight(RenderBuffer rbuff, int cx, int cz,
+	public void renderHighlight(MapBuffer rbuff, int cx, int cz,
 			Block hlBlock, java.awt.Color highlight) {
 	}
 

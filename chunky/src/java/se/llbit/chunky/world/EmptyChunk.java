@@ -20,7 +20,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import se.llbit.chunky.map.CorruptLayer;
-import se.llbit.chunky.map.RenderBuffer;
+import se.llbit.chunky.map.MapBuffer;
 
 /**
  * Empty or non-existent chunk.
@@ -58,26 +58,26 @@ public class EmptyChunk extends Chunk {
 	}
 
 	@Override
-	protected void renderLayer(RenderBuffer rbuff, int cx, int cz) {
+	protected void renderLayer(MapBuffer rbuff, int cx, int cz) {
 		renderEmpty(rbuff, cx, cz);
 	}
 
 	@Override
-	protected void renderSurface(RenderBuffer rbuff, int cx, int cz) {
+	protected void renderSurface(MapBuffer rbuff, int cx, int cz) {
 		renderEmpty(rbuff, cx, cz);
 	}
 
 	@Override
-	protected void renderCaves(RenderBuffer rbuff, int cx, int cz) {
+	protected void renderCaves(MapBuffer rbuff, int cx, int cz) {
 		renderEmpty(rbuff, cx, cz);
 	}
 
 	@Override
-	protected void renderBiomes(RenderBuffer rbuff, int cx, int cz) {
+	protected void renderBiomes(MapBuffer rbuff, int cx, int cz) {
 		renderEmpty(rbuff, cx, cz);
 	}
 
-	private void renderEmpty(RenderBuffer rbuff, int cx, int cz) {
+	private void renderEmpty(MapBuffer rbuff, int cx, int cz) {
 		ChunkView view = rbuff.getView();
 		int x0 = view.chunkScale * (cx - view.ix0);
 		int z0 = view.chunkScale * (cz - view.iz0);

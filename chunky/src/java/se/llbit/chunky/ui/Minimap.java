@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.map.RenderBuffer;
+import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.WorldRenderer;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
@@ -55,7 +55,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 
 	private static final Font font = new Font("Sans serif", Font.BOLD, 11);
 
-	private final RenderBuffer renderBuffer;
+	private final MapBuffer renderBuffer;
 	private final Chunky chunky;
 	private volatile ChunkView view;
 
@@ -70,7 +70,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 		setIgnoreRepaint(false);
 
 		view = chunky.getMinimapView();
-		renderBuffer = new RenderBuffer(view);
+		renderBuffer = new MapBuffer(view);
 
 		addMouseListener(new MouseListener() {
 			@Override

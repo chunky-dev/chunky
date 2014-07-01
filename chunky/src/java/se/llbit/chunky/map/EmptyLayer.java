@@ -33,7 +33,7 @@ public class EmptyLayer extends AbstractLayer {
 	}
 
 	@Override
-	public synchronized void render(RenderBuffer rbuff, int cx, int cz) {
+	public synchronized void render(MapBuffer rbuff, int cx, int cz) {
 		ChunkView view = rbuff.getView();
 		int x0 = view.chunkScale * (cx - view.ix0);
 		int z0 = view.chunkScale * (cz - view.iz0);

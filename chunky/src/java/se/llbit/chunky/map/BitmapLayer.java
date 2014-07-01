@@ -27,7 +27,7 @@ abstract public class BitmapLayer extends AbstractLayer {
 	 * @param cz
 	 */
 	@Override
-	final public void render(RenderBuffer rbuff, int cx, int cz) {
+	final public void render(MapBuffer rbuff, int cx, int cz) {
 		ChunkView view = rbuff.getView();
 		int x0 = view.chunkScale * (cx - view.ix0);
 		int z0 = view.chunkScale * (cz - view.iz0);

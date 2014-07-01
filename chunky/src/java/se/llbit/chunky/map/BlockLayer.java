@@ -52,7 +52,7 @@ public class BlockLayer extends AbstractLayer {
 	 * @param cz
 	 */
 	@Override
-	public synchronized void render(RenderBuffer rbuff, int cx, int cz) {
+	public synchronized void render(MapBuffer rbuff, int cx, int cz) {
 		ChunkView view = rbuff.getView();
 		int blockScale = view.chunkScale / 16;
 		int x0 = view.chunkScale * (cx - view.ix0);
@@ -129,7 +129,7 @@ public class BlockLayer extends AbstractLayer {
 	 * @param highlight
 	 */
 	@Override
-	public synchronized void renderHighlight(RenderBuffer rbuff, int cx, int cz,
+	public synchronized void renderHighlight(MapBuffer rbuff, int cx, int cz,
 			Block hlBlock, java.awt.Color highlight) {
 
 		ChunkView view = rbuff.getView();

@@ -37,7 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.map.RenderBuffer;
+import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
@@ -74,9 +74,9 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 	protected volatile boolean mouseInsideWindow = false;
 
-	private final RenderBuffer renderBuffer;
+	private final MapBuffer mapBuffer;
 	private volatile ChunkView view;
-	private final MapLabel errlbl = new MapLabel(this);
+	private final OverlayLabel mapLabel = new OverlayLabel(this);
 	private final JPopupMenu contextMenu = new JPopupMenu();
 
 	private volatile ChunkPosition start = ChunkPosition.get(0, 0);
@@ -133,7 +133,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		@Override
 		public void mouseExited(MouseEvent e) {
 			mouseInsideWindow = false;
-			errlbl.setVisible(false);
+			mapLabel.setVisible(false);
 		}
 
 		@Override
@@ -162,12 +162,12 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 					if (theView.chunkScale >= 16) {
 						chunky.selectChunk(cx, cz);
-						renderBuffer.updateChunk(cx, cz);
+						mapBuffer.updateChunk(cx, cz);
 					} else {
 						int rx = cx >> 5;
 						int rz = cz >> 5;
 						chunky.selectChunks(rx*32, (rx+1)*32, rz*32, (rz+1)*32);
-						renderBuffer.updateChunks(rx*32, (rx+1)*32, rz*32, (rz+1)*32);
+						mapBuffer.updateChunks(rx*32, (rx+1)*32, rz*32, (rz+1)*32);
 					}
 				}
 
@@ -207,7 +207,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			bz = Math.max(0, Math.min(Chunk.Z_MAX-1, bz));
 			ChunkPosition cp = ChunkPosition.get(cx, cz);
 			Chunk hoveredChunk = chunky.getWorld().getChunk(cp);
-			errlbl.setText(String.format("Chunk: %s, biome: %s",
+			mapLabel.setText(String.format("Chunk: %s, biome: %s",
 					""+hoveredChunk.getPosition(),
 					hoveredChunk.biomeAt(bx, bz)));
 			return cp;
@@ -279,7 +279,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		contextMenu.add(clearSelection);
 
 		setView(chunky.getMapView());
-		renderBuffer = new RenderBuffer(view);
+		mapBuffer = new MapBuffer(view);
 	}
 
 	/**
@@ -296,10 +296,10 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 			World world = chunky.getWorld();
 
-			chunky.getWorldRenderer().render(world, renderBuffer,
+			chunky.getWorldRenderer().render(world, mapBuffer,
 							chunky.getChunkRenderer(), chunky.getChunkSelection());
-			renderBuffer.renderBuffered(g);
-			chunky.getWorldRenderer().renderHUD(world, chunky, g, renderBuffer);
+			mapBuffer.renderBuffered(g);
+			chunky.getWorldRenderer().renderHUD(world, chunky, g, mapBuffer);
 			drawSelectionRect(g);
 		}
 		}
@@ -314,7 +314,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			int z0 = Math.min(cp0.z, cp1.z);
 			int z1 = Math.max(cp0.z, cp1.z);
 			chunky.selectChunks(x0, x1, z0, z1);
-			renderBuffer.updateChunks(x0, x1, z0, z1);
+			mapBuffer.updateChunks(x0, x1, z0, z1);
 		}
 	}
 
@@ -378,26 +378,26 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	 * @param targetFile
 	 */
 	public void renderPng(File targetFile) {
-		renderBuffer.renderPng(targetFile);
+		mapBuffer.renderPng(targetFile);
 	}
 
 	/**
 	 * Do a complete redraw of the visible chunks.
 	 */
 	public void redraw() {
-		renderBuffer.flushCache();
+		mapBuffer.flushCache();
 		repaint();
 	}
 
 	@Override
 	public void chunkUpdated(ChunkPosition chunk) {
-		renderBuffer.chunkUpdated(chunk);
+		mapBuffer.chunkUpdated(chunk);
 		repaint();
 	}
 
 	@Override
 	public void regionUpdated(ChunkPosition region) {
-		renderBuffer.regionUpdated(region);
+		mapBuffer.regionUpdated(region);
 		repaint();
 	}
 
@@ -407,7 +407,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	 */
 	public synchronized void viewUpdated(ChunkView newView) {
 		setView(newView);
-		renderBuffer.updateView(view, chunky.getChunkRenderer(),
+		mapBuffer.updateView(view, chunky.getChunkRenderer(),
 				chunky.getWorld().currentLayer());
 		repaint();
 	}
