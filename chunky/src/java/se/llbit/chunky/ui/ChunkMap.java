@@ -207,8 +207,8 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			bz = Math.max(0, Math.min(Chunk.Z_MAX-1, bz));
 			ChunkPosition cp = ChunkPosition.get(cx, cz);
 			Chunk hoveredChunk = chunky.getWorld().getChunk(cp);
-			mapLabel.setText(String.format("Chunk: %s, biome: %s",
-					""+hoveredChunk.getPosition(),
+			mapLabel.setText(String.format("%s, biome: %s",
+					""+hoveredChunk.toString(),
 					hoveredChunk.biomeAt(bx, bz)));
 			return cp;
 		}

@@ -105,4 +105,9 @@ public class EmptyChunk extends Chunk {
 	public synchronized void parse() {
 		// do nothing
 	}
+
+	@Override
+	public String toString() {
+		return "Chunk: [none]";
+	}
 }

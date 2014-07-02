@@ -446,7 +446,7 @@ public class Chunk {
 
 	@Override
 	public String toString() {
-		return "Chunk " + position.toString();
+		return "Chunk: " + position.toString();
 	}
 
 	/**
