@@ -156,6 +156,11 @@ public class ChunkView {
 				rz0 <= z && rz1 >= z;
 	}
 
+	public boolean isRegionFullyVisible(int x, int z) {
+		return rx0 < x && rx1 > x &&
+				rz0 < z && rz1 > z;
+	}
+
 	public boolean shouldPreload(Region region) {
 		ChunkPosition pos = region.getPosition();
 		return shouldPreloadRegion(pos.x, pos.z);

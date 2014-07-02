@@ -1,4 +1,6 @@
 1.2.3 - TBD
+    * Fixed a refreshing problem in the 2D map causing it to not refresh some
+      regions while panning
     * Right-clicking in the 2D map now opens a context menu with options to
       create a new scene, load a scene, or clear the current selection
     * Added iron trapdoor
@@ -18,7 +20,8 @@
     * Added chunk hover indicator in 2D map
     * Fixed error causing rayDepth setting to not be saved for scenes
     * Fixed error preventing naming and overwriting of custom camera presets
-    * Changed map status text color to red to improve visibility
+    * Improved status text visibility in the 2D map. In addition, status text
+      is now only displayed when the mouse is inside the map.
     * Added checkbox on the Advanced tab of Render controls which enables
       automatic shutdown of the computer after render completion
 

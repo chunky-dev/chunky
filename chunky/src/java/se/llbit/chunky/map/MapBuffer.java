@@ -149,9 +149,8 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 		}
 		for (int x = newView.rx0; x <= newView.rx1; ++x) {
 			for (int z = newView.rz0; z <= newView.rz1; ++z) {
-				ChunkPosition chunk = ChunkPosition.get(x, z);
-				if (!prevView.isChunkVisible(chunk)) {
-					updated.add(chunk);
+				if (!prevView.isRegionFullyVisible(x, z)) {
+					updated.add(ChunkPosition.get(x, z));
 				}
 			}
 		}
@@ -173,7 +172,7 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 	public final synchronized void renderBuffered2(Graphics g) {
 		if (buffer != null) {
 			graphics.dispose();
-			int margin = 200;
+			int margin = 50;
 			double iw = view.chunkScale * (view.x1 - view.x0);
 			double ih = view.chunkScale * (view.z1 - view.z0);
 			double xscale = (view.width-margin*2) / iw;
