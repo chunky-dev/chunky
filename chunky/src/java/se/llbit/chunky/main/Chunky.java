@@ -484,10 +484,9 @@ public class Chunky implements ChunkTopographyListener {
 			world.setCurrentLayer(layerNew);
 			if (chunkRenderer == Chunk.layerRenderer) {
 				getMap().redraw();
+				// force the chunks to redraw
+				viewUpdated();
 			}
-
-			// force the chunks to redraw
-			viewUpdated();
 		}
 		getControls().setLayer(world.currentLayer());
 	}
