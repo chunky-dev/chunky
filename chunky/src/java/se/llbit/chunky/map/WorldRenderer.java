@@ -51,48 +51,6 @@ public class WorldRenderer {
 	}
 
 	/**
-	 * Render the minimap
-	 * @param world
-	 * @param buffer
-	 * @param selection
-	 */
-	public void renderMinimap(World world, MapBuffer buffer,
-			ChunkSelectionTracker selection) {
-
-		ChunkView view = buffer.getView();
-		int width = view.width;
-		int height = view.height;
-
-		if (world.isEmptyWorld()) {
-			Graphics g = buffer.getGraphics();
-			renderEmpty(g, width, height);
-			return;
-		}
-
-		float[] selectionColor = new float[4];
-		float[] color = new float[4];
-		se.llbit.math.Color.getRGBAComponents(SELECTION_COLOR, selectionColor);
-		for (ChunkPosition pos: buffer) {
-			int y = pos.z - view.iz0;
-			int x = pos.x - view.ix0;
-			Chunk chunk = world.getChunk(pos);
-			if (!chunk.isEmpty()) {
-				if (selection.isSelected(pos)) {
-					se.llbit.math.Color.getRGBComponents(chunk.avgColor(),
-							color);
-					color[0] = color[0] * (1-selectionColor[3]) + selectionColor[0] * selectionColor[3];
-					color[1] = color[1] * (1-selectionColor[3]) + selectionColor[1] * selectionColor[3];
-					color[2] = color[2] * (1-selectionColor[3]) + selectionColor[2] * selectionColor[3];
-					color[3] = 1;
-					buffer.setRGB(x, y, se.llbit.math.Color.getRGB(color));
-				} else {
-					buffer.setRGB(x, y, chunk.avgColor());
-				}
-			}
-		}
-	}
-
-	/**
 	 * Render the map
 	 * @param world
 	 * @param buffer

@@ -31,6 +31,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.WorldRenderer;
+import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
@@ -123,7 +124,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 			World world = chunky.getWorld();
 			ChunkSelectionTracker selection = chunky.getChunkSelection();
 
-			renderer.renderMinimap(world, renderBuffer, selection);
+			renderer.render(world, renderBuffer, Chunk.surfaceRenderer, selection);
 			renderBuffer.renderBuffered(g);
 
 			renderer.renderPlayer(world, g, view, true);
