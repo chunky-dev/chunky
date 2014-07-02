@@ -20,7 +20,6 @@ import java.awt.Color;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.ref.SoftReference;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -81,9 +80,6 @@ public class Chunk {
 	private final World world;
 
 	private int timestamp = 0;
-
-	private SoftReference<Map<String, AnyTag>> chunkData =
-			new SoftReference<Map<String,AnyTag>>(null);
 
 	/**
 	 * A chunk renderer
@@ -180,7 +176,6 @@ public class Chunk {
 		request.add(LEVEL_HEIGHTMAP);
 
 		Map<String, AnyTag> result = NamedTag.quickParse(in, request);
-		chunkData = new SoftReference<Map<String,AnyTag>>(result);
 		try {
 			in.close();
 		} catch (IOException e) {
@@ -233,7 +228,7 @@ public class Chunk {
 
 		loadedLayer = requestedLayer;
 
-		Map<String, AnyTag> result = chunkChanged ? getChunkData() : getChunkDataCached();
+		Map<String, AnyTag> result = getChunkData();
 		if (result == null) {
 			// Chunk failed to load
 			layer = CorruptLayer.INSTANCE;
@@ -260,8 +255,7 @@ public class Chunk {
 
 			AnyTag heightmapTag = result.get(LEVEL_HEIGHTMAP);
 			AnyTag biomesTag = result.get(LEVEL_BIOMES);
-			if ((chunkChanged || surface == UnknownLayer.INSTANCE)
-					&& heightmapTag.isIntArray(X_MAX*Z_MAX)
+			if (heightmapTag.isIntArray(X_MAX*Z_MAX)
 					&& biomesTag.isByteArray(X_MAX*Z_MAX)) {
 
 				int[] chunkHeightmap = heightmapTag.intArray();
@@ -323,14 +317,6 @@ public class Chunk {
 		return region.chunkHasChanged(position, timestamp);
 	}
 
-	private Map<String, AnyTag> getChunkDataCached() {
-		Map<String, AnyTag> result = chunkData.get();
-		if (result == null) {
-			result = getChunkData();
-		}
-		return result;
-	}
-
 	private void queueTopography() {
 		for (int x = -1; x <= 1; ++x) {
 			for (int z = -1; z <= 1; ++z) {
@@ -388,11 +374,7 @@ public class Chunk {
 			data[i] = 0;
 		}
 
-		boolean chunkChanged = chunkHasChanged();
-		Map<String, AnyTag> result = chunkChanged ? getChunkData() : getChunkDataCached();
-		if (result == null) {
-			return;
-		}
+		Map<String, AnyTag> result = getChunkData();
 
 		AnyTag sections = result.get(LEVEL_SECTIONS);
 		AnyTag biomesTag = result.get(LEVEL_BIOMES);

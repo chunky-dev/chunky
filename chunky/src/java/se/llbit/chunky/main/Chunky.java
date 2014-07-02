@@ -82,19 +82,19 @@ public class Chunky implements ChunkTopographyListener {
 	/**
 	 * Minimum block scale for the map view
 	 */
-	public static final int BLOCK_SCALE_MIN = 0;
+	public static final int BLOCK_SCALE_MIN = 1;
 
 	/**
 	 * Maximum block scale for the map view
 	 */
-	public static final int BLOCK_SCALE_MAX = 32;
+	public static final int BLOCK_SCALE_MAX = 32*16;
 
 	/**
 	 * Default block scale for the map view
 	 */
-	public static final int DEFAULT_BLOCK_SCALE = 4;
+	public static final int DEFAULT_BLOCK_SCALE = 4*16;
 
-	private int chunkScale = DEFAULT_BLOCK_SCALE*16;
+	private int chunkScale = DEFAULT_BLOCK_SCALE;
 
 	private World world = EmptyWorld.instance;
 
@@ -794,11 +794,10 @@ public class Chunky implements ChunkTopographyListener {
 	 * @param blockScale
 	 */
 	public synchronized void setScale(int blockScale) {
-		int scaleNew = Math.max(BLOCK_SCALE_MIN,
+		int newScale = Math.max(BLOCK_SCALE_MIN,
 				Math.min(BLOCK_SCALE_MAX, blockScale));
-		scaleNew = scaleNew == 0 ? 1 : scaleNew*16;
-		if (scaleNew != chunkScale) {
-			chunkScale = scaleNew;
+		if (newScale != chunkScale) {
+			chunkScale = newScale;
 			getControls().setScale(getScale());
 			setView(map.x, map.z);
 		}
@@ -808,7 +807,7 @@ public class Chunky implements ChunkTopographyListener {
 	 * @return The current block scale of the map view
 	 */
 	public int getScale() {
-		return chunkScale/16;
+		return chunkScale;
 	}
 
 	/**
@@ -866,7 +865,16 @@ public class Chunky implements ChunkTopographyListener {
 		if (ctrlModifier) {
 			setLayer(getLayer() + diff);
 		} else {
-			setScale(getScale() - diff);
+			int scale = getScale();
+			if ((scale-diff) <= 16) {
+				setScale(scale - diff);
+			} else if ((scale-diff*4) < 64) {
+				setScale(scale - diff*4);
+			} else if ((scale-diff*16) < 128) {
+				setScale(scale - diff*16);
+			} else {
+				setScale(scale - diff*64);
+			}
 		}
 	}
 

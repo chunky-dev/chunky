@@ -144,15 +144,15 @@ public class WorldRenderer {
 	}
 
 	public void renderPlayer(World world, Graphics g, ChunkView view, boolean sameLayer) {
-		double blockScale = view.chunkScale / 16.;
+		double blockScale = view.scale / 16.;
 		Vector3d playerPos = world.playerPos();
 		if (playerPos == null) {
 			return;
 		}
 		int px = (int) QuickMath.floor(playerPos.x * blockScale);
 		int pz = (int) QuickMath.floor(playerPos.z * blockScale);
-		int ppx = px - (int) QuickMath.floor(view.x0 * view.chunkScale);
-		int ppy = pz - (int) QuickMath.floor(view.z0 * view.chunkScale);
+		int ppx = px - (int) QuickMath.floor(view.x0 * view.scale);
+		int ppy = pz - (int) QuickMath.floor(view.z0 * view.scale);
 		int pw = (int) QuickMath.max(8, QuickMath.min(16, blockScale * 2));
 		ppx = Math.min(view.width-pw, Math.max(0, ppx-pw/2));
 		ppy = Math.min(view.height-pw, Math.max(0, ppy-pw/2));
@@ -165,14 +165,14 @@ public class WorldRenderer {
 	}
 
 	public void renderSpawn(World world, Graphics g, ChunkView view, boolean sameLayer) {
-		double blockScale = view.chunkScale / 16.;
+		double blockScale = view.scale / 16.;
 		if (!world.haveSpawnPos()) {
 			return;
 		}
 		int px = (int) QuickMath.floor(world.spawnPosX() * blockScale);
 		int pz = (int) QuickMath.floor(world.spawnPosZ() * blockScale);
-		int ppx = px - (int) QuickMath.floor(view.x0 * view.chunkScale);
-		int ppy = pz - (int) QuickMath.floor(view.z0 * view.chunkScale);
+		int ppx = px - (int) QuickMath.floor(view.x0 * view.scale);
+		int ppy = pz - (int) QuickMath.floor(view.z0 * view.scale);
 		int pw = (int) QuickMath.max(8, QuickMath.min(16, blockScale * 2));
 		ppx = Math.min(view.width-pw, Math.max(0, ppx-pw/2));
 		ppy = Math.min(view.height-pw, Math.max(0, ppy-pw/2));

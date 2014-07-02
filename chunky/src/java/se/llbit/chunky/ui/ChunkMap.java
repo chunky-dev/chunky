@@ -156,11 +156,11 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 					int x = e.getX();
 					int y = e.getY();
 					ChunkView theView = chunky.getMapView();
-					double scale = theView.chunkScale;
+					double scale = theView.scale;
 					int cx = (int) QuickMath.floor(theView.x + (x - getWidth()/2) / scale);
 					int cz = (int) QuickMath.floor(theView.z + (y - getHeight()/2) / scale);
 
-					if (theView.chunkScale >= 16) {
+					if (theView.scale >= 16) {
 						chunky.selectChunk(cx, cz);
 						mapBuffer.updateChunk(cx, cz);
 					} else {
@@ -196,7 +196,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 		private ChunkPosition getChunk(MouseEvent e) {
 			ChunkView theView = view;
-			double scale = theView.chunkScale;
+			double scale = theView.scale;
 			double x = theView.x + (e.getX() - getWidth()/2) / scale;
 			double z = theView.z + (e.getY() - getHeight()/2) / scale;
 			int cx = (int) QuickMath.floor(x);
@@ -346,28 +346,28 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			int x1 = Math.max(cp0.x, cp1.x);
 			int z0 = Math.min(cp0.z, cp1.z);
 			int z1 = Math.max(cp0.z, cp1.z);
-			x0 = (int) (cv.chunkScale * (x0 - cv.x0));
-			z0 = (int) (cv.chunkScale * (z0 - cv.z0));
-			x1 = (int) (cv.chunkScale * (x1 - cv.x0 + 1));
-			z1 = (int) (cv.chunkScale * (z1 - cv.z0 + 1));
+			x0 = (int) (cv.scale * (x0 - cv.x0));
+			z0 = (int) (cv.scale * (z0 - cv.z0));
+			x1 = (int) (cv.scale * (x1 - cv.x0 + 1));
+			z1 = (int) (cv.scale * (z1 - cv.z0 + 1));
 			g.setColor(Color.red);
 			g.drawRect(x0, z0, x1-x0, z1-z0);
 		} else {
 			// test if hovered chunk is visible
 			if (cv.isChunkVisible(cp)) {
 
-				if (cv.chunkScale >= 16) {
-					int x0 = (int) (cv.chunkScale * (cp.x - cv.x0));
-					int y0 = (int) (cv.chunkScale * (cp.z - cv.z0));
-					int blockScale = cv.chunkScale;
+				if (cv.scale >= 16) {
+					int x0 = (int) (cv.scale * (cp.x - cv.x0));
+					int y0 = (int) (cv.scale * (cp.z - cv.z0));
+					int blockScale = cv.scale;
 					g.drawRect(x0, y0, blockScale, blockScale);
 				} else {
 					// hovered region
 					int rx = cp.x >> 5;
 					int rz = cp.z >> 5;
-					int x0 = (int) (cv.chunkScale * (rx*32 - cv.x0));
-					int y0 = (int) (cv.chunkScale * (rz*32 - cv.z0));
-					g.drawRect(x0, y0, cv.chunkScale*32, cv.chunkScale*32);
+					int x0 = (int) (cv.scale * (rx*32 - cv.x0));
+					int y0 = (int) (cv.scale * (rz*32 - cv.z0));
+					g.drawRect(x0, y0, cv.scale*32, cv.scale*32);
 				}
 			}
 		}

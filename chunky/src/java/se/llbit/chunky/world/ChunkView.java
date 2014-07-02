@@ -48,6 +48,7 @@ public class ChunkView {
 
 	public final int width;
 	public final int height;
+	public final int scale;
 	public final int chunkScale;
 
 
@@ -60,6 +61,8 @@ public class ChunkView {
 	}
 
 	public ChunkView(double x, double z, int width, int height, int scale) {
+		this.scale = scale;
+		this.chunkScale = Math.max(1, scale - (scale % 16));
 		this.x = x;
 		this.z = z;
 		double cw = width / (2. * scale);
@@ -99,7 +102,6 @@ public class ChunkView {
 			pz0 = prz0<<5;
 			pz1 = (prz1<<5)+31;
 		}
-		this.chunkScale = scale;
 	}
 
 	public boolean isVisible(Chunk chunk) {

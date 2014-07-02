@@ -135,8 +135,8 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 			g.drawRect(
 					(int) FastMath.round(mapView.x0 - view.x0),
 					(int) FastMath.round(mapView.z0 - view.z0),
-					FastMath.round(mapView.width / (float) mapView.chunkScale),
-					FastMath.round(mapView.height / (float) mapView.chunkScale));
+					FastMath.round(mapView.width / (float) mapView.scale),
+					FastMath.round(mapView.height / (float) mapView.scale));
 
 			// draw North indicator
 			g.setFont(font);
