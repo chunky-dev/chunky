@@ -863,7 +863,7 @@ public class Chunky implements ChunkTopographyListener {
 	 * @param diff
 	 */
 	public synchronized void onMouseWheelMotion(int diff) {
-		if (!ctrlModifier) {
+		if (ctrlModifier) {
 			setLayer(getLayer() + diff);
 		} else {
 			setScale(getScale() - diff);

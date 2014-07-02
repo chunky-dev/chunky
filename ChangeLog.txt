@@ -1,4 +1,6 @@
 1.2.3 - TBD
+    * Scrolling the mouse wheel now zooms the map, and holding the Ctrl key
+      will change the displayed layer (zooming used to require holding Ctrl)
     * Fixed a refreshing problem in the 2D map causing it to not refresh some
       regions while panning
     * Right-clicking in the 2D map now opens a context menu with options to
