@@ -710,6 +710,15 @@ public class Chunky implements ChunkTopographyListener {
 	}
 
 	/**
+	 * Select the region containing the given chunk.
+	 * @param cx
+	 * @param cz
+	 */
+	public void selectRegion(int cx, int cz) {
+		chunkSelection.selectRegion(world, cx, cz);
+	}
+
+	/**
 	 * @return The Controls UI element
 	 */
 	public Controls getControls() {

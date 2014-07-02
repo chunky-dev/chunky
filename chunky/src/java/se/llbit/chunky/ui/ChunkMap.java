@@ -164,10 +164,8 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 						chunky.selectChunk(cx, cz);
 						mapBuffer.updateChunk(cx, cz);
 					} else {
-						int rx = cx >> 5;
-						int rz = cz >> 5;
-						chunky.selectChunks(rx*32, rx*32+31, rz*32, rz*32+31);
-						mapBuffer.updateChunks(rx*32, rx*32+31, rz*32, rz*32+31);
+						chunky.selectRegion(cx, cz);
+						mapBuffer.updateRegion(cx, cz);
 					}
 				}
 

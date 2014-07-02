@@ -92,8 +92,8 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 	 * Toggle the selected status of the chunk at the given coordinates.
 	 *
 	 * @param world
-	 * @param cx
-	 * @param cz
+	 * @param cx chunk x-position
+	 * @param cz chunk z-position
 	 */
 	public synchronized void selectChunk(World world, int cx, int cz) {
 		ChunkPosition chunk = ChunkPosition.get(cx, cz);
@@ -103,6 +103,23 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 		} else if (!world.getChunk(chunk).isEmpty()) {
 			selected.add(chunk);
 			fireChunkUpdated(chunk);
+		}
+	}
+
+	/**
+	 * Select the region containing the given chunk.
+	 * @param world
+	 * @param cx chunk x-position
+	 * @param cz chunk z-position
+	 */
+	public synchronized void selectRegion(World world, int cx, int cz) {
+		ChunkPosition chunk = ChunkPosition.get(cx, cz);
+		int rx = cx >> 5;
+		int rz = cz >> 5;
+		if (selected.contains(chunk)) {
+			deselectChunks(world, rx*32, rz*32, rx*32+31, rz*32+31);
+		} else {
+			selectChunks(world, rx*32, rz*32, rx*32+31, rz*32+31);
 		}
 	}
 

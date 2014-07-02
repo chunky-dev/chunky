@@ -398,6 +398,17 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 	}
 
 	/**
+	 * Update region continaing the given chunk.
+	 * @param cx
+	 * @param cz
+	 */
+	public synchronized void updateRegion(int cx, int cz) {
+		int rx = cx >> 5;
+		int rz = cz >> 5;
+		updateChunks(rx*32, rx*32+31, rz*32, rz*32+31);
+	}
+
+	/**
 	 * Force the chunks within a rectangle to be redrawn
 	 * @param x0
 	 * @param x1
