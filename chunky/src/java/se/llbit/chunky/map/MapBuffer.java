@@ -149,7 +149,7 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 		}
 		for (int x = newView.rx0; x <= newView.rx1; ++x) {
 			for (int z = newView.rz0; z <= newView.rz1; ++z) {
-				if (!prevView.isRegionFullyVisible(x, z)) {
+				if (!prevView.isRegionFullyVisible(newView, x, z)) {
 					updated.add(ChunkPosition.get(x, z));
 				}
 			}

@@ -156,9 +156,23 @@ public class ChunkView {
 				rz0 <= z && rz1 >= z;
 	}
 
-	public boolean isRegionFullyVisible(int x, int z) {
-		return rx0 < x && rx1 > x &&
-				rz0 < z && rz1 > z;
+	/**
+	 * @param newView
+	 * @param x
+	 * @param z
+	 * @return {@code true} if all chunks in the region (x,z) in newView are
+	 * visible in this view
+	 */
+	public boolean isRegionFullyVisible(ChunkView newView, int x, int z) {
+		int x0 = x<<5;
+		int x1 = x0 + 31;
+		int z0 = z<<5;
+		int z1 = z0 + 31;
+		x0 = Math.max(newView.ix0, x0);
+		x1 = Math.min(newView.ix1, x1);
+		z0 = Math.max(newView.iz0, z0);
+		z1 = Math.min(newView.iz1, z1);
+		return isChunkVisible(x0, z0) && isChunkVisible(x1, z1);
 	}
 
 	public boolean shouldPreload(Region region) {
