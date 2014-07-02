@@ -56,7 +56,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 
 	private static final Font font = new Font("Sans serif", Font.BOLD, 11);
 
-	private final MapBuffer renderBuffer;
+	private final MapBuffer mapBuffer;
 	private final Chunky chunky;
 	private volatile ChunkView view;
 
@@ -71,7 +71,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 		setIgnoreRepaint(false);
 
 		view = chunky.getMinimapView();
-		renderBuffer = new MapBuffer(view);
+		mapBuffer = new MapBuffer(view);
 
 		addMouseListener(new MouseListener() {
 			@Override
@@ -124,8 +124,8 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 			World world = chunky.getWorld();
 			ChunkSelectionTracker selection = chunky.getChunkSelection();
 
-			renderer.render(world, renderBuffer, Chunk.surfaceRenderer, selection);
-			renderBuffer.renderBuffered(g);
+			renderer.render(world, mapBuffer, Chunk.surfaceRenderer, selection);
+			mapBuffer.renderBuffered(g);
 
 			renderer.renderPlayer(world, g, view, true);
 			renderer.renderSpawn(world, g, view, true);
@@ -153,19 +153,19 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 	 * Redraw all visible chunks.
 	 */
 	public void redraw() {
-		renderBuffer.flushCache();
+		mapBuffer.flushCache();
 		repaint();
 	}
 
 	@Override
 	public void chunkUpdated(ChunkPosition chunk) {
-		renderBuffer.chunkUpdated(chunk);
+		mapBuffer.chunkUpdated(chunk);
 		repaint();
 	}
 
 	@Override
 	public void regionUpdated(ChunkPosition region) {
-		renderBuffer.regionUpdated(region);
+		mapBuffer.regionUpdated(region);
 		repaint();
 	}
 
@@ -175,7 +175,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 	 */
 	public synchronized void viewUpdated(ChunkView newView) {
 		view = newView;
-		renderBuffer.updateView(view, null, 0);
+		mapBuffer.updateView(view, null, 0);
 		repaint();
 	}
 

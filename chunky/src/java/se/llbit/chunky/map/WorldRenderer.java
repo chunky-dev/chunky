@@ -50,6 +50,18 @@ public class WorldRenderer {
 		g.setFont(new Font("Sans serif", Font.BOLD, 11)); //$NON-NLS-1$
 	}
 
+	int round = 0;
+	int colors[] = {
+			0xFF0000, 0x00FF00, 0x0000FF,
+			0xFF3300, 0x00FF33, 0x3300FF,
+			0xFF3333, 0x33FF33, 0x3333FF,
+			0x990000, 0x009900, 0x000099,
+			0x993300, 0x009933, 0x330099,
+			0x993333, 0x339933, 0x333399,
+			0x99AA33, 0x3399AA, 0xAA3399,
+			0x99AAAA, 0xAA99AA, 0xAAAA99,
+	};
+
 	/**
 	 * Render the map
 	 * @param world
@@ -84,12 +96,23 @@ public class WorldRenderer {
 			}
 			if (selection.isSelected(pos)) {
 				buffer.fillRectAlpha(
-						view.chunkScale * (x - view.ix0),
-						view.chunkScale * (z - view.iz0),
+						view.chunkScale * (x - view.px0),
+						view.chunkScale * (z - view.pz0),
 						view.chunkScale, view.chunkScale,
 						SELECTION_COLOR);
 			}
+
+//			if (!chunk.isEmpty()) {
+//				buffer.fillRect(
+//						view.chunkScale * (x - view.px0),
+//						view.chunkScale * (z - view.pz0),
+//						view.chunkScale, view.chunkScale,
+//						colors[round]);
+//			}
+
 		}
+		round += 1;
+		round %= colors.length;
 	}
 
 	/**

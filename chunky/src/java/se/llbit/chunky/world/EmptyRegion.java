@@ -37,7 +37,7 @@ public class EmptyRegion extends Region {
 
 	@Override
 	public Chunk getChunk(ChunkPosition pos) {
-		return EmptyChunk.INSTANCE;
+		return EmptyRegionChunk.INSTANCE;
 	}
 
 	@Override

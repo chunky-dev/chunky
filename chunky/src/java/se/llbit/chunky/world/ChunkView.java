@@ -34,23 +34,11 @@ public class ChunkView {
 	public final double x1;
 	public final double z1;
 
-	// visible chunks [integer coordinates]
-	public final int ix0;
-	public final int iz0;
-	public final int ix1;
-	public final int iz1;
-
 	// preloaded chunks
 	public final int px0;
 	public final int pz0;
 	public final int px1;
 	public final int pz1;
-
-	// visible regions
-	public final int rx0;
-	public final int rz0;
-	public final int rx1;
-	public final int rz1;
 
 	// preloaded regions
 	public final int prx0;
@@ -82,33 +70,36 @@ public class ChunkView {
 		this.z1 = z + ch;
 		this.width = width;
 		this.height = height;
-		ix0 = (int) QuickMath.floor(x0);
-		ix1 = (int) QuickMath.floor(x1);
-		iz0 = (int) QuickMath.floor(z0);
-		iz1 = (int) QuickMath.floor(z1);
-		px0 = ix0-1;
-		px1 = ix1+1;
-		pz0 = iz0-1;
-		pz1 = iz1+1;
-		rx0 = ix0>>5;
-		rx1 = ix1>>5;
-		rz0 = iz0>>5;
-		rz1 = iz1>>5;
-		prx0 = px0>>5;
-		prx1 = px1>>5;
-		prz0 = pz0>>5;
-		prz1 = pz1>>5;
+		// visible chunks [integer coordinates]
+		int ix0 = (int) QuickMath.floor(x0);
+		int ix1 = (int) QuickMath.floor(x1);
+		int iz0 = (int) QuickMath.floor(z0);
+		int iz1 = (int) QuickMath.floor(z1);
+		if (scale >= 16) {
+			px0 = ix0-1;
+			px1 = ix1+1;
+			pz0 = iz0-1;
+			pz1 = iz1+1;
+			prx0 = px0>>5;
+			prx1 = px1>>5;
+			prz0 = pz0>>5;
+			prz1 = pz1>>5;
+		} else {
+			// visible regions
+			int irx0 = ix0>>5;
+			int irx1 = ix1>>5;
+			int irz0 = iz0>>5;
+			int irz1 = iz1>>5;
+			prx0 = irx0-1;
+			prx1 = irx1+1;
+			prz0 = irz0-1;
+			prz1 = irz1+1;
+			px0 = prx0<<5;
+			px1 = (prx1<<5)+31;
+			pz0 = prz0<<5;
+			pz1 = (prz1<<5)+31;
+		}
 		this.chunkScale = scale;
-	}
-
-	public boolean shouldPreload(Chunk chunk) {
-		ChunkPosition pos = chunk.getPosition();
-		return shouldPreloadChunk(pos.x, pos.z);
-	}
-
-	public boolean shouldPreloadChunk(int x, int z) {
-		return px0 <= x && px1 >= x &&
-				pz0 <= z && pz1 >= z;
 	}
 
 	public boolean isVisible(Chunk chunk) {
@@ -124,10 +115,10 @@ public class ChunkView {
 		if (obj instanceof ChunkView) {
 			ChunkView other = (ChunkView) obj;
 			if (chunkScale == other.chunkScale
-					&& ix0 == other.ix0
-					&& ix1 == other.ix1
-					&& iz0 == other.iz0
-					&& iz1 == other.iz1)
+					&& px0 == other.px0
+					&& px1 == other.px1
+					&& pz0 == other.pz0
+					&& pz1 == other.pz1)
 				return true;
 		}
 
@@ -139,8 +130,8 @@ public class ChunkView {
 	}
 
 	public boolean isChunkVisible(int x, int z) {
-		return ix0 <= x && ix1 >= x &&
-				iz0 <= z && iz1 >= z;
+		return px0 <= x && px1 >= x &&
+				pz0 <= z && pz1 >= z;
 	}
 
 	public boolean isVisible(Region region) {
@@ -152,8 +143,8 @@ public class ChunkView {
 	}
 
 	public boolean isRegionVisible(int x, int z) {
-		return rx0 <= x && rx1 >= x &&
-				rz0 <= z && rz1 >= z;
+		return prx0 <= x && prx1 >= x &&
+				prz0 <= z && prz1 >= z;
 	}
 
 	/**
@@ -168,25 +159,15 @@ public class ChunkView {
 		int x1 = x0 + 31;
 		int z0 = z<<5;
 		int z1 = z0 + 31;
-		x0 = Math.max(newView.ix0, x0);
-		x1 = Math.min(newView.ix1, x1);
-		z0 = Math.max(newView.iz0, z0);
-		z1 = Math.min(newView.iz1, z1);
+		x0 = Math.max(newView.px0, x0);
+		x1 = Math.min(newView.px1, x1);
+		z0 = Math.max(newView.pz0, z0);
+		z1 = Math.min(newView.pz1, z1);
 		return isChunkVisible(x0, z0) && isChunkVisible(x1, z1);
-	}
-
-	public boolean shouldPreload(Region region) {
-		ChunkPosition pos = region.getPosition();
-		return shouldPreloadRegion(pos.x, pos.z);
-	}
-
-	public boolean shouldPreloadRegion(int x, int z) {
-		return prx0 <= x && prx1 >= x &&
-				prz0 <= z && prz1 >= z;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("[(%d, %d), (%d, %d)]", ix0, iz0, ix1, iz1);
+		return String.format("[(%d, %d), (%d, %d)]", px0, pz0, px1, pz1);
 	}
 }

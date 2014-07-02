@@ -60,8 +60,8 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 	 */
 	public MapBuffer(ChunkView view) {
 		this.view = view;
-		buffW = view.chunkScale * (view.ix1 - view.ix0 + 1);
-		buffH = view.chunkScale * (view.iz1 - view.iz0 + 1);
+		buffW = view.chunkScale * (view.px1 - view.px0 + 1);
+		buffH = view.chunkScale * (view.pz1 - view.pz0 + 1);
 		buffer = new BufferedImage(buffW, buffH,
 				BufferedImage.TYPE_INT_RGB);
 		graphics = buffer.getGraphics();
@@ -94,21 +94,21 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 		if (!newView.equals(view) || !bufferedMode) {
 
 			BufferedImage prev = buffer;
-			buffW = newView.chunkScale * (newView.ix1 - newView.ix0 + 1);
-			buffH = newView.chunkScale * (newView.iz1 - newView.iz0 + 1);
+			buffW = newView.chunkScale * (newView.px1 - newView.px0 + 1);
+			buffH = newView.chunkScale * (newView.pz1 - newView.pz0 + 1);
 			buffer = new BufferedImage(buffW, buffH,
 					BufferedImage.TYPE_INT_RGB);
 			graphics = buffer.getGraphics();
-			graphics.setColor(java.awt.Color.white);
+			graphics.setColor(java.awt.Color.red);
 			graphics.fillRect(0, 0, buffW, buffH);
 
-			int ix0 = newView.chunkScale * (view.ix0 - newView.ix0);
-			int iz0 = newView.chunkScale * (view.iz0 - newView.iz0);
+			int ix0 = newView.chunkScale * (view.px0 - newView.px0);
+			int iz0 = newView.chunkScale * (view.pz0 - newView.pz0);
 
 			if (newView.chunkScale == view.chunkScale) {
 				graphics.drawImage(prev, ix0, iz0,
-						newView.chunkScale * (view.ix1 - view.ix0 + 1),
-						newView.chunkScale * (view.iz1 - view.iz0 + 1), null);
+						newView.chunkScale * (view.px1 - view.px0 + 1),
+						newView.chunkScale * (view.pz1 - view.pz0 + 1), null);
 			} else {
 				graphics.drawImage(prev, ix0, iz0, null);
 			}
@@ -127,14 +127,14 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 		buffLayer = layer;
 
 		view = newView;
-		x_offset = (int) (view.chunkScale * (view.ix0 - view.x0));
-		y_offset = (int) (view.chunkScale * (view.iz0 - view.z0));
+		x_offset = (int) (view.chunkScale * (view.px0 - view.x0));
+		y_offset = (int) (view.chunkScale * (view.pz0 - view.z0));
 	}
 
 	private synchronized void redrawAllChunks(ChunkView newView) {
 		updatedRegions.clear();
-		for (int x = newView.rx0; x <= newView.rx1; ++x) {
-			for (int z = newView.rz0; z <= newView.rz1; ++z) {
+		for (int x = newView.prx0; x <= newView.prx1; ++x) {
+			for (int z = newView.prz0; z <= newView.prz1; ++z) {
 				updatedRegions.add(ChunkPosition.get(x, z));
 			}
 		}
@@ -147,8 +147,8 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 				updated.add(region);
 			}
 		}
-		for (int x = newView.rx0; x <= newView.rx1; ++x) {
-			for (int z = newView.rz0; z <= newView.rz1; ++z) {
+		for (int x = newView.prx0; x <= newView.prx1; ++x) {
+			for (int z = newView.prz0; z <= newView.prz1; ++z) {
 				if (!prevView.isRegionFullyVisible(newView, x, z)) {
 					updated.add(ChunkPosition.get(x, z));
 				}
@@ -340,18 +340,18 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 
 			{
 				bounds = view;
-				x = bounds.ix0;
-				z = bounds.iz0;
+				x = bounds.px0;
+				z = bounds.pz0;
 				findNext();
 			}
 
 			private void findNext() {
-				while (z <= bounds.iz1) {
+				while (z <= bounds.pz1) {
 					int cx = x;
 					int cz = z;
 					x += 1;
-					if (x > bounds.ix1) {
-						x = bounds.ix0;
+					if (x > bounds.px1) {
+						x = bounds.px0;
 						z += 1;
 					}
 					ChunkPosition region = ChunkPosition.get(cx>>5, cz>>5);

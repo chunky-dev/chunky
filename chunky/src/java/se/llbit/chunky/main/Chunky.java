@@ -364,13 +364,14 @@ public class Chunky implements ChunkTopographyListener {
 
 		minimap = new ChunkView(map.x, map.z, minimapWidth, minimapHeight, 1);
 
+		int rx0 = Math.min(minimap.prx0, map.prx0);
+		int rx1 = Math.max(minimap.prx1, map.prx1);
+		int rz0 = Math.min(minimap.prz0, map.prz0);
+		int rz1 = Math.max(minimap.prz1, map.prz1);
+
 		// enqueue visible regions and chunks
-		for (int rx = Math.min(minimap.rx0, map.prx0);
-				rx <= Math.max(minimap.rx1, map.prx1); ++rx) {
-
-			for (int rz = Math.min(minimap.rz0, map.prz0);
-					rz <= Math.max(minimap.rz1, map.prz1); ++rz) {
-
+		for (int rx = rx0; rx <= rx1; ++rx) {
+			for (int rz = rz0; rz <= rz1; ++rz) {
 				regionQueue.add(ChunkPosition.get(rx, rz));
 			}
 		}

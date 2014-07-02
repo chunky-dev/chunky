@@ -26,21 +26,21 @@ import se.llbit.chunky.map.MapBuffer;
  * Empty or non-existent chunk.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class EmptyChunk extends Chunk {
+public class EmptyRegionChunk extends Chunk {
 
 	/**
 	 * Singleton instance
 	 */
-	public static final EmptyChunk INSTANCE = new EmptyChunk();
+	public static final EmptyRegionChunk INSTANCE = new EmptyRegionChunk();
 
-	private static final int COLOR = 0xFFFFFFFF;
+	private static final int COLOR = 0xFFEEEEEE;
 
 	@Override
 	public boolean isEmpty() {
 		return true;
 	}
 
-	private EmptyChunk() {
+	private EmptyRegionChunk() {
 		super(ChunkPosition.get(0, 0), EmptyWorld.instance);
 		surface = CorruptLayer.INSTANCE;
 		caves = CorruptLayer.INSTANCE;
@@ -110,6 +110,6 @@ public class EmptyChunk extends Chunk {
 
 	@Override
 	public String toString() {
-		return "Chunk: [empty]";
+		return "Chunk: [empty region]";
 	}
 }
