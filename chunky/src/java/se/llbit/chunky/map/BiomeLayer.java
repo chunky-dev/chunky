@@ -18,23 +18,36 @@ package se.llbit.chunky.map;
 
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
+import se.llbit.math.Color;
 
 public class BiomeLayer extends BitmapLayer {
 
-	byte[] biomes;
+	private final byte[] biomes;
+	private final int avgColor;
 
 	/**
 	 * Load biome IDs into layer
 	 * @param chunkBiomes
 	 */
 	public BiomeLayer(byte[] chunkBiomes) {
-		biomes = new byte[16*16];
-		for (int x = 0; x < 16; ++x) {
-			for (int z = 0; z < 16; ++z) {
-				//biomes[x*16+z] = Biomes.getColor(0x7F & chunkBiomes[Chunk.chunkXZIndex(x, z)]);
-				biomes[x*16+z] = chunkBiomes[Chunk.chunkXZIndex(x, z)];
+		biomes = new byte[Chunk.X_MAX*Chunk.Z_MAX];
+		double[] sum = new double[3];
+		double[] rgb = new double[3];
+		for (int x = 0; x < Chunk.X_MAX; ++x) {
+			for (int z = 0; z < Chunk.Z_MAX; ++z) {
+				byte biome = chunkBiomes[Chunk.chunkXZIndex(x, z)];
+				biomes[x*Chunk.Z_MAX+z] = biome;
+				int color = Biomes.getColor(biome);
+				Color.getRGBComponents(color, rgb);
+				sum[0] += rgb[0];
+				sum[1] += rgb[1];
+				sum[2] += rgb[2];
 			}
 		}
+		sum[0] /= Chunk.X_MAX*Chunk.Z_MAX;
+		sum[1] /= Chunk.X_MAX*Chunk.Z_MAX;
+		sum[2] /= Chunk.X_MAX*Chunk.Z_MAX;
+		avgColor = Color.getRGB(sum);
 	}
 
 	@Override
@@ -46,4 +59,8 @@ public class BiomeLayer extends BitmapLayer {
 		return Biomes.getName(biomes[x*16 + z]);
 	}
 
+	@Override
+	public int getAvgColor() {
+		return avgColor;
+	}
 }

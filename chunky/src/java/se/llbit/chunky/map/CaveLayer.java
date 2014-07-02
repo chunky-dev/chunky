@@ -24,6 +24,7 @@ import se.llbit.math.QuickMath;
 public class CaveLayer extends BitmapLayer {
 
 	private final byte[] caves;
+	private final int avgColor;
 
 	/**
 	 * Generate the cave map. Only holes which are large enough to have mobs spawn
@@ -38,6 +39,7 @@ public class CaveLayer extends BitmapLayer {
 	 */
 	public CaveLayer(byte[] blocksArray, int[] heightmap) {
 		caves = new byte[Chunk.X_MAX*Chunk.Z_MAX];
+		int luft = 0;
 		for (int x = 0; x < Chunk.X_MAX; ++x) {
 			for (int z = 0; z < Chunk.Z_MAX; ++z) {
 				int y = heightmap[z*16+x];
@@ -64,21 +66,31 @@ public class CaveLayer extends BitmapLayer {
 						}
 					}
 				}
-
-				caves[x*16+z] = (byte) Math.min(64, luftspalt);
+				luftspalt = (luftspalt < 64) ? luftspalt : 64;
+				caves[x*Chunk.Z_MAX+z] = (byte) luftspalt;
+				luft += luftspalt;
 			}
 		}
+		avgColor = color((byte) (luft / (float) (Chunk.X_MAX*Chunk.Z_MAX)));
 	}
 
 	@Override
 	public int colorAt(int x, int z) {
-		int luftspalt = caves[x*16+z];
+		return color(caves[x*16+z]);
+	}
+
+	private int color(byte luftspalt) {
 		if (luftspalt == 0) {
 			return 0xFFFFFFFF;
 		} else {
 			double fade = QuickMath.min(1, (luftspalt*3+5)/64.0);
 			return Color.getRGB(1.0-fade, 1.0-fade, 1.0);
 		}
+	}
+
+	@Override
+	public int getAvgColor() {
+		return avgColor;
 	}
 
 }

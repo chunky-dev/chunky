@@ -56,7 +56,7 @@ abstract public class AbstractLayer {
 	}
 
 	public int getAvgColor() {
-		return 0xFF;
+		return 0xFF000000;
 	}
 
 	/**

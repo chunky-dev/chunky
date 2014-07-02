@@ -22,6 +22,7 @@ import java.awt.image.DataBufferInt;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkView;
+import se.llbit.math.Color;
 
 /**
  * A layer with block data.
@@ -29,6 +30,7 @@ import se.llbit.chunky.world.ChunkView;
  */
 public class BlockLayer extends AbstractLayer {
 	private final byte[] blocks;
+	private final int avgColor;
 
 	/**
 	 * Load layer from block data
@@ -36,13 +38,24 @@ public class BlockLayer extends AbstractLayer {
 	 * @param layer
 	 */
 	public BlockLayer(byte[] blockData, int layer) {
-		byte[] data = new byte[16*16];
-		for (int x = 0; x < 16; ++x) {
-			for (int z = 0; z < 16; ++z) {
-				data[x*16+z] = blockData[Chunk.chunkIndex(x, layer, z)];
+		byte[] data = new byte[Chunk.X_MAX*Chunk.Z_MAX];
+		double[] sum = new double[3];
+		double[] rgb = new double[3];
+		for (int x = 0; x < Chunk.X_MAX; ++x) {
+			for (int z = 0; z < Chunk.Z_MAX; ++z) {
+				byte block = blockData[Chunk.chunkIndex(x, layer, z)];
+				data[x*Chunk.Z_MAX+z] = block;
+				Color.getRGBComponents(avgBlockColor(block), rgb);
+				sum[0] += rgb[0];
+				sum[1] += rgb[1];
+				sum[2] += rgb[2];
 			}
 		}
 		blocks = data;
+		sum[0] /= Chunk.X_MAX*Chunk.Z_MAX;
+		sum[1] /= Chunk.X_MAX*Chunk.Z_MAX;
+		sum[2] /= Chunk.X_MAX*Chunk.Z_MAX;
+		avgColor = Color.getRGB(sum);
 	}
 
 	/**
@@ -59,49 +72,40 @@ public class BlockLayer extends AbstractLayer {
 		int z0 = view.chunkScale * (cz - view.pz0);
 
 		if (view.chunkScale == 1) {
-
+			rbuff.setRGB(x0, z0, getAvgColor());
 		} else if (blockScale == 1) {
 
-			for (int z = 0; z < 16; ++z) {
+			for (int z = 0; z < Chunk.Z_MAX; ++z) {
 				int yp = z0 + z;
 
-				for (int x = 0; x < 16; ++x) {
+				for (int x = 0; x < Chunk.X_MAX; ++x) {
 					int xp = x0 + x;
 
-					byte block = blocks[x * 16 + z];
-					if (block == Block.AIR.id) {
-						rbuff.setRGB(xp, yp, 0xFFFFFFFF);
-					} else {
-						rbuff.setRGB(xp, yp, Block.get(block).getIcon().getAvgColor());
-					}
+					byte block = blocks[x*Chunk.Z_MAX + z];
+					rbuff.setRGB(xp, yp, avgBlockColor(block));
 				}
 			}
 		} else if (blockScale < 12) {
 
 
-			for (int z = 0; z < 16; ++z) {
+			for (int z = 0; z < Chunk.Z_MAX; ++z) {
 				int yp0 = z0 + z * blockScale;
 
-				for (int x = 0; x < 16; ++x) {
+				for (int x = 0; x < Chunk.X_MAX; ++x) {
 					int xp0 = x0 + x * blockScale;
 
-					byte block = blocks[x * 16 + z];
-					if (block == Block.AIR.id) {
-						rbuff.fillRect(xp0, yp0, blockScale, blockScale, 0xFFFFFFFF);
-					} else {
-						rbuff.fillRect(xp0, yp0, blockScale, blockScale,
-								Block.get(block).getIcon().getAvgColor());
-					}
+					byte block = blocks[x*Chunk.Z_MAX + z];
+					rbuff.fillRect(xp0, yp0, blockScale, blockScale, avgBlockColor(block));
 				}
 			}
 		} else {
-			for (int z = 0; z < 16; ++z) {
+			for (int z = 0; z < Chunk.Z_MAX; ++z) {
 				int yp0 = z0 + z * blockScale;
 
-				for (int x = 0; x < 16; ++x) {
+				for (int x = 0; x < Chunk.X_MAX; ++x) {
 					int xp0 = x0 + x * blockScale;
 
-					byte block = blocks[x * 16 + z];
+					byte block = blocks[x*Chunk.Z_MAX + z];
 					if (block == Block.AIR.id) {
 						rbuff.fillRect(xp0, yp0, blockScale, blockScale, 0xFFFFFFFF);
 						continue;
@@ -119,6 +123,13 @@ public class BlockLayer extends AbstractLayer {
 		}
 	}
 
+	private int avgBlockColor(byte block) {
+		if (block == Block.AIR.id) {
+			return 0xFFFFFFFF;
+		} else {
+			return Block.get(block).getIcon().getAvgColor();
+		}
+	}
 
 	/**
 	 * Render block highlight
@@ -176,4 +187,8 @@ public class BlockLayer extends AbstractLayer {
 		}
 	}
 
+	@Override
+	public int getAvgColor() {
+		return avgColor;
+	}
 }
