@@ -93,10 +93,10 @@ public class ChunkView {
 			int irx1 = ix1>>5;
 			int irz0 = iz0>>5;
 			int irz1 = iz1>>5;
-			prx0 = irx0-1;
-			prx1 = irx1+1;
-			prz0 = irz0-1;
-			prz1 = irz1+1;
+			prx0 = irx0;
+			prx1 = irx1;
+			prz0 = irz0;
+			prz1 = irz1;
 			px0 = prx0<<5;
 			px1 = (prx1<<5)+31;
 			pz0 = prz0<<5;
