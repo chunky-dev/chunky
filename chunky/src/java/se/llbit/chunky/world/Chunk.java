@@ -468,7 +468,7 @@ public class Chunk {
 			blockData[i] = 0;
 		}
 
-		Map<String, AnyTag> data = getChunkData();
+		Map<String, AnyTag> data = getChunkData(LEVEL_SECTIONS, LEVEL_BIOMES);
 		AnyTag sections = data.get(LEVEL_SECTIONS);
 		AnyTag biomesTag = data.get(LEVEL_BIOMES);
 		if (sections.isList() && biomesTag.isByteArray(X_MAX*Z_MAX)) {

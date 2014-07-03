@@ -53,6 +53,7 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 	private int[] data;
 	private Graphics graphics;
 	private Set<ChunkPosition> updatedRegions = new HashSet<ChunkPosition>();
+	private Set<ChunkPosition> updatedChunks = new HashSet<ChunkPosition>();
 
 	/**
 	 * Create a new render buffer for the provided view
@@ -134,28 +135,54 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 
 	private synchronized void redrawAllChunks(ChunkView newView) {
 		updatedRegions.clear();
-		for (int x = newView.prx0; x <= newView.prx1; ++x) {
-			for (int z = newView.prz0; z <= newView.prz1; ++z) {
-				updatedRegions.add(ChunkPosition.get(x, z));
+		updatedChunks.clear();
+		if (view.scale >= 16) {
+			for (int x = newView.px0; x <= newView.px1; ++x) {
+				for (int z = newView.pz0; z <= newView.pz1; ++z) {
+					updatedChunks.add(ChunkPosition.get(x, z));
+				}
+			}
+		} else {
+			for (int x = newView.prx0; x <= newView.prx1; ++x) {
+				for (int z = newView.prz0; z <= newView.prz1; ++z) {
+					updatedRegions.add(ChunkPosition.get(x, z));
+				}
 			}
 		}
 	}
 
 	private synchronized void redrawNewChunks(ChunkView prevView, ChunkView newView) {
-		Set<ChunkPosition> updated = new HashSet<ChunkPosition>();
-		for (ChunkPosition region: updatedRegions) {
-			if (newView.isRegionVisible(region)) {
-				updated.add(region);
-			}
-		}
-		for (int x = newView.prx0; x <= newView.prx1; ++x) {
-			for (int z = newView.prz0; z <= newView.prz1; ++z) {
-				if (!prevView.isRegionFullyVisible(newView, x, z)) {
-					updated.add(ChunkPosition.get(x, z));
+		if (view.scale >= 16) {
+			Set<ChunkPosition> updated = new HashSet<ChunkPosition>();
+			for (ChunkPosition chunk: updatedChunks) {
+				if (newView.isChunkVisible(chunk)) {
+					updated.add(chunk);
 				}
 			}
+			for (int x = newView.px0; x <= newView.px1; ++x) {
+				for (int z = newView.pz0; z <= newView.pz1; ++z) {
+					if (!prevView.isChunkVisible(x, z)) {
+						updated.add(ChunkPosition.get(x, z));
+					}
+				}
+			}
+			updatedChunks = updated;
+		} else {
+			Set<ChunkPosition> updated = new HashSet<ChunkPosition>();
+			for (ChunkPosition region: updatedRegions) {
+				if (newView.isRegionVisible(region)) {
+					updated.add(region);
+				}
+			}
+			for (int x = newView.prx0; x <= newView.prx1; ++x) {
+				for (int z = newView.prz0; z <= newView.prz1; ++z) {
+					if (!prevView.isRegionFullyVisible(newView, x, z)) {
+						updated.add(ChunkPosition.get(x, z));
+					}
+				}
+			}
+			updatedRegions = updated;
 		}
-		updatedRegions = updated;
 	}
 
 	/**
@@ -311,14 +338,28 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 
 	@Override
 	public synchronized void chunkUpdated(ChunkPosition chunk) {
-		if (view.isChunkVisible(chunk.x, chunk.z)) {
-			updatedRegions.add(chunk.getRegionPosition());
+		if (view.isChunkVisible(chunk)) {
+			if (view.scale >= 16) {
+				updatedChunks.add(chunk);
+			} else {
+				updatedRegions.add(chunk.getRegionPosition());
+			}
 		}
 	}
 
 	@Override
 	public synchronized void regionUpdated(ChunkPosition region) {
-		if (view.isRegionVisible(region)) {
+		if (view.scale >= 16) {
+			int x0 = region.x;
+			int x1 = region.x*32 + 31;
+			int z0 = region.z;
+			int z1 = region.z*32 + 31;
+			for (int cx = x0; cx <= x1; ++cx) {
+				for (int cz = z0; cz <= z1; ++cz) {
+					chunkUpdated(ChunkPosition.get(cx, cz));
+				}
+			}
+		} else if (view.isRegionVisible(region)) {
 			updatedRegions.add(region);
 		}
 	}
@@ -337,7 +378,9 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 	@Override
 	synchronized public Iterator<ChunkPosition> iterator() {
 		final Set<ChunkPosition> regions = updatedRegions;
+		final Set<ChunkPosition> chunks = updatedChunks;
 		updatedRegions = new HashSet<ChunkPosition>();
+		updatedChunks = new HashSet<ChunkPosition>();
 		return new Iterator<ChunkPosition>() {
 			private final ChunkView bounds;
 			private ChunkPosition next = null;
@@ -361,7 +404,8 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 						z += 1;
 					}
 					ChunkPosition region = ChunkPosition.get(cx>>5, cz>>5);
-					if (regions.contains(region)) {
+					ChunkPosition chunk = ChunkPosition.get(cx, cz);
+					if (regions.contains(region) || chunks.contains(chunk)) {
 						next = ChunkPosition.get(cx, cz);
 						return;
 					}

@@ -52,14 +52,14 @@ public class WorldRenderer {
 
 	int round = 0;
 	int colors[] = {
-			0xFF0000, 0x00FF00, 0x0000FF,
-			0xFF3300, 0x00FF33, 0x3300FF,
-			0xFF3333, 0x33FF33, 0x3333FF,
-			0x990000, 0x009900, 0x000099,
-			0x993300, 0x009933, 0x330099,
-			0x993333, 0x339933, 0x333399,
-			0x99AA33, 0x3399AA, 0xAA3399,
-			0x99AAAA, 0xAA99AA, 0xAAAA99,
+			0x88FF0000, 0x8800FF00, 0x880000FF,
+			0x88FF3300, 0x8800FF33, 0x883300FF,
+			0x88FF3333, 0x8833FF33, 0x883333FF,
+			0x88990000, 0x88009900, 0x88000099,
+			0x88993300, 0x88009933, 0x88330099,
+			0x88993333, 0x88339933, 0x88333399,
+			0x8899AA33, 0x883399AA, 0x88AA3399,
+			0x8899AAAA, 0x88AA99AA, 0x88AAAA99,
 	};
 
 	/**
@@ -103,7 +103,7 @@ public class WorldRenderer {
 			}
 
 //			if (!chunk.isEmpty()) {
-//				buffer.fillRect(
+//				buffer.fillRectAlpha(
 //						view.chunkScale * (x - view.px0),
 //						view.chunkScale * (z - view.pz0),
 //						view.chunkScale, view.chunkScale,
