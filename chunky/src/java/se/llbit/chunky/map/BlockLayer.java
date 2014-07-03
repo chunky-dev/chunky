@@ -116,7 +116,12 @@ public class BlockLayer extends AbstractLayer {
 							.getScaledImage(blockScale).getRaster().getDataBuffer()).getData();
 					for (int i = 0; i < blockScale; ++i) {
 						for (int j = 0; j < blockScale; ++j) {
-							rbuff.setRGB(xp0 + j, yp0 + i, tex[j + blockScale * i]);
+							int rgb = tex[j + blockScale * i];
+							if ((rgb & 0xFF000000) != 0) {
+								rbuff.setRGB(xp0 + j, yp0 + i, rgb);
+							} else {
+								rbuff.setRGB(xp0 + j, yp0 + i, 0xFFFFFFFF);
+							}
 						}
 					}
 				}
