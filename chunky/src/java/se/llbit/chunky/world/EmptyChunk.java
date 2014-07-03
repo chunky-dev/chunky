@@ -19,6 +19,7 @@ package se.llbit.chunky.world;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.CorruptLayer;
 import se.llbit.chunky.map.MapBuffer;
 
@@ -104,7 +105,7 @@ public class EmptyChunk extends Chunk {
 	}
 
 	@Override
-	public synchronized void parse() {
+	public synchronized void loadChunk(Chunky chunky) {
 		// do nothing
 	}
 

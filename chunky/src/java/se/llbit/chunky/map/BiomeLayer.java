@@ -31,32 +31,29 @@ public class BiomeLayer extends BitmapLayer {
 	 */
 	public BiomeLayer(byte[] chunkBiomes) {
 		biomes = new byte[Chunk.X_MAX*Chunk.Z_MAX];
+		System.arraycopy(chunkBiomes, 0, biomes, 0, biomes.length);
 		double[] sum = new double[3];
 		double[] rgb = new double[3];
-		for (int x = 0; x < Chunk.X_MAX; ++x) {
-			for (int z = 0; z < Chunk.Z_MAX; ++z) {
-				byte biome = chunkBiomes[Chunk.chunkXZIndex(x, z)];
-				biomes[x*Chunk.Z_MAX+z] = biome;
-				int color = Biomes.getColor(biome);
-				Color.getRGBComponents(color, rgb);
-				sum[0] += rgb[0];
-				sum[1] += rgb[1];
-				sum[2] += rgb[2];
-			}
+		for (int i = 0; i < biomes.length; ++i) {
+			byte biome = biomes[i];
+			Color.getRGBComponents(Biomes.getColor(biome), rgb);
+			sum[0] += rgb[0];
+			sum[1] += rgb[1];
+			sum[2] += rgb[2];
 		}
-		sum[0] /= Chunk.X_MAX*Chunk.Z_MAX;
-		sum[1] /= Chunk.X_MAX*Chunk.Z_MAX;
-		sum[2] /= Chunk.X_MAX*Chunk.Z_MAX;
+		sum[0] /= biomes.length;
+		sum[1] /= biomes.length;
+		sum[2] /= biomes.length;
 		avgColor = Color.getRGB(sum);
 	}
 
 	@Override
 	public int colorAt(int x, int z) {
-		return Biomes.getColor(biomes[x*16+z]);
+		return Biomes.getColor(biomes[Chunk.chunkXZIndex(x, z)]);
 	}
 
 	public String biomeAt(int x, int z) {
-		return Biomes.getName(biomes[x*16 + z]);
+		return Biomes.getName(biomes[Chunk.chunkXZIndex(x, z)]);
 	}
 
 	@Override

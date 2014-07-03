@@ -403,6 +403,8 @@ public class Chunky implements ChunkTopographyListener {
 	public synchronized void setRenderer(Chunk.Renderer renderer) {
 		this.chunkRenderer = renderer;
 		getMap().redraw();
+		// force the chunks to redraw
+		viewUpdated();
 	}
 
 	/**

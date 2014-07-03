@@ -35,9 +35,10 @@ public class BlockLayer extends AbstractLayer {
 	/**
 	 * Load layer from block data
 	 * @param blockData
+	 * @param chunkBiomes
 	 * @param layer
 	 */
-	public BlockLayer(byte[] blockData, int layer) {
+	public BlockLayer(byte[] blockData, byte[] chunkBiomes, int layer) {
 		byte[] data = new byte[Chunk.X_MAX*Chunk.Z_MAX];
 		double[] sum = new double[3];
 		double[] rgb = new double[3];
