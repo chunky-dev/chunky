@@ -128,12 +128,14 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		public void mouseEntered(MouseEvent e) {
 			mouseInsideWindow = true;
 			setMotionOrigin(e);
+			repaint();
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
 			mouseInsideWindow = false;
 			mapLabel.setVisible(false);
+			repaint();
 		}
 
 		@Override

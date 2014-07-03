@@ -372,6 +372,7 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 		return !updatedRegions.isEmpty();
 	}
 
+	// TODO use separate iterators for regions and chunks
 	/**
 	 * @return an iterator over chunks that need to be redrawn
 	 */
@@ -386,11 +387,15 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 			private ChunkPosition next = null;
 			private int x;
 			private int z;
+			private ChunkPosition region;
+			private boolean containsRegion;
 
 			{
 				bounds = view;
 				x = bounds.px0;
 				z = bounds.pz0;
+				region = ChunkPosition.get(x>>5, z>>5);
+				containsRegion = regions.contains(region);
 				findNext();
 			}
 
@@ -398,16 +403,26 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 				while (z <= bounds.pz1) {
 					int cx = x;
 					int cz = z;
+					int rx = cx>>5;
+					int rz = cz>>5;
 					x += 1;
 					if (x > bounds.px1) {
 						x = bounds.px0;
 						z += 1;
 					}
-					ChunkPosition region = ChunkPosition.get(cx>>5, cz>>5);
-					ChunkPosition chunk = ChunkPosition.get(cx, cz);
-					if (regions.contains(region) || chunks.contains(chunk)) {
+					if (region.x != rx || region.z != rz) {
+						region = ChunkPosition.get(rx, rz);
+						containsRegion = regions.contains(region);
+					}
+					if (containsRegion) {
 						next = ChunkPosition.get(cx, cz);
 						return;
+					} else {
+						ChunkPosition chunk = ChunkPosition.get(cx, cz);
+						if (chunks.contains(chunk)) {
+							next = chunk;
+							return;
+						}
 					}
 				}
 				next = null;
