@@ -62,9 +62,9 @@ public class ChunkView {
 
 	public ChunkView(double x, double z, int width, int height, int scale) {
 		this.scale = scale;
-		if (scale <= 16) {
+		if (scale <= 12) {
 			chunkScale = 1;
-		} else if (scale < 16*16) {
+		} else if (scale <= 12*16) {
 			chunkScale = 16;
 		} else {
 			this.chunkScale = 16*16;

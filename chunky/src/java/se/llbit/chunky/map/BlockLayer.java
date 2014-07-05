@@ -172,27 +172,28 @@ public class BlockLayer extends AbstractLayer {
 
 	private int getBiomeColor(float[] rgb, byte block, byte biome) {
 		float[] biomeColor;
+		float alpha = rgb[3];
 		switch ((int) block) {
 		case Block.GRASS_ID:
 		case Block.TALLGRASS_ID:
 			biomeColor = Biomes.getGrassColorLinear(biome);
 			return Color.getRGB(
-					FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
-					FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
-					FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
+					(1-alpha) + alpha * FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
+					(1-alpha) + alpha * FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
+					(1-alpha) + alpha * FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
 		case Block.LEAVES_ID:
 		case Block.LEAVES2_ID:
 		case Block.VINES_ID:
 			biomeColor = Biomes.getFoliageColorLinear(biome);
 			return Color.getRGB(
-					FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
-					FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
-					FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
+					(1-alpha) + alpha * FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
+					(1-alpha) + alpha * FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
+					(1-alpha) + alpha * FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
 		default:
 			return Color.getRGB(
-					FastMath.pow(rgb[0], Scene.DEFAULT_GAMMA_INV),
-					FastMath.pow(rgb[1], Scene.DEFAULT_GAMMA_INV),
-					FastMath.pow(rgb[2], Scene.DEFAULT_GAMMA_INV));
+					(1-alpha) + alpha * FastMath.pow(rgb[0], Scene.DEFAULT_GAMMA_INV),
+					(1-alpha) + alpha * FastMath.pow(rgb[1], Scene.DEFAULT_GAMMA_INV),
+					(1-alpha) + alpha * FastMath.pow(rgb[2], Scene.DEFAULT_GAMMA_INV));
 		}
 	}
 
