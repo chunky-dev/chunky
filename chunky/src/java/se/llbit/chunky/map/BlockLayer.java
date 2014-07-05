@@ -112,6 +112,7 @@ public class BlockLayer extends AbstractLayer {
 					case Block.TALLGRASS_ID:
 					case Block.LEAVES_ID:
 					case Block.LEAVES2_ID:
+					case Block.VINES_ID:
 					{
 						Texture tex = Block.get(block).getIcon();
 						for (int i = 0; i < 16; ++i) {
@@ -153,40 +154,46 @@ public class BlockLayer extends AbstractLayer {
 		if (block == Block.AIR.id) {
 			return 0xFFFFFFFF;
 		} else {
-			if (block == Block.GRASS_ID || block == Block.TALLGRASS_ID) {
+			switch ((int) block) {
+			case Block.GRASS_ID:
+			case Block.TALLGRASS_ID:
+			case Block.LEAVES_ID:
+			case Block.LEAVES2_ID:
+			case Block.VINES_ID:
+			{
 				float[] rgb = Block.get(block).getIcon().getAvgColorLinear();
-				float[] biomeColor = Biomes.getGrassColorLinear(biome);
-				return Color.getRGB(
-						FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
-						FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
-						FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
-			} else if (block == Block.LEAVES_ID || block == Block.LEAVES2_ID) {
-				float[] rgb = Block.get(block).getIcon().getAvgColorLinear();
-				float[] biomeColor = Biomes.getFoliageColorLinear(biome);
-				return Color.getRGB(
-						FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
-						FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
-						FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
+				return getBiomeColor(rgb, block, biome);
 			}
-			return Block.get(block).getIcon().getAvgColor();
+			default:
+				return Block.get(block).getIcon().getAvgColor();
+			}
 		}
 	}
 
 	private int getBiomeColor(float[] rgb, byte block, byte biome) {
-			if (block == Block.GRASS_ID || block == Block.TALLGRASS_ID) {
-				float[] biomeColor = Biomes.getGrassColorLinear(biome);
-				return Color.getRGB(
-						FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
-						FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
-						FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
-			} else if (block == Block.LEAVES_ID || block == Block.LEAVES2_ID) {
-				float[] biomeColor = Biomes.getFoliageColorLinear(biome);
-				return Color.getRGB(
-						FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
-						FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
-						FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
-			}
-			return 0xFF000000;
+		float[] biomeColor;
+		switch ((int) block) {
+		case Block.GRASS_ID:
+		case Block.TALLGRASS_ID:
+			biomeColor = Biomes.getGrassColorLinear(biome);
+			return Color.getRGB(
+					FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
+					FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
+					FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
+		case Block.LEAVES_ID:
+		case Block.LEAVES2_ID:
+		case Block.VINES_ID:
+			biomeColor = Biomes.getFoliageColorLinear(biome);
+			return Color.getRGB(
+					FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
+					FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
+					FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
+		default:
+			return Color.getRGB(
+					FastMath.pow(rgb[0], Scene.DEFAULT_GAMMA_INV),
+					FastMath.pow(rgb[1], Scene.DEFAULT_GAMMA_INV),
+					FastMath.pow(rgb[2], Scene.DEFAULT_GAMMA_INV));
+		}
 	}
 
 	/**
