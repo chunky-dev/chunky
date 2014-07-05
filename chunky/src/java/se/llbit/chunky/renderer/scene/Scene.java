@@ -112,7 +112,12 @@ public class Scene extends SceneDescription {
 	/**
 	 * Default gamma
 	 */
-	public static final double DEFAULT_GAMMA = 2.2;
+	public static final float DEFAULT_GAMMA = 2.2f;
+
+	/**
+	 * One over gamma
+	 */
+	public static final float DEFAULT_GAMMA_INV = 1 / DEFAULT_GAMMA;
 
 	/**
 	 * Default emitter intensity

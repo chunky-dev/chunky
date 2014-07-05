@@ -19,6 +19,10 @@ package se.llbit.chunky.map;
 import java.awt.Graphics;
 import java.awt.image.DataBufferInt;
 
+import org.apache.commons.math3.util.FastMath;
+
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkView;
@@ -30,6 +34,7 @@ import se.llbit.math.Color;
  */
 public class BlockLayer extends AbstractLayer {
 	private final byte[] blocks;
+	private final byte[] biomes;
 	private final int avgColor;
 
 	/**
@@ -39,20 +44,22 @@ public class BlockLayer extends AbstractLayer {
 	 * @param layer
 	 */
 	public BlockLayer(byte[] blockData, byte[] chunkBiomes, int layer) {
-		byte[] data = new byte[Chunk.X_MAX*Chunk.Z_MAX];
+		blocks = new byte[Chunk.X_MAX*Chunk.Z_MAX];
+		biomes = new byte[Chunk.X_MAX*Chunk.Z_MAX];
 		double[] sum = new double[3];
 		double[] rgb = new double[3];
 		for (int x = 0; x < Chunk.X_MAX; ++x) {
 			for (int z = 0; z < Chunk.Z_MAX; ++z) {
 				byte block = blockData[Chunk.chunkIndex(x, layer, z)];
-				data[x*Chunk.Z_MAX+z] = block;
-				Color.getRGBComponents(avgBlockColor(block), rgb);
+				byte biome = chunkBiomes[Chunk.chunkXZIndex(x, z)];
+				blocks[x*Chunk.Z_MAX+z] = block;
+				biomes[x*Chunk.Z_MAX+z] = block;
+				Color.getRGBComponents(avgBlockColor(block, biome), rgb);
 				sum[0] += rgb[0];
 				sum[1] += rgb[1];
 				sum[2] += rgb[2];
 			}
 		}
-		blocks = data;
 		sum[0] /= Chunk.X_MAX*Chunk.Z_MAX;
 		sum[1] /= Chunk.X_MAX*Chunk.Z_MAX;
 		sum[2] /= Chunk.X_MAX*Chunk.Z_MAX;
@@ -83,7 +90,8 @@ public class BlockLayer extends AbstractLayer {
 					int xp = x0 + x;
 
 					byte block = blocks[x*Chunk.Z_MAX + z];
-					rbuff.setRGB(xp, yp, avgBlockColor(block));
+					byte biome = biomes[x*Chunk.Z_MAX + z];
+					rbuff.setRGB(xp, yp, avgBlockColor(block, biome));
 				}
 			}
 		} else if (blockScale < 12) {
@@ -96,7 +104,8 @@ public class BlockLayer extends AbstractLayer {
 					int xp0 = x0 + x * blockScale;
 
 					byte block = blocks[x*Chunk.Z_MAX + z];
-					rbuff.fillRect(xp0, yp0, blockScale, blockScale, avgBlockColor(block));
+					byte biome = biomes[x*Chunk.Z_MAX + z];
+					rbuff.fillRect(xp0, yp0, blockScale, blockScale, avgBlockColor(block, biome));
 				}
 			}
 		} else {
@@ -129,10 +138,27 @@ public class BlockLayer extends AbstractLayer {
 		}
 	}
 
-	private int avgBlockColor(byte block) {
+	private int avgBlockColor(byte block, byte biome) {
 		if (block == Block.AIR.id) {
 			return 0xFFFFFFFF;
 		} else {
+			if (block == Block.GRASS_ID || block == Block.TALLGRASS_ID) {
+				float[] rgb = Block.get(block).getIcon().getAvgColorLinear();
+				float[] biomeColor = Biomes.getGrassColorLinear(biome);
+				float gamma = 1 / (float)Scene.DEFAULT_GAMMA;
+				return Color.getRGB(
+						FastMath.pow(rgb[0] * biomeColor[0], gamma),
+						FastMath.pow(rgb[1] * biomeColor[1], gamma),
+						FastMath.pow(rgb[2] * biomeColor[2], gamma));
+			} else if (block == Block.LEAVES_ID || block == Block.LEAVES2_ID) {
+				float[] rgb = Block.get(block).getIcon().getAvgColorLinear();
+				float[] biomeColor = Biomes.getFoliageColorLinear(biome);
+				float gamma = 1 / (float)Scene.DEFAULT_GAMMA;
+				return Color.getRGB(
+						FastMath.pow(rgb[0] * biomeColor[0], gamma),
+						FastMath.pow(rgb[1] * biomeColor[1], gamma),
+						FastMath.pow(rgb[2] * biomeColor[2], gamma));
+			}
 			return Block.get(block).getIcon().getAvgColor();
 		}
 	}
