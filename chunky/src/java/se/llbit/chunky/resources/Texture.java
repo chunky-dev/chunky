@@ -474,8 +474,6 @@ public class Texture {
 	protected int avgColor;
 	private float[] avgColorLinear;
 	private float[][] linear;
-	private BufferedImage prescaled;
-	private int bufferedScale = -1;
 
 	public Texture() {
 		this(ImageLoader.get("missing-image"));
@@ -551,13 +549,25 @@ public class Texture {
 		getColor(ray.u, ray.v, ray.color);
 	}
 
+	/**
+	 * Get linear color values
+	 * @param u
+	 * @param v
+	 * @return color
+	 */
 	public float[] getColor(double u, double v) {
 		return getColor(
 				(int) (u * width - Ray.EPSILON),
 				(int) ((1-v) * height - Ray.EPSILON));
 	}
 
-	private final float[] getColor(int x, int y) {
+	/**
+	 * Get linear color values
+	 * @param x
+	 * @param y
+	 * @return color
+	 */
+	public final float[] getColor(int x, int y) {
 		return linear[width*y + x];
 	}
 
@@ -636,24 +646,6 @@ public class Texture {
 	 */
 	public ImageIcon createIcon() {
 		return new ImageIcon(image);
-	}
-
-	/**
-	 * Get a scaled version of the texture
-	 * @param scale
-	 * @return
-	 */
-	public BufferedImage getScaledImage(int scale) {
-		if (bufferedScale == scale) {
-			return prescaled;
-		} else {
-			prescaled = new BufferedImage(scale, scale, BufferedImage.TYPE_INT_ARGB);
-			Graphics g = prescaled.getGraphics();
-			g.drawImage(image, 0, 0, scale, scale, null);
-			g.dispose();
-			bufferedScale = scale;
-			return prescaled;
-		}
 	}
 
 	/**

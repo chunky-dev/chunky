@@ -62,7 +62,13 @@ public class ChunkView {
 
 	public ChunkView(double x, double z, int width, int height, int scale) {
 		this.scale = scale;
-		this.chunkScale = Math.max(1, scale - (scale % 16));
+		if (scale <= 16) {
+			chunkScale = 1;
+		} else if (scale < 16*16) {
+			chunkScale = 16;
+		} else {
+			this.chunkScale = 16*16;
+		}
 		this.x = x;
 		this.z = z;
 		double cw = width / (2. * scale);

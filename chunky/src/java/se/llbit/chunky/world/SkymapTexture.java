@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -15,12 +15,11 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.world;
-import org.apache.commons.math3.util.FastMath;
-
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
+import org.apache.commons.math3.util.FastMath;
 import org.apache.log4j.Logger;
 
 import se.llbit.chunky.renderer.scene.Scene;
@@ -229,11 +228,6 @@ public class SkymapTexture extends Texture {
 
 	@Override
 	public BufferedImage getImage() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public BufferedImage getScaledImage(int scale) {
 		throw new UnsupportedOperationException();
 	}
 

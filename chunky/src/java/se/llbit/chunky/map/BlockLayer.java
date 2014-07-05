@@ -22,6 +22,7 @@ import java.awt.image.DataBufferInt;
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
@@ -75,13 +76,12 @@ public class BlockLayer extends AbstractLayer {
 	@Override
 	public synchronized void render(MapBuffer rbuff, int cx, int cz) {
 		ChunkView view = rbuff.getView();
-		int blockScale = view.chunkScale / 16;
 		int x0 = view.chunkScale * (cx - view.px0);
 		int z0 = view.chunkScale * (cz - view.pz0);
 
 		if (view.chunkScale == 1) {
 			rbuff.setRGB(x0, z0, getAvgColor());
-		} else if (blockScale == 1) {
+		} else if (view.chunkScale == 16) {
 
 			for (int z = 0; z < Chunk.Z_MAX; ++z) {
 				int yp = z0 + z;
@@ -94,48 +94,59 @@ public class BlockLayer extends AbstractLayer {
 					rbuff.setRGB(xp, yp, avgBlockColor(block, biome));
 				}
 			}
-		} else if (blockScale < 12) {
-
-
+		} else if (view.chunkScale == 16*16) {
 			for (int z = 0; z < Chunk.Z_MAX; ++z) {
-				int yp0 = z0 + z * blockScale;
+				int yp0 = z0 + z * 16;
 
 				for (int x = 0; x < Chunk.X_MAX; ++x) {
-					int xp0 = x0 + x * blockScale;
-
-					byte block = blocks[x*Chunk.Z_MAX + z];
-					byte biome = biomes[x*Chunk.Z_MAX + z];
-					rbuff.fillRect(xp0, yp0, blockScale, blockScale, avgBlockColor(block, biome));
-				}
-			}
-		} else {
-			for (int z = 0; z < Chunk.Z_MAX; ++z) {
-				int yp0 = z0 + z * blockScale;
-
-				for (int x = 0; x < Chunk.X_MAX; ++x) {
-					int xp0 = x0 + x * blockScale;
+					int xp0 = x0 + x * 16;
 
 					byte block = blocks[x*Chunk.Z_MAX + z];
 					if (block == Block.AIR.id) {
-						rbuff.fillRect(xp0, yp0, blockScale, blockScale, 0xFFFFFFFF);
+						rbuff.fillRect(xp0, yp0, 16, 16, 0xFFFFFFFF);
 						continue;
 					}
 
-					int[] tex = ((DataBufferInt) Block.get(block).getIcon()
-							.getScaledImage(blockScale).getRaster().getDataBuffer()).getData();
-					for (int i = 0; i < blockScale; ++i) {
-						for (int j = 0; j < blockScale; ++j) {
-							int rgb = tex[j + blockScale * i];
-							if ((rgb & 0xFF000000) != 0) {
-								rbuff.setRGB(xp0 + j, yp0 + i, rgb);
-							} else {
-								rbuff.setRGB(xp0 + j, yp0 + i, 0xFFFFFFFF);
+					switch ((int) block) {
+					case Block.GRASS_ID:
+					case Block.TALLGRASS_ID:
+					case Block.LEAVES_ID:
+					case Block.LEAVES2_ID:
+					{
+						Texture tex = Block.get(block).getIcon();
+						for (int i = 0; i < 16; ++i) {
+							for (int j = 0; j < 16; ++j) {
+								float[] rgb = tex.getColor(j, i);
+								if (rgb[3] != 0) {
+									rbuff.setRGB(xp0 + j, yp0 + i, getBiomeColor(rgb, block, biomes[x*Chunk.Z_MAX+z]));
+								} else {
+									rbuff.setRGB(xp0 + j, yp0 + i, 0xFFFFFFFF);
+								}
 							}
 						}
+						break;
+					}
+					default:
+					{
+						int[] tex = ((DataBufferInt) Block.get(block).getIcon()
+								.getImage().getRaster().getDataBuffer())
+								.getData();
+						for (int i = 0; i < 16; ++i) {
+							for (int j = 0; j < 16; ++j) {
+								int rgb = tex[i * 16 + j];
+								if ((rgb & 0xFF000000) != 0) {
+									rbuff.setRGB(xp0 + j, yp0 + i, rgb);
+								} else {
+									rbuff.setRGB(xp0 + j, yp0 + i, 0xFFFFFFFF);
+								}
+							}
+						}
+					}
 					}
 				}
 			}
 		}
+		// unsupported chunkScale if none of the above
 	}
 
 	private int avgBlockColor(byte block, byte biome) {
@@ -145,22 +156,37 @@ public class BlockLayer extends AbstractLayer {
 			if (block == Block.GRASS_ID || block == Block.TALLGRASS_ID) {
 				float[] rgb = Block.get(block).getIcon().getAvgColorLinear();
 				float[] biomeColor = Biomes.getGrassColorLinear(biome);
-				float gamma = 1 / (float)Scene.DEFAULT_GAMMA;
 				return Color.getRGB(
-						FastMath.pow(rgb[0] * biomeColor[0], gamma),
-						FastMath.pow(rgb[1] * biomeColor[1], gamma),
-						FastMath.pow(rgb[2] * biomeColor[2], gamma));
+						FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
+						FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
+						FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
 			} else if (block == Block.LEAVES_ID || block == Block.LEAVES2_ID) {
 				float[] rgb = Block.get(block).getIcon().getAvgColorLinear();
 				float[] biomeColor = Biomes.getFoliageColorLinear(biome);
-				float gamma = 1 / (float)Scene.DEFAULT_GAMMA;
 				return Color.getRGB(
-						FastMath.pow(rgb[0] * biomeColor[0], gamma),
-						FastMath.pow(rgb[1] * biomeColor[1], gamma),
-						FastMath.pow(rgb[2] * biomeColor[2], gamma));
+						FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
+						FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
+						FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
 			}
 			return Block.get(block).getIcon().getAvgColor();
 		}
+	}
+
+	private int getBiomeColor(float[] rgb, byte block, byte biome) {
+			if (block == Block.GRASS_ID || block == Block.TALLGRASS_ID) {
+				float[] biomeColor = Biomes.getGrassColorLinear(biome);
+				return Color.getRGB(
+						FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
+						FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
+						FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
+			} else if (block == Block.LEAVES_ID || block == Block.LEAVES2_ID) {
+				float[] biomeColor = Biomes.getFoliageColorLinear(biome);
+				return Color.getRGB(
+						FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
+						FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
+						FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
+			}
+			return 0xFF000000;
 	}
 
 	/**
