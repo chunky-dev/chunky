@@ -47,6 +47,7 @@ public class Texture {
 	public static final Texture andesite = new Texture();
 	public static final Texture smoothAndesite = new Texture();
 	public static final Texture dirt = new Texture("dirt");
+	public static final Texture coarseDirt = new Texture("dirt");
 	public static final Texture grassSideSaturated = new Texture("grass-side-saturated");
 	public static final Texture grassTop = new Texture("grass");
 	public static final Texture grassSide = new Texture();

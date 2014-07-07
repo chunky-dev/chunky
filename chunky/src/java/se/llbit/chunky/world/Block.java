@@ -154,12 +154,12 @@ public class Block {
 				Texture.dirt,
 			},
 			{
-				Texture.dirt,
-				Texture.dirt,
-				Texture.dirt,
-				Texture.dirt,
-				Texture.dirt,
-				Texture.dirt,
+				Texture.coarseDirt,
+				Texture.coarseDirt,
+				Texture.coarseDirt,
+				Texture.coarseDirt,
+				Texture.coarseDirt,
+				Texture.coarseDirt,
 			},
 			{
 				Texture.podzolSide,
@@ -175,6 +175,13 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return TexturedBlockModel.intersect(ray,
 					textures[ray.getBlockData() % 3]);
+		}
+		final String[] dirtType = {
+			"regular", "coarse", "podzol"
+		};
+		@Override
+		public String description(int data) {
+			return dirtType[data%3];
 		}
 	};
 	public static final Block COBBLESTONE = new Block(0x04, "Cobblestone", Texture.cobblestone) {

@@ -1258,6 +1258,10 @@ public class TexturePackLoader {
 		// [14w07a] Iron Trapdoor
 		allTextures.put("iron_trapdoor",
 				new SimpleTexture("assets/minecraft/textures/blocks/iron_trapdoor", Texture.ironTrapdoor));
+
+		// coarse dirt
+		allTextures.put("coarse_dirt",
+				new SimpleTexture("assets/minecraft/textures/blocks/coarse_dirt", Texture.coarseDirt));
 	}
 
 	/**
