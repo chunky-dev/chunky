@@ -91,6 +91,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		private int ox = 0;
 		private int oy = 0;
 		private boolean dragging = false;
+		private boolean mouseDown = false;
 
 		private void setMotionOrigin(MouseEvent e) {
 			ox = e.getX();
@@ -144,14 +145,16 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 				contextMenu.show((Component) e.getSource(), e.getX(), e.getY());
 			} else {
 				setMotionOrigin(e);
+				mouseDown = true;
 			}
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			if (e.getButton() == MouseEvent.BUTTON3) {
+			if (!mouseDown) {
 				return;
 			}
+			mouseDown = false;
 
 			if (!selectRect) {
 				if (!dragging) {
@@ -181,7 +184,9 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			onDrag(e);
+			if (mouseDown == true) {
+				onDrag(e);
+			}
 		}
 
 		@Override
