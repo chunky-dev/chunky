@@ -89,12 +89,6 @@ public class OctreeFinalizer {
 							octree.set(type, x, cy, z);
 						}
 						break;
-					case Block.DIRT_ID:
-						if ((type >> BlockData.OFFSET) != 0 &&
-							octree.get(x, cy+1, z) != 0) {
-							octree.set(Block.DIRT_ID, x, cy, z);
-						}
-						break;
 					case Block.WATER_ID:
 						fullBlock = (type >> WaterModel.FULL_BLOCK) & 1;
 						if (fullBlock != 0) break;
