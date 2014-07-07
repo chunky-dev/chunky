@@ -1,30 +1,33 @@
 1.2.3 - TBD
-    * The 2D map now has more zoom levels
-    * Scrolling the mouse wheel now zooms the map, and holding the Ctrl key
-      will change the displayed layer (zooming used to require holding Ctrl)
-    * Fixed a refreshing problem in the 2D map causing it to not refresh some
-      regions while panning
+    * Added Minecraft 1.8 blocks:
+        + Coarse Dirt
+	+ Prismarine (rough, block, dark)
+	+ Sea Lantern
+	+ Wet Sponge
+	+ Iron Trapdoor
+    * Improved the 2D map:
+        + More zoom levels
+	+ Mouse wheel scrolling zooms, Ctrl+Scroll changes layer
+	+ Fixed tearing issues
+	+ Improved performance for large map views
+        + The name of the biome under the cursor is now displayed in lower-left
+	  corner of the map
+	+ Improved the rendering of many blocks in the block-layer mode
     * Right-clicking in the 2D map now opens a context menu with options to
-      create a new scene, load a scene, or clear the current selection
-    * Added iron trapdoor
-    * Fixed issue causing the render preview window to display white after
-      being closed and re-opened
-    * The name of the biome under the cursor is now displayed in the 2D map
+      cre ate a new scene, load a scene, or clear the current selection
+    * (potentially) Fixed issue causing the render preview window to display
+      white after being closed and re-opened
     * Using the -snapshot command without arguments now prints a list of all
       available scenes in the scene directory
     * Using the -snapshot command without a destination PNG file name now
       automatically picks a filename based on the scene name and current SPP
     * Depth of field now only uses one scene variable (removed infDof variable)
-    * Fixed corner Acacia/Dark Oak stairs rendering
+    * Fixed corner Acacia/Dark Oak stairs rendering issue
     * Hay bales now render with the correct orientation
-    * Improved rendering of some blocks in the 2D map
     * Fixed sign texture loading error (item icon was loaded rather than the
       entity texture)
-    * Added chunk hover indicator in 2D map
     * Fixed error causing rayDepth setting to not be saved for scenes
     * Fixed error preventing naming and overwriting of custom camera presets
-    * Improved status text visibility in the 2D map. In addition, status text
-      is now only displayed when the mouse is inside the map.
     * Added checkbox on the Advanced tab of Render controls which enables
       automatic shutdown of the computer after render completion
 

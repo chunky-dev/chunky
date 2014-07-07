@@ -40,6 +40,9 @@ public class Texture {
 
 	public static final Texture air = new Texture("air");
 	public static final Texture stone = new Texture("stone");
+	public static final Texture prismarine = new Texture();
+	public static final Texture prismarineBricks = new Texture();
+	public static final Texture darkPrismarine = new Texture();
 	public static final Texture granite = new Texture();
 	public static final Texture smoothGranite = new Texture();
 	public static final Texture diorite = new Texture();
@@ -104,6 +107,7 @@ public class Texture {
 	public static final Texture dispenserFront = new Texture("dispenser");
 	public static final Texture dropperFront = new Texture();
 	public static final Texture sponge = new Texture("sponge");
+	public static final Texture wetSponge = new Texture("sponge");
 	public static final Texture glass = new Texture("glass");
 	public static final Texture diamondOre = new Texture("diamond-ore");
 	public static final Texture redstoneOre = new Texture("redstone-ore");
@@ -145,6 +149,7 @@ public class Texture {
 	public static final Texture netherrack = new Texture("netherrack");
 	public static final Texture soulsand = new Texture("soul-sand");
 	public static final Texture glowstone = new Texture("glowstone");
+	public static final Texture seaLantern = new Texture();
 	public static final Texture sandstoneSide = new Texture("sandstone");
 	public static final Texture sandstoneTop = new Texture();
 	public static final Texture sandstoneBottom = new Texture();

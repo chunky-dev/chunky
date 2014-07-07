@@ -176,12 +176,12 @@ public class Block {
 			return TexturedBlockModel.intersect(ray,
 					textures[ray.getBlockData() % 3]);
 		}
-		final String[] dirtType = {
+		final String[] kind = {
 			"regular", "coarse", "podzol"
 		};
 		@Override
 		public String description(int data) {
-			return dirtType[data%3];
+			return kind[data%3];
 		}
 	};
 	public static final Block COBBLESTONE = new Block(0x04, "Cobblestone", Texture.cobblestone) {
@@ -388,6 +388,37 @@ public class Block {
 		{
 			isOpaque = true;
 			isSolid = true;
+			localIntersect = true;
+		}
+		final Texture[][] textures = {
+			{
+				Texture.sponge,
+				Texture.sponge,
+				Texture.sponge,
+				Texture.sponge,
+				Texture.sponge,
+				Texture.sponge,
+			},
+			{
+				Texture.wetSponge,
+				Texture.wetSponge,
+				Texture.wetSponge,
+				Texture.wetSponge,
+				Texture.wetSponge,
+				Texture.wetSponge,
+			},
+		};
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return TexturedBlockModel.intersect(ray,
+					textures[ray.getBlockData() % 2]);
+		}
+		final String[] kind = {
+			"dry", "wet"
+		};
+		@Override
+		public String description(int data) {
+			return kind[data%2];
 		}
 	};
 	public static final int GLASS_ID = 0x14;
@@ -2720,18 +2751,57 @@ public class Block {
 			return TrapdoorModel.intersect(ray, Texture.ironTrapdoor);
 		}
 	};
-	public static final Block UNKNOWN0xA8 = new Block(0xA8, "Unknown Block 0xA8", Texture.unknown) {
+	public static final Block PRISMARINE = new Block(0xA8, "Prismarine", Texture.prismarine) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			isOpaque = true;
+			isSolid = true;
+			localIntersect = true;
+		}
+		final Texture[][] textures = {
+			{
+				Texture.prismarine,
+				Texture.prismarine,
+				Texture.prismarine,
+				Texture.prismarine,
+				Texture.prismarine,
+				Texture.prismarine,
+			},
+			{
+				Texture.prismarineBricks,
+				Texture.prismarineBricks,
+				Texture.prismarineBricks,
+				Texture.prismarineBricks,
+				Texture.prismarineBricks,
+				Texture.prismarineBricks,
+			},
+			{
+				Texture.darkPrismarine,
+				Texture.darkPrismarine,
+				Texture.darkPrismarine,
+				Texture.darkPrismarine,
+				Texture.darkPrismarine,
+				Texture.darkPrismarine,
+			},
+		};
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return TexturedBlockModel.intersect(ray,
+					textures[ray.getBlockData() % 3]);
+		}
+		final String[] kind = {
+			"rough", "bricks", "dark"
+		};
+		@Override
+		public String description(int data) {
+			return kind[data%3];
 		}
 	};
-	public static final Block UNKNOWN0xA9 = new Block(0xA9, "Unknown Block 0xA9", Texture.unknown) {
+	public static final Block SEALANTERN = new Block(0xA9, "Sea Lantern", Texture.seaLantern) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			isOpaque = true;
+			isSolid = true;
+			isEmitter = true;
+			emittance = 0.5;
 		}
 	};
 	public static final int HAY_BLOCK_ID = 0xAA;
@@ -3410,7 +3480,7 @@ public class Block {
 		QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, STAINED_CLAY,
 		STAINED_GLASSPANE, LEAVES2, WOOD2, ACACIASTAIRS,
 		DARKOAKSTAIRS, SLIMEBLOCK, BARRIER, IRON_TRAPDOOR,
-		UNKNOWN0xA8, UNKNOWN0xA9, HAY_BLOCK, CARPET,
+		PRISMARINE, SEALANTERN, HAY_BLOCK, CARPET,
 		HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, LARGE_FLOWER,
 		UNKNOWN0xB0, UNKNOWN0xB1, UNKNOWN0xB2, UNKNOWN0xB3,
 		UNKNOWN0xB4, UNKNOWN0xB5, UNKNOWN0xB6, UNKNOWN0xB7,

@@ -1254,14 +1254,21 @@ public class TexturePackLoader {
 				new SimpleTexture("assets/minecraft/textures/blocks/stone_andesite", Texture.andesite));
 		allTextures.put("stone_andesite_smooth",
 				new SimpleTexture("assets/minecraft/textures/blocks/stone_andesite_smooth", Texture.smoothAndesite));
-
-		// [14w07a] Iron Trapdoor
+		allTextures.put("coarse_dirt",
+				new SimpleTexture("assets/minecraft/textures/blocks/coarse_dirt", Texture.coarseDirt));
+		allTextures.put("prismarine_rough",
+				new SimpleTexture("assets/minecraft/textures/blocks/prismarine_rough", Texture.prismarine));
+		allTextures.put("prismarine_bricks",
+				new SimpleTexture("assets/minecraft/textures/blocks/prismarine_bricks", Texture.prismarineBricks));
+		allTextures.put("prismarine_dark",
+				new SimpleTexture("assets/minecraft/textures/blocks/prismarine_dark", Texture.darkPrismarine));
+		allTextures.put("sea_lantern",
+				new SimpleTexture("assets/minecraft/textures/blocks/sea_lantern", Texture.seaLantern));
+		allTextures.put("sponge_wet",
+				new SimpleTexture("assets/minecraft/textures/blocks/sponge_wet", Texture.wetSponge));
 		allTextures.put("iron_trapdoor",
 				new SimpleTexture("assets/minecraft/textures/blocks/iron_trapdoor", Texture.ironTrapdoor));
 
-		// coarse dirt
-		allTextures.put("coarse_dirt",
-				new SimpleTexture("assets/minecraft/textures/blocks/coarse_dirt", Texture.coarseDirt));
 	}
 
 	/**
