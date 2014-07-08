@@ -75,4 +75,9 @@ public class Vector3i {
 		y *= i;
 		z *= i;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("(%d, %d, %d)", x, y, z);
+	}
 }

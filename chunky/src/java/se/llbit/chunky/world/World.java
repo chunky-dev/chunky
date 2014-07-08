@@ -877,4 +877,15 @@ public class World implements Comparable<World> {
 	public long getSeed() {
 		return seed;
 	}
+
+	/**
+	 * Load entities from world file
+	 */
+	public Collection<Entity> getEntityData() {
+		Collection<Entity> list = new LinkedList<Entity>();
+		if (havePlayerPos) {
+			list.add(new PlayerEntity(new Vector3d(playerX, playerY, playerZ)));
+		}
+		return list;
+	}
 }

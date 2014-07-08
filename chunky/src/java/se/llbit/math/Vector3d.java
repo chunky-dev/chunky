@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -145,6 +145,18 @@ public class Vector3d {
 	}
 
 	/**
+	 * Add s*d to this vector
+	 * @param s
+	 * @param d
+	 * @param o
+	 */
+	public final void scaleAdd(double s, Vector3d d) {
+		x += s*d.x;
+		y += s*d.y;
+		z += s*d.z;
+	}
+
+	/**
 	 * Scale this vector by s
 	 * @param s
 	 */
@@ -231,6 +243,6 @@ public class Vector3d {
 
 	@Override
 	public String toString() {
-		return String.format("(%f, %f, %f)", x, y, z);
+		return String.format("(%.2f, %.2f, %.2f)", x, y, z);
 	}
 }

@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
@@ -50,6 +51,7 @@ import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.Entity;
 import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
@@ -168,6 +170,10 @@ public class Scene extends SceneDescription {
 	 */
 	protected Octree octree;
 
+	/**
+	 * Entities in the scene
+	 */
+	private Collection<Entity> entities = new LinkedList<Entity>();
 
 	// chunk loading buffers
 	private final byte[] blocks = new byte[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
@@ -236,6 +242,7 @@ public class Scene extends SceneDescription {
 		// the octree reference is overwritten to save time
 		// when the other scene is changed it must create a new octree
 		octree = other.octree;
+		entities = other.entities;
 		grassTexture = other.grassTexture;
 		foliageTexture = other.foliageTexture;
 		origin.set(other.origin);
@@ -474,11 +481,24 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
+	 * Find closest intersection between ray and scene
 	 * @param ray
 	 * @return <code>true</code> if an intersection was found
 	 */
 	public boolean intersect(Ray ray) {
-		return octree.intersect(this, ray);
+		boolean inOctree = false;//octree.intersect(this, ray);
+		boolean inEntity = false;
+		ray.tNear = Double.POSITIVE_INFINITY;
+		for (Entity entity: entities) {
+			if (entity.intersect(this, ray)) {
+				inEntity = true;
+			}
+		}
+		if (inEntity) {
+			ray.x.scaleAdd(ray.tNear, ray.d);
+			ray.distance += ray.tNear;
+		}
+		return inOctree || inEntity;
 	}
 
 	protected final boolean kill(Ray ray, Random random) {
@@ -561,6 +581,11 @@ public class Scene extends SceneDescription {
 			world.regionDiscovered(region);
 			world.getRegion(region).parse();
 		}
+
+		task = "Loading entities";
+		progressListener.setProgress(task, 0, 0, 1);
+		entities = world.getEntityData();
+		progressListener.setProgress(task, 1, 0, 1);
 
 		Heightmap biomeIdMap = new Heightmap();
 		task = "Loading chunks";
