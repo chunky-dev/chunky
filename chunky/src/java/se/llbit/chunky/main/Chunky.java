@@ -105,7 +105,7 @@ public class Chunky implements ChunkTopographyListener {
 	private final RegionChangeMonitor refresher = new RegionChangeMonitor(this);
 
 	private int currentDimension = 0;
-	private Chunk.Renderer chunkRenderer = Chunk.surfaceRenderer;
+	private Chunk.Renderer chunkRenderer = Chunk.autoRenderer;
 	private final WorldRenderer worldRenderer = new WorldRenderer();
 	protected ChunkSelectionTracker chunkSelection = new ChunkSelectionTracker();
 

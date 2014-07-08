@@ -133,6 +133,20 @@ public class Chunk {
 	};
 
 	/**
+	 * Switch between surface, layer and biome modes
+	 */
+	public static Renderer autoRenderer = new Renderer() {
+		@Override
+		public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz) {
+			if (rbuff.getView().chunkScale >= 10) {
+				chunk.renderSurface(rbuff, cx, cz);
+			} else {
+				chunk.renderBiomes(rbuff, cx, cz);
+			}
+		}
+	};
+
+	/**
 	 * Renders a single layer
 	 */
 	public static Renderer layerRenderer = new Renderer() {
@@ -232,18 +246,21 @@ public class Chunk {
 
 		int requestedLayer = world.currentLayer();
 		Chunk.Renderer renderer = chunky.getChunkRenderer();
+		ChunkView view = chunky.getMapView();
 
-		if (!chunkHasChanged(renderer, requestedLayer)) {
+		if (!chunkHasChanged(renderer, view, requestedLayer)) {
 			return;
 		}
 
 		loadedLayer = requestedLayer;
 
-		if (renderer == Chunk.surfaceRenderer) {
+		if (renderer == Chunk.surfaceRenderer || (view.chunkScale >= 10 && renderer == Chunk.autoRenderer)) {
 			Map<String, AnyTag> data = getChunkData(LEVEL_SECTIONS, LEVEL_HEIGHTMAP, LEVEL_BIOMES);
 			surfaceTimestamp = dataTimestamp;
+			biomesTimestamp = dataTimestamp;
 			loadSurface(data);
-		} else if (renderer == Chunk.biomeRenderer) {
+			loadBiomes(data);
+		} else if (renderer == Chunk.biomeRenderer || (view.chunkScale < 10 && renderer == Chunk.autoRenderer)) {
 			Map<String, AnyTag> data = getChunkData(LEVEL_BIOMES);
 			biomesTimestamp = dataTimestamp;
 			loadBiomes(data);
@@ -390,11 +407,11 @@ public class Chunk {
 		}
 	}
 
-	private boolean chunkHasChanged(Renderer renderer, int requestedLayer) {
+	private boolean chunkHasChanged(Renderer renderer, ChunkView view, int requestedLayer) {
 		int timestamp = 0;
-		if (renderer == Chunk.surfaceRenderer) {
+		if (renderer == Chunk.surfaceRenderer || (view.chunkScale >= 10 && renderer == Chunk.autoRenderer)) {
 			timestamp = surfaceTimestamp;
-		} else if (renderer == Chunk.biomeRenderer) {
+		} else if (renderer == Chunk.biomeRenderer || (view.chunkScale < 10 && renderer == Chunk.autoRenderer)) {
 			timestamp = biomesTimestamp;
 		} else if (renderer == Chunk.layerRenderer) {
 			if (requestedLayer != loadedLayer) {

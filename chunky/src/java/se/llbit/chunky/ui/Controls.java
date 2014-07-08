@@ -100,7 +100,7 @@ public class Controls extends JPanel {
 	private ProgressPanel progressPanel;
 	private final Minimap minimap;
 	private JButton exportZipBtn;
-	private JRadioButton earthBtn;
+	private JRadioButton overworldBtn;
 	private JRadioButton netherBtn;
 	private JRadioButton endBtn;
 	private final JCheckBox followPlayer = new JCheckBox("follow player");
@@ -593,8 +593,9 @@ public class Controls extends JPanel {
 
 		JComponent viewPanel = new JPanel();
 
-		ButtonGroup buttonGroup1 = new ButtonGroup();
+		ButtonGroup mapModeGroup = new ButtonGroup();
 		JLabel viewLabel = new JLabel();
+		JRadioButton autoModeBtn = new JRadioButton();
 		JRadioButton layerModeBtn = new JRadioButton();
 		JRadioButton surfaceModeBtn = new JRadioButton();
 		JRadioButton caveModeBtn = new JRadioButton();
@@ -612,17 +613,17 @@ public class Controls extends JPanel {
 		followPlayer.addActionListener(followPlayerListener);
 
 		ButtonGroup buttonGroup2 = new ButtonGroup();
-		earthBtn = new JRadioButton();
+		overworldBtn = new JRadioButton();
 		netherBtn = new JRadioButton();
 		endBtn = new JRadioButton();
 
 		dimLabel.setText(Messages.getString("Controls.Dimension_lbl")); //$NON-NLS-1$
 
-		buttonGroup2.add(earthBtn);
-		earthBtn.setText(Messages.getString("Controls.Earth_lbl")); //$NON-NLS-1$
-		earthBtn.setSelected(true);
-		earthBtn.setEnabled(false);
-		earthBtn.addActionListener(new ActionListener() {
+		buttonGroup2.add(overworldBtn);
+		overworldBtn.setText(Messages.getString("Controls.Earth_lbl")); //$NON-NLS-1$
+		overworldBtn.setSelected(true);
+		overworldBtn.setEnabled(false);
+		overworldBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				chunky.setDimension(World.OVERWORLD_DIMENSION);
@@ -651,7 +652,16 @@ public class Controls extends JPanel {
 
 		viewLabel.setText(Messages.getString("Controls.ViewMode_lbl")); //$NON-NLS-1$
 
-		buttonGroup1.add(layerModeBtn);
+		autoModeBtn.setText("Auto");
+		autoModeBtn.setSelected(true);
+		autoModeBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				chunky.setRenderer(Chunk.autoRenderer);
+			}
+		});
+		mapModeGroup.add(autoModeBtn);
+
 		layerModeBtn.setText(Messages.getString("Controls.LayerMode_lbl")); //$NON-NLS-1$
 		layerModeBtn.addActionListener(new ActionListener() {
 			@Override
@@ -659,18 +669,17 @@ public class Controls extends JPanel {
 				chunky.setRenderer(Chunk.layerRenderer);
 			}
 		});
+		mapModeGroup.add(layerModeBtn);
 
-		buttonGroup1.add(surfaceModeBtn);
 		surfaceModeBtn.setText(Messages.getString("Controls.SurfaceMode_lbl")); //$NON-NLS-1$
-		surfaceModeBtn.setSelected(true);
 		surfaceModeBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				chunky.setRenderer(Chunk.surfaceRenderer);
 			}
 		});
+		mapModeGroup.add(surfaceModeBtn);
 
-		buttonGroup1.add(caveModeBtn);
 		caveModeBtn.setText(Messages.getString("Controls.CaveMode_lbl")); //$NON-NLS-1$
 		caveModeBtn.addActionListener(new ActionListener() {
 			@Override
@@ -678,8 +687,8 @@ public class Controls extends JPanel {
 				chunky.setRenderer(Chunk.caveRenderer);
 			}
 		});
+		mapModeGroup.add(caveModeBtn);
 
-		buttonGroup1.add(biomeModeBtn);
 		biomeModeBtn.setText("Biomes");
 		biomeModeBtn.addActionListener(new ActionListener() {
 			@Override
@@ -687,6 +696,7 @@ public class Controls extends JPanel {
 				chunky.setRenderer(Chunk.biomeRenderer);
 			}
 		});
+		mapModeGroup.add(biomeModeBtn);
 
 		scaleLabel.setText(Messages.getString("Controls.Scale_lbl")); //$NON-NLS-1$
 
@@ -747,6 +757,7 @@ public class Controls extends JPanel {
 					.addGroup(layout.createSequentialGroup()
 						.addGroup(layout.createParallelGroup(Alignment.LEADING)
 							.addComponent(viewLabel)
+							.addComponent(autoModeBtn)
 							.addComponent(layerModeBtn)
 							.addComponent(surfaceModeBtn)
 							.addComponent(caveModeBtn)
@@ -754,7 +765,7 @@ public class Controls extends JPanel {
 						.addGap(18)
 						.addGroup(layout.createParallelGroup(Alignment.LEADING)
 							.addComponent(dimLabel)
-							.addComponent(earthBtn)
+							.addComponent(overworldBtn)
 							.addComponent(netherBtn)
 							.addComponent(endBtn)))
 					.addGroup(layout.createSequentialGroup()
@@ -793,19 +804,20 @@ public class Controls extends JPanel {
 						.addComponent(dimLabel))
 				.addPreferredGap(ComponentPlacement.RELATED)
 				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(layerModeBtn)
-						.addComponent(earthBtn))
+						.addComponent(autoModeBtn)
+						.addComponent(overworldBtn))
 				.addPreferredGap(ComponentPlacement.RELATED)
 				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(surfaceModeBtn)
+						.addComponent(layerModeBtn)
 						.addComponent(netherBtn))
 				.addPreferredGap(ComponentPlacement.RELATED)
 				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(caveModeBtn)
+						.addComponent(surfaceModeBtn)
 						.addComponent(endBtn))
-				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(biomeModeBtn)
-						.addComponent(endBtn))
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addComponent(caveModeBtn)
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addComponent(biomeModeBtn)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(sep1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
 				.addPreferredGap(ComponentPlacement.RELATED)
@@ -1060,7 +1072,7 @@ public class Controls extends JPanel {
 	public void enableDimension(int i, boolean haveDimension) {
 		switch (i) {
 		case World.OVERWORLD_DIMENSION:
-			earthBtn.setEnabled(haveDimension);
+			overworldBtn.setEnabled(haveDimension);
 			break;
 		case World.NETHER_DIMENSION:
 			netherBtn.setEnabled(haveDimension);
