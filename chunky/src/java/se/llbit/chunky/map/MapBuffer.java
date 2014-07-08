@@ -97,9 +97,9 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 			int layer) {
 
 		boolean bufferedMode = buffMode == renderer
-				&& (buffMode != Chunk.layerRenderer || buffLayer == layer);
+				&& buffMode.bufferValid(view, newView, buffLayer, layer);
 
-		if (!newView.equals(view) || !bufferedMode) {
+		if (!bufferedMode || !newView.equals(view)) {
 
 			BufferedImage prev = buffer;
 			initBuffer(newView);
@@ -118,7 +118,7 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 			DataBufferInt dataBuffer = (DataBufferInt) buffer.getRaster().getDataBuffer();
 			data = dataBuffer.getData();
 
-			if (!bufferedMode || view.chunkScale != newView.chunkScale) {
+			if (!bufferedMode /*|| view.chunkScale != newView.chunkScale*/) {
 				redrawAllChunks(newView);
 			} else {
 				redrawNewChunks(view, newView);

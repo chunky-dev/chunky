@@ -175,7 +175,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 	 */
 	public synchronized void viewUpdated(ChunkView newView) {
 		view = newView;
-		mapBuffer.updateView(view, null, 0);
+		mapBuffer.updateView(view, Chunk.surfaceRenderer, 0);
 		repaint();
 	}
 

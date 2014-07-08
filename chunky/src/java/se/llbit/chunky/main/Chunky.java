@@ -809,9 +809,9 @@ public class Chunky implements ChunkTopographyListener {
 				Math.min(BLOCK_SCALE_MAX, blockScale));
 		if (newScale != chunkScale) {
 			chunkScale = newScale;
-			getControls().setScale(getScale());
 			setView(map.x, map.z);
 		}
+		getControls().setScale(getScale());
 	}
 
 	/**

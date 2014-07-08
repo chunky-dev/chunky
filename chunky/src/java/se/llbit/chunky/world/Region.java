@@ -379,7 +379,12 @@ public class Region implements Iterable<Chunk> {
 		return timestamp != regionFile.lastModified();
 	}
 
-	public boolean chunkHasChanged(ChunkPosition chunkPos, int timestamp) {
+	/**
+	 * @param chunkPos
+	 * @param timestamp
+	 * @return {@code true} if the chunk has changed since the timestamp
+	 */
+	public boolean chunkChangedSince(ChunkPosition chunkPos, int timestamp) {
 		return timestamp != chunkTimestamps[(chunkPos.x&31)+(chunkPos.z&31)*32];
 	}
 

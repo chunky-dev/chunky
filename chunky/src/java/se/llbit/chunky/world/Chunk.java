@@ -73,6 +73,11 @@ public class Chunk {
 	private static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
 	private static final int CHUNK_BYTES = X_MAX*Y_MAX*Z_MAX;
 
+	private static final int BLOCK_LAYER = 1<<0;
+	private static final int SURFACE_LAYER = 1<<1;
+	private static final int CAVE_LAYER = 1<<2;
+	private static final int BIOME_LAYER = 1<<3;
+
 	private final ChunkPosition position;
 	private int loadedLayer = -1;
 	protected volatile AbstractLayer layer = UnknownLayer.INSTANCE;
@@ -91,7 +96,7 @@ public class Chunk {
 	/**
 	 * A chunk renderer
 	 */
-	public interface Renderer {
+	abstract static public class Renderer {
 		/**
 		 * Render the chunk
 		 * @param chunk
@@ -99,7 +104,40 @@ public class Chunk {
 		 * @param cx
 		 * @param cz
 		 */
-		public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz);
+		abstract public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz);
+
+		/**
+		 * Layers to be loaded for this renderer
+		 * @param view
+		 * @return
+		 */
+		abstract public int getLayers(ChunkView view);
+
+		public Set<String> getRequest(ChunkView view) {
+			int layers = getLayers(view);
+			Set<String> request = new HashSet<String>();
+			request.add(LEVEL_SECTIONS);
+			if ((layers&BLOCK_LAYER) != 0 || (layers&SURFACE_LAYER) != 0 ||
+					(layers&BIOME_LAYER) != 0) {
+				request.add(LEVEL_BIOMES);
+			}
+			if ((layers&SURFACE_LAYER) != 0 || (layers&CAVE_LAYER) != 0) {
+				request.add(LEVEL_HEIGHTMAP);
+			}
+			return request;
+		}
+
+		/**
+		 * @param view
+		 * @param newView
+		 * @param buffLayer
+		 * @param layer
+		 * @return {@code true} if the render buffer is still valid
+		 */
+		public boolean bufferValid(ChunkView oldView, ChunkView newView,
+				int oldLayer, int newLayer) {
+			return oldView.chunkScale == newView.chunkScale;
+		}
 	}
 
 	/**
@@ -109,6 +147,11 @@ public class Chunk {
 		@Override
 		public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz) {
 			chunk.renderCaves(rbuff, cx, cz);
+		}
+
+		@Override
+		public int getLayers(ChunkView view) {
+			return CAVE_LAYER;
 		}
 	};
 
@@ -120,6 +163,11 @@ public class Chunk {
 		public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz) {
 			chunk.renderBiomes(rbuff, cx, cz);
 		}
+
+		@Override
+		public int getLayers(ChunkView view) {
+			return BIOME_LAYER;
+		}
 	};
 
 	/**
@@ -130,6 +178,11 @@ public class Chunk {
 		public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz) {
 			chunk.renderSurface(rbuff, cx, cz);
 		}
+
+		@Override
+		public int getLayers(ChunkView view) {
+			return SURFACE_LAYER;
+		}
 	};
 
 	/**
@@ -138,11 +191,28 @@ public class Chunk {
 	public static Renderer autoRenderer = new Renderer() {
 		@Override
 		public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz) {
-			if (rbuff.getView().chunkScale >= 10) {
+			if (rbuff.getView().scale >= 10) {
 				chunk.renderSurface(rbuff, cx, cz);
 			} else {
 				chunk.renderBiomes(rbuff, cx, cz);
 			}
+		}
+
+		@Override
+		public int getLayers(ChunkView view) {
+			if (view.scale >= 10) {
+				return SURFACE_LAYER | BIOME_LAYER;
+			} else {
+				return BIOME_LAYER;
+			}
+		}
+
+		@Override
+		public boolean bufferValid(ChunkView oldView, ChunkView newView,
+				int oldLayer, int newLayer) {
+			return super.bufferValid(oldView, newView, oldLayer, newLayer) &&
+					(oldView.scale >= 10 && newView.scale >= 10 ||
+					oldView.scale < 10 && newView.scale < 10);
 		}
 	};
 
@@ -153,6 +223,18 @@ public class Chunk {
 		@Override
 		public void render(Chunk chunk, MapBuffer rbuff, int cx, int cz) {
 			chunk.renderLayer(rbuff, cx, cz);
+		}
+
+		@Override
+		public int getLayers(ChunkView view) {
+			return BLOCK_LAYER;
+		}
+
+		@Override
+		public boolean bufferValid(ChunkView oldView, ChunkView newView,
+				int oldLayer, int newLayer) {
+			return super.bufferValid(oldView, newView, oldLayer, newLayer) &&
+					oldLayer == newLayer;
 		}
 	};
 
@@ -182,7 +264,11 @@ public class Chunk {
 		biomes.render(rbuff, cx, cz);
 	}
 
-	private Map<String, AnyTag> getChunkData(String... keys) {
+	/**
+	 * @param request fresh request set
+	 * @return loaded data, or null if something went wrong
+	 */
+	private Map<String, AnyTag> getChunkData(Set<String> request) {
 		Region region = world.getRegion(position.getRegionPosition());
 		ChunkData data = region.getChunkData(position);
 		DataInputStream in = data.inputStream;
@@ -190,17 +276,12 @@ public class Chunk {
 			return null;
 		}
 		dataTimestamp = data.timestamp;
-		Set<String> request = new HashSet<String>();
-		for (String key: keys) {
-			request.add(key);
-		}
-
 		Map<String, AnyTag> result = NamedTag.quickParse(in, request);
 		try {
 			in.close();
 		} catch (IOException e) {
 		}
-		for (String key: keys) {
+		for (String key: request) {
 			if (!result.containsKey(key)) {
 				result.put(key, new ErrorTag());
 			}
@@ -248,28 +329,28 @@ public class Chunk {
 		Chunk.Renderer renderer = chunky.getChunkRenderer();
 		ChunkView view = chunky.getMapView();
 
-		if (!chunkHasChanged(renderer, view, requestedLayer)) {
+		if (!shouldReloadChunk(renderer, view, requestedLayer)) {
 			return;
 		}
 
 		loadedLayer = requestedLayer;
 
-		if (renderer == Chunk.surfaceRenderer || (view.chunkScale >= 10 && renderer == Chunk.autoRenderer)) {
-			Map<String, AnyTag> data = getChunkData(LEVEL_SECTIONS, LEVEL_HEIGHTMAP, LEVEL_BIOMES);
-			surfaceTimestamp = dataTimestamp;
-			biomesTimestamp = dataTimestamp;
-			loadSurface(data);
-			loadBiomes(data);
-		} else if (renderer == Chunk.biomeRenderer || (view.chunkScale < 10 && renderer == Chunk.autoRenderer)) {
-			Map<String, AnyTag> data = getChunkData(LEVEL_BIOMES);
-			biomesTimestamp = dataTimestamp;
-			loadBiomes(data);
-		} else if (renderer == Chunk.layerRenderer) {
-			Map<String, AnyTag> data = getChunkData(LEVEL_SECTIONS, LEVEL_BIOMES);
+		Map<String, AnyTag> data = getChunkData(renderer.getRequest(view));
+
+		int layers = renderer.getLayers(view);
+		if ((layers&BLOCK_LAYER) != 0) {
 			layerTimestamp = dataTimestamp;
 			loadLayer(data, requestedLayer);
-		} else if (renderer == Chunk.caveRenderer) {
-			Map<String, AnyTag> data = getChunkData(LEVEL_SECTIONS, LEVEL_HEIGHTMAP);
+		}
+		if ((layers&SURFACE_LAYER) != 0) {
+			surfaceTimestamp = dataTimestamp;
+			loadSurface(data);
+		}
+		if ((layers&BIOME_LAYER) != 0) {
+			biomesTimestamp = dataTimestamp;
+			loadBiomes(data);
+		}
+		if ((layers&CAVE_LAYER) != 0) {
 			cavesTimestamp = dataTimestamp;
 			loadCaves(data);
 		}
@@ -407,25 +488,29 @@ public class Chunk {
 		}
 	}
 
-	private boolean chunkHasChanged(Renderer renderer, ChunkView view, int requestedLayer) {
-		int timestamp = 0;
-		if (renderer == Chunk.surfaceRenderer || (view.chunkScale >= 10 && renderer == Chunk.autoRenderer)) {
-			timestamp = surfaceTimestamp;
-		} else if (renderer == Chunk.biomeRenderer || (view.chunkScale < 10 && renderer == Chunk.autoRenderer)) {
-			timestamp = biomesTimestamp;
-		} else if (renderer == Chunk.layerRenderer) {
+	private boolean shouldReloadChunk(Renderer renderer, ChunkView view, int requestedLayer) {
+		int timestamp = Integer.MAX_VALUE;
+		int layers = renderer.getLayers(view);
+		if ((layers&BLOCK_LAYER) != 0) {
 			if (requestedLayer != loadedLayer) {
 				return true;
 			}
 			timestamp = layerTimestamp;
-		} else if (renderer == Chunk.caveRenderer) {
-			timestamp = cavesTimestamp;
+		}
+		if ((layers&SURFACE_LAYER) != 0) {
+			timestamp = Math.min(timestamp, surfaceTimestamp);
+		}
+		if ((layers&BIOME_LAYER) != 0) {
+			timestamp = Math.min(timestamp, biomesTimestamp);
+		}
+		if ((layers&CAVE_LAYER) != 0) {
+			timestamp = Math.min(timestamp, cavesTimestamp);
 		}
 		if (timestamp == 0) {
 			return true;
 		}
 		Region region = world.getRegion(position.getRegionPosition());
-		return region.chunkHasChanged(position, timestamp);
+		return region.chunkChangedSince(position, timestamp);
 	}
 
 	private void queueTopography() {
@@ -485,7 +570,10 @@ public class Chunk {
 			blockData[i] = 0;
 		}
 
-		Map<String, AnyTag> data = getChunkData(LEVEL_SECTIONS, LEVEL_BIOMES);
+		Set<String> request = new HashSet<String>();
+		request.add(LEVEL_SECTIONS);
+		request.add(LEVEL_BIOMES);
+		Map<String, AnyTag> data = getChunkData(request);
 		AnyTag sections = data.get(LEVEL_SECTIONS);
 		AnyTag biomesTag = data.get(LEVEL_BIOMES);
 		if (sections.isList() && biomesTag.isByteArray(X_MAX*Z_MAX)) {
