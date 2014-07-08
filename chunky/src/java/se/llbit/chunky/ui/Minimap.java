@@ -124,7 +124,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 			World world = chunky.getWorld();
 			ChunkSelectionTracker selection = chunky.getChunkSelection();
 
-			renderer.render(world, mapBuffer, Chunk.surfaceRenderer, selection);
+			renderer.render(world, mapBuffer, Chunk.biomeRenderer, selection);
 			mapBuffer.renderBuffered(g);
 
 			renderer.renderPlayer(world, g, view, true);
@@ -175,7 +175,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 	 */
 	public synchronized void viewUpdated(ChunkView newView) {
 		view = newView;
-		mapBuffer.updateView(view, Chunk.surfaceRenderer, 0);
+		mapBuffer.updateView(view, Chunk.biomeRenderer, 0);
 		repaint();
 	}
 
