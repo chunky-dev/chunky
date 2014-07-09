@@ -383,7 +383,7 @@ public class Camera implements JSONifiable {
 
 			d.normalize();
 			d.scale(displacementValue);
-			o.scaleAdd(displacementSign, d, o);
+			o.scaleAdd(displacementSign, d);
 		}
 
 		@Override
@@ -636,7 +636,7 @@ public class Camera implements JSONifiable {
 			u.set(0, -1, 0);
 		}
 		transform.transform(u);
-		pos.scaleAdd(v, u, pos);
+		pos.scaleAdd(v, u);
 		scene.refresh();
 	}
 
@@ -651,7 +651,7 @@ public class Camera implements JSONifiable {
 			u.set(0, -1, 0);
 		}
 		transform.transform(u);
-		pos.scaleAdd(-v, u, pos);
+		pos.scaleAdd(-v, u);
 		scene.refresh();
 	}
 
@@ -661,7 +661,7 @@ public class Camera implements JSONifiable {
 	 */
 	public synchronized void moveUp(double v) {
 		u.set(0, 1, 0);
-		pos.scaleAdd(v, u, pos);
+		pos.scaleAdd(v, u);
 		scene.refresh();
 	}
 
@@ -671,7 +671,7 @@ public class Camera implements JSONifiable {
 	 */
 	public synchronized void moveDown(double v) {
 		u.set(0, 1, 0);
-		pos.scaleAdd(-v, u, pos);
+		pos.scaleAdd(-v, u);
 		scene.refresh();
 	}
 
@@ -682,7 +682,7 @@ public class Camera implements JSONifiable {
 	public synchronized void strafeLeft(double v) {
 		u.set(1, 0, 0);
 		transform.transform(u);
-		pos.scaleAdd(-v, u, pos);
+		pos.scaleAdd(-v, u);
 		scene.refresh();
 	}
 
@@ -693,7 +693,7 @@ public class Camera implements JSONifiable {
 	public synchronized void strafeRight(double v) {
 		u.set(1, 0, 0);
 		transform.transform(u);
-		pos.scaleAdd(v, u, pos);
+		pos.scaleAdd(v, u);
 		scene.refresh();
 	}
 

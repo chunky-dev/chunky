@@ -318,7 +318,7 @@ public class Ray {
 			}
 		}
 
-		x.scaleAdd(tNear, d, x);
+		x.scaleAdd(tNear, d);
 		n.set(nx, ny, nz);
 		distance += tNear;
 	}
@@ -391,7 +391,7 @@ public class Ray {
 		d.y = uy * tx + vy * ty + n.y * tz;
 		d.z = uz * tx + vz * ty + n.z * tz;
 
-		x.scaleAdd(Ray.OFFSET, d, x);
+		x.scaleAdd(Ray.OFFSET, d);
 		currentMaterial = prevMaterial;
 		specular = false;
 	}
@@ -405,7 +405,7 @@ public class Ray {
 		d.scaleAdd(
 				- 2 * ray.d.dot(ray.n),
 				ray.n, ray.d);
-		x.scaleAdd(Ray.OFFSET, d, x);
+		x.scaleAdd(Ray.OFFSET, d);
 		currentMaterial = prevMaterial;
 	}
 

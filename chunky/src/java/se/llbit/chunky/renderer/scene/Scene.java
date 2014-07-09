@@ -486,7 +486,16 @@ public class Scene extends SceneDescription {
 	 * @return <code>true</code> if an intersection was found
 	 */
 	public boolean intersect(Ray ray) {
-		boolean inOctree = false;//octree.intersect(this, ray);
+		double x0 = ray.x.x;
+		double y0 = ray.x.y;
+		double z0 = ray.x.z;
+		boolean inOctree = octree.intersect(this, ray);
+		if (inOctree) {
+			ray.x.x = x0;
+			ray.x.y = y0;
+			ray.x.z = z0;
+			ray.tNear = ray.distance;
+		}
 		boolean inEntity = false;
 		ray.tNear = Double.POSITIVE_INFINITY;
 		for (Entity entity: entities) {
@@ -494,9 +503,9 @@ public class Scene extends SceneDescription {
 				inEntity = true;
 			}
 		}
-		if (inEntity) {
+		if (inEntity || inOctree) {
 			ray.x.scaleAdd(ray.tNear, ray.d);
-			ray.distance += ray.tNear;
+			ray.distance = ray.tNear;
 		}
 		return inOctree || inEntity;
 	}

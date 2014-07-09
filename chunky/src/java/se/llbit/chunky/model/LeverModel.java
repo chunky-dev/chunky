@@ -16,14 +16,14 @@
  */
 package se.llbit.chunky.model;
 
+import static se.llbit.chunky.model.Model.rotateY;
+import static se.llbit.chunky.model.Model.rotateZ;
+import static se.llbit.chunky.model.Model.translate;
 import se.llbit.chunky.resources.Texture;
-
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
-
-import static se.llbit.chunky.model.Model.*;
 
 /**
  * A lever switch.
@@ -175,7 +175,7 @@ public class LeverModel {
 		if (hit) {
 			ray.color.w = 1;
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d, ray.x);
+			ray.x.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

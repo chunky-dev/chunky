@@ -63,7 +63,7 @@ public class LilyPadModel {
 				ray.n.set(0, 1, 0);
 				ray.n.scale(-QuickMath.signum(ray.d.y));
 				ray.distance += ray.tNear;
-				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
+				ray.x.scaleAdd(ray.tNear, ray.d);
 				return true;
 			}
 		}

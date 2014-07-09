@@ -41,7 +41,7 @@ public class RayTracer {
 
 					ray.t = (scene.waterHeight-.125-ray.x.y) / ray.d.y;
 					ray.distance += ray.t;
-					ray.x.scaleAdd(ray.t, ray.d, ray.x);
+					ray.x.scaleAdd(ray.t, ray.d);
 					ray.currentMaterial = Block.WATER.id;
 					ray.prevMaterial = 0;
 					WaterModel.intersect(ray);
@@ -52,7 +52,7 @@ public class RayTracer {
 			} else if (ray.currentMaterial != 0 && ray.color.w > 0) {
 				break;
 			} else {
-				ray.x.scaleAdd(Ray.OFFSET, ray.d, ray.x);
+				ray.x.scaleAdd(Ray.OFFSET, ray.d);
 			}
 		}
 
@@ -84,7 +84,7 @@ public class RayTracer {
 				ray.color.set(1, 1, 1, 1);
 				ray.prevMaterial = ray.currentMaterial;
 				ray.currentMaterial = Block.GRASS_ID;
-				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
+				ray.x.scaleAdd(ray.tNear, ray.d);
 				ray.n.set(0, -QuickMath.signum(ray.d.y), 0);
 				ray.distance += ray.tNear;
 			}
@@ -115,7 +115,7 @@ public class RayTracer {
 			// infinite water intersection
 			ray.t = (scene.waterHeight-.125-ray.x.y) / ray.d.y;
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d, ray.x);
+			ray.x.scaleAdd(ray.t, ray.d);
 			ray.currentMaterial = Block.WATER_ID;
 			ray.prevMaterial = 0;
 			WaterModel.intersect(ray);

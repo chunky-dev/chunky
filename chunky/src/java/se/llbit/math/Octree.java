@@ -15,11 +15,11 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.math;
-import org.apache.commons.math3.util.FastMath;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -364,7 +364,7 @@ public class Octree {
 					}
 
 					if (tNear < Double.MAX_VALUE) {
-						ray.x.scaleAdd(tNear, d, ray.x);
+						ray.x.scaleAdd(tNear, d);
 						ray.n.set(nx, ny, nz);
 						ray.distance += tNear;
 						tNear = Double.POSITIVE_INFINITY;
@@ -428,7 +428,7 @@ public class Octree {
 					if (prevBlock != currentBlock)
 						return true;
 
-					ray.x.scaleAdd(Ray.OFFSET, ray.d, ray.x);
+					ray.x.scaleAdd(Ray.OFFSET, ray.d);
 					continue;
 				} else {
 					// exit ray from this local block
@@ -484,7 +484,7 @@ public class Octree {
 				}
 			}
 
-			ray.x.scaleAdd(tNear, d, ray.x);
+			ray.x.scaleAdd(tNear, d);
 			ray.n.set(nx, ny, nz);
 			ray.distance += tNear;
 			tNear = Double.POSITIVE_INFINITY;
@@ -574,7 +574,7 @@ public class Octree {
 					ray.currentMaterial = Block.AIR.id;
 					return true;
 				} else if (currentBlock == Block.WATER) {
-					ray.x.scaleAdd(Ray.OFFSET, ray.d, ray.x);
+					ray.x.scaleAdd(Ray.OFFSET, ray.d);
 					continue;
 				} else {
 					return true;

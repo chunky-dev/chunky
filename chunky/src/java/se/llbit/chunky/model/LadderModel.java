@@ -53,7 +53,7 @@ public class LadderModel {
 				ray.color.set(color);
 				ray.n.set(quad.n);
 				ray.distance += ray.tNear;
-				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
+				ray.x.scaleAdd(ray.tNear, ray.d);
 				return true;
 			}
 		}

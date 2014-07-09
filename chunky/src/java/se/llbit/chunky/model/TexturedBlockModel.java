@@ -55,7 +55,7 @@ public class TexturedBlockModel {
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
 				ray.distance += ray.tNear;
-				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
+				ray.x.scaleAdd(ray.tNear, ray.d);
 				return true;
 			}
 		}
@@ -89,7 +89,7 @@ public class TexturedBlockModel {
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
 				ray.distance += ray.tNear;
-				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
+				ray.x.scaleAdd(ray.tNear, ray.d);
 				return true;
 			}
 		}
@@ -108,7 +108,7 @@ public class TexturedBlockModel {
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
 				ray.distance += ray.tNear;
-				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
+				ray.x.scaleAdd(ray.tNear, ray.d);
 				return true;
 			}
 		}

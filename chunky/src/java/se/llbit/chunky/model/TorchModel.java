@@ -172,7 +172,7 @@ public class TorchModel {
 			if (px >= 0 && px <= 1 && py >= 0 && py <= 1 && pz >= 0 && pz <= 1) {
 				ray.color.set(color);
 				ray.distance += ray.t;
-				ray.x.scaleAdd(ray.t, ray.d, ray.x);
+				ray.x.scaleAdd(ray.t, ray.d);
 				return true;
 			}
 		}
