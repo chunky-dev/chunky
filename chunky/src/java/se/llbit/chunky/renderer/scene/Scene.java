@@ -490,14 +490,15 @@ public class Scene extends SceneDescription {
 		double y0 = ray.x.y;
 		double z0 = ray.x.z;
 		boolean inOctree = octree.intersect(this, ray);
+		ray.x.x = x0;
+		ray.x.y = y0;
+		ray.x.z = z0;
 		if (inOctree) {
-			ray.x.x = x0;
-			ray.x.y = y0;
-			ray.x.z = z0;
 			ray.tNear = ray.distance;
+		} else {
+			ray.tNear = Double.POSITIVE_INFINITY;
 		}
 		boolean inEntity = false;
-		ray.tNear = Double.POSITIVE_INFINITY;
 		for (Entity entity: entities) {
 			if (entity.intersect(this, ray)) {
 				inEntity = true;
