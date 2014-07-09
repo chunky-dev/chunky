@@ -17,6 +17,7 @@
 package se.llbit.chunky.main;
 
 import java.awt.Color;
+import java.awt.Insets;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -277,6 +278,7 @@ public class Chunky implements ChunkTopographyListener {
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				UIManager.put("Slider.paintValue", Boolean.FALSE);
+				UIManager.put("TabbedPane.tabInsets", new Insets(5, 5, 7, 5));
 			} catch (Exception e) {
 				logger.warn("Failed to set native Look and Feel");
 			}
