@@ -490,9 +490,9 @@ public class Scene extends SceneDescription {
 		double y0 = ray.x.y;
 		double z0 = ray.x.z;
 		boolean inOctree = octree.intersect(this, ray);
-		ray.x.x = x0;
-		ray.x.y = y0;
-		ray.x.z = z0;
+		ray.x.x = x0+origin.x;
+		ray.x.y = y0+origin.y;
+		ray.x.z = z0+origin.z;
 		if (inOctree) {
 			ray.tNear = ray.distance;
 		} else {
@@ -500,10 +500,13 @@ public class Scene extends SceneDescription {
 		}
 		boolean inEntity = false;
 		for (Entity entity: entities) {
-			if (entity.intersect(this, ray)) {
+			if (entity.intersect(ray)) {
 				inEntity = true;
 			}
 		}
+		ray.x.x = x0;
+		ray.x.y = y0;
+		ray.x.z = z0;
 		if (inEntity || inOctree) {
 			ray.x.scaleAdd(ray.tNear, ray.d);
 			ray.distance = ray.tNear;
