@@ -34,6 +34,8 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -119,8 +121,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JSlider skyRotationSlider = new JSlider();
 	private final JButton loadSkymapBtn = new JButton();
 	private final JCheckBox mirrorSkyCB = new JCheckBox();
-	private final JTextField widthField = new JTextField();
-	private final JTextField heightField = new JTextField();
+	private final JComboBox canvasSizeCB = new JComboBox();
 	private final JComboBox cameraPreset = new JComboBox();
 	private final JComboBox customPreset = new JComboBox();
 	private final JComboBox projectionMode = new JComboBox();
@@ -859,17 +860,17 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	private JPanel buildGeneralPane() {
-		JLabel widthLbl = new JLabel("Canvas width: ");
-		JLabel heightLbl = new JLabel("Canvas height: ");
-		JLabel canvasSizeLbl = new JLabel("<html>Note: Actual image size may not be<br>the same as the window size!");
+		JLabel canvasSizeLbl = new JLabel("Canvas size:");
+		JLabel canvasSizeAdvisory = new JLabel("Note: Actual image size may not be the same as the window size!");
 
-		widthField.setColumns(10);
-		widthField.addActionListener(canvasSizeListener);
-		heightField.setColumns(10);
-		heightField.addActionListener(canvasSizeListener);
+		canvasSizeCB.setEditable(true);
+		canvasSizeCB.addItem("400x400");
+		canvasSizeCB.addItem("1024x768");
+		canvasSizeCB.addItem("960x540");
+		canvasSizeCB.addItem("1920x1080");
+		canvasSizeCB.addActionListener(canvasSizeListener);
 
-		updateWidthField();
-		updateHeightField();
+		updateCanvasSizeField();
 
 		loadSceneBtn.setText("Load Scene");
 		loadSceneBtn.addActionListener(loadSceneListener);
@@ -991,17 +992,12 @@ public class RenderControls extends JDialog implements ViewListener,
 				)
 				.addComponent(sep1)
 				.addGroup(layout.createSequentialGroup()
-					.addGroup(layout.createParallelGroup()
-						.addComponent(widthLbl)
-						.addComponent(heightLbl)
-					)
-					.addGroup(layout.createParallelGroup()
-						.addComponent(widthField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(heightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-					)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(canvasSizeLbl)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(canvasSizeCB, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 				)
+				.addComponent(canvasSizeAdvisory)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(setCanvasSizeBtn)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -1039,19 +1035,12 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(canvasSizeLbl)
-				.addGroup(layout.createSequentialGroup()
-					.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(widthLbl)
-						.addComponent(widthField)
-					)
-					.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(heightLbl)
-						.addComponent(heightField)
-					)
-				)
+				.addComponent(canvasSizeCB, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 			)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addComponent(canvasSizeAdvisory)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
 				.addComponent(setCanvasSizeBtn)
@@ -1707,10 +1696,17 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final ActionListener canvasSizeListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			String size = (String) canvasSizeCB.getSelectedItem();
 			try {
-				int width = Integer.parseInt(widthField.getText());
-				int height = Integer.parseInt(heightField.getText());
-				setCanvasSize(width, height);
+				Pattern regex = Pattern.compile("([0-9]+)[xX.]([0-9]+)");
+				Matcher matcher = regex.matcher(size);
+				if (matcher.matches()) {
+					int width = Integer.parseInt(matcher.group(1));
+					int height = Integer.parseInt(matcher.group(2));
+					setCanvasSize(width, height);
+				} else {
+					logger.info("Failed to set canvas size: format must be WIDTHxHEIGHT!");
+				}
 			} catch (NumberFormatException e1) {
 				logger.info("Failed to set canvas size: invalid dimensions!");
 			}
@@ -2011,12 +2007,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		skyModeCB.addActionListener(skyModeListener);
 	}
 
-	protected void updateWidthField() {
-		widthField.setText("" + renderMan.scene().canvasWidth());
-	}
-
-	protected void updateHeightField() {
-		heightField.setText("" + renderMan.scene().canvasHeight());
+	protected void updateCanvasSizeField() {
+		canvasSizeCB.setSelectedItem("" + renderMan.scene().canvasWidth() +
+				"x" + renderMan.scene().canvasHeight());
 	}
 
 	protected void updateSaveDumpsCheckBox() {
@@ -2248,8 +2241,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		renderMan.scene().setCanvasSize(width, height);
 		int canvasWidth = renderMan.scene().canvasWidth();
 		int canvasHeight = renderMan.scene().canvasHeight();
-		widthField.setText("" + canvasWidth);
-		heightField.setText("" + canvasHeight);
+		canvasSizeCB.setSelectedItem("" + canvasWidth + "x" + canvasHeight);
 		view.setCanvasSize(canvasWidth, canvasHeight);
 	}
 
@@ -2267,8 +2259,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				subjectDistance.update();
 				updateProjectionMode();
 				updateSkyMode();
-				updateWidthField();
-				updateHeightField();
+				updateCanvasSizeField();
 				emitterIntensity.update();
 				sunIntensity.update();
 				sunAzimuth.update();
