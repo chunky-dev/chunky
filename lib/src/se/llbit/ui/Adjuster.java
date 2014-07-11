@@ -326,9 +326,9 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	}
 
 	protected void setTextFieldText(String text) {
-		textField.removeActionListener(this);
+		textField.getDocument().removeDocumentListener(this);
 		textField.setText(text);
-		textField.addActionListener(this);
+		textField.getDocument().addDocumentListener(this);
 	}
 
 	/**
