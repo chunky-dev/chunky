@@ -791,7 +791,7 @@ public class Chunky implements ChunkTopographyListener {
 	 * The region was changed.
 	 * @param region
 	 */
-	public void regionChanged(ChunkPosition region) {
+	public void regionUpdated(ChunkPosition region) {
 		regionQueue.add(region);
 	}
 

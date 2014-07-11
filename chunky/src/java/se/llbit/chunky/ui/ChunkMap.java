@@ -409,6 +409,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	@Override
 	public void regionUpdated(ChunkPosition region) {
 		mapBuffer.regionUpdated(region);
+		chunky.regionUpdated(region);
 		repaint();
 	}
 

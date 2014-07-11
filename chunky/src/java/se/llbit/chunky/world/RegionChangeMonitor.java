@@ -65,11 +65,11 @@ public class RegionChangeMonitor extends Thread {
 							world.setRegion(pos, region);
 							region.parse();
 							world.regionDiscovered(pos);
-							chunky.regionChanged(pos);
+							chunky.regionUpdated(pos);
 						} else if (region.hasChanged()) {
 							region.parse();
 							ChunkPosition pos = region.getPosition();
-							chunky.regionChanged(pos);
+							chunky.regionUpdated(pos);
 						}
 					}
 				}
