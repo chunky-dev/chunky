@@ -44,6 +44,7 @@ import se.llbit.chunky.resources.texturepack.IndexedTexture;
 import se.llbit.chunky.resources.texturepack.LargeChestTexture;
 import se.llbit.chunky.resources.texturepack.SignTexture;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
+import se.llbit.chunky.resources.texturepack.SteveTexture;
 import se.llbit.chunky.resources.texturepack.SunTexture;
 import se.llbit.chunky.resources.texturepack.TextureRef;
 
@@ -1269,6 +1270,8 @@ public class TexturePackLoader {
 		allTextures.put("iron_trapdoor",
 				new SimpleTexture("assets/minecraft/textures/blocks/iron_trapdoor", Texture.ironTrapdoor));
 
+		allTextures.put("steve",
+				new SteveTexture("assets/minecraft/textures/entity/steve"));
 	}
 
 	/**

@@ -213,6 +213,7 @@ public class Transform {
 
 	/**
 	 * Rotation around the X axis
+	 * @param angle angle in radians
 	 */
 	public final Transform rotateX(final double angle) {
 		return chain(new Transform() {
@@ -229,6 +230,7 @@ public class Transform {
 
 	/**
 	 * Rotation around the Z axis
+	 * @param angle angle in radians
 	 */
 	public final Transform rotateZ(final double angle) {
 		return chain(new Transform() {

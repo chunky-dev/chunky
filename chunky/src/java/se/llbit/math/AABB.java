@@ -163,4 +163,35 @@ public class AABB {
 				ymin + y, ymax + y,
 				zmin + z, zmax + z);
 	}
+
+	/**
+	 * @param c
+	 * @return an AABB which encloses all given vertices
+	 */
+	public static AABB bounds(Vector3d... c) {
+		double xmin = Double.POSITIVE_INFINITY, xmax = Double.NEGATIVE_INFINITY,
+				ymin = Double.POSITIVE_INFINITY, ymax = Double.NEGATIVE_INFINITY,
+				zmin = Double.POSITIVE_INFINITY, zmax = Double.NEGATIVE_INFINITY;
+		for (Vector3d v: c) {
+			if (v.x < xmin) {
+				xmin = v.x;
+			}
+			if (v.x > xmax) {
+				xmax = v.x;
+			}
+			if (v.y < ymin) {
+				ymin = v.y;
+			}
+			if (v.y > ymax) {
+				ymax = v.y;
+			}
+			if (v.z < zmin) {
+				zmin = v.z;
+			}
+			if (v.z > zmax) {
+				zmax = v.z;
+			}
+		}
+		return new AABB(xmin, xmax, ymin, ymax, zmin, zmax);
+	}
 }

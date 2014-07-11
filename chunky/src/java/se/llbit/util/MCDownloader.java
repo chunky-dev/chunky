@@ -42,4 +42,15 @@ public class MCDownloader {
 		out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
 		out.close();
 	}
+
+	public static final void downloadSkin(String name, File destDir)
+			throws IOException {
+		String theUrl = "http://s3.amazonaws.com/MinecraftSkins/" + name + ".png";
+		File destination = new File(destDir, name+".skin.png");
+		URL url = new URL(theUrl);
+		ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
+		FileOutputStream out = new FileOutputStream(destination);
+		out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+		out.close();
+	}
 }

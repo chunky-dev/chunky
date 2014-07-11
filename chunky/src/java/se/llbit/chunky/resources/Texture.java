@@ -38,6 +38,43 @@ import se.llbit.resources.ImageLoader;
 @SuppressWarnings("javadoc")
 public class Texture {
 
+	public static final Texture steveHeadFront = new Texture();
+	public static final Texture steveHeadBack = new Texture();
+	public static final Texture steveHeadRight = new Texture();
+	public static final Texture steveHeadLeft = new Texture();
+	public static final Texture steveHeadTop = new Texture();
+	public static final Texture steveHeadBottom = new Texture();
+	public static final Texture steveChestFront = new Texture();
+	public static final Texture steveChestBack = new Texture();
+	public static final Texture steveChestRight = new Texture();
+	public static final Texture steveChestLeft = new Texture();
+	public static final Texture steveChestTop = new Texture();
+	public static final Texture steveChestBottom = new Texture();
+	public static final Texture steveLeftLegFront = new Texture();
+	public static final Texture steveLeftLegBack = new Texture();
+	public static final Texture steveLeftLegRight = new Texture();
+	public static final Texture steveLeftLegLeft = new Texture();
+	public static final Texture steveLeftLegTop = new Texture();
+	public static final Texture steveLeftLegBottom = new Texture();
+	public static final Texture steveRightLegFront = new Texture();
+	public static final Texture steveRightLegBack = new Texture();
+	public static final Texture steveRightLegRight = new Texture();
+	public static final Texture steveRightLegLeft = new Texture();
+	public static final Texture steveRightLegTop = new Texture();
+	public static final Texture steveRightLegBottom = new Texture();
+	public static final Texture steveLeftArmFront = new Texture();
+	public static final Texture steveLeftArmBack = new Texture();
+	public static final Texture steveLeftArmRight = new Texture();
+	public static final Texture steveLeftArmLeft = new Texture();
+	public static final Texture steveLeftArmTop = new Texture();
+	public static final Texture steveLeftArmBottom = new Texture();
+	public static final Texture steveRightArmFront = new Texture();
+	public static final Texture steveRightArmBack = new Texture();
+	public static final Texture steveRightArmRight = new Texture();
+	public static final Texture steveRightArmLeft = new Texture();
+	public static final Texture steveRightArmTop = new Texture();
+	public static final Texture steveRightArmBottom = new Texture();
+
 	public static final Texture air = new Texture("air");
 	public static final Texture stone = new Texture("stone");
 	public static final Texture prismarine = new Texture();
@@ -491,6 +528,30 @@ public class Texture {
 
 	public Texture(BufferedImage img) {
 		setTexture(img);
+	}
+
+	public void setTexture(Texture texture) {
+		setTexture(texture.image);
+	}
+
+	/**
+	 * Mirror the texture (in Y axis)
+	 */
+	public void mirror() {
+		BufferedImage mirror = new BufferedImage(image.getWidth(),
+				image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		DataBufferInt inDB = (DataBufferInt) image.getRaster().getDataBuffer();
+		int[] in = inDB.getData();
+		DataBufferInt outDB = (DataBufferInt) mirror.getRaster().getDataBuffer();
+		int[] out = outDB.getData();
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				int inIndex = width*y + x;
+				int outIndex = width*(y+1) - (x+1);
+				out[outIndex] = in[inIndex];
+			}
+		}
+		setTexture(mirror);
 	}
 
 	public void setTexture(BufferedImage newImage) {
