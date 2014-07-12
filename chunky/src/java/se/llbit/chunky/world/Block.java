@@ -314,7 +314,6 @@ public class Block {
 			isSolid = true;
 		}
 	};
-	public static final int IRONBARS_ID = 0x65;
 	public static final Block IRONORE = new Block(0x0F, "Iron Ore", Texture.ironOre) {
 		{
 			isOpaque = true;
@@ -1785,6 +1784,7 @@ public class Block {
 			return TexturedBlockModel.intersect(ray, tex[ray.getBlockData() % 11]);
 		}
 	};
+	public static final int IRONBARS_ID = 0x65;
 	public static final Block IRONBARS = new Block(IRONBARS_ID, "Iron Bars", Texture.ironBars) {
 		{
 			isOpaque = false;

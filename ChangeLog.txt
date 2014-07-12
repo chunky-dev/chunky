@@ -30,6 +30,7 @@
     * Fixed error preventing naming and overwriting of custom camera presets
     * Added checkbox on the Advanced tab of Render controls which enables
       automatic shutdown of the computer after render completion
+    * Fixed error in the rendering of iron bars
 
 1.2.2 - 2014-01-13
     * Added "follow player" option for the 2D map

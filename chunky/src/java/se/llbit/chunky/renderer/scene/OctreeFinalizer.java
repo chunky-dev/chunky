@@ -440,16 +440,16 @@ public class OctreeFinalizer {
 					case Block.IRONBARS_ID:
 						other = Block.get(octree.get(x, cy, z - 1));
 						if (other.isIronBarsConnector())
-							type |= 1 << BlockData.OFFSET;
+							type |= 1 << BlockData.GLASS_PANE_OFFSET;
 						other = Block.get(octree.get(x, cy, z + 1));
 						if (other.isIronBarsConnector())
-							type |= 2 << BlockData.OFFSET;
+							type |= 2 << BlockData.GLASS_PANE_OFFSET;
 						other = Block.get(octree.get(x + 1, cy, z));
 						if (other.isIronBarsConnector())
-							type |= 4 << BlockData.OFFSET;
+							type |= 4 << BlockData.GLASS_PANE_OFFSET;
 						other = Block.get(octree.get(x - 1, cy, z));
 						if (other.isIronBarsConnector())
-							type |= 8 << BlockData.OFFSET;
+							type |= 8 << BlockData.GLASS_PANE_OFFSET;
 						octree.set(type, x, cy, z);
 						break;
 					case Block.GLASSPANE_ID:
