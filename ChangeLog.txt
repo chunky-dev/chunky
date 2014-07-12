@@ -1,18 +1,19 @@
 1.2.3 - TBD
     * Added Minecraft 1.8 blocks:
         + Coarse Dirt
-	+ Prismarine (rough, block, dark)
-	+ Sea Lantern
-	+ Wet Sponge
-	+ Iron Trapdoor
+        + Prismarine (rough, block, dark)
+        + Sea Lantern
+        + Wet Sponge
+        + Iron Trapdoor
+        + Slime Block
     * Improved the 2D map:
         + More zoom levels
-	+ Mouse wheel scrolling zooms, Ctrl+Scroll changes layer
-	+ Fixed tearing issues
-	+ Improved performance for large map views
+        + Mouse wheel scrolling zooms, Ctrl+Scroll changes layer
+        + Fixed tearing issues
+        + Improved performance for large map views
         + The name of the biome under the cursor is now displayed in lower-left
-	  corner of the map
-	+ Improved the rendering of many blocks in the block-layer mode
+          corner of the map
+        + Improved the rendering of many blocks in the block-layer mode
     * Right-clicking in the 2D map now opens a context menu with options to
       cre ate a new scene, load a scene, or clear the current selection
     * (potentially) Fixed issue causing the render preview window to display

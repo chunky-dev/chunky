@@ -1268,6 +1268,8 @@ public class TexturePackLoader {
 				new SimpleTexture("assets/minecraft/textures/blocks/sponge_wet", Texture.wetSponge));
 		allTextures.put("iron_trapdoor",
 				new SimpleTexture("assets/minecraft/textures/blocks/iron_trapdoor", Texture.ironTrapdoor));
+		allTextures.put("slime",
+				new SimpleTexture("assets/minecraft/textures/blocks/slime", Texture.slime));
 
 	}
 

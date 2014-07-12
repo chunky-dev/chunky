@@ -88,6 +88,8 @@ import se.llbit.math.Ray;
  */
 @SuppressWarnings("javadoc")
 public class Block {
+	private static final boolean UNKNOWN_INVISIBLE = true;
+
 	public static final int AIR_ID = 0x00;
 	public static final Block AIR = new Block(AIR_ID, "Air", Texture.air) {
 		{
@@ -2725,12 +2727,12 @@ public class Block {
 			return Texture.darkOakPlanks;
 		}
 	};
-	private static final boolean UNKNOWN_INVISIBLE = true;
-	public static final Block SLIMEBLOCK = new Block(0xA5, "Slime Block", Texture.unknown) {
+	public static final int SLIMEBLOCK_ID = 0xA5;
+	public static final Block SLIMEBLOCK = new Block(SLIMEBLOCK_ID, "Slime Block", Texture.slime) {
 		{
 			isOpaque = false;
-			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			isSolid = true;
+			localIntersect = false;
 		}
 	};
 	public static final Block BARRIER = new Block(0xA6, "Barrier", Texture.unknown) {
