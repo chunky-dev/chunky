@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -35,6 +35,12 @@ public class Transform {
 			a.apply(v);
 			b.apply(v);
 		}
+
+		@Override
+		public void applyRotScale(Vector3d v) {
+			a.applyRotScale(v);
+			b.applyRotScale(v);
+		}
 	}
 
 	public static final Transform NONE = new Transform();
@@ -47,6 +53,13 @@ public class Transform {
 	 * @param v
 	 */
 	public void apply(Vector3d v) {
+	}
+
+	/**
+	 * Apply only rotation and scaling to a vertex.
+	 * @param v
+	 */
+	public void applyRotScale(Vector3d v) {
 	}
 
 	private final Transform chain(Transform other) {
@@ -96,6 +109,10 @@ public class Transform {
 			public void apply(Vector3d v) {
 				v.scale(scale);
 			}
+			@Override
+			public void applyRotScale(Vector3d v) {
+				v.scale(scale);
+			}
 		});
 	}
 
@@ -106,6 +123,12 @@ public class Transform {
 		return chain(new Transform() {
 			@Override
 			public void apply(Vector3d o) {
+		        double tmp = o.x;
+		        o.x = -o.z;
+		        o.z = tmp;
+		    }
+			@Override
+			public void applyRotScale(Vector3d o) {
 		        double tmp = o.x;
 		        o.x = -o.z;
 		        o.z = tmp;
@@ -124,6 +147,12 @@ public class Transform {
 		        o.y = -o.z;
 		        o.z = tmp;
 		    }
+			@Override
+			public void applyRotScale(Vector3d o) {
+		        double tmp = o.y;
+		        o.y = -o.z;
+		        o.z = tmp;
+		    }
 		});
 	}
 
@@ -134,6 +163,12 @@ public class Transform {
 		return chain(new Transform() {
 			@Override
 			public void apply(Vector3d o) {
+		        double tmp = o.y;
+		        o.y = o.z;
+		        o.z = -tmp;
+		    }
+			@Override
+			public void applyRotScale(Vector3d o) {
 		        double tmp = o.y;
 		        o.y = o.z;
 		        o.z = -tmp;
@@ -152,6 +187,12 @@ public class Transform {
 		        o.x = -o.y;
 		        o.y = tmp;
 		    }
+			@Override
+			public void applyRotScale(Vector3d o) {
+		        double tmp = o.x;
+		        o.x = -o.y;
+		        o.y = tmp;
+		    }
 		});
 	}
 
@@ -162,6 +203,12 @@ public class Transform {
 		return chain(new Transform() {
 			@Override
 			public void apply(Vector3d o) {
+		        double tmp = o.x;
+		        o.x = o.y;
+		        o.y = -tmp;
+		    }
+			@Override
+			public void applyRotScale(Vector3d o) {
 		        double tmp = o.x;
 		        o.x = o.y;
 		        o.y = -tmp;
@@ -208,6 +255,10 @@ public class Transform {
 			public void apply(Vector3d v) {
 				mat.transform(v);
 		    }
+			@Override
+			public void applyRotScale(Vector3d v) {
+				mat.transform(v);
+		    }
 		});
 	}
 
@@ -224,6 +275,10 @@ public class Transform {
 			public void apply(Vector3d v) {
 				mat.transform(v);
 		    }
+			@Override
+			public void applyRotScale(Vector3d v) {
+				mat.transform(v);
+		    }
 		});
 	}
 
@@ -238,6 +293,10 @@ public class Transform {
 			}
 			@Override
 			public void apply(Vector3d v) {
+				mat.transform(v);
+		    }
+			@Override
+			public void applyRotScale(Vector3d v) {
 				mat.transform(v);
 		    }
 		});

@@ -49,13 +49,12 @@ public class Quad {
 		o.x += .5;
 		o.y += .5;
 		o.z += .5;
-		t.translate(o);
 		xv.set(other.xv);
 		yv.set(other.yv);
 		n.set(other.n);
-		t.apply(xv);
-		t.apply(yv);
-		t.apply(n);
+		t.applyRotScale(xv);
+		t.applyRotScale(yv);
+		t.applyRotScale(n);
 		xvl = other.xvl;
 		yvl = other.yvl;
 		d = - n.dot(o);
