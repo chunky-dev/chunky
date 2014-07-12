@@ -885,6 +885,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		});
 
 		JButton reloadChunksBtn = new JButton("Reload Chunks");
+		reloadChunksBtn.setIcon(Icon.reload.createIcon());
 		reloadChunksBtn.setToolTipText("Reload all chunks in the scene");
 		reloadChunksBtn.addActionListener(new ActionListener() {
 			@Override

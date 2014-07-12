@@ -56,6 +56,7 @@ public class Icon extends Texture {
 	public static final Icon play = new Icon("play");
 	public static final Icon pause = new Icon("pause");
 	public static final Icon stop = new Icon("stop");
+	public static final Icon reload = new Icon("reload");
 
 	public Icon(String resourceName) {
 		setTexture(ImageLoader.get("icons/" + resourceName + ".png"));

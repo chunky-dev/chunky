@@ -151,6 +151,7 @@ public class Controls extends JPanel {
 		});
 
 		JButton reloadWorldBtn = new JButton("Reload");
+		reloadWorldBtn.setIcon(Icon.reload.createIcon());
 		reloadWorldBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
