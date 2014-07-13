@@ -44,7 +44,7 @@ class Version:
 				with open(notes_fn, 'r') as f:
 					self.release_notes = f.read()
 			except:
-				print "Error: release_notes not found!"
+				print "Error: release notes not found!"
 				print "Please edit release_notes-%s.txt!" % self.milestone
 				sys.exit(1)
 
@@ -248,6 +248,11 @@ def patch_url(version, url):
 		json.dump(j, f)
 
 ### MAIN
+for arg in sys.argv[1:]:
+	if arg == '-h' or arg == '--h' or arg == '-help' or arg == '--help':
+		print "usage: releasebot [VERSION]"
+		print "This utility creates a new release of Chunky"
+		sys.exit(0)
 if len(sys.argv) > 1:
 	version = Version(sys.argv[1])
 else:
