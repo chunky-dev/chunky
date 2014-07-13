@@ -26,6 +26,7 @@ import java.util.Collection;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 
 import org.apache.log4j.Logger;
@@ -276,9 +277,10 @@ public class Chunky implements ChunkTopographyListener {
 		// Create UI in the event dispatch thread
 		try {
 			try {
+				UIDefaults defaults = UIManager.getDefaults();
+				defaults.put("Slider.paintValue", Boolean.FALSE);
+				defaults.put("TabbedPane.tabInsets", new Insets(5, 5, 7, 5));
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				UIManager.put("Slider.paintValue", Boolean.FALSE);
-				UIManager.put("TabbedPane.tabInsets", new Insets(5, 5, 7, 5));
 			} catch (Exception e) {
 				logger.warn("Failed to set native Look and Feel");
 			}
