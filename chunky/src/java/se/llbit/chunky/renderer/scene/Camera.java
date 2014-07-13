@@ -51,7 +51,7 @@ public class Camera implements JSONifiable {
 	 * @return tan(fov/2)
 	 */
 	public static double clampedFovTan(double fov) {
-		double clampedFoV = QuickMath.clamp(fov, 0, 180);
+		double clampedFoV = Math.max(0, Math.min(180, fov));
 		return 2 * FastMath.tan(QuickMath.degToRad(clampedFoV / 2));
 	}
 

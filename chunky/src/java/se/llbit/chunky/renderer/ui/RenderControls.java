@@ -2387,8 +2387,11 @@ public class RenderControls extends JDialog implements ViewListener,
 			Camera camera = renderMan.scene().camera();
 			double value = renderMan.scene().camera().getFoV();
 			double scale = camera.getMaxFoV() - camera.getMinFoV();
-			value = value + diff * scale/20;
-			renderMan.scene().camera().setFoV(value);
+			double offset = value/scale;
+			double newValue = scale*Math.exp(Math.log(offset) + 0.1*diff);
+			if (!Double.isNaN(newValue) && !Double.isInfinite(newValue)) {
+				renderMan.scene().camera().setFoV(newValue);
+			}
 			fov.update();
 		}
 	}
