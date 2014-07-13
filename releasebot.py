@@ -87,7 +87,7 @@ def publish(version):
 def ftpupload():
 	while True:
 		user = raw_input('ftp user: ')
-		pw = getpass(prompt='ftp login: ')
+		pw = getpass(prompt='ftp password: ')
 		try:
 			ftp = ftplib.FTP('ftp.llbit.se')
 			ftp.login(user, pw)
