@@ -12,6 +12,8 @@ import praw
 import re
 import io
 import traceback
+import ftplib
+import codecs
 from subprocess import call
 from getpass import getpass
 from datetime import datetime
@@ -41,8 +43,8 @@ class Version:
 		else:
 			notes_fn = "release_notes-%s.txt" % self.milestone
 			try:
-				with open(notes_fn, 'r') as f:
-					self.release_notes = f.read()
+				with codecs.open(notes_fn, 'r', encoding='utf-8') as f:
+					self.release_notes = f.read().replace('\r', '')
 			except:
 				print "Error: release notes not found!"
 				print "Please edit release_notes-%s.txt!" % self.milestone
@@ -50,12 +52,12 @@ class Version:
 
 		try:
 			# load changelog
-			with open("ChangeLog.txt", 'r') as f:
+			with codecs.open("ChangeLog.txt", 'r', encoding='utf-8') as f:
 				f.readline() # skip version line
 				while True:
-					line = f.readline()
-					if not line.rstrip(): break
-					self.changelog += line
+					line = f.readline().rstrip()
+					if not line: break
+					self.changelog += line + '\n'
 		except:
 			print "Error: could not read ChangeLog!"
 			sys.exit(1)
@@ -76,12 +78,26 @@ def publish(version):
 		if raw_input('Publish files? [y/n] ') == "y":
 			(is_new, exe, zip, jar) = publish_release(version)
 			patch_url(version, jar)
-			if raw_input('Post release thread? [y/n] ') == "y":
-				post_release_thread(version, exe, zip)
-		elif raw_input('Post release thread? [y/n] ') == "y":
-			exe = raw_input('Exe URL: ')
-			zip = raw_input('Zip URL: ')
-			post_release_thread(version, exe, zip)
+			write_markup(version, exe, zip)
+		if raw_input('Post release thread? [y/n] ') == "y":
+			post_release_thread(version)
+		if raw_input('Upload latest.json? [y/n] ') == "y":
+			ftpupload()
+
+def ftpupload():
+	while True:
+		user = raw_input('ftp user: ')
+		pw = getpass(prompt='ftp login: ')
+		try:
+			ftp = ftplib.FTP('ftp.llbit.se')
+			ftp.login(user, pw)
+			break
+		except ftplib.error_perm:
+			print "Login failed, please try again"
+	ftp.cwd('chunkyupdate')
+	with open('latest.json', 'rb') as f:
+		ftp.storbinary('STOR latest.json', f)
+	ftp.quit()
 
 def lp_upload_file(version, release, filename, description, content_type, file_type):
 	# TODO handle re-uploads
@@ -202,13 +218,9 @@ def publish_release(version):
 	print exe_url
 	return (is_new_release, exe_url, zip_url, jar_url)
 
-"post reddit release thread"
-def post_release_thread(version, exe_url, zip_url):
-	r = praw.Reddit(user_agent='releasebot')
-	pw = getpass(prompt='releasebot login: ')
-	r.login('releasebot', pw)
-	post = r.submit('chunky', 'Chunky %s released!' % version.full,
-		text=('''###Downloads
+"output markdown"
+def write_markup(version, exe_url, zip_url):
+	text = '''###Downloads
 
 * [Windows installer](%s)
 * [Cross-platform binaries](%s)
@@ -216,11 +228,33 @@ def post_release_thread(version, exe_url, zip_url):
 
 ###Release Notes
 
-''' % (exe_url, zip_url)) + version.release_notes + '''
+''' % (exe_url, zip_url)
+	text += version.release_notes + '''
 
 ###ChangeLog
 
-''' + version.changelog)
+'''
+	text += version.changelog
+	with codecs.open('build/release_notes-%s.md' % version.milestone, 'w', encoding='utf-8') as f:
+		f.write(text)
+	with codecs.open('build/version-%s.properties' % version.milestone, 'w', encoding='utf-8') as f:
+		f.write('''version=%s
+exe.dl.link=%s
+zip.dl.link=%s''' % (version.milestone, exe_url, zip_url))
+
+"post reddit release thread"
+def post_release_thread(version):
+	try:
+		with codecs.open('build/release_notes-%s.md' % version.milestone, 'r', encoding='utf-8') as f:
+			text = f.read()
+	except IOError:
+		print "Error: reddit post must be in build/release_notes-%s.md" % version.milestone
+		return
+	r = praw.Reddit(user_agent='releasebot')
+	pw = getpass(prompt='releasebot login: ')
+	r.login('releasebot', pw)
+	post = r.submit('chunky', 'Chunky %s released!' % version.full,
+		text=text)
 	post.set_flair('announcement', 'announcement')
 	print "Submitted Reddit release thread!"
 
@@ -251,7 +285,14 @@ def patch_url(version, url):
 for arg in sys.argv[1:]:
 	if arg == '-h' or arg == '--h' or arg == '-help' or arg == '--help':
 		print "usage: releasebot [VERSION]"
+		print "commands:"
+		print "-ftp    uploda latest.json to FTP server"
 		print "This utility creates a new release of Chunky"
+		print "Required Python libraries: launchpadlib, praw"
+		print "Upgrade with pip install --upgrade PKG"
+		sys.exit(0)
+	if arg == '-ftp':
+		ftpupload()
 		sys.exit(0)
 if len(sys.argv) > 1:
 	version = Version(sys.argv[1])
