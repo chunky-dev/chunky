@@ -82,9 +82,9 @@ def publish(version):
 		if raw_input('Post release thread? [y/n] ') == "y":
 			post_release_thread(version)
 		if raw_input('Upload latest.json? [y/n] ') == "y":
-			ftpupload()
+			ftpupload(version)
 
-def ftpupload():
+def ftpupload(version):
 	while True:
 		user = raw_input('ftp user: ')
 		pw = getpass(prompt='ftp password: ')
@@ -97,6 +97,9 @@ def ftpupload():
 	ftp.cwd('chunkyupdate')
 	with open('latest.json', 'rb') as f:
 		ftp.storbinary('STOR latest.json', f)
+	ftp.cwd('lib')
+	with open('build/chunky-core-%s.jar' % version.milestone, 'rb') as f:
+		ftp.storbinary('STOR chunky-core-%s.jar' % version.milestone, f)
 	ftp.quit()
 
 def lp_upload_file(version, release, filename, description, content_type, file_type):
@@ -282,6 +285,8 @@ def patch_url(version, url):
 		json.dump(j, f)
 
 ### MAIN
+version = None
+do_ftpupload = False
 for arg in sys.argv[1:]:
 	if arg == '-h' or arg == '--h' or arg == '-help' or arg == '--help':
 		print "usage: releasebot [VERSION]"
@@ -291,13 +296,17 @@ for arg in sys.argv[1:]:
 		print "Required Python libraries: launchpadlib, praw"
 		print "Upgrade with pip install --upgrade PKG"
 		sys.exit(0)
-	if arg == '-ftp':
-		ftpupload()
-		sys.exit(0)
-if len(sys.argv) > 1:
-	version = Version(sys.argv[1])
-else:
+	elif arg == '-ftp':
+		do_ftpupload = True
+	else:
+		version = Version(arg)
+
+if version == None:
 	version = Version(raw_input('Enter version: '))
+
+if do_ftpupload:
+	ftpupload(version)
+	sys.exit(0)
 
 print "Ready to build version %s!" % version.full
 try:
