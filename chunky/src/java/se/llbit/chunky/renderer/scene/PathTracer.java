@@ -392,15 +392,16 @@ public class PathTracer {
 		attenuation.y = 1;
 		attenuation.z = 1;
 		attenuation.w = 1;
+		boolean b = false;
 		while (attenuation.w > 0) {
 			ray.x.scaleAdd(Ray.OFFSET,
 					ray.d, ray.x);
 			if (!RayTracer.nextIntersection(scene, ray, state))
 				break;
 			double mult = 1 - ray.color.w;
-			attenuation.x *= ray.color.x * mult + ray.color.w;
-			attenuation.y *= ray.color.y * mult + ray.color.w;
-			attenuation.z *= ray.color.z * mult + ray.color.w;
+			attenuation.x *= ray.color.x * ray.color.w + mult;
+			attenuation.y *= ray.color.y * ray.color.w + mult;
+			attenuation.z *= ray.color.z * ray.color.w + mult;
 			attenuation.w *= mult;
 			if (!scene.clearWater && ray.getPrevBlock() == Block.WATER) {
 				double a = ray.distance / scene.waterVisibility;

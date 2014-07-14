@@ -15,11 +15,11 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.math;
-import org.apache.commons.math3.util.FastMath;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
+import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -437,7 +437,7 @@ public class Octree {
 					ray.exitBlock(x, y, z);
 					continue;
 				}
-			} else if (currentBlock != prevBlock) {
+			} else if (currentBlock != prevBlock && currentBlock != Block.AIR) {
 				TexturedBlockModel.getIntersectionColor(ray);
 				return true;
 			}

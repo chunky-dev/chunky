@@ -1,5 +1,8 @@
 1.2.4 - TBD
     * Enable "Clear Selection" button after selecting region
+    * Fixed regular glass blocks not letting light pass through (since 1.2.0).
+      This could also affect other transparent blocks where the transparent
+      texels had dark RGB values.
 
 1.2.3 - 2014-07-13
     * Added Minecraft 1.8 blocks:
