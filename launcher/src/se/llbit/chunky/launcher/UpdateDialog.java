@@ -44,6 +44,7 @@ import java.util.concurrent.Future;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -317,6 +318,21 @@ public class UpdateDialog extends JDialog {
 				return false;
 			}
 		};
+		status.getTableHeader().setVisible(false);
+		status.setVisible(false);
+		final JCheckBox details = new JCheckBox("Details");
+		details.setIcon(Icons.expandIcon);
+		details.setRolloverIcon(Icons.expandHoverIcon);
+		details.setSelectedIcon(Icons.collapseIcon);
+		details.setRolloverSelectedIcon(Icons.collapseHoverIcon);
+		details.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean expand = details.isSelected();
+				status.getTableHeader().setVisible(expand);
+				status.setVisible(expand);
+			}
+		});
 
 		JScrollPane changeLogScrollPane = new JScrollPane(changeLog);
 
@@ -329,6 +345,7 @@ public class UpdateDialog extends JDialog {
 			.addGroup(layout.createParallelGroup()
 				.addComponent(infoLbl)
 				.addComponent(changeLogScrollPane)
+				.addComponent(details)
 				.addComponent(status.getTableHeader())
 				.addComponent(status)
 				.addComponent(progress)
@@ -348,6 +365,7 @@ public class UpdateDialog extends JDialog {
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(changeLogScrollPane)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(details)
 			.addComponent(status.getTableHeader())
 			.addComponent(status)
 			.addPreferredGap(ComponentPlacement.UNRELATED)

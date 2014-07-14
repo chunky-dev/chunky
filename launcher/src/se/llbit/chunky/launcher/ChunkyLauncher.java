@@ -58,7 +58,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame implements UpdateListener {
 
-	private static final String LAUNCHER_VERSION = "v1.8.4";
+	private static final String LAUNCHER_VERSION = "v1.8.5";
 
 	protected String java;
 	private final ChunkyDeployer deployer;
@@ -75,7 +75,7 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 	private final JComboBox versionCB = new JComboBox();
 	private final JButton checkForUpdateBtn = new JButton("Check for Update");
 	private final JLabel busyLbl = new JLabel();
-	private final JCheckBox showAdvancedSettingsCB = new JCheckBox("Show advanced settings");
+	private final JCheckBox advancedSettingsToggle = new JCheckBox("Advanced settings");
 
 	private final Object updateLock = new Object();
 	private volatile boolean isBusy = false;
@@ -219,7 +219,7 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 				settings.chunkyOptions = chunkyOptions.getText();
 				settings.version = ((VersionInfo) versionCB.getSelectedItem()).name;
 				settings.showLauncher = alwaysShowLauncherCB.isSelected();
-				settings.showAdvancedSettings = showAdvancedSettingsCB.isSelected();
+				settings.showAdvancedSettings = advancedSettingsToggle.isSelected();
 
 				// resolve specific version
 				VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
@@ -271,8 +271,12 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 		final JPanel advancedPanel = buildAdvancedPanel();
 		advancedPanel.setVisible(settings.showAdvancedSettings);
 
-		showAdvancedSettingsCB.setSelected(settings.showAdvancedSettings);
-		showAdvancedSettingsCB.addActionListener(new ActionListener() {
+		advancedSettingsToggle.setSelected(settings.showAdvancedSettings);
+		advancedSettingsToggle.setIcon(Icons.expandIcon);
+		advancedSettingsToggle.setRolloverIcon(Icons.expandHoverIcon);
+		advancedSettingsToggle.setSelectedIcon(Icons.collapseIcon);
+		advancedSettingsToggle.setRolloverSelectedIcon(Icons.collapseHoverIcon);
+		advancedSettingsToggle.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JCheckBox source = (JCheckBox) e.getSource();
@@ -315,7 +319,7 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 					.addComponent(browseMcBtn)
 				)
 				.addGroup(memoryLimitAdjuster.horizontalGroup(layout))
-				.addComponent(showAdvancedSettingsCB)
+				.addComponent(advancedSettingsToggle)
 				.addComponent(advancedPanel)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(alwaysShowLauncherCB)
@@ -351,7 +355,7 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(memoryLimitAdjuster.verticalGroup(layout))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(showAdvancedSettingsCB)
+					.addComponent(advancedSettingsToggle)
 					.addComponent(advancedPanel)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(layout.createParallelGroup()
