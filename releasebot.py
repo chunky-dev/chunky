@@ -14,11 +14,13 @@ import io
 import traceback
 import ftplib
 import codecs
+import os
 from subprocess import call
 from getpass import getpass
 from datetime import datetime
 from string import join
 from launchpadlib.launchpad import Launchpad
+from os import path
 
 class Version:
 	regex = re.compile('^(\d+\.\d+\.\d+)-?([a-zA-Z]*\.?\d*)$')
@@ -83,6 +85,8 @@ def publish(version):
 			post_release_thread(version)
 		if raw_input('Upload latest.json? [y/n] ') == "y":
 			ftpupload(version)
+		if raw_input('Update documentation? [y/n] ') == "y":
+			update_docs(version)
 
 def ftpupload(version):
 	while True:
@@ -101,6 +105,19 @@ def ftpupload(version):
 	with open('build/chunky-core-%s.jar' % version.milestone, 'rb') as f:
 		ftp.storbinary('STOR chunky-core-%s.jar' % version.milestone, f)
 	ftp.quit()
+
+def update_docs(version):
+	docs_dir = '../git/chunky-docs'
+	while not path.exists(docs_dir):
+		docs_dir = raw_input('documentation repo: ')
+	os.mkdir('%s/docs/release/%s' % (docs_dir, version.milestone))
+	with codecs.open('build/release_notes-%s.md' % version.milestone,'r',encoding='utf-8') as src:
+		with codecs.open('%s/docs/release/%s/release_notes.md' % (docs_dir, version.milestone),'w',encoding='utf-8') as dst:
+			dst.write('''Chunky %s
+============
+
+''' % version.milestone)
+			dst.write(src.read())
 
 def lp_upload_file(version, release, filename, description, content_type, file_type):
 	# TODO handle re-uploads
@@ -287,6 +304,7 @@ def patch_url(version, url):
 ### MAIN
 version = None
 do_ftpupload = False
+do_update_docs = False
 for arg in sys.argv[1:]:
 	if arg == '-h' or arg == '--h' or arg == '-help' or arg == '--help':
 		print "usage: releasebot [VERSION]"
@@ -298,6 +316,8 @@ for arg in sys.argv[1:]:
 		sys.exit(0)
 	elif arg == '-ftp':
 		do_ftpupload = True
+	elif arg == '-docs':
+		do_update_docs = True
 	else:
 		version = Version(arg)
 
@@ -306,6 +326,10 @@ if version == None:
 
 if do_ftpupload:
 	ftpupload(version)
+	sys.exit(0)
+
+if do_update_docs:
+	update_docs(version)
 	sys.exit(0)
 
 print "Ready to build version %s!" % version.full
