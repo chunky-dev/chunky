@@ -604,11 +604,11 @@ public class Controls extends JPanel {
 		JSeparator sep1 = new JSeparator();
 		JLabel scaleLabel = new JLabel();
 		scaleField = new JFormattedTextField(NumberFormat.getInstance());
-		scaleSlider = new JSlider(Chunky.BLOCK_SCALE_MIN, Chunky.BLOCK_SCALE_MAX);
+		scaleSlider = new ImprovedSlider(Chunky.BLOCK_SCALE_MIN, Chunky.BLOCK_SCALE_MAX);
 		scaleSlider.setValue(chunky.getScale());
 		JLabel layerLabel = new JLabel();
 		layerField = new JFormattedTextField(NumberFormat.getInstance());
-		layerSlider = new JSlider(0, Chunk.Y_MAX);
+		layerSlider = new ImprovedSlider(0, Chunk.Y_MAX);
 		JLabel dimLabel = new JLabel();
 		followPlayer.setSelected(PersistentSettings.getFollowPlayer());
 		followPlayer.addActionListener(followPlayerListener);
