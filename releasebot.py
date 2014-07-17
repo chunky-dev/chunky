@@ -276,6 +276,7 @@ def post_release_thread(version):
 	post = r.submit('chunky', 'Chunky %s released!' % version.full,
 		text=text)
 	post.set_flair('announcement', 'announcement')
+	post.sticky()
 	print "Submitted Reddit release thread!"
 
 "patch url into latest.json"
@@ -307,9 +308,10 @@ do_ftpupload = False
 do_update_docs = False
 for arg in sys.argv[1:]:
 	if arg == '-h' or arg == '--h' or arg == '-help' or arg == '--help':
-		print "usage: releasebot [VERSION]"
+		print "usage: releasebot [VERSION] [COMMAND]"
 		print "commands:"
-		print "-ftp    uploda latest.json to FTP server"
+		print "-ftp    upload latest.json to FTP server"
+		print
 		print "This utility creates a new release of Chunky"
 		print "Required Python libraries: launchpadlib, praw"
 		print "Upgrade with pip install --upgrade PKG"
