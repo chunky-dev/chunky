@@ -150,9 +150,11 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 				scene.waitOnRefreshRequest();
 
-				synchronized (scene) {
-					updateRenderState();
-					bufferedScene.set(scene);
+				synchronized (bufferMonitor) {
+					synchronized (scene) {
+						updateRenderState();
+						bufferedScene.set(scene);
+					}
 				}
 
 				if (bufferedScene.pathTrace()) {
