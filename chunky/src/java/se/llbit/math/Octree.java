@@ -437,7 +437,7 @@ public class Octree {
 					ray.exitBlock(x, y, z);
 					continue;
 				}
-			} else if (currentBlock != prevBlock && currentBlock != Block.AIR) {
+			} else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Block.AIR) {
 				TexturedBlockModel.getIntersectionColor(ray);
 				return true;
 			}

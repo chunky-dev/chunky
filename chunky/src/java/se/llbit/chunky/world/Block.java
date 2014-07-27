@@ -429,6 +429,10 @@ public class Block {
 			isSolid = true;
 			ior = 1.520f;
 		}
+		@Override
+		public boolean isSameMaterial(Block other) {
+			return other == this || other == STAINED_GLASS;
+		}
 	};
 	public static final Block LAPISLAZULIORE = new Block(0x15, "Lapis Lazuli Ore", Texture.lapislazuliOre) {
 		{
@@ -1563,6 +1567,10 @@ public class Block {
 		@Override
 		public String description(int data) {
 			return woolColor[data&15];
+		}
+		@Override
+		public boolean isSameMaterial(Block other) {
+			return other == this || other == GLASS;
 		}
 	};
 	public static final Block TRAPDOOR = new Block(0x60, "Trapdoor", Texture.trapdoor) {
@@ -3703,5 +3711,9 @@ public class Block {
 	 */
 	public String description(int data) {
 		return bits[data&15];
+	}
+
+	public boolean isSameMaterial(Block other) {
+		return other == this;
 	}
 }
