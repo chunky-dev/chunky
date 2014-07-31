@@ -447,6 +447,11 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	}
 
 	/**
+	 * Default directory for "save current frame" file dialog.
+	 */
+	private static String defaultDirectory = System.getProperty("user.dir");
+
+	/**
 	 * Save the current frame as a PNG image.
 	 * @param progressListener
 	 */
@@ -454,7 +459,11 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 		CenteredFileDialog fileDialog = new CenteredFileDialog(null,
 				"Save Current Frame", FileDialog.SAVE);
-		fileDialog.setDirectory(context.getSceneDirectory().getAbsolutePath());
+		String directory;
+		synchronized (RenderManager.class) {
+			directory = defaultDirectory;
+		}
+		fileDialog.setDirectory(directory);
 		fileDialog.setFile(bufferedScene.name()+"-"+bufferedScene.spp+".png");
 		fileDialog.setFilenameFilter(
 			new FilenameFilter() {
@@ -465,10 +474,16 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			}
 		);
 		fileDialog.setVisible(true);
-		File targetFile = fileDialog.getSelectedFile(".png");
-		if (targetFile != null) {
+		File selectedFile = fileDialog.getSelectedFile(".png");
+		if (selectedFile != null) {
+			synchronized (RenderManager.class) {
+				File parent = selectedFile.getParentFile();
+				if (parent != null) {
+					defaultDirectory = parent.getAbsolutePath();
+				}
+			}
 			try {
-				bufferedScene.saveFrame(targetFile, progressListener);
+				bufferedScene.saveFrame(selectedFile, progressListener);
 			} catch (IOException e) {
 				logger.error("Failed to save snapshot", e);
 			}
