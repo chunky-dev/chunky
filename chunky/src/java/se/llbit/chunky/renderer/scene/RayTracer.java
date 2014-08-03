@@ -171,6 +171,7 @@ public class RayTracer {
 		int ix = (int) Math.floor(xp);
 		int iz = (int) Math.floor(zp);
 		int xmod = (int)Math.signum(ray.d.x), zmod = (int)Math.signum(ray.d.z);
+		int xo = (1+xmod)/2, zo = (1+zmod)/2;
 		double dx = Math.abs(ray.d.x)*inv_size;
 		double dz = Math.abs(ray.d.z)*inv_size;
 		double t = 0;
@@ -178,11 +179,10 @@ public class RayTracer {
 		int nx = 0, nz = 0;
 		if (dx > dz) {
 			double m = dz/dx;
-			double xrem = xmod * (ix+0.5*(1+xmod) - xp);
+			double xrem = xmod * (ix+xo - xp);
 			double zlimit = xrem*m;
 			while (t < tExit) {
-				double zrem = zmod * (iz+0.5*(1+zmod) - zp);
-				zp = z0 + zmod * (i+1) * m;
+				double zrem = zmod * (iz+zo - zp);
 				if (zrem < zlimit) {
 					iz += zmod;
 					if (Clouds.getCloud(ix, iz) == target) {
@@ -218,14 +218,14 @@ public class RayTracer {
 				}
 				t = i/dx;
 				i+=1;
+				zp = z0 + zmod*i*m;
 			}
 		} else {
 			double m = dx/dz;
-			double zrem = zmod * (iz+0.5*(1+zmod) - zp);
+			double zrem = zmod * (iz+zo - zp);
 			double xlimit = zrem*m;
 			while (t < tExit) {
-				double xrem = xmod * (ix+0.5*(1+xmod) - xp);
-				xp = x0 + xmod * (i+1) * m;
+				double xrem = xmod * (ix+xo - xp);
 				if (xrem < xlimit) {
 					ix += xmod;
 					if (Clouds.getCloud(ix, iz) == target) {
@@ -261,6 +261,7 @@ public class RayTracer {
 				}
 				t = i/dz;
 				i+=1;
+				xp = x0 + xmod*i*m;
 			}
 		}
 		int ny = 0;
