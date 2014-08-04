@@ -392,7 +392,6 @@ public class PathTracer {
 		attenuation.y = 1;
 		attenuation.z = 1;
 		attenuation.w = 1;
-		boolean b = false;
 		while (attenuation.w > 0) {
 			ray.x.scaleAdd(Ray.OFFSET,
 					ray.d, ray.x);
