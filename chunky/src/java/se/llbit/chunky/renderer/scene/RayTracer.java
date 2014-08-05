@@ -152,7 +152,7 @@ public class RayTracer {
 			// ray is entering cloud
 			if (inCloud((ray.d.x*t_offset + ray.x.x)*inv_size + offsetX, (ray.d.z*t_offset + ray.x.z)*inv_size + offsetZ)) {
 				ray.n.set(0, -Math.signum(ray.d.y), 0);
-				onCloudEnter(ray, t_offset);
+				onCloudEnter(ray, t_offset, random);
 				return true;
 			}
 		} else if (inCloud(ray.x.x*inv_size + offsetX, ray.x.z*inv_size + offsetZ)) {
@@ -270,7 +270,7 @@ public class RayTracer {
 				return false;
 			}
 			ray.n.set(nx, ny, nz);
-			onCloudEnter(ray, t+t_offset);
+			onCloudEnter(ray, t+t_offset, random);
 			return true;
 		} else {
 			if (t > tExit) {
@@ -283,7 +283,7 @@ public class RayTracer {
 				nz = -nz;
 			}
 			if (t > .2) {
-				onCloudEnter(ray, .2);
+				onCloudExit(ray, .2, random);
 			} else {
 				ray.n.set(nx, ny, nz);
 				onCloudExit(ray, t, random);
@@ -293,7 +293,8 @@ public class RayTracer {
 		return true;
 	}
 
-	private static void onCloudEnter(Ray ray, double t) {
+	private static void onCloudEnter(Ray ray, double t, Random random) {
+		ray.scatterNormal(random);
 		ray.tNear = t;
 		ray.distance += t;
 		ray.color.set(1,1,1,0.075);
@@ -309,6 +310,5 @@ public class RayTracer {
 	private static boolean inCloud(double x, double z) {
 		return Clouds.getCloud((int)Math.floor(x), (int)Math.floor(z)) == 1;
 	}
-
 
 }

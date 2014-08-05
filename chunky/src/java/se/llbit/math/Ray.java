@@ -409,4 +409,54 @@ public class Ray {
 		currentMaterial = prevMaterial;
 	}
 
+	/**
+	 * Scatter ray normal
+	 * @param random random number source
+	 */
+	public final void scatterNormal(Random random) {
+		// get random point on unit disk
+		double x1 = random.nextDouble();
+		double x2 = random.nextDouble();
+		double r = FastMath.sqrt(x1);
+		double theta = 2 * Math.PI * x2;
+
+		// project to point on hemisphere in tangent space
+		double tx = r * FastMath.cos(theta);
+		double ty = r * FastMath.sin(theta);
+		double tz = FastMath.sqrt(1 - x1);
+
+		// transform from tangent space to world space
+		double xx, xy, xz;
+		double ux, uy, uz;
+		double vx, vy, vz;
+
+		if (QuickMath.abs(n.x) > .1) {
+			xx = 0;
+			xy = 1;
+			xz = 0;
+		} else {
+			xx = 1;
+			xy = 0;
+			xz = 0;
+		}
+
+		ux = xy * n.z - xz * n.y;
+		uy = xz * n.x - xx * n.z;
+		uz = xx * n.y - xy * n.x;
+
+		r = 1/FastMath.sqrt(ux*ux + uy*uy + uz*uz);
+
+		ux *= r;
+		uy *= r;
+		uz *= r;
+
+		vx = uy * n.z - uz * n.y;
+		vy = uz * n.x - ux * n.z;
+		vz = ux * n.y - uy * n.x;
+
+		n.set(ux * tx + vx * ty + n.x * tz,
+				uy * tx + vy * ty + n.y * tz,
+				uz * tx + vz * ty + n.z * tz);
+	}
+
 }
