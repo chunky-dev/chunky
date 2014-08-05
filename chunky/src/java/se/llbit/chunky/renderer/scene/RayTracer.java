@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import java.util.Random;
+
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Block;
@@ -27,7 +29,7 @@ import se.llbit.math.Ray.RayPool;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class RayTracer {
-	private static final double CLOUD_OPACITY = 0.9;
+	private static final double CLOUD_OPACITY = 0.4;
 
 	/**
 	 * @param scene
@@ -71,27 +73,28 @@ public class RayTracer {
 	 */
 	public static boolean nextIntersection(Scene scene, Ray ray, WorkerState state) {
 
-		if (scene.sky().cloudsEnabled() && cloudIntersection(scene, ray)) {
+		if (scene.sky().cloudsEnabled()) {
 			Ray oct = state.rayPool.get(ray);
-			if (nextWorldIntersection(scene, oct, state.rayPool) &&
-					oct.distance <= ray.distance) {
-				ray.distance = oct.distance;
-				ray.x.set(oct.x);
-				ray.n.set(oct.n);
-				ray.color.set(oct.color);
-				ray.prevMaterial = oct.prevMaterial;
-				ray.currentMaterial = oct.currentMaterial;
-			} else {
-				ray.prevMaterial = ray.currentMaterial;
-				ray.currentMaterial = Block.GRASS_ID;
-				ray.x.scaleAdd(ray.tNear + Ray.EPSILON, ray.d);
+			if  (cloudIntersection(scene, ray, state.random)) {
+				if (nextWorldIntersection(scene, oct, state.rayPool) &&
+						oct.distance <= ray.distance) {
+					ray.distance = oct.distance;
+					ray.d.set(oct.d);
+					ray.x.set(oct.x);
+					ray.n.set(oct.n);
+					ray.color.set(oct.color);
+					ray.prevMaterial = oct.prevMaterial;
+					ray.currentMaterial = oct.currentMaterial;
+				} else {
+					ray.prevMaterial = ray.currentMaterial;
+					ray.currentMaterial = Block.GRASS_ID;
+					ray.x.scaleAdd(ray.tNear + Ray.EPSILON, ray.d);
+				}
+				state.rayPool.dispose(oct);
+				return true;
 			}
-			state.rayPool.dispose(oct);
-			return true;
-		} else {
-			//return scene.intersect(ray);
-			return nextWorldIntersection(scene, ray, state.rayPool);
 		}
+		return nextWorldIntersection(scene, ray, state.rayPool);
 	}
 
 	private static boolean nextWorldIntersection(Scene scene, Ray ray,
@@ -127,7 +130,7 @@ public class RayTracer {
 		return hit;
 	}
 
-	private static boolean cloudIntersection(Scene scene, Ray ray) {
+	private static boolean cloudIntersection(Scene scene, Ray ray, Random random) {
 		double offsetX = scene.sky().cloudXOffset();
 		double offsetY = scene.sky().cloudYOffset();
 		double offsetZ = scene.sky().cloudZOffset();
@@ -148,15 +151,12 @@ public class RayTracer {
 			}
 			// ray is entering cloud
 			if (inCloud((ray.d.x*t_offset + ray.x.x)*inv_size + offsetX, (ray.d.z*t_offset + ray.x.z)*inv_size + offsetZ)) {
-				ray.tNear = t_offset;
-				ray.distance += t_offset;
 				ray.n.set(0, -Math.signum(ray.d.y), 0);
-				ray.color.set(1,1,1,CLOUD_OPACITY);
+				onCloudEnter(ray, t_offset);
 				return true;
 			}
 		} else if (inCloud(ray.x.x*inv_size + offsetX, ray.x.z*inv_size + offsetZ)) {
 			target = 0;
-			return false;
 		}
 		double tExit = Double.MAX_VALUE;
 		if (ray.d.y > 0) {
@@ -269,6 +269,9 @@ public class RayTracer {
 			if (t > tExit) {
 				return false;
 			}
+			ray.n.set(nx, ny, nz);
+			onCloudEnter(ray, t+t_offset);
+			return true;
 		} else {
 			if (t > tExit) {
 				nx = 0;
@@ -279,12 +282,28 @@ public class RayTracer {
 				nx = -nx;
 				nz = -nz;
 			}
+			if (t > .2) {
+				onCloudEnter(ray, .2);
+			} else {
+				ray.n.set(nx, ny, nz);
+				onCloudExit(ray, t, random);
+
+			}
 		}
-		ray.n.set(nx, ny, nz);
-		ray.tNear = t + t_offset;
-		ray.distance += ray.tNear;
-		ray.color.set(1, 1, 1, CLOUD_OPACITY);
 		return true;
+	}
+
+	private static void onCloudEnter(Ray ray, double t) {
+		ray.tNear = t;
+		ray.distance += t;
+		ray.color.set(1,1,1,0.075);
+	}
+
+	private static void onCloudExit(Ray ray, double t, Random random) {
+		//ray.diffuseReflection(ray, random);
+		ray.tNear = t;
+		ray.distance += t;
+		ray.color.set(1,1,1,0.075);
 	}
 
 	private static boolean inCloud(double x, double z) {
