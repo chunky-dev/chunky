@@ -1,5 +1,5 @@
 # coding=utf-8
-# Releasebot Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+# SHIPIT Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
 
 # requires PRAW, Launchpadlib
 
@@ -412,7 +412,7 @@ do_ftpupload = False
 do_update_docs = False
 for arg in sys.argv[1:]:
 	if arg == '-h' or arg == '--h' or arg == '-help' or arg == '--help':
-		print "usage: releasebot [VERSION] [COMMAND]"
+		print "usage: SHIPIT [VERSION] [COMMAND]"
 		print "commands:"
 		print "    -ftp         upload latest.json to FTP server"
 		print "    -docs        update documentation"
@@ -423,14 +423,21 @@ for arg in sys.argv[1:]:
 		print "Upgrade with >pip install --upgrade <PKG>"
 		sys.exit(0)
 	else:
-		matched = False
-		for key in options.keys():
-			if arg == '-'+key:
-				options[key] = True
-				matched = True
-				break
-		if not matched:
+		if arg.startswith('-'):
+			matched = False
+			for key in options.keys():
+				if arg == '-'+key:
+					options[key] = True
+					matched = True
+					break
+			if not matched:
+				print "Error: unknown command: %s" % arg
+				sys.exit(1)
+		elif version is None:
 			version = Version(arg)
+		else:
+			print "Error: redundant argument: %s" % arg
+			sys.exit(1)
 
 try:
 	credentials = Credentials()
