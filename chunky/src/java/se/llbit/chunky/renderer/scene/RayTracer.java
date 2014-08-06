@@ -297,14 +297,14 @@ public class RayTracer {
 		ray.scatterNormal(random);
 		ray.tNear = t;
 		ray.distance += t;
-		ray.color.set(1,1,1,0.075);
+		ray.color.set(1,1,1,0);
 	}
 
 	private static void onCloudExit(Ray ray, double t, Random random) {
 		//ray.diffuseReflection(ray, random);
 		ray.tNear = t;
 		ray.distance += t;
-		ray.color.set(1,1,1,0.075);
+		ray.color.set(1,1,1,0.075*t*5);
 	}
 
 	private static boolean inCloud(double x, double z) {

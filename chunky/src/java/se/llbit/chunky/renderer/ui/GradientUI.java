@@ -260,7 +260,7 @@ public class GradientUI extends JPanel {
 		}
 	}
 
-	private void fireStopModifiedNotification() {
+	private synchronized void fireStopModifiedNotification() {
 		for (GradientListener listener: listeners) {
 			listener.stopModified(selected, gradient.get(selected));
 		}
@@ -272,7 +272,7 @@ public class GradientUI extends JPanel {
 		fireGradientChangedNotification();
 	}
 
-	private void fireGradientChangedNotification() {
+	private synchronized void fireGradientChangedNotification() {
 		for (GradientListener listener: listeners) {
 			listener.gradientChanged(gradient);
 		}
@@ -295,8 +295,12 @@ public class GradientUI extends JPanel {
 		return stop;
 	}
 
-	public void addGradientListener(GradientListener listener) {
+	public synchronized void addGradientListener(GradientListener listener) {
 		this.listeners.add(listener);
+	}
+
+	public synchronized void removeGradientListener(GradientListener listener) {
+		this.listeners.remove(listener);
 	}
 
 	/**
@@ -311,7 +315,7 @@ public class GradientUI extends JPanel {
 		}
 	}
 
-	private void fireStopSelectedNotification() {
+	private synchronized void fireStopSelectedNotification() {
 		for (GradientListener listener: listeners) {
 			listener.stopSelected(selected);
 		}

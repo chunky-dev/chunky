@@ -1331,20 +1331,9 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		skyGradientPanel.setBorder(BorderFactory.createTitledBorder("Sky Gradient"));
 		gradientEditor = new GradientEditor();
+		gradientEditor.addGradientListener(gradientListener);
 		updateSkyGradient();
 		skyGradientPanel.add(gradientEditor);
-		gradientEditor.addGradientListener(new GradientListener() {
-			@Override
-			public void gradientChanged(List<Vector4d> newGradient) {
-				renderMan.scene().sky().setGradient(newGradient);
-			}
-			@Override
-			public void stopSelected(int index) {
-			}
-			@Override
-			public void stopModified(int index, Vector4d marker) {
-			}
-		});
 
 		GroupLayout skyboxLayout = new GroupLayout(skyboxPanel);
 		skyboxPanel.setLayout(skyboxLayout);
@@ -1983,6 +1972,19 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
+	private final GradientListener gradientListener = new GradientListener() {
+		@Override
+		public void gradientChanged(List<Vector4d> newGradient) {
+			renderMan.scene().sky().setGradient(newGradient);
+		}
+		@Override
+		public void stopSelected(int index) {
+		}
+		@Override
+		public void stopModified(int index, Vector4d marker) {
+		}
+	};
+
 	private final ActionListener saveSnapshotListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -2191,7 +2193,9 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	private void updateSkyGradient() {
+		gradientEditor.removeGradientListener(gradientListener);
 		gradientEditor.setGradient(renderMan.scene().sky().getGradient());
+		gradientEditor.addGradientListener(gradientListener);
 	}
 
 	protected void updateProjectionMode() {
@@ -2213,8 +2217,10 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	protected void updateCanvasSizeField() {
+		canvasSizeCB.removeActionListener(canvasSizeListener);
 		canvasSizeCB.setSelectedItem("" + renderMan.scene().canvasWidth() +
 				"x" + renderMan.scene().canvasHeight());
+		canvasSizeCB.addActionListener(canvasSizeListener);
 	}
 
 	protected void updateSaveDumpsCheckBox() {

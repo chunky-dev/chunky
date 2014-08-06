@@ -226,6 +226,10 @@ public class GradientEditor extends JPanel implements GradientListener, TextInpu
 		gradientUI.addGradientListener(listener);
 	}
 
+	public void removeGradientListener(GradientListener listener) {
+		gradientUI.removeGradientListener(listener);
+	}
+
 	@Override
 	public void gradientChanged(List<Vector4d> newGradient) {
 		del.setEnabled(newGradient.size()>2);
@@ -267,6 +271,7 @@ public class GradientEditor extends JPanel implements GradientListener, TextInpu
 
 	public void setGradient(List<Vector4d> newGradient) {
 		gradientUI.setGradient(newGradient);
+
 	}
 
 }
