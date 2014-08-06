@@ -1241,7 +1241,7 @@ public class TexturePackLoader {
 		allTextures.put("double_plant_syringa_top",
 				new SimpleTexture("assets/minecraft/textures/blocks/double_plant_syringa_top", Texture.lilacTop));
 
-		// [MC 1.8] New Stone Blocks
+		// [MC 1.8] New Blocks
 		allTextures.put("stone_diorite",
 				new SimpleTexture("assets/minecraft/textures/blocks/stone_diorite", Texture.diorite));
 		allTextures.put("stone_diorite_smooth",
@@ -1270,6 +1270,16 @@ public class TexturePackLoader {
 				new SimpleTexture("assets/minecraft/textures/blocks/iron_trapdoor", Texture.ironTrapdoor));
 		allTextures.put("slime",
 				new SimpleTexture("assets/minecraft/textures/blocks/slime", Texture.slime));
+		allTextures.put("red_sandstone_top",
+				new SimpleTexture("assets/minecraft/textures/blocks/red_sandstone_top", Texture.redSandstoneTop));
+		allTextures.put("red_sandstone_bottom",
+				new SimpleTexture("assets/minecraft/textures/blocks/red_sandstone_bottom", Texture.redSandstoneBottom));
+		allTextures.put("red_sandstone_normal",
+				new SimpleTexture("assets/minecraft/textures/blocks/red_sandstone_normal", Texture.redSandstoneSide));
+		allTextures.put("red_sandstone_carved",
+				new SimpleTexture("assets/minecraft/textures/blocks/red_sandstone_carved", Texture.redSandstoneDecorated));
+		allTextures.put("red_sandstone_smooth",
+				new SimpleTexture("assets/minecraft/textures/blocks/red_sandstone_smooth", Texture.redSandstoneSmooth));
 
 	}
 

@@ -170,6 +170,11 @@ public class Texture {
 	public static final Texture sandstoneBottom = new Texture();
 	public static final Texture sandstoneDecorated = new Texture();
 	public static final Texture sandstoneSmooth = new Texture();
+	public static final Texture redSandstoneSide = new Texture();
+	public static final Texture redSandstoneTop = new Texture();
+	public static final Texture redSandstoneBottom = new Texture();
+	public static final Texture redSandstoneDecorated = new Texture();
+	public static final Texture redSandstoneSmooth = new Texture();
 	public static final Texture bedFootTop = new Texture();
 	public static final Texture bedHeadTop = new Texture();
 	public static final Texture bedFootEnd = new Texture();

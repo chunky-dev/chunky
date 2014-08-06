@@ -862,11 +862,11 @@ public class Block {
 		final Texture[][] tex = {
 			{ Texture.slabSide, Texture.slabTop },
 			{ Texture.sandstoneSide, Texture.sandstoneTop },
-			{ Texture.oakPlanks },
-			{ Texture.cobblestone },
-			{ Texture.brick },
-			{ Texture.stoneBrick },
-			{ Texture.netherBrick },
+			{ Texture.oakPlanks, Texture.oakPlanks },
+			{ Texture.cobblestone, Texture.cobblestone },
+			{ Texture.brick, Texture.brick },
+			{ Texture.stoneBrick, Texture.stoneBrick },
+			{ Texture.netherBrick, Texture.netherBrick },
 			{ Texture.quartzSide, Texture.quartzTop },
 		};
 		final String[] slabKind = {
@@ -882,11 +882,7 @@ public class Block {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			Texture[] textures = tex[ray.getBlockData()&7];
-			if (textures.length > 1) {
-				return SlabModel.intersect(ray, textures[0], textures[1]);
-			} else {
-				return SlabModel.intersect(ray, textures[0]);
-			}
+			return SlabModel.intersect(ray, textures[0], textures[1]);
 		}
 		@Override
 		public String description(int data) {
@@ -2907,32 +2903,98 @@ public class Block {
 			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
-	public static final Block UNKNOWN0xB3 = new Block(0xB3, "Unknown Block 0xB3", Texture.unknown) {
+	public static final Block REDSANDSTONE = new Block(0xB3, "Red Sandstone", Texture.redSandstoneSide) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			isOpaque = true;
+			isSolid = true;
+			localIntersect = true;
+		}
+		final Texture[][] tex = {
+			// normal
+			{
+				Texture.redSandstoneSide,
+				Texture.redSandstoneSide,
+				Texture.redSandstoneSide,
+				Texture.redSandstoneSide,
+				Texture.redSandstoneTop,
+				Texture.redSandstoneBottom,
+			},
+
+			// decorated
+			{
+				Texture.redSandstoneDecorated,
+				Texture.redSandstoneDecorated,
+				Texture.redSandstoneDecorated,
+				Texture.redSandstoneDecorated,
+				Texture.redSandstoneTop,
+				Texture.redSandstoneBottom,
+			},
+
+			// smooth
+			{
+				Texture.redSandstoneSmooth,
+				Texture.redSandstoneSmooth,
+				Texture.redSandstoneSmooth,
+				Texture.redSandstoneSmooth,
+				Texture.redSandstoneTop,
+				Texture.redSandstoneBottom,
+			},
+		};
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return TexturedBlockModel.intersect(ray,
+					tex[ray.getBlockData() % 3]);
 		}
 	};
-	public static final Block UNKNOWN0xB4 = new Block(0xB4, "Unknown Block 0xB4", Texture.unknown) {
+	public static final Block REDSANDSTONESTAIRS = new Block(0xB4, "Red Sandstone Stairs", Icon.stoneStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return StairModel.intersect(ray, Texture.redSandstoneSide,
+					Texture.redSandstoneTop, Texture.redSandstoneBottom);
+		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.redSandstoneSide;
 		}
 	};
-	public static final Block UNKNOWN0xB5 = new Block(0xB5, "Unknown Block 0xB5", Texture.unknown) {
+	public static final Block DOUBLESLAB2 = new Block(0xB5, "Double Slab2", Texture.redSandstoneTop) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			isOpaque = true;
+			isSolid = true;
+			localIntersect = true;
+		}
+
+		final Texture[] textures = {
+			Texture.redSandstoneSide,
+			Texture.redSandstoneSide,
+			Texture.redSandstoneSide,
+			Texture.redSandstoneSide,
+			Texture.redSandstoneTop,
+			Texture.redSandstoneTop,
+		};
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return TexturedBlockModel.intersect(ray, textures);
 		}
 	};
-	public static final Block UNKNOWN0xB6 = new Block(0xB6, "Unknown Block 0xB6", Texture.unknown) {
+	public static final Block SLAB2 = new Block(0xB6, "Slab2", Texture.redSandstoneTop) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		final Texture[] textures = {
+			Texture.redSandstoneSide, Texture.redSandstoneTop
+		};
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return SlabModel.intersect(ray, textures[0], textures[1]);
 		}
 	};
 	public static final Block UNKNOWN0xB7 = new Block(0xB7, "Unknown Block 0xB7", Texture.unknown) {
@@ -3492,8 +3554,8 @@ public class Block {
 		DARKOAKSTAIRS, SLIMEBLOCK, BARRIER, IRON_TRAPDOOR,
 		PRISMARINE, SEALANTERN, HAY_BLOCK, CARPET,
 		HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, LARGE_FLOWER,
-		UNKNOWN0xB0, UNKNOWN0xB1, UNKNOWN0xB2, UNKNOWN0xB3,
-		UNKNOWN0xB4, UNKNOWN0xB5, UNKNOWN0xB6, UNKNOWN0xB7,
+		UNKNOWN0xB0, UNKNOWN0xB1, UNKNOWN0xB2, REDSANDSTONE,
+		REDSANDSTONESTAIRS, DOUBLESLAB2, SLAB2, UNKNOWN0xB7,
 		UNKNOWN0xB8, UNKNOWN0xB9, UNKNOWN0xBA, UNKNOWN0xBB,
 		UNKNOWN0xBC, UNKNOWN0xBD, UNKNOWN0xBE, UNKNOWN0xBF,
 		UNKNOWN0xC0, UNKNOWN0xC1, UNKNOWN0xC2, UNKNOWN0xC3,
@@ -3677,7 +3739,8 @@ public class Block {
 				this == JUNGLEWOODSTAIRS ||
 				this == QUARTZSTAIRS ||
 				this == ACACIASTAIRS ||
-				this == DARKOAKSTAIRS;
+				this == DARKOAKSTAIRS ||
+				this == REDSANDSTONESTAIRS;
 	}
 
 	public boolean isGroundBlock() {

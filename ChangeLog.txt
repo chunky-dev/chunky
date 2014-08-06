@@ -1,4 +1,5 @@
 1.3 - TBD
+    * Added Red Sandstone blocks, slabs, and stairs (from Minecraft snapshot)
     * Fixed a problem causing render progress to reset after loading a scene
     * Clouds can now be moved in all directions
     * HDRI sky textures can now be used, supported formats are:
