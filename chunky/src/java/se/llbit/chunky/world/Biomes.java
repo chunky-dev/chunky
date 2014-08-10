@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -30,70 +30,97 @@ import se.llbit.math.QuickMath;
  */
 public class Biomes {
 	/**
-	 * Mask to get valid biome IDs (removes variant bit)
-	 */
+	 * Mask to get valid biome IDs (removes variant bit).
+	 *
+ 	 * Currently we only handle 128 different biomes (40 currently implemented)
+ 	 * because biome IDs with the high bit set have the same properties, as far
+ 	 * as we are concerned, as the corresponding biome ID without the high bit.
+ 	 */
 	public static final int BIOME_MASK = 0x7F;
 
 	private static final int SWAMP_ID = 6;
+
+	private static final Biome unknown = new Biome("unknown", 0.5, 0.5, 0x7E7E7E, 0x7E7E7E);
+	private static final Biome ocean = new Biome("ocean", 0.5, 0.5, 0x000070, 0x75B646);
+	private static final Biome plains = new Biome("plains", 0.8, 0.4, 0x8DB360, 0x8DB84A);
+	private static final Biome desert = new Biome("desert", 1.0, 0.0, 0xFA9418, 0x9BA863);
+	private static final Biome extremeHills = new Biome("extreme hills", 0.2, 0.3, 0x606060, 0x75B646);
+	private static final Biome forest = new Biome("forest", 0.7, 0.8, 0x056621, 0x4A8F3A);
+	private static final Biome taiga = new Biome("taiga", 0.05, 0.8, 0x00DD2D, 0x478852);
+	private static final Biome swampland = new Biome("swampland", 0.8, 0.9, 0x07F9B2, 0x3e5226);
+	private static final Biome river = new Biome("river", 0.5, 0.5, 0x0000FF, 0x75B646);
+	private static final Biome hell = new Biome("hell", 1.0, 0.0, 0xFF0000, 0x75B646);
+	private static final Biome sky = new Biome("sky", 0.5, 0.5, 0x8080FF, 0x75B646);
+	private static final Biome frozenOcean = new Biome("frozen ocean", 0.0, 0.5, 0x9090A0, 0x7A9C91);
+	private static final Biome frozenRiver = new Biome("frozen river", 0.0, 0.5, 0xA0A0FF, 0x7A9C91);
+	private static final Biome icePlains = new Biome("ice plains", 0.0, 0.5, 0xFFFFFF, 0x7A9C91);
+	private static final Biome iceMountains = new Biome("ice mountains", 0.0, 0.5, 0xA0A0A0, 0x7A9C91);
+	private static final Biome mushroomIsland = new Biome("mushroom island", 0.9, 1.0, 0xFF00FF, 0x939D88);
+	private static final Biome mushroomIslandShore = new Biome("mushroom island shore", 0.9, 1.0, 0xA000FF, 0x939D88);
+	private static final Biome beach = new Biome("beach", 0.8, 0.4, 0xFADE55, 0x75B646);
+	private static final Biome desertHills = new Biome("desert hills", 1.0, 0.0, 0xD25F12, 0x9BA863);
+	private static final Biome forestHills = new Biome("forest hills", 0.7, 0.8, 0x22551C, 0x4A8F3A);
+	private static final Biome taigaHills = new Biome("taiga hills", 0.05,0.8, 0x163933, 0x478852);
+	private static final Biome extremeHillsEdge = new Biome("extreme hills edge", 0.2, 0.3, 0x72789A, 0x75B646);
+	private static final Biome jungle = new Biome("jungle", 1.0, 0.9, 0x537B09, 0x3A8B25);
+	private static final Biome jungleHills = new Biome("jungle hills", 1.0, 0.9, 0x2C4205, 0x3A8B25);
+	private static final Biome jungleEdge = new Biome("jungle edge", 0.95, 0.8, 0x628B17, 0x3EB80F);
+	private static final Biome deepOcean = new Biome("deep ocean", 0.5, 0.5, 0x000030, 0x71A74D);
+	private static final Biome stoneBeach = new Biome("stone beach", 0.2, 0.3, 0xA2A284, 0x6DA36B);
+	private static final Biome coldBeach = new Biome("cold beach", 0.05, 0.3, 0xFAF0C0, 0x64A278);
+	private static final Biome birchForest = new Biome("birch forest", 0.7, 0.8, 0x307444, 0x59AE30);
+	private static final Biome birchForestHills = new Biome("birch forest hills", 0.7, 0.8, 0x1F5F32, 0x59AE30);
+	private static final Biome roofedForest = new Biome("roofed forest", 0.7, 0.8, 0x40511A, 0x59AE30);
+	private static final Biome coldTaiga = new Biome("cold taiga", -0.5, 0.4, 0x31554A, 0x60A17B);
+	private static final Biome coldTaigaHills = new Biome("cold taiga hills", -0.5, 0.4, 0x243F36, 0x60A17B);
+	private static final Biome megaTaiga = new Biome("mega taiga", 0.3, 0.8, 0x596651, 0x68A55F);
+	private static final Biome megaTaigaHills = new Biome("mega taiga hills", 0.3, 0.8, 0x454F3E, 0x68A55F);
+	private static final Biome extremeHillsPlus = new Biome("extreme hills+", 0.2, 0.3, 0x507050, 0x6DA36B);
+	private static final Biome savanna = new Biome("savanna", 1.2, 0.0, 0xBDB25F, 0xAEA42A);
+	private static final Biome savannaPlateau = new Biome("savanna plateau", 1.0, 0.0, 0xA79D64, 0xAEA42A);
+	private static final Biome mesa = new Biome("mesa", 2.0, 0.0, 0xD94515, 0xAEA42A);
+	private static final Biome mesaPlateauF = new Biome("mesa plateau f", 2.0, 0.0, 0xB09765, 0xAEA42A);
+	private static final Biome mesaPlateau = new Biome("mesa plateau", 2.0, 0.0, 0xCA8C65, 0xAEA42A);
+
 	private static final Biome biomes[] = {
-		new Biome("ocean", 0.5, 0.5, 0x000070, 0x75B646),
-		new Biome("plains", 0.8, 0.4, 0x8DB360, 0x8DB84A),
-		new Biome("desert", 1.0, 0.0, 0xFA9418, 0x9BA863),
-		new Biome("extreme hills", 0.2, 0.3, 0x606060, 0x75B646),
-		new Biome("forest", 0.7, 0.8, 0x056621, 0x4A8F3A),
-		new Biome("taiga", 0.05, 0.8, 0x00DD2D, 0x478852),
-		new Biome("swampland", 0.8, 0.9, 0x07F9B2, 0x3e5226),
-		new Biome("river", 0.5, 0.5, 0x0000FF, 0x75B646),
-		new Biome("hell", 1.0, 0.0, 0xFF0000, 0x75B646),
-		new Biome("sky", 0.5, 0.5, 0x8080FF, 0x75B646),
-		new Biome("frozen ocean", 0.0, 0.5, 0x9090A0, 0x7A9C91),
-		new Biome("frozen river", 0.0, 0.5, 0xA0A0FF, 0x7A9C91),
-		new Biome("ice plains", 0.0, 0.5, 0xFFFFFF, 0x7A9C91),
-		new Biome("ice mountains", 0.0, 0.5, 0xA0A0A0, 0x7A9C91),
-		new Biome("mushroom island", 0.9, 1.0, 0xFF00FF, 0x939D88),
-		new Biome("mushroom island shore", 0.9, 1.0, 0xA000FF, 0x939D88),
-		new Biome("beach", 0.8, 0.4, 0xFADE55, 0x75B646),
-		new Biome("desert hills", 1.0, 0.0, 0xD25F12, 0x9BA863),
-		new Biome("forest hills", 0.7, 0.8, 0x22551C, 0x4A8F3A),
-		new Biome("taiga hills", 0.05,0.8, 0x163933, 0x478852),
-		new Biome("extreme hills edge", 0.2, 0.3, 0x72789A, 0x75B646),
-		new Biome("jungle", 1.0, 0.9, 0x537B09, 0x3A8B25),
-		new Biome("jungle hills", 1.0, 0.9, 0x2C4205, 0x3A8B25),
-		new Biome("jungle edge", 0.95, 0.8, 0x628B17, 0x3EB80F),
-		new Biome("deep ocean", 0.5, 0.5, 0x000030, 0x71A74D),
-		new Biome("stone beach", 0.2, 0.3, 0xA2A284, 0x6DA36B),
-		new Biome("cold beach", 0.05, 0.3, 0xFAF0C0, 0x64A278),
-		new Biome("birch forest", 0.7, 0.8, 0x307444, 0x59AE30),
-		new Biome("birch forest hills", 0.7, 0.8, 0x1F5F32, 0x59AE30),
-		new Biome("roofed forest", 0.7, 0.8, 0x40511A, 0x59AE30),
-		new Biome("cold taiga", -0.5, 0.4, 0x31554A, 0x60A17B),
-		new Biome("cold taiga hills", -0.5, 0.4, 0x243F36, 0x60A17B),
-		new Biome("mega taiga", 0.3, 0.8, 0x596651, 0x68A55F),
-		new Biome("mega taiga hills", 0.3, 0.8, 0x454F3E, 0x68A55F),
-		new Biome("extreme hills+", 0.2, 0.3, 0x507050, 0x6DA36B),
-		new Biome("savanna", 1.2, 0.0, 0xBDB25F, 0xAEA42A),
-		new Biome("savanna plateau", 1.0, 0.0, 0xA79D64, 0xAEA42A),
-		new Biome("mesa", 2.0, 0.0, 0xD94515, 0xAEA42A),
-		new Biome("mesa plateau f", 2.0, 0.0, 0xB09765, 0xAEA42A),
-		new Biome("mesa plateau", 2.0, 0.0, 0xCA8C65, 0xAEA42A),
+		ocean, plains, desert, extremeHills, forest,
+		taiga, swampland, river, hell, sky,
+		frozenOcean, frozenRiver, icePlains, iceMountains, mushroomIsland,
+		mushroomIslandShore, beach, desertHills, forestHills, taigaHills,
+		extremeHillsEdge, jungle, jungleHills, jungleEdge, deepOcean,
+		stoneBeach, coldBeach, birchForest, birchForestHills, roofedForest,
+		coldTaiga, coldTaigaHills, megaTaiga, megaTaigaHills, extremeHillsPlus,
+		savanna, savannaPlateau, mesa, mesaPlateauF, mesaPlateau,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown, unknown, unknown,
+		unknown, unknown, unknown
 	};
 
 	private static int[] grassColor = new int[128];
 	private static int[] foliageColor = new int[128];
 	private static float[][] grassColorLinear = new float[grassColor.length][3];
 	private static float[][] foliageColorLinear = new float[grassColor.length][3];
-	private static final int UNKNOWN_COLOR = 0x7E7E7E;
 
 	static {
 		for (int i = 0; i < biomes.length; ++i) {
 			grassColor[i] = biomes[i].grassColor;
 			foliageColor[i] = grassColor[i];
 		}
-		for (int i = biomes.length; i < 128; ++i) {
-			grassColor[i] = UNKNOWN_COLOR;
-			foliageColor[i] = grassColor[i];
-		}
-
 		gammaCorrectColors(grassColor, grassColorLinear);
 		gammaCorrectColors(foliageColor, foliageColorLinear);
 	}
@@ -103,8 +130,6 @@ public class Biomes {
 	 * @return Biome color for given biome ID
 	 */
 	public static final int getColor(int biomeId) {
-		if (biomeId >= biomes.length)
-			return UNKNOWN_COLOR;
 		return biomes[BIOME_MASK & biomeId].mapColor;
 	}
 

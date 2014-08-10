@@ -26,7 +26,7 @@ public class Biome {
 	public int mapColor;
 
 	/**
-	 * Preset grass/foliage color before loading from resource pack.
+	 * Default grass/foliage color before loading from resource pack.
 	 */
 	public int grassColor;
 
