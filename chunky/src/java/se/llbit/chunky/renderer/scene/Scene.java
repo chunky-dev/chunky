@@ -192,6 +192,8 @@ public class Scene extends SceneDescription {
 
 	private boolean finalizeBuffer = false;
 
+	private boolean resetRender = false;
+
 	/**
 	 * Create an empty scene with default canvas width and height.
 	 */
@@ -261,8 +263,6 @@ public class Scene extends SceneDescription {
 		spp = other.spp;
 		renderTime = other.renderTime;
 
-		pathTrace = other.pathTrace;
-		pauseRender = other.pauseRender;
 		refresh = other.refresh;
 
 		finalized = false;
@@ -275,6 +275,15 @@ public class Scene extends SceneDescription {
 			samples = other.samples;
 			bufferData = other.bufferData;
 		}
+	}
+
+	/**
+	 * Copy the current rendering state.
+	 * @param other
+	 */
+	public void copyRenderState(Scene other) {
+		pathTrace = other.pathTrace;
+		pauseRender = other.pauseRender;
 	}
 
 	/**
@@ -986,6 +995,7 @@ public class Scene extends SceneDescription {
 		if (pathTrace) {
 			pathTrace = false;
 			pauseRender = false;
+			resetRender = true;
 			refresh();
 		}
 	}
@@ -1859,6 +1869,19 @@ public class Scene extends SceneDescription {
 
 	public boolean shouldSaveSnapshots() {
 		return saveSnapshots;
+	}
+
+	public boolean shouldReset() {
+		if (resetRender) {
+			resetRender = false;
+			return true;
+		}
+		return false;
+	}
+
+	synchronized public void resetRender() {
+		resetRender = true;
+		refresh();
 	}
 
 }

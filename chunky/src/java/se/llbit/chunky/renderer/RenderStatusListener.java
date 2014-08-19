@@ -68,4 +68,10 @@ public interface RenderStatusListener extends ProgressListener {
 	 * @param sps Average SPS
 	 */
 	void renderJobFinished(long time, int sps);
+
+	/**
+	 * Render reset was prevented because the render time exceeded
+	 * the reset grace period.
+	 */
+	public void renderResetPrevented();
 }

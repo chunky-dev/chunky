@@ -129,4 +129,9 @@ public class ConsoleRenderListener implements RenderStatusListener {
 				hours, minutes, seconds));
 		System.out.println("Average samples per second (SPS): " + sps);
 	}
+
+	@Override
+	public void renderResetPrevented() {
+		System.out.println("Render reset prevented!");
+	}
 }

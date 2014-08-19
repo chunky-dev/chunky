@@ -32,9 +32,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -148,8 +147,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox atmosphereEnabled = new JCheckBox();
 	private final JCheckBox volumetricFogEnabled = new JCheckBox();
 	private final JCheckBox cloudsEnabled = new JCheckBox();
-	private final JCheckBox autoLock = new JCheckBox();
-	private final JButton lockBtn = new JButton();
 	private final RenderContext context;
 	private final JButton showPreviewBtn = new JButton();
 	private final JLabel renderTimeLbl = new JLabel();
@@ -178,14 +175,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox shutdownWhenDoneCB = new JCheckBox("Shutdown computer when render completes");
 
 	private final JTabbedPane tabbedPane = new JTabbedPane();
-
-	private boolean controlsLocked = false;
-
-	private JPanel generalPane;
-	private JPanel cameraPane;
-	private JPanel lightingPane;
-	private JPanel skyPane;
-	private JPanel advancedPane;
 
 	private final Adjuster skyHorizonOffset = new Adjuster(
 			"Horizon offset",
@@ -452,32 +441,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
-	Set<Component> safeComponents = new HashSet<Component>();
-
 	private GradientEditor gradientEditor;
-
-	{
-		// initialize safe component set
-		safeComponents.add(saveSceneBtn);
-		safeComponents.add(sceneNameField);
-		safeComponents.add(sceneNameLbl);
-		safeComponents.add(openSceneDirBtn);
-		safeComponents.add(rayDepth.getLabel());
-		safeComponents.add(rayDepth.getSlider());
-		safeComponents.add(rayDepth.getField());
-		safeComponents.add(mergeDumpBtn);
-		safeComponents.add(saveDumpsCB);
-		safeComponents.add(dumpFrequencyCB);
-		safeComponents.add(dumpFrequencyLbl);
-		safeComponents.add(numThreads.getLabel());
-		safeComponents.add(numThreads.getSlider());
-		safeComponents.add(numThreads.getField());
-		safeComponents.add(cpuLoad.getLabel());
-		safeComponents.add(cpuLoad.getSlider());
-		safeComponents.add(cpuLoad.getField());
-		safeComponents.add(saveSnapshotsCB);
-		safeComponents.add(shutdownWhenDoneCB);
-	}
 
 	/**
 	 * Create a new Render Controls dialog.
@@ -552,12 +516,12 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		updateTitle();
 
-		addTab("General", Icon.wrench, generalPane = buildGeneralPane());
-		addTab("Lighting", Icon.colors, lightingPane = buildLightingPane());
-		addTab("Sky", Icon.sky, skyPane = buildSkyPane());
-		addTab("Camera", Icon.camera, cameraPane = buildCameraPane());
+		addTab("General", Icon.wrench, buildGeneralPane());
+		addTab("Lighting", Icon.colors, buildLightingPane());
+		addTab("Sky", Icon.sky, buildSkyPane());
+		addTab("Camera", Icon.camera, buildCameraPane());
 		addTab("Post-processing", null, buildPostProcessingPane());
-		addTab("Advanced", null, advancedPane = buildAdvancedPane());
+		addTab("Advanced", null, buildAdvancedPane());
 		addTab("Help", Texture.unknown, buildHelpPane());
 
 		JLabel sppTargetLbl = new JLabel("SPP Target: ");
@@ -606,29 +570,6 @@ public class RenderControls extends JDialog implements ViewListener,
 					}
 				}
 				stopRenderBtn.setEnabled(true);
-			}
-		});
-
-		autoLock.setText("auto lock");
-		autoLock.setSelected(PersistentSettings.getAutoLock());
-		autoLock.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JCheckBox source = (JCheckBox) e.getSource();
-				PersistentSettings.setAutoLock(source.isSelected());
-			}
-		});
-
-		lockBtn.setIcon(Icon.lock.imageIcon());
-		lockBtn.setToolTipText("Lock or unlock the render controls");
-		lockBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (controlsLocked) {
-					unlockControls();
-				} else {
-					lockControls();
-				}
 			}
 		});
 
@@ -681,7 +622,8 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(sceneNameLbl)
 					.addComponent(sceneNameField)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(saveSceneBtn))
+					.addComponent(saveSceneBtn)
+				)
 				.addComponent(tabbedPane)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(sppTargetLbl)
@@ -696,10 +638,6 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(startRenderBtn)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(stopRenderBtn)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(autoLock)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(lockBtn)
 				)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(saveFrameBtn)
@@ -738,8 +676,6 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(renderLbl)
 				.addComponent(startRenderBtn)
 				.addComponent(stopRenderBtn)
-				.addComponent(autoLock)
-				.addComponent(lockBtn)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
@@ -2336,82 +2272,64 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	@Override
 	public void onStrafeLeft() {
-		if (!controlsLocked) {
-	        renderMan.scene().camera().strafeLeft(
-	        		chunky.getShiftModifier() ? .1 : 1);
-			updateCameraPosition();
-		}
+		renderMan.scene().camera().strafeLeft(
+				chunky.getShiftModifier() ? .1 : 1);
+				updateCameraPosition();
 	}
 
 	@Override
 	public void onStrafeRight() {
-		if (!controlsLocked) {
-	        renderMan.scene().camera().strafeRight(
-	        		chunky.getShiftModifier() ? .1 : 1);
-			updateCameraPosition();
-		}
+		renderMan.scene().camera().strafeRight(
+				chunky.getShiftModifier() ? .1 : 1);
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveForward() {
-		if (!controlsLocked) {
-	        renderMan.scene().camera().moveForward(
-	        		chunky.getShiftModifier() ? .1 : 1);
-			updateCameraPosition();
-		}
+		renderMan.scene().camera().moveForward(
+				chunky.getShiftModifier() ? .1 : 1);
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveBackward() {
-		if (!controlsLocked) {
-	        renderMan.scene().camera().moveBackward(
-	        		chunky.getShiftModifier() ? .1 : 1);
-			updateCameraPosition();
-		}
+		renderMan.scene().camera().moveBackward(
+				chunky.getShiftModifier() ? .1 : 1);
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveForwardFar() {
-		if (!controlsLocked) {
-		    renderMan.scene().camera().moveForward(100);
-			updateCameraPosition();
-		}
+		renderMan.scene().camera().moveForward(100);
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveBackwardFar() {
-		if (!controlsLocked) {
-	        renderMan.scene().camera().moveBackward(100);
-			updateCameraPosition();
-		}
+		renderMan.scene().camera().moveBackward(100);
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveUp() {
-		if (!controlsLocked) {
-	        renderMan.scene().camera().moveUp(
-	        		chunky.getShiftModifier() ? .1 : 1);
-			updateCameraPosition();
-		}
+		renderMan.scene().camera().moveUp(
+				chunky.getShiftModifier() ? .1 : 1);
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveDown() {
-		if (!controlsLocked) {
-	        renderMan.scene().camera().moveDown(
-	        		chunky.getShiftModifier() ? .1 : 1);
-			updateCameraPosition();
-		}
+		renderMan.scene().camera().moveDown(
+				chunky.getShiftModifier() ? .1 : 1);
+		updateCameraPosition();
 	}
 
 	@Override
 	public void onMouseDragged(int dx, int dy) {
-		if (!controlsLocked) {
-	        renderMan.scene().camera().rotateView(
-	                - (Math.PI / 250) * dx,
-	                (Math.PI / 250) * dy);
-	        updateCameraDirection();
-		}
+		renderMan.scene().camera().rotateView(
+				- (Math.PI / 250) * dx,
+				(Math.PI / 250) * dy);
+		updateCameraDirection();
 	}
 
 	/**
@@ -2465,51 +2383,55 @@ public class RenderControls extends JDialog implements ViewListener,
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				skyHorizonOffset.update();
-				dof.update();
-				fov.update();
-				subjectDistance.update();
-				updateProjectionMode();
-				updateSkyGradient();
-				updateSkyMode();
-				updateCanvasSizeField();
-				emitterIntensity.update();
-				skyLight.update();
-				sunIntensity.update();
-				sunAzimuth.update();
-				sunAltitude.update();
-				updateStillWater();
-				updateClearWater();
-				updateSkyRotation();
-				updateMirroSkyCB();
-				updateBiomeColorsCB();
-				updateAtmosphereCheckBox();
-				updateVolumetricFogCheckBox();
-				updateCloudsEnabledCheckBox();
-				updateTitle();
-				exposure.update();
-				updateSaveDumpsCheckBox();
-				updateSaveSnapshotCheckBox();
-				updateDumpFrequencyField();
-				updateSPPTargetField();
-				updateSceneNameField();
-				updatePostprocessCB();
-				cloudSize.update();
-				cloudXOffset.update();
-				cloudYOffset.update();
-				cloudZOffset.update();
-				rayDepth.update();
-				updateWaterHeight();
-				updateCameraDirection();
-				updateCameraPosition();
-				updateCustomPresets();
-				enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
-				directLight.setSelected(renderMan.scene().getDirectLight());
-				stopRenderBtn.setEnabled(true);
+				updateAllSettings();
 
 				showPreviewWindow();
 			}
 		});
+	}
+
+	protected void updateAllSettings() {
+		skyHorizonOffset.update();
+		dof.update();
+		fov.update();
+		subjectDistance.update();
+		updateProjectionMode();
+		updateSkyGradient();
+		updateSkyMode();
+		updateCanvasSizeField();
+		emitterIntensity.update();
+		skyLight.update();
+		sunIntensity.update();
+		sunAzimuth.update();
+		sunAltitude.update();
+		updateStillWater();
+		updateClearWater();
+		updateSkyRotation();
+		updateMirroSkyCB();
+		updateBiomeColorsCB();
+		updateAtmosphereCheckBox();
+		updateVolumetricFogCheckBox();
+		updateCloudsEnabledCheckBox();
+		updateTitle();
+		exposure.update();
+		updateSaveDumpsCheckBox();
+		updateSaveSnapshotCheckBox();
+		updateDumpFrequencyField();
+		updateSPPTargetField();
+		updateSceneNameField();
+		updatePostprocessCB();
+		cloudSize.update();
+		cloudXOffset.update();
+		cloudYOffset.update();
+		cloudZOffset.update();
+		rayDepth.update();
+		updateWaterHeight();
+		updateCameraDirection();
+		updateCameraPosition();
+		updateCustomPresets();
+		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
+		directLight.setSelected(renderMan.scene().getDirectLight());
+		stopRenderBtn.setEnabled(true);
 	}
 
 	/**
@@ -2599,17 +2521,15 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	@Override
 	public void onZoom(int diff) {
-		if (!controlsLocked) {
-			Camera camera = renderMan.scene().camera();
-			double value = renderMan.scene().camera().getFoV();
-			double scale = camera.getMaxFoV() - camera.getMinFoV();
-			double offset = value/scale;
-			double newValue = scale*Math.exp(Math.log(offset) + 0.1*diff);
-			if (!Double.isNaN(newValue) && !Double.isInfinite(newValue)) {
-				renderMan.scene().camera().setFoV(newValue);
-			}
-			fov.update();
+		Camera camera = renderMan.scene().camera();
+		double value = renderMan.scene().camera().getFoV();
+		double scale = camera.getMaxFoV() - camera.getMinFoV();
+		double offset = value/scale;
+		double newValue = scale*Math.exp(Math.log(offset) + 0.1*diff);
+		if (!Double.isNaN(newValue) && !Double.isInfinite(newValue)) {
+			renderMan.scene().camera().setFoV(newValue);
 		}
+		fov.update();
 	}
 
 	/**
@@ -2621,9 +2541,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	@Override
 	public void renderStateChanged(boolean pathTrace, boolean paused) {
-		boolean lock = false;
 		if (pathTrace) {
-			lock = true;
 			if (paused) {
 				startRenderBtn.setText("RESUME");
 				startRenderBtn.setIcon(Icon.play.imageIcon());
@@ -2638,47 +2556,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			startRenderBtn.setIcon(Icon.play.imageIcon());
 			stopRenderBtn.setEnabled(false);
 			stopRenderBtn.setForeground(Color.black);
-		}
-		if (lock && autoLock.isSelected()) {
-			lockControls();
-		} else if (!lock) {
-			unlockControls();
-		}
-	}
-
-	private void lockControls() {
-		lockPane(generalPane);
-		lockPane(cameraPane);
-		lockPane(skyPane);
-		lockPane(lightingPane);
-		lockPane(advancedPane);
-		lockBtn.setIcon(Icon.key.imageIcon());
-		controlsLocked = true;
-	}
-
-	private void unlockControls() {
-		unlockPane(generalPane);
-		unlockPane(cameraPane);
-		unlockPane(skyPane);
-		unlockPane(lightingPane);
-		unlockPane(advancedPane);
-		lockBtn.setIcon(Icon.lock.imageIcon());
-		controlsLocked = false;
-	}
-
-	private void lockPane(JPanel pane) {
-		for (Component component: pane.getComponents()) {
-			if (!safeComponents.contains(component)) {
-				component.setEnabled(false);
-			}
-		}
-	}
-
-	private void unlockPane(JPanel pane) {
-		for (Component component: pane.getComponents()) {
-			if (!safeComponents.contains(component)) {
-				component.setEnabled(true);
-			}
 		}
 	}
 
@@ -2793,4 +2670,31 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
+
+	protected AtomicBoolean resetConfirmMutex = new AtomicBoolean(false);
+
+	@Override
+	public void renderResetPrevented() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if (resetConfirmMutex.compareAndSet(false, true)) {
+					new ConfirmResetPopup(RenderControls.this, new AcceptOrRejectListener() {
+						@Override
+						public void onAccept() {
+							renderMan.scene().resetRender();
+							resetConfirmMutex.set(false);
+						}
+
+						@Override
+						public void onReject() {
+							renderMan.revertPendingSceneChanges();
+							updateAllSettings();
+							resetConfirmMutex.set(false);
+						}
+					});
+				}
+			}
+		});
+	}
 }

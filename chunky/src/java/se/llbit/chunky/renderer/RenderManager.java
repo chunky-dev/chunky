@@ -42,6 +42,11 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	private static final Logger logger =
 			Logger.getLogger(RenderManager.class);
 
+	/**
+	 * Milliseconds until the reset confirmation must be shown.
+	 */
+	private static final long SCENE_EDIT_GRACE_PERIOD = 30000;
+
 	private boolean updateBuffer = false;
 	private boolean dumpNextFrame = false;
 
@@ -53,7 +58,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	/**
  	 * The modifiable scene.
  	 */
-	private final Scene scene;
+	private final Scene mutableScene;
 
 	/**
  	 * The buffered scene is only updated between
@@ -111,8 +116,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		this.oneshot = oneshot;
 		renderListener = statusListener;
 
-		scene = new Scene();
-		bufferedScene = new Scene(scene);
+		mutableScene = new Scene();
+		bufferedScene = new Scene(mutableScene);
 
 		numJobs = 0;
 		nextJob = new AtomicInteger(0);
@@ -148,12 +153,17 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 			while (!isInterrupted()) {
 
-				scene.waitOnRefreshRequest();
+				mutableScene.waitOnRefreshRequest();
 
 				synchronized (bufferMonitor) {
-					synchronized (scene) {
+					synchronized (mutableScene) {
 						updateRenderState();
-						bufferedScene.set(scene);
+						bufferedScene.copyRenderState(mutableScene);
+						if (mutableScene.shouldReset() || bufferedScene.renderTime <= SCENE_EDIT_GRACE_PERIOD) {
+							bufferedScene.set(mutableScene);
+						} else {
+							renderListener.renderResetPrevented();
+						}
 					}
 				}
 
@@ -177,9 +187,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	}
 
 	private void updateRenderState() {
-		if (pathTracing != scene.pathTrace() || paused != scene.isPaused()) {
-			pathTracing = scene.pathTrace();
-			paused = scene.isPaused();
+		if (pathTracing != mutableScene.pathTrace() || paused != mutableScene.isPaused()) {
+			pathTracing = mutableScene.pathTrace();
+			paused = mutableScene.isPaused();
 			renderListener.renderStateChanged(pathTracing, paused);
 		}
 	}
@@ -190,13 +200,13 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 		while (true) {
 
-			if (scene.isPaused()) {
+			if (mutableScene.isPaused()) {
 				updateRenderState();
-				scene.pauseWait();
+				mutableScene.pauseWait();
 				updateRenderState();
 			}
 
-			if (scene.shouldRefresh()) {
+			if (mutableScene.shouldRefresh()) {
 				return;
 			}
 
@@ -240,7 +250,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 			if (dumpNextFrame) {
 				// save the current frame
-				if (scene.shouldSaveSnapshots() ||
+				if (mutableScene.shouldSaveSnapshots() ||
 						bufferedScene.spp >= bufferedScene.getTargetSPP()) {
 					bufferedScene.saveSnapshot(context.getSceneDirectory());
 				}
@@ -250,8 +260,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			}
 
 			if (bufferedScene.spp >= bufferedScene.getTargetSPP()) {
-				scene.pauseRender();
-				renderListener.renderStateChanged(scene.pathTrace(), scene.isPaused());
+				mutableScene.pauseRender();
+				renderListener.renderStateChanged(mutableScene.pathTrace(), mutableScene.isPaused());
 				renderListener.renderJobFinished(bufferedScene.renderTime,
 						(int) samplesPerSecond);
 				if (oneshot) {
@@ -272,7 +282,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		while (true) {
 			if (!updateBuffer ||
 					bufferedScene.previewCount <= 0 ||
-					scene.shouldRefresh()) {
+					mutableScene.shouldRefresh()) {
 
 				return;
 			}
@@ -330,7 +340,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	}
 
 	private synchronized void giveTickets() {
-		bufferedScene.copyTransients(scene);
+		bufferedScene.copyTransients(mutableScene);
 		int nextSpp = bufferedScene.spp + RenderConstants.SPP_PASS;
 		dumpNextFrame = nextSpp >= bufferedScene.getTargetSPP() ||
 				bufferedScene.shouldSaveDumps() &&
@@ -383,10 +393,10 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 				// create backup of scene description and current render dump
 				backupFile(context.getSceneDescriptionFile(sceneName));
-				backupFile(scene.name() + ".dump");
+				backupFile(mutableScene.name() + ".dump");
 
 				// synchronize the transients
-				bufferedScene.copyTransients(scene);
+				bufferedScene.copyTransients(mutableScene);
 
 				bufferedScene.saveScene(context, renderListener);
 
@@ -435,14 +445,14 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 					bufferedScene.spp, 0,
 					bufferedScene.getTargetSPP());
 
-			scene.set(bufferedScene);
-			scene.copyTransients(bufferedScene);
-			scene.softRefresh();
+			mutableScene.set(bufferedScene);
+			mutableScene.copyTransients(bufferedScene);
+			mutableScene.softRefresh();
 			bufferedScene.updateCanvas();
 			canvas.repaint();
 
 			renderListener.sceneLoaded();
-			renderListener.renderStateChanged(scene.pathTrace(), scene.isPaused());
+			renderListener.renderStateChanged(mutableScene.pathTrace(), mutableScene.isPaused());
 		}
 	}
 
@@ -494,7 +504,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	 * @return The current scene object
 	 */
 	public Scene scene() {
-		return scene;
+		return mutableScene;
 	}
 
 	@Override
@@ -507,9 +517,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		if (flag != updateBuffer) {
 			updateBuffer = flag;
 			if (flag) {
-				synchronized (scene) {
-					if (!scene.pathTrace())
-						scene.refresh();
+				synchronized (mutableScene) {
+					if (!mutableScene.pathTrace())
+						mutableScene.refresh();
 				}
 				logger.debug("buffer finalization enabled");
 			} else {
@@ -524,8 +534,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	 * @param chunksToLoad
 	 */
 	public void loadFreshChunks(World world, Collection<ChunkPosition> chunksToLoad) {
-		scene.loadChunks(renderListener, world, chunksToLoad);
-		scene.moveCameraToCenter();
+		mutableScene.loadChunks(renderListener, world, chunksToLoad);
+		mutableScene.moveCameraToCenter();
 		renderListener.chunksLoaded();
 	}
 
@@ -535,8 +545,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	 * @param chunksToLoad
 	 */
 	public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
-		scene.loadChunks(renderListener, world, chunksToLoad);
-		scene.refresh();
+		mutableScene.loadChunks(renderListener, world, chunksToLoad);
+		mutableScene.refresh();
 		renderListener.chunksLoaded();
 	}
 
@@ -544,7 +554,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	 * Attempts to reload all loaded chunks
 	 */
 	public void reloadChunks() {
-		scene.reloadChunks(renderListener);
+		mutableScene.reloadChunks(renderListener);
 		renderListener.chunksLoaded();
 	}
 
@@ -586,6 +596,14 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		// Halt all worker threads
 		for (int i = 0; i < numThreads; ++i) {
 			workers[i].interrupt();
+		}
+	}
+
+	public void revertPendingSceneChanges() {
+		synchronized (mutableScene) {
+			mutableScene.set(bufferedScene);
+			// clear refresh flag
+			mutableScene.shouldRefresh();
 		}
 	}
 }

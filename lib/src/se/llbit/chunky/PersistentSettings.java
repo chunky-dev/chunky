@@ -165,15 +165,6 @@ public final class PersistentSettings {
 		save();
 	}
 
-	public static boolean getAutoLock() {
-		return settings.getBool("autoLock", true);
-	}
-
-	public static void setAutoLock(boolean selected) {
-		settings.setBool("autoLock", selected);
-		save();
-	}
-
 	public static void set3DCanvasSize(int width, int height) {
 		settings.setInt("3dcanvas.width", width);
 		settings.setInt("3dcanvas.height", height);

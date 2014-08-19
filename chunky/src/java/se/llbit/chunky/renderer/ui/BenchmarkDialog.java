@@ -302,4 +302,10 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 	public void renderJobFinished(long time, int sps) {
 		// TODO Auto-generated method stub
 	}
+
+	@Override
+	public void renderResetPrevented() {
+		// TODO Auto-generated method stub
+
+	}
 }

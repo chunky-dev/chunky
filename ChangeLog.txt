@@ -1,4 +1,8 @@
 1.3 - TBD
+    * Removed the "render lock/auto lock" features, they have been replaced
+      by an automatic scene reset confirmation dialog which appears if anything
+      that would reset the render has been changed after rendering for at least
+      thirty seconds.
     * Added Red Sandstone blocks, slabs, and stairs (from Minecraft snapshot)
     * Fixed a problem causing render progress to reset after loading a scene
     * Clouds can now be moved in all directions
