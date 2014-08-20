@@ -153,16 +153,17 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 			while (!isInterrupted()) {
 
-				mutableScene.waitOnRefreshRequest();
+				boolean refreshed = mutableScene.waitOnRefreshOrStateChange();
 
 				synchronized (bufferMonitor) {
 					synchronized (mutableScene) {
 						updateRenderState();
 						bufferedScene.copyRenderState(mutableScene);
-						if (mutableScene.shouldReset() || bufferedScene.renderTime <= SCENE_EDIT_GRACE_PERIOD) {
-							bufferedScene.set(mutableScene);
-						} else {
+						if (refreshed && !mutableScene.shouldReset() &&
+								bufferedScene.renderTime > SCENE_EDIT_GRACE_PERIOD) {
 							renderListener.renderResetPrevented();
+						} else {
+							bufferedScene.set(mutableScene);
 						}
 					}
 				}
@@ -445,9 +446,13 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 					bufferedScene.spp, 0,
 					bufferedScene.getTargetSPP());
 
-			mutableScene.set(bufferedScene);
-			mutableScene.copyTransients(bufferedScene);
-			mutableScene.softRefresh();
+			synchronized (mutableScene) {
+				// synchronized to ensure that refresh flag is never visibly true
+				mutableScene.set(bufferedScene);
+				mutableScene.copyRenderState(bufferedScene);
+				mutableScene.copyTransients(bufferedScene);
+				mutableScene.setRefreshed();
+			}
 			bufferedScene.updateCanvas();
 			canvas.repaint();
 
@@ -601,9 +606,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 	public void revertPendingSceneChanges() {
 		synchronized (mutableScene) {
+			// synchronized to ensure that refresh flag is never visibly true
 			mutableScene.set(bufferedScene);
-			// clear refresh flag
-			mutableScene.shouldRefresh();
+			mutableScene.setRefreshed();// clear refresh flag
 		}
 	}
 }

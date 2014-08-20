@@ -221,6 +221,7 @@ public class Scene extends SceneDescription {
 	 */
 	public Scene(Scene other) {
 		set(other);
+		copyRenderState(other);
 		copyTransients(other);
 	}
 
@@ -928,12 +929,17 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
+	 * @return {@code true} if the refresh happened
 	 * @throws InterruptedException
 	 */
-	public synchronized void waitOnRefreshRequest() throws InterruptedException {
+	public synchronized boolean waitOnRefreshOrStateChange() throws InterruptedException {
 		while ((!pathTrace || pauseRender) && !refresh)
 			wait();
-		refresh = false;
+		if (refresh) {
+			refresh = false;
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -1043,7 +1049,7 @@ public class Scene extends SceneDescription {
 	/**
 	 * Clear the scene refresh flag
 	 */
-	public void setRefreshed() {
+	synchronized public void setRefreshed() {
 		refresh = false;
 	}
 
@@ -1764,13 +1770,6 @@ public class Scene extends SceneDescription {
 	 */
 	public void setBufferFinalization(boolean value) {
 		finalizeBuffer = value;
-	}
-
-	/**
-	 * Refresh without resetting SPP count.
-	 */
-	public void softRefresh() {
-		refresh = true;
 	}
 
 	/**
