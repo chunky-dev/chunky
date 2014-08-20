@@ -229,7 +229,7 @@ public class Scene extends SceneDescription {
 	 * Set scene equal to other
 	 * @param other
 	 */
-	public void set(Scene other) {
+	synchronized public void set(Scene other) {
 		loadedWorld = other.loadedWorld;
 		worldPath = other.worldPath;
 		worldDimension = other.worldDimension;
