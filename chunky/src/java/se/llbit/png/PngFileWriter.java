@@ -16,6 +16,8 @@
  */
 package se.llbit.png;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,7 +33,7 @@ public class PngFileWriter {
 	 */
 	public static final long PNG_SIGNATURE = 0x89504E470D0A1A0AL;
 
-	private DataOutputStream out;
+	private final DataOutputStream out;
 
 	/**
 	 * @param file
@@ -55,5 +57,33 @@ public class PngFileWriter {
 	 */
 	public void close() throws IOException {
 		out.close();
+	}
+
+	/**
+	 * Write the image to the file
+	 * @param image
+	 * @param file
+	 */
+	public static void write(BufferedImage image, File file) throws IOException {
+		DataBufferInt dataBuf = (DataBufferInt) image.getData().getDataBuffer();
+		int[] data = dataBuf.getData();
+		int width = image.getWidth();
+		int height = image.getHeight();
+		PngFileWriter writer = new PngFileWriter(file);
+		writer.writeChunk(new IHDR(width, height));
+		int pixels = width*height;
+		int i = 0;
+		while (pixels > 0) {
+			int chunkSize = Math.min(pixels, 4000);
+			pixels -= chunkSize;
+			IDAT dat = new IDAT();
+			DataOutputStream dd = new DataOutputStream(dat.getIDATOutputStream());
+			for (int k = 0; k < chunkSize; ++k) {
+				dd.writeInt(data[i++]);
+			}
+			dd.close();
+			writer.writeChunk(dat);
+		}
+		writer.close();
 	}
 }

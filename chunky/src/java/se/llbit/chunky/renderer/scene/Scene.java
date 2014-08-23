@@ -60,6 +60,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Ray.RayPool;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector3i;
+import se.llbit.png.PngFileWriter;
 
 /**
  * Scene description.
@@ -1312,7 +1313,7 @@ public class Scene extends SceneDescription {
 			}
 			String fileName = name + "-" + spp + ".png";
 			logger.info("Saving frame " + fileName);
-			ImageIO.write(buffer, "png", new File(directory, fileName));
+			PngFileWriter.write(buffer, new File(directory, fileName));
 			logger.info("Frame saved");
 		} catch (IOException e) {
 			logger.warn("Failed to save current frame. Reason: " +
