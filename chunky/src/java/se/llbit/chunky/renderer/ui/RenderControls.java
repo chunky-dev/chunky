@@ -1834,7 +1834,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		public void actionPerformed(ActionEvent e) {
 			String size = (String) canvasSizeCB.getSelectedItem();
 			try {
-				Pattern regex = Pattern.compile("([0-9]+)[xX.]([0-9]+)");
+				Pattern regex = Pattern.compile("([0-9]+)[xX.*]([0-9]+)");
 				Matcher matcher = regex.matcher(size);
 				if (matcher.matches()) {
 					int width = Integer.parseInt(matcher.group(1));
