@@ -38,6 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.GroupLayout;
@@ -50,6 +51,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
@@ -120,13 +122,15 @@ public class RenderControls extends JDialog implements ViewListener,
 			NumberFormat.getInstance();
 
 	private final JSlider skymapRotationSlider = new JSlider();
+	private final JSlider lightProbeRotationSlider = new JSlider();
 	private final JSlider skyboxRotationSlider = new JSlider();
 	private final JButton loadSkymapBtn = new JButton();
+	private final JButton loadLightProbeBtn = new JButton();
 	private final JPanel simulatedSkyPanel = new JPanel();
 	private final JPanel skymapPanel = new JPanel();
+	private final JPanel lightProbePanel = new JPanel();
 	private final JPanel skyGradientPanel = new JPanel();
 	private final JPanel skyboxPanel = new JPanel();
-	private final JCheckBox mirrorSkyCB = new JCheckBox();
 	private final JComboBox canvasSizeCB = new JComboBox();
 	private final JComboBox cameraPreset = new JComboBox();
 	private final JComboBox customPreset = new JComboBox();
@@ -173,6 +177,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JTextField cameraRoll = new JTextField();
 	private final JButton mergeDumpBtn = new JButton("Merge Render Dump");
 	private final JCheckBox shutdownWhenDoneCB = new JCheckBox("Shutdown computer when render completes");
+	private final JRadioButton v90Btn = new JRadioButton("90");
+	private final JRadioButton v180Btn = new JRadioButton("180");
 
 	private final JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -1210,6 +1216,11 @@ public class RenderControls extends JDialog implements ViewListener,
 		skymapRotationSlider.setMaximum(100);
 		skymapRotationSlider.addChangeListener(skyRotationListener);
 		skymapRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
+		JLabel lightProbeRotationLbl = new JLabel("Skymap rotation:");
+		lightProbeRotationSlider.setMinimum(1);
+		lightProbeRotationSlider.setMaximum(100);
+		lightProbeRotationSlider.addChangeListener(skyRotationListener);
+		lightProbeRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
 		JLabel skyboxRotationLbl = new JLabel("Skybox rotation:");
 		skyboxRotationSlider.setMinimum(1);
 		skyboxRotationSlider.setMaximum(100);
@@ -1222,6 +1233,17 @@ public class RenderControls extends JDialog implements ViewListener,
 		cloudXOffset.update();
 		cloudYOffset.update();
 		cloudZOffset.update();
+
+		JLabel verticalResolutionLbl = new JLabel("Vertical resolution (degrees):");
+		ButtonGroup verticalResolution = new ButtonGroup();
+		v90Btn.setSelected(true);
+		v180Btn.setSelected(false);
+		verticalResolution.add(v90Btn);
+		verticalResolution.add(v180Btn);
+
+		v90Btn.addActionListener(v90Listener);
+		v180Btn.addActionListener(v180Listener);
+		updateVerticalResolution();
 
 		simulatedSkyPanel.setBorder(BorderFactory.createTitledBorder("Simulated Sky Settings"));
 		GroupLayout simulatedSkyLayout = new GroupLayout(simulatedSkyPanel);
@@ -1246,24 +1268,57 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(skymapRotationLbl)
 				.addComponent(skymapRotationSlider)
 			)
-			.addComponent(mirrorSkyCB)
+			.addGroup(skymapLayout.createSequentialGroup()
+				.addComponent(verticalResolutionLbl)
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addComponent(v90Btn)
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addComponent(v180Btn)
+			)
 		);
 		skymapLayout.setVerticalGroup(skymapLayout.createSequentialGroup()
 			.addComponent(loadSkymapBtn)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(skymapLayout.createParallelGroup(Alignment.BASELINE)
+				.addComponent(verticalResolutionLbl)
+				.addComponent(v90Btn)
+				.addComponent(v180Btn)
+			)
+			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(skymapLayout.createParallelGroup()
 				.addComponent(skymapRotationLbl)
 				.addComponent(skymapRotationSlider)
 			)
-			.addComponent(mirrorSkyCB)
 		);
 
 		loadSkymapBtn.setText("Load Skymap");
 		loadSkymapBtn.setToolTipText("Use a panoramic skymap");
 		loadSkymapBtn.addActionListener(new SkymapTextureLoader(renderMan));
 
-		mirrorSkyCB.setText("Mirror sky at horizon");
-		mirrorSkyCB.addActionListener(mirrorSkyListener);
-		updateMirroSkyCB();
+		lightProbePanel.setBorder(BorderFactory.createTitledBorder("Spherical Skymap Settings"));
+		GroupLayout lightProbeLayout = new GroupLayout(lightProbePanel);
+		lightProbePanel.setLayout(lightProbeLayout);
+		lightProbeLayout.setAutoCreateContainerGaps(true);
+		lightProbeLayout.setAutoCreateGaps(true);
+		lightProbeLayout.setHorizontalGroup(lightProbeLayout.createParallelGroup()
+			.addComponent(loadLightProbeBtn)
+			.addGroup(lightProbeLayout.createSequentialGroup()
+				.addComponent(lightProbeRotationLbl)
+				.addComponent(lightProbeRotationSlider)
+			)
+		);
+		lightProbeLayout.setVerticalGroup(lightProbeLayout.createSequentialGroup()
+			.addComponent(loadLightProbeBtn)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(lightProbeLayout.createParallelGroup()
+				.addComponent(lightProbeRotationLbl)
+				.addComponent(lightProbeRotationSlider)
+			)
+		);
+
+		loadLightProbeBtn.setText("Load Spherical Skymap");
+		loadLightProbeBtn.setToolTipText("Select the spherical skymap to use");
+		loadLightProbeBtn.addActionListener(new SkymapTextureLoader(renderMan));
 
 		skyGradientPanel.setBorder(BorderFactory.createTitledBorder("Sky Gradient"));
 		gradientEditor = new GradientEditor();
@@ -1374,6 +1429,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				)
 				.addComponent(simulatedSkyPanel)
 				.addComponent(skymapPanel)
+				.addComponent(lightProbePanel)
 				.addComponent(skyGradientPanel)
 				.addComponent(skyboxPanel)
 				.addComponent(atmosphereEnabled)
@@ -1395,6 +1451,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(simulatedSkyPanel)
 			.addComponent(skymapPanel)
+			.addComponent(lightProbePanel)
 			.addComponent(skyGradientPanel)
 			.addComponent(skyboxPanel)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -1782,10 +1839,14 @@ public class RenderControls extends JDialog implements ViewListener,
 		atmosphereEnabled.addActionListener(atmosphereListener);
 	}
 
-	protected void updateMirroSkyCB() {
-		mirrorSkyCB.removeActionListener(mirrorSkyListener);
-		mirrorSkyCB.setSelected(renderMan.scene().sky().isMirrored());
-		mirrorSkyCB.addActionListener(mirrorSkyListener);
+	protected void updateVerticalResolution() {
+		v90Btn.removeActionListener(v90Listener);
+		v180Btn.removeActionListener(v180Listener);
+		boolean mirror = renderMan.scene().sky().isMirrored();
+		v90Btn.setSelected(mirror);
+		v180Btn.setSelected(!mirror);
+		v90Btn.addActionListener(v90Listener);
+		v180Btn.addActionListener(v180Listener);
 	}
 
 	protected void updateVolumetricFogCheckBox() {
@@ -2082,11 +2143,20 @@ public class RenderControls extends JDialog implements ViewListener,
 			renderMan.scene().sky().setCloudsEnabled(source.isSelected());
 		}
 	};
-	private final ActionListener mirrorSkyListener = new ActionListener() {
+	private final ActionListener v90Listener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JCheckBox source = (JCheckBox) e.getSource();
-			renderMan.scene().sky().setMirrored(source.isSelected());
+			if (v90Btn.isSelected()) {
+				renderMan.scene().sky().setMirrored(true);
+			}
+		}
+	};
+	private final ActionListener v180Listener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (v180Btn.isSelected()) {
+				renderMan.scene().sky().setMirrored(false);
+			}
 		}
 	};
 	private final ActionListener biomeColorsCBListener = new ActionListener() {
@@ -2151,7 +2221,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		SkyMode mode = renderMan.scene().sky().getSkyMode();
 		skyModeCB.setSelectedItem(mode);
 		simulatedSkyPanel.setVisible(mode == SkyMode.SIMULATED);
-		skymapPanel.setVisible(mode == SkyMode.SKYMAP_PANORAMIC || mode == SkyMode.SKYMAP_SPHERICAL);
+		skymapPanel.setVisible(mode == SkyMode.SKYMAP_PANORAMIC);
+		lightProbePanel.setVisible(mode == SkyMode.SKYMAP_SPHERICAL);
 		skyGradientPanel.setVisible(mode == SkyMode.GRADIENT);
 		skyboxPanel.setVisible(mode == SkyMode.SKYBOX);
 		skyModeCB.addActionListener(skyModeListener);
@@ -2412,7 +2483,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateStillWater();
 		updateClearWater();
 		updateSkyRotation();
-		updateMirroSkyCB();
+		updateVerticalResolution();
 		updateBiomeColorsCB();
 		updateAtmosphereCheckBox();
 		updateVolumetricFogCheckBox();
