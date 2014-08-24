@@ -23,6 +23,8 @@ import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -914,6 +916,16 @@ public class RenderControls extends JDialog implements ViewListener,
 		canvasSizeCB.addItem("960x540");
 		canvasSizeCB.addItem("1920x1080");
 		canvasSizeCB.addActionListener(canvasSizeListener);
+		final JTextField canvasSizeEditor = (JTextField) canvasSizeCB.getEditor().getEditorComponent();
+		canvasSizeEditor.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent e) {
+			}
+			@Override
+			public void focusGained(FocusEvent e) {
+				canvasSizeEditor.selectAll();
+			}
+		});
 
 		updateCanvasSizeField();
 
