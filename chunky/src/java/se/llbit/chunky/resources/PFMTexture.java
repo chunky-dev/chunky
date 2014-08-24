@@ -25,7 +25,10 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
+
 public class PFMTexture extends AbstractHDRITexture {
+	private static final Logger logger = Logger.getLogger(PFMTexture.class);
 
 	public PFMTexture(File file) {
 		try {
@@ -38,23 +41,19 @@ public class PFMTexture extends AbstractHDRITexture {
 			} else if (fmt.equals("Pf")) {
 				components = 1;
 			} else {
-				System.err.println("Warning: unknown PFM format!");
+				logger.warn("Unknown PFM format!");
 			}
-			System.out.println(fmt);
 			width = Integer.parseInt(scan.next());
-			System.out.println(width);
 			height = Integer.parseInt(scan.next());
-			System.out.println(height);
 			float endianScale = Float.parseFloat(scan.next());
 			boolean bigEndian = true;
-			float scale;// not used yet
+//			float scale;// not used yet
 			if (endianScale < 0) {
-				scale = -endianScale;
+//				scale = -endianScale;
 				bigEndian = false;
 			} else {
-				scale = endianScale;
+//				scale = endianScale;
 			}
-			System.out.println(endianScale);
 			scan.close();
 			RandomAccessFile f = new RandomAccessFile(file, "r");
 			long len = f.length();
@@ -83,7 +82,7 @@ public class PFMTexture extends AbstractHDRITexture {
 			}
 			f.close();
 		} catch (IOException e) {
-			System.err.println("Error loading PFM: " + e.getMessage());
+			logger.error("Error loading PFM image: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

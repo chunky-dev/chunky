@@ -24,7 +24,12 @@ import java.nio.channels.FileChannel;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 public class HDRTexture extends AbstractHDRITexture {
+	private static final Logger logger =
+			Logger.getLogger(HDRTexture.class);
+
 	public float[] buf;
 
 	public HDRTexture(File file) {
@@ -36,6 +41,7 @@ public class HDRTexture extends AbstractHDRITexture {
 			RandomAccessFile raf = new RandomAccessFile(file, "r");
 			String fmt = raf.readLine();
 			if (!fmt.equals("#?RADIANCE")) {
+				raf.close();
 				throw new Error("not a recognized HDR format! Can only handle RGBE!");
 			}
 			boolean haveFormat = false;
@@ -52,15 +58,18 @@ public class HDRTexture extends AbstractHDRITexture {
 				}
 			}
 			if (!haveFormat) {
+				raf.close();
 				throw new Error("could not find image format!");
 			}
 			if (!format.equals("FORMAT=32-bit_rle_rgbe")) {
+				raf.close();
 				throw new Error("only 32-bit RGBE HDR format supported!");
 			}
 			String resolution = raf.readLine();
 			Pattern regex = Pattern.compile("-Y\\s(\\d+)\\s\\+X\\s(\\d+)");
 			Matcher matcher = regex.matcher(resolution);
 			if (!matcher.matches()) {
+				raf.close();
 				throw new Error("unrecognized pixel order");
 			}
 			width = Integer.parseInt(matcher.group(2));
@@ -103,7 +112,7 @@ public class HDRTexture extends AbstractHDRITexture {
 			}
 			raf.close();
 		} catch (IOException e) {
-			System.err.println("Error loading PFM: " + e.getMessage());
+			logger.error("Error loading HRD image: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
