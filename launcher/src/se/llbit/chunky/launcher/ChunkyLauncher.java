@@ -58,7 +58,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame implements UpdateListener {
 
-	private static final String LAUNCHER_VERSION = "v1.8.5";
+	private static final String LAUNCHER_VERSION = "v1.8.6";
 
 	protected String java;
 	private final ChunkyDeployer deployer;
@@ -324,9 +324,9 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(alwaysShowLauncherCB)
 					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addComponent(launchBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(cancelBtn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(launchBtn)
 				)
 			)
 		);
