@@ -70,15 +70,14 @@ public class PngFileWriter {
 	 * @param file
 	 * @param progressListener
 	 */
-	public static void write(BufferedImage image, File file,
-			ProgressListener progressListener) throws IOException {
+	public void write(BufferedImage image, ProgressListener progressListener)
+			throws IOException {
 		DataBufferInt dataBuf = (DataBufferInt) image.getData().getDataBuffer();
 		int[] data = dataBuf.getData();
 		int width = image.getWidth();
 		int height = image.getHeight();
-		PngFileWriter writer = new PngFileWriter(file);
-		writer.writeChunk(new IHDR(width, height));
-		IDATWriter idat = writer.new IDATWriter();
+		writeChunk(new IHDR(width, height));
+		IDATWriter idat = new IDATWriter();
 		int i = 0;
 		for (int y = 0; y < height; ++y) {
 			progressListener.setProgress("Writing PNG", y, 0, height);
@@ -92,7 +91,6 @@ public class PngFileWriter {
 			progressListener.setProgress("Writing PNG", y+1, 0, height);
 		}
 		idat.close();
-		writer.close();
 	}
 
 	class IDATWriter {

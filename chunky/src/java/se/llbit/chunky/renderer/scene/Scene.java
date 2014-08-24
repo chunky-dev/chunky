@@ -58,6 +58,8 @@ import se.llbit.math.Ray;
 import se.llbit.math.Ray.RayPool;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector3i;
+import se.llbit.png.IEND;
+import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
 
 /**
@@ -1338,11 +1340,43 @@ public class Scene extends SceneDescription {
 	 * @param targetFile
 	 * @param progressListener
 	 */
-	static private void writePNG(BufferedImage buffer, File targetFile,
+	private void writePNG(BufferedImage buffer, File targetFile,
 			ProgressListener progressListener) {
 		try {
 			progressListener.setProgress("Writing PNG", 0, 0, 1);
-			PngFileWriter.write(buffer, targetFile, progressListener);
+			PngFileWriter writer = new PngFileWriter(targetFile);
+			writer.write(buffer, progressListener);
+			if (camera.getProjectionMode() == ProjectionMode.PANORAMIC &&
+					camera.getFoV() >= 179 && camera.getFoV() <= 181) {
+				int height = buffer.getHeight();
+				int width = buffer.getWidth();
+				StringBuilder xmp = new StringBuilder();
+				xmp.append("<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>\n");
+				xmp.append(" <rdf:Description rdf:about=''\n");
+				xmp.append("   xmlns:GPano='http://ns.google.com/photos/1.0/panorama/'>\n");
+				xmp.append(" <GPano:CroppedAreaImageHeightPixels>");
+				xmp.append(height);
+				xmp.append("</GPano:CroppedAreaImageHeightPixels>\n");
+				xmp.append(" <GPano:CroppedAreaImageWidthPixels>");
+				xmp.append(width);
+				xmp.append("</GPano:CroppedAreaImageWidthPixels>\n");
+				xmp.append(" <GPano:CroppedAreaLeftPixels>0</GPano:CroppedAreaLeftPixels>\n");
+				xmp.append(" <GPano:CroppedAreaTopPixels>0</GPano:CroppedAreaTopPixels>\n");
+				xmp.append(" <GPano:FullPanoHeightPixels>");
+				xmp.append(height);
+				xmp.append("</GPano:FullPanoHeightPixels>\n");
+				xmp.append(" <GPano:FullPanoWidthPixels>");
+				xmp.append(width);
+				xmp.append("</GPano:FullPanoWidthPixels>\n");
+				xmp.append(" <GPano:ProjectionType>equirectangular</GPano:ProjectionType>\n");
+				xmp.append(" <GPano:UsePanoramaViewer>True</GPano:UsePanoramaViewer>\n");
+				xmp.append(" </rdf:Description>\n");
+				xmp.append(" </rdf:RDF>");
+				ITXT iTXt = new ITXT("XML:com.adobe.xmp", xmp.toString());
+				writer.writeChunk(iTXt);
+			}
+			writer.writeChunk(new IEND());
+			writer.close();
 		} catch (IOException e) {
 			logger.warn("Failed to write PNG file: " + e.getMessage(), e);
 		}
