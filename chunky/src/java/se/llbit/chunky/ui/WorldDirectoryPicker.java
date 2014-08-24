@@ -74,11 +74,28 @@ public class WorldDirectoryPicker extends JDialog {
 		JLabel lbl = new JLabel("Please select the directory where your Minecraft worlds are stored:");
 
 		File initialDirectory = PersistentSettings.getLastWorld();
+		if (initialDirectory != null && initialDirectory.isDirectory()) {
+			initialDirectory = initialDirectory.getParentFile();
+		}
 
 		if (!isValidSelection(initialDirectory)) {
 			initialDirectory = MinecraftFinder.getSavesDirectory();
 		}
 		pathField.setText(initialDirectory.getAbsolutePath());
+
+		JButton defaultBtn = new JButton("Default");
+		defaultBtn.setToolTipText("Select the default world directory");
+		defaultBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				File worldDir = MinecraftFinder.getSavesDirectory();
+				if (!isValidSelection(worldDir)) {
+					logger.warn("Could not find Minecraft installation!");
+				} else {
+					pathField.setText(worldDir.getAbsolutePath());
+				}
+			}
+		});
 
 		JButton browseBtn = new JButton("Browse...");
 		browseBtn.addActionListener(new ActionListener() {
@@ -110,7 +127,6 @@ public class WorldDirectoryPicker extends JDialog {
 				if (!isValidSelection(getSelectedDirectory())) {
 					logger.warn("Please select a valid directory!");
 				} else {
-					PersistentSettings.setLastWorld(getSelectedDirectory());
 					accepted = true;
 					WorldDirectoryPicker.this.dispose();
 				}
@@ -130,6 +146,8 @@ public class WorldDirectoryPicker extends JDialog {
 					.addGroup(layout.createSequentialGroup()
 						.addComponent(pathField)
 						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(defaultBtn)
+						.addPreferredGap(ComponentPlacement.RELATED)
 						.addComponent(browseBtn))
 					.addGroup(layout.createSequentialGroup()
 						.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -146,6 +164,7 @@ public class WorldDirectoryPicker extends JDialog {
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addGroup(layout.createParallelGroup()
 					.addComponent(pathField)
+					.addComponent(defaultBtn)
 					.addComponent(browseBtn))
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addGroup(layout.createParallelGroup()
@@ -185,7 +204,7 @@ public class WorldDirectoryPicker extends JDialog {
 	 */
 	public static File getWorldDirectory(JFrame parent) {
 		File worldDir = PersistentSettings.getLastWorld();
-		if (worldDir == null) {
+		if (worldDir == null || !worldDir.isDirectory()) {
 			worldDir = MinecraftFinder.getSavesDirectory();
 		} else {
 			worldDir = worldDir.getParentFile();
@@ -200,10 +219,11 @@ public class WorldDirectoryPicker extends JDialog {
 			worldDir = sceneDirPicker.getSelectedDirectory();
 		}
 
-		if (isValidSelection(worldDir))
+		if (isValidSelection(worldDir)) {
 			return worldDir;
-		else
+		} else {
 			return null;
+		}
 	}
 
 	private static boolean isValidSelection(File worldDir) {
