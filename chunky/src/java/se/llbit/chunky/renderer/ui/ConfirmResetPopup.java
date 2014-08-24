@@ -96,21 +96,22 @@ public class ConfirmResetPopup extends JDialog {
 			.addComponent(description)
 			.addGroup(layout.createSequentialGroup()
 				.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-				.addComponent(okBtn)
-				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(cancelBtn)
+				.addPreferredGap(ComponentPlacement.UNRELATED)
+				.addComponent(okBtn)
 			)
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addComponent(description)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
-				.addComponent(okBtn)
 				.addComponent(cancelBtn)
+				.addComponent(okBtn)
 			)
 		);
 		setContentPane(panel);
 		getRootPane().setDefaultButton(cancelBtn);
+		cancelBtn.requestFocus();
 
 		pack();
 		setVisible(true);
