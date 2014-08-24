@@ -242,11 +242,11 @@ public class World implements Comparable<World> {
 
 		} catch (FileNotFoundException e) {
 			if (logWarnings) {
-				logger.warn("Could not find level.dat file for the world " + levelName + "!");
+				logger.info("Could not find level.dat file for the world '" + levelName + "'!");
 			}
 		} catch (IOException e) {
 			if (logWarnings) {
-				logger.warn("Could not read the level.dat file for the world " + levelName + "!");
+				logger.info("Could not read the level.dat file for the world '" + levelName + "'!");
 			}
 		}
 		return false;

@@ -26,12 +26,17 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import org.apache.log4j.Logger;
+
 /**
  * Abstract region representation.
  * Tracks chunks.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Region implements Iterable<Chunk> {
+
+	private static final Logger logger =
+			Logger.getLogger(Region.class);
 
 	/**
 	 * Region X chunk width
@@ -113,6 +118,9 @@ public class Region implements Iterable<Chunk> {
 	 */
 	public synchronized void parse() {
 		File regionFile = new File(world.getRegionDirectory(), fileName);
+		if (!regionFile.isFile()) {
+			return;
+		}
 		RandomAccessFile file = null;
 		try {
 			long modtime = regionFile.lastModified();
@@ -123,8 +131,7 @@ public class Region implements Iterable<Chunk> {
 			file = new RandomAccessFile(regionFile, "r");
 			long length = file.length();
 			if (length < 2*SECTOR_SIZE) {
-				// TODO error - missing headers!
-				System.err.println("Missing header in region file!");
+				logger.warn("Missing header in region file!");
 				return;
 			}
 
@@ -155,7 +162,7 @@ public class Region implements Iterable<Chunk> {
 			world.regionUpdated(position);
 
 		} catch (IOException e) {
-			System.err.println("Problem while reading chunk: " + e.getMessage());
+			logger.warn("Failed to read region: " + e.getMessage());
 		} finally {
 			if (file != null) {
 				try {
@@ -201,14 +208,20 @@ public class Region implements Iterable<Chunk> {
 	/**
 	 * Opens an input stream for the given chunk
 	 * @param chunkPos chunk position
-	 * @return Chunk data
+	 * @return Chunk data, or {@code null} if the chunk could not be read
 	 */
 	public ChunkData getChunkData(ChunkPosition chunkPos) {
 		File regionDirectory = world.getRegionDirectory();
 		File regionFile = new File(regionDirectory, fileName);
-		ChunkData data = getChunkData(regionFile, chunkPos);
-		chunkTimestamps[(chunkPos.x&31) + (chunkPos.z&31)*32] = data.timestamp;
-		return data;
+		if (regionFile.exists()) {
+			ChunkData data = getChunkData(regionFile, chunkPos);
+			if (data != null) {
+				chunkTimestamps[(chunkPos.x&31) + (chunkPos.z&31)*32] = data.timestamp;
+			}
+			return data;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -226,8 +239,7 @@ public class Region implements Iterable<Chunk> {
 			file = new RandomAccessFile(regionFile, "r");
 			long length = file.length();
 			if (length < 2*SECTOR_SIZE) {
-				// TODO error - missing headers!
-				System.err.println("Missing header in region file!");
+				logger.warn("Missing header in region file!");
 				return null;
 			}
 			file.seek(4 * index);
@@ -264,7 +276,7 @@ public class Region implements Iterable<Chunk> {
 			}
 
 		} catch (IOException e) {
-			System.err.println("Problem while reading chunk: " + e.getMessage());
+			logger.warn("Failed to read chunk: " + e.getMessage());
 		} finally {
 			if (file != null) {
 				try {
@@ -292,14 +304,13 @@ public class Region implements Iterable<Chunk> {
 			file = new RandomAccessFile(regionFile, "rw");
 			long length = file.length();
 			if (length < 2*SECTOR_SIZE) {
-				// TODO error - missing headers!
-				System.err.println("Missing header in region file!");
+				logger.warn("Missing header in region file!");
 				return;
 			}
 			file.seek(4 * index);
 			file.writeInt(0);
 		} catch (IOException e) {
-			System.err.println("Problem while deleting chunk: " + e.getMessage());
+			logger.warn("Failed to delete chunk: " + e.getMessage());
 		} finally {
 			if (file != null) {
 				try {
