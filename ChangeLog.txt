@@ -1,4 +1,6 @@
 1.3 - TBD
+    * Attempted to make PNG writing more efficient (PNG is split into 1 MiB
+      chunks)
     * Removed the "render lock/auto lock" features, they have been replaced
       by an automatic scene reset confirmation dialog which appears if anything
       that would reset the render has been changed after rendering for at least

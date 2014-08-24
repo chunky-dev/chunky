@@ -1938,7 +1938,12 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final ActionListener saveFrameListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			renderMan.saveFrame(RenderControls.this);
+			new Thread() {
+				@Override
+				public void run() {
+					renderMan.saveSnapshot(RenderControls.this);
+				}
+			}.start();
 		}
 	};
 	private final ActionListener loadSceneListener = new ActionListener() {
@@ -2492,9 +2497,11 @@ public class RenderControls extends JDialog implements ViewListener,
 		if (progressBar != null && progressLbl != null && etaLbl != null) {
 			progressLbl.setText(String.format("%s: %s of %s",
 					task, decimalFormat.format(done), decimalFormat.format(target)));
+			progressLbl.repaint();
 			progressBar.setMinimum(start);
 			progressBar.setMaximum(target);
 			progressBar.setValue(Math.min(target, done));
+			progressBar.repaint();
 			etaLbl.setText("ETA: N/A");
 		}
 	}

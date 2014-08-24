@@ -129,8 +129,8 @@ public class IDAT extends PngChunk {
 		crcOut.write(compressedData);
 		out.write(compressedData);
 
-		crc = crcOutputStream.getCRC();
 		crcOut.close();
+		crc = crcOutputStream.getCRC();
 	}
 
 	@Override

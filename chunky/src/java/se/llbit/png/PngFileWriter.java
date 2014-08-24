@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -22,6 +22,9 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.zip.Deflater;
+
+import se.llbit.chunky.renderer.ProgressListener;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -32,6 +35,8 @@ public class PngFileWriter {
 	 * PNG magic value
 	 */
 	public static final long PNG_SIGNATURE = 0x89504E470D0A1A0AL;
+
+	public static final int MAX_CHUNK_BYTES = 1000000;// max input/output buffer size
 
 	private final DataOutputStream out;
 
@@ -63,27 +68,90 @@ public class PngFileWriter {
 	 * Write the image to the file
 	 * @param image
 	 * @param file
+	 * @param progressListener
 	 */
-	public static void write(BufferedImage image, File file) throws IOException {
+	public static void write(BufferedImage image, File file,
+			ProgressListener progressListener) throws IOException {
 		DataBufferInt dataBuf = (DataBufferInt) image.getData().getDataBuffer();
 		int[] data = dataBuf.getData();
 		int width = image.getWidth();
 		int height = image.getHeight();
 		PngFileWriter writer = new PngFileWriter(file);
 		writer.writeChunk(new IHDR(width, height));
-		int pixels = width*height;
+		IDATWriter idat = writer.new IDATWriter();
 		int i = 0;
-		while (pixels > 0) {
-			int chunkSize = Math.min(pixels, 4000);
-			pixels -= chunkSize;
-			IDAT dat = new IDAT();
-			DataOutputStream dd = new DataOutputStream(dat.getIDATOutputStream());
-			for (int k = 0; k < chunkSize; ++k) {
-				dd.writeInt(data[i++]);
+		for (int y = 0; y < height; ++y) {
+			progressListener.setProgress("Writing PNG", y, 0, height);
+			idat.write(IDAT.FILTER_TYPE_NONE);// scanline header
+			for (int x = 0; x < width; ++x) {
+				int rgb = data[i++];
+				idat.write((rgb>>16)&0xFF);
+				idat.write((rgb>>8)&0xFF);
+				idat.write(rgb&0xFF);
 			}
-			dd.close();
-			writer.writeChunk(dat);
+			progressListener.setProgress("Writing PNG", y+1, 0, height);
 		}
+		idat.close();
 		writer.close();
+	}
+
+	class IDATWriter {
+		Deflater deflater = new Deflater();
+		int inputSize = 0;
+		byte[] inputBuf = new byte[MAX_CHUNK_BYTES];
+		int outputSize = 0;
+		byte[] outputBuf = new byte[MAX_CHUNK_BYTES];
+
+		void write(int b) throws IOException {
+			if (inputSize == MAX_CHUNK_BYTES) {
+				deflater.setInput(inputBuf, 0, inputSize);
+				inputSize = 0;
+				deflate();
+			}
+			inputBuf[inputSize++] = (byte) b;
+		}
+
+		private void deflate() throws IOException {
+			int deflated;
+			do {
+				if (outputSize == MAX_CHUNK_BYTES) {
+					writeChunk();
+				}
+				deflated = deflater.deflate(outputBuf, outputSize,
+						MAX_CHUNK_BYTES-outputSize);
+				outputSize += deflated;
+			} while (deflated != 0);
+		}
+
+		private void writeChunk() throws IOException {
+			out.writeInt(outputSize);
+
+			CrcOutputStream crcOut = new CrcOutputStream();
+			DataOutputStream crc = new DataOutputStream(crcOut);
+
+			crc.writeInt(IDAT.CHUNK_TYPE);
+			out.writeInt(IDAT.CHUNK_TYPE);
+
+			crc.write(outputBuf, 0, outputSize);
+			out.write(outputBuf, 0, outputSize);
+
+			out.writeInt(crcOut.getCRC());
+			crc.close();
+
+			outputSize = 0;
+		}
+
+		void close() throws IOException {
+			if (inputSize > 0) {
+				deflater.setInput(inputBuf, 0, inputSize);
+				deflater.finish();
+				inputSize = 0;
+				deflate();
+			}
+			if (outputSize > 0) {
+				writeChunk();
+			}
+			deflater.end();
+		}
 	}
 }

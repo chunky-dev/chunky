@@ -253,11 +253,13 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				// save the current frame
 				if (mutableScene.shouldSaveSnapshots() ||
 						bufferedScene.spp >= bufferedScene.getTargetSPP()) {
-					bufferedScene.saveSnapshot(context.getSceneDirectory());
+					bufferedScene.saveSnapshot(context.getSceneDirectory(), renderListener);
 				}
 
 				// save scene description and render dump
 				saveScene();
+				renderListener.setProgress("Rendering", bufferedScene.spp,
+						0, target, eta);
 			}
 
 			if (bufferedScene.spp >= bufferedScene.getTargetSPP()) {
@@ -470,7 +472,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	 * Save the current frame as a PNG image.
 	 * @param progressListener
 	 */
-	public synchronized void saveFrame(ProgressListener progressListener) {
+	public synchronized void saveSnapshot(ProgressListener progressListener) {
 
 		CenteredFileDialog fileDialog = new CenteredFileDialog(null,
 				"Save Current Frame", FileDialog.SAVE);

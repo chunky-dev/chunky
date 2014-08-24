@@ -30,13 +30,13 @@ public class IHDR extends PngChunk {
 	public static final int CHUNK_TYPE = 0x49484452;
 
 	private static final int BIT_DEPTH = 8;
-	private static final int COLOUR_TYPE = 2;
-	private static final int COMPRESSION_METHOD = 0;
+	private static final int COLOUR_TYPE = 2;// each pixel is an RGB triple
+	private static final int COMPRESSION_METHOD = 0;// deflate/inflate
 	private static final int FILTER_METHOD = 0;
 	private static final int INTERLACE_METHOD = 0;
 	private int crc;
-	private int width;
-	private int height;
+	private final int width;
+	private final int height;
 
 	/**
 	 * @param width

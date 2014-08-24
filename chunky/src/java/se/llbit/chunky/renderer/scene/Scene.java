@@ -33,8 +33,6 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import javax.imageio.ImageIO;
-
 import org.apache.commons.math3.util.FastMath;
 import org.apache.log4j.Logger;
 
@@ -1303,22 +1301,17 @@ public class Scene extends SceneDescription {
 	/**
 	 * Save a snapshot
 	 * @param directory
+	 * @param progressListener
 	 */
-	public void saveSnapshot(File directory) {
+	public void saveSnapshot(File directory, ProgressListener progressListener) {
 
-		try {
-			if (directory == null) {
-				logger.error("Fatal error: bad scene directory!");
-				return;
-			}
-			String fileName = name + "-" + spp + ".png";
-			logger.info("Saving frame " + fileName);
-			PngFileWriter.write(buffer, new File(directory, fileName));
-			logger.info("Frame saved");
-		} catch (IOException e) {
-			logger.warn("Failed to save current frame. Reason: " +
-				e.getMessage(), e);
+		if (directory == null) {
+			logger.error("Fatal error: bad output directory!");
+			return;
 		}
+		String fileName = name + "-" + spp + ".png";
+		File targetFile = new File(directory, fileName);
+		writePNG(buffer, targetFile, progressListener);
 	}
 
 	/**
@@ -1336,7 +1329,24 @@ public class Scene extends SceneDescription {
 			}
 		}
 
-		ImageIO.write(backBuffer, "png", targetFile);
+		writePNG(backBuffer, targetFile, progressListener);
+	}
+
+	/**
+	 * Write PNG image.
+	 * @param buffer
+	 * @param targetFile
+	 * @param progressListener
+	 */
+	static private void writePNG(BufferedImage buffer, File targetFile,
+			ProgressListener progressListener) {
+		try {
+			progressListener.setProgress("Writing PNG", 0, 0, 1);
+			PngFileWriter.write(buffer, targetFile, progressListener);
+		} catch (IOException e) {
+			logger.warn("Failed to write PNG file: " + e.getMessage(), e);
+		}
+
 	}
 
 	private synchronized void saveOctree(

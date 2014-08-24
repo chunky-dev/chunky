@@ -33,8 +33,9 @@ public abstract class PngChunk {
 	public void writeChunk(DataOutputStream out) throws IOException {
 		out.writeInt(getChunkLength());
 		out.writeInt(getChunkType());
-		if (getChunkLength() > 0)
+		if (getChunkLength() > 0) {
 			writeChunkData(out);
+		}
 		out.writeInt(getChunkCRC());
 	}
 
