@@ -53,7 +53,7 @@ import se.llbit.util.NotNull;
  */
 public class Sky implements JSONifiable {
 
-	private static final double CLOUD_OPACITY = 0.4;
+	//private static final double CLOUD_OPACITY = 0.4;
 
 	/**
 	 * Default sky light intensity
@@ -874,7 +874,7 @@ public class Sky implements JSONifiable {
 		double offsetX = cloudOffset.x;
 		double offsetY = cloudOffset.y;
 		double offsetZ = cloudOffset.z;
-		double inv_size = 1/scene.sky().cloudSize();
+		double inv_size = 1/cloudSize;
 		double cloudBot = offsetY - scene.origin.y;
 		double cloudTop = offsetY - scene.origin.y + 5;
 		int target = 1;
@@ -892,7 +892,7 @@ public class Sky implements JSONifiable {
 			// ray is entering cloud
 			if (inCloud((ray.d.x*t_offset + ray.x.x)*inv_size + offsetX, (ray.d.z*t_offset + ray.x.z)*inv_size + offsetZ)) {
 				ray.n.set(0, -Math.signum(ray.d.y), 0);
-				onCloudEnter(ray, t_offset, random);
+				onCloudEnter(ray, t_offset);
 				return true;
 			}
 		} else if (inCloud(ray.x.x*inv_size + offsetX, ray.x.z*inv_size + offsetZ)) {
@@ -1010,7 +1010,7 @@ public class Sky implements JSONifiable {
 				return false;
 			}
 			ray.n.set(nx, ny, nz);
-			onCloudEnter(ray, t+t_offset, random);
+			onCloudEnter(ray, t+t_offset);
 			return true;
 		} else {
 			if (t > tExit) {
@@ -1022,29 +1022,22 @@ public class Sky implements JSONifiable {
 				nx = -nx;
 				nz = -nz;
 			}
-			if (t > .2) {
-				onCloudExit(ray, .2, random);
-			} else {
-				ray.n.set(nx, ny, nz);
-				onCloudExit(ray, t, random);
-
-			}
+			ray.n.set(nx, ny, nz);
+			onCloudExit(ray, t);
 		}
 		return true;
 	}
 
-	private static void onCloudEnter(Ray ray, double t, Random random) {
-		ray.scatterNormal(random);
+	private static void onCloudEnter(Ray ray, double t) {
 		ray.tNear = t;
 		ray.distance += t;
-		ray.color.set(1,1,1,0);
+		ray.color.set(1,1,1,1);
 	}
 
-	private static void onCloudExit(Ray ray, double t, Random random) {
-		//ray.diffuseReflection(ray, random);
+	private static void onCloudExit(Ray ray, double t) {
 		ray.tNear = t;
 		ray.distance += t;
-		ray.color.set(1,1,1,0.075*t*5);
+		ray.color.set(1,1,1,1);
 	}
 
 	private static boolean inCloud(double x, double z) {
