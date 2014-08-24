@@ -294,7 +294,7 @@ public class Sky implements JSONifiable {
 			double y = ray.d.y;
 			double z = -sin*ray.d.x + cos*ray.d.z;
 			double len = Math.sqrt(x*x + y*y);
-			double theta = (len < Ray.EPSILON) ? 0 : Math.acos(-z)/Constants.TAU;
+			double theta = (len < Ray.EPSILON) ? 0 : Math.acos(-z)/(Constants.TAU*len);
 			double u = theta*x + .5;
 			double v = .5 + theta*y;
 			skymap.getColor(u, v, ray.color);
@@ -407,7 +407,7 @@ public class Sky implements JSONifiable {
 			double y = ray.d.y;
 			double z = -sin*ray.d.x + cos*ray.d.z;
 			double len = Math.sqrt(x*x + y*y);
-			double theta = (len < Ray.EPSILON) ? 0 : Math.acos(-z)/Constants.TAU;
+			double theta = (len < Ray.EPSILON) ? 0 : Math.acos(-z)/(Constants.TAU*len);
 			double u = theta*x + .5;
 			double v = .5 + theta*y;
 			skymap.getColorInterpolated(u, v, ray.color);
