@@ -127,6 +127,7 @@ public class ChunkyDeployer {
 					FileInputStream in = new FileInputStream(versionFile);
 					JsonParser parser = new JsonParser(in);
 					versions.add(new VersionInfo(parser.parse().object()));
+					in.close();
 				} catch (IOException e) {
 					System.err.println("Could not read version info file: " + e.getMessage());
 				} catch (SyntaxError e) {

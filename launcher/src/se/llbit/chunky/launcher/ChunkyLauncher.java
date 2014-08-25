@@ -58,7 +58,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame implements UpdateListener {
 
-	private static final String LAUNCHER_VERSION = "v1.8.6";
+	private static final String LAUNCHER_VERSION = "v1.8.7";
 
 	protected String java;
 	private final ChunkyDeployer deployer;
@@ -272,10 +272,10 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 		advancedPanel.setVisible(settings.showAdvancedSettings);
 
 		advancedSettingsToggle.setSelected(settings.showAdvancedSettings);
-		advancedSettingsToggle.setIcon(Icons.expandIcon);
-		advancedSettingsToggle.setRolloverIcon(Icons.expandHoverIcon);
-		advancedSettingsToggle.setSelectedIcon(Icons.collapseIcon);
-		advancedSettingsToggle.setRolloverSelectedIcon(Icons.collapseHoverIcon);
+		advancedSettingsToggle.setIcon(Icons.expand);
+		advancedSettingsToggle.setRolloverIcon(Icons.expandHover);
+		advancedSettingsToggle.setSelectedIcon(Icons.collapse);
+		advancedSettingsToggle.setRolloverSelectedIcon(Icons.collapseHover);
 		advancedSettingsToggle.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -713,6 +713,13 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 			}
 		}
 
+	}
+
+	/**
+	 * Select the latest version (always the first element of the version list).
+	 */
+	public void selectLatestVersion() {
+		versionCB.setSelectedIndex(0);
 	}
 
 	@Override

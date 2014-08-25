@@ -42,6 +42,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -101,8 +102,11 @@ public class UpdateDialog extends JDialog {
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
+							progress.setValue(progress.getMaximum());
+							completedLbl.setVisible(true);
 							cancelBtn.setText("Close");
 							parent.updateVersionList();
+							parent.selectLatestVersion();
 						}
 					});
 				} catch (IOException e) {
@@ -132,47 +136,30 @@ public class UpdateDialog extends JDialog {
 	}
 
 	static class StatusCellRenderer extends DefaultTableCellRenderer {
-		private static ImageIcon cached;
-		private static ImageIcon failed;
-		private static ImageIcon refresh;
-		static {
-			URL url = StatusCellRenderer.class.getResource("/cached.png");
-			if (url != null) {
-				cached = new ImageIcon(Toolkit.getDefaultToolkit().getImage(url));
-			}
-			url = StatusCellRenderer.class.getResource("/failed.png");
-			if (url != null) {
-				failed = new ImageIcon(Toolkit.getDefaultToolkit().getImage(url));
-			}
-			url = StatusCellRenderer.class.getResource("/refresh.png");
-			if (url != null) {
-				refresh = new ImageIcon(Toolkit.getDefaultToolkit().getImage(url));
-			}
-		}
-
 		@Override
 		protected void setValue(Object value) {
 			if (value instanceof LibraryStatus) {
 				LibraryStatus status = (LibraryStatus) value;
 				setText(status.downloadStatus());
 				if (status == LibraryStatus.PASSED || status == LibraryStatus.DOWNLOADED_OK) {
-					setIcon(cached);
+					setIcon(Icons.cached);
 				} else {
 					switch (status) {
 					case MD5_MISMATCH:
 					case MISSING:
-						setIcon(refresh);
+						setIcon(Icons.refresh);
 						break;
 					default:
-						setIcon(failed);
+						setIcon(Icons.failed);
 					}
 				}
 			}
 		}
 	}
 
-	private final JButton okBtn;
-	private final JButton cancelBtn;
+	private final JButton okBtn = new JButton("Update to New Version");
+	private final JButton cancelBtn = new JButton("Cancel");
+	private final JLabel completedLbl = new JLabel("Update completed!");
 	private final JProgressBar progress = new JProgressBar();
 	private final ChunkyLauncher parent;
 	private final VersionInfo version;
@@ -246,7 +233,6 @@ public class UpdateDialog extends JDialog {
 				"<br>Version <b>" + version.name + "</b>, released on " + version.date() +
 				"<br>Release notes:");
 
-		okBtn = new JButton("Update to New Version");
 		okBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -254,13 +240,15 @@ public class UpdateDialog extends JDialog {
 			}
 		});
 
-		cancelBtn = new JButton("Cancel");
 		cancelBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				close();
 			}
 		});
+
+		completedLbl.setIcon(Icons.cached);
+		completedLbl.setVisible(false);
 
 		JTextPane changeLog = new JTextPane();
 		changeLog.setCaretPosition(0);
@@ -321,10 +309,10 @@ public class UpdateDialog extends JDialog {
 		status.getTableHeader().setVisible(false);
 		status.setVisible(false);
 		final JCheckBox details = new JCheckBox("Details");
-		details.setIcon(Icons.expandIcon);
-		details.setRolloverIcon(Icons.expandHoverIcon);
-		details.setSelectedIcon(Icons.collapseIcon);
-		details.setRolloverSelectedIcon(Icons.collapseHoverIcon);
+		details.setIcon(Icons.expand);
+		details.setRolloverIcon(Icons.expandHover);
+		details.setSelectedIcon(Icons.collapse);
+		details.setRolloverSelectedIcon(Icons.collapseHover);
 		details.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -353,6 +341,7 @@ public class UpdateDialog extends JDialog {
 					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addComponent(busyLbl)
 					.addComponent(okBtn)
+					.addComponent(completedLbl)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(cancelBtn)
 				)
@@ -371,9 +360,10 @@ public class UpdateDialog extends JDialog {
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(progress)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(busyLbl)
 				.addComponent(okBtn)
+				.addComponent(completedLbl)
 				.addComponent(cancelBtn)
 			)
 			.addContainerGap()
@@ -400,7 +390,7 @@ public class UpdateDialog extends JDialog {
 		if (!versionsDir.isDirectory()) {
 			// TODO ERROR
 		}
-		progress.setMaximum(downloadBytes);
+		progress.setMaximum(downloadBytes+1);
 		progress.setValue(0);
 		final List<Future<DownloadStatus>> results = new LinkedList<Future<DownloadStatus>>();
 		for (VersionInfo.Library lib: neededLibraries) {
