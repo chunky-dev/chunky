@@ -972,7 +972,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		JButton setCanvasSizeBtn = new JButton("Set Canvas Size");
 		setCanvasSizeBtn.addActionListener(canvasSizeListener);
 		JButton halveCanvasSizeBtn = new JButton("Halve");
-		halveCanvasSizeBtn.setToolTipText("Halve the canvas size");
+		halveCanvasSizeBtn.setToolTipText("Halve the canvas width and height");
 		halveCanvasSizeBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -982,7 +982,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 		JButton doubleCanvasSizeBtn = new JButton("Double");
-		doubleCanvasSizeBtn.setToolTipText("Double the canvas size");
+		doubleCanvasSizeBtn.setToolTipText("Double the canvas width and height");
 		doubleCanvasSizeBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1054,18 +1054,17 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(canvasSizeLbl)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(canvasSizeCB, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-				)
-				.addComponent(canvasSizeAdvisory)
-				.addGroup(layout.createSequentialGroup()
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(setCanvasSizeBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(halveCanvasSizeBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(doubleCanvasSizeBtn)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(makeDefaultBtn)
 				)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(halveCanvasSizeBtn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(doubleCanvasSizeBtn)
+				)
+				.addComponent(canvasSizeAdvisory)
 				.addComponent(sep2)
 				.addComponent(stillWaterCB)
 				.addComponent(clearWaterCB)
@@ -1097,16 +1096,16 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(canvasSizeLbl)
 				.addComponent(canvasSizeCB, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				.addComponent(setCanvasSizeBtn)
+				.addComponent(makeDefaultBtn)
+			)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(halveCanvasSizeBtn)
+				.addComponent(doubleCanvasSizeBtn)
 			)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addComponent(canvasSizeAdvisory)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(setCanvasSizeBtn)
-				.addComponent(halveCanvasSizeBtn)
-				.addComponent(doubleCanvasSizeBtn)
-				.addComponent(makeDefaultBtn)
-			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
