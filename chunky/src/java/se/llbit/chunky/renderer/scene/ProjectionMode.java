@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.json.JsonValue;
+
 /**
  * Projection mode enumeration
  */
@@ -25,7 +27,8 @@ public enum ProjectionMode {
 	PARALLEL("Parallel"),
 	FISHEYE("Fisheye"),
 	PANORAMIC("Panoramic (equirectangular)"),
-	PANORAMIC_SLOT("Panoramic (slot)");
+	PANORAMIC_SLOT("Panoramic (slot)"),
+	STEREOGRAPHIC("Stereographic");
 
 	private final String niceName;
 
@@ -36,5 +39,13 @@ public enum ProjectionMode {
 	@Override
 	public String toString() {
 		return niceName;
+	}
+
+	public static ProjectionMode fromJson(JsonValue jsonValue) {
+		try {
+			return ProjectionMode.valueOf(jsonValue.stringValue("PINHOLE"));
+		} catch (IllegalArgumentException e) {
+			return PINHOLE;
+		}
 	}
 }

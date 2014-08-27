@@ -145,6 +145,38 @@ public class Camera implements JSONifiable {
 		}
 	}
 
+	static class StereographicProjector implements Projector {
+
+		public StereographicProjector() {
+		}
+
+		@Override
+		public void apply(double x, double y, Random random, Vector3d o,
+				Vector3d d) {
+			y *= -3;
+			x *= 3;
+			double xx_yy = x*x + y*y;
+			double r = 1 / (1 + xx_yy);
+			d.set(2*x*r, 2*y*r, (-1+xx_yy)*r);
+			o.set(0, 0, 0);
+		}
+
+		@Override
+		public double getMinRecommendedFoV() {
+			return 1;
+		}
+
+		@Override
+		public double getMaxRecommendedFoV() {
+			return 175;
+		}
+
+		@Override
+		public double getDefaultFoV() {
+			return 70;
+		}
+	}
+
 	static class FisheyeProjector implements Projector {
 		protected final double fov;
 
@@ -529,6 +561,8 @@ public class Camera implements JSONifiable {
 			return applySphericalDoF(new PanoramicSlotProjector(fov));
 		case PANORAMIC:
 			return applySphericalDoF(new PanoramicProjector(fov));
+		case STEREOGRAPHIC:
+			return new StereographicProjector();
 		}
 	}
 
@@ -891,8 +925,7 @@ public class Camera implements JSONifiable {
 		fov = obj.get("fov").doubleValue(0);
 		subjectDistance = obj.get("focalOffset").doubleValue(0);
 		try {
-			projectionMode = ProjectionMode.valueOf(
-					obj.get("projectionMode").stringValue(""));
+			projectionMode = ProjectionMode.fromJson(obj.get("projectionMode"));
 		} catch (IllegalArgumentException e) {
 			projectionMode = ProjectionMode.PINHOLE;
 		}
