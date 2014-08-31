@@ -13,8 +13,8 @@
         + PFM
     * Added new sky rendering modes:
         + gradient
-	+ spherical skymap
-	+ skybox
+        + spherical skymap
+        + skybox
     * Added sky light parameter, affecting indirect sky lighting contribution
     * The simulated sky has been modified (less pink, more bright)
     * Enable "Clear Selection" button after selecting region
