@@ -156,16 +156,16 @@ def build_release(version):
 		update_docs(version)
 
 def build_snapshot(version):
-	if raw_input('Build snapshot? [y/n] ') == "y":
+	if raw_input('Build snapshot? [y/N] ') == "y":
 		if call(['cmd', '/c', 'git', 'tag', '-a', version.full, '-m', 'Snapshot build']) is not 0:
 			print "Error: git tag failed!"
 			sys.exit(1)
 		if call(['cmd', '/c', 'ant', '-Ddebug=true', 'dist']) is not 0:
 			print "Error: Ant build failed!"
 			sys.exit(1)
-	if raw_input('Publish snapshot to FTP? [y/n] ') == "y":
+	if raw_input('Publish snapshot to FTP? [y/N] ') == "y":
 		publish_snapshot_ftp(version)
-	if raw_input('Post snapshot thread? [y/n] ') == "y":
+	if raw_input('Post snapshot thread? [y/N] ') == "y":
 		post_snapshot_thread(version)
 
 def reddit_login():
@@ -222,13 +222,16 @@ def update_docs(version):
 	docs_dir = '../git/chunky-docs'
 	while not path.exists(docs_dir):
 		docs_dir = raw_input('documentation repo: ')
-	os.mkdir('%s/docs/release/%s' % (docs_dir, version.milestone))
-	with codecs.open('build/release_notes-%s.md' % version.milestone,'r',encoding='utf-8') as src:
-		with codecs.open('%s/docs/release/%s/release_notes.md' % (docs_dir, version.milestone),'w',encoding='utf-8') as dst:
+	copyfile('build/version-%s.properties' % version.full, path.join(docs_dir, 'version.properties'))
+	version_dir = '%s/docs/release/%s' % (docs_dir, version.full)
+	if not path.exists(version_dir):
+		os.mkdir(version_dir)
+	with codecs.open('build/release_notes-%s.md' % version.full,'r',encoding='utf-8') as src:
+		with codecs.open('%s/docs/release/%s/release_notes.md' % (docs_dir, version.full),'w',encoding='utf-8') as dst:
 			dst.write('''Chunky %s
 ============
 
-''' % version.milestone)
+''' % version.full)
 			dst.write(src.read())
 
 def lp_upload_file(version, release, filename, description, content_type, file_type):
@@ -241,11 +244,13 @@ def lp_upload_file(version, release, filename, description, content_type, file_t
 		installer='Installer file')
 	print "Uploading %s..." % filename
 	try:
+		signature_fn = filename + '.sig'
 		release_file = release.add_file(
 			filename=filename,
 			description=description,
 			file_content=open('build/' + filename, 'rb').read(),
-			signature_content=open('build/' + filename + '.sig', 'rb').read(),
+			signature_content=open('build/' + signature_fn, 'rb').read(),
+			signature_filename=signature_fn,
 			content_type=content_type,
 			file_type=FILE_TYPES[file_type])
 		return 'https://launchpad.net/chunky/%s/%s/+download/%s' \
@@ -270,7 +275,7 @@ def publish_launchpad(version):
 	check_file_exists(version.tar_file())
 	check_file_exists(version.zip_file())
 	check_file_exists(version.exe_file())
-	if raw_input('Publish to production? [y/n] ') == "y":
+	if raw_input('Publish to production? [y/N] ') == "y":
 		server = 'production'
 	else:
 		server = 'staging'
@@ -381,9 +386,9 @@ def write_release_notes(version, exe_url, zip_url):
 
 '''
 	text += version.changelog
-	with codecs.open('build/release_notes-%s.md' % version.milestone, 'w', encoding='utf-8') as f:
+	with codecs.open('build/release_notes-%s.md' % version.full, 'w', encoding='utf-8') as f:
 		f.write(text)
-	with codecs.open('build/version-%s.properties' % version.milestone, 'w', encoding='utf-8') as f:
+	with codecs.open('build/version-%s.properties' % version.full, 'w', encoding='utf-8') as f:
 		f.write('''version=%s
 exe.dl.link=%s
 zip.dl.link=%s''' % (version.milestone, exe_url, zip_url))
@@ -391,10 +396,10 @@ zip.dl.link=%s''' % (version.milestone, exe_url, zip_url))
 "post reddit release thread"
 def post_release_thread(version):
 	try:
-		with codecs.open('build/release_notes-%s.md' % version.milestone, 'r', encoding='utf-8') as f:
+		with codecs.open('build/release_notes-%s.md' % version.full, 'r', encoding='utf-8') as f:
 			text = f.read()
 	except IOError:
-		print "Error: reddit post must be in build/release_notes-%s.md" % version.milestone
+		print "Error: reddit post must be in build/release_notes-%s.md" % version.full
 		return
 	r = reddit_login()
 	post = r.submit('chunky', 'Chunky %s released!' % version.full,
@@ -506,7 +511,7 @@ try:
 	else:
 		print "Ready to build version %s!" % version.full
 		build_release(version)
-		if raw_input('Push git release commit? [y/n] ') == "y":
+		if raw_input('Push git release commit? [y/N] ') == "y":
 			call(['git', 'push', 'origin', 'master'])# push version bump commit
 			call(['git', 'push', 'origin', version.full])# push version tag
 		print "All done."
