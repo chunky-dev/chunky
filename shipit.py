@@ -30,7 +30,7 @@ class Credentials:
 		if path.exists('credentials.json'):
 			with open('credentials.json', 'r') as fp:
 				self.credentials = json.load(fp)
-	
+
 	def get(self, key):
 		if key not in self.credentials:
 			self.credentials[key] = raw_input(key+': ')
@@ -106,23 +106,53 @@ class Version:
 			print "Error: ChangeLog is empty!"
 			sys.exit(1)
 
+	def jar_file(self):
+		return 'chunky-core-%s.jar' % self.full
+
+	def tar_file(self):
+		return 'chunky-%s.tar.gz' % self.full
+
+	def zip_file(self):
+		return 'Chunky-%s.zip' % self.full
+
+	def exe_file(self):
+		return 'Chunky-%s.exe' % self.full
+
+	def sign_files(self):
+		sign_file(self.jar_file())
+		sign_file(self.zip_file())
+		sign_file(self.tar_file())
+		sign_file(self.exe_file())
+
+def sign_file(filename):
+	while True:
+		if call(['cmd', '/c', 'gpg', '--detach-sig', 'build/' + filename]) is not 0:
+			print "Failed to sign file: " + filename
+			if raw_input('Retry? [y/N] ') == 'y':
+				continue
+			else:
+				sys.exit(1)
+		break
+
+
 def build_release(version):
-	if raw_input('Build release? [y/n] ') == "y":
+	if raw_input('Build release? [y/N] ') == 'y':
 		if call(['cmd', '/c', 'ant', '-Dversion=' + version.full, 'release']) is not 0:
 			print "Error: Ant build failed!"
 			sys.exit(1)
 		if call(['makensis', 'Chunky.nsi']) is not 0:
 			print "Error: NSIS build failed!"
 			sys.exit(1)
-	if raw_input('Publish to Launchpad? [y/n] ') == "y":
+		version.sign_files()
+	if raw_input('Publish to Launchpad? [y/N] ') == 'y':
 		(is_new, exe, zip, jar) = publish_launchpad(version)
 		patch_url(version, jar)
 		write_release_notes(version, exe, zip)
-	if raw_input('Publish to FTP? [y/n] ') == "y":
+	if raw_input('Publish to FTP? [y/N] ') == 'y':
 		publish_ftp(version)
-	if raw_input('Post release thread? [y/n] ') == "y":
+	if raw_input('Post release thread? [y/N] ') == 'y':
 		post_release_thread(version)
-	if raw_input('Update documentation? [y/n] ') == "y":
+	if raw_input('Update documentation? [y/N] ') == 'y':
 		update_docs(version)
 
 def build_snapshot(version):
@@ -215,6 +245,7 @@ def lp_upload_file(version, release, filename, description, content_type, file_t
 			filename=filename,
 			description=description,
 			file_content=open('build/' + filename, 'rb').read(),
+			signature_content=open('build/' + filename + '.sig', 'rb').read(),
 			content_type=content_type,
 			file_type=FILE_TYPES[file_type])
 		return 'https://launchpad.net/chunky/%s/%s/+download/%s' \
@@ -225,7 +256,20 @@ def lp_upload_file(version, release, filename, description, content_type, file_t
 		traceback.print_exception(exc_type, exc_value, exc_traceback)
 		return None
 
+def check_file_exists(filename):
+	if not path.exists('build/' + filename):
+		print "Error: required artifact %s not found!" % filename
+		sys.exit(1)
+	if not path.exists('build/' + filename + '.sig'):
+		print "Error: required signature for %s not found!" % filename
+		sys.exit(1)
+
 def publish_launchpad(version):
+	# check that required files exist
+	check_file_exists(version.jar_file())
+	check_file_exists(version.tar_file())
+	check_file_exists(version.zip_file())
+	check_file_exists(version.exe_file())
 	if raw_input('Publish to production? [y/n] ') == "y":
 		server = 'production'
 	else:
@@ -285,7 +329,7 @@ def publish_launchpad(version):
 	jar_url = lp_upload_file(
 		version,
 		release,
-		'chunky-core-%s.jar' % version.full,
+		version.jar_file(),
 		'Core Library',
 		'application/java-archive',
 		'installer')
@@ -294,7 +338,7 @@ def publish_launchpad(version):
 	tarball_url = lp_upload_file(
 		version,
 		release,
-		'chunky-%s.tar.gz' % version.full,
+		version.tar_file(),
 		'Source Code',
 		'application/x-tar',
 		'tarball')
@@ -303,7 +347,7 @@ def publish_launchpad(version):
 	zip_url = lp_upload_file(
 		version,
 		release,
-		'Chunky-%s.zip' % version.full,
+		version.zip_file(),
 		'Binaries',
 		'application/zip',
 		'installer')
@@ -312,7 +356,7 @@ def publish_launchpad(version):
 	exe_url = lp_upload_file(
 		version,
 		release,
-		'Chunky-%s.exe' % version.full,
+		version.exe_file(),
 		'Windows Installer',
 		'application/octet-stream',
 		'installer')
@@ -392,10 +436,9 @@ def patch_url(version, url):
 		print 'Error: could not read latest.json'
 		sys.exit(1)
 	libs = j['libraries']
-	core_lib_name = 'chunky-core-%s.jar' % version.full
 	patched = False
 	for lib in libs:
-		if lib['name'] == core_lib_name:
+		if lib['name'] == version.jar_file():
 			lib['url'] = url
 			patched = True
 			break
@@ -407,7 +450,12 @@ def patch_url(version, url):
 
 ### MAIN
 version = None
-options = {'ftp': False, 'docs': False, 'snapshot': False}
+options = {
+	'ftp': False,
+	'docs': False,
+	'snapshot': False,
+	'sign': False
+}
 do_ftpupload = False
 do_update_docs = False
 for arg in sys.argv[1:]:
@@ -452,6 +500,9 @@ try:
 	elif options['snapshot']:
 		print "Ready to build snapshot %s!" % version.full
 		build_snapshot(version)
+	elif options['sign']:
+		# test cryptosigning
+		version.sign_files()
 	else:
 		print "Ready to build version %s!" % version.full
 		build_release(version)

@@ -36,7 +36,7 @@ public class PngFileWriter {
 	 */
 	public static final long PNG_SIGNATURE = 0x89504E470D0A1A0AL;
 
-	public static final int MAX_CHUNK_BYTES = 1000000;// max input/output buffer size
+	public static final int MAX_CHUNK_BYTES = 0x100000;// max input/output buffer size = 1 MiB
 
 	private final DataOutputStream out;
 

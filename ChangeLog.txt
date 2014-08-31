@@ -1,7 +1,7 @@
-1.3 - TBD
-    * Attempted to make PNG writing more efficient (PNG is split into 1 MiB
-      chunks)
-    * Removed the "render lock/auto lock" features. They have been replaced
+1.3 - 2014-08-31
+    * Attempted to make PNG writing more efficient by splitting PNGs into
+      1 MiB chunks.
+    * Removed the "render lock/auto lock" features. These are replaced
       by a render reset confirmation dialog which appears if anything that
       would reset the render has been changed after rendering for at least
       thirty seconds.
