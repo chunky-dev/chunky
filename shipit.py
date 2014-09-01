@@ -143,7 +143,7 @@ def sign_file(filename):
 		if on_win():
 			proc.communicate(passphrase + "\r\n")
 		else:
-			proc.communicate(passphrase)
+			proc.communicate(passphrase + "\n")
 		if proc.returncode is not 0:
 			credentials.remove('gpg passphrase')
 			print "Failed to sign file: " + filename
