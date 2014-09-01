@@ -15,7 +15,8 @@ import traceback
 import ftplib
 import codecs
 import os
-from subprocess import call
+import platform
+from subprocess import call, Popen, PIPE
 from getpass import getpass
 from datetime import datetime
 from string import join
@@ -27,9 +28,10 @@ class Credentials:
 	credentials = {}
 
 	def __init__(self):
-		if path.exists('credentials.json'):
-			with open('credentials.json', 'r') as fp:
-				self.credentials = json.load(fp)
+		if path.exists('credentials.gpg'):
+			proc = Popen(cmd(['gpg', '--decrypt', 'credentials.gpg']), stdout=PIPE)
+			creds = proc.communicate()[0]
+			self.credentials = json.loads(creds)
 
 	def get(self, key):
 		if key not in self.credentials:
@@ -48,10 +50,10 @@ class Credentials:
 		self.save()
 
 	def save(self):
-		with open('credentials.json', 'w') as fp:
-			json.dump(self.credentials, fp)
-
-
+		proc = Popen(cmd(['gpg', '--output', 'credentials.gpg', '-r', 'jesper@llbit.se', '--encrypt']), stdin=PIPE)
+		proc.communicate(json.dumps(self.credentials))
+		if proc.returncode is not 0:
+			print "Warning: failed to encrypt credentials!"
 
 class Version:
 	regex = re.compile('^(\d+\.\d+\.\d+)-?([a-zA-Z]*\.?\d*)$')
@@ -124,9 +126,26 @@ class Version:
 		sign_file(self.tar_file())
 		sign_file(self.exe_file())
 
+def on_win():
+	return platform.system() == 'Windows'
+
+def cmd(cmd):
+	if on_win():
+		return ['cmd', '/c'] + cmd
+	else:
+		return cmd
+
 def sign_file(filename):
 	while True:
-		if call(['cmd', '/c', 'gpg', '--detach-sig', 'build/' + filename]) is not 0:
+		passphrase = credentials.getpass('gpg passphrase')
+		print "Signing build/" + filename
+		proc = Popen(cmd(['gpg', '--passphrase-fd', '0', '--detach-sig', 'build/' + filename]), stdin=PIPE)
+		if on_win():
+			proc.communicate(passphrase + "\r\n")
+		else:
+			proc.communicate(passphrase)
+		if proc.returncode is not 0:
+			credentials.remove('gpg passphrase')
 			print "Failed to sign file: " + filename
 			if raw_input('Retry? [y/N] ') == 'y':
 				continue
@@ -137,7 +156,7 @@ def sign_file(filename):
 
 def build_release(version):
 	if raw_input('Build release? [y/N] ') == 'y':
-		if call(['cmd', '/c', 'ant', '-Dversion=' + version.full, 'release']) is not 0:
+		if call(cmd(['ant', '-Dversion=' + version.full, 'release'])) is not 0:
 			print "Error: Ant build failed!"
 			sys.exit(1)
 		if call(['makensis', 'Chunky.nsi']) is not 0:
@@ -157,10 +176,10 @@ def build_release(version):
 
 def build_snapshot(version):
 	if raw_input('Build snapshot? [y/N] ') == "y":
-		if call(['cmd', '/c', 'git', 'tag', '-a', version.full, '-m', 'Snapshot build']) is not 0:
+		if call(['git', 'tag', '-a', version.full, '-m', 'Snapshot build']) is not 0:
 			print "Error: git tag failed!"
 			sys.exit(1)
-		if call(['cmd', '/c', 'ant', '-Ddebug=true', 'dist']) is not 0:
+		if call(cmd(['-Ddebug=true', 'dist'])) is not 0:
 			print "Error: Ant build failed!"
 			sys.exit(1)
 	if raw_input('Publish snapshot to FTP? [y/N] ') == "y":

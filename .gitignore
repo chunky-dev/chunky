@@ -23,6 +23,7 @@
 /snapshot.json
 /snapshot
 /credentials.json
+/credentials.gpg
 
 # IntelliJ IDEA Project files
 .idea/*
