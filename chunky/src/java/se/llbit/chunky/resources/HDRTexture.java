@@ -30,8 +30,6 @@ public class HDRTexture extends AbstractHDRITexture {
 	private static final Logger logger =
 			Logger.getLogger(HDRTexture.class);
 
-	public float[] buf;
-
 	public HDRTexture(File file) {
 		// This RGBE loader was created to mimic the behavior of the RADIANCE
 		// rendering system (http://radsite.lbl.gov/). I studied the sources
