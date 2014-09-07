@@ -58,7 +58,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame implements UpdateListener {
 
-	private static final String LAUNCHER_VERSION = "v1.8.7";
+	private static final String LAUNCHER_VERSION = "v1.8.8";
 
 	protected String java;
 	private final ChunkyDeployer deployer;
@@ -405,9 +405,11 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 	private JPanel buildAdvancedPanel() {
 		JLabel jreDirLbl = new JLabel("Java Runtime:");
 		jreDirField.setText(getConfiguredJre());
+
 		JButton browseJreBtn = new JButton("Browse...");
 
 		JLabel javaOptionsLbl = new JLabel("Java options:");
+		javaOptions.setText(settings.javaOptions);
 
 		JLabel chunkyOptionsLbl = new JLabel("Chunky options:");
 

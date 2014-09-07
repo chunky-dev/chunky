@@ -25,15 +25,20 @@ from os import path
 from shutil import copyfile
 
 class Credentials:
+	initialized = False
 	credentials = {}
 
-	def __init__(self):
-		if path.exists('credentials.gpg'):
-			proc = Popen(cmd(['gpg', '--decrypt', 'credentials.gpg']), stdout=PIPE)
+	def init(self):
+		if not self.initialized and path.exists('credentials.gpg'):
+			proc = Popen(cmd(['gpg', '--decrypt',
+				'credentials.gpg']), stdout=PIPE)
 			creds = proc.communicate()[0]
 			self.credentials = json.loads(creds)
+		self.initialized = True
+
 
 	def get(self, key):
+		self.init()
 		if key not in self.credentials:
 			self.credentials[key] = raw_input(key+': ')
 			self.save()
@@ -56,7 +61,7 @@ class Credentials:
 			print "Warning: failed to encrypt credentials!"
 
 class Version:
-	regex = re.compile('^(\d+\.\d+\.\d+)-?([a-zA-Z]*\.?\d*)$')
+	regex = re.compile('^(\d+\.\d+(\.\d+)?)(-[a-zA-Z]*\.?\d*)?$')
 	full = ''
 	milestone = ''
 	suffix = ''
@@ -66,9 +71,10 @@ class Version:
 
 	def __init__(self, version):
 		self.full = version
-		regex = re.compile('^(\d+\.\d+(\.\d+)?)-?([a-zA-Z]*\.?\d*)?$')
-		r = regex.match(version)
-		assert r, "Invalid version name: %s (expected e.g. 1.2.13-alpha1)" % version
+		r = self.regex.match(version)
+		if not r:
+			print "Invalid version name: %s (expected e.g. 1.2.13-alpha1)" % version
+			sys.exit(1)
 		self.milestone = r.groups()[0]
 		self.suffix = r.groups()[2]
 		self.series = join(self.milestone.split('.')[:2], '.')
@@ -235,6 +241,13 @@ def publish_ftp(version):
 	ftp.cwd('lib')
 	with open('build/chunky-core-%s.jar' % version.full, 'rb') as f:
 		ftp.storbinary('STOR chunky-core-%s.jar' % version.full, f)
+	ftp.quit()
+
+def publish_launcher(version):
+	ftp = ftp_login()
+	ftp.cwd('chunkyupdate')
+	with open('build/ChunkyLauncher.jar', 'rb') as f:
+		ftp.storbinary('STOR ChunkyLauncher.jar', f)
 	ftp.quit()
 
 def update_docs(version):
@@ -478,7 +491,8 @@ options = {
 	'ftp': False,
 	'docs': False,
 	'snapshot': False,
-	'sign': False
+	'sign': False,
+	'launcher': False
 }
 do_ftpupload = False
 do_update_docs = False
@@ -489,6 +503,7 @@ for arg in sys.argv[1:]:
 		print "    -ftp         upload latest.json to FTP server"
 		print "    -docs        update documentation"
 		print "    -snapshot    build snapshot instead of release"
+		print "    -launcher    upload the launcher to the FTP server"
 		print
 		print "This utility creates a new release of Chunky"
 		print "Required Python libraries: launchpadlib, PRAW"
@@ -514,6 +529,10 @@ for arg in sys.argv[1:]:
 try:
 	credentials = Credentials()
 
+	if options['launcher']:
+		publish_launcher(version)
+		sys.exit(0)
+
 	if version == None:
 		version = Version(raw_input('Enter version: '))
 
@@ -534,6 +553,8 @@ try:
 			call(['git', 'push', 'origin', 'master'])# push version bump commit
 			call(['git', 'push', 'origin', version.full])# push version tag
 		print "All done."
+except SystemExit:
+	raise
 except:
 	exc_type, exc_value, exc_traceback = sys.exc_info()
 	print "Unexpected error:"
