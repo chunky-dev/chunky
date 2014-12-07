@@ -159,11 +159,18 @@ def sign_file(filename):
 				sys.exit(1)
 		break
 
+def print_prerelease_checklist():
+	print "Pre-Release Checklist:"
+	print "    * Update PRAW (pip install praw --upgrade)"
+	print "    * Update Launchpadlib"
+	print "    * Edit release notes (check for typos)"
+	print "    * Update ChangeLog (check for typos)"
 
 def build_release(version):
 	if version.suffix:
 		print "Error: non-release version string speicifed (remove suffix)"
 		sys.exit(1)
+	print_prerelease_checklist()
 	print "Ready to build version %s!" % version.full
 	if raw_input('Build release? [y/N] ') == 'y':
 		if call(cmd(['ant', '-Dversion=' + version.full, 'release'])) is not 0:
@@ -188,6 +195,7 @@ def build_snapshot(version):
 	if not version.suffix:
 		print "Error: non-snapshot version string speicifed (add suffix)"
 		sys.exit(1)
+	print_prerelease_checklist()
 	print "Ready to build snapshot %s!" % version.full
 	if raw_input('Build snapshot? [y/N] ') == "y":
 		if call(['git', 'tag', '-a', version.full, '-m', 'Snapshot build']) is not 0:
