@@ -43,6 +43,7 @@ import se.llbit.chunky.renderer.ProgressListener;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.WorkerState;
+import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;

@@ -29,6 +29,7 @@ import se.llbit.chunky.renderer.projection.PanoramicProjector;
 import se.llbit.chunky.renderer.projection.PanoramicSlotProjector;
 import se.llbit.chunky.renderer.projection.ParallelProjector;
 import se.llbit.chunky.renderer.projection.PinholeProjector;
+import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.projection.Projector;
 import se.llbit.chunky.renderer.projection.SphericalApertureProjector;
 import se.llbit.chunky.renderer.projection.StereographicProjector;
@@ -193,7 +194,7 @@ public class Camera implements JSONifiable {
 		case PANORAMIC:
 			return applySphericalDoF(new PanoramicProjector(fov));
 		case STEREOGRAPHIC:
-			return new StereographicProjector();
+			return new StereographicProjector(fov);
 		}
 	}
 

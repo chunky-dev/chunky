@@ -14,21 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.scene;
+package se.llbit.chunky.renderer.projection;
 
 import se.llbit.json.JsonValue;
 
 /**
- * Projection mode enumeration
+ * Available projection modes.
  */
 @SuppressWarnings("javadoc")
 public enum ProjectionMode {
 	PINHOLE("Standard"),
 	PARALLEL("Parallel"),
 	FISHEYE("Fisheye"),
+	STEREOGRAPHIC("Stereographic"),
 	PANORAMIC("Panoramic (equirectangular)"),
-	PANORAMIC_SLOT("Panoramic (slot)"),
-	STEREOGRAPHIC("Stereographic");
+	PANORAMIC_SLOT("Panoramic (slot)");
 
 	private final String niceName;
 
