@@ -161,6 +161,10 @@ def sign_file(filename):
 
 
 def build_release(version):
+	if version.suffix:
+		print "Error: non-release version string speicifed (remove suffix)"
+		sys.exit(1)
+	print "Ready to build version %s!" % version.full
 	if raw_input('Build release? [y/N] ') == 'y':
 		if call(cmd(['ant', '-Dversion=' + version.full, 'release'])) is not 0:
 			print "Error: Ant build failed!"
@@ -181,11 +185,15 @@ def build_release(version):
 		update_docs(version)
 
 def build_snapshot(version):
+	if not version.suffix:
+		print "Error: non-snapshot version string speicifed (add suffix)"
+		sys.exit(1)
+	print "Ready to build snapshot %s!" % version.full
 	if raw_input('Build snapshot? [y/N] ') == "y":
 		if call(['git', 'tag', '-a', version.full, '-m', 'Snapshot build']) is not 0:
 			print "Error: git tag failed!"
 			sys.exit(1)
-		if call(cmd(['-Ddebug=true', 'dist'])) is not 0:
+		if call(cmd(['ant', '-Ddebug=true', 'dist'])) is not 0:
 			print "Error: Ant build failed!"
 			sys.exit(1)
 	if raw_input('Publish snapshot to FTP? [y/N] ') == "y":
@@ -541,13 +549,11 @@ try:
 	elif options['docs']:
 		update_docs(version)
 	elif options['snapshot']:
-		print "Ready to build snapshot %s!" % version.full
 		build_snapshot(version)
 	elif options['sign']:
 		# test cryptosigning
 		version.sign_files()
 	else:
-		print "Ready to build version %s!" % version.full
 		build_release(version)
 		if raw_input('Push git release commit? [y/N] ') == "y":
 			call(['git', 'push', 'origin', 'master'])# push version bump commit
