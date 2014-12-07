@@ -45,7 +45,7 @@ public class BlockTestRenderer {
 				TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJar(), false);
 			}
 		} catch (TextureLoadingError e) {
-			System.err.println("Error: failed to load texture pack!");
+			System.err.println(e.getMessage());
 		}
 
 		String block = "";

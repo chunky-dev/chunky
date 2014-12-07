@@ -55,6 +55,9 @@ public class TexturePackLoader {
 
 	@SuppressWarnings("serial")
 	public static final class TextureLoadingError extends Exception {
+		TextureLoadingError(String msg) {
+			super(msg);
+		}
 	}
 
 	private static final Logger logger =
@@ -1293,7 +1296,7 @@ public class TexturePackLoader {
 	 */
 	public static void loadTexturePack(File tpFile, boolean rememberTP) throws TextureLoadingError {
 		if (tpFile == null || !tpFile.isFile()) {
-			throw new TextureLoadingError();
+			throw new TextureLoadingError("Could not open texture pack: " + tpFile.getAbsolutePath());
 		}
 		logger.info("Loading textures from " + tpFile.getAbsolutePath());
 		loadTexturePack(tpFile, allTextures.keySet(), rememberTP);

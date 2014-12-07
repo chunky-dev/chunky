@@ -342,13 +342,19 @@ public class CommandLineOptions {
 				} else {
 					String lastTexturePack = PersistentSettings.getLastTexturePack();
 					if (!lastTexturePack.isEmpty()) {
-						TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
+						try {
+							TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
+						} catch (TextureLoadingError e) {
+							System.err.println(e.getMessage());
+							System.err.println("Loading default Minecraft textures");
+							TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJar(), false);
+						}
 					} else {
 						TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJar(), false);
 					}
 				}
 			} catch (TextureLoadingError e) {
-				System.err.println("Failed to load texture pack!");
+				System.err.println(e.getMessage());
 			}
 		}
 
