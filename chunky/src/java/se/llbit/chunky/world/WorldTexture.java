@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -28,8 +28,13 @@ import java.util.Map;
  */
 public class WorldTexture {
 
-	private Map<ChunkPosition, ChunkTexture> map =
+	private final Map<ChunkPosition, ChunkTexture> map =
 			new HashMap<ChunkPosition, ChunkTexture>();
+
+	/**
+	 * Timestamp of last serialization.
+	 */
+	private long timestamp = 0;
 
 	/**
 	 * Set color at (x, z)
@@ -96,4 +101,18 @@ public class WorldTexture {
 		return texture;
 	}
 
+	/**
+	 * @return last serialization timestamp
+	 */
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	/**
+	 * Set the serialization timestamp.
+	 * @param timestamp
+	 */
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
 }

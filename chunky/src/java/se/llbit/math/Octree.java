@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -152,6 +152,11 @@ public class Octree {
 	 * Root node
 	 */
 	public final Node root;
+
+	/**
+	 * Timestamp of last serialization.
+	 */
+	private long timestamp = 0;
 
 	private final Node[] parents;
 	private final Node[] cache;
@@ -587,5 +592,20 @@ public class Octree {
 				return true;
 			}
 		}
+	}
+
+	/**
+	 * Update the serialization timestamp.
+	 * @param timestamp
+	 */
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	/**
+	 * @return the serialization timestamp
+	 */
+	public long getTimestamp() {
+		return timestamp;
 	}
 }

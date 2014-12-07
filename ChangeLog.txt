@@ -1,4 +1,6 @@
 1.3.2 - TBD
+    * Octree and grass/foliage textures are not saved to disk again if they
+      were not changed since the last time they were saved
     * Added Stereographic projection mode
     * The launcher now remembers Java options changed in the launch settings
     * More descriptive error message when failing to open a texture pack

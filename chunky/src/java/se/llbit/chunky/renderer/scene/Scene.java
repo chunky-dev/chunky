@@ -25,6 +25,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -1391,13 +1392,21 @@ public class Scene extends SceneDescription {
 		String fileName = name + ".octree";
 		DataOutputStream out = null;
 		try {
+			File file = context.getSceneFile(fileName);
+			if (file.exists() && file.lastModified() == octree.getTimestamp()) {
+				logger.info("Skipping redundant Octree write");
+				return;
+			}
 			String task = "Saving octree";
 			progressListener.setProgress(task, 1, 0, 2);
 			logger.info("Saving octree " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
-					context.getSceneFileOutputStream(fileName)));
+					new FileOutputStream(file)));
 
 			octree.store(out);
+			out.close();
+			out = null;
+			octree.setTimestamp(file.lastModified());
 
 			progressListener.setProgress(task, 2, 0, 2);
 			logger.info("Octree saved");
@@ -1420,13 +1429,21 @@ public class Scene extends SceneDescription {
 		String fileName = name + ".grass";
 		DataOutputStream out = null;
 		try {
+			File file = context.getSceneFile(fileName);
+			if (file.exists() && file.lastModified() == grassTexture.getTimestamp()) {
+				logger.info("Skipping redundant grass texture write");
+				return;
+			}
 			String task = "Saving grass texture";
 			progressListener.setProgress(task, 1, 0, 2);
 			logger.info("Saving grass texture " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
-					context.getSceneFileOutputStream(fileName)));
+					new FileOutputStream(file)));
 
 			grassTexture.store(out);
+			out.close();
+			out = null;
+			grassTexture.setTimestamp(file.lastModified());
 
 			progressListener.setProgress(task, 2, 0, 2);
 			logger.info("Grass texture saved");
@@ -1449,13 +1466,21 @@ public class Scene extends SceneDescription {
 		String fileName = name + ".foliage";
 		DataOutputStream out = null;
 		try {
+			File file = context.getSceneFile(fileName);
+			if (file.exists() && file.lastModified() == foliageTexture.getTimestamp()) {
+				logger.info("Skipping redundant foliage texture write");
+				return;
+			}
 			String task = "Saving foliage texture";
 			progressListener.setProgress(task, 1, 0, 2);
 			logger.info("Saving foliage texture " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
-					context.getSceneFileOutputStream(fileName)));
+					new FileOutputStream(file)));
 
 			foliageTexture.store(out);
+			out.close();
+			out = null;
+			foliageTexture.setTimestamp(file.lastModified());
 
 			progressListener.setProgress(task, 2, 0, 2);
 			logger.info("Foliage texture saved");
@@ -1516,13 +1541,17 @@ public class Scene extends SceneDescription {
 
 		DataInputStream in = null;
 		try {
+			File file = context.getSceneFile(fileName);
 			String task = "Loading octree";
 			renderListener.setProgress(task, 1, 0, 2);
 			logger.info("Loading octree " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
-					context.getSceneFileInputStream(fileName)));
+					new FileInputStream(file)));
 
 			octree = Octree.load(in);
+			in.close();
+			in = null;
+			octree.setTimestamp(file.lastModified());
 
 			renderListener.setProgress(task, 2, 0, 2);
 			logger.info("Octree loaded");
@@ -1548,13 +1577,17 @@ public class Scene extends SceneDescription {
 
 		DataInputStream in = null;
 		try {
+			File file = context.getSceneFile(fileName);
 			String task = "Loading grass texture";
 			renderListener.setProgress(task, 1, 0, 2);
 			logger.info("Loading grass texture " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
-					context.getSceneFileInputStream(fileName)));
+					new FileInputStream(file)));
 
 			grassTexture = WorldTexture.load(in);
+			in.close();
+			in = null;
+			grassTexture.setTimestamp(file.lastModified());
 
 			renderListener.setProgress(task, 2, 0, 2);
 			logger.info("Grass texture loaded");
@@ -1580,13 +1613,17 @@ public class Scene extends SceneDescription {
 
 		DataInputStream in = null;
 		try {
+			File file = context.getSceneFile(fileName);
 			String task = "Loading foliage texture";
 			renderListener.setProgress(task, 1, 0, 2);
 			logger.info("Loading foliage texture " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
-					context.getSceneFileInputStream(fileName)));
+					new FileInputStream(file)));
 
 			foliageTexture = WorldTexture.load(in);
+			in.close();
+			in = null;
+			foliageTexture.setTimestamp(file.lastModified());
 
 			renderListener.setProgress(task, 2, 0, 2);
 			logger.info("Foliage texture loaded");
