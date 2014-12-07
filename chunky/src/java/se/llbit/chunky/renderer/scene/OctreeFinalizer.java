@@ -500,6 +500,11 @@ public class OctreeFinalizer {
 						octree.set(type, x, cy, z);
 						break;
 					case Block.FENCE_ID:
+					case Block.SPRUCEFENCE_ID:
+					case Block.BIRCHFENCE_ID:
+					case Block.JUNGLEFENCE_ID:
+					case Block.DARKOAKFENCE_ID:
+					case Block.ACACIAFENCE_ID:
 						other = Block.get(octree.get(x, cy, z - 1));
 						if (other.isFenceConnector())
 							type |= 1 << 8;
@@ -530,6 +535,11 @@ public class OctreeFinalizer {
 						octree.set(type, x, cy, z);
 						break;
 					case Block.FENCEGATE_ID:
+					case Block.SPRUCEFENCEGATE_ID:
+					case Block.BIRCHFENCEGATE_ID:
+					case Block.JUNGLEFENCEGATE_ID:
+					case Block.DARKOAKFENCEGATE_ID:
+					case Block.ACACIAFENCEGATE_ID:
 						dir = 3 & (type >> BlockData.OFFSET);
 						if (dir == 0 || dir == 2) {
 							// facing north or south

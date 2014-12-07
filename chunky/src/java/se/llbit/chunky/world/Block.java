@@ -88,7 +88,7 @@ import se.llbit.math.Ray;
  */
 @SuppressWarnings("javadoc")
 public class Block {
-	private static final boolean UNKNOWN_INVISIBLE = true;
+	private static final boolean UNKNOWN_INVISIBLE = false;
 
 	public static final int AIR_ID = 0x00;
 	public static final Block AIR = new Block(AIR_ID, "Air", Texture.air) {
@@ -186,13 +186,15 @@ public class Block {
 			return kind[data%3];
 		}
 	};
-	public static final Block COBBLESTONE = new Block(0x04, "Cobblestone", Texture.cobblestone) {
+	public static final int COBBLESTONE_ID = 0x04;
+	public static final Block COBBLESTONE = new Block(COBBLESTONE_ID, "Cobblestone", Texture.cobblestone) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block WOODENPLANKS = new Block(0x05, "Wooden Planks", Texture.oakPlanks) {
+	public static final int WOODENPLANKS_ID = 0x05;
+	public static final Block WOODENPLANKS = new Block(WOODENPLANKS_ID, "Wooden Planks", Texture.oakPlanks) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -212,7 +214,8 @@ public class Block {
 			return texture[blockData & 7];
 		}
 	};
-	public static final Block SAPLING = new Block(0x06, "Sapling", Texture.oakSapling) {
+	public static final int SAPLING_ID = 0x06;
+	public static final Block SAPLING = new Block(SAPLING_ID, "Sapling", Texture.oakSapling) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -232,7 +235,8 @@ public class Block {
 			return texture[blockData & 7];
 		}
 	};
-	public static final Block BEDROCK = new Block(0x07, "Bedrock", Texture.bedrock);
+	public static final int BEDROCK_ID = 0x07;
+	public static final Block BEDROCK = new Block(BEDROCK_ID, "Bedrock", Texture.bedrock);
 	public static final int WATER_ID = 0x08;
 	public static final Block WATER = new Block(WATER_ID, "Water", Texture.water) {
 		{
@@ -275,7 +279,8 @@ public class Block {
 			return LavaModel.intersect(ray);
 		}
 	};
-	public static final Block STATIONARYLAVA = new Block(0x0B, "Stationary Lava", Texture.lava) {
+	public static final int STATIONARYLAVA_ID = 0x0B;
+	public static final Block STATIONARYLAVA = new Block(STATIONARYLAVA_ID, "Stationary Lava", Texture.lava) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -288,7 +293,8 @@ public class Block {
 			return LavaModel.intersect(ray);
 		}
 	};
-	public static final Block SAND = new Block(0x0C, "Sand", Texture.sand) {
+	public static final int SAND_ID = 0x0C;
+	public static final Block SAND = new Block(SAND_ID, "Sand", Texture.sand) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -304,25 +310,29 @@ public class Block {
 			return texture[blockData&1];
 		}
 	};
-	public static final Block GRAVEL = new Block(0x0D, "Gravel", Texture.gravel) {
+	public static final int GRAVEL_ID = 0x0D;
+	public static final Block GRAVEL = new Block(GRAVEL_ID, "Gravel", Texture.gravel) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block GOLDORE = new Block(0x0E, "Gold Ore", Texture.goldOre) {
+	public static final int GOLDORE_ID = 0x0E;
+	public static final Block GOLDORE = new Block(GOLDORE_ID, "Gold Ore", Texture.goldOre) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block IRONORE = new Block(0x0F, "Iron Ore", Texture.ironOre) {
+	public static final int IRONORE_ID = 0x0F;
+	public static final Block IRONORE = new Block(IRONORE_ID, "Iron Ore", Texture.ironOre) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block COALORE = new Block(0x10, "Coal Ore", Texture.coalOre) {
+	public static final int COALORE_ID = 0x10;
+	public static final Block COALORE = new Block(COALORE_ID, "Coal Ore", Texture.coalOre) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -385,7 +395,8 @@ public class Block {
 			return texture[blockData & 3];
 		}
 	};
-	public static final Block SPONGE = new Block(0x13, "Sponge", Texture.sponge) {
+	public static final int SPONGE_ID = 0x13;
+	public static final Block SPONGE = new Block(SPONGE_ID, "Sponge", Texture.sponge) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -434,19 +445,22 @@ public class Block {
 			return other == this || other == STAINED_GLASS;
 		}
 	};
-	public static final Block LAPISLAZULIORE = new Block(0x15, "Lapis Lazuli Ore", Texture.lapislazuliOre) {
+	public static final int LAPISLAZULIORE_ID = 0x15;
+	public static final Block LAPISLAZULIORE = new Block(LAPISLAZULIORE_ID, "Lapis Lazuli Ore", Texture.lapislazuliOre) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block LAPISLAZULIBLOCK = new Block(0x16, "Lapis Lazuli Block", Texture.lapislazuliBlock) {
+	public static final int LAPISLAZULIBLOCK_ID = 0x16;
+	public static final Block LAPISLAZULIBLOCK = new Block(LAPISLAZULIBLOCK_ID, "Lapis Lazuli Block", Texture.lapislazuliBlock) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block DISPENSER = new Block(0x17, "Dispenser", Texture.dispenserFront) {
+	public static final int DISPENSER_ID = 0x17;
+	public static final Block DISPENSER = new Block(DISPENSER_ID, "Dispenser", Texture.dispenserFront) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -465,7 +479,8 @@ public class Block {
 			return FurnaceModel.intersect(ray, tex);
 		}
 	};
-	public static final Block SANDSTONE = new Block(0x18, "Sandstone", Texture.sandstoneSide) {
+	public static final int SANDSTONE_ID = 0x18;
+	public static final Block SANDSTONE = new Block(SANDSTONE_ID, "Sandstone", Texture.sandstoneSide) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -508,7 +523,8 @@ public class Block {
 					tex[ray.getBlockData() % 3]);
 		}
 	};
-	public static final Block NOTEBLOCK = new Block(0x19, "Note Block", Icon.noteBlock) {
+	public static final int NOTEBLOCK_ID = 0x19;
+	public static final Block NOTEBLOCK = new Block(NOTEBLOCK_ID, "Note Block", Icon.noteBlock) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -518,7 +534,8 @@ public class Block {
 			return Texture.jukeboxSide;
 		}
 	};
-	public static final Block BED = new Block(0x1A, "Bed", Icon.bed) {
+	public static final int BED_ID = 0x1A;
+	public static final Block BED = new Block(BED_ID, "Bed", Icon.bed) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -529,7 +546,8 @@ public class Block {
 			return BedModel.intersect(ray);
 		}
 	};
-	public static final Block POWEREDRAIL = new Block(0x1B, "Powered Rail", Texture.poweredRailOn) {
+	public static final int POWEREDRAIL_ID = 0x1B;
+	public static final Block POWEREDRAIL = new Block(POWEREDRAIL_ID, "Powered Rail", Texture.poweredRailOn) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -545,7 +563,8 @@ public class Block {
 					(ray.getBlockData() & 7) % 6);
 		}
 	};
-	public static final Block DETECTORRAIL = new Block(0x1C, "Detector Rail", Texture.detectorRail) {
+	public static final int DETECTORRAIL_ID = 0x1C;
+	public static final Block DETECTORRAIL = new Block(DETECTORRAIL_ID, "Detector Rail", Texture.detectorRail) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -557,7 +576,8 @@ public class Block {
 					(ray.getBlockData() & 7) % 6);
 		}
 	};
-	public static final Block STICKYPISTON = new Block(0x1D, "Sticky Piston", Texture.pistonTopSticky) {
+	public static final int STICKYPISTON_ID = 0x1D;
+	public static final Block STICKYPISTON = new Block(STICKYPISTON_ID, "Sticky Piston", Texture.pistonTopSticky) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -568,7 +588,8 @@ public class Block {
 			return PistonModel.intersect(ray, 1);
 		}
 	};
-	public static final Block COBWEB = new Block(0x1E, "Cobweb", Texture.cobweb) {
+	public static final int COBWEB_ID = 0x1E;
+	public static final Block COBWEB = new Block(COBWEB_ID, "Cobweb", Texture.cobweb) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -592,7 +613,8 @@ public class Block {
 			return TallGrassModel.intersect(ray, scene);
 		}
 	};
-	public static final Block DEADBUSH = new Block(0x20, "Dead Bush", Texture.deadBush) {
+	public static final int DEADBUSH_ID = 0x20;
+	public static final Block DEADBUSH = new Block(DEADBUSH_ID, "Dead Bush", Texture.deadBush) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -603,7 +625,8 @@ public class Block {
 			return SpriteModel.intersect(ray, Texture.deadBush);
 		}
 	};
-	public static final Block PISTON = new Block(0x21, "Piston", Texture.pistonTop) {
+	public static final int PISTON_ID = 0x21;
+	public static final Block PISTON = new Block(PISTON_ID, "Piston", Texture.pistonTop) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -614,7 +637,8 @@ public class Block {
 			return PistonModel.intersect(ray, 0);
 		}
 	};
-	public static final Block PISTONEXTENSION = new Block(0x22, "Piston Extension", Texture.pistonTop) {
+	public static final int PISTONEXTENSION_ID = 0x22;
+	public static final Block PISTONEXTENSION = new Block(PISTONEXTENSION_ID, "Piston Extension", Texture.pistonTop) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -649,7 +673,8 @@ public class Block {
 			isInvisible = true;
 		}
 	};
-	public static final Block DANDELION = new Block(0x25, "Dandelion", Texture.dandelion) {
+	public static final int DANDELION_ID = 0x25;
+	public static final Block DANDELION = new Block(DANDELION_ID, "Dandelion", Texture.dandelion) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -694,7 +719,8 @@ public class Block {
 			return flowerType[data%8];
 		}
 	};
-	public static final Block BROWNMUSHROOM = new Block(0x27, "Brown Mushroom", Texture.brownMushroom) {
+	public static final int BROWNMUSHROOM_ID = 0x27;
+	public static final Block BROWNMUSHROOM = new Block(BROWNMUSHROOM_ID, "Brown Mushroom", Texture.brownMushroom) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -705,7 +731,8 @@ public class Block {
 			return SpriteModel.intersect(ray, Texture.brownMushroom);
 		}
 	};
-	public static final Block REDMUSHROOM = new Block(0x28, "Red Mushroom", Texture.redMushroom) {
+	public static final int REDMUSHROOM_ID = 0x28;
+	public static final Block REDMUSHROOM = new Block(REDMUSHROOM_ID, "Red Mushroom", Texture.redMushroom) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -716,21 +743,24 @@ public class Block {
 			return SpriteModel.intersect(ray, Texture.redMushroom);
 		}
 	};
-	public static final Block GOLDBLOCK = new Block(0x29, "Gold Block", Texture.goldBlock) {
+	public static final int GOLDBLOCK_ID = 0x29;
+	public static final Block GOLDBLOCK = new Block(GOLDBLOCK_ID, "Gold Block", Texture.goldBlock) {
 		{
 			isOpaque = true;
 			isSolid = true;
 			isShiny = true;
 		}
 	};
-	public static final Block IRONBLOCK = new Block(0x2A, "Iron Block", Texture.ironBlock) {
+	public static final int IRONBLOCK_ID = 0x2A;
+	public static final Block IRONBLOCK = new Block(IRONBLOCK_ID, "Iron Block", Texture.ironBlock) {
 		{
 			isOpaque = true;
 			isSolid = true;
 			isShiny = true;
 		}
 	};
-	public static final Block DOUBLESLAB = new Block(0x2B, "Double Stone Slab", Texture.slabTop) {
+	public static final int DOUBLESLAB_ID = 0x2B;
+	public static final Block DOUBLESLAB = new Block(DOUBLESLAB_ID, "Double Stone Slab", Texture.slabTop) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -853,7 +883,8 @@ public class Block {
 			}
 		}
 	};
-	public static final Block SLAB = new Block(0x2C, "Stone Slab", Texture.slabTop) {
+	public static final int SLAB_ID = 0x2C;
+	public static final Block SLAB = new Block(SLAB_ID, "Stone Slab", Texture.slabTop) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -889,13 +920,15 @@ public class Block {
 			return slabKind[data&7];
 		};
 	};
-	public static final Block BRICKS = new Block(0x2D, "Bricks", Texture.brick) {
+	public static final int BRICKS_ID = 0x2D;
+	public static final Block BRICKS = new Block(BRICKS_ID, "Bricks", Texture.brick) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block TNT = new Block(0x2E, "TNT", Texture.tntSide) {
+	public static final int TNT_ID = 0x2E;
+	public static final Block TNT = new Block(TNT_ID, "TNT", Texture.tntSide) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -914,7 +947,8 @@ public class Block {
 			return TexturedBlockModel.intersect(ray, tex);
 		}
 	};
-	public static final Block BOOKSHELF = new Block(0x2F, "Bookshelf", Texture.bookshelf) {
+	public static final int BOOKSHELF_ID = 0x2F;
+	public static final Block BOOKSHELF = new Block(BOOKSHELF_ID, "Bookshelf", Texture.bookshelf) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -933,13 +967,15 @@ public class Block {
 			return TexturedBlockModel.intersect(ray, tex);
 		}
 	};
-	public static final Block MOSSSTONE = new Block(0x30, "Moss Stone", Texture.mossStone) {
+	public static final int MOSSSTONE_ID = 0x30;
+	public static final Block MOSSSTONE = new Block(MOSSSTONE_ID, "Moss Stone", Texture.mossStone) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block OBSIDIAN = new Block(0x31, "Obsidian", Texture.obsidian) {
+	public static final int OBSIDIAN_ID = 0x31;
+	public static final Block OBSIDIAN = new Block(OBSIDIAN_ID, "Obsidian", Texture.obsidian) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -966,7 +1002,8 @@ public class Block {
 			return direction[data%6];
 		};
 	};
-	public static final Block FIRE = new Block(0x33, "Fire", Texture.fire) {
+	public static final int FIRE_ID = 0x33;
+	public static final Block FIRE = new Block(FIRE_ID, "Fire", Texture.fire) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -979,7 +1016,8 @@ public class Block {
 			return SpriteModel.intersect(ray, Texture.fire);
 		}
 	};
-	public static final Block MONSTERSPAWNER = new Block(0x34, "Monster Spawner", Texture.monsterSpawner) {
+	public static final int MONSTERSPAWNER_ID = 0x34;
+	public static final Block MONSTERSPAWNER = new Block(MONSTERSPAWNER_ID, "Monster Spawner", Texture.monsterSpawner) {
 		{
 			isOpaque = false;
 			isSolid = true;
@@ -1072,20 +1110,23 @@ public class Block {
 			return "power: " + data;
 		};
 	};
-	public static final Block DIAMONDORE = new Block(0x38, "Diamond Ore", Texture.diamondOre) {
+	public static final int DIAMONDORE_ID = 0x38;
+	public static final Block DIAMONDORE = new Block(DIAMONDORE_ID, "Diamond Ore", Texture.diamondOre) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block DIAMONDBLOCK = new Block(0x39, "Diamond Block", Texture.diamondBlock) {
+	public static final int DIAMONDBLOCK_ID = 0x39;
+	public static final Block DIAMONDBLOCK = new Block(DIAMONDBLOCK_ID, "Diamond Block", Texture.diamondBlock) {
 		{
 			isOpaque = true;
 			isSolid = true;
 			isShiny = true;
 		}
 	};
-	public static final Block WORKBENCH = new Block(0x3A, "Workbench", Texture.workbenchFront) {
+	public static final int WORKBENCH_ID = 0x3A;
+	public static final Block WORKBENCH = new Block(WORKBENCH_ID, "Workbench", Texture.workbenchFront) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1105,7 +1146,8 @@ public class Block {
 			return TexturedBlockModel.intersect(ray, tex);
 		}
 	};
-	public static final Block CROPS = new Block(0x3B, "Wheat", Texture.crops7) {
+	public static final int CROPS_ID = 0x3B;
+	public static final Block CROPS = new Block(CROPS_ID, "Wheat", Texture.crops7) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1120,7 +1162,8 @@ public class Block {
 			return CropsModel.intersect(ray, texture[ray.getBlockData() % 8]);
 		}
 	};
-	public static final Block SOIL = new Block(0x3C, "Soil", Texture.farmlandWet) {
+	public static final int SOIL_ID = 0x3C;
+	public static final Block SOIL = new Block(SOIL_ID, "Soil", Texture.farmlandWet) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1131,7 +1174,8 @@ public class Block {
 			return FarmlandModel.intersect(ray);
 		}
 	};
-	public static final Block FURNACEUNLIT = new Block(0x3D, "Furnace", Texture.furnaceUnlitFront) {
+	public static final int FURNACEUNLIT_ID = 0x3D;
+	public static final Block FURNACEUNLIT = new Block(FURNACEUNLIT_ID, "Furnace", Texture.furnaceUnlitFront) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1150,7 +1194,8 @@ public class Block {
 			return FurnaceModel.intersect(ray, tex);
 		}
 	};
-	public static final Block FURNACELIT = new Block(0x3E, "Burning Furnace", Texture.furnaceLitFront) {
+	public static final int FURNACELIT_ID = 0x3E;
+	public static final Block FURNACELIT = new Block(FURNACELIT_ID, "Burning Furnace", Texture.furnaceLitFront) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1169,7 +1214,8 @@ public class Block {
 			return FurnaceModel.intersect(ray, tex);
 		}
 	};
-	public static final Block SIGNPOST = new Block(0x3F, "Sign Post", Icon.signPost) {
+	public static final int SIGNPOST_ID = 0x3F;
+	public static final Block SIGNPOST = new Block(SIGNPOST_ID, "Sign Post", Icon.signPost) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1197,7 +1243,8 @@ public class Block {
 			return DoorModel.intersect(ray, texture[ray.getBlockData() >>> 3]);
 		}
 	};
-	public static final Block LADDER = new Block(0x41, "Ladder", Texture.ladder) {
+	public static final int LADDER_ID = 0x41;
+	public static final Block LADDER = new Block(LADDER_ID, "Ladder", Texture.ladder) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1208,7 +1255,8 @@ public class Block {
 			return LadderModel.intersect(ray);
 		}
 	};
-	public static final Block MINECARTTRACKS = new Block(0x42, "Minecart Tracks", Texture.rails) {
+	public static final int MINECARTTRACKS_ID = 0x42;
+	public static final Block MINECARTTRACKS = new Block(MINECARTTRACKS_ID, "Minecart Tracks", Texture.rails) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1241,7 +1289,8 @@ public class Block {
 			return Texture.stone;
 		}
 	};
-	public static final Block WALLSIGN = new Block(0x44, "Wall Sign", Icon.wallSign) {
+	public static final int WALLSIGN_ID = 0x44;
+	public static final Block WALLSIGN = new Block(WALLSIGN_ID, "Wall Sign", Icon.wallSign) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1252,7 +1301,8 @@ public class Block {
 			return WallSignModel.intersect(ray);
 		}
 	};
-	public static final Block LEVER = new Block(0x45, "Lever", Texture.lever) {
+	public static final int LEVER_ID = 0x45;
+	public static final Block LEVER = new Block(LEVER_ID, "Lever", Texture.lever) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1263,7 +1313,8 @@ public class Block {
 			return LeverModel.intersect(ray);
 		}
 	};
-	public static final Block STONEPRESSUREPLATE = new Block(0x46, "Stone Pressure Plate", Icon.stonePressurePlate) {
+	public static final int STONEPRESSUREPLATE_ID = 0x46;
+	public static final Block STONEPRESSUREPLATE = new Block(STONEPRESSUREPLATE_ID, "Stone Pressure Plate", Icon.stonePressurePlate) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1290,7 +1341,8 @@ public class Block {
 			return DoorModel.intersect(ray, texture[ray.getBlockData() >>> 3]);
 		}
 	};
-	public static final Block WOODENPRESSUREPLATE = new Block(0x48, "Wooden Pressure Plate", Icon.woodenPressurePlate) {
+	public static final int WOODENPRESSUREPLATE_ID = 0x48;
+	public static final Block WOODENPRESSUREPLATE = new Block(WOODENPRESSUREPLATE_ID, "Wooden Pressure Plate", Icon.woodenPressurePlate) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1301,13 +1353,15 @@ public class Block {
 			return PressurePlateModel.intersect(ray, Texture.oakPlanks);
 		}
 	};
-	public static final Block REDSTONEORE = new Block(0x49, "Redstone Ore", Texture.redstoneOre) {
+	public static final int REDSTONEORE_ID = 0x49;
+	public static final Block REDSTONEORE = new Block(REDSTONEORE_ID, "Redstone Ore", Texture.redstoneOre) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block GLOWINGREDSTONEORE = new Block(0x4A, "Glowing Redstone Ore", Texture.redstoneOre) {
+	public static final int GLOWINGREDSTONEORE_ID = 0x4A;
+	public static final Block GLOWINGREDSTONEORE = new Block(GLOWINGREDSTONEORE_ID, "Glowing Redstone Ore", Texture.redstoneOre) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1365,7 +1419,8 @@ public class Block {
 			return ButtonModel.intersect(ray, Texture.stone);
 		}
 	};
-	public static final Block SNOW = new Block(0x4E, "Snow", Texture.snowBlock) {
+	public static final int SNOW_ID = 0x4E;
+	public static final Block SNOW = new Block(SNOW_ID, "Snow", Texture.snowBlock) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1384,13 +1439,15 @@ public class Block {
 			ior = 1.31f;
 		}
 	};
-	public static final Block SNOWBLOCK = new Block(0x50, "Snow Block", Texture.snowBlock) {
+	public static final int SNOWBLOCK_ID = 0x50;
+	public static final Block SNOWBLOCK = new Block(SNOWBLOCK_ID, "Snow Block", Texture.snowBlock) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block CACTUS = new Block(0x51, "Cactus", Texture.cactusSide) {
+	public static final int CACTUS_ID = 0x51;
+	public static final Block CACTUS = new Block(CACTUS_ID, "Cactus", Texture.cactusSide) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1401,13 +1458,15 @@ public class Block {
 			return CactusModel.intersect(ray);
 		}
 	};
-	public static final Block CLAY = new Block(0x52, "Clay", Texture.clay) {
+	public static final int CLAY_ID = 0x52;
+	public static final Block CLAY = new Block(CLAY_ID, "Clay", Texture.clay) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block SUGARCANE = new Block(0x53, "Sugar Cane", Texture.sugarCane) {
+	public static final int SUGARCANE_ID = 0x53;
+	public static final Block SUGARCANE = new Block(SUGARCANE_ID, "Sugar Cane", Texture.sugarCane) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1418,7 +1477,8 @@ public class Block {
 			return SpriteModel.intersect(ray, Texture.sugarCane);
 		}
 	};
-	public static final Block JUKEBOX = new Block(0x54, "Jukebox", Texture.jukeboxSide) {
+	public static final int JUKEBOX_ID = 0x54;
+	public static final Block JUKEBOX = new Block(JUKEBOX_ID, "Jukebox", Texture.jukeboxSide) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1449,9 +1509,13 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return FenceModel.intersect(ray, Texture.oakPlanks);
 		}
+		@Override
+		protected boolean isFence() {
+			return true;
+		}
 	};
-	public static final int PUMPKINSTEM_ID = 0x68;
-	public static final Block PUMPKIN = new Block(0x56, "Pumpkin", Texture.pumpkinSide) {
+	public static final int PUMPKIN_ID = 0x56;
+	public static final Block PUMPKIN = new Block(PUMPKIN_ID, "Pumpkin", Texture.pumpkinSide) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1470,19 +1534,22 @@ public class Block {
 			return PumpkinModel.intersect(ray, tex);
 		}
 	};
-	public static final Block NETHERRACK = new Block(0x57, "Netherrack", Texture.netherrack) {
+	public static final int NETHERRACK_ID = 0x57;
+	public static final Block NETHERRACK = new Block(NETHERRACK_ID, "Netherrack", Texture.netherrack) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block SOULSAND = new Block(0x58, "Soul Sand", Texture.soulsand) {
+	public static final int SOULSAND_ID = 0x58;
+	public static final Block SOULSAND = new Block(SOULSAND_ID, "Soul Sand", Texture.soulsand) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block GLOWSTONE = new Block(0x59, "Glowstone", Texture.glowstone) {
+	public static final int GLOWSTONE_ID = 0x59;
+	public static final Block GLOWSTONE = new Block(GLOWSTONE_ID, "Glowstone", Texture.glowstone) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1490,13 +1557,15 @@ public class Block {
 			emittance = 1.0;
 		}
 	};
-	public static final Block PORTAL = new Block(0x5A, "Portal", Texture.portal) {
+	public static final int PORTAL_ID = 0x5A;
+	public static final Block PORTAL = new Block(PORTAL_ID, "Portal", Texture.portal) {
 		{
 			isOpaque = false;
 			isSolid = false;
 		}
 	};
-	public static final Block JACKOLANTERN = new Block(0x5B, "Jack-O-Lantern", Texture.jackolanternFront) {
+	public static final int JACKOLANTERN_ID = 0x5B;
+	public static final Block JACKOLANTERN = new Block(JACKOLANTERN_ID, "Jack-O-Lantern", Texture.jackolanternFront) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1517,7 +1586,8 @@ public class Block {
 			return PumpkinModel.intersect(ray, tex);
 		}
 	};
-	public static final Block CAKE = new Block(0x5C, "Cake Block", Icon.cake) {
+	public static final int CAKE_ID = 0x5C;
+	public static final Block CAKE = new Block(CAKE_ID, "Cake Block", Icon.cake) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1528,7 +1598,8 @@ public class Block {
 			return CakeModel.intersect(ray);
 		}
 	};
-	public static final Block REDSTONEREPEATEROFF = new Block(0x5D, "Redstone Repeater (off)", Texture.redstoneRepeaterOff) {
+	public static final int REDSTONEREPEATEROFF_ID = 0x5D;
+	public static final Block REDSTONEREPEATEROFF = new Block(REDSTONEREPEATEROFF_ID, "Redstone Repeater (off)", Texture.redstoneRepeaterOff) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1539,7 +1610,8 @@ public class Block {
 			return RedstoneRepeaterModel.intersect(ray, 0);
 		}
 	};
-	public static final Block REDSTONEREPEATERON = new Block(0x5E, "Redstone Repeater (on)", Texture.redstoneRepeaterOn) {
+	public static final int REDSTONEREPEATERON_ID = 0x5E;
+	public static final Block REDSTONEREPEATERON = new Block(REDSTONEREPEATERON_ID, "Redstone Repeater (on)", Texture.redstoneRepeaterOn) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1550,7 +1622,8 @@ public class Block {
 			return RedstoneRepeaterModel.intersect(ray, 1);
 		}
 	};
-	public static final Block STAINED_GLASS = new Block(0x5F, "Stained Glass", Texture.glass) {
+	public static final int STAINED_GLASS_ID = 0x5F;
+	public static final Block STAINED_GLASS = new Block(STAINED_GLASS_ID, "Stained Glass", Texture.glass) {
 		{
 			isOpaque = false;
 			isSolid = true;
@@ -1569,7 +1642,8 @@ public class Block {
 			return other == this || other == GLASS;
 		}
 	};
-	public static final Block TRAPDOOR = new Block(0x60, "Trapdoor", Texture.trapdoor) {
+	public static final int TRAPDOOR_ID = 0x60;
+	public static final Block TRAPDOOR = new Block(TRAPDOOR_ID, "Trapdoor", Texture.trapdoor) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1580,7 +1654,8 @@ public class Block {
 			return TrapdoorModel.intersect(ray, Texture.trapdoor);
 		}
 	};
-	public static final Block HIDDENSILVERFISH = new Block(0x61, "Hidden Silverfish", Texture.stone) {
+	public static final int HIDDENSILVERFISH_ID = 0x61;
+	public static final Block HIDDENSILVERFISH = new Block(HIDDENSILVERFISH_ID, "Hidden Silverfish", Texture.stone) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1597,7 +1672,8 @@ public class Block {
 					tex[ray.getBlockData() % tex.length]);
 		}
 	};
-	public static final Block STONEBRICKS = new Block(0x62, "Stone Bricks", Texture.stoneBrick) {
+	public static final int STONEBRICKS_ID = 0x62;
+	public static final Block STONEBRICKS = new Block(STONEBRICKS_ID, "Stone Bricks", Texture.stoneBrick) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1612,7 +1688,8 @@ public class Block {
 			return TexturedBlockModel.intersect(ray, texture[(ray.currentMaterial>>8)&3]);
 		}
 	};
-	public static final Block HUGEBROWNMUSHROOM = new Block(0x63, "Huge Brown Mushroom", Texture.hugeBrownMushroom) {
+	public static final int HUGEBROWNMUSHROOM_ID = 0x63;
+	public static final Block HUGEBROWNMUSHROOM = new Block(HUGEBROWNMUSHROOM_ID, "Huge Brown Mushroom", Texture.hugeBrownMushroom) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1701,7 +1778,8 @@ public class Block {
 			return TexturedBlockModel.intersect(ray, tex[ray.getBlockData() % 11]);
 		}
 	};
-	public static final Block HUGEREDMUSHROOM = new Block(0x64, "Huge Red Mushroom", Texture.hugeRedMushroom) {
+	public static final int HUGEREDMUSHROOM_ID = 0x64;
+	public static final Block HUGEREDMUSHROOM = new Block(HUGEREDMUSHROOM_ID, "Huge Red Mushroom", Texture.hugeRedMushroom) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1815,7 +1893,8 @@ public class Block {
 			return GlassPaneModel.intersect(ray, Texture.glass, Texture.glassPaneSide);
 		}
 	};
-	public static final Block MELON = new Block(0x67, "Melon", Texture.melonSide) {
+	public static final int MELON_ID = 0x67;
+	public static final Block MELON = new Block(MELON_ID, "Melon", Texture.melonSide) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1832,6 +1911,7 @@ public class Block {
 			return TexturedBlockModel.intersect(ray, tex);
 		}
 	};
+	public static final int PUMPKINSTEM_ID = 0x68;
 	public static final Block PUMPKINSTEM = new Block(PUMPKINSTEM_ID, "Pumpkin Stem", Texture.stemStraight) {
 		{
 			isOpaque = false;
@@ -1877,7 +1957,11 @@ public class Block {
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return FenceGateModel.intersect(ray);
+			return FenceGateModel.intersect(ray, Texture.oakPlanks);
+		}
+		@Override
+		protected boolean isFenceGate() {
+			return true;
 		}
 	};
 	public static final int BRICKSTAIRS_ID = 0x6C;
@@ -1912,7 +1996,8 @@ public class Block {
 			return Texture.stoneBrick;
 		}
 	};
-	public static final Block MYCELIUM = new Block(0x6E, "Mycelium", Texture.myceliumSide) {
+	public static final int MYCELIUM_ID = 0x6E;
+	public static final Block MYCELIUM = new Block(MYCELIUM_ID, "Mycelium", Texture.myceliumSide) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1945,7 +2030,8 @@ public class Block {
 			return PancakeModel.intersect(ray, Texture.lilyPad);
 		}
 	};
-	public static final Block NETHERBRICK = new Block(0x70, "Nether Brick", Texture.netherBrick) {
+	public static final int NETHERBRICK_ID = 0x70;
+	public static final Block NETHERBRICK = new Block(NETHERBRICK_ID, "Nether Brick", Texture.netherBrick) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -1962,6 +2048,7 @@ public class Block {
 		public boolean intersect(Ray ray, Scene scene) {
 			return FenceModel.intersect(ray, Texture.netherBrick);
 		}
+		// isFence should return false since nether brick fence does not connect to normal fence
 	};
 	public static final int NETHERBRICKSTAIRS_ID = 0x72;
 	public static final Block NETHERBRICKSTAIRS = new Block(NETHERBRICKSTAIRS_ID, "Nether Brick Stairs", Icon.stoneStairs) {
@@ -1979,7 +2066,8 @@ public class Block {
 			return Texture.netherBrick;
 		}
 	};
-	public static final Block NETHERWART = new Block(0x73, "Nether Wart", Texture.netherWart2) {
+	public static final int NETHERWART_ID = 0x73;
+	public static final Block NETHERWART = new Block(NETHERWART_ID, "Nether Wart", Texture.netherWart2) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -1995,7 +2083,8 @@ public class Block {
 			return CropsModel.intersect(ray, texture[ray.getBlockData() & 3]);
 		}
 	};
-	public static final Block ENCHNATMENTTABLE = new Block(0x74, "Enchantment Table", Texture.enchantmentTableSide) {
+	public static final int ENCHNATMENTTABLE_ID = 0x74;
+	public static final Block ENCHNATMENTTABLE = new Block(ENCHNATMENTTABLE_ID, "Enchantment Table", Texture.enchantmentTableSide) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2006,7 +2095,8 @@ public class Block {
 			return EnchantmentTableModel.intersect(ray);
 		}
 	};
-	public static final Block BREWINGSTAND = new Block(0x75, "Brewing Stand", Texture.brewingStandSide) {
+	public static final int BREWINGSTAND_ID = 0x75;
+	public static final Block BREWINGSTAND = new Block(BREWINGSTAND_ID, "Brewing Stand", Texture.brewingStandSide) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2017,7 +2107,8 @@ public class Block {
 			return BrewingStandModel.intersect(ray);
 		}
 	};
-	public static final Block CAULDRON = new Block(0x76, "Cauldron", Texture.cauldronSide) {
+	public static final int CAULDRON_ID = 0x76;
+	public static final Block CAULDRON = new Block(CAULDRON_ID, "Cauldron", Texture.cauldronSide) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2028,7 +2119,8 @@ public class Block {
 			return CauldronModel.intersect(ray);
 		}
 	};
-	public static final Block ENDPORTAL = new Block(0x77, "End Portal", Texture.endPortal) {
+	public static final int ENDPORTAL_ID = 0x77;
+	public static final Block ENDPORTAL = new Block(ENDPORTAL_ID, "End Portal", Texture.endPortal) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2039,7 +2131,8 @@ public class Block {
 			return EndPortalModel.intersect(ray);
 		}
 	};
-	public static final Block ENDPORTALFRAME = new Block(0x78, "End Portal Frame", Texture.endPortalFrameTop) {
+	public static final int ENDPORTALFRAME_ID = 0x78;
+	public static final Block ENDPORTALFRAME = new Block(ENDPORTALFRAME_ID, "End Portal Frame", Texture.endPortalFrameTop) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2050,14 +2143,16 @@ public class Block {
 			return EndPortalFrameModel.intersect(ray);
 		}
 	};
-	public static final Block ENDSTONE = new Block(0x79, "End Stone", Texture.endStone) {
+	public static final int ENDSTONE_ID = 0x79;
+	public static final Block ENDSTONE = new Block(ENDSTONE_ID, "End Stone", Texture.endStone) {
 		{
 			isOpaque = true;
 			isSolid = true;
 			localIntersect = true;
 		}
 	};
-	public static final Block DRAGONEGG = new Block(0x7A, "Dragon Egg", Texture.dragonEgg) {
+	public static final int DRAGONEGG_ID = 0x7A;
+	public static final Block DRAGONEGG = new Block(DRAGONEGG_ID, "Dragon Egg", Texture.dragonEgg) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2068,13 +2163,15 @@ public class Block {
 			return DragonEggModel.intersect(ray);
 		}
 	};
-	public static final Block REDSTONELAMPOFF = new Block(0x7B, "Redstone Lamp (off)", Texture.redstoneLampOff) {
+	public static final int REDSTONELAMPOFF_ID = 0x7B;
+	public static final Block REDSTONELAMPOFF = new Block(REDSTONELAMPOFF_ID, "Redstone Lamp (off)", Texture.redstoneLampOff) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block REDSTONELAMPON = new Block(0x7C, "Redstone Lamp (on)", Texture.redstoneLampOn) {
+	public static final int REDSTONELAMPON_ID = 0x7C;
+	public static final Block REDSTONELAMPON = new Block(REDSTONELAMPON_ID, "Redstone Lamp (on)", Texture.redstoneLampOn) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -2082,7 +2179,8 @@ public class Block {
 			emittance = 1.0;
 		}
 	};
-	public static final Block DOUBLEWOODENSLAB = new Block(0x7D, "Double Wooden Slab", Texture.oakPlanks) {
+	public static final int DOUBLEWOODENSLAB_ID = 0x7D;
+	public static final Block DOUBLEWOODENSLAB = new Block(DOUBLEWOODENSLAB_ID, "Double Wooden Slab", Texture.oakPlanks) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -2113,7 +2211,8 @@ public class Block {
 			return woodKind[data % 6];
 		}
 	};
-	public static final Block SINGLEWOODENSLAB = new Block(0x7E, "Single Wooden Slab", Texture.oakPlanks) {
+	public static final int SINGLEWOODENSLAB_ID = 0x7E;
+	public static final Block SINGLEWOODENSLAB = new Block(SINGLEWOODENSLAB_ID, "Single Wooden Slab", Texture.oakPlanks) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2180,13 +2279,15 @@ public class Block {
 			return Texture.sandstoneSide;
 		}
 	};
-	public static final Block EMERALDORE = new Block(0x81, "Emerald Ore", Texture.emeraldOre) {
+	public static final int EMERALDORE_ID = 0x81;
+	public static final Block EMERALDORE = new Block(EMERALDORE_ID, "Emerald Ore", Texture.emeraldOre) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block ENDERCHEST = new Block(0x82, "Ender Chest", Texture.unknown) {
+	public static final int ENDERCHEST_ID = 0x82;
+	public static final Block ENDERCHEST = new Block(ENDERCHEST_ID, "Ender Chest", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2210,8 +2311,8 @@ public class Block {
 			return ChestModel.intersect(ray, tex);
 		}
 	};
-	public static final int TRIPWIRE_ID = 0x84;
-	public static final Block TRIPWIREHOOK = new Block(0x83, "Tripwire Hook", Texture.tripwireHook) {
+	public static final int TRIPWIREHOOK_ID = 0x83;
+	public static final Block TRIPWIREHOOK = new Block(TRIPWIREHOOK_ID, "Tripwire Hook", Texture.tripwireHook) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2222,6 +2323,7 @@ public class Block {
 			return TripwireHookModel.intersect(ray);
 		}
 	};
+	public static final int TRIPWIRE_ID = 0x84;
 	public static final Block TRIPWIRE = new Block(TRIPWIRE_ID, "Tripwire", Texture.tripwire) {
 		{
 			isOpaque = false;
@@ -2233,7 +2335,8 @@ public class Block {
 			return TripwireModel.intersection(ray);
 		}
 	};
-	public static final Block EMERALDBLOCK = new Block(0x85, "Emerald Block", Texture.emeraldBlock) {
+	public static final int EMERALDBLOCK_ID = 0x85;
+	public static final Block EMERALDBLOCK = new Block(EMERALDBLOCK_ID, "Emerald Block", Texture.emeraldBlock) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -2466,7 +2569,8 @@ public class Block {
 			return ChestModel.intersect(ray, tex[(ray.currentMaterial >> 16) % 3]);
 		}
 	};
-	public static final Block WEIGHTEDPRESSUREPLATELIGHT = new Block(0x93, "Weighted Pressure Plate (Light)", Texture.goldBlock) {
+	public static final int WEIGHTEDPRESSUREPLATELIGHT_ID = 0x93;
+	public static final Block WEIGHTEDPRESSUREPLATELIGHT = new Block(WEIGHTEDPRESSUREPLATELIGHT_ID, "Weighted Pressure Plate (Light)", Texture.goldBlock) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2477,7 +2581,8 @@ public class Block {
 			return PressurePlateModel.intersect(ray, Texture.goldBlock);
 		}
 	};
-	public static final Block WEIGHTEDPRESSUREPLATEHEAVY = new Block(0x94, "Weighted Pressure Plate (Heavy)", Texture.ironBlock) {
+	public static final int WEIGHTEDPRESSUREPLATEHEAVY_ID = 0x94;
+	public static final Block WEIGHTEDPRESSUREPLATEHEAVY = new Block(WEIGHTEDPRESSUREPLATEHEAVY_ID, "Weighted Pressure Plate (Heavy)", Texture.ironBlock) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2488,7 +2593,8 @@ public class Block {
 			return PressurePlateModel.intersect(ray, Texture.ironBlock);
 		}
 	};
-	public static final Block REDSTONECOMPARATOR = new Block(0x95, "Redstone Comparator (inactive)", Texture.unknown) {
+	public static final int REDSTONECOMPARATOR_ID = 0x95;
+	public static final Block REDSTONECOMPARATOR = new Block(REDSTONECOMPARATOR_ID, "Redstone Comparator (inactive)", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2499,7 +2605,8 @@ public class Block {
 			return ComparatorModel.intersect(ray, 0);
 		}
 	};
-	public static final Block REDSTONECOMPARATORLIT = new Block(0x96, "Redstone Comparator (active)", Texture.unknown) {
+	public static final int REDSTONECOMPARATORLIT_ID = 0x96;
+	public static final Block REDSTONECOMPARATORLIT = new Block(REDSTONECOMPARATORLIT_ID, "Redstone Comparator (active)", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2510,7 +2617,8 @@ public class Block {
 			return ComparatorModel.intersect(ray, 1);
 		}
 	};
-	public static final Block DAYLIGHTSENSOR = new Block(0x97, "Daylight Sensor", Texture.daylightDetectorTop) {
+	public static final int DAYLIGHTSENSOR_ID = 0x97;
+	public static final Block DAYLIGHTSENSOR = new Block(DAYLIGHTSENSOR_ID, "Daylight Sensor", Texture.daylightDetectorTop) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2521,19 +2629,22 @@ public class Block {
 			return DaylightSensorModel.intersect(ray);
 		}
 	};
-	public static final Block REDSTONEBLOCK = new Block(0x98, "Block of Redstone", Texture.redstoneBlock) {
+	public static final int REDSTONEBLOCK_ID = 0x98;
+	public static final Block REDSTONEBLOCK = new Block(REDSTONEBLOCK_ID, "Block of Redstone", Texture.redstoneBlock) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block NETHERQUARTZORE = new Block(0x99, "Nether Quartz Ore", Texture.netherQuartzOre) {
+	public static final int NETHERQUARTZORE_ID = 0x99;
+	public static final Block NETHERQUARTZORE = new Block(NETHERQUARTZORE_ID, "Nether Quartz Ore", Texture.netherQuartzOre) {
 		{
 			isOpaque = true;
 			isSolid = true;
 		}
 	};
-	public static final Block HOPPER = new Block(0x9A, "Hopper", Texture.unknown) {
+	public static final int HOPPER_ID = 0x9A;
+	public static final Block HOPPER = new Block(HOPPER_ID, "Hopper", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2544,7 +2655,8 @@ public class Block {
 			return HopperModel.intersect(ray);
 		}
 	};
-	public static final Block QUARTZ = new Block(0x9B, "Block of Quartz", Texture.quartzSide) {
+	public static final int QUARTZ_ID = 0x9B;
+	public static final Block QUARTZ = new Block(QUARTZ_ID, "Block of Quartz", Texture.quartzSide) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -2572,7 +2684,8 @@ public class Block {
 			return Texture.quartzSide;
 		}
 	};
-	public static final Block ACTIVATORRAIL = new Block(0x9D, "Activator Rail", Texture.unknown) {
+	public static final int ACTIVATORRAIL_ID = 0x9D;
+	public static final Block ACTIVATORRAIL = new Block(ACTIVATORRAIL_ID, "Activator Rail", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2588,7 +2701,8 @@ public class Block {
 					(ray.getBlockData() & 7) % 6);
 		}
 	};
-	public static final Block DROPPER = new Block(0x9E, "Dropper", Texture.dropperFront) {
+	public static final int DROPPER_ID = 0x9E;
+	public static final Block DROPPER = new Block(DROPPER_ID, "Dropper", Texture.dropperFront) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -2739,14 +2853,16 @@ public class Block {
 			localIntersect = false;
 		}
 	};
-	public static final Block BARRIER = new Block(0xA6, "Barrier", Texture.unknown) {
+	public static final int BARRIER_ID = 0xA6;
+	public static final Block BARRIER = new Block(BARRIER_ID, "Barrier", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
-	public static final Block IRON_TRAPDOOR = new Block(0xA7, "Iron Trapdoor", Texture.ironTrapdoor) {
+	public static final int IRON_TRAPDOOR_ID = 0xA7;
+	public static final Block IRON_TRAPDOOR = new Block(IRON_TRAPDOOR_ID, "Iron Trapdoor", Texture.ironTrapdoor) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2757,7 +2873,8 @@ public class Block {
 			return TrapdoorModel.intersect(ray, Texture.ironTrapdoor);
 		}
 	};
-	public static final Block PRISMARINE = new Block(0xA8, "Prismarine", Texture.prismarine) {
+	public static final int PRISMARINE_ID = 0xA8;
+	public static final Block PRISMARINE = new Block(PRISMARINE_ID, "Prismarine", Texture.prismarine) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -2802,7 +2919,8 @@ public class Block {
 			return kind[data%3];
 		}
 	};
-	public static final Block SEALANTERN = new Block(0xA9, "Sea Lantern", Texture.seaLantern) {
+	public static final int SEALANTERN_ID = 0xA9;
+	public static final Block SEALANTERN = new Block(SEALANTERN_ID, "Sea Lantern", Texture.seaLantern) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -2863,7 +2981,8 @@ public class Block {
 			isSolid = true;
 		}
 	};
-	public static final Block PACKED_ICE = new Block(0xAE, "Unknown Block 0xAE", Texture.packedIce) {
+	public static final int PACKED_ICE_ID = 0xAE;
+	public static final Block PACKED_ICE = new Block(PACKED_ICE_ID, "Unknown Block 0xAE", Texture.packedIce) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -2882,28 +3001,32 @@ public class Block {
 			return LargeFlowerModel.intersect(ray, scene);
 		}
 	};
-	public static final Block UNKNOWN0xB0 = new Block(0xB0, "Unknown Block 0xB0", Texture.unknown) {
+	public static final int UNKNOWN0xB0_ID = 0xB0;
+	public static final Block UNKNOWN0xB0 = new Block(UNKNOWN0xB0_ID, "Unknown Block 0xB0", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
-	public static final Block UNKNOWN0xB1 = new Block(0xB1, "Unknown Block 0xB1", Texture.unknown) {
+	public static final int UNKNOWN0xB1_ID = 0xB1;
+	public static final Block UNKNOWN0xB1 = new Block(UNKNOWN0xB1_ID, "Unknown Block 0xB1", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
-	public static final Block UNKNOWN0xB2 = new Block(0xB2, "Unknown Block 0xB2", Texture.unknown) {
+	public static final int UNKNOWN0xB2_ID = 0xB2;
+	public static final Block UNKNOWN0xB2 = new Block(UNKNOWN0xB2_ID, "Unknown Block 0xB2", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
 			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
-	public static final Block REDSANDSTONE = new Block(0xB3, "Red Sandstone", Texture.redSandstoneSide) {
+	public static final int REDSANDSTONE_ID = 0xB3;
+	public static final Block REDSANDSTONE = new Block(REDSANDSTONE_ID, "Red Sandstone", Texture.redSandstoneSide) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -2946,7 +3069,8 @@ public class Block {
 					tex[ray.getBlockData() % 3]);
 		}
 	};
-	public static final Block REDSANDSTONESTAIRS = new Block(0xB4, "Red Sandstone Stairs", Icon.stoneStairs) {
+	public static final int REDSANDSTONESTAIRS_ID = 0xB4;
+	public static final Block REDSANDSTONESTAIRS = new Block(REDSANDSTONESTAIRS_ID, "Red Sandstone Stairs", Icon.stoneStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2962,7 +3086,8 @@ public class Block {
 			return Texture.redSandstoneSide;
 		}
 	};
-	public static final Block DOUBLESLAB2 = new Block(0xB5, "Double Slab2", Texture.redSandstoneTop) {
+	public static final int DOUBLESLAB2_ID = 0xB5;
+	public static final Block DOUBLESLAB2 = new Block(DOUBLESLAB2_ID, "Double Slab2", Texture.redSandstoneTop) {
 		{
 			isOpaque = true;
 			isSolid = true;
@@ -2983,7 +3108,8 @@ public class Block {
 			return TexturedBlockModel.intersect(ray, textures);
 		}
 	};
-	public static final Block SLAB2 = new Block(0xB6, "Slab2", Texture.redSandstoneTop) {
+	public static final int SLAB2_ID = 0xB6;
+	public static final Block SLAB2 = new Block(SLAB2_ID, "Slab2", Texture.redSandstoneTop) {
 		{
 			isOpaque = false;
 			isSolid = false;
@@ -2997,74 +3123,168 @@ public class Block {
 			return SlabModel.intersect(ray, textures[0], textures[1]);
 		}
 	};
-	public static final Block UNKNOWN0xB7 = new Block(0xB7, "Unknown Block 0xB7", Texture.unknown) {
+	public static final int SPRUCEFENCEGATE_ID = 0xB7;
+	public static final Block SPRUCEFENCEGATE = new Block(SPRUCEFENCEGATE_ID, "Spruce Fence Gate", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return FenceGateModel.intersect(ray, Texture.sprucePlanks);
+		}
+		@Override
+		protected boolean isFence() {
+			return true;
+		}
+		@Override
+		protected boolean isFenceGate() {
+			return true;
 		}
 	};
-	public static final Block UNKNOWN0xB8 = new Block(0xB8, "Unknown Block 0xB8", Texture.unknown) {
+	public static final int BIRCHFENCEGATE_ID = 0xB8;
+	public static final Block BIRCHFENCEGATE = new Block(BIRCHFENCEGATE_ID, "Birch Fence Gate", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return FenceGateModel.intersect(ray, Texture.birchPlanks);
+		}
+		@Override
+		protected boolean isFenceGate() {
+			return true;
 		}
 	};
-	public static final Block UNKNOWN0xB9 = new Block(0xB9, "Unknown Block 0xB9", Texture.unknown) {
+	public static final int JUNGLEFENCEGATE_ID = 0xB9;
+	public static final Block JUNGLEFENCEGATE = new Block(JUNGLEFENCEGATE_ID, "Jungle Fence Gate", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return FenceGateModel.intersect(ray, Texture.jungleTreePlanks);
+		}
+		@Override
+		protected boolean isFenceGate() {
+			return true;
 		}
 	};
-	public static final Block UNKNOWN0xBA = new Block(0xBA, "Unknown Block 0xBA", Texture.unknown) {
+	public static final int DARKOAKFENCEGATE_ID = 0xBA;
+	public static final Block DARKOAKFENCEGATE = new Block(DARKOAKFENCEGATE_ID, "Dark Oak Fence Gate", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return FenceGateModel.intersect(ray, Texture.darkOakPlanks);
+		}
+		@Override
+		protected boolean isFenceGate() {
+			return true;
 		}
 	};
-	public static final Block UNKNOWN0xBB = new Block(0xBB, "Unknown Block 0xBB", Texture.unknown) {
+	public static final int ACACIAFENCEGATE_ID = 0xBB;
+	public static final Block ACACIAFENCEGATE = new Block(ACACIAFENCEGATE_ID, "Acacia Fence Gate", Texture.unknown) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return FenceGateModel.intersect(ray, Texture.acaciaPlanks);
+		}
+		@Override
+		protected boolean isFenceGate() {
+			return true;
 		}
 	};
-	public static final Block UNKNOWN0xBC = new Block(0xBC, "Unknown Block 0xBC", Texture.unknown) {
+	public static final int SPRUCEFENCE_ID = 0xBC;
+	public static final Block SPRUCEFENCE = new Block(SPRUCEFENCE_ID, "Spruce Fence", Icon.fence) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return FenceModel.intersect(ray, Texture.sprucePlanks);
+		}
+		@Override
+		protected boolean isFence() {
+			return true;
 		}
 	};
-	public static final Block UNKNOWN0xBD = new Block(0xBD, "Unknown Block 0xBD", Texture.unknown) {
+	public static final int BIRCHFENCE_ID = 0xBD;
+	public static final Block BIRCHFENCE = new Block(BIRCHFENCE_ID, "Birch Fence", Icon.fence) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return FenceModel.intersect(ray, Texture.birchPlanks);
+		}
+		@Override
+		protected boolean isFence() {
+			return true;
 		}
 	};
-	public static final Block UNKNOWN0xBE = new Block(0xBE, "Unknown Block 0xBE", Texture.unknown) {
+	public static final int JUNGLEFENCE_ID = 0xBE;
+	public static final Block JUNGLEFENCE = new Block(JUNGLEFENCE_ID, "Jungle Fence", Icon.fence) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return FenceModel.intersect(ray, Texture.jungleTreePlanks);
+		}
+		@Override
+		protected boolean isFence() {
+			return true;
 		}
 	};
-	public static final Block UNKNOWN0xBF = new Block(0xBF, "Unknown Block 0xBF", Texture.unknown) {
+	public static final int DARKOAKFENCE_ID = 0xBF;
+	public static final Block DARKOAKFENCE = new Block(DARKOAKFENCE_ID, "Dark Oak Fence", Icon.fence) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return FenceModel.intersect(ray, Texture.darkOakPlanks);
+		}
+		@Override
+		protected boolean isFence() {
+			return true;
 		}
 	};
-	public static final Block UNKNOWN0xC0 = new Block(0xC0, "Unknown Block 0xC0", Texture.unknown) {
+	public static final int ACACIAFENCE_ID = 0xC0;
+	public static final Block ACACIAFENCE = new Block(ACACIAFENCE_ID, "Acacia Fence", Icon.fence) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return FenceModel.intersect(ray, Texture.acaciaPlanks);
+		}
+		@Override
+		protected boolean isFence() {
+			return true;
 		}
 	};
 	public static final Block UNKNOWN0xC1 = new Block(0xC1, "Unknown Block 0xC1", Texture.unknown) {
@@ -3555,10 +3775,10 @@ public class Block {
 		PRISMARINE, SEALANTERN, HAY_BLOCK, CARPET,
 		HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, LARGE_FLOWER,
 		UNKNOWN0xB0, UNKNOWN0xB1, UNKNOWN0xB2, REDSANDSTONE,
-		REDSANDSTONESTAIRS, DOUBLESLAB2, SLAB2, UNKNOWN0xB7,
-		UNKNOWN0xB8, UNKNOWN0xB9, UNKNOWN0xBA, UNKNOWN0xBB,
-		UNKNOWN0xBC, UNKNOWN0xBD, UNKNOWN0xBE, UNKNOWN0xBF,
-		UNKNOWN0xC0, UNKNOWN0xC1, UNKNOWN0xC2, UNKNOWN0xC3,
+		REDSANDSTONESTAIRS, DOUBLESLAB2, SLAB2, SPRUCEFENCEGATE,
+		BIRCHFENCEGATE, JUNGLEFENCEGATE, DARKOAKFENCEGATE, ACACIAFENCEGATE,
+		SPRUCEFENCE, BIRCHFENCE, JUNGLEFENCE, DARKOAKFENCE,
+		ACACIAFENCE, UNKNOWN0xC1, UNKNOWN0xC2, UNKNOWN0xC3,
 		UNKNOWN0xC4, UNKNOWN0xC5, UNKNOWN0xC6, UNKNOWN0xC7,
 		UNKNOWN0xC8, UNKNOWN0xC9, UNKNOWN0xCA, UNKNOWN0xCB,
 		UNKNOWN0xCC, UNKNOWN0xCD, UNKNOWN0xCE, UNKNOWN0xCF,
@@ -3700,11 +3920,19 @@ public class Block {
 	}
 
 	public boolean isNetherBrickFenceConnector() {
-		return isSolid || this == FENCEGATE || this == NETHERBRICKFENCE;
+		return isSolid || this == NETHERBRICKFENCE || isFenceGate();
 	}
 
 	public boolean isFenceConnector() {
-		return isSolid || this == FENCEGATE || this == FENCE;
+		return isSolid || isFence() || isFenceGate();
+	}
+
+	protected boolean isFence() {
+		return false;
+	}
+
+	protected boolean isFenceGate() {
+		return false;
 	}
 
 	public boolean isStoneWallConnector() {

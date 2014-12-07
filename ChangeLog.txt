@@ -1,4 +1,6 @@
 1.3.2 - TBD
+    * Fixed rendering of the 1.8 fence blocks using Birch, Spruce, Jungle,
+      Dark Oak, and Acacia wood
     * Octree and grass/foliage textures are not saved to disk again if they
       were not changed since the last time they were saved
     * Added Stereographic projection mode

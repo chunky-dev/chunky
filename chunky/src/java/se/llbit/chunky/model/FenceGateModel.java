@@ -70,7 +70,7 @@ public class FenceGateModel {
 		}
 	}
 
-	public static boolean intersect(Ray ray) {
+	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 		int isOpen = (ray.getBlockData() >> 2) & 1;
 		int direction = ray.getBlockData() & 3;
@@ -78,7 +78,7 @@ public class FenceGateModel {
 		ray.t = Double.POSITIVE_INFINITY;
 		for (AABB box : rot[isLow][isOpen][direction]) {
 			if (box.intersect(ray)) {
-				Texture.oakPlanks.getColor(ray);
+				texture.getColor(ray);
 				ray.t = ray.tNear;
 				hit = true;
 			}
