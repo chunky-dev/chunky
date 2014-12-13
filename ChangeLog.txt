@@ -1,4 +1,5 @@
 1.3.2 - TBD
+    * Minor improvements to Launcher command-line interface.
     * Fixed rendering of the 1.8 fence blocks using Birch, Spruce, Jungle,
       Dark Oak, and Acacia wood
     * Octree and grass/foliage textures are not saved to disk again if they

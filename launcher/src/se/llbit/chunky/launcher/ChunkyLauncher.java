@@ -58,7 +58,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame implements UpdateListener {
 
-	private static final String LAUNCHER_VERSION = "v1.8.8";
+	private static final String LAUNCHER_VERSION = "v1.8.9";
 
 	protected String java;
 	private final ChunkyDeployer deployer;
@@ -560,7 +560,7 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 	}
 
 	public static void main(String[] args) {
-		LauncherSettings settings = new LauncherSettings();
+		final LauncherSettings settings = new LauncherSettings();
 		settings.load();
 
 		/*
@@ -586,7 +586,13 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 					return;
 				} else if (arg.equals("--verbose")) {
 					settings.verboseLauncher = true;
-				} else if (arg.equals("--update")) {
+				} else if (arg.equals("--update") || arg.equals("--updateAlpha")) {
+					if (arg.equals("--updateAlpha")) {
+						System.out.println("Checking for Chunky alpha/snapshot updates..");
+						settings.downloadSnapshots = true;
+					} else {
+						System.out.println("Checking for Chunky updates..");
+					}
 					UpdateChecker updateThread = new UpdateChecker(settings,
 							new UpdateListener() {
 								@Override
@@ -595,13 +601,16 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 
 								@Override
 								public void updateAvailable(VersionInfo latest) {
-									System.out.println("Downloading Chunky " + latest + "...");
+									System.out.println("Updating/downloading Chunky version " + latest + ":");
 									ConsoleUpdater.update(latest);
 								}
 
 								@Override
 								public void noUpdateAvailable() {
-									System.out.println("Chunky is up to date");
+									System.out.println("No updates found.");
+									if (!settings.downloadSnapshots) {
+										System.out.println("Alpha/snapshot updates are disabled, enable with --updateAlpha");
+									}
 								}
 							});
 					updateThread.start();
@@ -635,12 +644,13 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 				int exitCode = deployer.launchChunky(null, settings, version,
 						ChunkyMode.HEADLESS);
 				if (exitCode != 0) {
+					System.err.println("Failed to start Chunky. Command used:");
+					System.err.println(ChunkyDeployer.commandString(
+						ChunkyDeployer.buildCommandLine(version, settings)));
 					System.exit(exitCode);
 				}
 			} else {
-				System.err.println("Failed to start Chunky. Command used:");
-				System.err.println(ChunkyDeployer.commandString(
-						ChunkyDeployer.buildCommandLine(version, settings)));
+				System.err.println("Could not launch selected Chunky version. Try updating with --update");
 				System.exit(1);
 			}
 		} else {

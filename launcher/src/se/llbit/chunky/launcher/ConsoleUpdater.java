@@ -1,7 +1,24 @@
+/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package se.llbit.chunky.launcher;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -9,6 +26,10 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.VersionInfo.Library;
 import se.llbit.chunky.launcher.VersionInfo.LibraryStatus;
 
+/**
+ * Helper class to download an update with console output.
+ * @author Jesper Öqvist <jesper@llbit.se>
+ */
 public class ConsoleUpdater {
 	public static void update(VersionInfo version) {
 		File chunkyDir = PersistentSettings.getSettingsDirectory();
@@ -43,9 +64,11 @@ public class ConsoleUpdater {
 				} else {
 					libSize = String.format("%.1f %s", size, unit);
 				}
-				System.out.println("Downloading " + lib + " [" + libSize + "]...");
+				System.out.print("Downloading " + lib + " [" + libSize + "]...");
 
-				if (!downloadLibrary(libDir, lib)) {
+				if (downloadLibrary(libDir, lib, System.out)) {
+					System.out.println("done!");
+				} else {
 					return;
 				}
 			}
@@ -58,43 +81,49 @@ public class ConsoleUpdater {
 		}
 	}
 
-	private static boolean downloadLibrary(File libDir, Library lib) {
-		DownloadStatus result = DownloadStatus.DOWNLOAD_FAILED;
+	/**
+	 * Attempt to download a library.
+	 * @param libDir
+	 * @param lib
+	 * @param err
+	 * @return {@code true} if the library was downloaded successfully
+	 */
+	private static boolean downloadLibrary(File libDir, Library lib, PrintStream err) {
 		if (!lib.url.isEmpty()) {
-			result = UpdateDialog.tryDownload(libDir, lib, lib.url);
+			DownloadStatus result = UpdateDialog.tryDownload(libDir, lib, lib.url);
 			switch (result) {
 			case MALFORMED_URL:
-				System.err.println("Malformed URL: " + lib.url);
+				err.println("Malformed URL: " + lib.url);
 				break;
 			case FILE_NOT_FOUND:
-				System.err.println("File not found: " + lib.url);
+				err.println("File not found: " + lib.url);
 				break;
 			case DOWNLOAD_FAILED:
-				System.err.println("Download failed: " + lib.url);
+				err.println("Download failed: " + lib.url);
 				break;
-			default:
-				break;
+			case SUCCESS:
+				return true;
 			}
 		}
 		String defaultUrl = "http://chunkyupdate.llbit.se/lib/" + lib.name;
-		if (result != DownloadStatus.SUCCESS) {
-			result = UpdateDialog.tryDownload(libDir, lib, defaultUrl);
+		if (!lib.url.isEmpty()) {
+			err.print("  retrying with URL=" + defaultUrl + "...");
 		}
+		DownloadStatus result = UpdateDialog.tryDownload(libDir, lib, defaultUrl);
 		switch (result) {
-		case SUCCESS:
-			return true;
 		case MALFORMED_URL:
-			System.err.println("Malformed URL: " + defaultUrl);
+			err.println("Malformed URL: " + defaultUrl);
 			return false;
 		case FILE_NOT_FOUND:
-			System.err.println("File not found: " + defaultUrl);
+			err.println("File not found: " + defaultUrl);
 			return false;
 		case DOWNLOAD_FAILED:
-			System.err.println("Download failed: " + defaultUrl);
+			err.println("Download failed: " + defaultUrl);
 			return false;
-		default:
-			return false;
+		case SUCCESS:
+			return true;
 		}
+		return false;
 	}
 
 }
