@@ -1315,6 +1315,7 @@ public class Scene extends SceneDescription {
 		}
 		String fileName = name + "-" + spp + ".png";
 		File targetFile = new File(directory, fileName);
+		finalizeFrame(progressListener);
 		writePNG(buffer, targetFile, progressListener);
 	}
 
@@ -1326,14 +1327,19 @@ public class Scene extends SceneDescription {
 	public synchronized void saveFrame(File targetFile,
 			ProgressListener progressListener) throws IOException {
 
-		for (int x = 0; x < width; ++x) {
-			progressListener.setProgress("Finalizing frame", x+1, 0, width);
-			for (int y = 0; y < height; ++y) {
-				finalizePixel(x, y);
+		finalizeFrame(progressListener);
+		writePNG(backBuffer, targetFile, progressListener);
+	}
+
+	private void finalizeFrame(ProgressListener progressListener) {
+		if (!finalized) {
+			for (int x = 0; x < width; ++x) {
+				progressListener.setProgress("Finalizing frame", x+1, 0, width);
+				for (int y = 0; y < height; ++y) {
+					finalizePixel(x, y);
+				}
 			}
 		}
-
-		writePNG(backBuffer, targetFile, progressListener);
 	}
 
 	/**
@@ -1557,7 +1563,7 @@ public class Scene extends SceneDescription {
 			logger.info("Octree loaded");
 			return true;
 		} catch (IOException e) {
-			logger.info("Failed to load chunk octree: Missing file or incorrect format!", e);
+			logger.info("Failed to load chunk octree: missing file or incorrect format!", e);
 			return false;
 		} finally {
 			if (in != null) {
