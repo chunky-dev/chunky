@@ -40,6 +40,12 @@ public class PanoramicSlotProjector implements Projector {
 	@Override
 	public void apply(double x, double y, Random random, Vector3d o,
 			Vector3d d) {
+		apply(x, y, o, d);
+	}
+
+	@Override
+	public void apply(double x, double y, Vector3d o,
+			Vector3d d) {
 		double ax = QuickMath.degToRad(x * fov);
 		double dz = FastMath.cos(ax);
 		double dx = FastMath.sin(ax);

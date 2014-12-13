@@ -48,6 +48,15 @@ public class ForwardDisplacementProjector implements Projector {
 	}
 
 	@Override
+	public void apply(double x, double y, Vector3d o, Vector3d d) {
+		wrapped.apply(x, y, o, d);
+
+		d.normalize();
+		d.scale(displacementValue);
+		o.scaleAdd(displacementSign, d, o);
+	}
+
+	@Override
 	public double getMinRecommendedFoV() {
 		return wrapped.getMinRecommendedFoV();
 	}

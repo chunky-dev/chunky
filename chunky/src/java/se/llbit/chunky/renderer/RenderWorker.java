@@ -89,7 +89,7 @@ public class RenderWorker extends Thread {
 	private final void work(int jobId) throws InterruptedException {
 
 		Scene scene = manager.bufferedScene();
-		
+
 		Random random = state.random;
 		Ray ray = state.ray;
 
@@ -97,6 +97,7 @@ public class RenderWorker extends Thread {
 		int height = scene.canvasHeight();
 
 		double halfWidth = width/(2.0*height);
+		//double invHeight = 1 / height;
 
 		// calculate pixel bounds for this job
 		int xjobs = (width+(manager.tileWidth-1))/manager.tileWidth;

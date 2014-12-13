@@ -65,6 +65,36 @@ public class RayTracer {
 	/**
 	 * @param scene
 	 * @param state
+	 * @return occlusion value
+	 */
+	public static double skyOcclusion(Scene scene, WorkerState state) {
+		Ray ray = state.ray;
+		double occlusion = 1.0;
+		while (true) {
+			if (!nextIntersection(scene, ray, state)) {
+				if (scene.waterHeight > 0 &&
+						ray.d.y < 0 && ray.x.y > scene.waterHeight-.125) {
+
+					ray.t = (scene.waterHeight-.125-ray.x.y) / ray.d.y;
+					ray.distance += ray.t;
+					ray.x.scaleAdd(ray.t, ray.d, ray.x);
+					ray.currentMaterial = Block.WATER.id;
+					ray.prevMaterial = 0;
+					WaterModel.intersect(ray);
+					occlusion *= (1 - ray.color.w);
+				}
+				break;
+			} else {
+				occlusion *= (1 - ray.color.w);
+				ray.x.scaleAdd(Ray.OFFSET, ray.d, ray.x);
+			}
+		}
+		return 1-occlusion;
+	}
+
+	/**
+	 * @param scene
+	 * @param state
 	 * @return Next intersection
 	 */
 	public static boolean nextIntersection(Scene scene, Ray ray, WorkerState state) {

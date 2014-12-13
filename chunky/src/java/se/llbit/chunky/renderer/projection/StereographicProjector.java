@@ -35,6 +35,11 @@ public class StereographicProjector implements Projector {
 
 	@Override
 	public void apply(double x, double y, Random random, Vector3d o, Vector3d d) {
+		apply(x, y, o, d);
+	}
+
+	@Override
+	public void apply(double x, double y, Vector3d o, Vector3d d) {
 		y *= scale;
 		x *= scale;
 		double xx_yy = x * x + y * y;

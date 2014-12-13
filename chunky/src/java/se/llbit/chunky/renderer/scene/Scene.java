@@ -63,6 +63,7 @@ import se.llbit.math.Vector3i;
 import se.llbit.png.IEND;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
+import se.llbit.util.VectorPool;
 
 /**
  * Scene description.
@@ -190,6 +191,7 @@ public class Scene extends SceneDescription {
 	private double[] samples;
 
 	private int[] bufferData;
+	private byte[] alphaChannel;
 
 	private boolean finalized = false;
 
@@ -215,6 +217,7 @@ public class Scene extends SceneDescription {
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		backBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		bufferData = ((DataBufferInt) backBuffer.getRaster().getDataBuffer()).getData();
+		alphaChannel = new byte[width*height];
 		samples = new double[width*height*3];
 	}
 
@@ -277,6 +280,7 @@ public class Scene extends SceneDescription {
 			height = other.height;
 			backBuffer = other.backBuffer;
 			buffer = other.buffer;
+			alphaChannel = other.alphaChannel;
 			samples = other.samples;
 			bufferData = other.bufferData;
 		}
@@ -1185,6 +1189,7 @@ public class Scene extends SceneDescription {
 	public void setTransparentSky(boolean value) {
 		if (value != transparentSky) {
 			transparentSky = value;
+			refresh();
 		}
 	}
 
@@ -1333,6 +1338,7 @@ public class Scene extends SceneDescription {
 		}
 		String fileName = name + "-" + spp + ".png";
 		File targetFile = new File(directory, fileName);
+		computeAlpha(progressListener);
 		finalizeFrame(progressListener);
 		writePNG(buffer, targetFile, progressListener);
 	}
@@ -1345,8 +1351,29 @@ public class Scene extends SceneDescription {
 	public synchronized void saveFrame(File targetFile,
 			ProgressListener progressListener) throws IOException {
 
+		computeAlpha(progressListener);
 		finalizeFrame(progressListener);
 		writePNG(backBuffer, targetFile, progressListener);
+	}
+
+	/**
+	 * Compute the alpha channel.
+	 * @param progressListener
+	 */
+	private void computeAlpha(ProgressListener progressListener) {
+		if (transparentSky) {
+			WorkerState state = new WorkerState();
+			//state.random = new Random(0);
+			state.vectorPool = new VectorPool();
+			state.rayPool = new RayPool();
+			state.ray = state.rayPool.get();
+			for (int x = 0; x < width; ++x) {
+				progressListener.setProgress("Computing alpha channel", x+1, 0, width);
+				for (int y = 0; y < height; ++y) {
+					computeAlpha(x, y, state);
+				}
+			}
+		}
 	}
 
 	private void finalizeFrame(ProgressListener progressListener) {
@@ -1371,7 +1398,11 @@ public class Scene extends SceneDescription {
 		try {
 			progressListener.setProgress("Writing PNG", 0, 0, 1);
 			PngFileWriter writer = new PngFileWriter(targetFile);
-			writer.write(buffer, progressListener);
+			if (transparentSky) {
+				writer.write(buffer, alphaChannel, progressListener);
+			} else {
+				writer.write(buffer, progressListener);
+			}
 			if (camera.getProjectionMode() == ProjectionMode.PANORAMIC &&
 					camera.getFoV() >= 179 && camera.getFoV() <= 181) {
 				int height = buffer.getHeight();
@@ -1765,6 +1796,57 @@ public class Scene extends SceneDescription {
 		b = QuickMath.min(1, b);
 
 		bufferData[y*width + x] = Color.getRGB(r, g, b);
+	}
+
+	/**
+	 * Compute the alpha channel based on sky visibility.
+	 * @param x
+	 * @param y
+	 */
+	public void computeAlpha(int x, int y, WorkerState state) {
+		Ray ray = state.ray;
+		double halfWidth = width/(2.0*height);
+		double invHeight = 1.0 / height;
+
+		// rotated grid supersampling
+
+		camera.calcViewRay(ray,
+				-halfWidth + (x - 3/8.0) * invHeight,
+				-.5 + (y + 1/8.0) * invHeight);
+		ray.x.x -= origin.x;
+		ray.x.y -= origin.y;
+		ray.x.z -= origin.z;
+
+		double occlusion = RayTracer.skyOcclusion(this, state);
+
+		camera.calcViewRay(ray,
+				-halfWidth + (x + 1/8.0) * invHeight,
+				-.5 + (y + 3/8.0) * invHeight);
+		ray.x.x -= origin.x;
+		ray.x.y -= origin.y;
+		ray.x.z -= origin.z;
+
+		occlusion += RayTracer.skyOcclusion(this, state);
+
+		camera.calcViewRay(ray,
+				-halfWidth + (x - 1/8.0) * invHeight,
+				-.5 + (y - 3/8.0) * invHeight);
+		ray.x.x -= origin.x;
+		ray.x.y -= origin.y;
+		ray.x.z -= origin.z;
+
+		occlusion += RayTracer.skyOcclusion(this, state);
+
+		camera.calcViewRay(ray,
+				-halfWidth + (x + 3/8.0) * invHeight,
+				-.5 + (y - 1/8.0) * invHeight);
+		ray.x.x -= origin.x;
+		ray.x.y -= origin.y;
+		ray.x.z -= origin.z;
+
+		occlusion += RayTracer.skyOcclusion(this, state);
+
+		alphaChannel[y*width + x] = (byte) (255 * occlusion*0.25 + 0.5);
 	}
 
 	/**

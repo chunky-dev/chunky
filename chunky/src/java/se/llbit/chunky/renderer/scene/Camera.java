@@ -465,6 +465,29 @@ public class Camera implements JSONifiable {
 	}
 
 	/**
+	 * Calculate a ray shooting out of the camera based on normalized
+	 * image coordinates.
+	 * @param ray result ray
+	 * @param random random number stream
+	 * @param x normalized image coordinate [-0.5, 0.5]
+	 * @param y normalized image coordinate [-0.5, 0.5]
+	 */
+	public void calcViewRay(Ray ray, double x, double y) {
+
+		// reset the ray properties - current material etc.
+		ray.setDefault();
+
+		projector.apply(x, y, ray.x, ray.d);
+
+		ray.d.normalize();
+
+		// from camera space to world space
+		transform.transform(ray.d);
+		transform.transform(ray.x);
+		ray.x.add(pos);
+	}
+
+	/**
 	 * Rotate vector from camera space to world space (does not translate
 	 * the vector)
 	 * @param d Vector to rotate

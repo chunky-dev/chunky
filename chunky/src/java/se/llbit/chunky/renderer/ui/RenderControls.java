@@ -1860,7 +1860,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	protected void updateTransparentSky() {
 		transparentSky.removeActionListener(transparentSkyListener);
-		transparentSky.setSelected(renderMan.scene().atmosphereEnabled());
+		transparentSky.setSelected(renderMan.scene().transparentSky());
 		transparentSky.addActionListener(transparentSkyListener);
 	}
 

@@ -93,6 +93,38 @@ public class PngFileWriter {
 		idat.close();
 	}
 
+	/**
+	 * Write the image to the file
+	 * @param image
+	 * @param alpha
+	 * @param file
+	 * @param progressListener
+	 */
+	public void write(BufferedImage image, byte[] alpha, ProgressListener progressListener)
+			throws IOException {
+		DataBufferInt dataBuf = (DataBufferInt) image.getData().getDataBuffer();
+		int[] data = dataBuf.getData();
+		int width = image.getWidth();
+		int height = image.getHeight();
+		writeChunk(new IHDR(width, height, 6));
+		IDATWriter idat = new IDATWriter();
+		int i = 0;
+		for (int y = 0; y < height; ++y) {
+			progressListener.setProgress("Writing PNG", y, 0, height);
+			idat.write(IDAT.FILTER_TYPE_NONE);// scanline header
+			for (int x = 0; x < width; ++x) {
+				int rgb = data[i];
+				idat.write((rgb>>16)&0xFF);
+				idat.write((rgb>>8)&0xFF);
+				idat.write(rgb&0xFF);
+				idat.write(alpha[i]);
+				i += 1;
+			}
+			progressListener.setProgress("Writing PNG", y+1, 0, height);
+		}
+		idat.close();
+	}
+
 	class IDATWriter {
 		Deflater deflater = new Deflater();
 		int inputSize = 0;

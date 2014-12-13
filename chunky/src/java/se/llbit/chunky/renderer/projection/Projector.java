@@ -35,6 +35,15 @@ public interface Projector {
 	public void apply(double x, double y, Random random, Vector3d pos,
 			Vector3d direction);
 
+	/**
+	 * @param x pixel X coordinate, where 0 = center and +-0.5 = edges
+	 * @param y pixel Y coordinate, where 0 = center and +-0.5 = edges
+	 * @param pos will be populated with camera-relative ray origin position
+	 * @param direction will be populated with camera-relative ray direction
+	 *            (not necessarily normalized)
+	 */
+	public void apply(double x, double y, Vector3d pos, Vector3d direction);
+
 	public double getMinRecommendedFoV();
 
 	public double getMaxRecommendedFoV();

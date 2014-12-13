@@ -31,8 +31,12 @@ public class FisheyeProjector implements Projector {
 	}
 
 	@Override
-	public void apply(double x, double y, Random random, Vector3d o,
-			Vector3d d) {
+	public void apply(double x, double y, Random random, Vector3d o, Vector3d d) {
+		apply(x, y, o, d);
+	}
+
+	@Override
+	public void apply(double x, double y, Vector3d o, Vector3d d) {
 		double ay = QuickMath.degToRad(y * fov);
 		double ax = QuickMath.degToRad(x * fov);
 		double avSquared = ay * ay + ax * ax;

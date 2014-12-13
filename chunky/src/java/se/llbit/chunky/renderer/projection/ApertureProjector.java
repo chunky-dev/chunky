@@ -64,6 +64,11 @@ public class ApertureProjector implements Projector {
 	}
 
 	@Override
+	public void apply(double x, double y, Vector3d pos, Vector3d direction) {
+		wrapped.apply(x, y, pos, direction);
+	}
+
+	@Override
 	public double getMinRecommendedFoV() {
 		return wrapped.getMinRecommendedFoV();
 	}

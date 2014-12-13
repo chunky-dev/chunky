@@ -30,10 +30,11 @@ public class IHDR extends PngChunk {
 	public static final int CHUNK_TYPE = 0x49484452;
 
 	private static final int BIT_DEPTH = 8;
-	private static final int COLOUR_TYPE = 2;// each pixel is an RGB triple
+	private static final int COLOR_TYPE_RGB = 2;// each pixel is an RGB triple
 	private static final int COMPRESSION_METHOD = 0;// deflate/inflate
 	private static final int FILTER_METHOD = 0;
 	private static final int INTERLACE_METHOD = 0;
+	private final int colorType;
 	private int crc;
 	private final int width;
 	private final int height;
@@ -43,8 +44,18 @@ public class IHDR extends PngChunk {
 	 * @param height
 	 */
 	public IHDR(int width, int height) {
+		this(width, height, COLOR_TYPE_RGB);
+	}
+
+	/**
+	 * @param width
+	 * @param height
+	 * @param colortype
+	 */
+	public IHDR(int width, int height, int colortype) {
 		this.width = width;
 		this.height = height;
+		this.colorType = colortype;
 	}
 
 	@Override
@@ -68,8 +79,8 @@ public class IHDR extends PngChunk {
 		crcOut.writeByte(BIT_DEPTH);
 		out.writeByte(BIT_DEPTH);
 
-		crcOut.writeByte(COLOUR_TYPE);
-		out.writeByte(COLOUR_TYPE);
+		crcOut.writeByte(colorType);
+		out.writeByte(colorType);
 
 		crcOut.writeByte(COMPRESSION_METHOD);
 		out.writeByte(COMPRESSION_METHOD);

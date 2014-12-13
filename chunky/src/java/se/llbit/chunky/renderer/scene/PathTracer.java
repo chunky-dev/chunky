@@ -67,7 +67,9 @@ public class PathTracer {
 			if (!RayTracer.nextIntersection(scene, ray, state)) {
 				if (ray.depth == 0) {
 					// direct sky hit
-					scene.sky.getSkyColorInterpolated(ray, scene.waterHeight > 0);
+					if (!scene.transparentSky()) {
+						scene.sky.getSkyColorInterpolated(ray, scene.waterHeight > 0);
+					}
 
 				} else if (ray.specular) {
 					// sky color
