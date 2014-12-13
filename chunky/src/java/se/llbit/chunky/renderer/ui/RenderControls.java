@@ -151,6 +151,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JButton stopRenderBtn = new JButton();
 	private final JCheckBox clearWaterCB = new JCheckBox();
 	private final JCheckBox atmosphereEnabled = new JCheckBox();
+	private final JCheckBox transparentSky = new JCheckBox();
 	private final JCheckBox volumetricFogEnabled = new JCheckBox();
 	private final JCheckBox cloudsEnabled = new JCheckBox();
 	private final RenderContext context;
@@ -1419,6 +1420,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		atmosphereEnabled.addActionListener(atmosphereListener);
 		updateAtmosphereCheckBox();
 
+		transparentSky.setText("transparent sky");
+		transparentSky.addActionListener(transparentSkyListener);
+		updateTransparentSky();
+
 		volumetricFogEnabled.setText("enable volumetric fog");
 		volumetricFogEnabled.addActionListener(volumetricFogListener);
 		updateVolumetricFogCheckBox();
@@ -1444,6 +1449,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(skyGradientPanel)
 				.addComponent(skyboxPanel)
 				.addComponent(atmosphereEnabled)
+				.addComponent(transparentSky)
 				.addComponent(volumetricFogEnabled)
 				.addComponent(cloudsEnabled)
 				.addGroup(cloudSize.horizontalGroup(layout))
@@ -1467,6 +1473,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addComponent(skyboxPanel)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(atmosphereEnabled)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(transparentSky)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(volumetricFogEnabled)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -1850,6 +1858,12 @@ public class RenderControls extends JDialog implements ViewListener,
 		atmosphereEnabled.addActionListener(atmosphereListener);
 	}
 
+	protected void updateTransparentSky() {
+		transparentSky.removeActionListener(transparentSkyListener);
+		transparentSky.setSelected(renderMan.scene().atmosphereEnabled());
+		transparentSky.addActionListener(transparentSkyListener);
+	}
+
 	protected void updateVerticalResolution() {
 		v90Btn.removeActionListener(v90Listener);
 		v180Btn.removeActionListener(v180Listener);
@@ -2138,6 +2152,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
 			renderMan.scene().setAtmosphereEnabled(source.isSelected());
+		}
+	};
+	private final ActionListener transparentSkyListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JCheckBox source = (JCheckBox) e.getSource();
+			renderMan.scene().setTransparentSky(source.isSelected());
 		}
 	};
 	private final ActionListener volumetricFogListener = new ActionListener() {
@@ -2497,6 +2518,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateVerticalResolution();
 		updateBiomeColorsCB();
 		updateAtmosphereCheckBox();
+		updateTransparentSky();
 		updateVolumetricFogCheckBox();
 		updateCloudsEnabledCheckBox();
 		updateTitle();

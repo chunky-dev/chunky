@@ -256,6 +256,7 @@ public class Scene extends SceneDescription {
 		emittersEnabled = other.emittersEnabled;
 		emitterIntensity = other.emitterIntensity;
 		atmosphereEnabled = other.atmosphereEnabled;
+		transparentSky = other.transparentSky;
 		volumetricFogEnabled = other.volumetricFogEnabled;
 
 		camera.set(other.camera);
@@ -1178,6 +1179,16 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
+	 * Set the transparent sky option.
+	 * @param value
+	 */
+	public void setTransparentSky(boolean value) {
+		if (value != transparentSky) {
+			transparentSky = value;
+		}
+	}
+
+	/**
 	 * Set the volumetric fog flag
 	 * @param value
 	 */
@@ -1193,6 +1204,13 @@ public class Scene extends SceneDescription {
 	 */
 	public boolean atmosphereEnabled() {
 		return atmosphereEnabled;
+	}
+
+	/**
+	 * @return {@code true} if transparent sky is enabled
+	 */
+	public boolean transparentSky() {
+		return transparentSky;
 	}
 
 	/**

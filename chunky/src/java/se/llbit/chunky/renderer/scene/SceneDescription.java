@@ -102,6 +102,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	protected boolean clearWater = false;
 	protected boolean biomeColors = true;
 	protected boolean atmosphereEnabled = false;
+	protected boolean transparentSky = false;
 	protected boolean volumetricFogEnabled = false;
 	protected int waterHeight = 0;
 
@@ -159,6 +160,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		desc.add("clearWater", clearWater);
 		desc.add("biomeColorsEnabled", biomeColors);
 		desc.add("atmosphereEnabled", atmosphereEnabled);
+		desc.add("transparentSky", transparentSky);
 		desc.add("volumetricFogEnabled", volumetricFogEnabled);
 		desc.add("waterHeight", waterHeight);
 
@@ -211,6 +213,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		clearWater = desc.get("clearWater").boolValue(false);
 		biomeColors = desc.get("biomeColorsEnabled").boolValue(true);
 		atmosphereEnabled = desc.get("atmosphereEnabled").boolValue(false);
+		transparentSky = desc.get("transparentSky").boolValue(false);
 		volumetricFogEnabled = desc.get("volumetricFogEnabled").boolValue(false);
 		waterHeight = desc.get("waterHeight").intValue(0);
 
