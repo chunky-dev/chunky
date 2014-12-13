@@ -97,7 +97,7 @@ public class RenderWorker extends Thread {
 		int height = scene.canvasHeight();
 
 		double halfWidth = width/(2.0*height);
-		//double invHeight = 1 / height;
+		double invHeight = 1.0 / height;
 
 		// calculate pixel bounds for this job
 		int xjobs = (width+(manager.tileWidth-1))/manager.tileWidth;
@@ -126,8 +126,9 @@ public class RenderWorker extends Thread {
 						double oy = random.nextDouble();
 						double ox = random.nextDouble();
 
-						cam.calcViewRay(ray, random, (-halfWidth + (x + ox)
-								/ height), (-.5 + (y + oy) / height));
+						cam.calcViewRay(ray, random,
+								(-halfWidth + (x + ox) * invHeight),
+								(-.5 + (y + oy) * invHeight));
 
 						scene.pathTrace(state);
 
@@ -173,8 +174,8 @@ public class RenderWorker extends Thread {
 			}
 
 			cam.calcViewRay(ray, random,
-					(-halfWidth + (double)x / height),
-					(-.5 + (double)y / height));
+					(-halfWidth + (double)x * invHeight),
+					(-.5 + (double)y * invHeight));
 
 			scene.quickTrace(state);
 
