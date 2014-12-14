@@ -426,8 +426,8 @@ public class Camera implements JSONifiable {
 		if (world != null) {
 			Vector3d playerPos = world.playerPos();
 			if (playerPos != null) {
-				pitch = HALF_PI * ( (world.playerPitch() / 90) - 1);
-				yaw = HALF_PI * ( -(world.playerYaw() / 90) + 1);
+				pitch = QuickMath.degToRad(world.playerPitch() - 90);
+				yaw = QuickMath.degToRad(-world.playerYaw() + 90);
 				roll = 0;
 				pos.x = playerPos.x;
 				pos.y = playerPos.y + 1.6;

@@ -22,6 +22,9 @@ package se.llbit.math;
  */
 public class QuickMath {
 
+	public static final double HALF_PI = Math.PI/2;
+	public static final double TAU = Math.PI*2;
+
 	/**
 	 * @param d
 	 * @return The floor of d
@@ -107,7 +110,7 @@ public class QuickMath {
 	 * @return Radians
 	 */
 	public static final double degToRad(double deg) {
-		return Math.PI * (deg / 180);
+		return (deg * Math.PI) / 180;
 	}
 
 	/**

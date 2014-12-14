@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -109,5 +109,10 @@ public class Vector4d {
 		y += s*v.y;
 		z += s*v.z;
 		w += s*v.w;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("(%.2f, %.2f, %.2f, %.2f)", x, y, z, w);
 	}
 }

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -245,7 +245,7 @@ public class Vector3d {
 
 	@Override
 	public String toString() {
-		return String.format("(%f, %f, %f)", x, y, z);
+		return String.format("(%.2f, %.2f, %.2f)", x, y, z);
 	}
 
 	/**

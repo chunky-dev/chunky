@@ -51,7 +51,7 @@ public class Region implements Iterable<Chunk> {
 	private final ChunkPosition position;
 	private final World world;
 	private final String fileName;
-	private long timestamp = 0;
+	private long regionFileTime = 0;
 	private final int[] chunkTimestamps = new int[NUM_CHUNKS];
 
 	/**
@@ -121,10 +121,10 @@ public class Region implements Iterable<Chunk> {
 		RandomAccessFile file = null;
 		try {
 			long modtime = regionFile.lastModified();
-			if (timestamp == modtime) {
+			if (regionFileTime == modtime) {
 				return;
 			}
-			timestamp = modtime;
+			regionFileTime = modtime;
 			file = new RandomAccessFile(regionFile, "r");
 			long length = file.length();
 			if (length < 2*SECTOR_SIZE) {
@@ -384,7 +384,7 @@ public class Region implements Iterable<Chunk> {
 
 	public boolean hasChanged() {
 		File regionFile = new File(world.getRegionDirectory(), fileName);
-		return timestamp != regionFile.lastModified();
+		return regionFileTime != regionFile.lastModified();
 	}
 
 	/**
