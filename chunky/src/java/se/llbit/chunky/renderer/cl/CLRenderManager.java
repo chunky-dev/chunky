@@ -375,7 +375,7 @@ public class CLRenderManager extends Thread implements Renderer,
 		tmpTransform.transform(d);
 		Vector3d right = new Vector3d();
 		right.cross(up, d);
-		origin.scaleAdd(-1, right, origin);
+		origin.scaleAdd(-1, right);
 		updateOrigin();
 		refresh();
 	}
@@ -387,7 +387,7 @@ public class CLRenderManager extends Thread implements Renderer,
 		tmpTransform.transform(d);
 		Vector3d right = new Vector3d();
 		right.cross(up, d);
-		origin.scaleAdd(1, right, origin);
+		origin.scaleAdd(1, right);
 		updateOrigin();
 		refresh();
 	}
@@ -396,7 +396,7 @@ public class CLRenderManager extends Thread implements Renderer,
 	public synchronized void onMoveForward() {
 		Vector3d d = new Vector3d(0, -1, 0);
 		transform.transform(d);
-		origin.scaleAdd(1, d, origin);
+		origin.scaleAdd(1, d);
 		updateOrigin();
 		refresh();
 	}
@@ -405,7 +405,7 @@ public class CLRenderManager extends Thread implements Renderer,
 	public synchronized void onMoveBackward() {
 		Vector3d d = new Vector3d(0, -1, 0);
 		transform.transform(d);
-		origin.scaleAdd(-1, d, origin);
+		origin.scaleAdd(-1, d);
 		updateOrigin();
 		refresh();
 	}
@@ -420,14 +420,14 @@ public class CLRenderManager extends Thread implements Renderer,
 
 	@Override
 	public synchronized void onMoveUp() {
-		origin.scaleAdd(1, up, origin);
+		origin.scaleAdd(1, up);
 		updateOrigin();
 		refresh();
 	}
 
 	@Override
 	public synchronized void onMoveDown() {
-		origin.scaleAdd(-1, up, origin);
+		origin.scaleAdd(-1, up);
 		updateOrigin();
 		refresh();
 	}

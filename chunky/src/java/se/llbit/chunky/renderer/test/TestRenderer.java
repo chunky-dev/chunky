@@ -239,7 +239,7 @@ public class TestRenderer extends Thread implements ViewListener,
 		ray.color.set(1, 1, 1, 1);
 
 		if (tNear <= tFar && tFar >= 0) {
-			ray.x.scaleAdd(tNear, ray.d, ray.x);
+			ray.x.scaleAdd(tNear, ray.d);
 			ray.distance += tNear;
 
 			if (blockId == -1) {

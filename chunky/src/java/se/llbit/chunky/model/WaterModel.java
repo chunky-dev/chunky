@@ -199,7 +199,7 @@ public class WaterModel {
 			}
 			if (hit) {
 				ray.distance += ray.t;
-				ray.x.scaleAdd(ray.t, ray.d, ray.x);
+				ray.x.scaleAdd(ray.t, ray.d);
 				ray.color.w = WATER_OPACITY;
 
 				/*if ((level&8) != 0) {
@@ -320,7 +320,7 @@ public class WaterModel {
 			Texture.water.getAvgColorLinear(ray.color);
 			ray.color.w = WATER_OPACITY;
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d, ray.x);
+			ray.x.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

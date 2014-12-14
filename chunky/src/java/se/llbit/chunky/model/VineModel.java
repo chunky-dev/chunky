@@ -93,7 +93,7 @@ public class VineModel {
 		}
 		if (hit) {
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d, ray.x);
+			ray.x.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

@@ -369,7 +369,7 @@ public class Octree {
 					}
 
 					if (tNear < Double.MAX_VALUE) {
-						ray.x.scaleAdd(tNear, d, ray.x);
+						ray.x.scaleAdd(tNear, d);
 						ray.n.set(nx, ny, nz);
 						ray.distance += tNear;
 						tNear = Double.POSITIVE_INFINITY;
@@ -433,7 +433,7 @@ public class Octree {
 					if (prevBlock != currentBlock)
 						return true;
 
-					ray.x.scaleAdd(Ray.OFFSET, ray.d, ray.x);
+					ray.x.scaleAdd(Ray.OFFSET, ray.d);
 					continue;
 				} else {
 					// exit ray from this local block
@@ -489,7 +489,7 @@ public class Octree {
 				}
 			}
 
-			ray.x.scaleAdd(tNear, d, ray.x);
+			ray.x.scaleAdd(tNear, d);
 			ray.n.set(nx, ny, nz);
 			ray.distance += tNear;
 			tNear = Double.POSITIVE_INFINITY;
@@ -579,7 +579,7 @@ public class Octree {
 					ray.currentMaterial = Block.AIR.id;
 					return true;
 				} else if (currentBlock == Block.WATER) {
-					ray.x.scaleAdd(Ray.OFFSET, ray.d, ray.x);
+					ray.x.scaleAdd(Ray.OFFSET, ray.d);
 					continue;
 				} else {
 					return true;

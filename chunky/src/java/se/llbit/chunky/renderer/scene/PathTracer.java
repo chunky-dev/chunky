@@ -166,7 +166,7 @@ public class PathTracer {
 									random.nextDouble() < Scene.fSubSurface)) {
 
 								if (!frontLight) {
-									reflected.x.scaleAdd(-Ray.OFFSET, ray.n, reflected.x);
+									reflected.x.scaleAdd(-Ray.OFFSET, ray.n);
 								}
 
 								reflected.currentMaterial = ray.prevMaterial;
@@ -276,8 +276,7 @@ public class PathTracer {
 
 									refracted.d.normalize();
 
-									refracted.x.scaleAdd(Ray.OFFSET,
-											refracted.d, refracted.x);
+									refracted.x.scaleAdd(Ray.OFFSET, refracted.d);
 								}
 
 								pathTrace(scene, refracted, state, 1, false);
@@ -297,8 +296,7 @@ public class PathTracer {
 				} else {
 
 					transmitted.set(ray);
-					transmitted.x.scaleAdd(Ray.OFFSET, transmitted.d,
-							transmitted.x);
+					transmitted.x.scaleAdd(Ray.OFFSET, transmitted.d);
 
 					pathTrace(scene, transmitted, state, 1, false);
 					if (transmitted.hit) {
@@ -395,8 +393,7 @@ public class PathTracer {
 		attenuation.z = 1;
 		attenuation.w = 1;
 		while (attenuation.w > 0) {
-			ray.x.scaleAdd(Ray.OFFSET,
-					ray.d, ray.x);
+			ray.x.scaleAdd(Ray.OFFSET, ray.d);
 			if (!RayTracer.nextIntersection(scene, ray, state))
 				break;
 			double mult = 1 - ray.color.w;

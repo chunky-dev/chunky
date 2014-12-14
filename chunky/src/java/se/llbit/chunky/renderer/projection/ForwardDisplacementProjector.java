@@ -44,7 +44,7 @@ public class ForwardDisplacementProjector implements Projector {
 
 		d.normalize();
 		d.scale(displacementValue);
-		o.scaleAdd(displacementSign, d, o);
+		o.scaleAdd(displacementSign, d);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class ForwardDisplacementProjector implements Projector {
 
 		d.normalize();
 		d.scale(displacementValue);
-		o.scaleAdd(displacementSign, d, o);
+		o.scaleAdd(displacementSign, d);
 	}
 
 	@Override

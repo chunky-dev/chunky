@@ -40,7 +40,7 @@ public class RayTracer {
 
 					ray.t = (scene.waterHeight-.125-ray.x.y) / ray.d.y;
 					ray.distance += ray.t;
-					ray.x.scaleAdd(ray.t, ray.d, ray.x);
+					ray.x.scaleAdd(ray.t, ray.d);
 					ray.currentMaterial = Block.WATER.id;
 					ray.prevMaterial = 0;
 					WaterModel.intersect(ray);
@@ -51,7 +51,7 @@ public class RayTracer {
 			} else if (ray.currentMaterial != 0 && ray.color.w > 0) {
 				break;
 			} else {
-				ray.x.scaleAdd(Ray.OFFSET, ray.d, ray.x);
+				ray.x.scaleAdd(Ray.OFFSET, ray.d);
 			}
 		}
 
@@ -77,7 +77,7 @@ public class RayTracer {
 
 					ray.t = (scene.waterHeight-.125-ray.x.y) / ray.d.y;
 					ray.distance += ray.t;
-					ray.x.scaleAdd(ray.t, ray.d, ray.x);
+					ray.x.scaleAdd(ray.t, ray.d);
 					ray.currentMaterial = Block.WATER.id;
 					ray.prevMaterial = 0;
 					WaterModel.intersect(ray);
@@ -86,7 +86,7 @@ public class RayTracer {
 				break;
 			} else {
 				occlusion *= (1 - ray.color.w);
-				ray.x.scaleAdd(Ray.OFFSET, ray.d, ray.x);
+				ray.x.scaleAdd(Ray.OFFSET, ray.d);
 			}
 		}
 		return 1-occlusion;
@@ -142,7 +142,7 @@ public class RayTracer {
 			// infinite water intersection
 			ray.t = (scene.waterHeight-.125-ray.x.y) / ray.d.y;
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d, ray.x);
+			ray.x.scaleAdd(ray.t, ray.d);
 			ray.currentMaterial = Block.WATER_ID;
 			ray.prevMaterial = 0;
 			WaterModel.intersect(ray);

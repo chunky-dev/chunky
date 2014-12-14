@@ -36,7 +36,7 @@ public class LeafModel {
 				ray.color.y *= biomeColor[1];
 				ray.color.z *= biomeColor[2];
 				ray.distance += ray.tNear;
-				ray.x.scaleAdd(ray.tNear, ray.d, ray.x);
+				ray.x.scaleAdd(ray.tNear, ray.d);
 				return true;
 			}
 		}

@@ -88,7 +88,7 @@ public class WallSignModel {
 		if (hit) {
 			ray.color.w = 1;
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d, ray.x);
+			ray.x.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

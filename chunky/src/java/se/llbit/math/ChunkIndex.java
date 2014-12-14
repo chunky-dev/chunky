@@ -46,7 +46,7 @@ public class ChunkIndex {
 		ray.color.set(1, 1, 1, 1);
 
 		if (tNear <= tFar && tFar >= 0) {
-			ray.x.scaleAdd(tNear, ray.d, ray.x);
+			ray.x.scaleAdd(tNear, ray.d);
 			ray.distance += tNear;
 
 			ray.prevMaterial = 0;
