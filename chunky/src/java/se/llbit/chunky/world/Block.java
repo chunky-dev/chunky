@@ -88,7 +88,7 @@ import se.llbit.math.Ray;
  */
 @SuppressWarnings("javadoc")
 public class Block {
-	private static final boolean UNKNOWN_INVISIBLE = false;
+	private static final boolean UNKNOWN_INVISIBLE = true;
 
 	public static final int AIR_ID = 0x00;
 	public static final Block AIR = new Block(AIR_ID, "Air", Texture.air) {

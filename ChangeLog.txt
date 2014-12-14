@@ -1,3 +1,6 @@
+1.3.3 - TBD
+    * Set unknown blocks back to being invisible (instead of question marks).
+
 1.3.2 - 2014-12-13
     * Added option to the sky tab for rendering the sky transparent.
     * Minor improvements to Launcher command-line interface.
