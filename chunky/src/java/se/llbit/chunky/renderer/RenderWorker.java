@@ -141,7 +141,7 @@ public class RenderWorker extends Thread {
 					samples[offset+1] = (samples[offset+1] * scene.spp + sg) * sinv;
 					samples[offset+2] = (samples[offset+2] * scene.spp + sb) * sinv;
 
-					if (scene.finalizeBuffer()) {
+					if (scene.shouldFinalizeBuffer()) {
 						scene.finalizePixel(x, y);
 					}
 

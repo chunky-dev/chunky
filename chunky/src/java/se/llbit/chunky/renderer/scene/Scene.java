@@ -25,7 +25,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -1435,7 +1434,7 @@ public class Scene extends SceneDescription {
 			writer.writeChunk(new IEND());
 			writer.close();
 		} catch (IOException e) {
-			logger.warn("Failed to write PNG file: " + e.getMessage(), e);
+			logger.warn("Failed to write PNG file: " + targetFile.getAbsolutePath(), e);
 		}
 
 	}
@@ -1943,7 +1942,7 @@ public class Scene extends SceneDescription {
 	/**
 	 * @return <code>true</code> if the rendered buffer should be finalized
 	 */
-	public boolean finalizeBuffer() {
+	public boolean shouldFinalizeBuffer() {
 		return finalizeBuffer;
 	}
 

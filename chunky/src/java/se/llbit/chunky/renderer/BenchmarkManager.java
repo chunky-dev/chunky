@@ -120,7 +120,7 @@ public class BenchmarkManager extends AbstractRenderManager {
 			// warm up ten iterations with JIT enabled
 			java.lang.Compiler.enable();
 			scene.refresh();
-			for (int i = 0; i < 10; ++i) {
+			for (int i = 0; i < 15; ++i) {
 				renderListener.setProgress(task, i, 0, 120);
 				giveTickets();
 				waitOnWorkers();
@@ -129,7 +129,7 @@ public class BenchmarkManager extends AbstractRenderManager {
 			// warm up ten iterations with JIT disabled
 			java.lang.Compiler.disable();
 			scene.refresh();
-			for (int i = 0; i < 10; ++i) {
+			for (int i = 0; i < 5; ++i) {
 				renderListener.setProgress(task, i+10, 0, 120);
 				giveTickets();
 				waitOnWorkers();
@@ -142,6 +142,7 @@ public class BenchmarkManager extends AbstractRenderManager {
 				renderListener.setProgress(task, i+20, 0, 120);
 				giveTickets();
 				waitOnWorkers();
+				scene.spp += 1;
 			}
 			millis = System.currentTimeMillis() - millis;
 
@@ -151,6 +152,11 @@ public class BenchmarkManager extends AbstractRenderManager {
 			score = (int) ((100 * pixelsPerFrame) / (millis / 1000.0));
 
 			renderListener.setProgress(task, 120, 0, 120);
+
+			// DEBUG: write PNG output
+			//scene.finalizeFrame(renderListener);
+			//scene.updateCanvas();
+			//scene.saveSnapshot(new java.io.File("tmp"), renderListener);
 
 		} catch (InterruptedException e) {
 			// 3D view was closed
