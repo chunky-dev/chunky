@@ -156,7 +156,7 @@ public class BenchmarkManager extends AbstractRenderManager {
 			// DEBUG: write PNG output
 			//scene.finalizeFrame(renderListener);
 			//scene.updateCanvas();
-			//scene.saveSnapshot(new java.io.File("tmp"), renderListener);
+			//scene.saveSnapshot(new java.io.File(System.getProperty("user.dir")), renderListener);
 
 		} catch (InterruptedException e) {
 			// 3D view was closed

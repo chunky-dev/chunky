@@ -1375,7 +1375,7 @@ public class Scene extends SceneDescription {
 		}
 	}
 
-	private void finalizeFrame(ProgressListener progressListener) {
+	public void finalizeFrame(ProgressListener progressListener) {
 		if (!finalized) {
 			for (int x = 0; x < width; ++x) {
 				progressListener.setProgress("Finalizing frame", x+1, 0, width);

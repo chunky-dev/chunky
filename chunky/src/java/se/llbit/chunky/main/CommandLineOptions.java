@@ -335,7 +335,7 @@ public class CommandLineOptions {
 			}
 		}
 
-		if (!confError && mode != Mode.NO_OP) {
+		if (!confError && mode != Mode.NO_OP && mode != Mode.HEADLESS_BENCHMARK) {
 			try {
 				if (options.texturePack != null) {
 					TexturePackLoader.loadTexturePack(new File(options.texturePack), false);
