@@ -17,6 +17,7 @@
 package se.llbit.chunky.main;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import se.llbit.chunky.PersistentSettings;
@@ -42,7 +43,11 @@ public class BlockTestRenderer {
 			if (!lastTexturePack.isEmpty()) {
 				TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
 			} else {
-				TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJar(), false);
+				try {
+					TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJarNonNull(), false);
+				} catch (FileNotFoundException e) {
+					System.err.println("Minecraft Jar not found! Using placeholder textures.");
+				}
 			}
 		} catch (TextureLoadingError e) {
 			System.err.println(e.getMessage());

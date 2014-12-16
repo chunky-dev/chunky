@@ -19,6 +19,7 @@ package se.llbit.chunky.resources;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -97,7 +98,7 @@ public class MinecraftFinder {
 	}
 
 	/**
-	 * NB: This method caches it's result
+	 * NB: This method caches its result
 	 * @return File reference to the latest Minecraft jar of the local
 	 * Minecraft installation, or <code>null</code> if the Minecraft jar
 	 * could not be found.
@@ -123,6 +124,20 @@ public class MinecraftFinder {
 			}
 			return minecraftJar;
 		}
+	}
+
+	/**
+	 * NB: This method caches its result
+	 * @return File reference to the latest Minecraft jar of the local
+	 * Minecraft installation, or throws a FileNotFoundException if it
+	 * could not be found.
+	 */
+	public static final File getMinecraftJarNonNull() throws FileNotFoundException {
+		File jarFile = getMinecraftJar();
+		if (jarFile == null) {
+			throw new FileNotFoundException("Could not locate Minecraft Jar!");
+		}
+		return jarFile;
 	}
 
 	/**

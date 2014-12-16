@@ -57,7 +57,17 @@ public class EmbeddedResourceContext extends RenderContext {
 	}
 
 	@Override
-	public File getSceneFile(String fileName) {
+	protected File getSceneFile(String fileName) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean fileUnchangedSince(String fileName, long timestamp) {
+		return true;
+	}
+
+	@Override
+	public long fileTimestamp(String fileName) {
+		return 0;
 	}
 }

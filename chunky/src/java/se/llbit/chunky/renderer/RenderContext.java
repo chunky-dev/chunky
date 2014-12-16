@@ -93,7 +93,7 @@ public class RenderContext {
 	 * @return Input stream for the given scene file
 	 * @throws FileNotFoundException
 	 */
-	public File getSceneFile(String fileName) {
+	protected File getSceneFile(String fileName) {
 		return new File(config.sceneDir, fileName);
 	}
 
@@ -122,5 +122,21 @@ public class RenderContext {
 	 */
 	public int tileWidth() {
 		return config.tileWidth;
+	}
+
+	/**
+	 * @param timestamp the timestamp
+	 * @return {@code true} if the file has not changed since timestamp
+	 */
+	public boolean fileUnchangedSince(String fileName, long timestamp) {
+		File file = getSceneFile(fileName);
+		return file.exists() && file.lastModified() == timestamp;
+	}
+
+	/**
+	 * @return last modification timestamp
+	 */
+	public long fileTimestamp(String fileName) {
+		return getSceneFile(fileName).lastModified();
 	}
 }

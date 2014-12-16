@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -340,10 +341,12 @@ public class Controls extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJar(), true);
+					TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJarNonNull(), true);
 					chunky.reloadWorld();
+				} catch (FileNotFoundException e1) {
+					System.err.println("Minecraft Jar not found! Using placeholder textures.");
 				} catch (TextureLoadingError e1) {
-					System.err.println("Error: failed to load default texture pack!");
+					System.err.println("Error: failed to load default texture pack! Using placeholder textures.");
 				}
 			}
 		});

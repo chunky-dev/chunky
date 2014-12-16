@@ -1295,7 +1295,10 @@ public class TexturePackLoader {
 	 * last used texture pack
 	 */
 	public static void loadTexturePack(File tpFile, boolean rememberTP) throws TextureLoadingError {
-		if (tpFile == null || !tpFile.isFile()) {
+		if (tpFile == null) {
+			throw new TextureLoadingError("Could not open texture pack: no file specified");
+		}
+		if (!tpFile.isFile()) {
 			throw new TextureLoadingError("Could not open texture pack: " + tpFile.getAbsolutePath());
 		}
 		logger.info("Loading textures from " + tpFile.getAbsolutePath());

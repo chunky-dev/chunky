@@ -1,25 +1,25 @@
 {
-  "sdfVersion": 2,
+  "sdfVersion": 3,
   "name": "benchmark-1",
   "width": 400,
   "height": 400,
   "exposure": 1.0,
   "postprocess": 1,
-  "renderTime": 88244,
+  "renderTime": 0,
   "spp": 0,
   "sppTarget": 1200,
+  "rayDepth": 5,
   "pathTrace": true,
   "dumpFrequency": 0,
   "saveSnapshots": false,
   "emittersEnabled": true,
   "emitterIntensity": 13.0,
   "sunEnabled": true,
-  "cloudsEnabled": false,
-  "cloudHeight": 128,
   "stillWater": false,
   "clearWater": false,
-  "biomeColorsEnabled": true,
+  "biomeColorsEnabled": false,
   "atmosphereEnabled": false,
+  "transparentSky": false,
   "volumetricFogEnabled": false,
   "waterHeight": 0,
   "camera": {
@@ -35,8 +35,7 @@
     },
     "projectionMode": "PINHOLE",
     "fov": 64.55,
-    "dof": 8.0,
-    "infDof": true,
+    "dof": "Infinity",
     "focalOffset": 2.0
   },
   "sun": {
@@ -52,11 +51,29 @@
   "sky": {
     "skyYaw": 0.0,
     "skyMirrored": true,
-    "groundColor": {
-      "red": 0.0,
-      "green": 0.0,
-      "blue": 1.0
-    }
+    "skyLight": 1.0,
+    "mode": "SIMULATED",
+    "horizonOffset": 0.0,
+    "cloudsEnabled": false,
+    "cloudSize": 64.0,
+    "cloudOffset": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "gradient": [
+      {
+        "rgb": "09B7D9",
+        "pos": 0.0
+      },
+      {
+        "rgb": "D4F5FB",
+        "pos": 1.0
+      }
+    ]
+  },
+  "cameraPresets": {
+    
   },
   "chunkList": [
     [

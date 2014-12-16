@@ -179,7 +179,7 @@ public class Chunky implements ChunkTopographyListener {
 				break;
 			}
 		} catch (Throwable t) {
-			logger.fatal("Unchecked exception caused Chunky to close: " + t.getMessage());
+			logger.fatal("Unchecked exception caused Chunky to close", t);
 			return 2;
 		}
 		return 0;

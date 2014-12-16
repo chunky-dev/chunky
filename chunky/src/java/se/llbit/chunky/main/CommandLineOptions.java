@@ -176,7 +176,7 @@ public class CommandLineOptions {
 						i += 1;
 					}
 					try {
-						File file = getSceneFile(options);
+						File file = getSceneDescriptionFile(options);
 						Scene scene = new Scene();
 						FileInputStream in = new FileInputStream(file);
 						scene.loadDescription(in);
@@ -206,7 +206,7 @@ public class CommandLineOptions {
 				if (args.length > i+3) {
 					options.sceneName = args[i+3];
 					try {
-						File file = getSceneFile(options);
+						File file = getSceneDescriptionFile(options);
 						JsonObject desc = readSceneJson(file);
 						String name = args[i+1];
 						String value = args[i+2];
@@ -253,7 +253,7 @@ public class CommandLineOptions {
 				if (args.length > i+2) {
 					options.sceneName = args[i+2];
 					try {
-						File file = getSceneFile(options);
+						File file = getSceneDescriptionFile(options);
 						JsonObject desc = readSceneJson(file);
 						String name = args[i+1];
 						System.out.println("- " + name);
@@ -347,10 +347,18 @@ public class CommandLineOptions {
 						} catch (TextureLoadingError e) {
 							System.err.println(e.getMessage());
 							System.err.println("Loading default Minecraft textures");
-							TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJar(), false);
+							try {
+								TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJarNonNull(), false);
+							} catch (FileNotFoundException e1) {
+								System.err.println("Minecraft Jar not found! Using placeholder textures.");
+							}
 						}
 					} else {
-						TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJar(), false);
+						try {
+							TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJarNonNull(), false);
+						} catch (FileNotFoundException e1) {
+							System.err.println("Minecraft Jar not found! Using placeholder textures.");
+						}
 					}
 				}
 			} catch (TextureLoadingError e) {
@@ -390,7 +398,11 @@ public class CommandLineOptions {
 		System.out.println();
 	}
 
-	private static File getSceneFile(ChunkyOptions options) {
+	/**
+	 * Retrieve the scene description file for a specific scene.
+	 * @return the scene description file handle
+	 */
+	private static File getSceneDescriptionFile(ChunkyOptions options) {
 		if (options.sceneName.endsWith(
 				SceneDescription.SCENE_DESCRIPTION_EXTENSION)) {
 			File possibleSceneFile = new File(options.sceneName);
