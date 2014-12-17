@@ -20,16 +20,13 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import se.llbit.log.Log;
 
 /**
  * Utility methods to scan world directories for region files.
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class WorldScanner {
-
-	private static final Logger logger =
-			Logger.getLogger(WorldScanner.class);
 
 	// TODO: use region discovery listener instead
 	/**
@@ -58,7 +55,7 @@ public class WorldScanner {
 	        return;
 
 		if (!regionDirectory.isDirectory()) {
-			logger.warn(String.format("Failed to read region directory for world %s!",
+			Log.warn(String.format("Failed to read region directory for world %s!",
 							regionDirectory.getPath()));
 			return;
 		}

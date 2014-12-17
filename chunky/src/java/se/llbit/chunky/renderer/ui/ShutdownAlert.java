@@ -25,13 +25,10 @@ import java.io.IOException;
 import javax.swing.ProgressMonitor;
 import javax.swing.Timer;
 
-import org.apache.log4j.Logger;
-
+import se.llbit.log.Log;
 import se.llbit.util.OSDetector;
 
 public class ShutdownAlert extends ProgressMonitor implements ActionListener {
-
-	private static final Logger logger = Logger.getLogger(ShutdownAlert.class);
 
 	/**
 	 * Time in seconds to shutdown
@@ -94,15 +91,15 @@ public class ShutdownAlert extends ProgressMonitor implements ActionListener {
 				Process proc = Runtime.getRuntime().exec(getShutdownCommand());
 				proc.waitFor();
 				if (0 != proc.exitValue()) {
-					logger.error("Failed to shutdown computer (command returned error code)");
+					Log.error("Failed to shutdown computer (command returned error code)");
 				}
 			} catch (IOException e) {
-				logger.error("Failed to shutdown computer", e);
+				Log.error("Failed to shutdown computer", e);
 			} catch (InterruptedException e) {
-				logger.error("Failed to shutdown computer", e);
+				Log.error("Failed to shutdown computer", e);
 			}
 		} else {
-			logger.debug("Shutdown command: " + getShutdownCommand());
+			Log.info("Shutdown command: " + getShutdownCommand());
 		}
 	}
 
@@ -115,7 +112,7 @@ public class ShutdownAlert extends ProgressMonitor implements ActionListener {
 		case BSD:
 			return SHUTDOWN_UNIX;
 		default:
-			logger.info("Don't know how to shutdown this computer (OS unknown)");
+			Log.info("Don't know how to shutdown this computer (OS unknown)");
 			return "";
 		}
 	}

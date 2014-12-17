@@ -44,7 +44,6 @@ import java.util.Random;
 import javax.swing.JFrame;
 
 import org.apache.commons.math3.util.FastMath;
-import org.apache.log4j.Logger;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
 import org.jocl.cl_command_queue;
@@ -66,6 +65,7 @@ import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 import se.llbit.j99.pp.PP;
+import se.llbit.log.Log;
 import se.llbit.math.Color;
 import se.llbit.math.Matrix3d;
 import se.llbit.math.Octree;
@@ -75,9 +75,6 @@ import se.llbit.math.Vector3d;
 @SuppressWarnings("javadoc")
 public class CLRenderManager extends Thread implements Renderer,
 	ProgressListener, ViewListener {
-
-	private static final Logger logger =
-			Logger.getLogger(CLRenderManager.class);
 
 	private final int workItems;
 	private final long[] globalWorkSize;
@@ -152,7 +149,7 @@ public class CLRenderManager extends Thread implements Renderer,
 		origin.set(scene.calcCenterCamera());
 		origin.sub(scene.getOrigin());
 		int[] octreeData = octree.toDataBuffer();
-		logger.info("octree size: " + (4 * octreeData.length) + " bytes");
+		Log.info("octree size: " + (4 * octreeData.length) + " bytes");
 		octreeBuffer = clCreateBuffer(context, CL_MEM_READ_ONLY,
 				octreeData.length * Sizeof.cl_uint, null, null);
 		clEnqueueWriteBuffer(commandQueue, octreeBuffer, CL_TRUE, 0,
@@ -219,7 +216,7 @@ public class CLRenderManager extends Thread implements Renderer,
 			InputStream in = CLRenderManager.class
 					.getResourceAsStream(resourceName);
 			if (in == null) {
-				logger.warn("Could not load OpenCL kernel!");
+				Log.warn("Could not load OpenCL kernel!");
 				throw new Error("Could not load OpenCL kernel!");
 			}
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -233,9 +230,9 @@ public class CLRenderManager extends Thread implements Renderer,
 			}
 
 		} catch (IOException e) {
-			logger.error("Fatal IO error", e);
+			Log.error("Fatal IO error", e);
 		} catch (RuntimeException e) {
-			logger.error("Fatal error", e);
+			Log.error("Fatal error", e);
 		}
 
 		return null;
@@ -272,7 +269,7 @@ public class CLRenderManager extends Thread implements Renderer,
 
 			numSamples += 1;
 			if (numSamples % 10 == 0) {
-				logger.info("SPS: " + (int) ((numSamples * workItems) / QuickMath.max(1, (renderTime/1000.))));
+				Log.info("SPS: " + (int) ((numSamples * workItems) / QuickMath.max(1, (renderTime/1000.))));
 			}
 			updateCanvas(samples);
 		}
@@ -334,7 +331,7 @@ public class CLRenderManager extends Thread implements Renderer,
 			}
 			view.getCanvas().repaint();
 		} catch (IllegalStateException e) {
-			logger.error("Unexpected exception while rendering back buffer", e);
+			Log.error("Unexpected exception while rendering back buffer", e);
 		}
 	}
 

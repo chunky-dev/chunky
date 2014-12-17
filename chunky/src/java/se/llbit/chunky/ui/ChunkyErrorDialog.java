@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012,2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -21,11 +21,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 
 import javax.swing.Action;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -33,13 +32,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.DefaultEditorKit;
-
-import org.apache.log4j.spi.LoggingEvent;
-import org.apache.log4j.spi.ThrowableInformation;
 
 /**
  * Dedicated error reporting dialog.
@@ -51,7 +46,7 @@ import org.apache.log4j.spi.ThrowableInformation;
 @SuppressWarnings("serial")
 public class ChunkyErrorDialog extends JDialog {
 
-	private JTabbedPane tabbedPane;
+	private final JTabbedPane tabbedPane;
 	private int errorCount = 0;
 
 	/**
@@ -95,7 +90,7 @@ public class ChunkyErrorDialog extends JDialog {
 	 * Add a log record to be displayed by this error dialog.
 	 * @param event
 	 */
-	public synchronized void addRecord(LoggingEvent event) {
+	public synchronized void addRecord(String message) {
 		errorCount += 1;
 
 		final JPanel panel = new JPanel();
@@ -129,19 +124,7 @@ public class ChunkyErrorDialog extends JDialog {
 			}
 		});
 
-		ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-		PrintStream out = new PrintStream(byteOut);
-		out.println(event.getMessage());
-		out.println();
-
-		ThrowableInformation throwableInfo = event.getThrowableInformation();
-		if (throwableInfo != null) {
-			Throwable thrown = throwableInfo.getThrowable();
-			thrown.printStackTrace(out);
-		}
-		out.close();
-
-		textArea.setText(new String(byteOut.toByteArray()));
+		textArea.setText(message);
 
 		final JScrollPane textScrollPane = new JScrollPane(textArea);
 

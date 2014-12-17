@@ -32,8 +32,6 @@ import java.util.zip.ZipFile;
 
 import javax.imageio.ImageIO;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.texturepack.AlternateTextures;
 import se.llbit.chunky.resources.texturepack.ChestTexture;
@@ -46,6 +44,7 @@ import se.llbit.chunky.resources.texturepack.SignTexture;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.chunky.resources.texturepack.SunTexture;
 import se.llbit.chunky.resources.texturepack.TextureRef;
+import se.llbit.log.Log;
 
 /**
  * Utility methods to load Minecraft texture packs.
@@ -59,9 +58,6 @@ public class TexturePackLoader {
 			super(msg);
 		}
 	}
-
-	private static final Logger logger =
-			Logger.getLogger(TexturePackLoader.class);
 
 	private static Map<String, TextureRef> allTextures =
 		new HashMap<String, TextureRef>();
@@ -1301,7 +1297,7 @@ public class TexturePackLoader {
 		if (!tpFile.isFile()) {
 			throw new TextureLoadingError("Could not open texture pack: " + tpFile.getAbsolutePath());
 		}
-		logger.info("Loading textures from " + tpFile.getAbsolutePath());
+		Log.info("Loading textures from " + tpFile.getAbsolutePath());
 		loadTexturePack(tpFile, allTextures.keySet(), rememberTP);
 	}
 
@@ -1333,7 +1329,7 @@ public class TexturePackLoader {
 				PersistentSettings.setLastTexturePack(tpFile.getAbsolutePath());
 			}
 		} catch (IOException e) {
-			logger.warn("Failed to open " + tpName + ": " + e.getMessage());
+			Log.warn("Failed to open " + tpName + ": " + e.getMessage());
 		} finally {
 			if (texturePack != null) {
 				try {
@@ -1355,7 +1351,7 @@ public class TexturePackLoader {
 			if (notLoaded.size() > 10) {
 				msg.append("\t... plus " + (notLoaded.size()-10) + " more");
 			}
-			logger.info(msg.toString());
+			Log.info(msg.toString());
 
 			if (!isDefault) {
 				// fall back on default TP

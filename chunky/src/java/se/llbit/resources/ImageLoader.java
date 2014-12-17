@@ -25,7 +25,7 @@ import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
-import org.apache.log4j.Logger;
+import se.llbit.log.Log;
 
 /**
  * Utility class for image loading.
@@ -33,9 +33,6 @@ import org.apache.log4j.Logger;
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public final class ImageLoader {
-
-	private static final Logger logger =
-			Logger.getLogger(ImageLoader.class);
 
 	private final static HashMap<String, BufferedImage> map = new HashMap<String, BufferedImage>();
 	private final static BufferedImage missingImage;
@@ -80,7 +77,7 @@ public final class ImageLoader {
 	private static synchronized void loadImage(String resourceName) {
 		URL url = ImageLoader.class.getResource("/" + resourceName);
 		if (url == null) {
-			logger.info("Could not load image: " + resourceName);
+			Log.info("Could not load image: " + resourceName);
 			map.put(resourceName, missingImage);
 			return;
 		}

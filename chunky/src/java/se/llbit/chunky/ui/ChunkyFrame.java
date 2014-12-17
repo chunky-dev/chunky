@@ -34,11 +34,12 @@ import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingUtilities;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.Messages;
 import se.llbit.chunky.world.World;
+import se.llbit.log.ConsoleReceiver;
+import se.llbit.log.Level;
+import se.llbit.log.Log;
 
 /**
  * Main window of the Chunky application.
@@ -100,9 +101,8 @@ public class ChunkyFrame extends JFrame {
 
 		pack();
 
-		final ChunkyLogAppender uiAppender = new ChunkyLogAppender();
-		final Logger rootLogger = Logger.getRootLogger();
-		rootLogger.addAppender(uiAppender);
+		final UILogReceiver logReceiver = new UILogReceiver();
+		Log.setReceiver(logReceiver, Level.WARNING, Level.ERROR);
 
 		addWindowListener(new WindowListener() {
 			@Override
@@ -119,7 +119,7 @@ public class ChunkyFrame extends JFrame {
 			}
 			@Override
 			public void windowClosing(WindowEvent e) {
-				rootLogger.removeAppender(uiAppender);
+				Log.setReceiver(ConsoleReceiver.INSTANCE, Level.WARNING, Level.ERROR);
 			}
 			@Override
 			public void windowClosed(WindowEvent e) {

@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
-import org.apache.log4j.Logger;
+import se.llbit.log.Log;
 
 /**
  * Abstract region representation.
@@ -34,9 +34,6 @@ import org.apache.log4j.Logger;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Region implements Iterable<Chunk> {
-
-	private static final Logger logger =
-			Logger.getLogger(Region.class);
 
 	/**
 	 * Region X chunk width
@@ -131,7 +128,7 @@ public class Region implements Iterable<Chunk> {
 			file = new RandomAccessFile(regionFile, "r");
 			long length = file.length();
 			if (length < 2*SECTOR_SIZE) {
-				logger.warn("Missing header in region file!");
+				Log.warn("Missing header in region file!");
 				return;
 			}
 
@@ -162,7 +159,7 @@ public class Region implements Iterable<Chunk> {
 			world.regionUpdated(position);
 
 		} catch (IOException e) {
-			logger.warn("Failed to read region: " + e.getMessage());
+			Log.warn("Failed to read region: " + e.getMessage());
 		} finally {
 			if (file != null) {
 				try {
@@ -239,7 +236,7 @@ public class Region implements Iterable<Chunk> {
 			file = new RandomAccessFile(regionFile, "r");
 			long length = file.length();
 			if (length < 2*SECTOR_SIZE) {
-				logger.warn("Missing header in region file!");
+				Log.warn("Missing header in region file!");
 				return null;
 			}
 			file.seek(4 * index);
@@ -276,7 +273,7 @@ public class Region implements Iterable<Chunk> {
 			}
 
 		} catch (IOException e) {
-			logger.warn("Failed to read chunk: " + e.getMessage());
+			Log.warn("Failed to read chunk: " + e.getMessage());
 		} finally {
 			if (file != null) {
 				try {
@@ -304,13 +301,13 @@ public class Region implements Iterable<Chunk> {
 			file = new RandomAccessFile(regionFile, "rw");
 			long length = file.length();
 			if (length < 2*SECTOR_SIZE) {
-				logger.warn("Missing header in region file!");
+				Log.warn("Missing header in region file!");
 				return;
 			}
 			file.seek(4 * index);
 			file.writeInt(0);
 		} catch (IOException e) {
-			logger.warn("Failed to delete chunk: " + e.getMessage());
+			Log.warningfmt("Failed to delete chunk: %s", e.getMessage());
 		} finally {
 			if (file != null) {
 				try {

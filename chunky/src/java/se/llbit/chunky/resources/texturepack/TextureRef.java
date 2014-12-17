@@ -22,16 +22,13 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.log4j.Logger;
+import se.llbit.log.Log;
 
 /**
  * Reference to a texture file in a Minecraft texture pack
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public abstract class TextureRef {
-
-	private static final Logger logger =
-			Logger.getLogger(TextureRef.class);
 
 	/**
 	 * Default constructor
@@ -60,7 +57,7 @@ public abstract class TextureRef {
 				return load(in);
 			}
 		} catch (TextureFormatError e) {
-			logger.info(e.getMessage());
+			Log.info(e.getMessage());
 		} catch (IOException e) {
 		}
 		return false;

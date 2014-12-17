@@ -19,10 +19,9 @@ package se.llbit.chunky.renderer;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneLoadingError;
+import se.llbit.log.Log;
 
 /**
  * Benchmarks the renderer.
@@ -35,9 +34,6 @@ public class BenchmarkManager extends AbstractRenderManager {
 	 */
 	public static final int NUM_RENDER_THREADS_DEFAULT =
 			Runtime.getRuntime().availableProcessors();
-
-	private static final Logger logger =
-			Logger.getLogger(BenchmarkManager.class);
 
 	private final Thread[] workers;
 
@@ -83,11 +79,11 @@ public class BenchmarkManager extends AbstractRenderManager {
 			scene.loadScene(context,
 					renderStatusListener, BENCHMARK_NAME);
 		} catch (IOException e) {
-			logger.warn("Failed to load benchmark scene!", e);
+			Log.warn("Failed to load benchmark scene!", e);
 		} catch (SceneLoadingError e) {
-			logger.warn("Failed to load benchmark scene!", e);
+			Log.warn("Failed to load benchmark scene!", e);
 		} catch (InterruptedException e) {
-			logger.warn("Interrupted while loading benchmark scene");
+			Log.warn("Interrupted while loading benchmark scene");
 		}
 
 		scene.setBufferFinalization(false);
@@ -161,7 +157,7 @@ public class BenchmarkManager extends AbstractRenderManager {
 		} catch (InterruptedException e) {
 			// 3D view was closed
 		} catch (Throwable e) {
-			logger.error("Uncaught exception in render manager", e);
+			Log.error("Uncaught exception in render manager", e);
 		}
 
 		// Halt all worker threads

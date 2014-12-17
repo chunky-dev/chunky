@@ -24,13 +24,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
+import se.llbit.log.Log;
 
 /**
  * Manages the 3D render worker threads.
@@ -38,9 +37,6 @@ import se.llbit.chunky.world.World;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class RenderManager extends AbstractRenderManager implements Renderer {
-
-	private static final Logger logger =
-			Logger.getLogger(RenderManager.class);
 
 	/**
 	 * Milliseconds until the reset confirmation must be shown.
@@ -181,7 +177,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		} catch (InterruptedException e) {
 			// 3D view was closed
 		} catch (Throwable e) {
-			logger.error("Uncaught exception in render manager", e);
+			Log.error("Uncaught exception in render manager", e);
 		}
 
 		stopWorkers();
@@ -330,7 +326,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			if (backup.exists())
 				backup.delete();
 			if (!file.renameTo(new File(renderDir, backupFileName)))
-				logger.info("Could not create backup " + backupFileName);
+				Log.info("Could not create backup " + backupFileName);
 		}
 
 	}
@@ -392,7 +388,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		try {
 			synchronized (bufferMonitor) {
 				String sceneName = bufferedScene.name();
-				logger.info("Saving scene " + sceneName);
+				Log.info("Saving scene " + sceneName);
 
 				// create backup of scene description and current render dump
 				backupFile(context.getSceneDescriptionFile(sceneName));
@@ -403,12 +399,12 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 				bufferedScene.saveScene(context, renderListener);
 
-				logger.info("Scene saved");
+				Log.info("Scene saved");
 			}
 
 			renderListener.sceneSaved();
 		} catch (IOException e) {
-			logger.warn("Failed to save scene. Reason: " + e.getMessage(), e);
+			Log.warn("Failed to save scene. Reason: " + e.getMessage(), e);
 		}
 	}
 
@@ -502,7 +498,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			try {
 				bufferedScene.saveFrame(selectedFile, progressListener);
 			} catch (IOException e) {
-				logger.error("Failed to save snapshot", e);
+				Log.error("Failed to save snapshot", e);
 			}
 		}
 	}
@@ -528,9 +524,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 					if (!mutableScene.pathTrace())
 						mutableScene.refresh();
 				}
-				logger.debug("buffer finalization enabled");
+				Log.info("buffer finalization enabled");
 			} else {
-				logger.debug("buffer finalization disabled");
+				Log.info("buffer finalization disabled");
 			}
 		}
 	}

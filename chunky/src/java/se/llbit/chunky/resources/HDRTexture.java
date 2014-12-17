@@ -24,11 +24,9 @@ import java.nio.channels.FileChannel;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import se.llbit.log.Log;
 
 public class HDRTexture extends AbstractHDRITexture {
-	private static final Logger logger =
-			Logger.getLogger(HDRTexture.class);
 
 	public HDRTexture(File file) {
 		// This RGBE loader was created to mimic the behavior of the RADIANCE
@@ -110,7 +108,7 @@ public class HDRTexture extends AbstractHDRITexture {
 			}
 			raf.close();
 		} catch (IOException e) {
-			logger.error("Error loading HRD image: " + e.getMessage());
+			Log.error("Error loading HRD image: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

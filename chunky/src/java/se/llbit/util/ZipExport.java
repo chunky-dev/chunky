@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.log4j.Logger;
+import se.llbit.log.Log;
 
 /**
  * Utility class for exporting scenes to zip files.
@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
  * @author Tim De Keyser <aenterprise2@gmail.com>
  */
 public class ZipExport {
-	private static final Logger logger = Logger.getLogger(ZipExport.class);
 
 	/**
 	 * Export a scene to a zip file.
@@ -56,9 +55,9 @@ public class ZipExport {
 			fos.close();
 
 		} catch (FileNotFoundException e) {
-			logger.error(e);
+			Log.error(e);
 		} catch (IOException e) {
-			logger.error(e);
+			Log.error(e);
 		}
 
 	}

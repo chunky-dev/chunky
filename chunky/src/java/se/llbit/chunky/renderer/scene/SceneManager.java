@@ -22,13 +22,12 @@ import java.util.Collection;
 
 import javax.swing.JOptionPane;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.main.Messages;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
+import se.llbit.log.Log;
 
 /**
  * Perform synchronized scene actions without locking the GUI.
@@ -70,9 +69,6 @@ public class SceneManager extends Thread {
 		MERGE_DUMP
 	}
 
-	private static final Logger logger =
-			Logger.getLogger(SceneManager.class);
-
 	private final RenderManager renderManager;
 	private String sceneName = "";
 	private File renderDump;
@@ -107,20 +103,20 @@ public class SceneManager extends Thread {
 						try {
 							renderManager.loadScene(sceneName);
 						} catch (IOException e) {
-							logger.warn("Could not load scene.\n" +
+							Log.warn("Could not load scene.\n" +
 									"Reason: " + e.getMessage());
 						} catch (SceneLoadingError e) {
-							logger.warn("Could not open scene description.\n" +
+							Log.warn("Could not open scene description.\n" +
 									"Reason: " + e.getMessage());
 						} catch (InterruptedException e) {
-							logger.warn("Scene loading was interrupted.");
+							Log.warn("Scene loading was interrupted.");
 						}
 						break;
 					case SAVE_SCENE:
 						try {
 							renderManager.saveScene();
 						} catch (InterruptedException e1) {
-							logger.warn("Scene saving was interrupted.");
+							Log.warn("Scene saving was interrupted.");
 						}
 						break;
 					case LOAD_FRESH_CHUNKS:
@@ -290,10 +286,10 @@ public class SceneManager extends Thread {
 	public static boolean acceptSceneName(RenderContext context, String sceneName) {
 		sceneName = sceneName.trim();
 		if (sceneName.isEmpty()) {
-			logger.warn("The scene name can not be empty!");
+			Log.warn("The scene name can not be empty!");
 			return false;
 		} else if (!sceneNameIsValid(sceneName)) {
-			logger.warn("The scene name contains illegal characters!");
+			Log.warn("The scene name contains illegal characters!");
 			return false;
 		} else if (sceneNameIsAvailable(context, sceneName)) {
 			return true;

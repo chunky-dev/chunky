@@ -26,7 +26,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import org.apache.commons.math3.util.FastMath;
-import org.apache.log4j.Logger;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.Refreshable;
@@ -37,6 +36,7 @@ import se.llbit.chunky.renderer.ui.Chunk3DView;
 import se.llbit.chunky.renderer.ui.ViewListener;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Block;
+import se.llbit.log.Log;
 import se.llbit.math.Color;
 import se.llbit.math.Matrix3d;
 import se.llbit.math.Quad;
@@ -54,8 +54,6 @@ import se.llbit.util.VectorPool;
 @SuppressWarnings("unused")
 public class TestRenderer extends Thread implements ViewListener,
 	Renderer, Refreshable {
-
-	private static final Logger logger = Logger.getLogger(TestRenderer.class);
 
 	private static final int NUM_BUFFERS = 3;
 
@@ -186,9 +184,9 @@ public class TestRenderer extends Thread implements ViewListener,
 		try {
 			ImageIO.write(buffer, "png", new FileOutputStream(fileName));
 		} catch (FileNotFoundException e) {
-			logger.error(e);
+			Log.error(e);
 		} catch (IOException e) {
-			logger.error(e);
+			Log.error(e);
 		}
 	}
 

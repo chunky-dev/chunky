@@ -19,7 +19,6 @@ package se.llbit.chunky.renderer.scene;
 import java.util.Random;
 
 import org.apache.commons.math3.util.FastMath;
-import org.apache.log4j.Logger;
 
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.projection.ApertureProjector;
@@ -36,6 +35,7 @@ import se.llbit.chunky.renderer.projection.StereographicProjector;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.World;
 import se.llbit.json.JsonObject;
+import se.llbit.log.Log;
 import se.llbit.math.Matrix3d;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -51,8 +51,6 @@ import se.llbit.util.JSONifiable;
  * @author TOGoS (projection code)
  */
 public class Camera implements JSONifiable {
-
-	private static final Logger logger = Logger.getLogger(Camera.class);
 
 	private static final double HALF_PI = Math.PI/2;
 	private static final double TWO_PI = Math.PI*2;
@@ -179,8 +177,8 @@ public class Camera implements JSONifiable {
 	private Projector createProjector() {
 		switch (projectionMode) {
 		default:
-			logger.error("Unknown projection mode: "
-					+ projectionMode + ", using standard mode");
+			Log.errorfmt("Unknown projection mode: %s, using standard mode",
+					projectionMode);
 		case PINHOLE:
 			return applyDoF(new PinholeProjector(fov), subjectDistance);
 		case PARALLEL:

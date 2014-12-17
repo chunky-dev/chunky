@@ -38,13 +38,12 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Version;
 import se.llbit.chunky.renderer.BenchmarkManager;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderStatusListener;
+import se.llbit.log.Log;
 
 /**
  * Benchmark dialog.
@@ -52,9 +51,6 @@ import se.llbit.chunky.renderer.RenderStatusListener;
  */
 @SuppressWarnings("serial")
 public class BenchmarkDialog extends JDialog implements RenderStatusListener {
-
-	private static final Logger logger =
-			Logger.getLogger(BenchmarkDialog.class);
 
 	private final JProgressBar progressBar = new JProgressBar();
 	private final JButton startBtn = new JButton();
@@ -236,7 +232,7 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 					benchmarkScene, score));
 			out.close();
 		} catch (IOException e) {
-			logger.warn("Failed to append benchmark result to benchmark log file", e);
+			Log.warn("Failed to append benchmark result to benchmark log file", e);
 		}
 	}
 

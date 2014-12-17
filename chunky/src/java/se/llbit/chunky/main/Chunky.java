@@ -29,9 +29,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldRenderer;
 import se.llbit.chunky.renderer.BenchmarkManager;
@@ -67,6 +64,7 @@ import se.llbit.chunky.world.RegionParser;
 import se.llbit.chunky.world.RegionQueue;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
+import se.llbit.log.Log;
 import se.llbit.math.Vector3d;
 import se.llbit.util.OSDetector;
 import se.llbit.util.OSDetector.OS;
@@ -129,22 +127,11 @@ public class Chunky implements ChunkTopographyListener {
 	public ChunkyOptions options;
 
 	/**
-	 * Logger object.
-	 */
-	private static Logger logger = Logger.getLogger(Chunky.class);
-
-	/**
 	 * @return The name of this application
 	 */
 	public static final String getAppName() {
 		return Messages.getString("Chunky.appname") + " " +
 				Version.getVersion();
-	}
-
-	static {
-		// Configure the logger
-		PropertyConfigurator.configure(
-				Chunky.class.getResource("/log4j.properties"));
 	}
 
 	/**
@@ -179,7 +166,7 @@ public class Chunky implements ChunkTopographyListener {
 				break;
 			}
 		} catch (Throwable t) {
-			logger.fatal("Unchecked exception caused Chunky to close", t);
+			Log.error("Unchecked exception caused Chunky to close", t);
 			return 2;
 		}
 		return 0;
@@ -282,7 +269,7 @@ public class Chunky implements ChunkTopographyListener {
 				defaults.put("TabbedPane.tabInsets", new Insets(5, 5, 7, 5));
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch (Exception e) {
-				logger.warn("Failed to set native Look and Feel");
+				Log.warn("Failed to set native Look and Feel");
 			}
 
 			SwingUtilities.invokeAndWait(new Runnable() {
@@ -292,9 +279,9 @@ public class Chunky implements ChunkTopographyListener {
 				}
 			});
 		} catch (InterruptedException e) {
-			logger.warn("Failed to set Look and Feel", e);
+			Log.warn("Failed to set Look and Feel", e);
 		} catch (InvocationTargetException e) {
-			logger.warn("Failed to set Look and Feel", e);
+			Log.warn("Failed to set Look and Feel", e);
 		}
 	}
 

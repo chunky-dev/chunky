@@ -18,10 +18,9 @@ package se.llbit.chunky.renderer;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Ray.RayPool;
@@ -37,9 +36,6 @@ public class RenderWorker extends Thread {
 	 * Sleep interval (in ns)
 	 */
 	private static final int SLEEP_INTERVAL = 75000000;
-
-	private static final Logger logger =
-			Logger.getLogger(RenderWorker.class);
 
 	private final int id;
 	private final AbstractRenderManager manager;
@@ -76,7 +72,7 @@ public class RenderWorker extends Thread {
 			} catch (InterruptedException e) {
 			}
 		} catch (Throwable e) {
-			logger.error("Render worker " + id +
+			Log.error("Render worker " + id +
 					" crashed with uncaught exception.", e);
 		}
 	}

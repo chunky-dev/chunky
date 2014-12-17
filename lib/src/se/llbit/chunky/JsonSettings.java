@@ -33,6 +33,7 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonTrue;
+import se.llbit.log.Log;
 
 /**
  * Utility class for managing program properties.
@@ -54,17 +55,11 @@ public final class JsonSettings {
 			JsonParser parser = new JsonParser(in);
 			json = parser.parse().object();
 			in.close();
-			if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
-				System.out.println("Settings loaded from " + path);
-			}
+			Log.infofmt("Settings loaded from %s", path);
 		} catch (IOException e) {
-			if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
-				System.out.println("Warning: Could not load settings from " + path +
-						" - defaults will be used");
-			}
+			Log.infofmt("Warning: Could not load settings from %s - defaults will be used", path);
 		} catch (SyntaxError e) {
-			System.err.println("Warning: Could not load settings from " + path +
-					" (syntax error) - defaults will be used");
+			Log.infofmt("Warning: Could not load settings from %s (syntax error) - defaults will be used", path);
 		}
 	}
 

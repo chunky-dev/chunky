@@ -32,18 +32,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.log.Log;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 @SuppressWarnings("serial")
 public class SceneDirectoryPicker extends JDialog {
-
-	private static final Logger logger =
-			Logger.getLogger(SceneDirectoryPicker.class);
 
 	private File selectedDirectory;
 	private boolean accepted = false;
@@ -216,7 +212,7 @@ public class SceneDirectoryPicker extends JDialog {
 		if (sceneDir.exists() && sceneDir.isDirectory() && sceneDir.canWrite())
 			return true;
 
-		logger.warn("Could not open or create the scene directory " + sceneDir.getAbsolutePath());
+		Log.warningfmt("Could not open or create the scene directory %s", sceneDir.getAbsolutePath());
 		return false;
 	}
 }

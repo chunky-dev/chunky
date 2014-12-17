@@ -29,6 +29,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
+import se.llbit.log.Log;
 import se.llbit.util.OSDetector;
 import se.llbit.util.Util;
 
@@ -49,9 +50,7 @@ public class MinecraftFinder {
 		if (getMinecraftJar(mcDir, false) == null) {
 			mcDir = getDefaultMinecraftDirectory();
 		}
-		if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
-			System.out.println("Found Minecraft directory " + mcDir.getAbsolutePath());
-		}
+		Log.infofmt("Found Minecraft directory %s", mcDir.getAbsolutePath());
 		return mcDir;
 	}
 
@@ -106,8 +105,7 @@ public class MinecraftFinder {
 	public static final File getMinecraftJar() {
 		synchronized (MinecraftFinder.class) {
 			if (!foundJar) {
-				minecraftJar = getMinecraftJar(getMinecraftDirectory(),
-						System.getProperty("log4j.logLevel", "WARN").equals("INFO"));
+				minecraftJar = getMinecraftJar(getMinecraftDirectory(), true);
 				if (minecraftJar == null) {
 					// Fall back on downloaded Jar if available
 					File resourceDir = new File(
@@ -188,7 +186,7 @@ public class MinecraftFinder {
 					}
 				}
 				if (debug) {
-					System.out.println("Found latest Minecraft version: " +
+					Log.infofmt("Found latest Minecraft version: %s",
 						latest.jar.getAbsolutePath());
 				}
 				return latest.jar;

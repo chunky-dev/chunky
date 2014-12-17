@@ -20,10 +20,10 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 import org.apache.commons.math3.util.FastMath;
-import org.apache.log4j.Logger;
 
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.log.Log;
 import se.llbit.math.Color;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -36,9 +36,6 @@ import se.llbit.util.ImageTools;
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class SkymapTexture extends Texture {
-
-	private static final Logger logger =
-			Logger.getLogger(SkymapTexture.class);
 
 	class TexturePreprocessor extends Thread {
 		private final int x0;
@@ -103,7 +100,7 @@ public class SkymapTexture extends Texture {
 		height = image.getHeight();
 		avgColor = ImageTools.calcAvgColor(image);
 
-		logger.info("Preprocessing skymap texture");
+		Log.info("Preprocessing skymap texture");
 		long start = System.currentTimeMillis();
 
 		// gamma correct the texture
@@ -145,7 +142,7 @@ public class SkymapTexture extends Texture {
 
 		long time = System.currentTimeMillis() - start;
 
-		logger.info("Skymap preprocessing took " + time + "ms");
+		Log.info("Skymap preprocessing took " + time + "ms");
 
 	}
 

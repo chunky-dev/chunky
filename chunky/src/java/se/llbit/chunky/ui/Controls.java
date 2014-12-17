@@ -24,8 +24,8 @@ import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -54,8 +54,6 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.BlockTypeListCellRenderer;
@@ -71,6 +69,7 @@ import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
+import se.llbit.log.Log;
 
 /**
  * This is the toolbox that's shown in the left part of the main Chunky GUI.
@@ -81,9 +80,6 @@ import se.llbit.chunky.world.World;
  */
 @SuppressWarnings("serial")
 public class Controls extends JPanel {
-
-	private static final Logger logger =
-			Logger.getLogger(Controls.class);
 
 	private static final int WIDTH_BIG = 300;
 
@@ -458,7 +454,7 @@ public class Controls extends JPanel {
 						}
 					}
 				} catch (IOException e) {
-					logger.warn("Failed to open scene directory", e);
+					Log.warn("Failed to open scene directory", e);
 				}
 			}
 		});

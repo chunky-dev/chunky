@@ -19,46 +19,37 @@ package se.llbit.chunky.ui;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
+import se.llbit.log.Level;
+import se.llbit.log.Receiver;
 
 /**
  * A log handler for the global Chunky logger.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class ChunkyLogAppender extends AppenderSkeleton {
+public class UILogReceiver extends Receiver {
 
-	private ChunkyErrorDialog errorDialog = new ChunkyErrorDialog();
-
-	@Override
-	public void close() {
-		// do nothing
-	}
+	private final ChunkyErrorDialog errorDialog = new ChunkyErrorDialog();
 
 	@Override
-	public boolean requiresLayout() {
-		return false;
-	}
-
-	@Override
-	protected void append(final LoggingEvent event) {
-		Level level = event.getLevel();
-		if (level == Level.FATAL || level == Level.ERROR) {
+	public void logEvent(Level level, final String message) {
+		switch (level) {
+		case INFO:
+		case WARNING:
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					errorDialog.addRecord(event);
+					JOptionPane.showMessageDialog(null, message);
 				}
 			});
-		} else if (level == Level.WARN) {
+			break;
+		case ERROR:
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					JOptionPane.showMessageDialog(null,
-							event.getMessage().toString());
+					errorDialog.addRecord(message);
 				}
 			});
+			break;
 		}
 	}
 

@@ -35,19 +35,15 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.MinecraftFinder;
+import se.llbit.log.Log;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 @SuppressWarnings("serial")
 public class WorldDirectoryPicker extends JDialog {
-
-	private static final Logger logger =
-			Logger.getLogger(WorldDirectoryPicker.class);
 
 	private boolean accepted = false;
 
@@ -90,7 +86,7 @@ public class WorldDirectoryPicker extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				File worldDir = MinecraftFinder.getSavesDirectory();
 				if (!isValidSelection(worldDir)) {
-					logger.warn("Could not find Minecraft installation!");
+					Log.warn("Could not find Minecraft installation!");
 				} else {
 					pathField.setText(worldDir.getAbsolutePath());
 				}
@@ -125,7 +121,7 @@ public class WorldDirectoryPicker extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (!isValidSelection(getSelectedDirectory())) {
-					logger.warn("Please select a valid directory!");
+					Log.warn("Please select a valid directory!");
 				} else {
 					accepted = true;
 					WorldDirectoryPicker.this.dispose();

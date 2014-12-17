@@ -34,7 +34,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.math3.util.FastMath;
-import org.apache.log4j.Logger;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.model.WaterModel;
@@ -52,6 +51,7 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
+import se.llbit.log.Log;
 import se.llbit.math.Color;
 import se.llbit.math.Octree;
 import se.llbit.math.QuickMath;
@@ -68,9 +68,6 @@ import se.llbit.util.VectorPool;
  * Scene description.
  */
 public class Scene extends SceneDescription {
-
-	private static final Logger logger =
-			Logger.getLogger(Scene.class);
 
 	private static final Font infoFont = new Font("Sans serif", Font.BOLD, 11);
 	private static FontMetrics fontMetrics;
@@ -342,7 +339,7 @@ public class Scene extends SceneDescription {
 		sky.loadSkymap();
 
 		if (sdfVersion < SDF_VERSION) {
-			logger.warn("Old scene version detected! The scene may not have loaded correctly.");
+			Log.warn("Old scene version detected! The scene may not have loaded correctly.");
 		}
 
 		setCanvasSize(width, height);
@@ -363,7 +360,7 @@ public class Scene extends SceneDescription {
 
 				}
 			} else {
-				logger.debug("Could not load world: " + worldPath);
+				Log.info("Could not load world: " + worldPath);
 			}
 		}
 
@@ -388,7 +385,7 @@ public class Scene extends SceneDescription {
 			// Could not load stored octree
 			// Load the chunks from the world
 			if (loadedWorld == null) {
-				logger.warn("Could not load chunks (no world found for scene)");
+				Log.warn("Could not load chunks (no world found for scene)");
 			} else {
 				loadChunks(renderListener, loadedWorld, chunks);
 			}
@@ -504,7 +501,7 @@ public class Scene extends SceneDescription {
 	 */
 	public synchronized void reloadChunks(ProgressListener progressListener) {
 		if (loadedWorld == null) {
-			logger.warn("Can not reload chunks for scene - world directory not found!");
+			Log.warn("Can not reload chunks for scene - world directory not found!");
 			return;
 		}
 
@@ -793,7 +790,7 @@ public class Scene extends SceneDescription {
 
 		camera.setWorldSize(1<<octree.depth);
 
-		logger.info(String.format("Loaded %d chunks (%d emitters)",
+		Log.info(String.format("Loaded %d chunks (%d emitters)",
 				nchunks, emitters));
 	}
 
@@ -1332,7 +1329,7 @@ public class Scene extends SceneDescription {
 	public void saveSnapshot(File directory, ProgressListener progressListener) {
 
 		if (directory == null) {
-			logger.error("Fatal error: bad output directory!");
+			Log.error("Fatal error: bad output directory!");
 			return;
 		}
 		String fileName = name + "-" + spp + ".png";
@@ -1434,7 +1431,7 @@ public class Scene extends SceneDescription {
 			writer.writeChunk(new IEND());
 			writer.close();
 		} catch (IOException e) {
-			logger.warn("Failed to write PNG file: " + targetFile.getAbsolutePath(), e);
+			Log.warn("Failed to write PNG file: " + targetFile.getAbsolutePath(), e);
 		}
 
 	}
@@ -1447,12 +1444,12 @@ public class Scene extends SceneDescription {
 		DataOutputStream out = null;
 		try {
 			if (context.fileUnchangedSince(fileName, octree.getTimestamp())) {
-				logger.info("Skipping redundant Octree write");
+				Log.info("Skipping redundant Octree write");
 				return;
 			}
 			String task = "Saving octree";
 			progressListener.setProgress(task, 1, 0, 2);
-			logger.info("Saving octree " + fileName);
+			Log.info("Saving octree " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
 					context.getSceneFileOutputStream(fileName)));
 
@@ -1462,9 +1459,9 @@ public class Scene extends SceneDescription {
 			octree.setTimestamp(context.fileTimestamp(fileName));
 
 			progressListener.setProgress(task, 2, 0, 2);
-			logger.info("Octree saved");
+			Log.info("Octree saved");
 		} catch (IOException e) {
-			logger.warn("IO exception while saving octree!", e);
+			Log.warn("IO exception while saving octree!", e);
 		} finally {
 			if (out != null) {
 				try {
@@ -1483,12 +1480,12 @@ public class Scene extends SceneDescription {
 		DataOutputStream out = null;
 		try {
 			if (context.fileUnchangedSince(fileName, grassTexture.getTimestamp())) {
-				logger.info("Skipping redundant grass texture write");
+				Log.info("Skipping redundant grass texture write");
 				return;
 			}
 			String task = "Saving grass texture";
 			progressListener.setProgress(task, 1, 0, 2);
-			logger.info("Saving grass texture " + fileName);
+			Log.info("Saving grass texture " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
 					context.getSceneFileOutputStream(fileName)));
 
@@ -1498,9 +1495,9 @@ public class Scene extends SceneDescription {
 			grassTexture.setTimestamp(context.fileTimestamp(fileName));
 
 			progressListener.setProgress(task, 2, 0, 2);
-			logger.info("Grass texture saved");
+			Log.info("Grass texture saved");
 		} catch (IOException e) {
-			logger.warn("IO exception while saving octree!", e);
+			Log.warn("IO exception while saving octree!", e);
 		} finally {
 			if (out != null) {
 				try {
@@ -1519,12 +1516,12 @@ public class Scene extends SceneDescription {
 		DataOutputStream out = null;
 		try {
 			if (context.fileUnchangedSince(fileName, foliageTexture.getTimestamp())) {
-				logger.info("Skipping redundant foliage texture write");
+				Log.info("Skipping redundant foliage texture write");
 				return;
 			}
 			String task = "Saving foliage texture";
 			progressListener.setProgress(task, 1, 0, 2);
-			logger.info("Saving foliage texture " + fileName);
+			Log.info("Saving foliage texture " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
 					context.getSceneFileOutputStream(fileName)));
 
@@ -1534,9 +1531,9 @@ public class Scene extends SceneDescription {
 			foliageTexture.setTimestamp(context.fileTimestamp(fileName));
 
 			progressListener.setProgress(task, 2, 0, 2);
-			logger.info("Foliage texture saved");
+			Log.info("Foliage texture saved");
 		} catch (IOException e) {
-			logger.warn("IO exception while saving octree!", e);
+			Log.warn("IO exception while saving octree!", e);
 		} finally {
 			if (out != null) {
 				try {
@@ -1556,7 +1553,7 @@ public class Scene extends SceneDescription {
 		try {
 			String task = "Saving render dump";
 			progressListener.setProgress(task, 1, 0, 2);
-			logger.info("Saving render dump " + fileName);
+			Log.info("Saving render dump " + fileName);
 			out = new DataOutputStream(new GZIPOutputStream(
 					context.getSceneFileOutputStream(fileName)));
 			out.writeInt(width);
@@ -1571,9 +1568,9 @@ public class Scene extends SceneDescription {
 					out.writeDouble(samples[(y*width+x)*3+2]);
 				}
 			}
-			logger.info("Render dump saved");
+			Log.info("Render dump saved");
 		} catch (IOException e) {
-			logger.warn("IO exception while saving render dump!", e);
+			Log.warn("IO exception while saving render dump!", e);
 		} finally {
 			if (out != null) {
 				try {
@@ -1594,7 +1591,7 @@ public class Scene extends SceneDescription {
 		try {
 			String task = "Loading octree";
 			renderListener.setProgress(task, 1, 0, 2);
-			logger.info("Loading octree " + fileName);
+			Log.info("Loading octree " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
 
@@ -1604,10 +1601,10 @@ public class Scene extends SceneDescription {
 			octree.setTimestamp(context.fileTimestamp(fileName));
 
 			renderListener.setProgress(task, 2, 0, 2);
-			logger.info("Octree loaded");
+			Log.info("Octree loaded");
 			return true;
 		} catch (IOException e) {
-			logger.info("Failed to load chunk octree: missing file or incorrect format!", e);
+			Log.info("Failed to load chunk octree: missing file or incorrect format!", e);
 			return false;
 		} finally {
 			if (in != null) {
@@ -1629,7 +1626,7 @@ public class Scene extends SceneDescription {
 		try {
 			String task = "Loading grass texture";
 			renderListener.setProgress(task, 1, 0, 2);
-			logger.info("Loading grass texture " + fileName);
+			Log.info("Loading grass texture " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
 
@@ -1639,10 +1636,10 @@ public class Scene extends SceneDescription {
 			grassTexture.setTimestamp(context.fileTimestamp(fileName));
 
 			renderListener.setProgress(task, 2, 0, 2);
-			logger.info("Grass texture loaded");
+			Log.info("Grass texture loaded");
 			return true;
 		} catch (IOException e) {
-			logger.info("Failed to load grass texture!");
+			Log.info("Failed to load grass texture!");
 			return false;
 		} finally {
 			if (in != null) {
@@ -1664,7 +1661,7 @@ public class Scene extends SceneDescription {
 		try {
 			String task = "Loading foliage texture";
 			renderListener.setProgress(task, 1, 0, 2);
-			logger.info("Loading foliage texture " + fileName);
+			Log.info("Loading foliage texture " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
 
@@ -1674,10 +1671,10 @@ public class Scene extends SceneDescription {
 			foliageTexture.setTimestamp(context.fileTimestamp(fileName));
 
 			renderListener.setProgress(task, 2, 0, 2);
-			logger.info("Foliage texture loaded");
+			Log.info("Foliage texture loaded");
 			return true;
 		} catch (IOException e) {
-			logger.info("Failed to load foliage texture!");
+			Log.info("Failed to load foliage texture!");
 			return false;
 		} finally {
 			if (in != null) {
@@ -1702,11 +1699,11 @@ public class Scene extends SceneDescription {
 
 			String task = "Loading render dump";
 			renderListener.setProgress(task, 1, 0, 2);
-			logger.info("Loading render dump " + fileName);
+			Log.info("Loading render dump " + fileName);
 			int dumpWidth = in.readInt();
 			int dumpHeight= in.readInt();
 			if (dumpWidth != width || dumpHeight != height) {
-				logger.warn("Render dump discarded: incorrect width or height!");
+				Log.warn("Render dump discarded: incorrect width or height!");
 				in.close();
 				return;
 			}
@@ -1729,9 +1726,9 @@ public class Scene extends SceneDescription {
 					finalizePixel(x, y);
 				}
 			}
-			logger.info("Render dump loaded");
+			Log.info("Render dump loaded");
 		} catch (IOException e) {
-			logger.info("Render dump not loaded");
+			Log.info("Render dump not loaded");
 		} finally {
 			if (in != null) {
 				try {
@@ -1907,7 +1904,7 @@ public class Scene extends SceneDescription {
 
 			g.dispose();
 		} catch (IllegalStateException e) {
-			logger.error("Unexpected exception while rendering back buffer", e);
+			Log.error("Unexpected exception while rendering back buffer", e);
 		}
 	}
 
@@ -1995,11 +1992,11 @@ public class Scene extends SceneDescription {
 
 			String task = "Merging render dump";
 			renderListener.setProgress(task, 1, 0, 2);
-			logger.info("Loading render dump " + dumpFile.getAbsolutePath());
+			Log.info("Loading render dump " + dumpFile.getAbsolutePath());
 			int dumpWidth = in.readInt();
 			int dumpHeight= in.readInt();
 			if (dumpWidth != width || dumpHeight != height) {
-				logger.warn("Render dump discarded: incorrect widht or height!");
+				Log.warn("Render dump discarded: incorrect widht or height!");
 				in.close();
 				return;
 			}
@@ -2021,7 +2018,7 @@ public class Scene extends SceneDescription {
 					finalizePixel(x, y);
 				}
 			}
-			logger.info("Render dump loaded");
+			Log.info("Render dump loaded");
 
 			// Update render status
 			spp += dumpSpp;
@@ -2033,7 +2030,7 @@ public class Scene extends SceneDescription {
 					(int) (totalSamples / (renderTime / 1000.0)));
 
 		} catch (IOException e) {
-			logger.info("Render dump not loaded");
+			Log.info("Render dump not loaded");
 		} finally {
 			if (in != null) {
 				try {

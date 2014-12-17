@@ -16,7 +16,22 @@
  */
 package se.llbit.chunky.renderer.ui;
 
-import static org.jocl.CL.*;
+import static org.jocl.CL.CL_DEVICE_MAX_COMPUTE_UNITS;
+import static org.jocl.CL.CL_DEVICE_MAX_WORK_GROUP_SIZE;
+import static org.jocl.CL.CL_DEVICE_NAME;
+import static org.jocl.CL.CL_DEVICE_TYPE;
+import static org.jocl.CL.CL_DEVICE_TYPE_ACCELERATOR;
+import static org.jocl.CL.CL_DEVICE_TYPE_ALL;
+import static org.jocl.CL.CL_DEVICE_TYPE_CPU;
+import static org.jocl.CL.CL_DEVICE_TYPE_DEFAULT;
+import static org.jocl.CL.CL_DEVICE_TYPE_GPU;
+import static org.jocl.CL.CL_PLATFORM_NAME;
+import static org.jocl.CL.CL_PLATFORM_VERSION;
+import static org.jocl.CL.clGetDeviceIDs;
+import static org.jocl.CL.clGetDeviceInfo;
+import static org.jocl.CL.clGetPlatformIDs;
+import static org.jocl.CL.clGetPlatformInfo;
+import static org.jocl.CL.setExceptionsEnabled;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,7 +50,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import org.apache.log4j.Logger;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
 import org.jocl.cl_device_id;
@@ -46,6 +60,7 @@ import se.llbit.chunky.renderer.cl.CLPlatform;
 import se.llbit.chunky.renderer.cl.CLRenderManager;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
+import se.llbit.log.Log;
 
 /**
  * A dialog to select an OpenCL device to run the OpenCL renderer on.
@@ -54,23 +69,20 @@ import se.llbit.chunky.world.World;
 @SuppressWarnings("serial")
 public class CLDeviceSelector extends JDialog {
 
-	private static final Logger logger =
-			Logger.getLogger(CLDeviceSelector.class);
-
 	/**
 	 * The available CL platforms
 	 */
-	private List<CLPlatform> platforms = new ArrayList<CLPlatform>();
+	private final List<CLPlatform> platforms = new ArrayList<CLPlatform>();
 
 	/**
 	 * CL device map
 	 */
-	private Map<CLPlatform, List<CLDevice>> deviceMap =
+	private final Map<CLPlatform, List<CLDevice>> deviceMap =
 			new HashMap<CLPlatform, List<CLDevice>>();
 
-	private JComboBox platformList;
-	private JComboBox deviceList;
-	private JLabel deviceInfo = new JLabel();
+	private final JComboBox platformList;
+	private final JComboBox deviceList;
+	private final JLabel deviceInfo = new JLabel();
 
 	/**
 	 * Constructor
@@ -175,7 +187,7 @@ public class CLDeviceSelector extends JDialog {
 		clGetPlatformIDs(0, null, num_platforms);
 
 		if (num_platforms[0] == 0) {
-			logger.error("No OpenCL platforms available!");
+			Log.error("No OpenCL platforms available!");
 			return;
 		}
 

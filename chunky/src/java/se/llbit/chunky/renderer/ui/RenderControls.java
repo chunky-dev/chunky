@@ -70,7 +70,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import org.apache.commons.math3.util.FastMath;
-import org.apache.log4j.Logger;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
@@ -94,6 +93,7 @@ import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
+import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
@@ -106,9 +106,6 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class RenderControls extends JDialog implements ViewListener,
 	RenderStatusListener {
-
-	private static final Logger logger =
-			Logger.getLogger(RenderControls.class);
 
 	private static final int[] dumpFrequencies = { 50, 100, 500, 1000, 5000 };
 
@@ -963,7 +960,7 @@ public class RenderControls extends JDialog implements ViewListener,
 						Desktop.getDesktop().open(context.getSceneDirectory());
 					}
 				} catch (IOException e) {
-					logger.warn("Failed to open scene directory", e);
+					Log.warn("Failed to open scene directory", e);
 				}
 			}
 		});
@@ -1927,10 +1924,10 @@ public class RenderControls extends JDialog implements ViewListener,
 					int height = Integer.parseInt(matcher.group(2));
 					setCanvasSize(width, height);
 				} else {
-					logger.info("Failed to set canvas size: format must be WIDTHxHEIGHT!");
+					Log.info("Failed to set canvas size: format must be WIDTHxHEIGHT!");
 				}
 			} catch (NumberFormatException e1) {
-				logger.info("Failed to set canvas size: invalid dimensions!");
+				Log.info("Failed to set canvas size: invalid dimensions!");
 			}
 		}
 	};

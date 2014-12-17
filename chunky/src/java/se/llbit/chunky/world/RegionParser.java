@@ -16,17 +16,14 @@
  */
 package se.llbit.chunky.world;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.main.Chunky;
+import se.llbit.log.Log;
 
 /**
  * Parses regions
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class RegionParser extends Thread {
-
-	private static final Logger logger = Logger.getLogger(RegionParser.class);
 
 	private final Chunky chunky;
 	private final RegionQueue queue;
@@ -45,7 +42,7 @@ public class RegionParser extends Thread {
 		while (!isInterrupted()) {
 			ChunkPosition position = queue.poll();
 			if (position == null) {
-				logger.warn("Region parser shutting down abnormally.");
+				Log.warn("Region parser shutting down abnormally.");
 				return;
 			}
 			ChunkView map = chunky.getMapView();

@@ -36,6 +36,8 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
+import se.llbit.log.Level;
+import se.llbit.log.Log;
 
 /**
  * Deploys the embedded Chunky version, or launches an existing local version.
@@ -105,9 +107,7 @@ public class ChunkyDeployer {
 		List<VersionInfo> versions = availableVersions();
 		VersionInfo embedded = embeddedVersion();
 		if (embedded != null && (!versions.contains(embedded) || !checkVersionIntegrity(embedded.name))) {
-			if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
-				System.out.println("Deploying embedded version: " + embedded.name);
-			}
+			Log.infofmt("Deploying embedded version: %s", embedded.name);
 			deployEmbeddedVersion(embedded);
 		}
 	}
@@ -231,8 +231,7 @@ public class ChunkyDeployer {
 	public int launchChunky(Component parentComponent, LauncherSettings settings, VersionInfo version,
 			ChunkyMode mode) {
 		List<String> command = buildCommandLine(version, settings);
-		if (settings.verboseLauncher ||
-				System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
+		if (settings.verboseLauncher || Log.level == Level.INFO) {
 			System.out.println(commandString(command));
 		}
 		ProcessBuilder procBuilder = new ProcessBuilder(command);
@@ -350,7 +349,7 @@ public class ChunkyDeployer {
 		cmd.add(classpath(version,settings));
 
 		if (settings.verboseLogging) {
-			cmd.add("-Dlog4j.logLevel=INFO");
+			cmd.add("-DlogLevel=INFO");
 		}
 
 		cmd.add("se.llbit.chunky.main.Chunky");

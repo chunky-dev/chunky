@@ -27,7 +27,6 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.math3.util.FastMath;
-import org.apache.log4j.Logger;
 
 import se.llbit.chunky.resources.HDRTexture;
 import se.llbit.chunky.resources.PFMTexture;
@@ -38,6 +37,7 @@ import se.llbit.json.JsonArray;
 import se.llbit.json.JsonNull;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 import se.llbit.math.Color;
 import se.llbit.math.Constants;
 import se.llbit.math.QuickMath;
@@ -139,9 +139,6 @@ public class Sky implements JSONifiable {
 		}
 
 	};
-
-	private static final Logger logger =
-			Logger.getLogger(Sky.class);
 
 	@NotNull
 	private Texture skymap = Texture.EMPTY_TEXTURE;
@@ -761,7 +758,7 @@ public class Sky implements JSONifiable {
 		}
 		if (textureFile.exists()) {
 			try {
-				logger.info("Loading sky map: " + fileName);
+				Log.info("Loading sky map: " + fileName);
 				if (fileName.toLowerCase().endsWith(".pfm")) {
 					return new PFMTexture(textureFile);
 				} else if (fileName.toLowerCase().endsWith(".hdr")) {
@@ -770,12 +767,12 @@ public class Sky implements JSONifiable {
 					return new SkymapTexture(ImageIO.read(textureFile));
 				}
 			} catch (IOException e) {
-				logger.warn("Could not load skymap: " + fileName);
+				Log.warn("Could not load skymap: " + fileName);
 			} catch (Throwable e) {
-				logger.error("Unexpected exception ocurred!", e);
+				Log.error("Unexpected exception ocurred!", e);
 			}
 		} else {
-			logger.warn("Skymap could not be opened: " + fileName);
+			Log.warn("Skymap could not be opened: " + fileName);
 		}
 		return prevTexture;
 	}

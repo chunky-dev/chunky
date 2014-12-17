@@ -33,12 +33,11 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.log4j.Logger;
-
 import se.llbit.chunky.ui.ProgressPanel;
 import se.llbit.chunky.world.listeners.ChunkDeletionListener;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
+import se.llbit.log.Log;
 import se.llbit.math.Vector3d;
 import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.NamedTag;
@@ -52,9 +51,6 @@ import se.llbit.util.Pair;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class World implements Comparable<World> {
-
-	private static final Logger logger =
-			Logger.getLogger(World.class);
 
 	/**
 	 * The currently supported NBT version of level.dat files.
@@ -203,7 +199,7 @@ public class World implements Comparable<World> {
 
 			AnyTag version = result.get(".Data.version");
 			if (logWarnings && version.intValue() != NBT_VERSION) {
-				logger.warn("The world format for the world " + levelName +
+				Log.warn("The world format for the world " + levelName +
 						" is not supported by Chunky.\n" +
 						"Will attempt to load the world anyway.");
 			}
@@ -242,11 +238,11 @@ public class World implements Comparable<World> {
 
 		} catch (FileNotFoundException e) {
 			if (logWarnings) {
-				logger.info("Could not find level.dat file for the world '" + levelName + "'!");
+				Log.info("Could not find level.dat file for the world '" + levelName + "'!");
 			}
 		} catch (IOException e) {
 			if (logWarnings) {
-				logger.info("Could not read the level.dat file for the world '" + levelName + "'!");
+				Log.info("Could not read the level.dat file for the world '" + levelName + "'!");
 			}
 		}
 		return false;

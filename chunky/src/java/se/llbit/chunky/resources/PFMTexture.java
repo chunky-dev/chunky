@@ -25,10 +25,9 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Scanner;
 
-import org.apache.log4j.Logger;
+import se.llbit.log.Log;
 
 public class PFMTexture extends AbstractHDRITexture {
-	private static final Logger logger = Logger.getLogger(PFMTexture.class);
 
 	public PFMTexture(File file) {
 		try {
@@ -41,7 +40,7 @@ public class PFMTexture extends AbstractHDRITexture {
 			} else if (fmt.equals("Pf")) {
 				components = 1;
 			} else {
-				logger.warn("Unknown PFM format!");
+				Log.warn("Unknown PFM format!");
 			}
 			width = Integer.parseInt(scan.next());
 			height = Integer.parseInt(scan.next());
@@ -82,7 +81,7 @@ public class PFMTexture extends AbstractHDRITexture {
 			}
 			f.close();
 		} catch (IOException e) {
-			logger.error("Error loading PFM image: " + e.getMessage());
+			Log.error("Error loading PFM image: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
