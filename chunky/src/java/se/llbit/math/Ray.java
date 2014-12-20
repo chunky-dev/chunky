@@ -116,9 +116,18 @@ public class Ray {
 	public boolean hit;
 
 	/**
- 	 * Rays should be constructed using a ray pool.
+ 	 * Creat an uninitialized ray.
  	 */
-	private Ray() { }
+	public Ray() {
+	}
+
+	/**
+ 	 * Create a copy of the given ray
+ 	 * @param other ray to copy
+ 	 */
+	public Ray(Ray other) {
+		set(other);
+	}
 
 	/**
 	 * set default values
@@ -151,71 +160,6 @@ public class Ray {
 		emittance.set(0, 0, 0);
 		specular = other.specular;
 	}
-
-	/**
-	 * A free list for ray objects.
-	 */
-	public static class RayPool {
-		private int limit = 10;
-		private int size = 0;
-		private Ray[] pool = new Ray[limit];
-		private static RayPool defaultInstance;
-
-		/**
-		 * @param other
-		 * @return Next ray from free list
-		 */
-		public final Ray get(Ray other) {
-			Ray ray;
-			if (size == 0) {
-				ray = new Ray();
-			} else {
-				ray = pool[--size];
-			}
-			ray.set(other);
-			return ray;
-		}
-
-		/**
-		 * @return Get default ray pool
-		 */
-		public static RayPool getDefaultRayPool() {
-			if (defaultInstance == null) {
-				defaultInstance = new RayPool();
-			}
-			return defaultInstance;
-		}
-
-		/**
-		 * @return Next ray from free list
-		 */
-		public final Ray get() {
-			Ray ray;
-			if (size == 0) {
-				ray = new Ray();
-			} else {
-				ray = pool[--size];
-			}
-			ray.setDefault();
-			return ray;
-		}
-
-		/**
-		 * Put ray back on the free list
-		 * @param ray
-		 */
-		public final void dispose(Ray ray) {
-			if (size == limit) {
-				int newLimit = limit * 2;
-				Ray[] newPool = new Ray[newLimit];
-				System.arraycopy(pool, 0, newPool, 0, limit);
-				limit = newLimit;
-				pool = newPool;
-			}
-			pool[size++] = ray;
-		}
-	}
-
 
 	/**
 	 * @return Previous block

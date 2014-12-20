@@ -42,10 +42,8 @@ import se.llbit.math.Matrix3d;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
-import se.llbit.math.Ray.RayPool;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
-import se.llbit.util.VectorPool;
 
 /**
  * Test renderer
@@ -62,8 +60,6 @@ public class TestRenderer extends Thread implements ViewListener,
 	private BufferedImage backBuffer;
 	private final int width;
 	private final int height;
-	private final VectorPool vectorPool = new VectorPool();
-	private final RayPool rayPool = new RayPool();
 	private final Camera nextCamera;
 	private final Camera camera;
 	private boolean refresh = true;
@@ -197,7 +193,7 @@ public class TestRenderer extends Thread implements ViewListener,
 
 		double aspect = width / (double) height;
 
-		Ray ray = rayPool.get();
+		Ray ray = new Ray();
 
 		camPos.set(0, -distance, 0);
 		camera.transform(camPos);

@@ -27,7 +27,6 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
 import se.llbit.util.JSONifiable;
-import se.llbit.util.VectorPool;
 
 /**
  * Sun model for ray tracing
@@ -388,18 +387,17 @@ public class Sun implements JSONifiable {
 	 * Point ray in random direction within sun solid angle
 	 * @param reflected
 	 * @param random
-	 * @param vectorPool
 	 */
-	public void getRandomSunDirection(Ray reflected, Random random, VectorPool vectorPool) {
+	public void getRandomSunDirection(Ray reflected, Random random) {
 		double x1 = random.nextDouble();
 		double x2 = random.nextDouble();
 		double cos_a = 1-x1 + x1*RADIUS_COS;
 		double sin_a = FastMath.sqrt(1 - cos_a*cos_a);
 		double phi = 2 * Math.PI * x2;
 
-		Vector3d u = vectorPool.get(su);
-		Vector3d v = vectorPool.get(sv);
-		Vector3d w = vectorPool.get(sw);
+		Vector3d u = new Vector3d(su);
+		Vector3d v = new Vector3d(sv);
+		Vector3d w = new Vector3d(sw);
 
 		u.scale(FastMath.cos(phi)*sin_a);
 		v.scale(FastMath.sin(phi)*sin_a);
@@ -408,10 +406,6 @@ public class Sun implements JSONifiable {
 		reflected.d.add(u, v);
 		reflected.d.add(w);
 		reflected.d.normalize();
-
-		vectorPool.dispose(u);
-		vectorPool.dispose(v);
-		vectorPool.dispose(w);
 	}
 
 	/**

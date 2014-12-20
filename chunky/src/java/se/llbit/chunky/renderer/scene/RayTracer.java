@@ -20,7 +20,6 @@ import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Block;
 import se.llbit.math.Ray;
-import se.llbit.math.Ray.RayPool;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -100,9 +99,9 @@ public class RayTracer {
 	public static boolean nextIntersection(Scene scene, Ray ray, WorkerState state) {
 
 		if (scene.sky().cloudsEnabled()) {
-			Ray oct = state.rayPool.get(ray);
+			Ray oct = new Ray(ray);
 			if  (scene.sky().cloudIntersection(scene, ray, state.random)) {
-				if (nextWorldIntersection(scene, oct, state.rayPool) &&
+				if (nextWorldIntersection(scene, oct) &&
 						oct.distance <= ray.distance) {
 					ray.distance = oct.distance;
 					ray.d.set(oct.d);
@@ -116,18 +115,16 @@ public class RayTracer {
 					ray.currentMaterial = Block.GRASS_ID;
 					ray.x.scaleAdd(ray.tNear + Ray.EPSILON, ray.d);
 				}
-				state.rayPool.dispose(oct);
 				return true;
 			}
 		}
-		return nextWorldIntersection(scene, ray, state.rayPool);
+		return nextWorldIntersection(scene, ray);
 	}
 
-	private static boolean nextWorldIntersection(Scene scene, Ray ray,
-			RayPool rayPool) {
+	private static boolean nextWorldIntersection(Scene scene, Ray ray) {
 
 		boolean hit = false;
-		Ray oct = rayPool.get(ray);
+		Ray oct = new Ray(ray);
 		if (scene.intersect(oct)) {
 			ray.distance = oct.distance;
 			ray.x.set(oct.x);
@@ -152,7 +149,6 @@ public class RayTracer {
 		} else {
 			ray.currentMaterial = Block.AIR_ID;
 		}
-		rayPool.dispose(oct);
 		return hit;
 	}
 

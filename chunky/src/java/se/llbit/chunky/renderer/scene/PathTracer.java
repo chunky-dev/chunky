@@ -55,11 +55,8 @@ public class PathTracer {
 			int addEmitted, boolean first) {
 
 		Random random = state.random;
-		Ray reflected = state.rayPool.get();
-		Ray transmitted = state.rayPool.get();
-		Ray refracted = state.rayPool.get();
-		Vector3d ox = state.vectorPool.get(ray.x);
-		Vector3d od = state.vectorPool.get(ray.d);
+		Vector3d ox = new Vector3d(ray.x);
+		Vector3d od = new Vector3d(ray.d);
 		double s = 0;
 
 		while (true) {
@@ -120,6 +117,7 @@ public class PathTracer {
 			if (currentBlock.isShiny &&
 					random.nextDouble() < pSpecular) {
 
+				Ray reflected = new Ray();
 				reflected.specularReflection(ray);
 
 				if (!scene.kill(reflected, random)) {
@@ -136,6 +134,7 @@ public class PathTracer {
 
 				if (random.nextDouble() < pDiffuse) {
 
+					Ray reflected = new Ray();
 					reflected.set(ray);
 					if (!scene.kill(reflected, random)) {
 
@@ -154,7 +153,7 @@ public class PathTracer {
 						}
 
 						if (scene.sunEnabled) {
-							scene.sun.getRandomSunDirection(reflected, random, state.vectorPool);
+							scene.sun.getRandomSunDirection(reflected, random);
 
 							double directLightR = 0;
 							double directLightG = 0;
@@ -227,6 +226,7 @@ public class PathTracer {
 					double radicand = 1 - n1n2*n1n2 * (1 - cosTheta*cosTheta);
 					if (doRefraction && radicand < Ray.EPSILON) {
 						// total internal reflection
+						Ray reflected = new Ray();
 						reflected.specularReflection(ray);
 						if (!scene.kill(reflected, random)) {
 							pathTrace(scene, reflected, state, 1, false);
@@ -239,6 +239,7 @@ public class PathTracer {
 							}
 						}
 					} else {
+						Ray refracted = new Ray();
 						refracted.set(ray);
 						if (!scene.kill(refracted, random)) {
 
@@ -252,6 +253,7 @@ public class PathTracer {
 							double Rtheta = R0 + (1-R0) * c*c*c*c*c;
 
 							if (random.nextDouble() < Rtheta) {
+								Ray reflected = new Ray();
 								reflected.specularReflection(ray);
 								pathTrace(scene, reflected, state, 1, false);
 								if (reflected.hit) {
@@ -295,6 +297,7 @@ public class PathTracer {
 
 				} else {
 
+					Ray transmitted = new Ray();
 					transmitted.set(ray);
 					transmitted.x.scaleAdd(Ray.OFFSET, transmitted.d);
 
@@ -355,8 +358,9 @@ public class PathTracer {
 			if (scene.volumetricFogEnabled) {
 				s = (s - Ray.OFFSET) * random.nextDouble();
 
+				Ray reflected = new Ray();
 				reflected.x.scaleAdd(s, od, ox);
-				scene.sun.getRandomSunDirection(reflected, random, state.vectorPool);
+				scene.sun.getRandomSunDirection(reflected, random);
 				reflected.currentMaterial = 0;
 
 				getDirectLightAttenuation(scene, reflected, state);
@@ -371,11 +375,6 @@ public class PathTracer {
 			}
 		}
 
-		state.rayPool.dispose(reflected);
-		state.rayPool.dispose(transmitted);
-		state.rayPool.dispose(refracted);
-		state.vectorPool.dispose(ox);
-		state.vectorPool.dispose(od);
 	}
 
 	/**

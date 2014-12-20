@@ -23,8 +23,6 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
-import se.llbit.math.Ray.RayPool;
-import se.llbit.util.VectorPool;
 
 /**
  * Performs rendering work.
@@ -56,9 +54,7 @@ public class RenderWorker extends Thread {
 		this.id = id;
 		state = new WorkerState();
 		state.random = new Random(seed);
-		state.vectorPool = new VectorPool();
-		state.rayPool = new RayPool();
-		state.ray = state.rayPool.get();
+		state.ray = new Ray();
 	}
 
 	@Override
@@ -147,7 +143,7 @@ public class RenderWorker extends Thread {
 
 		} else {
 
-			Ray target = state.rayPool.get(ray);
+			Ray target = new Ray(ray);
 			scene.trace(target);
 			int tx = (int) QuickMath.floor(target.x.x + target.d.x * Ray.OFFSET);
 			int ty = (int) QuickMath.floor(target.x.y + target.d.y * Ray.OFFSET);
@@ -207,8 +203,6 @@ public class RenderWorker extends Thread {
 			}
 
 			}
-
-			state.rayPool.dispose(target);
 		}
 		jobTime += System.nanoTime() - jobStart;
 		if (jobTime > SLEEP_INTERVAL) {

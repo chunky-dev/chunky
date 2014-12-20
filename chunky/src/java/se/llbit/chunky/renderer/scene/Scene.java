@@ -56,13 +56,11 @@ import se.llbit.math.Color;
 import se.llbit.math.Octree;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
-import se.llbit.math.Ray.RayPool;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector3i;
 import se.llbit.png.IEND;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
-import se.llbit.util.VectorPool;
 
 /**
  * Scene description.
@@ -71,8 +69,6 @@ public class Scene extends SceneDescription {
 
 	private static final Font infoFont = new Font("Sans serif", Font.BOLD, 11);
 	private static FontMetrics fontMetrics;
-
-	private final RayPool rayPool = new RayPool();
 
 	protected static final int DEFAULT_DUMP_FREQUENCY = 500;
 
@@ -1063,6 +1059,7 @@ public class Scene extends SceneDescription {
 	 */
 	public void trace(Ray ray) {
 		ray.d.set(0, 0, 1);
+		ray.hit = false;
 		ray.x.set(camera.getPosition());
 		ray.x.x -= origin.x;
 		ray.x.y -= origin.y;
@@ -1080,7 +1077,7 @@ public class Scene extends SceneDescription {
 	 * Perform auto focus
 	 */
 	public void autoFocus() {
-		Ray ray = RayPool.getDefaultRayPool().get();
+		Ray ray = new Ray();
 		trace(ray);
 		if (!ray.hit) {
 			camera.setDof(Double.POSITIVE_INFINITY);
@@ -1088,7 +1085,6 @@ public class Scene extends SceneDescription {
 			camera.setSubjectDistance(ray.distance);
 			camera.setDof(ray.distance*ray.distance);
 		}
-		RayPool.getDefaultRayPool().dispose(ray);
 	}
 
 	/**
@@ -1359,10 +1355,7 @@ public class Scene extends SceneDescription {
 	private void computeAlpha(ProgressListener progressListener) {
 		if (transparentSky) {
 			WorkerState state = new WorkerState();
-			//state.random = new Random(0);
-			state.vectorPool = new VectorPool();
-			state.rayPool = new RayPool();
-			state.ray = state.rayPool.get();
+			state.ray = new Ray();
 			for (int x = 0; x < width; ++x) {
 				progressListener.setProgress("Computing alpha channel", x+1, 0, width);
 				for (int y = 0; y < height; ++y) {
@@ -1883,7 +1876,7 @@ public class Scene extends SceneDescription {
 					g.setColor(java.awt.Color.white);
 					g.drawLine(x0, y0-4, x0, y0+4);
 					g.drawLine(x0-4, y0, x0+4, y0);
-					Ray ray = rayPool.get();
+					Ray ray = new Ray();
 					trace(ray);
 					g.setFont(infoFont);
 					if (ray.hit) {
@@ -1898,7 +1891,6 @@ public class Scene extends SceneDescription {
 					Vector3d pos = camera.getPosition();
 					g.drawString(String.format("(%.1f, %.1f, %.1f)",
 							pos.x, pos.y, pos.z), 5, 11);
-					rayPool.dispose(ray);
 				}
 			}
 
