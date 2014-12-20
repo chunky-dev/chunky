@@ -684,6 +684,11 @@ public class Scene extends SceneDescription {
 
 						case Block.WOODENDOOR_ID:
 						case Block.IRONDOOR_ID:
+						case Block.SPRUCEDOOR_ID:
+						case Block.BIRCHDOOR_ID:
+						case Block.JUNGLEDOOR_ID:
+						case Block.ACACIADOOR_ID:
+						case Block.DARKOAKDOOR_ID:
 						{
 							int top = 0;
 							int bottom = 0;

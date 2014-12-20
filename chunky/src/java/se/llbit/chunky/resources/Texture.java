@@ -465,6 +465,18 @@ public class Texture {
 	public static final Texture acaciaWood = new Texture("wood");
 	public static final Texture darkOakWood = new Texture("wood");
 
+	public static final Texture spruceDoorTop = new Texture();
+	public static final Texture birchDoorTop = new Texture();
+	public static final Texture jungleDoorTop = new Texture();
+	public static final Texture acaciaDoorTop = new Texture();
+	public static final Texture darkOakDoorTop = new Texture();
+
+	public static final Texture spruceDoorBottom = new Texture();
+	public static final Texture birchDoorBottom = new Texture();
+	public static final Texture jungleDoorBottom = new Texture();
+	public static final Texture acaciaDoorBottom = new Texture();
+	public static final Texture darkOakDoorBottom = new Texture();
+
 	public static final Texture[] wool = {
 		whiteWool, orangeWool, magentaWool, lightBlueWool,
 		yellowWool, limeWool, pinkWool, grayWool, lightGrayWool,

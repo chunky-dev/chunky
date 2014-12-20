@@ -3287,39 +3287,84 @@ public class Block {
 			return true;
 		}
 	};
-	public static final Block UNKNOWN0xC1 = new Block(0xC1, "Unknown Block 0xC1", Texture.unknown) {
+	public static final int SPRUCEDOOR_ID = 0xC1;
+	public static final Block SPRUCEDOOR = new Block(SPRUCEDOOR_ID, "Spruce Door", Icon.woodenDoor) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		final Texture[] texture = {
+			Texture.spruceDoorBottom, Texture.spruceDoorTop
+		};
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return DoorModel.intersect(ray, texture[ray.getBlockData() >>> 3]);
 		}
 	};
-	public static final Block UNKNOWN0xC2 = new Block(0xC2, "Unknown Block 0xC2", Texture.unknown) {
+	public static final int BIRCHDOOR_ID = 0xC2;
+	public static final Block BIRCHDOOR = new Block(BIRCHDOOR_ID, "Birch Door", Icon.woodenDoor) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		final Texture[] texture = {
+			Texture.birchDoorBottom, Texture.birchDoorTop
+		};
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return DoorModel.intersect(ray, texture[ray.getBlockData() >>> 3]);
 		}
 	};
-	public static final Block UNKNOWN0xC3 = new Block(0xC3, "Unknown Block 0xC3", Texture.unknown) {
+	public static final int JUNGLEDOOR_ID = 0xC3;
+	public static final Block JUNGLEDOOR = new Block(JUNGLEDOOR_ID, "Jungle Door", Icon.woodenDoor) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		final Texture[] texture = {
+			Texture.jungleDoorBottom, Texture.jungleDoorTop
+		};
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return DoorModel.intersect(ray, texture[ray.getBlockData() >>> 3]);
 		}
 	};
-	public static final Block UNKNOWN0xC4 = new Block(0xC4, "Unknown Block 0xC4", Texture.unknown) {
+	public static final int ACACIADOOR_ID = 0xC4;
+	public static final Block ACACIADOOR = new Block(ACACIADOOR_ID, "Acacia Door", Icon.woodenDoor) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		final Texture[] texture = {
+			Texture.acaciaDoorBottom, Texture.acaciaDoorTop
+		};
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return DoorModel.intersect(ray, texture[ray.getBlockData() >>> 3]);
 		}
 	};
-	public static final Block UNKNOWN0xC5 = new Block(0xC5, "Unknown Block 0xC5", Texture.unknown) {
+	public static final int DARKOAKDOOR_ID = 0xC5;
+	public static final Block DARKOAKDOOR = new Block(DARKOAKDOOR_ID, "Dark Oak Door", Icon.woodenDoor) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		final Texture[] texture = {
+			Texture.darkOakDoorBottom, Texture.darkOakDoorTop
+		};
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return DoorModel.intersect(ray, texture[ray.getBlockData() >>> 3]);
 		}
 	};
 	public static final Block UNKNOWN0xC6 = new Block(0xC6, "Unknown Block 0xC6", Texture.unknown) {
@@ -3778,8 +3823,8 @@ public class Block {
 		REDSANDSTONESTAIRS, DOUBLESLAB2, SLAB2, SPRUCEFENCEGATE,
 		BIRCHFENCEGATE, JUNGLEFENCEGATE, DARKOAKFENCEGATE, ACACIAFENCEGATE,
 		SPRUCEFENCE, BIRCHFENCE, JUNGLEFENCE, DARKOAKFENCE,
-		ACACIAFENCE, UNKNOWN0xC1, UNKNOWN0xC2, UNKNOWN0xC3,
-		UNKNOWN0xC4, UNKNOWN0xC5, UNKNOWN0xC6, UNKNOWN0xC7,
+		ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR, JUNGLEDOOR,
+		ACACIADOOR, DARKOAKDOOR, UNKNOWN0xC6, UNKNOWN0xC7,
 		UNKNOWN0xC8, UNKNOWN0xC9, UNKNOWN0xCA, UNKNOWN0xCB,
 		UNKNOWN0xCC, UNKNOWN0xCD, UNKNOWN0xCE, UNKNOWN0xCF,
 		UNKNOWN0xD0, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3,

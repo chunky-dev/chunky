@@ -1279,6 +1279,28 @@ public class TexturePackLoader {
 		allTextures.put("red_sandstone_smooth",
 				new SimpleTexture("assets/minecraft/textures/blocks/red_sandstone_smooth", Texture.redSandstoneSmooth));
 
+		allTextures.put("door_spruce_upper",
+				new SimpleTexture("assets/minecraft/textures/blocks/door_spruce_upper", Texture.spruceDoorTop));
+		allTextures.put("door_birch_upper",
+				new SimpleTexture("assets/minecraft/textures/blocks/door_birch_upper", Texture.birchDoorTop));
+		allTextures.put("door_jungle_upper",
+				new SimpleTexture("assets/minecraft/textures/blocks/door_jungle_upper", Texture.jungleDoorTop));
+		allTextures.put("door_acacia_upper",
+				new SimpleTexture("assets/minecraft/textures/blocks/door_acacia_upper", Texture.acaciaDoorTop));
+		allTextures.put("door_dark_oak_upper",
+				new SimpleTexture("assets/minecraft/textures/blocks/door_dark_oak_upper", Texture.darkOakDoorTop));
+
+		allTextures.put("door_spruce_lower",
+				new SimpleTexture("assets/minecraft/textures/blocks/door_spruce_lower", Texture.spruceDoorBottom));
+		allTextures.put("door_birch_lower",
+				new SimpleTexture("assets/minecraft/textures/blocks/door_birch_lower", Texture.birchDoorBottom));
+		allTextures.put("door_jungle_lower",
+				new SimpleTexture("assets/minecraft/textures/blocks/door_jungle_lower", Texture.jungleDoorBottom));
+		allTextures.put("door_acacia_lower",
+				new SimpleTexture("assets/minecraft/textures/blocks/door_acacia_lower", Texture.acaciaDoorBottom));
+		allTextures.put("door_dark_oak_lower",
+				new SimpleTexture("assets/minecraft/textures/blocks/door_dark_oak_lower", Texture.darkOakDoorBottom));
+
 	}
 
 	/**
