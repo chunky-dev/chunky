@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -33,6 +33,7 @@ import java.util.zip.ZipFile;
 import javax.imageio.ImageIO;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.resources.texturepack.AlternateTextures;
 import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.CloudsTexture;
@@ -40,9 +41,7 @@ import se.llbit.chunky.resources.texturepack.FoliageColorTexture;
 import se.llbit.chunky.resources.texturepack.GrassColorTexture;
 import se.llbit.chunky.resources.texturepack.IndexedTexture;
 import se.llbit.chunky.resources.texturepack.LargeChestTexture;
-import se.llbit.chunky.resources.texturepack.SignTexture;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
-import se.llbit.chunky.resources.texturepack.SunTexture;
 import se.llbit.chunky.resources.texturepack.TextureRef;
 import se.llbit.log.Log;
 
@@ -108,12 +107,12 @@ public class TexturePackLoader {
 					Texture.largeTrappedChestBottomLeft, Texture.largeTrappedChestBottomRight,
 					Texture.largeTrappedChestBackLeft, Texture.largeTrappedChestBackRight)));
 		allTextures.put("sun", new AlternateTextures(
-				new SunTexture("assets/minecraft/textures/environment/sun"),// MC 1.6
-				new SunTexture("environment/sun"),// MC 1.5
-				new SunTexture("terrain/sun")));
+				new SimpleTexture("assets/minecraft/textures/environment/sun", Sun.texture),// MC 1.6
+				new SimpleTexture("environment/sun", Sun.texture),// MC 1.5
+				new SimpleTexture("terrain/sun", Sun.texture)));
 		allTextures.put("sign", new AlternateTextures(
-				new SignTexture("assets/minecraft/textures/entity/sign"),// MC 1.6
-				new SignTexture("item/sign")));
+				new SimpleTexture("assets/minecraft/textures/entity/sign", Texture.signPost),// MC 1.6
+				new SimpleTexture("item/sign", Texture.signPost)));
 		allTextures.put("clouds", new AlternateTextures(
 				new CloudsTexture("assets/minecraft/textures/environment/clouds"),// MC 1.6
 				new CloudsTexture("environment/clouds")));
