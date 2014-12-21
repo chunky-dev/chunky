@@ -323,7 +323,6 @@ public class Sun implements JSONifiable {
 				ray.color.x *= emittance.x * 10;
 				ray.color.y *= emittance.y * 10;
 				ray.color.z *= emittance.z * 10;
-				ray.hit = true;
 				return true;
 			}
 		}

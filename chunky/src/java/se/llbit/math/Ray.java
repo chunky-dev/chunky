@@ -111,11 +111,6 @@ public class Ray {
 	public boolean specular;
 
 	/**
- 	 * <code>true</code> if the ray has intersected any surface.
- 	 */
-	public boolean hit;
-
-	/**
  	 * Creat an uninitialized ray.
  	 */
 	public Ray() {
@@ -137,7 +132,6 @@ public class Ray {
 		prevMaterial = 0;
 		currentMaterial = -1;
 		depth = 0;
-		hit = false;
 		color.set(0, 0, 0, 0);
 		emittance.set(0, 0, 0);
 		specular = true;
@@ -152,7 +146,6 @@ public class Ray {
 		currentMaterial = other.currentMaterial;
 		depth = other.depth+1;
 		distance = 0;
-		hit = false;
 		o.set(other.o);
 		d.set(other.d);
 		n.set(other.n);

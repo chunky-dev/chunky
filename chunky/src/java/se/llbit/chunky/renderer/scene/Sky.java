@@ -354,7 +354,6 @@ public class Sky implements JSONifiable {
 		default:
 			break;
 		}
-		ray.hit = true;
 	}
 
 	/**
@@ -470,7 +469,6 @@ public class Sky implements JSONifiable {
 		if (scene.sunEnabled) {
 			addSunColor(ray);
 		}
-		ray.hit = true;
 		//ray.color.scale(skyLightModifier);
 		ray.color.w = 1;
 	}

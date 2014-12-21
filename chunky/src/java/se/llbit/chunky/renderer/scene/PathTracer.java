@@ -51,9 +51,10 @@ public class PathTracer {
 	 * @param addEmitted
 	 * @param first
 	 */
-	public static final void pathTrace(Scene scene, Ray ray, WorkerState state,
+	public static final boolean pathTrace(Scene scene, Ray ray, WorkerState state,
 			int addEmitted, boolean first) {
 
+		boolean hit = false;
 		Random random = state.random;
 		Vector3d ox = new Vector3d(ray.o);
 		Vector3d od = new Vector3d(ray.d);
@@ -66,13 +67,16 @@ public class PathTracer {
 					// direct sky hit
 					if (!scene.transparentSky()) {
 						scene.sky.getSkyColorInterpolated(ray, scene.waterHeight > 0);
+						hit = true;
 					}
 
 				} else if (ray.specular) {
 					// sky color
 					scene.sky.getSkySpecularColor(ray, scene.waterHeight > 0);
+					hit = true;
 				} else {
 					scene.sky.getSkyColor(ray, scene.waterHeight > 0);
+					hit = true;
 				}
 				break;
 			}
@@ -121,12 +125,11 @@ public class PathTracer {
 				reflected.specularReflection(ray);
 
 				if (!scene.kill(reflected, random)) {
-					pathTrace(scene, reflected, state, 1, false);
-					if (reflected.hit) {
+					if (pathTrace(scene, reflected, state, 1, false)) {
 						ray.color.x *= reflected.color.x;
 						ray.color.y *= reflected.color.y;
 						ray.color.z *= reflected.color.z;
-						ray.hit = true;
+						hit = true;
 					}
 				}
 
@@ -149,7 +152,7 @@ public class PathTracer {
 									currentBlock.emittance * scene.emitterIntensity;
 							ray.emittance.z = ray.color.z * ray.color.z *
 									currentBlock.emittance * scene.emitterIntensity;
-							ray.hit = true;
+							hit = true;
 						}
 
 						if (scene.sunEnabled) {
@@ -178,14 +181,13 @@ public class PathTracer {
 									directLightR = attenuation.x*attenuation.w * mult;
 									directLightG = attenuation.y*attenuation.w * mult;
 									directLightB = attenuation.z*attenuation.w * mult;
-									ray.hit = true;
+									hit = true;
 								}
 							}
 
 							reflected.diffuseReflection(ray, random);
-							pathTrace(scene, reflected, state, 0, false);
-							ray.hit = ray.hit || reflected.hit;
-							if (ray.hit) {
+							hit = pathTrace(scene, reflected, state, 0, false) || hit;
+							if (hit) {
 								ray.color.x = ray.color.x
 									* (emittance + directLightR * scene.sun.emittance.x
 										+ (reflected.color.x + reflected.emittance.x));
@@ -200,9 +202,8 @@ public class PathTracer {
 						} else {
 							reflected.diffuseReflection(ray, random);
 
-							pathTrace(scene, reflected, state, 0, false);
-							ray.hit = ray.hit || reflected.hit;
-							if (ray.hit) {
+							hit = pathTrace(scene, reflected, state, 0, false) || hit;
+							if (hit) {
 								ray.color.x = ray.color.x
 									* (emittance + (reflected.color.x + reflected.emittance.x));
 								ray.color.y = ray.color.y
@@ -229,13 +230,12 @@ public class PathTracer {
 						Ray reflected = new Ray();
 						reflected.specularReflection(ray);
 						if (!scene.kill(reflected, random)) {
-							pathTrace(scene, reflected, state, 1, false);
-							if (reflected.hit) {
+							if (pathTrace(scene, reflected, state, 1, false)) {
 
 								ray.color.x = reflected.color.x;
 								ray.color.y = reflected.color.y;
 								ray.color.z = reflected.color.z;
-								ray.hit = true;
+								hit = true;
 							}
 						}
 					} else {
@@ -255,12 +255,11 @@ public class PathTracer {
 							if (random.nextDouble() < Rtheta) {
 								Ray reflected = new Ray();
 								reflected.specularReflection(ray);
-								pathTrace(scene, reflected, state, 1, false);
-								if (reflected.hit) {
+								if (pathTrace(scene, reflected, state, 1, false)) {
 									ray.color.x = reflected.color.x;
 									ray.color.y = reflected.color.y;
 									ray.color.z = reflected.color.z;
-									ray.hit = true;
+									hit = true;
 								}
 							} else {
 								if (doRefraction) {
@@ -281,15 +280,14 @@ public class PathTracer {
 									refracted.o.scaleAdd(Ray.OFFSET, refracted.d);
 								}
 
-								pathTrace(scene, refracted, state, 1, false);
-								if (refracted.hit) {
+								if (pathTrace(scene, refracted, state, 1, false)) {
 									ray.color.x = ray.color.x * pDiffuse + (1-pDiffuse);
 									ray.color.y = ray.color.y * pDiffuse + (1-pDiffuse);
 									ray.color.z = ray.color.z * pDiffuse + (1-pDiffuse);
 									ray.color.x *= refracted.color.x;
 									ray.color.y *= refracted.color.y;
 									ray.color.z *= refracted.color.z;
-									ray.hit = true;
+									hit = true;
 								}
 							}
 						}
@@ -301,15 +299,14 @@ public class PathTracer {
 					transmitted.set(ray);
 					transmitted.o.scaleAdd(Ray.OFFSET, transmitted.d);
 
-					pathTrace(scene, transmitted, state, 1, false);
-					if (transmitted.hit) {
+					if (pathTrace(scene, transmitted, state, 1, false)) {
 						ray.color.x = ray.color.x * pDiffuse + (1-pDiffuse);
 						ray.color.y = ray.color.y * pDiffuse + (1-pDiffuse);
 						ray.color.z = ray.color.z * pDiffuse + (1-pDiffuse);
 						ray.color.x *= transmitted.color.x;
 						ray.color.y *= transmitted.color.y;
 						ray.color.z *= transmitted.color.z;
-						ray.hit = true;
+						hit = true;
 					}
 				}
 			}
@@ -327,15 +324,16 @@ public class PathTracer {
 				ray.color.y += (1-attenuation) * wc[1];
 				ray.color.z += (1-attenuation) * wc[2];
 				ray.color.w = attenuation;*/
-				ray.hit = true;
+				hit = true;
 			}
 
 			break;
 		}
-		if (!ray.hit) {
+		if (!hit) {
 			ray.color.set(0, 0, 0, 1);
-			if (first)
+			if (first) {
 				s = ray.distance;
+			}
 		}
 
 		if (s > 0) {
@@ -375,6 +373,7 @@ public class PathTracer {
 			}
 		}
 
+		return hit;
 	}
 
 	/**

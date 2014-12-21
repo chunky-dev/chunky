@@ -144,7 +144,7 @@ public class RenderWorker extends Thread {
 		} else {
 
 			Ray target = new Ray(ray);
-			scene.trace(target);
+			boolean hit = scene.trace(target);
 			int tx = (int) QuickMath.floor(target.o.x + target.d.x * Ray.OFFSET);
 			int ty = (int) QuickMath.floor(target.o.y + target.d.y * Ray.OFFSET);
 			int tz = (int) QuickMath.floor(target.o.z + target.d.z * Ray.OFFSET);
@@ -175,7 +175,7 @@ public class RenderWorker extends Thread {
 			int rx = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
 			int ry = (int) QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
 			int rz = (int) QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
-			if (target.hit && tx == rx && ty == ry && tz == rz) {
+			if (hit && tx == rx && ty == ry && tz == rz) {
 				/*ray.color.x = ray.color.x * 0.5 + 0.5;
 				ray.color.y = ray.color.y * 0.5;
 				ray.color.z = ray.color.z * 0.5;

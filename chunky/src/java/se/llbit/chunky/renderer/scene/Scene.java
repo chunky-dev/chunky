@@ -1061,10 +1061,10 @@ public class Scene extends SceneDescription {
 	/**
 	 * Trace a ray in the Octree
 	 * @param ray
+	 * @return {@code true} if the ray hit something
 	 */
-	public void trace(Ray ray) {
+	public boolean trace(Ray ray) {
 		ray.d.set(0, 0, 1);
-		ray.hit = false;
 		ray.o.set(camera.getPosition());
 		ray.o.x -= origin.x;
 		ray.o.y -= origin.y;
@@ -1072,10 +1072,10 @@ public class Scene extends SceneDescription {
 		camera.transform(ray.d);
 		while (intersect(ray)) {
 			if (ray.currentMaterial != 0) {
-				ray.hit = true;
-				break;
+				return true;
 			}
 		}
+		return false;
 	}
 
 	/**
@@ -1083,8 +1083,7 @@ public class Scene extends SceneDescription {
 	 */
 	public void autoFocus() {
 		Ray ray = new Ray();
-		trace(ray);
-		if (!ray.hit) {
+		if (!trace(ray)) {
 			camera.setDof(Double.POSITIVE_INFINITY);
 		} else {
 			camera.setSubjectDistance(ray.distance);
@@ -1881,10 +1880,9 @@ public class Scene extends SceneDescription {
 					g.setColor(java.awt.Color.white);
 					g.drawLine(x0, y0-4, x0, y0+4);
 					g.drawLine(x0-4, y0, x0+4, y0);
-					Ray ray = new Ray();
-					trace(ray);
 					g.setFont(infoFont);
-					if (ray.hit) {
+					Ray ray = new Ray();
+					if (trace(ray)) {
 						Block block = ray.getCurrentBlock();
 						g.drawString(String.format("target: %.2f m", ray.distance), 5, height-18);
 						g.drawString(String.format("[0x%08X] %s (%s)",
