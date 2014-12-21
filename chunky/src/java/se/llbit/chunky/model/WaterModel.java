@@ -182,7 +182,7 @@ public class WaterModel {
 	public static boolean intersect(Ray ray) {
 		ray.t = Double.POSITIVE_INFINITY;
 
-		int data = ray.currentMaterial;
+		int data = ray.getCurrentData();
 		int isFull = (data >> FULL_BLOCK) & 1;
 		//int level = data >> 8;
 
@@ -219,7 +219,7 @@ public class WaterModel {
 		}
 
 		// lily pad test
-		if (((ray.currentMaterial >> 13) & 1) != 0) {
+		if (((ray.getCurrentData() >> 13) & 1) != 0) {
 			if (LilyPadModel.intersect(ray))
 				return true;
 		}

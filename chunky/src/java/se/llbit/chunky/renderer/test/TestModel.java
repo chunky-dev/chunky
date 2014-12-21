@@ -135,7 +135,7 @@ public class TestModel {
 	 * @param ray
 	 */
 	public void intersect(Ray ray) {
-		ray.currentMaterial = 1 << 8;
+		ray.setCurrentMat(ray.getCurrentMaterial(), 1 << 8);
 
 		/*for (int i = 0; i < boxes.length; ++i) {
 			if (boxes[i].intersect(ray)) {

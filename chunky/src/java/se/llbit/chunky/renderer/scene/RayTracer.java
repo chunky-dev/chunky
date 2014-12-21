@@ -40,21 +40,21 @@ public class RayTracer {
 					ray.t = (scene.waterHeight-.125-ray.o.y) / ray.d.y;
 					ray.distance += ray.t;
 					ray.o.scaleAdd(ray.t, ray.d);
-					ray.currentMaterial = Block.WATER.id;
-					ray.prevMaterial = 0;
+					ray.setPrevMat(Block.AIR, 0);
+					ray.setCurrentMat(Block.WATER, 0);
 					WaterModel.intersect(ray);
 				}
 				break;
-			} else if (ray.getCurrentBlock() == Block.WATER) {
+			} else if (ray.getCurrentMaterial() == Block.WATER) {
 				break;
-			} else if (ray.currentMaterial != 0 && ray.color.w > 0) {
+			} else if (ray.getCurrentMaterial() != Block.AIR && ray.color.w > 0) {
 				break;
 			} else {
 				ray.o.scaleAdd(Ray.OFFSET, ray.d);
 			}
 		}
 
-		if (ray.currentMaterial == 0) {
+		if (ray.getCurrentMaterial() == Block.AIR) {
 			scene.sky.getSkySpecularColor(ray, false);
 		} else {
 			scene.sun.flatShading(ray);
@@ -77,8 +77,8 @@ public class RayTracer {
 					ray.t = (scene.waterHeight-.125-ray.o.y) / ray.d.y;
 					ray.distance += ray.t;
 					ray.o.scaleAdd(ray.t, ray.d);
-					ray.currentMaterial = Block.WATER.id;
-					ray.prevMaterial = 0;
+					ray.setPrevMat(Block.AIR, 0);
+					ray.setCurrentMat(Block.WATER, 0);
 					WaterModel.intersect(ray);
 					occlusion *= (1 - ray.color.w);
 				}
@@ -108,11 +108,11 @@ public class RayTracer {
 					ray.o.set(oct.o);
 					ray.n.set(oct.n);
 					ray.color.set(oct.color);
-					ray.prevMaterial = oct.prevMaterial;
-					ray.currentMaterial = oct.currentMaterial;
+					ray.setPrevMat(oct.getPrevMaterial(), oct.getPrevData());
+					ray.setCurrentMat(oct.getCurrentMaterial(), oct.getCurrentData());
 				} else {
-					ray.prevMaterial = ray.currentMaterial;
-					ray.currentMaterial = Block.GRASS_ID;
+					ray.setPrevMat(ray.getCurrentMaterial(), ray.getCurrentData());
+					ray.setCurrentMat(Block.GRASS, 0);
 					ray.o.scaleAdd(ray.tNext + Ray.EPSILON, ray.d);
 				}
 				return true;
@@ -130,8 +130,8 @@ public class RayTracer {
 			ray.o.set(oct.o);
 			ray.n.set(oct.n);
 			ray.color.set(oct.color);
-			ray.prevMaterial = oct.prevMaterial;
-			ray.currentMaterial = oct.currentMaterial;
+			ray.setPrevMat(oct.getPrevMaterial(), oct.getPrevData());
+			ray.setCurrentMat(oct.getCurrentMaterial(), oct.getCurrentData());
 			hit = true;
 		} else if (scene.waterHeight > 0 &&
 				ray.d.y < 0 && ray.o.y > scene.waterHeight-.125) {
@@ -140,14 +140,14 @@ public class RayTracer {
 			ray.t = (scene.waterHeight-.125-ray.o.y) / ray.d.y;
 			ray.distance += ray.t;
 			ray.o.scaleAdd(ray.t, ray.d);
-			ray.currentMaterial = Block.WATER_ID;
-			ray.prevMaterial = 0;
+			ray.setPrevMat(Block.AIR, 0);
+			ray.setCurrentMat(Block.WATER, 0);
 			WaterModel.intersect(ray);
 
 			hit = true;
 
 		} else {
-			ray.currentMaterial = Block.AIR_ID;
+			ray.setCurrentMat(Block.AIR, 0);
 		}
 		return hit;
 	}

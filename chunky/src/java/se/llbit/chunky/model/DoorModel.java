@@ -101,7 +101,7 @@ public class DoorModel {
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 
-		int data = ray.currentMaterial;
+		int data = ray.getCurrentData();
 		int top = 0xF & (data >> BlockData.DOOR_TOP);
 		int bottom = 0xF & (data >> BlockData.DOOR_BOTTOM);
 

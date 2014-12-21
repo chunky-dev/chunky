@@ -33,7 +33,7 @@ public class LavaModel {
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray) {
 		ray.t = Double.POSITIVE_INFINITY;
-		int data = ray.currentMaterial;
+		int data = ray.getCurrentData();
 		int isFull = (data >> WaterModel.FULL_BLOCK) & 1;
 
 		if (isFull != 0) {

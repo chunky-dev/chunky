@@ -20,6 +20,10 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
 
+/**
+ * Work in progress.
+ * @author Jesper Öqvist <jesper@llbit.se>
+ */
 public class ChunkIndex {
 
 	int[] blocks = new int[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
@@ -49,8 +53,8 @@ public class ChunkIndex {
 			ray.o.scaleAdd(tNear, ray.d);
 			ray.distance += tNear;
 
-			ray.prevMaterial = 0;
-			ray.currentMaterial = blockId;
+			ray.setPrevMat(Block.AIR, 0);
+			ray.setMat(blockId);
 			return Block.get(blockId).intersect(ray, scene);
 		}
 		return false;

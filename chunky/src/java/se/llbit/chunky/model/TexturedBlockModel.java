@@ -17,6 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.Block;
 import se.llbit.math.AABB;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -121,7 +122,7 @@ public class TexturedBlockModel {
 	 */
 	public static void getIntersectionColor(Ray ray) {
 
-		if (ray.currentMaterial == 0) {
+		if (ray.getCurrentMaterial() == Block.AIR) {
 			ray.color.x = 1;
 			ray.color.y = 1;
 			ray.color.z = 1;
@@ -131,7 +132,7 @@ public class TexturedBlockModel {
 
 		calcUVCoords(ray);
 
-		ray.getCurrentBlock().getTexture(ray.getBlockData()).getColor(ray);
+		ray.getCurrentMaterial().getTexture(ray.getBlockData()).getColor(ray);
 	}
 
 	/**

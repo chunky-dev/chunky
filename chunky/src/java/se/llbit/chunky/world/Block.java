@@ -87,7 +87,7 @@ import se.llbit.math.Ray;
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
 @SuppressWarnings("javadoc")
-public class Block {
+public class Block extends Material {
 	private static final boolean UNKNOWN_INVISIBLE = true;
 
 	public static final int AIR_ID = 0x00;
@@ -441,7 +441,7 @@ public class Block {
 			ior = 1.520f;
 		}
 		@Override
-		public boolean isSameMaterial(Block other) {
+		public boolean isSameMaterial(Material other) {
 			return other == this || other == STAINED_GLASS;
 		}
 	};
@@ -1090,7 +1090,7 @@ public class Block {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return ChestModel.intersect(ray, tex[(ray.currentMaterial >> 16) % 3]);
+			return ChestModel.intersect(ray, tex[(ray.getCurrentData() >> 16) % 3]);
 		}
 	};
 
@@ -1638,7 +1638,7 @@ public class Block {
 			return woolColor[data&15];
 		}
 		@Override
-		public boolean isSameMaterial(Block other) {
+		public boolean isSameMaterial(Material other) {
 			return other == this || other == GLASS;
 		}
 	};
@@ -1685,7 +1685,7 @@ public class Block {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, texture[(ray.currentMaterial>>8)&3]);
+			return TexturedBlockModel.intersect(ray, texture[(ray.getCurrentData() >> 8)&3]);
 		}
 	};
 	public static final int HUGEBROWNMUSHROOM_ID = 0x63;
@@ -2566,7 +2566,7 @@ public class Block {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return ChestModel.intersect(ray, tex[(ray.currentMaterial >> 16) % 3]);
+			return ChestModel.intersect(ray, tex[(ray.getCurrentData() >> 16) % 3]);
 		}
 	};
 	public static final int WEIGHTEDPRESSUREPLATELIGHT_ID = 0x93;
@@ -3846,63 +3846,6 @@ public class Block {
 	 */
 	public final int id;
 
-	/**
-	 * Block name
-	 */
-	private final String name;
-
-	/**
-	 * Index of refraction.
-	 * Default value is equal to the IoR for air.
-	 */
-	public float ior = 1.000293f;
-
-	/**
-	 * True if there is a specific local intersection model
-	 * for this block
-	 */
-	public boolean localIntersect = false;
-
-	/**
-	 * A block is opaque if it occupies an entire voxel
-	 * and no light can pass through it.
-	 *
-	 * @return {@code true} if the block is solid
-	 */
-	public boolean isOpaque = false;
-
-	/**
-	 * A block is solid if the block occupies an entire voxel.
-	 */
-	public boolean isSolid = true;
-
-	/**
-	 * A block is shiny if it has a specular reflection.
-	 */
-	public boolean isShiny = false;
-
-	/**
-	 * Invisible blocks are not added to the voxel octree, and thus
-	 * they are not rendered. This is only used for special blocks
-	 * that either have been replaced by specialized rendering,
-	 * such as the lily pad, or are not implemented.
-	 */
-	public boolean isInvisible = false;
-
-	/**
-	 * Emitter blocks emit light.
-	 */
-	public boolean isEmitter = false;
-
-	public double emittance = 0.0;
-
-	/**
-	 * Subsurface scattering property.
-	 */
-	public boolean subSurfaceScattering = false;
-
-	private final Texture texture;
-
 	private static final Set<Block> redstoneConnectors = new HashSet<Block>();
 	static {
 		redstoneConnectors.add(REDSTONEWIRE);
@@ -3920,9 +3863,8 @@ public class Block {
 	}
 
 	Block(int id, String name, Texture texture) {
+		super(name, texture);
 		this.id = id;
-		this.name = name;
-		this.texture = texture;
 	}
 
 	/**
@@ -3944,15 +3886,6 @@ public class Block {
 	}
 
 	public Texture getIcon() {
-		return texture;
-	}
-
-	/**
-	 * Retrieves the texture dependent on the block data
-	 * @param blockData [0,16]
-	 * @return the selected texture
-	 */
-	public Texture getTexture(int blockData) {
 		return texture;
 	}
 
@@ -4049,7 +3982,7 @@ public class Block {
 		return bits[data&15];
 	}
 
-	public boolean isSameMaterial(Block other) {
+	public boolean isSameMaterial(Material other) {
 		return other == this;
 	}
 }

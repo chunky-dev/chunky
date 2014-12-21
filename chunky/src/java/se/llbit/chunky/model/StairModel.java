@@ -169,7 +169,7 @@ public class StairModel {
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 		int flipped = (ray.getBlockData() & 4) >> 2;
-		int corner = 15 & (ray.currentMaterial >> BlockData.CORNER_OFFSET);
+		int corner = 15 & (ray.getCurrentData() >> BlockData.CORNER_OFFSET);
 		int rotation = 3 & ray.getBlockData();
 
 		ray.t = Double.POSITIVE_INFINITY;

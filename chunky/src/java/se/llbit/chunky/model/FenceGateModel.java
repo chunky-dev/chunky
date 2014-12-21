@@ -74,7 +74,7 @@ public class FenceGateModel {
 		boolean hit = false;
 		int isOpen = (ray.getBlockData() >> 2) & 1;
 		int direction = ray.getBlockData() & 3;
-		int isLow = (ray.currentMaterial >> BlockData.FENCEGATE_LOW) & 1;
+		int isLow = (ray.getCurrentData() >> BlockData.FENCEGATE_LOW) & 1;
 		ray.t = Double.POSITIVE_INFINITY;
 		for (AABB box : rot[isLow][isOpen][direction]) {
 			if (box.intersect(ray)) {

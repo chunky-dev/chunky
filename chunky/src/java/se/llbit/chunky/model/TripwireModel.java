@@ -35,7 +35,7 @@ public class TripwireModel {
 	};
 
 	public static boolean intersection(Ray ray) {
-		int direction = (ray.currentMaterial >> 12) & 1;
+		int direction = (ray.getCurrentData() >> 12) & 1;
 		ray.t = Double.POSITIVE_INFINITY;
 		Quad quad = wire[direction];
 		if (quad.intersect(ray)) {

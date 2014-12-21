@@ -1071,7 +1071,7 @@ public class Scene extends SceneDescription {
 		ray.o.z -= origin.z;
 		camera.transform(ray.d);
 		while (intersect(ray)) {
-			if (ray.currentMaterial != 0) {
+			if (ray.getCurrentMaterial() != Block.AIR) {
 				return true;
 			}
 		}
@@ -1882,11 +1882,11 @@ public class Scene extends SceneDescription {
 					g.drawLine(x0-4, y0, x0+4, y0);
 					g.setFont(infoFont);
 					Ray ray = new Ray();
-					if (trace(ray)) {
-						Block block = ray.getCurrentBlock();
+					if (trace(ray) && ray.getCurrentMaterial() instanceof Block) {
+						Block block = (Block) ray.getCurrentMaterial();
 						g.drawString(String.format("target: %.2f m", ray.distance), 5, height-18);
 						g.drawString(String.format("[0x%08X] %s (%s)",
-								ray.currentMaterial,
+								ray.getCurrentData(),
 								block,
 								block.description(ray.getBlockData())),
 								5, height-5);

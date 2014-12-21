@@ -68,7 +68,7 @@ public class MelonStemModel {
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray) {
 		boolean hit = false;
-		int connected = (ray.currentMaterial >> 16) % 5;
+		int connected = (ray.getCurrentData() >> 16) % 5;
 		ray.t = Double.POSITIVE_INFINITY;
 		if (connected == 0) {
 			int height = ray.getBlockData() & 7;

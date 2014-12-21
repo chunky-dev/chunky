@@ -74,7 +74,7 @@ public class VineModel {
 				}
 			}
 		}
-		if (data == 0 || (ray.currentMaterial & (1 << BlockData.VINE_TOP)) != 0) {
+		if (data == 0 || (ray.getCurrentData() & (1 << BlockData.VINE_TOP)) != 0) {
 			Quad quad = quads[4];
 			if (quad.intersect(ray)) {
 				float[] color = Texture.vines.getColor(ray.u, ray.v);

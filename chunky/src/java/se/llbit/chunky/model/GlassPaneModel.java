@@ -87,7 +87,7 @@ public class GlassPaneModel {
 	}
 
 	public static boolean intersect(Ray ray, Texture texture, Texture sideTexture) {
-		int metadata = 0xF & (ray.currentMaterial >> BlockData.GLASS_PANE_OFFSET);
+		int metadata = 0xF & (ray.getCurrentData() >> BlockData.GLASS_PANE_OFFSET);
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < 4; ++i) {

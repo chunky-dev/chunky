@@ -141,7 +141,7 @@ public class RedstoneWireModel {
 	}
 
 	public static boolean intersect(Ray ray) {
-		int data = ray.currentMaterial;
+		int data = ray.getCurrentData();
 		boolean hit = false;
 		int power = ray.getBlockData();
 		int connection = 0xF & (data >> BlockData.RSW_EAST_CONNECTION);

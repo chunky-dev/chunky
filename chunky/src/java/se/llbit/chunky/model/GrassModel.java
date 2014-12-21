@@ -65,7 +65,7 @@ public class GrassModel {
 					hit = true;
 					continue;
 				} else if (quad.n.y == 0 &&
-						(ray.currentMaterial & (1<<8)) != 0) {
+						(ray.getCurrentData() & (1<<8)) != 0) {
 
 					// snow side texture
 					Texture.snowSide.getColor(ray);

@@ -23,6 +23,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Block;
+import se.llbit.chunky.world.Material;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
@@ -83,8 +84,8 @@ public class PathTracer {
 
 			double pSpecular = 0;
 
-			Block currentBlock = ray.getCurrentBlock();
-			Block prevBlock = ray.getPrevBlock();
+			Material currentBlock = ray.getCurrentMaterial();
+			Material prevBlock = ray.getPrevMaterial();
 
 			if (!scene.stillWater && ray.n.y != 0 &&
 					((currentBlock == Block.WATER && prevBlock == Block.AIR) ||
@@ -171,7 +172,7 @@ public class PathTracer {
 									reflected.o.scaleAdd(-Ray.OFFSET, ray.n);
 								}
 
-								reflected.currentMaterial = ray.prevMaterial;
+								reflected.setCurrentMat(reflected.getPrevMaterial(), reflected.getPrevData());
 
 								getDirectLightAttenuation(scene, reflected, state);
 
@@ -359,7 +360,7 @@ public class PathTracer {
 				Ray reflected = new Ray();
 				reflected.o.scaleAdd(s, od, ox);
 				scene.sun.getRandomSunDirection(reflected, random);
-				reflected.currentMaterial = 0;
+				reflected.setCurrentMat(Block.AIR, 0);
 
 				getDirectLightAttenuation(scene, reflected, state);
 				Vector4d attenuation = state.attenuation;
@@ -399,7 +400,7 @@ public class PathTracer {
 			attenuation.y *= ray.color.y * ray.color.w + mult;
 			attenuation.z *= ray.color.z * ray.color.w + mult;
 			attenuation.w *= mult;
-			if (!scene.clearWater && ray.getPrevBlock() == Block.WATER) {
+			if (!scene.clearWater && ray.getPrevMaterial() == Block.WATER) {
 				double a = ray.distance / scene.waterVisibility;
 				attenuation.w *= 1 - QuickMath.min(1, a*a);
 			}

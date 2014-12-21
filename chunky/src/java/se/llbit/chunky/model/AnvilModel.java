@@ -54,7 +54,7 @@ public class AnvilModel {
 	 * @return <code>true</code> if the ray intersected the block
 	 */
 	public static boolean intersect(Ray ray) {
-		int data = ray.currentMaterial >> BlockData.OFFSET;
+		int data = ray.getCurrentData() >> BlockData.OFFSET;
 		int orientation = 1 & data;
 		int damage = 3 & (data >> 2);
 		boolean hit = false;

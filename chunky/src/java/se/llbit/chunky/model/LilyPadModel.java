@@ -52,7 +52,7 @@ public class LilyPadModel {
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray) {
 		ray.t = Double.POSITIVE_INFINITY;
-		int	dir = 3 & (ray.currentMaterial >> BlockData.LILY_PAD_ROTATION);
+		int	dir = 3 & (ray.getCurrentData() >> BlockData.LILY_PAD_ROTATION);
 		if (rot[dir].intersect(ray)) {
 			float[] color = Texture.lilyPad.getColor(ray.u, ray.v);
 			if (color[3] > Ray.EPSILON) {

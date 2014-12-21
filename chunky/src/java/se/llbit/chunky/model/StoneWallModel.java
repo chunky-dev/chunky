@@ -35,8 +35,8 @@ public class StoneWallModel {
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
-		int connections = 0xF & (ray.currentMaterial >>> BlockData.STONEWALL_CONN);
-		int midsection = 1 & (ray.currentMaterial >>> BlockData.STONEWALL_CORNER);
+		int connections = 0xF & (ray.getCurrentData() >>> BlockData.STONEWALL_CONN);
+		int midsection = 1 & (ray.getCurrentData() >>> BlockData.STONEWALL_CORNER);
 		// figure out if we should draw the center post
 		if (midsection != 0) {
 			if (post.intersect(ray)) {

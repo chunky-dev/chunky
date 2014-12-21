@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -23,6 +23,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
+import se.llbit.chunky.world.Material;
 
 /**
  * The ray representation used for ray tracing.
@@ -73,12 +74,22 @@ public class Ray {
 	/**
 	 * Previous material
 	 */
-	public int prevMaterial;
+	private Material prevMaterial = Block.AIR;
 
 	/**
 	 * Current material
 	 */
-	public int currentMaterial;
+	private Material currentMaterial = Block.AIR;
+
+	/**
+	 * Previous block metadata;
+	 */
+	private int prevData;
+
+	/**
+	 * Current block metadata.
+	 */
+	private int currentData;
 
 	/**
 	 * Recursive ray depth
@@ -129,8 +140,8 @@ public class Ray {
 	 */
 	public void setDefault() {
 		distance = 0;
-		prevMaterial = 0;
-		currentMaterial = -1;
+		prevMaterial = Block.AIR;
+		currentMaterial = Block.AIR;
 		depth = 0;
 		color.set(0, 0, 0, 0);
 		emittance.set(0, 0, 0);
@@ -155,40 +166,12 @@ public class Ray {
 	}
 
 	/**
-	 * @return Previous block
-	 */
-	public final Block getPrevBlock() {
-		return Block.get(prevMaterial);
-	}
-
-	/**
-	 * @return Current block
-	 */
-	public final Block getCurrentBlock() {
-		return Block.get(currentMaterial);
-	}
-
-	/**
-	 * @return Previous block type
-	 */
-	public final int getPrevBlockType() {
-		return prevMaterial & 0xFF;
-	}
-
-	/**
-	 * @return Current block type
-	 */
-	public final int getCurrentBlockType() {
-		return currentMaterial & 0xFF;
-	}
-
-	/**
 	 * The block data value is a 4-bit integer value describing
 	 * properties of the current block.
 	 * @return Current block data (sometimes called metadata)
 	 */
 	public final int getBlockData() {
-		return 0xF & (currentMaterial >> BlockData.OFFSET);
+		return 0xF & (currentData >> BlockData.OFFSET);
 	}
 
 	/**
@@ -394,6 +377,42 @@ public class Ray {
 		n.set(ux * tx + vx * ty + n.x * tz,
 				uy * tx + vy * ty + n.y * tz,
 				uz * tx + vz * ty + n.z * tz);
+	}
+
+	public void setPrevMat(Material mat, int data) {
+		this.prevMaterial = mat;
+		this.prevData = data;
+	}
+
+	public void setPrevMat(int blockId) {
+		this.prevMaterial = Block.get(blockId);
+		this.prevData = blockId;
+	}
+
+	public void setCurrentMat(Material mat, int data) {
+		this.currentMaterial = mat;
+		this.currentData = data;
+	}
+
+	public void setMat(int blockId) {
+		this.currentMaterial = Block.get(blockId);
+		this.currentData = blockId;
+	}
+
+	public Material getPrevMaterial() {
+		return prevMaterial;
+	}
+
+	public Material getCurrentMaterial() {
+		return currentMaterial;
+	}
+
+	public int getPrevData() {
+		return prevData;
+	}
+
+	public int getCurrentData() {
+		return currentData;
 	}
 
 }

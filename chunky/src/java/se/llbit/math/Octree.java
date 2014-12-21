@@ -24,6 +24,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Block;
+import se.llbit.chunky.world.Material;
 
 /**
  * A simple voxel Octree.
@@ -326,7 +327,7 @@ public class Octree {
 			if (lx != 0 || ly != 0 || lz != 0) {
 
 				// ray origin is outside octree!
-				ray.currentMaterial = Block.AIR_ID;
+				ray.setCurrentMat(Block.AIR, 0);
 
 				// only check octree intersection if this is the first iteration
 				if (first) {
@@ -410,17 +411,11 @@ public class Octree {
 				return true;
 			}*/
 
-			if (ray.currentMaterial == -1) {
-				ray.prevMaterial = 0;
-				ray.currentMaterial = node.type;
-			}
-
 			Block currentBlock = Block.get(node.type);
-			Block prevBlock = Block.get(ray.currentMaterial);
+			Material prevBlock = ray.getCurrentMaterial();
 
-			ray.prevMaterial = ray.currentMaterial;
-			ray.currentMaterial = node.type;
-
+			ray.setPrevMat(prevBlock, ray.getCurrentData());
+			ray.setCurrentMat(currentBlock, node.type);
 
 			if (currentBlock.localIntersect) {
 
@@ -437,7 +432,7 @@ public class Octree {
 					continue;
 				} else {
 					// exit ray from this local block
-					ray.currentMaterial = 0;// current material is air
+					ray.setCurrentMat(Block.AIR, 0);// current material is air
 
 					ray.exitBlock(x, y, z);
 					continue;
@@ -546,7 +541,7 @@ public class Octree {
 			if (lx != 0 || ly != 0 || lz != 0) {
 
 				// ray origin is outside octree!
-				ray.currentMaterial = Block.AIR.id;
+				ray.setCurrentMat(Block.AIR, 0);
 				return true;
 			}
 
@@ -559,15 +554,15 @@ public class Octree {
 			}
 
 			Block currentBlock = Block.get(node.type);
-			Block prevBlock = Block.get(ray.currentMaterial);
+			Material prevBlock = ray.getCurrentMaterial();
 
-			ray.prevMaterial = ray.currentMaterial;
-			ray.currentMaterial = node.type;
+			ray.setPrevMat(prevBlock, ray.getCurrentData());
+			ray.setCurrentMat(currentBlock, node.type);
 
 			if (currentBlock.localIntersect) {
 
 				if (!currentBlock.intersect(ray, scene)) {
-					ray.currentMaterial = Block.AIR.id;
+					ray.setCurrentMat(Block.AIR, 0);
 					return true;
 				}
 
@@ -576,7 +571,7 @@ public class Octree {
 					ray.n.set(nx, ny, nz);
 					ray.color.set(cx, cy, cz, cw);
 					ray.distance = distance;
-					ray.currentMaterial = Block.AIR.id;
+					ray.setCurrentMat(Block.AIR, 0);
 					return true;
 				} else if (currentBlock == Block.WATER) {
 					ray.o.scaleAdd(Ray.OFFSET, ray.d);

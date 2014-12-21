@@ -239,9 +239,10 @@ public class TestRenderer extends Thread implements ViewListener,
 			if (blockId == -1) {
 				renderTestModel(ray);
 			} else {
-				ray.prevMaterial = 0;
-				ray.currentMaterial = blockId;
-				Block.get(blockId).intersect(ray, scene);
+				ray.setPrevMat(Block.AIR, 0);
+				Block theBlock = Block.get(blockId);
+				ray.setCurrentMat(theBlock, blockId);
+				theBlock.intersect(ray, scene);
 			}
 		}
 	}

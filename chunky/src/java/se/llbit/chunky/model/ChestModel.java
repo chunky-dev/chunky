@@ -183,7 +183,7 @@ public class ChestModel {
 	@SuppressWarnings("javadoc")
 	public static boolean intersect(Ray ray, Texture[] texture) {
 		boolean hit = false;
-		Quad[] rot = variants[(ray.currentMaterial >> 16) % 3]
+		Quad[] rot = variants[(ray.getCurrentData() >> 16) % 3]
 				[ray.getBlockData() % 6];
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < rot.length; ++i) {
