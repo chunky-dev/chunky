@@ -45,6 +45,7 @@ class Credentials:
 		return self.credentials[key]
 
 	def getpass(self, key):
+		self.init()
 		if key not in self.credentials:
 			self.credentials[key] = getpass(prompt=key+': ')
 			self.save()
@@ -165,6 +166,7 @@ def print_prerelease_checklist():
 	print "    * Update Launchpadlib"
 	print "    * Edit release notes (check for typos)"
 	print "    * Update ChangeLog (check for typos)"
+	print "    * Commit all final changes in Git"
 
 def build_release(version):
 	if version.suffix:

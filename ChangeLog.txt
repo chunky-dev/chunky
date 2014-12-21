@@ -1,7 +1,8 @@
-1.3.3 - TBD
+1.3.3 - 2014-12-21
     * Fixed rendering of the 1.8 door blocks using Birch, Spruce, Jungle,
-      Dark Oak, and Acacia wood
+      Dark Oak, and Acacia wood.
     * Set unknown blocks back to being invisible (instead of question marks).
+    * Fixed error causing the Benchmark tool to fail horribly.
 
 1.3.2 - 2014-12-13
     * Added option to the sky tab for rendering the sky transparent.
