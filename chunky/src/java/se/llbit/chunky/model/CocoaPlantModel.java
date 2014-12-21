@@ -141,7 +141,7 @@ public class CocoaPlantModel {
 			if (quad.intersect(ray)) {
 				tex[size].getColor(ray);
 				ray.color.w = 1;
-				ray.t = ray.tNear;
+				ray.t = ray.tNext;
 				ray.n.set(quad.n);
 				hit = true;
 			}
@@ -150,7 +150,7 @@ public class CocoaPlantModel {
 			float[] color = tex[size].getColor(ray.u, ray.v);
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
-				ray.t = ray.tNear;
+				ray.t = ray.tNext;
 				ray.n.set(stem[direction].n);
 				ray.n.scale(QuickMath.signum(-ray.d.dot(stem[direction].n)));
 				hit = true;
@@ -158,7 +158,7 @@ public class CocoaPlantModel {
 		}
 		if (hit) {
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

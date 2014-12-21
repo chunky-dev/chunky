@@ -149,7 +149,7 @@ public class TorchModel {
 				if (c[3] > Ray.EPSILON) {
 					color = c;
 					ray.n.set(quad.n);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				}
 			}
@@ -160,19 +160,19 @@ public class TorchModel {
 				if (c[3] > Ray.EPSILON) {
 					color = c;
 					ray.n.set(triangle.n);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				}
 			}
 		}
 		if (hit) {
-			double px = ray.x.x - QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET) + ray.d.x * ray.tNear;
-			double py = ray.x.y - QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET) + ray.d.y * ray.tNear;
-			double pz = ray.x.z - QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET) + ray.d.z * ray.tNear;
+			double px = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET) + ray.d.x * ray.tNext;
+			double py = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET) + ray.d.y * ray.tNext;
+			double pz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET) + ray.d.z * ray.tNext;
 			if (px >= 0 && px <= 1 && py >= 0 && py <= 1 && pz >= 0 && pz <= 1) {
 				ray.color.set(color);
 				ray.distance += ray.t;
-				ray.x.scaleAdd(ray.t, ray.d);
+				ray.o.scaleAdd(ray.t, ray.d);
 				return true;
 			}
 		}

@@ -32,14 +32,14 @@ public class SaplingModel extends SpriteModel {
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
 					ray.n.set(quad.n);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				}
 			}
 		}
 		if (hit) {
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

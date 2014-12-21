@@ -150,7 +150,6 @@ public class Vector3d {
 	 * Add s*d to this vector
 	 * @param s
 	 * @param d
-	 * @param o
 	 */
 	public final void scaleAdd(double s, Vector3d d) {
 		x += s*d.x;

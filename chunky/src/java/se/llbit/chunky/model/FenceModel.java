@@ -48,7 +48,7 @@ public class FenceModel {
 		ray.t = Double.POSITIVE_INFINITY;
 		if (post.intersect(ray)) {
 			texture.getColor(ray);
-			ray.t = ray.tNear;
+			ray.t = ray.tNext;
 			hit = true;
 		}
 		for (int i = 0; i < 4; ++i) {
@@ -56,7 +56,7 @@ public class FenceModel {
 				for (AABB aabb : plank[i]) {
 					if (aabb.intersect(ray)) {
 						texture.getColor(ray);
-						ray.t = ray.tNear;
+						ray.t = ray.tNext;
 						hit = true;
 					}
 				}
@@ -65,7 +65,7 @@ public class FenceModel {
 		if (hit) {
 			ray.color.w = 1;
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

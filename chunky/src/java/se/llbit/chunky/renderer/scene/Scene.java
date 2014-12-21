@@ -459,9 +459,9 @@ public class Scene extends SceneDescription {
 	 * @param rayPool
 	 */
 	public void quickTrace(WorkerState state) {
-		state.ray.x.x -= origin.x;
-		state.ray.x.y -= origin.y;
-		state.ray.x.z -= origin.z;
+		state.ray.o.x -= origin.x;
+		state.ray.o.y -= origin.y;
+		state.ray.o.z -= origin.z;
 
 		RayTracer.quickTrace(this, state);
 	}
@@ -472,9 +472,9 @@ public class Scene extends SceneDescription {
 	 */
 	public void pathTrace(WorkerState state) {
 
-		state.ray.x.x -= origin.x;
-		state.ray.x.y -= origin.y;
-		state.ray.x.z -= origin.z;
+		state.ray.o.x -= origin.x;
+		state.ray.o.y -= origin.y;
+		state.ray.o.z -= origin.z;
 
 		PathTracer.pathTrace(this, state);
 	}
@@ -1065,10 +1065,10 @@ public class Scene extends SceneDescription {
 	public void trace(Ray ray) {
 		ray.d.set(0, 0, 1);
 		ray.hit = false;
-		ray.x.set(camera.getPosition());
-		ray.x.x -= origin.x;
-		ray.x.y -= origin.y;
-		ray.x.z -= origin.z;
+		ray.o.set(camera.getPosition());
+		ray.o.x -= origin.x;
+		ray.o.y -= origin.y;
+		ray.o.z -= origin.z;
 		camera.transform(ray.d);
 		while (intersect(ray)) {
 			if (ray.currentMaterial != 0) {
@@ -1801,36 +1801,36 @@ public class Scene extends SceneDescription {
 		camera.calcViewRay(ray,
 				-halfWidth + (x - 3/8.0) * invHeight,
 				-.5 + (y + 1/8.0) * invHeight);
-		ray.x.x -= origin.x;
-		ray.x.y -= origin.y;
-		ray.x.z -= origin.z;
+		ray.o.x -= origin.x;
+		ray.o.y -= origin.y;
+		ray.o.z -= origin.z;
 
 		double occlusion = RayTracer.skyOcclusion(this, state);
 
 		camera.calcViewRay(ray,
 				-halfWidth + (x + 1/8.0) * invHeight,
 				-.5 + (y + 3/8.0) * invHeight);
-		ray.x.x -= origin.x;
-		ray.x.y -= origin.y;
-		ray.x.z -= origin.z;
+		ray.o.x -= origin.x;
+		ray.o.y -= origin.y;
+		ray.o.z -= origin.z;
 
 		occlusion += RayTracer.skyOcclusion(this, state);
 
 		camera.calcViewRay(ray,
 				-halfWidth + (x - 1/8.0) * invHeight,
 				-.5 + (y - 3/8.0) * invHeight);
-		ray.x.x -= origin.x;
-		ray.x.y -= origin.y;
-		ray.x.z -= origin.z;
+		ray.o.x -= origin.x;
+		ray.o.y -= origin.y;
+		ray.o.z -= origin.z;
 
 		occlusion += RayTracer.skyOcclusion(this, state);
 
 		camera.calcViewRay(ray,
 				-halfWidth + (x + 3/8.0) * invHeight,
 				-.5 + (y - 1/8.0) * invHeight);
-		ray.x.x -= origin.x;
-		ray.x.y -= origin.y;
-		ray.x.z -= origin.z;
+		ray.o.x -= origin.x;
+		ray.o.y -= origin.y;
+		ray.o.z -= origin.z;
 
 		occlusion += RayTracer.skyOcclusion(this, state);
 

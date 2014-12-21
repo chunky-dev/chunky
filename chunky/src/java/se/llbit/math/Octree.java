@@ -313,9 +313,9 @@ public class Octree {
 
 			// add small offset past the intersection to avoid
 			// recursion to the same octree node!
-			x = (int) QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
-			y = (int) QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
-			z = (int) QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
+			x = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
+			y = (int) QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
+			z = (int) QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
 
 			node = root;
 			level = depth;
@@ -331,37 +331,37 @@ public class Octree {
 				// only check octree intersection if this is the first iteration
 				if (first) {
 					// test if it is entering the octree
-					t = -ray.x.x / d.x;
+					t = -ray.o.x / d.x;
 					if (t > Ray.EPSILON) {
 						tNear = t;
 						nx = 1;
 						ny = nz = 0;
 					}
-					t = ((1<<level) - ray.x.x) / d.x;
+					t = ((1<<level) - ray.o.x) / d.x;
 					if (t < tNear && t > Ray.EPSILON) {
 						tNear = t;
 						nx = -1;
 						ny = nz = 0;
 					}
-					t = -ray.x.y / d.y;
+					t = -ray.o.y / d.y;
 					if (t < tNear && t > Ray.EPSILON) {
 						tNear = t;
 						ny = 1;
 						nx = nz = 0;
 					}
-					t = ((1<<level) - ray.x.y) / d.y;
+					t = ((1<<level) - ray.o.y) / d.y;
 					if (t < tNear && t > Ray.EPSILON) {
 						tNear = t;
 						ny = -1;
 						nx = nz = 0;
 					}
-					t = -ray.x.z / d.z;
+					t = -ray.o.z / d.z;
 					if (t < tNear && t > Ray.EPSILON) {
 						tNear = t;
 						nz = 1;
 						nx = ny = 0;
 					}
-					t = ((1<<level) - ray.x.z) / d.z;
+					t = ((1<<level) - ray.o.z) / d.z;
 					if (t < tNear && t > Ray.EPSILON) {
 						tNear = t;
 						nz = -1;
@@ -369,7 +369,7 @@ public class Octree {
 					}
 
 					if (tNear < Double.MAX_VALUE) {
-						ray.x.scaleAdd(tNear, d);
+						ray.o.scaleAdd(tNear, d);
 						ray.n.set(nx, ny, nz);
 						ray.distance += tNear;
 						tNear = Double.POSITIVE_INFINITY;
@@ -433,7 +433,7 @@ public class Octree {
 					if (prevBlock != currentBlock)
 						return true;
 
-					ray.x.scaleAdd(Ray.OFFSET, ray.d);
+					ray.o.scaleAdd(Ray.OFFSET, ray.d);
 					continue;
 				} else {
 					// exit ray from this local block
@@ -447,13 +447,13 @@ public class Octree {
 				return true;
 			}
 
-			t = ((lx<<level) - ray.x.x) / d.x;
+			t = ((lx<<level) - ray.o.x) / d.x;
 			if (t > Ray.EPSILON) {
 				tNear = t;
 				nx = 1;
 				ny = nz = 0;
 			} else {
-				t = (((lx+1)<<level) - ray.x.x) / d.x;
+				t = (((lx+1)<<level) - ray.o.x) / d.x;
 				if (t < tNear && t > Ray.EPSILON) {
 					tNear = t;
 					nx = -1;
@@ -461,13 +461,13 @@ public class Octree {
 				}
 			}
 
-			t = ((ly<<level) - ray.x.y) / d.y;
+			t = ((ly<<level) - ray.o.y) / d.y;
 			if (t < tNear && t > Ray.EPSILON) {
 				tNear = t;
 				ny = 1;
 				nx = nz = 0;
 			} else {
-				t = (((ly+1)<<level) - ray.x.y) / d.y;
+				t = (((ly+1)<<level) - ray.o.y) / d.y;
 				if (t < tNear && t > Ray.EPSILON) {
 					tNear = t;
 					ny = -1;
@@ -475,13 +475,13 @@ public class Octree {
 				}
 			}
 
-			t = ((lz<<level) - ray.x.z) / d.z;
+			t = ((lz<<level) - ray.o.z) / d.z;
 			if (t < tNear && t > Ray.EPSILON) {
 				tNear = t;
 				nz = 1;
 				nx = ny = 0;
 			} else {
-				t = (((lz+1)<<level) - ray.x.z) / d.z;
+				t = (((lz+1)<<level) - ray.o.z) / d.z;
 				if (t < tNear && t > Ray.EPSILON) {
 					tNear = t;
 					nz = -1;
@@ -489,7 +489,7 @@ public class Octree {
 				}
 			}
 
-			ray.x.scaleAdd(tNear, d);
+			ray.o.scaleAdd(tNear, d);
 			ray.n.set(nx, ny, nz);
 			ray.distance += tNear;
 			tNear = Double.POSITIVE_INFINITY;
@@ -519,9 +519,9 @@ public class Octree {
 			ray.n.y = -ray.n.y;
 			ray.n.z = -ray.n.z;
 
-			xx = ray.x.x;
-			xy = ray.x.y;
-			xz = ray.x.z;
+			xx = ray.o.x;
+			xy = ray.o.y;
+			xz = ray.o.z;
 			nx = ray.n.x;
 			ny = ray.n.y;
 			nz = ray.n.z;
@@ -533,9 +533,9 @@ public class Octree {
 
 			// add small offset past the intersection to avoid
 			// recursion to the same octree node!
-			x = (int) QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
-			y = (int) QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
-			z = (int) QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
+			x = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
+			y = (int) QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
+			z = (int) QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
 
 			node = root;
 			level = depth;
@@ -572,14 +572,14 @@ public class Octree {
 				}
 
 				if (ray.distance > distance) {
-					ray.x.set(xx, xy, xz);
+					ray.o.set(xx, xy, xz);
 					ray.n.set(nx, ny, nz);
 					ray.color.set(cx, cy, cz, cw);
 					ray.distance = distance;
 					ray.currentMaterial = Block.AIR.id;
 					return true;
 				} else if (currentBlock == Block.WATER) {
-					ray.x.scaleAdd(Ray.OFFSET, ray.d);
+					ray.o.scaleAdd(Ray.OFFSET, ray.d);
 					continue;
 				} else {
 					return true;

@@ -45,8 +45,8 @@ public class TripwireModel {
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
 				ray.n.set(quad.n);
-				ray.distance += ray.tNear;
-				ray.x.scaleAdd(ray.tNear, ray.d);
+				ray.distance += ray.tNext;
+				ray.o.scaleAdd(ray.tNext, ray.d);
 				return true;
 			}
 		}

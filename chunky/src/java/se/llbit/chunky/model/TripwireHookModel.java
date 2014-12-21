@@ -120,7 +120,7 @@ public class TripwireHookModel {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
 		if (box[direction].intersect(ray)) {
-			ray.t = ray.tNear;
+			ray.t = ray.tNext;
 			Texture.oakPlanks.getColor(ray);
 			ray.color.w = 1;
 			hit = true;
@@ -131,7 +131,7 @@ public class TripwireHookModel {
 				float[] color = Texture.tripwireHook.getColor(ray.u, ray.v);
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					ray.n.set(quad.n);
 					hit = true;
 				}
@@ -142,7 +142,7 @@ public class TripwireHookModel {
 				float[] color = Texture.tripwireHook.getColor(ray.u, ray.v);
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					ray.n.set(quad.n);
 					hit = true;
 				}
@@ -150,7 +150,7 @@ public class TripwireHookModel {
 		}
 		if (hit) {
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

@@ -61,7 +61,7 @@ public class GrassModel {
 					// bottom texture
 					Texture.dirt.getColor(ray);
 					ray.n.set(quad.n);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 					continue;
 				} else if (quad.n.y == 0 &&
@@ -70,7 +70,7 @@ public class GrassModel {
 					// snow side texture
 					Texture.snowSide.getColor(ray);
 					ray.n.set(quad.n);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 					continue;
 				}
@@ -87,20 +87,20 @@ public class GrassModel {
 					ray.color.y *= biomeColor[1];
 					ray.color.z *= biomeColor[2];
 					ray.n.set(quad.n);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				} else {
 					Texture.grassSideSaturated.getColor(ray);
 					ray.color.w = 1;
 					ray.n.set(quad.n);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				}
 			}
 		}
 		if (hit) {
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

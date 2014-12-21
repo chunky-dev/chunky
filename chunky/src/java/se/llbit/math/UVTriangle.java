@@ -87,9 +87,9 @@ public class UVTriangle {
 	 * @return <code>true</code> if the ray intersects the triangle
 	 */
 	public boolean intersect(Ray ray) {
-		double px = ray.x.x - QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
-		double py = ray.x.y - QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
-		double pz = ray.x.z - QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
+		double px = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
+		double py = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
+		double pz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
 
 		// test that the ray is heading toward the plane
 		double denom = ray.d.dot(n);
@@ -124,7 +124,7 @@ public class UVTriangle {
 
 				if (alpha >= 0 && beta >= 0 && gamma >= 0) {
 
-					ray.tNear = t;
+					ray.tNext = t;
 					ray.u = alpha * sa.x + beta * sb.x + gamma * sc.x;
 					ray.v = alpha * sa.y + beta * sb.y + gamma * sc.y;
 					return true;

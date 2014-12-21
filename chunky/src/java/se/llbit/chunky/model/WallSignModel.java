@@ -81,14 +81,14 @@ public class WallSignModel {
 			if (face.intersect(ray)) {
 				Texture.oakPlanks.getColor(ray);
 				ray.n.set(face.n);
-				ray.t = ray.tNear;
+				ray.t = ray.tNext;
 				hit = true;
 			}
 		}
 		if (hit) {
 			ray.color.w = 1;
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

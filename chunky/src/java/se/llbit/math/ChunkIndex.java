@@ -46,7 +46,7 @@ public class ChunkIndex {
 		ray.color.set(1, 1, 1, 1);
 
 		if (tNear <= tFar && tFar >= 0) {
-			ray.x.scaleAdd(tNear, ray.d);
+			ray.o.scaleAdd(tNear, ray.d);
 			ray.distance += tNear;
 
 			ray.prevMaterial = 0;
@@ -62,7 +62,7 @@ public class ChunkIndex {
 		double tNear = Double.NEGATIVE_INFINITY;
 		double tFar = Double.POSITIVE_INFINITY;
 		Vector3d d = ray.d;
-		Vector3d o = ray.x;
+		Vector3d o = ray.o;
 
 		if (d.x != 0) {
 			t1 = -o.x / d.x;

@@ -135,14 +135,14 @@ public class PistonExtensionModel {
 			if (side.intersect(ray)) {
 				texture[isSticky][i].getColor(ray);
 				ray.n.set(side.n);
-				ray.t = ray.tNear;
+				ray.t = ray.tNext;
 				hit = true;
 			}
 		}
 		if (hit) {
 			ray.color.w = 1;
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

@@ -55,7 +55,7 @@ public class PathTracer {
 			int addEmitted, boolean first) {
 
 		Random random = state.random;
-		Vector3d ox = new Vector3d(ray.x);
+		Vector3d ox = new Vector3d(ray.o);
 		Vector3d od = new Vector3d(ray.d);
 		double s = 0;
 
@@ -165,7 +165,7 @@ public class PathTracer {
 									random.nextDouble() < Scene.fSubSurface)) {
 
 								if (!frontLight) {
-									reflected.x.scaleAdd(-Ray.OFFSET, ray.n);
+									reflected.o.scaleAdd(-Ray.OFFSET, ray.n);
 								}
 
 								reflected.currentMaterial = ray.prevMaterial;
@@ -278,7 +278,7 @@ public class PathTracer {
 
 									refracted.d.normalize();
 
-									refracted.x.scaleAdd(Ray.OFFSET, refracted.d);
+									refracted.o.scaleAdd(Ray.OFFSET, refracted.d);
 								}
 
 								pathTrace(scene, refracted, state, 1, false);
@@ -299,7 +299,7 @@ public class PathTracer {
 
 					Ray transmitted = new Ray();
 					transmitted.set(ray);
-					transmitted.x.scaleAdd(Ray.OFFSET, transmitted.d);
+					transmitted.o.scaleAdd(Ray.OFFSET, transmitted.d);
 
 					pathTrace(scene, transmitted, state, 1, false);
 					if (transmitted.hit) {
@@ -359,7 +359,7 @@ public class PathTracer {
 				s = (s - Ray.OFFSET) * random.nextDouble();
 
 				Ray reflected = new Ray();
-				reflected.x.scaleAdd(s, od, ox);
+				reflected.o.scaleAdd(s, od, ox);
 				scene.sun.getRandomSunDirection(reflected, random);
 				reflected.currentMaterial = 0;
 
@@ -392,7 +392,7 @@ public class PathTracer {
 		attenuation.z = 1;
 		attenuation.w = 1;
 		while (attenuation.w > 0) {
-			ray.x.scaleAdd(Ray.OFFSET, ray.d);
+			ray.o.scaleAdd(Ray.OFFSET, ray.d);
 			if (!RayTracer.nextIntersection(scene, ray, state))
 				break;
 			double mult = 1 - ray.color.w;

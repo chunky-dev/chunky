@@ -41,7 +41,7 @@ public class StoneWallModel {
 		if (midsection != 0) {
 			if (post.intersect(ray)) {
 				texture.getColor(ray);
-				ray.t = ray.tNear;
+				ray.t = ray.tNext;
 				hit = true;
 			}
 		}
@@ -49,7 +49,7 @@ public class StoneWallModel {
 			if ((connections & (1 << i)) != 0) {
 				if (plank[i].intersect(ray)) {
 					texture.getColor(ray);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				}
 			}
@@ -57,7 +57,7 @@ public class StoneWallModel {
 		if (hit) {
 			ray.color.w = 1;
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

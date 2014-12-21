@@ -62,8 +62,8 @@ public class LilyPadModel {
 				ray.color.z *= lilyPadColor[2];
 				ray.n.set(0, 1, 0);
 				ray.n.scale(-QuickMath.signum(ray.d.y));
-				ray.distance += ray.tNear;
-				ray.x.scaleAdd(ray.tNear, ray.d);
+				ray.distance += ray.tNext;
+				ray.o.scaleAdd(ray.tNext, ray.d);
 				return true;
 			}
 		}

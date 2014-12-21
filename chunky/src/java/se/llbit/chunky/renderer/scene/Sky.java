@@ -876,33 +876,33 @@ public class Sky implements JSONifiable {
 		double cloudTop = offsetY - scene.origin.y + 5;
 		int target = 1;
 		double t_offset = 0;
-		ray.tNear = Double.POSITIVE_INFINITY;
-		if (ray.x.y < cloudBot || ray.x.y > cloudTop) {
+		ray.tNext = Double.POSITIVE_INFINITY;
+		if (ray.o.y < cloudBot || ray.o.y > cloudTop) {
 			if (ray.d.y > 0) {
-				t_offset = (cloudBot - ray.x.y) / ray.d.y;
+				t_offset = (cloudBot - ray.o.y) / ray.d.y;
 			} else {
-				t_offset = (cloudTop - ray.x.y) / ray.d.y;
+				t_offset = (cloudTop - ray.o.y) / ray.d.y;
 			}
 			if (t_offset < 0) {
 				return false;
 			}
 			// ray is entering cloud
-			if (inCloud((ray.d.x*t_offset + ray.x.x)*inv_size + offsetX, (ray.d.z*t_offset + ray.x.z)*inv_size + offsetZ)) {
+			if (inCloud((ray.d.x*t_offset + ray.o.x)*inv_size + offsetX, (ray.d.z*t_offset + ray.o.z)*inv_size + offsetZ)) {
 				ray.n.set(0, -Math.signum(ray.d.y), 0);
 				onCloudEnter(ray, t_offset);
 				return true;
 			}
-		} else if (inCloud(ray.x.x*inv_size + offsetX, ray.x.z*inv_size + offsetZ)) {
+		} else if (inCloud(ray.o.x*inv_size + offsetX, ray.o.z*inv_size + offsetZ)) {
 			target = 0;
 		}
 		double tExit = Double.MAX_VALUE;
 		if (ray.d.y > 0) {
-			tExit = (cloudTop - ray.x.y) / ray.d.y - t_offset;
+			tExit = (cloudTop - ray.o.y) / ray.d.y - t_offset;
 		} else {
-			tExit = (cloudBot - ray.x.y) / ray.d.y - t_offset;
+			tExit = (cloudBot - ray.o.y) / ray.d.y - t_offset;
 		}
-		double x0 = (ray.x.x + ray.d.x*t_offset)*inv_size + offsetX;
-		double z0 = (ray.x.z + ray.d.z*t_offset)*inv_size + offsetZ;
+		double x0 = (ray.o.x + ray.d.x*t_offset)*inv_size + offsetX;
+		double z0 = (ray.o.z + ray.d.z*t_offset)*inv_size + offsetZ;
 		double xp = x0;
 		double zp = z0;
 		int ix = (int) Math.floor(xp);
@@ -1026,13 +1026,13 @@ public class Sky implements JSONifiable {
 	}
 
 	private static void onCloudEnter(Ray ray, double t) {
-		ray.tNear = t;
+		ray.tNext = t;
 		ray.distance += t;
 		ray.color.set(1,1,1,1);
 	}
 
 	private static void onCloudExit(Ray ray, double t) {
-		ray.tNear = t;
+		ray.tNext = t;
 		ray.distance += t;
 		ray.color.set(1,1,1,1);
 	}

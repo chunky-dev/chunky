@@ -213,7 +213,7 @@ public class TestRenderer extends Thread implements ViewListener,
 				ray.d.normalize();
 				camera.transform(ray.d);
 
-				ray.x.set(camPos);
+				ray.o.set(camPos);
 				raytrace(ray);
 
 				ray.color.x = QuickMath.min(1, FastMath.sqrt(ray.color.x));
@@ -233,7 +233,7 @@ public class TestRenderer extends Thread implements ViewListener,
 		ray.color.set(1, 1, 1, 1);
 
 		if (tNear <= tFar && tFar >= 0) {
-			ray.x.scaleAdd(tNear, ray.d);
+			ray.o.scaleAdd(tNear, ray.d);
 			ray.distance += tNear;
 
 			if (blockId == -1) {
@@ -250,7 +250,7 @@ public class TestRenderer extends Thread implements ViewListener,
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < quads.length; ++i) {
 			if (quads[i].intersect(ray)) {
-				ray.t = ray.tNear;
+				ray.t = ray.tNext;
 				tex[i].getColor(ray);
 			}
 		}
@@ -265,7 +265,7 @@ public class TestRenderer extends Thread implements ViewListener,
 		double tNear = Double.NEGATIVE_INFINITY;
 		double tFar = Double.POSITIVE_INFINITY;
 		Vector3d d = ray.d;
-		Vector3d o = ray.x;
+		Vector3d o = ray.o;
 
 		if (d.x != 0) {
 			t1 = -o.x / d.x;

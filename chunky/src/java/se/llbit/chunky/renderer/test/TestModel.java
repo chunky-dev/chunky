@@ -148,7 +148,7 @@ public class TestModel {
 		for (int i = 0; i < quads.length; ++i) {
 			if (quads[i].intersect(ray)) {
 				Texture.sunflowerFront.getColor(ray);
-				ray.t = ray.tNear;
+				ray.t = ray.tNext;
 			}
 		}
 

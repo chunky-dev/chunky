@@ -34,8 +34,8 @@ public class EnchantmentTableModel {
 			else
 				Texture.enchantmentTableSide.getColor(ray);
 			ray.color.w = 1;
-			ray.distance += ray.tNear;
-			ray.x.scaleAdd(ray.tNear, ray.d);
+			ray.distance += ray.tNext;
+			ray.o.scaleAdd(ray.tNext, ray.d);
 			return true;
 		}
 		return false;

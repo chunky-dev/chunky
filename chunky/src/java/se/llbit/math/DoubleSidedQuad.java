@@ -42,9 +42,9 @@ public class DoubleSidedQuad extends Quad {
 
 	@Override
 	public boolean intersect(Ray ray) {
-		double ix = ray.x.x - QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
-		double iy = ray.x.y - QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
-		double iz = ray.x.z - QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
+		double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
+		double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
+		double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
 		double denom = ray.d.dot(n);
 		double u, v;
 
@@ -61,7 +61,7 @@ public class DoubleSidedQuad extends Quad {
 				if (u >= 0 && u <= 1 && v >= 0 && v <= 1) {
 					ray.u = uv.x + u*uv.y;
 					ray.v = uv.z + v*uv.w;
-					ray.tNear = t;
+					ray.tNext = t;
 					return true;
 				}
 			}

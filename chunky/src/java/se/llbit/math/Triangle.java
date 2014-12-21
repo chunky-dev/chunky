@@ -72,9 +72,9 @@ public class Triangle {
 	 * @return <code>true</code> if the ray intersects the triangle
 	 */
 	public boolean intersect(Ray ray) {
-		double ix = ray.x.x - QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
-		double iy = ray.x.y - QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
-		double iz = ray.x.z - QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
+		double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
+		double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
+		double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
 
 		// test that the ray is heading toward the plane
 		double denom = ray.d.dot(n);
@@ -95,7 +95,7 @@ public class Triangle {
 				double si = (uv*wv - vv*wu) / (uv2 - uu*vv);
 				double ti = (uv*wu - uu*wv) / (uv2 - uu*vv);
 				if ((si >= 0) && (ti >= 0) && (si+ti <= 1)) {
-					ray.tNear = t;
+					ray.tNext = t;
 					ray.u = si;
 					ray.v = ti;
 					return true;

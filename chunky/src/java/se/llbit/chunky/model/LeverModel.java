@@ -158,7 +158,7 @@ public class LeverModel {
 			if (quad.intersect(ray)) {
 				Texture.cobblestone.getColor(ray);
 				ray.n.set(quad.n);
-				ray.t = ray.tNear;
+				ray.t = ray.tNext;
 				hit = true;
 			}
 		}
@@ -167,7 +167,7 @@ public class LeverModel {
 			if (quad.intersect(ray)) {
 				Texture.lever.getColor(ray);
 				ray.n.set(quad.n);
-				ray.t = ray.tNear;
+				ray.t = ray.tNext;
 				hit = true;
 			}
 		}
@@ -175,7 +175,7 @@ public class LeverModel {
 		if (hit) {
 			ray.color.w = 1;
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

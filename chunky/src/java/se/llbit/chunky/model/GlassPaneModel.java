@@ -103,7 +103,7 @@ public class GlassPaneModel {
 						if (color[3] > Ray.EPSILON) {
 							ray.color.set(color);
 							ray.n.set(quad.n);
-							ray.t = ray.tNear;
+							ray.t = ray.tNext;
 							hit = true;
 						}
 					}
@@ -113,7 +113,7 @@ public class GlassPaneModel {
 						sideTexture.getColor(ray);
 						if (ray.color.w > 0) {
 							ray.n.set(rotCap[i].n);
-							ray.t = ray.tNear;
+							ray.t = ray.tNext;
 							hit = true;
 						}
 					}
@@ -122,7 +122,7 @@ public class GlassPaneModel {
 		}
 		if (hit) {
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

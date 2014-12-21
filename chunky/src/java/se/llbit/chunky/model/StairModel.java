@@ -178,7 +178,7 @@ public class StairModel {
 			for (AABB box : corners[flipped][7 & corner]) {
 				if (box.intersect(ray)) {
 					texture.getColor(ray);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				}
 			}
@@ -186,14 +186,14 @@ public class StairModel {
 			for (AABB box : stairs[flipped][rotation]) {
 				if (box.intersect(ray)) {
 					texture.getColor(ray);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				}
 			}
 		}
 
 		if (hit) {
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

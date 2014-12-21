@@ -35,7 +35,7 @@ public class EndPortalFrameModel {
 				Texture.endStone.getColor(ray);
 			else
 				Texture.endPortalFrameSide.getColor(ray);
-			ray.t = ray.tNear;
+			ray.t = ray.tNext;
 			hit = true;
 		}
 		if ((ray.getBlockData() & 4) != 0 && eyeOfTheEnder.intersect(ray)) {
@@ -43,13 +43,13 @@ public class EndPortalFrameModel {
 				Texture.eyeOfTheEnder.getColor(ray);
 			else
 				Texture.eyeOfTheEnder.getColor(ray);
-			ray.t = ray.tNear;
+			ray.t = ray.tNext;
 			hit = true;
 		}
 		if (hit) {
 			ray.color.w = 1;
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

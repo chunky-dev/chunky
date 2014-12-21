@@ -48,7 +48,7 @@ public class Ray {
 	/**
 	 * Intersection point.
 	 */
-	public Vector3d x = new Vector3d();
+	public Vector3d o = new Vector3d();
 
 	/**
 	 * Intersection normal.
@@ -86,14 +86,14 @@ public class Ray {
 	public int depth;
 
 	/**
-	 * t variable
+	 * Distance to closest intersection.
 	 */
 	public double t;
 
 	/**
-	 * tNear variable
+	 * Distance to next potential intersection.
 	 */
-	public double tNear;
+	public double tNext;
 
 	/**
 	 * Texture coordinate
@@ -153,7 +153,7 @@ public class Ray {
 		depth = other.depth+1;
 		distance = 0;
 		hit = false;
-		x.set(other.x);
+		o.set(other.o);
 		d.set(other.d);
 		n.set(other.n);
 		color.set(0, 0, 0, 0);
@@ -205,7 +205,7 @@ public class Ray {
 	 */
 	public final void set(Vector3d o, Vector3d d) {
 		setDefault();
-		this.x.set(o);
+		this.o.set(o);
 		this.d.set(d);
 	}
 
@@ -219,52 +219,52 @@ public class Ray {
 		int nx = 0;
 		int ny = 0;
 		int nz = 0;
-		tNear = Double.POSITIVE_INFINITY;
-		t = (bx - x.x) / d.x;
+		tNext = Double.POSITIVE_INFINITY;
+		t = (bx - o.x) / d.x;
 		if (t > Ray.EPSILON) {
-			tNear = t;
+			tNext = t;
 			nx = 1;
 			ny = nz = 0;
 		} else {
-			t = ((bx+1) - x.x) / d.x;
-			if (t < tNear && t > Ray.EPSILON) {
-				tNear = t;
+			t = ((bx+1) - o.x) / d.x;
+			if (t < tNext && t > Ray.EPSILON) {
+				tNext = t;
 				nx = -1;
 				ny = nz = 0;
 			}
 		}
 
-		t = (by - x.y) / d.y;
-		if (t < tNear && t > Ray.EPSILON) {
-			tNear = t;
+		t = (by - o.y) / d.y;
+		if (t < tNext && t > Ray.EPSILON) {
+			tNext = t;
 			ny = 1;
 			nx = nz = 0;
 		} else {
-			t = ((by+1) - x.y) / d.y;
-			if (t < tNear && t > Ray.EPSILON) {
-				tNear = t;
+			t = ((by+1) - o.y) / d.y;
+			if (t < tNext && t > Ray.EPSILON) {
+				tNext = t;
 				ny = -1;
 				nx = nz = 0;
 			}
 		}
 
-		t = (bz - x.z) / d.z;
-		if (t < tNear && t > Ray.EPSILON) {
-			tNear = t;
+		t = (bz - o.z) / d.z;
+		if (t < tNext && t > Ray.EPSILON) {
+			tNext = t;
 			nz = 1;
 			nx = ny = 0;
 		} else {
-			t = ((bz+1) - x.z) / d.z;
-			if (t < tNear && t > Ray.EPSILON) {
-				tNear = t;
+			t = ((bz+1) - o.z) / d.z;
+			if (t < tNext && t > Ray.EPSILON) {
+				tNext = t;
 				nz = -1;
 				nx = ny = 0;
 			}
 		}
 
-		x.scaleAdd(tNear, d);
+		o.scaleAdd(tNext, d);
 		n.set(nx, ny, nz);
-		distance += tNear;
+		distance += tNext;
 	}
 
 	/**
@@ -272,7 +272,7 @@ public class Ray {
 	 * @return Foliage color for the current block
 	 */
 	public float[] getBiomeFoliageColor(Scene scene) {
-		return scene.getFoliageColor((int) (x.x + d.x * OFFSET), (int) (x.z + d.z * OFFSET));
+		return scene.getFoliageColor((int) (o.x + d.x * OFFSET), (int) (o.z + d.z * OFFSET));
 	}
 
 	/**
@@ -280,7 +280,7 @@ public class Ray {
 	 * @return Grass color for the current block
 	 */
 	public float[] getBiomeGrassColor(Scene scene) {
-		return scene.getGrassColor((int) (x.x + d.x * OFFSET), (int) (x.z + d.z * OFFSET));
+		return scene.getGrassColor((int) (o.x + d.x * OFFSET), (int) (o.z + d.z * OFFSET));
 	}
 
 	/**
@@ -335,7 +335,7 @@ public class Ray {
 		d.y = uy * tx + vy * ty + n.y * tz;
 		d.z = uz * tx + vz * ty + n.z * tz;
 
-		x.scaleAdd(Ray.OFFSET, d);
+		o.scaleAdd(Ray.OFFSET, d);
 		currentMaterial = prevMaterial;
 		specular = false;
 	}
@@ -349,7 +349,7 @@ public class Ray {
 		d.scaleAdd(
 				- 2 * ray.d.dot(ray.n),
 				ray.n, ray.d);
-		x.scaleAdd(Ray.OFFSET, d);
+		o.scaleAdd(Ray.OFFSET, d);
 		currentMaterial = prevMaterial;
 	}
 

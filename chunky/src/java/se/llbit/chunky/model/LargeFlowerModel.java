@@ -72,7 +72,7 @@ public class LargeFlowerModel {
 						ray.color.y *= biomeColor[1];
 						ray.color.z *= biomeColor[2];
 					}
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					ray.n.set(quad.n);
 					hit = true;
 				}
@@ -85,7 +85,7 @@ public class LargeFlowerModel {
 					float[] color = sunflowerTex[i].getColor(ray.u, ray.v);
 					if (color[3] > Ray.EPSILON) {
 						ray.color.set(color);
-						ray.t = ray.tNear;
+						ray.t = ray.tNext;
 						ray.n.set(quad.n);
 						hit = true;
 					}
@@ -95,7 +95,7 @@ public class LargeFlowerModel {
 
 		if (hit) {
 			ray.distance += ray.t;
-			ray.x.scaleAdd(ray.t, ray.d);
+			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;
 	}

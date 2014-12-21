@@ -155,7 +155,7 @@ public class RedstoneWireModel {
 				ray.color.z = color[2] * wireColor[power][2];
 				ray.color.w = color[3];
 				ray.n.set(quad.n);
-				ray.t = ray.tNear;
+				ray.t = ray.tNext;
 				hit = true;
 			}
 		}
@@ -168,7 +168,7 @@ public class RedstoneWireModel {
 					ray.color.z = color[2] * wireColor[power][2];
 					ray.color.w = color[3];
 					ray.n.set(eastSide.n);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				}
 			}
@@ -182,7 +182,7 @@ public class RedstoneWireModel {
 					ray.color.z = color[2] * wireColor[power][2];
 					ray.color.w = color[3];
 					ray.n.set(westSide.n);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				}
 			}
@@ -196,7 +196,7 @@ public class RedstoneWireModel {
 					ray.color.z = color[2] * wireColor[power][2];
 					ray.color.w = color[3];
 					ray.n.set(northSide.n);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				}
 			}
@@ -210,14 +210,14 @@ public class RedstoneWireModel {
 					ray.color.z = color[2] * wireColor[power][2];
 					ray.color.w = color[3];
 					ray.n.set(southSide.n);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				}
 			}
 		}
 		if (hit) {
-			ray.distance += ray.tNear;
-			ray.x.scaleAdd(ray.tNear, ray.d);
+			ray.distance += ray.tNext;
+			ray.o.scaleAdd(ray.tNext, ray.d);
 			return true;
 		}
 		return false;

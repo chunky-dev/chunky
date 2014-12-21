@@ -39,8 +39,8 @@ public class LavaModel {
 		if (isFull != 0) {
 			if (fullBlock.intersect(ray)) {
 				Texture.lava.getColor(ray);
-				ray.distance += ray.tNear;
-				ray.x.scaleAdd(ray.tNear, ray.d);
+				ray.distance += ray.tNext;
+				ray.o.scaleAdd(ray.tNext, ray.d);
 				return true;
 			}
 			return false;
@@ -55,14 +55,14 @@ public class LavaModel {
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
 			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNear;
+			ray.t = ray.tNext;
 			hit = true;
 		}
 		triangle = WaterModel.t230[c2][c3][c0];
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
 			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNear;
+			ray.t = ray.tNext;
 			ray.u = 1-ray.u;
 			ray.v = 1-ray.v;
 			hit = true;
@@ -71,9 +71,9 @@ public class LavaModel {
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
 			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNear;
-			double y = ray.t * ray.d.y + ray.x.y;
-			double z = ray.t * ray.d.z + ray.x.z;
+			ray.t = ray.tNext;
+			double y = ray.t * ray.d.y + ray.o.y;
+			double z = ray.t * ray.d.z + ray.o.z;
 			y -= QuickMath.floor(y);
 			z -= QuickMath.floor(z);
 			ray.u = z;
@@ -84,9 +84,9 @@ public class LavaModel {
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
 			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNear;
-			double y = ray.t * ray.d.y + ray.x.y;
-			double z = ray.t * ray.d.z + ray.x.z;
+			ray.t = ray.tNext;
+			double y = ray.t * ray.d.y + ray.o.y;
+			double z = ray.t * ray.d.z + ray.o.z;
 			y -= QuickMath.floor(y);
 			z -= QuickMath.floor(z);
 			ray.u = z;
@@ -97,9 +97,9 @@ public class LavaModel {
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
 			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNear;
-			double y = ray.t * ray.d.y + ray.x.y;
-			double z = ray.t * ray.d.z + ray.x.z;
+			ray.t = ray.tNext;
+			double y = ray.t * ray.d.y + ray.o.y;
+			double z = ray.t * ray.d.z + ray.o.z;
 			y -= QuickMath.floor(y);
 			z -= QuickMath.floor(z);
 			ray.u = z;
@@ -110,9 +110,9 @@ public class LavaModel {
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
 			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNear;
-			double y = ray.t * ray.d.y + ray.x.y;
-			double z = ray.t * ray.d.z + ray.x.z;
+			ray.t = ray.tNext;
+			double y = ray.t * ray.d.y + ray.o.y;
+			double z = ray.t * ray.d.z + ray.o.z;
 			y -= QuickMath.floor(y);
 			z -= QuickMath.floor(z);
 			ray.u = z;
@@ -123,9 +123,9 @@ public class LavaModel {
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
 			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNear;
-			double x = ray.t * ray.d.x + ray.x.x;
-			double y = ray.t * ray.d.y + ray.x.y;
+			ray.t = ray.tNext;
+			double x = ray.t * ray.d.x + ray.o.x;
+			double y = ray.t * ray.d.y + ray.o.y;
 			x -= QuickMath.floor(x);
 			y -= QuickMath.floor(y);
 			ray.u = x;
@@ -136,9 +136,9 @@ public class LavaModel {
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
 			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNear;
-			double x = ray.t * ray.d.x + ray.x.x;
-			double y = ray.t * ray.d.y + ray.x.y;
+			ray.t = ray.tNext;
+			double x = ray.t * ray.d.x + ray.o.x;
+			double y = ray.t * ray.d.y + ray.o.y;
 			x -= QuickMath.floor(x);
 			y -= QuickMath.floor(y);
 			ray.u = x;
@@ -149,9 +149,9 @@ public class LavaModel {
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
 			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNear;
-			double x = ray.t * ray.d.x + ray.x.x;
-			double y = ray.t * ray.d.y + ray.x.y;
+			ray.t = ray.tNext;
+			double x = ray.t * ray.d.x + ray.o.x;
+			double y = ray.t * ray.d.y + ray.o.y;
 			x -= QuickMath.floor(x);
 			y -= QuickMath.floor(y);
 			ray.u = 1-x;
@@ -162,9 +162,9 @@ public class LavaModel {
 		if (triangle.intersect(ray)) {
 			ray.n.set(triangle.n);
 			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNear;
-			double x = ray.t * ray.d.x + ray.x.x;
-			double y = ray.t * ray.d.y + ray.x.y;
+			ray.t = ray.tNext;
+			double x = ray.t * ray.d.x + ray.o.x;
+			double y = ray.t * ray.d.y + ray.o.y;
 			x -= QuickMath.floor(x);
 			y -= QuickMath.floor(y);
 			ray.u = 1-x;
@@ -174,8 +174,8 @@ public class LavaModel {
 		if (hit) {
 			Texture.lava.getColor(ray);
 			ray.color.w = 1;
-			ray.distance += ray.tNear;
-			ray.x.scaleAdd(ray.tNear, ray.d);
+			ray.distance += ray.tNext;
+			ray.o.scaleAdd(ray.tNext, ray.d);
 			return true;
 		}
 		return false;

@@ -51,88 +51,88 @@ public class AABB {
 	 * @return <code>true</code> if the ray intersects this AABB
 	 */
 	public boolean intersect(Ray ray) {
-		double ix = ray.x.x - QuickMath.floor(ray.x.x + ray.d.x * Ray.OFFSET);
-		double iy = ray.x.y - QuickMath.floor(ray.x.y + ray.d.y * Ray.OFFSET);
-		double iz = ray.x.z - QuickMath.floor(ray.x.z + ray.d.z * Ray.OFFSET);
+		double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
+		double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
+		double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
 		double t;
 		double u, v;
 		boolean hit = false;
 
-		ray.tNear = ray.t;
+		ray.tNext = ray.t;
 
 		t = (xmin - ix) / ray.d.x;
-		if (t < ray.tNear && t > -Ray.EPSILON) {
+		if (t < ray.tNext && t > -Ray.EPSILON) {
 			u = iz + ray.d.z * t;
 			v = iy + ray.d.y * t;
 			if (u >= zmin && u <= zmax &&
 					v >= ymin && v <= ymax) {
 				hit = true;
-				ray.tNear = t;
+				ray.tNext = t;
 				ray.u = u;
 				ray.v = v;
 				ray.n.set(-1, 0, 0);
 			}
 		}
 		t = (xmax - ix) / ray.d.x;
-		if (t < ray.tNear && t > -Ray.EPSILON) {
+		if (t < ray.tNext && t > -Ray.EPSILON) {
 			u = iz + ray.d.z * t;
 			v = iy + ray.d.y * t;
 			if (u >= zmin && u <= zmax &&
 					v >= ymin && v <= ymax) {
 				hit = true;
-				ray.tNear = t;
+				ray.tNext = t;
 				ray.u = 1-u;
 				ray.v = v;
 				ray.n.set(1, 0, 0);
 			}
 		}
 		t = (ymin - iy) / ray.d.y;
-		if (t < ray.tNear && t > -Ray.EPSILON) {
+		if (t < ray.tNext && t > -Ray.EPSILON) {
 			u = ix + ray.d.x * t;
 			v = iz + ray.d.z * t;
 			if (u >= xmin && u <= xmax &&
 					v >= zmin && v <= zmax) {
 				hit = true;
-				ray.tNear = t;
+				ray.tNext = t;
 				ray.u = u;
 				ray.v = v;
 				ray.n.set(0, -1, 0);
 			}
 		}
 		t = (ymax - iy) / ray.d.y;
-		if (t < ray.tNear && t > -Ray.EPSILON) {
+		if (t < ray.tNext && t > -Ray.EPSILON) {
 			u = ix + ray.d.x * t;
 			v = iz + ray.d.z * t;
 			if (u >= xmin && u <= xmax &&
 					v >= zmin && v <= zmax) {
 				hit = true;
-				ray.tNear = t;
+				ray.tNext = t;
 				ray.u = u;
 				ray.v = v;
 				ray.n.set(0, 1, 0);
 			}
 		}
 		t = (zmin - iz) / ray.d.z;
-		if (t < ray.tNear && t > -Ray.EPSILON) {
+		if (t < ray.tNext && t > -Ray.EPSILON) {
 			u = ix + ray.d.x * t;
 			v = iy + ray.d.y * t;
 			if (u >= xmin && u <= xmax &&
 					v >= ymin && v <= ymax) {
 				hit = true;
-				ray.tNear = t;
+				ray.tNext = t;
 				ray.u = 1-u;
 				ray.v = v;
 				ray.n.set(0, 0, -1);
 			}
 		}
 		t = (zmax - iz) / ray.d.z;
-		if (t < ray.tNear && t > -Ray.EPSILON) {
+		if (t < ray.tNext && t > -Ray.EPSILON) {
 			u = ix + ray.d.x * t;
 			v = iy + ray.d.y * t;
 			if (u >= xmin && u <= xmax &&
 					v >= ymin && v <= ymax) {
 				hit = true;
-				ray.tNear = t;
+				ray.tNext = t;
 				ray.u = u;
 				ray.v = v;
 				ray.n.set(0, 0, 1);

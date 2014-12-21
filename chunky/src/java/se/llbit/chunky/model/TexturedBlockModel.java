@@ -54,8 +54,8 @@ public class TexturedBlockModel {
 
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
-				ray.distance += ray.tNear;
-				ray.x.scaleAdd(ray.tNear, ray.d);
+				ray.distance += ray.tNext;
+				ray.o.scaleAdd(ray.tNext, ray.d);
 				return true;
 			}
 		}
@@ -88,8 +88,8 @@ public class TexturedBlockModel {
 
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
-				ray.distance += ray.tNear;
-				ray.x.scaleAdd(ray.tNear, ray.d);
+				ray.distance += ray.tNext;
+				ray.o.scaleAdd(ray.tNext, ray.d);
 				return true;
 			}
 		}
@@ -107,8 +107,8 @@ public class TexturedBlockModel {
 			float[] color = texture.getColor(ray.u, ray.v);
 			if (color[3] > Ray.EPSILON) {
 				ray.color.set(color);
-				ray.distance += ray.tNear;
-				ray.x.scaleAdd(ray.tNear, ray.d);
+				ray.distance += ray.tNext;
+				ray.o.scaleAdd(ray.tNext, ray.d);
 				return true;
 			}
 		}
@@ -139,18 +139,18 @@ public class TexturedBlockModel {
  	 * @param ray
  	 */
 	private static void calcUVCoords(Ray ray) {
-		int bx = (int) QuickMath.floor(ray.x.x);
-		int by = (int) QuickMath.floor(ray.x.y);
-		int bz = (int) QuickMath.floor(ray.x.z);
+		int bx = (int) QuickMath.floor(ray.o.x);
+		int by = (int) QuickMath.floor(ray.o.y);
+		int bz = (int) QuickMath.floor(ray.o.z);
 		if (ray.n.y != 0) {
-			ray.u = ray.x.x - bx;
-			ray.v = ray.x.z - bz;
+			ray.u = ray.o.x - bx;
+			ray.v = ray.o.z - bz;
 		} else if (ray.n.x != 0) {
-			ray.u = ray.x.z - bz;
-			ray.v = ray.x.y - by;
+			ray.u = ray.o.z - bz;
+			ray.v = ray.o.y - by;
 		} else {
-			ray.u = ray.x.x - bx;
-			ray.v = ray.x.y - by;
+			ray.u = ray.o.x - bx;
+			ray.v = ray.o.y - by;
 		}
 		if (ray.n.x > 0 || ray.n.z < 0)
 			ray.u = 1-ray.u;

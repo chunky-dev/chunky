@@ -452,14 +452,14 @@ public class Camera implements JSONifiable {
 		// reset the ray properties - current material etc.
 		ray.setDefault();
 
-		projector.apply(x, y, random, ray.x, ray.d);
+		projector.apply(x, y, random, ray.o, ray.d);
 
 		ray.d.normalize();
 
 		// from camera space to world space
 		transform.transform(ray.d);
-		transform.transform(ray.x);
-		ray.x.add(pos);
+		transform.transform(ray.o);
+		ray.o.add(pos);
 	}
 
 	/**
@@ -475,14 +475,14 @@ public class Camera implements JSONifiable {
 		// reset the ray properties - current material etc.
 		ray.setDefault();
 
-		projector.apply(x, y, ray.x, ray.d);
+		projector.apply(x, y, ray.o, ray.d);
 
 		ray.d.normalize();
 
 		// from camera space to world space
 		transform.transform(ray.d);
-		transform.transform(ray.x);
-		ray.x.add(pos);
+		transform.transform(ray.o);
+		ray.o.add(pos);
 	}
 
 	/**
