@@ -16,11 +16,15 @@
  */
 package se.llbit.chunky.renderer.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FileDialog;
+import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -54,10 +58,12 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -701,7 +707,23 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addComponent(progressBar)
 			.addContainerGap()
 		);
-		setContentPane(panel);
+		final JScrollPane scrollPane = new JScrollPane(panel,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		setContentPane(scrollPane);
+
+		scrollPane.getViewport().addChangeListener(new ChangeListener() {
+			private boolean resized = false;
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (!resized && scrollPane.getVerticalScrollBar().isVisible()) {
+					Dimension vsbPrefSize = new JScrollPane().getVerticalScrollBar().getPreferredSize();
+					Dimension size = getSize();
+					setSize(size.width + vsbPrefSize.width, size.height);
+					resized = true;
+				}
+			}
+		});
 
 		pack();
 
