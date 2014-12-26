@@ -1,4 +1,5 @@
 1.3.4 - TBD
+    * Saving a scene with a different name no longer hides the old scene.
     * Added scrollbar to Render Controls dialog for small screens.
 
 1.3.3 - 2014-12-21

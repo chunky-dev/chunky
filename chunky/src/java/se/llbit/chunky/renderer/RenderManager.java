@@ -391,7 +391,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				Log.info("Saving scene " + sceneName);
 
 				// create backup of scene description and current render dump
-				backupFile(context.getSceneDescriptionFile(sceneName));
+				backupFile(context.getSceneDescriptionFile(mutableScene.name()));
 				backupFile(mutableScene.name() + ".dump");
 
 				// synchronize the transients
