@@ -103,6 +103,15 @@ public final class PersistentSettings {
 		save();
 	}
 
+	public static void setYCutoff(int value) {
+		settings.setInt("yCutoff", value);
+		save();
+	}
+
+	public static int getYCutoff() {
+		return settings.getInt("yCutoff", 0);
+	}
+
 	/**
 	 * @return CPU load setting
 	 */

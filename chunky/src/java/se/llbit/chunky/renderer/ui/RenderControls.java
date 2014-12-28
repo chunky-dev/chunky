@@ -90,6 +90,7 @@ import se.llbit.chunky.renderer.scene.Sky.SkyMode;
 import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.ui.CenteredFileDialog;
+import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
@@ -252,6 +253,21 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void update() {
 			set(PersistentSettings.getNumThreads());
+		}
+	};
+
+	private final Adjuster yCutoff = new Adjuster(
+			"Y cutoff",
+			"Blocks below the Y cutoff are not loaded",
+			0, Chunk.Y_MAX) {
+		@Override
+		public void valueChanged(double newValue) {
+			int value = (int) newValue;
+			PersistentSettings.setYCutoff(value);
+		}
+		@Override
+		public void update() {
+			set(PersistentSettings.getYCutoff());
 		}
 	};
 
@@ -1145,6 +1161,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		saveSnapshotsCB.addActionListener(saveSnapshotListener);
 		updateSaveSnapshotCheckBox();
 
+		yCutoff.update();
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -1186,6 +1204,7 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addGap(0, 0, Short.MAX_VALUE)
 				)
 				.addComponent(saveSnapshotsCB)
+				.addGroup(yCutoff.horizontalGroup(layout))
 			)
 			.addContainerGap()
 		);
@@ -1226,6 +1245,8 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(dumpFrequencyLbl)
 			)
 			.addComponent(saveSnapshotsCB)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addGroup(yCutoff.verticalGroup(layout))
 			.addContainerGap()
 		);
 		return panel;

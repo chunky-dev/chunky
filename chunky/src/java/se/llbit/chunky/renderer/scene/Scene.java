@@ -618,6 +618,9 @@ public class Scene extends SceneDescription {
 		progressListener.setProgress(task, 0, 0, 1);
 		progressListener.setProgress(task, 1, 0, 1);
 
+		int ycutoff = PersistentSettings.getYCutoff();
+		ycutoff = Math.max(0, ycutoff);
+
 		Heightmap biomeIdMap = new Heightmap();
 		task = "Loading chunks";
 		int done = 1;
@@ -646,7 +649,7 @@ public class Scene extends SceneDescription {
 				}
 			}
 
-			for (int cy = 0; cy < 256; ++cy) {
+			for (int cy = ycutoff; cy < 256; ++cy) {
 				for (int cz = 0; cz < 16; ++cz) {
 					int z = cz + cp.z*16 - origin.z;
 					for (int cx = 0; cx < 16; ++cx) {

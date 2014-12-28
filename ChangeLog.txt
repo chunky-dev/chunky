@@ -1,4 +1,5 @@
 1.3.4 - TBD
+    * Added Y cutoff setting (blocks below the Y cutoff are not loaded)
     * Added new tab in the Render Controls dialog for water related settings
     * Added slider for water visibility
     * Added slider for water opacity
