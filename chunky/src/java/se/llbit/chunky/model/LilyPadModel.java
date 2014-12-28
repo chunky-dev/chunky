@@ -69,4 +69,13 @@ public class LilyPadModel {
 		}
 		return false;
 	}
+
+	public static void getColor(Ray ray) {
+		Texture.lilyPad.getColor(ray);
+		if (ray.color.w > Ray.EPSILON) {
+			ray.color.x *= lilyPadColor[0];
+			ray.color.y *= lilyPadColor[1];
+			ray.color.z *= lilyPadColor[2];
+		}
+	}
 }

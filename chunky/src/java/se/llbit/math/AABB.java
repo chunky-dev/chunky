@@ -22,9 +22,12 @@ package se.llbit.math;
  */
 public class AABB {
 
-	double xmin, xmax;
-	double ymin, ymax;
-	double zmin, zmax;
+	public double xmin;
+	public double xmax;
+	public double ymin;
+	public double ymax;
+	public double zmin;
+	public double zmax;
 
 	/**
 	 * @param xmin
@@ -142,6 +145,158 @@ public class AABB {
 	}
 
 	/**
+	 * Only test for intersection and find distance to intersection
+	 * @param ray
+	 * @return {@code true} if there is an intersection
+	 */
+	public boolean quickIntersect(Ray ray) {
+		double t1, t2;
+		double tNear = Double.NEGATIVE_INFINITY;
+		double tFar = Double.POSITIVE_INFINITY;
+		Vector3d d = ray.d;
+		Vector3d o = ray.o;
+
+		if (d.x != 0) {
+			double rx = 1/d.x;
+			t1 = (xmin - o.x) * rx;
+			t2 = (xmax - o.x) * rx;
+
+			if (t1 > t2) {
+				double t = t1;
+				t1 = t2;
+				t2 = t;
+			}
+
+			tNear = t1;
+			tFar = t2;
+		}
+
+		if (d.y != 0) {
+			double ry = 1 / d.y;
+			t1 = (ymin - o.y) * ry;
+			t2 = (ymax - o.y) * ry;
+
+			if (t1 > t2) {
+				double t = t1;
+				t1 = t2;
+				t2 = t;
+			}
+
+			if (t1 > tNear) {
+				tNear = t1;
+			}
+			if (t2 < tFar) {
+				tFar = t2;
+			}
+		}
+
+		if (d.z != 0) {
+			double rz = 1 / d.z;
+			t1 = (zmin - o.z) * rz;
+			t2 = (zmax - o.z) * rz;
+
+			if (t1 > t2) {
+				double t = t1;
+				t1 = t2;
+				t2 = t;
+			}
+
+			if (t1 > tNear) {
+				tNear = t1;
+			}
+			if (t2 < tFar) {
+				tFar = t2;
+			}
+		}
+
+		if (tNear < tFar+Ray.EPSILON && tNear >= 0 && tNear < ray.t) {
+			ray.tNext = tNear;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Test if point is inside the bounding box.
+	 * @param p
+	 * @return true if p is inside this BB.
+	 */
+	public boolean inside(Vector3d p) {
+		return (p.x >= xmin && p.x <= xmax) &&
+			(p.y >= ymin && p.y <= ymax) &&
+			(p.z >= zmin && p.z <= zmax);
+	}
+
+	/**
+	 * Test if a ray intersects this AABB
+	 * @param ray
+	 * @return {@code true} if there is an intersection
+	 */
+	public boolean hitTest(Ray ray) {
+		double t1, t2;
+		double tNear = Double.NEGATIVE_INFINITY;
+		double tFar = Double.POSITIVE_INFINITY;
+		Vector3d d = ray.d;
+		Vector3d o = ray.o;
+
+		if (d.x != 0) {
+			double rx = 1/d.x;
+			t1 = (xmin - o.x) * rx;
+			t2 = (xmax - o.x) * rx;
+
+			if (t1 > t2) {
+				double t = t1;
+				t1 = t2;
+				t2 = t;
+			}
+
+			tNear = t1;
+			tFar = t2;
+		}
+
+		if (d.y != 0) {
+			double ry = 1 / d.y;
+			t1 = (ymin - o.y) * ry;
+			t2 = (ymax - o.y) * ry;
+
+			if (t1 > t2) {
+				double t = t1;
+				t1 = t2;
+				t2 = t;
+			}
+
+			if (t1 > tNear) {
+				tNear = t1;
+			}
+			if (t2 < tFar) {
+				tFar = t2;
+			}
+		}
+
+		if (d.z != 0) {
+			double rz = 1 / d.z;
+			t1 = (zmin - o.z) * rz;
+			t2 = (zmax - o.z) * rz;
+
+			if (t1 > t2) {
+				double t = t1;
+				t1 = t2;
+				t2 = t;
+			}
+
+			if (t1 > tNear) {
+				tNear = t1;
+			}
+			if (t2 < tFar) {
+				tFar = t2;
+			}
+		}
+
+		return tNear < tFar+Ray.EPSILON && tFar > 0;
+	}
+
+	/**
 	 * @return AABB rotated about the Y axis
 	 */
 	public AABB getYRotated() {
@@ -162,5 +317,46 @@ public class AABB {
 				xmin + x, xmax + x,
 				ymin + y, ymax + y,
 				zmin + z, zmax + z);
+	}
+
+	/**
+	 * @param c
+	 * @return an AABB which encloses all given vertices
+	 */
+	public static AABB bounds(Vector3d... c) {
+		double xmin = Double.POSITIVE_INFINITY, xmax = Double.NEGATIVE_INFINITY,
+				ymin = Double.POSITIVE_INFINITY, ymax = Double.NEGATIVE_INFINITY,
+				zmin = Double.POSITIVE_INFINITY, zmax = Double.NEGATIVE_INFINITY;
+		for (Vector3d v: c) {
+			if (v.x < xmin) {
+				xmin = v.x;
+			}
+			if (v.x > xmax) {
+				xmax = v.x;
+			}
+			if (v.y < ymin) {
+				ymin = v.y;
+			}
+			if (v.y > ymax) {
+				ymax = v.y;
+			}
+			if (v.z < zmin) {
+				zmin = v.z;
+			}
+			if (v.z > zmax) {
+				zmax = v.z;
+			}
+		}
+		return new AABB(xmin, xmax, ymin, ymax, zmin, zmax);
+	}
+
+	public AABB expand(AABB bb) {
+		return new AABB(
+				Math.min(xmin, bb.xmin),
+				Math.max(xmax, bb.xmax),
+				Math.min(ymin, bb.ymin),
+				Math.max(ymax, bb.ymax),
+				Math.min(zmin, bb.zmin),
+				Math.max(zmax, bb.zmax));
 	}
 }

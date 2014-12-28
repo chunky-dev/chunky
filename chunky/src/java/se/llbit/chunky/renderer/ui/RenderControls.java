@@ -16,15 +16,11 @@
  */
 package se.llbit.chunky.renderer.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FileDialog;
-import java.awt.GraphicsEnvironment;
-import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -63,8 +59,8 @@ import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -152,7 +148,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JLabel sceneNameLbl = new JLabel();
 	private final JCheckBox biomeColorsCB = new JCheckBox();
 	private final JButton stopRenderBtn = new JButton();
-	private final JCheckBox clearWaterCB = new JCheckBox();
 	private final JCheckBox atmosphereEnabled = new JCheckBox();
 	private final JCheckBox transparentSky = new JCheckBox();
 	private final JCheckBox volumetricFogEnabled = new JCheckBox();
@@ -169,6 +164,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JLabel etaLbl = new JLabel();
 	private final JCheckBox waterWorldCB = new JCheckBox();
 	private final JTextField waterHeightField = new JTextField();
+	private final JButton applyWaterHeightBtn = new JButton("Apply");
 	private final DecimalFormat decimalFormat = new DecimalFormat();
 	private final JCheckBox saveDumpsCB = new JCheckBox();
 	private final JComboBox dumpFrequencyCB = new JComboBox();
@@ -200,6 +196,39 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void update() {
 			set(renderMan.scene().sky().getHorizonOffset());
+		}
+	};
+
+	private final Adjuster waterOpacity = new Adjuster(
+			"Water Opacity",
+			"Decides how opaque the water surface appears",
+			0.0, 1.0) {
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().setWaterOpacity(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().getWaterOpacity());
+		}
+	};
+
+	private final Adjuster waterVisibility = new Adjuster(
+			"Water Visibility",
+			"Visibility depth under water",
+			0.0, 20.0) {
+		{
+			setClampMax(false);
+		}
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().setWaterVisibility(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().getWaterVisibility());
 		}
 	};
 
@@ -531,6 +560,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		addTab("General", Icon.wrench, buildGeneralPane());
 		addTab("Lighting", Icon.colors, buildLightingPane());
 		addTab("Sky", Icon.sky, buildSkyPane());
+		addTab("Water", Icon.water, buildWaterPane());
 		addTab("Camera", Icon.camera, buildCameraPane());
 		addTab("Post-processing", null, buildPostProcessingPane());
 		addTab("Advanced", null, buildAdvancedPane());
@@ -757,44 +787,10 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		JSeparator sep1 = new JSeparator();
 		JSeparator sep2 = new JSeparator();
-		JSeparator sep3 = new JSeparator();
 
 		numThreads.update();
 
 		cpuLoad.update();
-
-		JLabel waterWorldLbl = new JLabel(
-				"Note: All chunks will be reloaded after changing the water world options!");
-		JLabel waterHeightLbl = new JLabel("Water height: ");
-		waterHeightField.setColumns(5);
-		waterHeightField.setText("" + World.SEA_LEVEL);
-		waterHeightField.setEnabled(renderMan.scene().getWaterHeight() != 0);
-		waterHeightField.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JTextField source = (JTextField) e.getSource();
-				renderMan.scene().setWaterHeight(Integer.parseInt(source.getText()));
-				sceneMan.reloadChunks();
-				updateWaterHeight();
-			}
-		});
-
-		waterWorldCB.setText("Water World Mode");
-		waterWorldCB.setSelected(false);
-		waterWorldCB.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JCheckBox source = (JCheckBox) e.getSource();
-				if (source.isSelected()) {
-					renderMan.scene().setWaterHeight(
-							Integer.parseInt(waterHeightField.getText()));
-				} else {
-					renderMan.scene().setWaterHeight(0);
-				}
-				sceneMan.reloadChunks();
-				updateWaterHeight();
-			}
-		});
 
 		mergeDumpBtn.setToolTipText(
 				"Merge an existing render dump with the current render");
@@ -832,14 +828,6 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(sep1)
 				.addGroup(rayDepth.horizontalGroup(layout))
 				.addComponent(sep2)
-				.addComponent(waterWorldLbl)
-				.addComponent(waterWorldCB)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(waterHeightLbl)
-					.addGap(0, 0, Short.MAX_VALUE)
-					.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				)
-				.addComponent(sep3)
 				.addComponent(mergeDumpBtn)
 				.addComponent(shutdownWhenDoneCB)
 			)
@@ -857,6 +845,83 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(mergeDumpBtn)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(shutdownWhenDoneCB)
+			.addContainerGap()
+		);
+		return panel;
+	}
+
+	private JPanel buildWaterPane() {
+
+		JButton storeDefaultsBtn = new JButton("Store as defaults");
+		storeDefaultsBtn.setToolTipText("Store the current water settings as new defaults");
+		storeDefaultsBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				PersistentSettings.setStillWater(renderMan.scene().stillWaterEnabled());
+				PersistentSettings.setWaterOpacity(renderMan.scene().getWaterOpacity());
+				PersistentSettings.setWaterVisibility(renderMan.scene().getWaterVisibility());
+				PersistentSettings.setWaterHeight(renderMan.scene().getWaterHeight());
+			}
+		});
+
+		stillWaterCB.setText("still water");
+		stillWaterCB.addActionListener(stillWaterListener);
+		updateStillWater();
+
+		waterVisibility.update();
+		waterOpacity.update();
+
+		JLabel waterWorldLbl = new JLabel(
+				"Note: All chunks will be reloaded after changing the water world options!");
+		JLabel waterHeightLbl = new JLabel("Water height: ");
+		waterHeightField.setColumns(5);
+		waterHeightField.setText("" + World.SEA_LEVEL);
+		waterHeightField.setEnabled(renderMan.scene().getWaterHeight() != 0);
+		waterHeightField.addActionListener(waterHeightListener);
+
+		applyWaterHeightBtn.setToolTipText("Use this water height");
+		applyWaterHeightBtn.addActionListener(waterHeightListener);
+
+		waterWorldCB.setText("Water World Mode");
+		waterWorldCB.addActionListener(waterWorldListener);
+		updateWaterHeight();
+
+		JPanel panel = new JPanel();
+		GroupLayout layout = new GroupLayout(panel);
+		panel.setLayout(layout);
+		layout.setHorizontalGroup(layout.createSequentialGroup()
+			.addContainerGap()
+			.addGroup(layout.createParallelGroup()
+				.addComponent(stillWaterCB)
+				.addGroup(waterVisibility.horizontalGroup(layout))
+				.addGroup(waterOpacity.horizontalGroup(layout))
+				.addComponent(waterWorldLbl)
+				.addComponent(waterWorldCB)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(waterHeightLbl)
+					.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+					.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(applyWaterHeightBtn)
+				)
+				.addGroup(layout.createSequentialGroup()
+					.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+					.addComponent(storeDefaultsBtn)
+				)
+			)
+			.addContainerGap()
+		);
+		layout.setVerticalGroup(layout.createSequentialGroup()
+			.addContainerGap()
+			.addComponent(stillWaterCB)
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(waterVisibility.verticalGroup(layout))
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(waterOpacity.verticalGroup(layout))
+			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(waterWorldLbl)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addComponent(waterWorldCB)
@@ -864,13 +929,10 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addGroup(layout.createParallelGroup()
 				.addComponent(waterHeightLbl)
 				.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				.addComponent(applyWaterHeightBtn)
 			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(mergeDumpBtn)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(shutdownWhenDoneCB)
+			.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+			.addComponent(storeDefaultsBtn)
 			.addContainerGap()
 		);
 		return panel;
@@ -1026,14 +1088,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		JSeparator sep1 = new JSeparator();
 		JSeparator sep2 = new JSeparator();
 
-		stillWaterCB.setText("still water");
-		stillWaterCB.addActionListener(stillWaterListener);
-		updateStillWater();
-
-		clearWaterCB.setText("clear water");
-		stillWaterCB.addActionListener(clearWaterListener);
-		updateClearWater();
-
 		biomeColorsCB.setText("enable biome colors");
 		updateBiomeColorsCB();
 
@@ -1086,8 +1140,6 @@ public class RenderControls extends JDialog implements ViewListener,
 				)
 				.addComponent(canvasSizeAdvisory)
 				.addComponent(sep2)
-				.addComponent(stillWaterCB)
-				.addComponent(clearWaterCB)
 				.addComponent(biomeColorsCB)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(saveDumpsCB)
@@ -1129,8 +1181,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(stillWaterCB)
-			.addComponent(clearWaterCB)
 			.addComponent(biomeColorsCB)
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(saveDumpsCB)
@@ -1859,12 +1909,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		stillWaterCB.addActionListener(stillWaterListener);
 	}
 
-	protected void updateClearWater() {
-		clearWaterCB.removeActionListener(clearWaterListener);
-		clearWaterCB.setSelected(renderMan.scene().getClearWater());
-		clearWaterCB.addActionListener(clearWaterListener);
-	}
-
 	protected void updateBiomeColorsCB() {
 		biomeColorsCB.removeActionListener(biomeColorsCBListener);
 		biomeColorsCB.addActionListener(biomeColorsCBListener);
@@ -2094,6 +2138,36 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	};
+	private final ActionListener waterHeightListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			try {
+				int waterHeight = Integer.parseInt(waterHeightField.getText());
+				renderMan.scene().setWaterHeight(waterHeight);
+				sceneMan.reloadChunks();
+				updateWaterHeight();
+			} catch (Error thrown) {
+				// ignore number format exceptions
+			}
+		}
+	};
+	private final ActionListener waterWorldListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JCheckBox source = (JCheckBox) e.getSource();
+			if (source.isSelected()) {
+				renderMan.scene().setWaterHeight(
+						Integer.parseInt(waterHeightField.getText()));
+			} else {
+				waterHeightField.removeActionListener(waterHeightListener);
+				waterHeightField.setText("" + renderMan.scene().getWaterHeight());
+				waterHeightField.addActionListener(waterHeightListener);
+				renderMan.scene().setWaterHeight(0);
+			}
+			sceneMan.reloadChunks();
+			updateWaterHeight();
+		}
+	};
 	private final ActionListener skyModeListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -2158,12 +2232,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			renderMan.scene().setStillWater(stillWaterCB.isSelected());
-		}
-	};
-	private final ActionListener clearWaterListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			renderMan.scene().setClearWater(clearWaterCB.isSelected());
 		}
 	};
 	private final ActionListener atmosphereListener = new ActionListener() {
@@ -2237,10 +2305,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		int height = renderMan.scene().getWaterHeight();
 		boolean waterWorld = height > 0;
 		if (waterWorld) {
+			waterHeightField.removeActionListener(waterHeightListener);
 			waterHeightField.setText("" + height);
+			waterHeightField.addActionListener(waterHeightListener);
 		}
-		waterWorldCB.setSelected(height > 0);
-		waterHeightField.setEnabled(height > 0);
+		waterWorldCB.setSelected(waterWorld);
+		waterHeightField.setEnabled(waterWorld);
+		applyWaterHeightBtn.setEnabled(waterWorld);
 	}
 
 	protected void updateSkyRotation() {
@@ -2532,7 +2603,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		sunAzimuth.update();
 		sunAltitude.update();
 		updateStillWater();
-		updateClearWater();
+		waterVisibility.update();
+		waterOpacity.update();
 		updateSkyRotation();
 		updateVerticalResolution();
 		updateBiomeColorsCB();

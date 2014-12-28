@@ -21,13 +21,17 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
@@ -52,12 +56,15 @@ import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
 import se.llbit.log.Log;
+import se.llbit.math.BVH;
 import se.llbit.math.Color;
 import se.llbit.math.Octree;
+import se.llbit.math.OctreeVisitor;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector3i;
+import se.llbit.math.primitive.Primitive;
 import se.llbit.png.IEND;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
@@ -135,8 +142,6 @@ public class Scene extends SceneDescription {
 	 */
 	public static final int CVF_VERSION = 1;
 
-	private static final double DEFAULT_WATER_VISIBILITY = 9;
-
 	//private static final double MIN_WATER_VISIBILITY = 0;
 	//private static final double MAX_WATER_VISIBILITY = 62;
 
@@ -144,8 +149,6 @@ public class Scene extends SceneDescription {
 	 * Default exposure
 	 */
 	public static final double DEFAULT_EXPOSURE = 1.0;
-
-	protected double waterVisibility = DEFAULT_WATER_VISIBILITY;
 
 	/**
 	 * World
@@ -160,8 +163,10 @@ public class Scene extends SceneDescription {
 	/**
 	 * Octree
 	 */
-	protected Octree octree;
+	private Octree worldOctree;
 
+	private List<Primitive> primitives = new LinkedList<Primitive>();
+	private BVH bvh = new BVH(Collections.<Primitive>emptyList());
 
 	// chunk loading buffers
 	private final byte[] blocks = new byte[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
@@ -195,7 +200,7 @@ public class Scene extends SceneDescription {
 	 * Create an empty scene with default canvas width and height.
 	 */
 	public Scene() {
-		octree = new Octree(1);// empty octree
+		worldOctree = new Octree(1);
 
 		width = PersistentSettings.get3DCanvasWidth();
 		height = PersistentSettings.get3DCanvasHeight();
@@ -234,7 +239,9 @@ public class Scene extends SceneDescription {
 
 		// the octree reference is overwritten to save time
 		// when the other scene is changed it must create a new octree
-		octree = other.octree;
+		worldOctree = other.worldOctree;
+		bvh = other.bvh;
+		primitives = other.primitives;
 		grassTexture = other.grassTexture;
 		foliageTexture = other.foliageTexture;
 		origin.set(other.origin);
@@ -245,7 +252,8 @@ public class Scene extends SceneDescription {
 		name = other.name;
 
 		stillWater = other.stillWater;
-		clearWater = other.clearWater;
+		waterOpacity = other.waterOpacity;
+		waterVisibility = other.waterVisibility;
 		biomeColors = other.biomeColors;
 		sunEnabled = other.sunEnabled;
 		emittersEnabled = other.emittersEnabled;
@@ -303,7 +311,8 @@ public class Scene extends SceneDescription {
 		String task = "Saving scene";
 		progressListener.setProgress(task, 1, 0, 2);
 
-		saveDescription(context.getSceneDescriptionOutputStream(name));
+		BufferedOutputStream out = new BufferedOutputStream(context.getSceneDescriptionOutputStream(name));
+		saveDescription(out);
 
 		saveOctree(context, progressListener);
 		saveGrassTexture(context, progressListener);
@@ -335,7 +344,9 @@ public class Scene extends SceneDescription {
 		sky.loadSkymap();
 
 		if (sdfVersion < SDF_VERSION) {
-			Log.warn("Old scene version detected! The scene may not have loaded correctly.");
+			Log.warn("Old scene version detected! The scene may not have been loaded correctly.");
+		} else if (sdfVersion > SDF_VERSION) {
+			Log.warn("This scene was created with a newer version of Chunky! The scene may not have been loaded correctly.");
 		}
 
 		setCanvasSize(width, height);
@@ -369,9 +380,6 @@ public class Scene extends SceneDescription {
 		loadDump(context, renderListener);
 
 		if (loadOctree(context, renderListener)) {
-			calculateOctreeOrigin(chunks);
-			camera.setWorldSize(1<<octree.depth);
-
 			boolean haveGrass = loadGrassTexture(context, renderListener);
 			boolean haveFoliage = loadFoliageTexture(context, renderListener);
 			if (!haveGrass || !haveFoliage) {
@@ -480,11 +488,42 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
+	 * Find closest intersection between ray and scene
 	 * @param ray
 	 * @return <code>true</code> if an intersection was found
 	 */
 	public boolean intersect(Ray ray) {
-		return octree.intersect(this, ray);
+		boolean hit = false;
+		if (bvh.closestIntersection(ray)) {
+			hit = true;
+		}
+		Ray oct = new Ray(ray);
+		oct.setCurrentMat(ray.getPrevMaterial(), ray.getPrevData());
+		if (worldOctree.intersect(this, oct) && oct.distance < ray.t) {
+			ray.t = oct.distance;
+			ray.distance += oct.distance;
+			ray.o.set(oct.o);
+			ray.n.set(oct.n);
+			ray.color.set(oct.color);
+			ray.setPrevMat(oct.getPrevMaterial(), oct.getPrevData());
+			ray.setCurrentMat(oct.getCurrentMaterial(), oct.getCurrentData());
+			updateOpacity(ray);
+			return true;
+		}
+		if (hit) {
+			ray.distance += ray.t;
+			ray.o.scaleAdd(ray.t, ray.d);
+			updateOpacity(ray);
+			return true;
+		}
+		return false;
+	}
+
+	public void updateOpacity(Ray ray) {
+		if (ray.getCurrentMaterial() == Block.WATER ||
+				(ray.getCurrentMaterial() == Block.AIR && ray.getPrevMaterial() == Block.WATER)) {
+			ray.color.w = waterOpacity;
+		}
 	}
 
 	protected final boolean kill(Ray ray, Random random) {
@@ -540,19 +579,20 @@ public class Scene extends SceneDescription {
 		int requiredDepth = calculateOctreeOrigin(chunksToLoad);
 
 		// create new octree to fit all chunks
-		octree = new Octree(requiredDepth);
+		worldOctree = new Octree(requiredDepth);
 
+		// TODO update
 		if (waterHeight > 0) {
-			for (int x = 0; x < (1<<octree.depth); ++x) {
-				for (int z = 0; z < (1<<octree.depth); ++z) {
+			for (int x = 0; x < (1<<worldOctree.depth); ++x) {
+				for (int z = 0; z < (1<<worldOctree.depth); ++z) {
 					for (int y = -origin.y; y < (-origin.y)+waterHeight-1; ++y) {
-						octree.set(Block.WATER.id | (1<<WaterModel.FULL_BLOCK), x, y, z);
+						worldOctree.set(Block.WATER_ID | (1<<WaterModel.FULL_BLOCK), x, y, z);
 					}
 				}
 			}
-			for (int x = 0; x < (1<<octree.depth); ++x) {
-				for (int z = 0; z < (1<<octree.depth); ++z) {
-					octree.set(Block.WATER.id, x, (-origin.y)+waterHeight-1, z);
+			for (int x = 0; x < (1<<worldOctree.depth); ++x) {
+				for (int z = 0; z < (1<<worldOctree.depth); ++z) {
+					worldOctree.set(Block.WATER_ID, x, (-origin.y)+waterHeight-1, z);
 				}
 			}
 		}
@@ -564,9 +604,12 @@ public class Scene extends SceneDescription {
 		}
 
 		for (ChunkPosition region: regions) {
-			world.regionDiscovered(region);
 			world.getRegion(region).parse();
 		}
+
+		task = "Loading entities";
+		progressListener.setProgress(task, 0, 0, 1);
+		progressListener.setProgress(task, 1, 0, 1);
 
 		Heightmap biomeIdMap = new Heightmap();
 		task = "Loading chunks";
@@ -585,10 +628,12 @@ public class Scene extends SceneDescription {
 			world.getChunk(cp).getBlockData(blocks, data, biomes);
 			nchunks += 1;
 
+			int wx0 = cp.x*16;
+			int wz0 = cp.z*16;
 			for (int cz = 0; cz < 16; ++cz) {
-				int wz = cz + cp.z*16;
+				int wz = cz + wz0;
 				for (int cx = 0; cx < 16; ++cx) {
-					int wx = cx + cp.x*16;
+					int wx = cx + wx0;
 					int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(cx, cz)];
 					biomeIdMap.set(biomeId, wx, wz);
 				}
@@ -612,7 +657,7 @@ public class Scene extends SceneDescription {
 									Block.get(blocks[index+Chunk.X_MAX]).isOpaque &&
 									Block.get(blocks[index-Chunk.X_MAX*Chunk.Z_MAX]).isOpaque &&
 									Block.get(blocks[index+Chunk.X_MAX*Chunk.Z_MAX]).isOpaque) {
-								octree.set(Block.STONE.id, x, cy - origin.y, z);
+								worldOctree.set(Block.STONE_ID, x, cy - origin.y, z);
 								continue;
 							}
 						}
@@ -620,11 +665,6 @@ public class Scene extends SceneDescription {
 						int metadata = 0xFF & data[index/2];
 						metadata >>= (cx % 2) * 4;
 						metadata &= 0xF;
-
-						if (block == Block.STATIONARYWATER)
-							block = Block.WATER;
-						else if (block == Block.STATIONARYLAVA)
-							block = Block.LAVA;
 
 						int type = block.id;
 						// store metadata
@@ -640,6 +680,8 @@ public class Scene extends SceneDescription {
 							}
 							break;
 
+						case Block.STATIONARYWATER_ID:
+							type = Block.WATER_ID;
 						case Block.WATER_ID:
 							if (cy < 255) {
 								// is there water above?
@@ -660,6 +702,8 @@ public class Scene extends SceneDescription {
 							}
 							break;
 
+						case Block.STATIONARYLAVA_ID:
+							type = Block.LAVA_ID;
 						case Block.LAVA_ID:
 							if (cy < 255) {
 								// is there lava above?
@@ -676,7 +720,7 @@ public class Scene extends SceneDescription {
 								// is it snow covered?
 								index = Chunk.chunkIndex(cx, cy+1, cz);
 								int blockAbove = 0xFF & blocks[index];
-								if (blockAbove == Block.SNOW.id) {
+								if (blockAbove == Block.SNOW_ID) {
 									type = type | (1 << 8);// 9th bit is the snow bit
 								}
 							}
@@ -722,7 +766,7 @@ public class Scene extends SceneDescription {
 							emitters += 1;
 						if (block.isInvisible)
 							type = 0;
-						octree.set(type, cx + cp.x*16 - origin.x,
+						worldOctree.set(type, cx + cp.x*16 - origin.x,
 								cy - origin.y, cz + cp.z*16 - origin.z);
 					}
 				}
@@ -784,15 +828,34 @@ public class Scene extends SceneDescription {
 			progressListener.setProgress(task, done, 0, target);
 			done += 1;
 
-			OctreeFinalizer.finalizeChunk(octree, origin, cp);
+			OctreeFinalizer.finalizeChunk(worldOctree, origin, cp);
 		}
 
 		chunks = loadedChunks;
 
-		camera.setWorldSize(1<<octree.depth);
+		camera.setWorldSize(1<<worldOctree.depth);
+
+		buildBVH();
 
 		Log.info(String.format("Loaded %d chunks (%d emitters)",
 				nchunks, emitters));
+	}
+
+	private void buildBVH() {
+		primitives = new LinkedList<Primitive>();
+		final List<Primitive> list = primitives;
+
+		worldOctree.visit(new OctreeVisitor() {
+			@Override
+			public void visit(int data, int x, int y, int z, int size) {
+				if ((data&0xF) == Block.WATER_ID) {
+					WaterModel.addPrimitives(list, data, x, y, z, 1<<size);
+				}
+			}
+		});
+
+		bvh = new BVH(primitives);
+
 	}
 
 	private int calculateOctreeOrigin(Collection<ChunkPosition> chunksToLoad) {
@@ -875,7 +938,7 @@ public class Scene extends SceneDescription {
 		int xcenter = (xmax + xmin)/2;
 		int zcenter = (zmax + zmin)/2;
 		for (int y = Chunk.Y_MAX-1; y >= 0; --y) {
-			int block = octree.get(xcenter - origin.x, y - origin.y,
+			int block = worldOctree.get(xcenter - origin.x, y - origin.y,
 					zcenter - origin.z);
 			if (Block.get(block) != Block.AIR) {
 				return new Vector3d(xcenter, y+5, zcenter);
@@ -1064,13 +1127,20 @@ public class Scene extends SceneDescription {
 	 * @return {@code true} if the ray hit something
 	 */
 	public boolean trace(Ray ray) {
+		WorkerState state = new WorkerState();
+		state.ray = ray;
+		if (isInWater(ray)) {
+			ray.setCurrentMat(Block.WATER, 0);
+		} else {
+			ray.setCurrentMat(Block.AIR, 0);
+		}
 		ray.d.set(0, 0, 1);
 		ray.o.set(camera.getPosition());
 		ray.o.x -= origin.x;
 		ray.o.y -= origin.y;
 		ray.o.z -= origin.z;
 		camera.transform(ray.d);
-		while (intersect(ray)) {
+		while (RayTracer.nextIntersection(this, ray, state)) {
 			if (ray.getCurrentMaterial() != Block.AIR) {
 				return true;
 			}
@@ -1095,7 +1165,7 @@ public class Scene extends SceneDescription {
 	 * @return The Octree object
 	 */
 	public Octree getOctree() {
-		return octree;
+		return worldOctree;
 	}
 
 	/**
@@ -1103,24 +1173,6 @@ public class Scene extends SceneDescription {
 	 */
 	public Vector3i getOrigin() {
 		return origin;
-	}
-
-	/**
-	 * Set the clear water flag
-	 * @param value
-	 */
-	public void setClearWater(boolean value) {
-		if (value != clearWater) {
-			clearWater	= value;
-			refresh();
-		}
-	}
-
-	/**
-	 * @return <code>true</code> if clear water is enabled
-	 */
-	public boolean getClearWater() {
-		return clearWater;
 	}
 
 	/**
@@ -1440,7 +1492,7 @@ public class Scene extends SceneDescription {
 		String fileName = name + ".octree";
 		DataOutputStream out = null;
 		try {
-			if (context.fileUnchangedSince(fileName, octree.getTimestamp())) {
+			if (context.fileUnchangedSince(fileName, worldOctree.getTimestamp())) {
 				Log.info("Skipping redundant Octree write");
 				return;
 			}
@@ -1450,10 +1502,10 @@ public class Scene extends SceneDescription {
 			out = new DataOutputStream(new GZIPOutputStream(
 					context.getSceneFileOutputStream(fileName)));
 
-			octree.store(out);
+			worldOctree.store(out);
 			out.close();
 			out = null;
-			octree.setTimestamp(context.fileTimestamp(fileName));
+			worldOctree.setTimestamp(context.fileTimestamp(fileName));
 
 			progressListener.setProgress(task, 2, 0, 2);
 			Log.info("Octree saved");
@@ -1592,13 +1644,19 @@ public class Scene extends SceneDescription {
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
 
-			octree = Octree.load(in);
+			worldOctree = Octree.load(in);
 			in.close();
 			in = null;
-			octree.setTimestamp(context.fileTimestamp(fileName));
+			worldOctree.setTimestamp(context.fileTimestamp(fileName));
 
 			renderListener.setProgress(task, 2, 0, 2);
 			Log.info("Octree loaded");
+
+			calculateOctreeOrigin(chunks);
+			camera.setWorldSize(1<<worldOctree.depth);
+
+			buildBVH();
+
 			return true;
 		} catch (IOException e) {
 			Log.info("Failed to load chunk octree: missing file or incorrect format!", e);
@@ -2057,4 +2115,44 @@ public class Scene extends SceneDescription {
 		refresh();
 	}
 
+	public boolean isInWater(Ray ray) {
+		if (worldOctree.isInside(ray.o)) {
+			int x = (int) QuickMath.floor(ray.o.x);
+			int y = (int) QuickMath.floor(ray.o.y);
+			int z = (int) QuickMath.floor(ray.o.z);
+			int block = worldOctree.get(x, y, z);
+			if ((block&0xF) != Block.WATER_ID) {
+				return false;
+			}
+			return (ray.o.y-y) < 0.875 || block == (Block.WATER_ID | (1<<WaterModel.FULL_BLOCK));
+		} else {
+			return waterHeight > 0 && ray.o.y < waterHeight-0.125;
+		}
+	}
+
+	public boolean isInsideOctree(Vector3d vec) {
+		return worldOctree.isInside(vec);
+	}
+
+	public double getWaterOpacity() {
+		return waterOpacity;
+	}
+
+	public void setWaterOpacity(double opacity) {
+		if (opacity != waterOpacity) {
+			this.waterOpacity = opacity;
+			refresh();
+		}
+	}
+
+	public double getWaterVisibility() {
+		return waterVisibility;
+	}
+
+	public void setWaterVisibility(double visibility) {
+		if (visibility != waterVisibility) {
+			this.waterVisibility = visibility;
+			refresh();
+		}
+	}
 }

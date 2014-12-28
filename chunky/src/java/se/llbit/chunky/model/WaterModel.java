@@ -16,14 +16,21 @@
  */
 package se.llbit.chunky.model;
 
+import java.util.List;
+
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.Block;
+import se.llbit.chunky.world.BlockData;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Triangle;
+import se.llbit.math.Vector2d;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
+import se.llbit.math.primitive.Primitive;
+import se.llbit.math.primitive.TexturedTriangle;
 
 /**
  * A water block. The height of the top water block is slightly
@@ -31,8 +38,6 @@ import se.llbit.math.Vector4d;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class WaterModel {
-
-	private static final double WATER_OPACITY = .42;
 
 	private static Quad[] fullBlock = {
 		// bottom
@@ -200,7 +205,6 @@ public class WaterModel {
 			if (hit) {
 				ray.distance += ray.t;
 				ray.o.scaleAdd(ray.t, ray.d);
-				ray.color.w = WATER_OPACITY;
 
 				/*if ((level&8) != 0) {
 					// falling water
@@ -216,12 +220,6 @@ public class WaterModel {
 				}*/
 			}
 			return hit;
-		}
-
-		// lily pad test
-		if (((ray.getCurrentData() >> 13) & 1) != 0) {
-			if (LilyPadModel.intersect(ray))
-				return true;
 		}
 
 		boolean hit = false;
@@ -318,7 +316,40 @@ public class WaterModel {
 		}
 		if (hit) {
 			Texture.water.getAvgColorLinear(ray.color);
-			ray.color.w = WATER_OPACITY;
+			ray.distance += ray.t;
+			ray.o.scaleAdd(ray.t, ray.d);
+		}
+		return hit;
+	}
+
+	public static boolean intersectTop(Ray ray) {
+		ray.t = Double.POSITIVE_INFINITY;
+
+		int data = ray.getCurrentData();
+
+		boolean hit = false;
+		int c0 = (0xF & (data >> 16)) % 8;
+		int c1 = (0xF & (data >> 20)) % 8;
+		int c2 = (0xF & (data >> 24)) % 8;
+		int c3 = (0xF & (data >> 28)) % 8;
+		Triangle triangle = t012[c0][c1][c2];
+		if (triangle.intersect(ray)) {
+			ray.n.set(triangle.n);
+			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+			ray.t = ray.tNext;
+			hit = true;
+		}
+		triangle = t230[c2][c3][c0];
+		if (triangle.intersect(ray)) {
+			ray.n.set(triangle.n);
+			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+			ray.t = ray.tNext;
+			ray.u = 1-ray.u;
+			ray.v = 1-ray.v;
+			hit = true;
+		}
+		if (hit) {
+			Texture.water.getAvgColorLinear(ray.color);
 			ray.distance += ray.t;
 			ray.o.scaleAdd(ray.t, ray.d);
 		}
@@ -345,5 +376,40 @@ public class WaterModel {
 		ray.n.x += normalMap[u][v][0]/2;
 		ray.n.z += normalMap[u][v][1]/2;
 		ray.n.normalize();
+	}
+
+	public static void addPrimitives(List<Primitive> primitives, int data,
+			int x, int y, int z, int size) {
+		// lily pad test
+		if ((data & (1<<BlockData.LILY_PAD)) != 0) {
+			double height = y+1-0.12;
+			Vector3d c1 = new Vector3d(x, height, z);
+			Vector3d c2 = new Vector3d(x, height, z+size);
+			Vector3d c3 = new Vector3d(x+size, height, z+size);
+			Vector3d c4 = new Vector3d(x+size, height, z);
+			Vector2d t1 = new Vector2d(0, 0);
+			Vector2d t2 = new Vector2d(0, 1);
+			Vector2d t3 = new Vector2d(1, 1);
+			Vector2d t4 = new Vector2d(1, 0);
+			int	dir = 3 & (data >> BlockData.LILY_PAD_ROTATION);
+			switch (dir) {
+			case 0:
+				primitives.add(new TexturedTriangle(c1, c3, c2, t1, t3, t2, Block.LILY_PAD));
+				primitives.add(new TexturedTriangle(c1, c4, c3, t1, t4, t3, Block.LILY_PAD));
+				break;
+			case 1:
+				primitives.add(new TexturedTriangle(c1, c3, c2, t4, t2, t1, Block.LILY_PAD));
+				primitives.add(new TexturedTriangle(c1, c4, c3, t4, t3, t2, Block.LILY_PAD));
+				break;
+			case 2:
+				primitives.add(new TexturedTriangle(c1, c3, c2, t3, t1, t4, Block.LILY_PAD));
+				primitives.add(new TexturedTriangle(c1, c4, c3, t3, t2, t1, Block.LILY_PAD));
+				break;
+			case 3:
+				primitives.add(new TexturedTriangle(c1, c3, c2, t2, t4, t3, Block.LILY_PAD));
+				primitives.add(new TexturedTriangle(c1, c4, c3, t2, t1, t4, Block.LILY_PAD));
+				break;
+			}
+		}
 	}
 }

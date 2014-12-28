@@ -16,7 +16,6 @@
  */
 package se.llbit.math;
 
-
 /**
  * A quad.
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -157,4 +156,5 @@ public class Quad {
 		transform.scale(scale);
 		return new Quad(this, transform);
 	}
+
 }

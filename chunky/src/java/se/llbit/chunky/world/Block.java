@@ -52,8 +52,8 @@ import se.llbit.chunky.model.LargeFlowerModel;
 import se.llbit.chunky.model.LavaModel;
 import se.llbit.chunky.model.LeafModel;
 import se.llbit.chunky.model.LeverModel;
+import se.llbit.chunky.model.LilyPadModel;
 import se.llbit.chunky.model.MelonStemModel;
-import se.llbit.chunky.model.PancakeModel;
 import se.llbit.chunky.model.PistonExtensionModel;
 import se.llbit.chunky.model.PistonModel;
 import se.llbit.chunky.model.PressurePlateModel;
@@ -81,6 +81,8 @@ import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.model.WoodModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.json.JsonString;
+import se.llbit.json.JsonValue;
 import se.llbit.math.Ray;
 
 /**
@@ -249,6 +251,10 @@ public class Block extends Material {
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return WaterModel.intersect(ray);
+		}
+		@Override
+		public void getColor(Ray ray) {
+			Texture.water.getAvgColorLinear(ray.color);
 		}
 	};
 	public static final int STATIONARYWATER_ID = 0x09;
@@ -2027,7 +2033,11 @@ public class Block extends Material {
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return PancakeModel.intersect(ray, Texture.lilyPad);
+			return LilyPadModel.intersect(ray);
+		}
+		@Override
+		public void getColor(Ray ray) {
+			LilyPadModel.getColor(ray);
 		}
 	};
 	public static final int NETHERBRICK_ID = 0x70;
@@ -3984,5 +3994,10 @@ public class Block extends Material {
 
 	public boolean isSameMaterial(Material other) {
 		return other == this;
+	}
+
+	@Override
+	public JsonValue toJson() {
+		return new JsonString("block:" + id);
 	}
 }

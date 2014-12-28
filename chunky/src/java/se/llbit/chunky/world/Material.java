@@ -17,6 +17,9 @@
 package se.llbit.chunky.world;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.json.JsonString;
+import se.llbit.json.JsonValue;
+import se.llbit.math.Ray;
 
 public abstract class Material {
 
@@ -91,4 +94,15 @@ public abstract class Material {
 		return texture;
 	}
 
+	public void getColor(Ray ray) {
+		texture.getColor(ray);
+	}
+
+	public JsonValue toJson() {
+		return new JsonString("mat:" + name);
+	}
+
+	public static Material fromJson(JsonValue json) {
+		throw new UnsupportedOperationException("TODO");
+	}
 }

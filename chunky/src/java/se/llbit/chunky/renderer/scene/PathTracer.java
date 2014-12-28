@@ -42,7 +42,13 @@ public class PathTracer {
 	 * @param state
 	 */
 	public static final void pathTrace(Scene scene, WorkerState state) {
-		pathTrace(scene, state.ray, state, 1, true);
+		Ray ray = state.ray;
+		if (scene.isInWater(ray)) {
+			ray.setCurrentMat(Block.WATER, 0);
+		} else {
+			ray.setCurrentMat(Block.AIR, 0);
+		}
+		pathTrace(scene, ray, state, 1, true);
 	}
 
 	/**
@@ -64,19 +70,21 @@ public class PathTracer {
 		while (true) {
 
 			if (!RayTracer.nextIntersection(scene, ray, state)) {
-				if (ray.depth == 0) {
+				if (ray.getPrevMaterial() == Block.WATER) {
+					ray.color.set(0,0,0,1);
+					hit = true;
+				} else if (ray.depth == 0) {
 					// direct sky hit
 					if (!scene.transparentSky()) {
-						scene.sky.getSkyColorInterpolated(ray, scene.waterHeight > 0);
+						scene.sky.getSkyColorInterpolated(ray);
 						hit = true;
 					}
-
 				} else if (ray.specular) {
 					// sky color
-					scene.sky.getSkySpecularColor(ray, scene.waterHeight > 0);
+					scene.sky.getSkySpecularColor(ray);
 					hit = true;
 				} else {
-					scene.sky.getSkyColor(ray, scene.waterHeight > 0);
+					scene.sky.getSkyColor(ray);
 					hit = true;
 				}
 				break;
@@ -313,7 +321,7 @@ public class PathTracer {
 			}
 
 			// do water fog
-			if (!scene.clearWater && prevBlock == Block.WATER) {
+			if (prevBlock == Block.WATER) {
 				double a = ray.distance / scene.waterVisibility;
 				double attenuation = 1 - QuickMath.min(1, a*a);
 				ray.color.scale(attenuation);
@@ -400,7 +408,7 @@ public class PathTracer {
 			attenuation.y *= ray.color.y * ray.color.w + mult;
 			attenuation.z *= ray.color.z * ray.color.w + mult;
 			attenuation.w *= mult;
-			if (!scene.clearWater && ray.getPrevMaterial() == Block.WATER) {
+			if (ray.getPrevMaterial() == Block.WATER) {
 				double a = ray.distance / scene.waterVisibility;
 				attenuation.w *= 1 - QuickMath.min(1, a*a);
 			}

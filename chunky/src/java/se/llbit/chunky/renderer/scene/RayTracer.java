@@ -16,10 +16,10 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Block;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3d;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -32,20 +32,13 @@ public class RayTracer {
 	 */
 	public static void quickTrace(Scene scene, WorkerState state) {
 		Ray ray = state.ray;
+		if (scene.isInWater(ray)) {
+			ray.setCurrentMat(Block.WATER, 0);
+		} else {
+			ray.setCurrentMat(Block.AIR, 0);
+		}
 		while (true) {
 			if (!nextIntersection(scene, ray, state)) {
-				if (scene.waterHeight > 0 &&
-						ray.d.y < 0 && ray.o.y > scene.waterHeight-.125) {
-
-					ray.t = (scene.waterHeight-.125-ray.o.y) / ray.d.y;
-					ray.distance += ray.t;
-					ray.o.scaleAdd(ray.t, ray.d);
-					ray.setPrevMat(Block.AIR, 0);
-					ray.setCurrentMat(Block.WATER, 0);
-					WaterModel.intersect(ray);
-				}
-				break;
-			} else if (ray.getCurrentMaterial() == Block.WATER) {
 				break;
 			} else if (ray.getCurrentMaterial() != Block.AIR && ray.color.w > 0) {
 				break;
@@ -55,7 +48,7 @@ public class RayTracer {
 		}
 
 		if (ray.getCurrentMaterial() == Block.AIR) {
-			scene.sky.getSkySpecularColor(ray, false);
+			scene.sky.getSkySpecularColor(ray);
 		} else {
 			scene.sun.flatShading(ray);
 		}
@@ -71,17 +64,6 @@ public class RayTracer {
 		double occlusion = 1.0;
 		while (true) {
 			if (!nextIntersection(scene, ray, state)) {
-				if (scene.waterHeight > 0 &&
-						ray.d.y < 0 && ray.o.y > scene.waterHeight-.125) {
-
-					ray.t = (scene.waterHeight-.125-ray.o.y) / ray.d.y;
-					ray.distance += ray.t;
-					ray.o.scaleAdd(ray.t, ray.d);
-					ray.setPrevMat(Block.AIR, 0);
-					ray.setCurrentMat(Block.WATER, 0);
-					WaterModel.intersect(ray);
-					occlusion *= (1 - ray.color.w);
-				}
 				break;
 			} else {
 				occlusion *= (1 - ray.color.w);
@@ -98,58 +80,59 @@ public class RayTracer {
 	 */
 	public static boolean nextIntersection(Scene scene, Ray ray, WorkerState state) {
 
-		if (scene.sky().cloudsEnabled()) {
-			Ray oct = new Ray(ray);
-			if  (scene.sky().cloudIntersection(scene, ray, state.random)) {
-				if (nextWorldIntersection(scene, oct) &&
-						oct.distance <= ray.distance) {
-					ray.distance = oct.distance;
-					ray.d.set(oct.d);
-					ray.o.set(oct.o);
-					ray.n.set(oct.n);
-					ray.color.set(oct.color);
-					ray.setPrevMat(oct.getPrevMaterial(), oct.getPrevData());
-					ray.setCurrentMat(oct.getCurrentMaterial(), oct.getCurrentData());
-				} else {
-					ray.setPrevMat(ray.getCurrentMaterial(), ray.getCurrentData());
-					ray.setCurrentMat(Block.GRASS, 0);
-					ray.o.scaleAdd(ray.tNext + Ray.EPSILON, ray.d);
-				}
-				return true;
-			}
-		}
-		return nextWorldIntersection(scene, ray);
-	}
-
-	private static boolean nextWorldIntersection(Scene scene, Ray ray) {
-
+		ray.setPrevMat(ray.getCurrentMaterial(), ray.getCurrentData());
+		ray.t = Double.POSITIVE_INFINITY;
 		boolean hit = false;
-		Ray oct = new Ray(ray);
-		if (scene.intersect(oct)) {
-			ray.distance = oct.distance;
-			ray.o.set(oct.o);
-			ray.n.set(oct.n);
-			ray.color.set(oct.color);
-			ray.setPrevMat(oct.getPrevMaterial(), oct.getPrevData());
-			ray.setCurrentMat(oct.getCurrentMaterial(), oct.getCurrentData());
-			hit = true;
-		} else if (scene.waterHeight > 0 &&
-				ray.d.y < 0 && ray.o.y > scene.waterHeight-.125) {
-
-			// infinite water intersection
-			ray.t = (scene.waterHeight-.125-ray.o.y) / ray.d.y;
+		if (scene.sky().cloudsEnabled()) {
+			hit = scene.sky().cloudIntersection(scene, ray, state.random);
+		}
+		if (scene.waterHeight > 0) {
+			hit = waterIntersection(scene, ray) || hit;
+		}
+		if (scene.intersect(ray)) {
+			return true;
+		}
+		if (hit) {
 			ray.distance += ray.t;
 			ray.o.scaleAdd(ray.t, ray.d);
-			ray.setPrevMat(Block.AIR, 0);
-			ray.setCurrentMat(Block.WATER, 0);
-			WaterModel.intersect(ray);
-
-			hit = true;
-
+			scene.updateOpacity(ray);
+			return true;
 		} else {
 			ray.setCurrentMat(Block.AIR, 0);
+			return false;
 		}
-		return hit;
+	}
+
+	private static boolean waterIntersection(Scene scene, Ray ray) {
+		if (ray.d.y < 0) {
+			double t = (scene.waterHeight-.125-ray.o.y) / ray.d.y;
+			if (t > 0 && t < ray.t) {
+				Vector3d vec = new Vector3d();
+				vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
+				if (!scene.isInsideOctree(vec)) {
+					ray.t = t;
+					Block.WATER.getColor(ray);
+					ray.n.set(0, 1, 0);
+					ray.setCurrentMat(Block.WATER, 0);
+					return true;
+				}
+			}
+		}
+		if (ray.d.y > 0) {
+			double t = (scene.waterHeight-.125-ray.o.y) / ray.d.y;
+			if (t > 0 && t < ray.t) {
+				Vector3d vec = new Vector3d();
+				vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
+				if (!scene.isInsideOctree(vec)) {
+					ray.t = t;
+					Block.WATER.getColor(ray);
+					ray.n.set(0, -1, 0);
+					ray.setCurrentMat(Block.AIR, 0);
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

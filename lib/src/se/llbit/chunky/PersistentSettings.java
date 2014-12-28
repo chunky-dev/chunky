@@ -33,6 +33,10 @@ public final class PersistentSettings {
 	public static final String SETTINGS_FILE = "chunky.json";
 	public static final String DEFAULT_SCENE_DIRECTORY_NAME = "scenes";
 
+	public static final double DEFAULT_WATER_OPACITY = .42;
+	public static final double DEFAULT_WATER_VISIBILITY = 9;
+	public static final int DEFAULT_WATER_HEIGHT = 0;
+
 	public static final int DEFAULT_RAY_DEPTH = 5;
 	public static final int DEFAULT_SPP_TARGET = 1000;
 
@@ -213,5 +217,42 @@ public final class PersistentSettings {
 		settings.setBool("followPlayer", value);
 		save();
 	}
+
+	public static void setStillWater(boolean value) {
+		settings.setBool("stillWater", value);
+		save();
+	}
+
+	public static boolean getStillWater() {
+		return settings.getBool("stillWater", false);
+	}
+
+	public static void setWaterOpacity(double value) {
+		settings.setDouble("waterOpacity", value);
+		save();
+	}
+
+	public static double getWaterOpacity() {
+		return settings.getDouble("waterOpacity", DEFAULT_WATER_OPACITY);
+	}
+
+	public static void setWaterVisibility(double value) {
+		settings.setDouble("waterVisibility", value);
+		save();
+	}
+
+	public static double getWaterVisibility() {
+		return settings.getDouble("waterVisibility", DEFAULT_WATER_VISIBILITY);
+	}
+
+	public static void setWaterHeight(int value) {
+		settings.setInt("waterHeight", value);
+		save();
+	}
+
+	public static int getWaterHeight() {
+		return settings.getInt("waterHeight", DEFAULT_WATER_HEIGHT);
+	}
+
 }
 

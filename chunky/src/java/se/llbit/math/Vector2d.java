@@ -18,6 +18,9 @@ package se.llbit.math;
 
 import org.apache.commons.math3.util.FastMath;
 
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonValue;
+
 /**
  * A 3D vector of doubles.
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -186,5 +189,16 @@ public class Vector2d {
 	@Override
 	public String toString() {
 		return String.format("(%f, %f)", x, y);
+	}
+
+	/**
+	 * Serialize to JSON
+	 * @return JSON object
+	 */
+	public JsonValue toJson() {
+		JsonObject object = new JsonObject();
+		object.add("x", x);
+		object.add("y", y);
+		return object;
 	}
 }

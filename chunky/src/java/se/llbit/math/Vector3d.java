@@ -258,7 +258,7 @@ public class Vector3d {
 	}
 
 	/**
-	 * Serialize
+	 * Serialize to JSON
 	 * @return JSON object
 	 */
 	public JsonObject toJson() {

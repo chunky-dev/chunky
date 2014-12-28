@@ -325,7 +325,7 @@ public class Ray {
 		d.scaleAdd(
 				- 2 * ray.d.dot(ray.n),
 				ray.n, ray.d);
-		o.scaleAdd(Ray.OFFSET, d);
+		o.scaleAdd(0.00001, ray.n);
 		currentMaterial = prevMaterial;
 	}
 

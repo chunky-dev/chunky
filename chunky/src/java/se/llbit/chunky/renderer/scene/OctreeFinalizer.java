@@ -53,7 +53,7 @@ public class OctreeFinalizer {
 								Block.get(octree.get(x, cy+1, z)).isOpaque &&
 								Block.get(octree.get(x, cy, z-1)).isOpaque &&
 								Block.get(octree.get(x, cy, z+1)).isOpaque) {
-							octree.set(Block.STONE.id, x, cy, z);
+							octree.set(Block.STONE_ID, x, cy, z);
 							continue;
 						}
 					}

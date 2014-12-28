@@ -48,7 +48,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	/**
 	 * The current Scene Description Format (SDF) version
 	 */
-	public static final int SDF_VERSION = 3;
+	public static final int SDF_VERSION = 4;
 
 	public int sdfVersion = -1;
 	public String name = "default";
@@ -98,13 +98,20 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	protected boolean emittersEnabled = true;
 	protected double emitterIntensity = Scene.DEFAULT_EMITTER_INTENSITY;
 	protected boolean sunEnabled = true;
-	protected boolean stillWater = false;
-	protected boolean clearWater = false;
+
+
+	/**
+	 * Water opacity modifier.
+	 */
+	protected double waterOpacity = PersistentSettings.getWaterOpacity();
+	protected double waterVisibility = PersistentSettings.getWaterVisibility();
+	protected int waterHeight = PersistentSettings.getWaterHeight();
+	protected boolean stillWater = PersistentSettings.getStillWater();
+
 	protected boolean biomeColors = true;
 	protected boolean atmosphereEnabled = false;
 	protected boolean transparentSky = false;
 	protected boolean volumetricFogEnabled = false;
-	protected int waterHeight = 0;
 
 	protected Collection<ChunkPosition> chunks = new ArrayList<ChunkPosition>();
 
@@ -157,7 +164,8 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		desc.add("emitterIntensity", emitterIntensity);
 		desc.add("sunEnabled", sunEnabled);
 		desc.add("stillWater", stillWater);
-		desc.add("clearWater", clearWater);
+		desc.add("waterOpacity", waterOpacity);
+		desc.add("waterVisibility", waterVisibility);
 		desc.add("biomeColorsEnabled", biomeColors);
 		desc.add("atmosphereEnabled", atmosphereEnabled);
 		desc.add("transparentSky", transparentSky);
@@ -210,7 +218,8 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		emitterIntensity = desc.get("emitterIntensity").doubleValue(Scene.DEFAULT_EMITTER_INTENSITY);
 		sunEnabled = desc.get("sunEnabled").boolValue(true);
 		stillWater = desc.get("stillWater").boolValue(false);
-		clearWater = desc.get("clearWater").boolValue(false);
+		waterOpacity = desc.get("waterOpacity").doubleValue(PersistentSettings.getWaterOpacity());
+		waterVisibility = desc.get("waterVisibility").doubleValue(PersistentSettings.getWaterVisibility());
 		biomeColors = desc.get("biomeColorsEnabled").boolValue(true);
 		atmosphereEnabled = desc.get("atmosphereEnabled").boolValue(false);
 		transparentSky = desc.get("transparentSky").boolValue(false);

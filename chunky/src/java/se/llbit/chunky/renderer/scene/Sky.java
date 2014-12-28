@@ -31,6 +31,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.resources.HDRTexture;
 import se.llbit.chunky.resources.PFMTexture;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.SkymapTexture;
 import se.llbit.json.JsonArray;
@@ -231,9 +232,8 @@ public class Sky implements JSONifiable {
 	/**
 	 * Calculate sky color for the ray, based on sky mode
 	 * @param ray
-	 * @param blackBelowHorizon
 	 */
-	public void getSkyDiffuseColorInner(Ray ray, boolean blackBelowHorizon) {
+	public void getSkyDiffuseColorInner(Ray ray) {
 		switch (mode) {
 		case GRADIENT:
 		{
@@ -359,10 +359,9 @@ public class Sky implements JSONifiable {
 	/**
 	 * Panormaic skymap color
 	 * @param ray
-	 * @param blackBelowHorizon
 	 */
-	public void getSkyColor(Ray ray, boolean blackBelowHorizon) {
-		getSkyDiffuseColorInner(ray, blackBelowHorizon);
+	public void getSkyColor(Ray ray) {
+		getSkyDiffuseColorInner(ray);
 		ray.color.scale(skyLightModifier);
 		ray.color.w = 1;
 	}
@@ -370,9 +369,8 @@ public class Sky implements JSONifiable {
 	/**
 	 * Bilinear interpolated panoramic skymap color
 	 * @param ray
-	 * @param blackBelowHorizon
 	 */
-	public void getSkyColorInterpolated(Ray ray, boolean blackBelowHorizon) {
+	public void getSkyColorInterpolated(Ray ray) {
 		switch (mode) {
 		case SKYMAP_PANORAMIC:
 		{
@@ -464,7 +462,7 @@ public class Sky implements JSONifiable {
 			break;
 		}
 		default:
-			getSkyDiffuseColorInner(ray, blackBelowHorizon);
+			getSkyDiffuseColorInner(ray);
 		}
 		if (scene.sunEnabled) {
 			addSunColor(ray);
@@ -476,10 +474,9 @@ public class Sky implements JSONifiable {
 	/**
 	 * Get the specular sky color for the ray
 	 * @param ray
-	 * @param blackBelowHorizon
 	 */
-	public void getSkySpecularColor(Ray ray, boolean blackBelowHorizon) {
-		getSkyColor(ray, blackBelowHorizon);
+	public void getSkySpecularColor(Ray ray) {
+		getSkyColor(ray);
 		if (scene.sunEnabled) {
 			addSunColor(ray);
 		}
@@ -874,7 +871,6 @@ public class Sky implements JSONifiable {
 		double cloudTop = offsetY - scene.origin.y + 5;
 		int target = 1;
 		double t_offset = 0;
-		ray.tNext = Double.POSITIVE_INFINITY;
 		if (ray.o.y < cloudBot || ray.o.y > cloudTop) {
 			if (ray.d.y > 0) {
 				t_offset = (cloudBot - ray.o.y) / ray.d.y;
@@ -893,11 +889,14 @@ public class Sky implements JSONifiable {
 		} else if (inCloud(ray.o.x*inv_size + offsetX, ray.o.z*inv_size + offsetZ)) {
 			target = 0;
 		}
-		double tExit = Double.MAX_VALUE;
+		double tExit;
 		if (ray.d.y > 0) {
 			tExit = (cloudTop - ray.o.y) / ray.d.y - t_offset;
 		} else {
 			tExit = (cloudBot - ray.o.y) / ray.d.y - t_offset;
+		}
+		if (ray.t < tExit) {
+			tExit = ray.t;
 		}
 		double x0 = (ray.o.x + ray.d.x*t_offset)*inv_size + offsetX;
 		double z0 = (ray.o.z + ray.d.z*t_offset)*inv_size + offsetZ;
@@ -1024,15 +1023,19 @@ public class Sky implements JSONifiable {
 	}
 
 	private static void onCloudEnter(Ray ray, double t) {
-		ray.tNext = t;
-		ray.distance += t;
+		ray.t = t;
 		ray.color.set(1,1,1,1);
+		ray.setPrevMat(Block.AIR, 0);
+		ray.setCurrentMat(Block.STONE, 0);
+		// TODO add Cloud material
 	}
 
 	private static void onCloudExit(Ray ray, double t) {
-		ray.tNext = t;
-		ray.distance += t;
+		ray.t = t;
 		ray.color.set(1,1,1,1);
+		ray.setPrevMat(Block.STONE, 0);
+		ray.setCurrentMat(Block.AIR, 0);
+		// TODO add Cloud material
 	}
 
 	private static boolean inCloud(double x, double z) {

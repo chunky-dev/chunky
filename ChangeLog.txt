@@ -1,6 +1,17 @@
 1.3.4 - TBD
-    * Saving a scene with a different name no longer hides the old scene.
-    * Added scrollbar to Render Controls dialog for small screens.
+    * Added new tab in the Render Controls dialog for water related settings
+    * Added slider for water visibility
+    * Added slider for water opacity
+    * Removed the "clear water" option (which is made obsolete by water
+      visibility slider)
+    * All water settings can now be stored as custom defaults
+    * Removed the visible sea border in water world rendering mode
+    * Lily pads now cast shadows
+    * Display a warning when a scene from a newer version of Chunky is loaded
+    * Saving a scene with a different name no longer hides the old scene by
+      renaming the old scene description file with the .backup suffix
+    * Added scrollbar to Render Controls dialog for small screens (only visible
+      when the whole window does not fit on screen)
 
 1.3.3 - 2014-12-21
     * Fixed rendering of the 1.8 door blocks using Birch, Spruce, Jungle,

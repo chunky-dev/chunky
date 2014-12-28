@@ -16,6 +16,10 @@
  */
 package se.llbit.math;
 
+import se.llbit.chunky.world.Material;
+import se.llbit.math.primitive.Primitive;
+import se.llbit.math.primitive.TexturedTriangle;
+
 /**
  * A class to test intersection against a three-dimensional,
  * non-degenerate triangle.
@@ -104,6 +108,19 @@ public class Triangle {
 		}
 
 		return false;
+	}
+
+	public Primitive toPrimitive(int x, int y, int z, int size, Material material) {
+		Vector3d c1 = new Vector3d(o);
+		Vector3d c2 = new Vector3d();
+		Vector3d c3 = new Vector3d();
+		c1.add(x, y, z);
+		c2.add(c1, u);
+		c3.add(c1, v);
+		Vector2d t1 = new Vector2d(0, 0);
+		Vector2d t2 = new Vector2d(0, 1);
+		Vector2d t3 = new Vector2d(1, 1);
+		return new TexturedTriangle(c1, c2, c3, t1, t2, t3, material);
 	}
 
 }
