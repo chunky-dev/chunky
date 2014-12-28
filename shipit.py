@@ -164,7 +164,7 @@ def print_prerelease_checklist():
 	print "Pre-Release Checklist:"
 	print "    * Update PRAW (pip install praw --upgrade)"
 	print "    * Update Launchpadlib"
-	print "    * Edit release notes (check for typos)"
+	print "    * Edit release notes (check for typos, if edited restart release script)"
 	print "    * Update ChangeLog (check for typos)"
 	print "    * Commit all final changes in Git"
 
