@@ -254,6 +254,8 @@ public class Scene extends SceneDescription {
 		stillWater = other.stillWater;
 		waterOpacity = other.waterOpacity;
 		waterVisibility = other.waterVisibility;
+		useCustomWaterColor = other.useCustomWaterColor;
+		waterColor.set(other.waterColor);
 		biomeColors = other.biomeColors;
 		sunEnabled = other.sunEnabled;
 		emittersEnabled = other.emittersEnabled;
@@ -522,6 +524,11 @@ public class Scene extends SceneDescription {
 	public void updateOpacity(Ray ray) {
 		if (ray.getCurrentMaterial() == Block.WATER ||
 				(ray.getCurrentMaterial() == Block.AIR && ray.getPrevMaterial() == Block.WATER)) {
+			if (useCustomWaterColor) {
+				ray.color.x = waterColor.x;
+				ray.color.y = waterColor.y;
+				ray.color.z = waterColor.z;
+			}
 			ray.color.w = waterOpacity;
 		}
 	}
@@ -2152,6 +2159,26 @@ public class Scene extends SceneDescription {
 	public void setWaterVisibility(double visibility) {
 		if (visibility != waterVisibility) {
 			this.waterVisibility = visibility;
+			refresh();
+		}
+	}
+
+	public Vector3d getWaterColor() {
+		return waterColor;
+	}
+
+	public void setWaterColor(Vector3d color) {
+		waterColor.set(color);
+		refresh();
+	}
+
+	public boolean getUseCustomWaterColor() {
+		return useCustomWaterColor;
+	}
+
+	public void setUseCustomWaterColor(boolean value) {
+		if (value != useCustomWaterColor) {
+			useCustomWaterColor = value;
 			refresh();
 		}
 	}

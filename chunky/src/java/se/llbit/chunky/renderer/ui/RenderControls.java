@@ -160,9 +160,11 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JLabel progressLbl = new JLabel();
 	private final JComboBox postprocessCB = new JComboBox();
 	private final JComboBox skyModeCB = new JComboBox();
-	private final JButton changeSunColorBtn = new JButton();
+	private final JButton changeSunColorBtn = new JButton("Change Sun Color");
 	private final JLabel etaLbl = new JLabel();
 	private final JCheckBox waterWorldCB = new JCheckBox();
+	private final JCheckBox waterColorCB = new JCheckBox("Use custom water color");
+	private final JButton waterColorBtn = new JButton("Change Water Color");
 	private final JTextField waterHeightField = new JTextField();
 	private final JButton applyWaterHeightBtn = new JButton("Apply");
 	private final DecimalFormat decimalFormat = new DecimalFormat();
@@ -864,6 +866,14 @@ public class RenderControls extends JDialog implements ViewListener,
 				PersistentSettings.setWaterOpacity(renderMan.scene().getWaterOpacity());
 				PersistentSettings.setWaterVisibility(renderMan.scene().getWaterVisibility());
 				PersistentSettings.setWaterHeight(renderMan.scene().getWaterHeight());
+				boolean useCustomWaterColor = renderMan.scene().getUseCustomWaterColor();
+				PersistentSettings.setUseCustomWaterColor(useCustomWaterColor);
+				if (useCustomWaterColor) {
+					Vector3d color = renderMan.scene().getWaterColor();
+					PersistentSettings.setWaterColorRed(color.x);
+					PersistentSettings.setWaterColorGreen(color.y);
+					PersistentSettings.setWaterColorBlue(color.z);
+				}
 			}
 		});
 
@@ -889,6 +899,23 @@ public class RenderControls extends JDialog implements ViewListener,
 		waterWorldCB.addActionListener(waterWorldListener);
 		updateWaterHeight();
 
+		waterColorCB.addActionListener(customWaterColorListener);
+		updateWaterColor();
+
+		waterColorBtn.setIcon(Icon.colors.imageIcon());
+		waterColorBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ColorPicker picker = new ColorPicker(waterColorBtn, renderMan.scene().getWaterColor());
+				picker.addColorListener(new ColorListener() {
+					@Override
+					public void onColorPicked(Vector3d color) {
+						renderMan.scene().setWaterColor(color);
+					}
+				});
+			}
+		});
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -906,6 +933,11 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(applyWaterHeightBtn)
+				)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(waterColorCB)
+					.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+					.addComponent(waterColorBtn)
 				)
 				.addGroup(layout.createSequentialGroup()
 					.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
@@ -931,6 +963,12 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 				.addComponent(applyWaterHeightBtn)
 			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(waterColorCB)
+				.addComponent(waterColorBtn)
+			)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 			.addComponent(storeDefaultsBtn)
 			.addContainerGap()
@@ -1195,7 +1233,6 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	private JPanel buildLightingPane() {
 
-		changeSunColorBtn.setText("Change Sun Color");
 		changeSunColorBtn.setIcon(Icon.colors.imageIcon());
 		changeSunColorBtn.addActionListener(new ActionListener() {
 			@Override
@@ -2168,6 +2205,21 @@ public class RenderControls extends JDialog implements ViewListener,
 			updateWaterHeight();
 		}
 	};
+	private final ActionListener customWaterColorListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JCheckBox source = (JCheckBox) e.getSource();
+			boolean useCustomWaterColor = source.isSelected();
+			if (useCustomWaterColor) {
+				renderMan.scene().setWaterColor(new Vector3d(
+						PersistentSettings.DEFAULT_WATER_RED,
+						PersistentSettings.DEFAULT_WATER_GREEN,
+						PersistentSettings.DEFAULT_WATER_BLUE));
+			}
+			renderMan.scene().setUseCustomWaterColor(useCustomWaterColor);
+			updateWaterColor();
+		}
+	};
 	private final ActionListener skyModeListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -2312,6 +2364,14 @@ public class RenderControls extends JDialog implements ViewListener,
 		waterWorldCB.setSelected(waterWorld);
 		waterHeightField.setEnabled(waterWorld);
 		applyWaterHeightBtn.setEnabled(waterWorld);
+	}
+
+	protected void updateWaterColor() {
+		waterColorCB.removeActionListener(customWaterColorListener);
+		boolean useCustomWaterColor = renderMan.scene().getUseCustomWaterColor();
+		waterColorCB.setSelected(useCustomWaterColor);
+		waterColorBtn.setEnabled(useCustomWaterColor);
+		waterColorCB.addActionListener(customWaterColorListener);
 	}
 
 	protected void updateSkyRotation() {
@@ -2626,6 +2686,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		cloudZOffset.update();
 		rayDepth.update();
 		updateWaterHeight();
+		updateWaterColor();
 		updateCameraDirection();
 		updateCameraPosition();
 		updateCustomPresets();

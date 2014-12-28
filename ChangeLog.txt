@@ -4,6 +4,7 @@
     * Added slider for water opacity
     * Removed the "clear water" option (which is made obsolete by water
       visibility slider)
+    * Added custom water color setting
     * All water settings can now be stored as custom defaults
     * Removed the visible sea border in water world rendering mode
     * Lily pads now cast shadows

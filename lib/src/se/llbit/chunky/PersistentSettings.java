@@ -37,6 +37,10 @@ public final class PersistentSettings {
 	public static final double DEFAULT_WATER_VISIBILITY = 9;
 	public static final int DEFAULT_WATER_HEIGHT = 0;
 
+	public static final double DEFAULT_WATER_RED = 0.03;
+	public static final double DEFAULT_WATER_GREEN = 0.13;
+	public static final double DEFAULT_WATER_BLUE = 0.16;
+
 	public static final int DEFAULT_RAY_DEPTH = 5;
 	public static final int DEFAULT_SPP_TARGET = 1000;
 
@@ -254,5 +258,40 @@ public final class PersistentSettings {
 		return settings.getInt("waterHeight", DEFAULT_WATER_HEIGHT);
 	}
 
+	public static void setUseCustomWaterColor(boolean value) {
+		settings.setBool("useCustomWaterColor", value);
+		save();
+	}
+
+	public static boolean getUseCustomWaterColor() {
+		return settings.getBool("useCustomWaterColor", false);
+	}
+
+	public static void setWaterColorRed(double value) {
+		settings.setDouble("waterColorRed", value);
+		save();
+	}
+
+	public static void setWaterColorGreen(double value) {
+		settings.setDouble("waterColorGreen", value);
+		save();
+	}
+
+	public static void setWaterColorBlue(double value) {
+		settings.setDouble("waterColorBlue", value);
+		save();
+	}
+
+	public static double getWaterColorRed() {
+		return settings.getDouble("waterColorRed", DEFAULT_WATER_RED);
+	}
+
+	public static double getWaterColorGreen() {
+		return settings.getDouble("waterColorGreen", DEFAULT_WATER_GREEN);
+	}
+
+	public static double getWaterColorBlue() {
+		return settings.getDouble("waterColorBlue", DEFAULT_WATER_BLUE);
+	}
 }
 

@@ -35,6 +35,7 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Vector3d;
 import se.llbit.util.JSONifiable;
 import se.llbit.util.ZipExport;
 
@@ -107,6 +108,9 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	protected double waterVisibility = PersistentSettings.getWaterVisibility();
 	protected int waterHeight = PersistentSettings.getWaterHeight();
 	protected boolean stillWater = PersistentSettings.getStillWater();
+	protected boolean useCustomWaterColor = PersistentSettings.getUseCustomWaterColor();
+	protected final Vector3d waterColor = new Vector3d(PersistentSettings.getWaterColorRed(),
+			PersistentSettings.getWaterColorGreen(), PersistentSettings.getWaterColorBlue());
 
 	protected boolean biomeColors = true;
 	protected boolean atmosphereEnabled = false;
@@ -166,6 +170,14 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		desc.add("stillWater", stillWater);
 		desc.add("waterOpacity", waterOpacity);
 		desc.add("waterVisibility", waterVisibility);
+		desc.add("useCustomWaterColor", useCustomWaterColor);
+		if (useCustomWaterColor) {
+			JsonObject colorObj = new JsonObject();
+			colorObj.add("red", waterColor.x);
+			colorObj.add("green", waterColor.y);
+			colorObj.add("blue", waterColor.z);
+			desc.add("waterColor", colorObj);
+		}
 		desc.add("biomeColorsEnabled", biomeColors);
 		desc.add("atmosphereEnabled", atmosphereEnabled);
 		desc.add("transparentSky", transparentSky);
@@ -220,6 +232,13 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		stillWater = desc.get("stillWater").boolValue(false);
 		waterOpacity = desc.get("waterOpacity").doubleValue(PersistentSettings.getWaterOpacity());
 		waterVisibility = desc.get("waterVisibility").doubleValue(PersistentSettings.getWaterVisibility());
+		useCustomWaterColor = desc.get("useCustomWaterColor").boolValue(PersistentSettings.getUseCustomWaterColor());
+		if (useCustomWaterColor) {
+			JsonObject colorObj = desc.get("waterColor").object();
+			waterColor.x = colorObj.get("red").doubleValue(PersistentSettings.getWaterColorRed());
+			waterColor.y = colorObj.get("green").doubleValue(PersistentSettings.getWaterColorGreen());
+			waterColor.z = colorObj.get("blue").doubleValue(PersistentSettings.getWaterColorBlue());
+		}
 		biomeColors = desc.get("biomeColorsEnabled").boolValue(true);
 		atmosphereEnabled = desc.get("atmosphereEnabled").boolValue(false);
 		transparentSky = desc.get("transparentSky").boolValue(false);
