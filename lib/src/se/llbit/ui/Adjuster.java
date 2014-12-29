@@ -49,6 +49,8 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	private final JTextField textField;
 	private double min;
 	private double max;
+	private double sliderMin;
+	private double sliderMax;
 	private final boolean integerMode;
 
 	/**
@@ -75,6 +77,8 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	private Adjuster(String label, String tip, double min, double max, boolean intMode) {
 		this.min = min;
 		this.max = max;
+		this.sliderMin = min;
+		this.sliderMax = max;
 		lbl = new JLabel(label + ":");
 		integerMode = intMode;
 		if (intMode) {
@@ -258,13 +262,13 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 		if (logarithmic) {
 			value = (double) (source.getValue() - source.getMinimum())
 					/ (source.getMaximum() - source.getMinimum());
-			double logMin = Math.log(min);
-			double logMax = Math.log(max);
-			double scale = logMax - logMin;
-			value = Math.pow(Math.E, value * scale + logMin);
+			double logMin = Math.log(sliderMin);
+			double logMax = Math.log(sliderMax);
+			double range = logMax - logMin;
+			value = Math.pow(Math.E, value * range + logMin);
 		} else {
-			double scale = (max - min) / (source.getMaximum() - source.getMinimum());
-			value = (source.getValue() - source.getMinimum()) * scale + min;
+			double range = (sliderMax - sliderMin) / (source.getMaximum() - source.getMinimum());
+			value = (source.getValue() - source.getMinimum()) * range + sliderMin;
 		}
 		setTextField(value);
 		valueChanged(value);
@@ -288,6 +292,8 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	public void set(double value, double min, double max) {
 		this.min = min;
 		this.max = max;
+		this.sliderMin = min;
+		this.sliderMax = max;
 		setSlider(value);
 		setTextField(value);
 	}
@@ -295,14 +301,19 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	private void setSlider(double value) {
 		int sliderValue;
 		if (logarithmic) {
-			double logMin = Math.log(min);
-			double logMax = Math.log(max);
-			double logValue = (Math.log(value) - logMin) / (logMax - logMin);
-			double scale = slider.getMaximum() - slider.getMinimum();
-			sliderValue = (int) (logValue * scale + slider.getMinimum());
+			double logMin = Math.log(sliderMin);
+			double logMax = Math.log(sliderMax);
+			double logValue = Math.log(value);
+			logValue = Math.max(logMin, logValue);
+			logValue = Math.min(logMax, logValue);
+			double pos = (logValue - logMin) / (logMax - logMin);
+			double range = slider.getMaximum() - slider.getMinimum();
+			sliderValue = (int) (pos * range + slider.getMinimum());
 		} else {
-			double scale = (slider.getMaximum() - slider.getMinimum()) / (max - min);
-			sliderValue = (int) ((value - min) * scale + 0.5 + slider.getMinimum());
+			double range = (slider.getMaximum() - slider.getMinimum()) / (sliderMax - sliderMin);
+			double clampedValue = Math.max(sliderMin, value);
+			clampedValue = Math.min(sliderMax, value);
+			sliderValue = (int) ((clampedValue - min) * range + 0.5 + slider.getMinimum());
 		}
 		setSliderValue(sliderValue);
 	}
@@ -371,5 +382,21 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 		lbl.setEnabled(enabled);
 		slider.setEnabled(enabled);
 		textField.setEnabled(enabled);
+	}
+
+	/**
+	 * Set the lower limit of the slider. Can not be zero in logarithmic mode.
+	 * @param sliderMin
+	 */
+	public void setSliderMin(double sliderMin) {
+		this.sliderMin = sliderMin;
+	}
+
+	/**
+	 * Set the upper limit of the slider.
+	 * @param sliderMax
+	 */
+	public void setSliderMax(double sliderMax) {
+		this.sliderMax = sliderMax;
 	}
 }

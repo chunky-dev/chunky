@@ -1,4 +1,6 @@
 1.3.5 - TBD
+    * The sky light modifier can now be set to zero by typing "0" in the
+      text field next to the sky light slider
 
 1.3.4 - 2014-12-29
     * Added Y cutoff setting (blocks below the Y cutoff are not loaded)

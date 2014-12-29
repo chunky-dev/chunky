@@ -76,7 +76,7 @@ public class Sky implements JSONifiable {
 	/**
 	 * Minimum sky light intensity
 	 */
-	public static final double MIN_INTENSITY = 0.01;
+	public static final double MIN_INTENSITY = 0.0;
 
 	public static final int SKYBOX_UP = 0;
 	public static final int SKYBOX_DOWN = 1;

@@ -327,6 +327,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			Sky.MAX_INTENSITY) {
 		{
 			setLogarithmicMode();
+			setSliderMin(0.01);
 		}
 		@Override
 		public void valueChanged(double newValue) {
