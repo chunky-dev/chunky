@@ -18,10 +18,12 @@ package se.llbit.chunky.world;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Collection;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.CorruptLayer;
 import se.llbit.chunky.map.MapBuffer;
+import se.llbit.nbt.CompoundTag;
 
 /**
  * Empty or non-existent chunk.
@@ -49,7 +51,9 @@ public class EmptyChunk extends Chunk {
 	}
 
 	@Override
-	public synchronized void getBlockData(byte[] blocks, byte[] data, byte[] biomes) {
+	public synchronized void getBlockData(byte[] blocks, byte[] data,
+			byte[] biomes, Collection<CompoundTag> tileEntities,
+			Collection<CompoundTag> entities) {
 		for (int i = 0; i < X_MAX * Y_MAX * Z_MAX; ++i)
 			blocks[i] = 0;
 

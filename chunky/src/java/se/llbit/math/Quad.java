@@ -16,6 +16,13 @@
  */
 package se.llbit.math;
 
+import java.util.Collection;
+
+import se.llbit.chunky.world.Material;
+import se.llbit.math.primitive.Primitive;
+import se.llbit.math.primitive.TexturedTriangle;
+
+
 /**
  * A quad.
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -157,4 +164,23 @@ public class Quad {
 		return new Quad(this, transform);
 	}
 
+	public void addTriangles(Collection<Primitive> primitives, Material material, Transform transform) {
+		Vector3d c0 = new Vector3d(o);
+		Vector3d c1 = new Vector3d();
+		Vector3d c2 = new Vector3d();
+		Vector3d c3 = new Vector3d();
+		c1.add(o, xv);
+		c2.add(o, yv);
+		c3.add(c1, yv);
+		transform.apply(c0);
+		transform.apply(c1);
+		transform.apply(c2);
+		transform.apply(c3);
+		double u0 = uv.x;
+		double u1 = uv.x+uv.y;
+		double v0 = uv.z;
+		double v1 = uv.z+uv.w;
+		primitives.add(new TexturedTriangle(c0, c2, c1, new Vector2d(u0, v0), new Vector2d(u0, v1), new Vector2d(u1, v0), material));
+		primitives.add(new TexturedTriangle(c1, c2, c3, new Vector2d(u1, v0), new Vector2d(u0, v1), new Vector2d(u1, v1), material));
+	}
 }

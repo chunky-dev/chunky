@@ -14,26 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.math.primitive;
+package se.llbit.chunky.world.entity;
 
-import se.llbit.math.AABB;
-import se.llbit.math.Ray;
+import java.util.Collection;
 
-/**
- * An intersectable primitive piece of geometry
- * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
- */
-public interface Primitive {
+import se.llbit.math.Vector3d;
+import se.llbit.math.primitive.Primitive;
 
-	/**
-	 * Intersect the ray with this geometry.
-	 * @param ray
-	 * @return {@code true} if there was an intersection
-	 */
-	boolean intersect(Ray ray);
+abstract public class Entity {
+	protected final Vector3d position;
 
-	/**
-	 * @return axis-aligned bounding box for the primitive
-	 */
-	AABB bounds();
+	protected Entity(Vector3d position) {
+		this.position = new Vector3d(position);
+	}
+
+	abstract public Collection<Primitive> primitives(Vector3d offset);
 }

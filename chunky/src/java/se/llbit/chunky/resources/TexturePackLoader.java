@@ -1301,6 +1301,8 @@ public class TexturePackLoader {
 		allTextures.put("door_dark_oak_lower",
 				new SimpleTexture("assets/minecraft/textures/blocks/door_dark_oak_lower", Texture.darkOakDoorBottom));
 
+		allTextures.put("paintings_zetterstrand",
+				new SimpleTexture("assets/minecraft/textures/painting/paintings_kristoffer_zetterstrand", Texture.paintings));
 	}
 
 	/**

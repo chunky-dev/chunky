@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,7 @@ import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.chunky.map.UnknownLayer;
 import se.llbit.nbt.AnyTag;
+import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.NamedTag;
@@ -52,6 +54,8 @@ public class Chunk {
 	private static final String LEVEL_HEIGHTMAP = ".Level.HeightMap";
 	private static final String LEVEL_SECTIONS = ".Level.Sections";
 	private static final String LEVEL_BIOMES = ".Level.Biomes";
+	private static final String LEVEL_ENTITIES = ".Level.Entities";
+	private static final String LEVEL_TILEENTITIES = ".Level.TileEntities";
 
 	/**
 	 * Chunk width
@@ -557,9 +561,11 @@ public class Chunk {
 	 * @param blocks
 	 * @param blockData
 	 * @param biomes
+	 * @param entities
 	 */
-	public synchronized void getBlockData(
-			byte[] blocks, byte[] blockData, byte[] biomes) {
+	public synchronized void getBlockData(byte[] blocks, byte[] blockData,
+			byte[] biomes, Collection<CompoundTag> tileEntities,
+			Collection<CompoundTag> entities) {
 
 		for (int i = 0; i < CHUNK_BYTES; ++i) {
 			blocks[i] = 0;
@@ -576,13 +582,29 @@ public class Chunk {
 		Set<String> request = new HashSet<String>();
 		request.add(LEVEL_SECTIONS);
 		request.add(LEVEL_BIOMES);
+		request.add(LEVEL_ENTITIES);
+		request.add(LEVEL_TILEENTITIES);
 		Map<String, AnyTag> data = getChunkData(request);
 		AnyTag sections = data.get(LEVEL_SECTIONS);
 		AnyTag biomesTag = data.get(LEVEL_BIOMES);
-		if (sections.isList() && biomesTag.isByteArray(X_MAX*Z_MAX)) {
+		AnyTag entitiesTag = data.get(LEVEL_ENTITIES);
+		AnyTag tileEntitiesTag = data.get(LEVEL_TILEENTITIES);
+		if (sections.isList() && biomesTag.isByteArray(X_MAX*Z_MAX)
+				&& tileEntitiesTag.isList()
+				&& entitiesTag.isList()) {
 			byte[] chunkBiomes = extractBiomeData(data);
 			System.arraycopy(chunkBiomes, 0, biomes, 0, chunkBiomes.length);
 			extractChunkData(data, blocks, blockData);
+			ListTag list = (ListTag) entitiesTag;
+			for (SpecificTag tag: list.getItemList()) {
+				if (tag.isCompoundTag())
+					entities.add((CompoundTag) tag);
+			}
+			list = (ListTag) tileEntitiesTag;
+			for (SpecificTag tag: list.getItemList()) {
+				if (tag.isCompoundTag())
+					tileEntities.add((CompoundTag) tag);
+			}
 		}
 	}
 

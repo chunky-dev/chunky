@@ -53,6 +53,8 @@ public class Texture {
 		};
 	};
 
+	public static final Texture paintings = new Texture();
+
 	public static final Texture air = new Texture("air");
 	public static final Texture stone = new Texture("stone");
 	public static final Texture prismarine = new Texture();

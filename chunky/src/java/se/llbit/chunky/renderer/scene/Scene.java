@@ -55,6 +55,8 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
+import se.llbit.chunky.world.entity.Entity;
+import se.llbit.chunky.world.entity.PaintingEntity;
 import se.llbit.log.Log;
 import se.llbit.math.BVH;
 import se.llbit.math.Color;
@@ -65,6 +67,8 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector3i;
 import se.llbit.math.primitive.Primitive;
+import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.ListTag;
 import se.llbit.png.IEND;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
@@ -166,6 +170,12 @@ public class Scene extends SceneDescription {
 	private Octree worldOctree;
 
 	private List<Primitive> primitives = new LinkedList<Primitive>();
+
+	/**
+	 * Entities in the scene
+	 */
+	private Collection<Entity> entities = new LinkedList<Entity>();
+
 	private BVH bvh = new BVH(Collections.<Primitive>emptyList());
 
 	// chunk loading buffers
@@ -240,8 +250,9 @@ public class Scene extends SceneDescription {
 		// the octree reference is overwritten to save time
 		// when the other scene is changed it must create a new octree
 		worldOctree = other.worldOctree;
-		bvh = other.bvh;
 		primitives = other.primitives;
+		entities = other.entities;
+		bvh = other.bvh;
 		grassTexture = other.grassTexture;
 		foliageTexture = other.foliageTexture;
 		origin.set(other.origin);
@@ -613,6 +624,8 @@ public class Scene extends SceneDescription {
 			world.getRegion(region).parse();
 		}
 
+		entities = new LinkedList<Entity>();
+
 		int ycutoff = PersistentSettings.getYCutoff();
 		ycutoff = Math.max(0, ycutoff);
 
@@ -630,7 +643,9 @@ public class Scene extends SceneDescription {
 
 			loadedChunks.add(cp);
 
-			world.getChunk(cp).getBlockData(blocks, data, biomes);
+			Collection<CompoundTag> tileEnts = new LinkedList<CompoundTag>();
+			Collection<CompoundTag> ents = new LinkedList<CompoundTag>();
+			world.getChunk(cp).getBlockData(blocks, data, biomes, tileEnts, ents);
 			nchunks += 1;
 
 			int wx0 = cp.x*16;
@@ -641,6 +656,20 @@ public class Scene extends SceneDescription {
 					int wx = cx + wx0;
 					int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(cx, cz)];
 					biomeIdMap.set(biomeId, wx, wz);
+				}
+			}
+
+			// load entities
+			for (CompoundTag tag: ents) {
+				if (tag.get("id").stringValue("").equals("Painting")) {
+					ListTag pos = (ListTag) tag.get("Pos");
+					double x = pos.getItem(0).doubleValue();
+					double y = pos.getItem(1).doubleValue();
+					double z = pos.getItem(2).doubleValue();
+					ListTag rot = (ListTag) tag.get("Rotation");
+					double yaw = rot.getItem(0).floatValue();
+					//double pitch = rot.getItem(1).floatValue();
+					entities.add(new PaintingEntity(new Vector3d(x, y, z), tag.get("Motive").stringValue(), yaw));
 				}
 			}
 
@@ -674,6 +703,10 @@ public class Scene extends SceneDescription {
 						int type = block.id;
 						// store metadata
 						switch (block.id) {
+						case Block.WALLSIGN_ID:
+						case Block.SIGNPOST_ID:
+							// treated as entities
+							continue;
 						case Block.VINES_ID:
 							if (cy < 255) {
 								// is this the top vine block?
@@ -858,6 +891,11 @@ public class Scene extends SceneDescription {
 				}
 			}
 		});
+
+		Vector3d worldOffset = new Vector3d(-origin.x, -origin.y, -origin.z);
+		for (Entity ent: entities) {
+			primitives.addAll(ent.primitives(worldOffset));
+		}
 
 		bvh = new BVH(primitives);
 
