@@ -588,7 +588,6 @@ public class Scene extends SceneDescription {
 		// create new octree to fit all chunks
 		worldOctree = new Octree(requiredDepth);
 
-		// TODO update
 		if (waterHeight > 0) {
 			for (int x = 0; x < (1<<worldOctree.depth); ++x) {
 				for (int z = 0; z < (1<<worldOctree.depth); ++z) {
@@ -613,10 +612,6 @@ public class Scene extends SceneDescription {
 		for (ChunkPosition region: regions) {
 			world.getRegion(region).parse();
 		}
-
-		task = "Loading entities";
-		progressListener.setProgress(task, 0, 0, 1);
-		progressListener.setProgress(task, 1, 0, 1);
 
 		int ycutoff = PersistentSettings.getYCutoff();
 		ycutoff = Math.max(0, ycutoff);
