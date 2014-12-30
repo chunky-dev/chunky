@@ -18,6 +18,8 @@ package se.llbit.chunky.world.entity;
 
 import java.util.Collection;
 
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonValue;
 import se.llbit.math.Vector3d;
 import se.llbit.math.primitive.Primitive;
 
@@ -29,4 +31,23 @@ abstract public class Entity {
 	}
 
 	abstract public Collection<Primitive> primitives(Vector3d offset);
+
+	/**
+	 * Serialize the entity to JSON
+	 * @return JSON object representing this entity
+	 */
+	abstract public JsonValue toJson();
+
+	/**
+	 * Deserialize entity from JSON
+	 * @param json
+	 * @return deserialized entity, or {@code null} if it was not a valid entity
+	 */
+	public static Entity fromJson(JsonObject json) {
+		String kind = json.get("kind").stringValue("");
+		if (kind.equals("painting")) {
+			return PaintingEntity.fromJson(json);
+		}
+		return null;
+	}
 }

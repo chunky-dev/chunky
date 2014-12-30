@@ -57,6 +57,9 @@ import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
 import se.llbit.chunky.world.entity.Entity;
 import se.llbit.chunky.world.entity.PaintingEntity;
+import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.math.BVH;
 import se.llbit.math.Color;
@@ -703,10 +706,6 @@ public class Scene extends SceneDescription {
 						int type = block.id;
 						// store metadata
 						switch (block.id) {
-						case Block.WALLSIGN_ID:
-						case Block.SIGNPOST_ID:
-							// treated as entities
-							continue;
 						case Block.VINES_ID:
 							if (cy < 255) {
 								// is this the top vine block?
@@ -2216,6 +2215,32 @@ public class Scene extends SceneDescription {
 		if (value != useCustomWaterColor) {
 			useCustomWaterColor = value;
 			refresh();
+		}
+	}
+
+	@Override
+	public synchronized JsonObject toJson() {
+		JsonObject obj = super.toJson();
+		JsonArray entityArray = new JsonArray();
+		for (Entity entity: entities) {
+			entityArray.add(entity.toJson());
+		}
+		if (entityArray.getNumElement() > 0) {
+			obj.add("entities", entityArray);
+		}
+		return obj;
+	}
+
+	@Override
+	public synchronized void fromJson(JsonObject desc) {
+		super.fromJson(desc);
+
+		entities = new LinkedList<Entity>();
+		for (JsonValue element: desc.get("entities").array().getElementList()) {
+			Entity entity = Entity.fromJson(element.object());
+			if (entity != null) {
+				entities.add(entity);
+			}
 		}
 	}
 }

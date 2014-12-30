@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import se.llbit.chunky.world.material.PaintingMaterial;
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonValue;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Transform;
@@ -119,5 +121,28 @@ public class PaintingEntity extends Entity {
 		}
 
 		return primitives;
+	}
+
+	@Override
+	public JsonValue toJson() {
+		JsonObject json = new JsonObject();
+		json.add("kind", "painting");
+		json.add("position", position.toJson());
+		json.add("art", art);
+		json.add("angle", angle);
+		return json;
+	}
+
+	/**
+	 * Deserialize entity from JSON
+	 * @param json
+	 * @return deserialized entity, or {@code null} if it was not a valid entity
+	 */
+	public static Entity fromJson(JsonObject json) {
+		Vector3d position = new Vector3d();
+		position.fromJson(json.get("position").object());
+		String art = json.get("art").stringValue("");
+		double angle = json.get("angle").doubleValue(0.0);
+		return new PaintingEntity(position, art, angle);
 	}
 }

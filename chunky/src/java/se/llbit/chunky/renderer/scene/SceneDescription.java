@@ -49,7 +49,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	/**
 	 * The current Scene Description Format (SDF) version
 	 */
-	public static final int SDF_VERSION = 4;
+	public static final int SDF_VERSION = 5;
 
 	public int sdfVersion = -1;
 	public String name = "default";
