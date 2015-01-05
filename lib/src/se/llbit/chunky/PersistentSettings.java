@@ -302,5 +302,14 @@ public final class PersistentSettings {
 	public static double getWaterColorBlue() {
 		return settings.getDouble("waterColorBlue", DEFAULT_WATER_BLUE);
 	}
+
+	public static void setSingleColorTextures(boolean value) {
+		settings.setBool("singleColorTextures", value);
+		save();
+	}
+
+	public static boolean getSingleColorTextures() {
+		return settings.getBool("singleColorTextures", false);
+	}
 }
 

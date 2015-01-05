@@ -347,18 +347,26 @@ public class Controls extends JPanel {
 			}
 		});
 
-		JCheckBox showLauncher = new JCheckBox("Show launcher when starting Chunky");
+		final JCheckBox showLauncher = new JCheckBox("Show launcher when starting Chunky");
 		LauncherSettings settings = new LauncherSettings();
 		settings.load();
 		showLauncher.setSelected(settings.showLauncher);
 		showLauncher.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JCheckBox source = (JCheckBox) e.getSource();
 				LauncherSettings settings = new LauncherSettings();
 				settings.load();
-				settings.showLauncher = source.isSelected();
+				settings.showLauncher = showLauncher.isSelected();
 				settings.save();
+			}
+		});
+
+		final JCheckBox singleColorTextures = new JCheckBox("Single color textures (needs restart)");
+		singleColorTextures.setSelected(PersistentSettings.getSingleColorTextures());
+		singleColorTextures.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				PersistentSettings.setSingleColorTextures(singleColorTextures.isSelected());
 			}
 		});
 
@@ -370,6 +378,7 @@ public class Controls extends JPanel {
 				.addGroup(layout.createParallelGroup()
 					.addComponent(loadTexturePackBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
 					.addComponent(loadDefaultTexturesBtn, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
+					.addComponent(singleColorTextures)
 					.addComponent(showLauncher)
 				)
 				.addContainerGap()
@@ -381,6 +390,8 @@ public class Controls extends JPanel {
 			.addComponent(loadTexturePackBtn)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addComponent(loadDefaultTexturesBtn)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(singleColorTextures)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(showLauncher)
 			.addContainerGap())

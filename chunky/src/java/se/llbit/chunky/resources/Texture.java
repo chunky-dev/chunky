@@ -24,6 +24,7 @@ import javax.swing.ImageIcon;
 
 import org.apache.commons.math3.util.FastMath;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.math.Color;
 import se.llbit.math.QuickMath;
@@ -559,6 +560,24 @@ public class Texture {
 				avgColorLinear[1] += linear[index][3] * linear[index][1];
 				avgColorLinear[2] += linear[index][3] * linear[index][2];
 				avgColorLinear[3] += linear[index][3];
+			}
+		}
+
+		if (PersistentSettings.getSingleColorTextures()) {
+			float[] avgColorFlat = { 0, 0, 0 };
+			if (avgColorLinear[3] > 0.001) {
+				avgColorFlat[0] = avgColorLinear[0] / avgColorLinear[3];
+				avgColorFlat[1] = avgColorLinear[1] / avgColorLinear[3];
+				avgColorFlat[2] = avgColorLinear[2] / avgColorLinear[3];
+			}
+			for (int y = 0; y < height; ++y) {
+				for (int x = 0; x < width; ++x) {
+					int index =  width*y + x;
+					linear[index][0] = avgColorFlat[0];
+					linear[index][1] = avgColorFlat[1];
+					linear[index][2] = avgColorFlat[2];
+					linear[index][3] = 1;
+				}
 			}
 		}
 
