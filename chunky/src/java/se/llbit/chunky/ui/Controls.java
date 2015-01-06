@@ -1160,12 +1160,14 @@ public class Controls extends JPanel {
 	public void stopMapTracking() {
 		if (followPlayer.isSelected()) {
 			followPlayer.removeActionListener(followPlayerListener);
-			followCamera.removeActionListener(followCameraListener);
 			followPlayer.setSelected(false);
-			followCamera.setSelected(false);
 			PersistentSettings.setFollowPlayer(false);
-			PersistentSettings.setFollowCamera(false);
 			followPlayer.addActionListener(followPlayerListener);
+		}
+		if (followCamera.isSelected()) {
+			followCamera.removeActionListener(followCameraListener);
+			followCamera.setSelected(false);
+			PersistentSettings.setFollowCamera(false);
 			followCamera.addActionListener(followCameraListener);
 		}
 	}

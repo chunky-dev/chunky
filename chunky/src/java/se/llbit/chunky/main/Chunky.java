@@ -967,4 +967,10 @@ public class Chunky implements ChunkTopographyListener {
 	public RenderControls getRenderControls() {
 		return renderControls;
 	}
+
+	public void moveCameraTo(double x, double z) {
+		if (renderControls != null) {
+			renderControls.moveCameraTo(x, z);
+		}
+	}
 }

@@ -3061,4 +3061,12 @@ public class RenderControls extends JDialog implements ViewListener,
 		Vector3d pos = renderMan.scene().camera().getPosition();
 		chunky.setView(pos.x / 16.0, pos.z / 16.0);
 	}
+
+	public void moveCameraTo(double x, double z) {
+		Vector3d pos = new Vector3d(renderMan.scene().camera().getPosition());
+		pos.x = x;
+		pos.z = z;
+		renderMan.scene().camera().setPosition(pos);
+		updateCameraPosition();
+	}
 }

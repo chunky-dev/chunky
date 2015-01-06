@@ -84,6 +84,10 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	private volatile ChunkPosition start = ChunkPosition.get(0, 0);
 	private volatile ChunkPosition end = ChunkPosition.get(0, 0);
 
+	public int lastX;
+
+	public int lastY;
+
 	/**
 	 * Mouse listener for the chunk map UI element.
 	 */
@@ -144,6 +148,8 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON3) {
+				lastX = e.getX();
+				lastY = e.getY();
 				contextMenu.show((Component) e.getSource(), e.getX(), e.getY());
 			} else {
 				setMotionOrigin(e);
@@ -286,10 +292,22 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 				chunky.clearSelectedChunks();
 			}
 		});
+		JMenuItem moveCameraHere = new JMenuItem("Move camera here");
+		moveCameraHere.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ChunkView theView = view;
+				double scale = theView.scale;
+				double x = theView.x + (lastX - getWidth()/2) / scale;
+				double z = theView.z + (lastY - getHeight()/2) / scale;
+				chunky.moveCameraTo(x*16, z*16);
+			}
+		});
 		contextMenu.add(createScene);
 		contextMenu.add(loadScene);
 		contextMenu.addSeparator();
 		contextMenu.add(clearSelection);
+		contextMenu.add(moveCameraHere);
 
 		setView(chunky.getMapView());
 		mapBuffer = new MapBuffer(view);
