@@ -294,7 +294,7 @@ public class Chunky implements ChunkTopographyListener {
 			getControls().openWorldSelector();
 		} else {
 			setView(0, 0);
-			goToPlayer();
+			panToPlayer();
 		}
 
 	}
@@ -335,7 +335,7 @@ public class Chunky implements ChunkTopographyListener {
 		world.setDimension(currentDimension);
 
 		setView(0, 0);
-		goToPlayer();
+		panToPlayer();
 
 		PersistentSettings.setLastWorld(world.getWorldDirectory());
 
@@ -834,7 +834,7 @@ public class Chunky implements ChunkTopographyListener {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					getControls().stopFollowingPlayer();
+					getControls().stopMapTracking();
 				}
 			});
 		}
@@ -950,11 +950,21 @@ public class Chunky implements ChunkTopographyListener {
 		topographyUpdater.addChunk(chunk);
 	}
 
-	public void goToPlayer() {
+	public void panToPlayer() {
 		Vector3d pos = world.playerPos();
 		if (pos != null) {
 			setView(pos.x / 16.0,
 					pos.z / 16.0);
 		}
+	}
+
+	public void panToCamera() {
+		if (renderControls != null) {
+			renderControls.panToCamera();
+		}
+	}
+
+	public RenderControls getRenderControls() {
+		return renderControls;
 	}
 }

@@ -231,6 +231,15 @@ public final class PersistentSettings {
 		save();
 	}
 
+	public static boolean getFollowCamera() {
+		return settings.getBool("followCamera", false);
+	}
+
+	public static void setFollowCamera(boolean value) {
+		settings.setBool("followCamera", value);
+		save();
+	}
+
 	public static void setStillWater(boolean value) {
 		settings.setBool("stillWater", value);
 		save();

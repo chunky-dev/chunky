@@ -21,6 +21,7 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FileDialog;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -92,12 +93,14 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 import se.llbit.ui.Adjuster;
@@ -2514,6 +2517,11 @@ public class RenderControls extends JDialog implements ViewListener,
 		cameraX.addActionListener(cameraPositionListener);
 		cameraY.addActionListener(cameraPositionListener);
 		cameraZ.addActionListener(cameraPositionListener);
+
+		if (PersistentSettings.getFollowCamera()) {
+			panToCamera();
+		}
+		onCameraStateChange();
 	}
 
 	protected void updateCameraDirection() {
@@ -2532,6 +2540,12 @@ public class RenderControls extends JDialog implements ViewListener,
 		cameraRoll.addActionListener(cameraDirectionListener);
 		cameraPitch.addActionListener(cameraDirectionListener);
 		cameraYaw.addActionListener(cameraDirectionListener);
+
+		onCameraStateChange();
+	}
+
+	private void onCameraStateChange() {
+		chunky.getMap().repaint();
 	}
 
 	/**
@@ -2876,6 +2890,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		}
 	}
+
 	static class SkymapTextureLoader implements ActionListener {
 		private final RenderManager renderMan;
 		private static String defaultDirectory = System.getProperty("user.dir");
@@ -2981,5 +2996,69 @@ public class RenderControls extends JDialog implements ViewListener,
 				}
 			}
 		});
+	}
+
+	public void drawViewBounds(Graphics g, ChunkView cv) {
+		Camera camera = renderMan.scene().camera();
+		int width = renderMan.scene().canvasWidth();
+		int height = renderMan.scene().canvasHeight();
+
+		double halfWidth = width/(2.0*height);
+
+		Ray ray = new Ray();
+
+		int[] corners = { -1, -1, -1, -1, -1, -1, -1, -1 };
+
+		camera.calcViewRay(ray, -halfWidth, -0.5);
+		findMapPos(corners, 0, 1, ray, cv);
+
+		camera.calcViewRay(ray, -halfWidth, 0.5);
+		findMapPos(corners, 2, 3, ray, cv);
+
+		camera.calcViewRay(ray, halfWidth, 0.5);
+		findMapPos(corners, 4, 5, ray, cv);
+
+		camera.calcViewRay(ray, halfWidth, -0.5);
+		findMapPos(corners, 6, 7, ray, cv);
+
+		g.setColor(Color.YELLOW);
+		g.drawLine(corners[0], corners[1], corners[2], corners[3]);
+		g.drawLine(corners[2], corners[3], corners[4], corners[5]);
+		g.drawLine(corners[4], corners[5], corners[6], corners[7]);
+		g.drawLine(corners[6], corners[7], corners[0], corners[1]);
+
+		int ox = (int) (cv.scale * (ray.o.x/16 - cv.x0));
+		int oy = (int) (cv.scale * (ray.o.z/16 - cv.z0));
+		g.drawLine(ox-5, oy, ox+5, oy);
+		g.drawLine(ox, oy-5, ox, oy+5);
+	}
+
+	private void findMapPos(int[] corners, int i, int j, Ray ray, ChunkView cv) {
+		if (ray.d.y < 0 && ray.o.y > 63 || ray.d.y > 0 && ray.o.y < 63) {
+			double d = (63 - ray.o.y) / ray.d.y;
+			Vector3d pos = new Vector3d();
+			pos.scaleAdd(d, ray.d, ray.o);
+
+			corners[i] = (int) (cv.scale * (pos.x/16 - cv.x0));
+			corners[j] = (int) (cv.scale * (pos.z/16 - cv.z0));
+		} else {
+			double r = ray.d.x*ray.d.x + ray.d.z* ray.d.z;
+			if (r > Ray.EPSILON) {
+				double cvw = cv.x1-cv.x0;
+				double cvh = cv.z1-cv.z0;
+				Vector3d o = new Vector3d(ray.o);
+				o.x /= 16;
+				o.z /= 16;
+				o.scaleAdd(Math.sqrt(cvw*cvw + cvh*cvh) / Math.sqrt(r), ray.d);
+				corners[i] = (int) (cv.scale * (o.x - cv.x0));
+				corners[j] = (int) (cv.scale * (o.z - cv.z0));
+			}
+		}
+
+	}
+
+	public void panToCamera() {
+		Vector3d pos = renderMan.scene().camera().getPosition();
+		chunky.setView(pos.x / 16.0, pos.z / 16.0);
 	}
 }

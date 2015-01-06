@@ -48,7 +48,7 @@ public class RegionChangeMonitor extends Thread {
 						}
 					});
 					if (PersistentSettings.getFollowPlayer()) {
-						chunky.goToPlayer();
+						chunky.panToPlayer();
 					}
 					chunky.getMap().repaint();
 					chunky.getMinimap().repaint();

@@ -38,6 +38,7 @@ import javax.swing.JPopupMenu;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.MapBuffer;
+import se.llbit.chunky.renderer.ui.RenderControls;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
@@ -313,7 +314,15 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			mapBuffer.renderBuffered(g);
 			chunky.getWorldRenderer().renderHUD(world, chunky, g, mapBuffer);
 			drawSelectionRect(g);
+			drawViewBounds(g);
 		}
+		}
+	}
+
+	private void drawViewBounds(Graphics g) {
+		RenderControls controls = chunky.getRenderControls();
+		if (controls != null) {
+			controls.drawViewBounds(g, view);
 		}
 	}
 
@@ -362,7 +371,6 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			z0 = (int) (cv.scale * (z0 - cv.z0));
 			x1 = (int) (cv.scale * (x1 - cv.x0 + 1));
 			z1 = (int) (cv.scale * (z1 - cv.z0 + 1));
-			g.setColor(Color.red);
 			g.drawRect(x0, z0, x1-x0, z1-z0);
 		} else {
 			// test if hovered chunk is visible

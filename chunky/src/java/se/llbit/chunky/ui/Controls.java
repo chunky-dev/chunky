@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -101,6 +101,7 @@ public class Controls extends JPanel {
 	private JRadioButton netherBtn;
 	private JRadioButton endBtn;
 	private final JCheckBox followPlayer = new JCheckBox("follow player");
+	private final JCheckBox followCamera = new JCheckBox("follow camera");
 
 	private WorldSelector worldSelector = null;
 
@@ -625,6 +626,9 @@ public class Controls extends JPanel {
 		followPlayer.setSelected(PersistentSettings.getFollowPlayer());
 		followPlayer.addActionListener(followPlayerListener);
 
+		followCamera.setSelected(PersistentSettings.getFollowCamera());
+		followCamera.addActionListener(followCameraListener);
+
 		ButtonGroup buttonGroup2 = new ButtonGroup();
 		overworldBtn = new JRadioButton();
 		netherBtn = new JRadioButton();
@@ -802,6 +806,8 @@ public class Controls extends JPanel {
 						.addComponent(zField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addPreferredGap(ComponentPlacement.UNRELATED)
 						.addComponent(followPlayer)
+						.addPreferredGap(ComponentPlacement.UNRELATED)
+						.addComponent(followCamera)
 					)
 				)
 				.addContainerGap()
@@ -856,6 +862,7 @@ public class Controls extends JPanel {
 					.addComponent(zLbl)
 					.addComponent(zField)
 					.addComponent(followPlayer)
+					.addComponent(followCamera)
 				)
 				.addContainerGap()
 			)
@@ -1116,7 +1123,7 @@ public class Controls extends JPanel {
 				int x = Integer.parseInt(xField.getText());
 				int z = Integer.parseInt(zField.getText());
 				chunky.setView(x/16.0, z/16.0);
-				stopFollowingPlayer();
+				stopMapTracking();
 			} catch (NumberFormatException e1) {
 			}
 		}
@@ -1125,21 +1132,41 @@ public class Controls extends JPanel {
 	final ActionListener followPlayerListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JCheckBox source = (JCheckBox) e.getSource();
-			boolean follow = source.isSelected();
+			boolean follow = followPlayer.isSelected();
 			PersistentSettings.setFollowPlayer(follow);
 			if (follow) {
-				chunky.goToPlayer();
+				if (followCamera.isSelected()) {
+					followCamera.setSelected(false);
+				}
+				chunky.panToPlayer();
 			}
 		}
 	};
 
-	public void stopFollowingPlayer() {
+	final ActionListener followCameraListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			boolean follow = followCamera.isSelected();
+			PersistentSettings.setFollowCamera(follow);
+			if (follow) {
+				if (followPlayer.isSelected()) {
+					followPlayer.setSelected(false);
+				}
+				chunky.panToCamera();
+			}
+		}
+	};
+
+	public void stopMapTracking() {
 		if (followPlayer.isSelected()) {
 			followPlayer.removeActionListener(followPlayerListener);
+			followCamera.removeActionListener(followCameraListener);
 			followPlayer.setSelected(false);
+			followCamera.setSelected(false);
 			PersistentSettings.setFollowPlayer(false);
+			PersistentSettings.setFollowCamera(false);
 			followPlayer.addActionListener(followPlayerListener);
+			followCamera.addActionListener(followCameraListener);
 		}
 	}
 }
