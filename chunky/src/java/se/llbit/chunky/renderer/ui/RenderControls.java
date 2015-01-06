@@ -2829,6 +2829,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			renderMan.scene().camera().setFoV(newValue);
 		}
 		fov.update();
+
+		onCameraStateChange();
 	}
 
 	/**
