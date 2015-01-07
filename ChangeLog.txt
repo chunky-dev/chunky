@@ -1,4 +1,7 @@
 1.3.5 - TBD
+    * Added scroll bars to the render preview when the window is too small to
+      fit the entire image
+    * The render preview window no longer stretches the image to fit the window
     * Added "Move camera here" item in the map context menu
     * Added "follow camera" option to the Map View tab of the main window
     * Added camera field of view indicator in the 2D map

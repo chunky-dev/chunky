@@ -2020,7 +2020,7 @@ public class Scene extends SceneDescription {
 	 * @param canvasHeight The canvas height
 	 */
 	public synchronized void drawBufferedImage(Graphics g, int canvasWidth, int canvasHeight) {
-		g.drawImage(buffer, 0, 0, canvasWidth, canvasHeight, null);
+		g.drawImage(buffer, 0, 0, null);
 	}
 
 	/**

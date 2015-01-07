@@ -40,6 +40,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
 import se.llbit.chunky.renderer.Renderer;
@@ -76,7 +77,7 @@ public class Chunk3DView extends JDialog {
 
 		canvas = new RenderCanvas();
 
-		setContentPane(canvas);
+		setContentPane(new JScrollPane(canvas));
 
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		setModalityType(ModalityType.MODELESS);
