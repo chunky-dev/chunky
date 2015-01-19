@@ -16,7 +16,7 @@
 /bench/x*
 /test
 
-# releasebot cache directory
+# releng
 /lpcache
 /bin
 /latest.json
@@ -32,3 +32,6 @@
 
 # Render snapshots from testing
 /*.png
+
+# personal files
+/TODO
