@@ -3019,6 +3019,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		findMapPos(corners, 6, 7, ray, cv);
 
 		g.setColor(Color.YELLOW);
+
 		g.drawLine(corners[0], corners[1], corners[2], corners[3]);
 		g.drawLine(corners[2], corners[3], corners[4], corners[5]);
 		g.drawLine(corners[4], corners[5], corners[6], corners[7]);
@@ -3028,6 +3029,16 @@ public class RenderControls extends JDialog implements ViewListener,
 		int oy = (int) (cv.scale * (ray.o.z/16 - cv.z0));
 		g.drawLine(ox-5, oy, ox+5, oy);
 		g.drawLine(ox, oy-5, ox, oy+5);
+
+		camera.calcViewRay(ray, 0, 0);
+		Vector3d o = new Vector3d(ray.o);
+		o.x /= 16;
+		o.z /= 16;
+		o.scaleAdd(1, ray.d);
+		int x = (int) (cv.scale * (o.x - cv.x0));
+		int y = (int) (cv.scale * (o.z - cv.z0));
+		g.drawLine(ox, oy, x, y);
+
 	}
 
 	private void findMapPos(int[] corners, int i, int j, Ray ray, ChunkView cv) {
