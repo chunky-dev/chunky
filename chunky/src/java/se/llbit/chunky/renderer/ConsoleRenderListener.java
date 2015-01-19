@@ -115,7 +115,7 @@ public class ConsoleRenderListener implements RenderStatusListener {
 	}
 
 	@Override
-	public void renderStateChanged(boolean pathTrace, boolean paused) {
+	public void renderStateChanged(RenderState state) {
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class ConsoleRenderListener implements RenderStatusListener {
 	}
 
 	@Override
-	public void renderResetPrevented() {
+	public void renderResetRequested() {
 		System.out.println("Render reset prevented!");
 	}
 }

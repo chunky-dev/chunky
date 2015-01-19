@@ -78,10 +78,15 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 	private final Object bufferMonitor = new Object();
 
+	/**
+	 * Selects if render threads shut down after reaching the target SPP.
+	 */
 	private final boolean oneshot;
 
-	private boolean pathTracing = false;
-	private boolean paused = true;
+	/**
+	 * Current renderer state/mode.
+	 */
+	private RenderState state = RenderState.PREVIEW;
 
 	/**
 	 * Constructor
@@ -149,25 +154,42 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 			while (!isInterrupted()) {
 
+				// PAUSED/PREVIEW/FINISHED
+
 				boolean refreshed = mutableScene.waitOnRefreshOrStateChange();
+
+				// RESUME/EDIT
 
 				synchronized (bufferMonitor) {
 					synchronized (mutableScene) {
 						updateRenderState();
-						bufferedScene.copyRenderState(mutableScene);
-						if (refreshed && !mutableScene.shouldReset() &&
+						if (refreshed) {
+							if (!mutableScene.shouldReset() &&
 								bufferedScene.renderTime > SCENE_EDIT_GRACE_PERIOD) {
-							renderListener.renderResetPrevented();
+								renderListener.renderResetRequested();
+							} else {
+								bufferedScene.set(mutableScene);
+							}
 						} else {
-							bufferedScene.set(mutableScene);
+							bufferedScene.copyTransients(mutableScene);
 						}
 					}
 				}
 
-				if (bufferedScene.pathTrace()) {
-					pathTraceLoop();
-				} else {
+				if (state == RenderState.PREVIEW) {
+					// PREVIEW
 					previewLoop();
+				} else {
+					if (bufferedScene.spp < bufferedScene.getTargetSPP()) {
+						updateRenderProgress();
+
+						// RENDERING
+						pathTraceLoop();
+					} else {
+						// PAUSED
+						mutableScene.pauseRender();
+						updateRenderState();
+					}
 				}
 
 				if (oneshot) {
@@ -184,26 +206,17 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	}
 
 	private void updateRenderState() {
-		if (pathTracing != mutableScene.pathTrace() || paused != mutableScene.isPaused()) {
-			pathTracing = mutableScene.pathTrace();
-			paused = mutableScene.isPaused();
-			renderListener.renderStateChanged(pathTracing, paused);
+		if (state != mutableScene.getRenderState()) {
+			state = mutableScene.getRenderState();
+			renderListener.renderStateChanged(state);
 		}
 	}
 
 	private void pathTraceLoop() throws InterruptedException {
-		// enable JIT for the first frame
-		java.lang.Compiler.enable();
-
 		while (true) {
 
-			if (mutableScene.isPaused()) {
-				updateRenderState();
-				mutableScene.pauseWait();
-				updateRenderState();
-			}
-
-			if (mutableScene.shouldRefresh()) {
+			updateRenderState();
+			if (state == RenderState.PAUSED || mutableScene.shouldRefresh()) {
 				return;
 			}
 
@@ -218,32 +231,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			// repaint canvas
 			canvas.repaint();
 
-			// disable JIT for subsequent frames
-			java.lang.Compiler.disable();
-
-			bufferedScene.spp += RenderConstants.SPP_PASS;
-
-			int canvasWidth = bufferedScene.canvasWidth();
-			int canvasHeight = bufferedScene.canvasHeight();
-			long pixelsPerFrame = canvasWidth * canvasHeight;
-			double samplesPerSecond = (bufferedScene.spp * pixelsPerFrame) /
-					(bufferedScene.renderTime / 1000.0);
-
-			// Update render status display
-			renderListener.setRenderTime(bufferedScene.renderTime);
-			renderListener.setSamplesPerSecond((int) samplesPerSecond);
-			renderListener.setSPP(bufferedScene.spp);
-
-			// Notify progress listener
-			int target = bufferedScene.getTargetSPP();
-			long etaSeconds = (long) (((target-bufferedScene.spp) *
-					pixelsPerFrame) / samplesPerSecond);
-			int seconds = (int) ((etaSeconds) % 60);
-			int minutes = (int) ((etaSeconds / 60) % 60);
-			int hours = (int) (etaSeconds / 3600);
-			String eta = String.format("%d:%02d:%02d", hours, minutes, seconds);
-			renderListener.setProgress("Rendering", bufferedScene.spp,
-					0, target, eta);
+			bufferedScene.spp += RenderConstants.SPP_PER_PASS;
 
 			if (dumpNextFrame) {
 				// save the current frame
@@ -254,22 +242,51 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 				// save scene description and render dump
 				saveScene();
-				renderListener.setProgress("Rendering", bufferedScene.spp,
-						0, target, eta);
 			}
+
+			updateRenderProgress();
 
 			if (bufferedScene.spp >= bufferedScene.getTargetSPP()) {
-				mutableScene.pauseRender();
-				renderListener.renderStateChanged(mutableScene.pathTrace(), mutableScene.isPaused());
-				renderListener.renderJobFinished(bufferedScene.renderTime,
-						(int) samplesPerSecond);
-				if (oneshot) {
-					return;
-				}
+				renderListener.renderJobFinished(bufferedScene.renderTime, samplesPerSecond());
+				return;
 			}
 		}
+	}
 
+	/**
+	 * @return the current rendering speed in samples per second (SPS)
+	 */
+	private int samplesPerSecond() {
+		int canvasWidth = bufferedScene.canvasWidth();
+		int canvasHeight = bufferedScene.canvasHeight();
+		long pixelsPerFrame = canvasWidth * canvasHeight;
+		double renderTime = bufferedScene.renderTime / 1000.0;
+		return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
+	}
 
+	private void updateRenderProgress() {
+		double renderTime = bufferedScene.renderTime / 1000.0;
+
+		// Notify progress listener
+		int target = mutableScene.getTargetSPP();
+		long etaSeconds = (long) (((target-bufferedScene.spp) * renderTime) / bufferedScene.spp);
+		if (etaSeconds > 0) {
+			int seconds = (int) ((etaSeconds) % 60);
+			int minutes = (int) ((etaSeconds / 60) % 60);
+			int hours = (int) (etaSeconds / 3600);
+			String eta = String.format("%d:%02d:%02d", hours, minutes, seconds);
+			renderListener.setProgress("Rendering", bufferedScene.spp,
+					0, target, eta);
+		} else {
+			renderListener.setProgress("Rendering", bufferedScene.spp, 0, target);
+		}
+
+		synchronized (this) {
+			// Update render status display
+			renderListener.setRenderTime(bufferedScene.renderTime);
+			renderListener.setSamplesPerSecond((int) samplesPerSecond());
+			renderListener.setSPP(bufferedScene.spp);
+		}
 	}
 
 	private void previewLoop() throws InterruptedException {
@@ -340,7 +357,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 	private synchronized void giveTickets() {
 		bufferedScene.copyTransients(mutableScene);
-		int nextSpp = bufferedScene.spp + RenderConstants.SPP_PASS;
+		int nextSpp = bufferedScene.spp + RenderConstants.SPP_PER_PASS;
 		dumpNextFrame = nextSpp >= bufferedScene.getTargetSPP() ||
 				bufferedScene.shouldSaveDumps() &&
 				(nextSpp % bufferedScene.getDumpFrequency() == 0);
@@ -447,7 +464,6 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			synchronized (mutableScene) {
 				// synchronized to ensure that refresh flag is never visibly true
 				mutableScene.set(bufferedScene);
-				mutableScene.copyRenderState(bufferedScene);
 				mutableScene.copyTransients(bufferedScene);
 				mutableScene.setRefreshed();
 			}
@@ -455,7 +471,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			canvas.repaint();
 
 			renderListener.sceneLoaded();
-			renderListener.renderStateChanged(mutableScene.pathTrace(), mutableScene.isPaused());
+			renderListener.renderStateChanged(mutableScene.getRenderState());
 		}
 	}
 
@@ -521,8 +537,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			updateBuffer = flag;
 			if (flag) {
 				synchronized (mutableScene) {
-					if (!mutableScene.pathTrace())
+					if (mutableScene.getRenderState() == RenderState.PREVIEW) {
 						mutableScene.refresh();
+					}
 				}
 				Log.info("buffer finalization enabled");
 			} else {
@@ -608,5 +625,14 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			mutableScene.set(bufferedScene);
 			mutableScene.setRefreshed();// clear refresh flag
 		}
+	}
+
+	public int getCurrentSPP() {
+		return bufferedScene.spp;
+	}
+
+	public void setTargetSPP(int target) {
+		mutableScene.setTargetSPP(target);
+		updateRenderProgress();
 	}
 }

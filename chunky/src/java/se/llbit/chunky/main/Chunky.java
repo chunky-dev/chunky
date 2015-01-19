@@ -215,7 +215,7 @@ public class Chunky implements ChunkTopographyListener {
 			if (options.target != -1) {
 				renderManager.scene().setTargetSPP(options.target);
 			}
-			renderManager.scene().goHeadless();
+			renderManager.scene().startHeadlessRender();
 
 			renderManager.start();
 			return 0;

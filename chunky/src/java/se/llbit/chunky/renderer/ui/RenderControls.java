@@ -80,6 +80,7 @@ import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.RenderState;
 import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Camera;
@@ -176,7 +177,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JComboBox dumpFrequencyCB = new JComboBox();
 	private final JCheckBox saveSnapshotsCB = new JCheckBox("Save snapshot for each dump");
 	private final JLabel dumpFrequencyLbl = new JLabel(" frames");
-	private final JTextField sppTargetField = new JTextField();
 	private final JTextField cameraX = new JTextField();
 	private final JTextField cameraY = new JTextField();
 	private final JTextField cameraZ = new JTextField();
@@ -202,6 +202,30 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void update() {
 			set(renderMan.scene().sky().getHorizonOffset());
+		}
+	};
+
+	private final Adjuster targetSPP = new Adjuster(
+			"Target SPP",
+			"The target Samples Per Pixel",
+			100, 100000) {
+
+		{
+			setClampMax(false);
+			setClampMin(false);
+			setLogarithmicMode();
+		}
+
+		@Override
+		public void valueChanged(double newValue) {
+			int value = (int) newValue;
+			renderMan.setTargetSPP(value);
+			startRenderBtn.setEnabled(renderMan.getCurrentSPP() < value);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().getTargetSPP());
 		}
 	};
 
@@ -591,7 +615,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		JLabel sppTargetLbl = new JLabel("SPP Target: ");
 		sppTargetLbl.setToolTipText("The render will be paused at this SPP count");
 
-		JButton setDefaultBtn = new JButton("Set Default");
+		JButton setDefaultBtn = new JButton("Make Default");
 		setDefaultBtn.setToolTipText("Make the current SPP target the default");
 		setDefaultBtn.addActionListener(new ActionListener() {
 			@Override
@@ -600,10 +624,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			}
 		});
 
-		sppTargetField.setColumns(10);
-		sppTargetField.getDocument().addDocumentListener(sppTargetListener);
-
-		updateSPPTargetField();
+		targetSPP.update();
 
 		JLabel renderLbl = new JLabel("Render: ");
 
@@ -624,14 +645,16 @@ public class RenderControls extends JDialog implements ViewListener,
 		startRenderBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!renderMan.scene().pathTrace()) {
+				switch (renderMan.scene().getRenderState()) {
+				case PAUSED:
+					renderMan.scene().resumeRender();
+					break;
+				case PREVIEW:
 					renderMan.scene().startRender();
-				} else {
-					if (renderMan.scene().isPaused()) {
-						renderMan.scene().resumeRender();
-					} else {
-						renderMan.scene().pauseRender();
-					}
+					break;
+				case RENDERING:
+					renderMan.scene().pauseRender();
+					break;
 				}
 				stopRenderBtn.setEnabled(true);
 			}
@@ -690,9 +713,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				)
 				.addComponent(tabbedPane)
 				.addGroup(layout.createSequentialGroup()
-					.addComponent(sppTargetLbl)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(sppTargetField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGroup(targetSPP.horizontalGroup(layout))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(setDefaultBtn)
 				)
@@ -731,8 +752,7 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addComponent(tabbedPane)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(sppTargetLbl)
-				.addComponent(sppTargetField)
+				.addGroup(targetSPP.verticalGroup(layout))
 				.addComponent(setDefaultBtn)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -1109,8 +1129,10 @@ public class RenderControls extends JDialog implements ViewListener,
 		openSceneDirBtn.setVisible(Desktop.isDesktopSupported());
 
 		loadSceneBtn.setToolTipText("This replaces the current scene!");
-		JButton setCanvasSizeBtn = new JButton("Set Canvas Size");
+		JButton setCanvasSizeBtn = new JButton("Apply");
+		setCanvasSizeBtn.setToolTipText("Set the canvas size to the value in the field");
 		setCanvasSizeBtn.addActionListener(canvasSizeListener);
+
 		JButton halveCanvasSizeBtn = new JButton("Halve");
 		halveCanvasSizeBtn.setToolTipText("Halve the canvas width and height");
 		halveCanvasSizeBtn.addActionListener(new ActionListener() {
@@ -2093,32 +2115,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
-	private final DocumentListener sppTargetListener = new DocumentListener() {
-		@Override
-		public void removeUpdate(DocumentEvent e) {
-			updateName(e);
-		}
-		@Override
-		public void insertUpdate(DocumentEvent e) {
-			updateName(e);
-		}
-		@Override
-		public void changedUpdate(DocumentEvent e) {
-			updateName(e);
-		}
-		private void updateName(DocumentEvent e) {
-			try {
-				Document d = e.getDocument();
-				String value = d.getText(0, d.getLength());
-				renderMan.scene().setTargetSPP(Integer.parseInt(value));
-				updateTitle();
-			} catch (NumberFormatException e1) {
-			} catch (BadLocationException e1) {
-				e1.printStackTrace();
-			}
-		}
-	};
-
 	private final GradientListener gradientListener = new GradientListener() {
 		@Override
 		public void gradientChanged(List<Vector4d> newGradient) {
@@ -2483,12 +2479,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		sceneNameField.addActionListener(sceneNameActionListener);
 	}
 
-	protected void updateSPPTargetField() {
-		sppTargetField.getDocument().removeDocumentListener(sppTargetListener);
-		sppTargetField.setText("" + renderMan.scene().getTargetSPP());
-		sppTargetField.getDocument().addDocumentListener(sppTargetListener);
-	}
-
 	protected void updatePostprocessCB() {
 		postprocessCB.setSelectedIndex(renderMan.scene().getPostprocess().ordinal());
 	}
@@ -2713,7 +2703,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateSaveDumpsCheckBox();
 		updateSaveSnapshotCheckBox();
 		updateDumpFrequencyField();
-		updateSPPTargetField();
+		targetSPP.update();
 		updateSceneNameField();
 		updatePostprocessCB();
 		cloudSize.update();
@@ -2841,22 +2831,27 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	@Override
-	public void renderStateChanged(boolean pathTrace, boolean paused) {
-		if (pathTrace) {
-			if (paused) {
-				startRenderBtn.setText("RESUME");
-				startRenderBtn.setIcon(Icon.play.imageIcon());
-			} else {
-				startRenderBtn.setText("PAUSE");
-				startRenderBtn.setIcon(Icon.pause.imageIcon());
-			}
+	public void renderStateChanged(RenderState state) {
+		switch (state) {
+		case PAUSED:
+			startRenderBtn.setText("RESUME");
+			startRenderBtn.setIcon(Icon.play.imageIcon());
 			stopRenderBtn.setEnabled(true);
 			stopRenderBtn.setForeground(Color.red);
-		} else {
+			startRenderBtn.setEnabled(renderMan.getCurrentSPP() < renderMan.scene().getTargetSPP());
+			break;
+		case PREVIEW:
 			startRenderBtn.setText("START");
 			startRenderBtn.setIcon(Icon.play.imageIcon());
 			stopRenderBtn.setEnabled(false);
 			stopRenderBtn.setForeground(Color.black);
+			break;
+		case RENDERING:
+				startRenderBtn.setText("PAUSE");
+				startRenderBtn.setIcon(Icon.pause.imageIcon());
+			stopRenderBtn.setEnabled(true);
+			stopRenderBtn.setForeground(Color.red);
+			break;
 		}
 	}
 
@@ -2976,7 +2971,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	protected AtomicBoolean resetConfirmMutex = new AtomicBoolean(false);
 
 	@Override
-	public void renderResetPrevented() {
+	public void renderResetRequested() {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

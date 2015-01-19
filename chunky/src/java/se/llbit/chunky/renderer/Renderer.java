@@ -35,7 +35,7 @@ public interface Renderer {
 	/**
 	 * Set the buffer update flag. The buffer update flag
 	 * decides whether the renderer should update the buffered image.
-	 * @param flag
+	 * @param finalizationEnabled
 	 */
-	public void setBufferFinalization(boolean flag);
+	public void setBufferFinalization(boolean finalizationEnabled);
 }

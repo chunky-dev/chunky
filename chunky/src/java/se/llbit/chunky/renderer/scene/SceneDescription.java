@@ -29,6 +29,7 @@ import org.jastadd.util.PrettyPrinter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.Refreshable;
+import se.llbit.chunky.renderer.RenderState;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -89,9 +90,9 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	protected String worldPath = "";
 	protected int worldDimension = 0;
 
-	protected boolean pathTrace = false;
 	protected boolean refresh = false;
-	protected boolean pauseRender = true;
+
+	protected RenderState renderState = RenderState.PREVIEW;
 
 	protected int dumpFrequency = Scene.DEFAULT_DUMP_FREQUENCY;
 	protected boolean saveSnapshots = false;
@@ -160,7 +161,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		desc.add("spp", spp);
 		desc.add("sppTarget", sppTarget);
 		desc.add("rayDepth", rayDepth);
-		desc.add("pathTrace", pathTrace);
+		desc.add("pathTrace", renderState != RenderState.PREVIEW);
 		desc.add("dumpFrequency", dumpFrequency);
 		desc.add("saveSnapshots", saveSnapshots);
 
@@ -222,7 +223,12 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		postprocess = Postprocess.get(desc.get("postprocess").intValue(Postprocess.DEFAULT));
 		sppTarget = desc.get("sppTarget").intValue(PersistentSettings.getSppTargetDefault());
 		rayDepth = desc.get("rayDepth").intValue(PersistentSettings.getRayDepthDefault());
-		pathTrace = desc.get("pathTrace").boolValue(false);
+		boolean pathTrace = desc.get("pathTrace").boolValue(false);
+		if (pathTrace) {
+			renderState = RenderState.PAUSED;
+		} else {
+			renderState = RenderState.PREVIEW;
+		}
 		dumpFrequency = desc.get("dumpFrequency").intValue(Scene.DEFAULT_DUMP_FREQUENCY);
 		saveSnapshots = desc.get("saveSnapshots").boolValue(false);
 
@@ -279,7 +285,9 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	@Override
 	public synchronized void refresh() {
 		refresh = true;
-		pauseRender = false;
+		if (renderState == RenderState.PAUSED) {
+			renderState = RenderState.RENDERING;
+		}
 		spp = 0;
 		renderTime = 0;
 		notifyAll();
@@ -366,5 +374,9 @@ public class SceneDescription implements Refreshable, JSONifiable {
 
 	public JsonObject getCameraPresets() {
 		return cameraPresets;
+	}
+
+	public RenderState getRenderState() {
+		return renderState;
 	}
 }

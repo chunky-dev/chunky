@@ -103,7 +103,7 @@ public class RenderWorker extends Thread {
 
 		long jobStart = System.nanoTime();
 
-		if (scene.pathTrace()) {
+		if (scene.getRenderState() != RenderState.PREVIEW) {
 
 			// this is intentionally incorrectly indented for readability
 			for (int y = y0; y < y1; ++y) {
@@ -114,7 +114,7 @@ public class RenderWorker extends Thread {
 					double sg = 0;
 					double sb = 0;
 
-					for (int i = 0; i < RenderConstants.SPP_PASS; ++i) {
+					for (int i = 0; i < RenderConstants.SPP_PER_PASS; ++i) {
 						double oy = random.nextDouble();
 						double ox = random.nextDouble();
 
@@ -128,7 +128,7 @@ public class RenderWorker extends Thread {
 						sg += ray.color.y;
 						sb += ray.color.z;
 					}
-					double sinv = 1.0 / (scene.spp + RenderConstants.SPP_PASS);
+					double sinv = 1.0 / (scene.spp + RenderConstants.SPP_PER_PASS);
 					samples[offset+0] = (samples[offset+0] * scene.spp + sr) * sinv;
 					samples[offset+1] = (samples[offset+1] * scene.spp + sg) * sinv;
 					samples[offset+2] = (samples[offset+2] * scene.spp + sb) * sinv;

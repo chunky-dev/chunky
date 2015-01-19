@@ -44,6 +44,7 @@ import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.ProgressListener;
 import se.llbit.chunky.renderer.RenderContext;
+import se.llbit.chunky.renderer.RenderState;
 import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
@@ -207,6 +208,10 @@ public class Scene extends SceneDescription {
 
 	private boolean finalizeBuffer = false;
 
+	/**
+	 * Indicates if the render should be forced to reset. If false, the user may be
+	 * asked to confirm the render reset.
+	 */
 	private boolean resetRender = false;
 
 	/**
@@ -237,7 +242,6 @@ public class Scene extends SceneDescription {
 	 */
 	public Scene(Scene other) {
 		set(other);
-		copyRenderState(other);
 		copyTransients(other);
 	}
 
@@ -300,15 +304,6 @@ public class Scene extends SceneDescription {
 			samples = other.samples;
 			bufferData = other.bufferData;
 		}
-	}
-
-	/**
-	 * Copy the current rendering state.
-	 * @param other
-	 */
-	public void copyRenderState(Scene other) {
-		pathTrace = other.pathTrace;
-		pauseRender = other.pauseRender;
 	}
 
 	/**
@@ -387,8 +382,8 @@ public class Scene extends SceneDescription {
 			}
 		}
 
-		if (pathTrace) {
-			pauseRender = true;
+		if (renderState == RenderState.RENDERING) {
+			renderState = RenderState.PAUSED;
 		}
 
 		refresh = false;
@@ -420,8 +415,10 @@ public class Scene extends SceneDescription {
 	 */
 	public synchronized void setExposure(double value) {
 		exposure = value;
-		if (!pathTrace)
+		if (renderState == RenderState.PREVIEW) {
+			// don't interrupt the render if we are currently rendering
 			refresh();
+		}
 	}
 
 	/**
@@ -1015,26 +1012,10 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
-	 * @return <code>true</code> if this scene is to be Monte Carlo path traced
+	 * Start rendering
 	 */
-	public boolean pathTrace() {
-		return pathTrace;
-	}
-
-	/**
-	 * Toggle Monte Carlo path tracing.
-	 */
-	public synchronized void toggleMonteCarlo() {
-		pathTrace = !pathTrace;
-		refresh();
-	}
-
-	/**
-	 * Start or resume path tracing
-	 */
-	public synchronized void goHeadless() {
-		pathTrace = true;
-		pauseRender = false;
+	public synchronized void startHeadlessRender() {
+		renderState = RenderState.RENDERING;
 		notifyAll();
 	}
 
@@ -1043,8 +1024,9 @@ public class Scene extends SceneDescription {
 	 * @throws InterruptedException
 	 */
 	public synchronized boolean waitOnRefreshOrStateChange() throws InterruptedException {
-		while ((!pathTrace || pauseRender) && !refresh)
+		while (renderState != RenderState.RENDERING && !refresh) {
 			wait();
+		}
 		if (refresh) {
 			refresh = false;
 			return true;
@@ -1065,25 +1047,17 @@ public class Scene extends SceneDescription {
 	 * @throws InterruptedException
 	 */
 	public synchronized void pauseWait() throws InterruptedException {
-		while (pauseRender) {
+		while (renderState == RenderState.PAUSED) {
 			wait();
 		}
-	}
-
-	/**
-	 * @return <code>true</code> if the rendering is paused
-	 */
-	public synchronized boolean isPaused() {
-		return pauseRender;
 	}
 
 	/**
 	 * Start rendering the scene.
 	 */
 	public synchronized void startRender() {
-		if (!pathTrace) {
-			pathTrace = true;
-			pauseRender = false;
+		if (renderState != RenderState.RENDERING) {
+			renderState = RenderState.RENDERING;
 			refresh();
 		}
 	}
@@ -1092,14 +1066,14 @@ public class Scene extends SceneDescription {
 	 * Pause the renderer.
 	 */
 	public synchronized void pauseRender() {
-		pauseRender = true;
+		renderState = RenderState.PAUSED;
 	}
 
 	/**
 	 * Resume a paused render.
 	 */
 	public synchronized void resumeRender() {
-		pauseRender = false;
+		renderState = RenderState.RENDERING;
 		notifyAll();
 	}
 
@@ -1108,9 +1082,8 @@ public class Scene extends SceneDescription {
 	 * Puts the renderer back in preview mode.
 	 */
 	public synchronized void haltRender() {
-		if (pathTrace) {
-			pathTrace = false;
-			pauseRender = false;
+		if (renderState != RenderState.PREVIEW) {
+			renderState = RenderState.PREVIEW;
 			resetRender = true;
 			refresh();
 		}
@@ -1241,8 +1214,10 @@ public class Scene extends SceneDescription {
 	 */
 	public synchronized void setPostprocess(Postprocess p) {
 		postprocess = p;
-		if (!pathTrace)
+		if (renderState == RenderState.PREVIEW) {
+			// don't interrupt the render if we are currently rendering
 			refresh();
+		}
 	}
 
 	/**
@@ -1373,6 +1348,7 @@ public class Scene extends SceneDescription {
 		sppTarget = other.sppTarget;
 		cameraPresets = other.cameraPresets;
 		rayDepth = other.rayDepth;
+		renderState = other.renderState;
 	}
 
 	/**
@@ -1853,7 +1829,7 @@ public class Scene extends SceneDescription {
 		g *= exposure;
 		b *= exposure;
 
-		if (pathTrace()) {
+		if (renderState != RenderState.PREVIEW) {
 			switch (postprocess) {
 			case NONE:
 				break;
@@ -1974,7 +1950,7 @@ public class Scene extends SceneDescription {
 						x0 - fontMetrics.stringWidth(warningText)/2, y0);
 			} else {
 
-				if (!pathTrace()) {
+				if (renderState == RenderState.PREVIEW) {
 					int x0 = width/2;
 					int y0 = height/2;
 					g.setColor(java.awt.Color.white);

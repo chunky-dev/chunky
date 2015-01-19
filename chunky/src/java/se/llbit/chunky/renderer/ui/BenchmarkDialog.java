@@ -42,6 +42,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Version;
 import se.llbit.chunky.renderer.BenchmarkManager;
 import se.llbit.chunky.renderer.RenderContext;
+import se.llbit.chunky.renderer.RenderState;
 import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.log.Log;
 
@@ -289,7 +290,7 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 	}
 
 	@Override
-	public void renderStateChanged(boolean pathTrace, boolean paused) {
+	public void renderStateChanged(RenderState state) {
 		// TODO Auto-generated method stub
 
 	}
@@ -300,7 +301,7 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 	}
 
 	@Override
-	public void renderResetPrevented() {
+	public void renderResetRequested() {
 		// TODO Auto-generated method stub
 
 	}

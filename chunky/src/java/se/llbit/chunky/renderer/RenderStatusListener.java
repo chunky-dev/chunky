@@ -57,10 +57,9 @@ public interface RenderStatusListener extends ProgressListener {
 
 	/**
 	 * Called when the rendering activity has changed state
-	 * @param pathTrace
-	 * @param paused
+	 * @param state the new rendering state
 	 */
-	void renderStateChanged(boolean pathTrace, boolean paused);
+	void renderStateChanged(RenderState state);
 
 	/**
 	 * Called when the current render job has completed.
@@ -73,5 +72,5 @@ public interface RenderStatusListener extends ProgressListener {
 	 * Render reset was prevented because the render time exceeded
 	 * the reset grace period.
 	 */
-	public void renderResetPrevented();
+	public void renderResetRequested();
 }

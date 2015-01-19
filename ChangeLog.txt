@@ -1,4 +1,7 @@
 1.3.5 - TBD
+    * The render reset confirmation feature now works as it should when the
+      target SPP has been reached
+    * Added slider for the target SPP setting
     * Added scroll bars to the render preview when the window is too small to
       fit the entire image
     * The render preview window no longer stretches the image to fit the window
