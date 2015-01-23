@@ -24,7 +24,7 @@ import se.llbit.math.Vector4d;
 
 @SuppressWarnings("javadoc")
 public class ButtonModel {
-	protected static Quad[] quads = {
+	protected static Quad[] attachedSouth = {
 		// front
 		new Quad(new Vector3d(.6875, .375, .875), new Vector3d(.3125, .375, .875),
 				new Vector3d(.6875, .625, .875), new Vector4d(.6875, .3125, .375, .625)),
@@ -51,19 +51,32 @@ public class ButtonModel {
 
 	};
 
-	private static Quad[][] rot = new Quad[4][];
-	private static final int[] index = { 0, 1, 3, 2 };
+	private static Quad[][] variant = new Quad[8][];
 
 	static {
-		rot[0] = quads;
-		for (int angle = 1; angle < 4; ++angle) {
-			rot[angle] = Model.rotateY(rot[angle-1]);
-		}
+		// data bits: (part of block attached to)
+		// 000 => top
+		// 001 => west
+		// 010 => east
+		// 011 => north
+		// 100 => south
+		// 101 => up
+		// 110 => undefined
+		// 111 => undefined
+		// last updated for MC 1.8
+		variant[4] = attachedSouth;
+		variant[1] = Model.rotateY(attachedSouth);
+		variant[3] = Model.rotateY(variant[1]);
+		variant[2] = Model.rotateY(variant[3]);
+		variant[0] = Model.rotateNegX(attachedSouth);
+		variant[5] = Model.rotateX(attachedSouth);
+		variant[6] = attachedSouth;
+		variant[7] = attachedSouth;
 	}
 
 	public static boolean intersect(Ray ray, Texture texture) {
 		boolean hit = false;
-		Quad[] rotated = rot[index[ray.getBlockData() & 3]];
+		Quad[] rotated = variant[ray.getBlockData() & 7];
 		ray.t = Double.POSITIVE_INFINITY;
 		for (Quad quad : rotated) {
 			if (quad.intersect(ray)) {
