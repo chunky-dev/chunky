@@ -320,8 +320,8 @@ public class PathTracer {
 				}
 			}
 
-			// do water fog
-			if (prevBlock == Block.WATER) {
+			if (hit && prevBlock == Block.WATER) {
+				// do water fog
 				double a = ray.distance / scene.waterVisibility;
 				double attenuation = 1 - QuickMath.min(1, a*a);
 				ray.color.scale(attenuation);
@@ -333,7 +333,6 @@ public class PathTracer {
 				ray.color.y += (1-attenuation) * wc[1];
 				ray.color.z += (1-attenuation) * wc[2];
 				ray.color.w = attenuation;*/
-				hit = true;
 			}
 
 			break;
