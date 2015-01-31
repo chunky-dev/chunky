@@ -544,8 +544,14 @@ public class Scene extends SceneDescription {
 		}
 	}
 
-	protected final boolean kill(Ray ray, Random random) {
-		return ray.depth >= rayDepth && random.nextDouble() < .5f;
+	/**
+	 * Test if the ray should be killed (Russian Roulette)
+	 * @param depth
+	 * @param random
+	 * @return {@code true} if the ray needs to die now
+	 */
+	protected final boolean kill(int depth, Random random) {
+		return depth >= rayDepth && random.nextDouble() < .5f;
 	}
 
 	/**

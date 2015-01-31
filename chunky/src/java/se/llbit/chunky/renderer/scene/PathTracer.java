@@ -92,22 +92,22 @@ public class PathTracer {
 
 			double pSpecular = 0;
 
-			Material currentBlock = ray.getCurrentMaterial();
-			Material prevBlock = ray.getPrevMaterial();
+			Material currentMat = ray.getCurrentMaterial();
+			Material prevMat = ray.getPrevMaterial();
 
 			if (!scene.stillWater && ray.n.y != 0 &&
-					((currentBlock == Block.WATER && prevBlock == Block.AIR) ||
-					(currentBlock == Block.AIR && prevBlock == Block.WATER))) {
+					((currentMat == Block.WATER && prevMat == Block.AIR) ||
+					(currentMat == Block.AIR && prevMat == Block.WATER))) {
 
 				WaterModel.doWaterDisplacement(ray);
 
-				if (currentBlock == Block.AIR) {
+				if (currentMat == Block.AIR) {
 					ray.n.y = -ray.n.y;
 				}
 			}
 
-			if (currentBlock.isShiny) {
-				if (currentBlock == Block.WATER) {
+			if (currentMat.isShiny) {
+				if (currentMat == Block.WATER) {
 					pSpecular = Scene.WATER_SPECULAR;
 				} else {
 					pSpecular = Scene.SPECULAR_COEFF;
@@ -116,8 +116,8 @@ public class PathTracer {
 
 			double pDiffuse = ray.color.w;
 
-			float n1 = prevBlock.ior;
-			float n2 = currentBlock.ior;
+			float n1 = prevMat.ior;
+			float n2 = currentMat.ior;
 
 			if (pDiffuse + pSpecular < Ray.EPSILON && n1 == n2)
 				continue;
@@ -127,13 +127,13 @@ public class PathTracer {
 				first = false;
 			}
 
-			if (currentBlock.isShiny &&
+			if (currentMat.isShiny &&
 					random.nextDouble() < pSpecular) {
 
-				Ray reflected = new Ray();
-				reflected.specularReflection(ray);
+				if (!scene.kill(ray.depth+1, random)) {
+					Ray reflected = new Ray();
+					reflected.specularReflection(ray);
 
-				if (!scene.kill(reflected, random)) {
 					if (pathTrace(scene, reflected, state, 1, false)) {
 						ray.color.x *= reflected.color.x;
 						ray.color.y *= reflected.color.y;
@@ -146,21 +146,21 @@ public class PathTracer {
 
 				if (random.nextDouble() < pDiffuse) {
 
-					Ray reflected = new Ray();
-					reflected.set(ray);
-					if (!scene.kill(reflected, random)) {
+					if (!scene.kill(ray.depth+1, random)) {
+						Ray reflected = new Ray();
+						reflected.set(ray);
 
 						double emittance = 0;
 
-						if (scene.emittersEnabled && currentBlock.isEmitter) {
+						if (scene.emittersEnabled && currentMat.isEmitter) {
 
 							emittance = addEmitted;
 							ray.emittance.x = ray.color.x * ray.color.x *
-									currentBlock.emittance * scene.emitterIntensity;
+									currentMat.emittance * scene.emitterIntensity;
 							ray.emittance.y = ray.color.y * ray.color.y *
-									currentBlock.emittance * scene.emitterIntensity;
+									currentMat.emittance * scene.emitterIntensity;
 							ray.emittance.z = ray.color.z * ray.color.z *
-									currentBlock.emittance * scene.emitterIntensity;
+									currentMat.emittance * scene.emitterIntensity;
 							hit = true;
 						}
 
@@ -173,7 +173,7 @@ public class PathTracer {
 
 							boolean frontLight = reflected.d.dot(ray.n) > 0;
 
-							if (frontLight || (currentBlock.subSurfaceScattering &&
+							if (frontLight || (currentMat.subSurfaceScattering &&
 									random.nextDouble() < Scene.fSubSurface)) {
 
 								if (!frontLight) {
@@ -225,10 +225,10 @@ public class PathTracer {
 				} else if (n1 != n2) {
 
 					boolean doRefraction =
-							currentBlock == Block.WATER ||
-							prevBlock == Block.WATER ||
-							currentBlock == Block.ICE ||
-							prevBlock == Block.ICE;
+							currentMat == Block.WATER ||
+							prevMat == Block.WATER ||
+							currentMat == Block.ICE ||
+							prevMat == Block.ICE;
 
 					// refraction
 					float n1n2 = n1 / n2;
@@ -236,9 +236,9 @@ public class PathTracer {
 					double radicand = 1 - n1n2*n1n2 * (1 - cosTheta*cosTheta);
 					if (doRefraction && radicand < Ray.EPSILON) {
 						// total internal reflection
-						Ray reflected = new Ray();
-						reflected.specularReflection(ray);
-						if (!scene.kill(reflected, random)) {
+						if (!scene.kill(ray.depth+1, random)) {
+							Ray reflected = new Ray();
+							reflected.specularReflection(ray);
 							if (pathTrace(scene, reflected, state, 1, false)) {
 
 								ray.color.x = reflected.color.x;
@@ -248,9 +248,9 @@ public class PathTracer {
 							}
 						}
 					} else {
-						Ray refracted = new Ray();
-						refracted.set(ray);
-						if (!scene.kill(refracted, random)) {
+						if (!scene.kill(ray.depth+1, random)) {
+							Ray refracted = new Ray();
+							refracted.set(ray);
 
 							// Calculate angle-dependent reflectance using
 							// Fresnel equation approximation
@@ -320,7 +320,7 @@ public class PathTracer {
 				}
 			}
 
-			if (hit && prevBlock == Block.WATER) {
+			if (hit && prevMat == Block.WATER) {
 				// do water fog
 				double a = ray.distance / scene.waterVisibility;
 				double attenuation = 1 - QuickMath.min(1, a*a);
