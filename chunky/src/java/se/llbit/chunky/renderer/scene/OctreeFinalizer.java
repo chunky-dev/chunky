@@ -571,8 +571,11 @@ public class OctreeFinalizer {
 					case Block.QUARTZSTAIRS_ID:
 					case Block.ACACIASTAIRS_ID:
 					case Block.DARKOAKSTAIRS_ID:
+						// all corner notation (s-e, n-w, etc) is indicating gradient
 						// check if this is a corner stair block
-						int rotation = 3 & (type >> BlockData.OFFSET);
+						int stairdata = type >> BlockData.OFFSET;
+						int rotation = 3 & stairdata;
+						int upsidedown = type & BlockData.UPSIDE_DOWN_STAIR;
 						switch (rotation) {
 						case 0:
 							// ascending east
@@ -580,30 +583,42 @@ public class OctreeFinalizer {
 							other = Block.get(bd);
 							bd_alt = octree.get(x-1, cy, z);// in front of
 							other_alt = Block.get(bd_alt);
-							if (other.isStair()) {
+							if (other.isStair() && (bd&BlockData.UPSIDE_DOWN_STAIR) == upsidedown) {
 								switch (3 & (bd >> BlockData.OFFSET)) {
 								case 2:
-									// if behind ascends south we have outer s-e corner
-									type |= BlockData.SOUTH_EAST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair behind ascends south we have outer s-e corner
+									// unless stair to the left has same orientation
+									if (!sameStair(octree, type, x, cy, z-1)) {
+										type |= BlockData.SOUTH_EAST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								case 3:
-									// if behind ascends north we have outer n-e corner
-									type |= BlockData.NORTH_EAST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair behind ascends north we have n-e corner
+									// unless stair to the right has same orientation
+									if (!sameStair(octree, type, x, cy, z+1)) {
+										type |= BlockData.NORTH_EAST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								}
-							} else if (other_alt.isStair()) {
+							} else if (other_alt.isStair() && (bd_alt&BlockData.UPSIDE_DOWN_STAIR) == upsidedown) {
 								switch (3 & (bd_alt >> BlockData.OFFSET)) {
 								case 2:
-									// if behind ascends south we have outer s-e corner
-									type |= BlockData.INNER_SOUTH_EAST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair in front ascends south we have inner s-e corner
+									// unless stair to the left has same orientation
+									if (!sameStair(octree, type, x, cy, z-1)) {
+										type |= BlockData.INNER_SOUTH_EAST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								case 3:
-									// if behind ascends north we have outer n-e corner
-									type |= BlockData.INNER_NORTH_EAST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair in front ascends north we have inner n-e corner
+									// unless stair to the right has same orientation
+									if (!sameStair(octree, type, x, cy, z+1)) {
+										type |= BlockData.INNER_NORTH_EAST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								}
 							}
@@ -614,30 +629,42 @@ public class OctreeFinalizer {
 							other = Block.get(bd);
 							bd_alt = octree.get(x+1, cy, z);// in front of
 							other_alt = Block.get(bd_alt);
-							if (other.isStair()) {
+							if (other.isStair() && (bd&BlockData.UPSIDE_DOWN_STAIR) == upsidedown) {
 								switch (3 & (bd >> BlockData.OFFSET)) {
 								case 2:
-									// if behind ascends south we have outer s-w corner
-									type |= BlockData.SOUTH_WEST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair behind ascends south we have outer s-w corner
+									// unless stair to the right has same orientation
+									if (!sameStair(octree, type, x, cy, z-1)) {
+										type |= BlockData.SOUTH_WEST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								case 3:
-									// if behind ascends north we have outer n-w corner
-									type |= BlockData.NORTH_WEST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair behind ascends north we have outer n-w corner
+									// unless stair to the left has same orientation
+									if (!sameStair(octree, type, x, cy, z+1)) {
+										type |= BlockData.NORTH_WEST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								}
-							} else if (other_alt.isStair()) {
+							} else if (other_alt.isStair() && (bd_alt&BlockData.UPSIDE_DOWN_STAIR) == upsidedown) {
 								switch (3 & (bd_alt >> BlockData.OFFSET)) {
 								case 2:
-									// if behind ascends south we have outer s-w corner
-									type |= BlockData.INNER_SOUTH_WEST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair in front ascends south we have inner s-w corner
+									// unless stair to the right has same orientation
+									if (!sameStair(octree, type, x, cy, z-1)) {
+										type |= BlockData.INNER_SOUTH_WEST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								case 3:
-									// if behind ascends north we have outer n-w corner
-									type |= BlockData.INNER_NORTH_WEST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair in front ascends north we have inner n-w corner
+									// unless stair to the left has same orientation
+									if (!sameStair(octree, type, x, cy, z+1)) {
+										type |= BlockData.INNER_NORTH_WEST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								}
 							}
@@ -648,30 +675,38 @@ public class OctreeFinalizer {
 							other = Block.get(bd);
 							bd_alt = octree.get(x, cy, z-1);// in front of
 							other_alt = Block.get(bd_alt);
-							if (other.isStair()) {
+							if (other.isStair() && (bd&BlockData.UPSIDE_DOWN_STAIR) == upsidedown) {
 								switch (3 & (bd >> BlockData.OFFSET)) {
 								case 0:
-									// if behind ascends east we have s-e corner
-									type |= BlockData.SOUTH_EAST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair behind ascends east we have outer s-e corner
+									if (!sameStair(octree, type, x-1, cy, z)) {
+										type |= BlockData.SOUTH_EAST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								case 1:
-									// if behind ascends west we have s-w corner
-									type |= BlockData.SOUTH_WEST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair behind ascends west we have outer s-w corner
+									if (!sameStair(octree, type, x+1, cy, z)) {
+										type |= BlockData.SOUTH_WEST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								}
-							} else if (other_alt.isStair()) {
+							} else if (other_alt.isStair() && (bd_alt&BlockData.UPSIDE_DOWN_STAIR) == upsidedown) {
 								switch (3 & (bd_alt >> BlockData.OFFSET)) {
 								case 0:
-									// if behind ascends east we have s-e corner
-									type |= BlockData.INNER_SOUTH_EAST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair in front ascends east we have inner s-e corner
+									if (!sameStair(octree, type, x-1, cy, z)) {
+										type |= BlockData.INNER_SOUTH_EAST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								case 1:
-									// if behind ascends west we have s-w corner
-									type |= BlockData.INNER_SOUTH_WEST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair in front ascends west we have inner s-w corner
+									if (!sameStair(octree, type, x+1, cy, z)) {
+										type |= BlockData.INNER_SOUTH_WEST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								}
 							}
@@ -682,30 +717,38 @@ public class OctreeFinalizer {
 							other = Block.get(bd);
 							bd_alt = octree.get(x, cy, z+1);// in front of
 							other_alt = Block.get(bd_alt);
-							if (other.isStair()) {
+							if (other.isStair() && (bd&BlockData.UPSIDE_DOWN_STAIR) == upsidedown) {
 								switch (3 & (bd >> BlockData.OFFSET)) {
 								case 0:
-									// if behind ascends east we have n-e corner
-									type |= BlockData.NORTH_EAST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair behind ascends east we have outer n-e corner
+									if (!sameStair(octree, type, x-1, cy, z)) {
+										type |= BlockData.NORTH_EAST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								case 1:
-									// if behind ascends west we have n-w corner
-									type |= BlockData.NORTH_WEST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair behind ascends west we have outer n-w corner
+									if (!sameStair(octree, type, x+1, cy, z)) {
+										type |= BlockData.NORTH_WEST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								}
-							} else if (other_alt.isStair()) {
+							} else if (other_alt.isStair() && (bd_alt&BlockData.UPSIDE_DOWN_STAIR) == upsidedown) {
 								switch (3 & (bd_alt >> BlockData.OFFSET)) {
 								case 0:
-									// if behind ascends east we have n-e corner
-									type |= BlockData.INNER_NORTH_EAST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair in front ascends east we have inner n-e corner
+									if (!sameStair(octree, type, x-1, cy, z)) {
+										type |= BlockData.INNER_NORTH_EAST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								case 1:
-									// if behind ascends west we have n-w corner
-									type |= BlockData.INNER_NORTH_WEST << BlockData.CORNER_OFFSET;
-									octree.set(type, x, cy, z);
+									// if stair in front ascends west we have inner n-w corner
+									if (!sameStair(octree, type, x+1, cy, z)) {
+										type |= BlockData.INNER_NORTH_WEST << BlockData.CORNER_OFFSET;
+										octree.set(type, x, cy, z);
+									}
 									break;
 								}
 							}
@@ -718,6 +761,11 @@ public class OctreeFinalizer {
 				}
 			}
 		}
+	}
+
+	private static boolean sameStair(Octree octree, int type, int x, int y, int z) {
+		int id = octree.get(x, y, z);
+		return Block.get(id).isStair() && (type&(7<<8)) == (id&(7<<8));
 	}
 
 }
