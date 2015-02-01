@@ -32,7 +32,7 @@ public class ChunkIndex {
 
 	public ChunkIndex() {
 		for (int i = 0; i < Chunk.X_MAX; ++i) {
-			for (int j = 0; j < Chunk.Y_MAX; ++i) {
+			for (int j = 0; j < Chunk.Y_MAX; ++j) {
 				for (int k = 0; k < Chunk.Z_MAX; ++k) {
 					int index = i*Chunk.Y_MAX*Chunk.Z_MAX + j*Chunk.Z_MAX + k;
 					blocks[index] = index;

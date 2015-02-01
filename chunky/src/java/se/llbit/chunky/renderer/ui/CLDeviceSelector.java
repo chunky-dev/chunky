@@ -80,8 +80,8 @@ public class CLDeviceSelector extends JDialog {
 	private final Map<CLPlatform, List<CLDevice>> deviceMap =
 			new HashMap<CLPlatform, List<CLDevice>>();
 
-	private final JComboBox platformList;
-	private final JComboBox deviceList;
+	private final JComboBox<CLPlatform> platformList;
+	private final JComboBox<CLDevice> deviceList;
 	private final JLabel deviceInfo = new JLabel();
 
 	/**
@@ -99,7 +99,7 @@ public class CLDeviceSelector extends JDialog {
 
 		JLabel platformLbl = new JLabel("Platform:");
 
-		platformList = new JComboBox(platforms.toArray());
+		platformList = new JComboBox<CLPlatform>(platforms.toArray(new CLPlatform[0]));
 
 		JLabel deviceLbl = new JLabel("Device:");
 
@@ -127,7 +127,7 @@ public class CLDeviceSelector extends JDialog {
 			}
 		});
 
-		deviceList = new JComboBox();
+		deviceList = new JComboBox<CLDevice>();
 
 		updateDeviceList();
 		updateDeviceInfo();
@@ -272,9 +272,8 @@ public class CLDeviceSelector extends JDialog {
 		int plaf = platformList.getSelectedIndex();
 		if (plaf >= 0 && plaf < platforms.size()) {
 			// quick & dirty way to update the combo box!
-			Object[] devices = deviceMap.get(platforms.get(plaf)).toArray();
-			deviceList.setModel(new JComboBox(devices).getModel());
+			CLDevice[] devices = deviceMap.get(platforms.get(plaf)).toArray(new CLDevice[0]);
+			deviceList.setModel(new JComboBox<CLDevice>(devices).getModel());
 		}
 	}
-
 }
