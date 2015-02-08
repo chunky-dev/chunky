@@ -604,13 +604,13 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateTitle();
 
 		addTab("General", Icon.wrench, buildGeneralPane());
-		addTab("Lighting", Icon.colors, buildLightingPane());
+		addTab("Lighting", Icon.light, buildLightingPane());
 		addTab("Sky", Icon.sky, buildSkyPane());
 		addTab("Water", Icon.water, buildWaterPane());
 		addTab("Camera", Icon.camera, buildCameraPane());
-		addTab("Post-processing", null, buildPostProcessingPane());
-		addTab("Advanced", null, buildAdvancedPane());
-		addTab("Help", Texture.unknown, buildHelpPane());
+		addTab("Post-processing", Icon.gear, buildPostProcessingPane());
+		addTab("Advanced", Icon.advanced, buildAdvancedPane());
+		addTab("Help", Icon.question, buildHelpPane());
 
 		JLabel sppTargetLbl = new JLabel("SPP Target: ");
 		sppTargetLbl.setToolTipText("The render will be paused at this SPP count");
