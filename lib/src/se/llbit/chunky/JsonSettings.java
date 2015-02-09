@@ -57,9 +57,9 @@ public final class JsonSettings {
 			in.close();
 			Log.infofmt("Settings loaded from %s", path);
 		} catch (IOException e) {
-			Log.infofmt("Warning: Could not load settings from %s - defaults will be used", path);
+			Log.warningfmt("Warning: Could not load settings from %s - defaults will be used", path);
 		} catch (SyntaxError e) {
-			Log.infofmt("Warning: Could not load settings from %s (syntax error) - defaults will be used", path);
+			Log.warningfmt("Warning: Could not load settings from %s (syntax error) - defaults will be used", path);
 		}
 	}
 
@@ -74,12 +74,10 @@ public final class JsonSettings {
 			PrettyPrinter pp = new PrettyPrinter("  ", new PrintStream(out));
 			json.prettyPrint(pp);
 			out.close();
-			if (System.getProperty("log4j.logLevel", "WARN").equals("INFO")) {
-				System.out.println("Saved settings to " + path);
-			}
+			Log.info("Saved settings to " + path);
 		} catch (IOException e) {
-			System.err.println("Warning: Failed to save settings to " +
-					path + ": " + e.getMessage());
+			Log.warningfmt("Warning: Failed to save settings to %s: %s", path,
+					e.getMessage());
 		}
 	}
 
