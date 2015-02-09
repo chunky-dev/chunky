@@ -137,10 +137,10 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JPanel lightProbePanel = new JPanel();
 	private final JPanel skyGradientPanel = new JPanel();
 	private final JPanel skyboxPanel = new JPanel();
-	private final JComboBox canvasSizeCB = new JComboBox();
-	private final JComboBox cameraPreset = new JComboBox();
-	private final JComboBox customPreset = new JComboBox();
-	private final JComboBox projectionMode = new JComboBox();
+	private final JComboBox<String> canvasSizeCB = new JComboBox<String>();
+	private final JComboBox<CameraPreset> cameraPreset = new JComboBox<CameraPreset>();
+	private final JComboBox<String> customPreset = new JComboBox<String>();
+	private final JComboBox<ProjectionMode> projectionMode = new JComboBox<ProjectionMode>();
 	private final JButton startRenderBtn = new JButton();
 	private final JCheckBox enableEmitters = new JCheckBox();
 	private final JCheckBox directLight = new JCheckBox();
@@ -163,8 +163,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JLabel sppLbl = new JLabel();
 	private final JProgressBar progressBar = new JProgressBar();
 	private final JLabel progressLbl = new JLabel();
-	private final JComboBox postprocessCB = new JComboBox();
-	private final JComboBox skyModeCB = new JComboBox();
+	private final JComboBox<String> postprocessCB = new JComboBox<String>();
+	private final JComboBox<SkyMode> skyModeCB = new JComboBox<SkyMode>();
 	private final JButton changeSunColorBtn = new JButton("Change Sun Color");
 	private final JLabel etaLbl = new JLabel();
 	private final JCheckBox waterWorldCB = new JCheckBox();
@@ -174,7 +174,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JButton applyWaterHeightBtn = new JButton("Apply");
 	private final DecimalFormat decimalFormat = new DecimalFormat();
 	private final JCheckBox saveDumpsCB = new JCheckBox();
-	private final JComboBox dumpFrequencyCB = new JComboBox();
+	private final JComboBox<String> dumpFrequencyCB = new JComboBox<String>();
 	private final JCheckBox saveSnapshotsCB = new JCheckBox("Save snapshot for each dump");
 	private final JLabel dumpFrequencyLbl = new JLabel(" frames");
 	private final JTextField cameraX = new JTextField();
@@ -1028,7 +1028,8 @@ public class RenderControls extends JDialog implements ViewListener,
 		postprocessCB.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JComboBox source = (JComboBox) e.getSource();
+				@SuppressWarnings("unchecked")
+				JComboBox<String> source = (JComboBox<String>) e.getSource();
 				renderMan.scene().setPostprocess(
 						Postprocess.get(source.getSelectedIndex()));
 			}
@@ -1179,7 +1180,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		for (int i = 0; i < dumpFrequencies.length; ++i) {
 			frequencyStrings[i] = Integer.toString(dumpFrequencies[i]);
 		}
-		dumpFrequencyCB.setModel(new DefaultComboBoxModel(frequencyStrings));
+		dumpFrequencyCB.setModel(new DefaultComboBoxModel<String>(frequencyStrings));
 		dumpFrequencyCB.setEditable(true);
 		dumpFrequencyCB.addActionListener(dumpFrequencyListener);
 		updateDumpFrequencyField();
@@ -1372,7 +1373,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JPanel buildSkyPane() {
 
 		JLabel skyModeLbl = new JLabel("Sky Mode:");
-		skyModeCB.setModel(new DefaultComboBoxModel(Sky.SkyMode.values()));
+		skyModeCB.setModel(new DefaultComboBoxModel<SkyMode>(SkyMode.values()));
 		skyModeCB.addActionListener(skyModeListener);
 		updateSkyMode();
 
@@ -1664,14 +1665,14 @@ public class RenderControls extends JDialog implements ViewListener,
 			CameraPreset.SKYBOX_UP, CameraPreset.SKYBOX_DOWN,
 			CameraPreset.SKYBOX_FRONT, CameraPreset.SKYBOX_BACK,
 		};
-		cameraPreset.setModel(new DefaultComboBoxModel(presets));
+		cameraPreset.setModel(new DefaultComboBoxModel<CameraPreset>(presets));
 		cameraPreset.setMaximumRowCount(presets.length);
 		final int presetHeight = cameraPreset.getPreferredSize().height;
 		final int presetWidth = cameraPreset.getPreferredSize().width;
 		cameraPreset.setRenderer(new DefaultListCellRenderer() {
 			@Override
-			public Component getListCellRendererComponent(JList list, Object value,
-					int index, boolean isSelected, boolean cellHasFocus) {
+			public Component getListCellRendererComponent(JList<?> list, Object value,
+					int index, boolean isSelected, boolean cellHasFocus) { 
 				JLabel label = (JLabel) super.getListCellRendererComponent(
 						list, value, index, isSelected, cellHasFocus);
 				label.setPreferredSize(new Dimension(presetWidth, presetHeight));
@@ -1778,7 +1779,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		});
 
 		ProjectionMode[] projectionModes = ProjectionMode.values();
-		projectionMode.setModel(new DefaultComboBoxModel(projectionModes));
+		projectionMode.setModel(new DefaultComboBoxModel<ProjectionMode>(projectionModes));
 		projectionMode.addActionListener(projectionModeListener);
 		updateProjectionMode();
 
@@ -2172,7 +2173,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final ActionListener projectionModeListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JComboBox source = (JComboBox) e.getSource();
+			@SuppressWarnings("unchecked")
+			JComboBox<ProjectionMode> source = (JComboBox<ProjectionMode>) e.getSource();
 			Object selected = source.getSelectedItem();
 			if (selected != null && selected instanceof ProjectionMode) {
 				renderMan.scene().camera().setProjectionMode(
@@ -2185,7 +2187,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final ActionListener cameraPresetListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JComboBox source = (JComboBox) e.getSource();
+			@SuppressWarnings("unchecked")
+			JComboBox<CameraPreset> source = (JComboBox<CameraPreset>) e.getSource();
 			Object selected = source.getSelectedItem();
 			if (selected != null && selected instanceof CameraPreset) {
 				CameraPreset preset = (CameraPreset) selected;
@@ -2244,7 +2247,8 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final ActionListener skyModeListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JComboBox source = (JComboBox) e.getSource();
+			@SuppressWarnings("unchecked")
+			JComboBox<SkyMode> source = (JComboBox<SkyMode>) e.getSource();
 			renderMan.scene().sky().setSkyMode((SkyMode) source.getSelectedItem());
 			updateSkyMode();
 			RenderControls.this.pack();

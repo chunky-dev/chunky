@@ -261,12 +261,13 @@ public class Controls extends JPanel {
 				Block.EMERALDORE,
 				Block.NETHERQUARTZORE
 			};
-		JComboBox blockTypeBox = new JComboBox(highlightBlocks);// BLAWK TYPE BAWKS
+		JComboBox<Block> blockTypeBox = new JComboBox<Block>(highlightBlocks);// BLAWK TYPE BAWKS
 		blockTypeBox.setSelectedItem(chunky.getHighlightBlock());
 		blockTypeBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JComboBox btb = (JComboBox) e.getSource();
+				@SuppressWarnings("unchecked")
+				JComboBox<Block> btb = (JComboBox<Block>) e.getSource();
 				chunky.highlightBlock((Block) btb.getSelectedItem());
 			}
 		});

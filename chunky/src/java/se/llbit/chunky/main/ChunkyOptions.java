@@ -24,7 +24,7 @@ import se.llbit.chunky.renderer.RenderConstants;
  * Current configuration
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class ChunkyOptions {
+public class ChunkyOptions implements Cloneable {
 	public File sceneDir = null;
 	public String sceneName = null;
 	public String texturePack = null;
