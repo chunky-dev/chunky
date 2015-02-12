@@ -68,8 +68,17 @@ public final class JsonSettings {
 	 * @param file
 	 */
 	public void save(File file) {
-		file.getParentFile().mkdirs();
 		String path = file.getAbsolutePath();
+		File settingsDir = file.getParentFile();
+		if (settingsDir == null) {
+			Log.error("Failed to save settings to " + path);
+		}
+		if (!settingsDir.isDirectory()) {
+			Log.warn("Warning: Chunky settings directory does not exist. " +
+					"Creating settings directory at " +
+					settingsDir.getAbsolutePath());
+			settingsDir.mkdirs();
+		}
 		try {
 			OutputStream out = new FileOutputStream(file);
 			PrettyPrinter pp = new PrettyPrinter("  ", new PrintStream(out));
