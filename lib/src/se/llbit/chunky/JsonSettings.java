@@ -68,7 +68,6 @@ public final class JsonSettings {
 	 * @param file
 	 */
 	public void save(File file) {
-		file.getParentFile().mkdirs();
 		String path = file.getAbsolutePath();
 		File settingsDir = file.getParentFile();
 		if (settingsDir == null) {
