@@ -36,8 +36,8 @@ public class Matrix3d {
 	 * @param theta
 	 */
 	public final void rotX(double theta) {
-		double cost = FastMath.cos(theta);
-		double sint = FastMath.sin(theta);
+		double cost = QuickMath.cos(theta);
+		double sint = QuickMath.sin(theta);
 		m11 = 1;
 		m12 = 0;
 		m13 = 0;
@@ -55,8 +55,8 @@ public class Matrix3d {
 	 * @param theta
 	 */
 	public final void rotY(double theta) {
-		double cost = FastMath.cos(theta);
-		double sint = FastMath.sin(theta);
+		double cost = QuickMath.cos(theta);
+		double sint = QuickMath.sin(theta);
 		m11 = cost;
 		m12 = 0;
 		m13 = sint;
@@ -74,8 +74,8 @@ public class Matrix3d {
 	 * @param theta
 	 */
 	public final void rotZ(double theta) {
-		double cost = FastMath.cos(theta);
-		double sint = FastMath.sin(theta);
+		double cost = QuickMath.cos(theta);
+		double sint = QuickMath.sin(theta);
 		m11 = cost;
 		m12 = -sint;
 		m13 = 0;

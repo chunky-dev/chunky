@@ -125,11 +125,11 @@ public class Sun implements JSONifiable {
 	 */
 	public static final double RADIUS = .03;
 	@SuppressWarnings("javadoc")
-	public static final double RADIUS_COS = FastMath.cos(RADIUS);
+	public static final double RADIUS_COS = QuickMath.cos(RADIUS);
 	@SuppressWarnings("javadoc")
-	public static final double RADIUS_COS_2 = FastMath.cos(RADIUS*2);
+	public static final double RADIUS_COS_2 = QuickMath.cos(RADIUS*2);
 	@SuppressWarnings("javadoc")
-	public static final double RADIUS_SIN = FastMath.sin(RADIUS);
+	public static final double RADIUS_SIN = QuickMath.sin(RADIUS);
 	@SuppressWarnings("javadoc")
 	public static final double RADIUS_COS_SQ = RADIUS_COS * RADIUS_COS;
 	@SuppressWarnings("javadoc")
@@ -237,12 +237,12 @@ public class Sun implements JSONifiable {
 		double theta = azimuth;
 		double phi = altitude;
 
-		double r = QuickMath.abs(FastMath.cos(phi));
+		double r = QuickMath.abs(QuickMath.cos(phi));
 
 		sw.set(
-			FastMath.cos(theta) * r,
-			FastMath.sin(phi),
-			FastMath.sin(theta) * r
+			QuickMath.cos(theta) * r,
+			QuickMath.sin(phi),
+			QuickMath.sin(theta) * r
 		);
 
 		if (QuickMath.abs(sw.x) > .1) {
@@ -353,7 +353,7 @@ public class Sun implements JSONifiable {
 
 	private void updateSkylightValues() {
 		double sunTheta = Math.PI/2 - altitude;
-		double cosTheta = FastMath.cos(sunTheta);
+		double cosTheta = QuickMath.cos(sunTheta);
 		double cos2Theta = cosTheta*cosTheta;
 		double chi = (4.0/9.0 - turb/120.0)*(Math.PI - 2*sunTheta);
 		zenith_Y = (4.0453*turb - 4.9710)*Math.tan(chi) - 0.2155*turb + 2.4192;
@@ -398,8 +398,8 @@ public class Sun implements JSONifiable {
 		Vector3d v = new Vector3d(sv);
 		Vector3d w = new Vector3d(sw);
 
-		u.scale(FastMath.cos(phi)*sin_a);
-		v.scale(FastMath.sin(phi)*sin_a);
+		u.scale(QuickMath.cos(phi)*sin_a);
+		v.scale(QuickMath.sin(phi)*sin_a);
 		w.scale(cos_a);
 
 		reflected.d.add(u, v);
@@ -424,7 +424,7 @@ public class Sun implements JSONifiable {
 			ray.color.z *= Fex;
 		} else {
 			double theta = ray.d.dot(sw);
-			double cos_theta = FastMath.cos(theta);
+			double cos_theta = QuickMath.cos(theta);
 			double cos2_theta = cos_theta*cos_theta;
 			double Brt = (3 / (16*Math.PI)) * Br * (1 + cos2_theta);
 			double Bmt = (1 / (4*Math.PI)) * Bm * ((1-g)*(1-g)) / FastMath.pow(1 + g*g + 2*g*cos_theta, 3/2.);
@@ -461,7 +461,7 @@ public class Sun implements JSONifiable {
 	 * @return Inscatter factor
 	 */
 	public double inscatter(double Fex, double theta) {
-		double cos_theta = FastMath.cos(theta);
+		double cos_theta = QuickMath.cos(theta);
 		double cos2_theta = cos_theta*cos_theta;
 		double Brt = (3 / (16*Math.PI)) * Br * (1 + cos2_theta);
 		double Bmt = (1 / (4*Math.PI)) * Bm * ((1-g)*(1-g)) / FastMath.pow(1 + g*g + 2*g*cos_theta, 3/2.);

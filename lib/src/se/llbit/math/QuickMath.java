@@ -24,6 +24,31 @@ public class QuickMath {
 
 	public static final double HALF_PI = Math.PI/2;
 	public static final double TAU = Math.PI*2;
+	public static final double[] SINE_TABLE = new double[65536];
+
+	public static void initSinCosTable() {
+		for (int i = 0; i < 65536; ++i) {
+			SINE_TABLE[i] = Math.sin(i * Math.PI * 2.0D / 65536.0D);
+		}
+	}
+
+	/**
+	 * @param d
+	 * @return The sine of d
+	 */
+	public static double sin(double d)
+	{
+		return SINE_TABLE[(int) (d * 10430.378D) & 65535];
+	}
+
+	/**
+	 * @param d
+	 * @return The cosine of d
+	 */
+	public static double cos(double d)
+	{
+		return SINE_TABLE[(int) (d * 10430.378D + 16384.0D) & 65535];
+	}
 
 	/**
 	 * @param d

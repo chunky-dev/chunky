@@ -274,8 +274,8 @@ public class Ray {
 		double theta = 2 * Math.PI * x2;
 
 		// project to point on hemisphere in tangent space
-		double tx = r * FastMath.cos(theta);
-		double ty = r * FastMath.sin(theta);
+		double tx = r * QuickMath.cos(theta);
+		double ty = r * QuickMath.sin(theta);
 		double tz = FastMath.sqrt(1 - x1);
 
 		// transform from tangent space to world space
@@ -341,8 +341,8 @@ public class Ray {
 		double theta = 2 * Math.PI * x2;
 
 		// project to point on hemisphere in tangent space
-		double tx = r * FastMath.cos(theta);
-		double ty = r * FastMath.sin(theta);
+		double tx = r * QuickMath.cos(theta);
+		double ty = r * QuickMath.sin(theta);
 		double tz = FastMath.sqrt(1 - x1);
 
 		// transform from tangent space to world space

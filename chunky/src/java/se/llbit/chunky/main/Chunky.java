@@ -65,6 +65,7 @@ import se.llbit.chunky.world.RegionQueue;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.log.Log;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3d;
 import se.llbit.util.OSDetector;
 import se.llbit.util.OSDetector.OS;
@@ -132,12 +133,6 @@ public class Chunky implements ChunkTopographyListener {
 	public static final String getAppName() {
 		return Messages.getString("Chunky.appname") + " " +
 				Version.getVersion();
-	}
-
-	/**
-	 * Constructor
-	 */
-	public Chunky() {
 	}
 
 	/**
@@ -379,6 +374,7 @@ public class Chunky implements ChunkTopographyListener {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
+		QuickMath.initSinCosTable();
 		Chunky chunky = new Chunky();
 		int exitVal = chunky.run(args);
 		if (exitVal != 0) {

@@ -45,10 +45,10 @@ public class PanoramicProjector implements Projector {
 		double ay = QuickMath.degToRad(y * fov);
 		double ax = QuickMath.degToRad(x * fov);
 
-		double vv = FastMath.cos(ay);
+		double vv = QuickMath.cos(ay);
 
 		o.set(0, 0, 0);
-		d.set(vv * FastMath.sin(ax), FastMath.sin(ay), vv * FastMath.cos(ax));
+		d.set(vv * QuickMath.sin(ax), QuickMath.sin(ay), vv * QuickMath.cos(ax));
 	}
 
 	@Override
