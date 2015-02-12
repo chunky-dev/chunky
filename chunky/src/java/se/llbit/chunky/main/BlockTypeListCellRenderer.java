@@ -32,7 +32,7 @@ import se.llbit.chunky.world.Block;
  *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
-public class BlockTypeListCellRenderer extends JLabel implements ListCellRenderer<Block> {
+public class BlockTypeListCellRenderer extends JLabel implements ListCellRenderer {
 
 	private static final long serialVersionUID = -4916737793036321488L;
 
@@ -48,8 +48,10 @@ public class BlockTypeListCellRenderer extends JLabel implements ListCellRendere
 	}
 
 	@Override
-	public Component getListCellRendererComponent(JList<? extends Block> list, Block value,
+	public Component getListCellRendererComponent(JList list, Object value,
 			int index, boolean isSelected, boolean hasFocus) {
+
+		Block selected = ((Block) value);
 
 		if (isSelected) {
 			setBackground(list.getSelectionBackground());
@@ -59,9 +61,9 @@ public class BlockTypeListCellRenderer extends JLabel implements ListCellRendere
 			setForeground(list.getForeground());
 		}
 
-		ImageIcon icon = new ImageIcon(value.getTexture(0).getImage());
+		ImageIcon icon = new ImageIcon(selected.getTexture(0).getImage());
 		setIcon(icon);
-		setText(value.toString());
+		setText(selected.toString());
 		setFont(list.getFont());
 
 		return this;
