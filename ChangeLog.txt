@@ -1,4 +1,10 @@
 1.3.5 - TBD
+    * Added new tab icons in the Render Controls window. This fixes the issue
+      with huge tabs when a high-resolution texture pack was used.
+    * Improved huge mushroom rendering: mushroom blocks with some data values
+      were rendered incorrectly
+    * Fixed a rendering issue for corner stairs causing various configurations
+      to render incorrectly
     * Fixed an error causing incorrect lighting of underwater blocks
     * Fixed button rendering (render new button orientations correctly)
     * The render reset confirmation feature now works as it should when the

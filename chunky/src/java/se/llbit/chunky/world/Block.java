@@ -1702,86 +1702,121 @@ public class Block extends Material {
 			localIntersect = true;
 		}
 		final Texture[][] tex =  {
-				// fleshy
+				// 0 = fleshy
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores
 				},
 
-				// cap on top, west, north
+				// 1 = cap on top, west, north
 				{
 					Texture.hugeBrownMushroom, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.hugeBrownMushroom,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, north
+				// 2 = cap on top, north
 				{
 					Texture.hugeBrownMushroom, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, east, north
+				// 3 = cap on top, east, north
 				{
 					Texture.hugeBrownMushroom, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, west
+				// 4 = cap on top, west
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.hugeBrownMushroom,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
 
-				// cap on top
+				// 5 = cap on top
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, east
+				// 6 = cap on top, east
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, west, south
+				// 7 = cap on top, west, south
 				{
 					Texture.mushroomPores, Texture.hugeBrownMushroom,
 					Texture.mushroomPores, Texture.hugeBrownMushroom,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, south
+				// 8 = cap on top, south
 				{
 					Texture.mushroomPores, Texture.hugeBrownMushroom,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, east, south
+				// 9 = cap on top, east, south
 				{
 					Texture.mushroomPores, Texture.hugeBrownMushroom,
 					Texture.hugeBrownMushroom, Texture.mushroomPores,
 					Texture.hugeBrownMushroom, Texture.mushroomPores
 				},
 
-				// stem
+				// 10 = stem
 				{
 					Texture.mushroomStem, Texture.mushroomStem,
 					Texture.mushroomStem, Texture.mushroomStem,
 					Texture.mushroomPores, Texture.mushroomPores
 				},
+
+				// 11 = undefined (cap on all sides)
+				{
+						Texture.hugeBrownMushroom, Texture.hugeBrownMushroom,
+						Texture.hugeBrownMushroom, Texture.hugeBrownMushroom,
+						Texture.hugeBrownMushroom, Texture.hugeBrownMushroom
+				},
+
+				// 12 = undefined (cap on all sides)
+				{
+						Texture.hugeBrownMushroom, Texture.hugeBrownMushroom,
+						Texture.hugeBrownMushroom, Texture.hugeBrownMushroom,
+						Texture.hugeBrownMushroom, Texture.hugeBrownMushroom
+				},
+
+				// 13 = undefined (cap on all sides)
+				{
+						Texture.hugeBrownMushroom, Texture.hugeBrownMushroom,
+						Texture.hugeBrownMushroom, Texture.hugeBrownMushroom,
+						Texture.hugeBrownMushroom, Texture.hugeBrownMushroom
+				},
+
+				// 14 = cap on all sides
+				{
+						Texture.hugeBrownMushroom, Texture.hugeBrownMushroom,
+						Texture.hugeBrownMushroom, Texture.hugeBrownMushroom,
+						Texture.hugeBrownMushroom, Texture.hugeBrownMushroom
+				},
+
+				// 15 = stem on all sides
+				{
+						Texture.mushroomStem, Texture.mushroomStem,
+						Texture.mushroomStem, Texture.mushroomStem,
+						Texture.mushroomStem, Texture.mushroomStem
+				}
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, tex[ray.getBlockData() % 11]);
+			return TexturedBlockModel.intersect(ray, tex[ray.getBlockData()]);
 		}
 	};
 	public static final int HUGEREDMUSHROOM_ID = 0x64;
@@ -1792,82 +1827,117 @@ public class Block extends Material {
 			localIntersect = true;
 		}
 		final Texture[][] tex =  {
-				// fleshy
+				// 0 = fleshy
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores
 				},
 
-				// cap on top, west, north
+				// 1 = cap on top, west, north
 				{
 					Texture.hugeRedMushroom, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.hugeRedMushroom,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, north
+				// 2 = cap on top, north
 				{
 					Texture.hugeRedMushroom, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, east, north
+				// 3 = cap on top, east, north
 				{
 					Texture.hugeRedMushroom, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, west
+				// 4 = cap on top, west
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.hugeRedMushroom,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
 
-				// cap on top
+				// 5 = cap on top
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, east
+				// 6 = cap on top, east
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, west, south
+				// 7 = cap on top, west, south
 				{
 					Texture.mushroomPores, Texture.hugeRedMushroom,
 					Texture.mushroomPores, Texture.hugeRedMushroom,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, south
+				// 8 = cap on top, south
 				{
 					Texture.mushroomPores, Texture.hugeRedMushroom,
 					Texture.mushroomPores, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
 
-				// cap on top, east, south
+				// 9 = cap on top, east, south
 				{
 					Texture.mushroomPores, Texture.hugeRedMushroom,
 					Texture.hugeRedMushroom, Texture.mushroomPores,
 					Texture.hugeRedMushroom, Texture.mushroomPores
 				},
 
-				// stem
+				// 10 = stem
 				{
 					Texture.mushroomStem, Texture.mushroomStem,
 					Texture.mushroomStem, Texture.mushroomStem,
 					Texture.mushroomPores, Texture.mushroomPores
 				},
+
+				// 11 = undefined (cap on all sides)
+				{
+						Texture.hugeRedMushroom, Texture.hugeRedMushroom,
+						Texture.hugeRedMushroom, Texture.hugeRedMushroom,
+						Texture.hugeRedMushroom, Texture.hugeRedMushroom
+				},
+
+				// 12 = undefined (cap on all sides)
+				{
+						Texture.hugeRedMushroom, Texture.hugeRedMushroom,
+						Texture.hugeRedMushroom, Texture.hugeRedMushroom,
+						Texture.hugeRedMushroom, Texture.hugeRedMushroom
+				},
+
+				// 13 = undefined (cap on all sides)
+				{
+						Texture.hugeRedMushroom, Texture.hugeRedMushroom,
+						Texture.hugeRedMushroom, Texture.hugeRedMushroom,
+						Texture.hugeRedMushroom, Texture.hugeRedMushroom
+				},
+
+				// 14 = cap on all sides
+				{
+						Texture.hugeRedMushroom, Texture.hugeRedMushroom,
+						Texture.hugeRedMushroom, Texture.hugeRedMushroom,
+						Texture.hugeRedMushroom, Texture.hugeRedMushroom
+				},
+
+				// 15 = stem on all sides
+				{
+						Texture.mushroomStem, Texture.mushroomStem,
+						Texture.mushroomStem, Texture.mushroomStem,
+						Texture.mushroomStem, Texture.mushroomStem
+				}
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {

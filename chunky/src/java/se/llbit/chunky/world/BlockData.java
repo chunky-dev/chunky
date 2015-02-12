@@ -81,4 +81,9 @@ public interface BlockData {
 	 * Fence gate is three pixels lower
 	 */
 	int FENCEGATE_LOW = 20;
+
+	/**
+	 * The upside down stair bit
+	 */
+	int UPSIDE_DOWN_STAIR = 1<<10;
 }
