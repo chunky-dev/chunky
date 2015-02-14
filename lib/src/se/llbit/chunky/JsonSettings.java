@@ -46,7 +46,7 @@ public final class JsonSettings {
 
 	/**
 	 * Load saved properties.
-	 * @param file
+	 * @param file source file
 	 */
 	public void load(File file) {
 		String path = file.getAbsolutePath();
@@ -65,19 +65,24 @@ public final class JsonSettings {
 
 	/**
 	 * Save settings to file.
-	 * @param file
+	 * @param file destination file
 	 */
 	public void save(File file) {
 		String path = file.getAbsolutePath();
 		File settingsDir = file.getParentFile();
 		if (settingsDir == null) {
 			Log.error("Failed to save settings to " + path);
+			return;
 		}
 		if (!settingsDir.isDirectory()) {
 			Log.warn("Warning: Chunky settings directory does not exist. " +
 					"Creating settings directory at " +
 					settingsDir.getAbsolutePath());
-			settingsDir.mkdirs();
+			boolean success = settingsDir.mkdirs();
+			if (!success) {
+				Log.error("Failed to create settings directory " + settingsDir.getAbsolutePath());
+				return;
+			}
 		}
 		try {
 			OutputStream out = new FileOutputStream(file);
@@ -137,8 +142,8 @@ public final class JsonSettings {
 
 	/**
 	 * Set string value
-	 * @param name
-	 * @param value
+	 * @param name setting name
+	 * @param value value
 	 */
 	public void setString(String name, String value) {
 		json.set(name, new JsonString(value));
@@ -146,8 +151,8 @@ public final class JsonSettings {
 
 	/**
 	 * Set boolean value
-	 * @param name
-	 * @param value
+	 * @param name setting name
+	 * @param value value
 	 */
 	public void setBool(String name, boolean value) {
 		json.set(name, value ? new JsonTrue() : new JsonFalse());
@@ -155,8 +160,8 @@ public final class JsonSettings {
 
 	/**
 	 * Set integer value
-	 * @param name
-	 * @param value
+	 * @param name setting name
+	 * @param value value
 	 */
 	public void setInt(String name, int value) {
 		json.set(name, new JsonNumber("" + value));
@@ -164,8 +169,8 @@ public final class JsonSettings {
 
 	/**
 	 * Set double value
-	 * @param name
-	 * @param value
+	 * @param name setting name
+	 * @param value value
 	 */
 	public void setDouble(String name, double value) {
 		json.set(name, new JsonNumber("" + value));
@@ -173,7 +178,7 @@ public final class JsonSettings {
 
 	/**
 	 * Remove a setting
-	 * @param name
+	 * @param name setting name
 	 */
 	public void removeSetting(String name) {
 		for (int i = 0; i < json.getNumMember(); ++i) {
@@ -185,8 +190,8 @@ public final class JsonSettings {
 	}
 
 	/**
-	 * @param name
-	 * @return <code>true</code> if the property map contains a property of
+	 * @param name setting name
+	 * @return <code>true</code> if the configuration contains a setting with
 	 * the given name
 	 */
 	public boolean containsKey(String name) {
