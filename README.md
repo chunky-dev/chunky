@@ -25,10 +25,6 @@ See the file license/JOCL.txt for the full license and copyright notice.
 * **MWC64X by David Thomas.**
   MWC64X is covered by the Modified BSD License.
 See the file license/MWC64X.txt for the full license and copyright notice.
-* **log4j by the Apche Software Foundation.**
-  The log4j library is covered by the Apache License, version 2.0.
-See the file license/Apache-2.0.txt for the full license text.
-See the file license/log4j.txt for the copyright notice.
 * **Markdown by John Gruber.**
   Markdown is covered by the Modified BSD License.
 See the file license/Markdown.txt for the full license and copyright notice.
