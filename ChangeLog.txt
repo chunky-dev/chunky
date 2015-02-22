@@ -1,4 +1,6 @@
 1.3.5 - TBD
+    * Added a notification after changing the Y cutoff setting about reloading
+      the chunks for the setting to take effect.
     * Added new tab icons in the Render Controls window. This fixes the issue
       with huge tabs when a high-resolution texture pack was used.
     * Improved huge mushroom rendering: mushroom blocks with some data values

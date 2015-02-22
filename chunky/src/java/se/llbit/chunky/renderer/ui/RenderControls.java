@@ -105,6 +105,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 import se.llbit.ui.Adjuster;
+import se.llbit.ui.ErrorLabel;
 
 /**
  * Render Controls dialog.
@@ -287,10 +288,20 @@ public class RenderControls extends JDialog implements ViewListener,
 			"Y cutoff",
 			"Blocks below the Y cutoff are not loaded",
 			0, Chunk.Y_MAX) {
+		public ErrorLabel advisory;
+
+		@Override
+		public void setUp() {
+			super.setUp();
+			advisory = new ErrorLabel(getField());
+			advisory.setVisible(false);
+		}
 		@Override
 		public void valueChanged(double newValue) {
 			int value = (int) newValue;
 			PersistentSettings.setYCutoff(value);
+			advisory.setText("This takes effect after the next time chunks are reloaded!");
+			advisory.setVisible(true);
 		}
 		@Override
 		public void update() {

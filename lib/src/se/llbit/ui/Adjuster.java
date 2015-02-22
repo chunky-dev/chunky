@@ -113,7 +113,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 		this(label, tip, min, max, true);
 	}
 
-	private void setUp() {
+	protected void setUp() {
 		slider.addChangeListener(this);
 		textField.addActionListener(this);
 		textField.getDocument().addDocumentListener(this);

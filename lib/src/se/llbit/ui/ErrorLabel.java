@@ -22,6 +22,8 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -34,7 +36,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 @SuppressWarnings("serial")
-public class ErrorLabel extends JPanel {
+public class ErrorLabel extends JPanel implements MouseListener {
 	private final JComponent parentComponent;
 	private final JLabel lbl = new JLabel();
 	private JLayeredPane layeredPane;
@@ -46,6 +48,7 @@ public class ErrorLabel extends JPanel {
 		setOpaque(true);
 		setBackground(errBGColor);
 		this.parentComponent = parent;
+		addMouseListener(this);
 		attachTooltip();
 	}
 
@@ -123,5 +126,27 @@ public class ErrorLabel extends JPanel {
 	public void setVisible(boolean aFlag) {
 		super.setVisible(aFlag);
 		showLabel = aFlag;
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// clicking on the error message dismisses it
+		setVisible(false);
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
 	}
 }
