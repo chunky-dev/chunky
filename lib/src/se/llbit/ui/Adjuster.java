@@ -93,10 +93,10 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 
 	/**
 	 * Create new double value adjuster
-	 * @param label
-	 * @param tip
-	 * @param min
-	 * @param max
+	 * @param label text label
+	 * @param tip tooltip
+	 * @param min minimum value
+	 * @param max maximum value
 	 */
 	public Adjuster(String label, String tip, double min, double max) {
 		this(label, tip, min, max, false);
@@ -104,10 +104,10 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 
 	/**
 	 * Create new integer value adjuster
-	 * @param label
-	 * @param tip
-	 * @param min
-	 * @param max
+	 * @param label text label
+	 * @param tip tooltip
+	 * @param min minimum value
+	 * @param max maximum value
 	 */
 	public Adjuster(String label, String tip, int min, int max) {
 		this(label, tip, min, max, true);
@@ -154,7 +154,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	}
 
 	/**
-	 * @param layout
+	 * @param layout layout manager
 	 * @return horizontal layout group
 	 */
 	public Group horizontalGroup(GroupLayout layout) {
@@ -167,7 +167,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	}
 
 	/**
-	 * @param layout
+	 * @param layout layout manager
 	 * @return vertical layout group
 	 */
 	public Group verticalGroup(GroupLayout layout) {
@@ -276,7 +276,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 
 	/**
 	 * Set the parameter value
-	 * @param value
+	 * @param value new adjuster value
 	 */
 	public void set(double value) {
 		setSlider(value);
@@ -285,7 +285,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 
 	/**
 	 * Set parameter value and new min/max limits
-	 * @param value
+	 * @param value new adjuster value
 	 * @param min New minimum value
 	 * @param max New maximum value
 	 */
@@ -312,7 +312,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 		} else {
 			double range = (slider.getMaximum() - slider.getMinimum()) / (sliderMax - sliderMin);
 			double clampedValue = Math.max(sliderMin, value);
-			clampedValue = Math.min(sliderMax, value);
+			clampedValue = Math.min(sliderMax, clampedValue);
 			sliderValue = (int) ((clampedValue - min) * range + 0.5 + slider.getMinimum());
 		}
 		setSliderValue(sliderValue);
@@ -343,8 +343,8 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	}
 
 	/**
-	 * Handles value changes
-	 * @param newValue
+	 * Callback for handling adjuster value changes.
+	 * @param newValue new adjuster value
 	 */
 	public abstract void valueChanged(double newValue);
 
@@ -376,7 +376,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 
 	/**
 	 * Enable or disable the controls of this adjuster
-	 * @param enabled
+	 * @param enabled true if the adjuster should be enabled
 	 */
 	public void setEnabled(boolean enabled) {
 		lbl.setEnabled(enabled);
@@ -386,7 +386,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 
 	/**
 	 * Set the lower limit of the slider. Can not be zero in logarithmic mode.
-	 * @param sliderMin
+	 * @param sliderMin new slider minimum value
 	 */
 	public void setSliderMin(double sliderMin) {
 		this.sliderMin = sliderMin;
@@ -394,7 +394,7 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 
 	/**
 	 * Set the upper limit of the slider.
-	 * @param sliderMax
+	 * @param sliderMax new slider maximum
 	 */
 	public void setSliderMax(double sliderMax) {
 		this.sliderMax = sliderMax;
