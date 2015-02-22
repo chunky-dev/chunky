@@ -1,4 +1,5 @@
 1.3.5 - TBD
+    * Fixed stairs with fog render issue
     * Added a notification after changing the Y cutoff setting about reloading
       the chunks for the setting to take effect.
     * Added new tab icons in the Render Controls window. This fixes the issue

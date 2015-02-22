@@ -57,7 +57,8 @@ public class Ray {
 	public Vector3d n = new Vector3d();
 
 	/**
-	 * Distance traveled in current medium.
+	 * Distance traveled in current medium. This is updated after all intersection
+	 * tests have run and the final t value has been found.
 	 */
 	public double distance;
 
@@ -103,6 +104,9 @@ public class Ray {
 
 	/**
 	 * Distance to next potential intersection.
+	 * The tNext value is stored by subroutines when calculating a potential
+	 * next hit point. This can then be stored in the t variable based on
+	 * further decision making.
 	 */
 	public double tNext;
 
@@ -187,6 +191,7 @@ public class Ray {
 
 	/**
  	 * Find the exit point from the given block for this ray.
+	 * This marches the ray forward - i.e. updates ray origin directly.
  	 * @param bx block x coordinate
  	 * @param by block y coordinate
  	 * @param bz block z coordinate
@@ -195,8 +200,8 @@ public class Ray {
 		int nx = 0;
 		int ny = 0;
 		int nz = 0;
-		tNext = Double.POSITIVE_INFINITY;
-		t = (bx - o.x) / d.x;
+		double tNext = Double.POSITIVE_INFINITY;
+		double t = (bx - o.x) / d.x;
 		if (t > Ray.EPSILON) {
 			tNext = t;
 			nx = 1;

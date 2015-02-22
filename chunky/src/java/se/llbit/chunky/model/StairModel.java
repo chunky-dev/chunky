@@ -193,6 +193,7 @@ public class StairModel {
 		}
 
 		if (hit) {
+			ray.distance += ray.t;
 			ray.o.scaleAdd(ray.t, ray.d);
 		}
 		return hit;

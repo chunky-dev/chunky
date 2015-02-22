@@ -87,7 +87,7 @@ public class ButtonModel {
 			}
 		}
 		if (hit) {
-			ray.color.w = 1;
+			ray.color.w = 1;// always opaque
 			ray.distance += ray.t;
 			ray.o.scaleAdd(ray.t, ray.d);
 		}

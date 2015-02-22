@@ -27,10 +27,11 @@ public class DaylightSensorModel {
 	public static boolean intersect(Ray ray) {
 		ray.t = Double.POSITIVE_INFINITY;
 		if (block.intersect(ray)) {
-			if (ray.n.y > 0)
+			if (ray.n.y > 0) {
 				Texture.daylightDetectorTop.getColor(ray);
-			else
+			} else {
 				Texture.daylightDetectorSide.getColor(ray);
+			}
 			ray.color.w = 1;
 			ray.distance += ray.tNext;
 			ray.o.scaleAdd(ray.tNext, ray.d);

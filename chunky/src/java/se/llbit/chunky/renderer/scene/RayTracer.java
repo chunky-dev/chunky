@@ -90,6 +90,7 @@ public class RayTracer {
 			hit = waterIntersection(scene, ray) || hit;
 		}
 		if (scene.intersect(ray)) {
+			// octree tracer handles updating distance
 			return true;
 		}
 		if (hit) {

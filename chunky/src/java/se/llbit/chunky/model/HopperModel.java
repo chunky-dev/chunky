@@ -74,10 +74,11 @@ public class HopperModel {
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < boxes.length; ++i) {
 			if (boxes[i].intersect(ray)) {
-				if (ray.n.y > 0)
+				if (ray.n.y > 0) {
 					Texture.hopperInside.getColor(ray);
-				else
+				} else {
 					Texture.hopperOutside.getColor(ray);
+				}
 				ray.color.w = 1;
 				ray.t = ray.tNext;
 				hit = true;
@@ -85,10 +86,11 @@ public class HopperModel {
 		}
 		int dir = 7 & (ray.getCurrentData() >> BlockData.OFFSET);
 		if (pipe[dir].intersect(ray)) {
-			if (ray.n.y > 0)
+			if (ray.n.y > 0) {
 				Texture.hopperInside.getColor(ray);
-			else
+			} else {
 				Texture.hopperOutside.getColor(ray);
+			}
 			ray.color.w = 1;
 			ray.t = ray.tNext;
 			hit = true;
@@ -96,10 +98,11 @@ public class HopperModel {
 		if (bottom.intersect(ray)) {
 			ray.n.set(bottom.n);
 			ray.n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
-			if (ray.n.y > 0)
+			if (ray.n.y > 0) {
 				Texture.hopperInside.getColor(ray);
-			else
+			} else {
 				Texture.hopperOutside.getColor(ray);
+			}
 			ray.t = ray.tNext;
 			hit = true;
 		}

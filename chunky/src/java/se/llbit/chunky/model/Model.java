@@ -26,8 +26,7 @@ import se.llbit.math.UVTriangle;
  */
 public class Model {
 	/**
-	 * @param src
-	 * @param angle
+	 * @param src source quads
 	 * @return Quads rotated minus 90 degrees around the X axis
 	 */
 	public static final Quad[] rotateNegX(Quad[] src) {
@@ -39,8 +38,7 @@ public class Model {
 	}
 
 	/**
-	 * @param src
-	 * @param angle
+	 * @param src source quads
 	 * @return Quads rotated 90 degrees around the X axis
 	 */
 	public static final Quad[] rotateX(Quad[] src) {
@@ -52,7 +50,7 @@ public class Model {
 	}
 
 	/**
-	 * @param src
+	 * @param src source quads
 	 * @param angle
 	 * @return Quads rotated about the X axis by some angle
 	 */
@@ -65,7 +63,7 @@ public class Model {
 	}
 
 	/**
-	 * @param src
+	 * @param src source quads
 	 * @return Quads rotated 90 degrees around the Y axis
 	 */
 	public static final Quad[] rotateY(Quad[] src) {
@@ -77,7 +75,7 @@ public class Model {
 	}
 
 	/**
-	 * @param src
+	 * @param src source quads
 	 * @return UVTriangles rotated about the Y axis
 	 */
 	public static final UVTriangle[] rotateY(UVTriangle[] src) {
@@ -89,7 +87,7 @@ public class Model {
 	}
 
 	/**
-	 * @param src
+	 * @param src source quads
 	 * @param angle
 	 * @return Quads rotated about the Y axis by some angle
 	 */
@@ -102,7 +100,7 @@ public class Model {
 	}
 
 	/**
-	 * @param src
+	 * @param src source quads
 	 * @return Quads rotated about the Z axis
 	 */
 	public static final Quad[] rotateZ(Quad[] src) {
@@ -114,7 +112,7 @@ public class Model {
 	}
 
 	/**
-	 * @param src
+	 * @param src source quads
 	 * @param angle
 	 * @return Quads rotated about the Z axis by some angle
 	 */
@@ -127,7 +125,7 @@ public class Model {
 	}
 
 	/**
-	 * @param src
+	 * @param src source quads
 	 * @param x Distance to translate along the X axis
 	 * @param y Distance to translate along the Y axis
 	 * @param z Distance to translate along the Z axis
@@ -142,7 +140,7 @@ public class Model {
 	}
 
 	/**
-	 * @param src
+	 * @param src source quads
 	 * @param scale
 	 * @return Scaled copies of the source quads
 	 */

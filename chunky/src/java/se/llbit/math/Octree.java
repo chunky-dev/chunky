@@ -463,6 +463,7 @@ public class Octree {
 				return true;
 			}
 
+			// exit current octree leaf
 			t = ((lx<<level) - ray.o.x) / d.x;
 			if (t > Ray.EPSILON) {
 				tNear = t;
@@ -623,6 +624,7 @@ public class Octree {
 				}
 			}
 
+			// exit current octree leaf
 			if ((node.type & (1<<WaterModel.FULL_BLOCK)) == 0) {
 				if (WaterModel.intersectTop(ray)) {
 					ray.setCurrentMat(Block.AIR, 0);

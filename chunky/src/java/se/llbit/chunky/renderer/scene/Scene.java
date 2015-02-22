@@ -501,8 +501,9 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
-	 * Find closest intersection between ray and scene
-	 * @param ray
+	 * Find closest intersection between ray and scene.
+	 * This marches the ray forward - i.e. updates the ray origin directly.
+	 * @param ray ray to test against scene
 	 * @return <code>true</code> if an intersection was found
 	 */
 	public boolean intersect(Ray ray) {
@@ -513,7 +514,6 @@ public class Scene extends SceneDescription {
 		Ray oct = new Ray(ray);
 		oct.setCurrentMat(ray.getPrevMaterial(), ray.getPrevData());
 		if (worldOctree.intersect(this, oct) && oct.distance < ray.t) {
-			ray.t = oct.distance;
 			ray.distance += oct.distance;
 			ray.o.set(oct.o);
 			ray.n.set(oct.n);

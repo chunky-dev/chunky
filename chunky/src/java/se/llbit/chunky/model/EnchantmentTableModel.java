@@ -27,12 +27,13 @@ public class EnchantmentTableModel {
 	public static boolean intersect(Ray ray) {
 		ray.t = Double.POSITIVE_INFINITY;
 		if (aabb.intersect(ray)) {
-			if (ray.n.y > 0)
+			if (ray.n.y > 0) {
 				Texture.enchantmentTableTop.getColor(ray);
-			else if (ray.n.y < 0)
+			} else if (ray.n.y < 0) {
 				Texture.enchantmentTableBottom.getColor(ray);
-			else
+			} else {
 				Texture.enchantmentTableSide.getColor(ray);
+			}
 			ray.color.w = 1;
 			ray.distance += ray.tNext;
 			ray.o.scaleAdd(ray.tNext, ray.d);

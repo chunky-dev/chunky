@@ -83,8 +83,8 @@ public class FlowerPotModel {
 
 	/**
 	 * Find intersection between ray and block
-	 * @param ray
-	 * @param scene
+	 * @param ray ray to test
+	 * @param scene scene reference
 	 * @return <code>true</code> if the ray intersected the block
 	 */
 	public static boolean intersect(Ray ray, Scene scene) {

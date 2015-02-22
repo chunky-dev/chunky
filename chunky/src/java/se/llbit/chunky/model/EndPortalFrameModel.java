@@ -29,20 +29,22 @@ public class EndPortalFrameModel {
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
 		if (frame.intersect(ray)) {
-			if (ray.n.y > 0)
+			if (ray.n.y > 0) {
 				Texture.endPortalFrameTop.getColor(ray);
-			else if (ray.n.y < 0)
+			} else if (ray.n.y < 0) {
 				Texture.endStone.getColor(ray);
-			else
+			} else {
 				Texture.endPortalFrameSide.getColor(ray);
+			}
 			ray.t = ray.tNext;
 			hit = true;
 		}
 		if ((ray.getBlockData() & 4) != 0 && eyeOfTheEnder.intersect(ray)) {
-			if (ray.n.y > 0)
+			if (ray.n.y > 0) {
 				Texture.eyeOfTheEnder.getColor(ray);
-			else
+			} else {
 				Texture.eyeOfTheEnder.getColor(ray);
+			}
 			ray.t = ray.tNext;
 			hit = true;
 		}
