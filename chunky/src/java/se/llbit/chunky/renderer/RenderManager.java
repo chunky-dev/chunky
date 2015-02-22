@@ -466,6 +466,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				mutableScene.set(bufferedScene);
 				mutableScene.copyTransients(bufferedScene);
 				mutableScene.setRefreshed();
+				state = bufferedScene.getRenderState();
 			}
 			bufferedScene.updateCanvas();
 			canvas.repaint();

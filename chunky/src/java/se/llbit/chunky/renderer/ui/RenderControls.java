@@ -221,7 +221,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		public void valueChanged(double newValue) {
 			int value = (int) newValue;
 			renderMan.setTargetSPP(value);
-			startRenderBtn.setEnabled(renderMan.getCurrentSPP() < value);
+			if (renderMan.scene().getRenderState() != RenderState.PREVIEW) {
+				startRenderBtn.setEnabled(renderMan.getCurrentSPP() < value);
+			}
 		}
 
 		@Override
@@ -1700,7 +1702,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		savePreset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String name = "";
+				String name;
 				int selected = customPreset.getSelectedIndex();
 				if (selected == -1) {
 					// select name
@@ -1745,7 +1747,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		loadPreset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String name = "";
+				String name;
 				int selected = customPreset.getSelectedIndex();
 				if (selected == -1) {
 					// select name
@@ -2854,12 +2856,14 @@ public class RenderControls extends JDialog implements ViewListener,
 		case PREVIEW:
 			startRenderBtn.setText("START");
 			startRenderBtn.setIcon(Icon.play.imageIcon());
+			startRenderBtn.setEnabled(true);
 			stopRenderBtn.setEnabled(false);
 			stopRenderBtn.setForeground(Color.black);
 			break;
 		case RENDERING:
-				startRenderBtn.setText("PAUSE");
-				startRenderBtn.setIcon(Icon.pause.imageIcon());
+			startRenderBtn.setText("PAUSE");
+			startRenderBtn.setIcon(Icon.pause.imageIcon());
+			startRenderBtn.setEnabled(true);
 			stopRenderBtn.setEnabled(true);
 			stopRenderBtn.setForeground(Color.red);
 			break;
