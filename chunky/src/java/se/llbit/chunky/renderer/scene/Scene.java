@@ -159,6 +159,16 @@ public class Scene extends SceneDescription {
 	public static final double DEFAULT_EXPOSURE = 1.0;
 
 	/**
+	 * Default fog density
+	 */
+	public static final double DEFAULT_FOG_DENSITY = 0.0;
+
+	/**
+	 * Default atmosphere density
+	 */
+	public static final double DEFAULT_ATMOSPHERE_DENSITY = 0.0;
+
+	/**
 	 * World
 	 */
 	private World loadedWorld;
@@ -278,9 +288,9 @@ public class Scene extends SceneDescription {
 		sunEnabled = other.sunEnabled;
 		emittersEnabled = other.emittersEnabled;
 		emitterIntensity = other.emitterIntensity;
-		atmosphereEnabled = other.atmosphereEnabled;
 		transparentSky = other.transparentSky;
-		volumetricFogEnabled = other.volumetricFogEnabled;
+		fogDensity = other.fogDensity;
+		atmosphereDensity = other.atmosphereDensity;
 
 		camera.set(other.camera);
 		sky.set(other.sky);
@@ -476,8 +486,8 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
-	 * @param ray
-	 * @param rayPool
+	 * Quick ray trace
+	 * @param state
 	 */
 	public void quickTrace(WorkerState state) {
 		state.ray.o.x -= origin.x;
@@ -1243,17 +1253,6 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
-	 * Set the atmospheric scattering flag
-	 * @param value
-	 */
-	public void setAtmosphereEnabled(boolean value) {
-		if (value != atmosphereEnabled) {
-			atmosphereEnabled = value;
-			refresh();
-		}
-	}
-
-	/**
 	 * Set the transparent sky option.
 	 * @param value
 	 */
@@ -1265,35 +1264,10 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
-	 * Set the volumetric fog flag
-	 * @param value
-	 */
-	public void setVolumetricFogEnabled(boolean value) {
-		if (value != volumetricFogEnabled) {
-			volumetricFogEnabled = value;
-			refresh();
-		}
-	}
-
-	/**
-	 * @return <code>true</code> if atmospheric scattering is enabled
-	 */
-	public boolean atmosphereEnabled() {
-		return atmosphereEnabled;
-	}
-
-	/**
 	 * @return {@code true} if transparent sky is enabled
 	 */
 	public boolean transparentSky() {
 		return transparentSky;
-	}
-
-	/**
-	 * @return <code>true</code> if volumetric fog is enabled
-	 */
-	public boolean volumetricFogEnabled() {
-		return volumetricFogEnabled;
 	}
 
 	/**
@@ -2225,4 +2199,5 @@ public class Scene extends SceneDescription {
 			}
 		}
 	}
+
 }

@@ -443,13 +443,17 @@ public class Sun implements JSONifiable {
 		return d.dot(sw);
 	}
 
+	// Rayleigh coefficient
 	private static final double Br = 0.0002;
+	// Mie coefficient
 	private static final double Bm = 0.0009;
+	// Henyey/Greenstein phase function eccentricity
 	private static final double g = -.0007;
+	private static final double g2 = g*g;
 
 	/**
 	 * @param s
-	 * @return Extinction factor
+	 * @return Extinction coefficient
 	 */
 	public double extinction(double s) {
 		return FastMath.exp(-(Br + Bm) * s);
@@ -458,13 +462,13 @@ public class Sun implements JSONifiable {
 	/**
 	 * @param Fex
 	 * @param theta
-	 * @return Inscatter factor
+	 * @return Inscatter coefficient
 	 */
 	public double inscatter(double Fex, double theta) {
 		double cos_theta = FastMath.cos(theta);
 		double cos2_theta = cos_theta*cos_theta;
 		double Brt = (3 / (16*Math.PI)) * Br * (1 + cos2_theta);
-		double Bmt = (1 / (4*Math.PI)) * Bm * ((1-g)*(1-g)) / FastMath.pow(1 + g*g + 2*g*cos_theta, 3/2.);
+		double Bmt = (1 / (4*Math.PI)) * Bm * ((1-g)*(1-g)) / FastMath.pow(1 + g2 + 2*g*cos_theta, 3/2.);
 		return ((Brt + Bmt) / (Br + Bm)) * (1 - Fex);
 	}
 

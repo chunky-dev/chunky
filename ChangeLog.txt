@@ -1,4 +1,5 @@
 1.3.5 - TBD
+    * Added sliders for atmosphere and fog density
     * Fixed stairs with fog render issue
     * Added a notification after changing the Y cutoff setting about reloading
       the chunks for the setting to take effect.

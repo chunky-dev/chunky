@@ -21,6 +21,7 @@ import java.util.Random;
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.model.WaterModel;
+import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Material;
@@ -345,25 +346,32 @@ public class PathTracer {
 		}
 
 		if (s > 0) {
+			// References:
+			// Hoffman N, Preetham A. J.: Rendering Outdoor Light Scattering in Real Time
+			// GPU Gems 2, Chapter 16
+			// Nielsen R. S., Real Time Rendering of Atmospheric Scattering Effects for Flight Simulators
 
-			if (scene.atmosphereEnabled) {
-				double Fex = scene.sun.extinction(s);
-				ray.color.x *= Fex;
-				ray.color.y *= Fex;
-				ray.color.z *= Fex;
+			// TODO improve this simplistic light scatter simulation!
+			if (scene.atmosphereEnabled()) {
+				double Fex = scene.sun.extinction(s * scene.getAtmosphereDensity());
+				ray.color.x *= (1-RenderConstants.CrL4R) + Fex * RenderConstants.CrL4R;
+				ray.color.y *= (1-RenderConstants.CrL4G) + Fex * RenderConstants.CrL4G;
+				ray.color.z *= (1-RenderConstants.CrL4B) + Fex * RenderConstants.CrL4B;
 
-				if (!scene.volumetricFogEnabled) {
+				if (!scene.volumetricFogEnabled()) {
 					double Fin = scene.sun.inscatter(Fex, scene.sun.theta(ray.d));
 
-					ray.color.x += Fin * scene.sun.emittance.x * scene.sun.getIntensity();
-					ray.color.y += Fin * scene.sun.emittance.y * scene.sun.getIntensity();
-					ray.color.z += Fin * scene.sun.emittance.z * scene.sun.getIntensity();
+					ray.color.x += Fin * scene.sun.emittance.x * scene.sun.getIntensity() * RenderConstants.CrL4R;
+					ray.color.y += Fin * scene.sun.emittance.y * scene.sun.getIntensity() * RenderConstants.CrL4G;
+					ray.color.z += Fin * scene.sun.emittance.z * scene.sun.getIntensity() * RenderConstants.CrL4B;
 				}
 			}
 
-			if (scene.volumetricFogEnabled) {
+			if (scene.volumetricFogEnabled()) {
+				// select point between ray source and intersected object
 				s = (s - Ray.OFFSET) * random.nextDouble();
 
+				// get direct light attenuation
 				Ray reflected = new Ray();
 				reflected.o.scaleAdd(s, od, ox);
 				scene.sun.getRandomSunDirection(reflected, random);
@@ -371,6 +379,9 @@ public class PathTracer {
 
 				getDirectLightAttenuation(scene, reflected, state);
 				Vector4d attenuation = state.attenuation;
+
+				// scale s with fog factor
+				s *= scene.getFogDensity();
 
 				double Fex = scene.sun.extinction(s);
 				double Fin = scene.sun.inscatter(Fex, scene.sun.theta(ray.d));

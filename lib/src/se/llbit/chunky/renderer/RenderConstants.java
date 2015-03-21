@@ -50,4 +50,17 @@ public interface RenderConstants {
 	 */
 	int TILE_WIDTH_DEFAULT = 8;
 
+	// Rayleigh coefficient
+	double Cr = 0.003;
+	// Mie coefficient
+	double Cm = 0.001;
+
+	double LAMBDA_RED = 650;
+	double LAMBDA_GREEN = 570;
+	double LAMBDA_BLUE = 475;
+
+	// Cr / pow(wavelength, 4)
+	double CrL4R = 10* Cr / Math.pow(LAMBDA_RED/1e3, 4);
+	double CrL4G = 10* Cr / Math.pow(LAMBDA_GREEN/1e3, 4);
+	double CrL4B = 10* Cr / Math.pow(LAMBDA_BLUE/1e3, 4);
 }

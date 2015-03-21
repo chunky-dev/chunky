@@ -113,10 +113,18 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	protected final Vector3d waterColor = new Vector3d(PersistentSettings.getWaterColorRed(),
 			PersistentSettings.getWaterColorGreen(), PersistentSettings.getWaterColorBlue());
 
+	/**
+	 * Fog thickness.
+	 */
+	protected double fogDensity;
+
+	/**
+	 * Haze thickness.
+	 */
+	protected double atmosphereDensity;
+
 	protected boolean biomeColors = true;
-	protected boolean atmosphereEnabled = false;
 	protected boolean transparentSky = false;
-	protected boolean volumetricFogEnabled = false;
 
 	protected Collection<ChunkPosition> chunks = new ArrayList<ChunkPosition>();
 
@@ -180,9 +188,9 @@ public class SceneDescription implements Refreshable, JSONifiable {
 			desc.add("waterColor", colorObj);
 		}
 		desc.add("biomeColorsEnabled", biomeColors);
-		desc.add("atmosphereEnabled", atmosphereEnabled);
+		desc.add("atmosphereDensity", atmosphereDensity);
 		desc.add("transparentSky", transparentSky);
-		desc.add("volumetricFogEnabled", volumetricFogEnabled);
+		desc.add("fogDensity", fogDensity);
 		desc.add("waterHeight", waterHeight);
 
 		// save world info
@@ -246,9 +254,9 @@ public class SceneDescription implements Refreshable, JSONifiable {
 			waterColor.z = colorObj.get("blue").doubleValue(PersistentSettings.getWaterColorBlue());
 		}
 		biomeColors = desc.get("biomeColorsEnabled").boolValue(true);
-		atmosphereEnabled = desc.get("atmosphereEnabled").boolValue(false);
+		atmosphereDensity = desc.get("atmosphereDensity").doubleValue(Scene.DEFAULT_ATMOSPHERE_DENSITY);
 		transparentSky = desc.get("transparentSky").boolValue(false);
-		volumetricFogEnabled = desc.get("volumetricFogEnabled").boolValue(false);
+		fogDensity = desc.get("fogDensity").doubleValue(Scene.DEFAULT_FOG_DENSITY);
 		waterHeight = desc.get("waterHeight").intValue(0);
 
 		// load world info
@@ -379,4 +387,41 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	public RenderState getRenderState() {
 		return renderState;
 	}
+
+	public void setFogDensity(double newValue) {
+		if (newValue != fogDensity) {
+			this.fogDensity = newValue;
+			refresh();
+		}
+	}
+
+	public double getFogDensity() {
+		return fogDensity;
+	}
+
+	public void setAtmosphereDensity(double newValue) {
+		if (newValue != atmosphereDensity) {
+			this.atmosphereDensity = newValue;
+			refresh();
+		}
+	}
+
+	public double getAtmosphereDensity() {
+		return atmosphereDensity;
+	}
+
+	/**
+	 * @return <code>true</code> if atmospheric scattering is enabled
+	 */
+	public boolean atmosphereEnabled() {
+		return atmosphereDensity > 0.0;
+	}
+
+	/**
+	 * @return <code>true</code> if volumetric fog is enabled
+	 */
+	public boolean volumetricFogEnabled() {
+		return fogDensity > 0.0;
+	}
+
 }

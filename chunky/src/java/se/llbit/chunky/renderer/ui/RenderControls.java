@@ -154,9 +154,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JLabel sceneNameLbl = new JLabel();
 	private final JCheckBox biomeColorsCB = new JCheckBox();
 	private final JButton stopRenderBtn = new JButton();
-	private final JCheckBox atmosphereEnabled = new JCheckBox();
 	private final JCheckBox transparentSky = new JCheckBox();
-	private final JCheckBox volumetricFogEnabled = new JCheckBox();
 	private final JCheckBox cloudsEnabled = new JCheckBox();
 	private final RenderContext context;
 	private final JButton showPreviewBtn = new JButton();
@@ -262,6 +260,42 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void update() {
 			set(renderMan.scene().getWaterVisibility());
+		}
+	};
+
+	private final Adjuster fogDensity = new Adjuster(
+			"Fog density",
+			"Alters the volumetric fog",
+			0.0, 10.0) {
+		{
+			setClampMax(false);
+		}
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().setFogDensity(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().getFogDensity());
+		}
+	};
+
+	private final Adjuster atmosphereDensity = new Adjuster(
+			"Atmosphere",
+			"Alters the atmospheric effects",
+			0.0, 15.0) {
+		{
+			setClampMax(false);
+		}
+		@Override
+		public void valueChanged(double newValue) {
+			renderMan.scene().setAtmosphereDensity(newValue);
+		}
+
+		@Override
+		public void update() {
+			set(renderMan.scene().getAtmosphereDensity());
 		}
 	};
 
@@ -545,8 +579,8 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	/**
 	 * Create a new Render Controls dialog.
-	 * @param chunkyInstance
-	 * @param renderContext
+	 * @param chunkyInstance parent window
+	 * @param renderContext render context
 	 */
 	public RenderControls(Chunky chunkyInstance, RenderContext renderContext) {
 
@@ -618,7 +652,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		addTab("General", Icon.wrench, buildGeneralPane());
 		addTab("Lighting", Icon.light, buildLightingPane());
-		addTab("Sky", Icon.sky, buildSkyPane());
+		addTab("Sky & Fog", Icon.sky, buildSkyPane());
 		addTab("Water", Icon.water, buildWaterPane());
 		addTab("Camera", Icon.camera, buildCameraPane());
 		addTab("Post-processing", Icon.gear, buildPostProcessingPane());
@@ -821,9 +855,9 @@ public class RenderControls extends JDialog implements ViewListener,
 	 * Add a tab and ensure that the icon is to the left of the text in the
 	 * tab label.
 	 *
-	 * @param title
-	 * @param icon
-	 * @param component
+	 * @param title tab title
+	 * @param icon tab icon
+	 * @param component tab component
 	 */
 	private void addTab(String title, Texture icon, Component component) {
 		int index = tabbedPane.getTabCount();
@@ -1581,18 +1615,13 @@ public class RenderControls extends JDialog implements ViewListener,
 			)
 		);
 
-
-		atmosphereEnabled.setText("enable atmosphere");
-		atmosphereEnabled.addActionListener(atmosphereListener);
-		updateAtmosphereCheckBox();
-
 		transparentSky.setText("transparent sky");
+		transparentSky.setToolTipText("Disables rendering the skybox");
 		transparentSky.addActionListener(transparentSkyListener);
 		updateTransparentSky();
 
-		volumetricFogEnabled.setText("enable volumetric fog");
-		volumetricFogEnabled.addActionListener(volumetricFogListener);
-		updateVolumetricFogCheckBox();
+		fogDensity.update();
+		atmosphereDensity.update();
 
 		cloudsEnabled.setText("enable clouds");
 		cloudsEnabled.addActionListener(cloudsEnabledListener);
@@ -1614,46 +1643,46 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(lightProbePanel)
 				.addComponent(skyGradientPanel)
 				.addComponent(skyboxPanel)
-				.addComponent(atmosphereEnabled)
 				.addComponent(transparentSky)
-				.addComponent(volumetricFogEnabled)
 				.addComponent(cloudsEnabled)
 				.addGroup(cloudSize.horizontalGroup(layout))
 				.addGroup(cloudXOffset.horizontalGroup(layout))
 				.addGroup(cloudYOffset.horizontalGroup(layout))
 				.addGroup(cloudZOffset.horizontalGroup(layout))
+				.addGroup(fogDensity.horizontalGroup(layout))
+				.addGroup(atmosphereDensity.horizontalGroup(layout))
 			)
 			.addContainerGap()
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(skyModeLbl)
-				.addComponent(skyModeCB)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(simulatedSkyPanel)
-			.addComponent(skymapPanel)
-			.addComponent(lightProbePanel)
-			.addComponent(skyGradientPanel)
-			.addComponent(skyboxPanel)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(atmosphereEnabled)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(transparentSky)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(volumetricFogEnabled)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(cloudsEnabled)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(cloudSize.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(cloudXOffset.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(cloudYOffset.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(cloudZOffset.verticalGroup(layout))
-			.addContainerGap()
+				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+					.addComponent(skyModeLbl)
+					.addComponent(skyModeCB)
+				)
+				.addPreferredGap(ComponentPlacement.UNRELATED)
+				.addComponent(simulatedSkyPanel)
+				.addComponent(skymapPanel)
+				.addComponent(lightProbePanel)
+				.addComponent(skyGradientPanel)
+				.addComponent(skyboxPanel)
+				.addPreferredGap(ComponentPlacement.UNRELATED)
+				.addComponent(transparentSky)
+				.addPreferredGap(ComponentPlacement.UNRELATED)
+				.addComponent(cloudsEnabled)
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addGroup(cloudSize.verticalGroup(layout))
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addGroup(cloudXOffset.verticalGroup(layout))
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addGroup(cloudYOffset.verticalGroup(layout))
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addGroup(cloudZOffset.verticalGroup(layout))
+				.addPreferredGap(ComponentPlacement.UNRELATED)
+				.addGroup(fogDensity.verticalGroup(layout))
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addGroup(atmosphereDensity.verticalGroup(layout))
+				.addContainerGap()
 		);
 		return panel;
 	}
@@ -1765,7 +1794,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		deletePreset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String name = "";
+				String name;
 				int selected = customPreset.getSelectedIndex();
 				if (selected == -1) {
 					// select name
@@ -2012,12 +2041,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		biomeColorsCB.setSelected(renderMan.scene().biomeColorsEnabled());
 	}
 
-	protected void updateAtmosphereCheckBox() {
-		atmosphereEnabled.removeActionListener(atmosphereListener);
-		atmosphereEnabled.setSelected(renderMan.scene().atmosphereEnabled());
-		atmosphereEnabled.addActionListener(atmosphereListener);
-	}
-
 	protected void updateTransparentSky() {
 		transparentSky.removeActionListener(transparentSkyListener);
 		transparentSky.setSelected(renderMan.scene().transparentSky());
@@ -2032,12 +2055,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		v180Btn.setSelected(!mirror);
 		v90Btn.addActionListener(v90Listener);
 		v180Btn.addActionListener(v180Listener);
-	}
-
-	protected void updateVolumetricFogCheckBox() {
-		volumetricFogEnabled.removeActionListener(volumetricFogListener);
-		volumetricFogEnabled.setSelected(renderMan.scene().volumetricFogEnabled());
-		volumetricFogEnabled.addActionListener(volumetricFogListener);
 	}
 
 	protected void updateCloudsEnabledCheckBox() {
@@ -2320,25 +2337,11 @@ public class RenderControls extends JDialog implements ViewListener,
 			renderMan.scene().setStillWater(stillWaterCB.isSelected());
 		}
 	};
-	private final ActionListener atmosphereListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JCheckBox source = (JCheckBox) e.getSource();
-			renderMan.scene().setAtmosphereEnabled(source.isSelected());
-		}
-	};
 	private final ActionListener transparentSkyListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
 			renderMan.scene().setTransparentSky(source.isSelected());
-		}
-	};
-	private final ActionListener volumetricFogListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JCheckBox source = (JCheckBox) e.getSource();
-			renderMan.scene().setVolumetricFogEnabled(source.isSelected());
 		}
 	};
 	private final ActionListener cloudsEnabledListener = new ActionListener() {
@@ -2707,9 +2710,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateSkyRotation();
 		updateVerticalResolution();
 		updateBiomeColorsCB();
-		updateAtmosphereCheckBox();
 		updateTransparentSky();
-		updateVolumetricFogCheckBox();
+		fogDensity.update();
+		atmosphereDensity.update();
 		updateCloudsEnabledCheckBox();
 		updateTitle();
 		exposure.update();
