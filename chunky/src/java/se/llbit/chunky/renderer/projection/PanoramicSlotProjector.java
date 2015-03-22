@@ -47,8 +47,8 @@ public class PanoramicSlotProjector implements Projector {
 	public void apply(double x, double y, Vector3d o,
 			Vector3d d) {
 		double ax = QuickMath.degToRad(x * fov);
-		double dz = FastMath.cos(ax);
-		double dx = FastMath.sin(ax);
+		double dz = QuickMath.cos(ax);
+		double dx = QuickMath.sin(ax);
 		double dy = fovTan * y;
 
 		o.set(0, 0, 0);

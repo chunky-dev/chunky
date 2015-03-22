@@ -41,8 +41,8 @@ public class FisheyeProjector implements Projector {
 		double ax = QuickMath.degToRad(x * fov);
 		double avSquared = ay * ay + ax * ax;
 		double angleFromCenter = FastMath.sqrt(avSquared);
-		double dz = FastMath.cos(angleFromCenter);
-		double dv = FastMath.sin(angleFromCenter);
+		double dz = QuickMath.cos(angleFromCenter);
+		double dv = QuickMath.sin(angleFromCenter);
 		double dy, dx;
 		if (angleFromCenter == 0) {
 			dx = dy = 0;
