@@ -92,6 +92,19 @@ import se.llbit.math.Ray;
 public class Block extends Material {
 	private static final boolean UNKNOWN_INVISIBLE = true;
 
+	// The maximum light level from Minecraft
+	private static final double MAX_LUMINACE = 15.0f;
+
+	// A fudge factor to keep the emitter intensity at the same level as it is
+	// in v1.3.4 and earlier. This value is the emittance of the torch from that
+	// version.
+	private static final double EMITTANCE_FUDGE_FACTOR = 50.0f;
+
+	// An adjustment value that will allow the following block definitions to
+	// use the Minecraft light level values while keeping the same look as older
+	// version of chunky.
+	public static final double EMITTANCE_ADJUSTMENT = (EMITTANCE_FUDGE_FACTOR / MAX_LUMINACE);
+
 	public static final int AIR_ID = 0x00;
 	public static final Block AIR = new Block(AIR_ID, "Air", Texture.air) {
 		{
@@ -277,7 +290,7 @@ public class Block extends Material {
 			isOpaque = false;
 			isSolid = false;
 			isEmitter = true;
-			emittance = 1.0;
+			emittance = (15 * EMITTANCE_ADJUSTMENT);
 			localIntersect = true;
 		}
 		@Override
@@ -731,6 +744,8 @@ public class Block extends Material {
 			isOpaque = false;
 			isSolid = false;
 			localIntersect = true;
+			isEmitter = true;
+			emittance = (1  * EMITTANCE_ADJUSTMENT);
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
@@ -993,7 +1008,7 @@ public class Block extends Material {
 			isOpaque = false;
 			isSolid = false;
 			isEmitter = true;
-			emittance = 50.0;
+			emittance = (14  * EMITTANCE_ADJUSTMENT);
 			localIntersect = true;
 		}
 		@Override
@@ -1014,7 +1029,7 @@ public class Block extends Material {
 			isOpaque = false;
 			isSolid = false;
 			isEmitter = true;
-			emittance = 1.0;
+			emittance = (15 * EMITTANCE_ADJUSTMENT);
 			localIntersect = true;
 		}
 		@Override
@@ -1206,6 +1221,8 @@ public class Block extends Material {
 			isOpaque = true;
 			isSolid = true;
 			localIntersect = true;
+			isEmitter = true;
+			emittance = (13 * EMITTANCE_ADJUSTMENT);
 		}
 		final Texture[] tex = {
 				Texture.furnaceLitFront,
@@ -1371,6 +1388,8 @@ public class Block extends Material {
 		{
 			isOpaque = true;
 			isSolid = true;
+			isEmitter = true;
+			emittance = (9 * EMITTANCE_ADJUSTMENT);
 		}
 	};
 	public static final int REDSTONETORCHOFF_ID = 0x4B;
@@ -1398,7 +1417,7 @@ public class Block extends Material {
 			isOpaque = false;
 			isSolid = false;
 			isEmitter = true;
-			emittance = 1.0;
+			emittance = (7 * EMITTANCE_ADJUSTMENT);
 			localIntersect = true;
 		}
 		@Override
@@ -1560,7 +1579,7 @@ public class Block extends Material {
 			isOpaque = true;
 			isSolid = true;
 			isEmitter = true;
-			emittance = 1.0;
+			emittance = (15 * EMITTANCE_ADJUSTMENT);
 		}
 	};
 	public static final int PORTAL_ID = 0x5A;
@@ -1568,6 +1587,8 @@ public class Block extends Material {
 		{
 			isOpaque = false;
 			isSolid = false;
+			isEmitter = true;
+			emittance = (11 * EMITTANCE_ADJUSTMENT);
 		}
 	};
 	public static final int JACKOLANTERN_ID = 0x5B;
@@ -1576,7 +1597,7 @@ public class Block extends Material {
 			isOpaque = true;
 			isSolid = true;
 			isEmitter = true;
-			emittance = 1.0;
+			emittance = (15 * EMITTANCE_ADJUSTMENT);
 			localIntersect = true;
 		}
 		final Texture[] tex = {
@@ -2181,6 +2202,8 @@ public class Block extends Material {
 			isOpaque = false;
 			isSolid = false;
 			localIntersect = true;
+			isEmitter = true;
+			emittance = (1 * EMITTANCE_ADJUSTMENT);
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
@@ -2205,6 +2228,8 @@ public class Block extends Material {
 			isOpaque = false;
 			isSolid = false;
 			localIntersect = true;
+			isEmitter = true;
+			emittance = (15 * EMITTANCE_ADJUSTMENT);
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
@@ -2217,6 +2242,8 @@ public class Block extends Material {
 			isOpaque = false;
 			isSolid = false;
 			localIntersect = true;
+			isEmitter = true;
+			emittance = (1 * EMITTANCE_ADJUSTMENT);
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
@@ -2237,6 +2264,8 @@ public class Block extends Material {
 			isOpaque = false;
 			isSolid = false;
 			localIntersect = true;
+			isEmitter = true;
+			emittance = (1 * EMITTANCE_ADJUSTMENT);
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
@@ -2256,7 +2285,7 @@ public class Block extends Material {
 			isOpaque = true;
 			isSolid = true;
 			isEmitter = true;
-			emittance = 1.0;
+			emittance = (15 * EMITTANCE_ADJUSTMENT);
 		}
 	};
 	public static final int DOUBLEWOODENSLAB_ID = 0x7D;
@@ -2372,6 +2401,8 @@ public class Block extends Material {
 			isOpaque = false;
 			isSolid = false;
 			localIntersect = true;
+			isEmitter = true;
+			emittance = (7 * EMITTANCE_ADJUSTMENT);
 		}
 		final Texture[] tex = {
 				Texture.enderChestFront,
@@ -2486,7 +2517,7 @@ public class Block extends Material {
 			ior = 1.520f;
 			localIntersect = true;
 			isEmitter = true;
-			emittance = 1.0;
+			emittance = (15 * EMITTANCE_ADJUSTMENT);
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
@@ -3005,7 +3036,7 @@ public class Block extends Material {
 			isOpaque = true;
 			isSolid = true;
 			isEmitter = true;
-			emittance = 0.5;
+			emittance = (15 * EMITTANCE_ADJUSTMENT);
 		}
 	};
 	public static final int HAY_BLOCK_ID = 0xAA;
