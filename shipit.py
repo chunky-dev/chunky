@@ -171,6 +171,7 @@ def print_prerelease_checklist():
 def build_release(version):
 	if version.suffix:
 		print "Error: non-release version string speicifed (remove suffix)"
+		print "Hint: add the -snapshot flag to build snapshot"
 		sys.exit(1)
 	print_prerelease_checklist()
 	print "Ready to build version %s!" % version.full
