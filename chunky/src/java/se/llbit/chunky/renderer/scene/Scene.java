@@ -164,11 +164,6 @@ public class Scene extends SceneDescription {
 	public static final double DEFAULT_FOG_DENSITY = 0.0;
 
 	/**
-	 * Default atmosphere density
-	 */
-	public static final double DEFAULT_ATMOSPHERE_DENSITY = 0.0;
-
-	/**
 	 * World
 	 */
 	private World loadedWorld;
@@ -284,13 +279,13 @@ public class Scene extends SceneDescription {
 		waterVisibility = other.waterVisibility;
 		useCustomWaterColor = other.useCustomWaterColor;
 		waterColor.set(other.waterColor);
+		fogColor.set(other.fogColor);
 		biomeColors = other.biomeColors;
 		sunEnabled = other.sunEnabled;
 		emittersEnabled = other.emittersEnabled;
 		emitterIntensity = other.emitterIntensity;
 		transparentSky = other.transparentSky;
 		fogDensity = other.fogDensity;
-		atmosphereDensity = other.atmosphereDensity;
 
 		camera.set(other.camera);
 		sky.set(other.sky);
@@ -2160,6 +2155,15 @@ public class Scene extends SceneDescription {
 
 	public void setWaterColor(Vector3d color) {
 		waterColor.set(color);
+		refresh();
+	}
+
+	public Vector3d getFogColor() {
+		return fogColor;
+	}
+
+	public void setFogColor(Vector3d color) {
+		fogColor.set(color);
 		refresh();
 	}
 

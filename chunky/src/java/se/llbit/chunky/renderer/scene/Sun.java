@@ -158,7 +158,7 @@ public class Sun implements JSONifiable {
 	private final Vector3d color = new Vector3d(1, 1, 1);
 
 	/**
-	 * Calculate skylight for ray
+	 * Calculate skylight for ray using Preetham day sky model.
 	 * @param ray
 	 */
 	public void calcSkyLight(Ray ray, double horizonOffset) {
@@ -178,13 +178,7 @@ public class Sun implements JSONifiable {
 			double x2 = x * f;
 			double y2 = z;
 			double z2 = (1-x-y) * f;
-			// Old CIE-to-RGB matrix
-			/*ray.color.set(
-					3.2410*x2 - 1.5374*y2 - 0.4986*z2,
-					-0.9692*x2 + 1.8760*y2 + 0.0416*z2,
-					0.0556*x2 - 0.2040*y2 + 1.0570*z2,
-					1);*/
-			// new CIE to RGB M^-1 matrix from http://www.brucelindbloom.com/Eqn_RGB_XYZ_Matrix.html
+			// CIE to RGB M^-1 matrix from http://www.brucelindbloom.com/Eqn_RGB_XYZ_Matrix.html
 			ray.color.set(
 					2.3706743*x2 - 0.9000405*y2 - 0.4706338*z2,
 					-0.513885*x2 + 1.4253036*y2 + 0.0885814*z2,
@@ -408,68 +402,11 @@ public class Sun implements JSONifiable {
 	}
 
 	/**
-	 * Atmospheric extinction and inscattering of ray.
-	 * @param ray
-	 * @param s
-	 * @param attenuation
-	 */
-	public void doAtmos(Ray ray, double s, double attenuation) {
-		double Br = 0.00002*10;
-		double Bm = 0.0007*10;
-		double g = -.001*10000;
-		double Fex = FastMath.exp(-(Br + Bm) * s);
-		if (attenuation < Ray.EPSILON) {
-			ray.color.x *= Fex;
-			ray.color.y *= Fex;
-			ray.color.z *= Fex;
-		} else {
-			double theta = ray.d.dot(sw);
-			double cos_theta = FastMath.cos(theta);
-			double cos2_theta = cos_theta*cos_theta;
-			double Brt = (3 / (16*Math.PI)) * Br * (1 + cos2_theta);
-			double Bmt = (1 / (4*Math.PI)) * Bm * ((1-g)*(1-g)) / FastMath.pow(1 + g*g + 2*g*cos_theta, 3/2.);
-			double Fin = ((Brt + Bmt) / (Br + Bm)) * (1 - Fex);
-			ray.color.x = ray.color.x * Fex + attenuation * Fin * emittance.x;
-			ray.color.y = ray.color.y * Fex + attenuation * Fin * emittance.y;
-			ray.color.z = ray.color.z * Fex + attenuation * Fin * emittance.z;
-		}
-	}
-
-	/**
 	 * @param d
 	 * @return Cosine of angle between sun and vector
 	 */
-	public double theta(Vector3d d) {
+	public double cosineAngle(Vector3d d) {
 		return d.dot(sw);
-	}
-
-	// Rayleigh coefficient
-	private static final double Br = 0.0002;
-	// Mie coefficient
-	private static final double Bm = 0.0009;
-	// Henyey/Greenstein phase function eccentricity
-	private static final double g = -.0007;
-	private static final double g2 = g*g;
-
-	/**
-	 * @param s
-	 * @return Extinction coefficient
-	 */
-	public double extinction(double s) {
-		return FastMath.exp(-(Br + Bm) * s);
-	}
-
-	/**
-	 * @param Fex
-	 * @param theta
-	 * @return Inscatter coefficient
-	 */
-	public double inscatter(double Fex, double theta) {
-		double cos_theta = FastMath.cos(theta);
-		double cos2_theta = cos_theta*cos_theta;
-		double Brt = (3 / (16*Math.PI)) * Br * (1 + cos2_theta);
-		double Bmt = (1 / (4*Math.PI)) * Bm * ((1-g)*(1-g)) / FastMath.pow(1 + g2 + 2*g*cos_theta, 3/2.);
-		return ((Brt + Bmt) / (Br + Bm)) * (1 - Fex);
 	}
 
 	@Override

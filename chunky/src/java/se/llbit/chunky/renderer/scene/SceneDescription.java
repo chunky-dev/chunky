@@ -112,16 +112,13 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	protected boolean useCustomWaterColor = PersistentSettings.getUseCustomWaterColor();
 	protected final Vector3d waterColor = new Vector3d(PersistentSettings.getWaterColorRed(),
 			PersistentSettings.getWaterColorGreen(), PersistentSettings.getWaterColorBlue());
+	protected final Vector3d fogColor = new Vector3d(PersistentSettings.getFogColorRed(),
+			PersistentSettings.getFogColorGreen(), PersistentSettings.getFogColorBlue());
 
 	/**
 	 * Fog thickness.
 	 */
 	protected double fogDensity;
-
-	/**
-	 * Haze thickness.
-	 */
-	protected double atmosphereDensity;
 
 	protected boolean biomeColors = true;
 	protected boolean transparentSky = false;
@@ -187,8 +184,12 @@ public class SceneDescription implements Refreshable, JSONifiable {
 			colorObj.add("blue", waterColor.z);
 			desc.add("waterColor", colorObj);
 		}
+		JsonObject fogColorObj = new JsonObject();
+		fogColorObj.add("red", fogColor.x);
+		fogColorObj.add("green", fogColor.y);
+		fogColorObj.add("blue", fogColor.z);
+		desc.add("fogColor", fogColorObj);
 		desc.add("biomeColorsEnabled", biomeColors);
-		desc.add("atmosphereDensity", atmosphereDensity);
 		desc.add("transparentSky", transparentSky);
 		desc.add("fogDensity", fogDensity);
 		desc.add("waterHeight", waterHeight);
@@ -253,8 +254,11 @@ public class SceneDescription implements Refreshable, JSONifiable {
 			waterColor.y = colorObj.get("green").doubleValue(PersistentSettings.getWaterColorGreen());
 			waterColor.z = colorObj.get("blue").doubleValue(PersistentSettings.getWaterColorBlue());
 		}
+		JsonObject fogColorObj = desc.get("fogColor").object();
+		fogColor.x = fogColorObj.get("red").doubleValue(PersistentSettings.getFogColorRed());
+		fogColor.y = fogColorObj.get("green").doubleValue(PersistentSettings.getFogColorGreen());
+		fogColor.z = fogColorObj.get("blue").doubleValue(PersistentSettings.getFogColorBlue());
 		biomeColors = desc.get("biomeColorsEnabled").boolValue(true);
-		atmosphereDensity = desc.get("atmosphereDensity").doubleValue(Scene.DEFAULT_ATMOSPHERE_DENSITY);
 		transparentSky = desc.get("transparentSky").boolValue(false);
 		fogDensity = desc.get("fogDensity").doubleValue(Scene.DEFAULT_FOG_DENSITY);
 		waterHeight = desc.get("waterHeight").intValue(0);
@@ -397,24 +401,6 @@ public class SceneDescription implements Refreshable, JSONifiable {
 
 	public double getFogDensity() {
 		return fogDensity;
-	}
-
-	public void setAtmosphereDensity(double newValue) {
-		if (newValue != atmosphereDensity) {
-			this.atmosphereDensity = newValue;
-			refresh();
-		}
-	}
-
-	public double getAtmosphereDensity() {
-		return atmosphereDensity;
-	}
-
-	/**
-	 * @return <code>true</code> if atmospheric scattering is enabled
-	 */
-	public boolean atmosphereEnabled() {
-		return atmosphereDensity > 0.0;
 	}
 
 	/**

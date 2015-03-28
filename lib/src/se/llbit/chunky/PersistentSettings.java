@@ -41,6 +41,18 @@ public final class PersistentSettings {
 	public static final double DEFAULT_WATER_GREEN = 0.13;
 	public static final double DEFAULT_WATER_BLUE = 0.16;
 
+	private static final double WAVELENGTH_RED = 650;
+	private static final double WAVELENGTH_GREEN = 570;
+	private static final double WAVELENGTH_BLUE = 475;
+
+	public static final double W = Math.pow(WAVELENGTH_BLUE/1e3, 4);
+	public static final double RM = 0.2;
+
+	// fog color scaled proportional to 1/wavelength^4 (rayleigh scatter)
+	public static final double DEFAULT_FOG_RED = RM + (1-RM) * W * Math.pow(WAVELENGTH_RED/1e3, -4);
+	public static final double DEFAULT_FOG_GREEN = RM + (1-RM) * W * Math.pow(WAVELENGTH_GREEN/1e3, -4);
+	public static final double DEFAULT_FOG_BLUE = 1;
+
 	public static final int DEFAULT_RAY_DEPTH = 5;
 	public static final int DEFAULT_SPP_TARGET = 1000;
 
@@ -285,18 +297,10 @@ public final class PersistentSettings {
 		return settings.getBool("useCustomWaterColor", false);
 	}
 
-	public static void setWaterColorRed(double value) {
-		settings.setDouble("waterColorRed", value);
-		save();
-	}
-
-	public static void setWaterColorGreen(double value) {
-		settings.setDouble("waterColorGreen", value);
-		save();
-	}
-
-	public static void setWaterColorBlue(double value) {
-		settings.setDouble("waterColorBlue", value);
+	public static void setWaterColor(double red, double green, double blue) {
+		settings.setDouble("waterColorRed", red);
+		settings.setDouble("waterColorGreen", green);
+		settings.setDouble("waterColorBlue", blue);
 		save();
 	}
 
@@ -310,6 +314,25 @@ public final class PersistentSettings {
 
 	public static double getWaterColorBlue() {
 		return settings.getDouble("waterColorBlue", DEFAULT_WATER_BLUE);
+	}
+
+	public static void setFogColor(double red, double green, double blue) {
+		settings.setDouble("fogColorRed", red);
+		settings.setDouble("fogColorGreen", green);
+		settings.setDouble("fogColorBlue", blue);
+		save();
+	}
+
+	public static double getFogColorRed() {
+		return settings.getDouble("fogColorRed", DEFAULT_FOG_RED);
+	}
+
+	public static double getFogColorGreen() {
+		return settings.getDouble("fogColorGreen", DEFAULT_FOG_GREEN);
+	}
+
+	public static double getFogColorBlue() {
+		return settings.getDouble("fogColorBlue", DEFAULT_FOG_BLUE);
 	}
 
 	public static void setSingleColorTextures(boolean value) {

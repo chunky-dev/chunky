@@ -169,6 +169,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox waterWorldCB = new JCheckBox();
 	private final JCheckBox waterColorCB = new JCheckBox("Use custom water color");
 	private final JButton waterColorBtn = new JButton("Change Water Color");
+	private final JButton fogColorBtn = new JButton("Edit Fog Color");
 	private final JTextField waterHeightField = new JTextField();
 	private final JButton applyWaterHeightBtn = new JButton("Apply");
 	private final DecimalFormat decimalFormat = new DecimalFormat();
@@ -266,7 +267,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final Adjuster fogDensity = new Adjuster(
 			"Fog density",
 			"Alters the volumetric fog",
-			0.0, 10.0) {
+			0.0, 2.0) {
 		{
 			setClampMax(false);
 		}
@@ -278,24 +279,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void update() {
 			set(renderMan.scene().getFogDensity());
-		}
-	};
-
-	private final Adjuster atmosphereDensity = new Adjuster(
-			"Atmosphere",
-			"Alters the atmospheric effects",
-			0.0, 15.0) {
-		{
-			setClampMax(false);
-		}
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().setAtmosphereDensity(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().getAtmosphereDensity());
 		}
 	};
 
@@ -957,9 +940,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				PersistentSettings.setUseCustomWaterColor(useCustomWaterColor);
 				if (useCustomWaterColor) {
 					Vector3d color = renderMan.scene().getWaterColor();
-					PersistentSettings.setWaterColorRed(color.x);
-					PersistentSettings.setWaterColorGreen(color.y);
-					PersistentSettings.setWaterColorBlue(color.z);
+					PersistentSettings.setWaterColor(color.x, color.y, color.z);
 				}
 			}
 		});
@@ -1345,6 +1326,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		directLight.setSelected(renderMan.scene().getDirectLight());
 		directLight.addActionListener(directLightListener);
 
+		JLabel bulbIcon = new JLabel(Icon.light.imageIcon());
+		JLabel sunIcon = new JLabel(Icon.sun.imageIcon());
+
 		enableEmitters.setText("enable emitters");
 		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
 		enableEmitters.addActionListener(emittersListener);
@@ -1365,8 +1349,14 @@ public class RenderControls extends JDialog implements ViewListener,
 		layout.setHorizontalGroup(layout.createSequentialGroup()
 			.addContainerGap()
 			.addGroup(layout.createParallelGroup()
-				.addComponent(directLight)
-				.addComponent(enableEmitters)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(bulbIcon)
+					.addComponent(enableEmitters)
+				)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(sunIcon)
+					.addComponent(directLight)
+				)
 				.addGroup(layout.createSequentialGroup()
 					.addGroup(layout.createParallelGroup()
 						.addComponent(skyLight.getLabel())
@@ -1398,11 +1388,17 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addContainerGap()
 			.addGroup(skyLight.verticalGroup(layout))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(enableEmitters)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(bulbIcon)
+				.addComponent(enableEmitters)
+			)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(emitterIntensity.verticalGroup(layout))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(directLight)
+			.addGroup(layout.createParallelGroup()
+				.addComponent(sunIcon)
+				.addComponent(directLight)
+			)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(sunIntensity.verticalGroup(layout))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -1621,7 +1617,21 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateTransparentSky();
 
 		fogDensity.update();
-		atmosphereDensity.update();
+
+		JLabel fogColorLbl = new JLabel("<html>Hint: set fog density &gt; 0.1 for thick fog,<br>set it &lt; 0.1 for haze/atmosphere effect");
+		fogColorBtn.setIcon(Icon.colors.imageIcon());
+		fogColorBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ColorPicker picker = new ColorPicker(fogColorBtn, renderMan.scene().getFogColor());
+				picker.addColorListener(new ColorListener() {
+					@Override
+					public void onColorPicked(Vector3d color) {
+						renderMan.scene().setFogColor(color);
+					}
+				});
+			}
+		});
 
 		cloudsEnabled.setText("enable clouds");
 		cloudsEnabled.addActionListener(cloudsEnabledListener);
@@ -1650,7 +1660,11 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addGroup(cloudYOffset.horizontalGroup(layout))
 				.addGroup(cloudZOffset.horizontalGroup(layout))
 				.addGroup(fogDensity.horizontalGroup(layout))
-				.addGroup(atmosphereDensity.horizontalGroup(layout))
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(fogColorBtn)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(fogColorLbl)
+				)
 			)
 			.addContainerGap()
 		);
@@ -1681,7 +1695,10 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addGroup(fogDensity.verticalGroup(layout))
 				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(atmosphereDensity.verticalGroup(layout))
+				.addGroup(layout.createParallelGroup()
+					.addComponent(fogColorBtn)
+					.addComponent(fogColorLbl)
+				)
 				.addContainerGap()
 		);
 		return panel;
@@ -2712,7 +2729,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateBiomeColorsCB();
 		updateTransparentSky();
 		fogDensity.update();
-		atmosphereDensity.update();
 		updateCloudsEnabledCheckBox();
 		updateTitle();
 		exposure.update();

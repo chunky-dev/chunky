@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -21,7 +21,6 @@ import java.util.Random;
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.model.WaterModel;
-import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Material;
@@ -36,6 +35,8 @@ import se.llbit.math.Vector4d;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class PathTracer {
+
+	private static final double EXTINCTION_FACTOR = 0.04;
 
 	/**
 	 * Path trace the ray
@@ -255,7 +256,7 @@ public class PathTracer {
 
 							// Calculate angle-dependent reflectance using
 							// Fresnel equation approximation
-							// R(theta) = R0 + (1 - R0) * (1 - cos(theta))^5
+							// R(cosineAngle) = R0 + (1 - R0) * (1 - cos(cosineAngle))^5
 							float a = (n1n2 - 1);
 							float b = (n1n2 + 1);
 							double R0 = a*a/(b*b);
@@ -346,49 +347,31 @@ public class PathTracer {
 		}
 
 		if (s > 0) {
-			// References:
-			// Hoffman N, Preetham A. J.: Rendering Outdoor Light Scattering in Real Time
-			// GPU Gems 2, Chapter 16
-			// Nielsen R. S., Real Time Rendering of Atmospheric Scattering Effects for Flight Simulators
-
-			// TODO improve this simplistic light scatter simulation!
-			if (scene.atmosphereEnabled()) {
-				double Fex = scene.sun.extinction(s * scene.getAtmosphereDensity());
-				ray.color.x *= (1-RenderConstants.CrL4R) + Fex * RenderConstants.CrL4R;
-				ray.color.y *= (1-RenderConstants.CrL4G) + Fex * RenderConstants.CrL4G;
-				ray.color.z *= (1-RenderConstants.CrL4B) + Fex * RenderConstants.CrL4B;
-
-				if (!scene.volumetricFogEnabled()) {
-					double Fin = scene.sun.inscatter(Fex, scene.sun.theta(ray.d));
-
-					ray.color.x += Fin * scene.sun.emittance.x * scene.sun.getIntensity() * RenderConstants.CrL4R;
-					ray.color.y += Fin * scene.sun.emittance.y * scene.sun.getIntensity() * RenderConstants.CrL4G;
-					ray.color.z += Fin * scene.sun.emittance.z * scene.sun.getIntensity() * RenderConstants.CrL4B;
-				}
-			}
-
+			// This is a simplistic fog model which gives greater artistic freedom but
+			// less realism. The user can select fog color and density; in a more
+			// realistic model color would depend on viewing angle and sun color/position.
 			if (scene.volumetricFogEnabled()) {
-				// select point between ray source and intersected object
-				s = (s - Ray.OFFSET) * random.nextDouble();
+				Sun sun = scene.sun;
 
-				// get direct light attenuation
-				Ray reflected = new Ray();
-				reflected.o.scaleAdd(s, od, ox);
-				scene.sun.getRandomSunDirection(reflected, random);
-				reflected.setCurrentMat(Block.AIR, 0);
+				// pick point between ray origin and intersected object
+				Ray atmos = new Ray();
+				double offset = QuickMath.clamp(s * random.nextFloat(), Ray.EPSILON, s-Ray.EPSILON);
+				atmos.o.scaleAdd(offset, od, ox);
+				sun.getRandomSunDirection(atmos, random);
+				atmos.setCurrentMat(Block.AIR, 0);
 
-				getDirectLightAttenuation(scene, reflected, state);
+				double extinction = Math.exp(-s * scene.getFogDensity() * EXTINCTION_FACTOR);
+				ray.color.scale(extinction);
+
+				// check sun visibility at random point to determine inscatter brightness
+				getDirectLightAttenuation(scene, atmos, state);
 				Vector4d attenuation = state.attenuation;
-
-				// scale s with fog factor
-				s *= scene.getFogDensity();
-
-				double Fex = scene.sun.extinction(s);
-				double Fin = scene.sun.inscatter(Fex, scene.sun.theta(ray.d));
-
-				ray.color.x += 50 * attenuation.x*attenuation.w * Fin * scene.sun.emittance.x * scene.sun.getIntensity();
-				ray.color.y += 50 * attenuation.y*attenuation.w * Fin * scene.sun.emittance.y * scene.sun.getIntensity();
-				ray.color.z += 50 * attenuation.z*attenuation.w * Fin * scene.sun.emittance.z * scene.sun.getIntensity();
+				if (attenuation.w > Ray.EPSILON) {
+					Vector3d fogColor = scene.getFogColor();
+					ray.color.x += attenuation.x*attenuation.w * fogColor.x*(1-extinction);
+					ray.color.y += attenuation.y*attenuation.w * fogColor.y*(1-extinction);
+					ray.color.z += attenuation.z*attenuation.w * fogColor.z*(1-extinction);
+				}
 			}
 		}
 

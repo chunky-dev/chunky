@@ -70,6 +70,7 @@ public class Icon extends Texture {
 	public static final Icon camera = new Icon("camera");
     final public static Icon water = new Icon("water");
     final public static Icon light = new Icon("light");
+    final public static Icon sun = new Icon("sun");
     final public static Icon gear = new Icon("gear");
     final public static Icon advanced = new Icon("advanced");
     final public static Icon question = new Icon("question");
