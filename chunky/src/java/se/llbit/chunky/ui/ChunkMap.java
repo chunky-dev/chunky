@@ -339,7 +339,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 	private void drawViewBounds(Graphics g) {
 		RenderControls controls = chunky.getRenderControls();
-		if (controls != null) {
+		if (controls != null && controls.isVisible()) {
 			controls.drawViewBounds(g, view);
 		}
 	}
