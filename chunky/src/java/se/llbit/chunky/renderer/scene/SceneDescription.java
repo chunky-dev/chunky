@@ -116,6 +116,11 @@ public class SceneDescription implements Refreshable, JSONifiable {
 			PersistentSettings.getFogColorGreen(), PersistentSettings.getFogColorBlue());
 
 	/**
+	 * Enables fast fog algorithm
+	 */
+	protected boolean fastFog = true;
+
+	/**
 	 * Fog thickness.
 	 */
 	protected double fogDensity;
@@ -189,6 +194,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		fogColorObj.add("green", fogColor.y);
 		fogColorObj.add("blue", fogColor.z);
 		desc.add("fogColor", fogColorObj);
+		desc.add("fastFog", fastFog);
 		desc.add("biomeColorsEnabled", biomeColors);
 		desc.add("transparentSky", transparentSky);
 		desc.add("fogDensity", fogDensity);
@@ -258,6 +264,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		fogColor.x = fogColorObj.get("red").doubleValue(PersistentSettings.getFogColorRed());
 		fogColor.y = fogColorObj.get("green").doubleValue(PersistentSettings.getFogColorGreen());
 		fogColor.z = fogColorObj.get("blue").doubleValue(PersistentSettings.getFogColorBlue());
+		fastFog = desc.get("fastFog").boolValue(true);
 		biomeColors = desc.get("biomeColorsEnabled").boolValue(true);
 		transparentSky = desc.get("transparentSky").boolValue(false);
 		fogDensity = desc.get("fogDensity").doubleValue(Scene.DEFAULT_FOG_DENSITY);
@@ -403,10 +410,21 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		return fogDensity;
 	}
 
+	public void setFastFog(boolean value) {
+		if (fastFog != value) {
+			fastFog = value;
+			refresh();
+		}
+	}
+
+	public boolean fastFog() {
+		return fastFog;
+	}
+
 	/**
 	 * @return <code>true</code> if volumetric fog is enabled
 	 */
-	public boolean volumetricFogEnabled() {
+	public boolean fogEnabled() {
 		return fogDensity > 0.0;
 	}
 

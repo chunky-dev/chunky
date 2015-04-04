@@ -346,32 +346,37 @@ public class PathTracer {
 			}
 		}
 
-		if (s > 0) {
-			// This is a simplistic fog model which gives greater artistic freedom but
-			// less realism. The user can select fog color and density; in a more
-			// realistic model color would depend on viewing angle and sun color/position.
-			if (scene.volumetricFogEnabled()) {
-				Sun sun = scene.sun;
+		// This is a simplistic fog model which gives greater artistic freedom but
+		// less realism. The user can select fog color and density; in a more
+		// realistic model color would depend on viewing angle and sun color/position.
+		if (s > 0 && scene.fogEnabled()) {
+			Sun sun = scene.sun;
 
-				// pick point between ray origin and intersected object
-				Ray atmos = new Ray();
-				double offset = QuickMath.clamp(s * random.nextFloat(), Ray.EPSILON, s-Ray.EPSILON);
-				atmos.o.scaleAdd(offset, od, ox);
-				sun.getRandomSunDirection(atmos, random);
-				atmos.setCurrentMat(Block.AIR, 0);
+			// pick point between ray origin and intersected object
+			Ray atmos = new Ray();
+			double offset = QuickMath.clamp(s * random.nextFloat(), Ray.EPSILON, s-Ray.EPSILON);
+			atmos.o.scaleAdd(offset, od, ox);
+			sun.getRandomSunDirection(atmos, random);
+			atmos.setCurrentMat(Block.AIR, 0);
 
-				double extinction = Math.exp(-s * scene.getFogDensity() * EXTINCTION_FACTOR);
-				ray.color.scale(extinction);
+			double fogDensity = scene.getFogDensity() * EXTINCTION_FACTOR;
+			double extinction = Math.exp(-s * fogDensity);
+			ray.color.scale(extinction);
 
-				// check sun visibility at random point to determine inscatter brightness
-				getDirectLightAttenuation(scene, atmos, state);
-				Vector4d attenuation = state.attenuation;
-				if (attenuation.w > Ray.EPSILON) {
-					Vector3d fogColor = scene.getFogColor();
-					ray.color.x += attenuation.x*attenuation.w * fogColor.x*(1-extinction);
-					ray.color.y += attenuation.y*attenuation.w * fogColor.y*(1-extinction);
-					ray.color.z += attenuation.z*attenuation.w * fogColor.z*(1-extinction);
+			// check sun visibility at random point to determine inscatter brightness
+			getDirectLightAttenuation(scene, atmos, state);
+			Vector4d attenuation = state.attenuation;
+			if (attenuation.w > Ray.EPSILON) {
+				Vector3d fogColor = scene.getFogColor();
+				double inscatter;
+				if (scene.fastFog()) {
+					inscatter = (1-extinction);
+				} else {
+					inscatter = s * fogDensity * Math.exp(-offset * fogDensity);
 				}
+				ray.color.x += attenuation.x*attenuation.w * fogColor.x * inscatter;
+				ray.color.y += attenuation.y*attenuation.w * fogColor.y * inscatter;
+				ray.color.z += attenuation.z*attenuation.w * fogColor.z * inscatter;
 			}
 		}
 

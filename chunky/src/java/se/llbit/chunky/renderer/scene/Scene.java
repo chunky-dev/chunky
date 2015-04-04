@@ -286,6 +286,7 @@ public class Scene extends SceneDescription {
 		emitterIntensity = other.emitterIntensity;
 		transparentSky = other.transparentSky;
 		fogDensity = other.fogDensity;
+		fastFog = other.fastFog;
 
 		camera.set(other.camera);
 		sky.set(other.sky);

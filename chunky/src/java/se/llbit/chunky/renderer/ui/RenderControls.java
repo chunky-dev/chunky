@@ -170,6 +170,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox waterColorCB = new JCheckBox("Use custom water color");
 	private final JButton waterColorBtn = new JButton("Change Water Color");
 	private final JButton fogColorBtn = new JButton("Edit Fog Color");
+	private final JCheckBox fastFogCB = new JCheckBox("Fast fog");
 	private final JTextField waterHeightField = new JTextField();
 	private final JButton applyWaterHeightBtn = new JButton("Apply");
 	private final DecimalFormat decimalFormat = new DecimalFormat();
@@ -864,6 +865,10 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		cpuLoad.update();
 
+		fastFogCB.setToolTipText("Enable faster fog algorithm");
+		fastFogCB.addActionListener(fastFogListener);
+		updateFastFog();
+
 		mergeDumpBtn.setToolTipText(
 				"Merge an existing render dump with the current render");
 		mergeDumpBtn.addActionListener(new ActionListener() {
@@ -902,6 +907,7 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(sep2)
 				.addComponent(mergeDumpBtn)
 				.addComponent(shutdownWhenDoneCB)
+				.addComponent(fastFogCB)
 			)
 			.addContainerGap()
 		);
@@ -920,6 +926,8 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addComponent(mergeDumpBtn)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(shutdownWhenDoneCB)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addComponent(fastFogCB)
 			.addContainerGap()
 		);
 		return panel;
@@ -2052,6 +2060,12 @@ public class RenderControls extends JDialog implements ViewListener,
 		stillWaterCB.addActionListener(stillWaterListener);
 	}
 
+	protected void updateFastFog() {
+		fastFogCB.removeActionListener(fastFogListener);
+		fastFogCB.setSelected(renderMan.scene().fastFog());
+		fastFogCB.addActionListener(fastFogListener);
+	}
+
 	protected void updateBiomeColorsCB() {
 		biomeColorsCB.removeActionListener(biomeColorsCBListener);
 		biomeColorsCB.addActionListener(biomeColorsCBListener);
@@ -2352,6 +2366,12 @@ public class RenderControls extends JDialog implements ViewListener,
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			renderMan.scene().setStillWater(stillWaterCB.isSelected());
+		}
+	};
+	private final ActionListener fastFogListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			renderMan.scene().setFastFog(fastFogCB.isSelected());
 		}
 	};
 	private final ActionListener transparentSkyListener = new ActionListener() {
@@ -2722,6 +2742,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		sunAzimuth.update();
 		sunAltitude.update();
 		updateStillWater();
+		updateFastFog();
 		waterVisibility.update();
 		waterOpacity.update();
 		updateSkyRotation();
