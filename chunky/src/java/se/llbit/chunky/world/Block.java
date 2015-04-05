@@ -1568,6 +1568,8 @@ public class Block extends Material {
 		{
 			isOpaque = false;
 			isSolid = false;
+			isEmitter = true;
+			emittance = 0.4;
 		}
 	};
 	public static final int JACKOLANTERN_ID = 0x5B;

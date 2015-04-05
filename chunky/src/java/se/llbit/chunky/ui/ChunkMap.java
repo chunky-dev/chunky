@@ -286,6 +286,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			}
 		});
 		JMenuItem clearSelection = new JMenuItem("Clear selection");
+		clearSelection.setIcon(Icon.clear.imageIcon());
 		clearSelection.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

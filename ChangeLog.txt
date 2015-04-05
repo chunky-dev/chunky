@@ -1,4 +1,5 @@
 1.3.5 - TBD
+    * Nether portals now emit light
     * Re-engineered atmosphere and fog rendering, replaced it with a simpler
       but more customizable fog system. Fog density and color can be changed
       by the user (in the "Sky & Fog" tab).

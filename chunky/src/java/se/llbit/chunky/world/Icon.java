@@ -64,6 +64,7 @@ public class Icon extends Texture {
 	public static final Icon play = new Icon("play");
 	public static final Icon pause = new Icon("pause");
 	public static final Icon stop = new Icon("stop");
+	public static final Icon clear = new Icon("clear");
 	public static final Icon reload = new Icon("reload");
 	public static final Icon colors = new Icon("colors");
 	public static final Icon sky = new Icon("sky");
