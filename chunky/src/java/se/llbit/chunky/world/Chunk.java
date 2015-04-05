@@ -274,7 +274,7 @@ public class Chunk {
 	 */
 	private Map<String, AnyTag> getChunkData(Set<String> request) {
 		Region region = world.getRegion(position.getRegionPosition());
-		ChunkData data = region.getChunkData(position);
+		ChunkDataSource data = region.getChunkData(position);
 		if (data == null) {
 			return null;
 		}

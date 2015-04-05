@@ -28,7 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import se.llbit.chunky.world.ChunkData;
+import se.llbit.chunky.world.ChunkDataSource;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Region;
 import se.llbit.nbt.AnyTag;
@@ -56,7 +56,7 @@ public class NBTDump {
 				filename = m.group(3);
 				int x = Integer.parseInt(m.group(1));
 				int z = Integer.parseInt(m.group(2));
-				ChunkData data = Region.getChunkData(new File(filename),
+				ChunkDataSource data = Region.getChunkData(new File(filename),
 					ChunkPosition.get(x, z));
 				if (data == null) {
 					System.err.println("No such chunk in region: (" + x + "," + z + ")");

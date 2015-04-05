@@ -20,13 +20,14 @@ import java.io.DataInputStream;
 import java.io.InputStream;
 
 /**
+ * Container representing a chunk data source with a timestamp and an input stream.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class ChunkData {
+public class ChunkDataSource {
 	public final int timestamp;
 	public final DataInputStream inputStream;
 
-	public ChunkData(int timestamp, InputStream in) {
+	public ChunkDataSource(int timestamp, InputStream in) {
 		this.timestamp = timestamp;
 		this.inputStream = new DataInputStream(in);
 	}

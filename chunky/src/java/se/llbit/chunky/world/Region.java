@@ -207,11 +207,11 @@ public class Region implements Iterable<Chunk> {
 	 * @param chunkPos chunk position
 	 * @return Chunk data, or {@code null} if the chunk could not be read
 	 */
-	public ChunkData getChunkData(ChunkPosition chunkPos) {
+	public ChunkDataSource getChunkData(ChunkPosition chunkPos) {
 		File regionDirectory = world.getRegionDirectory();
 		File regionFile = new File(regionDirectory, fileName);
 		if (regionFile.exists()) {
-			ChunkData data = getChunkData(regionFile, chunkPos);
+			ChunkDataSource data = getChunkData(regionFile, chunkPos);
 			if (data != null) {
 				chunkTimestamps[(chunkPos.x&31) + (chunkPos.z&31)*32] = data.timestamp;
 			}
@@ -227,7 +227,7 @@ public class Region implements Iterable<Chunk> {
 	 * @param chunkPos
 	 * @return {@code null} if the chunk could not be loaded
 	 */
-	public static ChunkData getChunkData(File regionFile, ChunkPosition chunkPos) {
+	public static ChunkDataSource getChunkData(File regionFile, ChunkPosition chunkPos) {
 		int x = chunkPos.x & 31;
 		int z = chunkPos.z & 31;
 		int index = x + z * 32;
@@ -267,9 +267,9 @@ public class Region implements Iterable<Chunk> {
 			file.read(buf);
 			ByteArrayInputStream in = new ByteArrayInputStream(buf);
 			if (type == 1) {
-				return new ChunkData(timestamp, new GZIPInputStream(in));
+				return new ChunkDataSource(timestamp, new GZIPInputStream(in));
 			} else if (type == 2) {
-				return new ChunkData(timestamp, new InflaterInputStream(in));
+				return new ChunkDataSource(timestamp, new InflaterInputStream(in));
 			}
 
 		} catch (IOException e) {
