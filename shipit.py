@@ -8,6 +8,8 @@
 # Release Candidates are not built by this script!
 # Snapshots are currently built by proprietary script
 
+import warnings
+
 import json
 import sys
 import praw
@@ -22,9 +24,13 @@ from subprocess import call, Popen, PIPE
 from getpass import getpass
 from datetime import datetime
 from string import join
-from launchpadlib.launchpad import Launchpad
 from os import path
 from shutil import copyfile
+
+with warnings.catch_warnings():
+	# ignore annoying warnings from lazr and mpl_toolkits about missing __init__.py
+	warnings.simplefilter("ignore")
+	from launchpadlib.launchpad import Launchpad
 
 class Credentials:
 	initialized = False
@@ -524,8 +530,6 @@ options = {
 	'launcher': False,
 	'testnsis': False
 }
-do_ftpupload = False
-do_update_docs = False
 for arg in sys.argv[1:]:
 	if arg == '-h' or arg == '--h' or arg == '-help' or arg == '--help':
 		print "usage: SHIPIT [VERSION] [COMMAND]"
