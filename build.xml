@@ -151,44 +151,33 @@
 			resource="${build.dir}/chunky-${version}.jar"/>
 	</target>
 
-	<!-- TODO update the Mac build targets!! -->
 	<target name="-macapp" description="Create an .app package for Chunky">
-		<property name="Chunky.app" value="build"/>
-		<property name="app.name" value="Chunky"/>
-		<property name="macosx.resrc" value="Resources"/>
-		<property name="app.resrc" value="${chunky.res.dir}"/>
-		<property name="macosx.stubfile" value="${macosx.resrc}/JavaApplicationStub"/>
-		<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
-		<jarbundler dir="."
-				name="${app.name}"
-				bundleid="se.llbit.chunky"
-				shortname="${app.name}"
-				version="${version}"
-				mainclass="se.llbit.chunky.launcher.ChunkyLauncher"
-				icon="${macosx.resrc}/chunky.icns"
-				infostring="${app.name}"
-				stubfile="${macosx.stubfile}"
-				workingdirectory="$APP_PACKAGE/Contents/Resources/Java"
-				vmoptions="-Xms512m -Xmx2048m">
-			<javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
-			<javaproperty name="apple.awt.textantialiasing" value="true"/>
-			<resourcefileset dir="${app.resrc}">
-				<include name="chunky.icns"/>
-			</resourcefileset>
-			<jarfileset dir="build">
-				<include name="chunky.jar"/>
-			</jarfileset>
-		</jarbundler>
+		<property file="${chunky.res.dir}/Version.properties"/>
+		<!-- download Oracle's appbundler and place in the tools dir to build for Mac! -->
+		<property name="appbundler.jar" location="${tools.dir}/appbundler-1.0.jar"/>
+		<taskdef name="appbundler" classpath="${appbundler.jar}"
+			classname="com.oracle.appbundler.AppBundlerTask"/>
+		<appbundler
+				outputdirectory="${build.dir}"
+				name="Chunky"
+				displayname="Chunky"
+				identifier="se.llbit.Chunky"
+				shortversion="${version}"
+				mainclassname="se.llbit.chunky.launcher.ChunkyLauncher"
+				icon="${dist.dir}/Chunky.icns">
+			<option value="-Dapple.laf.useScreenMenuBar=true"/>
+			<option value="-Dapple.awt.textantialiasing=true"/>
+			<classpath file="${build.dir}/chunky-${version}.jar"/>
+		</appbundler>
 	</target>
 
-	<!-- TODO update the Mac build targets!! -->
 	<target name="-macdmg" description="Create a DMG package for Chunky">
 		<property file="${chunky.res.dir}/Version.properties"/>
 		<property name="mountdir" value="/tmp"/>
 		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 			<arg value="create"/>
 			<arg value="-srcfolder"/>
-			<arg value="Chunky.app"/>
+			<arg value="${build.dir}/Chunky.app"/>
 			<arg value="-volname"/>
 			<arg value="Chunky"/>
 			<arg value="-ov"/>
@@ -203,13 +192,13 @@
 			<arg value="${mountdir}/"/>
 		</exec>
 		<mkdir dir="${mountdir}/Chunky/.background"/>
-		<copy file="${chunky.res.dir}/chunky-dmg.png"
+		<copy file="${dist.dir}/chunky-dmg.png"
 			tofile="${mountdir}/Chunky/.background/background.png"
 			overwrite="true"/>
-		<copy file="${chunky.res.dir}/chunky-dmg.icns"
+		<copy file="${dist.dir}/Chunky.icns"
 			tofile="${mountdir}/Chunky/.VolumeIcon.icns"
 			overwrite="true"/>
-		<copy file="${chunky.res.dir}/DS_Store"
+		<copy file="${dist.dir}/DS_Store"
 			tofile="${mountdir}/Chunky/.DS_Store"
 			overwrite="true"/>
 		<exec executable="/usr/bin/Setfile" os="Mac OS X">
@@ -222,7 +211,7 @@
 			<arg value="detach"/>
 			<arg value="${mountdir}/Chunky"/>
 		</exec>
-		<delete file="${app.name}-tmp.dmg" quiet="yes" failonerror="false"/>
+		<delete file="${build.dir}/Chunky-${version}.dmg" quiet="yes" failonerror="false"/>
 		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 			<arg value="convert"/>
 			<arg value="${build.dir}/Chunky-tmp.dmg"/>
@@ -239,10 +228,11 @@
 		</exec>
 	</target>
 
-	<!-- TODO update the Mac build targets!! -->
 	<target name="mac" description="Create and Bundle Chunky for OS X">
 		<antcall target="clean"/>
-		<antcall target="jar"/>
+		<antcall target="build"/>
+		<antcall target="gendoc"/>
+		<antcall target="package"/>
 		<antcall target="-macapp"/>
 		<antcall target="-macdmg"/>
 	</target>

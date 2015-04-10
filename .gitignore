@@ -35,3 +35,5 @@
 
 # personal files
 /TODO
+.DS_Store
+/tools/appbundler-*.jar
