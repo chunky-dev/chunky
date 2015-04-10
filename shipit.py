@@ -1,7 +1,9 @@
 # coding=utf-8
 # SHIPIT Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
 
-# requires PRAW, Launchpadlib
+# required python libs: PRAW, Launchpadlib
+# required external tools: Wine, NSIS (2.46)
+# requires appbundler and hdiutil for Mac build
 
 # Release Candidates are not built by this script!
 # Snapshots are currently built by proprietary script
@@ -179,7 +181,7 @@ def build_release(version):
 		if call(cmd(['ant', '-Dversion=' + version.full, 'release'])) is not 0:
 			print "Error: Ant build failed!"
 			sys.exit(1)
-		if call(['makensis', 'Chunky.nsi']) is not 0:
+		if nsis(['Chunky.nsi']) is not 0:
 			print "Error: NSIS build failed!"
 			sys.exit(1)
 		version.sign_files()
@@ -193,6 +195,14 @@ def build_release(version):
 		post_release_thread(version)
 	if raw_input('Update documentation? [y/N] ') == 'y':
 		update_docs(version)
+
+# call NSIS with given args
+def nsis(args):
+	if on_win():
+		return call(['makensis'] + args)
+	else:
+		# TODO: check for Wine/NSIS?
+		return call(['wine', path.expanduser('~/.wine/drive_c/Program Files/NSIS/makensis.exe')] + args)
 
 def build_snapshot(version):
 	if not version.suffix:
@@ -511,7 +521,8 @@ options = {
 	'docs': False,
 	'snapshot': False,
 	'sign': False,
-	'launcher': False
+	'launcher': False,
+	'testnsis': False
 }
 do_ftpupload = False
 do_update_docs = False
@@ -550,6 +561,12 @@ try:
 
 	if options['launcher']:
 		publish_launcher(version)
+		sys.exit(0)
+	elif options['testnsis']:
+		# test NSIS for Windows installer
+		# requires Wine on non-Windows
+		if nsis(['Chunky.nsi']) is not 0:
+			print "Error: NSIS build failed!"
 		sys.exit(0)
 
 	if version == None:
