@@ -91,7 +91,7 @@ public class GradientUI extends JPanel {
 	 * @param gradient
 	 * @param width
 	 * @param height
-	 * @return gradiant image
+	 * @return gradient image
 	 */
 	public static final BufferedImage gradientImage(List<Vector4d> gradient, int width, int height) {
 		if (width <= 0 || height <= 0 || gradient.size() < 2) {

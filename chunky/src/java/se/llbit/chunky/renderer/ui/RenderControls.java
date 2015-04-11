@@ -102,6 +102,7 @@ import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector2d;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 import se.llbit.ui.Adjuster;
@@ -3059,26 +3060,26 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		Ray ray = new Ray();
 
-		int[] corners = { -1, -1, -1, -1, -1, -1, -1, -1 };
+		Vector2d[] bounds = new Vector2d[4];
 
 		camera.calcViewRay(ray, -halfWidth, -0.5);
-		findMapPos(corners, 0, 1, ray, cv);
+		bounds[0] = findMapPos(ray, cv);
 
 		camera.calcViewRay(ray, -halfWidth, 0.5);
-		findMapPos(corners, 2, 3, ray, cv);
+		bounds[1] = findMapPos(ray, cv);
 
 		camera.calcViewRay(ray, halfWidth, 0.5);
-		findMapPos(corners, 4, 5, ray, cv);
+		bounds[2] = findMapPos(ray, cv);
 
 		camera.calcViewRay(ray, halfWidth, -0.5);
-		findMapPos(corners, 6, 7, ray, cv);
+		bounds[3] = findMapPos(ray, cv);
 
 		g.setColor(Color.YELLOW);
 
-		g.drawLine(corners[0], corners[1], corners[2], corners[3]);
-		g.drawLine(corners[2], corners[3], corners[4], corners[5]);
-		g.drawLine(corners[4], corners[5], corners[6], corners[7]);
-		g.drawLine(corners[6], corners[7], corners[0], corners[1]);
+		drawClipped(g, bounds[0], bounds[1]);
+		drawClipped(g, bounds[1], bounds[2]);
+		drawClipped(g, bounds[2], bounds[3]);
+		drawClipped(g, bounds[3], bounds[0]);
 
 		int ox = (int) (cv.scale * (ray.o.x/16 - cv.x0));
 		int oy = (int) (cv.scale * (ray.o.z/16 - cv.z0));
@@ -3096,14 +3097,30 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	}
 
-	private void findMapPos(int[] corners, int i, int j, Ray ray, ChunkView cv) {
+	private void drawClipped(Graphics g, Vector2d v1, Vector2d v2) {
+		if (v1 != null && v2 != null) {
+			int x1 = (int) v1.x;
+			int y1 = (int) v1.y;
+			int x2 = (int) v2.x;
+			int y2 = (int) v2.y;
+			g.drawLine(x1, y1, x2, y2);
+		}
+	}
+
+	/**
+	 * Find the point where the ray intersects the ground (y=63)
+	 * @param ray
+	 * @param cv
+	 */
+	private Vector2d findMapPos(Ray ray, ChunkView cv) {
 		if (ray.d.y < 0 && ray.o.y > 63 || ray.d.y > 0 && ray.o.y < 63) {
 			double d = (63 - ray.o.y) / ray.d.y;
 			Vector3d pos = new Vector3d();
 			pos.scaleAdd(d, ray.d, ray.o);
 
-			corners[i] = (int) (cv.scale * (pos.x/16 - cv.x0));
-			corners[j] = (int) (cv.scale * (pos.z/16 - cv.z0));
+			return new Vector2d(
+					cv.scale * (pos.x/16 - cv.x0),
+					cv.scale * (pos.z/16 - cv.z0));
 		} else {
 			double r = ray.d.x*ray.d.x + ray.d.z* ray.d.z;
 			if (r > Ray.EPSILON) {
@@ -3113,8 +3130,11 @@ public class RenderControls extends JDialog implements ViewListener,
 				o.x /= 16;
 				o.z /= 16;
 				o.scaleAdd(Math.sqrt(cvw*cvw + cvh*cvh) / Math.sqrt(r), ray.d);
-				corners[i] = (int) (cv.scale * (o.x - cv.x0));
-				corners[j] = (int) (cv.scale * (o.z - cv.z0));
+				return new Vector2d(
+						cv.scale * (o.x - cv.x0),
+						cv.scale * (o.z - cv.z0));
+			} else {
+				return null;
 			}
 		}
 
