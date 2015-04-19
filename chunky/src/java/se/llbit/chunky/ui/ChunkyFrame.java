@@ -171,9 +171,9 @@ public class ChunkyFrame extends JFrame {
 			case KeyEvent.VK_SHIFT:
 				chunky.setShiftModifier(true);
 				break;
-			/*case KeyEvent.VK_C:
-				chunky.openCLTestRenderer();
-				break;*/
+			case KeyEvent.VK_C:
+				chunky.getMap().showContextMenu();
+				break;
 			}
 		}
 

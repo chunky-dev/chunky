@@ -17,7 +17,6 @@
 package se.llbit.chunky.ui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -88,8 +87,10 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	private volatile ChunkPosition end = ChunkPosition.get(0, 0);
 
 	public int lastX;
-
 	public int lastY;
+
+	public int clickX;
+	public int clickY;
 
 	/**
 	 * Mouse listener for the chunk map UI element.
@@ -151,13 +152,9 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON3) {
-				lastX = e.getX();
-				lastY = e.getY();
-				RenderControls controls = chunky.getRenderControls();
-				boolean visible = controls != null && controls.isVisible();
-				moveCameraHere.setVisible(visible);
-				selectVisible.setVisible(visible);
-				contextMenu.show((Component) e.getSource(), e.getX(), e.getY());
+				clickX = e.getX();
+				clickY = e.getY();
+				showContextMenu();
 			} else {
 				setMotionOrigin(e);
 				mouseDown = true;
@@ -212,6 +209,8 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 				end = chunk;
 				repaint();
 			}
+			lastX = e.getX();
+			lastY = e.getY();
 		}
 
 		private ChunkPosition getChunk(MouseEvent e) {
@@ -243,6 +242,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 
 			chunky.onMouseWheelMotion(diff);
 		}
+
 	}
 
 	/**
@@ -306,8 +306,8 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 				// TODO atomic view copy
 				ChunkView theView = new ChunkView(view);
 				double scale = theView.scale;
-				double x = theView.x + (lastX - getWidth()/2) / scale;
-				double z = theView.z + (lastY - getHeight()/2) / scale;
+				double x = theView.x + (clickX - getWidth()/2) / scale;
+				double z = theView.z + (clickY - getHeight()/2) / scale;
 				chunky.moveCameraTo(x*16, z*16);
 			}
 		});
@@ -474,4 +474,16 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	private void setView(ChunkView newView) {
 		view = newView;
 	}
+
+	/**
+	 * Show the chunk context menu.
+	 */
+	public void showContextMenu() {
+		RenderControls controls = chunky.getRenderControls();
+		boolean visible = controls != null && controls.isVisible();
+		moveCameraHere.setVisible(visible);
+		selectVisible.setVisible(visible);
+		contextMenu.show(this, lastX, lastY);
+	}
+
 }
