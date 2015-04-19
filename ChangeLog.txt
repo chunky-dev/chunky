@@ -1,4 +1,6 @@
 1.3.5 - TBD
+    * Added option to select visible chunks in the 2D map context menu
+      (selects visible chunks inside the camera view indicator)
     * Nether portals now emit light
     * Re-engineered atmosphere and fog rendering, replaced it with a simpler
       but more customizable fog system. Fog density and color can be changed

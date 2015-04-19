@@ -118,6 +118,8 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	private static final int[] dumpFrequencies = { 50, 100, 500, 1000, 5000 };
 
+	private static final double CHUNK_SELECT_RADIUS = -8 * 1.4142;
+
 	private final RenderManager renderMan;
 	private final SceneManager sceneMan;
 	private final Chunk3DView view;
@@ -3179,5 +3181,54 @@ public class RenderControls extends JDialog implements ViewListener,
 		pos.z = z;
 		renderMan.scene().camera().setPosition(pos);
 		updateCameraPosition();
+	}
+
+	public void selectVisibleChunks(ChunkView cv, Chunky chunky) {
+		Camera camera = renderMan.scene().camera();
+		int width = renderMan.scene().canvasWidth();
+		int height = renderMan.scene().canvasHeight();
+
+		double halfWidth = width/(2.0*height);
+
+		Vector3d o = new Vector3d(camera.getPosition());
+
+		Ray ray = new Ray();
+		Vector3d[] corners = new Vector3d[4];
+
+		camera.calcViewRay(ray, -halfWidth, -0.5);
+		corners[0] = new Vector3d(ray.d);
+		camera.calcViewRay(ray, -halfWidth, 0.5);
+		corners[1] = new Vector3d(ray.d);
+		camera.calcViewRay(ray, halfWidth, 0.5);
+		corners[2] = new Vector3d(ray.d);
+		camera.calcViewRay(ray, halfWidth, -0.5);
+		corners[3] = new Vector3d(ray.d);
+
+		Vector3d[] norm = new Vector3d[4];
+		norm[0] = new Vector3d();
+		norm[0].cross(corners[1], corners[0]);
+		norm[0].normalize();
+		norm[1] = new Vector3d();
+		norm[1].cross(corners[2], corners[1]);
+		norm[1].normalize();
+		norm[2] = new Vector3d();
+		norm[2].cross(corners[3], corners[2]);
+		norm[2].normalize();
+		norm[3] = new Vector3d();
+		norm[3].cross(corners[0], corners[3]);
+		norm[3].normalize();
+
+		for (int x = cv.px0; x <= cv.px1; ++x) {
+			for (int z = cv.pz0; z <= cv.pz1; ++z) {
+				Vector3d pos = new Vector3d((x+0.5)*16, 63, (z+0.5)*16);// chunk top center position
+				pos.sub(o);
+				if (norm[0].dot(pos) > CHUNK_SELECT_RADIUS &&
+						norm[1].dot(pos) > CHUNK_SELECT_RADIUS &&
+						norm[2].dot(pos) > CHUNK_SELECT_RADIUS &&
+						norm[3].dot(pos) > CHUNK_SELECT_RADIUS) {
+					chunky.selectChunk(x, z);
+				}
+			}
+		}
 	}
 }

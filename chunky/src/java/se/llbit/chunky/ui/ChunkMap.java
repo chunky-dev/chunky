@@ -174,7 +174,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 					int cz = (int) QuickMath.floor(theView.z + (y - getHeight()/2) / scale);
 
 					if (theView.scale >= 16) {
-						chunky.selectChunk(cx, cz);
+						chunky.toggleChunkSelection(cx, cz);
 						mapBuffer.updateChunk(cx, cz);
 					} else {
 						chunky.selectRegion(cx, cz);
@@ -297,11 +297,24 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		moveCameraHere.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ChunkView theView = view;
+				// TODO atomic view copy
+				ChunkView theView = new ChunkView(view);
 				double scale = theView.scale;
 				double x = theView.x + (lastX - getWidth()/2) / scale;
 				double z = theView.z + (lastY - getHeight()/2) / scale;
 				chunky.moveCameraTo(x*16, z*16);
+			}
+		});
+		JMenuItem selectVisible = new JMenuItem("Select visible chunks");
+		selectVisible.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				RenderControls controls = chunky.getRenderControls();
+				if (controls != null && controls.isVisible()) {
+					// TODO atomic view copy
+					ChunkView theView = new ChunkView(view);
+					controls.selectVisibleChunks(theView, chunky);
+				}
 			}
 		});
 		contextMenu.add(createScene);
@@ -309,6 +322,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 		contextMenu.addSeparator();
 		contextMenu.add(clearSelection);
 		contextMenu.add(moveCameraHere);
+		contextMenu.add(selectVisible);
 
 		setView(chunky.getMapView());
 		mapBuffer = new MapBuffer(view);

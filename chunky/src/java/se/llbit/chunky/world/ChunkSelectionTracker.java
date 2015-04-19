@@ -95,12 +95,26 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
 	 * @param cx chunk x-position
 	 * @param cz chunk z-position
 	 */
-	public synchronized void selectChunk(World world, int cx, int cz) {
+	public synchronized void toggleChunk(World world, int cx, int cz) {
 		ChunkPosition chunk = ChunkPosition.get(cx, cz);
 		if (selected.contains(chunk)) {
 			selected.remove(chunk);
 			fireChunkUpdated(chunk);
 		} else if (!world.getChunk(chunk).isEmpty()) {
+			selected.add(chunk);
+			fireChunkUpdated(chunk);
+		}
+	}
+
+	/**
+	 * Adds a chunk to the selection
+	 * @param world
+	 * @param cx chunk x-position
+	 * @param cz chunk z-position
+	 */
+	public synchronized void selectChunk(World world, int cx, int cz) {
+		ChunkPosition chunk = ChunkPosition.get(cx, cz);
+		if (!selected.contains(chunk) && !world.getChunk(chunk).isEmpty()) {
 			selected.add(chunk);
 			fireChunkUpdated(chunk);
 		}

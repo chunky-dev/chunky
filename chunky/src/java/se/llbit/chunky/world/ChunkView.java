@@ -60,6 +60,10 @@ public class ChunkView {
 		this(x, z, width, height, 16);
 	}
 
+	public ChunkView(ChunkView other) {
+		this(other.x, other.z, other.width, other.height, other.scale);
+	}
+
 	public ChunkView(double x, double z, int width, int height, int scale) {
 		this.scale = scale;
 		if (scale <= 12) {

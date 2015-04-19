@@ -440,6 +440,16 @@ public class Chunky implements ChunkTopographyListener {
 	}
 
 	/**
+	 * Toggle chunk selection
+	 * @param cx
+	 * @param cz
+	 */
+	public synchronized void toggleChunkSelection(int cx, int cz) {
+		chunkSelection.toggleChunk(world, cx, cz);
+		getControls().setChunksSelected(chunkSelection.numSelectedChunks() > 0);
+	}
+
+	/**
 	 * Select specific chunk
 	 * @param cx
 	 * @param cz
@@ -969,8 +979,9 @@ public class Chunky implements ChunkTopographyListener {
 	}
 
 	public void moveCameraTo(double x, double z) {
-		if (renderControls != null) {
+		if (renderControls != null && renderControls.isVisible()) {
 			renderControls.moveCameraTo(x, z);
 		}
 	}
+
 }
