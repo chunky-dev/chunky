@@ -121,6 +121,15 @@ public class Vector2d {
 	}
 
 	/**
+	 * @param s
+	 * @param d
+	 */
+	public final void scaleAdd(double s, Vector2d d) {
+		x += s*d.x;
+		y += s*d.y;
+	}
+
+	/**
 	 * Scale this vector by s
 	 * @param s
 	 */

@@ -3060,26 +3060,36 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		Ray ray = new Ray();
 
+		Vector3d[] corners = new Vector3d[4];
 		Vector2d[] bounds = new Vector2d[4];
 
 		camera.calcViewRay(ray, -halfWidth, -0.5);
+		corners[0] = new Vector3d(ray.d);
 		bounds[0] = findMapPos(ray, cv);
 
 		camera.calcViewRay(ray, -halfWidth, 0.5);
+		corners[1] = new Vector3d(ray.d);
 		bounds[1] = findMapPos(ray, cv);
 
 		camera.calcViewRay(ray, halfWidth, 0.5);
+		corners[2] = new Vector3d(ray.d);
 		bounds[2] = findMapPos(ray, cv);
 
 		camera.calcViewRay(ray, halfWidth, -0.5);
+		corners[3] = new Vector3d(ray.d);
 		bounds[3] = findMapPos(ray, cv);
 
 		g.setColor(Color.YELLOW);
-
-		drawClipped(g, bounds[0], bounds[1]);
-		drawClipped(g, bounds[1], bounds[2]);
-		drawClipped(g, bounds[2], bounds[3]);
-		drawClipped(g, bounds[3], bounds[0]);
+		for (int i = 0; i < 4; ++i) {
+			int j = (i+1)%4;
+			if (bounds[i] != null && bounds[j] != null) {
+				drawLine(g, bounds[i], bounds[j]);
+			} else if (bounds[i] != null && bounds[j] == null) {
+				drawExtended(g, cv, bounds, corners, i, j);
+			} else if (bounds[j] != null && bounds[i] == null) {
+				drawExtended(g, cv, bounds, corners, j, i);
+			}
+		}
 
 		int ox = (int) (cv.scale * (ray.o.x/16 - cv.x0));
 		int oy = (int) (cv.scale * (ray.o.z/16 - cv.z0));
@@ -3097,14 +3107,44 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	}
 
-	private void drawClipped(Graphics g, Vector2d v1, Vector2d v2) {
-		if (v1 != null && v2 != null) {
-			int x1 = (int) v1.x;
-			int y1 = (int) v1.y;
-			int x2 = (int) v2.x;
-			int y2 = (int) v2.y;
-			g.drawLine(x1, y1, x2, y2);
+	private void drawExtended(Graphics g, ChunkView cv, Vector2d[] bounds,
+			Vector3d[] corners, int i, int j) {
+		Vector3d c = new Vector3d();
+		c.cross(corners[i], corners[j]);
+		Vector2d c2 = new Vector2d();
+		c2.x = c.z;
+		c2.y = -c.x;
+		c2.normalize();
+		double tNear = Double.POSITIVE_INFINITY;
+		double t = - bounds[i].x / c2.x;
+		if (t > 0 && t < tNear) {
+			tNear = t;
 		}
+		t = (cv.scale * (cv.x1 - cv.x0) - bounds[i].x) / c2.x;
+		if (t > 0 && t < tNear) {
+			tNear = t;
+		}
+		t = - bounds[i].y / c2.y;
+		if (t > 0 && t < tNear) {
+			tNear = t;
+		}
+		t = (cv.scale * (cv.z1 - cv.z0) - bounds[i].y) / c2.y;
+		if (t > 0 && t < tNear) {
+			tNear = t;
+		}
+		if (tNear != Double.POSITIVE_INFINITY) {
+			Vector2d p = new Vector2d(bounds[i]);
+			p.scaleAdd(tNear, c2);
+			drawLine(g, p, bounds[i]);
+		}
+	}
+
+	private void drawLine(Graphics g, Vector2d v1, Vector2d v2) {
+		int x1 = (int) v1.x;
+		int y1 = (int) v1.y;
+		int x2 = (int) v2.x;
+		int y2 = (int) v2.y;
+		g.drawLine(x1, y1, x2, y2);
 	}
 
 	/**
@@ -3114,6 +3154,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	 */
 	private Vector2d findMapPos(Ray ray, ChunkView cv) {
 		if (ray.d.y < 0 && ray.o.y > 63 || ray.d.y > 0 && ray.o.y < 63) {
+			// ray intersects ground
 			double d = (63 - ray.o.y) / ray.d.y;
 			Vector3d pos = new Vector3d();
 			pos.scaleAdd(d, ray.d, ray.o);
@@ -3122,20 +3163,7 @@ public class RenderControls extends JDialog implements ViewListener,
 					cv.scale * (pos.x/16 - cv.x0),
 					cv.scale * (pos.z/16 - cv.z0));
 		} else {
-			double r = ray.d.x*ray.d.x + ray.d.z* ray.d.z;
-			if (r > Ray.EPSILON) {
-				double cvw = cv.x1-cv.x0;
-				double cvh = cv.z1-cv.z0;
-				Vector3d o = new Vector3d(ray.o);
-				o.x /= 16;
-				o.z /= 16;
-				o.scaleAdd(Math.sqrt(cvw*cvw + cvh*cvh) / Math.sqrt(r), ray.d);
-				return new Vector2d(
-						cv.scale * (o.x - cv.x0),
-						cv.scale * (o.z - cv.z0));
-			} else {
-				return null;
-			}
+			return null;
 		}
 
 	}
