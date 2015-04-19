@@ -79,6 +79,9 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 	private final MapBuffer mapBuffer;
 	private volatile ChunkView view;
 	private final OverlayLabel mapLabel = new OverlayLabel(this);
+
+	private final JMenuItem moveCameraHere = new JMenuItem("Move camera here");
+	private final JMenuItem selectVisible = new JMenuItem("Select visible chunks");
 	private final JPopupMenu contextMenu = new JPopupMenu();
 
 	private volatile ChunkPosition start = ChunkPosition.get(0, 0);
@@ -150,6 +153,10 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 			if (e.getButton() == MouseEvent.BUTTON3) {
 				lastX = e.getX();
 				lastY = e.getY();
+				RenderControls controls = chunky.getRenderControls();
+				boolean visible = controls != null && controls.isVisible();
+				moveCameraHere.setVisible(visible);
+				selectVisible.setVisible(visible);
 				contextMenu.show((Component) e.getSource(), e.getX(), e.getY());
 			} else {
 				setMotionOrigin(e);
@@ -293,7 +300,6 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 				chunky.clearSelectedChunks();
 			}
 		});
-		JMenuItem moveCameraHere = new JMenuItem("Move camera here");
 		moveCameraHere.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -305,7 +311,6 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 				chunky.moveCameraTo(x*16, z*16);
 			}
 		});
-		JMenuItem selectVisible = new JMenuItem("Select visible chunks");
 		selectVisible.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
