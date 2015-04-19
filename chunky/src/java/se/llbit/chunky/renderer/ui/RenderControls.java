@@ -3117,6 +3117,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		c2.x = c.z;
 		c2.y = -c.x;
 		c2.normalize();
+		if (corners[i].y > 0 ) {
+			c2.scale(-1);
+		}
 		double tNear = Double.POSITIVE_INFINITY;
 		double t = - bounds[i].x / c2.x;
 		if (t > 0 && t < tNear) {
