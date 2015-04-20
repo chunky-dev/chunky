@@ -238,8 +238,8 @@ def reddit_login():
 		user = credentials.get('reddit user')
 		pw = credentials.getpass('reddit password')
 		try:
-			r = praw.Reddit(user_agent=user)
-			r.login('releasebot', pw)
+			r = praw.Reddit(user_agent='praw:se.llbit.chunky.releasebot:v1.0 (by /u/llbit)')
+			r.login(user, pw)
 			return r
 		except praw.errors.InvalidUserPass:
 			credentials.remove('reddit user')
