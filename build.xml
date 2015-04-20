@@ -95,12 +95,13 @@
 	<target name="dist" depends="update-version-string"
 		description="build distribution">
 
-		<!-- build subprojects -->
 		<antcall target="clean"/>
 		<antcall target="tarball"/>
 		<antcall target="build"/>
 		<antcall target="gendoc"/>
 		<antcall target="package"/>
+		<antcall target="-macapp"/>
+		<antcall target="-macdmg"/>
 	</target>
 
 	<target name="package" depends="update-version-string"

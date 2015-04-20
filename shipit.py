@@ -4,6 +4,7 @@
 # required python libs: PRAW, Launchpadlib
 # required external tools: Wine, NSIS (2.46)
 # requires appbundler and hdiutil for Mac build
+# requires gpg 1.4.19
 
 # Release Candidates are not built by this script!
 # Snapshots are currently built by proprietary script
@@ -135,11 +136,15 @@ class Version:
 	def exe_file(self):
 		return 'Chunky-%s.exe' % self.full
 
+	def dmg_file(self):
+		return 'Chunky-%s.dmg' % self.full
+
 	def sign_files(self):
 		sign_file(self.jar_file())
 		sign_file(self.zip_file())
 		sign_file(self.tar_file())
 		sign_file(self.exe_file())
+		sign_file(self.dmg_file())
 
 def on_win():
 	return platform.system() == 'Windows'
@@ -192,9 +197,9 @@ def build_release(version):
 			sys.exit(1)
 		version.sign_files()
 	if raw_input('Publish to Launchpad? [y/N] ') == 'y':
-		(is_new, exe, zip, jar) = publish_launchpad(version)
+		(is_new, exe, dmg, zip, jar) = publish_launchpad(version)
 		patch_url(version, jar)
-		write_release_notes(version, exe, zip)
+		write_release_notes(version, exe, dmg, zip)
 	if raw_input('Publish to FTP? [y/N] ') == 'y':
 		publish_ftp(version)
 	if raw_input('Post release thread? [y/N] ') == 'y':
@@ -342,6 +347,7 @@ def publish_launchpad(version):
 	check_file_exists(version.tar_file())
 	check_file_exists(version.zip_file())
 	check_file_exists(version.exe_file())
+	check_file_exists(version.dmg_file())
 	if raw_input('Publish to production? [y/N] ') == "y":
 		server = 'production'
 	else:
@@ -434,19 +440,29 @@ def publish_launchpad(version):
 		'installer')
 	assert exe_url
 	print exe_url
-	return (is_new_release, exe_url, zip_url, jar_url)
+	dmg_url = lp_upload_file(
+		version,
+		release,
+		version.dmg_file(),
+		'Mac Bundle',
+		'application/octet-stream',
+		'installer')
+	assert dmg_url
+	print dmg_url
+	return (is_new_release, exe_url, dmg_url, zip_url, jar_url)
 
 "output markdown"
-def write_release_notes(version, exe_url, zip_url):
+def write_release_notes(version, exe_url, dmg_url, zip_url):
 	text = '''###Downloads
 
 * [Windows installer](%s)
+* [Mac bundle](%s)
 * [Cross-platform binaries](%s)
 * [Only launcher (win, mac, linux)](http://chunkyupdate.llbit.se/ChunkyLauncher.jar)
 
 ###Release Notes
 
-''' % (exe_url, zip_url)
+''' % (exe_url, dmg_url, zip_url)
 	text += version.release_notes + '''
 
 ###ChangeLog
@@ -458,7 +474,8 @@ def write_release_notes(version, exe_url, zip_url):
 	with codecs.open('build/version-%s.properties' % version.full, 'w', encoding='utf-8') as f:
 		f.write('''version=%s
 exe.dl.link=%s
-zip.dl.link=%s''' % (version.milestone, exe_url, zip_url))
+dmg.dl.link=%s
+zip.dl.link=%s''' % (version.milestone, exe_url, dmg_url, zip_url))
 
 "post reddit release thread"
 def post_release_thread(version):
