@@ -663,6 +663,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		JLabel renderLbl = new JLabel("Render: ");
 
 		setViewVisible(false);
+		showPreviewBtn.setIcon(Icon.eye.imageIcon());
 		showPreviewBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -708,6 +709,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		});
 
 		saveFrameBtn.setText("Save Current Frame");
+		saveFrameBtn.setIcon(Icon.photo.imageIcon());
 		saveFrameBtn.addActionListener(saveFrameListener);
 
 		sppLbl.setToolTipText("SPP = Samples Per Pixel, SPS = Samples Per Second");
