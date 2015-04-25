@@ -431,15 +431,6 @@ def publish_launchpad(version):
 		'installer')
 	assert zip_url
 	print zip_url
-	exe_url = lp_upload_file(
-		version,
-		release,
-		version.exe_file(),
-		'Windows Installer',
-		'application/octet-stream',
-		'installer')
-	assert exe_url
-	print exe_url
 	dmg_url = lp_upload_file(
 		version,
 		release,
@@ -449,6 +440,15 @@ def publish_launchpad(version):
 		'installer')
 	assert dmg_url
 	print dmg_url
+	exe_url = lp_upload_file(
+		version,
+		release,
+		version.exe_file(),
+		'Windows Installer',
+		'application/octet-stream',
+		'installer')
+	assert exe_url
+	print exe_url
 	return (is_new_release, exe_url, dmg_url, zip_url, jar_url)
 
 "output markdown"
