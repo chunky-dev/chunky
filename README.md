@@ -12,7 +12,7 @@ Quick links:
 Copyright & License
 -------------------
 
-Chunky is Copyright (c) 2010-2014, Jesper Öqvist <jesper@llbit.se>
+Chunky is Copyright (c) 2010-2014, Jesper Ã–qvist <jesper@llbit.se>
 
 Permission to modify and redistribute is granted under the terms of
 the GPLv3 license. See the file license/LICENSE.txt for the full license.
@@ -50,7 +50,7 @@ command line:
     java -jar chunky.jar -render SceneName
 
 Where SceneName is the name of the scene to render. You can read more about
-[headless rendering on the Wiki](http://chunky.llbit.se/index.php?title=Headless_Rendering).
+[headless rendering on the Wiki](http://chunky.llbit.se/headless.html).
 
 Shutdown when render completes on Unix-like Systems (Mac OS X, Linux, BSD)
 --------------------------------------------------------------------------
