@@ -41,8 +41,7 @@ import se.llbit.math.QuickMath;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public abstract class Adjuster implements ChangeListener, ActionListener,
-		DocumentListener {
+public abstract class Adjuster implements ChangeListener, ActionListener, DocumentListener {
 	private final JLabel lbl;
 	private ErrorLabel errorLbl;
 	private final JSlider slider;
@@ -159,11 +158,11 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	 */
 	public Group horizontalGroup(GroupLayout layout) {
 		return layout.createSequentialGroup()
-					.addComponent(lbl)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(slider)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(textField);
+				.addComponent(lbl)
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addComponent(slider)
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addComponent(textField);
 	}
 
 	/**
@@ -172,9 +171,10 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 	 */
 	public Group verticalGroup(GroupLayout layout) {
 		return layout.createParallelGroup()
-						.addComponent(lbl)
-						.addComponent(slider)
-						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
+				.addComponent(lbl)
+				.addComponent(slider)
+				.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE,
+						GroupLayout.PREFERRED_SIZE);
 	}
 
 	@Override
@@ -332,7 +332,11 @@ public abstract class Adjuster implements ChangeListener, ActionListener,
 		if (integerMode) {
 			setTextFieldText("" + (int) value);
 		} else {
-			setTextFieldText(String.format("%.2f", value));
+			if (value > 1) {
+				setTextFieldText(String.format("%.2f", value));
+			} else {
+				setTextFieldText(String.format("%.4f", value));
+			}
 		}
 	}
 
