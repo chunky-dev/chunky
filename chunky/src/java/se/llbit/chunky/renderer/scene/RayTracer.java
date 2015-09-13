@@ -106,7 +106,7 @@ public class RayTracer {
 
 	private static boolean waterIntersection(Scene scene, Ray ray) {
 		if (ray.d.y < 0) {
-			double t = (scene.waterHeight-.125-ray.o.y) / ray.d.y;
+			double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
 			if (t > 0 && t < ray.t) {
 				Vector3d vec = new Vector3d();
 				vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
@@ -120,7 +120,7 @@ public class RayTracer {
 			}
 		}
 		if (ray.d.y > 0) {
-			double t = (scene.waterHeight-.125-ray.o.y) / ray.d.y;
+			double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
 			if (t > 0 && t < ray.t) {
 				Vector3d vec = new Vector3d();
 				vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
