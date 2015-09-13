@@ -523,10 +523,15 @@ public class Camera implements JSONifiable {
 	}
 
 	/**
+	 * Update the world size. This is the maximum X/Z dimension value. The world size affects
+	 * the parallel projector which uses the world size to avoid clipping chunks.
 	 * @param size World size
 	 */
 	public void setWorldSize(double size) {
 		worldWidth = 2*Math.sqrt(2*size*size + Chunk.Y_MAX*Chunk.Y_MAX);
+		if (projectionMode == ProjectionMode.PARALLEL) {
+			initProjector();
+		}
 	}
 
 	/**
