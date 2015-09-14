@@ -50,7 +50,7 @@ command line:
     java -jar chunky.jar -render SceneName
 
 Where SceneName is the name of the scene to render. You can read more about
-[headless rendering on the Wiki](http://chunky.llbit.se/index.php?title=Headless_Rendering).
+[headless rendering on the Wiki](http://chunky.llbit.se/headless.html).
 
 Shutdown when render completes on Unix-like Systems (Mac OS X, Linux, BSD)
 --------------------------------------------------------------------------
