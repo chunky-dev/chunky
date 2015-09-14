@@ -1,5 +1,6 @@
 1.3.6 - TBD
 
+* Fixed error causing the sun location to reset when rendering in headless mode.
 * Added chunk grid at bedrock level in preview rendering mode.
 * Fixed the parallel camera sometimes clipping world chunks.
 * Fixed an issue with the water world rendering mode causing the water plane to

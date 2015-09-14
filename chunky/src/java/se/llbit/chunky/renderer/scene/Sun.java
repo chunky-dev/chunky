@@ -433,6 +433,8 @@ public class Sun implements JSONifiable {
 		color.x = colorObj.get("red").doubleValue(1);
 		color.y = colorObj.get("green").doubleValue(1);
 		color.z = colorObj.get("blue").doubleValue(1);
+
+		initSun();
 	}
 
 	/**
