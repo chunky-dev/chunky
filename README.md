@@ -5,7 +5,7 @@ Chunky is a Minecraft mapping and rendering tool.
 
 Quick links:
 
-* [Wiki](http://chunky.llbit.se)
+* [Documentation](http://chunky.llbit.se)
 * [Subreddit](http://www.reddit.com/r/chunky)
 * [Development Blog](http://llbit.se)
 
@@ -50,7 +50,7 @@ command line:
     java -jar chunky.jar -render SceneName
 
 Where SceneName is the name of the scene to render. You can read more about
-[headless rendering on the Wiki](http://chunky.llbit.se/index.php?title=Headless_Rendering).
+[headless rendering here.](http://chunky.llbit.se/headless.html)
 
 Shutdown when render completes on Unix-like Systems (Mac OS X, Linux, BSD)
 --------------------------------------------------------------------------
@@ -109,4 +109,5 @@ Additional Information
 ----------------------
 
 More information about Chunky, including a short getting started guide and
-rendering tips are available at the [Chunky Wiki](http://chunky.llbit.se/).
+rendering tips are available at the [Chunky Documentation
+page.](http://chunky.llbit.se/)
