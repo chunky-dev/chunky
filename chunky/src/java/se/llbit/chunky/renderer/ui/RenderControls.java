@@ -641,7 +641,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		addTab("Lighting", Icon.light, buildLightingPane());
 		addTab("Sky & Fog", Icon.sky, buildSkyPane());
 		addTab("Water", Icon.water, buildWaterPane());
-		addTab("Camera", Icon.camera, buildCameraPane());
+		addTab("Camera", Icon.eye, buildCameraPane());
 		addTab("Post-processing", Icon.gear, buildPostProcessingPane());
 		addTab("Advanced", Icon.advanced, buildAdvancedPane());
 		addTab("Help", Icon.question, buildHelpPane());

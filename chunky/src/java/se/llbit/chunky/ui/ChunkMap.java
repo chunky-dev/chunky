@@ -311,6 +311,7 @@ public class ChunkMap extends JPanel implements ChunkUpdateListener {
 				chunky.moveCameraTo(x*16, z*16);
 			}
 		});
+		selectVisible.setIcon(Icon.eye.imageIcon());
 		selectVisible.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

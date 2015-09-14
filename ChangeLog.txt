@@ -1,5 +1,6 @@
 1.3.6 - TBD
 
+* Added chunk grid at bedrock level in preview rendering mode.
 * Fixed the parallel camera sometimes clipping world chunks.
 * Fixed an issue with the water world rendering mode causing the water plane to
   have an incorrect vertical offset in large scenes.

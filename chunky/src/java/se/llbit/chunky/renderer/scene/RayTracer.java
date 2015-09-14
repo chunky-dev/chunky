@@ -39,6 +39,9 @@ public class RayTracer {
 		}
 		while (true) {
 			if (!nextIntersection(scene, ray, state)) {
+				if (mapIntersection(scene, ray)) {
+					break;
+				}
 				break;
 			} else if (ray.getCurrentMaterial() != Block.AIR && ray.color.w > 0) {
 				break;
@@ -136,4 +139,28 @@ public class RayTracer {
 		return false;
 	}
 
+	private static boolean mapIntersection(Scene scene, Ray ray) {
+		if (ray.d.y < 0) {
+			double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
+			if (t > 0 && t < ray.t) {
+				Vector3d vec = new Vector3d();
+				vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
+				if (!scene.isInsideOctree(vec)) {
+					ray.t = t;
+					ray.o.set(vec);
+					double xm = (ray.o.x % 16.0 + 16.0) % 16.0;
+					double zm = (ray.o.z % 16.0 + 16.0) % 16.0;
+					if (xm > 0.6 && zm > 0.6) {
+						ray.color.set(1, 1, 1, 1);
+					} else {
+						ray.color.set(0, 0, 0, 1);
+					}
+					ray.setCurrentMat(Block.STONE, 0);
+					ray.n.set(0, 1, 0);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
