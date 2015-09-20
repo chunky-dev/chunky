@@ -37,6 +37,7 @@ import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.resources.texturepack.AlternateTextures;
 import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.CloudsTexture;
+import se.llbit.chunky.resources.texturepack.EntityTextureRef;
 import se.llbit.chunky.resources.texturepack.FoliageColorTexture;
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.GrassColorTexture;
@@ -1306,6 +1307,19 @@ public class TexturePackLoader {
 				new SimpleTexture("assets/minecraft/textures/painting/paintings_kristoffer_zetterstrand", Texture.paintings));
 		allTextures.put("font_ascii",
 				new FontTexture("assets/minecraft/textures/font/ascii"));
+
+		allTextures.put("alex",
+				new EntityTextureRef("assets/minecraft/textures/entity/alex", Texture.alex));
+		allTextures.put("steve",
+				new EntityTextureRef("assets/minecraft/textures/entity/steve", Texture.steve));
+		allTextures.put("creeper",
+				new EntityTextureRef("assets/minecraft/textures/entity/creeper/creeper", Texture.creeper));
+		allTextures.put("zombie",
+				new EntityTextureRef("assets/minecraft/textures/entity/zombie/zombie", Texture.zombie));
+		allTextures.put("skeleton",
+				new EntityTextureRef("assets/minecraft/textures/entity/skeleton/skeleton", Texture.skeleton));
+		allTextures.put("wither",
+				new EntityTextureRef("assets/minecraft/textures/entity/wither/wither", Texture.wither));
 	}
 
 	/**

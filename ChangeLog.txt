@@ -1,5 +1,6 @@
 1.3.6 - TBD
 
+* Added mob head rendering.
 * Added sign text rendering.
 * Signs are now rendered slightly taller, the same size as they appear in
   Minecraft.

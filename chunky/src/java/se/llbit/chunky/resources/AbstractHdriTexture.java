@@ -18,7 +18,7 @@ package se.llbit.chunky.resources;
 
 import se.llbit.math.Vector4d;
 
-public class AbstractHDRITexture extends Texture {
+public class AbstractHdriTexture extends Texture {
 	public float[] buf;
 
 	@Override

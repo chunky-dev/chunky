@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 
 import se.llbit.log.Log;
 
-public class HDRTexture extends AbstractHDRITexture {
+public class HDRTexture extends AbstractHdriTexture {
 
 	public HDRTexture(File file) {
 		// This RGBE loader was created to mimic the behavior of the RADIANCE

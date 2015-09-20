@@ -57,6 +57,7 @@ import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
 import se.llbit.chunky.world.entity.Entity;
+import se.llbit.chunky.world.entity.SkullEntity;
 import se.llbit.chunky.world.entity.PaintingEntity;
 import se.llbit.chunky.world.entity.SignEntity;
 import se.llbit.chunky.world.entity.WallSignEntity;
@@ -704,6 +705,9 @@ public class Scene extends SceneDescription {
 					break;
 				case Block.SIGNPOST_ID:
 					entities.add(new SignEntity(position, entityTag, metadata));
+					break;
+				case Block.HEAD_ID:
+					entities.add(new SkullEntity(position, entityTag, metadata));
 					break;
 				}
 			}

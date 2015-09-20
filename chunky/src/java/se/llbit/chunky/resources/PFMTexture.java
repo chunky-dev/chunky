@@ -27,7 +27,7 @@ import java.util.Scanner;
 
 import se.llbit.log.Log;
 
-public class PFMTexture extends AbstractHDRITexture {
+public class PFMTexture extends AbstractHdriTexture {
 
 	public PFMTexture(File file) {
 		try {

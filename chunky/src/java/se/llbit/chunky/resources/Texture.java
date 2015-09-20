@@ -423,6 +423,14 @@ public class Texture {
 	public static final Texture largeTrappedChestLeft = new Texture();
 	public static final Texture largeTrappedChestRight = new Texture();
 
+	// Entity textures.
+	public static final EntityTexture alex = new EntityTexture();
+	public static final EntityTexture steve = new EntityTexture();
+	public static final EntityTexture zombie = new EntityTexture();
+	public static final EntityTexture creeper = new EntityTexture();
+	public static final EntityTexture skeleton = new EntityTexture();
+	public static final EntityTexture wither = new EntityTexture();
+
 	/**
 	 * Missing or unknown texture.
 	 */
@@ -737,11 +745,12 @@ public class Texture {
 		return imageIcon;
 	}
 
-	/**
-	 * @return Texture width
-	 */
 	public int getWidth() {
 		return width;
+	}
+
+	public int getHeight() {
+		return height;
 	}
 
 	/**
