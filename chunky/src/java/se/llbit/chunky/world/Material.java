@@ -1,4 +1,4 @@
-/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2014-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -24,7 +24,7 @@ import se.llbit.math.Ray;
 public abstract class Material {
 
 	/**
-	 * Block name
+	 * The name of this material.
 	 */
 	protected final String name;
 
@@ -35,21 +35,20 @@ public abstract class Material {
 	public float ior = 1.000293f;
 
 	/**
-	 * True if there is a specific local intersection model
-	 * for this block
+	 * Set to true if there is a local intersection model
+	 * for this block.
 	 */
 	public boolean localIntersect = false;
 
 	/**
 	 * A block is opaque if it occupies an entire voxel
 	 * and no light can pass through it.
-	 *
-	 * @return {@code true} if the block is solid
 	 */
 	public boolean isOpaque = false;
 
 	/**
 	 * A block is solid if the block occupies an entire voxel.
+	 * The block may still be partly transparent.
 	 */
 	public boolean isSolid = true;
 

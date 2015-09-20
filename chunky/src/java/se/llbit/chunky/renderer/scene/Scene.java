@@ -58,6 +58,8 @@ import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
 import se.llbit.chunky.world.entity.Entity;
 import se.llbit.chunky.world.entity.PaintingEntity;
+import se.llbit.chunky.world.entity.SignEntity;
+import se.llbit.chunky.world.entity.WallSignEntity;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -655,9 +657,9 @@ public class Scene extends SceneDescription {
 
 			loadedChunks.add(cp);
 
-			Collection<CompoundTag> tileEnts = new LinkedList<CompoundTag>();
+			Collection<CompoundTag> tileEntities = new LinkedList<CompoundTag>();
 			Collection<CompoundTag> ents = new LinkedList<CompoundTag>();
-			world.getChunk(cp).getBlockData(blocks, data, biomes, tileEnts, ents);
+			world.getChunk(cp).getBlockData(blocks, data, biomes, tileEntities, ents);
 			nchunks += 1;
 
 			int wx0 = cp.x*16;
@@ -671,7 +673,7 @@ public class Scene extends SceneDescription {
 				}
 			}
 
-			// load entities
+			// Load entities.
 			for (CompoundTag tag: ents) {
 				if (tag.get("id").stringValue("").equals("Painting")) {
 					ListTag pos = (ListTag) tag.get("Pos");
@@ -682,6 +684,27 @@ public class Scene extends SceneDescription {
 					double yaw = rot.getItem(0).floatValue();
 					//double pitch = rot.getItem(1).floatValue();
 					entities.add(new PaintingEntity(new Vector3d(x, y, z), tag.get("Motive").stringValue(), yaw));
+				}
+			}
+
+			// Load tile entities.
+			for (CompoundTag entityTag: tileEntities) {
+				int x = entityTag.get("x").intValue(0)-wx0;
+				int y = entityTag.get("y").intValue(0);
+				int z = entityTag.get("z").intValue(0)-wz0;
+				int index = Chunk.chunkIndex(x, y, z);
+				int block = 0xFF & blocks[index];
+				int metadata = 0xFF & data[index/2];
+				metadata >>= (x % 2) * 4;
+				metadata &= 0xF;
+				Vector3d position = new Vector3d(x+wx0, y, z+wz0);
+				switch (block) {
+				case Block.WALLSIGN_ID:
+					entities.add(new WallSignEntity(position, entityTag, metadata));
+					break;
+				case Block.SIGNPOST_ID:
+					entities.add(new SignEntity(position, entityTag, metadata));
+					break;
 				}
 			}
 
@@ -696,7 +719,7 @@ public class Scene extends SceneDescription {
 						if (cx > 0 && cx < 15 && cz > 0 && cz < 15 && cy > 0 && cy < 255 &&
 								block != Block.STONE && block.isOpaque) {
 
-							// set obscured blocks to stone
+							// Set obscured blocks to stone.
 							if (Block.get(blocks[index-1]).isOpaque &&
 									Block.get(blocks[index+1]).isOpaque &&
 									Block.get(blocks[index-Chunk.X_MAX]).isOpaque &&
@@ -713,11 +736,15 @@ public class Scene extends SceneDescription {
 						metadata &= 0xF;
 
 						int type = block.id;
-						// store metadata
+						// Store metadata.
 						switch (block.id) {
+						case Block.WALLSIGN_ID:
+						case Block.SIGNPOST_ID:
+							// Treated as entities.
+							continue;
 						case Block.VINES_ID:
 							if (cy < 255) {
-								// is this the top vine block?
+								// Is this the top vine block?
 								index = Chunk.chunkIndex(cx, cy+1, cz);
 								Block above = Block.get(blocks[index]);
 								if (above.isSolid) {
@@ -730,7 +757,7 @@ public class Scene extends SceneDescription {
 							type = Block.WATER_ID;
 						case Block.WATER_ID:
 							if (cy < 255) {
-								// is there water above?
+								// Is there water above?
 								index = Chunk.chunkIndex(cx, cy+1, cz);
 								Block above = Block.get(blocks[index]);
 								if (above.isWater()) {
@@ -752,7 +779,7 @@ public class Scene extends SceneDescription {
 							type = Block.LAVA_ID;
 						case Block.LAVA_ID:
 							if (cy < 255) {
-								// is there lava above?
+								// Is there lava above?
 								index = Chunk.chunkIndex(cx, cy+1, cz);
 								Block above = Block.get(blocks[index]);
 								if (above.isLava()) {
@@ -763,14 +790,14 @@ public class Scene extends SceneDescription {
 
 						case Block.GRASS_ID:
 							if (cy < 255) {
-								// is it snow covered?
+								// Is it snow covered?
 								index = Chunk.chunkIndex(cx, cy+1, cz);
 								int blockAbove = 0xFF & blocks[index];
 								if (blockAbove == Block.SNOW_ID) {
 									type = type | (1 << 8);// 9th bit is the snow bit
 								}
 							}
-							// fallthrough!
+							// Fallthrough!
 
 						case Block.WOODENDOOR_ID:
 						case Block.IRONDOOR_ID:

@@ -529,6 +529,30 @@ public class Texture {
 		setTexture(img);
 	}
 
+	public void setTexture(Texture texture) {
+		setTexture(texture.image);
+	}
+
+	/**
+	 * Mirror the texture in the Y axis.
+	 */
+	public void mirror() {
+		BufferedImage mirror = new BufferedImage(image.getWidth(),
+				image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		DataBufferInt inDB = (DataBufferInt) image.getRaster().getDataBuffer();
+		int[] in = inDB.getData();
+		DataBufferInt outDB = (DataBufferInt) mirror.getRaster().getDataBuffer();
+		int[] out = outDB.getData();
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				int inIndex = width*y + x;
+				int outIndex = width*(y+1) - (x+1);
+				out[outIndex] = in[inIndex];
+			}
+		}
+		setTexture(mirror);
+	}
+
 	public void setTexture(BufferedImage newImage) {
 		if (newImage.getType() == BufferedImage.TYPE_INT_ARGB) {
 			image = newImage;

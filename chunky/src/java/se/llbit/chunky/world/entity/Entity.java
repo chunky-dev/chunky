@@ -1,4 +1,4 @@
-/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2014-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -23,6 +23,10 @@ import se.llbit.json.JsonValue;
 import se.llbit.math.Vector3d;
 import se.llbit.math.primitive.Primitive;
 
+/**
+ * Represents Minecraft entities that are not stored in the octree.
+ * @author Jesper Öqvist <jesper@llbit.se>
+ */
 abstract public class Entity {
 	protected final Vector3d position;
 
@@ -33,20 +37,24 @@ abstract public class Entity {
 	abstract public Collection<Primitive> primitives(Vector3d offset);
 
 	/**
-	 * Serialize the entity to JSON
-	 * @return JSON object representing this entity
+	 * Marshalls this entity to JSON.
+	 * @return JSON object representing this entity.
 	 */
 	abstract public JsonValue toJson();
 
 	/**
-	 * Deserialize entity from JSON
-	 * @param json
-	 * @return deserialized entity, or {@code null} if it was not a valid entity
+	 * Unmarshalls an entity object from JSON data.
+	 * @param json json data.
+	 * @return unmarshalled entity, or {@code null} if it was not a valid entity.
 	 */
 	public static Entity fromJson(JsonObject json) {
 		String kind = json.get("kind").stringValue("");
 		if (kind.equals("painting")) {
 			return PaintingEntity.fromJson(json);
+		} else if (kind.equals("sign")) {
+			return SignEntity.fromJson(json);
+		} else if (kind.equals("wallsign")) {
+			return WallSignEntity.fromJson(json);
 		}
 		return null;
 	}
