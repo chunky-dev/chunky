@@ -25,7 +25,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
@@ -40,15 +39,13 @@ import javax.swing.event.AncestorListener;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 @SuppressWarnings("serial")
-public class OverlayLabel extends JPanel {
+public class OverlayPanel extends JPanel {
 	private final JComponent parentComponent;
-	private final JLabel lbl = new JLabel();
 	private JLayeredPane layeredPane;
-	private final Color backgroundColor = new Color(0xFFF5BC);
+	private final Color backgroundColor = new Color(0xFFFFFF);
 	private boolean showLabel = false;
 
-	public OverlayLabel(JComponent parent) {
-		this.add(lbl);
+	public OverlayPanel(JComponent parent) {
 		setOpaque(true);
 		setBackground(backgroundColor);
 		this.parentComponent = parent;
@@ -116,14 +113,13 @@ public class OverlayLabel extends JPanel {
 		Dimension parentSize = parentComponent.getSize();
 		Dimension size = getPreferredSize();
 		Point loc = SwingUtilities.convertPoint(parentComponent, getLocation(), this);
-		int x = loc.x;
+		int x = loc.x + parentSize.width - size.width;
 		int y = loc.y + parentSize.height - size.height;
 		setBounds(x, y, size.width, size.height);
 		super.setVisible(showLabel);
 	}
 
-	public void setText(String message) {
-		lbl.setText(message);
+	public void update() {
 		showLabel = true;
 		if (layeredPane != null) {
 			updatePosition();
@@ -139,8 +135,8 @@ public class OverlayLabel extends JPanel {
 	}
 
 	@Override
-	public void setVisible(boolean aFlag) {
-		super.setVisible(aFlag);
-		showLabel = aFlag;
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+		showLabel = visible;
 	}
 }

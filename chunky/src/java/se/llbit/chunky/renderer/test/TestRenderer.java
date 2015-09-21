@@ -30,6 +30,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.Renderer;
+import se.llbit.chunky.renderer.SceneStatusListener;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.ui.Chunk3DView;
@@ -428,5 +429,13 @@ public class TestRenderer extends Thread implements ViewListener,
 			}
 			refresh = false;
 		}
+	}
+
+	@Override
+	public void addSceneStatusListener(SceneStatusListener listener) {
+	}
+
+	@Override
+	public void removeSceneStatusListener(SceneStatusListener listener) {
 	}
 }

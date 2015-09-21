@@ -57,6 +57,7 @@ import org.jocl.cl_program;
 
 import se.llbit.chunky.renderer.ProgressListener;
 import se.llbit.chunky.renderer.Renderer;
+import se.llbit.chunky.renderer.SceneStatusListener;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.ui.Chunk3DView;
 import se.llbit.chunky.renderer.ui.ViewListener;
@@ -461,5 +462,17 @@ public class CLRenderManager extends Thread implements Renderer,
 	public void onZoom(int diff) {
 		fov = QuickMath.min( 175, QuickMath.max( 1, fov + diff * 18 ) );
 		refresh();
+	}
+
+	@Override
+	public void addSceneStatusListener(SceneStatusListener listener) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeSceneStatusListener(SceneStatusListener listener) {
+		// TODO Auto-generated method stub
+
 	}
 }

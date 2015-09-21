@@ -77,6 +77,7 @@ public class Icon extends Texture {
     final public static Icon question = new Icon("question");
     final public static Icon photo = new Icon("photo");
     final public static Icon eye = new Icon("eye");
+    final public static Icon scale = new Icon("scale");
 
 	public Icon(String resourceName) {
 		setTexture(ImageLoader.get("icons/" + resourceName + ".png"));

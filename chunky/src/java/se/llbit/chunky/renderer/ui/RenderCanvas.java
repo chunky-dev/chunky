@@ -34,6 +34,8 @@ import se.llbit.chunky.renderer.Renderer;
 public class RenderCanvas extends JPanel implements RenderableCanvas {
 
 	private Renderer renderer;
+	private int preferredWidth = 200;
+	private int preferredHeight = 200;
 
 	/**
 	 * Create new canvas
@@ -41,11 +43,10 @@ public class RenderCanvas extends JPanel implements RenderableCanvas {
 	public RenderCanvas() {
 
 		setBackground(Color.white);
-		// apparently setting the same preferred size twice will cancel all
-		// other calls to setPreferredSize
-		setPreferredSize(new Dimension(
-				PersistentSettings.get3DCanvasWidth(),
-				PersistentSettings.get3DCanvasHeight()));
+		// Apparently setting the same preferred size twice will cancel all
+		// other calls to setPreferredSize.
+		setPreferredSize(PersistentSettings.get3DCanvasWidth(),
+				PersistentSettings.get3DCanvasHeight(), 1);
 		setMinimumSize(new Dimension(100, 100));
 		setIgnoreRepaint(false);
 	}
@@ -55,7 +56,7 @@ public class RenderCanvas extends JPanel implements RenderableCanvas {
 		super.paintComponent(g);
 
 		if (renderer != null) {
-			renderer.drawBufferedImage(g, getWidth(), getHeight());
+			renderer.drawBufferedImage(g, preferredWidth, preferredHeight);
 		}
 	}
 
@@ -81,5 +82,12 @@ public class RenderCanvas extends JPanel implements RenderableCanvas {
 				}
 			}.start();
 		}
+	}
+
+	public void setPreferredSize(int width, int height, int scale) {
+		preferredWidth = width * scale;
+		preferredHeight = height * scale;
+		setPreferredSize(new Dimension(preferredWidth, preferredHeight));
+
 	}
 }

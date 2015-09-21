@@ -16,8 +16,6 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -57,9 +55,9 @@ import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
 import se.llbit.chunky.world.entity.Entity;
-import se.llbit.chunky.world.entity.SkullEntity;
 import se.llbit.chunky.world.entity.PaintingEntity;
 import se.llbit.chunky.world.entity.SignEntity;
+import se.llbit.chunky.world.entity.SkullEntity;
 import se.llbit.chunky.world.entity.WallSignEntity;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -84,9 +82,6 @@ import se.llbit.png.PngFileWriter;
  * Scene description.
  */
 public class Scene extends SceneDescription {
-
-	private static final Font infoFont = new Font("Sans serif", Font.BOLD, 11);
-	private static FontMetrics fontMetrics;
 
 	protected static final int DEFAULT_DUMP_FREQUENCY = 500;
 
@@ -1932,68 +1927,48 @@ public class Scene extends SceneDescription {
 	 * Update the canvas - draw the latest rendered frame
 	 * @param warningText
 	 */
-	public synchronized void updateCanvas(String warningText) {
-		finalized = false;
-
+	public synchronized String sceneStatus(String warningText) {
 		try {
-			// flip buffers
-			BufferedImage tmp = buffer;
-			buffer = backBuffer;
-			backBuffer = tmp;
-
-			bufferData = ((DataBufferInt) backBuffer.getRaster().getDataBuffer()).getData();
-
-			Graphics g = buffer.getGraphics();
-
 			if (!warningText.isEmpty()) {
-				g.setColor(java.awt.Color.red);
-				int x0 = width/2;
-				int y0 = height/2;
-				g.setFont(infoFont);
-				if (fontMetrics == null) {
-					fontMetrics = g.getFontMetrics();
-				}
-				g.drawString(warningText,
-						x0 - fontMetrics.stringWidth(warningText)/2, y0);
+				return warningText;
 			} else {
-
-				if (renderState == RenderState.PREVIEW) {
-					int x0 = width/2;
-					int y0 = height/2;
-					g.setColor(java.awt.Color.white);
-					g.drawLine(x0, y0-4, x0, y0+4);
-					g.drawLine(x0-4, y0, x0+4, y0);
-					g.setFont(infoFont);
-					Ray ray = new Ray();
-					if (trace(ray) && ray.getCurrentMaterial() instanceof Block) {
-						Block block = (Block) ray.getCurrentMaterial();
-						g.drawString(String.format("target: %.2f m", ray.distance), 5, height-18);
-						g.drawString(String.format("[0x%08X] %s (%s)",
-								ray.getCurrentData(),
-								block,
-								block.description(ray.getBlockData())),
-								5, height-5);
-					}
-					Vector3d pos = camera.getPosition();
-					g.drawString(String.format("(%.1f, %.1f, %.1f)",
-							pos.x, pos.y, pos.z), 5, 11);
+				StringBuilder buf = new StringBuilder();
+				buf.append("<html>");
+				Ray ray = new Ray();
+				if (trace(ray) && ray.getCurrentMaterial() instanceof Block) {
+					Block block = (Block) ray.getCurrentMaterial();
+					buf.append(String.format("target: %.2f m<br>", ray.distance));
+					buf.append(String.format("[0x%08X] %s (%s)<br>",
+							ray.getCurrentData(),
+							block,
+							block.description(ray.getBlockData())));
 				}
+				Vector3d pos = camera.getPosition();
+				buf.append(String.format("pos: (%.1f, %.1f, %.1f)",
+						pos.x, pos.y, pos.z));
+				return buf.toString();
 			}
 
-			g.dispose();
 		} catch (IllegalStateException e) {
 			Log.error("Unexpected exception while rendering back buffer", e);
 		}
+		return "";
 	}
 
 	/**
 	 * Prepare the front buffer for rendering by flipping the back and front buffer.
-	 * Draw status text on the front buffer.
 	 */
-	public void updateCanvas() {
-		if (!finalized)
-			return;
-		updateCanvas(haveLoadedChunks() ? "" : "No chunks loaded!");
+	public synchronized void updateCanvas() {
+		finalized = false;
+		BufferedImage tmp = buffer;
+		buffer = backBuffer;
+		backBuffer = tmp;
+		bufferData = ((DataBufferInt) backBuffer.getRaster().getDataBuffer()).getData();
+	}
+
+	/** @return scene status text. */
+	public String sceneStatus() {
+		return sceneStatus(haveLoadedChunks() ? "" : "No chunks loaded!");
 	}
 
 	/**
@@ -2003,7 +1978,7 @@ public class Scene extends SceneDescription {
 	 * @param canvasHeight The canvas height
 	 */
 	public synchronized void drawBufferedImage(Graphics g, int canvasWidth, int canvasHeight) {
-		g.drawImage(buffer, 0, 0, null);
+		g.drawImage(buffer, 0, 0, canvasWidth, canvasHeight, null);
 	}
 
 	/**

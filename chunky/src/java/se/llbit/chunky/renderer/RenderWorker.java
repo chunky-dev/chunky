@@ -149,7 +149,7 @@ public class RenderWorker extends Thread {
 			int ty = (int) QuickMath.floor(target.o.y + target.d.y * Ray.OFFSET);
 			int tz = (int) QuickMath.floor(target.o.z + target.d.z * Ray.OFFSET);
 
-			// this is intentionally incorrectly indented for readability
+			// This is intentionally incorrectly indented for readability.
 			for (int x = x0; x < x1; ++x)
 			for (int y = y0; y < y1; ++y) {
 
@@ -163,6 +163,16 @@ public class RenderWorker extends Thread {
 					scene.finalizePixel(x, y);
 					continue;
 				}
+			}
+
+			// Draw the crosshair.
+			if (x == width / 2 && (y >= height / 2 - 5 && y <= height / 2 + 5) ||
+					y == height / 2 && (x >= width / 2 - 5 && x <= width / 2 + 5)) {
+				samples[(y*width+x)*3+0] = 0xFF;
+				samples[(y*width+x)*3+1] = 0xFF;
+				samples[(y*width+x)*3+2] = 0xFF;
+				scene.finalizePixel(x, y);
+				continue;
 			}
 
 			cam.calcViewRay(ray, random,

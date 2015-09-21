@@ -21,6 +21,7 @@ import java.awt.Graphics;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -87,6 +88,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	 * Current renderer state/mode.
 	 */
 	private RenderState state = RenderState.PREVIEW;
+
+	private final Collection<SceneStatusListener> sceneListeners =
+			new ArrayList<SceneStatusListener>();
 
 	/**
 	 * Constructor
@@ -225,6 +229,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				giveTickets();
 				waitOnWorkers();
 				bufferedScene.updateCanvas();
+				sendSceneStatus(bufferedScene.sceneStatus());
 				bufferedScene.renderTime += System.currentTimeMillis() - frameStart;
 			}
 
@@ -275,14 +280,13 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			int minutes = (int) ((etaSeconds / 60) % 60);
 			int hours = (int) (etaSeconds / 3600);
 			String eta = String.format("%d:%02d:%02d", hours, minutes, seconds);
-			renderListener.setProgress("Rendering", bufferedScene.spp,
-					0, target, eta);
+			renderListener.setProgress("Rendering", bufferedScene.spp, 0, target, eta);
 		} else {
 			renderListener.setProgress("Rendering", bufferedScene.spp, 0, target);
 		}
 
 		synchronized (this) {
-			// Update render status display
+			// Update render status display.
 			renderListener.setRenderTime(bufferedScene.renderTime);
 			renderListener.setSamplesPerSecond((int) samplesPerSecond());
 			renderListener.setSPP(bufferedScene.spp);
@@ -308,6 +312,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				giveTickets();
 				waitOnWorkers();
 				bufferedScene.updateCanvas();
+				sendSceneStatus(bufferedScene.sceneStatus());
 				bufferedScene.renderTime += System.currentTimeMillis() - frameStart;
 			}
 
@@ -469,6 +474,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				state = bufferedScene.getRenderState();
 			}
 			bufferedScene.updateCanvas();
+			sendSceneStatus(bufferedScene.sceneStatus());
 			canvas.repaint();
 
 			renderListener.sceneLoaded();
@@ -622,9 +628,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 	public void revertPendingSceneChanges() {
 		synchronized (mutableScene) {
-			// synchronized to ensure that refresh flag is never visibly true
+			// Synchronized to ensure that refresh flag is never visibly true.
 			mutableScene.set(bufferedScene);
-			mutableScene.setRefreshed();// clear refresh flag
+			mutableScene.setRefreshed();// Clear refresh flag.
 		}
 	}
 
@@ -635,5 +641,21 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	public void setTargetSPP(int target) {
 		mutableScene.setTargetSPP(target);
 		updateRenderProgress();
+	}
+
+	@Override
+	public synchronized void addSceneStatusListener(SceneStatusListener listener) {
+		sceneListeners.add(listener);
+	}
+
+	@Override
+	public synchronized void removeSceneStatusListener(SceneStatusListener listener) {
+		sceneListeners.remove(listener);
+	}
+
+	private synchronized void sendSceneStatus(String status) {
+		for (SceneStatusListener listener : sceneListeners) {
+			listener.sceneStatus(status);
+		}
 	}
 }

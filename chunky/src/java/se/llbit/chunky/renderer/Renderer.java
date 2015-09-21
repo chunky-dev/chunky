@@ -25,17 +25,17 @@ import java.awt.Graphics;
  */
 public interface Renderer {
 	/**
-	 * Draws the buffered image
-	 * @param g
-	 * @param width
-	 * @param height
+	 * Draws the buffered image to the given graphics context.
 	 */
 	public void drawBufferedImage(Graphics g, int width, int height);
 
 	/**
-	 * Set the buffer update flag. The buffer update flag
-	 * decides whether the renderer should update the buffered image.
-	 * @param finalizationEnabled
+	 * Set the buffer update flag. The buffer update flag decides whether the
+	 * renderer should update the buffered image.
 	 */
 	public void setBufferFinalization(boolean finalizationEnabled);
+
+	public void addSceneStatusListener(SceneStatusListener listener);
+
+	public void removeSceneStatusListener(SceneStatusListener listener);
 }
