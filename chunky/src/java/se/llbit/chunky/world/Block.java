@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -45,6 +45,7 @@ import se.llbit.chunky.model.FlowerPotModel;
 import se.llbit.chunky.model.FurnaceModel;
 import se.llbit.chunky.model.GlassPaneModel;
 import se.llbit.chunky.model.GrassModel;
+import se.llbit.chunky.model.GrassPathModel;
 import se.llbit.chunky.model.HeadModel;
 import se.llbit.chunky.model.HopperModel;
 import se.llbit.chunky.model.LadderModel;
@@ -3519,11 +3520,16 @@ public class Block extends Material {
 			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
-	public static final Block UNKNOWN0xD0 = new Block(0xD0, "Unknown Block 0xD0", Texture.unknown) {
+	public static final int GRASSPATH_ID = 0xD0;
+	public static final Block GRASSPATH = new Block(GRASSPATH_ID, "Grass Path", Texture.grassPathTop) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return GrassPathModel.intersect(ray);
 		}
 	};
 	public static final Block UNKNOWN0xD1 = new Block(0xD1, "Unknown Block 0xD1", Texture.unknown) {
@@ -3909,7 +3915,7 @@ public class Block extends Material {
 		ACACIADOOR, DARKOAKDOOR, UNKNOWN0xC6, UNKNOWN0xC7,
 		UNKNOWN0xC8, UNKNOWN0xC9, UNKNOWN0xCA, UNKNOWN0xCB,
 		UNKNOWN0xCC, UNKNOWN0xCD, UNKNOWN0xCE, UNKNOWN0xCF,
-		UNKNOWN0xD0, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3,
+		GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3,
 		UNKNOWN0xD4, UNKNOWN0xD5, UNKNOWN0xD6, UNKNOWN0xD7,
 		UNKNOWN0xD8, UNKNOWN0xD9, UNKNOWN0xDA, UNKNOWN0xDB,
 		UNKNOWN0xDC, UNKNOWN0xDD, UNKNOWN0xDE, UNKNOWN0xDF,

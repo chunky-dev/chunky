@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -18,64 +18,27 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.Quad;
+import se.llbit.math.AABB;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
 
 @SuppressWarnings("javadoc")
 public class GrassModel {
-	protected static Quad[] quads = {
-		// front
-		new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
-				new Vector3d(1, 1, 0), new Vector4d(1, 0, 0, 1)),
-
-		// back
-		new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
-				new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
-
-		// right
-		new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
-				new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
-
-		// left
-		new Quad(new Vector3d(1, 0, 1), new Vector3d(1, 0, 0),
-				new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, 1)),
-
-		// top
-		new Quad(new Vector3d(1, 1, 0), new Vector3d(0, 1, 0),
-				new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, 1)),
-
-		// bottom
-		new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
-				new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
-
-	};
+	private static AABB aabb = new AABB(0, 1, 0, 1, 0, 1);
 
 	public static boolean intersect(Ray ray, Scene scene) {
-		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
-		for (Quad quad : quads) {
-			if (quad.intersect(ray)) {
-				if (quad.n.y == -1) {
-					// bottom texture
-					Texture.dirt.getColor(ray);
-					ray.n.set(quad.n);
-					ray.t = ray.tNext;
-					hit = true;
-					continue;
-				} else if (quad.n.y == 0 &&
-						(ray.getCurrentData() & (1<<8)) != 0) {
-
-					// snow side texture
-					Texture.snowSide.getColor(ray);
-					ray.n.set(quad.n);
-					ray.t = ray.tNext;
-					hit = true;
-					continue;
-				}
+		if (aabb.intersect(ray)) {
+			if (ray.n.y == -1) {
+				// Bottom face.
+				Texture.dirt.getColor(ray);
+				ray.t = ray.tNext;
+			} else if (ray.n.y == 0 && (ray.getCurrentData() & (1<<8)) != 0) {
+				// Snowy side face.
+				Texture.snowSide.getColor(ray);
+				ray.t = ray.tNext;
+			} else {
 				float[] color;
-				if (quad.n.y > 0) {
+				if (ray.n.y > 0) {
 					color = Texture.grassTop.getColor(ray.u, ray.v);
 				} else {
 					color = Texture.grassSide.getColor(ray.u, ray.v);
@@ -86,22 +49,17 @@ public class GrassModel {
 					ray.color.x *= biomeColor[0];
 					ray.color.y *= biomeColor[1];
 					ray.color.z *= biomeColor[2];
-					ray.n.set(quad.n);
 					ray.t = ray.tNext;
-					hit = true;
 				} else {
 					Texture.grassSideSaturated.getColor(ray);
 					ray.color.w = 1;
-					ray.n.set(quad.n);
 					ray.t = ray.tNext;
-					hit = true;
 				}
 			}
-		}
-		if (hit) {
 			ray.distance += ray.t;
 			ray.o.scaleAdd(ray.t, ray.d);
+			return true;
 		}
-		return hit;
+		return false;
 	}
 }

@@ -403,6 +403,10 @@ public class Texture {
 	public static final Texture redGlassPaneSide = new Texture();
 	public static final Texture blackGlassPaneSide = new Texture();
 
+	// Minecraft 1.9 blocks.
+	public static final Texture grassPathSide = new Texture();
+	public static final Texture grassPathTop = new Texture();
+
 	// Trapped Chest
 	public static final Texture trappedChestTop = new Texture();
 	public static final Texture trappedChestBottom = new Texture();

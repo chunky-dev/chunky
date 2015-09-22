@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -1302,6 +1302,12 @@ public class TexturePackLoader {
 				new SimpleTexture("assets/minecraft/textures/blocks/door_acacia_lower", Texture.acaciaDoorBottom));
 		allTextures.put("door_dark_oak_lower",
 				new SimpleTexture("assets/minecraft/textures/blocks/door_dark_oak_lower", Texture.darkOakDoorBottom));
+
+		// Minecraft 1.9 blocks.
+		allTextures.put("grass_path_side",
+				new SimpleTexture("assets/minecraft/textures/blocks/grass_path_side", Texture.grassPathSide));
+		allTextures.put("grass_path_top",
+				new SimpleTexture("assets/minecraft/textures/blocks/grass_path_top", Texture.grassPathTop));
 
 		allTextures.put("paintings_zetterstrand",
 				new SimpleTexture("assets/minecraft/textures/painting/paintings_kristoffer_zetterstrand", Texture.paintings));

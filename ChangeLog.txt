@@ -1,5 +1,6 @@
 1.3.6 - TBD
 
+* Added grass path rendering.
 * Added buttons to uniformly scale the 3D canvas.
 * Replaced the status text embedded in the render preview by an overlay label.
 * Added mob head rendering.
