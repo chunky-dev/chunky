@@ -3482,11 +3482,20 @@ public class Block extends Material {
 			return TexturedBlockModel.intersect(ray, texture[ray.getBlockData()%7]);
 		}
 	};
-	public static final Block UNKNOWN0xCB = new Block(0xCB, "Unknown Block 0xCB", Texture.unknown) {
+	public static final int PURPURSTAIRS_ID = 0xCB;
+	public static final Block PURPURSTAIRS = new Block(PURPURSTAIRS_ID, "Purpur Stairs", Icon.stoneStairs) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return StairModel.intersect(ray, Texture.purpurBlock);
+		}
+		@Override
+		public Texture getTexture(int blockData) {
+			return Texture.purpurBlock;
 		}
 	};
 	public static final Block UNKNOWN0xCC = new Block(0xCC, "Unknown Block 0xCC", Texture.unknown) {
@@ -3911,7 +3920,7 @@ public class Block extends Material {
 		SPRUCEFENCE, BIRCHFENCE, JUNGLEFENCE, DARKOAKFENCE,
 		ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR, JUNGLEDOOR,
 		ACACIADOOR, DARKOAKDOOR, UNKNOWN0xC6, UNKNOWN0xC7,
-		UNKNOWN0xC8, PURPURBLOCK, PURPURPILLAR, UNKNOWN0xCB,
+		UNKNOWN0xC8, PURPURBLOCK, PURPURPILLAR, PURPURSTAIRS,
 		UNKNOWN0xCC, UNKNOWN0xCD, ENDBRICKS, UNKNOWN0xCF,
 		GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3,
 		UNKNOWN0xD4, UNKNOWN0xD5, UNKNOWN0xD6, UNKNOWN0xD7,
