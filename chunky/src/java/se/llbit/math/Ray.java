@@ -31,29 +31,17 @@ import se.llbit.chunky.world.Material;
  */
 public class Ray {
 
-	/**
-	 * EPSILON
-	 */
 	public static final double EPSILON = 0.000005;
 
-	/**
-	 * OFFSET
-	 */
 	public static final double OFFSET = 0.0001;
 
-	/**
-	 * Ray direction.
-	 */
+	/** Ray direction. */
 	public Vector3d d = new Vector3d();
 
-	/**
-	 * Intersection point.
-	 */
+	/** Intersection point. */
 	public Vector3d o = new Vector3d();
 
-	/**
-	 * Intersection normal.
-	 */
+	/** Intersection normal. */
 	public Vector3d n = new Vector3d();
 
 	/**
@@ -62,72 +50,47 @@ public class Ray {
 	 */
 	public double distance;
 
-	/**
- 	 * Accumulated color value.
- 	 */
+	/** Accumulated color value. */
 	public Vector4d color = new Vector4d();
 
-	/**
- 	 * Emittance of previously intersected surface.
- 	 */
+	/** Emittance of previously intersected surface. */
 	public Vector3d emittance = new Vector3d();
 
-	/**
-	 * Previous material
-	 */
+	/** Previous material. */
 	private Material prevMaterial = Block.AIR;
 
-	/**
-	 * Current material
-	 */
+	/** Current material. */
 	private Material currentMaterial = Block.AIR;
 
-	/**
-	 * Previous block metadata;
-	 */
+	/** Previous block metadata. */
 	private int prevData;
 
-	/**
-	 * Current block metadata.
-	 */
+	/** Current block metadata. */
 	private int currentData;
 
-	/**
-	 * Recursive ray depth
-	 */
+	/** Recursive ray depth */
 	public int depth;
 
-	/**
-	 * Distance to closest intersection.
-	 */
+	/** Distance to closest intersection. */
 	public double t;
 
 	/**
-	 * Distance to next potential intersection.
-	 * The tNext value is stored by subroutines when calculating a potential
-	 * next hit point. This can then be stored in the t variable based on
-	 * further decision making.
+	 * Distance to next potential intersection. The tNext value is stored by
+	 * subroutines when calculating a potential next hit point. This can then be
+	 * stored in the t variable based on further decision making.
 	 */
 	public double tNext;
 
-	/**
-	 * Texture coordinate
-	 */
+	/** Texture coordinate. */
 	public double u;
 
-	/**
-	 * Texture coordinate
-	 */
+	/** Texture coordinate. */
 	public double v;
 
-	/**
-	 * Is the ray specularly reflected
-	 */
+	/** Is the ray specularly reflected */
 	public boolean specular;
 
-	/**
- 	 * Creat an uninitialized ray.
- 	 */
+	/** Builds an uninitialized ray. */
 	public Ray() {
 	}
 
@@ -139,9 +102,7 @@ public class Ray {
 		set(other);
 	}
 
-	/**
-	 * set default values
-	 */
+	/** Set default values for this ray. */
 	public void setDefault() {
 		distance = 0;
 		prevMaterial = Block.AIR;
@@ -152,10 +113,7 @@ public class Ray {
 		specular = true;
 	}
 
-	/**
-	 * Clone other ray
-	 * @param other
-	 */
+	/** Copy state from another ray. */
 	public void set(Ray other) {
 		prevMaterial = other.prevMaterial;
 		currentMaterial = other.currentMaterial;
@@ -170,9 +128,9 @@ public class Ray {
 	}
 
 	/**
-	 * The block data value is a 4-bit integer value describing
-	 * properties of the current block.
-	 * @return Current block data (sometimes called metadata)
+	 * The block data value is a 4-bit integer value describing properties of the
+	 * current block.
+	 * @return current block data (sometimes called metadata).
 	 */
 	public final int getBlockData() {
 		return 0xF & (currentData >> BlockData.OFFSET);
@@ -180,8 +138,8 @@ public class Ray {
 
 	/**
 	 * Initialize a ray with origin and direction.
-	 * @param o Origin
-	 * @param d Direction
+	 * @param o origin
+	 * @param d direction
 	 */
 	public final void set(Vector3d o, Vector3d d) {
 		setDefault();
@@ -190,12 +148,12 @@ public class Ray {
 	}
 
 	/**
- 	 * Find the exit point from the given block for this ray.
-	 * This marches the ray forward - i.e. updates ray origin directly.
- 	 * @param bx block x coordinate
- 	 * @param by block y coordinate
- 	 * @param bz block z coordinate
- 	 */
+	 * Find the exit point from the given block for this ray. This marches the ray
+	 * forward - i.e. updates ray origin directly.
+	 * @param bx block x coordinate
+	 * @param by block y coordinate
+	 * @param bz block z coordinate
+	 */
 	public final void exitBlock(int bx, int by, int bz) {
 		int nx = 0;
 		int ny = 0;
@@ -249,26 +207,20 @@ public class Ray {
 	}
 
 	/**
-	 * @param scene
-	 * @return Foliage color for the current block
+	 * @return foliage color for the current block
 	 */
 	public float[] getBiomeFoliageColor(Scene scene) {
 		return scene.getFoliageColor((int) (o.x + d.x * OFFSET), (int) (o.z + d.z * OFFSET));
 	}
 
 	/**
-	 * @param scene
-	 * @return Grass color for the current block
+	 * @return grass color for the current block
 	 */
 	public float[] getBiomeGrassColor(Scene scene) {
 		return scene.getGrassColor((int) (o.x + d.x * OFFSET), (int) (o.z + d.z * OFFSET));
 	}
 
-	/**
-	 * Set this ray to a random diffuse reflection of the input ray.
-	 * @param ray
-	 * @param random
-	 */
+	/** Set this ray to a random diffuse reflection of the input ray. */
 	public final void diffuseReflection(Ray ray, Random random) {
 		set(ray);
 
@@ -321,10 +273,7 @@ public class Ray {
 		specular = false;
 	}
 
-	/**
-	 * Set this ray to the specular reflection of the input ray.
-	 * @param ray
-	 */
+	/** Set this ray to the specular reflection of the input ray. */
 	public final void specularReflection(Ray ray) {
 		set(ray);
 		d.scaleAdd(
