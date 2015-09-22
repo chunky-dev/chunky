@@ -766,51 +766,6 @@ public class Block extends Material {
 			Texture.sandstoneTop,
 		};
 
-		final Texture[] wood = {
-			Texture.oakPlanks,
-			Texture.oakPlanks,
-			Texture.oakPlanks,
-			Texture.oakPlanks,
-			Texture.oakPlanks,
-			Texture.oakPlanks,
-		};
-
-		final Texture[] cobble = {
-			Texture.cobblestone,
-			Texture.cobblestone,
-			Texture.cobblestone,
-			Texture.cobblestone,
-			Texture.cobblestone,
-			Texture.cobblestone,
-		};
-
-		final Texture[] brick = {
-			Texture.brick,
-			Texture.brick,
-			Texture.brick,
-			Texture.brick,
-			Texture.brick,
-			Texture.brick,
-		};
-
-		final Texture[] stoneBrick = {
-			Texture.stoneBrick,
-			Texture.stoneBrick,
-			Texture.stoneBrick,
-			Texture.stoneBrick,
-			Texture.stoneBrick,
-			Texture.stoneBrick,
-		};
-
-		final Texture[] netherBrick = {
-			Texture.netherBrick,
-			Texture.netherBrick,
-			Texture.netherBrick,
-			Texture.netherBrick,
-			Texture.netherBrick,
-			Texture.netherBrick,
-		};
-
 		final Texture[] stone = {
 			Texture.slabSide,
 			Texture.slabSide,
@@ -829,47 +784,36 @@ public class Block extends Material {
 			Texture.quartzBottom,
 		};
 
-		final Texture[] smoothStone = {
-			Texture.slabTop,
-			Texture.slabTop,
-			Texture.slabTop,
-			Texture.slabTop,
-			Texture.slabTop,
-			Texture.slabTop,
-		};
-
-		final Texture[] smoothSandstone = {
-			Texture.sandstoneTop,
-			Texture.sandstoneTop,
-			Texture.sandstoneTop,
-			Texture.sandstoneTop,
-			Texture.sandstoneTop,
-			Texture.sandstoneTop,
-		};
-
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			switch (ray.getBlockData()) {
-			default: case 0:
+			default:
+			case 0:
 				return TexturedBlockModel.intersect(ray, stone);
 			case 1:
 				return TexturedBlockModel.intersect(ray, sandstone);
-			case 2: case 10:
-				return TexturedBlockModel.intersect(ray, wood);
-			case 3: case 11:
-				return TexturedBlockModel.intersect(ray, cobble);
-			case 4: case 12:
-				return TexturedBlockModel.intersect(ray, brick);
-			case 5: case 13:
-				return TexturedBlockModel.intersect(ray, stoneBrick);
-			case 6: case 14:
-				return TexturedBlockModel.intersect(ray, netherBrick);
-			case 7: case 15:
+			case 2:
+			case 10:
+				return TexturedBlockModel.intersect(ray, Texture.oakPlanks);
+			case 3:
+			case 11:
+				return TexturedBlockModel.intersect(ray, Texture.cobblestone);
+			case 4:
+			case 12:
+				return TexturedBlockModel.intersect(ray, Texture.brick);
+			case 5:
+			case 13:
+				return TexturedBlockModel.intersect(ray, Texture.stoneBrick);
+			case 6:
+			case 14:
+				return TexturedBlockModel.intersect(ray, Texture.netherBrick);
+			case 7:
+			case 15:
 				return TexturedBlockModel.intersect(ray, quartz);
 			case 8:
-				return TexturedBlockModel.intersect(ray, smoothStone);
+				return TexturedBlockModel.intersect(ray, Texture.slabTop);
 			case 9:
-				return TexturedBlockModel.intersect(ray, smoothSandstone);
+				return TexturedBlockModel.intersect(ray, Texture.sandstoneTop);
 			}
 		}
 	};
@@ -3498,18 +3442,25 @@ public class Block extends Material {
 			return Texture.purpurBlock;
 		}
 	};
-	public static final Block UNKNOWN0xCC = new Block(0xCC, "Unknown Block 0xCC", Texture.unknown) {
+	public static final int PURPURDOUBLESLAB_ID = 0xCC;
+	public static final Block PURPURDOUBLESLAB = new Block(PURPURDOUBLESLAB_ID, "Purpur Double Slab", Texture.purpurBlock) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			isOpaque = true;
+			isSolid = true;
+			isInvisible = false;
 		}
 	};
-	public static final Block UNKNOWN0xCD = new Block(0xCD, "Unknown Block 0xCD", Texture.unknown) {
+	public static final int PURPURSLAB_ID = 0xCD;
+	public static final Block PURPURSLAB = new Block(PURPURSLAB_ID, "Purpur Slab", Texture.purpurBlock) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			isInvisible = false;
+			localIntersect = true;
+		}
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return SlabModel.intersect(ray, Texture.purpurBlock);
 		}
 	};
 	public static final int ENDBRICKS_ID = 0xCE;
@@ -3921,7 +3872,7 @@ public class Block extends Material {
 		ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR, JUNGLEDOOR,
 		ACACIADOOR, DARKOAKDOOR, UNKNOWN0xC6, UNKNOWN0xC7,
 		UNKNOWN0xC8, PURPURBLOCK, PURPURPILLAR, PURPURSTAIRS,
-		UNKNOWN0xCC, UNKNOWN0xCD, ENDBRICKS, UNKNOWN0xCF,
+		PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, UNKNOWN0xCF,
 		GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3,
 		UNKNOWN0xD4, UNKNOWN0xD5, UNKNOWN0xD6, UNKNOWN0xD7,
 		UNKNOWN0xD8, UNKNOWN0xD9, UNKNOWN0xDA, UNKNOWN0xDB,

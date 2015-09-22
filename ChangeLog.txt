@@ -1,6 +1,7 @@
 1.3.6 - TBD
 
 * Added rendering for the following Minecraft 1.9 block types:
+    + Purpur Slabs
     + Purpur Stairs
     + Purpur Block
     + Purpur Pillar
