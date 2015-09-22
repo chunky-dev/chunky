@@ -407,6 +407,9 @@ public class Texture {
 	public static final Texture grassPathSide = new Texture();
 	public static final Texture grassPathTop = new Texture();
 	public static final Texture endBricks = new Texture();
+	public static final Texture purpurBlock = new Texture();
+	public static final Texture purpurPillarTop = new Texture();
+	public static final Texture purpurPillarSide = new Texture();
 
 	// Trapped Chest
 	public static final Texture trappedChestTop = new Texture();

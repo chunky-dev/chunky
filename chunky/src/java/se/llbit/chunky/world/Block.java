@@ -108,7 +108,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 			Texture.stone,
 			Texture.granite, Texture.smoothGranite,
 			Texture.diorite, Texture.smoothDiorite,
@@ -122,7 +122,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, tex[ray.getBlockData()%7]);
+			return TexturedBlockModel.intersect(ray, texture[ray.getBlockData()%7]);
 		}
 		@Override
 		public String description(int data) {
@@ -178,8 +178,7 @@ public class Block extends Material {
 
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray,
-					textures[ray.getBlockData() % 3]);
+			return TexturedBlockModel.intersect(ray, textures[ray.getBlockData() % 3]);
 		}
 		final String[] kind = {
 			"regular", "coarse", "podzol"
@@ -409,28 +408,13 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[][] textures = {
-			{
-				Texture.sponge,
-				Texture.sponge,
-				Texture.sponge,
-				Texture.sponge,
-				Texture.sponge,
-				Texture.sponge,
-			},
-			{
-				Texture.wetSponge,
-				Texture.wetSponge,
-				Texture.wetSponge,
-				Texture.wetSponge,
-				Texture.wetSponge,
-				Texture.wetSponge,
-			},
+		final Texture[] texture = {
+			Texture.sponge,
+			Texture.wetSponge,
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray,
-					textures[ray.getBlockData() % 2]);
+			return TexturedBlockModel.intersect(ray, texture[ray.getBlockData() % 2]);
 		}
 		final String[] kind = {
 			"dry", "wet"
@@ -473,7 +457,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 				Texture.dispenserFront,
 				Texture.furnaceSide,
 				Texture.furnaceSide,
@@ -483,7 +467,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return FurnaceModel.intersect(ray, tex);
+			return FurnaceModel.intersect(ray, texture);
 		}
 	};
 	public static final int SANDSTONE_ID = 0x18;
@@ -493,7 +477,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[][] tex = {
+		final Texture[][] texture = {
 			// normal
 			{
 				Texture.sandstoneSide,
@@ -526,8 +510,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray,
-					tex[ray.getBlockData() % 3]);
+			return TexturedBlockModel.intersect(ray, texture[ray.getBlockData() % 3]);
 		}
 	};
 	public static final int NOTEBLOCK_ID = 0x19;
@@ -897,7 +880,7 @@ public class Block extends Material {
 			isSolid = false;
 			localIntersect = true;
 		}
-		final Texture[][] tex = {
+		final Texture[][] texture = {
 			{ Texture.slabSide, Texture.slabTop },
 			{ Texture.sandstoneSide, Texture.sandstoneTop },
 			{ Texture.oakPlanks, Texture.oakPlanks },
@@ -919,7 +902,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			Texture[] textures = tex[ray.getBlockData()&7];
+			Texture[] textures = texture[ray.getBlockData()&7];
 			return SlabModel.intersect(ray, textures[0], textures[1]);
 		}
 		@Override
@@ -941,7 +924,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 			Texture.tntSide,
 			Texture.tntSide,
 			Texture.tntSide,
@@ -951,7 +934,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, tex);
+			return TexturedBlockModel.intersect(ray, texture);
 		}
 	};
 	public static final int BOOKSHELF_ID = 0x2F;
@@ -961,7 +944,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 			Texture.bookshelf,
 			Texture.bookshelf,
 			Texture.bookshelf,
@@ -971,7 +954,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, tex);
+			return TexturedBlockModel.intersect(ray, texture);
 		}
 	};
 	public static final int MOSSSTONE_ID = 0x30;
@@ -1053,7 +1036,7 @@ public class Block extends Material {
 			isSolid = false;
 			localIntersect = true;
 		}
-		final Texture[][] tex = {
+		final Texture[][] texture = {
 			// single
 			{
 				Texture.chestFront,
@@ -1097,7 +1080,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return ChestModel.intersect(ray, tex[(ray.getCurrentData() >> 16) % 3]);
+			return ChestModel.intersect(ray, texture[(ray.getCurrentData() >> 16) % 3]);
 		}
 	};
 
@@ -1139,7 +1122,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 			Texture.workbenchFront,
 			Texture.workbenchSide,
 			Texture.workbenchSide,
@@ -1150,7 +1133,7 @@ public class Block extends Material {
 
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, tex);
+			return TexturedBlockModel.intersect(ray, texture);
 		}
 	};
 	public static final int CROPS_ID = 0x3B;
@@ -1188,7 +1171,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 				Texture.furnaceUnlitFront,
 				Texture.furnaceSide,
 				Texture.furnaceSide,
@@ -1198,7 +1181,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return FurnaceModel.intersect(ray, tex);
+			return FurnaceModel.intersect(ray, texture);
 		}
 	};
 	public static final int FURNACELIT_ID = 0x3E;
@@ -1208,7 +1191,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 				Texture.furnaceLitFront,
 				Texture.furnaceSide,
 				Texture.furnaceSide,
@@ -1218,7 +1201,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return FurnaceModel.intersect(ray, tex);
+			return FurnaceModel.intersect(ray, texture);
 		}
 	};
 	public static final int SIGNPOST_ID = 0x3F;
@@ -1491,7 +1474,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 			Texture.jukeboxSide,
 			Texture.jukeboxSide,
 			Texture.jukeboxSide,
@@ -1502,7 +1485,7 @@ public class Block extends Material {
 
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, tex);
+			return TexturedBlockModel.intersect(ray, texture);
 		}
 	};
 	public static final int FENCE_ID = 0x55;
@@ -1528,7 +1511,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 				Texture.pumpkinFront,
 				Texture.pumpkinSide,
 				Texture.pumpkinSide,
@@ -1538,7 +1521,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return PumpkinModel.intersect(ray, tex);
+			return PumpkinModel.intersect(ray, texture);
 		}
 	};
 	public static final int NETHERRACK_ID = 0x57;
@@ -1582,7 +1565,7 @@ public class Block extends Material {
 			emittance = 1.0;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 				Texture.jackolanternFront,
 				Texture.pumpkinSide,
 				Texture.pumpkinSide,
@@ -1592,7 +1575,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return PumpkinModel.intersect(ray, tex);
+			return PumpkinModel.intersect(ray, texture);
 		}
 	};
 	public static final int CAKE_ID = 0x5C;
@@ -1670,15 +1653,14 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 			Texture.stone,
 			Texture.cobblestone,
 			Texture.stoneBrick
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray,
-					tex[ray.getBlockData() % tex.length]);
+			return TexturedBlockModel.intersect(ray, texture[ray.getBlockData() % texture.length]);
 		}
 	};
 	public static final int STONEBRICKS_ID = 0x62;
@@ -1704,7 +1686,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[][] tex =  {
+		final Texture[][] texture = {
 				// 0 = fleshy
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
@@ -1819,7 +1801,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, tex[ray.getBlockData()]);
+			return TexturedBlockModel.intersect(ray, texture[ray.getBlockData()]);
 		}
 	};
 	public static final int HUGEREDMUSHROOM_ID = 0x64;
@@ -1829,7 +1811,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[][] tex =  {
+		final Texture[][] texture = {
 				// 0 = fleshy
 				{
 					Texture.mushroomPores, Texture.mushroomPores,
@@ -1944,7 +1926,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, tex[ray.getBlockData() % 11]);
+			return TexturedBlockModel.intersect(ray, texture[ray.getBlockData() % 11]);
 		}
 	};
 	public static final int IRONBARS_ID = 0x65;
@@ -1979,7 +1961,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture tex[] = {
+		final Texture texture[] = {
 				Texture.melonSide, Texture.melonSide,
 				Texture.melonSide, Texture.melonSide,
 				Texture.melonTop, Texture.melonTop
@@ -1987,7 +1969,7 @@ public class Block extends Material {
 
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, tex);
+			return TexturedBlockModel.intersect(ray, texture);
 		}
 	};
 	public static final int PUMPKINSTEM_ID = 0x68;
@@ -2082,14 +2064,14 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture tex[] = {
+		final Texture texture[] = {
 				Texture.myceliumSide, Texture.myceliumSide,
 				Texture.myceliumSide, Texture.myceliumSide,
 				Texture.myceliumTop, Texture.dirt
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, tex);
+			return TexturedBlockModel.intersect(ray, texture);
 		}
 		@Override
 		public Texture getTexture(int blockData) {
@@ -2269,7 +2251,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 			Texture.oakPlanks,
 			Texture.sprucePlanks,
 			Texture.birchPlanks,
@@ -2287,7 +2269,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray, tex[ray.getBlockData() % 6]);
+			return TexturedBlockModel.intersect(ray, texture[ray.getBlockData() % 6]);
 		}
 		@Override
 		public String description(int data) {
@@ -2301,7 +2283,7 @@ public class Block extends Material {
 			isSolid = false;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 			Texture.oakPlanks,
 			Texture.sprucePlanks,
 			Texture.birchPlanks,
@@ -2319,7 +2301,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return SlabModel.intersect(ray, tex[(ray.getBlockData()&7) % 6]);
+			return SlabModel.intersect(ray, texture[(ray.getBlockData()&7) % 6]);
 		}
 		@Override
 		public String description(int data) {
@@ -2376,7 +2358,7 @@ public class Block extends Material {
 			isSolid = false;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 				Texture.enderChestFront,
 				Texture.enderChestBack,
 				Texture.enderChestLeft,
@@ -2391,7 +2373,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return ChestModel.intersect(ray, tex);
+			return ChestModel.intersect(ray, texture);
 		}
 	};
 	public static final int TRIPWIREHOOK_ID = 0x83;
@@ -2503,13 +2485,13 @@ public class Block extends Material {
 			isSolid = false;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 				Texture.cobblestone,
 				Texture.mossStone
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return StoneWallModel.intersect(ray, tex[ray.getBlockData() & 1]);
+			return StoneWallModel.intersect(ray, texture[ray.getBlockData() & 1]);
 		}
 	};
 	public static final int FLOWERPOT_ID = 0x8C;
@@ -2605,7 +2587,7 @@ public class Block extends Material {
 			isSolid = false;
 			localIntersect = true;
 		}
-		final Texture[][] tex = {
+		final Texture[][] texture = {
 			// single
 			{
 				Texture.trappedChestFront,
@@ -2649,7 +2631,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return ChestModel.intersect(ray, tex[(ray.getCurrentData() >> 16) % 3]);
+			return ChestModel.intersect(ray, texture[(ray.getCurrentData() >> 16) % 3]);
 		}
 	};
 	public static final int WEIGHTEDPRESSUREPLATELIGHT_ID = 0x93;
@@ -2791,7 +2773,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[] tex = {
+		final Texture[] texture = {
 			Texture.dropperFront,
 			Texture.furnaceSide,
 			Texture.furnaceSide,
@@ -2801,7 +2783,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return FurnaceModel.intersect(ray, tex);
+			return FurnaceModel.intersect(ray, texture);
 		}
 	};
 	public static final int STAINED_CLAY_ID = 0x9F;
@@ -3115,7 +3097,7 @@ public class Block extends Material {
 			isSolid = true;
 			localIntersect = true;
 		}
-		final Texture[][] tex = {
+		final Texture[][] texture = {
 			// normal
 			{
 				Texture.redSandstoneSide,
@@ -3148,8 +3130,7 @@ public class Block extends Material {
 		};
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return TexturedBlockModel.intersect(ray,
-					tex[ray.getBlockData() % 3]);
+			return TexturedBlockModel.intersect(ray, texture[ray.getBlockData() % 3]);
 		}
 	};
 	public static final int REDSANDSTONESTAIRS_ID = 0xB4;
@@ -3471,18 +3452,34 @@ public class Block extends Material {
 			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
-	public static final Block UNKNOWN0xC9 = new Block(0xC9, "Unknown Block 0xC9", Texture.unknown) {
+	public static final int PURPURBLOCK_ID = 0xC9;
+	public static final Block PURPURBLOCK = new Block(PURPURBLOCK_ID, "Purpur Block", Texture.purpurBlock) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			isOpaque = true;
+			isSolid = true;
+			isInvisible = false;
 		}
 	};
-	public static final Block UNKNOWN0xCA = new Block(0xCA, "Unknown Block 0xCA", Texture.unknown) {
+	public static final int PURPURPILLAR_ID = 0xCA;
+	public static final Block PURPURPILLAR = new Block(PURPURPILLAR_ID, "Purpur Pillar", Texture.purpurPillarSide) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			isOpaque = true;
+			isSolid = true;
+			isInvisible = false;
+			localIntersect = true;
+		}
+		final Texture[] texture = {
+			Texture.purpurPillarSide,
+			Texture.purpurPillarSide,
+			Texture.purpurPillarSide,
+			Texture.purpurPillarSide,
+			Texture.purpurPillarTop,
+			Texture.purpurPillarTop,
+		};
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return TexturedBlockModel.intersect(ray, texture[ray.getBlockData()%7]);
 		}
 	};
 	public static final Block UNKNOWN0xCB = new Block(0xCB, "Unknown Block 0xCB", Texture.unknown) {
@@ -3914,7 +3911,7 @@ public class Block extends Material {
 		SPRUCEFENCE, BIRCHFENCE, JUNGLEFENCE, DARKOAKFENCE,
 		ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR, JUNGLEDOOR,
 		ACACIADOOR, DARKOAKDOOR, UNKNOWN0xC6, UNKNOWN0xC7,
-		UNKNOWN0xC8, UNKNOWN0xC9, UNKNOWN0xCA, UNKNOWN0xCB,
+		UNKNOWN0xC8, PURPURBLOCK, PURPURPILLAR, UNKNOWN0xCB,
 		UNKNOWN0xCC, UNKNOWN0xCD, ENDBRICKS, UNKNOWN0xCF,
 		GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3,
 		UNKNOWN0xD4, UNKNOWN0xD5, UNKNOWN0xD6, UNKNOWN0xD7,

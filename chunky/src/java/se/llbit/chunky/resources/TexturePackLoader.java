@@ -1310,6 +1310,12 @@ public class TexturePackLoader {
 				new SimpleTexture("assets/minecraft/textures/blocks/grass_path_top", Texture.grassPathTop));
 		allTextures.put("end_bricks",
 				new SimpleTexture("assets/minecraft/textures/blocks/end_bricks", Texture.endBricks));
+		allTextures.put("purpur_block",
+				new SimpleTexture("assets/minecraft/textures/blocks/purpur_block", Texture.purpurBlock));
+		allTextures.put("purpur_pillar",
+				new SimpleTexture("assets/minecraft/textures/blocks/purpur_pillar", Texture.purpurPillarSide));
+		allTextures.put("purpur_pillar_top",
+				new SimpleTexture("assets/minecraft/textures/blocks/purpur_pillar_top", Texture.purpurPillarTop));
 
 		allTextures.put("paintings_zetterstrand",
 				new SimpleTexture("assets/minecraft/textures/painting/paintings_kristoffer_zetterstrand", Texture.paintings));
