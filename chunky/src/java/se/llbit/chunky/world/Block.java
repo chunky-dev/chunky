@@ -3506,11 +3506,12 @@ public class Block extends Material {
 			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
-	public static final Block UNKNOWN0xCE = new Block(0xCE, "Unknown Block 0xCE", Texture.unknown) {
+	public static final int ENDBRICKS_ID = 0xCE;
+	public static final Block ENDBRICKS = new Block(ENDBRICKS_ID, "End Stone Bricks", Texture.endBricks) {
 		{
-			isOpaque = false;
-			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			isOpaque = true;
+			isSolid = true;
+			isInvisible = false;
 		}
 	};
 	public static final Block UNKNOWN0xCF = new Block(0xCF, "Unknown Block 0xCF", Texture.unknown) {
@@ -3914,7 +3915,7 @@ public class Block extends Material {
 		ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR, JUNGLEDOOR,
 		ACACIADOOR, DARKOAKDOOR, UNKNOWN0xC6, UNKNOWN0xC7,
 		UNKNOWN0xC8, UNKNOWN0xC9, UNKNOWN0xCA, UNKNOWN0xCB,
-		UNKNOWN0xCC, UNKNOWN0xCD, UNKNOWN0xCE, UNKNOWN0xCF,
+		UNKNOWN0xCC, UNKNOWN0xCD, ENDBRICKS, UNKNOWN0xCF,
 		GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3,
 		UNKNOWN0xD4, UNKNOWN0xD5, UNKNOWN0xD6, UNKNOWN0xD7,
 		UNKNOWN0xD8, UNKNOWN0xD9, UNKNOWN0xDA, UNKNOWN0xDB,

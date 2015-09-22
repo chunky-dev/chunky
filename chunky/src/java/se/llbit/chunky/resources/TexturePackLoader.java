@@ -1308,6 +1308,8 @@ public class TexturePackLoader {
 				new SimpleTexture("assets/minecraft/textures/blocks/grass_path_side", Texture.grassPathSide));
 		allTextures.put("grass_path_top",
 				new SimpleTexture("assets/minecraft/textures/blocks/grass_path_top", Texture.grassPathTop));
+		allTextures.put("end_bricks",
+				new SimpleTexture("assets/minecraft/textures/blocks/end_bricks", Texture.endBricks));
 
 		allTextures.put("paintings_zetterstrand",
 				new SimpleTexture("assets/minecraft/textures/painting/paintings_kristoffer_zetterstrand", Texture.paintings));

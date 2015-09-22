@@ -406,6 +406,7 @@ public class Texture {
 	// Minecraft 1.9 blocks.
 	public static final Texture grassPathSide = new Texture();
 	public static final Texture grassPathTop = new Texture();
+	public static final Texture endBricks = new Texture();
 
 	// Trapped Chest
 	public static final Texture trappedChestTop = new Texture();
