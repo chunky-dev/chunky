@@ -58,7 +58,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame implements UpdateListener {
 
-	private static final String LAUNCHER_VERSION = "v1.8.9";
+	private static final String LAUNCHER_VERSION = "v1.8.10";
 
 	protected String java;
 	private final ChunkyDeployer deployer;

@@ -42,9 +42,9 @@ public class VersionInfo implements Comparable<VersionInfo> {
 
 	public enum LibraryStatus {
 		PASSED("Installed"),
-		MD5_MISMATCH("Will be downloaded (checksum mismatch)"),
+		MD5_MISMATCH("To be downloaded (checksum mismatch)"),
 		INCOMPLETE_INFO("Incomplete library information"),
-		MISSING("Will be downloaded (file missing)"),
+		MISSING("To be downloaded (file missing)"),
 		MALFORMED_URL("Download failed (malformed URL)"),
 		FILE_NOT_FOUND("Download failed (file not found)"),
 		DOWNLOAD_FAILED("Download failed"),
