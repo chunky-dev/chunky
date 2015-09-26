@@ -254,14 +254,9 @@ def build_snapshot(version):
 		if call(['git', 'tag', '-a', version.full, '-m', 'Snapshot build']) is not 0:
 			print "Error: git tag failed!"
 			sys.exit(1)
-		if on_win():
-			if call(cmd(['ant', '-Ddebug=true', 'dist'])) is not 0:
-				print "Error: Ant build failed!"
-				sys.exit(1)
-		else:
-			if call(cmd(['ant', '-Ddebug=true', '-Dmacdist=true', 'dist'])) is not 0:
-				print "Error: Ant build failed!"
-				sys.exit(1)
+		if call(cmd(['ant', '-Ddebug=true', 'dist'])) is not 0:
+			print "Error: Ant build failed!"
+			sys.exit(1)
 	if raw_input('Publish snapshot to FTP? [y/N] ') == "y":
 		publish_snapshot_ftp(version)
 	if raw_input('Post snapshot thread? [y/N] ') == "y":
