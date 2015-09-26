@@ -21,6 +21,7 @@ import ftplib
 import codecs
 import os
 import platform
+import random, string
 from subprocess import call, Popen, PIPE
 from getpass import getpass
 from datetime import datetime
@@ -46,11 +47,19 @@ class Credentials:
 		self.initialized = True
 
 
+	# Check if the key has a value in the credential store, otherwise
+	# ask for user input.
 	def get(self, key):
 		self.init()
 		if key not in self.credentials:
 			self.credentials[key] = raw_input(key+': ')
 			self.save()
+		return self.credentials[key]
+
+	def get_noninteractive(self, key):
+		self.init()
+		if key not in self.credentials:
+			return None
 		return self.credentials[key]
 
 	def getpass(self, key):
@@ -59,6 +68,11 @@ class Credentials:
 			self.credentials[key] = getpass(prompt=key+': ')
 			self.save()
 		return self.credentials[key]
+
+	def put(self, key, value):
+		self.init()
+		self.credentials[key] = value
+		self.save()
 
 	def remove(self, key):
 		del self.credentials[key]
@@ -78,6 +92,7 @@ class Version:
 	series = ''
 	changelog = ''
 	release_notes = ''
+	notes_file = ''
 
 	def __init__(self, version):
 		self.full = version
@@ -108,14 +123,22 @@ class Version:
 			print "Error: failed to read release notes!"
 			sys.exit(1)
 
+		self.notes_file = notes_fn
+
 		try:
 			# load changelog
 			with codecs.open("ChangeLog.txt", 'r', encoding='utf-8') as f:
-				f.readline() # skip version line
+				f.readline() # Skip version line.
+				first = True
 				while True:
 					line = f.readline().rstrip()
-					if not line: break
+					if not line:
+						if first:
+							continue
+						else:
+							break
 					self.changelog += line + '\n'
+					first = False
 		except:
 			print "Error: could not read ChangeLog!"
 			sys.exit(1)
@@ -173,11 +196,12 @@ def sign_file(filename):
 				sys.exit(1)
 		break
 
-def print_prerelease_checklist():
+def print_prerelease_checklist(version):
 	print "Pre-Release Checklist:"
 	print "    * Update PRAW (pip install praw --upgrade)"
 	print "    * Update Launchpadlib"
-	print "    * Edit release notes (check for typos, if edited restart release script)"
+	print "    * Check release notes for typos: %s" % version.notes_file
+	print "    * Restart script if release notes were updated"
 	print "    * Update ChangeLog (check for typos)"
 	print "    * Commit all final changes in Git"
 
@@ -186,12 +210,17 @@ def build_release(version):
 		print "Error: non-release version string speicifed (remove suffix)"
 		print "Hint: add the -snapshot flag to build snapshot"
 		sys.exit(1)
-	print_prerelease_checklist()
+	print_prerelease_checklist(version)
 	print "Ready to build version %s!" % version.full
 	if raw_input('Build release? [y/N] ') == 'y':
-		if call(cmd(['ant', '-Dversion=' + version.full, 'release'])) is not 0:
-			print "Error: Ant build failed!"
-			sys.exit(1)
+		if on_win():
+			if call(cmd(['ant', '-Dversion=' + version.full, 'release'])) is not 0:
+				print "Error: Ant build failed!"
+				sys.exit(1)
+		else:
+			if call(cmd(['ant', '-Dversion=' + version.full, '-Dmacdist=true', 'release'])) is not 0:
+				print "Error: Ant build failed!"
+				sys.exit(1)
 		if nsis(['Chunky.nsi']) is not 0:
 			print "Error: NSIS build failed!"
 			sys.exit(1)
@@ -219,15 +248,20 @@ def build_snapshot(version):
 	if not version.suffix:
 		print "Error: non-snapshot version string speicifed (add suffix)"
 		sys.exit(1)
-	print_prerelease_checklist()
+	print_prerelease_checklist(version)
 	print "Ready to build snapshot %s!" % version.full
 	if raw_input('Build snapshot? [y/N] ') == "y":
 		if call(['git', 'tag', '-a', version.full, '-m', 'Snapshot build']) is not 0:
 			print "Error: git tag failed!"
 			sys.exit(1)
-		if call(cmd(['ant', '-Ddebug=true', 'dist'])) is not 0:
-			print "Error: Ant build failed!"
-			sys.exit(1)
+		if on_win():
+			if call(cmd(['ant', '-Ddebug=true', 'dist'])) is not 0:
+				print "Error: Ant build failed!"
+				sys.exit(1)
+		else:
+			if call(cmd(['ant', '-Ddebug=true', '-Dmacdist=true', 'dist'])) is not 0:
+				print "Error: Ant build failed!"
+				sys.exit(1)
 	if raw_input('Publish snapshot to FTP? [y/N] ') == "y":
 		publish_snapshot_ftp(version)
 	if raw_input('Post snapshot thread? [y/N] ') == "y":
@@ -235,11 +269,26 @@ def build_snapshot(version):
 
 def reddit_login():
 	while True:
-		user = credentials.get('reddit user')
-		pw = credentials.getpass('reddit password')
+		id = credentials.get('reddit client ID')
+		secret = credentials.get('reddit client secret')
 		try:
-			r = praw.Reddit(user_agent='praw:se.llbit.chunky.releasebot:v1.0 (by /u/llbit)')
-			r.login(user, pw)
+			r = praw.Reddit(user_agent='praw:se.llbit.chunky.releasebot:v1.1 (by /u/llbit)')
+			r.set_oauth_app_info(
+				client_id=id,
+				client_secret=secret,
+				redirect_uri='http://localhost:8181/q')
+			refresh_token = credentials.get_noninteractive('refresh_token')
+			if refresh_token:
+				access_info = r.refresh_access_information(refresh_token)
+			else:
+				rand_str = join(random.choice(string.lowercase + string.digits) for i in range(10))
+				url = r.get_authorize_url(rand_str, 'submit modposts modflair', True)
+				print "Visit the Reddit authorization URL:"
+				print url
+				code = credentials.get('reddit access code')
+				access_info = r.get_access_information(code)
+				credentials.put('refresh_token', access_info['refresh_token'])
+			r.set_access_credentials(**access_info)
 			return r
 		except praw.errors.InvalidUserPass:
 			credentials.remove('reddit user')
@@ -549,7 +598,7 @@ options = {
 }
 for arg in sys.argv[1:]:
 	if arg == '-h' or arg == '--h' or arg == '-help' or arg == '--help':
-		print "usage: SHIPIT [VERSION] [COMMAND]"
+		print "usage: SHIPIT [COMMAND] [VERSION]"
 		print "commands:"
 		print "    -ftp         upload latest.json to FTP server"
 		print "    -docs        update documentation"

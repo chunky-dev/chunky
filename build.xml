@@ -152,7 +152,8 @@
 			resource="${build.dir}/chunky-${version}.jar"/>
 	</target>
 
-	<target name="-macapp" description="Create an .app package for Chunky">
+	<target name="-macapp" description="Create an .app package for Chunky"
+			if="macdist">
 		<property file="${chunky.res.dir}/Version.properties"/>
 		<!-- download Oracle's appbundler and place in the tools dir to build for Mac! -->
 		<property name="appbundler.jar" location="${tools.dir}/appbundler-1.0.jar"/>
@@ -172,7 +173,8 @@
 		</appbundler>
 	</target>
 
-	<target name="-macdmg" description="Create a DMG package for Chunky">
+	<target name="-macdmg" description="Create a DMG package for Chunky"
+			if="macdist">
 		<property file="${chunky.res.dir}/Version.properties"/>
 		<property name="mountdir" value="/tmp"/>
 		<exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
