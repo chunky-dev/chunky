@@ -1316,6 +1316,12 @@ public class TexturePackLoader {
 				new SimpleTexture("assets/minecraft/textures/blocks/purpur_pillar", Texture.purpurPillarSide));
 		allTextures.put("purpur_pillar_top",
 				new SimpleTexture("assets/minecraft/textures/blocks/purpur_pillar_top", Texture.purpurPillarTop));
+		allTextures.put("chorus_flower",
+				new SimpleTexture("assets/minecraft/textures/blocks/chorus_flower", Texture.chorusFlower));
+		allTextures.put("chorus_flower_dead",
+				new SimpleTexture("assets/minecraft/textures/blocks/chorus_flower_dead", Texture.chorusFlowerDead));
+		allTextures.put("chorus_plant",
+				new SimpleTexture("assets/minecraft/textures/blocks/chorus_plant", Texture.chorusPlant));
 
 		allTextures.put("paintings_zetterstrand",
 				new SimpleTexture("assets/minecraft/textures/painting/paintings_kristoffer_zetterstrand", Texture.paintings));

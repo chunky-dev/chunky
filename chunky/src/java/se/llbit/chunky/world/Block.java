@@ -29,6 +29,8 @@ import se.llbit.chunky.model.CakeModel;
 import se.llbit.chunky.model.CarpetModel;
 import se.llbit.chunky.model.CauldronModel;
 import se.llbit.chunky.model.ChestModel;
+import se.llbit.chunky.model.ChorusFlowerModel;
+import se.llbit.chunky.model.ChorusPlantModel;
 import se.llbit.chunky.model.CocoaPlantModel;
 import se.llbit.chunky.model.ComparatorModel;
 import se.llbit.chunky.model.CropsModel;
@@ -2516,7 +2518,6 @@ public class Block extends Material {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = false;
 			localIntersect = true;
 		}
 		@Override
@@ -2975,7 +2976,6 @@ public class Block extends Material {
 		{
 			isOpaque = true;
 			isSolid = true;
-			isInvisible = false;
 		}
 
 		@Override
@@ -3267,7 +3267,7 @@ public class Block extends Material {
 	public static final Block DARKOAKFENCE = new Block(DARKOAKFENCE_ID, "Dark Oak Fence", Icon.fence) {
 		{
 			isOpaque = false;
-			isSolid = false;
+//			isSolid = false;
 			localIntersect = true;
 		}
 		@Override
@@ -3382,18 +3382,35 @@ public class Block extends Material {
 			isInvisible = UNKNOWN_INVISIBLE;
 		}
 	};
-	public static final Block UNKNOWN0xC7 = new Block(0xC7, "Unknown Block 0xC7", Texture.unknown) {
+	public static final int CHORUSPLANT_ID = 0xC7;
+	public static final Block CHORUSPLANT = new Block(CHORUSPLANT_ID, "Chorus Plant", Texture.chorusPlant) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return ChorusPlantModel.intersect(ray);
 		}
 	};
-	public static final Block UNKNOWN0xC8 = new Block(0xC8, "Unknown Block 0xC8", Texture.unknown) {
+	public static final int CHORUSFLOWER_ID = 0xC8;
+	public static final Block CHORUSFLOWER = new Block(CHORUSFLOWER_ID, "Chorus Flower", Texture.chorusFlower) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return ChorusFlowerModel.intersect(ray);
+		}
+
+		@Override
+		public Texture getTexture(int blockData) {
+			return blockData < 5 ? Texture.chorusFlower : Texture.chorusFlowerDead;
 		}
 	};
 	public static final int PURPURBLOCK_ID = 0xC9;
@@ -3401,7 +3418,6 @@ public class Block extends Material {
 		{
 			isOpaque = true;
 			isSolid = true;
-			isInvisible = false;
 		}
 	};
 	public static final int PURPURPILLAR_ID = 0xCA;
@@ -3409,7 +3425,6 @@ public class Block extends Material {
 		{
 			isOpaque = true;
 			isSolid = true;
-			isInvisible = false;
 			localIntersect = true;
 		}
 		final Texture[] texture = {
@@ -3447,7 +3462,6 @@ public class Block extends Material {
 		{
 			isOpaque = true;
 			isSolid = true;
-			isInvisible = false;
 		}
 	};
 	public static final int PURPURSLAB_ID = 0xCD;
@@ -3455,7 +3469,6 @@ public class Block extends Material {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = false;
 			localIntersect = true;
 		}
 		@Override
@@ -3468,7 +3481,6 @@ public class Block extends Material {
 		{
 			isOpaque = true;
 			isSolid = true;
-			isInvisible = false;
 		}
 	};
 	public static final Block UNKNOWN0xCF = new Block(0xCF, "Unknown Block 0xCF", Texture.unknown) {
@@ -3870,8 +3882,8 @@ public class Block extends Material {
 		BIRCHFENCEGATE, JUNGLEFENCEGATE, DARKOAKFENCEGATE, ACACIAFENCEGATE,
 		SPRUCEFENCE, BIRCHFENCE, JUNGLEFENCE, DARKOAKFENCE,
 		ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR, JUNGLEDOOR,
-		ACACIADOOR, DARKOAKDOOR, UNKNOWN0xC6, UNKNOWN0xC7,
-		UNKNOWN0xC8, PURPURBLOCK, PURPURPILLAR, PURPURSTAIRS,
+		ACACIADOOR, DARKOAKDOOR, UNKNOWN0xC6, CHORUSPLANT,
+		CHORUSFLOWER, PURPURBLOCK, PURPURPILLAR, PURPURSTAIRS,
 		PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, UNKNOWN0xCF,
 		GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3,
 		UNKNOWN0xD4, UNKNOWN0xD5, UNKNOWN0xD6, UNKNOWN0xD7,
@@ -3971,6 +3983,10 @@ public class Block extends Material {
 		return isSolid || this == IRONBARS;
 	}
 
+	public boolean isChorusPlant() {
+		return this == CHORUSPLANT || this == CHORUSFLOWER;
+	}
+
 	public boolean isRedstoneWireConnector() {
 		return redstoneConnectors.contains(this);
 	}
@@ -3980,19 +3996,19 @@ public class Block extends Material {
 	}
 
 	public boolean isStair() {
-		return this == OAKWOODSTAIRS ||
-				this == STONESTAIRS ||
-				this == BRICKSTAIRS ||
-				this == STONEBRICKSTAIRS ||
-				this == NETHERBRICKSTAIRS ||
-				this == SANDSTONESTAIRS ||
-				this == SPRUCEWOODSTAIRS ||
-				this == BIRCHWOODSTAIRS ||
-				this == JUNGLEWOODSTAIRS ||
-				this == QUARTZSTAIRS ||
-				this == ACACIASTAIRS ||
-				this == DARKOAKSTAIRS ||
-				this == REDSANDSTONESTAIRS;
+		return this == OAKWOODSTAIRS
+				|| this == STONESTAIRS
+				|| this == BRICKSTAIRS
+				|| this == STONEBRICKSTAIRS
+				|| this == NETHERBRICKSTAIRS
+				|| this == SANDSTONESTAIRS
+				|| this == SPRUCEWOODSTAIRS
+				|| this == BIRCHWOODSTAIRS
+				|| this == JUNGLEWOODSTAIRS
+				|| this == QUARTZSTAIRS
+				|| this == ACACIASTAIRS
+				|| this == DARKOAKSTAIRS
+				|| this == REDSANDSTONESTAIRS;
 	}
 
 	public boolean isGroundBlock() {

@@ -410,6 +410,9 @@ public class Texture {
 	public static final Texture purpurBlock = new Texture();
 	public static final Texture purpurPillarTop = new Texture();
 	public static final Texture purpurPillarSide = new Texture();
+	public static final Texture chorusFlower = new Texture();
+	public static final Texture chorusFlowerDead = new Texture();
+	public static final Texture chorusPlant = new Texture();
 
 	// Trapped Chest
 	public static final Texture trappedChestTop = new Texture();

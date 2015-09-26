@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -19,9 +19,7 @@ package se.llbit.chunky.world;
 @SuppressWarnings("javadoc")
 public interface BlockData {
 
-	/**
-	 * Offset to block metadata
-	 */
+	/** Bit offset to block metadata. */
 	int OFFSET = 8;
 
 	int RSW_EAST_CONNECTION = 12;
@@ -36,29 +34,19 @@ public interface BlockData {
 
 	int GLASS_PANE_OFFSET = 12;
 
-	/**
-	 * The water block has a lily pad floating on it
-	 */
+	/** The water block has a lily pad floating on it. */
 	int LILY_PAD = 13;
 
-	/**
-	 * Rotation of the lily pad
-	 */
+	/** Rotation of the lily pad. */
 	int LILY_PAD_ROTATION = 14;
 
-	/**
-	 * Offset to bottom door metadata
-	 */
+	/** Offset to bottom door metadata. */
 	int DOOR_BOTTOM = 12;
 
-	/**
-	 * Offset to top door metadata
-	 */
+	/** Offset to top door metadata. */
 	int DOOR_TOP = 16;
 
-	/**
-	 * Offset for stone wall data
-	 */
+	/** Offset for stone wall data. */
 	int STONEWALL_CONN = 9;
 
 	/**
@@ -77,13 +65,17 @@ public interface BlockData {
 	int INNER_NORTH_EAST = 8 + 6;
 	int INNER_NORTH_WEST = 8 + 7;
 
-	/**
-	 * Fence gate is three pixels lower
-	 */
+	/** Fence gate is three pixels lower. */
 	int FENCEGATE_LOW = 20;
 
-	/**
-	 * The upside down stair bit
-	 */
-	int UPSIDE_DOWN_STAIR = 1<<10;
+	/** The upside down stair bit. */
+	int UPSIDE_DOWN_STAIR = 1 << 10;
+
+	// Directional connection bits.
+	int CONNECTED_NORTH = 1;
+	int CONNECTED_SOUTH = 2;
+	int CONNECTED_EAST = 4;
+	int CONNECTED_WEST = 8;
+	int CONNECTED_ABOVE = 16;
+	int CONNECTED_BELOW = 32;
 }

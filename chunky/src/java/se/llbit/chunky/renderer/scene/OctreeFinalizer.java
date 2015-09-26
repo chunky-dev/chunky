@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -25,6 +25,10 @@ import se.llbit.math.Octree;
 import se.llbit.math.Vector3i;
 
 /**
+ * Processes the Octree after it has been loaded and updates block states for
+ * blocks that depend on neighbor blocks. Octree finalization is be done after
+ * all chunks have been loaded because before then we can't reliably test for
+ * neighbor blocks.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class OctreeFinalizer {
@@ -35,7 +39,7 @@ public class OctreeFinalizer {
 	 * @param cp Position of the chunk to finalize
 	 */
 	public static void finalizeChunk(Octree octree, Vector3i origin, ChunkPosition cp) {
-		for (int cy = 0-origin.y; cy < Chunk.Y_MAX-origin.y; ++cy) {
+		for (int cy = 0 - origin.y; cy < Chunk.Y_MAX - origin.y; ++cy) {
 			for (int cz = 0; cz < 16; ++cz) {
 				int z = cz + cp.z*16 - origin.z;
 				for (int cx = 0; cx < 16; ++cx) {
@@ -43,16 +47,16 @@ public class OctreeFinalizer {
 					int type = octree.get(x, cy, z);
 					Block block = Block.get(type);
 
-					// set non-visible blocks to be stone, in order to merge large patches
-					if ((cx == 0 || cx == 15 || cz == 0 || cz == 15) &&
-							cy > -origin.y && cy < Chunk.Y_MAX-origin.y-1 &&
-							block != Block.STONE && block.isOpaque) {
-						if (Block.get(octree.get(x-1, cy, z)).isOpaque &&
-								Block.get(octree.get(x+1, cy, z)).isOpaque &&
-								Block.get(octree.get(x, cy-1, z)).isOpaque &&
-								Block.get(octree.get(x, cy+1, z)).isOpaque &&
-								Block.get(octree.get(x, cy, z-1)).isOpaque &&
-								Block.get(octree.get(x, cy, z+1)).isOpaque) {
+					// Set non-visible blocks to be stone, in order to merge large patches.
+					if ((cx == 0 || cx == 15 || cz == 0 || cz == 15)
+							&& cy > -origin.y && cy < Chunk.Y_MAX - origin.y - 1
+							&& block != Block.STONE && block.isOpaque) {
+						if (Block.get(octree.get(x-1, cy, z)).isOpaque
+								&& Block.get(octree.get(x + 1, cy, z)).isOpaque
+								&& Block.get(octree.get(x, cy - 1, z)).isOpaque
+								&& Block.get(octree.get(x, cy + 1, z)).isOpaque
+								&& Block.get(octree.get(x, cy, z - 1)).isOpaque
+								&& Block.get(octree.get(x, cy, z + 1)).isOpaque) {
 							octree.set(Block.STONE_ID, x, cy, z);
 							continue;
 						}
@@ -83,8 +87,8 @@ public class OctreeFinalizer {
 					case Block.LARGE_FLOWER_ID:
 						data = type >> BlockData.OFFSET;
 						if ((data&8) != 0) {
-							// get flower kind from block beneath
-							int kind = (octree.get(x, cy-1, z) >> BlockData.OFFSET)&7;
+							// Get flower kind from block beneath.
+							int kind = (octree.get(x, cy - 1, z) >> BlockData.OFFSET)&7;
 							type = (type & ~(15<<BlockData.OFFSET)) | ( (8|kind) << BlockData.OFFSET);
 							octree.set(type, x, cy, z);
 						}
@@ -382,40 +386,44 @@ public class OctreeFinalizer {
 						octree.set(type, x, cy, z);
 						break;
 					case Block.MELONSTEM_ID:
-						if (Block.get(octree.get(x - 1, cy, z)) == Block.MELON)
+						if (Block.get(octree.get(x - 1, cy, z)) == Block.MELON) {
 							type |= 1 << 16;
-						else if (Block.get(octree.get(x + 1, cy, z)) == Block.MELON)
+						} else if (Block.get(octree.get(x + 1, cy, z)) == Block.MELON) {
 							type |= 2 << 16;
-						else if (Block.get(octree.get(x, cy, z - 1)) == Block.MELON)
+						} else if (Block.get(octree.get(x, cy, z - 1)) == Block.MELON) {
 							type |= 3 << 16;
-						else if (Block.get(octree.get(x, cy, z + 1)) == Block.MELON)
+						} else if (Block.get(octree.get(x, cy, z + 1)) == Block.MELON) {
 							type |= 4 << 16;
+						}
 						octree.set(type, x, cy, z);
 						break;
 					case Block.PUMPKINSTEM_ID:
-						if (Block.get(octree.get(x - 1, cy, z)) == Block.PUMPKIN)
+						if (Block.get(octree.get(x - 1, cy, z)) == Block.PUMPKIN) {
 							type |= 1 << 16;
-						else if (Block.get(octree.get(x + 1, cy, z)) == Block.PUMPKIN)
+						} else if (Block.get(octree.get(x + 1, cy, z)) == Block.PUMPKIN) {
 							type |= 2 << 16;
-						else if (Block.get(octree.get(x, cy, z - 1)) == Block.PUMPKIN)
+						} else if (Block.get(octree.get(x, cy, z - 1)) == Block.PUMPKIN) {
 							type |= 3 << 16;
-						else if (Block.get(octree.get(x, cy, z + 1)) == Block.PUMPKIN)
+						} else if (Block.get(octree.get(x, cy, z + 1)) == Block.PUMPKIN) {
 							type |= 4 << 16;
+						}
 						octree.set(type, x, cy, z);
 						break;
 					case Block.TRAPPEDCHEST_ID:
 						dir = type >> 8;
 						tex = 0;
 						if (dir < 4) {
-							if (Block.get(octree.get(x - 1, cy, z)) == Block.TRAPPEDCHEST)
+							if (Block.get(octree.get(x - 1, cy, z)) == Block.TRAPPEDCHEST) {
 								tex = 1 + (dir-1) % 2;
-							else if (Block.get(octree.get(x + 1, cy, z)) == Block.TRAPPEDCHEST)
+							} else if (Block.get(octree.get(x + 1, cy, z)) == Block.TRAPPEDCHEST) {
 								tex = 1 + dir % 2;
+							}
 						} else {
-							if (Block.get(octree.get(x, cy, z - 1)) == Block.TRAPPEDCHEST)
+							if (Block.get(octree.get(x, cy, z - 1)) == Block.TRAPPEDCHEST) {
 								tex = 1 + dir % 2;
-							else if (Block.get(octree.get(x, cy, z + 1)) == Block.TRAPPEDCHEST)
+							} else if (Block.get(octree.get(x, cy, z + 1)) == Block.TRAPPEDCHEST) {
 								tex = 1 + (dir-1) % 2;
+							}
 						}
 						type |= tex << 16;
 						octree.set(type, x, cy, z);
@@ -424,68 +432,78 @@ public class OctreeFinalizer {
 						dir = type >> 8;
 						tex = 0;
 						if (dir < 4) {
-							if (Block.get(octree.get(x - 1, cy, z)) == Block.CHEST)
+							if (Block.get(octree.get(x - 1, cy, z)) == Block.CHEST) {
 								tex = 1 + (dir-1) % 2;
-							else if (Block.get(octree.get(x + 1, cy, z)) == Block.CHEST)
+							} else if (Block.get(octree.get(x + 1, cy, z)) == Block.CHEST) {
 								tex = 1 + dir % 2;
+							}
 						} else {
-							if (Block.get(octree.get(x, cy, z - 1)) == Block.CHEST)
+							if (Block.get(octree.get(x, cy, z - 1)) == Block.CHEST) {
 								tex = 1 + dir % 2;
-							else if (Block.get(octree.get(x, cy, z + 1)) == Block.CHEST)
+							} else if (Block.get(octree.get(x, cy, z + 1)) == Block.CHEST) {
 								tex = 1 + (dir-1) % 2;
+							}
 						}
 						type |= tex << 16;
 						octree.set(type, x, cy, z);
 						break;
 					case Block.IRONBARS_ID:
 						other = Block.get(octree.get(x, cy, z - 1));
-						if (other.isIronBarsConnector())
-							type |= 1 << BlockData.GLASS_PANE_OFFSET;
+						if (other.isIronBarsConnector()) {
+							type |= BlockData.CONNECTED_NORTH << BlockData.GLASS_PANE_OFFSET;
+						}
 						other = Block.get(octree.get(x, cy, z + 1));
-						if (other.isIronBarsConnector())
-							type |= 2 << BlockData.GLASS_PANE_OFFSET;
+						if (other.isIronBarsConnector()) {
+							type |= BlockData.CONNECTED_SOUTH << BlockData.GLASS_PANE_OFFSET;
+						}
 						other = Block.get(octree.get(x + 1, cy, z));
-						if (other.isIronBarsConnector())
-							type |= 4 << BlockData.GLASS_PANE_OFFSET;
+						if (other.isIronBarsConnector()) {
+							type |= BlockData.CONNECTED_EAST << BlockData.GLASS_PANE_OFFSET;
+						}
 						other = Block.get(octree.get(x - 1, cy, z));
-						if (other.isIronBarsConnector())
-							type |= 8 << BlockData.GLASS_PANE_OFFSET;
+						if (other.isIronBarsConnector()) {
+							type |= BlockData.CONNECTED_WEST << BlockData.GLASS_PANE_OFFSET;
+						}
 						octree.set(type, x, cy, z);
 						break;
 					case Block.GLASSPANE_ID:
 					case Block.STAINED_GLASSPANE_ID:
 						other = Block.get(octree.get(x, cy, z - 1));
 						if (other.isGlassPaneConnector()) {
-							type |= 1 << BlockData.GLASS_PANE_OFFSET;
+							type |= BlockData.CONNECTED_NORTH << BlockData.GLASS_PANE_OFFSET;
 						}
 						other = Block.get(octree.get(x, cy, z + 1));
 						if (other.isGlassPaneConnector()) {
-							type |= 2 << BlockData.GLASS_PANE_OFFSET;
+							type |= BlockData.CONNECTED_SOUTH << BlockData.GLASS_PANE_OFFSET;
 						}
 						other = Block.get(octree.get(x + 1, cy, z));
 						if (other.isGlassPaneConnector()) {
-							type |= 4 << BlockData.GLASS_PANE_OFFSET;
+							type |= BlockData.CONNECTED_EAST << BlockData.GLASS_PANE_OFFSET;
 						}
 						other = Block.get(octree.get(x - 1, cy, z));
 						if (other.isGlassPaneConnector()) {
-							type |= 8 << BlockData.GLASS_PANE_OFFSET;
+							type |= BlockData.CONNECTED_WEST << BlockData.GLASS_PANE_OFFSET;
 						}
 						octree.set(type, x, cy, z);
 						break;
 					case Block.STONEWALL_ID:
-						other = Block.get(octree.get(x, cy, z - 1));
 						connections = 0;
-						if (other.isStoneWallConnector())
-							connections |= 1;
+						other = Block.get(octree.get(x, cy, z - 1));
+						if (other.isStoneWallConnector()) {
+							connections |= BlockData.CONNECTED_NORTH;
+						}
 						other = Block.get(octree.get(x, cy, z + 1));
-						if (other.isStoneWallConnector())
-							connections |= 2;
+						if (other.isStoneWallConnector()) {
+							connections |= BlockData.CONNECTED_SOUTH;
+						}
 						other = Block.get(octree.get(x + 1, cy, z));
-						if (other.isStoneWallConnector())
-							connections |= 4;
+						if (other.isStoneWallConnector()) {
+							connections |= BlockData.CONNECTED_EAST;
+						}
 						other = Block.get(octree.get(x - 1, cy, z));
-						if (other.isStoneWallConnector())
-							connections |= 8;
+						if (other.isStoneWallConnector()) {
+							connections |= BlockData.CONNECTED_WEST;
+						}
 						type |= connections << BlockData.STONEWALL_CONN;
 						if (connections != 3 && connections != 12) {
 							type |= 1 << BlockData.STONEWALL_CORNER;
@@ -506,32 +524,40 @@ public class OctreeFinalizer {
 					case Block.DARKOAKFENCE_ID:
 					case Block.ACACIAFENCE_ID:
 						other = Block.get(octree.get(x, cy, z - 1));
-						if (other.isFenceConnector())
-							type |= 1 << 8;
+						if (other.isFenceConnector()) {
+							type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
+						}
 						other = Block.get(octree.get(x, cy, z + 1));
-						if (other.isFenceConnector())
-							type |= 2 << 8;
+						if (other.isFenceConnector()) {
+							type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
+						}
 						other = Block.get(octree.get(x + 1, cy, z));
-						if (other.isFenceConnector())
-							type |= 4 << 8;
+						if (other.isFenceConnector()) {
+							type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
+						}
 						other = Block.get(octree.get(x - 1, cy, z));
-						if (other.isFenceConnector())
-							type |= 8 << 8;
+						if (other.isFenceConnector()) {
+							type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
+						}
 						octree.set(type, x, cy, z);
 						break;
 					case Block.NETHERBRICKFENCE_ID:
 						other = Block.get(octree.get(x, cy, z - 1));
-						if (other.isNetherBrickFenceConnector())
-							type |= 1 << 8;
+						if (other.isNetherBrickFenceConnector()) {
+							type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
+						}
 						other = Block.get(octree.get(x, cy, z + 1));
-						if (other.isNetherBrickFenceConnector())
-							type |= 2 << 8;
+						if (other.isNetherBrickFenceConnector()) {
+							type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
+						}
 						other = Block.get(octree.get(x + 1, cy, z));
-						if (other.isNetherBrickFenceConnector())
-							type |= 4 << 8;
+						if (other.isNetherBrickFenceConnector()) {
+							type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
+						}
 						other = Block.get(octree.get(x - 1, cy, z));
-						if (other.isNetherBrickFenceConnector())
-							type |= 8 << 8;
+						if (other.isNetherBrickFenceConnector()) {
+							type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
+						}
 						octree.set(type, x, cy, z);
 						break;
 					case Block.FENCEGATE_ID:
@@ -712,22 +738,22 @@ public class OctreeFinalizer {
 							}
 							break;
 						case 3:
-							// ascending north
-							bd = octree.get(x, cy, z-1);// behind
+							// Ascending north.
+							bd = octree.get(x, cy, z-1); // Behind.
 							other = Block.get(bd);
-							bd_alt = octree.get(x, cy, z+1);// in front of
+							bd_alt = octree.get(x, cy, z+1); // In front of.
 							other_alt = Block.get(bd_alt);
 							if (other.isStair() && (bd&BlockData.UPSIDE_DOWN_STAIR) == upsidedown) {
 								switch (3 & (bd >> BlockData.OFFSET)) {
 								case 0:
-									// if stair behind ascends east we have outer n-e corner
+									// If stair behind ascends east we have outer n-e corner.
 									if (!sameStair(octree, type, x-1, cy, z)) {
 										type |= BlockData.NORTH_EAST << BlockData.CORNER_OFFSET;
 										octree.set(type, x, cy, z);
 									}
 									break;
 								case 1:
-									// if stair behind ascends west we have outer n-w corner
+									// If stair behind ascends west we have outer n-w corner.
 									if (!sameStair(octree, type, x+1, cy, z)) {
 										type |= BlockData.NORTH_WEST << BlockData.CORNER_OFFSET;
 										octree.set(type, x, cy, z);
@@ -737,14 +763,14 @@ public class OctreeFinalizer {
 							} else if (other_alt.isStair() && (bd_alt&BlockData.UPSIDE_DOWN_STAIR) == upsidedown) {
 								switch (3 & (bd_alt >> BlockData.OFFSET)) {
 								case 0:
-									// if stair in front ascends east we have inner n-e corner
+									// If stair in front ascends east we have inner n-e corner.
 									if (!sameStair(octree, type, x+1, cy, z)) {
 										type |= BlockData.INNER_NORTH_EAST << BlockData.CORNER_OFFSET;
 										octree.set(type, x, cy, z);
 									}
 									break;
 								case 1:
-									// if stair in front ascends west we have inner n-w corner
+									// If stair in front ascends west we have inner n-w corner.
 									if (!sameStair(octree, type, x-1, cy, z)) {
 										type |= BlockData.INNER_NORTH_WEST << BlockData.CORNER_OFFSET;
 										octree.set(type, x, cy, z);
@@ -755,6 +781,33 @@ public class OctreeFinalizer {
 							break;
 						}
 						break;
+					case Block.CHORUSPLANT_ID:
+						other = Block.get(octree.get(x, cy, z - 1));
+						if (other.isChorusPlant()) {
+							type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
+						}
+						other = Block.get(octree.get(x, cy, z + 1));
+						if (other.isChorusPlant()) {
+							type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
+						}
+						other = Block.get(octree.get(x + 1, cy, z));
+						if (other.isChorusPlant()) {
+							type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
+						}
+						other = Block.get(octree.get(x - 1, cy, z));
+						if (other.isChorusPlant()) {
+							type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
+						}
+						other = Block.get(octree.get(x, cy + 1, z));
+						if (other.isChorusPlant()) {
+							type |= BlockData.CONNECTED_ABOVE << BlockData.OFFSET;
+						}
+						other = Block.get(octree.get(x, cy - 1, z));
+						if (other.isChorusPlant()) {
+							type |= BlockData.CONNECTED_BELOW << BlockData.OFFSET;
+						}
+						octree.set(type, x, cy, z);
+						break;
 					default:
 						break;
 					}
@@ -763,6 +816,7 @@ public class OctreeFinalizer {
 		}
 	}
 
+	/** Check if this stair type is the same as the other stair block. */
 	private static boolean sameStair(Octree octree, int type, int x, int y, int z) {
 		int id = octree.get(x, y, z);
 		return Block.get(id).isStair() && (type&(7<<8)) == (id&(7<<8));
