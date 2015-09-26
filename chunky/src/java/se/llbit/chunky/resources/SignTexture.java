@@ -52,7 +52,13 @@ public class SignTexture extends Texture {
 		for (int i = 0; i < 4; ++i) {
 			String line = textLines[i];
 			if (line.startsWith("\"") && line.endsWith("\"")) {
-				line = line.substring(1, line.length()-1);
+				line = line.substring(1, line.length() - 1);
+			} else if (line.startsWith("{")) {
+				if (line.startsWith("{\"text\":")) {
+					line = line.substring(9, line.length() - 2);
+				} else {
+					line = "";
+				}
 			}
 			if (line.isEmpty()) {
 				ystart += gh;
@@ -61,12 +67,20 @@ public class SignTexture extends Texture {
 			int lineWidth = 0;
 			for (int j = 0; j < line.length(); ++j) {
 				char c = line.charAt(j);
+				if (c == '$') {
+					j += 1;
+					continue;
+				}
 				Glyph glyph = FontTexture.glyphs[0xFF&c];
 				lineWidth += glyph.width;
 			}
 			int xstart = (width-lineWidth)/2;
 			for (int j = 0; j < line.length(); ++j) {
 				char c = line.charAt(j);
+				if (c == '$') {
+					j += 1;
+					continue;
+				}
 				Glyph glyph = FontTexture.glyphs[0xFF&c];
 				int k = 0;
 				int y = ystart;
