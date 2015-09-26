@@ -44,11 +44,11 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -97,11 +97,12 @@ public class Controls extends JPanel {
 	private ProgressPanel progressPanel;
 	private final Minimap minimap;
 	private JButton exportZipBtn;
-	private JRadioButton overworldBtn;
-	private JRadioButton netherBtn;
-	private JRadioButton endBtn;
+	private final JToggleButton overworldBtn = new JToggleButton();
+	private final JToggleButton netherBtn = new JToggleButton();
+	private final JToggleButton endBtn = new JToggleButton();
 	private final JCheckBox followPlayer = new JCheckBox("follow player");
 	private final JCheckBox followCamera = new JCheckBox("follow camera");
+	private final JComboBox mapModeSelector = new JComboBox();
 
 	private WorldSelector worldSelector = null;
 
@@ -134,7 +135,8 @@ public class Controls extends JPanel {
 
 		addTab("Map View", Icon.map.imageIcon(), buildViewPanel(), "Change map view");
 		addTab("Chunks", Icon.mapSelected.imageIcon(), buildEditPanel(), "Chunk operations");
-		addTab("Highlight", Icon.redTorchOn.imageIcon(), buildHighlightPanel(), "Change block highlight settings");
+		addTab("Highlight", Icon.light.imageIcon(), buildHighlightPanel(),
+				"Change block highlight settings");
 		addTab("Options", Icon.wrench.imageIcon(), buildOptionsPanel(), "Configure Chunky");
 		addTab("3D Render", Icon.sky.imageIcon(), buildRenderPanel(), "Render chunks in 3D");
 		addTab("About", Texture.unknown.imageIcon(), buildAboutPanel(), "About Chunky");
@@ -607,13 +609,7 @@ public class Controls extends JPanel {
 
 		JComponent viewPanel = new JPanel();
 
-		ButtonGroup mapModeGroup = new ButtonGroup();
 		JLabel viewLabel = new JLabel();
-		JRadioButton autoModeBtn = new JRadioButton();
-		JRadioButton layerModeBtn = new JRadioButton();
-		JRadioButton surfaceModeBtn = new JRadioButton();
-		JRadioButton caveModeBtn = new JRadioButton();
-		JRadioButton biomeModeBtn = new JRadioButton();
 		JSeparator sep1 = new JSeparator();
 		JLabel scaleLabel = new JLabel();
 		scaleField = new JFormattedTextField(NumberFormat.getInstance());
@@ -630,13 +626,11 @@ public class Controls extends JPanel {
 		followCamera.addActionListener(followCameraListener);
 
 		ButtonGroup buttonGroup2 = new ButtonGroup();
-		overworldBtn = new JRadioButton();
-		netherBtn = new JRadioButton();
-		endBtn = new JRadioButton();
 
 		dimLabel.setText(Messages.getString("Controls.Dimension_lbl")); //$NON-NLS-1$
 
 		buttonGroup2.add(overworldBtn);
+		overworldBtn.setIcon(Icon.grass.imageIcon());
 		overworldBtn.setText(Messages.getString("Controls.Earth_lbl")); //$NON-NLS-1$
 		overworldBtn.setSelected(true);
 		overworldBtn.setEnabled(false);
@@ -648,6 +642,7 @@ public class Controls extends JPanel {
 		});
 
 		buttonGroup2.add(netherBtn);
+		netherBtn.setIcon(Icon.netherrack.imageIcon());
 		netherBtn.setText(Messages.getString("Controls.Nether_lbl")); //$NON-NLS-1$
 		netherBtn.setEnabled(false);
 		netherBtn.addActionListener(new ActionListener() {
@@ -658,6 +653,7 @@ public class Controls extends JPanel {
 		});
 
 		buttonGroup2.add(endBtn);
+		endBtn.setIcon(Icon.endStone.imageIcon());
 		endBtn.setText(Messages.getString("Controls.End_lbl")); //$NON-NLS-1$
 		endBtn.setEnabled(false);
 		endBtn.addActionListener(new ActionListener() {
@@ -669,51 +665,34 @@ public class Controls extends JPanel {
 
 		viewLabel.setText(Messages.getString("Controls.ViewMode_lbl")); //$NON-NLS-1$
 
-		autoModeBtn.setText("Auto");
-		autoModeBtn.setSelected(true);
-		autoModeBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				chunky.setRenderer(Chunk.autoRenderer);
-			}
-		});
-		mapModeGroup.add(autoModeBtn);
+		mapModeSelector.addItem("Auto");
+		mapModeSelector.addItem(Messages.getString("Controls.LayerMode_lbl"));
+		mapModeSelector.addItem(Messages.getString("Controls.SurfaceMode_lbl"));
+		mapModeSelector.addItem(Messages.getString("Controls.CaveMode_lbl"));
+		mapModeSelector.addItem("Biomes");
 
-		layerModeBtn.setText(Messages.getString("Controls.LayerMode_lbl")); //$NON-NLS-1$
-		layerModeBtn.addActionListener(new ActionListener() {
+		mapModeSelector.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				chunky.setRenderer(Chunk.layerRenderer);
+			public void actionPerformed(ActionEvent e) {
+				switch (mapModeSelector.getSelectedIndex()) {
+				case 0:
+					chunky.setRenderer(Chunk.autoRenderer);
+					break;
+				case 1:
+					chunky.setRenderer(Chunk.layerRenderer);
+					break;
+				case 2:
+					chunky.setRenderer(Chunk.surfaceRenderer);
+					break;
+				case 3:
+					chunky.setRenderer(Chunk.caveRenderer);
+					break;
+				case 4:
+					chunky.setRenderer(Chunk.biomeRenderer);
+					break;
+				}
 			}
 		});
-		mapModeGroup.add(layerModeBtn);
-
-		surfaceModeBtn.setText(Messages.getString("Controls.SurfaceMode_lbl")); //$NON-NLS-1$
-		surfaceModeBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				chunky.setRenderer(Chunk.surfaceRenderer);
-			}
-		});
-		mapModeGroup.add(surfaceModeBtn);
-
-		caveModeBtn.setText(Messages.getString("Controls.CaveMode_lbl")); //$NON-NLS-1$
-		caveModeBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				chunky.setRenderer(Chunk.caveRenderer);
-			}
-		});
-		mapModeGroup.add(caveModeBtn);
-
-		biomeModeBtn.setText("Biomes");
-		biomeModeBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				chunky.setRenderer(Chunk.biomeRenderer);
-			}
-		});
-		mapModeGroup.add(biomeModeBtn);
 
 		scaleLabel.setText(Messages.getString("Controls.Scale_lbl")); //$NON-NLS-1$
 
@@ -773,18 +752,14 @@ public class Controls extends JPanel {
 					.addComponent(sep1, GroupLayout.DEFAULT_SIZE, WIDTH_BIG, Short.MAX_VALUE)
 					.addGroup(layout.createSequentialGroup()
 						.addGroup(layout.createParallelGroup(Alignment.LEADING)
-							.addComponent(viewLabel)
-							.addComponent(autoModeBtn)
-							.addComponent(layerModeBtn)
-							.addComponent(surfaceModeBtn)
-							.addComponent(caveModeBtn)
-							.addComponent(biomeModeBtn))
-						.addGap(18)
-						.addGroup(layout.createParallelGroup(Alignment.LEADING)
 							.addComponent(dimLabel)
 							.addComponent(overworldBtn)
 							.addComponent(netherBtn)
-							.addComponent(endBtn)))
+							.addComponent(endBtn))
+						.addGap(18)
+						.addGroup(layout.createParallelGroup(Alignment.LEADING)
+							.addComponent(viewLabel)
+							.addComponent(mapModeSelector)))
 					.addGroup(layout.createSequentialGroup()
 						.addGroup(layout.createParallelGroup(Alignment.TRAILING, false)
 							.addComponent(scaleField, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
@@ -822,21 +797,12 @@ public class Controls extends JPanel {
 						.addComponent(viewLabel)
 						.addComponent(dimLabel))
 				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(autoModeBtn)
-						.addComponent(overworldBtn))
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(layerModeBtn)
-						.addComponent(netherBtn))
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(surfaceModeBtn)
-						.addComponent(endBtn))
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(caveModeBtn)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(biomeModeBtn)
+				.addGroup(layout.createParallelGroup(Alignment.LEADING)
+						.addGroup(layout.createSequentialGroup()
+								.addComponent(overworldBtn)
+								.addComponent(netherBtn)
+								.addComponent(endBtn))
+						.addComponent(mapModeSelector, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(sep1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
 				.addPreferredGap(ComponentPlacement.RELATED)
@@ -1085,12 +1051,11 @@ public class Controls extends JPanel {
 	}
 
 	/**
-	 * Enable given dimension's check box
-	 * @param i
-	 * @param haveDimension
+	 * Enable or disable a dimensions toggle button.
+	 * @param dimension the numerical ID of the dimension.
 	 */
-	public void enableDimension(int i, boolean haveDimension) {
-		switch (i) {
+	public void enableDimension(int dimension, boolean haveDimension) {
+		switch (dimension) {
 		case World.OVERWORLD_DIMENSION:
 			overworldBtn.setEnabled(haveDimension);
 			break;
