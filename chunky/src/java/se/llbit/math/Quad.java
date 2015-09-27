@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -46,7 +46,7 @@ public class Quad {
 	 * @param other
 	 * @param t
 	 */
-	public Quad(Quad other, Transform t) {
+	protected Quad(Quad other, Transform t) {
 		o.set(other.o);
 		o.x -= .5;
 		o.y -= .5;
@@ -182,5 +182,10 @@ public class Quad {
 		double v1 = uv.z+uv.w;
 		primitives.add(new TexturedTriangle(c0, c2, c1, new Vector2d(u0, v0), new Vector2d(u0, v1), new Vector2d(u1, v0), material));
 		primitives.add(new TexturedTriangle(c1, c2, c3, new Vector2d(u1, v0), new Vector2d(u0, v1), new Vector2d(u1, v1), material));
+	}
+
+	/** Build a transformed copy of this quad. */
+	public Quad transform(Transform transform) {
+		return new Quad(this, transform);
 	}
 }

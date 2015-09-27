@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -32,7 +32,7 @@ public class Model {
 	public static final Quad[] rotateNegX(Quad[] src) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = new Quad(src[i], Transform.NONE.rotateNegX());
+			rot[i] = src[i].transform(Transform.NONE.rotateNegX());
 		}
 		return rot;
 	}
@@ -44,7 +44,7 @@ public class Model {
 	public static final Quad[] rotateX(Quad[] src) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = new Quad(src[i], Transform.NONE.rotateX());
+			rot[i] = src[i].transform(Transform.NONE.rotateX());
 		}
 		return rot;
 	}
@@ -57,7 +57,7 @@ public class Model {
 	public static final Quad[] rotateX(Quad[] src, double angle) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = new Quad(src[i], Transform.NONE.rotateX(angle));
+			rot[i] = src[i].transform(Transform.NONE.rotateX(angle));
 		}
 		return rot;
 	}
@@ -69,7 +69,7 @@ public class Model {
 	public static final Quad[] rotateY(Quad[] src) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = new Quad(src[i], Transform.NONE.rotateY());
+			rot[i] = src[i].transform(Transform.NONE.rotateY());
 		}
 		return rot;
 	}
@@ -94,7 +94,7 @@ public class Model {
 	public static final Quad[] rotateY(Quad[] src, double angle) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = new Quad(src[i], Transform.NONE.rotateY(angle));
+			rot[i] = src[i].transform(Transform.NONE.rotateY(angle));
 		}
 		return rot;
 	}
@@ -106,7 +106,7 @@ public class Model {
 	public static final Quad[] rotateZ(Quad[] src) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = new Quad(src[i], Transform.NONE.rotateZ());
+			rot[i] = src[i].transform(Transform.NONE.rotateZ());
 		}
 		return rot;
 	}
@@ -119,7 +119,7 @@ public class Model {
 	public static final Quad[] rotateZ(Quad[] src, double angle) {
 		Quad[] rot = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			rot[i] = new Quad(src[i], Transform.NONE.rotateZ(angle));
+			rot[i] = src[i].transform(Transform.NONE.rotateZ(angle));
 		}
 		return rot;
 	}
@@ -134,7 +134,7 @@ public class Model {
 	public static final Quad[] translate(Quad[] src, double x, double y, double z) {
 		Quad[] out = new Quad[src.length];
 		for (int i = 0; i < src.length; ++i) {
-			out[i] = new Quad(src[i], Transform.NONE.translate(x, y, z));
+			out[i] = src[i].transform(Transform.NONE.translate(x, y, z));
 		}
 		return out;
 	}

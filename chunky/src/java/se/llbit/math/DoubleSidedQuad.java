@@ -26,7 +26,7 @@ public class DoubleSidedQuad extends Quad {
 	 * @param other
 	 * @param t
 	 */
-	public DoubleSidedQuad(Quad other, Transform t) {
+	private DoubleSidedQuad(Quad other, Transform t) {
 		super(other, t);
 	}
 
@@ -69,4 +69,9 @@ public class DoubleSidedQuad extends Quad {
 		return false;
 	}
 
+	/** Build a transformed copy of this quad. */
+	@Override
+	public DoubleSidedQuad transform(Transform transform) {
+		return new DoubleSidedQuad(this, transform);
+	}
 }

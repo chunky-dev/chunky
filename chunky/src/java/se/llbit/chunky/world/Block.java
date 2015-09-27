@@ -50,6 +50,7 @@ import se.llbit.chunky.model.GrassModel;
 import se.llbit.chunky.model.GrassPathModel;
 import se.llbit.chunky.model.HeadModel;
 import se.llbit.chunky.model.HopperModel;
+import se.llbit.chunky.model.IronBarsModel;
 import se.llbit.chunky.model.LadderModel;
 import se.llbit.chunky.model.LargeFlowerModel;
 import se.llbit.chunky.model.LavaModel;
@@ -1884,7 +1885,7 @@ public class Block extends Material {
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return GlassPaneModel.intersect(ray, Texture.ironBars, Texture.ironBars);
+			return IronBarsModel.intersect(ray);
 		}
 	};
 	public static final int GLASSPANE_ID = 0x66;
@@ -1897,7 +1898,7 @@ public class Block extends Material {
 		}
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return GlassPaneModel.intersect(ray, Texture.glass, Texture.glassPaneSide);
+			return GlassPaneModel.intersect(ray, Texture.glass, Texture.glassPaneTop);
 		}
 	};
 	public static final int MELON_ID = 0x67;

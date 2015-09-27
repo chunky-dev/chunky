@@ -43,9 +43,9 @@ public class LilyPadModel {
 
 	static {
 		rot[0] = quad;
-		rot[3] = new Quad(rot[0], Transform.NONE.rotateY());
-		rot[2] = new Quad(rot[3], Transform.NONE.rotateY());
-		rot[1] = new Quad(rot[2], Transform.NONE.rotateY());
+		rot[3] = rot[0].transform(Transform.NONE.rotateY());
+		rot[2] = rot[3].transform(Transform.NONE.rotateY());
+		rot[1] = rot[2].transform(Transform.NONE.rotateY());
 		Color.getRGBAComponents(COLOR, lilyPadColor);
 	}
 

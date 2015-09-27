@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -18,61 +18,57 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
+import se.llbit.math.AABB;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
-import se.llbit.math.Transform;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 
 @SuppressWarnings("javadoc")
 public class GlassPaneModel {
-
-	private static Quad cap =
-			new Quad(new Vector3d(.5625, 1, .5), new Vector3d(.4375, 1, .5),
-				new Vector3d(.4375, 0, .5), new Vector4d(.5625, .4375, 1, 0));
+	private static AABB core = new AABB(7/16., 9/16., 0, 1, 7/16., 9/16.);
 
 	private static Quad[][] connector = {
-		// front
+		// Front side.
 		{
-			// left
-			new Quad(new Vector3d(.4375, 1, .5), new Vector3d(.4375, 1, 0),
-					new Vector3d(.4375, 0, .5), new Vector4d(.5, 0, 1, 0)),
+			// Left face.
+			new Quad(new Vector3d(7/16., 1, 7/16.), new Vector3d(7/16., 1, 0),
+					new Vector3d(7/16., 0, 7/16.), new Vector4d(7/16., 0, 1, 0)),
 
-			// right
-			new Quad(new Vector3d(.5625, 1, 0), new Vector3d(.5625, 1, .5),
-					new Vector3d(.5625, 0, 0), new Vector4d(0, .5, 1, 0)),
+			// Right face.
+			new Quad(new Vector3d(9/16., 1, 0), new Vector3d(9/16., 1, 7/16.),
+					new Vector3d(9/16., 0, 0), new Vector4d(0, 7/16., 1, 0)),
 
-			// top
-			new Quad(new Vector3d(.5625, 1, 0), new Vector3d(.4375, 1, 0),
-					new Vector3d(.5625, 1, .5), new Vector4d(.5625, .4375, 0, .5)),
+			// Top face.
+			new Quad(new Vector3d(9/16., 1, 0), new Vector3d(7/16., 1, 0),
+					new Vector3d(9/16., 1, 7/16.), new Vector4d(9/16., 7/16., 0, 7/16.)),
 
-			// bottom
-			new Quad(new Vector3d(.4375, 0, 0), new Vector3d(.5625, 0, 0),
-					new Vector3d(.4375, 0, .5), new Vector4d(.4375, .5625, 0, .5)),
+			// Bottom face.
+			new Quad(new Vector3d(7/16., 0, 0), new Vector3d(9/16., 0, 0),
+					new Vector3d(7/16., 0, 7/16.), new Vector4d(7/16., 9/16., 0, 7/16.)),
 
 		},
-		// back
+		// Back side.
 		{
-			// left
-			new Quad(new Vector3d(.4375, 1, 1), new Vector3d(.4375, 1, .5),
-					new Vector3d(.4375, 0, 1), new Vector4d(1, .5, 1, 0)),
+			// Left face.
+			new Quad(new Vector3d(7/16., 1, 1), new Vector3d(7/16., 1, 9/16.),
+					new Vector3d(7/16., 0, 1), new Vector4d(1, 9/16., 1, 0)),
 
-			// right
-			new Quad(new Vector3d(.5625, 1, .5), new Vector3d(.5625, 1, 1),
-					new Vector3d(.5625, 0, .5), new Vector4d(.5, 1, 1, 0)),
+			// Right face.
+			new Quad(new Vector3d(9/16., 1, 9/16.), new Vector3d(9/16., 1, 1),
+					new Vector3d(9/16., 0, 9/16.), new Vector4d(9/16., 1, 1, 0)),
 
-			// top
-			new Quad(new Vector3d(.5625, 1, .5), new Vector3d(.4375, 1, .5),
-					new Vector3d(.5625, 1, 1), new Vector4d(.5625, .4375, .5, 1)),
+			// Top face.
+			new Quad(new Vector3d(9/16., 1, 9/16.), new Vector3d(7/16., 1, 9/16.),
+					new Vector3d(9/16., 1, 1), new Vector4d(9/16., 7/16., 9/16., 1)),
 
-			// bottom
-			new Quad(new Vector3d(.4375, 0, .5), new Vector3d(.5625, 0, .5),
-					new Vector3d(.4375, 0, 1), new Vector4d(.4375, .5625, .5, 1)),
+			// Bottom face.
+			new Quad(new Vector3d(7/16., 0, 9/16.), new Vector3d(9/16., 0, 9/16.),
+					new Vector3d(7/16., 0, 1), new Vector4d(7/16., 9/16., 9/16., 1)),
 		},
 	};
 
 	private static Quad[][] panes = new Quad[4][];
-	private static Quad[] rotCap = new Quad[4];
 
 	static {
 		panes[0] = connector[0];
@@ -80,42 +76,34 @@ public class GlassPaneModel {
 		for (int j = 2; j < 4; ++j) {
 			panes[j] = Model.rotateY(connector[j-2]);
 		}
-		rotCap[0] = cap;
-		rotCap[2] = new Quad(rotCap[0], Transform.NONE.rotateY());
-		rotCap[1] = new Quad(rotCap[2], Transform.NONE.rotateY());
-		rotCap[3] = new Quad(rotCap[1], Transform.NONE.rotateY());
 	}
 
-	public static boolean intersect(Ray ray, Texture texture, Texture sideTexture) {
+	public static boolean intersect(Ray ray, Texture sideTexture, Texture topTexture) {
 		int metadata = 0xF & (ray.getCurrentData() >> BlockData.GLASS_PANE_OFFSET);
 		boolean hit = false;
 		ray.t = Double.POSITIVE_INFINITY;
+		if (core.intersect(ray)) {
+			if (ray.n.y > 0 || ray.n.y < 0) {
+				topTexture.getColor(ray);
+			} else {
+				sideTexture.getColor(ray);
+			}
+			ray.t = ray.tNext;
+			hit = true;
+		}
 		for (int i = 0; i < 4; ++i) {
-			if (metadata == 0 || ((metadata & (1 << i)) != 0)) {
+			if ((metadata & (1 << i)) != 0) {
 				for (int j = 0; j < panes[i].length; ++j) {
 					Quad quad = panes[i][j];
 					if (quad.intersect(ray)) {
-						float[] color;
-						if (j < 2)
-							color = texture.getColor(ray.u, ray.v);
-						else
-							color = sideTexture.getColor(ray.u, ray.v);
-						if (color[3] > Ray.EPSILON) {
-							ray.color.set(color);
-							ray.n.set(quad.n);
-							ray.t = ray.tNext;
-							hit = true;
+						if (j < 2) {
+							sideTexture.getColor(ray);
+						} else {
+							topTexture.getColor(ray);
 						}
-					}
-				}
-				if (metadata == (1 << i)) {
-					if (rotCap[i].intersect(ray)) {
-						sideTexture.getColor(ray);
-						if (ray.color.w > 0) {
-							ray.n.set(rotCap[i].n);
-							ray.t = ray.tNext;
-							hit = true;
-						}
+						ray.n.set(quad.n);
+						ray.t = ray.tNext;
+						hit = true;
 					}
 				}
 			}

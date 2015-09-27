@@ -688,9 +688,9 @@ public class TexturePackLoader {
 				new SimpleTexture("textures/blocks/repeater_lit", Texture.redstoneRepeaterOn),
 				new IndexedTexture(0x93, Texture.redstoneRepeaterOn)));
 		allTextures.put("glass_pane_top", new AlternateTextures(
-				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top", Texture.glassPaneSide),
-				new SimpleTexture("textures/blocks/thinglass_top", Texture.glassPaneSide),
-				new IndexedTexture(0x94, Texture.glassPaneSide)));
+				new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top", Texture.glassPaneTop),
+				new SimpleTexture("textures/blocks/thinglass_top", Texture.glassPaneTop),
+				new IndexedTexture(0x94, Texture.glassPaneTop)));
 		allTextures.put("bed_feet_end", new AlternateTextures(
 				new SimpleTexture("assets/minecraft/textures/blocks/bed_feet_end", Texture.bedFootEnd),
 				new SimpleTexture("textures/blocks/bed_feet_end", Texture.bedFootEnd),

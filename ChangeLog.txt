@@ -1,5 +1,6 @@
 1.3.6 - TBD
 
+* Improved glass pane and iron bars rendering.
 * Added rendering for the following Minecraft 1.9 block types:
     + Chorus Plant, Flower
     + Purpur Block, Pillar, Slab, Stairs

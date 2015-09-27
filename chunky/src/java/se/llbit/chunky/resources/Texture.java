@@ -385,7 +385,7 @@ public class Texture {
 	public static final Texture peonyTop = new Texture();
 
 	// [1.7.2] Colored Glass Panes
-	public static final Texture glassPaneSide = new Texture();
+	public static final Texture glassPaneTop = new Texture();
 	public static final Texture whiteGlassPaneSide = new Texture();
 	public static final Texture orangeGlassPaneSide = new Texture();
 	public static final Texture magentaGlassPaneSide = new Texture();
