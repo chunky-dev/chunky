@@ -20,6 +20,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.math.AABB;
 import se.llbit.math.Quad;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
@@ -88,6 +89,7 @@ public class GlassPaneModel {
 			} else {
 				sideTexture.getColor(ray);
 			}
+			ray.n.scale(QuickMath.signum(-ray.d.dot(ray.n)));
 			ray.t = ray.tNext;
 			hit = true;
 		}
