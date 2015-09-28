@@ -85,36 +85,29 @@ public class Sky implements JSONifiable {
 	public static final int SKYBOX_RIGHT = 4;
 	public static final int SKYBOX_LEFT = 5;
 
+	// TODO(jesper): add simulated night-time mode.
 	/**
 	 * Sky rendering mode
 	 * @author Jesper Öqvist <jesper@llbit.se>
 	 */
 	public enum SkyMode {
-		/**
-		 * Use simulated sky
-		 */
+		/** Use simulated sky. */
 		SIMULATED("Simulated"),
-		// TODO
-		///**
-		// * Simulated night-time
-		// */
-		//SIMULATED_NIGHT("Simulated (night)"),
-		/**
-		 * Use a gradient
-		 */
+
+		/** Use a gradient. */
 		GRADIENT("Color Gradient"),
-		/**
-		 * Use a panormaic skymap
-		 */
+
+		/** Use a panormaic skymap. */
 		SKYMAP_PANORAMIC("Skymap (panoramic)"),
-		/**
-		 * Light probe
-		 */
+
+		/** Light probe. */
 		SKYMAP_SPHERICAL("Skymap (spherical)"),
-		/**
-		 * Use a skybox
-		 */
-		SKYBOX("Skybox");
+
+		/** Use a skybox. */
+		SKYBOX("Skybox"),
+
+		/** Render a completely black sky, useful for rendering an emitter-only pass. */
+		BLACK("Black");
 
 		private String name;
 
@@ -235,8 +228,7 @@ public class Sky implements JSONifiable {
 	 */
 	public void getSkyDiffuseColorInner(Ray ray) {
 		switch (mode) {
-		case GRADIENT:
-		{
+		case GRADIENT: {
 			double angle = Math.asin(ray.d.y);
 			int x = 0;
 			if (gradient.size() > 1) {
@@ -257,13 +249,11 @@ public class Sky implements JSONifiable {
 			}
 			break;
         }
-		case SIMULATED:
-		{
+		case SIMULATED: {
 			scene.sun().calcSkyLight(ray, horizonOffset);
 			break;
 		}
-		case SKYMAP_PANORAMIC:
-		{
+		case SKYMAP_PANORAMIC: {
 			if (mirrored) {
 				double theta = FastMath.atan2(ray.d.z, ray.d.x);
 				theta += rotation;
@@ -283,8 +273,7 @@ public class Sky implements JSONifiable {
 			}
 			break;
 		}
-		case SKYMAP_SPHERICAL:
-		{
+		case SKYMAP_SPHERICAL: {
 			double cos = FastMath.cos(-rotation);
 			double sin = FastMath.sin(-rotation);
 			double x = cos*ray.d.x + sin*ray.d.z;
@@ -297,8 +286,7 @@ public class Sky implements JSONifiable {
 			skymap.getColor(u, v, ray.color);
 			break;
 		}
-		case SKYBOX:
-		{
+		case SKYBOX: {
 			double cos = FastMath.cos(-rotation);
 			double sin = FastMath.sin(-rotation);
 			double x = cos*ray.d.x + sin*ray.d.z;
@@ -351,8 +339,10 @@ public class Sky implements JSONifiable {
 			}
 			break;
 		}
-		default:
+		case BLACK: {
+			ray.color.set(0, 0, 0, 1);
 			break;
+		}
 		}
 	}
 
@@ -372,8 +362,7 @@ public class Sky implements JSONifiable {
 	 */
 	public void getSkyColorInterpolated(Ray ray) {
 		switch (mode) {
-		case SKYMAP_PANORAMIC:
-		{
+		case SKYMAP_PANORAMIC: {
 			if (mirrored) {
 				double theta = FastMath.atan2(ray.d.z, ray.d.x);
 				theta += rotation;
@@ -393,8 +382,7 @@ public class Sky implements JSONifiable {
 			}
 			break;
 		}
-		case SKYMAP_SPHERICAL:
-		{
+		case SKYMAP_SPHERICAL: {
 			double cos = FastMath.cos(-rotation);
 			double sin = FastMath.sin(-rotation);
 			double x = cos*ray.d.x + sin*ray.d.z;
@@ -407,8 +395,7 @@ public class Sky implements JSONifiable {
 			skymap.getColorInterpolated(u, v, ray.color);
 			break;
 		}
-		case SKYBOX:
-		{
+		case SKYBOX: {
 			double cos = FastMath.cos(-rotation);
 			double sin = FastMath.sin(-rotation);
 			double x = cos*ray.d.x + sin*ray.d.z;
@@ -461,8 +448,9 @@ public class Sky implements JSONifiable {
 			}
 			break;
 		}
-		default:
+		default: {
 			getSkyDiffuseColorInner(ray);
+		}
 		}
 		if (scene.sunEnabled) {
 			addSunColor(ray);
@@ -492,7 +480,7 @@ public class Sky implements JSONifiable {
 		double g = ray.color.y;
 		double b = ray.color.z;
 		if (scene.sun().intersect(ray)) {
-			// blend sun color with current color
+			// Blend sun color with current color.
 			ray.color.x = ray.color.x + r;
 			ray.color.y = ray.color.y + g;
 			ray.color.z = ray.color.z + b;
@@ -573,20 +561,18 @@ public class Sky implements JSONifiable {
 		sky.add("cloudSize", cloudSize);
 		sky.add("cloudOffset", cloudOffset.toJson());
 
-		// always save gradient
+		// Always save gradient.
 		sky.add("gradient", gradientJson(gradient));
 
 		switch (mode) {
 		case SKYMAP_PANORAMIC:
-		case SKYMAP_SPHERICAL:
-		{
+		case SKYMAP_SPHERICAL: {
 			if (!skymap.isEmptyTexture()) {
 				sky.add("skymap", skymapFileName);
 			}
 			break;
 		}
-		case SKYBOX:
-		{
+		case SKYBOX: {
 			JsonArray array = new JsonArray();
 			for (int i = 0; i < 6; ++i) {
 				if (!skybox[i].isEmptyTexture()) {
@@ -598,8 +584,9 @@ public class Sky implements JSONifiable {
 			sky.add("skybox", array);
 			break;
 		}
-		default:
+		default: {
 			break;
+		}
 		}
 		return sky;
 	}
@@ -621,16 +608,14 @@ public class Sky implements JSONifiable {
 		}
 
 		switch (mode) {
-		case SKYMAP_PANORAMIC:
-		{
+		case SKYMAP_PANORAMIC: {
 			skymapFileName = sky.get("skymap").stringValue("");
 			if (skymapFileName.isEmpty()) {
 				skymapFileName = sky.get("skymapFileName").stringValue("");
 			}
 			break;
 		}
-		case SKYBOX:
-		{
+		case SKYBOX: {
 			JsonArray array = sky.get("skybox").array();
 			for (int i = 0; i < 6; ++i) {
 				JsonValue value = array.get(i);
