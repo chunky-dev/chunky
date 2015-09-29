@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -33,14 +33,15 @@ import se.llbit.chunky.world.World;
 import se.llbit.log.Log;
 
 /**
- * Manages the 3D render worker threads.
+ * Manages render worker threads.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class RenderManager extends AbstractRenderManager implements Renderer {
 
 	/**
-	 * Milliseconds until the reset confirmation must be shown.
+	 * Milliseconds until the reset confirmation must be shown when trying to edit
+	 * a scene parameter.
 	 */
 	private static final long SCENE_EDIT_GRACE_PERIOD = 30000;
 
@@ -52,25 +53,16 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 	private int numJobs;
 
-	/**
- 	 * The modifiable scene.
- 	 */
+	/** The modifiable scene. */
 	private final Scene mutableScene;
 
-	/**
- 	 * The buffered scene is only updated between
- 	 * render jobs.
- 	 */
+	/** The buffered scene is only updated between render jobs. */
 	private final Scene bufferedScene;
 
-	/**
-	 * Next job on the job queue.
-	 */
+	/** Next job on the job queue. */
 	private final AtomicInteger nextJob;
 
-	/**
-	 * Number of completed jobs.
-	 */
+	/** Number of completed jobs. */
 	private final AtomicInteger finishedJobs;
 
 	private final RenderContext context;
@@ -79,35 +71,21 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 	private final Object bufferMonitor = new Object();
 
-	/**
-	 * Selects if render threads shut down after reaching the target SPP.
-	 */
+	/** Selects if render threads shut down after reaching the target SPP. */
 	private final boolean oneshot;
 
-	/**
-	 * Current renderer state/mode.
-	 */
+	/** Current renderer state/mode. */
 	private RenderState state = RenderState.PREVIEW;
 
 	private final Collection<SceneStatusListener> sceneListeners =
 			new ArrayList<SceneStatusListener>();
 
-	/**
-	 * Constructor
-	 * @param canvas
-	 * @param context
-	 * @param statusListener
-	 */
 	public RenderManager(RenderableCanvas canvas, RenderContext context,
 			RenderStatusListener statusListener) {
 		this(canvas, context, statusListener, false);
 	}
 
 	/**
-	 * Constructor
-	 * @param canvas
-	 * @param context
-	 * @param statusListener
 	 * @param oneshot <code>true</code> if rendering threads should be shut
 	 * down after meeting the render target
 	 */
@@ -139,12 +117,12 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			for (i = 0; i < workers.length && i < numThreads; ++i) {
 				pool[i] = workers[i];
 			}
-			// start additional workers
+			// Start additional workers.
 			for (; i < numThreads; ++i) {
 				pool[i] = new RenderWorker(this, i, seed+i);
 				pool[i].start();
 			}
-			// stop extra workers
+			// Stop extra workers.
 			for (; i < workers.length; ++i) {
 				workers[i].interrupt();
 			}
@@ -201,7 +179,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				}
 			}
 		} catch (InterruptedException e) {
-			// 3D view was closed
+			// 3D view was closed.
 		} catch (Throwable e) {
 			Log.error("Uncaught exception in render manager", e);
 		}
@@ -233,19 +211,19 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				bufferedScene.renderTime += System.currentTimeMillis() - frameStart;
 			}
 
-			// repaint canvas
+			// Repaint canvas.
 			canvas.repaint();
 
 			bufferedScene.spp += RenderConstants.SPP_PER_PASS;
 
 			if (dumpNextFrame) {
-				// save the current frame
-				if (mutableScene.shouldSaveSnapshots() ||
-						bufferedScene.spp >= bufferedScene.getTargetSPP()) {
+				// Save the current frame.
+				if (mutableScene.shouldSaveSnapshots()
+						|| bufferedScene.spp >= bufferedScene.getTargetSPP()) {
 					bufferedScene.saveSnapshot(context.getSceneDirectory(), renderListener);
 				}
 
-				// save scene description and render dump
+				// Save scene description and render dump.
 				saveScene();
 			}
 
@@ -340,15 +318,16 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
 	private void backupFile(File file) {
 		if (file.exists()) {
-			// try to create backup
-			// it's not a biggie if we can't
+			// Try to create backup. It is not a problem if we fail this.
 			String backupFileName = file.getName() + ".backup";
 			File renderDir = context.getSceneDirectory();
 			File backup = new File(renderDir, backupFileName);
-			if (backup.exists())
+			if (backup.exists()) {
 				backup.delete();
-			if (!file.renameTo(new File(renderDir, backupFileName)))
+			}
+			if (!file.renameTo(new File(renderDir, backupFileName))) {
 				Log.info("Could not create backup " + backupFileName);
+			}
 		}
 
 	}
@@ -356,7 +335,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	private synchronized void waitOnWorkers() throws InterruptedException {
 		while (finishedJobs.get() < numJobs)
 			wait();
-		// all workers finished - we can now change the number of worker threads!
+		// All workers finished - we can now change the number of worker threads!
 		manageWorkers();
 	}
 
@@ -412,11 +391,11 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				String sceneName = bufferedScene.name();
 				Log.info("Saving scene " + sceneName);
 
-				// create backup of scene description and current render dump
+				// Create backup of scene description and current render dump.
 				backupFile(context.getSceneDescriptionFile(mutableScene.name()));
 				backupFile(mutableScene.name() + ".dump");
 
-				// synchronize the transients
+				// Synchronize transient scene parameters.
 				bufferedScene.copyTransients(mutableScene);
 
 				bufferedScene.saveScene(context, renderListener);
@@ -461,13 +440,13 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				numJobs = canvasWidth * canvasHeight;
 			}
 
-			// Update progress bar
+			// Update progress bar.
 			renderListener.setProgress("Rendering",
 					bufferedScene.spp, 0,
 					bufferedScene.getTargetSPP());
 
 			synchronized (mutableScene) {
-				// synchronized to ensure that refresh flag is never visibly true
+				// Synchronized to ensure that refresh flag is never visibly true.
 				mutableScene.set(bufferedScene);
 				mutableScene.copyTransients(bufferedScene);
 				mutableScene.setRefreshed();
@@ -482,9 +461,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		}
 	}
 
-	/**
-	 * Default directory for "save current frame" file dialog.
-	 */
+	/** Default directory for "save current frame" file dialog. */
 	private static String defaultDirectory = System.getProperty("user.dir");
 
 	/**
@@ -567,7 +544,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	}
 
 	/**
-	 * Load chunks without moving the camera
+	 * Load chunks without moving the camera.
 	 * @param world
 	 * @param chunksToLoad
 	 */
@@ -577,9 +554,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		renderListener.chunksLoaded();
 	}
 
-	/**
-	 * Attempts to reload all loaded chunks
-	 */
+	/** Attempt to reload all loaded chunks. */
 	public void reloadChunks() {
 		mutableScene.reloadChunks(renderListener);
 		renderListener.chunksLoaded();
@@ -591,8 +566,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	}
 
 	/**
-	 * Merge a render dump into the current render
-	 * @param dumpFile
+	 * Merge a render dump into the current render.
+	 * @param dumpFile the file to be merged.
 	 */
 	public void mergeDump(File dumpFile) {
 		bufferedScene.mergeDump(dumpFile, renderListener);
@@ -601,26 +576,24 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	}
 
 	/**
-	 * Change number of render workers
-	 * @param threads
+	 * Change number of render workers.
+	 * @param threads new required thread count.
 	 */
 	public void setNumThreads(int threads) {
 		numThreads = Math.max(1, threads);
 	}
 
 	/**
-	 * Set CPU load percentage
-	 * @param value
+	 * Set CPU load percentage.
+	 * @param value new load percentage.
 	 */
 	public void setCPULoad(int value) {
 		cpuLoad  = value;
 	}
 
-	/**
-	 * Stop the render workers.
-	 */
+	/** Stop render workers. */
 	private synchronized void stopWorkers() {
-		// Halt all worker threads
+		// Halt all worker threads.
 		for (int i = 0; i < numThreads; ++i) {
 			workers[i].interrupt();
 		}

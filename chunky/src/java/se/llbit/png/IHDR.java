@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -30,8 +30,9 @@ public class IHDR extends PngChunk {
 	public static final int CHUNK_TYPE = 0x49484452;
 
 	private static final int BIT_DEPTH = 8;
-	private static final int COLOR_TYPE_RGB = 2;// each pixel is an RGB triple
-	private static final int COMPRESSION_METHOD = 0;// deflate/inflate
+	protected static final int COLOR_TYPE_RGB = 2; // Each pixel is an RGB triple.
+	protected static final int COLOR_TYPE_RGBA = 6; // Each pixel is an RGBA quad.
+	private static final int COMPRESSION_METHOD = 0; // Deflate/inflate compression.
 	private static final int FILTER_METHOD = 0;
 	private static final int INTERLACE_METHOD = 0;
 	private final int colorType;
@@ -39,23 +40,18 @@ public class IHDR extends PngChunk {
 	private final int width;
 	private final int height;
 
-	/**
-	 * @param width
-	 * @param height
-	 */
 	public IHDR(int width, int height) {
-		this(width, height, COLOR_TYPE_RGB);
+		this(width, height, COLOR_TYPE_RGB, BIT_DEPTH);
 	}
 
-	/**
-	 * @param width
-	 * @param height
-	 * @param colortype
-	 */
-	public IHDR(int width, int height, int colortype) {
+	public IHDR(int width, int height, int colorType) {
+		this(width, height, colorType, BIT_DEPTH);
+	}
+
+	public IHDR(int width, int height, int colorType, int bitDepth) {
 		this.width = width;
 		this.height = height;
-		this.colorType = colortype;
+		this.colorType = colorType;
 	}
 
 	@Override
