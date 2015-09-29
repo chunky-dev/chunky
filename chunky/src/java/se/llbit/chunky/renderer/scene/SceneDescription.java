@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -27,6 +27,7 @@ import java.util.Collection;
 import org.jastadd.util.PrettyPrinter;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.RenderState;
@@ -65,7 +66,8 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	 */
 	public int height;
 	protected double exposure = Scene.DEFAULT_EXPOSURE;
-	public Postprocess postprocess = Postprocess.get(Postprocess.DEFAULT);
+	public Postprocess postprocess = Postprocess.DEFAULT;
+	public OutputMode outputMode = OutputMode.DEFAULT;
 	public long renderTime;
 
 	/**
@@ -167,6 +169,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		desc.add("height", height);
 		desc.add("exposure", exposure);
 		desc.add("postprocess", postprocess.ordinal());
+		desc.add("outputMode", outputMode.name());
 		desc.add("renderTime", renderTime);
 		desc.add("spp", spp);
 		desc.add("sppTarget", sppTarget);
@@ -235,7 +238,8 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		width = desc.get("width").intValue(Scene.MIN_CANVAS_WIDTH);
 		height = desc.get("height").intValue(Scene.MIN_CANVAS_HEIGHT);
 		exposure = desc.get("exposure").doubleValue(Scene.DEFAULT_EXPOSURE);
-		postprocess = Postprocess.get(desc.get("postprocess").intValue(Postprocess.DEFAULT));
+		postprocess = Postprocess.get(desc.get("postprocess").intValue(Postprocess.DEFAULT.ordinal()));
+		outputMode = OutputMode.get(desc.get("outputMode").stringValue(""));
 		sppTarget = desc.get("sppTarget").intValue(PersistentSettings.getSppTargetDefault());
 		rayDepth = desc.get("rayDepth").intValue(PersistentSettings.getRayDepthDefault());
 		boolean pathTrace = desc.get("pathTrace").boolValue(false);
@@ -422,10 +426,18 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	}
 
 	/**
-	 * @return <code>true</code> if volumetric fog is enabled
+	 * @return {@code true} if volumetric fog is enabled
 	 */
 	public boolean fogEnabled() {
 		return fogDensity > 0.0;
+	}
+
+	public OutputMode getOutputMode() {
+		return outputMode;
+	}
+
+	public void setOutputMode(OutputMode mode) {
+		outputMode = mode;
 	}
 
 }

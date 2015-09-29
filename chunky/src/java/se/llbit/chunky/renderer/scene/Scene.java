@@ -1351,6 +1351,7 @@ public class Scene extends SceneDescription {
 		cameraPresets = other.cameraPresets;
 		rayDepth = other.rayDepth;
 		renderState = other.renderState;
+		outputMode = other.outputMode;
 	}
 
 	/**

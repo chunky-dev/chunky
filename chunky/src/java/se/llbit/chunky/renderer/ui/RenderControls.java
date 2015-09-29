@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -76,6 +76,7 @@ import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
+import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.renderer.RenderContext;
@@ -165,7 +166,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JLabel sppLbl = new JLabel();
 	private final JProgressBar progressBar = new JProgressBar();
 	private final JLabel progressLbl = new JLabel();
-	private final JComboBox postprocessCB = new JComboBox();
+	private final JComboBox postprocessCB = new JComboBox(Postprocess.values());
 	private final JComboBox skyModeCB = new JComboBox();
 	private final JButton changeSunColorBtn = new JButton("Change Sun Color");
 	private final JLabel etaLbl = new JLabel();
@@ -191,6 +192,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JCheckBox shutdownWhenDoneCB = new JCheckBox("Shutdown computer when render completes");
 	private final JRadioButton v90Btn = new JRadioButton("90");
 	private final JRadioButton v180Btn = new JRadioButton("180");
+	private final JComboBox outputMode = new JComboBox(OutputMode.values());
 
 	private final JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -863,6 +865,17 @@ public class RenderControls extends JDialog implements ViewListener,
 	private JPanel buildAdvancedPane() {
 		rayDepth.update();
 
+		JLabel outputModeLbl = new JLabel("Output mode: ");
+		outputMode.setModel(new DefaultComboBoxModel(OutputMode.values()));
+		outputMode.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JComboBox source = (JComboBox) e.getSource();
+				renderMan.scene().setOutputMode((OutputMode) source.getSelectedItem());
+			}
+		});
+		updateOutputMode();
+
 		JSeparator sep1 = new JSeparator();
 		JSeparator sep2 = new JSeparator();
 
@@ -913,6 +926,9 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(mergeDumpBtn)
 				.addComponent(shutdownWhenDoneCB)
 				.addComponent(fastFogCB)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(outputModeLbl)
+					.addComponent(outputMode, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 			)
 			.addContainerGap()
 		);
@@ -933,6 +949,10 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addComponent(shutdownWhenDoneCB)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(fastFogCB)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+					.addComponent(outputModeLbl)
+					.addComponent(outputMode))
 			.addContainerGap()
 		);
 		return panel;
@@ -1062,16 +1082,12 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		JLabel postprocessDescLbl = new JLabel("<html>Post processing affects rendering performance<br>when the preview window is visible");
 		JLabel postprocessLbl = new JLabel("Post-processing mode:");
-		for (Postprocess pp : Postprocess.values) {
-			postprocessCB.addItem("" + pp);
-		}
 		updatePostprocessCB();
 		postprocessCB.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox) e.getSource();
-				renderMan.scene().setPostprocess(
-						Postprocess.get(source.getSelectedIndex()));
+				renderMan.scene().setPostprocess((Postprocess) source.getSelectedItem());
 			}
 		});
 
@@ -2538,7 +2554,11 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	protected void updatePostprocessCB() {
-		postprocessCB.setSelectedIndex(renderMan.scene().getPostprocess().ordinal());
+		postprocessCB.setSelectedItem(renderMan.scene().getPostprocess());
+	}
+
+	protected void updateOutputMode() {
+		outputMode.setSelectedItem(renderMan.scene().getOutputMode());
 	}
 
 	protected void updateCustomPresets() {
@@ -2764,6 +2784,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		targetSPP.update();
 		updateSceneNameField();
 		updatePostprocessCB();
+		updateOutputMode();
 		cloudSize.update();
 		cloudXOffset.update();
 		cloudYOffset.update();

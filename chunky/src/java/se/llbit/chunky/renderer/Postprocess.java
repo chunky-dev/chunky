@@ -27,7 +27,7 @@ public enum Postprocess {
 		}
 	};
 
-	public static final int DEFAULT = GAMMA.ordinal();
+	public static final Postprocess DEFAULT = GAMMA;
 
 	public static final Postprocess[] values = values();
 
@@ -38,6 +38,15 @@ public enum Postprocess {
 	}
 
 	public static Postprocess get(AnyTag tag) {
-		return get(tag.intValue(DEFAULT));
+		return get(tag.intValue(DEFAULT.ordinal()));
+	}
+
+	public static Postprocess get(String name) {
+		for (Postprocess mode: values) {
+			if (mode.name().equals(name)) {
+				return mode;
+			}
+		}
+		return DEFAULT;
 	}
 }
