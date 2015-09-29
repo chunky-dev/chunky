@@ -168,7 +168,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		desc.add("width", width);
 		desc.add("height", height);
 		desc.add("exposure", exposure);
-		desc.add("postprocess", postprocess.ordinal());
+		desc.add("postprocess", postprocess.name());
 		desc.add("outputMode", outputMode.name());
 		desc.add("renderTime", renderTime);
 		desc.add("spp", spp);
@@ -238,7 +238,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		width = desc.get("width").intValue(Scene.MIN_CANVAS_WIDTH);
 		height = desc.get("height").intValue(Scene.MIN_CANVAS_HEIGHT);
 		exposure = desc.get("exposure").doubleValue(Scene.DEFAULT_EXPOSURE);
-		postprocess = Postprocess.get(desc.get("postprocess").intValue(Postprocess.DEFAULT.ordinal()));
+		postprocess = Postprocess.get(desc.get("postprocess").stringValue(""));
 		outputMode = OutputMode.get(desc.get("outputMode").stringValue(""));
 		sppTarget = desc.get("sppTarget").intValue(PersistentSettings.getSppTargetDefault());
 		rayDepth = desc.get("rayDepth").intValue(PersistentSettings.getRayDepthDefault());

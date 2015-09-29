@@ -24,10 +24,9 @@ public enum OutputMode {
 	PNG_16;
 
 	public static final OutputMode DEFAULT = PNG;
-	public static final OutputMode[] values = values();
 
 	public static OutputMode get(String name) {
-		for (OutputMode mode: values) {
+		for (OutputMode mode: values()) {
 			if (mode.name().equals(name)) {
 				return mode;
 			}
