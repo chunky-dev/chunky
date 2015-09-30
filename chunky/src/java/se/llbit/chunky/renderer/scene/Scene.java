@@ -129,19 +129,15 @@ public class Scene extends SceneDescription {
 	 */
 	public static final float DEFAULT_GAMMA_INV = 1 / DEFAULT_GAMMA;
 
-	/**
-	 * Default emitter intensity
-	 */
+	public static final boolean DEFAULT_EMITTERS_ENABLED = false;
+
+	/** Default emitter intensity. */
 	public static final double DEFAULT_EMITTER_INTENSITY = 13;
 
-	/**
-	 * Minimum emitter intensity
-	 */
+	/** Minimum emitter intensity. */
 	public static final double MIN_EMITTER_INTENSITY = 0.01;
 
-	/**
-	 * Maximum emitter intensity
-	 */
+	/** Maximum emitter intensity. */
 	public static final double MAX_EMITTER_INTENSITY = 1000;
 
 	/**

@@ -99,7 +99,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	protected int dumpFrequency = Scene.DEFAULT_DUMP_FREQUENCY;
 	protected boolean saveSnapshots = false;
 
-	protected boolean emittersEnabled = true;
+	protected boolean emittersEnabled = Scene.DEFAULT_EMITTERS_ENABLED;
 	protected double emitterIntensity = Scene.DEFAULT_EMITTER_INTENSITY;
 	protected boolean sunEnabled = true;
 
@@ -251,7 +251,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		dumpFrequency = desc.get("dumpFrequency").intValue(Scene.DEFAULT_DUMP_FREQUENCY);
 		saveSnapshots = desc.get("saveSnapshots").boolValue(false);
 
-		emittersEnabled = desc.get("emittersEnabled").boolValue(true);
+		emittersEnabled = desc.get("emittersEnabled").boolValue(Scene.DEFAULT_EMITTERS_ENABLED);
 		emitterIntensity = desc.get("emitterIntensity").doubleValue(Scene.DEFAULT_EMITTER_INTENSITY);
 		sunEnabled = desc.get("sunEnabled").boolValue(true);
 		stillWater = desc.get("stillWater").boolValue(false);
