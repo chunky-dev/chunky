@@ -440,4 +440,8 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		outputMode = mode;
 	}
 
+	public int numberOfChunks() {
+		return chunks.size();
+	}
+
 }

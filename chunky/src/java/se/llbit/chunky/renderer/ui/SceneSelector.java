@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -51,6 +51,7 @@ import javax.swing.table.DefaultTableModel;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.SceneDescription;
 import se.llbit.chunky.ui.CenteredFileDialog;
+import se.llbit.chunky.world.Icon;
 
 /**
  * The scene selector dialog.
@@ -62,23 +63,18 @@ public class SceneSelector extends JDialog {
 	private final DefaultTableModel tableModel;
 	private final JTable sceneTable;
 	private final RenderControls controls;
-	private final List<SceneDescription> scenes =
-			new ArrayList<SceneDescription>();
+	private final List<SceneDescription> scenes = new ArrayList<SceneDescription>();
 	protected boolean sceneLoaded = false;
 	private final RenderContext context;
 	private boolean accepted = false;
 	private SceneDescription selectedScene;
-	protected final JButton loadSelectedBtn =
-			new JButton("Load Selected Scene");
+	protected final JButton loadSelectedBtn = new JButton("Load Selected Scene");
 	protected final JButton deleteSelectedBtn = new JButton("Delete Scene");
 	protected final JButton exportSelectedBtn = new JButton("Export Scene");
 
 	/**
-	 * Creates a new scene selector dialog.
-	 * If the controls parameter is <code>null</code> the dialog
-	 * will be application modal.
-	 * @param controls
-	 * @param context
+	 * Creates a new scene selector dialog. If the controls parameter is
+	 * {@code null} the dialog will be application modal.
 	 */
 	public SceneSelector(RenderControls controls, RenderContext context) {
 		super(controls, "Load Scene");
@@ -88,7 +84,7 @@ public class SceneSelector extends JDialog {
 
 		tableModel = new DefaultTableModel(0, 3);
 		tableModel.setColumnIdentifiers(new String[] {
-				"Name", "Size", "Current SPP", "Render Time" });
+				"Name", "Chunks", "Size", "Current SPP", "Render Time" });
 		sceneTable = new JTable(tableModel) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
@@ -126,6 +122,7 @@ public class SceneSelector extends JDialog {
 		JLabel listDescription = new JLabel();
 		JButton cancelBtn = new JButton("Cancel");
 		loadSelectedBtn.setEnabled(false);
+		loadSelectedBtn.setIcon(Icon.load.imageIcon());
 		loadSelectedBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -134,6 +131,7 @@ public class SceneSelector extends JDialog {
 		});
 
 		deleteSelectedBtn.setEnabled(false);
+		deleteSelectedBtn.setIcon(Icon.clear.imageIcon());
 		deleteSelectedBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -163,8 +161,10 @@ public class SceneSelector extends JDialog {
 				String renderTime = String.format("%d:%d:%d", hours, minutes, seconds);
 				Object[] row = {
 						desc.name,
-						""+desc.width+"x"+desc.height,
-						""+desc.spp, renderTime };
+						desc.numberOfChunks(),
+						"" + desc.width + "x" + desc.height,
+						"" + desc.spp,
+						renderTime };
 				tableModel.addRow(row);
 			} catch (IOException e) {
 				System.err.println("Warning: could not load scene description: " + fileName);
