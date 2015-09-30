@@ -1125,7 +1125,6 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	private JPanel buildGeneralPane() {
 		JLabel canvasSizeLbl = new JLabel("Canvas size:");
-		JLabel canvasSizeAdvisory = new JLabel("Note: Actual image size may not be the same as the window size!");
 
 		canvasSizeCB.setEditable(true);
 		canvasSizeCB.addItem("400x400");
@@ -1277,7 +1276,6 @@ public class RenderControls extends JDialog implements ViewListener,
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(doubleCanvasSizeBtn)
 				)
-				.addComponent(canvasSizeAdvisory)
 				.addComponent(sep2)
 				.addComponent(biomeColorsCB)
 				.addGroup(layout.createSequentialGroup()
@@ -1316,8 +1314,6 @@ public class RenderControls extends JDialog implements ViewListener,
 				.addComponent(halveCanvasSizeBtn)
 				.addComponent(doubleCanvasSizeBtn)
 			)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addComponent(canvasSizeAdvisory)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
