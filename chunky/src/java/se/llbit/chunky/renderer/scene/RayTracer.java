@@ -87,13 +87,13 @@ public class RayTracer {
 		ray.t = Double.POSITIVE_INFINITY;
 		boolean hit = false;
 		if (scene.sky().cloudsEnabled()) {
-			hit = scene.sky().cloudIntersection(scene, ray, state.random);
+			hit = scene.sky().cloudIntersection(scene, ray);
 		}
 		if (scene.waterHeight > 0) {
 			hit = waterIntersection(scene, ray) || hit;
 		}
 		if (scene.intersect(ray)) {
-			// octree tracer handles updating distance
+			// Octree tracer handles updating distance.
 			return true;
 		}
 		if (hit) {

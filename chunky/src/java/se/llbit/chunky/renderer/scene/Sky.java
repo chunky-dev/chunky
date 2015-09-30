@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -847,44 +846,47 @@ public class Sky implements JSONifiable {
 		return cloudsEnabled;
 	}
 
-	public boolean cloudIntersection(Scene scene, Ray ray, Random random) {
+	public boolean cloudIntersection(Scene scene, Ray ray) {
+		double ox = ray.o.x + scene.origin.x;
+		double oy = ray.o.y + scene.origin.y;
+		double oz = ray.o.z + scene.origin.z;
 		double offsetX = cloudOffset.x;
 		double offsetY = cloudOffset.y;
 		double offsetZ = cloudOffset.z;
 		double inv_size = 1/cloudSize;
-		double cloudBot = offsetY - scene.origin.y;
-		double cloudTop = offsetY - scene.origin.y + 5;
+		double cloudTop = offsetY + 5;
 		int target = 1;
 		double t_offset = 0;
-		if (ray.o.y < cloudBot || ray.o.y > cloudTop) {
+		if (oy < offsetY || oy > cloudTop) {
 			if (ray.d.y > 0) {
-				t_offset = (cloudBot - ray.o.y) / ray.d.y;
+				t_offset = (offsetY - oy) / ray.d.y;
 			} else {
-				t_offset = (cloudTop - ray.o.y) / ray.d.y;
+				t_offset = (cloudTop - oy) / ray.d.y;
 			}
 			if (t_offset < 0) {
 				return false;
 			}
-			// ray is entering cloud
-			if (inCloud((ray.d.x*t_offset + ray.o.x)*inv_size + offsetX, (ray.d.z*t_offset + ray.o.z)*inv_size + offsetZ)) {
+			// Ray is entering cloud.
+			if (inCloud((ray.d.x * t_offset + ox) * inv_size + offsetX,
+					(ray.d.z * t_offset + oz) * inv_size + offsetZ)) {
 				ray.n.set(0, -Math.signum(ray.d.y), 0);
 				onCloudEnter(ray, t_offset);
 				return true;
 			}
-		} else if (inCloud(ray.o.x*inv_size + offsetX, ray.o.z*inv_size + offsetZ)) {
+		} else if (inCloud(ox*inv_size + offsetX, oz*inv_size + offsetZ)) {
 			target = 0;
 		}
 		double tExit;
 		if (ray.d.y > 0) {
-			tExit = (cloudTop - ray.o.y) / ray.d.y - t_offset;
+			tExit = (cloudTop - oy) / ray.d.y - t_offset;
 		} else {
-			tExit = (cloudBot - ray.o.y) / ray.d.y - t_offset;
+			tExit = (offsetY - oy) / ray.d.y - t_offset;
 		}
 		if (ray.t < tExit) {
 			tExit = ray.t;
 		}
-		double x0 = (ray.o.x + ray.d.x*t_offset)*inv_size + offsetX;
-		double z0 = (ray.o.z + ray.d.z*t_offset)*inv_size + offsetZ;
+		double x0 = (ox + ray.d.x*t_offset)*inv_size + offsetX;
+		double z0 = (oz + ray.d.z*t_offset)*inv_size + offsetZ;
 		double xp = x0;
 		double zp = z0;
 		int ix = (int) Math.floor(xp);

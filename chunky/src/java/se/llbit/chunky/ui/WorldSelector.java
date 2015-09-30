@@ -48,6 +48,7 @@ import javax.swing.table.DefaultTableModel;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.Messages;
 import se.llbit.chunky.resources.MinecraftFinder;
+import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 
 /**
@@ -151,6 +152,7 @@ public class WorldSelector extends JDialog {
 		JButton browseBtn = new JButton();
 
 		final JButton loadSelectedBtn = new JButton("Load Selected World");
+		loadSelectedBtn.setIcon(Icon.load.imageIcon());
 		loadSelectedBtn.setEnabled(false);
 		loadSelectedBtn.addActionListener(new ActionListener() {
 			@Override
