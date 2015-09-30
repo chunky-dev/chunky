@@ -1,5 +1,7 @@
 1.3.6 - TBD
 
+* Added output mode selector in the advanced tab, with an option to select PNG
+  output with higher bit depth (16-bit color components).
 * Changed the postprocess JSON variable to String.
 * Added black sky mode, useful for rendering an emitter-only pass.
 * Improved glass pane and iron bars rendering.

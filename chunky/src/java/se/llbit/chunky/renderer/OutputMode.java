@@ -18,10 +18,20 @@ package se.llbit.chunky.renderer;
 
 public enum OutputMode {
 	/** Standard PNG with 8-bit color channels. */
-	PNG,
+	PNG {
+		@Override
+		public String toString() {
+			return "PNG, 8-bit color channels";
+		}
+	},
 
 	/** PNG with 16-bit color channels. */
-	PNG_16;
+	PNG_16 {
+		@Override
+		public String toString() {
+			return "PNG, 16-bit color channels";
+		}
+	};
 
 	public static final OutputMode DEFAULT = PNG;
 

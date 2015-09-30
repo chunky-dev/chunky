@@ -39,6 +39,7 @@ import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.model.WaterModel;
+import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.ProgressListener;
 import se.llbit.chunky.renderer.RenderContext;
@@ -1409,7 +1410,7 @@ public class Scene extends SceneDescription {
 		File targetFile = new File(directory, fileName);
 		computeAlpha(progressListener);
 		finalizeFrame(progressListener);
-		writePNG(buffer, targetFile, progressListener);
+		writePng(targetFile, progressListener);
 	}
 
 	/**
@@ -1417,12 +1418,12 @@ public class Scene extends SceneDescription {
 	 * @param progressListener
 	 * @throws IOException
 	 */
-	public synchronized void saveFrame(File targetFile,
-			ProgressListener progressListener) throws IOException {
+	public synchronized void saveFrame(File targetFile, ProgressListener progressListener)
+			throws IOException {
 
 		computeAlpha(progressListener);
 		finalizeFrame(progressListener);
-		writePNG(backBuffer, targetFile, progressListener);
+		writePng(targetFile, progressListener);
 	}
 
 	/**
@@ -1455,24 +1456,32 @@ public class Scene extends SceneDescription {
 
 	/**
 	 * Write PNG image.
-	 * @param buffer
-	 * @param targetFile
-	 * @param progressListener
+	 *
+	 * @param targetFile file to write to.
 	 */
-	private void writePNG(BufferedImage buffer, File targetFile,
-			ProgressListener progressListener) {
+	private void writePng(File targetFile, ProgressListener progressListener) {
 		try {
 			progressListener.setProgress("Writing PNG", 0, 0, 1);
 			PngFileWriter writer = new PngFileWriter(targetFile);
-			if (transparentSky) {
-				writer.write(buffer, alphaChannel, progressListener);
-			} else {
-				writer.write(buffer, progressListener);
+			if (outputMode == OutputMode.PNG) {
+				if (transparentSky) {
+					writer.write(backBuffer, alphaChannel, progressListener);
+				} else {
+					writer.write(backBuffer, progressListener);
+				}
+			} else if (outputMode == OutputMode.PNG_16) {
+				if (transparentSky) {
+					writer.write16(backBuffer.getWidth(), backBuffer.getHeight(),
+							samples, alphaChannel, exposure, postprocess, progressListener);
+				} else {
+					writer.write16(backBuffer.getWidth(), backBuffer.getHeight(),
+							samples, exposure, postprocess, progressListener);
+				}
 			}
 			if (camera.getProjectionMode() == ProjectionMode.PANORAMIC &&
 					camera.getFoV() >= 179 && camera.getFoV() <= 181) {
-				int height = buffer.getHeight();
-				int width = buffer.getWidth();
+				int height = backBuffer.getHeight();
+				int width = backBuffer.getWidth();
 				StringBuilder xmp = new StringBuilder();
 				xmp.append("<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>\n");
 				xmp.append(" <rdf:Description rdf:about=''\n");
@@ -1503,7 +1512,6 @@ public class Scene extends SceneDescription {
 		} catch (IOException e) {
 			Log.warn("Failed to write PNG file: " + targetFile.getAbsolutePath(), e);
 		}
-
 	}
 
 	private synchronized void saveOctree(
