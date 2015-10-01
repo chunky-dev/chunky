@@ -220,6 +220,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				// Save the current frame.
 				if (mutableScene.shouldSaveSnapshots()
 						|| bufferedScene.spp >= bufferedScene.getTargetSPP()) {
+					bufferedScene.outputMode = mutableScene.outputMode;
 					bufferedScene.saveSnapshot(context.getSceneDirectory(), renderListener);
 				}
 
@@ -496,6 +497,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				}
 			}
 			try {
+				bufferedScene.outputMode = mutableScene.outputMode;
 				bufferedScene.saveFrame(selectedFile, progressListener);
 			} catch (IOException e) {
 				Log.error("Failed to save snapshot", e);
