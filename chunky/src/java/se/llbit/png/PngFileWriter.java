@@ -24,12 +24,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.Deflater;
 
-import org.apache.commons.math3.util.FastMath;
-
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.ProgressListener;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.math.QuickMath;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -126,49 +123,22 @@ public class PngFileWriter {
 	/**
 	 * Write the image to a PNG file with 16-bit color channels.
 	 */
-	public void write16(int width, int height, double[] samples,
-			double exposure, Postprocess postprocess, ProgressListener progressListener)
-			throws IOException {
+	public void write16(Scene scene, double exposure, Postprocess postprocess,
+			ProgressListener progressListener) throws IOException {
+		int width = scene.canvasWidth();
+		int height = scene.canvasHeight();
 		writeChunk(new IHDR(width, height, IHDR.COLOR_TYPE_RGB, 16));
 		IDATWriter idat = new IDATWriter();
 		for (int y = 0; y < height; ++y) {
 			progressListener.setProgress("Writing PNG", y, 0, height);
 			idat.write(IDAT.FILTER_TYPE_NONE); // Scanline header.
 			for (int x = 0; x < width; ++x) {
-				// TODO(jesper): refactor this to fix code duplication.
-				double r = samples[(y*width+x)*3+0];
-				double g = samples[(y*width+x)*3+1];
-				double b = samples[(y*width+x)*3+2];
+				double[] pixel = new double[3];
+				scene.postProcessPixel(x, y, pixel);
 
-				r *= exposure;
-				g *= exposure;
-				b *= exposure;
-
-				switch (postprocess) {
-				case NONE:
-					break;
-				case TONEMAP1:
-					r = QuickMath.max(0, r-0.004);
-					r = (r*(6.2*r + .5)) / (r * (6.2*r + 1.7) + 0.06);
-					g = QuickMath.max(0, g-0.004);
-					g = (g*(6.2*g + .5)) / (g * (6.2*g + 1.7) + 0.06);
-					b = QuickMath.max(0, b-0.004);
-					b = (b*(6.2*b + .5)) / (b * (6.2*b + 1.7) + 0.06);
-					break;
-				case GAMMA:
-					r = FastMath.pow(r, 1/Scene.DEFAULT_GAMMA);
-					g = FastMath.pow(g, 1/Scene.DEFAULT_GAMMA);
-					b = FastMath.pow(b, 1/Scene.DEFAULT_GAMMA);
-					break;
-				}
-
-				r = QuickMath.min(1, r);
-				g = QuickMath.min(1, g);
-				b = QuickMath.min(1, b);
-
-				idat.write16((int) (0xFFFF * r + .5));
-				idat.write16((int) (0xFFFF * g + .5));
-				idat.write16((int) (0xFFFF * b + .5));
+				idat.write16((int) (0xFFFF * pixel[0] + .5));
+				idat.write16((int) (0xFFFF * pixel[1] + .5));
+				idat.write16((int) (0xFFFF * pixel[2] + .5));
 			}
 			progressListener.setProgress("Writing PNG", y + 1, 0, height);
 		}
@@ -178,9 +148,11 @@ public class PngFileWriter {
 	/**
 	 * Write the image to a PNG file with 16-bit color channels.
 	 */
-	public void write16(int width, int height, double[] samples, byte[] alpha,
-			double exposure, Postprocess postprocess, ProgressListener progressListener)
+	public void write16(Scene scene, byte[] alpha, double exposure,
+			Postprocess postprocess, ProgressListener progressListener)
 			throws IOException {
+		int width = scene.canvasWidth();
+		int height = scene.canvasHeight();
 		writeChunk(new IHDR(width, height, IHDR.COLOR_TYPE_RGBA, 16));
 		IDATWriter idat = new IDATWriter();
 		int i = 0;
@@ -188,40 +160,12 @@ public class PngFileWriter {
 			progressListener.setProgress("Writing PNG", y, 0, height);
 			idat.write(IDAT.FILTER_TYPE_NONE); // Scanline header.
 			for (int x = 0; x < width; ++x) {
-				// TODO(jesper): refactor this to fix code duplication.
-				double r = samples[(y*width+x)*3+0];
-				double g = samples[(y*width+x)*3+1];
-				double b = samples[(y*width+x)*3+2];
+				double[] pixel = new double[3];
+				scene.postProcessPixel(x, y, pixel);
 
-				r *= exposure;
-				g *= exposure;
-				b *= exposure;
-
-				switch (postprocess) {
-				case NONE:
-					break;
-				case TONEMAP1:
-					r = QuickMath.max(0, r-0.004);
-					r = (r*(6.2*r + .5)) / (r * (6.2*r + 1.7) + 0.06);
-					g = QuickMath.max(0, g-0.004);
-					g = (g*(6.2*g + .5)) / (g * (6.2*g + 1.7) + 0.06);
-					b = QuickMath.max(0, b-0.004);
-					b = (b*(6.2*b + .5)) / (b * (6.2*b + 1.7) + 0.06);
-					break;
-				case GAMMA:
-					r = FastMath.pow(r, 1/Scene.DEFAULT_GAMMA);
-					g = FastMath.pow(g, 1/Scene.DEFAULT_GAMMA);
-					b = FastMath.pow(b, 1/Scene.DEFAULT_GAMMA);
-					break;
-				}
-
-				r = QuickMath.min(1, r);
-				g = QuickMath.min(1, g);
-				b = QuickMath.min(1, b);
-
-				idat.write16((int) (0xFFFF * r + .5));
-				idat.write16((int) (0xFFFF * g + .5));
-				idat.write16((int) (0xFFFF * b + .5));
+				idat.write16((int) (0xFFFF * pixel[0] + .5));
+				idat.write16((int) (0xFFFF * pixel[1] + .5));
+				idat.write16((int) (0xFFFF * pixel[2] + .5));
 				// TODO(jesper): add real 16-bit alpha channel.
 				idat.write16(alpha[i] << 8);
 				i += 1;

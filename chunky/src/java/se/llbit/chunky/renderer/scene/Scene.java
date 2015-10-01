@@ -1467,11 +1467,9 @@ public class Scene extends SceneDescription {
 				}
 			} else if (outputMode == OutputMode.PNG_16) {
 				if (transparentSky) {
-					writer.write16(backBuffer.getWidth(), backBuffer.getHeight(),
-							samples, alphaChannel, exposure, postprocess, progressListener);
+					writer.write16(this, alphaChannel, exposure, postprocess, progressListener);
 				} else {
-					writer.write16(backBuffer.getWidth(), backBuffer.getHeight(),
-							samples, exposure, postprocess, progressListener);
+					writer.write16(this, exposure, postprocess, progressListener);
 				}
 			}
 			if (camera.getProjectionMode() == ProjectionMode.PANORAMIC &&
@@ -1828,9 +1826,22 @@ public class Scene extends SceneDescription {
 	public void finalizePixel(int x, int y) {
 		finalized = true;
 
-		double r = samples[(y*width+x)*3+0];
-		double g = samples[(y*width+x)*3+1];
-		double b = samples[(y*width+x)*3+2];
+		double[] result = new double[3];
+		postProcessPixel(x, y, result);
+
+		bufferData[y*width + x] = Color.getRGB(result[0], result[1], result[2]);
+	}
+
+	/**
+	 * Postprocess a pixel. This applies gamma correction and clamps the color value to [0,1].
+	 * @param x
+	 * @param y
+	 * @param result the resulting color values are written to this array
+	 */
+	public void postProcessPixel(int x, int y, double[] result) {
+		double r = samples[(y * width + x) * 3 + 0];
+		double g = samples[(y * width + x) * 3 + 1];
+		double b = samples[(y * width + x) * 3 + 2];
 
 		r *= exposure;
 		g *= exposure;
@@ -1842,12 +1853,12 @@ public class Scene extends SceneDescription {
 				break;
 			case TONEMAP1:
 				// http://filmicgames.com/archives/75
-				r = QuickMath.max(0, r-0.004);
-				r = (r*(6.2*r + .5)) / (r * (6.2*r + 1.7) + 0.06);
-				g = QuickMath.max(0, g-0.004);
-				g = (g*(6.2*g + .5)) / (g * (6.2*g + 1.7) + 0.06);
-				b = QuickMath.max(0, b-0.004);
-				b = (b*(6.2*b + .5)) / (b * (6.2*b + 1.7) + 0.06);
+				r = QuickMath.max(0, r - 0.004);
+				r = (r * (6.2 * r + .5)) / (r * (6.2 * r + 1.7) + 0.06);
+				g = QuickMath.max(0, g - 0.004);
+				g = (g * (6.2 * g + .5)) / (g * (6.2 * g + 1.7) + 0.06);
+				b = QuickMath.max(0, b - 0.004);
+				b = (b * (6.2 * b + .5)) / (b * (6.2 * b + 1.7) + 0.06);
 				break;
 			case GAMMA:
 				r = FastMath.pow(r, 1/DEFAULT_GAMMA);
@@ -1861,11 +1872,9 @@ public class Scene extends SceneDescription {
 			b = FastMath.sqrt(b);
 		}
 
-		r = QuickMath.min(1, r);
-		g = QuickMath.min(1, g);
-		b = QuickMath.min(1, b);
-
-		bufferData[y*width + x] = Color.getRGB(r, g, b);
+		result[0] = QuickMath.min(1, r);
+		result[1] = QuickMath.min(1, g);
+		result[2] = QuickMath.min(1, b);
 	}
 
 	/**
