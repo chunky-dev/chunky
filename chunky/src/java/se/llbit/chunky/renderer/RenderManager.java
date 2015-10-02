@@ -470,6 +470,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	 * @param progressListener
 	 */
 	public synchronized void saveSnapshot(ProgressListener progressListener) {
+		final OutputMode outputMode = mutableScene.outputMode;
+		bufferedScene.outputMode = outputMode;
 
 		CenteredFileDialog fileDialog = new CenteredFileDialog(null,
 				"Save Current Frame", FileDialog.SAVE);
@@ -478,17 +480,18 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 			directory = defaultDirectory;
 		}
 		fileDialog.setDirectory(directory);
-		fileDialog.setFile(bufferedScene.name()+"-"+bufferedScene.spp+".png");
+		fileDialog.setFile(String.format("%s-%d%s", bufferedScene.name(), bufferedScene.spp,
+				outputMode.getExtension()));
 		fileDialog.setFilenameFilter(
 			new FilenameFilter() {
 				@Override
 				public boolean accept(File dir, String name) {
-					return name.toLowerCase().endsWith(".png");
+					return name.toLowerCase().endsWith(outputMode.getExtension());
 				}
 			}
 		);
 		fileDialog.setVisible(true);
-		File selectedFile = fileDialog.getSelectedFile(".png");
+		File selectedFile = fileDialog.getSelectedFile(outputMode.getExtension());
 		if (selectedFile != null) {
 			synchronized (RenderManager.class) {
 				File parent = selectedFile.getParentFile();
@@ -497,7 +500,6 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 				}
 			}
 			try {
-				bufferedScene.outputMode = mutableScene.outputMode;
 				bufferedScene.saveFrame(selectedFile, progressListener);
 			} catch (IOException e) {
 				Log.error("Failed to save snapshot", e);

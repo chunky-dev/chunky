@@ -24,9 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.Deflater;
 
-import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.ProgressListener;
-import se.llbit.chunky.renderer.scene.Scene;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -69,8 +67,7 @@ public class PngFileWriter {
 	/**
 	 * Write the image to a PNG file.
 	 */
-	public void write(BufferedImage image, ProgressListener progressListener)
-			throws IOException {
+	public void write(BufferedImage image, ProgressListener progressListener) throws IOException {
 		DataBufferInt dataBuf = (DataBufferInt) image.getData().getDataBuffer();
 		int[] data = dataBuf.getData();
 		int width = image.getWidth();
@@ -113,61 +110,6 @@ public class PngFileWriter {
 				idat.write((rgb >> 8) & 0xFF);
 				idat.write(rgb & 0xFF);
 				idat.write(alpha[i]);
-				i += 1;
-			}
-			progressListener.setProgress("Writing PNG", y + 1, 0, height);
-		}
-		idat.close();
-	}
-
-	/**
-	 * Write the image to a PNG file with 16-bit color channels.
-	 */
-	public void write16(Scene scene, double exposure, Postprocess postprocess,
-			ProgressListener progressListener) throws IOException {
-		int width = scene.canvasWidth();
-		int height = scene.canvasHeight();
-		writeChunk(new IHDR(width, height, IHDR.COLOR_TYPE_RGB, 16));
-		IDATWriter idat = new IDATWriter();
-		for (int y = 0; y < height; ++y) {
-			progressListener.setProgress("Writing PNG", y, 0, height);
-			idat.write(IDAT.FILTER_TYPE_NONE); // Scanline header.
-			for (int x = 0; x < width; ++x) {
-				double[] pixel = new double[3];
-				scene.postProcessPixel(x, y, pixel);
-
-				idat.write16((int) (0xFFFF * pixel[0] + .5));
-				idat.write16((int) (0xFFFF * pixel[1] + .5));
-				idat.write16((int) (0xFFFF * pixel[2] + .5));
-			}
-			progressListener.setProgress("Writing PNG", y + 1, 0, height);
-		}
-		idat.close();
-	}
-
-	/**
-	 * Write the image to a PNG file with 16-bit color channels.
-	 */
-	public void write16(Scene scene, byte[] alpha, double exposure,
-			Postprocess postprocess, ProgressListener progressListener)
-			throws IOException {
-		int width = scene.canvasWidth();
-		int height = scene.canvasHeight();
-		writeChunk(new IHDR(width, height, IHDR.COLOR_TYPE_RGBA, 16));
-		IDATWriter idat = new IDATWriter();
-		int i = 0;
-		for (int y = 0; y < height; ++y) {
-			progressListener.setProgress("Writing PNG", y, 0, height);
-			idat.write(IDAT.FILTER_TYPE_NONE); // Scanline header.
-			for (int x = 0; x < width; ++x) {
-				double[] pixel = new double[3];
-				scene.postProcessPixel(x, y, pixel);
-
-				idat.write16((int) (0xFFFF * pixel[0] + .5));
-				idat.write16((int) (0xFFFF * pixel[1] + .5));
-				idat.write16((int) (0xFFFF * pixel[2] + .5));
-				// TODO(jesper): add real 16-bit alpha channel.
-				idat.write16(alpha[i] << 8);
 				i += 1;
 			}
 			progressListener.setProgress("Writing PNG", y + 1, 0, height);

@@ -78,6 +78,7 @@ import se.llbit.nbt.ListTag;
 import se.llbit.png.IEND;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
+import se.llbit.tiff.TiffFileWriter;
 
 /**
  * Scene description.
@@ -1402,11 +1403,11 @@ public class Scene extends SceneDescription {
 			Log.error("Fatal error: bad output directory!");
 			return;
 		}
-		String fileName = name + "-" + spp + ".png";
+		String fileName = String.format("%s-%d%s", name, spp, outputMode.getExtension());
 		File targetFile = new File(directory, fileName);
 		computeAlpha(progressListener);
 		finalizeFrame(progressListener);
-		writePng(targetFile, progressListener);
+		writeImage(targetFile, progressListener);
 	}
 
 	/**
@@ -1419,7 +1420,7 @@ public class Scene extends SceneDescription {
 
 		computeAlpha(progressListener);
 		finalizeFrame(progressListener);
-		writePng(targetFile, progressListener);
+		writeImage(targetFile, progressListener);
 	}
 
 	/**
@@ -1431,7 +1432,7 @@ public class Scene extends SceneDescription {
 			WorkerState state = new WorkerState();
 			state.ray = new Ray();
 			for (int x = 0; x < width; ++x) {
-				progressListener.setProgress("Computing alpha channel", x+1, 0, width);
+				progressListener.setProgress("Computing alpha channel", x + 1, 0, width);
 				for (int y = 0; y < height; ++y) {
 					computeAlpha(x, y, state);
 				}
@@ -1451,6 +1452,19 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
+	 * Write buffer data to image.
+	 *
+	 * @param targetFile file to write to.
+	 */
+	private void writeImage(File targetFile, ProgressListener progressListener) {
+		if (outputMode == OutputMode.PNG) {
+			writePng(targetFile, progressListener);
+		} else if (outputMode == OutputMode.TIFF_32) {
+			writeTiff(targetFile, progressListener);
+		}
+	}
+
+	/**
 	 * Write PNG image.
 	 *
 	 * @param targetFile file to write to.
@@ -1459,18 +1473,10 @@ public class Scene extends SceneDescription {
 		try {
 			progressListener.setProgress("Writing PNG", 0, 0, 1);
 			PngFileWriter writer = new PngFileWriter(targetFile);
-			if (outputMode == OutputMode.PNG) {
-				if (transparentSky) {
-					writer.write(backBuffer, alphaChannel, progressListener);
-				} else {
-					writer.write(backBuffer, progressListener);
-				}
-			} else if (outputMode == OutputMode.PNG_16) {
-				if (transparentSky) {
-					writer.write16(this, alphaChannel, exposure, postprocess, progressListener);
-				} else {
-					writer.write16(this, exposure, postprocess, progressListener);
-				}
+			if (transparentSky) {
+				writer.write(backBuffer, alphaChannel, progressListener);
+			} else {
+				writer.write(backBuffer, progressListener);
 			}
 			if (camera.getProjectionMode() == ProjectionMode.PANORAMIC &&
 					camera.getFoV() >= 179 && camera.getFoV() <= 181) {
@@ -1505,6 +1511,28 @@ public class Scene extends SceneDescription {
 			writer.close();
 		} catch (IOException e) {
 			Log.warn("Failed to write PNG file: " + targetFile.getAbsolutePath(), e);
+		}
+	}
+
+	/**
+	 * Write TIFF image.
+	 *
+	 * @param targetFile file to write to.
+	 */
+	private void writeTiff(File targetFile, ProgressListener progressListener) {
+		try {
+			progressListener.setProgress("Writing TIFF", 0, 0, 1);
+			TiffFileWriter writer = new TiffFileWriter(targetFile);
+			if (transparentSky) {
+				// TODO(jesper): add TIFF output for transparent sky mode.
+				// Unsupported.
+				Log.error("Can not use transparent sky with TIFF output mode.");
+			} else {
+				writer.write32(this, progressListener);
+			}
+			writer.close();
+		} catch (IOException e) {
+			Log.warn("Failed to write TIFF file: " + targetFile.getAbsolutePath(), e);
 		}
 	}
 
@@ -1829,7 +1857,10 @@ public class Scene extends SceneDescription {
 		double[] result = new double[3];
 		postProcessPixel(x, y, result);
 
-		bufferData[y*width + x] = Color.getRGB(result[0], result[1], result[2]);
+		bufferData[y*width + x] = Color.getRGB(
+				QuickMath.min(1, result[0]),
+				QuickMath.min(1, result[1]),
+				QuickMath.min(1, result[2]));
 	}
 
 	/**
@@ -1872,9 +1903,9 @@ public class Scene extends SceneDescription {
 			b = FastMath.sqrt(b);
 		}
 
-		result[0] = QuickMath.min(1, r);
-		result[1] = QuickMath.min(1, g);
-		result[2] = QuickMath.min(1, b);
+		result[0] = r;
+		result[1] = g;
+		result[2] = b;
 	}
 
 	/**

@@ -21,15 +21,25 @@ public enum OutputMode {
 	PNG {
 		@Override
 		public String toString() {
-			return "PNG, 8-bit color channels";
+			return "PNG, 8 bits per channel";
+		}
+
+		@Override
+		public String getExtension() {
+			return ".png";
 		}
 	},
 
-	/** PNG with 16-bit color channels. */
-	PNG_16 {
+	/** TIFF with 32-bit color channels. */
+	TIFF_32 {
 		@Override
 		public String toString() {
-			return "PNG, 16-bit color channels";
+			return "TIFF, 32 bits per channel, floating point";
+		}
+
+		@Override
+		public String getExtension() {
+			return ".tif";
 		}
 	};
 
@@ -43,4 +53,6 @@ public enum OutputMode {
 		}
 		return DEFAULT;
 	}
+
+	public abstract String getExtension();
 }

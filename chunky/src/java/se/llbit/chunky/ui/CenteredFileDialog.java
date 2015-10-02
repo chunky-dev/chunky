@@ -65,7 +65,7 @@ public class CenteredFileDialog extends FileDialog {
 		if (fileName != null) {
 			File selectedFile;
 			boolean extensionAdded = false;
-			if (getMode() == FileDialog.SAVE && !fileName.endsWith(extension)) {
+			if (getMode() == FileDialog.SAVE && fileName.lastIndexOf('.') == -1) {
 				fileName = fileName + extension;
 				extensionAdded = true;
 			}

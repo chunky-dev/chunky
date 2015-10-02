@@ -3,8 +3,8 @@
 * New scenes have emitters turned off by default.
 * Cloud offset is now fixed relative to world origin.
 * Added chunk count column in scene selector table.
-* Added output mode selector in the advanced tab, with an option to select PNG
-  output with higher bit depth (16-bit color components).
+* Added output mode selector in the advanced tab, with an option to select
+  32-bit TIFF output.
 * Changed the postprocess JSON variable to String.
 * Added black sky mode, useful for rendering an emitter-only pass.
 * Improved glass pane and iron bars rendering.
