@@ -21,6 +21,9 @@ import java.awt.image.DataBufferInt;
 
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
+import se.llbit.chunky.world.entity.SignEntity.Color;
+import se.llbit.json.JsonArray;
+import se.llbit.json.JsonValue;
 import se.llbit.math.Vector4d;
 
 public class SignTexture extends Texture {
@@ -39,7 +42,7 @@ public class SignTexture extends Texture {
 
 	private final Texture texture;
 
-	public SignTexture(String[] textLines) {
+	public SignTexture(JsonArray[] text) {
 		int xmargin = 4;
 		int ymargin = 4;
 		int gh = 10;
@@ -49,43 +52,51 @@ public class SignTexture extends Texture {
 		DataBufferInt db = (DataBufferInt) img.getRaster().getDataBuffer();
 		int[] data = db.getData();
 		int ystart = ymargin;
-		for (String line : textLines) {
-			if (line.isEmpty()) {
+		for (JsonArray line : text) {
+			if (line.getNumElement() == 0) {
 				ystart += gh;
 				continue;
 			}
 			int lineWidth = 0;
-			for (int j = 0; j < line.length(); ++j) {
-				char c = line.charAt(j);
-				Glyph glyph = FontTexture.glyphs[0xFF&c];
-				lineWidth += glyph.width;
-			}
-			int xstart = (width-lineWidth)/2;
-			for (int j = 0; j < line.length(); ++j) {
-				char c = line.charAt(j);
-				Glyph glyph = FontTexture.glyphs[0xFF & c];
-				int k = 0;
-				int y = ystart;
-				for (int py = 0; py < 8; ++py) {
-					k += glyph.xmin;
-					int x = xstart;
-					for (int px = glyph.xmin; px <= glyph.xmax; ++px) {
-						int bit;
-						if (k < 32) {
-							bit = glyph.top & (1 << k);
-						} else {
-							bit = glyph.bot & (1 << (k - 32));
-						}
-						if (bit != 0) {
-							data[y * width + x] = 0xFF000000;
-						}
-						k += 1;
-						x += 1;
-					}
-					k += 7-glyph.xmax;
-					y += 1;
+			for (JsonValue textItem : line.getElementList()) {
+				String textLine = textItem.object().get("text").stringValue("");
+				for (int j = 0; j < textLine.length(); ++j) {
+					char c = textLine.charAt(j);
+					Glyph glyph = FontTexture.glyphs[0xFF & c];
+					lineWidth += glyph.width;
 				}
-				xstart += glyph.width;
+			}
+			int xstart = (width - lineWidth) / 2;
+			for (JsonValue textItem : line.getElementList()) {
+				String textLine = textItem.object().get("text").stringValue("");
+				Color color = Color.get(textItem.object().get("color").intValue(0));
+
+				for (int j = 0; j < textLine.length(); ++j) {
+					char c = textLine.charAt(j);
+					Glyph glyph = FontTexture.glyphs[0xFF & c];
+					int k = 0;
+					int y = ystart;
+					for (int py = 0; py < 8; ++py) {
+						k += glyph.xmin;
+						int x = xstart;
+						for (int px = glyph.xmin; px <= glyph.xmax; ++px) {
+							int bit;
+							if (k < 32) {
+								bit = glyph.top & (1 << k);
+							} else {
+								bit = glyph.bot & (1 << (k - 32));
+							}
+							if (bit != 0) {
+								data[y * width + x] = color.rgbColor;
+							}
+							k += 1;
+							x += 1;
+						}
+						k += 7-glyph.xmax;
+						y += 1;
+					}
+					xstart += glyph.width;
+				}
 			}
 			ystart += gh;
 		}
@@ -97,8 +108,6 @@ public class SignTexture extends Texture {
 		texture.getColor(u, v, c);
 		if (c.w == 0) {
 			Texture.signPost.getColor(u*ww+u0, v*hh+v0, c);
-		} else {
-			c.set(0, 0, 0, c.w);
 		}
 	}
 

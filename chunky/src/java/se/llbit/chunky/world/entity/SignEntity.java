@@ -19,7 +19,9 @@ package se.llbit.chunky.world.entity;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
@@ -40,6 +42,66 @@ import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.CompoundTag;
 
 public class SignEntity extends Entity {
+
+	public enum Color {
+		BLACK(0, 0xFF000000),
+		DARK_BLUE(1, 0xFF0000AA),
+		DARK_GREEN(2, 0xFF00AA00),
+		DARK_AQUA(3, 0xFF00AAAA),
+		DARK_RED(4, 0xFFAA0000),
+		DARK_PURPLE(5, 0xFFAA00AA),
+		GOLD(6, 0xFFFFAA00),
+		GRAY(7, 0xFFAAAAAA),
+		DARK_GRAY(8, 0xFF555555),
+		BLUE(9, 0xFF5555FF),
+		GREEN(10, 0xFF55FF55),
+		AQUA(11, 0xFF55FFFF),
+		RED(12, 0xFFFF5555),
+		LIGHT_PURPLE(13, 0xFFFF55FF),
+		YELLOW(14, 0xFFFFFF55),
+		WHITE(15, 0xFFFFFFFF);
+
+		public final int id;
+		public final int rgbColor;
+
+		private static final Map<String, Color> map = new HashMap<String, Color>();
+
+		static {
+			map.put("dark_blue", DARK_BLUE);
+			map.put("dark_green", DARK_GREEN);
+			map.put("dark_aqua", DARK_AQUA);
+			map.put("dark_red", DARK_RED);
+			map.put("dark_purple", DARK_PURPLE);
+			map.put("gold", GOLD);
+			map.put("gray", GRAY);
+			map.put("dark_gray", DARK_GRAY);
+			map.put("blue", BLUE);
+			map.put("green", GREEN);
+			map.put("aqua", AQUA);
+			map.put("red", RED);
+			map.put("light_purple", LIGHT_PURPLE);
+			map.put("yellow", YELLOW);
+			map.put("white", WHITE);
+
+		}
+
+		Color(int id, int color) {
+			this.id = id;
+			this.rgbColor = color;
+		}
+
+		public static Color get(String color) {
+			if (map.containsKey(color)) {
+				return map.get(color);
+			} else {
+				return Color.BLACK;
+			}
+		}
+
+		public static Color get(int id) {
+			return values()[id & 0xF];
+		}
+	}
 
 	// Facing south.
 	protected static Quad[] sides = {
@@ -99,7 +161,7 @@ public class SignEntity extends Entity {
 		}
 	}
 
-	private final String[] text;
+	private final JsonArray[] text;
 	private final int angle;
 	private final SignTexture texture;
 
@@ -107,7 +169,7 @@ public class SignEntity extends Entity {
 		this(position, getTextLines(entityTag), blockData & 0xF);
 	}
 
-	public SignEntity(Vector3d position, String[] text, int direction) {
+	public SignEntity(Vector3d position, JsonArray[] text, int direction) {
 		super(position);
 		this.text = text;
 		this.angle = direction;
@@ -118,8 +180,8 @@ public class SignEntity extends Entity {
 	 * Extracts the text lines from a sign entity tag.
 	 * @return array of text lines.
 	 */
-	protected static String[] getTextLines(CompoundTag entityTag) {
-		return new String[] {
+	protected static JsonArray[] getTextLines(CompoundTag entityTag) {
+		return new JsonArray[] {
 				extractText(entityTag.get("Text1")),
 				extractText(entityTag.get("Text2")),
 				extractText(entityTag.get("Text3")),
@@ -128,38 +190,58 @@ public class SignEntity extends Entity {
 	}
 
 	/** Extract text from entity tag. */
-	private static String extractText(AnyTag tag) {
+	private static JsonArray extractText(AnyTag tag) {
+		JsonArray array = new JsonArray();
 		String data = tag.stringValue("");
 		if (data.startsWith("\"")) {
-			return data.substring(1, data.length() - 1);
+			addText(array, data.substring(1, data.length() - 1));
 		} else {
-			// TODO(jesper): handle colored text.
 			JsonParser parser = new JsonParser(new ByteArrayInputStream(data.getBytes()));
 			try {
 				JsonValue value = parser.parse();
 				if (value.isObject()) {
 					JsonObject obj = value.object();
-					StringBuilder text = new StringBuilder(obj.get("text").stringValue(""));
+					addText(array, obj.get("text").stringValue(""));
 					JsonArray extraArray = obj.get("extra").array();
 					for (JsonValue extra : extraArray.getElementList()) {
 						if (extra.isObject()) {
-							text.append(extra.object().get("text").stringValue(""));
+							JsonObject extraObject = extra.object();
+							addText(array, extraObject.get("text").stringValue(""),
+									extraObject.get("color").stringValue(""));
 						} else {
-							text.append(extra.stringValue(""));
+							addText(array, extra.stringValue(""));
 						}
 					}
-					return text.toString();
 				} else {
-					StringBuilder text = new StringBuilder();
 					for (JsonValue item : value.array().getElementList()) {
-						text.append(item.stringValue(""));
+						addText(array, item.stringValue(""));
 					}
-					return text.toString();
 				}
 			} catch (IOException e) {
 			} catch (SyntaxError e) {
 			}
-			return "";
+		}
+		return array;
+	}
+
+	/** Add a text entry to a JSON text array. */
+	private static void addText(JsonArray array, String text) {
+		if (!text.isEmpty()) {
+			JsonObject object = new JsonObject();
+			object.add("text", text);
+			array.add(object);
+		}
+	}
+
+	/** Add a text entry with color to a JSON text array. */
+	private static void addText(JsonArray array, String text, String color) {
+		if (!color.isEmpty() && !text.isEmpty()) {
+			JsonObject object = new JsonObject();
+			object.add("text", text);
+			object.add("color", Color.get(color).id);
+			array.add(object);
+		} else {
+			addText(array, text);
 		}
 	}
 
@@ -197,7 +279,7 @@ public class SignEntity extends Entity {
 	public static Entity fromJson(JsonObject json) {
 		Vector3d position = new Vector3d();
 		position.fromJson(json.get("position").object());
-		String[] text = textFromJson(json.get("text"));
+		JsonArray[] text = textFromJson(json.get("text"));
 		int direction = json.get("direction").intValue(0);
 		return new SignEntity(position, text, direction);
 	}
@@ -205,25 +287,25 @@ public class SignEntity extends Entity {
 	/**
 	 * Marshalls sign text to JSON representation.
 	 */
-	protected static JsonArray textToJson(String[] text) {
+	protected static JsonArray textToJson(JsonArray[] text) {
 		JsonArray array = new JsonArray();
-		array.add(text[0]);
-		array.add(text[1]);
-		array.add(text[2]);
-		array.add(text[3]);
+		array.add(text[0].fullCopy());
+		array.add(text[1].fullCopy());
+		array.add(text[2].fullCopy());
+		array.add(text[3].fullCopy());
 		return array;
 	}
 
 	/**
 	 * Unmarshalls sign text from JSON representation.
 	 */
-	protected static String[] textFromJson(JsonValue json) {
+	protected static JsonArray[] textFromJson(JsonValue json) {
 		JsonArray array = json.array();
-		String[] text = new String[4];
-		text[0] = array.get(0).stringValue("");
-		text[1] = array.get(1).stringValue("");
-		text[2] = array.get(2).stringValue("");
-		text[3] = array.get(3).stringValue("");
+		JsonArray[] text = new JsonArray[4];
+		text[0] = array.get(0).array();
+		text[1] = array.get(1).array();
+		text[2] = array.get(2).array();
+		text[3] = array.get(3).array();
 		return text;
 	}
 

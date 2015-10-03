@@ -24,6 +24,7 @@ import se.llbit.chunky.resources.SignTexture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.SignMaterial;
 import se.llbit.chunky.world.material.TextureMaterial;
+import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Quad;
@@ -84,7 +85,7 @@ public class WallSignEntity extends Entity {
 		faces[4] = Model.rotateY(faces[3]);
 	}
 
-	private final String[] text;
+	private final JsonArray[] text;
 	private final int orientation;
 	private final SignTexture texture;
 
@@ -92,7 +93,7 @@ public class WallSignEntity extends Entity {
 		this(position, SignEntity.getTextLines(entityTag), blockData % 6);
 	}
 
-	public WallSignEntity(Vector3d position, String[] text, int direction) {
+	public WallSignEntity(Vector3d position, JsonArray[] text, int direction) {
 		super(position);
 		this.orientation = direction;
 		this.text = text;
@@ -134,7 +135,7 @@ public class WallSignEntity extends Entity {
 	public static Entity fromJson(JsonObject json) {
 		Vector3d position = new Vector3d();
 		position.fromJson(json.get("position").object());
-		String[] text = SignEntity.textFromJson(json.get("text"));
+		JsonArray[] text = SignEntity.textFromJson(json.get("text"));
 		int direction = json.get("direction").intValue(0);
 		return new WallSignEntity(position, text, direction);
 	}
