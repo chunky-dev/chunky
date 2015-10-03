@@ -37,7 +37,7 @@ public enum Postprocess {
 	TONEMAP1 {
 		@Override
 		public String toString() {
-			return "Tonemap op1";
+			return "Tonemap operator 1";
 		}
 	};
 

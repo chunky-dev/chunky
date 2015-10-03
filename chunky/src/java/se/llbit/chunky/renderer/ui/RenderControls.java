@@ -117,7 +117,7 @@ import se.llbit.ui.ErrorLabel;
 public class RenderControls extends JDialog implements ViewListener,
 	RenderStatusListener {
 
-	private static final int[] dumpFrequencies = { 50, 100, 500, 1000, 5000 };
+	private static final int[] dumpFrequencies = { 50, 100, 500, 1000, 2500, 5000 };
 
 	private static final double CHUNK_SELECT_RADIUS = -8 * 1.4142;
 
@@ -1125,6 +1125,7 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	private JPanel buildGeneralPane() {
 		JLabel canvasSizeLbl = new JLabel("Canvas size:");
+		canvasSizeLbl.setIcon(Icon.scale.imageIcon());
 
 		canvasSizeCB.setEditable(true);
 		canvasSizeCB.addItem("400x400");
