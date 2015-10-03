@@ -50,6 +50,12 @@ aspect Json {
 
 	syn boolean JsonValue.isUnknown() = false;
 	eq JsonUnknown.isUnknown() = true;
+	
+	syn boolean JsonValue.isObject() = false;
+	eq JsonObject.isObject() = true;
+
+	syn boolean JsonValue.isArray() = false;
+	eq JsonArray.isArray() = true;
 
 	syn JsonObject JsonValue.object() = new JsonObject();
 	eq JsonObject.object() = this;

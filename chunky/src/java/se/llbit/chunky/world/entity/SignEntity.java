@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.world.entity;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -26,12 +28,15 @@ import se.llbit.chunky.world.material.SignMaterial;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
+import se.llbit.json.JsonParser;
+import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3d;
 import se.llbit.math.Vector4d;
 import se.llbit.math.primitive.Primitive;
+import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.CompoundTag;
 
 public class SignEntity extends Entity {
@@ -115,11 +120,47 @@ public class SignEntity extends Entity {
 	 */
 	protected static String[] getTextLines(CompoundTag entityTag) {
 		return new String[] {
-				entityTag.get("Text1").stringValue(""),
-				entityTag.get("Text2").stringValue(""),
-				entityTag.get("Text3").stringValue(""),
-				entityTag.get("Text4").stringValue(""),
+				extractText(entityTag.get("Text1")),
+				extractText(entityTag.get("Text2")),
+				extractText(entityTag.get("Text3")),
+				extractText(entityTag.get("Text4")),
 		};
+	}
+
+	/** Extract text from entity tag. */
+	private static String extractText(AnyTag tag) {
+		String data = tag.stringValue("");
+		if (data.startsWith("\"")) {
+			return data.substring(1, data.length() - 1);
+		} else {
+			// TODO(jesper): handle colored text.
+			JsonParser parser = new JsonParser(new ByteArrayInputStream(data.getBytes()));
+			try {
+				JsonValue value = parser.parse();
+				if (value.isObject()) {
+					JsonObject obj = value.object();
+					StringBuilder text = new StringBuilder(obj.get("text").stringValue(""));
+					JsonArray extraArray = obj.get("extra").array();
+					for (JsonValue extra : extraArray.getElementList()) {
+						if (extra.isObject()) {
+							text.append(extra.object().get("text").stringValue(""));
+						} else {
+							text.append(extra.stringValue(""));
+						}
+					}
+					return text.toString();
+				} else {
+					StringBuilder text = new StringBuilder();
+					for (JsonValue item : value.array().getElementList()) {
+						text.append(item.stringValue(""));
+					}
+					return text.toString();
+				}
+			} catch (IOException e) {
+			} catch (SyntaxError e) {
+			}
+			return "";
+		}
 	}
 
 	@Override

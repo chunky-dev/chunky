@@ -49,17 +49,7 @@ public class SignTexture extends Texture {
 		DataBufferInt db = (DataBufferInt) img.getRaster().getDataBuffer();
 		int[] data = db.getData();
 		int ystart = ymargin;
-		for (int i = 0; i < 4; ++i) {
-			String line = textLines[i];
-			if (line.startsWith("\"") && line.endsWith("\"")) {
-				line = line.substring(1, line.length() - 1);
-			} else if (line.startsWith("{")) {
-				if (line.startsWith("{\"text\":")) {
-					line = line.substring(9, line.length() - 2);
-				} else {
-					line = "";
-				}
-			}
+		for (String line : textLines) {
 			if (line.isEmpty()) {
 				ystart += gh;
 				continue;
@@ -67,21 +57,13 @@ public class SignTexture extends Texture {
 			int lineWidth = 0;
 			for (int j = 0; j < line.length(); ++j) {
 				char c = line.charAt(j);
-				if (c == '$') {
-					j += 1;
-					continue;
-				}
 				Glyph glyph = FontTexture.glyphs[0xFF&c];
 				lineWidth += glyph.width;
 			}
 			int xstart = (width-lineWidth)/2;
 			for (int j = 0; j < line.length(); ++j) {
 				char c = line.charAt(j);
-				if (c == '$') {
-					j += 1;
-					continue;
-				}
-				Glyph glyph = FontTexture.glyphs[0xFF&c];
+				Glyph glyph = FontTexture.glyphs[0xFF & c];
 				int k = 0;
 				int y = ystart;
 				for (int py = 0; py < 8; ++py) {
@@ -90,12 +72,12 @@ public class SignTexture extends Texture {
 					for (int px = glyph.xmin; px <= glyph.xmax; ++px) {
 						int bit;
 						if (k < 32) {
-							bit = glyph.top & (1<<k);
+							bit = glyph.top & (1 << k);
 						} else {
-							bit = glyph.bot & (1<<(k-32));
+							bit = glyph.bot & (1 << (k - 32));
 						}
 						if (bit != 0) {
-							data[y*width+x] = 0xFF000000;
+							data[y * width + x] = 0xFF000000;
 						}
 						k += 1;
 						x += 1;
