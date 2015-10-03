@@ -21,7 +21,7 @@ public enum OutputMode {
 	PNG {
 		@Override
 		public String toString() {
-			return "PNG, 8 bits per channel";
+			return "PNG";
 		}
 
 		@Override
@@ -34,7 +34,7 @@ public enum OutputMode {
 	TIFF_32 {
 		@Override
 		public String toString() {
-			return "TIFF, 32 bits per channel, floating point";
+			return "TIFF, 32-bit floating point";
 		}
 
 		@Override

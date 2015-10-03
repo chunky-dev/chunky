@@ -1429,12 +1429,16 @@ public class Scene extends SceneDescription {
 	 */
 	private void computeAlpha(ProgressListener progressListener) {
 		if (transparentSky) {
-			WorkerState state = new WorkerState();
-			state.ray = new Ray();
-			for (int x = 0; x < width; ++x) {
-				progressListener.setProgress("Computing alpha channel", x + 1, 0, width);
-				for (int y = 0; y < height; ++y) {
-					computeAlpha(x, y, state);
+			if (outputMode == OutputMode.TIFF_32) {
+				Log.warn("Can not use transparent sky with TIFF output mode.");
+			} else {
+				WorkerState state = new WorkerState();
+				state.ray = new Ray();
+				for (int x = 0; x < width; ++x) {
+					progressListener.setProgress("Computing alpha channel", x + 1, 0, width);
+					for (int y = 0; y < height; ++y) {
+						computeAlpha(x, y, state);
+					}
 				}
 			}
 		}
@@ -1523,13 +1527,7 @@ public class Scene extends SceneDescription {
 		try {
 			progressListener.setProgress("Writing TIFF", 0, 0, 1);
 			TiffFileWriter writer = new TiffFileWriter(targetFile);
-			if (transparentSky) {
-				// TODO(jesper): add TIFF output for transparent sky mode.
-				// Unsupported.
-				Log.error("Can not use transparent sky with TIFF output mode.");
-			} else {
-				writer.write32(this, progressListener);
-			}
+			writer.write32(this, progressListener);
 			writer.close();
 		} catch (IOException e) {
 			Log.warn("Failed to write TIFF file: " + targetFile.getAbsolutePath(), e);
