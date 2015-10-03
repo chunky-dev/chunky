@@ -9,6 +9,7 @@
 * Added black sky mode, useful for rendering an emitter-only pass.
 * Improved glass pane and iron bars rendering.
 * Added rendering for the following Minecraft 1.9 block types:
+    + End Rod
     + Chorus Plant, Flower
     + Purpur Block, Pillar, Slab, Stairs
     + End Stone Bricks

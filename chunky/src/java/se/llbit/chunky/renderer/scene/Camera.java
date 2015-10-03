@@ -52,9 +52,6 @@ import se.llbit.util.JSONifiable;
  */
 public class Camera implements JSONifiable {
 
-	private static final double HALF_PI = Math.PI/2;
-	private static final double TWO_PI = Math.PI*2;
-
 	/**
 	 * @param fov Field of view, in degrees. Maximum 180.
 	 * @return tan(fov/2)
@@ -97,7 +94,7 @@ public class Camera implements JSONifiable {
 	/**
 	 * Yaw angle. Down = 0, forward = -PI/2, up = -PI.
 	 */
-	private double yaw = - HALF_PI;
+	private double yaw = - QuickMath.HALF_PI;
 
 	/**
 	 * Pitch angle. Pitch = 0 corresponds to the camera pointing along the z axis,
@@ -374,10 +371,10 @@ public class Camera implements JSONifiable {
 		this.pitch = QuickMath.min(0, this.pitch);
 		this.pitch = QuickMath.max(-Math.PI, this.pitch);
 
-		if (this.yaw > TWO_PI) {
-			this.yaw -= TWO_PI;
-		} else if (this.yaw < -TWO_PI) {
-			this.yaw += TWO_PI;
+		if (this.yaw > QuickMath.TAU) {
+			this.yaw -= QuickMath.TAU;
+		} else if (this.yaw < -QuickMath.TAU) {
+			this.yaw += QuickMath.TAU;
 		}
 
 		updateTransform();
@@ -397,21 +394,19 @@ public class Camera implements JSONifiable {
 		updateTransform();
 	}
 
-	/**
-	 * Update the camera transformation matrix.
-	 */
+	/** Update the camera transformation matrix. */
 	synchronized void updateTransform() {
 		transform.setIdentity();
 
-		// yaw (y axis rotation)
-		tmpTransform.rotY(HALF_PI + yaw);
+		// Yaw (y axis rotation).
+		tmpTransform.rotY(QuickMath.HALF_PI + yaw);
 		transform.mul(tmpTransform);
 
-		// pitch (x axis rotation)
-		tmpTransform.rotX(HALF_PI - pitch);
+		// Pitch (x axis rotation).
+		tmpTransform.rotX(QuickMath.HALF_PI - pitch);
 		transform.mul(tmpTransform);
 
-		// roll (z axis rotation)
+		// Roll (z axis rotation).
 		tmpTransform.rotZ(roll);
 		transform.mul(tmpTransform);
 
@@ -578,7 +573,7 @@ public class Camera implements JSONifiable {
 		JsonObject orientation = obj.get("orientation").object();
 		roll = orientation.get("roll").doubleValue(0);
 		pitch = orientation.get("pitch").doubleValue(0);
-		yaw = orientation.get("yaw").doubleValue(- HALF_PI);
+		yaw = orientation.get("yaw").doubleValue(-QuickMath.HALF_PI);
 
 		fov = obj.get("fov").doubleValue(0);
 		subjectDistance = obj.get("focalOffset").doubleValue(0);

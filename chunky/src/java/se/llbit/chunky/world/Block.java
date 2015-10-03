@@ -40,6 +40,7 @@ import se.llbit.chunky.model.DragonEggModel;
 import se.llbit.chunky.model.EnchantmentTableModel;
 import se.llbit.chunky.model.EndPortalFrameModel;
 import se.llbit.chunky.model.EndPortalModel;
+import se.llbit.chunky.model.EndRodModel;
 import se.llbit.chunky.model.FarmlandModel;
 import se.llbit.chunky.model.FenceGateModel;
 import se.llbit.chunky.model.FenceModel;
@@ -3376,11 +3377,17 @@ public class Block extends Material {
 			return DoorModel.intersect(ray, texture[ray.getBlockData() >>> 3]);
 		}
 	};
-	public static final Block UNKNOWN0xC6 = new Block(0xC6, "Unknown Block 0xC6", Texture.unknown) {
+	public static final int ENDROD_ID = 0xC6;
+	public static final Block ENDROD = new Block(ENDROD_ID, "End Rod", Texture.endRod) {
 		{
 			isOpaque = false;
 			isSolid = false;
-			isInvisible = UNKNOWN_INVISIBLE;
+			localIntersect = true;
+		}
+
+		@Override
+		public boolean intersect(Ray ray, Scene scene) {
+			return EndRodModel.intersect(ray);
 		}
 	};
 	public static final int CHORUSPLANT_ID = 0xC7;
@@ -3883,7 +3890,7 @@ public class Block extends Material {
 		BIRCHFENCEGATE, JUNGLEFENCEGATE, DARKOAKFENCEGATE, ACACIAFENCEGATE,
 		SPRUCEFENCE, BIRCHFENCE, JUNGLEFENCE, DARKOAKFENCE,
 		ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR, JUNGLEDOOR,
-		ACACIADOOR, DARKOAKDOOR, UNKNOWN0xC6, CHORUSPLANT,
+		ACACIADOOR, DARKOAKDOOR, ENDROD, CHORUSPLANT,
 		CHORUSFLOWER, PURPURBLOCK, PURPURPILLAR, PURPURSTAIRS,
 		PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, UNKNOWN0xCF,
 		GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3,

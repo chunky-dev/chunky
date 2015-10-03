@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -22,7 +22,7 @@ import se.llbit.math.Ray;
 
 @SuppressWarnings("javadoc")
 public class FenceModel {
-	private static AABB post = new AABB(.375, .625, 0, 1, .375, .625);
+	private static AABB post = new AABB(6/16., 10/16., 0, 1, 6/16., 10/16.);
 
 	private static AABB[][] plank = {
 		{

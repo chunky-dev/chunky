@@ -55,6 +55,7 @@ public class BlockTestRenderer {
 
 		String block = "";
 		String targetFile = "";
+		boolean compass = false;
 		for (int i = 0; i < args.length; ++i) {
 			String arg = args[i];
 			if (arg.equals("-help") || arg.equals("-h")) {
@@ -69,6 +70,8 @@ public class BlockTestRenderer {
 					targetFile = args[i+1];
 					i += 1;
 				}
+			} else if (arg.equals("-compass")) {
+				compass = true;
 			} else {
 				if (block.isEmpty()) {
 					block = arg;
@@ -94,16 +97,22 @@ public class BlockTestRenderer {
 					metadataPart = block.substring(sep+1);
 				}
 			}
-			int blockId = Integer.parseInt(blockPart);
+			int blockId;
+			if (blockPart.startsWith("0x")) {
+				blockId = Integer.parseInt(blockPart.substring(2), 16);
+			} else {
+				blockId = Integer.parseInt(blockPart);
+			}
 			int metadata = 0;
 			if (!metadataPart.isEmpty()) {
 				metadata = Integer.parseInt(metadataPart);
 			}
 			renderer = new TestRenderer(null,
 					blockId | (metadata << BlockData.OFFSET),
-					targetFile);
+					targetFile,
+					compass);
 		} else {
-			renderer = new TestRenderer(null, -1, targetFile);
+			renderer = new TestRenderer(null, -1, targetFile, compass);
 		}
 
 		renderer.start();
@@ -116,5 +125,6 @@ public class BlockTestRenderer {
 		out.println("");
 		out.println("Options:");
 		out.println("    -o ARG     write rendered image to file ARG");
+		out.println("    -compass   enable compass");
 	}
 }

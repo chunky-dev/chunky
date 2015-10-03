@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -51,8 +51,7 @@ import se.llbit.math.Vector4d;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 @SuppressWarnings("unused")
-public class TestRenderer extends Thread implements ViewListener,
-	Renderer, Refreshable {
+public class TestRenderer extends Thread implements ViewListener, Renderer, Refreshable {
 
 	private static final int NUM_BUFFERS = 3;
 
@@ -61,8 +60,9 @@ public class TestRenderer extends Thread implements ViewListener,
 	private BufferedImage backBuffer;
 	private final int width;
 	private final int height;
-	private final Camera nextCamera;
-	private final Camera camera;
+	private double yaw, pitch;
+	private final Matrix3d nextTransform = new Matrix3d();
+	private final Matrix3d transform = new Matrix3d();
 	private boolean refresh = true;
 	private final Vector3d camPos = new Vector3d();
 	private final Matrix3d rot = new Matrix3d();
@@ -70,6 +70,8 @@ public class TestRenderer extends Thread implements ViewListener,
 	private double distance;
 	private double nextDistance = 1.5;
 	private final int blockId;
+	private final double fov = 70;
+	private final double fovTan = Camera.clampedFovTan(fov);
 
 	private final Object renderLock = new Object();
 
@@ -95,6 +97,8 @@ public class TestRenderer extends Thread implements ViewListener,
 	private final TestModel testModel = new TestModel();
 	private final String targetFile;
 
+	private final boolean showCompass;
+
 	/**
 	 * Constructor
 	 * @param parent
@@ -109,7 +113,7 @@ public class TestRenderer extends Thread implements ViewListener,
 	 * @param blockId
 	 */
 	public TestRenderer(JFrame parent, int blockId) {
-		this(parent, blockId, "");
+		this(parent, blockId, "", false);
 	}
 
 	/**
@@ -118,9 +122,10 @@ public class TestRenderer extends Thread implements ViewListener,
 	 * @param blockId
 	 * @param targetFile
 	 */
-	public TestRenderer(JFrame parent, int blockId, String targetFile) {
+	public TestRenderer(JFrame parent, int blockId, String targetFile, boolean compass) {
 		super("Test Renderer");
 
+		showCompass = compass;
 		this.blockId = blockId;
 		this.targetFile = targetFile;
 		scene = new Scene();
@@ -132,9 +137,10 @@ public class TestRenderer extends Thread implements ViewListener,
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		backBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
-		camera = new Camera(this);
-		nextCamera = new Camera(this);
-		nextCamera.setView(-3*Math.PI/4, -5*Math.PI/6, 0);
+		yaw = -3*Math.PI/4;
+		pitch = -5*Math.PI/6;
+
+		updateTransform();
 
 		if (targetFile.isEmpty()) {
 			view = new Chunk3DView(this, parent);
@@ -150,9 +156,9 @@ public class TestRenderer extends Thread implements ViewListener,
 			while (!isInterrupted()) {
 
 				testModel.setUp();
-				waitRefresh();
 				synchronized (renderLock) {
-					camera.set(nextCamera);
+					waitRefresh();
+					transform.set(nextTransform);
 					distance = nextDistance;
 				}
 
@@ -197,22 +203,19 @@ public class TestRenderer extends Thread implements ViewListener,
 		Ray ray = new Ray();
 
 		camPos.set(0, -distance, 0);
-		camera.transform(camPos);
+		transform.transform(camPos);
 		camPos.add(.5, .5, .5);
 
 		for (int x = 0; x < width; ++x) {
 
-			double fovTan = Camera.clampedFovTan(70);
-			double rayx = fovTan * aspect *
-					(.5 - ((double) x) / width);
+			double rayx = fovTan * aspect * (.5 - ((double) x) / width);
 
 			for (int y = 0; y < height; ++y) {
 
 				ray.setDefault();
-				ray.d.set(rayx, 1,
-						fovTan * (.5 - ((double) y) / height));
+				ray.d.set(rayx, 1, fovTan * (.5 - ((double) y) / height));
 				ray.d.normalize();
-				camera.transform(ray.d);
+				transform.transform(ray.d);
 
 				ray.o.set(camPos);
 				raytrace(ray);
@@ -240,6 +243,10 @@ public class TestRenderer extends Thread implements ViewListener,
 			if (blockId == -1) {
 				renderTestModel(ray);
 			} else {
+				if (showCompass) {
+					renderCompass(ray);
+				}
+
 				ray.setPrevMat(Block.AIR, 0);
 				Block theBlock = Block.get(blockId);
 				ray.setCurrentMat(theBlock, blockId);
@@ -249,6 +256,13 @@ public class TestRenderer extends Thread implements ViewListener,
 	}
 
 	private void renderTestModel(Ray ray) {
+		renderCompass(ray);
+
+		ray.t = Double.POSITIVE_INFINITY;
+		testModel.intersect(ray);
+	}
+
+	private void renderCompass(Ray ray) {
 		ray.t = Double.POSITIVE_INFINITY;
 		for (int i = 0; i < quads.length; ++i) {
 			if (quads[i].intersect(ray)) {
@@ -256,9 +270,6 @@ public class TestRenderer extends Thread implements ViewListener,
 				tex[i].getColor(ray);
 			}
 		}
-
-		ray.t = Double.POSITIVE_INFINITY;
-		testModel.intersect(ray);
 	}
 
 	private void enterBlock(Ray ray, double[] nearfar) {
@@ -317,18 +328,10 @@ public class TestRenderer extends Thread implements ViewListener,
 
 	@Override
 	public void onStrafeLeft() {
-		synchronized (renderLock) {
-			nextCamera.strafeLeft(.5);
-		}
-		refresh();
 	}
 
 	@Override
 	public void onStrafeRight() {
-		synchronized (renderLock) {
-			nextCamera.strafeRight(.5);
-		}
-		refresh();
 	}
 
 	@Override
@@ -351,36 +354,35 @@ public class TestRenderer extends Thread implements ViewListener,
 
 	@Override
 	public void onMoveForwardFar() {
-		// do nothing
 	}
 
 	@Override
 	public void onMoveBackwardFar() {
-		// do nothing
 	}
 
 	@Override
 	public void onMoveUp() {
-		synchronized (renderLock) {
-			nextCamera.moveUp(.5);
-		}
-		refresh();
 	}
 
 	@Override
 	public void onMoveDown() {
-		synchronized (renderLock) {
-			nextCamera.moveDown(.5);
-		}
-		refresh();
 	}
 
 	@Override
 	public void onMouseDragged(int dx, int dy) {
 		synchronized (renderLock) {
-			nextCamera.rotateView(
-					(Math.PI / 250) * dx,
-					(Math.PI / 250) * dy);
+			double fovRad = QuickMath.degToRad(fov / 2);
+
+			yaw += (Math.PI / 250) * dx * fovRad;
+			pitch += (Math.PI / 250) * dy * fovRad;
+
+			if (yaw > QuickMath.TAU) {
+				yaw -= QuickMath.TAU;
+			} else if (yaw < -QuickMath.TAU) {
+				yaw += QuickMath.TAU;
+			}
+
+			updateTransform();
 		}
 		refresh();
 	}
@@ -405,13 +407,12 @@ public class TestRenderer extends Thread implements ViewListener,
 	@Override
 	public void drawBufferedImage(Graphics g, int width, int height) {
 		synchronized (backBuffer) {
-			g.drawImage(backBuffer, 0, 0, width, height, null);
+			g.drawImage(buffer, 0, 0, width, height, null);
 		}
 	}
 
 	@Override
 	public void setBufferFinalization(boolean flag) {
-		// do nothing
 	}
 
 	@Override
@@ -425,7 +426,7 @@ public class TestRenderer extends Thread implements ViewListener,
 	private void waitRefresh() throws InterruptedException {
 		synchronized (renderLock) {
 			while (!refresh) {
-				wait();
+				renderLock.wait();
 			}
 			refresh = false;
 		}
@@ -437,5 +438,19 @@ public class TestRenderer extends Thread implements ViewListener,
 
 	@Override
 	public void removeSceneStatusListener(SceneStatusListener listener) {
+	}
+
+	private void updateTransform() {
+		Matrix3d tmpTransform = new Matrix3d();
+
+		nextTransform.setIdentity();
+
+		// Yaw (y axis rotation).
+		tmpTransform.rotY(QuickMath.HALF_PI + yaw);
+		nextTransform.mul(tmpTransform);
+
+		// Pitch (x axis rotation).
+		tmpTransform.rotX(QuickMath.HALF_PI - pitch);
+		nextTransform.mul(tmpTransform);
 	}
 }

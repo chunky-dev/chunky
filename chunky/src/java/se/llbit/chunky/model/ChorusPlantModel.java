@@ -25,27 +25,15 @@ import se.llbit.math.Ray;
 public class ChorusPlantModel {
 	private static AABB core = new AABB(4/16., 12/16., 4/16., 12/16., 4/16., 12/16.);
 
-	private static AABB[][] connector = {
-		{
+	private static AABB[] connector = {
 			new AABB(4/16.0, 12/16.0, 4/16.0, 12/16.0, 0, 4/16.),
-		},
-		{
 			new AABB(4/16.0, 12/16.0, 4/16.0, 12/16.0, 12/16., 1),
-		},
-		{
 			new AABB(12/16., 1, 4/16.0, 12/16.0, 4/16.0, 12/16.0),
-		},
-		{
 			new AABB(0, 4/16., 4/16.0, 12/16.0, 4/16.0, 12/16.0),
-		},
-		{
 			// Above.
 			new AABB(4/16., 12/16., 12/16.0, 1, 4/16.0, 12/16.0),
-		},
-		{
 			// Below
 			new AABB(4/16., 12/16., 0, 4/16.0, 4/16.0, 12/16.0),
-		},
 	};
 
 	public static boolean intersect(Ray ray) {
@@ -58,12 +46,10 @@ public class ChorusPlantModel {
 		}
 		for (int i = 0; i < 6; ++i) {
 			if (((ray.getCurrentData() >> BlockData.OFFSET) & (1 << i)) != 0) {
-				for (AABB aabb : connector[i]) {
-					if (aabb.intersect(ray)) {
-						Texture.chorusPlant.getColor(ray);
-						ray.t = ray.tNext;
-						hit = true;
-					}
+				if (connector[i].intersect(ray)) {
+					Texture.chorusPlant.getColor(ray);
+					ray.t = ray.tNext;
+					hit = true;
 				}
 			}
 		}
