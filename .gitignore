@@ -1,22 +1,16 @@
-# eclipse workspace metadata
+# Eclipse workspace metadata.
 /.metadata
 /.recommenders
 
-# vim
+# Vim
 *.swp
 *.*~
 
-# chunky build files
-/build
-/Chunky.nsi
-/release_notes-*.txt
-/chunky.jar
-
-# benchmarking & testing
+# Benchmarking & testing.
 /bench/x*
 /test
 
-# releng
+# Release artifacts.
 /lpcache
 /bin
 /latest.json
@@ -24,16 +18,24 @@
 /snapshot
 /credentials.json
 /credentials.gpg
+/build
+/Chunky.nsi
+/release_notes-*.txt
+/chunky.jar
 
-# IntelliJ IDEA Project files
+
+# IntelliJ IDEA Project files.
 .idea/*
 *.eml
 *.iml
 
-# Render snapshots from testing
+# Render snapshots from testing.
 /*.png
 
-# personal files
+# Private files.
 /TODO
 .DS_Store
 /tools/appbundler-*.jar
+
+# Python virtual environment.
+/venv/
