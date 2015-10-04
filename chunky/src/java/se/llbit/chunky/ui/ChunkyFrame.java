@@ -164,29 +164,39 @@ public class ChunkyFrame extends JFrame {
 	public class InputListener implements AWTEventListener {
 
 		private void keyPressed(KeyEvent e) {
-			switch (e.getKeyCode()) {
-			case KeyEvent.VK_CONTROL:
-				chunky.setCtrlModifier(true);
-				break;
-			case KeyEvent.VK_SHIFT:
-				chunky.setShiftModifier(true);
-				break;
-			case KeyEvent.VK_C:
-				chunky.getMap().showContextMenu();
-				break;
+			if (ChunkyFrame.this.getFocusOwner() != null) {
+				switch (e.getKeyCode()) {
+				case KeyEvent.VK_CONTROL: {
+					chunky.setCtrlModifier(true);
+					break;
+				}
+				case KeyEvent.VK_SHIFT: {
+					chunky.setShiftModifier(true);
+					break;
+				}
+				case KeyEvent.VK_C: {
+					chunky.getMap().showContextMenu();
+					break;
+				}
+				}
 			}
 		}
 
 		private void keyReleased(KeyEvent e) {
-			switch (e.getKeyCode()) {
-			case KeyEvent.VK_CONTROL:
-				chunky.setCtrlModifier(false);
-				break;
-			case KeyEvent.VK_SHIFT:
-				chunky.setShiftModifier(false);
-				break;
+			if (ChunkyFrame.this.getFocusOwner() != null) {
+				switch (e.getKeyCode()) {
+				case KeyEvent.VK_CONTROL: {
+					chunky.setCtrlModifier(false);
+					break;
+				}
+				case KeyEvent.VK_SHIFT: {
+					chunky.setShiftModifier(false);
+					break;
+				}
+				}
 			}
 		}
+
 		@Override
 		public void eventDispatched(AWTEvent event) {
 			if (event instanceof KeyEvent) {
