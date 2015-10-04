@@ -107,6 +107,10 @@ public class PrettyPrinter {
 		out.print(getIndentation(level));
 	}
 
+	public void setIndent(int level) {
+		currentIndent = level;
+	}
+
 	private void pushIndentation() {
 		indentStack.push(currentIndent + indentStack.peek());
 		currentIndent = 0;
