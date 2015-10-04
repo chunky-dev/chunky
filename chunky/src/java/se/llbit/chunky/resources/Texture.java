@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -228,6 +228,8 @@ public class Texture {
 	public static final Texture pistonTop = new Texture("piston-extension");
 	public static final Texture pistonTopSticky = new Texture();
 	public static final Texture fire = new Texture("fire");
+	public static final AnimatedTexture fireLayer0 = new AnimatedTexture("fire");
+	public static final AnimatedTexture fireLayer1 = new AnimatedTexture("fire");
 	public static final Texture redstoneRepeaterOn = new Texture("redstone-repeater-off");
 	public static final Texture redstoneRepeaterOff = new Texture("redstone-repeater-on");
 	public static final Texture redstoneLampOn = new Texture("redstone-lamp-off");
@@ -577,7 +579,7 @@ public class Texture {
 		if (newImage.getType() == BufferedImage.TYPE_INT_ARGB) {
 			image = newImage;
 		} else {
-			// convert to ARGB
+			// Convert to ARGB.
 			image = new BufferedImage(newImage.getWidth(),
 					newImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			Graphics g = image.createGraphics();
@@ -585,7 +587,7 @@ public class Texture {
 			g.dispose();
 		}
 
-		// gamma correct the texture
+		// Gamma correct the texture.
 		avgColorLinear = new float[] { 0, 0, 0, 0 };
 
 		DataBufferInt dataBuffer = (DataBufferInt) image.getRaster().getDataBuffer();
@@ -625,18 +627,20 @@ public class Texture {
 			}
 		}
 
-		avgColorLinear[0] /= width*height;
-		avgColorLinear[1] /= width*height;
-		avgColorLinear[2] /= width*height;
-		avgColorLinear[3] /= width*height;
+		avgColorLinear[0] /= width * height;
+		avgColorLinear[1] /= width * height;
+		avgColorLinear[2] /= width * height;
+		avgColorLinear[3] /= width * height;
 
-		avgColor = Color.getRGBA(FastMath.pow(avgColorLinear[0], 1/Scene.DEFAULT_GAMMA),
+		avgColor = Color.getRGBA(
+				FastMath.pow(avgColorLinear[0], 1/Scene.DEFAULT_GAMMA),
 				FastMath.pow(avgColorLinear[1], 1/Scene.DEFAULT_GAMMA),
-				FastMath.pow(avgColorLinear[2], 1/Scene.DEFAULT_GAMMA), avgColorLinear[3]);
+				FastMath.pow(avgColorLinear[2], 1/Scene.DEFAULT_GAMMA),
+				avgColorLinear[3]);
 	}
 
 	/**
-	 * Get linear color values
+	 * Get linear color values.
 	 * @param u
 	 * @param v
 	 * @param c
@@ -646,15 +650,15 @@ public class Texture {
 	}
 
 	/**
-	 * Get linear color values
-	 * @param ray
+	 * Get linear color values.
+	 * @param ray ray to store color value in.
 	 */
 	public void getColor(Ray ray) {
 		getColor(ray.u, ray.v, ray.color);
 	}
 
 	/**
-	 * Get linear color values
+	 * Get linear color values.
 	 * @param u
 	 * @param v
 	 * @return color

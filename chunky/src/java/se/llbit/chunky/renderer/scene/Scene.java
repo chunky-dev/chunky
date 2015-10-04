@@ -772,6 +772,17 @@ public class Scene extends SceneDescription {
 							}
 							break;
 
+						case Block.FIRE_ID: {
+							long wx = cp.x * 16L + cx;
+							long wy = cy + 1;
+							long wz = cp.z * 16L + cz;
+							long pr = (wx * 3129871L) ^ (wz * 116129781L) ^ (wy);
+							pr = pr * pr * 42317861L + pr * 11L;
+							int dir = 0xF & (int)(pr >> 16);
+							type |= (dir<<BlockData.LILY_PAD_ROTATION);
+						}
+						break;
+
 						case Block.STATIONARYLAVA_ID:
 							type = Block.LAVA_ID;
 						case Block.LAVA_ID:

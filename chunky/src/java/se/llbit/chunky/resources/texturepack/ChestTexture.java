@@ -66,8 +66,7 @@ public class ChestTexture extends TextureRef {
 			TextureFormatError {
 
 		BufferedImage spritemap = ImageIO.read(imageStream);
-		if (spritemap.getWidth() != spritemap.getHeight() ||
-				spritemap.getWidth() % 16 != 0) {
+		if (spritemap.getWidth() != spritemap.getHeight() || spritemap.getWidth() % 16 != 0) {
 			throw new TextureFormatError(
 					"Chest texture files must have equal width and height, divisible by 16!");
 		}

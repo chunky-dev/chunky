@@ -1,5 +1,6 @@
 1.3.6 - TBD
 
+* Fire textures are now loaded from resource pack.
 * New scenes have emitters turned off by default.
 * Cloud offset is now fixed relative to world origin.
 * Added chunk count column in scene selector table.

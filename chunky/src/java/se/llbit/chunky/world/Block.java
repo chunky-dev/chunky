@@ -44,6 +44,7 @@ import se.llbit.chunky.model.EndRodModel;
 import se.llbit.chunky.model.FarmlandModel;
 import se.llbit.chunky.model.FenceGateModel;
 import se.llbit.chunky.model.FenceModel;
+import se.llbit.chunky.model.FireModel;
 import se.llbit.chunky.model.FlowerPotModel;
 import se.llbit.chunky.model.FurnaceModel;
 import se.llbit.chunky.model.GlassPaneModel;
@@ -949,9 +950,10 @@ public class Block extends Material {
 			emittance = 1.0;
 			localIntersect = true;
 		}
+
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
-			return SpriteModel.intersect(ray, Texture.fire);
+			return FireModel.intersect(ray);
 		}
 	};
 	public static final int MONSTERSPAWNER_ID = 0x34;

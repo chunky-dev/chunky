@@ -35,6 +35,7 @@ import javax.imageio.ImageIO;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.resources.texturepack.AlternateTextures;
+import se.llbit.chunky.resources.texturepack.AnimatedTextureLoader;
 import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.CloudsTexture;
 import se.llbit.chunky.resources.texturepack.EntityTextureRef;
@@ -1324,6 +1325,11 @@ public class TexturePackLoader {
 				new SimpleTexture("assets/minecraft/textures/blocks/chorus_plant", Texture.chorusPlant));
 		allTextures.put("end_rod",
 				new SimpleTexture("assets/minecraft/textures/blocks/end_rod", Texture.endRod));
+
+		allTextures.put("fire_layer_0",
+				new AnimatedTextureLoader("assets/minecraft/textures/blocks/fire_layer_0", Texture.fireLayer0));
+		allTextures.put("fire_layer_1",
+				new AnimatedTextureLoader("assets/minecraft/textures/blocks/fire_layer_1", Texture.fireLayer1));
 
 		allTextures.put("paintings_zetterstrand",
 				new SimpleTexture("assets/minecraft/textures/painting/paintings_kristoffer_zetterstrand", Texture.paintings));

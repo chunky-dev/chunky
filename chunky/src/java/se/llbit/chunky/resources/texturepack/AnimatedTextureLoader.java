@@ -26,38 +26,25 @@ import javax.imageio.ImageIO;
 import se.llbit.chunky.resources.Texture;
 
 /**
- * Non-animated texture loader.
+ * Animated texture loader.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class SimpleTexture extends TextureRef {
+public class AnimatedTextureLoader extends TextureRef {
 
 	private final String file;
 	protected Texture texture;
 
-	public SimpleTexture(String file, Texture texture) {
+	public AnimatedTextureLoader(String file, Texture texture) {
 		this.file = file;
 		this.texture = texture;
 	}
 
 	@Override
-	protected boolean load(InputStream imageStream) throws IOException {
+	protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
 		BufferedImage image = ImageIO.read(imageStream);
-
-		if (image.getHeight() > image.getWidth()) {
-			// Assuming this is an animated texture.
-			// Just grab the first frame.
-			int frameW = image.getWidth();
-
-			BufferedImage frame0 = new BufferedImage(frameW, frameW,
-						BufferedImage.TYPE_INT_ARGB);
-			for (int y = 0; y < frameW; ++y) {
-				for (int x = 0; x < frameW; ++x) {
-					frame0.setRGB(x, y, image.getRGB(x, y));
-				}
-			}
-			image = frame0;
+		if (image.getHeight() < image.getWidth()) {
+			throw new TextureFormatError("Block texture should have height >= width.");
 		}
-
 		texture.setTexture(image);
 		return true;
 	}

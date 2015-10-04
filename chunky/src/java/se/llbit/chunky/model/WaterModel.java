@@ -380,7 +380,7 @@ public class WaterModel {
 
 	public static void addPrimitives(List<Primitive> primitives, int data,
 			int x, int y, int z, int size) {
-		// lily pad test
+		// Lily pad test.
 		if ((data & (1<<BlockData.LILY_PAD)) != 0) {
 			double height = y+1-0.12;
 			Vector3d c1 = new Vector3d(x, height, z);
