@@ -56,6 +56,8 @@ public final class PersistentSettings {
 	public static final int DEFAULT_RAY_DEPTH = 5;
 	public static final int DEFAULT_SPP_TARGET = 1000;
 
+	public static final int DEFAULT_DIMENSION = 0;
+
 	/**
 	 * Default canvas width
 	 */
@@ -342,6 +344,15 @@ public final class PersistentSettings {
 
 	public static boolean getSingleColorTextures() {
 		return settings.getBool("singleColorTextures", false);
+	}
+
+	public static void setDimension(int value) {
+		settings.setInt("dimension", value);
+		save();
+	}
+
+	public static int getDimension() {
+		return settings.getInt("dimension", DEFAULT_DIMENSION);
 	}
 }
 

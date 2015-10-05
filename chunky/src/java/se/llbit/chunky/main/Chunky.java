@@ -100,11 +100,10 @@ public class Chunky implements ChunkTopographyListener {
 
 	private final RegionQueue regionQueue = new RegionQueue();
 
-	private final ChunkTopographyUpdater topographyUpdater =
-			new ChunkTopographyUpdater();
+	private final ChunkTopographyUpdater topographyUpdater = new ChunkTopographyUpdater();
 	private final RegionChangeMonitor refresher = new RegionChangeMonitor(this);
 
-	private int currentDimension = 0;
+	private int currentDimension = PersistentSettings.getDimension();
 	private Chunk.Renderer chunkRenderer = Chunk.autoRenderer;
 	private final WorldRenderer worldRenderer = new WorldRenderer();
 	protected ChunkSelectionTracker chunkSelection = new ChunkSelectionTracker();
@@ -324,14 +323,14 @@ public class Chunky implements ChunkTopographyListener {
 
 		chunkSelection.clearSelection();
 
-		// dispose old world
+		// Dispose old world.
 		world.dispose();
 
 		world = newWorld;
 		world.addChunkDeletionListener(chunkSelection);
 		world.addChunkTopographyListener(this);
 
-		// dimension must be set before chunks are loaded
+		// Dimension must be set before chunks are loaded.
 		world.setDimension(currentDimension);
 
 		setView(0, 0);
@@ -533,6 +532,7 @@ public class Chunky implements ChunkTopographyListener {
 	public void setDimension(int value) {
 		if (value != currentDimension) {
 			currentDimension = value;
+			PersistentSettings.setDimension(currentDimension);
 			loadWorld(world);
 		}
 	}
