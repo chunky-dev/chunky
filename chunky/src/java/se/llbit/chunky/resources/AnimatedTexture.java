@@ -27,11 +27,12 @@ import se.llbit.math.Ray;
  */
 public class AnimatedTexture extends Texture {
 
-	private int numFrames = 0;
-	private int frameHeight = 0;
+	protected int numFrames = 1;
+	protected int frameHeight = 0;
 
 	public AnimatedTexture(String resourceName) {
 		super(resourceName);
+		updateNumFrames();
 	}
 
 	/** Get color for animation frame. */
@@ -45,8 +46,12 @@ public class AnimatedTexture extends Texture {
 	@Override
 	public void setTexture(BufferedImage newImage) {
 		super.setTexture(newImage);
+		updateNumFrames();
+	}
 
-		numFrames = (int) (height / (float) width);
+	private void updateNumFrames() {
 		frameHeight = Math.min(height, width);
+		numFrames = (int) (frameHeight / (float) width);
+		numFrames = Math.max(1, numFrames);
 	}
 }
