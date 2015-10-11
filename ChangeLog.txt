@@ -1,5 +1,7 @@
 1.3.7 - TBD
 
+* Fixed potential crash when loading custom resource pack while the default
+  resource pack could not be found.
 * Store the current world dimension and re-open the current world in the same
   dimension next time Chunky starts.
 
