@@ -1,5 +1,8 @@
 1.3.7 - TBD
 
+* Added player entity rendering.
+* Added option to disable player loading in the General tab in the
+  Render Controls window.
 * Fixed potential crash when rendering fire.
 * Fixed potential crash when loading custom resource pack while the default
   resource pack could not be found.

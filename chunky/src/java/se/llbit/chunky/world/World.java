@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -33,6 +33,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.ui.ProgressPanel;
 import se.llbit.chunky.world.entity.Entity;
 import se.llbit.chunky.world.entity.PlayerEntity;
@@ -184,14 +185,7 @@ public class World implements Comparable<World> {
 			request.add(".Data.version");
 			request.add(".Data.RandomSeed");
 			request.add(".Data.Player.Dimension");
-			request.add(".Data.Player.Pos.0");
-			request.add(".Data.Player.Pos.1");
-			request.add(".Data.Player.Pos.2");
-			request.add(".Data.Player.Rotation.0");
-			request.add(".Data.Player.Rotation.1");
-			request.add(".Data.Player.SpawnX");
-			request.add(".Data.Player.SpawnY");
-			request.add(".Data.Player.SpawnZ");
+			request.add(".Data.Player");
 			request.add(".Data.LevelName");
 			request.add(".Data.GameType");
 			Map<String, AnyTag> result = NamedTag.quickParse(in, request);
@@ -205,14 +199,15 @@ public class World implements Comparable<World> {
 						" is not supported by Chunky.\n" +
 						"Will attempt to load the world anyway.");
 			}
-			AnyTag posX = result.get(".Data.Player.Pos.0");
-			AnyTag posY = result.get(".Data.Player.Pos.1");
-			AnyTag posZ = result.get(".Data.Player.Pos.2");
-			AnyTag yaw = result.get(".Data.Player.Rotation.0");
-			AnyTag pitch = result.get(".Data.Player.Rotation.1");
-			AnyTag spawnX = result.get(".Data.Player.SpawnX");
-			AnyTag spawnY = result.get(".Data.Player.SpawnY");
-			AnyTag spawnZ = result.get(".Data.Player.SpawnZ");
+			AnyTag player = result.get(".Data.Player");
+			AnyTag posX = player.get("Pos").get(0);
+			AnyTag posY = player.get("Pos").get(1);
+			AnyTag posZ = player.get("Pos").get(2);
+			AnyTag yaw = player.get("Rotation").get(0);
+			AnyTag pitch = player.get("Rotation").get(1);
+			AnyTag spawnX = player.get("SpawnX");
+			AnyTag spawnY = player.get("SpawnY");
+			AnyTag spawnZ = player.get("SpawnZ");
 			AnyTag gameType = result.get(".Data.GameType");
 			AnyTag randomSeed = result.get(".Data.RandomSeed");
 
@@ -881,7 +876,7 @@ public class World implements Comparable<World> {
 	 */
 	public Collection<Entity> getEntityData() {
 		Collection<Entity> list = new LinkedList<Entity>();
-		if (havePlayerPos) {
+		if (havePlayerPos && PersistentSettings.getLoadPlayers()) {
 			list.add(new PlayerEntity(
 					new Vector3d(playerX, playerY, playerZ),
 					playerYaw, playerPitch));

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -354,5 +354,15 @@ public final class PersistentSettings {
 	public static int getDimension() {
 		return settings.getInt("dimension", DEFAULT_DIMENSION);
 	}
+
+	public static boolean getLoadPlayers() {
+		return settings.getBool("loadPlayers", true);
+	}
+
+	public static void setLoadPlayers(boolean value) {
+		settings.setBool("loadPlayers", value);
+		save();
+	}
+
 }
 

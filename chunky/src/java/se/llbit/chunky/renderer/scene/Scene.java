@@ -176,9 +176,7 @@ public class Scene extends SceneDescription {
 
 	private List<Primitive> primitives = new LinkedList<Primitive>();
 
-	/**
-	 * Entities in the scene
-	 */
+	/** Entities in the scene. */
 	private Collection<Entity> entities = new LinkedList<Entity>();
 
 	private BVH bvh = new BVH(Collections.<Primitive>emptyList());
