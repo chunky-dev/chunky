@@ -109,7 +109,7 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 
 		overlay = new OverlayPanel(content.getViewport());
 
-		final JLabel scaleIcon = new JLabel(Icon.scale.imageIcon());
+		final JLabel scaleIcon = new JLabel(Icon.magnify.imageIcon());
 		scaleIcon.setText("1:1");
 		scaleUp.setToolTipText("Increases canvas scaling.");
 		scaleUp.addActionListener(new ActionListener() {

@@ -46,6 +46,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -91,6 +92,7 @@ import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.renderer.scene.Sky.SkyMode;
 import se.llbit.chunky.renderer.scene.Sun;
+import se.llbit.chunky.resources.MiscImages;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.Chunk;
@@ -1879,6 +1881,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		});
 
 		JButton cameraToPlayerBtn = new JButton("Camera to player");
+		cameraToPlayerBtn.setIcon(new ImageIcon(MiscImages.face));
 		cameraToPlayerBtn.setToolTipText("Move camera to player position");
 		cameraToPlayerBtn.addActionListener(new ActionListener() {
 			@Override
