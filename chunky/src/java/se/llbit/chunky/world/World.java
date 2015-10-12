@@ -34,6 +34,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import se.llbit.chunky.ui.ProgressPanel;
+import se.llbit.chunky.world.entity.Entity;
+import se.llbit.chunky.world.entity.PlayerEntity;
 import se.llbit.chunky.world.listeners.ChunkDeletionListener;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
@@ -872,5 +874,18 @@ public class World implements Comparable<World> {
 
 	public long getSeed() {
 		return seed;
+	}
+
+	/**
+	 * Load entities from world file
+	 */
+	public Collection<Entity> getEntityData() {
+		Collection<Entity> list = new LinkedList<Entity>();
+		if (havePlayerPos) {
+			list.add(new PlayerEntity(
+					new Vector3d(playerX, playerY, playerZ),
+					playerYaw, playerPitch));
+		}
+		return list;
 	}
 }

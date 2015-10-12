@@ -57,6 +57,8 @@ abstract public class Entity {
 			return WallSignEntity.fromJson(json);
 		} else if (kind.equals("skull")) {
 			return SkullEntity.fromJson(json);
+		} else if (kind.equals("player")) {
+			return PlayerEntity.fromJson(json);
 		}
 		return null;
 	}

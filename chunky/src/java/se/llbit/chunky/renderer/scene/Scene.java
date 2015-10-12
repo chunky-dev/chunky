@@ -637,6 +637,11 @@ public class Scene extends SceneDescription {
 		int ycutoff = PersistentSettings.getYCutoff();
 		ycutoff = Math.max(0, ycutoff);
 
+		task = "Loading entities";
+		progressListener.setProgress(task, 0, 0, 1);
+		entities = world.getEntityData();
+		progressListener.setProgress(task, 1, 0, 1);
+
 		Heightmap biomeIdMap = new Heightmap();
 		task = "Loading chunks";
 		int done = 1;
