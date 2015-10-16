@@ -87,6 +87,7 @@ import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.CameraPreset;
+import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.Sky;
@@ -196,6 +197,7 @@ public class RenderControls extends JDialog implements ViewListener,
 	private final JRadioButton v180Btn = new JRadioButton("180");
 	private final JComboBox outputMode = new JComboBox(OutputMode.values());
 	private final JCheckBox loadPlayersCB = new JCheckBox();
+	private final JComboBox playerModel = new JComboBox();
 
 	private final JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -1228,15 +1230,23 @@ public class RenderControls extends JDialog implements ViewListener,
 		JSeparator sep1 = new JSeparator();
 		JSeparator sep2 = new JSeparator();
 
-		loadPlayersCB.setText("load players");
+		loadPlayersCB.setText("Load players");
 		loadPlayersCB.setToolTipText("Enable/disable player entity loading. "
 				+ "Reload the chunks after changing this option.");
 		updateLoadPlayersCB();
 
-		biomeColorsCB.setText("enable biome colors");
+		JLabel playerModelLbl = new JLabel("Player model: ");
+
+		for (PlayerModel model : PlayerModel.values()) {
+			playerModel.addItem(model);
+		}
+		playerModel.setToolTipText("Reload chunks after changing this option.");
+		updatePlayerModel();
+
+		biomeColorsCB.setText("Enable biome colors");
 		updateBiomeColorsCB();
 
-		saveDumpsCB.setText("save dump once every ");
+		saveDumpsCB.setText("Save dump once every ");
 		saveDumpsCB.addActionListener(saveDumpsListener);
 		updateSaveDumpsCheckBox();
 
@@ -1287,6 +1297,10 @@ public class RenderControls extends JDialog implements ViewListener,
 				)
 				.addComponent(sep2)
 				.addComponent(loadPlayersCB)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(playerModelLbl)
+					.addComponent(playerModel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				)
 				.addComponent(biomeColorsCB)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(saveDumpsCB)
@@ -1328,6 +1342,11 @@ public class RenderControls extends JDialog implements ViewListener,
 			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(loadPlayersCB)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+				.addComponent(playerModelLbl)
+				.addComponent(playerModel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(biomeColorsCB)
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
@@ -2096,16 +2115,23 @@ public class RenderControls extends JDialog implements ViewListener,
 		fastFogCB.addActionListener(fastFogListener);
 	}
 
+	protected void updatePlayerModel() {
+		playerModel.removeActionListener(playerModelListener);
+		String model = PersistentSettings.getPlayerModel();
+		playerModel.setSelectedItem(PlayerModel.get(model));
+		playerModel.addActionListener(playerModelListener);
+	}
+
 	protected void updateLoadPlayersCB() {
 		loadPlayersCB.removeActionListener(loadPlayersCBListener);
-		loadPlayersCB.addActionListener(loadPlayersCBListener);
 		loadPlayersCB.setSelected(PersistentSettings.getLoadPlayers());
+		loadPlayersCB.addActionListener(loadPlayersCBListener);
 	}
 
 	protected void updateBiomeColorsCB() {
 		biomeColorsCB.removeActionListener(biomeColorsCBListener);
-		biomeColorsCB.addActionListener(biomeColorsCBListener);
 		biomeColorsCB.setSelected(renderMan.scene().biomeColorsEnabled());
+		biomeColorsCB.addActionListener(biomeColorsCBListener);
 	}
 
 	protected void updateTransparentSky() {
@@ -2438,6 +2464,14 @@ public class RenderControls extends JDialog implements ViewListener,
 			if (v180Btn.isSelected()) {
 				renderMan.scene().sky().setMirrored(false);
 			}
+		}
+	};
+	private final ActionListener playerModelListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JComboBox source = (JComboBox) e.getSource();
+			PlayerModel model = (PlayerModel) source.getSelectedItem();
+			PersistentSettings.setPlayerModel(model.name());
 		}
 	};
 	private final ActionListener loadPlayersCBListener = new ActionListener() {
@@ -2795,6 +2829,7 @@ public class RenderControls extends JDialog implements ViewListener,
 		updateSkyRotation();
 		updateVerticalResolution();
 		updateLoadPlayersCB();
+		updatePlayerModel();
 		updateBiomeColorsCB();
 		updateTransparentSky();
 		fogDensity.update();

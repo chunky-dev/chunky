@@ -29,11 +29,11 @@ import se.llbit.chunky.resources.EntityTexture;
  * Helper to load entity textures, i.e. creeper, zombie, skeleton etc. textures.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class EntityTextureRef extends TextureRef {
+public class EntityTextureLoader extends TextureRef {
 	private final String file;
 	private final EntityTexture texture;
 
-	public EntityTextureRef(String file, EntityTexture texture) {
+	public EntityTextureLoader(String file, EntityTexture texture) {
 		this.file = file;
 		this.texture = texture;
 	}

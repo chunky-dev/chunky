@@ -38,7 +38,7 @@ import se.llbit.chunky.resources.texturepack.AlternateTextures;
 import se.llbit.chunky.resources.texturepack.AnimatedTextureLoader;
 import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.CloudsTexture;
-import se.llbit.chunky.resources.texturepack.EntityTextureRef;
+import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
 import se.llbit.chunky.resources.texturepack.FoliageColorTexture;
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.GrassColorTexture;
@@ -46,6 +46,7 @@ import se.llbit.chunky.resources.texturepack.IndexedTexture;
 import se.llbit.chunky.resources.texturepack.LargeChestTexture;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.chunky.resources.texturepack.TextureRef;
+import se.llbit.chunky.resources.texturepack.ThinArmEntityTextureLoader;
 import se.llbit.log.Log;
 
 /**
@@ -1337,17 +1338,17 @@ public class TexturePackLoader {
 				new FontTexture("assets/minecraft/textures/font/ascii"));
 
 		allTextures.put("alex",
-				new EntityTextureRef("assets/minecraft/textures/entity/alex", Texture.alex));
+				new ThinArmEntityTextureLoader("assets/minecraft/textures/entity/alex", Texture.alex));
 		allTextures.put("steve",
-				new EntityTextureRef("assets/minecraft/textures/entity/steve", Texture.steve));
+				new EntityTextureLoader("assets/minecraft/textures/entity/steve", Texture.steve));
 		allTextures.put("creeper",
-				new EntityTextureRef("assets/minecraft/textures/entity/creeper/creeper", Texture.creeper));
+				new EntityTextureLoader("assets/minecraft/textures/entity/creeper/creeper", Texture.creeper));
 		allTextures.put("zombie",
-				new EntityTextureRef("assets/minecraft/textures/entity/zombie/zombie", Texture.zombie));
+				new EntityTextureLoader("assets/minecraft/textures/entity/zombie/zombie", Texture.zombie));
 		allTextures.put("skeleton",
-				new EntityTextureRef("assets/minecraft/textures/entity/skeleton/skeleton", Texture.skeleton));
+				new EntityTextureLoader("assets/minecraft/textures/entity/skeleton/skeleton", Texture.skeleton));
 		allTextures.put("wither",
-				new EntityTextureRef("assets/minecraft/textures/entity/wither/wither", Texture.wither));
+				new EntityTextureLoader("assets/minecraft/textures/entity/wither/wither", Texture.wither));
 	}
 
 	/**

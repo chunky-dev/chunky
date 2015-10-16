@@ -364,5 +364,14 @@ public final class PersistentSettings {
 		save();
 	}
 
+	public static String getPlayerModel() {
+		return settings.getString("playerModel", "STEVE");
+	}
+
+	public static void setPlayerModel(String model) {
+		settings.setString("playerModel", model);
+		save();
+	}
+
 }
 
