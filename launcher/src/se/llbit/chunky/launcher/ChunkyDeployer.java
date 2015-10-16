@@ -63,7 +63,7 @@ public class ChunkyDeployer {
 			return false;
 		}
 
-		// check version
+		// Check version.
 		try {
 			FileInputStream in = new FileInputStream(versionFile);
 			JsonParser parser = new JsonParser(in);
@@ -160,7 +160,7 @@ public class ChunkyDeployer {
 
 			ClassLoader parentCL = ChunkyLauncher.class.getClassLoader();
 
-			// deploy libraries that were not already installed correctly
+			// Deploy libraries that were not already installed correctly.
 			for (Library lib: version.libraries) {
 				if (lib.testIntegrity(libDir) != LibraryStatus.PASSED) {
 					unpackLibrary(parentCL, "lib/" + lib.name,
@@ -236,7 +236,7 @@ public class ChunkyDeployer {
 		}
 		ProcessBuilder procBuilder = new ProcessBuilder(command);
 		final Logger logger;
-		if (!settings.headless && settings.debugConsole) {
+		if (settings.forceGuiConsole || (!settings.headless && settings.debugConsole)) {
 			DebugConsole console = new DebugConsole(null, settings.closeConsoleOnExit);
 			console.setVisible(true);
 			logger = console;
@@ -248,7 +248,7 @@ public class ChunkyDeployer {
 			Runtime.getRuntime().addShutdownHook(new Thread() {
 				@Override
 				public void run() {
-					// kill the subprocess
+					// Kill the subprocess.
 					proc.destroy();
 				}
 			});
@@ -300,11 +300,11 @@ public class ChunkyDeployer {
 			shutdownThread.start();
 			try {
 				if (mode == ChunkyMode.GUI) {
-					// just wait a little while to check for startup errors
+					// Just wait a little while to check for startup errors.
 					Thread.sleep(3000);
 					return shutdownThread.exitValue;
 				} else {
-					// wait until completion so we can return correct exit code
+					// Wait until completion so we can return correct exit code.
 					return shutdownThread.exitValue();
 				}
 			} catch (InterruptedException e) {
@@ -312,18 +312,19 @@ public class ChunkyDeployer {
 			return 0;
 		} catch (IOException e) {
 			logger.appendErrorLine(e.getMessage());
-			// 3 indicates launcher error
+			// TODO(jesper): Add constant for this return value.
+			// Exit code 3 indicates launcher error.
 			return 3;
 		}
 	}
 
 	/**
-	 * @param command
+	 * Convert a command in list form to string.
 	 * @return command in string form
 	 */
 	public static String commandString(List<String> command) {
 		StringBuilder sb = new StringBuilder();
-		for (String part: command) {
+		for (String part : command) {
 			if (sb.length() > 0) {
 				sb.append(" ");
 			}
@@ -339,7 +340,7 @@ public class ChunkyDeployer {
 		cmd.add("-Xmx" + settings.memoryLimit + "m");
 
 		String[] parts = settings.javaOptions.split(" ");
-		for (String part: parts) {
+		for (String part : parts) {
 			if (!part.isEmpty()) {
 				cmd.add(part);
 			}
@@ -355,7 +356,7 @@ public class ChunkyDeployer {
 		cmd.add("se.llbit.chunky.main.Chunky");
 
 		parts = settings.chunkyOptions.split(" ");
-		for (String part: parts) {
+		for (String part : parts) {
 			if (!part.isEmpty()) {
 				cmd.add(part);
 			}
@@ -368,7 +369,7 @@ public class ChunkyDeployer {
 		File chunkyDir = PersistentSettings.getSettingsDirectory();
 		File libDir = new File(chunkyDir, "lib");
 		List<File> jars = new ArrayList<File>();
-		for (VersionInfo.Library library: version.libraries) {
+		for (VersionInfo.Library library : version.libraries) {
 			jars.add(library.getFile(libDir));
 		}
 		String classpath = "";
@@ -429,7 +430,7 @@ public class ChunkyDeployer {
 	public static VersionInfo resolveVersion(String name) {
 		List<VersionInfo> versions = availableVersions();
 		VersionInfo version = VersionInfo.LATEST;
-		for (VersionInfo info: versions) {
+		for (VersionInfo info : versions) {
 			if (info.name.equals(name)) {
 				version = info;
 				break;
@@ -448,7 +449,7 @@ public class ChunkyDeployer {
 
 	public static boolean canLaunch(VersionInfo version, ChunkyLauncher launcher, boolean reportErrors) {
 		if (version == VersionInfo.NONE) {
-			// version not available!
+			// Version not available!
 			System.err.println("No version installed");
 			if (reportErrors) {
 				Dialogs.error(launcher,

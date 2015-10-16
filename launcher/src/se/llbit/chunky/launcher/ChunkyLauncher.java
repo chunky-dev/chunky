@@ -58,7 +58,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame implements UpdateListener {
 
-	private static final String LAUNCHER_VERSION = "v1.8.10";
+	private static final String LAUNCHER_VERSION = "v1.8.11";
 
 	protected String java;
 	private final ChunkyDeployer deployer;
@@ -563,8 +563,7 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 		final LauncherSettings settings = new LauncherSettings();
 		settings.load();
 
-		/*
-		 * If there are command line arguments then we assume that Chunky should run
+		/* If there are command line arguments then we assume that Chunky should run
 		 * in headless mode, unless the --nolauncher command is present in which case
 		 * we strip that and start regularly, but without launcher. The --launcher
 		 * option overrides everything else and forces the launcher to appear.
@@ -586,6 +585,8 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 					return;
 				} else if (arg.equals("--verbose")) {
 					settings.verboseLauncher = true;
+				} else if (arg.equals("--console")) {
+					settings.forceGuiConsole = true;
 				} else if (arg.equals("--update") || arg.equals("--updateAlpha")) {
 					if (arg.equals("--updateAlpha")) {
 						System.out.println("Checking for Chunky alpha/snapshot updates..");

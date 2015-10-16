@@ -28,6 +28,7 @@ public class LauncherSettings {
 	public String javaDir = "";
 	public int memoryLimit = DEFAULT_MEMORY_LIMIT;
 	public boolean debugConsole = false;
+	public boolean forceGuiConsole = false;
 	public boolean verboseLogging = false;
 	public boolean verboseLauncher = false;
 	public String javaOptions = "";

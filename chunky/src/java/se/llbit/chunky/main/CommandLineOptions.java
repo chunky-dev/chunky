@@ -44,6 +44,7 @@ import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 import se.llbit.util.MCDownloader;
+import se.llbit.util.StringUtil;
 
 public class CommandLineOptions {
 	enum Mode {
@@ -56,41 +57,42 @@ public class CommandLineOptions {
 	/**
 	 * The help string
 	 */
-	private static final String USAGE =
-		"Usage: chunky [OPTIONS] [WORLD DIRECTORY]\n" +
-		"Options:\n" +
-		"  -texture <FILE>        use FILE as the texture pack (must be a Zip file)\n" +
-		"  -render <SCENE>        render the specified scene (see notes)\n" +
-		"  -snapshot <SCENE> [PNG] create a snapshot of the specified scene\n" +
-		"  -scene-dir <DIR>       use the directory DIR for loading/saving scenes\n" +
-		"  -benchmark             run the benchmark and exit\n" +
-		"  -threads <NUM>         use the specified number of threads for rendering\n" +
-		"  -tile-width <NUM>      use the specified job tile width\n" +
-		"  -target <NUM>          override target SPP to be NUM in headless mode\n" +
-		"  -opencl                enables OpenCL rendering in the GUI\n" +
-		"  -set <NAME> <VALUE>    set a global configuration option and exit\n" +
-		"  -reset <NAME>          reset a global configuration option and exit\n" +
-		"  -set <NAME> <VALUE> <SCENE>\n" +
-		"                         set a configuration option for a scene and exit\n" +
-		"  -reset <NAME> <SCENE>  reset a configuration option for a scene and exit\n" +
-		"  -reset <NAME> <SCENE>  reset a configuration option for a scene and exit\n" +
-		"  -download-mc <VERSION> download the given Minecraft version and exit\n" +
-		"  -help                  show this text\n" +
-		"\n" +
-		"Notes:\n" +
-		"<SCENE> can be either the path to a Scene Description File (" + SceneDescription.SCENE_DESCRIPTION_EXTENSION + "),\n" +
-		"*OR* the name of a scene relative to the scene directory (excluding extension).\n" +
-		"If the scene name is an absolute path then the scene directory will be the\n" +
-		"parent directory of the Scene Description File, otherwise the scene directory\n" +
-		"can be overridden temporarily by the -scene-dir option.\n" +
-		"\n" +
-		"Launcher options:\n" +
-		"  --update              download the latest version of Chunky and exit\n" +
-		"  --setup               configure memory limit and Java options for Chunky\n" +
-		"  --nolauncher          start Chunky as normal, but without opening launcher\n" +
-		"  --launcher            forces the launcher window to be displayed\n" +
-		"  --version             print the launcher version and exit\n" +
-		"  --verbose             verbose logging in the launcher\n";
+	private static final String USAGE = StringUtil.join("\n",
+		"Usage: chunky [OPTIONS] [WORLD DIRECTORY]",
+		"Options:",
+		"  -texture <FILE>        use FILE as the texture pack (must be a Zip file)",
+		"  -render <SCENE>        render the specified scene (see notes)",
+		"  -snapshot <SCENE> [PNG] create a snapshot of the specified scene",
+		"  -scene-dir <DIR>       use the directory DIR for loading/saving scenes",
+		"  -benchmark             run the benchmark and exit",
+		"  -threads <NUM>         use the specified number of threads for rendering",
+		"  -tile-width <NUM>      use the specified job tile width",
+		"  -target <NUM>          override target SPP to be NUM in headless mode",
+		"  -opencl                enables OpenCL rendering in the GUI",
+		"  -set <NAME> <VALUE>    set a global configuration option and exit",
+		"  -reset <NAME>          reset a global configuration option and exit",
+		"  -set <NAME> <VALUE> <SCENE>",
+		"                         set a configuration option for a scene and exit",
+		"  -reset <NAME> <SCENE>  reset a configuration option for a scene and exit",
+		"  -reset <NAME> <SCENE>  reset a configuration option for a scene and exit",
+		"  -download-mc <VERSION> download the given Minecraft version and exit",
+		"  -help                  show this text",
+		"",
+		"Notes:",
+		"<SCENE> can be either the path to a Scene Description File (" + SceneDescription.SCENE_DESCRIPTION_EXTENSION + "),",
+		"*OR* the name of a scene relative to the scene directory (excluding extension).",
+		"If the scene name is an absolute path then the scene directory will be the",
+		"parent directory of the Scene Description File, otherwise the scene directory",
+		"can be overridden temporarily by the -scene-dir option.",
+		"",
+		"Launcher options:",
+		"  --update              download the latest version of Chunky and exit",
+		"  --setup               configure memory limit and Java options for Chunky",
+		"  --nolauncher          start Chunky as normal, but without opening launcher",
+		"  --launcher            forces the launcher window to be displayed",
+		"  --version             print the launcher version and exit",
+		"  --verbose             verbose logging in the launcher",
+		"  --console             show the GUI console in headless mode");
 
 	protected boolean confError = false;
 

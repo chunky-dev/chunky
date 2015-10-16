@@ -1,5 +1,7 @@
 1.3.7 - TBD
 
+* Launcher v1.8.11: added --console option to show the GUI console even in
+  headless mode.
 * Added player entity rendering.
 * Added option to disable player loading in the General tab in the
   Render Controls window.
