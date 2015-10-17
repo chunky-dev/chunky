@@ -1,7 +1,21 @@
 # coding=utf-8
-# SHIPIT Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
+# Copyright (c) 2013-2015 Jesper Öqvist <jesper@llbit.se>
+#
+# This file is part of Chunky.
+#
+# Chunky is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Chunky is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
 
-# required python libs: PRAW, Launchpadlib
+# required python libs: PRAW, launchpadlib
 # required external tools: Wine, NSIS (2.46)
 # requires appbundler and hdiutil for Mac build
 # requires gpg 1.4.19
@@ -30,9 +44,11 @@ from os import path
 from shutil import copyfile
 
 with warnings.catch_warnings():
-	# ignore annoying warnings from lazr and mpl_toolkits about missing __init__.py
+	# Ignore annoying warnings from lazr and mpl_toolkits about missing __init__.py.
 	warnings.simplefilter("ignore")
+	import launchpadlib
 	from launchpadlib.launchpad import Launchpad
+	from launchpadlib.credentials import RequestTokenAuthorizationEngine
 
 class Credentials:
 	initialized = False
@@ -40,8 +56,7 @@ class Credentials:
 
 	def init(self):
 		if not self.initialized and path.exists('credentials.gpg'):
-			proc = Popen(cmd(['gpg', '--decrypt',
-				'credentials.gpg']), stdout=PIPE)
+			proc = Popen(cmd(['gpg', '--decrypt', 'credentials.gpg']), stdout=PIPE)
 			creds = proc.communicate()[0]
 			self.credentials = json.loads(creds)
 		self.initialized = True
@@ -82,7 +97,7 @@ class Credentials:
 		proc = Popen(cmd(['gpg', '--output', 'credentials.gpg', '-r', 'jesper@llbit.se', '--encrypt']), stdin=PIPE)
 		proc.communicate(json.dumps(self.credentials))
 		if proc.returncode is not 0:
-			print "Warning: failed to encrypt credentials!"
+			print("Warning: failed to encrypt credentials!")
 
 class Version:
 	regex = re.compile('^(\d+\.\d+(\.\d+)?)(-[a-zA-Z]*\.?\d*)?$')
@@ -98,7 +113,7 @@ class Version:
 		self.full = version
 		r = self.regex.match(version)
 		if not r:
-			print "Invalid version name: %s (expected e.g. 1.2.13-alpha1)" % version
+			print("Invalid version name: %s (expected e.g. 1.2.13-alpha1)" % version)
 			sys.exit(1)
 		self.milestone = r.groups()[0]
 		self.suffix = r.groups()[2]
@@ -109,8 +124,8 @@ class Version:
 			if path.exists(notes_fn2):
 				notes_fn = notes_fn2
 			else:
-				print "Error: release notes not found!"
-				print "Please edit release_notes-%s.txt!" % self.milestone
+				print("Error: release notes not found!")
+				print("Please edit release_notes-%s.txt!" % self.milestone)
 				sys.exit(1)
 		if not path.exists(notes_fn2):
 			copyfile(notes_fn, notes_fn2)
@@ -120,7 +135,7 @@ class Version:
 			with codecs.open(notes_fn, 'r', encoding='utf-8') as f:
 				self.release_notes = f.read().replace('\r', '')
 		except:
-			print "Error: failed to read release notes!"
+			print("Error: failed to read release notes!")
 			sys.exit(1)
 
 		self.notes_file = notes_fn
@@ -140,11 +155,11 @@ class Version:
 					self.changelog += line + '\n'
 					first = False
 		except:
-			print "Error: could not read ChangeLog!"
+			print("Error: could not read ChangeLog!")
 			sys.exit(1)
 
 		if not self.changelog:
-			print "Error: ChangeLog is empty!"
+			print("Error: ChangeLog is empty!")
 			sys.exit(1)
 
 	def jar_file(self):
@@ -169,6 +184,20 @@ class Version:
 		sign_file(self.exe_file())
 		sign_file(self.dmg_file())
 
+class LaunchpadConsoleAuthorization(RequestTokenAuthorizationEngine):
+	"""Launchpad application authorizer using the console."""
+
+	def __init__(self, service_root, application_name):
+		super(LaunchpadConsoleAuthorization, self).__init__(
+				service_root, application_name, None, None)
+
+	def make_end_user_authorize_token(self, credentials, request_token):
+		authorization_url = self.authorization_url(request_token)
+		print('Please visit the uthentication URL: %s' % authorization_url)
+		print('Press Enter when you have authorized this application.')
+		raw_input()
+		credentials.exchange_request_token_for_access_token(self.web_root)
+
 def on_win():
 	return platform.system() == 'Windows'
 
@@ -181,7 +210,7 @@ def cmd(cmd):
 def sign_file(filename):
 	while True:
 		passphrase = credentials.getpass('gpg passphrase')
-		print "Signing build/" + filename
+		print("Signing build/" + filename)
 		proc = Popen(cmd(['gpg', '--passphrase-fd', '0', '--detach-sig', 'build/' + filename]), stdin=PIPE)
 		if on_win():
 			proc.communicate(passphrase + "\r\n")
@@ -189,7 +218,7 @@ def sign_file(filename):
 			proc.communicate(passphrase + "\n")
 		if proc.returncode is not 0:
 			credentials.remove('gpg passphrase')
-			print "Failed to sign file: " + filename
+			print("Failed to sign file: " + filename)
 			if raw_input('Retry? [y/N] ') == 'y':
 				continue
 			else:
@@ -197,32 +226,32 @@ def sign_file(filename):
 		break
 
 def print_prerelease_checklist(version):
-	print "Pre-Release Checklist:"
-	print "    * Update PRAW (pip install praw --upgrade)"
-	print "    * Update Launchpadlib"
-	print "    * Check release notes for typos: %s" % version.notes_file
-	print "    * Restart script if release notes were updated"
-	print "    * Update ChangeLog (check for typos)"
-	print "    * Commit all final changes in Git"
+	print("Pre-Release Checklist:")
+	print("    * Update PRAW (pip install praw --upgrade)")
+	print("    * Update launchpadlib")
+	print("    * Check release notes for typos: %s" % version.notes_file)
+	print("    * Restart script if release notes were updated")
+	print("    * Update ChangeLog (check for typos)")
+	print("    * Commit all final changes in Git")
 
 def build_release(version):
 	if version.suffix:
-		print "Error: non-release version string speicifed (remove suffix)"
-		print "Hint: add the -snapshot flag to build snapshot"
+		print("Error: non-release version string speicifed (remove suffix)")
+		print("Hint: add the -snapshot flag to build snapshot")
 		sys.exit(1)
 	print_prerelease_checklist(version)
-	print "Ready to build version %s!" % version.full
+	print("Ready to build version %s!" % version.full)
 	if raw_input('Build release? [y/N] ') == 'y':
 		if on_win():
 			if call(cmd(['ant', '-Dversion=' + version.full, 'release'])) is not 0:
-				print "Error: Ant build failed!"
+				print("Error: Ant build failed!")
 				sys.exit(1)
 		else:
 			if call(cmd(['ant', '-Dversion=' + version.full, '-Dmacdist=true', 'release'])) is not 0:
-				print "Error: Ant build failed!"
+				print("Error: Ant build failed!")
 				sys.exit(1)
 		if nsis(['Chunky.nsi']) is not 0:
-			print "Error: NSIS build failed!"
+			print("Error: NSIS build failed!")
 			sys.exit(1)
 		version.sign_files()
 	if raw_input('Publish to Launchpad? [y/N] ') == 'y':
@@ -246,16 +275,16 @@ def nsis(args):
 
 def build_snapshot(version):
 	if not version.suffix:
-		print "Error: non-snapshot version string speicifed (add suffix)"
+		print("Error: non-snapshot version string speicifed (add suffix)")
 		sys.exit(1)
 	print_prerelease_checklist(version)
-	print "Ready to build snapshot %s!" % version.full
+	print("Ready to build snapshot %s!" % version.full)
 	if raw_input('Build snapshot? [y/N] ') == "y":
 		if call(['git', 'tag', '-a', version.full, '-m', 'Snapshot build']) is not 0:
-			print "Error: git tag failed!"
+			print("Error: git tag failed!")
 			sys.exit(1)
 		if call(cmd(['ant', '-Ddebug=true', 'dist'])) is not 0:
-			print "Error: Ant build failed!"
+			print("Error: Ant build failed!")
 			sys.exit(1)
 	if raw_input('Publish snapshot to FTP? [y/N] ') == "y":
 		publish_snapshot_ftp(version)
@@ -278,8 +307,8 @@ def reddit_login():
 			else:
 				rand_str = join(random.choice(string.lowercase + string.digits) for i in range(10))
 				url = r.get_authorize_url(rand_str, 'submit modposts modflair', True)
-				print "Visit the Reddit authorization URL:"
-				print url
+				print("Visit the Reddit authorization URL:")
+				print(url)
 				code = credentials.get('reddit access code')
 				access_info = r.get_access_information(code)
 				credentials.put('refresh_token', access_info['refresh_token'])
@@ -288,7 +317,7 @@ def reddit_login():
 		except praw.errors.InvalidUserPass:
 			credentials.remove('reddit user')
 			credentials.remove('reddit password')
-			print "Login failed, please try again"
+			print("Login failed, please try again")
 
 def ftp_login():
 	while True:
@@ -301,7 +330,7 @@ def ftp_login():
 		except ftplib.error_perm:
 			credentials.remove('ftp user')
 			credentials.remove('ftp password')
-			print "Login failed, please try again"
+			print("Login failed, please try again")
 
 def publish_snapshot_ftp(version):
 	ftp = ftp_login()
@@ -358,7 +387,7 @@ def lp_upload_file(version, release, filename, description, content_type, file_t
 		release_notes='Release Notes',
 		changelog='ChangeLog File',
 		installer='Installer file')
-	print "Uploading %s..." % filename
+	print("Uploading %s..." % filename)
 	try:
 		signature_fn = filename + '.sig'
 		release_file = release.add_file(
@@ -373,20 +402,20 @@ def lp_upload_file(version, release, filename, description, content_type, file_t
 			% (version.series, version.milestone, filename)
 	except:
 		exc_type, exc_value, exc_traceback = sys.exc_info()
-		print "File upload error:"
+		print("File upload error:")
 		traceback.print_exception(exc_type, exc_value, exc_traceback)
 		return None
 
 def check_file_exists(filename):
 	if not path.exists('build/' + filename):
-		print "Error: required artifact %s not found!" % filename
+		print("Error: required artifact %s not found!" % filename)
 		sys.exit(1)
 	if not path.exists('build/' + filename + '.sig'):
-		print "Error: required signature for %s not found!" % filename
+		print("Error: required signature for %s not found!" % filename)
 		sys.exit(1)
 
 def publish_launchpad(version):
-	# check that required files exist
+	# Check that required files exist.
 	check_file_exists(version.jar_file())
 	check_file_exists(version.tar_file())
 	check_file_exists(version.zip_file())
@@ -394,33 +423,43 @@ def publish_launchpad(version):
 	check_file_exists(version.dmg_file())
 	if raw_input('Publish to production? [y/N] ') == "y":
 		server = 'production'
+		service = launchpadlib.uris.LPNET_SERVICE_ROOT
 	else:
 		server = 'staging'
+		service = launchpadlib.uris.STAGING_SERVICE_ROOT
 
-	launchpad = Launchpad.login_with('Releasebot', server, 'lpcache')
+	app_name = 'Releasebot'
+	if on_win():
+		# Use regular authorization mechanism on Windows.
+		launchpad = Launchpad.login_with(app_name, server, 'lpcache')
+	else:
+		# On MacOS we use a custom authorizer to avoid this issue:
+		# https://bugs.launchpad.net/launchpadlib/+bug/1507048
+		launchpad = Launchpad.login_with(app_name, server, 'lpcache',
+				authorization_engine=LaunchpadConsoleAuthorization(service, app_name))
 
 	chunky = launchpad.projects['chunky']
 
-	# check if release exists
+	# Check if release exists.
 	release = None
 	for r in chunky.releases:
 		if r.version == version.milestone:
 			release = r
-			print "Previous %s release found: proceeding to upload additional files." \
-				% version.milestone
+			print("Previous %s release found: proceeding to upload additional files." \
+				% version.milestone)
 			break
 
 	is_new_release = release is None
 
 	if release is None:
-		# check if milestone exists
+		# Check if milestone exists
 		milestone = None
 		for ms in chunky.all_milestones:
 			if ms.name == version.milestone:
 				milestone = ms
 				break
 
-		# create milestone (and series) if needed
+		# Create milestone (and series) if needed
 		if milestone is None:
 			series = None
 			for s in chunky.series:
@@ -431,11 +470,11 @@ def publish_launchpad(version):
 				series = chunky.newSeries(
 					name=version.series,
 					summary="The current stable series for Chunky. NB: The code is maintained separately on GitHub.")
-				print "Series %s created. Please manually update the series summary:" % version.series
-				print series
+				print("Series %s created. Please manually update the series summary:" % version.series)
+				print(series)
 
 			milestone = series.newMilestone(name=version.milestone)
-			print "Milestone %s created." % version.milestone
+			print("Milestone %s created." % version.milestone)
 
 		# create release
 		release = milestone.createProductRelease(
@@ -443,7 +482,7 @@ def publish_launchpad(version):
 			changelog=version.changelog,
 			date_released=datetime.today())
 		milestone.is_active = False
-		print "Release %s created" % version.milestone
+		print("Release %s created" % version.milestone)
 
 	assert release is not None
 
@@ -456,7 +495,7 @@ def publish_launchpad(version):
 		'application/java-archive',
 		'installer')
 	assert jar_url
-	print jar_url
+	print(jar_url)
 	tarball_url = lp_upload_file(
 		version,
 		release,
@@ -465,7 +504,7 @@ def publish_launchpad(version):
 		'application/x-tar',
 		'tarball')
 	assert tarball_url
-	print tarball_url
+	print(tarball_url)
 	zip_url = lp_upload_file(
 		version,
 		release,
@@ -474,7 +513,7 @@ def publish_launchpad(version):
 		'application/zip',
 		'installer')
 	assert zip_url
-	print zip_url
+	print(zip_url)
 	dmg_url = lp_upload_file(
 		version,
 		release,
@@ -483,7 +522,7 @@ def publish_launchpad(version):
 		'application/octet-stream',
 		'installer')
 	assert dmg_url
-	print dmg_url
+	print(dmg_url)
 	exe_url = lp_upload_file(
 		version,
 		release,
@@ -492,7 +531,7 @@ def publish_launchpad(version):
 		'application/octet-stream',
 		'installer')
 	assert exe_url
-	print exe_url
+	print(exe_url)
 	return (is_new_release, exe_url, dmg_url, zip_url, jar_url)
 
 "output markdown"
@@ -527,14 +566,14 @@ def post_release_thread(version):
 		with codecs.open('build/release_notes-%s.md' % version.full, 'r', encoding='utf-8') as f:
 			text = f.read()
 	except IOError:
-		print "Error: reddit post must be in build/release_notes-%s.md" % version.full
+		print("Error: reddit post must be in build/release_notes-%s.md" % version.full)
 		return
 	r = reddit_login()
 	post = r.submit('chunky', 'Chunky %s released!' % version.full,
 		text=text)
 	post.set_flair('announcement', 'announcement')
 	post.sticky()
-	print "Submitted release thread!"
+	print("Submitted release thread!")
 
 "post reddit release thread"
 def post_snapshot_thread(version):
@@ -557,16 +596,16 @@ so please make sure to backup your scenes before using it.
 
 ''' % (version.full, version.release_notes) + version.changelog)
 	post.set_flair('announcement', 'announcement')
-	print "Submitted snapshot thread!"
+	print("Submitted snapshot thread!")
 
 "patch url into latest.json"
 def patch_url(version, url):
-	print "Patching latest.json"
+	print("Patching latest.json")
 	j = None
 	with open('latest.json', 'r') as f:
 		j = json.load(f)
 	if not j:
-		print 'Error: could not read latest.json'
+		print('Error: could not read latest.json')
 		sys.exit(1)
 	libs = j['libraries']
 	patched = False
@@ -576,7 +615,7 @@ def patch_url(version, url):
 			patched = True
 			break
 	if not patched:
-		print 'Error: failed to patch url in latest.json: core lib not found!'
+		print('Error: failed to patch url in latest.json: core lib not found!')
 		sys.exit(1)
 	with open('latest.json', 'w') as f:
 		json.dump(j, f)
@@ -593,16 +632,16 @@ options = {
 }
 for arg in sys.argv[1:]:
 	if arg == '-h' or arg == '--h' or arg == '-help' or arg == '--help':
-		print "usage: SHIPIT [COMMAND] [VERSION]"
-		print "commands:"
-		print "    -ftp         upload latest.json to FTP server"
-		print "    -docs        update documentation"
-		print "    -snapshot    build snapshot instead of release"
-		print "    -launcher    upload the launcher to the FTP server"
-		print
-		print "This utility creates a new release of Chunky"
-		print "Required Python libraries: launchpadlib, PRAW"
-		print "Upgrade with >pip install --upgrade <PKG>"
+		print("usage: SHIPIT [COMMAND] [VERSION]")
+		print("commands:")
+		print("    -ftp         upload latest.json to FTP server")
+		print("    -docs        update documentation")
+		print("    -snapshot    build snapshot instead of release")
+		print("    -launcher    upload the launcher to the FTP server")
+		print("")
+		print("This utility creates a new release of Chunky")
+		print("Required Python libraries: launchpadlib, PRAW")
+		print("Upgrade with >pip install --upgrade <PKG>")
 		sys.exit(0)
 	else:
 		if arg.startswith('-'):
@@ -613,12 +652,12 @@ for arg in sys.argv[1:]:
 					matched = True
 					break
 			if not matched:
-				print "Error: unknown command: %s" % arg
+				print("Error: unknown command: %s" % arg)
 				sys.exit(1)
 		elif version is None:
 			version = Version(arg)
 		else:
-			print "Error: redundant argument: %s" % arg
+			print("Error: redundant argument: %s" % arg)
 			sys.exit(1)
 
 try:
@@ -631,7 +670,7 @@ try:
 		# test NSIS for Windows installer
 		# requires Wine on non-Windows
 		if nsis(['Chunky.nsi']) is not 0:
-			print "Error: NSIS build failed!"
+			print("Error: NSIS build failed!")
 		sys.exit(0)
 
 	if version == None:
@@ -651,13 +690,13 @@ try:
 		if raw_input('Push git release commit? [y/N] ') == "y":
 			call(['git', 'push', 'origin', 'master'])# push version bump commit
 			call(['git', 'push', 'origin', version.full])# push version tag
-		print "All done."
+		print("All done.")
 except SystemExit:
 	raise
 except:
 	exc_type, exc_value, exc_traceback = sys.exc_info()
-	print "Unexpected error:"
+	print("Unexpected error:")
 	traceback.print_exception(exc_type, exc_value, exc_traceback)
-	print "Release aborted."
+	print("Release aborted. Press enter to exit.")
 	raw_input()
 
