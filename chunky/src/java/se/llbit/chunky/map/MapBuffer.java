@@ -68,8 +68,7 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 	private void initBuffer(ChunkView newView) {
 		buffW = newView.chunkScale * (newView.px1 - newView.px0 + 1);
 		buffH = newView.chunkScale * (newView.pz1 - newView.pz0 + 1);
-		buffer = new BufferedImage(buffW, buffH,
-				BufferedImage.TYPE_INT_RGB);
+		buffer = new BufferedImage(buffW, buffH, BufferedImage.TYPE_INT_RGB);
 		graphics = buffer.getGraphics();
 		DataBufferInt dataBuffer = (DataBufferInt) buffer.getRaster().getDataBuffer();
 		data = dataBuffer.getData();
@@ -93,9 +92,7 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 	 * @param renderer
 	 * @param layer
 	 */
-	public synchronized void updateView(ChunkView newView, Renderer renderer,
-			int layer) {
-
+	public synchronized void updateView(ChunkView newView, Renderer renderer, int layer) {
 		boolean bufferedMode = buffMode == renderer
 				&& buffMode.bufferValid(view, newView, buffLayer, layer);
 
@@ -227,7 +224,8 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 				g.drawImage(buffer, x_offset, y_offset, null);
 			} else {
 				float scale = view.scale / (float) view.chunkScale;
-				g.drawImage(buffer, x_offset, y_offset, (int) (buffW*scale), (int) (buffH*scale), null);
+				g.drawImage(buffer, x_offset, y_offset, (int) (buffW*scale),
+						(int) (buffH*scale), null);
 			}
 			graphics = buffer.getGraphics();
 		}
@@ -372,7 +370,7 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 		return !updatedRegions.isEmpty();
 	}
 
-	// TODO use separate iterators for regions and chunks
+	// TODO(jesper): use separate iterators for regions and chunks.
 	/**
 	 * @return an iterator over chunks that need to be redrawn
 	 */
@@ -477,7 +475,7 @@ public class MapBuffer implements ChunkUpdateListener, Iterable<ChunkPosition> {
 	public synchronized void updateChunks(int x0, int x1, int z0, int z1) {
 		for (int x = x0; x <= x1; x += 32) {
 			for (int z = z0; z <= z1; z += 32) {
-				regionUpdated(ChunkPosition.get(x>>5, z>>5));
+				regionUpdated(ChunkPosition.get(x >> 5, z >> 5));
 			}
 		}
 	}
