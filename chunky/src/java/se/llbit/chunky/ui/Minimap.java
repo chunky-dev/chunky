@@ -127,7 +127,7 @@ public class Minimap extends JPanel implements ChunkUpdateListener {
 			renderer.render(world, mapBuffer, Chunk.biomeRenderer, selection);
 			mapBuffer.renderBuffered(g);
 
-			renderer.renderPlayer(world, g, view, true);
+			renderer.renderPlayers(world, g, view, true);
 			renderer.renderSpawn(world, g, view, true);
 
 			// draw view rectangle

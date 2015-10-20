@@ -27,9 +27,9 @@ import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
+import se.llbit.chunky.world.PlayerPosition;
 import se.llbit.chunky.world.World;
 import se.llbit.math.QuickMath;
-import se.llbit.math.Vector3d;
 
 /**
  * @author Jesper Öqvist (jesper@llbit.se)
@@ -134,7 +134,7 @@ public class WorldRenderer {
 			g.drawImage(MiscImages.clock, view.width-32, 0, 32, 32, null);
 		}
 
-		renderPlayer(world, g, view,
+		renderPlayers(world, g, view,
 				renderer == Chunk.surfaceRenderer
 				|| world.playerLocY() == world.currentLayer());
 
@@ -143,24 +143,22 @@ public class WorldRenderer {
 				|| world.spawnPosY() == world.currentLayer());
 	}
 
-	public void renderPlayer(World world, Graphics g, ChunkView view, boolean sameLayer) {
+	public void renderPlayers(World world, Graphics g, ChunkView view, boolean sameLayer) {
 		double blockScale = view.scale / 16.;
-		Vector3d playerPos = world.playerPos();
-		if (playerPos == null) {
-			return;
-		}
-		int px = (int) QuickMath.floor(playerPos.x * blockScale);
-		int pz = (int) QuickMath.floor(playerPos.z * blockScale);
-		int ppx = px - (int) QuickMath.floor(view.x0 * view.scale);
-		int ppy = pz - (int) QuickMath.floor(view.z0 * view.scale);
-		int pw = (int) QuickMath.max(8, QuickMath.min(16, blockScale * 2));
-		ppx = Math.min(view.width-pw, Math.max(0, ppx-pw/2));
-		ppy = Math.min(view.height-pw, Math.max(0, ppy-pw/2));
+		for (PlayerPosition player : world.getPlayerPositions()) {
+			int px = (int) QuickMath.floor(player.x * blockScale);
+			int pz = (int) QuickMath.floor(player.z * blockScale);
+			int ppx = px - (int) QuickMath.floor(view.x0 * view.scale);
+			int ppy = pz - (int) QuickMath.floor(view.z0 * view.scale);
+			int pw = (int) QuickMath.max(8, QuickMath.min(16, blockScale * 2));
+			ppx = Math.min(view.width-pw, Math.max(0, ppx-pw/2));
+			ppy = Math.min(view.height-pw, Math.max(0, ppy-pw/2));
 
-		if (sameLayer) {
-			g.drawImage(MiscImages.face, ppx, ppy, pw, pw, null);
-		} else {
-			g.drawImage(MiscImages.face_t, ppx, ppy, pw, pw, null);
+			if (sameLayer) {
+				g.drawImage(MiscImages.face, ppx, ppy, pw, pw, null);
+			} else {
+				g.drawImage(MiscImages.face_t, ppx, ppy, pw, pw, null);
+			}
 		}
 	}
 

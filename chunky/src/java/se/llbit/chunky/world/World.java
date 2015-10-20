@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -236,7 +237,11 @@ public class World implements Comparable<World> {
 	}
 
 	private void loadAdditionalPlayers() {
-		File playerdata = new File(worldDirectory, "playerdata");
+		loadAdditionalPlayers(new File(worldDirectory, "players"));
+		loadAdditionalPlayers(new File(worldDirectory, "playerdata"));
+	}
+
+	private void loadAdditionalPlayers(File playerdata) {
 		if (playerdata.isDirectory()) {
 			File[] players = playerdata.listFiles();
 			if (players != null) {
@@ -900,4 +905,7 @@ public class World implements Comparable<World> {
 		}
 	}
 
+	public synchronized Collection<PlayerPosition> getPlayerPositions() {
+		return Collections.unmodifiableList(playerLocations);
+	}
 }
