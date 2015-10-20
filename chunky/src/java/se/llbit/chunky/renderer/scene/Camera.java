@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -33,6 +33,7 @@ import se.llbit.chunky.renderer.projection.Projector;
 import se.llbit.chunky.renderer.projection.SphericalApertureProjector;
 import se.llbit.chunky.renderer.projection.StereographicProjector;
 import se.llbit.chunky.world.Chunk;
+import se.llbit.chunky.world.PlayerPosition;
 import se.llbit.chunky.world.World;
 import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
@@ -419,14 +420,14 @@ public class Camera implements JSONifiable {
 	 */
 	public void moveToPlayer(World world) {
 		if (world != null) {
-			Vector3d playerPos = world.playerPos();
-			if (playerPos != null) {
-				pitch = QuickMath.degToRad(world.playerPitch() - 90);
-				yaw = QuickMath.degToRad(-world.playerYaw() + 90);
+			PlayerPosition player = world.getPlayerPosition();
+			if (player != null) {
+				pitch = QuickMath.degToRad(player.pitch - 90);
+				yaw = QuickMath.degToRad(-player.yaw + 90);
 				roll = 0;
-				pos.x = playerPos.x;
-				pos.y = playerPos.y + 1.6;
-				pos.z = playerPos.z;
+				pos.x = player.x;
+				pos.y = player.y + 1.6;
+				pos.z = player.z;
 				updateTransform();
 				scene.refresh();
 			}

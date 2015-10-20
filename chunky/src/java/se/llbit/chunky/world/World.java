@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
@@ -88,13 +89,8 @@ public class World implements Comparable<World> {
 
 	private int currentLayer = DEFAULT_LAYER;
 	private File worldDirectory = null;
-	private boolean havePlayerPos = false;
+	private final List<PlayerPosition> playerLocations = new LinkedList<PlayerPosition>();
 	private boolean haveSpawnPos = false;
-	private double playerX;
-	private double playerY;
-	private double playerZ;
-	private double playerYaw;
-	private double playerPitch;
 	private int playerDimension = 0;
 	private int dimension;
 
@@ -184,49 +180,43 @@ public class World implements Comparable<World> {
 			Set<String> request = new HashSet<String>();
 			request.add(".Data.version");
 			request.add(".Data.RandomSeed");
-			request.add(".Data.Player.Dimension");
 			request.add(".Data.Player");
 			request.add(".Data.LevelName");
 			request.add(".Data.GameType");
 			Map<String, AnyTag> result = NamedTag.quickParse(in, request);
 
-			AnyTag dim = result.get(".Data.Player.Dimension");
-			playerDimension = dim.intValue();
-
 			AnyTag version = result.get(".Data.version");
 			if (logWarnings && version.intValue() != NBT_VERSION) {
-				Log.warn("The world format for the world " + levelName +
-						" is not supported by Chunky.\n" +
-						"Will attempt to load the world anyway.");
+				Log.warn("The world format for the world " + levelName
+						+ " is not supported by Chunky.\n"
+						+ "Will attempt to load the world anyway.");
 			}
 			AnyTag player = result.get(".Data.Player");
-			AnyTag posX = player.get("Pos").get(0);
-			AnyTag posY = player.get("Pos").get(1);
-			AnyTag posZ = player.get("Pos").get(2);
-			AnyTag yaw = player.get("Rotation").get(0);
-			AnyTag pitch = player.get("Rotation").get(1);
 			AnyTag spawnX = player.get("SpawnX");
 			AnyTag spawnY = player.get("SpawnY");
 			AnyTag spawnZ = player.get("SpawnZ");
 			AnyTag gameType = result.get(".Data.GameType");
 			AnyTag randomSeed = result.get(".Data.RandomSeed");
 
+			playerDimension = player.get("Dimension").intValue();
+
 			gameMode  = gameType.intValue(0);
 			seed = randomSeed.longValue(0);
 
-			playerX = posX.doubleValue();
-			playerY = posY.doubleValue();
-			playerZ = posZ.doubleValue();
-			playerYaw = yaw.floatValue();
-			playerPitch = pitch.floatValue();
+			playerLocations.clear();
+
+			if (!player.isError()) {
+				playerLocations.add(new PlayerPosition(player));
+			}
+
+			currentLayer = playerLocY();
+
+			loadAdditionalPlayers();
+
 			this.spawnX = spawnX.intValue();
 			this.spawnY = spawnY.intValue();
 			this.spawnZ = spawnZ.intValue();
-			havePlayerPos = ! (posX.isError() || posY.isError() || posZ.isError());
 			haveSpawnPos = ! (spawnX.isError() || spawnY.isError() || spawnZ.isError());
-			if (havePlayerPos) {
-				currentLayer = playerLocY();
-			}
 
 			levelName = result.get(".Data.LevelName").stringValue(levelName);
 
@@ -243,6 +233,34 @@ public class World implements Comparable<World> {
 			}
 		}
 		return false;
+	}
+
+	private void loadAdditionalPlayers() {
+		File playerdata = new File(worldDirectory, "playerdata");
+		if (playerdata.isDirectory()) {
+			File[] players = playerdata.listFiles();
+			if (players != null) {
+				for (File player : players) {
+					DataInputStream in = null;
+					try {
+						in = new DataInputStream(new GZIPInputStream(
+								new FileInputStream(player)));
+						playerLocations.add(new PlayerPosition(NamedTag.read(in).unpack()));
+						in.close();
+					} catch (IOException e) {
+						Log.infofmt("Could not read player data file '%s'",
+								player.getAbsolutePath());
+					} finally {
+						if (in != null) {
+							try {
+								in.close();
+							} catch (IOException e) {
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -340,11 +358,12 @@ public class World implements Comparable<World> {
 	}
 
 	/**
-	 * @return vector with player position, nor {@code null} if not available
+	 * @return vector with player position, or {@code null} if not available
 	 */
 	public synchronized Vector3d playerPos() {
-		if (havePlayerPos && playerDimension == dimension) {
-			return new Vector3d(playerX, playerY, playerZ);
+		if (!playerLocations.isEmpty() && playerDimension == dimension) {
+			PlayerPosition pos = playerLocations.get(0);
+			return new Vector3d(pos.x, pos.y, pos.z);
 		} else {
 			return null;
 		}
@@ -365,25 +384,12 @@ public class World implements Comparable<World> {
 	}
 
 	/**
-	 * @return Player view yaw
-	 */
-	public synchronized double playerYaw() {
-		return playerYaw;
-	}
-
-	/**
-	 * @return Player view pitch
-	 */
-	public synchronized double playerPitch() {
-		return playerPitch;
-	}
-
-	/**
 	 * @return Player Y location, or -1 if not available
 	 */
 	public synchronized int playerLocY() {
-		if (havePlayerPos) {
-			return (int) (playerY - 0.5);
+		PlayerPosition player = getPlayerPosition();
+		if (player != null) {
+			return (int) (player.y - 0.5);
 		}
 		return -1;
 	}
@@ -863,7 +869,7 @@ public class World implements Comparable<World> {
 
 	@Override
 	public int compareTo(World o) {
-		// just compare the world names
+		// Just compare the world names.
 		return toString().compareToIgnoreCase(o.toString());
 	}
 
@@ -874,13 +880,24 @@ public class World implements Comparable<World> {
 	/**
 	 * Load entities from world file
 	 */
-	public Collection<Entity> getEntityData() {
+	public synchronized Collection<Entity> getEntityData() {
 		Collection<Entity> list = new LinkedList<Entity>();
-		if (havePlayerPos && PersistentSettings.getLoadPlayers()) {
-			list.add(new PlayerEntity(
-					new Vector3d(playerX, playerY, playerZ),
-					playerYaw, playerPitch));
+		if (PersistentSettings.getLoadPlayers()) {
+			for (PlayerPosition pos : playerLocations) {
+				list.add(new PlayerEntity(
+						new Vector3d(pos.x, pos.y, pos.z),
+						pos.yaw, pos.pitch));
+			}
 		}
 		return list;
 	}
+
+	public synchronized PlayerPosition getPlayerPosition() {
+		if (playerLocations.isEmpty()) {
+			return null;
+		} else {
+			return playerLocations.get(0);
+		}
+	}
+
 }

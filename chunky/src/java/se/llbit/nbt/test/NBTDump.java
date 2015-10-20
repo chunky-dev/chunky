@@ -57,9 +57,9 @@ public class NBTDump {
 				int x = Integer.parseInt(m.group(1));
 				int z = Integer.parseInt(m.group(2));
 				ChunkDataSource data = Region.getChunkData(new File(filename),
-					ChunkPosition.get(x, z));
+						ChunkPosition.get(x, z));
 				if (data == null) {
-					System.err.println("No such chunk in region: (" + x + "," + z + ")");
+					System.err.format("No such chunk in region: (%d, %d)\n", x, z);
 					return new ErrorTag();
 				}
 				in = data.inputStream;
@@ -79,7 +79,9 @@ public class NBTDump {
 				return new ErrorTag();
 			}
 		} finally {
-			if (in != null) in.close();
+			if (in != null) {
+				in.close();
+			}
 		}
 	}
 
