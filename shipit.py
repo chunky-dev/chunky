@@ -243,12 +243,12 @@ def build_release(version):
 	print("Ready to build version %s!" % version.full)
 	if raw_input('Build release? [y/N] ') == 'y':
 		if on_win():
-			if call(cmd(['ant', '-Dversion=' + version.full, 'release'])) is not 0:
-				print("Error: Ant build failed!")
+			if call(cmd(['gradle', '--rerun-tasks', '-PnewVersion=' + version.full, 'tarball', 'releaseJar', 'releaseZip', 'nsi', 'documentation', 'release'])) is not 0:
+				print("Error: release build failed!")
 				sys.exit(1)
 		else:
-			if call(cmd(['ant', '-Dversion=' + version.full, '-Dmacdist=true', 'release'])) is not 0:
-				print("Error: Ant build failed!")
+			if call(cmd(['gradle', '--rerun-tasks', '-PnewVersion=' + version.full, 'tarball', 'releaseJar', 'releaseZip', 'nsi', 'documentation', 'macDist', 'release'])) is not 0:
+				print("Error: release build failed!")
 				sys.exit(1)
 		if nsis(['Chunky.nsi']) is not 0:
 			print("Error: NSIS build failed!")
@@ -283,8 +283,8 @@ def build_snapshot(version):
 		if call(['git', 'tag', '-a', version.full, '-m', 'Snapshot build']) is not 0:
 			print("Error: git tag failed!")
 			sys.exit(1)
-		if call(cmd(['ant', '-Ddebug=true', 'dist'])) is not 0:
-			print("Error: Ant build failed!")
+		if call(cmd(['gradle', '--rerun-tasks', 'releaseJar'])) is not 0:
+			print("Error: release build failed!")
 			sys.exit(1)
 	if raw_input('Publish snapshot to FTP? [y/N] ') == "y":
 		publish_snapshot_ftp(version)
@@ -364,10 +364,16 @@ def publish_launcher(version):
 	ftp.quit()
 
 def update_docs(version):
+	version_links = 'build/version-%s.properties' % version.full
+	if not path.exists(version_links):
+		print('Error: can not update documentation because %s does not exist. You must publish to launchpad to generate this file.' % version_links)
+		return
 	docs_dir = '../git/chunky-docs'
+	if not path.exists(docs_dir):
+		docs_dir = '../chunky-docs'
 	while not path.exists(docs_dir):
 		docs_dir = raw_input('documentation repo: ')
-	copyfile('build/version-%s.properties' % version.full, path.join(docs_dir, 'version.properties'))
+	copyfile(version_links, path.join(docs_dir, 'version.properties'))
 	version_dir = '%s/docs/release/%s' % (docs_dir, version.full)
 	if not path.exists(version_dir):
 		os.mkdir(version_dir)

@@ -10,15 +10,18 @@
 /bench/x*
 /test
 
+# Build tool files.
+/.gradle/
+
 # Release artifacts.
-/lpcache
-/bin
+/lpcache/
+/bin/
 /latest.json
 /snapshot.json
 /snapshot
 /credentials.json
 /credentials.gpg
-/build
+/build/
 /Chunky.nsi
 /release_notes-*.txt
 /chunky.jar
@@ -39,3 +42,4 @@
 
 # Python virtual environment.
 /venv/
+requirements.txt

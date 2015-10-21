@@ -1,0 +1,92 @@
+archivesBaseName = 'chunky-core'
+
+jar {
+	// Include classes from the common library.
+	from project(':lib').configurations.archives.allArtifacts.files.collect {
+		zipTree(it)
+	}
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src/java'
+			srcDir 'src/gen'
+		}
+		resources {
+			srcDir 'src/gen-res'
+		}
+	}
+}
+
+repositories {
+	flatDir {
+		dirs 'lib'
+	}
+}
+
+dependencies {
+	compile name: 'ppj99-1.0.1'
+	compile name: 'JOCL-0.1.7'
+	compile name: 'commons-math3-3.2'
+	compile project(':lib')
+}
+
+processResources.dependsOn 'updateVersionString'
+processResources.dependsOn 'copyResources'
+
+task copyResources(type: Copy) {
+	from('src/res') {
+		exclude 'Version.properties'
+	}
+	into 'src/gen-res'
+}
+
+task updateVersionString {
+	description 'Store the current version string in src/gen-res/Version.properties'
+
+	outputs.upToDateWhen {
+		def props = new Properties()
+		def output = file('src/gen-res/Version.properties')
+		if (output.isFile()) {
+			output.withInputStream { stream -> props.load(stream) }
+		}
+		props['version'] == project.version
+	}
+
+	doLast {
+		file('src/gen-res').mkdirs()
+		def date = new Date()
+		def versionFile = file('src/gen-res/Version.properties')
+		ant.propertyfile(file: versionFile) {
+			entry(key: 'version', value: project.version)
+		}
+	}
+}
+
+compileJava.dependsOn 'generateJava'
+
+task generateJava() {
+	inputs.dir 'src/jastadd'
+	outputs.dir 'src/gen'
+
+	doLast {
+		project.file('src/gen').mkdirs()
+		ant.taskdef(
+			name: 'jastadd',
+			classname: 'org.jastadd.JastAddTask',
+			classpath: project.configurations.jastadd.asPath)
+		ant.jastadd(
+			outdir: project.file('src/gen'),
+			package: 'se.llbit.nbt',
+			rewrite: 'none',
+			visitCheck: false,
+			debug: false) {
+			fileset(dir: project.file('src/jastadd')) {
+				include(name: '*.ast')
+				include(name: '*.jrag')
+				include(name: '*.jadd')
+			}
+		}
+	}
+}

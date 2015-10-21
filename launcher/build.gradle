@@ -1,0 +1,22 @@
+sourceSets.main {
+	java.srcDir 'src'
+	resources {
+		srcDir 'src'
+		include '*.png'
+		include '*.gif'
+	}
+}
+
+jar {
+	archiveName = 'ChunkyLauncher.jar'
+	manifest.attributes 'Main-Class': 'se.llbit.chunky.launcher.ChunkyLauncher'
+
+	// Include classes from the common library.
+	from project(':lib').configurations.archives.allArtifacts.files.collect {
+		zipTree(it)
+	}
+}
+
+dependencies {
+	compile project(':lib')
+}
