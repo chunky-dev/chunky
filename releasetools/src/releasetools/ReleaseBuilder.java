@@ -40,8 +40,8 @@ import se.llbit.util.Util;
 
 public class ReleaseBuilder {
 	static final String LIBRARY_PATH = "chunky/lib";
-	static final String LAUNCHER_BIN = "launcher/ant-bin";
-	static final String LIB_BIN = "lib/ant-bin";
+	static final String LAUNCHER_BIN = "launcher/build/classes/main";
+	static final String LIB_BIN = "lib/build/classes/main";
 	private final String versionName;
 	private final String notes;
 	private static final String SYS_NL = System.getProperty("line.separator");

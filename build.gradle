@@ -12,9 +12,8 @@ allprojects {
 	sourceCompatibility = '1.6'
 	targetCompatibility = '1.6'
 
-	/*tasks.withType(Compile) {
-		options.encoding = 'UTF-8'
-	}*/
+	compileJava.options.encoding = 'UTF-8'
+	compileJava.options.debug = true
 
 	repositories {
 		mavenCentral()
@@ -28,6 +27,8 @@ allprojects {
 		jastadd 'org.jastadd:jastadd:2.1.13'
 	}
 }
+
+defaultTasks 'releaseJar'
 
 task tarball(type: Exec) {
 	// TODO(jesper): Prepend cmd /c on Windows?
