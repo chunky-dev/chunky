@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -40,7 +40,7 @@ import se.llbit.log.Level;
 import se.llbit.log.Log;
 
 /**
- * Deploys the embedded Chunky version, or launches an existing local version.
+ * Tracks installed Chunky versions, and deploys the embedded version.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkyDeployer {
@@ -102,13 +102,20 @@ public class ChunkyDeployer {
 
 	/**
 	 * Unpacks the embedded Chunky jar files.
+	 *
+	 * <p>Updates the settings to use the latest version if a new embedded version is installed.
 	 */
-	public void deploy() {
+	public void deploy(LauncherSettings settings) {
 		List<VersionInfo> versions = availableVersions();
 		VersionInfo embedded = embeddedVersion();
-		if (embedded != null && (!versions.contains(embedded) || !checkVersionIntegrity(embedded.name))) {
+		if (embedded != null && (!versions.contains(embedded)
+				|| !checkVersionIntegrity(embedded.name))) {
 			Log.infofmt("Deploying embedded version: %s", embedded.name);
 			deployEmbeddedVersion(embedded);
+			if (!settings.version.equals(VersionInfo.LATEST.name)) {
+				settings.version = VersionInfo.LATEST.name;
+				settings.save();
+			}
 		}
 	}
 

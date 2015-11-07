@@ -58,7 +58,7 @@ import se.llbit.ui.Adjuster;
 @SuppressWarnings("serial")
 public class ChunkyLauncher extends JFrame implements UpdateListener {
 
-	private static final String LAUNCHER_VERSION = "v1.8.11";
+	private static final String LAUNCHER_VERSION = "v1.8.12";
 
 	protected String java;
 	private final ChunkyDeployer deployer;
@@ -639,11 +639,10 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 			settings.headless = true;
 			settings.chunkyOptions = headlessOptions;
 			ChunkyDeployer deployer = new ChunkyDeployer();
-			deployer.deploy();
+			deployer.deploy(settings); // Install the embedded version.
 			VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
 			if (ChunkyDeployer.canLaunch(version, null, false)) {
-				int exitCode = deployer.launchChunky(null, settings, version,
-						ChunkyMode.HEADLESS);
+				int exitCode = deployer.launchChunky(null, settings, version, ChunkyMode.HEADLESS);
 				if (exitCode != 0) {
 					System.err.println("Failed to start Chunky. Command used:");
 					System.err.println(ChunkyDeployer.commandString(
@@ -651,27 +650,29 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 					System.exit(exitCode);
 				}
 			} else {
-				System.err.println("Could not launch selected Chunky version. Try updating with --update");
+				System.err.println(
+						"Could not launch selected Chunky version. Try updating with --update");
 				System.exit(1);
 			}
 		} else {
-			// Set up Look and Feel
+			// Set up Look and Feel.
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				UIManager.put("Slider.paintValue", Boolean.FALSE);
 			} catch (Exception e) {
-				System.out.println("Failed to set native Look and Feel");
+				System.out.println("Warning: failed to set native look and feel.");
 			}
 
 			if (firstTimeSetup()) {
 				ChunkyDeployer deployer = new ChunkyDeployer();
+				deployer.deploy(settings); // Install the embedded version.
+
 				boolean showLauncher = true;
 				if (!forceLauncher && !settings.showLauncher) {
-					// skip launcher only if we can launch this version
+					// Skip the launcher only if we can launch this version.
 					VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
 					if (ChunkyDeployer.canLaunch(version, null, false)) {
-						if (deployer.launchChunky(null, settings, version,
-								ChunkyMode.GUI) == 0) {
+						if (deployer.launchChunky(null, settings, version, ChunkyMode.GUI) == 0) {
 							showLauncher = false;
 							return;
 						} else {
@@ -680,7 +681,6 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 					}
 				}
 				if (showLauncher) {
-					deployer.deploy();
 					JFrame launcher = new ChunkyLauncher(deployer, settings);
 					//launcher.setLocationByPlatform(true);
 					launcher.setLocationRelativeTo(null);
