@@ -31,6 +31,12 @@ public class FontTexture extends TextureRef {
 
 	public static Glyph[] glyphs = new Glyph[256];
 
+	static {
+		for (int i = 0; i < 256; ++i) {
+			glyphs[i] = new Glyph(0, 0, 0, 0);
+		}
+	}
+
 	public static class Glyph {
 
 		public final int top;
