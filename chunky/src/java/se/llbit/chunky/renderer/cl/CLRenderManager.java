@@ -109,7 +109,8 @@ public class CLRenderManager extends Thread implements Renderer,
 
 		super("Render Manager");
 
-		view = new Chunk3DView(this, parent);
+		view = new Chunk3DView(parent);
+		view.addViewListener(this);
 		bufferWidth = 400;
 		bufferHeight = 400;
 		globalWorkSize = new long[] { bufferWidth, bufferHeight };

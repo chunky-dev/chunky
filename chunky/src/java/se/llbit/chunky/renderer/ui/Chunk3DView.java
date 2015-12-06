@@ -35,6 +35,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
@@ -73,7 +75,7 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 
 	private final ComponentListener componentListener;
 
-	private final ViewListener listener;
+	private final List<ViewListener> listeners = new LinkedList<ViewListener>();
 
 	private final OverlayLabel overlayLbl;
 
@@ -96,10 +98,8 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 	 * @param listener
 	 * @param parentFrame
 	 */
-	public Chunk3DView(final ViewListener listener, JFrame parentFrame) {
+	public Chunk3DView(JFrame parentFrame) {
 		super(parentFrame, "Render Preview");
-
-		this.listener = listener;
 
 		canvas = new RenderCanvas();
 
@@ -174,7 +174,9 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 			@Override
 			public void componentShown(ComponentEvent e) {
 				canvas.setBufferFinalization(true);
-				listener.setViewVisible(true);
+				for (ViewListener listener : listeners) {
+					listener.setViewVisible(true);
+				}
 			}
 			@Override
 			public void componentResized(ComponentEvent e) {
@@ -186,7 +188,9 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 			@Override
 			public void componentHidden(ComponentEvent e) {
 				canvas.setBufferFinalization(false);
-				listener.setViewVisible(false);
+				for (ViewListener listener : listeners) {
+					listener.setViewVisible(false);
+				}
 			}
 		};
 
@@ -206,31 +210,47 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 				switch (e.getKeyCode()) {
 				case KeyEvent.VK_A:
 				case KeyEvent.VK_LEFT:
-					listener.onStrafeLeft();
+					for (ViewListener listener : listeners) {
+						listener.onStrafeLeft();
+					}
 					break;
 				case KeyEvent.VK_D:
 				case KeyEvent.VK_RIGHT:
-					listener.onStrafeRight();
+					for (ViewListener listener : listeners) {
+						listener.onStrafeRight();
+					}
 					break;
 				case KeyEvent.VK_W:
 				case KeyEvent.VK_UP:
-					listener.onMoveForward();
+					for (ViewListener listener : listeners) {
+						listener.onMoveForward();
+					}
 					break;
 				case KeyEvent.VK_S:
 				case KeyEvent.VK_DOWN:
-					listener.onMoveBackward();
+					for (ViewListener listener : listeners) {
+						listener.onMoveBackward();
+					}
 					break;
 				case KeyEvent.VK_K:
-					listener.onMoveForwardFar();
+					for (ViewListener listener : listeners) {
+						listener.onMoveForwardFar();
+					}
 					break;
 				case KeyEvent.VK_J:
-					listener.onMoveBackwardFar();
+					for (ViewListener listener : listeners) {
+						listener.onMoveBackwardFar();
+					}
 					break;
 				case KeyEvent.VK_R:
-					listener.onMoveUp();
+					for (ViewListener listener : listeners) {
+						listener.onMoveUp();
+					}
 					break;
 				case KeyEvent.VK_F:
-					listener.onMoveDown();
+					for (ViewListener listener : listeners) {
+						listener.onMoveDown();
+					}
 					break;
 				case KeyEvent.VK_U:
 					setFullscreen(!fullscreen);
@@ -256,7 +276,9 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 			public void mouseDragged(MouseEvent e) {
 				int dx = e.getX() - x0;
 				int dy = e.getY() - y0;
-				listener.onMouseDragged(dx, dy);
+				for (ViewListener listener : listeners) {
+					listener.onMouseDragged(dx, dy);
+				}
 				x0 = e.getX();
 				y0 = e.getY();
 			}
@@ -328,9 +350,19 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				int rotation = e.getWheelRotation();
-				listener.onZoom(rotation);
+				for (ViewListener listener : listeners) {
+					listener.onZoom(rotation);
+				}
 			}
 		});
+	}
+
+	public synchronized void addViewListener(ViewListener listener) {
+		listeners.add(listener);
+	}
+
+	public synchronized void removeViewListener(ViewListener listener) {
+		listeners.remove(listener);
 	}
 
 	protected void setFullscreen(boolean mode) {
@@ -450,7 +482,10 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 			setVisible(false);
 		}
 		canvas.setBufferFinalization(false);
-		listener.setViewVisible(false);
+
+		for (ViewListener listener : listeners) {
+			listener.setViewVisible(false);
+		}
 	}
 
 	protected void scaleUp() {

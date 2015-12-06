@@ -18,47 +18,24 @@ package se.llbit.chunky.renderer.ui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.FileDialog;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -73,148 +50,69 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-import org.apache.commons.math3.util.FastMath;
-
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.renderer.OutputMode;
-import se.llbit.chunky.renderer.Postprocess;
-import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.RenderState;
 import se.llbit.chunky.renderer.RenderStatusListener;
-import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Camera;
-import se.llbit.chunky.renderer.scene.CameraPreset;
-import se.llbit.chunky.renderer.scene.PlayerModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneManager;
-import se.llbit.chunky.renderer.scene.Sky;
-import se.llbit.chunky.renderer.scene.Sky.SkyMode;
-import se.llbit.chunky.renderer.scene.Sun;
-import se.llbit.chunky.resources.MiscImages;
+import se.llbit.chunky.renderer.ui.tabs.AdvancedTab;
+import se.llbit.chunky.renderer.ui.tabs.CameraTab;
+import se.llbit.chunky.renderer.ui.tabs.GeneralTab;
+import se.llbit.chunky.renderer.ui.tabs.HelpTab;
+import se.llbit.chunky.renderer.ui.tabs.LightingTab;
+import se.llbit.chunky.renderer.ui.tabs.PostProcessingTab;
+import se.llbit.chunky.renderer.ui.tabs.RenderControlsTab;
+import se.llbit.chunky.renderer.ui.tabs.SkyTab;
+import se.llbit.chunky.renderer.ui.tabs.WaterTab;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.ui.CenteredFileDialog;
-import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
-import se.llbit.json.JsonMember;
-import se.llbit.json.JsonObject;
-import se.llbit.log.Log;
-import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector2d;
 import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
 import se.llbit.ui.Adjuster;
-import se.llbit.ui.ErrorLabel;
 
 /**
  * Render Controls dialog.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 @SuppressWarnings("serial")
-public class RenderControls extends JDialog implements ViewListener,
-	RenderStatusListener {
-
-	private static final int[] dumpFrequencies = { 50, 100, 500, 1000, 2500, 5000 };
+public class RenderControls extends JDialog implements ViewListener, RenderStatusListener {
 
 	private static final double CHUNK_SELECT_RADIUS = -8 * 1.4142;
+
+	private int spp = 0;
+	private int sps = 0;
 
 	private final RenderManager renderMan;
 	private final SceneManager sceneMan;
 	private final Chunk3DView view;
 	private final Chunky chunky;
 
-	/**
-	 * Number format for current locale.
-	 */
-	private final NumberFormat numberFormat =
-			NumberFormat.getInstance();
-
-	private final JSlider skymapRotationSlider = new JSlider();
-	private final JSlider lightProbeRotationSlider = new JSlider();
-	private final JSlider skyboxRotationSlider = new JSlider();
-	private final JButton loadSkymapBtn = new JButton();
-	private final JButton loadLightProbeBtn = new JButton();
-	private final JPanel simulatedSkyPanel = new JPanel();
-	private final JPanel skymapPanel = new JPanel();
-	private final JPanel lightProbePanel = new JPanel();
-	private final JPanel skyGradientPanel = new JPanel();
-	private final JPanel skyboxPanel = new JPanel();
-	private final JComboBox canvasSizeCB = new JComboBox();
-	private final JComboBox cameraPreset = new JComboBox();
-	private final JComboBox customPreset = new JComboBox();
-	private final JComboBox projectionMode = new JComboBox();
 	private final JButton startRenderBtn = new JButton();
-	private final JCheckBox enableEmitters = new JCheckBox();
-	private final JCheckBox directLight = new JCheckBox();
 	private final JButton saveSceneBtn = new JButton();
-	private final JButton loadSceneBtn = new JButton();
-	private final JButton openSceneDirBtn = new JButton();
+
+
 	private final JButton saveFrameBtn = new JButton();
-	private final JCheckBox stillWaterCB = new JCheckBox();
 	private final JTextField sceneNameField = new JTextField();
 	private final JLabel sceneNameLbl = new JLabel();
-	private final JCheckBox biomeColorsCB = new JCheckBox();
+
 	private final JButton stopRenderBtn = new JButton();
-	private final JCheckBox transparentSky = new JCheckBox();
-	private final JCheckBox cloudsEnabled = new JCheckBox();
 	private final RenderContext context;
 	private final JButton showPreviewBtn = new JButton();
 	private final JLabel renderTimeLbl = new JLabel();
 	private final JLabel sppLbl = new JLabel();
 	private final JProgressBar progressBar = new JProgressBar();
 	private final JLabel progressLbl = new JLabel();
-	private final JComboBox postprocessCB = new JComboBox(Postprocess.values());
-	private final JComboBox skyModeCB = new JComboBox();
-	private final JButton changeSunColorBtn = new JButton("Change Sun Color");
 	private final JLabel etaLbl = new JLabel();
-	private final JCheckBox waterWorldCB = new JCheckBox();
-	private final JCheckBox waterColorCB = new JCheckBox("Use custom water color");
-	private final JButton waterColorBtn = new JButton("Change Water Color");
-	private final JButton fogColorBtn = new JButton("Edit Fog Color");
-	private final JCheckBox fastFogCB = new JCheckBox("Fast fog");
-	private final JTextField waterHeightField = new JTextField();
-	private final JButton applyWaterHeightBtn = new JButton("Apply");
 	private final DecimalFormat decimalFormat = new DecimalFormat();
-	private final JCheckBox saveDumpsCB = new JCheckBox();
-	private final JComboBox dumpFrequencyCB = new JComboBox();
-	private final JCheckBox saveSnapshotsCB = new JCheckBox("Save snapshot for each dump");
-	private final JLabel dumpFrequencyLbl = new JLabel(" frames");
-	private final JTextField cameraX = new JTextField();
-	private final JTextField cameraY = new JTextField();
-	private final JTextField cameraZ = new JTextField();
-	private final JTextField cameraYaw = new JTextField();
-	private final JTextField cameraPitch = new JTextField();
-	private final JTextField cameraRoll = new JTextField();
-	private final JButton mergeDumpBtn = new JButton("Merge Render Dump");
-	private final JCheckBox shutdownWhenDoneCB = new JCheckBox("Shutdown computer when render completes");
-	private final JRadioButton v90Btn = new JRadioButton("90");
-	private final JRadioButton v180Btn = new JRadioButton("180");
-	private final JComboBox outputMode = new JComboBox(OutputMode.values());
-	private final JCheckBox loadPlayersCB = new JCheckBox();
-	private final JComboBox playerModel = new JComboBox();
 
 	private final JTabbedPane tabbedPane = new JTabbedPane();
-
-	private final Adjuster skyHorizonOffset = new Adjuster(
-			"Horizon offset",
-			"Moves the horizon below the actual horizon",
-			0.0, 1.0) {
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().sky().setHorizonOffset(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().sky().getHorizonOffset());
-		}
-	};
 
 	private final Adjuster targetSPP = new Adjuster(
 			"Target SPP",
@@ -242,334 +140,14 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
-	private final Adjuster waterOpacity = new Adjuster(
-			"Water Opacity",
-			"Decides how opaque the water surface appears",
-			0.0, 1.0) {
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().setWaterOpacity(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().getWaterOpacity());
-		}
-	};
-
-	private final Adjuster waterVisibility = new Adjuster(
-			"Water Visibility",
-			"Visibility depth under water",
-			0.0, 20.0) {
-		{
-			setClampMax(false);
-		}
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().setWaterVisibility(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().getWaterVisibility());
-		}
-	};
-
-	private final Adjuster fogDensity = new Adjuster(
-			"Fog density",
-			"Alters the volumetric fog",
-			0.0, 2.0) {
-		{
-			setClampMax(false);
-		}
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().setFogDensity(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().getFogDensity());
-		}
-	};
-
-	private final Adjuster numThreads = new Adjuster(
-			"Render threads",
-			"Number of rendering threads",
-			RenderConstants.NUM_RENDER_THREADS_MIN,
-			20) {
-		{
-			setClampMax(false);
-		}
-		@Override
-		public void valueChanged(double newValue) {
-			int value = (int) newValue;
-			PersistentSettings.setNumThreads(value);
-			renderMan.setNumThreads(value);
-		}
-
-		@Override
-		public void update() {
-			set(PersistentSettings.getNumThreads());
-		}
-	};
-
-	private final Adjuster yCutoff = new Adjuster(
-			"Y cutoff",
-			"Blocks below the Y cutoff are not loaded",
-			0, Chunk.Y_MAX) {
-		public ErrorLabel advisory;
-
-		@Override
-		public void setUp() {
-			super.setUp();
-			advisory = new ErrorLabel(getField());
-			advisory.setVisible(false);
-		}
-		@Override
-		public void valueChanged(double newValue) {
-			int value = (int) newValue;
-			PersistentSettings.setYCutoff(value);
-			advisory.setText("This takes effect after the next time chunks are reloaded!");
-			advisory.setVisible(true);
-		}
-		@Override
-		public void update() {
-			set(PersistentSettings.getYCutoff());
-		}
-	};
-
-	private final Adjuster cpuLoad = new Adjuster(
-			"CPU load",
-			"CPU load percentage",
-			1, 100) {
-		@Override
-		public void valueChanged(double newValue) {
-			int value = (int) newValue;
-			PersistentSettings.setCPULoad(value);
-			renderMan.setCPULoad(value);
-		}
-
-		@Override
-		public void update() {
-			set(PersistentSettings.getCPULoad());
-		}
-	};
-
-	private final Adjuster rayDepth = new Adjuster(
-			"Ray depth",
-			"Sets the recursive ray depth",
-			1, 25) {
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().setRayDepth((int) newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().getRayDepth());
-		}
-	};
-	private final Adjuster emitterIntensity = new Adjuster(
-			"Emitter intensity",
-			"Light intensity modifier for emitters",
-			Scene.MIN_EMITTER_INTENSITY,
-			Scene.MAX_EMITTER_INTENSITY) {
-		{
-			setLogarithmicMode();
-		}
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().setEmitterIntensity(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().getEmitterIntensity());
-		}
-	};
-	private final Adjuster skyLight = new Adjuster(
-			"Sky Light",
-			"Sky light intensity modifier",
-			Sky.MIN_INTENSITY,
-			Sky.MAX_INTENSITY) {
-		{
-			setLogarithmicMode();
-			setSliderMin(0.01);
-		}
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().sky().setSkyLight(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().sky().getSkyLight());
-		}
-	};
-	private final Adjuster sunIntensity = new Adjuster(
-			"Sun Intensity",
-			"Sunlight intensity modifier",
-			Sun.MIN_INTENSITY,
-			Sun.MAX_INTENSITY) {
-		{
-			setLogarithmicMode();
-		}
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().sun().setIntensity(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().sun().getIntensity());
-		}
-	};
-	private final Adjuster sunAzimuth = new Adjuster(
-			"Sun azimuth",
-			"The angle towards the sun from north",
-			0.0, 360.0) {
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().sun().setAzimuth(QuickMath.degToRad(newValue));
-		}
-
-		@Override
-		public void update() {
-			set(QuickMath.radToDeg(renderMan.scene().sun().getAzimuth()));
-		}
-	};
-	private final Adjuster sunAltitude = new Adjuster(
-			"Sun altitude",
-			"Angle of the sun above the horizon",
-			0.0, 90.0) {
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().sun().setAltitude(QuickMath.degToRad(newValue));
-		}
-
-		@Override
-		public void update() {
-			set(QuickMath.radToDeg(renderMan.scene().sun().getAltitude()));
-		}
-	};
-	private final Adjuster fov = new Adjuster(
-			"Field of View (zoom)",
-			"Field of View",
-			1.0,
-			180.0) {
-		{
-			setClampMax(false);
-		}
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().camera().setFoV(newValue);
-		}
-
-		@Override
-		public void update() {
-			Camera camera = renderMan.scene().camera();
-			set(camera.getFoV(), camera.getMinFoV(), camera.getMaxFoV());
-		}
-	};
-	private Adjuster dof;
-	private final Adjuster subjectDistance = new Adjuster(
-			"Subject Distance",
-			"Distance to focal plane",
-			Camera.MIN_SUBJECT_DISTANCE,
-			Camera.MAX_SUBJECT_DISTANCE) {
-		{
-			setLogarithmicMode();
-		}
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().camera().setSubjectDistance(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().camera().getSubjectDistance());
-		}
-	};
-	private final Adjuster exposure = new Adjuster(
-			"exposure",
-			"exposure",
-			Scene.MIN_EXPOSURE,
-			Scene.MAX_EXPOSURE) {
-		{
-			setLogarithmicMode();
-		}
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().setExposure(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().getExposure());
-		}
-	};
-	private final Adjuster cloudSize = new Adjuster(
-			"Cloud Size",
-			"Cloud Size",
-			1.0, 128.0) {
-		{
-			setLogarithmicMode();
-		}
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().sky().setCloudSize(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().sky().cloudSize());
-		}
-	};
-	private final Adjuster cloudXOffset = new Adjuster(
-			"Cloud X",
-			"Cloud X Offset",
-			1.0, 100.0) {
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().sky().setCloudXOffset(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().sky().cloudXOffset());
-		}
-	};
-	private final Adjuster cloudYOffset = new Adjuster(
-			"Cloud Y",
-			"Height of the cloud layer",
-			-128.0, 512.0) {
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().sky().setCloudYOffset(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().sky().cloudYOffset());
-		}
-	};
-	private final Adjuster cloudZOffset = new Adjuster(
-			"Cloud Z",
-			"Cloud Z Offset",
-			1.0, 100.0) {
-		@Override
-		public void valueChanged(double newValue) {
-			renderMan.scene().sky().setCloudZOffset(newValue);
-		}
-
-		@Override
-		public void update() {
-			set(renderMan.scene().sky().cloudZOffset());
-		}
-	};
-
-	private GradientEditor gradientEditor;
+	private final RenderControlsTab generalTab;
+	private final RenderControlsTab lightingTab;
+	private final RenderControlsTab skyTab;
+	private final RenderControlsTab waterTab;
+	private final CameraTab cameraTab;
+	private final RenderControlsTab postProcessingTab;
+	private final AdvancedTab advancedTab;
+	private final RenderControlsTab helpTab;
 
 	/**
 	 * Create a new Render Controls dialog.
@@ -586,15 +164,24 @@ public class RenderControls extends JDialog implements ViewListener,
 		context = renderContext;
 		chunky = chunkyInstance;
 
-		view = new Chunk3DView(this, chunkyInstance.getFrame());
+		view = new Chunk3DView(chunkyInstance.getFrame());
+		view.addViewListener(this);
 
-		renderMan = new RenderManager(
-				view.getCanvas(), renderContext, this);
+		renderMan = new RenderManager(view.getCanvas(), renderContext, this);
 
+		generalTab = new GeneralTab(this);
+		lightingTab = new LightingTab(this);
+		skyTab = new SkyTab(this);
+		waterTab = new WaterTab(this);
+		cameraTab = new CameraTab(this);
+		postProcessingTab = new PostProcessingTab(this);
+		advancedTab = new AdvancedTab(this);
+		helpTab = new HelpTab(this);
 		buildUI();
 
 		renderMan.start();
 
+		view.addViewListener(cameraTab);
 		view.setRenderer(renderMan);
 
 		sceneMan = new SceneManager(renderMan);
@@ -604,11 +191,6 @@ public class RenderControls extends JDialog implements ViewListener,
 	private void buildUI() {
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		setModalityType(ModalityType.MODELESS);
-
-		if (!ShutdownAlert.canShutdown()) {
-			// disable the computer shutdown checkbox if we can't shutdown
-			shutdownWhenDoneCB.setEnabled(false);
-		}
 
 		addWindowListener(new WindowListener() {
 			@Override
@@ -644,14 +226,14 @@ public class RenderControls extends JDialog implements ViewListener,
 
 		updateTitle();
 
-		addTab("General", Icon.wrench, buildGeneralPane());
-		addTab("Lighting", Icon.light, buildLightingPane());
-		addTab("Sky & Fog", Icon.sky, buildSkyPane());
-		addTab("Water", Icon.water, buildWaterPane());
-		addTab("Camera", Icon.eye, buildCameraPane());
-		addTab("Post-processing", Icon.gear, buildPostProcessingPane());
-		addTab("Advanced", Icon.advanced, buildAdvancedPane());
-		addTab("Help", Icon.question, buildHelpPane());
+		addTab("General", Icon.wrench, generalTab);
+		addTab("Lighting", Icon.light, lightingTab);
+		addTab("Sky & Fog", Icon.sky, skyTab);
+		addTab("Water", Icon.water, waterTab);
+		addTab("Camera", Icon.eye, cameraTab);
+		addTab("Post-processing", Icon.gear, postProcessingTab);
+		addTab("Advanced", Icon.advanced, advancedTab);
+		addTab("Help", Icon.question, helpTab);
 
 		JLabel sppTargetLbl = new JLabel("SPP Target: ");
 		sppTargetLbl.setToolTipText("The render will be paused at this SPP count");
@@ -867,1343 +449,9 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	}
 
-	private JPanel buildAdvancedPane() {
-		rayDepth.update();
-
-		JLabel outputModeLbl = new JLabel("Output mode: ");
-		outputMode.setModel(new DefaultComboBoxModel(OutputMode.values()));
-		outputMode.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JComboBox source = (JComboBox) e.getSource();
-				renderMan.scene().setOutputMode((OutputMode) source.getSelectedItem());
-			}
-		});
-		updateOutputMode();
-
-		JSeparator sep1 = new JSeparator();
-		JSeparator sep2 = new JSeparator();
-
-		numThreads.update();
-
-		cpuLoad.update();
-
-		fastFogCB.setToolTipText("Enable faster fog algorithm");
-		fastFogCB.addActionListener(fastFogListener);
-		updateFastFog();
-
-		mergeDumpBtn.setToolTipText(
-				"Merge an existing render dump with the current render");
-		mergeDumpBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				CenteredFileDialog fileDialog =
-						new CenteredFileDialog(null,
-								"Select Render Dump", FileDialog.LOAD);
-				fileDialog.setFilenameFilter(
-						new FilenameFilter() {
-							@Override
-							public boolean accept(File dir, String name) {
-								return name.toLowerCase().endsWith(".dump");
-							}
-						});
-				fileDialog.setDirectory(PersistentSettings.
-						getSceneDirectory().getAbsolutePath());
-				fileDialog.setVisible(true);
-				File selectedFile = fileDialog.getSelectedFile();
-				if (selectedFile != null) {
-					sceneMan.mergeRenderDump(selectedFile);
-				}
-			}
-		});
-
-		JPanel panel = new JPanel();
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
-				.addGroup(numThreads.horizontalGroup(layout))
-				.addGroup(cpuLoad.horizontalGroup(layout))
-				.addComponent(sep1)
-				.addGroup(rayDepth.horizontalGroup(layout))
-				.addComponent(sep2)
-				.addComponent(mergeDumpBtn)
-				.addComponent(shutdownWhenDoneCB)
-				.addComponent(fastFogCB)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(outputModeLbl)
-					.addComponent(outputMode, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-			)
-			.addContainerGap()
-		);
-		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(numThreads.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(cpuLoad.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(rayDepth.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(mergeDumpBtn)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(shutdownWhenDoneCB)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(fastFogCB)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-					.addComponent(outputModeLbl)
-					.addComponent(outputMode))
-			.addContainerGap()
-		);
-		return panel;
-	}
-
-	private JPanel buildWaterPane() {
-
-		JButton storeDefaultsBtn = new JButton("Store as defaults");
-		storeDefaultsBtn.setToolTipText("Store the current water settings as new defaults");
-		storeDefaultsBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				PersistentSettings.setStillWater(renderMan.scene().stillWaterEnabled());
-				PersistentSettings.setWaterOpacity(renderMan.scene().getWaterOpacity());
-				PersistentSettings.setWaterVisibility(renderMan.scene().getWaterVisibility());
-				PersistentSettings.setWaterHeight(renderMan.scene().getWaterHeight());
-				boolean useCustomWaterColor = renderMan.scene().getUseCustomWaterColor();
-				PersistentSettings.setUseCustomWaterColor(useCustomWaterColor);
-				if (useCustomWaterColor) {
-					Vector3d color = renderMan.scene().getWaterColor();
-					PersistentSettings.setWaterColor(color.x, color.y, color.z);
-				}
-			}
-		});
-
-		stillWaterCB.setText("still water");
-		stillWaterCB.addActionListener(stillWaterListener);
-		updateStillWater();
-
-		waterVisibility.update();
-		waterOpacity.update();
-
-		JLabel waterWorldLbl = new JLabel(
-				"Note: All chunks will be reloaded after changing the water world options!");
-		JLabel waterHeightLbl = new JLabel("Water height: ");
-		waterHeightField.setColumns(5);
-		waterHeightField.setText("" + World.SEA_LEVEL);
-		waterHeightField.setEnabled(renderMan.scene().getWaterHeight() != 0);
-		waterHeightField.addActionListener(waterHeightListener);
-
-		applyWaterHeightBtn.setToolTipText("Use this water height");
-		applyWaterHeightBtn.addActionListener(waterHeightListener);
-
-		waterWorldCB.setText("Water World Mode");
-		waterWorldCB.addActionListener(waterWorldListener);
-		updateWaterHeight();
-
-		waterColorCB.addActionListener(customWaterColorListener);
-		updateWaterColor();
-
-		waterColorBtn.setIcon(Icon.colors.imageIcon());
-		waterColorBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ColorPicker picker = new ColorPicker(waterColorBtn, renderMan.scene().getWaterColor());
-				picker.addColorListener(new ColorListener() {
-					@Override
-					public void onColorPicked(Vector3d color) {
-						renderMan.scene().setWaterColor(color);
-					}
-				});
-			}
-		});
-
-		JPanel panel = new JPanel();
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
-				.addComponent(stillWaterCB)
-				.addGroup(waterVisibility.horizontalGroup(layout))
-				.addGroup(waterOpacity.horizontalGroup(layout))
-				.addComponent(waterWorldLbl)
-				.addComponent(waterWorldCB)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(waterHeightLbl)
-					.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
-					.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(applyWaterHeightBtn)
-				)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(waterColorCB)
-					.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
-					.addComponent(waterColorBtn)
-				)
-				.addGroup(layout.createSequentialGroup()
-					.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
-					.addComponent(storeDefaultsBtn)
-				)
-			)
-			.addContainerGap()
-		);
-		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addComponent(stillWaterCB)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(waterVisibility.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(waterOpacity.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(waterWorldLbl)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addComponent(waterWorldCB)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(waterHeightLbl)
-				.addComponent(waterHeightField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				.addComponent(applyWaterHeightBtn)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(waterColorCB)
-				.addComponent(waterColorBtn)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
-			.addComponent(storeDefaultsBtn)
-			.addContainerGap()
-		);
-		return panel;
-	}
-
-	private JPanel buildPostProcessingPane() {
-		exposure.update();
-
-		JLabel postprocessDescLbl = new JLabel("<html>Post processing affects rendering performance<br>when the preview window is visible");
-		JLabel postprocessLbl = new JLabel("Post-processing mode:");
-		updatePostprocessCB();
-		postprocessCB.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JComboBox source = (JComboBox) e.getSource();
-				renderMan.scene().setPostprocess((Postprocess) source.getSelectedItem());
-			}
-		});
-
-		JPanel panel = new JPanel();
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
-				.addGroup(exposure.horizontalGroup(layout))
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(postprocessLbl)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(postprocessCB)
-				)
-				.addComponent(postprocessDescLbl)
-			)
-			.addContainerGap()
-		);
-		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(exposure.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(postprocessLbl)
-				.addComponent(postprocessCB)
-			)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addComponent(postprocessDescLbl)
-			.addContainerGap()
-		);
-		return panel;
-	}
-
-	private JPanel buildGeneralPane() {
-		JLabel canvasSizeLbl = new JLabel("Canvas size:");
-		canvasSizeLbl.setIcon(Icon.scale.imageIcon());
-
-		canvasSizeCB.setEditable(true);
-		canvasSizeCB.addItem("400x400");
-		canvasSizeCB.addItem("1024x768");
-		canvasSizeCB.addItem("960x540");
-		canvasSizeCB.addItem("1920x1080");
-		canvasSizeCB.addActionListener(canvasSizeListener);
-		final JTextField canvasSizeEditor = (JTextField) canvasSizeCB.getEditor().getEditorComponent();
-		canvasSizeEditor.addFocusListener(new FocusListener() {
-			@Override
-			public void focusLost(FocusEvent e) {
-			}
-			@Override
-			public void focusGained(FocusEvent e) {
-				canvasSizeEditor.selectAll();
-			}
-		});
-
-		updateCanvasSizeField();
-
-		loadSceneBtn.setText("Load Scene");
-		loadSceneBtn.setIcon(Icon.load.imageIcon());
-		loadSceneBtn.addActionListener(loadSceneListener);
-
-		JButton loadSelectedChunksBtn = new JButton("Load Selected Chunks");
-		loadSelectedChunksBtn.setToolTipText("Load the chunks that are currently selected in the map view");
-		loadSelectedChunksBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				sceneMan.loadChunks(chunky.getWorld(), chunky.getSelectedChunks());
-			}
-		});
-
-		JButton reloadChunksBtn = new JButton("Reload Chunks");
-		reloadChunksBtn.setIcon(Icon.reload.imageIcon());
-		reloadChunksBtn.setToolTipText("Reload all chunks in the scene");
-		reloadChunksBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				sceneMan.reloadChunks();
-			}
-		});
-
-		openSceneDirBtn.setText("Open Scene Directory");
-		openSceneDirBtn.setToolTipText("Open the directory where Chunky stores scene descriptions and renders");
-		openSceneDirBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					if (Desktop.isDesktopSupported()) {
-						Desktop.getDesktop().open(context.getSceneDirectory());
-					}
-				} catch (IOException e) {
-					Log.warn("Failed to open scene directory", e);
-				}
-			}
-		});
-		openSceneDirBtn.setVisible(Desktop.isDesktopSupported());
-
-		loadSceneBtn.setToolTipText("This replaces the current scene!");
-		JButton setCanvasSizeBtn = new JButton("Apply");
-		setCanvasSizeBtn.setToolTipText("Set the canvas size to the value in the field");
-		setCanvasSizeBtn.addActionListener(canvasSizeListener);
-
-		JButton halveCanvasSizeBtn = new JButton("Halve");
-		halveCanvasSizeBtn.setToolTipText("Halve the canvas width and height");
-		halveCanvasSizeBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int width = renderMan.scene().canvasWidth() / 2;
-				int height = renderMan.scene().canvasHeight() / 2;
-				setCanvasSize(width, height);
-			}
-		});
-		JButton doubleCanvasSizeBtn = new JButton("Double");
-		doubleCanvasSizeBtn.setToolTipText("Double the canvas width and height");
-		doubleCanvasSizeBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int width = renderMan.scene().canvasWidth() * 2;
-				int height = renderMan.scene().canvasHeight() * 2;
-				setCanvasSize(width, height);
-			}
-		});
-
-		JButton makeDefaultBtn = new JButton("Make Default");
-		makeDefaultBtn.setToolTipText("Make the current canvas size the default");
-		makeDefaultBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				PersistentSettings.set3DCanvasSize(
-						renderMan.scene().canvasWidth(),
-						renderMan.scene().canvasHeight());
-			}
-		});
-
-		JSeparator sep1 = new JSeparator();
-		JSeparator sep2 = new JSeparator();
-
-		loadPlayersCB.setText("Load players");
-		loadPlayersCB.setToolTipText("Enable/disable player entity loading. "
-				+ "Reload the chunks after changing this option.");
-		updateLoadPlayersCB();
-
-		JLabel playerModelLbl = new JLabel("Player model: ");
-
-		for (PlayerModel model : PlayerModel.values()) {
-			playerModel.addItem(model);
-		}
-		playerModel.setToolTipText("Reload chunks after changing this option.");
-		updatePlayerModel();
-
-		biomeColorsCB.setText("Enable biome colors");
-		updateBiomeColorsCB();
-
-		saveDumpsCB.setText("Save dump once every ");
-		saveDumpsCB.addActionListener(saveDumpsListener);
-		updateSaveDumpsCheckBox();
-
-		String[] frequencyStrings = new String[dumpFrequencies.length];
-		for (int i = 0; i < dumpFrequencies.length; ++i) {
-			frequencyStrings[i] = Integer.toString(dumpFrequencies[i]);
-		}
-		dumpFrequencyCB.setModel(new DefaultComboBoxModel(frequencyStrings));
-		dumpFrequencyCB.setEditable(true);
-		dumpFrequencyCB.addActionListener(dumpFrequencyListener);
-		updateDumpFrequencyField();
-
-		saveSnapshotsCB.addActionListener(saveSnapshotListener);
-		updateSaveSnapshotCheckBox();
-
-		yCutoff.update();
-
-		JPanel panel = new JPanel();
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(loadSceneBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(openSceneDirBtn)
-				)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(loadSelectedChunksBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(reloadChunksBtn)
-				)
-				.addComponent(sep1)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(canvasSizeLbl)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(canvasSizeCB, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(setCanvasSizeBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(makeDefaultBtn)
-				)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(halveCanvasSizeBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(doubleCanvasSizeBtn)
-				)
-				.addComponent(sep2)
-				.addComponent(loadPlayersCB)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(playerModelLbl)
-					.addComponent(playerModel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				)
-				.addComponent(biomeColorsCB)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(saveDumpsCB)
-					.addComponent(dumpFrequencyCB, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addComponent(dumpFrequencyLbl)
-					.addGap(0, 0, Short.MAX_VALUE)
-				)
-				.addComponent(saveSnapshotsCB)
-				.addGroup(yCutoff.horizontalGroup(layout))
-			)
-			.addContainerGap()
-		);
-		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
-				.addComponent(loadSceneBtn)
-				.addComponent(openSceneDirBtn)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(loadSelectedChunksBtn)
-				.addComponent(reloadChunksBtn)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(canvasSizeLbl)
-				.addComponent(canvasSizeCB, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				.addComponent(setCanvasSizeBtn)
-				.addComponent(makeDefaultBtn)
-			)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(halveCanvasSizeBtn)
-				.addComponent(doubleCanvasSizeBtn)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(loadPlayersCB)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(playerModelLbl)
-				.addComponent(playerModel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(biomeColorsCB)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(saveDumpsCB)
-				.addComponent(dumpFrequencyCB)
-				.addComponent(dumpFrequencyLbl)
-			)
-			.addComponent(saveSnapshotsCB)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(yCutoff.verticalGroup(layout))
-			.addContainerGap()
-		);
-		return panel;
-	}
-
-	private JPanel buildLightingPane() {
-
-		changeSunColorBtn.setIcon(Icon.colors.imageIcon());
-		changeSunColorBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ColorPicker picker = new ColorPicker(changeSunColorBtn, renderMan.scene().sun().getColor());
-				picker.addColorListener(new ColorListener() {
-					@Override
-					public void onColorPicked(Vector3d color) {
-						renderMan.scene().sun().setColor(color);
-					}
-				});
-			}
-		});
-
-		directLight.setText("enable sunlight");
-		directLight.setSelected(renderMan.scene().getDirectLight());
-		directLight.addActionListener(directLightListener);
-
-		JLabel bulbIcon = new JLabel(Icon.light.imageIcon());
-		JLabel sunIcon = new JLabel(Icon.sun.imageIcon());
-
-		enableEmitters.setText("enable emitters");
-		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
-		enableEmitters.addActionListener(emittersListener);
-
-		emitterIntensity.update();
-
-		sunIntensity.update();
-
-		skyLight.update();
-
-		sunAzimuth.update();
-
-		sunAltitude.update();
-
-		JPanel panel = new JPanel();
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(bulbIcon)
-					.addComponent(enableEmitters)
-				)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(sunIcon)
-					.addComponent(directLight)
-				)
-				.addGroup(layout.createSequentialGroup()
-					.addGroup(layout.createParallelGroup()
-						.addComponent(skyLight.getLabel())
-						.addComponent(emitterIntensity.getLabel())
-						.addComponent(sunIntensity.getLabel())
-						.addComponent(sunAzimuth.getLabel())
-						.addComponent(sunAltitude.getLabel())
-					)
-					.addGroup(layout.createParallelGroup()
-						.addComponent(skyLight.getSlider())
-						.addComponent(emitterIntensity.getSlider())
-						.addComponent(sunIntensity.getSlider())
-						.addComponent(sunAzimuth.getSlider())
-						.addComponent(sunAltitude.getSlider())
-					)
-					.addGroup(layout.createParallelGroup()
-						.addComponent(skyLight.getField())
-						.addComponent(emitterIntensity.getField())
-						.addComponent(sunIntensity.getField())
-						.addComponent(sunAzimuth.getField())
-						.addComponent(sunAltitude.getField())
-					)
-				)
-				.addComponent(changeSunColorBtn)
-			)
-			.addContainerGap()
-		);
-		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(skyLight.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(bulbIcon)
-				.addComponent(enableEmitters)
-			)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(emitterIntensity.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(sunIcon)
-				.addComponent(directLight)
-			)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(sunIntensity.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(sunAzimuth.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(sunAltitude.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(changeSunColorBtn)
-			.addContainerGap()
-		);
-		return panel;
-	}
-
-	private JPanel buildSkyPane() {
-
-		JLabel skyModeLbl = new JLabel("Sky Mode:");
-		skyModeCB.setModel(new DefaultComboBoxModel(Sky.SkyMode.values()));
-		skyModeCB.addActionListener(skyModeListener);
-		updateSkyMode();
-
-		JLabel skymapRotationLbl = new JLabel("Skymap rotation:");
-		skymapRotationSlider.setMinimum(1);
-		skymapRotationSlider.setMaximum(100);
-		skymapRotationSlider.addChangeListener(skyRotationListener);
-		skymapRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
-		JLabel lightProbeRotationLbl = new JLabel("Skymap rotation:");
-		lightProbeRotationSlider.setMinimum(1);
-		lightProbeRotationSlider.setMaximum(100);
-		lightProbeRotationSlider.addChangeListener(skyRotationListener);
-		lightProbeRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
-		JLabel skyboxRotationLbl = new JLabel("Skybox rotation:");
-		skyboxRotationSlider.setMinimum(1);
-		skyboxRotationSlider.setMaximum(100);
-		skyboxRotationSlider.addChangeListener(skyRotationListener);
-		skyboxRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
-		updateSkyRotation();
-
-		skyHorizonOffset.update();
-		cloudSize.update();
-		cloudXOffset.update();
-		cloudYOffset.update();
-		cloudZOffset.update();
-
-		JLabel verticalResolutionLbl = new JLabel("Vertical resolution (degrees):");
-		ButtonGroup verticalResolution = new ButtonGroup();
-		v90Btn.setSelected(true);
-		v180Btn.setSelected(false);
-		verticalResolution.add(v90Btn);
-		verticalResolution.add(v180Btn);
-
-		v90Btn.addActionListener(v90Listener);
-		v180Btn.addActionListener(v180Listener);
-		updateVerticalResolution();
-
-		simulatedSkyPanel.setBorder(BorderFactory.createTitledBorder("Simulated Sky Settings"));
-		GroupLayout simulatedSkyLayout = new GroupLayout(simulatedSkyPanel);
-		simulatedSkyPanel.setLayout(simulatedSkyLayout);
-		simulatedSkyLayout.setAutoCreateContainerGaps(true);
-		simulatedSkyLayout.setAutoCreateGaps(true);
-		simulatedSkyLayout.setHorizontalGroup(simulatedSkyLayout.createParallelGroup()
-			.addGroup(skyHorizonOffset.horizontalGroup(simulatedSkyLayout))
-		);
-		simulatedSkyLayout.setVerticalGroup(simulatedSkyLayout.createSequentialGroup()
-			.addGroup(skyHorizonOffset.verticalGroup(simulatedSkyLayout))
-		);
-
-		skymapPanel.setBorder(BorderFactory.createTitledBorder("Skymap Settings"));
-		GroupLayout skymapLayout = new GroupLayout(skymapPanel);
-		skymapPanel.setLayout(skymapLayout);
-		skymapLayout.setAutoCreateContainerGaps(true);
-		skymapLayout.setAutoCreateGaps(true);
-		skymapLayout.setHorizontalGroup(skymapLayout.createParallelGroup()
-			.addComponent(loadSkymapBtn)
-			.addGroup(skymapLayout.createSequentialGroup()
-				.addComponent(skymapRotationLbl)
-				.addComponent(skymapRotationSlider)
-			)
-			.addGroup(skymapLayout.createSequentialGroup()
-				.addComponent(verticalResolutionLbl)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(v90Btn)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(v180Btn)
-			)
-		);
-		skymapLayout.setVerticalGroup(skymapLayout.createSequentialGroup()
-			.addComponent(loadSkymapBtn)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(skymapLayout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(verticalResolutionLbl)
-				.addComponent(v90Btn)
-				.addComponent(v180Btn)
-			)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(skymapLayout.createParallelGroup()
-				.addComponent(skymapRotationLbl)
-				.addComponent(skymapRotationSlider)
-			)
-		);
-
-		loadSkymapBtn.setText("Load Skymap");
-		loadSkymapBtn.setToolTipText("Use a panoramic skymap");
-		loadSkymapBtn.addActionListener(new SkymapTextureLoader(renderMan));
-
-		lightProbePanel.setBorder(BorderFactory.createTitledBorder("Spherical Skymap Settings"));
-		GroupLayout lightProbeLayout = new GroupLayout(lightProbePanel);
-		lightProbePanel.setLayout(lightProbeLayout);
-		lightProbeLayout.setAutoCreateContainerGaps(true);
-		lightProbeLayout.setAutoCreateGaps(true);
-		lightProbeLayout.setHorizontalGroup(lightProbeLayout.createParallelGroup()
-			.addComponent(loadLightProbeBtn)
-			.addGroup(lightProbeLayout.createSequentialGroup()
-				.addComponent(lightProbeRotationLbl)
-				.addComponent(lightProbeRotationSlider)
-			)
-		);
-		lightProbeLayout.setVerticalGroup(lightProbeLayout.createSequentialGroup()
-			.addComponent(loadLightProbeBtn)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(lightProbeLayout.createParallelGroup()
-				.addComponent(lightProbeRotationLbl)
-				.addComponent(lightProbeRotationSlider)
-			)
-		);
-
-		loadLightProbeBtn.setText("Load Spherical Skymap");
-		loadLightProbeBtn.setToolTipText("Select the spherical skymap to use");
-		loadLightProbeBtn.addActionListener(new SkymapTextureLoader(renderMan));
-
-		skyGradientPanel.setBorder(BorderFactory.createTitledBorder("Sky Gradient"));
-		gradientEditor = new GradientEditor();
-		gradientEditor.addGradientListener(gradientListener);
-		updateSkyGradient();
-		skyGradientPanel.add(gradientEditor);
-
-		GroupLayout skyboxLayout = new GroupLayout(skyboxPanel);
-		skyboxPanel.setLayout(skyboxLayout);
-		skyboxPanel.setBorder(BorderFactory.createTitledBorder("Skybox"));
-
-		JLabel skyboxLbl = new JLabel("Load skybox textures:");
-
-		JButton loadUpTexture = new JButton("Up");
-		loadUpTexture.setToolTipText("Load up texture");
-		loadUpTexture.setIcon(Icon.skyboxUp.imageIcon());
-		loadUpTexture.addActionListener(new SkyboxTextureLoader(renderMan, Sky.SKYBOX_UP));
-
-		JButton loadDownTexture = new JButton("Down");
-		loadDownTexture.setToolTipText("Load down texture");
-		loadDownTexture.setIcon(Icon.skyboxDown.imageIcon());
-		loadDownTexture.addActionListener(new SkyboxTextureLoader(renderMan, Sky.SKYBOX_DOWN));
-
-		JButton loadFrontTexture = new JButton("Front");
-		loadFrontTexture.setToolTipText("Load front (north) texture");
-		loadFrontTexture.setIcon(Icon.skyboxFront.imageIcon());
-		loadFrontTexture.addActionListener(new SkyboxTextureLoader(renderMan, Sky.SKYBOX_FRONT));
-
-		JButton loadBackTexture = new JButton("Back");
-		loadBackTexture.setToolTipText("Load back (south) texture");
-		loadBackTexture.setIcon(Icon.skyboxBack.imageIcon());
-		loadBackTexture.addActionListener(new SkyboxTextureLoader(renderMan, Sky.SKYBOX_BACK));
-
-		JButton loadRightTexture = new JButton("Right");
-		loadRightTexture.setToolTipText("Load right (east) texture");
-		loadRightTexture.setIcon(Icon.skyboxRight.imageIcon());
-		loadRightTexture.addActionListener(new SkyboxTextureLoader(renderMan, Sky.SKYBOX_RIGHT));
-
-		JButton loadLeftTexture = new JButton("Left");
-		loadLeftTexture.setToolTipText("Load left (west) texture");
-		loadLeftTexture.setIcon(Icon.skyboxLeft.imageIcon());
-		loadLeftTexture.addActionListener(new SkyboxTextureLoader(renderMan, Sky.SKYBOX_LEFT));
-
-		skyboxLayout.setAutoCreateContainerGaps(true);
-		skyboxLayout.setAutoCreateGaps(true);
-		skyboxLayout.setHorizontalGroup(skyboxLayout.createParallelGroup()
-			.addGroup(skyboxLayout.createSequentialGroup()
-				.addComponent(skyboxLbl)
-				.addGroup(skyboxLayout.createParallelGroup()
-					.addComponent(loadUpTexture)
-					.addComponent(loadFrontTexture)
-					.addComponent(loadRightTexture)
-				)
-				.addGroup(skyboxLayout.createParallelGroup()
-					.addComponent(loadDownTexture)
-					.addComponent(loadBackTexture)
-					.addComponent(loadLeftTexture)
-				)
-			)
-			.addGroup(skyboxLayout.createSequentialGroup()
-				.addComponent(skyboxRotationLbl)
-				.addComponent(skyboxRotationSlider)
-			)
-		);
-		skyboxLayout.setVerticalGroup(skyboxLayout.createSequentialGroup()
-			.addComponent(skyboxLbl)
-			.addGroup(skyboxLayout.createParallelGroup()
-				.addComponent(loadUpTexture)
-				.addComponent(loadDownTexture)
-			)
-			.addGroup(skyboxLayout.createParallelGroup()
-				.addComponent(loadFrontTexture)
-				.addComponent(loadBackTexture)
-			)
-			.addGroup(skyboxLayout.createParallelGroup()
-				.addComponent(loadRightTexture)
-				.addComponent(loadLeftTexture)
-			)
-			.addGroup(skyboxLayout.createParallelGroup()
-				.addComponent(skyboxRotationLbl)
-				.addComponent(skyboxRotationSlider)
-			)
-		);
-
-		transparentSky.setText("transparent sky");
-		transparentSky.setToolTipText("Disables rendering the skybox");
-		transparentSky.addActionListener(transparentSkyListener);
-		updateTransparentSky();
-
-		fogDensity.update();
-
-		JLabel fogColorLbl = new JLabel("<html>Hint: set fog density &gt; 0.1 for thick fog,<br>set it &lt; 0.1 for haze/atmosphere effect");
-		fogColorBtn.setIcon(Icon.colors.imageIcon());
-		fogColorBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ColorPicker picker = new ColorPicker(fogColorBtn, renderMan.scene().getFogColor());
-				picker.addColorListener(new ColorListener() {
-					@Override
-					public void onColorPicked(Vector3d color) {
-						renderMan.scene().setFogColor(color);
-					}
-				});
-			}
-		});
-
-		cloudsEnabled.setText("enable clouds");
-		cloudsEnabled.addActionListener(cloudsEnabledListener);
-		updateCloudsEnabledCheckBox();
-
-		JPanel panel = new JPanel();
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(skyModeLbl)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(skyModeCB, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				)
-				.addComponent(simulatedSkyPanel)
-				.addComponent(skymapPanel)
-				.addComponent(lightProbePanel)
-				.addComponent(skyGradientPanel)
-				.addComponent(skyboxPanel)
-				.addComponent(transparentSky)
-				.addComponent(cloudsEnabled)
-				.addGroup(cloudSize.horizontalGroup(layout))
-				.addGroup(cloudXOffset.horizontalGroup(layout))
-				.addGroup(cloudYOffset.horizontalGroup(layout))
-				.addGroup(cloudZOffset.horizontalGroup(layout))
-				.addGroup(fogDensity.horizontalGroup(layout))
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(fogColorBtn)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(fogColorLbl)
-				)
-			)
-			.addContainerGap()
-		);
-		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-					.addComponent(skyModeLbl)
-					.addComponent(skyModeCB)
-				)
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(simulatedSkyPanel)
-				.addComponent(skymapPanel)
-				.addComponent(lightProbePanel)
-				.addComponent(skyGradientPanel)
-				.addComponent(skyboxPanel)
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(transparentSky)
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(cloudsEnabled)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(cloudSize.verticalGroup(layout))
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(cloudXOffset.verticalGroup(layout))
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(cloudYOffset.verticalGroup(layout))
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(cloudZOffset.verticalGroup(layout))
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addGroup(fogDensity.verticalGroup(layout))
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addGroup(layout.createParallelGroup()
-					.addComponent(fogColorBtn)
-					.addComponent(fogColorLbl)
-				)
-				.addContainerGap()
-		);
-		return panel;
-	}
-
-	private JPanel buildCameraPane() {
-		JLabel projectionModeLbl = new JLabel("Projection");
-
-		fov.update();
-
-		dof = new DoFAdjuster(renderMan);
-		dof.update();
-
-		subjectDistance.update();
-
-		JLabel presetLbl = new JLabel("Preset:");
-		CameraPreset[] presets = {
-			CameraPreset.NONE,
-			CameraPreset.ISO_WEST_NORTH, CameraPreset.ISO_NORTH_EAST,
-			CameraPreset.ISO_EAST_SOUTH, CameraPreset.ISO_SOUTH_WEST,
-			CameraPreset.SKYBOX_RIGHT, CameraPreset.SKYBOX_LEFT,
-			CameraPreset.SKYBOX_UP, CameraPreset.SKYBOX_DOWN,
-			CameraPreset.SKYBOX_FRONT, CameraPreset.SKYBOX_BACK,
-		};
-		cameraPreset.setModel(new DefaultComboBoxModel(presets));
-		cameraPreset.setMaximumRowCount(presets.length);
-		final int presetHeight = cameraPreset.getPreferredSize().height;
-		final int presetWidth = cameraPreset.getPreferredSize().width;
-		cameraPreset.setRenderer(new DefaultListCellRenderer() {
-			@Override
-			public Component getListCellRendererComponent(JList list, Object value,
-					int index, boolean isSelected, boolean cellHasFocus) {
-				JLabel label = (JLabel) super.getListCellRendererComponent(
-						list, value, index, isSelected, cellHasFocus);
-				label.setPreferredSize(new Dimension(presetWidth, presetHeight));
-				CameraPreset preset = (CameraPreset) value;
-				label.setIcon(preset.getIcon());
-				return label;
-			}
-		});
-		cameraPreset.addActionListener(cameraPresetListener);
-
-		JLabel customPresetLbl = new JLabel("Custom preset:");
-		customPreset.setEditable(true);
-		updateCustomPresets();
-		JButton savePreset = new JButton("save");
-		savePreset.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String name;
-				int selected = customPreset.getSelectedIndex();
-				if (selected == -1) {
-					// select name
-					name = (String) customPreset.getEditor().getItem();
-					name = (name==null) ? "" : name.trim();
-					if (name.isEmpty()) {
-						// auto-assign name
-						int nextIndex = customPreset.getItemCount() + 1;
-						outer: while (true) {
-							name = "custom-" + (nextIndex++);
-							for (int i = 0; i < customPreset.getItemCount(); ++i) {
-								String item = (String) customPreset.getItemAt(i);
-								if (name.equals(item)) {
-									continue outer;
-								}
-							}
-							break;
-						}
-					} else {
-						for (int i = 0; i < customPreset.getItemCount(); ++i) {
-							String item = (String) customPreset.getItemAt(i);
-							if (name.equals(item)) {
-								selected = i;
-								break;
-							}
-						}
-					}
-					if (selected == -1) {
-						// add new preset
-						selected = 	customPreset.getItemCount();
-						customPreset.addItem(name);
-
-					}
-					customPreset.setSelectedIndex(selected);
-				} else {
-					name = (String) customPreset.getSelectedItem();
-				}
-				renderMan.scene().saveCameraPreset(name);
-			}
-		});
-		JButton loadPreset = new JButton("load");
-		loadPreset.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String name;
-				int selected = customPreset.getSelectedIndex();
-				if (selected == -1) {
-					// select name
-					name = (String) customPreset.getEditor().getItem();
-					name = (name==null) ? "" : name.trim();
-				} else {
-					name = ((String) customPreset.getSelectedItem()).trim();
-				}
-				if (!name.isEmpty()) {
-					renderMan.scene().loadCameraPreset(name);
-				}
-			}
-		});
-		JButton deletePreset = new JButton("delete");
-		deletePreset.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String name;
-				int selected = customPreset.getSelectedIndex();
-				if (selected == -1) {
-					// select name
-					name = (String) customPreset.getEditor().getItem();
-					name = (name==null) ? "" : name.trim();
-				} else {
-					name = ((String) customPreset.getSelectedItem()).trim();
-				}
-				if (!name.isEmpty()) {
-					renderMan.scene().deleteCameraPreset(name);
-					if (selected != -1) {
-						customPreset.removeItemAt(selected);
-					} else {
-						for (int i = 0; i < customPreset.getItemCount(); ++i) {
-							if (name.equals(customPreset.getItemAt(i))) {
-								customPreset.removeItemAt(i);
-								break;
-							}
-						}
-					}
-				}
-			}
-		});
-
-		ProjectionMode[] projectionModes = ProjectionMode.values();
-		projectionMode.setModel(new DefaultComboBoxModel(projectionModes));
-		projectionMode.addActionListener(projectionModeListener);
-		updateProjectionMode();
-
-		JButton autoFocusBtn = new JButton("Autofocus");
-		autoFocusBtn.setToolTipText("Focuses on the object right in the center, under the crosshairs");
-		autoFocusBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				renderMan.scene().autoFocus();
-				dof.update();
-				subjectDistance.update();
-			}
-		});
-
-		JButton cameraToPlayerBtn = new JButton("Camera to player");
-		cameraToPlayerBtn.setIcon(new ImageIcon(MiscImages.face));
-		cameraToPlayerBtn.setToolTipText("Move camera to player position");
-		cameraToPlayerBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				renderMan.scene().moveCameraToPlayer();
-			}
-		});
-
-		JLabel posLbl = new JLabel("Position:");
-		cameraX.setColumns(10);
-		cameraX.setHorizontalAlignment(JTextField.RIGHT);
-		cameraX.addActionListener(cameraPositionListener);
-		cameraY.setColumns(10);
-		cameraY.setHorizontalAlignment(JTextField.RIGHT);
-		cameraY.addActionListener(cameraPositionListener);
-		cameraZ.setColumns(10);
-		cameraZ.setHorizontalAlignment(JTextField.RIGHT);
-		cameraZ.addActionListener(cameraPositionListener);
-		updateCameraPosition();
-
-		JLabel dirLbl = new JLabel("Direction:");
-		cameraYaw.setColumns(10);
-		cameraYaw.setHorizontalAlignment(JTextField.RIGHT);
-		cameraYaw.addActionListener(cameraDirectionListener);
-		cameraPitch.setColumns(10);
-		cameraPitch.setHorizontalAlignment(JTextField.RIGHT);
-		cameraPitch.addActionListener(cameraDirectionListener);
-		cameraRoll.setColumns(10);
-		cameraRoll.setHorizontalAlignment(JTextField.RIGHT);
-		cameraRoll.addActionListener(cameraDirectionListener);
-		updateCameraDirection();
-
-		JButton centerCameraBtn = new JButton("Center camera");
-		centerCameraBtn.setToolTipText("Center camera above loaded chunks");
-		centerCameraBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				renderMan.scene().moveCameraToCenter();
-			}
-		});
-
-		JSeparator sep1 = new JSeparator();
-
-		JPanel panel = new JPanel();
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
-				.addGroup(layout.createSequentialGroup()
-					.addGroup(layout.createParallelGroup()
-						.addComponent(posLbl)
-						.addComponent(dirLbl)
-					)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(layout.createParallelGroup()
-						.addComponent(cameraX, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(cameraYaw, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-					)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(layout.createParallelGroup()
-						.addComponent(cameraY, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(cameraPitch, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-					)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(layout.createParallelGroup()
-						.addComponent(cameraZ, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(cameraRoll, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-					)
-				)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(presetLbl)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(cameraPreset)
-				)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(customPresetLbl)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(customPreset)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(savePreset)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(loadPreset)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(deletePreset)
-				)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(cameraToPlayerBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(centerCameraBtn)
-				)
-				.addComponent(sep1)
-				.addGroup(layout.createSequentialGroup()
-					.addGroup(layout.createParallelGroup()
-						.addComponent(projectionModeLbl)
-						.addComponent(fov.getLabel())
-						.addComponent(dof.getLabel())
-						.addComponent(subjectDistance.getLabel()))
-					.addGroup(layout.createParallelGroup()
-						.addComponent(projectionMode)
-						.addComponent(fov.getSlider())
-						.addComponent(dof.getSlider())
-						.addComponent(subjectDistance.getSlider()))
-					.addGroup(layout.createParallelGroup()
-						.addComponent(fov.getField())
-						.addComponent(dof.getField())
-						.addComponent(subjectDistance.getField())))
-				.addComponent(autoFocusBtn))
-			.addContainerGap()
-		);
-		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(presetLbl)
-				.addComponent(cameraPreset)
-			)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(customPresetLbl)
-				.addComponent(customPreset)
-				.addComponent(savePreset)
-				.addComponent(loadPreset)
-				.addComponent(deletePreset)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(posLbl)
-				.addComponent(cameraX)
-				.addComponent(cameraY)
-				.addComponent(cameraZ)
-			)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(dirLbl)
-				.addComponent(cameraYaw)
-				.addComponent(cameraPitch)
-				.addComponent(cameraRoll)
-			)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(cameraToPlayerBtn)
-				.addComponent(centerCameraBtn)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(sep1, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(projectionModeLbl)
-				.addComponent(projectionMode)
-			)
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(fov.verticalGroup(layout))
-			.addGroup(dof.verticalGroup(layout))
-			.addGroup(subjectDistance.verticalGroup(layout))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(autoFocusBtn)
-			.addContainerGap()
-		);
-		return panel;
-	}
-
-	private JPanel buildHelpPane() {
-		JLabel helpLbl = new JLabel(
-			"<html>Render Preview Controls:<br>" +
-			"<b>W</b> move camera forward<br>" +
-			"<b>S</b> move camera backward<br>" +
-			"<b>A</b> strafe camera left<br>" +
-			"<b>D</b> strafe camera right<br>" +
-			"<b>R</b> move camera up<br>" +
-			"<b>F</b> move camera down<br>" +
-			"<b>U</b> toggle fullscreen mode<br>" +
-			"<b>K</b> move camera forward x100<br>" +
-			"<b>J</b> move camera backward x100<br>" +
-			"<br>" +
-			"Holding <b>SHIFT</b> makes the basic movement keys so move 1/10th of the normal distance."
-		);
-
-		JPanel panel = new JPanel();
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addComponent(helpLbl)
-			.addContainerGap()
-		);
-		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addComponent(helpLbl)
-			.addContainerGap()
-		);
-		return panel;
-	}
-
-	protected void updateStillWater() {
-		stillWaterCB.removeActionListener(stillWaterListener);
-		stillWaterCB.setSelected(renderMan.scene().stillWaterEnabled());
-		stillWaterCB.addActionListener(stillWaterListener);
-	}
-
-	protected void updateFastFog() {
-		fastFogCB.removeActionListener(fastFogListener);
-		fastFogCB.setSelected(renderMan.scene().fastFog());
-		fastFogCB.addActionListener(fastFogListener);
-	}
-
-	protected void updatePlayerModel() {
-		playerModel.removeActionListener(playerModelListener);
-		String model = PersistentSettings.getPlayerModel();
-		playerModel.setSelectedItem(PlayerModel.get(model));
-		playerModel.addActionListener(playerModelListener);
-	}
-
-	protected void updateLoadPlayersCB() {
-		loadPlayersCB.removeActionListener(loadPlayersCBListener);
-		loadPlayersCB.setSelected(PersistentSettings.getLoadPlayers());
-		loadPlayersCB.addActionListener(loadPlayersCBListener);
-	}
-
-	protected void updateBiomeColorsCB() {
-		biomeColorsCB.removeActionListener(biomeColorsCBListener);
-		biomeColorsCB.setSelected(renderMan.scene().biomeColorsEnabled());
-		biomeColorsCB.addActionListener(biomeColorsCBListener);
-	}
-
-	protected void updateTransparentSky() {
-		transparentSky.removeActionListener(transparentSkyListener);
-		transparentSky.setSelected(renderMan.scene().transparentSky());
-		transparentSky.addActionListener(transparentSkyListener);
-	}
-
-	protected void updateVerticalResolution() {
-		v90Btn.removeActionListener(v90Listener);
-		v180Btn.removeActionListener(v180Listener);
-		boolean mirror = renderMan.scene().sky().isMirrored();
-		v90Btn.setSelected(mirror);
-		v180Btn.setSelected(!mirror);
-		v90Btn.addActionListener(v90Listener);
-		v180Btn.addActionListener(v180Listener);
-	}
-
-	protected void updateCloudsEnabledCheckBox() {
-		cloudsEnabled.removeActionListener(cloudsEnabledListener);
-		cloudsEnabled.setSelected(renderMan.scene().sky().cloudsEnabled());
-		cloudsEnabled.addActionListener(cloudsEnabledListener);
-	}
-
 	private void updateTitle() {
 		setTitle("Render Controls - " + renderMan.scene().name());
 	}
-
-	private final ActionListener dumpFrequencyListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			try {
-				renderMan.scene().setDumpFrequency(getDumpFrequency());
-			} catch (NumberFormatException e1) {
-			}
-			updateDumpFrequencyField();
-		}
-	};
-
-	private final ActionListener saveDumpsListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			boolean enabled = saveDumpsCB.isSelected();
-			if (enabled) {
-				renderMan.scene().setDumpFrequency(getDumpFrequency());
-			} else {
-				renderMan.scene().setDumpFrequency(0);
-			}
-			dumpFrequencyCB.setEnabled(enabled);
-			saveSnapshotsCB.setEnabled(enabled);
-		}
-	};
-
-	private final ActionListener canvasSizeListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			String size = (String) canvasSizeCB.getSelectedItem();
-			try {
-				Pattern regex = Pattern.compile("([0-9]+)[xX.*]([0-9]+)");
-				Matcher matcher = regex.matcher(size);
-				if (matcher.matches()) {
-					int width = Integer.parseInt(matcher.group(1));
-					int height = Integer.parseInt(matcher.group(2));
-					setCanvasSize(width, height);
-				} else {
-					Log.info("Failed to set canvas size: format must be WIDTHxHEIGHT!");
-				}
-			} catch (NumberFormatException e1) {
-				Log.info("Failed to set canvas size: invalid dimensions!");
-			}
-		}
-	};
 
 	private final ActionListener sceneNameActionListener = new ActionListener() {
 		@Override
@@ -2238,26 +486,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	};
 
-	private final GradientListener gradientListener = new GradientListener() {
-		@Override
-		public void gradientChanged(List<Vector4d> newGradient) {
-			renderMan.scene().sky().setGradient(newGradient);
-		}
-		@Override
-		public void stopSelected(int index) {
-		}
-		@Override
-		public void stopModified(int index, Vector4d marker) {
-		}
-	};
-
-	private final ActionListener saveSnapshotListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JCheckBox source = (JCheckBox) e.getSource();
-			renderMan.scene().setSaveSnapshots(source.isSelected());
-		}
-	};
 	private final ActionListener saveSceneListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -2276,330 +504,6 @@ public class RenderControls extends JDialog implements ViewListener,
 			}.start();
 		}
 	};
-	private final ActionListener loadSceneListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			new SceneSelector(RenderControls.this, context);
-		}
-	};
-	private final ChangeListener skyRotationListener = new ChangeListener() {
-		@Override
-		public void stateChanged(ChangeEvent e) {
-			JSlider source = (JSlider) e.getSource();
-			double value = (double) (source.getValue() - source.getMinimum())
-					/ (source.getMaximum() - source.getMinimum());
-			double rotation = value * 2 * Math.PI;
-			renderMan.scene().sky().setRotation(rotation);
-		}
-	};
-	private final ActionListener projectionModeListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JComboBox source = (JComboBox) e.getSource();
-			Object selected = source.getSelectedItem();
-			if (selected != null && selected instanceof ProjectionMode) {
-				renderMan.scene().camera().setProjectionMode(
-						(ProjectionMode) selected);
-				updateProjectionMode();
-				fov.update();
-			}
-		}
-	};
-	private final ActionListener cameraPresetListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JComboBox source = (JComboBox) e.getSource();
-			Object selected = source.getSelectedItem();
-			if (selected != null && selected instanceof CameraPreset) {
-				CameraPreset preset = (CameraPreset) selected;
-				preset.apply(renderMan.scene().camera());
-				updateProjectionMode();
-				fov.update();
-				updateCameraDirection();
-			}
-		}
-	};
-	private final ActionListener waterHeightListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			try {
-				int waterHeight = Integer.parseInt(waterHeightField.getText());
-				renderMan.scene().setWaterHeight(waterHeight);
-				sceneMan.reloadChunks();
-				updateWaterHeight();
-			} catch (Error thrown) {
-				// ignore number format exceptions
-			}
-		}
-	};
-	private final ActionListener waterWorldListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JCheckBox source = (JCheckBox) e.getSource();
-			if (source.isSelected()) {
-				renderMan.scene().setWaterHeight(
-						Integer.parseInt(waterHeightField.getText()));
-			} else {
-				waterHeightField.removeActionListener(waterHeightListener);
-				waterHeightField.setText("" + renderMan.scene().getWaterHeight());
-				waterHeightField.addActionListener(waterHeightListener);
-				renderMan.scene().setWaterHeight(0);
-			}
-			sceneMan.reloadChunks();
-			updateWaterHeight();
-		}
-	};
-	private final ActionListener customWaterColorListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JCheckBox source = (JCheckBox) e.getSource();
-			boolean useCustomWaterColor = source.isSelected();
-			if (useCustomWaterColor) {
-				renderMan.scene().setWaterColor(new Vector3d(
-						PersistentSettings.DEFAULT_WATER_RED,
-						PersistentSettings.DEFAULT_WATER_GREEN,
-						PersistentSettings.DEFAULT_WATER_BLUE));
-			}
-			renderMan.scene().setUseCustomWaterColor(useCustomWaterColor);
-			updateWaterColor();
-		}
-	};
-	private final ActionListener skyModeListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JComboBox source = (JComboBox) e.getSource();
-			renderMan.scene().sky().setSkyMode((SkyMode) source.getSelectedItem());
-			updateSkyMode();
-			RenderControls.this.pack();
-		}
-	};
-	private final ActionListener cameraPositionListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Vector3d pos = new Vector3d(renderMan.scene().camera().getPosition());
-			try {
-				pos.x = numberFormat.parse(cameraX.getText()).doubleValue();
-			} catch (NumberFormatException ex) {
-			} catch (ParseException ex) {
-			}
-			try {
-				pos.y = numberFormat.parse(cameraY.getText()).doubleValue();
-			} catch (NumberFormatException ex) {
-			} catch (ParseException ex) {
-			}
-			try {
-				pos.z = numberFormat.parse(cameraZ.getText()).doubleValue();
-			} catch (NumberFormatException ex) {
-			} catch (ParseException ex) {
-			}
-			renderMan.scene().camera().setPosition(pos);
-			updateCameraPosition();
-		}
-	};
-	private final ActionListener cameraDirectionListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			double yaw = renderMan.scene().camera().getYaw();
-			double pitch = renderMan.scene().camera().getPitch();
-			double roll = renderMan.scene().camera().getRoll();
-			try {
-				double value = numberFormat.parse(cameraPitch.getText()).doubleValue();
-				pitch = QuickMath.degToRad(value);
-			} catch (NumberFormatException ex) {
-			} catch (ParseException ex) {
-			}
-			try {
-				double value = numberFormat.parse(cameraYaw.getText()).doubleValue();
-				yaw = QuickMath.degToRad(value);
-			} catch (NumberFormatException ex) {
-			} catch (ParseException ex) {
-			}
-			try {
-				double value = numberFormat.parse(cameraRoll.getText()).doubleValue();
-				roll = QuickMath.degToRad(value);
-			} catch (NumberFormatException ex) {
-			} catch (ParseException ex) {
-			}
-			renderMan.scene().camera().setView(yaw, pitch, roll);
-			updateCameraDirection();
-		}
-	};
-	private final ActionListener stillWaterListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			renderMan.scene().setStillWater(stillWaterCB.isSelected());
-		}
-	};
-	private final ActionListener fastFogListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			renderMan.scene().setFastFog(fastFogCB.isSelected());
-		}
-	};
-	private final ActionListener transparentSkyListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JCheckBox source = (JCheckBox) e.getSource();
-			renderMan.scene().setTransparentSky(source.isSelected());
-		}
-	};
-	private final ActionListener cloudsEnabledListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JCheckBox source = (JCheckBox) e.getSource();
-			renderMan.scene().sky().setCloudsEnabled(source.isSelected());
-		}
-	};
-	private final ActionListener v90Listener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if (v90Btn.isSelected()) {
-				renderMan.scene().sky().setMirrored(true);
-			}
-		}
-	};
-	private final ActionListener v180Listener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if (v180Btn.isSelected()) {
-				renderMan.scene().sky().setMirrored(false);
-			}
-		}
-	};
-	private final ActionListener playerModelListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JComboBox source = (JComboBox) e.getSource();
-			PlayerModel model = (PlayerModel) source.getSelectedItem();
-			PersistentSettings.setPlayerModel(model.name());
-		}
-	};
-	private final ActionListener loadPlayersCBListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JCheckBox source = (JCheckBox) e.getSource();
-			PersistentSettings.setLoadPlayers(source.isSelected());
-		}
-	};
-	private final ActionListener biomeColorsCBListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JCheckBox source = (JCheckBox) e.getSource();
-			renderMan.scene().setBiomeColorsEnabled(source.isSelected());
-		}
-	};
-	private final ActionListener emittersListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			renderMan.scene().setEmittersEnabled(enableEmitters.isSelected());
-		}
-	};
-	private final ActionListener directLightListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			renderMan.scene().setDirectLight(directLight.isSelected());
-		}
-	};
-
-	private int spp = 0;
-	private int sps = 0;
-
-	protected void updateWaterHeight() {
-		int height = renderMan.scene().getWaterHeight();
-		boolean waterWorld = height > 0;
-		if (waterWorld) {
-			waterHeightField.removeActionListener(waterHeightListener);
-			waterHeightField.setText("" + height);
-			waterHeightField.addActionListener(waterHeightListener);
-		}
-		waterWorldCB.setSelected(waterWorld);
-		waterHeightField.setEnabled(waterWorld);
-		applyWaterHeightBtn.setEnabled(waterWorld);
-	}
-
-	protected void updateWaterColor() {
-		waterColorCB.removeActionListener(customWaterColorListener);
-		boolean useCustomWaterColor = renderMan.scene().getUseCustomWaterColor();
-		waterColorCB.setSelected(useCustomWaterColor);
-		waterColorBtn.setEnabled(useCustomWaterColor);
-		waterColorCB.addActionListener(customWaterColorListener);
-	}
-
-	protected void updateSkyRotation() {
-		skymapRotationSlider.removeChangeListener(skyRotationListener);
-		skymapRotationSlider.setValue((int) FastMath.round(
-				100 * renderMan.scene().sky().getRotation() / (2 * Math.PI)));
-		skymapRotationSlider.addChangeListener(skyRotationListener);
-		skyboxRotationSlider.removeChangeListener(skyRotationListener);
-		skyboxRotationSlider.setValue((int) FastMath.round(
-				100 * renderMan.scene().sky().getRotation() / (2 * Math.PI)));
-		skyboxRotationSlider.addChangeListener(skyRotationListener);
-	}
-
-	private void updateSkyGradient() {
-		gradientEditor.removeGradientListener(gradientListener);
-		gradientEditor.setGradient(renderMan.scene().sky().getGradient());
-		gradientEditor.addGradientListener(gradientListener);
-	}
-
-	protected void updateProjectionMode() {
-		projectionMode.removeActionListener(projectionModeListener);
-		ProjectionMode mode = renderMan.scene().camera().getProjectionMode();
-		projectionMode.setSelectedItem(mode);
-		projectionMode.addActionListener(projectionModeListener);
-	}
-
-	protected void updateSkyMode() {
-		skyModeCB.removeActionListener(skyModeListener);
-		SkyMode mode = renderMan.scene().sky().getSkyMode();
-		skyModeCB.setSelectedItem(mode);
-		simulatedSkyPanel.setVisible(mode == SkyMode.SIMULATED);
-		skymapPanel.setVisible(mode == SkyMode.SKYMAP_PANORAMIC);
-		lightProbePanel.setVisible(mode == SkyMode.SKYMAP_SPHERICAL);
-		skyGradientPanel.setVisible(mode == SkyMode.GRADIENT);
-		skyboxPanel.setVisible(mode == SkyMode.SKYBOX);
-		skyModeCB.addActionListener(skyModeListener);
-	}
-
-	protected void updateCanvasSizeField() {
-		canvasSizeCB.removeActionListener(canvasSizeListener);
-		canvasSizeCB.setSelectedItem("" + renderMan.scene().canvasWidth() +
-				"x" + renderMan.scene().canvasHeight());
-		canvasSizeCB.addActionListener(canvasSizeListener);
-	}
-
-	protected void updateSaveDumpsCheckBox() {
-		saveDumpsCB.removeActionListener(saveDumpsListener);
-		saveDumpsCB.setSelected(renderMan.scene().shouldSaveDumps());
-		saveDumpsCB.addActionListener(saveDumpsListener);
-	}
-
-	protected void updateDumpFrequencyField() {
-		dumpFrequencyCB.removeActionListener(dumpFrequencyListener);
-		try {
-			dumpFrequencyCB.setEnabled(renderMan.scene().shouldSaveDumps());
-			saveSnapshotsCB.setEnabled(renderMan.scene().shouldSaveDumps());
-			int frequency = renderMan.scene().getDumpFrequency();
-			for (int i = 0; i < dumpFrequencies.length; ++i) {
-				if (frequency == dumpFrequencies[i]) {
-					dumpFrequencyCB.setSelectedIndex(i);
-					return;
-				}
-			}
-			dumpFrequencyCB.setSelectedItem(Integer.toString(frequency));
-		} finally {
-			dumpFrequencyCB.addActionListener(dumpFrequencyListener);
-		}
-	}
-
-	protected void updateSaveSnapshotCheckBox() {
-		saveSnapshotsCB.removeActionListener(saveSnapshotListener);
-		try {
-			saveSnapshotsCB.setSelected(renderMan.scene().shouldSaveSnapshots());
-		} finally {
-			saveSnapshotsCB.addActionListener(saveSnapshotListener);
-		}
-	}
 
 	protected void updateSceneNameField() {
 		sceneNameField.getDocument().removeDocumentListener(sceneNameListener);
@@ -2607,69 +511,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		sceneNameField.setText(renderMan.scene().name());
 		sceneNameField.getDocument().addDocumentListener(sceneNameListener);
 		sceneNameField.addActionListener(sceneNameActionListener);
-	}
-
-	protected void updatePostprocessCB() {
-		postprocessCB.setSelectedItem(renderMan.scene().getPostprocess());
-	}
-
-	protected void updateOutputMode() {
-		outputMode.setSelectedItem(renderMan.scene().getOutputMode());
-	}
-
-	protected void updateCustomPresets() {
-		customPreset.removeAllItems();
-		JsonObject presets = renderMan.scene().getCameraPresets();
-		for (JsonMember member : presets.getMemberList()) {
-			String name = member.getName().trim();
-			if (!name.isEmpty()) {
-				customPreset.addItem(name);
-			}
-		}
-	}
-
-	protected void updateCameraPosition() {
-		cameraX.removeActionListener(cameraPositionListener);
-		cameraY.removeActionListener(cameraPositionListener);
-		cameraZ.removeActionListener(cameraPositionListener);
-
-		Vector3d pos = renderMan.scene().camera().getPosition();
-		cameraX.setText(decimalFormat.format(pos.x));
-		cameraY.setText(decimalFormat.format(pos.y));
-		cameraZ.setText(decimalFormat.format(pos.z));
-
-		cameraX.addActionListener(cameraPositionListener);
-		cameraY.addActionListener(cameraPositionListener);
-		cameraZ.addActionListener(cameraPositionListener);
-
-		if (PersistentSettings.getFollowCamera()) {
-			panToCamera();
-		}
-		onCameraStateChange();
-	}
-
-	protected void updateCameraDirection() {
-		cameraRoll.removeActionListener(cameraDirectionListener);
-		cameraPitch.removeActionListener(cameraDirectionListener);
-		cameraYaw.removeActionListener(cameraDirectionListener);
-
-		double roll = QuickMath.radToDeg(renderMan.scene().camera().getRoll());
-		double pitch = QuickMath.radToDeg(renderMan.scene().camera().getPitch());
-		double yaw = QuickMath.radToDeg(renderMan.scene().camera().getYaw());
-
-		cameraRoll.setText(decimalFormat.format(roll));
-		cameraPitch.setText(decimalFormat.format(pitch));
-		cameraYaw.setText(decimalFormat.format(yaw));
-
-		cameraRoll.addActionListener(cameraDirectionListener);
-		cameraPitch.addActionListener(cameraDirectionListener);
-		cameraYaw.addActionListener(cameraDirectionListener);
-
-		onCameraStateChange();
-	}
-
-	private void onCameraStateChange() {
-		chunky.getMap().repaint();
 	}
 
 	/**
@@ -2690,56 +531,42 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	@Override
 	public void onStrafeLeft() {
-		renderMan.scene().camera().strafeLeft(
-				chunky.getShiftModifier() ? .1 : 1);
-				updateCameraPosition();
+		renderMan.scene().camera().strafeLeft(chunky.getShiftModifier() ? .1 : 1);
 	}
 
 	@Override
 	public void onStrafeRight() {
-		renderMan.scene().camera().strafeRight(
-				chunky.getShiftModifier() ? .1 : 1);
-		updateCameraPosition();
+		renderMan.scene().camera().strafeRight(chunky.getShiftModifier() ? .1 : 1);
 	}
 
 	@Override
 	public void onMoveForward() {
-		renderMan.scene().camera().moveForward(
-				chunky.getShiftModifier() ? .1 : 1);
-		updateCameraPosition();
+		renderMan.scene().camera().moveForward(chunky.getShiftModifier() ? .1 : 1);
 	}
 
 	@Override
 	public void onMoveBackward() {
-		renderMan.scene().camera().moveBackward(
-				chunky.getShiftModifier() ? .1 : 1);
-		updateCameraPosition();
+		renderMan.scene().camera().moveBackward(chunky.getShiftModifier() ? .1 : 1);
 	}
 
 	@Override
 	public void onMoveForwardFar() {
 		renderMan.scene().camera().moveForward(100);
-		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveBackwardFar() {
 		renderMan.scene().camera().moveBackward(100);
-		updateCameraPosition();
 	}
 
 	@Override
 	public void onMoveUp() {
-		renderMan.scene().camera().moveUp(
-				chunky.getShiftModifier() ? .1 : 1);
-		updateCameraPosition();
+		renderMan.scene().camera().moveUp(chunky.getShiftModifier() ? .1 : 1);
 	}
 
 	@Override
 	public void onMoveDown() {
-		renderMan.scene().camera().moveDown(
-				chunky.getShiftModifier() ? .1 : 1);
-		updateCameraPosition();
+		renderMan.scene().camera().moveDown(chunky.getShiftModifier() ? .1 : 1);
 	}
 
 	@Override
@@ -2747,7 +574,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		renderMan.scene().camera().rotateView(
 				- (Math.PI / 250) * dx,
 				(Math.PI / 250) * dy);
-		updateCameraDirection();
 	}
 
 	/**
@@ -2784,14 +610,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		}
 	}
 
-	protected void setCanvasSize(int width, int height) {
-		renderMan.scene().setCanvasSize(width, height);
-		int canvasWidth = renderMan.scene().canvasWidth();
-		int canvasHeight = renderMan.scene().canvasHeight();
-		canvasSizeCB.setSelectedItem("" + canvasWidth + "x" + canvasHeight);
-		view.setCanvasSize(canvasWidth, canvasHeight);
-	}
-
 	/**
 	 * Method to notify the render controls dialog that a scene has been loaded.
 	 * Causes canvas size to be updated. Can be called from outside EDT.
@@ -2809,52 +627,18 @@ public class RenderControls extends JDialog implements ViewListener,
 	}
 
 	protected void updateAllSettings() {
-		skyHorizonOffset.update();
-		dof.update();
-		fov.update();
-		subjectDistance.update();
-		updateProjectionMode();
-		updateSkyGradient();
-		updateSkyMode();
-		updateCanvasSizeField();
-		emitterIntensity.update();
-		skyLight.update();
-		sunIntensity.update();
-		sunAzimuth.update();
-		sunAltitude.update();
-		updateStillWater();
-		updateFastFog();
-		waterVisibility.update();
-		waterOpacity.update();
-		updateSkyRotation();
-		updateVerticalResolution();
-		updateLoadPlayersCB();
-		updatePlayerModel();
-		updateBiomeColorsCB();
-		updateTransparentSky();
-		fogDensity.update();
-		updateCloudsEnabledCheckBox();
+		generalTab.refreshSceneData();
+		lightingTab.refreshSceneData();
+		skyTab.refreshSceneData();
+		waterTab.refreshSceneData();
+		cameraTab.refreshSceneData();
+		postProcessingTab.refreshSceneData();
+		advancedTab.refreshSceneData();
+		helpTab.refreshSceneData();
+
 		updateTitle();
-		exposure.update();
-		updateSaveDumpsCheckBox();
-		updateSaveSnapshotCheckBox();
-		updateDumpFrequencyField();
 		targetSPP.update();
 		updateSceneNameField();
-		updatePostprocessCB();
-		updateOutputMode();
-		cloudSize.update();
-		cloudXOffset.update();
-		cloudYOffset.update();
-		cloudZOffset.update();
-		rayDepth.update();
-		updateWaterHeight();
-		updateWaterColor();
-		updateCameraDirection();
-		updateCameraPosition();
-		updateCustomPresets();
-		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
-		directLight.setSelected(renderMan.scene().getDirectLight());
 		stopRenderBtn.setEnabled(true);
 	}
 
@@ -2935,13 +719,13 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	@Override
 	public void taskAborted(String task) {
-		// TODO add abort notice
+		// TODO(llbit): add abort notice.
 		etaLbl.setText("ETA: N/A");
 	}
 
 	@Override
 	public void taskFailed(String task) {
-		// TODO add abort notice
+		// TODO(llbit): add abort notice.
 		etaLbl.setText("ETA: N/A");
 	}
 
@@ -2955,9 +739,6 @@ public class RenderControls extends JDialog implements ViewListener,
 		if (!Double.isNaN(newValue) && !Double.isInfinite(newValue)) {
 			renderMan.scene().camera().setFoV(newValue);
 		}
-		fov.update();
-
-		onCameraStateChange();
 	}
 
 	/**
@@ -2999,113 +780,18 @@ public class RenderControls extends JDialog implements ViewListener,
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				updateCameraPosition();
 				showPreviewWindow();
 			}
 		});
+		cameraTab.chunksLoaded();
 	}
 
 	@Override
 	public void renderJobFinished(long time, int sps) {
-		if (shutdownWhenDoneCB.isSelected()) {
+		if (advancedTab.shutdownAfterCompletedRender()) {
 			new ShutdownAlert(this);
 		}
 	}
-
-	protected int getDumpFrequency() {
-		int index = dumpFrequencyCB.getSelectedIndex();
-		if (index != -1) {
-			index = Math.max(0, index);
-			index = Math.min(dumpFrequencies.length-1, index);
-			return dumpFrequencies[index];
-		} else {
-			try {
-				return Integer.valueOf((String) dumpFrequencyCB.getSelectedItem());
-			} catch (NumberFormatException e) {
-				return 0;
-			}
-		}
-	}
-
-	static class SkymapTextureLoader implements ActionListener {
-		private final RenderManager renderMan;
-		private static String defaultDirectory = System.getProperty("user.dir");
-		public SkymapTextureLoader(RenderManager renderMan) {
-			this.renderMan = renderMan;
-		}
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			CenteredFileDialog fileDialog =
-					new CenteredFileDialog(null, "Open Skymap", FileDialog.LOAD);
-			String directory;
-			synchronized (SkyboxTextureLoader.class) {
-				directory = defaultDirectory;
-			}
-			fileDialog.setDirectory(directory);
-			fileDialog.setFilenameFilter(
-					new FilenameFilter() {
-						@Override
-						public boolean accept(File dir, String name) {
-							return name.toLowerCase().endsWith(".png")
-									|| name.toLowerCase().endsWith(".jpg")
-									|| name.toLowerCase().endsWith(".hdr")
-									|| name.toLowerCase().endsWith(".pfm");
-						}
-					});
-			fileDialog.setVisible(true);
-			File selectedFile = fileDialog.getSelectedFile();
-			if (selectedFile != null) {
-				synchronized (SkyboxTextureLoader.class) {
-					File parent = selectedFile.getParentFile();
-					if (parent != null) {
-						defaultDirectory = parent.getAbsolutePath();
-					}
-				}
-				renderMan.scene().sky().loadSkymap(selectedFile.getAbsolutePath());
-			}
-		}
-	};
-
-	static class SkyboxTextureLoader implements ActionListener {
-		private final RenderManager renderMan;
-		private final int textureIndex;
-		private static String defaultDirectory = System.getProperty("user.dir");
-		public SkyboxTextureLoader(RenderManager renderMan, int textureIndex) {
-			this.renderMan = renderMan;
-			this.textureIndex = textureIndex;
-		}
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			CenteredFileDialog fileDialog =
-					new CenteredFileDialog(null, "Open Skybox Texture", FileDialog.LOAD);
-			String directory;
-			synchronized (SkyboxTextureLoader.class) {
-				directory = defaultDirectory;
-			}
-			fileDialog.setDirectory(directory);
-			fileDialog.setFilenameFilter(
-					new FilenameFilter() {
-						@Override
-						public boolean accept(File dir, String name) {
-							return name.toLowerCase().endsWith(".png")
-									|| name.toLowerCase().endsWith(".jpg")
-									|| name.toLowerCase().endsWith(".hdr")
-									|| name.toLowerCase().endsWith(".pfm");
-						}
-					});
-			fileDialog.setVisible(true);
-			File selectedFile = fileDialog.getSelectedFile();
-			if (selectedFile != null) {
-				synchronized (SkyboxTextureLoader.class) {
-					File parent = selectedFile.getParentFile();
-					if (parent != null) {
-						defaultDirectory = parent.getAbsolutePath();
-					}
-				}
-				renderMan.scene().sky().loadSkyboxTexture(selectedFile.getAbsolutePath(), textureIndex);
-			}
-		}
-	};
 
 	protected AtomicBoolean resetConfirmMutex = new AtomicBoolean(false);
 
@@ -3254,19 +940,6 @@ public class RenderControls extends JDialog implements ViewListener,
 
 	}
 
-	public void panToCamera() {
-		Vector3d pos = renderMan.scene().camera().getPosition();
-		chunky.setView(pos.x / 16.0, pos.z / 16.0);
-	}
-
-	public void moveCameraTo(double x, double z) {
-		Vector3d pos = new Vector3d(renderMan.scene().camera().getPosition());
-		pos.x = x;
-		pos.z = z;
-		renderMan.scene().camera().setPosition(pos);
-		updateCameraPosition();
-	}
-
 	public void selectVisibleChunks(ChunkView cv, Chunky chunky) {
 		Camera camera = renderMan.scene().camera();
 		int width = renderMan.scene().canvasWidth();
@@ -3314,5 +987,29 @@ public class RenderControls extends JDialog implements ViewListener,
 				}
 			}
 		}
+	}
+
+	public RenderManager getRenderManager() {
+		return renderMan;
+	}
+
+	public SceneManager getSceneManager() {
+		return sceneMan;
+	}
+
+	public Chunky getChunky() {
+		return chunky;
+	}
+
+	public Chunk3DView getView() {
+		return view;
+	}
+
+	public void panToCamera() {
+		cameraTab.panToCamera();
+	}
+
+	public void moveCameraTo(double x, double z) {
+		cameraTab.moveCameraTo(x, z);
 	}
 }

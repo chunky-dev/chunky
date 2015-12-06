@@ -82,9 +82,8 @@ public class SceneSelector extends JDialog {
 		this.controls = controls;
 		this.context = context;
 
-		tableModel = new DefaultTableModel(0, 3);
-		tableModel.setColumnIdentifiers(new String[] {
-				"Name", "Chunks", "Size", "Current SPP", "Render Time" });
+		tableModel = new DefaultTableModel(new String[] {
+				"Name", "Chunks", "Size", "Current SPP", "Render Time" }, 0);
 		sceneTable = new JTable(tableModel) {
 			@Override
 			public boolean isCellEditable(int row, int column) {

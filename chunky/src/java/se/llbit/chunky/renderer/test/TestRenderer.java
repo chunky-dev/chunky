@@ -143,7 +143,8 @@ public class TestRenderer extends Thread implements ViewListener, Renderer, Refr
 		updateTransform();
 
 		if (targetFile.isEmpty()) {
-			view = new Chunk3DView(this, parent);
+			view = new Chunk3DView(parent);
+			view.addViewListener(this);
 			view.setRenderer(this);
 			view.setVisible(true);
 		}
