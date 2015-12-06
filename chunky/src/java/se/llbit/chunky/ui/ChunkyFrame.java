@@ -59,12 +59,11 @@ public class ChunkyFrame extends JFrame {
 	 */
 	public ChunkyFrame(Chunky chunky) {
 		super(Chunky.getAppName());
-
 		this.chunky = chunky;
 	}
 
 	/**
-	 * Initialize the UI components
+	 * Initialize the UI components.
 	 */
 	public void initComponents() {
 		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
@@ -72,7 +71,7 @@ public class ChunkyFrame extends JFrame {
 		getRootPane().getActionMap().put("Exit", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// dispatch window closing event
+				// Dispatch window closing event.
 				JFrame frame = ChunkyFrame.this;
 				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 			}
@@ -120,6 +119,7 @@ public class ChunkyFrame extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				Log.setReceiver(ConsoleReceiver.INSTANCE, Level.WARNING, Level.ERROR);
+				chunky.onExit();
 			}
 			@Override
 			public void windowClosed(WindowEvent e) {
@@ -159,7 +159,7 @@ public class ChunkyFrame extends JFrame {
 	}
 
 	/**
-	 * Chunky input listener
+	 * Chunky input listener.
 	 */
 	public class InputListener implements AWTEventListener {
 

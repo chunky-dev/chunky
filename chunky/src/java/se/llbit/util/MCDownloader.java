@@ -17,14 +17,26 @@
 package se.llbit.util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
+import javax.net.ssl.HttpsURLConnection;
+
+import org.jastadd.util.PrettyPrinter;
+
+import se.llbit.chunky.PersistentSettings;
+import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonParser;
+import se.llbit.json.JsonValue;
+
 /**
- * Utility class to download Minecraft
+ * Utility class to download Minecraft Jars and player data.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class MCDownloader {
@@ -53,5 +65,66 @@ public class MCDownloader {
 		FileOutputStream out = new FileOutputStream(destination);
 		out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
 		out.close();
+	}
+
+	/**
+	 * Download a Minecraft player profile.
+	 * @param uuid UUID of player
+	 * @return
+	 * @throws IOException
+	 */
+	public static final JsonObject fetchProfile(String uuid) throws IOException {
+		String key = uuid + ":profile";
+		File cacheFile = new File(PersistentSettings.cacheDirectory(),
+				Util.cacheEncode(key.hashCode()));
+		JsonArray cache;
+		if (cacheFile.exists()) {
+			FileInputStream in = new FileInputStream(cacheFile);
+			JsonParser cacheParse = new JsonParser(in);
+			try {
+				cache = cacheParse.parse().array();
+				in.close();
+				for (JsonValue entry : cache.getElementList()) {
+					if (entry.array().get(0).stringValue("").equals(key)) {
+						JsonObject cached = entry.array().get(1).object();
+						return cached;
+					}
+				}
+			} catch (JsonParser.SyntaxError e) {
+				cache = new JsonArray();
+			}
+		} else {
+			cache = new JsonArray();
+		}
+
+		String url = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid;
+		HttpsURLConnection conn = (HttpsURLConnection) new URL(url).openConnection();
+		int responseCode = conn.getResponseCode();
+		JsonObject profile;
+		if (responseCode == 200) {
+			try {
+				JsonParser parser = new JsonParser(conn.getInputStream());
+				profile = parser.parse().object();
+				// TODO unparse base64 data.
+			} catch (JsonParser.SyntaxError e) {
+				e.printStackTrace(System.err);
+				profile = new JsonObject();
+			}
+		} else {
+			profile = new JsonObject();
+		}
+
+		JsonArray newEntry = new JsonArray();
+		newEntry.add(key);
+		newEntry.add(profile);
+		cache.add(newEntry);
+		if (!PersistentSettings.cacheDirectory().isDirectory()) {
+			PersistentSettings.cacheDirectory().mkdirs();
+		}
+		FileOutputStream out = new FileOutputStream(cacheFile);
+		PrettyPrinter jsonOut = new PrettyPrinter("", new PrintStream(out));
+		cache.prettyPrint(jsonOut);
+		out.close();
+		return profile;
 	}
 }

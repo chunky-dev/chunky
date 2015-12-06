@@ -16,15 +16,22 @@
  */
 package se.llbit.chunky.world.entity;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Random;
 
-import se.llbit.chunky.PersistentSettings;
+import org.apache.commons.math3.util.FastMath;
+
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
+import se.llbit.chunky.resources.texturepack.TextureFormatError;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3d;
@@ -33,23 +40,28 @@ import se.llbit.math.primitive.Primitive;
 
 public class PlayerEntity extends Entity {
 
-	private final double yaw;
-	private final double pitch;
-	private final double leftLegPose;
-	private final double rightLegPose;
-	private final double leftArmPose;
-	private final double rightArmPose;
-	private final PlayerModel model;
+	public final String uuid;
+	public double yaw;
+	public double pitch;
+	public double headYaw = 0.0;
+	public double leftLegPose;
+	public double rightLegPose;
+	public double leftArmPose;
+	public double rightArmPose;
+	public PlayerModel model;
+	public String skin = "";
 
-	public PlayerEntity(Vector3d position, double yawDegrees, double pitchDegrees) {
-		this(position, QuickMath.degToRad(180 - yawDegrees), -QuickMath.degToRad(pitchDegrees),
-				0.4, -0.4, 0.4, -0.4, PlayerModel.get(PersistentSettings.getPlayerModel()));
+	public PlayerEntity(String uuid, Vector3d position, double yawDegrees, double pitchDegrees) {
+		this(uuid, position, QuickMath.degToRad(180 - yawDegrees),
+				-QuickMath.degToRad(pitchDegrees),
+				0.4, -0.4, 0.4, -0.4, PlayerModel.STEVE);
 	}
 
-	public PlayerEntity(Vector3d position, double yaw, double pitch,
+	public PlayerEntity(String uuid, Vector3d position, double yaw, double pitch,
 			double leftLegPose, double rightLegPose, double leftArmPose, double rightArmPose,
 			PlayerModel model) {
 		super(position);
+		this.uuid = uuid;
 		this.yaw = yaw;
 		this.pitch = pitch;
 		this.leftLegPose = leftLegPose;
@@ -75,15 +87,28 @@ public class PlayerEntity extends Entity {
 	@Override
 	public Collection<Primitive> primitives(Vector3d offset) {
 		EntityTexture texture = Texture.steve;
-		double armWidth = 2;
-		switch (model) {
-		case ALEX:
-			texture = Texture.alex;
-			armWidth = 1.5;
-			break;
-		case STEVE:
-			texture = Texture.steve;
-			break;
+		double armWidth = model == PlayerModel.ALEX ? 1.5 : 2;
+		if (skin.isEmpty()) {
+			switch (model) {
+			case ALEX:
+				texture = Texture.alex;
+				break;
+			case STEVE:
+				texture = Texture.steve;
+				break;
+			}
+		} else {
+			texture = new EntityTexture();
+			EntityTextureLoader loader = new EntityTextureLoader(skin, texture);
+			try {
+				loader.load(new File(skin));
+			} catch (IOException e) {
+				Log.warn("Failed to load skin", e);
+				texture = Texture.steve;
+			} catch (TextureFormatError e) {
+				Log.warn("Failed to load skin", e);
+				texture = Texture.steve;
+			}
 		}
 		Collection<Primitive> faces = new LinkedList<Primitive>();
 		Transform offsetTransform = Transform.NONE.translate(
@@ -91,7 +116,7 @@ public class PlayerEntity extends Entity {
 				position.y + offset.y,
 				position.z + offset.z);
 		Box head = new Box(-4/16., 4/16., -4/16., 4/16., -4/16., 4/16.);
-		poseHead(head, Transform.NONE.translate(0, 28/16., 0), offsetTransform);
+		poseHead(head, Transform.NONE.rotateY(headYaw).translate(0, 28/16., 0), offsetTransform);
 		head.addFrontFaces(faces, texture, texture.headFront);
 		head.addBackFaces(faces, texture, texture.headBack);
 		head.addLeftFaces(faces, texture, texture.headLeft);
@@ -99,7 +124,7 @@ public class PlayerEntity extends Entity {
 		head.addTopFaces(faces, texture, texture.headTop);
 		head.addBottomFaces(faces, texture, texture.headBottom);
 		Box hat = new Box(-4.2/16., 4.2/16., -4.2/16., 4.2/16., -4.2/16., 4.2/16.);
-		poseHead(hat, Transform.NONE.translate(0, 28.2/16., 0), offsetTransform);
+		poseHead(hat, Transform.NONE.rotateY(headYaw).translate(0, 28.2/16., 0), offsetTransform);
 		hat.addFrontFaces(faces, texture, texture.hatFront);
 		hat.addBackFaces(faces, texture, texture.hatBack);
 		hat.addLeftFaces(faces, texture, texture.hatLeft);
@@ -157,14 +182,17 @@ public class PlayerEntity extends Entity {
 	public JsonValue toJson() {
 		JsonObject json = new JsonObject();
 		json.add("kind", "player");
+		json.add("uuid", uuid);
 		json.add("position", position.toJson());
 		json.add("model", model.name());
+		json.add("skin", skin);
 		json.add("pitch", pitch);
 		json.add("yaw", yaw);
 		json.add("leftLegPose", leftLegPose);
 		json.add("rightLegPose", rightLegPose);
 		json.add("leftArmPose", leftArmPose);
 		json.add("rightArmPose", rightArmPose);
+		json.add("headYaw", headYaw);
 		return json;
 	}
 
@@ -174,11 +202,72 @@ public class PlayerEntity extends Entity {
 		PlayerModel model = PlayerModel.get(json.get("model").stringValue("STEVE"));
 		double pitch = json.get("pitch").doubleValue(0.0);
 		double yaw = json.get("yaw").doubleValue(0.0);
+		String uuid = json.get("uuid").stringValue("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+		String skin = json.get("skin").stringValue("");
 		double leftLegPose = json.get("leftLegPose").doubleValue(0.0);
 		double rightLegPose = json.get("rightLegPose").doubleValue(0.0);
 		double leftArmPose = json.get("leftArmPose").doubleValue(0.0);
 		double rightArmPose = json.get("rightArmPose").doubleValue(0.0);
-		return new PlayerEntity(position, yaw, pitch, leftLegPose,
+		PlayerEntity entity = new PlayerEntity(uuid, position, yaw, pitch, leftLegPose,
 				rightLegPose, leftArmPose, rightArmPose, model);
+		entity.headYaw = json.get("headYaw").doubleValue(0.0);
+		entity.skin = skin;
+		return entity;
+	}
+
+	@Override
+	public String toString() {
+		return "player: " + uuid;
+	}
+
+	@Override
+	public int hashCode() {
+		return uuid.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof PlayerEntity) {
+			return ((PlayerEntity) obj).uuid.equals(uuid);
+		}
+		return false;
+	}
+
+	public void setTexture(String path) {
+		skin = path;
+	}
+
+	public void randomPoseAndLook() {
+		Random random = new Random(System.currentTimeMillis());
+		randomPose(random);
+		randomLook(random);
+	}
+
+	public void randomPose() {
+		Random random = new Random(System.currentTimeMillis());
+		randomPose(random);
+	}
+
+	private void randomPose(Random random) {
+		leftLegPose = (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
+		rightLegPose = - leftLegPose;
+		leftArmPose = (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
+		rightArmPose = - leftArmPose;
+	}
+
+	private void randomLook(Random random) {
+		yaw = (random.nextFloat() - 0.5) * QuickMath.TAU;
+		headYaw = 0.4 * (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
+		pitch = (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
+	}
+
+	public void lookAt(Vector3d camera) {
+		Vector3d dir = new Vector3d(camera);
+		Vector3d face = new Vector3d(position);
+		face.add(0, 28/16., 0);
+		dir.sub(face);
+		dir.normalize();
+		yaw = FastMath.atan2(dir.x, dir.z) + Math.PI - headYaw;
+		pitch = Math.asin(dir.y);
 	}
 }

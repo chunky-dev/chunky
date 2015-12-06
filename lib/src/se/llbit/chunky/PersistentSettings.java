@@ -69,21 +69,16 @@ public final class PersistentSettings {
 	public static final int DEFAULT_3D_CANVAS_HEIGHT = 400;
 
 
-	private static File settingsDir = null;
-	private static File settingsFile = null;
+	private static final File settingsDir;
+	private static final File cacheDir;
+	private static final File settingsFile;
 
 	private PersistentSettings() { }
-
-	/**
-	 * @return The directory where program settings are stored
-	 */
-	public static File getSettingsDirectory() {
-		return settingsDir;
-	}
 
 	static {
 		settingsDir = SettingsDirectory.defaultSettingsDirectory();
 		settingsFile = new File(settingsDir, SETTINGS_FILE);
+		cacheDir = new File(settingsDir, "cache");
 		settings.load(settingsFile);
 	}
 
@@ -92,10 +87,21 @@ public final class PersistentSettings {
 	}
 
 	/**
+	 * @return The directory where program settings are stored
+	 */
+	public static File settingsDirectory() {
+		return settingsDir;
+	}
+
+	public static File cacheDirectory() {
+		return cacheDir;
+	}
+
+	/**
 	 * @return The default scene directory
 	 */
 	public static File getSceneDirectory() {
-		String defaultPath = new File(getSettingsDirectory(), DEFAULT_SCENE_DIRECTORY_NAME).getAbsolutePath();
+		String defaultPath = new File(settingsDir, DEFAULT_SCENE_DIRECTORY_NAME).getAbsolutePath();
 		return new File(settings.getString("sceneDirectory", defaultPath));
 	}
 
@@ -152,6 +158,15 @@ public final class PersistentSettings {
 	public static File getLastWorld() {
 		String lastWorld = settings.getString("lastWorld", "");
 		return lastWorld.isEmpty() ? null : new File(lastWorld);
+	}
+
+	public static void setSkinDirectory(File directory) {
+		settings.setString("skinDirectory", directory.getAbsolutePath());
+		save();
+	}
+
+	public static String getSkinDirectory() {
+		return settings.getString("skinDirectory", "");
 	}
 
 	public static String getLastTexturePack() {
@@ -363,15 +378,5 @@ public final class PersistentSettings {
 		settings.setBool("loadPlayers", value);
 		save();
 	}
-
-	public static String getPlayerModel() {
-		return settings.getString("playerModel", "STEVE");
-	}
-
-	public static void setPlayerModel(String model) {
-		settings.setString("playerModel", model);
-		save();
-	}
-
 }
 

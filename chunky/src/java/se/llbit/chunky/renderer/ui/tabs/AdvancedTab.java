@@ -41,6 +41,7 @@ import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.ui.Adjuster;
 
 public class AdvancedTab extends RenderControlsTab {
+	private static final long serialVersionUID = -1L;
 
 	private final JComboBox outputMode = new JComboBox(OutputMode.values());
 	private final JCheckBox fastFogCB = new JCheckBox("Fast fog");

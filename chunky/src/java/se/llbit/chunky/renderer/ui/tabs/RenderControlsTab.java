@@ -25,8 +25,9 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.ui.RenderControls;
 
-@SuppressWarnings("serial")
 public abstract class RenderControlsTab extends JPanel {
+	private static final long serialVersionUID = -1L;
+
 	protected final RenderManager renderMan;
 	protected final RenderControls renderControls;
 	protected final RenderContext context;
@@ -47,7 +48,7 @@ public abstract class RenderControlsTab extends JPanel {
 		return renderControls.getChunky();
 	}
 
-	protected Scene getScene() {
+	protected Scene scene() {
 		return renderMan.scene();
 	}
 }

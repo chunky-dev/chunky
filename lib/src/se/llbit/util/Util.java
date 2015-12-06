@@ -32,6 +32,9 @@ import java.util.TimeZone;
 
 public class Util {
 
+	private static final char[] B64 =
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".toCharArray();
+
 	public static String md5sum(File library) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("MD5");
@@ -139,5 +142,18 @@ public class Util {
 		int[] srcData = sourceBuffer.getData();
 		int[] destData = destBuffer.getData();
 		System.arraycopy(srcData, 0, destData, 0, width*height);
+	}
+
+	/**
+	 * Encode a hash code as a string.
+	 */
+	public static String cacheEncode(int hash) {
+		char s1 = B64[(hash & 0xFC000000) >>> 26];
+		char s2 = B64[(hash & 0x03F00000) >>> 20];
+		char s3 = B64[(hash & 0x000FC000) >>> 14];
+		char s4 = B64[(hash & 0x00003F00) >>> 8];
+		char s5 = B64[(hash & 0x000000FC) >>> 2];
+		char s6 = B64[hash & 0x00000003];
+		return "" + s1 + s2 + s3 + s4 + s5 + s6;
 	}
 }
