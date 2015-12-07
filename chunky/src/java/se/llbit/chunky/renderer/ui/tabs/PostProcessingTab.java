@@ -100,7 +100,7 @@ public class PostProcessingTab extends RenderControlsTab {
 	}
 
 	@Override
-	public void refreshSceneData() {
+	public void refreshSettings() {
 		exposure.update();
 		updatePostprocessCB();
 	}

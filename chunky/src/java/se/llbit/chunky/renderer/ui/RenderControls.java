@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -177,6 +178,15 @@ public class RenderControls extends JDialog implements ViewListener, RenderStatu
 		postProcessingTab = new PostProcessingTab(this);
 		advancedTab = new AdvancedTab(this);
 		helpTab = new HelpTab(this);
+
+		tabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				RenderControlsTab tab = (RenderControlsTab) tabbedPane.getSelectedComponent();
+				tab.refreshSettings();
+			}
+		});
+
 		buildUI();
 
 		renderMan.start();
@@ -438,12 +448,16 @@ public class RenderControls extends JDialog implements ViewListener, RenderStatu
 	 * @param component tab component
 	 */
 	private void addTab(String title, Texture icon, Component component) {
+		addTab(title, icon == null ? null : icon.imageIcon(), component);
+	}
+
+	private void addTab(String title, ImageIcon icon, Component component) {
 		int index = tabbedPane.getTabCount();
 
 		tabbedPane.add(title, component);
 
 		if (icon != null) {
-			JLabel lbl = new JLabel(title, icon.imageIcon(), SwingConstants.RIGHT);
+			JLabel lbl = new JLabel(title, icon, SwingConstants.RIGHT);
 			lbl.setIconTextGap(5);
 			tabbedPane.setTabComponentAt(index, lbl);
 		}
@@ -619,27 +633,21 @@ public class RenderControls extends JDialog implements ViewListener, RenderStatu
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				updateAllSettings();
+				refreshSettings();
 
 				showPreviewWindow();
 			}
 		});
 	}
 
-	protected void updateAllSettings() {
-		generalTab.refreshSceneData();
-		lightingTab.refreshSceneData();
-		skyTab.refreshSceneData();
-		waterTab.refreshSceneData();
-		cameraTab.refreshSceneData();
-		postProcessingTab.refreshSceneData();
-		advancedTab.refreshSceneData();
-		helpTab.refreshSceneData();
-
+	protected void refreshSettings() {
 		updateTitle();
 		targetSPP.update();
 		updateSceneNameField();
 		stopRenderBtn.setEnabled(true);
+
+		RenderControlsTab tab = (RenderControlsTab) tabbedPane.getSelectedComponent();
+		tab.refreshSettings();
 	}
 
 	/**
@@ -811,7 +819,7 @@ public class RenderControls extends JDialog implements ViewListener, RenderStatu
 						@Override
 						public void onReject() {
 							renderMan.revertPendingSceneChanges();
-							updateAllSettings();
+							refreshSettings();
 							resetConfirmMutex.set(false);
 						}
 					});

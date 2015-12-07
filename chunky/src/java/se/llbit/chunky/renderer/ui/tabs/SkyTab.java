@@ -611,7 +611,7 @@ public class SkyTab extends RenderControlsTab {
 	}
 
 	@Override
-	public void refreshSceneData() {
+	public void refreshSettings() {
 		skyHorizonOffset.update();
 		updateSkyGradient();
 		updateSkyMode();

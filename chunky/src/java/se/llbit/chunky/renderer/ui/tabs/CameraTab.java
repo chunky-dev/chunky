@@ -505,7 +505,7 @@ public class CameraTab extends RenderControlsTab implements ViewListener, Render
 	}
 
 	@Override
-	public void refreshSceneData() {
+	public void refreshSettings() {
 		dof.update();
 		fov.update();
 		updateCameraDirection();

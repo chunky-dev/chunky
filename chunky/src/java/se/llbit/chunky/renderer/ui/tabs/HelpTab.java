@@ -56,7 +56,7 @@ public class HelpTab extends RenderControlsTab {
 	}
 
 	@Override
-	public void refreshSceneData() {
+	public void refreshSettings() {
 	}
 
 }

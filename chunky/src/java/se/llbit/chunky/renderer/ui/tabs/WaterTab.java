@@ -251,7 +251,7 @@ public class WaterTab extends RenderControlsTab {
 	}
 
 	@Override
-	public void refreshSceneData() {
+	public void refreshSettings() {
 		updateStillWater();
 		waterVisibility.update();
 		waterOpacity.update();

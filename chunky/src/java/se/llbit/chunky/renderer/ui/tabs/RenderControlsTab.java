@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.ui.RenderControls;
 
@@ -36,7 +37,7 @@ public abstract class RenderControlsTab extends JPanel {
 		this.context = renderControls.getContext();
 	}
 
-	public abstract void refreshSceneData();
+	public abstract void refreshSettings();
 
 	protected SceneManager sceneManager() {
 		return renderControls.getSceneManager();
@@ -44,5 +45,9 @@ public abstract class RenderControlsTab extends JPanel {
 
 	protected Chunky getChunky() {
 		return renderControls.getChunky();
+	}
+
+	protected Scene getScene() {
+		return renderMan.scene();
 	}
 }

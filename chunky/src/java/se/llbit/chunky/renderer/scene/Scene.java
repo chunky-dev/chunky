@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -2266,6 +2266,10 @@ public class Scene extends SceneDescription {
 				entities.add(entity);
 			}
 		}
+	}
+
+	public Collection<Entity> getEntities() {
+		return entities;
 	}
 
 }

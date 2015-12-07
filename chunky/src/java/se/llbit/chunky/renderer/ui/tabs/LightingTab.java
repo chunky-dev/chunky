@@ -250,7 +250,7 @@ public class LightingTab extends RenderControlsTab {
 	}
 
 	@Override
-	public void refreshSceneData() {
+	public void refreshSettings() {
 		emitterIntensity.update();
 		skyLight.update();
 		sunIntensity.update();

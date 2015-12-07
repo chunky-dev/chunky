@@ -407,7 +407,7 @@ public class GeneralTab extends RenderControlsTab {
 	}
 
 	@Override
-	public void refreshSceneData() {
+	public void refreshSettings() {
 		updateCanvasSizeField();
 		updateLoadPlayersCB();
 		updatePlayerModel();

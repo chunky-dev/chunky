@@ -209,7 +209,7 @@ public class AdvancedTab extends RenderControlsTab {
 	}
 
 	@Override
-	public void refreshSceneData() {
+	public void refreshSettings() {
 		updateOutputMode();
 		updateFastFog();
 		rayDepth.update();
