@@ -18,18 +18,22 @@ package se.llbit.chunky.world;
 
 import se.llbit.nbt.AnyTag;
 
-public class PlayerPosition {
+public class PlayerData {
 	public final double x;
 	public final double y;
 	public final double z;
 	public final double yaw;
 	public final double pitch;
 	public final int dimension;
+	public final long uuidLo;
+	public final long uuidHi;
 
-	public PlayerPosition(AnyTag player) {
+	public PlayerData(AnyTag player) {
 		AnyTag pos = player.get("Pos");
 		AnyTag rotation = player.get("Rotation");
 
+		uuidLo = player.get("UUIDLeast").longValue(-1);
+		uuidHi = player.get("UUIDMost").longValue(-1);
 		x = pos.get(0).doubleValue();
 		y = pos.get(1).doubleValue();
 		z = pos.get(2).doubleValue();

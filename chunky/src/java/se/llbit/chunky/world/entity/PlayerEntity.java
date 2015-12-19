@@ -33,23 +33,27 @@ import se.llbit.math.primitive.Primitive;
 
 public class PlayerEntity extends Entity {
 
-	private final double yaw;
-	private final double pitch;
-	private final double leftLegPose;
-	private final double rightLegPose;
-	private final double leftArmPose;
-	private final double rightArmPose;
-	private final PlayerModel model;
+	public final String uuid;
+	public final double yaw;
+	public final double pitch;
+	public double headYaw = 0.0;
+	public final double leftLegPose;
+	public final double rightLegPose;
+	public final double leftArmPose;
+	public final double rightArmPose;
+	public final PlayerModel model;
 
-	public PlayerEntity(Vector3d position, double yawDegrees, double pitchDegrees) {
-		this(position, QuickMath.degToRad(180 - yawDegrees), -QuickMath.degToRad(pitchDegrees),
+	public PlayerEntity(String uuid, Vector3d position, double yawDegrees, double pitchDegrees) {
+		this(uuid, position, QuickMath.degToRad(180 - yawDegrees),
+				-QuickMath.degToRad(pitchDegrees),
 				0.4, -0.4, 0.4, -0.4, PlayerModel.get(PersistentSettings.getPlayerModel()));
 	}
 
-	public PlayerEntity(Vector3d position, double yaw, double pitch,
+	public PlayerEntity(String uuid, Vector3d position, double yaw, double pitch,
 			double leftLegPose, double rightLegPose, double leftArmPose, double rightArmPose,
 			PlayerModel model) {
 		super(position);
+		this.uuid = uuid;
 		this.yaw = yaw;
 		this.pitch = pitch;
 		this.leftLegPose = leftLegPose;
@@ -157,6 +161,7 @@ public class PlayerEntity extends Entity {
 	public JsonValue toJson() {
 		JsonObject json = new JsonObject();
 		json.add("kind", "player");
+		json.add("uuid", uuid);
 		json.add("position", position.toJson());
 		json.add("model", model.name());
 		json.add("pitch", pitch);
@@ -165,6 +170,7 @@ public class PlayerEntity extends Entity {
 		json.add("rightLegPose", rightLegPose);
 		json.add("leftArmPose", leftArmPose);
 		json.add("rightArmPose", rightArmPose);
+		json.add("headYaw", headYaw);
 		return json;
 	}
 
@@ -174,11 +180,19 @@ public class PlayerEntity extends Entity {
 		PlayerModel model = PlayerModel.get(json.get("model").stringValue("STEVE"));
 		double pitch = json.get("pitch").doubleValue(0.0);
 		double yaw = json.get("yaw").doubleValue(0.0);
+		String uuid = json.get("uuid").stringValue("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
 		double leftLegPose = json.get("leftLegPose").doubleValue(0.0);
 		double rightLegPose = json.get("rightLegPose").doubleValue(0.0);
 		double leftArmPose = json.get("leftArmPose").doubleValue(0.0);
 		double rightArmPose = json.get("rightArmPose").doubleValue(0.0);
-		return new PlayerEntity(position, yaw, pitch, leftLegPose,
+		PlayerEntity entity = new PlayerEntity(uuid, position, yaw, pitch, leftLegPose,
 				rightLegPose, leftArmPose, rightArmPose, model);
+		entity.headYaw = json.get("headYaw").doubleValue(0.0);
+		return entity;
+	}
+
+	@Override
+	public String toString() {
+		return uuid;
 	}
 }

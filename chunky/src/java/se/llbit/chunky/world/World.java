@@ -90,7 +90,7 @@ public class World implements Comparable<World> {
 
 	private int currentLayer = DEFAULT_LAYER;
 	private File worldDirectory = null;
-	private final List<PlayerPosition> playerLocations = new LinkedList<PlayerPosition>();
+	private final List<PlayerData> playerLocations = new LinkedList<PlayerData>();
 	private boolean haveSpawnPos = false;
 	private int playerDimension = 0;
 	private int dimension;
@@ -207,7 +207,7 @@ public class World implements Comparable<World> {
 			playerLocations.clear();
 
 			if (!player.isError()) {
-				playerLocations.add(new PlayerPosition(player));
+				playerLocations.add(new PlayerData(player));
 			}
 
 			currentLayer = playerLocY();
@@ -250,7 +250,7 @@ public class World implements Comparable<World> {
 					try {
 						in = new DataInputStream(new GZIPInputStream(
 								new FileInputStream(player)));
-						playerLocations.add(new PlayerPosition(NamedTag.read(in).unpack()));
+						playerLocations.add(new PlayerData(NamedTag.read(in).unpack()));
 						in.close();
 					} catch (IOException e) {
 						Log.infofmt("Could not read player data file '%s'",
@@ -367,7 +367,7 @@ public class World implements Comparable<World> {
 	 */
 	public synchronized Vector3d playerPos() {
 		if (!playerLocations.isEmpty() && playerDimension == dimension) {
-			PlayerPosition pos = playerLocations.get(0);
+			PlayerData pos = playerLocations.get(0);
 			return new Vector3d(pos.x, pos.y, pos.z);
 		} else {
 			return null;
@@ -392,7 +392,7 @@ public class World implements Comparable<World> {
 	 * @return Player Y location, or -1 if not available
 	 */
 	public synchronized int playerLocY() {
-		PlayerPosition player = getPlayerPosition();
+		PlayerData player = getPlayerPosition();
 		if (player != null) {
 			return (int) (player.y - 0.5);
 		}
@@ -888,16 +888,17 @@ public class World implements Comparable<World> {
 	public synchronized Collection<Entity> getEntityData() {
 		Collection<Entity> list = new LinkedList<Entity>();
 		if (PersistentSettings.getLoadPlayers()) {
-			for (PlayerPosition pos : playerLocations) {
+			for (PlayerData data : playerLocations) {
 				list.add(new PlayerEntity(
-						new Vector3d(pos.x, pos.y, pos.z),
-						pos.yaw, pos.pitch));
+						String.format("%016X%016X", data.uuidHi, data.uuidLo),
+						new Vector3d(data.x, data.y, data.z),
+						data.yaw, data.pitch));
 			}
 		}
 		return list;
 	}
 
-	public synchronized PlayerPosition getPlayerPosition() {
+	public synchronized PlayerData getPlayerPosition() {
 		if (playerLocations.isEmpty()) {
 			return null;
 		} else {
@@ -905,7 +906,7 @@ public class World implements Comparable<World> {
 		}
 	}
 
-	public synchronized Collection<PlayerPosition> getPlayerPositions() {
+	public synchronized Collection<PlayerData> getPlayerPositions() {
 		return Collections.unmodifiableList(playerLocations);
 	}
 }

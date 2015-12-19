@@ -33,7 +33,7 @@ import se.llbit.chunky.renderer.projection.Projector;
 import se.llbit.chunky.renderer.projection.SphericalApertureProjector;
 import se.llbit.chunky.renderer.projection.StereographicProjector;
 import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.PlayerPosition;
+import se.llbit.chunky.world.PlayerData;
 import se.llbit.chunky.world.World;
 import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
@@ -420,7 +420,7 @@ public class Camera implements JSONifiable {
 	 */
 	public void moveToPlayer(World world) {
 		if (world != null) {
-			PlayerPosition player = world.getPlayerPosition();
+			PlayerData player = world.getPlayerPosition();
 			if (player != null) {
 				pitch = QuickMath.degToRad(player.pitch - 90);
 				yaw = QuickMath.degToRad(-player.yaw + 90);
