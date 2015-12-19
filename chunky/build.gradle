@@ -1,3 +1,6 @@
+apply plugin: 'application'
+
+mainClassName = 'se.llbit.chunky.main.Chunky'
 archivesBaseName = 'chunky-core'
 
 jar {
