@@ -37,7 +37,6 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.ui.RenderControls;
 import se.llbit.chunky.renderer.ui.SceneSelector;
 import se.llbit.chunky.world.Chunk;
@@ -55,7 +54,6 @@ public class GeneralTab extends RenderControlsTab {
 	private final JButton loadSceneBtn = new JButton();
 	private final JButton openSceneDirBtn = new JButton();
 	private final JCheckBox loadPlayersCB = new JCheckBox();
-	private final JComboBox playerModel = new JComboBox();
 	private final JCheckBox biomeColorsCB = new JCheckBox();
 	private final JCheckBox saveDumpsCB = new JCheckBox();
 	private final JComboBox dumpFrequencyCB = new JComboBox();
@@ -119,15 +117,6 @@ public class GeneralTab extends RenderControlsTab {
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox source = (JCheckBox) e.getSource();
 			PersistentSettings.setLoadPlayers(source.isSelected());
-		}
-	};
-
-	private final ActionListener playerModelListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JComboBox source = (JComboBox) e.getSource();
-			PlayerModel model = (PlayerModel) source.getSelectedItem();
-			PersistentSettings.setPlayerModel(model.name());
 		}
 	};
 
@@ -282,14 +271,6 @@ public class GeneralTab extends RenderControlsTab {
 				+ "Reload the chunks after changing this option.");
 		updateLoadPlayersCB();
 
-		JLabel playerModelLbl = new JLabel("Player model: ");
-
-		for (PlayerModel model : PlayerModel.values()) {
-			playerModel.addItem(model);
-		}
-		playerModel.setToolTipText("Reload chunks after changing this option.");
-		updatePlayerModel();
-
 		biomeColorsCB.setText("Enable biome colors");
 		updateBiomeColorsCB();
 
@@ -343,10 +324,6 @@ public class GeneralTab extends RenderControlsTab {
 				)
 				.addComponent(sep2)
 				.addComponent(loadPlayersCB)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(playerModelLbl)
-					.addComponent(playerModel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-				)
 				.addComponent(biomeColorsCB)
 				.addGroup(layout.createSequentialGroup()
 					.addComponent(saveDumpsCB)
@@ -389,11 +366,6 @@ public class GeneralTab extends RenderControlsTab {
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(loadPlayersCB)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(playerModelLbl)
-				.addComponent(playerModel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-			)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(biomeColorsCB)
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(saveDumpsCB)
@@ -411,7 +383,6 @@ public class GeneralTab extends RenderControlsTab {
 	public void refreshSettings() {
 		updateCanvasSizeField();
 		updateLoadPlayersCB();
-		updatePlayerModel();
 		updateBiomeColorsCB();
 		updateSaveDumpsCheckBox();
 		updateSaveSnapshotCheckBox();
@@ -437,13 +408,6 @@ public class GeneralTab extends RenderControlsTab {
 		loadPlayersCB.removeActionListener(loadPlayersCBListener);
 		loadPlayersCB.setSelected(PersistentSettings.getLoadPlayers());
 		loadPlayersCB.addActionListener(loadPlayersCBListener);
-	}
-
-	protected void updatePlayerModel() {
-		playerModel.removeActionListener(playerModelListener);
-		String model = PersistentSettings.getPlayerModel();
-		playerModel.setSelectedItem(PlayerModel.get(model));
-		playerModel.addActionListener(playerModelListener);
 	}
 
 	protected void updateBiomeColorsCB() {

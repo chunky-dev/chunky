@@ -22,9 +22,13 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -36,6 +40,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.ui.RenderControls;
 import se.llbit.chunky.renderer.ui.tabs.SkyTab.SkyboxTextureLoader;
@@ -80,6 +85,7 @@ public class EntitiesTab extends RenderControlsTab {
 	}
 
 	private final JTable entityTable;
+	private final JComboBox playerModel = new JComboBox();
 	private final JTextField skinField = new JTextField();
 	private final JButton selectSkinBtn = new JButton("Select Skin");
 	private final JButton moveToPlayer = new JButton("Move Camera to Player");
@@ -304,6 +310,21 @@ public class EntitiesTab extends RenderControlsTab {
 		}
 	};
 
+	private final ActionListener playerModelListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			PlayerEntity player = getSelectedPlayer();
+			if (player != null) {
+				JComboBox source = (JComboBox) e.getSource();
+				PlayerModel model = (PlayerModel) source.getSelectedItem();
+				if (player.model != model) {
+					player.model = model;
+					scene().rebuildActorBvh();
+				}
+			}
+		}
+	};
+
 	public EntitiesTab(RenderControls renderControls) {
 		super(renderControls);
 
@@ -321,21 +342,20 @@ public class EntitiesTab extends RenderControlsTab {
 		selectionModel.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				updateSkin();
-				PlayerEntity player = getSelectedPlayer();
-				if (player != null) {
-					direction.update(player);
-					headYaw.update(player);
-					headPitch.update(player);
-					leftLeg.update(player);
-					rightLeg.update(player);
-					leftArm.update(player);
-					rightArm.update(player);
-				}
+				updateCurrentPlayer();
 			}
 		});
 
 		JLabel poseLbl = new JLabel("Pose");
+
+		JLabel playerModelLbl = new JLabel("Player model: ");
+
+		for (PlayerModel model : PlayerModel.values()) {
+			playerModel.addItem(model);
+		}
+		playerModel.setToolTipText("Reload chunks after changing this option.");
+		playerModel.addActionListener(playerModelListener);
+
 		JLabel skinLbl = new JLabel("Skin");
 
 		skinField.setEnabled(false);
@@ -343,14 +363,43 @@ public class EntitiesTab extends RenderControlsTab {
 		removePlayer.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				PlayerEntity player = getSelectedPlayer();
+				if (player != null) {
+					scene().removePlayer(player);
+				}
 			}
 		});
 
 		addPlayer.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				Collection<Entity> entities = scene().getActors();
+				Set<String> ids = new HashSet<String>();
+				for (Entity entity : entities) {
+					if (entity instanceof PlayerEntity) {
+						ids.add(((PlayerEntity) entity).uuid);
+					}
+				}
+				// Pick a new UUID for the new entity.
+				long id = System.currentTimeMillis();
+				while (ids.contains(String.format("%016X%016X", 0, id))) {
+					id += 1;
+				}
+				Vector3d position = scene().getTargetPosition();
+				if (position == null) {
+					position = new Vector3d(scene().camera().getPosition());
+				}
+				PlayerEntity player = new PlayerEntity(String.format("%016X%016X", 0, id),
+						position, 0, 0);
+				PlayerEntity selected = getSelectedPlayer();
+				if (selected != null) {
+					player.skin = selected.skin;
+					player.model = selected.model;
+				}
+				player.randomPoseAndLook();
+				scene().addPlayer(player);
+				PlayerData data = new PlayerData(player, scene());
+				tableModel.addRow(new Object[] { data.name, data });
 			}
 		});
 
@@ -438,8 +487,12 @@ public class EntitiesTab extends RenderControlsTab {
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(moveToTarget))
 			.addComponent(scrollPane)
-			.addComponent(skinLbl)
 			.addGroup(layout.createSequentialGroup()
+					.addComponent(playerModelLbl)
+					.addComponent(playerModel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+			.addGroup(layout.createSequentialGroup()
+					.addComponent(skinLbl)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(skinField)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(selectSkinBtn))
@@ -465,9 +518,12 @@ public class EntitiesTab extends RenderControlsTab {
 					.addComponent(moveToCamera)
 					.addComponent(moveToTarget))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(skinLbl)
-			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+					.addComponent(playerModelLbl)
+					.addComponent(playerModel, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
+					.addComponent(skinLbl)
 					.addComponent(skinField)
 					.addComponent(selectSkinBtn))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -511,13 +567,38 @@ public class EntitiesTab extends RenderControlsTab {
 	@Override
 	public void refreshSettings() {
 		tableModel.setRowCount(0);
-		Collection<Entity> entities = scene().getEntities();
+		Collection<Entity> entities = scene().getActors();
 		for (Entity entity : entities) {
 			if (entity instanceof PlayerEntity) {
 				PlayerEntity player = (PlayerEntity) entity;
 				PlayerData data = new PlayerData(player, scene());
 				tableModel.addRow(new Object[] { data.name, data });
 			}
+		}
+		updateCurrentPlayer();
+	}
+
+	protected void updateCurrentPlayer() {
+		updateSkin();
+		PlayerEntity player = getSelectedPlayer();
+		if (player != null) {
+			direction.update(player);
+			headYaw.update(player);
+			headPitch.update(player);
+			leftLeg.update(player);
+			rightLeg.update(player);
+			leftArm.update(player);
+			rightArm.update(player);
+		}
+		updatePlayerModel();
+	}
+
+	protected void updatePlayerModel() {
+		PlayerEntity player = getSelectedPlayer();
+		if (player != null) {
+			playerModel.removeActionListener(playerModelListener);
+			playerModel.setSelectedItem(player.model);
+			playerModel.addActionListener(playerModelListener);
 		}
 	}
 

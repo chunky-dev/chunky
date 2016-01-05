@@ -644,7 +644,8 @@ public class Scene extends SceneDescription {
 			int done = 1;
 			int target = players.size();
 			for (PlayerEntity entity : players) {
-				progressListener.setProgress(task, done, 0, players.size());
+				entity.randomPose();
+				progressListener.setProgress(task, done, 0, target);
 				done += 1;
 				JsonObject profile;
 				try {
@@ -2301,11 +2302,31 @@ public class Scene extends SceneDescription {
 		return entities;
 	}
 
+	public Collection<Entity> getActors() {
+		return actors;
+	}
+
 	public JsonObject getPlayerProfile(PlayerEntity entity) {
 		if (profiles.containsKey(entity)) {
 			return profiles.get(entity);
 		} else {
 			return new JsonObject();
+		}
+	}
+
+	public void removePlayer(PlayerEntity player) {
+		profiles.remove(player);
+		actors.remove(player);
+		rebuildActorBvh();
+	}
+
+	public void addPlayer(PlayerEntity player) {
+		if (!actors.contains(player)) {
+			profiles.put(player, new JsonObject());
+			actors.add(player);
+			rebuildActorBvh();
+		} else {
+			Log.warn("Failed to add player: entity already exists (" + player + ")");
 		}
 	}
 }

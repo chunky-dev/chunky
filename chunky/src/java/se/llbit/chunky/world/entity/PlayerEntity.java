@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Random;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.PlayerModel;
@@ -46,7 +47,7 @@ public class PlayerEntity extends Entity {
 	public double rightLegPose;
 	public double leftArmPose;
 	public double rightArmPose;
-	public final PlayerModel model;
+	public PlayerModel model;
 	public String skin = "";
 
 	public PlayerEntity(String uuid, Vector3d position, double yawDegrees, double pitchDegrees) {
@@ -85,12 +86,11 @@ public class PlayerEntity extends Entity {
 	@Override
 	public Collection<Primitive> primitives(Vector3d offset) {
 		EntityTexture texture = Texture.steve;
-		double armWidth = 2;
+		double armWidth = model == PlayerModel.ALEX ? 1.5 : 2;
 		if (skin.isEmpty()) {
 			switch (model) {
 			case ALEX:
 				texture = Texture.alex;
-				armWidth = 1.5;
 				break;
 			case STEVE:
 				texture = Texture.steve;
@@ -234,5 +234,29 @@ public class PlayerEntity extends Entity {
 
 	public void setTexture(String path) {
 		skin = path;
+	}
+
+	public void randomPoseAndLook() {
+		Random random = new Random(System.currentTimeMillis());
+		randomPose(random);
+		randomLook(random);
+	}
+
+	public void randomPose() {
+		Random random = new Random(System.currentTimeMillis());
+		randomPose(random);
+	}
+
+	private void randomPose(Random random) {
+		leftLegPose = (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
+		rightLegPose = - leftLegPose;
+		leftArmPose = (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
+		rightArmPose = - leftArmPose;
+	}
+
+	private void randomLook(Random random) {
+		yaw = (random.nextFloat() - 0.5) * QuickMath.TAU;
+		headYaw = 0.4 * (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
+		pitch = (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
 	}
 }
