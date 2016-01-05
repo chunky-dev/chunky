@@ -17,6 +17,8 @@
 package se.llbit.chunky.resources.texturepack;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
@@ -42,6 +44,20 @@ public abstract class TextureRef {
 	 * @return <code>true</code> if the texture was successfully loaded
 	 */
 	public abstract boolean load(ZipFile texturePack);
+
+	/**
+	 * Attempt to load a texture from a PNG image file.
+	 * @param file the texture file
+	 * @return <code>true</code> if the texture was successfully loaded
+	 * @throws TextureFormatError
+	 * @throws IOException
+	 */
+	public boolean load(File file) throws IOException, TextureFormatError {
+		FileInputStream in = new FileInputStream(file);
+		boolean result = load(in);
+		in.close();
+		return result;
+	}
 
 	/**
 	 * Attempt to load a texture from a texture pack
@@ -75,4 +91,3 @@ public abstract class TextureRef {
 	protected abstract boolean load(InputStream imageStream)
 			throws IOException, TextureFormatError;
 }
-

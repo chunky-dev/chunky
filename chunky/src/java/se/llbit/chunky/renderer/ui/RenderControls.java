@@ -639,7 +639,6 @@ public class RenderControls extends JDialog implements ViewListener, RenderStatu
 			@Override
 			public void run() {
 				refreshSettings();
-
 				showPreviewWindow();
 			}
 		});

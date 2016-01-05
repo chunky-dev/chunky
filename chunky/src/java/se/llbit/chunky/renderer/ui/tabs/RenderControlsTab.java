@@ -47,7 +47,7 @@ public abstract class RenderControlsTab extends JPanel {
 		return renderControls.getChunky();
 	}
 
-	protected Scene getScene() {
+	protected Scene scene() {
 		return renderMan.scene();
 	}
 }

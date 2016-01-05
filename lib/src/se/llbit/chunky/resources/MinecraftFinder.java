@@ -109,7 +109,7 @@ public class MinecraftFinder {
 				if (minecraftJar == null) {
 					// Fall back on downloaded Jar if available
 					File resourceDir = new File(
-							PersistentSettings.getSettingsDirectory(),
+							PersistentSettings.settingsDirectory(),
 							"resources");
 					if (resourceDir.isDirectory()) {
 						File jar = new File(resourceDir, "minecraft.jar");

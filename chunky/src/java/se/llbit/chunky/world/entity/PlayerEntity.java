@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.world.entity;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -23,8 +25,11 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
+import se.llbit.chunky.resources.texturepack.TextureFormatError;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3d;
@@ -42,6 +47,7 @@ public class PlayerEntity extends Entity {
 	public final double leftArmPose;
 	public final double rightArmPose;
 	public final PlayerModel model;
+	public String skin = "";
 
 	public PlayerEntity(String uuid, Vector3d position, double yawDegrees, double pitchDegrees) {
 		this(uuid, position, QuickMath.degToRad(180 - yawDegrees),
@@ -80,14 +86,28 @@ public class PlayerEntity extends Entity {
 	public Collection<Primitive> primitives(Vector3d offset) {
 		EntityTexture texture = Texture.steve;
 		double armWidth = 2;
-		switch (model) {
-		case ALEX:
-			texture = Texture.alex;
-			armWidth = 1.5;
-			break;
-		case STEVE:
-			texture = Texture.steve;
-			break;
+		if (skin.isEmpty()) {
+			switch (model) {
+			case ALEX:
+				texture = Texture.alex;
+				armWidth = 1.5;
+				break;
+			case STEVE:
+				texture = Texture.steve;
+				break;
+			}
+		} else {
+			texture = new EntityTexture();
+			EntityTextureLoader loader = new EntityTextureLoader(skin, texture);
+			try {
+				loader.load(new File(skin));
+			} catch (IOException e) {
+				Log.warn("Failed to load skin", e);
+				texture = Texture.steve;
+			} catch (TextureFormatError e) {
+				Log.warn("Failed to load skin", e);
+				texture = Texture.steve;
+			}
 		}
 		Collection<Primitive> faces = new LinkedList<Primitive>();
 		Transform offsetTransform = Transform.NONE.translate(
@@ -164,6 +184,7 @@ public class PlayerEntity extends Entity {
 		json.add("uuid", uuid);
 		json.add("position", position.toJson());
 		json.add("model", model.name());
+		json.add("skin", skin);
 		json.add("pitch", pitch);
 		json.add("yaw", yaw);
 		json.add("leftLegPose", leftLegPose);
@@ -181,6 +202,7 @@ public class PlayerEntity extends Entity {
 		double pitch = json.get("pitch").doubleValue(0.0);
 		double yaw = json.get("yaw").doubleValue(0.0);
 		String uuid = json.get("uuid").stringValue("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+		String skin = json.get("skin").stringValue("");
 		double leftLegPose = json.get("leftLegPose").doubleValue(0.0);
 		double rightLegPose = json.get("rightLegPose").doubleValue(0.0);
 		double leftArmPose = json.get("leftArmPose").doubleValue(0.0);
@@ -188,11 +210,29 @@ public class PlayerEntity extends Entity {
 		PlayerEntity entity = new PlayerEntity(uuid, position, yaw, pitch, leftLegPose,
 				rightLegPose, leftArmPose, rightArmPose, model);
 		entity.headYaw = json.get("headYaw").doubleValue(0.0);
+		entity.skin = skin;
 		return entity;
 	}
 
 	@Override
 	public String toString() {
-		return uuid;
+		return "player: " + uuid;
+	}
+
+	@Override
+	public int hashCode() {
+		return uuid.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof PlayerEntity) {
+			return ((PlayerEntity) obj).uuid.equals(uuid);
+		}
+		return false;
+	}
+
+	public void setTexture(String path) {
+		skin = path;
 	}
 }

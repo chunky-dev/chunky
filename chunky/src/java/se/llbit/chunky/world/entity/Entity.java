@@ -28,7 +28,7 @@ import se.llbit.math.primitive.Primitive;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 abstract public class Entity {
-	protected final Vector3d position;
+	public final Vector3d position;
 
 	protected Entity(Vector3d position) {
 		this.position = new Vector3d(position);

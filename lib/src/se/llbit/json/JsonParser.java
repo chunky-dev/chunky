@@ -55,6 +55,9 @@ public class JsonParser {
 	private final LookaheadReader in;
 
 	/**
+	 * Parse the JSON object from the given input.
+	 *
+	 * <p>The input stream is not closed after being used.
 	 * @param input
 	 */
 	public JsonParser(InputStream input) {

@@ -18,7 +18,7 @@ package se.llbit.chunky.world;
 
 import se.llbit.nbt.AnyTag;
 
-public class PlayerData {
+public class PlayerEntityData {
 	public final double x;
 	public final double y;
 	public final double z;
@@ -28,7 +28,9 @@ public class PlayerData {
 	public final long uuidLo;
 	public final long uuidHi;
 
-	public PlayerData(AnyTag player) {
+	public final String uuid;
+
+	public PlayerEntityData(AnyTag player) {
 		AnyTag pos = player.get("Pos");
 		AnyTag rotation = player.get("Rotation");
 
@@ -40,10 +42,25 @@ public class PlayerData {
 		yaw = rotation.get(0).floatValue();
 		pitch = rotation.get(1).floatValue();
 		dimension = player.get("Dimension").intValue();
+
+		uuid = String.format("%016X%016X", uuidHi, uuidLo);
 	}
 
 	@Override
 	public String toString() {
 		return String.format("%d: %d, %d, %d", dimension, (int) x, (int) y, (int) z);
+	}
+
+	@Override
+	public int hashCode() {
+		return uuid.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof PlayerEntityData) {
+			return ((PlayerEntityData) obj).uuid.equals(uuid);
+		}
+		return false;
 	}
 }

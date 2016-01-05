@@ -225,7 +225,7 @@ public class BenchmarkDialog extends JDialog implements RenderStatusListener {
 	public static void recordBenchmarkScore(String benchmarkScene, int score) {
 		try {
 			// append score to benchmark log file
-			File benchmarkFile = new File(PersistentSettings.getSettingsDirectory(), "benchmark.log");
+			File benchmarkFile = new File(PersistentSettings.settingsDirectory(), "benchmark.log");
 			PrintStream out = new PrintStream(new FileOutputStream(benchmarkFile, true));
 			SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			out.println(String.format("%s,%s,%s,%d",

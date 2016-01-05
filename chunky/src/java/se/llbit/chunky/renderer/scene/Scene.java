@@ -27,9 +27,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
@@ -57,6 +59,7 @@ import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
 import se.llbit.chunky.world.entity.Entity;
 import se.llbit.chunky.world.entity.PaintingEntity;
+import se.llbit.chunky.world.entity.PlayerEntity;
 import se.llbit.chunky.world.entity.SignEntity;
 import se.llbit.chunky.world.entity.SkullEntity;
 import se.llbit.chunky.world.entity.WallSignEntity;
@@ -79,6 +82,7 @@ import se.llbit.png.IEND;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
 import se.llbit.tiff.TiffFileWriter;
+import se.llbit.util.MCDownloader;
 
 /**
  * Scene description.
@@ -179,6 +183,9 @@ public class Scene extends SceneDescription {
 	/** Entities in the scene. */
 	private Collection<Entity> entities = new LinkedList<Entity>();
 
+	/** Poseable entities in the scene. */
+	private Map<PlayerEntity, JsonObject> profiles = Collections.emptyMap();
+
 	private BVH bvh = new BVH(Collections.<Primitive>emptyList());
 
 	// chunk loading buffers
@@ -253,11 +260,12 @@ public class Scene extends SceneDescription {
 		worldPath = other.worldPath;
 		worldDimension = other.worldDimension;
 
-		// the octree reference is overwritten to save time
-		// when the other scene is changed it must create a new octree
+		// The octree reference is overwritten to save time
+		// when the other scene is changed it must create a new octree.
 		worldOctree = other.worldOctree;
 		primitives = other.primitives;
 		entities = other.entities;
+		profiles = other.profiles;
 		bvh = other.bvh;
 		grassTexture = other.grassTexture;
 		foliageTexture = other.foliageTexture;
@@ -602,7 +610,7 @@ public class Scene extends SceneDescription {
 
 		int requiredDepth = calculateOctreeOrigin(chunksToLoad);
 
-		// create new octree to fit all chunks
+		// Create new octree to fit all chunks.
 		worldOctree = new Octree(requiredDepth);
 
 		if (waterHeight > 0) {
@@ -620,7 +628,7 @@ public class Scene extends SceneDescription {
 			}
 		}
 
-		// parse the regions first - force chunk lists to be populated!
+		// Parse the regions first - force chunk lists to be populated!
 		Set<ChunkPosition> regions = new HashSet<ChunkPosition>();
 		for (ChunkPosition cp: chunksToLoad) {
 			regions.add(cp.getRegionPosition());
@@ -631,26 +639,41 @@ public class Scene extends SceneDescription {
 		}
 
 		entities = new LinkedList<Entity>();
+		profiles = new HashMap<PlayerEntity, JsonObject>();
 
 		int ycutoff = PersistentSettings.getYCutoff();
 		ycutoff = Math.max(0, ycutoff);
 
+		Collection<PlayerEntity> players = world.playerEntities();
 		task = "Loading entities";
-		progressListener.setProgress(task, 0, 0, 1);
-		entities = world.getEntityData();
+		int done = 1;
+		int target = players.size();
+		for (PlayerEntity entity : players) {
+			progressListener.setProgress(task, done, 0, players.size());
+			done += 1;
+			JsonObject profile;
+			try {
+				profile = MCDownloader.fetchProfile(entity.uuid);
+			} catch (IOException e) {
+				Log.error(e);
+				profile = new JsonObject();
+			}
+			profiles.put(entity, profile);
+			entities.add(entity);
+		}
 		progressListener.setProgress(task, 1, 0, 1);
 
 		Heightmap biomeIdMap = new Heightmap();
 		task = "Loading chunks";
-		int done = 1;
-		int target = chunksToLoad.size();
+		done = 1;
+		target = chunksToLoad.size();
 		for (ChunkPosition cp : chunksToLoad) {
-
 			progressListener.setProgress(task, done, 0, target);
 			done += 1;
 
-			if (loadedChunks.contains(cp))
+			if (loadedChunks.contains(cp)) {
 				continue;
+			}
 
 			loadedChunks.add(cp);
 
@@ -821,19 +844,19 @@ public class Scene extends SceneDescription {
 							int top = 0;
 							int bottom = 0;
 							if ((metadata & 8) != 0) {
-								// this is the top part of the door
+								// This is the top part of the door.
 								top = metadata;
 								if (cy > 0) {
 									bottom = 0xFF & data[Chunk.chunkIndex(cx, cy-1, cz)/2];
-									bottom >>= (cx % 2) * 4;// extract metadata
+									bottom >>= (cx % 2) * 4; // Extract metadata.
 									bottom &= 0xF;
 								}
 							} else {
-								// this is the bottom part of the door
+								// This is the bottom part of the door.
 								bottom = metadata;
 								if (cy < 255) {
 									top = 0xFF & data[Chunk.chunkIndex(cx, cy+1, cz)/2];
-									top >>= (cx % 2) * 4;// extract metadata
+									top >>= (cx % 2) * 4; // Extract metadata.
 									top &= 0xF;
 								}
 							}
@@ -866,8 +889,8 @@ public class Scene extends SceneDescription {
 		done = 0;
 		for (ChunkPosition cp : chunksToLoad) {
 
-			// finalize grass and foliage textures
-			// box blur 3x3
+			// Finalize grass and foliage textures.
+			// 3x3 box blur.
 			for (int x = 0; x < 16; ++x) {
 				for (int z = 0; z < 16; ++z) {
 
@@ -894,7 +917,6 @@ public class Scene extends SceneDescription {
 							}
 						}
 					}
-
 					grassMix[0] /= nsum;
 					grassMix[1] /= nsum;
 					grassMix[2] /= nsum;
@@ -908,21 +930,14 @@ public class Scene extends SceneDescription {
 							cp.z*16 + z - origin.z, foliageMix);
 				}
 			}
-
 			progressListener.setProgress(task, done, 0, target);
 			done += 1;
-
 			OctreeFinalizer.finalizeChunk(worldOctree, origin, cp);
 		}
-
 		chunks = loadedChunks;
-
-		camera.setWorldSize(1<<worldOctree.depth);
-
+		camera.setWorldSize(1 << worldOctree.depth);
 		buildBVH();
-
-		Log.info(String.format("Loaded %d chunks (%d emitters)",
-				nchunks, emitters));
+		Log.info(String.format("Loaded %d chunks (%d emitters)", nchunks, emitters));
 	}
 
 	private void buildBVH() {
@@ -948,20 +963,23 @@ public class Scene extends SceneDescription {
 	}
 
 	private int calculateOctreeOrigin(Collection<ChunkPosition> chunksToLoad) {
-
 		int xmin = Integer.MAX_VALUE;
 		int xmax = Integer.MIN_VALUE;
 		int zmin = Integer.MAX_VALUE;
 		int zmax = Integer.MIN_VALUE;
 		for (ChunkPosition cp: chunksToLoad) {
-			if (cp.x < xmin)
+			if (cp.x < xmin) {
 				xmin = cp.x;
-			if (cp.x > xmax)
+			}
+			if (cp.x > xmax) {
 				xmax = cp.x;
-			if (cp.z < zmin)
+			}
+			if (cp.z < zmin) {
 				zmin = cp.z;
-			if (cp.z > zmax)
+			}
+			if (cp.z > zmax) {
 				zmax = cp.z;
+			}
 		}
 
 		xmax += 1;
@@ -971,12 +989,12 @@ public class Scene extends SceneDescription {
 		zmin *= 16;
 		zmax *= 16;
 
-		int maxDimension = Math.max(Chunk.Y_MAX, Math.max(xmax-xmin, zmax-zmin));
+		int maxDimension = Math.max(Chunk.Y_MAX, Math.max(xmax - xmin, zmax - zmin));
 		int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
 
-		int xroom = (1<<requiredDepth)-(xmax-xmin);
-		int yroom = (1<<requiredDepth)-Chunk.Y_MAX;
-		int zroom = (1<<requiredDepth)-(zmax-zmin);
+		int xroom = (1<<requiredDepth) - (xmax-xmin);
+		int yroom = (1<<requiredDepth) - Chunk.Y_MAX;
+		int zroom = (1<<requiredDepth) - (zmax-zmin);
 
 		origin.set(xmin - xroom/2, -yroom/2, zmin - zroom/2);
 		return requiredDepth;
@@ -1001,22 +1019,27 @@ public class Scene extends SceneDescription {
 	 * @return The calculated camera position
 	 */
 	public Vector3d calcCenterCamera() {
-		if (chunks.isEmpty())
+		if (chunks.isEmpty()) {
 			return new Vector3d(0, 128, 0);
+		}
 
 		int xmin = Integer.MAX_VALUE;
 		int xmax = Integer.MIN_VALUE;
 		int zmin = Integer.MAX_VALUE;
 		int zmax = Integer.MIN_VALUE;
-		for (ChunkPosition cp: chunks) {
-			if (cp.x < xmin)
+		for (ChunkPosition cp : chunks) {
+			if (cp.x < xmin) {
 				xmin = cp.x;
-			if (cp.x > xmax)
+			}
+			if (cp.x > xmax) {
 				xmax = cp.x;
-			if (cp.z < zmin)
+			}
+			if (cp.z < zmin) {
 				zmin = cp.z;
-			if (cp.z > zmax)
+			}
+			if (cp.z > zmax) {
 				zmax = cp.z;
+			}
 		}
 		xmax += 1;
 		zmax += 1;
@@ -1024,13 +1047,12 @@ public class Scene extends SceneDescription {
 		xmax *= 16;
 		zmin *= 16;
 		zmax *= 16;
-		int xcenter = (xmax + xmin)/2;
-		int zcenter = (zmax + zmin)/2;
-		for (int y = Chunk.Y_MAX-1; y >= 0; --y) {
-			int block = worldOctree.get(xcenter - origin.x, y - origin.y,
-					zcenter - origin.z);
+		int xcenter = (xmax + xmin) / 2;
+		int zcenter = (zmax + zmin) / 2;
+		for (int y = Chunk.Y_MAX - 1; y >= 0; --y) {
+			int block = worldOctree.get(xcenter - origin.x, y - origin.y, zcenter - origin.z);
 			if (Block.get(block) != Block.AIR) {
-				return new Vector3d(xcenter, y+5, zcenter);
+				return new Vector3d(xcenter, y + 5, zcenter);
 			}
 		}
 		return new Vector3d(xcenter, 128, zcenter);
@@ -1143,7 +1165,11 @@ public class Scene extends SceneDescription {
 	 * Move the camera to the player position, if available.
 	 */
 	public void moveCameraToPlayer() {
-		camera.moveToPlayer(loadedWorld);
+		for (Entity entity : entities) {
+			if (entity instanceof PlayerEntity) {
+				camera.moveToPlayer((PlayerEntity) entity);
+			}
+		}
 	}
 
 	/**
@@ -1431,7 +1457,6 @@ public class Scene extends SceneDescription {
 	 */
 	public synchronized void saveFrame(File targetFile, ProgressListener progressListener)
 			throws IOException {
-
 		computeAlpha(progressListener);
 		finalizeFrame(progressListener);
 		writeImage(targetFile, progressListener);
@@ -1461,7 +1486,7 @@ public class Scene extends SceneDescription {
 	public void finalizeFrame(ProgressListener progressListener) {
 		if (!finalized) {
 			for (int x = 0; x < width; ++x) {
-				progressListener.setProgress("Finalizing frame", x+1, 0, width);
+				progressListener.setProgress("Finalizing frame", x + 1, 0, width);
 				for (int y = 0; y < height; ++y) {
 					finalizePixel(x, y);
 				}
@@ -1496,8 +1521,8 @@ public class Scene extends SceneDescription {
 			} else {
 				writer.write(backBuffer, progressListener);
 			}
-			if (camera.getProjectionMode() == ProjectionMode.PANORAMIC &&
-					camera.getFoV() >= 179 && camera.getFoV() <= 181) {
+			if (camera.getProjectionMode() == ProjectionMode.PANORAMIC
+					&& camera.getFoV() >= 179 && camera.getFoV() <= 181) {
 				int height = backBuffer.getHeight();
 				int width = backBuffer.getWidth();
 				StringBuilder xmp = new StringBuilder();
@@ -1548,10 +1573,7 @@ public class Scene extends SceneDescription {
 		}
 	}
 
-	private synchronized void saveOctree(
-			RenderContext context,
-			ProgressListener progressListener) {
-
+	private synchronized void saveOctree(RenderContext context, ProgressListener progressListener) {
 		String fileName = name + ".octree";
 		DataOutputStream out = null;
 		try {
@@ -1584,10 +1606,8 @@ public class Scene extends SceneDescription {
 		}
 	}
 
-	private synchronized void saveGrassTexture(
-			RenderContext context,
+	private synchronized void saveGrassTexture(RenderContext context,
 			ProgressListener progressListener) {
-
 		String fileName = name + ".grass";
 		DataOutputStream out = null;
 		try {
@@ -1620,10 +1640,8 @@ public class Scene extends SceneDescription {
 		}
 	}
 
-	private synchronized void saveFoliageTexture(
-			RenderContext context,
+	private synchronized void saveFoliageTexture(RenderContext context,
 			ProgressListener progressListener) {
-
 		String fileName = name + ".foliage";
 		DataOutputStream out = null;
 		try {
@@ -1656,10 +1674,7 @@ public class Scene extends SceneDescription {
 		}
 	}
 
-	private synchronized void saveDump(
-			RenderContext context,
-			ProgressListener progressListener) {
-
+	private synchronized void saveDump(RenderContext context, ProgressListener progressListener) {
 		String fileName = name + ".dump";
 		DataOutputStream out = null;
 		try {
@@ -1673,11 +1688,11 @@ public class Scene extends SceneDescription {
 			out.writeInt(spp);
 			out.writeLong(renderTime);
 			for (int x = 0; x < width; ++x) {
-				progressListener.setProgress(task, x+1, 0, width);
+				progressListener.setProgress(task, x + 1, 0, width);
 				for (int y = 0; y < height; ++y) {
-					out.writeDouble(samples[(y*width+x)*3+0]);
-					out.writeDouble(samples[(y*width+x)*3+1]);
-					out.writeDouble(samples[(y*width+x)*3+2]);
+					out.writeDouble(samples[(y * width + x) * 3 + 0]);
+					out.writeDouble(samples[(y * width + x) * 3 + 1]);
+					out.writeDouble(samples[(y * width + x) * 3 + 2]);
 				}
 			}
 			Log.info("Render dump saved");
@@ -1693,12 +1708,9 @@ public class Scene extends SceneDescription {
 		}
 	}
 
-	private synchronized boolean loadOctree(
-			RenderContext context,
+	private synchronized boolean loadOctree(RenderContext context,
 			RenderStatusListener renderListener) {
-
 		String fileName = name + ".octree";
-
 		DataInputStream in = null;
 		try {
 			String task = "Loading octree";
@@ -1706,20 +1718,15 @@ public class Scene extends SceneDescription {
 			Log.info("Loading octree " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
-
 			worldOctree = Octree.load(in);
 			in.close();
 			in = null;
 			worldOctree.setTimestamp(context.fileTimestamp(fileName));
-
 			renderListener.setProgress(task, 2, 0, 2);
 			Log.info("Octree loaded");
-
 			calculateOctreeOrigin(chunks);
-			camera.setWorldSize(1<<worldOctree.depth);
-
+			camera.setWorldSize(1 << worldOctree.depth);
 			buildBVH();
-
 			return true;
 		} catch (IOException e) {
 			Log.info("Failed to load chunk octree: missing file or incorrect format!", e);
@@ -1734,12 +1741,9 @@ public class Scene extends SceneDescription {
 		}
 	}
 
-	private synchronized boolean loadGrassTexture(
-			RenderContext context,
+	private synchronized boolean loadGrassTexture(RenderContext context,
 			RenderStatusListener renderListener) {
-
 		String fileName = name + ".grass";
-
 		DataInputStream in = null;
 		try {
 			String task = "Loading grass texture";
@@ -1747,12 +1751,10 @@ public class Scene extends SceneDescription {
 			Log.info("Loading grass texture " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
-
 			grassTexture = WorldTexture.load(in);
 			in.close();
 			in = null;
 			grassTexture.setTimestamp(context.fileTimestamp(fileName));
-
 			renderListener.setProgress(task, 2, 0, 2);
 			Log.info("Grass texture loaded");
 			return true;
@@ -1769,12 +1771,9 @@ public class Scene extends SceneDescription {
 		}
 	}
 
-	private synchronized boolean loadFoliageTexture(
-			RenderContext context,
+	private synchronized boolean loadFoliageTexture(RenderContext context,
 			RenderStatusListener renderListener) {
-
 		String fileName = name + ".foliage";
-
 		DataInputStream in = null;
 		try {
 			String task = "Loading foliage texture";
@@ -1782,12 +1781,10 @@ public class Scene extends SceneDescription {
 			Log.info("Loading foliage texture " + fileName);
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
-
 			foliageTexture = WorldTexture.load(in);
 			in.close();
 			in = null;
 			foliageTexture.setTimestamp(context.fileTimestamp(fileName));
-
 			renderListener.setProgress(task, 2, 0, 2);
 			Log.info("Foliage texture loaded");
 			return true;
@@ -1804,17 +1801,13 @@ public class Scene extends SceneDescription {
 		}
 	}
 
-	public synchronized void loadDump(
-			RenderContext context,
+	public synchronized void loadDump(RenderContext context,
 			RenderStatusListener renderListener) {
-
 		String fileName = name + ".dump";
-
 		DataInputStream in = null;
 		try {
 			in = new DataInputStream(new GZIPInputStream(
 					context.getSceneFileInputStream(fileName)));
-
 			String task = "Loading render dump";
 			renderListener.setProgress(task, 1, 0, 2);
 			Log.info("Loading render dump " + fileName);
@@ -1828,7 +1821,7 @@ public class Scene extends SceneDescription {
 			spp = in.readInt();
 			renderTime = in.readLong();
 
-			// Update render status
+			// Update render status.
 			renderListener.setSPP(spp);
 			renderListener.setRenderTime(renderTime);
 			long totalSamples = spp * ((long) (width * height));
@@ -1865,10 +1858,8 @@ public class Scene extends SceneDescription {
 	 */
 	public void finalizePixel(int x, int y) {
 		finalized = true;
-
 		double[] result = new double[3];
 		postProcessPixel(x, y, result);
-
 		bufferData[y*width + x] = Color.getRGB(
 				QuickMath.min(1, result[0]),
 				QuickMath.min(1, result[1]),
@@ -1930,7 +1921,7 @@ public class Scene extends SceneDescription {
 		double halfWidth = width/(2.0*height);
 		double invHeight = 1.0 / height;
 
-		// rotated grid supersampling
+		// Rotated grid supersampling.
 
 		camera.calcViewRay(ray,
 				-halfWidth + (x - 3/8.0) * invHeight,
@@ -2178,12 +2169,12 @@ public class Scene extends SceneDescription {
 			int y = (int) QuickMath.floor(ray.o.y);
 			int z = (int) QuickMath.floor(ray.o.z);
 			int block = worldOctree.get(x, y, z);
-			if ((block&0xF) != Block.WATER_ID) {
+			if ((block & 0xF) != Block.WATER_ID) {
 				return false;
 			}
-			return (ray.o.y-y) < 0.875 || block == (Block.WATER_ID | (1<<WaterModel.FULL_BLOCK));
+			return (ray.o.y - y) < 0.875 || block == (Block.WATER_ID | (1<<WaterModel.FULL_BLOCK));
 		} else {
-			return waterHeight > 0 && ray.o.y < waterHeight-0.125;
+			return waterHeight > 0 && ray.o.y < waterHeight - 0.125;
 		}
 	}
 
@@ -2246,7 +2237,7 @@ public class Scene extends SceneDescription {
 	public synchronized JsonObject toJson() {
 		JsonObject obj = super.toJson();
 		JsonArray entityArray = new JsonArray();
-		for (Entity entity: entities) {
+		for (Entity entity : entities) {
 			entityArray.add(entity.toJson());
 		}
 		if (entityArray.getNumElement() > 0) {
@@ -2260,7 +2251,7 @@ public class Scene extends SceneDescription {
 		super.fromJson(desc);
 
 		entities = new LinkedList<Entity>();
-		for (JsonValue element: desc.get("entities").array().getElementList()) {
+		for (JsonValue element : desc.get("entities").array().getElementList()) {
 			Entity entity = Entity.fromJson(element.object());
 			if (entity != null) {
 				entities.add(entity);
@@ -2272,4 +2263,17 @@ public class Scene extends SceneDescription {
 		return entities;
 	}
 
+	public JsonObject getPlayerProfile(PlayerEntity entity) {
+		if (profiles.containsKey(entity)) {
+			return profiles.get(entity);
+		} else {
+			return new JsonObject();
+		}
+	}
+
+	/**
+	 * Rebuild the actors BVH.
+	 */
+	public void refreshActors() {
+	}
 }

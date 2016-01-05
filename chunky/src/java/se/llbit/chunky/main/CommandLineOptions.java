@@ -294,7 +294,7 @@ public class CommandLineOptions {
 				if (args.length > i+1) {
 					String version = args[i+1];
 					try {
-						File dir = new File(PersistentSettings.getSettingsDirectory(), "resources");
+						File dir = new File(PersistentSettings.settingsDirectory(), "resources");
 						if (!dir.exists()) {
 							dir.mkdir();
 						}

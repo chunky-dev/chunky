@@ -45,7 +45,7 @@ public class LauncherSettings {
 	public boolean downloadSnapshots = false;
 
 	public LauncherSettings() {
-		file = new File(PersistentSettings.getSettingsDirectory(), LAUNCHER_SETTINGS_FILE);
+		file = new File(PersistentSettings.settingsDirectory(), LAUNCHER_SETTINGS_FILE);
 	}
 
 	public void load() {

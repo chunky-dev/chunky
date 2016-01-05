@@ -27,7 +27,7 @@ import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.PlayerData;
+import se.llbit.chunky.world.PlayerEntityData;
 import se.llbit.chunky.world.World;
 import se.llbit.math.QuickMath;
 
@@ -145,7 +145,7 @@ public class WorldRenderer {
 
 	public void renderPlayers(World world, Graphics g, ChunkView view, boolean sameLayer) {
 		double blockScale = view.scale / 16.;
-		for (PlayerData player : world.getPlayerPositions()) {
+		for (PlayerEntityData player : world.getPlayerPositions()) {
 			int px = (int) QuickMath.floor(player.x * blockScale);
 			int pz = (int) QuickMath.floor(player.z * blockScale);
 			int ppx = px - (int) QuickMath.floor(view.x0 * view.scale);
