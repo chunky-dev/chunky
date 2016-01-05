@@ -61,11 +61,11 @@ public class EntityTextureLoader extends TextureRef {
 		texture.headRight.set(0, 8/64., (height - 16)/height, (height - 8)/height);
 		texture.headLeft.set(16/64., 24/64., (height - 16)/height, (height - 8)/height);
 
-		texture.hatFront.set(32/64., 40/64., (height - 16)/height, (height - 8)/height);
-		texture.hatBack.set(40/64., 48/64., (height - 16)/height, (height - 8)/height);
-		texture.hatTop.set(48/64., 56/64., (height - 8)/height, 1);
-		texture.hatBottom.set(56/64., 1, (height - 8)/height, 1);
-		texture.hatRight.set(40/64., 48/64., (height - 16)/height, (height - 8)/height);
+		texture.hatFront.set(40/64., 48/64., (height - 16)/height, (height - 8)/height);
+		texture.hatBack.set(56/64., 1, (height - 16)/height, (height - 8)/height);
+		texture.hatTop.set(40/64., 48/64., (height - 8)/height, 1);
+		texture.hatBottom.set(48/64., 56/64., (height - 8)/height, 1);
+		texture.hatRight.set(32/64., 40/64., (height - 16)/height, (height - 8)/height);
 		texture.hatLeft.set(48/64., 56/64., (height - 16)/height, (height - 8)/height);
 
 		texture.chestRight.set(16/64., 20/64., (height - 32)/height, (height - 20)/height);
