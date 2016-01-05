@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
@@ -53,7 +52,7 @@ public class PlayerEntity extends Entity {
 	public PlayerEntity(String uuid, Vector3d position, double yawDegrees, double pitchDegrees) {
 		this(uuid, position, QuickMath.degToRad(180 - yawDegrees),
 				-QuickMath.degToRad(pitchDegrees),
-				0.4, -0.4, 0.4, -0.4, PlayerModel.get(PersistentSettings.getPlayerModel()));
+				0.4, -0.4, 0.4, -0.4, PlayerModel.STEVE);
 	}
 
 	public PlayerEntity(String uuid, Vector3d position, double yaw, double pitch,

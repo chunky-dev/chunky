@@ -378,15 +378,5 @@ public final class PersistentSettings {
 		settings.setBool("loadPlayers", value);
 		save();
 	}
-
-	public static String getPlayerModel() {
-		return settings.getString("playerModel", "STEVE");
-	}
-
-	public static void setPlayerModel(String model) {
-		settings.setString("playerModel", model);
-		save();
-	}
-
 }
 
