@@ -51,7 +51,7 @@ public class ChunkyDeployer {
 	 * @return <code>true</code> if the version is installed locally
 	 */
 	public static boolean checkVersionIntegrity(String version) {
-		File chunkyDir = PersistentSettings.getSettingsDirectory();
+		File chunkyDir = PersistentSettings.settingsDirectory();
 		File versionsDir = new File(chunkyDir, "versions");
 		File libDir = new File(chunkyDir, "lib");
 		if (!versionsDir.isDirectory() || !libDir.isDirectory()) {
@@ -120,7 +120,7 @@ public class ChunkyDeployer {
 	}
 
 	public static List<VersionInfo> availableVersions() {
-		File chunkyDir = PersistentSettings.getSettingsDirectory();
+		File chunkyDir = PersistentSettings.settingsDirectory();
 		File versionsDir = new File(chunkyDir, "versions");
 		if (!versionsDir.isDirectory()) {
 			return Collections.emptyList();
@@ -152,7 +152,7 @@ public class ChunkyDeployer {
 	 * @param version
 	 */
 	private static void deployEmbeddedVersion(VersionInfo version) {
-		File chunkyDir = PersistentSettings.getSettingsDirectory();
+		File chunkyDir = PersistentSettings.settingsDirectory();
 		File versionsDir = new File(chunkyDir, "versions");
 		if (!versionsDir.isDirectory()) {
 			versionsDir.mkdirs();
@@ -373,7 +373,7 @@ public class ChunkyDeployer {
 	}
 
 	private static String classpath(VersionInfo version, LauncherSettings settings) {
-		File chunkyDir = PersistentSettings.getSettingsDirectory();
+		File chunkyDir = PersistentSettings.settingsDirectory();
 		File libDir = new File(chunkyDir, "lib");
 		List<File> jars = new ArrayList<File>();
 		for (VersionInfo.Library library : version.libraries) {

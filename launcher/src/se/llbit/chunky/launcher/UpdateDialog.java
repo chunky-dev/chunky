@@ -179,7 +179,7 @@ public class UpdateDialog extends JDialog {
 		this.parent = parent;
 		this.version = version;
 
-		File chunkyDir = PersistentSettings.getSettingsDirectory();
+		File chunkyDir = PersistentSettings.settingsDirectory();
 		libDir = new File(chunkyDir, "lib");
 		if (!libDir.isDirectory()) {
 			libDir.mkdirs();

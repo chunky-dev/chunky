@@ -32,7 +32,7 @@ import se.llbit.chunky.launcher.VersionInfo.LibraryStatus;
  */
 public class ConsoleUpdater {
 	public static void update(VersionInfo version) {
-		File chunkyDir = PersistentSettings.getSettingsDirectory();
+		File chunkyDir = PersistentSettings.settingsDirectory();
 		File libDir = new File(chunkyDir, "lib");
 		if (!libDir.isDirectory()) {
 			libDir.mkdirs();
