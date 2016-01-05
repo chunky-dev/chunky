@@ -401,6 +401,9 @@ public class EntitiesTab extends RenderControlsTab {
 				scene().addPlayer(player);
 				PlayerData data = new PlayerData(player, scene());
 				tableModel.addRow(new Object[] { data.name, data });
+				int index = tableModel.getRowCount() - 1;
+				entityTable.setRowSelectionInterval(index, index);
+				entityTable.scrollRectToVisible(entityTable.getCellRect(index, 0, true));
 			}
 		});
 
