@@ -39,13 +39,13 @@ import se.llbit.math.primitive.Primitive;
 public class PlayerEntity extends Entity {
 
 	public final String uuid;
-	public final double yaw;
-	public final double pitch;
+	public double yaw;
+	public double pitch;
 	public double headYaw = 0.0;
-	public final double leftLegPose;
-	public final double rightLegPose;
-	public final double leftArmPose;
-	public final double rightArmPose;
+	public double leftLegPose;
+	public double rightLegPose;
+	public double leftArmPose;
+	public double rightArmPose;
 	public final PlayerModel model;
 	public String skin = "";
 
@@ -115,7 +115,7 @@ public class PlayerEntity extends Entity {
 				position.y + offset.y,
 				position.z + offset.z);
 		Box head = new Box(-4/16., 4/16., -4/16., 4/16., -4/16., 4/16.);
-		poseHead(head, Transform.NONE.translate(0, 28/16., 0), offsetTransform);
+		poseHead(head, Transform.NONE.rotateY(headYaw).translate(0, 28/16., 0), offsetTransform);
 		head.addFrontFaces(faces, texture, texture.headFront);
 		head.addBackFaces(faces, texture, texture.headBack);
 		head.addLeftFaces(faces, texture, texture.headLeft);
@@ -123,7 +123,7 @@ public class PlayerEntity extends Entity {
 		head.addTopFaces(faces, texture, texture.headTop);
 		head.addBottomFaces(faces, texture, texture.headBottom);
 		Box hat = new Box(-4.2/16., 4.2/16., -4.2/16., 4.2/16., -4.2/16., 4.2/16.);
-		poseHead(hat, Transform.NONE.translate(0, 28.2/16., 0), offsetTransform);
+		poseHead(hat, Transform.NONE.rotateY(headYaw).translate(0, 28.2/16., 0), offsetTransform);
 		hat.addFrontFaces(faces, texture, texture.hatFront);
 		hat.addBackFaces(faces, texture, texture.hatBack);
 		hat.addLeftFaces(faces, texture, texture.hatLeft);

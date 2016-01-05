@@ -37,6 +37,7 @@ import se.llbit.math.Vector3d;
 import se.llbit.ui.Adjuster;
 
 public class LightingTab extends RenderControlsTab {
+	private static final long serialVersionUID = -1L;
 
 	private final JButton changeSunColorBtn = new JButton("Change Sun Color");
 	private final JCheckBox enableEmitters = new JCheckBox();

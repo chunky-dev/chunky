@@ -36,6 +36,7 @@ import se.llbit.math.Vector3d;
 import se.llbit.ui.Adjuster;
 
 public class WaterTab extends RenderControlsTab {
+	private static final long serialVersionUID = -1L;
 
 	private final JCheckBox stillWaterCB = new JCheckBox();
 	private final JTextField waterHeightField = new JTextField();

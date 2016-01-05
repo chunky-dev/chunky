@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import se.llbit.chunky.renderer.ui.RenderControls;
 
 public class HelpTab extends RenderControlsTab {
+	private static final long serialVersionUID = -1L;
 
 	public HelpTab(RenderControls renderControls) {
 		super(renderControls);

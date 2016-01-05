@@ -47,6 +47,7 @@ import se.llbit.ui.Adjuster;
 import se.llbit.ui.ErrorLabel;
 
 public class GeneralTab extends RenderControlsTab {
+	private static final long serialVersionUID = -1L;
 
 	private static final int[] dumpFrequencies = { 50, 100, 500, 1000, 2500, 5000 };
 

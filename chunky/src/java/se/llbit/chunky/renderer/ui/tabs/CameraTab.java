@@ -55,6 +55,7 @@ import se.llbit.math.Vector3d;
 import se.llbit.ui.Adjuster;
 
 public class CameraTab extends RenderControlsTab implements ViewListener, RenderStatusListener {
+	private static final long serialVersionUID = -1L;
 
 	/** Number format for current locale. */
 	private final NumberFormat numberFormat = NumberFormat.getInstance();

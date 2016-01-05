@@ -67,63 +67,8 @@ public class MCDownloader {
 		out.close();
 	}
 
-	public static final String nameOfUuid(String uuid) throws IOException {
-		String url = String.format("https://api.mojang.com/user/profiles/%s/names", uuid);
-		File cacheFile = new File(PersistentSettings.cacheDirectory(),
-				Util.cacheEncode(url.hashCode()));
-
-		JsonArray cache;
-		if (cacheFile.exists()) {
-			FileInputStream in = new FileInputStream(cacheFile);
-			JsonParser cacheParse = new JsonParser(in);
-			try {
-				cache = cacheParse.parse().array();
-				in.close();
-				for (JsonValue entry : cache.getElementList()) {
-					if (entry.object().get("k").stringValue("").equals(url)) {
-						return entry.object().get("v").stringValue("Unknown");
-					}
-				}
-			} catch (JsonParser.SyntaxError e) {
-				cache = new JsonArray();
-			}
-		} else {
-			cache = new JsonArray();
-		}
-
-		HttpsURLConnection conn = (HttpsURLConnection) new URL(url).openConnection();
-		int responseCode = conn.getResponseCode();
-		String lastName;
-		if (responseCode == 200) {
-			try {
-				JsonParser parser = new JsonParser(conn.getInputStream());
-				JsonArray array = parser.parse().array();
-				lastName = array.getElement(array.getNumElement() - 1).object()
-						.get("name").stringValue("Unknown");
-			} catch (JsonParser.SyntaxError e) {
-				e.printStackTrace(System.err);
-				lastName = "Unknown";
-			}
-		} else {
-			lastName = "Unknown";
-		}
-
-		JsonObject newEntry = new JsonObject();
-		newEntry.add("k", url);
-		newEntry.add("v", lastName);
-		cache.add(newEntry);
-		if (!PersistentSettings.cacheDirectory().isDirectory()) {
-			PersistentSettings.cacheDirectory().mkdirs();
-		}
-		FileOutputStream out = new FileOutputStream(cacheFile);
-		PrettyPrinter jsonOut = new PrettyPrinter("", new PrintStream(out));
-		cache.prettyPrint(jsonOut);
-		out.close();
-		return lastName;
-	}
-
 	/**
-	 * Download Minecraft player profile.
+	 * Download a Minecraft player profile.
 	 * @param uuid UUID of player
 	 * @return
 	 * @throws IOException
@@ -140,8 +85,8 @@ public class MCDownloader {
 				cache = cacheParse.parse().array();
 				in.close();
 				for (JsonValue entry : cache.getElementList()) {
-					if (entry.object().get("k").stringValue("").equals(key)) {
-						JsonObject cached = entry.object().get("v").object();
+					if (entry.array().get(0).stringValue("").equals(key)) {
+						JsonObject cached = entry.array().get(1).object();
 						return cached;
 					}
 				}
@@ -169,9 +114,9 @@ public class MCDownloader {
 			profile = new JsonObject();
 		}
 
-		JsonObject newEntry = new JsonObject();
-		newEntry.add("k", key);
-		newEntry.add("v", profile);
+		JsonArray newEntry = new JsonArray();
+		newEntry.add(key);
+		newEntry.add(profile);
 		cache.add(newEntry);
 		if (!PersistentSettings.cacheDirectory().isDirectory()) {
 			PersistentSettings.cacheDirectory().mkdirs();

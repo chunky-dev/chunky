@@ -43,9 +43,12 @@ import se.llbit.chunky.ui.CenteredFileDialog;
 import se.llbit.chunky.world.entity.Entity;
 import se.llbit.chunky.world.entity.PlayerEntity;
 import se.llbit.json.JsonObject;
+import se.llbit.math.QuickMath;
+import se.llbit.math.Vector3d;
 import se.llbit.ui.Adjuster;
 
 public class EntitiesTab extends RenderControlsTab {
+	private static final long serialVersionUID = -1L;
 
 	static class PlayerData {
 		public final PlayerEntity entity;
@@ -81,24 +84,62 @@ public class EntitiesTab extends RenderControlsTab {
 	private final JButton selectSkinBtn = new JButton("Select Skin");
 	private final JButton moveToPlayer = new JButton("Move Camera to Player");
 	private final JButton moveToCamera = new JButton("Move Player to Camera");
+	private final JButton moveToTarget = new JButton("Move Player to Target");
+	private final JButton addPlayer = new JButton("Add Player");
+	private final JButton removePlayer = new JButton("Remove Player");
 	private final ListSelectionModel selectionModel;
 	private final DefaultTableModel tableModel =
 			new DefaultTableModel(new String[] { "Name", "Id" }, 0);
 
-	private final EntityAdjuster headYaw = new EntityAdjuster(
-			"Head Yaw",
+	private final EntityAdjuster direction = new EntityAdjuster(
+			"Direction",
 			"",
-			100, 100000) {
+			-Math.PI, Math.PI) {
 
 		{
 			setClampMax(false);
 			setClampMin(false);
-			setLogarithmicMode();
 		}
 
 		@Override
 		public void valueChanged(double newValue) {
-			// TODO(llbit): update entity property.
+			PlayerEntity player = getSelectedPlayer();
+			if (player != null) {
+				player.yaw = newValue;
+				scene().rebuildActorBvh();
+				// TODO start entity refresh in utility thread
+			}
+		}
+
+		@Override
+		public void update() {
+			// Use update(PlayerEntity) instead.
+		}
+
+		@Override
+		public void update(PlayerEntity player) {
+			set(player.yaw);
+		}
+	};
+
+	private final EntityAdjuster headYaw = new EntityAdjuster(
+			"Head Yaw",
+			"",
+			-QuickMath.HALF_PI, QuickMath.HALF_PI) {
+
+		{
+			setClampMax(false);
+			setClampMin(false);
+		}
+
+		@Override
+		public void valueChanged(double newValue) {
+			PlayerEntity player = getSelectedPlayer();
+			if (player != null) {
+				player.headYaw = newValue;
+				scene().rebuildActorBvh();
+				// TODO start entity refresh in utility thread
+			}
 		}
 
 		@Override
@@ -112,20 +153,54 @@ public class EntitiesTab extends RenderControlsTab {
 		}
 	};
 
-	private final EntityAdjuster leftLeg = new EntityAdjuster(
-			"Left Leg Pose",
+	private final EntityAdjuster headPitch = new EntityAdjuster(
+			"Head Pitch",
 			"",
-			100, 100000) {
+			-QuickMath.HALF_PI, QuickMath.HALF_PI) {
 
 		{
 			setClampMax(false);
 			setClampMin(false);
-			setLogarithmicMode();
 		}
 
 		@Override
 		public void valueChanged(double newValue) {
-			// TODO(llbit): update entity property.
+			PlayerEntity player = getSelectedPlayer();
+			if (player != null) {
+				player.pitch = newValue;
+				scene().rebuildActorBvh();
+				// TODO start entity refresh in utility thread
+			}
+		}
+
+		@Override
+		public void update() {
+			// Use update(PlayerEntity) instead.
+		}
+
+		@Override
+		public void update(PlayerEntity player) {
+			set(player.pitch);
+		}
+	};
+
+	private final EntityAdjuster leftLeg = new EntityAdjuster(
+			"Left Leg Pose",
+			"",
+			-QuickMath.HALF_PI, QuickMath.HALF_PI) {
+
+		{
+			setClampMax(false);
+			setClampMin(false);
+		}
+
+		@Override
+		public void valueChanged(double newValue) {
+			PlayerEntity player = getSelectedPlayer();
+			if (player != null) {
+				player.leftLegPose = newValue;
+				scene().rebuildActorBvh();
+			}
 		}
 
 		@Override
@@ -142,17 +217,20 @@ public class EntitiesTab extends RenderControlsTab {
 	private final EntityAdjuster rightLeg = new EntityAdjuster(
 			"Right Leg Pose",
 			"",
-			100, 100000) {
+			-QuickMath.HALF_PI, QuickMath.HALF_PI) {
 
 		{
 			setClampMax(false);
 			setClampMin(false);
-			setLogarithmicMode();
 		}
 
 		@Override
 		public void valueChanged(double newValue) {
-			// TODO(llbit): update entity property.
+			PlayerEntity player = getSelectedPlayer();
+			if (player != null) {
+				player.rightLegPose = newValue;
+				scene().rebuildActorBvh();
+			}
 		}
 
 		@Override
@@ -169,17 +247,20 @@ public class EntitiesTab extends RenderControlsTab {
 	private final EntityAdjuster leftArm = new EntityAdjuster(
 			"Left Arm Pose",
 			"",
-			100, 100000) {
+			-Math.PI, Math.PI) {
 
 		{
 			setClampMax(false);
 			setClampMin(false);
-			setLogarithmicMode();
 		}
 
 		@Override
 		public void valueChanged(double newValue) {
-			// TODO(llbit): update entity property.
+			PlayerEntity player = getSelectedPlayer();
+			if (player != null) {
+				player.leftArmPose = newValue;
+				scene().rebuildActorBvh();
+			}
 		}
 
 		@Override
@@ -196,17 +277,20 @@ public class EntitiesTab extends RenderControlsTab {
 	private final EntityAdjuster rightArm = new EntityAdjuster(
 			"Right Arm Pose",
 			"",
-			100, 100000) {
+			-Math.PI, Math.PI) {
 
 		{
 			setClampMax(false);
 			setClampMin(false);
-			setLogarithmicMode();
 		}
 
 		@Override
 		public void valueChanged(double newValue) {
-			// TODO(llbit): update entity property.
+			PlayerEntity player = getSelectedPlayer();
+			if (player != null) {
+				player.rightArmPose = newValue;
+				scene().rebuildActorBvh();
+			}
 		}
 
 		@Override
@@ -240,7 +324,9 @@ public class EntitiesTab extends RenderControlsTab {
 				updateSkin();
 				PlayerEntity player = getSelectedPlayer();
 				if (player != null) {
+					direction.update(player);
 					headYaw.update(player);
+					headPitch.update(player);
 					leftLeg.update(player);
 					rightLeg.update(player);
 					leftArm.update(player);
@@ -253,7 +339,20 @@ public class EntitiesTab extends RenderControlsTab {
 		JLabel skinLbl = new JLabel("Skin");
 
 		skinField.setEnabled(false);
-		skinField.setText("Steve");
+
+		removePlayer.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+			}
+		});
+
+		addPlayer.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+			}
+		});
 
 		moveToPlayer.addActionListener(new ActionListener() {
 			@Override
@@ -261,6 +360,7 @@ public class EntitiesTab extends RenderControlsTab {
 				PlayerEntity player = getSelectedPlayer();
 				if (player != null) {
 					scene().camera().moveToPlayer(player);
+					scene().rebuildActorBvh();
 				}
 			}
 		});
@@ -271,7 +371,21 @@ public class EntitiesTab extends RenderControlsTab {
 				PlayerEntity player = getSelectedPlayer();
 				if (player != null) {
 					player.position.set(scene().camera().getPosition());
-					scene().refreshActors();
+					scene().rebuildActorBvh();
+				}
+			}
+		});
+
+		moveToTarget.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				PlayerEntity player = getSelectedPlayer();
+				if (player != null) {
+					Vector3d target = scene().getTargetPosition();
+					if (target != null) {
+						player.position.set(target);
+						scene().rebuildActorBvh();
+					}
 				}
 			}
 		});
@@ -279,30 +393,33 @@ public class EntitiesTab extends RenderControlsTab {
 		selectSkinBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CenteredFileDialog fileDialog =
-						new CenteredFileDialog(null, "Select Skin Texture", FileDialog.LOAD);
-				String directory;
-				synchronized (SkyboxTextureLoader.class) {
-					directory = PersistentSettings.getSkinDirectory();
-				}
-				fileDialog.setDirectory(directory);
-				fileDialog.setFilenameFilter(
-						new FilenameFilter() {
-							@Override
-							public boolean accept(File dir, String name) {
-								return name.toLowerCase().endsWith(".png");
-							}
-						});
-				fileDialog.setVisible(true);
-				File selectedFile = fileDialog.getSelectedFile();
-				if (selectedFile != null) {
-					File parent = selectedFile.getParentFile();
-					if (parent != null) {
-						PersistentSettings.setSkinDirectory(parent);
+				PlayerEntity player = getSelectedPlayer();
+				if (player != null) {
+					CenteredFileDialog fileDialog =
+							new CenteredFileDialog(null, "Select Skin Texture", FileDialog.LOAD);
+					String directory;
+					synchronized (SkyboxTextureLoader.class) {
+						directory = PersistentSettings.getSkinDirectory();
 					}
-					PlayerEntity player = getSelectedPlayer();
-					player.setTexture(selectedFile.getAbsolutePath());
-					skinField.setText(player.skin);
+					fileDialog.setDirectory(directory);
+					fileDialog.setFilenameFilter(
+							new FilenameFilter() {
+								@Override
+								public boolean accept(File dir, String name) {
+									return name.toLowerCase().endsWith(".png");
+								}
+							});
+					fileDialog.setVisible(true);
+					File selectedFile = fileDialog.getSelectedFile();
+					if (selectedFile != null) {
+						File parent = selectedFile.getParentFile();
+						if (parent != null) {
+							PersistentSettings.setSkinDirectory(parent);
+						}
+						player.setTexture(selectedFile.getAbsolutePath());
+						skinField.setText(player.skin);
+						scene().rebuildActorBvh();
+					}
 				}
 			}
 		});
@@ -311,9 +428,15 @@ public class EntitiesTab extends RenderControlsTab {
 		setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup()
 			.addGroup(layout.createSequentialGroup()
+					.addComponent(addPlayer)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(removePlayer))
+			.addGroup(layout.createSequentialGroup()
 					.addComponent(moveToPlayer)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(moveToCamera))
+					.addComponent(moveToCamera)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(moveToTarget))
 			.addComponent(scrollPane)
 			.addComponent(skinLbl)
 			.addGroup(layout.createSequentialGroup()
@@ -321,7 +444,9 @@ public class EntitiesTab extends RenderControlsTab {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(selectSkinBtn))
 			.addComponent(poseLbl)
+			.addGroup(direction.horizontalGroup(layout))
 			.addGroup(headYaw.horizontalGroup(layout))
+			.addGroup(headPitch.horizontalGroup(layout))
 			.addGroup(leftArm.horizontalGroup(layout))
 			.addGroup(rightArm.horizontalGroup(layout))
 			.addGroup(leftLeg.horizontalGroup(layout))
@@ -329,11 +454,16 @@ public class EntitiesTab extends RenderControlsTab {
 		);
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addContainerGap()
-			.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+			.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
+			.addPreferredGap(ComponentPlacement.UNRELATED)
+			.addGroup(layout.createParallelGroup()
+					.addComponent(addPlayer)
+					.addComponent(removePlayer))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
 					.addComponent(moveToPlayer)
-					.addComponent(moveToCamera))
+					.addComponent(moveToCamera)
+					.addComponent(moveToTarget))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(skinLbl)
 			.addPreferredGap(ComponentPlacement.RELATED)
@@ -343,7 +473,11 @@ public class EntitiesTab extends RenderControlsTab {
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(poseLbl)
 			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(direction.verticalGroup(layout))
+			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(headYaw.verticalGroup(layout))
+			.addPreferredGap(ComponentPlacement.RELATED)
+			.addGroup(headPitch.verticalGroup(layout))
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(leftArm.verticalGroup(layout))
 			.addPreferredGap(ComponentPlacement.RELATED)

@@ -209,7 +209,7 @@ public class AABB {
 			}
 		}
 
-		if (tNear < tFar+Ray.EPSILON && tNear >= 0 && tNear < ray.t) {
+		if (tNear < tFar + Ray.EPSILON && tNear >= 0 && tNear < ray.t) {
 			ray.tNext = tNear;
 			return true;
 		} else {

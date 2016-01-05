@@ -178,8 +178,6 @@ public class Scene extends SceneDescription {
 	 */
 	private Octree worldOctree;
 
-	private List<Primitive> primitives = new LinkedList<Primitive>();
-
 	/** Entities in the scene. */
 	private Collection<Entity> entities = new LinkedList<Entity>();
 
@@ -187,6 +185,7 @@ public class Scene extends SceneDescription {
 	private Map<PlayerEntity, JsonObject> profiles = Collections.emptyMap();
 
 	private BVH bvh = new BVH(Collections.<Primitive>emptyList());
+	private BVH actorBvh = new BVH(Collections.<Primitive>emptyList());
 
 	// chunk loading buffers
 	private final byte[] blocks = new byte[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
@@ -263,10 +262,10 @@ public class Scene extends SceneDescription {
 		// The octree reference is overwritten to save time
 		// when the other scene is changed it must create a new octree.
 		worldOctree = other.worldOctree;
-		primitives = other.primitives;
 		entities = other.entities;
 		profiles = other.profiles;
 		bvh = other.bvh;
+		actorBvh = other.actorBvh;
 		grassTexture = other.grassTexture;
 		foliageTexture = other.foliageTexture;
 		origin.set(other.origin);
@@ -510,13 +509,16 @@ public class Scene extends SceneDescription {
 
 	/**
 	 * Find closest intersection between ray and scene.
-	 * This marches the ray forward - i.e. updates the ray origin directly.
+	 * This advances the ray by updating the ray origin if an intersection is found.
 	 * @param ray ray to test against scene
 	 * @return <code>true</code> if an intersection was found
 	 */
 	public boolean intersect(Ray ray) {
 		boolean hit = false;
 		if (bvh.closestIntersection(ray)) {
+			hit = true;
+		}
+		if (actorBvh.closestIntersection(ray)) {
 			hit = true;
 		}
 		Ray oct = new Ray(ray);
@@ -579,18 +581,17 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
-	 * Load chunks into the Octree
+	 * Load chunks into the Octree.
 	 * @param progressListener
 	 * @param world
 	 * @param chunksToLoad
 	 */
-	public synchronized void loadChunks(
-			ProgressListener progressListener,
-			World world,
-			Collection<ChunkPosition> chunksToLoad) {
+	public synchronized void loadChunks(ProgressListener progressListener,
+			World world, Collection<ChunkPosition> chunksToLoad) {
 
-		if (world == null)
+		if (world == null) {
 			return;
+		}
 
 		String task = "Loading regions";
 		progressListener.setProgress(task, 1, 0, 2);
@@ -941,25 +942,44 @@ public class Scene extends SceneDescription {
 	}
 
 	private void buildBVH() {
-		primitives = new LinkedList<Primitive>();
-		final List<Primitive> list = primitives;
+		final List<Primitive> primitives = new LinkedList<Primitive>();
+		final List<Primitive> actorPrimitives = new LinkedList<Primitive>();
 
 		worldOctree.visit(new OctreeVisitor() {
 			@Override
 			public void visit(int data, int x, int y, int z, int size) {
-				if ((data&0xF) == Block.WATER_ID) {
-					WaterModel.addPrimitives(list, data, x, y, z, 1<<size);
+				if ((data & 0xF) == Block.WATER_ID) {
+					WaterModel.addPrimitives(primitives, data, x, y, z, 1<<size);
 				}
 			}
 		});
 
 		Vector3d worldOffset = new Vector3d(-origin.x, -origin.y, -origin.z);
-		for (Entity ent: entities) {
-			primitives.addAll(ent.primitives(worldOffset));
+		for (Entity entity : entities) {
+			if (entity instanceof PlayerEntity) {
+				actorPrimitives.addAll(entity.primitives(worldOffset));
+			} else {
+				primitives.addAll(entity.primitives(worldOffset));
+			}
 		}
 
 		bvh = new BVH(primitives);
+		actorBvh = new BVH(actorPrimitives);
+	}
 
+	/**
+	 * Rebuild the actors bounding volume hierarchy.
+	 */
+	public void rebuildActorBvh() {
+		final List<Primitive> actorPrimitives = new LinkedList<Primitive>();
+		Vector3d worldOffset = new Vector3d(-origin.x, -origin.y, -origin.z);
+		for (Entity entity : entities) {
+			if (entity instanceof PlayerEntity) {
+				actorPrimitives.addAll(entity.primitives(worldOffset));
+			}
+		}
+		actorBvh = new BVH(actorPrimitives);
+		refresh();
 	}
 
 	private int calculateOctreeOrigin(Collection<ChunkPosition> chunksToLoad) {
@@ -1240,7 +1260,7 @@ public class Scene extends SceneDescription {
 	}
 
 	/**
-	 * Perform auto focus
+	 * Perform auto focus.
 	 */
 	public void autoFocus() {
 		Ray ray = new Ray();
@@ -1248,7 +1268,22 @@ public class Scene extends SceneDescription {
 			camera.setDof(Double.POSITIVE_INFINITY);
 		} else {
 			camera.setSubjectDistance(ray.distance);
-			camera.setDof(ray.distance*ray.distance);
+			camera.setDof(ray.distance * ray.distance);
+		}
+	}
+
+	/**
+	 * Find the current camera target position.
+	 * @return {@code null} if the camera is not aiming at some intersectable object
+	 */
+	public Vector3d getTargetPosition() {
+		Ray ray = new Ray();
+		if (!trace(ray)) {
+			return null;
+		} else {
+			Vector3d target = new Vector3d(ray.o);
+			target.add(origin.x, origin.y, origin.z);
+			return target;
 		}
 	}
 
@@ -2269,11 +2304,5 @@ public class Scene extends SceneDescription {
 		} else {
 			return new JsonObject();
 		}
-	}
-
-	/**
-	 * Rebuild the actors BVH.
-	 */
-	public void refreshActors() {
 	}
 }

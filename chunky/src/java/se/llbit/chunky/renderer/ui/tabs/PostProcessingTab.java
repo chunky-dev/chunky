@@ -31,6 +31,7 @@ import se.llbit.chunky.renderer.ui.RenderControls;
 import se.llbit.ui.Adjuster;
 
 public class PostProcessingTab extends RenderControlsTab {
+	private static final long serialVersionUID = -1L;
 
 	private final JComboBox postprocessCB = new JComboBox(Postprocess.values());
 

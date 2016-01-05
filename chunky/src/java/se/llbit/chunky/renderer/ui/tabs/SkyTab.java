@@ -56,6 +56,7 @@ import se.llbit.math.Vector4d;
 import se.llbit.ui.Adjuster;
 
 public class SkyTab extends RenderControlsTab {
+	private static final long serialVersionUID = -1L;
 
 	private final JSlider skymapRotationSlider = new JSlider();
 	private final JSlider lightProbeRotationSlider = new JSlider();

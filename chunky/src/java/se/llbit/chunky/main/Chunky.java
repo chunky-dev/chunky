@@ -23,6 +23,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -124,6 +126,8 @@ public class Chunky implements ChunkTopographyListener {
 	private int minimapHeight = Minimap.DEFAULT_HEIGHT;
 
 	public ChunkyOptions options;
+
+	private ExecutorService utilityThreads;
 
 	/**
 	 * @return The name of this application
@@ -241,7 +245,7 @@ public class Chunky implements ChunkTopographyListener {
 	 * Start Chunky normally.
 	 */
 	private void startNormally() {
-		// load the world
+		// Load the world.
 		if (options.worldDir != null && World.isWorldDir(options.worldDir)) {
 			loadWorld(new World(options.worldDir, false));
 		} else {
@@ -251,7 +255,7 @@ public class Chunky implements ChunkTopographyListener {
 			}
 		}
 
-		// Start the worker threads
+		// Start worker threads.
 		RegionParser[] regionParsers = new RegionParser[3];
 		for (int i = 0; i < regionParsers.length; ++i) {
 			regionParsers[i] = new RegionParser(this, regionQueue);
@@ -259,8 +263,9 @@ public class Chunky implements ChunkTopographyListener {
 		}
 		topographyUpdater.start();
 		refresher.start();
+		utilityThreads = Executors.newFixedThreadPool(3);
 
-		// Create UI in the event dispatch thread
+		// Create UI in the event dispatch thread.
 		try {
 			try {
 				UIDefaults defaults = UIManager.getDefaults();
@@ -281,6 +286,13 @@ public class Chunky implements ChunkTopographyListener {
 			Log.warn("Failed to set Look and Feel", e);
 		} catch (InvocationTargetException e) {
 			Log.warn("Failed to set Look and Feel", e);
+		}
+	}
+
+	/** Called when the GUI shuts down. */
+	public void onExit() {
+		if (utilityThreads != null) {
+			utilityThreads.shutdown();
 		}
 	}
 
@@ -314,8 +326,6 @@ public class Chunky implements ChunkTopographyListener {
 
 	/**
 	 * Load a new world.
-	 *
-	 * @param newWorld
 	 */
 	public synchronized void loadWorld(World newWorld) {
 
@@ -359,7 +369,7 @@ public class Chunky implements ChunkTopographyListener {
 		int rz0 = Math.min(minimap.prz0, map.prz0);
 		int rz1 = Math.max(minimap.prz1, map.prz1);
 
-		// enqueue visible regions and chunks
+		// Enqueue visible regions and chunks.
 		for (int rx = rx0; rx <= rx1; ++rx) {
 			for (int rz = rz0; rz <= rz1; ++rz) {
 				regionQueue.add(ChunkPosition.get(rx, rz));
@@ -373,9 +383,7 @@ public class Chunky implements ChunkTopographyListener {
 	}
 
 	/**
-	 * Entry point for Chunky
-	 *
-	 * @param args
+	 * Entry point for Chunky.
 	 */
 	public static void main(final String[] args) {
 		Chunky chunky = new Chunky();
@@ -386,19 +394,17 @@ public class Chunky implements ChunkTopographyListener {
 	}
 
 	/**
-	 * Set the current map renderer
-	 *
-	 * @param renderer
+	 * Set the current map renderer.
 	 */
 	public synchronized void setRenderer(Chunk.Renderer renderer) {
 		this.chunkRenderer = renderer;
 		getMap().redraw();
-		// force the chunks to redraw
+		// Force the chunks to redraw.
 		viewUpdated();
 	}
 
 	/**
-	 * Open the 3D chunk view
+	 * Open the 3D chunk view.
 	 */
 	public synchronized void open3DView() {
 		if (renderControls == null || !renderControls.isDisplayable()) {
@@ -408,11 +414,9 @@ public class Chunky implements ChunkTopographyListener {
 				config.sceneDir = sceneDir;
 				RenderContext context = new RenderContext(config);
 				String name = world.levelName();
-				String preferredName = SceneManager.preferredSceneName(
-														context, name);
-
-				if (SceneManager.sceneNameIsValid(preferredName) &&
-						SceneManager.sceneNameIsAvailable(context, preferredName)) {
+				String preferredName = SceneManager.preferredSceneName(context, name);
+				if (SceneManager.sceneNameIsValid(preferredName)
+						&& SceneManager.sceneNameIsAvailable(context, preferredName)) {
 					create3DScene(context, preferredName);
 				} else {
 					NewSceneDialog dialog = new NewSceneDialog(getFrame(),
@@ -477,11 +481,11 @@ public class Chunky implements ChunkTopographyListener {
 	}
 
 	/**
-	 * Set the currently viewed layer
+	 * Set the currently viewed layer.
 	 * @param value
 	 */
 	public synchronized void setLayer(int value) {
-		int layerNew = Math.max(0, Math.min(Chunk.Y_MAX-1, value));
+		int layerNew = Math.max(0, Math.min(Chunk.Y_MAX - 1, value));
 		if (layerNew != world.currentLayer()) {
 			world.setCurrentLayer(layerNew);
 			if (chunkRenderer == Chunk.layerRenderer) {
