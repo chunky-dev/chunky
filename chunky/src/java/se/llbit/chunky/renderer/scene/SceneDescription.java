@@ -49,7 +49,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	public static final String SCENE_DESCRIPTION_EXTENSION = ".json";
 
 	/**
-	 * The current Scene Description Format (SDF) version
+	 * The current Scene Description Format (SDF) version.
 	 */
 	public static final int SDF_VERSION = 6;
 
@@ -81,7 +81,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	protected int sppTarget = PersistentSettings.getSppTargetDefault();
 
 	/**
-	 * Recursive ray depth limit (not including Russian Roulette)
+	 * Recursive ray depth limit (not including Russian Roulette).
 	 */
 	protected int rayDepth = PersistentSettings.getRayDepthDefault();
 
@@ -102,7 +102,6 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	protected boolean emittersEnabled = Scene.DEFAULT_EMITTERS_ENABLED;
 	protected double emitterIntensity = Scene.DEFAULT_EMITTER_INTENSITY;
 	protected boolean sunEnabled = true;
-
 
 	/**
 	 * Water opacity modifier.
@@ -285,7 +284,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 
 		cameraPresets = desc.get("cameraPresets").object();
 
-		// read these after loading camera, sun, sky because they refresh the scene
+		// Read these after loading camera, sun, sky because they refresh the scene.
 		spp = desc.get("spp").intValue(0);
 		renderTime = desc.get("renderTime").longValue(0);
 

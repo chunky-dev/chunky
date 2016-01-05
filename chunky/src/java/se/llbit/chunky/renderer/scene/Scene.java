@@ -145,31 +145,26 @@ public class Scene extends SceneDescription {
 	/** Maximum emitter intensity. */
 	public static final double MAX_EMITTER_INTENSITY = 1000;
 
-	/**
-	 * Current CVF file format version
-	 */
-	public static final int CVF_VERSION = 1;
-
 	//private static final double MIN_WATER_VISIBILITY = 0;
 	//private static final double MAX_WATER_VISIBILITY = 62;
 
 	/**
-	 * Default exposure
+	 * Default exposure.
 	 */
 	public static final double DEFAULT_EXPOSURE = 1.0;
 
 	/**
-	 * Default fog density
+	 * Default fog density.
 	 */
 	public static final double DEFAULT_FOG_DENSITY = 0.0;
 
 	/**
-	 * World
+	 * World reference.
 	 */
 	private World loadedWorld;
 
 	/**
-	 * Octree origin
+	 * Octree origin.
 	 */
 	protected Vector3i origin = new Vector3i();
 
@@ -182,12 +177,15 @@ public class Scene extends SceneDescription {
 	private Collection<Entity> entities = new LinkedList<Entity>();
 
 	/** Poseable entities in the scene. */
+	private Collection<Entity> actors = new LinkedList<Entity>();
+
+	/** Poseable entities in the scene. */
 	private Map<PlayerEntity, JsonObject> profiles = Collections.emptyMap();
 
 	private BVH bvh = new BVH(Collections.<Primitive>emptyList());
 	private BVH actorBvh = new BVH(Collections.<Primitive>emptyList());
 
-	// chunk loading buffers
+	// Chunk loading buffers.
 	private final byte[] blocks = new byte[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
 	private final byte[] biomes = new byte[Chunk.X_MAX * Chunk.Z_MAX];
 	private final byte[] data = new byte[(Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX) / 2];
@@ -259,10 +257,11 @@ public class Scene extends SceneDescription {
 		worldPath = other.worldPath;
 		worldDimension = other.worldDimension;
 
-		// The octree reference is overwritten to save time
-		// when the other scene is changed it must create a new octree.
+		// The octree reference is overwritten to save time.
+		// When the other scene is changed it must create a new octree.
 		worldOctree = other.worldOctree;
 		entities = other.entities;
+		actors = other.actors;
 		profiles = other.profiles;
 		bvh = other.bvh;
 		actorBvh = other.actorBvh;
@@ -350,15 +349,13 @@ public class Scene extends SceneDescription {
 	 * @throws SceneLoadingError
 	 * @throws InterruptedException
 	 */
-	public synchronized void loadScene(
-			RenderContext context,
-			RenderStatusListener renderListener,
-			String sceneName)
+	public synchronized void loadScene(RenderContext context,
+			RenderStatusListener renderListener, String sceneName)
 			throws IOException, SceneLoadingError, InterruptedException {
 
 		loadDescription(context.getSceneDescriptionInputStream(sceneName));
 
-		// load the configured skymap file
+		// Load the configured skymap file.
 		sky.loadSkymap();
 
 		if (sdfVersion < SDF_VERSION) {
@@ -372,9 +369,9 @@ public class Scene extends SceneDescription {
 		if (!worldPath.isEmpty()) {
 			File worldDirectory = new File(worldPath);
 			if (World.isWorldDir(worldDirectory)) {
-				if (loadedWorld == null ||
-						loadedWorld.getWorldDirectory() == null ||
-						!loadedWorld.getWorldDirectory().getAbsolutePath().equals(worldPath)) {
+				if (loadedWorld == null
+						|| loadedWorld.getWorldDirectory() == null
+						|| !loadedWorld.getWorldDirectory().getAbsolutePath().equals(worldPath)) {
 
 					loadedWorld = new World(worldDirectory, true);
 					loadedWorld.setDimension(worldDimension);
@@ -404,15 +401,14 @@ public class Scene extends SceneDescription {
 				biomeColors = false;
 			}
 		} else {
-			// Could not load stored octree
-			// Load the chunks from the world
+			// Could not load stored octree.
+			// Load the chunks from the world.
 			if (loadedWorld == null) {
 				Log.warn("Could not load chunks (no world found for scene)");
 			} else {
 				loadChunks(renderListener, loadedWorld, chunks);
 			}
 		}
-
 		notifyAll();
 	}
 
@@ -499,7 +495,6 @@ public class Scene extends SceneDescription {
 	 * @param state
 	 */
 	public void pathTrace(WorkerState state) {
-
 		state.ray.o.x -= origin.x;
 		state.ray.o.y -= origin.y;
 		state.ray.o.z -= origin.z;
@@ -573,7 +568,6 @@ public class Scene extends SceneDescription {
 			Log.warn("Can not reload chunks for scene - world directory not found!");
 			return;
 		}
-
 		loadedWorld.setDimension(worldDimension);
 		loadedWorld.reload();
 		loadChunks(progressListener, loadedWorld, chunks);
@@ -640,34 +634,37 @@ public class Scene extends SceneDescription {
 		}
 
 		entities = new LinkedList<Entity>();
-		profiles = new HashMap<PlayerEntity, JsonObject>();
+		if (actors.isEmpty()) {
+			// We don't load actor entities if some already exists. Loading actor entities
+			// risks resetting posed actors when reloading chunks for an existing scene.
+			actors = new LinkedList<Entity>();
+			profiles = new HashMap<PlayerEntity, JsonObject>();
+			Collection<PlayerEntity> players = world.playerEntities();
+			task = "Loading entities";
+			int done = 1;
+			int target = players.size();
+			for (PlayerEntity entity : players) {
+				progressListener.setProgress(task, done, 0, players.size());
+				done += 1;
+				JsonObject profile;
+				try {
+					profile = MCDownloader.fetchProfile(entity.uuid);
+				} catch (IOException e) {
+					Log.error(e);
+					profile = new JsonObject();
+				}
+				profiles.put(entity, profile);
+				actors.add(entity);
+			}
+		}
 
 		int ycutoff = PersistentSettings.getYCutoff();
 		ycutoff = Math.max(0, ycutoff);
 
-		Collection<PlayerEntity> players = world.playerEntities();
-		task = "Loading entities";
-		int done = 1;
-		int target = players.size();
-		for (PlayerEntity entity : players) {
-			progressListener.setProgress(task, done, 0, players.size());
-			done += 1;
-			JsonObject profile;
-			try {
-				profile = MCDownloader.fetchProfile(entity.uuid);
-			} catch (IOException e) {
-				Log.error(e);
-				profile = new JsonObject();
-			}
-			profiles.put(entity, profile);
-			entities.add(entity);
-		}
-		progressListener.setProgress(task, 1, 0, 1);
-
 		Heightmap biomeIdMap = new Heightmap();
 		task = "Loading chunks";
-		done = 1;
-		target = chunksToLoad.size();
+		int done = 1;
+		int target = chunksToLoad.size();
 		for (ChunkPosition cp : chunksToLoad) {
 			progressListener.setProgress(task, done, 0, target);
 			done += 1;
@@ -704,7 +701,8 @@ public class Scene extends SceneDescription {
 					ListTag rot = (ListTag) tag.get("Rotation");
 					double yaw = rot.getItem(0).floatValue();
 					//double pitch = rot.getItem(1).floatValue();
-					entities.add(new PaintingEntity(new Vector3d(x, y, z), tag.get("Motive").stringValue(), yaw));
+					entities.add(new PaintingEntity(new Vector3d(x, y, z),
+							tag.get("Motive").stringValue(), yaw));
 				}
 			}
 
@@ -937,13 +935,13 @@ public class Scene extends SceneDescription {
 		}
 		chunks = loadedChunks;
 		camera.setWorldSize(1 << worldOctree.depth);
-		buildBVH();
+		buildBvh();
+		buildActorBvh();
 		Log.info(String.format("Loaded %d chunks (%d emitters)", nchunks, emitters));
 	}
 
-	private void buildBVH() {
+	private void buildBvh() {
 		final List<Primitive> primitives = new LinkedList<Primitive>();
-		final List<Primitive> actorPrimitives = new LinkedList<Primitive>();
 
 		worldOctree.visit(new OctreeVisitor() {
 			@Override
@@ -956,14 +954,17 @@ public class Scene extends SceneDescription {
 
 		Vector3d worldOffset = new Vector3d(-origin.x, -origin.y, -origin.z);
 		for (Entity entity : entities) {
-			if (entity instanceof PlayerEntity) {
-				actorPrimitives.addAll(entity.primitives(worldOffset));
-			} else {
-				primitives.addAll(entity.primitives(worldOffset));
-			}
+			primitives.addAll(entity.primitives(worldOffset));
 		}
-
 		bvh = new BVH(primitives);
+	}
+
+	private void buildActorBvh() {
+		final List<Primitive> actorPrimitives = new LinkedList<Primitive>();
+		Vector3d worldOffset = new Vector3d(-origin.x, -origin.y, -origin.z);
+		for (Entity entity : actors) {
+			actorPrimitives.addAll(entity.primitives(worldOffset));
+		}
 		actorBvh = new BVH(actorPrimitives);
 	}
 
@@ -971,14 +972,7 @@ public class Scene extends SceneDescription {
 	 * Rebuild the actors bounding volume hierarchy.
 	 */
 	public void rebuildActorBvh() {
-		final List<Primitive> actorPrimitives = new LinkedList<Primitive>();
-		Vector3d worldOffset = new Vector3d(-origin.x, -origin.y, -origin.z);
-		for (Entity entity : entities) {
-			if (entity instanceof PlayerEntity) {
-				actorPrimitives.addAll(entity.primitives(worldOffset));
-			}
-		}
-		actorBvh = new BVH(actorPrimitives);
+		buildActorBvh();
 		refresh();
 	}
 
@@ -1761,7 +1755,8 @@ public class Scene extends SceneDescription {
 			Log.info("Octree loaded");
 			calculateOctreeOrigin(chunks);
 			camera.setWorldSize(1 << worldOctree.depth);
-			buildBVH();
+			buildBvh();
+			buildActorBvh();
 			return true;
 		} catch (IOException e) {
 			Log.info("Failed to load chunk octree: missing file or incorrect format!", e);
@@ -2272,6 +2267,9 @@ public class Scene extends SceneDescription {
 	public synchronized JsonObject toJson() {
 		JsonObject obj = super.toJson();
 		JsonArray entityArray = new JsonArray();
+		for (Entity entity : actors) {
+			entityArray.add(entity.toJson());
+		}
 		for (Entity entity : entities) {
 			entityArray.add(entity.toJson());
 		}
@@ -2286,10 +2284,15 @@ public class Scene extends SceneDescription {
 		super.fromJson(desc);
 
 		entities = new LinkedList<Entity>();
+		actors = new LinkedList<Entity>();
 		for (JsonValue element : desc.get("entities").array().getElementList()) {
 			Entity entity = Entity.fromJson(element.object());
 			if (entity != null) {
-				entities.add(entity);
+				if (entity instanceof PlayerEntity) {
+					actors.add(entity);
+				} else {
+					entities.add(entity);
+				}
 			}
 		}
 	}
