@@ -41,7 +41,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -65,6 +65,11 @@ import se.llbit.chunky.world.Icon;
 @SuppressWarnings("serial")
 public class Chunk3DView extends JDialog implements SceneStatusListener {
 
+	private static final String[] SCALE_DESC = { "1:0.25", "1:0.5", "1:0.75", "1:1", "1:1.5",
+			"1:2", "1:3", "1:4" };
+
+	private static final double[] SCALE = { 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4 };
+
 	private final RenderCanvas canvas;
 
 	private int x0, y0;
@@ -81,7 +86,7 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 
 	private final OverlayPanel overlay;
 
-	private int scale = 1;
+	private double scale = 1.0;
 
 	private int preferredWidth = 100;
 	private int preferredHeight = 100;
@@ -90,8 +95,7 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 
 	private final JScrollPane content;
 
-	private final JButton scaleUp = new JButton("+");
-	private final JButton scaleDown = new JButton("-");
+	private final JComboBox scaleSelector = new JComboBox(SCALE_DESC);
 
 	/**
 	 * Create the 3D view window
@@ -109,37 +113,26 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 
 		overlay = new OverlayPanel(content.getViewport());
 
+		scaleSelector.setSelectedIndex(3);
+		scaleSelector.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				scale = SCALE[scaleSelector.getSelectedIndex()];
+				setCanvasSize(preferredWidth, preferredHeight);
+			}
+		});
+
 		final JLabel scaleIcon = new JLabel(Icon.magnify.imageIcon());
-		scaleIcon.setText("1:1");
-		scaleUp.setToolTipText("Increases canvas scaling.");
-		scaleUp.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				scaleUp();
-				scaleIcon.setText("1:" + scale);
-			}
-		});
-		scaleDown.setVisible(false);
-		scaleDown.setToolTipText("Decreases canvas scaling.");
-		scaleDown.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				scaleDown();
-				scaleIcon.setText("1:" + scale);
-			}
-		});
 
 		GroupLayout layout = new GroupLayout(overlay);
 		overlay.setLayout(layout);
 		layout.setHorizontalGroup(layout.createSequentialGroup()
 			.addComponent(scaleIcon)
-			.addComponent(scaleUp)
-			.addComponent(scaleDown)
+			.addComponent(scaleSelector)
 		);
 		layout.setVerticalGroup(layout.createParallelGroup(Alignment.CENTER)
 			.addComponent(scaleIcon)
-			.addComponent(scaleUp)
-			.addComponent(scaleDown)
+			.addComponent(scaleSelector)
 		);
 
 		setContentPane(content);
@@ -263,8 +256,7 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 		addKeyListener(keyListener);
 		overlay.addKeyListener(keyListener);
 		canvas.addKeyListener(keyListener);
-		scaleUp.addKeyListener(keyListener);
-		scaleDown.addKeyListener(keyListener);
+		scaleSelector.addKeyListener(keyListener);
 		content.addKeyListener(keyListener);
 		content.getViewport().addKeyListener(keyListener);
 
@@ -431,8 +423,8 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 	public void setCanvasSize(int width, int height) {
 		preferredWidth = width;
 		preferredHeight = height;
-		int newWidth = width * scale;
-		int newHeight = width * scale;
+		int newWidth = (int) (width * scale);
+		int newHeight = (int) (width * scale);
 		// We avoid setting the same preferred size twice here.
 		if (newWidth != canvas.getWidth() || newHeight != canvas.getHeight()) {
 			if (!fullscreen) {
@@ -486,18 +478,6 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 		for (ViewListener listener : listeners) {
 			listener.setViewVisible(false);
 		}
-	}
-
-	protected void scaleUp() {
-		scale = Math.min(32, scale + 1);
-		setCanvasSize(preferredWidth, preferredHeight);
-		scaleDown.setVisible(true);
-	}
-
-	protected void scaleDown() {
-		scale = Math.max(1, scale - 1);
-		setCanvasSize(preferredWidth, preferredHeight);
-		scaleDown.setVisible(scale > 1);
 	}
 
 	@Override

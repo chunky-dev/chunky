@@ -84,9 +84,9 @@ public class RenderCanvas extends JPanel implements RenderableCanvas {
 		}
 	}
 
-	public void setPreferredSize(int width, int height, int scale) {
-		preferredWidth = width * scale;
-		preferredHeight = height * scale;
+	public void setPreferredSize(int width, int height, double scale) {
+		preferredWidth = (int) (width * scale);
+		preferredHeight = (int) (height * scale);
 		setPreferredSize(new Dimension(preferredWidth, preferredHeight));
 
 	}
