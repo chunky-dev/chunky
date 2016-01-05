@@ -88,9 +88,10 @@ public class EntitiesTab extends RenderControlsTab {
 	private final JComboBox playerModel = new JComboBox();
 	private final JTextField skinField = new JTextField();
 	private final JButton selectSkinBtn = new JButton("Select Skin");
-	private final JButton moveToPlayer = new JButton("Move Camera to Player");
-	private final JButton moveToCamera = new JButton("Move Player to Camera");
-	private final JButton moveToTarget = new JButton("Move Player to Target");
+	private final JButton moveToPlayer = new JButton("Camera to Player");
+	private final JButton moveToCamera = new JButton("Player to Camera");
+	private final JButton moveToTarget = new JButton("Player to Target");
+	private final JButton faceCamera = new JButton("Face Camera");
 	private final JButton addPlayer = new JButton("Add Player");
 	private final JButton removePlayer = new JButton("Remove Player");
 	private final ListSelectionModel selectionModel;
@@ -439,6 +440,17 @@ public class EntitiesTab extends RenderControlsTab {
 			}
 		});
 
+		faceCamera.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				PlayerEntity player = getSelectedPlayer();
+				if (player != null) {
+					player.lookAt(scene().camera().getPosition());
+					scene().rebuildActorBvh();
+				}
+			}
+		});
+
 		selectSkinBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -485,7 +497,9 @@ public class EntitiesTab extends RenderControlsTab {
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(moveToCamera)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(moveToTarget))
+					.addComponent(moveToTarget)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(faceCamera))
 			.addComponent(scrollPane)
 			.addGroup(layout.createSequentialGroup()
 					.addComponent(playerModelLbl)
@@ -516,7 +530,8 @@ public class EntitiesTab extends RenderControlsTab {
 			.addGroup(layout.createParallelGroup()
 					.addComponent(moveToPlayer)
 					.addComponent(moveToCamera)
-					.addComponent(moveToTarget))
+					.addComponent(moveToTarget)
+					.addComponent(faceCamera))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 					.addComponent(playerModelLbl)

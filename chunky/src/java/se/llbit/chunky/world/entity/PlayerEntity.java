@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
+import org.apache.commons.math3.util.FastMath;
+
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
@@ -257,5 +259,15 @@ public class PlayerEntity extends Entity {
 		yaw = (random.nextFloat() - 0.5) * QuickMath.TAU;
 		headYaw = 0.4 * (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
 		pitch = (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
+	}
+
+	public void lookAt(Vector3d camera) {
+		Vector3d dir = new Vector3d(camera);
+		Vector3d face = new Vector3d(position);
+		face.add(0, 28/16., 0);
+		dir.sub(face);
+		dir.normalize();
+		yaw = FastMath.atan2(dir.x, dir.z) + Math.PI - headYaw;
+		pitch = Math.asin(dir.y);
 	}
 }
