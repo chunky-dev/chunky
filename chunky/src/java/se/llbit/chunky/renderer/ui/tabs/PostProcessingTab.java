@@ -57,11 +57,10 @@ public class PostProcessingTab extends RenderControlsTab {
 	public PostProcessingTab(RenderControls renderControls) {
 		super(renderControls);
 
-		exposure.update();
-
-		JLabel postprocessDescLbl = new JLabel("<html>Post processing affects rendering performance<br>when the preview window is visible");
+		JLabel postprocessDescLbl = new JLabel(
+				"<html>Post processing affects rendering performance<br>"
+				+ "when the preview window is visible");
 		JLabel postprocessLbl = new JLabel("Post-processing mode:");
-		updatePostprocessCB();
 		postprocessCB.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

@@ -173,16 +173,6 @@ public class LightingTab extends RenderControlsTab {
 		enableEmitters.setSelected(renderMan.scene().getEmittersEnabled());
 		enableEmitters.addActionListener(emittersListener);
 
-		emitterIntensity.update();
-
-		sunIntensity.update();
-
-		skyLight.update();
-
-		sunAzimuth.update();
-
-		sunAltitude.update();
-
 		GroupLayout layout = new GroupLayout(this);
 		setLayout(layout);
 		layout.setHorizontalGroup(layout.createSequentialGroup()

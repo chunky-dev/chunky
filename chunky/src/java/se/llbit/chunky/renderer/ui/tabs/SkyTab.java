@@ -326,30 +326,32 @@ public class SkyTab extends RenderControlsTab {
 		JLabel skyModeLbl = new JLabel("Sky Mode:");
 		skyModeCB.setModel(new DefaultComboBoxModel(Sky.SkyMode.values()));
 		skyModeCB.addActionListener(skyModeListener);
-		updateSkyMode();
+
+		// Need to hide these to not warp the Swing layout:
+		simulatedSkyPanel.setVisible(false);
+		skymapPanel.setVisible(false);
+		lightProbePanel.setVisible(false);
+		skyGradientPanel.setVisible(false);
+		skyboxPanel.setVisible(false);
 
 		JLabel skymapRotationLbl = new JLabel("Skymap rotation:");
 		skymapRotationSlider.setMinimum(1);
 		skymapRotationSlider.setMaximum(100);
 		skymapRotationSlider.addChangeListener(skyRotationListener);
-		skymapRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
+		skymapRotationSlider.setToolTipText(
+				"Controls the horizontal rotational offset for the skymap");
 		JLabel lightProbeRotationLbl = new JLabel("Skymap rotation:");
 		lightProbeRotationSlider.setMinimum(1);
 		lightProbeRotationSlider.setMaximum(100);
 		lightProbeRotationSlider.addChangeListener(skyRotationListener);
-		lightProbeRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
+		lightProbeRotationSlider.setToolTipText(
+				"Controls the horizontal rotational offset for the skymap");
 		JLabel skyboxRotationLbl = new JLabel("Skybox rotation:");
 		skyboxRotationSlider.setMinimum(1);
 		skyboxRotationSlider.setMaximum(100);
 		skyboxRotationSlider.addChangeListener(skyRotationListener);
-		skyboxRotationSlider.setToolTipText("Controls the horizontal rotational offset for the skymap");
-		updateSkyRotation();
-
-		skyHorizonOffset.update();
-		cloudSize.update();
-		cloudXOffset.update();
-		cloudYOffset.update();
-		cloudZOffset.update();
+		skyboxRotationSlider.setToolTipText(
+				"Controls the horizontal rotational offset for the skymap");
 
 		JLabel verticalResolutionLbl = new JLabel("Vertical resolution (degrees):");
 		ButtonGroup verticalResolution = new ButtonGroup();
@@ -360,7 +362,6 @@ public class SkyTab extends RenderControlsTab {
 
 		v90Btn.addActionListener(v90Listener);
 		v180Btn.addActionListener(v180Listener);
-		updateVerticalResolution();
 
 		simulatedSkyPanel.setBorder(BorderFactory.createTitledBorder("Simulated Sky Settings"));
 		GroupLayout simulatedSkyLayout = new GroupLayout(simulatedSkyPanel);
@@ -440,7 +441,6 @@ public class SkyTab extends RenderControlsTab {
 		skyGradientPanel.setBorder(BorderFactory.createTitledBorder("Sky Gradient"));
 		gradientEditor = new GradientEditor();
 		gradientEditor.addGradientListener(gradientListener);
-		updateSkyGradient();
 		skyGradientPanel.add(gradientEditor);
 
 		GroupLayout skyboxLayout = new GroupLayout(skyboxPanel);
@@ -523,9 +523,6 @@ public class SkyTab extends RenderControlsTab {
 		transparentSky.setText("transparent sky");
 		transparentSky.setToolTipText("Disables rendering the skybox");
 		transparentSky.addActionListener(transparentSkyListener);
-		updateTransparentSky();
-
-		fogDensity.update();
 
 		JLabel fogColorLbl = new JLabel("<html>Hint: set fog density &gt; 0.1 for thick fog,<br>set it &lt; 0.1 for haze/atmosphere effect");
 		fogColorBtn.setIcon(Icon.colors.imageIcon());
@@ -544,7 +541,6 @@ public class SkyTab extends RenderControlsTab {
 
 		cloudsEnabled.setText("enable clouds");
 		cloudsEnabled.addActionListener(cloudsEnabledListener);
-		updateCloudsEnabledCheckBox();
 
 		GroupLayout layout = new GroupLayout(this);
 		setLayout(layout);

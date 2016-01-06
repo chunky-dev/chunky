@@ -71,7 +71,7 @@ public class CameraTab extends RenderControlsTab implements ViewListener, Render
 	private final JTextField cameraPitch = new JTextField();
 	private final JTextField cameraRoll = new JTextField();
 
-	private Adjuster dof;
+	private final Adjuster dof = new DoFAdjuster(renderMan);
 
 	private final Adjuster fov = new Adjuster(
 			"Field of View (zoom)",
@@ -199,13 +199,6 @@ public class CameraTab extends RenderControlsTab implements ViewListener, Render
 
 		JLabel projectionModeLbl = new JLabel("Projection");
 
-		fov.update();
-
-		dof = new DoFAdjuster(renderMan);
-		dof.update();
-
-		subjectDistance.update();
-
 		JLabel presetLbl = new JLabel("Preset:");
 		CameraPreset[] presets = {
 			CameraPreset.NONE,
@@ -235,7 +228,6 @@ public class CameraTab extends RenderControlsTab implements ViewListener, Render
 
 		JLabel customPresetLbl = new JLabel("Custom preset:");
 		customPreset.setEditable(true);
-		updateCustomPresets();
 		JButton savePreset = new JButton("save");
 		savePreset.addActionListener(new ActionListener() {
 			@Override
@@ -331,7 +323,6 @@ public class CameraTab extends RenderControlsTab implements ViewListener, Render
 		ProjectionMode[] projectionModes = ProjectionMode.values();
 		projectionMode.setModel(new DefaultComboBoxModel(projectionModes));
 		projectionMode.addActionListener(projectionModeListener);
-		updateProjectionMode();
 
 		JButton autoFocusBtn = new JButton("Autofocus");
 		autoFocusBtn.setToolTipText("Focuses on the object right in the center, under the crosshairs");
@@ -364,7 +355,6 @@ public class CameraTab extends RenderControlsTab implements ViewListener, Render
 		cameraZ.setColumns(10);
 		cameraZ.setHorizontalAlignment(JTextField.RIGHT);
 		cameraZ.addActionListener(cameraPositionListener);
-		updateCameraPosition();
 
 		JLabel dirLbl = new JLabel("Direction:");
 		cameraYaw.setColumns(10);
@@ -376,7 +366,6 @@ public class CameraTab extends RenderControlsTab implements ViewListener, Render
 		cameraRoll.setColumns(10);
 		cameraRoll.setHorizontalAlignment(JTextField.RIGHT);
 		cameraRoll.addActionListener(cameraDirectionListener);
-		updateCameraDirection();
 
 		JButton centerCameraBtn = new JButton("Center camera");
 		centerCameraBtn.setToolTipText("Center camera above loaded chunks");

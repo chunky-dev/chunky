@@ -26,7 +26,7 @@ import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.ui.Adjuster;
 
 /**
- * Adjuster specialized for DoF.
+ * Adjuster specialized for the depth of field setting.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class DoFAdjuster extends Adjuster {
@@ -37,8 +37,7 @@ public class DoFAdjuster extends Adjuster {
 	 * @param renderManager
 	 */
 	public DoFAdjuster(RenderManager renderManager) {
-		super("Depth of Field", "Depth of Field",
-				Camera.MIN_DOF, Camera.MAX_DOF);
+		super("Depth of Field", "Depth of Field", Camera.MIN_DOF, Camera.MAX_DOF);
 		this.renderMan = renderManager;
 		setLogarithmicMode();
 		setClampMax(false);

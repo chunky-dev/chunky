@@ -112,11 +112,9 @@ public class AdvancedTab extends RenderControlsTab {
 		super(renderControls);
 
 		if (!ShutdownAlert.canShutdown()) {
-			// disable the computer shutdown checkbox if we can't shutdown
+			// Disable the computer shutdown checkbox if we can't shutdown.
 			shutdownWhenDoneCB.setEnabled(false);
 		}
-
-		rayDepth.update();
 
 		JLabel outputModeLbl = new JLabel("Output mode: ");
 		outputMode.setModel(new DefaultComboBoxModel(OutputMode.values()));
@@ -127,21 +125,14 @@ public class AdvancedTab extends RenderControlsTab {
 				renderMan.scene().setOutputMode((OutputMode) source.getSelectedItem());
 			}
 		});
-		updateOutputMode();
 
 		JSeparator sep1 = new JSeparator();
 		JSeparator sep2 = new JSeparator();
 
-		numThreads.update();
-
-		cpuLoad.update();
-
 		fastFogCB.setToolTipText("Enable faster fog algorithm");
 		fastFogCB.addActionListener(fastFogListener);
-		updateFastFog();
 
-		mergeDumpBtn.setToolTipText(
-				"Merge an existing render dump with the current render");
+		mergeDumpBtn.setToolTipText("Merge an existing render dump with the current render");
 		mergeDumpBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -214,6 +205,8 @@ public class AdvancedTab extends RenderControlsTab {
 		updateOutputMode();
 		updateFastFog();
 		rayDepth.update();
+		cpuLoad.update();
+		numThreads.update();
 	}
 
 	protected void updateOutputMode() {

@@ -156,10 +156,6 @@ public class WaterTab extends RenderControlsTab {
 
 		stillWaterCB.setText("still water");
 		stillWaterCB.addActionListener(stillWaterListener);
-		updateStillWater();
-
-		waterVisibility.update();
-		waterOpacity.update();
 
 		JLabel waterWorldLbl = new JLabel(
 				"Note: All chunks will be reloaded after changing the water world options!");
@@ -174,10 +170,8 @@ public class WaterTab extends RenderControlsTab {
 
 		waterWorldCB.setText("Water World Mode");
 		waterWorldCB.addActionListener(waterWorldListener);
-		updateWaterHeight();
 
 		waterColorCB.addActionListener(customWaterColorListener);
-		updateWaterColor();
 
 		waterColorBtn.setIcon(Icon.colors.imageIcon());
 		waterColorBtn.addActionListener(new ActionListener() {

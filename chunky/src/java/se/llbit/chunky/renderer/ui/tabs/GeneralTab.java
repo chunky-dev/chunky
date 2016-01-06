@@ -184,8 +184,6 @@ public class GeneralTab extends RenderControlsTab {
 			}
 		});
 
-		updateCanvasSizeField();
-
 		loadSceneBtn.setText("Load Scene");
 		loadSceneBtn.setIcon(Icon.load.imageIcon());
 		loadSceneBtn.addActionListener(loadSceneListener);
@@ -269,14 +267,11 @@ public class GeneralTab extends RenderControlsTab {
 		loadPlayersCB.setText("Load players");
 		loadPlayersCB.setToolTipText("Enable/disable player entity loading. "
 				+ "Reload the chunks after changing this option.");
-		updateLoadPlayersCB();
 
 		biomeColorsCB.setText("Enable biome colors");
-		updateBiomeColorsCB();
 
 		saveDumpsCB.setText("Save dump once every ");
 		saveDumpsCB.addActionListener(saveDumpsListener);
-		updateSaveDumpsCheckBox();
 
 		String[] frequencyStrings = new String[dumpFrequencies.length];
 		for (int i = 0; i < dumpFrequencies.length; ++i) {
@@ -285,12 +280,8 @@ public class GeneralTab extends RenderControlsTab {
 		dumpFrequencyCB.setModel(new DefaultComboBoxModel(frequencyStrings));
 		dumpFrequencyCB.setEditable(true);
 		dumpFrequencyCB.addActionListener(dumpFrequencyListener);
-		updateDumpFrequencyField();
 
 		saveSnapshotsCB.addActionListener(saveSnapshotListener);
-		updateSaveSnapshotCheckBox();
-
-		yCutoff.update();
 
 		GroupLayout layout = new GroupLayout(this);
 		setLayout(layout);
