@@ -142,15 +142,15 @@ public class UpdateDialog extends JDialog {
 				LibraryStatus status = (LibraryStatus) value;
 				setText(status.downloadStatus());
 				if (status == LibraryStatus.PASSED || status == LibraryStatus.DOWNLOADED_OK) {
-					setIcon(Icons.cached);
+					setIcon(LauncherIcon.cached);
 				} else {
 					switch (status) {
 					case MD5_MISMATCH:
 					case MISSING:
-						setIcon(Icons.refresh);
+						setIcon(LauncherIcon.refresh);
 						break;
 					default:
-						setIcon(Icons.failed);
+						setIcon(LauncherIcon.failed);
 					}
 				}
 			}
@@ -247,7 +247,7 @@ public class UpdateDialog extends JDialog {
 			}
 		});
 
-		completedLbl.setIcon(Icons.cached);
+		completedLbl.setIcon(LauncherIcon.cached);
 		completedLbl.setVisible(false);
 
 		JTextPane changeLog = new JTextPane();
@@ -309,10 +309,10 @@ public class UpdateDialog extends JDialog {
 		status.getTableHeader().setVisible(false);
 		status.setVisible(false);
 		final JCheckBox details = new JCheckBox("Details");
-		details.setIcon(Icons.expand);
-		details.setRolloverIcon(Icons.expandHover);
-		details.setSelectedIcon(Icons.collapse);
-		details.setRolloverSelectedIcon(Icons.collapseHover);
+		details.setIcon(LauncherIcon.expand);
+		details.setRolloverIcon(LauncherIcon.expandHover);
+		details.setSelectedIcon(LauncherIcon.collapse);
+		details.setRolloverSelectedIcon(LauncherIcon.collapseHover);
 		details.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

@@ -272,10 +272,10 @@ public class ChunkyLauncher extends JFrame implements UpdateListener {
 		advancedPanel.setVisible(settings.showAdvancedSettings);
 
 		advancedSettingsToggle.setSelected(settings.showAdvancedSettings);
-		advancedSettingsToggle.setIcon(Icons.expand);
-		advancedSettingsToggle.setRolloverIcon(Icons.expandHover);
-		advancedSettingsToggle.setSelectedIcon(Icons.collapse);
-		advancedSettingsToggle.setRolloverSelectedIcon(Icons.collapseHover);
+		advancedSettingsToggle.setIcon(LauncherIcon.expand);
+		advancedSettingsToggle.setRolloverIcon(LauncherIcon.expandHover);
+		advancedSettingsToggle.setSelectedIcon(LauncherIcon.collapse);
+		advancedSettingsToggle.setRolloverSelectedIcon(LauncherIcon.collapseHover);
 		advancedSettingsToggle.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

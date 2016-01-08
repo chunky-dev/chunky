@@ -1,4 +1,4 @@
-/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2014-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -21,22 +21,20 @@ import java.net.URL;
 
 import javax.swing.ImageIcon;
 
-public class Icons {
-
-	final public static ImageIcon expand = loadIcon("expand");
-	final public static ImageIcon collapse = loadIcon("collapse");
-	final public static ImageIcon expandHover = loadIcon("expand-hover");
-	final public static ImageIcon collapseHover = loadIcon("collapse-hover");
-	final public static ImageIcon cached = loadIcon("cached");
-	final public static ImageIcon failed = loadIcon("failed");
-	final public static ImageIcon refresh = loadIcon("refresh");
+public class LauncherIcon {
+	public static final ImageIcon expand = loadIcon("expand");
+	public static final ImageIcon collapse = loadIcon("collapse");
+	public static final ImageIcon expandHover = loadIcon("expand-hover");
+	public static final ImageIcon collapseHover = loadIcon("collapse-hover");
+	public static final ImageIcon cached = loadIcon("cached");
+	public static final ImageIcon failed = loadIcon("failed");
+	public static final ImageIcon refresh = loadIcon("refresh");
 
 	private static ImageIcon loadIcon(String image) {
-		URL url = Icons.class.getResource("/" + image + ".png");
+		URL url = LauncherIcon.class.getResource("/" + image + ".png");
 		if (url != null) {
 			return new ImageIcon(Toolkit.getDefaultToolkit().getImage(url));
 		}
 		return null;
 	}
-
 }

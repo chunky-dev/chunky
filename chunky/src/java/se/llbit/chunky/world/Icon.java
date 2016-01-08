@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -21,6 +21,7 @@ import se.llbit.resources.ImageLoader;
 
 /**
  * Icon object.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 @SuppressWarnings("javadoc")
@@ -69,16 +70,18 @@ public class Icon extends Texture {
 	public static final Icon colors = new Icon("colors");
 	public static final Icon sky = new Icon("sky");
 	public static final Icon camera = new Icon("camera");
-    final public static Icon water = new Icon("water");
-    final public static Icon light = new Icon("light");
-    final public static Icon sun = new Icon("sun");
-    final public static Icon gear = new Icon("gear");
-    final public static Icon advanced = new Icon("advanced");
-    final public static Icon question = new Icon("question");
-    final public static Icon photo = new Icon("photo");
-    final public static Icon eye = new Icon("eye");
-    final public static Icon scale = new Icon("scale");
-    final public static Icon magnify = new Icon("magnify");
+	public static final Icon water = new Icon("water");
+	public static final Icon light = new Icon("light");
+	public static final Icon sun = new Icon("sun");
+	public static final Icon gear = new Icon("gear");
+	public static final Icon advanced = new Icon("advanced");
+	public static final Icon question = new Icon("question");
+	public static final Icon photo = new Icon("photo");
+	public static final Icon eye = new Icon("eye");
+	public static final Icon scale = new Icon("scale");
+	public static final Icon magnify = new Icon("magnify");
+	public static final Icon minus = new Icon("minus");
+	public static final Icon plus = new Icon("plus");
 	public static final Texture grass = new Texture("grass-side-saturated");
 	public static final Texture netherrack = new Texture("netherrack");
 	public static final Texture endStone = new Texture("end-stone");

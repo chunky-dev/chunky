@@ -45,6 +45,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.ui.RenderControls;
 import se.llbit.chunky.renderer.ui.tabs.SkyTab.SkyboxTextureLoader;
 import se.llbit.chunky.ui.CenteredFileDialog;
+import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.entity.Entity;
 import se.llbit.chunky.world.entity.PlayerEntity;
 import se.llbit.json.JsonObject;
@@ -92,8 +93,8 @@ public class EntitiesTab extends RenderControlsTab {
 	private final JButton moveToCamera = new JButton("Player to Camera");
 	private final JButton moveToTarget = new JButton("Player to Target");
 	private final JButton faceCamera = new JButton("Face Camera");
-	private final JButton addPlayer = new JButton("Add Player");
-	private final JButton removePlayer = new JButton("Remove Player");
+	private final JButton addPlayer = new JButton();
+	private final JButton removePlayer = new JButton();
 	private final ListSelectionModel selectionModel;
 	private final DefaultTableModel tableModel =
 			new DefaultTableModel(new String[] { "Name", "Id" }, 0);
@@ -361,6 +362,8 @@ public class EntitiesTab extends RenderControlsTab {
 
 		skinField.setEnabled(false);
 
+		removePlayer.setIcon(Icon.minus.imageIcon());
+		removePlayer.setToolTipText("Remove selected entity");
 		removePlayer.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -371,6 +374,8 @@ public class EntitiesTab extends RenderControlsTab {
 			}
 		});
 
+		addPlayer.setIcon(Icon.plus.imageIcon());
+		addPlayer.setToolTipText("Add player entity at target");
 		addPlayer.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -492,9 +497,9 @@ public class EntitiesTab extends RenderControlsTab {
 		setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup()
 			.addGroup(layout.createSequentialGroup()
-					.addComponent(addPlayer)
+					.addComponent(removePlayer)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(removePlayer))
+					.addComponent(addPlayer))
 			.addGroup(layout.createSequentialGroup()
 					.addComponent(moveToPlayer)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -527,8 +532,8 @@ public class EntitiesTab extends RenderControlsTab {
 			.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
-					.addComponent(addPlayer)
-					.addComponent(removePlayer))
+					.addComponent(removePlayer)
+					.addComponent(addPlayer))
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addGroup(layout.createParallelGroup()
 					.addComponent(moveToPlayer)
