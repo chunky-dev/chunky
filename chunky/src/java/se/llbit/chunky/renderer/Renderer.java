@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -19,15 +19,14 @@ package se.llbit.chunky.renderer;
 import java.awt.Graphics;
 
 /**
- * A renderer renders to a buffered image.
- * The buffered image in turn is displayed by a render canvas.
+ * A renderer renders to a buffered image which in turn is displayed by a render canvas.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public interface Renderer {
 	/**
 	 * Draws the buffered image to the given graphics context.
 	 */
-	public void drawBufferedImage(Graphics g, int width, int height);
+	public void drawBufferedImage(Graphics g, int offsetX, int offsetY, int width, int height);
 
 	/**
 	 * Set the buffer update flag. The buffer update flag decides whether the

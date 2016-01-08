@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -267,7 +267,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 		synchronized (this) {
 			// Update render status display.
 			renderListener.setRenderTime(bufferedScene.renderTime);
-			renderListener.setSamplesPerSecond((int) samplesPerSecond());
+			renderListener.setSamplesPerSecond(samplesPerSecond());
 			renderListener.setSPP(bufferedScene.spp);
 		}
 	}
@@ -515,8 +515,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 	}
 
 	@Override
-	public void drawBufferedImage(Graphics g, int width, int height) {
-		bufferedScene.drawBufferedImage(g, width, height);
+	public void drawBufferedImage(Graphics g, int offsetX, int offsetY, int width, int height) {
+		bufferedScene.drawBufferedImage(g, offsetX, offsetY, width, height);
 	}
 
 	@Override

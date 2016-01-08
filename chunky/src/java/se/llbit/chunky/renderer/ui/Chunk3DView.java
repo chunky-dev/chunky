@@ -65,8 +65,8 @@ import se.llbit.chunky.world.Icon;
 @SuppressWarnings("serial")
 public class Chunk3DView extends JDialog implements SceneStatusListener {
 
-	private static final String[] SCALE_DESC = { "1:0.25", "1:0.5", "1:0.75", "1:1", "1:1.5",
-			"1:2", "1:3", "1:4" };
+	private static final String[] SCALE_DESC = { "x0.25", "x0.5", "x0.75", "x1", "x1.5",
+			"x2", "x3", "x4" };
 
 	private static final double[] SCALE = { 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4 };
 
@@ -98,9 +98,7 @@ public class Chunk3DView extends JDialog implements SceneStatusListener {
 	private final JComboBox scaleSelector = new JComboBox(SCALE_DESC);
 
 	/**
-	 * Create the 3D view window
-	 * @param listener
-	 * @param parentFrame
+	 * Creates the 3D preview window.
 	 */
 	public Chunk3DView(JFrame parentFrame) {
 		super(parentFrame, "Render Preview");

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -37,14 +37,12 @@ public class RenderCanvas extends JPanel implements RenderableCanvas {
 	private int preferredWidth = 200;
 	private int preferredHeight = 200;
 
-	/**
-	 * Create new canvas
-	 */
 	public RenderCanvas() {
+		setBackground(Color.black);
 
-		setBackground(Color.white);
-		// Apparently setting the same preferred size twice will cancel all
-		// other calls to setPreferredSize.
+		// It seems like setting the same preferred size twice will cancel all
+		// other calls to setPreferredSize. This was observed on Windows 7,
+		// does it behave differently on different platforms? /llbit
 		setPreferredSize(PersistentSettings.get3DCanvasWidth(),
 				PersistentSettings.get3DCanvasHeight(), 1);
 		setMinimumSize(new Dimension(100, 100));
@@ -54,23 +52,22 @@ public class RenderCanvas extends JPanel implements RenderableCanvas {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-
+		int width = getWidth();
+		int height = getHeight();
+		int offsetX = Math.max(width - preferredWidth, 0) / 2;
+		int offsetY = Math.max(height - preferredHeight, 0) / 2;
 		if (renderer != null) {
-			renderer.drawBufferedImage(g, preferredWidth, preferredHeight);
+			renderer.drawBufferedImage(g, offsetX, offsetY, preferredWidth, preferredHeight);
 		}
 	}
 
-	/**
-	 * Set new renderer
-	 * @param newRenderer
-	 */
 	public void setRenderer(Renderer newRenderer) {
 		renderer = newRenderer;
 		renderer.setBufferFinalization(isShowing());
 	}
 
 	/**
-	 * Set the update buffer flag for the renderer
+	 * Set the update buffer flag for the current renderer.
 	 * @param flag
 	 */
 	public void setBufferFinalization(final boolean flag) {
@@ -88,6 +85,5 @@ public class RenderCanvas extends JPanel implements RenderableCanvas {
 		preferredWidth = (int) (width * scale);
 		preferredHeight = (int) (height * scale);
 		setPreferredSize(new Dimension(preferredWidth, preferredHeight));
-
 	}
 }

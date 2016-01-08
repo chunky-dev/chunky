@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer;
 
 /**
+ * Interface for render canvas which displays a rendered image.
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public interface RenderableCanvas {
@@ -30,8 +31,6 @@ public interface RenderableCanvas {
 	 */
 	int getHeight();
 
-	/**
-	 * Trigger a repaint of the canvas
-	 */
+	/** Trigger a repaint of the canvas. */
 	void repaint();
 }

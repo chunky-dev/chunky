@@ -2056,8 +2056,9 @@ public class Scene extends SceneDescription {
 	 * @param canvasWidth The canvas width
 	 * @param canvasHeight The canvas height
 	 */
-	public synchronized void drawBufferedImage(Graphics g, int canvasWidth, int canvasHeight) {
-		g.drawImage(buffer, 0, 0, canvasWidth, canvasHeight, null);
+	public synchronized void drawBufferedImage(Graphics g, int offsetX, int offsetY,
+			int canvasWidth, int canvasHeight) {
+		g.drawImage(buffer, offsetX, offsetY, canvasWidth, canvasHeight, null);
 	}
 
 	/**

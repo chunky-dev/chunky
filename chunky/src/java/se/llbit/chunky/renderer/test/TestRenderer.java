@@ -406,9 +406,9 @@ public class TestRenderer extends Thread implements ViewListener, Renderer, Refr
 	}
 
 	@Override
-	public void drawBufferedImage(Graphics g, int width, int height) {
+	public void drawBufferedImage(Graphics g, int offsetX, int offsetY, int width, int height) {
 		synchronized (backBuffer) {
-			g.drawImage(buffer, 0, 0, width, height, null);
+			g.drawImage(buffer, offsetX, offsetY, width, height, null);
 		}
 	}
 

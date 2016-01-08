@@ -338,9 +338,9 @@ public class CLRenderManager extends Thread implements Renderer,
 	}
 
 	@Override
-	public void drawBufferedImage(Graphics g, int width, int height) {
+	public void drawBufferedImage(Graphics g, int offsetX, int offsetY, int width, int height) {
 		synchronized (buffer) {
-			g.drawImage(buffer, 0, 0, width, height, null);
+			g.drawImage(buffer, offsetX, offsetY, width, height, null);
 		}
 	}
 
