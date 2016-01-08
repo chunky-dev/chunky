@@ -229,9 +229,9 @@ public class GeneralTab extends RenderControlsTab {
 		setCanvasSizeBtn.setToolTipText("Set the canvas size to the value in the field");
 		setCanvasSizeBtn.addActionListener(canvasSizeListener);
 
-		JButton halveCanvasSizeBtn = new JButton("Halve");
-		halveCanvasSizeBtn.setToolTipText("Halve the canvas width and height");
-		halveCanvasSizeBtn.addActionListener(new ActionListener() {
+		JButton times05Btn = new JButton("x0.5");
+		times05Btn.setToolTipText("Halve the canvas width and height");
+		times05Btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int width = renderMan.scene().canvasWidth() / 2;
@@ -239,9 +239,21 @@ public class GeneralTab extends RenderControlsTab {
 				setCanvasSize(width, height);
 			}
 		});
-		JButton doubleCanvasSizeBtn = new JButton("Double");
-		doubleCanvasSizeBtn.setToolTipText("Double the canvas width and height");
-		doubleCanvasSizeBtn.addActionListener(new ActionListener() {
+
+		JButton times15Btn = new JButton("x1.5");
+		times15Btn.setToolTipText("Multiply canvas width and height by 1.5");
+		times15Btn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int width = (int) (renderMan.scene().canvasWidth() * 1.5);
+				int height = (int) (renderMan.scene().canvasHeight() * 1.5);
+				setCanvasSize(width, height);
+			}
+		});
+
+		JButton times20Btn = new JButton("x2");
+		times20Btn.setToolTipText("Double the canvas width and height");
+		times20Btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int width = renderMan.scene().canvasWidth() * 2;
@@ -309,9 +321,11 @@ public class GeneralTab extends RenderControlsTab {
 					.addComponent(makeDefaultBtn)
 				)
 				.addGroup(layout.createSequentialGroup()
-					.addComponent(halveCanvasSizeBtn)
+					.addComponent(times05Btn)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(doubleCanvasSizeBtn)
+					.addComponent(times15Btn)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(times20Btn)
 				)
 				.addComponent(sep2)
 				.addComponent(loadPlayersCB)
@@ -349,8 +363,9 @@ public class GeneralTab extends RenderControlsTab {
 			)
 			.addPreferredGap(ComponentPlacement.RELATED)
 			.addGroup(layout.createParallelGroup()
-				.addComponent(halveCanvasSizeBtn)
-				.addComponent(doubleCanvasSizeBtn)
+				.addComponent(times05Btn)
+				.addComponent(times15Btn)
+				.addComponent(times20Btn)
 			)
 			.addPreferredGap(ComponentPlacement.UNRELATED)
 			.addComponent(sep2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
