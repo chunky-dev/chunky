@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -18,21 +18,29 @@ package se.llbit.chunky.renderer.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 
+import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.world.Icon;
 import se.llbit.log.Log;
 
 /**
@@ -41,6 +49,9 @@ import se.llbit.log.Log;
 @SuppressWarnings("serial")
 public class SceneDirectoryPicker extends JDialog {
 
+	private final JLabel warning = new JLabel("Can't use selected directory.");
+	private final JButton okBtn = new JButton("OK");
+	private final JTextField pathField = new JTextField(40);
 	private File selectedDirectory;
 	private boolean accepted = false;
 
@@ -53,11 +64,22 @@ public class SceneDirectoryPicker extends JDialog {
 
 		setModalityType(ModalityType.APPLICATION_MODAL);
 
-		JLabel lbl = new JLabel("Please select a directory where Chunky should store scene description files and renders:");
+		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Close Dialog");
+		getRootPane().getActionMap().put("Close Dialog", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				closeDialog();
+			}
+		});
 
-		final JTextField scenePath = new JTextField(40);
-		selectedDirectory = PersistentSettings.getSceneDirectory();
-		scenePath.setText(selectedDirectory.getAbsolutePath());
+		JLabel lbl = new JLabel("Please select a directory where Chunky should store "
+				+ "scene description files and renders:");
+
+		warning.setIcon(Icon.failed.imageIcon());
+
+		updatePathField(PersistentSettings.getSceneDirectory());
+		updateSelectedDirectory(PersistentSettings.getSceneDirectory());
 
 		final JCheckBox nopester =
 				new JCheckBox("Use this as the default and do not ask again");
@@ -71,8 +93,9 @@ public class SceneDirectoryPicker extends JDialog {
 				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				int result = fileChooser.showOpenDialog(null);
 				if (result == JFileChooser.APPROVE_OPTION) {
-					selectedDirectory = fileChooser.getSelectedFile();
-					scenePath.setText(selectedDirectory.getAbsolutePath());
+					File selectedFile = fileChooser.getSelectedFile();
+					updateSelectedDirectory(selectedFile);
+					updatePathField(selectedFile);
 				}
 			}
 		});
@@ -85,11 +108,10 @@ public class SceneDirectoryPicker extends JDialog {
 			}
 		});
 
-		JButton okBtn = new JButton("OK");
 		okBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				selectedDirectory = new File(scenePath.getText());
+				selectedDirectory = new File(pathField.getText());
 				if (tryCreateSceneDir(selectedDirectory)) {
 					if (nopester.isSelected()) {
 						PersistentSettings.setSceneDirectory(selectedDirectory);
@@ -100,6 +122,33 @@ public class SceneDirectoryPicker extends JDialog {
 			}
 		});
 
+		pathField.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				update();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				update();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				update();
+			}
+
+			void update() {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						updateSelectedDirectory(new File(pathField.getText()));
+					}
+				});
+			}
+		});
+
+
 		JPanel panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -109,12 +158,14 @@ public class SceneDirectoryPicker extends JDialog {
 				.addGroup(layout.createParallelGroup(Alignment.LEADING)
 					.addComponent(lbl)
 					.addGroup(layout.createSequentialGroup()
-						.addComponent(scenePath)
+						.addComponent(pathField)
 						.addPreferredGap(ComponentPlacement.RELATED)
 						.addComponent(browseBtn))
 					.addComponent(nopester)
 					.addGroup(layout.createSequentialGroup()
 						.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(warning)
+						.addPreferredGap(ComponentPlacement.UNRELATED)
 						.addComponent(okBtn)
 						.addPreferredGap(ComponentPlacement.RELATED)
 						.addComponent(cancelBtn)))
@@ -127,12 +178,13 @@ public class SceneDirectoryPicker extends JDialog {
 				.addComponent(lbl)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addGroup(layout.createParallelGroup()
-					.addComponent(scenePath)
+					.addComponent(pathField)
 					.addComponent(browseBtn))
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addComponent(nopester)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addGroup(layout.createParallelGroup()
+				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+					.addComponent(warning)
 					.addComponent(okBtn)
 					.addComponent(cancelBtn))
 				.addContainerGap())
@@ -141,6 +193,25 @@ public class SceneDirectoryPicker extends JDialog {
 		pack();
 
 		setLocationRelativeTo(parent);
+	}
+
+	protected void updateSelectedDirectory(File path) {
+		selectedDirectory = path;
+		boolean valid = path.isDirectory();
+		if (warning.isVisible() != !valid) {
+			warning.setVisible(!valid);
+		}
+		if (okBtn.isEnabled() != valid) {
+			okBtn.setEnabled(valid);
+		}
+	}
+
+	protected void updatePathField(File path) {
+		pathField.setText(path.getAbsolutePath());
+	}
+
+	protected void closeDialog() {
+		dispose();
 	}
 
 	/**
@@ -179,7 +250,6 @@ public class SceneDirectoryPicker extends JDialog {
 	 */
 	public static File getSceneDirectory(JFrame parent) {
 		File sceneDir = getCurrentSceneDirectory();
-
 		if (sceneDir != null) {
 			return sceneDir;
 		} else {
@@ -193,26 +263,29 @@ public class SceneDirectoryPicker extends JDialog {
 	 * @return The file representing the selected directory
 	 */
 	public static File changeSceneDirectory(JFrame parent) {
-
 		while (true) {
-			SceneDirectoryPicker sceneDirPicker =
-					new SceneDirectoryPicker(parent);
+			SceneDirectoryPicker sceneDirPicker = new SceneDirectoryPicker(parent);
 			sceneDirPicker.setVisible(true);
-			if (!sceneDirPicker.isAccepted())
+			if (!sceneDirPicker.isAccepted()) {
 				return null;
+			}
 			File sceneDir = sceneDirPicker.getSelectedDirectory();
-			if (tryCreateSceneDir(sceneDir))
+			if (tryCreateSceneDir(sceneDir)) {
 				return sceneDir;
+			}
 		}
 	}
 
 	private static boolean tryCreateSceneDir(File sceneDir) {
-		if (!sceneDir.exists())
+		if (!sceneDir.exists()) {
 			sceneDir.mkdir();
-		if (sceneDir.exists() && sceneDir.isDirectory() && sceneDir.canWrite())
+		}
+		if (sceneDir.exists() && sceneDir.isDirectory() && sceneDir.canWrite()) {
 			return true;
+		}
 
-		Log.warningfmt("Could not open or create the scene directory %s", sceneDir.getAbsolutePath());
+		Log.warningfmt("Could not open or create the scene directory %s",
+				sceneDir.getAbsolutePath());
 		return false;
 	}
 }

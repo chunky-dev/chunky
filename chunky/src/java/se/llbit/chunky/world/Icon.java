@@ -85,6 +85,7 @@ public class Icon extends Texture {
 	public static final Texture grass = new Texture("grass-side-saturated");
 	public static final Texture netherrack = new Texture("netherrack");
 	public static final Texture endStone = new Texture("end-stone");
+	public static final Texture failed = new Icon("failed");
 
 	public Icon(String resourceName) {
 		setTexture(ImageLoader.get("icons/" + resourceName + ".png"));
