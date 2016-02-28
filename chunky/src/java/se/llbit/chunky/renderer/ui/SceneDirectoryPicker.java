@@ -49,7 +49,8 @@ import se.llbit.log.Log;
 @SuppressWarnings("serial")
 public class SceneDirectoryPicker extends JDialog {
 
-	private final JLabel warning = new JLabel("Can't use selected directory.");
+	private final JLabel warning = new JLabel("Selected directory does not exist.");
+	private final JCheckBox mkdirs = new JCheckBox("Create this directory");
 	private final JButton okBtn = new JButton("OK");
 	private final JTextField pathField = new JTextField(40);
 	private File selectedDirectory;
@@ -78,11 +79,16 @@ public class SceneDirectoryPicker extends JDialog {
 
 		warning.setIcon(Icon.failed.imageIcon());
 
+		mkdirs.setSelected(true);
+		mkdirs.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				updateSelectedDirectory(selectedDirectory);
+			}
+		});
+
 		updatePathField(PersistentSettings.getSceneDirectory());
 		updateSelectedDirectory(PersistentSettings.getSceneDirectory());
-
-		final JCheckBox nopester =
-				new JCheckBox("Use this as the default and do not ask again");
 
 		JButton browseBtn = new JButton("Browse...");
 		browseBtn.addActionListener(new ActionListener() {
@@ -111,14 +117,11 @@ public class SceneDirectoryPicker extends JDialog {
 		okBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				selectedDirectory = new File(pathField.getText());
-				if (tryCreateSceneDir(selectedDirectory)) {
-					if (nopester.isSelected()) {
-						PersistentSettings.setSceneDirectory(selectedDirectory);
-					}
-					accepted = true;
-					SceneDirectoryPicker.this.dispose();
+				if (mkdirs.isSelected()) {
+					tryCreateSceneDir(selectedDirectory);
 				}
+				accepted = true;
+				SceneDirectoryPicker.this.dispose();
 			}
 		});
 
@@ -161,7 +164,7 @@ public class SceneDirectoryPicker extends JDialog {
 						.addComponent(pathField)
 						.addPreferredGap(ComponentPlacement.RELATED)
 						.addComponent(browseBtn))
-					.addComponent(nopester)
+					.addComponent(mkdirs)
 					.addGroup(layout.createSequentialGroup()
 						.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(warning)
@@ -181,7 +184,7 @@ public class SceneDirectoryPicker extends JDialog {
 					.addComponent(pathField)
 					.addComponent(browseBtn))
 				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(nopester)
+				.addComponent(mkdirs)
 				.addPreferredGap(ComponentPlacement.UNRELATED)
 				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 					.addComponent(warning)
@@ -197,13 +200,17 @@ public class SceneDirectoryPicker extends JDialog {
 
 	protected void updateSelectedDirectory(File path) {
 		selectedDirectory = path;
-		boolean valid = path.isDirectory();
+		boolean valid = mkdirs.isSelected() || isValidDirectory(path);
 		if (warning.isVisible() != !valid) {
 			warning.setVisible(!valid);
 		}
 		if (okBtn.isEnabled() != valid) {
 			okBtn.setEnabled(valid);
 		}
+	}
+
+	private static boolean isValidDirectory(File path) {
+		return path.isDirectory() && path.canWrite();
 	}
 
 	protected void updatePathField(File path) {
@@ -270,7 +277,8 @@ public class SceneDirectoryPicker extends JDialog {
 				return null;
 			}
 			File sceneDir = sceneDirPicker.getSelectedDirectory();
-			if (tryCreateSceneDir(sceneDir)) {
+			if (isValidDirectory(sceneDir)) {
+				PersistentSettings.setSceneDirectory(sceneDir);
 				return sceneDir;
 			}
 		}
@@ -278,14 +286,14 @@ public class SceneDirectoryPicker extends JDialog {
 
 	private static boolean tryCreateSceneDir(File sceneDir) {
 		if (!sceneDir.exists()) {
-			sceneDir.mkdir();
+			sceneDir.mkdirs();
 		}
-		if (sceneDir.exists() && sceneDir.isDirectory() && sceneDir.canWrite()) {
+		if (!isValidDirectory(sceneDir)) {
+			Log.warningfmt("Could not open or create the scene directory %s",
+					sceneDir.getAbsolutePath());
+			return false;
+		} else {
 			return true;
 		}
-
-		Log.warningfmt("Could not open or create the scene directory %s",
-				sceneDir.getAbsolutePath());
-		return false;
 	}
 }
