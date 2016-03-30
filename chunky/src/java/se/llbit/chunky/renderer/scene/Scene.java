@@ -609,27 +609,29 @@ public class Scene extends SceneDescription {
 		worldOctree = new Octree(requiredDepth);
 
 		if (waterHeight > 0) {
-			for (int x = 0; x < (1<<worldOctree.depth); ++x) {
-				for (int z = 0; z < (1<<worldOctree.depth); ++z) {
-					for (int y = -origin.y; y < (-origin.y)+waterHeight-1; ++y) {
-						worldOctree.set(Block.WATER_ID | (1<<WaterModel.FULL_BLOCK), x, y, z);
+			// Water world mode enabled, fill in water in empty blocks.
+			// The water blocks are replaced later when the world chunks are loaded.
+			for (int x = 0; x < (1 << worldOctree.depth); ++x) {
+				for (int z = 0; z < (1 << worldOctree.depth); ++z) {
+					for (int y = -origin.y; y < (-origin.y) + waterHeight - 1; ++y) {
+						worldOctree.set(Block.WATER_ID | (1 << WaterModel.FULL_BLOCK), x, y, z);
 					}
 				}
 			}
-			for (int x = 0; x < (1<<worldOctree.depth); ++x) {
-				for (int z = 0; z < (1<<worldOctree.depth); ++z) {
-					worldOctree.set(Block.WATER_ID, x, (-origin.y)+waterHeight-1, z);
+			for (int x = 0; x < (1 << worldOctree.depth); ++x) {
+				for (int z = 0; z < (1 << worldOctree.depth); ++z) {
+					worldOctree.set(Block.WATER_ID, x, (-origin.y) + waterHeight - 1, z);
 				}
 			}
 		}
 
 		// Parse the regions first - force chunk lists to be populated!
 		Set<ChunkPosition> regions = new HashSet<ChunkPosition>();
-		for (ChunkPosition cp: chunksToLoad) {
+		for (ChunkPosition cp : chunksToLoad) {
 			regions.add(cp.getRegionPosition());
 		}
 
-		for (ChunkPosition region: regions) {
+		for (ChunkPosition region : regions) {
 			world.getRegion(region).parse();
 		}
 
@@ -681,8 +683,8 @@ public class Scene extends SceneDescription {
 			world.getChunk(cp).getBlockData(blocks, data, biomes, tileEntities, ents);
 			nchunks += 1;
 
-			int wx0 = cp.x*16;
-			int wz0 = cp.z*16;
+			int wx0 = cp.x * 16;
+			int wz0 = cp.z * 16;
 			for (int cz = 0; cz < 16; ++cz) {
 				int wz = cz + wz0;
 				for (int cx = 0; cx < 16; ++cx) {
@@ -693,7 +695,7 @@ public class Scene extends SceneDescription {
 			}
 
 			// Load entities.
-			for (CompoundTag tag: ents) {
+			for (CompoundTag tag : ents) {
 				if (tag.get("id").stringValue("").equals("Painting")) {
 					ListTag pos = (ListTag) tag.get("Pos");
 					double x = pos.getItem(0).doubleValue();
@@ -709,15 +711,15 @@ public class Scene extends SceneDescription {
 
 			// Load tile entities.
 			for (CompoundTag entityTag: tileEntities) {
-				int x = entityTag.get("x").intValue(0)-wx0;
+				int x = entityTag.get("x").intValue(0) - wx0;
 				int y = entityTag.get("y").intValue(0);
-				int z = entityTag.get("z").intValue(0)-wz0;
+				int z = entityTag.get("z").intValue(0) - wz0;
 				int index = Chunk.chunkIndex(x, y, z);
 				int block = 0xFF & blocks[index];
 				int metadata = 0xFF & data[index/2];
 				metadata >>= (x % 2) * 4;
 				metadata &= 0xF;
-				Vector3d position = new Vector3d(x+wx0, y, z+wz0);
+				Vector3d position = new Vector3d(x + wx0, y, z + wz0);
 				switch (block) {
 				case Block.WALLSIGN_ID:
 					entities.add(new WallSignEntity(position, entityTag, metadata));
@@ -761,10 +763,6 @@ public class Scene extends SceneDescription {
 						int type = block.id;
 						// Store metadata.
 						switch (block.id) {
-						case Block.WALLSIGN_ID:
-						case Block.SIGNPOST_ID:
-							// Treated as entities.
-							continue;
 						case Block.VINES_ID:
 							if (cy < 255) {
 								// Is this the top vine block?
@@ -869,12 +867,13 @@ public class Scene extends SceneDescription {
 							break;
 						}
 						type |= metadata << 8;
-						if (block.isEmitter)
+						if (block.isEmitter) {
 							emitters += 1;
-						if (block.isInvisible)
+						}
+						if (block.isInvisible) {
 							type = 0;
-						worldOctree.set(type, cx + cp.x*16 - origin.x,
-								cy - origin.y, cz + cp.z*16 - origin.z);
+						}
+						worldOctree.set(type, cx + cp.x * 16 - origin.x, cy - origin.y, cz + cp.z * 16 - origin.z);
 					}
 				}
 			}

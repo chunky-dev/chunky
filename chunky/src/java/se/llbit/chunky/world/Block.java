@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2015 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -1160,13 +1160,9 @@ public class Block extends Material {
 			isOpaque = false;
 			isSolid = false;
 			localIntersect = true;
-		}
-		@Override
-		public boolean intersect(Ray ray, Scene scene) {
-			return SignPostModel.intersect(ray);
+			isInvisible = true; // Stored as entity.
 		}
 	};
-
 	public static final int WOODENDOOR_ID = 0x40;
 	public static final Block WOODENDOOR = new Block(WOODENDOOR_ID, "Wooden Door", Icon.woodenDoor) {
 		{
@@ -1234,11 +1230,8 @@ public class Block extends Material {
 		{
 			isOpaque = false;
 			isSolid = false;
-			localIntersect = true;
-		}
-		@Override
-		public boolean intersect(Ray ray, Scene scene) {
-			return WallSignModel.intersect(ray);
+			localIntersect = false;
+			isInvisible = true; // Stored as entity.
 		}
 	};
 	public static final int LEVER_ID = 0x45;
