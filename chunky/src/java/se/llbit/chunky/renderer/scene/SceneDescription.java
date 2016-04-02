@@ -129,6 +129,8 @@ public class SceneDescription implements Refreshable, JSONifiable {
 	protected boolean biomeColors = true;
 	protected boolean transparentSky = false;
 
+	protected boolean renderActors = true;
+
 	protected Collection<ChunkPosition> chunks = new ArrayList<ChunkPosition>();
 
 	protected JsonObject cameraPresets = new JsonObject();
@@ -201,6 +203,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		desc.add("transparentSky", transparentSky);
 		desc.add("fogDensity", fogDensity);
 		desc.add("waterHeight", waterHeight);
+		desc.add("renderActors", renderActors);
 
 		// save world info
 		if (!worldPath.isEmpty()) {
@@ -272,6 +275,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
 		transparentSky = desc.get("transparentSky").boolValue(false);
 		fogDensity = desc.get("fogDensity").doubleValue(Scene.DEFAULT_FOG_DENSITY);
 		waterHeight = desc.get("waterHeight").intValue(0);
+		renderActors = desc.get("renderActors").boolValue(true);
 
 		// load world info
 		JsonObject world = desc.get("world").object();

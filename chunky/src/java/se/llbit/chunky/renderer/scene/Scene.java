@@ -513,8 +513,10 @@ public class Scene extends SceneDescription {
 		if (bvh.closestIntersection(ray)) {
 			hit = true;
 		}
-		if (actorBvh.closestIntersection(ray)) {
-			hit = true;
+		if (renderActors) {
+			if (actorBvh.closestIntersection(ray)) {
+				hit = true;
+			}
 		}
 		Ray oct = new Ray(ray);
 		oct.setCurrentMat(ray.getPrevMaterial(), ray.getPrevData());
@@ -2268,14 +2270,18 @@ public class Scene extends SceneDescription {
 	public synchronized JsonObject toJson() {
 		JsonObject obj = super.toJson();
 		JsonArray entityArray = new JsonArray();
-		for (Entity entity : actors) {
-			entityArray.add(entity.toJson());
-		}
 		for (Entity entity : entities) {
 			entityArray.add(entity.toJson());
 		}
 		if (entityArray.getNumElement() > 0) {
 			obj.add("entities", entityArray);
+		}
+		JsonArray actorArray = new JsonArray();
+		for (Entity entity : actors) {
+			actorArray.add(entity.toJson());
+		}
+		if (entityArray.getNumElement() > 0) {
+			obj.add("actors", actorArray);
 		}
 		return obj;
 	}
@@ -2295,6 +2301,10 @@ public class Scene extends SceneDescription {
 					entities.add(entity);
 				}
 			}
+		}
+		for (JsonValue element : desc.get("actors").array().getElementList()) {
+			Entity entity = Entity.fromJson(element.object());
+			actors.add(entity);
 		}
 	}
 
