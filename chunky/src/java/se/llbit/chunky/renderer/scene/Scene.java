@@ -636,7 +636,7 @@ public class Scene extends SceneDescription {
 		}
 
 		entities = new LinkedList<Entity>();
-		if (actors.isEmpty()) {
+		if (actors.isEmpty() && PersistentSettings.getLoadPlayers()) {
 			// We don't load actor entities if some already exists. Loading actor entities
 			// risks resetting posed actors when reloading chunks for an existing scene.
 			actors = new LinkedList<Entity>();
