@@ -18,6 +18,7 @@ sourceSets {
 		}
 		resources {
 			srcDir 'src/gen-res'
+			srcDir 'src/res'
 		}
 	}
 }
@@ -36,14 +37,6 @@ dependencies {
 }
 
 processResources.dependsOn 'updateVersionString'
-processResources.dependsOn 'copyResources'
-
-task copyResources(type: Copy) {
-	from('src/res') {
-		exclude 'Version.properties'
-	}
-	into 'src/gen-res'
-}
 
 task updateVersionString {
 	description 'Store the current version string in src/gen-res/Version.properties'
