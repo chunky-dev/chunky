@@ -27,7 +27,9 @@ public enum ProjectionMode {
   FISHEYE("Fisheye"),
   STEREOGRAPHIC("Stereographic"),
   PANORAMIC("Panoramic (equirectangular)"),
-  PANORAMIC_SLOT("Panoramic (slot)");
+  PANORAMIC_SLOT("Panoramic (slot)"),
+  ODS_LEFT("Omni‐directional Stereo (left eye)"),
+  ODS_RIGHT("Omni‐directional Stereo (right eye)");
 
   private final String niceName;
 
