@@ -3375,14 +3375,25 @@ public class Block extends Material {
 	public static final int ENDROD_ID = 0xC6;
 	public static final Block ENDROD = new Block(ENDROD_ID, "End Rod", Texture.endRod) {
 		{
-			isOpaque = false;
-			isSolid = false;
+			isOpaque = true;
+			isSolid = true;
 			localIntersect = true;
+			isEmitter = true;
+			emittance = 1.0;
 		}
 
 		@Override
 		public boolean intersect(Ray ray, Scene scene) {
 			return EndRodModel.intersect(ray);
+		}
+
+		final String[] direction = {
+				"down", "up", "north", "south", "west", "east"
+		};
+
+		@Override
+		public String description(int data) {
+			return direction[data % 6];
 		}
 	};
 	public static final int CHORUSPLANT_ID = 0xC7;
