@@ -2280,7 +2280,7 @@ public class Scene extends SceneDescription {
 		for (Entity entity : actors) {
 			actorArray.add(entity.toJson());
 		}
-		if (entityArray.getNumElement() > 0) {
+		if (actorArray.getNumElement() > 0) {
 			obj.add("actors", actorArray);
 		}
 		return obj;
