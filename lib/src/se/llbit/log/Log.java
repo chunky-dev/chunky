@@ -18,6 +18,9 @@ package se.llbit.log;
 
 /**
  * Simple logging framework.
+ *
+ * <p>The default log level is "WARNING". The default log level can be changed
+ * by adding -DlogLevel=INFO to the Java command line.
  */
 public class Log {
 
@@ -32,6 +35,7 @@ public class Log {
     try {
       level = Level.valueOf(System.getProperty("logLevel", "WARNING"));
     } catch (IllegalArgumentException e) {
+      // Ignored.
     }
   }
 

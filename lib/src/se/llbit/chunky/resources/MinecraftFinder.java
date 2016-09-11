@@ -16,15 +16,6 @@
  */
 package se.llbit.chunky.resources;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
@@ -32,6 +23,14 @@ import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.log.Log;
 import se.llbit.util.OSDetector;
 import se.llbit.util.Util;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Locates the Minecraft installation.
@@ -59,20 +58,20 @@ public class MinecraftFinder {
    * @return The platform-dependent default Minecraft directory.
    */
   public static File getDefaultMinecraftDirectory() {
-    String home = System.getProperty("user.home", ".");   //$NON-NLS-1$ //$NON-NLS-2$
+    String home = System.getProperty("user.home", ".");
 
     switch (OSDetector.getOS()) {
       case WIN:
-        String appdata = System.getenv("APPDATA");  //$NON-NLS-1$
+        String appdata = System.getenv("APPDATA");
         if (appdata != null) {
-          return new File(appdata, ".minecraft");  //$NON-NLS-1$
+          return new File(appdata, ".minecraft");
         } else {
-          return new File(home, ".minecraft");  //$NON-NLS-1$
+          return new File(home, ".minecraft");
         }
       case MAC:
-        return new File(home, "Library/Application Support/minecraft");  //$NON-NLS-1$
+        return new File(home, "Library/Application Support/minecraft");
       default:
-        return new File(home, ".minecraft");  //$NON-NLS-1$
+        return new File(home, ".minecraft");
     }
   }
 
@@ -104,12 +103,12 @@ public class MinecraftFinder {
    * Minecraft installation, or <code>null</code> if the Minecraft jar
    * could not be found.
    */
-  public static final File getMinecraftJar() {
+  public static File getMinecraftJar() {
     synchronized (MinecraftFinder.class) {
       if (!foundJar) {
         minecraftJar = getMinecraftJar(getMinecraftDirectory(), true);
         if (minecraftJar == null) {
-          // Fall back on downloaded Jar if available
+          // Fall back on downloaded Jar if available.
           File resourceDir = new File(PersistentSettings.settingsDirectory(), "resources");
           if (resourceDir.isDirectory()) {
             File jar = new File(resourceDir, "minecraft.jar");
@@ -131,7 +130,7 @@ public class MinecraftFinder {
    * Minecraft installation, or throws a FileNotFoundException if it
    * could not be found.
    */
-  public static final File getMinecraftJarNonNull() throws FileNotFoundException {
+  public static File getMinecraftJarNonNull() throws FileNotFoundException {
     File jarFile = getMinecraftJar();
     if (jarFile == null) {
       throw new FileNotFoundException("Could not locate Minecraft Jar!");
@@ -146,41 +145,37 @@ public class MinecraftFinder {
    * Minecraft installation, or <code>null</code> if the Minecraft jar
    * could not be found.
    */
-  public static final File getMinecraftJar(File mcDir, boolean debug) {
+  public static File getMinecraftJar(File mcDir, boolean debug) {
     // MC 1.6.1 and above jars located in subdirectories under versions/
     File versions = new File(mcDir, "versions");
     if (versions.isDirectory()) {
-      File[] dirs = versions.listFiles(new FileFilter() {
-        @Override public boolean accept(File pathname) {
-          return pathname.isDirectory();
-        }
+      File[] dirs = versions.listFiles(pathname -> {
+        return pathname.isDirectory();
       });
-      List<MCVersion> versionDirs = new ArrayList<MCVersion>();
-      for (int i = dirs.length - 1; i >= 0; --i) {
-        File jarPath = new File(dirs[i], dirs[i].getName() + ".jar");
+      List<MCVersion> versionDirs = new ArrayList<>();
+      for (File directory : dirs) {
+        File jarPath = new File(directory, directory.getName() + ".jar");
         if (!jarPath.isFile()) {
           continue;
         }
         String releaseTime = "";
         try {
-          File jsonFile = new File(dirs[i], dirs[i].getName() + ".json");
+          File jsonFile = new File(directory, directory.getName() + ".json");
           FileInputStream in = new FileInputStream(jsonFile);
           JsonParser parser = new JsonParser(in);
           JsonObject obj = parser.parse().object();
           releaseTime = obj.get("releaseTime").stringValue("");
-        } catch (IOException e) {
-          // Json parsing failed
-        } catch (SyntaxError e) {
-          // Json parsing failed
+        } catch (IOException | SyntaxError e) {
+          // Json parsing failed.
         } finally {
           versionDirs.add(new MCVersion(jarPath, releaseTime));
         }
       }
 
-      // select latest available minecraft version
+      // Select latest available minecraft version.
       if (!versionDirs.isEmpty()) {
         MCVersion latest = versionDirs.get(0);
-        for (int i = 1; i < versionDirs.size() - 1; ++i) {
+        for (int i = 1; i < versionDirs.size(); ++i) {
           if (versionDirs.get(i).compareTo(latest) > 0) {
             latest = versionDirs.get(i);
           }
@@ -200,7 +195,7 @@ public class MinecraftFinder {
         }
       }
     }
-    // Failed to locate Minecraft Jar
+    // Failed to locate Minecraft Jar.
     return null;
   }
 
@@ -210,10 +205,7 @@ public class MinecraftFinder {
     private final Date timestamp;
 
     /**
-     * If time  not ISO 8601, the timestamp is set to {@code new Date(0)}
-     *
-     * @param jarFile
-     * @param time
+     * If time  not ISO 8601, the timestamp is set to {@code new Date(0)}.
      */
     public MCVersion(File jarFile, String time) {
       jar = jarFile;
