@@ -1501,6 +1501,8 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/bone_block_side", Texture.boneSide));
     allTextures.put("boneTop",
         new SimpleTexture("assets/minecraft/textures/blocks/bone_block_top", Texture.boneTop));
+    allTextures.put("magma",
+        new SimpleTexture("assets/minecraft/textures/blocks/magma", Texture.magma));
   }
 
   /**

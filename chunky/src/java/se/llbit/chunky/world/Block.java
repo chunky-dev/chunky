@@ -3240,11 +3240,12 @@ public class Block extends Material {
       isInvisible = UNKNOWN_INVISIBLE;
     }
   };
-  public static final Block UNKNOWN0xD5 = new Block(0xD5, "Unknown Block 0xD5", Texture.unknown) {
+  public static final Block MAGMA = new Block(0xD5, "Magma", Texture.magma) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      isEmitter = true;
+      emittance = 0.6;  // Not as bright as lava (1.0).
     }
   };
   public static final Block UNKNOWN0xD6 = new Block(0xD6, "Unknown Block 0xD6", Texture.unknown) {
@@ -3579,7 +3580,7 @@ public class Block extends Material {
           SPRUCEFENCE, BIRCHFENCE, JUNGLEFENCE, DARKOAKFENCE, ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR,
           JUNGLEDOOR, ACACIADOOR, DARKOAKDOOR, ENDROD, CHORUSPLANT, CHORUSFLOWER, PURPURBLOCK,
           PURPURPILLAR, PURPURSTAIRS, PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, UNKNOWN0xCF,
-          GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3, UNKNOWN0xD4, UNKNOWN0xD5, UNKNOWN0xD6,
+          GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3, UNKNOWN0xD4, MAGMA, UNKNOWN0xD6,
           UNKNOWN0xD7, BONE, UNKNOWN0xD9, UNKNOWN0xDA, UNKNOWN0xDB, UNKNOWN0xDC, UNKNOWN0xDD,
           UNKNOWN0xDE, UNKNOWN0xDF, UNKNOWN0xE0, UNKNOWN0xE1, UNKNOWN0xE2, UNKNOWN0xE3, UNKNOWN0xE4,
           UNKNOWN0xE5, UNKNOWN0xE6, UNKNOWN0xE7, UNKNOWN0xE8, UNKNOWN0xE9, UNKNOWN0xEA, UNKNOWN0xEB,

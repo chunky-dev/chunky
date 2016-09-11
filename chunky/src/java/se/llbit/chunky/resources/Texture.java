@@ -443,9 +443,10 @@ public class Texture {
   public static final EntityTexture skeleton = new EntityTexture();
   public static final EntityTexture wither = new EntityTexture();
 
-  // [1.10] Bone.
+  // [1.10] Bone, magma, nether wart block, red nether brick.
   public static final Texture boneSide = new Texture();
   public static final Texture boneTop = new Texture();
+  public static final Texture magma = new Texture();
 
   /**
    * Missing or unknown texture.

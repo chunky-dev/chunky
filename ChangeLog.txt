@@ -1,6 +1,10 @@
 1.4.0 - TBD
 
-* Added Bone blocks rendering.
+* Added rendering for Minecraft 1.10 blocks:
+    * Bone Block
+    * Magma Block
+block rendering: Bone block rendering.
+* Added Magma block rendering.
 * Chunky now requires Java 8 to run.
 * Modernized the Chunky User Interface by rewriting it in JavaFX.
 * Most of the UI remains similar to the old version, but some parts
