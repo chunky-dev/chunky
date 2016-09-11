@@ -532,7 +532,7 @@ public class ChunkMap extends Map2D {
     int ox = (int) (cv.scale * (ray.o.x / 16 - cv.x0));
     int oy = (int) (cv.scale * (ray.o.z / 16 - cv.z0));
 
-    // Draw the camera facing direction indicator..
+    // Draw the camera facing direction indicator.
     camera.calcViewRay(ray, 0, 0);
     Vector3 o = new Vector3(ray.o);
     o.x /= 16;

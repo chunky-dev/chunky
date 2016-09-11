@@ -112,31 +112,30 @@ public class SkyTab extends VBox implements RenderControlTab, Initializable {
     skyMode.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
           scene.sky().setSkyMode(newValue);
-          skyModeSettings.getChildren().clear();
           switch (newValue) {
             case SIMULATED:
-              skyModeSettings.getChildren().add(simulatedSettings);
+              skyModeSettings.getChildren().setAll(simulatedSettings);
               break;
             case GRADIENT:
-              skyModeSettings.getChildren().add(gradientEditor);
+              skyModeSettings.getChildren().setAll(gradientEditor);
               break;
             case BLACK:
               skyModeSettings.getChildren()
-                  .add(new Label(String.format("Selected mode has no settings.")));
+                  .setAll(new Label(String.format("Selected mode has no settings.")));
               break;
             case SKYBOX:
-              skyModeSettings.getChildren().add(skyboxSettings);
+              skyModeSettings.getChildren().setAll(skyboxSettings);
               break;
             case SKYMAP_PANORAMIC:
-              skyModeSettings.getChildren().add(skymapSettings);
+              skyModeSettings.getChildren().setAll(skymapSettings);
               skymapSettings.setPanoramic(true);
               break;
             case SKYMAP_SPHERICAL:
-              skyModeSettings.getChildren().add(skymapSettings);
+              skyModeSettings.getChildren().setAll(skymapSettings);
               skymapSettings.setPanoramic(false);
               break;
             default:
-              skyModeSettings.getChildren().add(new Label("" + newValue));
+              skyModeSettings.getChildren().setAll(new Label("" + newValue));
               break;
           }
         });

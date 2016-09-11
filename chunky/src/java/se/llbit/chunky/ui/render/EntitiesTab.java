@@ -114,6 +114,7 @@ public class EntitiesTab extends VBox implements RenderControlTab, Initializable
   }
 
   public void setRenderController(RenderController controller) {
+    scene = controller.getSceneManager().getScene();
   }
 
   @Override public void update(Scene scene) {
