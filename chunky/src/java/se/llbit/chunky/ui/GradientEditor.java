@@ -200,8 +200,8 @@ public class GradientEditor extends VBox implements Initializable {
       if (newGradient != null) {
         setGradientNoUpdate(newGradient);
       }
-    } catch (IOException e1) {
-    } catch (JsonParser.SyntaxError e2) {
+    } catch (IOException | JsonParser.SyntaxError ignored) {
+      // Ignored.
     }
   }
 
@@ -380,9 +380,7 @@ public class GradientEditor extends VBox implements Initializable {
     }
     // Copy top row to the rest of the image.
     for (int j = 1; j < height; ++j) {
-      for (int i = 0; i < width; ++i) {
-        pixels[j * width + i] = pixels[i];
-      }
+      System.arraycopy(pixels, 0, pixels, j * width, width);
     }
     WritableImage image = new WritableImage(width, height);
     image.getPixelWriter().setPixels(0, 0, width, height, PIXEL_FORMAT, pixels, 0, width);
