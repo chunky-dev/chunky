@@ -20,39 +20,38 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
-@SuppressWarnings("javadoc")
 public class EndPortalFrameModel {
-	private static AABB frame = new AABB(0, 1, 0, .75, 0, 1);
-	private static AABB eyeOfTheEnder = new AABB(.25, .75, .75, 1, .25, .75);
+  private static AABB frame = new AABB(0, 1, 0, .75, 0, 1);
+  private static AABB eyeOfTheEnder = new AABB(.25, .75, .75, 1, .25, .75);
 
-	public static boolean intersect(Ray ray) {
-		boolean hit = false;
-		ray.t = Double.POSITIVE_INFINITY;
-		if (frame.intersect(ray)) {
-			if (ray.n.y > 0) {
-				Texture.endPortalFrameTop.getColor(ray);
-			} else if (ray.n.y < 0) {
-				Texture.endStone.getColor(ray);
-			} else {
-				Texture.endPortalFrameSide.getColor(ray);
-			}
-			ray.t = ray.tNext;
-			hit = true;
-		}
-		if ((ray.getBlockData() & 4) != 0 && eyeOfTheEnder.intersect(ray)) {
-			if (ray.n.y > 0) {
-				Texture.eyeOfTheEnder.getColor(ray);
-			} else {
-				Texture.eyeOfTheEnder.getColor(ray);
-			}
-			ray.t = ray.tNext;
-			hit = true;
-		}
-		if (hit) {
-			ray.color.w = 1;
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+  public static boolean intersect(Ray ray) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    if (frame.intersect(ray)) {
+      if (ray.n.y > 0) {
+        Texture.endPortalFrameTop.getColor(ray);
+      } else if (ray.n.y < 0) {
+        Texture.endStone.getColor(ray);
+      } else {
+        Texture.endPortalFrameSide.getColor(ray);
+      }
+      ray.t = ray.tNext;
+      hit = true;
+    }
+    if ((ray.getBlockData() & 4) != 0 && eyeOfTheEnder.intersect(ray)) {
+      if (ray.n.y > 0) {
+        Texture.eyeOfTheEnder.getColor(ray);
+      } else {
+        Texture.eyeOfTheEnder.getColor(ray);
+      }
+      ray.t = ray.tNext;
+      hit = true;
+    }
+    if (hit) {
+      ray.color.w = 1;
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # coding=utf-8
 # Copyright (c) 2013-2015 Jesper Öqvist <jesper@llbit.se>
 #
@@ -283,7 +284,7 @@ def build_snapshot(version):
 		if call(['git', 'tag', '-a', version.full, '-m', 'Snapshot build']) is not 0:
 			print("Error: git tag failed!")
 			sys.exit(1)
-		if call(cmd(['gradle', '--rerun-tasks', 'releaseJar'])) is not 0:
+		if call(cmd(['gradle', '--rerun-tasks', '-PnewVersion=' + version.full, 'releaseJar'])) is not 0:
 			print("Error: release build failed!")
 			sys.exit(1)
 	if raw_input('Publish snapshot to FTP? [y/N] ') == "y":
@@ -542,19 +543,19 @@ def publish_launchpad(version):
 
 "output markdown"
 def write_release_notes(version, exe_url, dmg_url, zip_url):
-	text = '''###Downloads
+	text = '''## Downloads
 
 * [Windows installer](%s)
 * [Mac bundle](%s)
 * [Cross-platform binaries](%s)
 * [Only launcher (win, mac, linux)](http://chunkyupdate.llbit.se/ChunkyLauncher.jar)
 
-###Release Notes
+## Release Notes
 
 ''' % (exe_url, dmg_url, zip_url)
 	text += version.release_notes + '''
 
-###ChangeLog
+## ChangeLog
 
 '''
 	text += version.changelog
@@ -585,20 +586,20 @@ def post_release_thread(version):
 def post_snapshot_thread(version):
 	r = reddit_login()
 	post = r.submit('chunky', 'Chunky Snapshot %s' % version.full,
-		text='''###Snapshot %s
+		text='''## Snapshot %s
 
 A new snapshot for Chunky is now available. The snapshot is mostly untested,
 so please make sure to backup your scenes before using it.
 
 [The snapshot can be downloaded using the launcher.](http://chunky.llbit.se/snapshot.html)
 
-###Notes
+## Notes
 
 *These are preliminary release notes for upcoming features (which may not be fully functional).*
 
 %s
 
-###ChangeLog
+## ChangeLog
 
 ''' % (version.full, version.release_notes) + version.changelog)
 	post.set_flair('announcement', 'announcement')

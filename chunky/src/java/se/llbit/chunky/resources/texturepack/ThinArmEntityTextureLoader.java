@@ -16,122 +16,119 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.awt.image.BufferedImage;
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.EntityTexture;
+import se.llbit.resources.ImageLoader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
 
-import javax.imageio.ImageIO;
-
-import se.llbit.chunky.resources.EntityTexture;
-
 /**
  * Helper to load entity textures, i.e. creeper, zombie, skeleton etc. textures.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ThinArmEntityTextureLoader extends TextureRef {
-	private final String file;
-	private final EntityTexture texture;
+  private final String file;
+  private final EntityTexture texture;
 
-	public ThinArmEntityTextureLoader(String file, EntityTexture texture) {
-		this.file = file;
-		this.texture = texture;
-	}
+  public ThinArmEntityTextureLoader(String file, EntityTexture texture) {
+    this.file = file;
+    this.texture = texture;
+  }
 
-	@Override
-	protected boolean load(InputStream imageStream) throws IOException,
-			TextureFormatError {
+  @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
 
-		BufferedImage image = ImageIO.read(imageStream);
+    BitmapImage image = ImageLoader.read(imageStream);
 
-		if (image.getWidth() != image.getHeight() && image.getWidth() != 2 * image.getHeight()) {
-			throw new TextureFormatError("Entity texture should be 64x64 or 64x32 pixels, "
-					+ "or a multiple of those dimensions.");
-		}
+    if (image.width != image.height && image.width != 2 * image.height) {
+      throw new TextureFormatError("Entity texture should be 64x64 or 64x32 pixels, "
+          + "or a multiple of those dimensions.");
+    }
 
-		texture.setTexture(image);
+    texture.setTexture(image);
 
-		boolean extended = image.getHeight() == image.getWidth();
-		double height = extended ? 64 : 32;
+    boolean extended = image.height == image.width;
+    double height = extended ? 64 : 32;
 
-		texture.headFront.set(8/64., 16/64., (height - 16)/height, (height - 8)/height);
-		texture.headBack.set(24/64., 32/64., (height - 16)/height, (height - 8)/height);
-		texture.headTop.set(8/64., 16/64., (height - 8)/height, 1);
-		texture.headBottom.set(16/64., 24/64., (height - 8)/height, 1);
-		texture.headRight.set(0, 8/64., (height - 16)/height, (height - 8)/height);
-		texture.headLeft.set(16/64., 24/64., (height - 16)/height, (height - 8)/height);
+    texture.headFront.set(8 / 64., 16 / 64., (height - 16) / height, (height - 8) / height);
+    texture.headBack.set(24 / 64., 32 / 64., (height - 16) / height, (height - 8) / height);
+    texture.headTop.set(8 / 64., 16 / 64., (height - 8) / height, 1);
+    texture.headBottom.set(16 / 64., 24 / 64., (height - 8) / height, 1);
+    texture.headRight.set(0, 8 / 64., (height - 16) / height, (height - 8) / height);
+    texture.headLeft.set(16 / 64., 24 / 64., (height - 16) / height, (height - 8) / height);
 
-		texture.hatFront.set(32/64., 40/64., (height - 16)/height, (height - 8)/height);
-		texture.hatBack.set(40/64., 48/64., (height - 16)/height, (height - 8)/height);
-		texture.hatTop.set(48/64., 56/64., (height - 8)/height, 1);
-		texture.hatBottom.set(56/64., 1, (height - 8)/height, 1);
-		texture.hatRight.set(40/64., 48/64., (height - 16)/height, (height - 8)/height);
-		texture.hatLeft.set(48/64., 56/64., (height - 16)/height, (height - 8)/height);
+    texture.hatFront.set(32 / 64., 40 / 64., (height - 16) / height, (height - 8) / height);
+    texture.hatBack.set(40 / 64., 48 / 64., (height - 16) / height, (height - 8) / height);
+    texture.hatTop.set(48 / 64., 56 / 64., (height - 8) / height, 1);
+    texture.hatBottom.set(56 / 64., 1, (height - 8) / height, 1);
+    texture.hatRight.set(40 / 64., 48 / 64., (height - 16) / height, (height - 8) / height);
+    texture.hatLeft.set(48 / 64., 56 / 64., (height - 16) / height, (height - 8) / height);
 
-		texture.chestRight.set(16/64., 20/64., (height - 32)/height, (height - 20)/height);
-		texture.chestFront.set(20/64., 28/64., (height - 32)/height, (height - 20)/height);
-		texture.chestLeft.set(28/64., 32/64., (height - 32)/height, (height - 20)/height);
-		texture.chestBack.set(32/64., 40/64., (height - 32)/height, (height - 20)/height);
-		texture.chestTop.set(20/64., 28/64., (height - 20)/height, (height - 16)/height);
-		texture.chestBottom.set(28/64., 36/64., (height - 20)/height, (height - 16)/height);
+    texture.chestRight.set(16 / 64., 20 / 64., (height - 32) / height, (height - 20) / height);
+    texture.chestFront.set(20 / 64., 28 / 64., (height - 32) / height, (height - 20) / height);
+    texture.chestLeft.set(28 / 64., 32 / 64., (height - 32) / height, (height - 20) / height);
+    texture.chestBack.set(32 / 64., 40 / 64., (height - 32) / height, (height - 20) / height);
+    texture.chestTop.set(20 / 64., 28 / 64., (height - 20) / height, (height - 16) / height);
+    texture.chestBottom.set(28 / 64., 36 / 64., (height - 20) / height, (height - 16) / height);
 
-		texture.rightLegRight.set(0/64., 4/64., (height - 32)/height, (height - 20)/height);
-		texture.rightLegFront.set(4/64., 8/64., (height - 32)/height, (height - 20)/height);
-		texture.rightLegLeft.set(8/64., 12/64., (height - 32)/height, (height - 20)/height);
-		texture.rightLegBack.set(12/64., 16/64., (height - 32)/height, (height - 20)/height);
-		texture.rightLegTop.set(4/64., 8/64., (height - 20)/height, (height - 16)/height);
-		texture.rightLegBottom.set(8/64., 12/64., (height - 20)/height, (height - 16)/height);
+    texture.rightLegRight.set(0 / 64., 4 / 64., (height - 32) / height, (height - 20) / height);
+    texture.rightLegFront.set(4 / 64., 8 / 64., (height - 32) / height, (height - 20) / height);
+    texture.rightLegLeft.set(8 / 64., 12 / 64., (height - 32) / height, (height - 20) / height);
+    texture.rightLegBack.set(12 / 64., 16 / 64., (height - 32) / height, (height - 20) / height);
+    texture.rightLegTop.set(4 / 64., 8 / 64., (height - 20) / height, (height - 16) / height);
+    texture.rightLegBottom.set(8 / 64., 12 / 64., (height - 20) / height, (height - 16) / height);
 
-		texture.rightArmRight.set(40/64., 44/64., (height - 32)/height, (height - 20)/height);
-		texture.rightArmFront.set(44/64., 47/64., (height - 32)/height, (height - 20)/height);
-		texture.rightArmLeft.set(47/64., 50/64., (height - 32)/height, (height - 20)/height);
-		texture.rightArmBack.set(50/64., 54/64., (height - 32)/height, (height - 20)/height);
-		texture.rightArmTop.set(44/64., 47/64., (height - 20)/height, (height - 16)/height);
-		texture.rightArmBottom.set(47/64., 50/64., (height - 20)/height, (height - 16)/height);
+    texture.rightArmRight.set(40 / 64., 44 / 64., (height - 32) / height, (height - 20) / height);
+    texture.rightArmFront.set(44 / 64., 47 / 64., (height - 32) / height, (height - 20) / height);
+    texture.rightArmLeft.set(47 / 64., 50 / 64., (height - 32) / height, (height - 20) / height);
+    texture.rightArmBack.set(50 / 64., 54 / 64., (height - 32) / height, (height - 20) / height);
+    texture.rightArmTop.set(44 / 64., 47 / 64., (height - 20) / height, (height - 16) / height);
+    texture.rightArmBottom.set(47 / 64., 50 / 64., (height - 20) / height, (height - 16) / height);
 
-		if (extended) {
-			texture.leftLegRight.set(16/64., 20/64., (height - 64)/height, (height - 52)/height);
-			texture.leftLegFront.set(20/64., 24/64., (height - 64)/height, (height - 52)/height);
-			texture.leftLegLeft.set(24/64., 28/64., (height - 64)/height, (height - 52)/height);
-			texture.leftLegBack.set(28/64., 32/64., (height - 64)/height, (height - 52)/height);
-			texture.leftLegTop.set(20/64., 24/64., (height - 52)/height, (height - 48)/height);
-			texture.leftLegBottom.set(24/64., 28/64., (height - 52)/height, (height - 48)/height);
+    if (extended) {
+      texture.leftLegRight.set(16 / 64., 20 / 64., (height - 64) / height, (height - 52) / height);
+      texture.leftLegFront.set(20 / 64., 24 / 64., (height - 64) / height, (height - 52) / height);
+      texture.leftLegLeft.set(24 / 64., 28 / 64., (height - 64) / height, (height - 52) / height);
+      texture.leftLegBack.set(28 / 64., 32 / 64., (height - 64) / height, (height - 52) / height);
+      texture.leftLegTop.set(20 / 64., 24 / 64., (height - 52) / height, (height - 48) / height);
+      texture.leftLegBottom.set(24 / 64., 28 / 64., (height - 52) / height, (height - 48) / height);
 
-			texture.leftArmRight.set(32/64., 36/64., (height - 64)/height, (height - 52)/height);
-			texture.leftArmFront.set(36/64., 39/64., (height - 64)/height, (height - 52)/height);
-			texture.leftArmLeft.set(39/64., 42/64., (height - 64)/height, (height - 52)/height);
-			texture.leftArmBack.set(42/64., 46/64., (height - 64)/height, (height - 52)/height);
-			texture.leftArmTop.set(36/64., 39/64., (height - 52)/height, (height - 48)/height);
-			texture.leftArmBottom.set(39/64., 42/64., (height - 52)/height, (height - 48)/height);
-		} else {
-			texture.leftLegRight.set(texture.rightLegLeft);
-			texture.leftLegRight.x = texture.rightLegLeft.y;
-			texture.leftLegRight.y = texture.rightLegLeft.x;
-			texture.leftLegFront.set(texture.rightLegFront);
-			texture.leftLegFront.x = texture.rightLegFront.y;
-			texture.leftLegFront.y = texture.rightLegFront.x;
-			texture.leftLegLeft.set(texture.rightLegRight);
-			texture.leftLegLeft.x = texture.rightLegRight.y;
-			texture.leftLegLeft.y = texture.rightLegRight.x;
-			texture.leftLegBack.set(texture.rightLegBack);
-			texture.leftLegBack.x = texture.rightLegBack.y;
-			texture.leftLegBack.y = texture.rightLegBack.x;
-			texture.leftLegTop.set(texture.rightLegTop);
-			texture.leftLegBottom.set(texture.rightLegBottom);
-			texture.leftArmRight.set(texture.rightArmRight);
-			texture.leftArmFront.set(texture.rightArmFront);
-			texture.leftArmLeft.set(texture.rightArmLeft);
-			texture.leftArmBack.set(texture.rightArmBack);
-			texture.leftArmTop.set(texture.rightArmTop);
-			texture.leftArmBottom.set(texture.rightArmBottom);
-		}
-		return true;
-	}
+      texture.leftArmRight.set(32 / 64., 36 / 64., (height - 64) / height, (height - 52) / height);
+      texture.leftArmFront.set(36 / 64., 39 / 64., (height - 64) / height, (height - 52) / height);
+      texture.leftArmLeft.set(39 / 64., 42 / 64., (height - 64) / height, (height - 52) / height);
+      texture.leftArmBack.set(42 / 64., 46 / 64., (height - 64) / height, (height - 52) / height);
+      texture.leftArmTop.set(36 / 64., 39 / 64., (height - 52) / height, (height - 48) / height);
+      texture.leftArmBottom.set(39 / 64., 42 / 64., (height - 52) / height, (height - 48) / height);
+    } else {
+      texture.leftLegRight.set(texture.rightLegLeft);
+      texture.leftLegRight.x = texture.rightLegLeft.y;
+      texture.leftLegRight.y = texture.rightLegLeft.x;
+      texture.leftLegFront.set(texture.rightLegFront);
+      texture.leftLegFront.x = texture.rightLegFront.y;
+      texture.leftLegFront.y = texture.rightLegFront.x;
+      texture.leftLegLeft.set(texture.rightLegRight);
+      texture.leftLegLeft.x = texture.rightLegRight.y;
+      texture.leftLegLeft.y = texture.rightLegRight.x;
+      texture.leftLegBack.set(texture.rightLegBack);
+      texture.leftLegBack.x = texture.rightLegBack.y;
+      texture.leftLegBack.y = texture.rightLegBack.x;
+      texture.leftLegTop.set(texture.rightLegTop);
+      texture.leftLegBottom.set(texture.rightLegBottom);
+      texture.leftArmRight.set(texture.rightArmRight);
+      texture.leftArmFront.set(texture.rightArmFront);
+      texture.leftArmLeft.set(texture.rightArmLeft);
+      texture.leftArmBack.set(texture.rightArmBack);
+      texture.leftArmTop.set(texture.rightArmTop);
+      texture.leftArmBottom.set(texture.rightArmBottom);
+    }
+    return true;
+  }
 
-	@Override
-	public boolean load(ZipFile texturePack) {
-		return load(file, texturePack);
-	}
+  @Override public boolean load(ZipFile texturePack) {
+    return load(file, texturePack);
+  }
 
 }
 

@@ -29,30 +29,23 @@ import se.llbit.chunky.world.Biomes;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class GrassColorTexture extends TextureRef {
-	private final String file;
+  private final String file;
 
-	/**
-	 * Constructor
-	 * @param file
-	 */
-	public GrassColorTexture(String file) {
-		this.file = file;
-	}
+  public GrassColorTexture(String file) {
+    this.file = file;
+  }
 
-	@Override
-	protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
-		BufferedImage grasscolor = ImageIO.read(imageStream);
-		if (grasscolor.getWidth() != 256 || grasscolor.getHeight() != 256) {
-			throw new TextureFormatError(
-					"Grass color texture must be 256 by 256 pixels!");
-		}
-		Biomes.loadGrassColors(grasscolor);
-		return true;
-	}
+  @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
+    BufferedImage grasscolor = ImageIO.read(imageStream);
+    if (grasscolor.getWidth() != 256 || grasscolor.getHeight() != 256) {
+      throw new TextureFormatError("Grass color texture must be 256 by 256 pixels!");
+    }
+    Biomes.loadGrassColors(grasscolor);
+    return true;
+  }
 
-	@Override
-	public boolean load(ZipFile texturePack) {
-		return load(file, texturePack);
-	}
+  @Override public boolean load(ZipFile texturePack) {
+    return load(file, texturePack);
+  }
 }
 

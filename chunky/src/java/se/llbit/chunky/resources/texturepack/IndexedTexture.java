@@ -16,49 +16,43 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.awt.image.BufferedImage;
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.Texture;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
 
-import se.llbit.chunky.resources.Texture;
-
 /**
  * A texture that has an indexed position in terrain.pngggu
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class IndexedTexture extends TextureRef {
 
-	private final int index;
-	private final Texture texture;
+  private final int index;
+  private final Texture texture;
 
-	/**
-	 * Constructor
-	 * @param index Index of the texture in the terrain file
-	 * @param texture The loaded image is written to this texture
-	 * @param name The texture file name (excluding extension and directory
-	 * parts)
-	 */
-	public IndexedTexture(int index, Texture texture) {
-		this.index = index;
-		this.texture = texture;
-	}
+  /**
+   * @param index   Index of the texture in the terrain file
+   * @param texture The loaded image is written to this texture
+   */
+  public IndexedTexture(int index, Texture texture) {
+    this.index = index;
+    this.texture = texture;
+  }
 
-	@Override
-	public boolean loadFromTerrain(BufferedImage[] terrain) {
-		texture.setTexture(terrain[index]);
-		return true;
-	}
+  @Override public boolean loadFromTerrain(BitmapImage[] terrain) {
+    texture.setTexture(terrain[index]);
+    return true;
+  }
 
-	@Override
-	public boolean load(ZipFile texturePack) {
-		return false;
-	}
+  @Override public boolean load(ZipFile texturePack) {
+    return false;
+  }
 
-	@Override
-	protected boolean load(InputStream imageStream) throws IOException,
-			TextureFormatError {
-		return false;
-	}
+  @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
+    return false;
+  }
 
 }

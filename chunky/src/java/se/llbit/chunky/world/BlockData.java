@@ -16,66 +16,81 @@
  */
 package se.llbit.chunky.world;
 
-@SuppressWarnings("javadoc")
 public interface BlockData {
 
-	/** Bit offset to block metadata. */
-	int OFFSET = 8;
+  /**
+   * Bit offset to block metadata.
+   */
+  int OFFSET = 8;
 
-	int RSW_EAST_CONNECTION = 12;
-	int RSW_WEST_CONNECTION = 13;
-	int RSW_NORTH_CONNECTION = 14;
-	int RSW_SOUTH_CONNECTION = 15;
-	int RSW_EAST_SIDE = 16;
-	int RSW_WEST_SIDE = 17;
-	int RSW_NORTH_SIDE = 18;
-	int RSW_SOUTH_SIDE = 19;
-	int VINE_TOP = 12;
+  int RSW_EAST_CONNECTION = 12;
+  int RSW_WEST_CONNECTION = 13;
+  int RSW_NORTH_CONNECTION = 14;
+  int RSW_SOUTH_CONNECTION = 15;
+  int RSW_EAST_SIDE = 16;
+  int RSW_WEST_SIDE = 17;
+  int RSW_NORTH_SIDE = 18;
+  int RSW_SOUTH_SIDE = 19;
+  int VINE_TOP = 12;
 
-	int GLASS_PANE_OFFSET = 12;
+  int GLASS_PANE_OFFSET = 12;
 
-	/** The water block has a lily pad floating on it. */
-	int LILY_PAD = 13;
+  /**
+   * The water block has a lily pad floating on it.
+   */
+  int LILY_PAD = 13;
 
-	/** Rotation of the lily pad. */
-	int LILY_PAD_ROTATION = 14;
+  /**
+   * Rotation of the lily pad.
+   */
+  int LILY_PAD_ROTATION = 14;
 
-	/** Offset to bottom door metadata. */
-	int DOOR_BOTTOM = 12;
+  /**
+   * Offset to bottom door metadata.
+   */
+  int DOOR_BOTTOM = 12;
 
-	/** Offset to top door metadata. */
-	int DOOR_TOP = 16;
+  /**
+   * Offset to top door metadata.
+   */
+  int DOOR_TOP = 16;
 
-	/** Offset for stone wall data. */
-	int STONEWALL_CONN = 9;
+  /**
+   * Offset for stone wall data.
+   */
+  int STONEWALL_CONN = 9;
 
-	/**
-	 * One bit telling if the stone wall is a corner section
-	 */
-	int STONEWALL_CORNER = 14;
+  /**
+   * One bit telling if the stone wall is a corner section
+   */
+  int STONEWALL_CORNER = 14;
 
-	int CORNER_OFFSET = 24;
+  int CORNER_OFFSET = 24;
 
-	int SOUTH_EAST = 8 + 0;
-	int SOUTH_WEST = 8 + 1;
-	int NORTH_EAST = 8 + 2;
-	int NORTH_WEST = 8 + 3;
-	int INNER_SOUTH_EAST = 8 + 4;
-	int INNER_SOUTH_WEST = 8 + 5;
-	int INNER_NORTH_EAST = 8 + 6;
-	int INNER_NORTH_WEST = 8 + 7;
+  int SOUTH_EAST = 8 + 0;
+  int SOUTH_WEST = 8 + 1;
+  int NORTH_EAST = 8 + 2;
+  int NORTH_WEST = 8 + 3;
+  int INNER_SOUTH_EAST = 8 + 4;
+  int INNER_SOUTH_WEST = 8 + 5;
+  int INNER_NORTH_EAST = 8 + 6;
+  int INNER_NORTH_WEST = 8 + 7;
 
-	/** Fence gate is three pixels lower. */
-	int FENCEGATE_LOW = 20;
+  /**
+   * Fence gate is three pixels lower.
+   */
+  int FENCEGATE_LOW = 20;
 
-	/** The upside down stair bit. */
-	int UPSIDE_DOWN_STAIR = 1 << 10;
+  /**
+   * The upside down stair bit.
+   */
+  int UPSIDE_DOWN_STAIR = 1 << 10;
 
-	// Directional connection bits.
-	int CONNECTED_NORTH = 1;
-	int CONNECTED_SOUTH = 2;
-	int CONNECTED_EAST = 4;
-	int CONNECTED_WEST = 8;
-	int CONNECTED_ABOVE = 16;
-	int CONNECTED_BELOW = 32;
+  // Directional connection bits.
+  int CONNECTED_NORTH = 1;
+  int CONNECTED_SOUTH = 2;
+  int CONNECTED_EAST = 4;
+  int CONNECTED_WEST = 8;
+  int CONNECTED_ABOVE = 16;
+  int CONNECTED_BELOW = 32;
 }

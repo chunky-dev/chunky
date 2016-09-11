@@ -18,35 +18,34 @@ package se.llbit.chunky.renderer;
 
 public interface RenderConstants {
 
-	/**
-	 * Samples per pixel per pass.
-	 */
-	int SPP_PER_PASS = 1;
+  /**
+   * Samples per pixel per pass.
+   */
+  int SPP_PER_PASS = 1;
 
-	/**
-	 * Default number of worker threads.
-	 * Is set to the number of available CPU cores.
-	 */
-	int NUM_RENDER_THREADS_DEFAULT =
-			Runtime.getRuntime().availableProcessors();
+  /**
+   * Default number of worker threads.
+   * Is set to the number of available CPU cores.
+   */
+  int NUM_RENDER_THREADS_DEFAULT = Runtime.getRuntime().availableProcessors();
 
-	/**
-	 * Default CPU load
-	 */
-	int CPU_LOAD_DEFAULT = 100;
+  /**
+   * Default CPU load
+   */
+  int CPU_LOAD_DEFAULT = 100;
 
-	/**
-	 * Minimum number of worker threads
-	 */
-	int NUM_RENDER_THREADS_MIN = 1;
+  /**
+   * Minimum number of worker threads
+   */
+  int NUM_RENDER_THREADS_MIN = 1;
 
-	/**
-	 * Maximum number of worker threads
-	 */
-	int NUM_RENDER_THREADS_MAX = 10000;
+  /**
+   * Maximum number of worker threads
+   */
+  int NUM_RENDER_THREADS_MAX = 10000;
 
-	/**
-	 * Default tile width
-	 */
-	int TILE_WIDTH_DEFAULT = 8;
+  /**
+   * Default tile width
+   */
+  int TILE_WIDTH_DEFAULT = 8;
 }

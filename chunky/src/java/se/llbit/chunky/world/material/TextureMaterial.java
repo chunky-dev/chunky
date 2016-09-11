@@ -21,8 +21,8 @@ import se.llbit.chunky.world.Material;
 
 public class TextureMaterial extends Material {
 
-	public TextureMaterial(Texture texture) {
-		super("texture", texture);
-	}
+  public TextureMaterial(Texture texture) {
+    super("texture", texture);
+  }
 
 }

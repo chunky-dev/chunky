@@ -21,51 +21,46 @@ import java.util.Random;
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.math.QuickMath;
-import se.llbit.math.Vector3d;
+import se.llbit.math.Vector3;
 
 public class FisheyeProjector implements Projector {
-	protected final double fov;
+  protected final double fov;
 
-	public FisheyeProjector(double fov) {
-		this.fov = fov;
-	}
+  public FisheyeProjector(double fov) {
+    this.fov = fov;
+  }
 
-	@Override
-	public void apply(double x, double y, Random random, Vector3d o, Vector3d d) {
-		apply(x, y, o, d);
-	}
+  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
+    apply(x, y, o, d);
+  }
 
-	@Override
-	public void apply(double x, double y, Vector3d o, Vector3d d) {
-		double ay = QuickMath.degToRad(y * fov);
-		double ax = QuickMath.degToRad(x * fov);
-		double avSquared = ay * ay + ax * ax;
-		double angleFromCenter = FastMath.sqrt(avSquared);
-		double dz = FastMath.cos(angleFromCenter);
-		double dv = FastMath.sin(angleFromCenter);
-		double dy, dx;
-		if (angleFromCenter == 0) {
-			dx = dy = 0;
-		} else {
-			dx = dv * (ax / angleFromCenter);
-			dy = dv * (ay / angleFromCenter);
-		}
-		o.set(0, 0, 0);
-		d.set(dx, dy, dz);
-	}
+  @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
+    double ay = QuickMath.degToRad(y * fov);
+    double ax = QuickMath.degToRad(x * fov);
+    double avSquared = ay * ay + ax * ax;
+    double angleFromCenter = FastMath.sqrt(avSquared);
+    double dz = FastMath.cos(angleFromCenter);
+    double dv = FastMath.sin(angleFromCenter);
+    double dy, dx;
+    if (angleFromCenter == 0) {
+      dx = dy = 0;
+    } else {
+      dx = dv * (ax / angleFromCenter);
+      dy = dv * (ay / angleFromCenter);
+    }
+    o.set(0, 0, 0);
+    d.set(dx, dy, dz);
+  }
 
-	@Override
-	public double getMinRecommendedFoV() {
-		return 1;
-	}
+  @Override public double getMinRecommendedFoV() {
+    return 1;
+  }
 
-	@Override
-	public double getMaxRecommendedFoV() {
-		return 180;
-	}
+  @Override public double getMaxRecommendedFoV() {
+    return 180;
+  }
 
-	@Override
-	public double getDefaultFoV() {
-		return 120;
-	}
+  @Override public double getDefaultFoV() {
+    return 120;
+  }
 }

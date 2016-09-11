@@ -35,239 +35,264 @@ import se.llbit.io.LookaheadReader;
 
 /**
  * Parses JSON
+ *
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
 public class JsonParser {
 
-	/**
-	 * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
-	 */
-	@SuppressWarnings("serial")
-	public static class SyntaxError extends Exception {
-		/**
-		 * @param message
-		 */
-		public SyntaxError(String message) {
-			super("Syntax Error: " + message);
-		}
-	}
+  /**
+   * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
+   */
+  public static class SyntaxError extends Exception {
+    public SyntaxError(String message) {
+      super("Syntax Error: " + message);
+    }
+  }
 
-	private final LookaheadReader in;
 
-	/**
-	 * Parse the JSON object from the given input.
-	 *
-	 * <p>The input stream is not closed after being used.
-	 * @param input
-	 */
-	public JsonParser(InputStream input) {
-		in = new LookaheadReader(input, 8);
-	}
+  private final LookaheadReader in;
 
-	/**
-	 * Parses a JSON object or array.
-	 * @return JsonObject or JsonArray, not null
-	 * @throws IOException
-	 * @throws SyntaxError
-	 */
-	public JsonValue parse() throws IOException, SyntaxError {
-		JsonValue value;
-		skipWhitespace();
-		switch(in.peek()) {
-			case BEGIN_OBJECT:
-				value = parseObject();
-				break;
-			case BEGIN_ARRAY:
-				value = parseArray();
-				break;
-			default:
-				throw new SyntaxError("expected object or array");
-		}
-		skipWhitespace();
-		if (in.peek() != -1) {
-			throw new SyntaxError("garbage at end of input");
-		}
-		// attach value to tree
-		JsonRoot root = new JsonRoot(value);
-		return root.getValue();
-	}
+  /**
+   * Parse the JSON object from the given input.
+   *
+   * <p>The input stream is not closed after being used.
+   */
+  public JsonParser(InputStream input) {
+    in = new LookaheadReader(input, 8);
+  }
 
-	private JsonArray parseArray() throws IOException, SyntaxError {
-		accept(BEGIN_ARRAY);
-		JsonArray array = new JsonArray();
-		do {
-			skipWhitespace();
-			JsonValue value = parseValue();
-			if (value == null) {
-				if (array.hasElement() || in.peek() == VALUE_SEPARATOR)
-					throw new SyntaxError("missing element in array");
-				break;
-			}
-			array.addElement(value);
-			skipWhitespace();
-		} while (skip(VALUE_SEPARATOR));
-		accept(END_ARRAY);
-		return array;
-	}
+  /**
+   * Parses a JSON object or array.
+   *
+   * @return JsonObject or JsonArray, not null
+   * @throws IOException
+   * @throws SyntaxError
+   */
+  public JsonValue parse() throws IOException, SyntaxError {
+    JsonValue value;
+    skipWhitespace();
+    switch (in.peek()) {
+      case BEGIN_OBJECT:
+        value = parseObject();
+        break;
+      case BEGIN_ARRAY:
+        value = parseArray();
+        break;
+      default:
+        throw new SyntaxError("expected object or array");
+    }
+    skipWhitespace();
+    if (in.peek() != -1) {
+      throw new SyntaxError("garbage at end of input");
+    }
+    // attach value to tree
+    JsonRoot root = new JsonRoot(value);
+    return root.getValue();
+  }
 
-	private JsonValue parseValue() throws IOException, SyntaxError {
-		switch (in.peek()) {
-			case BEGIN_OBJECT:
-				return parseObject();
-			case BEGIN_ARRAY:
-				return parseArray();
-			case '0': case '1': case '2': case '3': case '4': case '5':
-			case '6': case '7': case '8': case '9': case '-': case '+':
-				return parseNumber();
-			case QUOTE_MARK:
-				return parseString();
-			case 't':
-				acceptLiteral(TRUE);
-				return new JsonTrue();
-			case 'f':
-				acceptLiteral(FALSE);
-				return new JsonFalse();
-			case 'n':
-				acceptLiteral(NULL);
-				return new JsonNull();
-			default:
-				// TODO use Null Object pattern
-				return null; // not a JSON value
-		}
-	}
+  private JsonArray parseArray() throws IOException, SyntaxError {
+    accept(BEGIN_ARRAY);
+    JsonArray array = new JsonArray();
+    do {
+      skipWhitespace();
+      JsonValue value = parseValue();
+      if (value == null) {
+        if (array.hasElement() || in.peek() == VALUE_SEPARATOR)
+          throw new SyntaxError("missing element in array");
+        break;
+      }
+      array.addElement(value);
+      skipWhitespace();
+    } while (skip(VALUE_SEPARATOR));
+    accept(END_ARRAY);
+    return array;
+  }
 
-	private JsonString parseString() throws IOException, SyntaxError {
-		accept(QUOTE_MARK);
-		StringBuilder sb = new StringBuilder();
-		while (true) {
-			int next = in.pop();
-			if (next == -1) {
-				throw new SyntaxError("EOF while parsing JSON string");
-			} else if (next == ESCAPE) {
-				sb.append(unescapeStringChar());
-			} else if (next == QUOTE_MARK) {
-				break;
-			} else {
-				sb.append((char) next);
-			}
-		}
-		return new JsonString(sb.toString());
-	}
+  private JsonValue parseValue() throws IOException, SyntaxError {
+    switch (in.peek()) {
+      case BEGIN_OBJECT:
+        return parseObject();
+      case BEGIN_ARRAY:
+        return parseArray();
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      case '-':
+      case '+':
+        return parseNumber();
+      case QUOTE_MARK:
+        return parseString();
+      case 't':
+        acceptLiteral(TRUE);
+        return new JsonTrue();
+      case 'f':
+        acceptLiteral(FALSE);
+        return new JsonFalse();
+      case 'n':
+        acceptLiteral(NULL);
+        return new JsonNull();
+      default:
+        // TODO use Null Object pattern
+        return null; // not a JSON value
+    }
+  }
 
-	private char unescapeStringChar() throws IOException, SyntaxError {
-		int next = in.pop();
-		switch (next) {
-		case QUOTE_MARK:
-		case ESCAPE:
-		case '/':
-			return (char) next;
-		case 'b':
-			return '\b';
-		case 'f':
-			return '\f';
-		case 'n':
-			return '\n';
-		case 'r':
-			return '\r';
-		case 't':
-			return '\t';
-		case 'u':
-			int[] u = { hexdigit(), hexdigit(), hexdigit(), hexdigit() };
-			return (char) ((u[0] << 12) | (u[1] << 8) | (u[2] << 4) | u[3]);
-		case -1:
-			throw new SyntaxError("end of input while parsing JSON string");
-		default:
-			throw new SyntaxError("illegal escape sequence in JSON string");
-		}
-	}
+  private JsonString parseString() throws IOException, SyntaxError {
+    accept(QUOTE_MARK);
+    StringBuilder sb = new StringBuilder();
+    while (true) {
+      int next = in.pop();
+      if (next == -1) {
+        throw new SyntaxError("EOF while parsing JSON string");
+      } else if (next == ESCAPE) {
+        sb.append(unescapeStringChar());
+      } else if (next == QUOTE_MARK) {
+        break;
+      } else {
+        sb.append((char) next);
+      }
+    }
+    return new JsonString(sb.toString());
+  }
 
-	private int hexdigit() throws IOException, SyntaxError {
-		int next = in.pop();
-		int v1 = next - '0';
-		int v2 = next - 'A' + 0xA;
-		int v3 = next - 'a' + 0xA;
-		if (v1 >= 0 && v1 <= 9) return v1;
-		if (v2 >= 0xA && v2 <= 0xF) return v2;
-		if (v3 >= 0xA && v3 <= 0xF) return v3;
-		throw new SyntaxError("non-hexadecimal digit in unicode escape sequence");
-	}
+  private char unescapeStringChar() throws IOException, SyntaxError {
+    int next = in.pop();
+    switch (next) {
+      case QUOTE_MARK:
+      case ESCAPE:
+      case '/':
+        return (char) next;
+      case 'b':
+        return '\b';
+      case 'f':
+        return '\f';
+      case 'n':
+        return '\n';
+      case 'r':
+        return '\r';
+      case 't':
+        return '\t';
+      case 'u':
+        int[] u = {hexdigit(), hexdigit(), hexdigit(), hexdigit()};
+        return (char) ((u[0] << 12) | (u[1] << 8) | (u[2] << 4) | u[3]);
+      case -1:
+        throw new SyntaxError("end of input while parsing JSON string");
+      default:
+        throw new SyntaxError("illegal escape sequence in JSON string");
+    }
+  }
 
-	private JsonValue parseNumber() throws IOException, SyntaxError {
-		StringBuilder sb = new StringBuilder();
-		while (true) {
-			switch (in.peek()) {
-				case -1:
-					throw new SyntaxError("EOF while parsing JSON number");
-				case '0': case '1': case '2': case '3': case '4': case '5':
-				case '6': case '7': case '8': case '9': case '-': case '+':
-				case '.': case 'e': case 'E':
-					sb.append((char) in.pop());
-					break;
-				default:
-					return new JsonNumber(sb.toString());
-			}
-		}
-	}
+  private int hexdigit() throws IOException, SyntaxError {
+    int next = in.pop();
+    int v1 = next - '0';
+    int v2 = next - 'A' + 0xA;
+    int v3 = next - 'a' + 0xA;
+    if (v1 >= 0 && v1 <= 9)
+      return v1;
+    if (v2 >= 0xA && v2 <= 0xF)
+      return v2;
+    if (v3 >= 0xA && v3 <= 0xF)
+      return v3;
+    throw new SyntaxError("non-hexadecimal digit in unicode escape sequence");
+  }
 
-	private void skipWhitespace() throws IOException {
-		while (isWhitespace(in.peek())) in.pop();
-	}
+  private JsonValue parseNumber() throws IOException, SyntaxError {
+    StringBuilder sb = new StringBuilder();
+    while (true) {
+      switch (in.peek()) {
+        case -1:
+          throw new SyntaxError("EOF while parsing JSON number");
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+        case '-':
+        case '+':
+        case '.':
+        case 'e':
+        case 'E':
+          sb.append((char) in.pop());
+          break;
+        default:
+          return new JsonNumber(sb.toString());
+      }
+    }
+  }
 
-	private boolean isWhitespace(int chr) {
-		return chr == 0x20 || chr == 0x09 || chr == 0x0A || chr == 0x0D;
-	}
+  private void skipWhitespace() throws IOException {
+    while (isWhitespace(in.peek()))
+      in.pop();
+  }
 
-	private void acceptLiteral(char[] literal) throws IOException, SyntaxError {
-		for (char c: literal) {
-			if (in.pop() != c)
-				throw new SyntaxError("encountered invalid JSON literal");
-		}
-	}
+  private boolean isWhitespace(int chr) {
+    return chr == 0x20 || chr == 0x09 || chr == 0x0A || chr == 0x0D;
+  }
 
-	private JsonObject parseObject() throws IOException, SyntaxError {
-		accept(BEGIN_OBJECT);
-		JsonObject object = new JsonObject();
-		do {
-			skipWhitespace();
-			JsonMember member = parseMember();
-			if (member == null) {
-				if (object.hasMember() || in.peek() == VALUE_SEPARATOR)
-					throw new SyntaxError("missing member in object");
-				break;
-			}
-			object.addMember(member);
-			skipWhitespace();
-		} while (skip(VALUE_SEPARATOR));
-		accept(END_OBJECT);
-		return object;
-	}
+  private void acceptLiteral(char[] literal) throws IOException, SyntaxError {
+    for (char c : literal) {
+      if (in.pop() != c)
+        throw new SyntaxError("encountered invalid JSON literal");
+    }
+  }
 
-	private boolean skip(char c) throws IOException, SyntaxError {
-		boolean skip = in.peek() == c;
-		if (skip) in.pop();
-		return skip;
-	}
+  private JsonObject parseObject() throws IOException, SyntaxError {
+    accept(BEGIN_OBJECT);
+    JsonObject object = new JsonObject();
+    do {
+      skipWhitespace();
+      JsonMember member = parseMember();
+      if (member == null) {
+        if (object.hasMember() || in.peek() == VALUE_SEPARATOR)
+          throw new SyntaxError("missing member in object");
+        break;
+      }
+      object.addMember(member);
+      skipWhitespace();
+    } while (skip(VALUE_SEPARATOR));
+    accept(END_OBJECT);
+    return object;
+  }
 
-	private void accept(char c) throws IOException, SyntaxError {
-		int next = in.pop();
-		if (next == -1)
-			throw new SyntaxError("unexpected end of input (expected '" + c + "')");
-		if (next != c)
-			throw new SyntaxError("unexpected character (was '" +
-				((char) next) + "', expected '" + c + "')");
-	}
+  private boolean skip(char c) throws IOException, SyntaxError {
+    boolean skip = in.peek() == c;
+    if (skip)
+      in.pop();
+    return skip;
+  }
 
-	private JsonMember parseMember() throws IOException, SyntaxError {
-		if (in.peek() == QUOTE_MARK) {
-			JsonString name = parseString();
-			skipWhitespace();
-			accept(NAME_SEPARATOR);
-			skipWhitespace();
-			JsonValue value = parseValue();
-			if (value == null)
-				throw new SyntaxError("missing value for object member");
-			return new JsonMember(name.getValue(), value);
-		}
-		return null;
-	}
+  private void accept(char c) throws IOException, SyntaxError {
+    int next = in.pop();
+    if (next == -1)
+      throw new SyntaxError("unexpected end of input (expected '" + c + "')");
+    if (next != c)
+      throw new SyntaxError("unexpected character (was '" +
+          ((char) next) + "', expected '" + c + "')");
+  }
+
+  private JsonMember parseMember() throws IOException, SyntaxError {
+    if (in.peek() == QUOTE_MARK) {
+      JsonString name = parseString();
+      skipWhitespace();
+      accept(NAME_SEPARATOR);
+      skipWhitespace();
+      JsonValue value = parseValue();
+      if (value == null)
+        throw new SyntaxError("missing value for object member");
+      return new JsonMember(name.getValue(), value);
+    }
+    return null;
+  }
 }

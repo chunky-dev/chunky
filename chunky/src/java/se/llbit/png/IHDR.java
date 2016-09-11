@@ -24,84 +24,80 @@ import java.io.IOException;
  */
 public class IHDR extends PngChunk {
 
-	/**
-	 * The PNG chunk type identifier
-	 */
-	public static final int CHUNK_TYPE = 0x49484452;
+  /**
+   * The PNG chunk type identifier
+   */
+  public static final int CHUNK_TYPE = 0x49484452;
 
-	private static final int BIT_DEPTH = 8;
-	protected static final int COLOR_TYPE_RGB = 2; // Each pixel is an RGB triple.
-	protected static final int COLOR_TYPE_RGBA = 6; // Each pixel is an RGBA quad.
-	private static final int COMPRESSION_METHOD = 0; // Deflate/inflate compression.
-	private static final int FILTER_METHOD = 0;
-	private static final int INTERLACE_METHOD = 0;
-	private int crc;
-	private final int width;
-	private final int height;
-	private final int colorType;
-	private final int bitDepth;
+  private static final int BIT_DEPTH = 8;
+  protected static final int COLOR_TYPE_RGB = 2; // Each pixel is an RGB triple.
+  protected static final int COLOR_TYPE_RGBA = 6; // Each pixel is an RGBA quad.
+  private static final int COMPRESSION_METHOD = 0; // Deflate/inflate compression.
+  private static final int FILTER_METHOD = 0;
+  private static final int INTERLACE_METHOD = 0;
+  private int crc;
+  private final int width;
+  private final int height;
+  private final int colorType;
+  private final int bitDepth;
 
-	public IHDR(int width, int height) {
-		this(width, height, COLOR_TYPE_RGB, BIT_DEPTH);
-	}
+  public IHDR(int width, int height) {
+    this(width, height, COLOR_TYPE_RGB, BIT_DEPTH);
+  }
 
-	public IHDR(int width, int height, int colorType) {
-		this(width, height, colorType, BIT_DEPTH);
-	}
+  public IHDR(int width, int height, int colorType) {
+    this(width, height, colorType, BIT_DEPTH);
+  }
 
-	public IHDR(int width, int height, int colorType, int bitDepth) {
-		this.width = width;
-		this.height = height;
-		this.colorType = colorType;
-		this.bitDepth = bitDepth;
-	}
+  public IHDR(int width, int height, int colorType, int bitDepth) {
+    this.width = width;
+    this.height = height;
+    this.colorType = colorType;
+    this.bitDepth = bitDepth;
+  }
 
-	@Override
-	public int getChunkType() {
-		return CHUNK_TYPE;
-	}
+  @Override public int getChunkType() {
+    return CHUNK_TYPE;
+  }
 
-	@Override
-	protected void writeChunkData(DataOutputStream out) throws IOException {
-		CrcOutputStream crcOutputStream = new CrcOutputStream();
-		DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
+  @Override protected void writeChunkData(DataOutputStream out) throws IOException {
+    CrcOutputStream crcOutputStream = new CrcOutputStream();
+    DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
 
-		crcOut.writeInt(CHUNK_TYPE);
+    crcOut.writeInt(CHUNK_TYPE);
 
-		crcOut.writeInt(width);
-		out.writeInt(width);
+    crcOut.writeInt(width);
+    out.writeInt(width);
 
-		crcOut.writeInt(height);
-		out.writeInt(height);
+    crcOut.writeInt(height);
+    out.writeInt(height);
 
-		crcOut.writeByte(bitDepth);
-		out.writeByte(bitDepth);
+    crcOut.writeByte(bitDepth);
+    out.writeByte(bitDepth);
 
-		crcOut.writeByte(colorType);
-		out.writeByte(colorType);
+    crcOut.writeByte(colorType);
+    out.writeByte(colorType);
 
-		crcOut.writeByte(COMPRESSION_METHOD);
-		out.writeByte(COMPRESSION_METHOD);
+    crcOut.writeByte(COMPRESSION_METHOD);
+    out.writeByte(COMPRESSION_METHOD);
 
-		crcOut.writeByte(FILTER_METHOD);
-		out.writeByte(FILTER_METHOD);
+    crcOut.writeByte(FILTER_METHOD);
+    out.writeByte(FILTER_METHOD);
 
-		crcOut.writeByte(INTERLACE_METHOD);
-		out.writeByte(INTERLACE_METHOD);
+    crcOut.writeByte(INTERLACE_METHOD);
+    out.writeByte(INTERLACE_METHOD);
 
-		crc = crcOutputStream.getCRC();
-		crcOut.close();
-	}
+    crc = crcOutputStream.getCRC();
+    crcOut.close();
+  }
 
-	@Override
-	public int getChunkLength() {
-		return 13;
-	}
+  @Override public int getChunkLength() {
+    return 13;
+  }
 
-	@Override
-	public int getChunkCRC() {
-		return crc;
-	}
+  @Override public int getChunkCRC() {
+    return crc;
+  }
 
 
 }

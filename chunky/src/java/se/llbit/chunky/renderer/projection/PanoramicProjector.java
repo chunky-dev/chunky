@@ -21,48 +21,42 @@ import java.util.Random;
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.math.QuickMath;
-import se.llbit.math.Vector3d;
+import se.llbit.math.Vector3;
 
 /**
  * Panoramic equirectangular projector. x is mapped to yaw, y is mapped to
  * pitch.
  */
 public class PanoramicProjector implements Projector {
-	protected final double fov;
+  protected final double fov;
 
-	public PanoramicProjector(double fov) {
-		this.fov = fov;
-	}
+  public PanoramicProjector(double fov) {
+    this.fov = fov;
+  }
 
-	@Override
-	public void apply(double x, double y, Random random, Vector3d o,
-			Vector3d d) {
-		apply(x, y, o, d);
-	}
+  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
+    apply(x, y, o, d);
+  }
 
-	@Override
-	public void apply(double x, double y, Vector3d o, Vector3d d) {
-		double ay = QuickMath.degToRad(y * fov);
-		double ax = QuickMath.degToRad(x * fov);
+  @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
+    double ay = QuickMath.degToRad(y * fov);
+    double ax = QuickMath.degToRad(x * fov);
 
-		double vv = FastMath.cos(ay);
+    double vv = FastMath.cos(ay);
 
-		o.set(0, 0, 0);
-		d.set(vv * FastMath.sin(ax), FastMath.sin(ay), vv * FastMath.cos(ax));
-	}
+    o.set(0, 0, 0);
+    d.set(vv * FastMath.sin(ax), FastMath.sin(ay), vv * FastMath.cos(ax));
+  }
 
-	@Override
-	public double getMinRecommendedFoV() {
-		return 1;
-	}
+  @Override public double getMinRecommendedFoV() {
+    return 1;
+  }
 
-	@Override
-	public double getMaxRecommendedFoV() {
-		return 180;
-	}
+  @Override public double getMaxRecommendedFoV() {
+    return 180;
+  }
 
-	@Override
-	public double getDefaultFoV() {
-		return 120;
-	}
+  @Override public double getDefaultFoV() {
+    return 120;
+  }
 }

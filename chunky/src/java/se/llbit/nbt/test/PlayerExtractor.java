@@ -16,10 +16,14 @@
  */
 package se.llbit.nbt.test;
 
+import se.llbit.nbt.AnyTag;
+import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.NamedTag;
+import se.llbit.nbt.StringTag;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
@@ -28,46 +32,35 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import se.llbit.nbt.AnyTag;
-import se.llbit.nbt.NamedTag;
-import se.llbit.nbt.StringTag;
-import se.llbit.nbt.CompoundTag;
-
-@SuppressWarnings("javadoc")
 public class PlayerExtractor {
 
-	public static void main(String[] args) {
-		if (args.length < 1) {
-			System.out.println("arguments: <NBT file>");
-			System.exit(1);
-		}
+  public static void main(String[] args) throws IOException {
+    if (args.length < 1) {
+      System.out.println("arguments: <NBT file>");
+      System.exit(1);
+    }
 
-		String fn = args[0];
-		String outFn = "player.dat";
-		try {
-			System.out.println("parsing "+fn);
-			DataInputStream in = new DataInputStream(new GZIPInputStream(new FileInputStream(fn)));
+    String fn = args[0];
+    String outFn = "player.dat";
 
-			Set<String> request = new HashSet<String>();
-			request.add(".Data.Player");
-			Map<String, AnyTag> result = NamedTag.quickParse(in, request);
-			in.close();
+    System.out.println("parsing " + fn);
+    try (DataInputStream in = new DataInputStream(new GZIPInputStream(new FileInputStream(fn)))) {
 
-			AnyTag playerTag = result.get(".Data.Player");
+      Set<String> request = new HashSet<>();
+      request.add(".Data.Player");
+      Map<String, AnyTag> result = NamedTag.quickParse(in, request);
+      in.close();
 
-			System.out.println("writing output to "+outFn);
-			DataOutputStream out = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(outFn)));
-			NamedTag rootTag = new NamedTag(new StringTag(""), (CompoundTag) playerTag);
-			rootTag.write(out);
-			out.close();
-			System.out.println("done");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+      AnyTag playerTag = result.get(".Data.Player");
+
+      System.out.println("writing output to " + outFn);
+      try (DataOutputStream out =
+          new DataOutputStream(new GZIPOutputStream(new FileOutputStream(outFn)))) {
+        NamedTag rootTag = new NamedTag(new StringTag(""), (CompoundTag) playerTag);
+        rootTag.write(out);
+      }
+      System.out.println("done");
+    }
+  }
 
 }

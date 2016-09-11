@@ -18,46 +18,42 @@ package se.llbit.chunky.map;
 
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
-import se.llbit.math.Color;
+import se.llbit.math.ColorUtil;
 
 public class BiomeLayer extends BitmapLayer {
 
-	private final byte[] biomes;
-	private final int avgColor;
+  private final byte[] biomes;
+  private final int avgColor;
 
-	/**
-	 * Load biome IDs into layer
-	 * @param chunkBiomes
-	 */
-	public BiomeLayer(byte[] chunkBiomes) {
-		biomes = new byte[Chunk.X_MAX*Chunk.Z_MAX];
-		System.arraycopy(chunkBiomes, 0, biomes, 0, biomes.length);
-		double[] sum = new double[3];
-		double[] rgb = new double[3];
-		for (int i = 0; i < biomes.length; ++i) {
-			byte biome = biomes[i];
-			Color.getRGBComponents(Biomes.getColor(biome), rgb);
-			sum[0] += rgb[0];
-			sum[1] += rgb[1];
-			sum[2] += rgb[2];
-		}
-		sum[0] /= biomes.length;
-		sum[1] /= biomes.length;
-		sum[2] /= biomes.length;
-		avgColor = Color.getRGB(sum);
-	}
+  /**
+   * Load biome IDs into layer.
+   */
+  public BiomeLayer(byte[] chunkBiomes) {
+    biomes = new byte[Chunk.X_MAX * Chunk.Z_MAX];
+    System.arraycopy(chunkBiomes, 0, biomes, 0, biomes.length);
+    double[] sum = new double[3];
+    double[] rgb = new double[3];
+    for (byte biome : biomes) {
+      ColorUtil.getRGBComponents(Biomes.getColor(biome), rgb);
+      sum[0] += rgb[0];
+      sum[1] += rgb[1];
+      sum[2] += rgb[2];
+    }
+    sum[0] /= biomes.length;
+    sum[1] /= biomes.length;
+    sum[2] /= biomes.length;
+    avgColor = ColorUtil.getRGB(sum);
+  }
 
-	@Override
-	public int colorAt(int x, int z) {
-		return Biomes.getColor(biomes[Chunk.chunkXZIndex(x, z)]);
-	}
+  @Override public int colorAt(int x, int z) {
+    return Biomes.getColor(biomes[Chunk.chunkXZIndex(x, z)]);
+  }
 
-	public String biomeAt(int x, int z) {
-		return Biomes.getName(biomes[Chunk.chunkXZIndex(x, z)]);
-	}
+  public String biomeAt(int x, int z) {
+    return Biomes.getName(biomes[Chunk.chunkXZIndex(x, z)]);
+  }
 
-	@Override
-	public int getAvgColor() {
-		return avgColor;
-	}
+  @Override public int getAvgColor() {
+    return avgColor;
+  }
 }

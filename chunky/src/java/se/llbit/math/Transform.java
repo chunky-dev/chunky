@@ -18,289 +18,287 @@ package se.llbit.math;
 
 /**
  * A transformation.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Transform {
-	private static class TransformPair extends Transform {
-		private final Transform a;
-		private final Transform b;
+  private static class TransformPair extends Transform {
+    private final Transform a;
+    private final Transform b;
 
-		protected TransformPair(Transform a, Transform b) {
-			this.a = a;
-			this.b = b;
-		}
+    protected TransformPair(Transform a, Transform b) {
+      this.a = a;
+      this.b = b;
+    }
 
-		@Override
-		public void apply(Vector3d v) {
-			a.apply(v);
-			b.apply(v);
-		}
+    @Override public void apply(Vector3 v) {
+      a.apply(v);
+      b.apply(v);
+    }
 
-		@Override
-		public void applyRotScale(Vector3d v) {
-			a.applyRotScale(v);
-			b.applyRotScale(v);
-		}
-	}
+    @Override public void applyRotScale(Vector3 v) {
+      a.applyRotScale(v);
+      b.applyRotScale(v);
+    }
+  }
 
-	public static final Transform NONE = new Transform();
 
-	private Transform() {
-	}
+  public static final Transform NONE = new Transform();
 
-	/**
-	 * Apply the transformation to a vertex.
-	 * @param v
-	 */
-	public void apply(Vector3d v) {
-	}
+  private Transform() {
+  }
 
-	/**
-	 * Apply only rotation and scaling to a vertex.
-	 * @param v
-	 */
-	public void applyRotScale(Vector3d v) {
-	}
+  /**
+   * Apply the transformation to a vertex.
+   *
+   * @param v
+   */
+  public void apply(Vector3 v) {
+  }
 
-	private final Transform chain(Transform other) {
-		if (this == NONE) {
-			return other;
-		} else {
-			return new TransformPair(this, other);
-		}
+  /**
+   * Apply only rotation and scaling to a vertex.
+   *
+   * @param v
+   */
+  public void applyRotScale(Vector3 v) {
+  }
 
-	}
+  private final Transform chain(Transform other) {
+    if (this == NONE) {
+      return other;
+    } else {
+      return new TransformPair(this, other);
+    }
 
-	/**
-	 * Translate by a vector
-	 * @param translation The translation vector
-	 */
-	public final Transform translate(final Vector3d translation) {
-		return chain(new Transform() {
-			@Override
-			public void apply(Vector3d v) {
-				v.add(translation);
-			}
-		});
-	}
+  }
 
-	/**
-	 * Translate by a vector
-	 * @param translation The translation vector
-	 */
-	public final Transform translate(final double x, final double y, final double z) {
-		return chain(new Transform() {
-			@Override
-			public void apply(Vector3d v) {
-				v.x += x;
-				v.y += y;
-				v.z += z;
-			}
-		});
-	}
+  /**
+   * Translate by a vector
+   *
+   * @param translation The translation vector
+   */
+  public final Transform translate(final Vector3 translation) {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 v) {
+        v.add(translation);
+      }
+    });
+  }
 
-	/**
-	 * Scale by a scalar
-	 * @param scale
-	 */
-	public final Transform scale(final double scale) {
-		return chain(new Transform() {
-			@Override
-			public void apply(Vector3d v) {
-				v.scale(scale);
-			}
-			@Override
-			public void applyRotScale(Vector3d v) {
-				v.scale(scale);
-			}
-		});
-	}
+  /**
+   * Translate by a vector
+   */
+  public final Transform translate(final double x, final double y, final double z) {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 v) {
+        v.x += x;
+        v.y += y;
+        v.z += z;
+      }
+    });
+  }
 
-	/**
-	 * Rotation by 90 degrees around the Y axis
-	 */
-	public final Transform rotateY() {
-		return chain(new Transform() {
-			@Override
-			public void apply(Vector3d o) {
-		        double tmp = o.x;
-		        o.x = -o.z;
-		        o.z = tmp;
-		    }
-			@Override
-			public void applyRotScale(Vector3d o) {
-		        double tmp = o.x;
-		        o.x = -o.z;
-		        o.z = tmp;
-		    }
-		});
-	}
+  /**
+   * Scale by a scalar
+   *
+   * @param scale
+   */
+  public final Transform scale(final double scale) {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 v) {
+        v.scale(scale);
+      }
 
-	/**
-	 * Rotation by 90 degrees around the X axis
-	 */
-	public final Transform rotateX() {
-		return chain(new Transform() {
-			@Override
-			public void apply(Vector3d o) {
-		        double tmp = o.y;
-		        o.y = -o.z;
-		        o.z = tmp;
-		    }
-			@Override
-			public void applyRotScale(Vector3d o) {
-		        double tmp = o.y;
-		        o.y = -o.z;
-		        o.z = tmp;
-		    }
-		});
-	}
+      @Override public void applyRotScale(Vector3 v) {
+        v.scale(scale);
+      }
+    });
+  }
 
-	/**
-	 * Rotation by 90 degrees around the negative X axis
-	 */
-	public final Transform rotateNegX() {
-		return chain(new Transform() {
-			@Override
-			public void apply(Vector3d o) {
-		        double tmp = o.y;
-		        o.y = o.z;
-		        o.z = -tmp;
-		    }
-			@Override
-			public void applyRotScale(Vector3d o) {
-		        double tmp = o.y;
-		        o.y = o.z;
-		        o.z = -tmp;
-		    }
-		});
-	}
+  /**
+   * Rotation by 90 degrees around the Y axis
+   */
+  public final Transform rotateY() {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 o) {
+        double tmp = o.x;
+        o.x = -o.z;
+        o.z = tmp;
+      }
 
-	/**
-	 * Rotation by 90 degrees around the Z axis
-	 */
-	public final Transform rotateZ() {
-		return chain(new Transform() {
-			@Override
-			public void apply(Vector3d o) {
-		        double tmp = o.x;
-		        o.x = -o.y;
-		        o.y = tmp;
-		    }
-			@Override
-			public void applyRotScale(Vector3d o) {
-		        double tmp = o.x;
-		        o.x = -o.y;
-		        o.y = tmp;
-		    }
-		});
-	}
+      @Override public void applyRotScale(Vector3 o) {
+        double tmp = o.x;
+        o.x = -o.z;
+        o.z = tmp;
+      }
+    });
+  }
 
-	/**
-	 * Rotation by 90 degrees around the negative Z axis
-	 */
-	public final Transform rotateNegZ() {
-		return chain(new Transform() {
-			@Override
-			public void apply(Vector3d o) {
-		        double tmp = o.x;
-		        o.x = o.y;
-		        o.y = -tmp;
-		    }
-			@Override
-			public void applyRotScale(Vector3d o) {
-		        double tmp = o.x;
-		        o.x = o.y;
-		        o.y = -tmp;
-		    }
-		});
-	}
+  /**
+   * Rotation by 90 degrees around the X axis
+   */
+  public final Transform rotateX() {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 o) {
+        double tmp = o.y;
+        o.y = -o.z;
+        o.z = tmp;
+      }
 
-	/**
-	 * Mirror in Y axis
-	 */
-	public final Transform mirrorY() {
-		return chain(new Transform() {
-			@Override
-			public void apply(Vector3d o) {
-		        o.x = -o.x;
-		        o.y = -o.y;
-		    }
-		});
-	}
+      @Override public void applyRotScale(Vector3 o) {
+        double tmp = o.y;
+        o.y = -o.z;
+        o.z = tmp;
+      }
+    });
+  }
 
-	/**
-	 * Mirror in X axis
-	 */
-	public final Transform mirrorX() {
-		return chain(new Transform() {
-			@Override
-			public void apply(Vector3d o) {
-		        o.x = -o.x;
-		        o.z = -o.z;
-		    }
-		});
-	}
+  /**
+   * Rotation by 90 degrees around the negative X axis
+   */
+  public final Transform rotateNegX() {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 o) {
+        double tmp = o.y;
+        o.y = o.z;
+        o.z = -tmp;
+      }
 
-	/**
-	 * Rotation around the Y axis
-	 */
-	public final Transform rotateY(final double angle) {
-		return chain(new Transform() {
-			private final Matrix3d mat = new Matrix3d();
-			{
-				mat.rotY(angle);
-			}
-			@Override
-			public void apply(Vector3d v) {
-				mat.transform(v);
-		    }
-			@Override
-			public void applyRotScale(Vector3d v) {
-				mat.transform(v);
-		    }
-		});
-	}
+      @Override public void applyRotScale(Vector3 o) {
+        double tmp = o.y;
+        o.y = o.z;
+        o.z = -tmp;
+      }
+    });
+  }
 
-	/**
-	 * Rotation around the X axis
-	 * @param angle angle in radians
-	 */
-	public final Transform rotateX(final double angle) {
-		return chain(new Transform() {
-			private final Matrix3d mat = new Matrix3d();
-			{
-				mat.rotX(angle);
-			}
-			@Override
-			public void apply(Vector3d v) {
-				mat.transform(v);
-		    }
-			@Override
-			public void applyRotScale(Vector3d v) {
-				mat.transform(v);
-		    }
-		});
-	}
+  /**
+   * Rotation by 90 degrees around the Z axis
+   */
+  public final Transform rotateZ() {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 o) {
+        double tmp = o.x;
+        o.x = -o.y;
+        o.y = tmp;
+      }
 
-	/**
-	 * Rotation around the Z axis
-	 * @param angle angle in radians
-	 */
-	public final Transform rotateZ(final double angle) {
-		return chain(new Transform() {
-			private final Matrix3d mat = new Matrix3d();
-			{
-				mat.rotZ(angle);
-			}
-			@Override
-			public void apply(Vector3d v) {
-				mat.transform(v);
-		    }
-			@Override
-			public void applyRotScale(Vector3d v) {
-				mat.transform(v);
-		    }
-		});
-	}
+      @Override public void applyRotScale(Vector3 o) {
+        double tmp = o.x;
+        o.x = -o.y;
+        o.y = tmp;
+      }
+    });
+  }
+
+  /**
+   * Rotation by 90 degrees around the negative Z axis
+   */
+  public final Transform rotateNegZ() {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 o) {
+        double tmp = o.x;
+        o.x = o.y;
+        o.y = -tmp;
+      }
+
+      @Override public void applyRotScale(Vector3 o) {
+        double tmp = o.x;
+        o.x = o.y;
+        o.y = -tmp;
+      }
+    });
+  }
+
+  /**
+   * Mirror in Y axis
+   */
+  public final Transform mirrorY() {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 o) {
+        o.x = -o.x;
+        o.y = -o.y;
+      }
+    });
+  }
+
+  /**
+   * Mirror in X axis
+   */
+  public final Transform mirrorX() {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 o) {
+        o.x = -o.x;
+        o.z = -o.z;
+      }
+    });
+  }
+
+  /**
+   * Rotation around the Y axis
+   */
+  public final Transform rotateY(final double angle) {
+    return chain(new Transform() {
+      private final Matrix3 mat = new Matrix3();
+
+      {
+        mat.rotY(angle);
+      }
+
+      @Override public void apply(Vector3 v) {
+        mat.transform(v);
+      }
+
+      @Override public void applyRotScale(Vector3 v) {
+        mat.transform(v);
+      }
+    });
+  }
+
+  /**
+   * Rotation around the X axis
+   *
+   * @param angle angle in radians
+   */
+  public final Transform rotateX(final double angle) {
+    return chain(new Transform() {
+      private final Matrix3 mat = new Matrix3();
+
+      {
+        mat.rotX(angle);
+      }
+
+      @Override public void apply(Vector3 v) {
+        mat.transform(v);
+      }
+
+      @Override public void applyRotScale(Vector3 v) {
+        mat.transform(v);
+      }
+    });
+  }
+
+  /**
+   * Rotation around the Z axis
+   *
+   * @param angle angle in radians
+   */
+  public final Transform rotateZ(final double angle) {
+    return chain(new Transform() {
+      private final Matrix3 mat = new Matrix3();
+
+      {
+        mat.rotZ(angle);
+      }
+
+      @Override public void apply(Vector3 v) {
+        mat.transform(v);
+      }
+
+      @Override public void applyRotScale(Vector3 v) {
+        mat.transform(v);
+      }
+    });
+  }
 }

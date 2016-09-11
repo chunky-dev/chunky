@@ -17,17 +17,19 @@
 package se.llbit.math;
 
 /**
- * Visitor for Octrees
+ * Visitor interface for Octrees.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public interface OctreeVisitor {
-	/**
-	 * This is called once for each leaf nod in the octree
-	 * @param data the data of the octree node
-	 * @param x x prefix
-	 * @param y y prefix
-	 * @param z z prefix
-	 * @param size the bit size of the leaf node
-	 */
-	void visit(int data, int x, int y, int z, int size);
+  /**
+   * This is called once for each leaf nod in the octree
+   *
+   * @param data the data of the octree node
+   * @param x    x prefix
+   * @param y    y prefix
+   * @param z    z prefix
+   * @param size the bit size of the leaf node
+   */
+  void visit(int data, int x, int y, int z, int size);
 }

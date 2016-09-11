@@ -22,19 +22,19 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 
 public class LauncherIcon {
-	public static final ImageIcon expand = loadIcon("expand");
-	public static final ImageIcon collapse = loadIcon("collapse");
-	public static final ImageIcon expandHover = loadIcon("expand-hover");
-	public static final ImageIcon collapseHover = loadIcon("collapse-hover");
-	public static final ImageIcon cached = loadIcon("cached");
-	public static final ImageIcon failed = loadIcon("failed");
-	public static final ImageIcon refresh = loadIcon("refresh");
+  public static final ImageIcon expand = loadIcon("expand");
+  public static final ImageIcon collapse = loadIcon("collapse");
+  public static final ImageIcon expandHover = loadIcon("expand-hover");
+  public static final ImageIcon collapseHover = loadIcon("collapse-hover");
+  public static final ImageIcon cached = loadIcon("cached");
+  public static final ImageIcon failed = loadIcon("failed");
+  public static final ImageIcon refresh = loadIcon("refresh");
 
-	private static ImageIcon loadIcon(String image) {
-		URL url = LauncherIcon.class.getResource("/" + image + ".png");
-		if (url != null) {
-			return new ImageIcon(Toolkit.getDefaultToolkit().getImage(url));
-		}
-		return null;
-	}
+  private static ImageIcon loadIcon(String image) {
+    URL url = LauncherIcon.class.getResource("/" + image + ".png");
+    if (url != null) {
+      return new ImageIcon(Toolkit.getDefaultToolkit().getImage(url));
+    }
+    return null;
+  }
 }

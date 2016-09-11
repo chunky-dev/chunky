@@ -1,14 +1,18 @@
-# Eclipse workspace metadata.
+# Eclipse files.
 /.metadata
 /.recommenders
+.settings
+.project
+.classpath
 
-# Vim
+# Vim swap and undo files.
 *.swp
 *.*~
 
 # Benchmarking & testing.
 /bench/x*
 /test
+/local
 
 # Build tool files.
 /.gradle/

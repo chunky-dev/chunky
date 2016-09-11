@@ -18,166 +18,155 @@ package se.llbit.math;
 
 /**
  * Quick math utility methods.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class QuickMath {
 
-	public static final double HALF_PI = Math.PI/2;
-	public static final double TAU = Math.PI*2;
+  public static final double HALF_PI = Math.PI / 2;
+  public static final double TAU = Math.PI * 2;
 
-	/**
-	 * @param d
-	 * @return The floor of d
-	 */
-	public static final long floor(double d) {
-		long i = (long) d;
-		return d < i ? i-1 : i;
-	}
+  /**
+   * @return The floor of d
+   */
+  public static long floor(double d) {
+    long i = (long) d;
+    return d < i ? i - 1 : i;
+  }
 
-	/**
-	 * @param d
-	 * @return The ceil of d
-	 */
-	public static final long ceil(double d) {
-		long i = (long) d;
-		return d > i ? i+1 : i;
-	}
+  /**
+   * @return The ceil of d
+   */
+  public static long ceil(double d) {
+    long i = (long) d;
+    return d > i ? i + 1 : i;
+  }
 
-	/**
-	 * Get the next power of two.
-	 * @param x
-	 * @return The next power of two
-	 */
-	public static int nextPow2(int x) {
-		x--;
-		x |= x >> 1;
-		x |= x >> 2;
-		x |= x >> 4;
-		x |= x >> 8;
-		x |= x >> 16;
-		return x+1;
-	}
+  /**
+   * Get the next power of two.
+   *
+   * @return The next power of two
+   */
+  public static int nextPow2(int x) {
+    x--;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return x + 1;
+  }
 
-	/**
-	 * @param x
-	 * @return 2-logarithm of x
-	 */
-	public static int log2(int x) {
-		int v = 0;
-		while ((x >>>= 1) != 0) {
-			v += 1;
-		}
-		return v;
-	}
+  /**
+   * @return 2-logarithm of x
+   */
+  public static int log2(int x) {
+    int v = 0;
+    while ((x >>>= 1) != 0) {
+      v += 1;
+    }
+    return v;
+  }
 
-	/**
-	 * @param x
-	 * @return The sign of x
-	 */
-	public static final int signum(double x) {
-		return x < 0 ? -1 : 1;
-	}
+  /**
+   * @return The sign of x
+   */
+  public static int signum(double x) {
+    return x < 0 ? -1 : 1;
+  }
 
-	/**
-	 * @param x
-	 * @return The sign of x
-	 */
-	public static final int signum(float x) {
-		return x < 0 ? -1 : 1;
-	}
+  /**
+   * @return The sign of x
+   */
+  public static int signum(float x) {
+    return x < 0 ? -1 : 1;
+  }
 
-	/**
-	 * Convert radians to degrees
-	 * @param rad Radians
-	 * @return Degrees
-	 */
-	public static final double radToDeg(double rad) {
-		return 180 * (rad / Math.PI);
-	}
+  /**
+   * Convert radians to degrees
+   *
+   * @param rad Radians
+   * @return Degrees
+   */
+  public static double radToDeg(double rad) {
+    return 180 * (rad / Math.PI);
+  }
 
-	/**
-	 * @param value
-	 * @param mod
-	 * @return Value modulo mod
-	 */
-	public static double modulo(double value, double mod) {
-		return ((value % mod) + mod) % mod;
-	}
+  /**
+   * @return Value modulo mod
+   */
+  public static double modulo(double value, double mod) {
+    return ((value % mod) + mod) % mod;
+  }
 
-	/**
-	 * Convert degrees to radians
-	 * @param deg Degrees
-	 * @return Radians
-	 */
-	public static final double degToRad(double deg) {
-		return (deg * Math.PI) / 180;
-	}
+  /**
+   * Convert degrees to radians
+   *
+   * @param deg Degrees
+   * @return Radians
+   */
+  public static double degToRad(double deg) {
+    return (deg * Math.PI) / 180;
+  }
 
-	/**
-	 * @param value
-	 * @param min
-	 * @param max
-	 * @return value clamped to min and max
-	 */
-	public static double clamp(double value, double min, double max) {
-		return value < min ? min : value > max ? max : value;
-	}
+  /**
+   * @return value clamped to min and max
+   */
+  public static double clamp(double value, double min, double max) {
+    return value < min ? min : value > max ? max : value;
+  }
 
-	/**
-	 * NB not NaN-correct
-	 * @param a
-	 * @param b
-	 * @return maximum value of a and b
-	 */
-	public static double max(double a, double b) {
-		return (a > b) ? a : b;
-	}
+  /**
+   * NB not NaN-correct
+   *
+   * @return maximum value of a and b
+   */
+  public static double max(double a, double b) {
+    return (a > b) ? a : b;
+  }
 
-	/**
-	 * NB not NaN-correct
-	 * @param a
-	 * @param b
-	 * @return maximum value of a and b
-	 */
-	public static float max(float a, float b) {
-		return (a > b) ? a : b;
-	}
+  /**
+   * NB not NaN-correct
+   *
+   * @return maximum value of a and b
+   */
+  public static float max(float a, float b) {
+    return (a > b) ? a : b;
+  }
 
-	/**
-	 * NB disregards NaN. Don't use if a or b can be NaN
-	 * @param a
-	 * @param b
-	 * @return minimum value of a and b
-	 */
-	public static double min(double a, double b) {
-		return (a < b) ? a : b;
-	}
+  /**
+   * NB disregards NaN. Don't use if a or b can be NaN
+   *
+   * @return minimum value of a and b
+   */
+  public static double min(double a, double b) {
+    return (a < b) ? a : b;
+  }
 
-	/**
-	 * NB disregards NaN. Don't use if a or b can be NaN
-	 * @param a
-	 * @param b
-	 * @return minimum value of a and b
-	 */
-	public static float min(float a, float b) {
-		return (a < b) ? a : b;
-	}
+  /**
+   * NB disregards NaN. Don't use if a or b can be NaN
+   *
+   * @return minimum value of a and b
+   */
+  public static float min(float a, float b) {
+    return (a < b) ? a : b;
+  }
 
-	/**
-	 * NB disregards +-0
-	 * @param x
-	 * @return absolute value of x
-	 */
-	public static float abs(float x) {
-		return (x < 0.f) ? -x : x;
-	}
+  /**
+   * NB disregards +-0
+   *
+   * @return absolute value of x
+   */
+  public static float abs(float x) {
+    return (x < 0.f) ? -x : x;
+  }
 
-	/**
-	 * NB disregards +-0
-	 * @param x
-	 * @return absolute value of x
-	 */
-	public static double abs(double x) {
-		return (x < 0.0) ? -x : x;
-	}
+  /**
+   * NB disregards +-0
+   *
+   * @return absolute value of x
+   */
+  public static double abs(double x) {
+    return (x < 0.0) ? -x : x;
+  }
 }

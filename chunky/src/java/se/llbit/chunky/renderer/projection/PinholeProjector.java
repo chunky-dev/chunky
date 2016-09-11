@@ -19,43 +19,37 @@ package se.llbit.chunky.renderer.projection;
 import java.util.Random;
 
 import se.llbit.chunky.renderer.scene.Camera;
-import se.llbit.math.Vector3d;
+import se.llbit.math.Vector3;
 
 /**
  * Casts rays like a pinhole camera.
  * This is the default projection mode in Chunky.
  */
 public class PinholeProjector implements Projector {
-	protected final double fovTan;
+  protected final double fovTan;
 
-	public PinholeProjector(double fov) {
-		this.fovTan = Camera.clampedFovTan(fov);
-	}
+  public PinholeProjector(double fov) {
+    this.fovTan = Camera.clampedFovTan(fov);
+  }
 
-	@Override
-	public void apply(double x, double y, Random random, Vector3d o,
-			Vector3d d) {
-		apply(x, y, o, d);
-	}
+  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
+    apply(x, y, o, d);
+  }
 
-	@Override
-	public void apply(double x, double y, Vector3d o, Vector3d d) {
-		o.set(0, 0, 0);
-		d.set(fovTan * x, fovTan * y, 1);
-	}
+  @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
+    o.set(0, 0, 0);
+    d.set(fovTan * x, fovTan * y, 1);
+  }
 
-	@Override
-	public double getMinRecommendedFoV() {
-		return 1;
-	}
+  @Override public double getMinRecommendedFoV() {
+    return 1;
+  }
 
-	@Override
-	public double getMaxRecommendedFoV() {
-		return 175;
-	}
+  @Override public double getMaxRecommendedFoV() {
+    return 175;
+  }
 
-	@Override
-	public double getDefaultFoV() {
-		return 70;
-	}
+  @Override public double getDefaultFoV() {
+    return 70;
+  }
 }

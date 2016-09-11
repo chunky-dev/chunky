@@ -41,117 +41,99 @@ import javax.swing.text.DefaultEditorKit;
 
 /**
  * Error report dialog.
- *
+ * <p>
  * Used to display critical errors in a nicer way.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-@SuppressWarnings("serial")
 public class LaunchErrorDialog extends JDialog {
 
-	private final JTextArea textArea;
+  private final JTextArea textArea;
 
-	/**
-	 * Initialize the error dialog.
-	 */
-	public LaunchErrorDialog(String command) {
-		super();
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setModalityType(ModalityType.APPLICATION_MODAL);
-		
-		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Close Dialog");
-		getRootPane().getActionMap().put("Close Dialog", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				closeDialog();
-			}
-		});
+  /**
+   * Initialize the error dialog.
+   */
+  public LaunchErrorDialog(String command) {
+    super();
+    setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+    setModalityType(ModalityType.APPLICATION_MODAL);
 
-		setTitle("Launch Error");
-		setLocationRelativeTo(null);
+    getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Close Dialog");
+    getRootPane().getActionMap().put("Close Dialog", new AbstractAction() {
+      @Override public void actionPerformed(ActionEvent arg0) {
+        closeDialog();
+      }
+    });
 
-		JPanel panel = new JPanel();
-		JLabel lbl = new JLabel(
-				"<html>Chunky failed to start! See the Debug Console for error messages.<br><br>" +
-				"The following command was used to start Chunky:");
+    setTitle("Launch Error");
+    setLocationRelativeTo(null);
 
-		textArea = new JTextArea(10, 60);
-		textArea.setEditable(false);
-		DefaultCaret caret = (DefaultCaret) textArea.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
-		textArea.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-			}
-			@Override
-			public void mousePressed(MouseEvent e) {
-				Action[] actions = textArea.getActions();
-				for (Action action: actions) {
-					if (action.getValue(Action.NAME).equals(
-							DefaultEditorKit.selectAllAction))
+    JPanel panel = new JPanel();
+    JLabel lbl = new JLabel(
+        "<html>Chunky failed to start! See the Debug Console for error messages.<br><br>"
+            + "The following command was used to start Chunky:");
 
-						action.actionPerformed(null);
-				}
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-			}
-			@Override
-			public void mouseEntered(MouseEvent e) {
-			}
-			@Override
-			public void mouseClicked(MouseEvent e) {
-			}
-		});
+    textArea = new JTextArea(10, 60);
+    textArea.setEditable(false);
+    DefaultCaret caret = (DefaultCaret) textArea.getCaret();
+    caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+    textArea.addMouseListener(new MouseListener() {
+      @Override public void mouseReleased(MouseEvent e) {
+      }
 
-		ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-		PrintStream out = new PrintStream(byteOut);
-		out.println(command);
-		out.println();
-		out.close();
+      @Override public void mousePressed(MouseEvent e) {
+        Action[] actions = textArea.getActions();
+        for (Action action : actions) {
+          if (action.getValue(Action.NAME).equals(DefaultEditorKit.selectAllAction))
 
-		textArea.setText(new String(byteOut.toByteArray()));
-		JScrollPane scrollPane = new JScrollPane(textArea);
+            action.actionPerformed(null);
+        }
+      }
 
-		JButton dismissBtn = new JButton("Dismiss");
-		dismissBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				closeDialog();
-			}
-		});
+      @Override public void mouseExited(MouseEvent e) {
+      }
 
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
-				.addComponent(lbl)
-				.addComponent(scrollPane)
-				.addGroup(layout.createSequentialGroup()
-					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addComponent(dismissBtn)
-				)
-			)
-			.addContainerGap()
-		);
-		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addComponent(lbl)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(scrollPane)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(dismissBtn)
-			.addContainerGap()
-		);
+      @Override public void mouseEntered(MouseEvent e) {
+      }
 
-		getContentPane().add(panel);
-		pack();
-	}
+      @Override public void mouseClicked(MouseEvent e) {
+      }
+    });
 
-	protected void closeDialog() {
-		LaunchErrorDialog.this.setVisible(false);
-		LaunchErrorDialog.this.dispose();
-	}
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    PrintStream out = new PrintStream(byteOut);
+    out.println(command);
+    out.println();
+    out.close();
+
+    textArea.setText(new String(byteOut.toByteArray()));
+    JScrollPane scrollPane = new JScrollPane(textArea);
+
+    JButton dismissBtn = new JButton("Dismiss");
+    dismissBtn.addActionListener(new ActionListener() {
+      @Override public void actionPerformed(ActionEvent e) {
+        closeDialog();
+      }
+    });
+
+    GroupLayout layout = new GroupLayout(panel);
+    panel.setLayout(layout);
+    layout.setHorizontalGroup(layout.createSequentialGroup().addContainerGap().addGroup(
+        layout.createParallelGroup().addComponent(lbl).addComponent(scrollPane).addGroup(
+            layout.createSequentialGroup()
+                .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
+                    Short.MAX_VALUE).addComponent(dismissBtn))).addContainerGap());
+    layout.setVerticalGroup(layout.createSequentialGroup().addContainerGap().addComponent(lbl)
+        .addPreferredGap(ComponentPlacement.UNRELATED).addComponent(scrollPane)
+        .addPreferredGap(ComponentPlacement.UNRELATED).addComponent(dismissBtn).addContainerGap());
+
+    getContentPane().add(panel);
+    pack();
+  }
+
+  protected void closeDialog() {
+    LaunchErrorDialog.this.setVisible(false);
+    LaunchErrorDialog.this.dispose();
+  }
 }

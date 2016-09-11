@@ -20,35 +20,27 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
-@SuppressWarnings("javadoc")
 public class FarmlandModel {
-	protected static AABB block = new AABB(0, 1, 0, 1, 0, 1);
+  protected static AABB block = new AABB(0, 1, 0, 1, 0, 1);
 
-	private static final Texture[] tex = {
-		Texture.farmlandDry,
-		Texture.farmlandWet,
-		Texture.farmlandWet,
-		Texture.farmlandWet,
-		Texture.farmlandWet,
-		Texture.farmlandWet,
-		Texture.farmlandWet,
-		Texture.farmlandWet,
-		Texture.farmlandWet,
-	};
+  private static final Texture[] tex =
+      {Texture.farmlandDry, Texture.farmlandWet, Texture.farmlandWet, Texture.farmlandWet,
+          Texture.farmlandWet, Texture.farmlandWet, Texture.farmlandWet, Texture.farmlandWet,
+          Texture.farmlandWet,};
 
-	public static boolean intersect(Ray ray) {
-		ray.t = Double.POSITIVE_INFINITY;
-		if (block.intersect(ray)) {
-			if (ray.n.y == 1) {
-				tex[ray.getBlockData() % 9].getColor(ray);
-			} else {
-				Texture.dirt.getColor(ray);
-			}
-			ray.color.w = 1;
-			ray.distance += ray.tNext;
-			ray.o.scaleAdd(ray.tNext, ray.d);
-			return true;
-		}
-		return false;
-	}
+  public static boolean intersect(Ray ray) {
+    ray.t = Double.POSITIVE_INFINITY;
+    if (block.intersect(ray)) {
+      if (ray.n.y == 1) {
+        tex[ray.getBlockData() % 9].getColor(ray);
+      } else {
+        Texture.dirt.getColor(ray);
+      }
+      ray.color.w = 1;
+      ray.distance += ray.tNext;
+      ray.o.scaleAdd(ray.tNext, ray.d);
+      return true;
+    }
+    return false;
+  }
 }

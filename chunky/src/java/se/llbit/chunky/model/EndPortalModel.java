@@ -20,25 +20,24 @@ import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
-@SuppressWarnings("javadoc")
 public class EndPortalModel {
-	private static final Quad quad =
-		new DoubleSidedQuad(new Vector3d(1, .75, 0), new Vector3d(0, .75, 0),
-				new Vector3d(1, .75, 1), new Vector4d(1, 0, 0, 1));
+  private static final Quad quad =
+      new DoubleSidedQuad(new Vector3(1, .75, 0), new Vector3(0, .75, 0), new Vector3(1, .75, 1),
+          new Vector4(1, 0, 0, 1));
 
-	public static boolean intersect(Ray ray) {
-		ray.t = Double.POSITIVE_INFINITY;
-		if (quad.intersect(ray)) {
-			ray.color.set(0, 0, 0, 1);
-			ray.n.set(quad.n);
-			ray.n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
-			ray.distance += ray.tNext;
-			ray.o.scaleAdd(ray.tNext, ray.d);
-			return true;
-		}
-		return false;
-	}
+  public static boolean intersect(Ray ray) {
+    ray.t = Double.POSITIVE_INFINITY;
+    if (quad.intersect(ray)) {
+      ray.color.set(0, 0, 0, 1);
+      ray.n.set(quad.n);
+      ray.n.scale(-QuickMath.signum(ray.d.dot(quad.n)));
+      ray.distance += ray.tNext;
+      ray.o.scaleAdd(ray.tNext, ray.d);
+      return true;
+    }
+    return false;
+  }
 }

@@ -16,69 +16,64 @@
  */
 package se.llbit.chunky.resources;
 
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector4;
 
 public class AbstractHdriTexture extends Texture {
-	public float[] buf;
+  public float[] buf;
 
-	@Override
-	public void getColorInterpolated(double u, double v, Vector4d sample) {
-		double x = width * u;
-		double y = height * v;
-		int x0 = clamp(floor(x), width);
-		int x1 = clamp(ceil(x), width);
-		int y0 = clamp(floor(y), height);
-		int y1 = clamp(ceil(y), height);
-		double xw = 1 - x + x0;
-		double yw = 1 - y + y0;
-		int offset = (y0*width + x0)*3;
-		double r0 = buf[offset+0];
-		double g0 = buf[offset+1];
-		double b0 = buf[offset+2];
-		offset = (y0*width + x1)*3;
-		double r1 = buf[offset+0];
-		double g1 = buf[offset+1];
-		double b1 = buf[offset+2];
-		offset = (y1*width + x0)*3;
-		double r2 = buf[offset+0];
-		double g2 = buf[offset+1];
-		double b2 = buf[offset+2];
-		offset = (y1*width + x1)*3;
-		double r3 = buf[offset+0];
-		double g3 = buf[offset+1];
-		double b3 = buf[offset+2];
-		sample.set(
-			r0*xw*yw + r1*(1-xw)*yw + r2*xw*(1-yw) + r3*(1-xw)*(1-yw),
-			g0*xw*yw + g1*(1-xw)*yw + g2*xw*(1-yw) + g3*(1-xw)*(1-yw),
-			b0*xw*yw + b1*(1-xw)*yw + b2*xw*(1-yw) + b3*(1-xw)*(1-yw),
-			1
-		);
-	}
+  @Override public void getColorInterpolated(double u, double v, Vector4 sample) {
+    double x = width * u;
+    double y = height * v;
+    int x0 = clamp(floor(x), width);
+    int x1 = clamp(ceil(x), width);
+    int y0 = clamp(floor(y), height);
+    int y1 = clamp(ceil(y), height);
+    double xw = 1 - x + x0;
+    double yw = 1 - y + y0;
+    int offset = (y0 * width + x0) * 3;
+    double r0 = buf[offset + 0];
+    double g0 = buf[offset + 1];
+    double b0 = buf[offset + 2];
+    offset = (y0 * width + x1) * 3;
+    double r1 = buf[offset + 0];
+    double g1 = buf[offset + 1];
+    double b1 = buf[offset + 2];
+    offset = (y1 * width + x0) * 3;
+    double r2 = buf[offset + 0];
+    double g2 = buf[offset + 1];
+    double b2 = buf[offset + 2];
+    offset = (y1 * width + x1) * 3;
+    double r3 = buf[offset + 0];
+    double g3 = buf[offset + 1];
+    double b3 = buf[offset + 2];
+    sample.set(r0 * xw * yw + r1 * (1 - xw) * yw + r2 * xw * (1 - yw) + r3 * (1 - xw) * (1 - yw),
+        g0 * xw * yw + g1 * (1 - xw) * yw + g2 * xw * (1 - yw) + g3 * (1 - xw) * (1 - yw),
+        b0 * xw * yw + b1 * (1 - xw) * yw + b2 * xw * (1 - yw) + b3 * (1 - xw) * (1 - yw), 1);
+  }
 
-	@Override
-	public void getColor(double u, double v, Vector4d c) {
-		int x = (int) (width * u);
-		int y = (int) (height * v);
-		x = (x<0)?0:(x>=width)?width-1:x;
-		y = (y<0)?0:(y>=height)?height-1:y;
-		int offset = (y*width + x)*3;
-		c.set(buf[offset+0], buf[offset+1], buf[offset+2], 1);
-	}
+  @Override public void getColor(double u, double v, Vector4 c) {
+    int x = (int) (width * u);
+    int y = (int) (height * v);
+    x = (x < 0) ? 0 : (x >= width) ? width - 1 : x;
+    y = (y < 0) ? 0 : (y >= height) ? height - 1 : y;
+    int offset = (y * width + x) * 3;
+    c.set(buf[offset + 0], buf[offset + 1], buf[offset + 2], 1);
+  }
 
-	/**
- 	 * Clamp image coordinate.
- 	 */
-	private static final int clamp(int i, int end) {
-		return i < 0 ? 0 : (i >= end ? end-1 : i);
-	}
+  /**
+   * Clamp image coordinate.
+   */
+  private static int clamp(int i, int end) {
+    return i < 0 ? 0 : (i >= end ? end - 1 : i);
+  }
 
-	private static final int floor(double d) {
-		int i = (int) d;
-		return d < i ? i-1 : i;
-	}
+  private static int floor(double d) {
+    int i = (int) d;
+    return d < i ? i - 1 : i;
+  }
 
-	private static final int ceil(double d) {
-		int i = (int) d;
-		return d > i ? i+1 : i;
-	}
+  private static int ceil(double d) {
+    int i = (int) d;
+    return d > i ? i + 1 : i;
+  }
 }

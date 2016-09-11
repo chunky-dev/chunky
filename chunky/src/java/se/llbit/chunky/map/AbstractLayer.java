@@ -16,16 +16,16 @@
  */
 package se.llbit.chunky.map;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Heightmap;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 /**
  * A layer describes the visible part of a chunk.
- *
+ * <p>
  * A chunk typically stores three layers;
  * current layer, cave layer and surface layer.
  *
@@ -33,48 +33,38 @@ import se.llbit.chunky.world.Heightmap;
  */
 abstract public class AbstractLayer {
 
-	/**
-	 * Render this layer
-	 * @param rbuff
-	 * @param cx
-	 * @param cz
-	 */
-	abstract public void render(MapBuffer rbuff, int cx, int cz);
+  /**
+   * Render this layer to a map tile.
+   */
+  abstract public void render(MapTile tile);
 
-	public void renderTopography(ChunkPosition position,
-			Heightmap heightmap) {
-	}
+  public void renderTopography(ChunkPosition position, Heightmap heightmap) {
+  }
 
-	/**
-	 * Render this layer
-	 * @param rbuff
-	 * @param cx
-	 * @param cz
-	 */
-	public void renderHighlight(MapBuffer rbuff, int cx, int cz,
-			Block hlBlock, java.awt.Color highlight) {
-	}
+  /**
+   * Render this layer
+   */
+  public void renderHighlight(MapTile tile, Block hlBlock, int hlColor) {
+  }
 
-	public int getAvgColor() {
-		return 0xFF000000;
-	}
+  public int getAvgColor() {
+    return 0xFF000000;
+  }
 
-	/**
-	 * Write a PNG scanline
-	 * @param scanline
-	 * @param out
-	 * @throws IOException
-	 */
-	public void writePngLine(int scanline, OutputStream out) throws IOException {
-		byte[] white = new byte[] {-1, -1, -1};
-		byte[] black = new byte[] {0, 0, 0};
-		for (int x = 0; x < 16; ++x) {
-			if (x == scanline) {
-				out.write(black);
-			} else {
-				out.write(white);
-			}
-		}
-	}
-
+  /**
+   * Write a PNG scanline.
+   *
+   * @throws IOException
+   */
+  public void writePngLine(int scanline, OutputStream out) throws IOException {
+    byte[] white = new byte[] {-1, -1, -1};
+    byte[] black = new byte[] {0, 0, 0};
+    for (int x = 0; x < 16; ++x) {
+      if (x == scanline) {
+        out.write(black);
+      } else {
+        out.write(white);
+      }
+    }
+  }
 }

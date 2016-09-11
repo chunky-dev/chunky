@@ -16,45 +16,34 @@
  */
 package se.llbit.chunky.map;
 
-import java.awt.Graphics;
-
-import se.llbit.chunky.resources.MiscImages;
-import se.llbit.chunky.world.ChunkView;
-import se.llbit.util.ImageTools;
+import se.llbit.chunky.world.Icon;
 
 /**
  * Represents an unknown chunk (not parsed/loaded).
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class UnknownLayer extends AbstractLayer {
 
-	/**
-	 * Singleton instance.
-	 */
-	public static final UnknownLayer INSTANCE = new UnknownLayer();
+  /**
+   * Singleton instance.
+   */
+  public static final UnknownLayer INSTANCE = new UnknownLayer();
 
-	private UnknownLayer() {
-	}
+  private UnknownLayer() {
+  }
 
-	@Override
-	public synchronized void render(MapBuffer rbuff, int cx, int cz) {
-		ChunkView view = rbuff.getView();
-		int x0 = view.chunkScale * (cx - view.px0);
-		int z0 = view.chunkScale * (cz - view.pz0);
+  @Override public synchronized void render(MapTile tile) {
+    if (tile.scale == 1) {
+      tile.fill(averageColor);
+    } else {
+      tile.drawImage(Icon.unknown.fxImage());
+    }
+  }
 
-		if (view.chunkScale == 1) {
-			rbuff.setRGB(x0, z0, averageColor);
-		} else {
-			Graphics g = rbuff.getGraphics();
-			g.drawImage(MiscImages.load, x0, z0,
-					view.chunkScale, view.chunkScale, null);
-		}
-	}
+  private final int averageColor = Icon.unknown.getAvgColor();
 
-	private final int averageColor = ImageTools.calcAvgColor(MiscImages.load);
-
-	@Override
-	public int getAvgColor() {
-		return averageColor;
-	}
+  @Override public int getAvgColor() {
+    return averageColor;
+  }
 }

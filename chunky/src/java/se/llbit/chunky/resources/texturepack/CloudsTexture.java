@@ -29,39 +29,30 @@ import se.llbit.chunky.world.Clouds;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class CloudsTexture extends TextureRef {
-	private final String file;
+  private final String file;
 
-	/**
-	 * Constructor
-	 * @param file
-	 */
-	public CloudsTexture(String file) {
-		this.file = file;
-	}
+  public CloudsTexture(String file) {
+    this.file = file;
+  }
 
-	@Override
-	protected boolean load(InputStream imageStream) throws IOException,
-			TextureFormatError {
+  @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
 
-		BufferedImage texture = ImageIO.read(imageStream);
-		if (texture.getWidth() != texture.getHeight() ||
-				texture.getWidth() != 256) {
-			throw new TextureFormatError(
-					"Clouds texture size must be 256 by 256 pixels!");
-		}
+    BufferedImage texture = ImageIO.read(imageStream);
+    if (texture.getWidth() != texture.getHeight() || texture.getWidth() != 256) {
+      throw new TextureFormatError("Clouds texture size must be 256 by 256 pixels!");
+    }
 
-		for (int y = 0; y < 256; ++y) {
-			for (int x = 0; x < 256; ++x) {
-				int v = texture.getRGB(x, y) >>> 31;
-				Clouds.setCloud(x, y, v);
-			}
-		}
-		return true;
-	}
+    for (int y = 0; y < 256; ++y) {
+      for (int x = 0; x < 256; ++x) {
+        int v = texture.getRGB(x, y) >>> 31;
+        Clouds.setCloud(x, y, v);
+      }
+    }
+    return true;
+  }
 
-	@Override
-	public boolean load(ZipFile texturePack) {
-		return load(file, texturePack);
-	}
+  @Override public boolean load(ZipFile texturePack) {
+    return load(file, texturePack);
+  }
 }
 

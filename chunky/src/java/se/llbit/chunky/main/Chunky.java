@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,976 +16,162 @@
  */
 package se.llbit.chunky.main;
 
-import java.awt.Color;
-import java.awt.Insets;
-import java.io.File;
+import se.llbit.chunky.renderer.ConsoleRenderListener;
+import se.llbit.chunky.renderer.RenderContext;
+import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.RenderManager;
+import se.llbit.chunky.renderer.RenderStatusListener;
+import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.SceneFactory;
+import se.llbit.chunky.renderer.scene.SceneLoadingError;
+import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
+import se.llbit.chunky.ui.ChunkyFx;
+import se.llbit.log.Log;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-
-import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.map.WorldRenderer;
-import se.llbit.chunky.renderer.BenchmarkManager;
-import se.llbit.chunky.renderer.ConsoleRenderListener;
-import se.llbit.chunky.renderer.PlaceholderRenderCanvas;
-import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.RenderManager;
-import se.llbit.chunky.renderer.scene.SceneLoadingError;
-import se.llbit.chunky.renderer.scene.SceneManager;
-import se.llbit.chunky.renderer.ui.BenchmarkDialog;
-import se.llbit.chunky.renderer.ui.CLDeviceSelector;
-import se.llbit.chunky.renderer.ui.NewSceneDialog;
-import se.llbit.chunky.renderer.ui.RenderControls;
-import se.llbit.chunky.renderer.ui.SceneDirectoryPicker;
-import se.llbit.chunky.renderer.ui.SceneSelector;
-import se.llbit.chunky.ui.ChunkMap;
-import se.llbit.chunky.ui.ChunkyFrame;
-import se.llbit.chunky.ui.Controls;
-import se.llbit.chunky.ui.Minimap;
-import se.llbit.chunky.ui.ProgressPanel;
-import se.llbit.chunky.world.Block;
-import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.Chunk.Renderer;
-import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.ChunkSelectionTracker;
-import se.llbit.chunky.world.ChunkTopographyUpdater;
-import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.DeleteChunksJob;
-import se.llbit.chunky.world.EmptyChunkView;
-import se.llbit.chunky.world.EmptyWorld;
-import se.llbit.chunky.world.RegionChangeMonitor;
-import se.llbit.chunky.world.RegionParser;
-import se.llbit.chunky.world.RegionQueue;
-import se.llbit.chunky.world.World;
-import se.llbit.chunky.world.listeners.ChunkTopographyListener;
-import se.llbit.log.Log;
-import se.llbit.math.Vector3d;
-import se.llbit.util.OSDetector;
-import se.llbit.util.OSDetector.OS;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created by
- * Jesper Öqvist.
- *
- * There is a Wiki for Chunky at http://chunky.llbit.se
- *
- * @author Jesper Öqvist (jesper@llbit.se)
+ * Jesper Öqvist (jesper@llbit.se).
+ * <p>
+ * Read more about Chunky at http://chunky.llbit.se .
  */
-public class Chunky implements ChunkTopographyListener {
-
-	/**
-	 * Minimum block scale for the map view
-	 */
-	public static final int BLOCK_SCALE_MIN = 1;
-
-	/**
-	 * Maximum block scale for the map view
-	 */
-	public static final int BLOCK_SCALE_MAX = 32*16;
-
-	/**
-	 * Default block scale for the map view
-	 */
-	public static final int DEFAULT_BLOCK_SCALE = 4*16;
-
-	private int chunkScale = DEFAULT_BLOCK_SCALE;
-
-	private World world = EmptyWorld.instance;
-
-	private final RegionQueue regionQueue = new RegionQueue();
-
-	private final ChunkTopographyUpdater topographyUpdater = new ChunkTopographyUpdater();
-	private final RegionChangeMonitor refresher = new RegionChangeMonitor(this);
-
-	private int currentDimension = PersistentSettings.getDimension();
-	private Chunk.Renderer chunkRenderer = Chunk.autoRenderer;
-	private final WorldRenderer worldRenderer = new WorldRenderer();
-	protected ChunkSelectionTracker chunkSelection = new ChunkSelectionTracker();
-
-	protected boolean ctrlModifier = false;
-	protected boolean shiftModifier = false;
-
-	private RenderControls renderControls = null;
-	private ChunkyFrame frame;
-
-	private volatile ChunkView map = EmptyChunkView.instance;
-	private volatile ChunkView minimap = EmptyChunkView.instance;
-
-	private int mapWidth = ChunkMap.DEFAULT_WIDTH;
-	private int mapHeight = ChunkMap.DEFAULT_HEIGHT;
-
-	private int minimapWidth = Minimap.DEFAULT_WIDTH;
-	private int minimapHeight = Minimap.DEFAULT_HEIGHT;
-
-	public ChunkyOptions options;
-
-	private ExecutorService utilityThreads;
-
-	/**
-	 * @return The name of this application
-	 */
-	public static final String getAppName() {
-		return Messages.getString("Chunky.appname") + " " +
-				Version.getVersion();
-	}
-
-	/**
-	 * Constructor
-	 */
-	public Chunky() {
-	}
-
-	/**
-	 * Create a new instance of the application GUI.
-	 * @param args
-	 * @return Program exit code (0 = success)
-	 */
-	public int run(String[] args) {
-		CommandLineOptions cmdline = new CommandLineOptions(args);
-		options = cmdline.options;
-
-		if (cmdline.confError) {
-			return 1;
-		}
-
-		try {
-			switch (cmdline.mode) {
-			case NO_OP:
-				break;
-			case HEADLESS_BENCHMARK:
-				return doBenchmark(options.renderThreads);
-			case HEADLESS_RENDER:
-				return doHeadlessRender();
-			case DEFAULT:
-				startNormally();
-				break;
-			}
-		} catch (Throwable t) {
-			Log.error("Unchecked exception caused Chunky to close", t);
-			return 2;
-		}
-		return 0;
-	}
-
-	/**
-	 * Run the benchmark in headless mode.
-	 * @param renderThreads number of threads to use for rendering
-	 * @return error code
-	 */
-	private int doBenchmark(int renderThreads) {
-		System.setProperty("java.awt.headless", "true");
-
-		RenderContext renderContext = new RenderContext(options);
-		BenchmarkManager benchmark = new BenchmarkManager(renderContext,
-				new ConsoleRenderListener());
-		benchmark.start();
-
-		try {
-			benchmark.join();
-			BenchmarkDialog.recordBenchmarkScore(benchmark.getSceneName(),
-					benchmark.getScore());
-			System.out.println("Benchmark completed with score " + benchmark.getScore() +
-					" (" + benchmark.getSceneName() + ")");
-			return 0;
-		} catch (InterruptedException e) {
-			System.err.println("Benchmarking interrupted");
-			return 1;
-		}
-	}
-
-	/**
-	 * Start headless mode
-	 * @return error code
-	 */
-	private int doHeadlessRender() {
-		System.setProperty("java.awt.headless", "true");
-
-		RenderContext renderContext = new RenderContext(options);
-		RenderManager renderManager = new RenderManager(
-				new PlaceholderRenderCanvas(),
-				renderContext, new ConsoleRenderListener(), true);
-
-		try {
-			renderManager.loadScene(options.sceneName);
-			if (options.target != -1) {
-				renderManager.scene().setTargetSPP(options.target);
-			}
-			renderManager.scene().startHeadlessRender();
-
-			renderManager.start();
-			return 0;
-		} catch (FileNotFoundException e) {
-			System.err.println("Scene \"" + options.sceneName + "\" not found!");
-			renderManager.interrupt();
-			return 1;
-		} catch (IOException e) {
-			System.err.println("IO error while loading scene (" + e.getMessage() + ")");
-			renderManager.interrupt();
-			return 1;
-		} catch (SceneLoadingError e) {
-			System.err.println("Scene loading error (" + e.getMessage() + ")");
-			renderManager.interrupt();
-			return 1;
-		} catch (InterruptedException e) {
-			System.err.println("Interrupted while loading scene");
-			renderManager.interrupt();
-			return 1;
-		}
-	}
-
-	/**
-	 * Start Chunky normally.
-	 */
-	private void startNormally() {
-		// Load the world.
-		if (options.worldDir != null && World.isWorldDir(options.worldDir)) {
-			loadWorld(new World(options.worldDir, false));
-		} else {
-			File lastWorldDir = PersistentSettings.getLastWorld();
-			if (lastWorldDir != null && World.isWorldDir(lastWorldDir)) {
-				loadWorld(new World(lastWorldDir, false));
-			}
-		}
-
-		// Start worker threads.
-		RegionParser[] regionParsers = new RegionParser[3];
-		for (int i = 0; i < regionParsers.length; ++i) {
-			regionParsers[i] = new RegionParser(this, regionQueue);
-			regionParsers[i].start();
-		}
-		topographyUpdater.start();
-		refresher.start();
-		utilityThreads = Executors.newFixedThreadPool(3);
-
-		// Create UI in the event dispatch thread.
-		try {
-			try {
-				UIDefaults defaults = UIManager.getDefaults();
-				defaults.put("Slider.paintValue", Boolean.FALSE);
-				defaults.put("TabbedPane.tabInsets", new Insets(5, 5, 7, 5));
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception e) {
-				Log.warn("Failed to set native Look and Feel");
-			}
-
-			SwingUtilities.invokeAndWait(new Runnable() {
-				@Override
-				public void run() {
-					buildUI();
-				}
-			});
-		} catch (InterruptedException e) {
-			Log.warn("Failed to set Look and Feel", e);
-		} catch (InvocationTargetException e) {
-			Log.warn("Failed to set Look and Feel", e);
-		}
-	}
-
-	/** Called when the GUI shuts down. */
-	public void onExit() {
-		if (utilityThreads != null) {
-			utilityThreads.shutdown();
-		}
-	}
-
-	protected void buildUI() {
-		frame = new ChunkyFrame(this);
-		frame.initComponents();
-		frame.setVisible(true);
-
-		if (world.isEmptyWorld()) {
-			getControls().openWorldSelector();
-		} else {
-			setView(0, 0);
-			panToPlayer();
-		}
-
-	}
-
-	/**
-	 * Flush all cached chunks and regions, forcing them to be reloaded
-	 * for the current world.
-	 */
-	public synchronized void reloadWorld() {
-		world.reload();
-
-		if (frame != null) {
-			viewUpdated();
-			frame.getMap().redraw();
-			frame.getMinimap().redraw();
-		}
-	}
-
-	/**
-	 * Load a new world.
-	 */
-	public synchronized void loadWorld(World newWorld) {
-
-		newWorld.reload();
-
-		chunkSelection.clearSelection();
-
-		// Dispose old world.
-		world.dispose();
-
-		world = newWorld;
-		world.addChunkDeletionListener(chunkSelection);
-		world.addChunkTopographyListener(this);
-
-		// Dimension must be set before chunks are loaded.
-		world.setDimension(currentDimension);
-
-		setView(0, 0);
-		panToPlayer();
-
-		PersistentSettings.setLastWorld(world.getWorldDirectory());
-
-		if (frame != null) {
-			frame.worldLoaded(world);
-			viewUpdated();
-			frame.getMap().redraw();
-			frame.getMinimap().redraw();
-		}
-	}
-
-	/**
-	 * Called when the map view has changed.
-	 */
-	public synchronized void viewUpdated() {
-		refresher.setView(map);
-
-		minimap = new ChunkView(map.x, map.z, minimapWidth, minimapHeight, 1);
-
-		int rx0 = Math.min(minimap.prx0, map.prx0);
-		int rx1 = Math.max(minimap.prx1, map.prx1);
-		int rz0 = Math.min(minimap.prz0, map.prz0);
-		int rz1 = Math.max(minimap.prz1, map.prz1);
-
-		// Enqueue visible regions and chunks.
-		for (int rx = rx0; rx <= rx1; ++rx) {
-			for (int rz = rz0; rz <= rz1; ++rz) {
-				regionQueue.add(ChunkPosition.get(rx, rz));
-			}
-		}
-
-		if (frame != null) {
-			frame.getMap().viewUpdated(map);
-			frame.getMinimap().viewUpdated(minimap);
-		}
-	}
-
-	/**
-	 * Entry point for Chunky.
-	 */
-	public static void main(final String[] args) {
-		Chunky chunky = new Chunky();
-		int exitVal = chunky.run(args);
-		if (exitVal != 0) {
-			System.exit(exitVal);
-		}
-	}
-
-	/**
-	 * Set the current map renderer.
-	 */
-	public synchronized void setRenderer(Chunk.Renderer renderer) {
-		this.chunkRenderer = renderer;
-		getMap().redraw();
-		// Force the chunks to redraw.
-		viewUpdated();
-	}
-
-	/**
-	 * Open the 3D chunk view.
-	 */
-	public synchronized void open3DView() {
-		if (renderControls == null || !renderControls.isDisplayable()) {
-			File sceneDir = SceneDirectoryPicker.getSceneDirectory(frame);
-			if (sceneDir != null) {
-				ChunkyOptions config = options.clone();
-				config.sceneDir = sceneDir;
-				RenderContext context = new RenderContext(config);
-				String name = world.levelName();
-				String preferredName = SceneManager.preferredSceneName(context, name);
-				if (SceneManager.sceneNameIsValid(preferredName)
-						&& SceneManager.sceneNameIsAvailable(context, preferredName)) {
-					create3DScene(context, preferredName);
-				} else {
-					NewSceneDialog dialog = new NewSceneDialog(getFrame(),
-							context, world.levelName());
-					dialog.setVisible(true);
-					if (dialog.isAccepted()) {
-						create3DScene(context, dialog.getSceneName());
-					}
-				}
-			}
-		}
-	}
-
-	private void create3DScene(RenderContext context, String sceneName) {
-		renderControls = new RenderControls(this, context);
-		renderControls.setSceneName(sceneName);
-		Collection<ChunkPosition> selection =
-				chunkSelection.getSelection();
-		if (!selection.isEmpty()) {
-			renderControls.loadFreshChunks(world, selection);
-		} else {
-			renderControls.showPreviewWindow();
-		}
-	}
-
-	/**
-	 * Toggle chunk selection
-	 * @param cx
-	 * @param cz
-	 */
-	public synchronized void toggleChunkSelection(int cx, int cz) {
-		chunkSelection.toggleChunk(world, cx, cz);
-		getControls().setChunksSelected(chunkSelection.numSelectedChunks() > 0);
-	}
-
-	/**
-	 * Select specific chunk
-	 * @param cx
-	 * @param cz
-	 */
-	public synchronized void selectChunk(int cx, int cz) {
-		chunkSelection.selectChunk(world, cx, cz);
-		getControls().setChunksSelected(chunkSelection.numSelectedChunks() > 0);
-	}
-
-	/**
-	 * Set the map view
-	 * @param cx
-	 * @param cz
-	 */
-	public synchronized void setView(final double cx, final double cz) {
-		map = new ChunkView(cx, cz, mapWidth, mapHeight, chunkScale);
-		if (frame != null && getControls() != null) {
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					getControls().setPosition(cx, getLayer(), cz);
-				}
-			});
-		}
-		viewUpdated();
-	}
-
-	/**
-	 * Set the currently viewed layer.
-	 * @param value
-	 */
-	public synchronized void setLayer(int value) {
-		int layerNew = Math.max(0, Math.min(Chunk.Y_MAX - 1, value));
-		if (layerNew != world.currentLayer()) {
-			world.setCurrentLayer(layerNew);
-			if (chunkRenderer == Chunk.layerRenderer) {
-				getMap().redraw();
-				// force the chunks to redraw
-				viewUpdated();
-			}
-		}
-		getControls().setLayer(world.currentLayer());
-	}
-
-	/**
-	 * @return The currently viewed layer
-	 */
-	public synchronized int getLayer() {
-		return world.currentLayer();
-	}
-
-	/**
-	 * Delete the currently selected chunks from the current world.
-	 */
-	public void deleteSelectedChunks() {
-		Object[] options = {Messages.getString("Chunky.Cancel_lbl"), //$NON-NLS-1$
-				Messages.getString("Chunky.AcceptDelete_lbl")}; //$NON-NLS-1$
-		int n = JOptionPane.showOptionDialog(null,
-				Messages.getString("Chunky.DeleteDialog_msg"), //$NON-NLS-1$
-				Messages.getString("Chunky.DeleteDialog_title"), //$NON-NLS-1$
-				JOptionPane.YES_NO_OPTION,
-				JOptionPane.WARNING_MESSAGE,
-				null,
-				options,
-				options[0]);
-		if (n == 1) {
-
-			Collection<ChunkPosition> selected = chunkSelection.getSelection();
-			ProgressPanel progress = getControls().getProgressPanel();
-			if (!selected.isEmpty() && !progress.isBusy()) {
-				DeleteChunksJob job = new DeleteChunksJob(world, selected, progress);
-				job.start();
-			}
-		}
-	}
-
-	/**
-	 * Set the current dimension
-	 * @param value Must be a valid dimension index
-	 */
-	public void setDimension(int value) {
-		if (value != currentDimension) {
-			currentDimension = value;
-			PersistentSettings.setDimension(currentDimension);
-			loadWorld(world);
-		}
-	}
-
-	/**
-	 * Clears the chunk selection
-	 */
-	public synchronized void clearSelectedChunks() {
-		chunkSelection.clearSelection();
-		getControls().setChunksSelected(chunkSelection.numSelectedChunks() > 0);
-	}
-
-	/**
-	 * @return The current highlight color
-	 */
-	public Color getHighlightColor() {
-		return worldRenderer.getHighlightColor();
-	}
-
-	/**
-	 * @return The currently highlighted block type
-	 */
-	public Block getHighlightBlock() {
-		return worldRenderer.getHighlightBlock();
-	}
-
-	/**
-	 * Set block type highlighting
-	 * @param value
-	 */
-	public void setHighlightEnable(boolean value) {
-		if (value != worldRenderer.isHighlightEnabled()) {
-
-			worldRenderer.setHighlightEnabled(value);
-			getMap().redraw();
-		}
-	}
-
-	/**
-	 * @return <code>true</code> if block type highlighting is currently active
-	 */
-	public boolean isHighlightEnabled() {
-		return worldRenderer.isHighlightEnabled();
-	}
-
-	/**
-	 * Set a new block type to highlight
-	 * @param hlBlock
-	 */
-	public void highlightBlock(Block hlBlock) {
-		worldRenderer.highlightBlock(hlBlock);
-		if (worldRenderer.isHighlightEnabled()) {
-			getMap().redraw();
-		}
-	}
-
-	/**
-	 * Set a new highlight color
-	 * @param newColor
-	 */
-	public void setHighlightColor(Color newColor) {
-		worldRenderer.setHighlightColor(newColor);
-		if (worldRenderer.isHighlightEnabled()) {
-			getMap().redraw();
-		}
-	}
-
-	/**
-	 * @return The name of the current world
-	 */
-	public String getWorldName() {
-		return world.levelName();
-	}
-
-	/**
-	 * Export the selected chunks to a zip file
-	 * @param targetFile
-	 * @param progress
-	 */
-	public synchronized void exportZip(File targetFile, ProgressPanel progress) {
-		if (!progress.isBusy()) {
-			if (OSDetector.getOS() != OS.WIN && targetFile.exists()) {
-				// Windows FileDialog asks for overwrite confirmation, so we don't have to
-				Object[] options = {Messages.getString("Chunky.Cancel_lbl"), //$NON-NLS-1$
-						Messages.getString("Chunky.AcceptOverwrite_lbl")}; //$NON-NLS-1$
-				int n = JOptionPane.showOptionDialog(null,
-						String.format(Messages.getString("Chunky.Confirm_overwrite_msg"), //$NON-NLS-1$
-								targetFile.getName()),
-						Messages.getString("Chunky.Confirm_overwrite_title"), //$NON-NLS-1$
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE,
-						null,
-						options,
-						options[0]);
-				if (n != 1) {
-					return;
-				}
-			}
-			new ZipExportJob(world, chunkSelection.getSelection(), targetFile, progress).start();
-		}
-	}
-
-	/**
-	 * Render the current view to a PNG image
-	 * @param targetFile
-	 * @param progress
-	 */
-	public void renderView(File targetFile, ProgressPanel progress) {
-		if (!progress.isBusy()) {
-			if (targetFile.exists()) {
-				Object[] options = {Messages.getString("Chunky.Cancel_lbl"), //$NON-NLS-1$
-						Messages.getString("Chunky.AcceptOverwrite_lbl")}; //$NON-NLS-1$
-				int n = JOptionPane.showOptionDialog(null,
-						String.format(Messages.getString("Chunky.Confirm_overwrite_msg"), //$NON-NLS-1$
-								targetFile.getName()),
-						Messages.getString("Chunky.Confirm_overwrite_title"), //$NON-NLS-1$
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE,
-						null,
-						options,
-						options[0]);
-				if (n != 1)
-					return;
-			}
-
-			if (progress.tryStartJob()) {
-				progress.setJobName("PNG export");
-				progress.setJobSize(1);
-				getMap().renderPng(targetFile);
-				progress.finishJob();
-			}
-		}
-	}
-
-	/**
-	 * @return The current world
-	 */
-	public World getWorld() {
-		return world;
-	}
-
-	/**
-	 * @return The currently selected chunks
-	 */
-	public Collection<ChunkPosition> getSelectedChunks() {
-		return chunkSelection.getSelection();
-	}
-
-	/**
-	 * @return <code>true</code> if the Shift key is pressed
-	 */
-	public boolean getShiftModifier() {
-		return shiftModifier;
-	}
-
-	/**
-	 * @return <code>true</code> if the Ctrl key is pressed
-	 */
-	public boolean getCtrlModifier() {
-		return ctrlModifier;
-	}
-
-	/**
-	 * Select chunks within a rectangle
-	 * @param cx0
-	 * @param cx1
-	 * @param cz0
-	 * @param cz1
-	 */
-	public void selectChunks(int cx0, int cx1, int cz0, int cz1) {
-		if (!ctrlModifier) {
-			chunkSelection.selectChunks(world, cx0, cz0, cx1, cz1);
-		} else {
-			chunkSelection.deselectChunks(world, cx0, cz0, cx1, cz1);
-		}
-
-		getControls().setChunksSelected(chunkSelection.numSelectedChunks() > 0);
-	}
-
-	/**
-	 * Select the region containing the given chunk.
-	 * @param cx
-	 * @param cz
-	 */
-	public void selectRegion(int cx, int cz) {
-		chunkSelection.selectRegion(world, cx, cz);
-		getControls().setChunksSelected(chunkSelection.numSelectedChunks() > 0);
-	}
-
-	/**
-	 * @return The Controls UI element
-	 */
-	public Controls getControls() {
-		return frame.getControls();
-	}
-
-	/**
-	 * @return The chunk selection tracker
-	 */
-	public ChunkSelectionTracker getChunkSelection() {
-		return chunkSelection;
-	}
-
-	/**
-	 * @return The world renderer
-	 */
-	public WorldRenderer getWorldRenderer() {
-		return worldRenderer;
-	}
-
-	/**
-	 * Update the Ctrl key modifier
-	 * @param value
-	 */
-	public void setCtrlModifier(boolean value) {
-		ctrlModifier = value;
-	}
-
-	/**
-	 * Update the Shift key modifier
-	 * @param value
-	 */
-	public void setShiftModifier(boolean value) {
-		shiftModifier = value;
-	}
-
-	/**
-	 * @return The main Chunky frame UI element
-	 */
-	public ChunkyFrame getFrame() {
-		return frame;
-	}
-
-	/**
-	 * @return The main chunk map
-	 */
-	public ChunkMap getMap() {
-		return frame.getMap();
-	}
-
-	/**
-	 * @return The current map renderer
-	 */
-	public Renderer getChunkRenderer() {
-		return chunkRenderer;
-	}
-
-	/**
-	 * @return The minimap UI element
-	 */
-	public Minimap getMinimap() {
-		return frame.getMinimap();
-	}
-
-	/**
-	 * The region was changed.
-	 * @param region
-	 */
-	public void regionUpdated(ChunkPosition region) {
-		regionQueue.add(region);
-	}
-
-	/**
-	 * @return <code>true</code> if chunks or regions are currently being parsed
-	 */
-	public boolean isLoading() {
-		return !regionQueue.isEmpty();
-	}
-
-	/**
-	 * Modify the block scale of the map view
-	 * @param blockScale
-	 */
-	public synchronized void setScale(int blockScale) {
-		int newScale = Math.max(BLOCK_SCALE_MIN,
-				Math.min(BLOCK_SCALE_MAX, blockScale));
-		if (newScale != chunkScale) {
-			chunkScale = newScale;
-			setView(map.x, map.z);
-		}
-		getControls().setScale(getScale());
-	}
-
-	/**
-	 * @return The current block scale of the map view
-	 */
-	public int getScale() {
-		return chunkScale;
-	}
-
-	/**
-	 * Called when the map view has been dragged by the user
-	 * @param dx
-	 * @param dy
-	 */
-	public void viewDragged(int dx, int dy) {
-		moveView(dx / (double) chunkScale,
-				dy / (double) chunkScale);
-	}
-
-	/**
-	 * Move the map view
-	 * @param dx
-	 * @param dz
-	 */
-	public synchronized void moveView(double dx, double dz) {
-		setView(map.x + dx, map.z + dz);
-		if (frame != null && getControls() != null) {
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					getControls().stopMapTracking();
-				}
-			});
-		}
-	}
-
-	/**
-	 * @return The current map view
-	 */
-	public ChunkView getMapView() {
-		return map;
-	}
-
-	/**
-	 * Called when the map has been resized
-	 * @param width
-	 * @param height
-	 */
-	public void mapResized(int width, int height) {
-		if (width != mapWidth || height != mapHeight) {
-			mapWidth = width;
-			mapHeight = height;
-			setView(map.x, map.z);
-		}
-	}
-
-	/**
-	 * Called when the user has moved the mouse wheel
-	 * @param diff
-	 */
-	public synchronized void onMouseWheelMotion(int diff) {
-		if (ctrlModifier) {
-			setLayer(getLayer() + diff);
-		} else {
-			int scale = getScale();
-			if ((scale-diff) <= 16) {
-				setScale(scale - diff);
-			} else if ((scale-diff*4) < 64) {
-				setScale(scale - diff*4);
-			} else if ((scale-diff*16) < 128) {
-				setScale(scale - diff*16);
-			} else {
-				setScale(scale - diff*64);
-			}
-		}
-	}
-
-	/**
-	 * @return The current minimap view
-	 */
-	public ChunkView getMinimapView() {
-		return minimap;
-	}
-
-	/**
-	 * Called when the minimap has been resized
-	 * @param width
-	 * @param height
-	 */
-	public void minimapResized(int width, int height) {
-		if (width != minimapWidth || height != minimapHeight) {
-			minimapWidth = width;
-			minimapHeight = height;
-			viewUpdated();
-		}
-	}
-
-	/**
-	 * Show the scene selector dialog.
-	 */
-	public void loadScene() {
-		if (renderControls == null || !renderControls.isDisplayable()) {
-			File sceneDir = SceneDirectoryPicker.getSceneDirectory(frame);
-			if (sceneDir != null) {
-				ChunkyOptions config = options.clone();
-				config.sceneDir = sceneDir;
-				RenderContext context = new RenderContext(config);
-				SceneSelector sceneSelector = new SceneSelector(null, context);
-				sceneSelector.setLocationRelativeTo(frame);
-				if (sceneSelector.isAccepted()) {
-					String scene = sceneSelector.getSelectedScene();
-					renderControls = new RenderControls(Chunky.this, context);
-					renderControls.loadScene(scene);
-				}
-			}
-		} else {
-			SceneSelector sceneSelector = new SceneSelector(null, renderControls.getContext());
-			sceneSelector.setLocationRelativeTo(frame);
-			if (sceneSelector.isAccepted()) {
-				String scene = sceneSelector.getSelectedScene();
-				renderControls.loadScene(scene);
-			}
-		}
-	}
-
-	/**
-	 * Open the OpenCL test renderer
-	 */
-	public void openCLTestRenderer() {
-		new CLDeviceSelector(getFrame(),
-				getWorld(), getSelectedChunks());
-	}
-
-	/**
-	 * Benchmark the path tracing renderer.
-	 */
-	public void runBenchmark() {
-		RenderContext context = new RenderContext(options);
-		new BenchmarkDialog(getFrame(), context);
-	}
-
-	@Override
-	public void chunksTopographyUpdated(Chunk chunk) {
-		topographyUpdater.addChunk(chunk);
-	}
-
-	public void panToPlayer() {
-		Vector3d pos = world.playerPos();
-		if (pos != null) {
-			setView(pos.x / 16.0,
-					pos.z / 16.0);
-		}
-	}
-
-	public void panToCamera() {
-		if (renderControls != null) {
-			renderControls.panToCamera();
-		}
-	}
-
-	public RenderControls getRenderControls() {
-		return renderControls;
-	}
-
-	public void moveCameraTo(double x, double z) {
-		if (renderControls != null && renderControls.isVisible()) {
-			renderControls.moveCameraTo(x, z);
-		}
-	}
-
+public class Chunky {
+
+  public final ChunkyOptions options;
+  private RenderContext renderContext;
+  private RenderController renderController;
+
+  /**
+   * @return The name of this application
+   */
+  public static String getAppName() {
+    return String.format("Chunky %s", Version.getVersion());
+  }
+
+  public Chunky(ChunkyOptions options) {
+    this.options = options;
+  }
+
+  /**
+   * Start a headless (no GUI) render.
+   *
+   * @return error code
+   */
+  private int doHeadlessRender() {
+    // TODO: This may not be needed after switching to JavaFX:
+    System.setProperty("java.awt.headless", "true");
+
+    // Initialize the SceneFactory to create non-paintable scenes.
+    SceneFactory.instance = new SceneFactory() {
+      @Override public Scene newScene() {
+        return new Scene();
+      }
+
+      @Override public Scene copyScene(Scene scene) {
+        return new Scene(scene);
+      }
+    };
+    RenderContext renderContext = new RenderContext(options);
+    RenderManager renderManager = new RenderManager(renderContext, true);
+    SynchronousSceneManager sceneManager =
+        new SynchronousSceneManager(renderContext, renderManager);
+    renderManager.setSceneProvider(sceneManager);
+    RenderStatusListener renderListener = new ConsoleRenderListener(renderContext, sceneManager);
+    sceneManager.setRenderStatusListener(renderListener);
+    renderManager.setRenderListener(renderListener);
+
+    try {
+      sceneManager.loadScene(options.sceneName);
+      if (options.target != -1) {
+        sceneManager.getScene().setTargetSpp(options.target);
+      }
+      sceneManager.getScene().startHeadlessRender();
+
+      renderManager.start();
+      return 0;
+    } catch (FileNotFoundException e) {
+      System.err.format("Scene \"%s\" not found!%n", options.sceneName);
+      renderManager.interrupt();
+      return 1;
+    } catch (IOException e) {
+      System.err.format("IO error while loading scene (%s)%n", e.getMessage());
+      renderManager.interrupt();
+      return 1;
+    } catch (SceneLoadingError e) {
+      System.err.format("Scene loading error (%s)%n", e.getMessage());
+      renderManager.interrupt();
+      return 1;
+    } catch (InterruptedException e) {
+      System.err.println("Interrupted while loading scene");
+      renderManager.interrupt();
+      return 1;
+    }
+  }
+
+  /**
+   * Start Chunky normally. This launches the Chunky UI.
+   */
+  private void startNormally() {
+    ChunkyFx.main(new String[0]);
+  }
+
+  /**
+   * Main entry point for Chunky. Chunky should normally be started via
+   * the launcher which sets up the classpath with all dependencies.
+   */
+  public static void main(final String[] args) {
+    CommandLineOptions cmdline = new CommandLineOptions(args);
+
+    if (cmdline.confError) {
+      System.exit(1);
+    }
+
+    Chunky chunky = new Chunky(cmdline.options);
+
+    int exitCode = 0;
+    try {
+      switch (cmdline.mode) {
+        case NOTHING:
+          break;
+        case HEADLESS_RENDER:
+          exitCode = chunky.doHeadlessRender();
+          break;
+        case DEFAULT:
+          chunky.startNormally();
+          break;
+      }
+    } catch (Throwable t) {
+      Log.error("Unchecked exception caused Chunky to close.", t);
+      exitCode = 2;
+    }
+
+    if (exitCode != 0) {
+      System.exit(exitCode);
+    }
+  }
+
+  public synchronized AsynchronousSceneManager getSceneManager() {
+    return getRenderController().getSceneManager();
+  }
+
+  public boolean sceneInitialized() {
+    return renderController != null;
+  }
+
+  public RenderController getRenderController() {
+    if (renderController == null) {
+      renderController = new RenderController(options);
+    }
+    return renderController;
+  }
+
+  public RenderContext getRenderContext() {
+    if (renderContext == null) {
+      renderContext = new RenderContext(options);
+    }
+    return renderContext;
+  }
 }

@@ -21,45 +21,42 @@ import java.io.IOException;
 
 /**
  * A PNG IEND chunk.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class IEND extends PngChunk {
 
-	/**
-	 * The PNG chunk type identifier
-	 */
-	public static final int CHUNK_TYPE = 0x49454E44;
-	private int crc;
+  /**
+   * The PNG chunk type identifier
+   */
+  public static final int CHUNK_TYPE = 0x49454E44;
+  private int crc;
 
-	/**
-	 * @throws IOException
-	 */
-	public IEND() throws IOException {
-		CrcOutputStream crcOutputStream = new CrcOutputStream();
-		DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
-		crcOut.writeInt(CHUNK_TYPE);
-		crc = crcOutputStream.getCRC();
-		crcOut.close();
-	}
+  /**
+   * @throws IOException
+   */
+  public IEND() throws IOException {
+    CrcOutputStream crcOutputStream = new CrcOutputStream();
+    DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
+    crcOut.writeInt(CHUNK_TYPE);
+    crc = crcOutputStream.getCRC();
+    crcOut.close();
+  }
 
-	@Override
-	public int getChunkType() {
-		return CHUNK_TYPE;
-	}
+  @Override public int getChunkType() {
+    return CHUNK_TYPE;
+  }
 
-	@Override
-	protected void writeChunkData(DataOutputStream out) throws IOException {
-	}
+  @Override protected void writeChunkData(DataOutputStream out) throws IOException {
+  }
 
-	@Override
-	public int getChunkLength() {
-		return 0;
-	}
+  @Override public int getChunkLength() {
+    return 0;
+  }
 
-	@Override
-	public int getChunkCRC() {
-		return crc;
-	}
+  @Override public int getChunkCRC() {
+    return crc;
+  }
 
 
 }

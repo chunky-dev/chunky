@@ -16,62 +16,63 @@
  */
 package se.llbit.chunky.resources;
 
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector4;
 
 /**
  * Stores additional UV coordinates used for entity textures.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class EntityTexture extends Texture {
 
-	// Head layer coordinates.
-	public final Vector4d headFront = new Vector4d();
-	public final Vector4d headBack = new Vector4d();
-	public final Vector4d headTop = new Vector4d();
-	public final Vector4d headBottom = new Vector4d();
-	public final Vector4d headRight = new Vector4d();
-	public final Vector4d headLeft = new Vector4d();
+  // Head layer coordinates.
+  public final Vector4 headFront = new Vector4();
+  public final Vector4 headBack = new Vector4();
+  public final Vector4 headTop = new Vector4();
+  public final Vector4 headBottom = new Vector4();
+  public final Vector4 headRight = new Vector4();
+  public final Vector4 headLeft = new Vector4();
 
-	// Hat layer coordinates.
-	public final Vector4d hatFront = new Vector4d();
-	public final Vector4d hatBack = new Vector4d();
-	public final Vector4d hatTop = new Vector4d();
-	public final Vector4d hatBottom = new Vector4d();
-	public final Vector4d hatRight = new Vector4d();
-	public final Vector4d hatLeft = new Vector4d();
+  // Hat layer coordinates.
+  public final Vector4 hatFront = new Vector4();
+  public final Vector4 hatBack = new Vector4();
+  public final Vector4 hatTop = new Vector4();
+  public final Vector4 hatBottom = new Vector4();
+  public final Vector4 hatRight = new Vector4();
+  public final Vector4 hatLeft = new Vector4();
 
-	public final Vector4d chestFront = new Vector4d();
-	public final Vector4d chestBack = new Vector4d();
-	public final Vector4d chestTop = new Vector4d();
-	public final Vector4d chestBottom = new Vector4d();
-	public final Vector4d chestRight = new Vector4d();
-	public final Vector4d chestLeft = new Vector4d();
+  public final Vector4 chestFront = new Vector4();
+  public final Vector4 chestBack = new Vector4();
+  public final Vector4 chestTop = new Vector4();
+  public final Vector4 chestBottom = new Vector4();
+  public final Vector4 chestRight = new Vector4();
+  public final Vector4 chestLeft = new Vector4();
 
-	public final Vector4d rightLegFront = new Vector4d();
-	public final Vector4d rightLegBack = new Vector4d();
-	public final Vector4d rightLegTop = new Vector4d();
-	public final Vector4d rightLegBottom = new Vector4d();
-	public final Vector4d rightLegRight = new Vector4d();
-	public final Vector4d rightLegLeft = new Vector4d();
+  public final Vector4 rightLegFront = new Vector4();
+  public final Vector4 rightLegBack = new Vector4();
+  public final Vector4 rightLegTop = new Vector4();
+  public final Vector4 rightLegBottom = new Vector4();
+  public final Vector4 rightLegRight = new Vector4();
+  public final Vector4 rightLegLeft = new Vector4();
 
-	public final Vector4d leftLegFront = new Vector4d();
-	public final Vector4d leftLegBack = new Vector4d();
-	public final Vector4d leftLegTop = new Vector4d();
-	public final Vector4d leftLegBottom = new Vector4d();
-	public final Vector4d leftLegRight = new Vector4d();
-	public final Vector4d leftLegLeft = new Vector4d();
+  public final Vector4 leftLegFront = new Vector4();
+  public final Vector4 leftLegBack = new Vector4();
+  public final Vector4 leftLegTop = new Vector4();
+  public final Vector4 leftLegBottom = new Vector4();
+  public final Vector4 leftLegRight = new Vector4();
+  public final Vector4 leftLegLeft = new Vector4();
 
-	public final Vector4d rightArmFront = new Vector4d();
-	public final Vector4d rightArmBack = new Vector4d();
-	public final Vector4d rightArmTop = new Vector4d();
-	public final Vector4d rightArmBottom = new Vector4d();
-	public final Vector4d rightArmRight = new Vector4d();
-	public final Vector4d rightArmLeft = new Vector4d();
+  public final Vector4 rightArmFront = new Vector4();
+  public final Vector4 rightArmBack = new Vector4();
+  public final Vector4 rightArmTop = new Vector4();
+  public final Vector4 rightArmBottom = new Vector4();
+  public final Vector4 rightArmRight = new Vector4();
+  public final Vector4 rightArmLeft = new Vector4();
 
-	public final Vector4d leftArmFront = new Vector4d();
-	public final Vector4d leftArmBack = new Vector4d();
-	public final Vector4d leftArmTop = new Vector4d();
-	public final Vector4d leftArmBottom = new Vector4d();
-	public final Vector4d leftArmRight = new Vector4d();
-	public final Vector4d leftArmLeft = new Vector4d();
+  public final Vector4 leftArmFront = new Vector4();
+  public final Vector4 leftArmBack = new Vector4();
+  public final Vector4 leftArmTop = new Vector4();
+  public final Vector4 leftArmBottom = new Vector4();
+  public final Vector4 leftArmRight = new Vector4();
+  public final Vector4 leftArmLeft = new Vector4();
 }

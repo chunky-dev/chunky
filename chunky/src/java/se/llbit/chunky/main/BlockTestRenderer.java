@@ -28,103 +28,98 @@ import se.llbit.chunky.resources.TexturePackLoader.TextureLoadingError;
 import se.llbit.chunky.world.BlockData;
 
 /**
- * Test renderer application
+ * Test renderer application.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class BlockTestRenderer {
 
-	/**
-	 * Entry point
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String lastTexturePack = PersistentSettings.getLastTexturePack();
-		try {
-			if (!lastTexturePack.isEmpty()) {
-				TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
-			} else {
-				try {
-					TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJarNonNull(), false);
-				} catch (FileNotFoundException e) {
-					System.err.println("Minecraft Jar not found! Using placeholder textures.");
-				}
-			}
-		} catch (TextureLoadingError e) {
-			System.err.println(e.getMessage());
-		}
+  public static void main(String[] args) {
+    String lastTexturePack = PersistentSettings.getLastTexturePack();
+    try {
+      if (!lastTexturePack.isEmpty()) {
+        TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
+      } else {
+        try {
+          TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJarNonNull(), false);
+        } catch (FileNotFoundException e) {
+          System.err.println("Minecraft Jar not found! Using placeholder textures.");
+        }
+      }
+    } catch (TextureLoadingError e) {
+      System.err.println(e.getMessage());
+    }
 
-		String block = "";
-		String targetFile = "";
-		boolean compass = false;
-		for (int i = 0; i < args.length; ++i) {
-			String arg = args[i];
-			if (arg.equals("-help") || arg.equals("-h")) {
-				printHelp(System.out);
-				return;
-			} else if (arg.equals("-o")) {
-				if (i+1 >= args.length) {
-					System.err.println("Missing target file argument!");
-					printHelp(System.out);
-					System.exit(1);
-				} else {
-					targetFile = args[i+1];
-					i += 1;
-				}
-			} else if (arg.equals("-compass")) {
-				compass = true;
-			} else {
-				if (block.isEmpty()) {
-					block = arg;
-				} else {
-					System.err.println("Too many arguments!");
-					printHelp(System.out);
-					System.exit(1);
-				}
-			}
-		}
+    String block = "";
+    String targetFile = "";
+    boolean compass = false;
+    for (int i = 0; i < args.length; ++i) {
+      String arg = args[i];
+      if (arg.equals("-help") || arg.equals("-h")) {
+        printHelp(System.out);
+        return;
+      } else if (arg.equals("-o")) {
+        if (i + 1 >= args.length) {
+          System.err.println("Missing target file argument!");
+          printHelp(System.out);
+          System.exit(1);
+        } else {
+          targetFile = args[i + 1];
+          i += 1;
+        }
+      } else if (arg.equals("-compass")) {
+        compass = true;
+      } else {
+        if (block.isEmpty()) {
+          block = arg;
+        } else {
+          System.err.println("Too many arguments!");
+          printHelp(System.out);
+          System.exit(1);
+        }
+      }
+    }
 
-		TestRenderer renderer;
+    TestRenderer renderer;
 
-		if (!block.isEmpty()) {
-			int sep = block.indexOf(':');
-			String blockPart;
-			String metadataPart = "";
-			if (sep == -1) {
-				blockPart = block;
-			} else {
-				blockPart = block.substring(0, sep);
-				if (sep+1 < block.length()) {
-					metadataPart = block.substring(sep+1);
-				}
-			}
-			int blockId;
-			if (blockPart.startsWith("0x")) {
-				blockId = Integer.parseInt(blockPart.substring(2), 16);
-			} else {
-				blockId = Integer.parseInt(blockPart);
-			}
-			int metadata = 0;
-			if (!metadataPart.isEmpty()) {
-				metadata = Integer.parseInt(metadataPart);
-			}
-			renderer = new TestRenderer(null,
-					blockId | (metadata << BlockData.OFFSET),
-					targetFile,
-					compass);
-		} else {
-			renderer = new TestRenderer(null, -1, targetFile, compass);
-		}
+    if (!block.isEmpty()) {
+      int sep = block.indexOf(':');
+      String blockPart;
+      String metadataPart = "";
+      if (sep == -1) {
+        blockPart = block;
+      } else {
+        blockPart = block.substring(0, sep);
+        if (sep + 1 < block.length()) {
+          metadataPart = block.substring(sep + 1);
+        }
+      }
+      int blockId;
+      if (blockPart.startsWith("0x")) {
+        blockId = Integer.parseInt(blockPart.substring(2), 16);
+      } else {
+        blockId = Integer.parseInt(blockPart);
+      }
+      int metadata = 0;
+      if (!metadataPart.isEmpty()) {
+        metadata = Integer.parseInt(metadataPart);
+      }
+      renderer =
+          new TestRenderer(null, blockId | (metadata << BlockData.OFFSET), targetFile, compass);
+    } else {
+      renderer = new TestRenderer(null, -1, targetFile, compass);
+    }
 
-		renderer.start();
-	}
+    renderer.start();
+  }
 
-	private static void printHelp(PrintStream out) {
-		out.println("Usage: BlockTestRenderer [ID[:METADATA]] [OPTIONS]");
-		out.println("    ID         is the id of the block to render");
-		out.println("    METADATA   specifies the metadata (TBD)");
-		out.println("");
-		out.println("Options:");
-		out.println("    -o ARG     write rendered image to file ARG");
-		out.println("    -compass   enable compass");
-	}
+  private static void printHelp(PrintStream out) {
+    out.println("Usage: BlockTestRenderer [ID[:METADATA]] [OPTIONS]");
+    out.println("    ID         is the id of the block to render");
+    out.println("    METADATA   specifies the metadata (TBD)");
+    out.println("");
+    out.println("Options:");
+    out.println("    -o ARG     write rendered image to file ARG");
+    out.println("    -compass   enable compass");
+  }
 }

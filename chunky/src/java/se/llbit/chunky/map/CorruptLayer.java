@@ -16,43 +16,36 @@
  */
 package se.llbit.chunky.map;
 
-import se.llbit.chunky.resources.MiscImages;
-import se.llbit.chunky.world.ChunkView;
+import se.llbit.chunky.world.Icon;
 import se.llbit.util.ImageTools;
 
 /**
  * Represents a chunk with corrupt chunk data.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class CorruptLayer extends AbstractLayer {
 
-	/**
-	 * Singleton instance.
-	 */
-	public static final CorruptLayer INSTANCE = new CorruptLayer();
+  /**
+   * Singleton instance.
+   */
+  public static final CorruptLayer INSTANCE = new CorruptLayer();
 
-	private CorruptLayer() {
-	}
+  private CorruptLayer() {
+  }
 
-	@Override
-	public synchronized void render(MapBuffer rbuff, int cx, int cz) {
-		ChunkView view = rbuff.getView();
-		int x0 = view.chunkScale * (cx - view.px0);
-		int z0 = view.chunkScale * (cz - view.pz0);
+  @Override public synchronized void render(MapTile tile) {
+    if (tile.scale == 1) {
+      tile.setPixel(0, 0, averageColor);
+    } else {
+      tile.drawImage(Icon.corruptLayer.fxImage());
+    }
+  }
 
-		if (view.chunkScale == 1) {
-			rbuff.setRGB(x0, z0, averageColor);
-		} else {
-			rbuff.getGraphics().drawImage(MiscImages.corruptLayer,
-					x0, z0, view.chunkScale, view.chunkScale, null);
-		}
-	}
+  private final int averageColor = Icon.corruptLayer.getAvgColor();
 
-	private final int averageColor = ImageTools.calcAvgColor(MiscImages.corruptLayer);
-
-	@Override
-	public int getAvgColor() {
-		return averageColor;
-	}
+  @Override public int getAvgColor() {
+    return averageColor;
+  }
 
 }

@@ -16,37 +16,46 @@
  */
 package se.llbit.chunky.main;
 
-import java.io.File;
-
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderConstants;
+
+import java.io.File;
 
 /**
  * Current configuration
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkyOptions {
-	public File sceneDir = null;
-	public String sceneName = null;
-	public String texturePack = null;
-	public int renderThreads = -1;
-	public File worldDir = null;
-	public int target = -1;
+  // The scene directory can be updated by the scene directory chooser dialog.
+  public volatile File sceneDir = null;
 
-	/**
-	 * Whether or not OpenCL rendering is enabled
-	 */
-	public boolean openCLEnabled;
+  public String sceneName = null;
+  public String texturePack = null;
+  public int renderThreads = -1;
+  public File worldDir = null;
+  public int target = -1;
 
-	public int tileWidth = RenderConstants.TILE_WIDTH_DEFAULT;
+  public int tileWidth = RenderConstants.TILE_WIDTH_DEFAULT;
 
-	@Override
-	public ChunkyOptions clone() {
-		ChunkyOptions clone = new ChunkyOptions();
-		clone.sceneDir = sceneDir;
-		clone.sceneName = sceneName;
-		clone.texturePack = texturePack;
-		clone.renderThreads = renderThreads;
-		clone.worldDir = worldDir;
-		return clone;
-	}
+  private ChunkyOptions() {
+  }
+
+  public static ChunkyOptions getDefaults() {
+    ChunkyOptions defaults = new ChunkyOptions();
+    defaults.sceneDir = PersistentSettings.getSceneDirectory();
+    defaults.renderThreads = PersistentSettings.getNumThreads();
+    defaults.texturePack = PersistentSettings.getLastTexturePack();
+    return defaults;
+  }
+
+  @Override public ChunkyOptions clone() {
+    ChunkyOptions clone = new ChunkyOptions();
+    clone.sceneDir = sceneDir;
+    clone.sceneName = sceneName;
+    clone.texturePack = texturePack;
+    clone.renderThreads = renderThreads;
+    clone.worldDir = worldDir;
+    return clone;
+  }
 }

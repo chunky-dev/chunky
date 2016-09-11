@@ -16,13 +16,13 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.world.listeners.ChunkDeletionListener;
+import se.llbit.chunky.world.listeners.ChunkUpdateListener;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
-
-import se.llbit.chunky.world.listeners.ChunkDeletionListener;
-import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 
 /**
  * Tracks chunk selections.
@@ -31,186 +31,185 @@ import se.llbit.chunky.world.listeners.ChunkUpdateListener;
  */
 public class ChunkSelectionTracker implements ChunkDeletionListener {
 
-	private final Set<ChunkPosition> selected = new HashSet<ChunkPosition>();
-	private final Collection<ChunkUpdateListener> chunkUpdateListeners =
-			new LinkedList<ChunkUpdateListener>();
+  private final Set<ChunkPosition> selected = new HashSet<>();
+  private final Collection<ChunkUpdateListener> chunkUpdateListeners = new LinkedList<>();
+  private final Collection<ChunkSelectionListener> selectionListeners = new LinkedList<>();
 
-	/**
-	 * Add a chunk update listener to listen for selection changes
-	 *
-	 * @param listener
-	 */
-	public void addRegionUpdateListener(ChunkUpdateListener listener) {
-		synchronized (chunkUpdateListeners) {
-			chunkUpdateListeners.add(listener);
-		}
-	}
+  /**
+   * Add a chunk update listener to listen for selection changes.
+   */
+  public void addChunkUpdateListener(ChunkUpdateListener listener) {
+    synchronized (chunkUpdateListeners) {
+      chunkUpdateListeners.add(listener);
+    }
+  }
 
-	/**
-	 * Remove a chunk update listener
-	 *
-	 * @param listener
-	 */
-	public synchronized void removeRegionUpdateListener(
-			ChunkUpdateListener listener) {
-		synchronized (chunkUpdateListeners) {
-			chunkUpdateListeners.remove(listener);
-		}
-	}
+  /**
+   * Add a chunk update listener to listen for selection changes.
+   */
+  public void addSelectionListener(ChunkSelectionListener listener) {
+    synchronized (chunkUpdateListeners) {
+      selectionListeners.add(listener);
+    }
+  }
 
-	/**
-	 * Notify the chunk update listeners that chunks have been updated
-	 *
-	 * @param chunks
-	 *            the updated chunks
-	 */
-	private void fireChunksUpdated(Collection<ChunkPosition> chunks) {
-		for (ChunkPosition chunk : chunks) {
-			fireChunkUpdated(chunk);
-		}
-	}
+  /**
+   * Remove a chunk update listener.
+   */
+  public synchronized void removeSelectionListener(ChunkSelectionListener listener) {
+    synchronized (chunkUpdateListeners) {
+      selectionListeners.remove(listener);
+    }
+  }
 
-	/**
-	 * Notify the chunk update listeners that a chunk has been updated.
-	 *
-	 * @param chunk
-	 *            the updated chunk
-	 */
-	private void fireChunkUpdated(ChunkPosition chunk) {
-		for (ChunkUpdateListener listener : chunkUpdateListeners) {
-			listener.chunkUpdated(chunk);
-		}
-	}
+  /**
+   * Notify the chunk update listeners that chunks have been updated
+   *
+   * @param chunks the updated chunks
+   */
+  private void notifyChunksUpdated(Collection<ChunkPosition> chunks) {
+    for (ChunkPosition chunk : chunks) {
+      notifyChunkUpdated(chunk);
+    }
+  }
 
-	@Override
-	public void chunkDeleted(ChunkPosition chunk) {
-		selected.remove(chunk);
-		fireChunkUpdated(chunk);
-	}
+  /**
+   * Notify the chunk update listeners that a chunk has been updated.
+   *
+   * @param chunk the updated chunk
+   */
+  private void notifyChunkUpdated(ChunkPosition chunk) {
+    for (ChunkUpdateListener listener : chunkUpdateListeners) {
+      listener.chunkUpdated(chunk);
+    }
+  }
 
-	/**
-	 * Toggle the selected status of the chunk at the given coordinates.
-	 *
-	 * @param world
-	 * @param cx chunk x-position
-	 * @param cz chunk z-position
-	 */
-	public synchronized void toggleChunk(World world, int cx, int cz) {
-		ChunkPosition chunk = ChunkPosition.get(cx, cz);
-		if (selected.contains(chunk)) {
-			selected.remove(chunk);
-			fireChunkUpdated(chunk);
-		} else if (!world.getChunk(chunk).isEmpty()) {
-			selected.add(chunk);
-			fireChunkUpdated(chunk);
-		}
-	}
+  private void notifyChunkSelectionChange() {
+    for (ChunkSelectionListener listener : selectionListeners) {
+      listener.chunkSelectionChanged();
+    }
+  }
 
-	/**
-	 * Adds a chunk to the selection
-	 * @param world
-	 * @param cx chunk x-position
-	 * @param cz chunk z-position
-	 */
-	public synchronized void selectChunk(World world, int cx, int cz) {
-		ChunkPosition chunk = ChunkPosition.get(cx, cz);
-		if (!selected.contains(chunk) && !world.getChunk(chunk).isEmpty()) {
-			selected.add(chunk);
-			fireChunkUpdated(chunk);
-		}
-	}
+  @Override public void chunkDeleted(ChunkPosition chunk) {
+    selected.remove(chunk);
+    notifyChunkUpdated(chunk);
+    notifyChunkSelectionChange();
+  }
 
-	/**
-	 * Select the region containing the given chunk.
-	 * @param world
-	 * @param cx chunk x-position
-	 * @param cz chunk z-position
-	 */
-	public synchronized void selectRegion(World world, int cx, int cz) {
-		ChunkPosition chunk = ChunkPosition.get(cx, cz);
-		int rx = cx >> 5;
-		int rz = cz >> 5;
-		if (selected.contains(chunk)) {
-			deselectChunks(world, rx*32, rz*32, rx*32+31, rz*32+31);
-		} else {
-			selectChunks(world, rx*32, rz*32, rx*32+31, rz*32+31);
-		}
-	}
+  /**
+   * Toggle the selected status of the chunk at the given coordinates.
+   *
+   * @param cx    chunk x-position
+   * @param cz    chunk z-position
+   */
+  public synchronized void toggleChunk(World world, int cx, int cz) {
+    ChunkPosition chunk = ChunkPosition.get(cx, cz);
+    if (selected.contains(chunk)) {
+      selected.remove(chunk);
+      notifyChunkUpdated(chunk);
+      notifyChunkSelectionChange();
+    } else if (!world.getChunk(chunk).isEmpty()) {
+      selected.add(chunk);
+      notifyChunkUpdated(chunk);
+      notifyChunkSelectionChange();
+    }
+  }
 
-	/**
-	 * @return The number of selected chunks
-	 */
-	public synchronized int numSelectedChunks() {
-		return selected.size();
-	}
+  /**
+   * Adds a chunk to the selection.
+   *
+   * @param cx    chunk x-position
+   * @param cz    chunk z-position
+   */
+  public synchronized void selectChunk(World world, int cx, int cz) {
+    ChunkPosition chunk = ChunkPosition.get(cx, cz);
+    if (!selected.contains(chunk) && !world.getChunk(chunk).isEmpty()) {
+      selected.add(chunk);
+      notifyChunkUpdated(chunk);
+      notifyChunkSelectionChange();
+    }
+  }
 
-	/**
-	 * Select chunks within rectangle
-	 *
-	 * @param world
-	 * @param cx0
-	 * @param cz0
-	 * @param cx1
-	 * @param cz1
-	 */
-	public synchronized void selectChunks(World world, int cx0, int cz0,
-			int cx1, int cz1) {
-		for (int cx = cx0; cx <= cx1; ++cx) {
-			for (int cz = cz0; cz <= cz1; ++cz) {
-				ChunkPosition chunk = ChunkPosition.get(cx, cz);
-				if (!selected.contains(chunk) &&
-						!world.getChunk(chunk).isEmpty()) {
-					selected.add(chunk);
-					fireChunkUpdated(chunk);
-				}
-			}
-		}
-	}
+  /**
+   * Select the region containing the given chunk.
+   *
+   * @param cx    chunk x-position
+   * @param cz    chunk z-position
+   */
+  public synchronized void selectRegion(World world, int cx, int cz) {
+    ChunkPosition chunk = ChunkPosition.get(cx, cz);
+    int rx = cx >> 5;
+    int rz = cz >> 5;
+    if (selected.contains(chunk)) {
+      deselectChunks(rx * 32, rz * 32, rx * 32 + 31, rz * 32 + 31);
+    } else {
+      selectChunks(world, rx * 32, rz * 32, rx * 32 + 31, rz * 32 + 31);
+    }
+  }
 
-	/**
-	 * Deselect chunks within rectangle
-	 *
-	 * @param world
-	 * @param cx0
-	 * @param cz0
-	 * @param cx1
-	 * @param cz1
-	 */
-	public synchronized void deselectChunks(World world, int cx0, int cz0,
-			int cx1, int cz1) {
-		for (int cx = cx0; cx <= cx1; ++cx) {
-			for (int cz = cz0; cz <= cz1; ++cz) {
-				ChunkPosition chunk = ChunkPosition.get(cx, cz);
-				if (selected.contains(chunk)) {
-					selected.remove(chunk);
-					fireChunkUpdated(chunk);
-				}
-			}
-		}
-	}
+  /**
+   * Select chunks within rectangle.
+   */
+  public synchronized void selectChunks(World world, int cx0, int cz0, int cx1, int cz1) {
+    boolean selectionChanged = false;
+    for (int cx = cx0; cx <= cx1; ++cx) {
+      for (int cz = cz0; cz <= cz1; ++cz) {
+        ChunkPosition chunk = ChunkPosition.get(cx, cz);
+        if (!selected.contains(chunk) && !world.getChunk(chunk).isEmpty()) {
+          selected.add(chunk);
+          selectionChanged = true;
+          notifyChunkUpdated(chunk);
+        }
+      }
+    }
+    if (selectionChanged) {
+      notifyChunkSelectionChange();
+    }
+  }
 
-	/**
-	 * Deselect all chunks
-	 */
-	public synchronized void clearSelection() {
-		if (!selected.isEmpty()) {
-			fireChunksUpdated(selected);
-			selected.clear();
-		}
-	}
+  /**
+   * Deselect chunks within rectangle.
+   */
+  public synchronized void deselectChunks(int cx0, int cz0, int cx1, int cz1) {
+    boolean selectionChanged = false;
+    for (int cx = cx0; cx <= cx1; ++cx) {
+      for (int cz = cz0; cz <= cz1; ++cz) {
+        ChunkPosition chunk = ChunkPosition.get(cx, cz);
+        if (selected.contains(chunk)) {
+          selected.remove(chunk);
+          selectionChanged = true;
+          notifyChunkUpdated(chunk);
+        }
+      }
+    }
+    if (selectionChanged) {
+      notifyChunkSelectionChange();
+    }
+  }
 
-	/**
-	 * @param chunk
-	 * @return <code>true</code> if the given chunk position is selected
-	 */
-	public boolean isSelected(ChunkPosition chunk) {
-		return selected.contains(chunk);
-	}
+  /**
+   * Deselect all chunks.
+   */
+  public void clearSelection() {
+    if (!selected.isEmpty()) {
+      Set<ChunkPosition> prev = new HashSet<>(selected);
+      selected.clear();
+      notifyChunksUpdated(prev);
+      notifyChunkSelectionChange();
+    }
+  }
 
-	/**
-	 * @return The currently selected chunks
-	 */
-	public synchronized Collection<ChunkPosition> getSelection() {
-		return new LinkedList<ChunkPosition>(selected);
-	}
+  /**
+   * @return <code>true</code> if the given chunk position is selected
+   */
+  public boolean isSelected(ChunkPosition chunk) {
+    return selected.contains(chunk);
+  }
+
+  /**
+   * @return The currently selected chunks
+   */
+  public synchronized Collection<ChunkPosition> getSelection() {
+    return new LinkedList<>(selected);
+  }
 }

@@ -20,21 +20,21 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 abstract public class Receiver {
-	abstract public void logEvent(Level level, String message);
+  abstract public void logEvent(Level level, String message);
 
-	public void logEvent(Level level, String message, Throwable thrown) {
-		StringWriter writer = new StringWriter();
-		writer.append(message);
-		writer.append('\n');
-		thrown.printStackTrace(new PrintWriter(writer));
-		logEvent(level, writer.toString());
-	}
+  public void logEvent(Level level, String message, Throwable thrown) {
+    StringWriter writer = new StringWriter();
+    writer.append(message);
+    writer.append('\n');
+    thrown.printStackTrace(new PrintWriter(writer));
+    logEvent(level, writer.toString());
+  }
 
-	public void logEvent(Level level, Throwable thrown) {
-		StringWriter writer = new StringWriter();
-		writer.append('\n');
-		thrown.printStackTrace(new PrintWriter(writer));
-		logEvent(level, writer.toString());
-	}
+  public void logEvent(Level level, Throwable thrown) {
+    StringWriter writer = new StringWriter();
+    writer.append('\n');
+    thrown.printStackTrace(new PrintWriter(writer));
+    logEvent(level, writer.toString());
+  }
 
 }

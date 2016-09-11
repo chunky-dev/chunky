@@ -27,102 +27,100 @@ import javax.imageio.ImageIO;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class FontTexture extends TextureRef {
-	private final String file;
+  private final String file;
 
-	public static Glyph[] glyphs = new Glyph[256];
+  public static Glyph[] glyphs = new Glyph[256];
 
-	static {
-		for (int i = 0; i < 256; ++i) {
-			glyphs[i] = new Glyph(0, 0, 0, 0);
-		}
-	}
+  static {
+    for (int i = 0; i < 256; ++i) {
+      glyphs[i] = new Glyph(0, 0, 0, 0);
+    }
+  }
 
-	public static class Glyph {
 
-		public final int top;
-		public final int bot;
-		public final int xmin;
-		public final int xmax;
-		public final int width;
+  public static class Glyph {
 
-		public Glyph(int top, int bot, int xmin, int xmax) {
-			this.top = top;
-			this.bot = bot;
-			this.xmin = xmin;
-			this.xmax = xmax;
-			if (xmax >= xmin) {
-				width = xmax-xmin+2;
-			} else {
-				width = 8;
-			}
-		}
-	}
+    public final int top;
+    public final int bot;
+    public final int xmin;
+    public final int xmax;
+    public final int width;
 
-	/**
-	 * Constructor
-	 * @param file texture filename
-	 */
-	public FontTexture(String file) {
-		this.file = file;
-	}
+    public Glyph(int top, int bot, int xmin, int xmax) {
+      this.top = top;
+      this.bot = bot;
+      this.xmin = xmin;
+      this.xmax = xmax;
+      if (xmax >= xmin) {
+        width = xmax - xmin + 2;
+      } else {
+        width = 8;
+      }
+    }
+  }
 
-	@Override
-	protected boolean load(InputStream imageStream) throws IOException,
-			TextureFormatError {
+  /**
+   * Constructor
+   *
+   * @param file texture filename
+   */
+  public FontTexture(String file) {
+    this.file = file;
+  }
 
-		BufferedImage spritemap = ImageIO.read(imageStream);
-		if (spritemap.getWidth() != 128 || spritemap.getHeight() != 128) {
-			throw new TextureFormatError(
-					"Font texture must be 128 by 128 pixels");
-		}
+  @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
 
-		for (int i = 0; i < 255; ++i) {
-			loadGlyph(spritemap, i);
-		}
-		return true;
-	}
+    BufferedImage spritemap = ImageIO.read(imageStream);
+    if (spritemap.getWidth() != 128 || spritemap.getHeight() != 128) {
+      throw new TextureFormatError("Font texture must be 128 by 128 pixels");
+    }
 
-	private static void loadGlyph(BufferedImage spritemap, int ch) {
-		int x = 0x0F & ch;
-		int y = (0xF0 & ch) >> 4;
-		int x0 = x*8;
-		int y0 = y*8;
-		int top = 0;
-		int bot = 0;
-		int bit = 0;
-		int xmin = 8;
-		int xmax = 0;
-		if (ch == ' ') {
-			// Space glyph gets a fixed width of 2 pixels.
-			glyphs[ch] = new Glyph(top, bot, xmin, xmin+2);
-			return;
-		}
-		for (int i = 0; i < 8; ++i){
-			for (int j = 0; j < 8; ++j) {
-				int rgb = spritemap.getRGB(x0 + j, y0 + i);
-				if (rgb != 0) {
-					if (bit < 32) {
-						top |= 1 << bit;
-					} else {
-						bot |= 1 << (bit - 32);
-					}
-					if (j < xmin) {
-						xmin = j;
-					}
-					if (j > xmax) {
-						xmax = j;
-					}
-				}
-				bit += 1;
-			}
-		}
-		glyphs[ch] = new Glyph(top, bot, xmin, xmax);
-	}
+    for (int i = 0; i < 255; ++i) {
+      loadGlyph(spritemap, i);
+    }
+    return true;
+  }
 
-	@Override
-	public boolean load(ZipFile texturePack) {
-		return load(file, texturePack);
-	}
+  private static void loadGlyph(BufferedImage spritemap, int ch) {
+    int x = 0x0F & ch;
+    int y = (0xF0 & ch) >> 4;
+    int x0 = x * 8;
+    int y0 = y * 8;
+    int top = 0;
+    int bot = 0;
+    int bit = 0;
+    int xmin = 8;
+    int xmax = 0;
+    if (ch == ' ') {
+      // Space glyph gets a fixed width of 2 pixels.
+      glyphs[ch] = new Glyph(top, bot, xmin, xmin + 2);
+      return;
+    }
+    for (int i = 0; i < 8; ++i) {
+      for (int j = 0; j < 8; ++j) {
+        int rgb = spritemap.getRGB(x0 + j, y0 + i);
+        if (rgb != 0) {
+          if (bit < 32) {
+            top |= 1 << bit;
+          } else {
+            bot |= 1 << (bit - 32);
+          }
+          if (j < xmin) {
+            xmin = j;
+          }
+          if (j > xmax) {
+            xmax = j;
+          }
+        }
+        bit += 1;
+      }
+    }
+    glyphs[ch] = new Glyph(top, bot, xmin, xmax);
+  }
+
+  @Override public boolean load(ZipFile texturePack) {
+    return load(file, texturePack);
+  }
 
 }
 

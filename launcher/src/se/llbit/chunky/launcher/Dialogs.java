@@ -22,31 +22,35 @@ import javax.swing.JOptionPane;
 
 /**
  * Utility class for showing dialogs.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public abstract class Dialogs {
-	private static final String DEFAULT_WARNING_TITLE = "Warning";
-	private static final String DEFAULT_ERROR_TITLE = "Error";
-	private static final String DEFAULT_MESSAGE_TITLE = "Message";
+  private static final String DEFAULT_WARNING_TITLE = "Warning";
+  private static final String DEFAULT_ERROR_TITLE = "Error";
+  private static final String DEFAULT_MESSAGE_TITLE = "Message";
 
-	public static final void message(Component component, String message) {
-		error(component, message, DEFAULT_MESSAGE_TITLE);
-	}
-	public static final void message(Component component, String message, String title) {
-		JOptionPane.showMessageDialog(component, message, title, JOptionPane.PLAIN_MESSAGE);
-	}
+  public static final void message(Component component, String message) {
+    error(component, message, DEFAULT_MESSAGE_TITLE);
+  }
 
-	public static final void error(Component component, String message) {
-		error(component, message, DEFAULT_ERROR_TITLE);
-	}
-	public static final void error(Component component, String message, String title) {
-		JOptionPane.showMessageDialog(component, message, title, JOptionPane.ERROR_MESSAGE);
-	}
+  public static final void message(Component component, String message, String title) {
+    JOptionPane.showMessageDialog(component, message, title, JOptionPane.PLAIN_MESSAGE);
+  }
 
-	public static final void warning(Component component, String message) {
-		warning(component, message, DEFAULT_WARNING_TITLE);
-	}
-	public static final void warning(Component component, String message, String title) {
-		JOptionPane.showMessageDialog(component, message, title, JOptionPane.WARNING_MESSAGE);
-	}
+  public static final void error(Component component, String message) {
+    error(component, message, DEFAULT_ERROR_TITLE);
+  }
+
+  public static final void error(Component component, String message, String title) {
+    JOptionPane.showMessageDialog(component, message, title, JOptionPane.ERROR_MESSAGE);
+  }
+
+  public static final void warning(Component component, String message) {
+    warning(component, message, DEFAULT_WARNING_TITLE);
+  }
+
+  public static final void warning(Component component, String message, String title) {
+    JOptionPane.showMessageDialog(component, message, title, JOptionPane.WARNING_MESSAGE);
+  }
 }

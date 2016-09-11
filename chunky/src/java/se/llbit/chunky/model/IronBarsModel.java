@@ -22,121 +22,116 @@ import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
-@SuppressWarnings("javadoc")
 public class IronBarsModel {
 
-	private static Quad[] core = {
-		new DoubleSidedQuad(new Vector3d(.5, 1, 7/16.), new Vector3d(.5, 1, 9/16.),
-				new Vector3d(.5, 0, 7/16.), new Vector4d(7/16., 9/16., 1, 0)),
+  private static Quad[] core =
+      {new DoubleSidedQuad(new Vector3(.5, 1, 7 / 16.), new Vector3(.5, 1, 9 / 16.),
+          new Vector3(.5, 0, 7 / 16.), new Vector4(7 / 16., 9 / 16., 1, 0)),
 
-		new DoubleSidedQuad(new Vector3d(7/16., 1, .5), new Vector3d(9/16., 1, .5),
-				new Vector3d(7/16., 0, .5), new Vector4d(7/16., 9/16., 1, 0)),
-	};
+          new DoubleSidedQuad(new Vector3(7 / 16., 1, .5), new Vector3(9 / 16., 1, .5),
+              new Vector3(7 / 16., 0, .5), new Vector4(7 / 16., 9 / 16., 1, 0)),};
 
 
-	private static Quad[] coreTop = {
-		// Top face.
-		new DoubleSidedQuad(new Vector3d(9/16., 1, 7/16.), new Vector3d(7/16., 1, 7/16.),
-				new Vector3d(9/16., 1, 9/16.), new Vector4d(9/16., 7/16., 7/16., 9/16.)),
+  private static Quad[] coreTop = {
+      // Top face.
+      new DoubleSidedQuad(new Vector3(9 / 16., 1, 7 / 16.), new Vector3(7 / 16., 1, 7 / 16.),
+          new Vector3(9 / 16., 1, 9 / 16.), new Vector4(9 / 16., 7 / 16., 7 / 16., 9 / 16.)),
 
-		// Bottom face.
-		new DoubleSidedQuad(new Vector3d(7/16., 0, 7/16.), new Vector3d(9/16., 0, 7/16.),
-				new Vector3d(7/16., 0, 9/16.), new Vector4d(7/16., 9/16., 7/16., 9/16.)),
-	};
+      // Bottom face.
+      new DoubleSidedQuad(new Vector3(7 / 16., 0, 7 / 16.), new Vector3(9 / 16., 0, 7 / 16.),
+          new Vector3(7 / 16., 0, 9 / 16.), new Vector4(7 / 16., 9 / 16., 7 / 16., 9 / 16.)),};
 
-	private static Quad[][] connector = {
-		// Front side.
-		{
-			// Center face.
-			new DoubleSidedQuad(new Vector3d(.5, 1, .5), new Vector3d(.5, 1, 0),
-					new Vector3d(.5, 0, .5), new Vector4d(.5, 0, 1, 0)),
+  private static Quad[][] connector = {
+      // Front side.
+      {
+          // Center face.
+          new DoubleSidedQuad(new Vector3(.5, 1, .5), new Vector3(.5, 1, 0),
+              new Vector3(.5, 0, .5), new Vector4(.5, 0, 1, 0)),
 
-			// Top face.
-			new DoubleSidedQuad(new Vector3d(9/16., 1, 0), new Vector3d(7/16., 1, 0),
-					new Vector3d(9/16., 1, 7/16.), new Vector4d(9/16., 7/16., 0, 7/16.)),
+          // Top face.
+          new DoubleSidedQuad(new Vector3(9 / 16., 1, 0), new Vector3(7 / 16., 1, 0),
+              new Vector3(9 / 16., 1, 7 / 16.), new Vector4(9 / 16., 7 / 16., 0, 7 / 16.)),
 
-			// Bottom face.
-			new DoubleSidedQuad(new Vector3d(7/16., 0, 0), new Vector3d(9/16., 0, 0),
-					new Vector3d(7/16., 0, 7/16.), new Vector4d(7/16., 9/16., 0, 7/16.)),
+          // Bottom face.
+          new DoubleSidedQuad(new Vector3(7 / 16., 0, 0), new Vector3(9 / 16., 0, 0),
+              new Vector3(7 / 16., 0, 7 / 16.), new Vector4(7 / 16., 9 / 16., 0, 7 / 16.)),
 
-		},
-		// Back side.
-		{
-			// Center face.
-			new DoubleSidedQuad(new Vector3d(.5, 1, 1), new Vector3d(.5, 1, .5),
-					new Vector3d(.5, 0, 1), new Vector4d(1, .5, 1, 0)),
+      },
+      // Back side.
+      {
+          // Center face.
+          new DoubleSidedQuad(new Vector3(.5, 1, 1), new Vector3(.5, 1, .5),
+              new Vector3(.5, 0, 1), new Vector4(1, .5, 1, 0)),
 
-			// Top face.
-			new DoubleSidedQuad(new Vector3d(9/16., 1, 9/16.), new Vector3d(7/16., 1, 9/16.),
-					new Vector3d(9/16., 1, 1), new Vector4d(9/16., 7/16., 9/16., 1)),
+          // Top face.
+          new DoubleSidedQuad(new Vector3(9 / 16., 1, 9 / 16.), new Vector3(7 / 16., 1, 9 / 16.),
+              new Vector3(9 / 16., 1, 1), new Vector4(9 / 16., 7 / 16., 9 / 16., 1)),
 
-			// Bottom face.
-			new DoubleSidedQuad(new Vector3d(7/16., 0, 9/16.), new Vector3d(9/16., 0, 9/16.),
-					new Vector3d(7/16., 0, 1), new Vector4d(7/16., 9/16., 9/16., 1)),
-		},
-	};
+          // Bottom face.
+          new DoubleSidedQuad(new Vector3(7 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 9 / 16.),
+              new Vector3(7 / 16., 0, 1), new Vector4(7 / 16., 9 / 16., 9 / 16., 1)),},};
 
-	private static Quad[][] panes = new Quad[4][];
+  private static Quad[][] panes = new Quad[4][];
 
-	static {
-		panes[0] = connector[0];
-		panes[1] = connector[1];
-		for (int j = 2; j < 4; ++j) {
-			panes[j] = Model.rotateY(connector[j-2]);
-		}
-	}
+  static {
+    panes[0] = connector[0];
+    panes[1] = connector[1];
+    for (int j = 2; j < 4; ++j) {
+      panes[j] = Model.rotateY(connector[j - 2]);
+    }
+  }
 
-	public static boolean intersect(Ray ray) {
-		int metadata = 0xF & (ray.getCurrentData() >> BlockData.GLASS_PANE_OFFSET);
-		boolean hit = false;
-		ray.t = Double.POSITIVE_INFINITY;
-		if (metadata == 0) {
-			for (Quad quad : core) {
-				if (quad.intersect(ray)) {
-					Texture.ironBars.getColor(ray);
-					if (ray.color.w > 0) {
-						ray.n.set(quad.n);
-						ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
-						ray.t = ray.tNext;
-						hit = true;
-					}
-				}
-			}
-		}
-		for (Quad quad : coreTop) {
-			if (quad.intersect(ray)) {
-				Texture.ironBars.getColor(ray);
-				if (ray.color.w > 0) {
-					ray.n.set(quad.n);
-					ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
-					ray.t = ray.tNext;
-					hit = true;
-				}
-			}
-		}
-		for (int i = 0; i < 4; ++i) {
-			if ((metadata & (1 << i)) != 0) {
-				for (int j = 0; j < panes[i].length; ++j) {
-					Quad quad = panes[i][j];
-					if (quad.intersect(ray)) {
-						Texture.ironBars.getColor(ray);
-						if (ray.color.w > 0) {
-							ray.n.set(quad.n);
-							ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
-							ray.t = ray.tNext;
-							hit = true;
-						}
-					}
-				}
-			}
-		}
-		if (hit) {
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+  public static boolean intersect(Ray ray) {
+    int metadata = 0xF & (ray.getCurrentData() >> BlockData.GLASS_PANE_OFFSET);
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    if (metadata == 0) {
+      for (Quad quad : core) {
+        if (quad.intersect(ray)) {
+          Texture.ironBars.getColor(ray);
+          if (ray.color.w > 0) {
+            ray.n.set(quad.n);
+            ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
+            ray.t = ray.tNext;
+            hit = true;
+          }
+        }
+      }
+    }
+    for (Quad quad : coreTop) {
+      if (quad.intersect(ray)) {
+        Texture.ironBars.getColor(ray);
+        if (ray.color.w > 0) {
+          ray.n.set(quad.n);
+          ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
+          ray.t = ray.tNext;
+          hit = true;
+        }
+      }
+    }
+    for (int i = 0; i < 4; ++i) {
+      if ((metadata & (1 << i)) != 0) {
+        for (int j = 0; j < panes[i].length; ++j) {
+          Quad quad = panes[i][j];
+          if (quad.intersect(ray)) {
+            Texture.ironBars.getColor(ray);
+            if (ray.color.w > 0) {
+              ray.n.set(quad.n);
+              ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
+              ray.t = ray.tNext;
+              hit = true;
+            }
+          }
+        }
+      }
+    }
+    if (hit) {
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

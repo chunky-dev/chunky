@@ -19,58 +19,56 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
-@SuppressWarnings("javadoc")
 public class CakeModel {
-	private static Quad[] quads = {
-		// front
-		new Quad(new Vector3d(.9375, 0, .0625), new Vector3d(.0625, 0, .0625),
-				new Vector3d(.9375, .5, .0625), new Vector4d(.9375, .0625, 0, .5)),
+  private static Quad[] quads = {
+      // front
+      new Quad(new Vector3(.9375, 0, .0625), new Vector3(.0625, 0, .0625),
+          new Vector3(.9375, .5, .0625), new Vector4(.9375, .0625, 0, .5)),
 
-		// back
-		new Quad(new Vector3d(.0625, 0, .9375), new Vector3d(.9375, 0, .9375),
-				new Vector3d(.0625, .5, .9375), new Vector4d(.0625, .9375, 0, .5)),
+      // back
+      new Quad(new Vector3(.0625, 0, .9375), new Vector3(.9375, 0, .9375),
+          new Vector3(.0625, .5, .9375), new Vector4(.0625, .9375, 0, .5)),
 
-		// right
-		new Quad(new Vector3d(.0625, 0, .0625), new Vector3d(.0625, 0, .9375),
-				new Vector3d(.0625, .5, .0625), new Vector4d(.0625, .9375, 0, .5)),
+      // right
+      new Quad(new Vector3(.0625, 0, .0625), new Vector3(.0625, 0, .9375),
+          new Vector3(.0625, .5, .0625), new Vector4(.0625, .9375, 0, .5)),
 
-		// left
-		new Quad(new Vector3d(.9375, 0, .9375), new Vector3d(.9375, 0, .0625),
-				new Vector3d(.9375, .5, .9375), new Vector4d(.9375, .0625, 0, .5)),
+      // left
+      new Quad(new Vector3(.9375, 0, .9375), new Vector3(.9375, 0, .0625),
+          new Vector3(.9375, .5, .9375), new Vector4(.9375, .0625, 0, .5)),
 
-		// top
-		new Quad(new Vector3d(.9375, .5, .0625), new Vector3d(.0625, .5, .0625),
-				new Vector3d(.9375, .5, .9375), new Vector4d(.9375, .0625, .0625, .9375)),
+      // top
+      new Quad(new Vector3(.9375, .5, .0625), new Vector3(.0625, .5, .0625),
+          new Vector3(.9375, .5, .9375), new Vector4(.9375, .0625, .0625, .9375)),
 
-		// bottom
-		new Quad(new Vector3d(.0625, 0, .0625), new Vector3d(.9375, 0, .0625),
-				new Vector3d(.0625, 0, .9375), new Vector4d(.0625, .9375, .0625, .9375)),
-	};
+      // bottom
+      new Quad(new Vector3(.0625, 0, .0625), new Vector3(.9375, 0, .0625),
+          new Vector3(.0625, 0, .9375), new Vector4(.0625, .9375, .0625, .9375)),};
 
-	public static boolean intersect(Ray ray) {
-		boolean hit = false;
-		ray.t = Double.POSITIVE_INFINITY;
-		for (Quad quad : quads) {
-			if (quad.intersect(ray)) {
-				if (quad.n.y > 0)
-					Texture.cakeTop.getColor(ray);
-				else if (quad.n.y < 0)
-					Texture.cakeBottom.getColor(ray);
-				else
-					Texture.cakeSide.getColor(ray);
-				ray.n.set(quad.n);
-				ray.t = ray.tNext;
-				hit = true;
-			}
-		}
-		if (hit) {
-			ray.color.w = 1;
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+  public static boolean intersect(Ray ray) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    for (Quad quad : quads) {
+      if (quad.intersect(ray)) {
+        if (quad.n.y > 0)
+          Texture.cakeTop.getColor(ray);
+        else if (quad.n.y < 0)
+          Texture.cakeBottom.getColor(ray);
+        else
+          Texture.cakeSide.getColor(ray);
+        ray.n.set(quad.n);
+        ray.t = ray.tNext;
+        hit = true;
+      }
+    }
+    if (hit) {
+      ray.color.w = 1;
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

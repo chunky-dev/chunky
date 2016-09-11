@@ -27,28 +27,25 @@ import java.util.zip.CRC32;
  */
 public class CrcOutputStream extends OutputStream {
 
-	CRC32 crc = new CRC32();
+  CRC32 crc = new CRC32();
 
-	@Override
-	public void write(int b) throws IOException {
-		crc.update(b);
-	}
+  @Override public void write(int b) throws IOException {
+    crc.update(b);
+  }
 
-	@Override
-	public void write(byte[] b, int off, int len) throws IOException {
-		crc.update(b, off, len);
-	}
+  @Override public void write(byte[] b, int off, int len) throws IOException {
+    crc.update(b, off, len);
+  }
 
-	@Override
-	public void write(byte[] b) throws IOException {
-		crc.update(b);
-	}
+  @Override public void write(byte[] b) throws IOException {
+    crc.update(b);
+  }
 
-	/**
-	 * @return The calculated CRC value
-	 */
-	public int getCRC() {
-		return (int) crc.getValue();
-	}
+  /**
+   * @return The calculated CRC value
+   */
+  public int getCRC() {
+    return (int) crc.getValue();
+  }
 
 }

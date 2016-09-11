@@ -21,43 +21,40 @@ import se.llbit.chunky.world.BlockData;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
-@SuppressWarnings("javadoc")
 public class ChorusPlantModel {
-	private static AABB core = new AABB(4/16., 12/16., 4/16., 12/16., 4/16., 12/16.);
+  private static AABB core = new AABB(4 / 16., 12 / 16., 4 / 16., 12 / 16., 4 / 16., 12 / 16.);
 
-	private static AABB[] connector = {
-			new AABB(4/16.0, 12/16.0, 4/16.0, 12/16.0, 0, 4/16.),
-			new AABB(4/16.0, 12/16.0, 4/16.0, 12/16.0, 12/16., 1),
-			new AABB(12/16., 1, 4/16.0, 12/16.0, 4/16.0, 12/16.0),
-			new AABB(0, 4/16., 4/16.0, 12/16.0, 4/16.0, 12/16.0),
-			// Above.
-			new AABB(4/16., 12/16., 12/16.0, 1, 4/16.0, 12/16.0),
-			// Below
-			new AABB(4/16., 12/16., 0, 4/16.0, 4/16.0, 12/16.0),
-	};
+  private static AABB[] connector = {new AABB(4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0, 0, 4 / 16.),
+      new AABB(4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0, 12 / 16., 1),
+      new AABB(12 / 16., 1, 4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0),
+      new AABB(0, 4 / 16., 4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0),
+      // Above.
+      new AABB(4 / 16., 12 / 16., 12 / 16.0, 1, 4 / 16.0, 12 / 16.0),
+      // Below
+      new AABB(4 / 16., 12 / 16., 0, 4 / 16.0, 4 / 16.0, 12 / 16.0),};
 
-	public static boolean intersect(Ray ray) {
-		boolean hit = false;
-		ray.t = Double.POSITIVE_INFINITY;
-		if (core.intersect(ray)) {
-			Texture.chorusPlant.getColor(ray);
-			ray.t = ray.tNext;
-			hit = true;
-		}
-		for (int i = 0; i < 6; ++i) {
-			if (((ray.getCurrentData() >> BlockData.OFFSET) & (1 << i)) != 0) {
-				if (connector[i].intersect(ray)) {
-					Texture.chorusPlant.getColor(ray);
-					ray.t = ray.tNext;
-					hit = true;
-				}
-			}
-		}
-		if (hit) {
-			ray.color.w = 1;
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+  public static boolean intersect(Ray ray) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    if (core.intersect(ray)) {
+      Texture.chorusPlant.getColor(ray);
+      ray.t = ray.tNext;
+      hit = true;
+    }
+    for (int i = 0; i < 6; ++i) {
+      if (((ray.getCurrentData() >> BlockData.OFFSET) & (1 << i)) != 0) {
+        if (connector[i].intersect(ray)) {
+          Texture.chorusPlant.getColor(ray);
+          ray.t = ray.tNext;
+          hit = true;
+        }
+      }
+    }
+    if (hit) {
+      ray.color.w = 1;
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

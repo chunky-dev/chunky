@@ -5,10 +5,10 @@ import se.llbit.chunky.world.Material;
 
 public class PaintingMaterial extends Material {
 
-	public static final PaintingMaterial INSTANCE = new PaintingMaterial();
+  public static final PaintingMaterial INSTANCE = new PaintingMaterial();
 
-	private PaintingMaterial() {
-		super("painting", Texture.paintings);
-	}
+  private PaintingMaterial() {
+    super("painting", Texture.paintings);
+  }
 
 }

@@ -20,25 +20,24 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
-@SuppressWarnings("javadoc")
 public class EnchantmentTableModel {
-	private static AABB aabb = new AABB(0, 1, 0, .75, 0, 1);
+  private static AABB aabb = new AABB(0, 1, 0, .75, 0, 1);
 
-	public static boolean intersect(Ray ray) {
-		ray.t = Double.POSITIVE_INFINITY;
-		if (aabb.intersect(ray)) {
-			if (ray.n.y > 0) {
-				Texture.enchantmentTableTop.getColor(ray);
-			} else if (ray.n.y < 0) {
-				Texture.enchantmentTableBottom.getColor(ray);
-			} else {
-				Texture.enchantmentTableSide.getColor(ray);
-			}
-			ray.color.w = 1;
-			ray.distance += ray.tNext;
-			ray.o.scaleAdd(ray.tNext, ray.d);
-			return true;
-		}
-		return false;
-	}
+  public static boolean intersect(Ray ray) {
+    ray.t = Double.POSITIVE_INFINITY;
+    if (aabb.intersect(ray)) {
+      if (ray.n.y > 0) {
+        Texture.enchantmentTableTop.getColor(ray);
+      } else if (ray.n.y < 0) {
+        Texture.enchantmentTableBottom.getColor(ray);
+      } else {
+        Texture.enchantmentTableSide.getColor(ray);
+      }
+      ray.color.w = 1;
+      ray.distance += ray.tNext;
+      ray.o.scaleAdd(ray.tNext, ray.d);
+      return true;
+    }
+    return false;
+  }
 }

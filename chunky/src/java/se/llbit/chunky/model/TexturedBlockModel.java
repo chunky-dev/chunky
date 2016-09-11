@@ -24,140 +24,147 @@ import se.llbit.math.Ray;
 
 /**
  * A textured block.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class TexturedBlockModel {
-	private static final AABB block = new AABB(0, 1, 0, 1, 0, 1);
+  private static final AABB block = new AABB(0, 1, 0, 1, 0, 1);
 
-	/**
-	 * Find intersection between ray and block
-	 * @param ray ray to test
-	 * @param texture texture[0] = north, [1] = south, [2] = east, [3] = west,
-	 * [4] = top, [5] = bottom
-	 * @return <code>true</code> if the ray intersected the block
-	 */
-	public static boolean intersect(Ray ray, Texture[] texture) {
-		ray.t = Double.POSITIVE_INFINITY;
-		if (block.intersect(ray)) {
-			float[] color;
-			if (ray.n.z < 0) {
-				color = texture[0].getColor(ray.u, ray.v);
-			} else if (ray.n.z > 0) {
-				color = texture[1].getColor(ray.u, ray.v);
-			} else if (ray.n.x > 0) {
-				color = texture[2].getColor(ray.u, ray.v);
-			} else if (ray.n.x < 0) {
-				color = texture[3].getColor(ray.u, ray.v);
-			} else if (ray.n.y > 0) {
-				color = texture[4].getColor(ray.u, ray.v);
-			} else {
-				color = texture[5].getColor(ray.u, ray.v);
-			}
+  /**
+   * Find intersection between ray and block
+   *
+   * @param ray     ray to test
+   * @param texture texture[0] = north, [1] = south, [2] = east, [3] = west,
+   *                [4] = top, [5] = bottom
+   * @return <code>true</code> if the ray intersected the block
+   */
+  public static boolean intersect(Ray ray, Texture[] texture) {
+    ray.t = Double.POSITIVE_INFINITY;
+    if (block.intersect(ray)) {
+      float[] color;
+      if (ray.n.z < 0) {
+        color = texture[0].getColor(ray.u, ray.v);
+      } else if (ray.n.z > 0) {
+        color = texture[1].getColor(ray.u, ray.v);
+      } else if (ray.n.x > 0) {
+        color = texture[2].getColor(ray.u, ray.v);
+      } else if (ray.n.x < 0) {
+        color = texture[3].getColor(ray.u, ray.v);
+      } else if (ray.n.y > 0) {
+        color = texture[4].getColor(ray.u, ray.v);
+      } else {
+        color = texture[5].getColor(ray.u, ray.v);
+      }
 
-			if (color[3] > Ray.EPSILON) {
-				ray.color.set(color);
-				ray.distance += ray.tNext;
-				ray.o.scaleAdd(ray.tNext, ray.d);
-				return true;
-			}
-		}
-		return false;
-	}
+      if (color[3] > Ray.EPSILON) {
+        ray.color.set(color);
+        ray.distance += ray.tNext;
+        ray.o.scaleAdd(ray.tNext, ray.d);
+        return true;
+      }
+    }
+    return false;
+  }
 
-	/**
-	 * Find intersection between ray and block.
-	 * @param ray ray to test
-	 * @param texture Texture array
-	 * @param index An index array used to index the texture array
-	 * @return <code>true</code> if the ray intersected the block
-	 */
-	public static boolean intersect(Ray ray, Texture[] texture, int[] index) {
-		ray.t = Double.POSITIVE_INFINITY;
-		if (block.intersect(ray)) {
-			float[] color;
-			if (ray.n.z < 0) {
-				color = texture[index[0]].getColor(ray.u, ray.v);
-			} else if (ray.n.z > 0) {
-				color = texture[index[1]].getColor(ray.u, ray.v);
-			} else if (ray.n.x > 0) {
-				color = texture[index[2]].getColor(ray.u, ray.v);
-			} else if (ray.n.x < 0) {
-				color = texture[index[3]].getColor(ray.u, ray.v);
-			} else if (ray.n.y > 0) {
-				color = texture[index[4]].getColor(ray.u, ray.v);
-			} else {
-				color = texture[index[5]].getColor(ray.u, ray.v);
-			}
+  /**
+   * Find intersection between ray and block.
+   *
+   * @param ray     ray to test
+   * @param texture Texture array
+   * @param index   An index array used to index the texture array
+   * @return <code>true</code> if the ray intersected the block
+   */
+  public static boolean intersect(Ray ray, Texture[] texture, int[] index) {
+    ray.t = Double.POSITIVE_INFINITY;
+    if (block.intersect(ray)) {
+      float[] color;
+      if (ray.n.z < 0) {
+        color = texture[index[0]].getColor(ray.u, ray.v);
+      } else if (ray.n.z > 0) {
+        color = texture[index[1]].getColor(ray.u, ray.v);
+      } else if (ray.n.x > 0) {
+        color = texture[index[2]].getColor(ray.u, ray.v);
+      } else if (ray.n.x < 0) {
+        color = texture[index[3]].getColor(ray.u, ray.v);
+      } else if (ray.n.y > 0) {
+        color = texture[index[4]].getColor(ray.u, ray.v);
+      } else {
+        color = texture[index[5]].getColor(ray.u, ray.v);
+      }
 
-			if (color[3] > Ray.EPSILON) {
-				ray.color.set(color);
-				ray.distance += ray.tNext;
-				ray.o.scaleAdd(ray.tNext, ray.d);
-				return true;
-			}
-		}
-		return false;
-	}
-	/**
-	 * Find intersection between ray and block
-	 * @param ray ray to test
-	 * @param texture Block texture
-	 * @return <code>true</code> if the ray intersected the block
-	 */
-	public static boolean intersect(Ray ray, Texture texture) {
-		ray.t = Double.POSITIVE_INFINITY;
-		if (block.intersect(ray)) {
-			float[] color = texture.getColor(ray.u, ray.v);
-			if (color[3] > Ray.EPSILON) {
-				ray.color.set(color);
-				ray.distance += ray.tNext;
-				ray.o.scaleAdd(ray.tNext, ray.d);
-				return true;
-			}
-		}
-		return false;
-	}
+      if (color[3] > Ray.EPSILON) {
+        ray.color.set(color);
+        ray.distance += ray.tNext;
+        ray.o.scaleAdd(ray.tNext, ray.d);
+        return true;
+      }
+    }
+    return false;
+  }
 
-	/**
-	 * Find the color of the object at the intersection point
-	 * @param ray ray to test
-	 */
-	public static void getIntersectionColor(Ray ray) {
+  /**
+   * Find intersection between ray and block
+   *
+   * @param ray     ray to test
+   * @param texture Block texture
+   * @return <code>true</code> if the ray intersected the block
+   */
+  public static boolean intersect(Ray ray, Texture texture) {
+    ray.t = Double.POSITIVE_INFINITY;
+    if (block.intersect(ray)) {
+      float[] color = texture.getColor(ray.u, ray.v);
+      if (color[3] > Ray.EPSILON) {
+        ray.color.set(color);
+        ray.distance += ray.tNext;
+        ray.o.scaleAdd(ray.tNext, ray.d);
+        return true;
+      }
+    }
+    return false;
+  }
 
-		if (ray.getCurrentMaterial() == Block.AIR) {
-			ray.color.x = 1;
-			ray.color.y = 1;
-			ray.color.z = 1;
-			ray.color.w = 0;
-			return;
-		}
+  /**
+   * Find the color of the object at the intersection point
+   *
+   * @param ray ray to test
+   */
+  public static void getIntersectionColor(Ray ray) {
 
-		calcUVCoords(ray);
+    if (ray.getCurrentMaterial() == Block.AIR) {
+      ray.color.x = 1;
+      ray.color.y = 1;
+      ray.color.z = 1;
+      ray.color.w = 0;
+      return;
+    }
 
-		ray.getCurrentMaterial().getTexture(ray.getBlockData()).getColor(ray);
-	}
+    calcUVCoords(ray);
 
-	/**
-	 * Calculate the UV coordinates for the ray on the intersected block.
-	 * @param ray ray to test
-	 */
-	private static void calcUVCoords(Ray ray) {
-		int bx = (int) QuickMath.floor(ray.o.x);
-		int by = (int) QuickMath.floor(ray.o.y);
-		int bz = (int) QuickMath.floor(ray.o.z);
-		if (ray.n.y != 0) {
-			ray.u = ray.o.x - bx;
-			ray.v = ray.o.z - bz;
-		} else if (ray.n.x != 0) {
-			ray.u = ray.o.z - bz;
-			ray.v = ray.o.y - by;
-		} else {
-			ray.u = ray.o.x - bx;
-			ray.v = ray.o.y - by;
-		}
-		if (ray.n.x > 0 || ray.n.z < 0) {
-			ray.u = 1 - ray.u;
-		}
-	}
+    ray.getCurrentMaterial().getTexture(ray.getBlockData()).getColor(ray);
+  }
+
+  /**
+   * Calculate the UV coordinates for the ray on the intersected block.
+   *
+   * @param ray ray to test
+   */
+  private static void calcUVCoords(Ray ray) {
+    int bx = (int) QuickMath.floor(ray.o.x);
+    int by = (int) QuickMath.floor(ray.o.y);
+    int bz = (int) QuickMath.floor(ray.o.z);
+    if (ray.n.y != 0) {
+      ray.u = ray.o.x - bx;
+      ray.v = ray.o.z - bz;
+    } else if (ray.n.x != 0) {
+      ray.u = ray.o.z - bz;
+      ray.v = ray.o.y - by;
+    } else {
+      ray.u = ray.o.x - bx;
+      ray.v = ray.o.y - by;
+    }
+    if (ray.n.x > 0 || ray.n.z < 0) {
+      ray.u = 1 - ray.u;
+    }
+  }
 
 }

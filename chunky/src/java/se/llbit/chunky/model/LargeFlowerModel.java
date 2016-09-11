@@ -20,83 +20,79 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
-@SuppressWarnings("javadoc")
 public class LargeFlowerModel {
-	protected static Quad[] quads = {
-		new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 1),
-				new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
+  protected static Quad[] quads =
+      {new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 1, 0),
+          new Vector4(0, 1, 0, 1)),
 
-		new Quad(new Vector3d(1, 0, 1), new Vector3d(0, 0, 0),
-				new Vector3d(1, 1, 1), new Vector4d(0, 1, 0, 1)),
+          new Quad(new Vector3(1, 0, 1), new Vector3(0, 0, 0), new Vector3(1, 1, 1),
+              new Vector4(0, 1, 0, 1)),
 
-		new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 1),
-				new Vector3d(1, 1, 0), new Vector4d(0, 1, 0, 1)),
+          new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 1, 0),
+              new Vector4(0, 1, 0, 1)),
 
-		new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 0),
-				new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
-	};
-	protected static Quad[] sunflower = {
-		new Quad(new Vector3d(14/16., 8/16., 2/16.), new Vector3d(2/16., 16/16., 2/16.),
-				new Vector3d(14/16., 8/16., 14/16.), new Vector4d(2/16., 14/16., 2/16., 14/16.)),
-		new Quad(new Vector3d(2/16., 16/16., 2/16.), new Vector3d(14/16., 8/16., 2/16.),
-				new Vector3d(2/16., 16/16., 14/16.), new Vector4d(2/16., 14/16., 2/16., 14/16.)),
-	};
+          new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(0, 1, 1),
+              new Vector4(0, 1, 0, 1)),};
+  protected static Quad[] sunflower =
+      {new Quad(new Vector3(14 / 16., 8 / 16., 2 / 16.), new Vector3(2 / 16., 16 / 16., 2 / 16.),
+          new Vector3(14 / 16., 8 / 16., 14 / 16.),
+          new Vector4(2 / 16., 14 / 16., 2 / 16., 14 / 16.)),
+          new Quad(new Vector3(2 / 16., 16 / 16., 2 / 16.),
+              new Vector3(14 / 16., 8 / 16., 2 / 16.), new Vector3(2 / 16., 16 / 16., 14 / 16.),
+              new Vector4(2 / 16., 14 / 16., 2 / 16., 14 / 16.)),};
 
-	final static Texture[][] tex = {
-		{ Texture.sunflowerBottom, Texture.sunflowerTop },
-		{ Texture.lilacBottom, Texture.lilacTop },
-		{ Texture.doubleTallGrassBottom, Texture.doubleTallGrassTop },
-		{ Texture.largeFernBottom, Texture.largeFernTop },
-		{ Texture.roseBushBottom, Texture.roseBushTop },
-		{ Texture.peonyBottom, Texture.peonyTop },
-	};
-	final static Texture[] sunflowerTex = { Texture.sunflowerFront, Texture.sunflowerBack };
+  final static Texture[][] tex =
+      {{Texture.sunflowerBottom, Texture.sunflowerTop}, {Texture.lilacBottom, Texture.lilacTop},
+          {Texture.doubleTallGrassBottom, Texture.doubleTallGrassTop},
+          {Texture.largeFernBottom, Texture.largeFernTop},
+          {Texture.roseBushBottom, Texture.roseBushTop}, {Texture.peonyBottom, Texture.peonyTop},};
+  final static Texture[] sunflowerTex = {Texture.sunflowerFront, Texture.sunflowerBack};
 
-	public static boolean intersect(Ray ray, Scene scene) {
-		boolean hit = false;
-		ray.t = Double.POSITIVE_INFINITY;
-		int data = ray.getBlockData();
-		int kind = (data&7) % 6;
-		int top = (data&8) >> 3;
-		for (Quad quad : quads) {
-			if (quad.intersect(ray)) {
-				float[] color = tex[kind][top].getColor(ray.u, ray.v);
-				if (color[3] > Ray.EPSILON) {
-					ray.color.set(color);
-					if (kind == 2 || kind == 3) {
-						float[] biomeColor = ray.getBiomeGrassColor(scene);
-						ray.color.x *= biomeColor[0];
-						ray.color.y *= biomeColor[1];
-						ray.color.z *= biomeColor[2];
-					}
-					ray.t = ray.tNext;
-					ray.n.set(quad.n);
-					hit = true;
-				}
-			}
-		}
-		if (kind == 0 && top == 1) {
-			for (int i = 0; i < sunflower.length; ++i) {
-				Quad quad = sunflower[i];
-				if (quad.intersect(ray)) {
-					float[] color = sunflowerTex[i].getColor(ray.u, ray.v);
-					if (color[3] > Ray.EPSILON) {
-						ray.color.set(color);
-						ray.t = ray.tNext;
-						ray.n.set(quad.n);
-						hit = true;
-					}
-				}
-			}
-		}
+  public static boolean intersect(Ray ray, Scene scene) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    int data = ray.getBlockData();
+    int kind = (data & 7) % 6;
+    int top = (data & 8) >> 3;
+    for (Quad quad : quads) {
+      if (quad.intersect(ray)) {
+        float[] color = tex[kind][top].getColor(ray.u, ray.v);
+        if (color[3] > Ray.EPSILON) {
+          ray.color.set(color);
+          if (kind == 2 || kind == 3) {
+            float[] biomeColor = ray.getBiomeGrassColor(scene);
+            ray.color.x *= biomeColor[0];
+            ray.color.y *= biomeColor[1];
+            ray.color.z *= biomeColor[2];
+          }
+          ray.t = ray.tNext;
+          ray.n.set(quad.n);
+          hit = true;
+        }
+      }
+    }
+    if (kind == 0 && top == 1) {
+      for (int i = 0; i < sunflower.length; ++i) {
+        Quad quad = sunflower[i];
+        if (quad.intersect(ray)) {
+          float[] color = sunflowerTex[i].getColor(ray.u, ray.v);
+          if (color[3] > Ray.EPSILON) {
+            ray.color.set(color);
+            ray.t = ray.tNext;
+            ray.n.set(quad.n);
+            hit = true;
+          }
+        }
+      }
+    }
 
-		if (hit) {
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+    if (hit) {
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

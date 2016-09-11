@@ -16,105 +16,108 @@
  */
 package se.llbit.chunky.world;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.Collection;
-
-import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.CorruptLayer;
-import se.llbit.chunky.map.MapBuffer;
+import se.llbit.chunky.map.MapTile;
+import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.nbt.CompoundTag;
+
+import java.util.Collection;
 
 /**
  * Empty or non-existent chunk.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class EmptyChunk extends Chunk {
 
-	/**
-	 * Singleton instance
-	 */
-	public static final EmptyChunk INSTANCE = new EmptyChunk();
+  /**
+   * Singleton instance
+   */
+  public static final EmptyChunk INSTANCE = new EmptyChunk();
 
-	private static final int COLOR = 0xFFFFFFFF;
+  private static final int COLOR = 0xFFFFFFFF;
 
-	@Override
-	public boolean isEmpty() {
-		return true;
-	}
+  @Override public boolean isEmpty() {
+    return true;
+  }
 
-	private EmptyChunk() {
-		super(ChunkPosition.get(0, 0), EmptyWorld.instance);
-		surface = CorruptLayer.INSTANCE;
-		caves = CorruptLayer.INSTANCE;
-		layer = CorruptLayer.INSTANCE;
-	}
+  private EmptyChunk() {
+    super(ChunkPosition.get(0, 0), EmptyWorld.instance);
+    surface = CorruptLayer.INSTANCE;
+    caves = CorruptLayer.INSTANCE;
+    layer = CorruptLayer.INSTANCE;
+  }
 
-	@Override
-	public synchronized void getBlockData(byte[] blocks, byte[] data,
-			byte[] biomes, Collection<CompoundTag> tileEntities,
-			Collection<CompoundTag> entities) {
-		for (int i = 0; i < X_MAX * Y_MAX * Z_MAX; ++i)
-			blocks[i] = 0;
+  @Override public synchronized void getBlockData(byte[] blocks, byte[] data, byte[] biomes,
+      Collection<CompoundTag> tileEntities, Collection<CompoundTag> entities) {
+    for (int i = 0; i < X_MAX * Y_MAX * Z_MAX; ++i) {
+      blocks[i] = 0;
+    }
 
-		for (int i = 0; i < X_MAX * Z_MAX; ++i)
-			biomes[i] = 0;
+    for (int i = 0; i < X_MAX * Z_MAX; ++i) {
+      biomes[i] = 0;
+    }
 
-		for (int i = 0; i < (X_MAX * Y_MAX * Z_MAX) / 2; ++i)
-			data[i] = 0;
-	}
+    for (int i = 0; i < (X_MAX * Y_MAX * Z_MAX) / 2; ++i) {
+      data[i] = 0;
+    }
+  }
 
-	@Override
-	protected void renderLayer(MapBuffer rbuff, int cx, int cz) {
-		renderEmpty(rbuff, cx, cz);
-	}
+  @Override protected void renderLayer(MapTile tile) {
+    renderEmpty(tile);
+  }
 
-	@Override
-	protected void renderSurface(MapBuffer rbuff, int cx, int cz) {
-		renderEmpty(rbuff, cx, cz);
-	}
+  @Override protected int layerColor() {
+    return 0xFFEEEEEE;
+  }
 
-	@Override
-	protected void renderCaves(MapBuffer rbuff, int cx, int cz) {
-		renderEmpty(rbuff, cx, cz);
-	}
+  @Override protected void renderSurface(MapTile tile) {
+    renderEmpty(tile);
+  }
 
-	@Override
-	protected void renderBiomes(MapBuffer rbuff, int cx, int cz) {
-		renderEmpty(rbuff, cx, cz);
-	}
+  @Override protected int surfaceColor() {
+    return 0xFFEEEEEE;
+  }
 
-	private void renderEmpty(MapBuffer rbuff, int cx, int cz) {
-		ChunkView view = rbuff.getView();
-		int x0 = view.chunkScale * (cx - view.px0);
-		int z0 = view.chunkScale * (cz - view.pz0);
+  @Override protected void renderCaves(MapTile tile) {
+    renderEmpty(tile);
+  }
 
-		if (view.chunkScale == 1) {
-			rbuff.setRGB(x0, z0, COLOR);
-		} else {
-			int blockScale = view.chunkScale / 16;
-			rbuff.fillRect(x0, z0, view.chunkScale, view.chunkScale, COLOR);
+  @Override protected int caveColor() {
+    return 0xFFEEEEEE;
+  }
 
-			Graphics g = rbuff.getGraphics();
-			g.setColor(Color.black);
-			g.drawLine(x0, z0+8*blockScale, x0+8*blockScale, z0+view.chunkScale);
-			g.drawLine(x0, z0, x0+view.chunkScale, z0+view.chunkScale);
-			g.drawLine(x0+8*blockScale, z0, x0+view.chunkScale, z0+8*blockScale);
-		}
-	}
+  @Override protected void renderBiomes(MapTile tile) {
+    renderEmpty(tile);
+  }
 
-	@Override
-	public synchronized void reset() {
-		// do nothing
-	}
+  @Override protected int biomeColor() {
+    return 0xFFEEEEEE;
+  }
 
-	@Override
-	public synchronized void loadChunk(Chunky chunky) {
-		// do nothing
-	}
+  private void renderEmpty(MapTile tile) {
+    int[] pixels = new int[tile.size * tile.size];
+    for (int z = 0; z < tile.size; ++z) {
+      for (int x = 0; x < tile.size; ++x) {
+        if (x == z || x - tile.size / 2 == z || x + tile.size / 2 == z) {
+          pixels[z * tile.size + x] = 0xFF000000;
+        } else {
+          pixels[z * tile.size + x] = COLOR;
+        }
+      }
+    }
+    tile.setPixels(pixels);
+  }
 
-	@Override
-	public String toString() {
-		return "Chunk: [empty]";
-	}
+  @Override public synchronized void reset() {
+    // Do nothing.
+  }
+
+  @Override public synchronized void loadChunk(WorldMapLoader loader) {
+    // Do nothing.
+  }
+
+  @Override public String toString() {
+    return "Chunk: [empty]";
+  }
 }

@@ -17,14 +17,18 @@
 package se.llbit.chunky.launcher;
 
 public interface Logger {
-	void appendStdout(byte[] buffer, int size);
-	void appendStderr(byte[] buffer, int size);
-	void appendLine(String line);
-	void appendErrorLine(String line);
+  void appendStdout(byte[] buffer, int size);
 
-	/**
-	 * Signals to the logger that the program has ended.
-	 * @param exitVal
-	 */
-	void processExited(int exitValue);
+  void appendStderr(byte[] buffer, int size);
+
+  void appendLine(String line);
+
+  void appendErrorLine(String line);
+
+  /**
+   * Signals to the logger that the program has ended.
+   *
+   * @param exitVal
+   */
+  void processExited(int exitValue);
 }

@@ -16,37 +16,26 @@
  */
 package se.llbit.nbt.test;
 
+import se.llbit.nbt.AnyTag;
+import se.llbit.nbt.NamedTag;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.zip.GZIPInputStream;
 
-import se.llbit.nbt.AnyTag;
-import se.llbit.nbt.NamedTag;
-
-@SuppressWarnings("javadoc")
 public class NBTTest {
-
-	public static void main(String[] args) {
-		String fn = "test.chunk";
-		try {
-			System.out.println("parsing test.chunk");
-			DataInputStream in = new DataInputStream(new GZIPInputStream(new FileInputStream(fn)));
-			AnyTag tag = NamedTag.read(in);
-			PrintStream out = new PrintStream(new File("output.test"));
-			out.print(tag.dumpTree());
-			out.close();
-			System.out.println("done");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
+  public static void main(String[] args) throws IOException {
+    String fn = "test.chunk";
+    System.out.println("parsing test.chunk");
+    try (DataInputStream in = new DataInputStream(new GZIPInputStream(new FileInputStream(fn)))) {
+      AnyTag tag = NamedTag.read(in);
+      try (PrintStream out = new PrintStream(new File("output.test"))) {
+        out.print(tag.dumpTree());
+        System.out.println("done");
+      }
+    }
+  }
 }

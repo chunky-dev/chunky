@@ -21,25 +21,24 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
-@SuppressWarnings("javadoc")
 public class LeafModel {
-	private static final AABB block = new AABB(0, 1, 0, 1, 0, 1);
+  private static final AABB block = new AABB(0, 1, 0, 1, 0, 1);
 
-	public static boolean intersect(Ray ray, Scene scene, Texture texture) {
-		ray.t = Double.POSITIVE_INFINITY;
-		if (block.intersect(ray)) {
-			float[] color = texture.getColor(ray.u, ray.v);
-			if (color[3] > Ray.EPSILON) {
-				ray.color.set(color);
-				float[] biomeColor = ray.getBiomeFoliageColor(scene);
-				ray.color.x *= biomeColor[0];
-				ray.color.y *= biomeColor[1];
-				ray.color.z *= biomeColor[2];
-				ray.distance += ray.tNext;
-				ray.o.scaleAdd(ray.tNext, ray.d);
-				return true;
-			}
-		}
-		return false;
-	}
+  public static boolean intersect(Ray ray, Scene scene, Texture texture) {
+    ray.t = Double.POSITIVE_INFINITY;
+    if (block.intersect(ray)) {
+      float[] color = texture.getColor(ray.u, ray.v);
+      if (color[3] > Ray.EPSILON) {
+        ray.color.set(color);
+        float[] biomeColor = ray.getBiomeFoliageColor(scene);
+        ray.color.x *= biomeColor[0];
+        ray.color.y *= biomeColor[1];
+        ray.color.z *= biomeColor[2];
+        ray.distance += ray.tNext;
+        ray.o.scaleAdd(ray.tNext, ray.d);
+        return true;
+      }
+    }
+    return false;
+  }
 }

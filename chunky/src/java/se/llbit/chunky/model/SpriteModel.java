@@ -19,43 +19,41 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
-@SuppressWarnings("javadoc")
 public class SpriteModel {
-	protected static Quad[] quads = {
-		new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 1),
-				new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
+  protected static Quad[] quads =
+      {new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 1, 0),
+          new Vector4(0, 1, 0, 1)),
 
-		new Quad(new Vector3d(1, 0, 1), new Vector3d(0, 0, 0),
-				new Vector3d(1, 1, 1), new Vector4d(0, 1, 0, 1)),
+          new Quad(new Vector3(1, 0, 1), new Vector3(0, 0, 0), new Vector3(1, 1, 1),
+              new Vector4(0, 1, 0, 1)),
 
-		new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 1),
-				new Vector3d(1, 1, 0), new Vector4d(0, 1, 0, 1)),
+          new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 1, 0),
+              new Vector4(0, 1, 0, 1)),
 
-		new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 0),
-				new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
-	};
+          new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(0, 1, 1),
+              new Vector4(0, 1, 0, 1)),};
 
-	public static boolean intersect(Ray ray, Texture material) {
-		boolean hit = false;
-		ray.t = Double.POSITIVE_INFINITY;
-		for (Quad quad : quads) {
-			if (quad.intersect(ray)) {
-				float[] color = material.getColor(ray.u, ray.v);
-				if (color[3] > Ray.EPSILON) {
-					ray.color.set(color);
-					ray.t = ray.tNext;
-					ray.n.set(quad.n);
-					hit = true;
-				}
-			}
-		}
-		if (hit) {
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+  public static boolean intersect(Ray ray, Texture material) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    for (Quad quad : quads) {
+      if (quad.intersect(ray)) {
+        float[] color = material.getColor(ray.u, ray.v);
+        if (color[3] > Ray.EPSILON) {
+          ray.color.set(color);
+          ray.t = ray.tNext;
+          ray.n.set(quad.n);
+          hit = true;
+        }
+      }
+    }
+    if (hit) {
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

@@ -21,195 +21,114 @@ import se.llbit.chunky.world.BlockData;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
-@SuppressWarnings("javadoc")
 public class StairModel {
-	private static AABB[][][] corners = {
-		{
-			{
-				// s-e
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0.5, 1, 0.5, 1, 0.5, 1),
-			},
-			{
-				// s-w
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0, 0.5, 0.5, 1, 0.5, 1),
-			},
-			{
-				// n-e
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0.5, 1, 0.5, 1, 0, 0.5),
-			},
-			{
-				// n-w
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0, 0.5, 0.5, 1, 0, 0.5),
-			},
-			{
-				// inner s-e
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0, 1, 0.5, 1, 0.5, 1),
-				new AABB(0.5, 1, 0.5, 1, 0, 0.5),
-			},
-			{
-				// inner s-w
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0.5, 1, 0.5, 1, 0.5, 1),
-				new AABB(0, 0.5, 0.5, 1, 0, 1),
-			},
-			{
-				// inner n-e
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0.5, 1, 0.5, 1, 0, 1),
-				new AABB(0, 0.5, 0.5, 1, 0, 0.5),
-			},
-			{
-				// inner n-w
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0, 1, 0.5, 1, 0, 0.5),
-				new AABB(0, 0.5, 0.5, 1, 0.5, 1),
-			},
-		},
-		{
-			// flipped
-			{
-				// s-e
-				new AABB(0, 1, 0.5, 1, 0, 1),
-				new AABB(0.5, 1, 0, 0.5, 0.5, 1),
-			},
-			{
-				// s-w
-				new AABB(0, 1, 0.5, 1, 0, 1),
-				new AABB(0, 0.5, 0, 0.5, 0.5, 1),
-			},
-			{
-				// n-e
-				new AABB(0, 1, 0.5, 1, 0, 1),
-				new AABB(0.5, 1, 0, 0.5, 0, 0.5),
-			},
-			{
-				// n-w
-				new AABB(0, 1, 0.5, 1, 0, 1),
-				new AABB(0, 0.5, 0, 0.5, 0, 0.5),
-			},
-			{
-				// inner s-e
-				new AABB(0, 1, 0.5, 1, 0, 1),
-				new AABB(0, 1, 0, 0.5, 0.5, 1),
-				new AABB(0.5, 1, 0, 0.5, 0, 0.5),
-			},
-			{
-				// inner s-w
-				new AABB(0, 1, 0.5, 1, 0, 1),
-				new AABB(0.5, 1, 0, 0.5, 0.5, 1),
-				new AABB(0, 0.5, 0, 0.5, 0, 1),
-			},
-			{
-				// inner n-e
-				new AABB(0, 1, 0.5, 1, 0, 1),
-				new AABB(0.5, 1, 0, 0.5, 0, 1),
-				new AABB(0, 0.5, 0, 0.5, 0, 0.5),
-			},
-			{
-				// inner n-w
-				new AABB(0, 1, 0.5, 1, 0, 1),
-				new AABB(0, 1, 0, 0.5, 0, 0.5),
-				new AABB(0, 0.5, 0, 0.5, 0.5, 1),
-			},
-		},
-	};
-	private static final AABB[][][] stairs = {
-		{
-			{
-				// ascending east
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0.5, 1, 0.5, 1, 0, 1),
-			},
-			{
-				// ascending west
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0, 0.5, 0.5, 1, 0, 1),
-			},
-			{
-				// ascending south
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0, 1, 0.5, 1, 0.5, 1),
-			},
-			{
-				// ascending north
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0, 1, 0.5, 1, 0, 0.5),
-			},
-		},
-		{
-			// flipped
-			{
-				// ascending east
-				new AABB(0, 1, 0.5, 1, 0, 1),
-				new AABB(0.5, 1, 0, 0.5, 0, 1),
-			},
-			{
-				// ascending west
-				new AABB(0, 1, 0.5, 1, 0, 1),
-				new AABB(0, 0.5, 0, 0.5, 0, 1),
-			},
-			{
-				// ascending south
-				new AABB(0, 1, 0.5, 1, 0, 1),
-				new AABB(0, 1, 0, 0.5, 0.5, 1),
-			},
-			{
-				// ascending north
-				new AABB(0, 1, 0.5, 1, 0, 1),
-				new AABB(0, 1, 0, 0.5, 0, 0.5),
-			},
-		},
-	};
+  private static AABB[][][] corners = {{{
+      // s-e
+      new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0.5, 1, 0.5, 1, 0.5, 1),}, {
+      // s-w
+      new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0, 0.5, 0.5, 1, 0.5, 1),}, {
+      // n-e
+      new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0.5, 1, 0.5, 1, 0, 0.5),}, {
+      // n-w
+      new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0, 0.5, 0.5, 1, 0, 0.5),}, {
+      // inner s-e
+      new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0, 1, 0.5, 1, 0.5, 1),
+      new AABB(0.5, 1, 0.5, 1, 0, 0.5),}, {
+      // inner s-w
+      new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0.5, 1, 0.5, 1, 0.5, 1),
+      new AABB(0, 0.5, 0.5, 1, 0, 1),}, {
+      // inner n-e
+      new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0.5, 1, 0.5, 1, 0, 1),
+      new AABB(0, 0.5, 0.5, 1, 0, 0.5),}, {
+      // inner n-w
+      new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0, 1, 0.5, 1, 0, 0.5),
+      new AABB(0, 0.5, 0.5, 1, 0.5, 1),},}, {
+      // flipped
+      {
+          // s-e
+          new AABB(0, 1, 0.5, 1, 0, 1), new AABB(0.5, 1, 0, 0.5, 0.5, 1),}, {
+      // s-w
+      new AABB(0, 1, 0.5, 1, 0, 1), new AABB(0, 0.5, 0, 0.5, 0.5, 1),}, {
+      // n-e
+      new AABB(0, 1, 0.5, 1, 0, 1), new AABB(0.5, 1, 0, 0.5, 0, 0.5),}, {
+      // n-w
+      new AABB(0, 1, 0.5, 1, 0, 1), new AABB(0, 0.5, 0, 0.5, 0, 0.5),}, {
+      // inner s-e
+      new AABB(0, 1, 0.5, 1, 0, 1), new AABB(0, 1, 0, 0.5, 0.5, 1),
+      new AABB(0.5, 1, 0, 0.5, 0, 0.5),}, {
+      // inner s-w
+      new AABB(0, 1, 0.5, 1, 0, 1), new AABB(0.5, 1, 0, 0.5, 0.5, 1),
+      new AABB(0, 0.5, 0, 0.5, 0, 1),}, {
+      // inner n-e
+      new AABB(0, 1, 0.5, 1, 0, 1), new AABB(0.5, 1, 0, 0.5, 0, 1),
+      new AABB(0, 0.5, 0, 0.5, 0, 0.5),}, {
+      // inner n-w
+      new AABB(0, 1, 0.5, 1, 0, 1), new AABB(0, 1, 0, 0.5, 0, 0.5),
+      new AABB(0, 0.5, 0, 0.5, 0.5, 1),},},};
+  private static final AABB[][][] stairs = {{{
+      // ascending east
+      new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0.5, 1, 0.5, 1, 0, 1),}, {
+      // ascending west
+      new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0, 0.5, 0.5, 1, 0, 1),}, {
+      // ascending south
+      new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0, 1, 0.5, 1, 0.5, 1),}, {
+      // ascending north
+      new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0, 1, 0.5, 1, 0, 0.5),},}, {
+      // flipped
+      {
+          // ascending east
+          new AABB(0, 1, 0.5, 1, 0, 1), new AABB(0.5, 1, 0, 0.5, 0, 1),}, {
+      // ascending west
+      new AABB(0, 1, 0.5, 1, 0, 1), new AABB(0, 0.5, 0, 0.5, 0, 1),}, {
+      // ascending south
+      new AABB(0, 1, 0.5, 1, 0, 1), new AABB(0, 1, 0, 0.5, 0.5, 1),}, {
+      // ascending north
+      new AABB(0, 1, 0.5, 1, 0, 1), new AABB(0, 1, 0, 0.5, 0, 0.5),},},};
 
-	public static boolean intersect(Ray ray, Texture texture) {
-		boolean hit = false;
-		int flipped = (ray.getBlockData() & 4) >> 2;
-		int corner = 15 & (ray.getCurrentData() >> BlockData.CORNER_OFFSET);
-		int rotation = 3 & ray.getBlockData();
+  public static boolean intersect(Ray ray, Texture texture) {
+    boolean hit = false;
+    int flipped = (ray.getBlockData() & 4) >> 2;
+    int corner = 15 & (ray.getCurrentData() >> BlockData.CORNER_OFFSET);
+    int rotation = 3 & ray.getBlockData();
 
-		ray.t = Double.POSITIVE_INFINITY;
+    ray.t = Double.POSITIVE_INFINITY;
 
-		if (corner != 0) {
-			for (AABB box : corners[flipped][7 & corner]) {
-				if (box.intersect(ray)) {
-					texture.getColor(ray);
-					ray.t = ray.tNext;
-					hit = true;
-				}
-			}
-		} else {
-			for (AABB box : stairs[flipped][rotation]) {
-				if (box.intersect(ray)) {
-					texture.getColor(ray);
-					ray.t = ray.tNext;
-					hit = true;
-				}
-			}
-		}
+    if (corner != 0) {
+      for (AABB box : corners[flipped][7 & corner]) {
+        if (box.intersect(ray)) {
+          texture.getColor(ray);
+          ray.t = ray.tNext;
+          hit = true;
+        }
+      }
+    } else {
+      for (AABB box : stairs[flipped][rotation]) {
+        if (box.intersect(ray)) {
+          texture.getColor(ray);
+          ray.t = ray.tNext;
+          hit = true;
+        }
+      }
+    }
 
-		if (hit) {
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+    if (hit) {
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 
-	public static boolean intersect(Ray ray, Texture texture,
-			Texture textureTop, Texture textureBottom) {
+  public static boolean intersect(Ray ray, Texture texture, Texture textureTop,
+      Texture textureBottom) {
 
-		boolean hit = intersect(ray, texture);
-		if (hit) {
-			if (ray.n.y > 0) {
-				textureTop.getColor(ray);
-			} else if (ray.n.y < 0) {
-				textureTop.getColor(ray);
-			}
-		}
-		return hit;
-	}
+    boolean hit = intersect(ray, texture);
+    if (hit) {
+      if (ray.n.y > 0) {
+        textureTop.getColor(ray);
+      } else if (ray.n.y < 0) {
+        textureTop.getColor(ray);
+      }
+    }
+    return hit;
+  }
 }

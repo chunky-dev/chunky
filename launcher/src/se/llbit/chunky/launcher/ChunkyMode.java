@@ -18,9 +18,10 @@ package se.llbit.chunky.launcher;
 
 /**
  * The mode to launch chunky in.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public enum ChunkyMode {
-	GUI,
-	HEADLESS
+  GUI,
+  HEADLESS
 }

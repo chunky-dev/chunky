@@ -29,114 +29,111 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 
 public class WallSignEntity extends Entity {
 
-	// Distance the sign is offset from the wall (as in Minecraft).
-	private static final double offset = 0.02;
+  // Distance the sign is offset from the wall (as in Minecraft).
+  private static final double offset = 0.02;
 
-	private static Quad[][] faces = {
-		{}, {},
+  private static Quad[][] faces = {{}, {},
 
-		// Facing north
-		{
-			// North (front) face.
-			new Quad(new Vector3d(1, .2, .875+offset), new Vector3d(0, .2, .875+offset),
-					new Vector3d(1, .8, .875+offset), new Vector4d(0, 1, 0, 1)),
+      // Facing north
+      {
+          // North (front) face.
+          new Quad(new Vector3(1, .2, .875 + offset), new Vector3(0, .2, .875 + offset),
+              new Vector3(1, .8, .875 + offset), new Vector4(0, 1, 0, 1)),
 
-			// South (back) face.
-			new Quad(new Vector3d(0, .2, 1-offset), new Vector3d(1, .2, 1-offset),
-					new Vector3d(0, .8, 1-offset), new Vector4d(28/64., 52/64., 18/32., 30/32.)),
+          // South (back) face.
+          new Quad(new Vector3(0, .2, 1 - offset), new Vector3(1, .2, 1 - offset),
+              new Vector3(0, .8, 1 - offset),
+              new Vector4(28 / 64., 52 / 64., 18 / 32., 30 / 32.)),
 
-			// West (left) face.
-			new Quad(new Vector3d(0, .2, .875+offset), new Vector3d(0, .2, 1-offset),
-					new Vector3d(0, .8, .875+offset), new Vector4d(26/64., 28/64., 18/32., 30/32.)),
+          // West (left) face.
+          new Quad(new Vector3(0, .2, .875 + offset), new Vector3(0, .2, 1 - offset),
+              new Vector3(0, .8, .875 + offset),
+              new Vector4(26 / 64., 28 / 64., 18 / 32., 30 / 32.)),
 
-			// East (right) face.
-			new Quad(new Vector3d(1, .2, 1-offset), new Vector3d(1, .2, .875+offset),
-					new Vector3d(1, .8, 1-offset), new Vector4d(0, 2/64., 18/32., 30/32.)),
+          // East (right) face.
+          new Quad(new Vector3(1, .2, 1 - offset), new Vector3(1, .2, .875 + offset),
+              new Vector3(1, .8, 1 - offset), new Vector4(0, 2 / 64., 18 / 32., 30 / 32.)),
 
-			// Top face.
-			new Quad(new Vector3d(1, .8, .875+offset), new Vector3d(0, .8, .875+offset),
-					new Vector3d(1, .8, 1-offset), new Vector4d(2/64., 26/64., 30/32., 1)),
+          // Top face.
+          new Quad(new Vector3(1, .8, .875 + offset), new Vector3(0, .8, .875 + offset),
+              new Vector3(1, .8, 1 - offset), new Vector4(2 / 64., 26 / 64., 30 / 32., 1)),
 
-			// Bottom face
-			new Quad(new Vector3d(0, .2, .875+offset), new Vector3d(1, .2, .875+offset),
-					new Vector3d(0, .2, 1-offset), new Vector4d(50/64., 26/64., 30/32., 1)),
-		},
+          // Bottom face
+          new Quad(new Vector3(0, .2, .875 + offset), new Vector3(1, .2, .875 + offset),
+              new Vector3(0, .2, 1 - offset), new Vector4(50 / 64., 26 / 64., 30 / 32., 1)),},
 
-		// Facing south.
-		{},
+      // Facing south.
+      {},
 
-		// Facing west.
-		{},
+      // Facing west.
+      {},
 
-		// Facing east.
-		{},
-	};
+      // Facing east.
+      {},};
 
-	static {
-		faces[5] = Model.rotateY(faces[2]);
-		faces[3] = Model.rotateY(faces[5]);
-		faces[4] = Model.rotateY(faces[3]);
-	}
+  static {
+    faces[5] = Model.rotateY(faces[2]);
+    faces[3] = Model.rotateY(faces[5]);
+    faces[4] = Model.rotateY(faces[3]);
+  }
 
-	private final JsonArray[] text;
-	private final int orientation;
-	private final SignTexture texture;
+  private final JsonArray[] text;
+  private final int orientation;
+  private final SignTexture texture;
 
-	public WallSignEntity(Vector3d position, CompoundTag entityTag, int blockData) {
-		this(position, SignEntity.getTextLines(entityTag), blockData % 6);
-	}
+  public WallSignEntity(Vector3 position, CompoundTag entityTag, int blockData) {
+    this(position, SignEntity.getTextLines(entityTag), blockData % 6);
+  }
 
-	public WallSignEntity(Vector3d position, JsonArray[] text, int direction) {
-		super(position);
-		this.orientation = direction;
-		this.text = text;
-		this.texture = new SignTexture(text);
-	}
+  public WallSignEntity(Vector3 position, JsonArray[] text, int direction) {
+    super(position);
+    this.orientation = direction;
+    this.text = text;
+    this.texture = new SignTexture(text);
+  }
 
-	@Override
-	public Collection<Primitive> primitives(Vector3d offset) {
-		Collection<Primitive> primitives = new LinkedList<Primitive>();
-		Transform transform = Transform.NONE.translate(position.x + offset.x,
-				position.y + offset.y, position.z + offset.z);
-		Quad[] quads = faces[orientation];
-		for (int i = 0; i < quads.length; ++i) {
-			Quad quad = quads[i];
-			Material material;
-			if (i != 0) {
-				material = SignMaterial.INSTANCE;
-			} else {
-				material = new TextureMaterial(texture);
-			}
-			quad.addTriangles(primitives, material, transform);
-		}
-		return primitives;
-	}
+  @Override public Collection<Primitive> primitives(Vector3 offset) {
+    Collection<Primitive> primitives = new LinkedList<>();
+    Transform transform = Transform.NONE
+        .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+    Quad[] quads = faces[orientation];
+    for (int i = 0; i < quads.length; ++i) {
+      Quad quad = quads[i];
+      Material material;
+      if (i != 0) {
+        material = SignMaterial.INSTANCE;
+      } else {
+        material = new TextureMaterial(texture);
+      }
+      quad.addTriangles(primitives, material, transform);
+    }
+    return primitives;
+  }
 
-	@Override
-	public JsonValue toJson() {
-		JsonObject json = new JsonObject();
-		json.add("kind", "wallsign");
-		json.add("position", position.toJson());
-		json.add("text", SignEntity.textToJson(text));
-		json.add("direction", orientation);
-		return json;
-	}
+  @Override public JsonValue toJson() {
+    JsonObject json = new JsonObject();
+    json.add("kind", "wallsign");
+    json.add("position", position.toJson());
+    json.add("text", SignEntity.textToJson(text));
+    json.add("direction", orientation);
+    return json;
+  }
 
-	/**
-	 * Unmarshalls a wall sign entity from JSON data.
-	 */
-	public static Entity fromJson(JsonObject json) {
-		Vector3d position = new Vector3d();
-		position.fromJson(json.get("position").object());
-		JsonArray[] text = SignEntity.textFromJson(json.get("text"));
-		int direction = json.get("direction").intValue(0);
-		return new WallSignEntity(position, text, direction);
-	}
+  /**
+   * Unmarshalls a wall sign entity from JSON data.
+   */
+  public static Entity fromJson(JsonObject json) {
+    Vector3 position = new Vector3();
+    position.fromJson(json.get("position").object());
+    JsonArray[] text = SignEntity.textFromJson(json.get("text"));
+    int direction = json.get("direction").intValue(0);
+    return new WallSignEntity(position, text, direction);
+  }
 }

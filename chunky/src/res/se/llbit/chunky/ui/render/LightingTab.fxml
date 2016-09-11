@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import se.llbit.chunky.ui.DoubleAdjuster?>
+<?import se.llbit.chunky.ui.SimpleColorPicker?>
+<fx:root prefWidth="556.0" spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <DoubleAdjuster fx:id="skyIntensity" maxWidth="1.7976931348623157E308" />
+        <CheckBox fx:id="enableEmitters" mnemonicParsing="false" text="Enable emitters" />
+        <DoubleAdjuster fx:id="emitterIntensity" maxWidth="1.7976931348623157E308" />
+        <CheckBox fx:id="enableSunlight" mnemonicParsing="false" text="Enable sunlight" />
+        <DoubleAdjuster fx:id="sunIntensity" maxWidth="1.7976931348623157E308" />
+        <DoubleAdjuster fx:id="sunAzimuth" maxWidth="1.7976931348623157E308" />
+        <DoubleAdjuster fx:id="sunAltitude" maxWidth="1.7976931348623157E308" />
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <Label text="Sun color:" />
+              <SimpleColorPicker fx:id="sunColor" />
+         </children>
+      </HBox>
+    </children>
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+</fx:root>

@@ -21,67 +21,63 @@ import java.io.IOException;
 
 public class ITXT extends PngChunk {
 
-	public static final int CHUNK_TYPE = 0x69545874;
+  public static final int CHUNK_TYPE = 0x69545874;
 
-	private int crc;
-	private final String keyword;
-	private final String text;
+  private int crc;
+  private final String keyword;
+  private final String text;
 
-	public ITXT(String keyword, String text) {
-		this.keyword = keyword;
-		this.text = text;
-	}
+  public ITXT(String keyword, String text) {
+    this.keyword = keyword;
+    this.text = text;
+  }
 
-	@Override
-	protected void writeChunkData(DataOutputStream out) throws IOException {
-		CrcOutputStream crcOutputStream = new CrcOutputStream();
-		DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
+  @Override protected void writeChunkData(DataOutputStream out) throws IOException {
+    CrcOutputStream crcOutputStream = new CrcOutputStream();
+    DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
 
-		crcOut.writeInt(CHUNK_TYPE);
+    crcOut.writeInt(CHUNK_TYPE);
 
-		crcOut.writeBytes(keyword);
-		out.writeBytes(keyword);
+    crcOut.writeBytes(keyword);
+    out.writeBytes(keyword);
 
-		// null separator
-		crcOut.writeByte(0);
-		out.writeByte(0);
+    // null separator
+    crcOut.writeByte(0);
+    out.writeByte(0);
 
-		// compression flag
-		crcOut.writeByte(0);
-		out.writeByte(0);
+    // compression flag
+    crcOut.writeByte(0);
+    out.writeByte(0);
 
-		// compression method
-		crcOut.writeByte(0);
-		out.writeByte(0);
+    // compression method
+    crcOut.writeByte(0);
+    out.writeByte(0);
 
-		// language tag + null sep
-		crcOut.writeByte(0);
-		out.writeByte(0);
+    // language tag + null sep
+    crcOut.writeByte(0);
+    out.writeByte(0);
 
-		// translated keyword + null sep
-		crcOut.writeByte(0);
-		out.writeByte(0);
+    // translated keyword + null sep
+    crcOut.writeByte(0);
+    out.writeByte(0);
 
-		crcOut.writeBytes(text);
-		out.writeBytes(text);
+    crcOut.writeBytes(text);
+    out.writeBytes(text);
 
-		crc = crcOutputStream.getCRC();
-		crcOut.close();
-	}
+    crc = crcOutputStream.getCRC();
+    crcOut.close();
+  }
 
-	@Override
-	public int getChunkLength() {
-		return keyword.length() + 5 + text.length();
-	}
+  @Override public int getChunkLength() {
+    return keyword.length() + 5 + text.length();
+  }
 
-	@Override
-	public int getChunkType() {
-		return CHUNK_TYPE;
-	}
+  @Override public int getChunkType() {
+    return CHUNK_TYPE;
+  }
 
-	@Override
-	public int getChunkCRC() {
-		return crc;
-	}
+  @Override public int getChunkCRC() {
+    return crc;
+  }
 
 }

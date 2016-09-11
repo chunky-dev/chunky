@@ -39,132 +39,114 @@ import javax.swing.text.StyleConstants;
 
 /**
  * Window that displays debug messages.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-@SuppressWarnings("serial")
 public class DebugConsole extends JDialog implements Logger {
 
-	static final SimpleAttributeSet stdoutAttributes = new SimpleAttributeSet();
-	static final SimpleAttributeSet stderrAttributes = new SimpleAttributeSet();
-	static {
-		stderrAttributes.addAttribute(
-				StyleConstants.CharacterConstants.Bold,
-				Boolean.TRUE);
-		stderrAttributes.addAttribute(
-				StyleConstants.CharacterConstants.Foreground,
-				Color.RED);
-	}
+  static final SimpleAttributeSet stdoutAttributes = new SimpleAttributeSet();
+  static final SimpleAttributeSet stderrAttributes = new SimpleAttributeSet();
 
-	private final JTextPane statusText;
-	private final AbstractDocument statusTextDoc;
-	private final JButton closeBtn;
-	private final boolean closeConsoleOnExit;
+  static {
+    stderrAttributes.addAttribute(StyleConstants.CharacterConstants.Bold, Boolean.TRUE);
+    stderrAttributes.addAttribute(StyleConstants.CharacterConstants.Foreground, Color.RED);
+  }
 
-	/**
-	 * Create a new status window
-	 * @param parent
-	 * @param closeConsoleOnExit
-	 */
-	public DebugConsole(JFrame parent, boolean closeConsoleOnExit) {
-		super(parent, "Debug Console");
+  private final JTextPane statusText;
+  private final AbstractDocument statusTextDoc;
+  private final JButton closeBtn;
+  private final boolean closeConsoleOnExit;
 
-		this.closeConsoleOnExit = closeConsoleOnExit;
+  /**
+   * Create a new status window.
+   */
+  public DebugConsole(JFrame parent, boolean closeConsoleOnExit) {
+    super(parent, "Debug Console");
 
-		setModalityType(ModalityType.MODELESS);
-		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    this.closeConsoleOnExit = closeConsoleOnExit;
 
-		statusText = new JTextPane();
-		statusText.setCaretPosition(0);
-		statusText.setMargin(new Insets(0, 0, 0, 0));
-		statusTextDoc = (AbstractDocument) statusText.getStyledDocument();
+    setModalityType(ModalityType.MODELESS);
+    setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-		closeBtn = new JButton("Close");
-		closeBtn.setToolTipText("Close the debug console");
-		closeBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-				dispose();
-			}
-		});
+    statusText = new JTextPane();
+    statusText.setCaretPosition(0);
+    statusText.setMargin(new Insets(0, 0, 0, 0));
+    statusTextDoc = (AbstractDocument) statusText.getStyledDocument();
 
-		JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		panel.add(new JScrollPane(statusText), BorderLayout.CENTER);
-		panel.add(closeBtn, BorderLayout.SOUTH);
+    closeBtn = new JButton("Close");
+    closeBtn.setToolTipText("Close the debug console");
+    closeBtn.addActionListener(new ActionListener() {
+      @Override public void actionPerformed(ActionEvent e) {
+        setVisible(false);
+        dispose();
+      }
+    });
 
-		URL url = getClass().getResource("/chunky-cfg.png");
-		if (url != null) {
-			setIconImage(Toolkit.getDefaultToolkit().getImage(url));
-		}
+    JPanel panel = new JPanel();
+    panel.setLayout(new BorderLayout());
+    panel.add(new JScrollPane(statusText), BorderLayout.CENTER);
+    panel.add(closeBtn, BorderLayout.SOUTH);
 
-		setContentPane(panel);
+    URL url = getClass().getResource("/chunky-cfg.png");
+    if (url != null) {
+      setIconImage(Toolkit.getDefaultToolkit().getImage(url));
+    }
 
-		setPreferredSize(new Dimension(550, 300));
-		pack();
+    setContentPane(panel);
 
-		setLocationByPlatform(true);
-	}
+    setPreferredSize(new Dimension(550, 300));
+    pack();
 
-	/**
-	 * Clear the status text area
-	 */
-	public void clearStatusText() {
-		statusText.setText(""); //$NON-NLS-1$
-	}
+    setLocationByPlatform(true);
+  }
 
-	/**
-	 * Append text to the status text area
-	 * @param text
-	 * @param attrs
-	 */
-	public void appendStatusText(final String text,
-			final SimpleAttributeSet attrs) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					statusTextDoc.insertString(
-							statusTextDoc.getLength(),
-							text,
-							attrs);
-				} catch (BadLocationException e) {
-					System.err.println("Error updating debug console: " + e.getMessage());
-				}
-			}
-		});
-	}
+  /**
+   * Clear the status text area.
+   */
+  public void clearStatusText() {
+    statusText.setText(""); //$NON-NLS-1$
+  }
 
-	@Override
-	public void processExited(int exitValue) {
-		if (exitValue == 0) {
-			appendLine("Chunky exited normally");
-			if (closeConsoleOnExit) {
-				setVisible(false);
-				dispose();
-			}
-		} else {
-			appendLine("Chunky exited abnormally with exit value " + exitValue);
-		}
-	}
+  /**
+   * Append text to the status text area.
+   */
+  public void appendStatusText(final String text, final SimpleAttributeSet attrs) {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override public void run() {
+        try {
+          statusTextDoc.insertString(statusTextDoc.getLength(), text, attrs);
+        } catch (BadLocationException e) {
+          System.err.println("Error updating debug console: " + e.getMessage());
+        }
+      }
+    });
+  }
 
-	@Override
-	public void appendStdout(byte[] buffer, int size) {
-		appendStatusText(new String(buffer, 0, size), stdoutAttributes);
-	}
+  @Override public void processExited(int exitValue) {
+    if (exitValue == 0) {
+      appendLine("Chunky exited normally");
+      if (closeConsoleOnExit) {
+        setVisible(false);
+        dispose();
+      }
+    } else {
+      appendLine("Chunky exited abnormally with exit value " + exitValue);
+    }
+  }
 
-	@Override
-	public void appendStderr(byte[] buffer, int size) {
-		appendStatusText(new String(buffer, 0, size), stderrAttributes);
-	}
+  @Override public void appendStdout(byte[] buffer, int size) {
+    appendStatusText(new String(buffer, 0, size), stdoutAttributes);
+  }
 
-	@Override
-	public void appendLine(String line) {
-		appendStatusText(line + "\n", stdoutAttributes);
-	}
+  @Override public void appendStderr(byte[] buffer, int size) {
+    appendStatusText(new String(buffer, 0, size), stderrAttributes);
+  }
 
-	@Override
-	public void appendErrorLine(String line) {
-		appendStatusText(line + "\n", stderrAttributes);
-	}
+  @Override public void appendLine(String line) {
+    appendStatusText(line + "\n", stdoutAttributes);
+  }
+
+  @Override public void appendErrorLine(String line) {
+    appendStatusText(line + "\n", stderrAttributes);
+  }
 }

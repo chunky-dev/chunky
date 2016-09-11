@@ -23,93 +23,90 @@ import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
 /**
  * Hopper block
- * @author Jesper Öqvist <jesper@llbit.se>
  *
+ * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class HopperModel {
-	private static final AABB[] boxes = new AABB[] {
-		// east
-		new AABB(14/16., 1, 10/16., 1, 0, 1),
-		// west
-		new AABB(0, 2/16., 10/16., 1, 0, 1),
-		// north
-		new AABB(2/16., 14/16., 10/16., 1, 0, 2/16.),
-		// south
-		new AABB(2/16., 14/16., 10/16., 1, 14/16., 1),
-		// center
-		new AABB(4/16., 12/16., 4/16., 10/16., 4/16., 12/16.),
-	};
+  private static final AABB[] boxes = new AABB[] {
+      // east
+      new AABB(14 / 16., 1, 10 / 16., 1, 0, 1),
+      // west
+      new AABB(0, 2 / 16., 10 / 16., 1, 0, 1),
+      // north
+      new AABB(2 / 16., 14 / 16., 10 / 16., 1, 0, 2 / 16.),
+      // south
+      new AABB(2 / 16., 14 / 16., 10 / 16., 1, 14 / 16., 1),
+      // center
+      new AABB(4 / 16., 12 / 16., 4 / 16., 10 / 16., 4 / 16., 12 / 16.),};
 
-	private static final AABB[] pipe = new AABB[] {
-		// bottom
-		new AABB(6/16., 10/16., 0, 4/16., 6/16., 10/16.),
-		// bottom
-		new AABB(6/16., 10/16., 0, 4/16., 6/16., 10/16.),
-		// facing north
-		new AABB(6/16., 10/16., 4/16., 8/16., 0, 4/16.),
-		// facing south
-		new AABB(6/16., 10/16., 4/16., 8/16., 12/16., 1),
-		// facing west
-		new AABB(0/16., 4/16., 4/16., 8/16., 6/16., 10/16.),
-		// facing east
-		new AABB(12/16., 1, 4/16., 8/16., 6/16., 10/16.),
-		// bottom
-		new AABB(6/16., 10/16., 0, 4/16., 6/16., 10/16.),
-		// bottom
-		new AABB(6/16., 10/16., 0, 4/16., 6/16., 10/16.),
-	};
+  private static final AABB[] pipe = new AABB[] {
+      // bottom
+      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
+      // bottom
+      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
+      // facing north
+      new AABB(6 / 16., 10 / 16., 4 / 16., 8 / 16., 0, 4 / 16.),
+      // facing south
+      new AABB(6 / 16., 10 / 16., 4 / 16., 8 / 16., 12 / 16., 1),
+      // facing west
+      new AABB(0 / 16., 4 / 16., 4 / 16., 8 / 16., 6 / 16., 10 / 16.),
+      // facing east
+      new AABB(12 / 16., 1, 4 / 16., 8 / 16., 6 / 16., 10 / 16.),
+      // bottom
+      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
+      // bottom
+      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),};
 
-	private static final Quad bottom = new DoubleSidedQuad(
-			new Vector3d(2/16., 10/16., 2/16.), new Vector3d(14/16., 10/16., 2/16.),
-			new Vector3d(2/16., 10/16., 14/16.), new Vector4d(2/16., 14/16., 2/16., 14/16.));
+  private static final Quad bottom = new DoubleSidedQuad(new Vector3(2 / 16., 10 / 16., 2 / 16.),
+      new Vector3(14 / 16., 10 / 16., 2 / 16.), new Vector3(2 / 16., 10 / 16., 14 / 16.),
+      new Vector4(2 / 16., 14 / 16., 2 / 16., 14 / 16.));
 
-	@SuppressWarnings("javadoc")
-	public static boolean intersect(Ray ray) {
-		boolean hit = false;
-		ray.t = Double.POSITIVE_INFINITY;
-		for (int i = 0; i < boxes.length; ++i) {
-			if (boxes[i].intersect(ray)) {
-				if (ray.n.y > 0) {
-					Texture.hopperInside.getColor(ray);
-				} else {
-					Texture.hopperOutside.getColor(ray);
-				}
-				ray.color.w = 1;
-				ray.t = ray.tNext;
-				hit = true;
-			}
-		}
-		int dir = 7 & (ray.getCurrentData() >> BlockData.OFFSET);
-		if (pipe[dir].intersect(ray)) {
-			if (ray.n.y > 0) {
-				Texture.hopperInside.getColor(ray);
-			} else {
-				Texture.hopperOutside.getColor(ray);
-			}
-			ray.color.w = 1;
-			ray.t = ray.tNext;
-			hit = true;
-		}
-		if (bottom.intersect(ray)) {
-			ray.n.set(bottom.n);
-			ray.n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
-			if (ray.n.y > 0) {
-				Texture.hopperInside.getColor(ray);
-			} else {
-				Texture.hopperOutside.getColor(ray);
-			}
-			ray.t = ray.tNext;
-			hit = true;
-		}
-		if (hit) {
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+  public static boolean intersect(Ray ray) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    for (AABB box : boxes) {
+      if (box.intersect(ray)) {
+        if (ray.n.y > 0) {
+          Texture.hopperInside.getColor(ray);
+        } else {
+          Texture.hopperOutside.getColor(ray);
+        }
+        ray.color.w = 1;
+        ray.t = ray.tNext;
+        hit = true;
+      }
+    }
+    int dir = 7 & (ray.getCurrentData() >> BlockData.OFFSET);
+    if (pipe[dir].intersect(ray)) {
+      if (ray.n.y > 0) {
+        Texture.hopperInside.getColor(ray);
+      } else {
+        Texture.hopperOutside.getColor(ray);
+      }
+      ray.color.w = 1;
+      ray.t = ray.tNext;
+      hit = true;
+    }
+    if (bottom.intersect(ray)) {
+      ray.n.set(bottom.n);
+      ray.n.scale(-QuickMath.signum(ray.d.dot(bottom.n)));
+      if (ray.n.y > 0) {
+        Texture.hopperInside.getColor(ray);
+      } else {
+        Texture.hopperOutside.getColor(ray);
+      }
+      ray.t = ray.tNext;
+      hit = true;
+    }
+    if (hit) {
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

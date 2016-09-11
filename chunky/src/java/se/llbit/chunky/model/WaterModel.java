@@ -26,188 +26,184 @@ import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Triangle;
-import se.llbit.math.Vector2d;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector2;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.math.primitive.TexturedTriangle;
 
 /**
  * A water block. The height of the top water block is slightly
  * lower than a regular block.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class WaterModel {
 
-	private static Quad[] fullBlock = {
-		// bottom
-		new DoubleSidedQuad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
-			new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
-		// top
-		new DoubleSidedQuad(new Vector3d(0, 1, 0), new Vector3d(1, 1, 0),
-			new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
-		// west
-		new DoubleSidedQuad(new Vector3d(0, 0, 0), new Vector3d(0, 1, 0),
-			new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
-		// east
-		new DoubleSidedQuad(new Vector3d(1, 0, 0), new Vector3d(1, 1, 0),
-			new Vector3d(1, 0, 1), new Vector4d(0, 1, 0, 1)),
-		// north
-		new DoubleSidedQuad(new Vector3d(0, 1, 0), new Vector3d(1, 1, 0),
-			new Vector3d(0, 0, 0), new Vector4d(0, 1, 0, 0)),
-		// south
-		new DoubleSidedQuad(new Vector3d(0, 1, 1), new Vector3d(1, 1, 1),
-			new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
-	};
+  private static Quad[] fullBlock = {
+      // bottom
+      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1)),
+      // top
+      new DoubleSidedQuad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 1, 1),
+          new Vector4(0, 1, 0, 1)),
+      // west
+      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1)),
+      // east
+      new DoubleSidedQuad(new Vector3(1, 0, 0), new Vector3(1, 1, 0), new Vector3(1, 0, 1),
+          new Vector4(0, 1, 0, 1)),
+      // north
+      new DoubleSidedQuad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 0, 0),
+          new Vector4(0, 1, 0, 0)),
+      // south
+      new DoubleSidedQuad(new Vector3(0, 1, 1), new Vector3(1, 1, 1), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1)),};
 
-	static final DoubleSidedQuad bot = new DoubleSidedQuad(
-			new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
-			new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1));
-	static final Triangle[][][] t012 = new Triangle[8][8][8];
-	static final Triangle[][][] t230 = new Triangle[8][8][8];
-	static final Triangle[][] westt = new Triangle[8][8];
-	static final Triangle[] westb = new Triangle[8];
-	static final Triangle[][] northt = new Triangle[8][8];
-	static final Triangle[] northb = new Triangle[8];
-	static final Triangle[][] eastt = new Triangle[8][8];
-	static final Triangle[] eastb = new Triangle[8];
-	static final Triangle[][] southt = new Triangle[8][8];
-	static final Triangle[] southb = new Triangle[8];
+  static final DoubleSidedQuad bot =
+      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1));
+  static final Triangle[][][] t012 = new Triangle[8][8][8];
+  static final Triangle[][][] t230 = new Triangle[8][8][8];
+  static final Triangle[][] westt = new Triangle[8][8];
+  static final Triangle[] westb = new Triangle[8];
+  static final Triangle[][] northt = new Triangle[8][8];
+  static final Triangle[] northb = new Triangle[8];
+  static final Triangle[][] eastt = new Triangle[8][8];
+  static final Triangle[] eastb = new Triangle[8];
+  static final Triangle[][] southt = new Triangle[8][8];
+  static final Triangle[] southb = new Triangle[8];
 
-	/**
-	 * Water height levels
-	 */
-	static final double height[] = {
-		14/16., 12.25/16., 10.5/16, 8.75/16, 7./16, 5.25/16, 3.5/16, 1.75/16
-	};
+  /**
+   * Water height levels
+   */
+  static final double height[] =
+      {14 / 16., 12.25 / 16., 10.5 / 16, 8.75 / 16, 7. / 16, 5.25 / 16, 3.5 / 16, 1.75 / 16};
 
-	private static final float[][][] normalMap;
-	private static final int normalMapW;
+  private static final float[][][] normalMap;
+  private static final int normalMapW;
 
-	/**
-	 * Block data offset for water above flag
-	 */
-	public static final int FULL_BLOCK = 12;
+  /**
+   * Block data offset for water above flag
+   */
+  public static final int FULL_BLOCK = 12;
 
-	static {
-		// precompute normal map
-		Texture waterHeight = new Texture("water-height");
-		normalMapW = waterHeight.getWidth();
-		normalMap = new float[normalMapW][normalMapW][2];
-		for (int u = 0; u < normalMapW; ++u) {
-			for (int v = 0; v < normalMapW; ++v) {
+  static {
+    // precompute normal map
+    Texture waterHeight = new Texture("water-height");
+    normalMapW = waterHeight.getWidth();
+    normalMap = new float[normalMapW][normalMapW][2];
+    for (int u = 0; u < normalMapW; ++u) {
+      for (int v = 0; v < normalMapW; ++v) {
 
-				float hx0 = (waterHeight.getColorWrapped(u, v) & 0xFF) / 255.f;
-				float hx1 = (waterHeight.getColorWrapped(u+1, v) & 0xFF) / 255.f;
-				float hz0 = (waterHeight.getColorWrapped(u, v) & 0xFF) / 255.f;
-				float hz1 = (waterHeight.getColorWrapped(u, v+1) & 0xFF) / 255.f;
-				normalMap[u][v][0] = hx1-hx0;
-				normalMap[u][v][1] = hz1-hz0;
-			}
-		}
+        float hx0 = (waterHeight.getColorWrapped(u, v) & 0xFF) / 255.f;
+        float hx1 = (waterHeight.getColorWrapped(u + 1, v) & 0xFF) / 255.f;
+        float hz0 = (waterHeight.getColorWrapped(u, v) & 0xFF) / 255.f;
+        float hz1 = (waterHeight.getColorWrapped(u, v + 1) & 0xFF) / 255.f;
+        normalMap[u][v][0] = hx1 - hx0;
+        normalMap[u][v][1] = hz1 - hz0;
+      }
+    }
 
-		// precompute water triangles
-		for (int i = 0; i < 8; ++i) {
-			double c0 = height[i];
-			for (int j = 0; j < 8; ++j) {
-				double c1 = height[j];
-				for (int k = 0; k < 8; ++k) {
-					double c2 = height[k];
-					t012[i][j][k] = new Triangle(
-							new Vector3d(1, c1, 1), new Vector3d(1, c2, 0), new Vector3d(0, c0, 1));
-				}
-			}
-		}
-		for (int i = 0; i < 8; ++i) {
-			double c2 = height[i];
-			for (int j = 0; j < 8; ++j) {
-				double c3 = height[j];
-				for (int k = 0; k < 8; ++k) {
-					double c0 = height[k];
-					t230[i][j][k] = new Triangle(
-							new Vector3d(0, c3, 0), new Vector3d(0, c0, 1), new Vector3d(1, c2, 0));
-				}
-			}
-		}
-		for (int i = 0; i < 8; ++i) {
-			double c0 = height[i];
-			for (int j = 0; j < 8; ++j) {
-				double c3 = height[j];
-				westt[i][j] = new Triangle(
-						new Vector3d(0, c3, 0), new Vector3d(0, 0, 0), new Vector3d(0, c0, 1));
-			}
-		}
-		for (int i = 0; i < 8; ++i) {
-			double c0 = height[i];
-			westb[i] = new Triangle(
-					new Vector3d(0, 0, 1), new Vector3d(0, c0, 1), new Vector3d(0, 0, 0));
-		}
-		for (int i = 0; i < 8; ++i) {
-			double c1 = height[i];
-			for (int j = 0; j < 8; ++j) {
-				double c2 = height[j];
-				eastt[i][j] = new Triangle(
-						new Vector3d(1, c2, 0), new Vector3d(1, c1, 1), new Vector3d(1, 0, 0));
-			}
-		}
-		for (int i = 0; i < 8; ++i) {
-			double c1 = height[i];
-			eastb[i] = new Triangle(
-					new Vector3d(1, c1, 1), new Vector3d(1, 0, 1), new Vector3d(1, 0, 0));
-		}
-		for (int i = 0; i < 8; ++i) {
-			double c2 = height[i];
-			for (int j = 0; j < 8; ++j) {
-				double c3 = height[j];
-				northt[i][j] = new Triangle(
-						new Vector3d(0, c3, 0), new Vector3d(1, c2, 0), new Vector3d(0, 0, 0));
-			}
-		}
-		for (int i = 0; i < 8; ++i) {
-			double c2 = height[i];
-			northb[i] = new Triangle(
-					new Vector3d(1, 0, 0), new Vector3d(0, 0, 0), new Vector3d(1, c2, 0));
-		}
-		for (int i = 0; i < 8; ++i) {
-			double c0 = height[i];
-			for (int j = 0; j < 8; ++j) {
-				double c1 = height[j];
-				southt[i][j] = new Triangle(
-						new Vector3d(0, c0, 1), new Vector3d(0, 0, 1), new Vector3d(1, c1, 1));
-			}
-		}
-		for (int i = 0; i < 8; ++i) {
-			double c1 = height[i];
-			southb[i] = new Triangle(
-					new Vector3d(1, 0, 1), new Vector3d(1, c1, 1), new Vector3d(0, 0, 1));
-		}
-	}
+    // precompute water triangles
+    for (int i = 0; i < 8; ++i) {
+      double c0 = height[i];
+      for (int j = 0; j < 8; ++j) {
+        double c1 = height[j];
+        for (int k = 0; k < 8; ++k) {
+          double c2 = height[k];
+          t012[i][j][k] =
+              new Triangle(new Vector3(1, c1, 1), new Vector3(1, c2, 0), new Vector3(0, c0, 1));
+        }
+      }
+    }
+    for (int i = 0; i < 8; ++i) {
+      double c2 = height[i];
+      for (int j = 0; j < 8; ++j) {
+        double c3 = height[j];
+        for (int k = 0; k < 8; ++k) {
+          double c0 = height[k];
+          t230[i][j][k] =
+              new Triangle(new Vector3(0, c3, 0), new Vector3(0, c0, 1), new Vector3(1, c2, 0));
+        }
+      }
+    }
+    for (int i = 0; i < 8; ++i) {
+      double c0 = height[i];
+      for (int j = 0; j < 8; ++j) {
+        double c3 = height[j];
+        westt[i][j] =
+            new Triangle(new Vector3(0, c3, 0), new Vector3(0, 0, 0), new Vector3(0, c0, 1));
+      }
+    }
+    for (int i = 0; i < 8; ++i) {
+      double c0 = height[i];
+      westb[i] = new Triangle(new Vector3(0, 0, 1), new Vector3(0, c0, 1), new Vector3(0, 0, 0));
+    }
+    for (int i = 0; i < 8; ++i) {
+      double c1 = height[i];
+      for (int j = 0; j < 8; ++j) {
+        double c2 = height[j];
+        eastt[i][j] =
+            new Triangle(new Vector3(1, c2, 0), new Vector3(1, c1, 1), new Vector3(1, 0, 0));
+      }
+    }
+    for (int i = 0; i < 8; ++i) {
+      double c1 = height[i];
+      eastb[i] = new Triangle(new Vector3(1, c1, 1), new Vector3(1, 0, 1), new Vector3(1, 0, 0));
+    }
+    for (int i = 0; i < 8; ++i) {
+      double c2 = height[i];
+      for (int j = 0; j < 8; ++j) {
+        double c3 = height[j];
+        northt[i][j] =
+            new Triangle(new Vector3(0, c3, 0), new Vector3(1, c2, 0), new Vector3(0, 0, 0));
+      }
+    }
+    for (int i = 0; i < 8; ++i) {
+      double c2 = height[i];
+      northb[i] =
+          new Triangle(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, c2, 0));
+    }
+    for (int i = 0; i < 8; ++i) {
+      double c0 = height[i];
+      for (int j = 0; j < 8; ++j) {
+        double c1 = height[j];
+        southt[i][j] =
+            new Triangle(new Vector3(0, c0, 1), new Vector3(0, 0, 1), new Vector3(1, c1, 1));
+      }
+    }
+    for (int i = 0; i < 8; ++i) {
+      double c1 = height[i];
+      southb[i] =
+          new Triangle(new Vector3(1, 0, 1), new Vector3(1, c1, 1), new Vector3(0, 0, 1));
+    }
+  }
 
-	@SuppressWarnings("javadoc")
-	public static boolean intersect(Ray ray) {
-		ray.t = Double.POSITIVE_INFINITY;
+  public static boolean intersect(Ray ray) {
+    ray.t = Double.POSITIVE_INFINITY;
 
-		int data = ray.getCurrentData();
-		int isFull = (data >> FULL_BLOCK) & 1;
-		//int level = data >> 8;
+    int data = ray.getCurrentData();
+    int isFull = (data >> FULL_BLOCK) & 1;
+    //int level = data >> 8;
 
-		if (isFull != 0) {
-			boolean hit = false;
-			for (Quad quad: fullBlock) {
-				if (quad.intersect(ray)) {
-					Texture.water.getAvgColorLinear(ray.color);
-					ray.t = ray.tNext;
-					ray.n.set(quad.n);
-					ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
-					hit = true;
-				}
-			}
-			if (hit) {
-				ray.distance += ray.t;
-				ray.o.scaleAdd(ray.t, ray.d);
+    if (isFull != 0) {
+      boolean hit = false;
+      for (Quad quad : fullBlock) {
+        if (quad.intersect(ray)) {
+          Texture.water.getAvgColorLinear(ray.color);
+          ray.t = ray.tNext;
+          ray.n.set(quad.n);
+          ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
+          hit = true;
+        }
+      }
+      if (hit) {
+        ray.distance += ray.t;
+        ray.o.scaleAdd(ray.t, ray.d);
 
 				/*if ((level&8) != 0) {
-					// falling water
+          // falling water
 					if (ray.n.x != 0) {
 						double sign = QuickMath.signum(ray.n.x);
 						doWaterDisplacement(ray);
@@ -218,198 +214,198 @@ public class WaterModel {
 						ray.n.set(ray.n.x, ray.n.z, ray.n.y*sign);
 					}
 				}*/
-			}
-			return hit;
-		}
+      }
+      return hit;
+    }
 
-		boolean hit = false;
-		if (bot.intersect(ray)) {
-			ray.n.set(bot.n);
-			ray.n.scale(-QuickMath.signum(ray.d.dot(bot.n)));
-			ray.t = ray.tNext;
-			hit = true;
-		}
+    boolean hit = false;
+    if (bot.intersect(ray)) {
+      ray.n.set(bot.n);
+      ray.n.scale(-QuickMath.signum(ray.d.dot(bot.n)));
+      ray.t = ray.tNext;
+      hit = true;
+    }
 
-		int c0 = (0xF & (data >> 16)) % 8;
-		int c1 = (0xF & (data >> 20)) % 8;
-		int c2 = (0xF & (data >> 24)) % 8;
-		int c3 = (0xF & (data >> 28)) % 8;
-		Triangle triangle = t012[c0][c1][c2];
-		if (triangle.intersect(ray)) {
-			ray.n.set(triangle.n);
-			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNext;
-			hit = true;
-		}
-		triangle = t230[c2][c3][c0];
-		if (triangle.intersect(ray)) {
-			ray.n.set(triangle.n);
-			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNext;
-			ray.u = 1-ray.u;
-			ray.v = 1-ray.v;
-			hit = true;
-		}
-		triangle = westt[c0][c3];
-		if (triangle.intersect(ray)) {
-			ray.n.set(triangle.n);
-			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNext;
-			hit = true;
-		}
-		triangle = westb[c0];
-		if (triangle.intersect(ray)) {
-			ray.n.set(triangle.n);
-			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNext;
-			ray.u = 1-ray.u;
-			ray.v = 1-ray.v;
-			hit = true;
-		}
-		triangle = eastt[c1][c2];
-		if (triangle.intersect(ray)) {
-			ray.n.set(triangle.n);
-			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNext;
-			hit = true;
-		}
-		triangle = eastb[c1];
-		if (triangle.intersect(ray)) {
-			ray.n.set(triangle.n);
-			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNext;
-			ray.u = 1-ray.u;
-			ray.v = 1-ray.v;
-			hit = true;
-		}
-		triangle = southt[c0][c1];
-		if (triangle.intersect(ray)) {
-			ray.n.set(triangle.n);
-			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNext;
-			hit = true;
-		}
-		triangle = southb[c1];
-		if (triangle.intersect(ray)) {
-			ray.n.set(triangle.n);
-			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNext;
-			ray.u = 1-ray.u;
-			ray.v = 1-ray.v;
-			hit = true;
-		}
-		triangle = northt[c2][c3];
-		if (triangle.intersect(ray)) {
-			ray.n.set(triangle.n);
-			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNext;
-			hit = true;
-		}
-		triangle = northb[c2];
-		if (triangle.intersect(ray)) {
-			ray.n.set(triangle.n);
-			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNext;
-			ray.u = 1-ray.u;
-			ray.v = 1-ray.v;
-			hit = true;
-		}
-		if (hit) {
-			Texture.water.getAvgColorLinear(ray.color);
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+    int c0 = (0xF & (data >> 16)) % 8;
+    int c1 = (0xF & (data >> 20)) % 8;
+    int c2 = (0xF & (data >> 24)) % 8;
+    int c3 = (0xF & (data >> 28)) % 8;
+    Triangle triangle = t012[c0][c1][c2];
+    if (triangle.intersect(ray)) {
+      ray.n.set(triangle.n);
+      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.t = ray.tNext;
+      hit = true;
+    }
+    triangle = t230[c2][c3][c0];
+    if (triangle.intersect(ray)) {
+      ray.n.set(triangle.n);
+      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.t = ray.tNext;
+      ray.u = 1 - ray.u;
+      ray.v = 1 - ray.v;
+      hit = true;
+    }
+    triangle = westt[c0][c3];
+    if (triangle.intersect(ray)) {
+      ray.n.set(triangle.n);
+      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.t = ray.tNext;
+      hit = true;
+    }
+    triangle = westb[c0];
+    if (triangle.intersect(ray)) {
+      ray.n.set(triangle.n);
+      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.t = ray.tNext;
+      ray.u = 1 - ray.u;
+      ray.v = 1 - ray.v;
+      hit = true;
+    }
+    triangle = eastt[c1][c2];
+    if (triangle.intersect(ray)) {
+      ray.n.set(triangle.n);
+      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.t = ray.tNext;
+      hit = true;
+    }
+    triangle = eastb[c1];
+    if (triangle.intersect(ray)) {
+      ray.n.set(triangle.n);
+      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.t = ray.tNext;
+      ray.u = 1 - ray.u;
+      ray.v = 1 - ray.v;
+      hit = true;
+    }
+    triangle = southt[c0][c1];
+    if (triangle.intersect(ray)) {
+      ray.n.set(triangle.n);
+      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.t = ray.tNext;
+      hit = true;
+    }
+    triangle = southb[c1];
+    if (triangle.intersect(ray)) {
+      ray.n.set(triangle.n);
+      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.t = ray.tNext;
+      ray.u = 1 - ray.u;
+      ray.v = 1 - ray.v;
+      hit = true;
+    }
+    triangle = northt[c2][c3];
+    if (triangle.intersect(ray)) {
+      ray.n.set(triangle.n);
+      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.t = ray.tNext;
+      hit = true;
+    }
+    triangle = northb[c2];
+    if (triangle.intersect(ray)) {
+      ray.n.set(triangle.n);
+      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.t = ray.tNext;
+      ray.u = 1 - ray.u;
+      ray.v = 1 - ray.v;
+      hit = true;
+    }
+    if (hit) {
+      Texture.water.getAvgColorLinear(ray.color);
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 
-	public static boolean intersectTop(Ray ray) {
-		ray.t = Double.POSITIVE_INFINITY;
+  public static boolean intersectTop(Ray ray) {
+    ray.t = Double.POSITIVE_INFINITY;
 
-		int data = ray.getCurrentData();
+    int data = ray.getCurrentData();
 
-		boolean hit = false;
-		int c0 = (0xF & (data >> 16)) % 8;
-		int c1 = (0xF & (data >> 20)) % 8;
-		int c2 = (0xF & (data >> 24)) % 8;
-		int c3 = (0xF & (data >> 28)) % 8;
-		Triangle triangle = t012[c0][c1][c2];
-		if (triangle.intersect(ray)) {
-			ray.n.set(triangle.n);
-			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNext;
-			hit = true;
-		}
-		triangle = t230[c2][c3][c0];
-		if (triangle.intersect(ray)) {
-			ray.n.set(triangle.n);
-			ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
-			ray.t = ray.tNext;
-			ray.u = 1-ray.u;
-			ray.v = 1-ray.v;
-			hit = true;
-		}
-		if (hit) {
-			Texture.water.getAvgColorLinear(ray.color);
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+    boolean hit = false;
+    int c0 = (0xF & (data >> 16)) % 8;
+    int c1 = (0xF & (data >> 20)) % 8;
+    int c2 = (0xF & (data >> 24)) % 8;
+    int c3 = (0xF & (data >> 28)) % 8;
+    Triangle triangle = t012[c0][c1][c2];
+    if (triangle.intersect(ray)) {
+      ray.n.set(triangle.n);
+      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.t = ray.tNext;
+      hit = true;
+    }
+    triangle = t230[c2][c3][c0];
+    if (triangle.intersect(ray)) {
+      ray.n.set(triangle.n);
+      ray.n.scale(QuickMath.signum(-ray.d.dot(triangle.n)));
+      ray.t = ray.tNext;
+      ray.u = 1 - ray.u;
+      ray.v = 1 - ray.v;
+      hit = true;
+    }
+    if (hit) {
+      Texture.water.getAvgColorLinear(ray.color);
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 
-	/**
-	 * Displace the normal using the water displacement map.
-	 * @param ray
-	 */
-	public final static void doWaterDisplacement(Ray ray) {
-		int w = (1<<4);
-		double x = ray.o.x/w - QuickMath.floor(ray.o.x/w);
-		double z = ray.o.z/w - QuickMath.floor(ray.o.z/w);
-		int u = (int) (x * normalMapW - Ray.EPSILON);
-		int v = (int) ((1-z) * normalMapW - Ray.EPSILON);
-		ray.n.set(normalMap[u][v][0], .15f,
-				normalMap[u][v][1]);
-		w = (1<<1);
-		x = ray.o.x/w - QuickMath.floor(ray.o.x/w);
-		z = ray.o.z/w - QuickMath.floor(ray.o.z/w);
-		u = (int) (x * normalMapW - Ray.EPSILON);
-		v = (int) ((1-z) * normalMapW - Ray.EPSILON);
-		ray.n.x += normalMap[u][v][0]/2;
-		ray.n.z += normalMap[u][v][1]/2;
-		ray.n.normalize();
-	}
+  /**
+   * Displace the normal using the water displacement map.
+   *
+   * @param ray
+   */
+  public final static void doWaterDisplacement(Ray ray) {
+    int w = (1 << 4);
+    double x = ray.o.x / w - QuickMath.floor(ray.o.x / w);
+    double z = ray.o.z / w - QuickMath.floor(ray.o.z / w);
+    int u = (int) (x * normalMapW - Ray.EPSILON);
+    int v = (int) ((1 - z) * normalMapW - Ray.EPSILON);
+    ray.n.set(normalMap[u][v][0], .15f, normalMap[u][v][1]);
+    w = (1 << 1);
+    x = ray.o.x / w - QuickMath.floor(ray.o.x / w);
+    z = ray.o.z / w - QuickMath.floor(ray.o.z / w);
+    u = (int) (x * normalMapW - Ray.EPSILON);
+    v = (int) ((1 - z) * normalMapW - Ray.EPSILON);
+    ray.n.x += normalMap[u][v][0] / 2;
+    ray.n.z += normalMap[u][v][1] / 2;
+    ray.n.normalize();
+  }
 
-	public static void addPrimitives(List<Primitive> primitives, int data,
-			int x, int y, int z, int size) {
-		// Lily pad test.
-		if ((data & (1<<BlockData.LILY_PAD)) != 0) {
-			double height = y+1-0.12;
-			Vector3d c1 = new Vector3d(x, height, z);
-			Vector3d c2 = new Vector3d(x, height, z+size);
-			Vector3d c3 = new Vector3d(x+size, height, z+size);
-			Vector3d c4 = new Vector3d(x+size, height, z);
-			Vector2d t1 = new Vector2d(0, 0);
-			Vector2d t2 = new Vector2d(0, 1);
-			Vector2d t3 = new Vector2d(1, 1);
-			Vector2d t4 = new Vector2d(1, 0);
-			int	dir = 3 & (data >> BlockData.LILY_PAD_ROTATION);
-			switch (dir) {
-			case 0:
-				primitives.add(new TexturedTriangle(c1, c3, c2, t1, t3, t2, Block.LILY_PAD));
-				primitives.add(new TexturedTriangle(c1, c4, c3, t1, t4, t3, Block.LILY_PAD));
-				break;
-			case 1:
-				primitives.add(new TexturedTriangle(c1, c3, c2, t4, t2, t1, Block.LILY_PAD));
-				primitives.add(new TexturedTriangle(c1, c4, c3, t4, t3, t2, Block.LILY_PAD));
-				break;
-			case 2:
-				primitives.add(new TexturedTriangle(c1, c3, c2, t3, t1, t4, Block.LILY_PAD));
-				primitives.add(new TexturedTriangle(c1, c4, c3, t3, t2, t1, Block.LILY_PAD));
-				break;
-			case 3:
-				primitives.add(new TexturedTriangle(c1, c3, c2, t2, t4, t3, Block.LILY_PAD));
-				primitives.add(new TexturedTriangle(c1, c4, c3, t2, t1, t4, Block.LILY_PAD));
-				break;
-			}
-		}
-	}
+  public static void addPrimitives(List<Primitive> primitives, int data, int x, int y, int z,
+      int size) {
+    // Lily pad test.
+    if ((data & (1 << BlockData.LILY_PAD)) != 0) {
+      double height = y + 1 - 0.12;
+      Vector3 c1 = new Vector3(x, height, z);
+      Vector3 c2 = new Vector3(x, height, z + size);
+      Vector3 c3 = new Vector3(x + size, height, z + size);
+      Vector3 c4 = new Vector3(x + size, height, z);
+      Vector2 t1 = new Vector2(0, 0);
+      Vector2 t2 = new Vector2(0, 1);
+      Vector2 t3 = new Vector2(1, 1);
+      Vector2 t4 = new Vector2(1, 0);
+      int dir = 3 & (data >> BlockData.LILY_PAD_ROTATION);
+      switch (dir) {
+        case 0:
+          primitives.add(new TexturedTriangle(c1, c3, c2, t1, t3, t2, Block.LILY_PAD));
+          primitives.add(new TexturedTriangle(c1, c4, c3, t1, t4, t3, Block.LILY_PAD));
+          break;
+        case 1:
+          primitives.add(new TexturedTriangle(c1, c3, c2, t4, t2, t1, Block.LILY_PAD));
+          primitives.add(new TexturedTriangle(c1, c4, c3, t4, t3, t2, Block.LILY_PAD));
+          break;
+        case 2:
+          primitives.add(new TexturedTriangle(c1, c3, c2, t3, t1, t4, Block.LILY_PAD));
+          primitives.add(new TexturedTriangle(c1, c4, c3, t3, t2, t1, Block.LILY_PAD));
+          break;
+        case 3:
+          primitives.add(new TexturedTriangle(c1, c3, c2, t2, t4, t3, Block.LILY_PAD));
+          primitives.add(new TexturedTriangle(c1, c4, c3, t2, t1, t4, Block.LILY_PAD));
+          break;
+      }
+    }
+  }
 }

@@ -37,94 +37,97 @@ import se.llbit.json.JsonValue;
 
 /**
  * Utility class to download Minecraft Jars and player data.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class MCDownloader {
 
-	/** Download a Minecraft Jar by version name. */
-	public static final void downloadMC(String version, File destDir) throws IOException {
-		String theUrl = String.format(
-				"https://s3.amazonaws.com/Minecraft.Download/versions/%s/%s.jar",
-				version, version);
-		File destination = new File(destDir, "minecraft.jar");
-		System.out.println("url: " + theUrl);
-		System.out.println("destination: " + destination.getAbsolutePath());
-		URL url = new URL(theUrl);
-		ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
-		FileOutputStream out = new FileOutputStream(destination);
-		out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
-		out.close();
-	}
+  /**
+   * Download a Minecraft Jar by version name.
+   */
+  public static void downloadMC(String version, File destDir) throws IOException {
+    String theUrl = String
+        .format("https://s3.amazonaws.com/Minecraft.Download/versions/%s/%s.jar", version, version);
+    File destination = new File(destDir, "minecraft.jar");
+    System.out.println("url: " + theUrl);
+    System.out.println("destination: " + destination.getAbsolutePath());
+    URL url = new URL(theUrl);
+    ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
+    FileOutputStream out = new FileOutputStream(destination);
+    out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+    out.close();
+  }
 
-	/** Download a player skin by player name. */
-	public static final void downloadSkin(String name, File destDir) throws IOException {
-		String theUrl = String.format("http://s3.amazonaws.com/MinecraftSkins/%s.png", name);
-		File destination = new File(destDir, name+".skin.png");
-		URL url = new URL(theUrl);
-		ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
-		FileOutputStream out = new FileOutputStream(destination);
-		out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
-		out.close();
-	}
+  /**
+   * Download a player skin by player name.
+   */
+  public static void downloadSkin(String name, File destDir) throws IOException {
+    String theUrl = String.format("http://s3.amazonaws.com/MinecraftSkins/%s.png", name);
+    File destination = new File(destDir, name + ".skin.png");
+    URL url = new URL(theUrl);
+    ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
+    FileOutputStream out = new FileOutputStream(destination);
+    out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+    out.close();
+  }
 
-	/**
-	 * Download a Minecraft player profile.
-	 * @param uuid UUID of player
-	 * @return
-	 * @throws IOException
-	 */
-	public static final JsonObject fetchProfile(String uuid) throws IOException {
-		String key = uuid + ":profile";
-		File cacheFile = new File(PersistentSettings.cacheDirectory(),
-				Util.cacheEncode(key.hashCode()));
-		JsonArray cache;
-		if (cacheFile.exists()) {
-			FileInputStream in = new FileInputStream(cacheFile);
-			JsonParser cacheParse = new JsonParser(in);
-			try {
-				cache = cacheParse.parse().array();
-				in.close();
-				for (JsonValue entry : cache.getElementList()) {
-					if (entry.array().get(0).stringValue("").equals(key)) {
-						JsonObject cached = entry.array().get(1).object();
-						return cached;
-					}
-				}
-			} catch (JsonParser.SyntaxError e) {
-				cache = new JsonArray();
-			}
-		} else {
-			cache = new JsonArray();
-		}
+  /**
+   * Download a Minecraft player profile.
+   *
+   * @param uuid UUID of player
+   * @throws IOException
+   */
+  public static JsonObject fetchProfile(String uuid) throws IOException {
+    String key = uuid + ":profile";
+    File cacheFile =
+        new File(PersistentSettings.cacheDirectory(), Util.cacheEncode(key.hashCode()));
+    JsonArray cache;
+    if (cacheFile.exists()) {
+      FileInputStream in = new FileInputStream(cacheFile);
+      JsonParser cacheParse = new JsonParser(in);
+      try {
+        cache = cacheParse.parse().array();
+        in.close();
+        for (JsonValue entry : cache.getElementList()) {
+          if (entry.array().get(0).stringValue("").equals(key)) {
+            return entry.array().get(1).object();
+          }
+        }
+      } catch (JsonParser.SyntaxError e) {
+        cache = new JsonArray();
+      }
+    } else {
+      cache = new JsonArray();
+    }
 
-		String url = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid;
-		HttpsURLConnection conn = (HttpsURLConnection) new URL(url).openConnection();
-		int responseCode = conn.getResponseCode();
-		JsonObject profile;
-		if (responseCode == 200) {
-			try {
-				JsonParser parser = new JsonParser(conn.getInputStream());
-				profile = parser.parse().object();
-				// TODO unparse base64 data.
-			} catch (JsonParser.SyntaxError e) {
-				e.printStackTrace(System.err);
-				profile = new JsonObject();
-			}
-		} else {
-			profile = new JsonObject();
-		}
+    String url = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid;
+    HttpsURLConnection conn = (HttpsURLConnection) new URL(url).openConnection();
+    int responseCode = conn.getResponseCode();
+    JsonObject profile;
+    if (responseCode == 200) {
+      try {
+        JsonParser parser = new JsonParser(conn.getInputStream());
+        profile = parser.parse().object();
+        // TODO unparse base64 data.
+      } catch (JsonParser.SyntaxError e) {
+        e.printStackTrace(System.err);
+        profile = new JsonObject();
+      }
+    } else {
+      profile = new JsonObject();
+    }
 
-		JsonArray newEntry = new JsonArray();
-		newEntry.add(key);
-		newEntry.add(profile);
-		cache.add(newEntry);
-		if (!PersistentSettings.cacheDirectory().isDirectory()) {
-			PersistentSettings.cacheDirectory().mkdirs();
-		}
-		FileOutputStream out = new FileOutputStream(cacheFile);
-		PrettyPrinter jsonOut = new PrettyPrinter("", new PrintStream(out));
-		cache.prettyPrint(jsonOut);
-		out.close();
-		return profile;
-	}
+    JsonArray newEntry = new JsonArray();
+    newEntry.add(key);
+    newEntry.add(profile);
+    cache.add(newEntry);
+    if (!PersistentSettings.cacheDirectory().isDirectory()) {
+      PersistentSettings.cacheDirectory().mkdirs();
+    }
+    FileOutputStream out = new FileOutputStream(cacheFile);
+    PrettyPrinter jsonOut = new PrettyPrinter("", new PrintStream(out));
+    cache.prettyPrint(jsonOut);
+    out.close();
+    return profile;
+  }
 }

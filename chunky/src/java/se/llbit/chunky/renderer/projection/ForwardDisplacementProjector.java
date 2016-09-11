@@ -19,55 +19,48 @@ package se.llbit.chunky.renderer.projection;
 import java.util.Random;
 
 import se.llbit.math.QuickMath;
-import se.llbit.math.Vector3d;
+import se.llbit.math.Vector3;
 
 /**
  * Moves the ray origin forward (if displacement is positive) along the
  * direction vector.
  */
 public class ForwardDisplacementProjector implements Projector {
-	protected final Projector wrapped;
-	protected final double displacementValue;
-	protected final double displacementSign;
+  protected final Projector wrapped;
+  protected final double displacementValue;
+  protected final double displacementSign;
 
-	public ForwardDisplacementProjector(Projector wrapped,
-			double displacement) {
-		this.wrapped = wrapped;
-		this.displacementValue = QuickMath.abs(displacement);
-		this.displacementSign = QuickMath.signum(displacement);
-	}
+  public ForwardDisplacementProjector(Projector wrapped, double displacement) {
+    this.wrapped = wrapped;
+    this.displacementValue = QuickMath.abs(displacement);
+    this.displacementSign = QuickMath.signum(displacement);
+  }
 
-	@Override
-	public void apply(double x, double y, Random random, Vector3d o,
-			Vector3d d) {
-		wrapped.apply(x, y, random, o, d);
+  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
+    wrapped.apply(x, y, random, o, d);
 
-		d.normalize();
-		d.scale(displacementValue);
-		o.scaleAdd(displacementSign, d);
-	}
+    d.normalize();
+    d.scale(displacementValue);
+    o.scaleAdd(displacementSign, d);
+  }
 
-	@Override
-	public void apply(double x, double y, Vector3d o, Vector3d d) {
-		wrapped.apply(x, y, o, d);
+  @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
+    wrapped.apply(x, y, o, d);
 
-		d.normalize();
-		d.scale(displacementValue);
-		o.scaleAdd(displacementSign, d);
-	}
+    d.normalize();
+    d.scale(displacementValue);
+    o.scaleAdd(displacementSign, d);
+  }
 
-	@Override
-	public double getMinRecommendedFoV() {
-		return wrapped.getMinRecommendedFoV();
-	}
+  @Override public double getMinRecommendedFoV() {
+    return wrapped.getMinRecommendedFoV();
+  }
 
-	@Override
-	public double getMaxRecommendedFoV() {
-		return wrapped.getMaxRecommendedFoV();
-	}
+  @Override public double getMaxRecommendedFoV() {
+    return wrapped.getMaxRecommendedFoV();
+  }
 
-	@Override
-	public double getDefaultFoV() {
-		return wrapped.getDefaultFoV();
-	}
+  @Override public double getDefaultFoV() {
+    return wrapped.getDefaultFoV();
+  }
 }

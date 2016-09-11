@@ -43,167 +43,142 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.SettingsDirectory;
 
-@SuppressWarnings("serial")
 public class FirstTimeSetupDialog extends JFrame {
-	private final JButton okBtn;
-	private final JButton cancelBtn;
-	private final CountDownLatch endLatch;
-	private boolean accepted = false;
-	private final JRadioButton homeDirectoryBtn;
-	private final JRadioButton programDirectoryBtn;
-	private final JRadioButton workingDirectoryBtn;
+  private final JButton okBtn;
+  private final JButton cancelBtn;
+  private final CountDownLatch endLatch;
+  private boolean accepted = false;
+  private final JRadioButton homeDirectoryBtn;
+  private final JRadioButton programDirectoryBtn;
+  private final JRadioButton workingDirectoryBtn;
 
-	public FirstTimeSetupDialog(CountDownLatch latch) {
-		super("Chunky First-Time Setup");
+  public FirstTimeSetupDialog(CountDownLatch latch) {
+    super("Chunky First-Time Setup");
 
-		endLatch = latch;
+    endLatch = latch;
 
-		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Close Dialog");
-		getRootPane().getActionMap().put("Close Dialog", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				close();
-			}
-		});
+    setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Close Dialog");
+    getRootPane().getActionMap().put("Close Dialog", new AbstractAction() {
+      @Override public void actionPerformed(ActionEvent e) {
+        close();
+      }
+    });
 
-		okBtn = new JButton("Use Selected Directory");
-		okBtn.setOpaque(false);
-		okBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				File settingsDir;
-				if (homeDirectoryBtn.isSelected()) {
-					settingsDir = SettingsDirectory.getHomeDirectory();
-				} else if (programDirectoryBtn.isSelected()) {
-					settingsDir = SettingsDirectory.getProgramDirectory();
-				} else {
-					settingsDir = SettingsDirectory.getWorkingDirectory();
-				}
-				boolean initialized = false;
-				try {
-					if (!settingsDir.isDirectory()) {
-						settingsDir.mkdirs();
-					}
-					File settingsFile = new File(settingsDir,
-							PersistentSettings.SETTINGS_FILE);
-					if (settingsFile.isFile() || settingsFile.createNewFile()) {
-						initialized = true;
-					}
-				} catch (IOException e1) {
-					System.err.println(e1.getMessage());
-				}
-				if (!initialized) {
-					Dialogs.error(
-							FirstTimeSetupDialog.this,
-							"Failed to initialize Chunky configuration directory! You may need administrative permissions on the computer to do this.",
-							"Failed to Initialize");
-				} else {
-					accepted = true;
-					close();
-				}
-			}
-		});
+    okBtn = new JButton("Use Selected Directory");
+    okBtn.setOpaque(false);
+    okBtn.addActionListener(new ActionListener() {
+      @Override public void actionPerformed(ActionEvent e) {
+        File settingsDir;
+        if (homeDirectoryBtn.isSelected()) {
+          settingsDir = SettingsDirectory.getHomeDirectory();
+        } else if (programDirectoryBtn.isSelected()) {
+          settingsDir = SettingsDirectory.getProgramDirectory();
+        } else {
+          settingsDir = SettingsDirectory.getWorkingDirectory();
+        }
+        boolean initialized = false;
+        try {
+          if (!settingsDir.isDirectory()) {
+            settingsDir.mkdirs();
+          }
+          File settingsFile = new File(settingsDir, PersistentSettings.SETTINGS_FILE);
+          if (settingsFile.isFile() || settingsFile.createNewFile()) {
+            initialized = true;
+          }
+        } catch (IOException e1) {
+          System.err.println(e1.getMessage());
+        }
+        if (!initialized) {
+          Dialogs.error(FirstTimeSetupDialog.this,
+              "Failed to initialize Chunky configuration directory! You may need administrative permissions on the computer to do this.",
+              "Failed to Initialize");
+        } else {
+          accepted = true;
+          close();
+        }
+      }
+    });
 
-		cancelBtn = new JButton("Cancel");
-		cancelBtn.setOpaque(false);
-		cancelBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				close();
-			}
-		});
+    cancelBtn = new JButton("Cancel");
+    cancelBtn.setOpaque(false);
+    cancelBtn.addActionListener(new ActionListener() {
+      @Override public void actionPerformed(ActionEvent e) {
+        close();
+      }
+    });
 
-		JLabel description = new JLabel(
-				"<html>It looks like this is your first time starting Chunky!<br>"
-				+ "(or the previous settings could not be found)<br>"
-				+ "<br>Please select which directory to store Chunky configuration in:");
+    JLabel description = new JLabel(
+        "<html>It looks like this is your first time starting Chunky!<br>"
+            + "(or the previous settings could not be found)<br>"
+            + "<br>Please select which directory to store Chunky configuration in:");
 
-		homeDirectoryBtn = new JRadioButton("<html><b>Home Directory (Recommended):</b><br>"
-				+ SettingsDirectory.getHomeDirectory());
-		homeDirectoryBtn.setOpaque(false);
-		programDirectoryBtn = new JRadioButton("<html><b>Program Directory (for portable/thumb drive installations):</b><br>"
-				+ SettingsDirectory.getProgramDirectory());
-		programDirectoryBtn.setOpaque(false);
-		workingDirectoryBtn = new JRadioButton("<html>Working Directory:<br>"
-				+ SettingsDirectory.getWorkingDirectory());
-		workingDirectoryBtn.setOpaque(false);
+    homeDirectoryBtn = new JRadioButton(
+        "<html><b>Home Directory (Recommended):</b><br>" + SettingsDirectory.getHomeDirectory());
+    homeDirectoryBtn.setOpaque(false);
+    programDirectoryBtn = new JRadioButton(
+        "<html><b>Program Directory (for portable/thumb drive installations):</b><br>"
+            + SettingsDirectory.getProgramDirectory());
+    programDirectoryBtn.setOpaque(false);
+    workingDirectoryBtn =
+        new JRadioButton("<html>Working Directory:<br>" + SettingsDirectory.getWorkingDirectory());
+    workingDirectoryBtn.setOpaque(false);
 
-		homeDirectoryBtn.setSelected(true);
+    homeDirectoryBtn.setSelected(true);
 
-		ButtonGroup group = new ButtonGroup();
-		group.add(homeDirectoryBtn);
-		group.add(workingDirectoryBtn);
-		group.add(programDirectoryBtn);
+    ButtonGroup group = new ButtonGroup();
+    group.add(homeDirectoryBtn);
+    group.add(workingDirectoryBtn);
+    group.add(programDirectoryBtn);
 
-		JLabel icon = new JLabel("");
+    JLabel icon = new JLabel("");
 
-		URL url = getClass().getResource("/chunky-cfg.png");
-		if (url != null) {
-			Image img = Toolkit.getDefaultToolkit().getImage(url);
-			setIconImage(img);
-			icon.setIcon(new ImageIcon(img));
-		}
+    URL url = getClass().getResource("/chunky-cfg.png");
+    if (url != null) {
+      Image img = Toolkit.getDefaultToolkit().getImage(url);
+      setIconImage(img);
+      icon.setIcon(new ImageIcon(img));
+    }
 
-		JPanel panel = new JPanel();
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
+    JPanel panel = new JPanel();
+    GroupLayout layout = new GroupLayout(panel);
+    panel.setLayout(layout);
 
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addComponent(icon)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(description)
-				.addComponent(homeDirectoryBtn)
-				.addComponent(programDirectoryBtn)
-				.addComponent(workingDirectoryBtn)
-				.addGroup(layout.createSequentialGroup()
-					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addComponent(okBtn)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(cancelBtn)
-				)
-			)
-			.addContainerGap()
-		);
-		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addComponent(description)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup()
-				.addComponent(icon)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(homeDirectoryBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(programDirectoryBtn)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(workingDirectoryBtn)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(layout.createParallelGroup()
-						.addComponent(okBtn)
-						.addComponent(cancelBtn)
-					)
-				)
-			)
-			.addContainerGap()
-		);
+    layout.setHorizontalGroup(layout.createSequentialGroup().addContainerGap().addComponent(icon)
+        .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(
+            layout.createParallelGroup().addComponent(description).addComponent(homeDirectoryBtn)
+                .addComponent(programDirectoryBtn).addComponent(workingDirectoryBtn).addGroup(
+                layout.createSequentialGroup()
+                    .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
+                        Short.MAX_VALUE).addComponent(okBtn)
+                    .addPreferredGap(ComponentPlacement.UNRELATED).addComponent(cancelBtn)))
+        .addContainerGap());
+    layout.setVerticalGroup(
+        layout.createSequentialGroup().addContainerGap().addComponent(description)
+            .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(
+            layout.createParallelGroup().addComponent(icon).addGroup(
+                layout.createSequentialGroup().addComponent(homeDirectoryBtn)
+                    .addPreferredGap(ComponentPlacement.RELATED).addComponent(programDirectoryBtn)
+                    .addPreferredGap(ComponentPlacement.RELATED).addComponent(workingDirectoryBtn)
+                    .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(
+                    layout.createParallelGroup().addComponent(okBtn).addComponent(cancelBtn))))
+            .addContainerGap());
 
-		setContentPane(panel);
+    setContentPane(panel);
 
-		pack();
+    pack();
 
-		setLocationByPlatform(true);
-	}
+    setLocationByPlatform(true);
+  }
 
-	protected void close() {
-		setVisible(false);
-		dispose();
-		endLatch.countDown();
-	}
+  protected void close() {
+    setVisible(false);
+    dispose();
+    endLatch.countDown();
+  }
 
-	public boolean accepted() {
-		return accepted;
-	}
+  public boolean accepted() {
+    return accepted;
+  }
 }

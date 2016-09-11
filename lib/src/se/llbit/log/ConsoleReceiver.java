@@ -18,22 +18,21 @@ package se.llbit.log;
 
 public class ConsoleReceiver extends Receiver {
 
-	public static final ConsoleReceiver INSTANCE = new ConsoleReceiver();
+  public static final ConsoleReceiver INSTANCE = new ConsoleReceiver();
 
-	private ConsoleReceiver() {
-	}
+  private ConsoleReceiver() {
+  }
 
-	@Override
-	public void logEvent(Level level, String message) {
-		switch (level) {
-		case INFO:
-		case WARNING:
-			System.out.println(message);
-			break;
-		case ERROR:
-			System.err.println(message);
-			break;
-		}
-	}
+  @Override public void logEvent(Level level, String message) {
+    switch (level) {
+      case INFO:
+      case WARNING:
+        System.out.println(message);
+        break;
+      case ERROR:
+        System.err.println(message);
+        break;
+    }
+  }
 
 }

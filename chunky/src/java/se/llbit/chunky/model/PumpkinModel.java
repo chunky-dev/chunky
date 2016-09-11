@@ -19,8 +19,8 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
 /**
  * Pumpkins and Jack-O-Lanterns
@@ -28,69 +28,66 @@ import se.llbit.math.Vector4d;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class PumpkinModel {
-	protected static Quad[][] sides = {
-		// facing south
-		{},
+  protected static Quad[][] sides = {
+      // facing south
+      {},
 
-		// facing west
-		{},
+      // facing west
+      {},
 
-		//facing north
-		{
-			// north
-			new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
-					new Vector3d(1, 1, 0), new Vector4d(1, 0, 0, 1)),
+      //facing north
+      {
+          // north
+          new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 0),
+              new Vector4(1, 0, 0, 1)),
 
-			// south
-			new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
-					new Vector3d(0, 1, 1), new Vector4d(0, 1, 0, 1)),
+          // south
+          new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(0, 1, 1),
+              new Vector4(0, 1, 0, 1)),
 
-			// west
-			new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
-					new Vector3d(0, 1, 0), new Vector4d(0, 1, 0, 1)),
+          // west
+          new Quad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 0),
+              new Vector4(0, 1, 0, 1)),
 
-			// east
-			new Quad(new Vector3d(1, 0, 1), new Vector3d(1, 0, 0),
-					new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, 1)),
+          // east
+          new Quad(new Vector3(1, 0, 1), new Vector3(1, 0, 0), new Vector3(1, 1, 1),
+              new Vector4(1, 0, 0, 1)),
 
-			// top
-			new Quad(new Vector3d(1, 1, 0), new Vector3d(0, 1, 0),
-					new Vector3d(1, 1, 1), new Vector4d(1, 0, 0, 1)),
+          // top
+          new Quad(new Vector3(1, 1, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 1),
+              new Vector4(1, 0, 0, 1)),
 
-			// bottom
-			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
-					new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1)),
-		},
+          // bottom
+          new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+              new Vector4(0, 1, 0, 1)),},
 
-		// facing east
-		{},
-	};
+      // facing east
+      {},};
 
-	static {
-		sides[3] = Model.rotateY(sides[2]);
-		sides[0] = Model.rotateY(sides[3]);
-		sides[1] = Model.rotateY(sides[0]);
-	}
+  static {
+    sides[3] = Model.rotateY(sides[2]);
+    sides[0] = Model.rotateY(sides[3]);
+    sides[1] = Model.rotateY(sides[0]);
+  }
 
-	@SuppressWarnings("javadoc")
-	public static boolean intersect(Ray ray, Texture[] texture) {
-		boolean hit = false;
-		Quad[] rot = sides[ray.getBlockData() % 4];
-		ray.t = Double.POSITIVE_INFINITY;
-		for (int i = 0; i < rot.length; ++i) {
-			Quad side = rot[i];
-			if (side.intersect(ray)) {
-				texture[i].getColor(ray);
-				ray.n.set(side.n);
-				ray.t = ray.tNext;
-				hit = true;
-			}
-		}
-		if (hit) {
-			ray.color.w = 1;
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+  public static boolean intersect(Ray ray, Texture[] texture) {
+    boolean hit = false;
+    Quad[] rot = sides[ray.getBlockData() % 4];
+    ray.t = Double.POSITIVE_INFINITY;
+    for (int i = 0; i < rot.length; ++i) {
+      Quad side = rot[i];
+      if (side.intersect(ray)) {
+        texture[i].getColor(ray);
+        ray.n.set(side.n);
+        ray.t = ray.tNext;
+        hit = true;
+      }
+    }
+    if (hit) {
+      ray.color.w = 1;
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

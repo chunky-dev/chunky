@@ -16,41 +16,52 @@
  */
 package se.llbit.chunky.ui;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Region;
 import se.llbit.log.Level;
 import se.llbit.log.Receiver;
 
+import java.io.IOException;
+
 /**
  * A log handler for the global Chunky logger.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class UILogReceiver extends Receiver {
 
-	private final ChunkyErrorDialog errorDialog = new ChunkyErrorDialog();
+  private ChunkyErrorDialog errorDialog = null;
 
-	@Override
-	public void logEvent(Level level, final String message) {
-		switch (level) {
-		case INFO:
-		case WARNING:
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					JOptionPane.showMessageDialog(null, message);
-				}
-			});
-			break;
-		case ERROR:
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					errorDialog.addRecord(message);
-				}
-			});
-			break;
-		}
-	}
+  @Override public void logEvent(Level level, final String message) {
+    switch (level) {
+      case INFO:
+      case WARNING:
+        Platform.runLater(() -> {
+          Alert warning = new Alert(Alert.AlertType.WARNING);
+          // We have to do some adjustments to make the warning dialog resize to
+          // the text content on Linux. Source: http://stackoverflow.com/a/33905734
+          warning.getDialogPane().getChildren().stream().filter(node -> node instanceof Label)
+              .forEach(node -> ((Label) node).setMinHeight(Region.USE_PREF_SIZE));
+          warning.setContentText(message);
+          warning.show();
+        });
+        break;
+      case ERROR:
+        Platform.runLater(() -> {
+          if (errorDialog == null) {
+            try {
+              errorDialog = new ChunkyErrorDialog();
+            } catch (IOException e) {
+              throw new Error("Failed to create error dialog", e);
+            }
+          }
+          errorDialog.addErrorMessage(message);
+          errorDialog.show();
+        });
+        break;
+    }
+  }
 
 }

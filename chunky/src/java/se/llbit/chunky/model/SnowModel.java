@@ -19,59 +19,63 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
-@SuppressWarnings("javadoc")
 public class SnowModel {
-	protected static Quad[][] quads = new Quad[8][];
-	static {
-		for (int i = 0; i < 8; ++i) {
-			double height = (i+1) * .125;
+  protected static Quad[][] quads = new Quad[8][];
 
-			quads[i] = new Quad[6];
+  static {
+    for (int i = 0; i < 8; ++i) {
+      double height = (i + 1) * .125;
 
-			// front
-			quads[i][0] = new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
-					new Vector3d(1, height, 0), new Vector4d(1, 0, 0, height));
-			// back
-			quads[i][1] = new Quad(new Vector3d(0, 0, 1), new Vector3d(1, 0, 1),
-					new Vector3d(0, height, 1), new Vector4d(0, 1, 0, height));
+      quads[i] = new Quad[6];
 
-			// right
-			quads[i][2] = new Quad(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1),
-					new Vector3d(0, height, 0), new Vector4d(0, 1, 0, height));
+      // front
+      quads[i][0] =
+          new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, height, 0),
+              new Vector4(1, 0, 0, height));
+      // back
+      quads[i][1] =
+          new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(0, height, 1),
+              new Vector4(0, 1, 0, height));
 
-			// left
-			quads[i][3] = new Quad(new Vector3d(1, 0, 1), new Vector3d(1, 0, 0),
-					new Vector3d(1, height, 1), new Vector4d(1, 0, 0, height));
+      // right
+      quads[i][2] =
+          new Quad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, height, 0),
+              new Vector4(0, 1, 0, height));
 
-			// top
-			quads[i][4] = new Quad(new Vector3d(1, height, 0), new Vector3d(0, height, 0),
-					new Vector3d(1, height, 1), new Vector4d(1, 0, 0, 1));
+      // left
+      quads[i][3] =
+          new Quad(new Vector3(1, 0, 1), new Vector3(1, 0, 0), new Vector3(1, height, 1),
+              new Vector4(1, 0, 0, height));
 
-			// bottom
-			quads[i][5] = new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
-					new Vector3d(0, 0, 1), new Vector4d(0, 1, 0, 1));
-		}
-	};
+      // top
+      quads[i][4] = new Quad(new Vector3(1, height, 0), new Vector3(0, height, 0),
+          new Vector3(1, height, 1), new Vector4(1, 0, 0, 1));
 
-	public static boolean intersect(Ray ray) {
-		boolean hit = false;
-		ray.t = Double.POSITIVE_INFINITY;
-		for (Quad quad : quads[ray.getBlockData() & 7]) {
-			if (quad.intersect(ray)) {
-				Texture.snowBlock.getColor(ray);
-				ray.n.set(quad.n);
-				ray.t = ray.tNext;
-				hit = true;
-			}
-		}
-		if (hit) {
-			ray.color.w = 1;
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+      // bottom
+      quads[i][5] = new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
+          new Vector4(0, 1, 0, 1));
+    }
+  }
+
+  public static boolean intersect(Ray ray) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    for (Quad quad : quads[ray.getBlockData() & 7]) {
+      if (quad.intersect(ray)) {
+        Texture.snowBlock.getColor(ray);
+        ray.n.set(quad.n);
+        ray.t = ray.tNext;
+        hit = true;
+      }
+    }
+    if (hit) {
+      ray.color.w = 1;
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

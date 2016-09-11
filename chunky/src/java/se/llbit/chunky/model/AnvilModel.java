@@ -23,61 +23,56 @@ import se.llbit.math.Ray;
 
 /**
  * Anvil block.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class AnvilModel {
-	private static final AABB[][] boxes = {
-		// north-south
-		{
-			new AABB(3/16., 13/16., 10/16., 1, 0, 1),
-			new AABB(2/16., 14/16., 0, 4/16., 2/16., 14/16.),
-			new AABB(4/16., 12/16., 4/16., 5/16., 3/16., 13/16.),
-			new AABB(6/16., 10/16., 5/16., 10/16., 4/16., 12/16.),
-		},
-		// east-west
-		{
-			new AABB(0, 1, 10/16., 1, 3/16., 13/16.),
-			new AABB(2/16., 14/16., 0, 4/16., 2/16., 14/16.),
-			new AABB(3/16., 13/16., 4/16., 5/16., 4/16., 12/16.),
-			new AABB(4/16., 12/16., 5/16., 10/16., 6/16., 10/16.),
-		},
-	};
+  private static final AABB[][] boxes = {
+      // north-south
+      {new AABB(3 / 16., 13 / 16., 10 / 16., 1, 0, 1),
+          new AABB(2 / 16., 14 / 16., 0, 4 / 16., 2 / 16., 14 / 16.),
+          new AABB(4 / 16., 12 / 16., 4 / 16., 5 / 16., 3 / 16., 13 / 16.),
+          new AABB(6 / 16., 10 / 16., 5 / 16., 10 / 16., 4 / 16., 12 / 16.),},
+      // east-west
+      {new AABB(0, 1, 10 / 16., 1, 3 / 16., 13 / 16.),
+          new AABB(2 / 16., 14 / 16., 0, 4 / 16., 2 / 16., 14 / 16.),
+          new AABB(3 / 16., 13 / 16., 4 / 16., 5 / 16., 4 / 16., 12 / 16.),
+          new AABB(4 / 16., 12 / 16., 5 / 16., 10 / 16., 6 / 16., 10 / 16.),},};
 
-	public static final Texture[] topTexture = {
-		Texture.anvilTop, Texture.anvilTopDamaged1, Texture.anvilTopDamaged2,
-		Texture.anvilTopDamaged2
-	};
+  public static final Texture[] topTexture =
+      {Texture.anvilTop, Texture.anvilTopDamaged1, Texture.anvilTopDamaged2,
+          Texture.anvilTopDamaged2};
 
-	/**
-	 * Find intersection between ray and block
-	 * @param ray
-	 * @return <code>true</code> if the ray intersected the block
-	 */
-	public static boolean intersect(Ray ray) {
-		int data = ray.getCurrentData() >> BlockData.OFFSET;
-		int orientation = 1 & data;
-		int damage = 3 & (data >> 2);
-		boolean hit = false;
-		ray.t = Double.POSITIVE_INFINITY;
-		for (int i = 0; i < boxes[0].length; ++i) {
-			if (boxes[orientation][i].intersect(ray)) {
-				if (i == 0 && ray.n.y > 0) {
-					double tmp = ray.v;
-					ray.v = ray.u * orientation + tmp * (1-orientation);
-					ray.u = tmp * orientation + ray.u * (1-orientation);
-					topTexture[damage].getColor(ray);
-				} else {
-					Texture.anvilSide.getColor(ray);
-				}
-				ray.t = ray.tNext;
-				hit = true;
-			}
-		}
-		if (hit) {
-			ray.color.w = 1;
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+  /**
+   * Find intersection between ray and block
+   *
+   * @return <code>true</code> if the ray intersected the block
+   */
+  public static boolean intersect(Ray ray) {
+    int data = ray.getCurrentData() >> BlockData.OFFSET;
+    int orientation = 1 & data;
+    int damage = 3 & (data >> 2);
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    for (int i = 0; i < boxes[0].length; ++i) {
+      if (boxes[orientation][i].intersect(ray)) {
+        if (i == 0 && ray.n.y > 0) {
+          double tmp = ray.v;
+          ray.v = ray.u * orientation + tmp * (1 - orientation);
+          ray.u = tmp * orientation + ray.u * (1 - orientation);
+          topTexture[damage].getColor(ray);
+        } else {
+          Texture.anvilSide.getColor(ray);
+        }
+        ray.t = ray.tNext;
+        hit = true;
+      }
+    }
+    if (hit) {
+      ray.color.w = 1;
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

@@ -18,60 +18,51 @@ package se.llbit.math;
 
 /**
  * A double-sided quad
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class DoubleSidedQuad extends Quad {
 
-	/**
-	 * @param other
-	 * @param t
-	 */
-	private DoubleSidedQuad(Quad other, Transform t) {
-		super(other, t);
-	}
+  private DoubleSidedQuad(Quad other, Transform t) {
+    super(other, t);
+  }
 
-	/**
-	 * @param p1
-	 * @param p2
-	 * @param p3
-	 * @param uv
-	 */
-	public DoubleSidedQuad(Vector3d p1, Vector3d p2, Vector3d p3, Vector4d uv) {
-		super(p1, p2, p3, uv);
-	}
+  public DoubleSidedQuad(Vector3 p1, Vector3 p2, Vector3 p3, Vector4 uv) {
+    super(p1, p2, p3, uv);
+  }
 
-	@Override
-	public boolean intersect(Ray ray) {
-		double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
-		double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
-		double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
-		double denom = ray.d.dot(n);
-		double u, v;
+  @Override public boolean intersect(Ray ray) {
+    double ix = ray.o.x - QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
+    double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
+    double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
+    double denom = ray.d.dot(n);
+    double u, v;
 
-		if (QuickMath.abs(denom) > Ray.EPSILON) {
-			double t = - (ix*n.x + iy*n.y + iz*n.z + d) / denom;
-			if (t > -Ray.EPSILON && t < ray.t) {
-				ix = ix + ray.d.x * t - o.x;
-				iy = iy + ray.d.y * t - o.y;
-				iz = iz + ray.d.z * t - o.z;
-				u = ix*xv.x + iy*xv.y + iz*xv.z;
-				u *= xvl;
-				v = ix*yv.x + iy*yv.y + iz*yv.z;
-				v *= yvl;
-				if (u >= 0 && u <= 1 && v >= 0 && v <= 1) {
-					ray.u = uv.x + u*uv.y;
-					ray.v = uv.z + v*uv.w;
-					ray.tNext = t;
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+    if (QuickMath.abs(denom) > Ray.EPSILON) {
+      double t = -(ix * n.x + iy * n.y + iz * n.z + d) / denom;
+      if (t > -Ray.EPSILON && t < ray.t) {
+        ix = ix + ray.d.x * t - o.x;
+        iy = iy + ray.d.y * t - o.y;
+        iz = iz + ray.d.z * t - o.z;
+        u = ix * xv.x + iy * xv.y + iz * xv.z;
+        u *= xvl;
+        v = ix * yv.x + iy * yv.y + iz * yv.z;
+        v *= yvl;
+        if (u >= 0 && u <= 1 && v >= 0 && v <= 1) {
+          ray.u = uv.x + u * uv.y;
+          ray.v = uv.z + v * uv.w;
+          ray.tNext = t;
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
-	/** Build a transformed copy of this quad. */
-	@Override
-	public DoubleSidedQuad transform(Transform transform) {
-		return new DoubleSidedQuad(this, transform);
-	}
+  /**
+   * Build a transformed copy of this quad.
+   */
+  @Override public DoubleSidedQuad transform(Transform transform) {
+    return new DoubleSidedQuad(this, transform);
+  }
 }

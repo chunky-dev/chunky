@@ -16,122 +16,61 @@
  */
 package se.llbit.chunky.renderer;
 
-import java.text.DecimalFormat;
+import se.llbit.chunky.renderer.scene.SceneManager;
+import se.llbit.util.TaskTracker;
 
 /**
  * Prints the render progress to the console.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class ConsoleRenderListener implements RenderStatusListener {
+public class ConsoleRenderListener extends StandardRenderListener {
 
-	private boolean first = true;
-	private final DecimalFormat decimalFormat;
+  public ConsoleRenderListener(RenderContext context, SceneManager sceneManager) {
+    super(context, sceneManager, new TaskTracker(new ConsoleProgressListener(),
+        new TaskTracker.TaskBuilder() {
+          @Override public TaskTracker.Task newTask(TaskTracker tracker, TaskTracker.Task previous,
+              String name, int size) {
+            return new TaskTracker.Task(tracker, previous, name, size) {
+              @Override public void close() {
+                super.close();
+                long endTime = System.currentTimeMillis();
+                int seconds = (int) ((endTime - startTime) / 1000);
+                System.out.format("\r%s took %dm %ds%n", name, seconds / 60, seconds % 60);
+              }
+            };
+          }
+        }));
+  }
 
-	/**
-	 * Constructor
-	 */
-	public ConsoleRenderListener() {
-		decimalFormat = new DecimalFormat();
-		decimalFormat.setGroupingSize(3);
-		decimalFormat.setGroupingUsed(true);
-	}
+  @Override public void chunksLoaded() {
+  }
 
-	@Override
-	public void setProgress(String task, int done, int start, int target) {
-		if (!first) {
-			System.out.print("\r");
-		}
-		first = false;
-		System.out.print(String.format("%s: %.1f%% (%s of %s)",
-				task, 100 * done / (float) target,
-				decimalFormat.format(done), decimalFormat.format(target)));
+  @Override public void setRenderTime(long time) {
+  }
 
-		if (done == target) {
-			System.out.println();
-			System.out.flush();
-			first = true;
-		}
-	}
+  @Override public void setSamplesPerSecond(int sps) {
+  }
 
-	@Override
-	public void setProgress(String task, int done, int start, int target, String eta) {
-		if (!first) {
-			System.out.print("\r");
-		}
-		first = false;
-		System.out.print(String.format("%s: %.1f%% (%s of %s) [ETA=%s]",
-				task, 100 * done / (float) target,
-				decimalFormat.format(done), decimalFormat.format(target), eta));
+  @Override public void setSpp(int spp) {
+  }
 
-		if (done == target) {
-			System.out.println();
-			System.out.flush();
-			first = true;
-		}
-	}
+  @Override public void sceneSaved() {
+  }
 
-	@Override
-	public void taskAborted(String task) {
-		if (!first) {
-			System.out.print("\r");
-		}
-		System.out.println(task + ": ABORTED       ");
-		System.out.flush();
-		first = true;
-	}
+  @Override public void sceneLoaded() {
+  }
 
-	@Override
-	public void taskFailed(String task) {
-		if (!first) {
-			System.out.print("\r");
-		}
-		System.out.println(task + ": FAILED        ");
-		System.out.flush();
-		first = true;
-	}
+  @Override public void renderStateChanged(RenderMode state) {
+  }
 
-	@Override
-	public void chunksLoaded() {
-	}
-
-	@Override
-	public void setRenderTime(long time) {
-	}
-
-	@Override
-	public void setSamplesPerSecond(int sps) {
-	}
-
-	@Override
-	public void setSPP(int spp) {
-	}
-
-	@Override
-	public void sceneSaved() {
-	}
-
-	@Override
-	public void sceneLoaded() {
-	}
-
-	@Override
-	public void renderStateChanged(RenderState state) {
-	}
-
-	@Override
-	public void renderJobFinished(long time, int sps) {
-		System.out.println("Render job finished.");
-		int seconds = (int) ((time / 1000) % 60);
-		int minutes = (int) ((time / 60000) % 60);
-		int hours = (int) (time / 3600000);
-		System.out.println(String.format(
-				"Total rendering time: %d hours, %d minutes, %d seconds",
-				hours, minutes, seconds));
-		System.out.println("Average samples per second (SPS): " + sps);
-	}
-
-	@Override
-	public void renderResetRequested() {
-		System.out.println("Render reset prevented!");
-	}
+  @Override public void renderJobFinished(long time, int sps) {
+    System.out.println("Render job finished.");
+    int seconds = (int) ((time / 1000) % 60);
+    int minutes = (int) ((time / 60000) % 60);
+    int hours = (int) (time / 3600000);
+    System.out.println(String
+        .format("Total rendering time: %d hours, %d minutes, %d seconds", hours, minutes, seconds));
+    System.out.println("Average samples per second (SPS): " + sps);
+  }
 }

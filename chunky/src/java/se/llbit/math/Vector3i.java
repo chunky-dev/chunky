@@ -18,66 +18,57 @@ package se.llbit.math;
 
 /**
  * A 3D vector of integers.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Vector3i {
 
-	@SuppressWarnings("javadoc")
-	public int x, y, z;
+  public int x, y, z;
 
-	/**
-	 * Creates a new vector (0, 0, 0)
-	 */
-	public Vector3i() {
-		this(0, 0, 0);
-	}
+  /**
+   * Creates a new vector (0, 0, 0).
+   */
+  public Vector3i() {
+    this(0, 0, 0);
+  }
 
-	/**
-	 * Creates a new vector (i, j, k)
-	 * @param i
-	 * @param j
-	 * @param k
-	 */
-	public Vector3i(int i, int j, int k) {
-		x = i;
-		y = j;
-		z = k;
-	}
+  /**
+   * Creates a new vector (i, j, k).
+   */
+  public Vector3i(int i, int j, int k) {
+    x = i;
+    y = j;
+    z = k;
+  }
 
-	/**
-	 * Set this vector equal to o
-	 * @param o
-	 */
-	public final void set(Vector3i o) {
-		x = o.x;
-		y = o.y;
-		z = o.z;
-	}
+  /**
+   * Set this vector equal to o.
+   */
+  public final void set(Vector3i o) {
+    x = o.x;
+    y = o.y;
+    z = o.z;
+  }
 
-	/**
-	 * Set this vector equal to (d, e, f)
-	 * @param d
-	 * @param e
-	 * @param f
-	 */
-	public final void set(int d, int e, int f) {
-		x = d;
-		y = e;
-		z = f;
-	}
+  /**
+   * Set this vector equal to (d, e, f).
+   */
+  public final void set(int d, int e, int f) {
+    x = d;
+    y = e;
+    z = f;
+  }
 
-	/**
-	 * Scale this vector by i
-	 * @param i
-	 */
-	public void scale(int i) {
-		x *= i;
-		y *= i;
-		z *= i;
-	}
+  /**
+   * Scale this vector by i.
+   */
+  public void scale(int i) {
+    x *= i;
+    y *= i;
+    z *= i;
+  }
 
-	@Override
-	public String toString() {
-		return String.format("(%d, %d, %d)", x, y, z);
-	}
+  @Override public String toString() {
+    return String.format("(%d, %d, %d)", x, y, z);
+  }
 }

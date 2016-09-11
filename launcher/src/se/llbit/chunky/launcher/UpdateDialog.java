@@ -66,464 +66,435 @@ import se.llbit.chunky.launcher.VersionInfo.LibraryStatus;
 /**
  * Asks user if new version should be downloaded.
  * Displays release notes and download status.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-@SuppressWarnings("serial")
 public class UpdateDialog extends JDialog {
-	protected final ExecutorService threadPool = Executors.newFixedThreadPool(4);
+  protected final ExecutorService threadPool = Executors.newFixedThreadPool(4);
 
-	public class Finalizer extends Thread {
-		private final Collection<Future<DownloadStatus>> results;
-		public Finalizer(Collection<Future<DownloadStatus>> resultFutures) {
-			results = resultFutures;
-		}
-		@Override
-		public void run() {
-			try {
-				boolean failed = false;
-				for (Future<DownloadStatus> result: results) {
-					try {
-						if (result.get() != DownloadStatus.SUCCESS) {
-							failed = true;
-						}
-					} catch (InterruptedException e) {
-						failed = true;
-					} catch (ExecutionException e) {
-						failed = true;
-					}
-				}
-				if (failed) {
-					updateFailed("Failed to download some required libraries. Please try again later.");
-					return;
-				}
-				try {
-					File versionFile = new File(versionsDir, version.name + ".json");
-					version.writeTo(versionFile);
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							progress.setValue(progress.getMaximum());
-							completedLbl.setVisible(true);
-							cancelBtn.setText("Close");
-							parent.updateVersionList();
-							parent.selectLatestVersion();
-						}
-					});
-				} catch (IOException e) {
-					updateFailed("Failed to update version info. Please try again later.");
-				}
-			} finally {
-				updateCompleted();
-			}
-		}
-		private void updateFailed(final String message) {
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					progress.setStringPainted(true);
-					progress.setString(message);
-					progress.setForeground(Color.red);
-				}
-			});
-		}
-		private void updateCompleted() {
-			busyLbl.setVisible(false);
-			synchronized (updateLock) {
-				busy = false;
-				updateLock.notifyAll();
-			}
-		}
-	}
 
-	static class StatusCellRenderer extends DefaultTableCellRenderer {
-		@Override
-		protected void setValue(Object value) {
-			if (value instanceof LibraryStatus) {
-				LibraryStatus status = (LibraryStatus) value;
-				setText(status.downloadStatus());
-				if (status == LibraryStatus.PASSED || status == LibraryStatus.DOWNLOADED_OK) {
-					setIcon(LauncherIcon.cached);
-				} else {
-					switch (status) {
-					case MD5_MISMATCH:
-					case MISSING:
-						setIcon(LauncherIcon.refresh);
-						break;
-					default:
-						setIcon(LauncherIcon.failed);
-					}
-				}
-			}
-		}
-	}
+  public class Finalizer extends Thread {
+    private final Collection<Future<DownloadStatus>> results;
 
-	private final JButton okBtn = new JButton("Update to New Version");
-	private final JButton cancelBtn = new JButton("Cancel");
-	private final JLabel completedLbl = new JLabel("Update completed!");
-	private final JProgressBar progress = new JProgressBar();
-	private final ChunkyLauncher parent;
-	private final VersionInfo version;
-	private final File libDir;
-	private final File versionsDir;
-	private final Object updateLock = new Object();
-	private boolean busy = false;
-	private final JLabel busyLbl = new JLabel();
-	private final JTable status;
-	private final Collection<VersionInfo.Library> neededLibraries = new LinkedList<VersionInfo.Library>();
-	private int downloadBytes = 0;
-	private final DefaultTableModel tableModel;
+    public Finalizer(Collection<Future<DownloadStatus>> resultFutures) {
+      results = resultFutures;
+    }
 
-	public UpdateDialog(final ChunkyLauncher parent, final VersionInfo version) {
-		super(parent, "Update Available!");
+    @Override public void run() {
+      try {
+        boolean failed = false;
+        for (Future<DownloadStatus> result : results) {
+          try {
+            if (result.get() != DownloadStatus.SUCCESS) {
+              failed = true;
+            }
+          } catch (InterruptedException e) {
+            failed = true;
+          } catch (ExecutionException e) {
+            failed = true;
+          }
+        }
+        if (failed) {
+          updateFailed("Failed to download some required libraries. Please try again later.");
+          return;
+        }
+        try {
+          File versionFile = new File(versionsDir, version.name + ".json");
+          version.writeTo(versionFile);
+          SwingUtilities.invokeLater(new Runnable() {
+            @Override public void run() {
+              progress.setValue(progress.getMaximum());
+              completedLbl.setVisible(true);
+              cancelBtn.setText("Close");
+              parent.updateVersionList();
+              parent.selectLatestVersion();
+            }
+          });
+        } catch (IOException e) {
+          updateFailed("Failed to update version info. Please try again later.");
+        }
+      } finally {
+        updateCompleted();
+      }
+    }
 
-		this.parent = parent;
-		this.version = version;
+    private void updateFailed(final String message) {
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override public void run() {
+          progress.setStringPainted(true);
+          progress.setString(message);
+          progress.setForeground(Color.red);
+        }
+      });
+    }
 
-		File chunkyDir = PersistentSettings.settingsDirectory();
-		libDir = new File(chunkyDir, "lib");
-		if (!libDir.isDirectory()) {
-			libDir.mkdirs();
-		}
-		versionsDir = new File(chunkyDir, "versions");
-		if (!versionsDir.isDirectory()) {
-			versionsDir.mkdirs();
-		}
+    private void updateCompleted() {
+      busyLbl.setVisible(false);
+      synchronized (updateLock) {
+        busy = false;
+        updateLock.notifyAll();
+      }
+    }
+  }
 
-		setModalityType(ModalityType.MODELESS);
-		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
-		addWindowListener(new WindowListener() {
-			@Override
-			public void windowOpened(WindowEvent e) {
-			}
-			@Override
-			public void windowIconified(WindowEvent e) {
-			}
-			@Override
-			public void windowDeiconified(WindowEvent e) {
-			}
-			@Override
-			public void windowDeactivated(WindowEvent e) {
-			}
-			@Override
-			public void windowClosing(WindowEvent e) {
-				close();
-			}
-			@Override
-			public void windowClosed(WindowEvent e) {
-			}
-			@Override
-			public void windowActivated(WindowEvent e) {
-			}
-		});
+  static class StatusCellRenderer extends DefaultTableCellRenderer {
+    @Override protected void setValue(Object value) {
+      if (value instanceof LibraryStatus) {
+        LibraryStatus status = (LibraryStatus) value;
+        setText(status.downloadStatus());
+        if (status == LibraryStatus.PASSED || status == LibraryStatus.DOWNLOADED_OK) {
+          setIcon(LauncherIcon.cached);
+        } else {
+          switch (status) {
+            case MD5_MISMATCH:
+            case MISSING:
+              setIcon(LauncherIcon.refresh);
+              break;
+            default:
+              setIcon(LauncherIcon.failed);
+          }
+        }
+      }
+    }
+  }
 
-		URL url = getClass().getResource("/chunky-cfg.png");
-		if (url != null) {
-			setIconImage(Toolkit.getDefaultToolkit().getImage(url));
-		}
 
-		url = getClass().getResource("/busy.gif");
-		if (url != null) {
-			busyLbl.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(url)));
-		}
-		busyLbl.setVisible(false);
+  private final JButton okBtn = new JButton("Update to New Version");
+  private final JButton cancelBtn = new JButton("Cancel");
+  private final JLabel completedLbl = new JLabel("Update completed!");
+  private final JProgressBar progress = new JProgressBar();
+  private final ChunkyLauncher parent;
+  private final VersionInfo version;
+  private final File libDir;
+  private final File versionsDir;
+  private final Object updateLock = new Object();
+  private boolean busy = false;
+  private final JLabel busyLbl = new JLabel();
+  private final JTable status;
+  private final Collection<VersionInfo.Library> neededLibraries =
+      new LinkedList<VersionInfo.Library>();
+  private int downloadBytes = 0;
+  private final DefaultTableModel tableModel;
 
-		JLabel infoLbl = new JLabel(
-				"<html>A new version of Chunky is available for download!<br>" +
-				"<br>Version <b>" + version.name + "</b>, released on " + version.date() +
-				"<br>Release notes:");
+  public UpdateDialog(final ChunkyLauncher parent, final VersionInfo version) {
+    super(parent, "Update Available!");
 
-		okBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				downloadUpdate();
-			}
-		});
+    this.parent = parent;
+    this.version = version;
 
-		cancelBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				close();
-			}
-		});
+    File chunkyDir = PersistentSettings.settingsDirectory();
+    libDir = new File(chunkyDir, "lib");
+    if (!libDir.isDirectory()) {
+      libDir.mkdirs();
+    }
+    versionsDir = new File(chunkyDir, "versions");
+    if (!versionsDir.isDirectory()) {
+      versionsDir.mkdirs();
+    }
 
-		completedLbl.setIcon(LauncherIcon.cached);
-		completedLbl.setVisible(false);
+    setModalityType(ModalityType.MODELESS);
+    setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
-		JTextPane changeLog = new JTextPane();
-		changeLog.setCaretPosition(0);
-		changeLog.setMargin(new Insets(0, 0, 0, 0));
-		if (version.notes.isEmpty()) {
-			changeLog.setText("No release notes available.");
-		} else {
-			changeLog.setText(version.notes);
-		}
+    addWindowListener(new WindowListener() {
+      @Override public void windowOpened(WindowEvent e) {
+      }
 
-		tableModel = new DefaultTableModel(version.libraries.size(), 3);
-		int i = 0;
-		for (Library lib: version.libraries) {
-			LibraryStatus libStatus = lib.testIntegrity(libDir);
-			if (libStatus != LibraryStatus.PASSED && libStatus != LibraryStatus.INCOMPLETE_INFO) {
-				neededLibraries.add(lib);
-				downloadBytes += lib.size;
-			}
+      @Override public void windowIconified(WindowEvent e) {
+      }
 
-			// pretty print library size
-			float size = lib.size;
-			String unit = "B";
-			if (size >= 1024*1024) {
-				size /= 1024*1024;
-				unit = "MiB";
-			} else if (size >= 1024) {
-				size /= 1024;
-				unit = "KiB";
-			}
-			String libSize;
-			if (size >= 10) {
-				libSize = String.format("%d %s", (int) size, unit);
-			} else {
-				libSize = String.format("%.1f %s", size, unit);
-			}
+      @Override public void windowDeiconified(WindowEvent e) {
+      }
 
-			tableModel.setValueAt(lib, i, 0);
-			tableModel.setValueAt(libStatus, i, 1);
-			tableModel.setValueAt(libSize, i, 2);
-			i += 1;
-		}
-		tableModel.setColumnIdentifiers(new String[] { "Library", "Status", "Size" });
-		final StatusCellRenderer statusRenderer = new StatusCellRenderer();
-		status = new JTable(tableModel) {
-			@Override
-			public TableCellRenderer getCellRenderer(int row, int column) {
-				if (column == 1) {
-					return statusRenderer;
-				}
-				return super.getCellRenderer(row, column);
-			}
+      @Override public void windowDeactivated(WindowEvent e) {
+      }
 
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return false;
-			}
-		};
-		status.getTableHeader().setVisible(false);
-		status.setVisible(false);
-		final JCheckBox details = new JCheckBox("Details");
-		details.setIcon(LauncherIcon.expand);
-		details.setRolloverIcon(LauncherIcon.expandHover);
-		details.setSelectedIcon(LauncherIcon.collapse);
-		details.setRolloverSelectedIcon(LauncherIcon.collapseHover);
-		details.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean expand = details.isSelected();
-				status.getTableHeader().setVisible(expand);
-				status.setVisible(expand);
-			}
-		});
+      @Override public void windowClosing(WindowEvent e) {
+        close();
+      }
 
-		JScrollPane changeLogScrollPane = new JScrollPane(changeLog);
+      @Override public void windowClosed(WindowEvent e) {
+      }
 
-		JPanel panel = new JPanel();
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
+      @Override public void windowActivated(WindowEvent e) {
+      }
+    });
 
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(layout.createParallelGroup()
-				.addComponent(infoLbl)
-				.addComponent(changeLogScrollPane)
-				.addComponent(details)
-				.addComponent(status.getTableHeader())
-				.addComponent(status)
-				.addComponent(progress)
-				.addGroup(layout.createSequentialGroup()
-					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addComponent(busyLbl)
-					.addComponent(okBtn)
-					.addComponent(completedLbl)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(cancelBtn)
-				)
-			)
-			.addContainerGap()
-		);
-		layout.setVerticalGroup(layout.createSequentialGroup()
-			.addContainerGap()
-			.addComponent(infoLbl)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(changeLogScrollPane)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(details)
-			.addComponent(status.getTableHeader())
-			.addComponent(status)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addComponent(progress)
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-				.addComponent(busyLbl)
-				.addComponent(okBtn)
-				.addComponent(completedLbl)
-				.addComponent(cancelBtn)
-			)
-			.addContainerGap()
-		);
+    URL url = getClass().getResource("/chunky-cfg.png");
+    if (url != null) {
+      setIconImage(Toolkit.getDefaultToolkit().getImage(url));
+    }
 
-		setContentPane(panel);
+    url = getClass().getResource("/busy.gif");
+    if (url != null) {
+      busyLbl.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(url)));
+    }
+    busyLbl.setVisible(false);
 
-		setPreferredSize(new Dimension(500, 500));
-		pack();
+    JLabel infoLbl = new JLabel("<html>A new version of Chunky is available for download!<br>" +
+        "<br>Version <b>" + version.name + "</b>, released on " + version.date() +
+        "<br>Release notes:");
 
-		setLocationRelativeTo(parent);
-		//setLocationByPlatform(true);
-	}
+    okBtn.addActionListener(new ActionListener() {
+      @Override public void actionPerformed(ActionEvent e) {
+        downloadUpdate();
+      }
+    });
 
-	protected void downloadUpdate() {
-		synchronized (updateLock) {
-			busy = true;
-		}
-		okBtn.setVisible(false);
-		busyLbl.setVisible(true);
-		if (!libDir.isDirectory()) {
-			// TODO ERROR
-		}
-		if (!versionsDir.isDirectory()) {
-			// TODO ERROR
-		}
-		progress.setMaximum(downloadBytes+1);
-		progress.setValue(0);
-		final List<Future<DownloadStatus>> results = new LinkedList<Future<DownloadStatus>>();
-		for (VersionInfo.Library lib: neededLibraries) {
-			results.add(threadPool.submit(new DownloadJob(lib, new ProgressIncrementer(lib.size))));
-		}
-		new Finalizer(results).start();
-	}
+    cancelBtn.addActionListener(new ActionListener() {
+      @Override public void actionPerformed(ActionEvent e) {
+        close();
+      }
+    });
 
-	protected void close() {
-		threadPool.shutdownNow();
-		awaitUpdate();
-		setVisible(false);
-		dispose();
-		parent.setBusyEDT(false);
-	}
+    completedLbl.setIcon(LauncherIcon.cached);
+    completedLbl.setVisible(false);
 
-	private void awaitUpdate() {
-		// TODO abort download threads!
-		synchronized (updateLock) {
-			try {
-				while (busy) {
-					updateLock.wait();
-				}
-			} catch (InterruptedException e) {
-				// not critical
-			}
-		}
-	}
+    JTextPane changeLog = new JTextPane();
+    changeLog.setCaretPosition(0);
+    changeLog.setMargin(new Insets(0, 0, 0, 0));
+    if (version.notes.isEmpty()) {
+      changeLog.setText("No release notes available.");
+    } else {
+      changeLog.setText(version.notes);
+    }
 
-	class DownloadJob implements Callable<DownloadStatus> {
+    tableModel = new DefaultTableModel(version.libraries.size(), 3);
+    int i = 0;
+    for (Library lib : version.libraries) {
+      LibraryStatus libStatus = lib.testIntegrity(libDir);
+      if (libStatus != LibraryStatus.PASSED && libStatus != LibraryStatus.INCOMPLETE_INFO) {
+        neededLibraries.add(lib);
+        downloadBytes += lib.size;
+      }
 
-		private final Library lib;
-		private final Runnable callback;
+      // pretty print library size
+      float size = lib.size;
+      String unit = "B";
+      if (size >= 1024 * 1024) {
+        size /= 1024 * 1024;
+        unit = "MiB";
+      } else if (size >= 1024) {
+        size /= 1024;
+        unit = "KiB";
+      }
+      String libSize;
+      if (size >= 10) {
+        libSize = String.format("%d %s", (int) size, unit);
+      } else {
+        libSize = String.format("%.1f %s", size, unit);
+      }
 
-		public DownloadJob(VersionInfo.Library lib, Runnable callback) {
-			this.lib = lib;
-			this.callback = callback;
-		}
+      tableModel.setValueAt(lib, i, 0);
+      tableModel.setValueAt(libStatus, i, 1);
+      tableModel.setValueAt(libSize, i, 2);
+      i += 1;
+    }
+    tableModel.setColumnIdentifiers(new String[] {"Library", "Status", "Size"});
+    final StatusCellRenderer statusRenderer = new StatusCellRenderer();
+    status = new JTable(tableModel) {
+      @Override public TableCellRenderer getCellRenderer(int row, int column) {
+        if (column == 1) {
+          return statusRenderer;
+        }
+        return super.getCellRenderer(row, column);
+      }
 
-		@Override
-		public DownloadStatus call() throws Exception {
-			DownloadStatus result = null;
-			if (!lib.url.isEmpty()) {
-				result = tryDownload(libDir, lib, lib.url);
-				switch (result) {
-				case MALFORMED_URL:
-					System.err.println("Malformed URL: " + lib.url);
-					break;
-				case FILE_NOT_FOUND:
-					System.err.println("File not found: " + lib.url);
-					break;
-				case DOWNLOAD_FAILED:
-					System.err.println("Download failed: " + lib.url);
-					break;
-				default:
-					break;
-				}
-			}
-			String defaultUrl = "http://chunkyupdate.llbit.se/lib/" + lib.name;
-			if (result != DownloadStatus.SUCCESS) {
-				result = tryDownload(libDir, lib, defaultUrl);
-			}
-			switch (result) {
-			case SUCCESS:
-				updateStatus(lib, LibraryStatus.DOWNLOADED_OK);
-				break;
-			case MALFORMED_URL:
-				updateStatus(lib, LibraryStatus.MALFORMED_URL);
-				System.err.println("Malformed URL: " + defaultUrl);
-				break;
-			case FILE_NOT_FOUND:
-				updateStatus(lib, LibraryStatus.FILE_NOT_FOUND);
-				System.err.println("File not found: " + defaultUrl);
-				break;
-			case DOWNLOAD_FAILED:
-				updateStatus(lib, LibraryStatus.DOWNLOAD_FAILED);
-				System.err.println("Download failed: " + defaultUrl);
-				break;
-			}
-			SwingUtilities.invokeLater(callback);
-			return result;
-		}
+      @Override public boolean isCellEditable(int row, int column) {
+        return false;
+      }
+    };
+    status.getTableHeader().setVisible(false);
+    status.setVisible(false);
+    final JCheckBox details = new JCheckBox("Details");
+    details.setIcon(LauncherIcon.expand);
+    details.setRolloverIcon(LauncherIcon.expandHover);
+    details.setSelectedIcon(LauncherIcon.collapse);
+    details.setRolloverSelectedIcon(LauncherIcon.collapseHover);
+    details.addActionListener(new ActionListener() {
+      @Override public void actionPerformed(ActionEvent e) {
+        boolean expand = details.isSelected();
+        status.getTableHeader().setVisible(expand);
+        status.setVisible(expand);
+      }
+    });
 
-	}
+    JScrollPane changeLogScrollPane = new JScrollPane(changeLog);
 
-	class ProgressIncrementer implements Runnable {
-		private final int value;
+    JPanel panel = new JPanel();
+    GroupLayout layout = new GroupLayout(panel);
+    panel.setLayout(layout);
 
-		public ProgressIncrementer(int value) {
-			this.value = value;
-		}
+    layout.setHorizontalGroup(layout.createSequentialGroup().addContainerGap().addGroup(
+        layout.createParallelGroup().addComponent(infoLbl).addComponent(changeLogScrollPane)
+            .addComponent(details).addComponent(status.getTableHeader()).addComponent(status)
+            .addComponent(progress).addGroup(layout.createSequentialGroup()
+            .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(busyLbl).addComponent(okBtn).addComponent(completedLbl)
+            .addPreferredGap(ComponentPlacement.UNRELATED).addComponent(cancelBtn)))
+        .addContainerGap());
+    layout.setVerticalGroup(layout.createSequentialGroup().addContainerGap().addComponent(infoLbl)
+        .addPreferredGap(ComponentPlacement.UNRELATED).addComponent(changeLogScrollPane)
+        .addPreferredGap(ComponentPlacement.UNRELATED).addComponent(details)
+        .addComponent(status.getTableHeader()).addComponent(status)
+        .addPreferredGap(ComponentPlacement.UNRELATED).addComponent(progress)
+        .addPreferredGap(ComponentPlacement.UNRELATED).addGroup(
+            layout.createParallelGroup(Alignment.BASELINE).addComponent(busyLbl).addComponent(okBtn)
+                .addComponent(completedLbl).addComponent(cancelBtn)).addContainerGap());
 
-		@Override
-		public void run() {
-			progress.setValue(progress.getValue() + value);
-		}
-	}
+    setContentPane(panel);
 
-	public void updateStatus(final Library library, final LibraryStatus status) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				for (int i = 0; i < tableModel.getRowCount(); ++i) {
-					if (tableModel.getValueAt(i, 0) == library) {
-						tableModel.setValueAt(status, i, 1);
-						break;
-					}
-				}
-			}
-		});
-	}
+    setPreferredSize(new Dimension(500, 500));
+    pack();
 
-	public static DownloadStatus tryDownload(File libDir, Library lib, String theUrl) {
-		try {
-			URL url = new URL(theUrl);
-			ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
-			FileOutputStream out = new FileOutputStream(lib.getFile(libDir));
-			out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
-			out.close();
-			LibraryStatus status = lib.testIntegrity(libDir);
-			if (status == LibraryStatus.PASSED) {
-				return DownloadStatus.SUCCESS;
-			} else {
-				return DownloadStatus.DOWNLOAD_FAILED;
-			}
-		} catch (MalformedURLException e) {
-			return DownloadStatus.MALFORMED_URL;
-		} catch (FileNotFoundException e) {
-			return DownloadStatus.FILE_NOT_FOUND;
-		} catch (IOException e) {
-			return DownloadStatus.DOWNLOAD_FAILED;
-		}
+    setLocationRelativeTo(parent);
+    //setLocationByPlatform(true);
+  }
 
-	}
+  protected void downloadUpdate() {
+    synchronized (updateLock) {
+      busy = true;
+    }
+    okBtn.setVisible(false);
+    busyLbl.setVisible(true);
+    if (!libDir.isDirectory()) {
+      // TODO ERROR
+    }
+    if (!versionsDir.isDirectory()) {
+      // TODO ERROR
+    }
+    progress.setMaximum(downloadBytes + 1);
+    progress.setValue(0);
+    final List<Future<DownloadStatus>> results = new LinkedList<Future<DownloadStatus>>();
+    for (VersionInfo.Library lib : neededLibraries) {
+      results.add(threadPool.submit(new DownloadJob(lib, new ProgressIncrementer(lib.size))));
+    }
+    new Finalizer(results).start();
+  }
+
+  protected void close() {
+    threadPool.shutdownNow();
+    awaitUpdate();
+    setVisible(false);
+    dispose();
+    parent.setBusyEDT(false);
+  }
+
+  private void awaitUpdate() {
+    // TODO abort download threads!
+    synchronized (updateLock) {
+      try {
+        while (busy) {
+          updateLock.wait();
+        }
+      } catch (InterruptedException e) {
+        // not critical
+      }
+    }
+  }
+
+  class DownloadJob implements Callable<DownloadStatus> {
+
+    private final Library lib;
+    private final Runnable callback;
+
+    public DownloadJob(VersionInfo.Library lib, Runnable callback) {
+      this.lib = lib;
+      this.callback = callback;
+    }
+
+    @Override public DownloadStatus call() throws Exception {
+      DownloadStatus result = null;
+      if (!lib.url.isEmpty()) {
+        result = tryDownload(libDir, lib, lib.url);
+        switch (result) {
+          case MALFORMED_URL:
+            System.err.println("Malformed URL: " + lib.url);
+            break;
+          case FILE_NOT_FOUND:
+            System.err.println("File not found: " + lib.url);
+            break;
+          case DOWNLOAD_FAILED:
+            System.err.println("Download failed: " + lib.url);
+            break;
+          default:
+            break;
+        }
+      }
+      String defaultUrl = "http://chunkyupdate.llbit.se/lib/" + lib.name;
+      if (result != DownloadStatus.SUCCESS) {
+        result = tryDownload(libDir, lib, defaultUrl);
+      }
+      switch (result) {
+        case SUCCESS:
+          updateStatus(lib, LibraryStatus.DOWNLOADED_OK);
+          break;
+        case MALFORMED_URL:
+          updateStatus(lib, LibraryStatus.MALFORMED_URL);
+          System.err.println("Malformed URL: " + defaultUrl);
+          break;
+        case FILE_NOT_FOUND:
+          updateStatus(lib, LibraryStatus.FILE_NOT_FOUND);
+          System.err.println("File not found: " + defaultUrl);
+          break;
+        case DOWNLOAD_FAILED:
+          updateStatus(lib, LibraryStatus.DOWNLOAD_FAILED);
+          System.err.println("Download failed: " + defaultUrl);
+          break;
+      }
+      SwingUtilities.invokeLater(callback);
+      return result;
+    }
+
+  }
+
+
+  class ProgressIncrementer implements Runnable {
+    private final int value;
+
+    public ProgressIncrementer(int value) {
+      this.value = value;
+    }
+
+    @Override public void run() {
+      progress.setValue(progress.getValue() + value);
+    }
+  }
+
+  public void updateStatus(final Library library, final LibraryStatus status) {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override public void run() {
+        for (int i = 0; i < tableModel.getRowCount(); ++i) {
+          if (tableModel.getValueAt(i, 0) == library) {
+            tableModel.setValueAt(status, i, 1);
+            break;
+          }
+        }
+      }
+    });
+  }
+
+  public static DownloadStatus tryDownload(File libDir, Library lib, String theUrl) {
+    try {
+      URL url = new URL(theUrl);
+      ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
+      FileOutputStream out = new FileOutputStream(lib.getFile(libDir));
+      out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+      out.close();
+      LibraryStatus status = lib.testIntegrity(libDir);
+      if (status == LibraryStatus.PASSED) {
+        return DownloadStatus.SUCCESS;
+      } else {
+        return DownloadStatus.DOWNLOAD_FAILED;
+      }
+    } catch (MalformedURLException e) {
+      return DownloadStatus.MALFORMED_URL;
+    } catch (FileNotFoundException e) {
+      return DownloadStatus.FILE_NOT_FOUND;
+    } catch (IOException e) {
+      return DownloadStatus.DOWNLOAD_FAILED;
+    }
+
+  }
 
 }

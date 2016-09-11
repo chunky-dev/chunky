@@ -19,8 +19,8 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
 /**
  * Piston
@@ -28,122 +28,100 @@ import se.llbit.math.Vector4d;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class PistonExtensionModel {
-	protected static Quad[][] extension = {
-		// down
-		{},
+  protected static Quad[][] extension = {
+      // down
+      {},
 
-		// up
-		{},
+      // up
+      {},
 
-		// facing north
-		{
-			// north
-			new Quad(new Vector3d(1, 0, 0), new Vector3d(0, 0, 0),
-					new Vector3d(1, 1, 0), new Vector4d(1, 0, 0, 1)),
+      // facing north
+      {
+          // north
+          new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 0),
+              new Vector4(1, 0, 0, 1)),
 
-			// south
-			new Quad(new Vector3d(0, 0, .25), new Vector3d(1, 0, .25),
-					new Vector3d(0, 1, .25), new Vector4d(0, 1, 0, 1)),
+          // south
+          new Quad(new Vector3(0, 0, .25), new Vector3(1, 0, .25), new Vector3(0, 1, .25),
+              new Vector4(0, 1, 0, 1)),
 
-			// west
-			new Quad(new Vector3d(0, 1, 0), new Vector3d(0, 0, 0),
-					new Vector3d(0, 1, .25), new Vector4d(0, 1, 1, .75)),
+          // west
+          new Quad(new Vector3(0, 1, 0), new Vector3(0, 0, 0), new Vector3(0, 1, .25),
+              new Vector4(0, 1, 1, .75)),
 
-			// east
-			new Quad(new Vector3d(1, 1, .25), new Vector3d(1, 0, .25),
-					new Vector3d(1, 1, 0), new Vector4d(1, 0, .75, 1)),
+          // east
+          new Quad(new Vector3(1, 1, .25), new Vector3(1, 0, .25), new Vector3(1, 1, 0),
+              new Vector4(1, 0, .75, 1)),
 
-			// top
-			new Quad(new Vector3d(1, 1, 0), new Vector3d(0, 1, 0),
-					new Vector3d(1, 1, .25), new Vector4d(1, 0, 1, .75)),
+          // top
+          new Quad(new Vector3(1, 1, 0), new Vector3(0, 1, 0), new Vector3(1, 1, .25),
+              new Vector4(1, 0, 1, .75)),
 
-			// bottom
-			new Quad(new Vector3d(0, 0, 0), new Vector3d(1, 0, 0),
-					new Vector3d(0, 0, .25), new Vector4d(0, 1, 1, .75)),
+          // bottom
+          new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, .25),
+              new Vector4(0, 1, 1, .75)),
 
-			// extension west
-			new Quad(new Vector3d(.375, .375, .25), new Vector3d(.375, .375, 1),
-					new Vector3d(.375, .625, .25), new Vector4d(1, .25, .75, 1)),
+          // extension west
+          new Quad(new Vector3(.375, .375, .25), new Vector3(.375, .375, 1),
+              new Vector3(.375, .625, .25), new Vector4(1, .25, .75, 1)),
 
-			// extension east
-			new Quad(new Vector3d(.625, .375, 1), new Vector3d(.625, .375, .25),
-					new Vector3d(.625, .625, 1), new Vector4d(.25, 1, .75, 1)),
+          // extension east
+          new Quad(new Vector3(.625, .375, 1), new Vector3(.625, .375, .25),
+              new Vector3(.625, .625, 1), new Vector4(.25, 1, .75, 1)),
 
-			// extension top
-			new Quad(new Vector3d(.375, .625, .25), new Vector3d(.375, .625, 1),
-					new Vector3d(.625, .625, .25), new Vector4d(1, .25, .75, 1)),
+          // extension top
+          new Quad(new Vector3(.375, .625, .25), new Vector3(.375, .625, 1),
+              new Vector3(.625, .625, .25), new Vector4(1, .25, .75, 1)),
 
-			// extension bottom
-			new Quad(new Vector3d(.375, .375, 1), new Vector3d(.375, .375, .25),
-					new Vector3d(.625, .375, 1), new Vector4d(.25, 1, .75, 1)),
-		},
+          // extension bottom
+          new Quad(new Vector3(.375, .375, 1), new Vector3(.375, .375, .25),
+              new Vector3(.625, .375, 1), new Vector4(.25, 1, .75, 1)),},
 
-		// facing south
-		{},
+      // facing south
+      {},
 
-		//facing west
-		{},
+      //facing west
+      {},
 
-		// facing east
-		{},
-	};
+      // facing east
+      {},};
 
-	static {
-		extension[0] = Model.rotateNegX(extension[2]);
-		extension[1] = Model.rotateX(extension[2]);
-		extension[5] = Model.rotateY(extension[2]);
-		extension[3] = Model.rotateY(extension[5]);
-		extension[4] = Model.rotateY(extension[3]);
-	}
+  static {
+    extension[0] = Model.rotateNegX(extension[2]);
+    extension[1] = Model.rotateX(extension[2]);
+    extension[5] = Model.rotateY(extension[2]);
+    extension[3] = Model.rotateY(extension[5]);
+    extension[4] = Model.rotateY(extension[3]);
+  }
 
-	static final Texture[][] texture = {
-		{
-			Texture.pistonTop,
-			Texture.pistonTop,
-			Texture.pistonSide,
-			Texture.pistonSide,
-			Texture.pistonSide,
-			Texture.pistonSide,
-			Texture.pistonSide,
-			Texture.pistonSide,
-			Texture.pistonSide,
-			Texture.pistonSide,
-		},
+  static final Texture[][] texture =
+      {{Texture.pistonTop, Texture.pistonTop, Texture.pistonSide, Texture.pistonSide,
+          Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
+          Texture.pistonSide, Texture.pistonSide,},
 
-		{
-			Texture.pistonTopSticky,
-			Texture.pistonTop,
-			Texture.pistonSide,
-			Texture.pistonSide,
-			Texture.pistonSide,
-			Texture.pistonSide,
-			Texture.pistonSide,
-			Texture.pistonSide,
-			Texture.pistonSide,
-			Texture.pistonSide,
-		},
-	};
+          {Texture.pistonTopSticky, Texture.pistonTop, Texture.pistonSide, Texture.pistonSide,
+              Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
+              Texture.pistonSide, Texture.pistonSide,},};
 
-	@SuppressWarnings("javadoc")
-	public static boolean intersect(Ray ray) {
-		boolean hit = false;
-		int isSticky = ray.getBlockData() >> 3;
-		Quad[] rot = extension[(ray.getBlockData() & 7) % 6];
-		ray.t = Double.POSITIVE_INFINITY;
-		for (int i = 0; i < rot.length; ++i) {
-			Quad side = rot[i];
-			if (side.intersect(ray)) {
-				texture[isSticky][i].getColor(ray);
-				ray.n.set(side.n);
-				ray.t = ray.tNext;
-				hit = true;
-			}
-		}
-		if (hit) {
-			ray.color.w = 1;
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+  public static boolean intersect(Ray ray) {
+    boolean hit = false;
+    int isSticky = ray.getBlockData() >> 3;
+    Quad[] rot = extension[(ray.getBlockData() & 7) % 6];
+    ray.t = Double.POSITIVE_INFINITY;
+    for (int i = 0; i < rot.length; ++i) {
+      Quad side = rot[i];
+      if (side.intersect(ray)) {
+        texture[isSticky][i].getColor(ray);
+        ray.n.set(side.n);
+        ray.t = ray.tNext;
+        hit = true;
+      }
+    }
+    if (hit) {
+      ray.color.w = 1;
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

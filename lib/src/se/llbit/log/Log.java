@@ -16,93 +16,93 @@
  */
 package se.llbit.log;
 
+/**
+ * Simple logging framework.
+ */
 public class Log {
 
-	public static Level level = Level.WARNING;
-	private static final int INFO = Level.INFO.ordinal();
-	private static final int WARNING = Level.WARNING.ordinal();
-	private static final int ERROR = Level.ERROR.ordinal();
-	private static final Receiver[] receiver = {
-		ConsoleReceiver.INSTANCE,
-		ConsoleReceiver.INSTANCE,
-		ConsoleReceiver.INSTANCE
-	};
+  public static Level level = Level.WARNING;
+  private static final int INFO = Level.INFO.ordinal();
+  private static final int WARNING = Level.WARNING.ordinal();
+  private static final int ERROR = Level.ERROR.ordinal();
+  private static final Receiver[] receiver =
+      {ConsoleReceiver.INSTANCE, ConsoleReceiver.INSTANCE, ConsoleReceiver.INSTANCE};
 
-	static {
-		try {
-			level = Level.valueOf(System.getProperty("logLevel", "WARNING"));
-		} catch (IllegalArgumentException e) {
-		}
-	}
+  static {
+    try {
+      level = Level.valueOf(System.getProperty("logLevel", "WARNING"));
+    } catch (IllegalArgumentException e) {
+    }
+  }
 
-	public static void setReceiver(Receiver recv, Level... levels) {
-		for (Level level: levels) {
-			receiver[level.ordinal()] = recv;
-		}
-	}
+  public static void setReceiver(Receiver recv, Level... levels) {
+    for (Level level : levels) {
+      receiver[level.ordinal()] = recv;
+    }
+  }
 
-	public static void infofmt(String fmt, Object... args) {
-		if (level == Level.INFO) {
-			receiver[INFO].logEvent(Level.INFO, String.format(fmt, args));
-		}
-	}
+  public static void infofmt(String fmt, Object... args) {
+    if (level == Level.INFO) {
+      receiver[INFO].logEvent(Level.INFO, String.format(fmt, args));
+    }
+  }
 
-	public static void info(String message) {
-		if (level == Level.INFO) {
-			receiver[INFO].logEvent(Level.INFO, message);
-		}
-	}
+  public static void info(String message) {
+    if (level == Level.INFO) {
+      receiver[INFO].logEvent(Level.INFO, message);
+    }
+  }
 
-	public static void info(String message, Throwable thrown) {
-		if (level == Level.INFO) {
-			receiver[INFO].logEvent(Level.INFO, message, thrown);
-		}
-	}
+  public static void info(String message, Throwable thrown) {
+    if (level == Level.INFO) {
+      receiver[INFO].logEvent(Level.INFO, message, thrown);
+    }
+  }
 
-	public static void warningfmt(String fmt, Object... args) {
-		if (level != Level.ERROR) {
-			receiver[WARNING].logEvent(Level.WARNING, String.format(fmt, args));
-		}
-	}
+  public static void warningfmt(String fmt, Object... args) {
+    if (level != Level.ERROR) {
+      receiver[WARNING].logEvent(Level.WARNING, String.format(fmt, args));
+    }
+  }
 
-	public static void warning(String message) {
-		if (level != Level.ERROR) {
-			receiver[WARNING].logEvent(Level.WARNING, message);
-		}
-	}
+  public static void warning(String message) {
+    if (level != Level.ERROR) {
+      receiver[WARNING].logEvent(Level.WARNING, message);
+    }
+  }
 
-	public static void warning(String message, Throwable thrown) {
-		if (level != Level.ERROR) {
-			receiver[WARNING].logEvent(Level.WARNING, message, thrown);
-		}
-	}
+  public static void warning(String message, Throwable thrown) {
+    if (level != Level.ERROR) {
+      receiver[WARNING].logEvent(Level.WARNING, message, thrown);
+    }
+  }
 
-	public static void warn(String message) {
-		if (level != Level.ERROR) {
-			receiver[WARNING].logEvent(Level.WARNING, message);
-		}
-	}
+  public static void warn(String message) {
+    if (level != Level.ERROR) {
+      receiver[WARNING].logEvent(Level.WARNING, message);
+    }
+  }
 
-	public static void warn(String message, Throwable thrown) {
-		if (level != Level.ERROR) {
-			receiver[WARNING].logEvent(Level.WARNING, message, thrown);
-		}
-	}
+  public static void warn(String message, Throwable thrown) {
+    if (level != Level.ERROR) {
+      receiver[WARNING].logEvent(Level.WARNING, message, thrown);
+    }
+  }
 
-	public static void errorfmt(String fmt, Object... args) {
-		receiver[ERROR].logEvent(Level.ERROR, String.format(fmt, args));
-	}
+  public static void errorfmt(String fmt, Object... args) {
+    receiver[ERROR].logEvent(Level.ERROR, String.format(fmt, args));
+  }
 
-	public static void error(String message) {
-		receiver[ERROR].logEvent(Level.ERROR, message);
-	}
+  public static void error(String message) {
+    receiver[ERROR].logEvent(Level.ERROR, message);
+  }
 
-	public static void error(String message, Throwable thrown) {
-		receiver[ERROR].logEvent(Level.ERROR, message, thrown);
-	}
+  public static void error(String message, Throwable thrown) {
+    receiver[ERROR].logEvent(Level.ERROR, message, thrown);
+  }
 
-	public static void error(Throwable thrown) {
-		receiver[ERROR].logEvent(Level.ERROR, thrown);
-	}
+  public static void error(Throwable thrown) {
+    receiver[ERROR].logEvent(Level.ERROR, thrown);
+  }
 
 }

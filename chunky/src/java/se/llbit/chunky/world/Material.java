@@ -23,85 +23,86 @@ import se.llbit.math.Ray;
 
 public abstract class Material {
 
-	/**
-	 * The name of this material.
-	 */
-	protected final String name;
+  /**
+   * The name of this material.
+   */
+  protected final String name;
 
-	/**
-	 * Index of refraction.
-	 * Default value is equal to the IoR for air.
-	 */
-	public float ior = 1.000293f;
+  /**
+   * Index of refraction.
+   * Default value is equal to the IoR for air.
+   */
+  public float ior = 1.000293f;
 
-	/**
-	 * Set to true if there is a local intersection model
-	 * for this block.
-	 */
-	public boolean localIntersect = false;
+  /**
+   * Set to true if there is a local intersection model
+   * for this block.
+   */
+  public boolean localIntersect = false;
 
-	/**
-	 * A block is opaque if it occupies an entire voxel
-	 * and no light can pass through it.
-	 */
-	public boolean isOpaque = false;
+  /**
+   * A block is opaque if it occupies an entire voxel
+   * and no light can pass through it.
+   */
+  public boolean isOpaque = false;
 
-	/**
-	 * A block is solid if the block occupies an entire voxel.
-	 * The block may still be partly transparent.
-	 */
-	public boolean isSolid = true;
+  /**
+   * A block is solid if the block occupies an entire voxel.
+   * The block may still be partly transparent.
+   */
+  public boolean isSolid = true;
 
-	/**
-	 * A block is shiny if it has a specular reflection.
-	 */
-	public boolean isShiny = false;
+  /**
+   * A block is shiny if it has a specular reflection.
+   */
+  public boolean isShiny = false;
 
-	/**
-	 * Invisible blocks are not added to the voxel octree, and thus
-	 * they are not rendered. This is only used for special blocks
-	 * that either have been replaced by specialized rendering,
-	 * such as the lily pad, or are not implemented.
-	 */
-	public boolean isInvisible = false;
+  /**
+   * Invisible blocks are not added to the voxel octree, and thus
+   * they are not rendered. This is only used for special blocks
+   * that either have been replaced by specialized rendering,
+   * such as the lily pad, or are not implemented.
+   */
+  public boolean isInvisible = false;
 
-	/**
-	 * Emitter blocks emit light.
-	 */
-	public boolean isEmitter = false;
+  /**
+   * Emitter blocks emit light.
+   */
+  public boolean isEmitter = false;
 
-	public double emittance = 0.0;
+  public double emittance = 0.0;
 
-	/**
-	 * Subsurface scattering property.
-	 */
-	public boolean subSurfaceScattering = false;
+  /**
+   * Subsurface scattering property.
+   */
+  public boolean subSurfaceScattering = false;
 
-	protected final Texture texture;
+  protected final Texture texture;
 
-	public Material(String name, Texture texture) {
-		this.name = name;
-		this.texture = texture;
-	}
+  public Material(String name, Texture texture) {
+    this.name = name;
+    this.texture = texture;
+  }
 
-	/**
-	 * Retrieves the texture dependent on the block data
-	 * @param blockData [0,16]
-	 * @return the selected texture
-	 */
-	public Texture getTexture(int blockData) {
-		return texture;
-	}
+  /**
+   * Retrieves the texture dependent on the block data
+   *
+   * @param blockData [0,16]
+   * @return the selected texture
+   */
+  public Texture getTexture(int blockData) {
+    return texture;
+  }
 
-	public void getColor(Ray ray) {
-		texture.getColor(ray);
-	}
+  public void getColor(Ray ray) {
+    texture.getColor(ray);
+  }
 
-	public JsonValue toJson() {
-		return new JsonString("mat:" + name);
-	}
+  public JsonValue toJson() {
+    return new JsonString("mat:" + name);
+  }
 
-	public static Material fromJson(JsonValue json) {
-		throw new UnsupportedOperationException("TODO");
-	}
+  public static Material fromJson(JsonValue json) {
+    throw new UnsupportedOperationException("TODO");
+  }
 }

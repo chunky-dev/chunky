@@ -19,18 +19,12 @@ package se.llbit.chunky.resources.texturepack;
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-@SuppressWarnings("serial")
 public class TextureFormatError extends Exception {
-	/**
-	 * Constructor
-	 * @param message
-	 */
-	public TextureFormatError(String message) {
-		super(message);
-	}
+  public TextureFormatError(String message) {
+    super(message);
+  }
 
-	@Override
-	public String getMessage() {
-		return "Texture format error: " + super.getMessage();
-	}
+  @Override public String getMessage() {
+    return "Texture format error: " + super.getMessage();
+  }
 }

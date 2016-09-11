@@ -42,365 +42,364 @@ import se.llbit.math.QuickMath;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public abstract class Adjuster implements ChangeListener, ActionListener, DocumentListener {
-	private final JLabel lbl;
-	private ErrorLabel errorLbl;
-	private final JSlider slider;
-	private final JTextField textField;
-	private double min;
-	private double max;
-	private double sliderMin;
-	private double sliderMax;
-	private final boolean integerMode;
+  private final JLabel lbl;
+  private ErrorLabel errorLbl;
+  private final JSlider slider;
+  private final JTextField textField;
+  private double min;
+  private double max;
+  private double sliderMin;
+  private double sliderMax;
+  private final boolean integerMode;
 
-	/**
-	 * Logarithmic mode flag.
-	 */
-	private boolean logarithmic = false;
+  /**
+   * Logarithmic mode flag.
+   */
+  private boolean logarithmic = false;
 
-	/**
-	 * Clamp values to minimum
-	 */
-	private boolean clampMin = true;
+  /**
+   * Clamp values to minimum
+   */
+  private boolean clampMin = true;
 
-	/**
-	 * Clamp values to maximum
-	 */
-	private boolean clampMax = true;
+  /**
+   * Clamp values to maximum
+   */
+  private boolean clampMax = true;
 
-	/**
-	 * Number format for current locale.
-	 */
-	private static final NumberFormat numberFormat =
-			NumberFormat.getInstance();
+  /**
+   * Number format for current locale.
+   */
+  private static final NumberFormat numberFormat = NumberFormat.getInstance();
 
-	private Adjuster(String label, String tip, double min, double max, boolean intMode) {
-		this.min = min;
-		this.max = max;
-		this.sliderMin = min;
-		this.sliderMax = max;
-		lbl = new JLabel(label + ":");
-		integerMode = intMode;
-		if (intMode) {
-			slider = new JSlider((int) min, (int) max);
-		} else {
-			slider = new JSlider(1, 400);
-		}
-		slider.setToolTipText(tip);
-		textField = new JTextField(5);
-		setUp();
-	}
+  private Adjuster(String label, String tip, double min, double max, boolean intMode) {
+    this.min = min;
+    this.max = max;
+    this.sliderMin = min;
+    this.sliderMax = max;
+    lbl = new JLabel(label + ":");
+    integerMode = intMode;
+    if (intMode) {
+      slider = new JSlider((int) min, (int) max);
+    } else {
+      slider = new JSlider(1, 400);
+    }
+    slider.setToolTipText(tip);
+    textField = new JTextField(5);
+    setUp();
+  }
 
-	/**
-	 * Create new double value adjuster
-	 * @param label text label
-	 * @param tip tooltip
-	 * @param min minimum value
-	 * @param max maximum value
-	 */
-	public Adjuster(String label, String tip, double min, double max) {
-		this(label, tip, min, max, false);
-	}
+  /**
+   * Create new double value adjuster
+   *
+   * @param label text label
+   * @param tip   tooltip
+   * @param min   minimum value
+   * @param max   maximum value
+   */
+  public Adjuster(String label, String tip, double min, double max) {
+    this(label, tip, min, max, false);
+  }
 
-	/**
-	 * Create new integer value adjuster
-	 * @param label text label
-	 * @param tip tooltip
-	 * @param min minimum value
-	 * @param max maximum value
-	 */
-	public Adjuster(String label, String tip, int min, int max) {
-		this(label, tip, min, max, true);
-	}
+  /**
+   * Create new integer value adjuster
+   *
+   * @param label text label
+   * @param tip   tooltip
+   * @param min   minimum value
+   * @param max   maximum value
+   */
+  public Adjuster(String label, String tip, int min, int max) {
+    this(label, tip, min, max, true);
+  }
 
-	protected void setUp() {
-		slider.addChangeListener(this);
-		textField.addActionListener(this);
-		textField.getDocument().addDocumentListener(this);
-		textField.addFocusListener(new FocusListener() {
-			@Override
-			public void focusLost(FocusEvent e) {
-			}
-			@Override
-			public void focusGained(FocusEvent e) {
-				textField.selectAll();
-			}
-		});
-		errorLbl = new ErrorLabel(textField);
-		errorLbl.setVisible(false);
-	}
+  protected void setUp() {
+    slider.addChangeListener(this);
+    textField.addActionListener(this);
+    textField.getDocument().addDocumentListener(this);
+    textField.addFocusListener(new FocusListener() {
+      @Override public void focusLost(FocusEvent e) {
+      }
 
-	/**
-	 * Set logarithmic mode for the slider
-	 */
-	public void setLogarithmicMode() {
-		logarithmic = true;
-	}
+      @Override public void focusGained(FocusEvent e) {
+        textField.selectAll();
+      }
+    });
+    errorLbl = new ErrorLabel(textField);
+    errorLbl.setVisible(false);
+  }
 
-	/**
-	 * Select clamping mode
-	 * @param mode <code>true</code> means clamping is enabled
-	 */
-	public void setClampMin(boolean mode) {
-		clampMin = mode;
-	}
+  /**
+   * Set logarithmic mode for the slider
+   */
+  public void setLogarithmicMode() {
+    logarithmic = true;
+  }
 
-	/**
-	 * Select clamping mode
-	 * @param mode <code>true</code> means clamping is enabled
-	 */
-	public void setClampMax(boolean mode) {
-		clampMax = mode;
-	}
+  /**
+   * Select clamping mode
+   *
+   * @param mode <code>true</code> means clamping is enabled
+   */
+  public void setClampMin(boolean mode) {
+    clampMin = mode;
+  }
 
-	/**
-	 * @param layout layout manager
-	 * @return horizontal layout group
-	 */
-	public Group horizontalGroup(GroupLayout layout) {
-		return layout.createSequentialGroup()
-				.addComponent(lbl)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(slider)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(textField);
-	}
+  /**
+   * Select clamping mode
+   *
+   * @param mode <code>true</code> means clamping is enabled
+   */
+  public void setClampMax(boolean mode) {
+    clampMax = mode;
+  }
 
-	/**
-	 * @param layout layout manager
-	 * @return vertical layout group
-	 */
-	public Group verticalGroup(GroupLayout layout) {
-		return layout.createParallelGroup()
-				.addComponent(lbl)
-				.addComponent(slider)
-				.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE,
-						GroupLayout.PREFERRED_SIZE);
-	}
+  /**
+   * @param layout layout manager
+   * @return horizontal layout group
+   */
+  public Group horizontalGroup(GroupLayout layout) {
+    return layout.createSequentialGroup().addComponent(lbl)
+        .addPreferredGap(ComponentPlacement.RELATED).addComponent(slider)
+        .addPreferredGap(ComponentPlacement.RELATED).addComponent(textField);
+  }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		onTextEdit(true);
-	}
+  /**
+   * @param layout layout manager
+   * @return vertical layout group
+   */
+  public Group verticalGroup(GroupLayout layout) {
+    return layout.createParallelGroup().addComponent(lbl).addComponent(slider)
+        .addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE,
+            GroupLayout.PREFERRED_SIZE);
+  }
 
-	@Override
-	public void insertUpdate(DocumentEvent e) {
-		if (onTextEdit(false)) {
-			setError("Warning: value out of bounds!");
-		}
-	}
+  @Override public void actionPerformed(ActionEvent e) {
+    onTextEdit(true);
+  }
 
-	@Override
-	public void changedUpdate(DocumentEvent e) {
-	}
+  @Override public void insertUpdate(DocumentEvent e) {
+    if (onTextEdit(false)) {
+      setError("Warning: value out of bounds!");
+    }
+  }
 
-	@Override
-	public void removeUpdate(DocumentEvent e) {
-		if (onTextEdit(false)) {
-			setError("Warning: value out of bounds!");
-		}
-	}
+  @Override public void changedUpdate(DocumentEvent e) {
+  }
 
-	/**
-	 * @param forceUpdate whether to update the text after parsing to reflect the
-	 * current state, even if the new value is out of bounds.
-	 * @return {@code true} if the value was clamped
-	 */
-	private boolean onTextEdit(boolean forceUpdate) {
-		try {
-			double value = parseText(textField.getText());
-			double clampedValue = clampValue(value);
-			double sliderValue = QuickMath.clamp(value, min, max);
-			boolean clamped = value != clampedValue;
-			if (!clamped || forceUpdate) {
-				setSlider(sliderValue);
-				valueChanged(clampedValue);
-				if (clamped) {
-					if (integerMode) {
-						textField.setText("" + (int) clampedValue);
-					} else {
-						textField.setText("" + clampedValue);
-					}
-				}
-				setError("");
-				errorLbl.setVisible(false);
-			}
-			return clamped;
-		} catch (ParseException ex) {
-			setError("Error: Not a valid number!");
-		}
-		return false;
-	}
+  @Override public void removeUpdate(DocumentEvent e) {
+    if (onTextEdit(false)) {
+      setError("Warning: value out of bounds!");
+    }
+  }
 
-	private double clampValue(double value) {
-		if (clampMin && value < min) {
-			value = min;
-		}
-		if (clampMax && value > max) {
-			value = max;
-		}
-		return value;
-	}
+  /**
+   * @param forceUpdate whether to update the text after parsing to reflect the
+   *                    current state, even if the new value is out of bounds.
+   * @return {@code true} if the value was clamped
+   */
+  private boolean onTextEdit(boolean forceUpdate) {
+    try {
+      double value = parseText(textField.getText());
+      double clampedValue = clampValue(value);
+      double sliderValue = QuickMath.clamp(value, min, max);
+      boolean clamped = value != clampedValue;
+      if (!clamped || forceUpdate) {
+        setSlider(sliderValue);
+        valueChanged(clampedValue);
+        if (clamped) {
+          if (integerMode) {
+            textField.setText("" + (int) clampedValue);
+          } else {
+            textField.setText("" + clampedValue);
+          }
+        }
+        setError("");
+        errorLbl.setVisible(false);
+      }
+      return clamped;
+    } catch (ParseException ex) {
+      setError("Error: Not a valid number!");
+    }
+    return false;
+  }
 
-	protected double parseText(String text) throws ParseException {
-		return numberFormat.parse(text).doubleValue();
-	}
+  private double clampValue(double value) {
+    if (clampMin && value < min) {
+      value = min;
+    }
+    if (clampMax && value > max) {
+      value = max;
+    }
+    return value;
+  }
 
-	private void setError(String message) {
-		if (message.isEmpty()) {
-			errorLbl.setVisible(false);
-		} else {
-			errorLbl.setText(message);
-			errorLbl.setVisible(true);
-		}
-	}
+  protected double parseText(String text) throws ParseException {
+    return numberFormat.parse(text).doubleValue();
+  }
 
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		// slider value changed
-		JSlider source = (JSlider) e.getSource();
-		double value;
-		if (logarithmic) {
-			value = (double) (source.getValue() - source.getMinimum())
-					/ (source.getMaximum() - source.getMinimum());
-			double logMin = Math.log(sliderMin);
-			double logMax = Math.log(sliderMax);
-			double range = logMax - logMin;
-			value = Math.pow(Math.E, value * range + logMin);
-		} else {
-			double range = (sliderMax - sliderMin) / (source.getMaximum() - source.getMinimum());
-			value = (source.getValue() - source.getMinimum()) * range + sliderMin;
-		}
-		setTextField(value);
-		valueChanged(value);
-	}
+  private void setError(String message) {
+    if (message.isEmpty()) {
+      errorLbl.setVisible(false);
+    } else {
+      errorLbl.setText(message);
+      errorLbl.setVisible(true);
+    }
+  }
 
-	/**
-	 * Set the parameter value
-	 * @param value new adjuster value
-	 */
-	public void set(double value) {
-		setSlider(value);
-		setTextField(value);
-	}
+  @Override public void stateChanged(ChangeEvent e) {
+    // slider value changed
+    JSlider source = (JSlider) e.getSource();
+    double value;
+    if (logarithmic) {
+      value = (double) (source.getValue() - source.getMinimum()) / (source.getMaximum() - source
+          .getMinimum());
+      double logMin = Math.log(sliderMin);
+      double logMax = Math.log(sliderMax);
+      double range = logMax - logMin;
+      value = Math.pow(Math.E, value * range + logMin);
+    } else {
+      double range = (sliderMax - sliderMin) / (source.getMaximum() - source.getMinimum());
+      value = (source.getValue() - source.getMinimum()) * range + sliderMin;
+    }
+    setTextField(value);
+    valueChanged(value);
+  }
 
-	/**
-	 * Set parameter value and new min/max limits
-	 * @param value new adjuster value
-	 * @param min New minimum value
-	 * @param max New maximum value
-	 */
-	public void set(double value, double min, double max) {
-		this.min = min;
-		this.max = max;
-		this.sliderMin = min;
-		this.sliderMax = max;
-		setSlider(value);
-		setTextField(value);
-	}
+  /**
+   * Set the parameter value
+   *
+   * @param value new adjuster value
+   */
+  public void set(double value) {
+    setSlider(value);
+    setTextField(value);
+  }
 
-	private void setSlider(double value) {
-		int sliderValue;
-		if (logarithmic) {
-			double logMin = Math.log(sliderMin);
-			double logMax = Math.log(sliderMax);
-			double logValue = Math.log(value);
-			logValue = Math.max(logMin, logValue);
-			logValue = Math.min(logMax, logValue);
-			double pos = (logValue - logMin) / (logMax - logMin);
-			double range = slider.getMaximum() - slider.getMinimum();
-			sliderValue = (int) (pos * range + slider.getMinimum());
-		} else {
-			double range = (slider.getMaximum() - slider.getMinimum()) / (sliderMax - sliderMin);
-			double clampedValue = Math.max(sliderMin, value);
-			clampedValue = Math.min(sliderMax, clampedValue);
-			sliderValue = (int) ((clampedValue - min) * range + 0.5 + slider.getMinimum());
-		}
-		setSliderValue(sliderValue);
-	}
+  /**
+   * Set parameter value and new min/max limits
+   *
+   * @param value new adjuster value
+   * @param min   New minimum value
+   * @param max   New maximum value
+   */
+  public void set(double value, double min, double max) {
+    this.min = min;
+    this.max = max;
+    this.sliderMin = min;
+    this.sliderMax = max;
+    setSlider(value);
+    setTextField(value);
+  }
 
-	protected void setSliderValue(int value) {
-		slider.removeChangeListener(this);
-		slider.setValue(value);
-		slider.addChangeListener(this);
-	}
+  private void setSlider(double value) {
+    int sliderValue;
+    if (logarithmic) {
+      double logMin = Math.log(sliderMin);
+      double logMax = Math.log(sliderMax);
+      double logValue = Math.log(value);
+      logValue = Math.max(logMin, logValue);
+      logValue = Math.min(logMax, logValue);
+      double pos = (logValue - logMin) / (logMax - logMin);
+      double range = slider.getMaximum() - slider.getMinimum();
+      sliderValue = (int) (pos * range + slider.getMinimum());
+    } else {
+      double range = (slider.getMaximum() - slider.getMinimum()) / (sliderMax - sliderMin);
+      double clampedValue = Math.max(sliderMin, value);
+      clampedValue = Math.min(sliderMax, clampedValue);
+      sliderValue = (int) ((clampedValue - min) * range + 0.5 + slider.getMinimum());
+    }
+    setSliderValue(sliderValue);
+  }
 
-	/**
- 	 * Update the text field
- 	 * @param value new value
- 	 */
-	private void setTextField(double value) {
-		if (integerMode) {
-			setTextFieldText("" + (int) value);
-		} else {
-			if (value > 1) {
-				setTextFieldText(String.format("%.2f", value));
-			} else {
-				setTextFieldText(String.format("%.4f", value));
-			}
-		}
-	}
+  protected void setSliderValue(int value) {
+    slider.removeChangeListener(this);
+    slider.setValue(value);
+    slider.addChangeListener(this);
+  }
 
-	protected void setTextFieldText(String text) {
-		textField.getDocument().removeDocumentListener(this);
-		textField.setText(text);
-		textField.getDocument().addDocumentListener(this);
-	}
+  /**
+   * Update the text field
+   *
+   * @param value new value
+   */
+  private void setTextField(double value) {
+    if (integerMode) {
+      setTextFieldText("" + (int) value);
+    } else {
+      if (value > 1) {
+        setTextFieldText(String.format("%.2f", value));
+      } else {
+        setTextFieldText(String.format("%.4f", value));
+      }
+    }
+  }
 
-	/**
-	 * Callback for handling adjuster value changes.
-	 * @param newValue new adjuster value
-	 */
-	public abstract void valueChanged(double newValue);
+  protected void setTextFieldText(String text) {
+    textField.getDocument().removeDocumentListener(this);
+    textField.setText(text);
+    textField.getDocument().addDocumentListener(this);
+  }
 
-	/**
-	 * Update the adjuster with the current value
-	 */
-	public abstract void update();
+  /**
+   * Callback for handling adjuster value changes.
+   *
+   * @param newValue new adjuster value
+   */
+  public abstract void valueChanged(double newValue);
 
-	/**
-	 * @return The label
-	 */
-	public JLabel getLabel() {
-		return lbl;
-	}
+  /**
+   * Update the adjuster with the current value
+   */
+  public abstract void update();
 
-	/**
-	 * @return The slider
-	 */
-	public JSlider getSlider() {
-		return slider;
-	}
+  /**
+   * @return The label
+   */
+  public JLabel getLabel() {
+    return lbl;
+  }
 
-	/**
-	 * @return The text field
-	 */
-	public JTextField getField() {
-		return textField;
-	}
+  /**
+   * @return The slider
+   */
+  public JSlider getSlider() {
+    return slider;
+  }
 
-	/**
-	 * Enable or disable the controls of this adjuster
-	 * @param enabled true if the adjuster should be enabled
-	 */
-	public void setEnabled(boolean enabled) {
-		lbl.setEnabled(enabled);
-		slider.setEnabled(enabled);
-		textField.setEnabled(enabled);
-	}
+  /**
+   * @return The text field
+   */
+  public JTextField getField() {
+    return textField;
+  }
 
-	/**
-	 * Set the lower limit of the slider. Can not be zero in logarithmic mode.
-	 * @param sliderMin new slider minimum value
-	 */
-	public void setSliderMin(double sliderMin) {
-		this.sliderMin = sliderMin;
-	}
+  /**
+   * Enable or disable the controls of this adjuster
+   *
+   * @param enabled true if the adjuster should be enabled
+   */
+  public void setEnabled(boolean enabled) {
+    lbl.setEnabled(enabled);
+    slider.setEnabled(enabled);
+    textField.setEnabled(enabled);
+  }
 
-	/**
-	 * Set the upper limit of the slider.
-	 * @param sliderMax new slider maximum
-	 */
-	public void setSliderMax(double sliderMax) {
-		this.sliderMax = sliderMax;
-	}
+  /**
+   * Set the lower limit of the slider. Can not be zero in logarithmic mode.
+   *
+   * @param sliderMin new slider minimum value
+   */
+  public void setSliderMin(double sliderMin) {
+    this.sliderMin = sliderMin;
+  }
+
+  /**
+   * Set the upper limit of the slider.
+   *
+   * @param sliderMax new slider maximum
+   */
+  public void setSliderMax(double sliderMax) {
+    this.sliderMax = sliderMax;
+  }
 }

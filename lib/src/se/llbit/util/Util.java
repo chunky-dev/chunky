@@ -32,128 +32,128 @@ import java.util.TimeZone;
 
 public class Util {
 
-	private static final char[] B64 =
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".toCharArray();
+  private static final char[] B64 =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".toCharArray();
 
-	public static String md5sum(File library) {
-		try {
-			MessageDigest digest = MessageDigest.getInstance("MD5");
-			FileInputStream in = new FileInputStream(library);
-			DigestInputStream dis = new DigestInputStream(in, digest);
-			byte[] buf = new byte[2048];
-			int n;
-			do {
-				n = dis.read(buf);
-			} while (n != -1);
-			in.close();
-			return byteArrayToHexString(digest.digest());
-		} catch (IOException e) {
-			return "md5 compute error: " + e.getMessage();
-		} catch (NoSuchAlgorithmException e) {
-			return "md5 compute error: " + e.getMessage();
-		}
-	}
+  public static String md5sum(File library) {
+    try {
+      MessageDigest digest = MessageDigest.getInstance("MD5");
+      FileInputStream in = new FileInputStream(library);
+      DigestInputStream dis = new DigestInputStream(in, digest);
+      byte[] buf = new byte[2048];
+      int n;
+      do {
+        n = dis.read(buf);
+      } while (n != -1);
+      in.close();
+      return byteArrayToHexString(digest.digest());
+    } catch (IOException e) {
+      return "md5 compute error: " + e.getMessage();
+    } catch (NoSuchAlgorithmException e) {
+      return "md5 compute error: " + e.getMessage();
+    }
+  }
 
-	private static byte[] NIBBLE_TO_HEX = "0123456789ABCDEF".getBytes();
+  private static byte[] NIBBLE_TO_HEX = "0123456789ABCDEF".getBytes();
 
-	/**
-	 * Inspired by Real's How To: http://www.rgagnon.com/javadetails/java-0596.html
-	 * @param array
-	 * @return Hexadecimal string representation of the input bytes
-	 */
-	public static String byteArrayToHexString(byte[] array) {
-		byte[] hexdigits = new byte[array.length*2];
-		for (int i = 0; i < array.length; ++i) {
-			hexdigits[i*2] = NIBBLE_TO_HEX[(array[i]&0xF0) >>> 4];
-			hexdigits[i*2+1] = NIBBLE_TO_HEX[array[i] & 0xF];
-		}
-		return new String(hexdigits);
-	}
+  /**
+   * Inspired by Real's How To: http://www.rgagnon.com/javadetails/java-0596.html
+   *
+   * @param array
+   * @return Hexadecimal string representation of the input bytes
+   */
+  public static String byteArrayToHexString(byte[] array) {
+    byte[] hexdigits = new byte[array.length * 2];
+    for (int i = 0; i < array.length; ++i) {
+      hexdigits[i * 2] = NIBBLE_TO_HEX[(array[i] & 0xF0) >>> 4];
+      hexdigits[i * 2 + 1] = NIBBLE_TO_HEX[array[i] & 0xF];
+    }
+    return new String(hexdigits);
+  }
 
-	/**
-	 * @param time
-	 * @return A date object representing the given ISO 8601 timestamp. If time is
-	 * not a ISO 8601 formatted timestamp, the returned object is
-	 * {@code new Date(0)}.
-	 */
-	public static Date dateFromISO8601(String time) {
-		if (time.length() < 6) {
-			return new Date(0);
-		}
-		try {
-			// insert "GMT"
-			if (time.endsWith("Z")) {
-				time = time.substring(0, time.length()-1) + "GMT-00:00";
-			} else {
-				time = time.substring(0, time.length()-6) + "GMT" +
-						time.substring(time.length()-6, time.length());
-			}
-			// http://stackoverflow.com/a/10624878/1250278
-			DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ssz");
-			return dateFormat.parse(time);
-		} catch (ParseException e) {
-			return new Date(0);
-		}
-	}
+  /**
+   * @param time
+   * @return A date object representing the given ISO 8601 timestamp. If time is
+   * not a ISO 8601 formatted timestamp, the returned object is
+   * {@code new Date(0)}.
+   */
+  public static Date dateFromISO8601(String time) {
+    if (time.length() < 6) {
+      return new Date(0);
+    }
+    try {
+      // insert "GMT"
+      if (time.endsWith("Z")) {
+        time = time.substring(0, time.length() - 1) + "GMT-00:00";
+      } else {
+        time = time.substring(0, time.length() - 6) + "GMT" +
+            time.substring(time.length() - 6, time.length());
+      }
+      // http://stackoverflow.com/a/10624878/1250278
+      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
+      return dateFormat.parse(time);
+    } catch (ParseException e) {
+      return new Date(0);
+    }
+  }
 
-	public static String ISO8601FromDate(Date date) {
-		// http://stackoverflow.com/a/3914498/1250278
-		// http://stackoverflow.com/a/10624878/1250278
-		TimeZone tz = TimeZone.getTimeZone("UTC");
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		df.setTimeZone(tz);
-		return df.format(new Date());
-	}
+  public static String ISO8601FromDate(Date date) {
+    // http://stackoverflow.com/a/3914498/1250278
+    // http://stackoverflow.com/a/10624878/1250278
+    TimeZone tz = TimeZone.getTimeZone("UTC");
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    df.setTimeZone(tz);
+    return df.format(new Date());
+  }
 
-	public static boolean isValidISO8601(String time) {
-		if (time.length() < 6) {
-			return false;
-		}
-		try {
-			// insert "GMT"
-			if (time.endsWith("Z")) {
-				time = time.substring(0, time.length()-1) + "GMT-00:00";
-			} else {
-				time = time.substring(0, time.length()-6) + "GMT" +
-						time.substring(time.length()-6, time.length());
-			}
-			// http://stackoverflow.com/a/10624878/1250278
-			DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ssz");
-			dateFormat.parse(time);
-			return true;
-		} catch (ParseException e) {
-			return false;
-		}
-	}
+  public static boolean isValidISO8601(String time) {
+    if (time.length() < 6) {
+      return false;
+    }
+    try {
+      // insert "GMT"
+      if (time.endsWith("Z")) {
+        time = time.substring(0, time.length() - 1) + "GMT-00:00";
+      } else {
+        time = time.substring(0, time.length() - 6) + "GMT" +
+            time.substring(time.length() - 6, time.length());
+      }
+      // http://stackoverflow.com/a/10624878/1250278
+      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
+      dateFormat.parse(time);
+      return true;
+    } catch (ParseException e) {
+      return false;
+    }
+  }
 
-	/**
-	 * Copies a BufferedImage to another. The buffered images must be TYPE_INT_****
-	 * @param source
-	 * @param dest
-	 * @param width
-	 * @param height
-	 */
-	public static void copyBufferedImage(BufferedImage source,
-			BufferedImage dest, int width, int height) {
-		DataBufferInt sourceBuffer = (DataBufferInt) source.getRaster().getDataBuffer();
-		DataBufferInt destBuffer = (DataBufferInt) dest.getRaster().getDataBuffer();
-		int[] srcData = sourceBuffer.getData();
-		int[] destData = destBuffer.getData();
-		System.arraycopy(srcData, 0, destData, 0, width*height);
-	}
+  /**
+   * Copies a BufferedImage to another. The buffered images must be TYPE_INT_****
+   *
+   * @param source
+   * @param dest
+   * @param width
+   * @param height
+   */
+  public static void copyBufferedImage(BufferedImage source, BufferedImage dest, int width,
+      int height) {
+    DataBufferInt sourceBuffer = (DataBufferInt) source.getRaster().getDataBuffer();
+    DataBufferInt destBuffer = (DataBufferInt) dest.getRaster().getDataBuffer();
+    int[] srcData = sourceBuffer.getData();
+    int[] destData = destBuffer.getData();
+    System.arraycopy(srcData, 0, destData, 0, width * height);
+  }
 
-	/**
-	 * Encode a hash code as a string.
-	 */
-	public static String cacheEncode(int hash) {
-		char s1 = B64[(hash & 0xFC000000) >>> 26];
-		char s2 = B64[(hash & 0x03F00000) >>> 20];
-		char s3 = B64[(hash & 0x000FC000) >>> 14];
-		char s4 = B64[(hash & 0x00003F00) >>> 8];
-		char s5 = B64[(hash & 0x000000FC) >>> 2];
-		char s6 = B64[hash & 0x00000003];
-		return "" + s1 + s2 + s3 + s4 + s5 + s6;
-	}
+  /**
+   * Encode a hash code as a string.
+   */
+  public static String cacheEncode(int hash) {
+    char s1 = B64[(hash & 0xFC000000) >>> 26];
+    char s2 = B64[(hash & 0x03F00000) >>> 20];
+    char s3 = B64[(hash & 0x000FC000) >>> 14];
+    char s4 = B64[(hash & 0x00003F00) >>> 8];
+    char s5 = B64[(hash & 0x000000FC) >>> 2];
+    char s6 = B64[hash & 0x00000003];
+    return "" + s1 + s2 + s3 + s4 + s5 + s6;
+  }
 }

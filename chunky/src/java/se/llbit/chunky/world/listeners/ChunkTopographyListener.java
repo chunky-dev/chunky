@@ -18,9 +18,6 @@ package se.llbit.chunky.world.listeners;
 
 import se.llbit.chunky.world.Chunk;
 
-@SuppressWarnings("javadoc")
 public interface ChunkTopographyListener {
-
-	void chunksTopographyUpdated(Chunk chunk);
-
+  void chunksTopographyUpdated(Chunk chunk);
 }

@@ -27,62 +27,54 @@ import java.util.Set;
  */
 public class ChunkTopographyUpdater extends Thread {
 
-	private final Set<Chunk> queue = new HashSet<Chunk>();
+  private final Set<Chunk> queue = new HashSet<>();
 
-	/**
-	 * Create new chunk parser
-	 */
-	public ChunkTopographyUpdater() {
-	    super("Chunk Topography Updater");
-	}
+  /**
+   * Create new chunk parser
+   */
+  public ChunkTopographyUpdater() {
+    super("Chunk Topography Updater");
+  }
 
-	@Override
-	public void run() {
-		try {
-			while (!isInterrupted()) {
-				Chunk chunk = getNext();
-				chunk.renderTopography();
-			}
-		} catch (InterruptedException e) {
-		}
-	}
+  @Override public void run() {
+    try {
+      while (!isInterrupted()) {
+        Chunk chunk = getNext();
+        chunk.renderTopography();
+      }
+    } catch (InterruptedException e) {
+    }
+  }
 
-	/**
-	 * Get next chunk from the parse queue
-	 * @return
-	 * @throws InterruptedException
-	 */
-	private synchronized Chunk getNext() throws InterruptedException {
-		while (queue.isEmpty()) {
-			wait();
-		}
-		Iterator<Chunk> iter = queue.iterator();
-		Chunk chunk = iter.next();
-		iter.remove();
-		return chunk;
-	}
+  /**
+   * Get next chunk from the parse queue
+   *
+   * @throws InterruptedException
+   */
+  private synchronized Chunk getNext() throws InterruptedException {
+    while (queue.isEmpty()) {
+      wait();
+    }
+    Iterator<Chunk> iter = queue.iterator();
+    Chunk chunk = iter.next();
+    iter.remove();
+    return chunk;
+  }
 
-	/**
-	 * Clear the parse queue
-	 */
-	public synchronized void clearQueue() {
-		queue.clear();
-	}
+  /**
+   * Add a chunk to the parse queue.
+   */
+  public synchronized void addChunk(Chunk chunk) {
+    queue.add(chunk);
+    notify();
+  }
 
-	/**
-	 * Add a chunk to the parse queue
-	 * @param chunk
-	 */
-	public synchronized void addChunk(Chunk chunk) {
-		queue.add(chunk);
-		notify();
-	}
-
-	/**
-	 * @return <code>true</code> if the work queue is not empty
-	 */
-	public synchronized boolean isWorking() {
-		return !queue.isEmpty();
-	}
+  /**
+   * @return <code>true</code> if the work queue is not empty
+   */
+  public synchronized boolean isWorking() {
+    // TODO: add loading indicator.
+    return !queue.isEmpty();
+  }
 
 }

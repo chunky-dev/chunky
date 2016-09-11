@@ -16,9 +16,9 @@
  */
 package se.llbit.chunky.world;
 
-import java.util.Collection;
+import se.llbit.chunky.ui.ProgressTracker;
 
-import se.llbit.chunky.ui.ProgressPanel;
+import java.util.Collection;
 
 /**
  * A job for deleting selected chunks.
@@ -27,37 +27,31 @@ import se.llbit.chunky.ui.ProgressPanel;
  */
 public class DeleteChunksJob extends Thread {
 
-	private World world;
-	private Collection<ChunkPosition> selected;
-	private ProgressPanel progress;
+  private World world;
+  private Collection<ChunkPosition> selected;
+  private ProgressTracker progress;
 
-	/**
-	 * @param world
-	 * @param selected
-	 * @param progress
-	 */
-	public DeleteChunksJob(World world, Collection<ChunkPosition> selected,
-			ProgressPanel progress) {
+  public DeleteChunksJob(World world, Collection<ChunkPosition> selected,
+      ProgressTracker progress) {
+    this.world = world;
+    this.selected = selected;
+    this.progress = progress;
+  }
 
-		this.world = world;
-		this.selected = selected;
-		this.progress = progress;
-	}
-
-	public void run() {
-		if (progress.tryStartJob()) {
-			progress.setJobName("Deleting chunks");
-			progress.setJobSize(selected.size());
-			int ndeleted = 0;
-			for (ChunkPosition pos : selected) {
-				if (progress.isInterrupted())
-					break;
-				Region region = world.getRegion(pos.getRegionPosition());
-				region.deleteChunk(pos);
-				progress.setProgress(++ndeleted);
-			}
-			progress.finishJob();
-		}
-	}
+  public void run() {
+    if (progress.tryStartJob()) {
+      progress.setJobName("Deleting chunks");
+      progress.setJobSize(selected.size());
+      int ndeleted = 0;
+      for (ChunkPosition pos : selected) {
+        if (progress.isInterrupted())
+          break;
+        Region region = world.getRegion(pos.getRegionPosition());
+        region.deleteChunk(pos);
+        progress.setProgress(++ndeleted);
+      }
+      progress.finishJob();
+    }
+  }
 
 }

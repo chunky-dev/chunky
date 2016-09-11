@@ -35,83 +35,80 @@ import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.NamedTag;
 
-@SuppressWarnings("javadoc")
 public class NBTDump {
 
-	static final Pattern REGION_PATTERN = Pattern.compile("^region-chunk:(\\d+),(\\d+):(.*)$");
+  static final Pattern REGION_PATTERN = Pattern.compile("^region-chunk:(\\d+),(\\d+):(.*)$");
 
-	protected static boolean isGzipped(InputStream is) throws IOException {
-		is.mark(2);
-		boolean isGZ = is.read() == 0x1F && is.read() == 0x8B;
-		is.reset();
-		return isGZ;
-	}
+  protected static boolean isGzipped(InputStream is) throws IOException {
+    is.mark(2);
+    boolean isGZ = is.read() == 0x1F && is.read() == 0x8B;
+    is.reset();
+    return isGZ;
+  }
 
-	protected static AnyTag read(String arg) throws IOException {
-		Matcher m = REGION_PATTERN.matcher(arg);
-		DataInputStream in = null;
-		String filename;
-		try {
-			if (m.matches()) {
-				filename = m.group(3);
-				int x = Integer.parseInt(m.group(1));
-				int z = Integer.parseInt(m.group(2));
-				ChunkDataSource data = Region.getChunkData(new File(filename),
-						ChunkPosition.get(x, z));
-				if (data == null) {
-					System.err.format("No such chunk in region: (%d, %d)\n", x, z);
-					return new ErrorTag();
-				}
-				in = data.inputStream;
-			} else {
-				filename = arg;
-				InputStream is = new BufferedInputStream(
-						new FileInputStream(new File(filename)));
-				if (isGzipped(is)) {
-					is = new GZIPInputStream(is);
-				}
-				in = new DataInputStream(is);
-			}
-			if (in != null) {
-				return NamedTag.read(in);
-			} else {
-				System.err.println("Failed to open file: " + filename);
-				return new ErrorTag();
-			}
-		} finally {
-			if (in != null) {
-				in.close();
-			}
-		}
-	}
+  protected static AnyTag read(String arg) throws IOException {
+    Matcher m = REGION_PATTERN.matcher(arg);
+    DataInputStream in = null;
+    String filename;
+    try {
+      if (m.matches()) {
+        filename = m.group(3);
+        int x = Integer.parseInt(m.group(1));
+        int z = Integer.parseInt(m.group(2));
+        ChunkDataSource data = Region.getChunkData(new File(filename), ChunkPosition.get(x, z));
+        if (data == null) {
+          System.err.format("No such chunk in region: (%d, %d)\n", x, z);
+          return new ErrorTag();
+        }
+        in = data.inputStream;
+      } else {
+        filename = arg;
+        InputStream is = new BufferedInputStream(new FileInputStream(new File(filename)));
+        if (isGzipped(is)) {
+          is = new GZIPInputStream(is);
+        }
+        in = new DataInputStream(is);
+      }
+      // TODO: is in always nonnull here?
+      if (in != null) {
+        return NamedTag.read(in);
+      } else {
+        System.err.println("Failed to open file: " + filename);
+        return new ErrorTag();
+      }
+    } finally {
+      if (in != null) {
+        in.close();
+      }
+    }
+  }
 
-	protected static final String USAGE =
-		"Usage: NBTDump <file>\n"+
-		"\n"+
-		"<file> may be an NBT-formatted file (gzipped or uncompressed),\n"+
-		"or of the form 'region-chunk:<x>,<y>:<region-file>',\n" +
-		"which will dump the specified chunk in the given region file.";
+  protected static final String USAGE = "Usage: NBTDump <file>\n" +
+      "\n" +
+      "<file> may be an NBT-formatted file (gzipped or uncompressed),\n" +
+      "or of the form 'region-chunk:<x>,<y>:<region-file>',\n" +
+      "which will dump the specified chunk in the given region file.";
 
-	public static void main(String[] args) throws Exception {
-		if (args.length != 1) {
-			System.err.println(USAGE);
-			System.exit(1);
-		}
-		if ("-?".equals(args[0]) || "-h".equals(args[0])) {
-			System.out.println(USAGE);
-			System.exit(0);
-		}
+  public static void main(String[] args) throws Exception {
+    if (args.length != 1) {
+      System.err.println(USAGE);
+      System.exit(1);
+    }
+    if ("-?".equals(args[0]) || "-h".equals(args[0])) {
+      System.out.println(USAGE);
+      System.exit(0);
+    }
 
-		String fn = args[0];
-		//String outFn = fn+".out";
-		//System.out.println("parsing "+fn);
-		//System.out.println("writing output to "+outFn);
-		//PrintStream out = new PrintStream(new File(outFn));
-		AnyTag tag = read(fn);
-		PrintStream out = System.out;
-		out.print(tag.dumpTree());
-		out.close();
-		System.out.println("done");
-	}
+    String fn = args[0];
+    //String outFn = fn+".out";
+    //System.out.println("parsing "+fn);
+    //System.out.println("writing output to "+outFn);
+    //PrintStream out = new PrintStream(new File(outFn));
+    AnyTag tag = read(fn);
+    PrintStream out = System.out;
+    out.print(tag.dumpTree());
+    out.close();
+    System.out.println("done");
+  }
 
 }

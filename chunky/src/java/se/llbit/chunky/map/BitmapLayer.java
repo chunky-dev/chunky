@@ -1,4 +1,4 @@
-/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2014-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,43 +16,47 @@
  */
 package se.llbit.chunky.map;
 
-import se.llbit.chunky.world.ChunkView;
-
 abstract public class BitmapLayer extends AbstractLayer {
 
-	/**
-	 * Render this layer
-	 * @param rbuff
-	 * @param cx
-	 * @param cz
-	 */
-	@Override
-	final public void render(MapBuffer rbuff, int cx, int cz) {
-		ChunkView view = rbuff.getView();
-		int x0 = view.chunkScale * (cx - view.px0);
-		int z0 = view.chunkScale * (cz - view.pz0);
+  /**
+   * Render this layer to a tile.
+   */
+  @Override final public void render(MapTile tile) {
+    if (tile.scale == 1) {
+      tile.setPixel(0, 0, getAvgColor());
+    } else {
+      int[] pixels = new int[tile.scale * tile.scale];
+      if (tile.scale == 16) {
+        for (int z = 0; z < 16; ++z) {
+          for (int x = 0; x < 16; ++x) {
+            pixels[z * 16 + x] = colorAt(x, z);
+          }
+        }
+      } else {
+        float scale = tile.scale / 16.f;
+        float diffx = 0;
+        float diffz = 0;
+        int index = 0;
+        for (int z = 0; z < 16; ++z) {
+          while (diffz < scale) {
+            for (int x = 0; x < 16; ++x) {
+              int pixel = colorAt(x, z);
+              while (diffx < scale) {
+                pixels[index] = pixel;
+                index += 1;
+                diffx += 1;
+              }
+              diffx -= scale;
+            }
+            diffz += 1;
+          }
+          diffz -= scale;
+        }
+      }
+      tile.setPixels(pixels);
+    }
+  }
 
-		if (view.chunkScale == 1) {
-			rbuff.setRGB(x0, z0, getAvgColor());
-		} else if (view.chunkScale == 16) {
-			for (int z = 0; z < 16; ++z) {
-				for (int x = 0; x < 16; ++x) {
-					rbuff.setRGB(x0 + x, z0 + z, colorAt(x, z));
-				}
-			}
-		} else {
-			int blockScale = view.chunkScale / 16;
-			for (int z = 0; z < 16; ++z) {
-				int yp0 = z0 + z * blockScale;
-				for (int x = 0; x < 16; ++x) {
-					int xp0 = x0 + x * blockScale;
-					rbuff.fillRect(xp0, yp0, blockScale, blockScale,
-							colorAt(x, z));
-				}
-			}
-		}
-	}
-
-	abstract public int colorAt(int x, int z);
+  abstract public int colorAt(int x, int z);
 
 }

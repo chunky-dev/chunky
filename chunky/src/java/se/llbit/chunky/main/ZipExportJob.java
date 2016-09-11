@@ -16,16 +16,15 @@
  */
 package se.llbit.chunky.main;
 
+import se.llbit.chunky.ui.ProgressTracker;
+import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.World;
+import se.llbit.log.Log;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
-
-import javax.swing.JOptionPane;
-
-import se.llbit.chunky.ui.ProgressPanel;
-import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.World;
 
 /**
  * Exports chunks to a Zip file.
@@ -34,42 +33,38 @@ import se.llbit.chunky.world.World;
  */
 public class ZipExportJob extends Thread {
 
-	private World world;
-	private File targetFile;
-	private ProgressPanel progress;
-	private Collection<ChunkPosition> selected;
+  private World world;
+  private File targetFile;
+  private ProgressTracker progress;
+  private Collection<ChunkPosition> selected;
 
-	/**
-	 * Create a new Zip export job.
-	 * @param world
-	 * @param selected
-	 * @param target
-	 * @param progress
-	 */
-	public ZipExportJob(World world, Collection<ChunkPosition> selected,
-			File target, ProgressPanel progress) {
-		super("Zip Export Job");
+  /**
+   * Create a new Zip export job.
+   */
+  public ZipExportJob(World world, Collection<ChunkPosition> selected, File target,
+      ProgressTracker progress) {
+    super("Zip Export Job");
+    this.world = world;
+    this.selected = selected;
+    this.targetFile = target;
+    this.progress = progress;
+  }
 
-		this.world = world;
-		this.selected = selected;
-		this.targetFile = target;
-		this.progress = progress;
-	}
-
-	public void run() {
-		if (progress.tryStartJob()) {
-			try {
-				progress.setJobName("Zip Export");
-				if (selected.isEmpty())
-					world.exportWorldToZip(targetFile, progress);
-				else
-					world.exportChunksToZip(targetFile, selected, world.currentDimension(), progress);
-			} catch (FileNotFoundException e) {
-				JOptionPane.showMessageDialog(null, "Could not write zip file:\n" + e.getMessage());
-			} catch (IOException e) {
-				JOptionPane.showMessageDialog(null, "Error while exporting to zip file:\n" + e.getMessage());
-			}
-			progress.finishJob();
-		}
-	}
+  public void run() {
+    if (progress.tryStartJob()) {
+      try {
+        progress.setJobName("Zip Export");
+        if (selected.isEmpty()) {
+          world.exportWorldToZip(targetFile, progress);
+        } else {
+          world.exportChunksToZip(targetFile, selected, world.currentDimension(), progress);
+        }
+      } catch (FileNotFoundException e) {
+        Log.error("Could not write zip file.", e);
+      } catch (IOException e) {
+        Log.error("Error while exporting to zip file.", e);
+      }
+      progress.finishJob();
+    }
+  }
 }

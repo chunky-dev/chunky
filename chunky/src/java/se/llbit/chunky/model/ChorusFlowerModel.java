@@ -20,30 +20,27 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
-@SuppressWarnings("javadoc")
 public class ChorusFlowerModel {
-	private static AABB[] boxes = {
-		new AABB(0, 1, 2/16., 14/16., 2/16., 14/16.),
-		new AABB(2/16., 14/16., 0, 1, 2/16., 14/16.),
-		new AABB(2/16., 14/16., 2/16., 14/16., 0, 1),
-	};
+  private static AABB[] boxes = {new AABB(0, 1, 2 / 16., 14 / 16., 2 / 16., 14 / 16.),
+      new AABB(2 / 16., 14 / 16., 0, 1, 2 / 16., 14 / 16.),
+      new AABB(2 / 16., 14 / 16., 2 / 16., 14 / 16., 0, 1),};
 
-	public static boolean intersect(Ray ray) {
-		boolean hit = false;
-		Texture texture = ray.getBlockData() < 5 ? Texture.chorusFlower : Texture.chorusFlowerDead;
-		ray.t = Double.POSITIVE_INFINITY;
-		for (AABB aabb : boxes) {
-			if (aabb.intersect(ray)) {
-				texture.getColor(ray);
-				ray.t = ray.tNext;
-				hit = true;
-			}
-		}
+  public static boolean intersect(Ray ray) {
+    boolean hit = false;
+    Texture texture = ray.getBlockData() < 5 ? Texture.chorusFlower : Texture.chorusFlowerDead;
+    ray.t = Double.POSITIVE_INFINITY;
+    for (AABB aabb : boxes) {
+      if (aabb.intersect(ray)) {
+        texture.getColor(ray);
+        ray.t = ray.tNext;
+        hit = true;
+      }
+    }
 
-		if (hit) {
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+    if (hit) {
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

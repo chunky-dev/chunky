@@ -16,70 +16,65 @@
  */
 package se.llbit.chunky.world;
 
-import javax.swing.SwingUtilities;
-
+import javafx.application.Platform;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.main.Chunky;
+import se.llbit.chunky.map.WorldMapLoader;
 
 /**
  * Monitors filesystem for changes to region files.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class RegionChangeMonitor extends Thread {
-	private final Chunky chunky;
-	private volatile ChunkView view = new ChunkView(0, 0, 0, 0);
+  private final WorldMapLoader mapLoader;
+  private volatile ChunkView view = ChunkView.EMPTY;
 
-	public RegionChangeMonitor(Chunky chunky) {
-		super("Region Refresher");
-		this.chunky = chunky;
-	}
+  public RegionChangeMonitor(WorldMapLoader loader) {
+    super("Region Refresher");
+    this.mapLoader = loader;
+  }
 
-	@Override
-	public void run() {
-		try {
-			while (!isInterrupted()) {
-				sleep(3000);
-				final World world = chunky.getWorld();
-				if (world.loadAdditionalData(true)) {
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							chunky.getControls().setPlayerY(world.playerLocY());
-						}
-					});
-					if (PersistentSettings.getFollowPlayer()) {
-						chunky.panToPlayer();
-					}
-					chunky.getMap().repaint();
-					chunky.getMinimap().repaint();
-				}
-				ChunkView theView = view;
-				for (int rx = theView.prx0; rx <= theView.prx1; ++rx) {
-					for (int rz = theView.prz0; rz <= theView.prz1; ++rz) {
-						Region region = world.getRegion(ChunkPosition.get(rx, rz));
-						if (region.isEmpty()) {
-							ChunkPosition pos = ChunkPosition.get(rx, rz);
-							if (world.regionExists(pos)) {
-								region = new Region(pos, world);
-							}
-							world.setRegion(pos, region);
-							region.parse();
-							world.regionDiscovered(pos);
-							chunky.regionUpdated(pos);
-						} else if (region.hasChanged()) {
-							region.parse();
-							ChunkPosition pos = region.getPosition();
-							chunky.regionUpdated(pos);
-						}
-					}
-				}
-			}
-		} catch (InterruptedException e) {
-		}
-	}
+  @Override public void run() {
+    try {
+      while (!isInterrupted()) {
+        sleep(3000);
+        final World world = mapLoader.getWorld();
+        if (world.loadAdditionalData(true)) {
+          Platform.runLater(() -> {
+            mapLoader.setPlayerY(world.playerLocY());
+            if (PersistentSettings.getFollowPlayer()) {
+              mapLoader.panToPlayer();
+            }
+          });
+        }
+        ChunkView theView = view;
+        for (int rx = theView.prx0; rx <= theView.prx1; ++rx) {
+          for (int rz = theView.prz0; rz <= theView.prz1; ++rz) {
+            Region region = world.getRegion(ChunkPosition.get(rx, rz));
+            if (region.isEmpty()) {
+              ChunkPosition pos = ChunkPosition.get(rx, rz);
+              if (world.regionExists(pos)) {
+                region = new Region(pos, world);
+              }
+              world.setRegion(pos, region);
+              region.parse();
+              world.regionDiscovered(pos);
+              mapLoader.regionUpdated(pos);
+            } else if (region.hasChanged()) {
+              region.parse();
+              ChunkPosition pos = region.getPosition();
+              mapLoader.regionUpdated(pos);
+            }
+          }
+        }
+      }
+    } catch (InterruptedException e) {
+      // Interrupted.
+    }
+  }
 
-	public void setView(ChunkView view) {
-		this.view = view;
-	}
+  public void setView(ChunkView view) {
+    this.view = view;
+  }
 
 }

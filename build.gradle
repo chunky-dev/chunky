@@ -9,8 +9,8 @@ allprojects {
 	group = 'se.llbit.chunky'
 	version = rootProject.version
 
-	sourceCompatibility = '1.6'
-	targetCompatibility = '1.6'
+	sourceCompatibility = '1.8'
+	targetCompatibility = '1.8'
 
 	compileJava.options.encoding = 'UTF-8'
 	compileJava.options.debug = true
@@ -36,7 +36,7 @@ task tarball(type: Exec) {
 }
 
 task release << {
-	tryCommand([ 'git', 'commit', '-m', "Release ${version}", 'chunky/src/res/Version.properties' ], true)
+	tryCommand([ 'git', 'commit', '-m', "Release ${version}", 'chunky/src/res/se/llbit/chunky/main/Version.properties' ], true)
 	tryCommand([ 'git', 'tag', '-a', "${version}", '-m', "Version ${version}" ], true)
 }
 
@@ -120,7 +120,7 @@ def getVersion() {
 		def date = new Date()
 		Properties version = new Properties()
 		version['version'] = newVersion
-		version.store(file('chunky/src/res/Version.properties').newWriter(), null)
+		version.store(file('chunky/src/res/se/llbit/chunky/main/Version.properties').newWriter(), null)
 		return newVersion
 	} else {
 		def output = tryCommand(['git', 'describe'])
@@ -130,7 +130,7 @@ def getVersion() {
 		} else {
 			// Git command failed. Read the previous version string instead.
 			Properties version = new Properties()
-			version.load(new FileInputStream(file('chunky/src/res/Version.properties')))
+			version.load(new FileInputStream(file('chunky/src/res/se/llbit/chunky/main/Version.properties')))
 			version['version']
 		}
 	}

@@ -21,31 +21,29 @@ import se.llbit.json.JsonValue;
 /**
  * Available projection modes.
  */
-@SuppressWarnings("javadoc")
 public enum ProjectionMode {
-	PINHOLE("Standard"),
-	PARALLEL("Parallel"),
-	FISHEYE("Fisheye"),
-	STEREOGRAPHIC("Stereographic"),
-	PANORAMIC("Panoramic (equirectangular)"),
-	PANORAMIC_SLOT("Panoramic (slot)");
+  PINHOLE("Standard"),
+  PARALLEL("Parallel"),
+  FISHEYE("Fisheye"),
+  STEREOGRAPHIC("Stereographic"),
+  PANORAMIC("Panoramic (equirectangular)"),
+  PANORAMIC_SLOT("Panoramic (slot)");
 
-	private final String niceName;
+  private final String niceName;
 
-	private ProjectionMode(String niceName) {
-		this.niceName = niceName;
-	}
+  ProjectionMode(String niceName) {
+    this.niceName = niceName;
+  }
 
-	@Override
-	public String toString() {
-		return niceName;
-	}
+  @Override public String toString() {
+    return niceName;
+  }
 
-	public static ProjectionMode fromJson(JsonValue jsonValue) {
-		try {
-			return ProjectionMode.valueOf(jsonValue.stringValue("PINHOLE"));
-		} catch (IllegalArgumentException e) {
-			return PINHOLE;
-		}
-	}
+  public static ProjectionMode fromJson(JsonValue jsonValue) {
+    try {
+      return ProjectionMode.valueOf(jsonValue.stringValue("PINHOLE"));
+    } catch (IllegalArgumentException e) {
+      return PINHOLE;
+    }
+  }
 }

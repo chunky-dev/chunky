@@ -16,245 +16,214 @@
  */
 package se.llbit.chunky.map;
 
-import java.awt.Graphics;
-import java.awt.image.DataBufferInt;
-
 import org.apache.commons.math3.util.FastMath;
-
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.ChunkView;
-import se.llbit.math.Color;
+import se.llbit.math.ColorUtil;
+
+import java.awt.image.DataBufferInt;
 
 /**
  * A layer with block data.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class BlockLayer extends AbstractLayer {
-	private final byte[] blocks;
-	private final byte[] biomes;
-	private final int avgColor;
+  private final byte[] blocks;
+  private final byte[] biomes;
+  private final int avgColor;
 
-	/**
-	 * Load layer from block data
-	 * @param blockData
-	 * @param chunkBiomes
-	 * @param layer
-	 */
-	public BlockLayer(byte[] blockData, byte[] chunkBiomes, int layer) {
-		blocks = new byte[Chunk.X_MAX*Chunk.Z_MAX];
-		biomes = new byte[Chunk.X_MAX*Chunk.Z_MAX];
-		double[] sum = new double[3];
-		double[] rgb = new double[3];
-		for (int x = 0; x < Chunk.X_MAX; ++x) {
-			for (int z = 0; z < Chunk.Z_MAX; ++z) {
-				byte block = blockData[Chunk.chunkIndex(x, layer, z)];
-				byte biome = chunkBiomes[Chunk.chunkXZIndex(x, z)];
-				blocks[x*Chunk.Z_MAX+z] = block;
-				biomes[x*Chunk.Z_MAX+z] = block;
-				Color.getRGBComponents(avgBlockColor(block, biome), rgb);
-				sum[0] += rgb[0];
-				sum[1] += rgb[1];
-				sum[2] += rgb[2];
-			}
-		}
-		sum[0] /= Chunk.X_MAX*Chunk.Z_MAX;
-		sum[1] /= Chunk.X_MAX*Chunk.Z_MAX;
-		sum[2] /= Chunk.X_MAX*Chunk.Z_MAX;
-		avgColor = Color.getRGB(sum);
-	}
+  /**
+   * Load layer from block data.
+   */
+  public BlockLayer(byte[] blockData, byte[] chunkBiomes, int layer) {
+    blocks = new byte[Chunk.X_MAX * Chunk.Z_MAX];
+    biomes = new byte[Chunk.X_MAX * Chunk.Z_MAX];
+    double[] sum = new double[3];
+    double[] rgb = new double[3];
+    for (int x = 0; x < Chunk.X_MAX; ++x) {
+      for (int z = 0; z < Chunk.Z_MAX; ++z) {
+        byte block = blockData[Chunk.chunkIndex(x, layer, z)];
+        byte biome = chunkBiomes[Chunk.chunkXZIndex(x, z)];
+        blocks[x * Chunk.Z_MAX + z] = block;
+        biomes[x * Chunk.Z_MAX + z] = block;
+        ColorUtil.getRGBComponents(avgBlockColor(block, biome), rgb);
+        sum[0] += rgb[0];
+        sum[1] += rgb[1];
+        sum[2] += rgb[2];
+      }
+    }
+    sum[0] /= Chunk.X_MAX * Chunk.Z_MAX;
+    sum[1] /= Chunk.X_MAX * Chunk.Z_MAX;
+    sum[2] /= Chunk.X_MAX * Chunk.Z_MAX;
+    avgColor = ColorUtil.getRGB(sum);
+  }
 
-	/**
-	 * Render this layer
-	 * @param rbuff
-	 * @param cx
-	 * @param cz
-	 */
-	@Override
-	public synchronized void render(MapBuffer rbuff, int cx, int cz) {
-		ChunkView view = rbuff.getView();
-		int x0 = view.chunkScale * (cx - view.px0);
-		int z0 = view.chunkScale * (cz - view.pz0);
+  /**
+   * Render this layer
+   */
+  @Override public synchronized void render(MapTile tile) {
+    if (tile.scale == 1) {
+      tile.setPixel(0, 0, getAvgColor());
+    } else if (tile.scale == 16) {
+      // TODO convert to using pixel array directly.
+      for (int z = 0; z < Chunk.Z_MAX; ++z) {
+        for (int x = 0; x < Chunk.X_MAX; ++x) {
+          byte block = blocks[x * Chunk.Z_MAX + z];
+          byte biome = biomes[x * Chunk.Z_MAX + z];
+          tile.setPixel(x, z, avgBlockColor(block, biome));
+        }
+      }
+    } else if (tile.scale == 16 * 16) {
+      for (int z = 0; z < Chunk.Z_MAX; ++z) {
+        int yp0 = z * 16;
 
-		if (view.chunkScale == 1) {
-			rbuff.setRGB(x0, z0, getAvgColor());
-		} else if (view.chunkScale == 16) {
+        for (int x = 0; x < Chunk.X_MAX; ++x) {
+          int xp0 = x * 16;
 
-			for (int z = 0; z < Chunk.Z_MAX; ++z) {
-				int yp = z0 + z;
+          byte block = blocks[x * Chunk.Z_MAX + z];
+          if (block == Block.AIR.id) {
+            for (int i = 0; i < 16; ++i) {
+              for (int j = 0; j < 16; ++j) {
+                tile.setPixel(xp0 + j, yp0 + i, 0xFFFFFFFF);
+              }
+            }
+            continue;
+          }
 
-				for (int x = 0; x < Chunk.X_MAX; ++x) {
-					int xp = x0 + x;
+          switch ((int) block) {
+            case Block.GRASS_ID:
+            case Block.TALLGRASS_ID:
+            case Block.LEAVES_ID:
+            case Block.LEAVES2_ID:
+            case Block.VINES_ID: {
+              Texture tex = Block.get(block).getIcon();
+              for (int i = 0; i < 16; ++i) {
+                for (int j = 0; j < 16; ++j) {
+                  float[] rgb = tex.getColor(j, i);
+                  if (rgb[3] != 0) {
+                    tile.setPixel(xp0 + j, yp0 + i,
+                        getBiomeColor(rgb, block, biomes[x * Chunk.Z_MAX + z]));
+                  } else {
+                    tile.setPixel(xp0 + j, yp0 + i, 0xFFFFFFFF);
+                  }
+                }
+              }
+              break;
+            }
+            default: {
+              int[] tex = Block.get(block).getIcon().getData();
+              for (int i = 0; i < 16; ++i) {
+                for (int j = 0; j < 16; ++j) {
+                  int rgb = tex[i * 16 + j];
+                  if ((rgb & 0xFF000000) != 0) {
+                    tile.setPixel(xp0 + j, yp0 + i, rgb);
+                  } else {
+                    tile.setPixel(xp0 + j, yp0 + i, 0xFFFFFFFF);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    } else {
+      throw new Error("Unsupported chunk scale.");
+    }
+  }
 
-					byte block = blocks[x*Chunk.Z_MAX + z];
-					byte biome = biomes[x*Chunk.Z_MAX + z];
-					rbuff.setRGB(xp, yp, avgBlockColor(block, biome));
-				}
-			}
-		} else if (view.chunkScale == 16*16) {
-			for (int z = 0; z < Chunk.Z_MAX; ++z) {
-				int yp0 = z0 + z * 16;
+  private int avgBlockColor(byte block, byte biome) {
+    if (block == Block.AIR.id) {
+      return 0xFFFFFFFF;
+    } else {
+      switch ((int) block) {
+        case Block.GRASS_ID:
+        case Block.TALLGRASS_ID:
+        case Block.LEAVES_ID:
+        case Block.LEAVES2_ID:
+        case Block.VINES_ID: {
+          float[] rgb = Block.get(block).getIcon().getAvgColorLinear();
+          return getBiomeColor(rgb, block, biome);
+        }
+        default:
+          return Block.get(block).getIcon().getAvgColor();
+      }
+    }
+  }
 
-				for (int x = 0; x < Chunk.X_MAX; ++x) {
-					int xp0 = x0 + x * 16;
+  private int getBiomeColor(float[] rgb, byte block, byte biome) {
+    float[] biomeColor;
+    float alpha = rgb[3];
+    switch ((int) block) {
+      case Block.GRASS_ID:
+      case Block.TALLGRASS_ID:
+        biomeColor = Biomes.getGrassColorLinear(biome);
+        return ColorUtil.getRGB(
+            (1 - alpha) + alpha * FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
+            (1 - alpha) + alpha * FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
+            (1 - alpha) + alpha * FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
+      case Block.LEAVES_ID:
+      case Block.LEAVES2_ID:
+      case Block.VINES_ID:
+        biomeColor = Biomes.getFoliageColorLinear(biome);
+        return ColorUtil.getRGB(
+            (1 - alpha) + alpha * FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
+            (1 - alpha) + alpha * FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
+            (1 - alpha) + alpha * FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
+      default:
+        return ColorUtil.getRGB((1 - alpha) + alpha * FastMath.pow(rgb[0], Scene.DEFAULT_GAMMA_INV),
+            (1 - alpha) + alpha * FastMath.pow(rgb[1], Scene.DEFAULT_GAMMA_INV),
+            (1 - alpha) + alpha * FastMath.pow(rgb[2], Scene.DEFAULT_GAMMA_INV));
+    }
+  }
 
-					byte block = blocks[x*Chunk.Z_MAX + z];
-					if (block == Block.AIR.id) {
-						rbuff.fillRect(xp0, yp0, 16, 16, 0xFFFFFFFF);
-						continue;
-					}
+  /**
+   * Render block highlight.
+   */
+  @Override public synchronized void renderHighlight(MapTile tile, Block hlBlock, int hlColor) {
 
-					switch ((int) block) {
-					case Block.GRASS_ID:
-					case Block.TALLGRASS_ID:
-					case Block.LEAVES_ID:
-					case Block.LEAVES2_ID:
-					case Block.VINES_ID:
-					{
-						Texture tex = Block.get(block).getIcon();
-						for (int i = 0; i < 16; ++i) {
-							for (int j = 0; j < 16; ++j) {
-								float[] rgb = tex.getColor(j, i);
-								if (rgb[3] != 0) {
-									rbuff.setRGB(xp0 + j, yp0 + i, getBiomeColor(rgb, block, biomes[x*Chunk.Z_MAX+z]));
-								} else {
-									rbuff.setRGB(xp0 + j, yp0 + i, 0xFFFFFFFF);
-								}
-							}
-						}
-						break;
-					}
-					default:
-					{
-						int[] tex = ((DataBufferInt) Block.get(block).getIcon()
-								.getImage().getRaster().getDataBuffer())
-								.getData();
-						for (int i = 0; i < 16; ++i) {
-							for (int j = 0; j < 16; ++j) {
-								int rgb = tex[i * 16 + j];
-								if ((rgb & 0xFF000000) != 0) {
-									rbuff.setRGB(xp0 + j, yp0 + i, rgb);
-								} else {
-									rbuff.setRGB(xp0 + j, yp0 + i, 0xFFFFFFFF);
-								}
-							}
-						}
-					}
-					}
-				}
-			}
-		}
-		// unsupported chunkScale if none of the above
-	}
+    if (blocks == null) {
+      return;
+    }
 
-	private int avgBlockColor(byte block, byte biome) {
-		if (block == Block.AIR.id) {
-			return 0xFFFFFFFF;
-		} else {
-			switch ((int) block) {
-			case Block.GRASS_ID:
-			case Block.TALLGRASS_ID:
-			case Block.LEAVES_ID:
-			case Block.LEAVES2_ID:
-			case Block.VINES_ID:
-			{
-				float[] rgb = Block.get(block).getIcon().getAvgColorLinear();
-				return getBiomeColor(rgb, block, biome);
-			}
-			default:
-				return Block.get(block).getIcon().getAvgColor();
-			}
-		}
-	}
+    //g.setColor(new java.awt.Color(1,1,1,0.35f));
+    //g.fillRect(x0, z0, view.chunkScale, view.chunkScale);
+    //g.setColor(highlight);
 
-	private int getBiomeColor(float[] rgb, byte block, byte biome) {
-		float[] biomeColor;
-		float alpha = rgb[3];
-		switch ((int) block) {
-		case Block.GRASS_ID:
-		case Block.TALLGRASS_ID:
-			biomeColor = Biomes.getGrassColorLinear(biome);
-			return Color.getRGB(
-					(1-alpha) + alpha * FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
-					(1-alpha) + alpha * FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
-					(1-alpha) + alpha * FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
-		case Block.LEAVES_ID:
-		case Block.LEAVES2_ID:
-		case Block.VINES_ID:
-			biomeColor = Biomes.getFoliageColorLinear(biome);
-			return Color.getRGB(
-					(1-alpha) + alpha * FastMath.pow(rgb[0] * biomeColor[0], Scene.DEFAULT_GAMMA_INV),
-					(1-alpha) + alpha * FastMath.pow(rgb[1] * biomeColor[1], Scene.DEFAULT_GAMMA_INV),
-					(1-alpha) + alpha * FastMath.pow(rgb[2] * biomeColor[2], Scene.DEFAULT_GAMMA_INV));
-		default:
-			return Color.getRGB(
-					(1-alpha) + alpha * FastMath.pow(rgb[0], Scene.DEFAULT_GAMMA_INV),
-					(1-alpha) + alpha * FastMath.pow(rgb[1], Scene.DEFAULT_GAMMA_INV),
-					(1-alpha) + alpha * FastMath.pow(rgb[2], Scene.DEFAULT_GAMMA_INV));
-		}
-	}
+    if (tile.scale == 16) {
+      for (int z = 0; z < 16; ++z) {
+        for (int x = 0; x < 16; ++x) {
+          if (hlBlock.id == (0xFF & blocks[x * 16 + z])) {
+            tile.setPixel(x, z, hlColor);
+          }
+        }
+      }
+    } else if (tile.scale > 16) {
+      int blockScale = tile.scale / 16;
+      for (int x = 0; x < 16; ++x) {
+        for (int z = 0; z < 16; ++z) {
+          if (hlBlock.id == (0xFF & blocks[x * 16 + z])) {
+            int xp0 = x * blockScale;
+            int xp1 = xp0 + blockScale;
+            int zp0 = z * blockScale;
+            int zp1 = zp0 + blockScale;
+            for (int j = zp0; j < zp1; ++j) {
+              for (int i = xp0; i < xp1; ++i) {
+                if (hlBlock.id == (0xFF & blocks[j * 16 + i])) {
+                  tile.setPixel(i, j, hlColor);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
-	/**
-	 * Render block highlight
-	 * @param rbuff
-	 * @param cx
-	 * @param cz
-	 * @param hlBlock
-	 * @param highlight
-	 */
-	@Override
-	public synchronized void renderHighlight(MapBuffer rbuff, int cx, int cz,
-			Block hlBlock, java.awt.Color highlight) {
-
-		ChunkView view = rbuff.getView();
-		int x0 = view.chunkScale * (cx - view.px0);
-		int z0 = view.chunkScale * (cz - view.pz0);
-
-		if (blocks == null)
-			return;
-
-		Graphics g = rbuff.getGraphics();
-		g.setColor(new java.awt.Color(1,1,1,0.35f));
-		g.fillRect(x0, z0, view.chunkScale, view.chunkScale);
-		g.setColor(highlight);
-
-		if (view.chunkScale == 16) {
-
-			for (int x = 0; x < 16; ++x) {
-				int xp = x0 + x;
-
-				for (int z = 0; z < 16; ++z) {
-					int yp = z0 + z;
-
-					if (hlBlock.id == (0xFF & blocks[x * 16 + z])) {
-						rbuff.setRGB(xp, yp, highlight.getRGB());
-					}
-				}
-			}
-		} else {
-			int blockScale = view.chunkScale / 16;
-
-			for (int x = 0; x < 16; ++x) {
-				int xp0 = x0 + x * blockScale;
-				int xp1 = xp0 + blockScale;
-
-				for (int z = 0; z < 16; ++z) {
-					int yp0 = z0 + z * blockScale;
-					int yp1 = yp0 + blockScale;
-
-					if (hlBlock.id == (0xFF & blocks[x * 16 + z])) {
-						g.fillRect(xp0, yp0, xp1 - xp0, yp1 - yp0);
-					}
-				}
-			}
-		}
-	}
-
-	@Override
-	public int getAvgColor() {
-		return avgColor;
-	}
+  @Override public int getAvgColor() {
+    return avgColor;
+  }
 }

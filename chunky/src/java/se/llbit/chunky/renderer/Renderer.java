@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
+/*
+ * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,25 +17,48 @@
  */
 package se.llbit.chunky.renderer;
 
-import java.awt.Graphics;
+import javafx.scene.canvas.GraphicsContext;
 
 /**
- * A renderer renders to a buffered image which in turn is displayed by a render canvas.
+ * A renderer renders to a buffered image which is displayed by a render canvas.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public interface Renderer {
-	/**
-	 * Draws the buffered image to the given graphics context.
-	 */
-	public void drawBufferedImage(Graphics g, int offsetX, int offsetY, int width, int height);
+  void setSceneProvider(SceneProvider sceneProvider);
 
-	/**
-	 * Set the buffer update flag. The buffer update flag decides whether the
-	 * renderer should update the buffered image.
-	 */
-	public void setBufferFinalization(boolean finalizationEnabled);
+  void setCanvas(Repaintable canvas);
 
-	public void addSceneStatusListener(SceneStatusListener listener);
+  /**
+   * Instructs the renderer to change its CPU load.
+   */
+  void setCPULoad(int loadPercent);
 
-	public void removeSceneStatusListener(SceneStatusListener listener);
+  /**
+   * Instructs the renderer to use the specified number of worker threads.
+   */
+  void setNumThreads(int numThreads);
+
+  void setRenderListener(RenderStatusListener renderStatusListener);
+
+  interface SampleBufferConsumer {
+    void accept(double[] samples, int width, int height);
+  }
+
+  /**
+   * Draws the buffered image to the given graphics context in the specified location.
+   */
+  void drawBufferedImage(GraphicsContext gc, double offsetX, double offsetY, double width,
+      double height);
+
+  void addSceneStatusListener(SceneStatusListener listener);
+
+  void removeSceneStatusListener(SceneStatusListener listener);
+
+  RenderStatus getRenderStatus();
+
+  /** Start up the renderer. */
+  void start();
+
+  void withSampleBufferProtected(SampleBufferConsumer consumer);
 }

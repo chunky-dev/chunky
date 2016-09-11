@@ -19,91 +19,91 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
 /**
  * A generic block.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class SignPostModel {
-	// facing south
-	protected static Quad[] sides = {
-		// front
-		new Quad(new Vector3d(0, .5, 9/16.), new Vector3d(1, .5, 9/16.),
-				new Vector3d(0, 1, 9/16.), new Vector4d(2/64., 26/64., 18/32., 30/32.)),
+  // facing south
+  protected static Quad[] sides = {
+      // front
+      new Quad(new Vector3(0, .5, 9 / 16.), new Vector3(1, .5, 9 / 16.),
+          new Vector3(0, 1, 9 / 16.), new Vector4(2 / 64., 26 / 64., 18 / 32., 30 / 32.)),
 
-		// back
-		new Quad(new Vector3d(1, .5, 7/16.), new Vector3d(0, .5, 7/16.),
-				new Vector3d(1, 1, 7/16.), new Vector4d(28/64., 52/64., 18/32., 30/32.)),
+      // back
+      new Quad(new Vector3(1, .5, 7 / 16.), new Vector3(0, .5, 7 / 16.),
+          new Vector3(1, 1, 7 / 16.), new Vector4(28 / 64., 52 / 64., 18 / 32., 30 / 32.)),
 
-		// left
-		new Quad(new Vector3d(0, .5, 7/16.), new Vector3d(0, .5, 9/16.),
-				new Vector3d(0, 1, 7/16.), new Vector4d(0, 2/64., 18/32., 30/32.)),
+      // left
+      new Quad(new Vector3(0, .5, 7 / 16.), new Vector3(0, .5, 9 / 16.),
+          new Vector3(0, 1, 7 / 16.), new Vector4(0, 2 / 64., 18 / 32., 30 / 32.)),
 
-		// right
-		new Quad(new Vector3d(1, .5, 9/16.), new Vector3d(1, .5, 7/16.),
-				new Vector3d(1, 1, 9/16.), new Vector4d(26/64., 28/64., 18/32., 30/32.)),
+      // right
+      new Quad(new Vector3(1, .5, 9 / 16.), new Vector3(1, .5, 7 / 16.),
+          new Vector3(1, 1, 9 / 16.), new Vector4(26 / 64., 28 / 64., 18 / 32., 30 / 32.)),
 
-		// top
-		new Quad(new Vector3d(1, 1, 7/16.), new Vector3d(0, 1, 7/16.),
-				new Vector3d(1, 1, 9/16.), new Vector4d(2/64., 26/64., 1, 30/32.)),
+      // top
+      new Quad(new Vector3(1, 1, 7 / 16.), new Vector3(0, 1, 7 / 16.),
+          new Vector3(1, 1, 9 / 16.), new Vector4(2 / 64., 26 / 64., 1, 30 / 32.)),
 
-		// bottom
-		new Quad(new Vector3d(0, .5, 7/16.), new Vector3d(1, .5, 7/16.),
-				new Vector3d(0, .5, 9/16.), new Vector4d(26/64., 50/64., 1, 30/32.)),
+      // bottom
+      new Quad(new Vector3(0, .5, 7 / 16.), new Vector3(1, .5, 7 / 16.),
+          new Vector3(0, .5, 9 / 16.), new Vector4(26 / 64., 50 / 64., 1, 30 / 32.)),
 
-		// post front
-		new Quad(new Vector3d(7/16., 0, 9/16.), new Vector3d(9/16., 0, 9/16.),
-				new Vector3d(7/16., .5, 9/16.), new Vector4d(2/64., 4/64., 2/32., 16/32.)),
+      // post front
+      new Quad(new Vector3(7 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 9 / 16.),
+          new Vector3(7 / 16., .5, 9 / 16.), new Vector4(2 / 64., 4 / 64., 2 / 32., 16 / 32.)),
 
-		// post back
-		new Quad(new Vector3d(9/16., 0, 7/16.), new Vector3d(7/16., 0, 7/16.),
-				new Vector3d(9/16., .5, 7/16.), new Vector4d(4/64., 6/64., 2/32., 16/32.)),
+      // post back
+      new Quad(new Vector3(9 / 16., 0, 7 / 16.), new Vector3(7 / 16., 0, 7 / 16.),
+          new Vector3(9 / 16., .5, 7 / 16.), new Vector4(4 / 64., 6 / 64., 2 / 32., 16 / 32.)),
 
-		// post left
-		new Quad(new Vector3d(7/16., 0, 7/16.), new Vector3d(7/16., 0, 9/16.),
-				new Vector3d(7/16., .5, 7/16.), new Vector4d(0, 2/64., 2/32., 16/32.)),
+      // post left
+      new Quad(new Vector3(7 / 16., 0, 7 / 16.), new Vector3(7 / 16., 0, 9 / 16.),
+          new Vector3(7 / 16., .5, 7 / 16.), new Vector4(0, 2 / 64., 2 / 32., 16 / 32.)),
 
-		// post right
-		new Quad(new Vector3d(9/16., 0, 9/16.), new Vector3d(9/16., 0, 7/16.),
-				new Vector3d(9/16., .5, 9/16.), new Vector4d(6/64., 8/64., 2/32., 16/32.)),
+      // post right
+      new Quad(new Vector3(9 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 7 / 16.),
+          new Vector3(9 / 16., .5, 9 / 16.), new Vector4(6 / 64., 8 / 64., 2 / 32., 16 / 32.)),
 
-		// post bottom
-		new Quad(new Vector3d(7/16., 0, 7/16.), new Vector3d(9/16., 0, 7/16.),
-				new Vector3d(7/16., 0, 9/16.), new Vector4d(4/64., 6/64., 16/32., 18/32.)),
+      // post bottom
+      new Quad(new Vector3(7 / 16., 0, 7 / 16.), new Vector3(9 / 16., 0, 7 / 16.),
+          new Vector3(7 / 16., 0, 9 / 16.), new Vector4(4 / 64., 6 / 64., 16 / 32., 18 / 32.)),
 
-	};
+  };
 
-	private static final Quad[][] rot = new Quad[16][];
+  private static final Quad[][] rot = new Quad[16][];
 
-	static {
-		// rotate the sign post to face the correct direction
-		rot[0] = sides;
-		for (int i = 1; i < 16; ++i) {
-			rot[i] = Model.rotateY(sides, - i * Math.PI/8);
-		}
-	}
+  static {
+    // Rotate the sign post to face the correct direction.
+    rot[0] = sides;
+    for (int i = 1; i < 16; ++i) {
+      rot[i] = Model.rotateY(sides, -i * Math.PI / 8);
+    }
+  }
 
-	@SuppressWarnings("javadoc")
-	public static boolean intersect(Ray ray) {
-		boolean hit = false;
-		int angle = ray.getBlockData() & 0xF;
-		ray.t = Double.POSITIVE_INFINITY;
-		for (int i = 0; i < sides.length; ++i) {
-			Quad side = rot[angle][i];
-			if (side.intersect(ray)) {
-				Texture.signPost.getColor(ray);
-				ray.n.set(side.n);
-				ray.t = ray.tNext;
-				hit = true;
-			}
-		}
-		if (hit) {
-			ray.color.w = 1;
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+  public static boolean intersect(Ray ray) {
+    boolean hit = false;
+    int angle = ray.getBlockData() & 0xF;
+    ray.t = Double.POSITIVE_INFINITY;
+    for (int i = 0; i < sides.length; ++i) {
+      Quad side = rot[angle][i];
+      if (side.intersect(ray)) {
+        Texture.signPost.getColor(ray);
+        ray.n.set(side.n);
+        ray.t = ray.tNext;
+        hit = true;
+      }
+    }
+    if (hit) {
+      ray.color.w = 1;
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

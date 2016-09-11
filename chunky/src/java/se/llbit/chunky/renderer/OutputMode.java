@@ -17,42 +17,42 @@
 package se.llbit.chunky.renderer;
 
 public enum OutputMode {
-	/** Standard PNG with 8-bit color channels. */
-	PNG {
-		@Override
-		public String toString() {
-			return "PNG";
-		}
+  /**
+   * Standard PNG with 8-bit color channels.
+   */
+  PNG {
+    @Override public String toString() {
+      return "PNG";
+    }
 
-		@Override
-		public String getExtension() {
-			return ".png";
-		}
-	},
+    @Override public String getExtension() {
+      return ".png";
+    }
+  },
 
-	/** TIFF with 32-bit color channels. */
-	TIFF_32 {
-		@Override
-		public String toString() {
-			return "TIFF, 32-bit floating point";
-		}
+  /**
+   * TIFF with 32-bit color channels.
+   */
+  TIFF_32 {
+    @Override public String toString() {
+      return "TIFF, 32-bit floating point";
+    }
 
-		@Override
-		public String getExtension() {
-			return ".tif";
-		}
-	};
+    @Override public String getExtension() {
+      return ".tif";
+    }
+  };
 
-	public static final OutputMode DEFAULT = PNG;
+  public static final OutputMode DEFAULT = PNG;
 
-	public static OutputMode get(String name) {
-		for (OutputMode mode: values()) {
-			if (mode.name().equals(name)) {
-				return mode;
-			}
-		}
-		return DEFAULT;
-	}
+  public static OutputMode get(String name) {
+    for (OutputMode mode : values()) {
+      if (mode.name().equals(name)) {
+        return mode;
+      }
+    }
+    return DEFAULT;
+  }
 
-	public abstract String getExtension();
+  public abstract String getExtension();
 }

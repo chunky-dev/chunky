@@ -16,11 +16,8 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-@SuppressWarnings({ "serial", "javadoc" })
 public class SceneLoadingError extends Exception {
-
-	public SceneLoadingError(String message) {
-		super(message);
-	}
-
+  public SceneLoadingError(String message) {
+    super(message);
+  }
 }

@@ -29,34 +29,27 @@ import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.LongTag;
 import se.llbit.nbt.NamedTag;
 
-@SuppressWarnings("javadoc")
 public class SeedTool {
 
-	public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
 
-		if (args.length < 3) {
-			System.out.println("arguments: <level.dat> <new seed> <output file>");
-			System.exit(0);
-		}
+    if (args.length < 3) {
+      System.out.println("arguments: <level.dat> <new seed> <output file>");
+      System.exit(0);
+    }
 
-		String fn = args[0];
-		Long seed = Long.parseLong(args[1]);
-		try {
-			System.out.println("loading save: "+fn);
-			DataInputStream in = new DataInputStream(new GZIPInputStream(new FileInputStream(fn)));
-			AnyTag tag = NamedTag.read(in);
-			LongTag seedTag = (LongTag) tag.unpack().get("Data").get("RandomSeed");
-			seedTag.setData(seed);
-			DataOutputStream out = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(args[2])));
-			tag.write(out);
-			out.close();
-			System.out.println("done");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+    String fn = args[0];
+    Long seed = Long.parseLong(args[1]);
+      System.out.println("loading save: " + fn);
+    try (DataInputStream in = new DataInputStream(new GZIPInputStream(new FileInputStream(fn)))) {
+      AnyTag tag = NamedTag.read(in);
+      LongTag seedTag = (LongTag) tag.unpack().get("Data").get("RandomSeed");
+      seedTag.setData(seed);
+      try (DataOutputStream out =
+          new DataOutputStream(new GZIPOutputStream(new FileOutputStream(args[2])))) {
+        tag.write(out);
+      }
+      System.out.println("done");
+    }
+  }
 }

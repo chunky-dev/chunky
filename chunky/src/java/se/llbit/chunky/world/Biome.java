@@ -20,22 +20,21 @@ package se.llbit.chunky.world;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Biome {
-	public String name;
-	public float temp;
-	public float rain;
-	public int mapColor;
+  public String name;
+  public float temp;
+  public float rain;
+  public int mapColor;
 
-	/**
-	 * Default grass/foliage color before loading from resource pack.
-	 */
-	public int grassColor;
+  /**
+   * Default grass/foliage color before loading from resource pack.
+   */
+  public int grassColor;
 
-	public Biome(String name, double temp, double rain, int mapColor,
-			int grassColor) {
-		this.name = name;
-		this.temp = (float) temp;
-		this.rain = (float) rain;
-		this.mapColor = mapColor;
-		this.grassColor = grassColor;
-	}
+  public Biome(String name, double temp, double rain, int mapColor, int grassColor) {
+    this.name = name;
+    this.temp = (float) temp;
+    this.rain = (float) rain;
+    this.mapColor = 0xFF000000 | mapColor;
+    this.grassColor = grassColor;
+  }
 }

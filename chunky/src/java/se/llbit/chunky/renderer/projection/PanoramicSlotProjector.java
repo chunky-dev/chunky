@@ -22,51 +22,44 @@ import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.math.QuickMath;
-import se.llbit.math.Vector3d;
+import se.llbit.math.Vector3;
 
 /**
  * Behaves like a pinhole camera in the vertical direction, but like a
  * spherical one in the horizontal direction.
  */
 public class PanoramicSlotProjector implements Projector {
-	protected final double fov;
-	protected final double fovTan;
+  protected final double fov;
+  protected final double fovTan;
 
-	public PanoramicSlotProjector(double fov) {
-		this.fov = fov;
-		this.fovTan = Camera.clampedFovTan(fov);
-	}
+  public PanoramicSlotProjector(double fov) {
+    this.fov = fov;
+    this.fovTan = Camera.clampedFovTan(fov);
+  }
 
-	@Override
-	public void apply(double x, double y, Random random, Vector3d o,
-			Vector3d d) {
-		apply(x, y, o, d);
-	}
+  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
+    apply(x, y, o, d);
+  }
 
-	@Override
-	public void apply(double x, double y, Vector3d o,
-			Vector3d d) {
-		double ax = QuickMath.degToRad(x * fov);
-		double dz = FastMath.cos(ax);
-		double dx = FastMath.sin(ax);
-		double dy = fovTan * y;
+  @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
+    double ax = QuickMath.degToRad(x * fov);
+    double dz = FastMath.cos(ax);
+    double dx = FastMath.sin(ax);
+    double dy = fovTan * y;
 
-		o.set(0, 0, 0);
-		d.set(dx, dy, dz);
-	}
+    o.set(0, 0, 0);
+    d.set(dx, dy, dz);
+  }
 
-	@Override
-	public double getMinRecommendedFoV() {
-		return 1;
-	}
+  @Override public double getMinRecommendedFoV() {
+    return 1;
+  }
 
-	@Override
-	public double getMaxRecommendedFoV() {
-		return 90;
-	}
+  @Override public double getMaxRecommendedFoV() {
+    return 90;
+  }
 
-	@Override
-	public double getDefaultFoV() {
-		return 90;
-	}
+  @Override public double getDefaultFoV() {
+    return 90;
+  }
 }

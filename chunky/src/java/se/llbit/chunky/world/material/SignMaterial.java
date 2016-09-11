@@ -21,10 +21,10 @@ import se.llbit.chunky.world.Material;
 
 public class SignMaterial extends Material {
 
-	public static final SignMaterial INSTANCE = new SignMaterial();
+  public static final SignMaterial INSTANCE = new SignMaterial();
 
-	private SignMaterial() {
-		super("sign", Texture.signPost);
-	}
+  private SignMaterial() {
+    super("sign", Texture.signPost);
+  }
 
 }

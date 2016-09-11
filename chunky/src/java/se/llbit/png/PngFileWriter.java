@@ -16,168 +16,157 @@
  */
 package se.llbit.png;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
+import se.llbit.util.TaskTracker;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.Deflater;
 
-import se.llbit.chunky.renderer.ProgressListener;
-
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class PngFileWriter {
+public class PngFileWriter implements AutoCloseable {
 
-	/**
-	 * PNG magic value
-	 */
-	public static final long PNG_SIGNATURE = 0x89504E470D0A1A0AL;
+  /**
+   * PNG magic value
+   */
+  public static final long PNG_SIGNATURE = 0x89504E470D0A1A0AL;
 
-	public static final int MAX_CHUNK_BYTES = 0x100000;// max input/output buffer size = 1 MiB
+  public static final int MAX_CHUNK_BYTES = 0x100000; // Max input/output buffer size = 1 MiB.
 
-	private final DataOutputStream out;
+  private final DataOutputStream out;
 
-	/**
-	 * @param file
-	 * @throws IOException
-	 */
-	public PngFileWriter(File file) throws IOException {
-		out = new DataOutputStream(new FileOutputStream(file));
-		out.writeLong(PNG_SIGNATURE);
-	}
+  /**
+   * @throws IOException
+   */
+  public PngFileWriter(File file) throws IOException {
+    out = new DataOutputStream(new FileOutputStream(file));
+    out.writeLong(PNG_SIGNATURE);
+  }
 
-	/**
-	 * @param chunk
-	 * @throws IOException
-	 */
-	public void writeChunk(PngChunk chunk) throws IOException {
-		chunk.writeChunk(out);
-	}
+  /**
+   * @throws IOException
+   */
+  public void writeChunk(PngChunk chunk) throws IOException {
+    chunk.writeChunk(out);
+  }
 
-	/**
-	 * @throws IOException
-	 */
-	public void close() throws IOException {
-		out.close();
-	}
+  /**
+   * @throws IOException
+   */
+  public void close() throws IOException {
+    out.close();
+  }
 
-	/**
-	 * Write the image to a PNG file.
-	 */
-	public void write(BufferedImage image, ProgressListener progressListener) throws IOException {
-		DataBufferInt dataBuf = (DataBufferInt) image.getData().getDataBuffer();
-		int[] data = dataBuf.getData();
-		int width = image.getWidth();
-		int height = image.getHeight();
-		writeChunk(new IHDR(width, height));
-		IDATWriter idat = new IDATWriter();
-		int i = 0;
-		for (int y = 0; y < height; ++y) {
-			progressListener.setProgress("Writing PNG", y, 0, height);
-			idat.write(IDAT.FILTER_TYPE_NONE); // Scanline header.
-			for (int x = 0; x < width; ++x) {
-				int rgb = data[i++];
-				idat.write((rgb >> 16) & 0xFF);
-				idat.write((rgb >> 8) & 0xFF);
-				idat.write(rgb & 0xFF);
-			}
-			progressListener.setProgress("Writing PNG", y+1, 0, height);
-		}
-		idat.close();
-	}
+  /**
+   * Write the image to a PNG file.
+   */
+  public void write(int[] data, int width, int height, TaskTracker.Task task)
+      throws IOException {
+    writeChunk(new IHDR(width, height));
+    IDATWriter idat = new IDATWriter();
+    int i = 0;
+    for (int y = 0; y < height; ++y) {
+      task.update(height, y);
+      idat.write(IDAT.FILTER_TYPE_NONE); // Scanline header.
+      for (int x = 0; x < width; ++x) {
+        int rgb = data[i++];
+        idat.write((rgb >> 16) & 0xFF);
+        idat.write((rgb >> 8) & 0xFF);
+        idat.write(rgb & 0xFF);
+      }
+      task.update(height, y + 1);
+    }
+    idat.close();
+  }
 
-	/**
-	 * Write the image to a PNG file.
-	 */
-	public void write(BufferedImage image, byte[] alpha, ProgressListener progressListener)
-			throws IOException {
-		DataBufferInt dataBuf = (DataBufferInt) image.getData().getDataBuffer();
-		int[] data = dataBuf.getData();
-		int width = image.getWidth();
-		int height = image.getHeight();
-		writeChunk(new IHDR(width, height, IHDR.COLOR_TYPE_RGBA));
-		IDATWriter idat = new IDATWriter();
-		int i = 0;
-		for (int y = 0; y < height; ++y) {
-			progressListener.setProgress("Writing PNG", y, 0, height);
-			idat.write(IDAT.FILTER_TYPE_NONE); // Scanline header.
-			for (int x = 0; x < width; ++x) {
-				int rgb = data[i];
-				idat.write((rgb >> 16) & 0xFF);
-				idat.write((rgb >> 8) & 0xFF);
-				idat.write(rgb & 0xFF);
-				idat.write(alpha[i]);
-				i += 1;
-			}
-			progressListener.setProgress("Writing PNG", y + 1, 0, height);
-		}
-		idat.close();
-	}
+  /**
+   * Write the image to a PNG file.
+   */
+  public void write(int[] data, byte[] alpha, int width, int height,
+      TaskTracker.Task task) throws IOException {
+    writeChunk(new IHDR(width, height, IHDR.COLOR_TYPE_RGBA));
+    IDATWriter idat = new IDATWriter();
+    int i = 0;
+    for (int y = 0; y < height; ++y) {
+      task.update(height, y);
+      idat.write(IDAT.FILTER_TYPE_NONE); // Scanline header.
+      for (int x = 0; x < width; ++x) {
+        int rgb = data[i];
+        idat.write((rgb >> 16) & 0xFF);
+        idat.write((rgb >> 8) & 0xFF);
+        idat.write(rgb & 0xFF);
+        idat.write(alpha[i]);
+        i += 1;
+      }
+      task.update(height, y + 1);
+    }
+    idat.close();
+  }
 
-	class IDATWriter {
-		Deflater deflater = new Deflater();
-		int inputSize = 0;
-		byte[] inputBuf = new byte[MAX_CHUNK_BYTES];
-		int outputSize = 0;
-		byte[] outputBuf = new byte[MAX_CHUNK_BYTES];
+  class IDATWriter {
+    Deflater deflater = new Deflater();
+    int inputSize = 0;
+    byte[] inputBuf = new byte[MAX_CHUNK_BYTES];
+    int outputSize = 0;
+    byte[] outputBuf = new byte[MAX_CHUNK_BYTES];
 
-		void write(int b) throws IOException {
-			if (inputSize == MAX_CHUNK_BYTES) {
-				deflater.setInput(inputBuf, 0, inputSize);
-				inputSize = 0;
-				deflate();
-			}
-			inputBuf[inputSize++] = (byte) b;
-		}
+    void write(int b) throws IOException {
+      if (inputSize == MAX_CHUNK_BYTES) {
+        deflater.setInput(inputBuf, 0, inputSize);
+        inputSize = 0;
+        deflate();
+      }
+      inputBuf[inputSize++] = (byte) b;
+    }
 
-		void write16(int bb) throws IOException {
-			write(bb >> 8);
-			write(bb & 0xFF);
-		}
+    void write16(int bb) throws IOException {
+      write(bb >> 8);
+      write(bb & 0xFF);
+    }
 
-		private void deflate() throws IOException {
-			int deflated;
-			do {
-				if (outputSize == MAX_CHUNK_BYTES) {
-					writeChunk();
-				}
-				deflated = deflater.deflate(outputBuf, outputSize, MAX_CHUNK_BYTES - outputSize);
-				outputSize += deflated;
-			} while (deflated != 0);
-		}
+    private void deflate() throws IOException {
+      int deflated;
+      do {
+        if (outputSize == MAX_CHUNK_BYTES) {
+          writeChunk();
+        }
+        deflated = deflater.deflate(outputBuf, outputSize, MAX_CHUNK_BYTES - outputSize);
+        outputSize += deflated;
+      } while (deflated != 0);
+    }
 
-		private void writeChunk() throws IOException {
-			out.writeInt(outputSize);
+    private void writeChunk() throws IOException {
+      out.writeInt(outputSize);
 
-			CrcOutputStream crcOut = new CrcOutputStream();
-			DataOutputStream crc = new DataOutputStream(crcOut);
+      CrcOutputStream crcOut = new CrcOutputStream();
+      DataOutputStream crc = new DataOutputStream(crcOut);
 
-			crc.writeInt(IDAT.CHUNK_TYPE);
-			out.writeInt(IDAT.CHUNK_TYPE);
+      crc.writeInt(IDAT.CHUNK_TYPE);
+      out.writeInt(IDAT.CHUNK_TYPE);
 
-			crc.write(outputBuf, 0, outputSize);
-			out.write(outputBuf, 0, outputSize);
+      crc.write(outputBuf, 0, outputSize);
+      out.write(outputBuf, 0, outputSize);
 
-			out.writeInt(crcOut.getCRC());
-			crc.close();
+      out.writeInt(crcOut.getCRC());
+      crc.close();
 
-			outputSize = 0;
-		}
+      outputSize = 0;
+    }
 
-		void close() throws IOException {
-			if (inputSize > 0) {
-				deflater.setInput(inputBuf, 0, inputSize);
-				deflater.finish();
-				inputSize = 0;
-				deflate();
-			}
-			if (outputSize > 0) {
-				writeChunk();
-			}
-			deflater.end();
-		}
-	}
+    void close() throws IOException {
+      if (inputSize > 0) {
+        deflater.setInput(inputBuf, 0, inputSize);
+        deflater.finish();
+        inputSize = 0;
+        deflate();
+      }
+      if (outputSize > 0) {
+        writeChunk();
+      }
+      deflater.end();
+    }
+  }
 }

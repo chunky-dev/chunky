@@ -16,6 +16,9 @@
  */
 package se.llbit.tiff;
 
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.util.TaskTracker;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.DataOutputStream;
@@ -23,231 +26,228 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import se.llbit.chunky.renderer.ProgressListener;
-import se.llbit.chunky.renderer.scene.Scene;
-
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class TiffFileWriter {
+public class TiffFileWriter implements AutoCloseable {
 
-	private static final int ASCII = 2;
-	private static final int SHORT = 3;
-	private static final int LONG = 4;
-	private static final int RATIONAL = 5;
+  private static final int ASCII = 2;
+  private static final int SHORT = 3;
+  private static final int LONG = 4;
+  private static final int RATIONAL = 5;
 
-	private final DataOutputStream out;
+  private final DataOutputStream out;
 
-	public TiffFileWriter(File file) throws IOException {
-		out = new DataOutputStream(new FileOutputStream(file));
-		out.write(0x4D);
-		out.write(0x4D);
-		out.write(0x00);
-		out.write(0x2A);
-	}
+  public TiffFileWriter(File file) throws IOException {
+    out = new DataOutputStream(new FileOutputStream(file));
+    out.write(0x4D);
+    out.write(0x4D);
+    out.write(0x00);
+    out.write(0x2A);
+  }
 
-	/**
-	 * @throws IOException
-	 */
-	public void close() throws IOException {
-		out.close();
-	}
+  /**
+   * @throws IOException
+   */
+  public void close() throws IOException {
+    out.close();
+  }
 
-	private void writeHeader(int width, int height, int bytesPerSample) throws IOException {
-		out.writeInt(ifdOffset(width, height, bytesPerSample));
-	}
+  private void writeHeader(int width, int height, int bytesPerSample) throws IOException {
+    out.writeInt(ifdOffset(width, height, bytesPerSample));
+  }
 
-	private void writeFooter(int width, int height, int bytesPerSample) throws IOException {
-		int ifdOffset = ifdOffset(width, height, bytesPerSample);
-		int numEntries = 15;
+  private void writeFooter(int width, int height, int bytesPerSample) throws IOException {
+    int ifdOffset = ifdOffset(width, height, bytesPerSample);
+    int numEntries = 15;
 
-		// Number of IFD entries.
-		out.writeShort(numEntries);
+    // Number of IFD entries.
+    out.writeShort(numEntries);
 
-		// 1: Width.
-		out.writeShort(0x0100);
-		out.writeShort(SHORT);
-		out.writeInt(1);
-		out.writeShort(width);
-		out.writeShort(0);
+    // 1: Width.
+    out.writeShort(0x0100);
+    out.writeShort(SHORT);
+    out.writeInt(1);
+    out.writeShort(width);
+    out.writeShort(0);
 
-		// 2: Height.
-		out.writeShort(0x0101);
-		out.writeShort(SHORT);
-		out.writeInt(1);
-		out.writeShort(height);
-		out.writeShort(0);
+    // 2: Height.
+    out.writeShort(0x0101);
+    out.writeShort(SHORT);
+    out.writeInt(1);
+    out.writeShort(height);
+    out.writeShort(0);
 
-		// 3: Bits per sample.
-		out.writeShort(0x0102);
-		out.writeShort(SHORT);
-		out.writeInt(3);
-		int offsetBps = ifdOffset + 2 + 12 * numEntries + 2;
-		out.writeInt(offsetBps);
+    // 3: Bits per sample.
+    out.writeShort(0x0102);
+    out.writeShort(SHORT);
+    out.writeInt(3);
+    int offsetBps = ifdOffset + 2 + 12 * numEntries + 2;
+    out.writeInt(offsetBps);
 
-		// 4: Compression type.
-		out.writeShort(0x0103);
-		out.writeShort(SHORT);
-		out.writeInt(1);
-		out.writeShort(1);
-		out.writeShort(0);
+    // 4: Compression type.
+    out.writeShort(0x0103);
+    out.writeShort(SHORT);
+    out.writeInt(1);
+    out.writeShort(1);
+    out.writeShort(0);
 
-		// 5: PhotometricInterpretation
-		out.writeShort(0x0106);
-		out.writeShort(SHORT);
-		out.writeInt(1);
-		out.writeShort(2);
-		out.writeShort(0);
+    // 5: PhotometricInterpretation
+    out.writeShort(0x0106);
+    out.writeShort(SHORT);
+    out.writeInt(1);
+    out.writeShort(2);
+    out.writeShort(0);
 
-		// 7: StripOffsets
-		out.writeShort(0x0111);
-		out.writeShort(LONG);
-		out.writeInt(1);
-		out.writeInt(8);
+    // 7: StripOffsets
+    out.writeShort(0x0111);
+    out.writeShort(LONG);
+    out.writeInt(1);
+    out.writeInt(8);
 
-		// 6: Orientation
-		out.writeShort(0x0112);
-		out.writeShort(SHORT);
-		out.writeInt(1);
-		out.writeShort(1); // First row is at the top of the image.
-		out.writeShort(0);
+    // 6: Orientation
+    out.writeShort(0x0112);
+    out.writeShort(SHORT);
+    out.writeInt(1);
+    out.writeShort(1); // First row is at the top of the image.
+    out.writeShort(0);
 
-		// 8: SamplesPerPixel
-		out.writeShort(0x0115);
-		out.writeShort(SHORT);
-		out.writeInt(1);
-		out.writeShort(3);
-		out.writeShort(0);
+    // 8: SamplesPerPixel
+    out.writeShort(0x0115);
+    out.writeShort(SHORT);
+    out.writeInt(1);
+    out.writeShort(3);
+    out.writeShort(0);
 
-		// 9: RowsPerStrip
-		out.writeShort(0x0116);
-		out.writeShort(LONG);
-		out.writeInt(1);
-		out.writeInt(height);
+    // 9: RowsPerStrip
+    out.writeShort(0x0116);
+    out.writeShort(LONG);
+    out.writeInt(1);
+    out.writeInt(height);
 
-		// 10: StripByteCounts
-		out.writeShort(0x0117);
-		out.writeShort(LONG);
-		out.writeInt(1);
-		int offsetSbc = ifdOffset + 2 + 12 * numEntries + 2 + 2*3;
-		out.writeInt(offsetSbc);
+    // 10: StripByteCounts
+    out.writeShort(0x0117);
+    out.writeShort(LONG);
+    out.writeInt(1);
+    int offsetSbc = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3;
+    out.writeInt(offsetSbc);
 
-		// 11: XResolution
-		out.writeShort(0x011A);
-		out.writeShort(RATIONAL);
-		out.writeInt(1);
-		int offsetXres = ifdOffset + 2 + 12 * numEntries + 2 + 2*3 + 4;
-		out.writeInt(offsetXres);
+    // 11: XResolution
+    out.writeShort(0x011A);
+    out.writeShort(RATIONAL);
+    out.writeInt(1);
+    int offsetXres = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3 + 4;
+    out.writeInt(offsetXres);
 
-		// 12: YResolution
-		out.writeShort(0x011B);
-		out.writeShort(RATIONAL);
-		out.writeInt(1);
-		int offsetYres = ifdOffset + 2 + 12 * numEntries + 2 + 2*3 + 4 + 8;
-		out.writeInt(offsetYres);
+    // 12: YResolution
+    out.writeShort(0x011B);
+    out.writeShort(RATIONAL);
+    out.writeInt(1);
+    int offsetYres = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3 + 4 + 8;
+    out.writeInt(offsetYres);
 
-		// 13: ResolutionUnit
-		out.writeShort(0x0128);
-		out.writeShort(SHORT);
-		out.writeInt(1);
-		out.writeShort(1);
-		out.writeShort(0);
+    // 13: ResolutionUnit
+    out.writeShort(0x0128);
+    out.writeShort(SHORT);
+    out.writeInt(1);
+    out.writeShort(1);
+    out.writeShort(0);
 
-		// 14: SampleFormat
-		out.writeShort(0x0153);
-		out.writeShort(SHORT);
-		out.writeInt(3);
-		int offsetSampleFormat = ifdOffset + 2 + 12 * numEntries + 2 + 2*3 + 4 + 8 + 8;
-		out.writeInt(offsetSampleFormat);
+    // 14: SampleFormat
+    out.writeShort(0x0153);
+    out.writeShort(SHORT);
+    out.writeInt(3);
+    int offsetSampleFormat = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3 + 4 + 8 + 8;
+    out.writeInt(offsetSampleFormat);
 
-		// 15: Software
-		out.writeShort(0x0131);
-		out.writeShort(ASCII);
-		out.writeInt("Chunky".length() + 1);
-		int offsetSoftware = ifdOffset + 2 + 12 * numEntries + 2 + 2*3 + 4 + 8 + 8 + 2*3;
-		out.writeInt(offsetSoftware);
+    // 15: Software
+    out.writeShort(0x0131);
+    out.writeShort(ASCII);
+    out.writeInt("Chunky".length() + 1);
+    int offsetSoftware = ifdOffset + 2 + 12 * numEntries + 2 + 2 * 3 + 4 + 8 + 8 + 2 * 3;
+    out.writeInt(offsetSoftware);
 
-		// End of IFD.
-		out.writeShort(0);
+    // End of IFD.
+    out.writeShort(0);
 
-		// Bits per sample, values.
-		out.writeShort(8 * bytesPerSample);
-		out.writeShort(8 * bytesPerSample);
-		out.writeShort(8 * bytesPerSample);
+    // Bits per sample, values.
+    out.writeShort(8 * bytesPerSample);
+    out.writeShort(8 * bytesPerSample);
+    out.writeShort(8 * bytesPerSample);
 
-		// Strip byte count.
-		out.writeInt(width * height * 3 * bytesPerSample);
+    // Strip byte count.
+    out.writeInt(width * height * 3 * bytesPerSample);
 
-		// X resolution.
-		out.writeInt(0);
-		out.writeInt(1);
+    // X resolution.
+    out.writeInt(0);
+    out.writeInt(1);
 
-		// Y resolution.
-		out.writeInt(0);
-		out.writeInt(1);
+    // Y resolution.
+    out.writeInt(0);
+    out.writeInt(1);
 
-		// Sample formats.
-		if (bytesPerSample == 1) {
-			out.writeShort(1);
-			out.writeShort(1);
-			out.writeShort(1);
-		} else {
-			out.writeShort(3);
-			out.writeShort(3);
-			out.writeShort(3);
-		}
+    // Sample formats.
+    if (bytesPerSample == 1) {
+      out.writeShort(1);
+      out.writeShort(1);
+      out.writeShort(1);
+    } else {
+      out.writeShort(3);
+      out.writeShort(3);
+      out.writeShort(3);
+    }
 
-		for (byte b : "Chunky".getBytes()) {
-			out.write(b);
-		}
-		out.write(0);
-	}
+    for (byte b : "Chunky".getBytes()) {
+      out.write(b);
+    }
+    out.write(0);
+  }
 
-	/**
-	 * Write the image to a PNG file.
-	 */
-	public void write(BufferedImage image, ProgressListener progressListener) throws IOException {
-		DataBufferInt dataBuf = (DataBufferInt) image.getData().getDataBuffer();
-		int[] data = dataBuf.getData();
-		int width = image.getWidth();
-		int height = image.getHeight();
-		writeHeader(width, height, 1);
-		int i = 0;
-		for (int y = 0; y < height; ++y) {
-			progressListener.setProgress("Writing TIFF", y, 0, height);
-			for (int x = 0; x < width; ++x) {
-				int rgb = data[i++];
-				out.write((rgb >> 16) & 0xFF);
-				out.write((rgb >> 8) & 0xFF);
-				out.write(rgb & 0xFF);
-			}
-			progressListener.setProgress("Writing TIFF", y+1, 0, height);
-		}
-		writeFooter(width, height, 1);
-	}
+  /**
+   * Write the image to a PNG file.
+   */
+  public void write(BufferedImage image, TaskTracker.Task task) throws IOException {
+    DataBufferInt dataBuf = (DataBufferInt) image.getData().getDataBuffer();
+    int[] data = dataBuf.getData();
+    int width = image.getWidth();
+    int height = image.getHeight();
+    writeHeader(width, height, 1);
+    int i = 0;
+    for (int y = 0; y < height; ++y) {
+      task.update(height, y);
+      for (int x = 0; x < width; ++x) {
+        int rgb = data[i++];
+        out.write((rgb >> 16) & 0xFF);
+        out.write((rgb >> 8) & 0xFF);
+        out.write(rgb & 0xFF);
+      }
+      task.update(height, y + 1);
+    }
+    writeFooter(width, height, 1);
+  }
 
-	/**
-	 * Write the image to a PNG file with 16-bit color channels.
-	 */
-	public void write32(Scene scene, ProgressListener progressListener) throws IOException {
-		int width = scene.canvasWidth();
-		int height = scene.canvasHeight();
-		writeHeader(width, height, 4);
-		for (int y = 0; y < height; ++y) {
-			progressListener.setProgress("Writing TIFF", y, 0, height);
-			for (int x = 0; x < width; ++x) {
-				double[] pixel = new double[3];
-				scene.postProcessPixel(x, y, pixel);
-				out.writeFloat((float) pixel[0]);
-				out.writeFloat((float) pixel[1]);
-				out.writeFloat((float) pixel[2]);
-			}
-			progressListener.setProgress("Writing TIFF", y + 1, 0, height);
-		}
-		writeFooter(width, height, 4);
-	}
+  /**
+   * Write the image to a PNG file with 16-bit color channels.
+   */
+  public void write32(Scene scene, TaskTracker.Task task) throws IOException {
+    int width = scene.canvasWidth();
+    int height = scene.canvasHeight();
+    writeHeader(width, height, 4);
+    for (int y = 0; y < height; ++y) {
+      task.update(height, y);
+      for (int x = 0; x < width; ++x) {
+        double[] pixel = new double[3];
+        scene.postProcessPixel(x, y, pixel);
+        out.writeFloat((float) pixel[0]);
+        out.writeFloat((float) pixel[1]);
+        out.writeFloat((float) pixel[2]);
+      }
+      task.update(height, y + 1);
+    }
+    writeFooter(width, height, 4);
+  }
 
-	private int ifdOffset(int width, int height, int bytesPerSample) {
-		return 8 + width * height * 3 * bytesPerSample; // Offset to first IFD from file start.
-	}
+  private int ifdOffset(int width, int height, int bytesPerSample) {
+    return 8 + width * height * 3 * bytesPerSample; // Offset to first IFD from file start.
+  }
 }

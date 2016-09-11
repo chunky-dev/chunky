@@ -19,12 +19,6 @@ the GPLv3 license. See the file license/LICENSE.txt for the full license.
 
 Chunky uses the following 3rd party libraries:
 
-* **JOCL by Marco Hutter.**
-  JOCL is covered by the MIT/X11 license.
-See the file license/JOCL.txt for the full license and copyright notice.
-* **MWC64X by David Thomas.**
-  MWC64X is covered by the Modified BSD License.
-See the file license/MWC64X.txt for the full license and copyright notice.
 * **Markdown by John Gruber.**
   Markdown is covered by the Modified BSD License.
 See the file license/Markdown.txt for the full license and copyright notice.

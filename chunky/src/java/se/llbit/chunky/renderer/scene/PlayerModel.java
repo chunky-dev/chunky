@@ -17,27 +17,25 @@
 package se.llbit.chunky.renderer.scene;
 
 public enum PlayerModel {
-	STEVE {
-		@Override
-		public String toString() {
-			return "Steve";
-		}
-	},
-	ALEX {
-		@Override
-		public String toString() {
-			return "Alex";
-		}
-	};
+  STEVE {
+    @Override public String toString() {
+      return "Steve";
+    }
+  },
+  ALEX {
+    @Override public String toString() {
+      return "Alex";
+    }
+  };
 
-	public static final PlayerModel DEFAULT = STEVE;
+  public static final PlayerModel DEFAULT = STEVE;
 
-	public static PlayerModel get(String name) {
-		for (PlayerModel mode : values()) {
-			if (mode.name().equals(name)) {
-				return mode;
-			}
-		}
-		return DEFAULT;
-	}
+  public static PlayerModel get(String name) {
+    for (PlayerModel mode : values()) {
+      if (mode.name().equals(name)) {
+        return mode;
+      }
+    }
+    return DEFAULT;
+  }
 }

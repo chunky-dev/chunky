@@ -17,7 +17,7 @@
 package se.llbit.log;
 
 public enum Level {
-	ERROR,
-	WARNING,
-	INFO
+  ERROR,
+  WARNING,
+  INFO
 }

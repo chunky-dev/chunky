@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package se.llbit.util;
+
+import se.llbit.log.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,8 +26,6 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import se.llbit.log.Log;
-
 /**
  * Utility class for exporting scenes to zip files.
  *
@@ -34,50 +33,46 @@ import se.llbit.log.Log;
  */
 public class ZipExport {
 
-	/**
-	 * Export a scene to a zip file.
-	 * @param archive zip file to write
-	 * @param sceneDir
-	 * @param sceneName zip prefix
-	 * @param extensions file extensions to include
-	 */
-	public static void zip(File archive, File sceneDir, String sceneName,
-			String[] extensions) {
-		try {
-			FileOutputStream fos = new FileOutputStream(archive);
-			ZipOutputStream zos = new ZipOutputStream(fos);
+  /**
+   * Export a scene to a zip file.
+   *
+   * @param archive    zip file to write
+   * @param sceneName  zip prefix
+   * @param extensions file extensions to include
+   */
+  public static void zip(File archive, File sceneDir, String sceneName, String[] extensions) {
+    try {
+      FileOutputStream fos = new FileOutputStream(archive);
+      ZipOutputStream zos = new ZipOutputStream(fos);
 
-			for (String extension : extensions) {
-				addToZipFile(zos, sceneDir, sceneName, sceneName + extension);
-			}
+      for (String extension : extensions) {
+        addToZipFile(zos, sceneDir, sceneName, sceneName + extension);
+      }
 
-			zos.close();
-			fos.close();
+      zos.close();
+      fos.close();
 
-		} catch (FileNotFoundException e) {
-			Log.error(e);
-		} catch (IOException e) {
-			Log.error(e);
-		}
+    } catch (FileNotFoundException e) {
+      Log.error(e);
+    } catch (IOException e) {
+      Log.error(e);
+    }
 
-	}
+  }
 
-	private static void addToZipFile(ZipOutputStream zos, File sceneDir,
-			String prefix, String fileName) throws FileNotFoundException,
-			IOException {
+  private static void addToZipFile(ZipOutputStream zos, File sceneDir, String prefix,
+      String fileName) throws IOException {
+    File file = new File(sceneDir, fileName);
+    FileInputStream fis = new FileInputStream(file);
+    ZipEntry zipEntry = new ZipEntry(prefix + "/" + fileName);
+    zos.putNextEntry(zipEntry);
 
-		File file = new File(sceneDir, fileName);
-		FileInputStream fis = new FileInputStream(file);
-		ZipEntry zipEntry = new ZipEntry(prefix + "/" + fileName);
-		zos.putNextEntry(zipEntry);
-
-		byte[] bytes = new byte[4096];
-		int length;
-		while ((length = fis.read(bytes)) >= 0) {
-			zos.write(bytes, 0, length);
-		}
-
-		zos.closeEntry();
-		fis.close();
-	}
+    byte[] bytes = new byte[4096];
+    int length;
+    while ((length = fis.read(bytes)) >= 0) {
+      zos.write(bytes, 0, length);
+    }
+    zos.closeEntry();
+    fis.close();
+  }
 }

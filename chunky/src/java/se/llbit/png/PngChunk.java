@@ -21,39 +21,41 @@ import java.io.IOException;
 
 /**
  * A PNG chunk
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public abstract class PngChunk {
 
-	/**
-	 * Write the chunk to the given output stream
-	 * @param out
-	 * @throws IOException
-	 */
-	public void writeChunk(DataOutputStream out) throws IOException {
-		out.writeInt(getChunkLength());
-		out.writeInt(getChunkType());
-		if (getChunkLength() > 0) {
-			writeChunkData(out);
-		}
-		out.writeInt(getChunkCRC());
-	}
+  /**
+   * Write the chunk to an output stream.
+   *
+   * @param out the stream to write the chunk to.
+   * @throws IOException
+   */
+  public void writeChunk(DataOutputStream out) throws IOException {
+    out.writeInt(getChunkLength());
+    out.writeInt(getChunkType());
+    if (getChunkLength() > 0) {
+      writeChunkData(out);
+    }
+    out.writeInt(getChunkCRC());
+  }
 
-	protected abstract void writeChunkData(DataOutputStream out) throws IOException;
+  protected abstract void writeChunkData(DataOutputStream out) throws IOException;
 
-	/**
-	 * @return The chunk length, in bytes
-	 */
-	public abstract int getChunkLength();
+  /**
+   * @return The chunk length, in bytes
+   */
+  public abstract int getChunkLength();
 
-	/**
-	 * @return The chunk type identifier
-	 */
-	public abstract int getChunkType();
+  /**
+   * @return The chunk type identifier
+   */
+  public abstract int getChunkType();
 
-	/**
-	 * @return The chunk CRC
-	 */
-	public abstract int getChunkCRC();
+  /**
+   * @return The chunk CRC
+   */
+  public abstract int getChunkCRC();
 
 }

@@ -17,28 +17,27 @@
 package se.llbit.util;
 
 public class OSDetector {
-	public enum OS {
-		WIN,
-		MAC,
-		LINUX,
-		BSD,
-		OTHER
-	}
+  public enum OS {
+    WIN,
+    MAC,
+    LINUX,
+    BSD,
+    OTHER
+  }
 
-	public static final OS getOS() {
-		String os = System.getProperty("os.name").toLowerCase();
-		if (os.contains("win")) {
-			return OS.WIN;
-		} else if (os.contains("mac")) {
-			return OS.MAC;
-		} else if (os.contains("linux")) {
-			return OS.LINUX;
-		} else if(os.contains("bsd")) {
-			return OS.BSD;
-		}
-		else {
-			return OS.OTHER;
-		}
-	}
+  public static final OS getOS() {
+    String os = System.getProperty("os.name").toLowerCase();
+    if (os.contains("win")) {
+      return OS.WIN;
+    } else if (os.contains("mac")) {
+      return OS.MAC;
+    } else if (os.contains("linux")) {
+      return OS.LINUX;
+    } else if (os.contains("bsd")) {
+      return OS.BSD;
+    } else {
+      return OS.OTHER;
+    }
+  }
 
 }

@@ -20,166 +20,196 @@ import se.llbit.math.QuickMath;
 
 /**
  * Abstract representation of a view over a map of chunks.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-@SuppressWarnings("javadoc")
 public class ChunkView {
+  /**
+   * Minimum block scale for the map view.
+   */
+  public static final int BLOCK_SCALE_MIN = 1;
 
-	public final double x;
-	public final double z;
+  /**
+   * Maximum block scale for the map view.
+   */
+  public static final int BLOCK_SCALE_MAX = 32 * 16;
 
-	// visible chunks
-	public final double x0;
-	public final double z0;
-	public final double x1;
-	public final double z1;
+  /**
+   * Default block scale for the map view.
+   */
+  public static final int DEFAULT_BLOCK_SCALE = 4 * 16;
 
-	// preloaded chunks
-	public final int px0;
-	public final int pz0;
-	public final int px1;
-	public final int pz1;
+  /**
+   * A zero-size chunk view useful as a default chunk view for an uninitialized map.
+   */
+  public static final ChunkView EMPTY = new ChunkView(0, 0, 0, 0, DEFAULT_BLOCK_SCALE,
+      Chunk.AUTO_RENDERER, World.SEA_LEVEL) {
+    @Override public boolean isChunkVisible(int x, int z) {
+      return false;
+    }
 
-	// preloaded regions
-	public final int prx0;
-	public final int prz0;
-	public final int prx1;
-	public final int prz1;
+    @Override public boolean isRegionVisible(int x, int z) {
+      return false;
+    }
+  };
 
-	public final int width;
-	public final int height;
-	public final int scale;
-	public final int chunkScale;
+  public final Chunk.Renderer renderer;
+
+  public final int layer;
+
+  // Center position.
+  public final double x;
+  public final double z;
+
+  // Visible chunks.
+  public final double x0;
+  public final double z0;
+  public final double x1;
+  public final double z1;
+
+  // Rendered chunks.
+  public final int cx0;
+  public final int cz0;
+  public final int cx1;
+  public final int cz1;
+
+  // Preloaded chunks.
+  public final int px0;
+  public final int pz0;
+  public final int px1;
+  public final int pz1;
+
+  // Rendered regions.
+  public final int prx0;
+  public final int prz0;
+  public final int prx1;
+  public final int prz1;
+
+  public final int width;
+  public final int height;
+  public final int scale;
+  public final int chunkScale;
 
 
-	public ChunkView() {
-		this(0, 0, 0, 0);
-	}
+  public ChunkView(double x, double z, int width, int height, Chunk.Renderer renderer, int layer) {
+    this(x, z, width, height, 16, renderer, layer);
+  }
 
-	public ChunkView(double x, double z, int width, int height) {
-		this(x, z, width, height, 16);
-	}
+  public ChunkView(ChunkView other) {
+    this(other.x, other.z, other.width, other.height, other.scale, other.renderer, other.layer);
+  }
 
-	public ChunkView(ChunkView other) {
-		this(other.x, other.z, other.width, other.height, other.scale);
-	}
+  public ChunkView(double x, double z, int width, int height, int scale, Chunk.Renderer renderer,
+      int layer) {
+    this.renderer = renderer;
+    this.layer = Math.max(0, Math.min(Chunk.Y_MAX - 1, layer));
+    this.scale = Math.max(BLOCK_SCALE_MIN, Math.min(BLOCK_SCALE_MAX, scale));
+    if (scale <= 12) {
+      chunkScale = 1;
+    } else if (scale <= 12 * 16) {
+      chunkScale = 16;
+    } else {
+      this.chunkScale = 16 * 16;
+    }
+    this.x = x;
+    this.z = z;
+    double cw = width / (2. * scale);
+    double ch = height / (2. * scale);
+    this.x0 = x - cw;
+    this.x1 = x + cw;
+    this.z0 = z - ch;
+    this.z1 = z + ch;
+    this.width = width;
+    this.height = height;
+    // Visible chunks [integer coordinates]:
+    cx0 = (int) QuickMath.floor(x0);
+    cx1 = (int) QuickMath.floor(x1);
+    cz0 = (int) QuickMath.floor(z0);
+    cz1 = (int) QuickMath.floor(z1);
+    if (scale >= 16) {
+      px0 = cx0 - 1;
+      px1 = cx1 + 1;
+      pz0 = cz0 - 1;
+      pz1 = cz1 + 1;
+      prx0 = px0 >> 5;
+      prx1 = px1 >> 5;
+      prz0 = pz0 >> 5;
+      prz1 = pz1 >> 5;
+    } else {
+      // Visible regions.
+      int irx0 = cx0 >> 5;
+      int irx1 = cx1 >> 5;
+      int irz0 = cz0 >> 5;
+      int irz1 = cz1 >> 5;
+      prx0 = irx0;
+      prx1 = irx1;
+      prz0 = irz0;
+      prz1 = irz1;
+      px0 = prx0 << 5;
+      px1 = (prx1 << 5) + 31;
+      pz0 = prz0 << 5;
+      pz1 = (prz1 << 5) + 31;
+    }
+  }
 
-	public ChunkView(double x, double z, int width, int height, int scale) {
-		this.scale = scale;
-		if (scale <= 12) {
-			chunkScale = 1;
-		} else if (scale <= 12*16) {
-			chunkScale = 16;
-		} else {
-			this.chunkScale = 16*16;
-		}
-		this.x = x;
-		this.z = z;
-		double cw = width / (2. * scale);
-		double ch = height / (2. * scale);
-		this.x0 = x - cw;
-		this.x1 = x + cw;
-		this.z0 = z - ch;
-		this.z1 = z + ch;
-		this.width = width;
-		this.height = height;
-		// visible chunks [integer coordinates]
-		int ix0 = (int) QuickMath.floor(x0);
-		int ix1 = (int) QuickMath.floor(x1);
-		int iz0 = (int) QuickMath.floor(z0);
-		int iz1 = (int) QuickMath.floor(z1);
-		if (scale >= 16) {
-			px0 = ix0-1;
-			px1 = ix1+1;
-			pz0 = iz0-1;
-			pz1 = iz1+1;
-			prx0 = px0>>5;
-			prx1 = px1>>5;
-			prz0 = pz0>>5;
-			prz1 = pz1>>5;
-		} else {
-			// visible regions
-			int irx0 = ix0>>5;
-			int irx1 = ix1>>5;
-			int irz0 = iz0>>5;
-			int irz1 = iz1>>5;
-			prx0 = irx0;
-			prx1 = irx1;
-			prz0 = irz0;
-			prz1 = irz1;
-			px0 = prx0<<5;
-			px1 = (prx1<<5)+31;
-			pz0 = prz0<<5;
-			pz1 = (prz1<<5)+31;
-		}
-	}
+  public boolean shouldPreload(Chunk chunk) {
+    if (chunk.isEmpty()) {
+      return false;
+    }
+    ChunkPosition pos = chunk.getPosition();
+    return isChunkVisible(pos.x, pos.z);
+  }
 
-	public boolean isVisible(Chunk chunk) {
-		ChunkPosition pos = chunk.getPosition();
-		return isChunkVisible(pos.x, pos.z);
-	}
+  @Override public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj instanceof ChunkView) {
+      ChunkView other = (ChunkView) obj;
+      if (chunkScale == other.chunkScale
+          && px0 == other.px0
+          && px1 == other.px1
+          && pz0 == other.pz0
+          && pz1 == other.pz1
+          && layer == other.layer
+          && renderer == other.renderer) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == this) {
-			return true;
-		}
-		if (obj instanceof ChunkView) {
-			ChunkView other = (ChunkView) obj;
-			if (chunkScale == other.chunkScale
-					&& px0 == other.px0
-					&& px1 == other.px1
-					&& pz0 == other.pz0
-					&& pz1 == other.pz1)
-				return true;
-		}
+  public boolean isVisible(ChunkPosition pos) {
+    return shouldPreload(pos);
+  }
 
-		return false;
-	}
 
-	public boolean isChunkVisible(ChunkPosition chunk) {
-		return isChunkVisible(chunk.x, chunk.z);
-	}
+  /**
+   * Determines if a chunk or region is visible based on the view scale.
+   * If the scale is greater than or equal to 16 then the test is for chunk visibility,
+   * otherwise region visibility is checked.
+   */
+  public boolean shouldPreload(ChunkPosition pos) {
+    return chunkScale >= 16 ? isChunkVisible(pos.x, pos.z) : isRegionVisible(pos.x, pos.z);
+  }
 
-	public boolean isChunkVisible(int x, int z) {
-		return px0 <= x && px1 >= x &&
-				pz0 <= z && pz1 >= z;
-	}
+  public boolean isChunkVisible(ChunkPosition chunk) {
+    return isChunkVisible(chunk.x, chunk.z);
+  }
 
-	public boolean isVisible(Region region) {
-		return isRegionVisible(region.getPosition());
-	}
+  public boolean isChunkVisible(int x, int z) {
+    return px0 <= x && px1 >= x && pz0 <= z && pz1 >= z;
+  }
 
-	public boolean isRegionVisible(ChunkPosition pos) {
-		return isRegionVisible(pos.x, pos.z);
-	}
+  public boolean isRegionVisible(ChunkPosition pos) {
+    return isRegionVisible(pos.x, pos.z);
+  }
 
-	public boolean isRegionVisible(int x, int z) {
-		return prx0 <= x && prx1 >= x &&
-				prz0 <= z && prz1 >= z;
-	}
+  public boolean isRegionVisible(int x, int z) {
+    return prx0 <= x && prx1 >= x && prz0 <= z && prz1 >= z;
+  }
 
-	/**
-	 * @param newView
-	 * @param x
-	 * @param z
-	 * @return {@code true} if all chunks in the region (x,z) in newView are
-	 * visible in this view
-	 */
-	public boolean isRegionFullyVisible(ChunkView newView, int x, int z) {
-		int x0 = x<<5;
-		int x1 = x0 + 31;
-		int z0 = z<<5;
-		int z1 = z0 + 31;
-		x0 = Math.max(newView.px0, x0);
-		x1 = Math.min(newView.px1, x1);
-		z0 = Math.max(newView.pz0, z0);
-		z1 = Math.min(newView.pz1, z1);
-		return isChunkVisible(x0, z0) && isChunkVisible(x1, z1);
-	}
-
-	@Override
-	public String toString() {
-		return String.format("[(%d, %d), (%d, %d)]", px0, pz0, px1, pz1);
-	}
+  @Override public String toString() {
+    return String.format("[(%d, %d), (%d, %d)]", px0, pz0, px1, pz1);
+  }
 }

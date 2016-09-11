@@ -16,55 +16,52 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.awt.image.BufferedImage;
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.Texture;
+import se.llbit.resources.ImageLoader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
 
-import javax.imageio.ImageIO;
-
-import se.llbit.chunky.resources.Texture;
-
 /**
  * Non-animated texture loader.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class SimpleTexture extends TextureRef {
 
-	private final String file;
-	protected Texture texture;
+  private final String file;
+  protected Texture texture;
 
-	public SimpleTexture(String file, Texture texture) {
-		this.file = file;
-		this.texture = texture;
-	}
+  public SimpleTexture(String file, Texture texture) {
+    this.file = file;
+    this.texture = texture;
+  }
 
-	@Override
-	protected boolean load(InputStream imageStream) throws IOException {
-		BufferedImage image = ImageIO.read(imageStream);
+  @Override protected boolean load(InputStream imageStream) throws IOException {
+    BitmapImage image = ImageLoader.read(imageStream);
 
-		if (image.getHeight() > image.getWidth()) {
-			// Assuming this is an animated texture.
-			// Just grab the first frame.
-			int frameW = image.getWidth();
+    if (image.height > image.width) {
+      // Assuming this is an animated texture.
+      // Just grab the first frame.
+      int frameW = image.width;
 
-			BufferedImage frame0 = new BufferedImage(frameW, frameW,
-						BufferedImage.TYPE_INT_ARGB);
-			for (int y = 0; y < frameW; ++y) {
-				for (int x = 0; x < frameW; ++x) {
-					frame0.setRGB(x, y, image.getRGB(x, y));
-				}
-			}
-			image = frame0;
-		}
+      BitmapImage frame0 = new BitmapImage(frameW, frameW);
+      for (int y = 0; y < frameW; ++y) {
+        for (int x = 0; x < frameW; ++x) {
+          frame0.setPixel(x, y, image.getPixel(x, y));
+        }
+      }
+      texture.setTexture(frame0);
+    } else {
+      texture.setTexture(image);
+    }
+    return true;
+  }
 
-		texture.setTexture(image);
-		return true;
-	}
-
-	@Override
-	public boolean load(ZipFile texturePack) {
-		return load(file, texturePack);
-	}
+  @Override public boolean load(ZipFile texturePack) {
+    return load(file, texturePack);
+  }
 
 }

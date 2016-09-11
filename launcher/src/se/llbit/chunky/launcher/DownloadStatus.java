@@ -17,9 +17,9 @@
 package se.llbit.chunky.launcher;
 
 public enum DownloadStatus {
-	SUCCESS,
-	MALFORMED_URL,
-	FILE_NOT_FOUND,
-	DOWNLOAD_FAILED
+  SUCCESS,
+  MALFORMED_URL,
+  FILE_NOT_FOUND,
+  DOWNLOAD_FAILED
 
 }

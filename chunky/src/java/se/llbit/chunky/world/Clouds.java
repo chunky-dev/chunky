@@ -18,49 +18,48 @@ package se.llbit.chunky.world;
 
 /**
  * Stores the cloud bits from the cloud texture
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Clouds {
-	private static long[][] clouds = new long[32][32];
+  private static long[][] clouds = new long[32][32];
 
-	static {
-		// zero the cloud data
-		for (int i = 0; i < 32; ++i) {
-			for (int j = 0; j < 32; ++j) {
-				clouds[i][j] = 0L;
-			}
-		}
-	}
+  static {
+    // zero the cloud data
+    for (int i = 0; i < 32; ++i) {
+      for (int j = 0; j < 32; ++j) {
+        clouds[i][j] = 0L;
+      }
+    }
+  }
 
-	/**
-	 * Get cloud bit at position (x, y)
-	 * @param x
-	 * @param y
-	 * @return 0 = no cloud, 1 = cloud
-	 */
-	public static int getCloud(int x, int y) {
-		x = ((x % 256) + 256) % 256;// ensure >= 0 and < 256
-		y = ((y % 256) + 256) % 256;// ensure >= 0 and < 256
-		int tilex = x / 8;
-		int tiley = y / 8;
-		int subx = x & 7;
-		int suby = y & 7;
-		return (int) ((clouds[tilex][tiley] >>> (suby*8 + subx)) & 1);
-	}
+  /**
+   * Get cloud bit at position (x, y)
+   *
+   * @return 0 = no cloud, 1 = cloud
+   */
+  public static int getCloud(int x, int y) {
+    x = ((x % 256) + 256) % 256; // Compute modulo 256 >=0.
+    y = ((y % 256) + 256) % 256; // Compute modulo 256 >=0.
+    int tilex = x / 8;
+    int tiley = y / 8;
+    int subx = x & 7;
+    int suby = y & 7;
+    return (int) ((clouds[tilex][tiley] >>> (suby * 8 + subx)) & 1);
+  }
 
-	/**
-	 * Set cloud bit at position (x, y)
-	 * @param x
-	 * @param y
-	 * @param v 0 = no cloud, 1 = cloud
-	 */
-	public static void setCloud(int x, int y, int v) {
-		x = ((x % 256) + 256) % 256;// ensure >= 0 and < 256
-		y = ((y % 256) + 256) % 256;// ensure >= 0 and < 256
-		int tilex = x / 8;
-		int tiley = y / 8;
-		int subx = x & 7;
-		int suby = y & 7;
-		clouds[tilex][tiley] |= ((long) (v & 1)) << (suby*8 + subx);
-	}
+  /**
+   * Set cloud bit at position (x, y)
+   *
+   * @param v 0 = no cloud, 1 = cloud
+   */
+  public static void setCloud(int x, int y, int v) {
+    x = ((x % 256) + 256) % 256; // Compute modulo 256 >=0.
+    y = ((y % 256) + 256) % 256; // Compute modulo 256 >=0.
+    int tilex = x / 8;
+    int tiley = y / 8;
+    int subx = x & 7;
+    int suby = y & 7;
+    clouds[tilex][tiley] |= ((long) (v & 1)) << (suby * 8 + subx);
+  }
 }

@@ -17,38 +17,35 @@
 package se.llbit.chunky.renderer;
 
 /**
- * Postprocessing modes
+ * Postprocessing modes.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-@SuppressWarnings("javadoc")
 public enum Postprocess {
-	NONE {
-		@Override
-		public String toString() {
-			return "None";
-		}
-	},
-	GAMMA {
-		@Override
-		public String toString() {
-			return "Gamma correction";
-		}
-	},
-	TONEMAP1 {
-		@Override
-		public String toString() {
-			return "Tonemap operator 1";
-		}
-	};
+  NONE {
+    @Override public String toString() {
+      return "None";
+    }
+  },
+  GAMMA {
+    @Override public String toString() {
+      return "Gamma correction";
+    }
+  },
+  TONEMAP1 {
+    @Override public String toString() {
+      return "Tonemap operator 1";
+    }
+  };
 
-	public static final Postprocess DEFAULT = GAMMA;
+  public static final Postprocess DEFAULT = GAMMA;
 
-	public static Postprocess get(String name) {
-		for (Postprocess mode : values()) {
-			if (mode.name().equals(name)) {
-				return mode;
-			}
-		}
-		return DEFAULT;
-	}
+  public static Postprocess get(String name) {
+    for (Postprocess mode : values()) {
+      if (mode.name().equals(name)) {
+        return mode;
+      }
+    }
+    return DEFAULT;
+  }
 }

@@ -18,44 +18,38 @@ package se.llbit.chunky.renderer.projection;
 
 import java.util.Random;
 
-import se.llbit.math.Vector3d;
+import se.llbit.math.Vector3;
 
 /**
  * Casts parallel rays from different origin points on a plane
  */
 public class ParallelProjector implements Projector {
-	protected final double worldWidth;
-	protected final double fov;
+  protected final double worldWidth;
+  protected final double fov;
 
-	public ParallelProjector(double worldWidth, double fov) {
-		this.worldWidth = worldWidth;
-		this.fov = fov;
-	}
+  public ParallelProjector(double worldWidth, double fov) {
+    this.worldWidth = worldWidth;
+    this.fov = fov;
+  }
 
-	@Override
-	public void apply(double x, double y, Random random, Vector3d o,
-			Vector3d d) {
-		apply(x, y, o, d);
-	}
+  @Override public void apply(double x, double y, Random random, Vector3 o, Vector3 d) {
+    apply(x, y, o, d);
+  }
 
-	@Override
-	public void apply(double x, double y, Vector3d o, Vector3d d) {
-		o.set(fov * x, fov * y, 0);
-		d.set(0, 0, 1);
-	}
+  @Override public void apply(double x, double y, Vector3 o, Vector3 d) {
+    o.set(fov * x, fov * y, 0);
+    d.set(0, 0, 1);
+  }
 
-	@Override
-	public double getMinRecommendedFoV() {
-		return 0.01;
-	}
+  @Override public double getMinRecommendedFoV() {
+    return 0.01;
+  }
 
-	@Override
-	public double getMaxRecommendedFoV() {
-		return worldWidth;
-	}
+  @Override public double getMaxRecommendedFoV() {
+    return worldWidth;
+  }
 
-	@Override
-	public double getDefaultFoV() {
-		return worldWidth / 2;
-	}
+  @Override public double getDefaultFoV() {
+    return worldWidth / 2;
+  }
 }

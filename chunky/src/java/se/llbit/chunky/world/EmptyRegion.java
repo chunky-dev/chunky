@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -18,35 +18,32 @@ package se.llbit.chunky.world;
 
 /**
  * An empty or non-existent region.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class EmptyRegion extends Region {
 
-	/**
-	 * Singleton instance
-	 */
-	public static final EmptyRegion instance =
-			new EmptyRegion();
+  /**
+   * Singleton instance.
+   */
+  public static final EmptyRegion instance = new EmptyRegion();
 
-	/**
-	 * Create the empty region.
-	 */
-	private EmptyRegion() {
-		super(ChunkPosition.get(0, 0), EmptyWorld.instance);
-	}
+  /**
+   * Create the empty region.
+   */
+  private EmptyRegion() {
+    super(ChunkPosition.get(0, 0), EmptyWorld.instance);
+  }
 
-	@Override
-	public Chunk getChunk(ChunkPosition pos) {
-		return EmptyRegionChunk.INSTANCE;
-	}
+  @Override public Chunk getChunk(ChunkPosition pos) {
+    return EmptyRegionChunk.INSTANCE;
+  }
 
-	@Override
-	public boolean isEmpty() {
-		return true;
-	}
+  @Override public boolean isEmpty() {
+    return true;
+  }
 
-	@Override
-	public boolean hasChanged() {
-		return false;
-	}
+  @Override public boolean hasChanged() {
+    return false;
+  }
 }

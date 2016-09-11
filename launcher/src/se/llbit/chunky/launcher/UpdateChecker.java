@@ -29,90 +29,93 @@ import se.llbit.json.JsonParser.SyntaxError;
 
 /**
  * Check for update and run update dialog (or just update in headless mode)
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class UpdateChecker extends Thread {
-	private final LauncherSettings settings;
-	private final UpdateListener listener;
+  private final LauncherSettings settings;
+  private final UpdateListener listener;
 
-	public UpdateChecker(LauncherSettings settings, UpdateListener listener) {
-		this.settings = settings;
-		this.listener = listener;
-	}
+  public UpdateChecker(LauncherSettings settings, UpdateListener listener) {
+    this.settings = settings;
+    this.listener = listener;
+  }
 
-	@Override public void run() {
-		try {
-			if (!tryUpdate()) {
-				listener.noUpdateAvailable();
-			}
-		} catch (MalformedURLException e1) {
-			System.err.println("Malformed version info url");
-			listener.updateError("Failed to fetch latest version info online.");
-		} catch (IOException e1) {
-			System.err.println("Failed to fetch version info " + e1.getMessage());
-			listener.updateError("Failed to fetch latest version info online. The server may be down right now.");
-		} catch (SyntaxError e1) {
-			System.err.println("Version info JSON error " + e1.getMessage());
-			listener.updateError("The downloaded version info was corrupt. Can not update at this time.");
-		} catch (Throwable e1) {
-			System.err.println("Uncaught exception: " + e1.getMessage());
-			listener.updateError("Can not update at this time.");
-		}
-	}
+  @Override public void run() {
+    try {
+      if (!tryUpdate()) {
+        listener.noUpdateAvailable();
+      }
+    } catch (MalformedURLException e1) {
+      System.err.println("Malformed version info url");
+      listener.updateError("Failed to fetch latest version info online.");
+    } catch (IOException e1) {
+      System.err.println("Failed to fetch version info " + e1.getMessage());
+      listener.updateError(
+          "Failed to fetch latest version info online. The server may be down right now.");
+    } catch (SyntaxError e1) {
+      System.err.println("Version info JSON error " + e1.getMessage());
+      listener.updateError("The downloaded version info was corrupt. Can not update at this time.");
+    } catch (Throwable e1) {
+      System.err.println("Uncaught exception: " + e1.getMessage());
+      listener.updateError("Can not update at this time.");
+    }
+  }
 
-	private boolean tryUpdate() throws IOException, SyntaxError {
-		List<VersionInfo> candidates = new LinkedList<VersionInfo>();
+  private boolean tryUpdate() throws IOException, SyntaxError {
+    List<VersionInfo> candidates = new LinkedList<VersionInfo>();
 
-		candidates.add(getVersion("http://chunkyupdate.llbit.se/latest.json"));
+    candidates.add(getVersion("http://chunkyupdate.llbit.se/latest.json"));
 
-		if (settings.downloadSnapshots) {
-			candidates.add(getVersion("http://chunkyupdate.llbit.se/snapshot.json"));
-		}
+    if (settings.downloadSnapshots) {
+      candidates.add(getVersion("http://chunkyupdate.llbit.se/snapshot.json"));
+    }
 
-		// filter out corrupt versions
-		Iterator<VersionInfo> iter = candidates.iterator();
-		while (iter.hasNext()) {
-			if (!iter.next().isValid()) {
-				iter.remove();
-			}
-		}
+    // filter out corrupt versions
+    Iterator<VersionInfo> iter = candidates.iterator();
+    while (iter.hasNext()) {
+      if (!iter.next().isValid()) {
+        iter.remove();
+      }
+    }
 
-		if (candidates.isEmpty()) {
-			listener.updateError("The downloaded version info was corrupt. Can not update at this moment.");
-			return false;
-		} else {
-			// find latest candidate
-			VersionInfo latest = candidates.get(0);
-			for (VersionInfo candidate: candidates) {
-				if (candidate.compareTo(latest) < 0) {
-					latest = candidate;
-				}
-			}
+    if (candidates.isEmpty()) {
+      listener
+          .updateError("The downloaded version info was corrupt. Can not update at this moment.");
+      return false;
+    } else {
+      // find latest candidate
+      VersionInfo latest = candidates.get(0);
+      for (VersionInfo candidate : candidates) {
+        if (candidate.compareTo(latest) < 0) {
+          latest = candidate;
+        }
+      }
 
-			// check if more recent version than candidate is already installed
-			List<VersionInfo> versions = ChunkyDeployer.availableVersions();
-			iter = versions.iterator();
-			while (iter.hasNext()) {
-				VersionInfo available = iter.next();
-				if (available.compareTo(latest) <= 0 &&
-					ChunkyDeployer.checkVersionIntegrity(available.name)) {
-					// more recent version already installed and not corrupt
-					return false;
-				}
-			}
+      // check if more recent version than candidate is already installed
+      List<VersionInfo> versions = ChunkyDeployer.availableVersions();
+      iter = versions.iterator();
+      while (iter.hasNext()) {
+        VersionInfo available = iter.next();
+        if (available.compareTo(latest) <= 0 && ChunkyDeployer
+            .checkVersionIntegrity(available.name)) {
+          // more recent version already installed and not corrupt
+          return false;
+        }
+      }
 
-			// install the candidate!
-			listener.updateAvailable(latest);
-			return true;
-		}
-	}
+      // install the candidate!
+      listener.updateAvailable(latest);
+      return true;
+    }
+  }
 
-	private VersionInfo getVersion(String url) throws IOException, SyntaxError {
-		URL latestJson = new URL(url);
-		InputStream in = latestJson.openStream();
-		JsonParser parser = new JsonParser(in);
-		VersionInfo version = new VersionInfo(parser.parse().object());
-		in.close();
-		return version;
-	}
+  private VersionInfo getVersion(String url) throws IOException, SyntaxError {
+    URL latestJson = new URL(url);
+    InputStream in = latestJson.openStream();
+    JsonParser parser = new JsonParser(in);
+    VersionInfo version = new VersionInfo(parser.parse().object());
+    in.close();
+    return version;
+  }
 }

@@ -16,42 +16,40 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.awt.image.BufferedImage;
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.Texture;
+import se.llbit.resources.ImageLoader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
 
-import javax.imageio.ImageIO;
-
-import se.llbit.chunky.resources.Texture;
-
 /**
  * Animated texture loader.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class AnimatedTextureLoader extends TextureRef {
 
-	private final String file;
-	protected Texture texture;
+  private final String file;
+  protected Texture texture;
 
-	public AnimatedTextureLoader(String file, Texture texture) {
-		this.file = file;
-		this.texture = texture;
-	}
+  public AnimatedTextureLoader(String file, Texture texture) {
+    this.file = file;
+    this.texture = texture;
+  }
 
-	@Override
-	protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
-		BufferedImage image = ImageIO.read(imageStream);
-		if (image.getHeight() < image.getWidth()) {
-			throw new TextureFormatError("Block texture should have height >= width.");
-		}
-		texture.setTexture(image);
-		return true;
-	}
+  @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
+    BitmapImage image = ImageLoader.read(imageStream);
+    if (image.height < image.width) {
+      throw new TextureFormatError("Block texture should have height >= width.");
+    }
+    texture.setTexture(image);
+    return true;
+  }
 
-	@Override
-	public boolean load(ZipFile texturePack) {
-		return load(file, texturePack);
-	}
+  @Override public boolean load(ZipFile texturePack) {
+    return load(file, texturePack);
+  }
 
 }

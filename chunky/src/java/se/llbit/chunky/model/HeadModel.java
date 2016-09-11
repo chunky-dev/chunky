@@ -19,61 +19,66 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
 /**
  * A head block.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class HeadModel {
-	private static final Quad[] quads = {
-		// front
-		new Quad(new Vector3d(12/16., 4/16., 4/16.), new Vector3d(4/16., 4/16., 4/16.),
-				new Vector3d(12/16., 12/16., 4/16.), new Vector4d(12/16., 4/16., 4/16., 12/16.)),
-		// back
-		new Quad(new Vector3d(4/16., 4/16., 12/16.), new Vector3d(12/16., 4/16., 12/16.),
-				new Vector3d(4/16., 12/16., 12/16.), new Vector4d(4/16., 12/16., 4/16., 12/16.)),
+  private static final Quad[] quads = {
+      // front
+      new Quad(new Vector3(12 / 16., 4 / 16., 4 / 16.), new Vector3(4 / 16., 4 / 16., 4 / 16.),
+          new Vector3(12 / 16., 12 / 16., 4 / 16.),
+          new Vector4(12 / 16., 4 / 16., 4 / 16., 12 / 16.)),
+      // back
+      new Quad(new Vector3(4 / 16., 4 / 16., 12 / 16.), new Vector3(12 / 16., 4 / 16., 12 / 16.),
+          new Vector3(4 / 16., 12 / 16., 12 / 16.),
+          new Vector4(4 / 16., 12 / 16., 4 / 16., 12 / 16.)),
 
-		// right
-		new Quad(new Vector3d(4/16., 4/16., 4/16.), new Vector3d(4/16., 4/16., 12/16.),
-				new Vector3d(4/16., 12/16., 4/16.), new Vector4d(4/16., 12/16., 4/16., 12/16.)),
+      // right
+      new Quad(new Vector3(4 / 16., 4 / 16., 4 / 16.), new Vector3(4 / 16., 4 / 16., 12 / 16.),
+          new Vector3(4 / 16., 12 / 16., 4 / 16.),
+          new Vector4(4 / 16., 12 / 16., 4 / 16., 12 / 16.)),
 
-		// left
-		new Quad(new Vector3d(12/16., 4/16., 12/16.), new Vector3d(12/16., 4/16., 4/16.),
-				new Vector3d(12/16., 12/16., 12/16.), new Vector4d(12/16., 4/16., 4/16., 12/16.)),
+      // left
+      new Quad(new Vector3(12 / 16., 4 / 16., 12 / 16.), new Vector3(12 / 16., 4 / 16., 4 / 16.),
+          new Vector3(12 / 16., 12 / 16., 12 / 16.),
+          new Vector4(12 / 16., 4 / 16., 4 / 16., 12 / 16.)),
 
-		// top
-		new Quad(new Vector3d(12/16., 12/16., 4/16.), new Vector3d(4/16., 12/16., 4/16.),
-				new Vector3d(12/16., 12/16., 12/16.), new Vector4d(12/16., 4/16., 4/16., 12/16.)),
+      // top
+      new Quad(new Vector3(12 / 16., 12 / 16., 4 / 16.), new Vector3(4 / 16., 12 / 16., 4 / 16.),
+          new Vector3(12 / 16., 12 / 16., 12 / 16.),
+          new Vector4(12 / 16., 4 / 16., 4 / 16., 12 / 16.)),
 
-		// bottom
-		new Quad(new Vector3d(4/16., 4/16., 4/16.), new Vector3d(1, 4/16., 4/16.),
-				new Vector3d(4/16., 4/16., 1), new Vector4d(4/16., 1, 4/16., 1)),
-	};
+      // bottom
+      new Quad(new Vector3(4 / 16., 4 / 16., 4 / 16.), new Vector3(1, 4 / 16., 4 / 16.),
+          new Vector3(4 / 16., 4 / 16., 1), new Vector4(4 / 16., 1, 4 / 16., 1)),};
 
-	/**
-	 * Find intersection between ray and block
-	 * @param ray
-	 * @param texture Block texture
-	 * @return <code>true</code> if the ray intersected the block
-	 */
-	public static boolean intersect(Ray ray, Texture texture) {
-		boolean hit = false;
-		ray.t = Double.POSITIVE_INFINITY;
-		for (Quad quad : quads) {
-			if (quad.intersect(ray)) {
-				Texture.dirt.getColor(ray);
-				ray.n.set(quad.n);
-				ray.t = ray.tNext;
-				hit = true;
-			}
-		}
-		if (hit) {
-			ray.color.w = 1;
-			ray.distance += ray.t;
-			ray.o.scaleAdd(ray.t, ray.d);
-		}
-		return hit;
-	}
+  /**
+   * Find intersection between ray and block.
+   *
+   * @param texture Block texture
+   * @return <code>true</code> if the ray intersected the block
+   */
+  public static boolean intersect(Ray ray, Texture texture) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    for (Quad quad : quads) {
+      if (quad.intersect(ray)) {
+        Texture.dirt.getColor(ray);
+        ray.n.set(quad.n);
+        ray.t = ray.tNext;
+        hit = true;
+      }
+    }
+    if (hit) {
+      ray.color.w = 1;
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
 }

@@ -21,8 +21,8 @@ package org.jastadd.util;
  */
 public interface PrettyPrintable {
 
-	/**
-	 * @param prettyPrinter
-	 */
-	void prettyPrint(PrettyPrinter prettyPrinter);
+  /**
+   * @param prettyPrinter
+   */
+  void prettyPrint(PrettyPrinter prettyPrinter);
 }

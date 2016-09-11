@@ -16,27 +16,31 @@
  */
 package se.llbit.chunky.main;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Utility class for version numbering.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Version {
-	private static ResourceBundle resources;
-	static {
-		try {
-			resources = ResourceBundle.getBundle("Version");
-		} catch (MissingResourceException e) {
-			throw new Error("Could not open version resource bundle!");
-		}
-	}
+  private static Properties properties;
 
-	/**
-	 * @return Version string
-	 */
-	public static String getVersion() {
-		return resources.getString("version");
-	}
+  static {
+    properties = new Properties();
+    try {
+      properties.load(Version.class.getClassLoader()
+          .getResourceAsStream("se/llbit/chunky/main/Version.properties"));
+    } catch (IOException e) {
+      throw new Error(e);
+    }
+  }
+
+  /**
+   * @return Version string
+   */
+  public static String getVersion() {
+    return properties.getProperty("version", "?-snapshot");
+  }
 }

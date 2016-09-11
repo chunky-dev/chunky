@@ -27,31 +27,31 @@ import se.llbit.math.Ray;
  */
 public class AnimatedTexture extends Texture {
 
-	protected int numFrames = 1;
-	protected int frameHeight = 0;
+  protected int numFrames = 1;
+  protected int frameHeight = 0;
 
-	public AnimatedTexture(String resourceName) {
-		super(resourceName);
-		updateNumFrames();
-	}
+  public AnimatedTexture(String resourceName) {
+    super(resourceName);
+    updateNumFrames();
+  }
 
-	/** Get color for animation frame. */
-	public float[] getColor(double u, double v, int frame) {
-		int i = frame % numFrames;
-		return getColor(
-				(int) (u * width - Ray.EPSILON),
-				(int) ((1-v) * frameHeight - Ray.EPSILON + i * frameHeight));
-	}
+  /**
+   * Get color for animation frame.
+   */
+  public float[] getColor(double u, double v, int frame) {
+    int i = frame % numFrames;
+    return getColor((int) (u * width - Ray.EPSILON),
+        (int) ((1 - v) * frameHeight - Ray.EPSILON + i * frameHeight));
+  }
 
-	@Override
-	public void setTexture(BufferedImage newImage) {
-		super.setTexture(newImage);
-		updateNumFrames();
-	}
+  @Override public void setTexture(BitmapImage newImage) {
+    super.setTexture(newImage);
+    updateNumFrames();
+  }
 
-	private void updateNumFrames() {
-		frameHeight = Math.min(height, width);
-		numFrames = (int) (frameHeight / (float) width);
-		numFrames = Math.max(1, numFrames);
-	}
+  private void updateNumFrames() {
+    frameHeight = Math.min(height, width);
+    numFrames = (int) (frameHeight / (float) width);
+    numFrames = Math.max(1, numFrames);
+  }
 }

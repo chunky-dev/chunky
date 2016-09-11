@@ -17,15 +17,17 @@
 package se.llbit.util;
 
 public abstract class StringUtil {
-	/** Join the string arguments using a separator string.  */
-	public static String join(String separator, String... strings) {
-		StringBuilder buf = new StringBuilder();
-		for (int i = 0; i < strings.length; ++i) {
-			if (i > 0) {
-				buf.append(separator);
-			}
-			buf.append(strings[i]);
-		}
-		return buf.toString();
-	}
+  /**
+   * Join the string arguments using a separator string.
+   */
+  public static String join(String separator, String... strings) {
+    StringBuilder buf = new StringBuilder();
+    for (int i = 0; i < strings.length; ++i) {
+      if (i > 0) {
+        buf.append(separator);
+      }
+      buf.append(strings[i]);
+    }
+    return buf.toString();
+  }
 }

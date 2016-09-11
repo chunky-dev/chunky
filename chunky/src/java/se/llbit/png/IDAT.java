@@ -16,132 +16,16 @@
  */
 package se.llbit.png;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.zip.DeflaterOutputStream;
-
 /**
- * A PNG IDAT chunk
+ * PNG IDAT chunk constants.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class IDAT extends PngChunk {
+public interface IDAT {
 
-	/**
-	 * Output stream
-	 */
-	public class IDATOutputStream extends OutputStream {
+  /** PNG chunk type ID. */
+  int CHUNK_TYPE = 0x49444154;
 
-		ByteArrayOutputStream bos;
-		DeflaterOutputStream out;
-
-		/**
-		 * @throws IOException
-		 */
-		public IDATOutputStream() throws IOException {
-			bos = new ByteArrayOutputStream();
-			out = new DeflaterOutputStream(bos);
-		}
-
-		/**
-		 * Flush the written data
-		 */
-		public void finishChunk() {
-		    compressedData = bos.toByteArray();
-		}
-
-		@Override
-		public void close() throws IOException {
-		    out.finish();
-		    compressedData = bos.toByteArray();
-		    out.close();
-		}
-
-		@Override
-		public void flush() throws IOException {
-			out.flush();
-		}
-
-		@Override
-		public void write(byte[] b, int off, int len) throws IOException {
-			out.write(b, off, len);
-		}
-
-		@Override
-		public void write(byte[] b) throws IOException {
-			out.write(b);
-		}
-
-		@Override
-		public void write(int b) throws IOException {
-			out.write(b);
-		}
-
-		/**
-		 * Reset the data stream
-		 * @throws IOException
-		 */
-		public void reset() throws IOException {
-			bos.reset();
-		}
-
-	}
-
-	/**
-	 * PNG chunk type ID
-	 */
-	public static final int CHUNK_TYPE = 0x49444154;
-
-	/**
-	 * Filter type
-	 */
-	public static final int FILTER_TYPE_NONE = 0;// the filter type for no filter
-
-	private int crc;
-	private byte[] compressedData;
-	private IDATOutputStream idatOut;
-
-	/**
-	 * @return The output stream of this chunk
-	 * @throws IOException
-	 */
-	public IDATOutputStream getIDATOutputStream() throws IOException {
-		if (idatOut == null)
-			idatOut = new IDATOutputStream();
-		else
-			idatOut.reset();
-		return idatOut;
-	}
-
-	@Override
-	public int getChunkType() {
-		return CHUNK_TYPE;
-	}
-
-	@Override
-	protected void writeChunkData(DataOutputStream out) throws IOException {
-		CrcOutputStream crcOutputStream = new CrcOutputStream();
-		DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
-
-		crcOut.writeInt(CHUNK_TYPE);
-
-		crcOut.write(compressedData);
-		out.write(compressedData);
-
-		crcOut.close();
-		crc = crcOutputStream.getCRC();
-	}
-
-	@Override
-	public int getChunkLength() {
-		return compressedData.length;
-	}
-
-	@Override
-	public int getChunkCRC() {
-		return crc;
-	}
-
-
+  /** The filter type for no filter. */
+  int FILTER_TYPE_NONE = 0;
 }

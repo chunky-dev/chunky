@@ -22,134 +22,131 @@ import se.llbit.math.UVTriangle;
 
 /**
  * Utility methods for quads and triangles.
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class Model {
-	/**
-	 * @param src source quads
-	 * @return Quads rotated minus 90 degrees around the X axis
-	 */
-	public static final Quad[] rotateNegX(Quad[] src) {
-		Quad[] rot = new Quad[src.length];
-		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].transform(Transform.NONE.rotateNegX());
-		}
-		return rot;
-	}
+  /**
+   * @param src source quads
+   * @return Quads rotated minus 90 degrees around the X axis
+   */
+  public static Quad[] rotateNegX(Quad[] src) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].transform(Transform.NONE.rotateNegX());
+    }
+    return rot;
+  }
 
-	/**
-	 * @param src source quads
-	 * @return Quads rotated 90 degrees around the X axis
-	 */
-	public static final Quad[] rotateX(Quad[] src) {
-		Quad[] rot = new Quad[src.length];
-		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].transform(Transform.NONE.rotateX());
-		}
-		return rot;
-	}
+  /**
+   * @param src source quads
+   * @return Quads rotated 90 degrees around the X axis
+   */
+  public static Quad[] rotateX(Quad[] src) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].transform(Transform.NONE.rotateX());
+    }
+    return rot;
+  }
 
-	/**
-	 * @param src source quads
-	 * @param angle
-	 * @return Quads rotated about the X axis by some angle
-	 */
-	public static final Quad[] rotateX(Quad[] src, double angle) {
-		Quad[] rot = new Quad[src.length];
-		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].transform(Transform.NONE.rotateX(angle));
-		}
-		return rot;
-	}
+  /**
+   * @param src   source quads
+   * @return Quads rotated about the X axis by some angle
+   */
+  public static Quad[] rotateX(Quad[] src, double angle) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].transform(Transform.NONE.rotateX(angle));
+    }
+    return rot;
+  }
 
-	/**
-	 * @param src source quads
-	 * @return Quads rotated 90 degrees around the Y axis
-	 */
-	public static final Quad[] rotateY(Quad[] src) {
-		Quad[] rot = new Quad[src.length];
-		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].transform(Transform.NONE.rotateY());
-		}
-		return rot;
-	}
+  /**
+   * @param src source quads
+   * @return Quads rotated 90 degrees around the Y axis
+   */
+  public static Quad[] rotateY(Quad[] src) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].transform(Transform.NONE.rotateY());
+    }
+    return rot;
+  }
 
-	/**
-	 * @param src source quads
-	 * @return UVTriangles rotated about the Y axis
-	 */
-	public static final UVTriangle[] rotateY(UVTriangle[] src) {
-		UVTriangle[] rot = new UVTriangle[src.length];
-		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].getYRotated();
-		}
-		return rot;
-	}
+  /**
+   * @param src source quads
+   * @return UVTriangles rotated about the Y axis
+   */
+  public static UVTriangle[] rotateY(UVTriangle[] src) {
+    UVTriangle[] rot = new UVTriangle[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].getYRotated();
+    }
+    return rot;
+  }
 
-	/**
-	 * @param src source quads
-	 * @param angle
-	 * @return Quads rotated about the Y axis by some angle
-	 */
-	public static final Quad[] rotateY(Quad[] src, double angle) {
-		Quad[] rot = new Quad[src.length];
-		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].transform(Transform.NONE.rotateY(angle));
-		}
-		return rot;
-	}
+  /**
+   * @param src   source quads
+   * @return Quads rotated about the Y axis by some angle
+   */
+  public static Quad[] rotateY(Quad[] src, double angle) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].transform(Transform.NONE.rotateY(angle));
+    }
+    return rot;
+  }
 
-	/**
-	 * @param src source quads
-	 * @return Quads rotated about the Z axis
-	 */
-	public static final Quad[] rotateZ(Quad[] src) {
-		Quad[] rot = new Quad[src.length];
-		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].transform(Transform.NONE.rotateZ());
-		}
-		return rot;
-	}
+  /**
+   * @param src source quads
+   * @return Quads rotated about the Z axis
+   */
+  public static Quad[] rotateZ(Quad[] src) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].transform(Transform.NONE.rotateZ());
+    }
+    return rot;
+  }
 
-	/**
-	 * @param src source quads
-	 * @param angle
-	 * @return Quads rotated about the Z axis by some angle
-	 */
-	public static final Quad[] rotateZ(Quad[] src, double angle) {
-		Quad[] rot = new Quad[src.length];
-		for (int i = 0; i < src.length; ++i) {
-			rot[i] = src[i].transform(Transform.NONE.rotateZ(angle));
-		}
-		return rot;
-	}
+  /**
+   * @param src   source quads
+   * @return Quads rotated about the Z axis by some angle
+   */
+  public static Quad[] rotateZ(Quad[] src, double angle) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].transform(Transform.NONE.rotateZ(angle));
+    }
+    return rot;
+  }
 
-	/**
-	 * @param src source quads
-	 * @param x Distance to translate along the X axis
-	 * @param y Distance to translate along the Y axis
-	 * @param z Distance to translate along the Z axis
-	 * @return Translated copies of the source quads
-	 */
-	public static final Quad[] translate(Quad[] src, double x, double y, double z) {
-		Quad[] out = new Quad[src.length];
-		for (int i = 0; i < src.length; ++i) {
-			out[i] = src[i].transform(Transform.NONE.translate(x, y, z));
-		}
-		return out;
-	}
+  /**
+   * @param src source quads
+   * @param x   Distance to translate along the X axis
+   * @param y   Distance to translate along the Y axis
+   * @param z   Distance to translate along the Z axis
+   * @return Translated copies of the source quads
+   */
+  public static Quad[] translate(Quad[] src, double x, double y, double z) {
+    Quad[] out = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      out[i] = src[i].transform(Transform.NONE.translate(x, y, z));
+    }
+    return out;
+  }
 
-	/**
-	 * @param src source quads
-	 * @param scale
-	 * @return Scaled copies of the source quads
-	 */
-	public static Quad[] scale(Quad[] src, double scale) {
-		Quad[] out = new Quad[src.length];
-		for (int i = 0; i < src.length; ++i) {
-			out[i] = src[i].getScaled(scale);
-		}
-		return out;
-	}
+  /**
+   * @param src   source quads
+   * @return Scaled copies of the source quads
+   */
+  public static Quad[] scale(Quad[] src, double scale) {
+    Quad[] out = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      out[i] = src[i].getScaled(scale);
+    }
+    return out;
+  }
 
 }

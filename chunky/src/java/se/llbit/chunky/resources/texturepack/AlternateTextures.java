@@ -16,7 +16,8 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.awt.image.BufferedImage;
+import se.llbit.chunky.resources.BitmapImage;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
@@ -24,43 +25,42 @@ import java.util.zip.ZipFile;
 /**
  * An alternate texture will try loading several textures,
  * and only fail if none of them could be loaded.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class AlternateTextures extends TextureRef {
 
-	private final TextureRef[] alternatives;
+  private final TextureRef[] alternatives;
 
-	/**
-	 * Attempts to load textures until one is successfully loaded.
-	 * @param alternatives List of textures to load
-	 */
-	public AlternateTextures(TextureRef... alternatives) {
-		this.alternatives = alternatives;
-	}
+  /**
+   * Attempts to load textures until one is successfully loaded.
+   *
+   * @param alternatives List of textures to load
+   */
+  public AlternateTextures(TextureRef... alternatives) {
+    this.alternatives = alternatives;
+  }
 
-	@Override
-	public boolean load(ZipFile texturePack) {
-		for (TextureRef alternative: alternatives) {
-			if (alternative.load(texturePack)) {
-				return true;
-			}
-		}
-		return false;
-	}
+  @Override public boolean load(ZipFile texturePack) {
+    for (TextureRef alternative : alternatives) {
+      if (alternative.load(texturePack)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-	@Override
-	public boolean loadFromTerrain(BufferedImage[] terrain) {
-		for (TextureRef alternative: alternatives) {
-			if (alternative.loadFromTerrain(terrain)) {
-				return true;
-			}
-		}
-		return false;
-	}
+  @Override public boolean loadFromTerrain(BitmapImage[] terrain) {
+    for (TextureRef alternative : alternatives) {
+      if (alternative.loadFromTerrain(terrain)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-	@Override
-	protected boolean load(InputStream imageStream) throws IOException {
-		throw new UnsupportedOperationException("Call load(ZipFile) instead!");
-	}
+  @Override protected boolean load(InputStream imageStream) throws IOException {
+    throw new UnsupportedOperationException("Call load(ZipFile) instead!");
+  }
 
 }

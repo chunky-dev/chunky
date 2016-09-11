@@ -16,9 +16,11 @@
  */
 package se.llbit.util;
 
-import java.awt.image.BufferedImage;
-
-import se.llbit.math.Color;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelFormat;
+import javafx.scene.image.WritableImage;
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.math.ColorUtil;
 
 /**
  * Image manipulation utility methods.
@@ -27,33 +29,41 @@ import se.llbit.math.Color;
  */
 public class ImageTools {
 
-	/**
-	 * Calculate the average color across an image.
-	 *
-	 * @param img
-	 * @return average color value
-	 */
-	public static int calcAvgColor(BufferedImage img) {
-		float ra = 0;
-		float ga = 0;
-		float ba = 0;
-		float aa = 0;
-		int n = 0;
-		for (int x = 0; x < img.getWidth(); ++x) {
-			for (int y = 0; y < img.getHeight(); ++y) {
-				int cv = img.getRGB(x, y);
-				float alpha = (cv >>> 24)/255.f;
-				aa += alpha;
-				n++;
-				ra += alpha * (0xFF & (cv >>> 16))/255.f;
-				ga += alpha * (0xFF & (cv >>> 8))/255.f;
-				ba += alpha * (0xFF & cv)/255.f;
-			}
-		}
+  /**
+   * Calculate the average color across an image.
+   *
+   * @return average color value
+   */
+  public static int calcAvgColor(BitmapImage image) {
+    float ra = 0;
+    float ga = 0;
+    float ba = 0;
+    float aa = 0;
+    int n = 0;
+    for (int x = 0; x < image.width; ++x) {
+      for (int y = 0; y < image.height; ++y) {
+        int cv = image.getPixel(x, y);
+        float alpha = (cv >>> 24) / 255.f;
+        aa += alpha;
+        n++;
+        ra += alpha * (0xFF & (cv >>> 16)) / 255.f;
+        ga += alpha * (0xFF & (cv >>> 8)) / 255.f;
+        ba += alpha * (0xFF & cv) / 255.f;
+      }
+    }
 
-		if (aa == 0.f)
-		    return 0;
-		else
-		    return Color.getRGBA(ra/aa, ga/aa, ba/aa, aa/n);
-	}
+    if (aa == 0.f) {
+      return 0;
+    } else {
+      return ColorUtil.getArgb(ra / aa, ga / aa, ba / aa, aa / n);
+    }
+  }
+
+  /** @return a JavaFX version of a BitmapImage. */
+  public static Image toFxImage(BitmapImage image) {
+    WritableImage fxImage = new WritableImage(image.width, image.height);
+    fxImage.getPixelWriter().setPixels(0, 0, image.width, image.height,
+        PixelFormat.getIntArgbInstance(), image.data, 0, image.width);
+    return fxImage;
+  }
 }

@@ -18,8 +18,6 @@ package se.llbit.chunky.world.listeners;
 
 import se.llbit.chunky.world.ChunkPosition;
 
-@SuppressWarnings("javadoc")
 public interface ChunkDeletionListener {
-
-	void chunkDeleted(ChunkPosition chunk);
+  void chunkDeleted(ChunkPosition chunk);
 }

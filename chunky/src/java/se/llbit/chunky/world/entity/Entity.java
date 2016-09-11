@@ -20,46 +20,50 @@ import java.util.Collection;
 
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Vector3d;
+import se.llbit.math.Vector3;
 import se.llbit.math.primitive.Primitive;
 
 /**
  * Represents Minecraft entities that are not stored in the octree.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 abstract public class Entity {
-	public final Vector3d position;
+  public final Vector3 position;
 
-	protected Entity(Vector3d position) {
-		this.position = new Vector3d(position);
-	}
+  protected Entity(Vector3 position) {
+    this.position = new Vector3(position);
+  }
 
-	abstract public Collection<Primitive> primitives(Vector3d offset);
+  abstract public Collection<Primitive> primitives(Vector3 offset);
 
-	/**
-	 * Marshalls this entity to JSON.
-	 * @return JSON object representing this entity.
-	 */
-	abstract public JsonValue toJson();
+  /**
+   * Marshalls this entity to JSON.
+   *
+   * @return JSON object representing this entity.
+   */
+  abstract public JsonValue toJson();
 
-	/**
-	 * Unmarshalls an entity object from JSON data.
-	 * @param json json data.
-	 * @return unmarshalled entity, or {@code null} if it was not a valid entity.
-	 */
-	public static Entity fromJson(JsonObject json) {
-		String kind = json.get("kind").stringValue("");
-		if (kind.equals("painting")) {
-			return PaintingEntity.fromJson(json);
-		} else if (kind.equals("sign")) {
-			return SignEntity.fromJson(json);
-		} else if (kind.equals("wallsign")) {
-			return WallSignEntity.fromJson(json);
-		} else if (kind.equals("skull")) {
-			return SkullEntity.fromJson(json);
-		} else if (kind.equals("player")) {
-			return PlayerEntity.fromJson(json);
-		}
-		return null;
-	}
+  /**
+   * Unmarshalls an entity object from JSON data.
+   *
+   * @param json json data.
+   * @return unmarshalled entity, or {@code null} if it was not a valid entity.
+   */
+  public static Entity fromJson(JsonObject json) {
+    String kind = json.get("kind").stringValue("");
+    switch (kind) {
+      case "painting":
+        return PaintingEntity.fromJson(json);
+      case "sign":
+        return SignEntity.fromJson(json);
+      case "wallsign":
+        return WallSignEntity.fromJson(json);
+      case "skull":
+        return SkullEntity.fromJson(json);
+      case "player":
+        return PlayerEntity.fromJson(json);
+    }
+    return null;
+  }
 }

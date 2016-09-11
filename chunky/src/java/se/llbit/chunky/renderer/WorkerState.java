@@ -16,13 +16,16 @@
  */
 package se.llbit.chunky.renderer;
 
+import se.llbit.math.Ray;
+import se.llbit.math.Vector4;
+
 import java.util.Random;
 
-import se.llbit.math.Ray;
-import se.llbit.math.Vector4d;
-
+/**
+ * State for a render worker.
+ */
 public class WorkerState {
-	public Ray ray;
-	public Vector4d attenuation = new Vector4d();
-	public Random random;
+  public Ray ray;
+  public Vector4 attenuation = new Vector4();
+  public Random random;
 }

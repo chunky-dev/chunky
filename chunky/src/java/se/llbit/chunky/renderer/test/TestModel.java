@@ -22,137 +22,112 @@ import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Triangle;
 import se.llbit.math.UVTriangle;
-import se.llbit.math.Vector2d;
-import se.llbit.math.Vector3d;
-import se.llbit.math.Vector4d;
+import se.llbit.math.Vector2;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-@SuppressWarnings("unused")
 public class TestModel {
 
-	private AABB[] boxes;
-	private Quad[] quads;
-	private Triangle[] triangles;
-	private UVTriangle[] uvtriangles;
-	private Vector3d light;
+  private AABB[] boxes;
+  private Quad[] quads;
+  private Triangle[] triangles;
+  private UVTriangle[] uvtriangles;
+  private Vector3 light;
 
-	/**
-	 * Set up the model
-	 */
-	public void setUp() {
-		boxes = new AABB[] {
-				// s-e
-//				new AABB(0, 1, 0, 0.5, 0, 1),
-//				new AABB(0, 1, 0.5, 1, 0.5, 1),
-//				new AABB(0.5, 1, 0.5, 1, 0, 0.5),
-//				new AABB(0, 1, 0, 0.5, 0, 1),
-//				new AABB(0.5, 1, 0.5, 1, 0.5, 1),
-//				new AABB(0, 0.5, 0.5, 1, 0, 1),
-//				new AABB(0, 1, 0, 0.5, 0, 1),
-//				new AABB(0.5, 1, 0.5, 1, 0, 1),
-//				new AABB(0, 0.5, 0.5, 1, 0, 0.5),
-				new AABB(0, 1, 0, 0.5, 0, 1),
-				new AABB(0, 1, 0.5, 1, 0, 0.5),
-				new AABB(0, 0.5, 0.5, 1, 0.5, 1),
-		};
-		quads = new Quad[] {
-			new Quad(new Vector3d(14/16., 16/16., 2/16.), new Vector3d(2/16., 16/16., 2/16.),
-					new Vector3d(14/16., 16/16., 14/16.), new Vector4d(2/16., 14/16., 2/16., 14/16.)),
-		};
-	}
+  /**
+   * Set up the model
+   */
+  public void setUp() {
+    boxes = new AABB[] {
+        // s-e
+        //				new AABB(0, 1, 0, 0.5, 0, 1),
+        //				new AABB(0, 1, 0.5, 1, 0.5, 1),
+        //				new AABB(0.5, 1, 0.5, 1, 0, 0.5),
+        //				new AABB(0, 1, 0, 0.5, 0, 1),
+        //				new AABB(0.5, 1, 0.5, 1, 0.5, 1),
+        //				new AABB(0, 0.5, 0.5, 1, 0, 1),
+        //				new AABB(0, 1, 0, 0.5, 0, 1),
+        //				new AABB(0.5, 1, 0.5, 1, 0, 1),
+        //				new AABB(0, 0.5, 0.5, 1, 0, 0.5),
+        new AABB(0, 1, 0, 0.5, 0, 1), new AABB(0, 1, 0.5, 1, 0, 0.5),
+        new AABB(0, 0.5, 0.5, 1, 0.5, 1),};
+    quads = new Quad[] {new Quad(new Vector3(14 / 16., 16 / 16., 2 / 16.),
+        new Vector3(2 / 16., 16 / 16., 2 / 16.), new Vector3(14 / 16., 16 / 16., 14 / 16.),
+        new Vector4(2 / 16., 14 / 16., 2 / 16., 14 / 16.)),};
+  }
 
-	private void setUpTorch() {
-		quads = new Quad[4];
+  private void setUpTorch() {
+    quads = new Quad[4];
 
-		// west
-		quads[0] = new Quad(new Vector3d(15/16., 3/16., 0),
-				new Vector3d(15/16., 3/16., 1),
-				new Vector3d((11-12/10.)/16., 1, 0),
-				new Vector4d(0, 1, 0, 13/16.));
+    // west
+    quads[0] = new Quad(new Vector3(15 / 16., 3 / 16., 0), new Vector3(15 / 16., 3 / 16., 1),
+        new Vector3((11 - 12 / 10.) / 16., 1, 0), new Vector4(0, 1, 0, 13 / 16.));
 
-		// east
-		quads[1] = new Quad(new Vector3d((13-12/10.)/16., 1, 0),
-				new Vector3d((13-12/10.)/16., 1, 1),
-				new Vector3d(17/16., 3/16., 0),
-				new Vector4d(1, 0, 13/16., 0));
+    // east
+    quads[1] = new Quad(new Vector3((13 - 12 / 10.) / 16., 1, 0),
+        new Vector3((13 - 12 / 10.) / 16., 1, 1), new Vector3(17 / 16., 3 / 16., 0),
+        new Vector4(1, 0, 13 / 16., 0));
 
-		// top
-		quads[2] = new Quad(
-				new Vector3d(13/16., 13/16., 9/16.),
-				new Vector3d(13/16., 13/16., 7/16.),
-				new Vector3d(11/16., 13/16., 9/16.),
-				new Vector4d(9/16., 7/16., 10/16., 8/16.));
+    // top
+    quads[2] = new Quad(new Vector3(13 / 16., 13 / 16., 9 / 16.),
+        new Vector3(13 / 16., 13 / 16., 7 / 16.), new Vector3(11 / 16., 13 / 16., 9 / 16.),
+        new Vector4(9 / 16., 7 / 16., 10 / 16., 8 / 16.));
 
-		// bottom
-		quads[3] = new Quad(
-				new Vector3d(15/16., 3/16., 7/16.),
-				new Vector3d(17/16., 3/16., 7/16.),
-				new Vector3d(15/16., 3/16., 9/16.),
-				new Vector4d(7/16., 9/16., 0/16., 2/16.));
+    // bottom
+    quads[3] =
+        new Quad(new Vector3(15 / 16., 3 / 16., 7 / 16.), new Vector3(17 / 16., 3 / 16., 7 / 16.),
+            new Vector3(15 / 16., 3 / 16., 9 / 16.),
+            new Vector4(7 / 16., 9 / 16., 0 / 16., 2 / 16.));
 
-		uvtriangles = new UVTriangle[4];
+    uvtriangles = new UVTriangle[4];
 
-		// facing south
-		uvtriangles[0] = new UVTriangle(
-				new Vector3d(8/16., 3/16., 9/16.),
-				new Vector3d(24/16., 3/16., 9/16.),
-				new Vector3d((4-12/10.)/16., 1, 9/16.),
-				new Vector2d(0, 0),
-				new Vector2d(1, 0),
-				new Vector2d(0., 13/16.));
-		uvtriangles[1] = new UVTriangle(
-				new Vector3d((20-12/10.)/16., 1, 9/16.),
-				new Vector3d((4-12/10.)/16., 1, 9/16.),
-				new Vector3d(24/16., 3/16., 9/16.),
-				new Vector2d(1, 13/16.),
-				new Vector2d(0, 13/16.),
-				new Vector2d(1, 0));
+    // facing south
+    uvtriangles[0] = new UVTriangle(new Vector3(8 / 16., 3 / 16., 9 / 16.),
+        new Vector3(24 / 16., 3 / 16., 9 / 16.), new Vector3((4 - 12 / 10.) / 16., 1, 9 / 16.),
+        new Vector2(0, 0), new Vector2(1, 0), new Vector2(0., 13 / 16.));
+    uvtriangles[1] = new UVTriangle(new Vector3((20 - 12 / 10.) / 16., 1, 9 / 16.),
+        new Vector3((4 - 12 / 10.) / 16., 1, 9 / 16.), new Vector3(24 / 16., 3 / 16., 9 / 16.),
+        new Vector2(1, 13 / 16.), new Vector2(0, 13 / 16.), new Vector2(1, 0));
 
-		// facing north
-		uvtriangles[2] = new UVTriangle(
-				new Vector3d(24/16., 3/16., 7/16.),
-				new Vector3d(8/16., 3/16., 7/16.),
-				new Vector3d((4-12/10.)/16., 1, 7/16.),
-				new Vector2d(1, 0),
-				new Vector2d(0, 0),
-				new Vector2d(0, 13/16.));
-		uvtriangles[3] = new UVTriangle(
-				new Vector3d((4-12/10.)/16., 1, 7/16.),
-				new Vector3d((20-12/10.)/16., 1, 7/16.),
-				new Vector3d(24/16., 3/16., 7/16.),
-				new Vector2d(0, 13/16.),
-				new Vector2d(1, 13/16.),
-				new Vector2d(1, 0));
+    // facing north
+    uvtriangles[2] = new UVTriangle(new Vector3(24 / 16., 3 / 16., 7 / 16.),
+        new Vector3(8 / 16., 3 / 16., 7 / 16.), new Vector3((4 - 12 / 10.) / 16., 1, 7 / 16.),
+        new Vector2(1, 0), new Vector2(0, 0), new Vector2(0, 13 / 16.));
+    uvtriangles[3] = new UVTriangle(new Vector3((4 - 12 / 10.) / 16., 1, 7 / 16.),
+        new Vector3((20 - 12 / 10.) / 16., 1, 7 / 16.), new Vector3(24 / 16., 3 / 16., 7 / 16.),
+        new Vector2(0, 13 / 16.), new Vector2(1, 13 / 16.), new Vector2(1, 0));
 
-		light = new Vector3d(.1, 1, -.1);
-		light.normalize();
-	}
+    light = new Vector3(.1, 1, -.1);
+    light.normalize();
+  }
 
-	/**
-	 * Ray-model intersection
-	 * @param ray
-	 */
-	public void intersect(Ray ray) {
-		ray.setCurrentMat(ray.getCurrentMaterial(), 1 << 8);
+  /**
+   * Ray-model intersection
+   *
+   * @param ray
+   */
+  public void intersect(Ray ray) {
+    ray.setCurrentMat(ray.getCurrentMaterial(), 1 << 8);
 
 		/*for (int i = 0; i < boxes.length; ++i) {
-			if (boxes[i].intersect(ray)) {
+      if (boxes[i].intersect(ray)) {
 				Texture.stone.getColor(ray);
 				ray.color.w = 1;
 				ray.t = ray.tNear;
 			}
 		}*/
 
-		for (int i = 0; i < quads.length; ++i) {
-			if (quads[i].intersect(ray)) {
-				Texture.sunflowerFront.getColor(ray);
-				ray.t = ray.tNext;
-			}
-		}
+    for (int i = 0; i < quads.length; ++i) {
+      if (quads[i].intersect(ray)) {
+        Texture.sunflowerFront.getColor(ray);
+        ray.t = ray.tNext;
+      }
+    }
 
-		// TORCH
+    // TORCH
 		/*
 		float[] color = null;
 		for (int i = 0; i < quads.length; ++i) {
@@ -185,6 +160,6 @@ public class TestModel {
 			}
 		}
 		*/
-	}
+  }
 
 }

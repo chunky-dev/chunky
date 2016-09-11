@@ -20,52 +20,52 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
 
 /**
- * Interface for render managers
+ * Base class for render managers.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public abstract class AbstractRenderManager extends Thread {
 
-	/**
-	 * Constructor
-	 * @param context
-	 */
-	public AbstractRenderManager(RenderContext context) {
-		super("Render Manager");
+  protected SceneProvider sceneProvider;
 
-		this.numThreads = context.numRenderThreads();
-		this.tileWidth = context.tileWidth();
-	}
+  public AbstractRenderManager(RenderContext context) {
+    super("Render Manager");
 
-	/**
-	 * Number of render threads
-	 */
-	protected int numThreads;
+    this.numThreads = context.numRenderThreads();
+    this.tileWidth = context.tileWidth();
+  }
 
-	/**
-	 * Tile width
-	 */
-	protected final int tileWidth;
+  /**
+   * Number of render threads
+   */
+  protected int numThreads;
 
-	/**
-	 * CPU load percentage
-	 */
-	public int cpuLoad = PersistentSettings.getCPULoad();
+  /**
+   * Tile width
+   */
+  protected final int tileWidth;
 
-	/**
-	 * Get a job from the job queue
-	 * @return Next job Id
-	 * @throws InterruptedException
-	 */
-	public abstract int getNextJob() throws InterruptedException;
+  /**
+   * CPU load percentage.
+   */
+  public int cpuLoad = PersistentSettings.getCPULoad();
 
-	/**
-	 * Report finished job
-	 */
-	public abstract void jobDone();
+  /**
+   * Get a job from the job queue.
+   *
+   * @return Next job Id
+   * @throws InterruptedException
+   */
+  public abstract int getNextJob() throws InterruptedException;
 
-	/**
-	 * @return The buffered scene object
-	 */
-	public abstract Scene bufferedScene();
+  /**
+   * Report finished job.
+   */
+  public abstract void jobDone();
 
+  public void setSceneProvider(SceneProvider sceneProvider) {
+    this.sceneProvider = sceneProvider;
+  }
+
+  public abstract Scene getBufferedScene();
 }

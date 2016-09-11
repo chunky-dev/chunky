@@ -16,47 +16,46 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.main.Chunky;
+import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.log.Log;
 
 /**
  * Parses regions
+ *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public class RegionParser extends Thread {
 
-	private final Chunky chunky;
-	private final RegionQueue queue;
+  private final WorldMapLoader mapLoader;
+  private final RegionQueue queue;
 
-	/**
-	 * Create new region parser
-	 */
-	public RegionParser(Chunky chunky, RegionQueue queue) {
-	    super("Region Parser");
-	    this.chunky = chunky;
-	    this.queue = queue;
-	}
+  /**
+   * Create new region parser
+   */
+  public RegionParser(WorldMapLoader loader, RegionQueue queue) {
+    super("Region Parser");
+    this.mapLoader = loader;
+    this.queue = queue;
+  }
 
-	@Override
-	public void run() {
-		while (!isInterrupted()) {
-			ChunkPosition position = queue.poll();
-			if (position == null) {
-				Log.warn("Region parser shutting down abnormally.");
-				return;
-			}
-			ChunkView map = chunky.getMapView();
-			ChunkView minimap = chunky.getMinimapView();
-			if (map.isRegionVisible(position) ||
-					minimap.isRegionVisible(position)) {
-				Region region = chunky.getWorld().getRegion(position);
-				region.parse();
-				for (Chunk chunk: region) {
-					if (map.isVisible(chunk)) {
-						chunk.loadChunk(chunky);
-					}
-				}
-			}
-		}
-	}
+  @Override public void run() {
+    while (!isInterrupted()) {
+      ChunkPosition position = queue.poll();
+      if (position == null) {
+        Log.warn("Region parser shutting down abnormally.");
+        return;
+      }
+      ChunkView map = mapLoader.getMapView();
+      ChunkView minimap = mapLoader.getMinimapView();
+      if (map.isRegionVisible(position) || minimap.isRegionVisible(position)) {
+        Region region = mapLoader.getWorld().getRegion(position);
+        region.parse();
+        for (Chunk chunk : region) {
+          if (map.shouldPreload(chunk)) {
+            chunk.loadChunk(mapLoader);
+          }
+        }
+      }
+    }
+  }
 }

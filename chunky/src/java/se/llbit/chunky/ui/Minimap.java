@@ -15,168 +15,57 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.ui;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
-import javax.swing.JPanel;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
-import org.apache.commons.math3.util.FastMath;
-
-import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.map.MapBuffer;
-import se.llbit.chunky.map.WorldRenderer;
-import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.ChunkSelectionTracker;
+import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.World;
-import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 
 /**
  * @author Jesper Öqvist (jesper@llbit.se)
  */
-@SuppressWarnings("serial")
-public class Minimap extends JPanel implements ChunkUpdateListener {
+public class Minimap extends Map2D {
+  private static final Font font = Font.font("Sans serif", FontWeight.BOLD, 11);
 
-	/**
-	 * Default width of the minimap
-	 */
-	public static final int DEFAULT_WIDTH = 300;
+  public Minimap(WorldMapLoader loader, ChunkyFxController controller) {
+    super(loader, controller);
+  }
 
-	/**
-	 * Default height of the minimap
-	 */
-	public static final int DEFAULT_HEIGHT = 150;
+  public void onMousePressed(MouseEvent event) {
+    mapLoader.moveView(event.getX() - getWidth() / 2, event.getY() - getHeight() / 2);
+  }
 
-	private static final Font font = new Font("Sans serif", Font.BOLD, 11);
+  public int getWidth() {
+    return (int) controller.getMinimapCanvas().getWidth();
+  }
 
-	private final MapBuffer mapBuffer;
-	private final Chunky chunky;
-	private volatile ChunkView view;
+  public int getHeight() {
+    return (int) controller.getMinimapCanvas().getHeight();
+  }
 
-	/**
-	 * @param parent
-	 */
-	public Minimap(Chunky parent) {
-		this.chunky = parent;
-		setBackground(Color.white);
-		setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
-		setMinimumSize(new Dimension(100, 100));
-		setIgnoreRepaint(false);
+  @Override public void viewUpdated() {
+    viewUpdated(mapLoader.getMinimapView());
+    mapBuffer.redrawView(mapLoader);
+    repaintDirect();
+  }
 
-		view = chunky.getMinimapView();
-		mapBuffer = new MapBuffer(view);
+  @Override protected void repaint(GraphicsContext gc) {
+    super.repaint(gc);
+    ChunkView mapView = controller.getMap().getView();
+    gc.setStroke(Color.ORANGE);
+    gc.strokeRect(mapView.x0 - view.x0, mapView.z0 - view.z0, mapView.width / mapView.scale,
+        mapView.height / mapView.scale);
 
-		addMouseListener(new MouseListener() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-			}
-			@Override
-			public void mousePressed(MouseEvent e) {
-				chunky.moveView(e.getX()-getWidth()/2,
-					e.getY()-getHeight()/2);
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-			}
-			@Override
-			public void mouseEntered(MouseEvent e) {
-			}
-			@Override
-			public void mouseClicked(MouseEvent e) {
-			}
-		});
+    // Draw North direction indicator.
+    gc.setFont(font);
+    gc.setFill(Color.RED);
+    gc.fillText("N", view.width / 2 - 4, 12);
 
-		addComponentListener(new ComponentListener() {
-			@Override
-			public void componentShown(ComponentEvent e) {
-			}
-			@Override
-			public void componentResized(ComponentEvent e) {
-				chunky.minimapResized(getWidth(), getHeight());
-			}
-			@Override
-			public void componentMoved(ComponentEvent e) {
-			}
-			@Override
-			public void componentHidden(ComponentEvent e) {
-			}
-		});
-	}
-
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-
-		// NB lock the lock ordering here is critical!
-		// we access ChunkMap via Chunky but here we also need to lock Chunky
-		synchronized (chunky) {
-		synchronized (this) {
-			ChunkView mapView = chunky.getMapView();
-
-			WorldRenderer renderer = chunky.getWorldRenderer();
-			World world = chunky.getWorld();
-			ChunkSelectionTracker selection = chunky.getChunkSelection();
-
-			renderer.render(world, mapBuffer, Chunk.biomeRenderer, selection);
-			mapBuffer.renderBuffered(g);
-
-			renderer.renderPlayers(world, g, view, true);
-			renderer.renderSpawn(world, g, view, true);
-
-			// draw view rectangle
-			g.setColor(Color.orange);
-			g.drawRect(
-					(int) FastMath.round(mapView.x0 - view.x0),
-					(int) FastMath.round(mapView.z0 - view.z0),
-					FastMath.round(mapView.width / (float) mapView.scale),
-					FastMath.round(mapView.height / (float) mapView.scale));
-
-			// draw North indicator
-			g.setFont(font);
-			g.setColor(Color.red);
-			g.drawString("N", view.width/2-4, 12);
-
-			g.setColor(Color.black);
-			g.drawString(world.levelName(), 10, view.height-10);
-		}
-		}
-	}
-
-	/**
-	 * Redraw all visible chunks.
-	 */
-	public void redraw() {
-		mapBuffer.flushCache();
-		repaint();
-	}
-
-	@Override
-	public void chunkUpdated(ChunkPosition chunk) {
-		mapBuffer.chunkUpdated(chunk);
-		repaint();
-	}
-
-	@Override
-	public void regionUpdated(ChunkPosition region) {
-		mapBuffer.regionUpdated(region);
-		repaint();
-	}
-
-	/**
-	 * Called when the minimap view has changed.
-	 * @param newView
-	 */
-	public synchronized void viewUpdated(ChunkView newView) {
-		view = newView;
-		mapBuffer.updateView(view, Chunk.biomeRenderer, 0);
-		repaint();
-	}
-
+    gc.setFill(Color.BLACK);
+    gc.fillText(mapLoader.getWorldName(), 10, view.height - 10);
+  }
 }

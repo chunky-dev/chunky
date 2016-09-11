@@ -24,107 +24,111 @@ import java.util.Stack;
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
 public class PrettyPrinter {
-	private final String indentation;
-	private final java.util.List<String> ind = new ArrayList<String>(32);
-	{
-		ind.add("");
-	}
-	private final Stack<Integer> indentStack = new Stack<Integer>();
-	{
-		indentStack.push(0);
-	}
-	private int currentIndent = 0;
+  private final String indentation;
+  private final java.util.List<String> ind = new ArrayList<String>(32);
 
-	private PrintStream out = System.out;
-	private boolean newline = false;
+  {
+    ind.add("");
+  }
 
-	/**
-	 * @param ind
-	 */
-	public PrettyPrinter(String ind) {
-		this.indentation = ind;
-	}
+  private final Stack<Integer> indentStack = new Stack<Integer>();
 
-	/**
-	 * @param ind
-	 * @param target
-	 */
-	public PrettyPrinter(String ind, PrintStream target) {
-		this(ind);
-		out = target;
-	}
+  {
+    indentStack.push(0);
+  }
 
-	/**
-	 * @param target
-	 */
-	public void setTarget(PrintStream target) {
-		out = target;
-	}
+  private int currentIndent = 0;
 
-	/**
- 	 * @param level The level of indentation
- 	 * @return The indentation string for the given indentation level
- 	 */
-	public String getIndentation(int level) {
-		while (ind.size() < (level+1)) {
-			ind.add(ind.get(ind.size()-1) + indentation);
-		}
-		return ind.get(level);
-	}
+  private PrintStream out = System.out;
+  private boolean newline = false;
+
+  /**
+   * @param ind
+   */
+  public PrettyPrinter(String ind) {
+    this.indentation = ind;
+  }
+
+  /**
+   * @param ind
+   * @param target
+   */
+  public PrettyPrinter(String ind, PrintStream target) {
+    this(ind);
+    out = target;
+  }
+
+  /**
+   * @param target
+   */
+  public void setTarget(PrintStream target) {
+    out = target;
+  }
+
+  /**
+   * @param level The level of indentation
+   * @return The indentation string for the given indentation level
+   */
+  public String getIndentation(int level) {
+    while (ind.size() < (level + 1)) {
+      ind.add(ind.get(ind.size() - 1) + indentation);
+    }
+    return ind.get(level);
+  }
 
 
-	/**
-	 * @param str
-	 */
-	public void print(String str) {
-		indentNewline();
-		out.print(str);
-	}
+  /**
+   * @param str
+   */
+  public void print(String str) {
+    indentNewline();
+    out.print(str);
+  }
 
-	/**
-	 *
-	 */
-	public void println() {
-		out.println();
-		newline = true;
-	}
+  /**
+   *
+   */
+  public void println() {
+    out.println();
+    newline = true;
+  }
 
-	/**
-	 * @param node
-	 */
-	public void print(PrettyPrintable node) {
-		pushIndentation();
-		node.prettyPrint(this);
-		popIndentation();
-	}
+  /**
+   * @param node
+   */
+  public void print(PrettyPrintable node) {
+    pushIndentation();
+    node.prettyPrint(this);
+    popIndentation();
+  }
 
-	/**
-	 * @param level
-	 */
-	public void indent(int level) {
-		indentNewline();
-		currentIndent = level;
-		out.print(getIndentation(level));
-	}
+  /**
+   * @param level
+   */
+  public void indent(int level) {
+    indentNewline();
+    currentIndent = level;
+    out.print(getIndentation(level));
+  }
 
-	public void setIndent(int level) {
-		currentIndent = level;
-	}
+  public void setIndent(int level) {
+    currentIndent = level;
+  }
 
-	private void pushIndentation() {
-		indentStack.push(currentIndent + indentStack.peek());
-		currentIndent = 0;
-	}
+  private void pushIndentation() {
+    indentStack.push(currentIndent + indentStack.peek());
+    currentIndent = 0;
+  }
 
-	private void popIndentation() {
-		currentIndent = indentStack.pop();
-		currentIndent -= indentStack.peek();
-	}
+  private void popIndentation() {
+    currentIndent = indentStack.pop();
+    currentIndent -= indentStack.peek();
+  }
 
-	private void indentNewline() {
-		if (newline) {
-			out.print(getIndentation(indentStack.peek()));
-			newline = false;
-		}
-	}
+  private void indentNewline() {
+    if (newline) {
+      out.print(getIndentation(indentStack.peek()));
+      newline = false;
+    }
+  }
 }

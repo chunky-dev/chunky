@@ -18,11 +18,12 @@ package se.llbit.chunky.renderer;
 
 /**
  * Refreshable interface.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public interface Refreshable {
-	/**
-	 * Refresh the refreshable object.
-	 */
-	public void refresh();
+  /**
+   * Refresh the refreshable object.
+   */
+  void refresh();
 }

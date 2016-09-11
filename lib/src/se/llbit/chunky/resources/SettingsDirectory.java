@@ -23,84 +23,85 @@ import java.net.URL;
 import se.llbit.chunky.PersistentSettings;
 
 public final class SettingsDirectory {
-	private static final String SETTINGS_DIR = ".chunky";
+  private static final String SETTINGS_DIR = ".chunky";
 
-	private SettingsDirectory() {}
+  private SettingsDirectory() {
+  }
 
-	/**
-	 * @return {@code true} if the settings directory could be located
-	 */
-	public static boolean findSettingsDirectory() {
-		return settingsDirectory() != null;
-	}
+  /**
+   * @return {@code true} if the settings directory could be located
+   */
+  public static boolean findSettingsDirectory() {
+    return settingsDirectory() != null;
+  }
 
-	/**
-	 * Falls back on home directory
-	 * @return The current settings directory, or the default one.
-	 */
-	public static File defaultSettingsDirectory() {
-		File dir = settingsDirectory();
-		return (dir == null) ? getHomeDirectory() : dir;
-	}
+  /**
+   * Falls back on home directory
+   *
+   * @return The current settings directory, or the default one.
+   */
+  public static File defaultSettingsDirectory() {
+    File dir = settingsDirectory();
+    return (dir == null) ? getHomeDirectory() : dir;
+  }
 
-	/**
-	 * @return {@code null} if the settings directory could not be located
-	 */
-	public static File settingsDirectory() {
-		File directory = null;
-		directory = getWorkingDirectory();
-		if (isSettingsDirectory(directory)) {
-			return directory;
-		}
-		directory = getProgramDirectory();
-		if (isSettingsDirectory(directory)) {
-			return directory;
-		}
-		directory = getHomeDirectory();
-		if (isSettingsDirectory(directory)) {
-			return directory;
-		}
-		return null;
-	}
+  /**
+   * @return {@code null} if the settings directory could not be located
+   */
+  public static File settingsDirectory() {
+    File directory = null;
+    directory = getWorkingDirectory();
+    if (isSettingsDirectory(directory)) {
+      return directory;
+    }
+    directory = getProgramDirectory();
+    if (isSettingsDirectory(directory)) {
+      return directory;
+    }
+    directory = getHomeDirectory();
+    if (isSettingsDirectory(directory)) {
+      return directory;
+    }
+    return null;
+  }
 
-	private static boolean isSettingsDirectory(File settingsDir) {
-		if (settingsDir != null && settingsDir.exists() &&
-				settingsDir.isDirectory() && settingsDir.canWrite()) {
-			File settingsFile = new File(settingsDir, PersistentSettings.SETTINGS_FILE);
-			if (settingsFile.isFile() && settingsFile.canRead()) {
-				return true;
-			}
-		}
-		return false;
-	}
+  private static boolean isSettingsDirectory(File settingsDir) {
+    if (settingsDir != null && settingsDir.exists() &&
+        settingsDir.isDirectory() && settingsDir.canWrite()) {
+      File settingsFile = new File(settingsDir, PersistentSettings.SETTINGS_FILE);
+      if (settingsFile.isFile() && settingsFile.canRead()) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-	public static File getHomeDirectory() {
-		String workingDir = System.getProperty("user.home");
-		if (workingDir != null && !workingDir.isEmpty()) {
-			return new File(workingDir, SETTINGS_DIR);
-		}
-		return null;
-	}
+  public static File getHomeDirectory() {
+    String workingDir = System.getProperty("user.home");
+    if (workingDir != null && !workingDir.isEmpty()) {
+      return new File(workingDir, SETTINGS_DIR);
+    }
+    return null;
+  }
 
-	public static File getWorkingDirectory() {
-		String workingDir = System.getProperty("user.dir");
-		if (workingDir != null && !workingDir.isEmpty()) {
-			return new File(workingDir);
-		}
-		return null;
-	}
+  public static File getWorkingDirectory() {
+    String workingDir = System.getProperty("user.dir");
+    if (workingDir != null && !workingDir.isEmpty()) {
+      return new File(workingDir);
+    }
+    return null;
+  }
 
-	public static File getProgramDirectory() {
-		URL location = SettingsDirectory.class.getProtectionDomain()
-				.getCodeSource().getLocation();
-		try {
-			File dir = new File(location.toURI());
-			if (dir.isFile()) {
-				dir = dir.getParentFile();
-			}
-			return dir;
-		} catch (URISyntaxException e) {
-			return null;
-		}
-	}
+  public static File getProgramDirectory() {
+    URL location = SettingsDirectory.class.getProtectionDomain().getCodeSource().getLocation();
+    try {
+      File dir = new File(location.toURI());
+      if (dir.isFile()) {
+        dir = dir.getParentFile();
+      }
+      return dir;
+    } catch (URISyntaxException e) {
+      return null;
+    }
+  }
 }

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import se.llbit.chunky.ui.DoubleAdjuster?>
+
+
+<HBox xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox>
+         <children>
+            <Label fx:id="playerLbl" text="Player" />
+            <Canvas fx:id="preview" height="300.0" width="300.0" />
+         </children>
+      </VBox>
+      <ScrollPane prefHeight="317.0">
+        <content>
+            <VBox prefHeight="332.0" prefWidth="360.0" spacing="10.0">
+               <children>
+                    <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
+                        <children>
+                            <Label text="Player model:" />
+                        <ChoiceBox fx:id="playerModel" prefWidth="150.0" />
+                        </children>
+                    </HBox>
+                  <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
+                     <children>
+                        <Label text="Skin:" />
+                        <TextField fx:id="skin" />
+                        <Button fx:id="selectSkin" mnemonicParsing="false" text="Select skin" />
+                     </children>
+                  </HBox>
+                  <Label text="Pose" />
+                  <DoubleAdjuster fx:id="direction" />
+                  <DoubleAdjuster fx:id="headYaw" />
+                  <DoubleAdjuster fx:id="headPitch" />
+                  <DoubleAdjuster fx:id="leftArmPose" />
+                  <DoubleAdjuster fx:id="rightArmPose" />
+                  <DoubleAdjuster fx:id="leftLegPose" />
+                  <DoubleAdjuster fx:id="rightLegPose" />
+               </children>
+            </VBox>
+        </content>
+      </ScrollPane>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</HBox>

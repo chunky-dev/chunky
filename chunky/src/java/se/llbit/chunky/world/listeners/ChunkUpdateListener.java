@@ -18,8 +18,8 @@ package se.llbit.chunky.world.listeners;
 
 import se.llbit.chunky.world.ChunkPosition;
 
-@SuppressWarnings("javadoc")
 public interface ChunkUpdateListener {
-	public void regionUpdated(ChunkPosition region);
-	public void chunkUpdated(ChunkPosition region);
+  void regionUpdated(ChunkPosition region);
+
+  void chunkUpdated(ChunkPosition region);
 }

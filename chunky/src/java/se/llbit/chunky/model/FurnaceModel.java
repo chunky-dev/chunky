@@ -25,29 +25,27 @@ import se.llbit.math.Ray;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class FurnaceModel {
-	private static final int texindices[][] = {
-		// undirectional
-		{ 2, 2, 2, 2, 4, 5 },
+  private static final int texindices[][] = {
+      // undirectional
+      {2, 2, 2, 2, 4, 5},
 
-		// undirectional
-		{ 2, 2, 2, 2, 4, 5 },
+      // undirectional
+      {2, 2, 2, 2, 4, 5},
 
-		// facing north
-		{ 0, 1, 2, 2, 4, 5 },
+      // facing north
+      {0, 1, 2, 2, 4, 5},
 
-		// facing south
-		{ 1, 0, 2, 2, 4, 5 },
+      // facing south
+      {1, 0, 2, 2, 4, 5},
 
-		// facing west
-		{ 2, 2, 1, 0, 4, 5 },
+      // facing west
+      {2, 2, 1, 0, 4, 5},
 
-		// facing east
-		{ 2, 2, 0, 1, 4, 5 },
-	};
+      // facing east
+      {2, 2, 0, 1, 4, 5},};
 
-	@SuppressWarnings("javadoc")
-	public static boolean intersect(Ray ray, Texture[] texture) {
-		int rot = ray.getBlockData() % 6;
-		return TexturedBlockModel.intersect(ray, texture, texindices[rot]);
-	}
+  public static boolean intersect(Ray ray, Texture[] texture) {
+    int rot = ray.getBlockData() % 6;
+    return TexturedBlockModel.intersect(ray, texture, texindices[rot]);
+  }
 }

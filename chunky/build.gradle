@@ -8,6 +8,9 @@ jar {
 	from project(':lib').configurations.archives.allArtifacts.files.collect {
 		zipTree(it)
 	}
+	manifest {
+		attributes("Main-Class": mainClassName)
+	}
 }
 
 sourceSets {
@@ -30,8 +33,6 @@ repositories {
 }
 
 dependencies {
-	compile name: 'ppj99-1.0.1'
-	compile name: 'JOCL-0.1.7'
 	compile name: 'commons-math3-3.2'
 	compile project(':lib')
 }

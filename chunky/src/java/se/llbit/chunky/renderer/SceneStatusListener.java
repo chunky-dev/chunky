@@ -17,5 +17,5 @@
 package se.llbit.chunky.renderer;
 
 public interface SceneStatusListener {
-	void sceneStatus(String status);
+  void sceneStatus(String status);
 }

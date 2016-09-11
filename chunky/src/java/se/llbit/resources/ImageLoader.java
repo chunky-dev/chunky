@@ -16,16 +16,17 @@
  */
 package se.llbit.resources;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.log.Log;
 
 import javax.imageio.ImageIO;
-
-import se.llbit.log.Log;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * Utility class for image loading.
@@ -33,72 +34,80 @@ import se.llbit.log.Log;
  * @author Jesper Öqvist (jesper@llbit.se)
  */
 public final class ImageLoader {
+  /** The missing image is a 16x16 image with black background and red border and cross. */
+  public final static BitmapImage missingImage;
 
-	private final static HashMap<String, BufferedImage> map = new HashMap<String, BufferedImage>();
-	private final static BufferedImage missingImage;
+  static {
+    missingImage = new BitmapImage(16, 16);
+    for (int y = 0; y < 16; ++y) {
+      for (int x = 0; x < 16; ++x) {
+        if (x == 0 || x == 15 || y == 0 || y == 15 || x == y || x == 16 - y) {
+          missingImage.data[y * 16 + x] = 0xFFFF0000;
+        } else {
+          missingImage.data[y * 16 + x] = 0xFF000000;
+        }
+      }
+    }
+  }
 
-	private ImageLoader() { }
+  private ImageLoader() {
+  }
 
-	static {
-		missingImage = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
-		Graphics g = missingImage.getGraphics();
-		g.setColor(Color.black);
-		g.fillRect(0, 0, 16, 16);
-		g.setColor(Color.red);
-		g.drawLine(0, 0, 16, 16);
-		g.drawLine(0, 16, 16, 0);
-		g.setColor(Color.white);
-		g.drawRect(0, 0, 16, 16);
-		g.dispose();
-		map.put("missing-image", missingImage);
-	}
+  /**
+   * Attempt to load an image with the given resource name.
+   * If no image is found for that resource name the default
+   * missing image is returned.
+   *
+   * @return Image for the given resource name
+   */
+  public static synchronized BitmapImage readNonNull(String resourceName) {
+    URL url = ImageLoader.class.getResource("/" + resourceName);
+    if (url == null) {
+      Log.info("Could not find image: " + resourceName);
+      return missingImage;
+    }
+    try {
+      return read(url);
+    } catch (IOException e) {
+      Log.info("Failed to read image: " + resourceName, e);
+      return missingImage;
+    }
+  }
 
-	/**
-	 * Attempt to load an image with the given resource name.
-	 * If no image is found for that resource name the default
-	 * missing image is returned.
-	 *
-	 * @param resourceName
-	 * @return Image for the given resource name
-	 */
-	public static synchronized BufferedImage get(String resourceName) {
-		if (!map.containsKey(resourceName)) {
-			loadImage(resourceName);
-		}
-		return map.get(resourceName);
-	}
+  public static BitmapImage read(URL url) throws IOException {
+    return fromBufferedImage(ImageIO.read(url));
+  }
 
-	/**
-	 * Attempt to load an image with a given resource name.
-	 * The Class loader is used to find the image resource.
-	 *
-	 * @param resourceName
-	 */
-	private static synchronized void loadImage(String resourceName) {
-		URL url = ImageLoader.class.getResource("/" + resourceName);
-		if (url == null) {
-			Log.info("Could not load image: " + resourceName);
-			map.put(resourceName, missingImage);
-			return;
-		}
-		try {
-			BufferedImage imgIn = ImageIO.read(url);
+  public static BitmapImage read(InputStream in) throws IOException {
+    return fromBufferedImage(ImageIO.read(in));
+  }
 
-			BufferedImage img;
-			if (imgIn.getType() == BufferedImage.TYPE_INT_ARGB) {
-				img = imgIn;
-			} else {
-				// convert to int ARGB
-				img = new BufferedImage(imgIn.getWidth(),
-						imgIn.getHeight(), BufferedImage.TYPE_INT_ARGB);
-				Graphics g = img.createGraphics();
-				g.drawImage(imgIn, 0, 0, null);
-				g.dispose();
-			}
-			map.put(resourceName, img);
-		} catch (IOException e) {
-			map.put(resourceName, missingImage);
-		}
-	}
+  public static BitmapImage read(File file) throws IOException {
+    return fromBufferedImage(ImageIO.read(file));
+  }
+
+  /**
+   * Converts an AWT BufferedImage to BitmapImage.
+   */
+  private static BitmapImage fromBufferedImage(BufferedImage newImage) {
+    int width = newImage.getWidth();
+    int height = newImage.getHeight();
+    BufferedImage image;
+    if (newImage.getType() == BufferedImage.TYPE_INT_ARGB) {
+      image = newImage;
+    } else {
+      // Convert to ARGB.
+      image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+      Graphics g = image.createGraphics();
+      g.drawImage(newImage, 0, 0, null);
+      g.dispose();
+    }
+    // Copy the BufferedImage data into a new bitmap image.
+    DataBufferInt dataBuffer = (DataBufferInt) image.getRaster().getDataBuffer();
+    int[] data = dataBuffer.getData();
+    BitmapImage bitmap = new BitmapImage(width, height);
+    System.arraycopy(data, 0, bitmap.data, 0, width * height);
+    return bitmap;
+  }
 
 }

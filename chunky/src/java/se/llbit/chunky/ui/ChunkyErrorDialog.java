@@ -16,151 +16,92 @@
  */
 package se.llbit.chunky.ui;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-import javax.swing.Action;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.text.DefaultCaret;
-import javax.swing.text.DefaultEditorKit;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 /**
- * Dedicated error reporting dialog.
- *
+ * Error reporting dialog for Chunky.
+ * <p>
  * Used to display critical errors in a nicer way.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-@SuppressWarnings("serial")
-public class ChunkyErrorDialog extends JDialog {
+public class ChunkyErrorDialog extends Stage implements Initializable {
 
-	private final JTabbedPane tabbedPane;
-	private int errorCount = 0;
+  @FXML TabPane tabPane;
 
-	/**
-	 * Initialize the error dialog.
-	 */
-	public ChunkyErrorDialog() {
-		super();
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setModalityType(ModalityType.APPLICATION_MODAL);
+  private int errorCount = 0;
 
-		setTitle("Error Summary");
-		setLocationRelativeTo(null);
+  /**
+   * Initialize the error dialog.
+   */
+  public ChunkyErrorDialog() throws IOException {
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("ErrorDialog.fxml"));
+    // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
+    loader.setClassLoader(getClass().getClassLoader());
+    loader.setController(this);
+    Parent root = loader.load();
+    setTitle("Error Summary");
+    getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
+    setScene(new Scene(root));
+    addEventFilter(KeyEvent.ANY, e -> {
+      if (e.getCode() == KeyCode.ESCAPE) {
+        e.consume();
+        close();
+      }
+    });
+  }
 
-		tabbedPane = new JTabbedPane();
-		JPanel panel = new JPanel();
-		JLabel lbl = new JLabel("<html>Oops! An unexpected error occurred.<br><br>" +
-				"Below is a detailed description of what went wrong.");
+  @Override public void initialize(URL location, ResourceBundle resources) {
+  }
 
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
-		layout.setHorizontalGroup(
-				layout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(layout.createParallelGroup()
-							.addComponent(lbl)
-							.addComponent(tabbedPane))
-					.addContainerGap());
-		layout.setVerticalGroup(
-			layout.createSequentialGroup()
-				.addContainerGap()
-				.addComponent(lbl)
-				.addPreferredGap(ComponentPlacement.UNRELATED)
-				.addComponent(tabbedPane)
-				.addContainerGap());
+  /**
+   * Add a log record to be displayed by this error dialog.
+   */
+  public synchronized void addErrorMessage(String message) {
+    errorCount += 1;
 
-		getContentPane().add(panel);
-		pack();
-	}
+    VBox vBox = new VBox();
+    vBox.setPadding(new Insets(10));
+    vBox.setSpacing(10);
+    vBox.setAlignment(Pos.TOP_RIGHT);
+    TextArea text = new TextArea();
+    text.setText(message);
+    text.setEditable(false);
+    Button dismissBtn = new Button("Dismiss");
 
-	/**
-	 * Add a log record to be displayed by this error dialog.
-	 * @param event
-	 */
-	public synchronized void addRecord(String message) {
-		errorCount += 1;
+    text.setPrefHeight(Region.USE_COMPUTED_SIZE);
+    vBox.setPrefHeight(Region.USE_COMPUTED_SIZE);
+    vBox.getChildren().setAll(text, dismissBtn);
 
-		final JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		final JTextArea textArea = new JTextArea(10, 60);
-		textArea.setEditable(false);
-		DefaultCaret caret = (DefaultCaret) textArea.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
-		textArea.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-			}
-			@Override
-			public void mousePressed(MouseEvent e) {
-				Action[] actions = textArea.getActions();
-				for (Action action: actions) {
-					if (action.getValue(Action.NAME).equals(
-							DefaultEditorKit.selectAllAction))
+    Tab tab = new Tab("Error " + errorCount, vBox);
+    tabPane.getTabs().add(tab);
 
-						action.actionPerformed(null);
-				}
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-			}
-			@Override
-			public void mouseEntered(MouseEvent e) {
-			}
-			@Override
-			public void mouseClicked(MouseEvent e) {
-			}
-		});
-
-		textArea.setText(message);
-
-		final JScrollPane textScrollPane = new JScrollPane(textArea);
-
-		JButton dismissBtn = new JButton("Dismiss");
-		dismissBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				tabbedPane.remove(panel);
-				if (tabbedPane.getTabCount() == 0)
-					ChunkyErrorDialog.this.dispose();
-			}
-		});
-
-		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
-		layout.setHorizontalGroup(
-				layout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(layout.createParallelGroup(Alignment.TRAILING)
-							.addComponent(textScrollPane)
-							.addComponent(dismissBtn))
-					.addContainerGap());
-		layout.setVerticalGroup(
-			layout.createSequentialGroup()
-				.addContainerGap()
-				.addComponent(textScrollPane)
-				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(dismissBtn)
-				.addContainerGap());
-
-		tabbedPane.addTab("Error " + errorCount, panel);
-		tabbedPane.setSelectedComponent(panel);
-		pack();
-
-		setVisible(true);
-		textArea.requestFocus();
-	}
+    dismissBtn.setOnAction(event -> {
+      tabPane.getTabs().remove(tab);
+      if (tabPane.getTabs().isEmpty()) {
+        hide();
+      }
+    });
+  }
 
 }

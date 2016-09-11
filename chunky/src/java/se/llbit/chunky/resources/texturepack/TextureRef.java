@@ -16,7 +16,9 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.awt.image.BufferedImage;
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.log.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,70 +26,70 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import se.llbit.log.Log;
-
 /**
  * Reference to a texture file in a Minecraft texture pack
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public abstract class TextureRef {
 
-	/**
-	 * Default constructor
-	 */
-	protected TextureRef() {
-	}
+  /**
+   * Default constructor
+   */
+  protected TextureRef() {
+  }
 
-	/**
-	 * Attempt to load a texture from a texture pack
-	 * @param texturePack Reference to the texture pack zip file
-	 * @return <code>true</code> if the texture was successfully loaded
-	 */
-	public abstract boolean load(ZipFile texturePack);
+  /**
+   * Attempt to load a texture from a texture pack
+   *
+   * @param texturePack Reference to the texture pack zip file
+   * @return <code>true</code> if the texture was successfully loaded
+   */
+  public abstract boolean load(ZipFile texturePack);
 
-	/**
-	 * Attempt to load a texture from a PNG image file.
-	 * @param file the texture file
-	 * @return <code>true</code> if the texture was successfully loaded
-	 * @throws TextureFormatError
-	 * @throws IOException
-	 */
-	public boolean load(File file) throws IOException, TextureFormatError {
-		FileInputStream in = new FileInputStream(file);
-		boolean result = load(in);
-		in.close();
-		return result;
-	}
+  /**
+   * Attempt to load a texture from a PNG image file.
+   *
+   * @param file the texture file
+   * @return <code>true</code> if the texture was successfully loaded
+   * @throws TextureFormatError
+   * @throws IOException
+   */
+  public boolean load(File file) throws IOException, TextureFormatError {
+    FileInputStream in = new FileInputStream(file);
+    boolean result = load(in);
+    in.close();
+    return result;
+  }
 
-	/**
-	 * Attempt to load a texture from a texture pack
-	 * @param file Path of texture in texture pack
-	 * @param texturePack Reference to the texture pack zip file
-	 * @return <code>true</code> if the texture was successfully loaded
-	 */
-	protected boolean load(String file, ZipFile texturePack) {
-		try {
-			InputStream in = texturePack.getInputStream(
-					new ZipEntry(file + ".png"));
-			if (in != null) {
-				return load(in);
-			}
-		} catch (TextureFormatError e) {
-			Log.info(e.getMessage());
-		} catch (IOException e) {
-		}
-		return false;
-	}
+  /**
+   * Attempt to load a texture from a texture pack
+   *
+   * @param file        Path of texture in texture pack
+   * @param texturePack Reference to the texture pack zip file
+   * @return <code>true</code> if the texture was successfully loaded
+   */
+  protected boolean load(String file, ZipFile texturePack) {
+    try (InputStream in = texturePack.getInputStream(new ZipEntry(file + ".png"))) {
+      if (in != null) {
+        return load(in);
+      }
+    } catch (TextureFormatError e) {
+      Log.info(e.getMessage());
+    } catch (IOException e) {
+      // Safe to ignore - will be handled implicitly later.
+    }
+    return false;
+  }
 
-	/**
-	 * Load this texture from the terrain spritemap
-	 * @param terrain
-	 * @return <code>true</code> if the texture was successfully loaded
-	 */
-	public boolean loadFromTerrain(BufferedImage[] terrain) {
-		return false;
-	}
+  /**
+   * Load this texture from the terrain spritemap.
+   *
+   * @return <code>true</code> if the texture was successfully loaded
+   */
+  public boolean loadFromTerrain(BitmapImage[] terrain) {
+    return false;
+  }
 
-	protected abstract boolean load(InputStream imageStream)
-			throws IOException, TextureFormatError;
+  protected abstract boolean load(InputStream imageStream) throws IOException, TextureFormatError;
 }

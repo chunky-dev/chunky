@@ -19,48 +19,45 @@ package se.llbit.chunky.world;
 import se.llbit.nbt.AnyTag;
 
 public class PlayerEntityData {
-	public final double x;
-	public final double y;
-	public final double z;
-	public final double yaw;
-	public final double pitch;
-	public final int dimension;
-	public final long uuidLo;
-	public final long uuidHi;
+  public final double x;
+  public final double y;
+  public final double z;
+  public final double yaw;
+  public final double pitch;
+  public final int dimension;
+  public final long uuidLo;
+  public final long uuidHi;
 
-	public final String uuid;
+  public final String uuid;
 
-	public PlayerEntityData(AnyTag player) {
-		AnyTag pos = player.get("Pos");
-		AnyTag rotation = player.get("Rotation");
+  public PlayerEntityData(AnyTag player) {
+    AnyTag pos = player.get("Pos");
+    AnyTag rotation = player.get("Rotation");
 
-		uuidLo = player.get("UUIDLeast").longValue(-1);
-		uuidHi = player.get("UUIDMost").longValue(-1);
-		x = pos.get(0).doubleValue();
-		y = pos.get(1).doubleValue();
-		z = pos.get(2).doubleValue();
-		yaw = rotation.get(0).floatValue();
-		pitch = rotation.get(1).floatValue();
-		dimension = player.get("Dimension").intValue();
+    uuidLo = player.get("UUIDLeast").longValue(-1);
+    uuidHi = player.get("UUIDMost").longValue(-1);
+    x = pos.get(0).doubleValue();
+    y = pos.get(1).doubleValue();
+    z = pos.get(2).doubleValue();
+    yaw = rotation.get(0).floatValue();
+    pitch = rotation.get(1).floatValue();
+    dimension = player.get("Dimension").intValue();
 
-		uuid = String.format("%016X%016X", uuidHi, uuidLo);
-	}
+    uuid = String.format("%016X%016X", uuidHi, uuidLo);
+  }
 
-	@Override
-	public String toString() {
-		return String.format("%d: %d, %d, %d", dimension, (int) x, (int) y, (int) z);
-	}
+  @Override public String toString() {
+    return String.format("%d: %d, %d, %d", dimension, (int) x, (int) y, (int) z);
+  }
 
-	@Override
-	public int hashCode() {
-		return uuid.hashCode();
-	}
+  @Override public int hashCode() {
+    return uuid.hashCode();
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof PlayerEntityData) {
-			return ((PlayerEntityData) obj).uuid.equals(uuid);
-		}
-		return false;
-	}
+  @Override public boolean equals(Object obj) {
+    if (obj instanceof PlayerEntityData) {
+      return ((PlayerEntityData) obj).uuid.equals(uuid);
+    }
+    return false;
+  }
 }

@@ -18,32 +18,22 @@ package se.llbit.chunky.world;
 
 /**
  * An empty or non-existent world.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class EmptyWorld extends World {
 
-	/**
-	 * Singleton instance
-	 */
-	public static final EmptyWorld instance = new EmptyWorld();
+  /**
+   * Singleton instance
+   */
+  public static final EmptyWorld instance = new EmptyWorld();
 
-	private EmptyWorld() {
-		super();
-	}
+  private EmptyWorld() {
+    super();
+  }
 
-	@Override
-	public boolean isEmptyWorld() {
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "[empty world]";
-	}
-
-	@Override
-	public boolean haveDimension(int i) {
-		return false;
-	}
+  @Override public String toString() {
+    return "[empty world]";
+  }
 
 }
