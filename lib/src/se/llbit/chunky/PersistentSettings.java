@@ -116,11 +116,9 @@ public final class PersistentSettings {
   }
 
   /**
-   * Set default number of render threads
-   *
-   * @param numThreads
+   * Set default number of render threads.
    */
-  public static void setNumThreads(int numThreads) {
+  public static void setNumRenderThreads(int numThreads) {
     numThreads = Math.max(RenderConstants.NUM_RENDER_THREADS_MIN, numThreads);
     numThreads = Math.min(RenderConstants.NUM_RENDER_THREADS_MAX, numThreads);
     settings.setInt("numThreads", numThreads);
@@ -144,9 +142,7 @@ public final class PersistentSettings {
   }
 
   /**
-   * Change the default CPU load
-   *
-   * @param cpuLoad
+   * Change the default CPU load.
    */
   public static void setCPULoad(int cpuLoad) {
     cpuLoad = Math.max(1, cpuLoad);
@@ -219,11 +215,6 @@ public final class PersistentSettings {
   public static void set3DCanvasSize(int width, int height) {
     settings.setInt("3dcanvas.width", width);
     settings.setInt("3dcanvas.height", height);
-    save();
-  }
-
-  public static void removeSetting(String name) {
-    settings.removeSetting(name);
     save();
   }
 
@@ -338,6 +329,7 @@ public final class PersistentSettings {
     return settings.getDouble("waterColorBlue", DEFAULT_WATER_BLUE);
   }
 
+  /** Set the default fog color. */
   public static void setFogColor(double red, double green, double blue) {
     settings.setDouble("fogColorRed", red);
     settings.setDouble("fogColorGreen", green);
@@ -382,6 +374,10 @@ public final class PersistentSettings {
   public static void setLoadPlayers(boolean value) {
     settings.setBool("loadPlayers", value);
     save();
+  }
+
+  public static boolean drawUnknownBlocks() {
+    return settings.getBool("drawUnknownBlocks", false);
   }
 }
 

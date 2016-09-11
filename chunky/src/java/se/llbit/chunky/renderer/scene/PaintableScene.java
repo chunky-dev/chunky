@@ -49,6 +49,16 @@ public class PaintableScene extends Scene {
     image = new WritableImage(width, height);
   }
 
+  @Override public synchronized void copyState(Scene other) {
+    if (other instanceof PaintableScene) {
+      PaintableScene otherScene = (PaintableScene) other;
+      if (image != otherScene.image) {
+        image = otherScene.image;
+      }
+    }
+    super.copyState(other);
+  }
+
   /**
    * Draw the buffered image to a canvas.
    */

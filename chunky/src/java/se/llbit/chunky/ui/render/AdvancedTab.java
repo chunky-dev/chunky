@@ -104,7 +104,10 @@ public class AdvancedTab extends VBox implements RenderControlTab, Initializable
     renderThreads.setTooltip("Number of rendering threads.");
     renderThreads.setRange(1, 20);
     renderThreads.clampMin();
-    renderThreads.onValueChange(value -> controller.getRenderer().setNumThreads(value));
+    renderThreads.onValueChange(value -> {
+      controller.getRenderer().setNumThreads(value);
+      PersistentSettings.setNumRenderThreads(value);
+    });
   }
 
   public boolean shutdownAfterCompletedRender() {

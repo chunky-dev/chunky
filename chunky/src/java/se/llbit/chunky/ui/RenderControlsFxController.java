@@ -340,8 +340,10 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
     sceneNameField.setText(scene.name);
     sceneNameField.textProperty().addListener((observable, oldValue, newValue) -> {
       scene.setName(newValue);
+      renderController.getSceneProvider().withSceneProtected(scene -> scene.setName(newValue));
       updateTitle();
     });
+    sceneNameField.setOnAction(event -> renderController.getSceneManager().saveScene());
     generalTab.setRenderController(renderController);
     lightingTab.setRenderController(renderController);
     skyTab.setRenderController(renderController);

@@ -210,7 +210,7 @@ public class Scene extends SceneDescription {
   private int[] backBuffer;
 
   /** HDR sample buffer for the render output. */
-  private double[] samples;
+  protected double[] samples;
 
   private byte[] alphaChannel;
 
@@ -2200,7 +2200,7 @@ public class Scene extends SceneDescription {
    */
   public synchronized void initializeNewScene(String name) {
     boolean finalizeBufferPrev = finalizeBuffer;  // Remember the finalize setting.
-    Scene newScene = new Scene();
+    Scene newScene = SceneFactory.instance.newScene();
     newScene.setName(name);
     copyState(newScene);
     copyTransients(newScene);
