@@ -1495,6 +1495,12 @@ public class TexturePackLoader {
             Texture.skeleton));
     allTextures.put("wither",
         new EntityTextureLoader("assets/minecraft/textures/entity/wither/wither", Texture.wither));
+
+    // Minecraft 1.10 blocks.
+    allTextures.put("boneSide",
+        new SimpleTexture("assets/minecraft/textures/blocks/bone_block_side", Texture.boneSide));
+    allTextures.put("boneTop",
+        new SimpleTexture("assets/minecraft/textures/blocks/bone_block_top", Texture.boneTop));
   }
 
   /**

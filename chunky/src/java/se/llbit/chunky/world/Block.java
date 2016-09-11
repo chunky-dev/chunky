@@ -93,7 +93,7 @@ import java.util.Set;
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
 public class Block extends Material {
-  private static final boolean UNKNOWN_INVISIBLE = true;
+  private static final boolean UNKNOWN_INVISIBLE = false;
 
   public static final int AIR_ID = 0x00;
   public static final Block AIR = new Block(AIR_ID, "Air", Texture.air) {
@@ -3260,11 +3260,17 @@ public class Block extends Material {
       isInvisible = UNKNOWN_INVISIBLE;
     }
   };
-  public static final Block UNKNOWN0xD8 = new Block(0xD8, "Unknown Block 0xD8", Texture.unknown) {
+  public static final Block BONE = new Block(0xD8, "Bone", Texture.boneSide) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] texture = {Texture.boneSide, Texture.boneTop};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return WoodModel.intersect(ray, texture);
     }
   };
   public static final Block UNKNOWN0xD9 = new Block(0xD9, "Unknown Block 0xD9", Texture.unknown) {
@@ -3573,7 +3579,7 @@ public class Block extends Material {
           JUNGLEDOOR, ACACIADOOR, DARKOAKDOOR, ENDROD, CHORUSPLANT, CHORUSFLOWER, PURPURBLOCK,
           PURPURPILLAR, PURPURSTAIRS, PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, UNKNOWN0xCF,
           GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3, UNKNOWN0xD4, UNKNOWN0xD5, UNKNOWN0xD6,
-          UNKNOWN0xD7, UNKNOWN0xD8, UNKNOWN0xD9, UNKNOWN0xDA, UNKNOWN0xDB, UNKNOWN0xDC, UNKNOWN0xDD,
+          UNKNOWN0xD7, BONE, UNKNOWN0xD9, UNKNOWN0xDA, UNKNOWN0xDB, UNKNOWN0xDC, UNKNOWN0xDD,
           UNKNOWN0xDE, UNKNOWN0xDF, UNKNOWN0xE0, UNKNOWN0xE1, UNKNOWN0xE2, UNKNOWN0xE3, UNKNOWN0xE4,
           UNKNOWN0xE5, UNKNOWN0xE6, UNKNOWN0xE7, UNKNOWN0xE8, UNKNOWN0xE9, UNKNOWN0xEA, UNKNOWN0xEB,
           UNKNOWN0xEC, UNKNOWN0xED, UNKNOWN0xEE, UNKNOWN0xEF, UNKNOWN0xF0, UNKNOWN0xF1, UNKNOWN0xF2,

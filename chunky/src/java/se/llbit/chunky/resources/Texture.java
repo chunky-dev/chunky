@@ -443,6 +443,10 @@ public class Texture {
   public static final EntityTexture skeleton = new EntityTexture();
   public static final EntityTexture wither = new EntityTexture();
 
+  // [1.10] Bone.
+  public static final Texture boneSide = new Texture();
+  public static final Texture boneTop = new Texture();
+
   /**
    * Missing or unknown texture.
    */
@@ -452,7 +456,7 @@ public class Texture {
   public static final Texture packedIce = new Texture();
   public static final Texture redSand = new Texture();
 
-  // Tree variants
+  // Tree variants.
   public static final Texture oakWoodTop = new Texture("wood-top");
   public static final Texture spruceWoodTop = new Texture("wood-top");
   public static final Texture birchWoodTop = new Texture("wood-top");

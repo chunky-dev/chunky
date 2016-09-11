@@ -1,5 +1,6 @@
 1.4.0 - TBD
 
+* Added Bone blocks rendering.
 * Chunky now requires Java 8 to run.
 * Modernized the Chunky User Interface by rewriting it in JavaFX.
 * Most of the UI remains similar to the old version, but some parts
