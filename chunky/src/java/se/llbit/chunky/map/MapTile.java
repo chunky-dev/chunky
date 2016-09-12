@@ -16,26 +16,19 @@
  */
 package se.llbit.chunky.map;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.PixelFormat;
-import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.paint.Color;
+import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.Region;
 import se.llbit.math.ColorUtil;
 
-import java.nio.IntBuffer;
-
 /**
  * A tile in the 2D world map or minimap. The tile contains either a chunk or a region.
  * The scale of the tile can not be changed.
  */
 public class MapTile {
-  private static final WritablePixelFormat<IntBuffer> PIXEL_FORMAT =
-      PixelFormat.getIntArgbInstance();
-
   int[] pixels;
 
   public ChunkPosition pos;
@@ -159,7 +152,15 @@ public class MapTile {
     }
   }
 
-  public void drawImage(Image image) {
-    image.getPixelReader().getPixels(0, 0, size, size, PIXEL_FORMAT, pixels, 0, size);
+  /**
+   * Draw a bitmap image to this map tile.
+   */
+  public void drawImage(BitmapImage image) {
+    // Safety check to see that the image has the correct size.
+    // This check fails when trying to draw static icons not rendered to the tile size.
+    // TODO: ensure that the image is always scaled to the tile size.
+    if (image.width == size || image.height == size) {
+      System.arraycopy(image.data, 0, pixels, 0, size * size);
+    }
   }
 }

@@ -21,7 +21,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.resources.ImageLoader;
 
 /**
- * Icon object.
+ * A collection of icon images for Chunky.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
@@ -53,7 +53,6 @@ public class Icon extends Texture {
   public static final Icon wrench = new Icon("wrench");
   public static final Icon map = new Icon("map");
   public static final Icon mapSelected = new Icon("map-selected");
-  public static final Icon chunky = new Icon("mapLoader");
   public static final Icon disk = new Icon("disk");
   public static final Icon load = new Icon("load");
   public static final Icon save = new Icon("save");

@@ -721,4 +721,8 @@ public class Texture {
   public int[] getData() {
     return image.data;
   }
+
+  public BitmapImage getBitmap() {
+    return image;
+  }
 }

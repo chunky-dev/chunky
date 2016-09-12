@@ -38,7 +38,8 @@ public class CorruptLayer extends AbstractLayer {
     if (tile.scale == 1) {
       tile.setPixel(0, 0, averageColor);
     } else {
-      tile.drawImage(Icon.corruptLayer.fxImage());
+      // TODO: scale the image to the current tile size.
+      tile.drawImage(Icon.corruptLayer.getBitmap());
     }
   }
 

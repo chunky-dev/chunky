@@ -24,8 +24,6 @@ import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.math.ColorUtil;
 
-import java.awt.image.DataBufferInt;
-
 /**
  * A layer with block data.
  *
@@ -189,10 +187,6 @@ public class BlockLayer extends AbstractLayer {
       return;
     }
 
-    //g.setColor(new java.awt.Color(1,1,1,0.35f));
-    //g.fillRect(x0, z0, view.chunkScale, view.chunkScale);
-    //g.setColor(highlight);
-
     if (tile.scale == 16) {
       for (int z = 0; z < 16; ++z) {
         for (int x = 0; x < 16; ++x) {
@@ -212,9 +206,7 @@ public class BlockLayer extends AbstractLayer {
             int zp1 = zp0 + blockScale;
             for (int j = zp0; j < zp1; ++j) {
               for (int i = xp0; i < xp1; ++i) {
-                if (hlBlock.id == (0xFF & blocks[j * 16 + i])) {
-                  tile.setPixel(i, j, hlColor);
-                }
+                tile.setPixel(i, j, hlColor);
               }
             }
           }

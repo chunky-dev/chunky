@@ -37,7 +37,8 @@ public class UnknownLayer extends AbstractLayer {
     if (tile.scale == 1) {
       tile.fill(averageColor);
     } else {
-      tile.drawImage(Icon.unknown.fxImage());
+      // TODO: scale the image to the current tile size.
+      tile.drawImage(Icon.unknown.getBitmap());
     }
   }
 
