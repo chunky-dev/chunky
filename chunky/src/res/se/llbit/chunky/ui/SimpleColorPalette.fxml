@@ -26,7 +26,7 @@
       </StackPane>
       <HBox spacing="10.0">
          <children>
-            <StackPane fx:id="satValueGrid" prefHeight="256.0" prefWidth="256.0" />
+            <StackPane fx:id="satValueRect" prefHeight="256.0" prefWidth="256.0" />
             <VBox spacing="10.0">
                <children>
                   <Canvas fx:id="colorSample" height="120.0" width="256.0" />

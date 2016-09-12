@@ -31,13 +31,16 @@ import javafx.stage.Window;
 /**
  * A simple color picker control for JavaFX.
  *
- * The control consists of a text field with the color code as a hexadecimal string
+ * <p>The control consists of a button which can be clicked to bring up
+ * a color palette. The button has an icon displaying the currently selected
+ * color. The color palette uses a Hue gradient selector and a HSV 2D gradient.
+ * The color palette also has color swatches with neighbour colors and
+ * previously selected colors are.
  */
 public class SimpleColorPicker extends Button {
 
   private Color originalColor = Color.CRIMSON;
   private ObjectProperty<Color> color = new SimpleObjectProperty<>(Color.CRIMSON);
-  private final Rectangle colorSample;
   private final Popup popup;
   private final SimpleColorPalette palette;
 
@@ -51,7 +54,7 @@ public class SimpleColorPicker extends Button {
         popup.hide();
       }
     });
-    colorSample = new Rectangle(12, 12);
+    Rectangle colorSample = new Rectangle(12, 12);
     colorSample.setStroke(Color.DARKGRAY);
     colorSample.setStrokeWidth(1);
     colorSample.fillProperty().bind(color);

@@ -21,6 +21,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -58,9 +59,18 @@ import java.util.Random;
 import java.util.ResourceBundle;
 
 /**
- * Color palette for the simple color picker.
- * The color palette contains a HSV-gradient displaying a slice of the HSV color cube.
- * The color palette also shows several color swatches.
+ * Color palette for a simple JavaFX color picker.
+ *
+ * <p>The color palette shows a Hue gradient for picking the Hue value,
+ * and a 2D HSV-gradient displaying a slice of the HSV color cube which
+ * can be clicked to select the Saturation and Value components.
+ * The color palette also has some swatches displaying neighbour colors
+ * and previously selected colors. There is a large color swatch showing
+ * the current color.
+ *
+ * <p>A cancel button is at the bottom right of the color palette, and the
+ * current HTML color code is displayed in a text field at the bottom of the
+ * palette.
  */
 public class SimpleColorPalette extends Region implements Initializable {
 
@@ -86,7 +96,7 @@ public class SimpleColorPalette extends Region implements Initializable {
   private @FXML TextField webColorCode;
   private @FXML Button saveBtn;
   private @FXML Button cancelBtn;
-  private @FXML StackPane satValueGrid;
+  private @FXML StackPane satValueRect;
   private @FXML Pane huePickerOverlay;
   private @FXML Region sample0;
   private @FXML Region sample1;
@@ -109,16 +119,22 @@ public class SimpleColorPalette extends Region implements Initializable {
   private Region[] sample;
   private Region[] history;
 
+  /**
+   * Set to true while the HTML color code listener is modifying the selected color.
+   * When this is set to true it the updating of the HTML color code is disabled.
+   */
+  private boolean editingHtmlCode = false;
+
   public SimpleColorPalette(SimpleColorPicker colorPicker) {
     this.colorPicker = colorPicker;
     try {
-      FXMLLoader loader = new FXMLLoader(getClass().getResource("ColorPicker.fxml"));
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("SimpleColorPalette.fxml"));
       // We need to explicitly set the class loader because in Java 1.8u40 FXMLLoader has a null
       // class loader for some reason:
       loader.setClassLoader(getClass().getClassLoader());
       loader.setController(this);
       getChildren().add(loader.load());
-      setOnMouseClicked(event -> event.consume());
+      setOnMouseClicked(Event::consume);
     } catch (IOException e) {
       throw new Error(e);
     }
@@ -137,9 +153,15 @@ public class SimpleColorPalette extends Region implements Initializable {
 
     webColorCode.textProperty().addListener((observable, oldValue, newValue) -> {
       try {
-        changeColor(Color.web(newValue));
+        editingHtmlCode = true;
+        Color color = Color.web(newValue);
+        hue.set(color.getHue() / 360);
+        saturation.set(color.getSaturation());
+        value.set(color.getBrightness());
       } catch (IllegalArgumentException e) {
         // Harmless exception - ignored.
+      } finally {
+        editingHtmlCode = false;
       }
     });
 
@@ -155,9 +177,9 @@ public class SimpleColorPalette extends Region implements Initializable {
       colorPicker.hide();
     });
 
-    satValueGrid.setBackground(
+    satValueRect.setBackground(
         new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
-    satValueGrid.backgroundProperty().bind(new ObjectBinding<Background>() {
+    satValueRect.backgroundProperty().bind(new ObjectBinding<Background>() {
       {
         bind(hue);
       }
@@ -222,7 +244,7 @@ public class SimpleColorPalette extends Region implements Initializable {
     valueOverlay.getChildren().add(satValIndicator);
     valueOverlay.setClip(new Rectangle(256, 256)); // Clip the indicator circle.
 
-    satValueGrid.getChildren().addAll(saturationOverlay, valueOverlay);
+    satValueRect.getChildren().addAll(saturationOverlay, valueOverlay);
 
     setBackground(new Background(
         new BackgroundFill(Color.rgb(240, 240, 240), new CornerRadii(4.0), new Insets(0))));
@@ -241,8 +263,8 @@ public class SimpleColorPalette extends Region implements Initializable {
     huePickerOverlay.setOnMousePressed(hueMouseHandler);
 
     EventHandler<MouseEvent> mouseHandler = event -> {
-      saturation.set(clamp(event.getX() / satValueGrid.getWidth()));
-      value.set(clamp(1 - event.getY() / satValueGrid.getHeight()));
+      saturation.set(clamp(event.getX() / satValueRect.getWidth()));
+      value.set(clamp(1 - event.getY() / satValueRect.getHeight()));
     };
 
     valueOverlay.setOnMousePressed(mouseHandler);
@@ -261,7 +283,10 @@ public class SimpleColorPalette extends Region implements Initializable {
       if (event.getSource() instanceof Region) {
         Region swatch = (Region) event.getSource();
         if (!swatch.getBackground().getFills().isEmpty()) {
-          changeColor((Color) swatch.getBackground().getFills().get(0).getFill());
+          Color color = (Color) swatch.getBackground().getFills().get(0).getFill();
+          hue.set(color.getHue() / 360);
+          saturation.set(color.getSaturation());
+          value.set(color.getBrightness());
         }
       }
     };
@@ -274,10 +299,10 @@ public class SimpleColorPalette extends Region implements Initializable {
       region.setOnMouseClicked(swatchClickHandler);
     }
     // Initialize history with random colors.
-    for (int i = 0; i < history.length; ++i) {
-      history[i].setBackground(
-          new Background(new BackgroundFill(getRandomNearColor(colorPicker.getColor()),
-              CornerRadii.EMPTY, Insets.EMPTY)));
+    for (Region swatch : history) {
+      swatch.setBackground(new Background(
+          new BackgroundFill(getRandomNearColor(colorPicker.getColor()), CornerRadii.EMPTY,
+              Insets.EMPTY)));
     }
   }
 
@@ -285,7 +310,6 @@ public class SimpleColorPalette extends Region implements Initializable {
     hue.set(color.getHue() / 360);
     saturation.set(color.getSaturation());
     value.set(color.getBrightness());
-    updateCurrentColor(color);
   }
 
   protected void addToHistory(Color color) {
@@ -304,28 +328,32 @@ public class SimpleColorPalette extends Region implements Initializable {
     return (value < 0) ? 0 : (value > 1 ? 1 : value);
   }
 
+  /**
+   * Change the currently selected color and update UI state to match.
+   */
   private void updateCurrentColor(double hue, double saturation, double value) {
     updateCurrentColor(Color.hsb(hue * 360, saturation, value));
   }
 
+  /**
+   * Change the currently selected color and update UI state to match.
+   */
   private void updateCurrentColor(Color newColor) {
-    for (int i = 0; i < sample.length; ++i) {
-      sample[i].setBackground(
-          new Background(new BackgroundFill(getRandomNearColor(newColor),
-              CornerRadii.EMPTY, Insets.EMPTY)));
+    for (Region swatch : sample) {
+      swatch.setBackground(new Background(
+          new BackgroundFill(getRandomNearColor(newColor), CornerRadii.EMPTY, Insets.EMPTY)));
     }
-    changeColor(newColor);
-    // TODO: make sure color values are rounded correctly.
-    webColorCode.setText(String.format("#%02X%02X%02X", (int) (newColor.getRed() * 255 + 0.5),
-        (int) (newColor.getGreen() * 255 + 0.5), (int) (newColor.getBlue() * 255 + 0.5)));
-  }
-
-  private void changeColor(Color newColor) {
     colorPicker.setColor(newColor);
 
     GraphicsContext gc = colorSample.getGraphicsContext2D();
     gc.setFill(newColor);
     gc.fillRect(0, 0, colorSample.getWidth(), colorSample.getHeight());
+
+    if (!editingHtmlCode) {
+      // TODO: make sure color values are rounded correctly.
+      webColorCode.setText(String.format("#%02X%02X%02X", (int) (newColor.getRed() * 255 + 0.5),
+          (int) (newColor.getGreen() * 255 + 0.5), (int) (newColor.getBlue() * 255 + 0.5)));
+    }
   }
 
   private Color getRandomNearColor(Color color) {
