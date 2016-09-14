@@ -35,6 +35,7 @@ block rendering: Bone block rendering.
     * Removed the chunk loading indicator icon.
     * Removed the player Y position indicator.
 * Added -list-scenes command.
+* End rods now emit light.
 
 1.3.8 - 2016-04-03
 
