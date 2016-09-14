@@ -2,8 +2,8 @@ sourceSets.main {
 	java.srcDir 'src'
 	resources {
 		srcDir 'src'
-		include '*.png'
-		include '*.gif'
+		include '**/*.png'
+		include '**/*.fxml'
 	}
 }
 
