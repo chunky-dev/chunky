@@ -138,7 +138,7 @@ public class SceneChooserController implements Initializable {
         stage.close();
       }
     });
-    cancelBtn.setOnAction(e -> stage.close());
+    cancelBtn.setOnAction(e -> stage.hide());
   }
 
   private void populate() {

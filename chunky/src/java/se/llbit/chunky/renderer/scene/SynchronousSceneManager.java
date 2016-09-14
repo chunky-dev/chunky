@@ -74,11 +74,11 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     this.context = context;
     this.renderer = renderer;
 
-    scene = SceneFactory.instance.newScene();
+    scene = context.getChunky().getSceneFactory().newScene();
 
     // The stored scene is a copy of the mutable scene. They even share
     // some data structures that are only used by the renderer.
-    storedScene = SceneFactory.instance.copyScene(scene);
+    storedScene = context.getChunky().getSceneFactory().copyScene(scene);
   }
 
   public void setRenderStatusListener(RenderStatusListener renderStatusListener) {
@@ -89,20 +89,10 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     this.resetHandler = resetHandler;
   }
 
-  /**
-   * This should only be used by the render controls dialog controller.
-   * Modifications to the scene must always be protected by the intrinsic
-   * lock of the scene object.
-   */
-  public Scene getScene() {
+  @Override public Scene getScene() {
     return scene;
   }
 
-  /**
-   * Save the current scene
-   *
-   * @throws InterruptedException
-   */
   @Override public void saveScene() throws InterruptedException {
     try {
       synchronized (storedScene) {
@@ -126,9 +116,6 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     }
   }
 
-  /**
-   * Load a saved scene.
-   */
   @Override public void loadScene(String sceneName)
       throws IOException, SceneLoadingError, InterruptedException {
 
@@ -152,11 +139,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     }
   }
 
-  /**
-   * Load chunks and reset camera and scene.
-   * The scene name should be set before the call to loadFreshChunks().
-   */
-  protected void loadFreshChunks(World world, Collection<ChunkPosition> chunksToLoad) {
+  @Override public void loadFreshChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
       scene.clear();
       scene.loadChunks(renderStatusListener.taskTracker(), world, chunksToLoad);
@@ -168,11 +151,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     renderStatusListener.sceneLoaded();
   }
 
-  /**
-   * Load chunks without resetting the current scene.
-   * This preserves camera position, etc.
-   */
-  protected void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
+  @Override public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
       scene.loadChunks(renderStatusListener.taskTracker(), world, chunksToLoad);
       scene.refresh();
@@ -182,10 +161,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     renderStatusListener.chunksLoaded();
   }
 
-  /**
-   * Attempt to reload all loaded chunks.
-   */
-  protected void reloadChunks() {
+  @Override public void reloadChunks() {
     synchronized (scene) {
       scene.reloadChunks(renderStatusListener.taskTracker());
       scene.refresh();

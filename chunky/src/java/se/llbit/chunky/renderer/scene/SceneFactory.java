@@ -17,20 +17,25 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-public abstract class SceneFactory {
-  public static SceneFactory instance = new PaintableSceneFactory();
+public interface SceneFactory {
+  /**
+   * Builds non-paintable scenes for headless rendering.
+   */
+  SceneFactory HEADLESS = new SceneFactory() {
+    @Override public Scene newScene() {
+      return new Scene();
+    }
 
-  public abstract Scene newScene();
+    @Override public Scene copyScene(Scene scene) {
+      return new Scene(scene);
+    }
+  };
 
   /**
-   * Creates a scene which copies the state of another scene.
-   * Some data like the sample buffer will be shared between the
-   * two scenes.
-   * @param scene the scene to copy
+   * Builds paintable scenes, which can render a preview during
+   * normal non-headless rendering.
    */
-  public abstract Scene copyScene(Scene scene);
-
-  private static class PaintableSceneFactory extends SceneFactory {
+  SceneFactory PAINTABLE = new SceneFactory() {
     @Override public Scene newScene() {
       return new PaintableScene();
     }
@@ -38,5 +43,19 @@ public abstract class SceneFactory {
     @Override public Scene copyScene(Scene scene) {
       return new PaintableScene(scene);
     }
-  }
+  };
+
+  /**
+   * Creates a new scene with the default configuration.
+   */
+  Scene newScene();
+
+  /**
+   * Creates a scene which copies the state of another scene.
+   * Some data like the sample buffer will be shared between the
+   * two scenes.
+   * @param scene the scene to copy
+   */
+  Scene copyScene(Scene scene);
+
 }

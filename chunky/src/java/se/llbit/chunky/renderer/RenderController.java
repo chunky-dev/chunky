@@ -18,25 +18,26 @@ package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
+import se.llbit.chunky.renderer.scene.SceneManager;
 
 /**
  * Contains all state for the renderer.
  */
 public class RenderController {
-  private final AsynchronousSceneManager sceneManager;
+  private final SceneManager sceneManager;
+  private final SceneProvider sceneProvider;
   private final Renderer renderer;
   private final RenderContext context;
 
-  public RenderController(ChunkyOptions options) {
-    context = new RenderContext(options);
-    renderer = new RenderManager(context);
-    sceneManager = new AsynchronousSceneManager(context, renderer);
-    renderer.setSceneProvider(sceneManager.getSceneProvider());
-    renderer.start();
-    sceneManager.start();
+  public RenderController(RenderContext context, Renderer renderer, SceneManager sceneManager,
+      SceneProvider sceneProvider) {
+    this.context = context;
+    this.renderer = renderer;
+    this.sceneManager = sceneManager;
+    this.sceneProvider = sceneProvider;
   }
 
-  public AsynchronousSceneManager getSceneManager() {
+  public SceneManager getSceneManager() {
     return sceneManager;
   }
 
@@ -49,6 +50,6 @@ public class RenderController {
   }
 
   public SceneProvider getSceneProvider() {
-    return sceneManager.getSceneProvider();
+    return sceneProvider;
   }
 }

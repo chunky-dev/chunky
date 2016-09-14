@@ -25,25 +25,29 @@ package se.llbit.util;
  */
 public class TaskTracker {
 
-  public static class TaskBuilder {
-
-    public Task newTask(TaskTracker tracker, Task previous, String name, int size) {
-      return new Task(tracker, previous, name, size);
-    }
+  public interface TaskBuilder {
+    Task newTask(TaskTracker tracker, Task previous, String name, int size);
   }
 
   private final ProgressListener progress;
   private final TaskBuilder taskBuilder;
-
-  private Task backgroundTask = new Task(this, null, "N/A", 1);
+  private final Task backgroundTask;
+  private Task currentTask;
 
   public TaskTracker(ProgressListener progress) {
-    this(progress, new TaskBuilder());
+    this(progress, Task::new);
   }
 
   public TaskTracker(ProgressListener progress, TaskBuilder taskBuilder) {
+    this(progress, taskBuilder, taskBuilder);
+  }
+
+  public TaskTracker(ProgressListener progress, TaskBuilder taskBuilder,
+      TaskBuilder backgroundTaskBuilder) {
     this.progress = progress;
     this.taskBuilder = taskBuilder;
+    this.backgroundTask = backgroundTaskBuilder.newTask(this, null, "N/A", 1);
+    currentTask = backgroundTask;
   }
 
   public static class Task implements AutoCloseable {
@@ -90,7 +94,7 @@ public class TaskTracker {
     }
 
     @Override public void close() {
-      tracker.backgroundTask = previous;
+      tracker.currentTask = previous;
       previous.update();
     }
 
@@ -99,7 +103,10 @@ public class TaskTracker {
       update(task, target, done, "");
     }
 
-    /** Changes the task name and state. */
+    /**
+     * Changes the task name and state.
+     * Reports the task state to the progress listener.
+     */
     public void update(String task, int target, int done, String eta) {
       this.taskName = task;
       this.done = done;
@@ -122,8 +129,8 @@ public class TaskTracker {
   }
 
   public Task task(String taskName, int taskSize) {
-    Task task = taskBuilder.newTask(this, backgroundTask, taskName, taskSize);
-    backgroundTask = task;
+    Task task = taskBuilder.newTask(this, currentTask, taskName, taskSize);
+    currentTask = task;
     task.update();
     return task;
   }

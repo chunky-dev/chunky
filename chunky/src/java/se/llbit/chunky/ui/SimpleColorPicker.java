@@ -49,11 +49,6 @@ public class SimpleColorPicker extends Button {
     palette = new SimpleColorPalette(this);
     popup = new Popup();
     popup.getContent().add(palette);
-    popup.focusedProperty().addListener((observable, oldValue, newValue) -> {
-      if (!newValue) {
-        popup.hide();
-      }
-    });
     Rectangle colorSample = new Rectangle(12, 12);
     colorSample.setStroke(Color.DARKGRAY);
     colorSample.setStrokeWidth(1);

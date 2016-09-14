@@ -179,7 +179,7 @@ public class GeneralTab extends VBox implements RenderControlTab, Initializable 
     loadSceneBtn.setGraphic(new ImageView(Icon.load.fxImage()));
     loadSceneBtn.setOnAction(e -> {
       try {
-        SceneChooser chooser = new SceneChooser(chunkyFxController, controller.getSceneManager());
+        SceneChooser chooser = new SceneChooser(chunkyFxController);
         chooser.show();
       } catch (IOException e1) {
         Log.error("Failed to create scene chooser window.", e1);

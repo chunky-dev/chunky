@@ -57,8 +57,19 @@ public interface Renderer {
 
   RenderStatus getRenderStatus();
 
-  /** Start up the renderer. */
+  /**
+   * Start up the renderer.
+   *
+   * <p>This should start all worker threads used by the renderer.
+   */
   void start();
 
   void withSampleBufferProtected(SampleBufferConsumer consumer);
+
+  /**
+   * Shut down the renderer.
+   *
+   * <p>This should interrupt all worker threads used by the renderer.
+   */
+  void shutdown();
 }

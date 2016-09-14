@@ -28,17 +28,12 @@ public class ConsoleRenderListener extends StandardRenderListener {
 
   public ConsoleRenderListener(RenderContext context, SceneManager sceneManager) {
     super(context, sceneManager, new TaskTracker(new ConsoleProgressListener(),
-        new TaskTracker.TaskBuilder() {
-          @Override public TaskTracker.Task newTask(TaskTracker tracker, TaskTracker.Task previous,
-              String name, int size) {
-            return new TaskTracker.Task(tracker, previous, name, size) {
-              @Override public void close() {
-                super.close();
-                long endTime = System.currentTimeMillis();
-                int seconds = (int) ((endTime - startTime) / 1000);
-                System.out.format("\r%s took %dm %ds%n", name, seconds / 60, seconds % 60);
-              }
-            };
+        (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
+          @Override public void close() {
+            super.close();
+            long endTime = System.currentTimeMillis();
+            int seconds = (int) ((endTime - startTime) / 1000);
+            System.out.format("\r%s took %dm %ds%n", name, seconds / 60, seconds % 60);
           }
         }));
   }

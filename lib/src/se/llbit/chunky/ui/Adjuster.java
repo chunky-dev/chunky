@@ -16,9 +16,12 @@
  */
 package se.llbit.chunky.ui;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -33,8 +36,9 @@ import java.util.function.Consumer;
 /**
  * A UI control combining a label, slider, and text field for adjusting one property.
  */
-public abstract class Adjuster<T> extends HBox {
-  private final Label nameLbl = new Label("Name:");
+public abstract class Adjuster<T extends Number> extends HBox {
+  private StringProperty name = new SimpleStringProperty("Name");
+  private final Label nameLbl = new Label();
   private final Slider valueSlider = new Slider();
   private final TextField valueField = new TextField();
   private final Property<Number> value;
@@ -49,6 +53,7 @@ public abstract class Adjuster<T> extends HBox {
 
   protected Adjuster(Property<Number> value) {
     this.value = value;
+    nameLbl.textProperty().bind(Bindings.concat(name, ":"));
     setAlignment(Pos.CENTER_LEFT);
     setSpacing(10);
     getChildren().addAll(nameLbl, valueSlider, valueField);
@@ -60,7 +65,15 @@ public abstract class Adjuster<T> extends HBox {
   }
 
   public void setName(String name) {
-    nameLbl.setText(name + ":");
+    this.name.set(name);
+  }
+
+  public String getName() {
+    return name.get();
+  }
+
+  public StringProperty nameProperty() {
+    return name;
   }
 
   public void setRange(double min, double max) {

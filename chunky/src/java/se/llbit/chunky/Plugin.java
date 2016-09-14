@@ -1,4 +1,5 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/*
+ * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -14,25 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.launcher;
+package se.llbit.chunky;
+
+import se.llbit.chunky.main.Chunky;
 
 /**
- * Logging interface for the Chunky process.
- * This is used to capture Chunky output to the debug console.
+ * The plugin interface for Chunky plugins.
+ *
+ * <p>The Chunky launcher calls the attach() method for each plugin
+ * in the plugin load order. A reference to the Chunky instance is passed
+ * so that plugins can register their hooks.
  */
-public interface Logger {
-  void appendStdout(byte[] buffer, int size);
-
-  void appendStderr(byte[] buffer, int size);
-
-  void appendLine(String line);
-
-  void appendErrorLine(String line);
-
+public interface Plugin {
   /**
-   * Signals to the logger that the program has ended.
-   *
-   * @param exitVal the exit value of the Chunky process.
+   * This is called so that the plugin can initialize itself and
+   * register its hooks with the Chunky instance.
+   * @param chunky Chunky instance which the plugin should attach to
    */
-  void processExited(int exitValue);
+  void attach(Chunky chunky);
 }

@@ -156,6 +156,7 @@ public final class PersistentSettings {
     save();
   }
 
+  /** @return the world directory of the previously loaded world. */
   public static File getLastWorld() {
     String lastWorld = settings.getString("lastWorld", "");
     return lastWorld.isEmpty() ? null : new File(lastWorld);

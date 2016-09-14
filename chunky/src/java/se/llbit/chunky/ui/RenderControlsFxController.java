@@ -28,6 +28,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
@@ -42,6 +43,7 @@ import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.ResetReason;
+import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.RenderResetHandler;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.StandardRenderListener;
@@ -70,6 +72,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Controller for the Render Controls dialog.
  */
 public class RenderControlsFxController implements Initializable, RenderResetHandler {
+  private AsynchronousSceneManager asyncSceneManager;
+
   static class GUIRenderListener extends StandardRenderListener {
     private final RenderControlsFxController gui;
     private int spp;
@@ -250,7 +254,7 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
   @Override public void initialize(URL location, ResourceBundle resources) {
     saveBtn.setTooltip(new Tooltip("Save the current scene."));
     saveBtn.setGraphic(new ImageView(Icon.disk.fxImage()));
-    saveBtn.setOnAction(e -> renderController.getSceneManager().saveScene());
+    saveBtn.setOnAction(e -> asyncSceneManager.saveScene());
     saveFrameBtn.setOnAction(this::saveCurrentFrame);
     tabPane.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> updateTab(newValue));
@@ -338,12 +342,28 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
     renderer = renderController.getRenderer();
     scene = renderController.getSceneManager().getScene();
     sceneNameField.setText(scene.name);
+    sceneNameField.setTextFormatter(new TextFormatter<TextFormatter.Change>(change -> {
+      if (change.isReplaced()) {
+        if (change.getText().isEmpty()) {
+          // Disallow clearing the scene name.
+          change.setText(change.getControlText().substring(change.getRangeStart(),
+              change.getRangeEnd()));
+        }
+      }
+      if (change.isAdded()) {
+        if (!AsynchronousSceneManager.sceneNameIsValid(change.getText())) {
+          // Stop a change adding illegal characters to the scene name.
+          change.setText("");
+        }
+      }
+      return change;
+    }));
     sceneNameField.textProperty().addListener((observable, oldValue, newValue) -> {
       scene.setName(newValue);
       renderController.getSceneProvider().withSceneProtected(scene -> scene.setName(newValue));
       updateTitle();
     });
-    sceneNameField.setOnAction(event -> renderController.getSceneManager().saveScene());
+    sceneNameField.setOnAction(event -> asyncSceneManager.saveScene());
     generalTab.setRenderController(renderController);
     lightingTab.setRenderController(renderController);
     skyTab.setRenderController(renderController);
@@ -355,8 +375,11 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
     targetSpp.set(scene.getTargetSpp());
     targetSpp.onValueChange(value -> scene.setTargetSpp(value));
 
-    renderController.getSceneManager().setResetHandler(this);
-    renderController.getSceneManager().setRenderStatusListener(renderTracker);
+    // TODO: remove the cast.
+    asyncSceneManager =
+        (AsynchronousSceneManager) renderController.getSceneManager();
+    asyncSceneManager.setResetHandler(this);
+    asyncSceneManager.setRenderStatusListener(renderTracker);
     renderer.setRenderListener(renderTracker);
   }
 
@@ -435,12 +458,12 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
           ConfirmResetPopup popup = new ConfirmResetPopup(
               () -> {
                 // On accept.
-                renderController.getSceneManager().applySceneChanges();
+                asyncSceneManager.applySceneChanges();
                 resetConfirmMutex.set(false);
               },
               () -> {
                 // On reject.
-                renderController.getSceneManager().discardSceneChanges();
+                asyncSceneManager.discardSceneChanges();
                 refreshSettings();
                 resetConfirmMutex.set(false);
               });

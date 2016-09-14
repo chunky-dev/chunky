@@ -16,15 +16,13 @@
  */
 package se.llbit.chunky.launcher;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Collection;
-import java.util.LinkedList;
-
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.VersionInfo.Library;
 import se.llbit.chunky.launcher.VersionInfo.LibraryStatus;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 
 /**
  * Helper class to download an update with console output.
@@ -42,29 +40,11 @@ public class ConsoleUpdater {
     if (!versionsDir.isDirectory()) {
       versionsDir.mkdirs();
     }
-    Collection<VersionInfo.Library> neededLibraries = new LinkedList<VersionInfo.Library>();
     for (Library lib : version.libraries) {
       LibraryStatus libStatus = lib.testIntegrity(libDir);
       if (libStatus != LibraryStatus.PASSED && libStatus != LibraryStatus.INCOMPLETE_INFO) {
-        neededLibraries.add(lib);
-
-        // pretty print library size
-        float size = lib.size;
-        String unit = "B";
-        if (size >= 1024 * 1024) {
-          size /= 1024 * 1024;
-          unit = "MiB";
-        } else if (size >= 1024) {
-          size /= 1024;
-          unit = "KiB";
-        }
-        String libSize;
-        if (size >= 10) {
-          libSize = String.format("%d %s", (int) size, unit);
-        } else {
-          libSize = String.format("%.1f %s", size, unit);
-        }
-        System.out.print("Downloading " + lib + " [" + libSize + "]...");
+        String libSize = ChunkyLauncher.prettyPrintSize(lib.size);
+        System.out.format("Downloading %s [%s]...", lib, libSize);
 
         if (downloadLibrary(libDir, lib, System.out)) {
           System.out.println("done!");
@@ -84,14 +64,11 @@ public class ConsoleUpdater {
   /**
    * Attempt to download a library.
    *
-   * @param libDir
-   * @param lib
-   * @param err
    * @return {@code true} if the library was downloaded successfully
    */
   private static boolean downloadLibrary(File libDir, Library lib, PrintStream err) {
     if (!lib.url.isEmpty()) {
-      DownloadStatus result = UpdateDialog.tryDownload(libDir, lib, lib.url);
+      DownloadStatus result = ChunkyLauncher.tryDownload(libDir, lib, lib.url);
       switch (result) {
         case MALFORMED_URL:
           err.println("Malformed URL: " + lib.url);
@@ -110,7 +87,7 @@ public class ConsoleUpdater {
     if (!lib.url.isEmpty()) {
       err.print("  retrying with URL=" + defaultUrl + "...");
     }
-    DownloadStatus result = UpdateDialog.tryDownload(libDir, lib, defaultUrl);
+    DownloadStatus result = ChunkyLauncher.tryDownload(libDir, lib, defaultUrl);
     switch (result) {
       case MALFORMED_URL:
         err.println("Malformed URL: " + defaultUrl);

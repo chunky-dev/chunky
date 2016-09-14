@@ -28,7 +28,7 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 
 /**
- * Check for update and run update dialog (or just update in headless mode)
+ * Check for update and run update dialog (or just update in headless mode).
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
@@ -63,7 +63,7 @@ public class UpdateChecker extends Thread {
   }
 
   private boolean tryUpdate() throws IOException, SyntaxError {
-    List<VersionInfo> candidates = new LinkedList<VersionInfo>();
+    List<VersionInfo> candidates = new LinkedList<>();
 
     candidates.add(getVersion("http://chunkyupdate.llbit.se/latest.json"));
 
@@ -71,7 +71,7 @@ public class UpdateChecker extends Thread {
       candidates.add(getVersion("http://chunkyupdate.llbit.se/snapshot.json"));
     }
 
-    // filter out corrupt versions
+    // Filter out corrupt versions.
     Iterator<VersionInfo> iter = candidates.iterator();
     while (iter.hasNext()) {
       if (!iter.next().isValid()) {
@@ -84,7 +84,7 @@ public class UpdateChecker extends Thread {
           .updateError("The downloaded version info was corrupt. Can not update at this moment.");
       return false;
     } else {
-      // find latest candidate
+      // Find latest candidate.
       VersionInfo latest = candidates.get(0);
       for (VersionInfo candidate : candidates) {
         if (candidate.compareTo(latest) < 0) {
@@ -92,19 +92,19 @@ public class UpdateChecker extends Thread {
         }
       }
 
-      // check if more recent version than candidate is already installed
+      // Check if more recent version than candidate is already installed.
       List<VersionInfo> versions = ChunkyDeployer.availableVersions();
       iter = versions.iterator();
       while (iter.hasNext()) {
         VersionInfo available = iter.next();
         if (available.compareTo(latest) <= 0 && ChunkyDeployer
             .checkVersionIntegrity(available.name)) {
-          // more recent version already installed and not corrupt
+          // More recent version already installed and not corrupt.
           return false;
         }
       }
 
-      // install the candidate!
+      // Install the candidate!
       listener.updateAvailable(latest);
       return true;
     }

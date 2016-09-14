@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="578.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label text="A new version of Chunky is available for download!" />
+      <Text fx:id="releaseInfo" strokeType="OUTSIDE" strokeWidth="0.0" text="Version XYZ, released on DATE" wrappingWidth="432.13671875" />
+      <Label layoutX="20.0" layoutY="20.0" text="Release notes:" />
+      <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" prefHeight="305.0" prefWidth="530.0">
+         <content>
+            <TextArea fx:id="releaseNotes" editable="false" maxHeight="1.7976931348623157E308" />
+         </content>
+      </ScrollPane>
+      <TitledPane fx:id="detailsPane" animated="false" expanded="false" text="Details">
+        <content>
+            <TableView fx:id="dependencies" prefHeight="200.0">
+              <columns>
+                <TableColumn fx:id="libraryCol" prefWidth="222.0" text="Library" />
+                <TableColumn fx:id="statusCol" minWidth="0.0" prefWidth="150.0" text="Status" />
+                  <TableColumn fx:id="sizeCol" minWidth="0.0" prefWidth="106.0" text="Size" />
+              </columns>
+            </TableView>
+        </content>
+      </TitledPane>
+      <ProgressBar fx:id="progress" maxWidth="1.7976931348623157E308" progress="0.0" />
+      <HBox alignment="CENTER_RIGHT" spacing="10.0">
+         <children>
+            <Label fx:id="updateComplete" text="Update complete!" visible="false">
+               <graphic>
+                  <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@cached.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Label>
+            <ProgressIndicator fx:id="busyIndicator" prefHeight="30.0" prefWidth="30.0" visible="false" />
+            <Button fx:id="updateButton" defaultButton="true" mnemonicParsing="false" text="Update to New Version" />
+          <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" text="Cancel" />
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</VBox>

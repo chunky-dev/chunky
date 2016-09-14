@@ -95,12 +95,8 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
   public void setResetHandler(RenderResetHandler resetHandler) {
     sceneManager.setResetHandler(resetHandler);
   }
-  /**
-   * This should only be used by the render controls dialog controller.
-   * Modifications to the scene must always be protected by the intrinsic
-   * lock of the scene object.
-   */
-  public Scene getScene() {
+
+  @Override public Scene getScene() {
     return sceneManager.getScene();
   }
 
@@ -179,7 +175,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
   /**
    * Load chunks and reset camera.
    */
-  public synchronized void loadFreshChunks(World world, Collection<ChunkPosition> chunks) {
+  @Override public synchronized void loadFreshChunks(World world, Collection<ChunkPosition> chunks) {
     chunksToLoad = chunks;
     this.world = world;
     action = Action.LOAD_FRESH_CHUNKS;
@@ -189,7 +185,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
   /**
    * Load chunks without moving the camera.
    */
-  public synchronized void loadChunks(World world, Collection<ChunkPosition> chunks) {
+  @Override public synchronized void loadChunks(World world, Collection<ChunkPosition> chunks) {
     chunksToLoad = chunks;
     this.world = world;
     action = Action.LOAD_CHUNKS;
@@ -199,7 +195,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
   /**
    * Reload all chunks
    */
-  public synchronized void reloadChunks() {
+  @Override public synchronized void reloadChunks() {
     action = Action.RELOAD_CHUNKS;
     notify();
   }
@@ -266,6 +262,7 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
     switch (c) {
       case '/':
       case ':':
+      case ';':
       case '\\': // Windows file separator.
       case '*':
       case '?':

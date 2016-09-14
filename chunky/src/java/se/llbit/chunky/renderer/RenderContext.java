@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer;
 
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.renderer.scene.SceneDescription;
 
@@ -27,19 +28,26 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Rendering context.
+ * Rendering context - keeps track of the Chunky configuration
+ * used for rendering.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class RenderContext {
 
+  protected final Chunky chunky;
   protected final ChunkyOptions config;
 
   /**
    * Construct a new render context.
    */
-  public RenderContext(ChunkyOptions options) {
+  public RenderContext(Chunky chunky, ChunkyOptions options) {
+    this.chunky = chunky;
     this.config = options;
+  }
+
+  public Chunky getChunky() {
+    return chunky;
   }
 
   /**

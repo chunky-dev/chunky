@@ -18,10 +18,6 @@ package se.llbit.chunky.main;
 
 import org.jastadd.util.PrettyPrinter;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.renderer.ConsoleProgressListener;
-import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.SimpleRenderListener;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneDescription;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
@@ -34,7 +30,6 @@ import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 import se.llbit.util.MCDownloader;
 import se.llbit.util.StringUtil;
-import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,13 +39,18 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class CommandLineOptions {
   enum Mode {
     DEFAULT,
     NOTHING,
     HEADLESS_RENDER,
+    SNAPSHOT,
   }
 
   /**
@@ -72,6 +72,7 @@ public class CommandLineOptions {
           "  -reset <NAME> <SCENE>  reset a configuration option for a scene and exit",
           "  -reset <NAME> <SCENE>  reset a configuration option for a scene and exit",
           "  -download-mc <VERSION> download the given Minecraft version and exit",
+          "  -list-scenes           print a list of all scenes in the scene directory",
           "  -help                  show this text", "", "Notes:",
           "<SCENE> can be either the path to a Scene Description File ("
               + SceneDescription.SCENE_DESCRIPTION_EXTENSION + "),",
@@ -93,219 +94,253 @@ public class CommandLineOptions {
 
   protected ChunkyOptions options = ChunkyOptions.getDefaults();
 
+  static class Range {
+    public final int start;
+    public final int end;
+
+    public Range(int value) {
+      this(value, value);
+    }
+
+    public Range(int start, int end) {
+      this.start = start;
+      this.end = end;
+    }
+  }
+
+  static class ArgumentError extends Exception {
+    public ArgumentError(String message) {
+      super(message);
+    }
+  }
+
+  static class OptionHandler {
+    private final String flag;
+    private final Range numOptions;
+    private final Consumer<List<String>> consumer;
+    private final Runnable errorHandler;
+
+    public OptionHandler(String flag, Range numOptions, Consumer<List<String>> consumer) {
+      this.flag = flag;
+      this.numOptions = numOptions;
+      this.consumer = consumer;
+      errorHandler = null;
+    }
+
+    public OptionHandler(String flag, Range numOptions, Consumer<List<String>> consumer,
+        Runnable errorHandler) {
+      this.flag = flag;
+      this.numOptions = numOptions;
+      this.consumer = consumer;
+      this.errorHandler = errorHandler;
+    }
+
+    int handle(String[] args, int pos) throws ArgumentError {
+      List<String> arguments = new LinkedList<>();
+      for (int i = 0; i < numOptions.end; i += 1) {
+        int nextArg = i + pos;
+        if (nextArg >= args.length) {
+          if (i >= numOptions.start) {
+            // We don't need to have the maximum number of options.
+            break;
+          }
+          if (errorHandler != null) {
+            errorHandler.run();
+            return args.length;  // Skip handling the rest of the command line.
+          } else {
+            throw new ArgumentError(String
+                .format("Missing argument for %s option. Found %d arguments, expected %d.",
+                    flag, i + 1, numOptions.start));
+          }
+        }
+        arguments.add(args[nextArg]);
+      }
+      consumer.accept(new LinkedList<>(arguments));  // Create copy to avoid side effects.
+      return pos + arguments.size();
+    }
+  }
+
+  private Map<String, OptionHandler> optionHandlers = new HashMap<>();
+
   public CommandLineOptions(String[] args) {
     boolean selectedWorld = false;
 
     options.sceneDir = PersistentSettings.getSceneDirectory();
 
-    // TODO: The command-line argument parsing should be refactored.
-    for (int i = 0; i < args.length; ++i) {
-      if (args[i].equals("-texture") && args.length > i + 1) {
-        options.texturePack = args[++i];
-      } else if (args[i].equals("-scene-dir")) {
-        if (i + 1 == args.length) {
-          System.err.println("Missing argument for -scene-dir option");
-          confError = true;
-          break;
-        } else {
-          options.sceneDir = new File(args[i + 1]);
-          i += 1;
-        }
-      } else if (args[i].equals("-render")) {
-        if (i + 1 == args.length) {
+    registerOption("-texture", new Range(1),
+        arguments -> options.texturePack = arguments.get(0));
+
+    registerOption("-scene-dir", new Range(1),
+        arguments -> options.sceneDir = new File(arguments.get(0)));
+
+    registerOption("-render", new Range(1),
+        arguments -> {
+          mode = Mode.HEADLESS_RENDER;
+          options.sceneName = arguments.get(0);
+        },
+        () -> {
           System.err.println("You must specify a scene name for the -render command");
           printAvailableScenes();
           confError = true;
-          break;
-        } else {
-          options.sceneName = args[i + 1];
-          i += 1;
-        }
-      } else if (args[i].equals("-target")) {
-        if (i + 1 == args.length) {
-          System.err.println("Missing argument for -target option");
-          confError = true;
-          break;
-        } else {
-          options.target = Math.max(1, Integer.parseInt(args[i + 1]));
-          i += 1;
-        }
-      } else if (args[i].equals("-threads")) {
-        if (i + 1 == args.length) {
-          System.err.println("Missing argument for -threads option");
-          confError = true;
-          break;
-        } else {
-          options.renderThreads = Math.max(1, Integer.parseInt(args[i + 1]));
-          i += 1;
-        }
-      } else if (args[i].equals("-tile-width")) {
-        if (i + 1 == args.length) {
-          System.err.println("Missing argument for -tile-width option");
-          confError = true;
-          break;
-        } else {
-          options.tileWidth = Math.max(1, Integer.parseInt(args[i + 1]));
-          i += 1;
-        }
-      } else if (args[i].equals("-version")) {
-        System.out.println("Chunky " + Version.getVersion());
-        mode = Mode.NOTHING;
-        break;
-      } else if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("-help") || args[i]
-          .equals("--help")) {
-        printUsage();
-        System.out
-            .println("The default scene directory is " + PersistentSettings.getSceneDirectory());
-        mode = Mode.NOTHING;
-      } else if (args[i].equals("-snapshot")) {
-        mode = Mode.NOTHING;
-        if (args.length > i + 1) {
-          options.sceneName = args[i + 1];
-          String pngFileName = "";
-          if (args.length > i + 2) {
-            pngFileName = args[i + 2];
+        });
+
+    registerOption("-target", new Range(1),
+        arguments -> options.target = Math.max(1, Integer.parseInt(arguments.get(0))));
+
+    registerOption("-threads", new Range(1),
+        arguments -> options.renderThreads = Math.max(1, Integer.parseInt(arguments.get(0))));
+
+    registerOption("-tile-width", new Range(1),
+        arguments -> options.tileWidth = Math.max(1, Integer.parseInt(arguments.get(0))));
+
+    registerOption("-version", new Range(0), arguments -> {
+      mode = Mode.NOTHING;
+      System.out.println("Chunky " + Version.getVersion());
+    });
+
+    registerOption(new String[] {"-help", "-h", "-?", "--help"}, new Range(0), arguments -> {
+      mode = Mode.NOTHING;
+      printUsage();
+      System.out.println("The default scene directory is " + PersistentSettings.getSceneDirectory());
+    });
+
+    registerOption("-snapshot", new Range(1, 2), arguments -> {
+      mode = Mode.SNAPSHOT;
+      options.sceneName = arguments.get(0);
+      if (arguments.size() == 2) {
+        options.imageOutputFile = arguments.get(1);
+      }
+    }, () -> {
+      System.err.println("You must specify a scene name for the -snapshot command!");
+      printAvailableScenes();
+      confError = true;
+    });
+
+    registerOption("-list-scenes", new Range(0), arguments -> {
+      mode = Mode.NOTHING;
+      printAvailableScenes();
+    });
+
+    registerOption("-set", new Range(2, 3), arguments -> {
+      mode = Mode.NOTHING;
+      if (arguments.size() == 3) {
+        options.sceneName = arguments.get(2);
+        try {
+          File file = options.getSceneDescriptionFile();
+          JsonObject desc = readSceneJson(file);
+          String name = arguments.get(0);
+          String value = arguments.get(1);
+          System.out.format("%s <- %s%n", name, value);
+          String[] path = name.split("\\.");
+          JsonObject obj = desc;
+          for (int j = 0; j < path.length - 1; ++j) {
+            obj = obj.get(path[j]).object();
           }
+          JsonValue jsonValue;
           try {
-            File file = getSceneDescriptionFile(options);
-            Scene scene = new Scene();
-            FileInputStream in = new FileInputStream(file);
-            scene.loadDescription(in);
-            RenderContext context = new RenderContext(options);
-            SimpleRenderListener listener = new SimpleRenderListener(new ConsoleProgressListener());
-            scene.setCanvasSize(scene.width, scene.height);
-            scene.loadDump(context, listener);
-            if (pngFileName.isEmpty()) {
-              pngFileName = scene.name + "-" + scene.spp + ".png";
-            }
-            scene.saveFrame(new File(pngFileName), new TaskTracker(listener.progressListener()));
-            System.out.println("Saved snapshot to " + pngFileName);
-          } catch (IOException e) {
-            System.err.println("Failed to dump snapshot: " + e.getMessage());
-          }
-          return;
-        } else {
-          System.err.println("You must specify a scene name for the -snapshot command!");
-          printAvailableScenes();
-          confError = true;
-          break;
-        }
-      } else if (args[i].equals("-set")) {
-        mode = Mode.NOTHING;
-        if (args.length > i + 3) {
-          options.sceneName = args[i + 3];
-          try {
-            File file = getSceneDescriptionFile(options);
-            JsonObject desc = readSceneJson(file);
-            String name = args[i + 1];
-            String value = args[i + 2];
-            System.out.println(name + " <- " + value);
-            String[] path = name.split("\\.");
-            JsonObject obj = desc;
-            for (int j = 0; j < path.length - 1; ++j) {
-              obj = obj.get(path[j]).object();
-            }
-            JsonValue jsonValue;
-            try {
-              jsonValue = new JsonNumber(Integer.parseInt(value));
-            } catch (Exception e) {
-              jsonValue = new JsonString(value);
-            }
-            obj.set(path[path.length - 1], jsonValue);
-            writeSceneJson(file, desc);
-            System.out.println("Updated scene " + file.getAbsolutePath());
-          } catch (SyntaxError e) {
-            System.err.println("JSON syntax error");
-          } catch (IOException e) {
-            System.err.println("Failed to write/load Scene Description File: " + e.getMessage());
-          }
-          return;
-        } else if (args.length > i + 2) {
-          String name = args[i + 1];
-          String value = args[i + 2];
-          try {
-            PersistentSettings.setIntOption(name, Integer.parseInt(value));
+            jsonValue = new JsonNumber(Integer.parseInt(value));
           } catch (Exception e) {
-            PersistentSettings.setStringOption(name, value);
+            jsonValue = new JsonString(value);
           }
-          return;
-        } else {
-          System.err.println("Too few arguments for -set option!");
-          confError = true;
-          break;
+          obj.set(path[path.length - 1], jsonValue);
+          writeSceneJson(file, desc);
+          System.out.println("Updated scene " + file.getAbsolutePath());
+        } catch (SyntaxError e) {
+          System.err.println("JSON syntax error");
+        } catch (IOException e) {
+          System.err.println("Failed to write/load Scene Description File: " + e.getMessage());
         }
-      } else if (args[i].equals("-reset")) {
-        mode = Mode.NOTHING;
-        if (args.length > i + 2) {
-          options.sceneName = args[i + 2];
-          try {
-            File file = getSceneDescriptionFile(options);
-            JsonObject desc = readSceneJson(file);
-            String name = args[i + 1];
-            System.out.println("- " + name);
-            String[] path = name.split("\\.");
-            JsonObject obj = desc;
-            for (int j = 0; j < path.length - 1; ++j) {
-              obj = obj.get(path[j]).object();
-            }
-            for (int j = 0; j < obj.getNumMember(); ++j) {
-              if (obj.getMember(j).getName().equals(name)) {
-                obj.getMemberList().removeChild(j);
-                break;
-              }
-            }
-            writeSceneJson(file, desc);
-            System.out.println("Updated scene " + file.getAbsolutePath());
-          } catch (SyntaxError e) {
-            System.err.println("JSON syntax error");
-          } catch (IOException e) {
-            System.err.println("Failed to write/load Scene Description File: " + e.getMessage());
-          }
-          return;
-        } else if (args.length > i + 1) {
-          PersistentSettings.resetOption(args[i + 1]);
-          return;
-        } else {
-          System.err.println("Too few arguments for -reset option!");
-          confError = true;
-          break;
+      } else if (arguments.size() == 2) {
+        String name = arguments.get(0);
+        String value = arguments.get(1);
+        try {
+          PersistentSettings.setIntOption(name, Integer.parseInt(value));
+        } catch (Exception e) {
+          PersistentSettings.setStringOption(name, value);
         }
-      } else if (args[i].equals("-download-mc")) {
-        mode = Mode.NOTHING;
-        if (args.length > i + 1) {
-          String version = args[i + 1];
-          try {
-            File dir = new File(PersistentSettings.settingsDirectory(), "resources");
-            if (!dir.exists()) {
-              //noinspection ResultOfMethodCallIgnored
-              dir.mkdir();
-            }
-            if (!dir.isDirectory()) {
-              System.err.println("Failed to create destination directory " + dir.getAbsolutePath());
-            }
-            System.out.println("Downloading Minecraft " + version + "...");
-            MCDownloader.downloadMC(version, dir);
-            System.out.println("Done!");
-          } catch (MalformedURLException e) {
-            System.err.println("Malformed URL (" + e.getMessage() + ")");
-          } catch (FileNotFoundException e) {
-            System.err.println("File not found (" + e.getMessage() + ")");
-          } catch (IOException e) {
-            System.err.println("Download failed (" + e.getMessage() + ")");
+      } else {
+        throw new Error("Wrong number of option arguments.");
+      }
+    });
+
+    registerOption("-reset", new Range(1), arguments -> {
+      mode = Mode.NOTHING;
+      if (arguments.size() == 2) {
+        options.sceneName = arguments.get(1);
+        try {
+          File file = options.getSceneDescriptionFile();
+          JsonObject desc = readSceneJson(file);
+          String name = arguments.get(0);
+          System.out.println("- " + name);
+          String[] path = name.split("\\.");
+          JsonObject obj = desc;
+          for (int j = 0; j < path.length - 1; ++j) {
+            obj = obj.get(path[j]).object();
           }
-          i += 1;
-        } else {
-          System.err.println("Missing argument for -download-mc option");
+          for (int j = 0; j < obj.getNumMember(); ++j) {
+            if (obj.getMember(j).getName().equals(name)) {
+              obj.getMemberList().removeChild(j);
+              break;
+            }
+          }
+          writeSceneJson(file, desc);
+          System.out.println("Updated scene " + file.getAbsolutePath());
+        } catch (SyntaxError e) {
+          System.err.println("JSON syntax error");
+        } catch (IOException e) {
+          System.err.println("Failed to write/load Scene Description File: " + e.getMessage());
+        }
+      } else if (arguments.size() == 1) {
+        PersistentSettings.resetOption(arguments.get(0));
+      } else {
+        throw new Error("Wrong number of option arguments.");
+      }
+    });
+
+    registerOption("-download-mc", new Range(1), arguments -> {
+      mode = Mode.NOTHING;
+      String version = arguments.get(0);
+      try {
+        File dir = new File(PersistentSettings.settingsDirectory(), "resources");
+        if (!dir.exists()) {
+          //noinspection ResultOfMethodCallIgnored
+          dir.mkdir();
+        }
+        if (!dir.isDirectory()) {
+          System.err.println("Failed to create destination directory " + dir.getAbsolutePath());
+        }
+        System.out.println("Downloading Minecraft " + version + "...");
+        MCDownloader.downloadMC(version, dir);
+        System.out.println("Done!");
+      } catch (MalformedURLException e) {
+        System.err.println("Malformed URL (" + e.getMessage() + ")");
+      } catch (FileNotFoundException e) {
+        System.err.println("File not found (" + e.getMessage() + ")");
+      } catch (IOException e) {
+        System.err.println("Download failed (" + e.getMessage() + ")");
+      }
+    });
+
+    // When mode is set to Mode.NOTHING, then an option handler has performed
+    // something and we should quit.
+    // If confError is set to true then an option handler encountered an
+    // error and we should quit.
+    for (int i = 0; i < args.length && !confError && mode != Mode.NOTHING; ++i) {
+      if (optionHandlers.containsKey(args[i])) {
+        try {
+          i = optionHandlers.get(args[i]).handle(args, i + 1);
+        } catch (ArgumentError error) {
+          System.err.println(error.getMessage());
+          printUsage();
           confError = true;
-          break;
         }
       } else if (!args[i].startsWith("-") && !selectedWorld) {
         options.worldDir = new File(args[i]);
+        selectedWorld = true;
       } else {
-        System.err.println("Unrecognized argument: " + args[i]);
+        System.err.println("Unrecognized option: " + args[i]);
         printUsage();
         confError = true;
-        break;
       }
     }
 
@@ -318,7 +353,7 @@ public class CommandLineOptions {
       }
     }
 
-    if (!confError && mode != Mode.NOTHING) {
+    if (!confError && mode != Mode.NOTHING && mode != Mode.SNAPSHOT) {
       try {
         if (options.texturePack != null) {
           TexturePackLoader.loadTexturePack(new File(options.texturePack), false);
@@ -348,10 +383,27 @@ public class CommandLineOptions {
         System.err.println(e.getMessage());
       }
     }
+  }
 
-    if (options.sceneName != null) {
-      mode = Mode.HEADLESS_RENDER;
+  /** Register an option handler for a single flag. */
+  private void registerOption(String flag, Range numOptions, Consumer<List<String>> consumer) {
+    OptionHandler handler = new OptionHandler(flag, numOptions, consumer);
+    optionHandlers.put(flag, handler);
+  }
+
+  /** Register an option handler for multiple flags. */
+  private void registerOption(String[] flags, Range numOptions, Consumer<List<String>> consumer) {
+    OptionHandler handler = new OptionHandler(flags[0], numOptions, consumer);
+    for (String flag : flags) {
+      optionHandlers.put(flag, handler);
     }
+  }
+
+  /** Register an option handler with special error handling. */
+  private void registerOption(String flag, Range numOptions, Consumer<List<String>> consumer,
+      Runnable errorHandler) {
+    OptionHandler handler = new OptionHandler(flag, numOptions, consumer, errorHandler);
+    optionHandlers.put(flag, handler);
   }
 
   private void printAvailableScenes() {
@@ -376,25 +428,6 @@ public class CommandLineOptions {
     System.out.println();
   }
 
-  /**
-   * Retrieve the scene description file for a specific scene.
-   *
-   * @return the scene description file handle
-   */
-  private static File getSceneDescriptionFile(ChunkyOptions options) {
-    if (options.sceneName.endsWith(SceneDescription.SCENE_DESCRIPTION_EXTENSION)) {
-      return new File(options.sceneName);
-    } else {
-      if (options.sceneDir != null) {
-        return new File(options.sceneDir,
-            options.sceneName + SceneDescription.SCENE_DESCRIPTION_EXTENSION);
-      } else {
-        return new File(PersistentSettings.getSceneDirectory(),
-            options.sceneName + SceneDescription.SCENE_DESCRIPTION_EXTENSION);
-      }
-    }
-  }
-
   private static JsonObject readSceneJson(File file) throws IOException, SyntaxError {
     try (FileInputStream in = new FileInputStream(file)) {
       JsonParser parser = new JsonParser(in);
@@ -408,5 +441,4 @@ public class CommandLineOptions {
       desc.prettyPrint(pp);
     }
   }
-
 }

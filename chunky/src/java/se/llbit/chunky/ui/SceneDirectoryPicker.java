@@ -84,9 +84,10 @@ public class SceneDirectoryPicker extends Stage implements Initializable {
     updateSelectedDirectory(PersistentSettings.getSceneDirectory());
 
     browseBtn.setOnAction(event -> {
-
       DirectoryChooser fileChooser = new DirectoryChooser();
-      fileChooser.setInitialDirectory(selectedDirectory);
+      if (selectedDirectory != null && selectedDirectory.isDirectory()) {
+        fileChooser.setInitialDirectory(selectedDirectory);
+      }
       fileChooser.setTitle("Select Scene Directory");
       File result = fileChooser.showDialog(getScene().getWindow());
       if (result != null) {

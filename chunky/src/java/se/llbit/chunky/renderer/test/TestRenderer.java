@@ -423,6 +423,10 @@ public class TestRenderer extends Thread
 
   }
 
+  @Override public void shutdown() {
+    interrupt();
+  }
+
   private void updateTransform() {
     Matrix3 tmpTransform = new Matrix3();
 

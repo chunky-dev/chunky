@@ -386,11 +386,13 @@ public class Scene extends SceneDescription {
       }
     }
 
-    if (mode == RenderMode.RENDERING) {
+    loadDump(context, renderListener);
+
+    if (spp == 0) {
+      mode = RenderMode.PREVIEW;
+    } else if (mode == RenderMode.RENDERING) {
       mode = RenderMode.PAUSED;
     }
-
-    loadDump(context, renderListener);
 
     TaskTracker taskTracker = renderListener.taskTracker();
     if (loadOctree(context, taskTracker)) {
@@ -1731,7 +1733,13 @@ public class Scene extends SceneDescription {
       }
       Log.info("Render dump loaded");
     } catch (IOException e) {
-      Log.info("Render dump not loaded");
+      if (spp == 0) {
+        // This is fine.
+        Log.info("Failed to load render dump", e);
+      } else {
+        Log.warn("Failed to load render dump", e);
+        spp = 0;  // Set spp = 0 because we don't have the old render state.
+      }
     }
   }
 
@@ -2198,9 +2206,9 @@ public class Scene extends SceneDescription {
    *
    * @param name sets the name for the scene
    */
-  public synchronized void initializeNewScene(String name) {
+  public synchronized void initializeNewScene(String name, SceneFactory sceneFactory) {
     boolean finalizeBufferPrev = finalizeBuffer;  // Remember the finalize setting.
-    Scene newScene = SceneFactory.instance.newScene();
+    Scene newScene = sceneFactory.newScene();
     newScene.setName(name);
     copyState(newScene);
     copyTransients(newScene);

@@ -87,13 +87,16 @@ public class WorldChooserController implements Initializable {
       });
       return row;
     });
-    fillWorldList(getWorldDirectory());
+    fillWorldList(getWorldSavesDirectory());
     changeWorldDirBtn
         .setTooltip(new Tooltip("Select the directory where Minecraft worlds are saved."));
     changeWorldDirBtn.setOnAction(e -> {
       DirectoryChooser chooser = new DirectoryChooser();
       chooser.setTitle("Choose Minecraft saves directory");
-      chooser.setInitialDirectory(getWorldDirectory());
+      File initialDirectory = getWorldSavesDirectory();
+      if (initialDirectory != null && initialDirectory.isDirectory()) {
+        chooser.setInitialDirectory(initialDirectory);
+      }
       File directory = chooser.showDialog(stage);
       if (directory != null) {
         if (directory.isDirectory()) {
@@ -106,7 +109,10 @@ public class WorldChooserController implements Initializable {
     browseBtn.setOnAction(e -> {
       DirectoryChooser chooser = new DirectoryChooser();
       chooser.setTitle("Choose world directory");
-      chooser.setInitialDirectory(getWorldDirectory());
+      File initialDirectory = PersistentSettings.getLastWorld();
+      if (initialDirectory != null && initialDirectory.isDirectory()) {
+        chooser.setInitialDirectory(initialDirectory);
+      }
       File directory = chooser.showDialog(stage);
       if (directory != null) {
         if (directory.isDirectory()) {
@@ -141,7 +147,11 @@ public class WorldChooserController implements Initializable {
     }
   }
 
-  public File getWorldDirectory() {
+  /**
+   * Get the directory where Minecraft worlds are stored.
+   * This is normally the parent of the active world directory.
+   */
+  public File getWorldSavesDirectory() {
     File worldDirectory = PersistentSettings.getLastWorld();
     if (worldDirectory == null || !worldDirectory.isDirectory()) {
       return MinecraftFinder.getSavesDirectory();

@@ -38,7 +38,7 @@ import se.llbit.io.LookaheadReader;
  *
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
-public class JsonParser {
+public class JsonParser implements AutoCloseable {
 
   /**
    * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
@@ -294,5 +294,9 @@ public class JsonParser {
       return new JsonMember(name.getValue(), value);
     }
     return null;
+  }
+
+  @Override public void close() throws IOException {
+    in.close();
   }
 }

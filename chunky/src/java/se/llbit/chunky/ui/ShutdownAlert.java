@@ -92,9 +92,7 @@ public class ShutdownAlert extends ProgressMonitor implements ActionListener {
         if (0 != proc.exitValue()) {
           Log.error("Failed to shutdown computer (command returned error code)");
         }
-      } catch (IOException e) {
-        Log.error("Failed to shutdown computer", e);
-      } catch (InterruptedException e) {
+      } catch (IOException | InterruptedException e) {
         Log.error("Failed to shutdown computer", e);
       }
     } else {

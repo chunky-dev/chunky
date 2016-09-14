@@ -16,14 +16,51 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.ui.RenderControlsFxController;
+import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.World;
+
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * A scene manager can save and load scenes.
  */
 public interface SceneManager {
+  /**
+   * Save the current scene.
+   *
+   * @throws InterruptedException
+   */
   void saveScene() throws InterruptedException;
 
+  /**
+   * Load a saved scene.
+   */
   void loadScene(String sceneName)
       throws IOException, SceneLoadingError, InterruptedException;
+
+  /**
+   * Load chunks and reset camera and scene.
+   * The scene name should be set before the call to loadFreshChunks().
+   */
+  void loadFreshChunks(World world, Collection<ChunkPosition> chunks);
+
+  /**
+   * Load chunks without resetting the current scene.
+   * This preserves camera position, etc.
+   */
+  void loadChunks(World world, Collection<ChunkPosition> chunks);
+
+  /**
+   * Attempt to reload all loaded chunks.
+   */
+  void reloadChunks();
+
+  /**
+   * This should only be used by the render controls dialog controller.
+   * Modifications to the scene must always be protected by the intrinsic
+   * lock of the scene object.
+   */
+  Scene getScene();
 }

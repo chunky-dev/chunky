@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/*
+ * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -14,32 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.ui;
+package se.llbit.chunky.launcher.ui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.image.Image;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
-import se.llbit.chunky.renderer.scene.SceneManager;
+import se.llbit.chunky.launcher.VersionInfo;
 
 import java.io.IOException;
 
-public class SceneChooser extends Stage {
-  private SceneChooserController controller;
-
-  public SceneChooser(ChunkyFxController chunkyFxController)
-      throws IOException {
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("SceneChooser.fxml"));
-    loader.setClassLoader(getClass()
-        .getClassLoader()); // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
+public class UpdateDialog extends Stage {
+  public UpdateDialog(ChunkyLauncherController launcher, VersionInfo versionInfo) throws IOException {
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("UpdateDialog.fxml"));
+    loader.setController(new UpdateDialogController(launcher, versionInfo));
     Parent root = loader.load();
-    controller = loader.getController();
-    setTitle("Select 3D Scene");
+    setResizable(false);
+    setTitle(String.format("Update Available: %s", versionInfo.name));
+    getIcons().add(new Image(getClass().getResourceAsStream("chunky-cfg.png")));
+    initModality(Modality.APPLICATION_MODAL);
     setScene(new Scene(root));
-    controller.setController(chunkyFxController);
-    controller.setStage(this);
+    setOnHidden(event -> launcher.setBusy(false));
   }
 }

@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -18,6 +18,7 @@ package releasetools;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,8 +40,15 @@ import se.llbit.json.JsonObject;
 import se.llbit.util.Util;
 
 public class ReleaseBuilder {
+  private static final FileFilter RESOURCE_FILTER = file ->
+      file.isDirectory() || file.getName().endsWith(".png") || file.getName().endsWith(".fxml");
+
+  private static final FileFilter JAR_FILES = file ->
+      file.isDirectory() || file.getName().endsWith(".jar");
+
   static final String LIBRARY_PATH = "chunky/lib";
   static final String LAUNCHER_BIN = "launcher/build/classes/main";
+  static final String LAUNCHER_RESOURCES = "launcher/src";
   static final String LIB_BIN = "lib/build/classes/main";
   private final String versionName;
   private final String notes;
@@ -61,6 +69,7 @@ public class ReleaseBuilder {
       System.exit(1);
     }
     String versionName = args[0];
+    System.out.format("ReleaseBuilder 1.1, building version %s%n", versionName);
 
     String releaseNotes = readReleaseNotes(args[1]);
     String changeLog = readChangeLog("ChangeLog.txt");
@@ -71,7 +80,7 @@ public class ReleaseBuilder {
       releaseNotes += "Changes:" + SYS_NL + changeLog;
     }
 
-    // write composed release notes to build dir
+    // Write composed release notes to build dir.
     PrintWriter out = null;
     try {
       out = new PrintWriter(new File("build", "release_notes-" + versionName + ".txt"));
@@ -86,7 +95,7 @@ public class ReleaseBuilder {
       }
     }
 
-    new ReleaseBuilder(versionName, releaseNotes).buildChunkJar();
+    new ReleaseBuilder(versionName, releaseNotes).buildChunkyJar();
   }
 
   private static String readReleaseNotes(String path) {
@@ -139,7 +148,7 @@ public class ReleaseBuilder {
     this.notes = releaseNotes;
   }
 
-  private void buildChunkJar() {
+  private void buildChunkyJar() {
     buildChunkyJar("build/chunky-" + versionName + ".jar");
   }
 
@@ -151,10 +160,11 @@ public class ReleaseBuilder {
     try {
       JarOutputStream out = new JarOutputStream(new FileOutputStream(targetFile), mf);
       addClassDir(out, new File(LAUNCHER_BIN));
+      addResourceDir(out, new File(LAUNCHER_RESOURCES));
       addClassDir(out, new File(LIB_BIN));
-      addToJar(out, new File("chunky/lib"));
+      addToJar(out, new File("chunky/lib"), JAR_FILES);
       File chunkyCore = new File("build/chunky-core-" + versionName + ".jar");
-      addToJar(out, chunkyCore, "lib");
+      addToJar(out, chunkyCore, "lib", JAR_FILES);
       addVersionInfoJson(out, chunkyCore);
       out.close();
     } catch (IOException e) {
@@ -184,8 +194,8 @@ public class ReleaseBuilder {
     {
       libraries.add(libraryJson(chunkyCore));
     }
-    for (File lib : libDir.listFiles()) {
-      if (lib.getName().endsWith(".jar")) {
+    for (File lib : libDir.listFiles(JAR_FILES)) {
+      if (lib.isFile() && lib.getName().endsWith(".jar")) {
         libraries.add(libraryJson(lib));
       }
     }
@@ -207,23 +217,33 @@ public class ReleaseBuilder {
 
   private void addClassDir(JarOutputStream jar, File dir) throws IOException {
     for (File binPkg : dir.listFiles()) {
-      addToJar(jar, binPkg);
+      addToJar(jar, binPkg, file -> true);
     }
   }
 
-  private void addToJar(JarOutputStream jar, File file) throws IOException {
-    addToJar(jar, file, "");
+  private void addResourceDir(JarOutputStream jar, File dir) throws IOException {
+    for (File binPkg : dir.listFiles(RESOURCE_FILTER)) {
+      addToJar(jar, binPkg, RESOURCE_FILTER);
+    }
   }
 
-  private void addToJar(JarOutputStream jar, File file, String prefix) throws IOException {
+  private void addToJar(JarOutputStream jar, File file, FileFilter filter) throws IOException {
+    addToJar(jar, file, "", filter);
+  }
+
+  private void addToJar(JarOutputStream jar, File file, String prefix, FileFilter filter)
+      throws IOException {
     String name = file.getName();
     String jarPath = prefix.isEmpty() ? name : prefix + '/' + name;
     if (file.isDirectory()) {
       createJarDir(jar, jarPath, file);
-      for (File nestedFile : file.listFiles()) {
-        addToJar(jar, nestedFile, jarPath);
+      File[] dirFiles = file.listFiles(filter);
+      if (dirFiles != null) {
+        for (File nestedFile : dirFiles) {
+          addToJar(jar, nestedFile, jarPath, filter);
+        }
       }
-    } else {
+    } else if (filter.accept(file)) {
       JarEntry entry = new JarEntry(jarPath);
       entry.setTime(file.lastModified());
       jar.putNextEntry(entry);

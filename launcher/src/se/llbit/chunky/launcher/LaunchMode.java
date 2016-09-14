@@ -21,7 +21,7 @@ package se.llbit.chunky.launcher;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public enum ChunkyMode {
+public enum LaunchMode {
   GUI,
   HEADLESS
 }

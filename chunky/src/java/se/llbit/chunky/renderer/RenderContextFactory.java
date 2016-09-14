@@ -1,4 +1,5 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/*
+ * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -14,25 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.launcher;
+package se.llbit.chunky.renderer;
 
-/**
- * Logging interface for the Chunky process.
- * This is used to capture Chunky output to the debug console.
- */
-public interface Logger {
-  void appendStdout(byte[] buffer, int size);
+import se.llbit.chunky.main.Chunky;
+import se.llbit.chunky.main.ChunkyOptions;
 
-  void appendStderr(byte[] buffer, int size);
-
-  void appendLine(String line);
-
-  void appendErrorLine(String line);
-
-  /**
-   * Signals to the logger that the program has ended.
-   *
-   * @param exitVal the exit value of the Chunky process.
-   */
-  void processExited(int exitValue);
+public interface RenderContextFactory {
+  RenderContext newRenderContext(Chunky chunky, ChunkyOptions options);
 }

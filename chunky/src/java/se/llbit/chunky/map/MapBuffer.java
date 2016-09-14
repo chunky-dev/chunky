@@ -26,7 +26,6 @@ import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.math.QuickMath;
 import se.llbit.util.RingBuffer;
 
 import javax.imageio.ImageIO;

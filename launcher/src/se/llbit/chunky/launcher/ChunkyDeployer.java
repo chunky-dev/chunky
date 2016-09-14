@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,7 +16,18 @@
  */
 package se.llbit.chunky.launcher;
 
-import java.awt.Component;
+import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.launcher.VersionInfo.Library;
+import se.llbit.chunky.launcher.VersionInfo.LibraryStatus;
+import se.llbit.chunky.launcher.ui.ChunkyLauncherController;
+import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonParser;
+import se.llbit.json.JsonParser.SyntaxError;
+import se.llbit.json.JsonValue;
+import se.llbit.log.Level;
+import se.llbit.log.Log;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,29 +38,28 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.launcher.VersionInfo.Library;
-import se.llbit.chunky.launcher.VersionInfo.LibraryStatus;
-import se.llbit.json.JsonArray;
-import se.llbit.json.JsonObject;
-import se.llbit.json.JsonParser;
-import se.llbit.json.JsonParser.SyntaxError;
-import se.llbit.json.JsonValue;
-import se.llbit.log.Level;
-import se.llbit.log.Log;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
- * Tracks installed Chunky versions, and deploys the embedded version.
+ * This class is responsible for launching Chunky after the
+ * launcher has constructed the command line. The deployer also
+ * tracks installed Chunky versions, and deploys the embedded version.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class ChunkyDeployer {
+public final class ChunkyDeployer {
+
+  public interface LoggerBuilder {
+    Logger build();
+  }
+
+  private ChunkyDeployer() {
+  }
 
   /**
    * Check the integrity of an installed version.
    *
-   * @param version
    * @return <code>true</code> if the version is installed locally
    */
   public static boolean checkVersionIntegrity(String version) {
@@ -107,7 +117,7 @@ public class ChunkyDeployer {
    * <p>
    * <p>Updates the settings to use the latest version if a new embedded version is installed.
    */
-  public void deploy(LauncherSettings settings) {
+  public static void deploy(LauncherSettings settings) {
     List<VersionInfo> versions = availableVersions();
     VersionInfo embedded = embeddedVersion();
     if (embedded != null && (!versions.contains(embedded) || !checkVersionIntegrity(
@@ -121,6 +131,9 @@ public class ChunkyDeployer {
     }
   }
 
+  /**
+   * @return a list of available Chunky versions sorted by release date.
+   */
   public static List<VersionInfo> availableVersions() {
     File chunkyDir = PersistentSettings.settingsDirectory();
     File versionsDir = new File(chunkyDir, "versions");
@@ -128,9 +141,13 @@ public class ChunkyDeployer {
       return Collections.emptyList();
     }
 
-    List<VersionInfo> versions = new ArrayList<VersionInfo>();
+    File[] versionFiles = versionsDir.listFiles();
+    if (versionFiles == null) {
+      return Collections.emptyList();
+    }
+    List<VersionInfo> versions = new ArrayList<>();
 
-    for (File versionFile : versionsDir.listFiles()) {
+    for (File versionFile : versionFiles) {
       if (versionFile.getName().endsWith(".json")) {
         try {
           FileInputStream in = new FileInputStream(versionFile);
@@ -151,10 +168,8 @@ public class ChunkyDeployer {
 
   /**
    * Unpack embedded libraries and deploy the embedded Chunky version.
-   *
-   * @param version
    */
-  private static void deployEmbeddedVersion(VersionInfo version) {
+  @SuppressWarnings("ResultOfMethodCallIgnored") private static void deployEmbeddedVersion(VersionInfo version) {
     File chunkyDir = PersistentSettings.settingsDirectory();
     File versionsDir = new File(chunkyDir, "versions");
     if (!versionsDir.isDirectory()) {
@@ -168,7 +183,7 @@ public class ChunkyDeployer {
       File versionJson = new File(versionsDir, version.name + ".json");
       version.writeTo(versionJson);
 
-      ClassLoader parentCL = ChunkyLauncher.class.getClassLoader();
+      ClassLoader parentCL = ChunkyDeployer.class.getClassLoader();
 
       // Deploy libraries that were not already installed correctly.
       for (Library lib : version.libraries) {
@@ -176,11 +191,7 @@ public class ChunkyDeployer {
           unpackLibrary(parentCL, "lib/" + lib.name, new File(libDir, lib.name));
         }
       }
-    } catch (SecurityException e) {
-      e.printStackTrace();
-    } catch (IllegalArgumentException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
+    } catch (SecurityException | IllegalArgumentException | IOException e) {
       e.printStackTrace();
     }
   }
@@ -188,10 +199,7 @@ public class ChunkyDeployer {
   /**
    * Unpack the jar file to the target directory.
    *
-   * @param parentCL
-   * @param name
    * @param dest     destination file
-   * @return the unpacked Jar file
    * @throws IOException
    */
   private static void unpackLibrary(ClassLoader parentCL, String name, File dest)
@@ -207,65 +215,58 @@ public class ChunkyDeployer {
     out.close();
   }
 
+  /** Gets the version info descriptor for the Chunky version embedded in this Jar. */
   private static VersionInfo embeddedVersion() {
     try {
-      ClassLoader parentCL = ChunkyLauncher.class.getClassLoader();
-      InputStream in = parentCL.getResourceAsStream("version.json");
-      try {
+      ClassLoader parentCL = ChunkyDeployer.class.getClassLoader();
+      try (InputStream in = parentCL.getResourceAsStream("version.json")) {
         if (in != null) {
           JsonParser parser = new JsonParser(in);
           return new VersionInfo(parser.parse().object());
         }
-      } catch (IOException e) {
-      } catch (SyntaxError e) {
-      } finally {
-        if (in != null) {
-          try {
-            in.close();
-          } catch (IOException e) {
-          }
-        }
+      } catch (IOException | SyntaxError ignored) {
+        // Ignored.
       }
-    } catch (SecurityException e) {
+    } catch (SecurityException ignored) {
+      // Ignored.
     }
     return null;
   }
 
   /**
-   * Launch a specific Chunky version
+   * Launch a specific Chunky version.
    *
-   * @param parentComponent
-   * @param settings
    * @return zero on success, non-zero if there is any problem
    * launching Chunky (waits 200ms to see if everything launched)
    */
-  public int launchChunky(Component parentComponent, LauncherSettings settings, VersionInfo version,
-      ChunkyMode mode) {
+  public static int launchChunky(LauncherSettings settings, VersionInfo version,
+      LaunchMode mode, Consumer<String> failureHandler, LoggerBuilder loggerBuilder) {
     List<String> command = buildCommandLine(version, settings);
     if (settings.verboseLauncher || Log.level == Level.INFO) {
       System.out.println(commandString(command));
     }
-    ProcessBuilder procBuilder = new ProcessBuilder(command);
-    final Logger logger;
-    if (settings.forceGuiConsole || (!settings.headless && settings.debugConsole)) {
-      DebugConsole console = new DebugConsole(null, settings.closeConsoleOnExit);
-      console.setVisible(true);
-      logger = console;
-    } else {
-      logger = new ConsoleLogger();
+    int exitValue = launchChunky(mode, command, loggerBuilder);
+    if (exitValue != 0) {
+      failureHandler.accept(commandString(command));
     }
+    return exitValue;
+  }
+
+  public static int launchChunky(LaunchMode mode, List<String> command,
+      LoggerBuilder loggerBuilder) {
+    ProcessBuilder processBuilder = new ProcessBuilder(command);
+    final Logger logger = loggerBuilder.build();
     try {
-      final Process proc = procBuilder.start();
+      final Process process = processBuilder.start();
       Runtime.getRuntime().addShutdownHook(new Thread() {
         @Override public void run() {
           // Kill the subprocess.
-          proc.destroy();
+          process.destroy();
         }
       });
       final Thread outputScanner = new Thread("Output Logger") {
         @Override public void run() {
-          InputStream is = proc.getInputStream();
-          try {
+          try (InputStream is = process.getInputStream()) {
             byte[] buffer = new byte[4096];
             while (true) {
               int size = is.read(buffer, 0, buffer.length);
@@ -274,19 +275,14 @@ public class ChunkyDeployer {
               }
               logger.appendStdout(buffer, size);
             }
-          } catch (IOException e) {
-            try {
-              is.close();
-            } catch (IOException e1) {
-            }
+          } catch (IOException ignored) {
           }
         }
       };
       outputScanner.start();
       final Thread errorScanner = new Thread("Error Logger") {
         @Override public void run() {
-          InputStream is = proc.getErrorStream();
-          try {
+          try (InputStream is = process.getErrorStream()) {
             byte[] buffer = new byte[4096];
             while (true) {
               int size = is.read(buffer, 0, buffer.length);
@@ -295,19 +291,15 @@ public class ChunkyDeployer {
               }
               logger.appendStderr(buffer, size);
             }
-          } catch (IOException e) {
-            try {
-              is.close();
-            } catch (IOException e1) {
-            }
+          } catch (IOException ignored) {
           }
         }
       };
       errorScanner.start();
-      ShutdownThread shutdownThread = new ShutdownThread(proc, logger, outputScanner, errorScanner);
+      ShutdownThread shutdownThread = new ShutdownThread(process, logger, outputScanner, errorScanner);
       shutdownThread.start();
       try {
-        if (mode == ChunkyMode.GUI) {
+        if (mode == LaunchMode.GUI) {
           // Just wait a little while to check for startup errors.
           Thread.sleep(3000);
           return shutdownThread.exitValue;
@@ -315,7 +307,8 @@ public class ChunkyDeployer {
           // Wait until completion so we can return correct exit code.
           return shutdownThread.exitValue();
         }
-      } catch (InterruptedException e) {
+      } catch (InterruptedException ignored) {
+        // Ignored.
       }
       return 0;
     } catch (IOException e) {
@@ -342,8 +335,8 @@ public class ChunkyDeployer {
     return sb.toString();
   }
 
-  public static List<String> buildCommandLine(VersionInfo version, LauncherSettings settings) {
-    List<String> cmd = new LinkedList<String>();
+  private static List<String> buildCommandLine(VersionInfo version, LauncherSettings settings) {
+    List<String> cmd = new LinkedList<>();
 
     cmd.add(JreUtil.javaCommand(settings.javaDir));
     cmd.add("-Xmx" + settings.memoryLimit + "m");
@@ -356,7 +349,7 @@ public class ChunkyDeployer {
     }
 
     cmd.add("-classpath");
-    cmd.add(classpath(version, settings));
+    cmd.add(classpath(version));
 
     if (settings.verboseLogging) {
       cmd.add("-DlogLevel=INFO");
@@ -374,13 +367,12 @@ public class ChunkyDeployer {
     return cmd;
   }
 
-  private static String classpath(VersionInfo version, LauncherSettings settings) {
+  private static String classpath(VersionInfo version) {
     File chunkyDir = PersistentSettings.settingsDirectory();
     File libDir = new File(chunkyDir, "lib");
-    List<File> jars = new ArrayList<File>();
-    for (VersionInfo.Library library : version.libraries) {
-      jars.add(library.getFile(libDir));
-    }
+    List<File> jars = version.libraries.stream()
+        .map(library -> library.getFile(libDir))
+        .collect(Collectors.toList());
     String classpath = "";
     for (File file : jars) {
       if (!classpath.isEmpty()) {
@@ -416,17 +408,17 @@ public class ChunkyDeployer {
     @Override public void run() {
       try {
         outputScanner.join();
-      } catch (InterruptedException e) {
+      } catch (InterruptedException ignored) {
       }
       try {
         errorScanner.join();
-      } catch (InterruptedException e) {
+      } catch (InterruptedException ignored) {
       }
       try {
         proc.waitFor();
         exitValue = proc.exitValue();
         logger.processExited(exitValue);
-      } catch (InterruptedException e) {
+      } catch (InterruptedException ignored) {
       }
       synchronized (this) {
         finished = true;
@@ -455,24 +447,24 @@ public class ChunkyDeployer {
     }
   }
 
-  public static boolean canLaunch(VersionInfo version, ChunkyLauncher launcher,
+  public static boolean canLaunch(VersionInfo version, ChunkyLauncherController launcher,
       boolean reportErrors) {
     if (version == VersionInfo.NONE) {
       // Version not available!
       System.err.println("No version installed");
       if (reportErrors) {
-        Dialogs.error(launcher,
-            "Failed to launch Chunky - there is no local version installed. Try updating.",
-            "Failed to Launch");
+        launcher.launcherError("No Chunky Available",
+            "There is no local Chunky version installed. Please try updating.");
       }
       return false;
     }
     if (!ChunkyDeployer.checkVersionIntegrity(version.name)) {
-      // TODO add some way to fix this??
+      // TODO: add a way to fix this (delete corrupt version and then update)!
       System.err.println("Version integrity check failed for version " + version.name);
       if (reportErrors) {
-        Dialogs.error(launcher, "Version integrity check failed for version " + version.name
-            + ". Try selecting another version.", "Failed to Launch");
+        launcher.launcherError("Chunky Version is Corrupt",
+            "Version integrity check failed for version "
+            + version.name + ". Please select another version.");
       }
       return false;
     }

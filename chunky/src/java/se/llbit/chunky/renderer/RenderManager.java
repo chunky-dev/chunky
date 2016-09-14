@@ -18,7 +18,6 @@ package se.llbit.chunky.renderer;
 
 import javafx.scene.canvas.GraphicsContext;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.log.Log;
 
 import java.util.ArrayList;
@@ -58,7 +57,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    * The buffered scene is only updated when the workers are
    * quiescent.
    */
-  private final Scene bufferedScene = SceneFactory.instance.newScene();
+  private final Scene bufferedScene;
 
   /**
    * Gives the next tile index for a worker.
@@ -73,7 +72,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
   /**
    * Decides if render threads shut down after reaching the target SPP.
    */
-  private final boolean oneshot;
+  private final boolean headless;
 
   /**
    * Current renderer mode.
@@ -82,18 +81,15 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
   private final Collection<SceneStatusListener> sceneListeners = new ArrayList<>();
 
-  public RenderManager(RenderContext context) {
-    this(context, false);
-  }
-
   /**
-   * @param oneshot {@code true} if rendering threads should be shut
-   *                down after reaching the render target.
+   * @param headless {@code true} if rendering threads should be shut
+   * down after reaching the render target.
    */
-  public RenderManager(RenderContext context, boolean oneshot) {
+  public RenderManager(RenderContext context, boolean headless) {
     super(context);
 
-    this.oneshot = oneshot;
+    this.headless = headless;
+    bufferedScene = context.getChunky().getSceneFactory().newScene();
 
     manageWorkers();
   }
@@ -171,7 +167,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
           }
         }
 
-        if (oneshot) {
+        if (headless) {
           break;
         }
       }
@@ -201,8 +197,10 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
   private void pathTraceLoop() throws InterruptedException {
     while (true) {
       sceneProvider.withSceneProtected(scene -> {
-        bufferedScene.copyTransients(scene);
-        updateRenderState(scene);
+        synchronized (bufferedScene) {
+          bufferedScene.copyTransients(scene);
+          updateRenderState(scene);
+        }
       });
 
       if (mode == RenderMode.PAUSED || sceneProvider.pollSceneStateChange()) {
@@ -246,7 +244,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
   private void updateRenderProgress() {
     double renderTime = bufferedScene.renderTime / 1000.0;
 
-    // Notify progress listener
+    // Notify progress listener.
     int target = bufferedScene.getTargetSpp();
     long etaSeconds = (long) (((target - bufferedScene.spp) * renderTime) / bufferedScene.spp);
     if (etaSeconds > 0) {
@@ -256,7 +254,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
       String eta = String.format("%d:%02d:%02d", hours, minutes, seconds);
       renderListener.renderTask().update("Rendering", target, bufferedScene.spp, eta);
     } else {
-      renderListener.renderTask().update("Rendering", bufferedScene.spp, target, "");
+      renderListener.renderTask().update("Rendering", target, bufferedScene.spp, "");
     }
 
     synchronized (this) {
@@ -426,5 +424,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
     for (SceneStatusListener listener : sceneListeners) {
       listener.sceneStatus(status);
     }
+  }
+
+  @Override public void shutdown() {
+    interrupt();
   }
 }

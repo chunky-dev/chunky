@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,124 +16,53 @@
  */
 package se.llbit.chunky.launcher.ui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.text.DefaultCaret;
-import javax.swing.text.DefaultEditorKit;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 /**
- * Error report dialog.
- * <p>
+ * Error reporting dialog for Chunky launch errors.
  * Used to display critical errors in a nicer way.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class LaunchErrorDialog extends JDialog {
+public class LaunchErrorDialog extends Stage {
 
-  private final JTextArea textArea;
-
-  /**
-   * Initialize the error dialog.
-   */
   public LaunchErrorDialog(String command) {
-    super();
-    setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-    setModalityType(ModalityType.APPLICATION_MODAL);
-
-    getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-        .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Close Dialog");
-    getRootPane().getActionMap().put("Close Dialog", new AbstractAction() {
-      @Override public void actionPerformed(ActionEvent arg0) {
-        closeDialog();
-      }
-    });
-
+    initModality(Modality.APPLICATION_MODAL);
     setTitle("Launch Error");
-    setLocationRelativeTo(null);
 
-    JPanel panel = new JPanel();
-    JLabel lbl = new JLabel(
-        "<html>Chunky failed to start! See the Debug Console for error messages.<br><br>"
-            + "The following command was used to start Chunky:");
+    Button dismissButton = new Button("Dismiss");
 
-    textArea = new JTextArea(10, 60);
-    textArea.setEditable(false);
-    DefaultCaret caret = (DefaultCaret) textArea.getCaret();
-    caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
-    textArea.addMouseListener(new MouseListener() {
-      @Override public void mouseReleased(MouseEvent e) {
-      }
+    dismissButton.setDefaultButton(true);
+    dismissButton.setCancelButton(true);
+    dismissButton.setOnAction(event -> hide());
 
-      @Override public void mousePressed(MouseEvent e) {
-        Action[] actions = textArea.getActions();
-        for (Action action : actions) {
-          if (action.getValue(Action.NAME).equals(DefaultEditorKit.selectAllAction))
+    TextField commandField = new TextField(command);
+    commandField.setPrefWidth(400);
+    commandField.setMaxWidth(400);
+    commandField.setEditable(false);
+    commandField.setOnMouseClicked(event -> commandField.selectAll());
 
-            action.actionPerformed(null);
-        }
-      }
+    VBox vBox = new VBox();
+    vBox.setSpacing(10);
+    vBox.setPadding(new Insets(10));
+    HBox buttons = new HBox();
+    buttons.setAlignment(Pos.CENTER_RIGHT);
+    buttons.getChildren().setAll(dismissButton);
 
-      @Override public void mouseExited(MouseEvent e) {
-      }
+    vBox.getChildren().setAll(new Label("Chunky failed to start! "
+        + "See the Debug Console for error messages."),
+        new Label("The following command was used to start Chunky:"),
+        commandField, buttons);
 
-      @Override public void mouseEntered(MouseEvent e) {
-      }
-
-      @Override public void mouseClicked(MouseEvent e) {
-      }
-    });
-
-    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-    PrintStream out = new PrintStream(byteOut);
-    out.println(command);
-    out.println();
-    out.close();
-
-    textArea.setText(new String(byteOut.toByteArray()));
-    JScrollPane scrollPane = new JScrollPane(textArea);
-
-    JButton dismissBtn = new JButton("Dismiss");
-    dismissBtn.addActionListener(new ActionListener() {
-      @Override public void actionPerformed(ActionEvent e) {
-        closeDialog();
-      }
-    });
-
-    GroupLayout layout = new GroupLayout(panel);
-    panel.setLayout(layout);
-    layout.setHorizontalGroup(layout.createSequentialGroup().addContainerGap().addGroup(
-        layout.createParallelGroup().addComponent(lbl).addComponent(scrollPane).addGroup(
-            layout.createSequentialGroup()
-                .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
-                    Short.MAX_VALUE).addComponent(dismissBtn))).addContainerGap());
-    layout.setVerticalGroup(layout.createSequentialGroup().addContainerGap().addComponent(lbl)
-        .addPreferredGap(ComponentPlacement.UNRELATED).addComponent(scrollPane)
-        .addPreferredGap(ComponentPlacement.UNRELATED).addComponent(dismissBtn).addContainerGap());
-
-    getContentPane().add(panel);
-    pack();
-  }
-
-  protected void closeDialog() {
-    LaunchErrorDialog.this.setVisible(false);
-    LaunchErrorDialog.this.dispose();
+    setScene(new Scene(vBox));
   }
 }

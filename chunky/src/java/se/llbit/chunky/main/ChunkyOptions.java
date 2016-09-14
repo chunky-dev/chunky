@@ -18,6 +18,7 @@ package se.llbit.chunky.main;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderConstants;
+import se.llbit.chunky.renderer.scene.SceneDescription;
 
 import java.io.File;
 
@@ -31,6 +32,10 @@ public class ChunkyOptions {
   public volatile File sceneDir = null;
 
   public String sceneName = null;
+
+  /** The output filename when doing a headless snapshot. */
+  public String imageOutputFile = "";
+
   public String texturePack = null;
   public int renderThreads = -1;
   public File worldDir = null;
@@ -58,4 +63,24 @@ public class ChunkyOptions {
     clone.worldDir = worldDir;
     return clone;
   }
+
+  /**
+   * Retrieve the scene description file for the selected scene.
+   *
+   * @return the scene description file handle
+   */
+  public File getSceneDescriptionFile() {
+    if (sceneName.endsWith(SceneDescription.SCENE_DESCRIPTION_EXTENSION)) {
+      return new File(sceneName);
+    } else {
+      if (sceneDir != null) {
+        return new File(sceneDir,
+            sceneName + SceneDescription.SCENE_DESCRIPTION_EXTENSION);
+      } else {
+        return new File(PersistentSettings.getSceneDirectory(),
+            sceneName + SceneDescription.SCENE_DESCRIPTION_EXTENSION);
+      }
+    }
+  }
+
 }

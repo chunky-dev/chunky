@@ -21,5 +21,4 @@ public enum DownloadStatus {
   MALFORMED_URL,
   FILE_NOT_FOUND,
   DOWNLOAD_FAILED
-
 }

@@ -58,6 +58,7 @@ import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.SceneDescription;
+import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.render.RenderControlsFx;
@@ -538,7 +539,8 @@ public class ChunkyFxController
     }
 
     // Reset the scene state to the default scene state.
-    chunky.getRenderController().getSceneManager().getScene().initializeNewScene(preferredName);
+    chunky.getRenderController().getSceneManager().getScene().initializeNewScene(preferredName,
+        chunky.getSceneFactory());
 
     // Show the render controls etc.
     open3DView();
@@ -552,7 +554,11 @@ public class ChunkyFxController
 
   public void loadScene(SceneDescription scene) {
     open3DView();
-    chunky.getSceneManager().loadScene(scene.name);
+    try {
+      chunky.getSceneManager().loadScene(scene.name);
+    } catch (IOException | SceneLoadingError | InterruptedException e) {
+      Log.error("Failed to load scene", e);
+    }
   }
 
   /**
@@ -560,7 +566,7 @@ public class ChunkyFxController
    */
   public void loadScene() {
     try {
-      SceneChooser chooser = new SceneChooser(this, chunky.getSceneManager());
+      SceneChooser chooser = new SceneChooser(this);
       chooser.show();
     } catch (IOException e) {
       Log.error("Failed to create scene chooser window.", e);

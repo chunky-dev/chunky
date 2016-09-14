@@ -53,7 +53,7 @@ public class VersionInfo implements Comparable<VersionInfo> {
 
     public final String dlStatus;
 
-    private LibraryStatus(String status) {
+    LibraryStatus(String status) {
       dlStatus = status;
     }
 
@@ -61,10 +61,6 @@ public class VersionInfo implements Comparable<VersionInfo> {
       return dlStatus;
     }
   }
-
-
-  ;
-
 
   public static class Library {
     public final String name;
@@ -119,12 +115,11 @@ public class VersionInfo implements Comparable<VersionInfo> {
     }
   }
 
-
   public static final VersionInfo LATEST = new VersionInfo("latest", new Date());
   public static final VersionInfo NONE = new VersionInfo("none", new Date());
 
   public final String name;
-  public Collection<Library> libraries = new LinkedList<Library>();
+  public Collection<Library> libraries = new LinkedList<>();
   private final String timestamp;
   private final Date date;
   public String notes = "";
@@ -193,14 +188,13 @@ public class VersionInfo implements Comparable<VersionInfo> {
   /**
    * Write the version info to the given file.
    *
-   * @param file
    * @throws FileNotFoundException
    */
   public void writeTo(File file) throws IOException {
-    PrintStream out = new PrintStream(new FileOutputStream(file));
-    PrettyPrinter pp = new PrettyPrinter("  ", out);
-    pp.print(json());
-    out.close();
+    try (PrintStream out = new PrintStream(new FileOutputStream(file))) {
+      PrettyPrinter pp = new PrettyPrinter("  ", out);
+      pp.print(json());
+    }
   }
 
   private JsonObject json() {

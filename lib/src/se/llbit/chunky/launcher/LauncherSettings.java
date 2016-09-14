@@ -27,8 +27,13 @@ public class LauncherSettings {
 
   public String javaDir = "";
   public int memoryLimit = DEFAULT_MEMORY_LIMIT;
+
+  /** Show the debugging console when launching Chunky. */
   public boolean debugConsole = false;
+
+  /** Force showing the debugging console even for headless rendering. */
   public boolean forceGuiConsole = false;
+
   public boolean verboseLogging = false;
   public boolean verboseLauncher = false;
   public String javaOptions = "";

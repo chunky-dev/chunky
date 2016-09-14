@@ -415,7 +415,7 @@ public class Texture {
   public static final Texture chorusPlant = new Texture();
   public static final Texture endRod = new Texture();
 
-  // Trapped Chest
+  // Trapped Chest.
   public static final Texture trappedChestTop = new Texture();
   public static final Texture trappedChestBottom = new Texture();
   public static final Texture trappedChestLeft = new Texture();

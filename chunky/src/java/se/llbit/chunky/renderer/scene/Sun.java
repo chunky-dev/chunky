@@ -122,7 +122,7 @@ public class Sun implements JSONifiable {
   private double azimuth = Math.PI / 2.5;
   private double altitude = Math.PI / 3;
 
-  // support vectors
+  // Support vectors.
   private final Vector3 su = new Vector3();
   private final Vector3 sv = new Vector3();
 

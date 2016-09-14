@@ -147,14 +147,11 @@ public class SceneDescription implements Refreshable, JSONifiable {
    * @param in input stream - will be closed
    */
   public void loadDescription(InputStream in) throws IOException {
-    try {
-      JsonParser parser = new JsonParser(in);
+    try (JsonParser parser = new JsonParser(in)) {
       JsonObject desc = parser.parse().object();
       fromJson(desc);
     } catch (SyntaxError e) {
       throw new IOException("JSON syntax error");
-    } finally {
-      in.close();
     }
   }
 

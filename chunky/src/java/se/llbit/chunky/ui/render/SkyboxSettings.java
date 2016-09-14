@@ -75,7 +75,7 @@ public class SkyboxSettings extends VBox implements Initializable {
     fileChooser.setTitle("Choose Sky Texture");
     fileChooser.setSelectedExtensionFilter(
         new FileChooser.ExtensionFilter("Sky textures", "*.png", "*.jpg", "*.hdr", "*.pfm"));
-    if (skyboxDirectory != null) {
+    if (skyboxDirectory != null && skyboxDirectory.isDirectory()) {
       fileChooser.setInitialDirectory(skyboxDirectory);
     }
     File imageFile = fileChooser.showOpenDialog(getScene().getWindow());

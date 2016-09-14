@@ -22,6 +22,7 @@ import se.llbit.util.TaskTracker;
 
 /**
  * A simple render listener with a custom progress listener.
+ * This is only used for the snapshot progress.
  */
 public class SimpleRenderListener implements RenderStatusListener {
   private final ProgressListener progressListener;
@@ -30,7 +31,13 @@ public class SimpleRenderListener implements RenderStatusListener {
 
   public SimpleRenderListener(ProgressListener progressListener) {
     this.progressListener = progressListener;
-    taskTracker = new TaskTracker(progressListener);
+    // Set a custom background task for the task tracker which does not print progress report.
+    taskTracker = new TaskTracker(progressListener, TaskTracker.Task::new,
+        (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
+          @Override public void update() {
+            // Don't report task state to progress listener.
+          }
+        });
     renderTask = taskTracker.backgroundTask();
   }
 

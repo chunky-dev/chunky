@@ -29,6 +29,7 @@ import javafx.stage.FileChooser;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.ShutdownAlert;
 import se.llbit.chunky.ui.IntegerAdjuster;
@@ -89,7 +90,8 @@ public class AdvancedTab extends VBox implements RenderControlTab, Initializable
           .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Render dumps", "*.dump"));
       File dump = fileChooser.showOpenDialog(getScene().getWindow());
       if (dump != null) {
-        controller.getSceneManager().mergeRenderDump(dump);
+        // TODO: remove cast.
+        ((AsynchronousSceneManager) controller.getSceneManager()).mergeRenderDump(dump);
       }
     });
     outputMode.getSelectionModel().selectedItemProperty()
