@@ -447,6 +447,8 @@ public class Texture {
   public static final Texture boneSide = new Texture();
   public static final Texture boneTop = new Texture();
   public static final Texture magma = new Texture();
+  public static final Texture netherWartBlock = new Texture();
+  public static final Texture redNetherBrick = new Texture();
 
   /**
    * Missing or unknown texture.

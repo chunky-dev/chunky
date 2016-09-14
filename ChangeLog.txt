@@ -3,6 +3,8 @@
 * Added rendering for Minecraft 1.10 blocks:
     * Bone Block
     * Magma Block
+    * Red Nether Brick
+    * Nether Wart Block
 block rendering: Bone block rendering.
 * Added Magma block rendering.
 * Chunky now requires Java 8 to run.

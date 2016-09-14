@@ -60,7 +60,6 @@ public class TexturePackLoader {
     }
   }
 
-
   private static Map<String, TextureRef> allTextures = new HashMap<>();
 
   static {
@@ -1503,6 +1502,12 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/bone_block_top", Texture.boneTop));
     allTextures.put("magma",
         new SimpleTexture("assets/minecraft/textures/blocks/magma", Texture.magma));
+    allTextures.put("netherWartBlock",
+        new SimpleTexture("assets/minecraft/textures/blocks/nether_wart_block",
+            Texture.netherWartBlock));
+    allTextures.put("redNetherBrick",
+        new SimpleTexture("assets/minecraft/textures/blocks/red_nether_brick",
+            Texture.redNetherBrick));
   }
 
   /**

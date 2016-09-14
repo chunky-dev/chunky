@@ -3248,18 +3248,18 @@ public class Block extends Material {
       emittance = 0.6;  // Not as bright as lava (1.0).
     }
   };
-  public static final Block UNKNOWN0xD6 = new Block(0xD6, "Unknown Block 0xD6", Texture.unknown) {
+  public static final Block NETHER_WART_BLOCK = new Block(0xD6, "Nether Wart",
+      Texture.netherWartBlock) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
     }
   };
-  public static final Block UNKNOWN0xD7 = new Block(0xD7, "Unknown Block 0xD7", Texture.unknown) {
+  public static final Block RED_NETHER_BRICK = new Block(0xD7, "Red Nether Brick",
+      Texture.redNetherBrick) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
     }
   };
   public static final Block BONE = new Block(0xD8, "Bone", Texture.boneSide) {
@@ -3580,8 +3580,8 @@ public class Block extends Material {
           SPRUCEFENCE, BIRCHFENCE, JUNGLEFENCE, DARKOAKFENCE, ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR,
           JUNGLEDOOR, ACACIADOOR, DARKOAKDOOR, ENDROD, CHORUSPLANT, CHORUSFLOWER, PURPURBLOCK,
           PURPURPILLAR, PURPURSTAIRS, PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, UNKNOWN0xCF,
-          GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3, UNKNOWN0xD4, MAGMA, UNKNOWN0xD6,
-          UNKNOWN0xD7, BONE, UNKNOWN0xD9, UNKNOWN0xDA, UNKNOWN0xDB, UNKNOWN0xDC, UNKNOWN0xDD,
+          GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3, UNKNOWN0xD4, MAGMA, NETHER_WART_BLOCK,
+          RED_NETHER_BRICK, BONE, UNKNOWN0xD9, UNKNOWN0xDA, UNKNOWN0xDB, UNKNOWN0xDC, UNKNOWN0xDD,
           UNKNOWN0xDE, UNKNOWN0xDF, UNKNOWN0xE0, UNKNOWN0xE1, UNKNOWN0xE2, UNKNOWN0xE3, UNKNOWN0xE4,
           UNKNOWN0xE5, UNKNOWN0xE6, UNKNOWN0xE7, UNKNOWN0xE8, UNKNOWN0xE9, UNKNOWN0xEA, UNKNOWN0xEB,
           UNKNOWN0xEC, UNKNOWN0xED, UNKNOWN0xEE, UNKNOWN0xEF, UNKNOWN0xF0, UNKNOWN0xF1, UNKNOWN0xF2,

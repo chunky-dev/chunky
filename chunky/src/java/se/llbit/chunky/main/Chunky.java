@@ -47,8 +47,8 @@ import java.io.IOException;
 /**
  * Chunky is a Minecraft mapping and rendering tool created by
  * Jesper Öqvist (jesper@llbit.se).
- * <p>
- * Read more about Chunky at http://chunky.llbit.se .
+ *
+ * <p>Read more about Chunky at http://chunky.llbit.se .
  */
 public class Chunky {
 
@@ -59,7 +59,7 @@ public class Chunky {
   private RendererFactory rendererFactory = RenderManager::new;
 
   /**
-   * @return The name of this application
+   * @return The name of this application, including version string.
    */
   public static String getAppName() {
     return String.format("Chunky %s", Version.getVersion());
