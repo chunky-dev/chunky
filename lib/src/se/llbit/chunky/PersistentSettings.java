@@ -20,6 +20,7 @@ import java.io.File;
 
 import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.json.JsonValue;
 
 /**
  * Utility class for managing program properties.
@@ -379,6 +380,10 @@ public final class PersistentSettings {
 
   public static boolean drawUnknownBlocks() {
     return settings.getBool("drawUnknownBlocks", false);
+  }
+
+  public static JsonValue getPlugins() {
+    return settings.get("plugins");
   }
 }
 

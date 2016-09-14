@@ -192,3 +192,7 @@ task macDist(dependsOn: 'releaseJar') << {
 		'-yes',
 		file("build/Chunky-${version}.dmg") ], true)
 }
+
+task install() {
+	dependsOn ':chunky:install'
+}

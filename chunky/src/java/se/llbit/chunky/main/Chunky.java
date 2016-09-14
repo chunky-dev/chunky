@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.main;
 
+import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.Plugin;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.ConsoleRenderListener;
 import se.llbit.chunky.renderer.OutputMode;
@@ -35,6 +37,7 @@ import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.ui.ChunkyFx;
+import se.llbit.json.JsonValue;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.log.Receiver;
@@ -43,6 +46,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created by
@@ -133,6 +139,7 @@ public class Chunky {
     }
 
     Chunky chunky = new Chunky(cmdline.options);
+    chunky.loadPlugins();
 
     int exitCode = 0;
     try {
@@ -156,6 +163,31 @@ public class Chunky {
 
     if (exitCode != 0) {
       System.exit(exitCode);
+    }
+  }
+
+  private void loadPlugins() {
+    JsonValue plugins = PersistentSettings.getPlugins();
+    for (JsonValue plugin : plugins.array().getElementList()) {
+      String jar = plugin.object().get("jar").stringValue("");
+      String main = plugin.object().get("main").stringValue("");
+      if (jar.endsWith(".jar")) {
+        File pluginJar = new File(jar);
+        if (pluginJar.isFile()) {
+          try {
+            URLClassLoader classLoader = new URLClassLoader(new URL[] {pluginJar.toURI().toURL()});
+            Class<?> pluginClass = classLoader.loadClass(main);
+            Plugin pluginInstance = (Plugin) pluginClass.newInstance();
+            pluginInstance.attach(this);
+          } catch (MalformedURLException| ClassNotFoundException
+              | InstantiationException | IllegalAccessException e) {
+            Log.error("Failed to load plugin " + pluginJar.getAbsolutePath(), e);
+          } catch (ClassCastException e) {
+            Log.error("Failed to load plugin " + pluginJar.getAbsolutePath()
+                + ". Main plugin class has wrong type", e);
+          }
+        }
+      }
     }
   }
 

@@ -33,6 +33,7 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonTrue;
+import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 
 /**
@@ -108,6 +109,13 @@ public final class JsonSettings {
    */
   public String getString(String name, String defValue) {
     return json.get(name).stringValue(defValue);
+  }
+
+  /**
+   * Get the raw JSON value for a setting.
+   */
+  public JsonValue get(String name) {
+    return json.get(name);
   }
 
   /**
