@@ -176,17 +176,24 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     });
     settingsDirectory.setText(SettingsDirectory.defaultSettingsDirectory().getAbsolutePath());
     openSettingsDirectory.setOnAction(event -> {
-      try {
-        if (Desktop.isDesktopSupported()) {
-          Desktop.getDesktop().open(SettingsDirectory.defaultSettingsDirectory());
-        } else {
-          launcherWarning("Failed to open Settings Directory",
-              "Can not open system file browser.");
+      // Running Desktop.open() on the JavaFX application thread seems to
+      // lock up the application on Linux, so we create a new thread to run that.
+      // This StackOverflow question seems to ask about the same bug:
+      // http://stackoverflow.com/questions/23176624/javafx-freeze-on-desktop-openfile-desktop-browseuri
+      new Thread(() -> {
+        try {
+          if (Desktop.isDesktopSupported()) {
+            Desktop.getDesktop().open(SettingsDirectory.defaultSettingsDirectory());
+          } else {
+            Platform.runLater(
+                () -> launcherWarning("Failed to open Settings Directory",
+                    "Can not open system file browser."));
+          }
+        } catch (IOException e1) {
+          Platform.runLater(() -> launcherWarning("Failed to open Settings Directory",
+              "Failed to open system file browser. Reason: " + e1.getMessage()));
         }
-      } catch (IOException e1) {
-        launcherWarning("Failed to open Settings Directory",
-            "Failed to open system file browser. Reason: " + e1.getMessage());
-      }
+      }).start();
     });
 
     checkForUpdate.setOnAction(event -> {
