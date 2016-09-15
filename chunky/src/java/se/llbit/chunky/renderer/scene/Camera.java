@@ -381,7 +381,7 @@ public class Camera implements JSONifiable {
   }
 
   /**
-   * Set the view direction
+   * Set the view direction.
    *
    * @param yaw   Yaw in radians
    * @param pitch Pitch in radians
@@ -393,6 +393,7 @@ public class Camera implements JSONifiable {
     this.roll = roll;
 
     updateTransform();
+    scene.refresh();
   }
 
   /**
