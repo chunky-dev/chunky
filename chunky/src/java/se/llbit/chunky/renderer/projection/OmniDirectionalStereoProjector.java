@@ -32,17 +32,17 @@ import java.util.Random;
  */
 public class OmniDirectionalStereoProjector implements Projector {
   /**
-   * The interpupillary distance of the viewer, in meters.
+   * The inter-pupillary distance of the viewer, in meters.
    */
-  private static final double interpupillaryDistance = 0.069;
+  private static final double interPupillaryDistance = 0.069;
 
   private final double scale;
 
   public OmniDirectionalStereoProjector(Eye eye) {
     if (eye == Eye.LEFT) {
-      scale = -interpupillaryDistance / 2;
+      scale = -interPupillaryDistance / 2;
     } else {
-      scale = interpupillaryDistance / 2;
+      scale = interPupillaryDistance / 2;
     }
   }
 
@@ -57,7 +57,8 @@ public class OmniDirectionalStereoProjector implements Projector {
     double phi = FastMath.PI / 2 - (y + 0.5) * FastMath.PI;
 
     pos.set(FastMath.cos(theta) * scale, 0, FastMath.sin(theta) * scale);
-    direction.set(FastMath.sin(theta) * FastMath.cos(phi), FastMath.sin(phi), -FastMath.cos(theta) * FastMath.cos(phi));
+    direction.set(FastMath.sin(theta) * FastMath.cos(phi), -FastMath.sin(phi),
+        -FastMath.cos(theta) * FastMath.cos(phi));
   }
 
   @Override
