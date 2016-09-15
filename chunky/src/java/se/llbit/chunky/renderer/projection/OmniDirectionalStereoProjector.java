@@ -22,8 +22,9 @@ import se.llbit.math.Vector3;
 import java.util.Random;
 
 /**
- * A projector for Omni-Directional Stereo (ODS) images. x is mapped to yaw, y is mapped to
- * pitch. This projector, unlike the {@link PanoramicProjector}, can create distinct
+ * A projector for Omni-Directional Stereo (ODS) images.
+ *
+ * <p>This projector, unlike the {@link PanoramicProjector}, can create distinct
  * images for the left and the right eye by slightly displacing the view ray origins based on the
  * viewing angle to account for the inter-pupillary distance. This allows to create panoramic
  * stereo images that are perfect for viewing on VR devices.
@@ -58,7 +59,7 @@ public class OmniDirectionalStereoProjector implements Projector {
 
     pos.set(FastMath.cos(theta) * scale, 0, FastMath.sin(theta) * scale);
     direction.set(FastMath.sin(theta) * FastMath.cos(phi), -FastMath.sin(phi),
-        -FastMath.cos(theta) * FastMath.cos(phi));
+        FastMath.cos(theta) * FastMath.cos(phi));
   }
 
   @Override
