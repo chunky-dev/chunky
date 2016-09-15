@@ -38,10 +38,17 @@ public class OmniDirectionalStereoProjector implements Projector {
   /**
    * The interpupillary distance of the viewer, in meters.
    */
-  private double interpupillaryDistance = 0.069;
+  private static final double interpupillaryDistance = 0.069;
+
+  private final double scale;
 
   public OmniDirectionalStereoProjector(Eye eye) {
     this.eye = eye;
+    if (eye == Eye.LEFT) {
+      scale = -interpupillaryDistance / 2;
+    } else {
+      scale = interpupillaryDistance / 2;
+    }
   }
 
   @Override
@@ -54,12 +61,6 @@ public class OmniDirectionalStereoProjector implements Projector {
     double theta = (x + 0.5) * FastMath.PI - FastMath.PI;
     double phi = FastMath.PI / 2 - (y + 0.5) * FastMath.PI;
 
-    double scale;
-    if (eye == Eye.LEFT) {
-      scale = -interpupillaryDistance / 2;
-    } else {
-      scale = interpupillaryDistance / 2;
-    }
     pos.set(FastMath.cos(theta) * scale, 0, FastMath.sin(theta) * scale);
     direction.set(FastMath.sin(theta) * FastMath.cos(phi), FastMath.sin(phi), -FastMath.cos(theta) * FastMath.cos(phi));
   }
