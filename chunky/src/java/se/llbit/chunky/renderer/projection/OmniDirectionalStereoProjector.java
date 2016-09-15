@@ -23,9 +23,10 @@ import java.util.Random;
 
 /**
  * A projector for Omni-Directional Stereo (ODS) images. x is mapped to yaw, y is mapped to
- * pitch. This projector is like the {@link PanoramicProjector} but can create distinct
- * images for the left and the right eye to create panoramic stereo images that are perfect
- * for viewing on VR devices.
+ * pitch. This projector, unlike the {@link PanoramicProjector}, can create distinct
+ * images for the left and the right eye by slightly displacing the view ray origins based on the
+ * viewing angle to account for the inter-pupillary distance. This allows to create panoramic
+ * stereo images that are perfect for viewing on VR devices.
  *
  * @see <a href="https://developers.google.com/vr/jump/rendering-ods-content.pdf">Rendering Omni‐directional Stereo Content</a>
  */
