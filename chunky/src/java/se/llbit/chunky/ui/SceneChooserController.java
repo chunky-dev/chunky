@@ -32,6 +32,7 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.main.SceneHelper;
 import se.llbit.chunky.renderer.scene.SceneDescription;
 import se.llbit.log.Log;
 
@@ -144,7 +145,7 @@ public class SceneChooserController implements Initializable {
   private void populate() {
     List<SceneDescription> scenes = new ArrayList<>();
     File sceneDir = PersistentSettings.getSceneDirectory();
-    List<File> fileList = getAvailableSceneFiles(sceneDir);
+    List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
     Collections.sort(fileList);
     for (File sceneFile : fileList) {
       String fileName = sceneFile.getName();
@@ -160,21 +161,6 @@ public class SceneChooserController implements Initializable {
     if (!scenes.isEmpty()) {
       sceneTbl.getSelectionModel().select(0);
     }
-  }
-
-  /**
-   * @return a list of available scene description files in the given scene
-   * directory
-   */
-  public static final List<File> getAvailableSceneFiles(File sceneDir) {
-    File[] sceneFiles = sceneDir.listFiles((dir, name) -> {
-      return name.endsWith(SceneDescription.SCENE_DESCRIPTION_EXTENSION);
-    });
-    List<File> fileList = new ArrayList<>(sceneFiles.length);
-    for (File file : sceneFiles) {
-      fileList.add(file);
-    }
-    return fileList;
   }
 
   public void setController(ChunkyFxController controller) {

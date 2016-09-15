@@ -20,6 +20,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.VersionInfo.Library;
 import se.llbit.chunky.launcher.VersionInfo.LibraryStatus;
 import se.llbit.chunky.launcher.ui.ChunkyLauncherController;
+import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
@@ -341,6 +342,11 @@ public final class ChunkyDeployer {
     cmd.add(JreUtil.javaCommand(settings.javaDir));
     cmd.add("-Xmx" + settings.memoryLimit + "m");
 
+    File settingsDirectory = SettingsDirectory.getSettingsDirectory();
+    if (settingsDirectory != null) {
+      cmd.add("-Dchunky.home=" + settingsDirectory.getAbsolutePath());
+    }
+
     String[] parts = settings.javaOptions.split(" ");
     for (String part : parts) {
       if (!part.isEmpty()) {
@@ -368,7 +374,7 @@ public final class ChunkyDeployer {
   }
 
   private static String classpath(VersionInfo version) {
-    File chunkyDir = PersistentSettings.settingsDirectory();
+    File chunkyDir = SettingsDirectory.getSettingsDirectory();
     File libDir = new File(chunkyDir, "lib");
     List<File> jars = version.libraries.stream()
         .map(library -> library.getFile(libDir))

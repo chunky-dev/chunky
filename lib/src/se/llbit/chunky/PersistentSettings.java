@@ -79,7 +79,7 @@ public final class PersistentSettings {
   }
 
   static {
-    settingsDir = SettingsDirectory.defaultSettingsDirectory();
+    settingsDir = SettingsDirectory.getSettingsDirectory();
     settingsFile = new File(settingsDir, SETTINGS_FILE);
     cacheDir = new File(settingsDir, "cache");
     settings.load(settingsFile);

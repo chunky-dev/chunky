@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -22,6 +22,9 @@ import java.net.URL;
 
 import se.llbit.chunky.PersistentSettings;
 
+/**
+ * Utility class with helper function to locate the Chunky settings directory.
+ */
 public final class SettingsDirectory {
   private static final String SETTINGS_DIR = ".chunky";
 
@@ -32,25 +35,34 @@ public final class SettingsDirectory {
    * @return {@code true} if the settings directory could be located
    */
   public static boolean findSettingsDirectory() {
-    return settingsDirectory() != null;
+    return getSettingsDirectory() != null;
   }
 
   /**
-   * Falls back on home directory
+   * Locates the Chunky settings directory. The following locations are
+   * tested in the listed order:
    *
-   * @return The current settings directory, or the default one.
+   * <ul>
+   *   <li>The path specified by the "chunky.home" system property.
+   *   <li>The current working directory.
+   *   <li>The directory where the Chunky or Chunky Launcher Jar file is.
+   *   <li>The directory $HOME/.chunky, where HOME is the current user home directory.
+   * </ul>
+   *
+   * Falls back on home directory.
+   *
+   * @return The configured settings directory, or {@code null}
+   * if the settings directory could not be located.
    */
-  public static File defaultSettingsDirectory() {
-    File dir = settingsDirectory();
-    return (dir == null) ? getHomeDirectory() : dir;
-  }
-
-  /**
-   * @return {@code null} if the settings directory could not be located
-   */
-  public static File settingsDirectory() {
-    File directory = null;
-    directory = getWorkingDirectory();
+  public static File getSettingsDirectory() {
+    String chunkyHomeProperty = System.getProperty("chunky.home");
+    if (chunkyHomeProperty != null && !chunkyHomeProperty.isEmpty()) {
+      // We don't check if this is a valid settings directory because
+      // we should always respect the system property in case the user
+      // has manually specified it.
+      return new File(chunkyHomeProperty);
+    }
+    File directory = getWorkingDirectory();
     if (isSettingsDirectory(directory)) {
       return directory;
     }
@@ -92,6 +104,9 @@ public final class SettingsDirectory {
     return null;
   }
 
+  /**
+   * @return the directory containing the Chunky Jar file.
+   */
   public static File getProgramDirectory() {
     URL location = SettingsDirectory.class.getProtectionDomain().getCodeSource().getLocation();
     try {

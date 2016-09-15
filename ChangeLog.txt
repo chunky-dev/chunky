@@ -35,6 +35,8 @@
     * Removed the player Y position indicator.
 * Added -list-scenes command.
 * End rods now emit light.
+* Made it possible to manually set the Chunky settings directory via system
+  properties (java -Dchunky.home=DIR).
 
 1.3.8 - 2016-04-03
 

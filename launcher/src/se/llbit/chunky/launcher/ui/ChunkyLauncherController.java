@@ -174,7 +174,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
       settings.downloadSnapshots = newValue;
       settings.save();
     });
-    settingsDirectory.setText(SettingsDirectory.defaultSettingsDirectory().getAbsolutePath());
+    settingsDirectory.setText(SettingsDirectory.getSettingsDirectory().getAbsolutePath());
     openSettingsDirectory.setOnAction(event -> {
       // Running Desktop.open() on the JavaFX application thread seems to
       // lock up the application on Linux, so we create a new thread to run that.
@@ -183,7 +183,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
       new Thread(() -> {
         try {
           if (Desktop.isDesktopSupported()) {
-            Desktop.getDesktop().open(SettingsDirectory.defaultSettingsDirectory());
+            Desktop.getDesktop().open(SettingsDirectory.getSettingsDirectory());
           } else {
             Platform.runLater(
                 () -> launcherWarning("Failed to open Settings Directory",
