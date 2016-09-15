@@ -31,11 +31,6 @@ import java.util.Random;
  */
 public class OmniDirectionalStereoProjector implements Projector {
   /**
-  * The eye that this projector produces rays for.
-  */
-  private final Eye eye;
-
-  /**
    * The interpupillary distance of the viewer, in meters.
    */
   private static final double interpupillaryDistance = 0.069;
@@ -43,7 +38,6 @@ public class OmniDirectionalStereoProjector implements Projector {
   private final double scale;
 
   public OmniDirectionalStereoProjector(Eye eye) {
-    this.eye = eye;
     if (eye == Eye.LEFT) {
       scale = -interpupillaryDistance / 2;
     } else {
