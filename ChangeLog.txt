@@ -5,7 +5,6 @@
     * Magma Block
     * Red Nether Brick
     * Nether Wart Block
-block rendering: Bone block rendering.
 * Added Magma block rendering.
 * Chunky now requires Java 8 to run.
 * Modernized the Chunky User Interface by rewriting it in JavaFX.
