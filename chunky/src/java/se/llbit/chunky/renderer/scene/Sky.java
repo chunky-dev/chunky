@@ -38,7 +38,6 @@ import se.llbit.resources.ImageLoader;
 import se.llbit.util.JSONifiable;
 import se.llbit.util.NotNull;
 
-import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Sky model for ray tracing
+ * Sky model and sky state for ray tracing.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
@@ -328,9 +327,7 @@ public class Sky implements JSONifiable {
   }
 
   /**
-   * Panormaic skymap color
-   *
-   * @param ray
+   * Panoramic skymap color.
    */
   public void getSkyColor(Ray ray) {
     getSkyDiffuseColorInner(ray);

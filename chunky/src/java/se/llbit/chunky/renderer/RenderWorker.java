@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.RayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
@@ -40,6 +41,8 @@ public class RenderWorker extends Thread {
   private final AbstractRenderManager manager;
 
   private final WorkerState state;
+  private final RayTracer previewRayTracer;
+  private final RayTracer rayTracer;
   private long jobTime = 0;
 
   /**
@@ -53,6 +56,8 @@ public class RenderWorker extends Thread {
     super("3D Render Worker " + id);
 
     this.manager = manager;
+    this.previewRayTracer = manager.getPreviewRayTracer();
+    this.rayTracer = manager.getRayTracer();
     this.id = id;
     state = new WorkerState();
     state.random = new Random(seed);
@@ -66,7 +71,7 @@ public class RenderWorker extends Thread {
           work(manager.getNextJob());
           manager.jobDone();
         }
-      } catch (InterruptedException e) {
+      } catch (InterruptedException ignored) {
         // Interrupted.
       }
     } catch (Throwable e) {
@@ -76,7 +81,7 @@ public class RenderWorker extends Thread {
   }
 
   /**
-   * Perform work>
+   * Perform the rendering work for a single render job.
    *
    * @throws InterruptedException interrupted while sleeping
    */
@@ -106,8 +111,6 @@ public class RenderWorker extends Thread {
     long jobStart = System.nanoTime();
 
     if (scene.getMode() != RenderMode.PREVIEW) {
-
-      // this is intentionally incorrectly indented for readability
       for (int y = y0; y < y1; ++y) {
         int offset = y * width * 3 + x0 * 3;
         for (int x = x0; x < x1; ++x) {
@@ -123,7 +126,7 @@ public class RenderWorker extends Thread {
             cam.calcViewRay(ray, random, (-halfWidth + (x + ox) * invHeight),
                 (-.5 + (y + oy) * invHeight));
 
-            scene.pathTrace(state);
+            scene.rayTrace(rayTracer, state);
 
             sr += ray.color.x;
             sg += ray.color.y;
@@ -178,7 +181,7 @@ public class RenderWorker extends Thread {
           cam.calcViewRay(ray, random, (-halfWidth + (double) x * invHeight),
               (-.5 + (double) y * invHeight));
 
-          scene.quickTrace(state);
+          scene.rayTrace(previewRayTracer, state);
 
           // Target highlighting.
           int rx = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
@@ -199,10 +202,10 @@ public class RenderWorker extends Thread {
 
           if (firstFrame) {
             if (y % 2 == 0 && x < (width - 1)) {
-              // copy forward
+              // Copy the current pixel to the next one.
               scene.copyPixel(y * width + x, 1);
             } else if (y % 2 != 0 && x > 0) {
-              // copy backward
+              // Copy the next pixel to this pixel.
               scene.copyPixel(y * width + x, -1);
             }
           }

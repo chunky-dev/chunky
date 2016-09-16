@@ -51,7 +51,6 @@ import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
-import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.renderer.RenderContext;
@@ -186,7 +185,6 @@ public class ChunkyFxController
 
   public ChunkyFxController() {
     mapLoader = new WorldMapLoader(this);
-    chunky = new Chunky(ChunkyOptions.getDefaults());
     map = new ChunkMap(mapLoader, this);
     minimap = new Minimap(mapLoader, this);
     mapLoader.addViewListener(this);
@@ -635,5 +633,12 @@ public class ChunkyFxController
 
   public Canvas getMapOverlay() {
     return mapOverlay;
+  }
+
+  /**
+   * This must be called when creating the Chunky User Interface.
+   */
+  public void setChunky(Chunky chunky) {
+    this.chunky = chunky;
   }
 }

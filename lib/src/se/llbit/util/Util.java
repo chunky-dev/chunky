@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,8 +16,6 @@
  */
 package se.llbit.util;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,25 +28,32 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+/**
+ * Miscellaneous utility functions.
+ */
 public class Util {
 
   private static final char[] B64 =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".toCharArray();
 
+  /**
+   * @return the MD5 hash sum of the given file, in hexadecimal format.
+   * Returns an error message if there was an error computing the checksum.
+   */
   public static String md5sum(File library) {
     try {
       MessageDigest digest = MessageDigest.getInstance("MD5");
-      FileInputStream in = new FileInputStream(library);
-      DigestInputStream dis = new DigestInputStream(in, digest);
-      byte[] buf = new byte[2048];
-      int n;
-      do {
-        n = dis.read(buf);
-      } while (n != -1);
-      in.close();
-      return byteArrayToHexString(digest.digest());
-    } catch (IOException e) {
-      return "md5 compute error: " + e.getMessage();
+      try (FileInputStream in = new FileInputStream(library);
+          DigestInputStream dis = new DigestInputStream(in, digest)) {
+        byte[] buf = new byte[2048];
+        int n;
+        do {
+          n = dis.read(buf);
+        } while (n != -1);
+        return byteArrayToHexString(digest.digest());
+      } catch (IOException e) {
+        return "md5 compute error: " + e.getMessage();
+      }
     } catch (NoSuchAlgorithmException e) {
       return "md5 compute error: " + e.getMessage();
     }
@@ -59,7 +64,6 @@ public class Util {
   /**
    * Inspired by Real's How To: http://www.rgagnon.com/javadetails/java-0596.html
    *
-   * @param array
    * @return Hexadecimal string representation of the input bytes
    */
   public static String byteArrayToHexString(byte[] array) {
@@ -72,7 +76,6 @@ public class Util {
   }
 
   /**
-   * @param time
    * @return A date object representing the given ISO 8601 timestamp. If time is
    * not a ISO 8601 formatted timestamp, the returned object is
    * {@code new Date(0)}.
@@ -82,7 +85,7 @@ public class Util {
       return new Date(0);
     }
     try {
-      // insert "GMT"
+      // Insert "GMT".
       if (time.endsWith("Z")) {
         time = time.substring(0, time.length() - 1) + "GMT-00:00";
       } else {
@@ -103,7 +106,7 @@ public class Util {
     TimeZone tz = TimeZone.getTimeZone("UTC");
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     df.setTimeZone(tz);
-    return df.format(new Date());
+    return df.format(date);
   }
 
   public static boolean isValidISO8601(String time) {
@@ -125,23 +128,6 @@ public class Util {
     } catch (ParseException e) {
       return false;
     }
-  }
-
-  /**
-   * Copies a BufferedImage to another. The buffered images must be TYPE_INT_****
-   *
-   * @param source
-   * @param dest
-   * @param width
-   * @param height
-   */
-  public static void copyBufferedImage(BufferedImage source, BufferedImage dest, int width,
-      int height) {
-    DataBufferInt sourceBuffer = (DataBufferInt) source.getRaster().getDataBuffer();
-    DataBufferInt destBuffer = (DataBufferInt) dest.getRaster().getDataBuffer();
-    int[] srcData = sourceBuffer.getData();
-    int[] destData = destBuffer.getData();
-    System.arraycopy(srcData, 0, destData, 0, width * height);
   }
 
   /**

@@ -119,6 +119,13 @@ public final class JsonSettings {
   }
 
   /**
+   * Replace the raw JSON value for a setting.
+   */
+  public void set(String name, JsonValue value) {
+    json.set(name, value);
+  }
+
+  /**
    * Get boolean value of a setting
    *
    * @param name     Property name

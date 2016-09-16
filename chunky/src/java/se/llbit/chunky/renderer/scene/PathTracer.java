@@ -29,18 +29,19 @@ import se.llbit.math.Vector4;
 import java.util.Random;
 
 /**
- * Static methods for path tracing
+ * Static methods for path tracing.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class PathTracer {
+public class PathTracer implements RayTracer {
 
+  /** Extinction factor for fog rendering. */
   private static final double EXTINCTION_FACTOR = 0.04;
 
   /**
    * Path trace the ray.
    */
-  public static void pathTrace(Scene scene, WorkerState state) {
+  @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
     if (scene.isInWater(ray)) {
       ray.setCurrentMat(Block.WATER, 0);
@@ -64,21 +65,22 @@ public class PathTracer {
 
     while (true) {
 
-      if (!RayTracer.nextIntersection(scene, ray)) {
+      if (!PreviewRayTracer.nextIntersection(scene, ray)) {
         if (ray.getPrevMaterial() == Block.WATER) {
           ray.color.set(0, 0, 0, 1);
           hit = true;
         } else if (ray.depth == 0) {
-          // direct sky hit
+          // Direct sky hit.
           if (!scene.transparentSky()) {
             scene.sky.getSkyColorInterpolated(ray);
             hit = true;
           }
         } else if (ray.specular) {
-          // sky color
+          // Indirect sky hit - specular color.
           scene.sky.getSkySpecularColor(ray);
           hit = true;
         } else {
+          // Indirect sky hit - diffuse color.
           scene.sky.getSkyColor(ray);
           hit = true;
         }
@@ -142,7 +144,6 @@ public class PathTracer {
 
           if (!scene.kill(ray.depth + 1, random)) {
             Ray reflected = new Ray();
-            reflected.set(ray);
 
             double emittance = 0;
 
@@ -159,6 +160,7 @@ public class PathTracer {
             }
 
             if (scene.sunEnabled) {
+              reflected.set(ray);
               scene.sun.getRandomSunDirection(reflected, random);
 
               double directLightR = 0;
@@ -220,12 +222,12 @@ public class PathTracer {
               currentMat == Block.ICE ||
               prevMat == Block.ICE;
 
-          // refraction
+          // Refraction.
           float n1n2 = n1 / n2;
           double cosTheta = -ray.n.dot(ray.d);
           double radicand = 1 - n1n2 * n1n2 * (1 - cosTheta * cosTheta);
           if (doRefraction && radicand < Ray.EPSILON) {
-            // total internal reflection
+            // Total internal reflection.
             if (!scene.kill(ray.depth + 1, random)) {
               Ray reflected = new Ray();
               reflected.specularReflection(ray);
@@ -243,7 +245,7 @@ public class PathTracer {
               refracted.set(ray);
 
               // Calculate angle-dependent reflectance using
-              // Fresnel equation approximation
+              // Fresnel equation approximation:
               // R(cosineAngle) = R0 + (1 - R0) * (1 - cos(cosineAngle))^5
               float a = (n1n2 - 1);
               float b = (n1n2 + 1);
@@ -311,18 +313,10 @@ public class PathTracer {
       }
 
       if (hit && prevMat == Block.WATER) {
-        // do water fog
+        // Render water fog effect.
         double a = ray.distance / scene.waterVisibility;
         double attenuation = 1 - QuickMath.min(1, a * a);
         ray.color.scale(attenuation);
-        /*ray.color.x *= attenuation;
-				ray.color.y *= attenuation;
-				ray.color.z *= attenuation;
-				float[] wc = Texture.water.getAvgColorLinear();
-				ray.color.x += (1-attenuation) * wc[0];
-				ray.color.y += (1-attenuation) * wc[1];
-				ray.color.z += (1-attenuation) * wc[2];
-				ray.color.w = attenuation;*/
       }
 
       break;
@@ -340,7 +334,7 @@ public class PathTracer {
     if (s > 0 && scene.fogEnabled()) {
       Sun sun = scene.sun;
 
-      // pick point between ray origin and intersected object
+      // Pick point between ray origin and intersected object.
       Ray atmos = new Ray();
       double offset = QuickMath.clamp(s * random.nextFloat(), Ray.EPSILON, s - Ray.EPSILON);
       atmos.o.scaleAdd(offset, od, ox);
@@ -351,7 +345,7 @@ public class PathTracer {
       double extinction = Math.exp(-s * fogDensity);
       ray.color.scale(extinction);
 
-      // check sun visibility at random point to determine inscatter brightness
+      // Check sun visibility at random point to determine inscatter brightness.
       getDirectLightAttenuation(scene, atmos, state);
       Vector4 attenuation = state.attenuation;
       if (attenuation.w > Ray.EPSILON) {
@@ -383,7 +377,7 @@ public class PathTracer {
     attenuation.w = 1;
     while (attenuation.w > 0) {
       ray.o.scaleAdd(Ray.OFFSET, ray.d);
-      if (!RayTracer.nextIntersection(scene, ray)) {
+      if (!PreviewRayTracer.nextIntersection(scene, ray)) {
         break;
       }
       double mult = 1 - ray.color.w;

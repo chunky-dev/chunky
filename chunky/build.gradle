@@ -87,7 +87,15 @@ task generateJava() {
 	}
 }
 
-// Exclude the :lib dependency since we embed it in the Jar.
 install.repositories.mavenInstaller.pom.whenConfigured {pom ->
+	// Exclude the :lib dependency since we embed it in the Jar.
 	pom.dependencies.removeAll { it.groupId == 'se.llbit.chunky' && it.artifactId == 'lib' }
+
+	// Change POM version to -SNAPSHOT for intermediate builds.
+	if (project.version =~ /\d+\.\d+(\.\d+)?-.+/) {
+		// This is a SNAPSHOT build.
+		def match = (project.version =~ /(\d+\.\d+(\.\d+)?)-.+/)
+		pom.version = "${match[0][1]}-SNAPSHOT"
+	}
+	println("POM version: ${pom.version}")
 }

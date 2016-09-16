@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.scene.RayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 
 /**
@@ -27,12 +28,16 @@ import se.llbit.chunky.renderer.scene.Scene;
 public abstract class AbstractRenderManager extends Thread {
 
   protected SceneProvider sceneProvider;
+  private RayTracer previewRayTracer;
+  private RayTracer rayTracer;
 
   public AbstractRenderManager(RenderContext context) {
     super("Render Manager");
 
     this.numThreads = context.numRenderThreads();
     this.tileWidth = context.tileWidth();
+    previewRayTracer = context.getChunky().getPreviewRayTracerFactory().newRayTracer();
+    rayTracer = context.getChunky().getRayTracerFactory().newRayTracer();
   }
 
   /**
@@ -68,4 +73,12 @@ public abstract class AbstractRenderManager extends Thread {
   }
 
   public abstract Scene getBufferedScene();
+
+  public RayTracer getPreviewRayTracer() {
+    return previewRayTracer;
+  }
+
+  public RayTracer getRayTracer() {
+    return rayTracer;
+  }
 }

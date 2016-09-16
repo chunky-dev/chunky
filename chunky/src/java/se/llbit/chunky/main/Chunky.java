@@ -21,6 +21,7 @@ import se.llbit.chunky.Plugin;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.ConsoleRenderListener;
 import se.llbit.chunky.renderer.OutputMode;
+import se.llbit.chunky.renderer.RayTracerFactory;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderContextFactory;
 import se.llbit.chunky.renderer.RenderController;
@@ -31,16 +32,19 @@ import se.llbit.chunky.renderer.RendererFactory;
 import se.llbit.chunky.renderer.SceneProvider;
 import se.llbit.chunky.renderer.SimpleRenderListener;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
+import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.renderer.scene.SceneManager;
+import se.llbit.chunky.renderer.scene.PreviewRayTracer;
 import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.log.Receiver;
+import se.llbit.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,6 +67,8 @@ public class Chunky {
   private SceneFactory sceneFactory = SceneFactory.PAINTABLE;
   private RenderContextFactory renderContextFactory = RenderContext::new;
   private RendererFactory rendererFactory = RenderManager::new;
+  private RayTracerFactory previewRayTracerFactory = PreviewRayTracer::new;
+  private RayTracerFactory rayTracerFactory = PathTracer::new;
 
   /**
    * @return The name of this application, including version string.
@@ -121,13 +127,6 @@ public class Chunky {
   }
 
   /**
-   * Start Chunky normally. This launches the Chunky UI.
-   */
-  private void startNormally() {
-    ChunkyFx.main(new String[0]);
-  }
-
-  /**
    * Main entry point for Chunky. Chunky should normally be started via
    * the launcher which sets up the classpath with all dependencies.
    */
@@ -153,7 +152,7 @@ public class Chunky {
           exitCode = chunky.doSnapshot();
           break;
         case DEFAULT:
-          chunky.startNormally();
+          ChunkyFx.startChunkyUI(chunky);
           break;
       }
     } catch (Throwable t) {
@@ -171,24 +170,51 @@ public class Chunky {
     for (JsonValue plugin : plugins.array().getElementList()) {
       String jar = plugin.object().get("jar").stringValue("");
       String main = plugin.object().get("main").stringValue("");
-      if (jar.endsWith(".jar")) {
-        File pluginJar = new File(jar);
-        if (pluginJar.isFile()) {
-          try {
-            URLClassLoader classLoader = new URLClassLoader(new URL[] {pluginJar.toURI().toURL()});
-            Class<?> pluginClass = classLoader.loadClass(main);
-            Plugin pluginInstance = (Plugin) pluginClass.newInstance();
-            pluginInstance.attach(this);
-          } catch (MalformedURLException| ClassNotFoundException
-              | InstantiationException | IllegalAccessException e) {
-            Log.error("Failed to load plugin " + pluginJar.getAbsolutePath(), e);
-          } catch (ClassCastException e) {
-            Log.error("Failed to load plugin " + pluginJar.getAbsolutePath()
-                + ". Main plugin class has wrong type", e);
-          }
+      // The MD5 checksum is only for Jar integrity checking, not security!
+      // Plugin Jar trust is implicit. Only install plugins that you trust!
+      String md5 = plugin.object().get("md5").stringValue("");
+      boolean enabled = plugin.object().get("enabled").boolValue(true);
+      if (!jar.endsWith(".jar")) {
+        Log.error("Plugin Jar path does not seem to point to a Jar file: " + jar);
+      }
+      if (!enabled) {
+        // Skip disabled plugin.
+        continue;
+      }
+      if (main.isEmpty()) {
+        Log.error("Plugin has no main class declared: " + jar);
+        continue;
+      }
+      if (md5.isEmpty()) {
+        Log.error("Plugin missing MD5 checksum: " + jar);
+        continue;
+      }
+      File pluginJar = new File(jar);
+      if (pluginJar.isFile()) {
+        if (!verifyChecksumMd5(pluginJar, md5)) {
+          Log.error("Plugin is corrupt (MD5 check failed): " + jar);
+          continue;
+        }
+        try {
+          URLClassLoader classLoader = new URLClassLoader(new URL[] {pluginJar.toURI().toURL()});
+          Class<?> pluginClass = classLoader.loadClass(main);
+          Plugin pluginInstance = (Plugin) pluginClass.newInstance();
+          pluginInstance.attach(this);
+          Log.info("Plugin loaded: " + jar);
+        } catch (MalformedURLException| ClassNotFoundException
+            | InstantiationException | IllegalAccessException e) {
+          Log.error("Failed to load plugin " + pluginJar.getAbsolutePath(), e);
+        } catch (ClassCastException e) {
+          Log.error("Failed to load plugin " + pluginJar.getAbsolutePath()
+              + ". Main plugin class has wrong type", e);
         }
       }
     }
+  }
+
+  private static boolean verifyChecksumMd5(File pluginJar, String expected) {
+    String actual = Util.md5sum(pluginJar);
+    return actual.equalsIgnoreCase(expected);
   }
 
   /**
@@ -265,11 +291,35 @@ public class Chunky {
     return renderController;
   }
 
+  public void setRenderContextFactory(RenderContextFactory renderContextFactory) {
+    this.renderContextFactory = renderContextFactory;
+  }
+
   public RenderContext getRenderContext() {
     return getRenderController().getContext();
   }
 
+  public void setSceneFactory(SceneFactory sceneFactory) {
+    this.sceneFactory = sceneFactory;
+  }
+
   public SceneFactory getSceneFactory() {
     return sceneFactory;
+  }
+
+  public void setPreviewRayTracerFactory(RayTracerFactory previewRayTracerFactory) {
+    this.previewRayTracerFactory = previewRayTracerFactory;
+  }
+
+  public RayTracerFactory getPreviewRayTracerFactory() {
+    return previewRayTracerFactory;
+  }
+
+  public void setRayTracerFactory(RayTracerFactory rayTracerFactory) {
+    this.rayTracerFactory = rayTracerFactory;
+  }
+
+  public RayTracerFactory getRayTracerFactory() {
+    return rayTracerFactory;
   }
 }

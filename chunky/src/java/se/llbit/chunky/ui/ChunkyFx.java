@@ -29,10 +29,13 @@ import se.llbit.chunky.main.Chunky;
  */
 public class ChunkyFx extends Application {
 
+  private static Chunky chunkyInstance;
+
   @Override public void start(Stage stage) throws Exception {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("Chunky.fxml"));
     Parent root = loader.load();
     ChunkyFxController controller = loader.getController();
+    controller.setChunky(chunkyInstance);
     stage.setTitle(Chunky.getAppName());
     Scene scene = new Scene(root);
     stage.setScene(scene);
@@ -41,7 +44,8 @@ public class ChunkyFx extends Application {
     stage.show();
   }
 
-  public static void main(String[] args) {
-    launch(args);
+  public static void startChunkyUI(Chunky chunkyInstance) {
+    ChunkyFx.chunkyInstance = chunkyInstance;
+    launch();
   }
 }

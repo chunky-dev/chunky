@@ -385,5 +385,10 @@ public final class PersistentSettings {
   public static JsonValue getPlugins() {
     return settings.get("plugins");
   }
+
+  public static void setPlugins(JsonValue value) {
+    settings.set("plugins", value);
+    save();
+  }
 }
 

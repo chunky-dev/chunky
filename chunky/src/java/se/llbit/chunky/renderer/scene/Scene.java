@@ -476,25 +476,15 @@ public class Scene extends SceneDescription {
   }
 
   /**
-   * Quick ray trace.
+   * Trace a ray in this scene. This offsets the ray origin to
+   * move it into the scene coordinate space.
    */
-  public void quickTrace(WorkerState state) {
+  public void rayTrace(RayTracer rayTracer, WorkerState state) {
     state.ray.o.x -= origin.x;
     state.ray.o.y -= origin.y;
     state.ray.o.z -= origin.z;
 
-    RayTracer.quickTrace(this, state);
-  }
-
-  /**
-   * Path trace the ray in this scene.
-   */
-  public void pathTrace(WorkerState state) {
-    state.ray.o.x -= origin.x;
-    state.ray.o.y -= origin.y;
-    state.ray.o.z -= origin.z;
-
-    PathTracer.pathTrace(this, state);
+    rayTracer.trace(this, state);
   }
 
   /**
@@ -548,11 +538,11 @@ public class Scene extends SceneDescription {
   }
 
   /**
-   * Test if the ray should be killed (Russian Roulette)
+   * Test if the ray should be killed (using Russian Roulette).
    *
    * @return {@code true} if the ray needs to die now
    */
-  protected final boolean kill(int depth, Random random) {
+  public final boolean kill(int depth, Random random) {
     return depth >= rayDepth && random.nextDouble() < .5f;
   }
 
@@ -1206,7 +1196,7 @@ public class Scene extends SceneDescription {
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
     camera.transform(ray.d);
-    while (RayTracer.nextIntersection(this, ray)) {
+    while (PreviewRayTracer.nextIntersection(this, ray)) {
       if (ray.getCurrentMaterial() != Block.AIR) {
         return true;
       }
@@ -1833,7 +1823,7 @@ public class Scene extends SceneDescription {
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
 
-    double occlusion = RayTracer.skyOcclusion(this, state);
+    double occlusion = PreviewRayTracer.skyOcclusion(this, state);
 
     camera
         .calcViewRay(ray, -halfWidth + (x + 1 / 8.0) * invHeight, -.5 + (y + 3 / 8.0) * invHeight);
@@ -1841,7 +1831,7 @@ public class Scene extends SceneDescription {
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
 
-    occlusion += RayTracer.skyOcclusion(this, state);
+    occlusion += PreviewRayTracer.skyOcclusion(this, state);
 
     camera
         .calcViewRay(ray, -halfWidth + (x - 1 / 8.0) * invHeight, -.5 + (y - 3 / 8.0) * invHeight);
@@ -1849,7 +1839,7 @@ public class Scene extends SceneDescription {
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
 
-    occlusion += RayTracer.skyOcclusion(this, state);
+    occlusion += PreviewRayTracer.skyOcclusion(this, state);
 
     camera
         .calcViewRay(ray, -halfWidth + (x + 3 / 8.0) * invHeight, -.5 + (y - 1 / 8.0) * invHeight);
@@ -1857,7 +1847,7 @@ public class Scene extends SceneDescription {
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
 
-    occlusion += RayTracer.skyOcclusion(this, state);
+    occlusion += PreviewRayTracer.skyOcclusion(this, state);
 
     alphaChannel[y * width + x] = (byte) (255 * occlusion * 0.25 + 0.5);
   }

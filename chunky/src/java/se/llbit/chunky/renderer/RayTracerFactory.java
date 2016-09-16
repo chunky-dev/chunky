@@ -15,12 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.renderer.scene;
+package se.llbit.chunky.renderer;
 
-import se.llbit.chunky.renderer.WorkerState;
+import se.llbit.chunky.renderer.scene.RayTracer;
 
-/**
- */
-public interface RayTracer {
-  void trace(Scene scene, WorkerState state);
+public interface RayTracerFactory {
+  RayTracer newRayTracer();
 }
