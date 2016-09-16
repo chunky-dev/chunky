@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer.projection;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.math.Constants;
 import se.llbit.math.Vector3;
 
 import java.util.Random;
@@ -54,8 +55,8 @@ public class OmniDirectionalStereoProjector implements Projector {
 
   @Override
   public void apply(double x, double y, Vector3 pos, Vector3 direction) {
-    double theta = (x + 0.5) * FastMath.PI - FastMath.PI;
-    double phi = FastMath.PI / 2 - (y + 0.5) * FastMath.PI;
+    double theta = (x + 0.5) * Math.PI - Constants.HALF_PI;
+    double phi = Constants.HALF_PI - (y + 0.5) * Math.PI;
 
     pos.set(FastMath.cos(theta) * scale, 0, FastMath.sin(theta) * scale);
     direction.set(FastMath.sin(theta) * FastMath.cos(phi), -FastMath.sin(phi),
