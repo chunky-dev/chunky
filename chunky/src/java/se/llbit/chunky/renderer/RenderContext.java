@@ -91,7 +91,7 @@ public class RenderContext {
   /**
    * @return Input stream for the given scene file
    */
-  protected File getSceneFile(String fileName) {
+  public File getSceneFile(String fileName) {
     return new File(config.sceneDir, fileName);
   }
 

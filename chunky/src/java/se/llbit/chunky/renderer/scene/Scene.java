@@ -365,7 +365,7 @@ public class Scene extends SceneDescription {
     // Load the configured skymap file.
     sky.loadSkymap();
 
-    setCanvasSize(width, height);
+    initBuffers(); // Re-initialize the render buffers.
 
     if (!worldPath.isEmpty()) {
       File worldDirectory = new File(worldPath);
@@ -1700,18 +1700,38 @@ public class Scene extends SceneDescription {
   }
 
   public synchronized void loadDump(RenderContext context, RenderStatusListener renderListener) {
-    String fileName = name + ".dump";
+    if (!tryLoadDump(context, renderListener, name + ".dump")) {
+      // Failed to load the default render dump - try the backup file.
+      if (!tryLoadDump(context, renderListener, name + ".dump.backup")) {
+        spp = 0;  // Set spp = 0 because we don't have the old render state.
+      }
+    }
+  }
+
+  /**
+   * @return {@code true} if the render dump was successfully loaded
+   */
+  private boolean tryLoadDump(RenderContext context, RenderStatusListener renderListener,
+      String fileName) {
     TaskTracker taskTracker = renderListener.taskTracker();
-    try (TaskTracker.Task task = taskTracker.task("Loading render dump", 2);
-        DataInputStream in = new DataInputStream(
-            new GZIPInputStream(context.getSceneFileInputStream(fileName)))) {
+    File dumpFile = context.getSceneFile(fileName);
+    if (!dumpFile.isFile()) {
+      if (spp != 0) {
+        // The scene state says the render had some progress, so we should warn
+        // that the render dump does not exist.
+        Log.warn("Render dump not found: " + fileName);
+      }
+      return false;
+    }
+    try (DataInputStream in = new DataInputStream(new GZIPInputStream(new FileInputStream(dumpFile)));
+        TaskTracker.Task task = taskTracker.task("Loading render dump", 2)) {
       task.update(1);
-      Log.info("Loading render dump " + fileName);
+      Log.info("Reading render dump " + fileName);
       int dumpWidth = in.readInt();
       int dumpHeight = in.readInt();
       if (dumpWidth != width || dumpHeight != height) {
         Log.warn("Render dump discarded: incorrect width or height!");
-        return;
+        return false;
       }
       spp = in.readInt();
       renderTime = in.readLong();
@@ -1731,15 +1751,12 @@ public class Scene extends SceneDescription {
           finalizePixel(x, y);
         }
       }
-      Log.info("Render dump loaded");
+      Log.info("Render dump loaded: " + fileName);
+      return true;
     } catch (IOException e) {
-      if (spp == 0) {
-        // This is fine.
-        Log.info("Failed to load render dump", e);
-      } else {
-        Log.warn("Failed to load render dump", e);
-        spp = 0;  // Set spp = 0 because we don't have the old render state.
-      }
+      // The render dump was possibly corrupt.
+      Log.warn("Failed to load render dump", e);
+      return false;
     }
   }
 
