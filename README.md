@@ -5,9 +5,10 @@ Chunky is a Minecraft mapping and rendering tool.
 
 Quick links:
 
-* [Documentation](http://chunky.llbit.se)
-* [Subreddit](http://www.reddit.com/r/chunky)
-* [Development Blog](http://llbit.se)
+* [Documentation][1]
+* [Troubleshooting][2]
+* [Subreddit][3]
+* [Development Blog][4]
 
 Copyright & License
 -------------------
@@ -15,7 +16,7 @@ Copyright & License
 Chunky is Copyright (c) 2010-2016, Jesper Öqvist <jesper@llbit.se>
 
 Permission to modify and redistribute is granted under the terms of
-the GPLv3 license. See the file license/LICENSE.txt for the full license.
+the GPLv3 license. See the file `license/LICENSE.txt` for the full license.
 
 Chunky uses the following 3rd party libraries:
 
@@ -43,8 +44,9 @@ command line:
 
     java -jar chunky.jar -render SceneName
 
+
 Where SceneName is the name of the scene to render. You can read more about
-[headless rendering here.](http://chunky.llbit.se/headless.html)
+[headless rendering here.][5]
 
 Shutdown when render completes on Unix-like Systems (Mac OS X, Linux, BSD)
 --------------------------------------------------------------------------
@@ -64,9 +66,10 @@ Add the following line at the end of the file: (press Insert to type)
 
     %user_name ALL=(ALL) NOPASSWD: /sbin/shutdown
 
+
 Replace `user_name` with your username.
 
-Press Escape, then type ":wq".
+Press Escape, then type `:wq`.
 
 You may need to restart or log out and in for this to take effect.
 
@@ -93,15 +96,23 @@ fairly simple to set those up in Eclipse. You will need to add a dependency
 from `chunky` to `lib`.
 
 
-###Code Style
+### Code Style
 
-The standard Eclipse Java style is used, with slight modifications. If you
-want to contribute code to Chunky please make your code look similar to the
-rest of the code.
+The [Google Java style guide][6] should be followed for new code (2 spaces for
+indentation, no tabs). If you want to contribute code to Chunky please make
+your code look similar to the rest of the code, and refer to the style guide
+when in doubt.
 
 Additional Information
 ----------------------
 
 More information about Chunky, including a short getting started guide and
 rendering tips are available at the [Chunky Documentation
-page.](http://chunky.llbit.se/)
+page.][1]
+
+[1]: http://chunky.llbit.se
+[2]: http://chunky.llbit.se/troubleshooting.html
+[3]: http://www.reddit.com/r/chunky
+[4]: http://llbit.se
+[5]: http://chunky.llbit.se/headless.html
+[6]: https://google.github.io/styleguide/javaguide.html
