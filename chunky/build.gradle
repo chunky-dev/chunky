@@ -88,19 +88,6 @@ task generateJava() {
 	}
 }
 
-install.repositories.mavenInstaller.pom.whenConfigured {pom ->
-	// Exclude the :lib dependency since we embed it in the Jar.
-	pom.dependencies.removeAll { it.groupId == 'se.llbit' && it.artifactId == 'lib' }
-
-	// Change POM version to -SNAPSHOT for intermediate builds.
-	if (project.version =~ /\d+\.\d+(\.\d+)?-.+/) {
-		// This is a SNAPSHOT build.
-		def match = (project.version =~ /(\d+\.\d+(\.\d+)?)-.+/)
-		pom.version = "${match[0][1]}-SNAPSHOT"
-	}
-	println("POM version: ${pom.version}")
-}
-
 task javadocJar(type: Jar) {
 	classifier = 'javadoc'
 	from javadoc
@@ -152,7 +139,7 @@ uploadArchives {
 			developers {
 				developer {
 					name 'Jesper Öqvist'
-					email '<jesper@llbit.se>'
+					email 'jesper@llbit.se'
 				}
 			}
 			scm {
@@ -160,5 +147,22 @@ uploadArchives {
 				url 'https://github.com/llbit/chunky'
 			}
 		}
+	}
+}
+
+project.afterEvaluate {
+	def installers = project.tasks.install.repositories
+	def deployers = project.tasks.uploadArchives.repositories
+	installers.plus(deployers)*.pom*.whenConfigured {pom ->
+		// Exclude the :lib dependency since we embed it in the Jar.
+		pom.dependencies.removeAll { it.groupId == 'se.llbit' && it.artifactId == 'lib' }
+
+		// Change POM version to -SNAPSHOT for intermediate builds.
+		if (project.version =~ /\d+\.\d+(\.\d+)?-.+/) {
+			// This is a SNAPSHOT build.
+			def match = (project.version =~ /(\d+\.\d+(\.\d+)?)-.+/)
+			pom.version = "${match[0][1]}-SNAPSHOT"
+		}
+		println("POM version: ${pom.version}")
 	}
 }

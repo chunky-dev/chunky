@@ -9,7 +9,10 @@ allprojects {
 	group = 'se.llbit'
 	version = rootProject.version
 
-	javadoc.options.addStringOption('Xdoclint:none', '-quiet')
+	javadoc {
+		options.encoding = 'UTF-8'
+		options.addStringOption('Xdoclint:none', '-quiet')
+	}
 
 	sourceCompatibility = '1.8'
 	targetCompatibility = '1.8'
