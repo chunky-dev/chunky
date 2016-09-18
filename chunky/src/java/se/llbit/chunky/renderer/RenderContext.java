@@ -41,9 +41,9 @@ public class RenderContext {
   /**
    * Construct a new render context.
    */
-  public RenderContext(Chunky chunky, ChunkyOptions options) {
+  public RenderContext(Chunky chunky) {
     this.chunky = chunky;
-    this.config = options;
+    this.config = chunky.options;
   }
 
   public Chunky getChunky() {

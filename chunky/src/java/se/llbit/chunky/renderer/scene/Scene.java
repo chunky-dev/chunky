@@ -238,7 +238,7 @@ public class Scene extends SceneDescription {
    * This initializes the render buffers when initializing the
    * scene and after scene canvas size changes.
    */
-  protected synchronized void initBuffers() {
+  public synchronized void initBuffers() {
     buffer = new int[width * height];
     backBuffer = new int[width * height];
     alphaChannel = new byte[width * height];
@@ -1605,7 +1605,7 @@ public class Scene extends SceneDescription {
     }
   }
 
-  private synchronized void saveDump(RenderContext context, TaskTracker progress) {
+  public synchronized void saveDump(RenderContext context, TaskTracker progress) {
     String fileName = name + ".dump";
     try (TaskTracker.Task task = progress.task("Saving render dump", 2)) {
       task.update(1);
@@ -1999,7 +1999,7 @@ public class Scene extends SceneDescription {
       }
       Log.info("Render dump loaded");
 
-      // Update render status
+      // Update render status.
       spp += dumpSpp;
       renderTime += dumpTime;
       renderListener.setSpp(spp);

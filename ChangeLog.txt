@@ -33,7 +33,9 @@
     * Added an icon to the camera view visualization.
     * Removed the chunk loading indicator icon.
     * Removed the player Y position indicator.
-* Added -list-scenes command.
+* Added new command-line options:
+    * Added -list-scenes command.
+    * Added -merge-dump command.
 * End rods now emit light.
 * Made it possible to manually set the Chunky settings directory via system
   properties (java -Dchunky.home=DIR).

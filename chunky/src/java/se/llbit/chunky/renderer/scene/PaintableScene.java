@@ -44,7 +44,7 @@ public class PaintableScene extends Scene {
     super(scene);
   }
 
-  @Override protected synchronized void initBuffers() {
+  @Override public synchronized void initBuffers() {
     super.initBuffers();
     image = new WritableImage(width, height);
   }

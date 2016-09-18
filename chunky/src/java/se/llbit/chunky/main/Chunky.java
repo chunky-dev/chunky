@@ -92,7 +92,7 @@ public class Chunky {
 
     // Initialize the SceneFactory to create non-paintable scenes.
     sceneFactory = SceneFactory.HEADLESS;
-    RenderContext context = renderContextFactory.newRenderContext(this, options);
+    RenderContext context = renderContextFactory.newRenderContext(this);
     Renderer renderer = rendererFactory.newRenderer(context, true);
     SynchronousSceneManager sceneManager = new SynchronousSceneManager(context, renderer);
     renderer.setSceneProvider(sceneManager);
@@ -137,31 +137,30 @@ public class Chunky {
       System.exit(1);
     }
 
-    Chunky chunky = new Chunky(cmdline.options);
-    chunky.loadPlugins();
-
     int exitCode = 0;
-    try {
-      switch (cmdline.mode) {
-        case NOTHING:
-          break;
-        case HEADLESS_RENDER:
-          exitCode = chunky.doHeadlessRender();
-          break;
-        case SNAPSHOT:
-          exitCode = chunky.doSnapshot();
-          break;
-        case DEFAULT:
-          ChunkyFx.startChunkyUI(chunky);
-          break;
-      }
-    } catch (Throwable t) {
-      Log.error("Unchecked exception caused Chunky to close.", t);
-      exitCode = 2;
-    }
+    if (cmdline.mode != CommandLineOptions.Mode.NOTHING) {
+      Chunky chunky = new Chunky(cmdline.options);
+      chunky.loadPlugins();
 
-    if (exitCode != 0) {
-      System.exit(exitCode);
+      try {
+        switch (cmdline.mode) {
+          case HEADLESS_RENDER:
+            exitCode = chunky.doHeadlessRender();
+            break;
+          case SNAPSHOT:
+            exitCode = chunky.doSnapshot();
+            break;
+          case DEFAULT:
+            ChunkyFx.startChunkyUI(chunky);
+            break;
+        }
+      } catch (Throwable t) {
+        Log.error("Unchecked exception caused Chunky to close.", t);
+        exitCode = 2;
+      }
+      if (exitCode != 0) {
+        System.exit(exitCode);
+      }
     }
   }
 
@@ -238,31 +237,32 @@ public class Chunky {
       }, Level.INFO, Level.WARNING, Level.ERROR);
       File file = options.getSceneDescriptionFile();
       Scene scene = new Scene();
-      FileInputStream in = new FileInputStream(file);
-      scene.loadDescription(in); // Load description to get current SPP & canvas size.
-      RenderContext context = new RenderContext(this, options);
-      SimpleRenderListener listener = new SimpleRenderListener(new ConsoleProgressListener());
-      scene.setCanvasSize(scene.width, scene.height);
-      scene.loadDump(context, listener); // Load the render dump.
-      OutputMode outputMode = scene.getOutputMode();
-      if (options.imageOutputFile.isEmpty()) {
-        String extension = ".png";
-        if (outputMode == OutputMode.TIFF_32) {
-          extension = ".tiff";
+      try (FileInputStream in = new FileInputStream(file)) {
+        scene.loadDescription(in); // Load description to get current SPP & canvas size.
+        RenderContext context = new RenderContext(this);
+        SimpleRenderListener listener = new SimpleRenderListener(new ConsoleProgressListener());
+        scene.initBuffers();  // Initialize the sample buffer.
+        scene.loadDump(context, listener); // Load the render dump.
+        OutputMode outputMode = scene.getOutputMode();
+        if (options.imageOutputFile.isEmpty()) {
+          String extension = ".png";
+          if (outputMode == OutputMode.TIFF_32) {
+            extension = ".tiff";
+          }
+          options.imageOutputFile = String.format("%s-%d%s", scene.name(), scene.spp, extension);
         }
-        options.imageOutputFile = String.format("%s-%d%s", scene.name(), scene.spp, extension);
+        switch (outputMode) {
+          case PNG:
+            System.out.println("Image output mode: PNG");
+            break;
+          case TIFF_32:
+            System.out.println("Image output mode: TIFF32");
+            break;
+        }
+        scene.saveFrame(new File(options.imageOutputFile), listener.taskTracker());
+        System.out.println("Saved snapshot to " + options.imageOutputFile);
+        return 0;
       }
-      switch (outputMode) {
-        case PNG:
-          System.out.println("Image output mode: PNG");
-          break;
-        case TIFF_32:
-          System.out.println("Image output mode: TIFF32");
-          break;
-      }
-      scene.saveFrame(new File(options.imageOutputFile), listener.taskTracker());
-      System.out.println("Saved snapshot to " + options.imageOutputFile);
-      return 0;
     } catch (IOException e) {
       System.err.println("Failed to dump snapshot: " + e.getMessage());
       return 1;
@@ -279,7 +279,7 @@ public class Chunky {
 
   public RenderController getRenderController() {
     if (renderController == null) {
-      RenderContext context = renderContextFactory.newRenderContext(this, options);
+      RenderContext context = renderContextFactory.newRenderContext(this);
       Renderer renderer = rendererFactory.newRenderer(context, false);
       AsynchronousSceneManager sceneManager = new AsynchronousSceneManager(context, renderer);
       SceneProvider sceneProvider = sceneManager.getSceneProvider();

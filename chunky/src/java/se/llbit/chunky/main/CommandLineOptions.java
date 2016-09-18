@@ -18,6 +18,10 @@ package se.llbit.chunky.main;
 
 import org.jastadd.util.PrettyPrinter;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.ConsoleProgressListener;
+import se.llbit.chunky.renderer.RenderContext;
+import se.llbit.chunky.renderer.SimpleRenderListener;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneDescription;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
@@ -28,6 +32,7 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 import se.llbit.util.MCDownloader;
 import se.llbit.util.StringUtil;
 
@@ -73,6 +78,8 @@ public class CommandLineOptions {
           "  -reset <NAME> <SCENE>  reset a configuration option for a scene and exit",
           "  -download-mc <VERSION> download the given Minecraft version and exit",
           "  -list-scenes           print a list of all scenes in the scene directory",
+          "  -merge-dump <SCENE> <PATH>",
+          "                         merge a render dump into the given scene",
           "  -help                  show this text", "", "Notes:",
           "<SCENE> can be either the path to a Scene Description File ("
               + SceneDescription.SCENE_DESCRIPTION_EXTENSION + "),",
@@ -318,6 +325,43 @@ public class CommandLineOptions {
         System.err.println("File not found (" + e.getMessage() + ")");
       } catch (IOException e) {
         System.err.println("Download failed (" + e.getMessage() + ")");
+      }
+    });
+
+    registerOption("-merge-dump", new Range(2), arguments -> {
+      mode = Mode.NOTHING;
+      options.sceneName = arguments.get(0);
+      String dumpPath = arguments.get(1);
+      File dumpfile = new File(dumpPath);
+      if (!dumpfile.isFile()) {
+        Log.error("Not a valid render dump file: " + dumpPath);
+        confError = true;
+        return;
+      }
+      File sceneFile = options.getSceneDescriptionFile();
+      if (!sceneFile.isFile()) {
+        Log.error("Not a valid scene: " + options.sceneName);
+        confError = true;
+        return;
+      }
+      Scene scene = new Scene();
+      try {
+        try (FileInputStream in = new FileInputStream(sceneFile)) {
+          scene.loadDescription(in);
+        }
+        scene.initBuffers();
+        RenderContext context = new RenderContext(new Chunky(options));
+        SimpleRenderListener listener = new SimpleRenderListener(new ConsoleProgressListener());
+        scene.loadDump(context, listener); // Load the render dump.
+        Log.info("Original scene SPP: " + scene.spp);
+        scene.mergeDump(dumpfile, listener);
+        Log.info("Current scene SPP: " + scene.spp);
+        scene.saveDump(context, listener.taskTracker());
+        try (FileOutputStream out = new FileOutputStream(sceneFile)) {
+          scene.saveDescription(out);
+        }
+      } catch (IOException e) {
+        Log.error("Failed to merge render dump.", e);
       }
     });
 
