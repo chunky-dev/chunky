@@ -1,5 +1,6 @@
 apply plugin: 'application'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 mainClassName = 'se.llbit.chunky.main.Chunky'
 archivesBaseName = 'chunky-core'
@@ -89,7 +90,7 @@ task generateJava() {
 
 install.repositories.mavenInstaller.pom.whenConfigured {pom ->
 	// Exclude the :lib dependency since we embed it in the Jar.
-	pom.dependencies.removeAll { it.groupId == 'se.llbit.chunky' && it.artifactId == 'lib' }
+	pom.dependencies.removeAll { it.groupId == 'se.llbit' && it.artifactId == 'lib' }
 
 	// Change POM version to -SNAPSHOT for intermediate builds.
 	if (project.version =~ /\d+\.\d+(\.\d+)?-.+/) {
@@ -98,4 +99,66 @@ install.repositories.mavenInstaller.pom.whenConfigured {pom ->
 		pom.version = "${match[0][1]}-SNAPSHOT"
 	}
 	println("POM version: ${pom.version}")
+}
+
+task javadocJar(type: Jar) {
+	classifier = 'javadoc'
+	from javadoc
+}
+
+task sourcesJar(type: Jar) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+artifacts {
+	archives javadocJar, sourcesJar
+}
+
+signing {
+	// Require OSSRH credentials before signing artifacts:
+	required { project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword') }
+	sign configurations.archives
+}
+
+uploadArchives {
+	repositories.mavenDeployer {
+		beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+		repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+			if (project.hasProperty('ossrhUsername')) {
+				authentication(userName: ossrhUsername, password: ossrhPassword)
+			}
+		}
+
+		snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
+			if (project.hasProperty('ossrhUsername')) {
+				authentication(userName: ossrhUsername, password: ossrhPassword)
+			}
+		}
+
+		pom.project {
+			name 'Chunky'
+			packaging 'jar'
+			description 'Minecraft mapping and rendering tool'
+			url 'http://chunky.llbit.se'
+			licenses {
+				license {
+					name 'GNU General Public License Version 3 (GPLv3)'
+					url 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+					distribution 'repo'
+				}
+			}
+			developers {
+				developer {
+					name 'Jesper Öqvist'
+					email '<jesper@llbit.se>'
+				}
+			}
+			scm {
+				connection 'scm:git:https://github.com/llbit/chunky.git'
+				url 'https://github.com/llbit/chunky'
+			}
+		}
+	}
 }

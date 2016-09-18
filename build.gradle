@@ -6,8 +6,10 @@ allprojects {
 
 	apply plugin: 'java'
 
-	group = 'se.llbit.chunky'
+	group = 'se.llbit'
 	version = rootProject.version
+
+	javadoc.options.addStringOption('Xdoclint:none', '-quiet')
 
 	sourceCompatibility = '1.8'
 	targetCompatibility = '1.8'
@@ -193,6 +195,8 @@ task macDist(dependsOn: 'releaseJar') << {
 		file("build/Chunky-${version}.dmg") ], true)
 }
 
-task install() {
-	dependsOn ':chunky:install'
+task install(dependsOn: ':chunky:install') {
+}
+
+task uploadArchives(dependsOn: ':chunky:uploadArchives') {
 }
