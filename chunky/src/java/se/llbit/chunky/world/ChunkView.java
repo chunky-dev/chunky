@@ -103,18 +103,19 @@ public class ChunkView {
       int layer) {
     this.renderer = renderer;
     this.layer = Math.max(0, Math.min(Chunk.Y_MAX - 1, layer));
-    this.scale = Math.max(BLOCK_SCALE_MIN, Math.min(BLOCK_SCALE_MAX, scale));
-    if (scale <= 12) {
+    scale = clampScale(scale);
+    this.scale = scale;
+    if (this.scale <= 12) {
       chunkScale = 1;
-    } else if (scale <= 12 * 16) {
+    } else if (this.scale <= 12 * 16) {
       chunkScale = 16;
     } else {
       this.chunkScale = 16 * 16;
     }
     this.x = x;
     this.z = z;
-    double cw = width / (2. * scale);
-    double ch = height / (2. * scale);
+    double cw = width / (2. * this.scale);
+    double ch = height / (2. * this.scale);
     this.x0 = x - cw;
     this.x1 = x + cw;
     this.z0 = z - ch;
@@ -126,7 +127,7 @@ public class ChunkView {
     cx1 = (int) QuickMath.floor(x1);
     cz0 = (int) QuickMath.floor(z0);
     cz1 = (int) QuickMath.floor(z1);
-    if (scale >= 16) {
+    if (this.scale >= 16) {
       px0 = cx0 - 1;
       px1 = cx1 + 1;
       pz0 = cz0 - 1;
@@ -211,5 +212,14 @@ public class ChunkView {
 
   @Override public String toString() {
     return String.format("[(%d, %d), (%d, %d)]", px0, pz0, px1, pz1);
+  }
+
+  /**
+   * Clamp the block scale to the minimum / maximum values if it is outside
+   * the valid value range.
+   * @return clamped scale value
+   */
+  public static int clampScale(int scale) {
+    return Math.max(BLOCK_SCALE_MIN, Math.min(BLOCK_SCALE_MAX, scale));
   }
 }

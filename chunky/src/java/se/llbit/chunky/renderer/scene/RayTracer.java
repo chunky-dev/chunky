@@ -20,6 +20,11 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.renderer.WorkerState;
 
 /**
+ * Interface for stateless ray tracers.
+ * Plugins that want to modify how the scene is rendered should
+ * implement this interface and call {@code Chunky.setRayTracerFactory(Plugin::new)}.
+ *
+ * <p>The worker and scene state is passed to the ray tracer during rendering.
  */
 public interface RayTracer {
   void trace(Scene scene, WorkerState state);
