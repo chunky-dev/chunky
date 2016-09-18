@@ -108,6 +108,7 @@ public class Chunky {
       sceneManager.getScene().startHeadlessRender();
 
       renderer.start();
+      renderer.join();
       return 0;
     } catch (FileNotFoundException e) {
       System.err.format("Scene \"%s\" not found!%n", options.sceneName);

@@ -64,6 +64,14 @@ public interface Renderer {
    */
   void start();
 
+  /**
+   * Wait for the renderer to terminate. This should only be done
+   * in headless rendering, otherwise the renderer will not automatically
+   * shut down after the render completes.
+   * @throws InterruptedException
+   */
+  void join() throws InterruptedException;
+
   void withSampleBufferProtected(SampleBufferConsumer consumer);
 
   /**
