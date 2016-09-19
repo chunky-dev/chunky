@@ -299,6 +299,9 @@ public class TexturePackLoader {
             Texture.dispenserFront),
         new SimpleTexture("textures/blocks/dispenser_front", Texture.dispenserFront),
         new IndexedTexture(0x2E, Texture.dispenserFront)));
+    allTextures.put("dispenser_front_vertical",
+        new SimpleTexture("assets/minecraft/textures/blocks/dispenser_front_vertical",
+            Texture.dispenserFrontVertical));
 
     allTextures.put("sponge", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/blocks/sponge", Texture.sponge),
@@ -1065,7 +1068,9 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/dropper_front_horizontal",
             Texture.dropperFront),
         new SimpleTexture("textures/blocks/dropper_front", Texture.dropperFront)));
-    // TODO vertical dropper
+    allTextures.put("dropper_front_vertical",
+        new SimpleTexture("assets/minecraft/textures/blocks/dropper_front_vertical",
+            Texture.dropperFrontVertical));
     allTextures.put("rail_activator", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/blocks/rail_activator", Texture.activatorRail),
         new SimpleTexture("textures/blocks/activatorRail", Texture.activatorRail)));

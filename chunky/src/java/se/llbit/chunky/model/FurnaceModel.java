@@ -20,29 +20,30 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 /**
- * Furnaces, chests, dispensers
+ * Renders furnaces (lit & unlit).
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class FurnaceModel {
   private static final int texindices[][] = {
-      // undirectional
+      // Undirectional.
       {2, 2, 2, 2, 4, 5},
 
-      // undirectional
+      // Undirectional.
       {2, 2, 2, 2, 4, 5},
 
-      // facing north
+      // Facing north.
       {0, 1, 2, 2, 4, 5},
 
-      // facing south
+      // Facing south.
       {1, 0, 2, 2, 4, 5},
 
-      // facing west
+      // Facing west.
       {2, 2, 1, 0, 4, 5},
 
-      // facing east
-      {2, 2, 0, 1, 4, 5},};
+      // Facing east.
+      {2, 2, 0, 1, 4, 5},
+  };
 
   public static boolean intersect(Ray ray, Texture[] texture) {
     int rot = ray.getBlockData() % 6;

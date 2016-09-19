@@ -121,7 +121,9 @@ public class Texture {
   public static final Texture furnaceUnlitFront = new Texture("furnace");
   public static final Texture furnaceLitFront = new Texture("furnace-lit");
   public static final Texture dispenserFront = new Texture("dispenser");
+  public static final Texture dispenserFrontVertical = new Texture("dispenser");
   public static final Texture dropperFront = new Texture();
+  public static final Texture dropperFrontVertical = new Texture();
   public static final Texture sponge = new Texture("sponge");
   public static final Texture wetSponge = new Texture("sponge");
   public static final Texture glass = new Texture("glass");

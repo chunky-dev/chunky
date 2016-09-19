@@ -434,12 +434,29 @@ public class Block extends Material {
           localIntersect = true;
         }
 
-        final Texture[] texture =
+        final Texture[][] texture = {
+            // Facing down.
+            {Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop,
+                Texture.furnaceTop, Texture.dispenserFrontVertical},
+            // Facing up.
+            {Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop,
+                Texture.dispenserFrontVertical, Texture.furnaceTop},
+            // Facing north.
             {Texture.dispenserFront, Texture.furnaceSide, Texture.furnaceSide, Texture.furnaceSide,
-                Texture.furnaceTop, Texture.furnaceTop,};
+                Texture.furnaceTop, Texture.furnaceTop,},
+            // Facing south.
+            {Texture.furnaceSide, Texture.dispenserFront, Texture.furnaceSide, Texture.furnaceSide,
+                Texture.furnaceTop, Texture.furnaceTop,},
+            // Facing east.
+            {Texture.furnaceSide, Texture.furnaceSide, Texture.furnaceSide, Texture.dispenserFront,
+                Texture.furnaceTop, Texture.furnaceTop,},
+            // Facing west.
+            {Texture.furnaceSide, Texture.furnaceSide, Texture.dispenserFront, Texture.furnaceSide,
+                Texture.furnaceTop, Texture.furnaceTop,},
+        };
 
         @Override public boolean intersect(Ray ray, Scene scene) {
-          return FurnaceModel.intersect(ray, texture);
+          return TexturedBlockModel.intersect(ray, texture[ray.getBlockData() % 6]);
         }
       };
   public static final int SANDSTONE_ID = 0x18;
@@ -2467,12 +2484,29 @@ public class Block extends Material {
       localIntersect = true;
     }
 
-    final Texture[] texture =
+    final Texture[][] texture = {
+        // Facing down.
+        {Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop,
+            Texture.furnaceTop, Texture.dropperFrontVertical},
+        // Facing up.
+        {Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop,
+            Texture.dropperFrontVertical, Texture.furnaceTop},
+        // Facing north.
         {Texture.dropperFront, Texture.furnaceSide, Texture.furnaceSide, Texture.furnaceSide,
-            Texture.furnaceTop, Texture.furnaceTop,};
+            Texture.furnaceTop, Texture.furnaceTop,},
+        // Facing south.
+        {Texture.furnaceSide, Texture.dropperFront, Texture.furnaceSide, Texture.furnaceSide,
+            Texture.furnaceTop, Texture.furnaceTop,},
+        // Facing east.
+        {Texture.furnaceSide, Texture.furnaceSide, Texture.furnaceSide, Texture.dropperFront,
+            Texture.furnaceTop, Texture.furnaceTop,},
+        // Facing west.
+        {Texture.furnaceSide, Texture.furnaceSide, Texture.dropperFront, Texture.furnaceSide,
+            Texture.furnaceTop, Texture.furnaceTop,},
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return FurnaceModel.intersect(ray, texture);
+      return TexturedBlockModel.intersect(ray, texture[ray.getBlockData() % 6]);
     }
   };
   public static final int STAINED_CLAY_ID = 0x9F;
