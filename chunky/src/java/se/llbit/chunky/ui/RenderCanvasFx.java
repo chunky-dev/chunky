@@ -256,7 +256,6 @@ public class RenderCanvasFx extends Stage implements Repaintable, SceneStatusLis
       scene.setBufferFinalization(false);
       renderer.setCanvas(RenderManager.EMPTY_CANVAS);
     });
-    repaint();
   }
 
   private void updateCanvasScale(double scale) {
