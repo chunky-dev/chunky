@@ -20,6 +20,7 @@ package se.llbit.chunky.ui;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
@@ -38,6 +39,7 @@ public class WorldChooser extends Stage {
     Parent root = loader.load();
     WorldChooserController controller = loader.getController();
     setTitle("Select World");
+    getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
     setScene(new Scene(root));
     controller.setStage(this);
     controller.populate(mapLoader);

@@ -19,16 +19,14 @@ package se.llbit.chunky.ui;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
-import se.llbit.chunky.renderer.scene.SceneManager;
 
 import java.io.IOException;
 
 public class SceneChooser extends Stage {
-  private SceneChooserController controller;
 
   public SceneChooser(ChunkyFxController chunkyFxController)
       throws IOException {
@@ -36,10 +34,17 @@ public class SceneChooser extends Stage {
     loader.setClassLoader(getClass()
         .getClassLoader()); // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
     Parent root = loader.load();
-    controller = loader.getController();
+    SceneChooserController controller = loader.getController();
     setTitle("Select 3D Scene");
+    getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
     setScene(new Scene(root));
     controller.setController(chunkyFxController);
     controller.setStage(this);
+    addEventFilter(KeyEvent.ANY, e -> {
+      if (e.getCode() == KeyCode.ESCAPE) {
+        e.consume();
+        close();
+      }
+    });
   }
 }
