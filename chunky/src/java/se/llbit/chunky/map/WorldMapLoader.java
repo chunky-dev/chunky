@@ -87,7 +87,9 @@ public class WorldMapLoader implements ChunkTopographyListener {
           listener.layerChanged(newValue.layer);
         }
       }
-      viewUpdated();
+      if (newValue.shouldRepaint(oldValue)) {
+        viewUpdated(newValue);
+      }
     });
 
     trackPlayer.addListener(e -> {
@@ -108,7 +110,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
 
     highlightEnabled.addListener(e -> {
       setRenderer(Chunk.LAYER_RENDERER);
-      notifyViewChanged();
+      notifyViewUpdated();
     });
 
     // Start worker threads.
@@ -163,9 +165,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
       PersistentSettings.setLastWorld(newWorldDir);
     }
 
-    for (Runnable worldLoadCallback : worldLoadListeners) {
-      worldLoadCallback.run();
-    }
+    worldLoadListeners.forEach(Runnable::run);
   }
 
   public void addWorldLoadListener(Runnable callback) {
@@ -175,8 +175,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
   /**
    * Called when the map view has changed.
    */
-  public synchronized void viewUpdated() {
-    ChunkView mapView = map.get();
+  public synchronized void viewUpdated(ChunkView mapView) {
     refresher.setView(mapView);
 
     minimap = new ChunkView(mapView.x, mapView.z, minimapWidth, minimapHeight, 1,
@@ -194,9 +193,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
       }
     }
 
-    for (ChunkViewListener listener : viewListeners) {
-      listener.viewUpdated();
-    }
+    notifyViewUpdated();
   }
 
   /**
@@ -217,7 +214,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
     if (width != minimapWidth || height != minimapHeight) {
       minimapWidth = width;
       minimapHeight = height;
-      viewUpdated();
+      viewUpdated(map.get());
     }
   }
 
@@ -227,7 +224,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
   public synchronized void moveView(double dx, double dz) {
     ChunkView mapView = map.get();
     panTo(mapView.x + dx, mapView.z + dz);
-    viewUpdated();
+    viewUpdated(map.get());
   }
 
   /** Set the map view by block coordinates. */
@@ -328,10 +325,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
     regionQueue.add(region);
   }
 
-  public void setPlayerY(int playerY) {
-    // FIXME update controls with new player Y position
-  }
-
   public synchronized Vector3 getPosition() {
     ChunkView mapView = map.get();
     return new Vector3(mapView.x, world.currentLayer(), mapView.z);
@@ -354,9 +347,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
    */
   public synchronized void reloadWorld() {
     world.reload();
-    for (ChunkViewListener listener : viewListeners) {
-      listener.viewUpdated();
-    }
+    notifyViewUpdated();
   }
 
   /**
@@ -423,9 +414,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
   public void viewDragged(int dx, int dy) {
     double scale = getScale();
     moveView(dx / scale, dy / scale);
-    for (ChunkViewListener listener : viewListeners) {
-      listener.viewMoved();
-    }
+    viewListeners.forEach(ChunkViewListener::viewMoved);
   }
 
   /**
@@ -509,7 +498,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
     this.highlightBlock = hlBlock;
     if (highlightEnabled.get()) {
       // TODO: make separate highlight update event.
-      notifyViewChanged();
+      notifyViewUpdated();
     }
   }
 
@@ -520,14 +509,15 @@ public class WorldMapLoader implements ChunkTopographyListener {
     highlightColor = newColor;
     if (highlightEnabled.get()) {
       // TODO: make separate highlight update event.
-      notifyViewChanged();
+      notifyViewUpdated();
     }
   }
 
-  public void notifyViewChanged() {
-    for (ChunkViewListener listener : viewListeners) {
-      listener.viewUpdated();
-    }
+  /**
+   * Notify view listeners that the view has changed.
+   */
+  private void notifyViewUpdated() {
+    viewListeners.forEach(ChunkViewListener::viewUpdated);
   }
 
   public int getDimension() {
@@ -543,8 +533,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
   }
 
   public void drawCameraVisualization() {
-    for (ChunkViewListener listener : viewListeners) {
-      listener.cameraPositionUpdated();
-    }
+    viewListeners.forEach(ChunkViewListener::cameraPositionUpdated);
   }
 }

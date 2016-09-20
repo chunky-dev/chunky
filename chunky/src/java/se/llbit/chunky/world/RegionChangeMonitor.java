@@ -40,12 +40,9 @@ public class RegionChangeMonitor extends Thread {
         sleep(3000);
         final World world = mapLoader.getWorld();
         if (world.loadAdditionalData(true)) {
-          Platform.runLater(() -> {
-            mapLoader.setPlayerY(world.playerLocY());
-            if (PersistentSettings.getFollowPlayer()) {
-              mapLoader.panToPlayer();
-            }
-          });
+          if (PersistentSettings.getFollowPlayer()) {
+            Platform.runLater(mapLoader::panToPlayer);
+          }
         }
         ChunkView theView = view;
         for (int rx = theView.prx0; rx <= theView.prx1; ++rx) {

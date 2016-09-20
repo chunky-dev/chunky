@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -167,15 +167,13 @@ public class ChunkView {
     }
     if (obj instanceof ChunkView) {
       ChunkView other = (ChunkView) obj;
-      if (chunkScale == other.chunkScale
+      return scale == other.scale
           && px0 == other.px0
           && px1 == other.px1
           && pz0 == other.pz0
           && pz1 == other.pz1
           && layer == other.layer
-          && renderer == other.renderer) {
-        return true;
-      }
+          && renderer == other.renderer;
     }
     return false;
   }
@@ -221,5 +219,25 @@ public class ChunkView {
    */
   public static int clampScale(int scale) {
     return Math.max(BLOCK_SCALE_MIN, Math.min(BLOCK_SCALE_MAX, scale));
+  }
+
+  /**
+   * @param other the previous view state
+   * @return {@code true} if changing to this view from the given old
+   * view should trigger a map repaint.
+   */
+  public boolean shouldRepaint(ChunkView other) {
+    if (px0 != other.px0
+        || px1 != other.px1
+        || pz0 != other.pz0
+        || pz1 != other.pz1
+        || renderer != other.renderer) {
+      return true;
+    }
+    if (renderer == Chunk.LAYER_RENDERER
+      && layer != other.layer) {
+      return true;
+    }
+    return scale != other.scale;
   }
 }
