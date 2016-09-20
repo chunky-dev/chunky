@@ -136,7 +136,7 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
       new Thread(() -> {
         try {
           guiUpdateLatch.await();
-          gui.canvas.repaint();
+          gui.canvas.forceRepaint();
         } catch (InterruptedException ignored) {
           // Ignored.
         }

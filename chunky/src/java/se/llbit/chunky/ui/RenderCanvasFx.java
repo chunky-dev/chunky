@@ -278,19 +278,24 @@ public class RenderCanvasFx extends Stage implements Repaintable, SceneStatusLis
 
   @Override public void repaint() {
     if (painting.compareAndSet(false, true)) {
-      renderer.withBufferedImage(bitmap -> {
-        if (bitmap.width == (int) image.getWidth()
-            && bitmap.height == (int) image.getHeight()) {
-          image.getPixelWriter().setPixels(0, 0, bitmap.width, bitmap.height, PIXEL_FORMAT,
-              bitmap.data, 0, bitmap.width);
-        }
-      });
-      Platform.runLater(() -> {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.drawImage(image, 0, 0);
-        painting.set(false);
-      });
+      forceRepaint();
     }
+  }
+
+  public void forceRepaint() {
+    painting.set(true);
+    renderer.withBufferedImage(bitmap -> {
+      if (bitmap.width == (int) image.getWidth()
+          && bitmap.height == (int) image.getHeight()) {
+        image.getPixelWriter().setPixels(0, 0, bitmap.width, bitmap.height, PIXEL_FORMAT,
+            bitmap.data, 0, bitmap.width);
+      }
+    });
+    Platform.runLater(() -> {
+      GraphicsContext gc = canvas.getGraphicsContext2D();
+      gc.drawImage(image, 0, 0);
+      painting.set(false);
+    });
   }
 
   public void setRenderListener(RenderStatusListener renderListener) {
