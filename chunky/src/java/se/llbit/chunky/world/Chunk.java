@@ -25,6 +25,7 @@ import se.llbit.chunky.map.MapTile;
 import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.chunky.map.UnknownLayer;
 import se.llbit.chunky.map.WorldMapLoader;
+import se.llbit.chunky.ui.MapViewMode;
 import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ErrorTag;
@@ -49,9 +50,9 @@ import java.util.Set;
  */
 public class Chunk {
 
-  private static final String LEVEL_HEIGHTMAP = ".Level.HeightMap";
-  private static final String LEVEL_SECTIONS = ".Level.Sections";
-  private static final String LEVEL_BIOMES = ".Level.Biomes";
+  public static final String LEVEL_HEIGHTMAP = ".Level.HeightMap";
+  public static final String LEVEL_SECTIONS = ".Level.Sections";
+  public static final String LEVEL_BIOMES = ".Level.Biomes";
   private static final String LEVEL_ENTITIES = ".Level.Entities";
   private static final String LEVEL_TILEENTITIES = ".Level.TileEntities";
 
@@ -69,10 +70,10 @@ public class Chunk {
   private static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
   private static final int CHUNK_BYTES = X_MAX * Y_MAX * Z_MAX;
 
-  private static final int BLOCK_LAYER = 1 << 0;
-  private static final int SURFACE_LAYER = 1 << 1;
-  private static final int CAVE_LAYER = 1 << 2;
-  private static final int BIOME_LAYER = 1 << 3;
+  public static final int BLOCK_LAYER = 1 << 0;
+  public static final int SURFACE_LAYER = 1 << 1;
+  public static final int CAVE_LAYER = 1 << 2;
+  public static final int BIOME_LAYER = 1 << 3;
 
   private final ChunkPosition position;
   private int loadedLayer = -1;
@@ -89,204 +90,40 @@ public class Chunk {
   private int cavesTimestamp = 0;
   private int biomesTimestamp = 0;
 
-
-  /**
-   * Chunk renderer used to render chunks in the 2D map.
-   */
-  abstract static public class Renderer {
-    /**
-     * Render the chunk to a map tile.
-     */
-    abstract public void render(Chunk chunk, MapTile tile);
-
-    /**
-     * Layers to be loaded for this renderer.
-     */
-    abstract public int getLayers(ChunkView view);
-
-    public Set<String> getRequest(ChunkView view) {
-      int layers = getLayers(view);
-      Set<String> request = new HashSet<>();
-      request.add(LEVEL_SECTIONS);
-      if ((layers & BLOCK_LAYER) != 0 || (layers & SURFACE_LAYER) != 0
-          || (layers & BIOME_LAYER) != 0) {
-        request.add(LEVEL_BIOMES);
-      }
-      if ((layers & SURFACE_LAYER) != 0 || (layers & CAVE_LAYER) != 0) {
-        request.add(LEVEL_HEIGHTMAP);
-      }
-      return request;
-    }
-
-    /**
-     * @return {@code true} if the render buffer is still valid
-     */
-    public boolean bufferValid(ChunkView oldView, ChunkView newView, int oldLayer, int newLayer) {
-      return oldView.chunkScale == newView.chunkScale;
-    }
-
-    public abstract int getChunkColor(Chunk chunk);
-  }
-
-
-  /**
-   * Renders caves and other underground caverns
-   */
-  public static Renderer CAVE_RENDERER = new Renderer() {
-    @Override public void render(Chunk chunk, MapTile tile) {
-      chunk.renderCaves(tile);
-    }
-
-    @Override public int getLayers(ChunkView view) {
-      return CAVE_LAYER;
-    }
-
-    @Override public int getChunkColor(Chunk chunk) {
-      return chunk.caveColor();
-    }
-
-    @Override public String toString() {
-      return "Cave renderer";
-    }
-  };
-
-  /**
-   * Renders caves and other underground caverns
-   */
-  public static Renderer BIOME_RENDERER = new Renderer() {
-    @Override public void render(Chunk chunk, MapTile tile) {
-      chunk.renderBiomes(tile);
-    }
-
-    @Override public int getLayers(ChunkView view) {
-      return BIOME_LAYER;
-    }
-
-    @Override public int getChunkColor(Chunk chunk) {
-      return chunk.biomeColor();
-    }
-
-    @Override public String toString() {
-      return "Biome renderer";
-    }
-  };
-
-  /**
-   * Renders the default surface view
-   */
-  public static Renderer SURFACE_RENDERER = new Renderer() {
-    @Override public void render(Chunk chunk, MapTile tile) {
-      chunk.renderSurface(tile);
-    }
-
-    @Override public int getLayers(ChunkView view) {
-      return SURFACE_LAYER;
-    }
-
-    @Override public int getChunkColor(Chunk chunk) {
-      return chunk.surfaceColor();
-    }
-
-    @Override public String toString() {
-      return "Surface renderer";
-    }
-  };
-
-  /**
-   * Switch between surface, layer and biome modes
-   */
-  public static Renderer AUTO_RENDERER = new Renderer() {
-    @Override public void render(Chunk chunk, MapTile tile) {
-      if (tile.scale >= 10) {
-        chunk.renderSurface(tile);
-      } else {
-        chunk.renderBiomes(tile);
-      }
-    }
-
-    @Override public int getLayers(ChunkView view) {
-      if (view.scale >= 10) {
-        return SURFACE_LAYER | BIOME_LAYER;
-      } else {
-        return BIOME_LAYER;
-      }
-    }
-
-    @Override
-    public boolean bufferValid(ChunkView oldView, ChunkView newView, int oldLayer, int newLayer) {
-      return super.bufferValid(oldView, newView, oldLayer, newLayer) && (
-          oldView.scale >= 10 && newView.scale >= 10 || oldView.scale < 10 && newView.scale < 10);
-    }
-
-    @Override public int getChunkColor(Chunk chunk) {
-      return chunk.biomeColor();
-    }
-
-    @Override public String toString() {
-      return "Auto renderer";
-    }
-  };
-
-  /**
-   * Renders a single layer
-   */
-  public static Renderer LAYER_RENDERER = new Renderer() {
-    @Override public void render(Chunk chunk, MapTile tile) {
-      chunk.renderLayer(tile);
-    }
-
-    @Override public int getLayers(ChunkView view) {
-      return BLOCK_LAYER;
-    }
-
-    @Override
-    public boolean bufferValid(ChunkView oldView, ChunkView newView, int oldLayer, int newLayer) {
-      return super.bufferValid(oldView, newView, oldLayer, newLayer) && oldLayer == newLayer;
-    }
-
-    @Override public int getChunkColor(Chunk chunk) {
-      return chunk.layerColor();
-    }
-
-    @Override public String toString() {
-      return "Layer renderer";
-    }
-  };
-
   public Chunk(ChunkPosition pos, World world) {
     this.world = world;
     this.position = pos;
   }
 
-  protected void renderLayer(MapTile tile) {
+  public void renderLayer(MapTile tile) {
     layer.render(tile);
   }
 
-  protected int layerColor() {
+  public int layerColor() {
     return layer.getAvgColor();
   }
 
-  protected void renderSurface(MapTile tile) {
+  public void renderSurface(MapTile tile) {
     surface.render(tile);
   }
 
-  protected int surfaceColor() {
+  public int surfaceColor() {
     return surface.getAvgColor();
   }
 
-  protected void renderCaves(MapTile tile) {
+  public void renderCaves(MapTile tile) {
     caves.render(tile);
   }
 
-  protected int caveColor() {
+  public int caveColor() {
     return caves.getAvgColor();
   }
 
-  protected void renderBiomes(MapTile tile) {
+  public void renderBiomes(MapTile tile) {
     biomes.render(tile);
   }
 
-  protected int biomeColor() {
+  public int biomeColor() {
     return biomes.getAvgColor();
   }
 
@@ -348,7 +185,7 @@ public class Chunk {
   public synchronized void loadChunk(WorldMapLoader loader) {
 
     int requestedLayer = world.currentLayer();
-    Chunk.Renderer renderer = loader.getChunkRenderer();
+    MapViewMode renderer = loader.getChunkRenderer();
     ChunkView view = loader.getMapView();
 
     if (!shouldReloadChunk(renderer, view, requestedLayer)) {
@@ -507,7 +344,7 @@ public class Chunk {
     }
   }
 
-  private boolean shouldReloadChunk(Renderer renderer, ChunkView view, int requestedLayer) {
+  private boolean shouldReloadChunk(MapViewMode renderer, ChunkView view, int requestedLayer) {
     int timestamp = Integer.MAX_VALUE;
     int layers = renderer.getLayers(view);
     if ((layers & BLOCK_LAYER) != 0) {

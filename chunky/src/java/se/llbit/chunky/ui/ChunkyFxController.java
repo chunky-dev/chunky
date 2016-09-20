@@ -264,6 +264,7 @@ public class ChunkyFxController
           zProperty.set(newValue.z * 16);
           scaleProperty.set(newValue.scale);
           layerProperty.set(newValue.layer);
+          mapViewCb.getSelectionModel().select(newValue.renderer);
         }));
 
     clearSelectionBtn2.setOnAction(e -> mapLoader.clearChunkSelection());
@@ -428,7 +429,7 @@ public class ChunkyFxController
     mapViewCb.getItems().addAll(MapViewMode.values());
     mapViewCb.getSelectionModel().select(MapViewMode.AUTO);
     mapViewCb.getSelectionModel().selectedItemProperty()
-        .addListener((item, prev, next) -> mapLoader.setRenderer(next.getRenderer()));
+        .addListener((item, prev, next) -> mapLoader.setRenderer(next));
 
     menuExit.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
     clearSelectionBtn.setOnAction(event -> mapLoader.clearChunkSelection());

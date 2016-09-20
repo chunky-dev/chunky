@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.ui.MapViewMode;
 import se.llbit.math.QuickMath;
 
 /**
@@ -43,7 +44,7 @@ public class ChunkView {
    * A zero-size chunk view useful as a default chunk view for an uninitialized map.
    */
   public static final ChunkView EMPTY = new ChunkView(0, 0, 0, 0, DEFAULT_BLOCK_SCALE,
-      Chunk.AUTO_RENDERER, World.SEA_LEVEL) {
+      MapViewMode.AUTO, World.SEA_LEVEL) {
     @Override public boolean isChunkVisible(int x, int z) {
       return false;
     }
@@ -53,7 +54,7 @@ public class ChunkView {
     }
   };
 
-  public final Chunk.Renderer renderer;
+  public final MapViewMode renderer;
 
   public final int layer;
 
@@ -91,7 +92,7 @@ public class ChunkView {
   public final int chunkScale;
 
 
-  public ChunkView(double x, double z, int width, int height, Chunk.Renderer renderer, int layer) {
+  public ChunkView(double x, double z, int width, int height, MapViewMode renderer, int layer) {
     this(x, z, width, height, 16, renderer, layer);
   }
 
@@ -99,7 +100,7 @@ public class ChunkView {
     this(other.x, other.z, other.width, other.height, other.scale, other.renderer, other.layer);
   }
 
-  public ChunkView(double x, double z, int width, int height, int scale, Chunk.Renderer renderer,
+  public ChunkView(double x, double z, int width, int height, int scale, MapViewMode renderer,
       int layer) {
     this.renderer = renderer;
     this.layer = Math.max(0, Math.min(Chunk.Y_MAX - 1, layer));
@@ -234,8 +235,7 @@ public class ChunkView {
         || renderer != other.renderer) {
       return true;
     }
-    if (renderer == Chunk.LAYER_RENDERER
-      && layer != other.layer) {
+    if (renderer == MapViewMode.LAYER && layer != other.layer) {
       return true;
     }
     return scale != other.scale;

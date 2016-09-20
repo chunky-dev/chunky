@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -17,35 +16,118 @@
  */
 package se.llbit.chunky.ui;
 
+import se.llbit.chunky.map.MapTile;
 import se.llbit.chunky.world.Chunk;
+import se.llbit.chunky.world.ChunkView;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * View mode for the 2D map.
  */
 public enum MapViewMode {
+  /**
+   * Switches between surface, layer and biome modes.
+   */
   AUTO("Auto") {
-    @Override public Chunk.Renderer getRenderer() {
-      return Chunk.AUTO_RENDERER;
+    @Override public void render(Chunk chunk, MapTile tile) {
+      if (tile.scale >= 10) {
+        chunk.renderSurface(tile);
+      } else {
+        chunk.renderBiomes(tile);
+      }
+    }
+
+    @Override public int getLayers(ChunkView view) {
+      if (view.scale >= 10) {
+        return Chunk.SURFACE_LAYER | Chunk.BIOME_LAYER;
+      } else {
+        return Chunk.BIOME_LAYER;
+      }
+    }
+
+    @Override
+    public boolean bufferValid(ChunkView oldView, ChunkView newView, int oldLayer, int newLayer) {
+      return super.bufferValid(oldView, newView, oldLayer, newLayer) && (
+          oldView.scale >= 10 && newView.scale >= 10 || oldView.scale < 10 && newView.scale < 10);
+    }
+
+    @Override public int getChunkColor(Chunk chunk) {
+      return chunk.biomeColor();
     }
   },
+
+  /**
+   * Renders a single layer.
+   */
   LAYER("Layer") {
-    @Override public Chunk.Renderer getRenderer() {
-      return Chunk.LAYER_RENDERER;
+    @Override public void render(Chunk chunk, MapTile tile) {
+      chunk.renderLayer(tile);
+    }
+
+    @Override public int getLayers(ChunkView view) {
+      return Chunk.BLOCK_LAYER;
+    }
+
+    @Override
+    public boolean bufferValid(ChunkView oldView, ChunkView newView, int oldLayer, int newLayer) {
+      return super.bufferValid(oldView, newView, oldLayer, newLayer) && oldLayer == newLayer;
+    }
+
+    @Override public int getChunkColor(Chunk chunk) {
+      return chunk.layerColor();
     }
   },
+
+  /**
+   * Renders the default surface view
+   */
   SURFACE("Surface") {
-    @Override public Chunk.Renderer getRenderer() {
-      return Chunk.SURFACE_RENDERER;
+    @Override public void render(Chunk chunk, MapTile tile) {
+      chunk.renderSurface(tile);
+    }
+
+    @Override public int getLayers(ChunkView view) {
+      return Chunk.SURFACE_LAYER;
+    }
+
+    @Override public int getChunkColor(Chunk chunk) {
+      return chunk.surfaceColor();
     }
   },
+
+  /**
+   * Visualizes underground cavities.
+   */
   CAVES("Caves") {
-    @Override public Chunk.Renderer getRenderer() {
-      return Chunk.CAVE_RENDERER;
+    @Override public void render(Chunk chunk, MapTile tile) {
+      chunk.renderCaves(tile);
+    }
+
+    @Override public int getLayers(ChunkView view) {
+      return Chunk.CAVE_LAYER;
+    }
+
+    @Override public int getChunkColor(Chunk chunk) {
+      return chunk.caveColor();
     }
   },
+
+  /**
+   * Renders biome values only.
+   */
   BIOMES("Biomes") {
-    @Override public Chunk.Renderer getRenderer() {
-      return Chunk.BIOME_RENDERER;
+    @Override public void render(Chunk chunk, MapTile tile) {
+      chunk.renderBiomes(tile);
+    }
+
+    @Override public int getLayers(ChunkView view) {
+      return Chunk.BIOME_LAYER;
+    }
+
+    @Override public int getChunkColor(Chunk chunk) {
+      return chunk.biomeColor();
     }
   };
 
@@ -59,5 +141,36 @@ public enum MapViewMode {
     return name;
   }
 
-  public abstract Chunk.Renderer getRenderer();
+  /**
+   * Render the chunk to a map tile.
+   */
+  abstract public void render(Chunk chunk, MapTile tile);
+
+  /**
+   * Layers to be loaded for this renderer.
+   */
+  abstract public int getLayers(ChunkView view);
+
+  public Set<String> getRequest(ChunkView view) {
+    int layers = getLayers(view);
+    Set<String> request = new HashSet<>();
+    request.add(Chunk.LEVEL_SECTIONS);
+    if ((layers & Chunk.BLOCK_LAYER) != 0 || (layers & Chunk.SURFACE_LAYER) != 0
+        || (layers & Chunk.BIOME_LAYER) != 0) {
+      request.add(Chunk.LEVEL_BIOMES);
+    }
+    if ((layers & Chunk.SURFACE_LAYER) != 0 || (layers & Chunk.CAVE_LAYER) != 0) {
+      request.add(Chunk.LEVEL_HEIGHTMAP);
+    }
+    return request;
+  }
+
+  /**
+   * @return {@code true} if the render buffer is still valid
+   */
+  public boolean bufferValid(ChunkView oldView, ChunkView newView, int oldLayer, int newLayer) {
+    return oldView.chunkScale == newView.chunkScale;
+  }
+
+  public abstract int getChunkColor(Chunk chunk);
 }

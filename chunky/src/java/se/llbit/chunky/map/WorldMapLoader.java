@@ -25,6 +25,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.ui.ChunkyFxController;
+import se.llbit.chunky.ui.MapViewMode;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
@@ -109,7 +110,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
     });
 
     highlightEnabled.addListener(e -> {
-      setRenderer(Chunk.LAYER_RENDERER);
+      setRenderer(MapViewMode.LAYER);
       notifyViewUpdated();
     });
 
@@ -179,7 +180,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
     refresher.setView(mapView);
 
     minimap = new ChunkView(mapView.x, mapView.z, minimapWidth, minimapHeight, 1,
-        Chunk.BIOME_RENDERER, mapView.layer);
+        MapViewMode.BIOMES, mapView.layer);
 
     int rx0 = Math.min(minimap.prx0, mapView.prx0);
     int rx1 = Math.max(minimap.prx1, mapView.prx1);
@@ -296,7 +297,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
   /**
    * @return The current map renderer
    */
-  public Chunk.Renderer getChunkRenderer() {
+  public MapViewMode getChunkRenderer() {
     return map.get().renderer;
   }
 
@@ -353,7 +354,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
   /**
    * Set the current map renderer.
    */
-  public synchronized void setRenderer(Chunk.Renderer renderer) {
+  public synchronized void setRenderer(MapViewMode renderer) {
     ChunkView mapView = map.get();
     if (renderer != mapView.renderer) {
       map.set(new ChunkView(mapView.x, mapView.z,

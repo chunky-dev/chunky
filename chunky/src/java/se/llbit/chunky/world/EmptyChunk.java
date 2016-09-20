@@ -63,35 +63,35 @@ public class EmptyChunk extends Chunk {
     }
   }
 
-  @Override protected void renderLayer(MapTile tile) {
+  @Override public void renderLayer(MapTile tile) {
     renderEmpty(tile);
   }
 
-  @Override protected int layerColor() {
+  @Override public int layerColor() {
     return 0xFFEEEEEE;
   }
 
-  @Override protected void renderSurface(MapTile tile) {
+  @Override public void renderSurface(MapTile tile) {
     renderEmpty(tile);
   }
 
-  @Override protected int surfaceColor() {
+  @Override public int surfaceColor() {
     return 0xFFEEEEEE;
   }
 
-  @Override protected void renderCaves(MapTile tile) {
+  @Override public void renderCaves(MapTile tile) {
     renderEmpty(tile);
   }
 
-  @Override protected int caveColor() {
+  @Override public int caveColor() {
     return 0xFFEEEEEE;
   }
 
-  @Override protected void renderBiomes(MapTile tile) {
+  @Override public void renderBiomes(MapTile tile) {
     renderEmpty(tile);
   }
 
-  @Override protected int biomeColor() {
+  @Override public int biomeColor() {
     return 0xFFEEEEEE;
   }
 

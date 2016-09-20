@@ -22,8 +22,8 @@ import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.paint.Color;
+import se.llbit.chunky.ui.MapViewMode;
 import se.llbit.chunky.world.Block;
-import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.util.RingBuffer;
@@ -75,8 +75,8 @@ public class MapBuffer {
    */
   public synchronized void updateView(ChunkView newView, WorldMapLoader loader) {
     boolean rebuild = newView.scale != view.scale || newView.renderer != view.renderer
-        || (newView.renderer == Chunk.LAYER_RENDERER && newView.layer != view.layer);
-    if (newView.renderer == Chunk.LAYER_RENDERER) {
+        || (newView.renderer == MapViewMode.LAYER && newView.layer != view.layer);
+    if (newView.renderer == MapViewMode.LAYER) {
       if (loader.highlightEnabled() != highlightEnabled
           || loader.highlightBlock() != highlightBlock
           || !loader.highlightColor().equals(highlightColor)) {

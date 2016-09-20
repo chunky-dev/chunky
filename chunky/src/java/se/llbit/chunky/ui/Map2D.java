@@ -22,7 +22,6 @@ import javafx.scene.canvas.GraphicsContext;
 import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.ChunkViewListener;
-import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
@@ -112,7 +111,7 @@ public class Map2D implements ChunkUpdateListener, ChunkViewListener {
   }
 
   @Override public void layerChanged(int layer) {
-    if (mapLoader.getChunkRenderer() == Chunk.LAYER_RENDERER) {
+    if (mapLoader.getChunkRenderer() == MapViewMode.LAYER) {
       repaintDirect();
     }
   }
