@@ -53,15 +53,18 @@ public class PathTracer implements RayTracer {
 
   /**
    * Path trace the ray in this scene.
+   *
+   * @param firstReflection {@code true} if the ray has not yet hit the first
+   * diffuse or specular reflection
    */
   public static boolean pathTrace(Scene scene, Ray ray, WorkerState state, int addEmitted,
-      boolean first) {
+      boolean firstReflection) {
 
     boolean hit = false;
     Random random = state.random;
     Vector3 ox = new Vector3(ray.o);
     Vector3 od = new Vector3(ray.d);
-    double s = 0;
+    double airDistance = 0;
 
     while (true) {
 
@@ -116,15 +119,24 @@ public class PathTracer implements RayTracer {
       float n1 = prevMat.ior;
       float n2 = currentMat.ior;
 
-      if (pDiffuse + pSpecular < Ray.EPSILON && n1 == n2)
-        continue;
+      if (prevMat == Block.AIR) {
+        airDistance = ray.distance;
+      }
 
-      if (first) {
-        s = ray.distance;
-        first = false;
+      if (pDiffuse + pSpecular < Ray.EPSILON && n1 == n2) {
+        // Transmission without refraction.
+        // This can happen when the ray passes through a transparent
+        // material into another. It can also happen for example
+        // when passing through a transparent part of an otherwise solid
+        // object.
+        // TODO: material color may change here.
+        continue;
       }
 
       if (currentMat.isShiny && random.nextDouble() < pSpecular) {
+        // Specular reflection.
+
+        firstReflection = false;
 
         if (!scene.kill(ray.depth + 1, random)) {
           Ray reflected = new Ray();
@@ -141,6 +153,9 @@ public class PathTracer implements RayTracer {
       } else {
 
         if (random.nextDouble() < pDiffuse) {
+          // Diffuse reflection.
+
+          firstReflection = false;
 
           if (!scene.kill(ray.depth + 1, random)) {
             Ray reflected = new Ray();
@@ -216,6 +231,7 @@ public class PathTracer implements RayTracer {
             }
           }
         } else if (n1 != n2) {
+          // Refraction.
 
           boolean doRefraction = currentMat == Block.WATER ||
               prevMat == Block.WATER ||
@@ -323,26 +339,36 @@ public class PathTracer implements RayTracer {
     }
     if (!hit) {
       ray.color.set(0, 0, 0, 1);
-      if (first) {
-        s = ray.distance;
+      if (firstReflection) {
+        airDistance = ray.distance;
       }
     }
 
     // This is a simplistic fog model which gives greater artistic freedom but
     // less realism. The user can select fog color and density; in a more
     // realistic model color would depend on viewing angle and sun color/position.
-    if (s > 0 && scene.fogEnabled()) {
+    if (airDistance > 0 && scene.fogEnabled()) {
       Sun sun = scene.sun;
 
       // Pick point between ray origin and intersected object.
+      // The chosen point is used to test if the sun is lighting the
+      // fog between the camera and the first diffuse ray target.
+      // The sun contribution will be proportional to the amount of
+      // sunlit fog areas in the ray path, thus giving an approximation
+      // of the sun inscatter leading to effects like god rays.
+      // The way the sun contribution point is chosen is not
+      // entirely correct because the original ray may have
+      // travelled through glass or other materials between air gaps.
+      // However, the results are probably close enough to not be distracting,
+      // so this seems like a reasonable approximation.
       Ray atmos = new Ray();
-      double offset = QuickMath.clamp(s * random.nextFloat(), Ray.EPSILON, s - Ray.EPSILON);
+      double offset = QuickMath.clamp(airDistance * random.nextFloat(), Ray.EPSILON, airDistance - Ray.EPSILON);
       atmos.o.scaleAdd(offset, od, ox);
       sun.getRandomSunDirection(atmos, random);
       atmos.setCurrentMat(Block.AIR, 0);
 
       double fogDensity = scene.getFogDensity() * EXTINCTION_FACTOR;
-      double extinction = Math.exp(-s * fogDensity);
+      double extinction = Math.exp(-airDistance * fogDensity);
       ray.color.scale(extinction);
 
       // Check sun visibility at random point to determine inscatter brightness.
@@ -354,7 +380,7 @@ public class PathTracer implements RayTracer {
         if (scene.fastFog()) {
           inscatter = (1 - extinction);
         } else {
-          inscatter = s * fogDensity * Math.exp(-offset * fogDensity);
+          inscatter = airDistance * fogDensity * Math.exp(-offset * fogDensity);
         }
         ray.color.x += attenuation.x * attenuation.w * fogColor.x * inscatter;
         ray.color.y += attenuation.y * attenuation.w * fogColor.y * inscatter;
