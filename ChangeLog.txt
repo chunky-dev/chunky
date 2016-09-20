@@ -27,8 +27,8 @@
 * Pressing space in the render preview window toggles rendering.
 * Fixed player entities not being saved if they were the only entity type in a
   scene.
-* Fixed bug preventing new players from being added if no players were
-  already loaded.
+* Fixed bug preventing new players from being added to a scene if no players
+  were already loaded.
 * Minor changes to the UI:
     * Added an icon to the camera view visualization.
     * Removed the chunk loading indicator icon.
@@ -36,12 +36,14 @@
 * Added new command-line options:
     * Added -list-scenes command.
     * Added -merge-dump command.
-* End rods now emit light.
-* Made it possible to manually set the Chunky settings directory via system
-  properties (java -Dchunky.home=DIR).
+* Made it possible to manually set the Chunky settings directory using a
+  system property (java -Dchunky.home=DIR).
 * Omni-Directional Stereo projector added (thanks leMaik!)
-* Vertical droppers and dispensers are now rendered correctly.
-* Improved fog rendering through glass and other transparent materials.
+* Rendering improvements and fixes:
+    * End rods now emit light.
+    * Vertical droppers and dispensers are now rendered correctly.
+    * Improved fog rendering through glass and other transparent materials.
+    * Fixed issue causing Chorus Plant to not connect to End Stone blocks.
 
 1.3.8 - 2016-04-03
 

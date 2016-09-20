@@ -809,7 +809,7 @@ public class OctreeFinalizer {
                 type |= BlockData.CONNECTED_ABOVE << BlockData.OFFSET;
               }
               other = Block.get(octree.get(x, cy - 1, z));
-              if (other.isChorusPlant()) {
+              if (other.isChorusPlant() || other == Block.ENDSTONE) {
                 type |= BlockData.CONNECTED_BELOW << BlockData.OFFSET;
               }
               octree.set(type, x, cy, z);
