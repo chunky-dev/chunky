@@ -66,6 +66,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ResourceBundle;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -122,6 +123,7 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
     }
 
     @Override public void sceneLoaded() {
+      CountDownLatch guiUpdateLatch = new CountDownLatch(1);
       Platform.runLater(() -> {
         synchronized (gui.scene) {
           gui.sceneNameField.setText(gui.scene.name());
@@ -129,7 +131,16 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
         }
         gui.updateTitle();
         gui.refreshSettings();
+        guiUpdateLatch.countDown();
       });
+      new Thread(() -> {
+        try {
+          guiUpdateLatch.await();
+          gui.canvas.repaint();
+        } catch (InterruptedException ignored) {
+          // Ignored.
+        }
+      }).start();
     }
 
     @Override public void renderStateChanged(RenderMode state) {

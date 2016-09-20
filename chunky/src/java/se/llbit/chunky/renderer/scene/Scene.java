@@ -209,7 +209,7 @@ public class Scene extends SceneDescription {
   private WorldTexture foliageTexture = new WorldTexture();
 
   /** This is the 8-bit channel frame buffer. */
-  protected BitmapImage buffer;
+  protected BitmapImage frontBuffer;
 
   private BitmapImage backBuffer;
 
@@ -243,7 +243,7 @@ public class Scene extends SceneDescription {
    * scene and after scene canvas size changes.
    */
   public synchronized void initBuffers() {
-    buffer = new BitmapImage(width, height);
+    frontBuffer = new BitmapImage(width, height);
     backBuffer = new BitmapImage(width, height);
     alphaChannel = new byte[width * height];
     samples = new double[width * height * 3];
@@ -314,7 +314,7 @@ public class Scene extends SceneDescription {
       width = other.width;
       height = other.height;
       backBuffer = other.backBuffer;
-      buffer = other.buffer;
+      frontBuffer = other.frontBuffer;
       alphaChannel = other.alphaChannel;
       samples = other.samples;
     }
@@ -390,7 +390,9 @@ public class Scene extends SceneDescription {
       }
     }
 
-    loadDump(context, renderListener);
+    if (loadDump(context, renderListener)) {
+      postProcessFrame(renderListener.taskTracker());
+    }
 
     if (spp == 0) {
       mode = RenderMode.PREVIEW;
@@ -1423,7 +1425,9 @@ public class Scene extends SceneDescription {
     String fileName = String.format("%s-%d%s", name, spp, outputMode.getExtension());
     File targetFile = new File(directory, fileName);
     computeAlpha(progress);
-    finalizeFrame(progress);
+    if (!finalized) {
+      postProcessFrame(progress);
+    }
     writeImage(targetFile, progress);
   }
 
@@ -1434,7 +1438,9 @@ public class Scene extends SceneDescription {
   public synchronized void saveFrame(File targetFile, TaskTracker progress)
       throws IOException {
     computeAlpha(progress);
-    finalizeFrame(progress);
+    if (!finalized) {
+      postProcessFrame(progress);
+    }
     writeImage(targetFile, progress);
   }
 
@@ -1460,14 +1466,18 @@ public class Scene extends SceneDescription {
     }
   }
 
-  public void finalizeFrame(TaskTracker progress) {
-    if (!finalized) {
-      try (TaskTracker.Task task = progress.task("Finalizing frame")) {
-        for (int x = 0; x < width; ++x) {
-          task.update(width, x + 1);
-          for (int y = 0; y < height; ++y) {
-            finalizePixel(x, y);
-          }
+  /**
+   * Post-process all pixels in the current frame.
+   *
+   * <p>This is normally done by the render workers during rendering,
+   * but in some cases an separate post processing pass is needed.
+   */
+  public void postProcessFrame(TaskTracker progress) {
+    try (TaskTracker.Task task = progress.task("Finalizing frame")) {
+      for (int x = 0; x < width; ++x) {
+        task.update(width, x + 1);
+        for (int y = 0; y < height; ++y) {
+          finalizePixel(x, y);
         }
       }
     }
@@ -1693,13 +1703,15 @@ public class Scene extends SceneDescription {
     }
   }
 
-  public synchronized void loadDump(RenderContext context, RenderStatusListener renderListener) {
+  public synchronized boolean loadDump(RenderContext context, RenderStatusListener renderListener) {
     if (!tryLoadDump(context, renderListener, name + ".dump")) {
       // Failed to load the default render dump - try the backup file.
       if (!tryLoadDump(context, renderListener, name + ".dump.backup")) {
         spp = 0;  // Set spp = 0 because we don't have the old render state.
+        return false;
       }
     }
+    return true;
   }
 
   /**
@@ -1893,10 +1905,10 @@ public class Scene extends SceneDescription {
   /**
    * Prepare the front buffer for rendering by flipping the back and front buffer.
    */
-  public synchronized void updateCanvas() {
+  public synchronized void swapBuffers() {
     finalized = false;
-    BitmapImage tmp = buffer;
-    buffer = backBuffer;
+    BitmapImage tmp = frontBuffer;
+    frontBuffer = backBuffer;
     backBuffer = tmp;
   }
 
@@ -1911,7 +1923,7 @@ public class Scene extends SceneDescription {
    * Call the consumer with the current front frame buffer.
    */
   public synchronized void withBufferedImage(Consumer<BitmapImage> consumer) {
-    consumer.accept(buffer);
+    consumer.accept(frontBuffer);
   }
 
   /**

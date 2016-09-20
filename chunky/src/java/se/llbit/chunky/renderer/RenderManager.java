@@ -138,11 +138,11 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
             finalizeAllFrames = scene.shouldFinalizeBuffer();
             updateRenderState(scene);
             if (reason == ResetReason.SCENE_LOADED) {
-              bufferedScene.updateCanvas();
-              sendSceneStatus(bufferedScene.sceneStatus());
+              // Swap buffers so the render canvas will see the current frame.
+              bufferedScene.swapBuffers();
 
-              // Notify the canvas to repaint.
-              canvas.repaint();
+              // Notify the scene listeners (this triggers a canvas repaint).
+              sendSceneStatus(bufferedScene.sceneStatus());
             }
           });
         }
@@ -212,7 +212,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
         long frameStart = System.currentTimeMillis();
         giveTickets();
         waitOnWorkers();
-        bufferedScene.updateCanvas();
+        bufferedScene.swapBuffers();
         bufferedScene.renderTime += System.currentTimeMillis() - frameStart;
       }
 
@@ -289,7 +289,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
         frameStart = System.currentTimeMillis();
         giveTickets();
         waitOnWorkers();
-        bufferedScene.updateCanvas();
+        bufferedScene.swapBuffers();
         sendSceneStatus(bufferedScene.sceneStatus());
         bufferedScene.renderTime += System.currentTimeMillis() - frameStart;
         bufferedScene.previewCount -= 1;

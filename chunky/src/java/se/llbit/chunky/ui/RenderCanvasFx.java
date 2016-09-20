@@ -306,10 +306,15 @@ public class RenderCanvasFx extends Stage implements Repaintable, SceneStatusLis
     });
   }
 
+  /**
+   * Should only be called on the JavaFX application thread.
+   */
   public void setCanvasSize(int width, int height) {
     canvas.setWidth(width);
     canvas.setHeight(height);
-    image = new WritableImage(width, height);
+    if (image == null || width != image.getWidth() || height != image.getHeight()) {
+      image = new WritableImage(width, height);
+    }
     updateCanvasScale(canvas.getScaleX());
   }
 }
