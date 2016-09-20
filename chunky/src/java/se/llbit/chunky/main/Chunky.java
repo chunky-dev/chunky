@@ -33,11 +33,11 @@ import se.llbit.chunky.renderer.SceneProvider;
 import se.llbit.chunky.renderer.SimpleRenderListener;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.PathTracer;
+import se.llbit.chunky.renderer.scene.PreviewRayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.renderer.scene.SceneManager;
-import se.llbit.chunky.renderer.scene.PreviewRayTracer;
 import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.json.JsonValue;
@@ -50,7 +50,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -199,12 +198,11 @@ public class Chunky {
           Plugin pluginInstance = (Plugin) pluginClass.newInstance();
           pluginInstance.attach(this);
           Log.info("Plugin loaded: " + jar);
-        } catch (MalformedURLException| ClassNotFoundException
-            | InstantiationException | IllegalAccessException e) {
-          Log.error("Failed to load plugin " + pluginJar.getAbsolutePath(), e);
         } catch (ClassCastException e) {
           Log.error("Failed to load plugin " + pluginJar.getAbsolutePath()
               + ". Main plugin class has wrong type", e);
+        } catch (Throwable e) {
+          Log.error("Failed to load plugin " + pluginJar.getAbsolutePath(), e);
         }
       }
     }

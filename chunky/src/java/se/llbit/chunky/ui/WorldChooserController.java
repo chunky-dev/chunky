@@ -134,9 +134,12 @@ public class WorldChooserController implements Initializable {
   private void fillWorldList(File worldSavesDir) {
     List<World> worlds = new ArrayList<>();
     if (worldSavesDir != null) {
-      for (File dir : worldSavesDir.listFiles()) {
-        if (World.isWorldDir(dir)) {
-          worlds.add(new World(dir, false));
+      File[] worldDirs = worldSavesDir.listFiles();
+      if (worldDirs != null) {
+        for (File dir : worldDirs) {
+          if (World.isWorldDir(dir)) {
+            worlds.add(new World(dir, false));
+          }
         }
       }
     }
