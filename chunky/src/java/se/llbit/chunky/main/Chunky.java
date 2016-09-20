@@ -64,7 +64,7 @@ public class Chunky {
 
   public final ChunkyOptions options;
   private RenderController renderController;
-  private SceneFactory sceneFactory = SceneFactory.PAINTABLE;
+  private SceneFactory sceneFactory = SceneFactory.DEFAULT;
   private RenderContextFactory renderContextFactory = RenderContext::new;
   private RendererFactory rendererFactory = RenderManager::new;
   private RayTracerFactory previewRayTracerFactory = PreviewRayTracer::new;
@@ -90,8 +90,6 @@ public class Chunky {
     // TODO: This may not be needed after switching to JavaFX:
     System.setProperty("java.awt.headless", "true");
 
-    // Initialize the SceneFactory to create non-paintable scenes.
-    sceneFactory = SceneFactory.HEADLESS;
     RenderContext context = renderContextFactory.newRenderContext(this);
     Renderer renderer = rendererFactory.newRenderer(context, true);
     SynchronousSceneManager sceneManager = new SynchronousSceneManager(context, renderer);

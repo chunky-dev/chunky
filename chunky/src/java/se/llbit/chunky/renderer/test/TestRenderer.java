@@ -16,19 +16,18 @@
  */
 package se.llbit.chunky.renderer.test;
 
-import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.canvas.GraphicsContext;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.RenderStatus;
 import se.llbit.chunky.renderer.RenderStatusListener;
-import se.llbit.chunky.renderer.Repaintable;
 import se.llbit.chunky.renderer.Renderer;
+import se.llbit.chunky.renderer.Repaintable;
 import se.llbit.chunky.renderer.SceneProvider;
 import se.llbit.chunky.renderer.SceneStatusListener;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Block;
 import se.llbit.log.Log;
@@ -46,6 +45,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * Test renderer
@@ -386,11 +386,7 @@ public class TestRenderer extends Thread
 
   }
 
-  @Override public void drawBufferedImage(GraphicsContext gc, double offsetX, double offsetY,
-      double width, double height) {
-    synchronized (backBuffer) {
-      gc.drawImage(SwingFXUtils.toFXImage(buffer, null), offsetX, offsetY, width, height);
-    }
+  @Override public void withBufferedImage(Consumer<BitmapImage> bitmap) {
   }
 
   @Override public synchronized void refresh() {

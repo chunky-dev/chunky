@@ -18,30 +18,13 @@
 package se.llbit.chunky.renderer.scene;
 
 public interface SceneFactory {
-  /**
-   * Builds non-paintable scenes for headless rendering.
-   */
-  SceneFactory HEADLESS = new SceneFactory() {
+  SceneFactory DEFAULT = new SceneFactory() {
     @Override public Scene newScene() {
       return new Scene();
     }
 
     @Override public Scene copyScene(Scene scene) {
       return new Scene(scene);
-    }
-  };
-
-  /**
-   * Builds paintable scenes, which can render a preview during
-   * normal non-headless rendering.
-   */
-  SceneFactory PAINTABLE = new SceneFactory() {
-    @Override public Scene newScene() {
-      return new PaintableScene();
-    }
-
-    @Override public Scene copyScene(Scene scene) {
-      return new PaintableScene(scene);
     }
   };
 

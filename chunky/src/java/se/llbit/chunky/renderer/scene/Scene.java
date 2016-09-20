@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import javafx.scene.canvas.GraphicsContext;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.model.WaterModel;
@@ -28,6 +27,7 @@ import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
@@ -78,11 +78,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * Scene description.
+ * Encapsulates scene and render state.
+ *
+ * <p>Render state is stored in a sample buffer. Two frame buffers
+ * are also kept for when a snapshot should be rendered.
  */
 public class Scene extends SceneDescription {
 
@@ -91,12 +95,12 @@ public class Scene extends SceneDescription {
   protected static final double fSubSurface = 0.3;
 
   /**
-   * Minimum canvas width
+   * Minimum canvas width.
    */
   public static final int MIN_CANVAS_WIDTH = 20;
 
   /**
-   * Minimum canvas height
+   * Minimum canvas height.
    */
   public static final int MIN_CANVAS_HEIGHT = 20;
 
@@ -205,9 +209,9 @@ public class Scene extends SceneDescription {
   private WorldTexture foliageTexture = new WorldTexture();
 
   /** This is the 8-bit channel frame buffer. */
-  protected int[] buffer;
+  protected BitmapImage buffer;
 
-  private int[] backBuffer;
+  private BitmapImage backBuffer;
 
   /** HDR sample buffer for the render output. */
   protected double[] samples;
@@ -239,8 +243,8 @@ public class Scene extends SceneDescription {
    * scene and after scene canvas size changes.
    */
   public synchronized void initBuffers() {
-    buffer = new int[width * height];
-    backBuffer = new int[width * height];
+    buffer = new BitmapImage(width, height);
+    backBuffer = new BitmapImage(width, height);
     alphaChannel = new byte[width * height];
     samples = new double[width * height * 3];
   }
@@ -1491,9 +1495,9 @@ public class Scene extends SceneDescription {
     try (TaskTracker.Task task = progress.task("Writing PNG");
         PngFileWriter writer = new PngFileWriter(targetFile)) {
       if (transparentSky) {
-        writer.write(backBuffer, alphaChannel, width, height, task);
+        writer.write(backBuffer.data, alphaChannel, width, height, task);
       } else {
-        writer.write(backBuffer, width, height, task);
+        writer.write(backBuffer.data, width, height, task);
       }
       if (camera.getProjectionMode() == ProjectionMode.PANORAMIC && camera.getFov() >= 179
           && camera.getFov() <= 181) {
@@ -1758,7 +1762,7 @@ public class Scene extends SceneDescription {
     finalized = true;
     double[] result = new double[3];
     postProcessPixel(x, y, result);
-    backBuffer[y * width + x] = ColorUtil
+    backBuffer.data[y * width + x] = ColorUtil
         .getRGB(QuickMath.min(1, result[0]), QuickMath.min(1, result[1]),
             QuickMath.min(1, result[2]));
   }
@@ -1856,7 +1860,7 @@ public class Scene extends SceneDescription {
    * Copies a pixel in-buffer.
    */
   public void copyPixel(int jobId, int offset) {
-    backBuffer[jobId + offset] = backBuffer[jobId];
+    backBuffer.data[jobId + offset] = backBuffer.data[jobId];
   }
 
   /**
@@ -1891,7 +1895,7 @@ public class Scene extends SceneDescription {
    */
   public synchronized void updateCanvas() {
     finalized = false;
-    int[] tmp = buffer;
+    BitmapImage tmp = buffer;
     buffer = backBuffer;
     backBuffer = tmp;
   }
@@ -1904,15 +1908,14 @@ public class Scene extends SceneDescription {
   }
 
   /**
-   * Draw the buffered image to a canvas.
+   * Call the consumer with the current front frame buffer.
    */
-  public synchronized void drawBufferedImage(GraphicsContext gc, double offsetX, double offsetY,
-      double canvasWidth, double canvasHeight) {
-    throw new UnsupportedOperationException();
+  public synchronized void withBufferedImage(Consumer<BitmapImage> consumer) {
+    consumer.accept(buffer);
   }
 
   /**
-   * Get direct access to the sample buffer
+   * Get direct access to the sample buffer.
    *
    * @return The sample buffer for this scene
    */

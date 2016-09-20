@@ -16,13 +16,14 @@
  */
 package se.llbit.chunky.renderer;
 
-import javafx.scene.canvas.GraphicsContext;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 /**
  * This class manages render workers. Each worker renders one tile at a time,
@@ -361,9 +362,11 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
     return bufferedScene;
   }
 
-  @Override public void drawBufferedImage(GraphicsContext gc, double offsetX, double offsetY,
-      double width, double height) {
-    bufferedScene.drawBufferedImage(gc, offsetX, offsetY, width, height);
+  /**
+   * Call the consumer with the current front frame buffer.
+   */
+  @Override public void withBufferedImage(Consumer<BitmapImage> consumer) {
+    bufferedScene.withBufferedImage(consumer);
   }
 
   /**

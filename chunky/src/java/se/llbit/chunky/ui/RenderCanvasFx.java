@@ -29,6 +29,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelFormat;
+import javafx.scene.image.WritableImage;
+import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
@@ -44,12 +47,18 @@ import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.SceneStatusListener;
 import se.llbit.chunky.renderer.scene.Camera;
 
+import java.nio.IntBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Shows the current render preview.
  */
 public class RenderCanvasFx extends Stage implements Repaintable, SceneStatusListener {
+  private static final WritablePixelFormat<IntBuffer> PIXEL_FORMAT =
+      PixelFormat.getIntArgbInstance();
+
+  private WritableImage image;
+
   private final AtomicBoolean painting = new AtomicBoolean(false);
   private final Canvas canvas;
   private final Pane canvasPane;
@@ -77,6 +86,7 @@ public class RenderCanvasFx extends Stage implements Repaintable, SceneStatusLis
     synchronized (scene) {
       canvas.setWidth(scene.width);
       canvas.setHeight(scene.height);
+      image = new WritableImage(scene.width, scene.height);
     }
     Line hGuide1 = new Line();
     Line hGuide2 = new Line();
@@ -269,11 +279,16 @@ public class RenderCanvasFx extends Stage implements Repaintable, SceneStatusLis
 
   @Override public void repaint() {
     if (painting.compareAndSet(false, true)) {
+      renderer.withBufferedImage(bitmap -> {
+        if (bitmap.width == (int) image.getWidth()
+            && bitmap.height == (int) image.getHeight()) {
+          image.getPixelWriter().setPixels(0, 0, bitmap.width, bitmap.height, PIXEL_FORMAT,
+              bitmap.data, 0, bitmap.width);
+        }
+      });
       Platform.runLater(() -> {
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        double width = canvas.getWidth();
-        double height = canvas.getHeight();
-        renderer.drawBufferedImage(gc, 0, 0, width, height);
+        gc.drawImage(image, 0, 0);
         painting.set(false);
       });
     }
@@ -295,6 +310,7 @@ public class RenderCanvasFx extends Stage implements Repaintable, SceneStatusLis
   public void setCanvasSize(int width, int height) {
     canvas.setWidth(width);
     canvas.setHeight(height);
+    image = new WritableImage(width, height);
     updateCanvasScale(canvas.getScaleX());
   }
 }

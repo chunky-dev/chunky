@@ -17,7 +17,9 @@
  */
 package se.llbit.chunky.renderer;
 
-import javafx.scene.canvas.GraphicsContext;
+import se.llbit.chunky.resources.BitmapImage;
+
+import java.util.function.Consumer;
 
 /**
  * A renderer renders to a buffered image which is displayed by a render canvas.
@@ -41,15 +43,11 @@ public interface Renderer {
 
   void setRenderListener(RenderStatusListener renderStatusListener);
 
+  void withBufferedImage(Consumer<BitmapImage> bitmap);
+
   interface SampleBufferConsumer {
     void accept(double[] samples, int width, int height);
   }
-
-  /**
-   * Draws the buffered image to the given graphics context in the specified location.
-   */
-  void drawBufferedImage(GraphicsContext gc, double offsetX, double offsetY, double width,
-      double height);
 
   void addSceneStatusListener(SceneStatusListener listener);
 
