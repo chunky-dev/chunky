@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -107,21 +107,19 @@ public class Region implements Iterable<Chunk> {
   }
 
   /**
-   * Parse the region file to discover chunks
+   * Parse the region file to discover chunks.
    */
   public synchronized void parse() {
     File regionFile = new File(world.getRegionDirectory(), fileName);
     if (!regionFile.isFile()) {
       return;
     }
-    RandomAccessFile file = null;
-    try {
-      long modtime = regionFile.lastModified();
-      if (regionFileTime == modtime) {
-        return;
-      }
-      regionFileTime = modtime;
-      file = new RandomAccessFile(regionFile, "r");
+    long modtime = regionFile.lastModified();
+    if (regionFileTime == modtime) {
+      return;
+    }
+    regionFileTime = modtime;
+    try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
       long length = file.length();
       if (length < 2 * SECTOR_SIZE) {
         Log.warn("Missing header in region file!");
@@ -154,13 +152,6 @@ public class Region implements Iterable<Chunk> {
 
     } catch (IOException e) {
       Log.warn("Failed to read region: " + e.getMessage());
-    } finally {
-      if (file != null) {
-        try {
-          file.close();
-        } catch (IOException e) {
-        }
-      }
     }
   }
 
@@ -224,9 +215,7 @@ public class Region implements Iterable<Chunk> {
     int x = chunkPos.x & 31;
     int z = chunkPos.z & 31;
     int index = x + z * 32;
-    RandomAccessFile file = null;
-    try {
-      file = new RandomAccessFile(regionFile, "r");
+    try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
       long length = file.length();
       if (length < 2 * SECTOR_SIZE) {
         Log.warn("Missing header in region file!");
@@ -264,16 +253,8 @@ public class Region implements Iterable<Chunk> {
       } else if (type == 2) {
         return new ChunkDataSource(timestamp, new InflaterInputStream(in));
       }
-
     } catch (IOException e) {
       Log.warn("Failed to read chunk: " + e.getMessage());
-    } finally {
-      if (file != null) {
-        try {
-          file.close();
-        } catch (IOException e) {
-        }
-      }
     }
     return null;
   }
@@ -288,9 +269,7 @@ public class Region implements Iterable<Chunk> {
     int z = chunkPos.z & 31;
     File regionFile = new File(regionDirectory, fileName);
     int index = x + z * 32;
-    RandomAccessFile file = null;
-    try {
-      file = new RandomAccessFile(regionFile, "rw");
+    try (RandomAccessFile file = new RandomAccessFile(regionFile, "rw")) {
       long length = file.length();
       if (length < 2 * SECTOR_SIZE) {
         Log.warn("Missing header in region file!");
@@ -300,13 +279,6 @@ public class Region implements Iterable<Chunk> {
       file.writeInt(0);
     } catch (IOException e) {
       Log.warningfmt("Failed to delete chunk: %s", e.getMessage());
-    } finally {
-      if (file != null) {
-        try {
-          file.close();
-        } catch (IOException e) {
-        }
-      }
     }
   }
 
@@ -319,9 +291,7 @@ public class Region implements Iterable<Chunk> {
       DataOutputStream out, Set<ChunkPosition> chunks) throws IOException {
     String fileName = regionPos.getMcaName();
     File regionFile = new File(regionDirectory, fileName);
-    RandomAccessFile file = null;
-    try {
-      file = new RandomAccessFile(regionFile, "r");
+    try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
       int[] location = new int[32 * 32];
       int[] loc_out = new int[32 * 32];
       int nextFree = 2;// 2 sectors reserved for offsets and timestamps
@@ -334,17 +304,17 @@ public class Region implements Iterable<Chunk> {
         }
       }
 
-      // write offset table
+      // Write offset table.
       for (int i = 0; i < 32 * 32; ++i) {
         out.writeInt(loc_out[i]);
       }
 
-      // write timestamp table
+      // Write timestamp table.
       for (int i = 0; i < 32 * 32; ++i) {
         out.writeInt(file.readInt());
       }
 
-      // write chunks
+      // Write chunks.
       for (int i = 0; i < 32 * 32; ++i) {
         if (loc_out[i] == 0) {
           continue;
@@ -359,13 +329,6 @@ public class Region implements Iterable<Chunk> {
         for (int j = 0; j < numSectors; ++j) {
           file.read(buffer);
           out.write(buffer);
-        }
-      }
-    } finally {
-      if (file != null) {
-        try {
-          file.close();
-        } catch (IOException e) {
         }
       }
     }

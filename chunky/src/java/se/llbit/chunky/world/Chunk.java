@@ -134,6 +134,7 @@ public class Chunk {
   private Map<String, AnyTag> getChunkData(Set<String> request) {
     Region region = world.getRegion(position.getRegionPosition());
     ChunkDataSource data = region.getChunkData(position);
+    // TODO: improve error handling. Null value means corrupt chunk.
     if (data == null) {
       return null;
     }
@@ -420,6 +421,10 @@ public class Chunk {
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
     Map<String, AnyTag> data = getChunkData(request);
+    // TODO: improve error handling here.
+    if (data == null) {
+      return;
+    }
     AnyTag sections = data.get(LEVEL_SECTIONS);
     AnyTag biomesTag = data.get(LEVEL_BIOMES);
     AnyTag entitiesTag = data.get(LEVEL_ENTITIES);
