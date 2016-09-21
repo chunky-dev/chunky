@@ -2,7 +2,7 @@ version = getVersion()
 
 println "Building version ${version}"
 
-allprojects {
+subprojects {
 
 	apply plugin: 'java'
 
@@ -198,8 +198,6 @@ task macDist(dependsOn: 'releaseJar') << {
 		file("build/Chunky-${version}.dmg") ], true)
 }
 
-task install(dependsOn: ':chunky:install') {
-}
+task install(dependsOn: ':chunky:install')
 
-task uploadArchives(dependsOn: ':chunky:uploadArchives') {
-}
+task uploadArchives(dependsOn: ':chunky:uploadArchives')
