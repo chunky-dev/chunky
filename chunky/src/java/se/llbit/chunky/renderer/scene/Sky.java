@@ -309,10 +309,10 @@ public class Sky implements JSONifiable {
           skybox[SKYBOX_BACK].getColor((1 - x * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
         } else if (-x > zabs && -x > yabs) {
           double alpha = 1 / xabs;
-          skybox[SKYBOX_LEFT].getColor((1 - z * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
+          skybox[SKYBOX_RIGHT].getColor((1 - z * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
         } else if (x > zabs && x > yabs) {
           double alpha = 1 / xabs;
-          skybox[SKYBOX_RIGHT].getColor((1 + z * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
+          skybox[SKYBOX_LEFT].getColor((1 + z * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
         } else if (-y > xabs && -y > zabs) {
           double alpha = 1 / yabs;
           skybox[SKYBOX_DOWN].getColor((1 + x * alpha) / 2.0, (1 - z * alpha) / 2.0, ray.color);
@@ -396,11 +396,11 @@ public class Sky implements JSONifiable {
               .getColorInterpolated((1 - x * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
         } else if (-x > zabs && -x > yabs) {
           double alpha = 1 / xabs;
-          skybox[SKYBOX_LEFT]
+          skybox[SKYBOX_RIGHT]
               .getColorInterpolated((1 - z * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
         } else if (x > zabs && x > yabs) {
           double alpha = 1 / xabs;
-          skybox[SKYBOX_RIGHT]
+          skybox[SKYBOX_LEFT]
               .getColorInterpolated((1 + z * alpha) / 2.0, (1 + y * alpha) / 2.0, ray.color);
         } else if (-y > xabs && -y > zabs) {
           double alpha = 1 / yabs;

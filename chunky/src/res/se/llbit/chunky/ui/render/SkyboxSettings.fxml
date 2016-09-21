@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 
-
 <fx:root spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label text="Load skybox textures:" />
@@ -23,12 +22,12 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Button fx:id="left" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Left" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Button fx:id="left" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Left" GridPane.rowIndex="2" />
             <Button fx:id="back" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Back" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Button fx:id="front" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Front" GridPane.rowIndex="1" />
             <Button fx:id="down" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Down" GridPane.columnIndex="1" />
             <Button fx:id="up" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Up" />
-            <Button fx:id="right" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Right" GridPane.rowIndex="2" />
+            <Button fx:id="right" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Right" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>
       </GridPane>
       <DoubleAdjuster fx:id="skyboxRotation" />
