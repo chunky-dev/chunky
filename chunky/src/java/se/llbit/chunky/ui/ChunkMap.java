@@ -131,6 +131,7 @@ public class ChunkMap extends Map2D {
     GraphicsContext gc = canvas.getGraphicsContext2D();
     gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     if (controller.hasActiveRenderControls()) {
+      // TODO: this can block for a long time, so it should ideally not be done on the JavaFX application thread.
       controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
           scene -> drawViewBounds(gc, mapView, scene));
     }
