@@ -417,6 +417,7 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
         togglePreviewBtn.setText("Hide preview window");
         onShowing.handle(e);
       });
+      canvas.initOwner(stage);
       canvas.show();
       canvas.setRenderListener(renderTracker);
     } else {
