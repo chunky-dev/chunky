@@ -74,6 +74,7 @@ public class WaterTab extends VBox implements RenderControlTab, Initializable {
   }
 
   public void setRenderController(RenderController controller) {
+    this.controller = controller;
     scene = controller.getSceneManager().getScene();
   }
 
