@@ -310,20 +310,7 @@ public class ChunkyFxController
     loadSceneBtn.setGraphic(new ImageView(Icon.load.fxImage()));
     loadSceneBtn.setOnAction(e -> loadScene());
 
-    openSceneDirBtn.setOnAction(e -> {
-      try {
-        if (Desktop.isDesktopSupported()) {
-          File sceneDir = SceneDirectoryPicker.getCurrentSceneDirectory();
-          if (sceneDir != null) {
-            Desktop.getDesktop().open(sceneDir);
-          }
-        } else {
-          Log.warn("Can not open system file browser.");
-        }
-      } catch (IOException e1) {
-        Log.warn("Failed to open scene directory.", e1);
-      }
-    });
+    openSceneDirBtn.setOnAction(e -> openSceneDirectory());
 
     changeSceneDirBtn.setOnAction(e -> SceneDirectoryPicker.changeSceneDirectory(chunky.options));
 
@@ -643,5 +630,26 @@ public class ChunkyFxController
    */
   public void setChunky(Chunky chunky) {
     this.chunky = chunky;
+  }
+
+  public static void openSceneDirectory() {
+    File sceneDir = SceneDirectoryPicker.getCurrentSceneDirectory();
+    if (sceneDir != null) {
+      // Running Desktop.open() on the JavaFX application thread seems to
+      // lock up the application on Linux, so we create a new thread to run that.
+      // This StackOverflow question seems to ask about the same bug:
+      // http://stackoverflow.com/questions/23176624/javafx-freeze-on-desktop-openfile-desktop-browseuri
+      new Thread(() -> {
+        try {
+          if (Desktop.isDesktopSupported()) {
+            Desktop.getDesktop().open(sceneDir);
+          } else {
+            Log.warn("Can not open system file browser.");
+          }
+        } catch (IOException e1) {
+          Log.warn("Failed to open scene directory.", e1);
+        }
+      }).start();
+    }
   }
 }

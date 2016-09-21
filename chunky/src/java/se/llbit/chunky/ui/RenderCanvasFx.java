@@ -303,7 +303,7 @@ public class RenderCanvasFx extends Stage implements Repaintable, SceneStatusLis
 
   @Override public void sceneStatus(String status) {
     Platform.runLater(() -> {
-      if (isFocused()) {
+      if (isShowing() && isFocused()) {
         tooltip.setText(status);
         tooltip.show(this, getX(), getY() + getHeight());
       }

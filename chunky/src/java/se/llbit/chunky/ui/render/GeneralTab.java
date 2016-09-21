@@ -185,20 +185,7 @@ public class GeneralTab extends VBox implements RenderControlTab, Initializable 
     });
     openSceneDirBtn.setTooltip(
         new Tooltip("Open the directory where Chunky stores scene descriptions and renders."));
-    openSceneDirBtn.setOnAction(e -> {
-      try {
-        if (Desktop.isDesktopSupported()) {
-          File sceneDir = SceneDirectoryPicker.getCurrentSceneDirectory();
-          if (sceneDir != null) {
-            Desktop.getDesktop().open(sceneDir);
-          }
-        } else {
-          Log.warn("Can not open system file browser.");
-        }
-      } catch (IOException e1) {
-        Log.warn("Failed to open scene directory.", e1);
-      }
-    });
+    openSceneDirBtn.setOnAction(e -> ChunkyFxController.openSceneDirectory());
     loadSelectedChunks
         .setTooltip(new Tooltip("Load the chunks that are currently selected in the map view"));
     loadSelectedChunks.setOnAction(e -> controller.getSceneManager()
