@@ -103,7 +103,7 @@ public class GeneralTab extends VBox implements RenderControlTab, Initializable 
     loader.setController(this);
     loader.load();
 
-    reloadHint = new Tooltip("This takes effect the next time chunks are reloaded.");
+    reloadHint = new Tooltip("This takes effect the next time a new scene is created.");
     reloadHint.setConsumeAutoHidingEvents(false);
     reloadHint.setAutoHide(true);
   }

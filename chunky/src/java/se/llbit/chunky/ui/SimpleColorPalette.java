@@ -21,7 +21,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -34,6 +33,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -131,7 +132,13 @@ public class SimpleColorPalette extends Region implements Initializable {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("SimpleColorPalette.fxml"));
       loader.setController(this);
       getChildren().add(loader.load());
-      setOnMouseClicked(Event::consume);
+      addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+        if (e.getCode() == KeyCode.ESCAPE) {
+          e.consume();
+          colorPicker.revertToOriginalColor();
+          colorPicker.hide();
+        }
+      });
     } catch (IOException e) {
       throw new Error(e);
     }

@@ -41,7 +41,7 @@ public class WorldChooser extends Stage {
     setScene(new Scene(root));
     controller.setStage(this);
     controller.populate(mapLoader);
-    addEventFilter(KeyEvent.ANY, e -> {
+    addEventFilter(KeyEvent.KEY_PRESSED, e -> {
       if (e.getCode() == KeyCode.ESCAPE) {
         e.consume();
         close();
