@@ -384,6 +384,7 @@ public class SceneDescription implements Refreshable, JSONifiable {
     JsonValue value = cameraPresets.get(name);
     if (!value.isUnknown()) {
       camera.fromJson(value.object());
+      refresh();
     }
   }
 
