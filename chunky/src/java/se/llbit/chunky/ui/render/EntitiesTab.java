@@ -83,7 +83,6 @@ public class EntitiesTab extends VBox implements RenderControlTab, Initializable
     }
   }
 
-
   @FXML private TableView<PlayerData> entityTable;
   @FXML private TableColumn<PlayerData, String> nameCol;
   @FXML private TableColumn<PlayerData, String> idCol;
@@ -147,7 +146,7 @@ public class EntitiesTab extends VBox implements RenderControlTab, Initializable
     add.setTooltip(new Tooltip("Add a player at the target position."));
     add.setOnAction(e -> {
       Collection<Entity> entities = scene.getActors();
-      Set<String> ids = new HashSet<String>();
+      Set<String> ids = new HashSet<>();
       for (Entity entity : entities) {
         if (entity instanceof PlayerEntity) {
           ids.add(((PlayerEntity) entity).uuid);
@@ -205,9 +204,7 @@ public class EntitiesTab extends VBox implements RenderControlTab, Initializable
       return row;
     });
     cameraToPlayer.setTooltip(new Tooltip("Move the camera to the selected player position."));
-    cameraToPlayer.setOnAction(e -> withSelected(player -> {
-      scene.camera().moveToPlayer(player);
-    }));
+    cameraToPlayer.setOnAction(e -> withSelected(player -> scene.camera().moveToPlayer(player)));
     playerToCamera.setTooltip(new Tooltip("Move the selected player to the camera position."));
     playerToCamera.setOnAction(e -> withSelected(player -> {
       player.position.set(scene.camera().getPosition());

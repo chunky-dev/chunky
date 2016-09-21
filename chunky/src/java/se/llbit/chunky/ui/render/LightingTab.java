@@ -24,7 +24,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import se.llbit.chunky.renderer.RenderController;
-import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.renderer.scene.Sun;

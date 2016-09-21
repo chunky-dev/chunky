@@ -27,7 +27,6 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 import se.llbit.chunky.renderer.RenderController;
-import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.ui.DoubleAdjuster;

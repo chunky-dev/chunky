@@ -51,13 +51,9 @@ import se.llbit.math.Vector3;
 
 import java.io.IOException;
 import java.net.URL;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
 public class CameraTab extends VBox implements RenderControlTab, Initializable {
-  private final NumberFormat numberFormat = NumberFormat.getInstance();
-  private final DecimalFormat decimalFormat = new DecimalFormat();
   private Scene scene;
 
   @FXML private MenuButton loadPreset;
@@ -98,8 +94,8 @@ public class CameraTab extends VBox implements RenderControlTab, Initializable {
 
   public void setRenderController(RenderController controller) {
     scene = controller.getSceneManager().getScene();
-    scene.camera().setDirectionListener(() -> updateCameraDirection());
-    scene.camera().setPositionListener(() -> updateCameraPosition());
+    scene.camera().setDirectionListener(this::updateCameraDirection);
+    scene.camera().setPositionListener(this::updateCameraPosition);
     scene.camera().setProjectionListener(() -> {
       updateFov();
       mapLoader.drawCameraVisualization();

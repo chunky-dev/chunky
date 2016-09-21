@@ -32,7 +32,6 @@ import javafx.scene.image.WritablePixelFormat;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -52,11 +51,13 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
 
+/**
+ * A tool for posing entities.
+ */
 public class Poser extends Stage implements RenderControlTab, Initializable {
   private static final WritablePixelFormat<IntBuffer> PIXEL_FORMAT =
       PixelFormat.getIntArgbInstance();
   private final EntitiesTab.PlayerData player;
-  private RenderManager renderer;
   private BVH bvh = new BVH(Collections.emptyList());
   private int[] pixels;
   private int width = 300;
@@ -88,10 +89,6 @@ public class Poser extends Stage implements RenderControlTab, Initializable {
     Parent root = loader.load();
     setScene(new javafx.scene.Scene(root));
     setTitle("Pose Preview");
-  }
-
-  public void setRenderManager(RenderManager renderManager) {
-    this.renderer = renderManager;
   }
 
   @Override public void update(Scene scene) {
@@ -199,7 +196,6 @@ public class Poser extends Stage implements RenderControlTab, Initializable {
         ray.t = Double.MAX_VALUE;
         ray.d.set(rayx, rayy, 1);
         ray.d.normalize();
-        //transform.transform(ray.d);
 
         ray.o.set(camPos);
         boolean hit = false;
