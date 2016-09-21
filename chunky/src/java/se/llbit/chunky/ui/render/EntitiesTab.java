@@ -232,6 +232,11 @@ public class EntitiesTab extends VBox implements RenderControlTab, Initializable
     nameCol.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().name));
     idCol.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().toString()));
     playerModel.getItems().addAll(PlayerModel.values());
+    playerModel.getSelectionModel().selectedItemProperty().addListener(
+        (observable, oldValue, newValue) -> withSelected(player -> {
+          player.model = newValue;
+          scene.rebuildActorBvh();
+        }));
     direction.setName("Direction");
     direction.setRange(-Math.PI, Math.PI);
     direction.onValueChange(value -> withSelected(player -> {

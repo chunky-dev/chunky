@@ -135,7 +135,7 @@ public class GeneralTab extends VBox implements RenderControlTab, Initializable 
       PersistentSettings.setLoadPlayers(newValue);
       attachTooltip(loadPlayers, reloadHint);
     });
-    biomeColors.setTooltip(new Tooltip("Enable biome colors."));
+    biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
       scene.setBiomeColorsEnabled(newValue);
     });

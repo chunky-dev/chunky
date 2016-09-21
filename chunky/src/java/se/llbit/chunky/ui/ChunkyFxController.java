@@ -304,6 +304,8 @@ public class ChunkyFxController
       }
     });
 
+    newSceneBtn.setTooltip(
+        new Tooltip("Creates a new 3D scene with the currently selected chunks."));
     newSceneBtn.setOnAction(e -> createNew3DScene());
     loadSceneBtn.setGraphic(new ImageView(Icon.load.fxImage()));
     loadSceneBtn.setOnAction(e -> loadScene());
