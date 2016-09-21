@@ -129,9 +129,6 @@ public class SimpleColorPalette extends Region implements Initializable {
     this.colorPicker = colorPicker;
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("SimpleColorPalette.fxml"));
-      // We need to explicitly set the class loader because in Java 1.8u40 FXMLLoader has a null
-      // class loader for some reason:
-      loader.setClassLoader(getClass().getClassLoader());
       loader.setController(this);
       getChildren().add(loader.load());
       setOnMouseClicked(Event::consume);

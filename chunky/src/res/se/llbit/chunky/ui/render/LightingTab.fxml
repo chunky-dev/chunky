@@ -8,7 +8,7 @@
 
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 <?import se.llbit.chunky.ui.SimpleColorPicker?>
-<fx:root prefWidth="556.0" spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefWidth="556.0" spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <DoubleAdjuster fx:id="skyIntensity" maxWidth="1.7976931348623157E308" />
         <CheckBox fx:id="enableEmitters" mnemonicParsing="false" text="Enable emitters" />

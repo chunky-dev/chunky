@@ -60,8 +60,6 @@ public class LightingTab extends VBox implements RenderControlTab, Initializable
 
   public LightingTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("LightingTab.fxml"));
-    loader.setClassLoader(getClass()
-        .getClassLoader()); // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
     loader.setRoot(this);
     loader.setController(this);
     loader.load();

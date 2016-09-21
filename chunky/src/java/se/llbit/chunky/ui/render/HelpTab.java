@@ -25,8 +25,6 @@ import java.io.IOException;
 public class HelpTab extends VBox implements RenderControlTab {
   public HelpTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("HelpTab.fxml"));
-    loader.setClassLoader(getClass()
-        .getClassLoader()); // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
     loader.setRoot(this);
     loader.setController(this);
     loader.load();

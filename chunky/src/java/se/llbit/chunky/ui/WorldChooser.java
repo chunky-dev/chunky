@@ -34,8 +34,6 @@ import java.io.IOException;
 public class WorldChooser extends Stage {
   public WorldChooser(WorldMapLoader mapLoader) throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("WorldChooser.fxml"));
-    // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
-    loader.setClassLoader(getClass().getClassLoader());
     Parent root = loader.load();
     WorldChooserController controller = loader.getController();
     setTitle("Select World");

@@ -89,8 +89,6 @@ public class GradientEditor extends VBox implements Initializable {
   public GradientEditor(SkyTab sky) throws IOException {
     this.sky = sky;
     FXMLLoader loader = new FXMLLoader(getClass().getResource("GradientEditor.fxml"));
-    loader.setClassLoader(getClass()
-        .getClassLoader()); // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
     loader.setRoot(this);
     loader.setController(this);
     loader.load();

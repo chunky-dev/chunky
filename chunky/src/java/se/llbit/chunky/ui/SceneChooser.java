@@ -31,8 +31,6 @@ public class SceneChooser extends Stage {
   public SceneChooser(ChunkyFxController chunkyFxController)
       throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("SceneChooser.fxml"));
-    loader.setClassLoader(getClass()
-        .getClassLoader()); // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
     Parent root = loader.load();
     SceneChooserController controller = loader.getController();
     setTitle("Select 3D Scene");

@@ -65,9 +65,6 @@ public class WaterTab extends VBox implements RenderControlTab, Initializable {
 
   public WaterTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("WaterTab.fxml"));
-    // We need to explicitly set the class loader because in Java 1.8u40 FXMLLoader has a null
-    // class loader for some reason:
-    loader.setClassLoader(getClass().getClassLoader());
     loader.setRoot(this);
     loader.setController(this);
     loader.load();

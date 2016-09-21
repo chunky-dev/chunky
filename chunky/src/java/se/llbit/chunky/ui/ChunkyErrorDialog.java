@@ -56,8 +56,6 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
    */
   public ChunkyErrorDialog() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("ErrorDialog.fxml"));
-    // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
-    loader.setClassLoader(getClass().getClassLoader());
     loader.setController(this);
     Parent root = loader.load();
     setTitle("Error Summary");

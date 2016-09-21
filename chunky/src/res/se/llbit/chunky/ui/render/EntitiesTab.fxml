@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 
-<fx:root prefWidth="556.0" spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefWidth="556.0" spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <TableView fx:id="entityTable" prefHeight="200.0" prefWidth="200.0">
         <columns>

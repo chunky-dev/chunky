@@ -29,8 +29,6 @@ import java.io.IOException;
 public class Credits extends Stage {
   public Credits() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("Credits.fxml"));
-    loader.setClassLoader(getClass()
-        .getClassLoader()); // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
     Parent root = loader.load();
     CreditsController controller = loader.getController();
     setTitle("Chunky Credits");

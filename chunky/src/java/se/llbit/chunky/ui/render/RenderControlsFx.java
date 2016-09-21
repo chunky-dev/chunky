@@ -35,12 +35,9 @@ public class RenderControlsFx extends Stage {
 
   public RenderControlsFx(ChunkyFxController fxController) throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("RenderControls.fxml"));
-    loader.setClassLoader(getClass()
-        .getClassLoader()); // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
     Parent root = loader.load();
     RenderControlsFxController controller = loader.getController();
     setTitle("Render Controls");
-    // TODO dynamic title
     setScene(new Scene(root));
     controller.setController(fxController);
     controller.setStage(this);

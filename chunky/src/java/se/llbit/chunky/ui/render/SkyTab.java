@@ -64,8 +64,6 @@ public class SkyTab extends VBox implements RenderControlTab, Initializable {
 
   public SkyTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("SkyTab.fxml"));
-    // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
-    loader.setClassLoader(getClass().getClassLoader());
     loader.setRoot(this);
     loader.setController(this);
     loader.load();

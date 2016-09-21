@@ -24,7 +24,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.VBox;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.RenderController;
-import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
 
@@ -40,8 +39,6 @@ public class PostprocessingTab extends VBox implements RenderControlTab, Initial
 
   public PostprocessingTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("PostprocessingTab.fxml"));
-    loader.setClassLoader(getClass()
-        .getClassLoader()); // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
     loader.setRoot(this);
     loader.setController(this);
     loader.load();

@@ -25,6 +25,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import se.llbit.chunky.launcher.Logger;
@@ -58,20 +59,23 @@ public class DebugConsole extends Stage implements Logger {
 
     getIcons().add(new Image(getClass().getResourceAsStream("chunky-cfg.png")));
 
-    VBox vBox = new VBox();
-    vBox.setSpacing(10);
-    vBox.setPadding(new Insets(10));
-    vBox.setAlignment(Pos.TOP_RIGHT);
-    vBox.getChildren().setAll(new ScrollPane(statusText), closeBtn);
+    VBox buttonBar = new VBox();
+    buttonBar.setPadding(new Insets(10));
+    buttonBar.setAlignment(Pos.TOP_RIGHT);
+    buttonBar.getChildren().add(closeBtn);
 
-    setScene(new Scene(vBox));
+    BorderPane content = new BorderPane();
+    content.setCenter(statusText);
+    content.setBottom(buttonBar);
+
+    setScene(new Scene(content));
   }
 
   /**
    * Append text to the status text area.
    */
   public void appendStatusText(final String text) {
-    statusText.appendText(text);
+    Platform.runLater(() -> statusText.appendText(text));
   }
 
   @Override public void processExited(int exitValue) {

@@ -83,8 +83,6 @@ public class Poser extends Stage implements RenderControlTab, Initializable {
   public Poser(EntitiesTab.PlayerData data) throws IOException {
     this.player = data;
     FXMLLoader loader = new FXMLLoader(getClass().getResource("Poser.fxml"));
-    loader.setClassLoader(getClass()
-        .getClassLoader()); // Needed for Java 1.8u40 where FXMLLoader has a null class loader for some reason.
     loader.setController(this);
     Parent root = loader.load();
     setScene(new javafx.scene.Scene(root));
