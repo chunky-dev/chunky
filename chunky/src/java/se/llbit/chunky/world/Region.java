@@ -29,8 +29,12 @@ import java.util.zip.InflaterInputStream;
 import se.llbit.log.Log;
 
 /**
- * Abstract region representation.
- * Tracks chunks.
+ * Abstract region representation. Tracks loaded chunks and their timestamps.
+ *
+ * <p>If an error occurs it will usually be reported to STDERR instead of using
+ * the logging framework, because the error dialogs can be so many for a
+ * single corrupted region. Corrupted chunks are illustrated by a black square
+ * with a red X and red outline in the map view.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
@@ -122,7 +126,7 @@ public class Region implements Iterable<Chunk> {
     try (RandomAccessFile file = new RandomAccessFile(regionFile, "r")) {
       long length = file.length();
       if (length < 2 * SECTOR_SIZE) {
-        Log.warn("Missing header in region file!");
+        System.err.println("Missing header in region file!");
         return;
       }
 
@@ -149,9 +153,8 @@ public class Region implements Iterable<Chunk> {
       }
 
       world.regionUpdated(position);
-
     } catch (IOException e) {
-      Log.warn("Failed to read region: " + e.getMessage());
+      System.err.println("Failed to read region: " + e.getMessage());
     }
   }
 
@@ -187,23 +190,24 @@ public class Region implements Iterable<Chunk> {
   private final static int SECTOR_SIZE = 4096;
 
   /**
-   * Opens an input stream for the given chunk
+   * Opens an input stream for the given chunk.
    *
-   * @param chunkPos chunk position
-   * @return Chunk data, or {@code null} if the chunk could not be read
+   * @param chunkPos chunk position for the chunk to read
+   * @return Chunk data source. The InputStream of the data source is
+   * {@code null} if the chunk could not be read.
    */
   public ChunkDataSource getChunkData(ChunkPosition chunkPos) {
     File regionDirectory = world.getRegionDirectory();
     File regionFile = new File(regionDirectory, fileName);
+    ChunkDataSource data = null;
     if (regionFile.exists()) {
-      ChunkDataSource data = getChunkData(regionFile, chunkPos);
-      if (data != null) {
-        chunkTimestamps[(chunkPos.x & 31) + (chunkPos.z & 31) * 32] = data.timestamp;
-      }
-      return data;
-    } else {
-      return null;
+      data = getChunkData(regionFile, chunkPos);
     }
+    if (data == null) {
+      data = new ChunkDataSource((int) System.currentTimeMillis(), null);
+    }
+    chunkTimestamps[(chunkPos.x & 31) + (chunkPos.z & 31) * 32] = data.timestamp;
+    return data;
   }
 
   /**
@@ -250,20 +254,20 @@ public class Region implements Iterable<Chunk> {
       ByteArrayInputStream in = new ByteArrayInputStream(buf);
       if (type == 1) {
         return new ChunkDataSource(timestamp, new GZIPInputStream(in));
-      } else if (type == 2) {
+      } else {
         return new ChunkDataSource(timestamp, new InflaterInputStream(in));
       }
     } catch (IOException e) {
-      Log.warn("Failed to read chunk: " + e.getMessage());
+      System.err.println("Failed to read chunk: " + e.getMessage());
+      return null;
     }
-    return null;
   }
 
   /**
    * Delete the chunk from the region file.
    */
   public void deleteChunkFromRegion(ChunkPosition chunkPos) {
-    // just write zero in the entry for the chunk in the location table
+    // Just write zero in the entry for the chunk in the location table.
     File regionDirectory = world.getRegionDirectory();
     int x = chunkPos.x & 31;
     int z = chunkPos.z & 31;

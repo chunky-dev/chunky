@@ -30,6 +30,10 @@ public class ChunkDataSource {
 
   public ChunkDataSource(int timestamp, InputStream in) {
     this.timestamp = timestamp;
-    this.inputStream = new DataInputStream(in);
+    if (in != null) {
+      this.inputStream = new DataInputStream(in);
+    } else {
+      this.inputStream = null;
+    }
   }
 }

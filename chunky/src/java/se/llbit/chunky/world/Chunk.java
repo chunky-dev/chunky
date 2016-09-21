@@ -134,26 +134,21 @@ public class Chunk {
   private Map<String, AnyTag> getChunkData(Set<String> request) {
     Region region = world.getRegion(position.getRegionPosition());
     ChunkDataSource data = region.getChunkData(position);
-    // TODO: improve error handling. Null value means corrupt chunk.
-    if (data == null) {
-      return null;
-    }
-    DataInputStream in = data.inputStream;
-    if (in == null) {
-      return null;
-    }
     dataTimestamp = data.timestamp;
-    Map<String, AnyTag> result = NamedTag.quickParse(in, request);
-    try {
-      in.close();
-    } catch (IOException e) {
-    }
-    for (String key : request) {
-      if (!result.containsKey(key)) {
-        result.put(key, new ErrorTag());
+    if (data.inputStream != null) {
+      try (DataInputStream in = data.inputStream) {
+        Map<String, AnyTag> result = NamedTag.quickParse(in, request);
+        for (String key : request) {
+          if (!result.containsKey(key)) {
+            result.put(key, new ErrorTag());
+          }
+        }
+        return result;
+      } catch (IOException e) {
+        // Ignored.
       }
     }
-    return result;
+    return null;
   }
 
   /**
