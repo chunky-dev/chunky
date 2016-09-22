@@ -23,7 +23,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.renderer.RenderController;
-import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.ui.DoubleAdjuster;

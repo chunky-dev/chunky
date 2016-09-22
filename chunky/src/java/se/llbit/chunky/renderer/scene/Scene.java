@@ -735,7 +735,9 @@ public class Scene extends SceneDescription {
               if (cx > 0 && cx < 15 && cz > 0 && cz < 15 && cy > 0 && cy < 255 &&
                   block != Block.STONE && block.isOpaque) {
 
-                // Set obscured blocks to stone.
+                // Set obscured blocks to stone. This makes adjacent obscured
+                // blocks be able to be merged into larger octree nodes
+                // even if they had different block types originally.
                 if (Block.get(blocks[index - 1]).isOpaque &&
                     Block.get(blocks[index + 1]).isOpaque &&
                     Block.get(blocks[index - Chunk.X_MAX]).isOpaque &&

@@ -34,7 +34,6 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.ui.SceneDirectoryPicker;
 import se.llbit.chunky.ui.ChunkyFxController;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderCanvasFx;
@@ -43,8 +42,6 @@ import se.llbit.chunky.ui.SceneChooser;
 import se.llbit.chunky.world.Icon;
 import se.llbit.log.Log;
 
-import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -94,7 +91,7 @@ public class GeneralTab extends VBox implements RenderControlTab, Initializable 
   private RenderController controller;
   private WorldMapLoader mapLoader;
   private RenderControlsFxController fxController;
-  private final Tooltip reloadHint;
+  private final Tooltip tooltip;
   private ChunkyFxController chunkyFxController;
 
   public GeneralTab() throws IOException {
@@ -103,9 +100,9 @@ public class GeneralTab extends VBox implements RenderControlTab, Initializable 
     loader.setController(this);
     loader.load();
 
-    reloadHint = new Tooltip("This takes effect the next time a new scene is created.");
-    reloadHint.setConsumeAutoHidingEvents(false);
-    reloadHint.setAutoHide(true);
+    tooltip = new Tooltip();
+    tooltip.setConsumeAutoHidingEvents(false);
+    tooltip.setAutoHide(true);
   }
 
   @Override public void update(Scene scene) {
@@ -128,10 +125,10 @@ public class GeneralTab extends VBox implements RenderControlTab, Initializable 
 
   @Override public void initialize(URL location, ResourceBundle resources) {
     loadPlayers.setTooltip(new Tooltip("Enable/disable player entity loading. "
-        + "Reload the chunks after changing this option."));
+        + "Takes effect on next scene creation."));
     loadPlayers.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setLoadPlayers(newValue);
-      attachTooltip(loadPlayers, reloadHint);
+      attachTooltip("This takes effect the next time a new scene is created.", loadPlayers);
     });
     biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -171,7 +168,7 @@ public class GeneralTab extends VBox implements RenderControlTab, Initializable 
         "Blocks below the Y cutoff are not loaded. Requires reloading chunks to take effect.");
     yCutoff.onValueChange(value -> {
       PersistentSettings.setYCutoff(value);
-      attachTooltip(yCutoff, reloadHint);
+      attachTooltip("Reload the chunks for this to take effect.", yCutoff);
     });
     loadSceneBtn.setTooltip(new Tooltip("This replaces the current scene!"));
     loadSceneBtn.setGraphic(new ImageView(Icon.load.fxImage()));
@@ -218,13 +215,14 @@ public class GeneralTab extends VBox implements RenderControlTab, Initializable 
     });
   }
 
-  private void attachTooltip(Region node, Tooltip tooltip) {
+  private void attachTooltip(String message, Region node) {
     if (node.getScene() != null && node.getScene().getWindow() != null) {
       Point2D offset = node.localToScene(0, 0);
-      tooltip
-          .show(node, offset.getX() + node.getScene().getX() + node.getScene().getWindow().getX(),
-              offset.getY() + node.getScene().getY() + node.getScene().getWindow().getY() + node
-                  .getHeight());
+      tooltip.setText(message);
+      tooltip.show(node,
+          offset.getX() + node.getScene().getX() + node.getScene().getWindow().getX(),
+          offset.getY() + node.getScene().getY() + node.getScene().getWindow().getY()
+              + node.getHeight());
     }
   }
 
