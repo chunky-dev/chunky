@@ -61,6 +61,19 @@ import java.net.URLClassLoader;
  */
 public class Chunky {
 
+  /** A log receiver suitable for headless rendering. */
+  private static final Receiver HEADLESS_LOG_RECEIVER = new Receiver() {
+    @Override public void logEvent(Level level, String message) {
+      if (level == Level.ERROR) {
+        System.err.println();  // Clear the current progress line.
+        System.err.println(message);
+      } else {
+        System.out.println();  // Clear the current progress line.
+        System.out.println(message);
+      }
+    }
+  };
+
   public final ChunkyOptions options;
   private RenderController renderController;
   private SceneFactory sceneFactory = SceneFactory.DEFAULT;
@@ -88,6 +101,8 @@ public class Chunky {
   private int doHeadlessRender() {
     // TODO: This may not be needed after switching to JavaFX:
     System.setProperty("java.awt.headless", "true");
+
+    Log.setReceiver(HEADLESS_LOG_RECEIVER, Level.INFO, Level.WARNING, Level.ERROR);
 
     RenderContext context = renderContextFactory.newRenderContext(this);
     Renderer renderer = rendererFactory.newRenderer(context, true);
@@ -220,18 +235,8 @@ public class Chunky {
    * render context and scene construction.
    */
   private int doSnapshot() {
+    Log.setReceiver(HEADLESS_LOG_RECEIVER, Level.INFO, Level.WARNING, Level.ERROR);
     try {
-      Log.setReceiver(new Receiver() {
-        @Override public void logEvent(Level level, String message) {
-          if (level == Level.ERROR) {
-            System.err.println();  // Clear the current progress line.
-            System.err.println(message);
-          } else {
-            System.out.println();  // Clear the current progress line.
-            System.out.println(message);
-          }
-        }
-      }, Level.INFO, Level.WARNING, Level.ERROR);
       File file = options.getSceneDescriptionFile();
       Scene scene = new Scene();
       try (FileInputStream in = new FileInputStream(file)) {
