@@ -1,6 +1,6 @@
-version = getVersion()
+project.version = getVersion()
 
-println "Building version ${version}"
+println "Building version ${project.version}"
 
 subprojects {
 
@@ -37,12 +37,12 @@ defaultTasks 'releaseJar'
 
 task tarball(type: Exec) {
 	// TODO(jesper): Prepend cmd /c on Windows?
-	commandLine "git archive --prefix=\"chunky-${version}\" -o build/chunky-${version}.tar.gz master".split(' ')
+	commandLine "git archive --prefix=\"chunky-${project.version}\" -o build/chunky-${project.version}.tar.gz master".split(' ')
 }
 
 task release << {
-	tryCommand([ 'git', 'commit', '-m', "Release ${version}", 'chunky/src/res/se/llbit/chunky/main/Version.properties' ], true)
-	tryCommand([ 'git', 'tag', '-a', "${version}", '-m', "Version ${version}" ], true)
+	tryCommand([ 'git', 'commit', '-m', "Release ${project.version}", 'chunky/src/res/se/llbit/chunky/main/Version.properties' ], true)
+	tryCommand([ 'git', 'tag', '-a', "${project.version}", '-m', "Version ${project.version}" ], true)
 }
 
 task releaseJar(type: JavaExec) {
@@ -51,24 +51,24 @@ task releaseJar(type: JavaExec) {
 	description 'Writes build/chunky-VERSION.jar, latest.json and updates chunky-core-VERSION.jar/version.json'
 	classpath = project(':releasetools').sourceSets.main.runtimeClasspath
 	main = 'releasetools.ReleaseBuilder'
-	args "${version}", "release_notes-${version}.txt"
+	args "${project.version}", "release_notes-${project.version}.txt"
 }
 
 task releaseZip(type: Zip) {
 	dependsOn 'copyArtifacts'
 
 	destinationDir = buildDir
-	archiveName = "Chunky-${version}.zip"
+	archiveName = "Chunky-${project.version}.zip"
 
 	from(buildDir) {
-		include "chunky-${version}.jar"
+		include "chunky-${project.version}.jar"
 		include "ReadMe.html"
-		include "release_notes-${version}.txt"
+		include "release_notes-${project.version}.txt"
 	}
 	from(projectDir) {
 		include 'license/*'
 	}
-	rename("release_notes-${version}.jar", 'chunky.jar')
+	rename("release_notes-${project.version}.jar", 'chunky.jar')
 }
 
 task nsi(type: Copy) {
@@ -77,7 +77,7 @@ task nsi(type: Copy) {
 	}
 	into project.projectDir
 	filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [
-		VERSION: "${version}".toString()
+		VERSION: "${project.version}".toString()
 	])
 }
 
@@ -151,12 +151,12 @@ task macDist(dependsOn: 'releaseJar') << {
 		name: 'Chunky',
 		displayname: 'Chunky',
 		identifier: 'se.llbit.Chunky',
-		shortversion: "${version}",
+		shortversion: "${project.version}",
 		mainclassname: 'se.llbit.chunky.launcher.ChunkyLauncher',
 		icon: file('dist/Chunky.icns').path) {
 		option(value: '-Dapple.laf.useScreenMenuBar=true')
 		option(value: '-Dapple.awt.textantialiasing=true')
-		classpath(file: file("build/chunky-${version}.jar").path)
+		classpath(file: file("build/chunky-${project.version}.jar").path)
 	}
 	tryCommand([ '/usr/bin/hdiutil',
 		'create',
@@ -183,19 +183,19 @@ task macDist(dependsOn: 'releaseJar') << {
 	tryCommand('/usr/bin/Setfile -a C /tmp/Chunky'.split(' '), true)
 	ant.symlink(link: '/tmp/Chunky', resource: '/Applications')
 	tryCommand('/usr/bin/hdiutil detach /tmp/Chunky'.split(' '), true)
-	file("build/Chunky-${version}.dmg").delete()
+	file("build/Chunky-${project.version}.dmg").delete()
 	tryCommand([ '/usr/bin/hdiutil',
 		'convert',
 		file('build/Chunky-tmp.dmg').path,
 		'-format',
 		'UDZO',
 		'-o',
-		file("build/Chunky-${version}.dmg").path ], true)
+		file("build/Chunky-${project.version}.dmg").path ], true)
 	file('build/Chunky-tmp.dmg').delete()
 	tryCommand([ '/usr/bin/hdiutil',
 		'internet-enable',
 		'-yes',
-		file("build/Chunky-${version}.dmg") ], true)
+		file("build/Chunky-${project.version}.dmg") ], true)
 }
 
 task install(dependsOn: ':chunky:install')
