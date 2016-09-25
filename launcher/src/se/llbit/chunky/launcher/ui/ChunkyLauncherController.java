@@ -30,6 +30,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.PopupWindow;
+import javafx.stage.WindowEvent;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.ChunkyDeployer;
 import se.llbit.chunky.launcher.ChunkyLauncher;
@@ -93,8 +94,6 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     advancedSettings.setExpanded(settings.showAdvancedSettings);
     advancedSettings.expandedProperty().addListener(observable -> Platform.runLater(
             () -> advancedSettings.getScene().getWindow().sizeToScene()));
-
-    updateVersionList();
 
     memoryLimit.setTooltip("Maximum Java heap space in megabytes (MiB).\n"
         + "Limited by the available memory in your computer.");
@@ -174,7 +173,6 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
       settings.downloadSnapshots = newValue;
       settings.save();
     });
-    settingsDirectory.setText(SettingsDirectory.getSettingsDirectory().getAbsolutePath());
     openSettingsDirectory.setOnAction(event -> {
       // Running Desktop.open() on the JavaFX application thread seems to
       // lock up the application on Linux, so we create a new thread to run that.
@@ -203,6 +201,23 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
         updateThread.start();
       }
     });
+  }
+
+  /**
+   * Updates the launcher settings when opening the main launcher window.
+   *
+   * <p>The launcher UI may be created before the first-time setup
+   * window is shown, at which point the settings directory has
+   * not yet been selected. The launcher settings and installed versions
+   * must thus be updated only when the launcher UI is shown.
+   */
+  protected void onShowing(WindowEvent event) {
+    File settingsDir = SettingsDirectory.getSettingsDirectory();
+    if (settingsDir != null) {
+      settingsDirectory.setText(settingsDir.getAbsolutePath());
+    }
+
+    updateVersionList();
   }
 
   private String getConfiguredJre() {

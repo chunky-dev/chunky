@@ -35,10 +35,10 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.ChunkyLauncher;
 import se.llbit.chunky.launcher.DownloadStatus;
 import se.llbit.chunky.launcher.VersionInfo;
+import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.util.Pair;
 
 import java.io.File;
@@ -80,7 +80,7 @@ public final class UpdateDialogController implements Initializable {
   public UpdateDialogController(ChunkyLauncherController launcher, VersionInfo versionInfo) {
     this.launcher = launcher;
     this.versionInfo = versionInfo;
-    File chunkyDir = PersistentSettings.settingsDirectory();
+    File chunkyDir = SettingsDirectory.getSettingsDirectory();
     libDir = new File(chunkyDir, "lib");
     if (!libDir.isDirectory()) {
       libDir.mkdirs();

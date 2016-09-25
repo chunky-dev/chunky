@@ -41,11 +41,13 @@ public class ChunkyLauncherFx extends Application {
 
   @Override public void start(Stage stage) throws Exception {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("ChunkyLauncher.fxml"));
-    loader.setController(new ChunkyLauncherController(settings));
+    ChunkyLauncherController controller = new ChunkyLauncherController(settings);
+    loader.setController(controller);
     Parent root = loader.load();
     stage.getIcons().add(new Image(getClass().getResourceAsStream("chunky-cfg.png")));
     stage.setTitle("Chunky Launcher");
     stage.setScene(new Scene(root));
+    stage.setOnShowing(controller::onShowing);
     ChunkyLauncherFx.stage = stage;
     latch.countDown();
     callback.accept(stage);

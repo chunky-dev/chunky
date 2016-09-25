@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.launcher;
 
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.VersionInfo.Library;
 import se.llbit.chunky.launcher.VersionInfo.LibraryStatus;
 import se.llbit.chunky.launcher.ui.ChunkyLauncherController;
@@ -64,7 +63,11 @@ public final class ChunkyDeployer {
    * @return <code>true</code> if the version is installed locally
    */
   public static boolean checkVersionIntegrity(String version) {
-    File chunkyDir = PersistentSettings.settingsDirectory();
+    File chunkyDir = SettingsDirectory.getSettingsDirectory();
+    if (chunkyDir == null) {
+      return false;
+    }
+
     File versionsDir = new File(chunkyDir, "versions");
     File libDir = new File(chunkyDir, "lib");
     if (!versionsDir.isDirectory() || !libDir.isDirectory()) {
@@ -136,7 +139,11 @@ public final class ChunkyDeployer {
    * @return a list of available Chunky versions sorted by release date.
    */
   public static List<VersionInfo> availableVersions() {
-    File chunkyDir = PersistentSettings.settingsDirectory();
+    File chunkyDir = SettingsDirectory.getSettingsDirectory();
+    if (chunkyDir == null) {
+      return Collections.emptyList();
+    }
+
     File versionsDir = new File(chunkyDir, "versions");
     if (!versionsDir.isDirectory()) {
       return Collections.emptyList();
@@ -170,8 +177,13 @@ public final class ChunkyDeployer {
   /**
    * Unpack embedded libraries and deploy the embedded Chunky version.
    */
-  @SuppressWarnings("ResultOfMethodCallIgnored") private static void deployEmbeddedVersion(VersionInfo version) {
-    File chunkyDir = PersistentSettings.settingsDirectory();
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  private static void deployEmbeddedVersion(VersionInfo version) {
+    File chunkyDir = SettingsDirectory.getSettingsDirectory();
+    if (chunkyDir == null) {
+      return;
+    }
+
     File versionsDir = new File(chunkyDir, "versions");
     if (!versionsDir.isDirectory()) {
       versionsDir.mkdirs();

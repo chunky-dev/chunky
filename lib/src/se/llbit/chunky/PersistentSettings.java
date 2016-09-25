@@ -72,18 +72,15 @@ public final class PersistentSettings {
   public static final int DEFAULT_3D_CANVAS_HEIGHT = 400;
 
 
-  private static final File settingsDir;
-  private static final File cacheDir;
-  private static final File settingsFile;
+  private static File settingsDir;
+  private static File cacheDir;
+  private static File settingsFile;
 
   private PersistentSettings() {
   }
 
   static {
-    settingsDir = SettingsDirectory.getSettingsDirectory();
-    settingsFile = new File(settingsDir, SETTINGS_FILE);
-    cacheDir = new File(settingsDir, "cache");
-    settings.load(settingsFile);
+    changeSettingsDirectory(SettingsDirectory.getSettingsDirectory());
   }
 
   private static void save() {
@@ -91,6 +88,8 @@ public final class PersistentSettings {
   }
 
   /**
+   * Note: must not be called before configuring the settings directory
+   * via the first-time setup dialog in the launcher.
    * @return The directory where program settings are stored
    */
   public static File settingsDirectory() {
@@ -389,6 +388,13 @@ public final class PersistentSettings {
   public static void setPlugins(JsonValue value) {
     settings.set("plugins", value);
     save();
+  }
+
+  public static void changeSettingsDirectory(File directory) {
+    settingsDir = directory;
+    settingsFile = new File(settingsDir, SETTINGS_FILE);
+    cacheDir = new File(settingsDir, "cache");
+    settings.load(settingsFile);
   }
 }
 

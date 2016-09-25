@@ -16,9 +16,9 @@
  */
 package se.llbit.chunky.launcher;
 
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.VersionInfo.Library;
 import se.llbit.chunky.launcher.VersionInfo.LibraryStatus;
+import se.llbit.chunky.resources.SettingsDirectory;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.io.PrintStream;
  */
 public class ConsoleUpdater {
   public static void update(VersionInfo version) {
-    File chunkyDir = PersistentSettings.settingsDirectory();
+    File chunkyDir = SettingsDirectory.getSettingsDirectory();
     File libDir = new File(chunkyDir, "lib");
     if (!libDir.isDirectory()) {
       libDir.mkdirs();

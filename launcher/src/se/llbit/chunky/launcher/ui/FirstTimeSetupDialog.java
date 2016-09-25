@@ -29,10 +29,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.Dialogs;
+import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.resources.SettingsDirectory;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 
 /**
  * A dialog which lets the user select a settings directory where
@@ -88,12 +91,20 @@ public class FirstTimeSetupDialog extends Stage {
             settingsDir.mkdirs();
           }
           File settingsFile = new File(settingsDir, PersistentSettings.SETTINGS_FILE);
-          if (settingsFile.isFile() || settingsFile.createNewFile()) {
-            initialized = true;
+          try (PrintStream out = new PrintStream(new FileOutputStream(settingsFile))) {
+            // Create an empty settings file (default settings will be used).
+            out.println("{}");
           }
+          File launcherSettings = new File(settingsDir, LauncherSettings.LAUNCHER_SETTINGS_FILE);
+          try (PrintStream out = new PrintStream(new FileOutputStream(launcherSettings))) {
+            // Create an empty settings file (default settings will be used).
+            out.println("{}");
+          }
+          initialized = settingsFile.isFile() && launcherSettings.isFile();
         } catch (IOException e1) {
           System.err.println(e1.getMessage());
         }
+        PersistentSettings.changeSettingsDirectory(settingsDir);
       }
       if (!initialized) {
         Dialogs.error("Failed to Initialize",

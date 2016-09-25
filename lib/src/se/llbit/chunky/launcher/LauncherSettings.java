@@ -16,14 +16,14 @@
  */
 package se.llbit.chunky.launcher;
 
-import java.io.File;
-
 import se.llbit.chunky.JsonSettings;
-import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.resources.SettingsDirectory;
+
+import java.io.File;
 
 public class LauncherSettings {
   private static final int DEFAULT_MEMORY_LIMIT = 1024;
-  private static final String LAUNCHER_SETTINGS_FILE = "chunky-launcher.json";
+  public static final String LAUNCHER_SETTINGS_FILE = "chunky-launcher.json";
 
   public String javaDir = "";
   public int memoryLimit = DEFAULT_MEMORY_LIMIT;
@@ -42,7 +42,6 @@ public class LauncherSettings {
   public boolean closeConsoleOnExit = true;
 
   private final JsonSettings settings = new JsonSettings();
-  private final File file;
 
   public boolean headless = false;
   public boolean showLauncher = true;
@@ -50,11 +49,10 @@ public class LauncherSettings {
   public boolean downloadSnapshots = false;
 
   public LauncherSettings() {
-    file = new File(PersistentSettings.settingsDirectory(), LAUNCHER_SETTINGS_FILE);
   }
 
   public void load() {
-    settings.load(file);
+    settings.load(new File(SettingsDirectory.getSettingsDirectory(), LAUNCHER_SETTINGS_FILE));
 
     javaDir = settings.getString("javaDir", "");
     if (javaDir.isEmpty()) {
@@ -77,6 +75,10 @@ public class LauncherSettings {
   }
 
   public void save() {
+    save(new File(SettingsDirectory.getSettingsDirectory(), LAUNCHER_SETTINGS_FILE));
+  }
+
+  public void save(File file) {
     settings.setString("javaDir", javaDir);
     settings.setInt("memoryLimit", memoryLimit);
     settings.setBool("showConsole", debugConsole);
@@ -91,9 +93,5 @@ public class LauncherSettings {
     settings.setBool("downloadSnapshots", downloadSnapshots);
 
     settings.save(file);
-  }
-
-  public File getFile() {
-    return file;
   }
 }
