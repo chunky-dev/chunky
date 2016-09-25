@@ -399,7 +399,7 @@ public class CommandLineOptions {
 
     if (!confError && mode != Mode.NOTHING && mode != Mode.SNAPSHOT) {
       try {
-        if (options.texturePack != null) {
+        if (options.texturePack != null && !options.texturePack.isEmpty()) {
           TexturePackLoader.loadTexturePack(new File(options.texturePack), false);
         } else {
           String lastTexturePack = PersistentSettings.getLastTexturePack();

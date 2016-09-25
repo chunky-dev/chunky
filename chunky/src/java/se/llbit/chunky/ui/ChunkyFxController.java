@@ -436,13 +436,6 @@ public class ChunkyFxController
     minimapCanvas.setOnMousePressed(minimap::onMousePressed);
 
     mapLoader.loadWorld(PersistentSettings.getLastWorld());
-    Platform.runLater(() -> {
-      try {
-        TexturePackLoader.loadTexturePack(new File(chunky.options.texturePack), false);
-      } catch (TexturePackLoader.TextureLoadingError e) {
-        Log.error("Failed to load texture pack.", e);
-      }
-    });
   }
 
   public void setStageAndScene(ChunkyFx app, Stage stage, Scene scene) {
