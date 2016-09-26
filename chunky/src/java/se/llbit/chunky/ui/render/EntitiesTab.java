@@ -183,6 +183,7 @@ public class EntitiesTab extends VBox implements RenderControlTab, Initializable
       File skinFile = fileChooser.showOpenDialog(getScene().getWindow());
       if (skinFile != null) {
         player.setTexture(skinFile.getAbsolutePath());
+        skin.setText(skinFile.getAbsolutePath());
         scene.rebuildActorBvh();
       }
     }));
