@@ -71,12 +71,17 @@ public final class JsonSettings {
    *
    * @param file destination file
    */
-  public void save(File file) {
-    String path = file.getAbsolutePath();
-    File settingsDir = file.getParentFile();
-    if (settingsDir == null) {
-      Log.error("Failed to save settings to " + path);
+  public void save(File settingsDir, File file) {
+    if (file == null) {
+      Log.error("Can't save settings: null file");
       return;
+    }
+    if (settingsDir == null) {
+      settingsDir = file.getParentFile();
+      if (settingsDir == null) {
+        Log.error("Can't save settings to file: " + file.getAbsolutePath());
+        return;
+      }
     }
     if (!settingsDir.isDirectory()) {
       Log.warn("Warning: Chunky settings directory does not exist. " +
@@ -93,9 +98,10 @@ public final class JsonSettings {
       PrettyPrinter pp = new PrettyPrinter("  ", new PrintStream(out));
       json.prettyPrint(pp);
       out.close();
-      Log.info("Saved settings to " + path);
+      Log.info("Saved settings to " + file.getAbsolutePath());
     } catch (IOException e) {
-      Log.warningfmt("Warning: Failed to save settings to %s: %s", path, e.getMessage());
+      Log.warningfmt("Warning: Failed to save settings to %s: %s",
+          file.getAbsolutePath(), e.getMessage());
     }
   }
 

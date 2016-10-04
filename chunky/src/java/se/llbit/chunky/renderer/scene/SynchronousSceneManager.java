@@ -99,6 +99,17 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         String sceneName = storedScene.name();
         Log.info("Saving scene " + sceneName);
 
+        File sceneDir = context.getSceneDirectory();
+        if (!sceneDir.isDirectory()) {
+          Log.warn("Scene directory does not exist. Creating directory at: "
+              + sceneDir.getAbsolutePath());
+          boolean success = sceneDir.mkdirs();
+          if (!success) {
+            Log.warn("Failed to create scene directory: " + sceneDir.getAbsolutePath());
+            return;
+          }
+        }
+
         // Create backup of scene description and current render dump.
         storedScene.backupFile(context, context.getSceneDescriptionFile(sceneName));
         storedScene.backupFile(context, sceneName + ".dump");
@@ -112,7 +123,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       }
       renderStatusListener.sceneSaved();
     } catch (IOException e) {
-      Log.warn("Failed to save scene. Reason: " + e.getMessage(), e);
+      Log.error("Failed to save scene. Reason: " + e.getMessage(), e);
     }
   }
 

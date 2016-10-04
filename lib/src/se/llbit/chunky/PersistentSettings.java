@@ -80,11 +80,15 @@ public final class PersistentSettings {
   }
 
   static {
-    changeSettingsDirectory(SettingsDirectory.getSettingsDirectory());
+    File directory = SettingsDirectory.getSettingsDirectory();
+    if (directory == null) {
+      directory = SettingsDirectory.getHomeDirectory();
+    }
+    changeSettingsDirectory(directory);
   }
 
   private static void save() {
-    settings.save(settingsFile);
+    settings.save(settingsDir, settingsFile);
   }
 
   /**

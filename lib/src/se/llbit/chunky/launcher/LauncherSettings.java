@@ -75,10 +75,6 @@ public class LauncherSettings {
   }
 
   public void save() {
-    save(new File(SettingsDirectory.getSettingsDirectory(), LAUNCHER_SETTINGS_FILE));
-  }
-
-  public void save(File file) {
     settings.setString("javaDir", javaDir);
     settings.setInt("memoryLimit", memoryLimit);
     settings.setBool("showConsole", debugConsole);
@@ -92,6 +88,7 @@ public class LauncherSettings {
     settings.setBool("showAdvancedSettings", showAdvancedSettings);
     settings.setBool("downloadSnapshots", downloadSnapshots);
 
-    settings.save(file);
+    File directory = SettingsDirectory.getSettingsDirectory();
+    settings.save(directory, new File(directory, LAUNCHER_SETTINGS_FILE));
   }
 }

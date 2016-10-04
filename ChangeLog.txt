@@ -1,3 +1,8 @@
+1.4.1 - TBD
+
+* Fixed scenes not able to be saved after fresh install, caused
+  by the scene directory not yet being created.
+
 1.4.0 - 2016-09-23
 
 * Chunky now requires Java 8 update 40, or a later version.
