@@ -44,9 +44,9 @@ public class PathTracer implements RayTracer {
   @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
     if (scene.isInWater(ray)) {
-      ray.setCurrentMat(Block.WATER, 0);
+      ray.setCurrentMaterial(Block.get(Block.WATER_ID), 0);
     } else {
-      ray.setCurrentMat(Block.AIR, 0);
+      ray.setCurrentMaterial(Block.AIR, 0);
     }
     pathTrace(scene, ray, state, 1, true);
   }
@@ -69,7 +69,7 @@ public class PathTracer implements RayTracer {
     while (true) {
 
       if (!PreviewRayTracer.nextIntersection(scene, ray)) {
-        if (ray.getPrevMaterial() == Block.WATER) {
+        if (ray.getPrevMaterial().isWater()) {
           ray.color.set(0, 0, 0, 1);
           hit = true;
         } else if (ray.depth == 0) {
@@ -96,18 +96,16 @@ public class PathTracer implements RayTracer {
       Material prevMat = ray.getPrevMaterial();
 
       if (!scene.stillWater && ray.n.y != 0 &&
-          ((currentMat == Block.WATER && prevMat == Block.AIR) || (currentMat == Block.AIR
-              && prevMat == Block.WATER))) {
-
+          ((currentMat.isWater() && prevMat == Block.AIR)
+              || (currentMat == Block.AIR && prevMat.isWater()))) {
         WaterModel.doWaterDisplacement(ray);
-
         if (currentMat == Block.AIR) {
           ray.n.y = -ray.n.y;
         }
       }
 
       if (currentMat.isShiny) {
-        if (currentMat == Block.WATER) {
+        if (currentMat.isWater()) {
           pSpecular = Scene.WATER_SPECULAR;
         } else {
           pSpecular = Scene.SPECULAR_COEFF;
@@ -191,7 +189,7 @@ public class PathTracer implements RayTracer {
                   reflected.o.scaleAdd(-Ray.OFFSET, ray.n);
                 }
 
-                reflected.setCurrentMat(reflected.getPrevMaterial(), reflected.getPrevData());
+                reflected.setCurrentMaterial(reflected.getPrevMaterial(), reflected.getPrevData());
 
                 getDirectLightAttenuation(scene, reflected, state);
 
@@ -233,10 +231,9 @@ public class PathTracer implements RayTracer {
         } else if (n1 != n2) {
           // Refraction.
 
-          boolean doRefraction = currentMat == Block.WATER ||
-              prevMat == Block.WATER ||
-              currentMat == Block.ICE ||
-              prevMat == Block.ICE;
+          // TODO: make this decision dependent on the material properties:
+          boolean doRefraction = currentMat.isWater() || prevMat.isWater() ||
+              currentMat == Block.get(Block.ICE_ID) || prevMat == Block.get(Block.ICE_ID);
 
           // Refraction.
           float n1n2 = n1 / n2;
@@ -328,7 +325,7 @@ public class PathTracer implements RayTracer {
         }
       }
 
-      if (hit && prevMat == Block.WATER) {
+      if (hit && prevMat.isWater()) {
         // Render water fog effect.
         double a = ray.distance / scene.waterVisibility;
         double attenuation = 1 - QuickMath.min(1, a * a);
@@ -365,7 +362,7 @@ public class PathTracer implements RayTracer {
       double offset = QuickMath.clamp(airDistance * random.nextFloat(), Ray.EPSILON, airDistance - Ray.EPSILON);
       atmos.o.scaleAdd(offset, od, ox);
       sun.getRandomSunDirection(atmos, random);
-      atmos.setCurrentMat(Block.AIR, 0);
+      atmos.setCurrentMaterial(Block.AIR, 0);
 
       double fogDensity = scene.getFogDensity() * EXTINCTION_FACTOR;
       double extinction = Math.exp(-airDistance * fogDensity);
@@ -411,7 +408,7 @@ public class PathTracer implements RayTracer {
       attenuation.y *= ray.color.y * ray.color.w + mult;
       attenuation.z *= ray.color.z * ray.color.w + mult;
       attenuation.w *= mult;
-      if (ray.getPrevMaterial() == Block.WATER) {
+      if (ray.getPrevMaterial().isWater()) {
         double a = ray.distance / scene.waterVisibility;
         attenuation.w *= 1 - QuickMath.min(1, a * a);
       }

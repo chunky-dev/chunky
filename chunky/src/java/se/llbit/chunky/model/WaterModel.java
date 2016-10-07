@@ -21,6 +21,7 @@ import java.util.List;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
+import se.llbit.chunky.world.Material;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
@@ -388,22 +389,23 @@ public class WaterModel {
       Vector2 t3 = new Vector2(1, 1);
       Vector2 t4 = new Vector2(1, 0);
       int dir = 3 & (data >> BlockData.LILY_PAD_ROTATION);
+      Material lilyMaterial = Block.get(Block.LILY_PAD_ID);
       switch (dir) {
         case 0:
-          primitives.add(new TexturedTriangle(c1, c3, c2, t1, t3, t2, Block.LILY_PAD));
-          primitives.add(new TexturedTriangle(c1, c4, c3, t1, t4, t3, Block.LILY_PAD));
+          primitives.add(new TexturedTriangle(c1, c3, c2, t1, t3, t2, lilyMaterial));
+          primitives.add(new TexturedTriangle(c1, c4, c3, t1, t4, t3, lilyMaterial));
           break;
         case 1:
-          primitives.add(new TexturedTriangle(c1, c3, c2, t4, t2, t1, Block.LILY_PAD));
-          primitives.add(new TexturedTriangle(c1, c4, c3, t4, t3, t2, Block.LILY_PAD));
+          primitives.add(new TexturedTriangle(c1, c3, c2, t4, t2, t1, lilyMaterial));
+          primitives.add(new TexturedTriangle(c1, c4, c3, t4, t3, t2, lilyMaterial));
           break;
         case 2:
-          primitives.add(new TexturedTriangle(c1, c3, c2, t3, t1, t4, Block.LILY_PAD));
-          primitives.add(new TexturedTriangle(c1, c4, c3, t3, t2, t1, Block.LILY_PAD));
+          primitives.add(new TexturedTriangle(c1, c3, c2, t3, t1, t4, lilyMaterial));
+          primitives.add(new TexturedTriangle(c1, c4, c3, t3, t2, t1, lilyMaterial));
           break;
         case 3:
-          primitives.add(new TexturedTriangle(c1, c3, c2, t2, t4, t3, Block.LILY_PAD));
-          primitives.add(new TexturedTriangle(c1, c4, c3, t2, t1, t4, Block.LILY_PAD));
+          primitives.add(new TexturedTriangle(c1, c3, c2, t2, t4, t3, lilyMaterial));
+          primitives.add(new TexturedTriangle(c1, c4, c3, t2, t1, t4, lilyMaterial));
           break;
       }
     }

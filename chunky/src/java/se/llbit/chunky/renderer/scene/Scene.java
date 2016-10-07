@@ -511,14 +511,14 @@ public class Scene extends SceneDescription {
       }
     }
     Ray oct = new Ray(ray);
-    oct.setCurrentMat(ray.getPrevMaterial(), ray.getPrevData());
+    oct.setCurrentMaterial(ray.getPrevMaterial(), ray.getPrevData());
     if (worldOctree.intersect(this, oct) && oct.distance < ray.t) {
       ray.distance += oct.distance;
       ray.o.set(oct.o);
       ray.n.set(oct.n);
       ray.color.set(oct.color);
-      ray.setPrevMat(oct.getPrevMaterial(), oct.getPrevData());
-      ray.setCurrentMat(oct.getCurrentMaterial(), oct.getCurrentData());
+      ray.setPrevMaterial(oct.getPrevMaterial(), oct.getPrevData());
+      ray.setCurrentMaterial(oct.getCurrentMaterial(), oct.getCurrentData());
       updateOpacity(ray);
       return true;
     }
@@ -532,8 +532,8 @@ public class Scene extends SceneDescription {
   }
 
   public void updateOpacity(Ray ray) {
-    if (ray.getCurrentMaterial() == Block.WATER || (ray.getCurrentMaterial() == Block.AIR
-        && ray.getPrevMaterial() == Block.WATER)) {
+    if (ray.getCurrentMaterial().isWater() || (ray.getCurrentMaterial() == Block.AIR
+        && ray.getPrevMaterial().isWater())) {
       if (useCustomWaterColor) {
         ray.color.x = waterColor.x;
         ray.color.y = waterColor.y;
@@ -730,10 +730,11 @@ public class Scene extends SceneDescription {
             for (int cx = 0; cx < 16; ++cx) {
               int x = cx + cp.x * 16 - origin.x;
               int index = Chunk.chunkIndex(cx, cy, cz);
-              Block block = Block.get(blocks[index]);
+              int blockId = blocks[index];
+              Block block = Block.get(blockId);
 
               if (cx > 0 && cx < 15 && cz > 0 && cz < 15 && cy > 0 && cy < 255 &&
-                  block != Block.STONE && block.isOpaque) {
+                  blockId != Block.STONE_ID && block.isOpaque) {
 
                 // Set obscured blocks to stone. This makes adjacent obscured
                 // blocks be able to be merged into larger octree nodes
@@ -776,7 +777,7 @@ public class Scene extends SceneDescription {
                     Block above = Block.get(blocks[index]);
                     if (above.isWater()) {
                       type |= (1 << WaterModel.FULL_BLOCK);
-                    } else if (above == Block.LILY_PAD) {
+                    } else if (above == Block.get(Block.LILY_PAD_ID)) {
                       type |= (1 << BlockData.LILY_PAD);
                       long wx = cp.x * 16L + cx;
                       long wy = cy + 1;
@@ -1050,7 +1051,7 @@ public class Scene extends SceneDescription {
     int zcenter = (zmax + zmin) / 2;
     for (int y = Chunk.Y_MAX - 1; y >= 0; --y) {
       int block = worldOctree.get(xcenter - origin.x, y - origin.y, zcenter - origin.z);
-      if (Block.get(block) != Block.AIR) {
+      if (block != Block.AIR_ID) {
         return new Vector3(xcenter, y + 5, zcenter);
       }
     }
@@ -1194,9 +1195,9 @@ public class Scene extends SceneDescription {
     WorkerState state = new WorkerState();
     state.ray = ray;
     if (isInWater(ray)) {
-      ray.setCurrentMat(Block.WATER, 0);
+      ray.setCurrentMaterial(Block.get(Block.WATER_ID), 0);
     } else {
-      ray.setCurrentMat(Block.AIR, 0);
+      ray.setCurrentMaterial(Block.AIR, 0);
     }
     ray.d.set(0, 0, 1);
     ray.o.set(camera.getPosition());

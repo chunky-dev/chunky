@@ -51,7 +51,7 @@ public class OctreeFinalizer {
 
           // Set non-visible blocks to be stone, in order to merge large patches.
           if ((cx == 0 || cx == 15 || cz == 0 || cz == 15) && cy > -origin.y
-              && cy < Chunk.Y_MAX - origin.y - 1 && block != Block.STONE && block.isOpaque) {
+              && cy < Chunk.Y_MAX - origin.y - 1 && type != Block.STONE_ID && block.isOpaque) {
             if (Block.get(octree.get(x - 1, cy, z)).isOpaque && Block
                 .get(octree.get(x + 1, cy, z)).isOpaque && Block
                 .get(octree.get(x, cy - 1, z)).isOpaque && Block
@@ -77,6 +77,7 @@ public class OctreeFinalizer {
           int bd_alt;
           int tex;
 
+          int otherId;
           Block other;
           Block other_alt;
           Block above;
@@ -107,7 +108,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x - 1, cy, z);
               level = level0;
-              if (Block.get(data) == Block.WATER) {
+              if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -118,7 +119,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x - 1, cy, z + 1);
               level = level0;
-              if (Block.get(data) == Block.WATER) {
+              if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -128,7 +129,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x, cy, z + 1);
               level = level0;
-              if (Block.get(data) == Block.WATER) {
+              if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -139,7 +140,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x + 1, cy, z + 1);
               level = level0;
-              if (Block.get(data) == Block.WATER) {
+              if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -149,7 +150,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x + 1, cy, z);
               level = level0;
-              if (Block.get(data) == Block.WATER) {
+              if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -160,7 +161,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x + 1, cy, z - 1);
               level = level0;
-              if (Block.get(data) == Block.WATER) {
+              if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -170,7 +171,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x, cy, z - 1);
               level = level0;
-              if (Block.get(data) == Block.WATER) {
+              if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -181,7 +182,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x - 1, cy, z - 1);
               level = level0;
-              if (Block.get(data) == Block.WATER) {
+              if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -212,7 +213,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x - 1, cy, z);
               level = level0;
-              if (Block.get(data) == Block.LAVA) {
+              if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -223,7 +224,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x - 1, cy, z + 1);
               level = level0;
-              if (Block.get(data) == Block.LAVA) {
+              if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -233,7 +234,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x, cy, z + 1);
               level = level0;
-              if (Block.get(data) == Block.LAVA) {
+              if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -244,7 +245,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x + 1, cy, z + 1);
               level = level0;
-              if (Block.get(data) == Block.LAVA) {
+              if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -254,7 +255,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x + 1, cy, z);
               level = level0;
-              if (Block.get(data) == Block.LAVA) {
+              if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -265,7 +266,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x + 1, cy, z - 1);
               level = level0;
-              if (Block.get(data) == Block.LAVA) {
+              if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -275,7 +276,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x, cy, z - 1);
               level = level0;
-              if (Block.get(data) == Block.LAVA) {
+              if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -286,7 +287,7 @@ public class OctreeFinalizer {
 
               data = octree.get(x - 1, cy, z - 1);
               level = level0;
-              if (Block.get(data) == Block.LAVA) {
+              if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
               } else if (!Block.get(data).isSolid) {
@@ -305,12 +306,12 @@ public class OctreeFinalizer {
               octree.set(type, x, cy, z);
               break;
             case Block.TRIPWIRE_ID:
-              other = Block.get(octree.get(x - 1, cy, z));
-              if (other == Block.TRIPWIRE || other == Block.TRIPWIREHOOK) {
+              otherId = 0xFF & octree.get(x - 1, cy, z);
+              if (otherId == Block.TRIPWIRE_ID || otherId == Block.TRIPWIREHOOK_ID) {
                 type |= 1 << 12;
               } else {
-                other = Block.get(octree.get(x + 1, cy, z));
-                if (other == Block.TRIPWIRE || other == Block.TRIPWIREHOOK) {
+                otherId = 0xFF & octree.get(x + 1, cy, z);
+                if (otherId == Block.TRIPWIRE_ID || otherId == Block.TRIPWIREHOOK_ID) {
                   type |= 1 << 12;
                 }
               }
@@ -324,26 +325,26 @@ public class OctreeFinalizer {
               south = Block.get(octree.get(x, cy, z + 1));
 
               if (above == Block.AIR) {
-                Block westAbove = Block.get(octree.get(x - 1, cy + 1, z));
-                if (west.isSolid && westAbove == Block.REDSTONEWIRE) {
+                int westAbove = 0xFF & octree.get(x - 1, cy + 1, z);
+                if (west.isSolid && westAbove == Block.REDSTONEWIRE_ID) {
                   // wire on west block side
                   type |= 1 << BlockData.RSW_WEST_CONNECTION;
                   type |= 1 << BlockData.RSW_WEST_SIDE;
                 }
-                Block eastAbove = Block.get(octree.get(x + 1, cy + 1, z));
-                if (east.isSolid && eastAbove == Block.REDSTONEWIRE) {
+                int eastAbove = 0xFF & octree.get(x + 1, cy + 1, z);
+                if (east.isSolid && eastAbove == Block.REDSTONEWIRE_ID) {
                   // wire on east block side
                   type |= 1 << BlockData.RSW_EAST_CONNECTION;
                   type |= 1 << BlockData.RSW_EAST_SIDE;
                 }
-                Block northAbove = Block.get(octree.get(x, cy + 1, z - 1));
-                if (north.isSolid && northAbove == Block.REDSTONEWIRE) {
+                int northAbove = 0xFF & octree.get(x, cy + 1, z - 1);
+                if (north.isSolid && northAbove == Block.REDSTONEWIRE_ID) {
                   // wire on north block side
                   type |= 1 << BlockData.RSW_NORTH_CONNECTION;
                   type |= 1 << BlockData.RSW_NORTH_SIDE;
                 }
-                Block southAbove = Block.get(octree.get(x, cy + 1, z + 1));
-                if (south.isSolid && southAbove == Block.REDSTONEWIRE) {
+                int southAbove = 0xFF & octree.get(x, cy + 1, z + 1);
+                if (south.isSolid && southAbove == Block.REDSTONEWIRE_ID) {
                   // wire on south block side
                   type |= 1 << BlockData.RSW_SOUTH_CONNECTION;
                   type |= 1 << BlockData.RSW_SOUTH_SIDE;
@@ -353,8 +354,8 @@ public class OctreeFinalizer {
               if (west.isRedstoneWireConnector()) {
                 type |= 1 << BlockData.RSW_WEST_CONNECTION;
               } else if (west == Block.AIR) {
-                Block westBelow = Block.get(octree.get(x - 1, cy - 1, z));
-                if (westBelow == Block.REDSTONEWIRE) {
+                int westBelow = 0xFF & octree.get(x - 1, cy - 1, z);
+                if (westBelow == Block.REDSTONEWIRE_ID) {
                   type |= 1 << BlockData.RSW_WEST_CONNECTION;
                 }
               }
@@ -362,8 +363,8 @@ public class OctreeFinalizer {
               if (east.isRedstoneWireConnector()) {
                 type |= 1 << BlockData.RSW_EAST_CONNECTION;
               } else if (east == Block.AIR) {
-                Block eastBelow = Block.get(octree.get(x + 1, cy - 1, z));
-                if (eastBelow == Block.REDSTONEWIRE) {
+                int eastBelow = 0xFF & octree.get(x + 1, cy - 1, z);
+                if (eastBelow == Block.REDSTONEWIRE_ID) {
                   type |= 1 << BlockData.RSW_EAST_CONNECTION;
                 }
               }
@@ -371,8 +372,8 @@ public class OctreeFinalizer {
               if (north.isRedstoneWireConnector() || south.isRedstoneWireConnector()) {
                 type |= 1 << BlockData.RSW_NORTH_CONNECTION;
               } else if (north == Block.AIR) {
-                Block northBelow = Block.get(octree.get(x, cy - 1, z - 1));
-                if (northBelow == Block.REDSTONEWIRE) {
+                int northBelow = 0xFF & octree.get(x, cy - 1, z - 1);
+                if (northBelow == Block.REDSTONEWIRE_ID) {
                   type |= 1 << BlockData.RSW_NORTH_CONNECTION;
                 }
               }
@@ -380,8 +381,8 @@ public class OctreeFinalizer {
               if (south.isRedstoneWireConnector()) {
                 type |= 1 << BlockData.RSW_SOUTH_CONNECTION;
               } else if (south == Block.AIR) {
-                Block southBelow = Block.get(octree.get(x, cy - 1, z + 1));
-                if (southBelow == Block.REDSTONEWIRE) {
+                int southBelow = 0xFF & octree.get(x, cy - 1, z + 1);
+                if (southBelow == Block.REDSTONEWIRE_ID) {
                   type |= 1 << BlockData.RSW_SOUTH_CONNECTION;
                 }
               }
@@ -389,25 +390,25 @@ public class OctreeFinalizer {
               octree.set(type, x, cy, z);
               break;
             case Block.MELONSTEM_ID:
-              if (Block.get(octree.get(x - 1, cy, z)) == Block.MELON) {
+              if ((0xFF & octree.get(x - 1, cy, z)) == Block.MELON_ID) {
                 type |= 1 << 16;
-              } else if (Block.get(octree.get(x + 1, cy, z)) == Block.MELON) {
+              } else if ((0xFF & octree.get(x + 1, cy, z)) == Block.MELON_ID) {
                 type |= 2 << 16;
-              } else if (Block.get(octree.get(x, cy, z - 1)) == Block.MELON) {
+              } else if ((0xFF & octree.get(x, cy, z - 1)) == Block.MELON_ID) {
                 type |= 3 << 16;
-              } else if (Block.get(octree.get(x, cy, z + 1)) == Block.MELON) {
+              } else if ((0xFF & octree.get(x, cy, z + 1)) == Block.MELON_ID) {
                 type |= 4 << 16;
               }
               octree.set(type, x, cy, z);
               break;
             case Block.PUMPKINSTEM_ID:
-              if (Block.get(octree.get(x - 1, cy, z)) == Block.PUMPKIN) {
+              if ((0xFF & octree.get(x - 1, cy, z)) == Block.PUMPKIN_ID) {
                 type |= 1 << 16;
-              } else if (Block.get(octree.get(x + 1, cy, z)) == Block.PUMPKIN) {
+              } else if ((0xFF & octree.get(x + 1, cy, z)) == Block.PUMPKIN_ID) {
                 type |= 2 << 16;
-              } else if (Block.get(octree.get(x, cy, z - 1)) == Block.PUMPKIN) {
+              } else if ((0xFF & octree.get(x, cy, z - 1)) == Block.PUMPKIN_ID) {
                 type |= 3 << 16;
-              } else if (Block.get(octree.get(x, cy, z + 1)) == Block.PUMPKIN) {
+              } else if ((0xFF & octree.get(x, cy, z + 1)) == Block.PUMPKIN_ID) {
                 type |= 4 << 16;
               }
               octree.set(type, x, cy, z);
@@ -416,15 +417,15 @@ public class OctreeFinalizer {
               dir = type >> 8;
               tex = 0;
               if (dir < 4) {
-                if (Block.get(octree.get(x - 1, cy, z)) == Block.TRAPPEDCHEST) {
+                if ((0xFF & octree.get(x - 1, cy, z)) == Block.TRAPPEDCHEST_ID) {
                   tex = 1 + (dir - 1) % 2;
-                } else if (Block.get(octree.get(x + 1, cy, z)) == Block.TRAPPEDCHEST) {
+                } else if ((0xFF & octree.get(x + 1, cy, z)) == Block.TRAPPEDCHEST_ID) {
                   tex = 1 + dir % 2;
                 }
               } else {
-                if (Block.get(octree.get(x, cy, z - 1)) == Block.TRAPPEDCHEST) {
+                if ((0xFF & octree.get(x, cy, z - 1)) == Block.TRAPPEDCHEST_ID) {
                   tex = 1 + dir % 2;
-                } else if (Block.get(octree.get(x, cy, z + 1)) == Block.TRAPPEDCHEST) {
+                } else if ((0xFF & octree.get(x, cy, z + 1)) == Block.TRAPPEDCHEST_ID) {
                   tex = 1 + (dir - 1) % 2;
                 }
               }
@@ -435,15 +436,15 @@ public class OctreeFinalizer {
               dir = type >> 8;
               tex = 0;
               if (dir < 4) {
-                if (Block.get(octree.get(x - 1, cy, z)) == Block.CHEST) {
+                if ((0xFF & octree.get(x - 1, cy, z)) == Block.CHEST_ID) {
                   tex = 1 + (dir - 1) % 2;
-                } else if (Block.get(octree.get(x + 1, cy, z)) == Block.CHEST) {
+                } else if ((0xFF & octree.get(x + 1, cy, z)) == Block.CHEST_ID) {
                   tex = 1 + dir % 2;
                 }
               } else {
-                if (Block.get(octree.get(x, cy, z - 1)) == Block.CHEST) {
+                if ((0xFF & octree.get(x, cy, z - 1)) == Block.CHEST_ID) {
                   tex = 1 + dir % 2;
-                } else if (Block.get(octree.get(x, cy, z + 1)) == Block.CHEST) {
+                } else if ((0xFF & octree.get(x, cy, z + 1)) == Block.CHEST_ID) {
                   tex = 1 + (dir - 1) % 2;
                 }
               }
@@ -511,9 +512,9 @@ public class OctreeFinalizer {
               if (connections != 3 && connections != 12) {
                 type |= 1 << BlockData.STONEWALL_CORNER;
               } else if (cy + 1 < Chunk.Y_MAX) {
-                other = Block.get(octree.get(x, cy + 1, z));
-                if (other == Block.TORCH || other == Block.REDSTONETORCHON
-                    || other == Block.REDSTONETORCHOFF) {
+                otherId = (0xFF & octree.get(x, cy + 1, z));
+                if (otherId == Block.TORCH_ID || otherId == Block.REDSTONETORCHON_ID
+                    || otherId == Block.REDSTONETORCHOFF_ID) {
                   type |= 1 << BlockData.STONEWALL_CORNER;
                 }
               }
@@ -571,17 +572,17 @@ public class OctreeFinalizer {
               dir = 3 & (type >> BlockData.OFFSET);
               if (dir == 0 || dir == 2) {
                 // facing north or south
-                west = Block.get(octree.get(x - 1, cy, z));
-                east = Block.get(octree.get(x + 1, cy, z));
-                if (west == Block.STONEWALL && east == Block.STONEWALL) {
+                int westId = (0xFF & octree.get(x - 1, cy, z));
+                int eastId = (0xFF & octree.get(x + 1, cy, z));
+                if (westId == Block.STONEWALL_ID && eastId == Block.STONEWALL_ID) {
                   type |= 1 << BlockData.FENCEGATE_LOW;
                   octree.set(type, x, cy, z);
                 }
               } else {
                 // facing east or west
-                north = Block.get(octree.get(x, cy, z - 1));
-                south = Block.get(octree.get(x, cy, z + 1));
-                if (north == Block.STONEWALL && south == Block.STONEWALL) {
+                int northId = (0xFF & octree.get(x, cy, z - 1));
+                int southId = (0xFF & octree.get(x, cy, z + 1));
+                if (northId == Block.STONEWALL_ID && southId == Block.STONEWALL_ID) {
                   type |= 1 << BlockData.FENCEGATE_LOW;
                   octree.set(type, x, cy, z);
                 }
@@ -809,7 +810,7 @@ public class OctreeFinalizer {
                 type |= BlockData.CONNECTED_ABOVE << BlockData.OFFSET;
               }
               other = Block.get(octree.get(x, cy - 1, z));
-              if (other.isChorusPlant() || other == Block.ENDSTONE) {
+              if (other.isChorusPlant() || other.id == Block.ENDSTONE_ID) {
                 type |= BlockData.CONNECTED_BELOW << BlockData.OFFSET;
               }
               octree.set(type, x, cy, z);

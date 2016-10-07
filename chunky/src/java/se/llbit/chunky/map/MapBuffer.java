@@ -58,7 +58,7 @@ public class MapBuffer {
   private boolean cached = false;
 
   private boolean highlightEnabled = false;
-  private Block highlightBlock = Block.DIAMONDORE;
+  private Block highlightBlock = Block.get(Block.DIAMONDORE_ID);
   private Color highlightColor = Color.CRIMSON;
 
   private ChunkView view = ChunkView.EMPTY;

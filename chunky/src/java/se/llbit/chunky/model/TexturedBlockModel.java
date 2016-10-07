@@ -124,12 +124,11 @@ public class TexturedBlockModel {
   }
 
   /**
-   * Find the color of the object at the intersection point
+   * Find the color of the object at the intersection point.
    *
    * @param ray ray to test
    */
   public static void getIntersectionColor(Ray ray) {
-
     if (ray.getCurrentMaterial() == Block.AIR) {
       ray.color.x = 1;
       ray.color.y = 1;
@@ -137,9 +136,7 @@ public class TexturedBlockModel {
       ray.color.w = 0;
       return;
     }
-
     calcUVCoords(ray);
-
     ray.getCurrentMaterial().getTexture(ray.getBlockData()).getColor(ray);
   }
 

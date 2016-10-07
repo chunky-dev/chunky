@@ -17,6 +17,7 @@
 package se.llbit.chunky.map;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Chunk;
@@ -48,7 +49,7 @@ public class SurfaceLayer extends BitmapLayer {
     for (int x = 0; x < Chunk.X_MAX; ++x) {
       for (int z = 0; z < Chunk.Z_MAX; ++z) {
 
-        // find the topmost non-empty block
+        // Find the topmost non-empty block.
         int y = Chunk.Y_MAX - 1;
         if (dim != -1) {
           for (; y > 0; --y) {
@@ -129,7 +130,7 @@ public class SurfaceLayer extends BitmapLayer {
                 depth += 1;
               }
 
-              ColorUtil.getRGBAComponents(Block.WATER.getTexture(data).getAvgColor(), blockColor);
+              ColorUtil.getRGBAComponents(Texture.water.getAvgColor(), blockColor);
               blockColor[3] = QuickMath.max(.5f, 1.f - depth / 32.f);
               break;
 

@@ -105,4 +105,8 @@ public abstract class Material {
   public static Material fromJson(JsonValue json) {
     throw new UnsupportedOperationException("TODO");
   }
+
+  public boolean isWater() {
+    return false;
+  }
 }

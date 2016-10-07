@@ -283,11 +283,10 @@ public class Octree {
    * Test whether the ray intersects any voxel before exiting the Octree.
    *
    * @param ray   the ray
-   * @return <code>true</code> if the ray intersects a voxel
+   * @return {@code true} if the ray intersects a voxel
    */
   public boolean intersect(Scene scene, Ray ray) {
-
-    if (ray.getCurrentMaterial() == Block.WATER) {
+    if (ray.getCurrentMaterial().isWater()) {
       return exitWater(scene, ray);
     } else {
       return enterBlock(scene, ray);
@@ -392,8 +391,8 @@ public class Octree {
       Block currentBlock = Block.get(node.type);
       Material prevBlock = ray.getCurrentMaterial();
 
-      ray.setPrevMat(prevBlock, ray.getCurrentData());
-      ray.setCurrentMat(currentBlock, node.type);
+      ray.setPrevMaterial(prevBlock, ray.getCurrentData());
+      ray.setCurrentMaterial(currentBlock, node.type);
 
       if (currentBlock.localIntersect) {
 
@@ -404,9 +403,8 @@ public class Octree {
           ray.o.scaleAdd(Ray.OFFSET, ray.d);
           continue;
         } else {
-          // exit ray from this local block
-          ray.setCurrentMat(Block.AIR, 0);// current material is air
-
+          // Exit ray from this local block.
+          ray.setCurrentMaterial(Block.AIR, 0); // Current material is air.
           ray.exitBlock(x, y, z);
           continue;
         }
@@ -415,7 +413,7 @@ public class Octree {
         return true;
       }
 
-      // exit current octree leaf
+      // Exit current octree leaf.
       t = ((lx << level) - ray.o.x) / d.x;
       if (t > Ray.EPSILON) {
         tNear = t;
@@ -559,13 +557,13 @@ public class Octree {
       Block currentBlock = Block.get(node.type);
       Material prevBlock = ray.getCurrentMaterial();
 
-      ray.setPrevMat(prevBlock, ray.getCurrentData());
-      ray.setCurrentMat(currentBlock, node.type);
+      ray.setPrevMaterial(prevBlock, ray.getCurrentData());
+      ray.setCurrentMaterial(currentBlock, node.type);
 
-      if (currentBlock != Block.WATER) {
+      if (!currentBlock.isWater()) {
         if (currentBlock.localIntersect) {
           if (!currentBlock.intersect(ray, scene)) {
-            ray.setCurrentMat(Block.AIR, 0);
+            ray.setCurrentMaterial(Block.AIR, 0);
           }
           return true;
         } else if (currentBlock != Block.AIR) {
@@ -576,11 +574,10 @@ public class Octree {
         }
       }
 
-      // exit current octree leaf
+      // Exit current octree leaf.
       if ((node.type & (1 << WaterModel.FULL_BLOCK)) == 0) {
         if (WaterModel.intersectTop(ray)) {
-          ray.setCurrentMat(Block.AIR, 0);
-          //ray.n.negate();
+          ray.setCurrentMaterial(Block.AIR, 0);
           return true;
         } else {
           ray.exitBlock(x, y, z);

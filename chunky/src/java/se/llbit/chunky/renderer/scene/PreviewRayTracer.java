@@ -32,9 +32,9 @@ public class PreviewRayTracer implements RayTracer {
   @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
     if (scene.isInWater(ray)) {
-      ray.setCurrentMat(Block.WATER, 0);
+      ray.setCurrentMaterial(Block.get(Block.WATER_ID), 0);
     } else {
-      ray.setCurrentMat(Block.AIR, 0);
+      ray.setCurrentMaterial(Block.AIR, 0);
     }
     while (true) {
       if (!nextIntersection(scene, ray)) {
@@ -80,7 +80,7 @@ public class PreviewRayTracer implements RayTracer {
    */
   public static boolean nextIntersection(Scene scene, Ray ray) {
 
-    ray.setPrevMat(ray.getCurrentMaterial(), ray.getCurrentData());
+    ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());
     ray.t = Double.POSITIVE_INFINITY;
     boolean hit = false;
     if (scene.sky().cloudsEnabled()) {
@@ -99,7 +99,7 @@ public class PreviewRayTracer implements RayTracer {
       scene.updateOpacity(ray);
       return true;
     } else {
-      ray.setCurrentMat(Block.AIR, 0);
+      ray.setCurrentMaterial(Block.AIR, 0);
       return false;
     }
   }
@@ -112,9 +112,9 @@ public class PreviewRayTracer implements RayTracer {
         vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
         if (!scene.isInsideOctree(vec)) {
           ray.t = t;
-          Block.WATER.getColor(ray);
+          Block.get(Block.WATER_ID).getColor(ray);
           ray.n.set(0, 1, 0);
-          ray.setCurrentMat(Block.WATER, 0);
+          ray.setCurrentMaterial(Block.get(Block.WATER_ID), 0);
           return true;
         }
       }
@@ -126,9 +126,9 @@ public class PreviewRayTracer implements RayTracer {
         vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
         if (!scene.isInsideOctree(vec)) {
           ray.t = t;
-          Block.WATER.getColor(ray);
+          Block.get(Block.WATER_ID).getColor(ray);
           ray.n.set(0, -1, 0);
-          ray.setCurrentMat(Block.AIR, 0);
+          ray.setCurrentMaterial(Block.AIR, 0);
           return true;
         }
       }
@@ -152,7 +152,7 @@ public class PreviewRayTracer implements RayTracer {
           } else {
             ray.color.set(0.25, 0.25, 0.25, 1);
           }
-          ray.setCurrentMat(Block.STONE, 0);
+          ray.setCurrentMaterial(Block.get(Block.STONE_ID), 0);
           ray.n.set(0, 1, 0);
           return true;
         }

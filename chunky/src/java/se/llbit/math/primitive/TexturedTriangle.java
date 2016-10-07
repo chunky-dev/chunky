@@ -96,7 +96,7 @@ public class TexturedTriangle implements Primitive {
       ray.u = t1.x * u + t2.x * v + t3.x * w;
       ray.v = t1.y * u + t2.y * v + t3.y * w;
       material.getColor(ray);
-      ray.setCurrentMat(material, 0);
+      ray.setCurrentMaterial(material, 0);
       ray.t = t;
       ray.n.set(n);
       return true;

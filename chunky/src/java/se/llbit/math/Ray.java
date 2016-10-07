@@ -373,22 +373,17 @@ public class Ray {
     n.set(ux * tx + vx * ty + n.x * tz, uy * tx + vy * ty + n.y * tz, uz * tx + vz * ty + n.z * tz);
   }
 
-  public void setPrevMat(Material mat, int data) {
+  public void setPrevMaterial(Material mat, int data) {
     this.prevMaterial = mat;
     this.prevData = data;
   }
 
-  public void setPrevMat(int blockId) {
-    this.prevMaterial = Block.get(blockId);
-    this.prevData = blockId;
-  }
-
-  public void setCurrentMat(Material mat, int data) {
+  public void setCurrentMaterial(Material mat, int data) {
     this.currentMaterial = mat;
     this.currentData = data;
   }
 
-  public void setMat(int blockId) {
+  public void setMaterial(int blockId) {
     this.currentMaterial = Block.get(blockId);
     this.currentData = blockId;
   }
@@ -408,5 +403,4 @@ public class Ray {
   public int getCurrentData() {
     return currentData;
   }
-
 }

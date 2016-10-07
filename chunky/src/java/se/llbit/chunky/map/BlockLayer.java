@@ -83,7 +83,7 @@ public class BlockLayer extends AbstractLayer {
           int xp0 = x * 16;
 
           byte block = blocks[x * Chunk.Z_MAX + z];
-          if (block == Block.AIR.id) {
+          if (block == Block.AIR_ID) {
             for (int i = 0; i < 16; ++i) {
               for (int j = 0; j < 16; ++j) {
                 tile.setPixel(xp0 + j, yp0 + i, 0xFFFFFFFF);
@@ -134,7 +134,7 @@ public class BlockLayer extends AbstractLayer {
   }
 
   private int avgBlockColor(byte block, byte biome) {
-    if (block == Block.AIR.id) {
+    if (block == Block.AIR_ID) {
       return 0xFFFFFFFF;
     } else {
       switch ((int) block) {

@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Sky model and sky state for ray tracing.
@@ -84,7 +85,6 @@ public class Sky implements JSONifiable {
   public static final int SKYBOX_LEFT = 5;
 
   // TODO(jesper): add simulated night-time mode.
-
 
   /**
    * Sky rendering mode
@@ -598,19 +598,12 @@ public class Sky implements JSONifiable {
   }
 
   public void setGradient(List<Vector4> newGradient) {
-    gradient = new ArrayList<>(newGradient.size());
-    for (Vector4 stop : newGradient) {
-      gradient.add(new Vector4(stop));
-    }
+    gradient = newGradient.stream().map(Vector4::new).collect(Collectors.toList());
     scene.refresh();
   }
 
   public List<Vector4> getGradient() {
-    List<Vector4> copy = new ArrayList<>(gradient.size());
-    for (Vector4 stop : gradient) {
-      copy.add(new Vector4(stop));
-    }
-    return copy;
+    return gradient.stream().map(Vector4::new).collect(Collectors.toList());
   }
 
   public static JsonArray gradientJson(Collection<Vector4> gradient) {
@@ -966,16 +959,16 @@ public class Sky implements JSONifiable {
   private static void onCloudEnter(Ray ray, double t) {
     ray.t = t;
     ray.color.set(1, 1, 1, 1);
-    ray.setPrevMat(Block.AIR, 0);
-    ray.setCurrentMat(Block.STONE, 0);
+    ray.setPrevMaterial(Block.AIR, 0);
+    ray.setCurrentMaterial(Block.get(Block.STONE_ID), 0);
     // TODO add Cloud material
   }
 
   private static void onCloudExit(Ray ray, double t) {
     ray.t = t;
     ray.color.set(1, 1, 1, 1);
-    ray.setPrevMat(Block.STONE, 0);
-    ray.setCurrentMat(Block.AIR, 0);
+    ray.setPrevMaterial(Block.get(Block.STONE_ID), 0);
+    ray.setCurrentMaterial(Block.AIR, 0);
     // TODO add Cloud material
   }
 

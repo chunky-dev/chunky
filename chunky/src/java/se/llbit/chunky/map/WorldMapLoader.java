@@ -66,7 +66,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
   protected ChunkSelectionTracker chunkSelection = new ChunkSelectionTracker();
 
   private BooleanProperty highlightEnabled = new SimpleBooleanProperty(false);
-  private Block highlightBlock = Block.DIAMONDORE;
+  private Block highlightBlock = Block.get(Block.DIAMONDORE_ID);
   private Color highlightColor = Color.CRIMSON;
 
   private volatile ObjectProperty<ChunkView> map = new SimpleObjectProperty<>(ChunkView.EMPTY);
