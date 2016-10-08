@@ -16,17 +16,17 @@ Copyright & License
 Chunky is Copyright (c) 2010-2016, Jesper Öqvist <jesper@llbit.se>
 
 Permission to modify and redistribute is granted under the terms of
-the GPLv3 license. See the file `license/LICENSE.txt` for the full license.
+the GPLv3 license. See the file `LICENSE` for the full license.
 
 Chunky uses the following 3rd party libraries:
 
 * **Markdown by John Gruber.**
   Markdown is covered by the Modified BSD License.
-See the file license/Markdown.txt for the full license and copyright notice.
+See the file `licenses/Markdown.txt` for the full license and copyright notice.
 * **Apache Commons Math library by the Apache Software Foundation.**
   The library is covered by the Apache License, version 2.0.
-See the file license/Apache-2.0.txt for the full license text.
-See the file license/commons-math.txt for the copyright notices.
+See the file `licenses/Apache-2.0.txt` for the full license text.
+See the file `licenses/commons-math.txt` for the copyright notices.
 
 Launching Chunky
 ----------------

@@ -20,7 +20,7 @@ RequestExecutionLevel admin
 !define MUI_ABORTWARNING
 
 ; Pages
-!insertmacro MUI_PAGE_LICENSE license\LICENSE.txt
+!insertmacro MUI_PAGE_LICENSE LICENSE
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -93,6 +93,7 @@ Section "Chunky (required)" SecChunky
 
   File /oname=chunky.jar build\chunky-@VERSION@.jar
   File build\ReadMe.html
+  File /oname=LICENSE.txt LICENSE
   File build\release_notes-@VERSION@.txt
   File dist\chunky.ico
 
