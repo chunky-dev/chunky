@@ -311,6 +311,10 @@ public class Chunky {
     this.renderContextFactory = renderContextFactory;
   }
 
+  public RenderContextFactory getRenderContextFactory() {
+    return renderContextFactory;
+  }
+
   public RenderContext getRenderContext() {
     return getRenderController().getContext();
   }

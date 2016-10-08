@@ -20,9 +20,14 @@ package se.llbit.chunky.main;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import se.llbit.chunky.renderer.RayTracerFactory;
+import se.llbit.chunky.renderer.RenderContextFactory;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Block;
 
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
 public class PluginApiTest {
@@ -55,5 +60,43 @@ public class PluginApiTest {
     // Illegal block ID.
     thrown.expect(IllegalArgumentException.class);
     Block.set(256, Block.AIR);
+  }
+
+  @Test public void testSetRenderContextFactory() {
+    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
+    RenderContextFactory myFactory = chunky1 -> null;
+    chunky.setRenderContextFactory(myFactory);
+    assertSame(myFactory, chunky.getRenderContextFactory());
+  }
+
+  @Test public void testSetSceneFactory() {
+    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
+    SceneFactory myFactory = new SceneFactory() {
+      @Override public Scene newScene() {
+        return null;
+      }
+
+      @Override public Scene copyScene(Scene scene) {
+        return null;
+      }
+    };
+    chunky.setSceneFactory(myFactory);
+    assertSame(myFactory, chunky.getSceneFactory());
+  }
+
+  @Test public void testSetPreviewRayTracerFactory() {
+    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
+    RayTracerFactory myFactory = () -> null;
+    chunky.setPreviewRayTracerFactory(myFactory);
+    assertSame(myFactory, chunky.getPreviewRayTracerFactory());
+    assertNotSame(myFactory, chunky.getRayTracerFactory());
+  }
+
+  @Test public void testSetRayTracerFactory() {
+    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
+    RayTracerFactory myFactory = () -> null;
+    chunky.setRayTracerFactory(myFactory);
+    assertSame(myFactory, chunky.getRayTracerFactory());
+    assertNotSame(myFactory, chunky.getPreviewRayTracerFactory());
   }
 }
