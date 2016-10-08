@@ -408,16 +408,16 @@ public class CommandLineOptions {
               TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
             } catch (TextureLoadingError e) {
               System.err.println(e.getMessage());
-              System.err.println("Loading default Minecraft textures");
+              System.err.println("Loading default Minecraft textures.");
               try {
-                TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJarNonNull(), false);
+                Chunky.loadDefaultTextures();
               } catch (FileNotFoundException e1) {
                 System.err.println("Minecraft Jar not found! Using placeholder textures.");
               }
             }
           } else {
             try {
-              TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJarNonNull(), false);
+              Chunky.loadDefaultTextures();
             } catch (FileNotFoundException e1) {
               System.err.println("Minecraft Jar not found! Using placeholder textures.");
             }

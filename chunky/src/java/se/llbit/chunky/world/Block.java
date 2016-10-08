@@ -3542,7 +3542,7 @@ public class Block extends Material {
           UNKNOWN0xFA, UNKNOWN0xFB, UNKNOWN0xFC, UNKNOWN0xFD, UNKNOWN0xFE, UNKNOWN0xFF,};
 
   /**
-   * Block ID
+   * Minecraft block ID.
    */
   public final int id;
 
@@ -3563,7 +3563,7 @@ public class Block extends Material {
     redstoneConnectors.add(DAYLIGHTSENSOR);
   }
 
-  Block(int id, String name, Texture texture) {
+  public Block(int id, String name, Texture texture) {
     super(name, texture);
     this.id = id;
   }
@@ -3649,6 +3649,27 @@ public class Block extends Material {
 
   public static Block get(int id) {
     return blocks[0xFF & id];
+  }
+
+  /**
+   * Changes the internal block representation for a given block ID.
+   *
+   * <p>The Block class is responsible for rendering Minecraft blocks.
+   * Changing the block instance for a given block ID can be used to
+   * change the rendering of that block, or to change rendering
+   * parameters such as emittance and texture.
+   *
+   * @param id ID of the block to change.
+   * @param newBlock new block representation.
+   */
+  public static void set(int id, Block newBlock) {
+    if (id < 0 || id > 0xFF) {
+      throw new IllegalArgumentException("Block id out of range.");
+    }
+    if (newBlock == null) {
+      throw new IllegalArgumentException("Block can not be null.");
+    }
+    blocks[id] = newBlock;
   }
 
   private static final String[] woolColor =
