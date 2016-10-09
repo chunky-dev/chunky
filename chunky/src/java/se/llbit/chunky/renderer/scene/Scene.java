@@ -1180,7 +1180,8 @@ public class Scene extends SceneDescription {
   }
 
   /**
-   * Trace a ray in the Octree
+   * Trace a ray in the Octree.
+   * The ray is displaced to the target position if it hits something.
    *
    * @return {@code true} if the ray hit something
    */
@@ -1864,12 +1865,12 @@ public class Scene extends SceneDescription {
   }
 
   /**
-   * Update the canvas - draw the latest rendered frame.
+   * @return scene status text.
    */
-  public synchronized String sceneStatus(String warningText) {
+  public synchronized String sceneStatus() {
     try {
-      if (!warningText.isEmpty()) {
-        return warningText;
+      if (!haveLoadedChunks()) {
+        return "No chunks loaded!";
       } else {
         StringBuilder buf = new StringBuilder();
         Ray ray = new Ray();
@@ -1898,13 +1899,6 @@ public class Scene extends SceneDescription {
     BitmapImage tmp = frontBuffer;
     frontBuffer = backBuffer;
     backBuffer = tmp;
-  }
-
-  /**
-   * @return scene status text.
-   */
-  public synchronized String sceneStatus() {
-    return sceneStatus(haveLoadedChunks() ? "" : "No chunks loaded!");
   }
 
   /**

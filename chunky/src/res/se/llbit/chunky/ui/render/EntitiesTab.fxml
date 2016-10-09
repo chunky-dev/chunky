@@ -16,53 +16,46 @@
 <fx:root text="Entities" type="javafx.scene.control.Tab" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <ScrollPane>
     <VBox spacing="10.0">
-      <children>
-        <TableView fx:id="entityTable" prefHeight="200.0" prefWidth="200.0">
-          <columns>
-            <TableColumn fx:id="nameCol" prefWidth="183.0" text="Name" />
-            <TableColumn fx:id="idCol" prefWidth="352.0" text="ID" />
-          </columns>
-        </TableView>
-        <HBox prefWidth="200.0" spacing="10.0">
-          <children>
-            <Button fx:id="delete" mnemonicParsing="false" text="-" />
-            <Button fx:id="add" mnemonicParsing="false" text="+" />
-          </children>
-        </HBox>
-        <HBox prefWidth="200.0" spacing="10.0">
-          <children>
-            <Button fx:id="cameraToPlayer" mnemonicParsing="false" text="Camera to player" />
-            <Button fx:id="playerToCamera" mnemonicParsing="false" text="Player to camera" />
-            <Button fx:id="playerToTarget" mnemonicParsing="false" text="Player to target" />
-            <Button fx:id="faceCamera" mnemonicParsing="false" text="Face camera" />
-          </children>
-        </HBox>
-        <Separator prefWidth="200.0" />
-        <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
-          <children>
-            <Label text="Player model:" />
-            <ChoiceBox fx:id="playerModel" prefWidth="150.0" />
-          </children>
-        </HBox>
-        <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="315.0" prefWidth="200.0" spacing="10.0">
-          <children>
-            <Label text="Skin:" />
-            <TextField fx:id="skin" />
-            <Button fx:id="selectSkin" mnemonicParsing="false" text="Select skin" />
-          </children>
-        </HBox>
-        <Label text="Pose" />
-        <DoubleAdjuster fx:id="direction" />
-        <DoubleAdjuster fx:id="headYaw" />
-        <DoubleAdjuster fx:id="headPitch" />
-        <DoubleAdjuster fx:id="leftArmPose" />
-        <DoubleAdjuster fx:id="rightArmPose" />
-        <DoubleAdjuster fx:id="leftLegPose" />
-        <DoubleAdjuster fx:id="rightLegPose" />
-      </children>
       <padding>
-        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
       </padding>
+      <TableView fx:id="entityTable" prefHeight="200.0">
+        <columns>
+          <TableColumn fx:id="nameCol" prefWidth="183.0" text="Name"/>
+          <TableColumn fx:id="idCol" prefWidth="352.0" text="ID"/>
+        </columns>
+      </TableView>
+      <HBox spacing="10.0">
+        <Button fx:id="delete" mnemonicParsing="false" text="-"/>
+        <Button fx:id="add" mnemonicParsing="false" text="+"/>
+      </HBox>
+      <HBox spacing="10.0">
+        <Button fx:id="cameraToPlayer" mnemonicParsing="false" text="Camera to player"/>
+        <Button fx:id="playerToCamera" mnemonicParsing="false" text="Player to camera"/>
+        <Button fx:id="playerToTarget" mnemonicParsing="false" text="Player to target"/>
+      </HBox>
+      <HBox spacing="10.0">
+        <Button fx:id="faceCamera" mnemonicParsing="false" text="Face camera"/>
+        <Button fx:id="faceTarget" mnemonicParsing="false" text="Face target"/>
+      </HBox>
+      <Separator/>
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="Player model:"/>
+        <ChoiceBox fx:id="playerModel" prefWidth="150.0"/>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="315.0" spacing="10.0">
+        <Label text="Skin:"/>
+        <TextField fx:id="skin"/>
+        <Button fx:id="selectSkin" mnemonicParsing="false" text="Select skin"/>
+      </HBox>
+      <Label text="Pose"/>
+      <DoubleAdjuster fx:id="direction"/>
+      <DoubleAdjuster fx:id="headYaw"/>
+      <DoubleAdjuster fx:id="headPitch"/>
+      <DoubleAdjuster fx:id="leftArmPose"/>
+      <DoubleAdjuster fx:id="rightArmPose"/>
+      <DoubleAdjuster fx:id="leftLegPose"/>
+      <DoubleAdjuster fx:id="rightLegPose"/>
     </VBox>
   </ScrollPane>
 </fx:root>

@@ -250,8 +250,8 @@ public class PlayerEntity extends Entity {
     pitch = (random.nextFloat() - 0.5) * QuickMath.HALF_PI;
   }
 
-  public void lookAt(Vector3 camera) {
-    Vector3 dir = new Vector3(camera);
+  public void lookAt(Vector3 target) {
+    Vector3 dir = new Vector3(target);
     Vector3 face = new Vector3(position);
     face.add(0, 28 / 16., 0);
     dir.sub(face);

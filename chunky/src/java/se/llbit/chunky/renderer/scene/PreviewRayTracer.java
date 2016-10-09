@@ -79,7 +79,6 @@ public class PreviewRayTracer implements RayTracer {
    * @return Next intersection
    */
   public static boolean nextIntersection(Scene scene, Ray ray) {
-
     ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());
     ray.t = Double.POSITIVE_INFINITY;
     boolean hit = false;

@@ -167,6 +167,15 @@ public class Vector3 {
   }
 
   /**
+   * Add a to this vector.
+   */
+  public final void add(Vector3i a) {
+    x += a.x;
+    y += a.y;
+    z += a.z;
+  }
+
+  /**
    * Add vector (a, b, c) to this vector.
    */
   public final void add(double a, double b, double c) {

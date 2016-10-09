@@ -38,6 +38,7 @@ import se.llbit.chunky.world.entity.PlayerEntity;
 import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 import java.io.File;
@@ -92,6 +93,7 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
   @FXML private Button playerToCamera;
   @FXML private Button playerToTarget;
   @FXML private Button faceCamera;
+  @FXML private Button faceTarget;
   @FXML private ChoiceBox<PlayerModel> playerModel;
   @FXML private TextField skin;
   @FXML private Button selectSkin;
@@ -221,6 +223,14 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
     faceCamera.setOnAction(e -> withSelected(player -> {
       player.lookAt(scene.camera().getPosition());
       scene.rebuildActorBvh();
+    }));
+    faceTarget.setTooltip(new Tooltip("Makes the selected player look at the current view target."));
+    faceTarget.setOnAction(e -> withSelected(player -> {
+      Vector3 target = scene.getTargetPosition();
+      if (target != null) {
+        player.lookAt(target);
+        scene.rebuildActorBvh();
+      }
     }));
     entityTable.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
