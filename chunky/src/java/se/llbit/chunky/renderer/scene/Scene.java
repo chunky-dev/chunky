@@ -23,7 +23,6 @@ import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderMode;
-import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
@@ -327,10 +326,8 @@ public class Scene extends SceneDescription {
    * @throws IOException
    * @throws InterruptedException
    */
-  public synchronized void saveScene(RenderContext context, RenderStatusListener progress)
+  public synchronized void saveScene(RenderContext context, TaskTracker taskTracker)
       throws IOException, InterruptedException {
-
-    TaskTracker taskTracker = progress.taskTracker();
     try (TaskTracker.Task task = taskTracker.task("Saving scene", 2)) {
       task.update(1);
 
@@ -341,8 +338,6 @@ public class Scene extends SceneDescription {
       saveGrassTexture(context, taskTracker);
       saveFoliageTexture(context, taskTracker);
       saveDump(context, taskTracker);
-
-      progress.sceneSaved();
     }
   }
 
@@ -354,9 +349,8 @@ public class Scene extends SceneDescription {
    * @throws SceneLoadingError
    * @throws InterruptedException
    */
-  public synchronized void loadScene(RenderContext context, RenderStatusListener renderListener,
-      String sceneName) throws IOException, SceneLoadingError, InterruptedException {
-
+  public synchronized void loadScene(RenderContext context, String sceneName,
+      TaskTracker taskTracker) throws IOException, SceneLoadingError, InterruptedException {
     loadDescription(context.getSceneDescriptionInputStream(sceneName));
 
     if (sdfVersion < SDF_VERSION) {
@@ -390,8 +384,8 @@ public class Scene extends SceneDescription {
       }
     }
 
-    if (loadDump(context, renderListener)) {
-      postProcessFrame(renderListener.taskTracker());
+    if (loadDump(context, taskTracker)) {
+      postProcessFrame(taskTracker);
     }
 
     if (spp == 0) {
@@ -400,7 +394,6 @@ public class Scene extends SceneDescription {
       mode = RenderMode.PAUSED;
     }
 
-    TaskTracker taskTracker = renderListener.taskTracker();
     if (loadOctree(context, taskTracker)) {
       boolean haveGrass = loadGrassTexture(context, taskTracker);
       boolean haveFoliage = loadFoliageTexture(context, taskTracker);
@@ -413,7 +406,7 @@ public class Scene extends SceneDescription {
       if (loadedWorld == null) {
         Log.warn("Could not load chunks (no world found for scene)");
       } else {
-        loadChunks(renderListener.taskTracker(), loadedWorld, chunks);
+        loadChunks(taskTracker, loadedWorld, chunks);
       }
     }
     notifyAll();
@@ -1706,10 +1699,10 @@ public class Scene extends SceneDescription {
     }
   }
 
-  public synchronized boolean loadDump(RenderContext context, RenderStatusListener renderListener) {
-    if (!tryLoadDump(context, renderListener, name + ".dump")) {
+  public synchronized boolean loadDump(RenderContext context, TaskTracker taskTracker) {
+    if (!tryLoadDump(context, name + ".dump", taskTracker)) {
       // Failed to load the default render dump - try the backup file.
-      if (!tryLoadDump(context, renderListener, name + ".dump.backup")) {
+      if (!tryLoadDump(context, name + ".dump.backup", taskTracker)) {
         spp = 0;  // Set spp = 0 because we don't have the old render state.
         return false;
       }
@@ -1720,9 +1713,7 @@ public class Scene extends SceneDescription {
   /**
    * @return {@code true} if the render dump was successfully loaded
    */
-  private boolean tryLoadDump(RenderContext context, RenderStatusListener renderListener,
-      String fileName) {
-    TaskTracker taskTracker = renderListener.taskTracker();
+  private boolean tryLoadDump(RenderContext context, String fileName, TaskTracker taskTracker) {
     File dumpFile = context.getSceneFile(fileName);
     if (!dumpFile.isFile()) {
       if (spp != 0) {
@@ -1744,12 +1735,6 @@ public class Scene extends SceneDescription {
       }
       spp = in.readInt();
       renderTime = in.readLong();
-
-      // Update render status.
-      renderListener.setSpp(spp);
-      renderListener.setRenderTime(renderTime);
-      long totalSamples = spp * ((long) (width * height));
-      renderListener.setSamplesPerSecond((int) (totalSamples / (renderTime / 1000.0)));
 
       for (int x = 0; x < width; ++x) {
         task.update(width, x + 1);
@@ -1982,10 +1967,9 @@ public class Scene extends SceneDescription {
   /**
    * Merge a render dump into this scene.
    */
-  public void mergeDump(File dumpFile, RenderStatusListener renderListener) {
+  public void mergeDump(File dumpFile, TaskTracker taskTracker) {
     int dumpSpp;
     long dumpTime;
-    TaskTracker taskTracker = renderListener.taskTracker();
     try (TaskTracker.Task task = taskTracker.task("Merging render dump", 2);
         DataInputStream in = new DataInputStream(
             new GZIPInputStream(new FileInputStream(dumpFile)))) {
@@ -2020,11 +2004,6 @@ public class Scene extends SceneDescription {
       // Update render status.
       spp += dumpSpp;
       renderTime += dumpTime;
-      renderListener.setSpp(spp);
-      renderListener.setRenderTime(renderTime);
-      long totalSamples = spp * ((long) (width * height));
-      renderListener.setSamplesPerSecond((int) (totalSamples / (renderTime / 1000.0)));
-
     } catch (IOException e) {
       Log.info("Render dump not loaded");
     }

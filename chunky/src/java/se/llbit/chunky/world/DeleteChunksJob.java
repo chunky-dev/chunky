@@ -38,7 +38,7 @@ public class DeleteChunksJob extends Thread {
     this.progress = progress;
   }
 
-  public void run() {
+  @Override public void run() {
     if (progress.tryStartJob()) {
       progress.setJobName("Deleting chunks");
       progress.setJobSize(selected.size());

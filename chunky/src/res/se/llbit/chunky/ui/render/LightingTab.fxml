@@ -5,11 +5,14 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
+<?import javafx.scene.control.ScrollPane?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 <?import se.llbit.chunky.ui.SimpleColorPicker?>
-<fx:root prefWidth="556.0" spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-    <children>
+
+<fx:root text="Lighting" type="javafx.scene.control.Tab" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+  <ScrollPane>
+    <VBox spacing="10.0">
+      <children>
         <DoubleAdjuster fx:id="skyIntensity" maxWidth="1.7976931348623157E308" />
         <CheckBox fx:id="enableEmitters" mnemonicParsing="false" text="Enable emitters" />
         <DoubleAdjuster fx:id="emitterIntensity" maxWidth="1.7976931348623157E308" />
@@ -17,14 +20,16 @@
         <DoubleAdjuster fx:id="sunIntensity" maxWidth="1.7976931348623157E308" />
         <DoubleAdjuster fx:id="sunAzimuth" maxWidth="1.7976931348623157E308" />
         <DoubleAdjuster fx:id="sunAltitude" maxWidth="1.7976931348623157E308" />
-      <HBox alignment="CENTER_LEFT" spacing="10.0">
-         <children>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+          <children>
             <Label text="Sun color:" />
-              <SimpleColorPicker fx:id="sunColor" />
-         </children>
-      </HBox>
-    </children>
-    <padding>
+            <SimpleColorPicker fx:id="sunColor" />
+          </children>
+        </HBox>
+      </children>
+      <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-    </padding>
+      </padding>
+    </VBox>
+  </ScrollPane>
 </fx:root>

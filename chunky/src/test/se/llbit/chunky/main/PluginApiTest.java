@@ -25,7 +25,10 @@ import se.llbit.chunky.renderer.RenderContextFactory;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.Block;
+
+import java.util.Collections;
 
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
@@ -98,5 +101,12 @@ public class PluginApiTest {
     chunky.setRayTracerFactory(myFactory);
     assertSame(myFactory, chunky.getRayTracerFactory());
     assertNotSame(myFactory, chunky.getPreviewRayTracerFactory());
+  }
+
+  @Test public void testSetRenderControlsTabTransformer() {
+    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
+    RenderControlsTabTransformer transformer = tabs -> Collections.emptyList();
+    chunky.setRenderControlsTabTransformer(transformer);
+    assertSame(transformer, chunky.getRenderControlsTabTransformer());
   }
 }

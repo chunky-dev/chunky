@@ -33,9 +33,8 @@ public class BeaconModel {
   private static final Texture[] tex = {Texture.glass, Texture.beacon, Texture.obsidian,};
 
   /**
-   * Find intersection between ray and block
+   * Find intersection between ray and block.
    *
-   * @param ray
    * @return <code>true</code> if the ray intersected the block
    */
   public static boolean intersect(Ray ray) {

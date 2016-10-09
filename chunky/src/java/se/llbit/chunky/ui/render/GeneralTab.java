@@ -25,10 +25,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldMapLoader;
@@ -48,7 +48,7 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GeneralTab extends VBox implements RenderControlTab, Initializable {
+public class GeneralTab extends Tab implements RenderControlsTab, Initializable {
   private Scene scene;
 
   @FXML private Button loadSceneBtn;
@@ -123,7 +123,13 @@ public class GeneralTab extends VBox implements RenderControlTab, Initializable 
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
   }
 
+  @Override public Tab getTab() {
+    return this;
+  }
+
   @Override public void initialize(URL location, ResourceBundle resources) {
+    setGraphic(new ImageView(Icon.wrench.fxImage()));
+
     loadPlayers.setTooltip(new Tooltip("Enable/disable player entity loading. "
         + "Takes effect on next scene creation."));
     loadPlayers.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -252,20 +258,11 @@ public class GeneralTab extends VBox implements RenderControlTab, Initializable 
     canvasSize.setValue(String.format("%dx%d", width, height));
   }
 
-  public void setRenderController(RenderController controller) {
-    this.controller = controller;
-    this.scene = controller.getSceneManager().getScene();
-  }
-
-  public void setMapLoader(WorldMapLoader mapLoader) {
-    this.mapLoader = mapLoader;
-  }
-
-  public void setFxController(RenderControlsFxController fxController) {
-    this.fxController = fxController;
-  }
-
-  public void setChunkyFxController(ChunkyFxController chunkyFxController) {
-    this.chunkyFxController = chunkyFxController;
+  @Override public void setController(RenderControlsFxController controls) {
+    this.fxController = controls;
+    this.chunkyFxController = controls.getChunkyController();
+    this.mapLoader = chunkyFxController.getMapLoader();
+    this.controller = controls.getRenderController();
+    this.scene = this.controller.getSceneManager().getScene();
   }
 }

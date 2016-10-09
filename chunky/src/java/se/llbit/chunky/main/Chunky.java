@@ -19,18 +19,16 @@ package se.llbit.chunky.main;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.Plugin;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
-import se.llbit.chunky.renderer.ConsoleRenderListener;
 import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.RayTracerFactory;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderContextFactory;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.RenderManager;
-import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.RendererFactory;
 import se.llbit.chunky.renderer.SceneProvider;
-import se.llbit.chunky.renderer.SimpleRenderListener;
+import se.llbit.chunky.renderer.SnapshotControl;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.PreviewRayTracer;
@@ -42,11 +40,12 @@ import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.log.Receiver;
+import se.llbit.util.TaskTracker;
 import se.llbit.util.Util;
 
 import java.io.File;
@@ -55,6 +54,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Collection;
+import java.util.function.Function;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created by
@@ -84,6 +85,7 @@ public class Chunky {
   private RendererFactory rendererFactory = RenderManager::new;
   private RayTracerFactory previewRayTracerFactory = PreviewRayTracer::new;
   private RayTracerFactory rayTracerFactory = PathTracer::new;
+  private RenderControlsTabTransformer renderControlsTabTransformer = tabs -> tabs;
 
   /**
    * @return The name of this application, including version string.
@@ -111,9 +113,42 @@ public class Chunky {
     Renderer renderer = rendererFactory.newRenderer(context, true);
     SynchronousSceneManager sceneManager = new SynchronousSceneManager(context, renderer);
     renderer.setSceneProvider(sceneManager);
-    RenderStatusListener renderListener = new ConsoleRenderListener(context, sceneManager);
-    sceneManager.setRenderStatusListener(renderListener);
-    renderer.setRenderListener(renderListener);
+    TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
+        (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
+          @Override public void close() {
+            super.close();
+            long endTime = System.currentTimeMillis();
+            int seconds = (int) ((endTime - startTime) / 1000);
+            System.out.format("\r%s took %dm %ds%n", name, seconds / 60, seconds % 60);
+          }
+        });
+    sceneManager.setTaskTracker(taskTracker);
+    renderer.setSnapshotControl(SnapshotControl.DEFAULT);
+    renderer.setOnFrameCompleted((scene, spp) -> {
+      if (SnapshotControl.DEFAULT.saveSnapshot(scene, spp)) {
+        // Save the current frame.
+        scene.saveSnapshot(context.getSceneDirectory(), taskTracker);
+      }
+
+      if (SnapshotControl.DEFAULT.saveRenderDump(scene, spp)) {
+        // Save the scene description and current render dump.
+        try {
+          sceneManager.saveScene();
+        } catch (InterruptedException e) {
+          throw new Error(e);
+        }
+      }
+    });
+    renderer.setRenderTask(taskTracker.backgroundTask());
+    renderer.setOnRenderCompleted((time, sps) -> {
+      System.out.println("Render job finished.");
+      int seconds = (int) ((time / 1000) % 60);
+      int minutes = (int) ((time / 60000) % 60);
+      int hours = (int) (time / 3600000);
+      System.out.println(String
+          .format("Total rendering time: %d hours, %d minutes, %d seconds", hours, minutes, seconds));
+      System.out.println("Average samples per second (SPS): " + sps);
+    });
 
     try {
       sceneManager.loadScene(options.sceneName);
@@ -256,9 +291,15 @@ public class Chunky {
       try (FileInputStream in = new FileInputStream(file)) {
         scene.loadDescription(in); // Load description to get current SPP & canvas size.
         RenderContext context = new RenderContext(this);
-        SimpleRenderListener listener = new SimpleRenderListener(new ConsoleProgressListener());
+        TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
+            TaskTracker.Task::new,
+            (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
+              @Override public void update() {
+                // Don't report task state to progress listener.
+              }
+            });
         scene.initBuffers();  // Initialize the sample buffer.
-        scene.loadDump(context, listener); // Load the render dump.
+        scene.loadDump(context, taskTracker); // Load the render dump.
         OutputMode outputMode = scene.getOutputMode();
         if (options.imageOutputFile.isEmpty()) {
           String extension = ".png";
@@ -275,7 +316,7 @@ public class Chunky {
             System.out.println("Image output mode: TIFF32");
             break;
         }
-        scene.saveFrame(new File(options.imageOutputFile), listener.taskTracker());
+        scene.saveFrame(new File(options.imageOutputFile), taskTracker);
         System.out.println("Saved snapshot to " + options.imageOutputFile);
         return 0;
       }
@@ -341,5 +382,14 @@ public class Chunky {
 
   public RayTracerFactory getRayTracerFactory() {
     return rayTracerFactory;
+  }
+
+  public void setRenderControlsTabTransformer(
+      RenderControlsTabTransformer renderControlsTabTransformer) {
+    this.renderControlsTabTransformer = renderControlsTabTransformer;
+  }
+
+  public RenderControlsTabTransformer getRenderControlsTabTransformer() {
+    return renderControlsTabTransformer;
   }
 }

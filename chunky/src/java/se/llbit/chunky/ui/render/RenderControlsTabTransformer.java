@@ -17,8 +17,13 @@
  */
 package se.llbit.chunky.ui.render;
 
-import se.llbit.chunky.renderer.scene.Scene;
+import java.util.Collection;
+import java.util.function.Function;
 
-public interface RenderControlTab {
-  void update(Scene scene);
+/**
+ * Interface for plugins to transform the tabs in the Render Controls dialog.
+ */
+@FunctionalInterface
+public interface RenderControlsTabTransformer extends
+    Function<Collection<RenderControlsTab>, Collection<RenderControlsTab>> {
 }

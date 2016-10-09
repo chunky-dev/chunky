@@ -62,12 +62,12 @@ public final class PersistentSettings {
   public static final int DEFAULT_DIMENSION = 0;
 
   /**
-   * Default canvas width
+   * Default canvas width.
    */
   public static final int DEFAULT_3D_CANVAS_WIDTH = 400;
 
   /**
-   * Default canvas height
+   * Default canvas height.
    */
   public static final int DEFAULT_3D_CANVAS_HEIGHT = 400;
 
@@ -94,7 +94,7 @@ public final class PersistentSettings {
   /**
    * Note: must not be called before configuring the settings directory
    * via the first-time setup dialog in the launcher.
-   * @return The directory where program settings are stored
+   * @return The directory where Chunky settings are stored
    */
   public static File settingsDirectory() {
     return settingsDir;

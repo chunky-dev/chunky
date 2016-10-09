@@ -56,7 +56,7 @@ public class PngFileWriter implements AutoCloseable {
   /**
    * @throws IOException
    */
-  public void close() throws IOException {
+  @Override public void close() throws IOException {
     out.close();
   }
 

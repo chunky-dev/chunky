@@ -14,68 +14,73 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ScrollPane?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 
-<fx:root prefHeight="369.0" prefWidth="556.0" spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-    <children>
+<fx:root text="Camera" type="javafx.scene.control.Tab" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+  <ScrollPane>
+    <VBox spacing="10.0">
+      <children>
         <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
-            <children>
+          <children>
             <MenuButton fx:id="loadPreset" mnemonicParsing="false" text="Load preset" />
-            </children>
+          </children>
         </HBox>
         <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
-            <children>
+          <children>
             <Label text="Camera:" />
             <ComboBox fx:id="cameras" editable="true" prefWidth="150.0" />
             <Button fx:id="duplicate" mnemonicParsing="false" text="Clone" />
             <Button fx:id="removeCamera" mnemonicParsing="false" text="Remove" />
-            </children>
+          </children>
         </HBox>
-      <TitledPane fx:id="positionOrientation" animated="false" expanded="false" text="Position &amp; Orientation">
-        <content>
+        <TitledPane fx:id="positionOrientation" animated="false" expanded="false" text="Position &amp; Orientation">
+          <content>
             <GridPane hgap="10.0" vgap="10.0">
-               <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints vgrow="SOMETIMES" />
-                  <RowConstraints vgrow="SOMETIMES" />
-               </rowConstraints>
-               <children>
-                  <Label text="Orientation:" GridPane.rowIndex="1" />
-                  <TextField fx:id="yawField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <TextField fx:id="pitchField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                  <TextField fx:id="rollField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                  <Label text="Position:" />
-                  <TextField fx:id="posX" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" />
-                  <TextField fx:id="posY" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" />
-                  <TextField fx:id="posZ" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="3" />
-               </children>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints vgrow="SOMETIMES" />
+                <RowConstraints vgrow="SOMETIMES" />
+              </rowConstraints>
+              <children>
+                <Label text="Orientation:" GridPane.rowIndex="1" />
+                <TextField fx:id="yawField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <TextField fx:id="pitchField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <TextField fx:id="rollField" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                <Label text="Position:" />
+                <TextField fx:id="posX" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" />
+                <TextField fx:id="posY" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" />
+                <TextField fx:id="posZ" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="3" />
+              </children>
             </GridPane>
-        </content>
-      </TitledPane>
-      <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="56.0" prefWidth="200.0" spacing="10.0">
-         <children>
+          </content>
+        </TitledPane>
+        <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="56.0" prefWidth="200.0" spacing="10.0">
+          <children>
             <Button fx:id="cameraToPlayer" mnemonicParsing="false" text="Camera to player" />
             <Button fx:id="centerCamera" mnemonicParsing="false" text="Center camera" />
-         </children>
-      </HBox>
-      <Separator prefWidth="200.0" />
-      <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="20.0" prefWidth="200.0" spacing="10.0">
-         <children>
+          </children>
+        </HBox>
+        <Separator prefWidth="200.0" />
+        <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="20.0" prefWidth="200.0" spacing="10.0">
+          <children>
             <Label text="Projection mode:" />
             <ChoiceBox fx:id="projectionMode" prefWidth="150.0" />
-         </children>
-      </HBox>
-      <DoubleAdjuster fx:id="fov" />
-      <DoubleAdjuster fx:id="dof" />
-      <DoubleAdjuster fx:id="subjectDistance" />
-      <Button fx:id="autofocus" mnemonicParsing="false" text="Autofocus" />
-    </children>
-    <padding>
+          </children>
+        </HBox>
+        <DoubleAdjuster fx:id="fov" />
+        <DoubleAdjuster fx:id="dof" />
+        <DoubleAdjuster fx:id="subjectDistance" />
+        <Button fx:id="autofocus" mnemonicParsing="false" text="Autofocus" />
+      </children>
+      <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-    </padding>
+      </padding>
+    </VBox>
+  </ScrollPane>
 </fx:root>

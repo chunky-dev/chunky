@@ -65,7 +65,7 @@ public class PaintingEntity extends Entity {
   }
 
 
-  static final Map<String, Painting> paintings = new HashMap<String, Painting>();
+  static final Map<String, Painting> paintings = new HashMap<>();
 
   static {
     paintings.put("Kebab", new Painting(0, 16, 0, 16));
@@ -106,7 +106,7 @@ public class PaintingEntity extends Entity {
   }
 
   @Override public Collection<Primitive> primitives(Vector3 offset) {
-    Collection<Primitive> primitives = new LinkedList<Primitive>();
+    Collection<Primitive> primitives = new LinkedList<>();
     Painting painting = paintings.get(art);
     if (painting == null) {
       return primitives;
@@ -131,9 +131,8 @@ public class PaintingEntity extends Entity {
   }
 
   /**
-   * Deserialize entity from JSON
+   * Deserialize entity from JSON.
    *
-   * @param json
    * @return deserialized entity, or {@code null} if it was not a valid entity
    */
   public static Entity fromJson(JsonObject json) {

@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -21,17 +20,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Tab;
 import se.llbit.chunky.renderer.Postprocess;
-import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.RenderControlsFxController;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class PostprocessingTab extends VBox implements RenderControlTab, Initializable {
+public class PostprocessingTab extends Tab implements RenderControlsTab, Initializable {
   private Scene scene;
 
   @FXML private DoubleAdjuster exposure;
@@ -44,13 +43,17 @@ public class PostprocessingTab extends VBox implements RenderControlTab, Initial
     loader.load();
   }
 
-  public void setRenderController(RenderController controller) {
-    scene = controller.getSceneManager().getScene();
+  @Override public void setController(RenderControlsFxController controller) {
+    scene = controller.getRenderController().getSceneManager().getScene();
   }
 
   @Override public void update(Scene scene) {
     postprocessingMode.getSelectionModel().select(scene.getPostprocess());
     exposure.set(scene.getExposure());
+  }
+
+  @Override public Tab getTab() {
+    return this;
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {

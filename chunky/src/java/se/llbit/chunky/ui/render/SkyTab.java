@@ -23,14 +23,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
-import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.GradientEditor;
+import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.SimpleColorPicker;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Vector4;
@@ -40,7 +41,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class SkyTab extends VBox implements RenderControlTab, Initializable {
+public class SkyTab extends Tab implements RenderControlsTab, Initializable {
   private Scene scene;
 
   @FXML private ChoiceBox<Sky.SkyMode> skyMode;
@@ -69,10 +70,10 @@ public class SkyTab extends VBox implements RenderControlTab, Initializable {
     loader.load();
   }
 
-  public void setRenderController(RenderController controller) {
-    scene = controller.getSceneManager().getScene();
-    skyboxSettings.setRenderController(controller);
-    skymapSettings.setRenderController(controller);
+  @Override public void setController(RenderControlsFxController controller) {
+    scene = controller.getRenderController().getSceneManager().getScene();
+    skyboxSettings.setRenderController(controller.getRenderController());
+    skymapSettings.setRenderController(controller.getRenderController());
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -117,8 +118,7 @@ public class SkyTab extends VBox implements RenderControlTab, Initializable {
               skyModeSettings.getChildren().setAll(gradientEditor);
               break;
             case BLACK:
-              skyModeSettings.getChildren()
-                  .setAll(new Label(String.format("Selected mode has no settings.")));
+              skyModeSettings.getChildren().setAll(new Label("Selected mode has no settings."));
               break;
             case SKYBOX:
               skyModeSettings.getChildren().setAll(skyboxSettings);
@@ -164,6 +164,10 @@ public class SkyTab extends VBox implements RenderControlTab, Initializable {
     horizonOffset.set(scene.sky().getHorizonOffset());
     gradientEditor.setGradient(scene.sky().getGradient());
     skyboxSettings.update(scene);
+  }
+
+  @Override public Tab getTab() {
+    return this;
   }
 
   public void gradientChanged(List<Vector4> gradient) {

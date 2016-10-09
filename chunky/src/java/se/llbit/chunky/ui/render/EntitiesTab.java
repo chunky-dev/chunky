@@ -22,17 +22,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.world.entity.Entity;
 import se.llbit.chunky.world.entity.PlayerEntity;
 import se.llbit.json.JsonObject;
@@ -49,7 +49,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class EntitiesTab extends VBox implements RenderControlTab, Initializable {
+public class EntitiesTab extends Tab implements RenderControlsTab, Initializable {
   private Scene scene;
 
   static class PlayerData {
@@ -110,10 +110,6 @@ public class EntitiesTab extends VBox implements RenderControlTab, Initializable
     loader.load();
   }
 
-  public void setRenderController(RenderController controller) {
-    scene = controller.getSceneManager().getScene();
-  }
-
   @Override public void update(Scene scene) {
     Collection<PlayerData> missing = new HashSet<>(entityTable.getItems());
     for (Entity entity : scene.getActors()) {
@@ -126,6 +122,10 @@ public class EntitiesTab extends VBox implements RenderControlTab, Initializable
       }
     }
     entityTable.getItems().removeAll(missing);
+  }
+
+  @Override public Tab getTab() {
+    return this;
   }
 
   private void updatePlayer(PlayerEntity player) {
@@ -180,7 +180,7 @@ public class EntitiesTab extends VBox implements RenderControlTab, Initializable
       fileChooser.setTitle("Load Skin");
       fileChooser
           .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
-      File skinFile = fileChooser.showOpenDialog(getScene().getWindow());
+      File skinFile = fileChooser.showOpenDialog(getTabPane().getScene().getWindow());
       if (skinFile != null) {
         player.setTexture(skinFile.getAbsolutePath());
         skin.setText(skinFile.getAbsolutePath());
@@ -285,5 +285,9 @@ public class EntitiesTab extends VBox implements RenderControlTab, Initializable
     if (player != null) {
       consumer.accept(player.entity);
     }
+  }
+
+  @Override public void setController(RenderControlsFxController controller) {
+    scene = controller.getRenderController().getSceneManager().getScene();
   }
 }

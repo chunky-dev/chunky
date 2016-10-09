@@ -17,66 +17,28 @@
 package se.llbit.chunky.renderer.scene;
 
 import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.SceneProvider;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 import se.llbit.log.Log;
+import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
 /**
- * Scene manager for performing synchronized scene actions on a separate thread.
- * This class is needed to do long-running scene tasks without blocking the GUI thread.
+ * This scene manager is used for asynchronous loading and saving of scenes.
+ * This class ensures that only one scene action happens at a time, and
+ * the actions are performed on a separate thread to avoid blocking the GUI.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class AsynchronousSceneManager extends Thread implements SceneManager {
 
-  /**
-   * Which action to perform next.
-   */
-  public enum Action {
-    /**
-     * Do nothing.
-     */
-    NONE,
-    /**
-     * Load a scene.
-     */
-    LOAD_SCENE,
-    /**
-     * Save the scene.
-     */
-    SAVE_SCENE,
-    /**
-     * Load chunks and reset camera position.
-     */
-    LOAD_FRESH_CHUNKS,
-    /**
-     * Load chunks but do not reset camera.
-     */
-    LOAD_CHUNKS,
-    /**
-     * Reload chunks.
-     */
-    RELOAD_CHUNKS,
-    /**
-     * Merge render dump.
-     */
-    MERGE_DUMP
-  }
-
-  private String sceneName = "";
-  private File renderDump;
-  private Action action = Action.NONE;
-  private Collection<ChunkPosition> chunksToLoad;
-  private World world;
-
   private final SynchronousSceneManager sceneManager;
+  private Runnable currentTask = null;
 
   public AsynchronousSceneManager(RenderContext context, Renderer renderer) {
     super("Scene Manager");
@@ -88,14 +50,21 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
     return sceneManager;
   }
 
-  public void setRenderStatusListener(RenderStatusListener renderStatusListener) {
-    sceneManager.setRenderStatusListener(renderStatusListener);
-  }
-
   public void setResetHandler(RenderResetHandler resetHandler) {
     sceneManager.setResetHandler(resetHandler);
   }
 
+  public void setTaskTracker(TaskTracker taskTracker) {
+    sceneManager.setTaskTracker(taskTracker);
+  }
+
+  public void setOnSceneLoaded(Runnable onSceneLoaded) {
+    sceneManager.setOnSceneLoaded(onSceneLoaded);
+  }
+
+  public void setOnChunksLoaded(Runnable onChunksLoaded) {
+    sceneManager.setOnChunksLoaded(onChunksLoaded);
+  }
   @Override public Scene getScene() {
     return sceneManager.getScene();
   }
@@ -104,51 +73,16 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
     try {
       while (!isInterrupted()) {
         synchronized (this) {
-
-          while (action == Action.NONE) {
+          while (currentTask == null) {
             wait();
           }
-
-          Action currentAction = action;
-          action = Action.NONE;
-
-          switch (currentAction) {
-            case LOAD_SCENE:
-              try {
-                sceneManager.loadScene(sceneName);
-              } catch (IOException e) {
-                Log.warn("Could not load scene.\nReason: " + e.getMessage());
-              } catch (SceneLoadingError e) {
-                Log.warn("Could not open scene description.\nReason: " + e.getMessage());
-              } catch (InterruptedException e) {
-                Log.warn("Scene loading was interrupted.");
-              }
-              break;
-            case SAVE_SCENE:
-              try {
-                sceneManager.saveScene();
-              } catch (InterruptedException e1) {
-                Log.warn("Scene saving was interrupted.");
-              }
-              break;
-            case LOAD_FRESH_CHUNKS:
-              sceneManager.loadFreshChunks(world, chunksToLoad);
-              break;
-            case LOAD_CHUNKS:
-              sceneManager.loadChunks(world, chunksToLoad);
-              break;
-            case RELOAD_CHUNKS:
-              sceneManager.reloadChunks();
-              break;
-            case MERGE_DUMP:
-              sceneManager.mergeDump(renderDump);
-              break;
-            default:
-              break;
-          }
+        }
+        currentTask.run();
+        synchronized (this) {
+          currentTask = null;
         }
       }
-    } catch (InterruptedException e) {
+    } catch (InterruptedException ignored) {
       // Interrupted.
     }
   }
@@ -158,55 +92,90 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
    *
    * @param name the name of the scene to load.
    */
-  public synchronized void loadScene(String name) {
-    sceneName = name;
-    action = Action.LOAD_SCENE;
-    notify();
+  @Override public synchronized void loadScene(String name) {
+    if (currentTask != null) {
+      Log.warn("Can't load scene right now.");
+    } else {
+      currentTask = () -> {
+        try {
+          sceneManager.loadScene(name);
+        } catch (IOException e) {
+          Log.warn("Could not load scene.\nReason: " + e.getMessage());
+        } catch (SceneLoadingError e) {
+          Log.warn("Could not open scene description.\nReason: " + e.getMessage());
+        } catch (InterruptedException e) {
+          Log.warn("Scene loading was interrupted.");
+        }
+      };
+      notifyAll();
+    }
   }
 
   /**
    * Save the current scene.
    */
-  public synchronized void saveScene() {
-    action = Action.SAVE_SCENE;
-    notify();
+  @Override public synchronized void saveScene() {
+    if (currentTask != null) {
+      Log.warn("Can't save the scene right now.");
+    } else {
+      currentTask = () -> {
+        try {
+          sceneManager.saveScene();
+        } catch (InterruptedException e) {
+          Log.warn("Scene saving was interrupted.");
+        }
+      };
+      notifyAll();
+    }
   }
 
   /**
    * Load chunks and reset camera.
    */
-  @Override public synchronized void loadFreshChunks(World world, Collection<ChunkPosition> chunks) {
-    chunksToLoad = chunks;
-    this.world = world;
-    action = Action.LOAD_FRESH_CHUNKS;
-    notify();
+  @Override
+  public synchronized void loadFreshChunks(World world, Collection<ChunkPosition> chunks) {
+    if (currentTask != null) {
+      Log.warn("Can't load chunks right now.");
+    } else {
+      currentTask = () -> sceneManager.loadFreshChunks(world, chunks);
+      notifyAll();
+    }
   }
 
   /**
    * Load chunks without moving the camera.
    */
   @Override public synchronized void loadChunks(World world, Collection<ChunkPosition> chunks) {
-    chunksToLoad = chunks;
-    this.world = world;
-    action = Action.LOAD_CHUNKS;
-    notify();
+    if (currentTask != null) {
+      Log.warn("Can't load chunks right now.");
+    } else {
+      currentTask = () -> sceneManager.loadChunks(world, chunks);
+      notifyAll();
+    }
   }
 
   /**
    * Reload all chunks
    */
   @Override public synchronized void reloadChunks() {
-    action = Action.RELOAD_CHUNKS;
-    notify();
+    if (currentTask != null) {
+      Log.warn("Can't load chunks right now.");
+    } else {
+      currentTask = sceneManager::reloadChunks;
+      notifyAll();
+    }
   }
 
   /**
    * Merge a render dump into the current render.
    */
   public synchronized void mergeRenderDump(File renderDump) {
-    this.renderDump = renderDump;
-    action = Action.MERGE_DUMP;
-    notify();
+    if (currentTask != null) {
+      Log.warn("Can't merge render dump right now.");
+    } else {
+      currentTask = () -> sceneManager.mergeDump(renderDump);
+      notifyAll();
+    }
   }
 
   /**

@@ -21,13 +21,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Tab;
 import javafx.scene.paint.Color;
-import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.SimpleColorPicker;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class LightingTab extends VBox implements RenderControlTab, Initializable {
+public class LightingTab extends Tab implements RenderControlsTab, Initializable {
   private Scene scene;
 
   @FXML private DoubleAdjuster skyIntensity;
@@ -107,8 +107,8 @@ public class LightingTab extends VBox implements RenderControlTab, Initializable
     sunColor.colorProperty().addListener(sunColorListener);
   }
 
-  public void setRenderController(RenderController controller) {
-    scene = controller.getSceneManager().getScene();
+  @Override public void setController(RenderControlsFxController controller) {
+    scene = controller.getRenderController().getSceneManager().getScene();
   }
 
   @Override public void update(Scene scene) {
@@ -122,5 +122,9 @@ public class LightingTab extends VBox implements RenderControlTab, Initializable
     sunColor.colorProperty().removeListener(sunColorListener);
     sunColor.setColor(ColorUtil.toFx(scene.sun().getColor()));
     sunColor.colorProperty().addListener(sunColorListener);
+  }
+
+  @Override public Tab getTab() {
+    return this;
   }
 }

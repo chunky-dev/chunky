@@ -17,8 +17,11 @@
  */
 package se.llbit.chunky.renderer;
 
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.util.TaskTracker;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -41,7 +44,29 @@ public interface Renderer {
    */
   void setNumThreads(int numThreads);
 
-  void setRenderListener(RenderStatusListener renderStatusListener);
+  /**
+   * Set a listener for render completion.
+   *
+   * @param listener a listener which is passed the total rendering
+   * time and average samples per second.
+   */
+  void setOnRenderCompleted(BiConsumer<Long, Integer> listener);
+
+  /**
+   * Set a listener for frame completion.
+   *
+   * @param listener a listener which is called when a frame completes
+   * with the current scene and the current samples per pixel.
+   */
+  void setOnFrameCompleted(BiConsumer<Scene, Integer> listener);
+
+  void setSnapshotControl(SnapshotControl callback);
+
+  void setRenderTask(TaskTracker.Task task);
+
+  void addRenderListener(RenderStatusListener listener);
+
+  void removeRenderListener(RenderStatusListener listener);
 
   void withBufferedImage(Consumer<BitmapImage> bitmap);
 

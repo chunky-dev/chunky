@@ -16,24 +16,38 @@
  */
 package se.llbit.chunky.ui.render;
 
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Tab;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.RenderControlsFxController;
 
-import java.io.IOException;
+/**
+ * Tabs in the Render Controls dialog implement this interface.
+ *
+ * <p>The update method is called to update the active tab with the
+ * current scene state.
+ */
+public interface RenderControlsTab {
+  /**
+   * Called when the tab should update itself because something in the
+   * scene state changed.
+   *
+   * <p>This is called on the JavaFX application thread.
+   *
+   * @param scene the current scene state
+   */
+  void update(Scene scene);
 
-public class HelpTab extends Tab implements RenderControlsTab {
-  public HelpTab() throws IOException {
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("HelpTab.fxml"));
-    loader.setRoot(this);
-    loader.setController(this);
-    loader.load();
+  /**
+   * @return the JavaFX tab component for this render controls tab
+   */
+  Tab getTab();
+
+  /**
+   * Called after chunks have been loaded.
+   */
+  default void onChunksLoaded() {
   }
 
-  @Override public void update(Scene scene) {
-  }
-
-  @Override public Tab getTab() {
-    return this;
+  default void setController(RenderControlsFxController controller) {
   }
 }

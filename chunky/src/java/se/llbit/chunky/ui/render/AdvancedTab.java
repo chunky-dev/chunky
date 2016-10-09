@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -23,23 +22,24 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.ui.ShutdownAlert;
 import se.llbit.chunky.ui.IntegerAdjuster;
+import se.llbit.chunky.ui.RenderControlsFxController;
+import se.llbit.chunky.ui.ShutdownAlert;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AdvancedTab extends VBox implements RenderControlTab, Initializable {
+public class AdvancedTab extends Tab implements RenderControlsTab, Initializable {
   private RenderController controller;
   private Scene scene;
 
@@ -86,7 +86,7 @@ public class AdvancedTab extends VBox implements RenderControlTab, Initializable
       fileChooser.setTitle("Merge Render Dump");
       fileChooser
           .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Render dumps", "*.dump"));
-      File dump = fileChooser.showOpenDialog(getScene().getWindow());
+      File dump = fileChooser.showOpenDialog(getTabPane().getScene().getWindow());
       if (dump != null) {
         // TODO: remove cast.
         ((AsynchronousSceneManager) controller.getSceneManager()).mergeRenderDump(dump);
@@ -122,8 +122,18 @@ public class AdvancedTab extends VBox implements RenderControlTab, Initializable
     rayDepth.set(scene.getRayDepth());
   }
 
-  public void setRenderController(RenderController controller) {
-    this.controller = controller;
+  @Override public Tab getTab() {
+    return this;
+  }
+
+  @Override public void setController(RenderControlsFxController controls) {
+    this.controller = controls.getRenderController();
     scene = controller.getSceneManager().getScene();
+    controller.getRenderer().setOnRenderCompleted((time, sps) -> {
+      if (shutdownAfterCompletedRender()) {
+        // TODO: rewrite the shutdown alert in JavaFX.
+        new ShutdownAlert(null);
+      }
+    });
   }
 }

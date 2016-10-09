@@ -24,7 +24,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
@@ -36,17 +35,16 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.ResetReason;
+import se.llbit.chunky.renderer.SnapshotControl;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.RenderResetHandler;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.StandardRenderListener;
 import se.llbit.chunky.ui.render.AdvancedTab;
 import se.llbit.chunky.ui.render.CameraTab;
 import se.llbit.chunky.ui.render.EntitiesTab;
@@ -54,20 +52,27 @@ import se.llbit.chunky.ui.render.GeneralTab;
 import se.llbit.chunky.ui.render.HelpTab;
 import se.llbit.chunky.ui.render.LightingTab;
 import se.llbit.chunky.ui.render.PostprocessingTab;
-import se.llbit.chunky.ui.render.RenderControlTab;
+import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.ui.render.SkyTab;
 import se.llbit.chunky.ui.render.WaterTab;
 import se.llbit.chunky.world.Icon;
 import se.llbit.log.Log;
 import se.llbit.util.ProgressListener;
+import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /**
  * Controller for the Render Controls dialog.
@@ -75,22 +80,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RenderControlsFxController implements Initializable, RenderResetHandler {
   private AsynchronousSceneManager asyncSceneManager;
 
-  static class GUIRenderListener extends StandardRenderListener {
+  public ChunkyFxController getChunkyController() {
+    return controller;
+  }
+
+  public RenderController getRenderController() {
+    return controller.getChunky().getRenderController();
+  }
+
+  static class GUIRenderListener implements RenderStatusListener {
     private final RenderControlsFxController gui;
     private int spp;
     private int sps;
 
-    public GUIRenderListener(RenderControlsFxController renderControls, RenderController controller,
-        ProgressListener progressListener) {
-      super(controller.getContext(), controller.getSceneManager(), progressListener);
+    public GUIRenderListener(RenderControlsFxController renderControls) {
       this.gui = renderControls;
-    }
-
-    @Override public void chunksLoaded() {
-      Platform.runLater(() -> {
-        gui.openPreview();
-        gui.cameraTab.chunksLoaded();
-      });
     }
 
     @Override public void setRenderTime(long time) {
@@ -119,30 +123,6 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
               gui.decimalFormat.format(sps))));
     }
 
-    @Override public void sceneSaved() {
-    }
-
-    @Override public void sceneLoaded() {
-      CountDownLatch guiUpdateLatch = new CountDownLatch(1);
-      Platform.runLater(() -> {
-        synchronized (gui.scene) {
-          gui.sceneNameField.setText(gui.scene.name());
-          gui.canvas.setCanvasSize(gui.scene.width, gui.scene.height);
-        }
-        gui.updateTitle();
-        gui.refreshSettings();
-        guiUpdateLatch.countDown();
-      });
-      new Thread(() -> {
-        try {
-          guiUpdateLatch.await();
-          gui.canvas.forceRepaint();
-        } catch (InterruptedException ignored) {
-          // Ignored.
-        }
-      }).start();
-    }
-
     @Override public void renderStateChanged(RenderMode state) {
       Platform.runLater(() -> {
         switch (state) {
@@ -157,13 +137,6 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
             break;
         }
       });
-    }
-
-    @Override public void renderJobFinished(long time, int sps) {
-      // TODO make sure this works.
-      if (gui.advancedTab.shutdownAfterCompletedRender()) {
-        new ShutdownAlert(null);
-      }
     }
   }
 
@@ -181,7 +154,6 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
   private File saveFrameDirectory = new File(System.getProperty("user.dir"));
 
   private Stage stage;
-  private RenderController renderController;
   private RenderCanvasFx canvas;
   private Renderer renderer;
 
@@ -210,6 +182,13 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
 
   private RenderStatusListener renderTracker = RenderStatusListener.NONE;
 
+  private TaskTracker taskTracker = new TaskTracker(ProgressListener.NONE);
+
+  private Collection<RenderControlsTab> tabs = new ArrayList<>();
+
+  /** Maps JavaFX tabs to tab controllers. */
+  private Map<Tab, RenderControlsTab> tabControllers = Collections.emptyMap();
+
   @FXML private TextField sceneNameField;
 
   @FXML private Button saveBtn;
@@ -232,29 +211,12 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
 
   @FXML private Label sppLbl;
 
-  @FXML private GeneralTab generalTab;
-
-  @FXML private LightingTab lightingTab;
-
-  @FXML private SkyTab skyTab;
-
-  @FXML private WaterTab waterTab;
-
-  @FXML private CameraTab cameraTab;
-
-  @FXML private EntitiesTab entitiesTab;
-
-  @FXML private PostprocessingTab postprocessingTab;
-
-  @FXML private AdvancedTab advancedTab;
-
-  @FXML private HelpTab helpTab;
-
   @FXML private IntegerAdjuster targetSpp;
 
   @FXML private Button saveDefaultSpp;
 
   @FXML private TabPane tabPane;
+
   private ChunkyFxController controller;
 
   public RenderControlsFxController() {
@@ -267,9 +229,6 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
     saveBtn.setGraphic(new ImageView(Icon.disk.fxImage()));
     saveBtn.setOnAction(e -> asyncSceneManager.saveScene());
     saveFrameBtn.setOnAction(this::saveCurrentFrame);
-    tabPane.getSelectionModel().selectedItemProperty()
-        .addListener((observable, oldValue, newValue) -> updateTab(newValue));
-    tabPane.getTabs().get(0).setGraphic(new ImageView(Icon.wrench.fxImage()));
     togglePreviewBtn.setOnAction(e -> {
       if (canvas == null || !canvas.isShowing()) {
         openPreview();
@@ -324,7 +283,7 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
         if (!target.getName().endsWith(extension)) {
           target = new File(target.getPath() + extension);
         }
-        scene.saveFrame(target, renderTracker.taskTracker());
+        scene.saveFrame(target, taskTracker);
       } catch (IOException e1) {
         Log.error("Failed to save current frame", e1);
       }
@@ -347,51 +306,41 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
     });
   }
 
-  private void setRenderController(RenderController renderController) {
-    this.renderTracker = new GUIRenderListener(this, renderController, progressListener);
-    this.renderController = renderController;
-    renderer = renderController.getRenderer();
-    scene = renderController.getSceneManager().getScene();
-    sceneNameField.setText(scene.name);
-    sceneNameField.setTextFormatter(new TextFormatter<TextFormatter.Change>(change -> {
-      if (change.isReplaced()) {
-        if (change.getText().isEmpty()) {
-          // Disallow clearing the scene name.
-          change.setText(change.getControlText().substring(change.getRangeStart(),
-              change.getRangeEnd()));
-        }
-      }
-      if (change.isAdded()) {
-        if (!AsynchronousSceneManager.sceneNameIsValid(change.getText())) {
-          // Stop a change adding illegal characters to the scene name.
-          change.setText("");
-        }
-      }
-      return change;
-    }));
-    sceneNameField.textProperty().addListener((observable, oldValue, newValue) -> {
-      scene.setName(newValue);
-      renderController.getSceneProvider().withSceneProtected(scene -> scene.setName(newValue));
-      updateTitle();
-    });
-    sceneNameField.setOnAction(event -> asyncSceneManager.saveScene());
-    generalTab.setRenderController(renderController);
-    lightingTab.setRenderController(renderController);
-    skyTab.setRenderController(renderController);
-    waterTab.setRenderController(renderController);
-    cameraTab.setRenderController(renderController);
-    entitiesTab.setRenderController(renderController);
-    advancedTab.setRenderController(renderController);
-    postprocessingTab.setRenderController(renderController);
-    targetSpp.set(scene.getTargetSpp());
-    targetSpp.onValueChange(value -> scene.setTargetSpp(value));
+  private void buildTabs() {
+    try {
+      // Create the default tabs:
+      tabs.add(new GeneralTab());
+      tabs.add(new LightingTab());
+      tabs.add(new SkyTab());
+      tabs.add(new WaterTab());
+      tabs.add(new CameraTab());
+      tabs.add(new EntitiesTab());
+      tabs.add(new PostprocessingTab());
+      tabs.add(new AdvancedTab());
+      tabs.add(new HelpTab());
 
-    // TODO: remove the cast.
-    asyncSceneManager =
-        (AsynchronousSceneManager) renderController.getSceneManager();
-    asyncSceneManager.setResetHandler(this);
-    asyncSceneManager.setRenderStatusListener(renderTracker);
-    renderer.setRenderListener(renderTracker);
+      // Transform tabs (allows plugin hooks to modify the tabs):
+      tabs = controller.getChunky().getRenderControlsTabTransformer().apply(tabs);
+
+      if (tabs.contains(null)) {
+        Log.error("Null tabs inserted in tab collection (possible plugin error).");
+        tabs = tabs.stream().filter(tab -> tab != null).collect(Collectors.toList());
+      }
+
+      Collection<Tab> javaFxTabs = new ArrayList<>();
+      tabControllers = new HashMap<>();
+      for (RenderControlsTab tab : tabs) {
+        Tab javaFxTab = tab.getTab();
+        tabControllers.put(javaFxTab, tab);
+        javaFxTabs.add(javaFxTab);
+      }
+      tabPane.getTabs().addAll(javaFxTabs);
+    } catch (IOException e) {
+      Log.error("Failed to build render controls tabs.", e);
+    }
+
+    tabPane.getSelectionModel().selectedItemProperty()
+        .addListener((observable, oldValue, newValue) -> updateTab(newValue));
   }
 
   private void refreshSettings() {
@@ -400,8 +349,12 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
   }
 
   private void updateTab(Tab tab) {
-    RenderControlTab controlTab = (RenderControlTab) ((ScrollPane) tab.getContent()).getContent();
-    controlTab.update(scene);
+    RenderControlsTab controller = tabControllers.get(tab);
+    if (controller != null) {
+      tabControllers.get(tab).update(scene);
+    } else {
+      Log.error("Missing tab controller!");
+    }
   }
 
   public void openPreview() {
@@ -431,22 +384,89 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
     canvas.repaint();
   }
 
-  public void setMapLoader(WorldMapLoader mapLoader) {
-    generalTab.setFxController(this);
-    generalTab.setMapLoader(mapLoader);
-    cameraTab.setMapLoader(mapLoader);
-    updateTab(tabPane.getSelectionModel().getSelectedItem());
-  }
-
   public RenderCanvasFx getCanvas() {
     return canvas;
   }
 
   public void setController(ChunkyFxController controller) {
     this.controller = controller;
-    generalTab.setChunkyFxController(controller);
-    setRenderController(controller.getChunky().getRenderController());
-    setMapLoader(controller.getMapLoader());
+    RenderController renderController = controller.getChunky().getRenderController();
+    this.renderTracker = new GUIRenderListener(this);
+    this.taskTracker = new TaskTracker(progressListener);
+    buildTabs();
+    renderer = renderController.getRenderer();
+    scene = renderController.getSceneManager().getScene();
+    sceneNameField.setText(scene.name);
+    sceneNameField.setTextFormatter(new TextFormatter<TextFormatter.Change>(change -> {
+      if (change.isReplaced()) {
+        if (change.getText().isEmpty()) {
+          // Disallow clearing the scene name.
+          change.setText(change.getControlText().substring(change.getRangeStart(),
+              change.getRangeEnd()));
+        }
+      }
+      if (change.isAdded()) {
+        if (!AsynchronousSceneManager.sceneNameIsValid(change.getText())) {
+          // Stop a change adding illegal characters to the scene name.
+          change.setText("");
+        }
+      }
+      return change;
+    }));
+    sceneNameField.textProperty().addListener((observable, oldValue, newValue) -> {
+      scene.setName(newValue);
+      renderController.getSceneProvider().withSceneProtected(scene1 -> scene1.setName(newValue));
+      updateTitle();
+    });
+    sceneNameField.setOnAction(event -> asyncSceneManager.saveScene());
+    targetSpp.set(scene.getTargetSpp());
+    targetSpp.onValueChange(value -> scene.setTargetSpp(value));
+
+    // TODO: remove the cast.
+    asyncSceneManager =
+        (AsynchronousSceneManager) renderController.getSceneManager();
+    asyncSceneManager.setResetHandler(this);
+    asyncSceneManager.setTaskTracker(taskTracker);
+    asyncSceneManager.setOnSceneLoaded(() -> {
+      CountDownLatch guiUpdateLatch = new CountDownLatch(1);
+      Platform.runLater(() -> {
+        synchronized (scene) {
+          sceneNameField.setText(scene.name());
+          canvas.setCanvasSize(scene.width, scene.height);
+        }
+        updateTitle();
+        refreshSettings();
+        guiUpdateLatch.countDown();
+      });
+      new Thread(() -> {
+        try {
+          guiUpdateLatch.await();
+          canvas.forceRepaint();
+        } catch (InterruptedException ignored) {
+          // Ignored.
+        }
+      }).start();
+    });
+    asyncSceneManager.setOnChunksLoaded(() -> Platform.runLater(() -> {
+      openPreview();
+      tabs.forEach(RenderControlsTab::onChunksLoaded);
+    }));
+    asyncSceneManager.setTaskTracker(taskTracker);
+    renderer.setSnapshotControl(SnapshotControl.DEFAULT);
+    renderer.setOnFrameCompleted((scene1, spp) -> {
+      if (SnapshotControl.DEFAULT.saveSnapshot(scene1, spp)) {
+        // Save the current frame.
+        scene1.saveSnapshot(renderController.getContext().getSceneDirectory(), taskTracker);
+      }
+
+      if (SnapshotControl.DEFAULT.saveRenderDump(scene1, spp)) {
+        // Save the scene description and current render dump.
+        asyncSceneManager.saveScene();
+      }
+    });
+    renderer.addRenderListener(renderTracker);
+    tabs.forEach(tab -> tab.setController(this));
+    updateTab(tabPane.getSelectionModel().getSelectedItem());
   }
 
   private void updateTitle() {

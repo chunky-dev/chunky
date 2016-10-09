@@ -1,4 +1,4 @@
-/* Copyright (c) 2014 Tim De Keyser <aenterprise2@gmail.com>
+/* Copyright (c) 2014-2016 Chunky committers
  *
  * This file is part of Chunky.
  *
@@ -51,13 +51,9 @@ public class ZipExport {
 
       zos.close();
       fos.close();
-
-    } catch (FileNotFoundException e) {
-      Log.error(e);
     } catch (IOException e) {
       Log.error(e);
     }
-
   }
 
   private static void addToZipFile(ZipOutputStream zos, File sceneDir, String prefix,

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012,2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -30,8 +30,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -40,8 +40,8 @@ import java.util.ResourceBundle;
 
 /**
  * Error reporting dialog for Chunky.
- * <p>
- * Used to display critical errors in a nicer way.
+ *
+ * <p>Used to display critical errors in a nicer way.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
@@ -78,23 +78,27 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
   public synchronized void addErrorMessage(String message) {
     errorCount += 1;
 
-    VBox vBox = new VBox();
-    vBox.setPadding(new Insets(10));
-    vBox.setSpacing(10);
-    vBox.setAlignment(Pos.TOP_RIGHT);
+    BorderPane.setMargin(tabPane, new Insets(10, 0, 0, 0));
+
+    BorderPane pane = new BorderPane();
+    pane.setPadding(new Insets(10));
+
     TextArea text = new TextArea();
     text.setText(message);
     text.setEditable(false);
-    Button dismissBtn = new Button("Dismiss");
-
     text.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    vBox.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    vBox.getChildren().setAll(text, dismissBtn);
+    pane.setPrefHeight(Region.USE_COMPUTED_SIZE);
+    pane.setCenter(text);
 
-    Tab tab = new Tab("Error " + errorCount, vBox);
+    Button dismiss = new Button("Dismiss");
+    BorderPane.setAlignment(dismiss, Pos.BOTTOM_RIGHT);
+    BorderPane.setMargin(dismiss, new Insets(10, 0, 0, 0));
+    pane.setBottom(dismiss);
+
+    Tab tab = new Tab("Error " + errorCount, pane);
     tabPane.getTabs().add(tab);
 
-    dismissBtn.setOnAction(event -> {
+    dismiss.setOnAction(event -> {
       tabPane.getTabs().remove(tab);
       if (tabPane.getTabs().isEmpty()) {
         hide();

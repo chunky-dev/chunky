@@ -20,10 +20,8 @@ import org.jastadd.util.PrettyPrinter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.SimpleRenderListener;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneDescription;
-import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.resources.TexturePackLoader.TextureLoadingError;
 import se.llbit.json.JsonNumber;
@@ -35,6 +33,7 @@ import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.util.MCDownloader;
 import se.llbit.util.StringUtil;
+import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -351,12 +350,18 @@ public class CommandLineOptions {
         }
         scene.initBuffers();
         RenderContext context = new RenderContext(new Chunky(options));
-        SimpleRenderListener listener = new SimpleRenderListener(new ConsoleProgressListener());
-        scene.loadDump(context, listener); // Load the render dump.
+        TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
+            TaskTracker.Task::new,
+            (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
+              @Override public void update() {
+                // Don't report task state to progress listener.
+              }
+            });
+        scene.loadDump(context, taskTracker); // Load the render dump.
         Log.info("Original scene SPP: " + scene.spp);
-        scene.mergeDump(dumpfile, listener);
+        scene.mergeDump(dumpfile, taskTracker);
         Log.info("Current scene SPP: " + scene.spp);
-        scene.saveDump(context, listener.taskTracker());
+        scene.saveDump(context, taskTracker);
         try (FileOutputStream out = new FileOutputStream(sceneFile)) {
           scene.saveDescription(out);
         }

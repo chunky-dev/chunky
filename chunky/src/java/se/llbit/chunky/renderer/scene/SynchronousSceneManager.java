@@ -19,13 +19,13 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.RenderStatus;
-import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.SceneProvider;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 import se.llbit.log.Log;
+import se.llbit.util.ProgressListener;
 import se.llbit.util.TaskTracker;
 
 import java.io.File;
@@ -66,9 +66,10 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
 
   private final Renderer renderer;
 
-  private RenderStatusListener renderStatusListener = RenderStatusListener.NONE;
-
   private RenderResetHandler resetHandler = () -> true;
+  private TaskTracker taskTracker = new TaskTracker(ProgressListener.NONE);
+  private Runnable onSceneLoaded = () -> {};
+  private Runnable onChunksLoaded = () -> {};
 
   public SynchronousSceneManager(RenderContext context, Renderer renderer) {
     this.context = context;
@@ -81,12 +82,20 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     storedScene = context.getChunky().getSceneFactory().copyScene(scene);
   }
 
-  public void setRenderStatusListener(RenderStatusListener renderStatusListener) {
-    this.renderStatusListener = renderStatusListener;
-  }
-
   public void setResetHandler(RenderResetHandler resetHandler) {
     this.resetHandler = resetHandler;
+  }
+
+  public void setTaskTracker(TaskTracker taskTracker) {
+    this.taskTracker = taskTracker;
+  }
+
+  public void setOnSceneLoaded(Runnable onSceneLoaded) {
+    this.onSceneLoaded = onSceneLoaded;
+  }
+
+  public void setOnChunksLoaded(Runnable onChunksLoaded) {
+    this.onChunksLoaded = onChunksLoaded;
   }
 
   @Override public Scene getScene() {
@@ -118,10 +127,9 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         RenderStatus status = renderer.getRenderStatus();
         storedScene.renderTime = status.getRenderTime();
         storedScene.spp = status.getSpp();
-        storedScene.saveScene(context, renderStatusListener);
+        storedScene.saveScene(context, taskTracker);
         Log.info("Scene saved");
       }
-      renderStatusListener.sceneSaved();
     } catch (IOException e) {
       Log.error("Failed to save scene. Reason: " + e.getMessage(), e);
     }
@@ -133,53 +141,51 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     // Do not change lock ordering here.
     // Lock order: scene -> storedScene.
     synchronized (scene) {
-      try (TaskTracker.Task ignored = renderStatusListener.taskTracker().task("Loading scene", 1)) {
-        scene.loadScene(context, renderStatusListener, sceneName);
+      try (TaskTracker.Task ignored = taskTracker.task("Loading scene", 1)) {
+        scene.loadScene(context, sceneName, taskTracker);
       }
 
       // Update progress bar.
-      renderStatusListener.renderTask().update("Rendering", scene.getTargetSpp(), scene.spp);
+      taskTracker.backgroundTask().update("Rendering", scene.getTargetSpp(), scene.spp);
 
       scene.setResetReason(ResetReason.SCENE_LOADED);
 
       // Wake up waiting threads in awaitSceneStateChange().
       scene.notifyAll();
-
-      renderStatusListener.sceneLoaded();
-      renderStatusListener.renderStateChanged(scene.getMode());
     }
+    onSceneLoaded.run();
   }
 
   @Override public void loadFreshChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
       scene.clear();
-      scene.loadChunks(renderStatusListener.taskTracker(), world, chunksToLoad);
+      scene.loadChunks(taskTracker, world, chunksToLoad);
       scene.moveCameraToCenter();
       scene.refresh();
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.setRenderMode(RenderMode.PREVIEW);
     }
-    renderStatusListener.sceneLoaded();
+    onSceneLoaded.run();
   }
 
   @Override public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
-      scene.loadChunks(renderStatusListener.taskTracker(), world, chunksToLoad);
+      scene.loadChunks(taskTracker, world, chunksToLoad);
       scene.refresh();
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.setRenderMode(RenderMode.PREVIEW);
     }
-    renderStatusListener.chunksLoaded();
+    onChunksLoaded.run();
   }
 
   @Override public void reloadChunks() {
     synchronized (scene) {
-      scene.reloadChunks(renderStatusListener.taskTracker());
+      scene.reloadChunks(taskTracker);
       scene.refresh();
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.setRenderMode(RenderMode.PREVIEW);
     }
-    renderStatusListener.chunksLoaded();
+    onChunksLoaded.run();
   }
 
   @Override public ResetReason awaitSceneStateChange() throws InterruptedException {
@@ -216,7 +222,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   }
 
   @Override public void withSceneProtected(Consumer<Scene> fun) {
-    // Lock order: scene -> storedScene;
+    // Lock order: scene -> storedScene.
     synchronized (scene) {
       synchronized (storedScene) {
         storedScene.copyTransients(scene);
@@ -241,7 +247,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         if (width != scene.width || height != scene.height) {
           throw new Error("Failed to merge render dump - wrong canvas size.");
         }
-        scene.mergeDump(dumpFile, renderStatusListener);
+        scene.mergeDump(dumpFile, taskTracker);
       });
       scene.setResetReason(ResetReason.SCENE_LOADED);
     }

@@ -50,21 +50,17 @@ public class Transform {
 
   /**
    * Apply the transformation to a vertex.
-   *
-   * @param v
    */
   public void apply(Vector3 v) {
   }
 
   /**
    * Apply only rotation and scaling to a vertex.
-   *
-   * @param v
    */
   public void applyRotScale(Vector3 v) {
   }
 
-  private final Transform chain(Transform other) {
+  private Transform chain(Transform other) {
     if (this == NONE) {
       return other;
     } else {
@@ -100,9 +96,7 @@ public class Transform {
   }
 
   /**
-   * Scale by a scalar
-   *
-   * @param scale
+   * Scale by a scalar.
    */
   public final Transform scale(final double scale) {
     return chain(new Transform() {

@@ -202,19 +202,6 @@ public class WaterModel {
       if (hit) {
         ray.distance += ray.t;
         ray.o.scaleAdd(ray.t, ray.d);
-
-				/*if ((level&8) != 0) {
-          // falling water
-					if (ray.n.x != 0) {
-						double sign = QuickMath.signum(ray.n.x);
-						doWaterDisplacement(ray);
-						ray.n.set(ray.n.y*sign, ray.n.x, ray.n.z);
-					} else {
-						double sign = QuickMath.signum(ray.n.z);
-						doWaterDisplacement(ray);
-						ray.n.set(ray.n.x, ray.n.z, ray.n.y*sign);
-					}
-				}*/
       }
       return hit;
     }
@@ -355,10 +342,8 @@ public class WaterModel {
 
   /**
    * Displace the normal using the water displacement map.
-   *
-   * @param ray
    */
-  public final static void doWaterDisplacement(Ray ray) {
+  public static void doWaterDisplacement(Ray ray) {
     int w = (1 << 4);
     double x = ray.o.x / w - QuickMath.floor(ray.o.x / w);
     double z = ray.o.z / w - QuickMath.floor(ray.o.z / w);

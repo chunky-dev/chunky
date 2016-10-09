@@ -8,33 +8,38 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ScrollPane?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 <?import se.llbit.chunky.ui.SimpleColorPicker?>
 
-<fx:root spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-    <children>
+<fx:root text="Water" type="javafx.scene.control.Tab" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+  <ScrollPane>
+    <VBox spacing="10.0">
+      <children>
         <CheckBox fx:id="stillWater" mnemonicParsing="false" text="Still water" />
-      <DoubleAdjuster fx:id="waterVisibility" />
-      <DoubleAdjuster fx:id="waterOpacity" />
-      <Label text="Note: All chunks are reloaded when changing Water World options." />
+        <DoubleAdjuster fx:id="waterVisibility" />
+        <DoubleAdjuster fx:id="waterOpacity" />
+        <Label text="Note: All chunks are reloaded when changing Water World options." />
         <CheckBox fx:id="waterWorld" mnemonicParsing="false" text="Water World mode" />
         <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
-            <children>
+          <children>
             <Label text="Water height:" />
             <TextField fx:id="waterHeight" />
-                <Button fx:id="applyWaterHeight" mnemonicParsing="false" text="Apply" />
-            </children>
+            <Button fx:id="applyWaterHeight" mnemonicParsing="false" text="Apply" />
+          </children>
         </HBox>
         <Separator prefWidth="200.0" />
-      <HBox alignment="CENTER_LEFT" spacing="10.0">
-         <children>
-              <CheckBox fx:id="useCustomWaterColor" mnemonicParsing="false" text="Use custom water color:" />
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+          <children>
+            <CheckBox fx:id="useCustomWaterColor" mnemonicParsing="false" text="Use custom water color:" />
             <SimpleColorPicker fx:id="waterColor" />
-         </children>
-      </HBox>
-      <Button fx:id="saveDefaults" mnemonicParsing="false" text="Save as defaults" />
-    </children>
-    <padding>
+          </children>
+        </HBox>
+        <Button fx:id="saveDefaults" mnemonicParsing="false" text="Save as defaults" />
+      </children>
+      <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-    </padding>
+      </padding>
+    </VBox>
+  </ScrollPane>
 </fx:root>

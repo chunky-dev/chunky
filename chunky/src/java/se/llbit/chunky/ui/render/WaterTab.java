@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -25,14 +24,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.VBox;
 import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.SimpleColorPicker;
 import se.llbit.chunky.world.World;
 import se.llbit.math.ColorUtil;
@@ -42,7 +42,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class WaterTab extends VBox implements RenderControlTab, Initializable {
+public class WaterTab extends Tab implements RenderControlsTab, Initializable {
   private Scene scene;
 
   @FXML private CheckBox stillWater;
@@ -70,9 +70,9 @@ public class WaterTab extends VBox implements RenderControlTab, Initializable {
     loader.load();
   }
 
-  public void setRenderController(RenderController controller) {
-    this.controller = controller;
-    scene = controller.getSceneManager().getScene();
+  @Override public void setController(RenderControlsFxController controller) {
+    this.controller = controller.getRenderController();
+    scene = this.controller.getSceneManager().getScene();
   }
 
   @Override public void update(Scene scene) {
@@ -90,6 +90,10 @@ public class WaterTab extends VBox implements RenderControlTab, Initializable {
     waterColor.colorProperty().removeListener(waterColorListener);
     waterColor.setColor(ColorUtil.toFx(scene.getWaterColor()));
     waterColor.colorProperty().addListener(waterColorListener);
+  }
+
+  @Override public Tab getTab() {
+    return this;
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {

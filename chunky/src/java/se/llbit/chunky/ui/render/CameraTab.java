@@ -28,22 +28,22 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.VBox;
 import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.CameraPreset;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.math.QuickMath;
@@ -53,7 +53,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class CameraTab extends VBox implements RenderControlTab, Initializable {
+public class CameraTab extends Tab implements RenderControlsTab, Initializable {
   private Scene scene;
 
   @FXML private MenuButton loadPreset;
@@ -90,16 +90,6 @@ public class CameraTab extends VBox implements RenderControlTab, Initializable {
     loader.load();
   }
 
-  public void setRenderController(RenderController controller) {
-    scene = controller.getSceneManager().getScene();
-    scene.camera().setDirectionListener(this::updateCameraDirection);
-    scene.camera().setPositionListener(this::updateCameraPosition);
-    scene.camera().setProjectionListener(() -> {
-      updateFov();
-      mapLoader.drawCameraVisualization();
-    });
-  }
-
   @Override public void update(Scene scene) {
     updateCameraList();
     updateCameraPosition();
@@ -108,6 +98,10 @@ public class CameraTab extends VBox implements RenderControlTab, Initializable {
     updateFov();
     updateDof();
     updateSubjectDistance();
+  }
+
+  @Override public Tab getTab() {
+    return this;
   }
 
   private void updateProjectionMode() {
@@ -342,11 +336,19 @@ public class CameraTab extends VBox implements RenderControlTab, Initializable {
     mapLoader.drawCameraVisualization();
   }
 
-  public void setMapLoader(WorldMapLoader mapLoader) {
-    this.mapLoader = mapLoader;
+  @Override public void onChunksLoaded() {
+    update(scene);
   }
 
-  public void chunksLoaded() {
-    update(scene);
+  @Override public void setController(RenderControlsFxController controller) {
+    this.mapLoader = controller.getChunkyController().getMapLoader();
+
+    scene = controller.getRenderController().getSceneManager().getScene();
+    scene.camera().setDirectionListener(this::updateCameraDirection);
+    scene.camera().setPositionListener(this::updateCameraPosition);
+    scene.camera().setProjectionListener(() -> {
+      updateFov();
+      mapLoader.drawCameraVisualization();
+    });
   }
 }

@@ -50,7 +50,7 @@ public class ZipExportJob extends Thread {
     this.progress = progress;
   }
 
-  public void run() {
+  @Override public void run() {
     if (progress.tryStartJob()) {
       try {
         progress.setJobName("Zip Export");

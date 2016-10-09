@@ -36,19 +36,15 @@ public class ChunkHeightmap {
   }
 
   /**
-   * Set height value y at (x, z)
+   * Set height value at (x, z).
    *
-   * @param y
-   * @param x
-   * @param z
+   * @param y new height value
    */
   public void set(int y, int x, int z) {
     data[x + 2 * z * Chunk.X_MAX] = (short) y;
   }
 
   /**
-   * @param x
-   * @param z
    * @return Height at (x, z)
    */
   public int get(int x, int z) {

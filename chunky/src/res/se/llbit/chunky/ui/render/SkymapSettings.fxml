@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 
-<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Button fx:id="loadSkymap" mnemonicParsing="false" text="Load skymap" />
       <HBox fx:id="panoSpecific" alignment="CENTER_LEFT" spacing="10.0">

@@ -34,7 +34,6 @@ import javafx.stage.Stage;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.PlayerModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.math.BVH;
 import se.llbit.math.ColorUtil;
@@ -54,7 +53,7 @@ import java.util.ResourceBundle;
 /**
  * A tool for posing entities.
  */
-public class Poser extends Stage implements RenderControlTab, Initializable {
+public class Poser extends Stage implements Initializable {
   private static final WritablePixelFormat<IntBuffer> PIXEL_FORMAT =
       PixelFormat.getIntArgbInstance();
   private final EntitiesTab.PlayerData player;
@@ -87,9 +86,6 @@ public class Poser extends Stage implements RenderControlTab, Initializable {
     Parent root = loader.load();
     setScene(new javafx.scene.Scene(root));
     setTitle("Pose Preview");
-  }
-
-  @Override public void update(Scene scene) {
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -196,7 +192,6 @@ public class Poser extends Stage implements RenderControlTab, Initializable {
         ray.d.normalize();
 
         ray.o.set(camPos);
-        boolean hit = false;
         while (true) {
           if (bvh.closestIntersection(ray)) {
             if (ray.color.w > 0.9) {

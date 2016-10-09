@@ -7,47 +7,52 @@
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ScrollPane?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
-
 <?import se.llbit.chunky.ui.SimpleColorPicker?>
-<fx:root spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-    <children>
+
+<fx:root text="Sky &amp; Lighting" type="javafx.scene.control.Tab" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+  <ScrollPane>
+    <VBox spacing="10.0">
+      <children>
         <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
-         <children>
+          <children>
             <Label text="Sky mode:" />
             <ChoiceBox fx:id="skyMode" prefWidth="150.0" />
-         </children>
+          </children>
         </HBox>
-      <TitledPane fx:id="detailsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Sky mode settings">
-         <VBox.margin>
+        <TitledPane fx:id="detailsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Sky mode settings">
+          <VBox.margin>
             <Insets />
-         </VBox.margin>
-         <content>
+          </VBox.margin>
+          <content>
             <VBox fx:id="skyModeSettings">
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </padding>
-               <children>
-                  <Label text="Selected mode has no settings." />
-               </children>
+              <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+              </padding>
+              <children>
+                <Label text="Selected mode has no settings." />
+              </children>
             </VBox>
-         </content></TitledPane>
+          </content></TitledPane>
         <CheckBox fx:id="transparentSkyEnabled" mnemonicParsing="false" text="Transparent sky" />
         <CheckBox fx:id="cloudsEnabled" mnemonicParsing="false" text="Enable clouds" />
-      <DoubleAdjuster fx:id="cloudSize" />
-      <DoubleAdjuster fx:id="cloudX" />
-      <DoubleAdjuster fx:id="cloudY" />
-      <DoubleAdjuster fx:id="cloudZ" />
-      <DoubleAdjuster fx:id="fogDensity" />
-      <HBox alignment="CENTER_LEFT" spacing="10.0">
-         <children>
+        <DoubleAdjuster fx:id="cloudSize" />
+        <DoubleAdjuster fx:id="cloudX" />
+        <DoubleAdjuster fx:id="cloudY" />
+        <DoubleAdjuster fx:id="cloudZ" />
+        <DoubleAdjuster fx:id="fogDensity" />
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+          <children>
             <Label text="Fog color:" />
             <SimpleColorPicker fx:id="fogColor" />
-         </children>
-      </HBox>
-      <Label text="Hint: Set fog density &gt; 0.1 for thick fog, and &lt; 0.1 for haze effect." />
-    </children>
-    <padding>
+          </children>
+        </HBox>
+        <Label text="Hint: Set fog density &gt; 0.1 for thick fog, and &lt; 0.1 for haze effect." />
+      </children>
+      <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-    </padding>
+      </padding>
+    </VBox>
+  </ScrollPane>
 </fx:root>

@@ -52,11 +52,9 @@ public final class JsonSettings {
    */
   public void load(File file) {
     String path = file.getAbsolutePath();
-    try {
-      InputStream in = new FileInputStream(file);
+    try (InputStream in = new FileInputStream(file)) {
       JsonParser parser = new JsonParser(in);
       json = parser.parse().object();
-      in.close();
       Log.infofmt("Settings loaded from %s", path);
     } catch (IOException e) {
       Log.warningfmt("Warning: Could not load settings from %s - defaults will be used", path);

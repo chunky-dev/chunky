@@ -19,10 +19,12 @@ package se.llbit.chunky.renderer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
+import se.llbit.util.TaskTracker;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -68,7 +70,11 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
   /** Number of completed jobs. */
   private final AtomicInteger finishedJobs = new AtomicInteger(0);
 
-  private RenderStatusListener renderListener = RenderStatusListener.NONE;
+  private Collection<RenderStatusListener> listeners = new ArrayList<>();
+
+  private BiConsumer<Long, Integer> renderCompletionListener = (time, sps) -> {};
+  private BiConsumer<Scene, Integer> frameCompletionListener = (scene, spp) -> {};
+  private TaskTracker.Task renderTask = TaskTracker.Task.NONE;
 
   /**
    * Decides if render threads shut down after reaching the target SPP.
@@ -81,6 +87,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
   private RenderMode mode = RenderMode.PREVIEW;
 
   private final Collection<SceneStatusListener> sceneListeners = new ArrayList<>();
+
+  private SnapshotControl snapshotControl = SnapshotControl.DEFAULT;
 
   /**
    * @param headless {@code true} if rendering threads should be shut
@@ -95,8 +103,12 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
     manageWorkers();
   }
 
-  public synchronized void setRenderListener(RenderStatusListener listener) {
-    this.renderListener = listener;
+  @Override public synchronized void addRenderListener(RenderStatusListener listener) {
+    listeners.add(listener);
+  }
+
+  @Override public void removeRenderListener(RenderStatusListener listener) {
+    listeners.remove(listener);
   }
 
   private void manageWorkers() {
@@ -186,7 +198,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
     if (mode != scene.getMode()) {
       mode = scene.getMode();
       // TODO: make render state update faster by moving this to Scene?
-      renderListener.renderStateChanged(mode);
+      listeners.forEach(listener -> listener.renderStateChanged(mode));
     }
   }
 
@@ -221,10 +233,11 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
       synchronized (bufferedScene) {
         bufferedScene.spp += RenderConstants.SPP_PER_PASS;
-        renderListener.frameCompleted(bufferedScene, bufferedScene.spp);
+        int currentSpp = bufferedScene.spp;
+        frameCompletionListener.accept(bufferedScene, currentSpp);
         updateRenderProgress();
-        if (bufferedScene.spp >= bufferedScene.getTargetSpp()) {
-          renderListener.renderJobFinished(bufferedScene.renderTime, samplesPerSecond());
+        if (currentSpp >= bufferedScene.getTargetSpp()) {
+          renderCompletionListener.accept(bufferedScene.renderTime, samplesPerSecond());
           return;
         }
       }
@@ -253,23 +266,25 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
       int minutes = (int) ((etaSeconds / 60) % 60);
       int hours = (int) (etaSeconds / 3600);
       String eta = String.format("%d:%02d:%02d", hours, minutes, seconds);
-      renderListener.renderTask().update("Rendering", target, bufferedScene.spp, eta);
+      renderTask.update("Rendering", target, bufferedScene.spp, eta);
     } else {
-      renderListener.renderTask().update("Rendering", target, bufferedScene.spp, "");
+      renderTask.update("Rendering", target, bufferedScene.spp, "");
     }
 
     synchronized (this) {
       // Update render status display.
-      renderListener.setRenderTime(bufferedScene.renderTime);
-      renderListener.setSamplesPerSecond(samplesPerSecond());
-      renderListener.setSpp(bufferedScene.spp);
+      listeners.forEach(listener -> {
+        listener.setRenderTime(bufferedScene.renderTime);
+        listener.setSamplesPerSecond(samplesPerSecond());
+        listener.setSpp(bufferedScene.spp);
+      });
     }
   }
 
   private void previewLoop() throws InterruptedException {
     long frameStart;
 
-    renderListener.renderTask().update("Preview", 2, 0, "");
+    renderTask.update("Preview", 2, 0, "");
     synchronized (bufferedScene) {
       bufferedScene.previewCount = 2;
     }
@@ -298,13 +313,15 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
         renderTime = bufferedScene.renderTime;
       }
 
-      // Update render status display
-      renderListener.setRenderTime(renderTime);
-      renderListener.setSamplesPerSecond(0);
-      renderListener.setSpp(0);
+      // Update render status display.
+      listeners.forEach(listener -> {
+        listener.setRenderTime(renderTime);
+        listener.setSamplesPerSecond(0);
+        listener.setSpp(0);
+      });
 
-      // Notify progress listener
-      renderListener.renderTask().update("Preview", 2, progress, "");
+      // Update render progress.
+      renderTask.update("Preview", 2, progress, "");
 
       // Notify the canvas to repaint.
       canvas.repaint();
@@ -325,7 +342,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
   private synchronized void giveTickets() {
     int nextSpp = bufferedScene.spp + RenderConstants.SPP_PER_PASS;
     bufferedScene.setBufferFinalization(finalizeAllFrames
-        || renderListener.saveSnapshot(bufferedScene, nextSpp));
+        || snapshotControl.saveSnapshot(bufferedScene, nextSpp));
 
     int canvasWidth = bufferedScene.canvasWidth();
     int canvasHeight = bufferedScene.canvasHeight();
@@ -374,8 +391,24 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    *
    * @param threads new required thread count.
    */
-  public void setNumThreads(int threads) {
+  @Override public void setNumThreads(int threads) {
     numThreads = Math.max(1, threads);
+  }
+
+  @Override public void setOnRenderCompleted(BiConsumer<Long, Integer> listener) {
+    renderCompletionListener = listener;
+  }
+
+  @Override public void setOnFrameCompleted(BiConsumer<Scene, Integer> listener) {
+    frameCompletionListener = listener;
+  }
+
+  @Override public void setSnapshotControl(SnapshotControl callback) {
+    this.snapshotControl = callback;
+  }
+
+  @Override public void setRenderTask(TaskTracker.Task task) {
+    renderTask = task;
   }
 
   /**
@@ -383,7 +416,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    *
    * @param value new load percentage.
    */
-  public void setCPULoad(int value) {
+  @Override public void setCPULoad(int value) {
     cpuLoad = value;
   }
 
