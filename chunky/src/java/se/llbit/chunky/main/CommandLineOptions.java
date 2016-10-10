@@ -42,6 +42,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -81,7 +83,7 @@ public class CommandLineOptions {
           "                         merge a render dump into the given scene",
           "  -help                  show this text", "", "Notes:",
           "<SCENE> can be either the path to a Scene Description File ("
-              + SceneDescription.SCENE_DESCRIPTION_EXTENSION + "),",
+              + SceneDescription.EXTENSION + "),",
           "*OR* the name of a scene relative to the scene directory (excluding extension).",
           "If the scene name is an absolute path then the scene directory will be the",
           "parent directory of the Scene Description File, otherwise the scene directory",
@@ -94,7 +96,7 @@ public class CommandLineOptions {
           "  --verbose             verbose logging in the launcher",
           "  --console             show the GUI console in headless mode");
 
-  protected boolean confError = false;
+  protected boolean configurationError = false;
 
   protected Mode mode = Mode.DEFAULT;
 
@@ -141,28 +143,36 @@ public class CommandLineOptions {
       this.errorHandler = errorHandler;
     }
 
-    int handle(String[] args, int pos) throws ArgumentError {
-      List<String> arguments = new LinkedList<>();
+    /**
+     * Run the handler for this option.
+     *
+     * @param args the arguments after the current option
+     * @return the remaining arguments after removing those used by this option
+     * @throws ArgumentError
+     */
+    List<String> handle(List<String> args) throws ArgumentError {
+      List<String> arguments = new LinkedList<>(args);  // Create local copy to avoid side effects.
+      List<String> optionArguments = new ArrayList<>();
       for (int i = 0; i < numOptions.end; i += 1) {
-        int nextArg = i + pos;
-        if (nextArg >= args.length) {
+        if (arguments.isEmpty() || arguments.get(0).startsWith("-")) {
           if (i >= numOptions.start) {
             // We don't need to have the maximum number of options.
             break;
           }
           if (errorHandler != null) {
             errorHandler.run();
-            return args.length;  // Skip handling the rest of the command line.
+            // Skip handling the rest of the command line.
+            return Collections.emptyList();
           } else {
-            throw new ArgumentError(String
-                .format("Missing argument for %s option. Found %d arguments, expected %d.",
-                    flag, i + 1, numOptions.start));
+            throw new ArgumentError(String.format(
+                "Missing argument for %s option. Found %d arguments, expected %d.",
+                flag, i + 1, numOptions.start));
           }
         }
-        arguments.add(args[nextArg]);
+        optionArguments.add(arguments.remove(0));
       }
-      consumer.accept(new LinkedList<>(arguments));  // Create copy to avoid side effects.
-      return pos + arguments.size();
+      consumer.accept(new ArrayList<>(optionArguments));  // Create copy to avoid side effects.
+      return arguments;
     }
   }
 
@@ -187,7 +197,7 @@ public class CommandLineOptions {
         () -> {
           System.err.println("You must specify a scene name for the -render command");
           printAvailableScenes();
-          confError = true;
+          configurationError = true;
         });
 
     registerOption("-target", new Range(1),
@@ -219,7 +229,7 @@ public class CommandLineOptions {
     }, () -> {
       System.err.println("You must specify a scene name for the -snapshot command!");
       printAvailableScenes();
-      confError = true;
+      configurationError = true;
     });
 
     registerOption("-list-scenes", new Range(0), arguments -> {
@@ -334,13 +344,13 @@ public class CommandLineOptions {
       File dumpfile = new File(dumpPath);
       if (!dumpfile.isFile()) {
         Log.error("Not a valid render dump file: " + dumpPath);
-        confError = true;
+        configurationError = true;
         return;
       }
       File sceneFile = options.getSceneDescriptionFile();
       if (!sceneFile.isFile()) {
         Log.error("Not a valid scene: " + options.sceneName);
-        confError = true;
+        configurationError = true;
         return;
       }
       Scene scene = new Scene();
@@ -372,37 +382,42 @@ public class CommandLineOptions {
 
     // When mode is set to Mode.NOTHING, then an option handler has performed
     // something and we should quit.
-    // If confError is set to true then an option handler encountered an
+    // If configurationError is set to true then an option handler encountered an
     // error and we should quit.
-    for (int i = 0; i < args.length && !confError && mode != Mode.NOTHING; ++i) {
-      if (optionHandlers.containsKey(args[i])) {
+    List<String> arguments = new LinkedList<>(Arrays.asList(args));
+    while (!arguments.isEmpty() && !configurationError && mode != Mode.NOTHING) {
+      // Remove first argument.
+      String argument = arguments.remove(0);
+      if (optionHandlers.containsKey(argument)) {
         try {
-          i = optionHandlers.get(args[i]).handle(args, i + 1);
+          arguments = optionHandlers.get(argument).handle(arguments);
         } catch (ArgumentError error) {
           System.err.println(error.getMessage());
           printUsage();
-          confError = true;
+          configurationError = true;
         }
-      } else if (!args[i].startsWith("-") && !selectedWorld) {
-        options.worldDir = new File(args[i]);
+      } else if (!argument.startsWith("-") && !selectedWorld) {
+        options.worldDir = new File(argument);
         selectedWorld = true;
       } else {
-        System.err.println("Unrecognized option: " + args[i]);
+        System.err.println("Unrecognized option: " + argument);
         printUsage();
-        confError = true;
+        configurationError = true;
       }
     }
 
-    if (options.sceneName != null && options.sceneName
-        .endsWith(SceneDescription.SCENE_DESCRIPTION_EXTENSION)) {
+    if (options.sceneName != null
+        && options.sceneName.endsWith(SceneDescription.EXTENSION)) {
       File possibleSceneFile = new File(options.sceneName);
       if (possibleSceneFile.isFile()) {
         options.sceneDir = possibleSceneFile.getParentFile();
-        options.sceneName = possibleSceneFile.getName();
+        String sceneName = possibleSceneFile.getName();
+        options.sceneName =
+            sceneName.substring(0, sceneName.length() - SceneDescription.EXTENSION.length());
       }
     }
 
-    if (!confError && mode != Mode.NOTHING && mode != Mode.SNAPSHOT) {
+    if (!configurationError && mode != Mode.NOTHING && mode != Mode.SNAPSHOT) {
       try {
         if (options.texturePack != null && !options.texturePack.isEmpty()) {
           TexturePackLoader.loadTexturePack(new File(options.texturePack), false);
@@ -456,16 +471,15 @@ public class CommandLineOptions {
   }
 
   private void printAvailableScenes() {
-    File sceneDir = PersistentSettings.getSceneDirectory();
-    System.err.println("Scene directory: " + sceneDir.getAbsolutePath());
-    List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
+    System.err.println("Scene directory: " + options.sceneDir.getAbsolutePath());
+    List<File> fileList = SceneHelper.getAvailableSceneFiles(options.sceneDir);
     Collections.sort(fileList);
     if (!fileList.isEmpty()) {
       System.err.println("Available scenes:");
       for (File file : fileList) {
         String name = file.getName();
         name = name.substring(0,
-            name.length() - SceneDescription.SCENE_DESCRIPTION_EXTENSION.length());
+            name.length() - SceneDescription.EXTENSION.length());
         System.err.println("\t" + name);
       }
     }

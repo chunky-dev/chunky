@@ -31,7 +31,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.SceneHelper;
 import se.llbit.chunky.renderer.scene.SceneDescription;
 import se.llbit.log.Log;
@@ -94,7 +93,7 @@ public class SceneChooserController implements Initializable {
         alert.setContentText(String.format("Are you sure you want to delete the scene %s? "
             + "All files for the scene, except snapshot images, will be deleted.", scene.name));
         if (alert.showAndWait().get() == ButtonType.OK) {
-          scene.delete();
+          scene.delete(controller.getChunky().options.sceneDir);
           sceneTbl.getItems().remove(sceneTbl.getSelectionModel().getSelectedItem());
         }
       }
@@ -114,8 +113,6 @@ public class SceneChooserController implements Initializable {
       int hours = (int) (scene.renderTime / 3600000);
       return new ReadOnlyStringWrapper(String.format("%d:%d:%d", hours, minutes, seconds));
     });
-
-    populate();
   }
 
   public void setStage(Stage stage) {
@@ -142,9 +139,8 @@ public class SceneChooserController implements Initializable {
     cancelBtn.setOnAction(e -> stage.hide());
   }
 
-  private void populate() {
+  private void populateSceneTable(File sceneDir) {
     List<SceneDescription> scenes = new ArrayList<>();
-    File sceneDir = PersistentSettings.getSceneDirectory();
     List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
     Collections.sort(fileList);
     for (File sceneFile : fileList) {
@@ -165,5 +161,7 @@ public class SceneChooserController implements Initializable {
 
   public void setController(ChunkyFxController controller) {
     this.controller = controller;
+
+    populateSceneTable(controller.getChunky().options.sceneDir);
   }
 }

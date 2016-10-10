@@ -54,8 +54,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Collection;
-import java.util.function.Function;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created by
@@ -184,7 +182,7 @@ public class Chunky {
   public static void main(final String[] args) {
     CommandLineOptions cmdline = new CommandLineOptions(args);
 
-    if (cmdline.confError) {
+    if (cmdline.configurationError) {
       System.exit(1);
     }
 

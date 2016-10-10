@@ -628,8 +628,8 @@ public class ChunkyFxController
     this.chunky = chunky;
   }
 
-  public static void openSceneDirectory() {
-    File sceneDir = SceneDirectoryPicker.getCurrentSceneDirectory();
+  public void openSceneDirectory() {
+    File sceneDir = chunky.options.sceneDir;
     if (sceneDir != null) {
       // Running Desktop.open() on the JavaFX application thread seems to
       // lock up the application on Linux, so we create a new thread to run that.

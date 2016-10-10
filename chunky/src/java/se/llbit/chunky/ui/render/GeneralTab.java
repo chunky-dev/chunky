@@ -188,7 +188,7 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
     });
     openSceneDirBtn.setTooltip(
         new Tooltip("Open the directory where Chunky stores scene descriptions and renders."));
-    openSceneDirBtn.setOnAction(e -> ChunkyFxController.openSceneDirectory());
+    openSceneDirBtn.setOnAction(e -> chunkyFxController.openSceneDirectory());
     loadSelectedChunks
         .setTooltip(new Tooltip("Load the chunks that are currently selected in the map view"));
     loadSelectedChunks.setOnAction(e -> controller.getSceneManager()

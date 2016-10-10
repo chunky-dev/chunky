@@ -48,7 +48,7 @@ import java.util.Collection;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class SceneDescription implements Refreshable, JSONifiable {
-  public static final String SCENE_DESCRIPTION_EXTENSION = ".json";
+  public static final String EXTENSION = ".json";
 
   /**
    * The current Scene Description Format (SDF) version.
@@ -348,10 +348,9 @@ public class SceneDescription implements Refreshable, JSONifiable {
    * Delete all scene files from the scene directory, leaving only
    * snapshots untouched.
    */
-  public void delete() {
+  public void delete(File sceneDir) {
     String[] extensions =
         {".json", ".dump", ".octree", ".foliage", ".grass", ".json.backup", ".dump.backup",};
-    File sceneDir = PersistentSettings.getSceneDirectory();
     for (String extension : extensions) {
       File file = new File(sceneDir, name + extension);
       if (file.isFile()) {

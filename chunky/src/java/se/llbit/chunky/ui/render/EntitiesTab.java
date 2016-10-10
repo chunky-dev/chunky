@@ -38,7 +38,6 @@ import se.llbit.chunky.world.entity.PlayerEntity;
 import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 import java.io.File;

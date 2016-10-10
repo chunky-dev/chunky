@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 

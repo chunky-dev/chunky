@@ -33,7 +33,7 @@ public class SceneHelper {
    */
   public static List<File> getAvailableSceneFiles(File sceneDir) {
     File[] sceneFiles = sceneDir
-        .listFiles((dir, name) -> name.endsWith(SceneDescription.SCENE_DESCRIPTION_EXTENSION));
+        .listFiles((dir, name) -> name.endsWith(SceneDescription.EXTENSION));
     if (sceneFiles != null) {
       List<File> fileList = new ArrayList<>(sceneFiles.length);
       Collections.addAll(fileList, sceneFiles);

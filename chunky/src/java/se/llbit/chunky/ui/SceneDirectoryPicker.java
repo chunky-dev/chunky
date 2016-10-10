@@ -60,7 +60,7 @@ public class SceneDirectoryPicker extends Stage implements Initializable {
   /**
    * Constructor
    */
-  public SceneDirectoryPicker() throws IOException {
+  public SceneDirectoryPicker(ChunkyOptions options) throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("SceneDirectoryChooser.fxml"));
     loader.setController(this);
     Parent root = loader.load();
@@ -78,8 +78,8 @@ public class SceneDirectoryPicker extends Stage implements Initializable {
     createDirectory.selectedProperty()
         .addListener(observable -> updateSelectedDirectory(selectedDirectory));
 
-    updatePathField(PersistentSettings.getSceneDirectory());
-    updateSelectedDirectory(PersistentSettings.getSceneDirectory());
+    updatePathField(options.sceneDir);
+    updateSelectedDirectory(options.sceneDir);
 
     browseBtn.setOnAction(event -> {
       DirectoryChooser fileChooser = new DirectoryChooser();
@@ -142,43 +142,14 @@ public class SceneDirectoryPicker extends Stage implements Initializable {
   }
 
   /**
-   * @return A reference to a file object representing the current scene directory,
-   * or <code>null</code> if the scene directory was not set or could not be opened
-   */
-  public static File getCurrentSceneDirectory() {
-    if (PersistentSettings.containsKey("sceneDirectory")) {
-      File sceneDir = PersistentSettings.getSceneDirectory();
-      if (tryCreateSceneDir(sceneDir)) {
-        return sceneDir;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Ask user for the directory to place scene descriptions and
-   * render dumps in.
-   *
-   * @return The selected scene directory
-   */
-  public static File getSceneDirectory(ChunkyOptions options) {
-    File sceneDir = getCurrentSceneDirectory();
-    if (sceneDir != null) {
-      return sceneDir;
-    } else {
-      return changeSceneDirectory(options);
-    }
-  }
-
-  /**
-   * Opens a dialog asking the user to specify a new scene directory
+   * Opens a dialog asking the user to specify a new scene directory.
    *
    * @return The file representing the selected directory
    */
   public static File changeSceneDirectory(ChunkyOptions options) {
     try {
       while (true) {
-        SceneDirectoryPicker sceneDirPicker = new SceneDirectoryPicker();
+        SceneDirectoryPicker sceneDirPicker = new SceneDirectoryPicker(options);
         sceneDirPicker.showAndWait();
         if (!sceneDirPicker.isAccepted()) {
           return null;

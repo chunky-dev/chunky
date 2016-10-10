@@ -3,6 +3,7 @@
 * Fixed scenes not able to be saved after fresh install, caused
   by the scene directory not yet being created.
 * Added "Face target" button in the Entities tab.
+* Fixed bugs in the command-line interface.
 * Expanded plugin API.
 
 1.4.0 - 2016-09-23

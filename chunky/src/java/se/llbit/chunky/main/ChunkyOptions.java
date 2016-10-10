@@ -70,15 +70,15 @@ public class ChunkyOptions {
    * @return the scene description file handle
    */
   public File getSceneDescriptionFile() {
-    if (sceneName.endsWith(SceneDescription.SCENE_DESCRIPTION_EXTENSION)) {
+    if (sceneName.endsWith(SceneDescription.EXTENSION)) {
       return new File(sceneName);
     } else {
       if (sceneDir != null) {
         return new File(sceneDir,
-            sceneName + SceneDescription.SCENE_DESCRIPTION_EXTENSION);
+            sceneName + SceneDescription.EXTENSION);
       } else {
         return new File(PersistentSettings.getSceneDirectory(),
-            sceneName + SceneDescription.SCENE_DESCRIPTION_EXTENSION);
+            sceneName + SceneDescription.EXTENSION);
       }
     }
   }

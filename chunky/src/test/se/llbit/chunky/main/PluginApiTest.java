@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -17,9 +16,7 @@
  */
 package se.llbit.chunky.main;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import se.llbit.chunky.renderer.RayTracerFactory;
 import se.llbit.chunky.renderer.RenderContextFactory;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -34,8 +31,6 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
 public class PluginApiTest {
-  @Rule public ExpectedException thrown = ExpectedException.none();
-
   @Test public void testSetBlock1() {
     Block newGrass = new Block(Block.GRASS_ID, "foo", Texture.EMPTY_TEXTURE);
     Block.set(Block.GRASS_ID, newGrass);
@@ -48,20 +43,20 @@ public class PluginApiTest {
     assertSame(Block.AIR, Block.get(Block.STONE_ID));
   }
 
-  @Test public void testSetBlockFail1() {
-    thrown.expect(IllegalArgumentException.class);
+  @Test(expected = IllegalArgumentException.class)
+  public void testSetBlockFail1() {
     Block.set(Block.GRASS_ID, null);
   }
 
-  @Test public void testSetBlockFail2() {
+  @Test(expected = IllegalArgumentException.class)
+  public void testSetBlockFail2() {
     // Illegal block ID.
-    thrown.expect(IllegalArgumentException.class);
     Block.set(-1, Block.AIR);
   }
 
-  @Test public void testSetBlockFail3() {
+  @Test(expected = IllegalArgumentException.class)
+  public void testSetBlockFail3() {
     // Illegal block ID.
-    thrown.expect(IllegalArgumentException.class);
     Block.set(256, Block.AIR);
   }
 

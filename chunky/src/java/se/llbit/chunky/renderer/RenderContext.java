@@ -68,7 +68,7 @@ public class RenderContext {
    * @return Scene description file
    */
   public File getSceneDescriptionFile(String sceneName) {
-    return getSceneFile(sceneName + SceneDescription.SCENE_DESCRIPTION_EXTENSION);
+    return getSceneFile(sceneName + SceneDescription.EXTENSION);
   }
 
   /**
@@ -76,7 +76,7 @@ public class RenderContext {
    * @throws FileNotFoundException
    */
   public InputStream getSceneDescriptionInputStream(String sceneName) throws FileNotFoundException {
-    return getSceneFileInputStream(sceneName + SceneDescription.SCENE_DESCRIPTION_EXTENSION);
+    return getSceneFileInputStream(sceneName + SceneDescription.EXTENSION);
   }
 
   /**
@@ -85,7 +85,7 @@ public class RenderContext {
    */
   public OutputStream getSceneDescriptionOutputStream(String sceneName)
       throws FileNotFoundException {
-    return getSceneFileOutputStream(sceneName + SceneDescription.SCENE_DESCRIPTION_EXTENSION);
+    return getSceneFileOutputStream(sceneName + SceneDescription.EXTENSION);
   }
 
   /**
