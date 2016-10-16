@@ -465,6 +465,7 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
       }
     });
     renderer.addRenderListener(renderTracker);
+    renderer.setRenderTask(taskTracker.backgroundTask());
     tabs.forEach(tab -> tab.setController(this));
     updateTab(tabPane.getSelectionModel().getSelectedItem());
   }
