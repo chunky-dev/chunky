@@ -42,7 +42,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -1516,33 +1515,24 @@ public class TexturePackLoader {
             Texture.redNetherBrick));
   }
 
-  /**
-   * Attempt to load the specified texture pack.
-   * If some textures files are not found they will be loaded from
-   * the default texture pack.
-   *
-   * @param rememberTP Decides if this texture pack should be saved as the
-   *                   last used texture pack
-   */
-  public static void loadTexturePack(File tpFile, boolean rememberTP) throws TextureLoadingError {
-    if (tpFile == null) {
-      throw new TextureLoadingError("Could not open texture pack: no file specified");
-    }
-    if (!tpFile.isFile()) {
-      throw new TextureLoadingError("Could not open texture pack: " + tpFile.getAbsolutePath());
-    }
-    Log.info("Loading textures from " + tpFile.getAbsolutePath());
-    loadTexturePack(tpFile, allTextures.keySet(), rememberTP);
-  }
-
-  private static void loadTexturePack(File tpFile, Collection<String> toLoad, boolean rememberTP) {
-    File defaultTP = MinecraftFinder.getMinecraftJar();
-    boolean isDefault = tpFile.equals(defaultTP);
-    String texturePackName = String.format("%s (%s)",
+  private static String texturePackName(File tpFile) {
+    boolean isDefault = tpFile.equals(MinecraftFinder.getMinecraftJar());
+    return String.format("%s (%s)",
         isDefault ? "default resource pack" : "resource pack",
         tpFile.getAbsolutePath());
+  }
 
-    Set<String> notLoaded = new HashSet<>(toLoad);
+  /**
+   * Load a set of textures from a Minecraft resource pack.
+   *
+   * @param tpFile resource pack file
+   * @param textures textures to load
+   * @param onSuccess called when some textures have been successfully loaded
+   * @return the keys for textures that could not be loaded
+   */
+  public static Set<Map.Entry<String, TextureRef>> loadTextures(File tpFile,
+      Collection<Map.Entry<String, TextureRef>> textures, Runnable onSuccess) {
+    Set<Map.Entry<String, TextureRef>> notLoaded = new HashSet<>(textures);
 
     try (ZipFile texturePack = new ZipFile(tpFile)) {
       boolean foundAssetDirectory = false;
@@ -1554,66 +1544,97 @@ public class TexturePackLoader {
         }
       }
       if (!foundAssetDirectory) {
-        Log.errorf("Missing assets directory in %s", texturePackName);
+        Log.errorf("Missing assets directory in %s", texturePackName(tpFile));
       } else {
-        for (String id : toLoad) {
-          TextureRef tex = allTextures.get(id);
-          if (tex.load(texturePack)) {
-            notLoaded.remove(id);
+        boolean oneTextureLoaded = false;
+        for (Map.Entry<String, TextureRef> texture : textures) {
+          if (texture.getValue().load(texturePack)) {
+            oneTextureLoaded = true;
+            notLoaded.remove(texture);
           }
         }
 
-        // Fall back on terrain.png.
-        loadTerrainTextures(texturePack, notLoaded);
+        // Fall back on terrain.png:
+        notLoaded = loadTerrainTextures(texturePack, notLoaded);
 
-        if (rememberTP) {
-          PersistentSettings.setLastTexturePack(tpFile.getAbsolutePath());
+        if (oneTextureLoaded) {
+          onSuccess.run();
         }
       }
     } catch (IOException e) {
-      Log.warnf("Failed to open %s: %s", texturePackName, e.getMessage());
+      Log.warnf("Failed to open %s: %s", texturePackName(tpFile), e.getMessage());
     }
+    return notLoaded;
+  }
+
+  /**
+   * Attempt to load the specified texture pack.
+   * If some textures files are not found they will be loaded from
+   * the default texture pack.
+   *
+   * @param rememberTP Decides if this texture pack should be saved as the
+   *                   last used texture pack
+   */
+  public static void loadTexturePack(File tpFile, boolean rememberTP) throws TextureLoadingError {
+    // TODO: replace exception by logging an error and using error return code.
+    if (tpFile == null) {
+      throw new TextureLoadingError("Could not open texture pack: no file specified");
+    }
+    if (!tpFile.isFile()) {
+      throw new TextureLoadingError("Could not open texture pack: " + tpFile.getAbsolutePath());
+    }
+    Log.info("Loading textures from " + tpFile.getAbsolutePath());
+    loadTexturePack(tpFile, allTextures.entrySet(), () -> {
+      if (rememberTP) {
+        PersistentSettings.setLastTexturePack(tpFile.getAbsolutePath());
+      }
+    });
+  }
+
+  private static void loadTexturePack(File tpFile, Collection<Map.Entry<String, TextureRef>> toLoad,
+      Runnable onSuccess) {
+    Set<Map.Entry<String, TextureRef>> notLoaded = loadTextures(tpFile, toLoad, onSuccess);
 
     if (!notLoaded.isEmpty()) {
       StringBuilder message = new StringBuilder();
-      message.append("Failed to load textures from ").append(texturePackName).append(":\n");
-      Iterator<String> iterator = notLoaded.iterator();
+      message.append("Failed to load textures from ").append(texturePackName(tpFile));
+      Iterator<Map.Entry<String, TextureRef>> iterator = notLoaded.iterator();
       for (int count = 0; iterator.hasNext() && count < 10; ++count) {
-        message.append("\t");
-        message.append(iterator.next());
-        message.append("\n");
+        message.append("\n\t").append(iterator.next().getKey());
       }
       if (notLoaded.size() > 10) {
-        message.append("\t... plus ").append(notLoaded.size() - 10).append(" more");
+        message.append("\n\t... and ").append(notLoaded.size() - 10).append(" more");
       }
       Log.info(message.toString());
 
+      File defaultTP = MinecraftFinder.getMinecraftJar();
+      boolean isDefault = tpFile.equals(defaultTP);
       if (!isDefault && defaultTP != null) {
-        // Fall back on default resource pack.
-        loadTexturePack(defaultTP, notLoaded, false);
+        // Fall back on default resource pack:
+        loadTexturePack(defaultTP, notLoaded, () -> {});
       }
     }
   }
 
-  private static void loadTerrainTextures(ZipFile texturePack, Set<String> notLoaded) {
-    // Will mutate notLoaded below.
-    Collection<String> toLoad = new LinkedList<>(notLoaded);
+  private static Set<Map.Entry<String, TextureRef>> loadTerrainTextures(ZipFile texturePack,
+      Set<Map.Entry<String, TextureRef>> textures) {
+    Set<Map.Entry<String, TextureRef>> notLoaded = new HashSet<>(textures);
 
     try (InputStream in = texturePack.getInputStream(new ZipEntry("terrain.png"))) {
       if (in != null) {
         BitmapImage spriteMap = ImageLoader.read(in);
-        BitmapImage[] texture = getTerrainTextures(spriteMap);
+        BitmapImage[] terrainTextures = getTerrainTextures(spriteMap);
 
-        for (String id : toLoad) {
-          TextureRef tex = allTextures.get(id);
-          if (notLoaded.contains(id) && tex.loadFromTerrain(texture)) {
-            notLoaded.remove(id);
+        for (Map.Entry<String, TextureRef> texture : textures) {
+          if (texture.getValue().loadFromTerrain(terrainTextures)) {
+            notLoaded.remove(texture);
           }
         }
       }
     } catch (IOException e) {
       // Failed to load terrain textures - this is handled implicitly.
     }
+    return notLoaded;
   }
 
   /**

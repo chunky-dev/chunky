@@ -96,9 +96,13 @@ task generateJava() {
 	}
 }
 
+task chunkyJavadoc(type: Javadoc) {
+	exclude 'src/gen/**'
+}
+
 task javadocJar(type: Jar) {
 	classifier = 'javadoc'
-	from javadoc
+	from chunkyJavadoc
 }
 
 task sourcesJar(type: Jar) {
