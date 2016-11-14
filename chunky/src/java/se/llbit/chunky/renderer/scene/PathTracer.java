@@ -359,7 +359,8 @@ public class PathTracer implements RayTracer {
       // However, the results are probably close enough to not be distracting,
       // so this seems like a reasonable approximation.
       Ray atmos = new Ray();
-      double offset = QuickMath.clamp(airDistance * random.nextFloat(), Ray.EPSILON, airDistance - Ray.EPSILON);
+      double offset = QuickMath.clamp(airDistance * random.nextFloat(),
+          Ray.EPSILON, airDistance - Ray.EPSILON);
       atmos.o.scaleAdd(offset, od, ox);
       sun.getRandomSunDirection(atmos, random);
       atmos.setCurrentMaterial(Block.AIR, 0);

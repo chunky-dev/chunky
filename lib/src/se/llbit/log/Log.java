@@ -45,7 +45,7 @@ public class Log {
     }
   }
 
-  public static void infofmt(String fmt, Object... args) {
+  public static void infof(String fmt, Object... args) {
     if (level == Level.INFO) {
       receiver[INFO].logEvent(Level.INFO, String.format(fmt, args));
     }
@@ -63,21 +63,9 @@ public class Log {
     }
   }
 
-  public static void warningfmt(String fmt, Object... args) {
+  public static void warnf(String fmt, Object... args) {
     if (level != Level.ERROR) {
       receiver[WARNING].logEvent(Level.WARNING, String.format(fmt, args));
-    }
-  }
-
-  public static void warning(String message) {
-    if (level != Level.ERROR) {
-      receiver[WARNING].logEvent(Level.WARNING, message);
-    }
-  }
-
-  public static void warning(String message, Throwable thrown) {
-    if (level != Level.ERROR) {
-      receiver[WARNING].logEvent(Level.WARNING, message, thrown);
     }
   }
 
@@ -93,7 +81,7 @@ public class Log {
     }
   }
 
-  public static void errorfmt(String fmt, Object... args) {
+  public static void errorf(String fmt, Object... args) {
     receiver[ERROR].logEvent(Level.ERROR, String.format(fmt, args));
   }
 

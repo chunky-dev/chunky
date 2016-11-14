@@ -102,7 +102,7 @@ public class WorldChooserController implements Initializable {
         if (directory.isDirectory()) {
           fillWorldList(directory);
         } else {
-          Log.warning("Non-directory selected.");
+          Log.warn("Non-directory selected.");
         }
       }
     });
@@ -119,7 +119,7 @@ public class WorldChooserController implements Initializable {
           mapLoader.loadWorld(new World(directory, false));
           stage.close();
         } else {
-          Log.warning("Non-directory selected.");
+          Log.warn("Non-directory selected.");
         }
       }
     });

@@ -55,11 +55,11 @@ public final class JsonSettings {
     try (InputStream in = new FileInputStream(file)) {
       JsonParser parser = new JsonParser(in);
       json = parser.parse().object();
-      Log.infofmt("Settings loaded from %s", path);
+      Log.infof("Settings loaded from %s", path);
     } catch (IOException e) {
-      Log.warningfmt("Warning: Could not load settings from %s - defaults will be used", path);
+      Log.warnf("Warning: Could not load settings from %s - defaults will be used", path);
     } catch (SyntaxError e) {
-      Log.warningfmt(
+      Log.warnf(
           "Warning: Could not load settings from %s (syntax error) - defaults will be used", path);
     }
   }
@@ -98,7 +98,7 @@ public final class JsonSettings {
       out.close();
       Log.info("Saved settings to " + file.getAbsolutePath());
     } catch (IOException e) {
-      Log.warningfmt("Warning: Failed to save settings to %s: %s",
+      Log.warnf("Warning: Failed to save settings to %s: %s",
           file.getAbsolutePath(), e.getMessage());
     }
   }

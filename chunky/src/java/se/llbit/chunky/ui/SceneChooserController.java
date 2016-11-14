@@ -150,7 +150,7 @@ public class SceneChooserController implements Initializable {
         desc.loadDescription(new FileInputStream(new File(sceneDir, fileName)));
         scenes.add(desc);
       } catch (IOException e) {
-        Log.warningfmt("Warning: could not load scene description: %s", fileName);
+        Log.warnf("Warning: could not load scene description: %s", fileName);
       }
     }
     sceneTbl.setItems(FXCollections.observableArrayList(scenes));

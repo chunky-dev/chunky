@@ -126,7 +126,7 @@ public final class ChunkyDeployer {
     VersionInfo embedded = embeddedVersion();
     if (embedded != null && (!versions.contains(embedded) || !checkVersionIntegrity(
         embedded.name))) {
-      Log.infofmt("Deploying embedded version: %s", embedded.name);
+      Log.infof("Deploying embedded version: %s", embedded.name);
       deployEmbeddedVersion(embedded);
       if (!settings.version.equals(VersionInfo.LATEST.name)) {
         settings.version = VersionInfo.LATEST.name;

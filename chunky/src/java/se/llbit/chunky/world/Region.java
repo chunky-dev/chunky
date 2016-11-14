@@ -282,7 +282,7 @@ public class Region implements Iterable<Chunk> {
       file.seek(4 * index);
       file.writeInt(0);
     } catch (IOException e) {
-      Log.warningfmt("Failed to delete chunk: %s", e.getMessage());
+      Log.warnf("Failed to delete chunk: %s", e.getMessage());
     }
   }
 

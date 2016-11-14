@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1535,45 +1536,57 @@ public class TexturePackLoader {
   }
 
   private static void loadTexturePack(File tpFile, Collection<String> toLoad, boolean rememberTP) {
-
     File defaultTP = MinecraftFinder.getMinecraftJar();
     boolean isDefault = tpFile.equals(defaultTP);
-    String tpName = isDefault ? "default texture pack" : "texture pack";
-    tpName += " (" + tpFile.getAbsolutePath() + ")";
+    String texturePackName = String.format("%s (%s)",
+        isDefault ? "default resource pack" : "resource pack",
+        tpFile.getAbsolutePath());
 
     Set<String> notLoaded = new HashSet<>(toLoad);
 
-    try (ZipFile texturePack = new ZipFile(tpFile)){
-      for (String id : toLoad) {
-        TextureRef tex = allTextures.get(id);
-        if (tex.load(texturePack)) {
-          notLoaded.remove(id);
+    try (ZipFile texturePack = new ZipFile(tpFile)) {
+      boolean foundAssetDirectory = false;
+      Enumeration<? extends ZipEntry> entries = texturePack.entries();
+      while (entries.hasMoreElements()) {
+        if (entries.nextElement().getName().startsWith("assets/")) {
+          foundAssetDirectory = true;
+          break;
         }
       }
+      if (!foundAssetDirectory) {
+        Log.errorf("Missing assets directory in %s", texturePackName);
+      } else {
+        for (String id : toLoad) {
+          TextureRef tex = allTextures.get(id);
+          if (tex.load(texturePack)) {
+            notLoaded.remove(id);
+          }
+        }
 
-      // Fall back on terrain.png.
-      loadTerrainTextures(texturePack, notLoaded);
+        // Fall back on terrain.png.
+        loadTerrainTextures(texturePack, notLoaded);
 
-      if (rememberTP) {
-        PersistentSettings.setLastTexturePack(tpFile.getAbsolutePath());
+        if (rememberTP) {
+          PersistentSettings.setLastTexturePack(tpFile.getAbsolutePath());
+        }
       }
     } catch (IOException e) {
-      Log.warn("Failed to open " + tpName + ": " + e.getMessage());
+      Log.warnf("Failed to open %s: %s", texturePackName, e.getMessage());
     }
 
     if (!notLoaded.isEmpty()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("Failed to load textures from ").append(tpName).append(":\n");
-      Iterator<String> iter = notLoaded.iterator();
-      for (int count = 0; iter.hasNext() && count < 10; ++count) {
-        msg.append("\t");
-        msg.append(iter.next());
-        msg.append("\n");
+      StringBuilder message = new StringBuilder();
+      message.append("Failed to load textures from ").append(texturePackName).append(":\n");
+      Iterator<String> iterator = notLoaded.iterator();
+      for (int count = 0; iterator.hasNext() && count < 10; ++count) {
+        message.append("\t");
+        message.append(iterator.next());
+        message.append("\n");
       }
       if (notLoaded.size() > 10) {
-        msg.append("\t... plus ").append(notLoaded.size() - 10).append(" more");
+        message.append("\t... plus ").append(notLoaded.size() - 10).append(" more");
       }
-      Log.info(msg.toString());
+      Log.info(message.toString());
 
       if (!isDefault && defaultTP != null) {
         // Fall back on default resource pack.

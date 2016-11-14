@@ -50,7 +50,7 @@ public class MinecraftFinder {
     if (getMinecraftJar(mcDir, false) == null) {
       mcDir = getDefaultMinecraftDirectory();
     }
-    Log.infofmt("Found Minecraft directory %s", mcDir.getAbsolutePath());
+    Log.infof("Found Minecraft directory %s", mcDir.getAbsolutePath());
     return mcDir;
   }
 
@@ -181,7 +181,7 @@ public class MinecraftFinder {
           }
         }
         if (debug) {
-          Log.infofmt("Found latest Minecraft version: %s", latest.jar.getAbsolutePath());
+          Log.infof("Found latest Minecraft version: %s", latest.jar.getAbsolutePath());
         }
         return latest.jar;
       }

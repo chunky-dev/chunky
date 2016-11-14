@@ -240,7 +240,7 @@ public class World implements Comparable<World> {
             playerEntities.add(new PlayerEntityData(NamedTag.read(in).unpack()));
             in.close();
           } catch (IOException e) {
-            Log.infofmt("Could not read player data file '%s'", player.getAbsolutePath());
+            Log.infof("Could not read player data file '%s'", player.getAbsolutePath());
           }
         }
       }

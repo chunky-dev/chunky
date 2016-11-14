@@ -183,7 +183,7 @@ public class Camera implements JSONifiable {
   private Projector createProjector() {
     switch (projectionMode) {
       default:
-        Log.errorfmt("Unknown projection mode: %s, using standard mode", projectionMode);
+        Log.errorf("Unknown projection mode: %s, using standard mode", projectionMode);
       case PINHOLE:
         return applyDoF(new PinholeProjector(fov), subjectDistance);
       case PARALLEL:

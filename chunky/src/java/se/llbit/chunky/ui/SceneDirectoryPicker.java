@@ -177,7 +177,7 @@ public class SceneDirectoryPicker extends Stage implements Initializable {
       sceneDir.mkdirs();
     }
     if (!isValidDirectory(sceneDir)) {
-      Log.warningfmt("Could not open or create the scene directory %s", sceneDir.getAbsolutePath());
+      Log.warnf("Could not open or create the scene directory %s", sceneDir.getAbsolutePath());
       return false;
     } else {
       return true;
