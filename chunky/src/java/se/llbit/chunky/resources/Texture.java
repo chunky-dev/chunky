@@ -272,7 +272,22 @@ public class Texture {
   public static final Texture enchantmentTableSide = new Texture();
   public static final Texture enchantmentTableTop = new Texture();
   public static final Texture enchantmentTableBottom = new Texture();
-  public static final Texture commandBlock = new Texture();
+
+  public static final Texture commandBlockBack = new Texture();
+  public static final Texture commandBlockFront = new Texture();
+  public static final Texture commandBlockSide = new Texture();
+  public static final Texture commandBlockConditional = new Texture();
+
+  public static final Texture repeatingCommandBlockBack = new Texture();
+  public static final Texture repeatingCommandBlockFront = new Texture();
+  public static final Texture repeatingCommandBlockSide = new Texture();
+  public static final Texture repeatingCommandBlockConditional = new Texture();
+
+  public static final Texture chainCommandBlockBack = new Texture();
+  public static final Texture chainCommandBlockFront = new Texture();
+  public static final Texture chainCommandBlockSide = new Texture();
+  public static final Texture chainCommandBlockConditional = new Texture();
+
   public static final Texture eyeOfTheEnder = new Texture();
   public static final Texture dragonEgg = new Texture();
   public static final Texture cocoaPlantSmall = new Texture();

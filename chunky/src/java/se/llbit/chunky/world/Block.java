@@ -30,6 +30,7 @@ import se.llbit.chunky.model.ChestModel;
 import se.llbit.chunky.model.ChorusFlowerModel;
 import se.llbit.chunky.model.ChorusPlantModel;
 import se.llbit.chunky.model.CocoaPlantModel;
+import se.llbit.chunky.model.CommandBlockModel;
 import se.llbit.chunky.model.ComparatorModel;
 import se.llbit.chunky.model.CropsModel;
 import se.llbit.chunky.model.DaylightSensorModel;
@@ -48,7 +49,6 @@ import se.llbit.chunky.model.FurnaceModel;
 import se.llbit.chunky.model.GlassPaneModel;
 import se.llbit.chunky.model.GrassModel;
 import se.llbit.chunky.model.GrassPathModel;
-import se.llbit.chunky.model.HeadModel;
 import se.llbit.chunky.model.HopperModel;
 import se.llbit.chunky.model.IronBarsModel;
 import se.llbit.chunky.model.LadderModel;
@@ -1043,10 +1043,10 @@ public class Block extends Material {
   public static final int SIGNPOST_ID = 0x3F;
   private static final Block SIGNPOST = new Block(SIGNPOST_ID, "Sign Post", Icon.signPost) {
     {
+      // This block is rendered as an entity instead of a voxel.
       isOpaque = false;
       isSolid = false;
-      localIntersect = true;
-      isInvisible = true; // Stored as entity.
+      isInvisible = true;
     }
   };
   public static final int WOODENDOOR_ID = 0x40;
@@ -1112,10 +1112,10 @@ public class Block extends Material {
   public static final int WALLSIGN_ID = 0x44;
   private static final Block WALLSIGN = new Block(WALLSIGN_ID, "Wall Sign", Icon.wallSign) {
     {
+      // This block is rendered as an entity instead of a voxel.
       isOpaque = false;
       isSolid = false;
-      localIntersect = false;
-      isInvisible = true; // Stored as entity.
+      isInvisible = true;
     }
   };
   public static final int LEVER_ID = 0x45;
@@ -2136,11 +2136,21 @@ public class Block extends Material {
       return Texture.jungleTreePlanks;
     }
   };
-  public static final int COMMANDBLOCK_ID = 0x89;
-  private static final Block COMMANDBLOCK = new Block(COMMANDBLOCK_ID, "Command Block", Texture.commandBlock) {
+  public static final int COMMAND_BLOCK_ID = 0x89;
+  private static final Block COMMAND_BLOCK = new Block(COMMAND_BLOCK_ID, "Command Block", Texture.commandBlockBack) {
     {
       isOpaque = true;
       isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] texture = {
+        Texture.commandBlockBack, Texture.commandBlockFront,
+        Texture.commandBlockSide, Texture.commandBlockConditional
+    };
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return CommandBlockModel.intersect(ray, texture);
     }
   };
   public static final int BEACON_ID = 0x8A;
@@ -2231,14 +2241,10 @@ public class Block extends Material {
   public static final int HEAD_ID = 0x90;
   private static final Block HEAD = new Block(HEAD_ID, "Head", Texture.unknown) {
     {
+      // This block is rendered as an entity instead of a voxel.
       isOpaque = false;
       isSolid = false;
-      localIntersect = true;
       isInvisible = true;
-    }
-
-    @Override public boolean intersect(Ray ray, Scene scene) {
-      return HeadModel.intersect(ray, Texture.oakPlanks);
     }
   };
   public static final int ANVIL_ID = 0x91;
@@ -3172,18 +3178,40 @@ public class Block extends Material {
       isInvisible = UNKNOWN_INVISIBLE;
     }
   };
-  private static final Block UNKNOWN0xD2 = new Block(0xD2, "Unknown Block 0xD2", Texture.unknown) {
+  public static final int REPEATING_COMMAND_BLOCK_ID = 0xD2;
+  private static final Block REPEATING_COMMAND_BLOCK = new Block(REPEATING_COMMAND_BLOCK_ID,
+      "Repeating Command Block", Texture.repeatingCommandBlockBack) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] texture = {
+        Texture.repeatingCommandBlockBack, Texture.repeatingCommandBlockFront,
+        Texture.repeatingCommandBlockSide, Texture.repeatingCommandBlockConditional
+    };
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return CommandBlockModel.intersect(ray, texture);
     }
   };
-  private static final Block UNKNOWN0xD3 = new Block(0xD3, "Unknown Block 0xD3", Texture.unknown) {
+  public static final int CHAIN_COMMAND_BLOCK_ID = 0xD3;
+  private static final Block CHAIN_COMMAND_BLOCK = new Block(CHAIN_COMMAND_BLOCK_ID,
+      "Chain Command Block", Texture.chainCommandBlockBack) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] texture = {
+        Texture.chainCommandBlockBack, Texture.chainCommandBlockFront,
+        Texture.chainCommandBlockSide, Texture.chainCommandBlockConditional
+    };
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return CommandBlockModel.intersect(ray, texture);
     }
   };
   private static final Block UNKNOWN0xD4 = new Block(0xD4, "Unknown Block 0xD4", Texture.unknown) {
@@ -3522,7 +3550,7 @@ public class Block extends Material {
           ENDPORTAL, ENDPORTALFRAME, ENDSTONE, DRAGONEGG, REDSTONELAMPOFF, REDSTONELAMPON,
           DOUBLEWOODENSLAB, SINGLEWOODENSLAB, COCOAPLANT, SANDSTONESTAIRS, EMERALDORE, ENDERCHEST,
           TRIPWIREHOOK, TRIPWIRE, EMERALDBLOCK, SPRUCEWOODSTAIRS, BIRCHWOODSTAIRS, JUNGLEWOODSTAIRS,
-          COMMANDBLOCK, BEACON, STONEWALL, FLOWERPOT, CARROTS, POTATOES, WOODENBUTTON, HEAD, ANVIL,
+          COMMAND_BLOCK, BEACON, STONEWALL, FLOWERPOT, CARROTS, POTATOES, WOODENBUTTON, HEAD, ANVIL,
           TRAPPEDCHEST, WEIGHTEDPRESSUREPLATELIGHT, WEIGHTEDPRESSUREPLATEHEAVY, REDSTONECOMPARATOR,
           REDSTONECOMPARATORLIT, DAYLIGHTSENSOR, REDSTONEBLOCK, NETHERQUARTZORE, HOPPER, QUARTZ,
           QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, STAINED_CLAY, STAINED_GLASSPANE, LEAVES2, WOOD2,
@@ -3533,7 +3561,7 @@ public class Block extends Material {
           SPRUCEFENCE, BIRCHFENCE, JUNGLEFENCE, DARKOAKFENCE, ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR,
           JUNGLEDOOR, ACACIADOOR, DARKOAKDOOR, ENDROD, CHORUSPLANT, CHORUSFLOWER, PURPURBLOCK,
           PURPURPILLAR, PURPURSTAIRS, PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, UNKNOWN0xCF,
-          GRASSPATH, UNKNOWN0xD1, UNKNOWN0xD2, UNKNOWN0xD3, UNKNOWN0xD4, MAGMA, NETHER_WART_BLOCK,
+          GRASSPATH, UNKNOWN0xD1, REPEATING_COMMAND_BLOCK, CHAIN_COMMAND_BLOCK, UNKNOWN0xD4, MAGMA, NETHER_WART_BLOCK,
           RED_NETHER_BRICK, BONE, UNKNOWN0xD9, UNKNOWN0xDA, UNKNOWN0xDB, UNKNOWN0xDC, UNKNOWN0xDD,
           UNKNOWN0xDE, UNKNOWN0xDF, UNKNOWN0xE0, UNKNOWN0xE1, UNKNOWN0xE2, UNKNOWN0xE3, UNKNOWN0xE4,
           UNKNOWN0xE5, UNKNOWN0xE6, UNKNOWN0xE7, UNKNOWN0xE8, UNKNOWN0xE9, UNKNOWN0xEA, UNKNOWN0xEB,

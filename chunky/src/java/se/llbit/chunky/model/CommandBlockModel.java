@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -22,59 +22,72 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-/**
- * A block of wood.
- *
- * @author Jesper Öqvist <jesper@llbit.se>
- */
-public class WoodModel {
-  private static final Quad[] sides = {
-      // north
+public class CommandBlockModel {
+
+  // Facing up:
+  private static final Quad[] up = new Quad[] {
+      // North face.
       new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 0),
           new Vector4(1, 0, 0, 1)),
 
-      // south
+      // South face.
       new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(0, 1, 1),
           new Vector4(0, 1, 0, 1)),
 
-      // west
+      // West face.
       new Quad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 0),
           new Vector4(0, 1, 0, 1)),
 
-      // east
+      // East face.
       new Quad(new Vector3(1, 0, 1), new Vector3(1, 0, 0), new Vector3(1, 1, 1),
           new Vector4(1, 0, 0, 1)),
 
-      // top
+      // Top face.
       new Quad(new Vector3(1, 1, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 1),
           new Vector4(1, 0, 0, 1)),
 
-      // bottom
+      // Bottom face.
       new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1)),
-
   };
 
-  private static final int[][] textureIndex =
-      {{0, 0, 0, 0, 1, 1}, {0, 0, 1, 1, 0, 0}, {1, 1, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}};
+  private static final Quad[][] faces = new Quad[8][];
 
-  private static final int[][] uv =
-      {{0, 0, 0, 0, 0, 0}, {1, 1, 0, 0, 1, 1}, {0, 0, 1, 1, 0, 0}, {0, 0, 0, 0, 0, 0},};
+  static {
+    // Rotate faces for all directions.
+    faces[1] = up;
+    // Facing south:
+    faces[3] = Model.rotateX(up);
+    // Facing down:
+    faces[0] = Model.rotateX(faces[3]);
+    // Facing north:
+    faces[2] = Model.rotateX(faces[0]);
+    // Facing west:
+    faces[5] = Model.rotateZ(faces[0]);
+    // Facing east:
+    faces[4] = Model.rotateZ(faces[1]);
+    // Facing down:
+    faces[6] = faces[1];
+    // Facing up:
+    faces[7] = up;
+  }
 
-  public static boolean intersect(Ray ray, Texture[] texture) {
+  // Index 0 = back, 1 = front, 2 = side, 3 = conditional side.
+  private static final int[][] textureIndex = {
+      {2, 2, 2, 2, 1, 0},
+      {3, 3, 3, 3, 1, 0},
+  };
+
+  public static boolean intersect(Ray ray, Texture[] textures) {
     boolean hit = false;
-    int data = ray.getBlockData();
-    int direction = data >> 2;
     ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < sides.length; ++i) {
-      Quad side = sides[i];
-      if (side.intersect(ray)) {
-        double u = ray.u;
-        int uv_x = uv[direction][i];
-        ray.u = (1 - uv_x) * ray.u + uv_x * ray.v;
-        ray.v = uv_x * u + (1 - uv_x) * ray.v;
-        texture[textureIndex[direction][i]].getColor(ray);
-        ray.n.set(side.n);
+    int direction = ray.getBlockData() & 7;
+    int conditional = ray.getBlockData() >> 3;
+    for (int i = 0; i < 6; ++i) {
+      Quad face = faces[direction][i];
+      if (face.intersect(ray)) {
+        textures[textureIndex[conditional][i]].getColor(ray);
+        ray.n.set(face.n);
         ray.t = ray.tNext;
         hit = true;
       }

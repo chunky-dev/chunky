@@ -866,10 +866,47 @@ public class TexturePackLoader {
             Texture.enchantmentTableBottom),
         new SimpleTexture("textures/blocks/enchantment_bottom", Texture.enchantmentTableBottom),
         new IndexedTexture(0xB7, Texture.enchantmentTableBottom)));
-    allTextures.put("command_block", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/blocks/command_block", Texture.commandBlock),
-        new SimpleTexture("textures/blocks/commandBlock", Texture.commandBlock),
-        new IndexedTexture(0xB8, Texture.commandBlock)));
+
+    // Command block textures were changed in Minecraft 1.9.
+    allTextures.put("command_block_back",
+        new SimpleTexture("assets/minecraft/textures/blocks/command_block_back",
+            Texture.commandBlockBack));
+    allTextures.put("command_block_conditional",
+        new SimpleTexture("assets/minecraft/textures/blocks/command_block_conditional",
+            Texture.commandBlockConditional));
+    allTextures.put("command_block_front",
+        new SimpleTexture("assets/minecraft/textures/blocks/command_block_front",
+            Texture.commandBlockFront));
+    allTextures.put("command_block_side",
+        new SimpleTexture("assets/minecraft/textures/blocks/command_block_side",
+            Texture.commandBlockSide));
+
+    allTextures.put("repeating_command_block_back",
+        new SimpleTexture("assets/minecraft/textures/blocks/repeating_command_block_back",
+            Texture.repeatingCommandBlockBack));
+    allTextures.put("repeating_command_block_conditional",
+        new SimpleTexture("assets/minecraft/textures/blocks/repeating_command_block_conditional",
+            Texture.repeatingCommandBlockConditional));
+    allTextures.put("repeating_command_block_front",
+        new SimpleTexture("assets/minecraft/textures/blocks/repeating_command_block_front",
+            Texture.repeatingCommandBlockFront));
+    allTextures.put("repeating_command_block_side",
+        new SimpleTexture("assets/minecraft/textures/blocks/repeating_command_block_side",
+            Texture.repeatingCommandBlockSide));
+
+    allTextures.put("chain_command_block_back",
+        new SimpleTexture("assets/minecraft/textures/blocks/chain_command_block_back",
+            Texture.chainCommandBlockBack));
+    allTextures.put("chain_command_block_conditional",
+        new SimpleTexture("assets/minecraft/textures/blocks/chain_command_block_conditional",
+            Texture.chainCommandBlockConditional));
+    allTextures.put("chain_command_block_front",
+        new SimpleTexture("assets/minecraft/textures/blocks/chain_command_block_front",
+            Texture.chainCommandBlockFront));
+    allTextures.put("chain_command_block_side",
+        new SimpleTexture("assets/minecraft/textures/blocks/chain_command_block_side",
+            Texture.chainCommandBlockSide));
+
     allTextures.put("flower_pot", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/blocks/flower_pot", Texture.flowerPot),
         new SimpleTexture("textures/blocks/flowerPot", Texture.flowerPot),
@@ -947,6 +984,73 @@ public class TexturePackLoader {
         new SimpleTexture("textures/blocks/water", Texture.water),
         new IndexedTexture(0xCD, Texture.water)));
 
+    allTextures.put("sandstone_normal", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/sandstone_normal",
+            Texture.sandstoneSide),
+        new SimpleTexture("textures/blocks/sandstone_side", Texture.sandstoneSide),
+        new IndexedTexture(0xC0, Texture.sandstoneSide)));
+    allTextures.put("purple wool", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/wool_colored_purple",
+            Texture.purpleWool), new SimpleTexture("textures/blocks/cloth_10", Texture.purpleWool),
+        new IndexedTexture(0xC1, Texture.purpleWool)));
+    allTextures.put("magenta wool", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/wool_colored_magenta",
+            Texture.magentaWool), new SimpleTexture("textures/blocks/cloth_2", Texture.magentaWool),
+        new IndexedTexture(0xC2, Texture.magentaWool)));
+    allTextures.put("rail_detector", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/rail_detector", Texture.detectorRail),
+        new SimpleTexture("textures/blocks/detectorRail", Texture.detectorRail),
+        new IndexedTexture(0xC3, Texture.detectorRail)));
+    allTextures.put("leaves_jungle", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/leaves_jungle",
+            Texture.jungleTreeLeaves),
+        new SimpleTexture("textures/blocks/leaves_jungle", Texture.jungleTreeLeaves),
+        new IndexedTexture(0xC4, Texture.jungleTreeLeaves)));
+    allTextures.put("planks_spruce", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/planks_spruce", Texture.sprucePlanks),
+        new SimpleTexture("textures/blocks/wood_spruce", Texture.sprucePlanks),
+        new IndexedTexture(0xC6, Texture.sprucePlanks)));
+    allTextures.put("planks_jungle", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/planks_jungle",
+            Texture.jungleTreePlanks),
+        new SimpleTexture("textures/blocks/wood_jungle", Texture.jungleTreePlanks),
+        new IndexedTexture(0xC7, Texture.jungleTreePlanks)));
+    allTextures.put("carrots_stage_0", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/carrots_stage_0", Texture.carrots0),
+        new SimpleTexture("textures/blocks/carrots_0", Texture.carrots0),
+        new IndexedTexture(0xC8, Texture.carrots0)));
+    allTextures.put("potatoes_stage_0", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/potatoes_stage_0", Texture.potatoes0),
+        new SimpleTexture("textures/blocks/potatoes_0", Texture.potatoes0),
+        new IndexedTexture(0xC8, Texture.potatoes0)));
+    allTextures.put("carrots_stage_1", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/carrots_stage_1", Texture.carrots1),
+        new SimpleTexture("textures/blocks/carrots_1", Texture.carrots1),
+        new IndexedTexture(0xC9, Texture.carrots1)));
+    allTextures.put("potatoes_stage_1", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/potatoes_stage_1", Texture.potatoes1),
+        new SimpleTexture("textures/blocks/potatoes_1", Texture.potatoes1),
+        new IndexedTexture(0xC9, Texture.potatoes1)));
+    allTextures.put("carrots_stage_2", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/carrots_stage_2", Texture.carrots2),
+        new SimpleTexture("textures/blocks/carrots_2", Texture.carrots2),
+        new IndexedTexture(0xCA, Texture.carrots2)));
+    allTextures.put("potatoes_stage_2", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/potatoes_stage_2", Texture.potatoes2),
+        new SimpleTexture("textures/blocks/potatoes_2", Texture.potatoes2),
+        new IndexedTexture(0xCA, Texture.potatoes2)));
+    allTextures.put("carrots_stage_3", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/carrots_stage_3", Texture.carrots3),
+        new SimpleTexture("textures/blocks/carrots_3", Texture.carrots3),
+        new IndexedTexture(0xCB, Texture.carrots3)));
+    allTextures.put("potatoes_stage_3", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/potatoes_stage_3", Texture.potatoes3),
+        new SimpleTexture("textures/blocks/potatoes_3", Texture.potatoes3),
+        new IndexedTexture(0xCC, Texture.potatoes3)));
+    allTextures.put("water_still", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/blocks/water_still", Texture.water),
+        new SimpleTexture("textures/blocks/water", Texture.water),
+        new IndexedTexture(0xCD, Texture.water)));
     allTextures.put("sandstone_bottom", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/blocks/sandstone_bottom",
             Texture.sandstoneBottom),

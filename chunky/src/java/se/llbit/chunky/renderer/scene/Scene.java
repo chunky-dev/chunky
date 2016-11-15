@@ -663,8 +663,8 @@ public class Scene extends SceneDescription {
         loadedChunks.add(cp);
 
         Collection<CompoundTag> tileEntities = new LinkedList<>();
-        Collection<CompoundTag> ents = new LinkedList<>();
-        world.getChunk(cp).getBlockData(blocks, data, biomes, tileEntities, ents);
+        Collection<CompoundTag> chunkEntities = new LinkedList<>();
+        world.getChunk(cp).getBlockData(blocks, data, biomes, tileEntities, chunkEntities);
         nchunks += 1;
 
         int wx0 = cp.x * 16;
@@ -678,8 +678,8 @@ public class Scene extends SceneDescription {
           }
         }
 
-        // Load entities.
-        for (CompoundTag tag : ents) {
+        // Load entities from the chunk:
+        for (CompoundTag tag : chunkEntities) {
           if (tag.get("id").stringValue("").equals("Painting")) {
             ListTag pos = (ListTag) tag.get("Pos");
             double x = pos.getItem(0).doubleValue();
@@ -693,6 +693,9 @@ public class Scene extends SceneDescription {
           }
         }
 
+        // The name tileEntities is confusing, because the entities are usually
+        // referred to as "block entities". However, we keep the name tileEntities
+        // to match the name of these entities in the Minecraft world format.
         // Load tile entities.
         for (CompoundTag entityTag : tileEntities) {
           int x = entityTag.get("x").intValue(0) - wx0;
@@ -700,6 +703,7 @@ public class Scene extends SceneDescription {
           int z = entityTag.get("z").intValue(0) - wz0;
           int index = Chunk.chunkIndex(x, y, z);
           int block = 0xFF & blocks[index];
+          // Metadata is the old block data (to be replaced in future Minecraft versions?).
           int metadata = 0xFF & data[index / 2];
           metadata >>= (x % 2) * 4;
           metadata &= 0xF;

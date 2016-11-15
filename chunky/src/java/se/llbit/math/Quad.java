@@ -124,7 +124,7 @@ public class Quad {
     double iy = ray.o.y - QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
     double iz = ray.o.z - QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
 
-    // test that the ray is heading toward the plane
+    // Test that the ray is heading toward the plane of this quad.
     double denom = ray.d.dot(n);
     if (denom < -Ray.EPSILON) {
 

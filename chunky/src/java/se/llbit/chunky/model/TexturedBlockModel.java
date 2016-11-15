@@ -34,8 +34,9 @@ public class TexturedBlockModel {
    * Find intersection between ray and block
    *
    * @param ray     ray to test
-   * @param texture texture[0] = north, [1] = south, [2] = east, [3] = west,
-   *                [4] = top, [5] = bottom
+   * @param texture array of textures for each side of the block.
+   * Texture 0 is north, 1 is south, 2 is west,
+   * 3 is east, 4 is top, 5 is bottom.
    * @return <code>true</code> if the ray intersected the block
    */
   public static boolean intersect(Ray ray, Texture[] texture) {
@@ -103,7 +104,7 @@ public class TexturedBlockModel {
   }
 
   /**
-   * Find intersection between ray and block
+   * Find intersection between ray and block.
    *
    * @param ray     ray to test
    * @param texture Block texture
@@ -136,7 +137,7 @@ public class TexturedBlockModel {
       ray.color.w = 0;
       return;
     }
-    calcUVCoords(ray);
+    getTextureCoordinates(ray);
     ray.getCurrentMaterial().getTexture(ray.getBlockData()).getColor(ray);
   }
 
@@ -145,7 +146,7 @@ public class TexturedBlockModel {
    *
    * @param ray ray to test
    */
-  private static void calcUVCoords(Ray ray) {
+  private static void getTextureCoordinates(Ray ray) {
     int bx = (int) QuickMath.floor(ray.o.x);
     int by = (int) QuickMath.floor(ray.o.y);
     int bz = (int) QuickMath.floor(ray.o.z);
