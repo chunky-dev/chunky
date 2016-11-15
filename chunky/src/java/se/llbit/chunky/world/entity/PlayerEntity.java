@@ -48,6 +48,7 @@ public class PlayerEntity extends Entity {
   public double rightLegPose;
   public double leftArmPose;
   public double rightArmPose;
+  public double scale = 1.0;
   public PlayerModel model;
   public String skin = "";
 
@@ -108,7 +109,7 @@ public class PlayerEntity extends Entity {
     Transform offsetTransform = Transform.NONE
         .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
-    poseHead(head, Transform.NONE.rotateY(headYaw).translate(0, 28 / 16., 0), offsetTransform);
+    poseHead(head, withScale(Transform.NONE.rotateY(headYaw).translate(0, 28 / 16., 0)), offsetTransform);
     head.addFrontFaces(faces, texture, texture.headFront);
     head.addBackFaces(faces, texture, texture.headBack);
     head.addLeftFaces(faces, texture, texture.headLeft);
@@ -116,7 +117,7 @@ public class PlayerEntity extends Entity {
     head.addTopFaces(faces, texture, texture.headTop);
     head.addBottomFaces(faces, texture, texture.headBottom);
     Box hat = new Box(-4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16.);
-    poseHead(hat, Transform.NONE.rotateY(headYaw).translate(0, 28.2 / 16., 0), offsetTransform);
+    poseHead(hat, withScale(Transform.NONE.rotateY(headYaw).translate(0, 28.2 / 16., 0)), offsetTransform);
     hat.addFrontFaces(faces, texture, texture.hatFront);
     hat.addBackFaces(faces, texture, texture.hatBack);
     hat.addLeftFaces(faces, texture, texture.hatLeft);
@@ -124,7 +125,7 @@ public class PlayerEntity extends Entity {
     hat.addTopFaces(faces, texture, texture.hatTop);
     hat.addBottomFaces(faces, texture, texture.hatBottom);
     Box chest = new Box(-4 / 16., 4 / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
-    poseLimb(chest, Transform.NONE.translate(0, 18 / 16., 0), offsetTransform);
+    poseLimb(chest, withScale(Transform.NONE.translate(0, 18 / 16., 0)), offsetTransform);
     chest.addFrontFaces(faces, texture, texture.chestFront);
     chest.addBackFaces(faces, texture, texture.chestBack);
     chest.addLeftFaces(faces, texture, texture.chestLeft);
@@ -132,8 +133,8 @@ public class PlayerEntity extends Entity {
     chest.addTopFaces(faces, texture, texture.chestTop);
     chest.addBottomFaces(faces, texture, texture.chestBottom);
     Box leftLeg = new Box(-2 / 16., 2 / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
-    poseLimb(leftLeg, Transform.NONE.translate(0, -6 / 16., 0).rotateX(leftLegPose)
-        .translate(-2 / 16., 12 / 16., 0), offsetTransform);
+    poseLimb(leftLeg, withScale(Transform.NONE.translate(0, -6 / 16., 0).rotateX(leftLegPose)
+        .translate(-2 / 16., 12 / 16., 0)), offsetTransform);
     leftLeg.addFrontFaces(faces, texture, texture.leftLegFront);
     leftLeg.addBackFaces(faces, texture, texture.leftLegBack);
     leftLeg.addLeftFaces(faces, texture, texture.leftLegLeft);
@@ -141,8 +142,8 @@ public class PlayerEntity extends Entity {
     leftLeg.addTopFaces(faces, texture, texture.leftLegTop);
     leftLeg.addBottomFaces(faces, texture, texture.leftLegBottom);
     Box rightLeg = new Box(-2 / 16., 2 / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
-    poseLimb(rightLeg, Transform.NONE.translate(0, -6 / 16., 0).rotateX(rightLegPose)
-        .translate(2 / 16., 12 / 16., 0), offsetTransform);
+    poseLimb(rightLeg, withScale(Transform.NONE.translate(0, -6 / 16., 0).rotateX(rightLegPose)
+        .translate(2 / 16., 12 / 16., 0)), offsetTransform);
     rightLeg.addFrontFaces(faces, texture, texture.rightLegFront);
     rightLeg.addBackFaces(faces, texture, texture.rightLegBack);
     rightLeg.addLeftFaces(faces, texture, texture.rightLegLeft);
@@ -150,8 +151,8 @@ public class PlayerEntity extends Entity {
     rightLeg.addTopFaces(faces, texture, texture.rightLegTop);
     rightLeg.addBottomFaces(faces, texture, texture.rightLegBottom);
     Box leftArm = new Box(-armWidth / 16., armWidth / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
-    poseLimb(leftArm, Transform.NONE.translate(0, -5 / 16., 0).rotateX(leftArmPose)
-        .translate(-(4 + armWidth) / 16., 23 / 16., 0), offsetTransform);
+    poseLimb(leftArm, withScale(Transform.NONE.translate(0, -5 / 16., 0).rotateX(leftArmPose)
+        .translate(-(4 + armWidth) / 16., 23 / 16., 0)), offsetTransform);
     leftArm.addFrontFaces(faces, texture, texture.leftArmFront);
     leftArm.addBackFaces(faces, texture, texture.leftArmBack);
     leftArm.addLeftFaces(faces, texture, texture.leftArmLeft);
@@ -159,8 +160,8 @@ public class PlayerEntity extends Entity {
     leftArm.addTopFaces(faces, texture, texture.leftArmTop);
     leftArm.addBottomFaces(faces, texture, texture.leftArmBottom);
     Box rightArm = new Box(-armWidth / 16., armWidth / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
-    poseLimb(rightArm, Transform.NONE.translate(0, -5 / 16., 0).rotateX(rightArmPose)
-        .translate((4 + armWidth) / 16., 23 / 16., 0), offsetTransform);
+    poseLimb(rightArm, withScale(Transform.NONE.translate(0, -5 / 16., 0).rotateX(rightArmPose)
+        .translate((4 + armWidth) / 16., 23 / 16., 0)), offsetTransform);
     rightArm.addFrontFaces(faces, texture, texture.rightArmFront);
     rightArm.addBackFaces(faces, texture, texture.rightArmBack);
     rightArm.addLeftFaces(faces, texture, texture.rightArmLeft);
@@ -168,6 +169,14 @@ public class PlayerEntity extends Entity {
     rightArm.addTopFaces(faces, texture, texture.rightArmTop);
     rightArm.addBottomFaces(faces, texture, texture.rightArmBottom);
     return faces;
+  }
+
+  private Transform withScale(Transform transform) {
+    if (scale == 1.0) {
+      return transform;
+    } else {
+      return transform.scale(scale);
+    }
   }
 
   @Override public JsonValue toJson() {
@@ -184,6 +193,9 @@ public class PlayerEntity extends Entity {
     json.add("leftArmPose", leftArmPose);
     json.add("rightArmPose", rightArmPose);
     json.add("headYaw", headYaw);
+    if (scale != 1.0) {
+      json.add("scale", scale);
+    }
     return json;
   }
 
@@ -199,11 +211,13 @@ public class PlayerEntity extends Entity {
     double rightLegPose = json.get("rightLegPose").doubleValue(0.0);
     double leftArmPose = json.get("leftArmPose").doubleValue(0.0);
     double rightArmPose = json.get("rightArmPose").doubleValue(0.0);
+    double scale = json.get("scale").doubleValue(1.0);
     PlayerEntity entity =
         new PlayerEntity(uuid, position, yaw, pitch, leftLegPose, rightLegPose, leftArmPose,
             rightArmPose, model);
     entity.headYaw = json.get("headYaw").doubleValue(0.0);
     entity.skin = skin;
+    entity.scale = scale;
     return entity;
   }
 

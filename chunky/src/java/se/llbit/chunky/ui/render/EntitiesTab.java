@@ -103,6 +103,7 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
   @FXML private DoubleAdjuster rightArmPose;
   @FXML private DoubleAdjuster leftLegPose;
   @FXML private DoubleAdjuster rightLegPose;
+  @FXML private DoubleAdjuster scale;
 
   public EntitiesTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("EntitiesTab.fxml"));
@@ -139,6 +140,7 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
     rightArmPose.set(player.rightArmPose);
     leftLegPose.set(player.leftLegPose);
     rightLegPose.set(player.rightLegPose);
+    scale.set(player.scale);
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -285,6 +287,12 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
     rightLegPose.setRange(-QuickMath.HALF_PI, QuickMath.HALF_PI);
     rightLegPose.onValueChange(value -> withSelected(player -> {
       player.rightLegPose = value;
+      scene.rebuildActorBvh();
+    }));
+    scale.setName("Scale");
+    scale.setRange(0.1, 10);
+    scale.onValueChange(value -> withSelected(player -> {
+      player.scale = value;
       scene.rebuildActorBvh();
     }));
   }

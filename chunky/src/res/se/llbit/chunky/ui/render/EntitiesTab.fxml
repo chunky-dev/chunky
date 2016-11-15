@@ -56,6 +56,7 @@
       <DoubleAdjuster fx:id="rightArmPose"/>
       <DoubleAdjuster fx:id="leftLegPose"/>
       <DoubleAdjuster fx:id="rightLegPose"/>
+      <DoubleAdjuster fx:id="scale"/>
     </VBox>
   </ScrollPane>
 </fx:root>
