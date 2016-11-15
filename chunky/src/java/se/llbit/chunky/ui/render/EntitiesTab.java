@@ -76,8 +76,10 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
     }
 
     @Override public boolean equals(Object obj) {
+      // Identity comparison is used to ensure that the table in the
+      // entities tab is properly updated after rebuilding the scene.
       if (obj instanceof PlayerData) {
-        return ((PlayerData) obj).entity.uuid.equals(entity.uuid);
+        return ((PlayerData) obj).entity == entity;
       }
       return false;
     }
@@ -113,6 +115,7 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
   }
 
   @Override public void update(Scene scene) {
+    // TODO: it might be better to always just rebuild the whole table.
     Collection<PlayerData> missing = new HashSet<>(entityTable.getItems());
     for (Entity entity : scene.getActors()) {
       if (entity instanceof PlayerEntity) {

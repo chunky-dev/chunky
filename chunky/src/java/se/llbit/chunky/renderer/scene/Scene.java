@@ -191,8 +191,8 @@ public class Scene extends SceneDescription {
    */
   private Map<PlayerEntity, JsonObject> profiles = new HashMap<>();
 
-  private BVH bvh = new BVH(Collections.<Primitive>emptyList());
-  private BVH actorBvh = new BVH(Collections.<Primitive>emptyList());
+  private BVH bvh = new BVH(Collections.emptyList());
+  private BVH actorBvh = new BVH(Collections.emptyList());
 
   // Chunk loading buffers.
   private final byte[] blocks = new byte[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];

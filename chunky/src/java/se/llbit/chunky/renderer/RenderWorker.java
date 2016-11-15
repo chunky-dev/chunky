@@ -86,7 +86,6 @@ public class RenderWorker extends Thread {
    * @throws InterruptedException interrupted while sleeping
    */
   private void work(int jobId) throws InterruptedException {
-
     Scene scene = manager.getBufferedScene();
 
     Random random = state.random;
