@@ -17,6 +17,7 @@
 package se.llbit.chunky.launcher;
 
 import javafx.stage.Stage;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.ui.ChunkyLauncherFx;
 import se.llbit.chunky.launcher.ui.DebugConsole;
 import se.llbit.chunky.launcher.ui.FirstTimeSetupDialog;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -60,7 +62,7 @@ public class ChunkyLauncher {
     System.out.println(command);
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws FileNotFoundException {
     final LauncherSettings settings = new LauncherSettings();
     settings.load();
 
@@ -70,6 +72,8 @@ public class ChunkyLauncher {
 		 * we strip that and start regularly, but without launcher. The --launcher
 		 * option overrides everything else and forces the launcher to appear.
 		 */
+
+    // TODO(llbit): the control flow for launching Chunky needs to be simplified.
 
     boolean forceLauncher = false;
     LaunchMode mode = LaunchMode.GUI;
@@ -162,6 +166,7 @@ public class ChunkyLauncher {
 
     if (mode == LaunchMode.HEADLESS) {
       // Chunky is being run from the console, i.e. headless mode.
+      headlessCreateSettingsDirectory();
       settings.debugConsole = true;
       settings.headless = true;
       settings.chunkyOptions = headlessOptions;
@@ -200,11 +205,42 @@ public class ChunkyLauncher {
     }
   }
 
+  /** Ensure that the settings directory exists. */
+  private static void headlessCreateSettingsDirectory() throws FileNotFoundException {
+    // We will try to set up a Chunky settings directory if one is not already configured.
+    File directory = SettingsDirectory.getSettingsDirectory();
+    if (directory == null || !directory.isDirectory()) {
+      System.out.println("Chunky settings directory not found - trying to create one.");
+      if (directory != null && !directory.mkdir()) {
+        System.out.format("Failed to create directory: %s%n", directory.getAbsolutePath());
+      }
+      if (directory == null || !directory.isDirectory()) {
+        directory = SettingsDirectory.getHomeDirectory();
+        if (directory != null && !directory.mkdir()) {
+          System.out.format("Failed to create directory: %s%n", directory.getAbsolutePath());
+        }
+      }
+      if (directory != null && directory.isDirectory()) {
+        System.out.format("Created settings directory: %s%n", directory.getAbsolutePath());
+      }
+    }
+    if (directory != null) {
+      File settingsFile = new File(directory, PersistentSettings.SETTINGS_FILE);
+      if (!settingsFile.exists()) {
+        try (PrintStream out = new PrintStream(new FileOutputStream(settingsFile))) {
+          // Create an empty settings file (default settings will be used).
+          out.println("{}");
+        }
+      }
+    }
+  }
+
   interface ShowLauncher {
     boolean showLauncher();
   }
 
-  private static void doSetup(LauncherSettings settings) {
+  private static void doSetup(LauncherSettings settings) throws FileNotFoundException {
+    headlessCreateSettingsDirectory();
     System.out.print("Memory limit (MiB): ");
     Scanner in = new Scanner(System.in);
     settings.memoryLimit = in.nextInt();

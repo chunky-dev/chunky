@@ -469,7 +469,7 @@ public final class ChunkyDeployer {
       boolean reportErrors) {
     if (version == VersionInfo.NONE) {
       // Version not available!
-      System.err.println("No version installed");
+      System.err.println("Found no installed Chunky version.");
       if (reportErrors) {
         launcher.launcherError("No Chunky Available",
             "There is no local Chunky version installed. Please try updating.");

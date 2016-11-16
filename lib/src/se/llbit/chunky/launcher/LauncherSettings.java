@@ -52,7 +52,10 @@ public class LauncherSettings {
   }
 
   public void load() {
-    settings.load(new File(SettingsDirectory.getSettingsDirectory(), LAUNCHER_SETTINGS_FILE));
+    File directory = SettingsDirectory.getSettingsDirectory();
+    if (directory != null) {
+      settings.load(new File(directory, LAUNCHER_SETTINGS_FILE));
+    }
 
     javaDir = settings.getString("javaDir", "");
     if (javaDir.isEmpty()) {

@@ -35,7 +35,8 @@ public final class SettingsDirectory {
    * @return {@code true} if the settings directory could be located
    */
   public static boolean findSettingsDirectory() {
-    return getSettingsDirectory() != null;
+    File directory = getSettingsDirectory();
+    return directory != null && directory.isDirectory();
   }
 
   /**
