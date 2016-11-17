@@ -1,7 +1,8 @@
 1.4.2 - TBD
 
 * It is now possible to temporarily change the view target via the
-  render preview context menu.
+  render preview context menu. This is useful for autofocus and moving
+  entities.
 * Updated command block rendering to be compatible with Minecraft 1.9+.
 * Added scale setting for player entities.
 * Improved error checking for resource packs.
