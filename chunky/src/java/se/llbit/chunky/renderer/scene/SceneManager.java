@@ -60,6 +60,9 @@ public interface SceneManager {
    * This should only be used by the render controls dialog controller.
    * Modifications to the scene must always be protected by the intrinsic
    * lock of the scene object.
+   *
+   * @return the mutable scene state (note: scene lock must be held while
+   * modifying the state)
    */
   Scene getScene();
 }

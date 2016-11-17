@@ -38,6 +38,7 @@ import se.llbit.log.Log;
 import se.llbit.math.Matrix3;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 import se.llbit.util.JSONifiable;
 
@@ -127,6 +128,11 @@ public class Camera implements JSONifiable {
   private double fov = projector.getDefaultFoV();
 
   /**
+   * Target location. Position is relative to center of view, normalized by scene height.
+   */
+  private Vector2 target = new Vector2(0, 0);
+
+  /**
    * Maximum diagonal width of the world. Recalculated when world is loaded.
    */
   private double worldWidth = 100;
@@ -214,7 +220,7 @@ public class Camera implements JSONifiable {
    */
   public void setPosition(Vector3 v) {
     pos.set(v);
-    scene.refresh();
+    onViewChange();
   }
 
   /**
@@ -256,7 +262,7 @@ public class Camera implements JSONifiable {
       projectionMode = mode;
       initProjector();
       fov = projector.getDefaultFoV();
-      scene.refresh();
+      onViewChange();
     }
   }
 
@@ -266,7 +272,7 @@ public class Camera implements JSONifiable {
   public synchronized void setFoV(double value) {
     fov = value;
     initProjector();
-    scene.refresh();
+    onViewChange();
     projectionListener.run();
   }
 
@@ -303,7 +309,7 @@ public class Camera implements JSONifiable {
     }
     transform.transform(u);
     pos.scaleAdd(v, u);
-    scene.refresh();
+    onViewChange();
     positionListener.run();
   }
 
@@ -318,7 +324,7 @@ public class Camera implements JSONifiable {
     }
     transform.transform(u);
     pos.scaleAdd(-v, u);
-    scene.refresh();
+    onViewChange();
     positionListener.run();
   }
 
@@ -328,7 +334,7 @@ public class Camera implements JSONifiable {
   public synchronized void moveUp(double v) {
     u.set(0, 1, 0);
     pos.scaleAdd(v, u);
-    scene.refresh();
+    onViewChange();
     positionListener.run();
   }
 
@@ -338,7 +344,7 @@ public class Camera implements JSONifiable {
   public synchronized void moveDown(double v) {
     u.set(0, 1, 0);
     pos.scaleAdd(-v, u);
-    scene.refresh();
+    onViewChange();
     positionListener.run();
   }
 
@@ -349,7 +355,7 @@ public class Camera implements JSONifiable {
     u.set(1, 0, 0);
     transform.transform(u);
     pos.scaleAdd(-v, u);
-    scene.refresh();
+    onViewChange();
     positionListener.run();
   }
 
@@ -360,8 +366,18 @@ public class Camera implements JSONifiable {
     u.set(1, 0, 0);
     transform.transform(u);
     pos.scaleAdd(v, u);
-    scene.refresh();
+    onViewChange();
     positionListener.run();
+  }
+
+  /**
+   * Called when the view is changed (translated or rotated), and
+   * when the projection mode changes, and when the field of view
+   * changes.
+   */
+  private void onViewChange() {
+    scene.refresh();
+    target.set(0, 0);
   }
 
   /**
@@ -382,7 +398,7 @@ public class Camera implements JSONifiable {
     }
 
     updateTransform();
-    scene.refresh();
+    onViewChange();
     directionListener.run();
   }
 
@@ -399,7 +415,7 @@ public class Camera implements JSONifiable {
     this.roll = roll;
 
     updateTransform();
-    scene.refresh();
+    onViewChange();
   }
 
   /**
@@ -431,7 +447,6 @@ public class Camera implements JSONifiable {
    * @param y      normalized image coordinate [-0.5, 0.5]
    */
   public void calcViewRay(Ray ray, Random random, double x, double y) {
-
     // Reset the ray properties - current material etc.
     ray.setDefault();
 
@@ -454,7 +469,6 @@ public class Camera implements JSONifiable {
    * @param y   normalized image coordinate [-0.5, 0.5]
    */
   public void calcViewRay(Ray ray, double x, double y) {
-
     // Reset the ray properties - current material etc.
     ray.setDefault();
 
@@ -592,7 +606,7 @@ public class Camera implements JSONifiable {
     pos.y = player.position.y + 1.6;
     pos.z = player.position.z;
     updateTransform();
-    scene.refresh();
+    onViewChange();
   }
 
   public void setDirectionListener(Runnable directionListener) {
@@ -605,5 +619,24 @@ public class Camera implements JSONifiable {
 
   public void setProjectionListener(Runnable projectionListener) {
     this.projectionListener = projectionListener;
+  }
+
+  /**
+   * Update the argument ray to point toward the current target.
+   */
+  public void getTargetDirection(Ray ray) {
+    calcViewRay(ray, target.x, target.y);
+  }
+
+  public void setTarget(double x, double y) {
+    target.set(x, y);
+  }
+
+  /**
+   * Copy transient state from another camera.
+   */
+  public void copyTransients(Camera other) {
+    name = other.name;
+    target.set(other.target);
   }
 }

@@ -147,7 +147,7 @@ public class RenderWorker extends Thread {
     } else {
       // Preview rendering.
       Ray target = new Ray(ray);
-      boolean hit = scene.trace(target);
+      boolean hit = scene.traceTarget(target);
       int tx = (int) QuickMath.floor(target.o.x + target.d.x * Ray.OFFSET);
       int ty = (int) QuickMath.floor(target.o.y + target.d.y * Ray.OFFSET);
       int tz = (int) QuickMath.floor(target.o.z + target.d.z * Ray.OFFSET);

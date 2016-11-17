@@ -1184,12 +1184,14 @@ public class Scene extends SceneDescription {
   }
 
   /**
-   * Trace a ray in the Octree.
+   * Trace a ray in the Octree towards the current view target.
    * The ray is displaced to the target position if it hits something.
+   *
+   * <p>The view target is defined by the current camera state.
    *
    * @return {@code true} if the ray hit something
    */
-  public boolean trace(Ray ray) {
+  public boolean traceTarget(Ray ray) {
     WorkerState state = new WorkerState();
     state.ray = ray;
     if (isInWater(ray)) {
@@ -1197,12 +1199,10 @@ public class Scene extends SceneDescription {
     } else {
       ray.setCurrentMaterial(Block.AIR, 0);
     }
-    ray.d.set(0, 0, 1);
-    ray.o.set(camera.getPosition());
+    camera.getTargetDirection(ray);
     ray.o.x -= origin.x;
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
-    camera.transform(ray.d);
     while (PreviewRayTracer.nextIntersection(this, ray)) {
       if (ray.getCurrentMaterial() != Block.AIR) {
         return true;
@@ -1216,7 +1216,7 @@ public class Scene extends SceneDescription {
    */
   public void autoFocus() {
     Ray ray = new Ray();
-    if (!trace(ray)) {
+    if (!traceTarget(ray)) {
       camera.setDof(Double.POSITIVE_INFINITY);
     } else {
       camera.setSubjectDistance(ray.distance);
@@ -1231,7 +1231,7 @@ public class Scene extends SceneDescription {
    */
   public Vector3 getTargetPosition() {
     Ray ray = new Ray();
-    if (!trace(ray)) {
+    if (!traceTarget(ray)) {
       return null;
     } else {
       Vector3 target = new Vector3(ray.o);
@@ -1373,7 +1373,7 @@ public class Scene extends SceneDescription {
     mode = other.mode;
     outputMode = other.outputMode;
     cameraPresets = other.cameraPresets;
-    camera.name = other.camera.name;
+    camera.copyTransients(other.camera);
     finalizeBuffer = other.finalizeBuffer;
   }
 
@@ -1878,7 +1878,7 @@ public class Scene extends SceneDescription {
       } else {
         StringBuilder buf = new StringBuilder();
         Ray ray = new Ray();
-        if (trace(ray) && ray.getCurrentMaterial() instanceof Block) {
+        if (traceTarget(ray) && ray.getCurrentMaterial() instanceof Block) {
           Block block = (Block) ray.getCurrentMaterial();
           buf.append(String.format("target: %.2f m\n", ray.distance));
           buf.append(String.format("[0x%08X] %s (%s)\n", ray.getCurrentData(), block,
@@ -2197,6 +2197,7 @@ public class Scene extends SceneDescription {
   }
 
   public synchronized void forceReset() {
+    setResetReason(ResetReason.MODE_CHANGE);
     forceReset = true;
 
     // Wake up waiting threads.

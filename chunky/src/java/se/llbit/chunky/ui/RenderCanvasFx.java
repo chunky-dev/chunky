@@ -23,6 +23,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleGroup;
@@ -45,6 +46,7 @@ import se.llbit.chunky.renderer.Repaintable;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.SceneStatusListener;
 import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.math.Vector2;
 
 import java.nio.IntBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -65,6 +67,7 @@ public class RenderCanvasFx extends Stage implements Repaintable, SceneStatusLis
   private final Renderer renderer;
   private int lastX;
   private int lastY;
+  private Vector2 target = new Vector2(0, 0);
   private Tooltip tooltip = new Tooltip();
 
   private RenderStatusListener renderListener;
@@ -151,6 +154,13 @@ public class RenderCanvasFx extends Stage implements Repaintable, SceneStatusLis
     });
 
     ContextMenu contextMenu = new ContextMenu();
+    MenuItem setTarget = new MenuItem("Set target");
+    setTarget.setOnAction(e -> {
+      scene.camera().setTarget(target.x, target.y);
+      if (scene.getMode() == RenderMode.PREVIEW) {
+        scene.forceReset();
+      }
+    });
     CheckMenuItem showGuides = new CheckMenuItem("Show guides");
     showGuides.setSelected(false);
     showGuides.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -170,10 +180,14 @@ public class RenderCanvasFx extends Stage implements Repaintable, SceneStatusLis
       item.setOnAction(e -> updateCanvasScale(percent / 100.0));
       canvasScale.getItems().add(item);
     }
-    contextMenu.getItems().addAll(showGuides, canvasScale);
+    contextMenu.getItems().addAll(setTarget, showGuides, canvasScale);
 
     canvas.setOnMouseClicked(event -> {
       if (event.getButton() == MouseButton.SECONDARY) {
+        double invHeight = 1.0 / canvas.getHeight();
+        double halfWidth = canvas.getWidth() / (2.0 * canvas.getHeight());
+        target.set(-halfWidth + event.getX() * invHeight,
+            -0.5 + event.getY() * invHeight);
         contextMenu.show(getScene().getWindow(), event.getScreenX(), event.getScreenY());
       }
     });
