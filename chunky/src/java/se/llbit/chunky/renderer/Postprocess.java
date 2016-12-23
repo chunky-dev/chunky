@@ -41,11 +41,10 @@ public enum Postprocess {
   public static final Postprocess DEFAULT = GAMMA;
 
   public static Postprocess get(String name) {
-    for (Postprocess mode : values()) {
-      if (mode.name().equals(name)) {
-        return mode;
-      }
+    try {
+      return Postprocess.valueOf(name);
+    } catch (IllegalArgumentException e) {
+      return DEFAULT;
     }
-    return DEFAULT;
   }
 }

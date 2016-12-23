@@ -32,7 +32,9 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import se.llbit.chunky.main.SceneHelper;
-import se.llbit.chunky.renderer.scene.SceneDescription;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
 
 import java.io.File;
@@ -45,17 +47,17 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class SceneChooserController implements Initializable {
-  @FXML private TableView<SceneDescription> sceneTbl;
+  @FXML private TableView<JsonObject> sceneTbl;
 
-  @FXML private TableColumn<SceneDescription, String> nameCol;
+  @FXML private TableColumn<JsonObject, String> nameCol;
 
-  @FXML private TableColumn<SceneDescription, Number> chunkCountCol;
+  @FXML private TableColumn<JsonObject, Number> chunkCountCol;
 
-  @FXML private TableColumn<SceneDescription, String> sizeCol;
+  @FXML private TableColumn<JsonObject, String> sizeCol;
 
-  @FXML private TableColumn<SceneDescription, Number> sppCol;
+  @FXML private TableColumn<JsonObject, Number> sppCol;
 
-  @FXML private TableColumn<SceneDescription, String> renderTimeCol;
+  @FXML private TableColumn<JsonObject, String> renderTimeCol;
 
   @FXML private Button loadSceneBtn;
 
@@ -73,44 +75,65 @@ public class SceneChooserController implements Initializable {
     exportBtn.setTooltip(new Tooltip("Exports the selected scene as a Zip archive."));
     exportBtn.setOnAction(e -> {
       if (!sceneTbl.getSelectionModel().isEmpty()) {
-        SceneDescription scene = sceneTbl.getSelectionModel().getSelectedItem();
+        JsonObject scene = sceneTbl.getSelectionModel().getSelectedItem();
+        String sceneName = scene.get("fileName").stringValue("");
+        if (sceneName.isEmpty()) {
+          Log.error("Can not export scene with unknown filename.");
+          return;
+        }
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Export Scene");
         fileChooser
             .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Zip files", "*.zip"));
-        fileChooser.setInitialFileName(String.format("%s.zip", scene.name));
-        File target = fileChooser.showSaveDialog(stage);
-        if (target != null) {
-          scene.exportToZip(target);
+        fileChooser.setInitialFileName(String.format("%s.zip", sceneName));
+        File targetFile = fileChooser.showSaveDialog(stage);
+        if (targetFile != null) {
+          Scene.exportToZip(sceneName, targetFile);
         }
       }
     });
     deleteBtn.setOnAction(e -> {
       if (!sceneTbl.getSelectionModel().isEmpty()) {
-        SceneDescription scene = sceneTbl.getSelectionModel().getSelectedItem();
+        JsonObject scene = sceneTbl.getSelectionModel().getSelectedItem();
+        String sceneName = scene.get("fileName").stringValue("");
+        if (sceneName.isEmpty()) {
+          Log.error("Can not delete scene with unknown filename.");
+          return;
+        }
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Delete Scene");
         alert.setContentText(String.format("Are you sure you want to delete the scene %s? "
-            + "All files for the scene, except snapshot images, will be deleted.", scene.name));
+            + "All files for the scene, except snapshot images, will be deleted.", sceneName));
         if (alert.showAndWait().get() == ButtonType.OK) {
-          scene.delete(controller.getChunky().options.sceneDir);
+          Scene.delete(sceneName, controller.getChunky().options.sceneDir);
           sceneTbl.getItems().remove(sceneTbl.getSelectionModel().getSelectedItem());
         }
       }
     });
-    nameCol.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().name));
-    chunkCountCol
-        .setCellValueFactory(data -> new ReadOnlyIntegerWrapper(data.getValue().numberOfChunks()));
-    sizeCol.setCellValueFactory(data -> {
-      SceneDescription scene = data.getValue();
-      return new ReadOnlyStringWrapper(String.format("%dx%d", scene.width, scene.height));
+    nameCol.setCellValueFactory(data -> {
+      JsonObject scene = data.getValue();
+      String sceneName = scene.get("fileName").stringValue("");
+      return new ReadOnlyStringWrapper(sceneName);
     });
-    sppCol.setCellValueFactory(data -> new ReadOnlyIntegerWrapper(data.getValue().spp));
+    chunkCountCol.setCellValueFactory(data -> {
+      JsonObject scene = data.getValue();
+      return new ReadOnlyIntegerWrapper(scene.get("chunkList").array().getNumElement());
+    });
+    sizeCol.setCellValueFactory(data -> {
+      JsonObject scene = data.getValue();
+      return new ReadOnlyStringWrapper(String.format("%sx%s", scene.get("width").intValue(400),
+          scene.get("height").intValue(400)));
+    });
+    sppCol.setCellValueFactory(data -> {
+      JsonObject scene = data.getValue();
+      return new ReadOnlyIntegerWrapper(scene.get("spp").intValue(0));
+    });
     renderTimeCol.setCellValueFactory(data -> {
-      SceneDescription scene = data.getValue();
-      int seconds = (int) ((scene.renderTime / 1000) % 60);
-      int minutes = (int) ((scene.renderTime / 60000) % 60);
-      int hours = (int) (scene.renderTime / 3600000);
+      JsonObject scene = data.getValue();
+      long renderTime = scene.get("renderTime").longValue(0);
+      int seconds = (int) ((renderTime / 1000) % 60);
+      int minutes = (int) ((renderTime / 60000) % 60);
+      int hours = (int) (renderTime / 3600000);
       return new ReadOnlyStringWrapper(String.format("%d:%d:%d", hours, minutes, seconds));
     });
   }
@@ -118,38 +141,53 @@ public class SceneChooserController implements Initializable {
   public void setStage(Stage stage) {
     this.stage = stage;
     sceneTbl.setRowFactory(tbl -> {
-      TableRow<SceneDescription> row = new TableRow<>();
+      TableRow<JsonObject> row = new TableRow<>();
       row.setOnMouseClicked(e -> {
         if (e.getClickCount() == 2 && !row.isEmpty()) {
-          SceneDescription scene = row.getItem();
-          controller.loadScene(scene);
-          e.consume();
-          stage.close();
+          JsonObject scene = row.getItem();
+          String sceneName = scene.get("fileName").stringValue("");
+          if (sceneName.isEmpty()) {
+            Log.error("Can't load scene with unknown filename.");
+          } else {
+            controller.loadScene(sceneName);
+            e.consume();
+            stage.close();
+          }
         }
       });
       return row;
     });
     loadSceneBtn.setOnAction(e -> {
       if (!sceneTbl.getSelectionModel().isEmpty()) {
-        SceneDescription scene = sceneTbl.getSelectionModel().getSelectedItem();
-        controller.loadScene(scene);
-        stage.close();
+        JsonObject scene = sceneTbl.getSelectionModel().getSelectedItem();
+        String sceneName = scene.get("fileName").stringValue("");
+        if (sceneName.isEmpty()) {
+          Log.error("Can't load scene with unknown filename.");
+        } else {
+          controller.loadScene(sceneName);
+          stage.close();
+        }
       }
     });
     cancelBtn.setOnAction(e -> stage.hide());
   }
 
   private void populateSceneTable(File sceneDir) {
-    List<SceneDescription> scenes = new ArrayList<>();
+    List<JsonObject> scenes = new ArrayList<>();
     List<File> fileList = SceneHelper.getAvailableSceneFiles(sceneDir);
     Collections.sort(fileList);
     for (File sceneFile : fileList) {
       String fileName = sceneFile.getName();
       try {
-        SceneDescription desc = new SceneDescription();
-        desc.loadDescription(new FileInputStream(new File(sceneDir, fileName)));
-        scenes.add(desc);
-      } catch (IOException e) {
+        JsonParser parser = new JsonParser(new FileInputStream(new File(sceneDir, fileName)));
+        JsonObject scene = parser.parse().object();
+        // The scene name and filename may not always match. This can happen
+        // if the user has copied and renamed some scene file.
+        // Therefore we make sure to distinguish scenes by filename.
+        scene.add("fileName",
+            fileName.substring(0, fileName.length() - Scene.EXTENSION.length()));
+        scenes.add(scene);
+      } catch (IOException | JsonParser.SyntaxError e) {
         Log.warnf("Warning: could not load scene description: %s", fileName);
       }
     }

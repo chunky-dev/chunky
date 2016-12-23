@@ -46,12 +46,11 @@ public enum OutputMode {
   public static final OutputMode DEFAULT = PNG;
 
   public static OutputMode get(String name) {
-    for (OutputMode mode : values()) {
-      if (mode.name().equals(name)) {
-        return mode;
-      }
+    try {
+      return OutputMode.valueOf(name);
+    } catch (IllegalArgumentException e) {
+      return DEFAULT;
     }
-    return DEFAULT;
   }
 
   public abstract String getExtension();

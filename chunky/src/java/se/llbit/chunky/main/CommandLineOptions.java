@@ -21,7 +21,6 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.renderer.scene.SceneDescription;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.resources.TexturePackLoader.TextureLoadingError;
 import se.llbit.json.JsonNumber;
@@ -83,7 +82,7 @@ public class CommandLineOptions {
           "                         merge a render dump into the given scene",
           "  -help                  show this text", "", "Notes:",
           "<SCENE> can be either the path to a Scene Description File ("
-              + SceneDescription.EXTENSION + "),",
+              + Scene.EXTENSION + "),",
           "*OR* the name of a scene relative to the scene directory (excluding extension).",
           "If the scene name is an absolute path then the scene directory will be the",
           "parent directory of the Scene Description File, otherwise the scene directory",
@@ -353,12 +352,11 @@ public class CommandLineOptions {
         configurationError = true;
         return;
       }
-      Scene scene = new Scene();
       try {
+        Scene scene = new Scene();
         try (FileInputStream in = new FileInputStream(sceneFile)) {
           scene.loadDescription(in);
         }
-        scene.initBuffers();
         RenderContext context = new RenderContext(new Chunky(options));
         TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
             TaskTracker.Task::new,
@@ -407,13 +405,13 @@ public class CommandLineOptions {
     }
 
     if (options.sceneName != null
-        && options.sceneName.endsWith(SceneDescription.EXTENSION)) {
+        && options.sceneName.endsWith(Scene.EXTENSION)) {
       File possibleSceneFile = new File(options.sceneName);
       if (possibleSceneFile.isFile()) {
         options.sceneDir = possibleSceneFile.getParentFile();
         String sceneName = possibleSceneFile.getName();
         options.sceneName =
-            sceneName.substring(0, sceneName.length() - SceneDescription.EXTENSION.length());
+            sceneName.substring(0, sceneName.length() - Scene.EXTENSION.length());
       }
     }
 
@@ -479,7 +477,7 @@ public class CommandLineOptions {
       for (File file : fileList) {
         String name = file.getName();
         name = name.substring(0,
-            name.length() - SceneDescription.EXTENSION.length());
+            name.length() - Scene.EXTENSION.length());
         System.err.println("\t" + name);
       }
     }

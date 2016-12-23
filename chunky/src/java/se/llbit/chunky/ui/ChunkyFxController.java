@@ -56,7 +56,6 @@ import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
-import se.llbit.chunky.renderer.scene.SceneDescription;
 import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
@@ -523,7 +522,7 @@ public class ChunkyFxController
     }
 
     // Reset the scene state to the default scene state.
-    chunky.getRenderController().getSceneManager().getScene().initializeNewScene(preferredName,
+    chunky.getRenderController().getSceneManager().getScene().resetScene(preferredName,
         chunky.getSceneFactory());
 
     // Show the render controls etc.
@@ -536,10 +535,10 @@ public class ChunkyFxController
     }
   }
 
-  public void loadScene(SceneDescription scene) {
+  public void loadScene(String sceneName) {
     open3DView();
     try {
-      chunky.getSceneManager().loadScene(scene.name);
+      chunky.getSceneManager().loadScene(sceneName);
     } catch (IOException | SceneLoadingError | InterruptedException e) {
       Log.error("Failed to load scene", e);
     }

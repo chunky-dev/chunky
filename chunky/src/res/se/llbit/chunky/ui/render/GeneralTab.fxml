@@ -19,6 +19,8 @@
           <children>
             <Button fx:id="loadSceneBtn" mnemonicParsing="false" text="Load scene" />
             <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open scene directory" />
+            <Button fx:id="exportSettings" mnemonicParsing="false" text="Export settings" />
+            <Button fx:id="importSettings" mnemonicParsing="false" text="Import settings" />
           </children>
         </HBox>
         <HBox spacing="10.0">

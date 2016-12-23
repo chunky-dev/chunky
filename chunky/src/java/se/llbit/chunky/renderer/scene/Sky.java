@@ -35,7 +35,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 import se.llbit.resources.ImageLoader;
-import se.llbit.util.JSONifiable;
+import se.llbit.util.JsonSerializable;
 import se.llbit.util.NotNull;
 
 import java.io.File;
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class Sky implements JSONifiable {
+public class Sky implements JsonSerializable {
 
   //private static final double CLOUD_OPACITY = 0.4;
 
@@ -136,12 +136,11 @@ public class Sky implements JSONifiable {
     public static final SkyMode[] values = values();
 
     public static SkyMode get(String name) {
-      for (SkyMode mode : values) {
-        if (mode.name().equals(name)) {
-          return mode;
-        }
+      try {
+        return SkyMode.valueOf(name);
+      } catch (IllegalArgumentException e) {
+        return DEFAULT;
       }
-      return DEFAULT;
     }
 
   }
@@ -152,7 +151,7 @@ public class Sky implements JSONifiable {
           Texture.EMPTY_TEXTURE, Texture.EMPTY_TEXTURE};
   private String skymapFileName = "";
   private final String skyboxFileName[] = {"", "", "", "", "", ""};
-  private final SceneDescription scene;
+  private final Scene scene;
   private double rotation = 0;
   private boolean mirrored = true;
   private double horizonOffset = 0.1;
@@ -169,7 +168,7 @@ public class Sky implements JSONifiable {
    */
   private SkyMode mode = SkyMode.DEFAULT;
 
-  public Sky(SceneDescription sceneDescription) {
+  public Sky(Scene sceneDescription) {
     this.scene = sceneDescription;
     makeDefaultGradient(gradient);
   }
@@ -546,34 +545,38 @@ public class Sky implements JSONifiable {
     return sky;
   }
 
-  @Override public void fromJson(JsonObject sky) {
-    rotation = sky.get("skyYaw").doubleValue(0);
-    mirrored = sky.get("skyMirrored").boolValue(true);
-    skyLightModifier = sky.get("skyLight").doubleValue(DEFAULT_INTENSITY);
-    mode = SkyMode.get(sky.get("mode").stringValue(""));
-    horizonOffset = sky.get("horizonOffset").doubleValue(0.0);
-    cloudsEnabled = sky.get("cloudsEnabled").boolValue(false);
-    cloudSize = sky.get("cloudSize").doubleValue(DEFAULT_CLOUD_SIZE);
-    cloudOffset.fromJson(sky.get("cloudOffset").object());
+  public void importFromJson(JsonObject json) {
+    rotation = json.get("skyYaw").doubleValue(rotation);
+    mirrored = json.get("skyMirrored").boolValue(mirrored);
+    skyLightModifier = json.get("skyLight").doubleValue(skyLightModifier);
+    mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
+    horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
+    cloudsEnabled = json.get("cloudsEnabled").boolValue(cloudsEnabled);
+    cloudSize = json.get("cloudSize").doubleValue(cloudSize);
+    if (json.get("cloudOffset").isObject()) {
+      cloudOffset.fromJson(json.get("cloudOffset").object());
+    }
 
-    List<Vector4> theGradient = gradientFromJson(sky.get("gradient").array());
-    if (theGradient != null && theGradient.size() >= 2) {
-      gradient = theGradient;
+    if (json.get("gradient").isArray()) {
+      List<Vector4> theGradient = gradientFromJson(json.get("gradient").array());
+      if (theGradient != null && theGradient.size() >= 2) {
+        gradient = theGradient;
+      }
     }
 
     switch (mode) {
       case SKYMAP_PANORAMIC: {
-        skymapFileName = sky.get("skymap").stringValue("");
+        skymapFileName = json.get("skymap").stringValue(skymapFileName);
         if (skymapFileName.isEmpty()) {
-          skymapFileName = sky.get("skymapFileName").stringValue("");
+          skymapFileName = json.get("skymapFileName").stringValue(skymapFileName);
         }
         break;
       }
       case SKYBOX: {
-        JsonArray array = sky.get("skybox").array();
+        JsonArray array = json.get("skybox").array();
         for (int i = 0; i < 6; ++i) {
           JsonValue value = array.get(i);
-          skyboxFileName[i] = value.stringValue("");
+          skyboxFileName[i] = value.stringValue(skyboxFileName[i]);
         }
         break;
       }

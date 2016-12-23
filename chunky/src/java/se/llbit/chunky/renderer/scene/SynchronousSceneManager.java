@@ -76,6 +76,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     this.renderer = renderer;
 
     scene = context.getChunky().getSceneFactory().newScene();
+    scene.initBuffers();
 
     // The stored scene is a copy of the mutable scene. They even share
     // some data structures that are only used by the renderer.

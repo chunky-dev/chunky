@@ -16,8 +16,6 @@
  */
 package se.llbit.chunky.renderer.projection;
 
-import se.llbit.json.JsonValue;
-
 /**
  * Available projection modes.
  */
@@ -41,9 +39,9 @@ public enum ProjectionMode {
     return niceName;
   }
 
-  public static ProjectionMode fromJson(JsonValue jsonValue) {
+  public static ProjectionMode get(String name) {
     try {
-      return ProjectionMode.valueOf(jsonValue.stringValue("PINHOLE"));
+      return ProjectionMode.valueOf(name);
     } catch (IllegalArgumentException e) {
       return PINHOLE;
     }

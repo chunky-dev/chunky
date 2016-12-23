@@ -17,10 +17,12 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
+import org.jastadd.util.PrettyPrinter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.Postprocess;
+import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.ResetReason;
@@ -42,7 +44,9 @@ import se.llbit.chunky.world.entity.SignEntity;
 import se.llbit.chunky.world.entity.SkullEntity;
 import se.llbit.chunky.world.entity.WallSignEntity;
 import se.llbit.json.JsonArray;
+import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
+import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.math.BVH;
@@ -59,8 +63,10 @@ import se.llbit.png.IEND;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
 import se.llbit.tiff.TiffFileWriter;
+import se.llbit.util.JsonSerializable;
 import se.llbit.util.MCDownloader;
 import se.llbit.util.TaskTracker;
+import se.llbit.util.ZipExport;
 
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -68,6 +74,10 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -87,9 +97,14 @@ import java.util.zip.GZIPOutputStream;
  * <p>Render state is stored in a sample buffer. Two frame buffers
  * are also kept for when a snapshot should be rendered.
  */
-public class Scene extends SceneDescription {
+public class Scene implements JsonSerializable, Refreshable {
 
   public static final int DEFAULT_DUMP_FREQUENCY = 500;
+  public static final String EXTENSION = ".json";
+  /**
+   * The current Scene Description Format (SDF) version.
+   */
+  public static final int SDF_VERSION = 7;
 
   protected static final double fSubSurface = 0.3;
 
@@ -161,6 +176,78 @@ public class Scene extends SceneDescription {
    */
   public static final double DEFAULT_FOG_DENSITY = 0.0;
 
+  protected final Sky sky = new Sky(this);
+  protected final Camera camera = new Camera(this);
+  protected final Sun sun = new Sun(this);
+  protected final Vector3 waterColor =
+      new Vector3(PersistentSettings.getWaterColorRed(), PersistentSettings.getWaterColorGreen(),
+          PersistentSettings.getWaterColorBlue());
+  protected final Vector3 fogColor =
+      new Vector3(PersistentSettings.getFogColorRed(), PersistentSettings.getFogColorGreen(),
+          PersistentSettings.getFogColorBlue());
+  public int sdfVersion = -1;
+  public String name = "default";
+
+  /**
+   * Canvas width.
+   */
+  public int width;
+
+  /**
+   * Canvas height.
+   */
+  public int height;
+
+  public Postprocess postprocess = Postprocess.DEFAULT;
+  public OutputMode outputMode = OutputMode.DEFAULT;
+  public long renderTime;
+  /**
+   * Current SPP for the scene.
+   */
+  public int spp = 0;
+  protected double exposure = DEFAULT_EXPOSURE;
+  /**
+   * Target SPP for the scene.
+   */
+  protected int sppTarget = PersistentSettings.getSppTargetDefault();
+  /**
+   * Recursive ray depth limit (not including Russian Roulette).
+   */
+  protected int rayDepth = PersistentSettings.getRayDepthDefault();
+  protected String worldPath = "";
+  protected int worldDimension = 0;
+  protected RenderMode mode = RenderMode.PREVIEW;
+  protected int dumpFrequency = DEFAULT_DUMP_FREQUENCY;
+  protected boolean saveSnapshots = false;
+  protected boolean emittersEnabled = DEFAULT_EMITTERS_ENABLED;
+  protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
+  protected boolean sunEnabled = true;
+  /**
+   * Water opacity modifier.
+   */
+  protected double waterOpacity = PersistentSettings.getWaterOpacity();
+  protected double waterVisibility = PersistentSettings.getWaterVisibility();
+  protected int waterHeight = PersistentSettings.getWaterHeight();
+  protected boolean stillWater = PersistentSettings.getStillWater();
+  protected boolean useCustomWaterColor = PersistentSettings.getUseCustomWaterColor();
+  /**
+   * Enables fast fog algorithm
+   */
+  protected boolean fastFog = true;
+  /**
+   * Fog thickness.
+   */
+  protected double fogDensity = DEFAULT_FOG_DENSITY;
+  protected boolean biomeColors = true;
+  protected boolean transparentSky = false;
+  protected boolean renderActors = true;
+  protected Collection<ChunkPosition> chunks = new ArrayList<>();
+  protected JsonObject cameraPresets = new JsonObject();
+  /**
+   * Indicates if the render should be forced to reset.
+   */
+  protected ResetReason resetReason = ResetReason.NONE;
+
   /**
    * World reference.
    */
@@ -212,7 +299,18 @@ public class Scene extends SceneDescription {
 
   private BitmapImage backBuffer;
 
-  /** HDR sample buffer for the render output. */
+  /**
+   * HDR sample buffer for the render output.
+   *
+   * <p>Note: the sample buffer is initially null, it is only
+   * initialized if the scene will be used for rendering.
+   * This avoids allocating new sample buffers each time
+   * we want to copy the scene state to a temporary scene.
+   *
+   * <p>TODO: render buffers (sample buffer, alpha channel, etc.)
+   * should really be moved somewhere else and not be so tightly
+   * coupled to the scene settings.
+   */
   protected double[] samples;
 
   private byte[] alphaChannel;
@@ -224,17 +322,42 @@ public class Scene extends SceneDescription {
   private boolean forceReset = false;
 
   /**
-   * Create an empty scene with default canvas width and height.
+   * Creates a scene with all default settings.
+   *
+   * <p>Note: this does not initialize the render buffers for the scene!
+   * Render buffers are initialized either by using loadDescription(),
+   * fromJson(), or importFromJson(), or by calling initBuffers().
    */
   public Scene() {
-    worldOctree = new Octree(1);
-
     width = PersistentSettings.get3DCanvasWidth();
     height = PersistentSettings.get3DCanvasHeight();
-
     sppTarget = PersistentSettings.getSppTargetDefault();
 
-    initBuffers();
+    worldOctree = new Octree(1);
+  }
+
+  /**
+   * Delete all scene files from the scene directory, leaving only
+   * snapshots untouched.
+   */
+  public static void delete(String name, File sceneDir) {
+    String[] extensions =
+        {".json", ".dump", ".octree", ".foliage", ".grass", ".json.backup", ".dump.backup",};
+    for (String extension : extensions) {
+      File file = new File(sceneDir, name + extension);
+      if (file.isFile()) {
+        //noinspection ResultOfMethodCallIgnored
+        file.delete();
+      }
+    }
+  }
+
+  /**
+   * Export the scene to a zip file.
+   */
+  public static void exportToZip(String name, File targetFile) {
+    String[] extensions = {".json", ".dump", ".octree", ".foliage", ".grass",};
+    ZipExport.zip(targetFile, PersistentSettings.getSceneDirectory(), name, extensions);
   }
 
   /**
@@ -249,7 +372,7 @@ public class Scene extends SceneDescription {
   }
 
   /**
-   * Clone other scene
+   * Creates a copy of another scene.
    */
   public Scene(Scene other) {
     copyState(other);
@@ -268,11 +391,11 @@ public class Scene extends SceneDescription {
     // When the other scene is changed it must create a new octree.
     worldOctree = other.worldOctree;
     entities = other.entities;
-    actors = new LinkedList<>(
-        other.actors); // Have to create a copy so that changes to entities can be reset.
+    actors = new LinkedList<>(other.actors); // We create a copy so entity changes can be reset.
     profiles = other.profiles;
     bvh = other.bvh;
     actorBvh = other.actorBvh;
+    renderActors = other.renderActors;
     grassTexture = other.grassTexture;
     foliageTexture = other.foliageTexture;
     origin.set(other.origin);
@@ -280,7 +403,7 @@ public class Scene extends SceneDescription {
     chunks = other.chunks;
 
     exposure = other.exposure;
-    name = other.name;
+    name = other.name; // TODO: Safe to remove this? Name is copied in copyTransients().
 
     stillWater = other.stillWater;
     waterOpacity = other.waterOpacity;
@@ -331,8 +454,9 @@ public class Scene extends SceneDescription {
     try (TaskTracker.Task task = taskTracker.task("Saving scene", 2)) {
       task.update(1);
 
-      BufferedOutputStream out = new BufferedOutputStream(context.getSceneDescriptionOutputStream(name));
-      saveDescription(out);
+      try (BufferedOutputStream out = new BufferedOutputStream(context.getSceneDescriptionOutputStream(name))) {
+        saveDescription(out);
+      }
 
       saveOctree(context, taskTracker);
       saveGrassTexture(context, taskTracker);
@@ -362,8 +486,6 @@ public class Scene extends SceneDescription {
 
     // Load the configured skymap file.
     sky.loadSkymap();
-
-    initBuffers(); // Re-initialize the render buffers.
 
     if (!worldPath.isEmpty()) {
       File worldDirectory = new File(worldPath);
@@ -571,7 +693,7 @@ public class Scene extends SceneDescription {
 
     Set<ChunkPosition> loadedChunks = new HashSet<>();
     int emitters = 0;
-    int nchunks = 0;
+    int numChunks = 0;
 
     try (TaskTracker.Task task = progress.task("Loading regions")) {
       task.update(2, 1);
@@ -665,7 +787,7 @@ public class Scene extends SceneDescription {
         Collection<CompoundTag> tileEntities = new LinkedList<>();
         Collection<CompoundTag> chunkEntities = new LinkedList<>();
         world.getChunk(cp).getBlockData(blocks, data, biomes, tileEntities, chunkEntities);
-        nchunks += 1;
+        numChunks += 1;
 
         int wx0 = cp.x * 16;
         int wz0 = cp.z * 16;
@@ -929,7 +1051,7 @@ public class Scene extends SceneDescription {
     camera.setWorldSize(1 << worldOctree.depth);
     buildBvh();
     buildActorBvh();
-    Log.info(String.format("Loaded %d chunks (%d emitters)", nchunks, emitters));
+    Log.info(String.format("Loaded %d chunks (%d emitters)", numChunks, emitters));
   }
 
   private void buildBvh() {
@@ -1392,13 +1514,19 @@ public class Scene extends SceneDescription {
   }
 
   /**
-   * Change the canvas size.
+   * Change the canvas size for this scene. This will refresh
+   * the scene and reinitialize the sample buffers if the
+   * new canvas size is not identical to the current canvas size.
    */
   public synchronized void setCanvasSize(int canvasWidth, int canvasHeight) {
-    width = Math.max(MIN_CANVAS_WIDTH, canvasWidth);
-    height = Math.max(MIN_CANVAS_HEIGHT, canvasHeight);
-    initBuffers();
-    refresh();
+    int newWidth = Math.max(MIN_CANVAS_WIDTH, canvasWidth);
+    int newHeight = Math.max(MIN_CANVAS_HEIGHT, canvasHeight);
+    if (newWidth != width || newHeight != height) {
+      width = newWidth;
+      height = newHeight;
+      initBuffers();
+      refresh();
+    }
   }
 
   /**
@@ -1909,7 +2037,9 @@ public class Scene extends SceneDescription {
    * Call the consumer with the current front frame buffer.
    */
   public synchronized void withBufferedImage(Consumer<BitmapImage> consumer) {
-    consumer.accept(frontBuffer);
+    if (frontBuffer != null) {
+      consumer.accept(frontBuffer);
+    }
   }
 
   /**
@@ -2084,43 +2214,99 @@ public class Scene extends SceneDescription {
   }
 
   @Override public synchronized JsonObject toJson() {
-    JsonObject obj = super.toJson();
+    JsonObject json = new JsonObject();
+    json.add("sdfVersion", SDF_VERSION);
+    json.add("name", name);
+    json.add("width", width);
+    json.add("height", height);
+    json.add("exposure", exposure);
+    json.add("postprocess", postprocess.name());
+    json.add("outputMode", outputMode.name());
+    json.add("renderTime", renderTime);
+    json.add("spp", spp);
+    json.add("sppTarget", sppTarget);
+    json.add("rayDepth", rayDepth);
+    json.add("pathTrace", mode != RenderMode.PREVIEW);
+    json.add("dumpFrequency", dumpFrequency);
+    json.add("saveSnapshots", saveSnapshots);
+    json.add("emittersEnabled", emittersEnabled);
+    json.add("emitterIntensity", emitterIntensity);
+    json.add("sunEnabled", sunEnabled);
+    json.add("stillWater", stillWater);
+    json.add("waterOpacity", waterOpacity);
+    json.add("waterVisibility", waterVisibility);
+    json.add("useCustomWaterColor", useCustomWaterColor);
+    if (useCustomWaterColor) {
+      JsonObject colorObj = new JsonObject();
+      colorObj.add("red", waterColor.x);
+      colorObj.add("green", waterColor.y);
+      colorObj.add("blue", waterColor.z);
+      json.add("waterColor", colorObj);
+    }
+    JsonObject fogColorObj = new JsonObject();
+    fogColorObj.add("red", fogColor.x);
+    fogColorObj.add("green", fogColor.y);
+    fogColorObj.add("blue", fogColor.z);
+    json.add("fogColor", fogColorObj);
+    json.add("fastFog", fastFog);
+    json.add("biomeColorsEnabled", biomeColors);
+    json.add("transparentSky", transparentSky);
+    json.add("fogDensity", fogDensity);
+    json.add("waterHeight", waterHeight);
+    json.add("renderActors", renderActors);
+
+    if (!worldPath.isEmpty()) {
+      // Save world info.
+      JsonObject world = new JsonObject();
+      world.add("path", worldPath);
+      world.add("dimension", worldDimension);
+      json.add("world", world);
+    }
+
+    json.add("camera", camera.toJson());
+    json.add("sun", sun.toJson());
+    json.add("sky", sky.toJson());
+    json.add("cameraPresets", cameraPresets.fullCopy());
+    JsonArray chunkList = new JsonArray();
+    for (ChunkPosition pos : chunks) {
+      JsonArray chunk = new JsonArray();
+      chunk.add(pos.x);
+      chunk.add(pos.z);
+      chunkList.add(chunk);
+    }
+    json.add("chunkList", chunkList);
+
     JsonArray entityArray = new JsonArray();
     for (Entity entity : entities) {
       entityArray.add(entity.toJson());
     }
     if (entityArray.getNumElement() > 0) {
-      obj.add("entities", entityArray);
+      json.add("entities", entityArray);
     }
     JsonArray actorArray = new JsonArray();
     for (Entity entity : actors) {
       actorArray.add(entity.toJson());
     }
     if (actorArray.getNumElement() > 0) {
-      obj.add("actors", actorArray);
+      json.add("actors", actorArray);
     }
-    return obj;
+    return json;
   }
 
-  @Override public synchronized void fromJson(JsonObject desc) {
-    super.fromJson(desc);
+  /**
+   * Reset the scene settings and import from a JSON object.
+   */
+  public synchronized void fromJson(JsonObject json) {
+    boolean finalizeBufferPrev = finalizeBuffer;  // Remember the finalize setting.
+    Scene scene = new Scene();
+    scene.importFromJson(json);
+    copyState(scene);
+    copyTransients(scene);
+    finalizeBuffer = finalizeBufferPrev; // Restore the finalize setting.
 
-    entities = new LinkedList<>();
-    actors = new LinkedList<>();
-    for (JsonValue element : desc.get("entities").array().getElementList()) {
-      Entity entity = Entity.fromJson(element.object());
-      if (entity != null) {
-        if (entity instanceof PlayerEntity) {
-          actors.add(entity);
-        } else {
-          entities.add(entity);
-        }
-      }
-    }
-    for (JsonValue element : desc.get("actors").array().getElementList()) {
-      Entity entity = Entity.fromJson(element.object());
-      actors.add(entity);
-    }
+    setResetReason(ResetReason.SCENE_LOADED);
+    sdfVersion = json.get("sdfVersion").intValue(-1);
+    name = json.get("name").stringValue("default");
   }
 
   public Collection<Entity> getEntities() {
@@ -2209,9 +2395,10 @@ public class Scene extends SceneDescription {
    *
    * @param name sets the name for the scene
    */
-  public synchronized void initializeNewScene(String name, SceneFactory sceneFactory) {
+  public synchronized void resetScene(String name, SceneFactory sceneFactory) {
     boolean finalizeBufferPrev = finalizeBuffer;  // Remember the finalize setting.
     Scene newScene = sceneFactory.newScene();
+    newScene.initBuffers();
     newScene.setName(name);
     copyState(newScene);
     copyTransients(newScene);
@@ -2219,5 +2406,282 @@ public class Scene extends SceneDescription {
     resetReason = ResetReason.SETTINGS_CHANGED;
     mode = RenderMode.PREVIEW;
     finalizeBuffer = finalizeBufferPrev;
+  }
+
+  /**
+   * Parse the scene description from a JSON file.
+   *
+   * <p>This initializes the sample buffers.
+   *
+   * @param in Input stream to read the JSON data from. The stream will
+   * be closed when done.
+   */
+  public void loadDescription(InputStream in) throws IOException {
+    try (JsonParser parser = new JsonParser(in)) {
+      JsonObject json = parser.parse().object();
+      fromJson(json);
+    } catch (JsonParser.SyntaxError e) {
+      throw new IOException("JSON syntax error");
+    }
+  }
+
+  /**
+   * Write the scene description as JSON.
+   *
+   * @param out Output stream to write the JSON data to.
+   * The stream will not be closed when done.
+   */
+  public void saveDescription(OutputStream out) throws IOException {
+    PrettyPrinter pp = new PrettyPrinter("  ", new PrintStream(out));
+    JsonObject json = toJson();
+    json.prettyPrint(pp);
+  }
+
+  /**
+   * Replace the current settings from exported JSON settings.
+   *
+   * <p>This (re)initializes the sample buffers for the scene.
+   */
+  public synchronized void importFromJson(JsonObject json) {
+    // The scene is refreshed so that any ongoing renders will restart.
+    // We do this in case some setting that requires restart changes.
+    // TODO: check if we actually need to reset the scene based on changed settings.
+    refresh();
+
+    int newWidth = json.get("width").intValue(width);
+    int newHeight = json.get("height").intValue(height);
+    if (width != newWidth || height != newHeight || samples == null) {
+      width = newWidth;
+      height = newHeight;
+      initBuffers();
+    }
+
+    exposure = json.get("exposure").doubleValue(exposure);
+    postprocess = Postprocess.get(json.get("postprocess").stringValue(postprocess.name()));
+    outputMode = OutputMode.get(json.get("outputMode").stringValue(outputMode.name()));
+    sppTarget = json.get("sppTarget").intValue(sppTarget);
+    rayDepth = json.get("rayDepth").intValue(rayDepth);
+    if (!json.get("pathTrace").isUnknown()) {
+      boolean pathTrace = json.get("pathTrace").boolValue(false);
+      if (pathTrace) {
+        mode = RenderMode.PAUSED;
+      } else {
+        mode = RenderMode.PREVIEW;
+      }
+    }
+    dumpFrequency = json.get("dumpFrequency").intValue(dumpFrequency);
+    saveSnapshots = json.get("saveSnapshots").boolValue(saveSnapshots);
+    emittersEnabled = json.get("emittersEnabled").boolValue(emittersEnabled);
+    emitterIntensity = json.get("emitterIntensity").doubleValue(emitterIntensity);
+    sunEnabled = json.get("sunEnabled").boolValue(sunEnabled);
+    stillWater = json.get("stillWater").boolValue(stillWater);
+    waterOpacity = json.get("waterOpacity").doubleValue(waterOpacity);
+    waterVisibility = json.get("waterVisibility").doubleValue(waterVisibility);
+    useCustomWaterColor = json.get("useCustomWaterColor").boolValue(useCustomWaterColor);
+    if (useCustomWaterColor) {
+      JsonObject colorObj = json.get("waterColor").object();
+      waterColor.x = colorObj.get("red").doubleValue(waterColor.x);
+      waterColor.y = colorObj.get("green").doubleValue(waterColor.y);
+      waterColor.z = colorObj.get("blue").doubleValue(waterColor.z);
+    }
+    JsonObject fogColorObj = json.get("fogColor").object();
+    fogColor.x = fogColorObj.get("red").doubleValue(fogColor.x);
+    fogColor.y = fogColorObj.get("green").doubleValue(fogColor.y);
+    fogColor.z = fogColorObj.get("blue").doubleValue(fogColor.z);
+    fastFog = json.get("fastFog").boolValue(fastFog);
+    biomeColors = json.get("biomeColorsEnabled").boolValue(biomeColors);
+    transparentSky = json.get("transparentSky").boolValue(transparentSky);
+    fogDensity = json.get("fogDensity").doubleValue(fogDensity);
+    waterHeight = json.get("waterHeight").intValue(waterHeight);
+    renderActors = json.get("renderActors").boolValue(renderActors);
+
+    // Load world info.
+    if (json.get("world").isObject()) {
+      JsonObject world = json.get("world").object();
+      worldPath = world.get("path").stringValue(worldPath);
+      worldDimension = world.get("dimension").intValue(worldDimension);
+    }
+
+    if (json.get("camera").isObject()) {
+      camera.importFromJson(json.get("camera").object());
+    }
+
+    if (json.get("sun").isObject()) {
+      sun.importFromJson(json.get("sun").object());
+    }
+
+    if (json.get("sky").isObject()) {
+      sky.importFromJson(json.get("sky").object());
+    }
+
+    if (json.get("cameraPresets").isObject()) {
+      cameraPresets = json.get("cameraPresets").object();
+    }
+
+    // Current SPP and render time are read after loading
+    // other settings which can reset the render status.
+    spp = json.get("spp").intValue(spp);
+    renderTime = json.get("renderTime").longValue(renderTime);
+
+    if (json.get("chunkList").isArray()) {
+      JsonArray chunkList = json.get("chunkList").array();
+      chunks.clear();
+      for (JsonValue elem : chunkList.getElementList()) {
+        JsonArray chunk = elem.array();
+        int x = chunk.get(0).intValue(Integer.MAX_VALUE);
+        int z = chunk.get(1).intValue(Integer.MAX_VALUE);
+        if (x != Integer.MAX_VALUE && z != Integer.MAX_VALUE) {
+          chunks.add(ChunkPosition.get(x, z));
+        }
+      }
+    }
+
+    if (json.get("entities").isArray()) {
+      entities = new LinkedList<>();
+      actors = new LinkedList<>();
+      // Previously poseable entities were stored in the entities array
+      // rather than the actors array. In future versions only the actors
+      // array should contain poseable entities.
+      for (JsonValue element : json.get("entities").array().getElementList()) {
+        Entity entity = Entity.fromJson(element.object());
+        if (entity != null) {
+          if (entity instanceof PlayerEntity) {
+            actors.add(entity);
+          } else {
+            entities.add(entity);
+          }
+        }
+      }
+      for (JsonValue element : json.get("actors").array().getElementList()) {
+        Entity entity = Entity.fromJson(element.object());
+        actors.add(entity);
+      }
+    }
+  }
+
+  /**
+   * Called when the scene description has been altered in a way that
+   * forces the rendering to restart.
+   */
+  @Override public synchronized void refresh() {
+    if (mode == RenderMode.PAUSED) {
+      mode = RenderMode.RENDERING;
+    }
+    spp = 0;
+    renderTime = 0;
+    setResetReason(ResetReason.SETTINGS_CHANGED);
+    notifyAll();
+  }
+
+  /**
+   * @return The sun state object.
+   */
+  public Sun sun() {
+    return sun;
+  }
+
+  /**
+   * @return The sky state object.
+   */
+  public Sky sky() {
+    return sky;
+  }
+
+  /**
+   * @return The camera state object.
+   */
+  public Camera camera() {
+    return camera;
+  }
+
+  public void saveCameraPreset(String name) {
+    camera.name = name;
+    for (JsonMember member : cameraPresets.getMemberList()) {
+      if (member.getName().equals(name)) {
+        member.setValue(camera.toJson());
+        return;
+      }
+    }
+    cameraPresets.add(name, camera.toJson());
+  }
+
+  public void loadCameraPreset(String name) {
+    JsonValue value = cameraPresets.get(name);
+    if (value.isObject()) {
+      camera.importFromJson(value.object());
+      refresh();
+    }
+  }
+
+  public void deleteCameraPreset(String name) {
+    for (int i = 0; i < cameraPresets.getNumMember(); ++i) {
+      if (cameraPresets.getMember(i).getName().equals(name)) {
+        cameraPresets.getMemberList().removeChild(i);
+        return;
+      }
+    }
+  }
+
+  public JsonObject getCameraPresets() {
+    return cameraPresets;
+  }
+
+  public RenderMode getMode() {
+    return mode;
+  }
+
+  public void setFogDensity(double newValue) {
+    if (newValue != fogDensity) {
+      this.fogDensity = newValue;
+      refresh();
+    }
+  }
+
+  public double getFogDensity() {
+    return fogDensity;
+  }
+
+  public void setFastFog(boolean value) {
+    if (fastFog != value) {
+      fastFog = value;
+      refresh();
+    }
+  }
+
+  public boolean fastFog() {
+    return fastFog;
+  }
+
+  /**
+   * @return {@code true} if volumetric fog is enabled
+   */
+  public boolean fogEnabled() {
+    return fogDensity > 0.0;
+  }
+
+  public OutputMode getOutputMode() {
+    return outputMode;
+  }
+
+  public void setOutputMode(OutputMode mode) {
+    outputMode = mode;
+  }
+
+  public int numberOfChunks() {
+    return chunks.size();
+  }
+
+  /**
+   * Clears the reset reason and returns the previous reason.
+   * @return the current reset reason
+   */
+  public synchronized ResetReason getResetReason() {
+    return resetReason;
+  }
+
+  public void setResetReason(ResetReason resetReason) {
+    if (this.resetReason != ResetReason.SCENE_LOADED) {
+      this.resetReason = resetReason;
+    }
   }
 }

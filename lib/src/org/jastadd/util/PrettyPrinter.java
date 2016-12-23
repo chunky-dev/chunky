@@ -25,13 +25,13 @@ import java.util.Stack;
  */
 public class PrettyPrinter {
   private final String indentation;
-  private final java.util.List<String> ind = new ArrayList<String>(32);
+  private final java.util.List<String> ind = new ArrayList<>(32);
 
   {
     ind.add("");
   }
 
-  private final Stack<Integer> indentStack = new Stack<Integer>();
+  private final Stack<Integer> indentStack = new Stack<>();
 
   {
     indentStack.push(0);
@@ -42,25 +42,15 @@ public class PrettyPrinter {
   private PrintStream out = System.out;
   private boolean newline = false;
 
-  /**
-   * @param ind
-   */
   public PrettyPrinter(String ind) {
     this.indentation = ind;
   }
 
-  /**
-   * @param ind
-   * @param target
-   */
   public PrettyPrinter(String ind, PrintStream target) {
     this(ind);
     out = target;
   }
 
-  /**
-   * @param target
-   */
   public void setTarget(PrintStream target) {
     out = target;
   }
@@ -77,9 +67,6 @@ public class PrettyPrinter {
   }
 
 
-  /**
-   * @param str
-   */
   public void print(String str) {
     indentNewline();
     out.print(str);
@@ -93,18 +80,12 @@ public class PrettyPrinter {
     newline = true;
   }
 
-  /**
-   * @param node
-   */
   public void print(PrettyPrintable node) {
     pushIndentation();
     node.prettyPrint(this);
     popIndentation();
   }
 
-  /**
-   * @param level
-   */
   public void indent(int level) {
     indentNewline();
     currentIndent = level;

@@ -285,8 +285,8 @@ public class Chunky {
     Log.setReceiver(HEADLESS_LOG_RECEIVER, Level.INFO, Level.WARNING, Level.ERROR);
     try {
       File file = options.getSceneDescriptionFile();
-      Scene scene = new Scene();
       try (FileInputStream in = new FileInputStream(file)) {
+        Scene scene = new Scene();
         scene.loadDescription(in); // Load description to get current SPP & canvas size.
         RenderContext context = new RenderContext(this);
         TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
@@ -296,7 +296,6 @@ public class Chunky {
                 // Don't report task state to progress listener.
               }
             });
-        scene.initBuffers();  // Initialize the sample buffer.
         scene.loadDump(context, taskTracker); // Load the render dump.
         OutputMode outputMode = scene.getOutputMode();
         if (options.imageOutputFile.isEmpty()) {

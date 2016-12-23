@@ -40,7 +40,7 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
-import se.llbit.util.JSONifiable;
+import se.llbit.util.JsonSerializable;
 
 import java.util.Random;
 
@@ -52,7 +52,7 @@ import java.util.Random;
  * @author Jesper Öqvist <jesper@llbit.se>
  * @author TOGoS (projection code)
  */
-public class Camera implements JSONifiable {
+public class Camera implements JsonSerializable {
 
   private Runnable directionListener = () -> {};
   private Runnable positionListener = () -> {};
@@ -569,27 +569,26 @@ public class Camera implements JSONifiable {
     return camera;
   }
 
-  @Override public void fromJson(JsonObject obj) {
-    name = obj.get("name").stringValue("camera 1");
-    pos.fromJson(obj.get("position").object());
-
-    JsonObject orientation = obj.get("orientation").object();
-    roll = orientation.get("roll").doubleValue(0);
-    pitch = orientation.get("pitch").doubleValue(0);
-    yaw = orientation.get("yaw").doubleValue(-QuickMath.HALF_PI);
-
-    fov = obj.get("fov").doubleValue(0);
-    subjectDistance = obj.get("focalOffset").doubleValue(0);
-    try {
-      projectionMode = ProjectionMode.fromJson(obj.get("projectionMode"));
-    } catch (IllegalArgumentException e) {
-      projectionMode = ProjectionMode.PINHOLE;
+  public void importFromJson(JsonObject json) {
+    name = json.get("name").stringValue(name);
+    if (json.get("position").isObject()) {
+      pos.fromJson(json.get("position").object());
     }
-    if (obj.get("infDof").boolValue(false)) {
+
+    JsonObject orientation = json.get("orientation").object();
+    roll = orientation.get("roll").doubleValue(roll);
+    pitch = orientation.get("pitch").doubleValue(pitch);
+    yaw = orientation.get("yaw").doubleValue(yaw);
+
+    fov = json.get("fov").doubleValue(fov);
+    subjectDistance = json.get("focalOffset").doubleValue(subjectDistance);
+    projectionMode = ProjectionMode.get(
+        json.get("projectionMode").stringValue(projectionMode.name()));
+    if (json.get("infDof").boolValue(false)) {
       // The infDof setting is deprecated.
       dof = Double.POSITIVE_INFINITY;
     } else {
-      dof = obj.get("dof").doubleValue(Double.POSITIVE_INFINITY);
+      dof = json.get("dof").doubleValue(dof);
     }
     initProjector();
     updateTransform();

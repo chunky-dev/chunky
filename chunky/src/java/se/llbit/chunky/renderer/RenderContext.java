@@ -18,7 +18,7 @@ package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
-import se.llbit.chunky.renderer.scene.SceneDescription;
+import se.llbit.chunky.renderer.scene.Scene;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,7 +68,7 @@ public class RenderContext {
    * @return Scene description file
    */
   public File getSceneDescriptionFile(String sceneName) {
-    return getSceneFile(sceneName + SceneDescription.EXTENSION);
+    return getSceneFile(sceneName + Scene.EXTENSION);
   }
 
   /**
@@ -76,7 +76,7 @@ public class RenderContext {
    * @throws FileNotFoundException
    */
   public InputStream getSceneDescriptionInputStream(String sceneName) throws FileNotFoundException {
-    return getSceneFileInputStream(sceneName + SceneDescription.EXTENSION);
+    return getSceneFileInputStream(sceneName + Scene.EXTENSION);
   }
 
   /**
@@ -85,7 +85,7 @@ public class RenderContext {
    */
   public OutputStream getSceneDescriptionOutputStream(String sceneName)
       throws FileNotFoundException {
-    return getSceneFileOutputStream(sceneName + SceneDescription.EXTENSION);
+    return getSceneFileOutputStream(sceneName + Scene.EXTENSION);
   }
 
   /**

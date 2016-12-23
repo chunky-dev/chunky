@@ -26,6 +26,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
@@ -40,10 +41,14 @@ import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.SceneChooser;
 import se.llbit.chunky.world.Icon;
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,6 +59,10 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
   @FXML private Button loadSceneBtn;
 
   @FXML private Button openSceneDirBtn;
+
+  @FXML private Button exportSettings;
+
+  @FXML private Button importSettings;
 
   @FXML private Button loadSelectedChunks;
 
@@ -129,6 +138,31 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
 
   @Override public void initialize(URL location, ResourceBundle resources) {
     setGraphic(new ImageView(Icon.wrench.fxImage()));
+
+    exportSettings.setOnAction(event -> {
+      SettingsExport dialog = new SettingsExport(scene.toJson());
+      dialog.show();
+    });
+
+    importSettings.setOnAction(event -> {
+      TextInputDialog dialog = new TextInputDialog();
+      dialog.setTitle("Settings Import");
+      dialog.setHeaderText("Import scene settings");
+      dialog.setContentText("Settings JSON:");
+      Optional<String> result = dialog.showAndWait();
+      if (result.isPresent()) {
+        String text = result.get();
+        try (JsonParser parser = new JsonParser(new ByteArrayInputStream(text.getBytes()))) {
+          JsonObject json = parser.parse().object();
+          scene.importFromJson(json);
+        } catch (IOException e) {
+          Log.warn("Failed to import scene settings.");
+        } catch (JsonParser.SyntaxError syntaxError) {
+          Log.warnf("Failed to import settings: syntax error in JSON string (%s).",
+              syntaxError.getMessage());
+        }
+      }
+    });
 
     loadPlayers.setTooltip(new Tooltip("Enable/disable player entity loading. "
         + "Takes effect on next scene creation."));

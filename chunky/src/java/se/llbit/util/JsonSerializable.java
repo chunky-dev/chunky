@@ -19,20 +19,15 @@ package se.llbit.util;
 import se.llbit.json.JsonObject;
 
 /**
- * Interface for things that are serialized to JSON.
+ * Classes implementing this interface can be serialized to JSON.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public interface JSONifiable {
+public interface JsonSerializable {
   /**
    * Serialize this object to a JSON object.
    *
    * @return JSON object
    */
   JsonObject toJson();
-
-  /**
-   * Deserialize this object from a JSON object.
-   */
-  void fromJson(JsonObject obj);
 }

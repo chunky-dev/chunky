@@ -26,14 +26,14 @@ import se.llbit.json.JsonObject;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
-import se.llbit.util.JSONifiable;
+import se.llbit.util.JsonSerializable;
 
 /**
- * Sun model for ray tracing
+ * Sun model for ray tracing.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class Sun implements JSONifiable {
+public class Sun implements JsonSerializable {
 
   /**
    * Default sun intensity
@@ -367,15 +367,17 @@ public class Sun implements JSONifiable {
     return sun;
   }
 
-  @Override public void fromJson(JsonObject obj) {
-    azimuth = obj.get("azimuth").doubleValue(Math.PI / 2.5);
-    altitude = obj.get("altitude").doubleValue(Math.PI / 3);
-    intensity = obj.get("intensity").doubleValue(DEFAULT_INTENSITY);
+  public void importFromJson(JsonObject json) {
+    azimuth = json.get("azimuth").doubleValue(azimuth);
+    altitude = json.get("altitude").doubleValue(altitude);
+    intensity = json.get("intensity").doubleValue(intensity);
 
-    JsonObject colorObj = obj.get("color").object();
-    color.x = colorObj.get("red").doubleValue(1);
-    color.y = colorObj.get("green").doubleValue(1);
-    color.z = colorObj.get("blue").doubleValue(1);
+    if (json.get("color").isObject()) {
+      JsonObject colorObj = json.get("color").object();
+      color.x = colorObj.get("red").doubleValue(1);
+      color.y = colorObj.get("green").doubleValue(1);
+      color.z = colorObj.get("blue").doubleValue(1);
+    }
 
     initSun();
   }

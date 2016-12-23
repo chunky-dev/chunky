@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.main;
 
-import se.llbit.chunky.renderer.scene.SceneDescription;
+import se.llbit.chunky.renderer.scene.Scene;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class SceneHelper {
    */
   public static List<File> getAvailableSceneFiles(File sceneDir) {
     File[] sceneFiles = sceneDir
-        .listFiles((dir, name) -> name.endsWith(SceneDescription.EXTENSION));
+        .listFiles((dir, name) -> name.endsWith(Scene.EXTENSION));
     if (sceneFiles != null) {
       List<File> fileList = new ArrayList<>(sceneFiles.length);
       Collections.addAll(fileList, sceneFiles);

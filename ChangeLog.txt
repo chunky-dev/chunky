@@ -1,5 +1,6 @@
 1.4.2 - TBD
 
+* Added scene settings export/import system.
 * It is now possible to temporarily change the view target via the
   render preview context menu. This is useful for autofocus and moving
   entities.

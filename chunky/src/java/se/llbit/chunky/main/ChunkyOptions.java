@@ -18,7 +18,7 @@ package se.llbit.chunky.main;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderConstants;
-import se.llbit.chunky.renderer.scene.SceneDescription;
+import se.llbit.chunky.renderer.scene.Scene;
 
 import java.io.File;
 
@@ -70,15 +70,13 @@ public class ChunkyOptions {
    * @return the scene description file handle
    */
   public File getSceneDescriptionFile() {
-    if (sceneName.endsWith(SceneDescription.EXTENSION)) {
+    if (sceneName.endsWith(Scene.EXTENSION)) {
       return new File(sceneName);
     } else {
       if (sceneDir != null) {
-        return new File(sceneDir,
-            sceneName + SceneDescription.EXTENSION);
+        return new File(sceneDir, sceneName + Scene.EXTENSION);
       } else {
-        return new File(PersistentSettings.getSceneDirectory(),
-            sceneName + SceneDescription.EXTENSION);
+        return new File(PersistentSettings.getSceneDirectory(), sceneName + Scene.EXTENSION);
       }
     }
   }

@@ -125,7 +125,7 @@ public class GradientEditor extends VBox implements Initializable {
       }
     });
     importBtn.setOnAction(e -> {
-      javafx.scene.control.TextInputDialog dialog = new TextInputDialog();
+      TextInputDialog dialog = new TextInputDialog();
       dialog.setTitle("Import Gradient");
       dialog.setHeaderText("Gradient Import");
       dialog.setContentText("Graident JSON:");
@@ -135,8 +135,7 @@ public class GradientEditor extends VBox implements Initializable {
       }
     });
     exportBtn.setOnAction(e -> {
-      javafx.scene.control.TextInputDialog dialog =
-          new TextInputDialog(Sky.gradientJson(gradient).toCompactString());
+      TextInputDialog dialog = new TextInputDialog(Sky.gradientJson(gradient).toCompactString());
       dialog.setTitle("Gradient Export");
       dialog.setHeaderText("Gradient Export");
       dialog.setContentText("Gradient JSON:");
