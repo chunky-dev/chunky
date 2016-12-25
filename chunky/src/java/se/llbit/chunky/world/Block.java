@@ -2314,8 +2314,9 @@ public class Block extends Material {
       return PressurePlateModel.intersect(ray, Texture.ironBlock);
     }
   };
-  public static final int REDSTONECOMPARATOR_ID = 0x95;
-  private static final Block REDSTONECOMPARATOR = new Block(REDSTONECOMPARATOR_ID, "Redstone Comparator (inactive)", Texture.unknown) {
+  public static final int COMPARATOR_ID = 0x95;
+  private static final Block COMPARATOR = new Block(COMPARATOR_ID,
+      "Redstone Comparator", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2323,11 +2324,12 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return ComparatorModel.intersect(ray, 0);
+      return ComparatorModel.intersect(ray, 1 & (ray.getBlockData() >> 3));
     }
   };
-  public static final int REDSTONECOMPARATORLIT_ID = 0x96;
-  private static final Block REDSTONECOMPARATORLIT = new Block(REDSTONECOMPARATORLIT_ID, "Redstone Comparator (active)", Texture.unknown) {
+  public static final int COMPARATOR_POWERED_ID = 0x96;
+  private static final Block COMPARATOR_POWERED = new Block(COMPARATOR_POWERED_ID,
+      "Redstone Comparator (powered)", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -3551,8 +3553,8 @@ public class Block extends Material {
           DOUBLEWOODENSLAB, SINGLEWOODENSLAB, COCOAPLANT, SANDSTONESTAIRS, EMERALDORE, ENDERCHEST,
           TRIPWIREHOOK, TRIPWIRE, EMERALDBLOCK, SPRUCEWOODSTAIRS, BIRCHWOODSTAIRS, JUNGLEWOODSTAIRS,
           COMMAND_BLOCK, BEACON, STONEWALL, FLOWERPOT, CARROTS, POTATOES, WOODENBUTTON, HEAD, ANVIL,
-          TRAPPEDCHEST, WEIGHTEDPRESSUREPLATELIGHT, WEIGHTEDPRESSUREPLATEHEAVY, REDSTONECOMPARATOR,
-          REDSTONECOMPARATORLIT, DAYLIGHTSENSOR, REDSTONEBLOCK, NETHERQUARTZORE, HOPPER, QUARTZ,
+          TRAPPEDCHEST, WEIGHTEDPRESSUREPLATELIGHT, WEIGHTEDPRESSUREPLATEHEAVY, COMPARATOR,
+          COMPARATOR_POWERED, DAYLIGHTSENSOR, REDSTONEBLOCK, NETHERQUARTZORE, HOPPER, QUARTZ,
           QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, STAINED_CLAY, STAINED_GLASSPANE, LEAVES2, WOOD2,
           ACACIASTAIRS, DARKOAKSTAIRS, SLIMEBLOCK, BARRIER, IRON_TRAPDOOR, PRISMARINE, SEALANTERN,
           HAY_BLOCK, CARPET, HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, LARGE_FLOWER, UNKNOWN0xB0,
@@ -3586,8 +3588,8 @@ public class Block extends Material {
     redstoneConnectors.add(STONEBUTTON);
     redstoneConnectors.add(TRIPWIREHOOK);
     redstoneConnectors.add(TRIPWIREHOOK);
-    redstoneConnectors.add(REDSTONECOMPARATOR);
-    redstoneConnectors.add(REDSTONECOMPARATORLIT);
+    redstoneConnectors.add(COMPARATOR);
+    redstoneConnectors.add(COMPARATOR_POWERED);
     redstoneConnectors.add(DAYLIGHTSENSOR);
   }
 

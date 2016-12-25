@@ -23,63 +23,67 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class ComparatorModel {
+  // The comparator base plate facing north:
   private static Quad[] north = {
-      // front
+      // Front face.
       new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, .125, 0),
           new Vector4(1, 0, 0, .125)),
 
-      // back
+      // Back face.
       new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(0, .125, 1),
           new Vector4(0, 1, 0, .125)),
 
-      // right
+      // Right face.
       new Quad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, .125, 0),
           new Vector4(0, 1, 0, .125)),
 
-      // left
+      // Left face.
       new Quad(new Vector3(1, 0, 1), new Vector3(1, 0, 0), new Vector3(1, .125, 1),
           new Vector4(1, 0, 0, .125)),
 
-      // top
+      // Top face.
       new Quad(new Vector3(1, .125, 0), new Vector3(0, .125, 0), new Vector3(1, .125, 1),
-          new Vector4(1, 0, 1, 0)),};
+          new Vector4(1, 0, 1, 0)),
+  };
 
-  private static Quad[] torchHigh =
-      {new Quad(new Vector3(.75, 2 / 16., 7 / 16.), new Vector3(4 / 16., 2 / 16., 7 / 16.),
+  private static Quad[] torchHigh = {
+      new Quad(new Vector3(.75, 2 / 16., 7 / 16.), new Vector3(4 / 16., 2 / 16., 7 / 16.),
           new Vector3(.75, 13 / 16., 7 / 16.), new Vector4(12 / 16., 4 / 16., 5 / 16., 1)),
 
-          new Quad(new Vector3(4 / 16., 2 / 16., 9 / 16.), new Vector3(.75, 2 / 16., 9 / 16.),
-              new Vector3(4 / 16., 13 / 16., 9 / 16.), new Vector4(4 / 16., .75, 5 / 16., 1)),
+      new Quad(new Vector3(4 / 16., 2 / 16., 9 / 16.), new Vector3(.75, 2 / 16., 9 / 16.),
+          new Vector3(4 / 16., 13 / 16., 9 / 16.), new Vector4(4 / 16., .75, 5 / 16., 1)),
 
-          new Quad(new Vector3(7 / 16., 2 / 16., 4 / 16.), new Vector3(7 / 16., 2 / 16., .75),
-              new Vector3(7 / 16., 13 / 16., 4 / 16.), new Vector4(4 / 16., .75, 5 / 16., 1)),
+      new Quad(new Vector3(7 / 16., 2 / 16., 4 / 16.), new Vector3(7 / 16., 2 / 16., .75),
+          new Vector3(7 / 16., 13 / 16., 4 / 16.), new Vector4(4 / 16., .75, 5 / 16., 1)),
 
-          new Quad(new Vector3(9 / 16., 2 / 16., .75), new Vector3(9 / 16., 2 / 16., 4 / 16.),
-              new Vector3(9 / 16., 13 / 16., .75), new Vector4(.75, 4 / 16., 5 / 16., 1)),
+      new Quad(new Vector3(9 / 16., 2 / 16., .75), new Vector3(9 / 16., 2 / 16., 4 / 16.),
+          new Vector3(9 / 16., 13 / 16., .75), new Vector4(.75, 4 / 16., 5 / 16., 1)),
 
-          // top
-          new Quad(new Vector3(7 / 16., 7 / 16., 9 / 16.), new Vector3(9 / 16., 7 / 16., 9 / 16.),
-              new Vector3(7 / 16., 7 / 16., 7 / 16.),
-              new Vector4(7 / 16., 9 / 16., 8 / 16., .625)),};
+      // Top face.
+      new Quad(new Vector3(7 / 16., 7 / 16., 9 / 16.), new Vector3(9 / 16., 7 / 16., 9 / 16.),
+          new Vector3(7 / 16., 7 / 16., 7 / 16.),
+          new Vector4(7 / 16., 9 / 16., 8 / 16., .625))
+  };
 
-  // Lowered 3 pixels from high version
-  private static Quad[] torchLow =
-      {new Quad(new Vector3(.75, 2 / 16., 7 / 16.), new Vector3(4 / 16., 2 / 16., 7 / 16.),
+  // The lowered torch is 3 texels lower than the high version.
+  private static Quad[] torchLow = {
+      new Quad(new Vector3(.75, 2 / 16., 7 / 16.), new Vector3(4 / 16., 2 / 16., 7 / 16.),
           new Vector3(.75, 10 / 16., 7 / 16.), new Vector4(12 / 16., 4 / 16., 8 / 16., 1)),
 
-          new Quad(new Vector3(4 / 16., 2 / 16., 9 / 16.), new Vector3(.75, 2 / 16., 9 / 16.),
-              new Vector3(4 / 16., 10 / 16., 9 / 16.), new Vector4(4 / 16., .75, 8 / 16., 1)),
+      new Quad(new Vector3(4 / 16., 2 / 16., 9 / 16.), new Vector3(.75, 2 / 16., 9 / 16.),
+          new Vector3(4 / 16., 10 / 16., 9 / 16.), new Vector4(4 / 16., .75, 8 / 16., 1)),
 
-          new Quad(new Vector3(7 / 16., 2 / 16., 4 / 16.), new Vector3(7 / 16., 2 / 16., .75),
-              new Vector3(7 / 16., 10 / 16., 4 / 16.), new Vector4(4 / 16., .75, 8 / 16., 1)),
+      new Quad(new Vector3(7 / 16., 2 / 16., 4 / 16.), new Vector3(7 / 16., 2 / 16., .75),
+          new Vector3(7 / 16., 10 / 16., 4 / 16.), new Vector4(4 / 16., .75, 8 / 16., 1)),
 
-          new Quad(new Vector3(9 / 16., 2 / 16., .75), new Vector3(9 / 16., 2 / 16., 4 / 16.),
-              new Vector3(9 / 16., 10 / 16., .75), new Vector4(.75, 4 / 16., 8 / 16., 1)),
+      new Quad(new Vector3(9 / 16., 2 / 16., .75), new Vector3(9 / 16., 2 / 16., 4 / 16.),
+          new Vector3(9 / 16., 10 / 16., .75), new Vector4(.75, 4 / 16., 8 / 16., 1)),
 
-          // top
-          new Quad(new Vector3(7 / 16., 4 / 16., 9 / 16.), new Vector3(9 / 16., 4 / 16., 9 / 16.),
-              new Vector3(7 / 16., 4 / 16., 7 / 16.),
-              new Vector4(7 / 16., 9 / 16., 8 / 16., .625)),};
+      // Top face.
+      new Quad(new Vector3(7 / 16., 4 / 16., 9 / 16.), new Vector3(9 / 16., 4 / 16., 9 / 16.),
+          new Vector3(7 / 16., 4 / 16., 7 / 16.),
+          new Vector4(7 / 16., 9 / 16., 8 / 16., .625))
+  };
 
   private static Quad[][][] torch1 = new Quad[2][4][];
   private static Quad[][][] torch2 = new Quad[2][4][];
@@ -117,22 +121,22 @@ public class ComparatorModel {
     torch2[1][2] = Model.rotateY(torch2[1][1]);
     torch2[1][3] = Model.rotateY(torch2[1][2]);
 
-    torch3[0][0] = Model.translate(torchHigh, 3 / 16., 0, 4 / 16.);
+    torch3[0][0] = Model.translate(torchHigh, -3 / 16., 0, 4 / 16.);
     torch3[0][1] = Model.rotateY(torch3[0][0]);
     torch3[0][2] = Model.rotateY(torch3[0][1]);
     torch3[0][3] = Model.rotateY(torch3[0][2]);
 
-    torch3[1][0] = Model.translate(torchHigh, 3 / 16., 0, 4 / 16.);
+    torch3[1][0] = Model.translate(torchHigh, -3 / 16., 0, 4 / 16.);
     torch3[1][1] = Model.rotateY(torch3[1][0]);
     torch3[1][2] = Model.rotateY(torch3[1][1]);
     torch3[1][3] = Model.rotateY(torch3[1][2]);
   }
 
   /**
-   * @param lit 0 or 1
+   * @param powered 0 if unpowered, 1 if powered
    * @return <code>true</code> if the block was intersected
    */
-  public static boolean intersect(Ray ray, int lit) {
+  public static boolean intersect(Ray ray, int powered) {
     boolean hit = false;
     int data = ray.getBlockData();
     int direction = data & 3;
@@ -140,7 +144,7 @@ public class ComparatorModel {
     ray.t = Double.POSITIVE_INFINITY;
     for (Quad face : rot[direction]) {
       if (face.intersect(ray)) {
-        blockTex[lit].getColor(ray);
+        blockTex[powered].getColor(ray);
         ray.n.set(face.n);
         ray.t = ray.tNext;
         hit = true;
@@ -157,9 +161,9 @@ public class ComparatorModel {
         }
       }
     }
-    for (Quad face : torch2[lit][direction]) {
+    for (Quad face : torch2[powered][direction]) {
       if (face.intersect(ray)) {
-        float[] color = torchTex[lit].getColor(ray.u, ray.v);
+        float[] color = torchTex[powered].getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.n.set(face.n);
@@ -168,17 +172,17 @@ public class ComparatorModel {
         }
       }
     }
-    /*for (Quad face: torch2[delay][direction]) {
+    for (Quad face: torch3[powered][direction]) {
 			if (face.intersect(ray)) {
-				float[] color = torchTex[on].getColor(ray.u, ray.v);
+				float[] color = torchTex[powered].getColor(ray.u, ray.v);
 				if (color[3] > Ray.EPSILON) {
 					ray.color.set(color);
 					ray.n.set(face.n);
-					ray.t = ray.tNear;
+					ray.t = ray.tNext;
 					hit = true;
 				}
 			}
-		}*/
+		}
     if (hit) {
       ray.color.w = 1;
       ray.distance += ray.t;

@@ -42,7 +42,7 @@ public class AABB {
   }
 
   /**
-   * Find intersection between the given ray and this AABB
+   * Find intersection between the given ray and this AABB.
    *
    * @return <code>true</code> if the ray intersects this AABB
    */
@@ -138,7 +138,7 @@ public class AABB {
   }
 
   /**
-   * Only test for intersection and find distance to intersection
+   * Only test for intersection and find distance to intersection.
    *
    * @return {@code true} if there is an intersection
    */
