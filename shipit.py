@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
 
-# required python libs: PRAW, launchpadlib
+# required python libs: PRAW, launchpadlib, simplejson
 # required external tools: Wine, NSIS (2.46)
 # requires appbundler and hdiutil for Mac build
 # requires gpg 1.4.19
