@@ -28,6 +28,7 @@ import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.GrassColorTexture;
 import se.llbit.chunky.resources.texturepack.IndexedTexture;
 import se.llbit.chunky.resources.texturepack.LargeChestTexture;
+import se.llbit.chunky.resources.texturepack.ShulkerTextureLoader;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.chunky.resources.texturepack.ThinArmEntityTextureLoader;
@@ -1550,6 +1551,88 @@ public class TexturePackLoader {
     allTextures.put("redNetherBrick",
         new SimpleTexture("assets/minecraft/textures/blocks/red_nether_brick",
             Texture.redNetherBrick));
+
+    // [1.11] Shulker boxes.
+    allTextures.put("shulkerBlack",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_black",
+            "assets/minecraft/textures/entity/shulker/shulker_black",
+            Texture.shulkerBlack));
+    allTextures.put("shulkerBlue",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_blue",
+            "assets/minecraft/textures/entity/shulker/shulker_blue",
+            Texture.shulkerBlue));
+    allTextures.put("shulkerBrown",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_brown",
+            "assets/minecraft/textures/entity/shulker/shulker_brown",
+            Texture.shulkerBrown));
+    allTextures.put("shulkerCyan",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_cyan",
+            "assets/minecraft/textures/entity/shulker/shulker_cyan",
+            Texture.shulkerCyan));
+    allTextures.put("shulkerGray",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_gray",
+            "assets/minecraft/textures/entity/shulker/shulker_gray",
+            Texture.shulkerGray));
+    allTextures.put("shulkerGreen",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_green",
+            "assets/minecraft/textures/entity/shulker/shulker_green",
+            Texture.shulkerGreen));
+    allTextures.put("shulkerLightBlue",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_light_blue",
+            "assets/minecraft/textures/entity/shulker/shulker_light_blue",
+            Texture.shulkerLightBlue));
+    allTextures.put("shulkerLime",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_lime",
+            "assets/minecraft/textures/entity/shulker/shulker_lime",
+            Texture.shulkerLime));
+    allTextures.put("shulkerMagenta",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_magenta",
+            "assets/minecraft/textures/entity/shulker/shulker_magenta",
+            Texture.shulkerMagenta));
+    allTextures.put("shulkerOrange",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_orange",
+            "assets/minecraft/textures/entity/shulker/shulker_orange",
+            Texture.shulkerOrange));
+    allTextures.put("shulkerPink",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_pink",
+            "assets/minecraft/textures/entity/shulker/shulker_pink",
+            Texture.shulkerPink));
+    allTextures.put("shulkerPurple",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_purple",
+            "assets/minecraft/textures/entity/shulker/shulker_purple",
+            Texture.shulkerPurple));
+    allTextures.put("shulkerRed",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_red",
+            "assets/minecraft/textures/entity/shulker/shulker_red",
+            Texture.shulkerRed));
+    allTextures.put("shulkerSilver",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_silver",
+            "assets/minecraft/textures/entity/shulker/shulker_silver",
+            Texture.shulkerSilver));
+    allTextures.put("shulkerWhite",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_white",
+            "assets/minecraft/textures/entity/shulker/shulker_white",
+            Texture.shulkerWhite));
+    allTextures.put("shulkerYellow",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/blocks/shulker_top_yellow",
+            "assets/minecraft/textures/entity/shulker/shulker_yellow",
+            Texture.shulkerYellow));
   }
 
   private static String texturePackName(File tpFile) {

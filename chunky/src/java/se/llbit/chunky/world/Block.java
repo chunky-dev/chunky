@@ -3272,116 +3272,262 @@ public class Block extends Material {
       isInvisible = UNKNOWN_INVISIBLE;
     }
   };
-  private static final Block UNKNOWN0xDB = new Block(0xDB, "Unknown Block 0xDB", Texture.unknown) {
+  private static final Block SHULKERBOX_WHITE = new Block(0xDB, "Shulker Box White", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerWhite.side, Texture.shulkerWhite.side,
+        Texture.shulkerWhite.side, Texture.shulkerWhite.side,
+        Texture.shulkerWhite.top, Texture.shulkerWhite.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xDC = new Block(0xDC, "Unknown Block 0xDC", Texture.unknown) {
+  private static final Block SHULKERBOX_ORANGE = new Block(0xDC, "Shulker Box Orange", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerOrange.side, Texture.shulkerOrange.side,
+        Texture.shulkerOrange.side, Texture.shulkerOrange.side,
+        Texture.shulkerOrange.top, Texture.shulkerOrange.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xDD = new Block(0xDD, "Unknown Block 0xDD", Texture.unknown) {
+  private static final Block SHULKERBOX_MAGENTA = new Block(0xDD, "Shulker Box Magenta", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerMagenta.side, Texture.shulkerMagenta.side,
+        Texture.shulkerMagenta.side, Texture.shulkerMagenta.side,
+        Texture.shulkerMagenta.top, Texture.shulkerMagenta.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xDE = new Block(0xDE, "Unknown Block 0xDE", Texture.unknown) {
+  private static final Block SHULKERBOX_LIGHTBLUE = new Block(0xDE, "Shulker Box Light Blue",
+      Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerLightBlue.side, Texture.shulkerLightBlue.side,
+        Texture.shulkerLightBlue.side, Texture.shulkerLightBlue.side,
+        Texture.shulkerLightBlue.top, Texture.shulkerLightBlue.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xDF = new Block(0xDF, "Unknown Block 0xDF", Texture.unknown) {
+  private static final Block SHULKERBOX_YELLOW = new Block(0xDF, "Shulker Box Yellow", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerYellow.side, Texture.shulkerYellow.side,
+        Texture.shulkerYellow.side, Texture.shulkerYellow.side,
+        Texture.shulkerYellow.top, Texture.shulkerYellow.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xE0 = new Block(0xE0, "Unknown Block 0xE0", Texture.unknown) {
+  private static final Block SHULKERBOX_LIME = new Block(0xE0, "Shulker Box Lime", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerLime.side, Texture.shulkerLime.side,
+        Texture.shulkerLime.side, Texture.shulkerLime.side,
+        Texture.shulkerLime.top, Texture.shulkerLime.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xE1 = new Block(0xE1, "Unknown Block 0xE1", Texture.unknown) {
+  private static final Block SHULKERBOX_PINK = new Block(0xE1, "Shulker Box Pink", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerPink.side, Texture.shulkerPink.side,
+        Texture.shulkerPink.side, Texture.shulkerPink.side,
+        Texture.shulkerPink.top, Texture.shulkerPink.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xE2 = new Block(0xE2, "Unknown Block 0xE2", Texture.unknown) {
+  private static final Block SHULKERBOX_GRAY = new Block(0xE2, "Shulker Box Gray", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerGray.side, Texture.shulkerGray.side,
+        Texture.shulkerGray.side, Texture.shulkerGray.side,
+        Texture.shulkerGray.top, Texture.shulkerGray.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xE3 = new Block(0xE3, "Unknown Block 0xE3", Texture.unknown) {
+  private static final Block SHULKERBOX_SILVER = new Block(0xE3, "Shulker Box Light Gray",
+      Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerSilver.side, Texture.shulkerSilver.side,
+        Texture.shulkerSilver.side, Texture.shulkerSilver.side,
+        Texture.shulkerSilver.top, Texture.shulkerSilver.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xE4 = new Block(0xE4, "Unknown Block 0xE4", Texture.unknown) {
+  private static final Block SHULKERBOX_CYAN = new Block(0xE4, "Shulker Box Cyan", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerCyan.side, Texture.shulkerCyan.side,
+        Texture.shulkerCyan.side, Texture.shulkerCyan.side,
+        Texture.shulkerCyan.top, Texture.shulkerCyan.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xE5 = new Block(0xE5, "Unknown Block 0xE5", Texture.unknown) {
+  private static final Block SHULKERBOX_PURPLE = new Block(0xE5, "Shulker Box Purple", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerPurple.side, Texture.shulkerPurple.side,
+        Texture.shulkerPurple.side, Texture.shulkerPurple.side,
+        Texture.shulkerPurple.top, Texture.shulkerPurple.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xE6 = new Block(0xE6, "Unknown Block 0xE6", Texture.unknown) {
+  private static final Block SHULKERBOX_BLUE = new Block(0xE6, "Shulker Box Blue", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerBlue.side, Texture.shulkerBlue.side,
+        Texture.shulkerBlue.side, Texture.shulkerBlue.side,
+        Texture.shulkerBlue.top, Texture.shulkerBlue.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xE7 = new Block(0xE7, "Unknown Block 0xE7", Texture.unknown) {
+  private static final Block SHULKERBOX_BROWN = new Block(0xE7, "Shulker Box Brown", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerBrown.side, Texture.shulkerBrown.side,
+        Texture.shulkerBrown.side, Texture.shulkerBrown.side,
+        Texture.shulkerBrown.top, Texture.shulkerBrown.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xE8 = new Block(0xE8, "Unknown Block 0xE8", Texture.unknown) {
+  private static final Block SHULKERBOX_GREEN = new Block(0xE8, "Shulker Box Green", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerGreen.side, Texture.shulkerGreen.side,
+        Texture.shulkerGreen.side, Texture.shulkerGreen.side,
+        Texture.shulkerGreen.top, Texture.shulkerGreen.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xE9 = new Block(0xE9, "Unknown Block 0xE9", Texture.unknown) {
+  private static final Block SHULKERBOX_RED = new Block(0xE9, "Shulker Box Red", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerRed.side, Texture.shulkerRed.side,
+        Texture.shulkerRed.side, Texture.shulkerRed.side,
+        Texture.shulkerRed.top, Texture.shulkerRed.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xEA = new Block(0xEA, "Unknown Block 0xEA", Texture.unknown) {
+  private static final Block SHULKERBOX_BLACK = new Block(0xEA, "Shulker Box Black", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] textures = {
+        Texture.shulkerBlack.side, Texture.shulkerBlack.side,
+        Texture.shulkerBlack.side, Texture.shulkerBlack.side,
+        Texture.shulkerBlack.top, Texture.shulkerBlack.bottom};
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, textures);
     }
   };
   private static final Block UNKNOWN0xEB = new Block(0xEB, "Unknown Block 0xEB", Texture.unknown) {
@@ -3564,9 +3710,11 @@ public class Block extends Material {
           JUNGLEDOOR, ACACIADOOR, DARKOAKDOOR, ENDROD, CHORUSPLANT, CHORUSFLOWER, PURPURBLOCK,
           PURPURPILLAR, PURPURSTAIRS, PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, UNKNOWN0xCF,
           GRASSPATH, UNKNOWN0xD1, REPEATING_COMMAND_BLOCK, CHAIN_COMMAND_BLOCK, UNKNOWN0xD4, MAGMA, NETHER_WART_BLOCK,
-          RED_NETHER_BRICK, BONE, UNKNOWN0xD9, UNKNOWN0xDA, UNKNOWN0xDB, UNKNOWN0xDC, UNKNOWN0xDD,
-          UNKNOWN0xDE, UNKNOWN0xDF, UNKNOWN0xE0, UNKNOWN0xE1, UNKNOWN0xE2, UNKNOWN0xE3, UNKNOWN0xE4,
-          UNKNOWN0xE5, UNKNOWN0xE6, UNKNOWN0xE7, UNKNOWN0xE8, UNKNOWN0xE9, UNKNOWN0xEA, UNKNOWN0xEB,
+          RED_NETHER_BRICK, BONE, UNKNOWN0xD9, UNKNOWN0xDA, SHULKERBOX_WHITE, SHULKERBOX_ORANGE,
+          SHULKERBOX_MAGENTA, SHULKERBOX_LIGHTBLUE, SHULKERBOX_YELLOW, SHULKERBOX_LIME,
+          SHULKERBOX_PINK, SHULKERBOX_GRAY, SHULKERBOX_SILVER, SHULKERBOX_CYAN,
+          SHULKERBOX_PURPLE, SHULKERBOX_BLUE, SHULKERBOX_BROWN, SHULKERBOX_GREEN, SHULKERBOX_RED,
+          SHULKERBOX_BLACK, UNKNOWN0xEB,
           UNKNOWN0xEC, UNKNOWN0xED, UNKNOWN0xEE, UNKNOWN0xEF, UNKNOWN0xF0, UNKNOWN0xF1, UNKNOWN0xF2,
           UNKNOWN0xF3, UNKNOWN0xF4, UNKNOWN0xF5, UNKNOWN0xF6, UNKNOWN0xF7, UNKNOWN0xF8, UNKNOWN0xF9,
           UNKNOWN0xFA, UNKNOWN0xFB, UNKNOWN0xFC, UNKNOWN0xFD, UNKNOWN0xFE, UNKNOWN0xFF,};

@@ -90,7 +90,7 @@ public class ChestTexture extends TextureLoader {
       int y0 = (14 + 5) * scale;
       int y1 = (14 * 2 + 5) * scale;
       for (int y = y0; y < y1; ++y) {
-        int sy = y - y0 + scale;
+        int sy = y - y0 + scale; // TODO: why + scale?
         for (int x = x0; x < x1; ++x) {
           int sx = x - x0 + scale;
           img.setPixel(sx, sy, spritemap.getRGB(x, y));

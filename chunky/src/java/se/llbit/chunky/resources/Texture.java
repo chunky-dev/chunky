@@ -432,6 +432,24 @@ public class Texture {
   public static final Texture chorusPlant = new Texture();
   public static final Texture endRod = new Texture();
 
+  // [1.11] Shulker boxes.
+  public static final ShulkerTexture shulkerBlack = new ShulkerTexture();
+  public static final ShulkerTexture shulkerBlue = new ShulkerTexture();
+  public static final ShulkerTexture shulkerBrown = new ShulkerTexture();
+  public static final ShulkerTexture shulkerCyan = new ShulkerTexture();
+  public static final ShulkerTexture shulkerGray = new ShulkerTexture();
+  public static final ShulkerTexture shulkerGreen = new ShulkerTexture();
+  public static final ShulkerTexture shulkerLightBlue = new ShulkerTexture();
+  public static final ShulkerTexture shulkerLime = new ShulkerTexture();
+  public static final ShulkerTexture shulkerMagenta = new ShulkerTexture();
+  public static final ShulkerTexture shulkerOrange = new ShulkerTexture();
+  public static final ShulkerTexture shulkerPink = new ShulkerTexture();
+  public static final ShulkerTexture shulkerPurple = new ShulkerTexture();
+  public static final ShulkerTexture shulkerRed = new ShulkerTexture();
+  public static final ShulkerTexture shulkerSilver = new ShulkerTexture();
+  public static final ShulkerTexture shulkerWhite = new ShulkerTexture();
+  public static final ShulkerTexture shulkerYellow = new ShulkerTexture();
+
   // Trapped Chest.
   public static final Texture trappedChestTop = new Texture();
   public static final Texture trappedChestBottom = new Texture();
