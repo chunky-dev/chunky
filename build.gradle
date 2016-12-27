@@ -40,9 +40,11 @@ task tarball(type: Exec) {
 	commandLine "git archive --prefix=\"chunky-${project.version}\" -o build/chunky-${project.version}.tar.gz master".split(' ')
 }
 
-task release << {
-	tryCommand([ 'git', 'commit', '-m', "Release ${project.version}", 'chunky/src/res/se/llbit/chunky/main/Version.properties' ], true)
-	tryCommand([ 'git', 'tag', '-a', "${project.version}", '-m', "Version ${project.version}" ], true)
+task release {
+	doLast {
+		tryCommand([ 'git', 'commit', '-m', "Release ${project.version}", 'chunky/src/res/se/llbit/chunky/main/Version.properties' ], true)
+		tryCommand([ 'git', 'tag', '-a', "${project.version}", '-m', "Version ${project.version}" ], true)
+	}
 }
 
 task releaseJar(type: JavaExec) {
@@ -141,61 +143,63 @@ def getVersion() {
 	}
 }
 
-task macDist(dependsOn: 'releaseJar') << {
-	buildDir.mkdirs()
+task macDist(dependsOn: 'releaseJar') {
+	doLast {
+		buildDir.mkdirs()
 
-	// TODO(jesper): Add support for Mac build on Linux.
-	ant.taskdef(name: 'appbundler', classpath: file('tools/appbundler-1.0.jar'),
-		classname: 'com.oracle.appbundler.AppBundlerTask')
-	ant.appbundler(outputdirectory: buildDir,
-		name: 'Chunky',
-		displayname: 'Chunky',
-		identifier: 'se.llbit.Chunky',
-		shortversion: "${project.version}",
-		mainclassname: 'se.llbit.chunky.launcher.ChunkyLauncher',
-		icon: file('dist/Chunky.icns').path) {
-		option(value: '-Dapple.laf.useScreenMenuBar=true')
-		option(value: '-Dapple.awt.textantialiasing=true')
-		classpath(file: file("build/chunky-${project.version}.jar").path)
+		// TODO(jesper): Add support for Mac build on Linux.
+		ant.taskdef(name: 'appbundler', classpath: file('tools/appbundler-1.0.jar'),
+			classname: 'com.oracle.appbundler.AppBundlerTask')
+		ant.appbundler(outputdirectory: buildDir,
+			name: 'Chunky',
+			displayname: 'Chunky',
+			identifier: 'se.llbit.Chunky',
+			shortversion: "${project.version}",
+			mainclassname: 'se.llbit.chunky.launcher.ChunkyLauncher',
+			icon: file('dist/Chunky.icns').path) {
+			option(value: '-Dapple.laf.useScreenMenuBar=true')
+			option(value: '-Dapple.awt.textantialiasing=true')
+			classpath(file: file("build/chunky-${project.version}.jar").path)
+		}
+		tryCommand([ '/usr/bin/hdiutil',
+			'create',
+			'-srcfolder',
+			file('build/Chunky.app').path,
+			'-volname', 'Chunky', '-ov',
+			file('build/Chunky-tmp.dmg').path,
+			'-format', 'UDRW' ], true)
+		tryCommand([ '/usr/bin/hdiutil',
+			'attach',
+			file('build/Chunky-tmp.dmg').path,
+			'-mountroot',
+			'/tmp' ], true)
+		new File('/tmp/Chunky/.background').mkdirs()
+		ant.copy(file: file('dist/chunky-dmg.png'),
+			tofile: '/tmp/Chunky/.background/background.png',
+			overwrite: true)
+		ant.copy(file: file('dist/Chunky.icns'),
+			tofile: '/tmp/Chunky/.VolumeIcon.icns',
+			overwrite: true)
+		ant.copy(file: file('dist/DS_Store'),
+			tofile: '/tmp/Chunky/.DS_Store',
+			overwrite: true)
+		tryCommand('/usr/bin/Setfile -a C /tmp/Chunky'.split(' '), true)
+		ant.symlink(link: '/tmp/Chunky', resource: '/Applications')
+		tryCommand('/usr/bin/hdiutil detach /tmp/Chunky'.split(' '), true)
+		file("build/Chunky-${project.version}.dmg").delete()
+		tryCommand([ '/usr/bin/hdiutil',
+			'convert',
+			file('build/Chunky-tmp.dmg').path,
+			'-format',
+			'UDZO',
+			'-o',
+			file("build/Chunky-${project.version}.dmg").path ], true)
+		file('build/Chunky-tmp.dmg').delete()
+		tryCommand([ '/usr/bin/hdiutil',
+			'internet-enable',
+			'-yes',
+			file("build/Chunky-${project.version}.dmg") ], true)
 	}
-	tryCommand([ '/usr/bin/hdiutil',
-		'create',
-		'-srcfolder',
-		file('build/Chunky.app').path,
-		'-volname', 'Chunky', '-ov',
-		file('build/Chunky-tmp.dmg').path,
-		'-format', 'UDRW' ], true)
-	tryCommand([ '/usr/bin/hdiutil',
-		'attach',
-		file('build/Chunky-tmp.dmg').path,
-		'-mountroot',
-		'/tmp' ], true)
-	new File('/tmp/Chunky/.background').mkdirs()
-	ant.copy(file: file('dist/chunky-dmg.png'),
-		tofile: '/tmp/Chunky/.background/background.png',
-		overwrite: true)
-	ant.copy(file: file('dist/Chunky.icns'),
-		tofile: '/tmp/Chunky/.VolumeIcon.icns',
-		overwrite: true)
-	ant.copy(file: file('dist/DS_Store'),
-		tofile: '/tmp/Chunky/.DS_Store',
-		overwrite: true)
-	tryCommand('/usr/bin/Setfile -a C /tmp/Chunky'.split(' '), true)
-	ant.symlink(link: '/tmp/Chunky', resource: '/Applications')
-	tryCommand('/usr/bin/hdiutil detach /tmp/Chunky'.split(' '), true)
-	file("build/Chunky-${project.version}.dmg").delete()
-	tryCommand([ '/usr/bin/hdiutil',
-		'convert',
-		file('build/Chunky-tmp.dmg').path,
-		'-format',
-		'UDZO',
-		'-o',
-		file("build/Chunky-${project.version}.dmg").path ], true)
-	file('build/Chunky-tmp.dmg').delete()
-	tryCommand([ '/usr/bin/hdiutil',
-		'internet-enable',
-		'-yes',
-		file("build/Chunky-${project.version}.dmg") ], true)
 }
 
 task install(dependsOn: ':chunky:install')
