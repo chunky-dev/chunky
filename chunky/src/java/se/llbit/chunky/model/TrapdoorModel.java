@@ -48,7 +48,8 @@ public class TrapdoorModel {
 
           // bottom
           new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-              new Vector4(0, 1, 0, 1)),},
+              new Vector4(0, 1, 0, 1))
+      },
 
       // high
       {
@@ -73,8 +74,9 @@ public class TrapdoorModel {
               new Vector4(1, 0, 0, 1)),
 
           // bottom
-          new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
-              new Vector4(0, 1, 0, 1)),},
+          new Quad(new Vector3(0, 13/16., 0), new Vector3(1, 13/16., 0),
+              new Vector3(0, 13/16., 1), new Vector4(0, 1, 0, 1))
+      },
 
       // facing north
       {
@@ -100,7 +102,8 @@ public class TrapdoorModel {
 
           // bottom
           new Quad(new Vector3(0, 0, .8125), new Vector3(1, 0, .8125), new Vector3(0, 0, 1),
-              new Vector4(0, 1, .8125, 1)),},
+              new Vector4(0, 1, .8125, 1))
+      },
 
       // facing south
       {
@@ -126,7 +129,8 @@ public class TrapdoorModel {
 
           // bottom
           new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, .1875),
-              new Vector4(0, 1, 0, .1875)),},
+              new Vector4(0, 1, 0, .1875))
+      },
 
       // facing west
       {
@@ -152,7 +156,8 @@ public class TrapdoorModel {
 
           // bottom
           new Quad(new Vector3(.8125, 0, 0), new Vector3(1, 0, 0), new Vector3(.8125, 0, 1),
-              new Vector4(.8125, 1, 0, 1)),},
+              new Vector4(.8125, 1, 0, 1))
+      },
 
       // facing east
       {
@@ -178,7 +183,9 @@ public class TrapdoorModel {
 
           // bottom
           new Quad(new Vector3(0, 0, 0), new Vector3(.1875, 0, 0), new Vector3(0, 0, 1),
-              new Vector4(0, .1875, 0, 1)),},};
+              new Vector4(0, .1875, 0, 1))
+      }
+  };
 
   public static boolean intersect(Ray ray, Texture texture) {
     boolean hit = false;
@@ -186,10 +193,10 @@ public class TrapdoorModel {
     int data = ray.getBlockData();
     ray.t = Double.POSITIVE_INFINITY;
     if ((ray.getBlockData() & 4) == 0) {
-      // not open - top or bottom?
+      // Not open - top or bottom?
       state = faces[data >> 3];
     } else {
-      // open
+      // Open
       state = faces[(data & 3) + 2];
     }
     for (Quad face : state) {
