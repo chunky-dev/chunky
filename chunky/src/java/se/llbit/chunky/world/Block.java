@@ -30,10 +30,10 @@ import se.llbit.chunky.model.ChestModel;
 import se.llbit.chunky.model.ChorusFlowerModel;
 import se.llbit.chunky.model.ChorusPlantModel;
 import se.llbit.chunky.model.CocoaPlantModel;
-import se.llbit.chunky.model.CommandBlockModel;
 import se.llbit.chunky.model.ComparatorModel;
 import se.llbit.chunky.model.CropsModel;
 import se.llbit.chunky.model.DaylightSensorModel;
+import se.llbit.chunky.model.DirectionalBlockModel;
 import se.llbit.chunky.model.DoorModel;
 import se.llbit.chunky.model.DragonEggModel;
 import se.llbit.chunky.model.EnchantmentTableModel;
@@ -58,6 +58,7 @@ import se.llbit.chunky.model.LeafModel;
 import se.llbit.chunky.model.LeverModel;
 import se.llbit.chunky.model.LilyPadModel;
 import se.llbit.chunky.model.MelonStemModel;
+import se.llbit.chunky.model.ObserverModel;
 import se.llbit.chunky.model.PistonExtensionModel;
 import se.llbit.chunky.model.PistonModel;
 import se.llbit.chunky.model.PressurePlateModel;
@@ -2144,13 +2145,21 @@ public class Block extends Material {
       localIntersect = true;
     }
 
-    final Texture[] texture = {
-        Texture.commandBlockBack, Texture.commandBlockFront,
-        Texture.commandBlockSide, Texture.commandBlockConditional
+    final Texture[][] texture = {
+        {
+            Texture.commandBlockBack,
+            Texture.commandBlockFront,
+            Texture.commandBlockSide
+        },
+        {
+            Texture.commandBlockBack,
+            Texture.commandBlockFront,
+            Texture.commandBlockConditional
+        },
     };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return CommandBlockModel.intersect(ray, texture);
+      return DirectionalBlockModel.intersect(ray, texture[ray.getBlockData() >> 3]);
     }
   };
   public static final int BEACON_ID = 0x8A;
@@ -3189,13 +3198,21 @@ public class Block extends Material {
       localIntersect = true;
     }
 
-    final Texture[] texture = {
-        Texture.repeatingCommandBlockBack, Texture.repeatingCommandBlockFront,
-        Texture.repeatingCommandBlockSide, Texture.repeatingCommandBlockConditional
+    final Texture[][] texture = {
+        {
+            Texture.repeatingCommandBlockBack,
+            Texture.repeatingCommandBlockFront,
+            Texture.repeatingCommandBlockSide
+        },
+        {
+            Texture.repeatingCommandBlockBack,
+            Texture.repeatingCommandBlockFront,
+            Texture.repeatingCommandBlockConditional
+        }
     };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return CommandBlockModel.intersect(ray, texture);
+      return DirectionalBlockModel.intersect(ray, texture[ray.getBlockData() >> 3]);
     }
   };
   public static final int CHAIN_COMMAND_BLOCK_ID = 0xD3;
@@ -3207,13 +3224,21 @@ public class Block extends Material {
       localIntersect = true;
     }
 
-    final Texture[] texture = {
-        Texture.chainCommandBlockBack, Texture.chainCommandBlockFront,
-        Texture.chainCommandBlockSide, Texture.chainCommandBlockConditional
+    final Texture[][] texture = {
+        {
+            Texture.chainCommandBlockBack,
+            Texture.chainCommandBlockFront,
+            Texture.chainCommandBlockSide
+        },
+        {
+            Texture.chainCommandBlockBack,
+            Texture.chainCommandBlockFront,
+            Texture.chainCommandBlockConditional
+        }
     };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return CommandBlockModel.intersect(ray, texture);
+      return DirectionalBlockModel.intersect(ray, texture[ray.getBlockData() >> 3]);
     }
   };
   private static final Block UNKNOWN0xD4 = new Block(0xD4, "Unknown Block 0xD4", Texture.unknown) {
@@ -3265,11 +3290,20 @@ public class Block extends Material {
       isInvisible = UNKNOWN_INVISIBLE;
     }
   };
-  private static final Block UNKNOWN0xDA = new Block(0xDA, "Unknown Block 0xDA", Texture.unknown) {
+  private static final Block OBSERVER = new Block(0xDA, "Observer", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    final Texture[] texture = {
+        Texture.observerBack, Texture.observerFront,
+        Texture.observerSide, Texture.observerTop
+    };
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return ObserverModel.intersect(ray, texture);
     }
   };
   private static final Block SHULKERBOX_WHITE = new Block(0xDB, "Shulker Box White", Texture.unknown) {
@@ -3710,7 +3744,7 @@ public class Block extends Material {
           JUNGLEDOOR, ACACIADOOR, DARKOAKDOOR, ENDROD, CHORUSPLANT, CHORUSFLOWER, PURPURBLOCK,
           PURPURPILLAR, PURPURSTAIRS, PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, UNKNOWN0xCF,
           GRASSPATH, UNKNOWN0xD1, REPEATING_COMMAND_BLOCK, CHAIN_COMMAND_BLOCK, UNKNOWN0xD4, MAGMA, NETHER_WART_BLOCK,
-          RED_NETHER_BRICK, BONE, UNKNOWN0xD9, UNKNOWN0xDA, SHULKERBOX_WHITE, SHULKERBOX_ORANGE,
+          RED_NETHER_BRICK, BONE, UNKNOWN0xD9, OBSERVER, SHULKERBOX_WHITE, SHULKERBOX_ORANGE,
           SHULKERBOX_MAGENTA, SHULKERBOX_LIGHTBLUE, SHULKERBOX_YELLOW, SHULKERBOX_LIME,
           SHULKERBOX_PINK, SHULKERBOX_GRAY, SHULKERBOX_SILVER, SHULKERBOX_CYAN,
           SHULKERBOX_PURPLE, SHULKERBOX_BLUE, SHULKERBOX_BROWN, SHULKERBOX_GREEN, SHULKERBOX_RED,

@@ -1633,6 +1633,20 @@ public class TexturePackLoader {
             "assets/minecraft/textures/blocks/shulker_top_yellow",
             "assets/minecraft/textures/entity/shulker/shulker_yellow",
             Texture.shulkerYellow));
+
+    // [1.11] Observer block.
+    allTextures.put("observer_back",
+        new SimpleTexture("assets/minecraft/textures/blocks/observer_back",
+            Texture.observerBack));
+    allTextures.put("observer_front",
+        new SimpleTexture("assets/minecraft/textures/blocks/observer_front",
+            Texture.observerFront));
+    allTextures.put("observer_side",
+        new SimpleTexture("assets/minecraft/textures/blocks/observer_side",
+            Texture.observerSide));
+    allTextures.put("observer_top",
+        new SimpleTexture("assets/minecraft/textures/blocks/observer_top",
+            Texture.observerTop));
   }
 
   private static String texturePackName(File tpFile) {

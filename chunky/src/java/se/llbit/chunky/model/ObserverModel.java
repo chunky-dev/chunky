@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/*
+ * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -22,17 +23,21 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class CommandBlockModel {
+/**
+ * This block model is used to render blocks which can face east, west, north, south, up and down.
+ * For example, command blocks and observer blocks.
+ */
+public class ObserverModel {
 
   // Facing up:
   private static final Quad[] up = new Quad[] {
-      // North face.
+      // Bottom face.
       new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 0),
-          new Vector4(1, 0, 0, 1)),
+          new Vector4(1, 0, 1, 0)),
 
-      // South face.
+      // Top face.
       new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(0, 1, 1),
-          new Vector4(0, 1, 0, 1)),
+          new Vector4(0, 1, 1, 0)),
 
       // West face.
       new Quad(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 0),
@@ -42,11 +47,11 @@ public class CommandBlockModel {
       new Quad(new Vector3(1, 0, 1), new Vector3(1, 0, 0), new Vector3(1, 1, 1),
           new Vector4(1, 0, 0, 1)),
 
-      // Top face.
+      // Front face.
       new Quad(new Vector3(1, 1, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 1),
           new Vector4(1, 0, 0, 1)),
 
-      // Bottom face.
+      // Back face.
       new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1)),
   };
@@ -56,37 +61,34 @@ public class CommandBlockModel {
   static {
     // Rotate faces for all directions.
     faces[1] = up;
-    // Facing south:
-    faces[3] = Model.rotateX(up);
+    Quad[] temp = Model.rotateX(up);
     // Facing down:
-    faces[0] = Model.rotateX(faces[3]);
+    faces[0] = Model.rotateX(temp);
     // Facing north:
     faces[2] = Model.rotateX(faces[0]);
-    // Facing west:
-    faces[5] = Model.rotateZ(faces[0]);
     // Facing east:
-    faces[4] = Model.rotateZ(faces[1]);
+    faces[5] = Model.rotateY(faces[2]);
+    // Facing south:
+    faces[3] = Model.rotateY(faces[5]);
+    // Facing west:
+    faces[4] = Model.rotateY(faces[3]);
     // Facing down:
     faces[6] = faces[1];
     // Facing up:
     faces[7] = up;
   }
 
-  // Index 0 = back, 1 = front, 2 = side, 3 = conditional side.
-  private static final int[][] textureIndex = {
-      {2, 2, 2, 2, 1, 0},
-      {3, 3, 3, 3, 1, 0},
-  };
+  // Index 0 = back, 1 = front, 2 = side, 3 = top/bottom.
+  private static final int[] textureIndex = {3, 3, 2, 2, 1, 0};
 
   public static boolean intersect(Ray ray, Texture[] textures) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     int direction = ray.getBlockData() & 7;
-    int conditional = ray.getBlockData() >> 3;
     for (int i = 0; i < 6; ++i) {
       Quad face = faces[direction][i];
       if (face.intersect(ray)) {
-        textures[textureIndex[conditional][i]].getColor(ray);
+        textures[textureIndex[i]].getColor(ray);
         ray.n.set(face.n);
         ray.t = ray.tNext;
         hit = true;

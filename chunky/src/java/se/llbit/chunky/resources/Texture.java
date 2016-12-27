@@ -450,6 +450,12 @@ public class Texture {
   public static final ShulkerTexture shulkerWhite = new ShulkerTexture();
   public static final ShulkerTexture shulkerYellow = new ShulkerTexture();
 
+  // [1.11] Observer block.
+  public static final Texture observerBack = new Texture();
+  public static final Texture observerFront = new Texture();
+  public static final Texture observerSide = new Texture();
+  public static final Texture observerTop = new Texture();
+
   // Trapped Chest.
   public static final Texture trappedChestTop = new Texture();
   public static final Texture trappedChestBottom = new Texture();
