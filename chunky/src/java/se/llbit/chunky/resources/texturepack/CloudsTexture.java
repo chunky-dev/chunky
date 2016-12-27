@@ -28,7 +28,7 @@ import se.llbit.chunky.world.Clouds;
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class CloudsTexture extends TextureRef {
+public class CloudsTexture extends TextureLoader {
   private final String file;
 
   public CloudsTexture(String file) {

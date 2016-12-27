@@ -29,7 +29,7 @@ import se.llbit.chunky.resources.Texture;
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class LargeChestTexture extends TextureRef {
+public class LargeChestTexture extends TextureLoader {
   private final String file;
   private final Texture left;
   private final Texture topLeft;

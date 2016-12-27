@@ -28,7 +28,7 @@ import java.util.zip.ZipFile;
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class ChestTexture extends TextureRef {
+public class ChestTexture extends TextureLoader {
   private final String file;
   private final Texture lock;
   private final Texture top;

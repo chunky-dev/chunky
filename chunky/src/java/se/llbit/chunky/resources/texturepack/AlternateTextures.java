@@ -28,21 +28,21 @@ import java.util.zip.ZipFile;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class AlternateTextures extends TextureRef {
+public class AlternateTextures extends TextureLoader {
 
-  private final TextureRef[] alternatives;
+  private final TextureLoader[] alternatives;
 
   /**
    * Attempts to load textures until one is successfully loaded.
    *
    * @param alternatives List of textures to load
    */
-  public AlternateTextures(TextureRef... alternatives) {
+  public AlternateTextures(TextureLoader... alternatives) {
     this.alternatives = alternatives;
   }
 
   @Override public boolean load(ZipFile texturePack) {
-    for (TextureRef alternative : alternatives) {
+    for (TextureLoader alternative : alternatives) {
       if (alternative.load(texturePack)) {
         return true;
       }
@@ -51,7 +51,7 @@ public class AlternateTextures extends TextureRef {
   }
 
   @Override public boolean loadFromTerrain(BitmapImage[] terrain) {
-    for (TextureRef alternative : alternatives) {
+    for (TextureLoader alternative : alternatives) {
       if (alternative.loadFromTerrain(terrain)) {
         return true;
       }

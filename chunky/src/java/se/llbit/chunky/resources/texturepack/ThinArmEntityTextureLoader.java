@@ -29,7 +29,7 @@ import java.util.zip.ZipFile;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class ThinArmEntityTextureLoader extends TextureRef {
+public class ThinArmEntityTextureLoader extends TextureLoader {
   private final String file;
   private final EntityTexture texture;
 

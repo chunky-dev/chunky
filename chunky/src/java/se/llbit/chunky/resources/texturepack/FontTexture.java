@@ -26,7 +26,7 @@ import javax.imageio.ImageIO;
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class FontTexture extends TextureRef {
+public class FontTexture extends TextureLoader {
   private final String file;
 
   public static Glyph[] glyphs = new Glyph[256];

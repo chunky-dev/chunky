@@ -29,7 +29,7 @@ import se.llbit.chunky.resources.texturepack.GrassColorTexture;
 import se.llbit.chunky.resources.texturepack.IndexedTexture;
 import se.llbit.chunky.resources.texturepack.LargeChestTexture;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
-import se.llbit.chunky.resources.texturepack.TextureRef;
+import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.chunky.resources.texturepack.ThinArmEntityTextureLoader;
 import se.llbit.log.Log;
 import se.llbit.resources.ImageLoader;
@@ -60,7 +60,7 @@ public class TexturePackLoader {
     }
   }
 
-  private static Map<String, TextureRef> allTextures = new HashMap<>();
+  private static Map<String, TextureLoader> allTextures = new HashMap<>();
 
   static {
     allTextures.put("normal chest", new AlternateTextures(
@@ -1567,9 +1567,9 @@ public class TexturePackLoader {
    * @param onSuccess called when some textures have been successfully loaded
    * @return the keys for textures that could not be loaded
    */
-  public static Set<Map.Entry<String, TextureRef>> loadTextures(File tpFile,
-      Collection<Map.Entry<String, TextureRef>> textures, Runnable onSuccess) {
-    Set<Map.Entry<String, TextureRef>> notLoaded = new HashSet<>(textures);
+  public static Set<Map.Entry<String, TextureLoader>> loadTextures(File tpFile,
+      Collection<Map.Entry<String, TextureLoader>> textures, Runnable onSuccess) {
+    Set<Map.Entry<String, TextureLoader>> notLoaded = new HashSet<>(textures);
 
     try (ZipFile texturePack = new ZipFile(tpFile)) {
       boolean foundAssetDirectory = false;
@@ -1584,7 +1584,7 @@ public class TexturePackLoader {
         Log.errorf("Missing assets directory in %s", texturePackName(tpFile));
       } else {
         boolean oneTextureLoaded = false;
-        for (Map.Entry<String, TextureRef> texture : textures) {
+        for (Map.Entry<String, TextureLoader> texture : textures) {
           if (texture.getValue().load(texturePack)) {
             oneTextureLoaded = true;
             notLoaded.remove(texture);
@@ -1628,14 +1628,14 @@ public class TexturePackLoader {
     });
   }
 
-  private static void loadTexturePack(File tpFile, Collection<Map.Entry<String, TextureRef>> toLoad,
+  private static void loadTexturePack(File tpFile, Collection<Map.Entry<String, TextureLoader>> toLoad,
       Runnable onSuccess) {
-    Set<Map.Entry<String, TextureRef>> notLoaded = loadTextures(tpFile, toLoad, onSuccess);
+    Set<Map.Entry<String, TextureLoader>> notLoaded = loadTextures(tpFile, toLoad, onSuccess);
 
     if (!notLoaded.isEmpty()) {
       StringBuilder message = new StringBuilder();
       message.append("Failed to load textures from ").append(texturePackName(tpFile));
-      Iterator<Map.Entry<String, TextureRef>> iterator = notLoaded.iterator();
+      Iterator<Map.Entry<String, TextureLoader>> iterator = notLoaded.iterator();
       for (int count = 0; iterator.hasNext() && count < 10; ++count) {
         message.append("\n\t").append(iterator.next().getKey());
       }
@@ -1653,16 +1653,16 @@ public class TexturePackLoader {
     }
   }
 
-  private static Set<Map.Entry<String, TextureRef>> loadTerrainTextures(ZipFile texturePack,
-      Set<Map.Entry<String, TextureRef>> textures) {
-    Set<Map.Entry<String, TextureRef>> notLoaded = new HashSet<>(textures);
+  private static Set<Map.Entry<String, TextureLoader>> loadTerrainTextures(ZipFile texturePack,
+      Set<Map.Entry<String, TextureLoader>> textures) {
+    Set<Map.Entry<String, TextureLoader>> notLoaded = new HashSet<>(textures);
 
     try (InputStream in = texturePack.getInputStream(new ZipEntry("terrain.png"))) {
       if (in != null) {
         BitmapImage spriteMap = ImageLoader.read(in);
         BitmapImage[] terrainTextures = getTerrainTextures(spriteMap);
 
-        for (Map.Entry<String, TextureRef> texture : textures) {
+        for (Map.Entry<String, TextureLoader> texture : textures) {
           if (texture.getValue().loadFromTerrain(terrainTextures)) {
             notLoaded.remove(texture);
           }

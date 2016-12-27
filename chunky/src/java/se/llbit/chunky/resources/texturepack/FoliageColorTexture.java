@@ -28,7 +28,7 @@ import se.llbit.chunky.world.Biomes;
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class FoliageColorTexture extends TextureRef {
+public class FoliageColorTexture extends TextureLoader {
   private final String file;
 
   public FoliageColorTexture(String file) {

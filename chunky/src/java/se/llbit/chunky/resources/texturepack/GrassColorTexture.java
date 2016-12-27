@@ -28,7 +28,7 @@ import se.llbit.chunky.world.Biomes;
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class GrassColorTexture extends TextureRef {
+public class GrassColorTexture extends TextureLoader {
   private final String file;
 
   public GrassColorTexture(String file) {

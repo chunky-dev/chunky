@@ -29,7 +29,7 @@ import java.util.zip.ZipFile;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class SimpleTexture extends TextureRef {
+public class SimpleTexture extends TextureLoader {
 
   private final String file;
   protected Texture texture;

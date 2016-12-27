@@ -27,20 +27,19 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * Reference to a texture file in a Minecraft texture pack
+ * This class loads textures from a Minecraft resource pack.
+ * Subclasses of this class are used for loading different kinds of
+ * textures, e.g. entity textures, simple textures, chest textures etc.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public abstract class TextureRef {
+public abstract class TextureLoader {
 
-  /**
-   * Default constructor
-   */
-  protected TextureRef() {
+  protected TextureLoader() {
   }
 
   /**
-   * Attempt to load a texture from a texture pack
+   * Attempt to load a texture from a texture pack.
    *
    * @param texturePack Reference to the texture pack zip file
    * @return <code>true</code> if the texture was successfully loaded
@@ -63,7 +62,7 @@ public abstract class TextureRef {
   }
 
   /**
-   * Attempt to load a texture from a texture pack
+   * Attempt to load a texture from a texture pack.
    *
    * @param file        Path of texture in texture pack
    * @param texturePack Reference to the texture pack zip file

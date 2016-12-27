@@ -28,7 +28,7 @@ import java.util.zip.ZipFile;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class IndexedTexture extends TextureRef {
+public class IndexedTexture extends TextureLoader {
 
   private final int index;
   private final Texture texture;
