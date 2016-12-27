@@ -3314,12 +3314,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerWhite.side, Texture.shulkerWhite.side,
-        Texture.shulkerWhite.side, Texture.shulkerWhite.side,
-        Texture.shulkerWhite.top, Texture.shulkerWhite.bottom};
+        Texture.shulkerWhite.bottom,
+        Texture.shulkerWhite.top,
+        Texture.shulkerWhite.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_ORANGE = new Block(0xDC, "Shulker Box Orange", Texture.unknown) {
@@ -3330,12 +3331,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerOrange.side, Texture.shulkerOrange.side,
-        Texture.shulkerOrange.side, Texture.shulkerOrange.side,
-        Texture.shulkerOrange.top, Texture.shulkerOrange.bottom};
+        Texture.shulkerOrange.bottom,
+        Texture.shulkerOrange.top,
+        Texture.shulkerOrange.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_MAGENTA = new Block(0xDD, "Shulker Box Magenta", Texture.unknown) {
@@ -3346,12 +3348,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerMagenta.side, Texture.shulkerMagenta.side,
-        Texture.shulkerMagenta.side, Texture.shulkerMagenta.side,
-        Texture.shulkerMagenta.top, Texture.shulkerMagenta.bottom};
+        Texture.shulkerMagenta.bottom,
+        Texture.shulkerMagenta.top,
+        Texture.shulkerMagenta.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_LIGHTBLUE = new Block(0xDE, "Shulker Box Light Blue",
@@ -3363,12 +3366,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerLightBlue.side, Texture.shulkerLightBlue.side,
-        Texture.shulkerLightBlue.side, Texture.shulkerLightBlue.side,
-        Texture.shulkerLightBlue.top, Texture.shulkerLightBlue.bottom};
+        Texture.shulkerLightBlue.bottom,
+        Texture.shulkerLightBlue.top,
+        Texture.shulkerLightBlue.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_YELLOW = new Block(0xDF, "Shulker Box Yellow", Texture.unknown) {
@@ -3379,12 +3383,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerYellow.side, Texture.shulkerYellow.side,
-        Texture.shulkerYellow.side, Texture.shulkerYellow.side,
-        Texture.shulkerYellow.top, Texture.shulkerYellow.bottom};
+        Texture.shulkerYellow.bottom,
+        Texture.shulkerYellow.top,
+        Texture.shulkerYellow.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_LIME = new Block(0xE0, "Shulker Box Lime", Texture.unknown) {
@@ -3395,12 +3400,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerLime.side, Texture.shulkerLime.side,
-        Texture.shulkerLime.side, Texture.shulkerLime.side,
-        Texture.shulkerLime.top, Texture.shulkerLime.bottom};
+        Texture.shulkerLime.bottom,
+        Texture.shulkerLime.top,
+        Texture.shulkerLime.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_PINK = new Block(0xE1, "Shulker Box Pink", Texture.unknown) {
@@ -3411,12 +3417,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerPink.side, Texture.shulkerPink.side,
-        Texture.shulkerPink.side, Texture.shulkerPink.side,
-        Texture.shulkerPink.top, Texture.shulkerPink.bottom};
+        Texture.shulkerPink.bottom,
+        Texture.shulkerPink.top,
+        Texture.shulkerPink.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_GRAY = new Block(0xE2, "Shulker Box Gray", Texture.unknown) {
@@ -3427,12 +3434,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerGray.side, Texture.shulkerGray.side,
-        Texture.shulkerGray.side, Texture.shulkerGray.side,
-        Texture.shulkerGray.top, Texture.shulkerGray.bottom};
+        Texture.shulkerGray.bottom,
+        Texture.shulkerGray.top,
+        Texture.shulkerGray.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_SILVER = new Block(0xE3, "Shulker Box Light Gray",
@@ -3444,12 +3452,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerSilver.side, Texture.shulkerSilver.side,
-        Texture.shulkerSilver.side, Texture.shulkerSilver.side,
-        Texture.shulkerSilver.top, Texture.shulkerSilver.bottom};
+        Texture.shulkerSilver.bottom,
+        Texture.shulkerSilver.top,
+        Texture.shulkerSilver.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_CYAN = new Block(0xE4, "Shulker Box Cyan", Texture.unknown) {
@@ -3460,12 +3469,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerCyan.side, Texture.shulkerCyan.side,
-        Texture.shulkerCyan.side, Texture.shulkerCyan.side,
-        Texture.shulkerCyan.top, Texture.shulkerCyan.bottom};
+        Texture.shulkerCyan.bottom,
+        Texture.shulkerCyan.top,
+        Texture.shulkerCyan.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_PURPLE = new Block(0xE5, "Shulker Box Purple", Texture.unknown) {
@@ -3476,12 +3486,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerPurple.side, Texture.shulkerPurple.side,
-        Texture.shulkerPurple.side, Texture.shulkerPurple.side,
-        Texture.shulkerPurple.top, Texture.shulkerPurple.bottom};
+        Texture.shulkerPurple.bottom,
+        Texture.shulkerPurple.top,
+        Texture.shulkerPurple.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_BLUE = new Block(0xE6, "Shulker Box Blue", Texture.unknown) {
@@ -3492,12 +3503,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerBlue.side, Texture.shulkerBlue.side,
-        Texture.shulkerBlue.side, Texture.shulkerBlue.side,
-        Texture.shulkerBlue.top, Texture.shulkerBlue.bottom};
+        Texture.shulkerBlue.bottom,
+        Texture.shulkerBlue.top,
+        Texture.shulkerBlue.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_BROWN = new Block(0xE7, "Shulker Box Brown", Texture.unknown) {
@@ -3508,12 +3520,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerBrown.side, Texture.shulkerBrown.side,
-        Texture.shulkerBrown.side, Texture.shulkerBrown.side,
-        Texture.shulkerBrown.top, Texture.shulkerBrown.bottom};
+        Texture.shulkerBrown.bottom,
+        Texture.shulkerBrown.top,
+        Texture.shulkerBrown.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_GREEN = new Block(0xE8, "Shulker Box Green", Texture.unknown) {
@@ -3524,12 +3537,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerGreen.side, Texture.shulkerGreen.side,
-        Texture.shulkerGreen.side, Texture.shulkerGreen.side,
-        Texture.shulkerGreen.top, Texture.shulkerGreen.bottom};
+        Texture.shulkerGreen.bottom,
+        Texture.shulkerGreen.top,
+        Texture.shulkerGreen.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_RED = new Block(0xE9, "Shulker Box Red", Texture.unknown) {
@@ -3540,12 +3554,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerRed.side, Texture.shulkerRed.side,
-        Texture.shulkerRed.side, Texture.shulkerRed.side,
-        Texture.shulkerRed.top, Texture.shulkerRed.bottom};
+        Texture.shulkerRed.bottom,
+        Texture.shulkerRed.top,
+        Texture.shulkerRed.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block SHULKERBOX_BLACK = new Block(0xEA, "Shulker Box Black", Texture.unknown) {
@@ -3556,12 +3571,13 @@ public class Block extends Material {
     }
 
     final Texture[] textures = {
-        Texture.shulkerBlack.side, Texture.shulkerBlack.side,
-        Texture.shulkerBlack.side, Texture.shulkerBlack.side,
-        Texture.shulkerBlack.top, Texture.shulkerBlack.bottom};
+        Texture.shulkerBlack.bottom,
+        Texture.shulkerBlack.top,
+        Texture.shulkerBlack.side
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, textures);
+      return DirectionalBlockModel.intersect(ray, textures);
     }
   };
   private static final Block UNKNOWN0xEB = new Block(0xEB, "Unknown Block 0xEB", Texture.unknown) {

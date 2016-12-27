@@ -78,9 +78,13 @@ public class DirectionalBlockModel {
     faces[7] = up;
   }
 
-  // Index 0 = back, 1 = front, 2 = side, 3 = top.
+  // Index 0 = back, 1 = front, 2 = side.
   private static final int[] textureIndex = {2, 2, 2, 2, 1, 0};
 
+  /**
+   * @param textures texture[0] is the back texture, texture[1] is the front
+   * texture, and texture[2] is the side texture.
+   */
   public static boolean intersect(Ray ray, Texture[] textures) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
