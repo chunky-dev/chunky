@@ -1647,10 +1647,10 @@ public class TexturePackLoader {
 
     allTextures.put("redstone_dust_cross", new AlternateTextures(
         new LayeredTextureLoader(
-            "assets/minecraft/textures/blocks/redstone_dust_line0",
+            "assets/minecraft/textures/blocks/redstone_dust_dot",
             Texture.redstoneWireCross,
             new LayeredTextureLoader(
-                "assets/minecraft/textures/blocks/redstone_dust_dot",
+                "assets/minecraft/textures/blocks/redstone_dust_line0",
                 Texture.redstoneWireCross,
                 new RotatedTextureLoader(
                     "assets/minecraft/textures/blocks/redstone_dust_line1",
