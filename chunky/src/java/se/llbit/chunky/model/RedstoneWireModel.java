@@ -88,7 +88,8 @@ public class RedstoneWireModel {
 
       // 1111 north south east west
       new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 0, 1),
-          new Vector4(1, 0, 1, 0)),};
+          new Vector4(1, 0, 1, 0))
+  };
 
   private static final Quad eastSide =
       new Quad(new Vector3(1, 1, 0), new Vector3(1, 0, 0), new Vector3(1, 1, 1),
@@ -103,12 +104,13 @@ public class RedstoneWireModel {
       new Quad(new Vector3(1, 1, 1), new Vector3(1, 0, 1), new Vector3(0, 1, 1),
           new Vector4(1, 0, 1, 0));
 
-  private static final Texture[] tex =
-      {Texture.redstoneWireCross, Texture.redstoneWire, Texture.redstoneWire, Texture.redstoneWire,
-          Texture.redstoneWire, Texture.redstoneWireCross, Texture.redstoneWireCross,
-          Texture.redstoneWireCross, Texture.redstoneWire, Texture.redstoneWireCross,
-          Texture.redstoneWireCross, Texture.redstoneWireCross, Texture.redstoneWire,
-          Texture.redstoneWireCross, Texture.redstoneWireCross, Texture.redstoneWireCross,};
+  private static final Texture[] tex = {
+      Texture.redstoneWireCross, Texture.redstoneWire, Texture.redstoneWire, Texture.redstoneWire,
+      Texture.redstoneWire, Texture.redstoneWireCross, Texture.redstoneWireCross,
+      Texture.redstoneWireCross, Texture.redstoneWire, Texture.redstoneWireCross,
+      Texture.redstoneWireCross, Texture.redstoneWireCross, Texture.redstoneWire,
+      Texture.redstoneWireCross, Texture.redstoneWireCross, Texture.redstoneWireCross
+  };
 
   private static final float[][] wireColor = new float[16][3];
 

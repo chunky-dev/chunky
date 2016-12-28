@@ -18,9 +18,8 @@ package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.ShulkerTexture;
+import se.llbit.resources.ImageLoader;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
@@ -47,21 +46,21 @@ public class ShulkerTextureLoader extends TextureLoader {
   }
 
   @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
-    BufferedImage spritemap = ImageIO.read(imageStream);
-    if (spritemap.getWidth() != spritemap.getHeight() || spritemap.getWidth() % 16 != 0) {
+    BitmapImage image = ImageLoader.read(imageStream);
+    if (image.width != image.height || image.width % 16 != 0) {
       throw new TextureFormatError(
           "Shulker texture must have equal width and height, divisible by 16!");
     }
 
-    int imgW = spritemap.getWidth();
+    int imgW = image.width;
     int scale = imgW / (16 * 4);
 
-    texture.bottom.setTexture(loadBottom(spritemap, scale, 32, 28));
-    texture.side.setTexture(loadSide(spritemap, scale));
+    texture.bottom.setTexture(loadBottom(image, scale, 32, 28));
+    texture.side.setTexture(loadSide(image, scale));
     return true;
   }
 
-  private static BitmapImage loadBottom(BufferedImage spritemap, int scale, int u, int v) {
+  private static BitmapImage loadBottom(BitmapImage spritemap, int scale, int u, int v) {
     BitmapImage image = new BitmapImage(scale * 16, scale * 16);
     int x0 = u * scale;
     int x1 = (u + 16) * scale;
@@ -71,7 +70,7 @@ public class ShulkerTextureLoader extends TextureLoader {
       int sy = y - y0;
       for (int x = x0; x < x1; ++x) {
         int sx = x - x0;
-        image.setPixel(sx, sy, spritemap.getRGB(x, y));
+        image.setPixel(sx, sy, spritemap.getPixel(x, y));
       }
     }
     return image;
@@ -82,7 +81,7 @@ public class ShulkerTextureLoader extends TextureLoader {
    * This stitches together the top and bottom parts of the first
    * side texture.
    */
-  private static BitmapImage loadSide(BufferedImage spritemap, int scale) {
+  private static BitmapImage loadSide(BitmapImage spritemap, int scale) {
     BitmapImage image = new BitmapImage(scale * 16, scale * 16);
 
     // Load the top part:
@@ -94,7 +93,7 @@ public class ShulkerTextureLoader extends TextureLoader {
       int sy = y - y0;
       for (int x = x0; x < x1; ++x) {
         int sx = x - x0;
-        image.setPixel(sx, sy, spritemap.getRGB(x, y));
+        image.setPixel(sx, sy, spritemap.getPixel(x, y));
       }
     }
 
@@ -107,7 +106,7 @@ public class ShulkerTextureLoader extends TextureLoader {
       int sy = y - y0 + 8 * scale;
       for (int x = x0; x < x1; ++x) {
         int sx = x - x0 + 4 * scale;
-        image.setPixel(sx, sy, spritemap.getRGB(x, y));
+        image.setPixel(sx, sy, spritemap.getPixel(x, y));
       }
     }
 
@@ -120,7 +119,7 @@ public class ShulkerTextureLoader extends TextureLoader {
       int sy = y - y0 + 12 * scale;
       for (int x = x0; x < x1; ++x) {
         int sx = x - x0;
-        image.setPixel(sx, sy, spritemap.getRGB(x, y));
+        image.setPixel(sx, sy, spritemap.getPixel(x, y));
       }
     }
     return image;

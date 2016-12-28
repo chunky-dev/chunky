@@ -327,25 +327,25 @@ public class OctreeFinalizer {
               if (above == Block.AIR) {
                 int westAbove = 0xFF & octree.get(x - 1, cy + 1, z);
                 if (west.isSolid && westAbove == Block.REDSTONEWIRE_ID) {
-                  // wire on west block side
+                  // Wire on west block side.
                   type |= 1 << BlockData.RSW_WEST_CONNECTION;
                   type |= 1 << BlockData.RSW_WEST_SIDE;
                 }
                 int eastAbove = 0xFF & octree.get(x + 1, cy + 1, z);
                 if (east.isSolid && eastAbove == Block.REDSTONEWIRE_ID) {
-                  // wire on east block side
+                  // Wire on east block side.
                   type |= 1 << BlockData.RSW_EAST_CONNECTION;
                   type |= 1 << BlockData.RSW_EAST_SIDE;
                 }
                 int northAbove = 0xFF & octree.get(x, cy + 1, z - 1);
                 if (north.isSolid && northAbove == Block.REDSTONEWIRE_ID) {
-                  // wire on north block side
+                  // Wire on north block side.
                   type |= 1 << BlockData.RSW_NORTH_CONNECTION;
                   type |= 1 << BlockData.RSW_NORTH_SIDE;
                 }
                 int southAbove = 0xFF & octree.get(x, cy + 1, z + 1);
                 if (south.isSolid && southAbove == Block.REDSTONEWIRE_ID) {
-                  // wire on south block side
+                  // Wire on south block side.
                   type |= 1 << BlockData.RSW_SOUTH_CONNECTION;
                   type |= 1 << BlockData.RSW_SOUTH_SIDE;
                 }
@@ -369,7 +369,7 @@ public class OctreeFinalizer {
                 }
               }
 
-              if (north.isRedstoneWireConnector() || south.isRedstoneWireConnector()) {
+              if (north.isRedstoneWireConnector()) {
                 type |= 1 << BlockData.RSW_NORTH_CONNECTION;
               } else if (north == Block.AIR) {
                 int northBelow = 0xFF & octree.get(x, cy - 1, z - 1);

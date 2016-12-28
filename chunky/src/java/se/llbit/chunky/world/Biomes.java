@@ -16,11 +16,9 @@
  */
 package se.llbit.chunky.world;
 
-import java.awt.image.BufferedImage;
-
 import org.apache.commons.math3.util.FastMath;
-
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 
@@ -136,7 +134,7 @@ public class Biomes {
   /**
    * Loads grass colors from a grass color texture.
    */
-  public static void loadGrassColors(BufferedImage texture) {
+  public static void loadGrassColors(BitmapImage texture) {
     loadColorsFromTexture(grassColor, texture);
     gammaCorrectColors(grassColor, grassColorLinear);
   }
@@ -144,17 +142,17 @@ public class Biomes {
   /**
    * Loads foliage colors from a grass color texture.
    */
-  public static void loadFoliageColors(BufferedImage texture) {
+  public static void loadFoliageColors(BitmapImage texture) {
     loadColorsFromTexture(foliageColor, texture);
     gammaCorrectColors(foliageColor, foliageColorLinear);
   }
 
-  private static void loadColorsFromTexture(int[] dest, BufferedImage texture) {
+  private static void loadColorsFromTexture(int[] dest, BitmapImage texture) {
     for (int i = 0; i < biomes.length; ++i) {
       double temp = QuickMath.clamp(biomes[i].temp, 0, 1);
       double rain = QuickMath.clamp(biomes[i].rain, 0, 1);
       rain *= temp;
-      int color = texture.getRGB((int) ((1 - temp) * 255), (int) ((1 - rain) * 255));
+      int color = texture.getPixel((int) ((1 - temp) * 255), (int) ((1 - rain) * 255));
       dest[i] = color;
     }
     // Swamp get special treatment.

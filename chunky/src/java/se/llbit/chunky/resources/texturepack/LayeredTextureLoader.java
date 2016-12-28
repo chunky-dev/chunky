@@ -1,4 +1,5 @@
-/* Copyright (c) 2013 Jesper Öqvist <jesper@llbit.se>
+/*
+ * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -17,7 +18,7 @@
 package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.world.Clouds;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
@@ -25,32 +26,42 @@ import java.io.InputStream;
 import java.util.zip.ZipFile;
 
 /**
+ * Loads two textures and overlays them on top of each other.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class CloudsTexture extends TextureLoader {
-  private final String file;
+public class LayeredTextureLoader extends TextureLoader {
+  private final TextureLoader subLoader;
+  private final String textureName;
+  private final Texture texture;
 
-  public CloudsTexture(String file) {
-    this.file = file;
+  public LayeredTextureLoader(String file, Texture texture, TextureLoader subLoader) {
+    this.textureName = file;
+    this.texture = texture;
+    this.subLoader = subLoader;
   }
 
   @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
-    BitmapImage texture = ImageLoader.read(imageStream);
-    if (texture.width != texture.height || texture.width != 256) {
-      throw new TextureFormatError("Clouds texture size must be 256 by 256 pixels!");
+    BitmapImage image = ImageLoader.read(imageStream);
+    if (image.width != texture.getWidth() || image.height != texture.getHeight()) {
+      throw new TextureFormatError("Can't layer textures with different sizes.");
     }
 
-    for (int y = 0; y < 256; ++y) {
-      for (int x = 0; x < 256; ++x) {
-        int v = texture.getPixel(x, y) >>> 31;
-        Clouds.setCloud(x, y, v);
+    BitmapImage result = new BitmapImage(texture.getBitmap());
+    for (int y = 0; y < image.height; ++y) {
+      for (int x = 0; x < image.width; ++x) {
+        int pixel = image.getPixel(x, y);
+        if (pixel != 0) {
+          result.setPixel(x, y, pixel);
+        }
       }
     }
+    texture.setTexture(result);
     return true;
   }
 
   @Override public boolean load(ZipFile texturePack) {
-    return load(file, texturePack);
+    return subLoader.load(texturePack) && load(textureName, texturePack);
   }
 }
 

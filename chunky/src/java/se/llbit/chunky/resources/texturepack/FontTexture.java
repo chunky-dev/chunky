@@ -16,12 +16,12 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.awt.image.BufferedImage;
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.resources.ImageLoader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
-
-import javax.imageio.ImageIO;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -36,7 +36,6 @@ public class FontTexture extends TextureLoader {
       glyphs[i] = new Glyph(0, 0, 0, 0);
     }
   }
-
 
   public static class Glyph {
 
@@ -59,19 +58,13 @@ public class FontTexture extends TextureLoader {
     }
   }
 
-  /**
-   * Constructor
-   *
-   * @param file texture filename
-   */
   public FontTexture(String file) {
     this.file = file;
   }
 
   @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
-
-    BufferedImage spritemap = ImageIO.read(imageStream);
-    if (spritemap.getWidth() != 128 || spritemap.getHeight() != 128) {
+    BitmapImage spritemap = ImageLoader.read(imageStream);
+    if (spritemap.width != 128 || spritemap.height != 128) {
       throw new TextureFormatError("Font texture must be 128 by 128 pixels");
     }
 
@@ -81,7 +74,7 @@ public class FontTexture extends TextureLoader {
     return true;
   }
 
-  private static void loadGlyph(BufferedImage spritemap, int ch) {
+  private static void loadGlyph(BitmapImage spritemap, int ch) {
     int x = 0x0F & ch;
     int y = (0xF0 & ch) >> 4;
     int x0 = x * 8;
@@ -98,7 +91,7 @@ public class FontTexture extends TextureLoader {
     }
     for (int i = 0; i < 8; ++i) {
       for (int j = 0; j < 8; ++j) {
-        int rgb = spritemap.getRGB(x0 + j, y0 + i);
+        int rgb = spritemap.getPixel(x0 + j, y0 + i);
         if (rgb != 0) {
           if (bit < 32) {
             top |= 1 << bit;
@@ -121,6 +114,5 @@ public class FontTexture extends TextureLoader {
   @Override public boolean load(ZipFile texturePack) {
     return load(file, texturePack);
   }
-
 }
 

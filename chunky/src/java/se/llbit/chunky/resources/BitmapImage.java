@@ -29,10 +29,23 @@ public class BitmapImage {
   public final int width;
   public final int height;
 
+  /**
+   * Create an empty bitmap.
+   */
   public BitmapImage(int width, int height) {
     this.width = width;
     this.height = height;
     data = new int[width * height];
+  }
+
+  /**
+   * Create a copy of another image.
+   */
+  public BitmapImage(BitmapImage image) {
+    this.width = image.width;
+    this.height = image.height;
+    data = new int[width * height];
+    System.arraycopy(image.data, 0, data, 0, width * height);
   }
 
   /** @return the ARGB value of the pixel (x, y). */

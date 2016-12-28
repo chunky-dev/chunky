@@ -16,15 +16,13 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.awt.image.BufferedImage;
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.Texture;
+import se.llbit.resources.ImageLoader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
-
-import javax.imageio.ImageIO;
-
-import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.resources.Texture;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -59,13 +57,13 @@ public class LargeChestTexture extends TextureLoader {
   }
 
   @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
-    BufferedImage spritemap = ImageIO.read(imageStream);
-    if (spritemap.getWidth() % 16 != 0 || spritemap.getHeight() % 16 != 0) {
+    BitmapImage spritemap = ImageLoader.read(imageStream);
+    if (spritemap.width % 16 != 0 || spritemap.height % 16 != 0) {
       throw new TextureFormatError(
           "Large chest texture file must have width and height divisible by 16!");
     }
 
-    int imgW = spritemap.getWidth();
+    int imgW = spritemap.width;
     int scale = imgW / (16 * 8);
 
     left.setTexture(loadLargeChestTexture(spritemap, scale, 0, 2));
@@ -81,7 +79,7 @@ public class LargeChestTexture extends TextureLoader {
     return true;
   }
 
-  private static BitmapImage loadLargeChestTexture(BufferedImage spritemap, int scale, int u,
+  private static BitmapImage loadLargeChestTexture(BitmapImage spritemap, int scale, int u,
       int v) {
     BitmapImage img = new BitmapImage(scale * 16, scale * 16);
 
@@ -90,11 +88,12 @@ public class LargeChestTexture extends TextureLoader {
     int xo = 0;
     int[][][] offsets = {
         // v == 0
-        {{0, 0, 0}, {0, 1, 0}, {1, 2, -1},},
+        {{0, 0, 0}, {0, 1, 0}, {1, 2, -1}},
         // v == 1
-        {{0, 0, 0}, {0, 1, 0}, {1, 2, -1}, {2, 3, 0}, {3, 4, -1},},
+        {{0, 0, 0}, {0, 1, 0}, {1, 2, -1}, {2, 3, 0}, {3, 4, -1}},
         // v == 2
-        {{0, 0, 0}, {0, 1, 0}, {1, 2, -1}, {2, 2, 0}, {2, 3, 0}, {3, 4, -1},},};
+        {{0, 0, 0}, {0, 1, 0}, {1, 2, -1}, {2, 2, 0}, {2, 3, 0}, {3, 4, -1}}
+    };
     x0 += offsets[v][u][0] * scale;
     x1 += offsets[v][u][1] * scale;
     xo += offsets[v][u][2] * scale;
@@ -106,7 +105,7 @@ public class LargeChestTexture extends TextureLoader {
         int sy = y - y0 + scale;
         for (int x = x0; x < x1; ++x) {
           int sx = x - x0 + scale + xo;
-          img.setPixel(sx, sy, spritemap.getRGB(x, y));
+          img.setPixel(sx, sy, spritemap.getPixel(x, y));
         }
       }
     } else if (v == 1) {
@@ -116,7 +115,7 @@ public class LargeChestTexture extends TextureLoader {
         int sy = y - y0 + scale;
         for (int x = x0; x < x1; ++x) {
           int sx = x - x0 + scale + xo;
-          img.setPixel(sx, sy, spritemap.getRGB(x, y));
+          img.setPixel(sx, sy, spritemap.getPixel(x, y));
         }
       }
     } else /*if (v == 2)*/ {
@@ -126,7 +125,7 @@ public class LargeChestTexture extends TextureLoader {
         int sy = y - y0 + scale;
         for (int x = x0; x < x1; ++x) {
           int sx = x - x0 + scale + xo;
-          img.setPixel(sx, sy, spritemap.getRGB(x, y));
+          img.setPixel(sx, sy, spritemap.getPixel(x, y));
         }
       }
       y0 = (14 * 2 + 6) * scale;
@@ -135,7 +134,7 @@ public class LargeChestTexture extends TextureLoader {
         int sy = y - y0 + 6 * scale;
         for (int x = x0; x < x1; ++x) {
           int sx = x - x0 + scale + xo;
-          img.setPixel(sx, sy, spritemap.getRGB(x, y));
+          img.setPixel(sx, sy, spritemap.getPixel(x, y));
         }
       }
 

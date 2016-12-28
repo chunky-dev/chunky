@@ -18,9 +18,8 @@ package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.resources.ImageLoader;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
@@ -51,14 +50,13 @@ public class ChestTexture extends TextureLoader {
   }
 
   @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
-
-    BufferedImage spritemap = ImageIO.read(imageStream);
-    if (spritemap.getWidth() != spritemap.getHeight() || spritemap.getWidth() % 16 != 0) {
+    BitmapImage spritemap = ImageLoader.read(imageStream);
+    if (spritemap.width != spritemap.height || spritemap.width % 16 != 0) {
       throw new TextureFormatError(
           "Chest texture files must have equal width and height, divisible by 16!");
     }
 
-    int imgW = spritemap.getWidth();
+    int imgW = spritemap.width;
     int scale = imgW / (16 * 4);
 
     lock.setTexture(loadChestTexture(spritemap, scale, 0, 0));
@@ -71,8 +69,7 @@ public class ChestTexture extends TextureLoader {
     return true;
   }
 
-  private static BitmapImage loadChestTexture(BufferedImage spritemap, int scale, int u, int v) {
-
+  private static BitmapImage loadChestTexture(BitmapImage spritemap, int scale, int u, int v) {
     BitmapImage img = new BitmapImage(scale * 16, scale * 16);
     int x0 = 14 * u * scale;
     int x1 = 14 * (u + 1) * scale;
@@ -83,7 +80,7 @@ public class ChestTexture extends TextureLoader {
         int sy = y - y0 + scale;
         for (int x = x0; x < x1; ++x) {
           int sx = x - x0 + scale;
-          img.setPixel(sx, sy, spritemap.getRGB(x, y));
+          img.setPixel(sx, sy, spritemap.getPixel(x, y));
         }
       }
     } else if (v == 1) {
@@ -93,7 +90,7 @@ public class ChestTexture extends TextureLoader {
         int sy = y - y0 + scale; // TODO: why + scale?
         for (int x = x0; x < x1; ++x) {
           int sx = x - x0 + scale;
-          img.setPixel(sx, sy, spritemap.getRGB(x, y));
+          img.setPixel(sx, sy, spritemap.getPixel(x, y));
         }
       }
     } else /*if (v == 2)*/ {
@@ -103,7 +100,7 @@ public class ChestTexture extends TextureLoader {
         int sy = y - y0 + scale;
         for (int x = x0; x < x1; ++x) {
           int sx = x - x0 + scale;
-          img.setPixel(sx, sy, spritemap.getRGB(x, y));
+          img.setPixel(sx, sy, spritemap.getPixel(x, y));
         }
       }
       y0 = (14 * 2 + 6) * scale;
@@ -112,7 +109,7 @@ public class ChestTexture extends TextureLoader {
         int sy = y - y0 + 6 * scale;
         for (int x = x0; x < x1; ++x) {
           int sx = x - x0 + scale;
-          img.setPixel(sx, sy, spritemap.getRGB(x, y));
+          img.setPixel(sx, sy, spritemap.getPixel(x, y));
         }
       }
 

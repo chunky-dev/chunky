@@ -16,14 +16,13 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
-import java.awt.image.BufferedImage;
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.world.Biomes;
+import se.llbit.resources.ImageLoader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipFile;
-
-import javax.imageio.ImageIO;
-
-import se.llbit.chunky.world.Biomes;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -36,11 +35,11 @@ public class GrassColorTexture extends TextureLoader {
   }
 
   @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
-    BufferedImage grasscolor = ImageIO.read(imageStream);
-    if (grasscolor.getWidth() != 256 || grasscolor.getHeight() != 256) {
+    BitmapImage grassColor = ImageLoader.read(imageStream);
+    if (grassColor.width != 256 || grassColor.height != 256) {
       throw new TextureFormatError("Grass color texture must be 256 by 256 pixels!");
     }
-    Biomes.loadGrassColors(grasscolor);
+    Biomes.loadGrassColors(grassColor);
     return true;
   }
 

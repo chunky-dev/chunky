@@ -28,6 +28,8 @@ import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.GrassColorTexture;
 import se.llbit.chunky.resources.texturepack.IndexedTexture;
 import se.llbit.chunky.resources.texturepack.LargeChestTexture;
+import se.llbit.chunky.resources.texturepack.LayeredTextureLoader;
+import se.llbit.chunky.resources.texturepack.RotatedTextureLoader;
 import se.llbit.chunky.resources.texturepack.ShulkerTextureLoader;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.chunky.resources.texturepack.TextureLoader;
@@ -783,16 +785,6 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/rail_golden", Texture.poweredRailOff),
         new SimpleTexture("textures/blocks/goldenRail", Texture.poweredRailOff),
         new IndexedTexture(0xA3, Texture.poweredRailOff)));
-    allTextures.put("redstone_dust_cross", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/blocks/redstone_dust_cross",
-            Texture.redstoneWireCross),
-        new SimpleTexture("textures/blocks/redstoneDust_cross", Texture.redstoneWireCross),
-        new IndexedTexture(0xA4, Texture.redstoneWireCross)));
-    allTextures.put("redstone_dust_line", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/blocks/redstone_dust_line",
-            Texture.redstoneWire),
-        new SimpleTexture("textures/blocks/redstoneDust_line", Texture.redstoneWire),
-        new IndexedTexture(0xA5, Texture.redstoneWire)));
     allTextures.put("enchanting_table_top", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/blocks/enchanting_table_top",
             Texture.enchantmentTableTop),
@@ -1647,6 +1639,33 @@ public class TexturePackLoader {
     allTextures.put("observer_top",
         new SimpleTexture("assets/minecraft/textures/blocks/observer_top",
             Texture.observerTop));
+
+    // Redstone textures were redone and renamed in Minecraft 1.9.
+    // The redstone cross texture is now created by combining redstone_dust_dot
+    // and redstone_dust_line0, and redstone_dust_line1.
+    // See https://github.com/llbit/chunky/issues/359
+
+    allTextures.put("redstone_dust_cross", new AlternateTextures(
+        new LayeredTextureLoader(
+            "assets/minecraft/textures/blocks/redstone_dust_line0",
+            Texture.redstoneWireCross,
+            new LayeredTextureLoader(
+                "assets/minecraft/textures/blocks/redstone_dust_dot",
+                Texture.redstoneWireCross,
+                new RotatedTextureLoader(
+                    "assets/minecraft/textures/blocks/redstone_dust_line1",
+                    Texture.redstoneWireCross))),
+        new SimpleTexture("assets/minecraft/textures/blocks/redstone_dust_cross",
+            Texture.redstoneWireCross),
+        new SimpleTexture("textures/blocks/redstoneDust_cross", Texture.redstoneWireCross),
+        new IndexedTexture(0xA4, Texture.redstoneWireCross)));
+    allTextures.put("redstone_dust_line", new AlternateTextures(
+        new RotatedTextureLoader("assets/minecraft/textures/blocks/redstone_dust_line0",
+            Texture.redstoneWire),
+        new SimpleTexture("assets/minecraft/textures/blocks/redstone_dust_line",
+            Texture.redstoneWire),
+        new SimpleTexture("textures/blocks/redstoneDust_line", Texture.redstoneWire),
+        new IndexedTexture(0xA5, Texture.redstoneWire)));
   }
 
   private static String texturePackName(File tpFile) {

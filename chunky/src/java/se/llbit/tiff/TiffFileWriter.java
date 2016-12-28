@@ -19,14 +19,16 @@ package se.llbit.tiff;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
+ * TIFF image output. This supports 32-bit floating point channel output.
+ *
+ * <p>Non-32bit output has been removed sine it was unused.
+ *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class TiffFileWriter implements AutoCloseable {
@@ -204,30 +206,7 @@ public class TiffFileWriter implements AutoCloseable {
   }
 
   /**
-   * Write the image to a PNG file.
-   */
-  public void write(BufferedImage image, TaskTracker.Task task) throws IOException {
-    DataBufferInt dataBuf = (DataBufferInt) image.getData().getDataBuffer();
-    int[] data = dataBuf.getData();
-    int width = image.getWidth();
-    int height = image.getHeight();
-    writeHeader(width, height, 1);
-    int i = 0;
-    for (int y = 0; y < height; ++y) {
-      task.update(height, y);
-      for (int x = 0; x < width; ++x) {
-        int rgb = data[i++];
-        out.write((rgb >> 16) & 0xFF);
-        out.write((rgb >> 8) & 0xFF);
-        out.write(rgb & 0xFF);
-      }
-      task.update(height, y + 1);
-    }
-    writeFooter(width, height, 1);
-  }
-
-  /**
-   * Write the image to a PNG file with 16-bit color channels.
+   * Write an image as a 32-bit per channel TIFF file.
    */
   public void write32(Scene scene, TaskTracker.Task task) throws IOException {
     int width = scene.canvasWidth();

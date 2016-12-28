@@ -16,8 +16,6 @@
  */
 package se.llbit.chunky.resources;
 
-import java.awt.image.BufferedImage;
-
 import se.llbit.math.Ray;
 
 /**

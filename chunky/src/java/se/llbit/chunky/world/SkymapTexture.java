@@ -27,8 +27,6 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 import se.llbit.util.ImageTools;
 
-import java.awt.image.BufferedImage;
-
 /**
  * Specialized skymap texture with multithreaded gamma correction
  * preprocessing.

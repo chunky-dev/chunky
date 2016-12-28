@@ -39,7 +39,6 @@ public class ThinArmEntityTextureLoader extends TextureLoader {
   }
 
   @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
-
     BitmapImage image = ImageLoader.read(imageStream);
 
     if (image.width != image.height && image.width != 2 * image.height) {
