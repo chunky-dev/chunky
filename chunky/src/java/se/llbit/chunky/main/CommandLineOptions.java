@@ -22,7 +22,6 @@ import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.TexturePackLoader;
-import se.llbit.chunky.resources.TexturePackLoader.TextureLoadingError;
 import se.llbit.json.JsonNumber;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
@@ -31,6 +30,7 @@ import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
 import se.llbit.util.MCDownloader;
+import se.llbit.util.NotNull;
 import se.llbit.util.StringUtil;
 import se.llbit.util.TaskTracker;
 
@@ -416,33 +416,11 @@ public class CommandLineOptions {
     }
 
     if (!configurationError && mode != Mode.NOTHING && mode != Mode.SNAPSHOT) {
-      try {
-        if (options.texturePack != null && !options.texturePack.isEmpty()) {
-          TexturePackLoader.loadTexturePack(new File(options.texturePack), false);
-        } else {
-          String lastTexturePack = PersistentSettings.getLastTexturePack();
-          if (!lastTexturePack.isEmpty()) {
-            try {
-              TexturePackLoader.loadTexturePack(new File(lastTexturePack), false);
-            } catch (TextureLoadingError e) {
-              System.err.println(e.getMessage());
-              System.err.println("Loading default Minecraft textures.");
-              try {
-                Chunky.loadDefaultTextures();
-              } catch (FileNotFoundException e1) {
-                System.err.println("Minecraft Jar not found! Using placeholder textures.");
-              }
-            }
-          } else {
-            try {
-              Chunky.loadDefaultTextures();
-            } catch (FileNotFoundException e1) {
-              System.err.println("Minecraft Jar not found! Using placeholder textures.");
-            }
-          }
-        }
-      } catch (TextureLoadingError e) {
-        System.err.println(e.getMessage());
+      if (options.texturePack != null && !options.texturePack.isEmpty()) {
+        TexturePackLoader.loadTexturePacks(options.texturePack.split(File.pathSeparator), false);
+      } else {
+        @NotNull String lastTexturePack = PersistentSettings.getLastTexturePack();
+        TexturePackLoader.loadTexturePacks(lastTexturePack.split(File.pathSeparator), false);
       }
     }
   }

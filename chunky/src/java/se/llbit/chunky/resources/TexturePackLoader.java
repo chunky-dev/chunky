@@ -36,6 +36,7 @@ import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.chunky.resources.texturepack.ThinArmEntityTextureLoader;
 import se.llbit.log.Log;
 import se.llbit.resources.ImageLoader;
+import se.llbit.util.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,13 +57,6 @@ import java.util.zip.ZipFile;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class TexturePackLoader {
-
-  public static final class TextureLoadingError extends Exception {
-    TextureLoadingError(String msg) {
-      super(msg);
-    }
-  }
-
   private static Map<String, TextureLoader> allTextures = new HashMap<>();
 
   static {
@@ -1680,11 +1674,10 @@ public class TexturePackLoader {
    *
    * @param tpFile resource pack file
    * @param textures textures to load
-   * @param onSuccess called when some textures have been successfully loaded
    * @return the keys for textures that could not be loaded
    */
   public static Set<Map.Entry<String, TextureLoader>> loadTextures(File tpFile,
-      Collection<Map.Entry<String, TextureLoader>> textures, Runnable onSuccess) {
+      Collection<Map.Entry<String, TextureLoader>> textures) {
     Set<Map.Entry<String, TextureLoader>> notLoaded = new HashSet<>(textures);
 
     try (ZipFile texturePack = new ZipFile(tpFile)) {
@@ -1699,20 +1692,14 @@ public class TexturePackLoader {
       if (!foundAssetDirectory) {
         Log.errorf("Missing assets directory in %s", texturePackName(tpFile));
       } else {
-        boolean oneTextureLoaded = false;
         for (Map.Entry<String, TextureLoader> texture : textures) {
           if (texture.getValue().load(texturePack)) {
-            oneTextureLoaded = true;
             notLoaded.remove(texture);
           }
         }
 
-        // Fall back on terrain.png:
+        // Fall back on the "terrain.png" texture atlas:
         notLoaded = loadTerrainTextures(texturePack, notLoaded);
-
-        if (oneTextureLoaded) {
-          onSuccess.run();
-        }
       }
     } catch (IOException e) {
       Log.warnf("Failed to open %s: %s", texturePackName(tpFile), e.getMessage());
@@ -1721,51 +1708,56 @@ public class TexturePackLoader {
   }
 
   /**
-   * Attempt to load the specified texture pack.
-   * If some textures files are not found they will be loaded from
-   * the default texture pack.
-   *
-   * @param rememberTP Decides if this texture pack should be saved as the
-   *                   last used texture pack
+   * Load textures from some resource packs.
+   * @param texturePacks The paths to texture packs to be loaded.
+   * Texture packs are loaded in the order of the paths in this argument.
+   * @param remember Decides if the texture packs should be saved as the
+   * last used texture pack.
    */
-  public static void loadTexturePack(File tpFile, boolean rememberTP) throws TextureLoadingError {
-    // TODO: replace exception by logging an error and using error return code.
-    if (tpFile == null) {
-      throw new TextureLoadingError("Could not open texture pack: no file specified");
-    }
-    if (!tpFile.isFile()) {
-      throw new TextureLoadingError("Could not open texture pack: " + tpFile.getAbsolutePath());
-    }
-    Log.info("Loading textures from " + tpFile.getAbsolutePath());
-    loadTexturePack(tpFile, allTextures.entrySet(), () -> {
-      if (rememberTP) {
-        PersistentSettings.setLastTexturePack(tpFile.getAbsolutePath());
+  public static void loadTexturePacks(@NotNull String[] texturePacks, boolean remember) {
+    Set<Map.Entry<String, TextureLoader>> toLoad = allTextures.entrySet();
+    for (String path : texturePacks) {
+      File file = new File(path);
+      if (!file.isFile()) {
+        Log.error("Could not open texture pack: " + file.getAbsolutePath());
       }
-    });
-  }
-
-  private static void loadTexturePack(File tpFile, Collection<Map.Entry<String, TextureLoader>> toLoad,
-      Runnable onSuccess) {
-    Set<Map.Entry<String, TextureLoader>> notLoaded = loadTextures(tpFile, toLoad, onSuccess);
-
-    if (!notLoaded.isEmpty()) {
+      Log.infof("Loading %d textures from %s", toLoad.size(), file.getAbsolutePath());
+      toLoad = loadTextures(file, toLoad);
+      if (toLoad.isEmpty()) {
+        break;
+      }
+    }
+    if (!toLoad.isEmpty()) {
+      // If there are textures left to load we try to load the default textures.
+      File defaultResources = MinecraftFinder.getMinecraftJar();
+      if (defaultResources != null) {
+        Log.infof("Loading %d textures from %s", toLoad.size(), defaultResources.getAbsolutePath());
+        toLoad = loadTextures(defaultResources, toLoad);
+      } else {
+        Log.error("Minecraft Jar not found: falling back on placeholder textures.");
+      }
+    }
+    if (!toLoad.isEmpty()) {
       StringBuilder message = new StringBuilder();
-      message.append("Failed to load textures from ").append(texturePackName(tpFile));
-      Iterator<Map.Entry<String, TextureLoader>> iterator = notLoaded.iterator();
+      message.append("Failed to load textures:");
+      Iterator<Map.Entry<String, TextureLoader>> iterator = toLoad.iterator();
       for (int count = 0; iterator.hasNext() && count < 10; ++count) {
         message.append("\n\t").append(iterator.next().getKey());
       }
-      if (notLoaded.size() > 10) {
-        message.append("\n\t... and ").append(notLoaded.size() - 10).append(" more");
+      if (toLoad.size() > 10) {
+        message.append("\n\t... and ").append(toLoad.size() - 10).append(" more");
       }
       Log.info(message.toString());
-
-      File defaultTP = MinecraftFinder.getMinecraftJar();
-      boolean isDefault = tpFile.equals(defaultTP);
-      if (!isDefault && defaultTP != null) {
-        // Fall back on default resource pack:
-        loadTexturePack(defaultTP, notLoaded, () -> {});
+    }
+    if (remember) {
+      StringBuilder paths = new StringBuilder();
+      for (String path : texturePacks) {
+        if (paths.length() > 0) {
+          paths.append(File.pathSeparator);
+        }
+        paths.append(path);
       }
+      PersistentSettings.setLastTexturePack(paths.toString());
     }
   }
 

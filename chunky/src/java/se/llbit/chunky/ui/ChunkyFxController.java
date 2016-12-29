@@ -57,8 +57,6 @@ import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.SceneLoadingError;
-import se.llbit.chunky.resources.MinecraftFinder;
-import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.render.RenderControlsFx;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.ChunkPosition;
@@ -74,7 +72,6 @@ import se.llbit.math.Vector3;
 
 import java.awt.Desktop;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
@@ -142,9 +139,7 @@ public class ChunkyFxController
 
   @FXML private SimpleColorPicker highlightColor;
 
-  @FXML private Button loadResourcePackBtn;
-
-  @FXML private Button loadDefaultTexturesBtn;
+  @FXML private Button editResourcePacks;
 
   @FXML private CheckBox singleColorBtn;
 
@@ -328,21 +323,12 @@ public class ChunkyFxController
     renderTab.setGraphic(new ImageView(Icon.sky.fxImage()));
     aboutTab.setGraphic(new ImageView(Icon.question.fxImage()));
 
-    loadResourcePackBtn
-        .setTooltip(new Tooltip("Select which resource pack Chunky uses to load block textures."));
-    loadResourcePackBtn.setGraphic(new ImageView(Icon.load.fxImage()));
-
-    loadDefaultTexturesBtn
-        .setTooltip(new Tooltip("Load default Minecraft textures from Minecraft installation."));
-    loadDefaultTexturesBtn.setOnAction(e -> {
-      try {
-        TexturePackLoader.loadTexturePack(MinecraftFinder.getMinecraftJarNonNull(), true);
-        mapLoader.reloadWorld();
-      } catch (FileNotFoundException e1) {
-        Log.warn("Minecraft Jar not found! Using placeholder textures.");
-      } catch (TexturePackLoader.TextureLoadingError e1) {
-        Log.warn("Failed to load default texture pack! Using placeholder textures.");
-      }
+    editResourcePacks.setTooltip(
+        new Tooltip("Select resource packs Chunky uses to load textures."));
+    editResourcePacks.setGraphic(new ImageView(Icon.pencil.fxImage()));
+    editResourcePacks.setOnAction(e -> {
+      ResourceLoadOrderEditor editor = new ResourceLoadOrderEditor();
+      editor.show();
     });
 
     LauncherSettings settings = new LauncherSettings();
@@ -463,21 +449,6 @@ public class ChunkyFxController
       System.exit(0);
     });
 
-    loadResourcePackBtn.setOnAction(e -> {
-      FileChooser fileChooser = new FileChooser();
-      fileChooser.setTitle("Choose Resource Pack");
-      fileChooser
-          .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Resource Packs", "*.zip"));
-      File resourcePack = fileChooser.showOpenDialog(stage);
-      if (resourcePack != null) {
-        try {
-          TexturePackLoader.loadTexturePack(resourcePack, true);
-          mapLoader.reloadWorld();
-        } catch (TexturePackLoader.TextureLoadingError e1) {
-          Log.warn("Failed to load textures from selected resource pack.");
-        }
-      }
-    });
     borderPane.prefHeightProperty().bind(scene.heightProperty());
     borderPane.prefWidthProperty().bind(scene.widthProperty());
   }

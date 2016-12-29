@@ -1,5 +1,7 @@
 1.4.2 - TBD
 
+* Added support for multiple resource packs. The resource pack
+  load order can be changed via Options->Edit resource packs.
 * Added rendering for Minecraft 1.11 blocks:
     * Observer Block
     * Shulker Box

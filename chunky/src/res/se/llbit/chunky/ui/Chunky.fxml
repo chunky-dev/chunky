@@ -164,8 +164,7 @@
                                 <content>
                                     <VBox spacing="10.0">
                                        <children>
-                                          <Button fx:id="loadResourcePackBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Load resource pack" />
-                                          <Button fx:id="loadDefaultTexturesBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Load default textures" />
+                                          <Button fx:id="editResourcePacks" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Edit resource packs" />
                                           <CheckBox fx:id="singleColorBtn" mnemonicParsing="false" text="Single color textures (needs restart)" />
                                           <CheckBox fx:id="showLauncherBtn" mnemonicParsing="false" text="Show launcher when starting Chunky" />
                                           <Separator prefWidth="200.0" />
