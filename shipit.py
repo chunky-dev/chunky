@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
 
-# required python libs: PRAW, launchpadlib, simplejson
+# required python libs: PRAW (4.1.0), launchpadlib, simplejson
 # required external tools: Wine, NSIS (2.46)
 # requires appbundler and hdiutil for Mac build
 # requires gpg 1.4.19
@@ -297,28 +297,33 @@ def reddit_login():
 		id = credentials.get('reddit client ID')
 		secret = credentials.get('reddit client secret')
 		try:
-			r = praw.Reddit(user_agent='praw:se.llbit.chunky.releasebot:v1.1 (by /u/llbit)')
-			r.set_oauth_app_info(
-				client_id=id,
-				client_secret=secret,
-				redirect_uri='http://localhost:8181/q')
+			ua_string = 'praw:se.llbit.chunky.releasebot:v1.1 (by /u/llbit)'
 			refresh_token = credentials.get_noninteractive('refresh_token')
 			if refresh_token:
-				access_info = r.refresh_access_information(refresh_token)
+				r = praw.Reddit(
+						client_id=id,
+						client_secret=secret,
+						redirect_uri='http://localhost:8181/q',
+						refresh_token=refresh_token,
+						user_agent=ua_string)
 			else:
+				r = praw.Reddit(
+						client_id=id,
+						client_secret=secret,
+						redirect_uri='http://localhost:8181/q',
+						user_agent=ua_string)
 				rand_str = join(random.choice(string.lowercase + string.digits) for i in range(10))
-				url = r.get_authorize_url(rand_str, 'submit modposts modflair', True)
+				url = r.auth.url(['read', 'submit', 'flair', 'modposts', 'modflair'], rand_str, 'permanent')
+				print("state: %s" % rand_str)
 				print("Visit the Reddit authorization URL:")
 				print(url)
-				code = credentials.get('reddit access code')
-				access_info = r.get_access_information(code)
-				credentials.put('refresh_token', access_info['refresh_token'])
-			r.set_access_credentials(**access_info)
+				code = raw_input('Enter access code (from result URL): ')
+				refresh_token = r.auth.authorize(code)
+				credentials.put('refresh_token', refresh_token)
 			return r
-		except praw.errors.InvalidUserPass:
-			credentials.remove('reddit user')
-			credentials.remove('reddit password')
-			print("Login failed, please try again")
+		except:
+			if raw_input('Login failed. Try again? [y/N] ') != "y":
+				raise
 
 def ftp_login():
 	while True:
@@ -567,6 +572,12 @@ exe.dl.link=%s
 dmg.dl.link=%s
 zip.dl.link=%s''' % (version.milestone, exe_url, dmg_url, zip_url))
 
+"Set a Reddit submission to be an announcement"
+def set_announcement(post):
+	flair = next(x for x in post.flair.choices()
+			if x['flair_css_class'] == 'announcement')['flair_template_id']
+	post.flair.select(flair, 'announcement')
+
 "post reddit release thread"
 def post_release_thread(version):
 	try:
@@ -576,17 +587,17 @@ def post_release_thread(version):
 		print("Error: reddit post must be in build/release_notes-%s.md" % version.full)
 		return
 	r = reddit_login()
-	post = r.submit('chunky', 'Chunky %s released!' % version.full,
-		text=text)
-	post.set_flair('announcement', 'announcement')
-	post.sticky()
+	post = r.subreddit('chunky').submit('Chunky %s released!' % version.full,
+		selftext=text)
+	set_announcement(post)
+	post.mod.sticky()
 	print("Submitted release thread!")
 
 "post reddit release thread"
 def post_snapshot_thread(version):
 	r = reddit_login()
-	post = r.submit('chunky', 'Chunky Snapshot %s' % version.full,
-		text='''## Snapshot %s
+	post = r.subreddit('chunky').submit('Chunky Snapshot %s' % version.full,
+		selftext='''## Snapshot %s
 
 A new snapshot for Chunky is now available. The snapshot is mostly untested,
 so please make sure to backup your scenes before using it.
@@ -602,7 +613,7 @@ so please make sure to backup your scenes before using it.
 ## ChangeLog
 
 ''' % (version.full, version.release_notes) + version.changelog)
-	post.set_flair('announcement', 'announcement')
+	set_announcement(post)
 	print("Submitted snapshot thread!")
 
 "patch url into latest.json"
@@ -633,6 +644,7 @@ options = {
 	'ftp': False,
 	'docs': False,
 	'snapshot': False,
+	'prawdebug': False,
 	'sign': False,
 	'launcher': False,
 	'testnsis': False
@@ -669,6 +681,14 @@ for arg in sys.argv[1:]:
 
 try:
 	credentials = Credentials()
+
+	if options['prawdebug']:
+		r = reddit_login()
+		post = r.subreddit('chunky').submit('Test post',
+				selftext='Debugging the reddit bot.')
+		print(post.flair.choices())
+		set_announcement(post)
+		sys.exit(0)
 
 	if options['launcher']:
 		publish_launcher(version)
