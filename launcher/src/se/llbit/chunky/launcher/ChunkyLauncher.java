@@ -104,14 +104,19 @@ public class ChunkyLauncher {
               System.out.println("Checking for Chunky alpha/snapshot updates..");
               settings.downloadSnapshots = true;
             } else {
-              System.out.println("Checking for Chunky updates..");
+              System.out.println("Checking for updates..");
             }
             UpdateChecker updateThread = new UpdateChecker(settings, new UpdateListener() {
               @Override public void updateError(String message) {
               }
 
               @Override public void updateAvailable(VersionInfo latest) {
-                System.out.println("Updating/downloading Chunky version " + latest + ":");
+                try {
+                  headlessCreateSettingsDirectory();
+                } catch (FileNotFoundException e) {
+                  throw new Error(e);
+                }
+                System.out.println("Downloading Chunky " + latest + ":");
                 ConsoleUpdater.update(latest);
               }
 
