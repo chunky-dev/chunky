@@ -230,7 +230,15 @@ public class ChunkyLauncher {
       }
     }
     if (directory != null) {
+      // Initialize empty settings files.
       File settingsFile = new File(directory, PersistentSettings.SETTINGS_FILE);
+      if (!settingsFile.exists()) {
+        try (PrintStream out = new PrintStream(new FileOutputStream(settingsFile))) {
+          // Create an empty settings file (default settings will be used).
+          out.println("{}");
+        }
+      }
+      settingsFile = new File(directory, LauncherSettings.LAUNCHER_SETTINGS_FILE);
       if (!settingsFile.exists()) {
         try (PrintStream out = new PrintStream(new FileOutputStream(settingsFile))) {
           // Create an empty settings file (default settings will be used).
