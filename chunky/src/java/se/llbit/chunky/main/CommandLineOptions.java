@@ -454,10 +454,11 @@ public class CommandLineOptions {
       System.err.println("Available scenes:");
       for (File file : fileList) {
         String name = file.getName();
-        name = name.substring(0,
-            name.length() - Scene.EXTENSION.length());
+        name = name.substring(0, name.length() - Scene.EXTENSION.length());
         System.err.println("\t" + name);
       }
+    } else {
+      System.err.println("No scenes found. Is the scene directory correct?");
     }
   }
 
