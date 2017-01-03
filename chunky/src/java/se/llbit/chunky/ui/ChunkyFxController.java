@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.ui;
 
-import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -429,16 +428,16 @@ public class ChunkyFxController
   public void setStageAndScene(ChunkyFx app, Stage stage, Scene scene) {
     this.stage = stage;
     documentationLink.setOnAction(
-        e -> HostServicesFactory.getInstance(app).showDocument("http://chunky.llbit.se"));
+        e -> app.getHostServices().showDocument("http://chunky.llbit.se"));
 
-    issueTrackerLink.setOnAction(e -> HostServicesFactory.getInstance(app)
-        .showDocument("https://github.com/llbit/chunky/issues"));
+    issueTrackerLink.setOnAction(
+        e -> app.getHostServices().showDocument("https://github.com/llbit/chunky/issues"));
 
     gitHubLink.setOnAction(
-        e -> HostServicesFactory.getInstance(app).showDocument("https://github.com/llbit/chunky"));
+        e -> app.getHostServices().showDocument("https://github.com/llbit/chunky"));
 
     forumLink.setOnAction(
-        e -> HostServicesFactory.getInstance(app).showDocument("https://www.reddit.com/r/chunky"));
+        e -> app.getHostServices().showDocument("https://www.reddit.com/r/chunky"));
 
     stage.setOnCloseRequest(event -> {
       Platform.exit();
