@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.map;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
@@ -26,10 +25,10 @@ import se.llbit.chunky.ui.MapViewMode;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
+import se.llbit.png.PngFileWriter;
 import se.llbit.util.RingBuffer;
+import se.llbit.util.TaskTracker;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.IntBuffer;
@@ -282,8 +281,13 @@ public class MapBuffer {
     updateActiveTiles(view, true);
   }
 
-  public void renderPng(File targetFile) throws IOException {
-    BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
-    ImageIO.write(bufferedImage, "PNG", targetFile);
+  public synchronized void renderPng(File targetFile) throws IOException {
+    int width = view.width;
+    int height = view.height;
+    int[] pixels = new int[width * height];
+    image.getPixelReader().getPixels(0, 0, width, height, PIXEL_FORMAT, pixels, 0, width);
+    try (PngFileWriter pngWriter = new PngFileWriter(targetFile)) {
+      pngWriter.write(pixels, width, height, TaskTracker.Task.NONE);
+    }
   }
 }
