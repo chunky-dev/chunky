@@ -417,10 +417,10 @@ public class CommandLineOptions {
 
     if (!configurationError && mode != Mode.NOTHING && mode != Mode.SNAPSHOT) {
       if (options.texturePack != null && !options.texturePack.isEmpty()) {
-        TexturePackLoader.loadTexturePacks(options.texturePack.split(File.pathSeparator), false);
+        TexturePackLoader.loadTexturePacks(options.texturePack, false);
       } else {
         @NotNull String lastTexturePack = PersistentSettings.getLastTexturePack();
-        TexturePackLoader.loadTexturePacks(lastTexturePack.split(File.pathSeparator), false);
+        TexturePackLoader.loadTexturePacks(lastTexturePack, false);
       }
     }
   }

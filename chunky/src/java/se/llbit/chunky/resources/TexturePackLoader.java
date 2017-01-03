@@ -1709,6 +1709,25 @@ public class TexturePackLoader {
 
   /**
    * Load textures from some resource packs.
+   * @param texturePacks The paths to texture packs to be loaded, as a path list.
+   * Texture packs are loaded in the order of the paths in this argument.
+   * Paths are separated by the system path separator.
+   * @param remember Decides if the texture packs should be saved as the
+   * last used texture pack.
+   */
+  public static void loadTexturePacks(@NotNull String texturePacks, boolean remember) {
+    String pathList = texturePacks.trim();
+    String[] packs;
+    if (!texturePacks.isEmpty()) {
+      packs = pathList.split(File.pathSeparator);
+    } else {
+      packs = new String[0];
+    }
+    loadTexturePacks(packs, remember);
+  }
+
+  /**
+   * Load textures from some resource packs.
    * @param texturePacks The paths to texture packs to be loaded.
    * Texture packs are loaded in the order of the paths in this argument.
    * @param remember Decides if the texture packs should be saved as the
@@ -1717,14 +1736,16 @@ public class TexturePackLoader {
   public static void loadTexturePacks(@NotNull String[] texturePacks, boolean remember) {
     Set<Map.Entry<String, TextureLoader>> toLoad = allTextures.entrySet();
     for (String path : texturePacks) {
-      File file = new File(path);
-      if (!file.isFile()) {
-        Log.error("Could not open texture pack: " + file.getAbsolutePath());
-      }
-      Log.infof("Loading %d textures from %s", toLoad.size(), file.getAbsolutePath());
-      toLoad = loadTextures(file, toLoad);
-      if (toLoad.isEmpty()) {
-        break;
+      if (!path.isEmpty()) {
+        File file = new File(path);
+        if (!file.isFile()) {
+          Log.error("Could not open texture pack: " + file.getAbsolutePath());
+        }
+        Log.infof("Loading %d textures from %s", toLoad.size(), file.getAbsolutePath());
+        toLoad = loadTextures(file, toLoad);
+        if (toLoad.isEmpty()) {
+          break;
+        }
       }
     }
     if (!toLoad.isEmpty()) {
