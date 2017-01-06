@@ -5,6 +5,7 @@ println "Building version ${project.version}"
 subprojects {
 
 	apply plugin: 'java'
+	apply plugin: 'jacoco'
 
 	group = 'se.llbit'
 	version = rootProject.version
@@ -31,6 +32,16 @@ subprojects {
 	dependencies {
 		jastadd 'org.jastadd:jastadd:2.1.13'
 	}
+
+	// Code coverage with Jacoco:
+	jacocoTestReport {
+		reports {
+			xml.enabled = true
+			html.enabled = true
+		}
+	}
+
+	check.dependsOn jacocoTestReport
 }
 
 defaultTasks 'releaseJar'

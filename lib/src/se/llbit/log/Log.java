@@ -39,9 +39,19 @@ public class Log {
     }
   }
 
-  public static void setReceiver(Receiver recv, Level... levels) {
+  public static void setLevel(Level level) {
+    Log.level = level;
+  }
+
+  public static void setReceiver(Receiver receiver, Level... levels) {
+    if (receiver == null) {
+      throw new IllegalArgumentException("Can't set a null receiver.");
+    }
+    if (levels == null || levels.length == 0) {
+      throw new IllegalArgumentException("No log level specified for receiver.");
+    }
     for (Level level : levels) {
-      receiver[level.ordinal()] = recv;
+      Log.receiver[level.ordinal()] = receiver;
     }
   }
 
