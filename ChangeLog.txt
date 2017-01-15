@@ -12,6 +12,10 @@
 * Updated command block rendering to be compatible with Minecraft 1.9+.
 * Added scale setting for player entities.
 * Improved error checking for resource packs.
+* Fixed rendering errors for trapdoors, redstone dust, and comparator blocks.
+* The --update command now creates a settings directory if needed.
+* Default settings should be generated when running headless commands for the
+  first time.
 
 1.4.1 - 2016-10-22
 
