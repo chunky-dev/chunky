@@ -20,9 +20,11 @@ import se.llbit.chunky.Plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,12 +63,12 @@ public class ChunkyPlugin {
     try {
       Map<String, String> env = new HashMap<>();
       env.put("create", "true");
-      PluginMeta meta = PluginMeta.loadFromJson(
-          FileSystems.newFileSystem(
-              URI.create("jar:file:" + pluginJar.getAbsolutePath()),
-              env
-          ).getPath("/plugin.json").toUri().toURL().openStream()
-      );
+
+      PluginMeta meta;
+      try (FileSystem zipFs = FileSystems.newFileSystem(URI.create("jar:file:" + pluginJar.getAbsolutePath()), env);
+           InputStream in = zipFs.getPath("/plugin.json").toUri().toURL().openStream()) {
+        meta = PluginMeta.loadFromJson(in);
+      }
 
       URLClassLoader classLoader = new URLClassLoader(new URL[]{pluginJar.toURI().toURL()});
       Class<?> pluginClass = classLoader.loadClass(meta.getPluginClassName());
