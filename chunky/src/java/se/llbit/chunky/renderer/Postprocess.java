@@ -36,6 +36,12 @@ public enum Postprocess {
     @Override public String toString() {
       return "Tonemap operator 1";
     }
+  },
+  TONEMAP2 {
+    @Override public String toString() { return "ACES filmic tone mapping"; }
+  },
+  TONEMAP3 {
+    @Override public String toString() { return "Hable tonemapping"; }
   };
 
   public static final Postprocess DEFAULT = GAMMA;
