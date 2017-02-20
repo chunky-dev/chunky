@@ -1946,7 +1946,9 @@ public class Scene implements JsonSerializable, Refreshable {
           float hD = 0.20f;
           float hE = 0.02f;
           float hF = 0.30f;
-          r *= 16; // manually adjust exposure to approx. match other post-processing modes
+          // This adjusts the exposure by a factor of 16 so that the resulting exposure approximately matches the other
+          // post-processing methods. Without this, the image would be very dark.
+          r *= 16;
           g *= 16;
           b *= 16;
           r = ((r * (hA * r + hC * hB) + hD * hE) / (r * (hA * r + hB) + hD * hF)) - hE / hF;

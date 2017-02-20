@@ -38,10 +38,14 @@ public enum Postprocess {
     }
   },
   TONEMAP2 {
-    @Override public String toString() { return "ACES filmic tone mapping"; }
+    @Override public String toString() {
+      return "ACES filmic tone mapping";
+    }
   },
   TONEMAP3 {
-    @Override public String toString() { return "Hable tonemapping"; }
+    @Override public String toString() {
+      return "Hable tonemapping";
+    }
   };
 
   public static final Postprocess DEFAULT = GAMMA;
