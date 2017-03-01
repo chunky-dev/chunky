@@ -24,7 +24,10 @@ import java.io.InputStream;
 import java.util.zip.ZipFile;
 
 /**
- * A texture that has an indexed position in terrain.pngggu
+ * A texture indexed by position in Minecraft's old terrain.png.
+ *
+ * <p>This kind of texture has largely become obsolete since all
+ * textures are now stored as individual PNGs.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */

@@ -216,3 +216,14 @@ task macDist(dependsOn: 'releaseJar') {
 task install(dependsOn: ':chunky:install')
 
 task uploadArchives(dependsOn: ':chunky:uploadArchives')
+
+// Includes both main and library documentation:
+task docs(type: Javadoc) {
+		options.encoding = 'UTF-8'
+		options.addStringOption('Xdoclint:none', '-quiet')
+
+		def docProjects = [ ':chunky', ':lib' ]
+		source docProjects.collect { project(it).sourceSets.main.allJava }
+		classpath = files(docProjects.collect { project(it).sourceSets.main.compileClasspath })
+		destinationDir = file("${buildDir}/docs/javadoc")
+}
