@@ -22,7 +22,6 @@ import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.json.JsonObject;
-import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 
 import java.util.ArrayList;
@@ -74,13 +73,7 @@ public class TestBlankRender {
 
   private static void renderAndCheckSamples(Scene scene, double[] expected)
       throws InterruptedException {
-    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
-    RenderContext context = new RenderContext(chunky);
-    RenderManager renderer = new RenderManager(context, true);
-    renderer.setSceneProvider(new MockSceneProvider(scene));
-    renderer.start();
-    renderer.join();
-    double[] samples = renderer.getBufferedScene().getSampleBuffer();
+    double[] samples = render(scene);
     int offset = 0;
     for (int i = 0; i < WIDTH * HEIGHT; ++i) {
       // Check each channel value:
@@ -93,6 +86,29 @@ public class TestBlankRender {
         }
       }
       offset += 3;
+    }
+  }
+
+  /** Renders a scene and returns the resulting sample buffer. */
+  private static double[] render(Scene scene) throws InterruptedException {
+    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
+    RenderContext context = new RenderContext(chunky);
+    RenderManager renderer = new RenderManager(context, true);
+    renderer.setSceneProvider(new MockSceneProvider(scene));
+    renderer.start();
+    renderer.join();
+    return renderer.getBufferedScene().getSampleBuffer();
+  }
+
+  /** Compares two sample buffers. */
+  private static void compareSamples(double[] expected, double[] actual, int size, double delta)
+      throws InterruptedException {
+    for (int i = 0; i < size; ++i) {
+      if (actual[i] < expected[i] - delta || actual[i] > expected[i] + delta) {
+        assertEquals("Sampled pixel is outside expected value range.",
+            expected[i], actual[i], delta);
+        fail("Sampled pixel is outside expected value range.");
+      }
     }
   }
 
@@ -127,7 +143,7 @@ public class TestBlankRender {
   }
 
   /**
-   * Render with a gray sky.
+   * Test that render output is correct after JSON export/import.
    */
   @Test public void testJsonRoundTrip1() throws InterruptedException {
     final Scene scene = new Scene();
@@ -144,5 +160,27 @@ public class TestBlankRender {
     scene.fromJson(json);
     scene.setRenderMode(RenderMode.RENDERING); // Un-pause after JSON import.
     renderAndCheckSamples(scene, new double[] {0.5, 1, 0.25});
+  }
+
+  /**
+   * Test that render output is correct after JSON export/import.
+   */
+  @Test public void testJsonRoundTrip2() throws InterruptedException {
+    final Scene scene = new Scene();
+    scene.setTargetSpp(2);
+    scene.setName("json2");
+    scene.setCanvasSize(WIDTH, HEIGHT);
+    scene.setRenderMode(RenderMode.RENDERING);
+    scene.sky().setSkyMode(Sky.SkyMode.SIMULATED);
+
+    int size = 3 * WIDTH * HEIGHT;
+    double[] samples1 = new double[size];
+    System.arraycopy(render(scene), 0, samples1, 0, size);
+
+    JsonObject json = scene.toJson();
+    scene.fromJson(json);
+    scene.setRenderMode(RenderMode.RENDERING); // Un-pause after JSON import.
+
+    compareSamples(samples1, render(scene), size, 0.05);
   }
 }
