@@ -16,7 +16,9 @@
  */
 package se.llbit.json;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -32,6 +34,8 @@ import static org.junit.Assert.assertTrue;
  * Tests for the Chunky JSON library.
  */
 public class TestJson {
+  @Rule public ExpectedException thrown = ExpectedException.none();
+
   private static JsonValue parse(String json) throws IOException, JsonParser.SyntaxError {
     InputStream input = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
     try (JsonParser parser = new JsonParser(input)) {
@@ -42,6 +46,33 @@ public class TestJson {
   /** Possible to parse empty objects. */
   @Test public void testEmptyObject() throws IOException, JsonParser.SyntaxError {
     assertEquals(0, parse("{}").object().getNumMember());
+  }
+
+  /** Simple JSON object. */
+  @Test public void testObject1() throws IOException, JsonParser.SyntaxError {
+    JsonObject object = parse("{\"a\":\"a\", \"b\": -1}").object();
+    assertEquals(2, object.getNumMember());
+    assertEquals("a", object.get("a").stringValue(""));
+    assertEquals(-1, object.get("b").intValue(8));
+  }
+
+  /** Nested objects. */
+  @Test public void testObject2() throws IOException, JsonParser.SyntaxError {
+    JsonObject object = parse("{\"a\": {\"x\": true, \"y\": {\"z\":16.0}}, \"b\": []}").object();
+    assertEquals(2, object.getNumMember());
+    assertEquals(2, object.get("a").object().getNumMember());
+    assertEquals(true, object.get("a").object().get("x").boolValue(false));
+    assertEquals(1, object.get("a").object().get("y").object().getNumMember());
+    assertEquals(16, object.get("a").object().get("y").object().get("z").doubleValue(0), 0.01);
+    assertTrue(object.get("b").isArray());
+  }
+
+  /** Only the first duplicate member name can be indexed in an object. */
+  @Test public void testObject3() throws IOException, JsonParser.SyntaxError {
+    assertEquals("first", parse("{\"x\" : \"first\", \"x\" : \"second\"}")
+        .object().get("x").stringValue(""));
+    assertEquals(-10, parse("{\"bort\" : 3, \"x\" : -10, \"x\" : null}")
+        .object().get("x").intValue(0));
   }
 
   /** Possible to parse empty arrays. */
@@ -72,6 +103,23 @@ public class TestJson {
   }
 
   /** Test numbers. */
+  @Test public void testBool() throws IOException, JsonParser.SyntaxError {
+    JsonArray array = parse("[true, false]").array();
+    assertEquals(true, array.get(0).boolValue(false));
+    assertEquals(false, array.get(1).boolValue(true));
+  }
+
+  /**
+   * Test null value.
+   *
+   * <p>The JSON null value is not used in Chunky.
+   */
+  @Test public void testNull() throws IOException, JsonParser.SyntaxError {
+    JsonArray array = parse("[null]").array();
+    assertTrue(array.get(0) instanceof JsonNull);
+  }
+
+  /** Test numbers. */
   @Test public void testNumber1() throws IOException, JsonParser.SyntaxError {
     JsonArray array = parse("[0, 1, 2, 3]").array();
     assertEquals(0, array.get(0).intValue(-1));
@@ -90,11 +138,19 @@ public class TestJson {
     assertEquals(true, array.get(4001).boolValue(true));
   }
 
-  /** Undefined value is replaced by the given defaults. */
-  @Test public void testUndefined1() throws IOException, JsonParser.SyntaxError {
+  /** Unknown value is replaced by the given defaults. */
+  @Test public void testUnknown1() throws IOException, JsonParser.SyntaxError {
     JsonArray array = parse("[]").array();
     assertEquals("bort", array.get(0).stringValue("bort"));
     assertEquals(true, array.get(1).boolValue(true));
+  }
+
+  /** Unknown is returned when accessing non-existing member. */
+  @Test public void testUnknown2() throws IOException, JsonParser.SyntaxError {
+    JsonObject object = parse("{\"xyz\" : 123}").object();
+    assertTrue(object.get("bort").isUnknown());
+    assertTrue(object.get("123").isUnknown());
+    assertFalse(object.get("xyz").isUnknown());
   }
 
   /** Inconvertible types result in the given defaults. */
@@ -102,5 +158,97 @@ public class TestJson {
     JsonArray array = parse("[1, false]").array();
     assertEquals("bort", array.get(0).stringValue("bort"));
     assertEquals(100, array.get(1).intValue(100));
+  }
+
+  /** Values can be surrounded by whitespace. */
+  @Test public void testWhitespace() throws IOException, JsonParser.SyntaxError {
+    assertEquals(2, parse("[1,      2]").array().getNumElement());
+    assertEquals(2, parse("\t  [1, \n2, 3]\r").array().get(1).intValue(0));
+    assertEquals(3, parse("\t  [1, \n2, 3]\r").array().get(2).intValue(0));
+    assertEquals(3, parse("{\"x\"   \n\r\t   :3}").object().get("x").intValue(0));
+  }
+
+  /** Trailing comma in array. */
+  @Test public void testSyntaxError1() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("[1,2,]");
+  }
+
+  /** Unmatched left brace. */
+  @Test public void testSyntaxError2() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("{ ");
+  }
+
+  /** Unmatched right brace. */
+  @Test public void testSyntaxError3() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("{ \"x\" : 123 } }");
+  }
+
+  /** Unclosed quote. */
+  @Test public void testSyntaxError4() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("[\",2]");
+  }
+
+  /** Stuttered comma in array. */
+  @Test public void testSyntaxError5() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("[1,,2]");
+  }
+
+  /** Unmatched left bracket. */
+  @Test public void testSyntaxError6() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("[");
+  }
+
+  /** Unmatched right bracket. */
+  @Test public void testSyntaxError7() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("]");
+  }
+
+  /** Missing colon after member name. */
+  @Test public void testSyntaxError8() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("{\"01\" 23}");
+  }
+
+  /** Misplaced colon in object. */
+  @Test public void testSyntaxError9() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("{\"01\" : 23 :}");
+  }
+
+  /** Misplaced stuttered colon in object. */
+  @Test public void testSyntaxError10() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("{\"01\" :: 23}");
+  }
+
+  /** Misspelled keyword. */
+  @Test public void testSyntaxError11() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("[tru]");
+  }
+
+  /** Misspelled keyword (incorrect capitalization). */
+  @Test public void testSyntaxError12() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("[False]");
+  }
+
+  /** Misspelled keyword. */
+  @Test public void testSyntaxError13() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("[nul]");
+  }
+
+  /** Missing comma in object. */
+  @Test public void testSyntaxError14() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    parse("{\"01\" : 23 \"45\" : 67}");
   }
 }
