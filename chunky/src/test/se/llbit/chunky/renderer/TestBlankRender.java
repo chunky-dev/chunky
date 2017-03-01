@@ -21,6 +21,7 @@ import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
+import se.llbit.json.JsonObject;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
@@ -40,7 +42,7 @@ public class TestBlankRender {
   private static final int WIDTH = Math.max(10, Scene.MIN_CANVAS_WIDTH);
   private static final int HEIGHT = Math.max(10, Scene.MIN_CANVAS_HEIGHT);
 
-  class MockSceneProvider implements SceneProvider {
+  static class MockSceneProvider implements SceneProvider {
     private final Scene scene;
     private boolean change = true;
 
@@ -70,37 +72,47 @@ public class TestBlankRender {
     }
   }
 
+  private static void renderAndCheckSamples(Scene scene, double[] expected)
+      throws InterruptedException {
+    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
+    RenderContext context = new RenderContext(chunky);
+    RenderManager renderer = new RenderManager(context, true);
+    renderer.setSceneProvider(new MockSceneProvider(scene));
+    renderer.start();
+    renderer.join();
+    double[] samples = renderer.getBufferedScene().getSampleBuffer();
+    int offset = 0;
+    for (int i = 0; i < WIDTH * HEIGHT; ++i) {
+      // Check each channel value:
+      for (int cc = 0; cc < 3; ++cc) {
+        if (samples[offset + cc] < expected[cc] - 0.005
+            || samples[offset + cc] > expected[cc] + 0.005) {
+          assertEquals("Sampled pixel is outside expected value range.",
+              expected[cc], samples[offset + cc], 0.005);
+          fail("Sampled pixel is outside expected value range.");
+        }
+      }
+      offset += 3;
+    }
+  }
+
   /**
    * Render with a fully black sky.
    */
   @Test public void testBlackRender() throws InterruptedException {
-    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
-    RenderContext context = new RenderContext(chunky);
-    RenderManager renderer = new RenderManager(context, true);
     final Scene scene = new Scene();
     scene.setCanvasSize(WIDTH, HEIGHT);
     scene.setRenderMode(RenderMode.RENDERING);
     scene.setTargetSpp(2);
     scene.setName("foobar");
     scene.sky().setSkyMode(Sky.SkyMode.BLACK);
-    renderer.setSceneProvider(new MockSceneProvider(scene));
-    renderer.start();
-    renderer.join();
-    double[] samples = renderer.getBufferedScene().getSampleBuffer();
-    for (int i = 0; i < 3 * WIDTH * HEIGHT; ++i) {
-      if (samples[i] > Ray.EPSILON) {
-        fail("Sampled pixel is outside expected value range.");
-      }
-    }
+    renderAndCheckSamples(scene, new double[] {0, 0, 0});
   }
 
   /**
    * Render with a gray sky.
    */
   @Test public void testGrayRender() throws InterruptedException {
-    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
-    RenderContext context = new RenderContext(chunky);
-    RenderManager renderer = new RenderManager(context, true);
     final Scene scene = new Scene();
     scene.setCanvasSize(WIDTH, HEIGHT);
     scene.setRenderMode(RenderMode.RENDERING);
@@ -110,15 +122,27 @@ public class TestBlankRender {
     white.add(new Vector4(0.5, 0.5, 0.5, 1));
     scene.sky().setGradient(white);
     scene.setTargetSpp(2);
-    scene.setName("foobar");
-    renderer.setSceneProvider(new MockSceneProvider(scene));
-    renderer.start();
-    renderer.join();
-    double[] samples = renderer.getBufferedScene().getSampleBuffer();
-    for (int i = 0; i < 3 * WIDTH * HEIGHT; ++i) {
-      if (samples[i] < 0.5 - Ray.EPSILON || samples[i] > 0.5 + Ray.EPSILON) {
-        fail("Sampled pixel is outside expected value range.");
-      }
-    }
+    scene.setName("gray");
+    renderAndCheckSamples(scene, new double[] {0.5, 0.5, 0.5});
+  }
+
+  /**
+   * Render with a gray sky.
+   */
+  @Test public void testJsonRoundTrip1() throws InterruptedException {
+    final Scene scene = new Scene();
+    scene.setCanvasSize(WIDTH, HEIGHT);
+    scene.setRenderMode(RenderMode.RENDERING);
+    scene.sky().setSkyMode(Sky.SkyMode.GRADIENT);
+    List<Vector4> white = new ArrayList<>();
+    white.add(new Vector4(0.5, 1, 0.25, 0));
+    white.add(new Vector4(0.5, 1, 0.25, 1));
+    scene.sky().setGradient(white);
+    scene.setTargetSpp(2);
+    scene.setName("json1");
+    JsonObject json = scene.toJson();
+    scene.fromJson(json);
+    scene.setRenderMode(RenderMode.RENDERING); // Un-pause after JSON import.
+    renderAndCheckSamples(scene, new double[] {0.5, 1, 0.25});
   }
 }
