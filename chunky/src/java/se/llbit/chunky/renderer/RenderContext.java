@@ -37,6 +37,7 @@ public class RenderContext {
 
   protected final Chunky chunky;
   protected final ChunkyOptions config;
+  public AbstractRenderManager.WorkerFactory workerFactory = RenderWorker::new;
 
   /**
    * Construct a new render context.

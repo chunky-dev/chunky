@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer;
 import org.junit.Test;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
+import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.json.JsonObject;
@@ -91,8 +92,14 @@ public class TestBlankRender {
 
   /** Renders a scene and returns the resulting sample buffer. */
   private static double[] render(Scene scene) throws InterruptedException {
-    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
+    // A single worker thread is used, with fixed PRNG seed.
+    // This makes the path tracing results deterministic.
+    ChunkyOptions options = ChunkyOptions.getDefaults();
+    options.renderThreads = 1;
+    Chunky chunky = new Chunky(options);
     RenderContext context = new RenderContext(chunky);
+    context.workerFactory =
+        (renderManager, index, seed) -> new RenderWorker(renderManager, index, 0);
     RenderManager renderer = new RenderManager(context, true);
     renderer.setSceneProvider(new MockSceneProvider(scene));
     renderer.start();
@@ -172,6 +179,8 @@ public class TestBlankRender {
     scene.setCanvasSize(WIDTH, HEIGHT);
     scene.setRenderMode(RenderMode.RENDERING);
     scene.sky().setSkyMode(Sky.SkyMode.SIMULATED);
+    scene.camera().setProjectionMode(ProjectionMode.PANORAMIC);
+    scene.camera().setFoV(100);
 
     int size = 3 * WIDTH * HEIGHT;
     double[] samples1 = new double[size];
@@ -181,6 +190,6 @@ public class TestBlankRender {
     scene.fromJson(json);
     scene.setRenderMode(RenderMode.RENDERING); // Un-pause after JSON import.
 
-    compareSamples(samples1, render(scene), size, 0.05);
+    compareSamples(samples1, render(scene), size, 0.005);
   }
 }

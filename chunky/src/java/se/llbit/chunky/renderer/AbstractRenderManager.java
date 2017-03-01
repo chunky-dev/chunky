@@ -27,6 +27,12 @@ import se.llbit.chunky.renderer.scene.Scene;
  */
 public abstract class AbstractRenderManager extends Thread {
 
+  @FunctionalInterface
+  public interface WorkerFactory {
+    RenderWorker buildWorker(AbstractRenderManager renderer, int index, long seed);
+  }
+
+  protected final WorkerFactory workerFactory;
   protected SceneProvider sceneProvider;
   private RayTracer previewRayTracer;
   private RayTracer rayTracer;
@@ -38,6 +44,7 @@ public abstract class AbstractRenderManager extends Thread {
     this.tileWidth = context.tileWidth();
     previewRayTracer = context.getChunky().getPreviewRayTracerFactory().newRayTracer();
     rayTracer = context.getChunky().getRayTracerFactory().newRayTracer();
+    workerFactory = context.workerFactory;
   }
 
   /**

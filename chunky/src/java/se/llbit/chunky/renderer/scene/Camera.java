@@ -627,6 +627,7 @@ public class Camera implements JsonSerializable {
     calcViewRay(ray, target.x, target.y);
   }
 
+  /** Sets the target position (where autofocus is calculated). */
   public void setTarget(double x, double y) {
     target.set(x, y);
   }

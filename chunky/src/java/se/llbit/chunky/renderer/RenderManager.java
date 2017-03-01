@@ -121,7 +121,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
       }
       // Start additional workers.
       for (; i < numThreads; ++i) {
-        pool[i] = new RenderWorker(this, i, seed + i);
+        pool[i] = workerFactory.buildWorker(this, i, seed + i);
         pool[i].start();
       }
       // Stop extra workers.
