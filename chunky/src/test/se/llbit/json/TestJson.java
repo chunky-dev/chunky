@@ -75,6 +75,27 @@ public class TestJson {
         .object().get("x").intValue(0));
   }
 
+  /** Accessing object members with strange names. */
+  @Test public void testObject4() {
+    JsonObject object = new JsonObject();
+    object.add("\"", 1);
+    object.add("\\", 2);
+    object.add("\n", 3);
+    object.add("\r", 4);
+    object.add("\t", 5);
+    object.add("\b", 6);
+    object.add("\f", 7);
+    object.add(" ", 8);
+    assertEquals(1, object.get("\"").intValue(0));
+    assertEquals(2, object.get("\\").intValue(0));
+    assertEquals(3, object.get("\n").intValue(0));
+    assertEquals(4, object.get("\r").intValue(0));
+    assertEquals(5, object.get("\t").intValue(0));
+    assertEquals(6, object.get("\b").intValue(0));
+    assertEquals(7, object.get("\f").intValue(0));
+    assertEquals(8, object.get(" ").intValue(0));
+  }
+
   /** Possible to parse empty arrays. */
   @Test public void testEmptyArray() throws IOException, JsonParser.SyntaxError {
     assertEquals(0, parse("[]").array().getNumElement());
@@ -171,84 +192,126 @@ public class TestJson {
   /** Trailing comma in array. */
   @Test public void testSyntaxError1() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: missing element in array");
     parse("[1,2,]");
   }
 
   /** Unmatched left brace. */
   @Test public void testSyntaxError2() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: unexpected end of input (expected '}')");
     parse("{ ");
   }
 
   /** Unmatched right brace. */
   @Test public void testSyntaxError3() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: garbage at end of input (unexpected '}')");
     parse("{ \"x\" : 123 } }");
   }
 
   /** Unclosed quote. */
   @Test public void testSyntaxError4() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: EOF while parsing JSON string (expected '\"')");
     parse("[\",2]");
   }
 
   /** Stuttered comma in array. */
   @Test public void testSyntaxError5() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: missing element in array");
     parse("[1,,2]");
   }
 
   /** Unmatched left bracket. */
   @Test public void testSyntaxError6() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: unexpected end of input (expected ']')");
     parse("[");
   }
 
   /** Unmatched right bracket. */
   @Test public void testSyntaxError7() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: expected JSON object or array");
     parse("]");
   }
 
   /** Missing colon after member name. */
   @Test public void testSyntaxError8() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: unexpected character (was '2', expected ':')");
     parse("{\"01\" 23}");
   }
 
   /** Misplaced colon in object. */
   @Test public void testSyntaxError9() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: unexpected character (was ':', expected '}')");
     parse("{\"01\" : 23 :}");
   }
 
   /** Misplaced stuttered colon in object. */
   @Test public void testSyntaxError10() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: missing value for object member");
     parse("{\"01\" :: 23}");
   }
 
   /** Misspelled keyword. */
   @Test public void testSyntaxError11() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: encountered invalid JSON literal");
     parse("[tru]");
   }
 
   /** Misspelled keyword (incorrect capitalization). */
   @Test public void testSyntaxError12() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: unexpected character (was 'F', expected ']')");
     parse("[False]");
   }
 
   /** Misspelled keyword. */
   @Test public void testSyntaxError13() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: encountered invalid JSON literal");
     parse("[nul]");
   }
 
   /** Missing comma in object. */
   @Test public void testSyntaxError14() throws IOException, JsonParser.SyntaxError {
     thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: unexpected character (was '\"', expected '}')");
     parse("{\"01\" : 23 \"45\" : 67}");
+  }
+
+  /** Empty string. */
+  @Test public void testSyntaxError15() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: expected JSON object or array");
+    parse("");
+  }
+
+  /** Just whitespace. */
+  @Test public void testSyntaxError16() throws IOException, JsonParser.SyntaxError {
+    thrown.expect(JsonParser.SyntaxError.class);
+    thrown.expectMessage("Syntax Error: expected JSON object or array");
+    parse(" \t\n\r   \t\n");
+  }
+
+  @Test public void testToCompactString() {
+    JsonArray array = new JsonArray();
+    array.add("!");
+    array.add(711);
+    JsonObject object = new JsonObject();
+    object.add(" ab cd", 123);
+    object.add("@", "''''");
+    object.add("\"\"", "\n\r");
+    object.add(".", array);
+
+    assertEquals("{\" ab cd\":123,\"@\":\"''''\",\"\\\"\\\"\":\"\\n\\r\",\".\":[\"!\",711]}",
+        object.toCompactString());
   }
 }

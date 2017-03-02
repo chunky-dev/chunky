@@ -1,35 +1,81 @@
+/* Copyright (c) 2013-2017 Jesper Öqvist <jesper.oqvist@gmail.com>
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 aspect StringEscape {
-	public static String ASTNode.escape(String value) {
-		char[] str = value.toCharArray();
-		StringBuilder sb = new StringBuilder(str.length);
-		for (int i = 0; i < str.length; ++i) {
-			switch (str[i]) {
-				case '"':
-					sb.append("\\\"");
-					break;
-				case '\\':
-					sb.append("\\\\");
-					break;
-				case '\n':
-					sb.append("\\n");
-					break;
-				case '\r':
-					sb.append("\\r");
-					break;
-				case '\t':
-					sb.append("\\t");
-					break;
-				case '\b':
-					sb.append("\\b");
-					break;
-				case '\f':
-					sb.append("\\f");
-					break;
-				default:
-					sb.append(str[i]);
+	/**
+	 * @return an escaped version of the input string where
+	 * special chars are escaped with reverse solidus.
+	 */
+	protected static String ASTNode.escape(String string) {
+		for (int i = 0; i < string.length(); ) {
+			int cp = string.codePointAt(i);
+			i += Character.charCount(cp);
+			switch (cp) {
+			case '"':
+			case '\\':
+			case '\n':
+			case '\r':
+			case '\t':
+			case '\b':
+			case '\f':
+				// These characters should be escaped.
+				return doStringEscape(string);
+			}
+		}
+		// Found no character that needs escaping.
+		return string;
+	}
+
+	/**
+	 * @return an escaped version of the input string where
+	 * special chars are escaped with reverse solidus.
+	 */
+	protected static String ASTNode.doStringEscape(String string) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < string.length(); ) {
+			int cp = string.codePointAt(i);
+			i += Character.charCount(cp);
+			switch (cp) {
+			case '"':
+				sb.append("\\\"");
+				break;
+			case '\\':
+				sb.append("\\\\");
+				break;
+			case '\n':
+				sb.append("\\n");
+				break;
+			case '\r':
+				sb.append("\\r");
+				break;
+			case '\t':
+				sb.append("\\t");
+				break;
+			case '\b':
+				sb.append("\\b");
+				break;
+			case '\f':
+				sb.append("\\f");
+				break;
+			default:
+				sb.appendCodePoint(cp);
 			}
 		}
 		return sb.toString();
 	}
+
 }

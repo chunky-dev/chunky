@@ -34,15 +34,11 @@ import java.io.InputStream;
 import se.llbit.io.LookaheadReader;
 
 /**
- * Parses JSON
- *
- * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
+ * Parses JSON input.
  */
 public class JsonParser implements AutoCloseable {
 
-  /**
-   * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
-   */
+  /** JSON parsing syntax error. */
   public static class SyntaxError extends Exception {
     public SyntaxError(String message) {
       super("Syntax Error: " + message);
@@ -64,9 +60,7 @@ public class JsonParser implements AutoCloseable {
   /**
    * Parses a JSON object or array.
    *
-   * @return JsonObject or JsonArray, not null
-   * @throws IOException
-   * @throws SyntaxError
+   * @return either a JsonObject or JsonArray, not null.
    */
   public JsonValue parse() throws IOException, SyntaxError {
     JsonValue value;
@@ -79,13 +73,14 @@ public class JsonParser implements AutoCloseable {
         value = parseArray();
         break;
       default:
-        throw new SyntaxError("expected object or array");
+        throw new SyntaxError("expected JSON object or array");
     }
     skipWhitespace();
     if (in.peek() != -1) {
-      throw new SyntaxError("garbage at end of input");
+      throw new SyntaxError(String.format(
+          "garbage at end of input (unexpected '%c')", (char) in.peek()));
     }
-    // attach value to tree
+    // Attach value to the tree.
     JsonRoot root = new JsonRoot(value);
     return root.getValue();
   }
@@ -97,8 +92,9 @@ public class JsonParser implements AutoCloseable {
       skipWhitespace();
       JsonValue value = parseValue();
       if (value == null) {
-        if (array.hasElement() || in.peek() == VALUE_SEPARATOR)
+        if (array.hasElement() || in.peek() == VALUE_SEPARATOR) {
           throw new SyntaxError("missing element in array");
+        }
         break;
       }
       array.addElement(value);
@@ -139,8 +135,8 @@ public class JsonParser implements AutoCloseable {
         acceptLiteral(NULL);
         return new JsonNull();
       default:
-        // TODO use Null Object pattern
-        return null; // not a JSON value
+        // TODO: return a Null Object instead.
+        return null; // Not a JSON value.
     }
   }
 
@@ -150,7 +146,7 @@ public class JsonParser implements AutoCloseable {
     while (true) {
       int next = in.pop();
       if (next == -1) {
-        throw new SyntaxError("EOF while parsing JSON string");
+        throw new SyntaxError("EOF while parsing JSON string (expected '\"')");
       } else if (next == ESCAPE) {
         sb.append(unescapeStringChar());
       } else if (next == QUOTE_MARK) {
@@ -194,12 +190,15 @@ public class JsonParser implements AutoCloseable {
     int v1 = next - '0';
     int v2 = next - 'A' + 0xA;
     int v3 = next - 'a' + 0xA;
-    if (v1 >= 0 && v1 <= 9)
+    if (v1 >= 0 && v1 <= 9) {
       return v1;
-    if (v2 >= 0xA && v2 <= 0xF)
+    }
+    if (v2 >= 0xA && v2 <= 0xF) {
       return v2;
-    if (v3 >= 0xA && v3 <= 0xF)
+    }
+    if (v3 >= 0xA && v3 <= 0xF) {
       return v3;
+    }
     throw new SyntaxError("non-hexadecimal digit in unicode escape sequence");
   }
 
@@ -233,8 +232,9 @@ public class JsonParser implements AutoCloseable {
   }
 
   private void skipWhitespace() throws IOException {
-    while (isWhitespace(in.peek()))
+    while (isWhitespace(in.peek())) {
       in.pop();
+    }
   }
 
   private boolean isWhitespace(int chr) {
@@ -243,8 +243,9 @@ public class JsonParser implements AutoCloseable {
 
   private void acceptLiteral(char[] literal) throws IOException, SyntaxError {
     for (char c : literal) {
-      if (in.pop() != c)
+      if (in.pop() != c) {
         throw new SyntaxError("encountered invalid JSON literal");
+      }
     }
   }
 
@@ -255,8 +256,9 @@ public class JsonParser implements AutoCloseable {
       skipWhitespace();
       JsonMember member = parseMember();
       if (member == null) {
-        if (object.hasMember() || in.peek() == VALUE_SEPARATOR)
+        if (object.hasMember() || in.peek() == VALUE_SEPARATOR) {
           throw new SyntaxError("missing member in object");
+        }
         break;
       }
       object.addMember(member);
@@ -268,18 +270,22 @@ public class JsonParser implements AutoCloseable {
 
   private boolean skip(char c) throws IOException, SyntaxError {
     boolean skip = in.peek() == c;
-    if (skip)
+    if (skip) {
       in.pop();
+    }
     return skip;
   }
 
   private void accept(char c) throws IOException, SyntaxError {
     int next = in.pop();
-    if (next == -1)
-      throw new SyntaxError("unexpected end of input (expected '" + c + "')");
-    if (next != c)
-      throw new SyntaxError("unexpected character (was '" +
-          ((char) next) + "', expected '" + c + "')");
+    if (next == -1) {
+      throw new SyntaxError(String.format(
+          "unexpected end of input (expected '%c')", c));
+    }
+    if (next != c) {
+      throw new SyntaxError(String.format(
+          "unexpected character (was '%c', expected '%c')", (char) next, c));
+    }
   }
 
   private JsonMember parseMember() throws IOException, SyntaxError {
@@ -289,8 +295,9 @@ public class JsonParser implements AutoCloseable {
       accept(NAME_SEPARATOR);
       skipWhitespace();
       JsonValue value = parseValue();
-      if (value == null)
+      if (value == null) {
         throw new SyntaxError("missing value for object member");
+      }
       return new JsonMember(name.getValue(), value);
     }
     return null;
