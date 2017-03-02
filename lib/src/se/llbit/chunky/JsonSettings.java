@@ -60,7 +60,8 @@ public final class JsonSettings {
       Log.warnf("Warning: Could not load settings from %s - defaults will be used", path);
     } catch (SyntaxError e) {
       Log.warnf(
-          "Warning: Could not load settings from %s (syntax error) - defaults will be used", path);
+          "Warning: Could not load settings from %s - defaults will be used (%s)",
+          path, e.getMessage());
     }
   }
 
