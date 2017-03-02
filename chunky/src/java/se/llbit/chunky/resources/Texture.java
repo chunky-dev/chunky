@@ -491,6 +491,24 @@ public class Texture {
   public static final Texture netherWartBlock = new Texture();
   public static final Texture redNetherBrick = new Texture();
 
+  // [1.12] Glazed Terracotta:
+  public static final Texture terracottaBlack = new Texture();
+  public static final Texture terracottaBlue = new Texture();
+  public static final Texture terracottaBrown = new Texture();
+  public static final Texture terracottaCyan = new Texture();
+  public static final Texture terracottaGray = new Texture();
+  public static final Texture terracottaGreen = new Texture();
+  public static final Texture terracottaLightBlue = new Texture();
+  public static final Texture terracottaLime = new Texture();
+  public static final Texture terracottaMagenta = new Texture();
+  public static final Texture terracottaOrange = new Texture();
+  public static final Texture terracottaPink = new Texture();
+  public static final Texture terracottaPurple = new Texture();
+  public static final Texture terracottaRed = new Texture();
+  public static final Texture terracottaSilver = new Texture();
+  public static final Texture terracottaWhite = new Texture();
+  public static final Texture terracottaYellow = new Texture();
+
   /**
    * Missing or unknown texture.
    */

@@ -1,4 +1,8 @@
-1.4.2 - TBD
+1.4.3 - TBD
+
+* Added rendering for Glazed Terracotta blocks in Minecraft 1.12.
+
+1.4.2 - 2017-01-15
 
 * Added support for multiple resource packs. The resource pack
   load order can be changed via Options->Edit resource packs.

@@ -3580,116 +3580,194 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block UNKNOWN0xEB = new Block(0xEB, "Unknown Block 0xEB", Texture.unknown) {
+  private static final Block WHITE_TERRACOTTA = new Block(0xEB, "White Glazed Terracotta",
+      Texture.terracottaWhite) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaWhite);
     }
   };
-  private static final Block UNKNOWN0xEC = new Block(0xEC, "Unknown Block 0xEC", Texture.unknown) {
+  private static final Block ORANGE_TERRACOTTA = new Block(0xEC, "Orange Glazed Terracotta",
+      Texture.terracottaOrange) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaOrange);
     }
   };
-  private static final Block UNKNOWN0xED = new Block(0xED, "Unknown Block 0xED", Texture.unknown) {
+  private static final Block MAGENTA_TERRACOTTA = new Block(0xED, "Magenta Glazed Terracotta",
+      Texture.terracottaMagenta) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaMagenta);
     }
   };
-  private static final Block UNKNOWN0xEE = new Block(0xEE, "Unknown Block 0xEE", Texture.unknown) {
+  private static final Block LIGHT_BLUE_TERRACOTTA = new Block(0xEE, "Light Blue Glazed Terracotta",
+      Texture.terracottaLightBlue) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaLightBlue);
     }
   };
-  private static final Block UNKNOWN0xEF = new Block(0xEF, "Unknown Block 0xEF", Texture.unknown) {
+  private static final Block YELLOW_TERRACOTTA = new Block(0xEF, "Yellow Glazed Terracotta",
+      Texture.terracottaYellow) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaYellow);
     }
   };
-  private static final Block UNKNOWN0xF0 = new Block(0xF0, "Unknown Block 0xF0", Texture.unknown) {
+  private static final Block LIME_TERRACOTTA = new Block(0xF0, "Lime Glazed Terracotta",
+      Texture.terracottaLime) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaLime);
     }
   };
-  private static final Block UNKNOWN0xF1 = new Block(0xF1, "Unknown Block 0xF1", Texture.unknown) {
+  private static final Block PINK_TERRACOTTA = new Block(0xF1, "Pink Glazed Terracotta", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaWhite);
     }
   };
-  private static final Block UNKNOWN0xF2 = new Block(0xF2, "Unknown Block 0xF2", Texture.unknown) {
+  private static final Block GRAY_TERRACOTTA = new Block(0xF2, "Gray Glazed Terracotta", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaWhite);
     }
   };
-  private static final Block UNKNOWN0xF3 = new Block(0xF3, "Unknown Block 0xF3", Texture.unknown) {
+  private static final Block SILVER_TERRACOTTA = new Block(0xF3, "Light Gray Glazed Terracotta",
+      Texture.terracottaSilver) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaSilver);
     }
   };
-  private static final Block UNKNOWN0xF4 = new Block(0xF4, "Unknown Block 0xF4", Texture.unknown) {
+  private static final Block CYAN_TERRACOTTA = new Block(0xF4, "Cyan Glazed Terracotta",
+      Texture.terracottaCyan) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaCyan);
     }
   };
-  private static final Block UNKNOWN0xF5 = new Block(0xF5, "Unknown Block 0xF5", Texture.unknown) {
+  private static final Block PURPLE_TERRACOTTA = new Block(0xF5, "Purple Glazed Terracotta",
+      Texture.terracottaPurple) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaPurple);
     }
   };
-  private static final Block UNKNOWN0xF6 = new Block(0xF6, "Unknown Block 0xF6", Texture.unknown) {
+  private static final Block BLUE_TERRACOTTA = new Block(0xF6, "Blue Glazed Terracotta",
+      Texture.terracottaBlue) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaBlue);
     }
   };
-  private static final Block UNKNOWN0xF7 = new Block(0xF7, "Unknown Block 0xF7", Texture.unknown) {
+  private static final Block BROWN_TERRACOTTA = new Block(0xF7, "Brown Glazed Terracotta",
+      Texture.terracottaBrown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaBrown);
     }
   };
-  private static final Block UNKNOWN0xF8 = new Block(0xF8, "Unknown Block 0xF8", Texture.unknown) {
+  private static final Block GREEN_TERRACOTTA = new Block(0xF8, "Green Glazed Terracotta",
+      Texture.terracottaGreen) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaGreen);
     }
   };
-  private static final Block UNKNOWN0xF9 = new Block(0xF9, "Unknown Block 0xF9", Texture.unknown) {
+  private static final Block RED_TERRACOTTA = new Block(0xF9, "Red Glazed Terracotta",
+      Texture.terracottaRed) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaRed);
     }
   };
-  private static final Block UNKNOWN0xFA = new Block(0xFA, "Unknown Block 0xFA", Texture.unknown) {
+  private static final Block BLACK_TERRACOTTA = new Block(0xFA, "Black Glazed Terracotta",
+      Texture.terracottaBlack) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return TexturedBlockModel.intersect(ray, Texture.terracottaBlack);
     }
   };
   private static final Block UNKNOWN0xFB = new Block(0xFB, "Unknown Block 0xFB", Texture.unknown) {
@@ -3728,52 +3806,53 @@ public class Block extends Material {
     }
   };
 
-  private static final Block[] blocks =
-      {AIR, STONE, GRASS, DIRT, COBBLESTONE, WOODENPLANKS, SAPLING, BEDROCK, WATER, STATIONARYWATER,
-          LAVA, STATIONARYLAVA, SAND, GRAVEL, GOLDORE, IRONORE, COALORE, WOOD, LEAVES, SPONGE,
-          GLASS, LAPISLAZULIORE, LAPISLAZULIBLOCK, DISPENSER, SANDSTONE, NOTEBLOCK, BED,
-          POWEREDRAIL, DETECTORRAIL, STICKYPISTON, COBWEB, TALLGRASS, DEADBUSH, PISTON,
-          PISTONEXTENSION, WOOL, MOVEDBYPISTON, DANDELION, FLOWER, BROWNMUSHROOM, REDMUSHROOM,
-          GOLDBLOCK, IRONBLOCK, DOUBLESLAB, SLAB, BRICKS, TNT, BOOKSHELF, MOSSSTONE, OBSIDIAN,
-          TORCH, FIRE, MONSTERSPAWNER, OAKWOODSTAIRS, CHEST, REDSTONEWIRE, DIAMONDORE, DIAMONDBLOCK,
-          WORKBENCH, CROPS, SOIL, FURNACEUNLIT, FURNACELIT, SIGNPOST, WOODENDOOR, LADDER,
-          MINECARTTRACKS, STONESTAIRS, WALLSIGN, LEVER, STONEPRESSUREPLATE, IRONDOOR,
-          WOODENPRESSUREPLATE, REDSTONEORE, GLOWINGREDSTONEORE, REDSTONETORCHOFF, REDSTONETORCHON,
-          STONEBUTTON, SNOW, ICE, SNOWBLOCK, CACTUS, CLAY, SUGARCANE, JUKEBOX, FENCE, PUMPKIN,
-          NETHERRACK, SOULSAND, GLOWSTONE, PORTAL, JACKOLANTERN, CAKE, REDSTONEREPEATEROFF,
-          REDSTONEREPEATERON, STAINED_GLASS, TRAPDOOR, HIDDENSILVERFISH, STONEBRICKS,
-          HUGEBROWNMUSHROOM, HUGEREDMUSHROOM, IRONBARS, GLASSPANE, MELON, PUMPKINSTEM, MELONSTEM,
-          VINES, FENCEGATE, BRICKSTAIRS, STONEBRICKSTAIRS, MYCELIUM, LILY_PAD, NETHERBRICK,
-          NETHERBRICKFENCE, NETHERBRICKSTAIRS, NETHERWART, ENCHNATMENTTABLE, BREWINGSTAND, CAULDRON,
-          ENDPORTAL, ENDPORTALFRAME, ENDSTONE, DRAGONEGG, REDSTONELAMPOFF, REDSTONELAMPON,
-          DOUBLEWOODENSLAB, SINGLEWOODENSLAB, COCOAPLANT, SANDSTONESTAIRS, EMERALDORE, ENDERCHEST,
-          TRIPWIREHOOK, TRIPWIRE, EMERALDBLOCK, SPRUCEWOODSTAIRS, BIRCHWOODSTAIRS, JUNGLEWOODSTAIRS,
-          COMMAND_BLOCK, BEACON, STONEWALL, FLOWERPOT, CARROTS, POTATOES, WOODENBUTTON, HEAD, ANVIL,
-          TRAPPEDCHEST, WEIGHTEDPRESSUREPLATELIGHT, WEIGHTEDPRESSUREPLATEHEAVY, COMPARATOR,
-          COMPARATOR_POWERED, DAYLIGHTSENSOR, REDSTONEBLOCK, NETHERQUARTZORE, HOPPER, QUARTZ,
-          QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, STAINED_CLAY, STAINED_GLASSPANE, LEAVES2, WOOD2,
-          ACACIASTAIRS, DARKOAKSTAIRS, SLIMEBLOCK, BARRIER, IRON_TRAPDOOR, PRISMARINE, SEALANTERN,
-          HAY_BLOCK, CARPET, HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, LARGE_FLOWER, UNKNOWN0xB0,
-          UNKNOWN0xB1, UNKNOWN0xB2, REDSANDSTONE, REDSANDSTONESTAIRS, DOUBLESLAB2, SLAB2,
-          SPRUCEFENCEGATE, BIRCHFENCEGATE, JUNGLEFENCEGATE, DARKOAKFENCEGATE, ACACIAFENCEGATE,
-          SPRUCEFENCE, BIRCHFENCE, JUNGLEFENCE, DARKOAKFENCE, ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR,
-          JUNGLEDOOR, ACACIADOOR, DARKOAKDOOR, ENDROD, CHORUSPLANT, CHORUSFLOWER, PURPURBLOCK,
-          PURPURPILLAR, PURPURSTAIRS, PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, UNKNOWN0xCF,
-          GRASSPATH, UNKNOWN0xD1, REPEATING_COMMAND_BLOCK, CHAIN_COMMAND_BLOCK, UNKNOWN0xD4, MAGMA, NETHER_WART_BLOCK,
-          RED_NETHER_BRICK, BONE, UNKNOWN0xD9, OBSERVER, SHULKERBOX_WHITE, SHULKERBOX_ORANGE,
-          SHULKERBOX_MAGENTA, SHULKERBOX_LIGHTBLUE, SHULKERBOX_YELLOW, SHULKERBOX_LIME,
-          SHULKERBOX_PINK, SHULKERBOX_GRAY, SHULKERBOX_SILVER, SHULKERBOX_CYAN,
-          SHULKERBOX_PURPLE, SHULKERBOX_BLUE, SHULKERBOX_BROWN, SHULKERBOX_GREEN, SHULKERBOX_RED,
-          SHULKERBOX_BLACK, UNKNOWN0xEB,
-          UNKNOWN0xEC, UNKNOWN0xED, UNKNOWN0xEE, UNKNOWN0xEF, UNKNOWN0xF0, UNKNOWN0xF1, UNKNOWN0xF2,
-          UNKNOWN0xF3, UNKNOWN0xF4, UNKNOWN0xF5, UNKNOWN0xF6, UNKNOWN0xF7, UNKNOWN0xF8, UNKNOWN0xF9,
-          UNKNOWN0xFA, UNKNOWN0xFB, UNKNOWN0xFC, UNKNOWN0xFD, UNKNOWN0xFE, UNKNOWN0xFF,};
+  private static final Block[] blocks = {
+      AIR, STONE, GRASS, DIRT, COBBLESTONE, WOODENPLANKS, SAPLING, BEDROCK, WATER, STATIONARYWATER,
+      LAVA, STATIONARYLAVA, SAND, GRAVEL, GOLDORE, IRONORE, COALORE, WOOD, LEAVES, SPONGE,
+      GLASS, LAPISLAZULIORE, LAPISLAZULIBLOCK, DISPENSER, SANDSTONE, NOTEBLOCK, BED,
+      POWEREDRAIL, DETECTORRAIL, STICKYPISTON, COBWEB, TALLGRASS, DEADBUSH, PISTON,
+      PISTONEXTENSION, WOOL, MOVEDBYPISTON, DANDELION, FLOWER, BROWNMUSHROOM, REDMUSHROOM,
+      GOLDBLOCK, IRONBLOCK, DOUBLESLAB, SLAB, BRICKS, TNT, BOOKSHELF, MOSSSTONE, OBSIDIAN,
+      TORCH, FIRE, MONSTERSPAWNER, OAKWOODSTAIRS, CHEST, REDSTONEWIRE, DIAMONDORE, DIAMONDBLOCK,
+      WORKBENCH, CROPS, SOIL, FURNACEUNLIT, FURNACELIT, SIGNPOST, WOODENDOOR, LADDER,
+      MINECARTTRACKS, STONESTAIRS, WALLSIGN, LEVER, STONEPRESSUREPLATE, IRONDOOR,
+      WOODENPRESSUREPLATE, REDSTONEORE, GLOWINGREDSTONEORE, REDSTONETORCHOFF, REDSTONETORCHON,
+      STONEBUTTON, SNOW, ICE, SNOWBLOCK, CACTUS, CLAY, SUGARCANE, JUKEBOX, FENCE, PUMPKIN,
+      NETHERRACK, SOULSAND, GLOWSTONE, PORTAL, JACKOLANTERN, CAKE, REDSTONEREPEATEROFF,
+      REDSTONEREPEATERON, STAINED_GLASS, TRAPDOOR, HIDDENSILVERFISH, STONEBRICKS,
+      HUGEBROWNMUSHROOM, HUGEREDMUSHROOM, IRONBARS, GLASSPANE, MELON, PUMPKINSTEM, MELONSTEM,
+      VINES, FENCEGATE, BRICKSTAIRS, STONEBRICKSTAIRS, MYCELIUM, LILY_PAD, NETHERBRICK,
+      NETHERBRICKFENCE, NETHERBRICKSTAIRS, NETHERWART, ENCHNATMENTTABLE, BREWINGSTAND, CAULDRON,
+      ENDPORTAL, ENDPORTALFRAME, ENDSTONE, DRAGONEGG, REDSTONELAMPOFF, REDSTONELAMPON,
+      DOUBLEWOODENSLAB, SINGLEWOODENSLAB, COCOAPLANT, SANDSTONESTAIRS, EMERALDORE, ENDERCHEST,
+      TRIPWIREHOOK, TRIPWIRE, EMERALDBLOCK, SPRUCEWOODSTAIRS, BIRCHWOODSTAIRS, JUNGLEWOODSTAIRS,
+      COMMAND_BLOCK, BEACON, STONEWALL, FLOWERPOT, CARROTS, POTATOES, WOODENBUTTON, HEAD, ANVIL,
+      TRAPPEDCHEST, WEIGHTEDPRESSUREPLATELIGHT, WEIGHTEDPRESSUREPLATEHEAVY, COMPARATOR,
+      COMPARATOR_POWERED, DAYLIGHTSENSOR, REDSTONEBLOCK, NETHERQUARTZORE, HOPPER, QUARTZ,
+      QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, STAINED_CLAY, STAINED_GLASSPANE, LEAVES2, WOOD2,
+      ACACIASTAIRS, DARKOAKSTAIRS, SLIMEBLOCK, BARRIER, IRON_TRAPDOOR, PRISMARINE, SEALANTERN,
+      HAY_BLOCK, CARPET, HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, LARGE_FLOWER, UNKNOWN0xB0,
+      UNKNOWN0xB1, UNKNOWN0xB2, REDSANDSTONE, REDSANDSTONESTAIRS, DOUBLESLAB2, SLAB2,
+      SPRUCEFENCEGATE, BIRCHFENCEGATE, JUNGLEFENCEGATE, DARKOAKFENCEGATE, ACACIAFENCEGATE,
+      SPRUCEFENCE, BIRCHFENCE, JUNGLEFENCE, DARKOAKFENCE, ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR,
+      JUNGLEDOOR, ACACIADOOR, DARKOAKDOOR, ENDROD, CHORUSPLANT, CHORUSFLOWER, PURPURBLOCK,
+      PURPURPILLAR, PURPURSTAIRS, PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, UNKNOWN0xCF,
+      GRASSPATH, UNKNOWN0xD1, REPEATING_COMMAND_BLOCK, CHAIN_COMMAND_BLOCK, UNKNOWN0xD4, MAGMA,
+      NETHER_WART_BLOCK, RED_NETHER_BRICK, BONE, UNKNOWN0xD9, OBSERVER, SHULKERBOX_WHITE,
+      SHULKERBOX_ORANGE, SHULKERBOX_MAGENTA, SHULKERBOX_LIGHTBLUE, SHULKERBOX_YELLOW,
+      SHULKERBOX_LIME, SHULKERBOX_PINK, SHULKERBOX_GRAY, SHULKERBOX_SILVER, SHULKERBOX_CYAN,
+      SHULKERBOX_PURPLE, SHULKERBOX_BLUE, SHULKERBOX_BROWN, SHULKERBOX_GREEN, SHULKERBOX_RED,
+      SHULKERBOX_BLACK, WHITE_TERRACOTTA, ORANGE_TERRACOTTA, MAGENTA_TERRACOTTA,
+      LIGHT_BLUE_TERRACOTTA, YELLOW_TERRACOTTA, LIME_TERRACOTTA, PINK_TERRACOTTA, GRAY_TERRACOTTA,
+      SILVER_TERRACOTTA, CYAN_TERRACOTTA, PURPLE_TERRACOTTA, BLUE_TERRACOTTA, BROWN_TERRACOTTA,
+      GREEN_TERRACOTTA, RED_TERRACOTTA, BLACK_TERRACOTTA, UNKNOWN0xFB, UNKNOWN0xFC, UNKNOWN0xFD,
+      UNKNOWN0xFE, UNKNOWN0xFF
+  };
 
-  /**
-   * Minecraft block ID.
-   */
+  /** Minecraft block ID. */
   public final int id;
 
+  /** The block types that can connect to redstone wire. */
   private static final Set<Block> redstoneConnectors = new HashSet<>();
 
   static {
@@ -3796,9 +3875,7 @@ public class Block extends Material {
     this.id = id;
   }
 
-  /**
-   * The name of the block.
-   */
+  /** The in-game name of this block. */
   public String getBlockName() {
     return name;
   }
@@ -3900,13 +3977,15 @@ public class Block extends Material {
     blocks[id] = newBlock;
   }
 
-  private static final String[] woolColor =
-      {"white", "orange", "magenta", "light blue", "yellow", "lime", "pink", "gray", "light gray",
-          "cyan", "purple", "blue", "brown", "green", "red", "black"};
+  private static final String[] woolColor = {
+      "white", "orange", "magenta", "light blue", "yellow", "lime", "pink", "gray", "light gray",
+      "cyan", "purple", "blue", "brown", "green", "red", "black"
+  };
 
-  private static final String[] bits =
-      {"0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010",
-          "1011", "1100", "1101", "1110", "1111",};
+  private static final String[] bits = {
+      "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010",
+      "1011", "1100", "1101", "1110", "1111"
+  };
 
   /**
    * @param data block data

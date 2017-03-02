@@ -1660,6 +1660,56 @@ public class TexturePackLoader {
             Texture.redstoneWire),
         new SimpleTexture("textures/blocks/redstoneDust_line", Texture.redstoneWire),
         new IndexedTexture(0xA5, Texture.redstoneWire)));
+
+    // Minecraft 1.12: Glazed Terracotta:
+    allTextures.put("glazed_terracotta_black",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_black",
+            Texture.terracottaBlack));
+    allTextures.put("glazed_terracotta_blue",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_blue",
+            Texture.terracottaBlue));
+    allTextures.put("glazed_terracotta_brown",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_brown",
+            Texture.terracottaBrown));
+    allTextures.put("glazed_terracotta_cyan",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_cyan",
+            Texture.terracottaCyan));
+    allTextures.put("glazed_terracotta_gray",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_gray",
+            Texture.terracottaGray));
+    allTextures.put("glazed_terracotta_green",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_green",
+            Texture.terracottaGreen));
+    allTextures.put("glazed_terracotta_light_blue",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_light_blue",
+            Texture.terracottaLightBlue));
+    allTextures.put("glazed_terracotta_lime",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_lime",
+            Texture.terracottaLime));
+    allTextures.put("glazed_terracotta_magenta",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_magenta",
+            Texture.terracottaMagenta));
+    allTextures.put("glazed_terracotta_orange",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_orange",
+            Texture.terracottaOrange));
+    allTextures.put("glazed_terracotta_pink",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_pink",
+            Texture.terracottaPink));
+    allTextures.put("glazed_terracotta_purple",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_purple",
+            Texture.terracottaPurple));
+    allTextures.put("glazed_terracotta_red",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_red",
+            Texture.terracottaRed));
+    allTextures.put("glazed_terracotta_silver",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_silver",
+            Texture.terracottaSilver));
+    allTextures.put("glazed_terracotta_white",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_white",
+            Texture.terracottaWhite));
+    allTextures.put("glazed_terracotta_yellow",
+        new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_yellow",
+            Texture.terracottaYellow));
   }
 
   private static String texturePackName(File tpFile) {
