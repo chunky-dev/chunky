@@ -74,6 +74,7 @@ import se.llbit.chunky.model.SpriteModel;
 import se.llbit.chunky.model.StairModel;
 import se.llbit.chunky.model.StoneWallModel;
 import se.llbit.chunky.model.TallGrassModel;
+import se.llbit.chunky.model.TerracottaModel;
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.TorchModel;
 import se.llbit.chunky.model.TrapdoorModel;
@@ -3589,7 +3590,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaWhite);
+      return TerracottaModel.intersect(ray, Texture.terracottaWhite);
     }
   };
   private static final Block ORANGE_TERRACOTTA = new Block(0xEC, "Orange Glazed Terracotta",
@@ -3601,7 +3602,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaOrange);
+      return TerracottaModel.intersect(ray, Texture.terracottaOrange);
     }
   };
   private static final Block MAGENTA_TERRACOTTA = new Block(0xED, "Magenta Glazed Terracotta",
@@ -3613,7 +3614,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaMagenta);
+      return TerracottaModel.intersect(ray, Texture.terracottaMagenta);
     }
   };
   private static final Block LIGHT_BLUE_TERRACOTTA = new Block(0xEE, "Light Blue Glazed Terracotta",
@@ -3625,7 +3626,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaLightBlue);
+      return TerracottaModel.intersect(ray, Texture.terracottaLightBlue);
     }
   };
   private static final Block YELLOW_TERRACOTTA = new Block(0xEF, "Yellow Glazed Terracotta",
@@ -3637,7 +3638,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaYellow);
+      return TerracottaModel.intersect(ray, Texture.terracottaYellow);
     }
   };
   private static final Block LIME_TERRACOTTA = new Block(0xF0, "Lime Glazed Terracotta",
@@ -3649,7 +3650,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaLime);
+      return TerracottaModel.intersect(ray, Texture.terracottaLime);
     }
   };
   private static final Block PINK_TERRACOTTA = new Block(0xF1, "Pink Glazed Terracotta", Texture.unknown) {
@@ -3660,7 +3661,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaWhite);
+      return TerracottaModel.intersect(ray, Texture.terracottaWhite);
     }
   };
   private static final Block GRAY_TERRACOTTA = new Block(0xF2, "Gray Glazed Terracotta", Texture.unknown) {
@@ -3671,7 +3672,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaWhite);
+      return TerracottaModel.intersect(ray, Texture.terracottaWhite);
     }
   };
   private static final Block SILVER_TERRACOTTA = new Block(0xF3, "Light Gray Glazed Terracotta",
@@ -3683,7 +3684,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaSilver);
+      return TerracottaModel.intersect(ray, Texture.terracottaSilver);
     }
   };
   private static final Block CYAN_TERRACOTTA = new Block(0xF4, "Cyan Glazed Terracotta",
@@ -3695,7 +3696,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaCyan);
+      return TerracottaModel.intersect(ray, Texture.terracottaCyan);
     }
   };
   private static final Block PURPLE_TERRACOTTA = new Block(0xF5, "Purple Glazed Terracotta",
@@ -3707,7 +3708,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaPurple);
+      return TerracottaModel.intersect(ray, Texture.terracottaPurple);
     }
   };
   private static final Block BLUE_TERRACOTTA = new Block(0xF6, "Blue Glazed Terracotta",
@@ -3719,7 +3720,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaBlue);
+      return TerracottaModel.intersect(ray, Texture.terracottaBlue);
     }
   };
   private static final Block BROWN_TERRACOTTA = new Block(0xF7, "Brown Glazed Terracotta",
@@ -3731,7 +3732,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaBrown);
+      return TerracottaModel.intersect(ray, Texture.terracottaBrown);
     }
   };
   private static final Block GREEN_TERRACOTTA = new Block(0xF8, "Green Glazed Terracotta",
@@ -3743,7 +3744,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaGreen);
+      return TerracottaModel.intersect(ray, Texture.terracottaGreen);
     }
   };
   private static final Block RED_TERRACOTTA = new Block(0xF9, "Red Glazed Terracotta",
@@ -3755,7 +3756,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaRed);
+      return TerracottaModel.intersect(ray, Texture.terracottaRed);
     }
   };
   private static final Block BLACK_TERRACOTTA = new Block(0xFA, "Black Glazed Terracotta",
@@ -3767,7 +3768,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TexturedBlockModel.intersect(ray, Texture.terracottaBlack);
+      return TerracottaModel.intersect(ray, Texture.terracottaBlack);
     }
   };
   private static final Block UNKNOWN0xFB = new Block(0xFB, "Unknown Block 0xFB", Texture.unknown) {
