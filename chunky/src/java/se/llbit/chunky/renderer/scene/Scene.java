@@ -35,6 +35,7 @@ import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Heightmap;
+import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
 import se.llbit.chunky.world.entity.Entity;
@@ -101,33 +102,26 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public static final int DEFAULT_DUMP_FREQUENCY = 500;
   public static final String EXTENSION = ".json";
-  /**
-   * The current Scene Description Format (SDF) version.
-   */
-  public static final int SDF_VERSION = 7;
+
+  /** The current Scene Description Format (SDF) version. */
+  public static final int SDF_VERSION = 8;
 
   protected static final double fSubSurface = 0.3;
 
-  /**
-   * Minimum canvas width.
-   */
+  /** Minimum canvas width. */
   public static final int MIN_CANVAS_WIDTH = 20;
 
-  /**
-   * Minimum canvas height.
-   */
+  /** Minimum canvas height. */
   public static final int MIN_CANVAS_HEIGHT = 20;
 
 
-  /**
-   * Default specular reflection coefficient
-   */
-  protected static final float SPECULAR_COEFF = 0.31f;
+  /** Default specular reflection coefficient. */
+  public static final float SPECULAR_COEFF = 0.04f;
 
   /**
-   * Default water specular reflection coefficient
+   * Default water specular reflection coefficient.
    */
-  public static final float WATER_SPECULAR = 0.46f;
+  public static final float WATER_SPECULAR = 0.12f;
 
   /**
    * Minimum exposure
@@ -273,10 +267,11 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   private Collection<Entity> actors = new LinkedList<>();
 
-  /**
-   * Poseable entities in the scene.
-   */
+  /** Poseable entities in the scene. */
   private Map<PlayerEntity, JsonObject> profiles = new HashMap<>();
+
+  /** Material properties for this scene. */
+  private Map<String, JsonValue> materials = Collections.emptyMap();
 
   private BVH bvh = new BVH(Collections.emptyList());
   private BVH actorBvh = new BVH(Collections.emptyList());
@@ -380,7 +375,7 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Set scene equal to other
+   * Import scene state from another scene.
    */
   public synchronized void copyState(Scene other) {
     loadedWorld = other.loadedWorld;
@@ -391,7 +386,7 @@ public class Scene implements JsonSerializable, Refreshable {
     // When the other scene is changed it must create a new octree.
     worldOctree = other.worldOctree;
     entities = other.entities;
-    actors = new LinkedList<>(other.actors); // We create a copy so entity changes can be reset.
+    actors = new LinkedList<>(other.actors); // Create a copy so that entity changes can be reset.
     profiles = other.profiles;
     bvh = other.bvh;
     actorBvh = other.actorBvh;
@@ -399,6 +394,9 @@ public class Scene implements JsonSerializable, Refreshable {
     grassTexture = other.grassTexture;
     foliageTexture = other.foliageTexture;
     origin.set(other.origin);
+
+    // Copy material properties.
+    materials = other.materials;
 
     chunks = other.chunks;
 
@@ -468,10 +466,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Load a stored scene by file name.
    *
-   * @param sceneName      file name of the scene to load
-   * @throws IOException
-   * @throws SceneLoadingError
-   * @throws InterruptedException
+   * @param sceneName file name of the scene to load
    */
   public synchronized void loadScene(RenderContext context, String sceneName,
       TaskTracker taskTracker) throws IOException, SceneLoadingError, InterruptedException {
@@ -692,7 +687,6 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     Set<ChunkPosition> loadedChunks = new HashSet<>();
-    int emitters = 0;
     int numChunks = 0;
 
     try (TaskTracker.Task task = progress.task("Loading regions")) {
@@ -979,9 +973,6 @@ public class Scene implements JsonSerializable, Refreshable {
                   break;
               }
               type |= metadata << 8;
-              if (block.isEmitter) {
-                emitters += 1;
-              }
               if (block.isInvisible) {
                 type = 0;
               }
@@ -1051,7 +1042,7 @@ public class Scene implements JsonSerializable, Refreshable {
     camera.setWorldSize(1 << worldOctree.depth);
     buildBvh();
     buildActorBvh();
-    Log.info(String.format("Loaded %d chunks (%d emitters)", numChunks, emitters));
+    Log.info(String.format("Loaded %d chunks", numChunks));
   }
 
   private void buildBvh() {
@@ -2527,6 +2518,7 @@ public class Scene implements JsonSerializable, Refreshable {
     fogDensity = json.get("fogDensity").doubleValue(fogDensity);
     waterHeight = json.get("waterHeight").intValue(waterHeight);
     renderActors = json.get("renderActors").boolValue(renderActors);
+    materials = json.get("materials").object().treeCopy().toMap();
 
     // Load world info.
     if (json.get("world").isObject()) {
@@ -2715,6 +2707,302 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setResetReason(ResetReason resetReason) {
     if (this.resetReason != ResetReason.SCENE_LOADED) {
       this.resetReason = resetReason;
+    }
+  }
+
+  public void importMaterials() {
+    importMaterial(materials, "all:blocks", Block.blocks);
+    importMaterial(materials, "all:water", Block.WATER, Block.STATIONARYWATER);
+
+    importMaterial(materials, "block:stone", Block.STONE);
+    importMaterial(materials, "block:grass", Block.GRASS);
+    importMaterial(materials, "block:dirt", Block.DIRT);
+    importMaterial(materials, "block:cobblestone", Block.COBBLESTONE);
+    importMaterial(materials, "block:planks", Block.WOODENPLANKS);
+    importMaterial(materials, "block:sapling", Block.SAPLING);
+    importMaterial(materials, "block:bedrock", Block.BEDROCK);
+    importMaterial(materials, "block:flowing_water", Block.WATER);
+    importMaterial(materials, "block:water", Block.STATIONARYWATER);
+    importMaterial(materials, "block:flowing_lava", Block.LAVA);
+    importMaterial(materials, "block:lava", Block.STATIONARYLAVA);
+    importMaterial(materials, "block:sand", Block.SAND);
+    importMaterial(materials, "block:gravel", Block.GRAVEL);
+    importMaterial(materials, "block:gold_ore", Block.GOLDORE);
+    importMaterial(materials, "block:iron_ore", Block.IRONORE);
+
+    importMaterial(materials, "block:coal_ore", Block.COALORE);
+    importMaterial(materials, "block:log", Block.WOOD);
+    importMaterial(materials, "block:leaves", Block.LEAVES);
+    importMaterial(materials, "block:sponge", Block.SPONGE);
+    importMaterial(materials, "block:glass", Block.GLASS);
+    importMaterial(materials, "block:lapis_ore", Block.LAPIS_ORE);
+    importMaterial(materials, "block:lapis_block", Block.LAPIS_BLOCK);
+    importMaterial(materials, "block:dispenser", Block.DISPENSER);
+    importMaterial(materials, "block:sandstone", Block.SANDSTONE);
+    importMaterial(materials, "block:noteblock", Block.NOTEBLOCK);
+    importMaterial(materials, "block:bed", Block.BED);
+    importMaterial(materials, "block:golden_rail", Block.POWEREDRAIL);
+    importMaterial(materials, "block:detector_rail", Block.DETECTORRAIL);
+    importMaterial(materials, "block:sticky_piston", Block.STICKYPISTON);
+    importMaterial(materials, "block:web", Block.COBWEB);
+    importMaterial(materials, "block:tallgrass", Block.TALLGRASS);
+
+    importMaterial(materials, "block:deadbush", Block.DEADBUSH);
+    importMaterial(materials, "block:piston", Block.PISTON);
+    importMaterial(materials, "block:piston_head", Block.PISTON_HEAD);
+    importMaterial(materials, "block:wool", Block.WOOL);
+    importMaterial(materials, "block:piston_extension", Block.PISTON_EXTENSION);
+    importMaterial(materials, "block:yellow_flower", Block.DANDELION);
+    importMaterial(materials, "block:red_flower", Block.FLOWER);
+    importMaterial(materials, "block:brown_mushroom", Block.BROWNMUSHROOM);
+    importMaterial(materials, "block:red_mushroom", Block.REDMUSHROOM);
+    importMaterial(materials, "block:gold_block", Block.GOLDBLOCK);
+    importMaterial(materials, "block:iron_block", Block.IRONBLOCK);
+    importMaterial(materials, "block:double_stone_slab", Block.DOUBLESLAB);
+    importMaterial(materials, "block:stone_slab", Block.SLAB);
+    importMaterial(materials, "block:brick_block", Block.BRICKS);
+    importMaterial(materials, "block:tnt", Block.TNT);
+    importMaterial(materials, "block:bookshelf", Block.BOOKSHELF);
+
+    importMaterial(materials, "block:mossy_cobblestone", Block.MOSSSTONE);
+    importMaterial(materials, "block:obsidian", Block.OBSIDIAN);
+    importMaterial(materials, "block:torch", Block.TORCH);
+    importMaterial(materials, "block:fire", Block.FIRE);
+    importMaterial(materials, "block:mob_spawner", Block.MONSTERSPAWNER);
+    importMaterial(materials, "block:oak_stairs", Block.OAKWOODSTAIRS);
+    importMaterial(materials, "block:chest", Block.CHEST);
+    importMaterial(materials, "block:redstone_wire", Block.REDSTONEWIRE);
+    importMaterial(materials, "block:diamond_ore", Block.DIAMONDORE);
+    importMaterial(materials, "block:diamond_block", Block.DIAMONDBLOCK);
+    importMaterial(materials, "block:crafting_table", Block.WORKBENCH);
+    importMaterial(materials, "block:wheat", Block.CROPS);
+    importMaterial(materials, "block:farmland", Block.SOIL);
+    importMaterial(materials, "block:furnace", Block.FURNACEUNLIT);
+    importMaterial(materials, "block:lit_furnace", Block.FURNACELIT);
+    importMaterial(materials, "block:standing_sign", Block.SIGNPOST);
+
+    importMaterial(materials, "block:wooden_door", Block.WOODENDOOR);
+    importMaterial(materials, "block:ladder", Block.LADDER);
+    importMaterial(materials, "block:rail", Block.MINECARTTRACKS);
+    importMaterial(materials, "block:stone_stairs", Block.STONESTAIRS);
+    importMaterial(materials, "block:wall_sign", Block.WALLSIGN);
+    importMaterial(materials, "block:lever", Block.LEVER);
+    importMaterial(materials, "block:stone_pressure_plate", Block.STONEPRESSUREPLATE);
+    importMaterial(materials, "block:iron_door", Block.IRONDOOR);
+    importMaterial(materials, "block:wooden_pressure_plate", Block.WOODENPRESSUREPLATE);
+    importMaterial(materials, "block:redstone_ore", Block.REDSTONEORE);
+    importMaterial(materials, "block:lit_redstone_ore", Block.GLOWINGREDSTONEORE);
+    importMaterial(materials, "block:unlit_redstone_torch", Block.REDSTONETORCHOFF);
+    importMaterial(materials, "block:redstone_torch", Block.REDSTONETORCHON);
+    importMaterial(materials, "block:stone_button", Block.STONEBUTTON);
+    importMaterial(materials, "block:snow_layer", Block.SNOW);
+    importMaterial(materials, "block:ice", Block.ICE);
+
+    importMaterial(materials, "block:snow", Block.SNOWBLOCK);
+    importMaterial(materials, "block:cactus", Block.CACTUS);
+    importMaterial(materials, "block:clay", Block.CLAY);
+    importMaterial(materials, "block:reeds", Block.SUGARCANE);
+    importMaterial(materials, "block:jukebox", Block.JUKEBOX);
+    importMaterial(materials, "block:fence", Block.FENCE);
+    importMaterial(materials, "block:pumpkin", Block.PUMPKIN);
+    importMaterial(materials, "block:netherrack", Block.NETHERRACK);
+    importMaterial(materials, "block:soul_sand", Block.SOULSAND);
+    importMaterial(materials, "block:glowstone", Block.GLOWSTONE);
+    importMaterial(materials, "block:portal", Block.PORTAL);
+    importMaterial(materials, "block:lit_pumpkin", Block.JACKOLANTERN);
+    importMaterial(materials, "block:cake", Block.CAKE);
+    importMaterial(materials, "block:unpowered_repeater", Block.REDSTONEREPEATEROFF);
+    importMaterial(materials, "block:powered_repeater", Block.REDSTONEREPEATERON);
+    importMaterial(materials, "block:stained_glass", Block.STAINED_GLASS);
+
+    importMaterial(materials, "block:trapdoor", Block.TRAPDOOR);
+    importMaterial(materials, "block:monster_egg", Block.HIDDENSILVERFISH);
+    importMaterial(materials, "block:stonebrick", Block.STONEBRICKS);
+    importMaterial(materials, "block:brown_mushroom_block", Block.HUGEBROWNMUSHROOM);
+    importMaterial(materials, "block:red_mushroom_block", Block.HUGEREDMUSHROOM);
+    importMaterial(materials, "block:iron_bars", Block.IRONBARS);
+    importMaterial(materials, "block:glass_pane", Block.GLASSPANE);
+    importMaterial(materials, "block:melon_block", Block.MELON);
+    importMaterial(materials, "block:pumpkin_stem", Block.PUMPKINSTEM);
+    importMaterial(materials, "block:melon_stem", Block.MELONSTEM);
+    importMaterial(materials, "block:vine", Block.VINES);
+    importMaterial(materials, "block:fence_gate", Block.FENCEGATE);
+    importMaterial(materials, "block:brick_stairs", Block.BRICKSTAIRS);
+    importMaterial(materials, "block:stone_brick_stairs", Block.STONEBRICKSTAIRS);
+    importMaterial(materials, "block:mycelium", Block.MYCELIUM);
+    importMaterial(materials, "block:waterlily", Block.LILY_PAD);
+
+    importMaterial(materials, "block:nether_brick", Block.NETHERBRICK);
+    importMaterial(materials, "block:nether_brick_fence", Block.NETHERBRICKFENCE);
+    importMaterial(materials, "block:nether_brick_stairs", Block.NETHERBRICKSTAIRS);
+    importMaterial(materials, "block:nether_wart", Block.NETHERWART);
+    importMaterial(materials, "block:enchanting_table", Block.ENCHNATMENTTABLE);
+    importMaterial(materials, "block:brewing_stand", Block.BREWINGSTAND);
+    importMaterial(materials, "block:cauldron", Block.CAULDRON);
+    importMaterial(materials, "block:end_portal", Block.ENDPORTAL);
+    importMaterial(materials, "block:end_portal_frame", Block.ENDPORTALFRAME);
+    importMaterial(materials, "block:end_stone", Block.ENDSTONE);
+    importMaterial(materials, "block:dragon_egg", Block.DRAGONEGG);
+    importMaterial(materials, "block:redstone_lamp", Block.REDSTONELAMPOFF);
+    importMaterial(materials, "block:lit_redstone_lamp", Block.REDSTONELAMPON);
+    importMaterial(materials, "block:double_wooden_slab", Block.DOUBLEWOODENSLAB);
+    importMaterial(materials, "block:wooden_slab", Block.SINGLEWOODENSLAB);
+    importMaterial(materials, "block:cocoa", Block.COCOAPLANT);
+
+    importMaterial(materials, "block:sandstone_stairs", Block.SANDSTONESTAIRS);
+    importMaterial(materials, "block:emerald_ore", Block.EMERALDORE);
+    importMaterial(materials, "block:ender_chest", Block.ENDERCHEST);
+    importMaterial(materials, "block:tripwire_hook", Block.TRIPWIREHOOK);
+    importMaterial(materials, "block:tripwire", Block.TRIPWIRE);
+    importMaterial(materials, "block:emerald_block", Block.EMERALDBLOCK);
+    importMaterial(materials, "block:spruce_stairs", Block.SPRUCEWOODSTAIRS);
+    importMaterial(materials, "block:birch_stairs", Block.BIRCHWOODSTAIRS);
+    importMaterial(materials, "block:jungle_stairs", Block.JUNGLEWOODSTAIRS);
+    importMaterial(materials, "block:command_block", Block.COMMAND_BLOCK);
+    importMaterial(materials, "block:beacon", Block.BEACON);
+    importMaterial(materials, "block:cobblestone_wall", Block.STONEWALL);
+    importMaterial(materials, "block:flower_pot", Block.FLOWERPOT);
+    importMaterial(materials, "block:carrots", Block.CARROTS);
+    importMaterial(materials, "block:potatoes", Block.POTATOES);
+    importMaterial(materials, "block:wooden_button", Block.WOODENBUTTON);
+
+    importMaterial(materials, "block:skull", Block.HEAD);
+    importMaterial(materials, "block:anvil", Block.ANVIL);
+    importMaterial(materials, "block:trapped_chest", Block.TRAPPEDCHEST);
+    importMaterial(materials, "block:light_weighted_pressure_plate", Block.WEIGHTEDPRESSUREPLATELIGHT);
+    importMaterial(materials, "block:heavy_weighted_pressure_plate", Block.WEIGHTEDPRESSUREPLATEHEAVY);
+    importMaterial(materials, "block:unpowered_comparator", Block.COMPARATOR);
+    importMaterial(materials, "block:powered_comparator", Block.COMPARATOR_POWERED);
+    importMaterial(materials, "block:daylight_detector", Block.DAYLIGHTSENSOR);
+    importMaterial(materials, "block:redstone_block", Block.REDSTONEBLOCK);
+    importMaterial(materials, "block:quartz_ore", Block.NETHERQUARTZORE);
+    importMaterial(materials, "block:hopper", Block.HOPPER);
+    importMaterial(materials, "block:quartz_block", Block.QUARTZ);
+    importMaterial(materials, "block:quartz_stairs", Block.QUARTZSTAIRS);
+    importMaterial(materials, "block:activator_rail", Block.ACTIVATORRAIL);
+    importMaterial(materials, "block:dropper", Block.DROPPER);
+    importMaterial(materials, "block:stained_hardened_clay", Block.STAINED_CLAY);
+
+    importMaterial(materials, "block:stained_glass_pane", Block.STAINED_GLASSPANE);
+    importMaterial(materials, "block:leaves2", Block.LEAVES2);
+    importMaterial(materials, "block:log2", Block.WOOD2);
+    importMaterial(materials, "block:acacia_stairs", Block.ACACIASTAIRS);
+    importMaterial(materials, "block:dark_oak_stairs", Block.DARKOAKSTAIRS);
+    importMaterial(materials, "block:slime", Block.SLIMEBLOCK);
+    importMaterial(materials, "block:barrier", Block.BARRIER);
+    importMaterial(materials, "block:iron_trapdoor", Block.IRON_TRAPDOOR);
+    importMaterial(materials, "block:prismarine", Block.PRISMARINE);
+    importMaterial(materials, "block:sea_lantern", Block.SEALANTERN);
+    importMaterial(materials, "block:hay_block", Block.HAY_BLOCK);
+    importMaterial(materials, "block:carpet", Block.CARPET);
+    importMaterial(materials, "block:hardened_clay", Block.HARDENED_CLAY);
+    importMaterial(materials, "block:coal_block", Block.COAL_BLOCK);
+    importMaterial(materials, "block:packed_ice", Block.PACKED_ICE);
+    importMaterial(materials, "block:double_plant", Block.LARGE_FLOWER);
+
+    importMaterial(materials, "block:standing_banner", Block.STANDING_BANNER);
+    importMaterial(materials, "block:wall_banner", Block.WALL_BANNER);
+    importMaterial(materials, "block:daylight_detector_inverted", Block.INVERTED_DAYLIGHTSENSOR);
+    importMaterial(materials, "block:red_standstone", Block.REDSANDSTONE);
+    importMaterial(materials, "block:red_standstone_stairs", Block.REDSANDSTONESTAIRS);
+    importMaterial(materials, "block:double_stone_slab2", Block.DOUBLESLAB2);
+    importMaterial(materials, "block:stone_slab2", Block.SLAB2);
+    importMaterial(materials, "block:spruce_fence_gate", Block.SPRUCEFENCEGATE);
+    importMaterial(materials, "block:birch_fence_gate", Block.BIRCHFENCEGATE);
+    importMaterial(materials, "block:jungle_fence_gate", Block.JUNGLEFENCEGATE);
+    importMaterial(materials, "block:dark_oak_fence_gate", Block.DARKOAKFENCEGATE);
+    importMaterial(materials, "block:acacia_fence_gate", Block.ACACIAFENCEGATE);
+    importMaterial(materials, "block:spruce_fence", Block.SPRUCEFENCE);
+    importMaterial(materials, "block:birch_fence", Block.BIRCHFENCE);
+    importMaterial(materials, "block:jungle_fence", Block.JUNGLEFENCE);
+    importMaterial(materials, "block:dark_oak_fence", Block.DARKOAKFENCE);
+
+    importMaterial(materials, "block:acacia_fence", Block.ACACIAFENCE);
+    importMaterial(materials, "block:spruce_door", Block.SPRUCEDOOR);
+    importMaterial(materials, "block:birch_door", Block.BIRCHDOOR);
+    importMaterial(materials, "block:jungle_door", Block.JUNGLEDOOR);
+    importMaterial(materials, "block:acacia_door", Block.ACACIADOOR);
+    importMaterial(materials, "block:dark_oak_door", Block.DARKOAKDOOR);
+    importMaterial(materials, "block:end_rod", Block.ENDROD);
+    importMaterial(materials, "block:chorus_plant", Block.CHORUSPLANT);
+    importMaterial(materials, "block:chorus_flower", Block.CHORUSFLOWER);
+    importMaterial(materials, "block:purpur_block", Block.PURPURBLOCK);
+    importMaterial(materials, "block:purpur_pillar", Block.PURPURPILLAR);
+    importMaterial(materials, "block:purpur_stairs", Block.PURPURSTAIRS);
+    importMaterial(materials, "block:purpur_double_slab", Block.PURPURDOUBLESLAB);
+    importMaterial(materials, "block:purpur_slab", Block.PURPURSLAB);
+    importMaterial(materials, "block:end_bricks", Block.ENDBRICKS);
+    importMaterial(materials, "block:beetroots", Block.BEETROOTS);
+
+    importMaterial(materials, "block:grass_path", Block.GRASSPATH);
+    importMaterial(materials, "block:end_gateway", Block.END_GATEWAY);
+    importMaterial(materials, "block:repeating_command_block", Block.REPEATING_COMMAND_BLOCK);
+    importMaterial(materials, "block:chain_command_block", Block.CHAIN_COMMAND_BLOCK);
+    importMaterial(materials, "block:frosted_ice", Block.FROSTEDICE);
+    importMaterial(materials, "block:magma", Block.MAGMA);
+    importMaterial(materials, "block:nether_wart_block", Block.NETHER_WART_BLOCK);
+    importMaterial(materials, "block:red_nether_brick", Block.RED_NETHER_BRICK);
+    importMaterial(materials, "block:bone_block", Block.BONE);
+    importMaterial(materials, "block:observer", Block.OBSERVER);
+    importMaterial(materials, "block:white_shuler_box", Block.SHULKERBOX_WHITE);
+    importMaterial(materials, "block:orange_shuler_box", Block.SHULKERBOX_ORANGE);
+    importMaterial(materials, "block:magenta_shuler_box", Block.SHULKERBOX_MAGENTA);
+    importMaterial(materials, "block:ligth_blue_shuler_box", Block.SHULKERBOX_LIGHTBLUE);
+    importMaterial(materials, "block:yellow_shuler_box", Block.SHULKERBOX_YELLOW);
+
+    importMaterial(materials, "block:lime_shuler_box", Block.SHULKERBOX_LIME);
+    importMaterial(materials, "block:pink_shuler_box", Block.SHULKERBOX_PINK);
+    importMaterial(materials, "block:gray_shuler_box", Block.SHULKERBOX_GRAY);
+    importMaterial(materials, "block:light_gray_shuler_box", Block.SHULKERBOX_SILVER);
+    importMaterial(materials, "block:cyan_shuler_box", Block.SHULKERBOX_CYAN);
+    importMaterial(materials, "block:purple_shuler_box", Block.SHULKERBOX_PURPLE);
+    importMaterial(materials, "block:blue_shuler_box", Block.SHULKERBOX_BLUE);
+    importMaterial(materials, "block:brown_shuler_box", Block.SHULKERBOX_BROWN);
+    importMaterial(materials, "block:green_shuler_box", Block.SHULKERBOX_GREEN);
+    importMaterial(materials, "block:red_shuler_box", Block.SHULKERBOX_RED);
+    importMaterial(materials, "block:black_shuler_box", Block.SHULKERBOX_BLACK);
+    importMaterial(materials, "block:white_glazed_terracotta", Block.WHITE_TERRACOTTA);
+    importMaterial(materials, "block:orange_glazed_terracotta", Block.ORANGE_TERRACOTTA);
+    importMaterial(materials, "block:magenta_glazed_terracotta", Block.MAGENTA_TERRACOTTA);
+    importMaterial(materials, "block:light_blue_glazed_terracotta", Block.LIGHT_BLUE_TERRACOTTA);
+    importMaterial(materials, "block:yellow_glazed_terracotta", Block.YELLOW_TERRACOTTA);
+
+    importMaterial(materials, "block:lime_glazed_terracotta", Block.LIME_TERRACOTTA);
+    importMaterial(materials, "block:pink_glazed_terracotta", Block.PINK_TERRACOTTA);
+    importMaterial(materials, "block:gray_glazed_terracotta", Block.GRAY_TERRACOTTA);
+    importMaterial(materials, "block:light_gray_glazed_terracotta", Block.SILVER_TERRACOTTA);
+    importMaterial(materials, "block:cyan_glazed_terracotta", Block.CYAN_TERRACOTTA);
+    importMaterial(materials, "block:purple_glazed_terracotta", Block.PURPLE_TERRACOTTA);
+    importMaterial(materials, "block:blue_glazed_terracotta", Block.BLUE_TERRACOTTA);
+    importMaterial(materials, "block:brown_glazed_terracotta", Block.BROWN_TERRACOTTA);
+    importMaterial(materials, "block:green_glazed_terracotta", Block.GREEN_TERRACOTTA);
+    importMaterial(materials, "block:red_glazed_terracotta", Block.RED_TERRACOTTA);
+    importMaterial(materials, "block:black_glazed_terracotta", Block.BLACK_TERRACOTTA);
+    importMaterial(materials, "block:concrete", Block.CONCRETE);
+    importMaterial(materials, "block:concrete_powder", Block.CONCRETE_POWDER);
+    importMaterial(materials, "block:structure_block", Block.STRUCTURE_BLOCK);
+  }
+
+  private void importMaterial(Map<String, JsonValue> propertyMap, String name, Material material) {
+    JsonValue value = propertyMap.get(name);
+    if (value != null) {
+      JsonObject properties = value.object();
+      material.emittance = properties.get("emittance").floatValue(material.emittance);
+      material.specular = properties.get("specular").floatValue(material.specular);
+      material.ior = properties.get("ior").floatValue(material.ior);
+    }
+  }
+
+  private void importMaterial(Map<String, JsonValue> propertyMap, String name,
+      Material... materials) {
+    JsonValue value = propertyMap.get(name);
+    if (value != null) {
+      JsonObject properties = value.object();
+      for (Material material : materials) {
+        material.emittance = properties.get("emittance").floatValue(material.emittance);
+        material.specular = properties.get("specular").floatValue(material.specular);
+        material.ior = properties.get("ior").floatValue(material.ior);
+      }
     }
   }
 }

@@ -356,7 +356,7 @@ public class ChunkyFxController
         Block.get(Block.IRONORE_ID), Block.get(Block.COALORE_ID),
         Block.get(Block.REDSTONEORE_ID), Block.get(Block.DIAMONDORE_ID),
         Block.get(Block.GOLDORE_ID), Block.get(Block.MONSTERSPAWNER_ID),
-        Block.get(Block.BRICKS_ID), Block.get(Block.CLAY_ID), Block.get(Block.LAPISLAZULIORE_ID),
+        Block.get(Block.BRICKS_ID), Block.get(Block.CLAY_ID), Block.get(Block.LAPIS_ORE_ID),
         Block.get(Block.EMERALDORE_ID), Block.get(Block.NETHERQUARTZORE_ID));
     highlightCb.getSelectionModel().select(Block.get(Block.DIAMONDORE_ID));
     highlightCb.getSelectionModel().selectedItemProperty().addListener((item, prev, next) -> {

@@ -23,13 +23,11 @@ import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.json.JsonValue;
 
 /**
- * Utility class for managing program properties.
- *
- * @author Jesper Öqvist <jesper@llbit.se>
+ * Utility class for managing global Chunky settings.
  */
 public final class PersistentSettings {
 
-  private static JsonSettings settings = new JsonSettings();
+  public static JsonSettings settings = new JsonSettings();
 
   public static final String SETTINGS_FILE = "chunky.json";
   public static final String DEFAULT_SCENE_DIRECTORY_NAME = "scenes";

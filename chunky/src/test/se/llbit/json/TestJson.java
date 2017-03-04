@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -313,5 +314,23 @@ public class TestJson {
 
     assertEquals("{\" ab cd\":123,\"@\":\"''''\",\"\\\"\\\"\":\"\\n\\r\",\".\":[\"!\",711]}",
         object.toCompactString());
+  }
+
+  @Test public void testToMap() {
+    JsonArray array = new JsonArray();
+    array.add("!");
+    array.add(711);
+    JsonObject object = new JsonObject();
+    object.add(" ab cd", 123);
+    object.add("@", "''''");
+    object.add("\"\"", "\n\r");
+    object.add(".", array);
+    object.add("@", "notfirst");
+
+    Map<String, JsonValue> map = object.toMap();
+    assertEquals(123, map.get(" ab cd").intValue(0));
+    assertEquals("''''", map.get("@").stringValue(""));
+    assertEquals("\n\r", map.get("\"\"").stringValue(""));
+    assertSame(array, map.get("."));
   }
 }

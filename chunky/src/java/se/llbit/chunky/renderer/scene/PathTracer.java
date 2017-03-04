@@ -90,8 +90,6 @@ public class PathTracer implements RayTracer {
         break;
       }
 
-      double pSpecular = 0;
-
       Material currentMat = ray.getCurrentMaterial();
       Material prevMat = ray.getPrevMaterial();
 
@@ -104,13 +102,7 @@ public class PathTracer implements RayTracer {
         }
       }
 
-      if (currentMat.isShiny) {
-        if (currentMat.isWater()) {
-          pSpecular = Scene.WATER_SPECULAR;
-        } else {
-          pSpecular = Scene.SPECULAR_COEFF;
-        }
-      }
+      float pSpecular = currentMat.specular;
 
       double pDiffuse = ray.color.w;
 
@@ -131,7 +123,7 @@ public class PathTracer implements RayTracer {
         continue;
       }
 
-      if (currentMat.isShiny && random.nextDouble() < pSpecular) {
+      if (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular) {
         // Specular reflection.
 
         firstReflection = false;
@@ -141,16 +133,16 @@ public class PathTracer implements RayTracer {
           reflected.specularReflection(ray);
 
           if (pathTrace(scene, reflected, state, 1, false)) {
-            ray.color.x *= reflected.color.x;
-            ray.color.y *= reflected.color.y;
-            ray.color.z *= reflected.color.z;
+            ray.color.x = reflected.color.x;
+            ray.color.y = reflected.color.y;
+            ray.color.z = reflected.color.z;
             hit = true;
           }
         }
 
       } else {
 
-        if (random.nextDouble() < pDiffuse) {
+        if (random.nextFloat() < pDiffuse) {
           // Diffuse reflection.
 
           firstReflection = false;
@@ -158,9 +150,9 @@ public class PathTracer implements RayTracer {
           if (!scene.kill(ray.depth + 1, random)) {
             Ray reflected = new Ray();
 
-            double emittance = 0;
+            float emittance = 0;
 
-            if (scene.emittersEnabled && currentMat.isEmitter) {
+            if (scene.emittersEnabled && currentMat.emittance > Ray.EPSILON) {
 
               emittance = addEmitted;
               ray.emittance.x = ray.color.x * ray.color.x *
@@ -183,7 +175,7 @@ public class PathTracer implements RayTracer {
               boolean frontLight = reflected.d.dot(ray.n) > 0;
 
               if (frontLight || (currentMat.subSurfaceScattering
-                  && random.nextDouble() < Scene.fSubSurface)) {
+                  && random.nextFloat() < Scene.fSubSurface)) {
 
                 if (!frontLight) {
                   reflected.o.scaleAdd(-Ray.OFFSET, ray.n);
@@ -266,7 +258,7 @@ public class PathTracer implements RayTracer {
               double c = 1 - cosTheta;
               double Rtheta = R0 + (1 - R0) * c * c * c * c * c;
 
-              if (random.nextDouble() < Rtheta) {
+              if (random.nextFloat() < Rtheta) {
                 Ray reflected = new Ray();
                 reflected.specularReflection(ray);
                 if (pathTrace(scene, reflected, state, 1, false)) {

@@ -97,6 +97,8 @@ import java.util.Set;
  *
  * <p>This class also determines how blocks are rendered.
  *
+ * <p>Block ID reference: http://minecraft.gamepedia.com/Data_values/Block_IDs
+ *
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
 public class Block extends Material {
@@ -114,7 +116,7 @@ public class Block extends Material {
     }
   };
   public static final int STONE_ID = 0x01;
-  private static final Block STONE = new Block(STONE_ID, "Stone", Texture.stone) {
+  public static final Block STONE = new Block(STONE_ID, "Stone", Texture.stone) {
     {
       isOpaque = true;
       isSolid = true;
@@ -137,7 +139,7 @@ public class Block extends Material {
     }
   };
   public static final int GRASS_ID = 0x02;
-  private static final Block GRASS = new Block(GRASS_ID, "Grass", Texture.grassTop) {
+  public static final Block GRASS = new Block(GRASS_ID, "Grass", Texture.grassTop) {
     {
       isOpaque = true;
       isSolid = true;
@@ -149,7 +151,7 @@ public class Block extends Material {
     }
   };
   public static final int DIRT_ID = 0x03;
-  private static final Block DIRT = new Block(DIRT_ID, "Dirt", Texture.dirt) {
+  public static final Block DIRT = new Block(DIRT_ID, "Dirt", Texture.dirt) {
     {
       isOpaque = true;
       isSolid = true;
@@ -174,14 +176,14 @@ public class Block extends Material {
     }
   };
   public static final int COBBLESTONE_ID = 0x04;
-  private static final Block COBBLESTONE = new Block(COBBLESTONE_ID, "Cobblestone", Texture.cobblestone) {
+  public static final Block COBBLESTONE = new Block(COBBLESTONE_ID, "Cobblestone", Texture.cobblestone) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int WOODENPLANKS_ID = 0x05;
-  private static final Block WOODENPLANKS = new Block(WOODENPLANKS_ID, "Wooden Planks", Texture.oakPlanks) {
+  public static final Block WOODENPLANKS = new Block(WOODENPLANKS_ID, "Wooden Planks", Texture.oakPlanks) {
     {
       isOpaque = true;
       isSolid = true;
@@ -202,7 +204,7 @@ public class Block extends Material {
     }
   };
   public static final int SAPLING_ID = 0x06;
-  private static final Block SAPLING = new Block(SAPLING_ID, "Sapling", Texture.oakSapling) {
+  public static final Block SAPLING = new Block(SAPLING_ID, "Sapling", Texture.oakSapling) {
     {
       isOpaque = false;
       isSolid = false;
@@ -223,13 +225,13 @@ public class Block extends Material {
     }
   };
   public static final int BEDROCK_ID = 0x07;
-  private static final Block BEDROCK = new Block(BEDROCK_ID, "Bedrock", Texture.bedrock);
+  public static final Block BEDROCK = new Block(BEDROCK_ID, "Bedrock", Texture.bedrock);
   public static final int WATER_ID = 0x08;
-  private static final Block WATER = new Block(WATER_ID, "Water", Texture.water) {
+  public static final Block WATER = new Block(WATER_ID, "Water", Texture.water) {
     {
       isOpaque = false;
       isSolid = false;
-      isShiny = true;
+      specular = Scene.WATER_SPECULAR;
       localIntersect = true;
       ior = 1.333f;
     }
@@ -247,11 +249,11 @@ public class Block extends Material {
     }
   };
   public static final int STATIONARYWATER_ID = 0x09;
-  private static final Block STATIONARYWATER = new Block(STATIONARYWATER_ID, "Stationary Water", Texture.water) {
+  public static final Block STATIONARYWATER = new Block(STATIONARYWATER_ID, "Stationary Water", Texture.water) {
     {
       isOpaque = false;
       isSolid = false;
-      isShiny = true;
+      specular = Scene.WATER_SPECULAR;
       localIntersect = true;
       ior = 1.333f;
     }
@@ -265,12 +267,11 @@ public class Block extends Material {
     }
   };
   public static final int LAVA_ID = 0x0A;
-  private static final Block LAVA = new Block(LAVA_ID, "Lava", Texture.lava) {
+  public static final Block LAVA = new Block(LAVA_ID, "Lava", Texture.lava) {
     {
       isOpaque = false;
       isSolid = false;
-      isEmitter = true;
-      emittance = 1.0;
+      emittance = 1.0f;
       localIntersect = true;
     }
 
@@ -279,12 +280,11 @@ public class Block extends Material {
     }
   };
   public static final int STATIONARYLAVA_ID = 0x0B;
-  private static final Block STATIONARYLAVA = new Block(STATIONARYLAVA_ID, "Stationary Lava", Texture.lava) {
+  public static final Block STATIONARYLAVA = new Block(STATIONARYLAVA_ID, "Stationary Lava", Texture.lava) {
     {
       isOpaque = false;
       isSolid = false;
-      isEmitter = true;
-      emittance = 1.0;
+      emittance = 1.0f;
       localIntersect = true;
     }
 
@@ -293,7 +293,7 @@ public class Block extends Material {
     }
   };
   public static final int SAND_ID = 0x0C;
-  private static final Block SAND = new Block(SAND_ID, "Sand", Texture.sand) {
+  public static final Block SAND = new Block(SAND_ID, "Sand", Texture.sand) {
     {
       isOpaque = true;
       isSolid = true;
@@ -311,35 +311,35 @@ public class Block extends Material {
     }
   };
   public static final int GRAVEL_ID = 0x0D;
-  private static final Block GRAVEL = new Block(GRAVEL_ID, "Gravel", Texture.gravel) {
+  public static final Block GRAVEL = new Block(GRAVEL_ID, "Gravel", Texture.gravel) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int GOLDORE_ID = 0x0E;
-  private static final Block GOLDORE = new Block(GOLDORE_ID, "Gold Ore", Texture.goldOre) {
+  public static final Block GOLDORE = new Block(GOLDORE_ID, "Gold Ore", Texture.goldOre) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int IRONORE_ID = 0x0F;
-  private static final Block IRONORE = new Block(IRONORE_ID, "Iron Ore", Texture.ironOre) {
+  public static final Block IRONORE = new Block(IRONORE_ID, "Iron Ore", Texture.ironOre) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int COALORE_ID = 0x10;
-  private static final Block COALORE = new Block(COALORE_ID, "Coal Ore", Texture.coalOre) {
+  public static final Block COALORE = new Block(COALORE_ID, "Coal Ore", Texture.coalOre) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int WOOD_ID = 0x11;
-  private static final Block WOOD = new Block(WOOD_ID, "Wood", Texture.oakWood) {
+  public static final Block WOOD = new Block(WOOD_ID, "Wood", Texture.oakWood) {
     {
       isOpaque = true;
       isSolid = true;
@@ -365,7 +365,7 @@ public class Block extends Material {
     }
   };
   public static final int LEAVES_ID = 0x12;
-  private static final Block LEAVES = new Block(LEAVES_ID, "Leaves", Texture.oakLeaves) {
+  public static final Block LEAVES = new Block(LEAVES_ID, "Leaves", Texture.oakLeaves) {
     {
       isOpaque = false;
       isSolid = true;
@@ -391,7 +391,7 @@ public class Block extends Material {
     }
   };
   public static final int SPONGE_ID = 0x13;
-  private static final Block SPONGE = new Block(SPONGE_ID, "Sponge", Texture.sponge) {
+  public static final Block SPONGE = new Block(SPONGE_ID, "Sponge", Texture.sponge) {
     {
       isOpaque = true;
       isSolid = true;
@@ -411,7 +411,7 @@ public class Block extends Material {
     }
   };
   public static final int GLASS_ID = 0x14;
-  private static final Block GLASS = new Block(GLASS_ID, "Glass", Texture.glass) {
+  public static final Block GLASS = new Block(GLASS_ID, "Glass", Texture.glass) {
     {
       isOpaque = false;
       isSolid = true;
@@ -422,24 +422,24 @@ public class Block extends Material {
       return other == this || other == STAINED_GLASS;
     }
   };
-  public static final int LAPISLAZULIORE_ID = 0x15;
-  private static final Block LAPISLAZULIORE =
-      new Block(LAPISLAZULIORE_ID, "Lapis Lazuli Ore", Texture.lapislazuliOre) {
+  public static final int LAPIS_ORE_ID = 0x15;
+  public static final Block LAPIS_ORE =
+      new Block(LAPIS_ORE_ID, "Lapis Lazuli Ore", Texture.lapisOre) {
         {
           isOpaque = true;
           isSolid = true;
         }
       };
-  public static final int LAPISLAZULIBLOCK_ID = 0x16;
-  private static final Block LAPISLAZULIBLOCK =
-      new Block(LAPISLAZULIBLOCK_ID, "Lapis Lazuli Block", Texture.lapislazuliBlock) {
+  public static final int LAPIS_BLOCK_ID = 0x16;
+  public static final Block LAPIS_BLOCK =
+      new Block(LAPIS_BLOCK_ID, "Lapis Lazuli Block", Texture.lapisBlock) {
         {
           isOpaque = true;
           isSolid = true;
         }
       };
   public static final int DISPENSER_ID = 0x17;
-  private static final Block DISPENSER = new Block(DISPENSER_ID, "Dispenser", Texture.dispenserFront) {
+  public static final Block DISPENSER = new Block(DISPENSER_ID, "Dispenser", Texture.dispenserFront) {
     {
       isOpaque = true;
       isSolid = true;
@@ -472,7 +472,7 @@ public class Block extends Material {
     }
   };
   public static final int SANDSTONE_ID = 0x18;
-  private static final Block SANDSTONE = new Block(SANDSTONE_ID, "Sandstone", Texture.sandstoneSide) {
+  public static final Block SANDSTONE = new Block(SANDSTONE_ID, "Sandstone", Texture.sandstoneSide) {
     {
       isOpaque = true;
       isSolid = true;
@@ -497,7 +497,7 @@ public class Block extends Material {
     }
   };
   public static final int NOTEBLOCK_ID = 0x19;
-  private static final Block NOTEBLOCK = new Block(NOTEBLOCK_ID, "Note Block", Icon.noteBlock) {
+  public static final Block NOTEBLOCK = new Block(NOTEBLOCK_ID, "Note Block", Icon.noteBlock) {
     {
       isOpaque = true;
       isSolid = true;
@@ -508,7 +508,7 @@ public class Block extends Material {
     }
   };
   public static final int BED_ID = 0x1A;
-  private static final Block BED = new Block(BED_ID, "Bed", Icon.bed) {
+  public static final Block BED = new Block(BED_ID, "Bed", Icon.bed) {
     {
       isOpaque = false;
       isSolid = false;
@@ -520,7 +520,7 @@ public class Block extends Material {
     }
   };
   public static final int POWEREDRAIL_ID = 0x1B;
-  private static final Block POWEREDRAIL = new Block(POWEREDRAIL_ID, "Powered Rail", Texture.poweredRailOn) {
+  public static final Block POWEREDRAIL = new Block(POWEREDRAIL_ID, "Powered Rail", Texture.poweredRailOn) {
     {
       isOpaque = false;
       isSolid = false;
@@ -535,7 +535,7 @@ public class Block extends Material {
     }
   };
   public static final int DETECTORRAIL_ID = 0x1C;
-  private static final Block DETECTORRAIL = new Block(DETECTORRAIL_ID, "Detector Rail", Texture.detectorRail) {
+  public static final Block DETECTORRAIL = new Block(DETECTORRAIL_ID, "Detector Rail", Texture.detectorRail) {
     {
       isOpaque = false;
       isSolid = false;
@@ -547,7 +547,7 @@ public class Block extends Material {
     }
   };
   public static final int STICKYPISTON_ID = 0x1D;
-  private static final Block STICKYPISTON = new Block(STICKYPISTON_ID, "Sticky Piston", Texture.pistonTopSticky) {
+  public static final Block STICKYPISTON = new Block(STICKYPISTON_ID, "Sticky Piston", Texture.pistonTopSticky) {
     {
       isOpaque = false;
       isSolid = false;
@@ -559,7 +559,7 @@ public class Block extends Material {
     }
   };
   public static final int COBWEB_ID = 0x1E;
-  private static final Block COBWEB = new Block(COBWEB_ID, "Cobweb", Texture.cobweb) {
+  public static final Block COBWEB = new Block(COBWEB_ID, "Cobweb", Texture.cobweb) {
     {
       isOpaque = false;
       isSolid = false;
@@ -571,7 +571,7 @@ public class Block extends Material {
     }
   };
   public static final int TALLGRASS_ID = 0x1F;
-  private static final Block TALLGRASS = new Block(TALLGRASS_ID, "Tall Grass", Texture.tallGrass) {
+  public static final Block TALLGRASS = new Block(TALLGRASS_ID, "Tall Grass", Texture.tallGrass) {
     {
       isOpaque = false;
       isSolid = false;
@@ -584,7 +584,7 @@ public class Block extends Material {
     }
   };
   public static final int DEADBUSH_ID = 0x20;
-  private static final Block DEADBUSH = new Block(DEADBUSH_ID, "Dead Bush", Texture.deadBush) {
+  public static final Block DEADBUSH = new Block(DEADBUSH_ID, "Dead Bush", Texture.deadBush) {
     {
       isOpaque = false;
       isSolid = false;
@@ -596,7 +596,7 @@ public class Block extends Material {
     }
   };
   public static final int PISTON_ID = 0x21;
-  private static final Block PISTON = new Block(PISTON_ID, "Piston", Texture.pistonTop) {
+  public static final Block PISTON = new Block(PISTON_ID, "Piston", Texture.pistonTop) {
     {
       isOpaque = false;
       isSolid = false;
@@ -607,8 +607,9 @@ public class Block extends Material {
       return PistonModel.intersect(ray, 0);
     }
   };
-  public static final int PISTONEXTENSION_ID = 0x22;
-  private static final Block PISTONEXTENSION = new Block(PISTONEXTENSION_ID, "Piston Extension", Texture.pistonTop) {
+  public static final int PISTON_HEAD_ID = 0x22;
+  public static final Block PISTON_HEAD = new Block(PISTON_HEAD_ID,
+      "Piston Head", Texture.pistonTop) {
     {
       isOpaque = false;
       isSolid = false;
@@ -620,7 +621,7 @@ public class Block extends Material {
     }
   };
   public static final int WOOL_ID = 0x23;
-  private static final Block WOOL = new Block(WOOL_ID, "Wool", Texture.lightGrayWool) {
+  public static final Block WOOL = new Block(WOOL_ID, "Wool", Texture.lightGrayWool) {
     {
       isOpaque = true;
       isSolid = true;
@@ -634,8 +635,9 @@ public class Block extends Material {
       return woolColor[data & 15];
     }
   };
-  public static final int MOVEDBYPISTON_ID = 0x24;
-  private static final Block MOVEDBYPISTON = new Block(MOVEDBYPISTON_ID, "Block moved by Piston", Texture.unknown) {
+  public static final int PISTON_EXTENSION_ID = 0x24;
+  public static final Block PISTON_EXTENSION = new Block(PISTON_EXTENSION_ID,
+      "Block moved by Piston", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -643,7 +645,7 @@ public class Block extends Material {
     }
   };
   public static final int DANDELION_ID = 0x25;
-  private static final Block DANDELION = new Block(DANDELION_ID, "Dandelion", Texture.dandelion) {
+  public static final Block DANDELION = new Block(DANDELION_ID, "Dandelion", Texture.dandelion) {
     {
       isOpaque = false;
       isSolid = false;
@@ -656,7 +658,7 @@ public class Block extends Material {
     }
   };
   public static final int FLOWER_ID = 0x26;
-  private static final Block FLOWER = new Block(FLOWER_ID, "Flower", Texture.poppy) {
+  public static final Block FLOWER = new Block(FLOWER_ID, "Flower", Texture.poppy) {
     {
       isOpaque = false;
       isSolid = false;
@@ -681,7 +683,7 @@ public class Block extends Material {
     }
   };
   public static final int BROWNMUSHROOM_ID = 0x27;
-  private static final Block BROWNMUSHROOM = new Block(BROWNMUSHROOM_ID, "Brown Mushroom", Texture.brownMushroom) {
+  public static final Block BROWNMUSHROOM = new Block(BROWNMUSHROOM_ID, "Brown Mushroom", Texture.brownMushroom) {
     {
       isOpaque = false;
       isSolid = false;
@@ -693,7 +695,7 @@ public class Block extends Material {
     }
   };
   public static final int REDMUSHROOM_ID = 0x28;
-  private static final Block REDMUSHROOM = new Block(REDMUSHROOM_ID, "Red Mushroom", Texture.redMushroom) {
+  public static final Block REDMUSHROOM = new Block(REDMUSHROOM_ID, "Red Mushroom", Texture.redMushroom) {
     {
       isOpaque = false;
       isSolid = false;
@@ -705,23 +707,23 @@ public class Block extends Material {
     }
   };
   public static final int GOLDBLOCK_ID = 0x29;
-  private static final Block GOLDBLOCK = new Block(GOLDBLOCK_ID, "Gold Block", Texture.goldBlock) {
+  public static final Block GOLDBLOCK = new Block(GOLDBLOCK_ID, "Gold Block", Texture.goldBlock) {
     {
       isOpaque = true;
       isSolid = true;
-      isShiny = true;
+      specular = Scene.SPECULAR_COEFF;
     }
   };
   public static final int IRONBLOCK_ID = 0x2A;
-  private static final Block IRONBLOCK = new Block(IRONBLOCK_ID, "Iron Block", Texture.ironBlock) {
+  public static final Block IRONBLOCK = new Block(IRONBLOCK_ID, "Iron Block", Texture.ironBlock) {
     {
       isOpaque = true;
       isSolid = true;
-      isShiny = true;
+      specular = Scene.SPECULAR_COEFF;
     }
   };
   public static final int DOUBLESLAB_ID = 0x2B;
-  private static final Block DOUBLESLAB = new Block(DOUBLESLAB_ID, "Double Stone Slab", Texture.slabTop) {
+  public static final Block DOUBLESLAB = new Block(DOUBLESLAB_ID, "Double Stone Slab", Texture.slabTop) {
     {
       isOpaque = true;
       isSolid = true;
@@ -773,7 +775,7 @@ public class Block extends Material {
     }
   };
   public static final int SLAB_ID = 0x2C;
-  private static final Block SLAB = new Block(SLAB_ID, "Stone Slab", Texture.slabTop) {
+  public static final Block SLAB = new Block(SLAB_ID, "Stone Slab", Texture.slabTop) {
     {
       isOpaque = false;
       isSolid = false;
@@ -798,14 +800,14 @@ public class Block extends Material {
     }
   };
   public static final int BRICKS_ID = 0x2D;
-  private static final Block BRICKS = new Block(BRICKS_ID, "Bricks", Texture.brick) {
+  public static final Block BRICKS = new Block(BRICKS_ID, "Bricks", Texture.brick) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int TNT_ID = 0x2E;
-  private static final Block TNT = new Block(TNT_ID, "TNT", Texture.tntSide) {
+  public static final Block TNT = new Block(TNT_ID, "TNT", Texture.tntSide) {
     {
       isOpaque = true;
       isSolid = true;
@@ -821,7 +823,7 @@ public class Block extends Material {
     }
   };
   public static final int BOOKSHELF_ID = 0x2F;
-  private static final Block BOOKSHELF = new Block(BOOKSHELF_ID, "Bookshelf", Texture.bookshelf) {
+  public static final Block BOOKSHELF = new Block(BOOKSHELF_ID, "Bookshelf", Texture.bookshelf) {
     {
       isOpaque = true;
       isSolid = true;
@@ -837,26 +839,25 @@ public class Block extends Material {
     }
   };
   public static final int MOSSSTONE_ID = 0x30;
-  private static final Block MOSSSTONE = new Block(MOSSSTONE_ID, "Moss Stone", Texture.mossStone) {
+  public static final Block MOSSSTONE = new Block(MOSSSTONE_ID, "Moss Stone", Texture.mossStone) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int OBSIDIAN_ID = 0x31;
-  private static final Block OBSIDIAN = new Block(OBSIDIAN_ID, "Obsidian", Texture.obsidian) {
+  public static final Block OBSIDIAN = new Block(OBSIDIAN_ID, "Obsidian", Texture.obsidian) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int TORCH_ID = 0x32;
-  private static final Block TORCH = new Block(TORCH_ID, "Torch", Texture.torch) {
+  public static final Block TORCH = new Block(TORCH_ID, "Torch", Texture.torch) {
     {
       isOpaque = false;
       isSolid = false;
-      isEmitter = true;
-      emittance = 50.0;
+      emittance = 50.0f;
       localIntersect = true;
     }
 
@@ -871,12 +872,11 @@ public class Block extends Material {
     }
   };
   public static final int FIRE_ID = 0x33;
-  private static final Block FIRE = new Block(FIRE_ID, "Fire", Texture.fire) {
+  public static final Block FIRE = new Block(FIRE_ID, "Fire", Texture.fire) {
     {
       isOpaque = false;
       isSolid = false;
-      isEmitter = true;
-      emittance = 1.0;
+      emittance = 1.0f;
       localIntersect = true;
     }
 
@@ -885,14 +885,14 @@ public class Block extends Material {
     }
   };
   public static final int MONSTERSPAWNER_ID = 0x34;
-  private static final Block MONSTERSPAWNER = new Block(MONSTERSPAWNER_ID, "Monster Spawner", Texture.monsterSpawner) {
+  public static final Block MONSTERSPAWNER = new Block(MONSTERSPAWNER_ID, "Monster Spawner", Texture.monsterSpawner) {
     {
       isOpaque = false;
       isSolid = true;
     }
   };
   public static final int OAKWOODSTAIRS_ID = 0x35;
-  private static final Block OAKWOODSTAIRS = new Block(OAKWOODSTAIRS_ID, "Wooden Stairs", Icon.woodenStairs) {
+  public static final Block OAKWOODSTAIRS = new Block(OAKWOODSTAIRS_ID, "Wooden Stairs", Icon.woodenStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -908,7 +908,7 @@ public class Block extends Material {
     }
   };
   public static final int CHEST_ID = 0x36;
-  private static final Block CHEST = new Block(CHEST_ID, "Chest", Texture.chestFront) {
+  public static final Block CHEST = new Block(CHEST_ID, "Chest", Texture.chestFront) {
     {
       isOpaque = false;
       isSolid = false;
@@ -936,7 +936,7 @@ public class Block extends Material {
     }
   };
   public static final int REDSTONEWIRE_ID = 0x37;
-  private static final Block REDSTONEWIRE = new Block(REDSTONEWIRE_ID, "Redstone Wire", Texture.redstoneWireCross) {
+  public static final Block REDSTONEWIRE = new Block(REDSTONEWIRE_ID, "Redstone Wire", Texture.redstoneWireCross) {
     {
       isOpaque = false;
       isSolid = false;
@@ -952,22 +952,22 @@ public class Block extends Material {
     }
   };
   public static final int DIAMONDORE_ID = 0x38;
-  private static final Block DIAMONDORE = new Block(DIAMONDORE_ID, "Diamond Ore", Texture.diamondOre) {
+  public static final Block DIAMONDORE = new Block(DIAMONDORE_ID, "Diamond Ore", Texture.diamondOre) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int DIAMONDBLOCK_ID = 0x39;
-  private static final Block DIAMONDBLOCK = new Block(DIAMONDBLOCK_ID, "Diamond Block", Texture.diamondBlock) {
+  public static final Block DIAMONDBLOCK = new Block(DIAMONDBLOCK_ID, "Diamond Block", Texture.diamondBlock) {
     {
       isOpaque = true;
       isSolid = true;
-      isShiny = true;
+      specular = Scene.SPECULAR_COEFF;
     }
   };
   public static final int WORKBENCH_ID = 0x3A;
-  private static final Block WORKBENCH = new Block(WORKBENCH_ID, "Workbench", Texture.workbenchFront) {
+  public static final Block WORKBENCH = new Block(WORKBENCH_ID, "Workbench", Texture.workbenchFront) {
     {
       isOpaque = true;
       isSolid = true;
@@ -983,7 +983,7 @@ public class Block extends Material {
     }
   };
   public static final int CROPS_ID = 0x3B;
-  private static final Block CROPS = new Block(CROPS_ID, "Wheat", Texture.crops7) {
+  public static final Block CROPS = new Block(CROPS_ID, "Wheat", Texture.crops7) {
     {
       isOpaque = false;
       isSolid = false;
@@ -999,7 +999,7 @@ public class Block extends Material {
     }
   };
   public static final int SOIL_ID = 0x3C;
-  private static final Block SOIL = new Block(SOIL_ID, "Soil", Texture.farmlandWet) {
+  public static final Block SOIL = new Block(SOIL_ID, "Soil", Texture.farmlandWet) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1011,7 +1011,7 @@ public class Block extends Material {
     }
   };
   public static final int FURNACEUNLIT_ID = 0x3D;
-  private static final Block FURNACEUNLIT = new Block(FURNACEUNLIT_ID, "Furnace", Texture.furnaceUnlitFront) {
+  public static final Block FURNACEUNLIT = new Block(FURNACEUNLIT_ID, "Furnace", Texture.furnaceUnlitFront) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1027,7 +1027,7 @@ public class Block extends Material {
     }
   };
   public static final int FURNACELIT_ID = 0x3E;
-  private static final Block FURNACELIT = new Block(FURNACELIT_ID, "Burning Furnace", Texture.furnaceLitFront) {
+  public static final Block FURNACELIT = new Block(FURNACELIT_ID, "Burning Furnace", Texture.furnaceLitFront) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1043,7 +1043,7 @@ public class Block extends Material {
     }
   };
   public static final int SIGNPOST_ID = 0x3F;
-  private static final Block SIGNPOST = new Block(SIGNPOST_ID, "Sign Post", Icon.signPost) {
+  public static final Block SIGNPOST = new Block(SIGNPOST_ID, "Sign Post", Icon.signPost) {
     {
       // This block is rendered as an entity instead of a voxel.
       isOpaque = false;
@@ -1052,7 +1052,7 @@ public class Block extends Material {
     }
   };
   public static final int WOODENDOOR_ID = 0x40;
-  private static final Block WOODENDOOR = new Block(WOODENDOOR_ID, "Wooden Door", Icon.woodenDoor) {
+  public static final Block WOODENDOOR = new Block(WOODENDOOR_ID, "Wooden Door", Icon.woodenDoor) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1066,7 +1066,7 @@ public class Block extends Material {
     }
   };
   public static final int LADDER_ID = 0x41;
-  private static final Block LADDER = new Block(LADDER_ID, "Ladder", Texture.ladder) {
+  public static final Block LADDER = new Block(LADDER_ID, "Ladder", Texture.ladder) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1078,7 +1078,7 @@ public class Block extends Material {
     }
   };
   public static final int MINECARTTRACKS_ID = 0x42;
-  private static final Block MINECARTTRACKS = new Block(MINECARTTRACKS_ID, "Minecart Tracks", Texture.rails) {
+  public static final Block MINECARTTRACKS = new Block(MINECARTTRACKS_ID, "Minecart Tracks", Texture.rails) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1096,7 +1096,7 @@ public class Block extends Material {
     }
   };
   public static final int STONESTAIRS_ID = 0x43;
-  private static final Block STONESTAIRS = new Block(STONESTAIRS_ID, "Cobblestone Stairs", Icon.stoneStairs) {
+  public static final Block STONESTAIRS = new Block(STONESTAIRS_ID, "Cobblestone Stairs", Icon.stoneStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1112,7 +1112,7 @@ public class Block extends Material {
     }
   };
   public static final int WALLSIGN_ID = 0x44;
-  private static final Block WALLSIGN = new Block(WALLSIGN_ID, "Wall Sign", Icon.wallSign) {
+  public static final Block WALLSIGN = new Block(WALLSIGN_ID, "Wall Sign", Icon.wallSign) {
     {
       // This block is rendered as an entity instead of a voxel.
       isOpaque = false;
@@ -1121,7 +1121,7 @@ public class Block extends Material {
     }
   };
   public static final int LEVER_ID = 0x45;
-  private static final Block LEVER = new Block(LEVER_ID, "Lever", Texture.lever) {
+  public static final Block LEVER = new Block(LEVER_ID, "Lever", Texture.lever) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1133,7 +1133,7 @@ public class Block extends Material {
     }
   };
   public static final int STONEPRESSUREPLATE_ID = 0x46;
-  private static final Block STONEPRESSUREPLATE = new Block(STONEPRESSUREPLATE_ID, "Stone Pressure Plate", Icon.stonePressurePlate) {
+  public static final Block STONEPRESSUREPLATE = new Block(STONEPRESSUREPLATE_ID, "Stone Pressure Plate", Icon.stonePressurePlate) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1145,7 +1145,7 @@ public class Block extends Material {
     }
   };
   public static final int IRONDOOR_ID = 0x47;
-  private static final Block IRONDOOR = new Block(IRONDOOR_ID, "Iron Door", Icon.ironDoor) {
+  public static final Block IRONDOOR = new Block(IRONDOOR_ID, "Iron Door", Icon.ironDoor) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1159,7 +1159,7 @@ public class Block extends Material {
     }
   };
   public static final int WOODENPRESSUREPLATE_ID = 0x48;
-  private static final Block WOODENPRESSUREPLATE = new Block(WOODENPRESSUREPLATE_ID, "Wooden Pressure Plate", Icon.woodenPressurePlate) {
+  public static final Block WOODENPRESSUREPLATE = new Block(WOODENPRESSUREPLATE_ID, "Wooden Pressure Plate", Icon.woodenPressurePlate) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1171,21 +1171,21 @@ public class Block extends Material {
     }
   };
   public static final int REDSTONEORE_ID = 0x49;
-  private static final Block REDSTONEORE = new Block(REDSTONEORE_ID, "Redstone Ore", Texture.redstoneOre) {
+  public static final Block REDSTONEORE = new Block(REDSTONEORE_ID, "Redstone Ore", Texture.redstoneOre) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int GLOWINGREDSTONEORE_ID = 0x4A;
-  private static final Block GLOWINGREDSTONEORE = new Block(GLOWINGREDSTONEORE_ID, "Glowing Redstone Ore", Texture.redstoneOre) {
+  public static final Block GLOWINGREDSTONEORE = new Block(GLOWINGREDSTONEORE_ID, "Glowing Redstone Ore", Texture.redstoneOre) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int REDSTONETORCHOFF_ID = 0x4B;
-  private static final Block REDSTONETORCHOFF = new Block(REDSTONETORCHOFF_ID, "Redstone Torch (off)", Texture.redstoneTorchOff) {
+  public static final Block REDSTONETORCHOFF = new Block(REDSTONETORCHOFF_ID, "Redstone Torch (off)", Texture.redstoneTorchOff) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1203,12 +1203,11 @@ public class Block extends Material {
     }
   };
   public static final int REDSTONETORCHON_ID = 0x4C;
-  private static final Block REDSTONETORCHON = new Block(REDSTONETORCHON_ID, "Redstone Torch (on)", Texture.redstoneTorchOn) {
+  public static final Block REDSTONETORCHON = new Block(REDSTONETORCHON_ID, "Redstone Torch (on)", Texture.redstoneTorchOn) {
     {
       isOpaque = false;
       isSolid = false;
-      isEmitter = true;
-      emittance = 1.0;
+      emittance = 1.0f;
       localIntersect = true;
     }
 
@@ -1223,7 +1222,7 @@ public class Block extends Material {
     }
   };
   public static final int STONEBUTTON_ID = 0x4D;
-  private static final Block STONEBUTTON = new Block(STONEBUTTON_ID, "Stone Button", Icon.stoneButton) {
+  public static final Block STONEBUTTON = new Block(STONEBUTTON_ID, "Stone Button", Icon.stoneButton) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1235,7 +1234,7 @@ public class Block extends Material {
     }
   };
   public static final int SNOW_ID = 0x4E;
-  private static final Block SNOW = new Block(SNOW_ID, "Snow", Texture.snowBlock) {
+  public static final Block SNOW = new Block(SNOW_ID, "Snow", Texture.snowBlock) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1247,7 +1246,7 @@ public class Block extends Material {
     }
   };
   public static final int ICE_ID = 0x4F;
-  private static final Block ICE = new Block(ICE_ID, "Ice", Texture.ice) {
+  public static final Block ICE = new Block(ICE_ID, "Ice", Texture.ice) {
     {
       isOpaque = false;
       isSolid = true;
@@ -1255,14 +1254,14 @@ public class Block extends Material {
     }
   };
   public static final int SNOWBLOCK_ID = 0x50;
-  private static final Block SNOWBLOCK = new Block(SNOWBLOCK_ID, "Snow Block", Texture.snowBlock) {
+  public static final Block SNOWBLOCK = new Block(SNOWBLOCK_ID, "Snow Block", Texture.snowBlock) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int CACTUS_ID = 0x51;
-  private static final Block CACTUS = new Block(CACTUS_ID, "Cactus", Texture.cactusSide) {
+  public static final Block CACTUS = new Block(CACTUS_ID, "Cactus", Texture.cactusSide) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1274,14 +1273,14 @@ public class Block extends Material {
     }
   };
   public static final int CLAY_ID = 0x52;
-  private static final Block CLAY = new Block(CLAY_ID, "Clay", Texture.clay) {
+  public static final Block CLAY = new Block(CLAY_ID, "Clay", Texture.clay) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int SUGARCANE_ID = 0x53;
-  private static final Block SUGARCANE = new Block(SUGARCANE_ID, "Sugar Cane", Texture.sugarCane) {
+  public static final Block SUGARCANE = new Block(SUGARCANE_ID, "Sugar Cane", Texture.sugarCane) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1293,7 +1292,7 @@ public class Block extends Material {
     }
   };
   public static final int JUKEBOX_ID = 0x54;
-  private static final Block JUKEBOX = new Block(JUKEBOX_ID, "Jukebox", Texture.jukeboxSide) {
+  public static final Block JUKEBOX = new Block(JUKEBOX_ID, "Jukebox", Texture.jukeboxSide) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1309,7 +1308,7 @@ public class Block extends Material {
     }
   };
   public static final int FENCE_ID = 0x55;
-  private static final Block FENCE = new Block(FENCE_ID, "Fence", Icon.fence) {
+  public static final Block FENCE = new Block(FENCE_ID, "Fence", Icon.fence) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1325,7 +1324,7 @@ public class Block extends Material {
     }
   };
   public static final int PUMPKIN_ID = 0x56;
-  private static final Block PUMPKIN = new Block(PUMPKIN_ID, "Pumpkin", Texture.pumpkinSide) {
+  public static final Block PUMPKIN = new Block(PUMPKIN_ID, "Pumpkin", Texture.pumpkinSide) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1341,7 +1340,7 @@ public class Block extends Material {
     }
   };
   public static final int NETHERRACK_ID = 0x57;
-  private static final Block NETHERRACK =
+  public static final Block NETHERRACK =
       new Block(NETHERRACK_ID, "Netherrack", Texture.netherrack) {
         {
           isOpaque = true;
@@ -1349,37 +1348,34 @@ public class Block extends Material {
         }
       };
   public static final int SOULSAND_ID = 0x58;
-  private static final Block SOULSAND = new Block(SOULSAND_ID, "Soul Sand", Texture.soulsand) {
+  public static final Block SOULSAND = new Block(SOULSAND_ID, "Soul Sand", Texture.soulsand) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int GLOWSTONE_ID = 0x59;
-  private static final Block GLOWSTONE = new Block(GLOWSTONE_ID, "Glowstone", Texture.glowstone) {
+  public static final Block GLOWSTONE = new Block(GLOWSTONE_ID, "Glowstone", Texture.glowstone) {
     {
       isOpaque = true;
       isSolid = true;
-      isEmitter = true;
-      emittance = 1.0;
+      emittance = 1.0f;
     }
   };
   public static final int PORTAL_ID = 0x5A;
-  private static final Block PORTAL = new Block(PORTAL_ID, "Portal", Texture.portal) {
+  public static final Block PORTAL = new Block(PORTAL_ID, "Portal", Texture.portal) {
     {
       isOpaque = false;
       isSolid = false;
-      isEmitter = true;
-      emittance = 0.4;
+      emittance = 0.4f;
     }
   };
   public static final int JACKOLANTERN_ID = 0x5B;
-  private static final Block JACKOLANTERN = new Block(JACKOLANTERN_ID, "Jack-O-Lantern", Texture.jackolanternFront) {
+  public static final Block JACKOLANTERN = new Block(JACKOLANTERN_ID, "Jack-O-Lantern", Texture.jackolanternFront) {
     {
       isOpaque = true;
       isSolid = true;
-      isEmitter = true;
-      emittance = 1.0;
+      emittance = 1.0f;
       localIntersect = true;
     }
 
@@ -1392,7 +1388,7 @@ public class Block extends Material {
     }
   };
   public static final int CAKE_ID = 0x5C;
-  private static final Block CAKE = new Block(CAKE_ID, "Cake Block", Icon.cake) {
+  public static final Block CAKE = new Block(CAKE_ID, "Cake Block", Icon.cake) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1404,7 +1400,7 @@ public class Block extends Material {
     }
   };
   public static final int REDSTONEREPEATEROFF_ID = 0x5D;
-  private static final Block REDSTONEREPEATEROFF = new Block(REDSTONEREPEATEROFF_ID, "Redstone Repeater (off)", Texture.redstoneRepeaterOff) {
+  public static final Block REDSTONEREPEATEROFF = new Block(REDSTONEREPEATEROFF_ID, "Redstone Repeater (off)", Texture.redstoneRepeaterOff) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1416,7 +1412,7 @@ public class Block extends Material {
     }
   };
   public static final int REDSTONEREPEATERON_ID = 0x5E;
-  private static final Block REDSTONEREPEATERON = new Block(REDSTONEREPEATERON_ID, "Redstone Repeater (on)", Texture.redstoneRepeaterOn) {
+  public static final Block REDSTONEREPEATERON = new Block(REDSTONEREPEATERON_ID, "Redstone Repeater (on)", Texture.redstoneRepeaterOn) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1428,7 +1424,7 @@ public class Block extends Material {
     }
   };
   public static final int STAINED_GLASS_ID = 0x5F;
-  private static final Block STAINED_GLASS = new Block(STAINED_GLASS_ID, "Stained Glass", Texture.glass) {
+  public static final Block STAINED_GLASS = new Block(STAINED_GLASS_ID, "Stained Glass", Texture.glass) {
     {
       isOpaque = false;
       isSolid = true;
@@ -1448,7 +1444,7 @@ public class Block extends Material {
     }
   };
   public static final int TRAPDOOR_ID = 0x60;
-  private static final Block TRAPDOOR = new Block(TRAPDOOR_ID, "Trapdoor", Texture.trapdoor) {
+  public static final Block TRAPDOOR = new Block(TRAPDOOR_ID, "Trapdoor", Texture.trapdoor) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1460,7 +1456,7 @@ public class Block extends Material {
     }
   };
   public static final int HIDDENSILVERFISH_ID = 0x61;
-  private static final Block HIDDENSILVERFISH = new Block(HIDDENSILVERFISH_ID, "Hidden Silverfish", Texture.stone) {
+  public static final Block HIDDENSILVERFISH = new Block(HIDDENSILVERFISH_ID, "Hidden Silverfish", Texture.stone) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1474,7 +1470,7 @@ public class Block extends Material {
     }
   };
   public static final int STONEBRICKS_ID = 0x62;
-  private static final Block STONEBRICKS = new Block(STONEBRICKS_ID, "Stone Bricks", Texture.stoneBrick) {
+  public static final Block STONEBRICKS = new Block(STONEBRICKS_ID, "Stone Bricks", Texture.stoneBrick) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1490,7 +1486,7 @@ public class Block extends Material {
     }
   };
   public static final int HUGEBROWNMUSHROOM_ID = 0x63;
-  private static final Block HUGEBROWNMUSHROOM = new Block(HUGEBROWNMUSHROOM_ID, "Huge Brown Mushroom", Texture.hugeBrownMushroom) {
+  public static final Block HUGEBROWNMUSHROOM = new Block(HUGEBROWNMUSHROOM_ID, "Huge Brown Mushroom", Texture.hugeBrownMushroom) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1567,7 +1563,7 @@ public class Block extends Material {
     }
   };
   public static final int HUGEREDMUSHROOM_ID = 0x64;
-  private static final Block HUGEREDMUSHROOM = new Block(HUGEREDMUSHROOM_ID, "Huge Red Mushroom", Texture.hugeRedMushroom) {
+  public static final Block HUGEREDMUSHROOM = new Block(HUGEREDMUSHROOM_ID, "Huge Red Mushroom", Texture.hugeRedMushroom) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1644,7 +1640,7 @@ public class Block extends Material {
     }
   };
   public static final int IRONBARS_ID = 0x65;
-  private static final Block IRONBARS = new Block(IRONBARS_ID, "Iron Bars", Texture.ironBars) {
+  public static final Block IRONBARS = new Block(IRONBARS_ID, "Iron Bars", Texture.ironBars) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1656,7 +1652,7 @@ public class Block extends Material {
     }
   };
   public static final int GLASSPANE_ID = 0x66;
-  private static final Block GLASSPANE = new Block(GLASSPANE_ID, "Glass Pane", Texture.glass) {
+  public static final Block GLASSPANE = new Block(GLASSPANE_ID, "Glass Pane", Texture.glass) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1669,7 +1665,7 @@ public class Block extends Material {
     }
   };
   public static final int MELON_ID = 0x67;
-  private static final Block MELON = new Block(MELON_ID, "Melon", Texture.melonSide) {
+  public static final Block MELON = new Block(MELON_ID, "Melon", Texture.melonSide) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1685,7 +1681,7 @@ public class Block extends Material {
     }
   };
   public static final int PUMPKINSTEM_ID = 0x68;
-  private static final Block PUMPKINSTEM = new Block(PUMPKINSTEM_ID, "Pumpkin Stem", Texture.stemStraight) {
+  public static final Block PUMPKINSTEM = new Block(PUMPKINSTEM_ID, "Pumpkin Stem", Texture.stemStraight) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1697,7 +1693,7 @@ public class Block extends Material {
     }
   };
   public static final int MELONSTEM_ID = 0x69;
-  private static final Block MELONSTEM = new Block(MELONSTEM_ID, "Melon Stem", Texture.stemStraight) {
+  public static final Block MELONSTEM = new Block(MELONSTEM_ID, "Melon Stem", Texture.stemStraight) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1709,7 +1705,7 @@ public class Block extends Material {
     }
   };
   public static final int VINES_ID = 0x6A;
-  private static final Block VINES = new Block(VINES_ID, "Vines", Texture.vines) {
+  public static final Block VINES = new Block(VINES_ID, "Vines", Texture.vines) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1721,7 +1717,7 @@ public class Block extends Material {
     }
   };
   public static final int FENCEGATE_ID = 0x6B;
-  private static final Block FENCEGATE = new Block(FENCEGATE_ID, "Fence Gate", Texture.unknown) {
+  public static final Block FENCEGATE = new Block(FENCEGATE_ID, "Fence Gate", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1737,7 +1733,7 @@ public class Block extends Material {
     }
   };
   public static final int BRICKSTAIRS_ID = 0x6C;
-  private static final Block BRICKSTAIRS = new Block(BRICKSTAIRS_ID, "Brick Stairs", Icon.stoneStairs) {
+  public static final Block BRICKSTAIRS = new Block(BRICKSTAIRS_ID, "Brick Stairs", Icon.stoneStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1753,7 +1749,7 @@ public class Block extends Material {
     }
   };
   public static final int STONEBRICKSTAIRS_ID = 0x6D;
-  private static final Block STONEBRICKSTAIRS = new Block(STONEBRICKSTAIRS_ID, "Stone Brick Stairs", Icon.stoneBrickStairs) {
+  public static final Block STONEBRICKSTAIRS = new Block(STONEBRICKSTAIRS_ID, "Stone Brick Stairs", Icon.stoneBrickStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1769,7 +1765,7 @@ public class Block extends Material {
     }
   };
   public static final int MYCELIUM_ID = 0x6E;
-  private static final Block MYCELIUM = new Block(MYCELIUM_ID, "Mycelium", Texture.myceliumSide) {
+  public static final Block MYCELIUM = new Block(MYCELIUM_ID, "Mycelium", Texture.myceliumSide) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1789,7 +1785,7 @@ public class Block extends Material {
     }
   };
   public static final int LILY_PAD_ID = 0x6F;
-  private static final Block LILY_PAD = new Block(LILY_PAD_ID, "Lily Pad", Texture.lilyPad) {
+  public static final Block LILY_PAD = new Block(LILY_PAD_ID, "Lily Pad", Texture.lilyPad) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1806,14 +1802,14 @@ public class Block extends Material {
     }
   };
   public static final int NETHERBRICK_ID = 0x70;
-  private static final Block NETHERBRICK = new Block(NETHERBRICK_ID, "Nether Brick", Texture.netherBrick) {
+  public static final Block NETHERBRICK = new Block(NETHERBRICK_ID, "Nether Brick", Texture.netherBrick) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int NETHERBRICKFENCE_ID = 0x71;
-  private static final Block NETHERBRICKFENCE = new Block(NETHERBRICKFENCE_ID, "Nether Brick Fence", Texture.unknown) {
+  public static final Block NETHERBRICKFENCE = new Block(NETHERBRICKFENCE_ID, "Nether Brick Fence", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1830,7 +1826,7 @@ public class Block extends Material {
     }
   };
   public static final int NETHERBRICKSTAIRS_ID = 0x72;
-  private static final Block NETHERBRICKSTAIRS = new Block(NETHERBRICKSTAIRS_ID, "Nether Brick Stairs", Icon.stoneStairs) {
+  public static final Block NETHERBRICKSTAIRS = new Block(NETHERBRICKSTAIRS_ID, "Nether Brick Stairs", Icon.stoneStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1846,7 +1842,7 @@ public class Block extends Material {
     }
   };
   public static final int NETHERWART_ID = 0x73;
-  private static final Block NETHERWART = new Block(NETHERWART_ID, "Nether Wart", Texture.netherWart2) {
+  public static final Block NETHERWART = new Block(NETHERWART_ID, "Nether Wart", Texture.netherWart2) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1861,7 +1857,7 @@ public class Block extends Material {
     }
   };
   public static final int ENCHNATMENTTABLE_ID = 0x74;
-  private static final Block ENCHNATMENTTABLE = new Block(ENCHNATMENTTABLE_ID, "Enchantment Table", Texture.enchantmentTableSide) {
+  public static final Block ENCHNATMENTTABLE = new Block(ENCHNATMENTTABLE_ID, "Enchantment Table", Texture.enchantmentTableSide) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1873,7 +1869,7 @@ public class Block extends Material {
     }
   };
   public static final int BREWINGSTAND_ID = 0x75;
-  private static final Block BREWINGSTAND = new Block(BREWINGSTAND_ID, "Brewing Stand", Texture.brewingStandSide) {
+  public static final Block BREWINGSTAND = new Block(BREWINGSTAND_ID, "Brewing Stand", Texture.brewingStandSide) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1885,7 +1881,7 @@ public class Block extends Material {
     }
   };
   public static final int CAULDRON_ID = 0x76;
-  private static final Block CAULDRON = new Block(CAULDRON_ID, "Cauldron", Texture.cauldronSide) {
+  public static final Block CAULDRON = new Block(CAULDRON_ID, "Cauldron", Texture.cauldronSide) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1897,7 +1893,7 @@ public class Block extends Material {
     }
   };
   public static final int ENDPORTAL_ID = 0x77;
-  private static final Block ENDPORTAL = new Block(ENDPORTAL_ID, "End Portal", Texture.endPortal) {
+  public static final Block ENDPORTAL = new Block(ENDPORTAL_ID, "End Portal", Texture.endPortal) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1909,7 +1905,7 @@ public class Block extends Material {
     }
   };
   public static final int ENDPORTALFRAME_ID = 0x78;
-  private static final Block ENDPORTALFRAME = new Block(ENDPORTALFRAME_ID, "End Portal Frame", Texture.endPortalFrameTop) {
+  public static final Block ENDPORTALFRAME = new Block(ENDPORTALFRAME_ID, "End Portal Frame", Texture.endPortalFrameTop) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1921,7 +1917,7 @@ public class Block extends Material {
     }
   };
   public static final int ENDSTONE_ID = 0x79;
-  private static final Block ENDSTONE = new Block(ENDSTONE_ID, "End Stone", Texture.endStone) {
+  public static final Block ENDSTONE = new Block(ENDSTONE_ID, "End Stone", Texture.endStone) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1929,7 +1925,7 @@ public class Block extends Material {
     }
   };
   public static final int DRAGONEGG_ID = 0x7A;
-  private static final Block DRAGONEGG = new Block(DRAGONEGG_ID, "Dragon Egg", Texture.dragonEgg) {
+  public static final Block DRAGONEGG = new Block(DRAGONEGG_ID, "Dragon Egg", Texture.dragonEgg) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1941,23 +1937,22 @@ public class Block extends Material {
     }
   };
   public static final int REDSTONELAMPOFF_ID = 0x7B;
-  private static final Block REDSTONELAMPOFF = new Block(REDSTONELAMPOFF_ID, "Redstone Lamp (off)", Texture.redstoneLampOff) {
+  public static final Block REDSTONELAMPOFF = new Block(REDSTONELAMPOFF_ID, "Redstone Lamp (off)", Texture.redstoneLampOff) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int REDSTONELAMPON_ID = 0x7C;
-  private static final Block REDSTONELAMPON = new Block(REDSTONELAMPON_ID, "Redstone Lamp (on)", Texture.redstoneLampOn) {
+  public static final Block REDSTONELAMPON = new Block(REDSTONELAMPON_ID, "Redstone Lamp (on)", Texture.redstoneLampOn) {
     {
       isOpaque = true;
       isSolid = true;
-      isEmitter = true;
-      emittance = 1.0;
+      emittance = 1.0f;
     }
   };
   public static final int DOUBLEWOODENSLAB_ID = 0x7D;
-  private static final Block DOUBLEWOODENSLAB = new Block(DOUBLEWOODENSLAB_ID, "Double Wooden Slab", Texture.oakPlanks) {
+  public static final Block DOUBLEWOODENSLAB = new Block(DOUBLEWOODENSLAB_ID, "Double Wooden Slab", Texture.oakPlanks) {
     {
       isOpaque = true;
       isSolid = true;
@@ -1978,7 +1973,7 @@ public class Block extends Material {
     }
   };
   public static final int SINGLEWOODENSLAB_ID = 0x7E;
-  private static final Block SINGLEWOODENSLAB = new Block(SINGLEWOODENSLAB_ID, "Single Wooden Slab", Texture.oakPlanks) {
+  public static final Block SINGLEWOODENSLAB = new Block(SINGLEWOODENSLAB_ID, "Single Wooden Slab", Texture.oakPlanks) {
     {
       isOpaque = false;
       isSolid = false;
@@ -1999,7 +1994,7 @@ public class Block extends Material {
     }
   };
   public static final int COCOAPLANT_ID = 0x7F;
-  private static final Block COCOAPLANT = new Block(COCOAPLANT_ID, "Cocoa Plant", Texture.cocoaPlantLarge) {
+  public static final Block COCOAPLANT = new Block(COCOAPLANT_ID, "Cocoa Plant", Texture.cocoaPlantLarge) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2017,7 +2012,7 @@ public class Block extends Material {
     }
   };
   public static final int SANDSTONESTAIRS_ID = 0x80;
-  private static final Block SANDSTONESTAIRS = new Block(SANDSTONESTAIRS_ID, "Sandstone Stairs", Icon.stoneStairs) {
+  public static final Block SANDSTONESTAIRS = new Block(SANDSTONESTAIRS_ID, "Sandstone Stairs", Icon.stoneStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2034,14 +2029,14 @@ public class Block extends Material {
     }
   };
   public static final int EMERALDORE_ID = 0x81;
-  private static final Block EMERALDORE = new Block(EMERALDORE_ID, "Emerald Ore", Texture.emeraldOre) {
+  public static final Block EMERALDORE = new Block(EMERALDORE_ID, "Emerald Ore", Texture.emeraldOre) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int ENDERCHEST_ID = 0x82;
-  private static final Block ENDERCHEST = new Block(ENDERCHEST_ID, "Ender Chest", Texture.unknown) {
+  public static final Block ENDERCHEST = new Block(ENDERCHEST_ID, "Ender Chest", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2059,7 +2054,7 @@ public class Block extends Material {
     }
   };
   public static final int TRIPWIREHOOK_ID = 0x83;
-  private static final Block TRIPWIREHOOK = new Block(TRIPWIREHOOK_ID, "Tripwire Hook", Texture.tripwireHook) {
+  public static final Block TRIPWIREHOOK = new Block(TRIPWIREHOOK_ID, "Tripwire Hook", Texture.tripwireHook) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2071,7 +2066,7 @@ public class Block extends Material {
     }
   };
   public static final int TRIPWIRE_ID = 0x84;
-  private static final Block TRIPWIRE = new Block(TRIPWIRE_ID, "Tripwire", Texture.tripwire) {
+  public static final Block TRIPWIRE = new Block(TRIPWIRE_ID, "Tripwire", Texture.tripwire) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2083,15 +2078,15 @@ public class Block extends Material {
     }
   };
   public static final int EMERALDBLOCK_ID = 0x85;
-  private static final Block EMERALDBLOCK = new Block(EMERALDBLOCK_ID, "Emerald Block", Texture.emeraldBlock) {
+  public static final Block EMERALDBLOCK = new Block(EMERALDBLOCK_ID, "Emerald Block", Texture.emeraldBlock) {
     {
       isOpaque = true;
       isSolid = true;
-      isShiny = true;
+      specular = Scene.SPECULAR_COEFF;
     }
   };
   public static final int SPRUCEWOODSTAIRS_ID = 0x86;
-  private static final Block SPRUCEWOODSTAIRS = new Block(SPRUCEWOODSTAIRS_ID, "Spruce Wood Stairs", Icon.woodenStairs) {
+  public static final Block SPRUCEWOODSTAIRS = new Block(SPRUCEWOODSTAIRS_ID, "Spruce Wood Stairs", Icon.woodenStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2107,7 +2102,7 @@ public class Block extends Material {
     }
   };
   public static final int BIRCHWOODSTAIRS_ID = 0x87;
-  private static final Block BIRCHWOODSTAIRS = new Block(BIRCHWOODSTAIRS_ID, "Birch Wood Stairs", Icon.woodenStairs) {
+  public static final Block BIRCHWOODSTAIRS = new Block(BIRCHWOODSTAIRS_ID, "Birch Wood Stairs", Icon.woodenStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2123,7 +2118,7 @@ public class Block extends Material {
     }
   };
   public static final int JUNGLEWOODSTAIRS_ID = 0x88;
-  private static final Block JUNGLEWOODSTAIRS = new Block(JUNGLEWOODSTAIRS_ID, "Jungle Wood Stairs", Icon.woodenStairs) {
+  public static final Block JUNGLEWOODSTAIRS = new Block(JUNGLEWOODSTAIRS_ID, "Jungle Wood Stairs", Icon.woodenStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2139,7 +2134,7 @@ public class Block extends Material {
     }
   };
   public static final int COMMAND_BLOCK_ID = 0x89;
-  private static final Block COMMAND_BLOCK = new Block(COMMAND_BLOCK_ID, "Command Block", Texture.commandBlockBack) {
+  public static final Block COMMAND_BLOCK = new Block(COMMAND_BLOCK_ID, "Command Block", Texture.commandBlockBack) {
     {
       isOpaque = true;
       isSolid = true;
@@ -2164,14 +2159,13 @@ public class Block extends Material {
     }
   };
   public static final int BEACON_ID = 0x8A;
-  private static final Block BEACON = new Block(BEACON_ID, "Beacon", Texture.glass) {
+  public static final Block BEACON = new Block(BEACON_ID, "Beacon", Texture.glass) {
     {
       isOpaque = false;
       isSolid = true;
       ior = 1.520f;
       localIntersect = true;
-      isEmitter = true;
-      emittance = 1.0;
+      emittance = 1.0f;
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -2179,7 +2173,7 @@ public class Block extends Material {
     }
   };
   public static final int STONEWALL_ID = 0x8B;
-  private static final Block STONEWALL = new Block(STONEWALL_ID, "Cobblestone Wall", Texture.unknown) {
+  public static final Block STONEWALL = new Block(STONEWALL_ID, "Cobblestone Wall", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2193,7 +2187,7 @@ public class Block extends Material {
     }
   };
   public static final int FLOWERPOT_ID = 0x8C;
-  private static final Block FLOWERPOT = new Block(FLOWERPOT_ID, "Flower Pot", Texture.unknown) {
+  public static final Block FLOWERPOT = new Block(FLOWERPOT_ID, "Flower Pot", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2205,7 +2199,7 @@ public class Block extends Material {
     }
   };
   public static final int CARROTS_ID = 0x8D;
-  private static final Block CARROTS = new Block(CARROTS_ID, "Carrots", Texture.carrots3) {
+  public static final Block CARROTS = new Block(CARROTS_ID, "Carrots", Texture.carrots3) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2221,7 +2215,7 @@ public class Block extends Material {
     }
   };
   public static final int POTATOES_ID = 0x8E;
-  private static final Block POTATOES = new Block(POTATOES_ID, "Potatoes", Texture.potatoes3) {
+  public static final Block POTATOES = new Block(POTATOES_ID, "Potatoes", Texture.potatoes3) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2237,7 +2231,7 @@ public class Block extends Material {
     }
   };
   public static final int WOODENBUTTON_ID = 0x8F;
-  private static final Block WOODENBUTTON = new Block(WOODENBUTTON_ID, "Wooden Button", Texture.unknown) {
+  public static final Block WOODENBUTTON = new Block(WOODENBUTTON_ID, "Wooden Button", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2249,7 +2243,7 @@ public class Block extends Material {
     }
   };
   public static final int HEAD_ID = 0x90;
-  private static final Block HEAD = new Block(HEAD_ID, "Head", Texture.unknown) {
+  public static final Block HEAD = new Block(HEAD_ID, "Head", Texture.unknown) {
     {
       // This block is rendered as an entity instead of a voxel.
       isOpaque = false;
@@ -2258,7 +2252,7 @@ public class Block extends Material {
     }
   };
   public static final int ANVIL_ID = 0x91;
-  private static final Block ANVIL = new Block(ANVIL_ID, "Anvil", Texture.unknown) {
+  public static final Block ANVIL = new Block(ANVIL_ID, "Anvil", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2270,7 +2264,7 @@ public class Block extends Material {
     }
   };
   public static final int TRAPPEDCHEST_ID = 0x92;
-  private static final Block TRAPPEDCHEST = new Block(TRAPPEDCHEST_ID, "Trapped Chest", Texture.chestFront) {
+  public static final Block TRAPPEDCHEST = new Block(TRAPPEDCHEST_ID, "Trapped Chest", Texture.chestFront) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2301,7 +2295,7 @@ public class Block extends Material {
     }
   };
   public static final int WEIGHTEDPRESSUREPLATELIGHT_ID = 0x93;
-  private static final Block WEIGHTEDPRESSUREPLATELIGHT = new Block(WEIGHTEDPRESSUREPLATELIGHT_ID, "Weighted Pressure Plate (Light)", Texture.goldBlock) {
+  public static final Block WEIGHTEDPRESSUREPLATELIGHT = new Block(WEIGHTEDPRESSUREPLATELIGHT_ID, "Weighted Pressure Plate (Light)", Texture.goldBlock) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2313,7 +2307,7 @@ public class Block extends Material {
     }
   };
   public static final int WEIGHTEDPRESSUREPLATEHEAVY_ID = 0x94;
-  private static final Block WEIGHTEDPRESSUREPLATEHEAVY = new Block(WEIGHTEDPRESSUREPLATEHEAVY_ID, "Weighted Pressure Plate (Heavy)", Texture.ironBlock) {
+  public static final Block WEIGHTEDPRESSUREPLATEHEAVY = new Block(WEIGHTEDPRESSUREPLATEHEAVY_ID, "Weighted Pressure Plate (Heavy)", Texture.ironBlock) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2325,7 +2319,7 @@ public class Block extends Material {
     }
   };
   public static final int COMPARATOR_ID = 0x95;
-  private static final Block COMPARATOR = new Block(COMPARATOR_ID,
+  public static final Block COMPARATOR = new Block(COMPARATOR_ID,
       "Redstone Comparator", Texture.unknown) {
     {
       isOpaque = false;
@@ -2338,7 +2332,7 @@ public class Block extends Material {
     }
   };
   public static final int COMPARATOR_POWERED_ID = 0x96;
-  private static final Block COMPARATOR_POWERED = new Block(COMPARATOR_POWERED_ID,
+  public static final Block COMPARATOR_POWERED = new Block(COMPARATOR_POWERED_ID,
       "Redstone Comparator (powered)", Texture.unknown) {
     {
       isOpaque = false;
@@ -2351,7 +2345,8 @@ public class Block extends Material {
     }
   };
   public static final int DAYLIGHTSENSOR_ID = 0x97;
-  private static final Block DAYLIGHTSENSOR = new Block(DAYLIGHTSENSOR_ID, "Daylight Sensor", Texture.daylightDetectorTop) {
+  public static final Block DAYLIGHTSENSOR = new Block(DAYLIGHTSENSOR_ID,
+      "Daylight Sensor", Texture.daylightDetectorTop) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2363,21 +2358,21 @@ public class Block extends Material {
     }
   };
   public static final int REDSTONEBLOCK_ID = 0x98;
-  private static final Block REDSTONEBLOCK = new Block(REDSTONEBLOCK_ID, "Block of Redstone", Texture.redstoneBlock) {
+  public static final Block REDSTONEBLOCK = new Block(REDSTONEBLOCK_ID, "Block of Redstone", Texture.redstoneBlock) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int NETHERQUARTZORE_ID = 0x99;
-  private static final Block NETHERQUARTZORE = new Block(NETHERQUARTZORE_ID, "Nether Quartz Ore", Texture.netherQuartzOre) {
+  public static final Block NETHERQUARTZORE = new Block(NETHERQUARTZORE_ID, "Nether Quartz Ore", Texture.netherQuartzOre) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int HOPPER_ID = 0x9A;
-  private static final Block HOPPER = new Block(HOPPER_ID, "Hopper", Texture.unknown) {
+  public static final Block HOPPER = new Block(HOPPER_ID, "Hopper", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2389,7 +2384,7 @@ public class Block extends Material {
     }
   };
   public static final int QUARTZ_ID = 0x9B;
-  private static final Block QUARTZ = new Block(QUARTZ_ID, "Block of Quartz", Texture.quartzSide) {
+  public static final Block QUARTZ = new Block(QUARTZ_ID, "Block of Quartz", Texture.quartzSide) {
     {
       isOpaque = true;
       isSolid = true;
@@ -2401,7 +2396,7 @@ public class Block extends Material {
     }
   };
   public static final int QUARTZSTAIRS_ID = 0x9C;
-  private static final Block QUARTZSTAIRS = new Block(QUARTZSTAIRS_ID, "Quartz Stairs", Icon.stoneStairs) {
+  public static final Block QUARTZSTAIRS = new Block(QUARTZSTAIRS_ID, "Quartz Stairs", Icon.stoneStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2418,7 +2413,7 @@ public class Block extends Material {
     }
   };
   public static final int ACTIVATORRAIL_ID = 0x9D;
-  private static final Block ACTIVATORRAIL = new Block(ACTIVATORRAIL_ID, "Activator Rail", Texture.unknown) {
+  public static final Block ACTIVATORRAIL = new Block(ACTIVATORRAIL_ID, "Activator Rail", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2433,7 +2428,7 @@ public class Block extends Material {
     }
   };
   public static final int DROPPER_ID = 0x9E;
-  private static final Block DROPPER = new Block(DROPPER_ID, "Dropper", Texture.dropperFront) {
+  public static final Block DROPPER = new Block(DROPPER_ID, "Dropper", Texture.dropperFront) {
     {
       isOpaque = true;
       isSolid = true;
@@ -2466,7 +2461,7 @@ public class Block extends Material {
     }
   };
   public static final int STAINED_CLAY_ID = 0x9F;
-  private static final Block STAINED_CLAY = new Block(STAINED_CLAY_ID, "Stained Clay", Texture.clay) {
+  public static final Block STAINED_CLAY = new Block(STAINED_CLAY_ID, "Stained Clay", Texture.clay) {
     {
       isOpaque = true;
       isSolid = true;
@@ -2481,7 +2476,7 @@ public class Block extends Material {
     }
   };
   public static final int STAINED_GLASSPANE_ID = 0xA0;
-  private static final Block STAINED_GLASSPANE = new Block(STAINED_GLASSPANE_ID, "Stained Glass Pane", Texture.glass) {
+  public static final Block STAINED_GLASSPANE = new Block(STAINED_GLASSPANE_ID, "Stained Glass Pane", Texture.glass) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2500,7 +2495,7 @@ public class Block extends Material {
     }
   };
   public static final int LEAVES2_ID = 0xA1;
-  private static final Block LEAVES2 = new Block(LEAVES2_ID, "Leaves", Texture.oakLeaves) {
+  public static final Block LEAVES2 = new Block(LEAVES2_ID, "Leaves", Texture.oakLeaves) {
     {
       isOpaque = false;
       isSolid = true;
@@ -2525,7 +2520,7 @@ public class Block extends Material {
     }
   };
   public static final int WOOD2_ID = 0xA2;
-  private static final Block WOOD2 = new Block(WOOD2_ID, "Wood", Texture.oakWood) {
+  public static final Block WOOD2 = new Block(WOOD2_ID, "Wood", Texture.oakWood) {
     {
       isOpaque = true;
       isSolid = true;
@@ -2552,7 +2547,7 @@ public class Block extends Material {
     }
   };
   public static final int ACACIASTAIRS_ID = 0xA3;
-  private static final Block ACACIASTAIRS = new Block(ACACIASTAIRS_ID, "Acacia Stairs", Icon.woodenStairs) {
+  public static final Block ACACIASTAIRS = new Block(ACACIASTAIRS_ID, "Acacia Stairs", Icon.woodenStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2568,7 +2563,7 @@ public class Block extends Material {
     }
   };
   public static final int DARKOAKSTAIRS_ID = 0xA4;
-  private static final Block DARKOAKSTAIRS = new Block(DARKOAKSTAIRS_ID, "Dark Oak Stairs", Icon.woodenStairs) {
+  public static final Block DARKOAKSTAIRS = new Block(DARKOAKSTAIRS_ID, "Dark Oak Stairs", Icon.woodenStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2584,7 +2579,7 @@ public class Block extends Material {
     }
   };
   public static final int SLIMEBLOCK_ID = 0xA5;
-  private static final Block SLIMEBLOCK = new Block(SLIMEBLOCK_ID, "Slime Block", Texture.slime) {
+  public static final Block SLIMEBLOCK = new Block(SLIMEBLOCK_ID, "Slime Block", Texture.slime) {
     {
       isOpaque = false;
       isSolid = true;
@@ -2592,15 +2587,15 @@ public class Block extends Material {
     }
   };
   public static final int BARRIER_ID = 0xA6;
-  private static final Block BARRIER = new Block(BARRIER_ID, "Barrier", Texture.unknown) {
+  public static final Block BARRIER = new Block(BARRIER_ID, "Barrier", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isInvisible = true;
     }
   };
   public static final int IRON_TRAPDOOR_ID = 0xA7;
-  private static final Block IRON_TRAPDOOR = new Block(IRON_TRAPDOOR_ID, "Iron Trapdoor", Texture.ironTrapdoor) {
+  public static final Block IRON_TRAPDOOR = new Block(IRON_TRAPDOOR_ID, "Iron Trapdoor", Texture.ironTrapdoor) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2612,7 +2607,7 @@ public class Block extends Material {
     }
   };
   public static final int PRISMARINE_ID = 0xA8;
-  private static final Block PRISMARINE = new Block(PRISMARINE_ID, "Prismarine", Texture.prismarine) {
+  public static final Block PRISMARINE = new Block(PRISMARINE_ID, "Prismarine", Texture.prismarine) {
     {
       isOpaque = true;
       isSolid = true;
@@ -2638,16 +2633,15 @@ public class Block extends Material {
     }
   };
   public static final int SEALANTERN_ID = 0xA9;
-  private static final Block SEALANTERN = new Block(SEALANTERN_ID, "Sea Lantern", Texture.seaLantern) {
+  public static final Block SEALANTERN = new Block(SEALANTERN_ID, "Sea Lantern", Texture.seaLantern) {
     {
       isOpaque = true;
       isSolid = true;
-      isEmitter = true;
-      emittance = 0.5;
+      emittance = 0.5f;
     }
   };
   public static final int HAY_BLOCK_ID = 0xAA;
-  private static final Block HAY_BLOCK = new Block(HAY_BLOCK_ID, "Hay Block", Texture.hayBlockSide) {
+  public static final Block HAY_BLOCK = new Block(HAY_BLOCK_ID, "Hay Block", Texture.hayBlockSide) {
     {
       isOpaque = true;
       isSolid = true;
@@ -2661,7 +2655,7 @@ public class Block extends Material {
     }
   };
   public static final int CARPET_ID = 0xAB;
-  private static final Block CARPET = new Block(CARPET_ID, "Carpet", Texture.unknown) {
+  public static final Block CARPET = new Block(CARPET_ID, "Carpet", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2677,7 +2671,7 @@ public class Block extends Material {
     }
   };
   public static final int HARDENED_CLAY_ID = 0xAC;
-  private static final Block HARDENED_CLAY = new Block(HARDENED_CLAY_ID, "Hardened Clay", Texture.hardenedClay) {
+  public static final Block HARDENED_CLAY = new Block(HARDENED_CLAY_ID, "Hardened Clay", Texture.hardenedClay) {
     {
       isOpaque = true;
       isSolid = true;
@@ -2688,21 +2682,21 @@ public class Block extends Material {
     }
   };
   public static final int BLOCK_OF_COAL_ID = 0xAD;
-  private static final Block BLOCK_OF_COAL = new Block(BLOCK_OF_COAL_ID, "Block of Coal", Texture.coalBlock) {
+  public static final Block COAL_BLOCK = new Block(BLOCK_OF_COAL_ID, "Block of Coal", Texture.coalBlock) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int PACKED_ICE_ID = 0xAE;
-  private static final Block PACKED_ICE = new Block(PACKED_ICE_ID, "Unknown Block 0xAE", Texture.packedIce) {
+  public static final Block PACKED_ICE = new Block(PACKED_ICE_ID, "Unknown Block 0xAE", Texture.packedIce) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int LARGE_FLOWER_ID = 0xAF;
-  private static final Block LARGE_FLOWER = new Block(LARGE_FLOWER_ID, "Large Flower", Texture.dandelion) {
+  public static final Block LARGE_FLOWER = new Block(LARGE_FLOWER_ID, "Large Flower", Texture.dandelion) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2714,32 +2708,39 @@ public class Block extends Material {
       return LargeFlowerModel.intersect(ray, scene);
     }
   };
-  public static final int UNKNOWN0xB0_ID = 0xB0;
-  private static final Block UNKNOWN0xB0 = new Block(UNKNOWN0xB0_ID, "Unknown Block 0xB0", Texture.unknown) {
+  public static final int STANDING_BANNER_ID = 0xB0;
+  public static final Block STANDING_BANNER = new Block(STANDING_BANNER_ID,
+      "Standing Banner", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
       isInvisible = UNKNOWN_INVISIBLE;
+      // TODO: render this.
     }
   };
-  public static final int UNKNOWN0xB1_ID = 0xB1;
-  private static final Block UNKNOWN0xB1 = new Block(UNKNOWN0xB1_ID, "Unknown Block 0xB1", Texture.unknown) {
+  public static final int WALL_BANNER_ID = 0xB1;
+  public static final Block WALL_BANNER = new Block(WALL_BANNER_ID, "Wall Banner", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
       isInvisible = UNKNOWN_INVISIBLE;
+      // TODO: render this.
     }
   };
-  public static final int UNKNOWN0xB2_ID = 0xB2;
-  private static final Block UNKNOWN0xB2 = new Block(UNKNOWN0xB2_ID, "Unknown Block 0xB2", Texture.unknown) {
+  public static final Block INVERTED_DAYLIGHTSENSOR = new Block(0xB2,
+      "Inverted Daylight Sensor", Texture.daylightDetectorTop) {
     {
       isOpaque = false;
       isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      localIntersect = true;
+    }
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return DaylightSensorModel.intersect(ray);
     }
   };
   public static final int REDSANDSTONE_ID = 0xB3;
-  private static final Block REDSANDSTONE = new Block(REDSANDSTONE_ID, "Red Sandstone", Texture.redSandstoneSide) {
+  public static final Block REDSANDSTONE = new Block(REDSANDSTONE_ID, "Red Sandstone", Texture.redSandstoneSide) {
     {
       isOpaque = true;
       isSolid = true;
@@ -2765,7 +2766,7 @@ public class Block extends Material {
     }
   };
   public static final int REDSANDSTONESTAIRS_ID = 0xB4;
-  private static final Block REDSANDSTONESTAIRS = new Block(REDSANDSTONESTAIRS_ID, "Red Sandstone Stairs", Icon.stoneStairs) {
+  public static final Block REDSANDSTONESTAIRS = new Block(REDSANDSTONESTAIRS_ID, "Red Sandstone Stairs", Icon.stoneStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2782,7 +2783,7 @@ public class Block extends Material {
     }
   };
   public static final int DOUBLESLAB2_ID = 0xB5;
-  private static final Block DOUBLESLAB2 = new Block(DOUBLESLAB2_ID, "Double Slab2", Texture.redSandstoneTop) {
+  public static final Block DOUBLESLAB2 = new Block(DOUBLESLAB2_ID, "Double Slab2", Texture.redSandstoneTop) {
     {
       isOpaque = true;
       isSolid = true;
@@ -2798,7 +2799,7 @@ public class Block extends Material {
     }
   };
   public static final int SLAB2_ID = 0xB6;
-  private static final Block SLAB2 = new Block(SLAB2_ID, "Slab2", Texture.redSandstoneTop) {
+  public static final Block SLAB2 = new Block(SLAB2_ID, "Slab2", Texture.redSandstoneTop) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2812,7 +2813,7 @@ public class Block extends Material {
     }
   };
   public static final int SPRUCEFENCEGATE_ID = 0xB7;
-  private static final Block SPRUCEFENCEGATE = new Block(SPRUCEFENCEGATE_ID, "Spruce Fence Gate", Texture.unknown) {
+  public static final Block SPRUCEFENCEGATE = new Block(SPRUCEFENCEGATE_ID, "Spruce Fence Gate", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2832,7 +2833,7 @@ public class Block extends Material {
     }
   };
   public static final int BIRCHFENCEGATE_ID = 0xB8;
-  private static final Block BIRCHFENCEGATE = new Block(BIRCHFENCEGATE_ID, "Birch Fence Gate", Texture.unknown) {
+  public static final Block BIRCHFENCEGATE = new Block(BIRCHFENCEGATE_ID, "Birch Fence Gate", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2848,7 +2849,7 @@ public class Block extends Material {
     }
   };
   public static final int JUNGLEFENCEGATE_ID = 0xB9;
-  private static final Block JUNGLEFENCEGATE = new Block(JUNGLEFENCEGATE_ID, "Jungle Fence Gate", Texture.unknown) {
+  public static final Block JUNGLEFENCEGATE = new Block(JUNGLEFENCEGATE_ID, "Jungle Fence Gate", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2864,7 +2865,7 @@ public class Block extends Material {
     }
   };
   public static final int DARKOAKFENCEGATE_ID = 0xBA;
-  private static final Block DARKOAKFENCEGATE = new Block(DARKOAKFENCEGATE_ID, "Dark Oak Fence Gate", Texture.unknown) {
+  public static final Block DARKOAKFENCEGATE = new Block(DARKOAKFENCEGATE_ID, "Dark Oak Fence Gate", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2880,7 +2881,7 @@ public class Block extends Material {
     }
   };
   public static final int ACACIAFENCEGATE_ID = 0xBB;
-  private static final Block ACACIAFENCEGATE = new Block(ACACIAFENCEGATE_ID, "Acacia Fence Gate", Texture.unknown) {
+  public static final Block ACACIAFENCEGATE = new Block(ACACIAFENCEGATE_ID, "Acacia Fence Gate", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2896,7 +2897,7 @@ public class Block extends Material {
     }
   };
   public static final int SPRUCEFENCE_ID = 0xBC;
-  private static final Block SPRUCEFENCE = new Block(SPRUCEFENCE_ID, "Spruce Fence", Icon.fence) {
+  public static final Block SPRUCEFENCE = new Block(SPRUCEFENCE_ID, "Spruce Fence", Icon.fence) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2912,7 +2913,7 @@ public class Block extends Material {
     }
   };
   public static final int BIRCHFENCE_ID = 0xBD;
-  private static final Block BIRCHFENCE = new Block(BIRCHFENCE_ID, "Birch Fence", Icon.fence) {
+  public static final Block BIRCHFENCE = new Block(BIRCHFENCE_ID, "Birch Fence", Icon.fence) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2928,7 +2929,7 @@ public class Block extends Material {
     }
   };
   public static final int JUNGLEFENCE_ID = 0xBE;
-  private static final Block JUNGLEFENCE = new Block(JUNGLEFENCE_ID, "Jungle Fence", Icon.fence) {
+  public static final Block JUNGLEFENCE = new Block(JUNGLEFENCE_ID, "Jungle Fence", Icon.fence) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2944,7 +2945,7 @@ public class Block extends Material {
     }
   };
   public static final int DARKOAKFENCE_ID = 0xBF;
-  private static final Block DARKOAKFENCE =
+  public static final Block DARKOAKFENCE =
       new Block(DARKOAKFENCE_ID, "Dark Oak Fence", Icon.fence) {
         {
           isOpaque = false;
@@ -2961,7 +2962,7 @@ public class Block extends Material {
         }
       };
   public static final int ACACIAFENCE_ID = 0xC0;
-  private static final Block ACACIAFENCE = new Block(ACACIAFENCE_ID, "Acacia Fence", Icon.fence) {
+  public static final Block ACACIAFENCE = new Block(ACACIAFENCE_ID, "Acacia Fence", Icon.fence) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2977,7 +2978,7 @@ public class Block extends Material {
     }
   };
   public static final int SPRUCEDOOR_ID = 0xC1;
-  private static final Block SPRUCEDOOR = new Block(SPRUCEDOOR_ID, "Spruce Door", Icon.woodenDoor) {
+  public static final Block SPRUCEDOOR = new Block(SPRUCEDOOR_ID, "Spruce Door", Icon.woodenDoor) {
     {
       isOpaque = false;
       isSolid = false;
@@ -2991,7 +2992,7 @@ public class Block extends Material {
     }
   };
   public static final int BIRCHDOOR_ID = 0xC2;
-  private static final Block BIRCHDOOR = new Block(BIRCHDOOR_ID, "Birch Door", Icon.woodenDoor) {
+  public static final Block BIRCHDOOR = new Block(BIRCHDOOR_ID, "Birch Door", Icon.woodenDoor) {
     {
       isOpaque = false;
       isSolid = false;
@@ -3005,7 +3006,7 @@ public class Block extends Material {
     }
   };
   public static final int JUNGLEDOOR_ID = 0xC3;
-  private static final Block JUNGLEDOOR = new Block(JUNGLEDOOR_ID, "Jungle Door", Icon.woodenDoor) {
+  public static final Block JUNGLEDOOR = new Block(JUNGLEDOOR_ID, "Jungle Door", Icon.woodenDoor) {
     {
       isOpaque = false;
       isSolid = false;
@@ -3019,7 +3020,7 @@ public class Block extends Material {
     }
   };
   public static final int ACACIADOOR_ID = 0xC4;
-  private static final Block ACACIADOOR = new Block(ACACIADOOR_ID, "Acacia Door", Icon.woodenDoor) {
+  public static final Block ACACIADOOR = new Block(ACACIADOOR_ID, "Acacia Door", Icon.woodenDoor) {
     {
       isOpaque = false;
       isSolid = false;
@@ -3033,7 +3034,7 @@ public class Block extends Material {
     }
   };
   public static final int DARKOAKDOOR_ID = 0xC5;
-  private static final Block DARKOAKDOOR = new Block(DARKOAKDOOR_ID, "Dark Oak Door", Icon.woodenDoor) {
+  public static final Block DARKOAKDOOR = new Block(DARKOAKDOOR_ID, "Dark Oak Door", Icon.woodenDoor) {
     {
       isOpaque = false;
       isSolid = false;
@@ -3047,13 +3048,12 @@ public class Block extends Material {
     }
   };
   public static final int ENDROD_ID = 0xC6;
-  private static final Block ENDROD = new Block(ENDROD_ID, "End Rod", Texture.endRod) {
+  public static final Block ENDROD = new Block(ENDROD_ID, "End Rod", Texture.endRod) {
     {
       isOpaque = false;
       isSolid = false;
       localIntersect = true;
-      isEmitter = true;
-      emittance = 1.0;
+      emittance = 1.0f;
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -3070,7 +3070,7 @@ public class Block extends Material {
     }
   };
   public static final int CHORUSPLANT_ID = 0xC7;
-  private static final Block CHORUSPLANT =
+  public static final Block CHORUSPLANT =
       new Block(CHORUSPLANT_ID, "Chorus Plant", Texture.chorusPlant) {
         {
           isOpaque = false;
@@ -3083,7 +3083,7 @@ public class Block extends Material {
         }
       };
   public static final int CHORUSFLOWER_ID = 0xC8;
-  private static final Block CHORUSFLOWER =
+  public static final Block CHORUSFLOWER =
       new Block(CHORUSFLOWER_ID, "Chorus Flower", Texture.chorusFlower) {
         {
           isOpaque = false;
@@ -3100,14 +3100,14 @@ public class Block extends Material {
         }
       };
   public static final int PURPURBLOCK_ID = 0xC9;
-  private static final Block PURPURBLOCK = new Block(PURPURBLOCK_ID, "Purpur Block", Texture.purpurBlock) {
+  public static final Block PURPURBLOCK = new Block(PURPURBLOCK_ID, "Purpur Block", Texture.purpurBlock) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int PURPURPILLAR_ID = 0xCA;
-  private static final Block PURPURPILLAR = new Block(PURPURPILLAR_ID, "Purpur Pillar", Texture.purpurPillarSide) {
+  public static final Block PURPURPILLAR = new Block(PURPURPILLAR_ID, "Purpur Pillar", Texture.purpurPillarSide) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3123,7 +3123,7 @@ public class Block extends Material {
     }
   };
   public static final int PURPURSTAIRS_ID = 0xCB;
-  private static final Block PURPURSTAIRS = new Block(PURPURSTAIRS_ID, "Purpur Stairs", Icon.stoneStairs) {
+  public static final Block PURPURSTAIRS = new Block(PURPURSTAIRS_ID, "Purpur Stairs", Icon.stoneStairs) {
     {
       isOpaque = false;
       isSolid = false;
@@ -3139,14 +3139,14 @@ public class Block extends Material {
     }
   };
   public static final int PURPURDOUBLESLAB_ID = 0xCC;
-  private static final Block PURPURDOUBLESLAB = new Block(PURPURDOUBLESLAB_ID, "Purpur Double Slab", Texture.purpurBlock) {
+  public static final Block PURPURDOUBLESLAB = new Block(PURPURDOUBLESLAB_ID, "Purpur Double Slab", Texture.purpurBlock) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
   public static final int PURPURSLAB_ID = 0xCD;
-  private static final Block PURPURSLAB = new Block(PURPURSLAB_ID, "Purpur Slab", Texture.purpurBlock) {
+  public static final Block PURPURSLAB = new Block(PURPURSLAB_ID, "Purpur Slab", Texture.purpurBlock) {
     {
       isOpaque = false;
       isSolid = false;
@@ -3158,13 +3158,13 @@ public class Block extends Material {
     }
   };
   public static final int ENDBRICKS_ID = 0xCE;
-  private static final Block ENDBRICKS = new Block(ENDBRICKS_ID, "End Stone Bricks", Texture.endBricks) {
+  public static final Block ENDBRICKS = new Block(ENDBRICKS_ID, "End Stone Bricks", Texture.endBricks) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
-  private static final Block UNKNOWN0xCF = new Block(0xCF, "Unknown Block 0xCF", Texture.unknown) {
+  public static final Block BEETROOTS = new Block(0xCF, "Beetroot Seeds", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
@@ -3172,7 +3172,7 @@ public class Block extends Material {
     }
   };
   public static final int GRASSPATH_ID = 0xD0;
-  private static final Block GRASSPATH = new Block(GRASSPATH_ID, "Grass Path", Texture.grassPathTop) {
+  public static final Block GRASSPATH = new Block(GRASSPATH_ID, "Grass Path", Texture.grassPathTop) {
     {
       isOpaque = false;
       isSolid = false;
@@ -3183,15 +3183,16 @@ public class Block extends Material {
       return GrassPathModel.intersect(ray);
     }
   };
-  private static final Block UNKNOWN0xD1 = new Block(0xD1, "Unknown Block 0xD1", Texture.unknown) {
+  public static final Block END_GATEWAY = new Block(0xD1, "End Gateway", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
       isInvisible = UNKNOWN_INVISIBLE;
     }
+    // TODO: render this.
   };
   public static final int REPEATING_COMMAND_BLOCK_ID = 0xD2;
-  private static final Block REPEATING_COMMAND_BLOCK = new Block(REPEATING_COMMAND_BLOCK_ID,
+  public static final Block REPEATING_COMMAND_BLOCK = new Block(REPEATING_COMMAND_BLOCK_ID,
       "Repeating Command Block", Texture.repeatingCommandBlockBack) {
     {
       isOpaque = true;
@@ -3217,7 +3218,7 @@ public class Block extends Material {
     }
   };
   public static final int CHAIN_COMMAND_BLOCK_ID = 0xD3;
-  private static final Block CHAIN_COMMAND_BLOCK = new Block(CHAIN_COMMAND_BLOCK_ID,
+  public static final Block CHAIN_COMMAND_BLOCK = new Block(CHAIN_COMMAND_BLOCK_ID,
       "Chain Command Block", Texture.chainCommandBlockBack) {
     {
       isOpaque = true;
@@ -3242,36 +3243,36 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, texture[ray.getBlockData() >> 3]);
     }
   };
-  private static final Block UNKNOWN0xD4 = new Block(0xD4, "Unknown Block 0xD4", Texture.unknown) {
+  public static final Block FROSTEDICE = new Block(0xD4, "Frosted Ice", Texture.ice) {
     {
       isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isSolid = true;
+      ior = 1.31f;
     }
+    // TODO: render ice cracks.
   };
-  private static final Block MAGMA = new Block(0xD5, "Magma", Texture.magma) {
+  public static final Block MAGMA = new Block(0xD5, "Magma", Texture.magma) {
     {
       isOpaque = true;
       isSolid = true;
-      isEmitter = true;
-      emittance = 0.6;  // Not as bright as lava (1.0).
+      emittance = 0.6f;  // Not as bright as lava (1.0).
     }
   };
-  private static final Block NETHER_WART_BLOCK = new Block(0xD6, "Nether Wart",
+  public static final Block NETHER_WART_BLOCK = new Block(0xD6, "Nether Wart",
       Texture.netherWartBlock) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
-  private static final Block RED_NETHER_BRICK = new Block(0xD7, "Red Nether Brick",
+  public static final Block RED_NETHER_BRICK = new Block(0xD7, "Red Nether Brick",
       Texture.redNetherBrick) {
     {
       isOpaque = true;
       isSolid = true;
     }
   };
-  private static final Block BONE = new Block(0xD8, "Bone", Texture.boneSide) {
+  public static final Block BONE = new Block(0xD8, "Bone", Texture.boneSide) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3284,14 +3285,14 @@ public class Block extends Material {
       return WoodModel.intersect(ray, texture);
     }
   };
-  private static final Block UNKNOWN0xD9 = new Block(0xD9, "Unknown Block 0xD9", Texture.unknown) {
+  private static final Block STRUCTURE_VOID = new Block(0xD9, "Structure Void", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isInvisible = true;
     }
   };
-  private static final Block OBSERVER = new Block(0xDA, "Observer", Texture.unknown) {
+  public static final Block OBSERVER = new Block(0xDA, "Observer", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3307,7 +3308,7 @@ public class Block extends Material {
       return ObserverModel.intersect(ray, texture);
     }
   };
-  private static final Block SHULKERBOX_WHITE = new Block(0xDB, "Shulker Box White", Texture.unknown) {
+  public static final Block SHULKERBOX_WHITE = new Block(0xDB, "Shulker Box White", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3324,7 +3325,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_ORANGE = new Block(0xDC, "Shulker Box Orange", Texture.unknown) {
+  public static final Block SHULKERBOX_ORANGE = new Block(0xDC, "Shulker Box Orange", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3341,7 +3342,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_MAGENTA = new Block(0xDD, "Shulker Box Magenta", Texture.unknown) {
+  public static final Block SHULKERBOX_MAGENTA = new Block(0xDD, "Shulker Box Magenta", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3358,7 +3359,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_LIGHTBLUE = new Block(0xDE, "Shulker Box Light Blue",
+  public static final Block SHULKERBOX_LIGHTBLUE = new Block(0xDE, "Shulker Box Light Blue",
       Texture.unknown) {
     {
       isOpaque = true;
@@ -3376,7 +3377,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_YELLOW = new Block(0xDF, "Shulker Box Yellow", Texture.unknown) {
+  public static final Block SHULKERBOX_YELLOW = new Block(0xDF, "Shulker Box Yellow", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3393,7 +3394,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_LIME = new Block(0xE0, "Shulker Box Lime", Texture.unknown) {
+  public static final Block SHULKERBOX_LIME = new Block(0xE0, "Shulker Box Lime", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3410,7 +3411,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_PINK = new Block(0xE1, "Shulker Box Pink", Texture.unknown) {
+  public static final Block SHULKERBOX_PINK = new Block(0xE1, "Shulker Box Pink", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3427,7 +3428,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_GRAY = new Block(0xE2, "Shulker Box Gray", Texture.unknown) {
+  public static final Block SHULKERBOX_GRAY = new Block(0xE2, "Shulker Box Gray", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3444,7 +3445,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_SILVER = new Block(0xE3, "Shulker Box Light Gray",
+  public static final Block SHULKERBOX_SILVER = new Block(0xE3, "Shulker Box Light Gray",
       Texture.unknown) {
     {
       isOpaque = true;
@@ -3462,7 +3463,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_CYAN = new Block(0xE4, "Shulker Box Cyan", Texture.unknown) {
+  public static final Block SHULKERBOX_CYAN = new Block(0xE4, "Shulker Box Cyan", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3479,7 +3480,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_PURPLE = new Block(0xE5, "Shulker Box Purple", Texture.unknown) {
+  public static final Block SHULKERBOX_PURPLE = new Block(0xE5, "Shulker Box Purple", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3496,7 +3497,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_BLUE = new Block(0xE6, "Shulker Box Blue", Texture.unknown) {
+  public static final Block SHULKERBOX_BLUE = new Block(0xE6, "Shulker Box Blue", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3513,7 +3514,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_BROWN = new Block(0xE7, "Shulker Box Brown", Texture.unknown) {
+  public static final Block SHULKERBOX_BROWN = new Block(0xE7, "Shulker Box Brown", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3530,7 +3531,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_GREEN = new Block(0xE8, "Shulker Box Green", Texture.unknown) {
+  public static final Block SHULKERBOX_GREEN = new Block(0xE8, "Shulker Box Green", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3547,7 +3548,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_RED = new Block(0xE9, "Shulker Box Red", Texture.unknown) {
+  public static final Block SHULKERBOX_RED = new Block(0xE9, "Shulker Box Red", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3564,7 +3565,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block SHULKERBOX_BLACK = new Block(0xEA, "Shulker Box Black", Texture.unknown) {
+  public static final Block SHULKERBOX_BLACK = new Block(0xEA, "Shulker Box Black", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3581,7 +3582,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  private static final Block WHITE_TERRACOTTA = new Block(0xEB, "White Glazed Terracotta",
+  public static final Block WHITE_TERRACOTTA = new Block(0xEB, "White Glazed Terracotta",
       Texture.terracottaWhite) {
     {
       isOpaque = true;
@@ -3593,7 +3594,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaWhite);
     }
   };
-  private static final Block ORANGE_TERRACOTTA = new Block(0xEC, "Orange Glazed Terracotta",
+  public static final Block ORANGE_TERRACOTTA = new Block(0xEC, "Orange Glazed Terracotta",
       Texture.terracottaOrange) {
     {
       isOpaque = true;
@@ -3605,7 +3606,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaOrange);
     }
   };
-  private static final Block MAGENTA_TERRACOTTA = new Block(0xED, "Magenta Glazed Terracotta",
+  public static final Block MAGENTA_TERRACOTTA = new Block(0xED, "Magenta Glazed Terracotta",
       Texture.terracottaMagenta) {
     {
       isOpaque = true;
@@ -3617,7 +3618,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaMagenta);
     }
   };
-  private static final Block LIGHT_BLUE_TERRACOTTA = new Block(0xEE, "Light Blue Glazed Terracotta",
+  public static final Block LIGHT_BLUE_TERRACOTTA = new Block(0xEE, "Light Blue Glazed Terracotta",
       Texture.terracottaLightBlue) {
     {
       isOpaque = true;
@@ -3629,7 +3630,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaLightBlue);
     }
   };
-  private static final Block YELLOW_TERRACOTTA = new Block(0xEF, "Yellow Glazed Terracotta",
+  public static final Block YELLOW_TERRACOTTA = new Block(0xEF, "Yellow Glazed Terracotta",
       Texture.terracottaYellow) {
     {
       isOpaque = true;
@@ -3641,7 +3642,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaYellow);
     }
   };
-  private static final Block LIME_TERRACOTTA = new Block(0xF0, "Lime Glazed Terracotta",
+  public static final Block LIME_TERRACOTTA = new Block(0xF0, "Lime Glazed Terracotta",
       Texture.terracottaLime) {
     {
       isOpaque = true;
@@ -3653,7 +3654,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaLime);
     }
   };
-  private static final Block PINK_TERRACOTTA = new Block(0xF1, "Pink Glazed Terracotta", Texture.unknown) {
+  public static final Block PINK_TERRACOTTA = new Block(0xF1, "Pink Glazed Terracotta", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3664,7 +3665,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaWhite);
     }
   };
-  private static final Block GRAY_TERRACOTTA = new Block(0xF2, "Gray Glazed Terracotta", Texture.unknown) {
+  public static final Block GRAY_TERRACOTTA = new Block(0xF2, "Gray Glazed Terracotta", Texture.unknown) {
     {
       isOpaque = true;
       isSolid = true;
@@ -3675,7 +3676,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaWhite);
     }
   };
-  private static final Block SILVER_TERRACOTTA = new Block(0xF3, "Light Gray Glazed Terracotta",
+  public static final Block SILVER_TERRACOTTA = new Block(0xF3, "Light Gray Glazed Terracotta",
       Texture.terracottaSilver) {
     {
       isOpaque = true;
@@ -3687,7 +3688,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaSilver);
     }
   };
-  private static final Block CYAN_TERRACOTTA = new Block(0xF4, "Cyan Glazed Terracotta",
+  public static final Block CYAN_TERRACOTTA = new Block(0xF4, "Cyan Glazed Terracotta",
       Texture.terracottaCyan) {
     {
       isOpaque = true;
@@ -3699,7 +3700,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaCyan);
     }
   };
-  private static final Block PURPLE_TERRACOTTA = new Block(0xF5, "Purple Glazed Terracotta",
+  public static final Block PURPLE_TERRACOTTA = new Block(0xF5, "Purple Glazed Terracotta",
       Texture.terracottaPurple) {
     {
       isOpaque = true;
@@ -3711,7 +3712,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaPurple);
     }
   };
-  private static final Block BLUE_TERRACOTTA = new Block(0xF6, "Blue Glazed Terracotta",
+  public static final Block BLUE_TERRACOTTA = new Block(0xF6, "Blue Glazed Terracotta",
       Texture.terracottaBlue) {
     {
       isOpaque = true;
@@ -3723,7 +3724,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaBlue);
     }
   };
-  private static final Block BROWN_TERRACOTTA = new Block(0xF7, "Brown Glazed Terracotta",
+  public static final Block BROWN_TERRACOTTA = new Block(0xF7, "Brown Glazed Terracotta",
       Texture.terracottaBrown) {
     {
       isOpaque = true;
@@ -3735,7 +3736,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaBrown);
     }
   };
-  private static final Block GREEN_TERRACOTTA = new Block(0xF8, "Green Glazed Terracotta",
+  public static final Block GREEN_TERRACOTTA = new Block(0xF8, "Green Glazed Terracotta",
       Texture.terracottaGreen) {
     {
       isOpaque = true;
@@ -3747,7 +3748,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaGreen);
     }
   };
-  private static final Block RED_TERRACOTTA = new Block(0xF9, "Red Glazed Terracotta",
+  public static final Block RED_TERRACOTTA = new Block(0xF9, "Red Glazed Terracotta",
       Texture.terracottaRed) {
     {
       isOpaque = true;
@@ -3759,7 +3760,7 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaRed);
     }
   };
-  private static final Block BLACK_TERRACOTTA = new Block(0xFA, "Black Glazed Terracotta",
+  public static final Block BLACK_TERRACOTTA = new Block(0xFA, "Black Glazed Terracotta",
       Texture.terracottaBlack) {
     {
       isOpaque = true;
@@ -3771,19 +3772,21 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaBlack);
     }
   };
-  private static final Block UNKNOWN0xFB = new Block(0xFB, "Unknown Block 0xFB", Texture.unknown) {
+  public static final Block CONCRETE = new Block(0xFB, "Concrete", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
       isInvisible = UNKNOWN_INVISIBLE;
     }
+    // TODO: render this.
   };
-  private static final Block UNKNOWN0xFC = new Block(0xFC, "Unknown Block 0xFC", Texture.unknown) {
+  public static final Block CONCRETE_POWDER = new Block(0xFC, "Concrete Powder", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
       isInvisible = UNKNOWN_INVISIBLE;
     }
+    // TODO: render this.
   };
   private static final Block UNKNOWN0xFD = new Block(0xFD, "Unknown Block 0xFD", Texture.unknown) {
     {
@@ -3799,20 +3802,21 @@ public class Block extends Material {
       isInvisible = UNKNOWN_INVISIBLE;
     }
   };
-  private static final Block UNKNOWN0xFF = new Block(0xFF, "Unknown Block 0xFF", Texture.unknown) {
+  public static final Block STRUCTURE_BLOCK = new Block(0xFF, "Structure Block", Texture.unknown) {
     {
       isOpaque = false;
       isSolid = false;
       isInvisible = UNKNOWN_INVISIBLE;
     }
+    // TODO: render this.
   };
 
-  private static final Block[] blocks = {
+  public static final Block[] blocks = {
       AIR, STONE, GRASS, DIRT, COBBLESTONE, WOODENPLANKS, SAPLING, BEDROCK, WATER, STATIONARYWATER,
       LAVA, STATIONARYLAVA, SAND, GRAVEL, GOLDORE, IRONORE, COALORE, WOOD, LEAVES, SPONGE,
-      GLASS, LAPISLAZULIORE, LAPISLAZULIBLOCK, DISPENSER, SANDSTONE, NOTEBLOCK, BED,
-      POWEREDRAIL, DETECTORRAIL, STICKYPISTON, COBWEB, TALLGRASS, DEADBUSH, PISTON,
-      PISTONEXTENSION, WOOL, MOVEDBYPISTON, DANDELION, FLOWER, BROWNMUSHROOM, REDMUSHROOM,
+      GLASS, LAPIS_ORE, LAPIS_BLOCK, DISPENSER, SANDSTONE, NOTEBLOCK, BED,
+      POWEREDRAIL, DETECTORRAIL, STICKYPISTON, COBWEB, TALLGRASS, DEADBUSH, PISTON, PISTON_HEAD, WOOL,
+      PISTON_EXTENSION, DANDELION, FLOWER, BROWNMUSHROOM, REDMUSHROOM,
       GOLDBLOCK, IRONBLOCK, DOUBLESLAB, SLAB, BRICKS, TNT, BOOKSHELF, MOSSSTONE, OBSIDIAN,
       TORCH, FIRE, MONSTERSPAWNER, OAKWOODSTAIRS, CHEST, REDSTONEWIRE, DIAMONDORE, DIAMONDBLOCK,
       WORKBENCH, CROPS, SOIL, FURNACEUNLIT, FURNACELIT, SIGNPOST, WOODENDOOR, LADDER,
@@ -3832,22 +3836,22 @@ public class Block extends Material {
       COMPARATOR_POWERED, DAYLIGHTSENSOR, REDSTONEBLOCK, NETHERQUARTZORE, HOPPER, QUARTZ,
       QUARTZSTAIRS, ACTIVATORRAIL, DROPPER, STAINED_CLAY, STAINED_GLASSPANE, LEAVES2, WOOD2,
       ACACIASTAIRS, DARKOAKSTAIRS, SLIMEBLOCK, BARRIER, IRON_TRAPDOOR, PRISMARINE, SEALANTERN,
-      HAY_BLOCK, CARPET, HARDENED_CLAY, BLOCK_OF_COAL, PACKED_ICE, LARGE_FLOWER, UNKNOWN0xB0,
-      UNKNOWN0xB1, UNKNOWN0xB2, REDSANDSTONE, REDSANDSTONESTAIRS, DOUBLESLAB2, SLAB2,
+      HAY_BLOCK, CARPET, HARDENED_CLAY, COAL_BLOCK, PACKED_ICE, LARGE_FLOWER, STANDING_BANNER,
+      WALL_BANNER, INVERTED_DAYLIGHTSENSOR, REDSANDSTONE, REDSANDSTONESTAIRS, DOUBLESLAB2, SLAB2,
       SPRUCEFENCEGATE, BIRCHFENCEGATE, JUNGLEFENCEGATE, DARKOAKFENCEGATE, ACACIAFENCEGATE,
       SPRUCEFENCE, BIRCHFENCE, JUNGLEFENCE, DARKOAKFENCE, ACACIAFENCE, SPRUCEDOOR, BIRCHDOOR,
       JUNGLEDOOR, ACACIADOOR, DARKOAKDOOR, ENDROD, CHORUSPLANT, CHORUSFLOWER, PURPURBLOCK,
-      PURPURPILLAR, PURPURSTAIRS, PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, UNKNOWN0xCF,
-      GRASSPATH, UNKNOWN0xD1, REPEATING_COMMAND_BLOCK, CHAIN_COMMAND_BLOCK, UNKNOWN0xD4, MAGMA,
-      NETHER_WART_BLOCK, RED_NETHER_BRICK, BONE, UNKNOWN0xD9, OBSERVER, SHULKERBOX_WHITE,
+      PURPURPILLAR, PURPURSTAIRS, PURPURDOUBLESLAB, PURPURSLAB, ENDBRICKS, BEETROOTS,
+      GRASSPATH, END_GATEWAY, REPEATING_COMMAND_BLOCK, CHAIN_COMMAND_BLOCK, FROSTEDICE, MAGMA,
+      NETHER_WART_BLOCK, RED_NETHER_BRICK, BONE, STRUCTURE_VOID, OBSERVER, SHULKERBOX_WHITE,
       SHULKERBOX_ORANGE, SHULKERBOX_MAGENTA, SHULKERBOX_LIGHTBLUE, SHULKERBOX_YELLOW,
       SHULKERBOX_LIME, SHULKERBOX_PINK, SHULKERBOX_GRAY, SHULKERBOX_SILVER, SHULKERBOX_CYAN,
       SHULKERBOX_PURPLE, SHULKERBOX_BLUE, SHULKERBOX_BROWN, SHULKERBOX_GREEN, SHULKERBOX_RED,
       SHULKERBOX_BLACK, WHITE_TERRACOTTA, ORANGE_TERRACOTTA, MAGENTA_TERRACOTTA,
       LIGHT_BLUE_TERRACOTTA, YELLOW_TERRACOTTA, LIME_TERRACOTTA, PINK_TERRACOTTA, GRAY_TERRACOTTA,
       SILVER_TERRACOTTA, CYAN_TERRACOTTA, PURPLE_TERRACOTTA, BLUE_TERRACOTTA, BROWN_TERRACOTTA,
-      GREEN_TERRACOTTA, RED_TERRACOTTA, BLACK_TERRACOTTA, UNKNOWN0xFB, UNKNOWN0xFC, UNKNOWN0xFD,
-      UNKNOWN0xFE, UNKNOWN0xFF
+      GREEN_TERRACOTTA, RED_TERRACOTTA, BLACK_TERRACOTTA, CONCRETE, CONCRETE_POWDER, UNKNOWN0xFD,
+      UNKNOWN0xFE, STRUCTURE_BLOCK
   };
 
   /** Minecraft block ID. */

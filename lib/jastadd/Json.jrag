@@ -14,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.Map;
+import java.util.HashMap;
+
 aspect Json {
 
 	public static JsonUnknown JsonUnknown.INSTANCE = new JsonUnknown();
@@ -27,12 +30,26 @@ aspect Json {
 	}
 
 	/**
+	 * Builds a map associating the member names to member values.
+	 */
+	syn Map<String, JsonValue> JsonObject.toMap() {
+		Map<String, JsonValue> map = new HashMap<String, JsonValue>();
+		for (JsonMember member : getMemberList()) {
+			if (!map.containsKey(member.getName())) {
+				// Only the first occurrence of a member is mapped.
+				map.put(member.getName(), member.getValue());
+			}
+		}
+		return map;
+	}
+
+	/**
 	 * Retrieves the value of a member in this JSON object.
 	 * @param name the name to search for
 	 * @return the JSON member value for the first member with the given name
 	 */
 	syn JsonValue JsonObject.get(String name) {
-		for (JsonMember member: getMemberList()) {
+		for (JsonMember member : getMemberList()) {
 			if (member.getName().equals(name)) {
 				return member.getValue();
 			}
@@ -42,8 +59,6 @@ aspect Json {
 
 	/**
 	 * Modify first member with the given name, or add a new member.
-	 * @param name
-	 * @param value
 	 */
 	public void JsonObject.set(String name, JsonValue value) {
 		for (int i = 0; i < getNumMember(); ++i) {

@@ -1,6 +1,8 @@
 1.4.3 - TBD
 
 * Added rendering for Glazed Terracotta blocks in Minecraft 1.12.
+* Made block material properties configurable per-scene.
+* Modified specular reflection rendering.
 
 1.4.2 - 2017-01-15
 

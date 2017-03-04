@@ -693,9 +693,9 @@ public class TexturePackLoader {
         new IndexedTexture(0x8F, Texture.vines)));
 
     allTextures.put("lapis_block", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/blocks/lapis_block", Texture.lapislazuliBlock),
-        new SimpleTexture("textures/blocks/blockLapis", Texture.lapislazuliBlock),
-        new IndexedTexture(0x90, Texture.lapislazuliBlock)));
+        new SimpleTexture("assets/minecraft/textures/blocks/lapis_block", Texture.lapisBlock),
+        new SimpleTexture("textures/blocks/blockLapis", Texture.lapisBlock),
+        new IndexedTexture(0x90, Texture.lapisBlock)));
     allTextures.put("green wool", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/blocks/wool_colored_green", Texture.greenWool),
         new SimpleTexture("textures/blocks/cloth_13", Texture.greenWool),
@@ -764,9 +764,9 @@ public class TexturePackLoader {
         new IndexedTexture(0x9F, Texture.endPortalFrameSide)));
 
     allTextures.put("lapis_ore", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/blocks/lapis_ore", Texture.lapislazuliOre),
-        new SimpleTexture("textures/blocks/oreLapis", Texture.lapislazuliOre),
-        new IndexedTexture(0xA0, Texture.lapislazuliOre)));
+        new SimpleTexture("assets/minecraft/textures/blocks/lapis_ore", Texture.lapisOre),
+        new SimpleTexture("textures/blocks/oreLapis", Texture.lapisOre),
+        new IndexedTexture(0xA0, Texture.lapisOre)));
     allTextures.put("brown wool", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/blocks/wool_colored_brown", Texture.brownWool),
         new SimpleTexture("textures/blocks/cloth_12", Texture.brownWool),

@@ -220,8 +220,8 @@ public class Texture {
   public static final Texture redWool = new Texture("wool");
   public static final Texture blackWool = new Texture("wool");
   public static final Texture lava = new Texture("lava");
-  public static final Texture lapislazuliOre = new Texture("lapis-lazuli-ore");
-  public static final Texture lapislazuliBlock = new Texture("lapis-lazuli-block");
+  public static final Texture lapisOre = new Texture("lapis-lazuli-ore");
+  public static final Texture lapisBlock = new Texture("lapis-lazuli-block");
   public static final Texture pistonSide = new Texture("piston");
   public static final Texture pistonInnerTop = new Texture();
   public static final Texture pistonBottom = new Texture();

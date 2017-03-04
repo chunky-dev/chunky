@@ -53,9 +53,9 @@ public abstract class Material {
   public boolean isSolid = true;
 
   /**
-   * A block is shiny if it has a specular reflection.
+   * The specular coefficient controlling how shiny the block appears.
    */
-  public boolean isShiny = false;
+  public float specular = 0;
 
   /**
    * Invisible blocks are not added to the voxel octree, and thus
@@ -66,11 +66,9 @@ public abstract class Material {
   public boolean isInvisible = false;
 
   /**
-   * Emitter blocks emit light.
+   * The amount of light the material emits.
    */
-  public boolean isEmitter = false;
-
-  public double emittance = 0.0;
+  public float emittance = 0;
 
   /**
    * Subsurface scattering property.
@@ -85,7 +83,7 @@ public abstract class Material {
   }
 
   /**
-   * Retrieves the texture dependent on the block data
+   * Retrieves the texture dependent on the block data.
    *
    * @param blockData [0,16]
    * @return the selected texture
