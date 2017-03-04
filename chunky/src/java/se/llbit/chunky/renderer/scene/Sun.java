@@ -205,9 +205,9 @@ public class Sun implements JsonSerializable {
     double theta = azimuth;
     double phi = altitude;
 
-    double r = QuickMath.abs(FastMath.cos(phi));
+    double r = QuickMath.abs(QuickMath.cos(phi));
 
-    sw.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
+    sw.set(QuickMath.cos(theta) * r, QuickMath.sin(phi), QuickMath.sin(theta) * r);
 
     if (QuickMath.abs(sw.x) > .1) {
       su.set(0, 1, 0);
@@ -303,7 +303,7 @@ public class Sun implements JsonSerializable {
 
   private void updateSkylightValues() {
     double sunTheta = Math.PI / 2 - altitude;
-    double cosTheta = FastMath.cos(sunTheta);
+    double cosTheta = QuickMath.cos(sunTheta);
     double cos2Theta = cosTheta * cosTheta;
     double chi = (4.0 / 9.0 - turb / 120.0) * (Math.PI - 2 * sunTheta);
     zenith_Y = (4.0453 * turb - 4.9710) * Math.tan(chi) - 0.2155 * turb + 2.4192;
@@ -345,8 +345,8 @@ public class Sun implements JsonSerializable {
     Vector3 v = new Vector3(sv);
     Vector3 w = new Vector3(sw);
 
-    u.scale(FastMath.cos(phi) * sin_a);
-    v.scale(FastMath.sin(phi) * sin_a);
+    u.scale(QuickMath.cos(phi) * sin_a);
+    v.scale(QuickMath.sin(phi) * sin_a);
     w.scale(cos_a);
 
     reflected.d.add(u, v);

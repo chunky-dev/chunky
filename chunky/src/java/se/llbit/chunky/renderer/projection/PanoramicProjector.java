@@ -18,8 +18,6 @@ package se.llbit.chunky.renderer.projection;
 
 import java.util.Random;
 
-import org.apache.commons.math3.util.FastMath;
-
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
@@ -42,10 +40,10 @@ public class PanoramicProjector implements Projector {
     double ay = QuickMath.degToRad(y * fov);
     double ax = QuickMath.degToRad(x * fov);
 
-    double vv = FastMath.cos(ay);
+    double vv = QuickMath.cos(ay);
 
     o.set(0, 0, 0);
-    d.set(vv * FastMath.sin(ax), FastMath.sin(ay), vv * FastMath.cos(ax));
+    d.set(vv * QuickMath.sin(ax), QuickMath.sin(ay), vv * QuickMath.cos(ax));
   }
 
   @Override public double getMinRecommendedFoV() {
