@@ -17,6 +17,8 @@
 package se.llbit.chunky.plugin;
 
 import se.llbit.chunky.Plugin;
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,21 +35,30 @@ import java.util.Map;
  * A chunky plugin.
  */
 public class ChunkyPlugin {
-  private final PluginMeta meta;
+  private final JsonObject meta;
   private final Plugin implementation;
 
-  protected ChunkyPlugin(PluginMeta meta, Plugin implementation) {
+  protected ChunkyPlugin(JsonObject meta, Plugin implementation) {
     this.meta = meta;
     this.implementation = implementation;
   }
 
   /**
-   * Gets meta information of this plugin.
+   * Gets the name of this plugin.
    *
-   * @return meta information of this plugin
+   * @return the name of this plugin
    */
-  public PluginMeta getMeta() {
-    return meta;
+  public String getName() {
+    return meta.get("name").stringValue("");
+  }
+
+  /**
+   * Gets the version of this plugin.
+   *
+   * @return the version of this plugin
+   */
+  public String getVersion() {
+    return meta.get("version").stringValue("<Unknown version>");
   }
 
   /**
@@ -60,26 +71,35 @@ public class ChunkyPlugin {
   }
 
   public static ChunkyPlugin load(File pluginJar) throws LoadPluginException {
-    try {
-      Map<String, String> env = new HashMap<>();
-      env.put("create", "true");
+    Map<String, String> env = new HashMap<>();
+    env.put("create", "true");
 
-      PluginMeta meta;
-      try (FileSystem zipFs = FileSystems.newFileSystem(URI.create("jar:file:" + pluginJar.getAbsolutePath()), env);
-           InputStream in = zipFs.getPath("/plugin.json").toUri().toURL().openStream()) {
-        meta = PluginMeta.loadFromJson(in);
+    try (FileSystem zipFs = FileSystems.newFileSystem(URI.create("jar:file:" + pluginJar.getAbsolutePath()), env);
+         InputStream in = zipFs.getPath("/plugin.json").toUri().toURL().openStream();
+         JsonParser parser = new JsonParser(in)) {
+      JsonObject pluginDefiniton = parser.parse().object();
+
+      String name = pluginDefiniton.get("name").stringValue("");
+      String main = pluginDefiniton.get("main").stringValue("");
+      if (name.isEmpty()) {
+        throw new LoadPluginException("Plugin has no name specified");
+      }
+      if (main.isEmpty()) {
+        throw new LoadPluginException("Plugin has no main class specified");
       }
 
       URLClassLoader classLoader = new URLClassLoader(new URL[]{pluginJar.toURI().toURL()});
-      Class<?> pluginClass = classLoader.loadClass(meta.getPluginClassName());
+      Class<?> pluginClass = classLoader.loadClass(main);
       Plugin pluginInstance = (Plugin) pluginClass.newInstance();
-      return new ChunkyPlugin(meta, pluginInstance);
+      return new ChunkyPlugin(pluginDefiniton, pluginInstance);
     } catch (IOException e) {
       throw new LoadPluginException("Could not load the plugin", e);
     } catch (ClassCastException e) {
       throw new LoadPluginException("Main plugin class has wrong type", e);
     } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
       throw new LoadPluginException("Could not create plugin instance", e);
+    } catch (JsonParser.SyntaxError e) {
+      throw new LoadPluginException("Could not parse the plugin definition file", e);
     }
   }
 }

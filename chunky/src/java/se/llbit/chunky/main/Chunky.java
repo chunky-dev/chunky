@@ -216,7 +216,7 @@ public class Chunky {
       Log.info("Loading plugin: " + file.getName());
       try {
         ChunkyPlugin plugin = ChunkyPlugin.load(file);
-        Log.info("Plugin loaded: " + plugin.getMeta().getName() + " " + plugin.getMeta().getVersion());
+        Log.info("Plugin loaded: " + plugin.getName() + " " + plugin.getVersion());
         plugin.getImplementation().attach(this);
       } catch (LoadPluginException e) {
         Log.error("Failed to load plugin: " + file.getAbsolutePath(), e);
