@@ -150,6 +150,15 @@ public class TestJson {
     assertEquals(3, array.get(3).doubleValue(-1), 0.001);
   }
 
+  /** Test non-number conversions. */
+  @Test public void testNumber4() throws IOException, JsonParser.SyntaxError {
+    JsonArray array = parse("[[], {}, true, false]").array();
+    assertEquals(-1, array.get(0).intValue(-1));
+    assertEquals(-2, array.get(1).longValue(-2));
+    assertEquals(-3, array.get(2).floatValue(-3), 0.001);
+    assertEquals(-4, array.get(3).doubleValue(-4), 0.001);
+  }
+
   /** Test string parsing. */
   @Test public void testString1() throws IOException, JsonParser.SyntaxError {
     JsonArray array = parse("[\"foo\", \"bart\"]").array();
@@ -160,11 +169,20 @@ public class TestJson {
     assertEquals(true, array.get(4001).boolValue(true));
   }
 
+  /** Test non-string conversions. */
+  @Test public void testString2() throws IOException, JsonParser.SyntaxError {
+    JsonArray array = parse("[null, [], {}]").array();
+    assertEquals("foo", array.get(0).stringValue("foo"));
+    assertEquals("bart", array.get(1).stringValue("bart"));
+    assertEquals("bort", array.get(2).stringValue("bort"));
+  }
+
   /** Unknown value is replaced by the given defaults. */
   @Test public void testUnknown1() throws IOException, JsonParser.SyntaxError {
     JsonArray array = parse("[]").array();
     assertEquals("bort", array.get(0).stringValue("bort"));
     assertEquals(true, array.get(1).boolValue(true));
+    assertTrue(array.get(-1).isUnknown()); // Negative index -> unknown.
   }
 
   /** Unknown is returned when accessing non-existing member. */
