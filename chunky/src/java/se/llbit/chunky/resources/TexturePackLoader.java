@@ -1710,6 +1710,106 @@ public class TexturePackLoader {
     allTextures.put("glazed_terracotta_yellow",
         new SimpleTexture("assets/minecraft/textures/blocks/glazed_terracotta_yellow",
             Texture.terracottaYellow));
+
+    // Minecraft 1.12: Concrete:
+    allTextures.put("concrete_black",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_black",
+            Texture.concreteBlack));
+    allTextures.put("concrete_blue",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_blue",
+            Texture.concreteBlue));
+    allTextures.put("concrete_brown",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_brown",
+            Texture.concreteBrown));
+    allTextures.put("concrete_cyan",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_cyan",
+            Texture.concreteCyan));
+    allTextures.put("concrete_gray",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_gray",
+            Texture.concreteGray));
+    allTextures.put("concrete_green",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_green",
+            Texture.concreteGreen));
+    allTextures.put("concrete_light_blue",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_light_blue",
+            Texture.concreteLightBlue));
+    allTextures.put("concrete_lime",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_lime",
+            Texture.concreteLime));
+    allTextures.put("concrete_magenta",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_magenta",
+            Texture.concreteMagenta));
+    allTextures.put("concrete_orange",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_orange",
+            Texture.concreteOrange));
+    allTextures.put("concrete_pink",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_pink",
+            Texture.concretePink));
+    allTextures.put("concrete_purple",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_purple",
+            Texture.concretePurple));
+    allTextures.put("concrete_red",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_red",
+            Texture.concreteRed));
+    allTextures.put("concrete_silver",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_silver",
+            Texture.concreteSilver));
+    allTextures.put("concrete_white",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_white",
+            Texture.concreteWhite));
+    allTextures.put("concrete_yellow",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_yellow",
+            Texture.concreteYellow));
+
+    // Concrete powder:
+    allTextures.put("concrete_powder_black",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_black",
+            Texture.concretePowderBlack));
+    allTextures.put("concrete_powder_blue",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_blue",
+            Texture.concretePowderBlue));
+    allTextures.put("concrete_powder_brown",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_brown",
+            Texture.concretePowderBrown));
+    allTextures.put("concrete_powder_cyan",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_cyan",
+            Texture.concretePowderCyan));
+    allTextures.put("concrete_powder_gray",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_gray",
+            Texture.concretePowderGray));
+    allTextures.put("concrete_powder_green",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_green",
+            Texture.concretePowderGreen));
+    allTextures.put("concrete_powder_light_blue",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_light_blue",
+            Texture.concretePowderLightBlue));
+    allTextures.put("concrete_powder_lime",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_lime",
+            Texture.concretePowderLime));
+    allTextures.put("concrete_powder_magenta",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_magenta",
+            Texture.concretePowderMagenta));
+    allTextures.put("concrete_powder_orange",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_orange",
+            Texture.concretePowderOrange));
+    allTextures.put("concrete_powder_pink",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_pink",
+            Texture.concretePowderPink));
+    allTextures.put("concrete_powder_purple",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_purple",
+            Texture.concretePowderPurple));
+    allTextures.put("concrete_powder_red",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_red",
+            Texture.concretePowderRed));
+    allTextures.put("concrete_powder_silver",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_silver",
+            Texture.concretePowderSilver));
+    allTextures.put("concrete_powder_white",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_white",
+            Texture.concretePowderWhite));
+    allTextures.put("concrete_powder_yellow",
+        new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_yellow",
+            Texture.concretePowderYellow));
   }
 
   private static String texturePackName(File tpFile) {

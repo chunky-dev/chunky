@@ -3774,19 +3774,31 @@ public class Block extends Material {
   };
   public static final Block CONCRETE = new Block(0xFB, "Concrete", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
     }
-    // TODO: render this.
+
+    @Override public Texture getTexture(int blockData) {
+      return Texture.concrete[blockData];
+    }
+
+    @Override public String description(int data) {
+      return woolColor[data & 15];
+    }
   };
   public static final Block CONCRETE_POWDER = new Block(0xFC, "Concrete Powder", Texture.unknown) {
     {
-      isOpaque = false;
-      isSolid = false;
-      isInvisible = UNKNOWN_INVISIBLE;
+      isOpaque = true;
+      isSolid = true;
     }
-    // TODO: render this.
+
+    @Override public Texture getTexture(int blockData) {
+      return Texture.concretePowder[blockData];
+    }
+
+    @Override public String description(int data) {
+      return woolColor[data & 15];
+    }
   };
   private static final Block UNKNOWN0xFD = new Block(0xFD, "Unknown Block 0xFD", Texture.unknown) {
     {

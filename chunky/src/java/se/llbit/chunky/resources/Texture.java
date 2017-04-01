@@ -509,6 +509,41 @@ public class Texture {
   public static final Texture terracottaWhite = new Texture();
   public static final Texture terracottaYellow = new Texture();
 
+  // [1.12] Concrete:
+  public static final Texture concreteBlack = new Texture();
+  public static final Texture concreteBlue = new Texture();
+  public static final Texture concreteBrown = new Texture();
+  public static final Texture concreteCyan = new Texture();
+  public static final Texture concreteGray = new Texture();
+  public static final Texture concreteGreen = new Texture();
+  public static final Texture concreteLightBlue = new Texture();
+  public static final Texture concreteLime = new Texture();
+  public static final Texture concreteMagenta = new Texture();
+  public static final Texture concreteOrange = new Texture();
+  public static final Texture concretePink = new Texture();
+  public static final Texture concretePurple = new Texture();
+  public static final Texture concreteRed = new Texture();
+  public static final Texture concreteSilver = new Texture();
+  public static final Texture concreteWhite = new Texture();
+  public static final Texture concreteYellow = new Texture();
+
+  public static final Texture concretePowderBlack = new Texture();
+  public static final Texture concretePowderBlue = new Texture();
+  public static final Texture concretePowderBrown = new Texture();
+  public static final Texture concretePowderCyan = new Texture();
+  public static final Texture concretePowderGray = new Texture();
+  public static final Texture concretePowderGreen = new Texture();
+  public static final Texture concretePowderLightBlue = new Texture();
+  public static final Texture concretePowderLime = new Texture();
+  public static final Texture concretePowderMagenta = new Texture();
+  public static final Texture concretePowderOrange = new Texture();
+  public static final Texture concretePowderPink = new Texture();
+  public static final Texture concretePowderPurple = new Texture();
+  public static final Texture concretePowderRed = new Texture();
+  public static final Texture concretePowderSilver = new Texture();
+  public static final Texture concretePowderWhite = new Texture();
+  public static final Texture concretePowderYellow = new Texture();
+
   /**
    * Missing or unknown texture.
    */
@@ -566,24 +601,41 @@ public class Texture {
   public static final Texture acaciaDoorBottom = new Texture();
   public static final Texture darkOakDoorBottom = new Texture();
 
-  public static final Texture[] wool =
-      {whiteWool, orangeWool, magentaWool, lightBlueWool, yellowWool, limeWool, pinkWool, grayWool,
-          lightGrayWool, cyanWool, purpleWool, blueWool, brownWool, greenWool, redWool, blackWool};
+  // All the wool variants, ordered after block ID.
+  public static final Texture[] wool = {
+      whiteWool, orangeWool, magentaWool, lightBlueWool, yellowWool, limeWool, pinkWool, grayWool,
+      lightGrayWool, cyanWool, purpleWool, blueWool, brownWool, greenWool, redWool, blackWool
+  };
 
-  public static final Texture[] stainedGlass =
-      {whiteGlass, orangeGlass, magentaGlass, lightBlueGlass, yellowGlass, limeGlass, pinkGlass,
-          grayGlass, lightGrayGlass, cyanGlass, purpleGlass, blueGlass, brownGlass, greenGlass,
-          redGlass, blackGlass};
+  public static final Texture[] concrete = {
+      concreteWhite, concreteOrange, concreteMagenta, concreteLightBlue, concreteYellow,
+      concreteLime, concretePink, concreteGray, concreteSilver, concreteCyan, concretePurple,
+      concreteBlue, concreteBrown, concreteGreen, concreteRed, concreteBlack
+  };
 
-  public static final Texture[] stainedGlassPaneSide =
-      {whiteGlassPaneSide, orangeGlassPaneSide, magentaGlassPaneSide, lightBlueGlassPaneSide,
-          yellowGlassPaneSide, limeGlassPaneSide, pinkGlassPaneSide, grayGlassPaneSide,
-          lightGrayGlassPaneSide, cyanGlassPaneSide, purpleGlassPaneSide, blueGlassPaneSide,
-          brownGlassPaneSide, greenGlassPaneSide, redGlassPaneSide, blackGlassPaneSide};
+  public static final Texture[] concretePowder = {
+      concretePowderWhite, concretePowderOrange, concretePowderMagenta, concretePowderLightBlue, concretePowderYellow,
+      concretePowderLime, concretePowderPink, concretePowderGray, concretePowderSilver, concretePowderCyan, concretePowderPurple,
+      concretePowderBlue, concretePowderBrown, concretePowderGreen, concretePowderRed, concretePowderBlack
+  };
 
-  public static final Texture[] stainedClay =
-      {whiteClay, orangeClay, magentaClay, lightBlueClay, yellowClay, limeClay, pinkClay, grayClay,
-          lightGrayClay, cyanClay, purpleClay, blueClay, brownClay, greenClay, redClay, blackClay};
+  public static final Texture[] stainedGlass = {
+      whiteGlass, orangeGlass, magentaGlass, lightBlueGlass, yellowGlass, limeGlass, pinkGlass,
+      grayGlass, lightGrayGlass, cyanGlass, purpleGlass, blueGlass, brownGlass, greenGlass,
+      redGlass, blackGlass
+  };
+
+  public static final Texture[] stainedGlassPaneSide = {
+      whiteGlassPaneSide, orangeGlassPaneSide, magentaGlassPaneSide, lightBlueGlassPaneSide,
+      yellowGlassPaneSide, limeGlassPaneSide, pinkGlassPaneSide, grayGlassPaneSide,
+      lightGrayGlassPaneSide, cyanGlassPaneSide, purpleGlassPaneSide, blueGlassPaneSide,
+      brownGlassPaneSide, greenGlassPaneSide, redGlassPaneSide, blackGlassPaneSide
+  };
+
+  public static final Texture[] stainedClay = {
+      whiteClay, orangeClay, magentaClay, lightBlueClay, yellowClay, limeClay, pinkClay, grayClay,
+      lightGrayClay, cyanClay, purpleClay, blueClay, brownClay, greenClay, redClay, blackClay
+  };
 
   @NotNull protected BitmapImage image;
   protected int width;

@@ -1,6 +1,9 @@
 1.4.3 - TBD
 
-* Added rendering for Glazed Terracotta blocks in Minecraft 1.12.
+* Added rendering for Minecraft 1.12 blocks:
+    * Glazed Terracotta
+    * Concrete
+    * Concrete Powder
 * Made block material properties configurable per-scene.
 * Modified specular reflection rendering.
 
