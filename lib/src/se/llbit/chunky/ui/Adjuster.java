@@ -34,7 +34,7 @@ import javafx.util.converter.NumberStringConverter;
 import java.util.function.Consumer;
 
 /**
- * A UI control combining a label, slider, and text field for adjusting one property.
+ * A UI control combining a label, slider, and text field for adjusting one numeric property.
  */
 public abstract class Adjuster<T extends Number> extends HBox {
   private StringProperty name = new SimpleStringProperty("Name");
@@ -72,6 +72,7 @@ public abstract class Adjuster<T extends Number> extends HBox {
     return name.get();
   }
 
+  // TODO: not used - should be removed?
   public StringProperty nameProperty() {
     return name;
   }
@@ -168,6 +169,9 @@ public abstract class Adjuster<T extends Number> extends HBox {
   }
 
   public void onValueChange(Consumer<T> changeConsumer) {
+    if (listener != null) {
+      value.removeListener(listener);
+    }
     listener = (observable, oldValue, newValue) -> changeConsumer.accept(clamp(newValue));
     value.addListener(listener);
   }

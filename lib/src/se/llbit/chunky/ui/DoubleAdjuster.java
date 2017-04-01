@@ -18,6 +18,9 @@ package se.llbit.chunky.ui;
 
 import javafx.beans.property.SimpleDoubleProperty;
 
+/**
+ * A double adjuster stores double precision floating point values.
+ */
 public class DoubleAdjuster extends Adjuster<Double> {
   private double min = Double.MIN_VALUE;
   private double max = Double.MAX_VALUE;

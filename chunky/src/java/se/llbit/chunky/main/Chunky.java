@@ -39,6 +39,7 @@ import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
+import se.llbit.chunky.world.Block;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
@@ -92,6 +93,7 @@ public class Chunky {
 
   public Chunky(ChunkyOptions options) {
     this.options = options;
+    Block.loadDefaultMaterialProperties();
   }
 
   /**

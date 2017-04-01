@@ -58,10 +58,10 @@ public abstract class Material {
   public float specular = 0;
 
   /**
-   * Invisible blocks are not added to the voxel octree, and thus
-   * they are not rendered. This is only used for special blocks
-   * that either have been replaced by specialized rendering,
-   * such as the lily pad, or are not implemented.
+   * Invisible blocks are not rendered as regular voxels
+   * (they are not added to the voxel octree).
+   * This is used for blocks that are rendered as entities,
+   * and blocks that are not implemented yet.
    */
   public boolean isInvisible = false;
 
@@ -83,7 +83,7 @@ public abstract class Material {
   }
 
   /**
-   * Retrieves the texture dependent on the block data.
+   * Retrieves the texture based on the block data.
    *
    * @param blockData [0,16]
    * @return the selected texture
@@ -101,7 +101,8 @@ public abstract class Material {
   }
 
   public static Material fromJson(JsonValue json) {
-    throw new UnsupportedOperationException("TODO");
+    // TODO: implement this?
+    throw new UnsupportedOperationException("Can not export material as JSON.");
   }
 
   public boolean isWater() {

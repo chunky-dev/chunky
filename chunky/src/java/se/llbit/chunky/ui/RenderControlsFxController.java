@@ -51,6 +51,7 @@ import se.llbit.chunky.ui.render.EntitiesTab;
 import se.llbit.chunky.ui.render.GeneralTab;
 import se.llbit.chunky.ui.render.HelpTab;
 import se.llbit.chunky.ui.render.LightingTab;
+import se.llbit.chunky.ui.render.MaterialsTab;
 import se.llbit.chunky.ui.render.PostprocessingTab;
 import se.llbit.chunky.ui.render.RenderControlsTab;
 import se.llbit.chunky.ui.render.SkyTab;
@@ -315,6 +316,7 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
       tabs.add(new WaterTab());
       tabs.add(new CameraTab());
       tabs.add(new EntitiesTab());
+      tabs.add(new MaterialsTab());
       tabs.add(new PostprocessingTab());
       tabs.add(new AdvancedTab());
       tabs.add(new HelpTab());
