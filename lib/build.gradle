@@ -1,31 +1,3 @@
 sourceSets.main.java {
-	srcDir 'src'
-	srcDir 'gen'
-}
-
-compileJava.dependsOn 'generateJava'
-
-task generateJava() {
-	inputs.dir 'jastadd'
-	outputs.dir 'gen'
-
-	doLast {
-		project.file('src').mkdirs()
-		ant.taskdef(
-			name: 'jastadd',
-			classname: 'org.jastadd.JastAddTask',
-			classpath: project.configurations.jastadd.asPath)
-		ant.jastadd(
-			outdir: project.file('gen'),
-			package: 'se.llbit.json',
-			rewrite: 'none',
-			visitCheck: false,
-			debug: false) {
-			fileset(dir: project.file('jastadd')) {
-				include(name: '*.ast')
-				include(name: '*.jrag')
-				include(name: '*.jadd')
-			}
-		}
-	}
+  srcDir 'src'
 }

@@ -221,7 +221,7 @@ public class Chunky {
 
   private void loadPlugins() {
     JsonValue plugins = PersistentSettings.getPlugins();
-    for (JsonValue plugin : plugins.array().getElementList()) {
+    for (JsonValue plugin : plugins.array()) {
       String jar = plugin.object().get("jar").stringValue("");
       String main = plugin.object().get("main").stringValue("");
       // The MD5 checksum is only for Jar integrity checking, not security!

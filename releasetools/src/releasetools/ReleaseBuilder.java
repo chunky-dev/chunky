@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2013-2017 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,7 +16,11 @@
  */
 package releasetools;
 
-import java.io.BufferedInputStream;
+import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
+import se.llbit.json.PrettyPrinter;
+import se.llbit.util.Util;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -25,36 +29,18 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Scanner;
-import java.util.Set;
-import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Manifest;
 
-import org.jastadd.util.PrettyPrinter;
-
-import se.llbit.json.JsonArray;
-import se.llbit.json.JsonObject;
-import se.llbit.util.Util;
-
+/**
+ * This is a tool for generating the version JSON file and the release notes
+ * for a Chunky release or snapshot.
+ */
 public class ReleaseBuilder {
-  private static final FileFilter RESOURCE_FILTER = file ->
-      file.isDirectory() || file.getName().endsWith(".png") || file.getName().endsWith(".fxml");
-
   private static final FileFilter JAR_FILES = file ->
       file.isDirectory() || file.getName().endsWith(".jar");
 
   static final String LIBRARY_PATH = "chunky/lib";
-  static final String LAUNCHER_BIN = "launcher/build/classes/main";
-  static final String LAUNCHER_RESOURCES = "launcher/src";
-  static final String LIB_BIN = "lib/build/classes/main";
-  private final String versionName;
-  private final String notes;
   private static final String SYS_NL = System.getProperty("line.separator");
-
-  private final Set<String> jarDirs = new HashSet<>();
 
   public static void main(String[] args) {
     for (String arg : args) {
@@ -69,7 +55,7 @@ public class ReleaseBuilder {
       System.exit(1);
     }
     String versionName = args[0];
-    System.out.format("ReleaseBuilder 1.1, building version %s%n", versionName);
+    System.out.format("ReleaseBuilder 1.2, building version %s%n", versionName);
 
     String releaseNotes = readReleaseNotes(args[1]);
     String changeLog = readChangeLog("ChangeLog.txt");
@@ -80,22 +66,7 @@ public class ReleaseBuilder {
       releaseNotes += "Changes:" + SYS_NL + changeLog;
     }
 
-    // Write composed release notes to build dir.
-    PrintWriter out = null;
-    try {
-      out = new PrintWriter(new File("build", "release_notes-" + versionName + ".txt"));
-      out.print(releaseNotes);
-    } catch (IOException e) {
-      System.err.println("Failed to write release notes (" + e.getMessage() + ")");
-      System.exit(1);
-      return;
-    } finally {
-      if (out != null) {
-        out.close();
-      }
-    }
-
-    new ReleaseBuilder(versionName, releaseNotes).buildChunkyJar();
+    buildVersionInfo(versionName, releaseNotes);
   }
 
   private static String readReleaseNotes(String path) {
@@ -140,35 +111,58 @@ public class ReleaseBuilder {
   }
 
   private static void printHelp() {
-    System.out.println("Usage: ReleaseBuilder <version name> <release notes file>");
+    System.out.println("Usage: ReleaseBuilder <VERSION> <NOTES>");
+    System.out.println("    VERSION    version name");
+    System.out.println("    NOTES      release notes file");
   }
 
-  public ReleaseBuilder(String versionName, String releaseNotes) {
-    this.versionName = versionName;
-    this.notes = releaseNotes;
-  }
-
-  private void buildChunkyJar() {
-    buildChunkyJar("build/chunky-" + versionName + ".jar");
-  }
-
-  private void buildChunkyJar(String targetFile) {
-    Manifest mf = new Manifest();
-    mf.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-    mf.getMainAttributes()
-        .put(Attributes.Name.MAIN_CLASS, "se.llbit.chunky.launcher.ChunkyLauncher");
+  private static void buildVersionInfo(String versionName, String notes) {
     try {
-      JarOutputStream out = new JarOutputStream(new FileOutputStream(targetFile), mf);
-      addClassDir(out, new File(LAUNCHER_BIN));
-      addResourceDir(out, new File(LAUNCHER_RESOURCES));
-      addClassDir(out, new File(LIB_BIN));
-      addToJar(out, new File("chunky/lib"), JAR_FILES);
+      // Write composed release notes to build dir.
+      PrintWriter out = null;
+      try {
+        File targetFile = new File("build", "release_notes-" + versionName + ".txt");
+        System.out.println("Writing file " + targetFile);
+        out = new PrintWriter(targetFile);
+        out.print(notes);
+      } catch (IOException e) {
+        System.err.println("Failed to write release notes (" + e.getMessage() + ")");
+        System.exit(1);
+        return;
+      } finally {
+        if (out != null) {
+          out.close();
+        }
+      }
+
       File chunkyCore = new File("build/chunky-core-" + versionName + ".jar");
-      addToJar(out, chunkyCore, "lib", JAR_FILES);
-      addVersionInfoJson(out, chunkyCore);
-      out.close();
-    } catch (IOException e) {
-      System.err.println("Jar file writing error occurred!");
+      File libDir = new File(LIBRARY_PATH);
+      if (!libDir.isDirectory()) {
+        System.err.println("Not a valid directory: " + LIBRARY_PATH);
+      }
+      JsonObject version = new JsonObject();
+      version.add("name", versionName);
+      version.add("timestamp", Util.ISO8601FromDate(new Date()));
+      version.add("notes", notes);
+      JsonArray libraries = new JsonArray();
+      {
+        libraries.add(libraryJson(chunkyCore));
+      }
+      for (File lib : libDir.listFiles(JAR_FILES)) {
+        if (lib.isFile() && lib.getName().endsWith(".jar")) {
+          libraries.add(libraryJson(lib));
+        }
+      }
+      version.add("libraries", libraries);
+
+      File latest = new File("latest.json");
+      System.out.println("Writing file " + latest);
+      try (PrettyPrinter pp =
+          new PrettyPrinter("  ", new PrintStream(new FileOutputStream(latest)))) {
+        version.prettyPrint(pp);
+      }
+    } catch (Exception e) {
+      System.err.println("Failed to generate version info/release notes.");
       e.printStackTrace(System.err);
     }
   }
@@ -181,95 +175,4 @@ public class ReleaseBuilder {
     return library;
   }
 
-  private void addVersionInfoJson(JarOutputStream jar, File chunkyCore) throws IOException {
-    File libDir = new File(LIBRARY_PATH);
-    if (!libDir.isDirectory()) {
-      System.err.println("Not a valid directory: " + LIBRARY_PATH);
-    }
-    JsonObject version = new JsonObject();
-    version.add("name", versionName);
-    version.add("timestamp", Util.ISO8601FromDate(new Date()));
-    version.add("notes", notes);
-    JsonArray libraries = new JsonArray();
-    {
-      libraries.add(libraryJson(chunkyCore));
-    }
-    for (File lib : libDir.listFiles(JAR_FILES)) {
-      if (lib.isFile() && lib.getName().endsWith(".jar")) {
-        libraries.add(libraryJson(lib));
-      }
-    }
-    version.add("libraries", libraries);
-    JarEntry entry = new JarEntry("version.json");
-    entry.setTime(System.currentTimeMillis());
-    jar.putNextEntry(entry);
-    PrintStream out = new PrintStream(jar);
-    PrettyPrinter pp = new PrettyPrinter("  ", out);
-    version.prettyPrint(pp);
-    out.flush();
-    jar.closeEntry();
-
-    File latest = new File("latest.json");
-    out = new PrintStream(new FileOutputStream(latest));
-    version.prettyPrint(new PrettyPrinter("  ", out));
-    out.close();
-  }
-
-  private void addClassDir(JarOutputStream jar, File dir) throws IOException {
-    for (File binPkg : dir.listFiles()) {
-      addToJar(jar, binPkg, file -> true);
-    }
-  }
-
-  private void addResourceDir(JarOutputStream jar, File dir) throws IOException {
-    for (File binPkg : dir.listFiles(RESOURCE_FILTER)) {
-      addToJar(jar, binPkg, RESOURCE_FILTER);
-    }
-  }
-
-  private void addToJar(JarOutputStream jar, File file, FileFilter filter) throws IOException {
-    addToJar(jar, file, "", filter);
-  }
-
-  private void addToJar(JarOutputStream jar, File file, String prefix, FileFilter filter)
-      throws IOException {
-    String name = file.getName();
-    String jarPath = prefix.isEmpty() ? name : prefix + '/' + name;
-    if (file.isDirectory()) {
-      createJarDir(jar, jarPath, file);
-      File[] dirFiles = file.listFiles(filter);
-      if (dirFiles != null) {
-        for (File nestedFile : dirFiles) {
-          addToJar(jar, nestedFile, jarPath, filter);
-        }
-      }
-    } else if (filter.accept(file)) {
-      JarEntry entry = new JarEntry(jarPath);
-      entry.setTime(file.lastModified());
-      jar.putNextEntry(entry);
-      BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-
-      byte[] buff = new byte[4096];
-      while (true) {
-        int len = in.read(buff);
-        if (len == -1) {
-          break;
-        }
-        jar.write(buff, 0, len);
-      }
-      jar.closeEntry();
-      in.close();
-    }
-  }
-
-  private void createJarDir(JarOutputStream jar, String jarPath, File file) throws IOException {
-    String jarEntry = jarPath + '/';
-    if (!jarPath.isEmpty() && !jarDirs.contains(jarEntry)) {
-      jarDirs.add(jarEntry);
-      JarEntry entry = new JarEntry(jarEntry);
-      entry.setTime(file.lastModified());
-      jar.putNextEntry(entry);
-      jar.closeEntry();
-    }
-  }
 }

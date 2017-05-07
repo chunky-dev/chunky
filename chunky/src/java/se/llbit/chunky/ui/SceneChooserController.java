@@ -117,7 +117,7 @@ public class SceneChooserController implements Initializable {
     });
     chunkCountCol.setCellValueFactory(data -> {
       JsonObject scene = data.getValue();
-      return new ReadOnlyIntegerWrapper(scene.get("chunkList").array().getNumElement());
+      return new ReadOnlyIntegerWrapper(scene.get("chunkList").array().size());
     });
     sizeCol.setCellValueFactory(data -> {
       JsonObject scene = data.getValue();

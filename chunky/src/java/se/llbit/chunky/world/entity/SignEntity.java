@@ -207,7 +207,7 @@ public class SignEntity extends Entity {
           JsonObject obj = value.object();
           addText(array, obj.get("text").stringValue(""));
           JsonArray extraArray = obj.get("extra").array();
-          for (JsonValue extra : extraArray.getElementList()) {
+          for (JsonValue extra : extraArray) {
             if (extra.isObject()) {
               JsonObject extraObject = extra.object();
               addText(array, extraObject.get("text").stringValue(""),
@@ -217,7 +217,7 @@ public class SignEntity extends Entity {
             }
           }
         } else {
-          for (JsonValue item : value.array().getElementList()) {
+          for (JsonValue item : value.array()) {
             addText(array, item.stringValue(""));
           }
         }
@@ -294,10 +294,10 @@ public class SignEntity extends Entity {
    */
   protected static JsonArray textToJson(JsonArray[] text) {
     JsonArray array = new JsonArray();
-    array.add(text[0].fullCopy());
-    array.add(text[1].fullCopy());
-    array.add(text[2].fullCopy());
-    array.add(text[3].fullCopy());
+    array.add(text[0].copy());
+    array.add(text[1].copy());
+    array.add(text[2].copy());
+    array.add(text[3].copy());
     return array;
   }
 

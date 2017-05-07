@@ -2,215 +2,247 @@ project.version = getVersion()
 
 println "Building version ${project.version}"
 
+repositories {
+  mavenCentral()
+  mavenLocal()
+}
+
 subprojects {
 
-	apply plugin: 'java'
-	apply plugin: 'jacoco'
+  apply plugin: 'java'
+  apply plugin: 'jacoco'
 
-	group = 'se.llbit'
-	version = rootProject.version
+  group = 'se.llbit'
+  version = rootProject.version
 
-	javadoc {
-		options.encoding = 'UTF-8'
-		options.addStringOption('Xdoclint:none', '-quiet')
-	}
+  javadoc {
+    options.encoding = 'UTF-8'
+    options.addStringOption('Xdoclint:none', '-quiet')
+  }
 
-	sourceCompatibility = '1.8'
-	targetCompatibility = '1.8'
+  sourceCompatibility = '1.8'
+  targetCompatibility = '1.8'
 
-	compileJava.options.encoding = 'UTF-8'
-	compileJava.options.debug = true
+  compileJava.options.encoding = 'UTF-8'
+  compileJava.options.debug = true
 
-	repositories {
-		mavenCentral()
-	}
+  repositories {
+    mavenCentral()
+    mavenLocal()
+  }
 
-	configurations {
-		jastadd
-	}
+  configurations {
+    jastadd
+    jsonlib
+  }
 
-	dependencies {
-		jastadd 'org.jastadd:jastadd:2.1.13'
-	}
+  dependencies {
+    compile 'se.llbit:jo-json:1.3.0'
+    jsonlib 'se.llbit:jo-json:1.3.0'
+    jastadd 'org.jastadd:jastadd:2.1.13'
+  }
 
-	// Code coverage with Jacoco:
-	jacocoTestReport {
-		reports {
-			xml.enabled = true
-			html.enabled = true
-		}
-	}
+  // Code coverage with Jacoco:
+  jacocoTestReport {
+    reports {
+      xml.enabled = true
+      html.enabled = true
+    }
+  }
 
-	check.dependsOn jacocoTestReport
+  check.dependsOn jacocoTestReport
 }
 
 defaultTasks 'releaseJar'
 
 task tarball(type: Exec) {
-	// TODO(jesper): Prepend cmd /c on Windows?
-	commandLine "git archive --prefix=\"chunky-${project.version}\" -o build/chunky-${project.version}.tar.gz master".split(' ')
+  // TODO(jesper): Prepend cmd /c on Windows?
+  commandLine "git archive --prefix=\"chunky-${project.version}\" -o build/chunky-${project.version}.tar.gz master".split(' ')
 }
 
 task release {
-	doLast {
-		tryCommand([ 'git', 'commit', '-m', "Release ${project.version}", 'chunky/src/res/se/llbit/chunky/main/Version.properties' ], true)
-		tryCommand([ 'git', 'tag', '-a', "${project.version}", '-m', "Version ${project.version}" ], true)
-	}
+  doLast {
+    tryCommand([ 'git', 'commit', '-m', "Release ${project.version}", 'chunky/src/res/se/llbit/chunky/main/Version.properties' ], true)
+    tryCommand([ 'git', 'tag', '-a', "${project.version}", '-m', "Version ${project.version}" ], true)
+  }
 }
 
-task releaseJar(type: JavaExec) {
-	dependsOn 'copyArtifacts'
+task versionInfo(type: JavaExec) {
+  dependsOn 'copyArtifacts'
 
-	description 'Writes build/chunky-VERSION.jar, latest.json and updates chunky-core-VERSION.jar/version.json'
-	classpath = project(':releasetools').sourceSets.main.runtimeClasspath
-	main = 'releasetools.ReleaseBuilder'
-	args "${project.version}", "release_notes-${project.version}.txt"
+  outputs.files file("build/chunky-${project.version}.jar")
+  description 'Writes build/chunky-VERSION.jar, latest.json and updates chunky-core-VERSION.jar/version.json'
+  classpath = project(':releasetools').sourceSets.main.runtimeClasspath
+  main = 'releasetools.ReleaseBuilder'
+  args "${project.version}", "release_notes-${project.version}.txt"
+}
+
+task releaseJar(type: Jar) {
+  dependsOn 'versionInfo'
+
+  archiveName = "chunky-${project.version}.jar"
+  destinationDir = file('build')
+  manifest {
+    attributes('Main-Class': 'se.llbit.chunky.launcher.ChunkyLauncher')
+  }
+
+  into('') {
+    from file('latest.json')
+    rename { 'version.json' }
+  }
+
+  into('lib') {
+    from fileTree('chunky/lib').include('*.jar')
+    from file("build/chunky-core-${project.version}.jar")
+  }
+
+  from { project(':launcher').configurations.runtime.allArtifacts.files.collect { zipTree(it) } }
 }
 
 task releaseZip(type: Zip) {
-	dependsOn 'copyArtifacts'
+  dependsOn 'copyArtifacts'
 
-	destinationDir = buildDir
-	archiveName = "Chunky-${project.version}.zip"
+  destinationDir = buildDir
+  archiveName = "Chunky-${project.version}.zip"
 
-	from(buildDir) {
-		include "chunky-${project.version}.jar"
-		include "ReadMe.html"
-		include "release_notes-${project.version}.txt"
-	}
-	from(projectDir) {
-		include 'license/*'
-	}
-	rename("release_notes-${project.version}.jar", 'chunky.jar')
+  from(buildDir) {
+    include "chunky-${project.version}.jar"
+    include "ReadMe.html"
+    include "release_notes-${project.version}.txt"
+  }
+  from(projectDir) {
+    include 'license/*'
+  }
+  rename("release_notes-${project.version}.jar", 'chunky.jar')
 }
 
 task nsi(type: Copy) {
-	from('dist') {
-		include 'Chunky.nsi'
-	}
-	into project.projectDir
-	filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [
-		VERSION: "${project.version}".toString()
-	])
+  from('dist') {
+    include 'Chunky.nsi'
+  }
+  into project.projectDir
+  filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [
+    VERSION: "${project.version}".toString()
+  ])
 }
 
 task documentation {
-	inputs.files 'README.md'
-	outputs.files 'build/ReadMe.html'
+  inputs.files 'README.md'
+  outputs.files 'build/ReadMe.html'
 
-	doLast {
-		def readme = tryCommand([ 'perl', file('tools/Markdown.pl').path, file('README.md').path ], true)
-		file('build/ReadMe.html').write(readme)
-	}
+  doLast {
+    def readme = tryCommand([ 'perl', file('tools/Markdown.pl').path, file('README.md').path ], true)
+    file('build/ReadMe.html').write(readme)
+  }
 }
 
 task copyArtifacts(type: Copy) {
-	dependsOn subprojects.jar
-	from subprojects.jar
-	into buildDir
+  dependsOn subprojects.jar
+  from subprojects.jar
+  into buildDir
 }
 
 /** Helper function to run a command. Returns the command output if the command succeeded. */
 def tryCommand(def command, boolean failOnError = false) {
-	def out = new StringBuilder()
-	def err = new StringBuilder()
-	def proc = command.execute()
-	proc.waitForProcessOutput(out, err)
-	if (proc.exitValue()) {
-		def msg = "failed to run '${command[0]}' command (args: ${command.tail()})\n$err$out"
-		if (failOnError) {
-			throw new GradleException(msg)
-		} else {
-			print 'Warning: '
-			println msg
-		}
-		""
-	} else {
-		if (err) println "${err}"
-		out.toString()
-	}
+  def out = new StringBuilder()
+  def err = new StringBuilder()
+  def proc = command.execute()
+  proc.waitForProcessOutput(out, err)
+  if (proc.exitValue()) {
+    def msg = "failed to run '${command[0]}' command (args: ${command.tail()})\n$err$out"
+    if (failOnError) {
+      throw new GradleException(msg)
+    } else {
+      print 'Warning: '
+      println msg
+    }
+    ""
+  } else {
+    if (err) println "${err}"
+    out.toString()
+  }
 }
 
 /** Helper function to retrieve the current version string. */
 def getVersion() {
-	if (hasProperty('newVersion')) {
-		// A new version string should be saved.
-		def date = new Date()
-		Properties version = new Properties()
-		version['version'] = newVersion
-		version.store(file('chunky/src/res/se/llbit/chunky/main/Version.properties').newWriter(), null)
-		return newVersion
-	} else {
-		def output = tryCommand(['git', 'describe'])
-		if (output) {
-			// Use Git describe output.
-			output.readLines()[0]
-		} else {
-			// Git command failed. Read the previous version string instead.
-			Properties version = new Properties()
-			version.load(new FileInputStream(file('chunky/src/res/se/llbit/chunky/main/Version.properties')))
-			version['version']
-		}
-	}
+  if (hasProperty('newVersion')) {
+    // A new version string should be saved.
+    def date = new Date()
+    Properties version = new Properties()
+    version['version'] = newVersion
+    version.store(file('chunky/src/res/se/llbit/chunky/main/Version.properties').newWriter(), null)
+    return newVersion
+  } else {
+    def output = tryCommand(['git', 'describe'])
+    if (output) {
+      // Use Git describe output.
+      output.readLines()[0]
+    } else {
+      // Git command failed. Read the previous version string instead.
+      Properties version = new Properties()
+      version.load(new FileInputStream(file('chunky/src/res/se/llbit/chunky/main/Version.properties')))
+      version['version']
+    }
+  }
 }
 
 task macDist(dependsOn: 'releaseJar') {
-	doLast {
-		buildDir.mkdirs()
+  doLast {
+    buildDir.mkdirs()
 
-		// TODO(jesper): Add support for Mac build on Linux.
-		ant.taskdef(name: 'appbundler', classpath: file('tools/appbundler-1.0.jar'),
-			classname: 'com.oracle.appbundler.AppBundlerTask')
-		ant.appbundler(outputdirectory: buildDir,
-			name: 'Chunky',
-			displayname: 'Chunky',
-			identifier: 'se.llbit.Chunky',
-			shortversion: "${project.version}",
-			mainclassname: 'se.llbit.chunky.launcher.ChunkyLauncher',
-			icon: file('dist/Chunky.icns').path) {
-			option(value: '-Dapple.laf.useScreenMenuBar=true')
-			option(value: '-Dapple.awt.textantialiasing=true')
-			classpath(file: file("build/chunky-${project.version}.jar").path)
-		}
-		tryCommand([ '/usr/bin/hdiutil',
-			'create',
-			'-srcfolder',
-			file('build/Chunky.app').path,
-			'-volname', 'Chunky', '-ov',
-			file('build/Chunky-tmp.dmg').path,
-			'-format', 'UDRW' ], true)
-		tryCommand([ '/usr/bin/hdiutil',
-			'attach',
-			file('build/Chunky-tmp.dmg').path,
-			'-mountroot',
-			'/tmp' ], true)
-		new File('/tmp/Chunky/.background').mkdirs()
-		ant.copy(file: file('dist/chunky-dmg.png'),
-			tofile: '/tmp/Chunky/.background/background.png',
-			overwrite: true)
-		ant.copy(file: file('dist/Chunky.icns'),
-			tofile: '/tmp/Chunky/.VolumeIcon.icns',
-			overwrite: true)
-		ant.copy(file: file('dist/DS_Store'),
-			tofile: '/tmp/Chunky/.DS_Store',
-			overwrite: true)
-		tryCommand('/usr/bin/Setfile -a C /tmp/Chunky'.split(' '), true)
-		ant.symlink(link: '/tmp/Chunky', resource: '/Applications')
-		tryCommand('/usr/bin/hdiutil detach /tmp/Chunky'.split(' '), true)
-		file("build/Chunky-${project.version}.dmg").delete()
-		tryCommand([ '/usr/bin/hdiutil',
-			'convert',
-			file('build/Chunky-tmp.dmg').path,
-			'-format',
-			'UDZO',
-			'-o',
-			file("build/Chunky-${project.version}.dmg").path ], true)
-		file('build/Chunky-tmp.dmg').delete()
-		tryCommand([ '/usr/bin/hdiutil',
-			'internet-enable',
-			'-yes',
-			file("build/Chunky-${project.version}.dmg") ], true)
-	}
+    // TODO(jesper): Add support for Mac build on Linux.
+    ant.taskdef(name: 'appbundler', classpath: file('tools/appbundler-1.0.jar'),
+      classname: 'com.oracle.appbundler.AppBundlerTask')
+    ant.appbundler(outputdirectory: buildDir,
+      name: 'Chunky',
+      displayname: 'Chunky',
+      identifier: 'se.llbit.Chunky',
+      shortversion: "${project.version}",
+      mainclassname: 'se.llbit.chunky.launcher.ChunkyLauncher',
+      icon: file('dist/Chunky.icns').path) {
+      option(value: '-Dapple.laf.useScreenMenuBar=true')
+      option(value: '-Dapple.awt.textantialiasing=true')
+      classpath(file: file("build/chunky-${project.version}.jar").path)
+    }
+    tryCommand([ '/usr/bin/hdiutil',
+      'create',
+      '-srcfolder',
+      file('build/Chunky.app').path,
+      '-volname', 'Chunky', '-ov',
+      file('build/Chunky-tmp.dmg').path,
+      '-format', 'UDRW' ], true)
+    tryCommand([ '/usr/bin/hdiutil',
+      'attach',
+      file('build/Chunky-tmp.dmg').path,
+      '-mountroot',
+      '/tmp' ], true)
+    new File('/tmp/Chunky/.background').mkdirs()
+    ant.copy(file: file('dist/chunky-dmg.png'),
+      tofile: '/tmp/Chunky/.background/background.png',
+      overwrite: true)
+    ant.copy(file: file('dist/Chunky.icns'),
+      tofile: '/tmp/Chunky/.VolumeIcon.icns',
+      overwrite: true)
+    ant.copy(file: file('dist/DS_Store'),
+      tofile: '/tmp/Chunky/.DS_Store',
+      overwrite: true)
+    tryCommand('/usr/bin/Setfile -a C /tmp/Chunky'.split(' '), true)
+    ant.symlink(link: '/tmp/Chunky', resource: '/Applications')
+    tryCommand('/usr/bin/hdiutil detach /tmp/Chunky'.split(' '), true)
+    file("build/Chunky-${project.version}.dmg").delete()
+    tryCommand([ '/usr/bin/hdiutil',
+      'convert',
+      file('build/Chunky-tmp.dmg').path,
+      '-format',
+      'UDZO',
+      '-o',
+      file("build/Chunky-${project.version}.dmg").path ], true)
+    file('build/Chunky-tmp.dmg').delete()
+    tryCommand([ '/usr/bin/hdiutil',
+      'internet-enable',
+      '-yes',
+      file("build/Chunky-${project.version}.dmg") ], true)
+  }
 }
 
 task install(dependsOn: ':chunky:install')
@@ -219,11 +251,11 @@ task uploadArchives(dependsOn: ':chunky:uploadArchives')
 
 // Includes both main and library documentation:
 task docs(type: Javadoc) {
-		options.encoding = 'UTF-8'
-		options.addStringOption('Xdoclint:none', '-quiet')
+    options.encoding = 'UTF-8'
+    options.addStringOption('Xdoclint:none', '-quiet')
 
-		def docProjects = [ ':chunky', ':lib' ]
-		source docProjects.collect { project(it).sourceSets.main.allJava }
-		classpath = files(docProjects.collect { project(it).sourceSets.main.compileClasspath })
-		destinationDir = file("${buildDir}/docs/javadoc")
+    def docProjects = [ ':chunky', ':lib' ]
+    source docProjects.collect { project(it).sourceSets.main.allJava }
+    classpath = files(docProjects.collect { project(it).sourceSets.main.compileClasspath })
+    destinationDir = file("${buildDir}/docs/javadoc")
 }

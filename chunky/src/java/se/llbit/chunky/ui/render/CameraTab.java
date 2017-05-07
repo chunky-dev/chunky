@@ -297,7 +297,7 @@ public class CameraTab extends Tab implements RenderControlsTab, Initializable {
   private void updateCameraList() {
     cameras.getItems().clear();
     JsonObject presets = scene.getCameraPresets();
-    for (JsonMember member : presets.getMemberList()) {
+    for (JsonMember member : presets) {
       String name = member.getName().trim();
       if (!name.isEmpty()) {
         cameras.getItems().add(name);

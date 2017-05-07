@@ -24,16 +24,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import org.jastadd.util.PrettyPrinter;
-
-import se.llbit.json.JsonFalse;
+import se.llbit.json.Json;
+import se.llbit.json.JsonMember;
 import se.llbit.json.JsonNumber;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonString;
-import se.llbit.json.JsonTrue;
 import se.llbit.json.JsonValue;
+import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
 
 /**
@@ -105,7 +104,7 @@ public final class JsonSettings {
   }
 
   /**
-   * Get string value of a setting
+   * Get string value of a setting.
    *
    * @param name     Property name
    * @param defValue Default value
@@ -131,7 +130,7 @@ public final class JsonSettings {
   }
 
   /**
-   * Get boolean value of a setting
+   * Get boolean value of a setting.
    *
    * @param name     Property name
    * @param defValue Default value
@@ -143,7 +142,7 @@ public final class JsonSettings {
   }
 
   /**
-   * Get the integer value of a setting
+   * Get the integer value of a setting.
    *
    * @param name     Property name
    * @param defValue Default value
@@ -155,7 +154,7 @@ public final class JsonSettings {
   }
 
   /**
-   * Get the double value of a setting
+   * Get the double value of a setting.
    *
    * @param name     Property name
    * @param defValue Default value
@@ -167,57 +166,52 @@ public final class JsonSettings {
   }
 
   /**
-   * Set string value
+   * Set string value.
    *
    * @param name  setting name
-   * @param value value
+   * @param value new value
    */
   public void setString(String name, String value) {
     json.set(name, new JsonString(value));
   }
 
   /**
-   * Set boolean value
+   * Set boolean value.
    *
    * @param name  setting name
-   * @param value value
+   * @param value new value
    */
   public void setBool(String name, boolean value) {
-    json.set(name, value ? new JsonTrue() : new JsonFalse());
+    json.set(name, Json.of(value));
   }
 
   /**
-   * Set integer value
+   * Set integer value.
    *
    * @param name  setting name
-   * @param value value
+   * @param value new value
    */
   public void setInt(String name, int value) {
     json.set(name, new JsonNumber("" + value));
   }
 
   /**
-   * Set double value
+   * Set double value.
    *
    * @param name  setting name
-   * @param value value
+   * @param value new value
    */
   public void setDouble(String name, double value) {
     json.set(name, new JsonNumber("" + value));
   }
 
   /**
-   * Remove a setting
+   * Remove a setting by name.
    *
    * @param name setting name
    */
   public void removeSetting(String name) {
-    for (int i = 0; i < json.getNumMember(); ++i) {
-      if (json.getMember(i).getName().equals(name)) {
-        json.getMemberList().removeChild(i);
-        break;
-      }
-    }
+    json.remove(name);
   }
 
   /**
@@ -226,8 +220,8 @@ public final class JsonSettings {
    * the given name
    */
   public boolean containsKey(String name) {
-    for (int i = 0; i < json.getNumMember(); ++i) {
-      if (json.getMember(i).getName().equals(name)) {
+    for (JsonMember entry : json) {
+      if (entry.name.equals(name)) {
         return true;
       }
     }

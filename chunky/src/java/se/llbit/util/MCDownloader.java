@@ -27,13 +27,12 @@ import java.nio.channels.ReadableByteChannel;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import org.jastadd.util.PrettyPrinter;
-
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
+import se.llbit.json.PrettyPrinter;
 
 /**
  * Utility class to download Minecraft Jars and player data.
@@ -88,7 +87,7 @@ public class MCDownloader {
       try {
         cache = cacheParse.parse().array();
         in.close();
-        for (JsonValue entry : cache.getElementList()) {
+        for (JsonValue entry : cache) {
           if (entry.array().get(0).stringValue("").equals(key)) {
             return entry.array().get(1).object();
           }

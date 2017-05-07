@@ -23,8 +23,8 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.SkymapTexture;
+import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
-import se.llbit.json.JsonNull;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
@@ -532,7 +532,7 @@ public class Sky implements JsonSerializable {
           if (!skybox[i].isEmptyTexture()) {
             array.add(skyboxFileName[i]);
           } else {
-            array.add(new JsonNull());
+            array.add(Json.NULL);
           }
         }
         sky.add("skybox", array);
@@ -624,9 +624,9 @@ public class Sky implements JsonSerializable {
    * @return {@code null} if the gradient was not valid
    */
   public static List<Vector4> gradientFromJson(JsonArray array) {
-    List<Vector4> gradient = new ArrayList<>(array.getNumElement());
-    for (int i = 0; i < array.getNumElement(); ++i) {
-      JsonObject obj = array.getElement(i).object();
+    List<Vector4> gradient = new ArrayList<>(array.size());
+    for (int i = 0; i < array.size(); ++i) {
+      JsonObject obj = array.get(i).object();
       Vector3 color = new Vector3();
       try {
         ColorUtil.fromString(obj.get("rgb").stringValue(""), 16, color);

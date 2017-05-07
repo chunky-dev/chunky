@@ -17,7 +17,6 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
-import org.jastadd.util.PrettyPrinter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.OutputMode;
@@ -49,6 +48,7 @@ import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
+import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
 import se.llbit.math.BVH;
 import se.llbit.math.ColorUtil;
@@ -2290,7 +2290,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("camera", camera.toJson());
     json.add("sun", sun.toJson());
     json.add("sky", sky.toJson());
-    json.add("cameraPresets", cameraPresets.fullCopy());
+    json.add("cameraPresets", cameraPresets.copy());
     JsonArray chunkList = new JsonArray();
     for (ChunkPosition pos : chunks) {
       JsonArray chunk = new JsonArray();
@@ -2304,14 +2304,14 @@ public class Scene implements JsonSerializable, Refreshable {
     for (Entity entity : entities) {
       entityArray.add(entity.toJson());
     }
-    if (entityArray.getNumElement() > 0) {
+    if (!entityArray.isEmpty()) {
       json.add("entities", entityArray);
     }
     JsonArray actorArray = new JsonArray();
     for (Entity entity : actors) {
       actorArray.add(entity.toJson());
     }
-    if (actorArray.getNumElement() > 0) {
+    if (!actorArray.isEmpty()) {
       json.add("actors", actorArray);
     }
     return json;
@@ -2518,7 +2518,7 @@ public class Scene implements JsonSerializable, Refreshable {
     fogDensity = json.get("fogDensity").doubleValue(fogDensity);
     waterHeight = json.get("waterHeight").intValue(waterHeight);
     renderActors = json.get("renderActors").boolValue(renderActors);
-    materials = json.get("materials").object().treeCopy().toMap();
+    materials = json.get("materials").object().copy().toMap();
 
     // Load world info.
     if (json.get("world").isObject()) {
@@ -2551,7 +2551,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (json.get("chunkList").isArray()) {
       JsonArray chunkList = json.get("chunkList").array();
       chunks.clear();
-      for (JsonValue elem : chunkList.getElementList()) {
+      for (JsonValue elem : chunkList) {
         JsonArray chunk = elem.array();
         int x = chunk.get(0).intValue(Integer.MAX_VALUE);
         int z = chunk.get(1).intValue(Integer.MAX_VALUE);
@@ -2567,7 +2567,7 @@ public class Scene implements JsonSerializable, Refreshable {
       // Previously poseable entities were stored in the entities array
       // rather than the actors array. In future versions only the actors
       // array should contain poseable entities.
-      for (JsonValue element : json.get("entities").array().getElementList()) {
+      for (JsonValue element : json.get("entities").array()) {
         Entity entity = Entity.fromJson(element.object());
         if (entity != null) {
           if (entity instanceof PlayerEntity) {
@@ -2577,7 +2577,7 @@ public class Scene implements JsonSerializable, Refreshable {
           }
         }
       }
-      for (JsonValue element : json.get("actors").array().getElementList()) {
+      for (JsonValue element : json.get("actors").array()) {
         Entity entity = Entity.fromJson(element.object());
         actors.add(entity);
       }
@@ -2621,13 +2621,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void saveCameraPreset(String name) {
     camera.name = name;
-    for (JsonMember member : cameraPresets.getMemberList()) {
-      if (member.getName().equals(name)) {
-        member.setValue(camera.toJson());
-        return;
-      }
-    }
-    cameraPresets.add(name, camera.toJson());
+    cameraPresets.set(name, camera.toJson());
   }
 
   public void loadCameraPreset(String name) {
@@ -2639,9 +2633,9 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void deleteCameraPreset(String name) {
-    for (int i = 0; i < cameraPresets.getNumMember(); ++i) {
-      if (cameraPresets.getMember(i).getName().equals(name)) {
-        cameraPresets.getMemberList().removeChild(i);
+    for (int i = 0; i < cameraPresets.size(); ++i) {
+      if (cameraPresets.get(i).name.equals(name)) {
+        cameraPresets.remove(i);
         return;
       }
     }

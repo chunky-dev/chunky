@@ -49,12 +49,12 @@ public class SignTexture extends Texture {
     int[] data = img.data;
     int ystart = ymargin;
     for (JsonArray line : text) {
-      if (line.getNumElement() == 0) {
+      if (line.isEmpty()) {
         ystart += gh;
         continue;
       }
       int lineWidth = 0;
-      for (JsonValue textItem : line.getElementList()) {
+      for (JsonValue textItem : line) {
         String textLine = textItem.object().get("text").stringValue("");
         for (int j = 0; j < textLine.length(); ++j) {
           char c = textLine.charAt(j);
@@ -63,7 +63,7 @@ public class SignTexture extends Texture {
         }
       }
       int xstart = (width - lineWidth) / 2;
-      for (JsonValue textItem : line.getElementList()) {
+      for (JsonValue textItem : line) {
         String textLine = textItem.object().get("text").stringValue("");
         Color color = Color.get(textItem.object().get("color").intValue(0));
 

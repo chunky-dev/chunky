@@ -27,11 +27,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 
-import org.jastadd.util.PrettyPrinter;
-
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.json.PrettyPrinter;
 import se.llbit.util.Util;
 
 /**
@@ -130,7 +129,7 @@ public class VersionInfo implements Comparable<VersionInfo> {
     date = Util.dateFromISO8601(timestamp);
     notes = json.get("notes").stringValue("");
     JsonArray libraryArray = json.get("libraries").array();
-    for (JsonValue lib : libraryArray.getElementList()) {
+    for (JsonValue lib : libraryArray) {
       libraries.add(new Library(lib.object()));
     }
   }

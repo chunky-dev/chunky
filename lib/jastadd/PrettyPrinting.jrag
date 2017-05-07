@@ -1,9 +1,0 @@
-import org.jastadd.util.PrettyPrintable;
-import org.jastadd.util.PrettyPrinter;
-
-aspect PrettyPrinting {
-	JsonValue implements PrettyPrintable;
-	JsonMember implements PrettyPrintable;
-
-	syn String JsonString.escaped() = escape(getValue());
-}

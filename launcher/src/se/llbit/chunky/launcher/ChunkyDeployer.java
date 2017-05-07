@@ -91,7 +91,7 @@ public final class ChunkyDeployer {
         return false;
       }
       JsonArray array = obj.get("libraries").array();
-      for (JsonValue value : array.getElementList()) {
+      for (JsonValue value : array) {
         VersionInfo.Library lib = new VersionInfo.Library(value.object());
         switch (lib.testIntegrity(libDir)) {
           case INCOMPLETE_INFO:

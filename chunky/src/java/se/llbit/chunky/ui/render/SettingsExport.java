@@ -124,7 +124,7 @@ class SettingsExport extends Stage {
       }
     }
 
-    for (JsonMember setting : json.object().getMemberList()) {
+    for (JsonMember setting : json.object()) {
       if (!excluded.contains(setting.getName())) {
         // TODO build a hierarchical checkbox system for complex settings.
         CheckBox checkBox = new CheckBox(setting.getName());
@@ -177,10 +177,10 @@ class SettingsExport extends Stage {
 
   private void update() {
     JsonObject result = new JsonObject();
-    for (JsonMember setting : json.object().getMemberList()) {
-      CheckBox checkBox = checkMap.get(setting.getName());
+    for (JsonMember setting : json.object()) {
+      CheckBox checkBox = checkMap.get(setting.name);
       if (checkBox != null && checkBox.isSelected()) {
-        result.addMember(setting.treeCopyNoTransform());
+        result.add(setting.copy());
       }
     }
     jsonField.setText(result.toCompactString());

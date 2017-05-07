@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.main;
 
-import org.jastadd.util.PrettyPrinter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.RenderContext;
@@ -28,6 +27,7 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
+import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
 import se.llbit.util.MCDownloader;
 import se.llbit.util.NotNull;
@@ -292,12 +292,7 @@ public class CommandLineOptions {
           for (int j = 0; j < path.length - 1; ++j) {
             obj = obj.get(path[j]).object();
           }
-          for (int j = 0; j < obj.getNumMember(); ++j) {
-            if (obj.getMember(j).getName().equals(name)) {
-              obj.getMemberList().removeChild(j);
-              break;
-            }
-          }
+          obj.remove(name);
           writeSceneJson(file, desc);
           System.out.println("Updated scene " + file.getAbsolutePath());
         } catch (SyntaxError e) {
