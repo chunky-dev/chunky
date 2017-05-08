@@ -37,7 +37,7 @@ subprojects {
   }
 
   dependencies {
-    compile 'se.llbit:jo-json:1.3.0'
+    compile configurations.jsonlib
     jsonlib 'se.llbit:jo-json:1.3.0'
     jastadd 'org.jastadd:jastadd:2.1.13'
   }
