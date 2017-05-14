@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.nbt.AnyTag;
+import se.llbit.nbt.Tag;
 
 public class PlayerEntityData {
   public final double x;
@@ -30,9 +30,9 @@ public class PlayerEntityData {
 
   public final String uuid;
 
-  public PlayerEntityData(AnyTag player) {
-    AnyTag pos = player.get("Pos");
-    AnyTag rotation = player.get("Rotation");
+  public PlayerEntityData(Tag player) {
+    Tag pos = player.get("Pos");
+    Tag rotation = player.get("Rotation");
 
     uuidLo = player.get("UUIDLeast").longValue(-1);
     uuidHi = player.get("UUIDMost").longValue(-1);

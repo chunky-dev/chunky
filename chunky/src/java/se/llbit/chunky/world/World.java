@@ -24,8 +24,8 @@ import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.log.Log;
 import se.llbit.math.Vector3;
-import se.llbit.nbt.AnyTag;
 import se.llbit.nbt.NamedTag;
+import se.llbit.nbt.Tag;
 import se.llbit.util.Pair;
 
 import java.io.DataInputStream;
@@ -171,19 +171,19 @@ public class World implements Comparable<World> {
       request.add(".Data.Player");
       request.add(".Data.LevelName");
       request.add(".Data.GameType");
-      Map<String, AnyTag> result = NamedTag.quickParse(in, request);
+      Map<String, Tag> result = NamedTag.quickParse(in, request);
 
-      AnyTag version = result.get(".Data.version");
+      Tag version = result.get(".Data.version");
       if (logWarnings && version.intValue() != NBT_VERSION) {
         Log.warn("The world format for the world " + levelName + " is not supported by Chunky.\n"
             + "Will attempt to load the world anyway.");
       }
-      AnyTag player = result.get(".Data.Player");
-      AnyTag spawnX = player.get("SpawnX");
-      AnyTag spawnY = player.get("SpawnY");
-      AnyTag spawnZ = player.get("SpawnZ");
-      AnyTag gameType = result.get(".Data.GameType");
-      AnyTag randomSeed = result.get(".Data.RandomSeed");
+      Tag player = result.get(".Data.Player");
+      Tag spawnX = player.get("SpawnX");
+      Tag spawnY = player.get("SpawnY");
+      Tag spawnZ = player.get("SpawnZ");
+      Tag gameType = result.get(".Data.GameType");
+      Tag randomSeed = result.get(".Data.RandomSeed");
 
       playerDimension = player.get("Dimension").intValue();
 

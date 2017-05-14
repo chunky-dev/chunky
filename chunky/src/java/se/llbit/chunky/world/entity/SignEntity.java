@@ -38,7 +38,7 @@ import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
-import se.llbit.nbt.AnyTag;
+import se.llbit.nbt.Tag;
 import se.llbit.nbt.CompoundTag;
 
 public class SignEntity extends Entity {
@@ -194,7 +194,7 @@ public class SignEntity extends Entity {
   /**
    * Extract text from entity tag.
    */
-  private static JsonArray extractText(AnyTag tag) {
+  private static JsonArray extractText(Tag tag) {
     JsonArray array = new JsonArray();
     String data = tag.stringValue("");
     if (data.startsWith("\"")) {

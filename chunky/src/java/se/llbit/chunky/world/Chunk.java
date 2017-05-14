@@ -26,7 +26,7 @@ import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.chunky.map.UnknownLayer;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.ui.MapViewMode;
-import se.llbit.nbt.AnyTag;
+import se.llbit.nbt.Tag;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.ListTag;
@@ -131,16 +131,16 @@ public class Chunk {
    * @param request fresh request set
    * @return loaded data, or null if something went wrong
    */
-  private Map<String, AnyTag> getChunkData(Set<String> request) {
+  private Map<String, Tag> getChunkData(Set<String> request) {
     Region region = world.getRegion(position.getRegionPosition());
     ChunkDataSource data = region.getChunkData(position);
     dataTimestamp = data.timestamp;
     if (data.inputStream != null) {
       try (DataInputStream in = data.inputStream) {
-        Map<String, AnyTag> result = NamedTag.quickParse(in, request);
+        Map<String, Tag> result = NamedTag.quickParse(in, request);
         for (String key : request) {
           if (!result.containsKey(key)) {
-            result.put(key, new ErrorTag());
+            result.put(key, new ErrorTag(""));
           }
         }
         return result;
@@ -190,7 +190,7 @@ public class Chunk {
 
     loadedLayer = requestedLayer;
 
-    Map<String, AnyTag> data = getChunkData(renderer.getRequest(view));
+    Map<String, Tag> data = getChunkData(renderer.getRequest(view));
 
     int layers = renderer.getLayers(view);
     if ((layers & BLOCK_LAYER) != 0) {
@@ -213,14 +213,14 @@ public class Chunk {
     world.chunkUpdated(position);
   }
 
-  private void loadSurface(Map<String, AnyTag> data) {
+  private void loadSurface(Map<String, Tag> data) {
     if (data == null) {
       surface = CorruptLayer.INSTANCE;
       return;
     }
 
     Heightmap heightmap = world.heightmap();
-    AnyTag sections = data.get(LEVEL_SECTIONS);
+    Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
       int[] heightmapData = extractHeightmapData(data);
       byte[] biomeData = extractBiomeData(data);
@@ -235,7 +235,7 @@ public class Chunk {
     }
   }
 
-  private void loadBiomes(Map<String, AnyTag> data) {
+  private void loadBiomes(Map<String, Tag> data) {
     if (data == null) {
       biomes = CorruptLayer.INSTANCE;
     } else {
@@ -243,13 +243,13 @@ public class Chunk {
     }
   }
 
-  private void loadLayer(Map<String, AnyTag> data, int requestedLayer) {
+  private void loadLayer(Map<String, Tag> data, int requestedLayer) {
     if (data == null) {
       layer = CorruptLayer.INSTANCE;
       return;
     }
 
-    AnyTag sections = data.get(LEVEL_SECTIONS);
+    Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
       byte[] biomeData = extractBiomeData(data);
       byte[] chunkData = new byte[CHUNK_BYTES];
@@ -260,13 +260,13 @@ public class Chunk {
     }
   }
 
-  private void loadCaves(Map<String, AnyTag> data) {
+  private void loadCaves(Map<String, Tag> data) {
     if (data == null) {
       caves = CorruptLayer.INSTANCE;
       return;
     }
 
-    AnyTag sections = data.get(LEVEL_SECTIONS);
+    Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
       int[] heightmapData = extractHeightmapData(data);
       byte[] chunkData = new byte[CHUNK_BYTES];
@@ -277,8 +277,8 @@ public class Chunk {
     }
   }
 
-  private byte[] extractBiomeData(@NotNull Map<String, AnyTag> data) {
-    AnyTag biomesTag = data.get(LEVEL_BIOMES);
+  private byte[] extractBiomeData(@NotNull Map<String, Tag> data) {
+    Tag biomesTag = data.get(LEVEL_BIOMES);
     if (biomesTag.isByteArray(X_MAX * Z_MAX)) {
       return biomesTag.byteArray();
     } else {
@@ -286,8 +286,8 @@ public class Chunk {
     }
   }
 
-  private int[] extractHeightmapData(@NotNull Map<String, AnyTag> data) {
-    AnyTag heightmapTag = data.get(LEVEL_HEIGHTMAP);
+  private int[] extractHeightmapData(@NotNull Map<String, Tag> data) {
+    Tag heightmapTag = data.get(LEVEL_HEIGHTMAP);
     if (heightmapTag.isIntArray(X_MAX * Z_MAX)) {
       return heightmapTag.intArray();
     } else {
@@ -299,19 +299,19 @@ public class Chunk {
     }
   }
 
-  private void extractChunkData(@NotNull Map<String, AnyTag> data, @NotNull byte[] blocks,
+  private void extractChunkData(@NotNull Map<String, Tag> data, @NotNull byte[] blocks,
       @NotNull byte[] blockData) {
-    AnyTag sections = data.get(LEVEL_SECTIONS);
+    Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
-      for (SpecificTag section : ((ListTag) sections).getItemList()) {
-        AnyTag yTag = section.get("Y");
+      for (SpecificTag section : ((ListTag) sections)) {
+        Tag yTag = section.get("Y");
         int yOffset = yTag.byteValue() & 0xFF;
-        AnyTag blocksTag = section.get("Blocks");
+        Tag blocksTag = section.get("Blocks");
         if (blocksTag.isByteArray(SECTION_BYTES)) {
           System
               .arraycopy(blocksTag.byteArray(), 0, blocks, SECTION_BYTES * yOffset, SECTION_BYTES);
         }
-        AnyTag dataTag = section.get("Data");
+        Tag dataTag = section.get("Data");
         if (dataTag.isByteArray(SECTION_HALF_NIBBLES)) {
           System.arraycopy(dataTag.byteArray(), 0, blockData, SECTION_HALF_NIBBLES * yOffset,
               SECTION_HALF_NIBBLES);
@@ -415,27 +415,27 @@ public class Chunk {
     request.add(LEVEL_BIOMES);
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
-    Map<String, AnyTag> data = getChunkData(request);
+    Map<String, Tag> data = getChunkData(request);
     // TODO: improve error handling here.
     if (data == null) {
       return;
     }
-    AnyTag sections = data.get(LEVEL_SECTIONS);
-    AnyTag biomesTag = data.get(LEVEL_BIOMES);
-    AnyTag entitiesTag = data.get(LEVEL_ENTITIES);
-    AnyTag tileEntitiesTag = data.get(LEVEL_TILEENTITIES);
+    Tag sections = data.get(LEVEL_SECTIONS);
+    Tag biomesTag = data.get(LEVEL_BIOMES);
+    Tag entitiesTag = data.get(LEVEL_ENTITIES);
+    Tag tileEntitiesTag = data.get(LEVEL_TILEENTITIES);
     if (sections.isList() && biomesTag.isByteArray(X_MAX * Z_MAX) && tileEntitiesTag.isList()
         && entitiesTag.isList()) {
       byte[] chunkBiomes = extractBiomeData(data);
       System.arraycopy(chunkBiomes, 0, biomes, 0, chunkBiomes.length);
       extractChunkData(data, blocks, blockData);
       ListTag list = (ListTag) entitiesTag;
-      for (SpecificTag tag : list.getItemList()) {
+      for (SpecificTag tag : list) {
         if (tag.isCompoundTag())
           entities.add((CompoundTag) tag);
       }
       list = (ListTag) tileEntitiesTag;
-      for (SpecificTag tag : list.getItemList()) {
+      for (SpecificTag tag : list) {
         if (tag.isCompoundTag())
           tileEntities.add((CompoundTag) tag);
       }

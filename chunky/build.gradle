@@ -7,6 +7,7 @@ archivesBaseName = 'chunky-core'
 
 dependencies {
   compile 'org.apache.commons:commons-math3:3.2'
+  compile configurations.nbtlib
   compile project(':lib')
 
   testCompile 'com.google.truth:truth:0.30'
@@ -19,6 +20,9 @@ jar {
     zipTree(it)
   }
   from configurations.jsonlib.files.collect {
+    zipTree(it)
+  }
+  from configurations.nbtlib.files.collect {
     zipTree(it)
   }
   manifest {
@@ -64,33 +68,6 @@ task updateVersionString {
     def versionFile = file('src/gen-res/Version.properties')
     ant.propertyfile(file: versionFile) {
       entry(key: 'version', value: project.version)
-    }
-  }
-}
-
-compileJava.dependsOn 'generateJava'
-
-task generateJava() {
-  inputs.dir 'src/jastadd'
-  outputs.dir 'src/gen'
-
-  doLast {
-    project.file('src/gen').mkdirs()
-    ant.taskdef(
-      name: 'jastadd',
-      classname: 'org.jastadd.JastAddTask',
-      classpath: project.configurations.jastadd.asPath)
-    ant.jastadd(
-      outdir: project.file('src/gen'),
-      package: 'se.llbit.nbt',
-      rewrite: 'none',
-      visitCheck: false,
-      debug: false) {
-      fileset(dir: project.file('src/jastadd')) {
-        include(name: '*.ast')
-        include(name: '*.jrag')
-        include(name: '*.jadd')
-      }
     }
   }
 }
@@ -168,6 +145,7 @@ project.afterEvaluate {
     // Exclude the :lib and jo-json dependencies because they are embedded in the built Jar.
     pom.dependencies.removeAll { it.groupId == 'se.llbit' && it.artifactId == 'lib' }
     pom.dependencies.removeAll { it.groupId == 'se.llbit' && it.artifactId == 'jo-json' }
+    pom.dependencies.removeAll { it.groupId == 'se.llbit' && it.artifactId == 'jo-nbt' }
 
     // Change POM version to -SNAPSHOT for intermediate builds.
     if (project.version =~ /\d+\.\d+(\.\d+)?-.+/) {

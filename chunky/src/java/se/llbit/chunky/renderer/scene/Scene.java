@@ -798,11 +798,11 @@ public class Scene implements JsonSerializable, Refreshable {
         for (CompoundTag tag : chunkEntities) {
           if (tag.get("id").stringValue("").equals("Painting")) {
             ListTag pos = (ListTag) tag.get("Pos");
-            double x = pos.getItem(0).doubleValue();
-            double y = pos.getItem(1).doubleValue();
-            double z = pos.getItem(2).doubleValue();
+            double x = pos.get(0).doubleValue();
+            double y = pos.get(1).doubleValue();
+            double z = pos.get(2).doubleValue();
             ListTag rot = (ListTag) tag.get("Rotation");
-            double yaw = rot.getItem(0).floatValue();
+            double yaw = rot.get(0).floatValue();
             //double pitch = rot.getItem(1).floatValue();
             entities.add(
                 new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
