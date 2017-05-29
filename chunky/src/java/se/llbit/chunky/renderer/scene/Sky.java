@@ -276,8 +276,8 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SKYMAP_SPHERICAL: {
-        double cos = FastMath.cos(-rotation);
-        double sin = FastMath.sin(-rotation);
+        double cos = QuickMath.cos(-rotation);
+        double sin = QuickMath.sin(-rotation);
         double x = cos * ray.d.x + sin * ray.d.z;
         double y = ray.d.y;
         double z = -sin * ray.d.x + cos * ray.d.z;
@@ -289,8 +289,8 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SKYBOX: {
-        double cos = FastMath.cos(-rotation);
-        double sin = FastMath.sin(-rotation);
+        double cos = QuickMath.cos(-rotation);
+        double sin = QuickMath.sin(-rotation);
         double x = cos * ray.d.x + sin * ray.d.z;
         double y = ray.d.y;
         double z = -sin * ray.d.x + cos * ray.d.z;
@@ -360,8 +360,8 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SKYMAP_SPHERICAL: {
-        double cos = FastMath.cos(-rotation);
-        double sin = FastMath.sin(-rotation);
+        double cos = QuickMath.cos(-rotation);
+        double sin = QuickMath.sin(-rotation);
         double x = cos * ray.d.x + sin * ray.d.z;
         double y = ray.d.y;
         double z = -sin * ray.d.x + cos * ray.d.z;
@@ -373,8 +373,8 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SKYBOX: {
-        double cos = FastMath.cos(-rotation);
-        double sin = FastMath.sin(-rotation);
+        double cos = QuickMath.cos(-rotation);
+        double sin = QuickMath.sin(-rotation);
         double x = cos * ray.d.x + sin * ray.d.z;
         double y = ray.d.y;
         double z = -sin * ray.d.x + cos * ray.d.z;

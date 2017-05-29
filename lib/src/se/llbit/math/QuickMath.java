@@ -25,6 +25,21 @@ public class QuickMath {
 
   public static final double HALF_PI = Math.PI / 2;
   public static final double TAU = Math.PI * 2;
+  private static final double[] SINE_TABLE = new double[65536];
+
+  /**
+   * @return The sine of d
+   */
+  public static double sin(double d) {
+    return SINE_TABLE[(int) (d * 10430.378) & 65535];
+  }
+
+  /**
+   * @return The cosine of d
+   */
+  public static double cos(double d) {
+    return SINE_TABLE[(int) (d * 10430.378 + 16384) & 65535];
+  }
 
   /**
    * @return The floor of d
@@ -168,5 +183,12 @@ public class QuickMath {
    */
   public static double abs(double x) {
     return (x < 0.0) ? -x : x;
+  }
+  
+  static
+  {
+    for (int i = 0; i < 65536; ++i) {
+      SINE_TABLE[i] = Math.sin(i * Math.PI * 2 / 65536);
+    }
   }
 }
