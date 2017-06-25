@@ -1837,7 +1837,6 @@ public class TexturePackLoader {
     if (basename.endsWith(".zip")) {
       basename = basename.substring(0, basename.length() - 4);
     }
-    System.err.println("basename: " + basename);
 
     try (ZipFile texturePack = new ZipFile(tpFile)) {
       // Seach for the assets directory in the resource pack.
