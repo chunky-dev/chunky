@@ -111,8 +111,8 @@ public class FontTexture extends TextureLoader {
     glyphs[ch] = new Glyph(top, bot, xmin, xmax);
   }
 
-  @Override public boolean load(ZipFile texturePack) {
-    return load(file, texturePack);
+  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
+    return load(topLevelDir + file, texturePack);
   }
 }
 

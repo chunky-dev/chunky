@@ -1821,6 +1821,9 @@ public class TexturePackLoader {
 
   /**
    * Load a set of textures from a Minecraft resource pack.
+   * The resource pack must contain an assets directory, either as
+   * a top-level directory or inside a top-level directory with the
+   * same name as the Zip file.
    *
    * @param tpFile resource pack file
    * @param textures textures to load
@@ -1830,11 +1833,28 @@ public class TexturePackLoader {
       Collection<Map.Entry<String, TextureLoader>> textures) {
     Set<Map.Entry<String, TextureLoader>> notLoaded = new HashSet<>(textures);
 
+    String basename = tpFile.getName().toLowerCase();
+    if (basename.endsWith(".zip")) {
+      basename = basename.substring(0, basename.length() - 4);
+    }
+    System.err.println("basename: " + basename);
+
     try (ZipFile texturePack = new ZipFile(tpFile)) {
+      // Seach for the assets directory in the resource pack.
+      // The assets directory can be inside a top-level directory with
+      // the same name as the resource pack zip file.
       boolean foundAssetDirectory = false;
+      String topLevel = "";
       Enumeration<? extends ZipEntry> entries = texturePack.entries();
       while (entries.hasMoreElements()) {
-        if (entries.nextElement().getName().startsWith("assets/")) {
+        String name = entries.nextElement().getName();
+        if (name.startsWith("assets/")) {
+          foundAssetDirectory = true;
+          break;
+        }
+        if (name.toLowerCase().startsWith(basename) &&
+            name.substring(basename.length()).startsWith("/assets/")) {
+          topLevel = name.substring(0, basename.length()) + "/";
           foundAssetDirectory = true;
           break;
         }
@@ -1843,7 +1863,7 @@ public class TexturePackLoader {
         Log.errorf("Missing assets directory in %s", texturePackName(tpFile));
       } else {
         for (Map.Entry<String, TextureLoader> texture : textures) {
-          if (texture.getValue().load(texturePack)) {
+          if (texture.getValue().load(texturePack, topLevel)) {
             notLoaded.remove(texture);
           }
         }

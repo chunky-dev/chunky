@@ -41,9 +41,9 @@ public class AlternateTextures extends TextureLoader {
     this.alternatives = alternatives;
   }
 
-  @Override public boolean load(ZipFile texturePack) {
+  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
     for (TextureLoader alternative : alternatives) {
-      if (alternative.load(texturePack)) {
+      if (alternative.load(texturePack, topLevelDir)) {
         return true;
       }
     }

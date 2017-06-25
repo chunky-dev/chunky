@@ -42,9 +42,13 @@ public abstract class TextureLoader {
    * Attempt to load a texture from a texture pack.
    *
    * @param texturePack Reference to the texture pack zip file
+   * @param topLevelDir The top-level directory of the resource pack, with
+   * trailing slash. The assets directory should be inside the top-level directory.
+   * This can be empty, if the assets directory is a top-level directory of the
+   * Zip file.
    * @return <code>true</code> if the texture was successfully loaded
    */
-  public abstract boolean load(ZipFile texturePack);
+  public abstract boolean load(ZipFile texturePack, String topLevelDir);
 
   /**
    * Attempt to load a texture from a PNG image file.

@@ -38,8 +38,8 @@ public class RotatedTextureLoader extends TextureLoader {
     loader = new SimpleTexture(file, texture);
   }
 
-  @Override public boolean load(ZipFile texturePack) {
-    if (!loader.load(texturePack)) {
+  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
+    if (!loader.load(texturePack, topLevelDir)) {
       return false;
     }
 

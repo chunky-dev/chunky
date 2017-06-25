@@ -50,7 +50,7 @@ public class IndexedTexture extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(ZipFile texturePack) {
+  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
     return false;
   }
 

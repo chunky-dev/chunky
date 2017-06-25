@@ -60,8 +60,8 @@ public class SimpleTexture extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(ZipFile texturePack) {
-    return load(file, texturePack);
+  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
+    return load(topLevelDir + file, texturePack);
   }
 
 }

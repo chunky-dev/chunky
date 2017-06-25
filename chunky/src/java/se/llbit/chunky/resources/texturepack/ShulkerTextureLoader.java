@@ -125,8 +125,9 @@ public class ShulkerTextureLoader extends TextureLoader {
     return image;
   }
 
-  @Override public boolean load(ZipFile texturePack) {
-    return topLoader.load(texturePack) && load(entityTexture, texturePack);
+  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
+    return topLoader.load(texturePack, topLevelDir)
+        && load(topLevelDir + entityTexture, texturePack);
   }
 }
 

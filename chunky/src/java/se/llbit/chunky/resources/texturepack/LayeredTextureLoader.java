@@ -60,8 +60,9 @@ public class LayeredTextureLoader extends TextureLoader {
     return true;
   }
 
-  @Override public boolean load(ZipFile texturePack) {
-    return subLoader.load(texturePack) && load(textureName, texturePack);
+  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
+    return subLoader.load(texturePack, topLevelDir)
+        && load(topLevelDir + textureName, texturePack);
   }
 }
 

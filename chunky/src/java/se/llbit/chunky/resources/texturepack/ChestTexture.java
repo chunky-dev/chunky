@@ -117,8 +117,8 @@ public class ChestTexture extends TextureLoader {
     return img;
   }
 
-  @Override public boolean load(ZipFile texturePack) {
-    return load(file, texturePack);
+  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
+    return load(topLevelDir + file, texturePack);
   }
 }
 
