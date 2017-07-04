@@ -2354,7 +2354,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return DaylightSensorModel.intersect(ray);
+      return DaylightSensorModel.intersect(ray, Texture.daylightDetectorTop);
     }
   };
   public static final int REDSTONEBLOCK_ID = 0x98;
@@ -2736,7 +2736,7 @@ public class Block extends Material {
     }
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return DaylightSensorModel.intersect(ray);
+      return DaylightSensorModel.intersect(ray, Texture.daylightDetectorInvertedTop);
     }
   };
   public static final int REDSANDSTONE_ID = 0xB3;

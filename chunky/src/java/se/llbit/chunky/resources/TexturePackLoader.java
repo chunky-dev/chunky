@@ -1106,6 +1106,9 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/daylight_detector_top",
             Texture.daylightDetectorTop),
         new SimpleTexture("textures/blocks/daylightDetector_top", Texture.daylightDetectorTop)));
+    allTextures.put("daylight_detector_inverted_top",
+        new SimpleTexture("assets/minecraft/textures/blocks/daylight_detector_inverted_top",
+            Texture.daylightDetectorInvertedTop));
     allTextures.put("daylight_detector_side", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/blocks/daylight_detector_side",
             Texture.daylightDetectorSide),

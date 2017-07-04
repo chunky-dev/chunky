@@ -1,5 +1,6 @@
 1.4.3 - TBD
 
+* Fixed incorrect top texture for inverted daylight sensors.
 * Added rendering for Minecraft 1.12 blocks:
     * Glazed Terracotta
     * Concrete

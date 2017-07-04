@@ -320,6 +320,7 @@ public class Texture {
   public static final Texture quartzPillar = new Texture();
   public static final Texture quartzPillarTop = new Texture();
   public static final Texture daylightDetectorTop = new Texture();
+  public static final Texture daylightDetectorInvertedTop = new Texture();
   public static final Texture daylightDetectorSide = new Texture();
   public static final Texture comparatorOff = new Texture();
   public static final Texture comparatorOn = new Texture();

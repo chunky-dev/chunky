@@ -23,11 +23,11 @@ import se.llbit.math.Ray;
 public class DaylightSensorModel {
   private static AABB block = new AABB(0, 1, 0, 6 / 16., 0, 1);
 
-  public static boolean intersect(Ray ray) {
+  public static boolean intersect(Ray ray, Texture topTexture) {
     ray.t = Double.POSITIVE_INFINITY;
     if (block.intersect(ray)) {
       if (ray.n.y > 0) {
-        Texture.daylightDetectorTop.getColor(ray);
+        topTexture.getColor(ray);
       } else {
         Texture.daylightDetectorSide.getColor(ray);
       }
