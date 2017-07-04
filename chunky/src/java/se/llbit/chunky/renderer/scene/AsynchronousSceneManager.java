@@ -101,8 +101,6 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
           sceneManager.loadScene(name);
         } catch (IOException e) {
           Log.warn("Could not load scene.\nReason: " + e.getMessage());
-        } catch (SceneLoadingError e) {
-          Log.warn("Could not open scene description.\nReason: " + e.getMessage());
         } catch (InterruptedException e) {
           Log.warn("Scene loading was interrupted.");
         }

@@ -137,7 +137,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   }
 
   @Override public void loadScene(String sceneName)
-      throws IOException, SceneLoadingError, InterruptedException {
+      throws IOException, InterruptedException {
 
     // Do not change lock ordering here.
     // Lock order: scene -> storedScene.

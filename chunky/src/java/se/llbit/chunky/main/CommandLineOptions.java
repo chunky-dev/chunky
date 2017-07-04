@@ -199,6 +199,10 @@ public class CommandLineOptions {
           configurationError = true;
         });
 
+    registerOption("-f", new Range(0), arguments -> {
+      options.force = true;
+    });
+
     registerOption("-target", new Range(1),
         arguments -> options.target = Math.max(1, Integer.parseInt(arguments.get(0))));
 

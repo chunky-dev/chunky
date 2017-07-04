@@ -28,16 +28,13 @@ import java.util.Collection;
 public interface SceneManager {
   /**
    * Save the current scene.
-   *
-   * @throws InterruptedException
    */
   void saveScene() throws InterruptedException;
 
   /**
    * Load a saved scene.
    */
-  void loadScene(String sceneName)
-      throws IOException, SceneLoadingError, InterruptedException;
+  void loadScene(String sceneName) throws IOException, InterruptedException;
 
   /**
    * Load chunks and reset camera and scene.

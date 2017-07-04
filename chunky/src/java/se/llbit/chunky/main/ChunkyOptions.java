@@ -23,9 +23,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import java.io.File;
 
 /**
- * Current configuration
- *
- * @author Jesper Öqvist <jesper@llbit.se>
+ * Various options for Chunky, set via the configuration file and/or command-line flags.
  */
 public class ChunkyOptions {
   // The scene directory can be updated by the scene directory chooser dialog.
@@ -42,6 +40,9 @@ public class ChunkyOptions {
   public int target = -1;
 
   public int tileWidth = RenderConstants.TILE_WIDTH_DEFAULT;
+
+  /** Ignore scene loading errors when starting a headless render. */
+  public boolean force = false;
 
   private ChunkyOptions() {
   }

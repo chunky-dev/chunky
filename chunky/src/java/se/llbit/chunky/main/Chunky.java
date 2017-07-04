@@ -34,7 +34,6 @@ import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.PreviewRayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
-import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.resources.TexturePackLoader;
@@ -104,7 +103,8 @@ public class Chunky {
     // TODO: This may not be needed after switching to JavaFX:
     System.setProperty("java.awt.headless", "true");
 
-    Log.setReceiver(HEADLESS_LOG_RECEIVER, Level.INFO, Level.WARNING, Level.ERROR);
+    HeadlessErrorTrackingLogger logger = new HeadlessErrorTrackingLogger();
+    Log.setReceiver(logger, Level.INFO, Level.WARNING, Level.ERROR);
 
     RenderContext context = renderContextFactory.newRenderContext(this);
     Renderer renderer = rendererFactory.newRenderer(context, true);
@@ -152,6 +152,13 @@ public class Chunky {
       if (options.target != -1) {
         sceneManager.getScene().setTargetSpp(options.target);
       }
+      if (logger.getNumErrors() > 0) {
+        if (!options.force) {
+          System.err.println("\rAborting render due to errors while loading the scene.");
+          System.err.println("Run again with -f to render anyway.");
+          return 1;
+        }
+      }
       sceneManager.getScene().startHeadlessRender();
 
       renderer.start();
@@ -162,9 +169,6 @@ public class Chunky {
       return 1;
     } catch (IOException e) {
       System.err.format("IO error while loading scene (%s)%n", e.getMessage());
-      return 1;
-    } catch (SceneLoadingError e) {
-      System.err.format("Scene loading error (%s)%n", e.getMessage());
       return 1;
     } catch (InterruptedException e) {
       System.err.println("Interrupted while loading scene");

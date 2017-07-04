@@ -124,22 +124,22 @@ public class Scene implements JsonSerializable, Refreshable {
   public static final float WATER_SPECULAR = 0.12f;
 
   /**
-   * Minimum exposure
+   * Minimum exposure.
    */
   public static final double MIN_EXPOSURE = 0.001;
 
   /**
-   * Maximum exposure
+   * Maximum exposure.
    */
   public static final double MAX_EXPOSURE = 1000.0;
 
   /**
-   * Default gamma
+   * Default gamma for the gamma correction post process.
    */
   public static final float DEFAULT_GAMMA = 2.2f;
 
   /**
-   * One over gamma
+   * One over gamma.
    */
   public static final float DEFAULT_GAMMA_INV = 1 / DEFAULT_GAMMA;
 
@@ -469,7 +469,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param sceneName file name of the scene to load
    */
   public synchronized void loadScene(RenderContext context, String sceneName,
-      TaskTracker taskTracker) throws IOException, SceneLoadingError, InterruptedException {
+      TaskTracker taskTracker) throws IOException, InterruptedException {
     loadDescription(context.getSceneDescriptionInputStream(sceneName));
 
     if (sdfVersion < SDF_VERSION) {

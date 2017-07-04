@@ -39,7 +39,6 @@ import se.llbit.util.JsonSerializable;
 import se.llbit.util.NotNull;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -683,12 +682,9 @@ public class Sky implements JsonSerializable {
 
   private Texture loadSkyTexture(String fileName, Texture prevTexture) {
     File textureFile = new File(fileName);
-    if (!textureFile.exists()) {
-      return prevTexture;
-    }
     if (textureFile.exists()) {
       try {
-        Log.info("Loading sky map: " + fileName);
+        Log.info("Loading skymap: " + fileName);
         if (fileName.toLowerCase().endsWith(".pfm")) {
           return new PFMTexture(textureFile);
         } else if (fileName.toLowerCase().endsWith(".hdr")) {
@@ -696,15 +692,14 @@ public class Sky implements JsonSerializable {
         } else {
           return new SkymapTexture(ImageLoader.read(textureFile));
         }
-      } catch (IOException e) {
-        Log.warn("Could not load skymap: " + fileName);
       } catch (Throwable e) {
-        Log.error("Unexpected exception occurred!", e);
+        Log.error("Failed to load skymap: " + fileName);
+        return prevTexture;
       }
     } else {
-      Log.warn("Skymap could not be opened: " + fileName);
+      Log.errorf("Failed to load skymap: %s (file does not exist)", fileName);
+      return prevTexture;
     }
-    return prevTexture;
   }
 
   public void setHorizonOffset(double newValue) {

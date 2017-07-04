@@ -55,7 +55,6 @@ import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
-import se.llbit.chunky.renderer.scene.SceneLoadingError;
 import se.llbit.chunky.ui.render.RenderControlsFx;
 import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.ChunkPosition;
@@ -509,7 +508,7 @@ public class ChunkyFxController
     open3DView();
     try {
       chunky.getSceneManager().loadScene(sceneName);
-    } catch (IOException | SceneLoadingError | InterruptedException e) {
+    } catch (IOException | InterruptedException e) {
       Log.error("Failed to load scene", e);
     }
   }
