@@ -57,13 +57,15 @@ public class GradientEditor extends VBox implements Initializable {
       PixelFormat.getIntArgbInstance();
   private final SkyTab sky;
 
+  // The array order determines the order of the preset list.
+  // Sorted alphabetically, including "The" prefixes.
   private String[][] presets = {
       {"Clear", "[{\"rgb\":\"0BABC7\",\"pos\":0.0},{\"rgb\":\"75AAFF\",\"pos\":1.0}]"},
       {"Desert", "[{\"rgb\":\"FF9966\",\"pos\":0.0},{\"rgb\":\"FFB77D\",\"pos\":0.19811320754716982},{\"rgb\":\"FFFFB3\",\"pos\":0.3867924528301887},{\"rgb\":\"D5ECEE\",\"pos\":0.7358490566037735},{\"rgb\":\"EBFCFD\",\"pos\":1.0}]"},
-      {"The End", "[{\"rgb\":\"2F1234\",\"pos\":0.0},{\"rgb\":\"321237\",\"pos\":0.42924528301886794},{\"rgb\":\"110713\",\"pos\":0.6320754716981132},{\"rgb\":\"000000\",\"pos\":1.0}]"},
       {"Mountain", "[{\"rgb\":\"718A83\",\"pos\":0.0},{\"rgb\":\"E7E8E8\",\"pos\":0.41745283018867924},{\"rgb\":\"BBF1F4\",\"pos\":0.5801886792452831},{\"rgb\":\"72F0F7\",\"pos\":0.7735849056603774},{\"rgb\":\"58F0F9\",\"pos\":1.0}]"},
-      {"The Nether", "[{\"rgb\":\"000000\",\"pos\":0.0},{\"rgb\":\"000000\",\"pos\":0.20047169811320756},{\"rgb\":\"B31A1A\",\"pos\":0.7240566037735849},{\"rgb\":\"B3281A\",\"pos\":0.8655660377358491},{\"rgb\":\"B3341A\",\"pos\":1.0}]"},
       {"Overcast", "[{\"rgb\":\"A5BECA\",\"pos\":0.0},{\"rgb\":\"BED6DD\",\"pos\":0.5259433962264151},{\"rgb\":\"D2E9EB\",\"pos\":0.7358490566037735},{\"rgb\":\"E3F3F4\",\"pos\":1.0}]"},
+      {"The End", "[{\"rgb\":\"2F1234\",\"pos\":0.0},{\"rgb\":\"321237\",\"pos\":0.42924528301886794},{\"rgb\":\"110713\",\"pos\":0.6320754716981132},{\"rgb\":\"000000\",\"pos\":1.0}]"},
+      {"The Nether", "[{\"rgb\":\"000000\",\"pos\":0.0},{\"rgb\":\"000000\",\"pos\":0.20047169811320756},{\"rgb\":\"B31A1A\",\"pos\":0.7240566037735849},{\"rgb\":\"B3281A\",\"pos\":0.8655660377358491},{\"rgb\":\"B3341A\",\"pos\":1.0}]"},
   };
 
   @FXML private MenuButton loadPreset;
