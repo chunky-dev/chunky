@@ -45,7 +45,6 @@ import se.llbit.chunky.world.entity.SkullEntity;
 import se.llbit.chunky.world.entity.WallSignEntity;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
-import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
@@ -2773,5 +2772,25 @@ public class Scene implements JsonSerializable, Refreshable {
     material.set("ior", Json.of(value));
     materials.put(materialName, material);
     refresh();
+  }
+
+  /**
+   * Renders a fog effect over the sky near the horizon.
+   */
+  public void addSkyFog(Ray ray) {
+    if (fogEnabled()) {
+      // This does not take fog density into account because the sky is
+      // most consistently treated as being infinitely far away.
+      double fog;
+      if (ray.d.y > 0) {
+        fog = 1 - ray.d.y;
+        fog *= fog;
+      } else {
+        fog = 1;
+      }
+      ray.color.x = (1 - fog) * ray.color.x + fog * fogColor.x;
+      ray.color.y = (1 - fog) * ray.color.y + fog * fogColor.y;
+      ray.color.z = (1 - fog) * ray.color.z + fog * fogColor.z;
+    }
   }
 }

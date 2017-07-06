@@ -76,15 +76,18 @@ public class PathTracer implements RayTracer {
           // Direct sky hit.
           if (!scene.transparentSky()) {
             scene.sky.getSkyColorInterpolated(ray);
+            scene.addSkyFog(ray);
             hit = true;
           }
         } else if (ray.specular) {
           // Indirect sky hit - specular color.
           scene.sky.getSkySpecularColor(ray);
+          scene.addSkyFog(ray);
           hit = true;
         } else {
           // Indirect sky hit - diffuse color.
           scene.sky.getSkyColor(ray);
+          // Skip sky fog - likely not noticeable in diffuse reflection.
           hit = true;
         }
         break;
