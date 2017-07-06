@@ -1,5 +1,6 @@
 1.4.3 - TBD
 
+* The Minecraft block ID is now displayed in the block info tooltip.
 * Improved error handling for skymap loading.
     * Added -f option to ignore headless skymap loading errors.
 * Fixed incorrect top texture for inverted daylight sensors.
