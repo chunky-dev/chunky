@@ -17,8 +17,10 @@
 package se.llbit.chunky.plugin;
 
 import se.llbit.chunky.Plugin;
+import se.llbit.chunky.main.Version;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
+import se.llbit.log.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,6 +88,11 @@ public class ChunkyPlugin {
       }
       if (main.isEmpty()) {
         throw new LoadPluginException("Plugin has no main class specified");
+      }
+
+      String targetVersion = pluginDefiniton.get("targetVersion").stringValue("");
+      if (!targetVersion.isEmpty() && !targetVersion.equalsIgnoreCase(Version.getVersion())) {
+        Log.warn("The plugin " + name + " was developed for Chunky " + targetVersion + " but this is Chunky " + Version.getVersion() + " - it may not work properly.");
       }
 
       URLClassLoader classLoader = new URLClassLoader(new URL[]{pluginJar.toURI().toURL()});
