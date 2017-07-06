@@ -45,6 +45,7 @@ public class MaterialsTab extends Tab implements RenderControlsTab, Initializabl
   private final DoubleAdjuster emittance = new DoubleAdjuster();
   private final DoubleAdjuster specular = new DoubleAdjuster();
   private final DoubleAdjuster ior = new DoubleAdjuster();
+  private final ListView<String> listView;
 
   public MaterialsTab() {
     setText("Materials");
@@ -56,42 +57,10 @@ public class MaterialsTab extends Tab implements RenderControlsTab, Initializabl
     blockIds.addAll(Block.collections.keySet());
     blockIds.addAll(Block.idMap.keySet());
     FilteredList<String> filteredList = new FilteredList<>(blockIds);
-    ListView<String> listView = new ListView<>(filteredList);
+    listView = new ListView<>(filteredList);
     listView.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, materialName) -> {
-          boolean materialExists = false;
-          if (Block.collections.containsKey(materialName)) {
-            double emAcc = 0;
-            double specAcc = 0;
-            double iorAcc = 0;
-            Collection<Block> blocks = Block.collections.get(materialName);
-            for (Block block : blocks) {
-              emAcc += block.emittance;
-              specAcc += block.specular;
-              iorAcc += block.ior;
-            }
-            emittance.set(emAcc / blocks.size());
-            specular.set(specAcc / blocks.size());
-            ior.set(iorAcc / blocks.size());
-            materialExists = true;
-          } else if (Block.idMap.containsKey(materialName)) {
-            Material material = Block.idMap.get(materialName);
-            if (material != null) {
-              emittance.set(material.emittance);
-              specular.set(material.specular);
-              ior.set(material.ior);
-              materialExists = true;
-            }
-          }
-          if (materialExists) {
-            emittance.onValueChange(value -> scene.setEmittance(materialName, value.floatValue()));
-            specular.onValueChange(value -> scene.setSpecular(materialName, value.floatValue()));
-            ior.onValueChange(value -> scene.setIor(materialName, value.floatValue()));
-          } else {
-            emittance.onValueChange(value -> {});
-            specular.onValueChange(value -> {});
-            ior.onValueChange(value -> {});
-          }
+          updateSelectedMaterial(materialName);
         }
     );
     VBox settings = new VBox();
@@ -122,7 +91,45 @@ public class MaterialsTab extends Tab implements RenderControlsTab, Initializabl
     setContent(content);
   }
 
+  private void updateSelectedMaterial(String materialName) {
+    boolean materialExists = false;
+    if (Block.collections.containsKey(materialName)) {
+      double emAcc = 0;
+      double specAcc = 0;
+      double iorAcc = 0;
+      Collection<Block> blocks = Block.collections.get(materialName);
+      for (Block block : blocks) {
+        emAcc += block.emittance;
+        specAcc += block.specular;
+        iorAcc += block.ior;
+      }
+      emittance.set(emAcc / blocks.size());
+      specular.set(specAcc / blocks.size());
+      ior.set(iorAcc / blocks.size());
+      materialExists = true;
+    } else if (Block.idMap.containsKey(materialName)) {
+      Material material = Block.idMap.get(materialName);
+      if (material != null) {
+        emittance.set(material.emittance);
+        specular.set(material.specular);
+        ior.set(material.ior);
+        materialExists = true;
+      }
+    }
+    if (materialExists) {
+      emittance.onValueChange(value -> scene.setEmittance(materialName, value.floatValue()));
+      specular.onValueChange(value -> scene.setSpecular(materialName, value.floatValue()));
+      ior.onValueChange(value -> scene.setIor(materialName, value.floatValue()));
+    } else {
+      emittance.onValueChange(value -> {});
+      specular.onValueChange(value -> {});
+      ior.onValueChange(value -> {});
+    }
+  }
+
   @Override public void update(Scene scene) {
+    String material = listView.getSelectionModel().getSelectedItem();
+    updateSelectedMaterial(material);
   }
 
   @Override public Tab getTab() {
