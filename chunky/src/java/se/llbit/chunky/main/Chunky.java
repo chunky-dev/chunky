@@ -17,7 +17,6 @@
 package se.llbit.chunky.main;
 
 import se.llbit.chunky.plugin.ChunkyPlugin;
-import se.llbit.chunky.plugin.LoadPluginException;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.RayTracerFactory;
@@ -45,7 +44,6 @@ import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.log.Receiver;
 import se.llbit.util.TaskTracker;
-import se.llbit.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,8 +53,8 @@ import java.io.IOException;
 /**
  * Chunky is a Minecraft mapping and rendering tool created by
  * Jesper Öqvist (jesper@llbit.se).
- * <p>
- * <p>Read more about Chunky at http://chunky.llbit.se .
+ *
+ * <p>Read more about Chunky at <a href="https://chunky.llbit.se">https://chunky.llbit.se</a>.
  */
 public class Chunky {
 
@@ -228,33 +226,30 @@ public class Chunky {
   }
 
   private void loadPlugins() {
-    Log.setLevel(Level.INFO);
-    Log.info("Getting plugins from " + SettingsDirectory.getPluginsDirectory().getAbsolutePath());
-    File[] pluginFiles = SettingsDirectory.getPluginsDirectory().listFiles((f) -> f.getName().endsWith(".jar"));
+    File pluginsDirectory = SettingsDirectory.getPluginsDirectory();
+    if (!pluginsDirectory.isDirectory()) {
+      Log.infof("Plugins directory does not exist: %s", pluginsDirectory.getAbsolutePath());
+      return;
+    }
+    Log.info("Getting plugins from " + pluginsDirectory.getAbsolutePath());
+    File[] pluginFiles = pluginsDirectory.listFiles((f) -> f.getName().endsWith(".jar"));
     if (pluginFiles == null) {
       return;
     }
 
     for (File file : pluginFiles) {
       Log.info("Loading plugin: " + file.getName());
-      try {
-        ChunkyPlugin plugin = ChunkyPlugin.load(file);
-        Log.info("Plugin loaded: " + plugin.getName() + " " + plugin.getVersion());
-        plugin.getImplementation().attach(this);
-      } catch (LoadPluginException e) {
-        Log.error("Failed to load plugin: " + file.getAbsolutePath(), e);
-      }
+      ChunkyPlugin.load(file, (plugin, manifest) -> {
+        Log.infof("Plugin loaded: %s %s", manifest.get("name").asString(""),
+            manifest.get("version").asString(""));
+        plugin.attach(this);
+      });
     }
-  }
-
-  private static boolean verifyChecksumMd5(File pluginJar, String expected) {
-    String actual = Util.md5sum(pluginJar);
-    return actual.equalsIgnoreCase(expected);
   }
 
   /**
    * Save a snapshot for a scene.
-   * <p>
+   *
    * <p>This currently disregards the various factories for the
    * render context and scene construction.
    */

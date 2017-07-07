@@ -78,6 +78,9 @@ public final class SettingsDirectory {
     return null;
   }
 
+  /**
+   * Test if the given directory contains a Chunky configuration file.
+   */
   private static boolean isSettingsDirectory(File settingsDir) {
     if (settingsDir != null && settingsDir.exists() &&
         settingsDir.isDirectory() && settingsDir.canWrite()) {
@@ -89,6 +92,9 @@ public final class SettingsDirectory {
     return false;
   }
 
+  /**
+   * @return the home directory of the current user.
+   */
   public static File getHomeDirectory() {
     String workingDir = System.getProperty("user.home");
     if (workingDir != null && !workingDir.isEmpty()) {
@@ -97,6 +103,9 @@ public final class SettingsDirectory {
     return null;
   }
 
+  /**
+   * @return the directory where Chunky was started from.
+   */
   public static File getWorkingDirectory() {
     String workingDir = System.getProperty("user.dir");
     if (workingDir != null && !workingDir.isEmpty()) {
@@ -109,7 +118,7 @@ public final class SettingsDirectory {
    * @return the plugin directory
    */
   public static File getPluginsDirectory() {
-    return new File(getWorkingDirectory(), "plugins");
+    return new File(getSettingsDirectory(), "plugins");
   }
 
   /**

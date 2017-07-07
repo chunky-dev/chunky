@@ -30,83 +30,73 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
- * A chunky plugin.
+ * Helper class to load plugins.
  */
-public class ChunkyPlugin {
-  private final JsonObject meta;
-  private final Plugin implementation;
+public final class ChunkyPlugin {
 
-  protected ChunkyPlugin(JsonObject meta, Plugin implementation) {
-    this.meta = meta;
-    this.implementation = implementation;
-  }
+  private ChunkyPlugin() { }
 
   /**
-   * Gets the name of this plugin.
+   * Loads a plugin from the given file.
+   * On successfully loading the plugin class, the plugin instance
+   * and its manifest are sent to the onLoad consumer.
    *
-   * @return the name of this plugin
+   * @param pluginJar the plugin Jar file.
+   * @param onLoad a function object that the plugin instance and manifest
+   * are sent to after it successfully loads.
    */
-  public String getName() {
-    return meta.get("name").stringValue("");
-  }
-
-  /**
-   * Gets the version of this plugin.
-   *
-   * @return the version of this plugin
-   */
-  public String getVersion() {
-    return meta.get("version").stringValue("<Unknown version>");
-  }
-
-  /**
-   * Gets the implementation of this plugin.
-   *
-   * @return the implementation of this plugin
-   */
-  public Plugin getImplementation() {
-    return implementation;
-  }
-
-  public static ChunkyPlugin load(File pluginJar) throws LoadPluginException {
-    Map<String, String> env = new HashMap<>();
-    env.put("create", "true");
-
-    try (FileSystem zipFs = FileSystems.newFileSystem(URI.create("jar:file:" + pluginJar.getAbsolutePath()), env);
-         InputStream in = zipFs.getPath("/plugin.json").toUri().toURL().openStream();
-         JsonParser parser = new JsonParser(in)) {
-      JsonObject pluginDefiniton = parser.parse().object();
-
-      String name = pluginDefiniton.get("name").stringValue("");
-      String main = pluginDefiniton.get("main").stringValue("");
-      if (name.isEmpty()) {
-        throw new LoadPluginException("Plugin has no name specified");
+  public static void load(File pluginJar, BiConsumer<Plugin, JsonObject> onLoad) {
+    try (FileSystem zipFs = FileSystems.newFileSystem(URI.create("jar:" + pluginJar.toURI()),
+        Collections.emptyMap())) {
+      Path manifestPath = zipFs.getPath("/plugin.json");
+      if (!Files.exists(manifestPath)) {
+        Log.errorf("Missing plugin manifest file (plugin.json) in plugin %s", pluginJar.getName());
+        return;
       }
-      if (main.isEmpty()) {
-        throw new LoadPluginException("Plugin has no main class specified");
-      }
+      try (InputStream in = Files.newInputStream(manifestPath);
+          JsonParser parser = new JsonParser(in)) {
+        JsonObject manifest = parser.parse().object();
 
-      String targetVersion = pluginDefiniton.get("targetVersion").stringValue("");
-      if (!targetVersion.isEmpty() && !targetVersion.equalsIgnoreCase(Version.getVersion())) {
-        Log.warn("The plugin " + name + " was developed for Chunky " + targetVersion + " but this is Chunky " + Version.getVersion() + " - it may not work properly.");
-      }
+        String name = manifest.get("name").stringValue("");
+        String main = manifest.get("main").stringValue("");
+        if (name.isEmpty()) {
+          Log.errorf("Plugin %s has no name specified", pluginJar.getName());
+          return;
+        }
+        if (main.isEmpty()) {
+          Log.errorf("Plugin %s has no main class specified", pluginJar.getName());
+          return;
+        }
 
-      URLClassLoader classLoader = new URLClassLoader(new URL[]{pluginJar.toURI().toURL()});
-      Class<?> pluginClass = classLoader.loadClass(main);
-      Plugin pluginInstance = (Plugin) pluginClass.newInstance();
-      return new ChunkyPlugin(pluginDefiniton, pluginInstance);
+        String targetVersion = manifest.get("targetVersion").stringValue("");
+        if (!targetVersion.isEmpty() && !targetVersion.equalsIgnoreCase(Version.getVersion())) {
+          Log.warnf("The plugin %s was developed for Chunky %s but this is Chunky %s "
+              + "- it may not work properly.",
+              name, targetVersion, Version.getVersion());
+        }
+
+        URLClassLoader classLoader = new URLClassLoader(new URL[] {pluginJar.toURI().toURL()});
+        Class<?> pluginClass = classLoader.loadClass(main);
+        Plugin plugin = (Plugin) pluginClass.newInstance();
+        onLoad.accept(plugin, manifest);
+      }
     } catch (IOException e) {
-      throw new LoadPluginException("Could not load the plugin", e);
+      Log.error("Could not load the plugin", e);
     } catch (ClassCastException e) {
-      throw new LoadPluginException("Main plugin class has wrong type", e);
+      Log.error("Plugin main class has wrong type", e);
     } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-      throw new LoadPluginException("Could not create plugin instance", e);
+      Log.error("Could not create plugin instance", e);
     } catch (JsonParser.SyntaxError e) {
-      throw new LoadPluginException("Could not parse the plugin definition file", e);
+      Log.error("Could not parse the plugin definition file", e);
     }
   }
 }
