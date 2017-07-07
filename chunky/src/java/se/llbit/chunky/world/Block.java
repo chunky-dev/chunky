@@ -113,7 +113,13 @@ public class Block extends Material {
 
   // The air block is public because it is never supposed to change.
   // All other blocks are private to avoid direct references to the default blocks.
-  public static final Block AIR = new Block(AIR_ID, "Air", Texture.air);
+  public static final Block AIR = new Block(AIR_ID, "Air", Texture.air) {
+    {
+      isSolid = false;
+      isOpaque = false;
+      isInvisible = true;
+    }
+  };
   public static final int STONE_ID = 0x01;
   public static final Block STONE = new Block(STONE_ID, "block:stone", Texture.stone) {
     final Texture[] texture =
@@ -2419,8 +2425,6 @@ public class Block extends Material {
       block.ior = 1.000293f;
     }
 
-    AIR.isOpaque = false;
-    AIR.isInvisible = true;
     STONE.isOpaque = true;
     STONE.localIntersect = true;
     GRASS.isOpaque = true;
