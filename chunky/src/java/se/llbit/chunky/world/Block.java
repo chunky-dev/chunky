@@ -107,27 +107,21 @@ import java.util.Set;
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
 public class Block extends Material {
+  /** Controls if unknown blocks are rendered. Useful for debugging. */
   private static final boolean UNKNOWN_INVISIBLE = !PersistentSettings.drawUnknownBlocks();
 
   public static final int AIR_ID = 0x00;
-
-  // The air block is public because it is never supposed to change.
-  // All other blocks are private to avoid direct references to the default blocks.
-  public static final Block AIR = new Block(AIR_ID, "Air", Texture.air) {
-    {
-      isSolid = false;
-      isOpaque = false;
-      isInvisible = true;
-    }
-  };
+  public static final Block AIR = new Block(AIR_ID, "Air", Texture.air);
   public static final int STONE_ID = 0x01;
   public static final Block STONE = new Block(STONE_ID, "block:stone", Texture.stone) {
-    final Texture[] texture =
-        {Texture.stone, Texture.granite, Texture.smoothGranite, Texture.diorite,
-            Texture.smoothDiorite, Texture.andesite, Texture.smoothAndesite,};
-    final String[] stoneKind =
-        {"stone", "granite", "smoothGranite", "diorite", "smoothDiorite", "andesite",
-            "smoothAndesite",};
+    final Texture[] texture = {
+        Texture.stone, Texture.granite, Texture.smoothGranite, Texture.diorite,
+        Texture.smoothDiorite, Texture.andesite, Texture.smoothAndesite,
+    };
+    final String[] stoneKind = {
+        "stone", "granite", "smoothGranite", "diorite", "smoothDiorite", "andesite",
+        "smoothAndesite"
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TexturedBlockModel.intersect(ray, texture[ray.getBlockData() % 7]);
@@ -2425,6 +2419,9 @@ public class Block extends Material {
       block.ior = 1.000293f;
     }
 
+    AIR.isSolid = false;
+    AIR.isOpaque = false;
+    AIR.isInvisible = true;
     STONE.isOpaque = true;
     STONE.localIntersect = true;
     GRASS.isOpaque = true;
