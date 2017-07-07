@@ -16,8 +16,8 @@
  */
 package se.llbit.chunky.main;
 
-import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.Plugin;
+import se.llbit.chunky.plugin.ChunkyPlugin;
+import se.llbit.chunky.plugin.LoadPluginException;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.RayTracerFactory;
@@ -36,11 +36,11 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
+import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.Block;
-import se.llbit.json.JsonValue;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.log.Receiver;
@@ -51,20 +51,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created by
  * Jesper Öqvist (jesper@llbit.se).
- *
+ * <p>
  * <p>Read more about Chunky at http://chunky.llbit.se .
  */
 public class Chunky {
 
-  /** A log receiver suitable for headless rendering. */
+  /**
+   * A log receiver suitable for headless rendering.
+   */
   private static final Receiver HEADLESS_LOG_RECEIVER = new Receiver() {
-    @Override public void logEvent(Level level, String message) {
+    @Override
+    public void logEvent(Level level, String message) {
       if (level == Level.ERROR) {
         System.err.println();  // Clear the current progress line.
         System.err.println(message);
@@ -114,7 +115,8 @@ public class Chunky {
     renderer.setSceneProvider(sceneManager);
     TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
         (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
-          @Override public void close() {
+          @Override
+          public void close() {
             super.close();
             long endTime = System.currentTimeMillis();
             int seconds = (int) ((endTime - startTime) / 1000);
@@ -226,47 +228,21 @@ public class Chunky {
   }
 
   private void loadPlugins() {
-    JsonValue plugins = PersistentSettings.getPlugins();
-    for (JsonValue plugin : plugins.array()) {
-      String jar = plugin.object().get("jar").stringValue("");
-      String main = plugin.object().get("main").stringValue("");
-      // The MD5 checksum is only for Jar integrity checking, not security!
-      // Plugin Jar trust is implicit. Only install plugins that you trust!
-      String md5 = plugin.object().get("md5").stringValue("");
-      boolean enabled = plugin.object().get("enabled").boolValue(true);
-      if (!jar.endsWith(".jar")) {
-        Log.error("Plugin Jar path does not seem to point to a Jar file: " + jar);
-      }
-      if (!enabled) {
-        // Skip disabled plugin.
-        continue;
-      }
-      if (main.isEmpty()) {
-        Log.error("Plugin has no main class declared: " + jar);
-        continue;
-      }
-      if (md5.isEmpty()) {
-        Log.error("Plugin missing MD5 checksum: " + jar);
-        continue;
-      }
-      File pluginJar = new File(jar);
-      if (pluginJar.isFile()) {
-        if (!verifyChecksumMd5(pluginJar, md5)) {
-          Log.error("Plugin is corrupt (MD5 check failed): " + jar);
-          continue;
-        }
-        try {
-          URLClassLoader classLoader = new URLClassLoader(new URL[] {pluginJar.toURI().toURL()});
-          Class<?> pluginClass = classLoader.loadClass(main);
-          Plugin pluginInstance = (Plugin) pluginClass.newInstance();
-          pluginInstance.attach(this);
-          Log.info("Plugin loaded: " + jar);
-        } catch (ClassCastException e) {
-          Log.error("Failed to load plugin " + pluginJar.getAbsolutePath()
-              + ". Main plugin class has wrong type", e);
-        } catch (Throwable e) {
-          Log.error("Failed to load plugin " + pluginJar.getAbsolutePath(), e);
-        }
+    Log.setLevel(Level.INFO);
+    Log.info("Getting plugins from " + SettingsDirectory.getPluginsDirectory().getAbsolutePath());
+    File[] pluginFiles = SettingsDirectory.getPluginsDirectory().listFiles((f) -> f.getName().endsWith(".jar"));
+    if (pluginFiles == null) {
+      return;
+    }
+
+    for (File file : pluginFiles) {
+      Log.info("Loading plugin: " + file.getName());
+      try {
+        ChunkyPlugin plugin = ChunkyPlugin.load(file);
+        Log.info("Plugin loaded: " + plugin.getName() + " " + plugin.getVersion());
+        plugin.getImplementation().attach(this);
+      } catch (LoadPluginException e) {
+        Log.error("Failed to load plugin: " + file.getAbsolutePath(), e);
       }
     }
   }
@@ -278,7 +254,7 @@ public class Chunky {
 
   /**
    * Save a snapshot for a scene.
-   *
+   * <p>
    * <p>This currently disregards the various factories for the
    * render context and scene construction.
    */
@@ -293,7 +269,8 @@ public class Chunky {
         TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
             TaskTracker.Task::new,
             (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
-              @Override public void update() {
+              @Override
+              public void update() {
                 // Don't report task state to progress listener.
               }
             });

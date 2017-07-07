@@ -16,11 +16,11 @@
  */
 package se.llbit.chunky.resources;
 
+import se.llbit.chunky.PersistentSettings;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-
-import se.llbit.chunky.PersistentSettings;
 
 /**
  * Utility class with helper function to locate the Chunky settings directory.
@@ -42,14 +42,14 @@ public final class SettingsDirectory {
   /**
    * Locates the Chunky settings directory. The following locations are
    * tested in the listed order:
-   *
+   * <p>
    * <ul>
-   *   <li>The path specified by the "chunky.home" system property.
-   *   <li>The current working directory.
-   *   <li>The directory where the Chunky or Chunky Launcher Jar file is.
-   *   <li>The directory $HOME/.chunky, where HOME is the current user home directory.
+   * <li>The path specified by the "chunky.home" system property.
+   * <li>The current working directory.
+   * <li>The directory where the Chunky or Chunky Launcher Jar file is.
+   * <li>The directory $HOME/.chunky, where HOME is the current user home directory.
    * </ul>
-   *
+   * <p>
    * Falls back on home directory.
    *
    * @return The configured settings directory, or {@code null}
@@ -103,6 +103,13 @@ public final class SettingsDirectory {
       return new File(workingDir);
     }
     return null;
+  }
+
+  /**
+   * @return the plugin directory
+   */
+  public static File getPluginsDirectory() {
+    return new File(getWorkingDirectory(), "plugins");
   }
 
   /**
