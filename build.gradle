@@ -1,6 +1,10 @@
 project.version = getVersion()
 
 println "Building version ${project.version}"
+if (project.version =~ /\d+\.\d+(\.\d+)?-.+/) {
+  // This is a SNAPSHOT build.
+  println 'Building snapshot version.'
+}
 
 repositories {
   mavenCentral()
