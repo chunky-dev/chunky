@@ -1,5 +1,8 @@
 1.4.3 - TBD
 
+* Improved resource pack handling - assets folder can be found inside
+  top-level folder with the same name as the resource pack.
+* Modified fog rendering to blend better with the sky near the horizon.
 * Added simulated fog overlay to the sky near horizon.
 * The Minecraft block ID is now displayed in the block info tooltip.
 * Improved error handling for skymap loading.
