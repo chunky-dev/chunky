@@ -272,7 +272,7 @@ public class Scene implements JsonSerializable, Refreshable {
   private Map<PlayerEntity, JsonObject> profiles = new HashMap<>();
 
   /** Material properties for this scene. */
-  public Map<String, JsonValue> materials = Collections.emptyMap();
+  public Map<String, JsonValue> materials = new HashMap<>();
 
   private BVH bvh = new BVH(Collections.emptyList());
   private BVH actorBvh = new BVH(Collections.emptyList());
@@ -2745,6 +2745,9 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
+  /**
+   * Modifies the emittance property for the given material.
+   */
   public void setEmittance(String materialName, float value) {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("emittance", Json.of(value));
@@ -2752,6 +2755,9 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh();
   }
 
+  /**
+   * Modifies the specular coefficient property for the given material.
+   */
   public void setSpecular(String materialName, float value) {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("specular", Json.of(value));
@@ -2759,6 +2765,9 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh();
   }
 
+  /**
+   * Modifies the index of refraction property for the given material.
+   */
   public void setIor(String materialName, float value) {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("ior", Json.of(value));
