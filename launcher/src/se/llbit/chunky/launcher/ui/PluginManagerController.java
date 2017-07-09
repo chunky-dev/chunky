@@ -22,7 +22,9 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -52,6 +54,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.ResourceBundle;
@@ -60,7 +63,7 @@ import java.util.Set;
 public class PluginManagerController implements Initializable {
   @FXML protected Button saveButton;
   @FXML protected Button addButton;
-  @FXML protected Button removeButton;
+  @FXML protected Button deleteButton;
   @FXML protected Button upButton;
   @FXML protected Button downButton;
   @FXML protected TableView<JsonObject> tableView;
@@ -99,9 +102,25 @@ public class PluginManagerController implements Initializable {
         if (!pluginsDir.isDirectory()) {
           pluginsDir.mkdirs();
         }
+        boolean alreadyExists = pluginExists(jar.getName());
+        if (alreadyExists) {
+          Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+          alert.setTitle("Replace Plugin");
+          alert.setContentText(String.format("Replace the plugin %s, with the new file %s?",
+              jar.getName(), jar.getAbsolutePath()));
+          if (alert.showAndWait().get() != ButtonType.OK) {
+            return;
+          }
+        }
         try {
-          Files.copy(jar.toPath(), pluginsDir.toPath().resolve(jar.getName()));
-          addPlugin(jar.getName(), true);
+          Files.copy(jar.toPath(), pluginsDir.toPath().resolve(jar.getName()),
+              StandardCopyOption.REPLACE_EXISTING);
+          if (alreadyExists) {
+            enablePlugin(jar.getName());
+            tableView.refresh();  // Refresh the enabled cell for the plugin.
+          } else {
+            addPlugin(jar.getName(), true);
+          }
         } catch (IOException e1) {
           e1.printStackTrace();
         }
@@ -124,8 +143,8 @@ public class PluginManagerController implements Initializable {
         }
       }).start();
     });
-    removeButton.setTooltip(new Tooltip("Delete the plugin Jar file from the plugin directory."));
-    removeButton.setOnAction(event -> {
+    deleteButton.setTooltip(new Tooltip("Delete the plugin Jar file from the plugin directory."));
+    deleteButton.setOnAction(event -> {
       // Remove the plugin from the list and delete it from the plugin directory.
       JsonObject plugin = tableView.getSelectionModel().getSelectedItem();
       String jar = plugin.get("jar").asString("");
@@ -161,49 +180,32 @@ public class PluginManagerController implements Initializable {
     enabledColumn.setCellValueFactory(data -> {
       BooleanProperty property = new SimpleBooleanProperty(data.getValue().get("enabled").boolValue(true));
       property.addListener((observable, oldValue, enabled) -> {
-        data.getValue().set("enabled", Json.of(enabled));
         if (enabled) {
-          // Move the enabled plugin row to after the last already enabled plugin.
-          JsonObject value = data.getValue();
-          int start = tableView.getItems().indexOf(value);
-          if (start > 0) {
-            int index = start - 1;
-            for (; index >= 0; index -= 1) {
-              JsonObject item = tableView.getItems().get(index);
-              if (item.get("enabled").boolValue(false)) {
-                break;
-              }
-            }
-            int selected = tableView.getSelectionModel().getSelectedIndex();
-            tableView.getItems().remove(start);
-            tableView.getItems().add(index + 1, value);
-            if (selected == start) {
-              tableView.getSelectionModel().select(index + 1);
-            }
-          }
+          enablePlugin(data.getValue());
+        } else {
+          data.getValue().set("enabled", Json.of(false));
         }
       });
       return property;
     });
     enabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(enabledColumn));
     pluginColumn.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue()));
-    pluginColumn.setCellFactory(column -> {
-      return new TableCell<JsonObject, JsonObject>() {
-        @Override protected void updateItem(JsonObject item, boolean empty) {
-          super.updateItem(item, empty);
+    pluginColumn.setCellFactory(column -> new TableCell<JsonObject, JsonObject>() {
+      @Override protected void updateItem(JsonObject item, boolean empty) {
+        super.updateItem(item, empty);
 
-          if (empty) {
-            setText("");
+        if (empty) {
+          setText("");
+          getTableRow().setStyle("");
+        } else {
+          setText(item.get("jar").asString(""));
+          if (item.get("error").asString("").isEmpty()) {
+            getTableRow().setStyle("");
           } else {
-            setText(item.get("jar").asString(""));
-            if (!item.get("error").asString("").isEmpty()) {
-              getTableRow().setStyle("-fx-background-color:#ff7878");
-            } else {
-              getTableRow().setStyle("");
-            }
+            getTableRow().setStyle("-fx-background-color:#ff7878");
           }
         }
-      };
+      }
     });
     tableView.setEditable(true);
     pluginColumn.setEditable(false);
@@ -251,6 +253,48 @@ public class PluginManagerController implements Initializable {
         }
       }
     }
+  }
+
+  private void enablePlugin(String jar) {
+    for (JsonObject plugin : tableView.getItems()) {
+      if (plugin.get("jar").asString("").equals(jar)) {
+        enablePlugin(plugin);
+        return;
+      }
+    }
+  }
+
+  private void enablePlugin(JsonObject plugin) {
+    plugin.set("enabled", Json.of(true));
+    // Move the enabled plugin row to after the last already enabled plugin.
+    int start = tableView.getItems().indexOf(plugin);
+    if (start > 0) {
+      int index = start - 1;
+      for (; index >= 0; index -= 1) {
+        JsonObject item = tableView.getItems().get(index);
+        if (item.get("enabled").boolValue(false)) {
+          break;
+        }
+      }
+      int selected = tableView.getSelectionModel().getSelectedIndex();
+      tableView.getItems().remove(start);
+      tableView.getItems().add(index + 1, plugin);
+      if (selected == start) {
+        tableView.getSelectionModel().select(index + 1);
+      }
+    }
+  }
+
+  /**
+   * Check if a plugin with the given name already exists.
+   */
+  private boolean pluginExists(String jar) {
+    for (JsonObject plugin : tableView.getItems()) {
+      if (plugin.get("jar").asString("").equals(jar)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void addPlugin(String jar, boolean enabled) {

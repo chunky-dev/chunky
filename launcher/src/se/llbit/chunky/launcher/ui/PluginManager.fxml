@@ -87,7 +87,7 @@
         <buttons>
             <Button fx:id="upButton" mnemonicParsing="false" text="Up" />
             <Button fx:id="downButton" mnemonicParsing="false" text="Down" />
-            <Button fx:id="removeButton" mnemonicParsing="false" text="Remove" />
+            <Button fx:id="deleteButton" mnemonicParsing="false" text="Delete" />
             <Button fx:id="addButton" mnemonicParsing="false" text="Add" />
         </buttons>
       </ButtonBar>
