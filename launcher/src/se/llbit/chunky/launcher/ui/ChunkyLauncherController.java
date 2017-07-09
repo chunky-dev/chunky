@@ -79,6 +79,7 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
   @FXML protected Button cancelButton;
   @FXML protected Label launcherVersion;
   @FXML protected TitledPane advancedSettings;
+  @FXML protected Button pluginsButton;
 
   public ChunkyLauncherController(LauncherSettings settings) {
     this.settings = settings;
@@ -88,6 +89,15 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
     busyIndicator.setTooltip(new Tooltip("Checking for Chunky update..."));
     cancelButton.setTooltip(new Tooltip("Close the Chunky launcher."));
     cancelButton.setOnAction(event -> cancelButton.getScene().getWindow().hide());
+    pluginsButton.setTooltip(new Tooltip("Customize plugins."));
+    pluginsButton.setOnAction(event -> {
+      try {
+        PluginManager pluginManager = new PluginManager();
+        pluginManager.show();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    });
     launchButton.setTooltip(new Tooltip("Launch Chunky using the current settings."));
     launchButton.setOnAction(event -> launchChunky());
     launcherVersion.setText(ChunkyLauncher.LAUNCHER_VERSION);

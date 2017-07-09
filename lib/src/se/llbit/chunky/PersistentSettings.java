@@ -20,6 +20,7 @@ import java.io.File;
 
 import se.llbit.chunky.renderer.RenderConstants;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 
 /**
@@ -383,8 +384,13 @@ public final class PersistentSettings {
     return settings.getBool("drawUnknownBlocks", false);
   }
 
-  public static JsonValue getPlugins() {
-    return settings.get("plugins");
+  /**
+   * Get the plugin load order.
+   * @return a JSON array on the plugins to load, specified by
+   * Jar file name.
+   */
+  public static JsonArray getPlugins() {
+    return settings.get("plugins").array();
   }
 
   public static void setPlugins(JsonValue value) {

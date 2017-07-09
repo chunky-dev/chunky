@@ -1,5 +1,6 @@
 1.4.3 - TBD
 
+* Added plugin manager in launcher.
 * Improved resource pack handling - assets folder can be found inside
   top-level folder with the same name as the resource pack.
 * Modified fog rendering to blend better with the sky near the horizon.

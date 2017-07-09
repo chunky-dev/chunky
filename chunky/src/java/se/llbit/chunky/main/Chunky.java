@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.main;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.plugin.ChunkyPlugin;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.OutputMode;
@@ -40,6 +41,8 @@ import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.Block;
+import se.llbit.json.JsonArray;
+import se.llbit.json.JsonValue;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
 import se.llbit.log.Receiver;
@@ -49,6 +52,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created by
@@ -231,19 +235,22 @@ public class Chunky {
       Log.infof("Plugins directory does not exist: %s", pluginsDirectory.getAbsolutePath());
       return;
     }
-    Log.info("Getting plugins from " + pluginsDirectory.getAbsolutePath());
-    File[] pluginFiles = pluginsDirectory.listFiles((f) -> f.getName().endsWith(".jar"));
-    if (pluginFiles == null) {
-      return;
-    }
-
-    for (File file : pluginFiles) {
-      Log.info("Loading plugin: " + file.getName());
-      ChunkyPlugin.load(file, (plugin, manifest) -> {
-        Log.infof("Plugin loaded: %s %s", manifest.get("name").asString(""),
-            manifest.get("version").asString(""));
-        plugin.attach(this);
-      });
+    Path pluginsPath = pluginsDirectory.toPath();
+    JsonArray plugins = PersistentSettings.getPlugins();
+    for (JsonValue value : plugins) {
+      String jarName = value.asString("");
+      if (!jarName.isEmpty()) {
+        Log.info("Loading plugin: " + value);
+        ChunkyPlugin.load(pluginsPath.resolve(jarName).toFile(), (plugin, manifest) -> {
+          try {
+            plugin.attach(this);
+          } catch (Throwable t) {
+            Log.error("Plugin " + jarName + " failed to load.", t);
+          }
+          Log.infof("Plugin loaded: %s %s", manifest.get("name").asString(""),
+              manifest.get("version").asString(""));
+        });
+      }
     }
   }
 

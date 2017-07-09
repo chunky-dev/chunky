@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<!--
+  ~ Copyright (c) 2017 Jesper Öqvist <jesper@llbit.se>
+  ~
+  ~ This file is part of Chunky.
+  ~
+  ~ Chunky is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ Chunky is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.llbit.chunky.launcher.ui.PluginManagerController">
+   <children>
+      <TableView fx:id="tableView">
+        <columns>
+          <TableColumn fx:id="pluginColumn" prefWidth="308.0000305175781" text="Plugin" />
+          <TableColumn fx:id="enabledColumn" minWidth="0.0" prefWidth="113.0" text="Enabled" />
+        </columns>
+      </TableView>
+      <TitledPane animated="false" text="Plugin Details">
+         <content>
+            <StackPane>
+               <children>
+                  <VBox fx:id="pluginDetails" spacing="10.0">
+                     <children>
+                        <GridPane>
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="194.0" minWidth="10.0" prefWidth="117.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="283.0" minWidth="10.0" prefWidth="283.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints vgrow="SOMETIMES" />
+                            <RowConstraints vgrow="SOMETIMES" />
+                            <RowConstraints vgrow="SOMETIMES" />
+                              <RowConstraints vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Name" />
+                              <Label text="Version" GridPane.rowIndex="1" />
+                              <Label text="Target version" GridPane.rowIndex="2" />
+                              <Label text="Author" GridPane.rowIndex="3" />
+                              <Label fx:id="pluginName" GridPane.columnIndex="1" />
+                              <Label fx:id="pluginVersion" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label fx:id="targetVersion" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label fx:id="author" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                           </children>
+                        </GridPane>
+                        <Label text="Description" />
+                        <Text fx:id="description" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="386.548828125" />
+                     </children>
+                  </VBox>
+                  <VBox fx:id="errorDetails" spacing="10.0" visible="false">
+                     <children>
+                        <Label text="ERROR" textFill="RED" />
+                        <TextArea fx:id="errorMessage" editable="false" prefHeight="116.0" prefWidth="478.0" />
+                     </children>
+                  </VBox>
+               </children>
+            </StackPane>
+         </content>
+      </TitledPane>
+      <ButtonBar prefHeight="40.0" prefWidth="200.0">
+        <buttons>
+            <Button fx:id="upButton" mnemonicParsing="false" text="Up" />
+            <Button fx:id="downButton" mnemonicParsing="false" text="Down" />
+            <Button fx:id="removeButton" mnemonicParsing="false" text="Remove" />
+            <Button fx:id="addButton" mnemonicParsing="false" text="Add" />
+        </buttons>
+      </ButtonBar>
+      <ButtonBar prefHeight="40.0" prefWidth="200.0">
+        <buttons>
+          <Button fx:id="openPluginDir" mnemonicParsing="false" text="Open plugin directory" />
+          <Button fx:id="saveButton" defaultButton="true" mnemonicParsing="false" text="Save" />
+        </buttons>
+      </ButtonBar>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</VBox>

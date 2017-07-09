@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
 
-<VBox xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<VBox xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="15.0">
          <children>
@@ -36,7 +36,7 @@
                      <children>
                         <Label text="Version:" />
                         <ComboBox fx:id="version" />
-                        <Button fx:id="checkForUpdate" mnemonicParsing="false" text="Check for Update" />
+                        <Button fx:id="checkForUpdate" mnemonicParsing="false" text="Check for update" />
                         <ProgressIndicator fx:id="busyIndicator" prefHeight="30.0" prefWidth="30.0" visible="false" />
                      </children>
                   </HBox>
@@ -85,13 +85,18 @@
                                     <Button fx:id="openSettingsDirectory" mnemonicParsing="false" text="Open" />
                                  </children>
                               </HBox>
+                              <HBox alignment="TOP_RIGHT">
+                                 <children>
+                                    <Button fx:id="pluginsButton" mnemonicParsing="false" text="Manage plugins" />
+                                 </children>
+                              </HBox>
                            </children>
                         </VBox>
                      </content>
                   </TitledPane>
                   <HBox alignment="CENTER_RIGHT" spacing="10.0">
                      <children>
-                        <CheckBox fx:id="alwaysShowLauncher" mnemonicParsing="false" selected="true" text="Always show the launcher" />
+                        <CheckBox fx:id="alwaysShowLauncher" mnemonicParsing="false" selected="true" text="Always open launcher" />
                         <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" text="Cancel" />
                         <Button fx:id="launchButton" defaultButton="true" mnemonicParsing="false" text="Launch" />
                      </children>
