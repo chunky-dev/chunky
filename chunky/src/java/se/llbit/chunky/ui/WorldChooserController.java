@@ -19,9 +19,12 @@ package se.llbit.chunky.ui;
 import javafx.beans.property.ReadOnlyLongWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -42,6 +45,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class WorldChooserController implements Initializable {
+  @FXML private Label statusLabel;
+
   @FXML private TableView<World> worldTbl;
 
   @FXML private TableColumn<World, String> worldNameCol;
@@ -131,23 +136,54 @@ public class WorldChooserController implements Initializable {
     });
   }
 
-  private void fillWorldList(File worldSavesDir) {
-    List<World> worlds = new ArrayList<>();
-    if (worldSavesDir != null) {
-      File[] worldDirs = worldSavesDir.listFiles();
-      if (worldDirs != null) {
-        for (File dir : worldDirs) {
-          if (World.isWorldDir(dir)) {
-            worlds.add(new World(dir, false));
+  /**
+   * Disables or enables window controls (TableView & Buttons).
+   */
+  private void disableControls(boolean value) {
+    worldTbl.setDisable(value);
+    changeWorldDirBtn.setDisable(value);
+    browseBtn.setDisable(value);
+    loadSelectedBtn.setDisable(value);
+  }
+
+  private void fillWorldList(final File worldSavesDir) {
+    final String prevStatus = statusLabel.getText();
+    statusLabel.setText("Loading worlds list...");
+    disableControls(true);
+
+    Task<List<World>> loadWorldsTask = new Task<List<World>>() {
+      @Override
+      protected List<World> call() throws Exception {
+        List<World> worlds = new ArrayList<>();
+        if (worldSavesDir != null) {
+          File[] worldDirs = worldSavesDir.listFiles();
+          if (worldDirs != null) {
+            for (File dir : worldDirs) {
+              if (World.isWorldDir(dir)) {
+                worlds.add(new World(dir, false));
+              }
+            }
           }
         }
+        return worlds;
       }
-    }
-    Collections.sort(worlds);
-    worldTbl.setItems(FXCollections.observableArrayList(worlds));
-    if (!worlds.isEmpty()) {
-      worldTbl.getSelectionModel().select(0);
-    }
+    };
+
+    loadWorldsTask.setOnSucceeded((WorkerStateEvent event) -> {
+      List<World> worlds = loadWorldsTask.getValue();
+
+      Collections.sort(worlds);
+      worldTbl.setItems(FXCollections.observableArrayList(worlds));
+      if (!worlds.isEmpty()) {
+        worldTbl.getSelectionModel().select(0);
+      }
+
+      statusLabel.setText(prevStatus);
+      disableControls(false);
+    });
+
+    Thread loadWorldsThread = new Thread(loadWorldsTask, "Worlds list loader");
+    loadWorldsThread.start();
   }
 
   /**
