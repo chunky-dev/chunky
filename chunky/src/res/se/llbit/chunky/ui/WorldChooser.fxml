@@ -10,8 +10,8 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.llbit.chunky.ui.WorldChooserController">
    <children>
-      <Label text="Select world to load:" />
-      <TableView fx:id="worldTbl" prefHeight="200.0" prefWidth="200.0">
+      <Label fx:id="statusLabel" text="Select world to load:" />
+      <TableView fx:id="worldTbl" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="433.0" VBox.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="worldNameCol" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="174.0" text="World name" />
           <TableColumn fx:id="worldDirCol" minWidth="-1.0" prefWidth="151.0" text="Directory" />
