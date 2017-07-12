@@ -83,6 +83,7 @@
             </StackPane>
          </content>
       </TitledPane>
+      <Label text="Only install plugins from trusted sources. Plugins have full access to your files." />
       <ButtonBar prefHeight="40.0" prefWidth="200.0">
         <buttons>
             <Button fx:id="upButton" mnemonicParsing="false" text="Up" />
