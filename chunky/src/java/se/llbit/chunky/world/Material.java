@@ -47,8 +47,8 @@ public abstract class Material {
   public boolean isOpaque = false;
 
   /**
-   * A block is solid if the block occupies an entire voxel.
-   * The block may still be partly transparent.
+   * The solid property controls various block behaviours like
+   * if the block connects to fences, gates, walls, etc.
    */
   public boolean isSolid = true;
 

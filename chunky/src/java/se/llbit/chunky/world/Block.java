@@ -2199,12 +2199,6 @@ public class Block extends Material {
   };
   public static final Block ORANGE_TERRACOTTA = new Block(0xEC, "block:orange_glazed_terracotta",
       Texture.terracottaOrange) {
-    {
-      isOpaque = true;
-      isSolid = true;
-      localIntersect = true;
-    }
-
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaOrange);
     }
@@ -2514,7 +2508,6 @@ public class Block extends Material {
     FIRE.isSolid = false;
     FIRE.localIntersect = true;
     FIRE.emittance = 1.0f;
-    OAKWOODSTAIRS.isSolid = false;
     OAKWOODSTAIRS.localIntersect = true;
     CHEST.isSolid = false;
     CHEST.localIntersect = true;
@@ -2540,7 +2533,6 @@ public class Block extends Material {
     LADDER.localIntersect = true;
     MINECARTTRACKS.isSolid = false;
     MINECARTTRACKS.localIntersect = true;
-    STONESTAIRS.isSolid = false;
     STONESTAIRS.localIntersect = true;
     WALLSIGN.isSolid = false;
     LEVER.isSolid = false;
@@ -2571,8 +2563,8 @@ public class Block extends Material {
     SUGARCANE.localIntersect = true;
     JUKEBOX.isOpaque = true;
     JUKEBOX.localIntersect = true;
-    FENCE.isSolid = false;
     FENCE.localIntersect = true;
+    PUMPKIN.isSolid = false;
     PUMPKIN.isOpaque = true;
     PUMPKIN.localIntersect = true;
     NETHERRACK.isOpaque = true;
@@ -2581,6 +2573,7 @@ public class Block extends Material {
     GLOWSTONE.emittance = 1.0f;
     PORTAL.isSolid = false;
     PORTAL.emittance = 0.4f;
+    JACKOLANTERN.isSolid = false;
     JACKOLANTERN.isOpaque = true;
     JACKOLANTERN.localIntersect = true;
     JACKOLANTERN.emittance = 1.0f;
@@ -2603,9 +2596,9 @@ public class Block extends Material {
     HUGEREDMUSHROOM.localIntersect = true;
     IRONBARS.isSolid = false;
     IRONBARS.localIntersect = true;
-    GLASSPANE.isSolid = false;
     GLASSPANE.localIntersect = true;
     GLASSPANE.ior = 1.52f;
+    MELON.isSolid = false;
     MELON.isOpaque = true;
     MELON.localIntersect = true;
     PUMPKINSTEM.isSolid = false;
@@ -2614,20 +2607,15 @@ public class Block extends Material {
     MELONSTEM.localIntersect = true;
     VINES.isSolid = false;
     VINES.localIntersect = true;
-    FENCEGATE.isSolid = false;
     FENCEGATE.localIntersect = true;
-    BRICKSTAIRS.isSolid = false;
     BRICKSTAIRS.localIntersect = true;
-    STONEBRICKSTAIRS.isSolid = false;
     STONEBRICKSTAIRS.localIntersect = true;
     MYCELIUM.isOpaque = true;
     MYCELIUM.localIntersect = true;
     LILY_PAD.isSolid = false;
     LILY_PAD.localIntersect = true;
     NETHERBRICK.isOpaque = true;
-    NETHERBRICKFENCE.isSolid = false;
     NETHERBRICKFENCE.localIntersect = true;
-    NETHERBRICKSTAIRS.isSolid = false;
     NETHERBRICKSTAIRS.localIntersect = true;
     NETHERWART.isSolid = false;
     NETHERWART.localIntersect = true;
@@ -2654,7 +2642,6 @@ public class Block extends Material {
     SINGLEWOODENSLAB.localIntersect = true;
     COCOAPLANT.isSolid = false;
     COCOAPLANT.localIntersect = true;
-    SANDSTONESTAIRS.isSolid = false;
     SANDSTONESTAIRS.localIntersect = true;
     EMERALDORE.isOpaque = true;
     ENDERCHEST.isSolid = false;
@@ -2665,18 +2652,14 @@ public class Block extends Material {
     TRIPWIRE.localIntersect = true;
     EMERALDBLOCK.isOpaque = true;
     EMERALDBLOCK.specular = 0.04f;
-    SPRUCEWOODSTAIRS.isSolid = false;
     SPRUCEWOODSTAIRS.localIntersect = true;
-    BIRCHWOODSTAIRS.isSolid = false;
     BIRCHWOODSTAIRS.localIntersect = true;
-    JUNGLEWOODSTAIRS.isSolid = false;
     JUNGLEWOODSTAIRS.localIntersect = true;
     COMMAND_BLOCK.isOpaque = true;
     COMMAND_BLOCK.localIntersect = true;
     BEACON.localIntersect = true;
     BEACON.emittance = 1.0f;
     BEACON.ior = 1.52f;
-    STONEWALL.isSolid = false;
     STONEWALL.localIntersect = true;
     FLOWERPOT.isSolid = false;
     FLOWERPOT.localIntersect = true;
@@ -2707,22 +2690,18 @@ public class Block extends Material {
     HOPPER.localIntersect = true;
     QUARTZ.isOpaque = true;
     QUARTZ.localIntersect = true;
-    QUARTZSTAIRS.isSolid = false;
     QUARTZSTAIRS.localIntersect = true;
     ACTIVATORRAIL.isSolid = false;
     ACTIVATORRAIL.localIntersect = true;
     DROPPER.isOpaque = true;
     DROPPER.localIntersect = true;
     STAINED_CLAY.isOpaque = true;
-    STAINED_GLASSPANE.isSolid = false;
     STAINED_GLASSPANE.localIntersect = true;
     STAINED_GLASSPANE.ior = 1.52f;
     LEAVES2.localIntersect = true;
     WOOD2.isOpaque = true;
     WOOD2.localIntersect = true;
-    ACACIASTAIRS.isSolid = false;
     ACACIASTAIRS.localIntersect = true;
-    DARKOAKSTAIRS.isSolid = false;
     DARKOAKSTAIRS.localIntersect = true;
     BARRIER.isSolid = false;
     IRON_TRAPDOOR.isSolid = false;
@@ -2746,30 +2725,20 @@ public class Block extends Material {
     INVERTED_DAYLIGHTSENSOR.localIntersect = true;
     REDSANDSTONE.isOpaque = true;
     REDSANDSTONE.localIntersect = true;
-    REDSANDSTONESTAIRS.isSolid = false;
     REDSANDSTONESTAIRS.localIntersect = true;
     DOUBLESLAB2.isOpaque = true;
     DOUBLESLAB2.localIntersect = true;
     SLAB2.isSolid = false;
     SLAB2.localIntersect = true;
-    SPRUCEFENCEGATE.isSolid = false;
     SPRUCEFENCEGATE.localIntersect = true;
-    BIRCHFENCEGATE.isSolid = false;
     BIRCHFENCEGATE.localIntersect = true;
-    JUNGLEFENCEGATE.isSolid = false;
     JUNGLEFENCEGATE.localIntersect = true;
-    DARKOAKFENCEGATE.isSolid = false;
     DARKOAKFENCEGATE.localIntersect = true;
-    ACACIAFENCEGATE.isSolid = false;
     ACACIAFENCEGATE.localIntersect = true;
-    SPRUCEFENCE.isSolid = false;
     SPRUCEFENCE.localIntersect = true;
-    BIRCHFENCE.isSolid = false;
     BIRCHFENCE.localIntersect = true;
-    JUNGLEFENCE.isSolid = false;
     JUNGLEFENCE.localIntersect = true;
     DARKOAKFENCE.localIntersect = true;
-    ACACIAFENCE.isSolid = false;
     ACACIAFENCE.localIntersect = true;
     SPRUCEDOOR.isSolid = false;
     SPRUCEDOOR.localIntersect = true;
@@ -2791,7 +2760,6 @@ public class Block extends Material {
     PURPURBLOCK.isOpaque = true;
     PURPURPILLAR.isOpaque = true;
     PURPURPILLAR.localIntersect = true;
-    PURPURSTAIRS.isSolid = false;
     PURPURSTAIRS.localIntersect = true;
     PURPURDOUBLESLAB.isOpaque = true;
     PURPURSLAB.isSolid = false;

@@ -49,5 +49,12 @@ public class TestBlockProperties {
     assertFalse(Block.CROPS.isFenceConnector());
     assertFalse(Block.SUGARCANE.isFenceConnector());
     assertFalse(Block.CARROTS.isFenceConnector());
+    assertFalse(Block.MELON.isFenceConnector());
+    assertFalse(Block.PUMPKIN.isFenceConnector());
+    assertFalse(Block.JACKOLANTERN.isFenceConnector());
+    assertTrue(Block.FURNACEUNLIT.isFenceConnector());
+    assertTrue(Block.OAKWOODSTAIRS.isFenceConnector());
+    assertFalse(Block.TRAPDOOR.isFenceConnector());
+    assertFalse(Block.IRON_TRAPDOOR.isFenceConnector());
   }
 }
