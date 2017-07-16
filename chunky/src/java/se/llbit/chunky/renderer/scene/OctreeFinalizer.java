@@ -526,40 +526,96 @@ public class OctreeFinalizer {
             case Block.JUNGLEFENCE_ID:
             case Block.DARKOAKFENCE_ID:
             case Block.ACACIAFENCE_ID:
-              other = Block.get(octree.get(x, cy, z - 1));
+              data = octree.get(x, cy, z - 1);
+              other = Block.get(data);
               if (other.isFenceConnector()) {
-                type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
+                if (other.isFenceGate()) {
+                  if ((data & 0x100) != 0) {
+                    type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
+                  }
+                } else {
+                  type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
+                }
               }
-              other = Block.get(octree.get(x, cy, z + 1));
+              data = octree.get(x, cy, z + 1);
+              other = Block.get(data);
               if (other.isFenceConnector()) {
-                type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
+                if (other.isFenceGate()) {
+                  if ((data & 0x100) != 0) {
+                    type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
+                  }
+                } else {
+                  type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
+                }
               }
-              other = Block.get(octree.get(x + 1, cy, z));
+              data = octree.get(x + 1, cy, z);
+              other = Block.get(data);
               if (other.isFenceConnector()) {
-                type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
+                if (other.isFenceGate()) {
+                  if ((data & 0x100) == 0) {
+                    type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
+                  }
+                } else {
+                  type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
+                }
               }
-              other = Block.get(octree.get(x - 1, cy, z));
+              data = octree.get(x - 1, cy, z);
+              other = Block.get(data);
               if (other.isFenceConnector()) {
-                type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
+                if (other.isFenceGate()) {
+                  if ((data & 0x100) == 0) {
+                    type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
+                  }
+                } else {
+                  type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
+                }
               }
               octree.set(type, x, cy, z);
               break;
             case Block.NETHERBRICKFENCE_ID:
-              other = Block.get(octree.get(x, cy, z - 1));
+              data = octree.get(x, cy, z - 1);
+              other = Block.get(data);
               if (other.isNetherBrickFenceConnector()) {
-                type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
+                if (other.isFenceGate()) {
+                  if ((data & 0x100) != 0) {
+                    type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
+                  }
+                } else {
+                  type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
+                }
               }
-              other = Block.get(octree.get(x, cy, z + 1));
+              data = octree.get(x, cy, z + 1);
+              other = Block.get(data);
               if (other.isNetherBrickFenceConnector()) {
-                type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
+                if (other.isFenceGate()) {
+                  if ((data & 0x100) != 0) {
+                    type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
+                  }
+                } else {
+                  type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
+                }
               }
-              other = Block.get(octree.get(x + 1, cy, z));
+              data = octree.get(x + 1, cy, z);
+              other = Block.get(data);
               if (other.isNetherBrickFenceConnector()) {
-                type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
+                if (other.isFenceGate()) {
+                  if ((data & 0x100) == 0) {
+                    type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
+                  }
+                } else {
+                  type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
+                }
               }
-              other = Block.get(octree.get(x - 1, cy, z));
+              data = octree.get(x - 1, cy, z);
+              other = Block.get(data);
               if (other.isNetherBrickFenceConnector()) {
-                type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
+                if (other.isFenceGate()) {
+                  if ((data & 0x100) == 0) {
+                    type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
+                  }
+                } else {
+                  type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
+                }
               }
               octree.set(type, x, cy, z);
               break;
