@@ -231,7 +231,10 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
     reloadChunks.setGraphic(new ImageView(Icon.reload.fxImage()));
     reloadChunks.setOnAction(e -> controller.getSceneManager().reloadChunks());
     applySize.setTooltip(new Tooltip("Set the canvas size to the value in the field."));
-    applySize.setOnAction(e -> updateCanvasSize());
+    applySize.setOnAction(e -> {
+      // Make the change handler for the combo box update the canvas size.
+      canvasSize.setValue(canvasSize.getEditor().getText());
+    });
     makeDefaultSize.setTooltip(new Tooltip("Make the current canvas size the default."));
     makeDefaultSize.setOnAction(e -> PersistentSettings
         .set3DCanvasSize(scene.canvasWidth(), scene.canvasHeight()));
