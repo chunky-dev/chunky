@@ -41,6 +41,18 @@ public class TestBlockProperties {
     assertEquals(true, Block.GRASS.isSolid);
   }
 
+  @Test public void testInvisible() {
+    // The invisible flag indicates if a block should be represented as a voxel.
+    assertEquals(true, Block.AIR.isInvisible);
+    assertEquals(false, Block.STONE.isInvisible);
+    assertEquals(true, Block.PISTON_EXTENSION.isInvisible);
+    assertEquals(true, Block.SIGNPOST.isInvisible);
+    assertEquals(true, Block.WALLSIGN.isInvisible);
+    assertEquals(true, Block.LILY_PAD.isInvisible);
+    assertEquals(true, Block.HEAD.isInvisible);
+    assertEquals(true, Block.BARRIER.isInvisible);
+  }
+
   @Test public void testFenceConn1() {
     assertEquals(false, Block.AIR.isFenceConnector());
     assertEquals(false, Block.WATER.isFenceConnector());

@@ -2582,6 +2582,7 @@ public class Block extends Material {
     PISTON_HEAD.localIntersect = true;
     WOOL.isOpaque = true;
     PISTON_EXTENSION.isSolid = false;
+    PISTON_EXTENSION.isInvisible = true;
     DANDELION.isSolid = false;
     DANDELION.localIntersect = true;
     FLOWER.isSolid = false;
@@ -2630,6 +2631,7 @@ public class Block extends Material {
     FURNACELIT.isOpaque = true;
     FURNACELIT.localIntersect = true;
     SIGNPOST.isSolid = false;
+    SIGNPOST.isInvisible = true;
     WOODENDOOR.isSolid = false;
     WOODENDOOR.localIntersect = true;
     LADDER.isSolid = false;
@@ -2638,6 +2640,7 @@ public class Block extends Material {
     MINECARTTRACKS.localIntersect = true;
     STONESTAIRS.localIntersect = true;
     WALLSIGN.isSolid = false;
+    WALLSIGN.isInvisible = true;
     LEVER.isSolid = false;
     LEVER.localIntersect = true;
     STONEPRESSUREPLATE.isSolid = false;
@@ -2716,6 +2719,7 @@ public class Block extends Material {
     MYCELIUM.isOpaque = true;
     MYCELIUM.localIntersect = true;
     LILY_PAD.isSolid = false;
+    LILY_PAD.isInvisible = true;
     LILY_PAD.localIntersect = true;
     NETHERBRICK.isOpaque = true;
     NETHERBRICKFENCE.localIntersect = true;
@@ -2773,6 +2777,7 @@ public class Block extends Material {
     WOODENBUTTON.isSolid = false;
     WOODENBUTTON.localIntersect = true;
     HEAD.isSolid = false;
+    HEAD.isInvisible = true;
     ANVIL.isSolid = false;
     ANVIL.localIntersect = true;
     TRAPPEDCHEST.isSolid = false;
@@ -2807,6 +2812,7 @@ public class Block extends Material {
     ACACIASTAIRS.localIntersect = true;
     DARKOAKSTAIRS.localIntersect = true;
     BARRIER.isSolid = false;
+    BARRIER.isInvisible = true;
     IRON_TRAPDOOR.isSolid = false;
     IRON_TRAPDOOR.localIntersect = true;
     PRISMARINE.isOpaque = true;
