@@ -54,53 +54,104 @@ public class TestBlockProperties {
   }
 
   @Test public void testFenceConn1() {
-    assertEquals(false, Block.AIR.isFenceConnector());
-    assertEquals(false, Block.WATER.isFenceConnector());
-    assertEquals(false, Block.FLOWER.isFenceConnector());
-    assertEquals(false, Block.CROPS.isFenceConnector());
-    assertEquals(false, Block.SUGARCANE.isFenceConnector());
-    assertEquals(false, Block.CARROTS.isFenceConnector());
-    assertEquals(false, Block.MELON.isFenceConnector());
-    assertEquals(false, Block.PUMPKIN.isFenceConnector());
-    assertEquals(false, Block.JACKOLANTERN.isFenceConnector());
-    assertEquals(true, Block.FURNACEUNLIT.isFenceConnector());
-    assertEquals(true, Block.OAKWOODSTAIRS.isFenceConnector());
-    assertEquals(false, Block.TRAPDOOR.isFenceConnector());
-    assertEquals(false, Block.IRON_TRAPDOOR.isFenceConnector());
+    assertEquals(false, Block.AIR.isFenceConnector(0, 0));
+    assertEquals(false, Block.WATER.isFenceConnector(0, 0));
+    assertEquals(false, Block.FLOWER.isFenceConnector(0, 0));
+    assertEquals(false, Block.CROPS.isFenceConnector(0, 0));
+    assertEquals(false, Block.SUGARCANE.isFenceConnector(0, 0));
+    assertEquals(false, Block.CARROTS.isFenceConnector(0, 0));
+    assertEquals(false, Block.MELON.isFenceConnector(0, 0));
+    assertEquals(false, Block.PUMPKIN.isFenceConnector(0, 0));
+    assertEquals(false, Block.JACKOLANTERN.isFenceConnector(0, 0));
+    assertEquals(true, Block.FURNACEUNLIT.isFenceConnector(0, 0));
+    assertEquals(false, Block.TRAPDOOR.isFenceConnector(0, 0));
+    assertEquals(false, Block.IRON_TRAPDOOR.isFenceConnector(0, 0));
+
+    // Stair connections are direction dependent: only connect when facing away from the fence.
+    assertEquals(true, Block.OAKWOODSTAIRS.isFenceConnector(BlockData.NORTH, BlockData.SOUTH));
+    assertEquals(false, Block.OAKWOODSTAIRS.isFenceConnector(BlockData.NORTH, BlockData.EAST));
+    assertEquals(false, Block.OAKWOODSTAIRS.isFenceConnector(BlockData.NORTH, BlockData.NORTH));
 
     // Nether brick fences should not connect to regular fences.
-    assertEquals(false, Block.NETHERBRICKFENCE.isFenceConnector());
-    assertEquals(false, Block.FENCE.isNetherBrickFenceConnector());
-    assertEquals(false, Block.DARKOAKFENCE.isNetherBrickFenceConnector());
+    assertEquals(false, Block.NETHERBRICKFENCE.isFenceConnector(0, 0));
+    assertEquals(false, Block.FENCE.isNetherBrickFenceConnector(0, 0));
+    assertEquals(false, Block.DARKOAKFENCE.isNetherBrickFenceConnector(0, 0));
 
     // Glass panes should connect to iron bars.
-    assertEquals(true, Block.IRONBARS.isGlassPaneConnector());
-    assertEquals(true, Block.GLASSPANE.isIronBarsConnector());
+    assertEquals(true, Block.IRONBARS.isGlassPaneConnector(0, 0));
+    assertEquals(true, Block.GLASSPANE.isIronBarsConnector(0, 0));
+    assertEquals(true, Block.STAINED_GLASSPANE.isIronBarsConnector(0, 0));
 
     // Glass panes should not connect to fences.
-    assertEquals(false, Block.FENCE.isGlassPaneConnector());
-    assertEquals(false, Block.BIRCHFENCE.isGlassPaneConnector());
-    assertEquals(false, Block.GLASSPANE.isFenceConnector());
-    assertEquals(false, Block.NETHERBRICKFENCE.isGlassPaneConnector());
-    assertEquals(false, Block.GLASSPANE.isNetherBrickFenceConnector());
+    assertEquals(false, Block.FENCE.isGlassPaneConnector(0, 0));
+    assertEquals(false, Block.BIRCHFENCE.isGlassPaneConnector(0, 0));
+    assertEquals(false, Block.GLASSPANE.isFenceConnector(0, 0));
+    assertEquals(false, Block.STAINED_GLASSPANE.isFenceConnector(0, 0));
+    assertEquals(false, Block.NETHERBRICKFENCE.isGlassPaneConnector(0, 0));
+    assertEquals(false, Block.STAINED_GLASSPANE.isNetherBrickFenceConnector(0, 0));
 
     // Fences should not connect to glass blocks.
-    assertEquals(false, Block.GLASS.isFenceConnector());
-    assertEquals(false, Block.GLASS.isNetherBrickFenceConnector());
+    assertEquals(false, Block.GLASS.isFenceConnector(0, 0));
+    assertEquals(false, Block.GLASS.isNetherBrickFenceConnector(0, 0));
+    assertEquals(false, Block.STAINED_GLASS.isFenceConnector(0, 0));
+    assertEquals(false, Block.STAINED_GLASS.isNetherBrickFenceConnector(0, 0));
+
+    // Fences should not connect to glass panes.
+    assertEquals(false, Block.GLASSPANE.isFenceConnector(0, 0));
+    assertEquals(false, Block.GLASSPANE.isNetherBrickFenceConnector(0, 0));
+    assertEquals(false, Block.STAINED_GLASSPANE.isFenceConnector(0, 0));
+    assertEquals(false, Block.STAINED_GLASSPANE.isNetherBrickFenceConnector(0, 0));
 
     // Fences should not connect to iron bars.
-    assertEquals(false, Block.FENCE.isIronBarsConnector());
-    assertEquals(false, Block.SPRUCEFENCE.isIronBarsConnector());
-    assertEquals(false, Block.DARKOAKFENCE.isIronBarsConnector());
-    assertEquals(false, Block.JUNGLEFENCE.isIronBarsConnector());
-    assertEquals(false, Block.ACACIAFENCE.isIronBarsConnector());
-    assertEquals(false, Block.NETHERBRICKFENCE.isIronBarsConnector());
-    assertEquals(false, Block.IRONBARS.isFenceConnector());
-    assertEquals(false, Block.IRONBARS.isNetherBrickFenceConnector());
+    assertEquals(false, Block.FENCE.isIronBarsConnector(0, 0));
+    assertEquals(false, Block.SPRUCEFENCE.isIronBarsConnector(0, 0));
+    assertEquals(false, Block.DARKOAKFENCE.isIronBarsConnector(0, 0));
+    assertEquals(false, Block.JUNGLEFENCE.isIronBarsConnector(0, 0));
+    assertEquals(false, Block.ACACIAFENCE.isIronBarsConnector(0, 0));
+    assertEquals(false, Block.NETHERBRICKFENCE.isIronBarsConnector(0, 0));
+    assertEquals(false, Block.IRONBARS.isFenceConnector(0, 0));
+    assertEquals(false, Block.IRONBARS.isNetherBrickFenceConnector(0, 0));
 
     // Iron bars should not connect to fence gates.
-    assertEquals(false, Block.FENCEGATE.isIronBarsConnector());
-    assertEquals(false, Block.SPRUCEFENCEGATE.isIronBarsConnector());
-    assertEquals(false, Block.ACACIAFENCEGATE.isIronBarsConnector());
+    assertEquals(false, Block.FENCEGATE.isIronBarsConnector(0, 0));
+    assertEquals(false, Block.SPRUCEFENCEGATE.isIronBarsConnector(0, 0));
+    assertEquals(false, Block.ACACIAFENCEGATE.isIronBarsConnector(0, 0));
+
+    // Fences should not connect to leaf blocks.
+    assertEquals(false, Block.LEAVES.isFenceConnector(0, 0));
+    assertEquals(false, Block.LEAVES.isNetherBrickFenceConnector(0, 0));
+    assertEquals(false, Block.LEAVES2.isFenceConnector(0, 0));
+    assertEquals(false, Block.LEAVES2.isNetherBrickFenceConnector(0, 0));
+
+    // Fences should not connect to stone walls.
+    assertEquals(false, Block.FENCE.isStoneWallConnector(0, 0));
+    assertEquals(false, Block.SPRUCEFENCE.isStoneWallConnector(0, 0));
+    assertEquals(false, Block.DARKOAKFENCE.isStoneWallConnector(0, 0));
+    assertEquals(false, Block.JUNGLEFENCE.isStoneWallConnector(0, 0));
+    assertEquals(false, Block.ACACIAFENCE.isStoneWallConnector(0, 0));
+    assertEquals(false, Block.NETHERBRICKFENCE.isStoneWallConnector(0, 0));
+    assertEquals(false, Block.STONEWALL.isFenceConnector(0, 0));
+    assertEquals(false, Block.STONEWALL.isNetherBrickFenceConnector(0, 0));
+
+    // Iron bars should not connect to stone walls.
+    assertEquals(false, Block.IRONBARS.isStoneWallConnector(0, 0));
+    assertEquals(false, Block.STONEWALL.isIronBarsConnector(0, 0));
+
+    // Glass panes should not connect to stone walls.
+    assertEquals(false, Block.GLASSPANE.isStoneWallConnector(0, 0));
+    assertEquals(false, Block.STAINED_GLASSPANE.isStoneWallConnector(0, 0));
+    assertEquals(false, Block.STONEWALL.isGlassPaneConnector(0, 0));
+
+    // Stone walls should not connect to leaf blocks.
+    assertEquals(false, Block.LEAVES.isStoneWallConnector(0, 0));
+    assertEquals(false, Block.LEAVES2.isStoneWallConnector(0, 0));
+
+    // Glass panes should not connect to leaf blocks.
+    assertEquals(false, Block.LEAVES.isGlassPaneConnector(0, 0));
+    assertEquals(false, Block.LEAVES2.isGlassPaneConnector(0, 0));
+
+    // Iron bars should not connect to leaf blocks.
+    assertEquals(false, Block.LEAVES.isIronBarsConnector(0, 0));
+    assertEquals(false, Block.LEAVES2.isIronBarsConnector(0, 0));
   }
 }

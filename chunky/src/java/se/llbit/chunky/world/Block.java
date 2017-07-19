@@ -17,6 +17,9 @@
 package se.llbit.chunky.world;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.block.Fence;
+import se.llbit.chunky.block.FenceGate;
+import se.llbit.chunky.block.Stairs;
 import se.llbit.chunky.model.AnvilModel;
 import se.llbit.chunky.model.BeaconModel;
 import se.llbit.chunky.model.BedModel;
@@ -139,12 +142,19 @@ public class Block extends Material {
   };
   public static final int DIRT_ID = 0x03;
   public static final Block DIRT = new Block(DIRT_ID, "block:dirt", Texture.dirt) {
-    final Texture[][] textures =
-        {{Texture.dirt, Texture.dirt, Texture.dirt, Texture.dirt, Texture.dirt, Texture.dirt,},
-            {Texture.coarseDirt, Texture.coarseDirt, Texture.coarseDirt, Texture.coarseDirt,
-                Texture.coarseDirt, Texture.coarseDirt,},
-            {Texture.podzolSide, Texture.podzolSide, Texture.podzolSide, Texture.podzolSide,
-                Texture.podzolTop, Texture.podzolSide,},};
+    final Texture[][] textures = {
+        {
+            Texture.dirt, Texture.dirt, Texture.dirt, Texture.dirt, Texture.dirt, Texture.dirt,
+        },
+        {
+            Texture.coarseDirt, Texture.coarseDirt, Texture.coarseDirt, Texture.coarseDirt,
+            Texture.coarseDirt, Texture.coarseDirt,
+        },
+        {
+            Texture.podzolSide, Texture.podzolSide, Texture.podzolSide, Texture.podzolSide,
+            Texture.podzolTop, Texture.podzolSide,
+        },
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TexturedBlockModel.intersect(ray, textures[ray.getBlockData() % 3]);
@@ -285,6 +295,26 @@ public class Block extends Material {
     @Override public Texture getTexture(int blockData) {
       return texture[blockData & 3];
     }
+
+    @Override public boolean isFenceConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isStoneWallConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isGlassPaneConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isIronBarsConnector(int data, int direction) {
+      return false;
+    }
   };
   public static final int SPONGE_ID = 0x13;
   public static final Block SPONGE = new Block(SPONGE_ID, "block:sponge", Texture.sponge) {
@@ -306,11 +336,11 @@ public class Block extends Material {
       return other == this || other == STAINED_GLASS;
     }
 
-    @Override public boolean isFenceConnector() {
+    @Override public boolean isFenceConnector(int data, int direction) {
       return false;
     }
 
-    @Override public boolean isNetherBrickFenceConnector() {
+    @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
       return false;
     }
   };
@@ -595,7 +625,7 @@ public class Block extends Material {
   public static final int MONSTERSPAWNER_ID = 0x34;
   public static final Block MONSTERSPAWNER = new Block(MONSTERSPAWNER_ID, "block:mob_spawner", Texture.monsterSpawner);
   public static final int OAKWOODSTAIRS_ID = 0x35;
-  public static final Block OAKWOODSTAIRS = new Block(OAKWOODSTAIRS_ID, "block:oak_stairs", Icon.woodenStairs) {
+  public static final Block OAKWOODSTAIRS = new Stairs(OAKWOODSTAIRS_ID, "block:oak_stairs", Icon.woodenStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.oakPlanks);
     }
@@ -715,7 +745,7 @@ public class Block extends Material {
     }
   };
   public static final int STONESTAIRS_ID = 0x43;
-  public static final Block STONESTAIRS = new Block(STONESTAIRS_ID, "block:stone_stairs", Icon.stoneStairs) {
+  public static final Block STONESTAIRS = new Stairs(STONESTAIRS_ID, "block:stone_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.cobblestone);
     }
@@ -822,25 +852,9 @@ public class Block extends Material {
     }
   };
   public static final int FENCE_ID = 0x55;
-  public static final Block FENCE = new Block(FENCE_ID, "block:fence", Icon.fence) {
+  public static final Block FENCE = new Fence(FENCE_ID, "block:fence", Icon.fence) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.oakPlanks);
-    }
-
-    @Override protected boolean isFence() {
-      return true;
-    }
-
-    @Override public boolean isNetherBrickFenceConnector() {
-      return false;
-    }
-
-    @Override public boolean isGlassPaneConnector() {
-      return false;
-    }
-
-    @Override public boolean isIronBarsConnector() {
-      return false;
     }
   };
   public static final int PUMPKIN_ID = 0x56;
@@ -902,6 +916,14 @@ public class Block extends Material {
 
     @Override public boolean isSameMaterial(Material other) {
       return other == this || other == GLASS;
+    }
+
+    @Override public boolean isFenceConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
+      return false;
     }
   };
   public static final int TRAPDOOR_ID = 0x60;
@@ -1076,11 +1098,15 @@ public class Block extends Material {
       return IronBarsModel.intersect(ray);
     }
 
-    @Override public boolean isFenceConnector() {
+    @Override public boolean isFenceConnector(int data, int direction) {
       return false;
     }
 
-    @Override public boolean isNetherBrickFenceConnector() {
+    @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isStoneWallConnector(int data, int direction) {
       return false;
     }
   };
@@ -1090,11 +1116,15 @@ public class Block extends Material {
       return GlassPaneModel.intersect(ray, Texture.glass, Texture.glassPaneTop);
     }
 
-    @Override public boolean isFenceConnector() {
+    @Override public boolean isFenceConnector(int data, int direction) {
       return false;
     }
 
-    @Override public boolean isNetherBrickFenceConnector() {
+    @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isStoneWallConnector(int data, int direction) {
       return false;
     }
   };
@@ -1127,17 +1157,13 @@ public class Block extends Material {
     }
   };
   public static final int FENCEGATE_ID = 0x6B;
-  public static final Block FENCEGATE = new Block(FENCEGATE_ID, "block:fence_gate", Texture.unknown) {
+  public static final Block FENCEGATE = new FenceGate(FENCEGATE_ID, "block:fence_gate", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceGateModel.intersect(ray, Texture.oakPlanks);
     }
-
-    @Override public boolean isFenceGate() {
-      return true;
-    }
   };
   public static final int BRICKSTAIRS_ID = 0x6C;
-  public static final Block BRICKSTAIRS = new Block(BRICKSTAIRS_ID, "block:brick_stairs", Icon.stoneStairs) {
+  public static final Block BRICKSTAIRS = new Stairs(BRICKSTAIRS_ID, "block:brick_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.brick);
     }
@@ -1147,7 +1173,7 @@ public class Block extends Material {
     }
   };
   public static final int STONEBRICKSTAIRS_ID = 0x6D;
-  public static final Block STONEBRICKSTAIRS = new Block(STONEBRICKSTAIRS_ID, "block:stone_brick_stairs", Icon.stoneBrickStairs) {
+  public static final Block STONEBRICKSTAIRS = new Stairs(STONEBRICKSTAIRS_ID, "block:stone_brick_stairs", Icon.stoneBrickStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.stoneBrick);
     }
@@ -1188,20 +1214,24 @@ public class Block extends Material {
       return FenceModel.intersect(ray, Texture.netherBrick);
     }
 
-    @Override public boolean isFenceConnector() {
+    @Override public boolean isFenceConnector(int data, int direction) {
       return false;
     }
 
-    @Override public boolean isGlassPaneConnector() {
+    @Override public boolean isGlassPaneConnector(int data, int direction) {
       return false;
     }
 
-    @Override public boolean isIronBarsConnector() {
+    @Override public boolean isIronBarsConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isStoneWallConnector(int data, int direction) {
       return false;
     }
   };
   public static final int NETHERBRICKSTAIRS_ID = 0x72;
-  public static final Block NETHERBRICKSTAIRS = new Block(NETHERBRICKSTAIRS_ID, "block:nether_brick_stairs", Icon.stoneStairs) {
+  public static final Block NETHERBRICKSTAIRS = new Stairs(NETHERBRICKSTAIRS_ID, "block:nether_brick_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.netherBrick);
     }
@@ -1304,7 +1334,7 @@ public class Block extends Material {
     }
   };
   public static final int SANDSTONESTAIRS_ID = 0x80;
-  public static final Block SANDSTONESTAIRS = new Block(SANDSTONESTAIRS_ID, "block:sandstone_stairs", Icon.stoneStairs) {
+  public static final Block SANDSTONESTAIRS = new Stairs(SANDSTONESTAIRS_ID, "block:sandstone_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel
           .intersect(ray, Texture.sandstoneSide, Texture.sandstoneTop, Texture.sandstoneBottom);
@@ -1343,7 +1373,7 @@ public class Block extends Material {
   public static final int EMERALDBLOCK_ID = 0x85;
   public static final Block EMERALDBLOCK = new Block(EMERALDBLOCK_ID, "block:emerald_block", Texture.emeraldBlock);
   public static final int SPRUCEWOODSTAIRS_ID = 0x86;
-  public static final Block SPRUCEWOODSTAIRS = new Block(SPRUCEWOODSTAIRS_ID, "block:spruce_stairs", Icon.woodenStairs) {
+  public static final Block SPRUCEWOODSTAIRS = new Stairs(SPRUCEWOODSTAIRS_ID, "block:spruce_stairs", Icon.woodenStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.sprucePlanks);
     }
@@ -1353,7 +1383,7 @@ public class Block extends Material {
     }
   };
   public static final int BIRCHWOODSTAIRS_ID = 0x87;
-  public static final Block BIRCHWOODSTAIRS = new Block(BIRCHWOODSTAIRS_ID, "block:birch_stairs", Icon.woodenStairs) {
+  public static final Block BIRCHWOODSTAIRS = new Stairs(BIRCHWOODSTAIRS_ID, "block:birch_stairs", Icon.woodenStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.birchPlanks);
     }
@@ -1363,7 +1393,7 @@ public class Block extends Material {
     }
   };
   public static final int JUNGLEWOODSTAIRS_ID = 0x88;
-  public static final Block JUNGLEWOODSTAIRS = new Block(JUNGLEWOODSTAIRS_ID, "block:jungle_stairs", Icon.woodenStairs) {
+  public static final Block JUNGLEWOODSTAIRS = new Stairs(JUNGLEWOODSTAIRS_ID, "block:jungle_stairs", Icon.woodenStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.jungleTreePlanks);
     }
@@ -1403,6 +1433,22 @@ public class Block extends Material {
 
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StoneWallModel.intersect(ray, texture[ray.getBlockData() & 1]);
+    }
+
+    @Override public boolean isFenceConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isIronBarsConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isGlassPaneConnector(int data, int direction) {
+      return false;
     }
   };
   public static final int FLOWERPOT_ID = 0x8C;
@@ -1521,7 +1567,7 @@ public class Block extends Material {
     }
   };
   public static final int QUARTZSTAIRS_ID = 0x9C;
-  public static final Block QUARTZSTAIRS = new Block(QUARTZSTAIRS_ID, "block:quartz_stairs", Icon.stoneStairs) {
+  public static final Block QUARTZSTAIRS = new Stairs(QUARTZSTAIRS_ID, "block:quartz_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel
           .intersect(ray, Texture.quartzSide, Texture.quartzTop, Texture.quartzBottom);
@@ -1588,6 +1634,18 @@ public class Block extends Material {
     @Override public String description(int data) {
       return woolColor[data & 15];
     }
+
+    @Override public boolean isFenceConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isStoneWallConnector(int data, int direction) {
+      return false;
+    }
   };
   public static final int LEAVES2_ID = 0xA1;
   public static final Block LEAVES2 = new Block(LEAVES2_ID, "block:leaves", Texture.oakLeaves) {
@@ -1606,6 +1664,26 @@ public class Block extends Material {
 
     @Override public Texture getTexture(int blockData) {
       return texture[blockData & 3];
+    }
+
+    @Override public boolean isFenceConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isStoneWallConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isGlassPaneConnector(int data, int direction) {
+      return false;
+    }
+
+    @Override public boolean isIronBarsConnector(int data, int direction) {
+      return false;
     }
   };
   public static final int WOOD2_ID = 0xA2;
@@ -1630,7 +1708,7 @@ public class Block extends Material {
     }
   };
   public static final int ACACIASTAIRS_ID = 0xA3;
-  public static final Block ACACIASTAIRS = new Block(ACACIASTAIRS_ID, "block:acacia_stairs", Icon.woodenStairs) {
+  public static final Block ACACIASTAIRS = new Stairs(ACACIASTAIRS_ID, "block:acacia_stairs", Icon.woodenStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.acaciaPlanks);
     }
@@ -1640,7 +1718,7 @@ public class Block extends Material {
     }
   };
   public static final int DARKOAKSTAIRS_ID = 0xA4;
-  public static final Block DARKOAKSTAIRS = new Block(DARKOAKSTAIRS_ID, "block:dark_oak_stairs", Icon.woodenStairs) {
+  public static final Block DARKOAKSTAIRS = new Stairs(DARKOAKSTAIRS_ID, "block:dark_oak_stairs", Icon.woodenStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.darkOakPlanks);
     }
@@ -1747,7 +1825,7 @@ public class Block extends Material {
     }
   };
   public static final int REDSANDSTONESTAIRS_ID = 0xB4;
-  public static final Block REDSANDSTONESTAIRS = new Block(REDSANDSTONESTAIRS_ID, "block:red_standstone_stairs", Icon.stoneStairs) {
+  public static final Block REDSANDSTONESTAIRS = new Stairs(REDSANDSTONESTAIRS_ID, "block:red_standstone_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.redSandstoneSide, Texture.redSandstoneTop,
           Texture.redSandstoneBottom);
@@ -1776,27 +1854,15 @@ public class Block extends Material {
     }
   };
   public static final int SPRUCEFENCEGATE_ID = 0xB7;
-  public static final Block SPRUCEFENCEGATE = new Block(SPRUCEFENCEGATE_ID, "block:spruce_fence_gate", Texture.unknown) {
+  public static final Block SPRUCEFENCEGATE = new FenceGate(SPRUCEFENCEGATE_ID, "block:spruce_fence_gate", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceGateModel.intersect(ray, Texture.sprucePlanks);
     }
-
-    @Override protected boolean isFence() {
-      return true;
-    }
-
-    @Override public boolean isFenceGate() {
-      return true;
-    }
   };
   public static final int BIRCHFENCEGATE_ID = 0xB8;
-  public static final Block BIRCHFENCEGATE = new Block(BIRCHFENCEGATE_ID, "block:birch_fence_gate", Texture.unknown) {
+  public static final Block BIRCHFENCEGATE = new FenceGate(BIRCHFENCEGATE_ID, "block:birch_fence_gate", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceGateModel.intersect(ray, Texture.birchPlanks);
-    }
-
-    @Override public boolean isFenceGate() {
-      return true;
     }
   };
   public static final int JUNGLEFENCEGATE_ID = 0xB9;
@@ -1804,19 +1870,11 @@ public class Block extends Material {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceGateModel.intersect(ray, Texture.jungleTreePlanks);
     }
-
-    @Override public boolean isFenceGate() {
-      return true;
-    }
   };
   public static final int DARKOAKFENCEGATE_ID = 0xBA;
   public static final Block DARKOAKFENCEGATE = new Block(DARKOAKFENCEGATE_ID, "block:dark_oak_fence_gate", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceGateModel.intersect(ray, Texture.darkOakPlanks);
-    }
-
-    @Override public boolean isFenceGate() {
-      return true;
     }
   };
   public static final int ACACIAFENCEGATE_ID = 0xBB;
@@ -1824,119 +1882,35 @@ public class Block extends Material {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceGateModel.intersect(ray, Texture.acaciaPlanks);
     }
-
-    @Override public boolean isFenceGate() {
-      return true;
-    }
   };
   public static final int SPRUCEFENCE_ID = 0xBC;
-  public static final Block SPRUCEFENCE = new Block(SPRUCEFENCE_ID, "block:spruce_fence", Icon.fence) {
+  public static final Block SPRUCEFENCE = new Fence(SPRUCEFENCE_ID, "block:spruce_fence", Icon.fence) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.sprucePlanks);
     }
-
-    @Override protected boolean isFence() {
-      return true;
-    }
-
-    @Override public boolean isNetherBrickFenceConnector() {
-      return false;
-    }
-
-    @Override public boolean isGlassPaneConnector() {
-      return false;
-    }
-
-    @Override public boolean isIronBarsConnector() {
-      return false;
-    }
   };
   public static final int BIRCHFENCE_ID = 0xBD;
-  public static final Block BIRCHFENCE = new Block(BIRCHFENCE_ID, "block:birch_fence", Icon.fence) {
+  public static final Block BIRCHFENCE = new Fence(BIRCHFENCE_ID, "block:birch_fence", Icon.fence) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.birchPlanks);
     }
-
-    @Override protected boolean isFence() {
-      return true;
-    }
-
-    @Override public boolean isNetherBrickFenceConnector() {
-      return false;
-    }
-
-    @Override public boolean isGlassPaneConnector() {
-      return false;
-    }
-
-    @Override public boolean isIronBarsConnector() {
-      return false;
-    }
   };
   public static final int JUNGLEFENCE_ID = 0xBE;
-  public static final Block JUNGLEFENCE = new Block(JUNGLEFENCE_ID, "block:jungle_fence", Icon.fence) {
+  public static final Block JUNGLEFENCE = new Fence(JUNGLEFENCE_ID, "block:jungle_fence", Icon.fence) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.jungleTreePlanks);
     }
-
-    @Override protected boolean isFence() {
-      return true;
-    }
-
-    @Override public boolean isNetherBrickFenceConnector() {
-      return false;
-    }
-
-    @Override public boolean isGlassPaneConnector() {
-      return false;
-    }
-
-    @Override public boolean isIronBarsConnector() {
-      return false;
-    }
   };
   public static final int DARKOAKFENCE_ID = 0xBF;
-  public static final Block DARKOAKFENCE = new Block(DARKOAKFENCE_ID, "block:dark_oak_fence", Icon.fence) {
+  public static final Block DARKOAKFENCE = new Fence(DARKOAKFENCE_ID, "block:dark_oak_fence", Icon.fence) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.darkOakPlanks);
     }
-
-    @Override protected boolean isFence() {
-      return true;
-    }
-
-    @Override public boolean isNetherBrickFenceConnector() {
-      return false;
-    }
-
-    @Override public boolean isGlassPaneConnector() {
-      return false;
-    }
-
-    @Override public boolean isIronBarsConnector() {
-      return false;
-    }
   };
   public static final int ACACIAFENCE_ID = 0xC0;
-  public static final Block ACACIAFENCE = new Block(ACACIAFENCE_ID, "block:acacia_fence", Icon.fence) {
+  public static final Block ACACIAFENCE = new Fence(ACACIAFENCE_ID, "block:acacia_fence", Icon.fence) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.acaciaPlanks);
-    }
-
-    @Override protected boolean isFence() {
-      return true;
-    }
-
-    @Override public boolean isNetherBrickFenceConnector() {
-      return false;
-    }
-
-    @Override public boolean isGlassPaneConnector() {
-      return false;
-    }
-
-    @Override public boolean isIronBarsConnector() {
-      return false;
     }
   };
   public static final int SPRUCEDOOR_ID = 0xC1;
@@ -2025,7 +1999,7 @@ public class Block extends Material {
     }
   };
   public static final int PURPURSTAIRS_ID = 0xCB;
-  public static final Block PURPURSTAIRS = new Block(PURPURSTAIRS_ID, "block:purpur_stairs", Icon.stoneStairs) {
+  public static final Block PURPURSTAIRS = new Stairs(PURPURSTAIRS_ID, "block:purpur_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.purpurBlock);
     }
@@ -3006,11 +2980,11 @@ public class Block extends Material {
     return this == LAVA || this == STATIONARYLAVA;
   }
 
-  public boolean isNetherBrickFenceConnector() {
+  public boolean isNetherBrickFenceConnector(int data, int direction) {
     return solid || this == NETHERBRICKFENCE || isFenceGate();
   }
 
-  public boolean isFenceConnector() {
+  public boolean isFenceConnector(int data, int direction) {
     return solid || isFence() || isFenceGate();
   }
 
@@ -3022,15 +2996,15 @@ public class Block extends Material {
     return false;
   }
 
-  public boolean isStoneWallConnector() {
+  public boolean isStoneWallConnector(int data, int direction) {
     return solid || this == FENCEGATE || this == STONEWALL;
   }
 
-  public boolean isGlassPaneConnector() {
+  public boolean isGlassPaneConnector(int data, int direction) {
     return solid || this == GLASSPANE || this == STAINED_GLASSPANE;
   }
 
-  public boolean isIronBarsConnector() {
+  public boolean isIronBarsConnector(int data, int direction) {
     return solid || this == IRONBARS;
   }
 

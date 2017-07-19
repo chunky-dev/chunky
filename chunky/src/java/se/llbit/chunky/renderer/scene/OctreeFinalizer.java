@@ -452,60 +452,72 @@ public class OctreeFinalizer {
               octree.set(type, x, cy, z);
               break;
             case Block.IRONBARS_ID:
-              other = Block.get(octree.get(x, cy, z - 1));
-              if (other.isIronBarsConnector()) {
+              data = octree.get(x, cy, z - 1);
+              other = Block.get(data);
+              if (other.isIronBarsConnector(data >> BlockData.OFFSET, BlockData.NORTH)) {
                 type |= BlockData.CONNECTED_NORTH << BlockData.GLASS_PANE_OFFSET;
               }
-              other = Block.get(octree.get(x, cy, z + 1));
-              if (other.isIronBarsConnector()) {
+              data = octree.get(x, cy, z + 1);
+              other = Block.get(data);
+              if (other.isIronBarsConnector(data >> BlockData.OFFSET, BlockData.SOUTH)) {
                 type |= BlockData.CONNECTED_SOUTH << BlockData.GLASS_PANE_OFFSET;
               }
-              other = Block.get(octree.get(x + 1, cy, z));
-              if (other.isIronBarsConnector()) {
+              data = octree.get(x + 1, cy, z);
+              other = Block.get(data);
+              if (other.isIronBarsConnector(data >> BlockData.OFFSET, BlockData.EAST)) {
                 type |= BlockData.CONNECTED_EAST << BlockData.GLASS_PANE_OFFSET;
               }
-              other = Block.get(octree.get(x - 1, cy, z));
-              if (other.isIronBarsConnector()) {
+              data = octree.get(x - 1, cy, z);
+              other = Block.get(data);
+              if (other.isIronBarsConnector(data >> BlockData.OFFSET, BlockData.WEST)) {
                 type |= BlockData.CONNECTED_WEST << BlockData.GLASS_PANE_OFFSET;
               }
               octree.set(type, x, cy, z);
               break;
             case Block.GLASSPANE_ID:
             case Block.STAINED_GLASSPANE_ID:
-              other = Block.get(octree.get(x, cy, z - 1));
-              if (other.isGlassPaneConnector()) {
+              data = octree.get(x, cy, z - 1);
+              other = Block.get(data);
+              if (other.isGlassPaneConnector(data >> BlockData.OFFSET, BlockData.NORTH)) {
                 type |= BlockData.CONNECTED_NORTH << BlockData.GLASS_PANE_OFFSET;
               }
-              other = Block.get(octree.get(x, cy, z + 1));
-              if (other.isGlassPaneConnector()) {
+              data = octree.get(x, cy, z + 1);
+              other = Block.get(data);
+              if (other.isGlassPaneConnector(data >> BlockData.OFFSET, BlockData.SOUTH)) {
                 type |= BlockData.CONNECTED_SOUTH << BlockData.GLASS_PANE_OFFSET;
               }
-              other = Block.get(octree.get(x + 1, cy, z));
-              if (other.isGlassPaneConnector()) {
+              data = octree.get(x + 1, cy, z);
+              other = Block.get(data);
+              if (other.isGlassPaneConnector(data >> BlockData.OFFSET, BlockData.EAST)) {
                 type |= BlockData.CONNECTED_EAST << BlockData.GLASS_PANE_OFFSET;
               }
-              other = Block.get(octree.get(x - 1, cy, z));
-              if (other.isGlassPaneConnector()) {
+              data = octree.get(x - 1, cy, z);
+              other = Block.get(data);
+              if (other.isGlassPaneConnector(data >> BlockData.OFFSET, BlockData.WEST)) {
                 type |= BlockData.CONNECTED_WEST << BlockData.GLASS_PANE_OFFSET;
               }
               octree.set(type, x, cy, z);
               break;
             case Block.STONEWALL_ID:
               connections = 0;
-              other = Block.get(octree.get(x, cy, z - 1));
-              if (other.isStoneWallConnector()) {
+              data = octree.get(x, cy, z - 1);
+              other = Block.get(data);
+              if (other.isStoneWallConnector(data >> BlockData.OFFSET, BlockData.NORTH)) {
                 connections |= BlockData.CONNECTED_NORTH;
               }
-              other = Block.get(octree.get(x, cy, z + 1));
-              if (other.isStoneWallConnector()) {
+              data = octree.get(x, cy, z + 1);
+              other = Block.get(data);
+              if (other.isStoneWallConnector(data >> BlockData.OFFSET, BlockData.SOUTH)) {
                 connections |= BlockData.CONNECTED_SOUTH;
               }
-              other = Block.get(octree.get(x + 1, cy, z));
-              if (other.isStoneWallConnector()) {
+              data = octree.get(x + 1, cy, z);
+              other = Block.get(data);
+              if (other.isStoneWallConnector(data >> BlockData.OFFSET, BlockData.EAST)) {
                 connections |= BlockData.CONNECTED_EAST;
               }
-              other = Block.get(octree.get(x - 1, cy, z));
-              if (other.isStoneWallConnector()) {
+              data = octree.get(x - 1, cy, z);
+              other = Block.get(data);
+              if (other.isStoneWallConnector(data >> BlockData.OFFSET, BlockData.WEST)) {
                 connections |= BlockData.CONNECTED_WEST;
               }
               type |= connections << BlockData.STONEWALL_CONN;
@@ -528,94 +540,46 @@ public class OctreeFinalizer {
             case Block.ACACIAFENCE_ID:
               data = octree.get(x, cy, z - 1);
               other = Block.get(data);
-              if (other.isFenceConnector()) {
-                if (other.isFenceGate()) {
-                  if ((data & 0x100) != 0) {
-                    type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
-                  }
-                } else {
-                  type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
-                }
+              if (other.isFenceConnector(data >> BlockData.OFFSET, BlockData.NORTH)) {
+                type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
               }
               data = octree.get(x, cy, z + 1);
               other = Block.get(data);
-              if (other.isFenceConnector()) {
-                if (other.isFenceGate()) {
-                  if ((data & 0x100) != 0) {
-                    type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
-                  }
-                } else {
-                  type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
-                }
+              if (other.isFenceConnector(data >> BlockData.OFFSET, BlockData.SOUTH)) {
+                type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
               }
               data = octree.get(x + 1, cy, z);
               other = Block.get(data);
-              if (other.isFenceConnector()) {
-                if (other.isFenceGate()) {
-                  if ((data & 0x100) == 0) {
-                    type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
-                  }
-                } else {
-                  type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
-                }
+              if (other.isFenceConnector(data >> BlockData.OFFSET, BlockData.EAST)) {
+                type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
               }
               data = octree.get(x - 1, cy, z);
               other = Block.get(data);
-              if (other.isFenceConnector()) {
-                if (other.isFenceGate()) {
-                  if ((data & 0x100) == 0) {
-                    type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
-                  }
-                } else {
-                  type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
-                }
+              if (other.isFenceConnector(data >> BlockData.OFFSET, BlockData.WEST)) {
+                type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
               }
               octree.set(type, x, cy, z);
               break;
             case Block.NETHERBRICKFENCE_ID:
               data = octree.get(x, cy, z - 1);
               other = Block.get(data);
-              if (other.isNetherBrickFenceConnector()) {
-                if (other.isFenceGate()) {
-                  if ((data & 0x100) != 0) {
-                    type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
-                  }
-                } else {
-                  type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
-                }
+              if (other.isNetherBrickFenceConnector(data >> BlockData.OFFSET, BlockData.NORTH)) {
+                type |= BlockData.CONNECTED_NORTH << BlockData.OFFSET;
               }
               data = octree.get(x, cy, z + 1);
               other = Block.get(data);
-              if (other.isNetherBrickFenceConnector()) {
-                if (other.isFenceGate()) {
-                  if ((data & 0x100) != 0) {
-                    type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
-                  }
-                } else {
-                  type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
-                }
+              if (other.isNetherBrickFenceConnector(data >> BlockData.OFFSET, BlockData.SOUTH)) {
+                type |= BlockData.CONNECTED_SOUTH << BlockData.OFFSET;
               }
               data = octree.get(x + 1, cy, z);
               other = Block.get(data);
-              if (other.isNetherBrickFenceConnector()) {
-                if (other.isFenceGate()) {
-                  if ((data & 0x100) == 0) {
-                    type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
-                  }
-                } else {
-                  type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
-                }
+              if (other.isNetherBrickFenceConnector(data >> BlockData.OFFSET, BlockData.EAST)) {
+                type |= BlockData.CONNECTED_EAST << BlockData.OFFSET;
               }
               data = octree.get(x - 1, cy, z);
               other = Block.get(data);
-              if (other.isNetherBrickFenceConnector()) {
-                if (other.isFenceGate()) {
-                  if ((data & 0x100) == 0) {
-                    type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
-                  }
-                } else {
-                  type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
-                }
+              if (other.isNetherBrickFenceConnector(data >> BlockData.OFFSET, BlockData.WEST)) {
+                type |= BlockData.CONNECTED_WEST << BlockData.OFFSET;
               }
               octree.set(type, x, cy, z);
               break;

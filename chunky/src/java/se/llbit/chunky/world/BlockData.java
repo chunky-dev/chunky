@@ -23,6 +23,11 @@ public interface BlockData {
    */
   int OFFSET = 8;
 
+  int EAST = 0;
+  int WEST = 1;
+  int SOUTH = 2;
+  int NORTH = 3;
+
   int RSW_EAST_CONNECTION = 12;
   int RSW_WEST_CONNECTION = 13;
   int RSW_NORTH_CONNECTION = 14;
