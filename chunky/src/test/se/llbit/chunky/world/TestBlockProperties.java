@@ -34,23 +34,23 @@ public class TestBlockProperties {
   }
 
   @Test public void testSolid() {
-    assertEquals(false, Block.AIR.isSolid);
-    assertEquals(false, Block.WATER.isSolid);
-    assertEquals(true, Block.STONE.isSolid);
-    assertEquals(true, Block.SAND.isSolid);
-    assertEquals(true, Block.GRASS.isSolid);
+    assertEquals(false, Block.AIR.solid);
+    assertEquals(false, Block.WATER.solid);
+    assertEquals(true, Block.STONE.solid);
+    assertEquals(true, Block.SAND.solid);
+    assertEquals(true, Block.GRASS.solid);
   }
 
   @Test public void testInvisible() {
     // The invisible flag indicates if a block should be represented as a voxel.
-    assertEquals(true, Block.AIR.isInvisible);
-    assertEquals(false, Block.STONE.isInvisible);
-    assertEquals(true, Block.PISTON_EXTENSION.isInvisible);
-    assertEquals(true, Block.SIGNPOST.isInvisible);
-    assertEquals(true, Block.WALLSIGN.isInvisible);
-    assertEquals(true, Block.LILY_PAD.isInvisible);
-    assertEquals(true, Block.HEAD.isInvisible);
-    assertEquals(true, Block.BARRIER.isInvisible);
+    assertEquals(true, Block.AIR.invisible);
+    assertEquals(false, Block.STONE.invisible);
+    assertEquals(true, Block.PISTON_EXTENSION.invisible);
+    assertEquals(true, Block.SIGNPOST.invisible);
+    assertEquals(true, Block.WALLSIGN.invisible);
+    assertEquals(true, Block.LILY_PAD.invisible);
+    assertEquals(true, Block.HEAD.invisible);
+    assertEquals(true, Block.BARRIER.invisible);
   }
 
   @Test public void testFenceConn1() {
@@ -102,6 +102,5 @@ public class TestBlockProperties {
     assertEquals(false, Block.FENCEGATE.isIronBarsConnector());
     assertEquals(false, Block.SPRUCEFENCEGATE.isIronBarsConnector());
     assertEquals(false, Block.ACACIAFENCEGATE.isIronBarsConnector());
-
   }
 }

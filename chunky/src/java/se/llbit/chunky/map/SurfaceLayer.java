@@ -112,7 +112,7 @@ public class SurfaceLayer extends BitmapLayer {
               y -= 1;
 
               for (; y >= 0; --y) {
-                if (Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]).isOpaque) {
+                if (Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]).opaque) {
                   ColorUtil.getRGBAComponents(block.getTexture(data).getAvgColor(), blockColor);
                   break;
                 }
@@ -137,7 +137,7 @@ public class SurfaceLayer extends BitmapLayer {
             default:
               ColorUtil.getRGBAComponents(block.getTexture(data).getAvgColor(), blockColor);
 
-              if (block.isOpaque && y > 64) {
+              if (block.opaque && y > 64) {
                 float fade = QuickMath.min(0.6f, (y - World.SEA_LEVEL) / 60.f);
                 fade = QuickMath.max(0.f, fade);
                 blockColor[0] = (1 - fade) * blockColor[0] + fade;
@@ -151,7 +151,7 @@ public class SurfaceLayer extends BitmapLayer {
 
           color = blend(color, blockColor);
 
-          if (block.isOpaque) {
+          if (block.opaque) {
             break;
           }
         }

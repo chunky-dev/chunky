@@ -44,13 +44,13 @@ public abstract class Material {
    * A block is opaque if it occupies an entire voxel
    * and no light can pass through it.
    */
-  public boolean isOpaque = false;
+  public boolean opaque = false;
 
   /**
    * The solid property controls various block behaviours like
    * if the block connects to fences, gates, walls, etc.
    */
-  public boolean isSolid = true;
+  public boolean solid = true;
 
   /**
    * The specular coefficient controlling how shiny the block appears.
@@ -63,7 +63,7 @@ public abstract class Material {
    * This is used for blocks that are rendered as entities,
    * and blocks that are not implemented yet.
    */
-  public boolean isInvisible = false;
+  public boolean invisible = false;
 
   /**
    * The amount of light the material emits.

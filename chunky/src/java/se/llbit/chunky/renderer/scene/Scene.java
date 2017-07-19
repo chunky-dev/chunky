@@ -847,17 +847,17 @@ public class Scene implements JsonSerializable, Refreshable {
               Block block = Block.get(blockId);
 
               if (cx > 0 && cx < 15 && cz > 0 && cz < 15 && cy > 0 && cy < 255 &&
-                  blockId != Block.STONE_ID && block.isOpaque) {
+                  blockId != Block.STONE_ID && block.opaque) {
 
                 // Set obscured blocks to stone. This makes adjacent obscured
                 // blocks be able to be merged into larger octree nodes
                 // even if they had different block types originally.
-                if (Block.get(blocks[index - 1]).isOpaque &&
-                    Block.get(blocks[index + 1]).isOpaque &&
-                    Block.get(blocks[index - Chunk.X_MAX]).isOpaque &&
-                    Block.get(blocks[index + Chunk.X_MAX]).isOpaque &&
-                    Block.get(blocks[index - Chunk.X_MAX * Chunk.Z_MAX]).isOpaque &&
-                    Block.get(blocks[index + Chunk.X_MAX * Chunk.Z_MAX]).isOpaque) {
+                if (Block.get(blocks[index - 1]).opaque &&
+                    Block.get(blocks[index + 1]).opaque &&
+                    Block.get(blocks[index - Chunk.X_MAX]).opaque &&
+                    Block.get(blocks[index + Chunk.X_MAX]).opaque &&
+                    Block.get(blocks[index - Chunk.X_MAX * Chunk.Z_MAX]).opaque &&
+                    Block.get(blocks[index + Chunk.X_MAX * Chunk.Z_MAX]).opaque) {
                   worldOctree.set(Block.STONE_ID, x, cy - origin.y, z);
                   continue;
                 }
@@ -875,7 +875,7 @@ public class Scene implements JsonSerializable, Refreshable {
                     // Is this the top vine block?
                     index = Chunk.chunkIndex(cx, cy + 1, cz);
                     Block above = Block.get(blocks[index]);
-                    if (above.isSolid) {
+                    if (above.solid) {
                       type = type | (1 << BlockData.VINE_TOP);
                     }
                   }
@@ -973,7 +973,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   break;
               }
               type |= metadata << 8;
-              if (block.isInvisible) {
+              if (block.invisible) {
                 type = 0;
               }
               worldOctree.set(type, cx + cp.x * 16 - origin.x, cy - origin.y, cz + cp.z * 16 - origin.z);

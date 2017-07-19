@@ -51,13 +51,13 @@ public class OctreeFinalizer {
 
           // Set non-visible blocks to be stone, in order to merge large patches.
           if ((cx == 0 || cx == 15 || cz == 0 || cz == 15) && cy > -origin.y
-              && cy < Chunk.Y_MAX - origin.y - 1 && type != Block.STONE_ID && block.isOpaque) {
-            if (Block.get(octree.get(x - 1, cy, z)).isOpaque && Block
-                .get(octree.get(x + 1, cy, z)).isOpaque && Block
-                .get(octree.get(x, cy - 1, z)).isOpaque && Block
-                .get(octree.get(x, cy + 1, z)).isOpaque && Block
-                .get(octree.get(x, cy, z - 1)).isOpaque && Block
-                .get(octree.get(x, cy, z + 1)).isOpaque) {
+              && cy < Chunk.Y_MAX - origin.y - 1 && type != Block.STONE_ID && block.opaque) {
+            if (Block.get(octree.get(x - 1, cy, z)).opaque && Block
+                .get(octree.get(x + 1, cy, z)).opaque && Block
+                .get(octree.get(x, cy - 1, z)).opaque && Block
+                .get(octree.get(x, cy + 1, z)).opaque && Block
+                .get(octree.get(x, cy, z - 1)).opaque && Block
+                .get(octree.get(x, cy, z + 1)).opaque) {
               octree.set(Block.STONE_ID, x, cy, z);
               continue;
             }
@@ -111,7 +111,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner3 += level;
@@ -122,7 +122,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner0 += level;
@@ -132,7 +132,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner0 += level;
@@ -143,7 +143,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner1 += level;
@@ -153,7 +153,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner1 += level;
@@ -164,7 +164,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner2 += level;
@@ -174,7 +174,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner2 += level;
@@ -185,7 +185,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.WATER_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner3 += level;
@@ -216,7 +216,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner3 += level;
@@ -227,7 +227,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner0 += level;
@@ -237,7 +237,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner0 += level;
@@ -248,7 +248,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner1 += level;
@@ -258,7 +258,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner1 += level;
@@ -269,7 +269,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner2 += level;
@@ -279,7 +279,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner2 += level;
@@ -290,7 +290,7 @@ public class OctreeFinalizer {
               if ((data & 0xFF) == Block.LAVA_ID) {
                 fullBlock = (data >> WaterModel.FULL_BLOCK) & 1;
                 level = 8 - (1 - fullBlock) * (7 & (data >> 8));
-              } else if (!Block.get(data).isSolid) {
+              } else if (!Block.get(data).solid) {
                 level = 0;
               }
               corner3 += level;
@@ -326,25 +326,25 @@ public class OctreeFinalizer {
 
               if (above == Block.AIR) {
                 int westAbove = 0xFF & octree.get(x - 1, cy + 1, z);
-                if (west.isSolid && westAbove == Block.REDSTONEWIRE_ID) {
+                if (west.solid && westAbove == Block.REDSTONEWIRE_ID) {
                   // Wire on west block side.
                   type |= 1 << BlockData.RSW_WEST_CONNECTION;
                   type |= 1 << BlockData.RSW_WEST_SIDE;
                 }
                 int eastAbove = 0xFF & octree.get(x + 1, cy + 1, z);
-                if (east.isSolid && eastAbove == Block.REDSTONEWIRE_ID) {
+                if (east.solid && eastAbove == Block.REDSTONEWIRE_ID) {
                   // Wire on east block side.
                   type |= 1 << BlockData.RSW_EAST_CONNECTION;
                   type |= 1 << BlockData.RSW_EAST_SIDE;
                 }
                 int northAbove = 0xFF & octree.get(x, cy + 1, z - 1);
-                if (north.isSolid && northAbove == Block.REDSTONEWIRE_ID) {
+                if (north.solid && northAbove == Block.REDSTONEWIRE_ID) {
                   // Wire on north block side.
                   type |= 1 << BlockData.RSW_NORTH_CONNECTION;
                   type |= 1 << BlockData.RSW_NORTH_SIDE;
                 }
                 int southAbove = 0xFF & octree.get(x, cy + 1, z + 1);
-                if (south.isSolid && southAbove == Block.REDSTONEWIRE_ID) {
+                if (south.solid && southAbove == Block.REDSTONEWIRE_ID) {
                   // Wire on south block side.
                   type |= 1 << BlockData.RSW_SOUTH_CONNECTION;
                   type |= 1 << BlockData.RSW_SOUTH_SIDE;
