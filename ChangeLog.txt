@@ -13,6 +13,7 @@
     * Glazed Terracotta
     * Concrete
     * Concrete Powder
+    * Beetroots
 * Made block material properties configurable per-scene.
 * Modified specular reflection rendering.
 

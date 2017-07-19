@@ -545,6 +545,12 @@ public class Texture {
   public static final Texture concretePowderWhite = new Texture();
   public static final Texture concretePowderYellow = new Texture();
 
+  // [1.12] Beetroots:
+  public static final Texture beets0 = new Texture();
+  public static final Texture beets1 = new Texture();
+  public static final Texture beets2 = new Texture();
+  public static final Texture beets3 = new Texture();
+
   /**
    * Missing or unknown texture.
    */

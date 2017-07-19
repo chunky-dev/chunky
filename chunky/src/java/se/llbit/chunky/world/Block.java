@@ -1413,9 +1413,10 @@ public class Block extends Material {
   };
   public static final int CARROTS_ID = 0x8D;
   public static final Block CARROTS = new Block(CARROTS_ID, "block:carrots", Texture.carrots3) {
-    final Texture[] texture =
-        {Texture.carrots0, Texture.carrots0, Texture.carrots1, Texture.carrots1, Texture.carrots2,
-            Texture.carrots2, Texture.carrots2, Texture.carrots3};
+    final Texture[] texture = {
+        Texture.carrots0, Texture.carrots0, Texture.carrots1, Texture.carrots1, Texture.carrots2,
+        Texture.carrots2, Texture.carrots2, Texture.carrots3
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
       return CropsModel.intersect(ray, texture[ray.getBlockData() % 8]);
@@ -2043,7 +2044,15 @@ public class Block extends Material {
   };
   public static final int ENDBRICKS_ID = 0xCE;
   public static final Block ENDBRICKS = new Block(ENDBRICKS_ID, "block:end_bricks", Texture.endBricks);
-  public static final Block BEETROOTS = new Block(0xCF, "block:beetroots", Texture.unknown);
+  public static final Block BEETROOTS = new Block(0xCF, "block:beetroots", Texture.beets3) {
+    final Texture[] texture = {
+        Texture.beets0, Texture.beets1, Texture.beets2, Texture.beets3
+    };
+
+    @Override public boolean intersect(Ray ray, Scene scene) {
+      return CropsModel.intersect(ray, texture[ray.getBlockData() % 4]);
+    }
+  };
   public static final int GRASSPATH_ID = 0xD0;
   public static final Block GRASSPATH = new Block(GRASSPATH_ID, "block:grass_path", Texture.grassPathTop) {
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -2880,6 +2889,7 @@ public class Block extends Material {
     PURPURSLAB.localIntersect = true;
     ENDBRICKS.opaque = true;
     BEETROOTS.solid = false;
+    BEETROOTS.localIntersect = true;
     GRASSPATH.solid = false;
     GRASSPATH.localIntersect = true;
     END_GATEWAY.solid = false;
@@ -2967,7 +2977,6 @@ public class Block extends Material {
     // TODO: render these:
     STANDING_BANNER.invisible = UNKNOWN_INVISIBLE;
     WALL_BANNER.invisible = UNKNOWN_INVISIBLE;
-    BEETROOTS.invisible = UNKNOWN_INVISIBLE;
     END_GATEWAY.invisible = UNKNOWN_INVISIBLE;
     STRUCTURE_BLOCK.invisible = UNKNOWN_INVISIBLE; // TODO: render this.
 

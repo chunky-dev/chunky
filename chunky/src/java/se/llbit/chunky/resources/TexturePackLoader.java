@@ -1813,6 +1813,20 @@ public class TexturePackLoader {
     allTextures.put("concrete_powder_yellow",
         new SimpleTexture("assets/minecraft/textures/blocks/concrete_powder_yellow",
             Texture.concretePowderYellow));
+
+    // [1.12] Beetroots:
+    allTextures.put("beetroots_stage_0",
+        new SimpleTexture("assets/minecraft/textures/blocks/beetroots_stage_0",
+            Texture.beets0));
+    allTextures.put("beetroots_stage_1",
+        new SimpleTexture("assets/minecraft/textures/blocks/beetroots_stage_1",
+            Texture.beets1));
+    allTextures.put("beetroots_stage_2",
+        new SimpleTexture("assets/minecraft/textures/blocks/beetroots_stage_2",
+            Texture.beets2));
+    allTextures.put("beetroots_stage_3",
+        new SimpleTexture("assets/minecraft/textures/blocks/beetroots_stage_3",
+            Texture.beets3));
   }
 
   private static String texturePackName(File tpFile) {
