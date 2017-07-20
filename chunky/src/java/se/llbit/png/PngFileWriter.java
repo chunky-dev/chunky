@@ -54,9 +54,10 @@ public class PngFileWriter implements AutoCloseable {
   }
 
   /**
-   * @throws IOException
+   * Writes the IEND chunk and closes the stream.
    */
   @Override public void close() throws IOException {
+    writeChunk(new IEND());
     out.close();
   }
 

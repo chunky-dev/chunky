@@ -1656,7 +1656,6 @@ public class Scene implements JsonSerializable, Refreshable {
         ITXT iTXt = new ITXT("XML:com.adobe.xmp", xmp);
         writer.writeChunk(iTXt);
       }
-      writer.writeChunk(new IEND());
     } catch (IOException e) {
       Log.warn("Failed to write PNG file: " + targetFile.getAbsolutePath(), e);
     }
