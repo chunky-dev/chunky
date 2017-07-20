@@ -16,13 +16,6 @@
  */
 package se.llbit.chunky.world.entity;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
 import se.llbit.chunky.world.Material;
@@ -38,8 +31,15 @@ import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
-import se.llbit.nbt.Tag;
 import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.Tag;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class SignEntity extends Entity {
 
@@ -186,9 +186,10 @@ public class SignEntity extends Entity {
    * @return array of text lines.
    */
   protected static JsonArray[] getTextLines(CompoundTag entityTag) {
-    return new JsonArray[] {extractText(entityTag.get("Text1")),
-        extractText(entityTag.get("Text2")), extractText(entityTag.get("Text3")),
-        extractText(entityTag.get("Text4")),};
+    return new JsonArray[] {
+        extractText(entityTag.get("Text1")), extractText(entityTag.get("Text2")),
+        extractText(entityTag.get("Text3")), extractText(entityTag.get("Text4")),
+    };
   }
 
   /**
@@ -197,9 +198,7 @@ public class SignEntity extends Entity {
   private static JsonArray extractText(Tag tag) {
     JsonArray array = new JsonArray();
     String data = tag.stringValue("");
-    if (data.startsWith("\"")) {
-      addText(array, data.substring(1, data.length() - 1));
-    } else {
+    if (data.startsWith("{")) {
       JsonParser parser = new JsonParser(new ByteArrayInputStream(data.getBytes()));
       try {
         JsonValue value = parser.parse();
@@ -223,6 +222,10 @@ public class SignEntity extends Entity {
         }
       } catch (IOException | SyntaxError e) {
       }
+    } else if (data.startsWith("\"")) {
+      addText(array, data.substring(1, data.length() - 1));
+    } else {
+      addText(array, data);
     }
     return array;
   }
