@@ -25,7 +25,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.SimpleColorPicker?>
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.llbit.chunky.ui.ChunkyFxController">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.llbit.chunky.ui.ChunkyFxController">
    <children>
       <BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
          <top>
@@ -192,7 +192,12 @@
                                     <VBox layoutX="40.0" layoutY="-13.0" spacing="10.0">
                                        <children>
                                           <Button fx:id="clearSelectionBtn2" mnemonicParsing="false" text="Clear Selection" />
-                                          <Button fx:id="newSceneBtn" mnemonicParsing="false" text="New Scene" />
+                                          <HBox alignment="BASELINE_LEFT" spacing="10.0">
+                                             <children>
+                                                <Button fx:id="newSceneBtn" mnemonicParsing="false" text="New Scene" />
+                                                <Label text="(Select chunks in the map first!)" />
+                                             </children>
+                                          </HBox>
                                           <Button fx:id="loadSceneBtn" mnemonicParsing="false" text="Load Scene" />
                                           <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open Scene Directory" />
                                           <Button fx:id="changeSceneDirBtn" mnemonicParsing="false" text="Change Scene Directory" />
