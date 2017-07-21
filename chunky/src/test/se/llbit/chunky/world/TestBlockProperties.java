@@ -146,6 +146,10 @@ public class TestBlockProperties {
     assertEquals(false, Block.LEAVES.isStoneWallConnector(0, 0));
     assertEquals(false, Block.LEAVES2.isStoneWallConnector(0, 0));
 
+    // Stone walls should not connect to glass blocks.
+    assertEquals(false, Block.GLASS.isStoneWallConnector(0, 0));
+    assertEquals(false, Block.STAINED_GLASS.isStoneWallConnector(0, 0));
+
     // Glass panes should not connect to leaf blocks.
     assertEquals(false, Block.LEAVES.isGlassPaneConnector(0, 0));
     assertEquals(false, Block.LEAVES2.isGlassPaneConnector(0, 0));

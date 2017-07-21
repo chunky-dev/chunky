@@ -525,8 +525,13 @@ public class OctreeFinalizer {
                 type |= 1 << BlockData.STONEWALL_CORNER;
               } else if (cy + 1 < Chunk.Y_MAX) {
                 otherId = (0xFF & octree.get(x, cy + 1, z));
+                other = Block.get(otherId);
+                // TODO(llbit): make this less hard-coded?
                 if (otherId == Block.TORCH_ID || otherId == Block.REDSTONETORCHON_ID
-                    || otherId == Block.REDSTONETORCHOFF_ID) {
+                    || otherId == Block.REDSTONETORCHOFF_ID
+                    || other.isWater()
+                    || other.isLava()
+                    || other.solid) {
                   type |= 1 << BlockData.STONEWALL_CORNER;
                 }
               }

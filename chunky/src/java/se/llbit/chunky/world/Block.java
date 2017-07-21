@@ -343,6 +343,10 @@ public class Block extends Material {
     @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
       return false;
     }
+
+    @Override public boolean isStoneWallConnector(int data, int direction) {
+      return false;
+    }
   };
   public static final int LAPIS_ORE_ID = 0x15;
   public static final Block LAPIS_ORE =
@@ -925,6 +929,10 @@ public class Block extends Material {
     @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
       return false;
     }
+
+    @Override public boolean isStoneWallConnector(int data, int direction) {
+      return false;
+    }
   };
   public static final int TRAPDOOR_ID = 0x60;
   public static final Block TRAPDOOR = new Block(TRAPDOOR_ID, "block:trapdoor", Texture.trapdoor) {
@@ -1429,7 +1437,7 @@ public class Block extends Material {
   };
   public static final int STONEWALL_ID = 0x8B;
   public static final Block STONEWALL = new Block(STONEWALL_ID, "block:cobblestone_wall", Texture.unknown) {
-    final Texture[] texture = {Texture.cobblestone, Texture.mossStone};
+    final Texture[] texture = { Texture.cobblestone, Texture.mossStone };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StoneWallModel.intersect(ray, texture[ray.getBlockData() & 1]);
