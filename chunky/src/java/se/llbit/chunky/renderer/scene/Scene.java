@@ -60,7 +60,6 @@ import se.llbit.math.Vector3i;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
-import se.llbit.png.IEND;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
 import se.llbit.tiff.TiffFileWriter;
@@ -796,7 +795,10 @@ public class Scene implements JsonSerializable, Refreshable {
 
         // Load entities from the chunk:
         for (CompoundTag tag : chunkEntities) {
-          if (tag.get("id").stringValue("").equals("Painting")) {
+          // Before 1.12 paintings had id=Painting.
+          // After 1.12 paintings had id=minecraft:painting.
+          if (tag.get("id").stringValue("").equals("minecraft:painting")
+              || tag.get("id").stringValue("").equals("Painting")) {
             ListTag pos = (ListTag) tag.get("Pos");
             double x = pos.get(0).doubleValue();
             double y = pos.get(1).doubleValue();
