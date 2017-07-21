@@ -66,6 +66,7 @@ import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.fxutil.GroupedChangeListener;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
 import java.awt.Desktop;
@@ -509,7 +510,10 @@ public class ChunkyFxController
 
     // Load selected chunks.
     Collection<ChunkPosition> selection = mapLoader.getChunkSelection().getSelection();
-    if (!selection.isEmpty()) {
+    if (selection.isEmpty()) {
+      chunky.getSceneManager().getScene().camera().setView(0.0, QuickMath.degToRad(-68.0), 0.0);
+      chunky.getSceneManager().getScene().camera().setPosition(new Vector3(0, 84, 0));
+    } else {
       chunky.getSceneManager().loadFreshChunks(mapLoader.getWorld(), selection);
     }
   }
