@@ -72,6 +72,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.ResourceBundle;
 
@@ -174,6 +175,7 @@ public class ChunkyFxController
 
   private RenderControlsFx controls = null;
   private Stage stage;
+  private Path prevPngDir = null;
 
   public ChunkyFxController() {
     mapLoader = new WorldMapLoader(this);
@@ -290,9 +292,17 @@ public class ChunkyFxController
       fileChooser
           .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("PNG images", "*.png"));
       fileChooser.setInitialFileName(String.format("%s.png", mapLoader.getWorldName()));
+      if (prevPngDir != null) {
+        fileChooser.setInitialDirectory(prevPngDir.toFile());
+      }
       File target = fileChooser.showSaveDialog(stage);
       if (target != null) {
-        map.renderView(target, ProgressTracker.NONE);
+        Path path = target.toPath();
+        if (!target.getName().endsWith(".png")) {
+          path = path.resolveSibling(target.getName() + ".png");
+        }
+        prevPngDir = path.getParent();
+        map.renderView(path.toFile(), ProgressTracker.NONE);
       }
     });
 

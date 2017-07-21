@@ -281,6 +281,9 @@ public class MapBuffer {
     updateActiveTiles(view, true);
   }
 
+  /**
+   * Write the map to a PNG image.
+   */
   public synchronized void renderPng(File targetFile) throws IOException {
     int width = view.width;
     int height = view.height;
