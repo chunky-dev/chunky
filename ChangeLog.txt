@@ -1,11 +1,13 @@
-1.4.3 - TBD
+1.4.3 - 2017-07-22
 
-* Added plugin manager in launcher.
-* Improved resource pack handling - assets folder can be found inside
-  top-level folder with the same name as the resource pack.
-* Modified fog rendering to blend better with the sky near the horizon.
-* Added simulated fog overlay to the sky near horizon.
-* The Minecraft block ID is now displayed in the block info tooltip.
+* Various small UI improvements and bug fixes.
+* Improved the way fences, stone walls, glass panes, and iron bars
+  connect to other blocks.
+* Added plugin manager in the launcher, among the advanced settings.
+* The Plugin API now expects plugins to provide metadata.
+* Made resource pack loading more flexible.
+* Fog is now blended with the sky near the horizon.
+* Minecraft block IDs are now displayed in the block info tooltip.
 * Improved error handling for skymap loading.
     * Added -f option to ignore headless skymap loading errors.
 * Fixed incorrect top texture for inverted daylight sensors.
