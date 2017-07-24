@@ -19,7 +19,7 @@ package se.llbit.chunky.renderer.scene;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;

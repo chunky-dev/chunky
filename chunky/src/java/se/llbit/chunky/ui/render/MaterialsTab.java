@@ -32,7 +32,7 @@ import javafx.scene.layout.VBox;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.Material;
 
 import java.net.URL;

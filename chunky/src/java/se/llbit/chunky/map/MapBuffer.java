@@ -22,7 +22,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.paint.Color;
 import se.llbit.chunky.ui.MapViewMode;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.png.PngFileWriter;

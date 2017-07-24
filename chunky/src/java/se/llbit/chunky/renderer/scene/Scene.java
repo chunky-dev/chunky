@@ -29,7 +29,7 @@ import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.world.Biomes;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;

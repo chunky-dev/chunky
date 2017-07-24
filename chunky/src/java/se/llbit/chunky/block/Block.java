@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2017 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -14,12 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world;
+package se.llbit.chunky.block;
 
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.block.Fence;
-import se.llbit.chunky.block.FenceGate;
-import se.llbit.chunky.block.Stairs;
 import se.llbit.chunky.model.AnvilModel;
 import se.llbit.chunky.model.BeaconModel;
 import se.llbit.chunky.model.BedModel;
@@ -88,6 +85,8 @@ import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.model.WoodModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.Icon;
+import se.llbit.chunky.world.Material;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Ray;

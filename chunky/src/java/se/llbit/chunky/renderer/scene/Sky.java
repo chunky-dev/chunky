@@ -20,7 +20,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.resources.HDRTexture;
 import se.llbit.chunky.resources.PFMTexture;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.SkymapTexture;
 import se.llbit.json.Json;

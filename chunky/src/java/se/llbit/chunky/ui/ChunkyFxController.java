@@ -56,7 +56,7 @@ import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.ui.render.RenderControlsFx;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionListener;
 import se.llbit.chunky.world.ChunkView;

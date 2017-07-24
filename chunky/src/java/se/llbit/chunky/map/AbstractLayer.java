@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.map;
 
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Heightmap;
 

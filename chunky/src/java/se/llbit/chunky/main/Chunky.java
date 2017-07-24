@@ -40,7 +40,7 @@ import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Level;

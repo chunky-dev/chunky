@@ -23,7 +23,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 
 import java.util.Collections;
 

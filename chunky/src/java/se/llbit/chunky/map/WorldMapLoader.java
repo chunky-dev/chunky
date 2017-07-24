@@ -27,7 +27,7 @@ import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.ui.ChunkyFxController;
 import se.llbit.chunky.ui.MapViewMode;
 import se.llbit.chunky.ui.ProgressTracker;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;

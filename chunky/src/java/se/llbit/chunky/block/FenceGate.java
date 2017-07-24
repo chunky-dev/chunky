@@ -18,7 +18,6 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Block;
 import se.llbit.chunky.world.BlockData;
 
 public class FenceGate extends Block {

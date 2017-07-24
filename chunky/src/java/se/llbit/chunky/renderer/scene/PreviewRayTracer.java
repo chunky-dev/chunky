@@ -17,7 +17,7 @@
 package se.llbit.chunky.renderer.scene;
 
 import se.llbit.chunky.renderer.WorkerState;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 

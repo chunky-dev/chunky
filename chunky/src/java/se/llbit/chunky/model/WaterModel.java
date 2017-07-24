@@ -19,7 +19,7 @@ package se.llbit.chunky.model;
 import java.util.List;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.DoubleSidedQuad;

@@ -25,7 +25,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.Material;
 
 /**

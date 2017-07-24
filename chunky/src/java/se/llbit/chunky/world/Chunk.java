@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
 import se.llbit.chunky.map.BlockLayer;

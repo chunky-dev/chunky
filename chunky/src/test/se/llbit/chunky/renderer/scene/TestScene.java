@@ -18,7 +18,7 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.junit.Test;
-import se.llbit.chunky.world.Block;
+import se.llbit.chunky.block.Block;
 
 public class TestScene {
   /**

@@ -19,6 +19,7 @@ package se.llbit.chunky.world;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import se.llbit.chunky.block.Block;
 
 import static org.junit.Assert.assertEquals;
 
