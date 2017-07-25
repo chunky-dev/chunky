@@ -18,6 +18,9 @@
     * Beetroots
 * Made block material properties configurable per-scene.
 * Modified specular reflection rendering.
+* Added two new post-processors
+    * Hable tone mapping
+    * ACES filmic tone mapping
 
 1.4.2 - 2017-01-15
 
