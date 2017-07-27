@@ -60,6 +60,7 @@ import se.llbit.math.Vector3i;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
+import se.llbit.nbt.Tag;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
 import se.llbit.tiff.TiffFileWriter;
@@ -112,15 +113,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
   /** Minimum canvas height. */
   public static final int MIN_CANVAS_HEIGHT = 20;
-
-
-  /** Default specular reflection coefficient. */
-  public static final float SPECULAR_COEFF = 0.04f;
-
-  /**
-   * Default water specular reflection coefficient.
-   */
-  public static final float WATER_SPECULAR = 0.12f;
 
   /**
    * Minimum exposure.
@@ -676,7 +668,11 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Load chunks into the Octree.
+   * Load chunks into the octree.
+   *
+   * <p>This is the main method loading all voxels into the octree.
+   * The octree finalizer is then run to compute block properties like fence
+   * connectedness.
    */
   public synchronized void loadChunks(TaskTracker progress, World world,
       Collection<ChunkPosition> chunksToLoad) {
@@ -759,8 +755,8 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
-    int ycutoff = PersistentSettings.getYCutoff();
-    ycutoff = Math.max(0, ycutoff);
+    int yMin = PersistentSettings.getYCutoff();
+    yMin = Math.max(0, yMin);
 
     Heightmap biomeIdMap = new Heightmap();
 
@@ -795,19 +791,25 @@ public class Scene implements JsonSerializable, Refreshable {
 
         // Load entities from the chunk:
         for (CompoundTag tag : chunkEntities) {
-          // Before 1.12 paintings had id=Painting.
-          // After 1.12 paintings had id=minecraft:painting.
-          if (tag.get("id").stringValue("").equals("minecraft:painting")
-              || tag.get("id").stringValue("").equals("Painting")) {
-            ListTag pos = (ListTag) tag.get("Pos");
+          Tag posTag = tag.get("Pos");
+          if (posTag.isList()) {
+            ListTag pos = posTag.asList();
             double x = pos.get(0).doubleValue();
             double y = pos.get(1).doubleValue();
             double z = pos.get(2).doubleValue();
-            ListTag rot = (ListTag) tag.get("Rotation");
-            double yaw = rot.get(0).floatValue();
-            //double pitch = rot.getItem(1).floatValue();
-            entities.add(
-                new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
+
+            if (y >= yMin) {
+              // Before 1.12 paintings had id=Painting.
+              // After 1.12 paintings had id=minecraft:painting.
+              if (tag.get("id").stringValue("").equals("minecraft:painting")
+                  || tag.get("id").stringValue("").equals("Painting")) {
+                ListTag rot = (ListTag) tag.get("Rotation");
+                double yaw = rot.get(0).floatValue();
+                //double pitch = rot.getItem(1).floatValue();
+                entities.add(
+                    new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
+              }
+            }
           }
         }
 
@@ -816,30 +818,32 @@ public class Scene implements JsonSerializable, Refreshable {
         // to match the name of these entities in the Minecraft world format.
         // Load tile entities.
         for (CompoundTag entityTag : tileEntities) {
-          int x = entityTag.get("x").intValue(0) - wx0;
           int y = entityTag.get("y").intValue(0);
-          int z = entityTag.get("z").intValue(0) - wz0;
-          int index = Chunk.chunkIndex(x, y, z);
-          int block = 0xFF & blocks[index];
-          // Metadata is the old block data (to be replaced in future Minecraft versions?).
-          int metadata = 0xFF & data[index / 2];
-          metadata >>= (x % 2) * 4;
-          metadata &= 0xF;
-          Vector3 position = new Vector3(x + wx0, y, z + wz0);
-          switch (block) {
-            case Block.WALLSIGN_ID:
-              entities.add(new WallSignEntity(position, entityTag, metadata));
-              break;
-            case Block.SIGNPOST_ID:
-              entities.add(new SignEntity(position, entityTag, metadata));
-              break;
-            case Block.HEAD_ID:
-              entities.add(new SkullEntity(position, entityTag, metadata));
-              break;
+          if (y >= yMin) {
+            int x = entityTag.get("x").intValue(0) - wx0;
+            int z = entityTag.get("z").intValue(0) - wz0;
+            int index = Chunk.chunkIndex(x, y, z);
+            int block = 0xFF & blocks[index];
+            // Metadata is the old block data (to be replaced in future Minecraft versions?).
+            int metadata = 0xFF & data[index / 2];
+            metadata >>= (x % 2) * 4;
+            metadata &= 0xF;
+            Vector3 position = new Vector3(x + wx0, y, z + wz0);
+            switch (block) {
+              case Block.WALLSIGN_ID:
+                entities.add(new WallSignEntity(position, entityTag, metadata));
+                break;
+              case Block.SIGNPOST_ID:
+                entities.add(new SignEntity(position, entityTag, metadata));
+                break;
+              case Block.HEAD_ID:
+                entities.add(new SkullEntity(position, entityTag, metadata));
+                break;
+            }
           }
         }
 
-        for (int cy = ycutoff; cy < 256; ++cy) {
+        for (int cy = yMin; cy < 256; ++cy) {
           for (int cz = 0; cz < 16; ++cz) {
             int z = cz + cp.z * 16 - origin.z;
             for (int cx = 0; cx < 16; ++cx) {
