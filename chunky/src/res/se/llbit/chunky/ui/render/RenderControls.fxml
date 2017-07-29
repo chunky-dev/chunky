@@ -26,7 +26,7 @@
   </TabPane>
   <HBox alignment="CENTER_LEFT" spacing="10.0">
     <IntegerAdjuster fx:id="targetSpp"/>
-    <Button fx:id="saveDefaultSpp" mnemonicParsing="false" text="Make default"/>
+    <Button fx:id="saveDefaultSpp" mnemonicParsing="false" text="Set default"/>
   </HBox>
   <HBox alignment="CENTER_LEFT" spacing="10.0">
     <Label text="Render:"/>

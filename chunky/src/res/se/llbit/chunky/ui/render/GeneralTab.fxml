@@ -35,7 +35,7 @@
             <Label fx:id="canvasSizeLbl" text="Canvas size:" />
             <ComboBox fx:id="canvasSize" />
             <Button fx:id="applySize" mnemonicParsing="false" text="Apply" />
-            <Button fx:id="makeDefaultSize" mnemonicParsing="false" text="Make default" />
+            <Button fx:id="makeDefaultSize" mnemonicParsing="false" text="Set default" />
           </children>
         </HBox>
         <HBox spacing="10.0">
@@ -56,7 +56,18 @@
           </children>
         </HBox>
         <CheckBox fx:id="saveSnapshots" mnemonicParsing="false" text="Save snapshot for each dump" />
-        <IntegerAdjuster fx:id="yCutoff" />
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+          <children>
+            <IntegerAdjuster fx:id="yMin" name="Y min clip" />
+            <Button fx:id="setDefaultYMin" mnemonicParsing="false" text="Set default" />
+          </children>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+          <children>
+            <IntegerAdjuster fx:id="yMax" name="Y max clip" />
+            <Button fx:id="setDefaultYMax" mnemonicParsing="false" text="Set default" />
+          </children>
+        </HBox>
       </children>
       <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

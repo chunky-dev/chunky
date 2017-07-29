@@ -76,6 +76,9 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
 
   @FXML private Button makeDefaultSize;
 
+  @FXML private Button setDefaultYMin;
+  @FXML private Button setDefaultYMax;
+
   @FXML private Button scale05;
 
   @FXML private Button scale15;
@@ -92,7 +95,9 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
 
   @FXML private ComboBox<Number> dumpFrequency;
 
-  @FXML private IntegerAdjuster yCutoff;
+  @FXML private IntegerAdjuster yMin;
+
+  @FXML private IntegerAdjuster yMax;
 
   private ChangeListener<String> canvasSizeListener =
       (observable, oldValue, newValue) -> updateCanvasSize();
@@ -115,7 +120,8 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
   }
 
   @Override public void update(Scene scene) {
-    yCutoff.set(PersistentSettings.getYCutoff());
+    yMin.set(scene.getYClipMin());
+    yMax.set(scene.getYClipMax());
     canvasSize.valueProperty().removeListener(canvasSizeListener);
     canvasSize.setValue(String.format("%dx%d", scene.width, scene.height));
     canvasSize.valueProperty().addListener(canvasSizeListener);
@@ -203,12 +209,17 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
     canvasSize.setEditable(true);
     canvasSize.getItems().addAll("400x400", "1024x768", "960x540", "1920x1080");
     canvasSize.valueProperty().addListener(canvasSizeListener);
-    yCutoff.setName("Y cutoff");
-    yCutoff.setTooltip(
-        "Blocks below the Y cutoff are not loaded. Requires reloading chunks to take effect.");
-    yCutoff.onValueChange(value -> {
-      PersistentSettings.setYCutoff(value);
-      attachTooltip("Reload the chunks for this to take effect.", yCutoff);
+    yMax.setTooltip(
+        "Blocks above this Y value are not loaded. Requires reloading chunks to take effect.");
+    yMax.onValueChange(value -> {
+      scene.setYClipMax(value);
+      attachTooltip("Reload the chunks for this to take effect.", yMax);
+    });
+    yMin.setTooltip(
+        "Blocks below this Y value are not loaded. Requires reloading chunks to take effect.");
+    yMin.onValueChange(value -> {
+      scene.setYClipMin(value);
+      attachTooltip("Reload the chunks for this to take effect.", yMax);
     });
     loadSceneBtn.setTooltip(new Tooltip("This replaces the current scene!"));
     loadSceneBtn.setGraphic(new ImageView(Icon.load.fxImage()));
@@ -238,6 +249,10 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
     makeDefaultSize.setTooltip(new Tooltip("Make the current canvas size the default."));
     makeDefaultSize.setOnAction(e -> PersistentSettings
         .set3DCanvasSize(scene.canvasWidth(), scene.canvasHeight()));
+    setDefaultYMin.setTooltip(new Tooltip("Make this the default lower Y clip plane."));
+    setDefaultYMin.setOnAction(e -> PersistentSettings.setYClipMin(yMin.get()));
+    setDefaultYMax.setTooltip(new Tooltip("Make this the default upper Y clip plane."));
+    setDefaultYMax.setOnAction(e -> PersistentSettings.setYClipMax(yMax.get()));
     scale15.setTooltip(new Tooltip("Halve canvas width and height."));
     scale05.setOnAction(e -> {
       int width = scene.canvasWidth() / 2;

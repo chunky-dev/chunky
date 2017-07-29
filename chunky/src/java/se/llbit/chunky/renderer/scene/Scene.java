@@ -104,7 +104,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public static final String EXTENSION = ".json";
 
   /** The current Scene Description Format (SDF) version. */
-  public static final int SDF_VERSION = 8;
+  public static final int SDF_VERSION = 9;
 
   protected static final double fSubSurface = 0.3;
 
@@ -263,6 +263,12 @@ public class Scene implements JsonSerializable, Refreshable {
 
   /** Material properties for this scene. */
   public Map<String, JsonValue> materials = new HashMap<>();
+
+  /** Lower Y clip plane. */
+  public int yClipMin = PersistentSettings.getYClipMin();
+
+  /** Upper Y clip plane. */
+  public int yClipMax = PersistentSettings.getYClipMax();
 
   private BVH bvh = new BVH(Collections.emptyList());
   private BVH actorBvh = new BVH(Collections.emptyList());
@@ -755,9 +761,6 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
-    int yMin = PersistentSettings.getYCutoff();
-    yMin = Math.max(0, yMin);
-
     Heightmap biomeIdMap = new Heightmap();
 
     try (TaskTracker.Task task = progress.task("Loading chunks")) {
@@ -798,7 +801,7 @@ public class Scene implements JsonSerializable, Refreshable {
             double y = pos.get(1).doubleValue();
             double z = pos.get(2).doubleValue();
 
-            if (y >= yMin) {
+            if (y >= yClipMin && y <= yClipMax) {
               // Before 1.12 paintings had id=Painting.
               // After 1.12 paintings had id=minecraft:painting.
               if (tag.get("id").stringValue("").equals("minecraft:painting")
@@ -819,7 +822,7 @@ public class Scene implements JsonSerializable, Refreshable {
         // Load tile entities.
         for (CompoundTag entityTag : tileEntities) {
           int y = entityTag.get("y").intValue(0);
-          if (y >= yMin) {
+          if (y >= yClipMin && y <= yClipMax) {
             int x = entityTag.get("x").intValue(0) - wx0;
             int z = entityTag.get("z").intValue(0) - wz0;
             int index = Chunk.chunkIndex(x, y, z);
@@ -843,7 +846,9 @@ public class Scene implements JsonSerializable, Refreshable {
           }
         }
 
-        for (int cy = yMin; cy < 256; ++cy) {
+        int yMin = Math.max(0, yClipMin);
+        int yMax = Math.min(256, yClipMax);
+        for (int cy = yMin; cy < yMax; ++cy) {
           for (int cz = 0; cz < 16; ++cz) {
             int z = cz + cp.z * 16 - origin.z;
             for (int cx = 0; cx < 16; ++cx) {
@@ -2248,6 +2253,8 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("name", name);
     json.add("width", width);
     json.add("height", height);
+    json.add("yClipMin", yClipMin);
+    json.add("yClipMax", yClipMax);
     json.add("exposure", exposure);
     json.add("postprocess", postprocess.name());
     json.add("outputMode", outputMode.name());
@@ -2495,6 +2502,9 @@ public class Scene implements JsonSerializable, Refreshable {
       height = newHeight;
       initBuffers();
     }
+
+    yClipMin = json.get("yClipMin").asInt(0);
+    yClipMax = json.get("yClipMax").asInt(256);
 
     exposure = json.get("exposure").doubleValue(exposure);
     postprocess = Postprocess.get(json.get("postprocess").stringValue(postprocess.name()));
@@ -2798,4 +2808,21 @@ public class Scene implements JsonSerializable, Refreshable {
       ray.color.z = (1 - fog) * ray.color.z + fog * fogColor.z;
     }
   }
+
+  public int getYClipMin() {
+    return yClipMin;
+  }
+
+  public void setYClipMin(int yClipMin) {
+    this.yClipMin = yClipMin;
+  }
+
+  public int getYClipMax() {
+    return yClipMax;
+  }
+
+  public void setYClipMax(int yClipMax) {
+    this.yClipMax = yClipMax;
+  }
+
 }

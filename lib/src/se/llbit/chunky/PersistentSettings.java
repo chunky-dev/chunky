@@ -128,13 +128,22 @@ public final class PersistentSettings {
     save();
   }
 
-  public static void setYCutoff(int value) {
-    settings.setInt("yCutoff", value);
+  public static void setYClipMax(int value) {
+    settings.setInt("yClipMax", value);
     save();
   }
 
-  public static int getYCutoff() {
-    return settings.getInt("yCutoff", 0);
+  public static int getYClipMax() {
+    return settings.getInt("yClipMax", 256);
+  }
+
+  public static void setYClipMin(int value) {
+    settings.setInt("yClipMin", value);
+    save();
+  }
+
+  public static int getYClipMin() {
+    return settings.getInt("yClipMin", 0);
   }
 
   /**

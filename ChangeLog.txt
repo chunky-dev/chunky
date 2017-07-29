@@ -1,6 +1,7 @@
 1.4.4 - TBD
 
-* The low Y clip plane now culls non-player entities.
+* Y clipping is now a per-scene setting, with an upper clip value.
+* The Y clip planes now cull non-player entities.
 
 1.4.3 - 2017-07-22
 
