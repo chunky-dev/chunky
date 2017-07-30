@@ -241,15 +241,19 @@ public class Chunky {
       String jarName = value.asString("");
       if (!jarName.isEmpty()) {
         Log.info("Loading plugin: " + value);
-        ChunkyPlugin.load(pluginsPath.resolve(jarName).toFile(), (plugin, manifest) -> {
-          try {
-            plugin.attach(this);
-          } catch (Throwable t) {
-            Log.error("Plugin " + jarName + " failed to load.", t);
-          }
-          Log.infof("Plugin loaded: %s %s", manifest.get("name").asString(""),
-              manifest.get("version").asString(""));
-        });
+        try {
+          ChunkyPlugin.load(pluginsPath.resolve(jarName).toRealPath().toFile(), (plugin, manifest) -> {
+            try {
+              plugin.attach(this);
+            } catch (Throwable t) {
+              Log.error("Plugin " + jarName + " failed to load.", t);
+            }
+            Log.infof("Plugin loaded: %s %s", manifest.get("name").asString(""),
+                manifest.get("version").asString(""));
+          });
+        } catch (Throwable t) {
+          Log.error("Plugin " + jarName + " failed to load.", t);
+        }
       }
     }
   }
