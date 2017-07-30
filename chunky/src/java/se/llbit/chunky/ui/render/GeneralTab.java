@@ -209,12 +209,14 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
     canvasSize.setEditable(true);
     canvasSize.getItems().addAll("400x400", "1024x768", "960x540", "1920x1080");
     canvasSize.valueProperty().addListener(canvasSizeListener);
+    yMax.setRange(0, 256);
     yMax.setTooltip(
         "Blocks above this Y value are not loaded. Requires reloading chunks to take effect.");
     yMax.onValueChange(value -> {
       scene.setYClipMax(value);
       attachTooltip("Reload the chunks for this to take effect.", yMax);
     });
+    yMin.setRange(0, 256);
     yMin.setTooltip(
         "Blocks below this Y value are not loaded. Requires reloading chunks to take effect.");
     yMin.onValueChange(value -> {
