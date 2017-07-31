@@ -31,7 +31,7 @@ import java.util.zip.ZipFile;
  */
 public class SimpleTexture extends TextureLoader {
 
-  private final String file;
+  public final String file;
   protected Texture texture;
 
   public SimpleTexture(String file, Texture texture) {
@@ -64,4 +64,7 @@ public class SimpleTexture extends TextureLoader {
     return load(topLevelDir + file, texturePack);
   }
 
+  @Override public String toString() {
+    return "texture:" + file;
+  }
 }
