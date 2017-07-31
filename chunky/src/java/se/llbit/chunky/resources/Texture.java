@@ -608,6 +608,23 @@ public class Texture {
   public static final Texture acaciaDoorBottom = new Texture();
   public static final Texture darkOakDoorBottom = new Texture();
 
+  public static final Texture bedWhite = new Texture();
+  public static final Texture bedOrange = new Texture();
+  public static final Texture bedMagenta = new Texture();
+  public static final Texture bedLightBlue = new Texture();
+  public static final Texture bedYellow = new Texture();
+  public static final Texture bedLime = new Texture();
+  public static final Texture bedPink = new Texture();
+  public static final Texture bedGray = new Texture();
+  public static final Texture bedSilver = new Texture();
+  public static final Texture bedCyan = new Texture();
+  public static final Texture bedPurple = new Texture();
+  public static final Texture bedBlue = new Texture();
+  public static final Texture bedBrown = new Texture();
+  public static final Texture bedGreen = new Texture();
+  public static final Texture bedRed = new Texture();
+  public static final Texture bedBlack = new Texture();
+
   // All the wool variants, ordered after block ID.
   public static final Texture[] wool = {
       whiteWool, orangeWool, magentaWool, lightBlueWool, yellowWool, limeWool, pinkWool, grayWool,

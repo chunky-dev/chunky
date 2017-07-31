@@ -238,7 +238,6 @@ public class World implements Comparable<World> {
           try (DataInputStream in = new DataInputStream(
               new GZIPInputStream(new FileInputStream(player)))) {
             playerEntities.add(new PlayerEntityData(NamedTag.read(in).unpack()));
-            in.close();
           } catch (IOException e) {
             Log.infof("Could not read player data file '%s'", player.getAbsolutePath());
           }

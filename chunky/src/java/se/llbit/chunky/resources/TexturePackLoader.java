@@ -1827,6 +1827,39 @@ public class TexturePackLoader {
     allTextures.put("beetroots_stage_3",
         new SimpleTexture("assets/minecraft/textures/blocks/beetroots_stage_3",
             Texture.beets3));
+
+    allTextures.put("bed_white",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/white", Texture.bedWhite));
+    allTextures.put("bed_orange",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/orange", Texture.bedOrange));
+    allTextures.put("bed_magenta",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/magenta", Texture.bedMagenta));
+    allTextures.put("bed_light_blue",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/light_blue", Texture.bedLightBlue));
+    allTextures.put("bed_yellow",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/yellow", Texture.bedYellow));
+    allTextures.put("bed_lime",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/lime", Texture.bedLime));
+    allTextures.put("bed_pink",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/pink", Texture.bedPink));
+    allTextures.put("bed_gray",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/gray", Texture.bedGray));
+    allTextures.put("bed_silver",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/silver", Texture.bedSilver));
+    allTextures.put("bed_cyan",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/cyan", Texture.bedCyan));
+    allTextures.put("bed_purple",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/purple", Texture.bedPurple));
+    allTextures.put("bed_blue",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/blue", Texture.bedBlue));
+    allTextures.put("bed_brown",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/brown", Texture.bedBrown));
+    allTextures.put("bed_green",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/green", Texture.bedGreen));
+    allTextures.put("bed_red",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/red", Texture.bedRed));
+    allTextures.put("bed_black",
+        new SimpleTexture("assets/minecraft/textures/entity/bed/black", Texture.bedBlack));
   }
 
   private static String texturePackName(File tpFile) {

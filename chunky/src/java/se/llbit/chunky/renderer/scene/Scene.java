@@ -763,6 +763,9 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Heightmap biomeIdMap = new Heightmap();
 
+    int yMin = Math.max(0, yClipMin);
+    int yMax = Math.min(256, yClipMax);
+
     try (TaskTracker.Task task = progress.task("Loading chunks")) {
       int done = 1;
       int target = chunksToLoad.size();
@@ -781,7 +784,7 @@ public class Scene implements JsonSerializable, Refreshable {
         world.getChunk(cp).getBlockData(blocks, data, biomes, tileEntities, chunkEntities);
         numChunks += 1;
 
-        int wx0 = cp.x * 16;
+        int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
         int wz0 = cp.z * 16;
         for (int cz = 0; cz < 16; ++cz) {
           int wz = cz + wz0;
@@ -802,10 +805,10 @@ public class Scene implements JsonSerializable, Refreshable {
             double z = pos.get(2).doubleValue();
 
             if (y >= yClipMin && y <= yClipMax) {
-              // Before 1.12 paintings had id=Painting.
-              // After 1.12 paintings had id=minecraft:painting.
-              if (tag.get("id").stringValue("").equals("minecraft:painting")
-                  || tag.get("id").stringValue("").equals("Painting")) {
+              String id = tag.get("id").stringValue("");
+              if (id.equals("minecraft:painting") || id.equals("Painting")) {
+                // Before 1.12 paintings had id=Painting.
+                // After 1.12 paintings had id=minecraft:painting.
                 ListTag rot = (ListTag) tag.get("Rotation");
                 double yaw = rot.get(0).floatValue();
                 //double pitch = rot.getItem(1).floatValue();
@@ -816,38 +819,6 @@ public class Scene implements JsonSerializable, Refreshable {
           }
         }
 
-        // The name tileEntities is confusing, because the entities are usually
-        // referred to as "block entities". However, we keep the name tileEntities
-        // to match the name of these entities in the Minecraft world format.
-        // Load tile entities.
-        for (CompoundTag entityTag : tileEntities) {
-          int y = entityTag.get("y").intValue(0);
-          if (y >= yClipMin && y <= yClipMax) {
-            int x = entityTag.get("x").intValue(0) - wx0;
-            int z = entityTag.get("z").intValue(0) - wz0;
-            int index = Chunk.chunkIndex(x, y, z);
-            int block = 0xFF & blocks[index];
-            // Metadata is the old block data (to be replaced in future Minecraft versions?).
-            int metadata = 0xFF & data[index / 2];
-            metadata >>= (x % 2) * 4;
-            metadata &= 0xF;
-            Vector3 position = new Vector3(x + wx0, y, z + wz0);
-            switch (block) {
-              case Block.WALLSIGN_ID:
-                entities.add(new WallSignEntity(position, entityTag, metadata));
-                break;
-              case Block.SIGNPOST_ID:
-                entities.add(new SignEntity(position, entityTag, metadata));
-                break;
-              case Block.HEAD_ID:
-                entities.add(new SkullEntity(position, entityTag, metadata));
-                break;
-            }
-          }
-        }
-
-        int yMin = Math.max(0, yClipMin);
-        int yMax = Math.min(256, yClipMax);
         for (int cy = yMin; cy < yMax; ++cy) {
           for (int cz = 0; cz < 16; ++cz) {
             int z = cz + cp.z * 16 - origin.z;
@@ -987,7 +958,50 @@ public class Scene implements JsonSerializable, Refreshable {
               if (block.invisible) {
                 type = 0;
               }
-              worldOctree.set(type, cx + cp.x * 16 - origin.x, cy - origin.y, cz + cp.z * 16 - origin.z);
+              worldOctree.set(type,
+                  cx + cp.x * 16 - origin.x,
+                  cy - origin.y,
+                  cz + cp.z * 16 - origin.z);
+            }
+          }
+        }
+
+        // Block entities are also called "tile entities". These are extra bits of metadata
+        // about certain blocks or entities.
+        // Block entities are loaded after the base block data so that metadata can be updated.
+        for (CompoundTag entityTag : tileEntities) {
+          int y = entityTag.get("y").intValue(0);
+          if (y >= yClipMin && y <= yClipMax) {
+            int x = entityTag.get("x").intValue(0) - wx0; // Chunk-local coordinates.
+            int z = entityTag.get("z").intValue(0) - wz0;
+            int index = Chunk.chunkIndex(x, y, z);
+            int block = 0xFF & blocks[index];
+            // Metadata is the old block data (to be replaced in future Minecraft versions?).
+            int metadata = 0xFF & data[index / 2];
+            metadata >>= (x % 2) * 4;
+            metadata &= 0xF;
+            Vector3 position = new Vector3(x + wx0, y, z + wz0);
+            switch (block) {
+              case Block.WALLSIGN_ID:
+                entities.add(new WallSignEntity(position, entityTag, metadata));
+                break;
+              case Block.SIGNPOST_ID:
+                entities.add(new SignEntity(position, entityTag, metadata));
+                break;
+              case Block.HEAD_ID:
+                entities.add(new SkullEntity(position, entityTag, metadata));
+                break;
+              case Block.BED_ID:
+              {
+                // Set color metadata for the bed.
+                int ox = x + wx0 - origin.x;
+                int oy = y - origin.y;
+                int oz = z + wz0 - origin.z;
+                int voxel = worldOctree.get(ox, oy, oz);
+                voxel |= entityTag.get("color").intValue(0) << BlockData.BED_COLOR;
+                worldOctree.set(voxel, ox, oy, oz);
+              }
+              break;
             }
           }
         }

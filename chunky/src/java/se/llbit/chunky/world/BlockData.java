@@ -98,4 +98,6 @@ public interface BlockData {
   int CONNECTED_WEST = 8;
   int CONNECTED_ABOVE = 16;
   int CONNECTED_BELOW = 32;
+
+  int BED_COLOR = 16;
 }
