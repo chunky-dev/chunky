@@ -21,7 +21,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
@@ -33,12 +32,15 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.TexturePackLoader;
 
 import java.io.File;
 
 public class ResourceLoadOrderEditor extends Stage {
   private final ListView<String> pathList = new ListView<>();
+
+  private static File prevDir = null;
 
   public ResourceLoadOrderEditor() {
     VBox content = new VBox();
@@ -76,38 +78,33 @@ public class ResourceLoadOrderEditor extends Stage {
         pathList.getSelectionModel().select(index + 1);
       }
     });
-    Button removeResourcePack = new Button("-");
+    Button removeResourcePack = new Button("Remove");
     removeResourcePack.setOnAction(event -> {
       int index = pathList.getSelectionModel().getSelectedIndex();
       if (index >= 0 && index < pathList.getItems().size()) {
         pathList.getItems().remove(index);
       }
     });
-    Button addResourcePack = new Button("+");
+    Button addResourcePack = new Button("Add");
     addResourcePack.setOnAction(event -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Choose Resource Pack");
       fileChooser.setSelectedExtensionFilter(
           new FileChooser.ExtensionFilter("Resource Packs", "*.zip"));
-      if (!pathList.getItems().isEmpty()) {
-        String path = pathList.getItems().get(0);
-        File resourcePack = new File(path);
-        if (resourcePack.isDirectory()) {
-          fileChooser.setInitialDirectory(resourcePack);
-        } else if (resourcePack.isFile() && resourcePack.getParentFile() != null) {
-          fileChooser.setInitialDirectory(resourcePack.getParentFile());
-        }
-      }
+      setInitialDirectory(fileChooser);
       File resourcePack = fileChooser.showOpenDialog(this);
       if (resourcePack != null) {
+        prevDir = resourcePack.getParentFile();
         pathList.getItems().add(resourcePack.getAbsolutePath());
       }
     });
-    buttons.getChildren().addAll(up, down, removeResourcePack, addResourcePack, apply);
+    buttons.getChildren().addAll(up, down, addResourcePack, removeResourcePack, apply);
     Label label = new Label("Resource packs (loaded from top to bottom):");
     String resourcePacks = PersistentSettings.getLastTexturePack();
     for (String path : resourcePacks.split(File.pathSeparator)) {
-      pathList.getItems().add(path);
+      if (!path.isEmpty()) {
+        pathList.getItems().add(path);
+      }
     }
     content.getChildren().addAll(label, pathList, buttons);
     setScene(new Scene(content));
@@ -119,5 +116,33 @@ public class ResourceLoadOrderEditor extends Stage {
         hide();
       }
     });
+  }
+
+  private void setInitialDirectory(FileChooser fileChooser) {
+    // First try to use the previously used (in the current session) resource packs directory:
+    if (prevDir != null) {
+      fileChooser.setInitialDirectory(prevDir);
+      return;
+    }
+    // Try to set the initial directory to the top resource pack directory:
+    if (!pathList.getItems().isEmpty()) {
+      String path = pathList.getItems().get(0);
+      File resourcePack = new File(path);
+      if (resourcePack.isDirectory()) {
+        fileChooser.setInitialDirectory(resourcePack);
+        return;
+      } else if (resourcePack.isFile() && resourcePack.getParentFile() != null) {
+        fileChooser.setInitialDirectory(resourcePack.getParentFile());
+        return;
+      }
+    }
+    // Try to set the default Minecraft resource packs directory:
+    File mcDir = MinecraftFinder.getMinecraftDirectory();
+    if (mcDir != null && mcDir.isDirectory()) {
+      File packsDir = new File(mcDir, "resourcepacks");
+      if (packsDir.isDirectory()) {
+        fileChooser.setInitialDirectory(packsDir);
+      }
+    }
   }
 }
