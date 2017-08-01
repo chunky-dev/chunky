@@ -951,6 +951,11 @@ public class Scene implements JsonSerializable, Refreshable {
                   break;
                 }
 
+                case Block.BED_ID:
+                  // Set default bed color (for pre-1.12 worlds).
+                  type |= BlockData.COLOR_RED << BlockData.BED_COLOR;
+                  break;
+
                 default:
                   break;
               }
@@ -998,7 +1003,8 @@ public class Scene implements JsonSerializable, Refreshable {
                 int oy = y - origin.y;
                 int oz = z + wz0 - origin.z;
                 int voxel = worldOctree.get(ox, oy, oz);
-                voxel |= entityTag.get("color").intValue(0) << BlockData.BED_COLOR;
+                voxel = (voxel & 0xFFFF)
+                    | (entityTag.get("color").intValue(0) << BlockData.BED_COLOR);
                 worldOctree.set(voxel, ox, oy, oz);
               }
               break;

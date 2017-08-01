@@ -52,7 +52,7 @@ public class BedModel {
           new Vector3(0, 3 / 16.0, 0),
           new Vector3(16 / 16.0, 9 / 16.0, 0),
           new Vector4(22 / 64.0, 38 / 64.0, 42 / 64.0, 36 / 64.0)),
-      // cube3
+      // Leg 1 (left when facing back end):
       new Quad(
           new Vector3(16 / 16.0, 0, 3 / 16.0),
           new Vector3(13 / 16.0, 0, 3 / 16.0),
@@ -62,23 +62,23 @@ public class BedModel {
           new Vector3(16 / 16.0, 0, 3 / 16.0),
           new Vector3(16 / 16.0, 0, 0),
           new Vector3(16 / 16.0, 3 / 16.0, 3 / 16.0),
-          new Vector4(50 / 64.0, 53 / 64.0, 49 / 64.0, 46 / 64.0)),
+          new Vector4(50 / 64.0, 53 / 64.0, 61 / 64.0, 58 / 64.0)),
       new Quad(
           new Vector3(13 / 16.0, 0, 0),
           new Vector3(13 / 16.0, 0, 3 / 16.0),
           new Vector3(13 / 16.0, 3 / 16.0, 0),
-          new Vector4(56 / 64.0, 59 / 64.0, 49 / 64.0, 46 / 64.0)),
+          new Vector4(56 / 64.0, 59 / 64.0, 61 / 64.0, 58 / 64.0)),
       new Quad(
           new Vector3(16 / 16.0, 0, 0),
           new Vector3(13 / 16.0, 0, 0),
           new Vector3(16 / 16.0, 3 / 16.0, 0),
-          new Vector4(53 / 64.0, 56 / 64.0, 49 / 64.0, 46 / 64.0)),
+          new Vector4(53 / 64.0, 56 / 64.0, 61 / 64.0, 58 / 64.0)),
       new Quad(
           new Vector3(13 / 16.0, 0, 3 / 16.0),
           new Vector3(16 / 16.0, 0, 3 / 16.0),
           new Vector3(13 / 16.0, 3 / 16.0, 3 / 16.0),
-          new Vector4(59 / 64.0, 62 / 64.0, 49 / 64.0, 46 / 64.0)),
-      // cube2
+          new Vector4(59 / 64.0, 62 / 64.0, 61 / 64.0, 58 / 64.0)),
+      // Leg 3 (right when facing back end):
       new Quad(
           new Vector3(3 / 16.0, 0, 0),
           new Vector3(3 / 16.0, 0, 3 / 16.0),
@@ -133,7 +133,7 @@ public class BedModel {
           new Vector3(16 / 16.0, 3 / 16.0, 16 / 16.0),
           new Vector3(0, 9 / 16.0, 16 / 16.0),
           new Vector4(6 / 64.0, 22 / 64.0, 64 / 64.0, 58 / 64.0)),
-      // cube2
+      // Leg 4 (left when facing front end).
       new Quad(
           new Vector3(0, 0, 13 / 16.0),
           new Vector3(3 / 16.0, 0, 13 / 16.0),
@@ -143,23 +143,23 @@ public class BedModel {
           new Vector3(3 / 16.0, 0, 16 / 16.0),
           new Vector3(3 / 16.0, 0, 13 / 16.0),
           new Vector3(3 / 16.0, 3 / 16.0, 16 / 16.0),
-          new Vector4(56 / 64.0, 59 / 64.0, 58 / 64.0, 61 / 64.0)),
+          new Vector4(56 / 64.0, 59 / 64.0, 40 / 64.0, 43 / 64.0)),
       new Quad(
           new Vector3(0, 0, 13 / 16.0),
           new Vector3(0, 0, 16 / 16.0),
           new Vector3(0, 3 / 16.0, 13 / 16.0),
-          new Vector4(50 / 64.0, 53 / 64.0, 58 / 64.0, 61 / 64.0)),
+          new Vector4(50 / 64.0, 53 / 64.0, 40 / 64.0, 43 / 64.0)),
       new Quad(
           new Vector3(3 / 16.0, 0, 13 / 16.0),
           new Vector3(0, 0, 13 / 16.0),
           new Vector3(3 / 16.0, 3 / 16.0, 13 / 16.0),
-          new Vector4(59 / 64.0, 62 / 64.0, 58 / 64.0, 61 / 64.0)),
+          new Vector4(59 / 64.0, 62 / 64.0, 40 / 64.0, 43 / 64.0)),
       new Quad(
           new Vector3(0, 0, 16 / 16.0),
           new Vector3(3 / 16.0, 0, 16 / 16.0),
           new Vector3(0, 3 / 16.0, 16 / 16.0),
-          new Vector4(53 / 64.0, 56 / 64.0, 58 / 64.0, 61 / 64.0)),
-      // cube3
+          new Vector4(53 / 64.0, 56 / 64.0, 40 / 64.0, 43 / 64.0)),
+      // Leg 2 (right when facing front end).
       new Quad(
           new Vector3(13 / 16.0, 0, 13 / 16.0),
           new Vector3(16 / 16.0, 0, 13 / 16.0),
@@ -169,22 +169,22 @@ public class BedModel {
           new Vector3(16 / 16.0, 0, 16 / 16.0),
           new Vector3(16 / 16.0, 0, 13 / 16.0),
           new Vector3(16 / 16.0, 3 / 16.0, 16 / 16.0),
-          new Vector4(53 / 64.0, 56 / 64.0, 58 / 64.0, 61 / 64.0)),
+          new Vector4(53 / 64.0, 56 / 64.0, 52 / 64.0, 55 / 64.0)),
       new Quad(
           new Vector3(13 / 16.0, 0, 13 / 16.0),
           new Vector3(13 / 16.0, 0, 16 / 16.0),
           new Vector3(13 / 16.0, 3 / 16.0, 13 / 16.0),
-          new Vector4(59 / 64.0, 62 / 64.0, 58 / 64.0, 61 / 64.0)),
+          new Vector4(59 / 64.0, 62 / 64.0, 52 / 64.0, 55 / 64.0)),
       new Quad(
           new Vector3(16 / 16.0, 0, 13 / 16.0),
           new Vector3(13 / 16.0, 0, 13 / 16.0),
           new Vector3(16 / 16.0, 3 / 16.0, 13 / 16.0),
-          new Vector4(56 / 64.0, 59 / 64.0, 58 / 64.0, 61 / 64.0)),
+          new Vector4(56 / 64.0, 59 / 64.0, 52 / 64.0, 55 / 64.0)),
       new Quad(
           new Vector3(13 / 16.0, 0, 16 / 16.0),
           new Vector3(16 / 16.0, 0, 16 / 16.0),
           new Vector3(13 / 16.0, 3 / 16.0, 16 / 16.0),
-          new Vector4(50 / 64.0, 53 / 64.0, 58 / 64.0, 61 / 64.0)),
+          new Vector4(50 / 64.0, 53 / 64.0, 52 / 64.0, 55 / 64.0)),
    };
 
   private static Quad[][][] rot = new Quad[2][4][];

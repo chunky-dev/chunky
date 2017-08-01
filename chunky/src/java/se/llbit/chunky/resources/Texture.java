@@ -178,12 +178,6 @@ public class Texture {
   public static final Texture redSandstoneBottom = new Texture();
   public static final Texture redSandstoneDecorated = new Texture();
   public static final Texture redSandstoneSmooth = new Texture();
-  public static final Texture bedFootTop = new Texture();
-  public static final Texture bedHeadTop = new Texture();
-  public static final Texture bedFootEnd = new Texture();
-  public static final Texture bedFootSide = new Texture();
-  public static final Texture bedHeadSide = new Texture();
-  public static final Texture bedHeadEnd = new Texture();
   public static final Texture deadBush = new Texture("dead-bush");
   public static final Texture tallGrass = new Texture("tall-grass");
   public static final Texture fern = new Texture();

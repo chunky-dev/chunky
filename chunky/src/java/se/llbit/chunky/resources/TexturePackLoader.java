@@ -20,6 +20,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.resources.texturepack.AlternateTextures;
 import se.llbit.chunky.resources.texturepack.AnimatedTextureLoader;
+import se.llbit.chunky.resources.texturepack.BedTextureAdapter;
 import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.CloudsTexture;
 import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
@@ -652,14 +653,6 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/leaves_spruce", Texture.spruceLeaves),
         new SimpleTexture("textures/blocks/leaves_spruce", Texture.spruceLeaves),
         new IndexedTexture(0x84, Texture.spruceLeaves)));
-    allTextures.put("bed_feet_top", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/blocks/bed_feet_top", Texture.bedFootTop),
-        new SimpleTexture("textures/blocks/bed_feet_top", Texture.bedFootTop),
-        new IndexedTexture(0x86, Texture.bedFootTop)));
-    allTextures.put("bed_head_top", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/blocks/bed_head_top", Texture.bedHeadTop),
-        new SimpleTexture("textures/blocks/bed_head_top", Texture.bedHeadTop),
-        new IndexedTexture(0x87, Texture.bedHeadTop)));
     allTextures.put("melon_side", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/blocks/melon_side", Texture.melonSide),
         new SimpleTexture("textures/blocks/melon_side", Texture.melonSide),
@@ -713,22 +706,6 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/glass_pane_top", Texture.glassPaneTop),
         new SimpleTexture("textures/blocks/thinglass_top", Texture.glassPaneTop),
         new IndexedTexture(0x94, Texture.glassPaneTop)));
-    allTextures.put("bed_feet_end", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/blocks/bed_feet_end", Texture.bedFootEnd),
-        new SimpleTexture("textures/blocks/bed_feet_end", Texture.bedFootEnd),
-        new IndexedTexture(0x95, Texture.bedFootEnd)));
-    allTextures.put("bed_feet_side", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/blocks/bed_feet_side", Texture.bedFootSide),
-        new SimpleTexture("textures/blocks/bed_feet_side", Texture.bedFootSide),
-        new IndexedTexture(0x96, Texture.bedFootSide)));
-    allTextures.put("bed_head_side", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/blocks/bed_head_side", Texture.bedHeadSide),
-        new SimpleTexture("textures/blocks/bed_head_side", Texture.bedHeadSide),
-        new IndexedTexture(0x97, Texture.bedHeadSide)));
-    allTextures.put("bed_head_end", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/blocks/bed_head_end", Texture.bedHeadEnd),
-        new SimpleTexture("textures/blocks/bed_head_end", Texture.bedHeadEnd),
-        new IndexedTexture(0x98, Texture.bedHeadEnd)));
     allTextures.put("log_jungle", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/blocks/log_jungle", Texture.jungleWood),
         new SimpleTexture("textures/blocks/tree_jungle", Texture.jungleWood),
@@ -1857,7 +1834,10 @@ public class TexturePackLoader {
     allTextures.put("bed_green",
         new SimpleTexture("assets/minecraft/textures/entity/bed/green", Texture.bedGreen));
     allTextures.put("bed_red",
-        new SimpleTexture("assets/minecraft/textures/entity/bed/red", Texture.bedRed));
+        new AlternateTextures(
+            new SimpleTexture("assets/minecraft/textures/entity/bed/red", Texture.bedRed),
+            new BedTextureAdapter()
+        ));
     allTextures.put("bed_black",
         new SimpleTexture("assets/minecraft/textures/entity/bed/black", Texture.bedBlack));
   }

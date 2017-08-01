@@ -44,13 +44,7 @@ public class RotatedTextureLoader extends TextureLoader {
     }
 
     BitmapImage source = texture.getBitmap();
-    BitmapImage rotated = new BitmapImage(source.height, source.width);
-    for (int y = 0; y < source.height; ++y) {
-      for (int x = 0; x < source.width; ++x) {
-        rotated.setPixel(y, x, source.getPixel(x, y));
-      }
-    }
-    texture.setTexture(rotated);
+    texture.setTexture(source.diagonalFlipped());
     return true;
   }
 

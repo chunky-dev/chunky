@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2017 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -57,4 +57,109 @@ public class BitmapImage {
   public void setPixel(int x, int y, int argb) {
     data[y * width + x] = argb;
   }
+
+  /**
+   * Copies the source bitmap into this bitmap at the given (x0, y0) position.
+   */
+  public void blit(BitmapImage source, int x0, int y0) {
+    for (int y = 0; y < source.height; ++y) {
+      System.arraycopy(source.data, y * source.width, data, (y0 + y) * width + x0, source.width);
+    }
+  }
+
+  /**
+   * Copies a region of the source bitmap into this bitmap at the given (x0, y0) position.
+   * @param x0 destination x position
+   * @param y0 destination y position
+   * @param sx0 source x start position
+   * @param sy0 source y start position
+   * @param sx1 source x end position
+   * @param sy1 source y end position
+   */
+  public void blit(BitmapImage source, int x0, int y0, int sx0, int sy0, int sx1, int sy1) {
+    for (int y = 0; y < sy1 - sy0; ++y) {
+      System.arraycopy(source.data, (sy0 + y) * source.width + sx0,
+          data, (y0 + y) * width + x0,
+          sx1 - sx0);
+    }
+  }
+
+  /**
+   * @return a copy of this bitmap that is vertically flipped.
+   */
+  public BitmapImage vFlipped() {
+    BitmapImage rotated = new BitmapImage(width, height);
+    for (int y = 0; y < height; ++y) {
+      for (int x = 0; x < width; ++x) {
+        rotated.setPixel(x, height - y - 1, getPixel(x, y));
+      }
+    }
+    return rotated;
+  }
+
+  /**
+   * @return a copy of this bitmap that is horizontally flipped.
+   */
+  public BitmapImage hFlipped() {
+    BitmapImage rotated = new BitmapImage(width, height);
+    for (int y = 0; y < height; ++y) {
+      for (int x = 0; x < width; ++x) {
+        rotated.setPixel(width - x - 1, y, getPixel(x, y));
+      }
+    }
+    return rotated;
+  }
+
+  /**
+   * @return a copy of this bitmap that is flipped in the diagonal.
+   */
+  public BitmapImage diagonalFlipped() {
+    BitmapImage rotated = new BitmapImage(height, width);
+    for (int y = 0; y < height; ++y) {
+      for (int x = 0; x < width; ++x) {
+        rotated.setPixel(y, x, getPixel(x, y));
+      }
+    }
+    return rotated;
+  }
+
+  /**
+   * @return a copy of this bitmap rotated 90 degrees clockwise.
+   */
+  public BitmapImage rotated() {
+    BitmapImage rotated = new BitmapImage(height, width);
+    for (int y = 0; y < height; ++y) {
+      for (int x = 0; x < width; ++x) {
+        rotated.setPixel(height - y - 1, x, getPixel(x, y));
+      }
+    }
+    return rotated;
+  }
+
+  /**
+   * @return a copy of this bitmap rotated 180 degrees.
+   */
+  public BitmapImage rotated180() {
+    BitmapImage rotated = new BitmapImage(width, height);
+    for (int y = 0; y < height; ++y) {
+      for (int x = 0; x < width; ++x) {
+        rotated.setPixel(width - x - 1, height - y - 1, getPixel(x, y));
+      }
+    }
+    return rotated;
+  }
+
+  /**
+   * @return a copy of this bitmap rotated 270 degrees clockwise.
+   */
+  public BitmapImage rotated270() {
+    BitmapImage rotated = new BitmapImage(height, width);
+    for (int y = 0; y < height; ++y) {
+      for (int x = 0; x < width; ++x) {
+        rotated.setPixel(y, width - x - 1, getPixel(x, y));
+      }
+    }
+    return rotated;
+  }
+
 }
