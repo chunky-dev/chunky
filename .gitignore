@@ -35,6 +35,8 @@
 .idea/*
 *.eml
 *.iml
+/*.ipr
+/*.iws
 /out/
 
 # Render snapshots from testing.

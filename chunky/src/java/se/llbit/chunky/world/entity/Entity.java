@@ -63,6 +63,10 @@ abstract public class Entity {
         return SkullEntity.fromJson(json);
       case "player":
         return PlayerEntity.fromJson(json);
+      case "standing_banner":
+        return StandingBanner.fromJson(json);
+      case "wall_banner":
+        return WallBanner.fromJson(json);
     }
     return null;
   }

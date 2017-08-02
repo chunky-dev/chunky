@@ -619,6 +619,9 @@ public class Texture {
   public static final Texture bedRed = new Texture();
   public static final Texture bedBlack = new Texture();
 
+  /** Banner base texture. */
+  public static final Texture bannerBase = new Texture();
+
   // All the wool variants, ordered after block ID.
   public static final Texture[] wool = {
       whiteWool, orangeWool, magentaWool, lightBlueWool, yellowWool, limeWool, pinkWool, grayWool,

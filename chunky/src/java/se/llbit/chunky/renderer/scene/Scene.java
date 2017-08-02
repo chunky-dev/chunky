@@ -37,11 +37,13 @@ import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
+import se.llbit.chunky.world.entity.StandingBanner;
 import se.llbit.chunky.world.entity.Entity;
 import se.llbit.chunky.world.entity.PaintingEntity;
 import se.llbit.chunky.world.entity.PlayerEntity;
 import se.llbit.chunky.world.entity.SignEntity;
 import se.llbit.chunky.world.entity.SkullEntity;
+import se.llbit.chunky.world.entity.WallBanner;
 import se.llbit.chunky.world.entity.WallSignEntity;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
@@ -996,18 +998,25 @@ public class Scene implements JsonSerializable, Refreshable {
               case Block.HEAD_ID:
                 entities.add(new SkullEntity(position, entityTag, metadata));
                 break;
-              case Block.BED_ID:
-              {
+              case Block.BED_ID: {
                 // Set color metadata for the bed.
                 int ox = x + wx0 - origin.x;
                 int oy = y - origin.y;
                 int oz = z + wz0 - origin.z;
-                int voxel = worldOctree.get(ox, oy, oz);
-                voxel = (voxel & 0xFFFF)
+                int voxel = block
+                    | (metadata << BlockData.OFFSET)
                     | (entityTag.get("color").intValue(0) << BlockData.BED_COLOR);
                 worldOctree.set(voxel, ox, oy, oz);
+                break;
               }
-              break;
+              case Block.STANDING_BANNER_ID: {
+                entities.add(new StandingBanner(position, metadata, entityTag));
+                break;
+              }
+              case Block.WALL_BANNER_ID: {
+                entities.add(new WallBanner(position, metadata, entityTag));
+                break;
+              }
             }
           }
         }

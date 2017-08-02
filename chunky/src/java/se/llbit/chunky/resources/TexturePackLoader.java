@@ -1840,6 +1840,9 @@ public class TexturePackLoader {
         ));
     allTextures.put("bed_black",
         new SimpleTexture("assets/minecraft/textures/entity/bed/black", Texture.bedBlack));
+
+    allTextures.put("banner_base",
+        new SimpleTexture("assets/minecraft/textures/entity/banner_base", Texture.bannerBase));
   }
 
   private static String texturePackName(File tpFile) {

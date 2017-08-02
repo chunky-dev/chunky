@@ -112,10 +112,10 @@ public class PaintingEntity extends Entity {
       return primitives;
     }
     double rot = QuickMath.degToRad(180 - angle);
+    Transform transform = Transform.NONE.translate(painting.ox, painting.oy, 0).rotateY(rot)
+              .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     for (Quad quad : painting.quads) {
-      quad.addTriangles(primitives, PaintingMaterial.INSTANCE,
-          Transform.NONE.translate(painting.ox, painting.oy, 0).rotateY(rot)
-              .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
+      quad.addTriangles(primitives, PaintingMaterial.INSTANCE, transform);
     }
 
     return primitives;

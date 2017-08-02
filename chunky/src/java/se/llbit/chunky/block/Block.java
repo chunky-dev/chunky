@@ -2819,7 +2819,9 @@ public class Block extends Material {
     LARGE_FLOWER.solid = false;
     LARGE_FLOWER.localIntersect = true;
     STANDING_BANNER.solid = false;
+    STANDING_BANNER.invisible = true; // Rendered as an entity.
     WALL_BANNER.solid = false;
+    WALL_BANNER.invisible = true; // Rendered as an entity.
     INVERTED_DAYLIGHTSENSOR.solid = false;
     INVERTED_DAYLIGHTSENSOR.localIntersect = true;
     REDSANDSTONE.opaque = true;
@@ -2956,8 +2958,6 @@ public class Block extends Material {
     STRUCTURE_BLOCK.solid = false;
 
     // TODO: render these:
-    STANDING_BANNER.invisible = UNKNOWN_INVISIBLE;
-    WALL_BANNER.invisible = UNKNOWN_INVISIBLE;
     END_GATEWAY.invisible = UNKNOWN_INVISIBLE;
     STRUCTURE_BLOCK.invisible = UNKNOWN_INVISIBLE; // TODO: render this.
 
