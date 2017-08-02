@@ -17,6 +17,7 @@
 package se.llbit.chunky.main;
 
 import org.junit.Test;
+import se.llbit.chunky.plugin.TabTransformer;
 import se.llbit.chunky.renderer.RayTracerFactory;
 import se.llbit.chunky.renderer.RenderContextFactory;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -103,5 +104,12 @@ public class PluginApiTest {
     RenderControlsTabTransformer transformer = tabs -> Collections.emptyList();
     chunky.setRenderControlsTabTransformer(transformer);
     assertSame(transformer, chunky.getRenderControlsTabTransformer());
+  }
+
+  @Test public void testSetMainTabTransformer() {
+    Chunky chunky = new Chunky(ChunkyOptions.getDefaults());
+    TabTransformer transformer = tabs -> Collections.emptyList();
+    chunky.setMainTabTransformer(transformer);
+    assertSame(transformer, chunky.getMainTabTransformer());
   }
 }

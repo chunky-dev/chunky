@@ -18,6 +18,7 @@ package se.llbit.chunky.main;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.plugin.ChunkyPlugin;
+import se.llbit.chunky.plugin.TabTransformer;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
 import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.RayTracerFactory;
@@ -86,11 +87,12 @@ public class Chunky {
   private RayTracerFactory previewRayTracerFactory = PreviewRayTracer::new;
   private RayTracerFactory rayTracerFactory = PathTracer::new;
   private RenderControlsTabTransformer renderControlsTabTransformer = tabs -> tabs;
+  private TabTransformer mainTabTransformer = tabs -> tabs;
 
   /**
-   * @return The name of this application, including version string.
+   * @return The title of the main window. Includes the current version string.
    */
-  public static String getAppName() {
+  public static String getMainWindowTitle() {
     return String.format("Chunky %s", Version.getVersion());
   }
 
@@ -365,6 +367,12 @@ public class Chunky {
     return rayTracerFactory;
   }
 
+  /**
+   * Registers a hook to modify the tabs in the Render Controls dialog.
+   *
+   * <p>Note: To behave nice with other plugins, please call to the previous
+   * tab transformer.
+   */
   public void setRenderControlsTabTransformer(
       RenderControlsTabTransformer renderControlsTabTransformer) {
     this.renderControlsTabTransformer = renderControlsTabTransformer;
@@ -372,5 +380,19 @@ public class Chunky {
 
   public RenderControlsTabTransformer getRenderControlsTabTransformer() {
     return renderControlsTabTransformer;
+  }
+
+  /**
+   * Registers a hook to modify the tabs in the Render Controls dialog.
+   *
+   * <p>Note: To behave nice with other plugins, please call to the previous
+   * tab transformer.
+   */
+  public void setMainTabTransformer(TabTransformer mainTabTransformer) {
+    this.mainTabTransformer = mainTabTransformer;
+  }
+
+  public TabTransformer getMainTabTransformer() {
+    return mainTabTransformer;
   }
 }

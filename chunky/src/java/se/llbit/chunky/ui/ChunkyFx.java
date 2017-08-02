@@ -33,10 +33,10 @@ public class ChunkyFx extends Application {
 
   @Override public void start(Stage stage) throws Exception {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("Chunky.fxml"));
+    ChunkyFxController controller = new ChunkyFxController(chunkyInstance);
+    loader.setController(controller);
     Parent root = loader.load();
-    ChunkyFxController controller = loader.getController();
-    controller.setChunky(chunkyInstance);
-    stage.setTitle(Chunky.getAppName());
+    stage.setTitle(Chunky.getMainWindowTitle());
     Scene scene = new Scene(root);
     stage.setScene(scene);
     controller.setStageAndScene(this, stage, scene);

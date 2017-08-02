@@ -25,7 +25,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.SimpleColorPicker?>
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.llbit.chunky.ui.ChunkyFxController">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
          <top>
@@ -64,7 +64,7 @@
                               <Insets left="10.0" right="10.0" />
                            </padding>
                         </HBox>
-                        <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
+                        <TabPane fx:id="tabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
                             <Tab fx:id="mapViewTab" text="Map View">
                                  <content>

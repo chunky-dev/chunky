@@ -34,6 +34,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -74,6 +75,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ResourceBundle;
 
@@ -83,7 +85,7 @@ import java.util.ResourceBundle;
 public class ChunkyFxController
     implements Initializable, ChunkViewListener, ChunkSelectionListener, ChunkUpdateListener {
 
-  private Chunky chunky;
+  private final Chunky chunky;
   private WorldMapLoader mapLoader;
   private ChunkMap map;
   private Minimap minimap;
@@ -173,12 +175,14 @@ public class ChunkyFxController
   @FXML private Button renderPng;
   @FXML private StackPane mapPane;
   @FXML private StackPane minimapPane;
+  @FXML private TabPane tabPane;
 
   private RenderControlsFx controls = null;
   private Stage stage;
   private Path prevPngDir = null;
 
-  public ChunkyFxController() {
+  public ChunkyFxController(Chunky chunky) {
+    this.chunky = chunky;
     mapLoader = new WorldMapLoader(this);
     map = new ChunkMap(mapLoader, this);
     minimap = new Minimap(mapLoader, this);
@@ -331,6 +335,16 @@ public class ChunkyFxController
     optionsTab.setGraphic(new ImageView(Icon.wrench.fxImage()));
     renderTab.setGraphic(new ImageView(Icon.sky.fxImage()));
     aboutTab.setGraphic(new ImageView(Icon.question.fxImage()));
+
+    Collection<Tab> javaFxTabs = new ArrayList<>();
+    javaFxTabs.add(mapViewTab);
+    javaFxTabs.add(chunksTab);
+    javaFxTabs.add(optionsTab);
+    javaFxTabs.add(renderTab);
+    javaFxTabs.add(aboutTab);
+    // Call the hook to let plugins add their tabs.
+    javaFxTabs = chunky.getMainTabTransformer().apply(javaFxTabs);
+    tabPane.getTabs().setAll(javaFxTabs);
 
     editResourcePacks.setTooltip(
         new Tooltip("Select resource packs Chunky uses to load textures."));
@@ -601,13 +615,6 @@ public class ChunkyFxController
 
   public Canvas getMapOverlay() {
     return mapOverlay;
-  }
-
-  /**
-   * This must be called when creating the Chunky User Interface.
-   */
-  public void setChunky(Chunky chunky) {
-    this.chunky = chunky;
   }
 
   public void openSceneDirectory() {
