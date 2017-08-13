@@ -46,8 +46,8 @@ import java.util.Random;
 
 /**
  * Camera model for 3D rendering.
- * <p>
- * The camera space has x as right vector and z as up vector.
+ *
+ * <p>The camera space has x as right vector and z as up vector.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  * @author TOGoS (projection code)
@@ -68,22 +68,22 @@ public class Camera implements JsonSerializable {
   }
 
   /**
-   * Minimum DoF
+   * Minimum Depth of Field (DoF).
    */
   public static final double MIN_DOF = .05;
 
   /**
-   * Maximum DoF
+   * Maximum Depth of Field (DoF).
    */
   public static final double MAX_DOF = 5000;
 
   /**
-   * Minimum recommended subject distance
+   * Minimum recommended subject distance.
    */
   public static final double MIN_SUBJECT_DISTANCE = 0.01;
 
   /**
-   * Maximum recommended subject distance
+   * Maximum recommended subject distance.
    */
   public static final double MAX_SUBJECT_DISTANCE = 1000;
 
@@ -92,7 +92,7 @@ public class Camera implements JsonSerializable {
   Vector3 pos = new Vector3(0, 0, 0);
 
   /**
-   * Scratch vector
+   * Scratch vector used for temporary storage.
    * NB: protected by synchronized methods (no concurrent modification)
    */
   private final Vector3 u = new Vector3();
@@ -122,7 +122,7 @@ public class Camera implements JsonSerializable {
   private final Matrix3 tmpTransform = new Matrix3();
 
   private ProjectionMode projectionMode = ProjectionMode.PINHOLE;
-  private Projector projector = createProjector();
+  private Projector projector = new PinholeProjector(PinholeProjector.DEFAULT_FOV);
 
   private double dof = Double.POSITIVE_INFINITY;
   private double fov = projector.getDefaultFoV();
@@ -142,19 +142,17 @@ public class Camera implements JsonSerializable {
   public String name = "camera 1";
 
   /**
-   * Create a new camera
-   *
-   * @param sceneDescription The scene which the camera should be attached to
+   * @param scene The scene that will be refreshed after the camera view changes.
    */
-  public Camera(Refreshable sceneDescription) {
-    this.scene = sceneDescription;
+  public Camera(Refreshable scene) {
+    this.scene = scene;
     transform.setIdentity();
     initProjector();
     updateTransform();
   }
 
   /**
-   * Copy camera configuration from another camera
+   * Copy camera configuration from another camera.
    *
    * @param other the camera to copy configuration from
    */
@@ -183,8 +181,7 @@ public class Camera implements JsonSerializable {
   }
 
   /**
-   * Creates, but does not otherwise use, a projector object
-   * based on the current camera settings.
+   * Creates projector based on the current camera settings.
    */
   private Projector createProjector() {
     switch (projectionMode) {
@@ -211,12 +208,15 @@ public class Camera implements JsonSerializable {
     }
   }
 
+  /**
+   * This (re-)initializes the camera projector.
+   */
   private void initProjector() {
     projector = createProjector();
   }
 
   /**
-   * Set the camera position
+   * Set the camera position.
    */
   public void setPosition(Vector3 v) {
     pos.set(v);

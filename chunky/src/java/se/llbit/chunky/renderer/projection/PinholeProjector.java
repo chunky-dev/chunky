@@ -26,6 +26,9 @@ import se.llbit.math.Vector3;
  * This is the default projection mode in Chunky.
  */
 public class PinholeProjector implements Projector {
+  /** The default field of view. */
+  public static final float DEFAULT_FOV = 70;
+
   protected final double fovTan;
 
   public PinholeProjector(double fov) {
@@ -50,6 +53,6 @@ public class PinholeProjector implements Projector {
   }
 
   @Override public double getDefaultFoV() {
-    return 70;
+    return DEFAULT_FOV;
   }
 }
