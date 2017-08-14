@@ -27,6 +27,12 @@ public class PlayerEntityData {
   public final int dimension;
   public final long uuidLo;
   public final long uuidHi;
+  public String feet = "";
+  public String legs = "";
+  public String head = "";
+  public String chestplate = "";
+  public String shield = "";
+  public String mainHand = "";
 
   public final String uuid;
 
@@ -42,6 +48,33 @@ public class PlayerEntityData {
     yaw = rotation.get(0).floatValue();
     pitch = rotation.get(1).floatValue();
     dimension = player.get("Dimension").intValue();
+
+    int selectedItem = player.get("SelectedItemSlot").intValue(0);
+
+    for (Tag item : player.get("Inventory").asList()) {
+      int slot = item.get("Slot").byteValue(0);
+      String id = item.get("id").stringValue("");
+      switch (slot) {
+        case -106:
+          shield = id;
+          break;
+        case 100:
+          feet = id;
+          break;
+        case 101:
+          legs = id;
+          break;
+        case 102:
+          chestplate = id;
+          break;
+        case 103:
+          head = id;
+          break;
+      }
+      if (slot == selectedItem) {
+        mainHand = id;
+      }
+    }
 
     uuid = String.format("%016X%016X", uuidHi, uuidLo);
   }

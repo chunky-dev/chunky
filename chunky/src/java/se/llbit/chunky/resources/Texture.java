@@ -622,6 +622,8 @@ public class Texture {
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
+  public static final Texture armorStand = new Texture();
+
   // All the wool variants, ordered after block ID.
   public static final Texture[] wool = {
       whiteWool, orangeWool, magentaWool, lightBlueWool, yellowWool, limeWool, pinkWool, grayWool,

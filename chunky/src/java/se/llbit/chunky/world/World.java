@@ -691,8 +691,7 @@ public class World implements Comparable<World> {
     Collection<PlayerEntity> list = new LinkedList<>();
     if (PersistentSettings.getLoadPlayers()) {
       for (PlayerEntityData data : playerEntities) {
-        list.add(new PlayerEntity(data.uuid, new Vector3(data.x, data.y, data.z), data.yaw,
-            data.pitch));
+        list.add(new PlayerEntity(data));
       }
     }
     return list;

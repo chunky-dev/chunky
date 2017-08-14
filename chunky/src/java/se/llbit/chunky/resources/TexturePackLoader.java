@@ -42,6 +42,7 @@ import se.llbit.util.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -1843,7 +1844,12 @@ public class TexturePackLoader {
 
     allTextures.put("banner_base",
         new SimpleTexture("assets/minecraft/textures/entity/banner_base", Texture.bannerBase));
+
+    allTextures.put("armor_stand",
+        new SimpleTexture("assets/minecraft/textures/entity/armorstand/wood", Texture.armorStand));
   }
+
+  private static String[] texturePacks = { };
 
   private static String texturePackName(File tpFile) {
     boolean isDefault = tpFile.equals(MinecraftFinder.getMinecraftJar());
@@ -1942,11 +1948,12 @@ public class TexturePackLoader {
         File file = new File(path);
         if (!file.isFile()) {
           Log.error("Could not open texture pack: " + file.getAbsolutePath());
-        }
-        Log.infof("Loading %d textures from %s", toLoad.size(), file.getAbsolutePath());
-        toLoad = loadTextures(file, toLoad);
-        if (toLoad.isEmpty()) {
-          break;
+        } else {
+          Log.infof("Loading %d textures from %s", toLoad.size(), file.getAbsolutePath());
+          toLoad = loadTextures(file, toLoad);
+          if (toLoad.isEmpty()) {
+            break;
+          }
         }
       }
     }
@@ -2035,5 +2042,54 @@ public class TexturePackLoader {
       }
     }
     return tex;
+  }
+
+  /**
+   * Set the resource packs to be used to load textures from.
+   */
+  public static void setTexturePacks(@NotNull String texturePacks) {
+    String pathList = texturePacks.trim();
+    String[] packs;
+    if (!texturePacks.isEmpty()) {
+      packs = pathList.split(File.pathSeparator);
+    } else {
+      packs = new String[0];
+    }
+    TexturePackLoader.texturePacks = packs;
+  }
+
+  public static Collection<Map.Entry<String, TextureLoader>> loadTextures(
+      Collection<Map.Entry<String, TextureLoader>> textures) {
+    Collection<Map.Entry<String, TextureLoader>> toLoad = textures;
+    for (String pack : texturePacks) {
+      Set<Map.Entry<String, TextureLoader>> missing = loadTextures(new File(pack), textures);
+      if (!missing.isEmpty()) {
+        textures = new HashSet<>(textures);
+        textures.removeAll(missing);
+      }
+    }
+    for (String path : texturePacks) {
+      if (!path.isEmpty()) {
+        File file = new File(path);
+        if (!file.isFile()) {
+          Log.error("Could not open texture pack: " + file.getAbsolutePath());
+        } else {
+          toLoad = loadTextures(file, toLoad);
+          if (toLoad.isEmpty()) {
+            break;
+          }
+        }
+      }
+    }
+    if (!toLoad.isEmpty()) {
+      // If there are textures left to load we try to load the default textures.
+      File defaultResources = MinecraftFinder.getMinecraftJar();
+      if (defaultResources != null) {
+        toLoad = loadTextures(defaultResources, toLoad);
+      } else {
+        Log.error("Minecraft Jar not found: falling back on placeholder textures.");
+      }
+    }
+    return toLoad;
   }
 }

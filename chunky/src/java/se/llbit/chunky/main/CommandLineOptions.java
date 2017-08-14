@@ -415,12 +415,11 @@ public class CommandLineOptions {
     }
 
     if (!configurationError && mode != Mode.NOTHING && mode != Mode.SNAPSHOT) {
-      if (options.texturePack != null && !options.texturePack.isEmpty()) {
-        TexturePackLoader.loadTexturePacks(options.texturePack, false);
-      } else {
-        @NotNull String lastTexturePack = PersistentSettings.getLastTexturePack();
-        TexturePackLoader.loadTexturePacks(lastTexturePack, false);
+      if (options.texturePack == null || options.texturePack.isEmpty()) {
+        options.texturePack = PersistentSettings.getLastTexturePack();
       }
+      TexturePackLoader.setTexturePacks(options.texturePack);
+      TexturePackLoader.loadTexturePacks(options.texturePack, false);
     }
   }
 

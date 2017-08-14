@@ -324,8 +324,8 @@ public class StandingBanner extends Entity {
         TextureCache.put(texId, texture);
         Map<String, TextureLoader> map =
             Collections.singletonMap(filename, new SimpleTexture(texId, texture));
-        Set<Map.Entry<String, TextureLoader>> missing =
-            TexturePackLoader.loadTextures(MinecraftFinder.getMinecraftJar(), map.entrySet());
+        Collection<Map.Entry<String, TextureLoader>> missing =
+            TexturePackLoader.loadTextures(map.entrySet());
         if (!missing.isEmpty()) {
           Log.info("Failed to load banner pattern: " + filename);
           texture = Texture.bannerBase;

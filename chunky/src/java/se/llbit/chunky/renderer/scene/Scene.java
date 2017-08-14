@@ -37,6 +37,7 @@ import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
+import se.llbit.chunky.world.entity.ArmorStand;
 import se.llbit.chunky.world.entity.StandingBanner;
 import se.llbit.chunky.world.entity.Entity;
 import se.llbit.chunky.world.entity.PaintingEntity;
@@ -811,11 +812,12 @@ public class Scene implements JsonSerializable, Refreshable {
               if (id.equals("minecraft:painting") || id.equals("Painting")) {
                 // Before 1.12 paintings had id=Painting.
                 // After 1.12 paintings had id=minecraft:painting.
-                ListTag rot = (ListTag) tag.get("Rotation");
-                double yaw = rot.get(0).floatValue();
-                //double pitch = rot.getItem(1).floatValue();
+                float yaw = tag.get("Rotation").get(0).floatValue();
                 entities.add(
                     new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
+              } else if (id.equals("minecraft:armor_stand")) {
+                float rotation = tag.get("Rotation").get(0).floatValue();
+                entities.add(new ArmorStand(new Vector3(x, y, z), rotation, tag));
               }
             }
           }

@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world.entity;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -26,12 +27,19 @@ import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.EntityTexture;
+import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
 import se.llbit.chunky.resources.texturepack.TextureFormatError;
+import se.llbit.chunky.world.PlayerEntityData;
+import se.llbit.chunky.world.material.TextureMaterial;
+import se.llbit.chunky.world.model.CubeModel;
+import se.llbit.chunky.world.model.JsonModel;
 import se.llbit.json.JsonObject;
+import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
+import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
@@ -48,17 +56,24 @@ public class PlayerEntity extends Entity {
   public double rightLegPose;
   public double leftArmPose;
   public double rightArmPose;
+  public JsonObject gear = new JsonObject();
   public double scale = 1.0;
   public PlayerModel model;
   public String skin = "";
 
-  public PlayerEntity(String uuid, Vector3 position, double yawDegrees, double pitchDegrees) {
+  public PlayerEntity(PlayerEntityData data) {
+    this(data.uuid, new Vector3(data.x, data.y, data.z), data.yaw, data.pitch, buildGear(data));
+  }
+
+  public PlayerEntity(String uuid, Vector3 position, double yawDegrees, double pitchDegrees,
+      JsonObject gear) {
     this(uuid, position, QuickMath.degToRad(180 - yawDegrees), -QuickMath.degToRad(pitchDegrees),
-        0.4, -0.4, 0.4, -0.4, PlayerModel.STEVE);
+        0.4, -0.4, 0.4, -0.4, PlayerModel.STEVE, gear);
   }
 
   public PlayerEntity(String uuid, Vector3 position, double yaw, double pitch, double leftLegPose,
-      double rightLegPose, double leftArmPose, double rightArmPose, PlayerModel model) {
+      double rightLegPose, double leftArmPose, double rightArmPose, PlayerModel model,
+      JsonObject gear) {
     super(position);
     this.uuid = uuid;
     this.yaw = yaw;
@@ -68,6 +83,24 @@ public class PlayerEntity extends Entity {
     this.leftArmPose = leftArmPose;
     this.rightArmPose = rightArmPose;
     this.model = model;
+    this.gear = gear;
+  }
+
+  static JsonObject buildGear(PlayerEntityData data) {
+    JsonObject gear = new JsonObject();
+    if (!data.chestplate.isEmpty()) {
+      gear.add("chest", data.chestplate);
+    }
+    if (!data.feet.isEmpty()) {
+      gear.add("feet", data.feet);
+    }
+    if (!data.head.isEmpty()) {
+      gear.add("head", data.head);
+    }
+    if (!data.legs.isEmpty()) {
+      gear.add("legs", data.legs);
+    }
+    return gear;
   }
 
   private void poseLimb(Box part, Transform transform, Transform offset) {
@@ -105,70 +138,532 @@ public class PlayerEntity extends Entity {
         texture = Texture.steve;
       }
     }
-    Collection<Primitive> faces = new LinkedList<>();
+    Collection<Primitive> primitives = new LinkedList<>();
     Transform offsetTransform = Transform.NONE
         .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
     poseHead(head, withScale(Transform.NONE.rotateY(headYaw).translate(0, 28 / 16., 0)), offsetTransform);
-    head.addFrontFaces(faces, texture, texture.headFront);
-    head.addBackFaces(faces, texture, texture.headBack);
-    head.addLeftFaces(faces, texture, texture.headLeft);
-    head.addRightFaces(faces, texture, texture.headRight);
-    head.addTopFaces(faces, texture, texture.headTop);
-    head.addBottomFaces(faces, texture, texture.headBottom);
+    head.addFrontFaces(primitives, texture, texture.headFront);
+    head.addBackFaces(primitives, texture, texture.headBack);
+    head.addLeftFaces(primitives, texture, texture.headLeft);
+    head.addRightFaces(primitives, texture, texture.headRight);
+    head.addTopFaces(primitives, texture, texture.headTop);
+    head.addBottomFaces(primitives, texture, texture.headBottom);
     Box hat = new Box(-4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16.);
     poseHead(hat, withScale(Transform.NONE.rotateY(headYaw).translate(0, 28.2 / 16., 0)), offsetTransform);
-    hat.addFrontFaces(faces, texture, texture.hatFront);
-    hat.addBackFaces(faces, texture, texture.hatBack);
-    hat.addLeftFaces(faces, texture, texture.hatLeft);
-    hat.addRightFaces(faces, texture, texture.hatRight);
-    hat.addTopFaces(faces, texture, texture.hatTop);
-    hat.addBottomFaces(faces, texture, texture.hatBottom);
+    hat.addFrontFaces(primitives, texture, texture.hatFront);
+    hat.addBackFaces(primitives, texture, texture.hatBack);
+    hat.addLeftFaces(primitives, texture, texture.hatLeft);
+    hat.addRightFaces(primitives, texture, texture.hatRight);
+    hat.addTopFaces(primitives, texture, texture.hatTop);
+    hat.addBottomFaces(primitives, texture, texture.hatBottom);
     Box chest = new Box(-4 / 16., 4 / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     poseLimb(chest, withScale(Transform.NONE.translate(0, 18 / 16., 0)), offsetTransform);
-    chest.addFrontFaces(faces, texture, texture.chestFront);
-    chest.addBackFaces(faces, texture, texture.chestBack);
-    chest.addLeftFaces(faces, texture, texture.chestLeft);
-    chest.addRightFaces(faces, texture, texture.chestRight);
-    chest.addTopFaces(faces, texture, texture.chestTop);
-    chest.addBottomFaces(faces, texture, texture.chestBottom);
+    chest.addFrontFaces(primitives, texture, texture.chestFront);
+    chest.addBackFaces(primitives, texture, texture.chestBack);
+    chest.addLeftFaces(primitives, texture, texture.chestLeft);
+    chest.addRightFaces(primitives, texture, texture.chestRight);
+    chest.addTopFaces(primitives, texture, texture.chestTop);
+    chest.addBottomFaces(primitives, texture, texture.chestBottom);
     Box leftLeg = new Box(-2 / 16., 2 / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     poseLimb(leftLeg, withScale(Transform.NONE.translate(0, -6 / 16., 0).rotateX(leftLegPose)
         .translate(-2 / 16., 12 / 16., 0)), offsetTransform);
-    leftLeg.addFrontFaces(faces, texture, texture.leftLegFront);
-    leftLeg.addBackFaces(faces, texture, texture.leftLegBack);
-    leftLeg.addLeftFaces(faces, texture, texture.leftLegLeft);
-    leftLeg.addRightFaces(faces, texture, texture.leftLegRight);
-    leftLeg.addTopFaces(faces, texture, texture.leftLegTop);
-    leftLeg.addBottomFaces(faces, texture, texture.leftLegBottom);
+    leftLeg.addFrontFaces(primitives, texture, texture.leftLegFront);
+    leftLeg.addBackFaces(primitives, texture, texture.leftLegBack);
+    leftLeg.addLeftFaces(primitives, texture, texture.leftLegLeft);
+    leftLeg.addRightFaces(primitives, texture, texture.leftLegRight);
+    leftLeg.addTopFaces(primitives, texture, texture.leftLegTop);
+    leftLeg.addBottomFaces(primitives, texture, texture.leftLegBottom);
     Box rightLeg = new Box(-2 / 16., 2 / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     poseLimb(rightLeg, withScale(Transform.NONE.translate(0, -6 / 16., 0).rotateX(rightLegPose)
         .translate(2 / 16., 12 / 16., 0)), offsetTransform);
-    rightLeg.addFrontFaces(faces, texture, texture.rightLegFront);
-    rightLeg.addBackFaces(faces, texture, texture.rightLegBack);
-    rightLeg.addLeftFaces(faces, texture, texture.rightLegLeft);
-    rightLeg.addRightFaces(faces, texture, texture.rightLegRight);
-    rightLeg.addTopFaces(faces, texture, texture.rightLegTop);
-    rightLeg.addBottomFaces(faces, texture, texture.rightLegBottom);
+    rightLeg.addFrontFaces(primitives, texture, texture.rightLegFront);
+    rightLeg.addBackFaces(primitives, texture, texture.rightLegBack);
+    rightLeg.addLeftFaces(primitives, texture, texture.rightLegLeft);
+    rightLeg.addRightFaces(primitives, texture, texture.rightLegRight);
+    rightLeg.addTopFaces(primitives, texture, texture.rightLegTop);
+    rightLeg.addBottomFaces(primitives, texture, texture.rightLegBottom);
     Box leftArm = new Box(-armWidth / 16., armWidth / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     poseLimb(leftArm, withScale(Transform.NONE.translate(0, -5 / 16., 0).rotateX(leftArmPose)
         .translate(-(4 + armWidth) / 16., 23 / 16., 0)), offsetTransform);
-    leftArm.addFrontFaces(faces, texture, texture.leftArmFront);
-    leftArm.addBackFaces(faces, texture, texture.leftArmBack);
-    leftArm.addLeftFaces(faces, texture, texture.leftArmLeft);
-    leftArm.addRightFaces(faces, texture, texture.leftArmRight);
-    leftArm.addTopFaces(faces, texture, texture.leftArmTop);
-    leftArm.addBottomFaces(faces, texture, texture.leftArmBottom);
+    leftArm.addFrontFaces(primitives, texture, texture.leftArmFront);
+    leftArm.addBackFaces(primitives, texture, texture.leftArmBack);
+    leftArm.addLeftFaces(primitives, texture, texture.leftArmLeft);
+    leftArm.addRightFaces(primitives, texture, texture.leftArmRight);
+    leftArm.addTopFaces(primitives, texture, texture.leftArmTop);
+    leftArm.addBottomFaces(primitives, texture, texture.leftArmBottom);
     Box rightArm = new Box(-armWidth / 16., armWidth / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     poseLimb(rightArm, withScale(Transform.NONE.translate(0, -5 / 16., 0).rotateX(rightArmPose)
         .translate((4 + armWidth) / 16., 23 / 16., 0)), offsetTransform);
-    rightArm.addFrontFaces(faces, texture, texture.rightArmFront);
-    rightArm.addBackFaces(faces, texture, texture.rightArmBack);
-    rightArm.addLeftFaces(faces, texture, texture.rightArmLeft);
-    rightArm.addRightFaces(faces, texture, texture.rightArmRight);
-    rightArm.addTopFaces(faces, texture, texture.rightArmTop);
-    rightArm.addBottomFaces(faces, texture, texture.rightArmBottom);
-    return faces;
+    rightArm.addFrontFaces(primitives, texture, texture.rightArmFront);
+    rightArm.addBackFaces(primitives, texture, texture.rightArmBack);
+    rightArm.addLeftFaces(primitives, texture, texture.rightArmLeft);
+    rightArm.addRightFaces(primitives, texture, texture.rightArmRight);
+    rightArm.addTopFaces(primitives, texture, texture.rightArmTop);
+    rightArm.addBottomFaces(primitives, texture, texture.rightArmBottom);
+
+    JsonObject pose = new JsonObject();
+    pose.add("pitch", pitch);
+    pose.add("headYaw", headYaw);
+    pose.add("yaw", yaw);
+    pose.add("leftArm", leftArmPose);
+    pose.add("rightArm", rightArmPose);
+    pose.add("leftLeg", leftLegPose);
+    pose.add("rightLeg", rightLegPose);
+    addArmor(primitives, gear, pose, new Vector3(
+        position.x + offset.x,
+        position.y + offset.y,
+        position.z + offset.z), armWidth);
+    return primitives;
+  }
+
+  public static void addArmor(Collection<Primitive> faces,
+      JsonObject gear,
+      JsonObject pose,
+      Vector3 offset,
+      double armWidth) {
+    double pitch = pose.get("pitch").asDouble(0);
+    double headYaw = pose.get("headYaw").asDouble(0);
+    double yaw = pose.get("yaw").asDouble(0);
+    double leftArmPose = pose.get("leftArm").asDouble(0);
+    double rightArmPose = pose.get("rightArm").asDouble(0);
+    double leftLegPose = pose.get("leftLeg").asDouble(0);
+    double rightLegPose = pose.get("rightLeg").asDouble(0);
+
+    String headItem = gear.get("head").asString("");
+    if (!headItem.isEmpty()) {
+      Transform transform = Transform.NONE
+          .translate(-0.5, -0.5, -0.5)
+          .rotateX(pitch)
+          .rotateY(headYaw)
+          .translate(0, 28 / 16.0, 0)
+          .rotateY(yaw)
+          .translate(offset.x, offset.y, offset.z);
+      addModel(faces, getHelmModel(headItem), transform);
+    }
+
+    String chestItem = gear.get("chest").asString("");
+    if (!chestItem.isEmpty()) {
+      Transform transform = Transform.NONE.translate(-0.5, 0.5, -.5).rotateY(yaw)
+          .translate(offset.x, offset.y, offset.z);
+      addModel(faces, getChestModel(chestItem), transform);
+
+      transform = Transform.NONE
+          .translate(-0.5, -14 / 16., -0.5)
+          .rotateX(leftArmPose)
+          .translate(-(4 + armWidth) / 16., 23 / 16., 0)
+          .rotateY(yaw)
+          .translate(offset.x, offset.y, offset.z);
+      addModel(faces, getLeftPauldron(chestItem), transform);
+
+      transform = Transform.NONE
+          .translate(-0.5, -14 / 16., -0.5)
+          .rotateX(rightArmPose)
+          .translate((4 + armWidth) / 16., 23 / 16., 0)
+          .rotateY(yaw)
+          .translate(offset.x, offset.y, offset.z);
+      addModel(faces, getRightPauldron(chestItem), transform);
+    }
+
+    String legs = gear.get("legs").asString("");
+    if (!legs.isEmpty()) {
+      Transform transform = Transform.NONE.translate(-0.5, 0.5, -.5).rotateY(yaw)
+          .translate(offset.x, offset.y, offset.z);
+      addModel(faces, getLeggingsModel(legs), transform);
+
+      transform = Transform.NONE
+          .translate(0, -6 / 16.0, 0)
+          .rotateX(leftLegPose)
+          .translate(-2 / 16., 12 / 16., 0)
+          .rotateY(yaw)
+          .translate(offset.x, offset.y, offset.z);
+      addModel(faces, getLeftLeg(legs), transform);
+
+      transform = Transform.NONE
+          .translate(0, -6 / 16.0, 0)
+          .rotateX(rightLegPose)
+          .translate(2 / 16., 12 / 16., 0)
+          .rotateY(yaw)
+          .translate(offset.x, offset.y, offset.z);
+      addModel(faces, getRightLeg(legs), transform);
+    }
+
+    String feet = gear.get("feet").asString("");
+    if (!feet.isEmpty()) {
+      Transform transform = Transform.NONE
+          .translate(0, -6 / 16.0, 0)
+          .rotateX(leftLegPose)
+          .translate(-2 / 16., 12 / 16., 0)
+          .rotateY(yaw)
+          .translate(offset.x, offset.y, offset.z);
+      addModel(faces, getLeftBoot(feet), transform);
+
+      transform = Transform.NONE
+          .translate(0, -6 / 16.0, 0)
+          .rotateX(rightLegPose)
+          .translate(2 / 16., 12 / 16., 0)
+          .rotateY(yaw)
+          .translate(offset.x, offset.y, offset.z);
+      addModel(faces, getRightBoot(feet), transform);
+    }
+  }
+
+  private static final String chestJson =
+      "{\"elements\":[{\"from\":[3.6,4,5.6],\"to\":[12.4,16,10.4],\"faces\":{\"east\":{\"uv\":[7,10,8,16],\"texture\":\"#texture\"},\"west\":{\"uv\":[4,10,5,16],\"texture\":\"#texture\"},\"north\":{\"uv\":[8,10,10,16],\"texture\":\"#texture\"},\"south\":{\"uv\":[5,10,7,16],\"texture\":\"#texture\"}}}]}";
+
+  private static final String leggingsJson =
+      "{\"elements\":[{\"from\":[3.8,4,5.8],\"to\":[12.2,16,10.2],\"faces\":{\"east\":{\"uv\":[7,10,8,16],\"texture\":\"#texture\"},\"west\":{\"uv\":[4,10,5,16],\"texture\":\"#texture\"},\"north\":{\"uv\":[8,10,10,16],\"texture\":\"#texture\"},\"south\":{\"uv\":[5,10,7,16],\"texture\":\"#texture\"}}}]}";
+
+  private static final String helmJson =
+      "{\"elements\":[{\"from\":[3.6,3.6,3.6],\"to\":[12.4,12.4,12.4],\"faces\":{\"up\":{\"uv\":[2,0,4,4],\"texture\":\"models/armor/diamond_layer_1\"},\"east\":{\"uv\":[0,4,2,8],\"texture\":\"models/armor/diamond_layer_1\"},\"west\":{\"uv\":[4,4,6,8],\"texture\":\"models/armor/diamond_layer_1\"},\"north\":{\"uv\":[2,4,4,8],\"texture\":\"models/armor/diamond_layer_1\"},\"south\":{\"uv\":[6,4,8,8],\"texture\":\"models/armor/diamond_layer_1\"}}}]}";
+
+  private static final String headJson =
+      "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[2,0,4,2],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,2],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,2,4,4],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,2,0,4],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,2,4,4],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,2,8,4],\"texture\":\"#texture\"}}}]}";
+
+  private static final String leftPauldron =
+      "{\"elements\":[{\"from\":[5,0,5],\"to\":[11,16,11],\"faces\":{\"up\":{\"uv\":[11,8,12,10],\"texture\":\"#texture\"},\"east\":{\"uv\":[12,10,13,16],\"texture\":\"#texture\"},\"west\":{\"uv\":[10,10,11,16],\"texture\":\"#texture\"},\"north\":{\"uv\":[13,10,14,16],\"texture\":\"#texture\"},\"south\":{\"uv\":[11,10,12,16],\"texture\":\"#texture\"}}}]}";
+
+  private static final String rightPauldron =
+      "{\"elements\":[{\"from\":[5,0,5],\"to\":[11,16,11],\"faces\":{\"up\":{\"uv\":[12,8,11,10],\"texture\":\"#texture\"},\"east\":{\"uv\":[11,10,10,16],\"texture\":\"#texture\"},\"west\":{\"uv\":[13,10,12,16],\"texture\":\"#texture\"},\"north\":{\"uv\":[14,10,13,16],\"texture\":\"#texture\"},\"south\":{\"uv\":[12,10,11,16],\"texture\":\"#texture\"}}}]}";
+
+  private static final String leftLeg =
+      "{\"elements\":[{\"from\":[-2.2,-6.2,-2.2],\"to\":[2.2,6.2,2.2],\"faces\":{\"up\":{\"uv\":[1,8,2,10],\"texture\":\"#texture\"},\"east\":{\"uv\":[3,10,2,16],\"texture\":\"#texture\"},\"west\":{\"uv\":[1,10,0,16],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,10,1,16],\"texture\":\"#texture\"},\"south\":{\"uv\":[4,10,3,16],\"texture\":\"#texture\"}}}]}";
+
+  private static final String rightLeg =
+      "{\"elements\":[{\"from\":[-2.2,-6.2,-2.2],\"to\":[2.2,6.2,2.2],\"faces\":{\"up\":{\"uv\":[1,8,2,10],\"texture\":\"#texture\"},\"east\":{\"uv\":[0,10,1,16],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,10,3,16],\"texture\":\"#texture\"},\"north\":{\"uv\":[1,10,2,16],\"texture\":\"#texture\"},\"south\":{\"uv\":[3,10,4,16],\"texture\":\"#texture\"}}}]}";
+
+  private static final String leftBoot =
+      "{\"elements\":[{\"from\":[-2.4,-6.4,-2.4],\"to\":[2.4,6.4,2.4],\"faces\":{\"down\":{\"uv\":[2,8,3,10],\"texture\":\"#texture\"},\"east\":{\"uv\":[3,10,2,16],\"texture\":\"#texture\"},\"west\":{\"uv\":[1,10,0,16],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,10,1,16],\"texture\":\"#texture\"},\"south\":{\"uv\":[4,10,3,16],\"texture\":\"#texture\"}}}]}";
+
+  private static final String rightBoot =
+      "{\"elements\":[{\"from\":[-2.4,-6.4,-2.4],\"to\":[2.4,6.4,2.4],\"faces\":{\"down\":{\"uv\":[3,8,2,10],\"texture\":\"#texture\"},\"east\":{\"uv\":[0,10,1,16],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,10,3,16],\"texture\":\"#texture\"},\"north\":{\"uv\":[1,10,2,16],\"texture\":\"#texture\"},\"south\":{\"uv\":[3,10,4,16],\"texture\":\"#texture\"}}}]}";
+
+  private static void addModel(Collection<Primitive> primitives, CubeModel model,
+      Transform baseTransform) {
+    for (int i = 0; i < model.quads.length; ++i) {
+      Quad quad = model.quads[i];
+      Texture texture = model.textures[i];
+      quad.addTriangles(primitives, new TextureMaterial(texture), baseTransform);
+    }
+  }
+
+  static CubeModel getChestModel(String id) {
+    if (id.startsWith("minecraft:")) {
+      String item = id.substring("minecraft:".length());
+      JsonObject json = parseJson(chestJson);
+      JsonObject textureMapping = new JsonObject();
+      json.add("textures", textureMapping);
+      switch (item) {
+        case "leather_chestplate":
+          textureMapping.add("texture", "models/armor/leather_layer_1");
+          break;
+        case "golden_chestplate":
+          textureMapping.add("texture", "models/armor/gold_layer_1");
+          break;
+        case "iron_chestplate":
+          textureMapping.add("texture", "models/armor/iron_layer_1");
+          break;
+        case "chainmail_chestplate":
+          textureMapping.add("texture", "models/armor/chainmail_layer_1");
+          break;
+        case "diamond_chestplate":
+          textureMapping.add("texture", "models/armor/diamond_layer_1");
+          break;
+        default:
+          System.err.format("unknown item: %s%n", item);
+          return new CubeModel();
+      }
+      return new CubeModel(JsonModel.fromJson(json), 16);
+    }
+    return new CubeModel();
+  }
+
+  private static CubeModel getLeggingsModel(String id) {
+    if (id.startsWith("minecraft:")) {
+      String item = id.substring("minecraft:".length());
+      JsonObject json = parseJson(leggingsJson);
+      JsonObject textureMapping = new JsonObject();
+      json.add("textures", textureMapping);
+      switch (item) {
+        case "leather_leggings":
+          textureMapping.add("texture", "models/armor/leather_layer_2");
+          break;
+        case "golden_leggings":
+          textureMapping.add("texture", "models/armor/gold_layer_2");
+          break;
+        case "iron_leggings":
+          textureMapping.add("texture", "models/armor/iron_layer_2");
+          break;
+        case "chainmail_leggings":
+          textureMapping.add("texture", "models/armor/chainmail_layer_2");
+          break;
+        case "diamond_leggings":
+          textureMapping.add("texture", "models/armor/diamond_layer_2");
+          break;
+        default:
+          System.err.format("unknown item: %s%n", item);
+          return new CubeModel();
+      }
+      return new CubeModel(JsonModel.fromJson(json), 16);
+    }
+    return new CubeModel();
+  }
+
+  static CubeModel getLeftPauldron(String id) {
+    if (id.startsWith("minecraft:")) {
+      String item = id.substring("minecraft:".length());
+      JsonObject json = parseJson(leftPauldron);
+      JsonObject textureMapping = new JsonObject();
+      json.add("textures", textureMapping);
+      System.out.format("item: %s%n", item);
+      switch (item) {
+        case "leather_chestplate":
+          textureMapping.add("texture", "models/armor/leather_layer_1");
+          break;
+        case "golden_chestplate":
+          textureMapping.add("texture", "models/armor/gold_layer_1");
+          break;
+        case "iron_chestplate":
+          textureMapping.add("texture", "models/armor/iron_layer_1");
+          break;
+        case "chainmail_chestplate":
+          textureMapping.add("texture", "models/armor/chainmail_layer_1");
+          break;
+        case "diamond_chestplate":
+          textureMapping.add("texture", "models/armor/diamond_layer_1");
+          break;
+        default:
+          System.err.format("unknown item: %s%n", item);
+          return new CubeModel();
+      }
+      return new CubeModel(JsonModel.fromJson(json), 16);
+    }
+    return new CubeModel();
+  }
+
+  static CubeModel getRightPauldron(String id) {
+    if (id.startsWith("minecraft:")) {
+      String item = id.substring("minecraft:".length());
+      JsonObject json = parseJson(rightPauldron);
+      JsonObject textureMapping = new JsonObject();
+      json.add("textures", textureMapping);
+      System.out.format("item: %s%n", item);
+      switch (item) {
+        case "leather_chestplate":
+          textureMapping.add("texture", "models/armor/leather_layer_1");
+          break;
+        case "golden_chestplate":
+          textureMapping.add("texture", "models/armor/gold_layer_1");
+          break;
+        case "iron_chestplate":
+          textureMapping.add("texture", "models/armor/iron_layer_1");
+          break;
+        case "chainmail_chestplate":
+          textureMapping.add("texture", "models/armor/chainmail_layer_1");
+          break;
+        case "diamond_chestplate":
+          textureMapping.add("texture", "models/armor/diamond_layer_1");
+          break;
+        default:
+          System.err.format("unknown item: %s%n", item);
+          return new CubeModel();
+      }
+      return new CubeModel(JsonModel.fromJson(json), 16);
+    }
+    return new CubeModel();
+  }
+
+  private static CubeModel getLeftLeg(String id) {
+    if (id.startsWith("minecraft:")) {
+      String item = id.substring("minecraft:".length());
+      JsonObject json = parseJson(leftLeg);
+      JsonObject textureMapping = new JsonObject();
+      json.add("textures", textureMapping);
+      System.out.format("item: %s%n", item);
+      switch (item) {
+        case "leather_leggings":
+          textureMapping.add("texture", "models/armor/leather_layer_2");
+          break;
+        case "golden_leggings":
+          textureMapping.add("texture", "models/armor/gold_layer_2");
+          break;
+        case "iron_leggings":
+          textureMapping.add("texture", "models/armor/iron_layer_2");
+          break;
+        case "chainmail_leggings":
+          textureMapping.add("texture", "models/armor/chainmail_layer_2");
+          break;
+        case "diamond_leggings":
+          textureMapping.add("texture", "models/armor/diamond_layer_2");
+          break;
+        default:
+          System.err.format("unknown item: %s%n", item);
+          return new CubeModel();
+      }
+      return new CubeModel(JsonModel.fromJson(json), 16);
+    }
+    return new CubeModel();
+  }
+
+  private static CubeModel getRightLeg(String id) {
+    if (id.startsWith("minecraft:")) {
+      String item = id.substring("minecraft:".length());
+      JsonObject json = parseJson(rightLeg);
+      JsonObject textureMapping = new JsonObject();
+      json.add("textures", textureMapping);
+      System.out.format("item: %s%n", item);
+      switch (item) {
+        case "leather_leggings":
+          textureMapping.add("texture", "models/armor/leather_layer_2");
+          break;
+        case "golden_leggings":
+          textureMapping.add("texture", "models/armor/gold_layer_2");
+          break;
+        case "iron_leggings":
+          textureMapping.add("texture", "models/armor/iron_layer_2");
+          break;
+        case "chainmail_leggings":
+          textureMapping.add("texture", "models/armor/chainmail_layer_2");
+          break;
+        case "diamond_leggings":
+          textureMapping.add("texture", "models/armor/diamond_layer_2");
+          break;
+        default:
+          System.err.format("unknown item: %s%n", item);
+          return new CubeModel();
+      }
+      return new CubeModel(JsonModel.fromJson(json), 16);
+    }
+    return new CubeModel();
+  }
+
+  private static CubeModel getLeftBoot(String id) {
+    if (id.startsWith("minecraft:")) {
+      String item = id.substring("minecraft:".length());
+      JsonObject json = parseJson(leftBoot);
+      JsonObject textureMapping = new JsonObject();
+      json.add("textures", textureMapping);
+      System.out.format("item: %s%n", item);
+      switch (item) {
+        case "leather_boots":
+          textureMapping.add("texture", "models/armor/leather_layer_1");
+          break;
+        case "golden_boots":
+          textureMapping.add("texture", "models/armor/gold_layer_1");
+          break;
+        case "iron_boots":
+          textureMapping.add("texture", "models/armor/iron_layer_1");
+          break;
+        case "chainmail_boots":
+          textureMapping.add("texture", "models/armor/chainmail_layer_1");
+          break;
+        case "diamond_boots":
+          textureMapping.add("texture", "models/armor/diamond_layer_1");
+          break;
+        default:
+          System.err.format("unknown item: %s%n", item);
+          return new CubeModel();
+      }
+      return new CubeModel(JsonModel.fromJson(json), 16);
+    }
+    return new CubeModel();
+  }
+
+  private static CubeModel getRightBoot(String id) {
+    if (id.startsWith("minecraft:")) {
+      String item = id.substring("minecraft:".length());
+      JsonObject json = parseJson(rightBoot);
+      JsonObject textureMapping = new JsonObject();
+      json.add("textures", textureMapping);
+      System.out.format("item: %s%n", item);
+      switch (item) {
+        case "leather_boots":
+          textureMapping.add("texture", "models/armor/leather_layer_1");
+          break;
+        case "golden_boots":
+          textureMapping.add("texture", "models/armor/gold_layer_1");
+          break;
+        case "iron_boots":
+          textureMapping.add("texture", "models/armor/iron_layer_1");
+          break;
+        case "chainmail_boots":
+          textureMapping.add("texture", "models/armor/chainmail_layer_1");
+          break;
+        case "diamond_boots":
+          textureMapping.add("texture", "models/armor/diamond_layer_1");
+          break;
+        default:
+          System.err.format("unknown item: %s%n", item);
+          return new CubeModel();
+      }
+      return new CubeModel(JsonModel.fromJson(json), 16);
+    }
+    return new CubeModel();
+  }
+
+  static CubeModel getHelmModel(String id) {
+    if (id.startsWith("minecraft:")) {
+      String item = id.substring("minecraft:".length());
+      JsonObject json = parseJson(helmJson);
+      JsonObject textureMapping = new JsonObject();
+      json.add("textures", textureMapping);
+      System.out.format("item: %s%n", item);
+      switch (item) {
+        case "skull":
+          json = parseJson(headJson);
+          textureMapping = new JsonObject();
+          json.add("textures", textureMapping);
+          textureMapping.add("texture", "entity/steve");
+          return new CubeModel(JsonModel.fromJson(json), 16);
+        case "leather_chestplate":
+          json = parseJson(chestJson);
+          return new CubeModel(JsonModel.fromJson(json), 16);
+        case "golden_chestplate":
+          json = parseJson(chestJson);
+          textureMapping.add("texture", "models/armor/gold_layer_1");
+          return new CubeModel(JsonModel.fromJson(json), 16);
+        case "iron_chestplate":
+          json = parseJson(chestJson);
+          textureMapping.add("texture", "models/armor/iron_layer_1");
+          return new CubeModel(JsonModel.fromJson(json), 16);
+        case "chainmail_chestplate":
+          json = parseJson(chestJson);
+          textureMapping.add("texture", "models/armor/chainmail_layer_1");
+          return new CubeModel(JsonModel.fromJson(json), 16);
+        case "diamond_chestplate":
+          json = parseJson(chestJson);
+          textureMapping.add("texture", "models/armor/diamond_layer_1");
+          return new CubeModel(JsonModel.fromJson(json), 16);
+        case "leather_helmet":
+          return new CubeModel(JsonModel.fromJson(json), 16);
+        case "golden_helmet":
+          textureMapping.add("texture", "models/armor/gold_layer_1");
+          return new CubeModel(JsonModel.fromJson(json), 16);
+        case "iron_helmet":
+          textureMapping.add("texture", "models/armor/iron_layer_1");
+          return new CubeModel(JsonModel.fromJson(json), 16);
+        case "chainmail_helmet":
+          textureMapping.add("texture", "models/armor/chainmail_layer_1");
+          return new CubeModel(JsonModel.fromJson(json), 16);
+        case "diamond_helmet":
+          textureMapping.add("texture", "models/armor/diamond_layer_1");
+          return new CubeModel(JsonModel.fromJson(json), 16);
+        default:
+          String model = "item/" + item;
+          return new CubeModel(JsonModel.get(MinecraftFinder.getMinecraftJar(), model), 16);
+      }
+    }
+    return new CubeModel();
+  }
+
+  public static JsonObject parseJson(String helmetJson) {
+    try (ByteArrayInputStream in = new ByteArrayInputStream(helmetJson.getBytes());
+        JsonParser parser = new JsonParser(in)) {
+      return parser.parse().object();
+    } catch (IOException | JsonParser.SyntaxError e) {
+      Log.warn("Failed to parse JSON", e);
+      return new JsonObject();
+    }
   }
 
   private Transform withScale(Transform transform) {
@@ -193,6 +688,7 @@ public class PlayerEntity extends Entity {
     json.add("leftArmPose", leftArmPose);
     json.add("rightArmPose", rightArmPose);
     json.add("headYaw", headYaw);
+    json.add("gear", gear);
     if (scale != 1.0) {
       json.add("scale", scale);
     }
@@ -212,9 +708,11 @@ public class PlayerEntity extends Entity {
     double leftArmPose = json.get("leftArmPose").doubleValue(0.0);
     double rightArmPose = json.get("rightArmPose").doubleValue(0.0);
     double scale = json.get("scale").doubleValue(1.0);
+    JsonObject gear = json.get("gear").object();
+    // TODO: store pose in JSON object.
     PlayerEntity entity =
         new PlayerEntity(uuid, position, yaw, pitch, leftLegPose, rightLegPose, leftArmPose,
-            rightArmPose, model);
+            rightArmPose, model, gear);
     entity.headYaw = json.get("headYaw").doubleValue(0.0);
     entity.skin = skin;
     entity.scale = scale;

@@ -165,7 +165,8 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
       if (position == null) {
         position = new Vector3(scene.camera().getPosition());
       }
-      PlayerEntity player = new PlayerEntity(String.format("%016X%016X", 0, id), position, 0, 0);
+      PlayerEntity player = new PlayerEntity(String.format("%016X%016X", 0, id), position, 0, 0,
+          new JsonObject());
       withSelected(selected -> {
         player.skin = selected.skin;
         player.model = selected.model;
