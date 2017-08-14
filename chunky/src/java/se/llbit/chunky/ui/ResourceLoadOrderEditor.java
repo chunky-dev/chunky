@@ -33,6 +33,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.MinecraftFinder;
+import se.llbit.chunky.resources.TextureCache;
 import se.llbit.chunky.resources.TexturePackLoader;
 
 import java.io.File;
@@ -56,6 +57,7 @@ public class ResourceLoadOrderEditor extends Stage {
       String[] paths = new String[pathList.getItems().size()];
       pathList.getItems().toArray(paths);
       TexturePackLoader.loadTexturePacks(paths, true);
+      TextureCache.reset();
       hide();
     });
     Button up = new Button("Up");

@@ -32,4 +32,9 @@ public class TextureCache {
   public static Texture put(Object key, Texture texture) {
     return map.put(key, texture);
   }
+
+  public static void reset() {
+    // TODO: make thread safe.
+    map.clear();
+  }
 }
