@@ -37,4 +37,10 @@ public class TextureCache {
     // TODO: make thread safe.
     map.clear();
   }
+
+  public static boolean containsKey(Object key) {
+    return map.containsKey(key);
+  }
+
+  // TODO: deferred texture loading.
 }

@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -2061,13 +2062,6 @@ public class TexturePackLoader {
   public static Collection<Map.Entry<String, TextureLoader>> loadTextures(
       Collection<Map.Entry<String, TextureLoader>> textures) {
     Collection<Map.Entry<String, TextureLoader>> toLoad = textures;
-    for (String pack : texturePacks) {
-      Set<Map.Entry<String, TextureLoader>> missing = loadTextures(new File(pack), textures);
-      if (!missing.isEmpty()) {
-        textures = new HashSet<>(textures);
-        textures.removeAll(missing);
-      }
-    }
     for (String path : texturePacks) {
       if (!path.isEmpty()) {
         File file = new File(path);
@@ -2076,7 +2070,7 @@ public class TexturePackLoader {
         } else {
           toLoad = loadTextures(file, toLoad);
           if (toLoad.isEmpty()) {
-            break;
+            return Collections.emptyList();
           }
         }
       }

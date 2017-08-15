@@ -16,18 +16,9 @@
  */
 package se.llbit.chunky.world.entity;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Random;
-
 import org.apache.commons.math3.util.FastMath;
-
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.EntityTexture;
-import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
 import se.llbit.chunky.resources.texturepack.TextureFormatError;
@@ -45,6 +36,13 @@ import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.primitive.Box;
 import se.llbit.math.primitive.Primitive;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Random;
 
 public class PlayerEntity extends Entity {
 
@@ -138,9 +136,13 @@ public class PlayerEntity extends Entity {
         texture = Texture.steve;
       }
     }
+    Vector3 worldOffset = new Vector3(
+        position.x + offset.x,
+        position.y + offset.y,
+        position.z + offset.z);
     Collection<Primitive> primitives = new LinkedList<>();
     Transform offsetTransform = Transform.NONE
-        .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+        .translate(worldOffset);
     Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
     poseHead(head, withScale(Transform.NONE.rotateY(headYaw).translate(0, 28 / 16., 0)), offsetTransform);
     head.addFrontFaces(primitives, texture, texture.headFront);
@@ -210,10 +212,7 @@ public class PlayerEntity extends Entity {
     pose.add("rightArm", rightArmPose);
     pose.add("leftLeg", leftLegPose);
     pose.add("rightLeg", rightLegPose);
-    addArmor(primitives, gear, pose, new Vector3(
-        position.x + offset.x,
-        position.y + offset.y,
-        position.z + offset.z), armWidth);
+    addArmor(primitives, gear, pose, worldOffset, armWidth);
     return primitives;
   }
 
@@ -238,37 +237,38 @@ public class PlayerEntity extends Entity {
           .rotateY(headYaw)
           .translate(0, 28 / 16.0, 0)
           .rotateY(yaw)
-          .translate(offset.x, offset.y, offset.z);
+          .translate(offset);
       addModel(faces, getHelmModel(headItem), transform);
     }
 
     String chestItem = gear.get("chest").asString("");
     if (!chestItem.isEmpty()) {
-      Transform transform = Transform.NONE.translate(-0.5, 0.5, -.5).rotateY(yaw)
-          .translate(offset.x, offset.y, offset.z);
+      Transform transform = Transform.NONE.translate(-0.5, 0.5, -.5)
+          .rotateY(yaw + Math.PI)
+          .translate(offset);
       addModel(faces, getChestModel(chestItem), transform);
 
       transform = Transform.NONE
           .translate(-0.5, -14 / 16., -0.5)
           .rotateX(leftArmPose)
           .translate(-(4 + armWidth) / 16., 23 / 16., 0)
-          .rotateY(yaw)
-          .translate(offset.x, offset.y, offset.z);
+          .rotateY(yaw + Math.PI)
+          .translate(offset);
       addModel(faces, getLeftPauldron(chestItem), transform);
 
       transform = Transform.NONE
           .translate(-0.5, -14 / 16., -0.5)
           .rotateX(rightArmPose)
           .translate((4 + armWidth) / 16., 23 / 16., 0)
-          .rotateY(yaw)
-          .translate(offset.x, offset.y, offset.z);
+          .rotateY(yaw + Math.PI)
+          .translate(offset);
       addModel(faces, getRightPauldron(chestItem), transform);
     }
 
     String legs = gear.get("legs").asString("");
     if (!legs.isEmpty()) {
       Transform transform = Transform.NONE.translate(-0.5, 0.5, -.5).rotateY(yaw)
-          .translate(offset.x, offset.y, offset.z);
+          .translate(offset);
       addModel(faces, getLeggingsModel(legs), transform);
 
       transform = Transform.NONE
@@ -276,7 +276,7 @@ public class PlayerEntity extends Entity {
           .rotateX(leftLegPose)
           .translate(-2 / 16., 12 / 16., 0)
           .rotateY(yaw)
-          .translate(offset.x, offset.y, offset.z);
+          .translate(offset);
       addModel(faces, getLeftLeg(legs), transform);
 
       transform = Transform.NONE
@@ -284,7 +284,7 @@ public class PlayerEntity extends Entity {
           .rotateX(rightLegPose)
           .translate(2 / 16., 12 / 16., 0)
           .rotateY(yaw)
-          .translate(offset.x, offset.y, offset.z);
+          .translate(offset);
       addModel(faces, getRightLeg(legs), transform);
     }
 
@@ -295,7 +295,7 @@ public class PlayerEntity extends Entity {
           .rotateX(leftLegPose)
           .translate(-2 / 16., 12 / 16., 0)
           .rotateY(yaw)
-          .translate(offset.x, offset.y, offset.z);
+          .translate(offset);
       addModel(faces, getLeftBoot(feet), transform);
 
       transform = Transform.NONE
@@ -303,7 +303,7 @@ public class PlayerEntity extends Entity {
           .rotateX(rightLegPose)
           .translate(2 / 16., 12 / 16., 0)
           .rotateY(yaw)
-          .translate(offset.x, offset.y, offset.z);
+          .translate(offset);
       addModel(faces, getRightBoot(feet), transform);
     }
   }
@@ -315,7 +315,7 @@ public class PlayerEntity extends Entity {
       "{\"elements\":[{\"from\":[3.8,4,5.8],\"to\":[12.2,16,10.2],\"faces\":{\"east\":{\"uv\":[7,10,8,16],\"texture\":\"#texture\"},\"west\":{\"uv\":[4,10,5,16],\"texture\":\"#texture\"},\"north\":{\"uv\":[8,10,10,16],\"texture\":\"#texture\"},\"south\":{\"uv\":[5,10,7,16],\"texture\":\"#texture\"}}}]}";
 
   private static final String helmJson =
-      "{\"elements\":[{\"from\":[3.6,3.6,3.6],\"to\":[12.4,12.4,12.4],\"faces\":{\"up\":{\"uv\":[2,0,4,4],\"texture\":\"models/armor/diamond_layer_1\"},\"east\":{\"uv\":[0,4,2,8],\"texture\":\"models/armor/diamond_layer_1\"},\"west\":{\"uv\":[4,4,6,8],\"texture\":\"models/armor/diamond_layer_1\"},\"north\":{\"uv\":[2,4,4,8],\"texture\":\"models/armor/diamond_layer_1\"},\"south\":{\"uv\":[6,4,8,8],\"texture\":\"models/armor/diamond_layer_1\"}}}]}";
+      "{\"elements\":[{\"from\":[3.6,3.6,3.6],\"to\":[12.4,12.4,12.4],\"faces\":{\"up\":{\"uv\":[2,0,4,4],\"texture\":\"#texture\"},\"east\":{\"uv\":[0,4,2,8],\"texture\":\"#texture\"},\"west\":{\"uv\":[4,4,6,8],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,4,4,8],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,4,8,8],\"texture\":\"#texture\"}}}]}";
 
   private static final String headJson =
       "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[2,0,4,2],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,2],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,2,4,4],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,2,0,4],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,2,4,4],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,2,8,4],\"texture\":\"#texture\"}}}]}";
@@ -614,44 +614,27 @@ public class PlayerEntity extends Entity {
           textureMapping = new JsonObject();
           json.add("textures", textureMapping);
           textureMapping.add("texture", "entity/steve");
-          return new CubeModel(JsonModel.fromJson(json), 16);
-        case "leather_chestplate":
-          json = parseJson(chestJson);
-          return new CubeModel(JsonModel.fromJson(json), 16);
-        case "golden_chestplate":
-          json = parseJson(chestJson);
-          textureMapping.add("texture", "models/armor/gold_layer_1");
-          return new CubeModel(JsonModel.fromJson(json), 16);
-        case "iron_chestplate":
-          json = parseJson(chestJson);
-          textureMapping.add("texture", "models/armor/iron_layer_1");
-          return new CubeModel(JsonModel.fromJson(json), 16);
-        case "chainmail_chestplate":
-          json = parseJson(chestJson);
-          textureMapping.add("texture", "models/armor/chainmail_layer_1");
-          return new CubeModel(JsonModel.fromJson(json), 16);
-        case "diamond_chestplate":
-          json = parseJson(chestJson);
-          textureMapping.add("texture", "models/armor/diamond_layer_1");
-          return new CubeModel(JsonModel.fromJson(json), 16);
+          break;
         case "leather_helmet":
-          return new CubeModel(JsonModel.fromJson(json), 16);
+          textureMapping.add("texture", "models/armor/leather_layer_1");
+          break;
         case "golden_helmet":
           textureMapping.add("texture", "models/armor/gold_layer_1");
-          return new CubeModel(JsonModel.fromJson(json), 16);
+          break;
         case "iron_helmet":
           textureMapping.add("texture", "models/armor/iron_layer_1");
-          return new CubeModel(JsonModel.fromJson(json), 16);
+          break;
         case "chainmail_helmet":
           textureMapping.add("texture", "models/armor/chainmail_layer_1");
-          return new CubeModel(JsonModel.fromJson(json), 16);
+          break;
         case "diamond_helmet":
           textureMapping.add("texture", "models/armor/diamond_layer_1");
-          return new CubeModel(JsonModel.fromJson(json), 16);
+          break;
         default:
-          String model = "item/" + item;
-          return new CubeModel(JsonModel.get(MinecraftFinder.getMinecraftJar(), model), 16);
+          System.err.format("unknown item: %s%n", item);
+          return new CubeModel();
       }
+      return new CubeModel(JsonModel.fromJson(json), 16);
     }
     return new CubeModel();
   }
