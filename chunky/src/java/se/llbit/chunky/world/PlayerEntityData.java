@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
 public class PlayerEntityData {
@@ -27,12 +28,12 @@ public class PlayerEntityData {
   public final int dimension;
   public final long uuidLo;
   public final long uuidHi;
-  public String feet = "";
-  public String legs = "";
-  public String head = "";
-  public String chestplate = "";
-  public String shield = "";
-  public String mainHand = "";
+  public Tag feet = new CompoundTag();
+  public Tag legs = new CompoundTag();
+  public Tag head = new CompoundTag();
+  public Tag chestplate = new CompoundTag();
+  public Tag shield = new CompoundTag();
+  public Tag mainHand = new CompoundTag();
 
   public final String uuid;
 
@@ -53,26 +54,25 @@ public class PlayerEntityData {
 
     for (Tag item : player.get("Inventory").asList()) {
       int slot = item.get("Slot").byteValue(0);
-      String id = item.get("id").stringValue("");
       switch (slot) {
         case -106:
-          shield = id;
+          shield = item;
           break;
         case 100:
-          feet = id;
+          feet = item;
           break;
         case 101:
-          legs = id;
+          legs = item;
           break;
         case 102:
-          chestplate = id;
+          chestplate = item;
           break;
         case 103:
-          head = id;
+          head = item;
           break;
       }
       if (slot == selectedItem) {
-        mainHand = id;
+        mainHand = item;
       }
     }
 

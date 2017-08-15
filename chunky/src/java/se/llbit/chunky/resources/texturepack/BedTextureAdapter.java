@@ -49,9 +49,9 @@ public class BedTextureAdapter extends TextureLoader {
 
   public BedTextureAdapter() {
     bottomLoader = new AlternateTextures(
-            new SimpleTexture("assets/minecraft/textures/blocks/planks_oak", bottom),
-            new SimpleTexture("textures/blocks/wood", bottom),
-            new IndexedTexture(0x04, bottom));
+        new SimpleTexture("assets/minecraft/textures/blocks/planks_oak", bottom),
+        new SimpleTexture("textures/blocks/wood", bottom),
+        new IndexedTexture(0x04, bottom));
     footTopLoader = new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/blocks/bed_feet_top", bedFootTop),
         new SimpleTexture("textures/blocks/bed_feet_top", bedFootTop),

@@ -20,8 +20,13 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.TextureCache;
+import se.llbit.chunky.resources.TexturePackLoader;
+import se.llbit.chunky.resources.texturepack.ColoredTexture;
 import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
+import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.chunky.resources.texturepack.TextureFormatError;
+import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.chunky.world.PlayerEntityData;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.chunky.world.model.CubeModel;
@@ -36,12 +41,16 @@ import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.primitive.Box;
 import se.llbit.math.primitive.Primitive;
+import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.Tag;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 
 public class PlayerEntity extends Entity {
@@ -84,19 +93,30 @@ public class PlayerEntity extends Entity {
     this.gear = gear;
   }
 
+  static JsonObject parseItem(CompoundTag tag) {
+    JsonObject item = new JsonObject();
+    String id = tag.get("id").stringValue("");
+    item.add("id", id);
+    Tag color = tag.get("tag").get("display").get("color");
+    if (!color.isError()) {
+      item.add("color", color.intValue(0));
+    }
+    return item;
+  }
+
   static JsonObject buildGear(PlayerEntityData data) {
     JsonObject gear = new JsonObject();
-    if (!data.chestplate.isEmpty()) {
-      gear.add("chest", data.chestplate);
+    if (!data.chestplate.asCompound().isEmpty()) {
+      gear.add("chest", parseItem(data.chestplate.asCompound()));
     }
-    if (!data.feet.isEmpty()) {
-      gear.add("feet", data.feet);
+    if (!data.feet.asCompound().isEmpty()) {
+      gear.add("feet", parseItem(data.feet.asCompound()));
     }
-    if (!data.head.isEmpty()) {
-      gear.add("head", data.head);
+    if (!data.head.asCompound().isEmpty()) {
+      gear.add("head", parseItem(data.head.asCompound()));
     }
-    if (!data.legs.isEmpty()) {
-      gear.add("legs", data.legs);
+    if (!data.legs.asCompound().isEmpty()) {
+      gear.add("legs", parseItem(data.legs.asCompound()));
     }
     return gear;
   }
@@ -229,7 +249,7 @@ public class PlayerEntity extends Entity {
     double leftLegPose = pose.get("leftLeg").asDouble(0);
     double rightLegPose = pose.get("rightLeg").asDouble(0);
 
-    String headItem = gear.get("head").asString("");
+    JsonObject headItem = gear.get("head").object();
     if (!headItem.isEmpty()) {
       Transform transform = Transform.NONE
           .translate(-0.5, -0.5, -0.5)
@@ -241,7 +261,7 @@ public class PlayerEntity extends Entity {
       addModel(faces, getHelmModel(headItem), transform);
     }
 
-    String chestItem = gear.get("chest").asString("");
+    JsonObject chestItem = gear.get("chest").object();
     if (!chestItem.isEmpty()) {
       Transform transform = Transform.NONE.translate(-0.5, 0.5, -.5)
           .rotateY(yaw + Math.PI)
@@ -265,7 +285,7 @@ public class PlayerEntity extends Entity {
       addModel(faces, getRightPauldron(chestItem), transform);
     }
 
-    String legs = gear.get("legs").asString("");
+    JsonObject legs = gear.get("legs").object();
     if (!legs.isEmpty()) {
       Transform transform = Transform.NONE.translate(-0.5, 0.5, -.5).rotateY(yaw)
           .translate(offset);
@@ -288,7 +308,7 @@ public class PlayerEntity extends Entity {
       addModel(faces, getRightLeg(legs), transform);
     }
 
-    String feet = gear.get("feet").asString("");
+    JsonObject feet = gear.get("feet").object();
     if (!feet.isEmpty()) {
       Transform transform = Transform.NONE
           .translate(0, -6 / 16.0, 0)
@@ -347,296 +367,62 @@ public class PlayerEntity extends Entity {
     }
   }
 
-  static CubeModel getChestModel(String id) {
-    if (id.startsWith("minecraft:")) {
-      String item = id.substring("minecraft:".length());
-      JsonObject json = parseJson(chestJson);
-      JsonObject textureMapping = new JsonObject();
-      json.add("textures", textureMapping);
-      switch (item) {
-        case "leather_chestplate":
-          textureMapping.add("texture", "models/armor/leather_layer_1");
-          break;
-        case "golden_chestplate":
-          textureMapping.add("texture", "models/armor/gold_layer_1");
-          break;
-        case "iron_chestplate":
-          textureMapping.add("texture", "models/armor/iron_layer_1");
-          break;
-        case "chainmail_chestplate":
-          textureMapping.add("texture", "models/armor/chainmail_layer_1");
-          break;
-        case "diamond_chestplate":
-          textureMapping.add("texture", "models/armor/diamond_layer_1");
-          break;
-        default:
-          System.err.format("unknown item: %s%n", item);
-          return new CubeModel();
-      }
-      return new CubeModel(JsonModel.fromJson(json), 16);
-    }
-    return new CubeModel();
+  static CubeModel getChestModel(JsonObject item) {
+    JsonObject json = parseJson(chestJson);
+    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
-  private static CubeModel getLeggingsModel(String id) {
-    if (id.startsWith("minecraft:")) {
-      String item = id.substring("minecraft:".length());
-      JsonObject json = parseJson(leggingsJson);
-      JsonObject textureMapping = new JsonObject();
-      json.add("textures", textureMapping);
-      switch (item) {
-        case "leather_leggings":
-          textureMapping.add("texture", "models/armor/leather_layer_2");
-          break;
-        case "golden_leggings":
-          textureMapping.add("texture", "models/armor/gold_layer_2");
-          break;
-        case "iron_leggings":
-          textureMapping.add("texture", "models/armor/iron_layer_2");
-          break;
-        case "chainmail_leggings":
-          textureMapping.add("texture", "models/armor/chainmail_layer_2");
-          break;
-        case "diamond_leggings":
-          textureMapping.add("texture", "models/armor/diamond_layer_2");
-          break;
-        default:
-          System.err.format("unknown item: %s%n", item);
-          return new CubeModel();
-      }
-      return new CubeModel(JsonModel.fromJson(json), 16);
-    }
-    return new CubeModel();
+  private static CubeModel getLeggingsModel(JsonObject item) {
+    JsonObject json = parseJson(leggingsJson);
+    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
-  static CubeModel getLeftPauldron(String id) {
-    if (id.startsWith("minecraft:")) {
-      String item = id.substring("minecraft:".length());
-      JsonObject json = parseJson(leftPauldron);
-      JsonObject textureMapping = new JsonObject();
-      json.add("textures", textureMapping);
-      System.out.format("item: %s%n", item);
-      switch (item) {
-        case "leather_chestplate":
-          textureMapping.add("texture", "models/armor/leather_layer_1");
-          break;
-        case "golden_chestplate":
-          textureMapping.add("texture", "models/armor/gold_layer_1");
-          break;
-        case "iron_chestplate":
-          textureMapping.add("texture", "models/armor/iron_layer_1");
-          break;
-        case "chainmail_chestplate":
-          textureMapping.add("texture", "models/armor/chainmail_layer_1");
-          break;
-        case "diamond_chestplate":
-          textureMapping.add("texture", "models/armor/diamond_layer_1");
-          break;
-        default:
-          System.err.format("unknown item: %s%n", item);
-          return new CubeModel();
-      }
-      return new CubeModel(JsonModel.fromJson(json), 16);
-    }
-    return new CubeModel();
+  static CubeModel getLeftPauldron(JsonObject item) {
+    JsonObject json = parseJson(leftPauldron);
+    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
-  static CubeModel getRightPauldron(String id) {
-    if (id.startsWith("minecraft:")) {
-      String item = id.substring("minecraft:".length());
-      JsonObject json = parseJson(rightPauldron);
-      JsonObject textureMapping = new JsonObject();
-      json.add("textures", textureMapping);
-      System.out.format("item: %s%n", item);
-      switch (item) {
-        case "leather_chestplate":
-          textureMapping.add("texture", "models/armor/leather_layer_1");
-          break;
-        case "golden_chestplate":
-          textureMapping.add("texture", "models/armor/gold_layer_1");
-          break;
-        case "iron_chestplate":
-          textureMapping.add("texture", "models/armor/iron_layer_1");
-          break;
-        case "chainmail_chestplate":
-          textureMapping.add("texture", "models/armor/chainmail_layer_1");
-          break;
-        case "diamond_chestplate":
-          textureMapping.add("texture", "models/armor/diamond_layer_1");
-          break;
-        default:
-          System.err.format("unknown item: %s%n", item);
-          return new CubeModel();
-      }
-      return new CubeModel(JsonModel.fromJson(json), 16);
-    }
-    return new CubeModel();
+  static CubeModel getRightPauldron(JsonObject item) {
+    JsonObject json = parseJson(rightPauldron);
+    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
-  private static CubeModel getLeftLeg(String id) {
-    if (id.startsWith("minecraft:")) {
-      String item = id.substring("minecraft:".length());
-      JsonObject json = parseJson(leftLeg);
-      JsonObject textureMapping = new JsonObject();
-      json.add("textures", textureMapping);
-      System.out.format("item: %s%n", item);
-      switch (item) {
-        case "leather_leggings":
-          textureMapping.add("texture", "models/armor/leather_layer_2");
-          break;
-        case "golden_leggings":
-          textureMapping.add("texture", "models/armor/gold_layer_2");
-          break;
-        case "iron_leggings":
-          textureMapping.add("texture", "models/armor/iron_layer_2");
-          break;
-        case "chainmail_leggings":
-          textureMapping.add("texture", "models/armor/chainmail_layer_2");
-          break;
-        case "diamond_leggings":
-          textureMapping.add("texture", "models/armor/diamond_layer_2");
-          break;
-        default:
-          System.err.format("unknown item: %s%n", item);
-          return new CubeModel();
-      }
-      return new CubeModel(JsonModel.fromJson(json), 16);
-    }
-    return new CubeModel();
+  private static CubeModel getLeftLeg(JsonObject item) {
+    JsonObject json = parseJson(leftLeg);
+    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
-  private static CubeModel getRightLeg(String id) {
-    if (id.startsWith("minecraft:")) {
-      String item = id.substring("minecraft:".length());
-      JsonObject json = parseJson(rightLeg);
-      JsonObject textureMapping = new JsonObject();
-      json.add("textures", textureMapping);
-      System.out.format("item: %s%n", item);
-      switch (item) {
-        case "leather_leggings":
-          textureMapping.add("texture", "models/armor/leather_layer_2");
-          break;
-        case "golden_leggings":
-          textureMapping.add("texture", "models/armor/gold_layer_2");
-          break;
-        case "iron_leggings":
-          textureMapping.add("texture", "models/armor/iron_layer_2");
-          break;
-        case "chainmail_leggings":
-          textureMapping.add("texture", "models/armor/chainmail_layer_2");
-          break;
-        case "diamond_leggings":
-          textureMapping.add("texture", "models/armor/diamond_layer_2");
-          break;
-        default:
-          System.err.format("unknown item: %s%n", item);
-          return new CubeModel();
-      }
-      return new CubeModel(JsonModel.fromJson(json), 16);
-    }
-    return new CubeModel();
+  private static CubeModel getRightLeg(JsonObject item) {
+    JsonObject json = parseJson(rightLeg);
+    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
-  private static CubeModel getLeftBoot(String id) {
-    if (id.startsWith("minecraft:")) {
-      String item = id.substring("minecraft:".length());
-      JsonObject json = parseJson(leftBoot);
-      JsonObject textureMapping = new JsonObject();
-      json.add("textures", textureMapping);
-      System.out.format("item: %s%n", item);
-      switch (item) {
-        case "leather_boots":
-          textureMapping.add("texture", "models/armor/leather_layer_1");
-          break;
-        case "golden_boots":
-          textureMapping.add("texture", "models/armor/gold_layer_1");
-          break;
-        case "iron_boots":
-          textureMapping.add("texture", "models/armor/iron_layer_1");
-          break;
-        case "chainmail_boots":
-          textureMapping.add("texture", "models/armor/chainmail_layer_1");
-          break;
-        case "diamond_boots":
-          textureMapping.add("texture", "models/armor/diamond_layer_1");
-          break;
-        default:
-          System.err.format("unknown item: %s%n", item);
-          return new CubeModel();
-      }
-      return new CubeModel(JsonModel.fromJson(json), 16);
-    }
-    return new CubeModel();
+  private static CubeModel getLeftBoot(JsonObject item) {
+    JsonObject json = parseJson(leftBoot);
+    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
-  private static CubeModel getRightBoot(String id) {
-    if (id.startsWith("minecraft:")) {
-      String item = id.substring("minecraft:".length());
-      JsonObject json = parseJson(rightBoot);
-      JsonObject textureMapping = new JsonObject();
-      json.add("textures", textureMapping);
-      System.out.format("item: %s%n", item);
-      switch (item) {
-        case "leather_boots":
-          textureMapping.add("texture", "models/armor/leather_layer_1");
-          break;
-        case "golden_boots":
-          textureMapping.add("texture", "models/armor/gold_layer_1");
-          break;
-        case "iron_boots":
-          textureMapping.add("texture", "models/armor/iron_layer_1");
-          break;
-        case "chainmail_boots":
-          textureMapping.add("texture", "models/armor/chainmail_layer_1");
-          break;
-        case "diamond_boots":
-          textureMapping.add("texture", "models/armor/diamond_layer_1");
-          break;
-        default:
-          System.err.format("unknown item: %s%n", item);
-          return new CubeModel();
-      }
-      return new CubeModel(JsonModel.fromJson(json), 16);
-    }
-    return new CubeModel();
+  private static CubeModel getRightBoot(JsonObject item) {
+    JsonObject json = parseJson(rightBoot);
+    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
-  static CubeModel getHelmModel(String id) {
-    if (id.startsWith("minecraft:")) {
-      String item = id.substring("minecraft:".length());
-      JsonObject json = parseJson(helmJson);
-      JsonObject textureMapping = new JsonObject();
-      json.add("textures", textureMapping);
-      System.out.format("item: %s%n", item);
-      switch (item) {
-        case "skull":
-          json = parseJson(headJson);
-          textureMapping = new JsonObject();
-          json.add("textures", textureMapping);
-          textureMapping.add("texture", "entity/steve");
-          break;
-        case "leather_helmet":
-          textureMapping.add("texture", "models/armor/leather_layer_1");
-          break;
-        case "golden_helmet":
-          textureMapping.add("texture", "models/armor/gold_layer_1");
-          break;
-        case "iron_helmet":
-          textureMapping.add("texture", "models/armor/iron_layer_1");
-          break;
-        case "chainmail_helmet":
-          textureMapping.add("texture", "models/armor/chainmail_layer_1");
-          break;
-        case "diamond_helmet":
-          textureMapping.add("texture", "models/armor/diamond_layer_1");
-          break;
-        default:
-          System.err.format("unknown item: %s%n", item);
-          return new CubeModel();
-      }
-      return new CubeModel(JsonModel.fromJson(json), 16);
+  static CubeModel getHelmModel(JsonObject item) {
+    String id = item.get("id").asString("");
+    JsonObject json = parseJson(helmJson);
+    if (id.equals("minecraft:skull")) {
+      json = parseJson(headJson);
     }
-    return new CubeModel();
+    Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
+    return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
   }
 
   public static JsonObject parseJson(String helmetJson) {
@@ -676,6 +462,86 @@ public class PlayerEntity extends Entity {
       json.add("scale", scale);
     }
     return json;
+  }
+
+  static Texture getTexture(JsonObject item) {
+    String id = item.get("id").asString("");
+    if (TextureCache.containsKey(item)) {
+      return TextureCache.get(item);
+    }
+    Texture texture = new Texture();
+    if (id.startsWith("minecraft:")) {
+      TextureLoader loader = null;
+      switch (id.substring("minecraft:".length())) {
+        case "skull":
+          loader = simpleTexture("entity/steve", texture);
+          break;
+        case "leather_boots":
+        case "leather_helmet":
+        case "leather_chestplate":
+          loader = coloredTexture("models/armor/leather_layer_1",
+              item.get("color").intValue(0x96613A), texture);
+          break;
+        case "leather_leggings":
+          loader = coloredTexture("models/armor/leather_layer_2",
+              item.get("color").intValue(0x96613A), texture);
+          break;
+        case "golden_boots":
+        case "golden_helmet":
+        case "golden_chestplate":
+          loader = simpleTexture("models/armor/gold_layer_1", texture);
+          break;
+        case "golden_leggings":
+          loader = simpleTexture("models/armor/gold_layer_2", texture);
+          break;
+        case "iron_boots":
+        case "iron_helmet":
+        case "iron_chestplate":
+          loader = simpleTexture("models/armor/iron_layer_1", texture);
+          break;
+        case "iron_leggings":
+          loader = simpleTexture("models/armor/iron_layer_2", texture);
+          break;
+        case "chainmail_boots":
+        case "chainmail_helmet":
+        case "chainmail_chestplate":
+          loader = simpleTexture("models/armor/chainmail_layer_1", texture);
+          break;
+        case "chainmail_leggings":
+          loader = simpleTexture("models/armor/chainmail_layer_2", texture);
+          break;
+        case "diamond_boots":
+        case "diamond_helmet":
+        case "diamond_chestplate":
+          loader = simpleTexture("models/armor/diamond_layer_1", texture);
+          break;
+        case "diamond_leggings":
+          loader = simpleTexture("models/armor/diamond_layer_2", texture);
+          break;
+        default:
+          Log.warnf("unknown item: %s%n", id);
+      }
+      if (loader != null) {
+        // TODO: defer loading.
+        Map<String, TextureLoader> toLoad = Collections.singletonMap(id, loader);
+        System.out.println("Loading textures: " + toLoad.keySet());
+        Collection<Map.Entry<String, TextureLoader>> missing =
+            TexturePackLoader.loadTextures(toLoad.entrySet());
+        for (Map.Entry<String, TextureLoader> tex : missing) {
+          System.err.println("Failed to load texture: " + tex.getValue());
+        }
+      }
+    }
+    TextureCache.put(item, texture);
+    return texture;
+  }
+
+  private static TextureLoader simpleTexture(String id, Texture texture) {
+    return new SimpleTexture("assets/minecraft/textures/" + id, texture);
+  }
+
+  private static TextureLoader coloredTexture(String id, int color, Texture texture) {
+    return new ColoredTexture("assets/minecraft/textures/" + id, color, texture);
   }
 
   public static PlayerEntity fromJson(JsonObject json) {

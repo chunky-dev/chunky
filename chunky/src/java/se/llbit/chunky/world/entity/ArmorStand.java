@@ -28,6 +28,7 @@ import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
+import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 
 import java.util.Collection;
@@ -373,22 +374,22 @@ public class ArmorStand extends Entity {
   private static JsonObject parseSettings(Tag tag) {
     JsonObject gear = new JsonObject();
     Tag armorItems = tag.get("ArmorItems");
-    String boots = armorItems.get(0).get("id").stringValue("");
+    CompoundTag boots = armorItems.get(0).asCompound();
     // TODO: handle colored leather.
     if (!boots.isEmpty()) {
-      gear.add("feet", boots);
+      gear.add("feet", PlayerEntity.parseItem(boots));
     }
-    String legs = armorItems.get(1).get("id").stringValue("");
+    CompoundTag legs = armorItems.get(1).asCompound();
     if (!legs.isEmpty()) {
-      gear.add("legs", legs);
+      gear.add("legs", PlayerEntity.parseItem(legs));
     }
-    String chest = armorItems.get(2).get("id").stringValue("");
+    CompoundTag chest = armorItems.get(2).asCompound();
     if (!chest.isEmpty()) {
-      gear.add("chest", chest);
+      gear.add("chest", PlayerEntity.parseItem(chest));
     }
-    String head = armorItems.get(3).get("id").stringValue("");
+    CompoundTag head = armorItems.get(3).asCompound();
     if (!head.isEmpty()) {
-      gear.add("head", head);
+      gear.add("head", PlayerEntity.parseItem(head));
     }
     JsonObject settings = new JsonObject();
     settings.add("showArms", tag.get("ShowArms").boolValue(false));

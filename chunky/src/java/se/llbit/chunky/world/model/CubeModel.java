@@ -22,6 +22,7 @@ import se.llbit.chunky.resources.TextureCache;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.resources.texturepack.SimpleTexture;
 import se.llbit.chunky.resources.texturepack.TextureLoader;
+import se.llbit.log.Log;
 import se.llbit.math.Quad;
 import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
@@ -39,7 +40,7 @@ public class CubeModel {
   public CubeModel() {
   }
 
-  public CubeModel(Collection<Cube> cubes, double uvScale) {
+  public CubeModel(Collection<Cube> cubes, double uvScale, Map<String, Texture> textureMap) {
     Collection<Quad> theFaces = new ArrayList<>();
     Collection<String> theTextures = new ArrayList<>();
     for (Cube cube : cubes) {
@@ -122,29 +123,15 @@ public class CubeModel {
       }
     }
 
-    Map<String, TextureLoader> toLoad = new HashMap<>();
-    this.textures = new Texture[theTextures.size()];
+    textures = new Texture[theTextures.size()];
     int index = 0;
-    for (String id : theTextures) {
-      Texture texture = TextureCache.get(id);
-      if (texture == null) {
-        texture = new Texture();
-        if (id.startsWith("#")) {
-          System.out.println("Unknown texture: " + id);
-        } else {
-          toLoad.put(id, new SimpleTexture("assets/minecraft/textures/" + id, texture));
-        }
-        TextureCache.put(id, texture);
+    for (String texture : theTextures) {
+      textures[index] = textureMap.get(texture);
+      if (textures[index] == null) {
+        Log.error("Missing texture in cube model.");
+        textures[index] = new Texture();
       }
-      this.textures[index++] = texture;
-    }
-    if (!toLoad.isEmpty()) {
-      System.out.println("Loading textures: " + toLoad.keySet());
-      Collection<Map.Entry<String, TextureLoader>> missing =
-          TexturePackLoader.loadTextures(toLoad.entrySet());
-      for (Map.Entry<String, TextureLoader> tex : missing) {
-        System.err.println("Failed to load texture: " + tex.getValue());
-      }
+      index += 1;
     }
     quads = new Quad[theFaces.size()];
     theFaces.toArray(quads);
