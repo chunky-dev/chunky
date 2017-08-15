@@ -301,6 +301,7 @@ def reddit_login():
 			refresh_token = credentials.get_noninteractive('refresh_token')
 			if refresh_token:
 				r = praw.Reddit(
+						check_for_updates=False,
 						client_id=id,
 						client_secret=secret,
 						redirect_uri='http://localhost:8181/q',
@@ -308,6 +309,7 @@ def reddit_login():
 						user_agent=ua_string)
 			else:
 				r = praw.Reddit(
+						check_for_updates=False,
 						client_id=id,
 						client_secret=secret,
 						redirect_uri='http://localhost:8181/q',
