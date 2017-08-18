@@ -159,4 +159,16 @@ public class TestBlockProperties {
     assertEquals(false, Block.LEAVES.isIronBarsConnector(0, 0));
     assertEquals(false, Block.LEAVES2.isIronBarsConnector(0, 0));
   }
+
+  @Test public void testWallTopConnector() {
+    assertEquals(true, Block.ENDROD.isWallTopConnector());
+    assertEquals(true, Block.HOPPER.isWallTopConnector());
+    assertEquals(true, Block.LEAVES.isWallTopConnector());
+    assertEquals(true, Block.LEAVES2.isWallTopConnector());
+    assertEquals(true, Block.REDSTONETORCHON.isWallTopConnector());
+    assertEquals(true, Block.TORCH.isWallTopConnector());
+    assertEquals(true, Block.STONE.isWallTopConnector());
+    assertEquals(true, Block.ENDERCHEST.isWallTopConnector());
+    assertEquals(true, Block.DRAGONEGG.isWallTopConnector());
+  }
 }

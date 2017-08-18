@@ -618,6 +618,10 @@ public class Block extends Material {
     @Override public String description(int data) {
       return direction[data % 6];
     }
+
+    @Override public boolean isWallTopConnector() {
+      return true;
+    }
   };
   public static final int FIRE_ID = 0x33;
   public static final Block FIRE = new Block(FIRE_ID, "block:fire", Texture.fire) {
@@ -657,6 +661,10 @@ public class Block extends Material {
 
     @Override public boolean intersect(Ray ray, Scene scene) {
       return ChestModel.intersect(ray, texture[(ray.getCurrentData() >> 16) % 3]);
+    }
+
+    @Override public boolean isWallTopConnector() {
+      return true;
     }
   };
   public static final int REDSTONEWIRE_ID = 0x37;
@@ -800,6 +808,10 @@ public class Block extends Material {
     @Override public String description(int data) {
       return direction[data % 6];
     }
+
+    @Override public boolean isWallTopConnector() {
+      return true;
+    }
   };
   public static final int REDSTONETORCHON_ID = 0x4C;
   public static final Block REDSTONETORCHON = new Block(REDSTONETORCHON_ID, "block:redstone_torch", Texture.redstoneTorchOn) {
@@ -811,6 +823,10 @@ public class Block extends Material {
 
     @Override public String description(int data) {
       return direction[data % 6];
+    }
+
+    @Override public boolean isWallTopConnector() {
+      return true;
     }
   };
   public static final int STONEBUTTON_ID = 0x4D;
@@ -1293,6 +1309,10 @@ public class Block extends Material {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return DragonEggModel.intersect(ray);
     }
+
+    @Override public boolean isWallTopConnector() {
+      return true;
+    }
   };
   public static final int REDSTONELAMPOFF_ID = 0x7B;
   public static final Block REDSTONELAMPOFF = new Block(REDSTONELAMPOFF_ID, "block:redstone_lamp", Texture.redstoneLampOff);
@@ -1363,6 +1383,10 @@ public class Block extends Material {
 
     @Override public boolean intersect(Ray ray, Scene scene) {
       return ChestModel.intersect(ray, texture);
+    }
+
+    @Override public boolean isWallTopConnector() {
+      return true;
     }
   };
   public static final int TRIPWIREHOOK_ID = 0x83;
@@ -1523,6 +1547,10 @@ public class Block extends Material {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return ChestModel.intersect(ray, texture[(ray.getCurrentData() >> 16) % 3]);
     }
+
+    @Override public boolean isWallTopConnector() {
+      return true;
+    }
   };
   public static final int WEIGHTEDPRESSUREPLATELIGHT_ID = 0x93;
   public static final Block WEIGHTEDPRESSUREPLATELIGHT = new Block(WEIGHTEDPRESSUREPLATELIGHT_ID, "block:light_weighted_pressure_plate", Texture.goldBlock) {
@@ -1565,6 +1593,10 @@ public class Block extends Material {
   public static final Block HOPPER = new Block(HOPPER_ID, "block:hopper", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return HopperModel.intersect(ray);
+    }
+
+    @Override public boolean isWallTopConnector() {
+      return true;
     }
   };
   public static final int QUARTZ_ID = 0x9B;
@@ -1973,6 +2005,10 @@ public class Block extends Material {
     @Override
     public String description(int data) {
       return direction[data % 6];
+    }
+
+    @Override public boolean isWallTopConnector() {
+      return true;
     }
   };
   public static final int CHORUSPLANT_ID = 0xC7;
@@ -3005,6 +3041,10 @@ public class Block extends Material {
 
   public boolean isStoneWallConnector(int data, int direction) {
     return solid || this == FENCEGATE || this == STONEWALL;
+  }
+
+  public boolean isWallTopConnector() {
+    return solid || isWater() || isLava();
   }
 
   public boolean isGlassPaneConnector(int data, int direction) {

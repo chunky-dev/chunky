@@ -1,5 +1,6 @@
 1.4.4 - TBD
 
+* Tweaked stone wall rendering to behave more like Minecraft.
 * Plugins can now modify the main window tabs.
 * Added banner rendering.
 * Improve bed rendering for Minecraft 1.12 (colored beds).
