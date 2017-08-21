@@ -589,20 +589,21 @@ public class OctreeFinalizer {
             case Block.JUNGLEFENCEGATE_ID:
             case Block.DARKOAKFENCEGATE_ID:
             case Block.ACACIAFENCEGATE_ID:
+              // Lower the fence gate if one stone wall block is adjacent.
               dir = 3 & (type >> BlockData.OFFSET);
               if (dir == 0 || dir == 2) {
-                // facing north or south
+                // Facing north or south.
                 int westId = (0xFF & octree.get(x - 1, cy, z));
                 int eastId = (0xFF & octree.get(x + 1, cy, z));
-                if (westId == Block.STONEWALL_ID && eastId == Block.STONEWALL_ID) {
+                if (westId == Block.STONEWALL_ID || eastId == Block.STONEWALL_ID) {
                   type |= 1 << BlockData.FENCEGATE_LOW;
                   octree.set(type, x, cy, z);
                 }
               } else {
-                // facing east or west
+                // Facing east or west.
                 int northId = (0xFF & octree.get(x, cy, z - 1));
                 int southId = (0xFF & octree.get(x, cy, z + 1));
-                if (northId == Block.STONEWALL_ID && southId == Block.STONEWALL_ID) {
+                if (northId == Block.STONEWALL_ID || southId == Block.STONEWALL_ID) {
                   type |= 1 << BlockData.FENCEGATE_LOW;
                   octree.set(type, x, cy, z);
                 }
