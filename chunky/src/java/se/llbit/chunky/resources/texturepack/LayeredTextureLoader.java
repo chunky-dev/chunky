@@ -19,6 +19,7 @@ package se.llbit.chunky.resources.texturepack;
 
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.log.Log;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
@@ -31,38 +32,51 @@ import java.util.zip.ZipFile;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class LayeredTextureLoader extends TextureLoader {
-  private final TextureLoader subLoader;
+  private final TextureLoader baseTexture;
   private final String textureName;
   private final Texture texture;
 
-  public LayeredTextureLoader(String file, Texture texture, TextureLoader subLoader) {
+  public LayeredTextureLoader(String file, Texture texture,
+      TextureLoader baseTextureLoader) {
     this.textureName = file;
     this.texture = texture;
-    this.subLoader = subLoader;
+    this.baseTexture = baseTextureLoader;
   }
 
   @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
-    BitmapImage image = ImageLoader.read(imageStream);
-    if (image.width != texture.getWidth() || image.height != texture.getHeight()) {
-      throw new TextureFormatError("Can't layer textures with different sizes.");
-    }
+    try {
+      BitmapImage overlay = ImageLoader.read(imageStream);
+      if (overlay.width != texture.getWidth() || overlay.height != texture.getHeight()) {
+        throw new TextureFormatError(String.format(
+            "Overlay texture %s has wrong size. Expected %dx%d, but was %dx%d.",
+            textureName,
+            texture.getWidth(), texture.getHeight(),
+            overlay.width, overlay.height));
+      }
 
-    BitmapImage result = new BitmapImage(texture.getBitmap());
-    for (int y = 0; y < image.height; ++y) {
-      for (int x = 0; x < image.width; ++x) {
-        int pixel = image.getPixel(x, y);
-        if (pixel != 0) {
-          result.setPixel(x, y, pixel);
+      BitmapImage result = new BitmapImage(texture.getBitmap());
+      for (int y = 0; y < overlay.height; ++y) {
+        for (int x = 0; x < overlay.width; ++x) {
+          int pixel = overlay.getPixel(x, y);
+          if (pixel != 0) {
+            result.setPixel(x, y, pixel);
+          }
         }
       }
+      texture.setTexture(result);
+    } catch (IOException e) {
+      Log.info("Missing overlay texture: " + textureName);
     }
-    texture.setTexture(result);
     return true;
   }
 
   @Override public boolean load(ZipFile texturePack, String topLevelDir) {
-    return subLoader.load(texturePack, topLevelDir)
+    return baseTexture.load(texturePack, topLevelDir)
         && load(topLevelDir + textureName, texturePack);
+  }
+
+  @Override public String toString() {
+    return String.format("{texture: %s, overlay: %s}", baseTexture, textureName);
   }
 }
 

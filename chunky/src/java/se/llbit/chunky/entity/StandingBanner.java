@@ -1,4 +1,5 @@
-/* Copyright (c) 2017 Jesper Öqvist <jesper@llbit.se>
+/*
+ * Copyright (c) 2017 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -14,11 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world.entity;
+package se.llbit.chunky.entity;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.resources.MinecraftFinder;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.TextureCache;
 import se.llbit.chunky.resources.TexturePackLoader;
@@ -45,7 +45,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A mob head (skull) entity.

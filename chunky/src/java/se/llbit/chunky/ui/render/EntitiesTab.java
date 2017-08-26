@@ -22,9 +22,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -33,11 +33,11 @@ import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
-import se.llbit.chunky.world.entity.Entity;
-import se.llbit.chunky.world.entity.PlayerEntity;
+import se.llbit.chunky.entity.Entity;
+import se.llbit.chunky.entity.PlayerEntity;
+import se.llbit.json.Json;
+import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
-import se.llbit.log.Log;
-import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
 import java.io.File;
@@ -49,7 +49,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class EntitiesTab extends Tab implements RenderControlsTab, Initializable {
+public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
   static class PlayerData {
@@ -85,9 +85,10 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
     }
   }
 
+  private final Tab parentTab;
   @FXML private TableView<PlayerData> entityTable;
   @FXML private TableColumn<PlayerData, String> nameCol;
-  @FXML private TableColumn<PlayerData, String> idCol;
+  @FXML private TableColumn<PlayerData, String> kindCol;
   @FXML private Button delete;
   @FXML private Button add;
   @FXML private Button cameraToPlayer;
@@ -98,16 +99,15 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
   @FXML private ChoiceBox<PlayerModel> playerModel;
   @FXML private TextField skin;
   @FXML private Button selectSkin;
-  @FXML private DoubleAdjuster direction;
-  @FXML private DoubleAdjuster headYaw;
-  @FXML private DoubleAdjuster headPitch;
-  @FXML private DoubleAdjuster leftArmPose;
-  @FXML private DoubleAdjuster rightArmPose;
-  @FXML private DoubleAdjuster leftLegPose;
-  @FXML private DoubleAdjuster rightLegPose;
+  @FXML private DoubleAdjuster yaw;
+  @FXML private DoubleAdjuster pitch;
+  @FXML private DoubleAdjuster roll;
   @FXML private DoubleAdjuster scale;
+  @FXML private DoubleAdjuster headScale;
+  @FXML private ChoiceBox<String> posePart;
 
   public EntitiesTab() throws IOException {
+    parentTab = new Tab("Entities", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("EntitiesTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -130,20 +130,16 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
   }
 
   @Override public Tab getTab() {
-    return this;
+    return parentTab;
   }
 
   private void updatePlayer(PlayerEntity player) {
+    posePart.getItems().setAll(player.partNames());
     playerModel.getSelectionModel().select(player.model);
     skin.setText(player.skin);
-    direction.set(player.yaw);
-    headYaw.set(player.headYaw);
-    headPitch.set(player.pitch);
-    leftArmPose.set(player.leftArmPose);
-    rightArmPose.set(player.rightArmPose);
-    leftLegPose.set(player.leftLegPose);
-    rightLegPose.set(player.rightLegPose);
     scale.set(player.scale);
+    headScale.set(player.headScale);
+    posePart.getSelectionModel().selectFirst(); // Updates the pose parameters.
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -165,9 +161,8 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
       if (position == null) {
         position = new Vector3(scene.camera().getPosition());
       }
-      PlayerEntity player = new PlayerEntity(String.format("%016X%016X", 0, id), position, 0, 0,
-          new JsonObject());
-      withSelected(selected -> {
+      PlayerEntity player = new PlayerEntity(String.format("%016X%016X", 0, id), position);
+      withEntity(selected -> {
         player.skin = selected.skin;
         player.model = selected.model;
       });
@@ -178,23 +173,24 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
       entityTable.getSelectionModel().select(data);
     });
     delete.setTooltip(new Tooltip("Delete the selected player."));
-    delete.setOnAction(e -> withSelected(selected -> {
+    delete.setOnAction(e -> withEntity(selected -> {
       scene.removePlayer(selected);
       update(scene);
     }));
-    selectSkin.setOnAction(e -> withSelected(player -> {
+    selectSkin.setOnAction(e -> withEntity(player -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Load Skin");
       fileChooser
           .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
-      File skinFile = fileChooser.showOpenDialog(getTabPane().getScene().getWindow());
+      File skinFile = fileChooser.showOpenDialog(getScene().getWindow());
       if (skinFile != null) {
         player.setTexture(skinFile.getAbsolutePath());
         skin.setText(skinFile.getAbsolutePath());
         scene.rebuildActorBvh();
       }
     }));
-    entityTable.setRowFactory(tbl -> {
+    // TODO: remove or update the pose editing dialog.
+    /*entityTable.setRowFactory(tbl -> {
       TableRow<PlayerData> row = new TableRow<>();
       row.setOnMouseClicked(e -> {
         if (e.getClickCount() == 2 && !row.isEmpty()) {
@@ -208,16 +204,16 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
         }
       });
       return row;
-    });
+    });*/
     cameraToPlayer.setTooltip(new Tooltip("Move the camera to the selected player position."));
-    cameraToPlayer.setOnAction(e -> withSelected(player -> scene.camera().moveToPlayer(player)));
+    cameraToPlayer.setOnAction(e -> withEntity(player -> scene.camera().moveToPlayer(player)));
     playerToCamera.setTooltip(new Tooltip("Move the selected player to the camera position."));
-    playerToCamera.setOnAction(e -> withSelected(player -> {
+    playerToCamera.setOnAction(e -> withEntity(player -> {
       player.position.set(scene.camera().getPosition());
       scene.rebuildActorBvh();
     }));
     playerToTarget.setTooltip(new Tooltip("Move the selected player to the current target."));
-    playerToTarget.setOnAction(e -> withSelected(player -> {
+    playerToTarget.setOnAction(e -> withEntity(player -> {
       Vector3 target = scene.getTargetPosition();
       if (target != null) {
         player.position.set(target);
@@ -225,12 +221,12 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
       }
     }));
     faceCamera.setTooltip(new Tooltip("Makes the selected player look at the camera."));
-    faceCamera.setOnAction(e -> withSelected(player -> {
+    faceCamera.setOnAction(e -> withEntity(player -> {
       player.lookAt(scene.camera().getPosition());
       scene.rebuildActorBvh();
     }));
     faceTarget.setTooltip(new Tooltip("Makes the selected player look at the current view target."));
-    faceTarget.setOnAction(e -> withSelected(player -> {
+    faceTarget.setOnAction(e -> withEntity(player -> {
       Vector3 target = scene.getTargetPosition();
       if (target != null) {
         player.lookAt(target);
@@ -244,67 +240,79 @@ public class EntitiesTab extends Tab implements RenderControlsTab, Initializable
           }
         });
     nameCol.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().name));
-    idCol.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().toString()));
+    kindCol.setCellValueFactory(data -> new ReadOnlyStringWrapper("Player"));
     playerModel.getItems().addAll(PlayerModel.values());
     playerModel.getSelectionModel().selectedItemProperty().addListener(
-        (observable, oldValue, newValue) -> withSelected(player -> {
+        (observable, oldValue, newValue) -> withEntity(player -> {
           player.model = newValue;
           scene.rebuildActorBvh();
         }));
-    direction.setName("Direction");
-    direction.setRange(-Math.PI, Math.PI);
-    direction.onValueChange(value -> withSelected(player -> {
-      player.yaw = value;
-      scene.rebuildActorBvh();
-    }));
-    headYaw.setName("Head yaw");
-    headYaw.setRange(-QuickMath.HALF_PI, QuickMath.HALF_PI);
-    headYaw.onValueChange(value -> withSelected(player -> {
-      player.headYaw = value;
-      scene.rebuildActorBvh();
-    }));
-    headPitch.setName("Head pitch");
-    headPitch.setRange(-QuickMath.HALF_PI, QuickMath.HALF_PI);
-    headPitch.onValueChange(value -> withSelected(player -> {
-      player.pitch = value;
-      scene.rebuildActorBvh();
-    }));
-    leftArmPose.setName("Left arm pose");
-    leftArmPose.setRange(-Math.PI, Math.PI);
-    leftArmPose.onValueChange(value -> withSelected(player -> {
-      player.leftArmPose = value;
-      scene.rebuildActorBvh();
-    }));
-    rightArmPose.setName("Right arm pose");
-    rightArmPose.setRange(-Math.PI, Math.PI);
-    rightArmPose.onValueChange(value -> withSelected(player -> {
-      player.rightArmPose = value;
-      scene.rebuildActorBvh();
-    }));
-    leftLegPose.setName("Left leg pose");
-    leftLegPose.setRange(-QuickMath.HALF_PI, QuickMath.HALF_PI);
-    leftLegPose.onValueChange(value -> withSelected(player -> {
-      player.leftLegPose = value;
-      scene.rebuildActorBvh();
-    }));
-    rightLegPose.setName("Right leg pose");
-    rightLegPose.setRange(-QuickMath.HALF_PI, QuickMath.HALF_PI);
-    rightLegPose.onValueChange(value -> withSelected(player -> {
-      player.rightLegPose = value;
-      scene.rebuildActorBvh();
-    }));
-    scale.setName("Scale");
+    scale.setTooltip("Modifies entity scale.");
     scale.setRange(0.1, 10);
-    scale.onValueChange(value -> withSelected(player -> {
+    scale.onValueChange(value -> withEntity(player -> {
       player.scale = value;
+      scene.rebuildActorBvh();
+    }));
+    headScale.setTooltip("Modifies entity head scale.");
+    headScale.setRange(0.1, 10);
+    headScale.onValueChange(value -> withEntity(player -> {
+      player.headScale = value;
+      scene.rebuildActorBvh();
+    }));
+    posePart.setTooltip(new Tooltip("Select the part of the entity to adjust."));
+    posePart.getSelectionModel().selectedItemProperty().addListener(
+        (observable, oldValue, part) -> withEntity(player -> {
+          withPose(player, part, partPose -> {
+            pitch.set(partPose.get(0).asDouble(0));
+            yaw.set(partPose.get(1).asDouble(0));
+            roll.set(partPose.get(2).asDouble(0));
+          });
+        }));
+    pitch.setTooltip("Modifies pitch of currently selected entity part.");
+    pitch.setRange(-Math.PI, Math.PI);
+    pitch.onValueChange(value -> withEntity(player -> {
+      withPose(player, posePart.getValue(), partPose -> {
+        partPose.set(0, Json.of(value));
+      });
+      scene.rebuildActorBvh();
+    }));
+    yaw.setTooltip("Modifies yaw of currently selected entity part.");
+    yaw.setRange(-Math.PI, Math.PI);
+    yaw.onValueChange(value -> withEntity(player -> {
+      withPose(player, posePart.getValue(), partPose -> {
+        partPose.set(1, Json.of(value));
+      });
+      scene.rebuildActorBvh();
+    }));
+    roll.setTooltip("Modifies roll of currently selected entity part.");
+    roll.setRange(-Math.PI, Math.PI);
+    roll.onValueChange(value -> withEntity(player -> {
+      withPose(player, posePart.getValue(), partPose -> {
+        partPose.set(2, Json.of(value));
+      });
       scene.rebuildActorBvh();
     }));
   }
 
-  private void withSelected(Consumer<PlayerEntity> consumer) {
+  private void withEntity(Consumer<PlayerEntity> consumer) {
     PlayerData player = entityTable.getSelectionModel().getSelectedItem();
     if (player != null) {
       consumer.accept(player.entity);
+    }
+  }
+
+  private void withPose(PlayerEntity entity, String part, Consumer<JsonArray> consumer) {
+    if (part != null && !part.isEmpty()) {
+      JsonArray pose = entity.pose.get(part).array();
+      if (pose.size() < 3) {
+        // Set default pose to [0, 0, 0].
+        pose = new JsonArray(3);
+        pose.add(0);
+        pose.add(0);
+        pose.add(0);
+        entity.pose.set(part, pose);
+      }
+      consumer.accept(pose);
     }
   }
 

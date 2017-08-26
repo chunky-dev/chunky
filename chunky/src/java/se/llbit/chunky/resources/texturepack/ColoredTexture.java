@@ -24,6 +24,7 @@ import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.zip.ZipFile;
 
 /**
@@ -32,12 +33,12 @@ import java.util.zip.ZipFile;
  * <p>This is used for coloring leather armor textures.
  */
 public class ColoredTexture extends TextureLoader {
-  private final String file;
+  private final String textureName;
   private final float[] color = new float[4];
   private final Texture texture;
 
-  public ColoredTexture(String file, int color, Texture texture) {
-    this.file = file;
+  public ColoredTexture(String textureName, int color, Texture texture) {
+    this.textureName = textureName;
     this.texture = texture;
     ColorUtil.getRGBAComponents(color, this.color);
   }
@@ -61,6 +62,10 @@ public class ColoredTexture extends TextureLoader {
   }
 
   @Override public boolean load(ZipFile texturePack, String topLevelDir) {
-    return load(topLevelDir + file, texturePack);
+    return load(topLevelDir + textureName, texturePack);
+  }
+
+  @Override public String toString() {
+    return String.format("{texture: %s, color: %s}", textureName, Arrays.toString(color));
   }
 }

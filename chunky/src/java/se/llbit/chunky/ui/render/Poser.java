@@ -35,6 +35,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.json.Json;
 import se.llbit.math.BVH;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Matrix3;
@@ -127,43 +128,49 @@ public class Poser extends Stage implements Initializable {
     direction.setName("Direction");
     direction.setRange(-Math.PI, Math.PI);
     direction.onValueChange(value -> {
-      player.entity.yaw = value;
+      player.entity.pose.set("rotation", Json.of(value));
       redraw();
     });
     headYaw.setName("Head yaw");
     headYaw.setRange(-QuickMath.HALF_PI, QuickMath.HALF_PI);
     headYaw.onValueChange(value -> {
-      player.entity.headYaw = value;
+      // TODO
+      //player.entity.headYaw = value;
       redraw();
     });
     headPitch.setName("Head pitch");
     headPitch.setRange(-QuickMath.HALF_PI, QuickMath.HALF_PI);
     headPitch.onValueChange(value -> {
-      player.entity.pitch = value;
+      // TODO
+      //player.entity.pitch = value;
       redraw();
     });
     leftArmPose.setName("Left arm pose");
     leftArmPose.setRange(-Math.PI, Math.PI);
     leftArmPose.onValueChange(value -> {
-      player.entity.leftArmPose = value;
+      // TODO
+      //player.entity.leftArmPose = value;
       redraw();
     });
     rightArmPose.setName("Right arm pose");
     rightArmPose.setRange(-Math.PI, Math.PI);
     rightArmPose.onValueChange(value -> {
-      player.entity.rightArmPose = value;
+      // TODO
+      //player.entity.rightArmPose = value;
       redraw();
     });
     leftLegPose.setName("Left leg pose");
     leftLegPose.setRange(-QuickMath.HALF_PI, QuickMath.HALF_PI);
     leftLegPose.onValueChange(value -> {
-      player.entity.leftLegPose = value;
+      // TODO
+      //player.entity.leftLegPose = value;
       redraw();
     });
     rightLegPose.setName("Right leg pose");
     rightLegPose.setRange(-QuickMath.HALF_PI, QuickMath.HALF_PI);
     rightLegPose.onValueChange(value -> {
-      player.entity.rightLegPose = value;
+      // TODO
+      //player.entity.rightLegPose = value;
       redraw();
     });
     redraw();

@@ -18,7 +18,7 @@ package se.llbit.chunky.world;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.ui.ProgressTracker;
-import se.llbit.chunky.world.entity.PlayerEntity;
+import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.world.listeners.ChunkDeletionListener;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;

@@ -32,7 +32,7 @@ import se.llbit.chunky.renderer.projection.Projector;
 import se.llbit.chunky.renderer.projection.SphericalApertureProjector;
 import se.llbit.chunky.renderer.projection.StereographicProjector;
 import se.llbit.chunky.world.Chunk;
-import se.llbit.chunky.world.entity.PlayerEntity;
+import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.json.JsonObject;
 import se.llbit.log.Log;
 import se.llbit.math.Matrix3;
@@ -598,8 +598,9 @@ public class Camera implements JsonSerializable {
    * Move the camera to the player location.
    */
   public void moveToPlayer(PlayerEntity player) {
-    pitch = QuickMath.degToRad(player.pitch - 90);
-    yaw = QuickMath.degToRad(-player.yaw + 90);
+    // TODO
+    //pitch = QuickMath.degToRad(player.pitch - 90);
+    //yaw = QuickMath.degToRad(-player.rotation + 90);
     roll = 0;
     pos.x = player.position.x;
     pos.y = player.position.y + 1.6;

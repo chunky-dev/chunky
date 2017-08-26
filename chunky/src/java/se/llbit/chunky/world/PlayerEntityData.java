@@ -23,7 +23,7 @@ public class PlayerEntityData {
   public final double x;
   public final double y;
   public final double z;
-  public final double yaw;
+  public final double rotation;
   public final double pitch;
   public final int dimension;
   public final long uuidLo;
@@ -46,7 +46,7 @@ public class PlayerEntityData {
     x = pos.get(0).doubleValue();
     y = pos.get(1).doubleValue();
     z = pos.get(2).doubleValue();
-    yaw = rotation.get(0).floatValue();
+    this.rotation = rotation.get(0).floatValue();
     pitch = rotation.get(1).floatValue();
     dimension = player.get("Dimension").intValue();
 

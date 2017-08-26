@@ -1,4 +1,5 @@
-/* Copyright (c) 2015 Jesper Öqvist <jesper@llbit.se>
+/*
+ * Copyright (c) 2017 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -14,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world.entity;
+package se.llbit.chunky.entity;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;

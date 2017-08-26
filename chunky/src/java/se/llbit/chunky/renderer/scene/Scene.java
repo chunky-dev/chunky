@@ -37,15 +37,15 @@ import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
-import se.llbit.chunky.world.entity.ArmorStand;
-import se.llbit.chunky.world.entity.StandingBanner;
-import se.llbit.chunky.world.entity.Entity;
-import se.llbit.chunky.world.entity.PaintingEntity;
-import se.llbit.chunky.world.entity.PlayerEntity;
-import se.llbit.chunky.world.entity.SignEntity;
-import se.llbit.chunky.world.entity.SkullEntity;
-import se.llbit.chunky.world.entity.WallBanner;
-import se.llbit.chunky.world.entity.WallSignEntity;
+import se.llbit.chunky.entity.ArmorStand;
+import se.llbit.chunky.entity.StandingBanner;
+import se.llbit.chunky.entity.Entity;
+import se.llbit.chunky.entity.PaintingEntity;
+import se.llbit.chunky.entity.PlayerEntity;
+import se.llbit.chunky.entity.SignEntity;
+import se.llbit.chunky.entity.SkullEntity;
+import se.llbit.chunky.entity.WallBanner;
+import se.llbit.chunky.entity.WallSignEntity;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -816,8 +816,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 entities.add(
                     new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
               } else if (id.equals("minecraft:armor_stand")) {
-                float rotation = tag.get("Rotation").get(0).floatValue();
-                entities.add(new ArmorStand(new Vector3(x, y, z), rotation, tag));
+                entities.add(new ArmorStand(new Vector3(x, y, z), tag));
               }
             }
           }

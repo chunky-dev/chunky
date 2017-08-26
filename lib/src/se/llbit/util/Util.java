@@ -114,7 +114,7 @@ public class Util {
       return false;
     }
     try {
-      // insert "GMT"
+      // Insert "GMT".
       if (time.endsWith("Z")) {
         time = time.substring(0, time.length() - 1) + "GMT-00:00";
       } else {

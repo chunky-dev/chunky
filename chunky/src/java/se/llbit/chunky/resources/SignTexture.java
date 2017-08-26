@@ -18,7 +18,7 @@ package se.llbit.chunky.resources;
 
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
-import se.llbit.chunky.world.entity.SignEntity.Color;
+import se.llbit.chunky.entity.SignEntity.Color;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Vector4;

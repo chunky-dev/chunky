@@ -60,13 +60,15 @@ public class Transform {
   public void applyRotScale(Vector3 v) {
   }
 
-  private Transform chain(Transform other) {
+  /**
+   * Creates a new transform by chaining another transform after this one.
+   */
+  public Transform chain(Transform other) {
     if (this == NONE) {
       return other;
     } else {
       return new TransformPair(this, other);
     }
-
   }
 
   /**
@@ -96,9 +98,13 @@ public class Transform {
   }
 
   /**
-   * Scale by a scalar.
+   * Scales all coordinates uniformly.
    */
   public final Transform scale(final double scale) {
+    if (scale == 1.0) {
+      // No transform.
+      return this;
+    }
     return chain(new Transform() {
       @Override public void apply(Vector3 v) {
         v.scale(scale);
