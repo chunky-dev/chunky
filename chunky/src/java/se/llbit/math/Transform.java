@@ -17,11 +17,20 @@
 package se.llbit.math;
 
 /**
- * A transformation.
+ * Coordinate transforms.
+ *
+ * <p>A sequence of transforms can be chained together to form a more complex transform.
+ *
+ * <p>A sequence of transforms is created by using the NONE transform as base transform,
+ * then using .scale(), .translate(), .rotate(), etc., to chain the next transform in
+ * the sequence.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Transform {
+  /**
+   * Used to sequence two separate transformations.
+   */
   private static class TransformPair extends Transform {
     private final Transform a;
     private final Transform b;
