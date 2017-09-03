@@ -21,6 +21,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -31,6 +32,7 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -190,6 +192,8 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
   /** Maps JavaFX tabs to tab controllers. */
   private Map<Tab, RenderControlsTab> tabControllers = Collections.emptyMap();
 
+  private final Tooltip tooltip;
+
   @FXML private TextField sceneNameField;
 
   @FXML private Button saveBtn;
@@ -223,6 +227,9 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
   public RenderControlsFxController() {
     decimalFormat.setGroupingSize(3);
     decimalFormat.setGroupingUsed(true);
+    tooltip = new Tooltip();
+    tooltip.setConsumeAutoHidingEvents(false);
+    tooltip.setAutoHide(true);
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -510,4 +517,20 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
     }
   }
 
+  /**
+   * Shows a simple popup with a tooltip type message.
+   * The popup is displayed directly below the given scene node.
+   *
+   * @param node the scene node to display the popup below
+   */
+  public void showPopup(String message, Region node) {
+    if (node.getScene() != null && node.getScene().getWindow() != null) {
+      Point2D offset = node.localToScene(0, 0);
+      tooltip.setText(message);
+      tooltip.show(node,
+          offset.getX() + node.getScene().getX() + node.getScene().getWindow().getX(),
+          offset.getY() + node.getScene().getY() + node.getScene().getWindow().getY()
+              + node.getHeight());
+    }
+  }
 }

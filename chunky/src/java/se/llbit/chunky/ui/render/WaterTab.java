@@ -24,6 +24,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -42,9 +43,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class WaterTab extends Tab implements RenderControlsTab, Initializable {
+public class WaterTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
+  private final Tab parentTab;
   @FXML private CheckBox stillWater;
   @FXML private DoubleAdjuster waterVisibility;
   @FXML private DoubleAdjuster waterOpacity;
@@ -56,6 +58,7 @@ public class WaterTab extends Tab implements RenderControlsTab, Initializable {
   @FXML private Button saveDefaults;
 
   private IntegerProperty waterHeightProp = new SimpleIntegerProperty();
+  private RenderControlsFxController renderControls;
   private RenderController controller;
   private final ChangeListener<javafx.scene.paint.Color> waterColorListener =
       (observable, oldValue, newValue) -> {
@@ -64,6 +67,7 @@ public class WaterTab extends Tab implements RenderControlsTab, Initializable {
       };
 
   public WaterTab() throws IOException {
+    parentTab = new Tab("Water", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("WaterTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -71,6 +75,7 @@ public class WaterTab extends Tab implements RenderControlsTab, Initializable {
   }
 
   @Override public void setController(RenderControlsFxController controller) {
+    renderControls = controller;
     this.controller = controller.getRenderController();
     scene = this.controller.getSceneManager().getScene();
   }
@@ -93,7 +98,7 @@ public class WaterTab extends Tab implements RenderControlsTab, Initializable {
   }
 
   @Override public Tab getTab() {
-    return this;
+    return parentTab;
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -120,24 +125,29 @@ public class WaterTab extends Tab implements RenderControlsTab, Initializable {
     waterHeightProp.set(initialWaterHeight);
 
     applyWaterHeight.setOnAction(e -> {
-      if (!waterWorld.isSelected()) {
-        // The check box event handler will update scene config.
-        waterWorld.setSelected(true);
+      boolean needsReload;
+      if (waterWorld.isSelected()) {
+        needsReload = scene.setWaterHeight(waterHeightProp.get());
       } else {
-        scene.setWaterHeight(waterHeightProp.get());
+        needsReload = scene.setWaterHeight(0);
+      }
+      if (needsReload) {
         controller.getSceneManager().reloadChunks();
       }
     });
 
+    waterWorld.setTooltip(
+        new Tooltip("In Water World mode, an infinite ocean surrounds the loaded chunks."));
     waterWorld.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      boolean reload;
+      int waterHeight;
       if (newValue) {
-        reload = scene.setWaterHeight(waterHeightProp.get());
+        waterHeight = waterHeightProp.get();
       } else {
-        reload = scene.setWaterHeight(0);
+        waterHeight = 0;
       }
-      if (reload) {
-        controller.getSceneManager().reloadChunks();
+      if (waterHeight != scene.getWaterHeight()) {
+        renderControls.showPopup(
+            "Click the Apply button to apply this setting and reload all chunks.", waterWorld);
       }
     });
 
@@ -161,4 +171,5 @@ public class WaterTab extends Tab implements RenderControlsTab, Initializable {
       }
     });
   }
+
 }

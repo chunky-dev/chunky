@@ -20,7 +20,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -29,7 +28,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Region;
 import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.map.WorldMapLoader;
@@ -104,7 +102,7 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
 
   private RenderController controller;
   private WorldMapLoader mapLoader;
-  private RenderControlsFxController fxController;
+  private RenderControlsFxController renderControls;
   private final Tooltip tooltip;
   private ChunkyFxController chunkyFxController;
 
@@ -174,7 +172,8 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
         + "Takes effect on next scene creation."));
     loadPlayers.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setLoadPlayers(newValue);
-      attachTooltip("This takes effect the next time a new scene is created.", loadPlayers);
+      renderControls.showPopup(
+          "This takes effect the next time a new scene is created.", loadPlayers);
     });
     biomeColors.setTooltip(new Tooltip("Colors grass and tree leaves according to biome."));
     biomeColors.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -214,14 +213,14 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
         "Blocks above this Y value are not loaded. Requires reloading chunks to take effect.");
     yMax.onValueChange(value -> {
       scene.setYClipMax(value);
-      attachTooltip("Reload the chunks for this to take effect.", yMax);
+      renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
     });
     yMin.setRange(0, 256);
     yMin.setTooltip(
         "Blocks below this Y value are not loaded. Requires reloading chunks to take effect.");
     yMin.onValueChange(value -> {
       scene.setYClipMin(value);
-      attachTooltip("Reload the chunks for this to take effect.", yMax);
+      renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
     });
     loadSceneBtn.setTooltip(new Tooltip("This replaces the current scene!"));
     loadSceneBtn.setGraphic(new ImageView(Icon.load.fxImage()));
@@ -275,17 +274,6 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
     });
   }
 
-  private void attachTooltip(String message, Region node) {
-    if (node.getScene() != null && node.getScene().getWindow() != null) {
-      Point2D offset = node.localToScene(0, 0);
-      tooltip.setText(message);
-      tooltip.show(node,
-          offset.getX() + node.getScene().getX() + node.getScene().getWindow().getX(),
-          offset.getY() + node.getScene().getY() + node.getScene().getWindow().getY()
-              + node.getHeight());
-    }
-  }
-
   private void updateCanvasSize() {
     String size = canvasSize.getValue();
     try {
@@ -294,7 +282,7 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
       if (matcher.matches()) {
         int width = Integer.parseInt(matcher.group(1));
         int height = Integer.parseInt(matcher.group(2));
-        RenderCanvasFx canvas = fxController.getCanvas();
+        RenderCanvasFx canvas = renderControls.getCanvas();
         if (canvas != null && canvas.isShowing()) {
           canvas.setCanvasSize(width, height);
         }
@@ -313,7 +301,7 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
   }
 
   @Override public void setController(RenderControlsFxController controls) {
-    this.fxController = controls;
+    this.renderControls = controls;
     this.chunkyFxController = controls.getChunkyController();
     this.mapLoader = chunkyFxController.getMapLoader();
     this.controller = controls.getRenderController();
