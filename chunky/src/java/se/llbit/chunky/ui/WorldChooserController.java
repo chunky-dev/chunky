@@ -142,7 +142,6 @@ public class WorldChooserController implements Initializable {
   private void disableControls(boolean value) {
     worldTbl.setDisable(value);
     changeWorldDirBtn.setDisable(value);
-    browseBtn.setDisable(value);
     loadSelectedBtn.setDisable(value);
   }
 
@@ -181,6 +180,9 @@ public class WorldChooserController implements Initializable {
       statusLabel.setText(prevStatus);
       disableControls(false);
     });
+
+    loadWorldsTask.setOnCancelled(event -> disableControls(false));
+    loadWorldsTask.setOnFailed(event -> disableControls(false));
 
     Thread loadWorldsThread = new Thread(loadWorldsTask, "Worlds list loader");
     loadWorldsThread.start();
