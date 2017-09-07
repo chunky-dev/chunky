@@ -621,6 +621,7 @@ public class OctreeFinalizer {
             case Block.QUARTZSTAIRS_ID:
             case Block.ACACIASTAIRS_ID:
             case Block.DARKOAKSTAIRS_ID:
+            case Block.PURPURSTAIRS_ID:
               // all corner notation (s-e, n-w, etc) is indicating gradient
               // check if this is a corner stair block
               int stairdata = type >> BlockData.OFFSET;

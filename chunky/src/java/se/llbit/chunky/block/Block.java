@@ -3072,7 +3072,7 @@ public class Block extends Material {
         || this == STONEBRICKSTAIRS || this == NETHERBRICKSTAIRS || this == SANDSTONESTAIRS
         || this == SPRUCEWOODSTAIRS || this == BIRCHWOODSTAIRS || this == JUNGLEWOODSTAIRS
         || this == QUARTZSTAIRS || this == ACACIASTAIRS || this == DARKOAKSTAIRS
-        || this == REDSANDSTONESTAIRS;
+        || this == REDSANDSTONESTAIRS || this == PURPURSTAIRS;
   }
 
   public boolean isGroundBlock() {
