@@ -19,10 +19,20 @@ package se.llbit.chunky.model;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
+import se.llbit.math.ColorUtil;
 import se.llbit.math.Ray;
 
 public class LeafModel {
   private static final AABB block = new AABB(0, 1, 0, 1, 0, 1);
+
+  private static final float[] SPRUCE_COLOR = new float[4];
+  private static final float[] BIRCH_COLOR = new float[4];
+
+  static {
+    // Spruce and birch colors are hard-coded.
+    ColorUtil.getRGBAComponents(0x2b472b, SPRUCE_COLOR);
+    ColorUtil.getRGBAComponents(0x3a4e25, BIRCH_COLOR);
+  }
 
   public static boolean intersect(Ray ray, Scene scene, Texture texture) {
     ray.t = Double.POSITIVE_INFINITY;
@@ -30,7 +40,17 @@ public class LeafModel {
       float[] color = texture.getColor(ray.u, ray.v);
       if (color[3] > Ray.EPSILON) {
         ray.color.set(color);
-        float[] biomeColor = ray.getBiomeFoliageColor(scene);
+        float[] biomeColor;
+        int woodType = ray.getBlockData();
+        if (woodType == 1) {
+          // Use constant spruce color:
+          biomeColor = SPRUCE_COLOR;
+        } else if (woodType == 2) {
+          // Use constant birch color:
+          biomeColor = BIRCH_COLOR;
+        } else {
+          biomeColor = ray.getBiomeFoliageColor(scene);
+        }
         ray.color.x *= biomeColor[0];
         ray.color.y *= biomeColor[1];
         ray.color.z *= biomeColor[2];
