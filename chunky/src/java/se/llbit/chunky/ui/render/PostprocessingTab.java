@@ -20,6 +20,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -30,13 +31,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class PostprocessingTab extends Tab implements RenderControlsTab, Initializable {
+public class PostprocessingTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
+  private final Tab parentTab;
   @FXML private DoubleAdjuster exposure;
   @FXML private ChoiceBox<Postprocess> postprocessingMode;
 
   public PostprocessingTab() throws IOException {
+    parentTab = new Tab("Postprocessing", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("PostprocessingTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -53,7 +56,7 @@ public class PostprocessingTab extends Tab implements RenderControlsTab, Initial
   }
 
   @Override public Tab getTab() {
-    return this;
+    return parentTab;
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {

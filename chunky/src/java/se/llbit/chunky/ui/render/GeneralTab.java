@@ -24,6 +24,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
@@ -51,50 +52,31 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GeneralTab extends Tab implements RenderControlsTab, Initializable {
+public class GeneralTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
+  private final Tab parentTab;
   @FXML private Button loadSceneBtn;
-
   @FXML private Button openSceneDirBtn;
-
   @FXML private Button exportSettings;
-
   @FXML private Button importSettings;
-
   @FXML private Button loadSelectedChunks;
-
   @FXML private Button reloadChunks;
-
   @FXML private ComboBox<String> canvasSize;
-
   @FXML private Label canvasSizeLbl;
-
   @FXML private Button applySize;
-
   @FXML private Button makeDefaultSize;
-
   @FXML private Button setDefaultYMin;
   @FXML private Button setDefaultYMax;
-
   @FXML private Button scale05;
-
   @FXML private Button scale15;
-
   @FXML private Button scale20;
-
   @FXML private CheckBox loadPlayers;
-
   @FXML private CheckBox biomeColors;
-
   @FXML private CheckBox saveDumps;
-
   @FXML private CheckBox saveSnapshots;
-
   @FXML private ComboBox<Number> dumpFrequency;
-
   @FXML private IntegerAdjuster yMin;
-
   @FXML private IntegerAdjuster yMax;
 
   private ChangeListener<String> canvasSizeListener =
@@ -103,18 +85,14 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
   private RenderController controller;
   private WorldMapLoader mapLoader;
   private RenderControlsFxController renderControls;
-  private final Tooltip tooltip;
   private ChunkyFxController chunkyFxController;
 
   public GeneralTab() throws IOException {
+    parentTab = new Tab("General", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("GeneralTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
     loader.load();
-
-    tooltip = new Tooltip();
-    tooltip.setConsumeAutoHidingEvents(false);
-    tooltip.setAutoHide(true);
   }
 
   @Override public void update(Scene scene) {
@@ -137,11 +115,11 @@ public class GeneralTab extends Tab implements RenderControlsTab, Initializable 
   }
 
   @Override public Tab getTab() {
-    return this;
+    return parentTab;
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
-    setGraphic(new ImageView(Icon.wrench.fxImage()));
+    parentTab.setGraphic(new ImageView(Icon.wrench.fxImage()));
 
     exportSettings.setOnAction(event -> {
       SettingsExport dialog = new SettingsExport(scene.toJson());

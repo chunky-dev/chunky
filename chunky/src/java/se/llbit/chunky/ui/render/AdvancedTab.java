@@ -22,6 +22,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
@@ -39,25 +40,21 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AdvancedTab extends Tab implements RenderControlsTab, Initializable {
+public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initializable {
   private RenderController controller;
   private Scene scene;
 
+  private final Tab parentTab;
   @FXML private IntegerAdjuster renderThreads;
-
   @FXML private IntegerAdjuster cpuLoad;
-
   @FXML private IntegerAdjuster rayDepth;
-
   @FXML private Button mergeRenderDump;
-
   @FXML private CheckBox shutdown;
-
   @FXML private CheckBox fastFog;
-
   @FXML private ChoiceBox<OutputMode> outputMode;
 
   public AdvancedTab() throws IOException {
+    parentTab = new Tab("Advanced", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("AdvancedTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -86,7 +83,7 @@ public class AdvancedTab extends Tab implements RenderControlsTab, Initializable
       fileChooser.setTitle("Merge Render Dump");
       fileChooser
           .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Render dumps", "*.dump"));
-      File dump = fileChooser.showOpenDialog(getTabPane().getScene().getWindow());
+      File dump = fileChooser.showOpenDialog(getScene().getWindow());
       if (dump != null) {
         // TODO: remove cast.
         ((AsynchronousSceneManager) controller.getSceneManager()).mergeRenderDump(dump);
@@ -123,7 +120,7 @@ public class AdvancedTab extends Tab implements RenderControlsTab, Initializable
   }
 
   @Override public Tab getTab() {
-    return this;
+    return parentTab;
   }
 
   @Override public void setController(RenderControlsFxController controls) {

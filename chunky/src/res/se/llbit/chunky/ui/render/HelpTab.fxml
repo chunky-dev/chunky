@@ -7,8 +7,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.control.ScrollPane?>
 
-<fx:root text="Help" type="javafx.scene.control.Tab" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-   <ScrollPane>
+<fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
       <VBox spacing="10.0">
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -31,5 +30,4 @@
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Holding SHIFT makes the basic movement keys move 0.1 of the normal speed." wrappingWidth="251.2109375" />
          </children>
       </VBox>
-   </ScrollPane>
 </fx:root>

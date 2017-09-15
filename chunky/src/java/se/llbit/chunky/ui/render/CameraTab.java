@@ -28,6 +28,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -53,9 +54,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class CameraTab extends Tab implements RenderControlsTab, Initializable {
+public class CameraTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
+  private final Tab parentTab;
   @FXML private MenuButton loadPreset;
   @FXML private ComboBox<String> cameras;
   @FXML private Button duplicate;
@@ -84,6 +86,7 @@ public class CameraTab extends Tab implements RenderControlsTab, Initializable {
   private WorldMapLoader mapLoader;
 
   public CameraTab() throws IOException {
+    parentTab = new Tab("Camera", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("CameraTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -101,7 +104,7 @@ public class CameraTab extends Tab implements RenderControlsTab, Initializable {
   }
 
   @Override public Tab getTab() {
-    return this;
+    return parentTab;
   }
 
   private void updateProjectionMode() {

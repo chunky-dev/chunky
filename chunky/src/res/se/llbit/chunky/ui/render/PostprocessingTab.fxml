@@ -9,8 +9,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 
-<fx:root text="Postprocessing" type="javafx.scene.control.Tab" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-  <ScrollPane>
+<fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
     <VBox spacing="10.0">
       <children>
         <DoubleAdjuster fx:id="exposure" />
@@ -26,5 +25,4 @@
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
       </padding>
     </VBox>
-  </ScrollPane>
 </fx:root>
