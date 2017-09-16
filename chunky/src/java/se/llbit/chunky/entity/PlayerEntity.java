@@ -566,6 +566,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       return TextureCache.get(item);
     }
     Texture texture = new Texture();
+    String textureId = id; // Texture ID is used for log messages.
     if (id.startsWith("minecraft:")) {
       TextureLoader loader = null;
       switch (id.substring("minecraft:".length())) {
@@ -575,30 +576,31 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           switch (type) {
             case 0:
               // Skeleton skull.
-              loader = simpleTexture("entity/skeleton/skeleton", texture);
+              textureId = "entity/skeleton/skeleton";
               break;
             case 1:
               // Wither skeleton skull.
-              loader = simpleTexture("entity/skeleton/wither_skeleton", texture);
+              textureId = "entity/skeleton/wither_skeleton";
               break;
             case 2:
               // Zombie head.
-              loader = simpleTexture("entity/zombie/zombie", texture);
+              textureId = "entity/zombie/zombie";
               break;
             case 3:
               // Steve head.
-              loader = simpleTexture("entity/steve", texture);
+              textureId = "entity/steve";
               break;
             case 4:
               // Creeper head.
-              loader = simpleTexture("entity/creeper/creeper", texture);
+              textureId = "entity/creeper/creeper";
               break;
             case 5:
               // Dragon head.
               // TODO: fixme
-              loader = simpleTexture("entity/skeleton/wither_skeleton", texture);
+              textureId = "entity/skeleton/wither_skeleton";
               break;
           }
+          loader = simpleTexture(textureId, texture);
           break;
         }
         case "leather_boots":
@@ -644,16 +646,16 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           loader = simpleTexture("models/armor/diamond_layer_2", texture);
           break;
         default:
-          Log.warnf("unknown item: %s%n", id);
+          Log.warnf("Unknown item ID: %s%n", id);
       }
       if (loader != null) {
         // TODO: defer loading.
-        Map<String, TextureLoader> toLoad = Collections.singletonMap(id, loader);
-        System.out.println("Loading textures: " + toLoad.keySet());
+        Map<String, TextureLoader> toLoad = Collections.singletonMap(textureId, loader);
+        Log.infof("Loading textures: %s", toLoad.keySet().toString());
         Collection<Map.Entry<String, TextureLoader>> missing =
             TexturePackLoader.loadTextures(toLoad.entrySet());
         for (Map.Entry<String, TextureLoader> tex : missing) {
-          System.err.println("Failed to load texture: " + tex.getValue());
+          Log.warnf("Failed to load texture: %s", tex.getValue());
         }
       }
     }
