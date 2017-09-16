@@ -385,6 +385,7 @@ public class ArmorStand extends Entity implements Poseable, Geared {
   public ArmorStand(Vector3 position, Tag tag) {
     super(position);
     gear = new JsonObject();
+    Tag handItems = tag.get("HandItems");
     Tag armorItems = tag.get("ArmorItems");
     CompoundTag boots = armorItems.get(0).asCompound();
     // TODO: handle colored leather.

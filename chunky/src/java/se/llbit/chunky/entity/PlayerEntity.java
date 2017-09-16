@@ -114,6 +114,11 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     if (!color.isError()) {
       item.add("color", color.intValue(0));
     }
+    if (id.equals("minecraft:skull")) {
+      // Skull type is stored in the damage field.
+      int damage = tag.get("Damage").shortValue();
+      item.add("type", damage);
+    }
     return item;
   }
 
@@ -407,6 +412,10 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
   private static final String headJson =
       "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[2,0,4,2],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,2],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,2,4,4],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,2,0,4],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,2,4,4],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,2,8,4],\"texture\":\"#texture\"}}}]}";
 
+  // The difference between skullJson/headJson is that skullJson is textured with a half as tall texture.
+  private static final String skullJson =
+      "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[2,0,4,4],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,4],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,4,4,8],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,4,0,8],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,4,4,8],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,4,8,8],\"texture\":\"#texture\"}}}]}";
+
   private static final String leftPauldron =
       "{\"elements\":[{\"from\":[5,0,5],\"to\":[11,16,11],\"faces\":{\"up\":{\"uv\":[11,8,12,10],\"texture\":\"#texture\"},\"east\":{\"uv\":[12,10,13,16],\"texture\":\"#texture\"},\"west\":{\"uv\":[10,10,11,16],\"texture\":\"#texture\"},\"north\":{\"uv\":[13,10,14,16],\"texture\":\"#texture\"},\"south\":{\"uv\":[11,10,12,16],\"texture\":\"#texture\"}}}]}";
 
@@ -486,7 +495,34 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     String id = item.get("id").asString("");
     JsonObject json = parseJson(helmJson);
     if (id.equals("minecraft:skull")) {
-      json = parseJson(headJson);
+      // Reference: https://minecraft.gamepedia.com/Mob_head#Data_values
+      int type = item.get("type").asInt(3);
+      switch (type) {
+        case 0:
+          // Skeleton skull.
+          json = parseJson(skullJson);
+          break;
+        case 1:
+          // Wither skeleton skull.
+          json = parseJson(skullJson);
+          break;
+        case 2:
+          // Zombie head.
+          json = parseJson(headJson);
+          break;
+        case 3:
+          // Steve head.
+          json = parseJson(headJson);
+          break;
+        case 4:
+          // Creeper head.
+          json = parseJson(skullJson);
+          break;
+        case 5:
+          // Dragon head.
+          json = parseJson(skullJson);
+          break;
+      }
     }
     Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
@@ -533,9 +569,38 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     if (id.startsWith("minecraft:")) {
       TextureLoader loader = null;
       switch (id.substring("minecraft:".length())) {
-        case "skull":
-          loader = simpleTexture("entity/steve", texture);
+        case "skull": {
+          // Reference: https://minecraft.gamepedia.com/Mob_head#Data_values
+          int type = item.get("type").asInt(3);
+          switch (type) {
+            case 0:
+              // Skeleton skull.
+              loader = simpleTexture("entity/skeleton/skeleton", texture);
+              break;
+            case 1:
+              // Wither skeleton skull.
+              loader = simpleTexture("entity/skeleton/wither_skeleton", texture);
+              break;
+            case 2:
+              // Zombie head.
+              loader = simpleTexture("entity/zombie/zombie", texture);
+              break;
+            case 3:
+              // Steve head.
+              loader = simpleTexture("entity/steve", texture);
+              break;
+            case 4:
+              // Creeper head.
+              loader = simpleTexture("entity/creeper/creeper", texture);
+              break;
+            case 5:
+              // Dragon head.
+              // TODO: fixme
+              loader = simpleTexture("entity/skeleton/wither_skeleton", texture);
+              break;
+          }
           break;
+        }
         case "leather_boots":
         case "leather_helmet":
         case "leather_chestplate":
