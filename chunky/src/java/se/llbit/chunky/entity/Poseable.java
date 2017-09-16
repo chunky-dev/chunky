@@ -17,6 +17,12 @@
  */
 package se.llbit.chunky.entity;
 
+import org.apache.commons.math3.util.FastMath;
+import se.llbit.json.Json;
+import se.llbit.json.JsonObject;
+import se.llbit.math.Vector3;
+import se.llbit.util.JsonUtil;
+
 /**
  * Defines the API for poseable entities.
  *
@@ -27,4 +33,27 @@ public interface Poseable {
    * @return an array of the names of the parts of this entity.
    */
   String[] partNames();
+
+  double getScale();
+  void setScale(double value);
+
+  double getHeadScale();
+  void setHeadScale(double value);
+
+  Vector3 getPosition();
+
+  default void lookAt(Vector3 target) {
+    Vector3 dir = new Vector3(target);
+    Vector3 face = new Vector3(getPosition());
+    face.add(0, 28 / 16., 0);
+    dir.sub(face);
+    dir.normalize();
+    double headYaw = JsonUtil.vec3FromJson(getPose().get("head")).y;
+    getPose().set("rotation", Json.of(FastMath.atan2(dir.x, dir.z) + Math.PI - headYaw));
+    double pitch = Math.asin(dir.y);
+    getPose().add("head", JsonUtil.vec3ToJson(new Vector3(pitch, headYaw, 0)));
+  }
+
+
+  JsonObject getPose();
 }

@@ -22,7 +22,7 @@
     <TextField fx:id="sceneNameField"/>
     <Button fx:id="saveBtn" mnemonicParsing="false" text="Save"/>
   </HBox>
-  <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
+  <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
   </TabPane>
   <HBox alignment="CENTER_LEFT" spacing="10.0">
     <IntegerAdjuster fx:id="targetSpp"/>

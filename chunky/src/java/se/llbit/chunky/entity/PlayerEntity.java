@@ -655,19 +655,27 @@ public class PlayerEntity extends Entity implements Poseable {
     pose.add("head", JsonUtil.vec3ToJson(new Vector3(pitch, headYaw, 0)));
   }
 
-  public void lookAt(Vector3 target) {
-    Vector3 dir = new Vector3(target);
-    Vector3 face = new Vector3(position);
-    face.add(0, 28 / 16., 0);
-    dir.sub(face);
-    dir.normalize();
-    double headYaw = JsonUtil.vec3FromJson(pose.get("head")).y;
-    pose.set("rotation", Json.of(FastMath.atan2(dir.x, dir.z) + Math.PI - headYaw));
-    double pitch = Math.asin(dir.y);
-    pose.add("head", JsonUtil.vec3ToJson(new Vector3(pitch, headYaw, 0)));
-  }
-
   @Override public String[] partNames() {
     return new String[] { "all", "head", "chest", "leftArm", "rightArm", "leftLeg", "rightLeg" };
+  }
+
+  @Override public double getScale() {
+    return scale;
+  }
+
+  @Override public void setScale(double value) {
+    scale = value;
+  }
+
+  @Override public double getHeadScale() {
+    return headScale;
+  }
+
+  @Override public void setHeadScale(double value) {
+    headScale = value;
+  }
+
+  @Override public JsonObject getPose() {
+    return pose;
   }
 }

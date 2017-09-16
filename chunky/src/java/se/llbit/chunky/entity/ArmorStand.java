@@ -566,4 +566,24 @@ public class ArmorStand extends Entity implements Poseable {
   @Override public String[] partNames() {
     return new String[] { "all", "head", "chest", "leftArm", "rightArm", "leftLeg", "rightLeg" };
   }
+
+  @Override public double getScale() {
+    return scale;
+  }
+
+  @Override public void setScale(double scale) {
+    this.scale = scale;
+  }
+
+  @Override public double getHeadScale() {
+    return headScale;
+  }
+
+  @Override public void setHeadScale(double headScale) {
+    this.headScale = headScale;
+  }
+
+  @Override public JsonObject getPose() {
+    return pose;
+  }
 }

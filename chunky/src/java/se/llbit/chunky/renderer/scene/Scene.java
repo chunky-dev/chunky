@@ -816,7 +816,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 entities.add(
                     new PaintingEntity(new Vector3(x, y, z), tag.get("Motive").stringValue(), yaw));
               } else if (id.equals("minecraft:armor_stand")) {
-                entities.add(new ArmorStand(new Vector3(x, y, z), tag));
+                actors.add(new ArmorStand(new Vector3(x, y, z), tag));
               }
             }
           }
@@ -2402,8 +2402,10 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public void removePlayer(PlayerEntity player) {
-    profiles.remove(player);
+  public void removeEntity(Entity player) {
+    if (player instanceof PlayerEntity) {
+      profiles.remove(player);
+    }
     actors.remove(player);
     rebuildActorBvh();
   }

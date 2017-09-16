@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.renderer.Refreshable;
 import se.llbit.chunky.renderer.projection.ApertureProjector;
 import se.llbit.chunky.renderer.projection.FisheyeProjector;
@@ -597,14 +598,13 @@ public class Camera implements JsonSerializable {
   /**
    * Move the camera to the player location.
    */
-  public void moveToPlayer(PlayerEntity player) {
+  public void moveToPlayer(Entity player) {
     // TODO
     //pitch = QuickMath.degToRad(player.pitch - 90);
     //yaw = QuickMath.degToRad(-player.rotation + 90);
     roll = 0;
-    pos.x = player.position.x;
-    pos.y = player.position.y + 1.6;
-    pos.z = player.position.z;
+    pos.set(player.getPosition());
+    pos.y += 1.6;
     updateTransform();
     onViewChange();
   }

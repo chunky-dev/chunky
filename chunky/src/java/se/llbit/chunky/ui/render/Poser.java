@@ -57,7 +57,7 @@ import java.util.ResourceBundle;
 public class Poser extends Stage implements Initializable {
   private static final WritablePixelFormat<IntBuffer> PIXEL_FORMAT =
       PixelFormat.getIntArgbInstance();
-  private final EntitiesTab.PlayerData player;
+  private final EntitiesTab.EntityData player;
   private BVH bvh = new BVH(Collections.emptyList());
   private int[] pixels;
   private int width = 300;
@@ -80,7 +80,7 @@ public class Poser extends Stage implements Initializable {
   private double lastX;
   private double lastY;
 
-  public Poser(EntitiesTab.PlayerData data) throws IOException {
+  public Poser(EntitiesTab.EntityData data) throws IOException {
     this.player = data;
     FXMLLoader loader = new FXMLLoader(getClass().getResource("Poser.fxml"));
     loader.setController(this);
@@ -97,7 +97,8 @@ public class Poser extends Stage implements Initializable {
           .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
       File skinFile = fileChooser.showOpenDialog(getScene().getWindow());
       if (skinFile != null) {
-        player.entity.setTexture(skinFile.getAbsolutePath());
+        // TODO
+        //player.entity.setTexture(skinFile.getAbsolutePath());
         skin.setText(skinFile.getAbsolutePath());
         redraw();
       }
@@ -114,21 +115,25 @@ public class Poser extends Stage implements Initializable {
       direction.setAndUpdate(direction.get() + dx / 20);
       headPitch.setAndUpdate(headPitch.get() - dy / 60);
     });
-    skin.setText(player.entity.skin);
+    // TODO
+    // skin.setText(player.entity.skin);
     pixels = new int[width * height];
     transform.setIdentity();
     image = new WritableImage(width, height);
     playerModel.getItems().addAll(PlayerModel.values());
-    playerModel.getSelectionModel().select(player.entity.model);
+    // TODO
+    //playerModel.getSelectionModel().select(player.entity.model);
     playerModel.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
-          player.entity.model = newValue;
+          // TODO
+          //player.entity.model = newValue;
           redraw();
         });
     direction.setName("Direction");
     direction.setRange(-Math.PI, Math.PI);
     direction.onValueChange(value -> {
-      player.entity.pose.set("rotation", Json.of(value));
+      // TODO
+      //player.entity.pose.set("rotation", Json.of(value));
       redraw();
     });
     headYaw.setName("Head yaw");
@@ -178,8 +183,9 @@ public class Poser extends Stage implements Initializable {
 
   private void buildBvh() {
     Vector3 offset = new Vector3(); // Offset to place player in focus.
-    offset.sub(player.entity.position);
-    bvh = new BVH(new LinkedList<>(player.entity.primitives(offset)));
+    // TODO
+    //offset.sub(player.entity.position);
+    //bvh = new BVH(new LinkedList<>(player.entity.primitives(offset)));
   }
 
   private void redraw() {
