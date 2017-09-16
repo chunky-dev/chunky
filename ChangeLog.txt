@@ -1,5 +1,6 @@
 1.4.4 - TBD
 
+* Added UI elements to modify entity gear in the Entities tab.
 * Tweaked stone wall rendering to behave more like Minecraft.
 * Plugins can now modify the main window tabs.
 * Added banner rendering.

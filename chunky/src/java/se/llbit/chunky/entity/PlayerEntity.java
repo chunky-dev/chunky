@@ -56,7 +56,11 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 
-public class PlayerEntity extends Entity implements Poseable {
+public class PlayerEntity extends Entity implements Poseable, Geared {
+  private static final String[] partNames =
+      { "all", "head", "chest", "leftArm", "rightArm", "leftLeg", "rightLeg" };
+  private static final String[] gearSlots =
+      { "leftHand", "rightHand", "head", "chest", "legs", "feet" };
 
   public final String uuid;
   public JsonObject gear = new JsonObject();
@@ -655,7 +659,7 @@ public class PlayerEntity extends Entity implements Poseable {
   }
 
   @Override public String[] partNames() {
-    return new String[] { "all", "head", "chest", "leftArm", "rightArm", "leftLeg", "rightLeg" };
+    return partNames;
   }
 
   @Override public double getScale() {
@@ -676,5 +680,13 @@ public class PlayerEntity extends Entity implements Poseable {
 
   @Override public JsonObject getPose() {
     return pose;
+  }
+
+  @Override public String[] gearSlots() {
+    return gearSlots;
+  }
+
+  @Override public JsonObject getGear() {
+    return gear;
   }
 }

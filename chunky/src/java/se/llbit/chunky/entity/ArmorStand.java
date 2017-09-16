@@ -35,7 +35,11 @@ import se.llbit.util.JsonUtil;
 import java.util.Collection;
 import java.util.LinkedList;
 
-public class ArmorStand extends Entity implements Poseable {
+public class ArmorStand extends Entity implements Poseable, Geared {
+  private static final String[] partNames =
+      { "all", "head", "chest", "leftArm", "rightArm", "leftLeg", "rightLeg" };
+  private static final String[] gearSlots =
+      { "leftHand", "rightHand", "head", "chest", "legs", "feet" };
 
   private static final Quad[] base = {
       // cube1
@@ -564,7 +568,7 @@ public class ArmorStand extends Entity implements Poseable {
   }
 
   @Override public String[] partNames() {
-    return new String[] { "all", "head", "chest", "leftArm", "rightArm", "leftLeg", "rightLeg" };
+    return partNames;
   }
 
   @Override public double getScale() {
@@ -585,5 +589,13 @@ public class ArmorStand extends Entity implements Poseable {
 
   @Override public JsonObject getPose() {
     return pose;
+  }
+
+  @Override public String[] gearSlots() {
+    return gearSlots;
+  }
+
+  @Override public JsonObject getGear() {
+    return gear;
   }
 }

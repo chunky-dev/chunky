@@ -34,6 +34,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.entity.ArmorStand;
+import se.llbit.chunky.entity.Geared;
 import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -262,6 +263,26 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       });
 
       controls.getChildren().addAll(scale, headScale, poseBox, pitch, yaw, roll);
+    }
+
+    if (entity instanceof Geared) {
+      Geared geared = (Geared) entity;
+      controls.getChildren().addAll(new Label("Gear:"));
+      for (String slot : geared.gearSlots()) {
+        HBox slotBox = new HBox();
+        slotBox.setSpacing(10.0);
+        slotBox.setAlignment(Pos.BASELINE_LEFT);
+        TextField gearField = new TextField();
+        gearField.setOnAction(event -> {
+          JsonObject gear = new JsonObject();
+          gear.add("id", gearField.getText());
+          geared.getGear().set(slot, gear);
+          scene.rebuildActorBvh();
+        });
+        gearField.setText(geared.getGear(slot).get("id").stringValue(""));
+        slotBox.getChildren().addAll(new Label(slot + ":"), gearField);
+        controls.getChildren().add(slotBox);
+      }
     }
   }
 
