@@ -19,6 +19,7 @@ package se.llbit.util;
 
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
+import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
@@ -40,11 +41,19 @@ public final class JsonUtil {
     return json;
   }
 
-  public static Vector3 vec3FromJson(JsonValue json) {
+  public static Vector3 vec3FromJsonArray(JsonValue json) {
     JsonArray array = json.array();
     double x = array.size() >= 1 ? array.get(0).asDouble(0) : 0;
     double y = array.size() >= 2 ? array.get(1).asDouble(0) : 0;
     double z = array.size() >= 3 ? array.get(2).asDouble(0) : 0;
+    return new Vector3(x, y, z);
+  }
+
+  public static Vector3 vec3FromJsonObject(JsonValue json) {
+    JsonObject obj = json.object();
+    double x = obj.get("x").asDouble(0);
+    double y = obj.get("y").asDouble(0);
+    double z = obj.get("z").asDouble(0);
     return new Vector3(x, y, z);
   }
 

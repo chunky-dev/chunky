@@ -370,7 +370,7 @@ public class ArmorStand extends Entity implements Poseable {
   private final boolean showArms;
 
   public ArmorStand(JsonObject json) {
-    super(JsonUtil.vec3FromJson(json.get("position")));
+    super(JsonUtil.vec3FromJsonObject(json.get("position")));
     this.scale = json.get("scale").asDouble(1.0);
     this.headScale = json.get("headScale").asDouble(1.0);
     this.showArms = json.get("showArms").asBoolean(false);
@@ -436,22 +436,22 @@ public class ArmorStand extends Entity implements Poseable {
     double armWidth = 2;
     JsonObject pose = new JsonObject();
     // TODO: sort out rotations so we use the same sign everywhere (player entity).
-    Vector3 allPose = JsonUtil.vec3FromJson(this.pose.get("all"));
+    Vector3 allPose = JsonUtil.vec3FromJsonArray(this.pose.get("all"));
     double yaw = allPose.y;
-    Vector3 headPose = JsonUtil.vec3FromJson(this.pose.get("head"));
+    Vector3 headPose = JsonUtil.vec3FromJsonArray(this.pose.get("head"));
     headPose.x = - headPose.x;
     headPose.y = - headPose.y;
-    Vector3 chestPose = JsonUtil.vec3FromJson(this.pose.get("chest"));
-    Vector3 leftArmPose = JsonUtil.vec3FromJson(this.pose.get("leftArm"));
+    Vector3 chestPose = JsonUtil.vec3FromJsonArray(this.pose.get("chest"));
+    Vector3 leftArmPose = JsonUtil.vec3FromJsonArray(this.pose.get("leftArm"));
     leftArmPose.x = -leftArmPose.x;
     leftArmPose.y = -leftArmPose.y;
-    Vector3 rightArmPose = JsonUtil.vec3FromJson(this.pose.get("rightArm"));
+    Vector3 rightArmPose = JsonUtil.vec3FromJsonArray(this.pose.get("rightArm"));
     rightArmPose.x = -rightArmPose.x;
     rightArmPose.y = -rightArmPose.y;
-    Vector3 leftLegPose = JsonUtil.vec3FromJson(this.pose.get("leftLeg"));
+    Vector3 leftLegPose = JsonUtil.vec3FromJsonArray(this.pose.get("leftLeg"));
     leftLegPose.x = -leftLegPose.x;
     leftLegPose.y = -leftLegPose.y;
-    Vector3 rightLegPose = JsonUtil.vec3FromJson(this.pose.get("rightLeg"));
+    Vector3 rightLegPose = JsonUtil.vec3FromJsonArray(this.pose.get("rightLeg"));
     rightLegPose.x = -rightLegPose.x;
     rightLegPose.y = -rightLegPose.y;
     pose.add("all", JsonUtil.vec3ToJson(allPose));

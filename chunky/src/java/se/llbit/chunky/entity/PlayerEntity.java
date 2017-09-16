@@ -17,7 +17,6 @@
  */
 package se.llbit.chunky.entity;
 
-import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
@@ -93,13 +92,13 @@ public class PlayerEntity extends Entity implements Poseable {
   }
 
   public PlayerEntity(JsonObject settings) {
-    super(JsonUtil.vec3FromJson(settings.get("position")));
+    super(JsonUtil.vec3FromJsonObject(settings.get("position")));
     this.model = PlayerModel.get(settings.get("model").stringValue("STEVE"));
     this.uuid = settings.get("uuid").stringValue("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
     this.skin = settings.get("skin").stringValue("");
     this.scale = settings.get("scale").doubleValue(1.0);
     this.headScale = settings.get("headScale").doubleValue(1.0);
-    this.pose = settings.get("position").object();
+    this.pose = settings.get("pose").object();
     this.gear = settings.get("gear").object();
   }
 
@@ -166,13 +165,13 @@ public class PlayerEntity extends Entity implements Poseable {
         texture = Texture.steve;
       }
     }
-    Vector3 allPose = JsonUtil.vec3FromJson(pose.get("all"));
-    Vector3 headPose = JsonUtil.vec3FromJson(pose.get("head"));
-    Vector3 chestPose = JsonUtil.vec3FromJson(pose.get("chest"));
-    Vector3 leftLegPose = JsonUtil.vec3FromJson(pose.get("leftLeg"));
-    Vector3 rightLegPose = JsonUtil.vec3FromJson(pose.get("rightLeg"));
-    Vector3 leftArmPose = JsonUtil.vec3FromJson(pose.get("leftArm"));
-    Vector3 rightArmPose = JsonUtil.vec3FromJson(pose.get("rightArm"));
+    Vector3 allPose = JsonUtil.vec3FromJsonArray(pose.get("all"));
+    Vector3 headPose = JsonUtil.vec3FromJsonArray(pose.get("head"));
+    Vector3 chestPose = JsonUtil.vec3FromJsonArray(pose.get("chest"));
+    Vector3 leftLegPose = JsonUtil.vec3FromJsonArray(pose.get("leftLeg"));
+    Vector3 rightLegPose = JsonUtil.vec3FromJsonArray(pose.get("rightLeg"));
+    Vector3 leftArmPose = JsonUtil.vec3FromJsonArray(pose.get("leftArm"));
+    Vector3 rightArmPose = JsonUtil.vec3FromJsonArray(pose.get("rightArm"));
     Vector3 worldOffset = new Vector3(
         position.x + offset.x,
         position.y + offset.y,
@@ -288,12 +287,12 @@ public class PlayerEntity extends Entity implements Poseable {
       double armWidth,
       Transform worldTransform,
       double headScale) {
-    Vector3 headPose = JsonUtil.vec3FromJson(pose.get("head"));
-    Vector3 chestPose = JsonUtil.vec3FromJson(pose.get("chest"));
-    Vector3 leftArmPose = JsonUtil.vec3FromJson(pose.get("leftArm"));
-    Vector3 rightArmPose = JsonUtil.vec3FromJson(pose.get("rightArm"));
-    Vector3 leftLegPose = JsonUtil.vec3FromJson(pose.get("leftLeg"));
-    Vector3 rightLegPose = JsonUtil.vec3FromJson(pose.get("rightLeg"));
+    Vector3 headPose = JsonUtil.vec3FromJsonArray(pose.get("head"));
+    Vector3 chestPose = JsonUtil.vec3FromJsonArray(pose.get("chest"));
+    Vector3 leftArmPose = JsonUtil.vec3FromJsonArray(pose.get("leftArm"));
+    Vector3 rightArmPose = JsonUtil.vec3FromJsonArray(pose.get("rightArm"));
+    Vector3 leftLegPose = JsonUtil.vec3FromJsonArray(pose.get("leftLeg"));
+    Vector3 rightLegPose = JsonUtil.vec3FromJsonArray(pose.get("rightLeg"));
 
     JsonObject headItem = gear.get("head").object();
     if (!headItem.isEmpty()) {

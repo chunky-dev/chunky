@@ -48,7 +48,7 @@ public interface Poseable {
     face.add(0, 28 / 16., 0);
     dir.sub(face);
     dir.normalize();
-    double headYaw = JsonUtil.vec3FromJson(getPose().get("head")).y;
+    double headYaw = getPose("head").y;
     getPose().set("rotation", Json.of(FastMath.atan2(dir.x, dir.z) + Math.PI - headYaw));
     double pitch = Math.asin(dir.y);
     getPose().add("head", JsonUtil.vec3ToJson(new Vector3(pitch, headYaw, 0)));
@@ -56,4 +56,11 @@ public interface Poseable {
 
 
   JsonObject getPose();
+
+  /**
+   * Get the pose for one body part.
+   */
+  default Vector3 getPose(String part) {
+    return JsonUtil.vec3FromJsonArray(getPose().get(part));
+  }
 }
