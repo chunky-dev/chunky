@@ -42,6 +42,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Loads Minecraft entity models stored in the JSON format.
+ */
 public class JsonModel {
   private static String mapTexture(Map<String, String> textures, String texture) {
     while (texture.startsWith("#")) {

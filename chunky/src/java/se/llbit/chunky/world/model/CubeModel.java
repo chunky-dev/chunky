@@ -33,6 +33,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A 3D model consisiting of cubes.
+ *
+ * <p>This is used to load Minecraft entity models.
+ */
 public class CubeModel {
   public Quad[] quads = new Quad[0];
   public Texture[] textures = new Texture[0];
