@@ -212,7 +212,10 @@ def sign_file(filename):
 	while True:
 		passphrase = credentials.getpass('gpg passphrase')
 		print("Signing build/" + filename)
-		proc = Popen(cmd(['gpg', '--passphrase-fd', '0', '--detach-sig', 'build/' + filename]), stdin=PIPE)
+		proc = Popen(cmd(['gpg',
+				'--pinentry-mode', 'loopback',
+				'--passphrase-fd', '0',
+				'--detach-sig', 'build/' + filename]), stdin=PIPE)
 		if on_win():
 			proc.communicate(passphrase + "\r\n")
 		else:
