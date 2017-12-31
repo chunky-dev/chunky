@@ -2,6 +2,7 @@
 
 * Added armor rendering for player entities.
 * Added armor stand rendering.
+* Added banner rendering.
 * Added UI elements to modify entity armor in the Entities tab.
   This currently applies to players and armor stands.
 * Added a drop down menu to the entity posing controls for selecting which limb
