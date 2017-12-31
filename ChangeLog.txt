@@ -1,6 +1,6 @@
 1.4.4 - 2017-12-31
 
-* Fixed Windows installer to detect Java 9 installations.
+* Windows installer now detects Java 9 installations.
 * Added armor rendering for player entities.
 * Added armor stand rendering.
 * Added banner rendering.
