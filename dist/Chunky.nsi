@@ -45,15 +45,29 @@ Function .onInit
   ; First check for 64 bit JRE
   SetRegView 64
   ReadRegStr $0 HKLM "Software\JavaSoft\Java Runtime Environment" "CurrentVersion"
-  StrCmp $0 "" FindJDK64
+  StrCmp $0 "" FindJRE64_2
   ReadRegStr $1 HKLM "Software\JavaSoft\Java Runtime Environment\$0" "JavaHome"
+  StrCmp $1 "" FindJRE64_2 FoundJava
+
+  ; JRE 9.0.1 registry entries are in Software\JavaSoft\JRE:
+  FindJRE64_2:
+  ReadRegStr $0 HKLM "Software\JavaSoft\JRE" "CurrentVersion"
+  StrCmp $0 "" FindJDK64
+  ReadRegStr $1 HKLM "Software\JavaSoft\JRE\$0" "JavaHome"
   StrCmp $1 "" FindJDK64 FoundJava
 
   ; 64 bit JDK
   FindJDK64:
   ReadRegStr $0 HKLM "Software\JavaSoft\Java Development Kit" "CurrentVersion"
-  StrCmp $0 "" FindJRE32
+  StrCmp $0 "" FindJDK64_2
   ReadRegStr $1 HKLM "Software\JavaSoft\Java Development Kit\$0" "JavaHome"
+  StrCmp $1 "" FindJDK64_2 FoundJava
+
+  ; JDK 9.0.1 registry entries are in Software\JavaSoft\JDK:
+  FindJDK64_2:
+  ReadRegStr $0 HKLM "Software\JavaSoft\JDK" "CurrentVersion"
+  StrCmp $0 "" FindJRE32
+  ReadRegStr $1 HKLM "Software\JavaSoft\JDK\$0" "JavaHome"
   StrCmp $1 "" FindJRE32 FoundJava
 
   ; 32 bit JRE
