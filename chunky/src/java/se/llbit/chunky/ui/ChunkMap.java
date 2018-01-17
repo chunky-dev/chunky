@@ -499,34 +499,70 @@ public class ChunkMap extends Map2D {
 
     Ray ray = new Ray();
 
-    Vector3[] corners = new Vector3[4];
+    Vector3[] direction = new Vector3[4];
     Vector2[] bounds = new Vector2[4];
 
     camera.calcViewRay(ray, -halfWidth, -0.5);
-    corners[0] = new Vector3(ray.d);
+    direction[0] = new Vector3(ray.d);
     bounds[0] = findMapPos(ray, cv);
 
     camera.calcViewRay(ray, -halfWidth, 0.5);
-    corners[1] = new Vector3(ray.d);
+    direction[1] = new Vector3(ray.d);
     bounds[1] = findMapPos(ray, cv);
 
     camera.calcViewRay(ray, halfWidth, 0.5);
-    corners[2] = new Vector3(ray.d);
+    direction[2] = new Vector3(ray.d);
     bounds[2] = findMapPos(ray, cv);
 
     camera.calcViewRay(ray, halfWidth, -0.5);
-    corners[3] = new Vector3(ray.d);
+    direction[3] = new Vector3(ray.d);
     bounds[3] = findMapPos(ray, cv);
 
     gc.setStroke(javafx.scene.paint.Color.YELLOW);
     for (int i = 0; i < 4; ++i) {
       int j = (i + 1) % 4;
+      Vector2 start = null;
+      Vector2 end = null;
       if (bounds[i] != null && bounds[j] != null) {
-        drawLine(gc, bounds[i], bounds[j]);
-      } else if (bounds[i] != null && bounds[j] == null) {
-        drawExtended(gc, cv, bounds, corners, i, j);
-      } else if (bounds[j] != null && bounds[i] == null) {
-        drawExtended(gc, cv, bounds, corners, j, i);
+        start = new Vector2(bounds[i]);
+        end = new Vector2(bounds[j]);
+        Vector2 d = new Vector2(end);
+        d.sub(start);
+        double tFar = Math.sqrt(d.lengthSquared());
+        d.normalize();
+        if (!clipToMap(cv, start, end, d, tFar)) {
+          continue;
+        }
+      }
+
+      if (bounds[i] != null && bounds[j] == null) {
+        start = new Vector2(bounds[i]);
+        end = new Vector2();
+        Vector2 d = new Vector2(direction[j].x, direction[j].z);
+        d.normalize();
+        if (!clipToMap(cv, start, end, d, Double.POSITIVE_INFINITY)) {
+          continue;
+        }
+      }
+
+      if (bounds[j] != null && bounds[i] == null) {
+        start = new Vector2(bounds[j]);
+        end = new Vector2();
+        Vector2 d = new Vector2(direction[i].x, direction[i].z);
+        d.normalize();
+        if (!clipToMap(cv, start, end, d, Double.POSITIVE_INFINITY)) {
+          continue;
+        }
+      }
+
+      if (start != null && end != null) {
+        start.x -= cv.x0;
+        start.y -= cv.z0;
+        end.x -= cv.x0;
+        end.y -= cv.z0;
+        start.scale(cv.scale);
+        end.scale(cv.scale);
+        drawLine(gc, start, end);
       }
     }
 
@@ -549,6 +585,8 @@ public class ChunkMap extends Map2D {
 
   /**
    * Find the point where the ray intersects the ground (y=63).
+   *
+   * <p>The result is given in chunk coordinates.
    */
   private static Vector2 findMapPos(Ray ray, ChunkView cv) {
     if (ray.d.y < 0 && ray.o.y > 63 || ray.d.y > 0 && ray.o.y < 63) {
@@ -556,48 +594,48 @@ public class ChunkMap extends Map2D {
       double d = (63 - ray.o.y) / ray.d.y;
       Vector3 pos = new Vector3();
       pos.scaleAdd(d, ray.d, ray.o);
-
-      return new Vector2(cv.scale * (pos.x / 16 - cv.x0), cv.scale * (pos.z / 16 - cv.z0));
+      return new Vector2(pos.x / 16, pos.z / 16);
     } else {
       return null;
     }
   }
 
-  private static void drawExtended(GraphicsContext gc, ChunkView cv, Vector2[] bounds, Vector3[] corners,
-      int i, int j) {
-    Vector3 c = new Vector3();
-    c.cross(corners[i], corners[j]);
-    Vector2 c2 = new Vector2();
-    c2.x = c.z;
-    c2.y = -c.x;
-    c2.normalize();
-    if (corners[i].y > 0) {
-      c2.scale(-1);
-    }
-    double tNear = Double.POSITIVE_INFINITY;
-    double t = -bounds[i].x / c2.x;
-    if (t > 0 && t < tNear) {
-      tNear = t;
-    }
-    t = (cv.scale * (cv.x1 - cv.x0) - bounds[i].x) / c2.x;
-    if (t > 0 && t < tNear) {
-      tNear = t;
-    }
-    t = -bounds[i].y / c2.y;
-    if (t > 0 && t < tNear) {
-      tNear = t;
-    }
-    t = (cv.scale * (cv.z1 - cv.z0) - bounds[i].y) / c2.y;
-    if (t > 0 && t < tNear) {
-      tNear = t;
-    }
-    if (tNear != Double.POSITIVE_INFINITY) {
-      Vector2 p = new Vector2(bounds[i]);
-      p.scaleAdd(tNear, c2);
-      drawLine(gc, p, bounds[i]);
+  /**
+   * Clip a line to the map view boundaries.
+   *
+   * <p>The line is specified by a start point, a direction,
+   * and distance. The end parameter receives the clipped
+   * line end point.
+   *
+   * @param cv map view.
+   * @param start start of the line to clip.
+   * @param end end point of the clipped line (output).
+   * @param d normalized direction of the line to clip.
+   * @param tFar maximul line length.
+   * @return {@code true} if any part of the line intersects the map view.
+   */
+  private static boolean clipToMap(ChunkView cv, Vector2 start, Vector2 end, Vector2 d, double tFar) {
+    double tNear = 0;
+    double tx0 = (cv.x0 - start.x) / d.x;
+    double tx1 = (cv.x1 - start.x) / d.x;
+    tNear = Math.max(tNear, Math.min(tx0, tx1));
+    tFar = Math.min(tFar, Math.max(tx0, tx1));
+    double tz0 = (cv.z0 - start.y) / d.y;
+    double tz1 = (cv.z1 - start.y) / d.y;
+    tNear = Math.max(tNear, Math.min(tz0, tz1));
+    tFar = Math.min(tFar, Math.max(tz0, tz1));
+    if (tNear < tFar) {
+      end.scaleAdd(tFar, d, start);
+      start.scaleAdd(tNear, d);
+      return true;
+    } else {
+      return false;
     }
   }
 
+  /**
+   * Draws a line between two points specified by 2-vectors.
+   */
   private static void drawLine(GraphicsContext gc, Vector2 v1, Vector2 v2) {
     int x1 = (int) v1.x;
     int y1 = (int) v1.y;
