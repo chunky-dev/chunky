@@ -23,6 +23,10 @@ public class TextureMaterial extends Material {
 
   public TextureMaterial(Texture texture) {
     super("texture", texture);
+
+    if (texture == null) {
+      throw new NullPointerException("Texture material may not have a null texture.");
+    }
   }
 
 }

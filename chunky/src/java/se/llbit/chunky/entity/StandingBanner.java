@@ -414,14 +414,14 @@ public class StandingBanner extends Entity {
     if (base == BlockData.BANNER_WHITE && patterns.isEmpty()) {
       return new TextureMaterial(Texture.bannerBase);
     }
-    Texture texture = TextureCache.get(design);
-    if (texture != null) {
-      return new TextureMaterial(texture);
+    Texture cachedTexture = TextureCache.get(design);
+    if (cachedTexture != null) {
+      return new TextureMaterial(cachedTexture);
     }
     BitmapImage plain = Texture.bannerBase.getBitmap();
     if (plain.width < 64 || plain.height < 64) {
       Log.info("Banner texture is too small to compose patterns.");
-      return new TextureMaterial(texture);
+      return new TextureMaterial(Texture.unknown);
     }
     int scale = plain.width / 64;
     BitmapImage tinted = new BitmapImage(plain.width, plain.height);
@@ -463,7 +463,7 @@ public class StandingBanner extends Entity {
         }
       }
     }
-    texture = new Texture(tinted);
+    Texture texture = new Texture(tinted);
     TextureCache.put(design, texture);
     return new TextureMaterial(texture);
   }
