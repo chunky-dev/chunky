@@ -148,20 +148,25 @@ task copyArtifacts(type: Copy) {
 def tryCommand(def command, boolean failOnError = false) {
   def out = new StringBuilder()
   def err = new StringBuilder()
-  def proc = command.execute()
-  proc.waitForProcessOutput(out, err)
-  if (proc.exitValue()) {
-    def msg = "failed to run '${command[0]}' command (args: ${command.tail()})\n$err$out"
-    if (failOnError) {
-      throw new GradleException(msg)
+  try {
+    def proc = command.execute()
+    proc.waitForProcessOutput(out, err)
+    if (proc.exitValue()) {
+      def msg = "failed to run '${command[0]}' (args: ${command.tail()})\n$err$out"
+      if (failOnError) {
+        throw new GradleException(msg)
+      } else {
+        print 'Warning: '
+        println msg
+      }
+      ""
     } else {
-      print 'Warning: '
-      println msg
+      if (err) println "${err}"
+      out.toString()
     }
+  } catch (IOException e) {
+    println "failed to run ${command[0]} (args: ${command.tail()}): $e"
     ""
-  } else {
-    if (err) println "${err}"
-    out.toString()
   }
 }
 
