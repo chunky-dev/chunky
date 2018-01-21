@@ -41,6 +41,14 @@ public class AlternateTextures extends TextureLoader {
     this.alternatives = alternatives;
   }
 
+  /**
+   * Don't use this.
+   */
+  public AlternateTextures(TextureLoader ignored) {
+    throw new Error(
+        "It is pointless to create an alternative texture loader with only one alternative.");
+  }
+
   @Override public boolean load(ZipFile texturePack, String topLevelDir) {
     for (TextureLoader alternative : alternatives) {
       if (alternative.load(texturePack, topLevelDir)) {
