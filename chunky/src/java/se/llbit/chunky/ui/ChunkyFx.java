@@ -26,6 +26,9 @@ import se.llbit.chunky.main.Chunky;
 
 /**
  * The main window of the Chunky UI.
+ *
+ * <p>This should only be started via se.llbit.chunky.main.Chunky.
+ * Do not try to start Chunky with the default JavaFX main method!
  */
 public class ChunkyFx extends Application {
 

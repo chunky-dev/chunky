@@ -38,6 +38,8 @@
 /*.ipr
 /*.iws
 /out/
+/chunky/out/
+/lib/out/
 
 # Render snapshots from testing.
 /*.png
