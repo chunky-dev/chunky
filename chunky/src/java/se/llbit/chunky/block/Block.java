@@ -2356,14 +2356,16 @@ public class Block extends Material {
       return TerracottaModel.intersect(ray, Texture.terracottaLime);
     }
   };
-  public static final Block PINK_TERRACOTTA = new Block(0xF1, "block:pink_glazed_terracotta", Texture.unknown) {
+  public static final Block PINK_TERRACOTTA = new Block(0xF1, "block:pink_glazed_terracotta",
+      Texture.terracottaPink) {
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TerracottaModel.intersect(ray, Texture.terracottaWhite);
+      return TerracottaModel.intersect(ray, Texture.terracottaPink);
     }
   };
-  public static final Block GRAY_TERRACOTTA = new Block(0xF2, "block:gray_glazed_terracotta", Texture.unknown) {
+  public static final Block GRAY_TERRACOTTA = new Block(0xF2, "block:gray_glazed_terracotta",
+      Texture.terracottaGray) {
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return TerracottaModel.intersect(ray, Texture.terracottaWhite);
+      return TerracottaModel.intersect(ray, Texture.terracottaGray);
     }
   };
   public static final Block SILVER_TERRACOTTA = new Block(0xF3, "block:light_gray_glazed_terracotta",
