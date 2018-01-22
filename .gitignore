@@ -40,6 +40,8 @@
 /out/
 /chunky/out/
 /lib/out/
+/releasetools/out/
+/launcher/out/
 
 # Render snapshots from testing.
 /*.png
