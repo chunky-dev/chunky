@@ -23,6 +23,7 @@ import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.json.JsonObject;
+import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 import java.util.ArrayList;
@@ -72,6 +73,10 @@ public class TestBlankRender {
     }
   }
 
+  /**
+   * Renders one sample per pixel and checks that the color values are
+   * close enough to the expected color.
+   */
   private static void renderAndCheckSamples(Scene scene, double[] expected)
       throws InterruptedException {
     double[] samples = render(scene);
@@ -122,7 +127,7 @@ public class TestBlankRender {
   /**
    * Render with a fully black sky.
    */
-  @Test public void testBlackRender() throws InterruptedException {
+  @Test public void testBlackSky() throws InterruptedException {
     final Scene scene = new Scene();
     scene.setCanvasSize(WIDTH, HEIGHT);
     scene.setRenderMode(RenderMode.RENDERING);
@@ -133,9 +138,22 @@ public class TestBlankRender {
   }
 
   /**
-   * Render with a gray sky.
+   * Render with a solid sky color.
    */
-  @Test public void testGrayRender() throws InterruptedException {
+  @Test public void testSolidColorSky() throws InterruptedException {
+    final Scene scene = new Scene();
+    scene.setCanvasSize(WIDTH, HEIGHT);
+    scene.setRenderMode(RenderMode.RENDERING);
+    scene.setTargetSpp(2);
+    scene.setName("foobar");
+    scene.sky().setSkyMode(Sky.SkyMode.SOLID_COLOR);
+    scene.sky().setColor(new Vector3(0.9, 0.8, 1.0));
+    renderAndCheckSamples(scene, new double[] { 0.9, 0.8, 1.0 });
+  }
+  /**
+   * Render with a gray gradient sky.
+   */
+  @Test public void testGradientSky() throws InterruptedException {
     final Scene scene = new Scene();
     scene.setCanvasSize(WIDTH, HEIGHT);
     scene.setRenderMode(RenderMode.RENDERING);

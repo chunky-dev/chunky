@@ -28,6 +28,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.ui.DoubleAdjuster;
@@ -35,6 +36,7 @@ import se.llbit.chunky.ui.GradientEditor;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.SimpleColorPicker;
 import se.llbit.math.ColorUtil;
+import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 import java.io.IOException;
@@ -60,6 +62,8 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   private final VBox simulatedSettings = new VBox();
   private DoubleAdjuster horizonOffset = new DoubleAdjuster();
   private final GradientEditor gradientEditor = new GradientEditor(this);
+  private final SimpleColorPicker colorPicker = new SimpleColorPicker();
+  private final VBox colorEditor = new VBox(colorPicker);
   private final SkyboxSettings skyboxSettings = new SkyboxSettings();
   private final SkymapSettings skymapSettings = new SkymapSettings();
   private ChangeListener<? super javafx.scene.paint.Color> fogColorListener =
@@ -117,6 +121,9 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
             case SIMULATED:
               skyModeSettings.getChildren().setAll(simulatedSettings);
               break;
+            case SOLID_COLOR:
+              skyModeSettings.getChildren().setAll(colorEditor);
+              break;
             case GRADIENT:
               skyModeSettings.getChildren().setAll(gradientEditor);
               break;
@@ -150,6 +157,9 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
       scene.sky().setCloudsEnabled(newValue);
     });
     fogColor.colorProperty().addListener(fogColorListener);
+
+    colorPicker.colorProperty().addListener(
+        (observable, oldValue, newValue) -> scene.sky().setColor(ColorUtil.fromFx(newValue)));
   }
 
   @Override public void update(Scene scene) {
@@ -166,6 +176,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     fogColor.colorProperty().addListener(fogColorListener);
     horizonOffset.set(scene.sky().getHorizonOffset());
     gradientEditor.setGradient(scene.sky().getGradient());
+    colorPicker.setColor(ColorUtil.toFx(scene.sky().getColor()));
     skyboxSettings.update(scene);
   }
 

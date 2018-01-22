@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2018 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -36,6 +36,7 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 import se.llbit.resources.ImageLoader;
 import se.llbit.util.JsonSerializable;
+import se.llbit.util.JsonUtil;
 import se.llbit.util.NotNull;
 
 import java.io.File;
@@ -86,39 +87,30 @@ public class Sky implements JsonSerializable {
   // TODO(jesper): add simulated night-time mode.
 
   /**
-   * Sky rendering mode
+   * Sky rendering mode.
    *
    * @author Jesper Öqvist <jesper@llbit.se>
    */
   public enum SkyMode {
-    /**
-     * Use simulated sky.
-     */
+    /** Simulated realistic sky. */
     SIMULATED("Simulated"),
 
-    /**
-     * Use a gradient.
-     */
+    /** Single color. */
+    SOLID_COLOR("Solid Color"),
+
+    /** Color gradient. */
     GRADIENT("Color Gradient"),
 
-    /**
-     * Use a panormaic skymap.
-     */
+    /** Panormaic skymap. */
     SKYMAP_PANORAMIC("Skymap (panoramic)"),
 
-    /**
-     * Light probe.
-     */
+    /** Light probe skymap. */
     SKYMAP_SPHERICAL("Skymap (spherical)"),
 
-    /**
-     * Use a skybox.
-     */
+    /** Skybox. */
     SKYBOX("Skybox"),
 
-    /**
-     * Render a completely black sky, useful for rendering an emitter-only pass.
-     */
+    /** A completely black sky, useful for rendering an emitter-only pass. */
     BLACK("Black");
 
     private String name;
@@ -160,11 +152,13 @@ public class Sky implements JsonSerializable {
 
   private double skyLightModifier = DEFAULT_INTENSITY;
 
+  /** Color gradient used for the GRADIENT sky mode. */
   private List<Vector4> gradient = new LinkedList<>();
 
-  /**
-   * Current rendering mode
-   */
+  /** Color used for the SOLID_COLOR sky mode. */
+  private Vector3 color = new Vector3(0, 0, 0);
+
+  /** Current sky rendering mode. */
   private SkyMode mode = SkyMode.DEFAULT;
 
   public Sky(Scene sceneDescription) {
@@ -217,6 +211,7 @@ public class Sky implements JsonSerializable {
     mirrored = other.mirrored;
     skyLightModifier = other.skyLightModifier;
     gradient = new ArrayList<>(other.gradient);
+    color.set(other.color);
     mode = other.mode;
     for (int i = 0; i < 6; ++i) {
       skybox[i] = other.skybox[i];
@@ -229,6 +224,10 @@ public class Sky implements JsonSerializable {
    */
   public void getSkyDiffuseColorInner(Ray ray) {
     switch (mode) {
+      case SOLID_COLOR: {
+        ray.color.set(color.x, color.y, color.z, 1);
+        break;
+      }
       case GRADIENT: {
         double angle = Math.asin(ray.d.y);
         int x = 0;
@@ -517,6 +516,8 @@ public class Sky implements JsonSerializable {
     // Always save gradient.
     sky.add("gradient", gradientJson(gradient));
 
+    sky.add("color", JsonUtil.vec3ToJson(color));
+
     switch (mode) {
       case SKYMAP_PANORAMIC:
       case SKYMAP_SPHERICAL: {
@@ -562,6 +563,8 @@ public class Sky implements JsonSerializable {
         gradient = theGradient;
       }
     }
+
+    color.set(JsonUtil.vec3FromJsonArray(json.get("color")));
 
     switch (mode) {
       case SKYMAP_PANORAMIC: {
@@ -974,4 +977,12 @@ public class Sky implements JsonSerializable {
     return Clouds.getCloud((int) Math.floor(x), (int) Math.floor(z)) == 1;
   }
 
+  public void setColor(Vector3 color) {
+    this.color.set(color);
+    scene.refresh();
+  }
+
+  public Vector3 getColor() {
+    return new Vector3(color);
+  }
 }

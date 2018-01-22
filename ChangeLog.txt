@@ -1,5 +1,6 @@
 LATEST
 
+* Added new solid color sky mode.
 * Fixed wrong texture for pink and gray glazed terracotta.
 
 1.4.4 - 2017-12-31
