@@ -19,9 +19,12 @@ package se.llbit.chunky.ui;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Control;
 import javafx.scene.image.Image;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import se.llbit.chunky.main.Chunky;
 
@@ -36,21 +39,26 @@ public class ChunkyFx extends Application {
   private static Chunky chunkyInstance;
 
   @Override public void start(Stage stage) throws Exception {
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("Chunky.fxml"));
-    ChunkyFxController controller = new ChunkyFxController(chunkyInstance);
-    loader.setController(controller);
-    Parent root = loader.load();
-    stage.setTitle(Chunky.getMainWindowTitle());
-    Scene scene = new Scene(root);
-    stage.setScene(scene);
-    controller.setApplication(this);
-    stage.getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
-    scene.getStylesheets().add("style.css");
-    stage.setOnCloseRequest(event -> {
-      Platform.exit();
-      System.exit(0);
-    });
-    stage.show();
+    try {
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("Chunky.fxml"));
+      ChunkyFxController controller = new ChunkyFxController(chunkyInstance);
+      loader.setController(controller);
+      Parent root = loader.load();
+      stage.setTitle(Chunky.getMainWindowTitle());
+      Scene scene = new Scene(root);
+      stage.setScene(scene);
+      controller.setApplication(this, scene);
+      stage.getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
+      stage.setOnCloseRequest(event -> {
+        Platform.exit();
+        System.exit(0);
+      });
+      stage.setWidth(1800);
+      stage.setMaximized(true);
+      stage.show();
+    } catch (Exception e) {
+      e.printStackTrace(System.err);
+    }
   }
 
   public static void startChunkyUI(Chunky chunkyInstance) {

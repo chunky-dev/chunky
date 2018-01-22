@@ -17,6 +17,7 @@
 package se.llbit.chunky.ui;
 
 import javafx.application.Platform;
+import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -35,6 +36,7 @@ import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.CameraViewListener;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.renderer.scene.Camera;
+import se.llbit.chunky.renderer.scene.SceneManager;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
@@ -115,23 +117,23 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     mapBuffer = new MapBuffer();
     moveCameraHere = new MenuItem("Move camera here");
-    selectVisible = new MenuItem("Select visible chunks");
+    selectVisible = new MenuItem("Select camera-visible chunks");
 
     tooltip.setAutoHide(true);
     tooltip.setConsumeAutoHidingEvents(false);
     tooltip.setAnchorLocation(PopupWindow.AnchorLocation.WINDOW_BOTTOM_LEFT);
 
-    MenuItem createScene = new MenuItem("New 3D scene...");
-    createScene.setGraphic(new ImageView(Icon.sky.fxImage()));
-    createScene.setOnAction(event -> controller.createNew3DScene());
-
-    MenuItem loadScene = new MenuItem("Load scene...");
-    loadScene.setGraphic(new ImageView(Icon.load.fxImage()));
-    loadScene.setOnAction(event -> controller.loadScene());
-
     MenuItem clearSelection = new MenuItem("Clear selection");
     clearSelection.setGraphic(new ImageView(Icon.clear.fxImage()));
     clearSelection.setOnAction(event -> chunkSelection.clearSelection());
+
+    MenuItem loadChunks = new MenuItem("Load selection in scene");
+    loadChunks.setGraphic(new ImageView(Icon.sky.fxImage()));
+    loadChunks.setOnAction(event -> {
+      SceneManager sceneManager = controller.getRenderController().getSceneManager();
+      sceneManager
+          .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
+    });
 
     moveCameraHere.setOnAction(event -> {
       ChunkView theView = new ChunkView(view);  // Make thread-local copy.
@@ -151,7 +153,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     });
 
     contextMenu.getItems()
-        .addAll(createScene, loadScene, clearSelection, moveCameraHere, selectVisible);
+        .addAll(clearSelection, moveCameraHere, selectVisible, loadChunks);
   }
 
   @Override public void chunkUpdated(ChunkPosition chunk) {
@@ -186,11 +188,9 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     ChunkView mapView = new ChunkView(view);  // Make thread-local copy.
     GraphicsContext gc = canvas.getGraphicsContext2D();
     gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-    if (controller.hasActiveRenderControls()) {
-      // TODO: this can block for a long time, so it should ideally not be done on the JavaFX application thread.
-      controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
-          scene -> ChunkMap.drawViewBounds(gc, mapView, scene));
-    }
+    // TODO: this can block for a long time, so it should ideally not be done on the JavaFX application thread.
+    controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
+        scene -> ChunkMap.drawViewBounds(gc, mapView, scene));
   }
 
   protected synchronized void selectWithinRect() {
@@ -367,8 +367,10 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       }
       Scene scene = mapOverlay.getScene();
       if (mapOverlay.isFocused()) {
-        tooltip.show(scene.getWindow(), scene.getWindow().getX(),
-            scene.getWindow().getY() + scene.getWindow().getHeight());
+        Point2D offset = mapOverlay.localToScene(0, 0);
+        tooltip.show(scene.getWindow(),
+            offset.getX() + scene.getX() + scene.getWindow().getX(),
+            offset.getY() + scene.getY() + scene.getWindow().getY() + mapOverlay.getHeight());
       }
     }
     return cp;
@@ -380,8 +382,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     if (event.getButton() == MouseButton.SECONDARY) {
       clickX = lastX;
       clickY = lastY;
-      moveCameraHere.setVisible(controller.hasActiveRenderControls());
-      selectVisible.setVisible(controller.hasActiveRenderControls());
       contextMenu.show(mapOverlay, event.getScreenX(), event.getScreenY());
     } else {
       if (contextMenu.isShowing()) {
@@ -451,9 +451,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     drawPlayers(gc);
     drawSpawn(gc);
     drawSelectionRect(gc);
-    if (controller.hasActiveRenderControls()) {
-      drawViewBounds(mapOverlay);
-    }
+    drawViewBounds(mapOverlay);
   }
 
   private void drawPlayers(GraphicsContext gc) {

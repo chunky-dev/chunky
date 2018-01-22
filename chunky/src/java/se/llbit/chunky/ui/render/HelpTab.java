@@ -17,17 +17,14 @@
 package se.llbit.chunky.ui.render;
 
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import se.llbit.chunky.renderer.scene.Scene;
 
 import java.io.IOException;
 
 public class HelpTab extends ScrollPane implements RenderControlsTab {
-  private final Tab parentTab;
-
   public HelpTab() throws IOException {
-    parentTab = new Tab("Help", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("HelpTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -37,7 +34,11 @@ public class HelpTab extends ScrollPane implements RenderControlsTab {
   @Override public void update(Scene scene) {
   }
 
-  @Override public Tab getTab() {
-    return parentTab;
+  @Override public String getTabTitle() {
+    return "Help";
+  }
+
+  @Override public Node getTabContent() {
+    return this;
   }
 }

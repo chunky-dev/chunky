@@ -23,13 +23,13 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
@@ -58,7 +58,6 @@ import java.util.ResourceBundle;
 public class CameraTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
-  private final Tab parentTab;
   @FXML private MenuButton loadPreset;
   @FXML private ComboBox<String> cameras;
   @FXML private Button duplicate;
@@ -88,7 +87,6 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   private CameraViewListener cameraViewListener;
 
   public CameraTab() throws IOException {
-    parentTab = new Tab("Camera", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("CameraTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -105,8 +103,12 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     updateSubjectDistance();
   }
 
-  @Override public Tab getTab() {
-    return parentTab;
+  @Override public String getTabTitle() {
+    return "Camera";
+  }
+
+  @Override public Node getTabContent() {
+    return this;
   }
 
   private void updateProjectionMode() {

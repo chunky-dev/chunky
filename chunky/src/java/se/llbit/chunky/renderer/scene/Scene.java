@@ -2867,5 +2867,4 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setYClipMax(int yClipMax) {
     this.yClipMax = yClipMax;
   }
-
 }

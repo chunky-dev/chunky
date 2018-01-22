@@ -9,6 +9,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
@@ -16,11 +17,14 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
+<?import se.llbit.fx.ToolPane?>
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
       xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
   <MenuBar>
@@ -28,14 +32,40 @@
       <MenuItem fx:id="menuExit" mnemonicParsing="false" text="Quit"/>
     </Menu>
   </MenuBar>
-  <SplitPane dividerPositions="0.4251668255481411"
+  <HBox alignment="CENTER_LEFT" spacing="10.0">
+    <padding>
+      <Insets left="10.0" right="10.0" />
+    </padding>
+    <Label text="Scene:" />
+    <TextField fx:id="sceneNameField" />
+    <Button fx:id="saveScene" mnemonicParsing="false">
+      <tooltip>
+        <Tooltip text="Save the current scene." />
+      </tooltip>
+    </Button>
+    <Button fx:id="loadScene" mnemonicParsing="false">
+      <tooltip>
+        <Tooltip text="Load a scene, replacing the current scene." />
+      </tooltip>
+    </Button>
+    <Button fx:id="saveFrameBtn" mnemonicParsing="false" text="Save current frame" />
+  </HBox>
+  <SplitPane fx:id="splitPane"
              VBox.vgrow="ALWAYS"
              maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-    <StackPane fx:id="mapPane" prefHeight="150.0" prefWidth="200.0">
-      <Canvas fx:id="mapCanvas" height="600.0" width="695.0"/>
-      <Canvas fx:id="mapOverlay" height="600.0" width="695.0"/>
-    </StackPane>
-    <TabPane fx:id="tabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
+    <ToolPane fx:id="renderControls" prefWidth="350" />
+    <TabPane fx:id="mainTabs" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
+      <Tab text="Map">
+        <StackPane fx:id="mapPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="150.0" prefWidth="200.0">
+          <Canvas fx:id="mapCanvas" height="600.0" width="695.0"/>
+          <Canvas fx:id="mapOverlay" height="600.0" width="695.0"/>
+        </StackPane>
+      </Tab>
+      <Tab fx:id="previewTab" text="Render Preview">
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+      </Tab>
+    </TabPane>
+    <TabPane fx:id="mapTabs" prefWidth="300" maxHeight="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
       <Tab fx:id="mapViewTab" text="Map View">
         <VBox maxHeight="1.7976931348623157E308" spacing="5.0">
           <padding>
@@ -135,4 +165,34 @@
       </Tab>
     </TabPane>
   </SplitPane>
+  <HBox alignment="CENTER_LEFT" spacing="10.0">
+    <Label text="Render:" />
+    <ToggleButton fx:id="start">
+      <toggleGroup>
+        <ToggleGroup fx:id="renderControl" />
+      </toggleGroup>
+    </ToggleButton>
+    <ToggleButton fx:id="pause" toggleGroup="$renderControl" />
+    <ToggleButton fx:id="reset" mnemonicParsing="false" selected="true" text="Reset" toggleGroup="$renderControl" />
+    <IntegerAdjuster fx:id="targetSpp" />
+    <Button fx:id="saveDefaultSpp" mnemonicParsing="false" text="Set default" />
+  </HBox>
+  <BorderPane>
+    <left>
+      <Label fx:id="renderTimeLbl" text="Render time: 0" />
+    </left>
+    <right>
+      <Label fx:id="sppLbl" text="0 SPP, 0 SPS" />
+    </right>
+  </BorderPane>
+  <BorderPane>
+    <left>
+      <Label fx:id="progressLbl" text="Progress" />
+    </left>
+    <right>
+      <Label fx:id="etaLbl" text="ETA: N/A" />
+    </right>
+  </BorderPane>
+  <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0" />
+  <stylesheets>style.css</stylesheets>
 </VBox>

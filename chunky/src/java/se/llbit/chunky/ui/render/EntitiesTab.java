@@ -21,11 +21,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -34,19 +34,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.entity.ArmorStand;
+import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.Geared;
+import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
-import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
-import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
 import java.io.File;
@@ -109,7 +108,6 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     }
   }
 
-  private final Tab parentTab;
   @FXML private TableView<EntityData> entityTable;
   @FXML private TableColumn<EntityData, String> nameCol;
   @FXML private TableColumn<EntityData, String> kindCol;
@@ -123,7 +121,6 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private VBox controls;
 
   public EntitiesTab() throws IOException {
-    parentTab = new Tab("Entities", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("EntitiesTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -143,8 +140,12 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     entityTable.getItems().removeAll(missing);
   }
 
-  @Override public Tab getTab() {
-    return parentTab;
+  @Override public String getTabTitle() {
+    return "Entities";
+  }
+
+  @Override public Node getTabContent() {
+    return this;
   }
 
   private void updateEntity(Entity entity) {

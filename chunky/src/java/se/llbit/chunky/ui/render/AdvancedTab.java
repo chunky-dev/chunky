@@ -19,6 +19,7 @@ package se.llbit.chunky.ui.render;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -45,7 +46,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   private RenderController controller;
   private Scene scene;
 
-  private final Tab parentTab;
   @FXML private IntegerAdjuster renderThreads;
   @FXML private IntegerAdjuster cpuLoad;
   @FXML private IntegerAdjuster rayDepth;
@@ -55,7 +55,6 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private ChoiceBox<OutputMode> outputMode;
 
   public AdvancedTab() throws IOException {
-    parentTab = new Tab("Advanced", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("AdvancedTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -120,8 +119,12 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     rayDepth.set(scene.getRayDepth());
   }
 
-  @Override public Tab getTab() {
-    return parentTab;
+  @Override public String getTabTitle() {
+    return "Advanced";
+  }
+
+  @Override public Node getTabContent() {
+    return this;
   }
 
   @Override public void setController(RenderControlsFxController controls) {

@@ -1,8 +1,36 @@
 .root {
     -fx-base: rgb(30,30,30);
     -fx-background: rgb(20,20,20);
+    -fx-control-inner-background: rgb(40, 40, 40);
+    -fx-accent: orange;
+    -fx-focus-color: orange;
+}
+
+ProgressBar {
+    -fx-control-inner-background: rgb(30, 30, 30);
+    -fx-progress-color: orange;
 }
 
 ToggleButton:selected {
     -fx-background-color: rgb(80,80,80);
+}
+
+Button {
+    -fx-text-fill: #faebd7;
+}
+
+ToggleButton {
+    -fx-text-fill: #faebd7;
+}
+
+CheckBox {
+    -fx-text-fill: #faebd7;
+}
+
+Label {
+    -fx-text-fill: #faebd7;
+}
+
+Text {
+    -fx-fill: #faebd7;
 }

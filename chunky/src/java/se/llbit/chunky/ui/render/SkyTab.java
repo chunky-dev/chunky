@@ -20,11 +20,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
@@ -45,7 +45,6 @@ import java.util.ResourceBundle;
 public class SkyTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
-  private final Tab parentTab;
   @FXML private ChoiceBox<Sky.SkyMode> skyMode;
   @FXML private TitledPane detailsPane;
   @FXML private VBox skyModeSettings;
@@ -69,7 +68,6 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
       (observable, oldValue, newValue) -> scene.setFogColor(ColorUtil.fromFx(newValue));
 
   public SkyTab() throws IOException {
-    parentTab = new Tab("Sky & Fog", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("SkyTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -182,8 +180,12 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     skyboxSettings.update(scene);
   }
 
-  @Override public Tab getTab() {
-    return parentTab;
+  @Override public String getTabTitle() {
+    return "Sky & Fog";
+  }
+
+  @Override public Node getTabContent() {
+    return this;
   }
 
   public void gradientChanged(List<Vector4> gradient) {

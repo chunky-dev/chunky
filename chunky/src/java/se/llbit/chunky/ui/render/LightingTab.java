@@ -20,9 +20,9 @@ import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -42,7 +42,6 @@ import java.util.ResourceBundle;
 public class LightingTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
-  private final Tab parentTab;
   @FXML private DoubleAdjuster skyIntensity;
   @FXML private DoubleAdjuster emitterIntensity;
   @FXML private DoubleAdjuster sunIntensity;
@@ -57,7 +56,6 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
       scene.sun().setColor(ColorUtil.fromFx(newValue));
 
   public LightingTab() throws IOException {
-    parentTab = new Tab("Lighting", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("LightingTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -123,7 +121,11 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunColor.colorProperty().addListener(sunColorListener);
   }
 
-  @Override public Tab getTab() {
-    return parentTab;
+  @Override public String getTabTitle() {
+    return "Lighting";
+  }
+
+  @Override public Node getTabContent() {
+    return this;
   }
 }

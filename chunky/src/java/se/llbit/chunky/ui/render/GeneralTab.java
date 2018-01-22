@@ -20,12 +20,12 @@ import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
@@ -38,7 +38,6 @@ import se.llbit.chunky.ui.ChunkyFxController;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.RenderControlsFxController;
-import se.llbit.chunky.ui.SceneChooser;
 import se.llbit.chunky.world.Icon;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
@@ -55,8 +54,6 @@ import java.util.regex.Pattern;
 public class GeneralTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
-  private final Tab parentTab;
-  @FXML private Button loadSceneBtn;
   @FXML private Button openSceneDirBtn;
   @FXML private Button exportSettings;
   @FXML private Button importSettings;
@@ -88,7 +85,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   private ChunkyFxController chunkyFxController;
 
   public GeneralTab() throws IOException {
-    parentTab = new Tab("General", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("GeneralTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -114,12 +110,16 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
   }
 
-  @Override public Tab getTab() {
-    return parentTab;
+  @Override public String getTabTitle() {
+    return "Scene";
+  }
+
+  @Override public Node getTabContent() {
+    return this;
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
-    parentTab.setGraphic(new ImageView(Icon.wrench.fxImage()));
+    // TODO: parentTab.setGraphic(new ImageView(Icon.wrench.fxImage()));
 
     exportSettings.setOnAction(event -> {
       SettingsExport dialog = new SettingsExport(scene.toJson());
@@ -200,16 +200,6 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       scene.setYClipMin(value);
       renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
     });
-    loadSceneBtn.setTooltip(new Tooltip("This replaces the current scene!"));
-    loadSceneBtn.setGraphic(new ImageView(Icon.load.fxImage()));
-    loadSceneBtn.setOnAction(e -> {
-      try {
-        SceneChooser chooser = new SceneChooser(chunkyFxController);
-        chooser.show();
-      } catch (IOException e1) {
-        Log.error("Failed to create scene chooser window.", e1);
-      }
-    });
     openSceneDirBtn.setTooltip(
         new Tooltip("Open the directory where Chunky stores scene descriptions and renders."));
     openSceneDirBtn.setOnAction(e -> chunkyFxController.openSceneDirectory());
@@ -261,9 +251,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         int width = Integer.parseInt(matcher.group(1));
         int height = Integer.parseInt(matcher.group(2));
         RenderCanvasFx canvas = renderControls.getCanvas();
-        if (canvas != null && canvas.isShowing()) {
-          canvas.setCanvasSize(width, height);
-        }
+        canvas.setCanvasSize(width, height);
         scene.setCanvasSize(width, height);
       } else {
         Log.info("Failed to set canvas size: format must be <width>x<height>!");

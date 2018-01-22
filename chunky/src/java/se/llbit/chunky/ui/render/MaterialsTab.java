@@ -23,16 +23,16 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.ExtraMaterials;
 import se.llbit.chunky.world.Material;
 
@@ -41,7 +41,7 @@ import java.util.Collection;
 import java.util.ResourceBundle;
 
 // TODO: customization of textures, base color, etc.
-public class MaterialsTab extends Tab implements RenderControlsTab, Initializable {
+public class MaterialsTab extends HBox implements RenderControlsTab, Initializable {
   private Scene scene;
 
   private final DoubleAdjuster emittance = new DoubleAdjuster();
@@ -50,7 +50,6 @@ public class MaterialsTab extends Tab implements RenderControlsTab, Initializabl
   private final ListView<String> listView;
 
   public MaterialsTab() {
-    setText("Materials");
     emittance.setName("Emittance");
     specular.setName("Specular");
     specular.setRange(0, 1);
@@ -72,9 +71,8 @@ public class MaterialsTab extends Tab implements RenderControlsTab, Initializabl
         new Label("Material Properties"),
         emittance, specular, ior,
         new Label("(set to zero to disable)"));
-    HBox content = new HBox();
-    content.setPadding(new Insets(10));
-    content.setSpacing(15);
+    setPadding(new Insets(10));
+    setSpacing(15);
     TextField filterField = new TextField();
     filterField.textProperty().addListener((observable, oldValue, newValue) -> {
       if (newValue.trim().isEmpty()) {
@@ -90,8 +88,7 @@ public class MaterialsTab extends Tab implements RenderControlsTab, Initializabl
     VBox listPane = new VBox();
     listPane.setSpacing(10);
     listPane.getChildren().addAll(filterBox, listView);
-    content.getChildren().addAll(listPane, settings);
-    setContent(content);
+    getChildren().addAll(listPane, settings);
   }
 
   private void updateSelectedMaterial(String materialName) {
@@ -143,7 +140,11 @@ public class MaterialsTab extends Tab implements RenderControlsTab, Initializabl
     updateSelectedMaterial(material);
   }
 
-  @Override public Tab getTab() {
+  @Override public String getTabTitle() {
+    return "Materials";
+  }
+
+  @Override public Node getTabContent() {
     return this;
   }
 

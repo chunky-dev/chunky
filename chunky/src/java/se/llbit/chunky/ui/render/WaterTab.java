@@ -22,10 +22,10 @@ import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.util.converter.NumberStringConverter;
@@ -46,7 +46,6 @@ import java.util.ResourceBundle;
 public class WaterTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
-  private final Tab parentTab;
   @FXML private CheckBox stillWater;
   @FXML private DoubleAdjuster waterVisibility;
   @FXML private DoubleAdjuster waterOpacity;
@@ -67,7 +66,6 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       };
 
   public WaterTab() throws IOException {
-    parentTab = new Tab("Water", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("WaterTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -97,8 +95,12 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterColor.colorProperty().addListener(waterColorListener);
   }
 
-  @Override public Tab getTab() {
-    return parentTab;
+  @Override public String getTabTitle() {
+    return "Water";
+  }
+
+  @Override public Node getTabContent() {
+    return this;
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {

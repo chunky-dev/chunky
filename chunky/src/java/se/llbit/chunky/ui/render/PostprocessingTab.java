@@ -19,9 +19,9 @@ package se.llbit.chunky.ui.render;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
@@ -34,12 +34,10 @@ import java.util.ResourceBundle;
 public class PostprocessingTab extends ScrollPane implements RenderControlsTab, Initializable {
   private Scene scene;
 
-  private final Tab parentTab;
   @FXML private DoubleAdjuster exposure;
   @FXML private ChoiceBox<Postprocess> postprocessingMode;
 
   public PostprocessingTab() throws IOException {
-    parentTab = new Tab("Postprocessing", this);
     FXMLLoader loader = new FXMLLoader(getClass().getResource("PostprocessingTab.fxml"));
     loader.setRoot(this);
     loader.setController(this);
@@ -55,8 +53,12 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
     exposure.set(scene.getExposure());
   }
 
-  @Override public Tab getTab() {
-    return parentTab;
+  @Override public String getTabTitle() {
+    return "Postprocessing";
+  }
+
+  @Override public Node getTabContent() {
+    return this;
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {

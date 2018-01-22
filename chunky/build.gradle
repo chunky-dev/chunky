@@ -9,6 +9,7 @@ dependencies {
   compile 'org.apache.commons:commons-math3:3.2'
   compile configurations.nbtlib
   compile configurations.cplib
+  compile configurations.toolpanelib
   compile project(':lib')
 
   testCompile 'com.google.truth:truth:0.30'
@@ -27,6 +28,9 @@ jar {
     zipTree(it)
   }
   from configurations.cplib.files.collect {
+    zipTree(it)
+  }
+  from configurations.toolpanelib.files.collect {
     zipTree(it)
   }
   manifest {

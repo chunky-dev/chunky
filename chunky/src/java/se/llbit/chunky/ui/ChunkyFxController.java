@@ -22,8 +22,10 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -32,9 +34,12 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
@@ -52,37 +57,48 @@ import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.CameraViewListener;
-import se.llbit.chunky.renderer.RenderContext;
+import se.llbit.chunky.renderer.OutputMode;
+import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.RenderMode;
+import se.llbit.chunky.renderer.RenderStatusListener;
+import se.llbit.chunky.renderer.Renderer;
+import se.llbit.chunky.renderer.ResetReason;
+import se.llbit.chunky.renderer.SnapshotControl;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
-import se.llbit.chunky.ui.render.RenderControlsFx;
+import se.llbit.chunky.renderer.scene.RenderResetHandler;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.DeleteChunksJob;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
+import se.llbit.fx.ToolPane;
 import se.llbit.fxutil.GroupedChangeListener;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
-import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
+import se.llbit.util.ProgressListener;
+import se.llbit.util.TaskTracker;
 
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Controller for the main Chunky window.
  */
 public class ChunkyFxController
-    implements Initializable, CameraViewListener {
+    implements Initializable, CameraViewListener, RenderResetHandler {
 
   private final Chunky chunky;
   private WorldMapLoader mapLoader;
@@ -94,6 +110,7 @@ public class ChunkyFxController
   @FXML private Canvas mapOverlay;
   @FXML private Label mapName;
   @FXML private MenuItem menuExit;
+  @FXML private ToolPane renderControls;
   @FXML private Button clearSelectionBtn;
   @FXML private Button changeWorldBtn;
   @FXML private Button reloadWorldBtn;
@@ -127,19 +144,146 @@ public class ChunkyFxController
   @FXML private Button exportZip;
   @FXML private Button renderPng;
   @FXML private StackPane mapPane;
-  @FXML private TabPane tabPane;
+  @FXML private SplitPane splitPane;
+  @FXML private TabPane mapTabs;
+  @FXML private TabPane mainTabs;
+  @FXML private Tab previewTab;
+
+  @FXML private TextField sceneNameField;
+  @FXML private Button saveScene;
+  @FXML private Button loadScene;
+
+  @FXML private Button saveFrameBtn;
+  @FXML private ProgressBar progressBar;
+  @FXML private Label progressLbl;
+  @FXML private Label etaLbl;
+  @FXML private Label renderTimeLbl;
+  @FXML private Label sppLbl;
+  @FXML private IntegerAdjuster targetSpp;
+  @FXML private Button saveDefaultSpp;
+
+  @FXML private ToggleButton start;
+  @FXML private ToggleButton pause;
+  @FXML private ToggleButton reset;
+
+  RenderControlsFxController sceneControls;
+
+  private File saveFrameDirectory = new File(System.getProperty("user.dir"));
+
+  public final DecimalFormat decimalFormat = new DecimalFormat();
+  {
+    decimalFormat.setGroupingSize(3);
+    decimalFormat.setGroupingUsed(true);
+  }
+
+  private final ProgressListener progressListener = new ProgressListener() {
+    @Override public void setProgress(String task, int done, int start, int target) {
+      Platform.runLater(() -> {
+        progressBar.setProgress((double) done / (target - start));
+        progressLbl.setText(String.format("%s: %s of %s", task, decimalFormat.format(done),
+            decimalFormat.format(target)));
+        etaLbl.setText("ETA: N/A");
+      });
+    }
+
+    @Override public void setProgress(String task, int done, int start, int target, String eta) {
+      Platform.runLater(() -> {
+        progressBar.setProgress((double) done / (target - start));
+        progressLbl.setText(String.format("%s: %s of %s", task, decimalFormat.format(done),
+            decimalFormat.format(target)));
+        etaLbl.setText("ETA: " + eta);
+      });
+    }
+  };
+
+  public RenderController getRenderController() {
+    return renderController;
+  }
+
+  public void showRenderPreview() {
+    mainTabs.getSelectionModel().select(previewTab);
+  }
+
+  static class GUIRenderListener implements RenderStatusListener {
+    private final ChunkyFxController gui;
+    private int spp;
+    private int sps;
+
+    public GUIRenderListener(ChunkyFxController renderControls) {
+      this.gui = renderControls;
+    }
+
+    @Override public void setRenderTime(long time) {
+      Platform.runLater(() -> {
+        int seconds = (int) ((time / 1000) % 60);
+        int minutes = (int) ((time / 60000) % 60);
+        int hours = (int) (time / 3600000);
+        gui.renderTimeLbl.setText(String
+            .format("Render time: %d hours, %d minutes, %d seconds", hours, minutes, seconds));
+      });
+    }
+
+    @Override public void setSamplesPerSecond(int sps) {
+      this.sps = sps;
+      updateSppStats();
+    }
+
+    @Override public void setSpp(int spp) {
+      this.spp = spp;
+      updateSppStats();
+    }
+
+    private void updateSppStats() {
+      Platform.runLater(() -> gui.sppLbl.setText(String
+          .format("%s SPP, %s SPS", gui.decimalFormat.format(spp),
+              gui.decimalFormat.format(sps))));
+    }
+
+    @Override public void renderStateChanged(RenderMode state) {
+      Platform.runLater(() -> {
+        switch (state) {
+          case RENDERING:
+            gui.start.setSelected(true);
+            break;
+          case PAUSED:
+            gui.pause.setSelected(true);
+            break;
+          case PREVIEW:
+            gui.reset.setSelected(true);
+            break;
+        }
+      });
+    }
+  }
+
+  /**
+   * The number of milliseconds spent on rendering a scene until
+   * the reset confirmation must be shown when trying to edit
+   * the scene state.
+   */
+  private static final long SCENE_EDIT_GRACE_PERIOD = 30000;
+
+  /** Used to ensure only one render reset confirm dialog is displayed at a time. */
+  protected AtomicBoolean resetConfirmMutex = new AtomicBoolean(false);
 
   private BooleanProperty trackPlayer =
       new SimpleBooleanProperty(PersistentSettings.getFollowPlayer());
   private BooleanProperty trackCamera =
       new SimpleBooleanProperty(PersistentSettings.getFollowCamera());
 
-  private RenderControlsFx controls = null;
+  /** The main Chunky JavaFx window. */
   private Path prevPngDir = null;
+  private RenderCanvasFx canvas;
+  private AsynchronousSceneManager asyncSceneManager;
+  private final RenderStatusListener renderTracker;
+  private se.llbit.chunky.renderer.scene.Scene scene = null;
+  private Renderer renderer;
+  private RenderController renderController;
 
   public ChunkyFxController(Chunky chunky) {
     this.chunky = chunky;
     mapView = new MapView();
+    renderTracker = new GUIRenderListener(this);
   }
 
   /**
@@ -161,6 +305,81 @@ public class ChunkyFxController
   }
 
   @Override public void initialize(URL fxmlUrl, ResourceBundle resources) {
+    scene = chunky.getSceneManager().getScene();
+    renderController = chunky.getRenderController();
+    renderer = renderController.getRenderer();
+    asyncSceneManager =
+        (AsynchronousSceneManager) renderController.getSceneManager();
+    asyncSceneManager.setResetHandler(this);
+    TaskTracker taskTracker = new TaskTracker(progressListener);
+    asyncSceneManager.setTaskTracker(taskTracker);
+    asyncSceneManager.setOnSceneLoaded(() -> {
+      CountDownLatch guiUpdateLatch = new CountDownLatch(1);
+      Platform.runLater(() -> {
+        synchronized (scene) {
+          sceneNameField.setText(scene.name());
+          canvas.setCanvasSize(scene.width, scene.height);
+        }
+        updateTitle();
+        refreshSettings();
+        guiUpdateLatch.countDown();
+      });
+      new Thread(() -> {
+        try {
+          guiUpdateLatch.await();
+          showRenderPreview();
+          canvas.forceRepaint();
+        } catch (InterruptedException ignored) {
+          // Ignored.
+        }
+      }).start();
+    });
+    renderer.setSnapshotControl(SnapshotControl.DEFAULT);
+    renderer.setOnFrameCompleted((scene1, spp) -> {
+      if (SnapshotControl.DEFAULT.saveSnapshot(scene1, spp)) {
+        // Save the current frame.
+        scene1.saveSnapshot(renderController.getContext().getSceneDirectory(), taskTracker);
+      }
+
+      if (SnapshotControl.DEFAULT.saveRenderDump(scene1, spp)) {
+        // Save the scene description and current render dump.
+        asyncSceneManager.saveScene();
+      }
+    });
+
+    renderer.addRenderListener(renderTracker);
+    renderer.setRenderTask(taskTracker.backgroundTask());
+
+    saveScene.setGraphic(new ImageView(Icon.disk.fxImage()));
+    saveScene.setOnAction(e -> asyncSceneManager.saveScene());
+
+    loadScene.setGraphic(new ImageView(Icon.load.fxImage()));
+    loadScene.setOnAction(e -> openSceneChooser());
+
+    sceneNameField.setText(scene.name);
+    sceneNameField.setTextFormatter(new TextFormatter<TextFormatter.Change>(change -> {
+      if (change.isReplaced()) {
+        if (change.getText().isEmpty()) {
+          // Disallow clearing the scene name.
+          change.setText(change.getControlText().substring(change.getRangeStart(),
+              change.getRangeEnd()));
+        }
+      }
+      if (change.isAdded()) {
+        if (!AsynchronousSceneManager.sceneNameIsValid(change.getText())) {
+          // Stop a change adding illegal characters to the scene name.
+          change.setText("");
+        }
+      }
+      return change;
+    }));
+    sceneNameField.textProperty().addListener((observable, oldValue, newValue) -> {
+      scene.setName(newValue);
+      renderController.getSceneProvider().withSceneProtected(scene1 -> scene1.setName(newValue));
+      updateTitle();
+    });
+    sceneNameField.setOnAction(event -> asyncSceneManager.saveScene());
+
     Log.setReceiver(new UILogReceiver(), Level.ERROR, Level.WARNING);
 
     mapLoader = new WorldMapLoader(this, mapView);
@@ -289,12 +508,6 @@ public class ChunkyFxController
       }
     });
 
-    newSceneBtn.setTooltip(
-        new Tooltip("Creates a new 3D scene with the currently selected chunks."));
-    newSceneBtn.setOnAction(e -> createNew3DScene());
-    loadSceneBtn.setGraphic(new ImageView(Icon.load.fxImage()));
-    loadSceneBtn.setOnAction(e -> loadScene());
-
     openSceneDirBtn.setOnAction(e -> openSceneDirectory());
 
     changeSceneDirBtn.setOnAction(e -> SceneDirectoryPicker.changeSceneDirectory(chunky.options));
@@ -322,7 +535,8 @@ public class ChunkyFxController
     javaFxTabs.add(aboutTab);
     // Call the hook to let plugins add their tabs.
     javaFxTabs = chunky.getMainTabTransformer().apply(javaFxTabs);
-    tabPane.getTabs().setAll(javaFxTabs);
+    mapTabs.getTabs().setAll(javaFxTabs);
+    splitPane.setDividerPositions(0.2, 0.8);
 
     editResourcePacks.setTooltip(
         new Tooltip("Select resource packs Chunky uses to load textures."));
@@ -404,9 +618,46 @@ public class ChunkyFxController
       Platform.exit();
       System.exit(0);
     });
+
+    canvas = new RenderCanvasFx(chunky.getSceneManager().getScene(),
+        chunky.getRenderController().getRenderer());
+    canvas.setRenderListener(renderTracker);
+    previewTab.setContent(canvas);
+    sceneControls = new RenderControlsFxController(this, renderControls, canvas,
+        chunky.getRenderController().getRenderer());
+    mainTabs.getSelectionModel().select(mapViewTab);
+    mainTabs.getSelectionModel().selectedItemProperty().addListener(
+        (observable, oldValue, newValue) -> {
+          boolean finalize = newValue == previewTab;
+          scene.setBufferFinalization(finalize);
+          if (finalize && scene.getMode() == RenderMode.PREVIEW) {
+            scene.refresh();
+          }
+        });
+
+    saveFrameBtn.setOnAction(this::saveCurrentFrame);
+    start.setGraphic(new ImageView(Icon.play.fxImage()));
+    start.setTooltip(new Tooltip("Start rendering."));
+    start.setOnAction(e -> scene.startRender());
+    pause.setGraphic(new ImageView(Icon.pause.fxImage()));
+    pause.setTooltip(new Tooltip("Pause the render."));
+    pause.setOnAction(e -> scene.pauseRender());
+    reset.setGraphic(new ImageView(Icon.stop.fxImage()));
+    reset.setTooltip(new Tooltip("Resets the current render. Discards render progress."));
+    reset.setOnAction(e -> scene.haltRender());
+    sppLbl.setTooltip(new Tooltip("SPP = Samples Per Pixel, SPS = Samples Per Second"));
+    targetSpp.setName("Target SPP");
+    targetSpp.setTooltip("Rendering is stopped after reaching the target Samples Per Pixel (SPP).");
+    targetSpp.setRange(100, 100000);
+    targetSpp.makeLogarithmic();
+    targetSpp.set(scene.getTargetSpp());
+    targetSpp.onValueChange(value -> scene.setTargetSpp(value));
+    saveDefaultSpp.setTooltip(new Tooltip("Make the current SPP target the default."));
+    saveDefaultSpp.setOnAction(e ->
+        PersistentSettings.setSppTargetDefault(scene.getTargetSpp()));
   }
 
-  public void setApplication(Application app) {
+  public void setApplication(Application app, Scene scene) {
     documentationLink.setOnAction(
         e -> app.getHostServices().showDocument("http://chunky.llbit.se"));
 
@@ -418,82 +669,105 @@ public class ChunkyFxController
 
     forumLink.setOnAction(
         e -> app.getHostServices().showDocument("https://www.reddit.com/r/chunky"));
+
+    canvas.setScene(scene);
   }
 
-  /**
-   * Open the 3D chunk view.
-   */
-  private synchronized void open3DView() {
+  public void openSceneChooser() {
     try {
-      if (controls == null) {
-        controls = new RenderControlsFx(this);
-        controls.show();
-      } else {
-        controls.show();
-        controls.toFront();
-      }
-    } catch (IOException e) {
-      Log.error("Failed to create render controls window.", e);
+      SceneChooser chooser = new SceneChooser(this);
+      chooser.show();
+    } catch (IOException e1) {
+      Log.error("Failed to create scene chooser window.", e1);
     }
   }
 
-  public void createNew3DScene() {
-    if (hasActiveRenderControls()) {
-      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-      alert.setTitle("Create New Scene");
-      alert.setHeaderText("Overwrite existing scene?");
-      alert.setContentText(
-          "It seems like a scene already exists. Do you wish to overwrite it?");
-      if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
-        return;
+  private void saveCurrentFrame(Event event) {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Save Current Frame");
+    if (saveFrameDirectory != null && saveFrameDirectory.isDirectory()) {
+      fileChooser.setInitialDirectory(saveFrameDirectory);
+    }
+    OutputMode outputMode = scene.getOutputMode();
+    String extension = ".png";
+    switch (outputMode) {
+      case PNG:
+        fileChooser.setSelectedExtensionFilter(
+            new FileChooser.ExtensionFilter("PNG files", "*.png"));
+        break;
+      case TIFF_32:
+        extension = ".tiff";
+        fileChooser.setSelectedExtensionFilter(
+            new FileChooser.ExtensionFilter("PNG files", "*.png"));
+        break;
+    }
+    fileChooser.setInitialFileName(String.format("%s-%d%s",
+        scene.name(), renderer.getRenderStatus().getSpp(), extension));
+    File target = fileChooser.showSaveDialog(saveFrameBtn.getScene().getWindow());
+    if (target != null) {
+      saveFrameDirectory = target.getParentFile();
+      try {
+        if (!target.getName().endsWith(extension)) {
+          target = new File(target.getPath() + extension);
+        }
+        // TODO:
+        //scene.saveFrame(target, taskTracker);
+        scene.saveFrame(target, new TaskTracker(ProgressListener.NONE));
+      } catch (IOException e1) {
+        Log.error("Failed to save current frame", e1);
       }
     }
+  }
 
-    // Choose a default scene name.
-    World world = mapLoader.getWorld();
-    RenderContext context = chunky.getRenderContext();
-    String preferredName =
-        AsynchronousSceneManager.preferredSceneName(context, world.levelName());
-    if (!AsynchronousSceneManager.sceneNameIsValid(preferredName)
-        || !AsynchronousSceneManager.sceneNameIsAvailable(context, preferredName)) {
-      preferredName = "Untitled Scene";
-    }
-
-    // Reset the scene state to the default scene state.
-    chunky.getRenderController().getSceneManager().getScene().resetScene(preferredName,
-        chunky.getSceneFactory());
-
-    // Show the render controls etc.
-    open3DView();
-
-    // Load selected chunks.
-    Collection<ChunkPosition> selection = chunkSelection.getSelection();
-    if (selection.isEmpty()) {
-      chunky.getSceneManager().getScene().camera().setView(0.0, QuickMath.degToRad(-68.0), 0.0);
-      chunky.getSceneManager().getScene().camera().setPosition(new Vector3(0, 84, 0));
+  @Override  public boolean allowSceneRefresh() {
+    if (scene.getResetReason() == ResetReason.SCENE_LOADED
+        || renderer.getRenderStatus().getRenderTime() < SCENE_EDIT_GRACE_PERIOD) {
+      return true;
     } else {
-      chunky.getSceneManager().loadFreshChunks(mapLoader.getWorld(), selection);
+      requestRenderReset();
     }
+    return false;
+  }
+
+  private void requestRenderReset() {
+    if (resetConfirmMutex.compareAndSet(false, true)) {
+      Platform.runLater(() -> {
+        try {
+          ConfirmResetPopup popup = new ConfirmResetPopup(
+              () -> {
+                // On accept.
+                asyncSceneManager.applySceneChanges();
+                resetConfirmMutex.set(false);
+              },
+              () -> {
+                // On reject.
+                asyncSceneManager.discardSceneChanges();
+                refreshSettings();
+                resetConfirmMutex.set(false);
+              });
+          popup.show(renderControls.getScene().getWindow());
+        } catch (IOException e) {
+          Log.warn("Could not open reset confirmation dialog.", e);
+        }
+      });
+    }
+  }
+
+  private void refreshSettings() {
+    targetSpp.set(scene.getTargetSpp());
+    sceneControls.refreshSettings();
+  }
+
+  private void updateTitle() {
+    // TODO
+    // stage.setTitle(chunky.getSceneManager().getScene().name());
   }
 
   public void loadScene(String sceneName) {
-    open3DView();
     try {
       chunky.getSceneManager().loadScene(sceneName);
     } catch (IOException | InterruptedException e) {
       Log.error("Failed to load scene", e);
-    }
-  }
-
-  /**
-   * Show the scene selector dialog.
-   */
-  public void loadScene() {
-    try {
-      SceneChooser chooser = new SceneChooser(this);
-      chooser.show();
-    } catch (IOException e) {
-      Log.error("Failed to create scene chooser window.", e);
     }
   }
 
@@ -508,10 +782,6 @@ public class ChunkyFxController
       Vector3 pos = new Vector3(x, camera.getPosition().y, z);
       camera.setPosition(pos);
     });
-  }
-
-  public boolean hasActiveRenderControls() {
-    return controls != null && controls.isShowing();
   }
 
   public ChunkMap getMap() {
