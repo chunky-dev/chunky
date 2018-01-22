@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2018 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -21,6 +20,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -120,11 +120,28 @@ public class SimpleColorPalette extends Region implements Initializable {
   private Region[] sample;
   private Region[] history;
 
+  /** Updates the current color based on changes to the web color code. */
+  private ChangeListener<String> webColorListener = (observable, oldValue, newValue) -> {
+    try {
+      editingWebColorCode = true;
+      Color color = Color.web(newValue);
+      hue.set(color.getHue() / 360);
+      saturation.set(color.getSaturation());
+      value.set(color.getBrightness());
+    } catch (IllegalArgumentException e) {
+      // Harmless exception - ignored.
+    } finally {
+      editingWebColorCode = false;
+    }
+  };
+
   /**
-   * Set to true while the HTML color code listener is modifying the selected color.
-   * When this is set to true it the updating of the HTML color code is disabled.
+   * Set to true while the web color code listener is modifying the selected color.
+   *
+   * <p>When this is set to true the updating of the HTML color code is disabled to
+   * avoid update loops.
    */
-  private boolean editingHtmlCode = false;
+  private boolean editingWebColorCode = false;
 
   public SimpleColorPalette(SimpleColorPicker colorPicker) {
     this.colorPicker = colorPicker;
@@ -155,19 +172,7 @@ public class SimpleColorPalette extends Region implements Initializable {
       colorPicker.hide();
     });
 
-    webColorCode.textProperty().addListener((observable, oldValue, newValue) -> {
-      try {
-        editingHtmlCode = true;
-        Color color = Color.web(newValue);
-        hue.set(color.getHue() / 360);
-        saturation.set(color.getSaturation());
-        value.set(color.getBrightness());
-      } catch (IllegalArgumentException e) {
-        // Harmless exception - ignored.
-      } finally {
-        editingHtmlCode = false;
-      }
-    });
+    webColorCode.textProperty().addListener(webColorListener);
 
     saveBtn.setOnAction(event -> {
       colorPicker.updateHistory();
@@ -336,13 +341,8 @@ public class SimpleColorPalette extends Region implements Initializable {
    * Change the currently selected color and update UI state to match.
    */
   private void updateCurrentColor(double hue, double saturation, double value) {
-    updateCurrentColor(Color.hsb(hue * 360, saturation, value));
-  }
+    Color newColor = Color.hsb(hue * 360, saturation, value);
 
-  /**
-   * Change the currently selected color and update UI state to match.
-   */
-  private void updateCurrentColor(Color newColor) {
     for (Region swatch : sample) {
       swatch.setBackground(new Background(
           new BackgroundFill(getRandomNearColor(newColor), CornerRadii.EMPTY, Insets.EMPTY)));
@@ -353,10 +353,13 @@ public class SimpleColorPalette extends Region implements Initializable {
     gc.setFill(newColor);
     gc.fillRect(0, 0, colorSample.getWidth(), colorSample.getHeight());
 
-    if (!editingHtmlCode) {
+    if (!editingWebColorCode) {
       // TODO: make sure color values are rounded correctly.
+      // Suspending the web color listener to avoid it tweaking the current color.
+      webColorCode.textProperty().removeListener(webColorListener);
       webColorCode.setText(String.format("#%02X%02X%02X", (int) (newColor.getRed() * 255 + 0.5),
           (int) (newColor.getGreen() * 255 + 0.5), (int) (newColor.getBlue() * 255 + 0.5)));
+      webColorCode.textProperty().addListener(webColorListener);
     }
   }
 
