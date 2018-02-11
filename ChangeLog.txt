@@ -1,5 +1,6 @@
 LATEST
 
+* Fixed incorrect dark oak leaf color blending.
 * Added new solid color sky mode.
 * Fixed wrong texture for pink and gray glazed terracotta.
 

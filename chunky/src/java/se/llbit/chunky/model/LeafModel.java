@@ -25,15 +25,9 @@ import se.llbit.math.Ray;
 public class LeafModel {
   private static final AABB block = new AABB(0, 1, 0, 1, 0, 1);
 
-  private static final float[] SPRUCE_COLOR = new float[4];
-  private static final float[] BIRCH_COLOR = new float[4];
-
-  static {
-    // Spruce and birch colors are hard-coded.
-    ColorUtil.getRGBAComponents(0x2b472b, SPRUCE_COLOR);
-    ColorUtil.getRGBAComponents(0x3a4e25, BIRCH_COLOR);
-  }
-
+  /**
+   * Get leaf color at ray intersection, based on biome.
+   */
   public static boolean intersect(Ray ray, Scene scene, Texture texture) {
     ray.t = Double.POSITIVE_INFINITY;
     if (block.intersect(ray)) {
@@ -41,19 +35,32 @@ public class LeafModel {
       if (color[3] > Ray.EPSILON) {
         ray.color.set(color);
         float[] biomeColor;
-        int woodType = ray.getBlockData();
-        if (woodType == 1) {
-          // Use constant spruce color:
-          biomeColor = SPRUCE_COLOR;
-        } else if (woodType == 2) {
-          // Use constant birch color:
-          biomeColor = BIRCH_COLOR;
-        } else {
-          biomeColor = ray.getBiomeFoliageColor(scene);
-        }
+        biomeColor = ray.getBiomeFoliageColor(scene);
         ray.color.x *= biomeColor[0];
         ray.color.y *= biomeColor[1];
         ray.color.z *= biomeColor[2];
+        ray.distance += ray.tNext;
+        ray.o.scaleAdd(ray.tNext, ray.d);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Get leaf color at ray intersection, using base leaf color.
+   *
+   * @param leafColor base leaf color to blend the leaf texture with.
+   */
+  public static boolean intersect(Ray ray, Texture texture, float[] leafColor) {
+    ray.t = Double.POSITIVE_INFINITY;
+    if (block.intersect(ray)) {
+      float[] color = texture.getColor(ray.u, ray.v);
+      if (color[3] > Ray.EPSILON) {
+        ray.color.set(color);
+        ray.color.x *= leafColor[0];
+        ray.color.y *= leafColor[1];
+        ray.color.z *= leafColor[2];
         ray.distance += ray.tNext;
         ray.o.scaleAdd(ray.tNext, ray.d);
         return true;

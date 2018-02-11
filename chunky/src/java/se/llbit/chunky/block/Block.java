@@ -89,6 +89,7 @@ import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.Material;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
+import se.llbit.math.ColorUtil;
 import se.llbit.math.Ray;
 
 import java.util.Arrays;
@@ -113,7 +114,7 @@ public class Block extends Material {
   private static final boolean UNKNOWN_INVISIBLE = !PersistentSettings.drawUnknownBlocks();
 
   public static final int AIR_ID = 0x00;
-  public static final Block AIR = new Block(AIR_ID, "Air", Texture.air);
+  public static final Block AIR = new Block(AIR_ID, "block:air", Texture.air);
   public static final int STONE_ID = 0x01;
   public static final Block STONE = new Block(STONE_ID, "block:stone", Texture.stone) {
     final Texture[] texture = {
@@ -277,12 +278,31 @@ public class Block extends Material {
   };
   public static final int LEAVES_ID = 0x12;
   public static final Block LEAVES = new Block(LEAVES_ID, "block:leaves", Texture.oakLeaves) {
-    final Texture[] texture =
-        {Texture.oakLeaves, Texture.spruceLeaves, Texture.birchLeaves, Texture.jungleTreeLeaves};
+    private final float[] SPRUCE_COLOR = new float[4];
+    private final float[] BIRCH_COLOR = new float[4];
+
+    {
+      // Spruce and birch colors are hard-coded.
+      ColorUtil.getRGBAComponents(0x2b472b, SPRUCE_COLOR);
+      ColorUtil.getRGBAComponents(0x3a4e25, BIRCH_COLOR);
+    }
+
+    final Texture[] texture = {
+        Texture.oakLeaves, Texture.spruceLeaves, Texture.birchLeaves, Texture.jungleTreeLeaves
+    };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
-      return LeafModel.intersect(ray, scene, getTexture(ray.getBlockData()));
-
+      int data = ray.getBlockData();
+      switch (data) {
+        case 1:
+          // Spruce leaf color is not based on biome.
+          return LeafModel.intersect(ray, getTexture(data), SPRUCE_COLOR);
+        case 2:
+          // Birch leaf color is not based on biome.
+          return LeafModel.intersect(ray, getTexture(data), BIRCH_COLOR);
+        default:
+          return LeafModel.intersect(ray, scene, getTexture(data));
+      }
     }
 
     final String[] woodType = {"oak", "spruce", "birch", "jungle",};
