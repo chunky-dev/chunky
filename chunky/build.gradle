@@ -73,6 +73,7 @@ task updateVersionString {
 
 task javadocJar(type: Jar) {
   classifier = 'javadoc'
+  from rootProject.docs
 }
 
 task sourcesJar(type: Jar) {
