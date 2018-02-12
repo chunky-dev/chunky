@@ -82,6 +82,7 @@ public class SimpleColorPicker extends Button {
 
   public void setColor(Color value) {
     color.set(value);
+    palette.updateRandomColorSamples();
   }
 
   public Color getColor() {
@@ -91,7 +92,7 @@ public class SimpleColorPicker extends Button {
   /**
    * Hide the color picker popup.
    */
-  public void hide() {
+  public void hidePopup() {
     popup.hide();
   }
 

@@ -153,7 +153,7 @@ public class SimpleColorPalette extends Region implements Initializable {
         if (e.getCode() == KeyCode.ESCAPE) {
           e.consume();
           colorPicker.revertToOriginalColor();
-          colorPicker.hide();
+          colorPicker.hidePopup();
         }
       });
     } catch (IOException e) {
@@ -169,21 +169,21 @@ public class SimpleColorPalette extends Region implements Initializable {
     // Handle color selection on click.
     colorSample.setOnMouseClicked(event -> {
       colorPicker.updateHistory();
-      colorPicker.hide();
+      colorPicker.hidePopup();
     });
 
     webColorCode.textProperty().addListener(webColorListener);
 
     saveBtn.setOnAction(event -> {
       colorPicker.updateHistory();
-      colorPicker.hide();
+      colorPicker.hidePopup();
     });
 
     saveBtn.setDefaultButton(true);
 
     cancelBtn.setOnAction(event -> {
       colorPicker.revertToOriginalColor();
-      colorPicker.hide();
+      colorPicker.hidePopup();
     });
 
     satValueRect.setBackground(
@@ -270,6 +270,7 @@ public class SimpleColorPalette extends Region implements Initializable {
 
     huePickerOverlay.setOnMouseDragged(hueMouseHandler);
     huePickerOverlay.setOnMousePressed(hueMouseHandler);
+    huePickerOverlay.setOnMouseReleased(event -> updateRandomColorSamples());
 
     EventHandler<MouseEvent> mouseHandler = event -> {
       saturation.set(clamp(event.getX() / satValueRect.getWidth()));
@@ -278,6 +279,7 @@ public class SimpleColorPalette extends Region implements Initializable {
 
     valueOverlay.setOnMousePressed(mouseHandler);
     valueOverlay.setOnMouseDragged(mouseHandler);
+    valueOverlay.setOnMouseReleased(event -> updateRandomColorSamples());
 
     hue.addListener((observable, oldValue, newValue) -> updateCurrentColor(newValue.doubleValue(),
         saturation.get(), value.get()));
@@ -315,6 +317,17 @@ public class SimpleColorPalette extends Region implements Initializable {
     }
   }
 
+  /**
+   * Updates the nearby random color samples.
+   */
+  void updateRandomColorSamples() {
+    Color color = colorPicker.getColor();
+    for (Region swatch : sample) {
+      swatch.setBackground(new Background(
+          new BackgroundFill(getRandomNearColor(color), CornerRadii.EMPTY, Insets.EMPTY)));
+    }
+  }
+
   protected void setColor(Color color) {
     hue.set(color.getHue() / 360);
     saturation.set(color.getSaturation());
@@ -343,11 +356,7 @@ public class SimpleColorPalette extends Region implements Initializable {
   private void updateCurrentColor(double hue, double saturation, double value) {
     Color newColor = Color.hsb(hue * 360, saturation, value);
 
-    for (Region swatch : sample) {
-      swatch.setBackground(new Background(
-          new BackgroundFill(getRandomNearColor(newColor), CornerRadii.EMPTY, Insets.EMPTY)));
-    }
-    colorPicker.setColor(newColor);
+    colorPicker.colorProperty().set(newColor);
 
     GraphicsContext gc = colorSample.getGraphicsContext2D();
     gc.setFill(newColor);
@@ -357,8 +366,10 @@ public class SimpleColorPalette extends Region implements Initializable {
       // TODO: make sure color values are rounded correctly.
       // Suspending the web color listener to avoid it tweaking the current color.
       webColorCode.textProperty().removeListener(webColorListener);
-      webColorCode.setText(String.format("#%02X%02X%02X", (int) (newColor.getRed() * 255 + 0.5),
-          (int) (newColor.getGreen() * 255 + 0.5), (int) (newColor.getBlue() * 255 + 0.5)));
+      webColorCode.setText(String.format("#%02X%02X%02X",
+          (int) (newColor.getRed() * 255 + 0.5),
+          (int) (newColor.getGreen() * 255 + 0.5),
+          (int) (newColor.getBlue() * 255 + 0.5)));
       webColorCode.textProperty().addListener(webColorListener);
     }
   }
