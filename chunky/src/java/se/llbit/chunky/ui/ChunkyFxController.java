@@ -49,6 +49,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.WorldMapLoader;
@@ -57,14 +58,12 @@ import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.ui.render.RenderControlsFx;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionListener;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
-import se.llbit.fx.LuxColorPalette;
 import se.llbit.fx.LuxColorPicker;
 import se.llbit.fxutil.GroupedChangeListener;
 import se.llbit.log.Level;
@@ -276,7 +275,7 @@ public class ChunkyFxController
       alert.setTitle("Delete Selected Chunks");
       alert.setContentText(
           "Do you really want to delete the selected chunks? This can not be undone.");
-      if (alert.showAndWait().get() == ButtonType.OK) {
+      if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
         mapLoader.deleteSelectedChunks(ProgressTracker.NONE);
       }
     });
@@ -502,7 +501,7 @@ public class ChunkyFxController
       alert.setHeaderText("Overwrite existing scene?");
       alert.setContentText(
           "It seems like a scene already exists. Do you wish to overwrite it?");
-      if (alert.showAndWait().get() != ButtonType.OK) {
+      if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
         return;
       }
     }
