@@ -10,8 +10,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
-<?import se.llbit.chunky.ui.SimpleColorPicker?>
 
+<?import se.llbit.fx.LuxColorPicker?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
   <VBox prefWidth="480.0" spacing="10.0">
     <children>
@@ -32,7 +32,7 @@
       <HBox alignment="CENTER_LEFT" spacing="10.0">
         <children>
           <CheckBox fx:id="useCustomWaterColor" mnemonicParsing="false" text="Use custom water color:" />
-          <SimpleColorPicker fx:id="waterColor" />
+          <LuxColorPicker fx:id="waterColor" />
         </children>
       </HBox>
       <Button fx:id="saveDefaults" mnemonicParsing="false" text="Save as defaults" />

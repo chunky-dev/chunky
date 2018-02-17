@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import se.llbit.chunky.ui.SimpleColorPicker?>
+<?import se.llbit.fx.LuxColorPicker?>
 
 <fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <children>
@@ -32,7 +32,7 @@
             </HBox>
          </right>
          <center>
-            <SimpleColorPicker fx:id="colorPicker" BorderPane.alignment="CENTER" />
+            <LuxColorPicker fx:id="colorPicker" BorderPane.alignment="CENTER" />
          </center>
       </BorderPane>
    </children>

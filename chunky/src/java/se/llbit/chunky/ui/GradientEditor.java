@@ -35,6 +35,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.ui.render.SkyTab;
+import se.llbit.fx.LuxColorPicker;
 import se.llbit.json.JsonParser;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Constants;
@@ -76,7 +77,7 @@ public class GradientEditor extends VBox implements Initializable {
   @FXML private Button importBtn;
   @FXML private Button exportBtn;
   @FXML private Canvas canvas;
-  @FXML private SimpleColorPicker colorPicker;
+  @FXML private LuxColorPicker colorPicker;
 
   private List<Vector4> gradient;
   int selected = 0;

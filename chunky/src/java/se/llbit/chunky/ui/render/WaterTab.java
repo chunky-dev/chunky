@@ -34,8 +34,8 @@ import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
-import se.llbit.chunky.ui.SimpleColorPicker;
 import se.llbit.chunky.world.World;
+import se.llbit.fx.LuxColorPicker;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Vector3;
 
@@ -54,7 +54,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private TextField waterHeight;
   @FXML private Button applyWaterHeight;
   @FXML private CheckBox useCustomWaterColor;
-  @FXML private SimpleColorPicker waterColor;
+  @FXML private LuxColorPicker waterColor;
   @FXML private Button saveDefaults;
 
   private IntegerProperty waterHeightProp = new SimpleIntegerProperty();

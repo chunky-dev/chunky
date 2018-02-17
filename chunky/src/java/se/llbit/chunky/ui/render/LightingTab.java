@@ -30,7 +30,7 @@ import se.llbit.chunky.renderer.scene.Sun;
 import se.llbit.chunky.ui.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
-import se.llbit.chunky.ui.SimpleColorPicker;
+import se.llbit.fx.LuxColorPicker;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 
@@ -49,7 +49,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private AngleAdjuster sunAltitude;
   @FXML private CheckBox enableEmitters;
   @FXML private CheckBox enableSunlight;
-  @FXML private SimpleColorPicker sunColor;
+  @FXML private LuxColorPicker sunColor;
 
   private ChangeListener<Color> sunColorListener = (observable, oldValue, newValue) ->
       scene.sun().setColor(ColorUtil.fromFx(newValue));

@@ -9,8 +9,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.ScrollPane?>
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
-<?import se.llbit.chunky.ui.SimpleColorPicker?>
 
+<?import se.llbit.fx.LuxColorPicker?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
     <VBox spacing="10.0">
       <children>
@@ -44,7 +44,7 @@
         <HBox alignment="CENTER_LEFT" spacing="10.0">
           <children>
             <Label text="Fog color:" />
-            <SimpleColorPicker fx:id="fogColor" />
+            <LuxColorPicker fx:id="fogColor" />
           </children>
         </HBox>
         <Label text="Hint: Set fog density &gt; 0.1 for thick fog, and &lt; 0.1 for haze effect." />

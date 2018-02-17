@@ -64,6 +64,8 @@ import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
+import se.llbit.fx.LuxColorPalette;
+import se.llbit.fx.LuxColorPicker;
 import se.llbit.fxutil.GroupedChangeListener;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
@@ -139,7 +141,7 @@ public class ChunkyFxController
 
   @FXML private ChoiceBox<Block> highlightCb;
 
-  @FXML private SimpleColorPicker highlightColor;
+  @FXML private LuxColorPicker highlightColor;
 
   @FXML private Button editResourcePacks;
 
