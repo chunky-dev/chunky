@@ -215,14 +215,6 @@ public class ChunkyFxController
       mapLoader.setMapSize((int) mapCanvas.getWidth(), (int) mapCanvas.getHeight());
     });
 
-    minimapPane.widthProperty().addListener((observable, oldValue, newValue) -> {
-      minimapCanvas.setWidth(newValue.doubleValue());
-      mapLoader.setMinimapSize((int) minimapCanvas.getWidth(), (int) minimapCanvas.getHeight());
-    });
-    minimapPane.heightProperty().addListener((observable, oldValue, newValue) -> {
-      minimapCanvas.setHeight(newValue.doubleValue());
-      mapLoader.setMinimapSize((int) minimapCanvas.getWidth(), (int) minimapCanvas.getHeight());
-    });
     mapOverlay.setOnMouseExited(e -> map.tooltip.hide());
 
     // Set up property bindings for the map view.
