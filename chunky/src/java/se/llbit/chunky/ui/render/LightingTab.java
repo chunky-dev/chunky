@@ -27,6 +27,7 @@ import javafx.scene.paint.Color;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.renderer.scene.Sun;
+import se.llbit.chunky.ui.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.SimpleColorPicker;
@@ -44,8 +45,8 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private DoubleAdjuster skyIntensity;
   @FXML private DoubleAdjuster emitterIntensity;
   @FXML private DoubleAdjuster sunIntensity;
-  @FXML private DoubleAdjuster sunAzimuth;
-  @FXML private DoubleAdjuster sunAltitude;
+  @FXML private AngleAdjuster sunAzimuth;
+  @FXML private AngleAdjuster sunAltitude;
   @FXML private CheckBox enableEmitters;
   @FXML private CheckBox enableSunlight;
   @FXML private SimpleColorPicker sunColor;
@@ -84,16 +85,12 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunIntensity.onValueChange(value -> scene.sun().setIntensity(value));
 
     sunAzimuth.setName("Sun azimuth");
-    sunAzimuth.setTooltip("The angle to the sun from north");
-    sunAzimuth.setRange(0, 360);
-    sunAzimuth
-        .onValueChange(value -> scene.sun().setAzimuth(QuickMath.degToRad(value)));
+    sunAzimuth.setTooltip("Change the angle to the sun from north.");
+    sunAzimuth.onValueChange(value -> scene.sun().setAzimuth(-QuickMath.degToRad(value)));
 
     sunAltitude.setName("Sun altitude");
-    sunAltitude.setTooltip("The angle to the sun above the horizon");
-    sunAltitude.setRange(0, 90);
-    sunAltitude
-        .onValueChange(value -> scene.sun().setAltitude(QuickMath.degToRad(value)));
+    sunAltitude.setTooltip("Change the angle to the sun above the horizon.");
+    sunAltitude.onValueChange(value -> scene.sun().setAltitude(QuickMath.degToRad(value)));
 
     enableEmitters.selectedProperty().addListener(
         (observable, oldValue, newValue) -> scene.setEmittersEnabled(newValue));
@@ -111,7 +108,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     skyIntensity.set(scene.sky().getSkyLight());
     emitterIntensity.set(scene.getEmitterIntensity());
     sunIntensity.set(scene.sun().getIntensity());
-    sunAzimuth.set(QuickMath.radToDeg(scene.sun().getAzimuth()));
+    sunAzimuth.set(-QuickMath.radToDeg(scene.sun().getAzimuth()));
     sunAltitude.set(QuickMath.radToDeg(scene.sun().getAltitude()));
     enableEmitters.setSelected(scene.getEmittersEnabled());
     enableSunlight.setSelected(scene.getDirectLight());

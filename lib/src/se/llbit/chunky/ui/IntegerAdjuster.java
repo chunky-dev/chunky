@@ -21,7 +21,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 /**
  * An integer adjuster stores integer values.
  */
-public class IntegerAdjuster extends Adjuster<Integer> {
+public class IntegerAdjuster extends SliderAdjuster<Integer> {
   private int min = Integer.MIN_VALUE;
   private int max = Integer.MAX_VALUE;
 

@@ -38,6 +38,7 @@ import se.llbit.chunky.entity.Geared;
 import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.ui.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.entity.Entity;
@@ -45,6 +46,7 @@ import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
+import se.llbit.math.QuickMath;
 import se.llbit.math.Vector3;
 
 import java.io.File;
@@ -217,15 +219,15 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       poseBox.setAlignment(Pos.CENTER_LEFT);
       poseBox.getChildren().addAll(new Label("Pose part"), partList);
 
-      DoubleAdjuster yaw = new DoubleAdjuster();
+      AngleAdjuster yaw = new AngleAdjuster();
       yaw.setTooltip("Modifies yaw of currently selected entity part.");
       yaw.setName("yaw");
 
-      DoubleAdjuster pitch = new DoubleAdjuster();
+      AngleAdjuster pitch = new AngleAdjuster();
       pitch.setTooltip("Modifies pitch of currently selected entity part.");
       pitch.setName("pitch");
 
-      DoubleAdjuster roll = new DoubleAdjuster();
+      AngleAdjuster roll = new AngleAdjuster();
       roll.setTooltip("Modifies roll of currently selected entity part.");
       roll.setName("roll");
 
@@ -240,24 +242,21 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
 
       partList.getSelectionModel().selectFirst(); // Updates the pose parameters.
 
-      pitch.setRange(-Math.PI, Math.PI);
       pitch.onValueChange(value -> {
         withPose(entity, partList.getValue(), partPose -> {
-          partPose.set(0, Json.of(value));
+          partPose.set(0, Json.of(Math.toRadians(value)));
         });
         scene.rebuildActorBvh();
       });
-      yaw.setRange(-Math.PI, Math.PI);
       yaw.onValueChange(value -> {
         withPose(entity, partList.getValue(), partPose -> {
-          partPose.set(1, Json.of(value));
+          partPose.set(1, Json.of(Math.toRadians(value)));
         });
         scene.rebuildActorBvh();
       });
-      roll.setRange(-Math.PI, Math.PI);
       roll.onValueChange(value -> {
         withPose(entity, partList.getValue(), partPose -> {
-          partPose.set(2, Json.of(value));
+          partPose.set(2, Json.of(Math.toRadians(value)));
         });
         scene.rebuildActorBvh();
       });

@@ -9,6 +9,7 @@
 <?import se.llbit.chunky.ui.DoubleAdjuster?>
 <?import se.llbit.chunky.ui.SimpleColorPicker?>
 
+<?import se.llbit.chunky.ui.AngleAdjuster?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
     <VBox spacing="10.0">
       <children>
@@ -17,8 +18,8 @@
         <DoubleAdjuster fx:id="emitterIntensity" maxWidth="1.7976931348623157E308" />
         <CheckBox fx:id="enableSunlight" mnemonicParsing="false" text="Enable sunlight" />
         <DoubleAdjuster fx:id="sunIntensity" maxWidth="1.7976931348623157E308" />
-        <DoubleAdjuster fx:id="sunAzimuth" maxWidth="1.7976931348623157E308" />
-        <DoubleAdjuster fx:id="sunAltitude" maxWidth="1.7976931348623157E308" />
+        <AngleAdjuster fx:id="sunAzimuth" />
+        <AngleAdjuster fx:id="sunAltitude" />
         <HBox alignment="CENTER_LEFT" spacing="10.0">
           <children>
             <Label text="Sun color:" />

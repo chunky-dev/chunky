@@ -24,6 +24,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -34,21 +36,13 @@ import javafx.util.converter.NumberStringConverter;
 import java.util.function.Consumer;
 
 /**
- * A UI control combining a label, slider, and text field for adjusting one numeric property.
+ * A control for editing numeric values with a text field.
  */
 public abstract class Adjuster<T extends Number> extends HBox {
-  private StringProperty name = new SimpleStringProperty("Name");
-  private final Label nameLbl = new Label();
-  private final Slider valueSlider = new Slider();
-  private final TextField valueField = new TextField();
-  private final Property<Number> value;
-  protected boolean clampMax;
-  protected boolean clampMin;
-  private double sliderMin = 0.01; // Lower limit for logarithmic calculations.
-  private double min = 0; // TODO: handle minimum.
-  private double max = 100;
-  private boolean logarithmic = false;
-  private boolean maxInfinity = false;
+  private final StringProperty name = new SimpleStringProperty("Name");
+  protected final Label nameLbl = new Label();
+  protected final TextField valueField = new TextField();
+  protected final Property<Number> value;
   private ChangeListener<Number> listener;
 
   protected Adjuster(Property<Number> value) {
@@ -56,12 +50,9 @@ public abstract class Adjuster<T extends Number> extends HBox {
     nameLbl.textProperty().bind(Bindings.concat(name, ":"));
     setAlignment(Pos.CENTER_LEFT);
     setSpacing(10);
-    getChildren().addAll(nameLbl, valueSlider, valueField);
     valueField.setPrefWidth(103);
     valueField.textProperty().bindBidirectional(value, new NumberStringConverter());
-    valueSlider.valueProperty().bindBidirectional(value);
-    valueSlider.setMin(0);
-    valueSlider.setMax(100);
+    getChildren().addAll(nameLbl, valueField);
   }
 
   public void setName(String name) {
@@ -75,20 +66,6 @@ public abstract class Adjuster<T extends Number> extends HBox {
   // TODO: not used - should be removed?
   public StringProperty nameProperty() {
     return name;
-  }
-
-  public void setRange(double min, double max) {
-    if (min < 0.01 && min >= 0) {
-      sliderMin = 0.01;
-    } else {
-      sliderMin = min;
-    }
-    this.min = min;
-    this.max = max;
-    if (!logarithmic) {
-      valueSlider.setMin(min);
-      valueSlider.setMax(max);
-    }
   }
 
   /**
@@ -118,55 +95,9 @@ public abstract class Adjuster<T extends Number> extends HBox {
   public void setTooltip(String tooltip) {
     nameLbl.setTooltip(new Tooltip(tooltip));
     valueField.setTooltip(new Tooltip(tooltip));
-    valueSlider.setTooltip(new Tooltip(tooltip));
   }
 
-  /**
-   * Make the adjuster use a logarithmic mapping for the slider position.
-   */
-  public void makeLogarithmic() {
-    logarithmic = true;
-    valueSlider.setMin(0);
-    valueSlider.setMax(100);
-    DoubleProperty sliderValue = new SimpleDoubleProperty();
-    ChangeListener<Number> sliderListener = (observable, oldValue, newValue) -> {
-      double result;
-      if (maxInfinity && newValue.doubleValue() > 99.9) {
-        result = Double.POSITIVE_INFINITY;
-      } else {
-        double logMin = Math.log(sliderMin);
-        double logMax = Math.log(max);
-        double range = logMax - logMin;
-        result = Math.pow(Math.E, (newValue.doubleValue() / 100.0) * range + logMin);
-      }
-      value.setValue(result);
-    };
-    ChangeListener<Number> valueListener = (observable, oldValue, newValue) -> {
-      double result;
-      double logMin = Math.log(sliderMin);
-      double logMax = Math.log(max);
-      double logValue = Math.log(newValue.doubleValue());
-      logValue = Math.max(logMin, logValue);
-      logValue = Math.min(logMax, logValue);
-      double pos = (logValue - logMin) / (logMax - logMin);
-      result = pos * 100;
-      // Temporarily stop listening to avoid event recursion.
-      sliderValue.removeListener(sliderListener);
-      sliderValue.set(result);
-      sliderValue.addListener(sliderListener);
-    };
-    sliderValue.addListener(sliderListener);
-    value.addListener(valueListener);
-    valueSlider.valueProperty().unbindBidirectional(value);
-    valueSlider.valueProperty().bindBidirectional(sliderValue);
-  }
-
-  /**
-   * When set to true the value is set to infinity when the slider is at the maximum position.
-   */
-  public void setMaxInfinity(boolean maxInfinity) {
-    this.maxInfinity = maxInfinity;
-  }
+  protected abstract T clamp(Number value);
 
   public void onValueChange(Consumer<T> changeConsumer) {
     if (listener != null) {
@@ -174,20 +105,5 @@ public abstract class Adjuster<T extends Number> extends HBox {
     }
     listener = (observable, oldValue, newValue) -> changeConsumer.accept(clamp(newValue));
     value.addListener(listener);
-  }
-
-  protected abstract T clamp(Number value);
-
-  public void clampBoth() {
-    clampMax();
-    clampMin();
-  }
-
-  public void clampMax() {
-    clampMax = true;
-  }
-
-  public void clampMin() {
-    clampMin = true;
   }
 }
