@@ -415,13 +415,14 @@ def lp_upload_file(version, release, filename, description, content_type, file_t
 			signature_filename=signature_fn,
 			content_type=content_type,
 			file_type=FILE_TYPES[file_type])
-		return 'https://launchpad.net/chunky/%s/%s/+download/%s' \
-			% (version.series, version.milestone, filename)
 	except:
 		exc_type, exc_value, exc_traceback = sys.exc_info()
 		print("File upload error:")
 		traceback.print_exception(exc_type, exc_value, exc_traceback)
-		return None
+		print("Upload %s (%s) manually. Press enter to continue." % (filename, description))
+		raw_input()
+	return 'https://launchpad.net/chunky/%s/%s/+download/%s' \
+		% (version.series, version.milestone, filename)
 
 def check_file_exists(filename):
 	if not path.exists('build/' + filename):
