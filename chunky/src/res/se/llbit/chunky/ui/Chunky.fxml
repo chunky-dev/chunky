@@ -18,16 +18,16 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.fx.LuxColorPicker?>
 
-<?import se.llbit.fx.LuxColorPicker?>
-<BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
-   <top>
-      <MenuBar BorderPane.alignment="CENTER">
+<VBox fx:id="rootContainer"
+      maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+      xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <MenuBar>
         <menus>
           <Menu mnemonicParsing="false" text="Chunky">
             <items>
@@ -36,9 +36,9 @@
           </Menu>
         </menus>
       </MenuBar>
-   </top>
-   <center>
-      <SplitPane dividerPositions="0.4251668255481411" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+      <SplitPane dividerPositions="0.4251668255481411"
+                 VBox.vgrow="ALWAYS"
+                 maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
         <items>
             <StackPane fx:id="mapPane" prefHeight="150.0" prefWidth="200.0">
                <children>
@@ -231,5 +231,5 @@
             </VBox>
         </items>
       </SplitPane>
-   </center>
-</BorderPane>
+   </children>
+</VBox>
