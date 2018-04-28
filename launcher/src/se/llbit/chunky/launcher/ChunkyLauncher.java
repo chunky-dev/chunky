@@ -49,7 +49,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final String LAUNCHER_VERSION = "v1.10.1";
+  public static final String LAUNCHER_VERSION = "v1.10.2";
 
   protected String java;
 

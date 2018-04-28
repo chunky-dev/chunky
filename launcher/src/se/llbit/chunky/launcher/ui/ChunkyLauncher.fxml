@@ -12,12 +12,13 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
 
 <VBox xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="15.0">
+      <HBox minHeight="-Infinity" minWidth="-Infinity" spacing="15.0" VBox.vgrow="ALWAYS">
          <children>
             <AnchorPane>
                <children>
@@ -29,7 +30,7 @@
                   <Label fx:id="launcherVersion" text="version" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
                </children>
             </AnchorPane>
-            <VBox spacing="10.0">
+            <VBox spacing="10.0" HBox.hgrow="ALWAYS">
                <children>
                   <Label text="Chunky startup settings:" />
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -43,7 +44,7 @@
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                      <children>
                         <Label text="Minecraft directory:" />
-                        <TextField fx:id="minecraftDirectory" editable="false" />
+                        <TextField fx:id="minecraftDirectory" editable="false" HBox.hgrow="ALWAYS" />
                         <Button fx:id="browseMinecraft" mnemonicParsing="false" text="..." />
                      </children>
                   </HBox>
@@ -55,7 +56,7 @@
                               <HBox alignment="CENTER_LEFT" spacing="10.0">
                                  <children>
                                     <Label text="Java Runtime:" />
-                                    <TextField fx:id="javaRuntime" editable="false" />
+                                    <TextField fx:id="javaRuntime" editable="false" HBox.hgrow="ALWAYS" />
                                     <Button fx:id="browseJava" mnemonicParsing="false" text="..." />
                                  </children>
                                  <VBox.margin>
@@ -65,13 +66,13 @@
                               <HBox alignment="CENTER_LEFT" spacing="10.0">
                                  <children>
                                     <Label text="Java options:" />
-                                    <TextField fx:id="javaOptions" />
+                                    <TextField fx:id="javaOptions" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="10.0">
                                  <children>
                                     <Label text="Chunky options:" />
-                                    <TextField fx:id="chunkyOptions" />
+                                    <TextField fx:id="chunkyOptions" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
                               <CheckBox fx:id="enableDebugConsole" mnemonicParsing="false" text="Enable debug console" />
@@ -81,7 +82,7 @@
                               <HBox alignment="CENTER_LEFT" spacing="10.0">
                                  <children>
                                     <Label text="Settings directory:" />
-                                    <TextField fx:id="settingsDirectory" editable="false" />
+                                    <TextField fx:id="settingsDirectory" editable="false" HBox.hgrow="ALWAYS" />
                                     <Button fx:id="openSettingsDirectory" mnemonicParsing="false" text="Open" />
                                  </children>
                               </HBox>
@@ -94,6 +95,7 @@
                         </VBox>
                      </content>
                   </TitledPane>
+                  <Pane maxHeight="1.7976931348623157E308" prefHeight="0.0" VBox.vgrow="ALWAYS" />
                   <HBox alignment="CENTER_RIGHT" spacing="10.0">
                      <children>
                         <CheckBox fx:id="alwaysShowLauncher" mnemonicParsing="false" selected="true" text="Always open launcher" />
