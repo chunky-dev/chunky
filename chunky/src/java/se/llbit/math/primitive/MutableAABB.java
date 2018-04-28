@@ -37,7 +37,6 @@ public class MutableAABB implements Primitive {
    * Construct a new AABB with given bounds.
    */
   public MutableAABB(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax) {
-
     this.xmin = xmin;
     this.xmax = xmax;
     this.ymin = ymin;
@@ -227,13 +226,14 @@ public class MutableAABB implements Primitive {
   }
 
   /**
+   * This is used in BVH construction heuristic.
    * @return surface area of the bounding box
    */
   public double surfaceArea() {
     double x = xmax - xmin;
     double y = ymax - ymin;
     double z = zmax - zmin;
-    return 2 * (y * z + x * z * x * y);
+    return 2 * (y * z + x * z + x * y);
   }
 
 }
