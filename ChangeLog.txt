@@ -1,5 +1,11 @@
 LATEST
 
+* Added sky fog blending setting in the Sky&Fog tab.
+  This setting is used to adjust how much the fog color is
+  blended over the sky/skymap.
+
+1.4.5 - 2018-02-18
+
 * Added radial knob control to improve editing angles like sun azimuth.
 * Fixed incorrect dark oak leaf color blending.
 * Added new solid color sky mode.

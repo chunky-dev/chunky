@@ -222,10 +222,13 @@ public class Scene implements JsonSerializable, Refreshable {
    * Enables fast fog algorithm
    */
   protected boolean fastFog = true;
-  /**
-   * Fog thickness.
-   */
+
+  /** Fog thickness. */
   protected double fogDensity = DEFAULT_FOG_DENSITY;
+
+  /** Controls how much the fog color is blended over the sky/skymap. */
+  protected double skyFogDensity = 1;
+
   protected boolean biomeColors = true;
   protected boolean transparentSky = false;
   protected boolean renderActors = true;
@@ -415,6 +418,7 @@ public class Scene implements JsonSerializable, Refreshable {
     emitterIntensity = other.emitterIntensity;
     transparentSky = other.transparentSky;
     fogDensity = other.fogDensity;
+    skyFogDensity = other.skyFogDensity;
     fastFog = other.fastFog;
 
     camera.set(other.camera);
@@ -2318,6 +2322,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("biomeColorsEnabled", biomeColors);
     json.add("transparentSky", transparentSky);
     json.add("fogDensity", fogDensity);
+    json.add("skyFogDensity", skyFogDensity);
     json.add("waterHeight", waterHeight);
     json.add("renderActors", renderActors);
 
@@ -2574,6 +2579,7 @@ public class Scene implements JsonSerializable, Refreshable {
     biomeColors = json.get("biomeColorsEnabled").boolValue(biomeColors);
     transparentSky = json.get("transparentSky").boolValue(transparentSky);
     fogDensity = json.get("fogDensity").doubleValue(fogDensity);
+    skyFogDensity = json.get("skyFogDensity").doubleValue(skyFogDensity);
     waterHeight = json.get("waterHeight").intValue(waterHeight);
     renderActors = json.get("renderActors").boolValue(renderActors);
     materials = json.get("materials").object().copy().toMap();
@@ -2718,6 +2724,16 @@ public class Scene implements JsonSerializable, Refreshable {
     return fogDensity;
   }
 
+  public void setSkyFogDensity(double newValue) {
+    if (newValue != skyFogDensity) {
+      this.skyFogDensity = newValue;
+      refresh();
+    }
+  }
+
+  public double getSkyFogDensity() {
+    return skyFogDensity;
+  }
   public void setFastFog(boolean value) {
     if (fastFog != value) {
       fastFog = value;
@@ -2835,6 +2851,7 @@ public class Scene implements JsonSerializable, Refreshable {
       } else {
         fog = 1;
       }
+      fog *= skyFogDensity;
       ray.color.x = (1 - fog) * ray.color.x + fog * fogColor.x;
       ray.color.y = (1 - fog) * ray.color.y + fog * fogColor.y;
       ray.color.z = (1 - fog) * ray.color.z + fog * fogColor.z;

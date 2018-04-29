@@ -56,6 +56,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   @FXML private DoubleAdjuster cloudY;
   @FXML private DoubleAdjuster cloudZ;
   @FXML private DoubleAdjuster fogDensity;
+  @FXML private DoubleAdjuster skyFogDensity;
   @FXML private LuxColorPicker fogColor;
   private final VBox simulatedSettings = new VBox();
   private DoubleAdjuster horizonOffset = new DoubleAdjuster();
@@ -95,21 +96,23 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     cloudSize.makeLogarithmic();
     cloudSize.onValueChange(value -> scene.sky().setCloudSize(value));
 
-    cloudX.setName("Cloud X");
     cloudX.setTooltip("Cloud X offset.");
     cloudX.onValueChange(value -> scene.sky().setCloudXOffset(value));
-    cloudY.setName("Cloud Y");
     cloudY.setTooltip("Cloud Y offset.");
     cloudY.onValueChange(value -> scene.sky().setCloudYOffset(value));
-    cloudZ.setName("Cloud Z");
     cloudZ.setTooltip("Cloud Z offset.");
     cloudZ.onValueChange(value -> scene.sky().setCloudZOffset(value));
 
-    fogDensity.setName("Fog density");
-    fogDensity.setTooltip("Alters the volumetric fog effect.");
+    fogDensity.setTooltip("Fog thickness. Set to 0 to disable volumetric fog effect.");
     fogDensity.setRange(0, 2);
     fogDensity.clampMin();
     fogDensity.onValueChange(value -> scene.setFogDensity(value));
+
+    skyFogDensity.setTooltip(
+        "How much the fog color is blended over the sky/skymap. No effect when fog is disabled.");
+    skyFogDensity.setRange(0, 1);
+    skyFogDensity.clampMin();
+    skyFogDensity.onValueChange(value -> scene.setSkyFogDensity(value));
 
     skyMode.getItems().addAll(Sky.SkyMode.values());
     skyMode.getSelectionModel().selectedItemProperty()
@@ -169,6 +172,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     cloudY.set(scene.sky().cloudYOffset());
     cloudZ.set(scene.sky().cloudZOffset());
     fogDensity.set(scene.getFogDensity());
+    skyFogDensity.set(scene.getSkyFogDensity());
     fogColor.colorProperty().removeListener(fogColorListener);
     fogColor.setColor(ColorUtil.toFx(scene.getFogColor()));
     fogColor.colorProperty().addListener(fogColorListener);

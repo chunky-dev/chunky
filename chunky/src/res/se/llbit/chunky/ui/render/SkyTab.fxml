@@ -37,10 +37,11 @@
         <CheckBox fx:id="transparentSkyEnabled" mnemonicParsing="false" text="Transparent sky" />
         <CheckBox fx:id="cloudsEnabled" mnemonicParsing="false" text="Enable clouds" />
         <DoubleAdjuster fx:id="cloudSize" />
-        <DoubleAdjuster fx:id="cloudX" />
-        <DoubleAdjuster fx:id="cloudY" />
-        <DoubleAdjuster fx:id="cloudZ" />
-        <DoubleAdjuster fx:id="fogDensity" />
+        <DoubleAdjuster fx:id="cloudX" name="Cloud X"/>
+        <DoubleAdjuster fx:id="cloudY" name="Cloud Y"/>
+        <DoubleAdjuster fx:id="cloudZ" name="Cloud Z"/>
+        <DoubleAdjuster fx:id="fogDensity" name="Fog density"/>
+        <DoubleAdjuster fx:id="skyFogDensity" name="Sky fog blending"/>
         <HBox alignment="CENTER_LEFT" spacing="10.0">
           <children>
             <Label text="Fog color:" />
