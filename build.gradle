@@ -62,6 +62,9 @@ defaultTasks 'releaseJar'
 task tarball(type: Exec) {
   // TODO(jesper): Prepend cmd /c on Windows?
   commandLine "git archive --prefix=\"chunky-${project.version}\" -o build/chunky-${project.version}.tar.gz master".split(' ')
+  doFirst {
+    file('build').mkdir()
+  }
 }
 
 task release {
