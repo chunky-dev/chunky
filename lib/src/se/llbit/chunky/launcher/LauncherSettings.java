@@ -18,6 +18,7 @@ package se.llbit.chunky.launcher;
 
 import se.llbit.chunky.JsonSettings;
 import se.llbit.chunky.resources.SettingsDirectory;
+import se.llbit.util.OSDetector;
 
 import java.io.File;
 
@@ -49,6 +50,7 @@ public class LauncherSettings {
   public boolean downloadSnapshots = false;
 
   public LauncherSettings() {
+    javaOptions = defaultJavaOptions();
   }
 
   public void load() {
@@ -69,12 +71,20 @@ public class LauncherSettings {
     verboseLogging = settings.getBool("verboseLogging", false);
     verboseLauncher = settings.getBool("verboseLauncher", false);
     closeConsoleOnExit = settings.getBool("closeConsoleOnExit", true);
-    javaOptions = settings.getString("javaOptions", "");
+    javaOptions = settings.getString("javaOptions", defaultJavaOptions());
     chunkyOptions = settings.getString("chunkyOptions", "");
     version = settings.getString("version", "latest");
     showLauncher = settings.getBool("showLauncher", true);
     showAdvancedSettings = settings.getBool("showAdvancedSettings", false);
     downloadSnapshots = settings.getBool("downloadSnapshots", false);
+  }
+
+  private String defaultJavaOptions() {
+    // Workaround for JavaFX hardware rendering issue on Windows.
+    // See https://www.reddit.com/r/javahelp/comments/84w6i6/problem_displaying_anything_with_javafx_only/
+    return (OSDetector.getOS() == OSDetector.OS.WIN)
+        ? "-Dprism.order=sw"
+        : "";
   }
 
   public void save() {
