@@ -114,9 +114,9 @@ public class Block extends Material {
   private static final boolean UNKNOWN_INVISIBLE = !PersistentSettings.drawUnknownBlocks();
 
   public static final int AIR_ID = 0x00;
-  public static final Block AIR = new Block(AIR_ID, "block:air", Texture.air);
+  public static final Block AIR = new Block(AIR_ID, "minecraft:air", Texture.air);
   public static final int STONE_ID = 0x01;
-  public static final Block STONE = new Block(STONE_ID, "block:stone", Texture.stone) {
+  public static final Block STONE = new Block(STONE_ID, "minecraft:stone", Texture.stone) {
     final Texture[] texture = {
         Texture.stone, Texture.granite, Texture.smoothGranite, Texture.diorite,
         Texture.smoothDiorite, Texture.andesite, Texture.smoothAndesite,
@@ -135,13 +135,13 @@ public class Block extends Material {
     }
   };
   public static final int GRASS_ID = 0x02;
-  public static final Block GRASS = new Block(GRASS_ID, "block:grass", Texture.grassTop) {
+  public static final Block GRASS = new Block(GRASS_ID, "minecraft:grass", Texture.grassTop) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return GrassModel.intersect(ray, scene);
     }
   };
   public static final int DIRT_ID = 0x03;
-  public static final Block DIRT = new Block(DIRT_ID, "block:dirt", Texture.dirt) {
+  public static final Block DIRT = new Block(DIRT_ID, "minecraft:dirt", Texture.dirt) {
     final Texture[][] textures = {
         {
             Texture.dirt, Texture.dirt, Texture.dirt, Texture.dirt, Texture.dirt, Texture.dirt,
@@ -167,9 +167,9 @@ public class Block extends Material {
     }
   };
   public static final int COBBLESTONE_ID = 0x04;
-  public static final Block COBBLESTONE = new Block(COBBLESTONE_ID, "block:cobblestone", Texture.cobblestone);
+  public static final Block COBBLESTONE = new Block(COBBLESTONE_ID, "minecraft:cobblestone", Texture.cobblestone);
   public static final int WOODENPLANKS_ID = 0x05;
-  public static final Block WOODENPLANKS = new Block(WOODENPLANKS_ID, "block:planks", Texture.oakPlanks) {
+  public static final Block WOODENPLANKS = new Block(WOODENPLANKS_ID, "minecraft:planks", Texture.oakPlanks) {
     final Texture[] texture =
         {Texture.oakPlanks, Texture.sprucePlanks, Texture.birchPlanks, Texture.jungleTreePlanks,
             Texture.acaciaPlanks, Texture.darkOakPlanks, Texture.acaciaPlanks,
@@ -184,7 +184,7 @@ public class Block extends Material {
     }
   };
   public static final int SAPLING_ID = 0x06;
-  public static final Block SAPLING = new Block(SAPLING_ID, "block:sapling", Texture.oakSapling) {
+  public static final Block SAPLING = new Block(SAPLING_ID, "minecraft:sapling", Texture.oakSapling) {
     final Texture[] texture =
         {Texture.oakSapling, Texture.spruceSapling, Texture.birchSapling, Texture.jungleSapling,
             Texture.acaciaSapling, Texture.darkOakSapling, Texture.acaciaSapling,
@@ -199,9 +199,9 @@ public class Block extends Material {
     }
   };
   public static final int BEDROCK_ID = 0x07;
-  public static final Block BEDROCK = new Block(BEDROCK_ID, "block:bedrock", Texture.bedrock);
+  public static final Block BEDROCK = new Block(BEDROCK_ID, "minecraft:bedrock", Texture.bedrock);
   public static final int WATER_ID = 0x08;
-  public static final Block WATER = new Block(WATER_ID, "block:flowing_water", Texture.water) {
+  public static final Block WATER = new Block(WATER_ID, "minecraft:flowing_water", Texture.water) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return WaterModel.intersect(ray);
     }
@@ -215,7 +215,7 @@ public class Block extends Material {
     }
   };
   public static final int STATIONARYWATER_ID = 0x09;
-  public static final Block STATIONARYWATER = new Block(STATIONARYWATER_ID, "block:water", Texture.water) {
+  public static final Block STATIONARYWATER = new Block(STATIONARYWATER_ID, "minecraft:water", Texture.water) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return WaterModel.intersect(ray);
     }
@@ -225,19 +225,19 @@ public class Block extends Material {
     }
   };
   public static final int LAVA_ID = 0x0A;
-  public static final Block LAVA = new Block(LAVA_ID, "block:flowing_lava", Texture.lava) {
+  public static final Block LAVA = new Block(LAVA_ID, "minecraft:flowing_lava", Texture.lava) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return LavaModel.intersect(ray);
     }
   };
   public static final int STATIONARYLAVA_ID = 0x0B;
-  public static final Block STATIONARYLAVA = new Block(STATIONARYLAVA_ID, "block:lava", Texture.lava) {
+  public static final Block STATIONARYLAVA = new Block(STATIONARYLAVA_ID, "minecraft:lava", Texture.lava) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return LavaModel.intersect(ray);
     }
   };
   public static final int SAND_ID = 0x0C;
-  public static final Block SAND = new Block(SAND_ID, "block:sand", Texture.sand) {
+  public static final Block SAND = new Block(SAND_ID, "minecraft:sand", Texture.sand) {
     final Texture[] texture = {Texture.sand, Texture.redSand};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -249,15 +249,15 @@ public class Block extends Material {
     }
   };
   public static final int GRAVEL_ID = 0x0D;
-  public static final Block GRAVEL = new Block(GRAVEL_ID, "block:gravel", Texture.gravel);
+  public static final Block GRAVEL = new Block(GRAVEL_ID, "minecraft:gravel", Texture.gravel);
   public static final int GOLDORE_ID = 0x0E;
-  public static final Block GOLDORE = new Block(GOLDORE_ID, "block:gold_ore", Texture.goldOre);
+  public static final Block GOLDORE = new Block(GOLDORE_ID, "minecraft:gold_ore", Texture.goldOre);
   public static final int IRONORE_ID = 0x0F;
-  public static final Block IRONORE = new Block(IRONORE_ID, "block:iron_ore", Texture.ironOre);
+  public static final Block IRONORE = new Block(IRONORE_ID, "minecraft:iron_ore", Texture.ironOre);
   public static final int COALORE_ID = 0x10;
-  public static final Block COALORE = new Block(COALORE_ID, "block:coal_ore", Texture.coalOre);
+  public static final Block COALORE = new Block(COALORE_ID, "minecraft:coal_ore", Texture.coalOre);
   public static final int WOOD_ID = 0x11;
-  public static final Block WOOD = new Block(WOOD_ID, "block:log2", Texture.oakWood) {
+  public static final Block WOOD = new Block(WOOD_ID, "minecraft:log2", Texture.oakWood) {
     final Texture[][] texture =
         {{Texture.oakWood, Texture.oakWoodTop}, {Texture.spruceWood, Texture.spruceWoodTop},
             {Texture.birchWood, Texture.birchWoodTop}, {Texture.jungleWood, Texture.jungleTreeTop}};
@@ -277,7 +277,7 @@ public class Block extends Material {
     }
   };
   public static final int LEAVES_ID = 0x12;
-  public static final Block LEAVES = new Block(LEAVES_ID, "block:leaves", Texture.oakLeaves) {
+  public static final Block LEAVES = new Block(LEAVES_ID, "minecraft:leaves", Texture.oakLeaves) {
     private final float[] SPRUCE_COLOR = new float[4];
     private final float[] BIRCH_COLOR = new float[4];
 
@@ -336,7 +336,7 @@ public class Block extends Material {
     }
   };
   public static final int SPONGE_ID = 0x13;
-  public static final Block SPONGE = new Block(SPONGE_ID, "block:sponge", Texture.sponge) {
+  public static final Block SPONGE = new Block(SPONGE_ID, "minecraft:sponge", Texture.sponge) {
     final Texture[] texture = {Texture.sponge, Texture.wetSponge,};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -350,7 +350,7 @@ public class Block extends Material {
     }
   };
   public static final int GLASS_ID = 0x14;
-  public static final Block GLASS = new Block(GLASS_ID, "block:glass", Texture.glass) {
+  public static final Block GLASS = new Block(GLASS_ID, "minecraft:glass", Texture.glass) {
     @Override public boolean isSameMaterial(Material other) {
       return other == this || other == STAINED_GLASS;
     }
@@ -369,12 +369,12 @@ public class Block extends Material {
   };
   public static final int LAPIS_ORE_ID = 0x15;
   public static final Block LAPIS_ORE =
-      new Block(LAPIS_ORE_ID, "block:lapis_ore", Texture.lapisOre);
+      new Block(LAPIS_ORE_ID, "minecraft:lapis_ore", Texture.lapisOre);
   public static final int LAPIS_BLOCK_ID = 0x16;
   public static final Block LAPIS_BLOCK =
-      new Block(LAPIS_BLOCK_ID, "block:lapis_block", Texture.lapisBlock);
+      new Block(LAPIS_BLOCK_ID, "minecraft:lapis_block", Texture.lapisBlock);
   public static final int DISPENSER_ID = 0x17;
-  public static final Block DISPENSER = new Block(DISPENSER_ID, "block:dispenser", Texture.dispenserFront) {
+  public static final Block DISPENSER = new Block(DISPENSER_ID, "minecraft:dispenser", Texture.dispenserFront) {
     final Texture[][] texture = {
         // Facing down.
         {Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop,
@@ -401,7 +401,7 @@ public class Block extends Material {
     }
   };
   public static final int SANDSTONE_ID = 0x18;
-  public static final Block SANDSTONE = new Block(SANDSTONE_ID, "block:sandstone", Texture.sandstoneSide) {
+  public static final Block SANDSTONE = new Block(SANDSTONE_ID, "minecraft:sandstone", Texture.sandstoneSide) {
     final Texture[][] texture = {
         // normal
         {Texture.sandstoneSide, Texture.sandstoneSide, Texture.sandstoneSide,
@@ -420,19 +420,19 @@ public class Block extends Material {
     }
   };
   public static final int NOTEBLOCK_ID = 0x19;
-  public static final Block NOTEBLOCK = new Block(NOTEBLOCK_ID, "block:noteblock", Icon.noteBlock) {
+  public static final Block NOTEBLOCK = new Block(NOTEBLOCK_ID, "minecraft:noteblock", Icon.noteBlock) {
     @Override public Texture getTexture(int blockData) {
       return Texture.jukeboxSide;
     }
   };
   public static final int BED_ID = 0x1A;
-  public static final Block BED = new Block(BED_ID, "block:bed", Icon.bed) {
+  public static final Block BED = new Block(BED_ID, "minecraft:bed", Icon.bed) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return BedModel.intersect(ray);
     }
   };
   public static final int POWEREDRAIL_ID = 0x1B;
-  public static final Block POWEREDRAIL = new Block(POWEREDRAIL_ID, "block:golden_rail", Texture.poweredRailOn) {
+  public static final Block POWEREDRAIL = new Block(POWEREDRAIL_ID, "minecraft:golden_rail", Texture.poweredRailOn) {
     final Texture[] texture = {Texture.poweredRailOff, Texture.poweredRailOn};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -441,50 +441,50 @@ public class Block extends Material {
     }
   };
   public static final int DETECTORRAIL_ID = 0x1C;
-  public static final Block DETECTORRAIL = new Block(DETECTORRAIL_ID, "block:detector_rail", Texture.detectorRail) {
+  public static final Block DETECTORRAIL = new Block(DETECTORRAIL_ID, "minecraft:detector_rail", Texture.detectorRail) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return RailModel.intersect(ray, Texture.detectorRail, (ray.getBlockData() & 7) % 6);
     }
   };
   public static final int STICKYPISTON_ID = 0x1D;
-  public static final Block STICKYPISTON = new Block(STICKYPISTON_ID, "block:sticky_piston", Texture.pistonTopSticky) {
+  public static final Block STICKYPISTON = new Block(STICKYPISTON_ID, "minecraft:sticky_piston", Texture.pistonTopSticky) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return PistonModel.intersect(ray, 1);
     }
   };
   public static final int COBWEB_ID = 0x1E;
-  public static final Block COBWEB = new Block(COBWEB_ID, "block:web", Texture.cobweb) {
+  public static final Block COBWEB = new Block(COBWEB_ID, "minecraft:web", Texture.cobweb) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return SpriteModel.intersect(ray, Texture.cobweb);
     }
   };
   public static final int TALLGRASS_ID = 0x1F;
-  public static final Block TALLGRASS = new Block(TALLGRASS_ID, "block:tallgrass", Texture.tallGrass) {
+  public static final Block TALLGRASS = new Block(TALLGRASS_ID, "minecraft:tallgrass", Texture.tallGrass) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TallGrassModel.intersect(ray, scene);
     }
   };
   public static final int DEADBUSH_ID = 0x20;
-  public static final Block DEADBUSH = new Block(DEADBUSH_ID, "block:deadbush", Texture.deadBush) {
+  public static final Block DEADBUSH = new Block(DEADBUSH_ID, "minecraft:deadbush", Texture.deadBush) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return SpriteModel.intersect(ray, Texture.deadBush);
     }
   };
   public static final int PISTON_ID = 0x21;
-  public static final Block PISTON = new Block(PISTON_ID, "block:piston", Texture.pistonTop) {
+  public static final Block PISTON = new Block(PISTON_ID, "minecraft:piston", Texture.pistonTop) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return PistonModel.intersect(ray, 0);
     }
   };
   public static final int PISTON_HEAD_ID = 0x22;
   public static final Block PISTON_HEAD = new Block(PISTON_HEAD_ID,
-      "block:piston_head", Texture.pistonTop) {
+      "minecraft:piston_head", Texture.pistonTop) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return PistonExtensionModel.intersect(ray);
     }
   };
   public static final int WOOL_ID = 0x23;
-  public static final Block WOOL = new Block(WOOL_ID, "block:wool", Texture.lightGrayWool) {
+  public static final Block WOOL = new Block(WOOL_ID, "minecraft:wool", Texture.lightGrayWool) {
     @Override public Texture getTexture(int blockData) {
       return Texture.wool[blockData];
     }
@@ -495,15 +495,15 @@ public class Block extends Material {
   };
   public static final int PISTON_EXTENSION_ID = 0x24;
   public static final Block PISTON_EXTENSION = new Block(PISTON_EXTENSION_ID,
-      "block:piston_extension", Texture.unknown);
+      "minecraft:piston_extension", Texture.unknown);
   public static final int DANDELION_ID = 0x25;
-  public static final Block DANDELION = new Block(DANDELION_ID, "block:yellow_flower", Texture.dandelion) {
+  public static final Block DANDELION = new Block(DANDELION_ID, "minecraft:yellow_flower", Texture.dandelion) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return SpriteModel.intersect(ray, Texture.dandelion);
     }
   };
   public static final int FLOWER_ID = 0x26;
-  public static final Block FLOWER = new Block(FLOWER_ID, "block:red_flower", Texture.poppy) {
+  public static final Block FLOWER = new Block(FLOWER_ID, "minecraft:red_flower", Texture.poppy) {
     final Texture[] textures =
         {Texture.poppy, Texture.blueOrchid, Texture.allium, Texture.azureBluet, Texture.redTulip,
             Texture.orangeTulip, Texture.whiteTulip, Texture.pinkTulip, Texture.oxeyeDaisy};
@@ -521,23 +521,23 @@ public class Block extends Material {
     }
   };
   public static final int BROWNMUSHROOM_ID = 0x27;
-  public static final Block BROWNMUSHROOM = new Block(BROWNMUSHROOM_ID, "block:brown_mushroom", Texture.brownMushroom) {
+  public static final Block BROWNMUSHROOM = new Block(BROWNMUSHROOM_ID, "minecraft:brown_mushroom", Texture.brownMushroom) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return SpriteModel.intersect(ray, Texture.brownMushroom);
     }
   };
   public static final int REDMUSHROOM_ID = 0x28;
-  public static final Block REDMUSHROOM = new Block(REDMUSHROOM_ID, "block:red_mushroom", Texture.redMushroom) {
+  public static final Block REDMUSHROOM = new Block(REDMUSHROOM_ID, "minecraft:red_mushroom", Texture.redMushroom) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return SpriteModel.intersect(ray, Texture.redMushroom);
     }
   };
   public static final int GOLDBLOCK_ID = 0x29;
-  public static final Block GOLDBLOCK = new Block(GOLDBLOCK_ID, "block:gold_block", Texture.goldBlock);
+  public static final Block GOLDBLOCK = new Block(GOLDBLOCK_ID, "minecraft:gold_block", Texture.goldBlock);
   public static final int IRONBLOCK_ID = 0x2A;
-  public static final Block IRONBLOCK = new Block(IRONBLOCK_ID, "block:iron_block", Texture.ironBlock);
+  public static final Block IRONBLOCK = new Block(IRONBLOCK_ID, "minecraft:iron_block", Texture.ironBlock);
   public static final int DOUBLESLAB_ID = 0x2B;
-  public static final Block DOUBLESLAB = new Block(DOUBLESLAB_ID, "block:double_stone_slab", Texture.slabTop) {
+  public static final Block DOUBLESLAB = new Block(DOUBLESLAB_ID, "minecraft:double_stone_slab", Texture.slabTop) {
     final Texture[] sandstone =
         {Texture.sandstoneSide, Texture.sandstoneSide, Texture.sandstoneSide,
             Texture.sandstoneSide, Texture.sandstoneTop, Texture.sandstoneTop,};
@@ -583,7 +583,7 @@ public class Block extends Material {
     }
   };
   public static final int SLAB_ID = 0x2C;
-  public static final Block SLAB = new Block(SLAB_ID, "block:stone_slab", Texture.slabTop) {
+  public static final Block SLAB = new Block(SLAB_ID, "minecraft:stone_slab", Texture.slabTop) {
     final Texture[][] texture =
         {{Texture.slabSide, Texture.slabTop}, {Texture.sandstoneSide, Texture.sandstoneTop},
             {Texture.oakPlanks, Texture.oakPlanks}, {Texture.cobblestone, Texture.cobblestone},
@@ -602,9 +602,9 @@ public class Block extends Material {
     }
   };
   public static final int BRICKS_ID = 0x2D;
-  public static final Block BRICKS = new Block(BRICKS_ID, "block:brick_block", Texture.brick);
+  public static final Block BRICKS = new Block(BRICKS_ID, "minecraft:brick_block", Texture.brick);
   public static final int TNT_ID = 0x2E;
-  public static final Block TNT = new Block(TNT_ID, "block:tnt", Texture.tntSide) {
+  public static final Block TNT = new Block(TNT_ID, "minecraft:tnt", Texture.tntSide) {
     final Texture[] texture =
         {Texture.tntSide, Texture.tntSide, Texture.tntSide, Texture.tntSide, Texture.tntTop,
             Texture.tntBottom,};
@@ -614,7 +614,7 @@ public class Block extends Material {
     }
   };
   public static final int BOOKSHELF_ID = 0x2F;
-  public static final Block BOOKSHELF = new Block(BOOKSHELF_ID, "block:bookshelf", Texture.bookshelf) {
+  public static final Block BOOKSHELF = new Block(BOOKSHELF_ID, "minecraft:bookshelf", Texture.bookshelf) {
     final Texture[] texture =
         {Texture.bookshelf, Texture.bookshelf, Texture.bookshelf, Texture.bookshelf,
             Texture.oakPlanks, Texture.oakPlanks,};
@@ -624,11 +624,11 @@ public class Block extends Material {
     }
   };
   public static final int MOSSSTONE_ID = 0x30;
-  public static final Block MOSSSTONE = new Block(MOSSSTONE_ID, "block:mossy_cobblestone", Texture.mossStone);
+  public static final Block MOSSSTONE = new Block(MOSSSTONE_ID, "minecraft:mossy_cobblestone", Texture.mossStone);
   public static final int OBSIDIAN_ID = 0x31;
-  public static final Block OBSIDIAN = new Block(OBSIDIAN_ID, "block:obsidian", Texture.obsidian);
+  public static final Block OBSIDIAN = new Block(OBSIDIAN_ID, "minecraft:obsidian", Texture.obsidian);
   public static final int TORCH_ID = 0x32;
-  public static final Block TORCH = new Block(TORCH_ID, "block:torch", Texture.torch) {
+  public static final Block TORCH = new Block(TORCH_ID, "minecraft:torch", Texture.torch) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TorchModel.intersect(ray, Texture.torch);
     }
@@ -644,15 +644,15 @@ public class Block extends Material {
     }
   };
   public static final int FIRE_ID = 0x33;
-  public static final Block FIRE = new Block(FIRE_ID, "block:fire", Texture.fire) {
+  public static final Block FIRE = new Block(FIRE_ID, "minecraft:fire", Texture.fire) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FireModel.intersect(ray);
     }
   };
   public static final int MONSTERSPAWNER_ID = 0x34;
-  public static final Block MONSTERSPAWNER = new Block(MONSTERSPAWNER_ID, "block:mob_spawner", Texture.monsterSpawner);
+  public static final Block MONSTERSPAWNER = new Block(MONSTERSPAWNER_ID, "minecraft:mob_spawner", Texture.monsterSpawner);
   public static final int OAKWOODSTAIRS_ID = 0x35;
-  public static final Block OAKWOODSTAIRS = new Stairs(OAKWOODSTAIRS_ID, "block:oak_stairs", Icon.woodenStairs) {
+  public static final Block OAKWOODSTAIRS = new Stairs(OAKWOODSTAIRS_ID, "minecraft:oak_stairs", Icon.woodenStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.oakPlanks);
     }
@@ -662,7 +662,7 @@ public class Block extends Material {
     }
   };
   public static final int CHEST_ID = 0x36;
-  public static final Block CHEST = new Block(CHEST_ID, "block:chest", Texture.chestFront) {
+  public static final Block CHEST = new Block(CHEST_ID, "minecraft:chest", Texture.chestFront) {
     final Texture[][] texture = {
         // single
         {Texture.chestFront, Texture.chestBack, Texture.chestLeft, Texture.chestRight,
@@ -688,7 +688,7 @@ public class Block extends Material {
     }
   };
   public static final int REDSTONEWIRE_ID = 0x37;
-  public static final Block REDSTONEWIRE = new Block(REDSTONEWIRE_ID, "block:redstone_wire", Texture.redstoneWireCross) {
+  public static final Block REDSTONEWIRE = new Block(REDSTONEWIRE_ID, "minecraft:redstone_wire", Texture.redstoneWireCross) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return RedstoneWireModel.intersect(ray);
     }
@@ -698,11 +698,11 @@ public class Block extends Material {
     }
   };
   public static final int DIAMONDORE_ID = 0x38;
-  public static final Block DIAMONDORE = new Block(DIAMONDORE_ID, "block:diamond_ore", Texture.diamondOre);
+  public static final Block DIAMONDORE = new Block(DIAMONDORE_ID, "minecraft:diamond_ore", Texture.diamondOre);
   public static final int DIAMONDBLOCK_ID = 0x39;
-  public static final Block DIAMONDBLOCK = new Block(DIAMONDBLOCK_ID, "block:diamond_block", Texture.diamondBlock);
+  public static final Block DIAMONDBLOCK = new Block(DIAMONDBLOCK_ID, "minecraft:diamond_block", Texture.diamondBlock);
   public static final int WORKBENCH_ID = 0x3A;
-  public static final Block WORKBENCH = new Block(WORKBENCH_ID, "block:crafting_table", Texture.workbenchFront) {
+  public static final Block WORKBENCH = new Block(WORKBENCH_ID, "minecraft:crafting_table", Texture.workbenchFront) {
     final Texture[] texture =
         {Texture.workbenchFront, Texture.workbenchSide, Texture.workbenchSide,
             Texture.workbenchFront, Texture.workbenchTop, Texture.oakPlanks,};
@@ -712,7 +712,7 @@ public class Block extends Material {
     }
   };
   public static final int CROPS_ID = 0x3B;
-  public static final Block CROPS = new Block(CROPS_ID, "block:wheat", Texture.crops7) {
+  public static final Block CROPS = new Block(CROPS_ID, "minecraft:wheat", Texture.crops7) {
     final Texture[] texture =
         {Texture.crops0, Texture.crops1, Texture.crops2, Texture.crops3, Texture.crops4,
             Texture.crops5, Texture.crops6, Texture.crops7};
@@ -722,13 +722,13 @@ public class Block extends Material {
     }
   };
   public static final int SOIL_ID = 0x3C;
-  public static final Block SOIL = new Block(SOIL_ID, "block:farmland", Texture.farmlandWet) {
+  public static final Block SOIL = new Block(SOIL_ID, "minecraft:farmland", Texture.farmlandWet) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FarmlandModel.intersect(ray);
     }
   };
   public static final int FURNACEUNLIT_ID = 0x3D;
-  public static final Block FURNACEUNLIT = new Block(FURNACEUNLIT_ID, "block:furnace", Texture.furnaceUnlitFront) {
+  public static final Block FURNACEUNLIT = new Block(FURNACEUNLIT_ID, "minecraft:furnace", Texture.furnaceUnlitFront) {
     final Texture[] texture =
         {Texture.furnaceUnlitFront, Texture.furnaceSide, Texture.furnaceSide,
             Texture.furnaceSide, Texture.furnaceTop, Texture.furnaceTop,};
@@ -738,7 +738,7 @@ public class Block extends Material {
     }
   };
   public static final int FURNACELIT_ID = 0x3E;
-  public static final Block FURNACELIT = new Block(FURNACELIT_ID, "block:lit_furnace", Texture.furnaceLitFront) {
+  public static final Block FURNACELIT = new Block(FURNACELIT_ID, "minecraft:lit_furnace", Texture.furnaceLitFront) {
     final Texture[] texture =
         {Texture.furnaceLitFront, Texture.furnaceSide, Texture.furnaceSide, Texture.furnaceSide,
             Texture.furnaceTop, Texture.furnaceTop,};
@@ -748,9 +748,9 @@ public class Block extends Material {
     }
   };
   public static final int SIGNPOST_ID = 0x3F;
-  public static final Block SIGNPOST = new Block(SIGNPOST_ID, "block:standing_sign", Icon.signPost);
+  public static final Block SIGNPOST = new Block(SIGNPOST_ID, "minecraft:standing_sign", Icon.signPost);
   public static final int WOODENDOOR_ID = 0x40;
-  public static final Block WOODENDOOR = new Block(WOODENDOOR_ID, "block:wooden_door", Icon.woodenDoor) {
+  public static final Block WOODENDOOR = new Block(WOODENDOOR_ID, "minecraft:wooden_door", Icon.woodenDoor) {
     final Texture[] texture = {Texture.woodenDoorBottom, Texture.woodenDoorTop};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -758,13 +758,13 @@ public class Block extends Material {
     }
   };
   public static final int LADDER_ID = 0x41;
-  public static final Block LADDER = new Block(LADDER_ID, "block:ladder", Texture.ladder) {
+  public static final Block LADDER = new Block(LADDER_ID, "minecraft:ladder", Texture.ladder) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return LadderModel.intersect(ray);
     }
   };
   public static final int MINECARTTRACKS_ID = 0x42;
-  public static final Block MINECARTTRACKS = new Block(MINECARTTRACKS_ID, "block:rail", Texture.rails) {
+  public static final Block MINECARTTRACKS = new Block(MINECARTTRACKS_ID, "minecraft:rail", Texture.rails) {
     final Texture[] texture =
         {Texture.rails, Texture.rails, Texture.rails, Texture.rails, Texture.rails,
             Texture.rails, Texture.railsCurved, Texture.railsCurved, Texture.railsCurved,
@@ -776,7 +776,7 @@ public class Block extends Material {
     }
   };
   public static final int STONESTAIRS_ID = 0x43;
-  public static final Block STONESTAIRS = new Stairs(STONESTAIRS_ID, "block:stone_stairs", Icon.stoneStairs) {
+  public static final Block STONESTAIRS = new Stairs(STONESTAIRS_ID, "minecraft:stone_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.cobblestone);
     }
@@ -786,21 +786,21 @@ public class Block extends Material {
     }
   };
   public static final int WALLSIGN_ID = 0x44;
-  public static final Block WALLSIGN = new Block(WALLSIGN_ID, "block:wall_sign", Icon.wallSign);
+  public static final Block WALLSIGN = new Block(WALLSIGN_ID, "minecraft:wall_sign", Icon.wallSign);
   public static final int LEVER_ID = 0x45;
-  public static final Block LEVER = new Block(LEVER_ID, "block:lever", Texture.lever) {
+  public static final Block LEVER = new Block(LEVER_ID, "minecraft:lever", Texture.lever) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return LeverModel.intersect(ray);
     }
   };
   public static final int STONEPRESSUREPLATE_ID = 0x46;
-  public static final Block STONEPRESSUREPLATE = new Block(STONEPRESSUREPLATE_ID, "block:stone_pressure_plate", Icon.stonePressurePlate) {
+  public static final Block STONEPRESSUREPLATE = new Block(STONEPRESSUREPLATE_ID, "minecraft:stone_pressure_plate", Icon.stonePressurePlate) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return PressurePlateModel.intersect(ray, Texture.stone);
     }
   };
   public static final int IRONDOOR_ID = 0x47;
-  public static final Block IRONDOOR = new Block(IRONDOOR_ID, "block:iron_door", Icon.ironDoor) {
+  public static final Block IRONDOOR = new Block(IRONDOOR_ID, "minecraft:iron_door", Icon.ironDoor) {
     final Texture[] texture = {Texture.ironDoorBottom, Texture.ironDoorTop};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -808,17 +808,17 @@ public class Block extends Material {
     }
   };
   public static final int WOODENPRESSUREPLATE_ID = 0x48;
-  public static final Block WOODENPRESSUREPLATE = new Block(WOODENPRESSUREPLATE_ID, "block:wooden_pressure_plate", Icon.woodenPressurePlate) {
+  public static final Block WOODENPRESSUREPLATE = new Block(WOODENPRESSUREPLATE_ID, "minecraft:wooden_pressure_plate", Icon.woodenPressurePlate) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return PressurePlateModel.intersect(ray, Texture.oakPlanks);
     }
   };
   public static final int REDSTONEORE_ID = 0x49;
-  public static final Block REDSTONEORE = new Block(REDSTONEORE_ID, "block:redstone_ore", Texture.redstoneOre);
+  public static final Block REDSTONEORE = new Block(REDSTONEORE_ID, "minecraft:redstone_ore", Texture.redstoneOre);
   public static final int GLOWINGREDSTONEORE_ID = 0x4A;
-  public static final Block GLOWINGREDSTONEORE = new Block(GLOWINGREDSTONEORE_ID, "block:lit_redstone_ore", Texture.redstoneOre);
+  public static final Block GLOWINGREDSTONEORE = new Block(GLOWINGREDSTONEORE_ID, "minecraft:lit_redstone_ore", Texture.redstoneOre);
   public static final int REDSTONETORCHOFF_ID = 0x4B;
-  public static final Block REDSTONETORCHOFF = new Block(REDSTONETORCHOFF_ID, "block:unlit_redstone_torch", Texture.redstoneTorchOff) {
+  public static final Block REDSTONETORCHOFF = new Block(REDSTONETORCHOFF_ID, "minecraft:unlit_redstone_torch", Texture.redstoneTorchOff) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TorchModel.intersect(ray, Texture.redstoneTorchOff);
     }
@@ -834,7 +834,7 @@ public class Block extends Material {
     }
   };
   public static final int REDSTONETORCHON_ID = 0x4C;
-  public static final Block REDSTONETORCHON = new Block(REDSTONETORCHON_ID, "block:redstone_torch", Texture.redstoneTorchOn) {
+  public static final Block REDSTONETORCHON = new Block(REDSTONETORCHON_ID, "minecraft:redstone_torch", Texture.redstoneTorchOn) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TorchModel.intersect(ray, Texture.redstoneTorchOn);
     }
@@ -850,37 +850,37 @@ public class Block extends Material {
     }
   };
   public static final int STONEBUTTON_ID = 0x4D;
-  public static final Block STONEBUTTON = new Block(STONEBUTTON_ID, "block:stone_button", Icon.stoneButton) {
+  public static final Block STONEBUTTON = new Block(STONEBUTTON_ID, "minecraft:stone_button", Icon.stoneButton) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return ButtonModel.intersect(ray, Texture.stone);
     }
   };
   public static final int SNOW_ID = 0x4E;
-  public static final Block SNOW = new Block(SNOW_ID, "block:snow_layer", Texture.snowBlock) {
+  public static final Block SNOW = new Block(SNOW_ID, "minecraft:snow_layer", Texture.snowBlock) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return SnowModel.intersect(ray);
     }
   };
   public static final int ICE_ID = 0x4F;
-  public static final Block ICE = new Block(ICE_ID, "block:ice", Texture.ice);
+  public static final Block ICE = new Block(ICE_ID, "minecraft:ice", Texture.ice);
   public static final int SNOWBLOCK_ID = 0x50;
-  public static final Block SNOWBLOCK = new Block(SNOWBLOCK_ID, "block:snow", Texture.snowBlock);
+  public static final Block SNOWBLOCK = new Block(SNOWBLOCK_ID, "minecraft:snow", Texture.snowBlock);
   public static final int CACTUS_ID = 0x51;
-  public static final Block CACTUS = new Block(CACTUS_ID, "block:cactus", Texture.cactusSide) {
+  public static final Block CACTUS = new Block(CACTUS_ID, "minecraft:cactus", Texture.cactusSide) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return CactusModel.intersect(ray);
     }
   };
   public static final int CLAY_ID = 0x52;
-  public static final Block CLAY = new Block(CLAY_ID, "block:clay", Texture.clay);
+  public static final Block CLAY = new Block(CLAY_ID, "minecraft:clay", Texture.clay);
   public static final int SUGARCANE_ID = 0x53;
-  public static final Block SUGARCANE = new Block(SUGARCANE_ID, "block:reeds", Texture.sugarCane) {
+  public static final Block SUGARCANE = new Block(SUGARCANE_ID, "minecraft:reeds", Texture.sugarCane) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return SpriteModel.intersect(ray, Texture.sugarCane);
     }
   };
   public static final int JUKEBOX_ID = 0x54;
-  public static final Block JUKEBOX = new Block(JUKEBOX_ID, "block:jukebox", Texture.jukeboxSide) {
+  public static final Block JUKEBOX = new Block(JUKEBOX_ID, "minecraft:jukebox", Texture.jukeboxSide) {
     final Texture[] texture = {
         Texture.jukeboxSide, Texture.jukeboxSide, Texture.jukeboxSide, Texture.jukeboxSide,
         Texture.jukeboxTop, Texture.jukeboxSide,
@@ -891,13 +891,13 @@ public class Block extends Material {
     }
   };
   public static final int FENCE_ID = 0x55;
-  public static final Block FENCE = new Fence(FENCE_ID, "block:fence", Icon.fence) {
+  public static final Block FENCE = new Fence(FENCE_ID, "minecraft:fence", Icon.fence) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.oakPlanks);
     }
   };
   public static final int PUMPKIN_ID = 0x56;
-  public static final Block PUMPKIN = new Block(PUMPKIN_ID, "block:pumpkin", Texture.pumpkinSide) {
+  public static final Block PUMPKIN = new Block(PUMPKIN_ID, "minecraft:pumpkin", Texture.pumpkinSide) {
     final Texture[] texture =
         {Texture.pumpkinFront, Texture.pumpkinSide, Texture.pumpkinSide, Texture.pumpkinSide,
             Texture.pumpkinTop, Texture.pumpkinTop,};
@@ -908,15 +908,15 @@ public class Block extends Material {
   };
   public static final int NETHERRACK_ID = 0x57;
   public static final Block NETHERRACK =
-      new Block(NETHERRACK_ID, "block:netherrack", Texture.netherrack);
+      new Block(NETHERRACK_ID, "minecraft:netherrack", Texture.netherrack);
   public static final int SOULSAND_ID = 0x58;
-  public static final Block SOULSAND = new Block(SOULSAND_ID, "block:soul_sand", Texture.soulsand);
+  public static final Block SOULSAND = new Block(SOULSAND_ID, "minecraft:soul_sand", Texture.soulsand);
   public static final int GLOWSTONE_ID = 0x59;
-  public static final Block GLOWSTONE = new Block(GLOWSTONE_ID, "block:glowstone", Texture.glowstone);
+  public static final Block GLOWSTONE = new Block(GLOWSTONE_ID, "minecraft:glowstone", Texture.glowstone);
   public static final int PORTAL_ID = 0x5A;
-  public static final Block PORTAL = new Block(PORTAL_ID, "block:portal", Texture.portal);
+  public static final Block PORTAL = new Block(PORTAL_ID, "minecraft:portal", Texture.portal);
   public static final int JACKOLANTERN_ID = 0x5B;
-  public static final Block JACKOLANTERN = new Block(JACKOLANTERN_ID, "block:lit_pumpkin", Texture.jackolanternFront) {
+  public static final Block JACKOLANTERN = new Block(JACKOLANTERN_ID, "minecraft:lit_pumpkin", Texture.jackolanternFront) {
     final Texture[] texture =
         {Texture.jackolanternFront, Texture.pumpkinSide, Texture.pumpkinSide,
             Texture.pumpkinSide, Texture.pumpkinTop, Texture.pumpkinTop,};
@@ -926,25 +926,25 @@ public class Block extends Material {
     }
   };
   public static final int CAKE_ID = 0x5C;
-  public static final Block CAKE = new Block(CAKE_ID, "block:cake", Icon.cake) {
+  public static final Block CAKE = new Block(CAKE_ID, "minecraft:cake", Icon.cake) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return CakeModel.intersect(ray);
     }
   };
   public static final int REDSTONEREPEATEROFF_ID = 0x5D;
-  public static final Block REDSTONEREPEATEROFF = new Block(REDSTONEREPEATEROFF_ID, "block:unpowered_repeater", Texture.redstoneRepeaterOff) {
+  public static final Block REDSTONEREPEATEROFF = new Block(REDSTONEREPEATEROFF_ID, "minecraft:unpowered_repeater", Texture.redstoneRepeaterOff) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return RedstoneRepeaterModel.intersect(ray, 0);
     }
   };
   public static final int REDSTONEREPEATERON_ID = 0x5E;
-  public static final Block REDSTONEREPEATERON = new Block(REDSTONEREPEATERON_ID, "block:powered_repeater", Texture.redstoneRepeaterOn) {
+  public static final Block REDSTONEREPEATERON = new Block(REDSTONEREPEATERON_ID, "minecraft:powered_repeater", Texture.redstoneRepeaterOn) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return RedstoneRepeaterModel.intersect(ray, 1);
     }
   };
   public static final int STAINED_GLASS_ID = 0x5F;
-  public static final Block STAINED_GLASS = new Block(STAINED_GLASS_ID, "block:stained_glass", Texture.glass) {
+  public static final Block STAINED_GLASS = new Block(STAINED_GLASS_ID, "minecraft:stained_glass", Texture.glass) {
     @Override public Texture getTexture(int blockData) {
       return Texture.stainedGlass[blockData];
     }
@@ -970,13 +970,13 @@ public class Block extends Material {
     }
   };
   public static final int TRAPDOOR_ID = 0x60;
-  public static final Block TRAPDOOR = new Block(TRAPDOOR_ID, "block:trapdoor", Texture.trapdoor) {
+  public static final Block TRAPDOOR = new Block(TRAPDOOR_ID, "minecraft:trapdoor", Texture.trapdoor) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TrapdoorModel.intersect(ray, Texture.trapdoor);
     }
   };
   public static final int HIDDENSILVERFISH_ID = 0x61;
-  public static final Block HIDDENSILVERFISH = new Block(HIDDENSILVERFISH_ID, "block:monster_egg", Texture.stone) {
+  public static final Block HIDDENSILVERFISH = new Block(HIDDENSILVERFISH_ID, "minecraft:monster_egg", Texture.stone) {
     final Texture[] texture = {Texture.stone, Texture.cobblestone, Texture.stoneBrick};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -984,7 +984,7 @@ public class Block extends Material {
     }
   };
   public static final int STONEBRICKS_ID = 0x62;
-  public static final Block STONEBRICKS = new Block(STONEBRICKS_ID, "block:stonebrick", Texture.stoneBrick) {
+  public static final Block STONEBRICKS = new Block(STONEBRICKS_ID, "minecraft:stonebrick", Texture.stoneBrick) {
     final Texture[] texture =
         {Texture.stoneBrick, Texture.mossyStoneBrick, Texture.crackedStoneBrick,
             Texture.circleStoneBrick};
@@ -994,7 +994,7 @@ public class Block extends Material {
     }
   };
   public static final int HUGEBROWNMUSHROOM_ID = 0x63;
-  public static final Block HUGEBROWNMUSHROOM = new Block(HUGEBROWNMUSHROOM_ID, "block:brown_mushroom_block", Texture.hugeBrownMushroom) {
+  public static final Block HUGEBROWNMUSHROOM = new Block(HUGEBROWNMUSHROOM_ID, "minecraft:brown_mushroom_block", Texture.hugeBrownMushroom) {
     final Texture[][] texture = {
         // 0 = fleshy
         {Texture.mushroomPores, Texture.mushroomPores, Texture.mushroomPores,
@@ -1065,7 +1065,7 @@ public class Block extends Material {
     }
   };
   public static final int HUGEREDMUSHROOM_ID = 0x64;
-  public static final Block HUGEREDMUSHROOM = new Block(HUGEREDMUSHROOM_ID, "block:red_mushroom_block", Texture.hugeRedMushroom) {
+  public static final Block HUGEREDMUSHROOM = new Block(HUGEREDMUSHROOM_ID, "minecraft:red_mushroom_block", Texture.hugeRedMushroom) {
     final Texture[][] texture = {
         // 0 = fleshy
         {Texture.mushroomPores, Texture.mushroomPores, Texture.mushroomPores,
@@ -1136,7 +1136,7 @@ public class Block extends Material {
     }
   };
   public static final int IRONBARS_ID = 0x65;
-  public static final Block IRONBARS = new Block(IRONBARS_ID, "block:iron_bars", Texture.ironBars) {
+  public static final Block IRONBARS = new Block(IRONBARS_ID, "minecraft:iron_bars", Texture.ironBars) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return IronBarsModel.intersect(ray);
     }
@@ -1154,7 +1154,7 @@ public class Block extends Material {
     }
   };
   public static final int GLASSPANE_ID = 0x66;
-  public static final Block GLASSPANE = new Block(GLASSPANE_ID, "block:glass_pane", Texture.glass) {
+  public static final Block GLASSPANE = new Block(GLASSPANE_ID, "minecraft:glass_pane", Texture.glass) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return GlassPaneModel.intersect(ray, Texture.glass, Texture.glassPaneTop);
     }
@@ -1172,7 +1172,7 @@ public class Block extends Material {
     }
   };
   public static final int MELON_ID = 0x67;
-  public static final Block MELON = new Block(MELON_ID, "block:melon_block", Texture.melonSide) {
+  public static final Block MELON = new Block(MELON_ID, "minecraft:melon_block", Texture.melonSide) {
     final Texture texture[] =
         {Texture.melonSide, Texture.melonSide, Texture.melonSide, Texture.melonSide,
             Texture.melonTop, Texture.melonTop};
@@ -1182,31 +1182,31 @@ public class Block extends Material {
     }
   };
   public static final int PUMPKINSTEM_ID = 0x68;
-  public static final Block PUMPKINSTEM = new Block(PUMPKINSTEM_ID, "block:pumpkin_stem", Texture.stemStraight) {
+  public static final Block PUMPKINSTEM = new Block(PUMPKINSTEM_ID, "minecraft:pumpkin_stem", Texture.stemStraight) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return MelonStemModel.intersect(ray);
     }
   };
   public static final int MELONSTEM_ID = 0x69;
-  public static final Block MELONSTEM = new Block(MELONSTEM_ID, "block:melon_stem", Texture.stemStraight) {
+  public static final Block MELONSTEM = new Block(MELONSTEM_ID, "minecraft:melon_stem", Texture.stemStraight) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return MelonStemModel.intersect(ray);
     }
   };
   public static final int VINES_ID = 0x6A;
-  public static final Block VINES = new Block(VINES_ID, "block:vine", Texture.vines) {
+  public static final Block VINES = new Block(VINES_ID, "minecraft:vine", Texture.vines) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return VineModel.intersect(ray, scene);
     }
   };
   public static final int FENCEGATE_ID = 0x6B;
-  public static final Block FENCEGATE = new FenceGate(FENCEGATE_ID, "block:fence_gate", Texture.unknown) {
+  public static final Block FENCEGATE = new FenceGate(FENCEGATE_ID, "minecraft:fence_gate", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceGateModel.intersect(ray, Texture.oakPlanks);
     }
   };
   public static final int BRICKSTAIRS_ID = 0x6C;
-  public static final Block BRICKSTAIRS = new Stairs(BRICKSTAIRS_ID, "block:brick_stairs", Icon.stoneStairs) {
+  public static final Block BRICKSTAIRS = new Stairs(BRICKSTAIRS_ID, "minecraft:brick_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.brick);
     }
@@ -1216,7 +1216,7 @@ public class Block extends Material {
     }
   };
   public static final int STONEBRICKSTAIRS_ID = 0x6D;
-  public static final Block STONEBRICKSTAIRS = new Stairs(STONEBRICKSTAIRS_ID, "block:stone_brick_stairs", Icon.stoneBrickStairs) {
+  public static final Block STONEBRICKSTAIRS = new Stairs(STONEBRICKSTAIRS_ID, "minecraft:stone_brick_stairs", Icon.stoneBrickStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.stoneBrick);
     }
@@ -1226,7 +1226,7 @@ public class Block extends Material {
     }
   };
   public static final int MYCELIUM_ID = 0x6E;
-  public static final Block MYCELIUM = new Block(MYCELIUM_ID, "block:mycelium", Texture.myceliumSide) {
+  public static final Block MYCELIUM = new Block(MYCELIUM_ID, "minecraft:mycelium", Texture.myceliumSide) {
     final Texture texture[] =
         {Texture.myceliumSide, Texture.myceliumSide, Texture.myceliumSide, Texture.myceliumSide,
             Texture.myceliumTop, Texture.dirt};
@@ -1240,7 +1240,7 @@ public class Block extends Material {
     }
   };
   public static final int LILY_PAD_ID = 0x6F;
-  public static final Block LILY_PAD = new Block(LILY_PAD_ID, "block:waterlily", Texture.lilyPad) {
+  public static final Block LILY_PAD = new Block(LILY_PAD_ID, "minecraft:waterlily", Texture.lilyPad) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return LilyPadModel.intersect(ray);
     }
@@ -1250,9 +1250,9 @@ public class Block extends Material {
     }
   };
   public static final int NETHERBRICK_ID = 0x70;
-  public static final Block NETHERBRICK = new Block(NETHERBRICK_ID, "block:nether_brick", Texture.netherBrick);
+  public static final Block NETHERBRICK = new Block(NETHERBRICK_ID, "minecraft:nether_brick", Texture.netherBrick);
   public static final int NETHERBRICKFENCE_ID = 0x71;
-  public static final Block NETHERBRICKFENCE = new Block(NETHERBRICKFENCE_ID, "block:nether_brick_fence", Texture.unknown) {
+  public static final Block NETHERBRICKFENCE = new Block(NETHERBRICKFENCE_ID, "minecraft:nether_brick_fence", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.netherBrick);
     }
@@ -1274,7 +1274,7 @@ public class Block extends Material {
     }
   };
   public static final int NETHERBRICKSTAIRS_ID = 0x72;
-  public static final Block NETHERBRICKSTAIRS = new Stairs(NETHERBRICKSTAIRS_ID, "block:nether_brick_stairs", Icon.stoneStairs) {
+  public static final Block NETHERBRICKSTAIRS = new Stairs(NETHERBRICKSTAIRS_ID, "minecraft:nether_brick_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.netherBrick);
     }
@@ -1284,7 +1284,7 @@ public class Block extends Material {
     }
   };
   public static final int NETHERWART_ID = 0x73;
-  public static final Block NETHERWART = new Block(NETHERWART_ID, "block:nether_wart_block", Texture.netherWart2) {
+  public static final Block NETHERWART = new Block(NETHERWART_ID, "minecraft:nether_wart_block", Texture.netherWart2) {
     final Texture[] texture =
         {Texture.netherWart0, Texture.netherWart1, Texture.netherWart1, Texture.netherWart2};
 
@@ -1293,39 +1293,39 @@ public class Block extends Material {
     }
   };
   public static final int ENCHNATMENTTABLE_ID = 0x74;
-  public static final Block ENCHNATMENTTABLE = new Block(ENCHNATMENTTABLE_ID, "block:enchanting_table", Texture.enchantmentTableSide) {
+  public static final Block ENCHNATMENTTABLE = new Block(ENCHNATMENTTABLE_ID, "minecraft:enchanting_table", Texture.enchantmentTableSide) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return EnchantmentTableModel.intersect(ray);
     }
   };
   public static final int BREWINGSTAND_ID = 0x75;
-  public static final Block BREWINGSTAND = new Block(BREWINGSTAND_ID, "block:brewing_stand", Texture.brewingStandSide) {
+  public static final Block BREWINGSTAND = new Block(BREWINGSTAND_ID, "minecraft:brewing_stand", Texture.brewingStandSide) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return BrewingStandModel.intersect(ray);
     }
   };
   public static final int CAULDRON_ID = 0x76;
-  public static final Block CAULDRON = new Block(CAULDRON_ID, "block:cauldron", Texture.cauldronSide) {
+  public static final Block CAULDRON = new Block(CAULDRON_ID, "minecraft:cauldron", Texture.cauldronSide) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return CauldronModel.intersect(ray);
     }
   };
   public static final int ENDPORTAL_ID = 0x77;
-  public static final Block ENDPORTAL = new Block(ENDPORTAL_ID, "block:end_portal", Texture.endPortal) {
+  public static final Block ENDPORTAL = new Block(ENDPORTAL_ID, "minecraft:end_portal", Texture.endPortal) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return EndPortalModel.intersect(ray);
     }
   };
   public static final int ENDPORTALFRAME_ID = 0x78;
-  public static final Block ENDPORTALFRAME = new Block(ENDPORTALFRAME_ID, "block:end_portal_frame", Texture.endPortalFrameTop) {
+  public static final Block ENDPORTALFRAME = new Block(ENDPORTALFRAME_ID, "minecraft:end_portal_frame", Texture.endPortalFrameTop) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return EndPortalFrameModel.intersect(ray);
     }
   };
   public static final int ENDSTONE_ID = 0x79;
-  public static final Block ENDSTONE = new Block(ENDSTONE_ID, "block:end_stone", Texture.endStone);
+  public static final Block ENDSTONE = new Block(ENDSTONE_ID, "minecraft:end_stone", Texture.endStone);
   public static final int DRAGONEGG_ID = 0x7A;
-  public static final Block DRAGONEGG = new Block(DRAGONEGG_ID, "block:dragon_egg", Texture.dragonEgg) {
+  public static final Block DRAGONEGG = new Block(DRAGONEGG_ID, "minecraft:dragon_egg", Texture.dragonEgg) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return DragonEggModel.intersect(ray);
     }
@@ -1335,11 +1335,11 @@ public class Block extends Material {
     }
   };
   public static final int REDSTONELAMPOFF_ID = 0x7B;
-  public static final Block REDSTONELAMPOFF = new Block(REDSTONELAMPOFF_ID, "block:redstone_lamp", Texture.redstoneLampOff);
+  public static final Block REDSTONELAMPOFF = new Block(REDSTONELAMPOFF_ID, "minecraft:redstone_lamp", Texture.redstoneLampOff);
   public static final int REDSTONELAMPON_ID = 0x7C;
-  public static final Block REDSTONELAMPON = new Block(REDSTONELAMPON_ID, "block:lit_redstone_lamp", Texture.redstoneLampOn);
+  public static final Block REDSTONELAMPON = new Block(REDSTONELAMPON_ID, "minecraft:lit_redstone_lamp", Texture.redstoneLampOn);
   public static final int DOUBLEWOODENSLAB_ID = 0x7D;
-  public static final Block DOUBLEWOODENSLAB = new Block(DOUBLEWOODENSLAB_ID, "block:double_wooden_slab", Texture.oakPlanks) {
+  public static final Block DOUBLEWOODENSLAB = new Block(DOUBLEWOODENSLAB_ID, "minecraft:double_wooden_slab", Texture.oakPlanks) {
     final Texture[] texture =
         {Texture.oakPlanks, Texture.sprucePlanks, Texture.birchPlanks, Texture.jungleTreePlanks,
             Texture.acaciaPlanks, Texture.darkOakPlanks,};
@@ -1354,7 +1354,7 @@ public class Block extends Material {
     }
   };
   public static final int SINGLEWOODENSLAB_ID = 0x7E;
-  public static final Block SINGLEWOODENSLAB = new Block(SINGLEWOODENSLAB_ID, "block:wooden_slab", Texture.oakPlanks) {
+  public static final Block SINGLEWOODENSLAB = new Block(SINGLEWOODENSLAB_ID, "minecraft:wooden_slab", Texture.oakPlanks) {
     final Texture[] texture =
         {Texture.oakPlanks, Texture.sprucePlanks, Texture.birchPlanks, Texture.jungleTreePlanks,
             Texture.acaciaPlanks, Texture.darkOakPlanks,};
@@ -1369,7 +1369,7 @@ public class Block extends Material {
     }
   };
   public static final int COCOAPLANT_ID = 0x7F;
-  public static final Block COCOAPLANT = new Block(COCOAPLANT_ID, "block:cocoa", Texture.cocoaPlantLarge) {
+  public static final Block COCOAPLANT = new Block(COCOAPLANT_ID, "minecraft:cocoa", Texture.cocoaPlantLarge) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return CocoaPlantModel.intersect(ray);
     }
@@ -1381,7 +1381,7 @@ public class Block extends Material {
     }
   };
   public static final int SANDSTONESTAIRS_ID = 0x80;
-  public static final Block SANDSTONESTAIRS = new Stairs(SANDSTONESTAIRS_ID, "block:sandstone_stairs", Icon.stoneStairs) {
+  public static final Block SANDSTONESTAIRS = new Stairs(SANDSTONESTAIRS_ID, "minecraft:sandstone_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel
           .intersect(ray, Texture.sandstoneSide, Texture.sandstoneTop, Texture.sandstoneBottom);
@@ -1392,9 +1392,9 @@ public class Block extends Material {
     }
   };
   public static final int EMERALDORE_ID = 0x81;
-  public static final Block EMERALDORE = new Block(EMERALDORE_ID, "block:emerald_ore", Texture.emeraldOre);
+  public static final Block EMERALDORE = new Block(EMERALDORE_ID, "minecraft:emerald_ore", Texture.emeraldOre);
   public static final int ENDERCHEST_ID = 0x82;
-  public static final Block ENDERCHEST = new Block(ENDERCHEST_ID, "block:ender_chest", Texture.unknown) {
+  public static final Block ENDERCHEST = new Block(ENDERCHEST_ID, "minecraft:ender_chest", Texture.unknown) {
     final Texture[] texture =
         {Texture.enderChestFront, Texture.enderChestBack, Texture.enderChestLeft,
             Texture.enderChestRight, Texture.enderChestTop, Texture.enderChestBottom,
@@ -1410,21 +1410,21 @@ public class Block extends Material {
     }
   };
   public static final int TRIPWIREHOOK_ID = 0x83;
-  public static final Block TRIPWIREHOOK = new Block(TRIPWIREHOOK_ID, "block:tripwire_hook", Texture.tripwireHook) {
+  public static final Block TRIPWIREHOOK = new Block(TRIPWIREHOOK_ID, "minecraft:tripwire_hook", Texture.tripwireHook) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TripwireHookModel.intersect(ray);
     }
   };
   public static final int TRIPWIRE_ID = 0x84;
-  public static final Block TRIPWIRE = new Block(TRIPWIRE_ID, "block:tripwire", Texture.tripwire) {
+  public static final Block TRIPWIRE = new Block(TRIPWIRE_ID, "minecraft:tripwire", Texture.tripwire) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TripwireModel.intersection(ray);
     }
   };
   public static final int EMERALDBLOCK_ID = 0x85;
-  public static final Block EMERALDBLOCK = new Block(EMERALDBLOCK_ID, "block:emerald_block", Texture.emeraldBlock);
+  public static final Block EMERALDBLOCK = new Block(EMERALDBLOCK_ID, "minecraft:emerald_block", Texture.emeraldBlock);
   public static final int SPRUCEWOODSTAIRS_ID = 0x86;
-  public static final Block SPRUCEWOODSTAIRS = new Stairs(SPRUCEWOODSTAIRS_ID, "block:spruce_stairs", Icon.woodenStairs) {
+  public static final Block SPRUCEWOODSTAIRS = new Stairs(SPRUCEWOODSTAIRS_ID, "minecraft:spruce_stairs", Icon.woodenStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.sprucePlanks);
     }
@@ -1434,7 +1434,7 @@ public class Block extends Material {
     }
   };
   public static final int BIRCHWOODSTAIRS_ID = 0x87;
-  public static final Block BIRCHWOODSTAIRS = new Stairs(BIRCHWOODSTAIRS_ID, "block:birch_stairs", Icon.woodenStairs) {
+  public static final Block BIRCHWOODSTAIRS = new Stairs(BIRCHWOODSTAIRS_ID, "minecraft:birch_stairs", Icon.woodenStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.birchPlanks);
     }
@@ -1444,7 +1444,7 @@ public class Block extends Material {
     }
   };
   public static final int JUNGLEWOODSTAIRS_ID = 0x88;
-  public static final Block JUNGLEWOODSTAIRS = new Stairs(JUNGLEWOODSTAIRS_ID, "block:jungle_stairs", Icon.woodenStairs) {
+  public static final Block JUNGLEWOODSTAIRS = new Stairs(JUNGLEWOODSTAIRS_ID, "minecraft:jungle_stairs", Icon.woodenStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.jungleTreePlanks);
     }
@@ -1454,7 +1454,7 @@ public class Block extends Material {
     }
   };
   public static final int COMMAND_BLOCK_ID = 0x89;
-  public static final Block COMMAND_BLOCK = new Block(COMMAND_BLOCK_ID, "block:command_block", Texture.commandBlockBack) {
+  public static final Block COMMAND_BLOCK = new Block(COMMAND_BLOCK_ID, "minecraft:command_block", Texture.commandBlockBack) {
     final Texture[][] texture = {
         {
             Texture.commandBlockBack,
@@ -1473,13 +1473,13 @@ public class Block extends Material {
     }
   };
   public static final int BEACON_ID = 0x8A;
-  public static final Block BEACON = new Block(BEACON_ID, "block:beacon", Texture.glass) {
+  public static final Block BEACON = new Block(BEACON_ID, "minecraft:beacon", Texture.glass) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return BeaconModel.intersect(ray);
     }
   };
   public static final int STONEWALL_ID = 0x8B;
-  public static final Block STONEWALL = new Block(STONEWALL_ID, "block:cobblestone_wall", Texture.unknown) {
+  public static final Block STONEWALL = new Block(STONEWALL_ID, "minecraft:cobblestone_wall", Texture.unknown) {
     final Texture[] texture = { Texture.cobblestone, Texture.mossStone };
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -1503,13 +1503,13 @@ public class Block extends Material {
     }
   };
   public static final int FLOWERPOT_ID = 0x8C;
-  public static final Block FLOWERPOT = new Block(FLOWERPOT_ID, "block:flower_pot", Texture.unknown) {
+  public static final Block FLOWERPOT = new Block(FLOWERPOT_ID, "minecraft:flower_pot", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FlowerPotModel.intersect(ray, scene);
     }
   };
   public static final int CARROTS_ID = 0x8D;
-  public static final Block CARROTS = new Block(CARROTS_ID, "block:carrots", Texture.carrots3) {
+  public static final Block CARROTS = new Block(CARROTS_ID, "minecraft:carrots", Texture.carrots3) {
     final Texture[] texture = {
         Texture.carrots0, Texture.carrots0, Texture.carrots1, Texture.carrots1, Texture.carrots2,
         Texture.carrots2, Texture.carrots2, Texture.carrots3
@@ -1520,7 +1520,7 @@ public class Block extends Material {
     }
   };
   public static final int POTATOES_ID = 0x8E;
-  public static final Block POTATOES = new Block(POTATOES_ID, "block:potatoes", Texture.potatoes3) {
+  public static final Block POTATOES = new Block(POTATOES_ID, "minecraft:potatoes", Texture.potatoes3) {
     final Texture[] texture =
         {Texture.potatoes0, Texture.potatoes0, Texture.potatoes1, Texture.potatoes1,
             Texture.potatoes2, Texture.potatoes2, Texture.potatoes2, Texture.potatoes3};
@@ -1530,21 +1530,21 @@ public class Block extends Material {
     }
   };
   public static final int WOODENBUTTON_ID = 0x8F;
-  public static final Block WOODENBUTTON = new Block(WOODENBUTTON_ID, "block:wooden_button", Texture.unknown) {
+  public static final Block WOODENBUTTON = new Block(WOODENBUTTON_ID, "minecraft:wooden_button", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return ButtonModel.intersect(ray, Texture.oakPlanks);
     }
   };
   public static final int HEAD_ID = 0x90;
-  public static final Block HEAD = new Block(HEAD_ID, "block:skull", Texture.unknown);
+  public static final Block HEAD = new Block(HEAD_ID, "minecraft:skull", Texture.unknown);
   public static final int ANVIL_ID = 0x91;
-  public static final Block ANVIL = new Block(ANVIL_ID, "block:anvil", Texture.unknown) {
+  public static final Block ANVIL = new Block(ANVIL_ID, "minecraft:anvil", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return AnvilModel.intersect(ray);
     }
   };
   public static final int TRAPPEDCHEST_ID = 0x92;
-  public static final Block TRAPPEDCHEST = new Block(TRAPPEDCHEST_ID, "block:trapped_chest", Texture.chestFront) {
+  public static final Block TRAPPEDCHEST = new Block(TRAPPEDCHEST_ID, "minecraft:trapped_chest", Texture.chestFront) {
     final Texture[][] texture = {
         // single
         {Texture.trappedChestFront, Texture.trappedChestBack, Texture.trappedChestLeft,
@@ -1573,44 +1573,44 @@ public class Block extends Material {
     }
   };
   public static final int WEIGHTEDPRESSUREPLATELIGHT_ID = 0x93;
-  public static final Block WEIGHTEDPRESSUREPLATELIGHT = new Block(WEIGHTEDPRESSUREPLATELIGHT_ID, "block:light_weighted_pressure_plate", Texture.goldBlock) {
+  public static final Block WEIGHTEDPRESSUREPLATELIGHT = new Block(WEIGHTEDPRESSUREPLATELIGHT_ID, "minecraft:light_weighted_pressure_plate", Texture.goldBlock) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return PressurePlateModel.intersect(ray, Texture.goldBlock);
     }
   };
   public static final int WEIGHTEDPRESSUREPLATEHEAVY_ID = 0x94;
-  public static final Block WEIGHTEDPRESSUREPLATEHEAVY = new Block(WEIGHTEDPRESSUREPLATEHEAVY_ID, "block:heavy_weighted_pressure_plate", Texture.ironBlock) {
+  public static final Block WEIGHTEDPRESSUREPLATEHEAVY = new Block(WEIGHTEDPRESSUREPLATEHEAVY_ID, "minecraft:heavy_weighted_pressure_plate", Texture.ironBlock) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return PressurePlateModel.intersect(ray, Texture.ironBlock);
     }
   };
   public static final int COMPARATOR_ID = 0x95;
   public static final Block COMPARATOR = new Block(COMPARATOR_ID,
-      "block:unpowered_comparator", Texture.unknown) {
+      "minecraft:unpowered_comparator", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return ComparatorModel.intersect(ray, 1 & (ray.getBlockData() >> 3));
     }
   };
   public static final int COMPARATOR_POWERED_ID = 0x96;
   public static final Block COMPARATOR_POWERED = new Block(COMPARATOR_POWERED_ID,
-      "block:powered_comparator", Texture.unknown) {
+      "minecraft:powered_comparator", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return ComparatorModel.intersect(ray, 1);
     }
   };
   public static final int DAYLIGHTSENSOR_ID = 0x97;
   public static final Block DAYLIGHTSENSOR = new Block(DAYLIGHTSENSOR_ID,
-      "block:daylight_detector", Texture.daylightDetectorTop) {
+      "minecraft:daylight_detector", Texture.daylightDetectorTop) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return DaylightSensorModel.intersect(ray, Texture.daylightDetectorTop);
     }
   };
   public static final int REDSTONEBLOCK_ID = 0x98;
-  public static final Block REDSTONEBLOCK = new Block(REDSTONEBLOCK_ID, "block:redstone_block", Texture.redstoneBlock);
+  public static final Block REDSTONEBLOCK = new Block(REDSTONEBLOCK_ID, "minecraft:redstone_block", Texture.redstoneBlock);
   public static final int NETHERQUARTZORE_ID = 0x99;
-  public static final Block NETHERQUARTZORE = new Block(NETHERQUARTZORE_ID, "block:quartz_ore", Texture.netherQuartzOre);
+  public static final Block NETHERQUARTZORE = new Block(NETHERQUARTZORE_ID, "minecraft:quartz_ore", Texture.netherQuartzOre);
   public static final int HOPPER_ID = 0x9A;
-  public static final Block HOPPER = new Block(HOPPER_ID, "block:hopper", Texture.unknown) {
+  public static final Block HOPPER = new Block(HOPPER_ID, "minecraft:hopper", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return HopperModel.intersect(ray);
     }
@@ -1620,13 +1620,13 @@ public class Block extends Material {
     }
   };
   public static final int QUARTZ_ID = 0x9B;
-  public static final Block QUARTZ = new Block(QUARTZ_ID, "block:quartz_block", Texture.quartzSide) {
+  public static final Block QUARTZ = new Block(QUARTZ_ID, "minecraft:quartz_block", Texture.quartzSide) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return QuartzModel.intersect(ray);
     }
   };
   public static final int QUARTZSTAIRS_ID = 0x9C;
-  public static final Block QUARTZSTAIRS = new Stairs(QUARTZSTAIRS_ID, "block:quartz_stairs", Icon.stoneStairs) {
+  public static final Block QUARTZSTAIRS = new Stairs(QUARTZSTAIRS_ID, "minecraft:quartz_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel
           .intersect(ray, Texture.quartzSide, Texture.quartzTop, Texture.quartzBottom);
@@ -1637,7 +1637,7 @@ public class Block extends Material {
     }
   };
   public static final int ACTIVATORRAIL_ID = 0x9D;
-  public static final Block ACTIVATORRAIL = new Block(ACTIVATORRAIL_ID, "block:activator_rail", Texture.unknown) {
+  public static final Block ACTIVATORRAIL = new Block(ACTIVATORRAIL_ID, "minecraft:activator_rail", Texture.unknown) {
     final Texture[] texture = {Texture.activatorRail, Texture.activatorRailPowered};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -1646,7 +1646,7 @@ public class Block extends Material {
     }
   };
   public static final int DROPPER_ID = 0x9E;
-  public static final Block DROPPER = new Block(DROPPER_ID, "block:dropper", Texture.dropperFront) {
+  public static final Block DROPPER = new Block(DROPPER_ID, "minecraft:dropper", Texture.dropperFront) {
     final Texture[][] texture = {
         // Facing down.
         {Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop,
@@ -1673,7 +1673,7 @@ public class Block extends Material {
     }
   };
   public static final int STAINED_CLAY_ID = 0x9F;
-  public static final Block STAINED_CLAY = new Block(STAINED_CLAY_ID, "block:stained_hardened_clay", Texture.clay) {
+  public static final Block STAINED_CLAY = new Block(STAINED_CLAY_ID, "minecraft:stained_hardened_clay", Texture.clay) {
     @Override public Texture getTexture(int blockData) {
       return Texture.stainedClay[blockData];
     }
@@ -1683,7 +1683,7 @@ public class Block extends Material {
     }
   };
   public static final int STAINED_GLASSPANE_ID = 0xA0;
-  public static final Block STAINED_GLASSPANE = new Block(STAINED_GLASSPANE_ID, "block:stained_glass_pane", Texture.glass) {
+  public static final Block STAINED_GLASSPANE = new Block(STAINED_GLASSPANE_ID, "minecraft:stained_glass_pane", Texture.glass) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       int data = ray.getBlockData();
       return GlassPaneModel
@@ -1707,7 +1707,7 @@ public class Block extends Material {
     }
   };
   public static final int LEAVES2_ID = 0xA1;
-  public static final Block LEAVES2 = new Block(LEAVES2_ID, "block:leaves", Texture.oakLeaves) {
+  public static final Block LEAVES2 = new Block(LEAVES2_ID, "minecraft:leaves", Texture.oakLeaves) {
     final Texture[] texture =
         {Texture.acaciaLeaves, Texture.darkOakLeaves, Texture.acaciaLeaves, Texture.darkOakLeaves};
 
@@ -1746,7 +1746,7 @@ public class Block extends Material {
     }
   };
   public static final int WOOD2_ID = 0xA2;
-  public static final Block WOOD2 = new Block(WOOD2_ID, "block:log2", Texture.oakWood) {
+  public static final Block WOOD2 = new Block(WOOD2_ID, "minecraft:log2", Texture.oakWood) {
     final Texture[][] texture =
         {{Texture.acaciaWood, Texture.acaciaWoodTop}, {Texture.darkOakWood, Texture.darkOakWoodTop},
             {Texture.acaciaWood, Texture.acaciaWoodTop},
@@ -1767,7 +1767,7 @@ public class Block extends Material {
     }
   };
   public static final int ACACIASTAIRS_ID = 0xA3;
-  public static final Block ACACIASTAIRS = new Stairs(ACACIASTAIRS_ID, "block:acacia_stairs", Icon.woodenStairs) {
+  public static final Block ACACIASTAIRS = new Stairs(ACACIASTAIRS_ID, "minecraft:acacia_stairs", Icon.woodenStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.acaciaPlanks);
     }
@@ -1777,7 +1777,7 @@ public class Block extends Material {
     }
   };
   public static final int DARKOAKSTAIRS_ID = 0xA4;
-  public static final Block DARKOAKSTAIRS = new Stairs(DARKOAKSTAIRS_ID, "block:dark_oak_stairs", Icon.woodenStairs) {
+  public static final Block DARKOAKSTAIRS = new Stairs(DARKOAKSTAIRS_ID, "minecraft:dark_oak_stairs", Icon.woodenStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.darkOakPlanks);
     }
@@ -1787,17 +1787,17 @@ public class Block extends Material {
     }
   };
   public static final int SLIMEBLOCK_ID = 0xA5;
-  public static final Block SLIMEBLOCK = new Block(SLIMEBLOCK_ID, "block:slime", Texture.slime);
+  public static final Block SLIMEBLOCK = new Block(SLIMEBLOCK_ID, "minecraft:slime", Texture.slime);
   public static final int BARRIER_ID = 0xA6;
-  public static final Block BARRIER = new Block(BARRIER_ID, "block:barrier", Texture.unknown);
+  public static final Block BARRIER = new Block(BARRIER_ID, "minecraft:barrier", Texture.unknown);
   public static final int IRON_TRAPDOOR_ID = 0xA7;
-  public static final Block IRON_TRAPDOOR = new Block(IRON_TRAPDOOR_ID, "block:iron_trapdoor", Texture.ironTrapdoor) {
+  public static final Block IRON_TRAPDOOR = new Block(IRON_TRAPDOOR_ID, "minecraft:iron_trapdoor", Texture.ironTrapdoor) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TrapdoorModel.intersect(ray, Texture.ironTrapdoor);
     }
   };
   public static final int PRISMARINE_ID = 0xA8;
-  public static final Block PRISMARINE = new Block(PRISMARINE_ID, "block:prismarine", Texture.prismarine) {
+  public static final Block PRISMARINE = new Block(PRISMARINE_ID, "minecraft:prismarine", Texture.prismarine) {
     final Texture[][] textures =
         {{Texture.prismarine, Texture.prismarine, Texture.prismarine, Texture.prismarine,
             Texture.prismarine, Texture.prismarine,},
@@ -1817,9 +1817,9 @@ public class Block extends Material {
     }
   };
   public static final int SEALANTERN_ID = 0xA9;
-  public static final Block SEALANTERN = new Block(SEALANTERN_ID, "block:sea_lantern", Texture.seaLantern);
+  public static final Block SEALANTERN = new Block(SEALANTERN_ID, "minecraft:sea_lantern", Texture.seaLantern);
   public static final int HAY_BLOCK_ID = 0xAA;
-  public static final Block HAY_BLOCK = new Block(HAY_BLOCK_ID, "block:hay_block", Texture.hayBlockSide) {
+  public static final Block HAY_BLOCK = new Block(HAY_BLOCK_ID, "minecraft:hay_block", Texture.hayBlockSide) {
     final Texture[] texture = {Texture.hayBlockSide, Texture.hayBlockTop,};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -1827,7 +1827,7 @@ public class Block extends Material {
     }
   };
   public static final int CARPET_ID = 0xAB;
-  public static final Block CARPET = new Block(CARPET_ID, "block:carpet", Texture.unknown) {
+  public static final Block CARPET = new Block(CARPET_ID, "minecraft:carpet", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return CarpetModel.intersect(ray, Texture.wool[ray.getBlockData()]);
     }
@@ -1837,34 +1837,34 @@ public class Block extends Material {
     }
   };
   public static final int HARDENED_CLAY_ID = 0xAC;
-  public static final Block HARDENED_CLAY = new Block(HARDENED_CLAY_ID, "block:hardened_clay", Texture.hardenedClay) {
+  public static final Block HARDENED_CLAY = new Block(HARDENED_CLAY_ID, "minecraft:hardened_clay", Texture.hardenedClay) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TexturedBlockModel.intersect(ray, Texture.hardenedClay);
     }
   };
   public static final int BLOCK_OF_COAL_ID = 0xAD;
-  public static final Block COAL_BLOCK = new Block(BLOCK_OF_COAL_ID, "block:coal_block", Texture.coalBlock);
+  public static final Block COAL_BLOCK = new Block(BLOCK_OF_COAL_ID, "minecraft:coal_block", Texture.coalBlock);
   public static final int PACKED_ICE_ID = 0xAE;
-  public static final Block PACKED_ICE = new Block(PACKED_ICE_ID, "block:packed_ice", Texture.packedIce);
+  public static final Block PACKED_ICE = new Block(PACKED_ICE_ID, "minecraft:packed_ice", Texture.packedIce);
   public static final int LARGE_FLOWER_ID = 0xAF;
-  public static final Block LARGE_FLOWER = new Block(LARGE_FLOWER_ID, "block:double_plant", Texture.dandelion) {
+  public static final Block LARGE_FLOWER = new Block(LARGE_FLOWER_ID, "minecraft:double_plant", Texture.dandelion) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return LargeFlowerModel.intersect(ray, scene);
     }
   };
   public static final int STANDING_BANNER_ID = 0xB0;
   public static final Block STANDING_BANNER = new Block(STANDING_BANNER_ID,
-      "block:standing_banner", Texture.unknown);
+      "minecraft:standing_banner", Texture.unknown);
   public static final int WALL_BANNER_ID = 0xB1;
-  public static final Block WALL_BANNER = new Block(WALL_BANNER_ID, "block:wall_banner", Texture.unknown);
+  public static final Block WALL_BANNER = new Block(WALL_BANNER_ID, "minecraft:wall_banner", Texture.unknown);
   public static final Block INVERTED_DAYLIGHTSENSOR = new Block(0xB2,
-      "block:daylight_detector_inverted", Texture.daylightDetectorTop) {
+      "minecraft:daylight_detector_inverted", Texture.daylightDetectorTop) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return DaylightSensorModel.intersect(ray, Texture.daylightDetectorInvertedTop);
     }
   };
   public static final int REDSANDSTONE_ID = 0xB3;
-  public static final Block REDSANDSTONE = new Block(REDSANDSTONE_ID, "block:red_standstone", Texture.redSandstoneSide) {
+  public static final Block REDSANDSTONE = new Block(REDSANDSTONE_ID, "minecraft:red_standstone", Texture.redSandstoneSide) {
     final Texture[][] texture = {
         // normal
         {Texture.redSandstoneSide, Texture.redSandstoneSide, Texture.redSandstoneSide,
@@ -1884,7 +1884,7 @@ public class Block extends Material {
     }
   };
   public static final int REDSANDSTONESTAIRS_ID = 0xB4;
-  public static final Block REDSANDSTONESTAIRS = new Stairs(REDSANDSTONESTAIRS_ID, "block:red_standstone_stairs", Icon.stoneStairs) {
+  public static final Block REDSANDSTONESTAIRS = new Stairs(REDSANDSTONESTAIRS_ID, "minecraft:red_standstone_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.redSandstoneSide, Texture.redSandstoneTop,
           Texture.redSandstoneBottom);
@@ -1895,7 +1895,7 @@ public class Block extends Material {
     }
   };
   public static final int DOUBLESLAB2_ID = 0xB5;
-  public static final Block DOUBLESLAB2 = new Block(DOUBLESLAB2_ID, "block:double_stone_slab2", Texture.redSandstoneTop) {
+  public static final Block DOUBLESLAB2 = new Block(DOUBLESLAB2_ID, "minecraft:double_stone_slab2", Texture.redSandstoneTop) {
     final Texture[] textures =
         {Texture.redSandstoneSide, Texture.redSandstoneSide, Texture.redSandstoneSide,
             Texture.redSandstoneSide, Texture.redSandstoneTop, Texture.redSandstoneTop,};
@@ -1905,7 +1905,7 @@ public class Block extends Material {
     }
   };
   public static final int SLAB2_ID = 0xB6;
-  public static final Block SLAB2 = new Block(SLAB2_ID, "block:stone_slab2", Texture.redSandstoneTop) {
+  public static final Block SLAB2 = new Block(SLAB2_ID, "minecraft:stone_slab2", Texture.redSandstoneTop) {
     final Texture[] textures = {Texture.redSandstoneSide, Texture.redSandstoneTop};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -1913,67 +1913,67 @@ public class Block extends Material {
     }
   };
   public static final int SPRUCEFENCEGATE_ID = 0xB7;
-  public static final Block SPRUCEFENCEGATE = new FenceGate(SPRUCEFENCEGATE_ID, "block:spruce_fence_gate", Texture.unknown) {
+  public static final Block SPRUCEFENCEGATE = new FenceGate(SPRUCEFENCEGATE_ID, "minecraft:spruce_fence_gate", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceGateModel.intersect(ray, Texture.sprucePlanks);
     }
   };
   public static final int BIRCHFENCEGATE_ID = 0xB8;
-  public static final Block BIRCHFENCEGATE = new FenceGate(BIRCHFENCEGATE_ID, "block:birch_fence_gate", Texture.unknown) {
+  public static final Block BIRCHFENCEGATE = new FenceGate(BIRCHFENCEGATE_ID, "minecraft:birch_fence_gate", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceGateModel.intersect(ray, Texture.birchPlanks);
     }
   };
   public static final int JUNGLEFENCEGATE_ID = 0xB9;
-  public static final Block JUNGLEFENCEGATE = new Block(JUNGLEFENCEGATE_ID, "block:jungle_fence_gate", Texture.unknown) {
+  public static final Block JUNGLEFENCEGATE = new Block(JUNGLEFENCEGATE_ID, "minecraft:jungle_fence_gate", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceGateModel.intersect(ray, Texture.jungleTreePlanks);
     }
   };
   public static final int DARKOAKFENCEGATE_ID = 0xBA;
-  public static final Block DARKOAKFENCEGATE = new Block(DARKOAKFENCEGATE_ID, "block:dark_oak_fence_gate", Texture.unknown) {
+  public static final Block DARKOAKFENCEGATE = new Block(DARKOAKFENCEGATE_ID, "minecraft:dark_oak_fence_gate", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceGateModel.intersect(ray, Texture.darkOakPlanks);
     }
   };
   public static final int ACACIAFENCEGATE_ID = 0xBB;
-  public static final Block ACACIAFENCEGATE = new Block(ACACIAFENCEGATE_ID, "block:acacia_fence_gate", Texture.unknown) {
+  public static final Block ACACIAFENCEGATE = new Block(ACACIAFENCEGATE_ID, "minecraft:acacia_fence_gate", Texture.unknown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceGateModel.intersect(ray, Texture.acaciaPlanks);
     }
   };
   public static final int SPRUCEFENCE_ID = 0xBC;
-  public static final Block SPRUCEFENCE = new Fence(SPRUCEFENCE_ID, "block:spruce_fence", Icon.fence) {
+  public static final Block SPRUCEFENCE = new Fence(SPRUCEFENCE_ID, "minecraft:spruce_fence", Icon.fence) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.sprucePlanks);
     }
   };
   public static final int BIRCHFENCE_ID = 0xBD;
-  public static final Block BIRCHFENCE = new Fence(BIRCHFENCE_ID, "block:birch_fence", Icon.fence) {
+  public static final Block BIRCHFENCE = new Fence(BIRCHFENCE_ID, "minecraft:birch_fence", Icon.fence) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.birchPlanks);
     }
   };
   public static final int JUNGLEFENCE_ID = 0xBE;
-  public static final Block JUNGLEFENCE = new Fence(JUNGLEFENCE_ID, "block:jungle_fence", Icon.fence) {
+  public static final Block JUNGLEFENCE = new Fence(JUNGLEFENCE_ID, "minecraft:jungle_fence", Icon.fence) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.jungleTreePlanks);
     }
   };
   public static final int DARKOAKFENCE_ID = 0xBF;
-  public static final Block DARKOAKFENCE = new Fence(DARKOAKFENCE_ID, "block:dark_oak_fence", Icon.fence) {
+  public static final Block DARKOAKFENCE = new Fence(DARKOAKFENCE_ID, "minecraft:dark_oak_fence", Icon.fence) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.darkOakPlanks);
     }
   };
   public static final int ACACIAFENCE_ID = 0xC0;
-  public static final Block ACACIAFENCE = new Fence(ACACIAFENCE_ID, "block:acacia_fence", Icon.fence) {
+  public static final Block ACACIAFENCE = new Fence(ACACIAFENCE_ID, "minecraft:acacia_fence", Icon.fence) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return FenceModel.intersect(ray, Texture.acaciaPlanks);
     }
   };
   public static final int SPRUCEDOOR_ID = 0xC1;
-  public static final Block SPRUCEDOOR = new Block(SPRUCEDOOR_ID, "block:spruce_door", Icon.woodenDoor) {
+  public static final Block SPRUCEDOOR = new Block(SPRUCEDOOR_ID, "minecraft:spruce_door", Icon.woodenDoor) {
     final Texture[] texture = {Texture.spruceDoorBottom, Texture.spruceDoorTop};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -1981,7 +1981,7 @@ public class Block extends Material {
     }
   };
   public static final int BIRCHDOOR_ID = 0xC2;
-  public static final Block BIRCHDOOR = new Block(BIRCHDOOR_ID, "block:birch_door", Icon.woodenDoor) {
+  public static final Block BIRCHDOOR = new Block(BIRCHDOOR_ID, "minecraft:birch_door", Icon.woodenDoor) {
     final Texture[] texture = {Texture.birchDoorBottom, Texture.birchDoorTop};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -1989,7 +1989,7 @@ public class Block extends Material {
     }
   };
   public static final int JUNGLEDOOR_ID = 0xC3;
-  public static final Block JUNGLEDOOR = new Block(JUNGLEDOOR_ID, "block:jungle_door", Icon.woodenDoor) {
+  public static final Block JUNGLEDOOR = new Block(JUNGLEDOOR_ID, "minecraft:jungle_door", Icon.woodenDoor) {
     final Texture[] texture = {Texture.jungleDoorBottom, Texture.jungleDoorTop};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -1997,7 +1997,7 @@ public class Block extends Material {
     }
   };
   public static final int ACACIADOOR_ID = 0xC4;
-  public static final Block ACACIADOOR = new Block(ACACIADOOR_ID, "block:acacia_door", Icon.woodenDoor) {
+  public static final Block ACACIADOOR = new Block(ACACIADOOR_ID, "minecraft:acacia_door", Icon.woodenDoor) {
     final Texture[] texture = {Texture.acaciaDoorBottom, Texture.acaciaDoorTop};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -2005,7 +2005,7 @@ public class Block extends Material {
     }
   };
   public static final int DARKOAKDOOR_ID = 0xC5;
-  public static final Block DARKOAKDOOR = new Block(DARKOAKDOOR_ID, "block:dark_oak_door", Icon.woodenDoor) {
+  public static final Block DARKOAKDOOR = new Block(DARKOAKDOOR_ID, "minecraft:dark_oak_door", Icon.woodenDoor) {
     final Texture[] texture = {Texture.darkOakDoorBottom, Texture.darkOakDoorTop};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -2013,7 +2013,7 @@ public class Block extends Material {
     }
   };
   public static final int ENDROD_ID = 0xC6;
-  public static final Block ENDROD = new Block(ENDROD_ID, "block:end_rod", Texture.endRod) {
+  public static final Block ENDROD = new Block(ENDROD_ID, "minecraft:end_rod", Texture.endRod) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return EndRodModel.intersect(ray);
     }
@@ -2033,14 +2033,14 @@ public class Block extends Material {
   };
   public static final int CHORUSPLANT_ID = 0xC7;
   public static final Block CHORUSPLANT =
-      new Block(CHORUSPLANT_ID, "block:chorus_plant", Texture.chorusPlant) {
+      new Block(CHORUSPLANT_ID, "minecraft:chorus_plant", Texture.chorusPlant) {
         @Override public boolean intersect(Ray ray, Scene scene) {
           return ChorusPlantModel.intersect(ray);
         }
       };
   public static final int CHORUSFLOWER_ID = 0xC8;
   public static final Block CHORUSFLOWER =
-      new Block(CHORUSFLOWER_ID, "block:chorus_flower", Texture.chorusFlower) {
+      new Block(CHORUSFLOWER_ID, "minecraft:chorus_flower", Texture.chorusFlower) {
         @Override public boolean intersect(Ray ray, Scene scene) {
           return ChorusFlowerModel.intersect(ray);
         }
@@ -2050,9 +2050,9 @@ public class Block extends Material {
         }
       };
   public static final int PURPURBLOCK_ID = 0xC9;
-  public static final Block PURPURBLOCK = new Block(PURPURBLOCK_ID, "block:purpur_block", Texture.purpurBlock);
+  public static final Block PURPURBLOCK = new Block(PURPURBLOCK_ID, "minecraft:purpur_block", Texture.purpurBlock);
   public static final int PURPURPILLAR_ID = 0xCA;
-  public static final Block PURPURPILLAR = new Block(PURPURPILLAR_ID, "block:purpur_pillar", Texture.purpurPillarSide) {
+  public static final Block PURPURPILLAR = new Block(PURPURPILLAR_ID, "minecraft:purpur_pillar", Texture.purpurPillarSide) {
     final Texture[] texture =
         {Texture.purpurPillarSide, Texture.purpurPillarSide, Texture.purpurPillarSide,
             Texture.purpurPillarSide, Texture.purpurPillarTop, Texture.purpurPillarTop,};
@@ -2062,7 +2062,7 @@ public class Block extends Material {
     }
   };
   public static final int PURPURSTAIRS_ID = 0xCB;
-  public static final Block PURPURSTAIRS = new Stairs(PURPURSTAIRS_ID, "block:purpur_stairs", Icon.stoneStairs) {
+  public static final Block PURPURSTAIRS = new Stairs(PURPURSTAIRS_ID, "minecraft:purpur_stairs", Icon.stoneStairs) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return StairModel.intersect(ray, Texture.purpurBlock);
     }
@@ -2072,16 +2072,16 @@ public class Block extends Material {
     }
   };
   public static final int PURPURDOUBLESLAB_ID = 0xCC;
-  public static final Block PURPURDOUBLESLAB = new Block(PURPURDOUBLESLAB_ID, "block:purpur_double_slab", Texture.purpurBlock);
+  public static final Block PURPURDOUBLESLAB = new Block(PURPURDOUBLESLAB_ID, "minecraft:purpur_double_slab", Texture.purpurBlock);
   public static final int PURPURSLAB_ID = 0xCD;
-  public static final Block PURPURSLAB = new Block(PURPURSLAB_ID, "block:purpur_slab", Texture.purpurBlock) {
+  public static final Block PURPURSLAB = new Block(PURPURSLAB_ID, "minecraft:purpur_slab", Texture.purpurBlock) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return SlabModel.intersect(ray, Texture.purpurBlock);
     }
   };
   public static final int ENDBRICKS_ID = 0xCE;
-  public static final Block ENDBRICKS = new Block(ENDBRICKS_ID, "block:end_bricks", Texture.endBricks);
-  public static final Block BEETROOTS = new Block(0xCF, "block:beetroots", Texture.beets3) {
+  public static final Block ENDBRICKS = new Block(ENDBRICKS_ID, "minecraft:end_bricks", Texture.endBricks);
+  public static final Block BEETROOTS = new Block(0xCF, "minecraft:beetroots", Texture.beets3) {
     final Texture[] texture = {
         Texture.beets0, Texture.beets1, Texture.beets2, Texture.beets3
     };
@@ -2091,15 +2091,15 @@ public class Block extends Material {
     }
   };
   public static final int GRASSPATH_ID = 0xD0;
-  public static final Block GRASSPATH = new Block(GRASSPATH_ID, "block:grass_path", Texture.grassPathTop) {
+  public static final Block GRASSPATH = new Block(GRASSPATH_ID, "minecraft:grass_path", Texture.grassPathTop) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return GrassPathModel.intersect(ray);
     }
   };
-  public static final Block END_GATEWAY = new Block(0xD1, "block:end_gateway", Texture.unknown);
+  public static final Block END_GATEWAY = new Block(0xD1, "minecraft:end_gateway", Texture.unknown);
   public static final int REPEATING_COMMAND_BLOCK_ID = 0xD2;
   public static final Block REPEATING_COMMAND_BLOCK = new Block(REPEATING_COMMAND_BLOCK_ID,
-      "block:repeating_command_block", Texture.repeatingCommandBlockBack) {
+      "minecraft:repeating_command_block", Texture.repeatingCommandBlockBack) {
     final Texture[][] texture = {
         {
             Texture.repeatingCommandBlockBack,
@@ -2119,7 +2119,7 @@ public class Block extends Material {
   };
   public static final int CHAIN_COMMAND_BLOCK_ID = 0xD3;
   public static final Block CHAIN_COMMAND_BLOCK = new Block(CHAIN_COMMAND_BLOCK_ID,
-      "block:chain_command_block", Texture.chainCommandBlockBack) {
+      "minecraft:chain_command_block", Texture.chainCommandBlockBack) {
     final Texture[][] texture = {
         {
             Texture.chainCommandBlockBack,
@@ -2138,13 +2138,13 @@ public class Block extends Material {
     }
   };
   // TODO: render frosted ice cracks.
-  public static final Block FROSTEDICE = new Block(0xD4, "block:frosted_ice", Texture.ice);
-  public static final Block MAGMA = new Block(0xD5, "block:magma", Texture.magma);
-  public static final Block NETHER_WART_BLOCK = new Block(0xD6, "block:nether_wart_block",
+  public static final Block FROSTEDICE = new Block(0xD4, "minecraft:frosted_ice", Texture.ice);
+  public static final Block MAGMA = new Block(0xD5, "minecraft:magma", Texture.magma);
+  public static final Block NETHER_WART_BLOCK = new Block(0xD6, "minecraft:nether_wart_block",
       Texture.netherWartBlock);
-  public static final Block RED_NETHER_BRICK = new Block(0xD7, "block:red_nether_brick",
+  public static final Block RED_NETHER_BRICK = new Block(0xD7, "minecraft:red_nether_brick",
       Texture.redNetherBrick);
-  public static final Block BONE = new Block(0xD8, "block:bone_block", Texture.boneSide) {
+  public static final Block BONE = new Block(0xD8, "minecraft:bone_block", Texture.boneSide) {
     final Texture[] texture = {Texture.boneSide, Texture.boneTop};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
@@ -2152,7 +2152,7 @@ public class Block extends Material {
     }
   };
   private static final Block STRUCTURE_VOID = new Block(0xD9, "Structure Void", Texture.unknown);
-  public static final Block OBSERVER = new Block(0xDA, "block:observer", Texture.unknown) {
+  public static final Block OBSERVER = new Block(0xDA, "minecraft:observer", Texture.unknown) {
     final Texture[] texture = {
         Texture.observerBack, Texture.observerFront,
         Texture.observerSide, Texture.observerTop
@@ -2162,7 +2162,7 @@ public class Block extends Material {
       return ObserverModel.intersect(ray, texture);
     }
   };
-  public static final Block SHULKERBOX_WHITE = new Block(0xDB, "block:white_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_WHITE = new Block(0xDB, "minecraft:white_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerWhite.bottom,
         Texture.shulkerWhite.top,
@@ -2173,7 +2173,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_ORANGE = new Block(0xDC, "block:orange_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_ORANGE = new Block(0xDC, "minecraft:orange_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerOrange.bottom,
         Texture.shulkerOrange.top,
@@ -2184,7 +2184,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_MAGENTA = new Block(0xDD, "block:magenta_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_MAGENTA = new Block(0xDD, "minecraft:magenta_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerMagenta.bottom,
         Texture.shulkerMagenta.top,
@@ -2195,7 +2195,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_LIGHTBLUE = new Block(0xDE, "block:ligth_blue_shuler_box",
+  public static final Block SHULKERBOX_LIGHTBLUE = new Block(0xDE, "minecraft:ligth_blue_shuler_box",
       Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerLightBlue.bottom,
@@ -2207,7 +2207,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_YELLOW = new Block(0xDF, "block:yellow_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_YELLOW = new Block(0xDF, "minecraft:yellow_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerYellow.bottom,
         Texture.shulkerYellow.top,
@@ -2218,7 +2218,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_LIME = new Block(0xE0, "block:lime_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_LIME = new Block(0xE0, "minecraft:lime_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerLime.bottom,
         Texture.shulkerLime.top,
@@ -2229,7 +2229,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_PINK = new Block(0xE1, "block:pink_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_PINK = new Block(0xE1, "minecraft:pink_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerPink.bottom,
         Texture.shulkerPink.top,
@@ -2240,7 +2240,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_GRAY = new Block(0xE2, "block:gray_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_GRAY = new Block(0xE2, "minecraft:gray_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerGray.bottom,
         Texture.shulkerGray.top,
@@ -2251,7 +2251,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_SILVER = new Block(0xE3, "block:light_gray_shuler_box",
+  public static final Block SHULKERBOX_SILVER = new Block(0xE3, "minecraft:light_gray_shuler_box",
       Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerSilver.bottom,
@@ -2263,7 +2263,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_CYAN = new Block(0xE4, "block:cyan_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_CYAN = new Block(0xE4, "minecraft:cyan_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerCyan.bottom,
         Texture.shulkerCyan.top,
@@ -2274,7 +2274,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_PURPLE = new Block(0xE5, "block:purple_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_PURPLE = new Block(0xE5, "minecraft:purple_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerPurple.bottom,
         Texture.shulkerPurple.top,
@@ -2285,7 +2285,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_BLUE = new Block(0xE6, "block:blue_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_BLUE = new Block(0xE6, "minecraft:blue_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerBlue.bottom,
         Texture.shulkerBlue.top,
@@ -2296,7 +2296,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_BROWN = new Block(0xE7, "block:brown_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_BROWN = new Block(0xE7, "minecraft:brown_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerBrown.bottom,
         Texture.shulkerBrown.top,
@@ -2307,7 +2307,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_GREEN = new Block(0xE8, "block:green_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_GREEN = new Block(0xE8, "minecraft:green_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerGreen.bottom,
         Texture.shulkerGreen.top,
@@ -2318,7 +2318,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_RED = new Block(0xE9, "block:red_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_RED = new Block(0xE9, "minecraft:red_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerRed.bottom,
         Texture.shulkerRed.top,
@@ -2329,7 +2329,7 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block SHULKERBOX_BLACK = new Block(0xEA, "block:black_shuler_box", Texture.unknown) {
+  public static final Block SHULKERBOX_BLACK = new Block(0xEA, "minecraft:black_shuler_box", Texture.unknown) {
     final Texture[] textures = {
         Texture.shulkerBlack.bottom,
         Texture.shulkerBlack.top,
@@ -2340,103 +2340,103 @@ public class Block extends Material {
       return DirectionalBlockModel.intersect(ray, textures);
     }
   };
-  public static final Block WHITE_TERRACOTTA = new Block(0xEB, "block:white_glazed_terracotta",
+  public static final Block WHITE_TERRACOTTA = new Block(0xEB, "minecraft:white_glazed_terracotta",
       Texture.terracottaWhite) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaWhite);
     }
   };
-  public static final Block ORANGE_TERRACOTTA = new Block(0xEC, "block:orange_glazed_terracotta",
+  public static final Block ORANGE_TERRACOTTA = new Block(0xEC, "minecraft:orange_glazed_terracotta",
       Texture.terracottaOrange) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaOrange);
     }
   };
-  public static final Block MAGENTA_TERRACOTTA = new Block(0xED, "block:magenta_glazed_terracotta",
+  public static final Block MAGENTA_TERRACOTTA = new Block(0xED, "minecraft:magenta_glazed_terracotta",
       Texture.terracottaMagenta) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaMagenta);
     }
   };
-  public static final Block LIGHT_BLUE_TERRACOTTA = new Block(0xEE, "block:light_blue_glazed_terracotta",
+  public static final Block LIGHT_BLUE_TERRACOTTA = new Block(0xEE, "minecraft:light_blue_glazed_terracotta",
       Texture.terracottaLightBlue) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaLightBlue);
     }
   };
-  public static final Block YELLOW_TERRACOTTA = new Block(0xEF, "block:yellow_glazed_terracotta",
+  public static final Block YELLOW_TERRACOTTA = new Block(0xEF, "minecraft:yellow_glazed_terracotta",
       Texture.terracottaYellow) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaYellow);
     }
   };
-  public static final Block LIME_TERRACOTTA = new Block(0xF0, "block:lime_glazed_terracotta",
+  public static final Block LIME_TERRACOTTA = new Block(0xF0, "minecraft:lime_glazed_terracotta",
       Texture.terracottaLime) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaLime);
     }
   };
-  public static final Block PINK_TERRACOTTA = new Block(0xF1, "block:pink_glazed_terracotta",
+  public static final Block PINK_TERRACOTTA = new Block(0xF1, "minecraft:pink_glazed_terracotta",
       Texture.terracottaPink) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaPink);
     }
   };
-  public static final Block GRAY_TERRACOTTA = new Block(0xF2, "block:gray_glazed_terracotta",
+  public static final Block GRAY_TERRACOTTA = new Block(0xF2, "minecraft:gray_glazed_terracotta",
       Texture.terracottaGray) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaGray);
     }
   };
-  public static final Block SILVER_TERRACOTTA = new Block(0xF3, "block:light_gray_glazed_terracotta",
+  public static final Block SILVER_TERRACOTTA = new Block(0xF3, "minecraft:light_gray_glazed_terracotta",
       Texture.terracottaSilver) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaSilver);
     }
   };
-  public static final Block CYAN_TERRACOTTA = new Block(0xF4, "block:cyan_glazed_terracotta",
+  public static final Block CYAN_TERRACOTTA = new Block(0xF4, "minecraft:cyan_glazed_terracotta",
       Texture.terracottaCyan) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaCyan);
     }
   };
-  public static final Block PURPLE_TERRACOTTA = new Block(0xF5, "block:purple_glazed_terracotta",
+  public static final Block PURPLE_TERRACOTTA = new Block(0xF5, "minecraft:purple_glazed_terracotta",
       Texture.terracottaPurple) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaPurple);
     }
   };
-  public static final Block BLUE_TERRACOTTA = new Block(0xF6, "block:blue_glazed_terracotta",
+  public static final Block BLUE_TERRACOTTA = new Block(0xF6, "minecraft:blue_glazed_terracotta",
       Texture.terracottaBlue) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaBlue);
     }
   };
-  public static final Block BROWN_TERRACOTTA = new Block(0xF7, "block:brown_glazed_terracotta",
+  public static final Block BROWN_TERRACOTTA = new Block(0xF7, "minecraft:brown_glazed_terracotta",
       Texture.terracottaBrown) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaBrown);
     }
   };
-  public static final Block GREEN_TERRACOTTA = new Block(0xF8, "block:green_glazed_terracotta",
+  public static final Block GREEN_TERRACOTTA = new Block(0xF8, "minecraft:green_glazed_terracotta",
       Texture.terracottaGreen) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaGreen);
     }
   };
-  public static final Block RED_TERRACOTTA = new Block(0xF9, "block:red_glazed_terracotta",
+  public static final Block RED_TERRACOTTA = new Block(0xF9, "minecraft:red_glazed_terracotta",
       Texture.terracottaRed) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaRed);
     }
   };
-  public static final Block BLACK_TERRACOTTA = new Block(0xFA, "block:black_glazed_terracotta",
+  public static final Block BLACK_TERRACOTTA = new Block(0xFA, "minecraft:black_glazed_terracotta",
       Texture.terracottaBlack) {
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TerracottaModel.intersect(ray, Texture.terracottaBlack);
     }
   };
-  public static final Block CONCRETE = new Block(0xFB, "block:concrete", Texture.unknown) {
+  public static final Block CONCRETE = new Block(0xFB, "minecraft:concrete", Texture.unknown) {
     @Override public Texture getTexture(int blockData) {
       return Texture.concrete[blockData];
     }
@@ -2445,7 +2445,7 @@ public class Block extends Material {
       return woolColor[data & 15];
     }
   };
-  public static final Block CONCRETE_POWDER = new Block(0xFC, "block:concrete_powder", Texture.unknown) {
+  public static final Block CONCRETE_POWDER = new Block(0xFC, "minecraft:concrete_powder", Texture.unknown) {
     @Override public Texture getTexture(int blockData) {
       return Texture.concretePowder[blockData];
     }
@@ -2456,7 +2456,7 @@ public class Block extends Material {
   };
   private static final Block UNKNOWN0xFD = new Block(0xFD, "Unknown Block 0xFD", Texture.unknown);
   private static final Block UNKNOWN0xFE = new Block(0xFE, "Unknown Block 0xFE", Texture.unknown);
-  public static final Block STRUCTURE_BLOCK = new Block(0xFF, "block:structure_block", Texture.unknown);
+  public static final Block STRUCTURE_BLOCK = new Block(0xFF, "minecraft:structure_block", Texture.unknown);
 
   public static final Block[] blocks = {
       AIR, STONE, GRASS, DIRT, COBBLESTONE, WOODENPLANKS, SAPLING, BEDROCK, WATER, STATIONARYWATER,
@@ -3153,6 +3153,6 @@ public class Block extends Material {
   }
 
   @Override public JsonValue toJson() {
-    return new JsonString("block:" + id);
+    return new JsonString("minecraft:" + id);
   }
 }
