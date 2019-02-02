@@ -224,7 +224,8 @@ public class Chunk {
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
       int[] heightmapData = extractHeightmapData(data);
-      byte[] biomeData = extractBiomeData(data);
+      byte[] biomeData = new byte[X_MAX * Z_MAX];
+      extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
       byte[] chunkData = new byte[CHUNK_BYTES];
       byte[] blockData = new byte[CHUNK_BYTES];
       extractChunkData(data, chunkData, blockData);
@@ -240,7 +241,9 @@ public class Chunk {
     if (data == null) {
       biomes = CorruptLayer.INSTANCE;
     } else {
-      biomes = new BiomeLayer(extractBiomeData(data));
+      byte[] biomeData = new byte[X_MAX * Z_MAX];
+      extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
+      biomes = new BiomeLayer(biomeData);
     }
   }
 
@@ -252,7 +255,8 @@ public class Chunk {
 
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
-      byte[] biomeData = extractBiomeData(data);
+      byte[] biomeData = new byte[X_MAX * Z_MAX];
+      extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
       byte[] chunkData = new byte[CHUNK_BYTES];
       extractChunkData(data, chunkData, new byte[CHUNK_BYTES]);
       layer = new BlockLayer(chunkData, biomeData, requestedLayer);
@@ -278,12 +282,22 @@ public class Chunk {
     }
   }
 
-  private byte[] extractBiomeData(@NotNull Map<String, Tag> data) {
-    Tag biomesTag = data.get(LEVEL_BIOMES);
+  /**
+   * Extracts biome IDs from chunk data into the second argument.
+   *
+   * @param biomesTag the .Level.Biomes NBT tag to load data from.
+   * @param output a byte array of length 16x16.
+   */
+  private void extractBiomeData(@NotNull Tag biomesTag, byte[] output) {
     if (biomesTag.isByteArray(X_MAX * Z_MAX)) {
-      return biomesTag.byteArray();
-    } else {
-      return new byte[X_MAX * Z_MAX];
+      System.arraycopy(biomesTag.byteArray(), 0, output, 0, X_MAX * Z_MAX);
+    } else if (biomesTag.isIntArray(X_MAX * Z_MAX)) {
+      // Since Minecraft 1.13, biome IDs are stored in an int vector.
+      // TODO(llbit): do we need to use ints to store biome IDs for Minecraft 1.13+?
+      int[] data = biomesTag.intArray();
+      for (int i = 0; i < X_MAX * Z_MAX; ++i) {
+        output[i] = (byte) data[i];
+      }
     }
   }
 
@@ -425,10 +439,11 @@ public class Chunk {
     Tag biomesTag = data.get(LEVEL_BIOMES);
     Tag entitiesTag = data.get(LEVEL_ENTITIES);
     Tag tileEntitiesTag = data.get(LEVEL_TILEENTITIES);
-    if (sections.isList() && biomesTag.isByteArray(X_MAX * Z_MAX) && tileEntitiesTag.isList()
+    if (biomesTag.isByteArray(X_MAX * Z_MAX) || biomesTag.isIntArray(X_MAX * Z_MAX)) {
+      extractBiomeData(biomesTag, biomes);
+    }
+    if (sections.isList() && tileEntitiesTag.isList()
         && entitiesTag.isList()) {
-      byte[] chunkBiomes = extractBiomeData(data);
-      System.arraycopy(chunkBiomes, 0, biomes, 0, chunkBiomes.length);
       extractChunkData(data, blocks, blockData);
       ListTag list = (ListTag) entitiesTag;
       for (SpecificTag tag : list) {
