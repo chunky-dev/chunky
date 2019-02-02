@@ -17,7 +17,11 @@
 package se.llbit.math;
 
 /**
- * Quick math utility methods.
+ * Quick math utility functions.
+ *
+ * <p>Note: some of these functions disregard important edge cases, like
+ * when an input value is NaN. By disregarding NaNs we can get slightly improved
+ * performance.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
@@ -27,7 +31,7 @@ public class QuickMath {
   public static final double TAU = Math.PI * 2;
 
   /**
-   * @return The floor of d
+   * The value of d rounded down to the nearest long.
    */
   public static long floor(double d) {
     long i = (long) d;
@@ -35,7 +39,7 @@ public class QuickMath {
   }
 
   /**
-   * @return The ceil of d
+   * The value of d rounded up to the nearest long.
    */
   public static long ceil(double d) {
     long i = (long) d;
@@ -43,9 +47,7 @@ public class QuickMath {
   }
 
   /**
-   * Get the next power of two.
-   *
-   * @return The next power of two
+   * The next power of two from x.
    */
   public static int nextPow2(int x) {
     x--;
@@ -58,7 +60,7 @@ public class QuickMath {
   }
 
   /**
-   * @return 2-logarithm of x
+   * The 2-logarithm of x, rounded down to the nearest integer.
    */
   public static int log2(int x) {
     int v = 0;
@@ -69,102 +71,90 @@ public class QuickMath {
   }
 
   /**
-   * @return The sign of x
+   * The sign of x.
    */
   public static int signum(double x) {
     return x < 0 ? -1 : 1;
   }
 
   /**
-   * @return The sign of x
+   * The sign of x.
    */
   public static int signum(float x) {
     return x < 0 ? -1 : 1;
   }
 
   /**
-   * Convert radians to degrees
-   *
-   * @param rad Radians
-   * @return Degrees
+   * Convert radians to degrees.
    */
   public static double radToDeg(double rad) {
     return 180 * (rad / Math.PI);
   }
 
   /**
-   * @return Value modulo mod
+   * Gives the modulus of value and mod (positive).
    */
   public static double modulo(double value, double mod) {
     return ((value % mod) + mod) % mod;
   }
 
   /**
-   * Convert degrees to radians
-   *
-   * @param deg Degrees
-   * @return Radians
+   * Convert degrees to radians.
    */
   public static double degToRad(double deg) {
     return (deg * Math.PI) / 180;
   }
 
   /**
-   * @return value clamped to min and max
+   * Gives value clamped to {@code [min, max]}.
    */
   public static double clamp(double value, double min, double max) {
     return value < min ? min : value > max ? max : value;
   }
 
   /**
-   * NB not NaN-correct
-   *
-   * @return maximum value of a and b
+   * Maximum of a and b.
+   * <p>NB: not NaN-correct. Do not use if either a or b can be NaN.
    */
   public static double max(double a, double b) {
     return (a > b) ? a : b;
   }
 
   /**
-   * NB not NaN-correct
-   *
-   * @return maximum value of a and b
+   * Maximum of a and b.
+   * <p>NB: not NaN-correct. Do not use if either a or b can be NaN.
    */
   public static float max(float a, float b) {
     return (a > b) ? a : b;
   }
 
   /**
-   * NB disregards NaN. Don't use if a or b can be NaN
-   *
-   * @return minimum value of a and b
+   * Minimum of a and b.
+   * <p>NB: not NaN-correct. Do not use if either a or b can be NaN.
    */
   public static double min(double a, double b) {
     return (a < b) ? a : b;
   }
 
   /**
-   * NB disregards NaN. Don't use if a or b can be NaN
-   *
-   * @return minimum value of a and b
+   * Minimum of a and b.
+   * <p>NB: not NaN-correct. Do not use if either a or b can be NaN.
    */
   public static float min(float a, float b) {
     return (a < b) ? a : b;
   }
 
   /**
-   * NB disregards +-0
-   *
-   * @return absolute value of x
+   * Absolute value of x.
+   * NB: disregards +-0.
    */
   public static float abs(float x) {
     return (x < 0.f) ? -x : x;
   }
 
   /**
-   * NB disregards +-0
-   *
-   * @return absolute value of x
+   * Absolute value of x.
+   * NB: disregards +-0.
    */
   public static double abs(double x) {
     return (x < 0.0) ? -x : x;
