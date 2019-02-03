@@ -17,6 +17,8 @@
 package se.llbit.chunky.main;
 
 import org.junit.Test;
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.plugin.TabTransformer;
 import se.llbit.chunky.renderer.RayTracerFactory;
 import se.llbit.chunky.renderer.RenderContextFactory;
@@ -24,7 +26,6 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SceneFactory;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
-import se.llbit.chunky.block.Block;
 
 import java.util.Collections;
 
@@ -33,32 +34,32 @@ import static org.junit.Assert.assertSame;
 
 public class PluginApiTest {
   @Test public void testSetBlock1() {
-    Block newGrass = new Block(Block.GRASS_ID, "foo", Texture.EMPTY_TEXTURE);
-    Block.set(Block.GRASS_ID, newGrass);
-    assertSame(newGrass, Block.get(Block.GRASS_ID));
+    IdBlock newGrass = new IdBlock(IdBlock.GRASS_ID, "foo", Texture.EMPTY_TEXTURE);
+    IdBlock.set(IdBlock.GRASS_ID, newGrass);
+    assertSame(newGrass, IdBlock.get(IdBlock.GRASS_ID));
   }
 
   @Test public void testSetBlock2() {
     // This will not work well in the renderer, but it is allowed.
-    Block.set(Block.STONE_ID, Block.AIR);
-    assertSame(Block.AIR, Block.get(Block.STONE_ID));
+    IdBlock.set(IdBlock.STONE_ID, IdBlock.AIR);
+    assertSame(IdBlock.AIR, IdBlock.get(IdBlock.STONE_ID));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testSetBlockFail1() {
-    Block.set(Block.GRASS_ID, null);
+    IdBlock.set(IdBlock.GRASS_ID, null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testSetBlockFail2() {
     // Illegal block ID.
-    Block.set(-1, Block.AIR);
+    IdBlock.set(-1, IdBlock.AIR);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testSetBlockFail3() {
     // Illegal block ID.
-    Block.set(256, Block.AIR);
+    IdBlock.set(256, IdBlock.AIR);
   }
 
   @Test public void testSetRenderContextFactory() {

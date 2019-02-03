@@ -29,7 +29,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import se.llbit.chunky.block.Block;
+import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
@@ -55,9 +55,9 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     specular.setRange(0, 1);
     ior.setName("IoR");
     ObservableList<String> blockIds = FXCollections.observableArrayList();
-    blockIds.addAll(Block.collections.keySet());
+    blockIds.addAll(IdBlock.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());
-    blockIds.addAll(Block.idMap.keySet());
+    blockIds.addAll(IdBlock.idMap.keySet());
     FilteredList<String> filteredList = new FilteredList<>(blockIds);
     listView = new ListView<>(filteredList);
     listView.getSelectionModel().selectedItemProperty().addListener(
@@ -93,12 +93,12 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
 
   private void updateSelectedMaterial(String materialName) {
     boolean materialExists = false;
-    if (Block.collections.containsKey(materialName)) {
+    if (IdBlock.collections.containsKey(materialName)) {
       double emAcc = 0;
       double specAcc = 0;
       double iorAcc = 0;
-      Collection<Block> blocks = Block.collections.get(materialName);
-      for (Block block : blocks) {
+      Collection<IdBlock> blocks = IdBlock.collections.get(materialName);
+      for (IdBlock block : blocks) {
         emAcc += block.emittance;
         specAcc += block.specular;
         iorAcc += block.ior;
@@ -115,8 +115,8 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
         ior.set(material.ior);
         materialExists = true;
       }
-    } else if (Block.idMap.containsKey(materialName)) {
-      Material material = Block.idMap.get(materialName);
+    } else if (IdBlock.idMap.containsKey(materialName)) {
+      Material material = IdBlock.idMap.get(materialName);
       if (material != null) {
         emittance.set(material.emittance);
         specular.set(material.specular);

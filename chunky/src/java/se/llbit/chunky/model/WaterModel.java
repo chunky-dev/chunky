@@ -19,7 +19,7 @@ package se.llbit.chunky.model;
 import java.util.List;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.block.Block;
+import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.DoubleSidedQuad;
@@ -360,6 +360,7 @@ public class WaterModel {
     ray.n.normalize();
   }
 
+  // Adds lily pad objects.
   public static void addPrimitives(List<Primitive> primitives, int data, int x, int y, int z,
       int size) {
     // Lily pad test.
@@ -374,7 +375,7 @@ public class WaterModel {
       Vector2 t3 = new Vector2(1, 1);
       Vector2 t4 = new Vector2(1, 0);
       int dir = 3 & (data >> BlockData.LILY_PAD_ROTATION);
-      Material lilyMaterial = Block.get(Block.LILY_PAD_ID);
+      Material lilyMaterial = IdBlock.get(IdBlock.LILY_PAD_ID);
       switch (dir) {
         case 0:
           primitives.add(new TexturedTriangle(c1, c3, c2, t1, t3, t2, lilyMaterial));

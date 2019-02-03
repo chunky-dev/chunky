@@ -20,8 +20,9 @@ import java.util.Random;
 
 import org.apache.commons.math3.util.FastMath;
 
+import se.llbit.chunky.block.Air;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.block.Block;
+import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Material;
 
@@ -70,12 +71,12 @@ public class Ray {
   /**
    * Previous material.
    */
-  private Material prevMaterial = Block.AIR;
+  private Material prevMaterial = Air.INSTANCE;
 
   /**
    * Current material.
    */
-  private Material currentMaterial = Block.AIR;
+  private Material currentMaterial = Air.INSTANCE;
 
   /**
    * Previous block metadata.
@@ -139,8 +140,8 @@ public class Ray {
    */
   public void setDefault() {
     distance = 0;
-    prevMaterial = Block.AIR;
-    currentMaterial = Block.AIR;
+    prevMaterial = Air.INSTANCE;
+    currentMaterial = Air.INSTANCE;
     depth = 0;
     color.set(0, 0, 0, 0);
     emittance.set(0, 0, 0);
@@ -384,7 +385,7 @@ public class Ray {
   }
 
   public void setMaterial(int blockId) {
-    this.currentMaterial = Block.get(blockId);
+    this.currentMaterial = IdBlock.get(blockId);
     this.currentData = blockId;
   }
 

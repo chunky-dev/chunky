@@ -15,41 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.block;
+package se.llbit.chunky.idblock;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
 
-public class FenceGate extends Block {
-  public FenceGate(int id, String name, Texture texture) {
+public class Fence extends IdBlock {
+  public Fence(int id, String name, Texture texture) {
     super(id, name, texture);
   }
 
-  @Override public boolean isFenceGate() {
+  @Override protected boolean isFence() {
     return true;
   }
 
-  @Override public boolean isFenceConnector(int data, int direction) {
-    if (direction == BlockData.NORTH || direction == BlockData.SOUTH) {
-      return (data & 0x1) != 0;
-    } else {
-      return (data & 0x1) == 0;
-    }
+  @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
+    return false;
   }
 
-  @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
-    if (direction == BlockData.NORTH || direction == BlockData.SOUTH) {
-      return (data & 0x1) != 0;
-    } else {
-      return (data & 0x1) == 0;
-    }
+  @Override public boolean isGlassPaneConnector(int data, int direction) {
+    return false;
+  }
+
+  @Override public boolean isIronBarsConnector(int data, int direction) {
+    return false;
   }
 
   @Override public boolean isStoneWallConnector(int data, int direction) {
-    if (direction == BlockData.NORTH || direction == BlockData.SOUTH) {
-      return (data & 0x1) != 0;
-    } else {
-      return (data & 0x1) == 0;
-    }
+    return false;
   }
 }

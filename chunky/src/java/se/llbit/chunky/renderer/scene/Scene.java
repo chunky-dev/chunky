@@ -18,6 +18,15 @@ package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.chunk.WaterBlockSpec;
+import se.llbit.chunky.idblock.IdBlock;
+import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.entity.ArmorStand;
+import se.llbit.chunky.entity.Entity;
+import se.llbit.chunky.entity.PaintingEntity;
+import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.Postprocess;
@@ -29,8 +38,6 @@ import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.world.Biomes;
-import se.llbit.chunky.block.Block;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.EmptyWorld;
@@ -39,15 +46,6 @@ import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
-import se.llbit.chunky.entity.ArmorStand;
-import se.llbit.chunky.entity.StandingBanner;
-import se.llbit.chunky.entity.Entity;
-import se.llbit.chunky.entity.PaintingEntity;
-import se.llbit.chunky.entity.PlayerEntity;
-import se.llbit.chunky.entity.SignEntity;
-import se.llbit.chunky.entity.SkullEntity;
-import se.llbit.chunky.entity.WallBanner;
-import se.llbit.chunky.entity.WallSignEntity;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -283,11 +281,6 @@ public class Scene implements JsonSerializable, Refreshable {
   private BVH bvh = new BVH(Collections.emptyList());
   private BVH actorBvh = new BVH(Collections.emptyList());
 
-  // Chunk loading buffers.
-  private final byte[] blocks = new byte[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
-  private final byte[] biomes = new byte[Chunk.X_MAX * Chunk.Z_MAX];
-  private final byte[] data = new byte[(Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX) / 2];
-
   /**
    * Preview frame interlacing counter.
    */
@@ -336,6 +329,9 @@ public class Scene implements JsonSerializable, Refreshable {
     sppTarget = PersistentSettings.getSppTargetDefault();
 
     worldOctree = new Octree(1);
+  }
+
+  private void addToPalette(IdBlock block) {
   }
 
   /**
@@ -640,7 +636,7 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void updateOpacity(Ray ray) {
-    if (ray.getCurrentMaterial().isWater() || (ray.getCurrentMaterial() == Block.AIR
+    if (ray.getCurrentMaterial().isWater() || (ray.getCurrentMaterial() == Air.INSTANCE
         && ray.getPrevMaterial().isWater())) {
       if (useCustomWaterColor) {
         ray.color.x = waterColor.x;
@@ -713,13 +709,13 @@ public class Scene implements JsonSerializable, Refreshable {
         for (int x = 0; x < (1 << worldOctree.depth); ++x) {
           for (int z = 0; z < (1 << worldOctree.depth); ++z) {
             for (int y = -origin.y; y < (-origin.y) + waterHeight - 1; ++y) {
-              worldOctree.set(Block.WATER_ID | (1 << WaterModel.FULL_BLOCK), x, y, z);
+              worldOctree.set(IdBlock.WATER_ID | (1 << WaterModel.FULL_BLOCK), x, y, z);
             }
           }
         }
         for (int x = 0; x < (1 << worldOctree.depth); ++x) {
           for (int z = 0; z < (1 << worldOctree.depth); ++z) {
-            worldOctree.set(Block.WATER_ID, x, (-origin.y) + waterHeight - 1, z);
+            worldOctree.set(IdBlock.WATER_ID, x, (-origin.y) + waterHeight - 1, z);
           }
         }
       }
@@ -767,6 +763,12 @@ public class Scene implements JsonSerializable, Refreshable {
     int yMin = Math.max(0, yClipMin);
     int yMax = Math.min(256, yClipMax);
 
+    int[] blocks = new int[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
+    byte[] biomes = new byte[Chunk.X_MAX * Chunk.Z_MAX];
+
+    BlockPalette palette = worldOctree.palette;
+    Block stone = palette.stone;
+
     try (TaskTracker.Task task = progress.task("Loading chunks")) {
       int done = 1;
       int target = chunksToLoad.size();
@@ -782,7 +784,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
         Collection<CompoundTag> tileEntities = new LinkedList<>();
         Collection<CompoundTag> chunkEntities = new LinkedList<>();
-        world.getChunk(cp).getBlockData(blocks, data, biomes, tileEntities, chunkEntities);
+        world.getChunk(cp).getBlockData(blocks, biomes, tileEntities, chunkEntities,
+            palette);
         numChunks += 1;
 
         int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
@@ -826,146 +829,38 @@ public class Scene implements JsonSerializable, Refreshable {
             for (int cx = 0; cx < 16; ++cx) {
               int x = cx + cp.x * 16 - origin.x;
               int index = Chunk.chunkIndex(cx, cy, cz);
-              int blockId = blocks[index];
-              Block block = Block.get(blockId);
+              Block block = palette.get(blocks[index]);
 
+              // TODO: is this code duplicated in OctreeFinalizer?
               if (cx > 0 && cx < 15 && cz > 0 && cz < 15 && cy > 0 && cy < 255 &&
-                  blockId != Block.STONE_ID && block.opaque) {
-
+                  block != stone && block.opaque) {
                 // Set obscured blocks to stone. This makes adjacent obscured
-                // blocks be able to be merged into larger octree nodes
+                // blocks able to be merged into larger octree nodes
                 // even if they had different block types originally.
-                if (Block.get(blocks[index - 1]).opaque &&
-                    Block.get(blocks[index + 1]).opaque &&
-                    Block.get(blocks[index - Chunk.X_MAX]).opaque &&
-                    Block.get(blocks[index + Chunk.X_MAX]).opaque &&
-                    Block.get(blocks[index - Chunk.X_MAX * Chunk.Z_MAX]).opaque &&
-                    Block.get(blocks[index + Chunk.X_MAX * Chunk.Z_MAX]).opaque) {
-                  worldOctree.set(Block.STONE_ID, x, cy - origin.y, z);
+                Block b1 = palette.get(blocks[index - 1]),
+                    b2 = palette.get(blocks[index + 1]),
+                    b3 = palette.get(blocks[index - Chunk.X_MAX]),
+                    b4 = palette.get(blocks[index + Chunk.X_MAX]),
+                    b5 = palette.get(blocks[index - Chunk.X_MAX * Chunk.Z_MAX]),
+                    b6 = palette.get(blocks[index + Chunk.X_MAX * Chunk.Z_MAX]);
+                if (b1.opaque && b2.opaque && b3.opaque && b4.opaque && b5.opaque && b6.opaque) {
+                  block = palette.stone;
+                  blocks[index] = palette.stoneId;
                   continue;
                 }
               }
-
-              int metadata = 0xFF & data[index / 2];
-              metadata >>= (cx % 2) * 4;
-              metadata &= 0xF;
-
-              int type = block.id;
-              // Store metadata.
-              switch (block.id) {
-                case Block.VINES_ID:
-                  if (cy < 255) {
-                    // Is this the top vine block?
-                    index = Chunk.chunkIndex(cx, cy + 1, cz);
-                    Block above = Block.get(blocks[index]);
-                    if (above.solid) {
-                      type = type | (1 << BlockData.VINE_TOP);
-                    }
-                  }
-                  break;
-
-                case Block.STATIONARYWATER_ID:
-                  type = Block.WATER_ID;
-                case Block.WATER_ID:
-                  if (cy < 255) {
-                    // Is there water above?
-                    index = Chunk.chunkIndex(cx, cy + 1, cz);
-                    Block above = Block.get(blocks[index]);
-                    if (above.isWater()) {
-                      type |= (1 << WaterModel.FULL_BLOCK);
-                    } else if (above == Block.get(Block.LILY_PAD_ID)) {
-                      type |= (1 << BlockData.LILY_PAD);
-                      long wx = cp.x * 16L + cx;
-                      long wy = cy + 1;
-                      long wz = cp.z * 16L + cz;
-                      long pr = MinecraftPRNG.rand(wx, wy, wz);
-                      int dir = 3 & (int) (pr >> 16);
-                      type |= (dir << BlockData.LILY_PAD_ROTATION);
-                    }
-                  }
-                  break;
-
-                case Block.FIRE_ID: {
-                  long wx = cp.x * 16L + cx;
-                  long wy = cy + 1;
-                  long wz = cp.z * 16L + cz;
-                  long pr = MinecraftPRNG.rand(wx, wy, wz);
-                  int dir = 0xF & (int) (pr >> 16);
-                  type |= (dir << BlockData.LILY_PAD_ROTATION);
+              if (cy + 1 < yMax && block.isWater()) {
+                int above = Chunk.chunkIndex(cx, cy + 1, cz);
+                Block aboveBlock = palette.get(blocks[above]);
+                if (aboveBlock.isWater()) {
+                  blocks[index] = worldOctree.palette.put(new WaterBlockSpec(0, 1, 0, 0, 0, 0));
                 }
-                break;
-
-                case Block.STATIONARYLAVA_ID:
-                  type = Block.LAVA_ID;
-                case Block.LAVA_ID:
-                  if (cy < 255) {
-                    // Is there lava above?
-                    index = Chunk.chunkIndex(cx, cy + 1, cz);
-                    Block above = Block.get(blocks[index]);
-                    if (above.isLava()) {
-                      type = type | (1 << WaterModel.FULL_BLOCK);
-                    }
-                  }
-                  break;
-
-                case Block.GRASS_ID:
-                  if (cy < 255) {
-                    // Is it snow covered?
-                    index = Chunk.chunkIndex(cx, cy + 1, cz);
-                    int blockAbove = 0xFF & blocks[index];
-                    if (blockAbove == Block.SNOW_ID) {
-                      type = type | (1 << 8);// 9th bit is the snow bit
-                    }
-                  }
-                  // Fallthrough!
-
-                case Block.WOODENDOOR_ID:
-                case Block.IRONDOOR_ID:
-                case Block.SPRUCEDOOR_ID:
-                case Block.BIRCHDOOR_ID:
-                case Block.JUNGLEDOOR_ID:
-                case Block.ACACIADOOR_ID:
-                case Block.DARKOAKDOOR_ID: {
-                  int top = 0;
-                  int bottom = 0;
-                  if ((metadata & 8) != 0) {
-                    // This is the top part of the door.
-                    top = metadata;
-                    if (cy > 0) {
-                      bottom = 0xFF & data[Chunk.chunkIndex(cx, cy - 1, cz) / 2];
-                      bottom >>= (cx % 2) * 4; // Extract metadata.
-                      bottom &= 0xF;
-                    }
-                  } else {
-                    // This is the bottom part of the door.
-                    bottom = metadata;
-                    if (cy < 255) {
-                      top = 0xFF & data[Chunk.chunkIndex(cx, cy + 1, cz) / 2];
-                      top >>= (cx % 2) * 4; // Extract metadata.
-                      top &= 0xF;
-                    }
-                  }
-                  type |= (top << BlockData.DOOR_TOP);
-                  type |= (bottom << BlockData.DOOR_BOTTOM);
-                  break;
-                }
-
-                case Block.BED_ID:
-                  // Set default bed color (for pre-1.12 worlds).
-                  type |= BlockData.COLOR_RED << BlockData.BED_COLOR;
-                  break;
-
-                default:
-                  break;
               }
-              type |= metadata << 8;
-              if (block.invisible) {
-                type = 0;
-              }
-              worldOctree.set(type,
+              worldOctree.set(blocks[index],
                   cx + cp.x * 16 - origin.x,
                   cy - origin.y,
                   cz + cp.z * 16 - origin.z);
+
             }
           }
         }
@@ -979,7 +874,7 @@ public class Scene implements JsonSerializable, Refreshable {
             int x = entityTag.get("x").intValue(0) - wx0; // Chunk-local coordinates.
             int z = entityTag.get("z").intValue(0) - wz0;
             int index = Chunk.chunkIndex(x, y, z);
-            int block = 0xFF & blocks[index];
+            /*int block = 0xFF & blocks[index];
             // Metadata is the old block data (to be replaced in future Minecraft versions?).
             int metadata = 0xFF & data[index / 2];
             metadata >>= (x % 2) * 4;
@@ -1014,7 +909,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 entities.add(new WallBanner(position, metadata, entityTag));
                 break;
               }
-            }
+            }*/
           }
         }
       }
@@ -1086,7 +981,7 @@ public class Scene implements JsonSerializable, Refreshable {
     final List<Primitive> primitives = new LinkedList<>();
 
     worldOctree.visit((data1, x, y, z, size) -> {
-      if ((data1 & 0xF) == Block.WATER_ID) {
+      if ((data1 & 0xF) == IdBlock.WATER_ID) {
         WaterModel.addPrimitives(primitives, data1, x, y, z, 1 << size);
       }
     });
@@ -1198,7 +1093,7 @@ public class Scene implements JsonSerializable, Refreshable {
     int zcenter = (zmax + zmin) / 2;
     for (int y = Chunk.Y_MAX - 1; y >= 0; --y) {
       int block = worldOctree.get(xcenter - origin.x, y - origin.y, zcenter - origin.z);
-      if (block != Block.AIR_ID) {
+      if (block != IdBlock.AIR_ID) {
         return new Vector3(xcenter, y + 5, zcenter);
       }
     }
@@ -1345,16 +1240,16 @@ public class Scene implements JsonSerializable, Refreshable {
     WorkerState state = new WorkerState();
     state.ray = ray;
     if (isInWater(ray)) {
-      ray.setCurrentMaterial(Block.get(Block.WATER_ID), 0);
+      ray.setCurrentMaterial(IdBlock.get(IdBlock.WATER_ID), 0);
     } else {
-      ray.setCurrentMaterial(Block.AIR, 0);
+      ray.setCurrentMaterial(Air.INSTANCE, 0);
     }
     camera.getTargetDirection(ray);
     ray.o.x -= origin.x;
     ray.o.y -= origin.y;
     ray.o.z -= origin.z;
     while (PreviewRayTracer.nextIntersection(this, ray)) {
-      if (ray.getCurrentMaterial() != Block.AIR) {
+      if (ray.getCurrentMaterial() != Air.INSTANCE) {
         return true;
       }
     }
@@ -2070,7 +1965,7 @@ public class Scene implements JsonSerializable, Refreshable {
           Block block = (Block) ray.getCurrentMaterial();
           buf.append(String.format("target: %.2f m\n", ray.distance));
           buf.append(String.format("[%X] %s (%s)\n", ray.getCurrentData(), block,
-              block.description(ray.getBlockData())));
+              block.description()));
         }
         Vector3 pos = camera.getPosition();
         buf.append(String.format("pos: (%.1f, %.1f, %.1f)", pos.x, pos.y, pos.z));
@@ -2211,8 +2106,8 @@ public class Scene implements JsonSerializable, Refreshable {
       int y = (int) QuickMath.floor(ray.o.y);
       int z = (int) QuickMath.floor(ray.o.z);
       int block = worldOctree.get(x, y, z);
-      return (block & 0xF) == Block.WATER_ID
-          && ((ray.o.y - y) < 0.875 || block == (Block.WATER_ID | (1 << WaterModel.FULL_BLOCK)));
+      return (block & 0xF) == IdBlock.WATER_ID
+          && ((ray.o.y - y) < 0.875 || block == (IdBlock.WATER_ID | (1 << WaterModel.FULL_BLOCK)));
     } else {
       return waterHeight > 0 && ray.o.y < waterHeight - 0.125;
     }
@@ -2771,10 +2666,10 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void importMaterials() {
-    Block.loadDefaultMaterialProperties();
+    IdBlock.loadDefaultMaterialProperties();
     ExtraMaterials.loadDefaultMaterialProperties();
-    Block.collections.forEach((name, coll) -> importMaterial(materials, name, coll));
-    Block.idMap.forEach((name, block) -> importMaterial(materials, name, block));
+    IdBlock.collections.forEach((name, coll) -> importMaterial(materials, name, coll));
+    IdBlock.idMap.forEach((name, block) -> importMaterial(materials, name, block));
     ExtraMaterials.idMap.forEach((name, block) -> importMaterial(materials, name, block));
   }
 

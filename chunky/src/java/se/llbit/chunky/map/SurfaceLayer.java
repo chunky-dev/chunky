@@ -17,9 +17,9 @@
 package se.llbit.chunky.map;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Biomes;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Heightmap;
@@ -54,24 +54,24 @@ public class SurfaceLayer extends BitmapLayer {
         if (dim != -1) {
           for (; y > 0; --y) {
             int block = 0xFF & blocksArray[Chunk.chunkIndex(x, y, z)];
-            if (block != Block.AIR.id)
+            if (block != IdBlock.AIR.id)
               break;
           }
         } else {
           // nether worlds have a ceiling that we want to skip
           for (; y > 1; --y) {
             int block = 0xFF & blocksArray[Chunk.chunkIndex(x, y, z)];
-            if (block != Block.AIR.id)
+            if (block != IdBlock.AIR.id)
               break;
           }
           for (; y > 1; --y) {
             int block = 0xFF & blocksArray[Chunk.chunkIndex(x, y, z)];
-            if (block == Block.AIR.id)
+            if (block == IdBlock.AIR.id)
               break;
           }
           for (; y > 1; --y) {
             int block = 0xFF & blocksArray[Chunk.chunkIndex(x, y, z)];
-            if (block != Block.AIR.id)
+            if (block != IdBlock.AIR.id)
               break;
           }
         }
@@ -79,7 +79,7 @@ public class SurfaceLayer extends BitmapLayer {
         float[] color = new float[4];
 
         for (; y >= 0 && color[3] < 1.f; ) {
-          Block block = Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
+          IdBlock block = IdBlock.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
           float[] blockColor = new float[4];
           int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
 
@@ -89,42 +89,42 @@ public class SurfaceLayer extends BitmapLayer {
 
           switch (block.id) {
 
-            case Block.LEAVES_ID:
-            case Block.LEAVES2_ID:
+            case IdBlock.LEAVES_ID:
+            case IdBlock.LEAVES2_ID:
               ColorUtil.getRGBComponents(Biomes.getFoliageColor(biomeId), blockColor);
               blockColor[3] = 1.f;// foliage colors don't include alpha
 
               y -= 1;
               break;
 
-            case Block.GRASS_ID:
-            case Block.VINES_ID:
-            case Block.TALLGRASS_ID:
+            case IdBlock.GRASS_ID:
+            case IdBlock.VINES_ID:
+            case IdBlock.TALLGRASS_ID:
               ColorUtil.getRGBComponents(Biomes.getGrassColor(biomeId), blockColor);
               blockColor[3] = 1.f;// grass colors don't include alpha
 
               y -= 1;
               break;
 
-            case Block.ICE_ID:
+            case IdBlock.ICE_ID:
               ColorUtil.getRGBAComponents(block.getTexture(data).getAvgColor(), blockColor);
               color = blend(color, blockColor);
               y -= 1;
 
               for (; y >= 0; --y) {
-                if (Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]).opaque) {
+                if (IdBlock.get(blocksArray[Chunk.chunkIndex(x, y, z)]).opaque) {
                   ColorUtil.getRGBAComponents(block.getTexture(data).getAvgColor(), blockColor);
                   break;
                 }
               }
               break;
 
-            case Block.WATER_ID:
-            case Block.STATIONARYWATER_ID:
+            case IdBlock.WATER_ID:
+            case IdBlock.STATIONARYWATER_ID:
               int depth = 1;
               y -= 1;
               for (; y >= 0; --y) {
-                Block block1 = Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
+                IdBlock block1 = IdBlock.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
                 if (!block1.isWater())
                   break;
                 depth += 1;

@@ -16,8 +16,9 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.renderer.WorkerState;
-import se.llbit.chunky.block.Block;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
@@ -32,9 +33,9 @@ public class PreviewRayTracer implements RayTracer {
   @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
     if (scene.isInWater(ray)) {
-      ray.setCurrentMaterial(Block.get(Block.WATER_ID), 0);
+      ray.setCurrentMaterial(IdBlock.get(IdBlock.WATER_ID), 0);
     } else {
-      ray.setCurrentMaterial(Block.AIR, 0);
+      ray.setCurrentMaterial(Air.INSTANCE, 0);
     }
     while (true) {
       if (!nextIntersection(scene, ray)) {
@@ -42,14 +43,14 @@ public class PreviewRayTracer implements RayTracer {
           break;
         }
         break;
-      } else if (ray.getCurrentMaterial() != Block.AIR && ray.color.w > 0) {
+      } else if (ray.getCurrentMaterial() != Air.INSTANCE && ray.color.w > 0) {
         break;
       } else {
         ray.o.scaleAdd(Ray.OFFSET, ray.d);
       }
     }
 
-    if (ray.getCurrentMaterial() == Block.AIR) {
+    if (ray.getCurrentMaterial() == Air.INSTANCE) {
       scene.sky.getSkySpecularColor(ray);
     } else {
       scene.sun.flatShading(ray);
@@ -98,7 +99,7 @@ public class PreviewRayTracer implements RayTracer {
       scene.updateOpacity(ray);
       return true;
     } else {
-      ray.setCurrentMaterial(Block.AIR, 0);
+      ray.setCurrentMaterial(Air.INSTANCE, 0);
       return false;
     }
   }
@@ -111,9 +112,9 @@ public class PreviewRayTracer implements RayTracer {
         vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
         if (!scene.isInsideOctree(vec)) {
           ray.t = t;
-          Block.get(Block.WATER_ID).getColor(ray);
+          IdBlock.get(IdBlock.WATER_ID).getColor(ray);
           ray.n.set(0, 1, 0);
-          ray.setCurrentMaterial(Block.get(Block.WATER_ID), 0);
+          ray.setCurrentMaterial(IdBlock.get(IdBlock.WATER_ID), 0);
           return true;
         }
       }
@@ -125,9 +126,9 @@ public class PreviewRayTracer implements RayTracer {
         vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
         if (!scene.isInsideOctree(vec)) {
           ray.t = t;
-          Block.get(Block.WATER_ID).getColor(ray);
+          IdBlock.get(IdBlock.WATER_ID).getColor(ray);
           ray.n.set(0, -1, 0);
-          ray.setCurrentMaterial(Block.AIR, 0);
+          ray.setCurrentMaterial(Air.INSTANCE, 0);
           return true;
         }
       }
@@ -151,7 +152,7 @@ public class PreviewRayTracer implements RayTracer {
           } else {
             ray.color.set(0.25, 0.25, 0.25, 1);
           }
-          ray.setCurrentMaterial(Block.get(Block.STONE_ID), 0);
+          ray.setCurrentMaterial(IdBlock.get(IdBlock.STONE_ID), 0);
           ray.n.set(0, 1, 0);
           return true;
         }

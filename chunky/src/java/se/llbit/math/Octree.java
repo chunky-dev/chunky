@@ -22,10 +22,13 @@ import java.io.IOException;
 
 import org.apache.commons.math3.util.FastMath;
 
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.UnknownBlock;
+import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.Material;
 
 /**
@@ -153,6 +156,8 @@ public class Octree {
   private int cz = 0;
   private int cacheLevel;
 
+  public BlockPalette palette = new BlockPalette();
+
   /**
    * Create a new Octree. The dimensions of the Octree
    * are 2^levels.
@@ -236,6 +241,12 @@ public class Octree {
           cache[cacheLevel + 1].children[((cx & 1) << 2) | ((cy & 1) << 1) | (cz & 1)];
     }
     return type;
+  }
+
+  public Material getMaterial(int x, int y, int z) {
+    int type = get(x, y, z);
+    if (type == -1) return UnknownBlock.UNKNOWN;
+    return palette.get(type);
   }
 
   /**
@@ -388,7 +399,7 @@ public class Octree {
         node = node.children[((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)];
       }
 
-      Block currentBlock = Block.get(node.type);
+      Block currentBlock = palette.get(node.type);
       Material prevBlock = ray.getCurrentMaterial();
 
       ray.setPrevMaterial(prevBlock, ray.getCurrentData());
@@ -404,11 +415,11 @@ public class Octree {
           continue;
         } else {
           // Exit ray from this local block.
-          ray.setCurrentMaterial(Block.AIR, 0); // Current material is air.
+          ray.setCurrentMaterial(Air.INSTANCE, 0); // Current material is air.
           ray.exitBlock(x, y, z);
           continue;
         }
-      } else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Block.AIR) {
+      } else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Air.INSTANCE) {
         TexturedBlockModel.getIntersectionColor(ray);
         return true;
       }
@@ -464,7 +475,6 @@ public class Octree {
   }
 
   private boolean exitWater(Scene scene, Ray ray) {
-
     int level;
     Octree.Node node;
     boolean first = true;
@@ -554,7 +564,7 @@ public class Octree {
         node = node.children[((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)];
       }
 
-      Block currentBlock = Block.get(node.type);
+      Block currentBlock = palette.get(node.type);
       Material prevBlock = ray.getCurrentMaterial();
 
       ray.setPrevMaterial(prevBlock, ray.getCurrentData());
@@ -563,10 +573,10 @@ public class Octree {
       if (!currentBlock.isWater()) {
         if (currentBlock.localIntersect) {
           if (!currentBlock.intersect(ray, scene)) {
-            ray.setCurrentMaterial(Block.AIR, 0);
+            ray.setCurrentMaterial(Air.INSTANCE, 0);
           }
           return true;
-        } else if (currentBlock != Block.AIR) {
+        } else if (currentBlock != Air.INSTANCE) {
           TexturedBlockModel.getIntersectionColor(ray);
           return true;
         } else {
@@ -577,7 +587,7 @@ public class Octree {
       // Exit current octree leaf.
       if ((node.type & (1 << WaterModel.FULL_BLOCK)) == 0) {
         if (WaterModel.intersectTop(ray)) {
-          ray.setCurrentMaterial(Block.AIR, 0);
+          ray.setCurrentMaterial(Air.INSTANCE, 0);
           return true;
         } else {
           ray.exitBlock(x, y, z);

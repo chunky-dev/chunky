@@ -17,9 +17,10 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -44,9 +45,9 @@ public class PathTracer implements RayTracer {
   @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
     if (scene.isInWater(ray)) {
-      ray.setCurrentMaterial(Block.get(Block.WATER_ID), 0);
+      ray.setCurrentMaterial(IdBlock.get(IdBlock.WATER_ID), 0);
     } else {
-      ray.setCurrentMaterial(Block.AIR, 0);
+      ray.setCurrentMaterial(Air.INSTANCE, 0);
     }
     pathTrace(scene, ray, state, 1, true);
   }
@@ -97,10 +98,10 @@ public class PathTracer implements RayTracer {
       Material prevMat = ray.getPrevMaterial();
 
       if (!scene.stillWater && ray.n.y != 0 &&
-          ((currentMat.isWater() && prevMat == Block.AIR)
-              || (currentMat == Block.AIR && prevMat.isWater()))) {
+          ((currentMat.isWater() && prevMat == Air.INSTANCE)
+              || (currentMat == Air.INSTANCE && prevMat.isWater()))) {
         WaterModel.doWaterDisplacement(ray);
-        if (currentMat == Block.AIR) {
+        if (currentMat == Air.INSTANCE) {
           ray.n.y = -ray.n.y;
         }
       }
@@ -112,7 +113,7 @@ public class PathTracer implements RayTracer {
       float n1 = prevMat.ior;
       float n2 = currentMat.ior;
 
-      if (prevMat == Block.AIR) {
+      if (prevMat == Air.INSTANCE) {
         airDistance = ray.distance;
       }
 
@@ -228,7 +229,7 @@ public class PathTracer implements RayTracer {
 
           // TODO: make this decision dependent on the material properties:
           boolean doRefraction = currentMat.isWater() || prevMat.isWater() ||
-              currentMat == Block.get(Block.ICE_ID) || prevMat == Block.get(Block.ICE_ID);
+              currentMat == IdBlock.get(IdBlock.ICE_ID) || prevMat == IdBlock.get(IdBlock.ICE_ID);
 
           // Refraction.
           float n1n2 = n1 / n2;
@@ -358,7 +359,7 @@ public class PathTracer implements RayTracer {
           Ray.EPSILON, airDistance - Ray.EPSILON);
       atmos.o.scaleAdd(offset, od, ox);
       sun.getRandomSunDirection(atmos, random);
-      atmos.setCurrentMaterial(Block.AIR, 0);
+      atmos.setCurrentMaterial(Air.INSTANCE, 0);
 
       double fogDensity = scene.getFogDensity() * EXTINCTION_FACTOR;
       double extinction = Math.exp(-airDistance * fogDensity);

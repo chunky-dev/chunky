@@ -16,8 +16,8 @@
  */
 package se.llbit.chunky.model;
 
+import se.llbit.chunky.block.Air;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.block.Block;
 import se.llbit.math.AABB;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -130,7 +130,7 @@ public class TexturedBlockModel {
    * @param ray ray to test
    */
   public static void getIntersectionColor(Ray ray) {
-    if (ray.getCurrentMaterial() == Block.AIR) {
+    if (ray.getCurrentMaterial() == Air.INSTANCE) {
       ray.color.x = 1;
       ray.color.y = 1;
       ray.color.z = 1;

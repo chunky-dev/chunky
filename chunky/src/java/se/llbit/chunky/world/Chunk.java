@@ -16,7 +16,8 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.block.Block;
+import se.llbit.chunky.idblock.IdBlock;
+import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
 import se.llbit.chunky.map.IconLayer;
@@ -248,10 +249,32 @@ public class Chunk {
     return version;
   }
 
-  static Set<String> logged = new HashSet<>();
-
+  // OLD
   private void extractChunkData(@NotNull Map<String, Tag> data, @NotNull byte[] blocks,
       @NotNull byte[] blockData) {
+    Tag sections = data.get(LEVEL_SECTIONS);
+    if (sections.isList()) {
+      for (SpecificTag section : sections.asList()) {
+        Tag yTag = section.get("Y");
+        int yOffset = yTag.byteValue() & 0xFF;
+        if (!section.get("Palette").isList()) {
+          Tag blocksTag = section.get("Blocks");
+          if (blocksTag.isByteArray(SECTION_BYTES)) {
+            System.arraycopy(blocksTag.byteArray(), 0, blocks, SECTION_BYTES * yOffset,
+                SECTION_BYTES);
+          }
+          Tag dataTag = section.get("Data");
+          if (dataTag.isByteArray(SECTION_HALF_NIBBLES)) {
+            System.arraycopy(dataTag.byteArray(), 0, blockData, SECTION_HALF_NIBBLES * yOffset,
+                SECTION_HALF_NIBBLES);
+          }
+        }
+      }
+    }
+  }
+
+  private void loadBlockData(@NotNull Map<String, Tag> data, @NotNull int[] blocks,
+      BlockPalette blockPalette) {
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
@@ -271,10 +294,12 @@ public class Chunk {
           Tag blockStates = section.get("BlockStates");
 
           if (blockStates.isLongArray(dataSize)) {
-            int[] bp = new int[palette.size()];
-            int[] bd = new int[palette.size()];
+            int[] subpalette = new int[palette.size()];
             int paletteIndex = 0;
             for (Tag item : palette.asList()) {
+              subpalette[paletteIndex] = blockPalette.put(item);
+              paletteIndex += 1;
+              /*
               String name = item.asCompound().get("Name").stringValue("");
               if (name.startsWith("minecraft:")) {
                 Block block;
@@ -337,21 +362,21 @@ public class Chunk {
                   }
                 }
                 bp[paletteIndex++] = block.id;
-              }
+              }*/
             }
             BitBuffer buffer = new BitBuffer(blockStates.longArray(), bpb);
             int offset = SECTION_BYTES * yOffset;
             for (int i = 0; i < SECTION_BYTES; ++i) {
               int b0 = buffer.read();
-              if (b0 < bp.length) {
-                blocks[offset] = (byte) bp[b0];
-                blockData[offset] = (byte) bd[b0];
+              if (b0 < subpalette.length) {
+                blocks[offset] = subpalette[b0];
               }
               offset += 1;
             }
           }
         } else {
-          Tag blocksTag = section.get("Blocks");
+          Log.error(">>> WIP <<< Old chunk format temp disabled.");
+          /*Tag blocksTag = section.get("Blocks");
           if (blocksTag.isByteArray(SECTION_BYTES)) {
             System.arraycopy(blocksTag.byteArray(), 0, blocks, SECTION_BYTES * yOffset,
                 SECTION_BYTES);
@@ -360,7 +385,7 @@ public class Chunk {
           if (dataTag.isByteArray(SECTION_HALF_NIBBLES)) {
             System.arraycopy(dataTag.byteArray(), 0, blockData, SECTION_HALF_NIBBLES * yOffset,
                 SECTION_HALF_NIBBLES);
-          }
+          }*/
         }
       }
     }
@@ -377,8 +402,8 @@ public class Chunk {
         int y = chunkHeightmap[z * 16 + x];
         y = Math.max(1, y - 1);
         for (; y > 1; --y) {
-          Block block = Block.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
-          if (block != Block.AIR && !block.isWater())
+          IdBlock block = IdBlock.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
+          if (block != IdBlock.AIR && !block.isWater())
             break;
         }
         heightmap.set(y, pos.x * 16 + x, pos.z * 16 + z);
@@ -429,19 +454,16 @@ public class Chunk {
    *
    * @param blocks block order: y, z, x.
    */
-  public synchronized void getBlockData(byte[] blocks, byte[] blockData, byte[] biomes,
-      Collection<CompoundTag> tileEntities, Collection<CompoundTag> entities) {
+  public synchronized void getBlockData(int[] blocks, byte[] biomes,
+      Collection<CompoundTag> tileEntities, Collection<CompoundTag> entities,
+      BlockPalette blockPalette) {
 
     for (int i = 0; i < CHUNK_BYTES; ++i) {
-      blocks[i] = 0;
+      blocks[i] = blockPalette.airId;
     }
 
     for (int i = 0; i < X_MAX * Z_MAX; ++i) {
       biomes[i] = 0;
-    }
-
-    for (int i = 0; i < (CHUNK_BYTES) / 2; ++i) {
-      blockData[i] = 0;
     }
 
     Set<String> request = new HashSet<>();
@@ -463,7 +485,7 @@ public class Chunk {
     }
     if (sections.isList() && tileEntitiesTag.isList()
         && entitiesTag.isList()) {
-      extractChunkData(data, blocks, blockData);
+      loadBlockData(data, blocks, blockPalette);
       ListTag list = (ListTag) entitiesTag;
       for (SpecificTag tag : list) {
         if (tag.isCompoundTag())

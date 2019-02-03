@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.block;
+package se.llbit.chunky.idblock;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
 
-public class Stairs extends Block {
+public class Stairs extends IdBlock {
   public Stairs(int id, String name, Texture texture) {
     super(id, name, texture);
   }
