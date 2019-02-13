@@ -358,10 +358,10 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
     int jobId = nextJob.getAndIncrement();
     if (jobId >= numJobs) {
       synchronized (this) {
-        do {
+        while (jobId >= numJobs) {
           wait();
           jobId = nextJob.getAndIncrement();
-        } while (jobId >= numJobs);
+        }
       }
     }
     return jobId;
