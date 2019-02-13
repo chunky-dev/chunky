@@ -1,5 +1,6 @@
 LATEST
 
+* Added new texture paths to support Minecraft 1.13+ resource packs.
 * Fixed deadlock issue in the renderer.
   Render workers could get deadlocked when waiting for the next frame to start
   rendering. This issue seems to be most common at the start of a render job.

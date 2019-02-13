@@ -34,13 +34,10 @@ import java.util.zip.ZipFile;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ShulkerTextureLoader extends TextureLoader {
-  private final SimpleTexture topLoader;
   private final String entityTexture;
   private final ShulkerTexture texture;
 
-  public ShulkerTextureLoader(String topTexture, String entityTexture,
-      ShulkerTexture texture) {
-    this.topLoader = new SimpleTexture(topTexture, texture.top);
+  public ShulkerTextureLoader(String entityTexture, ShulkerTexture texture) {
     this.entityTexture = entityTexture;
     this.texture = texture;
   }
@@ -55,12 +52,13 @@ public class ShulkerTextureLoader extends TextureLoader {
     int imgW = image.width;
     int scale = imgW / (16 * 4);
 
-    texture.bottom.setTexture(loadBottom(image, scale, 32, 28));
+    texture.top.setTexture(loadTopBottom(image, scale, 16, 0));
+    texture.bottom.setTexture(loadTopBottom(image, scale, 32, 28));
     texture.side.setTexture(loadSide(image, scale));
     return true;
   }
 
-  private static BitmapImage loadBottom(BitmapImage spritemap, int scale, int u, int v) {
+  private static BitmapImage loadTopBottom(BitmapImage spritemap, int scale, int u, int v) {
     BitmapImage image = new BitmapImage(scale * 16, scale * 16);
     int x0 = u * scale;
     int x1 = (u + 16) * scale;
@@ -126,8 +124,7 @@ public class ShulkerTextureLoader extends TextureLoader {
   }
 
   @Override public boolean load(ZipFile texturePack, String topLevelDir) {
-    return topLoader.load(texturePack, topLevelDir)
-        && load(topLevelDir + entityTexture, texturePack);
+    return load(topLevelDir + entityTexture, texturePack);
   }
 }
 
