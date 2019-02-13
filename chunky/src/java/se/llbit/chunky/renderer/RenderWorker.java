@@ -37,13 +37,13 @@ public class RenderWorker extends Thread {
    */
   private static final int SLEEP_INTERVAL = 75000000;
 
-  private final int id;
-  private final AbstractRenderManager manager;
+  protected final int id;
+  protected final AbstractRenderManager manager;
 
-  private final WorkerState state;
-  private final RayTracer previewRayTracer;
-  private final RayTracer rayTracer;
-  private long jobTime = 0;
+  protected final WorkerState state;
+  protected final RayTracer previewRayTracer;
+  protected final RayTracer rayTracer;
+  protected long jobTime = 0;
 
   /**
    * Create a new render worker, slave to a given render manager.
@@ -66,14 +66,12 @@ public class RenderWorker extends Thread {
 
   @Override public void run() {
     try {
-      try {
-        while (!isInterrupted()) {
-          work(manager.getNextJob());
-          manager.jobDone();
-        }
-      } catch (InterruptedException ignored) {
-        // Interrupted.
+      while (!isInterrupted()) {
+        work(manager.getNextJob());
+        manager.jobDone();
       }
+    } catch (InterruptedException ignored) {
+      // Interrupted.
     } catch (Throwable e) {
       Log.error("Render worker " + id +
           " crashed with uncaught exception.", e);

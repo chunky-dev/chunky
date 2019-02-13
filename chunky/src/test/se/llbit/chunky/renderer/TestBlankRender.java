@@ -1,4 +1,4 @@
-/* Copyright (c) 2017 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2017-2019 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -28,7 +28,6 @@ import se.llbit.math.Vector4;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -42,36 +41,6 @@ import static org.junit.Assert.fail;
 public class TestBlankRender {
   private static final int WIDTH = Math.max(10, Scene.MIN_CANVAS_WIDTH);
   private static final int HEIGHT = Math.max(10, Scene.MIN_CANVAS_HEIGHT);
-
-  static class MockSceneProvider implements SceneProvider {
-    private final Scene scene;
-    private boolean change = true;
-
-    public MockSceneProvider(Scene scene) {
-      this.scene = scene;
-    }
-
-    @Override
-    public synchronized ResetReason awaitSceneStateChange() throws InterruptedException {
-      while (!change) {
-        wait();
-      }
-      change = false;
-      return ResetReason.SCENE_LOADED;
-    }
-
-    @Override public synchronized boolean pollSceneStateChange() {
-      return change;
-    }
-
-    @Override public synchronized void withSceneProtected(Consumer<Scene> fun) {
-      fun.accept(scene);
-    }
-
-    @Override public synchronized void withEditSceneProtected(Consumer<Scene> fun) {
-      // Won't be edited by the scene manager.
-    }
-  }
 
   /**
    * Renders one sample per pixel and checks that the color values are
