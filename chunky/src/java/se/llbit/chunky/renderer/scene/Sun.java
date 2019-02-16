@@ -136,6 +136,8 @@ public class Sun implements JsonSerializable {
   // final to ensure that we don't do a lot of redundant re-allocation
   private final Vector3 color = new Vector3(1, 1, 1);
 
+  private boolean drawTexture = true;
+
   /**
    * Calculate skylight for ray using Preetham day sky model.
    */
@@ -197,6 +199,7 @@ public class Sun implements JsonSerializable {
     azimuth = other.azimuth;
     altitude = other.altitude;
     color.set(other.color);
+    drawTexture = other.drawTexture;
     intensity = other.intensity;
     initSun();
   }
@@ -257,12 +260,12 @@ public class Sun implements JsonSerializable {
   }
 
   /**
-   * Check if the ray intersects the sun>
+   * Check if the ray intersects the sun.
    *
    * @return <code>true</code> if the ray intersects the sun model
    */
   public boolean intersect(Ray ray) {
-    if (ray.d.dot(sw) < .5) {
+    if (!drawTexture || ray.d.dot(sw) < .5) {
       return false;
     }
 
@@ -364,6 +367,7 @@ public class Sun implements JsonSerializable {
     colorObj.add("green", color.y);
     colorObj.add("blue", color.z);
     sun.add("color", colorObj);
+    sun.add("drawTexture", drawTexture);
     return sun;
   }
 
@@ -379,6 +383,8 @@ public class Sun implements JsonSerializable {
       color.z = colorObj.get("blue").doubleValue(1);
     }
 
+    drawTexture = json.get("drawTexture").boolValue(drawTexture);
+
     initSun();
   }
 
@@ -387,5 +393,16 @@ public class Sun implements JsonSerializable {
    */
   public Vector3 getColor() {
     return new Vector3(color);
+  }
+
+  public void setDrawTexture(boolean value) {
+    if (value != drawTexture) {
+      drawTexture = value;
+      scene.refresh();
+    }
+  }
+
+  public boolean drawTexture() {
+    return drawTexture;
   }
 }

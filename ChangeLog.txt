@@ -1,5 +1,6 @@
 LATEST
 
+* Added option to disable sun texture in the Lighting tab.
 * Added new texture paths to support Minecraft 1.13+ resource packs.
 * Fixed deadlock issue in the renderer.
   Render workers could get deadlocked when waiting for the next frame to start

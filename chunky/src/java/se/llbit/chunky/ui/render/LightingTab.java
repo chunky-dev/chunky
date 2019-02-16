@@ -23,6 +23,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
@@ -49,6 +50,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private AngleAdjuster sunAltitude;
   @FXML private CheckBox enableEmitters;
   @FXML private CheckBox enableSunlight;
+  @FXML private CheckBox drawSun;
   @FXML private LuxColorPicker sunColor;
 
   private ChangeListener<Color> sunColorListener = (observable, oldValue, newValue) ->
@@ -96,6 +98,9 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
         (observable, oldValue, newValue) -> scene.setEmittersEnabled(newValue));
     enableSunlight.selectedProperty().addListener(
         (observable, oldValue, newValue) -> scene.setDirectLight(newValue));
+    drawSun.selectedProperty().addListener(
+        (observable, oldValue, newValue) -> scene.sun().setDrawTexture(newValue));
+    drawSun.setTooltip(new Tooltip("Draws the sun texture on top of the skymap."));
 
     sunColor.colorProperty().addListener(sunColorListener);
   }
@@ -112,6 +117,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunAltitude.set(QuickMath.radToDeg(scene.sun().getAltitude()));
     enableEmitters.setSelected(scene.getEmittersEnabled());
     enableSunlight.setSelected(scene.getDirectLight());
+    drawSun.setSelected(scene.sun().drawTexture());
     sunColor.colorProperty().removeListener(sunColorListener);
     sunColor.setColor(ColorUtil.toFx(scene.sun().getColor()));
     sunColor.colorProperty().addListener(sunColorListener);
