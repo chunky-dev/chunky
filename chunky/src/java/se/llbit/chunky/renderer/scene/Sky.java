@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2018 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2019 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -17,12 +17,13 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.resources.HDRTexture;
 import se.llbit.chunky.resources.PFMTexture;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.Clouds;
 import se.llbit.chunky.world.SkymapTexture;
+import se.llbit.chunky.world.material.CloudMaterial;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -818,7 +819,7 @@ public class Sky implements JsonSerializable {
       if (inCloud((ray.d.x * t_offset + ox) * inv_size + offsetX,
           (ray.d.z * t_offset + oz) * inv_size + offsetZ)) {
         ray.n.set(0, -Math.signum(ray.d.y), 0);
-        onCloudEnter(ray, t_offset);
+        enterCloud(ray, t_offset);
         return true;
       }
     } else if (inCloud(ox * inv_size + offsetX, oz * inv_size + offsetZ)) {
@@ -939,7 +940,7 @@ public class Sky implements JsonSerializable {
         return false;
       }
       ray.n.set(nx, ny, nz);
-      onCloudEnter(ray, t + t_offset);
+      enterCloud(ray, t + t_offset);
       return true;
     } else {
       if (t > tExit) {
@@ -952,23 +953,21 @@ public class Sky implements JsonSerializable {
         nz = -nz;
       }
       ray.n.set(nx, ny, nz);
-      onCloudExit(ray, t);
+      exitCloud(ray, t);
     }
     return true;
   }
 
-  private static void onCloudEnter(Ray ray, double t) {
+  private static void enterCloud(Ray ray, double t) {
     ray.t = t;
-    ray.color.set(1, 1, 1, 1);
-    ray.setCurrentMaterial(Block.get(Block.STONE_ID), 0);
-    // TODO add Cloud material
+    ray.color.set(CloudMaterial.color);
+    ray.setCurrentMaterial(CloudMaterial.INSTANCE, 0);
   }
 
-  private static void onCloudExit(Ray ray, double t) {
+  private static void exitCloud(Ray ray, double t) {
     ray.t = t;
-    ray.color.set(1, 1, 1, 1);
+    ray.color.set(CloudMaterial.color);
     ray.setCurrentMaterial(Block.AIR, 0);
-    // TODO add Cloud material
   }
 
   private static boolean inCloud(double x, double z) {
