@@ -12,7 +12,7 @@
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.llbit.chunky.ui.SceneChooserController">
    <children>
       <Label text="Select scene to load:" />
-      <TableView fx:id="sceneTbl" maxHeight="1.7976931348623157E308" prefHeight="293.0">
+      <TableView fx:id="sceneTbl" maxHeight="1.7976931348623157E308" prefHeight="293.0" VBox.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="nameCol" prefWidth="120.0" text="Name" />
           <TableColumn fx:id="chunkCountCol" prefWidth="88.0" text="Chunks" />
