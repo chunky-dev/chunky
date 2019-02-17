@@ -2781,6 +2781,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void importMaterials() {
     Block.loadDefaultMaterialProperties();
+    ExtraMaterials.loadDefaultMaterialProperties();
     Block.collections.forEach((name, coll) -> importMaterial(materials, name, coll));
     Block.idMap.forEach((name, block) -> importMaterial(materials, name, block));
     ExtraMaterials.idMap.forEach((name, block) -> importMaterial(materials, name, block));
