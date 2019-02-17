@@ -41,6 +41,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initializable {
+  private RenderControlsFxController renderControls;
   private RenderController controller;
   private Scene scene;
 
@@ -63,8 +64,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override public void initialize(URL location, ResourceBundle resources) {
     outputMode.getItems().addAll(OutputMode.values());
-    cpuLoad.setName("CPU load");
-    cpuLoad.setTooltip("CPU utilization percentage for rendering.");
+    cpuLoad.setName("CPU utilization");
+    cpuLoad.setTooltip("CPU utilization percentage per render thread.");
     cpuLoad.setRange(1, 100);
     cpuLoad.clampBoth();
     cpuLoad.onValueChange(value -> {
@@ -102,8 +103,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     renderThreads.setRange(1, 20);
     renderThreads.clampMin();
     renderThreads.onValueChange(value -> {
-      controller.getRenderer().setNumThreads(value);
       PersistentSettings.setNumRenderThreads(value);
+      renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
     });
   }
 
@@ -124,6 +125,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   }
 
   @Override public void setController(RenderControlsFxController controls) {
+    this.renderControls = controls;
     this.controller = controls.getRenderController();
     scene = controller.getSceneManager().getScene();
     controller.getRenderer().setOnRenderCompleted((time, sps) -> {

@@ -63,12 +63,13 @@ public abstract class AbstractRenderManager extends Thread {
   public int cpuLoad = PersistentSettings.getCPULoad();
 
   /**
-   * Get a job from the job queue.
+   * Get a job from the job queue. The job describes the
+   * next tile to be rendered.
    *
-   * @return Next job Id
+   * @return description of tile to be rendered.
    * @throws InterruptedException
    */
-  public abstract int getNextJob() throws InterruptedException;
+  public abstract RenderTile getNextJob() throws InterruptedException;
 
   /**
    * Report finished job.

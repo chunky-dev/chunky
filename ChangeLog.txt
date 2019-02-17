@@ -1,5 +1,7 @@
 LATEST
 
+* The render thread count setting now takes effect after restarting Chunky.
+* Fixed concurrency issues in the renderer.
 * Fixed issue causing the renderer to hang if clouds were enabled.
 * Added option to disable sun texture in the Lighting tab.
 * Added new texture paths to support Minecraft 1.13+ resource packs.

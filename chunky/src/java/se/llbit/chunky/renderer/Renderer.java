@@ -40,11 +40,6 @@ public interface Renderer {
   void setCPULoad(int loadPercent);
 
   /**
-   * Instructs the renderer to use the specified number of worker threads.
-   */
-  void setNumThreads(int numThreads);
-
-  /**
    * Set a listener for render completion.
    *
    * @param listener a listener which is passed the total rendering

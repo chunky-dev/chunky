@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2019 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -33,7 +33,7 @@ import java.util.Random;
 public class RenderWorker extends Thread {
 
   /**
-   * Sleep interval (in ns)
+   * Sleep interval (in ns).
    */
   private static final int SLEEP_INTERVAL = 75000000;
 
@@ -67,8 +67,20 @@ public class RenderWorker extends Thread {
   @Override public void run() {
     try {
       while (!isInterrupted()) {
+        long jobStart = System.nanoTime();
         work(manager.getNextJob());
+        jobTime += System.nanoTime() - jobStart;
         manager.jobDone();
+
+        // Sleep to manage CPU utilization.
+        if (jobTime > SLEEP_INTERVAL) {
+          if (manager.cpuLoad < 100) {
+            // sleep = jobTime * (1-utilization) / utilization
+            double load = (100.0 - manager.cpuLoad) / manager.cpuLoad;
+            sleep((long) ((jobTime / 1000000.0) * load));
+          }
+          jobTime = 0;
+        }
       }
     } catch (InterruptedException ignored) {
       // Interrupted.
@@ -79,11 +91,11 @@ public class RenderWorker extends Thread {
   }
 
   /**
-   * Perform the rendering work for a single render job.
+   * Perform the rendering work for a single tile.
    *
-   * @throws InterruptedException interrupted while sleeping
+   * @param tile describes the tile to be rendered.
    */
-  private void work(int jobId) throws InterruptedException {
+  private void work(RenderTile tile) {
     Scene scene = manager.getBufferedScene();
 
     Random random = state.random;
@@ -95,22 +107,13 @@ public class RenderWorker extends Thread {
     double halfWidth = width / (2.0 * height);
     double invHeight = 1.0 / height;
 
-    // Calculate pixel bounds for this job.
-    int xjobs = (width + (manager.tileWidth - 1)) / manager.tileWidth;
-    int x0 = manager.tileWidth * (jobId % xjobs);
-    int x1 = Math.min(x0 + manager.tileWidth, width);
-    int y0 = manager.tileWidth * (jobId / xjobs);
-    int y1 = Math.min(y0 + manager.tileWidth, height);
-
     double[] samples = scene.getSampleBuffer();
     final Camera cam = scene.camera();
 
-    long jobStart = System.nanoTime();
-
     if (scene.getMode() != RenderMode.PREVIEW) {
-      for (int y = y0; y < y1; ++y) {
-        int offset = y * width * 3 + x0 * 3;
-        for (int x = x0; x < x1; ++x) {
+      for (int y = tile.y0; y < tile.y1; ++y) {
+        int offset = y * width * 3 + tile.x0 * 3;
+        for (int x = tile.x0; x < tile.x1; ++x) {
 
           double sr = 0;
           double sg = 0;
@@ -150,8 +153,8 @@ public class RenderWorker extends Thread {
       int ty = (int) QuickMath.floor(target.o.y + target.d.y * Ray.OFFSET);
       int tz = (int) QuickMath.floor(target.o.z + target.d.z * Ray.OFFSET);
 
-      for (int x = x0; x < x1; ++x)
-        for (int y = y0; y < y1; ++y) {
+      for (int x = tile.x0; x < tile.x1; ++x)
+        for (int y = tile.y0; y < tile.y1; ++y) {
 
           boolean firstFrame = scene.previewCount > 1;
           if (firstFrame) {
@@ -206,17 +209,7 @@ public class RenderWorker extends Thread {
               scene.copyPixel(y * width + x, -1);
             }
           }
-
         }
-    }
-    jobTime += System.nanoTime() - jobStart;
-    if (jobTime > SLEEP_INTERVAL) {
-      if (manager.cpuLoad < 100) {
-        // sleep = jobTime * (1-utilization) / utilization
-        double load = (100.0 - manager.cpuLoad) / manager.cpuLoad;
-        sleep((long) ((jobTime / 1000000.0) * load));
-      }
-      jobTime = 0;
     }
   }
 

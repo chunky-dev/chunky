@@ -23,6 +23,7 @@ import se.llbit.util.TaskTracker;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -53,8 +54,6 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
   private Thread[] workers = {};
 
-  private int numJobs = 0;
-
   /**
    * This scene state is used by render workers while rendering.
    * The buffered scene is only updated when the workers are
@@ -62,13 +61,14 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    */
   private final Scene bufferedScene;
 
-  /**
-   * Gives the next tile index for a worker.
-   */
+  /** Gives the next tile index for a worker. */
+  private volatile RenderTile[] tileQueue = new RenderTile[0];
+  private final Object jobMonitor = new Object();
+  private int numJobs = 0, lastJob = 0;
   private final AtomicInteger nextJob = new AtomicInteger(0);
 
-  /** Number of completed jobs. */
-  private final AtomicInteger finishedJobs = new AtomicInteger(0);
+  /** Latch for waiting on workers to finish the current frame. */
+  private CountDownLatch frameFinished = new CountDownLatch(Integer.MAX_VALUE);
 
   private Collection<RenderStatusListener> listeners = new ArrayList<>();
 
@@ -100,7 +100,12 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
     this.headless = headless;
     bufferedScene = context.getChunky().getSceneFactory().newScene();
 
-    manageWorkers();
+    long seed = System.currentTimeMillis();
+    workers = new Thread[numThreads];
+    for (int i = 0; i < numThreads; ++i) {
+      workers[i] = workerFactory.buildWorker(this, i, seed + i);
+      workers[i].start();
+    }
   }
 
   @Override public synchronized void addRenderListener(RenderStatusListener listener) {
@@ -109,27 +114,6 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
   @Override public void removeRenderListener(RenderStatusListener listener) {
     listeners.remove(listener);
-  }
-
-  private void manageWorkers() {
-    if (numThreads != workers.length) {
-      long seed = System.currentTimeMillis();
-      Thread[] pool = new Thread[numThreads];
-      int i;
-      for (i = 0; i < workers.length && i < numThreads; ++i) {
-        pool[i] = workers[i];
-      }
-      // Start additional workers.
-      for (; i < numThreads; ++i) {
-        pool[i] = workerFactory.buildWorker(this, i, seed + i);
-        pool[i].start();
-      }
-      // Stop extra workers.
-      for (; i < workers.length; ++i) {
-        workers[i].interrupt();
-      }
-      workers = pool;
-    }
   }
 
   @Override public void setCanvas(Repaintable canvas) {
@@ -159,6 +143,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
             }
           });
         }
+        initializeJobQueue();
 
         if (mode == RenderMode.PREVIEW) {
           previewLoop();
@@ -223,7 +208,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
       synchronized (bufferedScene) {
         long frameStart = System.currentTimeMillis();
-        giveTickets();
+        startNextFrame();
         waitOnWorkers();
         bufferedScene.swapBuffers();
         bufferedScene.renderTime += System.currentTimeMillis() - frameStart;
@@ -303,7 +288,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
       long renderTime;
       synchronized (bufferedScene) {
         frameStart = System.currentTimeMillis();
-        giveTickets();
+        startNextFrame();
         waitOnWorkers();
         bufferedScene.swapBuffers();
         sendSceneStatus(bufferedScene.sceneStatus());
@@ -329,51 +314,60 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
     }
   }
 
-  private synchronized void waitOnFrameCompletion() throws InterruptedException {
-    while (finishedJobs.get() < numJobs) {
-      wait();
+  /**
+   * Assign render jobs to tiles of the canvas.
+   */
+  private void initializeJobQueue() {
+    int canvasWidth = bufferedScene.canvasWidth();
+    int canvasHeight = bufferedScene.canvasHeight();
+    numJobs = ((canvasWidth + (tileWidth - 1)) / tileWidth)
+        * ((canvasHeight + (tileWidth - 1)) / tileWidth);
+    if (tileQueue.length != numJobs) {
+      tileQueue = new RenderTile[numJobs];
+    }
+    int xjobs = (canvasWidth + (tileWidth - 1)) / tileWidth;
+    for (int job = 0; job < numJobs; ++job) {
+      // Calculate pixel bounds for this job.
+      int x0 = tileWidth * (job % xjobs);
+      int x1 = Math.min(x0 + tileWidth, canvasWidth);
+      int y0 = tileWidth * (job / xjobs);
+      int y1 = Math.min(y0 + tileWidth, canvasHeight);
+      tileQueue[job] = new RenderTile(x0, x1, y0, y1);
     }
   }
 
-  private synchronized void waitOnWorkers() throws InterruptedException {
-    waitOnFrameCompletion();
-    manageWorkers();  // Adjust number of worker threads if needed.
+  private void waitOnWorkers() throws InterruptedException {
+    frameFinished.await();
   }
 
-  private synchronized void giveTickets() {
+  /**
+   * Adds new jobs to the job queue and releases the workers.
+   */
+  private void startNextFrame() {
     int nextSpp = bufferedScene.spp + RenderConstants.SPP_PER_PASS;
     bufferedScene.setBufferFinalization(finalizeAllFrames
         || snapshotControl.saveSnapshot(bufferedScene, nextSpp));
-
-    int canvasWidth = bufferedScene.canvasWidth();
-    int canvasHeight = bufferedScene.canvasHeight();
-    numJobs = ((canvasWidth + (tileWidth - 1)) / tileWidth) * ((canvasHeight + (tileWidth - 1))
-        / tileWidth);
-    nextJob.set(0);
-    finishedJobs.set(0);
-    notifyAll();
+    frameFinished = new CountDownLatch(numJobs);
+    synchronized (jobMonitor) {
+      lastJob += numJobs;
+      jobMonitor.notifyAll();
+    }
   }
 
-  @Override public int getNextJob() throws InterruptedException {
-    int jobId = nextJob.getAndIncrement();
-    if (jobId >= numJobs) {
-      synchronized (this) {
-        while (jobId >= numJobs) {
-          wait();
-          jobId = nextJob.getAndIncrement();
+  @Override public RenderTile getNextJob() throws InterruptedException {
+    int job = nextJob.getAndIncrement();
+    if (job >= lastJob) {
+      synchronized (jobMonitor) {
+        while (job >= lastJob) {
+          jobMonitor.wait();
         }
       }
     }
-    return jobId;
+    return tileQueue[lastJob - job - 1];
   }
 
   @Override public void jobDone() {
-    int finished = finishedJobs.incrementAndGet();
-    if (finished >= numJobs) {
-      synchronized (this) {
-        notifyAll();
-      }
-    }
+    frameFinished.countDown();
   }
 
   @Override public Scene getBufferedScene() {
@@ -385,15 +379,6 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    */
   @Override public void withBufferedImage(Consumer<BitmapImage> consumer) {
     bufferedScene.withBufferedImage(consumer);
-  }
-
-  /**
-   * Change number of render workers.
-   *
-   * @param threads new required thread count.
-   */
-  @Override public void setNumThreads(int threads) {
-    numThreads = Math.max(1, threads);
   }
 
   @Override public void setOnRenderCompleted(BiConsumer<Long, Integer> listener) {
