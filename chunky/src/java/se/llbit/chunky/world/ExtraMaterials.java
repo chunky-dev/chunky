@@ -14,17 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world.material;
+package se.llbit.chunky.world;
 
-import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.material.CloudMaterial;
 
-public class CloudMaterial extends Material {
-  public static final CloudMaterial INSTANCE = new CloudMaterial();
-  public static float[] color = {1, 1, 1, 1};
+import java.util.HashMap;
+import java.util.Map;
 
-  private CloudMaterial() {
-    super("cloud", Texture.air);
+public class ExtraMaterials {
+  public static final Map<String, Material> idMap = new HashMap<>();
+  static {
+    idMap.put("cloud", CloudMaterial.INSTANCE);
   }
-
 }

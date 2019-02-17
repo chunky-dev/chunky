@@ -33,6 +33,7 @@ import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.ExtraMaterials;
 import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.World;
@@ -2782,6 +2783,7 @@ public class Scene implements JsonSerializable, Refreshable {
     Block.loadDefaultMaterialProperties();
     Block.collections.forEach((name, coll) -> importMaterial(materials, name, coll));
     Block.idMap.forEach((name, block) -> importMaterial(materials, name, block));
+    ExtraMaterials.idMap.forEach((name, block) -> importMaterial(materials, name, block));
   }
 
   private void importMaterial(Map<String, JsonValue> propertyMap, String name, Material material) {
