@@ -960,7 +960,6 @@ public class Sky implements JsonSerializable {
   private static void onCloudEnter(Ray ray, double t) {
     ray.t = t;
     ray.color.set(1, 1, 1, 1);
-    ray.setPrevMaterial(Block.AIR, 0);
     ray.setCurrentMaterial(Block.get(Block.STONE_ID), 0);
     // TODO add Cloud material
   }
@@ -968,7 +967,6 @@ public class Sky implements JsonSerializable {
   private static void onCloudExit(Ray ray, double t) {
     ray.t = t;
     ray.color.set(1, 1, 1, 1);
-    ray.setPrevMaterial(Block.get(Block.STONE_ID), 0);
     ray.setCurrentMaterial(Block.AIR, 0);
     // TODO add Cloud material
   }
