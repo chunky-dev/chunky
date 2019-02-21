@@ -25,9 +25,13 @@ import java.io.File;
 public class LauncherSettings {
   private static final int DEFAULT_MEMORY_LIMIT = 1024;
   public static final String LAUNCHER_SETTINGS_FILE = "chunky-launcher.json";
+  public static final String DEFAULT_UPDATE_SITE = "http://chunkyupdate.llbit.se/";
 
   public String javaDir = "";
   public int memoryLimit = DEFAULT_MEMORY_LIMIT;
+
+  /** URL used for checking for new updates and downloading archives. */
+  public String updateSite = DEFAULT_UPDATE_SITE;
 
   /** Show the debugging console when launching Chunky. */
   public boolean debugConsole = false;
@@ -59,6 +63,7 @@ public class LauncherSettings {
       settings.load(new File(directory, LAUNCHER_SETTINGS_FILE));
     }
 
+    updateSite = settings.getString("updateSite", DEFAULT_UPDATE_SITE);
     javaDir = settings.getString("javaDir", "");
     if (javaDir.isEmpty()) {
       javaDir = settings.getString("javaExecutable", "");
@@ -88,6 +93,7 @@ public class LauncherSettings {
   }
 
   public void save() {
+    settings.setString("updateSite", updateSite);
     settings.setString("javaDir", javaDir);
     settings.setInt("memoryLimit", memoryLimit);
     settings.setBool("showConsole", debugConsole);

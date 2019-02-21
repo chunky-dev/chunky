@@ -268,7 +268,7 @@ public final class UpdateDialogController implements Initializable {
       this.callback = callback;
     }
 
-    @Override public DownloadStatus call() throws Exception {
+    @Override public DownloadStatus call() {
       DownloadStatus result = null;
       // First try to download using the URL specified for the library.
       if (!lib.url.isEmpty()) {
@@ -289,7 +289,7 @@ public final class UpdateDialogController implements Initializable {
       }
       // Using the library URL failed.
       // Try downloading the library from the default update site.
-      String defaultUrl = "http://chunkyupdate.llbit.se/lib/" + lib.name;
+      String defaultUrl = launcher.settings.updateSite + "lib/" + lib.name;
       if (result != DownloadStatus.SUCCESS) {
         result = ChunkyLauncher.tryDownload(libDir, lib, defaultUrl);
       }

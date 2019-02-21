@@ -47,14 +47,16 @@ public class UpdateChecker extends Thread {
         listener.noUpdateAvailable();
       }
     } catch (MalformedURLException e1) {
-      System.err.println("Malformed version info url");
-      listener.updateError("Failed to fetch latest version info online.");
+      System.err.println("Malformed version info URL.");
+      listener.updateError("Failed to fetch version info from update site."
+          + " Malformed version info URL.");
     } catch (IOException e1) {
       System.err.println("Failed to fetch version info " + e1.getMessage());
       listener.updateError(
-          "Failed to fetch latest version info online. The server may be down right now.");
+          "Failed to fetch version info from update site."
+              + " Either the server is down or the URL is wrong.");
     } catch (SyntaxError e1) {
-      System.err.println("Version info JSON error " + e1.getMessage());
+      System.err.println("Version info JSON error: " + e1.getMessage());
       listener.updateError("The downloaded version info was corrupt. Can not update at this time.");
     } catch (Throwable e1) {
       System.err.println("Uncaught exception: " + e1.getMessage());
@@ -65,10 +67,10 @@ public class UpdateChecker extends Thread {
   private boolean tryUpdate() throws IOException, SyntaxError {
     List<VersionInfo> candidates = new LinkedList<>();
 
-    candidates.add(getVersion("http://chunkyupdate.llbit.se/latest.json"));
+    candidates.add(getVersion(settings.updateSite + "latest.json"));
 
     if (settings.downloadSnapshots) {
-      candidates.add(getVersion("http://chunkyupdate.llbit.se/snapshot.json"));
+      candidates.add(getVersion(settings.updateSite + "snapshot.json"));
     }
 
     // Filter out corrupt versions.

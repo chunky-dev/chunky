@@ -49,9 +49,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final String LAUNCHER_VERSION = "v1.10.3";
-
-  protected String java;
+  public static final String LAUNCHER_VERSION = "v1.11.0";
 
   /**
    * Print a launch error message to the console.
@@ -117,7 +115,7 @@ public class ChunkyLauncher {
                   throw new Error(e);
                 }
                 System.out.println("Downloading Chunky " + latest + ":");
-                ConsoleUpdater.update(latest);
+                ConsoleUpdater.update(latest, settings);
               }
 
               @Override public void noUpdateAvailable() {

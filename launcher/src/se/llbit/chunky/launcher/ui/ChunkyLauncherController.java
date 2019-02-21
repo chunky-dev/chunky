@@ -56,7 +56,7 @@ import java.util.ResourceBundle;
  * JavaFX window for the Chunky launcher.
  */
 public final class ChunkyLauncherController implements Initializable, UpdateListener {
-  private final LauncherSettings settings;
+  final LauncherSettings settings;
 
   @FXML protected ComboBox<VersionInfo> version;
   @FXML protected Button checkForUpdate;
@@ -64,6 +64,8 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
   @FXML protected TextField minecraftDirectory;
   @FXML protected Button browseMinecraft;
   @FXML protected IntegerAdjuster memoryLimit;
+  @FXML protected TextField updateSite;
+  @FXML protected Button resetUpdateSite;
   @FXML protected TextField javaRuntime;
   @FXML protected Button browseJava;
   @FXML protected TextField javaOptions;
@@ -140,6 +142,17 @@ public final class ChunkyLauncherController implements Initializable, UpdateList
         }
       }
     });
+
+    updateSite.setText(settings.updateSite);
+    updateSite.setTooltip(new Tooltip("Update site URL for Chunky releases."));
+    updateSite.textProperty().addListener((observable, oldValue, newValue) -> {
+      settings.updateSite = newValue;
+      settings.save();
+    });
+    resetUpdateSite.setOnAction(event -> {
+      updateSite.setText(LauncherSettings.DEFAULT_UPDATE_SITE);
+    });
+    resetUpdateSite.setTooltip(new Tooltip("Reset to default Chunky update site."));
 
     javaRuntime.setText(getConfiguredJre());
 

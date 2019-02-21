@@ -30,7 +30,7 @@ import java.io.PrintStream;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ConsoleUpdater {
-  public static void update(VersionInfo version) {
+  public static void update(VersionInfo version, LauncherSettings settings) {
     File chunkyDir = SettingsDirectory.getSettingsDirectory();
     File libDir = new File(chunkyDir, "lib");
     if (!libDir.isDirectory()) {
@@ -46,7 +46,7 @@ public class ConsoleUpdater {
         String libSize = ChunkyLauncher.prettyPrintSize(lib.size);
         System.out.format("Downloading %s [%s]...", lib, libSize);
 
-        if (downloadLibrary(libDir, lib, System.out)) {
+        if (downloadLibrary(libDir, lib, System.out, settings)) {
           System.out.println("done!");
         } else {
           return;
@@ -66,7 +66,8 @@ public class ConsoleUpdater {
    *
    * @return {@code true} if the library was downloaded successfully
    */
-  private static boolean downloadLibrary(File libDir, Library lib, PrintStream err) {
+  private static boolean downloadLibrary(File libDir, Library lib, PrintStream err,
+      LauncherSettings settings) {
     if (!lib.url.isEmpty()) {
       DownloadStatus result = ChunkyLauncher.tryDownload(libDir, lib, lib.url);
       switch (result) {
@@ -83,7 +84,7 @@ public class ConsoleUpdater {
           return true;
       }
     }
-    String defaultUrl = "http://chunkyupdate.llbit.se/lib/" + lib.name;
+    String defaultUrl = settings.updateSite + "lib/" + lib.name;
     if (!lib.url.isEmpty()) {
       err.print("  retrying with URL=" + defaultUrl + "...");
     }
