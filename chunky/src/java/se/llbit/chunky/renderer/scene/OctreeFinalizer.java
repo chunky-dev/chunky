@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -45,9 +46,16 @@ public class OctreeFinalizer {
         int z = cz + cp.z * 16 - origin.z;
         for (int cx = 0; cx < 16; ++cx) {
           int x = cx + cp.x * 16 - origin.x;
-          Material mat = octree.getMaterial(x, cy, z);
+          processBlock(octree, x, cy, z);
+        }
+      }
+    }
+  }
 
-          // TODO: duplicated code? Check Scene.loadChunks()...
+  private static void processBlock(Octree octree, int x, int cy, int z) {
+    Material mat = octree.getMaterial(x, cy, z);
+
+    // TODO: duplicated code? Check Scene.loadChunks()...
           /*
           // Set non-visible blocks to be stone, in order to merge large patches.
           if ((cx == 0 || cx == 15 || cz == 0 || cz == 15) && cy > -origin.y
@@ -63,125 +71,239 @@ public class OctreeFinalizer {
             }
           }*/
 
-          if (mat instanceof Water) {
-            Material above = octree.getMaterial(x, cy + 1, z);
-            if (!above.isWater()) {
-              Water water = (Water) mat;
+    if (mat instanceof Water) {
+      Material above = octree.getMaterial(x, cy + 1, z);
+      if (!above.isWater()) {
+        Water water = (Water) mat;
 
-              int level0 = 8 - water.level;
-              int corner0 = level0;
-              int corner1 = level0;
-              int corner2 = level0;
-              int corner3 = level0;
+        int level0 = 8 - water.level;
+        int corner0 = level0;
+        int corner1 = level0;
+        int corner2 = level0;
+        int corner3 = level0;
 
-              Octree.Node node = octree.get(x - 1, cy, z);
-              Material corner = octree.palette.get(node.type);
-              int fullBlock;
-              int level = level0;
-              if (corner.isWater()) {
-                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-                level = 8 - (1 - fullBlock) * ((Water) corner).level;
-              } else if (!corner.solid) {
-                level = 0;
-              }
-              corner3 += level;
-              corner0 += level;
-
-              node = octree.get(x - 1, cy, z + 1);
-              corner = octree.palette.get(node.type);
-              level = level0;
-              if (corner.isWater()) {
-                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-                level = 8 - (1 - fullBlock) * ((Water) corner).level;
-              } else if (!corner.solid) {
-                level = 0;
-              }
-              corner0 += level;
-
-              node = octree.get(x, cy, z + 1);
-              corner = octree.palette.get(node.type);
-              level = level0;
-              if (corner.isWater()) {
-                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-                level = 8 - (1 - fullBlock) * ((Water) corner).level;
-              } else if (!corner.solid) {
-                level = 0;
-              }
-              corner0 += level;
-              corner1 += level;
-
-              node = octree.get(x + 1, cy, z + 1);
-              corner = octree.palette.get(node.type);
-              level = level0;
-              if (corner.isWater()) {
-                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-                level = 8 - (1 - fullBlock) * ((Water) corner).level;
-              } else if (!corner.solid) {
-                level = 0;
-              }
-              corner1 += level;
-
-              node = octree.get(x + 1, cy, z);
-              corner = octree.palette.get(node.type);
-              level = level0;
-              if (corner.isWater()) {
-                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-                level = 8 - (1 - fullBlock) * ((Water) corner).level;
-              } else if (!corner.solid) {
-                level = 0;
-              }
-              corner1 += level;
-              corner2 += level;
-
-              node = octree.get(x + 1, cy, z - 1);
-              corner = octree.palette.get(node.type);
-              level = level0;
-              if (corner.isWater()) {
-                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-                level = 8 - (1 - fullBlock) * ((Water) corner).level;
-              } else if (!corner.solid) {
-                level = 0;
-              }
-              corner2 += level;
-
-              node = octree.get(x, cy, z - 1);
-              corner = octree.palette.get(node.type);
-              level = level0;
-              if (corner.isWater()) {
-                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-                level = 8 - (1 - fullBlock) * ((Water) corner).level;
-              } else if (!corner.solid) {
-                level = 0;
-              }
-              corner2 += level;
-              corner3 += level;
-
-              node = octree.get(x - 1, cy, z - 1);
-              corner = octree.palette.get(node.type);
-              level = level0;
-              if (corner.isWater()) {
-                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-                level = 8 - (1 - fullBlock) * ((Water) corner).level;
-              } else if (!corner.solid) {
-                level = 0;
-              }
-              corner3 += level;
-
-              corner0 = Math.min(7, 8 - (corner0 / 4));
-              corner1 = Math.min(7, 8 - (corner1 / 4));
-              corner2 = Math.min(7, 8 - (corner2 / 4));
-              corner3 = Math.min(7, 8 - (corner3 / 4));
-              node = octree.get(x, cy, z);
-              Octree.Node replaced = new Octree.DataNode(
-                  node.type,
-                  (corner0 << Water.CORNER_0)
-                  | (corner1 << Water.CORNER_1)
-                  | (corner2 << Water.CORNER_2)
-                  | (corner3 << Water.CORNER_3));
-              octree.set(replaced, x, cy, z);
-            }
-          }
+        Octree.Node node = octree.get(x - 1, cy, z);
+        Material corner = octree.palette.get(node.type);
+        int fullBlock;
+        int level = level0;
+        if (corner.isWater()) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Water) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
         }
+        corner3 += level;
+        corner0 += level;
+
+        node = octree.get(x - 1, cy, z + 1);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner.isWater()) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Water) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner0 += level;
+
+        node = octree.get(x, cy, z + 1);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner.isWater()) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Water) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner0 += level;
+        corner1 += level;
+
+        node = octree.get(x + 1, cy, z + 1);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner.isWater()) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Water) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner1 += level;
+
+        node = octree.get(x + 1, cy, z);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner.isWater()) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Water) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner1 += level;
+        corner2 += level;
+
+        node = octree.get(x + 1, cy, z - 1);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner.isWater()) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Water) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner2 += level;
+
+        node = octree.get(x, cy, z - 1);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner.isWater()) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Water) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner2 += level;
+        corner3 += level;
+
+        node = octree.get(x - 1, cy, z - 1);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner.isWater()) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Water) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner3 += level;
+
+        corner0 = Math.min(7, 8 - (corner0 / 4));
+        corner1 = Math.min(7, 8 - (corner1 / 4));
+        corner2 = Math.min(7, 8 - (corner2 / 4));
+        corner3 = Math.min(7, 8 - (corner3 / 4));
+        node = octree.get(x, cy, z);
+        Octree.Node replaced = new Octree.DataNode(
+            node.type,
+            (corner0 << Water.CORNER_0)
+                | (corner1 << Water.CORNER_1)
+                | (corner2 << Water.CORNER_2)
+                | (corner3 << Water.CORNER_3));
+        octree.set(replaced, x, cy, z);
+      }
+    } else if (mat instanceof Lava) {
+      Material above = octree.getMaterial(x, cy + 1, z);
+      if (!(above instanceof Lava)) {
+        Lava lava = (Lava) mat;
+
+        int level0 = 8 - lava.level;
+        int corner0 = level0;
+        int corner1 = level0;
+        int corner2 = level0;
+        int corner3 = level0;
+
+        Octree.Node node = octree.get(x - 1, cy, z);
+        Material corner = octree.palette.get(node.type);
+        int fullBlock;
+        int level = level0;
+        if (corner instanceof Lava) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner3 += level;
+        corner0 += level;
+
+        node = octree.get(x - 1, cy, z + 1);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner instanceof Lava) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner0 += level;
+
+        node = octree.get(x, cy, z + 1);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner instanceof Lava) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner0 += level;
+        corner1 += level;
+
+        node = octree.get(x + 1, cy, z + 1);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner instanceof Lava) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner1 += level;
+
+        node = octree.get(x + 1, cy, z);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner instanceof Lava) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner1 += level;
+        corner2 += level;
+
+        node = octree.get(x + 1, cy, z - 1);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner instanceof Lava) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner2 += level;
+
+        node = octree.get(x, cy, z - 1);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner instanceof Lava) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner2 += level;
+        corner3 += level;
+
+        node = octree.get(x - 1, cy, z - 1);
+        corner = octree.palette.get(node.type);
+        level = level0;
+        if (corner instanceof Lava) {
+          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
+        } else if (!corner.solid) {
+          level = 0;
+        }
+        corner3 += level;
+
+        corner0 = Math.min(7, 8 - (corner0 / 4));
+        corner1 = Math.min(7, 8 - (corner1 / 4));
+        corner2 = Math.min(7, 8 - (corner2 / 4));
+        corner3 = Math.min(7, 8 - (corner3 / 4));
+        node = octree.get(x, cy, z);
+        Octree.Node replaced = new Octree.DataNode(
+            node.type,
+            (corner0 << Water.CORNER_0)
+                | (corner1 << Water.CORNER_1)
+                | (corner2 << Water.CORNER_2)
+                | (corner3 << Water.CORNER_3));
+        octree.set(replaced, x, cy, z);
       }
     }
   }

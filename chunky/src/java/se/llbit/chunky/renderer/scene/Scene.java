@@ -20,6 +20,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.chunk.BlockPalette;
@@ -854,6 +855,13 @@ public class Scene implements JsonSerializable, Refreshable {
                 int above = Chunk.chunkIndex(cx, cy + 1, cz);
                 Block aboveBlock = palette.get(blocks[above]);
                 if (aboveBlock.isWater()) {
+                  octNode = new Octree.DataNode(blocks[index],
+                      1 << Water.FULL_BLOCK);
+                }
+              } else if (cy + 1 < yMax && block instanceof Lava) {
+                int above = Chunk.chunkIndex(cx, cy + 1, cz);
+                Block aboveBlock = palette.get(blocks[above]);
+                if (aboveBlock instanceof Lava) {
                   octNode = new Octree.DataNode(blocks[index],
                       1 << Water.FULL_BLOCK);
                 }

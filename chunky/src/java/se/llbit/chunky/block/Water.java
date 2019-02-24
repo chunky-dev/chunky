@@ -178,7 +178,7 @@ public class Water extends MinecraftBlock {
       boolean hit = false;
       for (Quad quad : fullBlock) {
         if (quad.intersect(ray)) {
-          Texture.water.getAvgColorLinear(ray.color);
+          texture.getAvgColorLinear(ray.color);
           ray.t = ray.tNext;
           ray.n.set(quad.n);
           ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
@@ -285,7 +285,7 @@ public class Water extends MinecraftBlock {
       hit = true;
     }
     if (hit) {
-      Texture.water.getAvgColorLinear(ray.color);
+      texture.getAvgColorLinear(ray.color);
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
     }

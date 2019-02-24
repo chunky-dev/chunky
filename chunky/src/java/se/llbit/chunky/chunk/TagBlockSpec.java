@@ -94,8 +94,14 @@ public class TagBlockSpec implements BlockSpec {
         }
         case "bubble_column":
           return new UnknownBlock(name);
-        case "lava":
-          return new UnknownBlock(name);
+        case "lava": {
+          int level = 0;
+          try {
+            level = Integer.parseInt(tag.get("Properties").get("level").stringValue("0"));
+          } catch (NumberFormatException ignored) {
+          }
+          return new Lava(level);
+        }
         case "bedrock":
           return new Bedrock();
         case "sand":
