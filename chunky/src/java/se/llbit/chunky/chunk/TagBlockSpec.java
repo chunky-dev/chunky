@@ -141,17 +141,30 @@ public class TagBlockSpec implements BlockSpec {
           return new DarkOakLog(axis);
         }
         case "stripped_oak_log":
+          // TODO 1.13
         case "stripped_spruce_log":
+          // TODO 1.13
         case "stripped_birch_log":
+          // TODO 1.13
         case "stripped_jungle_log":
+          // TODO 1.13
         case "stripped_acacia_log":
+          // TODO 1.13
         case "stripped_dark_oak_log":
+          // TODO 1.13
         case "stripped_oak_wood":
+          // TODO 1.13
         case "stripped_spruce_wood":
+          // TODO 1.13
         case "stripped_birch_wood":
+          // TODO 1.13
         case "stripped_jungle_wood":
+          // TODO 1.13
         case "stripped_acacia_wood":
+          // TODO 1.13
         case "stripped_dark_oak_wood":
+          // TODO 1.13
+          return new UnknownBlock(name);
         case "oak_wood":
           return new OakWood();
         case "spruce_wood":
@@ -191,8 +204,9 @@ public class TagBlockSpec implements BlockSpec {
         case "sandstone":
           return new Sandstone();
         case "chiseled_sandstone":
+          return new ChiseledStandstone();
         case "cut_sandstone":
-          return new UnknownBlock(name);
+          return new CutSandstone();
         case "note_block":
           return new NoteBlock();
         case "powered_rail":
@@ -203,30 +217,48 @@ public class TagBlockSpec implements BlockSpec {
         case "grass":
           return new Grass();
         case "fern":
+          return new Fern();
         case "dead_bush":
+          return new DeadBush();
         case "seagrass":
         case "tall_seagrass":
         case "sea_pickle":
         case "piston":
         case "piston_head":
         case "moving_piston":
-        case "white_wool":
-        case "orange_wool":
-        case "magenta_wool":
-        case "light_blue_wool":
-        case "yellow_wool":
-        case "lime_wool":
-        case "pink_wool":
-        case "gray_wool":
-        case "light_gray_wool":
-        case "cyan_wool":
-        case "purple_wool":
-        case "blue_wool":
-        case "brown_wool":
-        case "green_wool":
-        case "red_wool":
-        case "black_wool":
           return new UnknownBlock(name);
+        case "white_wool":
+          return new WoolWhite();
+        case "orange_wool":
+          return new WoolOrange();
+        case "magenta_wool":
+          return new WoolMagenta();
+        case "light_blue_wool":
+          return new WoolLightBlue();
+        case "yellow_wool":
+          return new WoolYellow();
+        case "lime_wool":
+          return new WoolLime();
+        case "pink_wool":
+          return new WoolPink();
+        case "gray_wool":
+          return new WoolGray();
+        case "light_gray_wool":
+          return new WoolLightGray();
+        case "cyan_wool":
+          return new WoolCyan();
+        case "purple_wool":
+          return new WoolPurple();
+        case "blue_wool":
+          return new WoolBlue();
+        case "brown_wool":
+          return new WoolBrown();
+        case "green_wool":
+          return new WoolGreen();
+        case "red_wool":
+          return new WoolRed();
+        case "black_wool":
+          return new WoolBlack();
         case "dandelion":
           return new Dandelion();
         case "poppy":
