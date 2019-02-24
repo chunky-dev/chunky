@@ -17,7 +17,6 @@
 package se.llbit.chunky.renderer.scene;
 
 import se.llbit.chunky.block.Water;
-import se.llbit.chunky.chunk.WaterBlockSpec;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Material;
@@ -75,77 +74,94 @@ public class OctreeFinalizer {
               int corner2 = level0;
               int corner3 = level0;
 
-              Material corner = octree.getMaterial(x - 1, cy, z);
+              Octree.Node node = octree.get(x - 1, cy, z);
+              Material corner = octree.palette.get(node.type);
+              int fullBlock;
               int level = level0;
               if (corner.isWater()) {
-                level = 8 - ((Water) corner).level;
+                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+                level = 8 - (1 - fullBlock) * ((Water) corner).level;
               } else if (!corner.solid) {
                 level = 0;
               }
               corner3 += level;
               corner0 += level;
 
-              corner = octree.getMaterial(x - 1, cy, z + 1);
+              node = octree.get(x - 1, cy, z + 1);
+              corner = octree.palette.get(node.type);
               level = level0;
               if (corner.isWater()) {
-                level = 8 - ((Water) corner).level;
+                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+                level = 8 - (1 - fullBlock) * ((Water) corner).level;
               } else if (!corner.solid) {
                 level = 0;
               }
               corner0 += level;
 
-              corner = octree.getMaterial(x, cy, z + 1);
+              node = octree.get(x, cy, z + 1);
+              corner = octree.palette.get(node.type);
               level = level0;
               if (corner.isWater()) {
-                level = 8 - ((Water) corner).level;
+                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+                level = 8 - (1 - fullBlock) * ((Water) corner).level;
               } else if (!corner.solid) {
                 level = 0;
               }
               corner0 += level;
               corner1 += level;
 
-              corner = octree.getMaterial(x + 1, cy, z + 1);
+              node = octree.get(x + 1, cy, z + 1);
+              corner = octree.palette.get(node.type);
               level = level0;
               if (corner.isWater()) {
-                level = 8 - ((Water) corner).level;
+                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+                level = 8 - (1 - fullBlock) * ((Water) corner).level;
               } else if (!corner.solid) {
                 level = 0;
               }
               corner1 += level;
 
-              corner = octree.getMaterial(x + 1, cy, z);
+              node = octree.get(x + 1, cy, z);
+              corner = octree.palette.get(node.type);
               level = level0;
               if (corner.isWater()) {
-                level = 8 - ((Water) corner).level;
+                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+                level = 8 - (1 - fullBlock) * ((Water) corner).level;
               } else if (!corner.solid) {
                 level = 0;
               }
               corner1 += level;
               corner2 += level;
 
-              corner = octree.getMaterial(x + 1, cy, z - 1);
+              node = octree.get(x + 1, cy, z - 1);
+              corner = octree.palette.get(node.type);
               level = level0;
               if (corner.isWater()) {
-                level = 8 - ((Water) corner).level;
+                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+                level = 8 - (1 - fullBlock) * ((Water) corner).level;
               } else if (!corner.solid) {
                 level = 0;
               }
               corner2 += level;
 
-              corner = octree.getMaterial(x, cy, z - 1);
+              node = octree.get(x, cy, z - 1);
+              corner = octree.palette.get(node.type);
               level = level0;
               if (corner.isWater()) {
-                level = 8 - ((Water) corner).level;
+                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+                level = 8 - (1 - fullBlock) * ((Water) corner).level;
               } else if (!corner.solid) {
                 level = 0;
               }
               corner2 += level;
               corner3 += level;
 
-              corner = octree.getMaterial(x - 1, cy, z - 1);
+              node = octree.get(x - 1, cy, z - 1);
+              corner = octree.palette.get(node.type);
               level = level0;
               if (corner.isWater()) {
-                level = 8 - ((Water) corner).level;
+                fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+                level = 8 - (1 - fullBlock) * ((Water) corner).level;
               } else if (!corner.solid) {
                 level = 0;
               }
@@ -155,8 +171,13 @@ public class OctreeFinalizer {
               corner1 = Math.min(7, 8 - (corner1 / 4));
               corner2 = Math.min(7, 8 - (corner2 / 4));
               corner3 = Math.min(7, 8 - (corner3 / 4));
-              int replaced = octree.palette.put(new WaterBlockSpec(
-                  water.level, 0, corner0, corner1, corner2, corner3));
+              node = octree.get(x, cy, z);
+              Octree.Node replaced = new Octree.DataNode(
+                  node.type,
+                  (corner0 << Water.CORNER_0)
+                  | (corner1 << Water.CORNER_1)
+                  | (corner2 << Water.CORNER_2)
+                  | (corner3 << Water.CORNER_3));
               octree.set(replaced, x, cy, z);
             }
           }

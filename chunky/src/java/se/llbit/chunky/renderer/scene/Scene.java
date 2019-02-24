@@ -20,7 +20,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
-import se.llbit.chunky.chunk.WaterBlockSpec;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.entity.ArmorStand;
@@ -829,6 +829,7 @@ public class Scene implements JsonSerializable, Refreshable {
             for (int cx = 0; cx < 16; ++cx) {
               int x = cx + cp.x * 16 - origin.x;
               int index = Chunk.chunkIndex(cx, cy, cz);
+              Octree.Node octNode = new Octree.Node(blocks[index]);
               Block block = palette.get(blocks[index]);
 
               // TODO: is this code duplicated in OctreeFinalizer?
@@ -846,17 +847,18 @@ public class Scene implements JsonSerializable, Refreshable {
                 if (b1.opaque && b2.opaque && b3.opaque && b4.opaque && b5.opaque && b6.opaque) {
                   block = palette.stone;
                   blocks[index] = palette.stoneId;
-                  continue;
+                  octNode = new Octree.Node(blocks[index]);
                 }
               }
               if (cy + 1 < yMax && block.isWater()) {
                 int above = Chunk.chunkIndex(cx, cy + 1, cz);
                 Block aboveBlock = palette.get(blocks[above]);
                 if (aboveBlock.isWater()) {
-                  blocks[index] = worldOctree.palette.put(new WaterBlockSpec(0, 1, 0, 0, 0, 0));
+                  octNode = new Octree.DataNode(blocks[index],
+                      1 << Water.FULL_BLOCK);
                 }
               }
-              worldOctree.set(blocks[index],
+              worldOctree.set(octNode,
                   cx + cp.x * 16 - origin.x,
                   cy - origin.y,
                   cz + cp.z * 16 - origin.z);
@@ -1092,8 +1094,8 @@ public class Scene implements JsonSerializable, Refreshable {
     int xcenter = (xmax + xmin) / 2;
     int zcenter = (zmax + zmin) / 2;
     for (int y = Chunk.Y_MAX - 1; y >= 0; --y) {
-      int block = worldOctree.get(xcenter - origin.x, y - origin.y, zcenter - origin.z);
-      if (block != IdBlock.AIR_ID) {
+      Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z);
+      if (!(block instanceof Air)) {
         return new Vector3(xcenter, y + 5, zcenter);
       }
     }
@@ -2105,9 +2107,10 @@ public class Scene implements JsonSerializable, Refreshable {
       int x = (int) QuickMath.floor(ray.o.x);
       int y = (int) QuickMath.floor(ray.o.y);
       int z = (int) QuickMath.floor(ray.o.z);
-      int block = worldOctree.get(x, y, z);
-      return (block & 0xF) == IdBlock.WATER_ID
-          && ((ray.o.y - y) < 0.875 || block == (IdBlock.WATER_ID | (1 << WaterModel.FULL_BLOCK)));
+      Octree.Node node = worldOctree.get(x, y, z);
+      Material block = worldOctree.palette.get(node.type);
+      return block.isWater()
+          && ((ray.o.y - y) < 0.875 || (0 != (node.getData() & (1 << Water.FULL_BLOCK))));
     } else {
       return waterHeight > 0 && ray.o.y < waterHeight - 0.125;
     }

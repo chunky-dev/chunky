@@ -12,26 +12,14 @@ import se.llbit.math.Vector4;
 
 public class Water extends MinecraftBlock {
   public final int level;
-  public final boolean full;
-  public final int corner0, corner1, corner2, corner3;
 
   public Water(int level) {
-    this(level, true, level, level, level, level);
+    super(String.format("water (%d)", level), Texture.water);
+    this.level = level;
     solid = false;
     localIntersect = true;
     specular = 0.12f;
     ior = 1.333f;
-  }
-
-  public Water(int level, boolean full, int corner0, int corner1, int corner2, int corner3) {
-    super(String.format("water (%d) %d %d %d %d", level, corner0, corner1, corner2, corner3), Texture.water);
-    this.level = level;
-    this.full = full;
-    this.corner0 = corner0;
-    this.corner1 = corner1;
-    this.corner2 = corner2;
-    this.corner3 = corner3;
-    localIntersect = true;
   }
 
   @Override public boolean isWater() {
@@ -72,9 +60,7 @@ public class Water extends MinecraftBlock {
   static final Triangle[][] southt = new Triangle[8][8];
   static final Triangle[] southb = new Triangle[8];
 
-  /**
-   * Water height levels
-   */
+  /** Water height levels. */
   static final double height[] =
       {14 / 16., 12.25 / 16., 10.5 / 16, 8.75 / 16, 7. / 16, 5.25 / 16, 3.5 / 16, 1.75 / 16};
 
@@ -82,9 +68,13 @@ public class Water extends MinecraftBlock {
   private static final int normalMapW;
 
   /**
-   * Block data offset for water above flag
+   * Block data offset for water above flag.
    */
-  public static final int FULL_BLOCK = 12;
+  public static final int FULL_BLOCK = 16;
+  public static final int CORNER_0 = 0;
+  public static final int CORNER_1 = 4;
+  public static final int CORNER_2 = 8;
+  public static final int CORNER_3 = 12;
 
   static {
     // precompute normal map
@@ -181,7 +171,10 @@ public class Water extends MinecraftBlock {
   @Override public boolean intersect(Ray ray, Scene scene) {
     ray.t = Double.POSITIVE_INFINITY;
 
-    if (full) {
+    int data = ray.getCurrentData();
+    int isFull = (data >> FULL_BLOCK) & 1;
+
+    if (isFull != 0) {
       boolean hit = false;
       for (Quad quad : fullBlock) {
         if (quad.intersect(ray)) {
@@ -207,10 +200,10 @@ public class Water extends MinecraftBlock {
       hit = true;
     }
 
-    int c0 = corner0;
-    int c1 = corner1;
-    int c2 = corner2;
-    int c3 = corner3;
+    int c0 = (0xF & (data >> CORNER_0)) % 8;
+    int c1 = (0xF & (data >> CORNER_1)) % 8;
+    int c2 = (0xF & (data >> CORNER_2)) % 8;
+    int c3 = (0xF & (data >> CORNER_3)) % 8;
     Triangle triangle = t012[c0][c1][c2];
     if (triangle.intersect(ray)) {
       ray.n.set(triangle.n);

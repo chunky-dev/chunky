@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2019 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -38,10 +38,8 @@ import se.llbit.chunky.world.Material;
  */
 public class Octree {
 
-  /**
-   * An Octree node
-   */
-  public static final class Node {
+  /** An Octree node. */
+  public static class Node {
     /**
      * The node type. Type is -1 if it's a non-leaf node.
      */
@@ -131,8 +129,43 @@ public class Octree {
         visitor.visit(type, x << depth, y << depth, z << depth, depth);
       }
     }
+
+    public int getData() {
+      return 0;
+    }
+
+    @Override public boolean equals(Object obj) {
+      if (obj != null && obj.getClass() == Node.class) {
+        return ((Node) obj).type == type;
+      }
+      return false;
+    }
   }
 
+
+  /**
+   * An octree node with extra data.
+   */
+  static public final class DataNode extends Node {
+    final int data;
+
+    public DataNode(int type, int data) {
+      super(type);
+      this.data = data;
+    }
+
+    @Override public int getData() {
+      return data;
+    }
+
+    @Override public boolean equals(Object obj) {
+      if (obj instanceof DataNode) {
+        DataNode node = ((DataNode) obj);
+        return node.type == type && node.data == data;
+      }
+      return false;
+    }
+  }
 
   /**
    * Recursive depth of the octree
@@ -179,35 +212,44 @@ public class Octree {
    * @param type The new voxel type to be set
    */
   public synchronized void set(int type, int x, int y, int z) {
+    set(new Node(type), x, y, z);
+  }
+
+  /**
+   * Set the voxel type at the given coordinates.
+   *
+   * @param data The new voxel to insert.
+   */
+  public synchronized void set(Node data, int x, int y, int z) {
     Node node = root;
-    int parentLvl = depth - 1;
-    int level = parentLvl;
+    int parentLevel = depth - 1;
+    int position = 0;
     for (int i = depth - 1; i >= 0; --i) {
-      level = i;
       parents[i] = node;
 
-      if (node.type == type) {
+      if (node.equals(data)) {
         return;
       } else if (node.children == null) {
         node.subdivide();
-        parentLvl = i;
+        parentLevel = i;
       }
 
       int xbit = 1 & (x >> i);
       int ybit = 1 & (y >> i);
       int zbit = 1 & (z >> i);
-      node = node.children[(xbit << 2) | (ybit << 1) | zbit];
+      position = (xbit << 2) | (ybit << 1) | zbit;
+      node = node.children[position];
 
     }
-    node.type = type;
+    parents[0].children[position] = data;
 
-    // merge nodes where all children have been set to the same type
-    for (int i = level; i <= parentLvl; ++i) {
+    // Merge nodes where all children have been set to the same type.
+    for (int i = 0; i <= parentLevel; ++i) {
       Node parent = parents[i];
 
       boolean allSame = true;
       for (Node child : parent.children) {
-        if (child.type != node.type) {
+        if (!child.equals(node)) {
           allSame = false;
           break;
         }
@@ -220,19 +262,20 @@ public class Octree {
         break;
       }
     }
-
   }
 
   /**
    * @return The voxel type at the given coordinates
    */
-  public synchronized int get(int x, int y, int z) {
+  public synchronized Node get(int x, int y, int z) {
     while (cacheLevel < depth && ((x >>> cacheLevel) != cx ||
         (y >>> cacheLevel) != cy || (z >>> cacheLevel) != cz))
       cacheLevel += 1;
 
-    int type;
-    while ((type = cache[cacheLevel].type) == -1) {
+    Node node;
+    while (true) {
+      node = cache[cacheLevel];
+      if (node.type != -1) break;
       cacheLevel -= 1;
       cx = x >>> cacheLevel;
       cy = y >>> cacheLevel;
@@ -240,13 +283,13 @@ public class Octree {
       cache[cacheLevel] =
           cache[cacheLevel + 1].children[((cx & 1) << 2) | ((cy & 1) << 1) | (cz & 1)];
     }
-    return type;
+    return node;
   }
 
   public Material getMaterial(int x, int y, int z) {
-    int type = get(x, y, z);
-    if (type == -1) return UnknownBlock.UNKNOWN;
-    return palette.get(type);
+    Node node = get(x, y, z);
+    if (node.type == -1) return UnknownBlock.UNKNOWN;
+    return palette.get(node.type);
   }
 
   /**
@@ -403,7 +446,7 @@ public class Octree {
       Material prevBlock = ray.getCurrentMaterial();
 
       ray.setPrevMaterial(prevBlock, ray.getCurrentData());
-      ray.setCurrentMaterial(currentBlock, node.type);
+      ray.setCurrentMaterial(currentBlock, node.getData());
 
       if (currentBlock.localIntersect) {
 
