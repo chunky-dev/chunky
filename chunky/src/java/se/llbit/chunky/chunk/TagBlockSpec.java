@@ -186,12 +186,14 @@ public class TagBlockSpec implements BlockSpec {
           return new Sandstone();
         case "chiseled_sandstone":
         case "cut_sandstone":
+          return new UnknownBlock(name);
         case "note_block":
+          return new NoteBlock();
         case "powered_rail":
         case "detector_rail":
         case "sticky_piston":
         case "cobweb":
-          return new UnknownBlock(name);
+          return new Cobweb();
         case "grass":
           return new Grass();
         case "fern":
@@ -218,19 +220,33 @@ public class TagBlockSpec implements BlockSpec {
         case "green_wool":
         case "red_wool":
         case "black_wool":
+          return new UnknownBlock(name);
         case "dandelion":
+          return new Dandelion();
         case "poppy":
+          return new Poppy();
         case "blue_orchid":
+          return new BlueOrchid();
         case "allium":
+          return new Allium();
         case "azure_bluet":
+          return new AzureBluet();
         case "red_tulip":
+          return new TulipRed();
         case "orange_tulip":
+          return new TulipOrange();
         case "white_tulip":
+          return new TulipWhite();
         case "pink_tulip":
+          return new TulipPink();
         case "oxeye_daisy":
+          return new OxeyeDaisy();
         case "cornflower":
+          return new UnknownBlock(name);
         case "lily_of_the_valley":
+          return new UnknownBlock(name);
         case "wither_rose":
+          return new UnknownBlock(name);
         case "brown_mushroom":
         case "red_mushroom":
         case "gold_block":
