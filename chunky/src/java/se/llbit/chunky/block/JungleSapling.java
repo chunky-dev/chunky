@@ -8,6 +8,8 @@ import se.llbit.math.Ray;
 public class JungleSapling extends MinecraftBlock {
   public JungleSapling() {
     super("jungle_sapling", Texture.jungleSapling);
+    localIntersect = true;
+    solid = false;
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {

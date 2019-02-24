@@ -8,6 +8,8 @@ import se.llbit.math.Ray;
 public class DarkOakSapling extends MinecraftBlock {
   public DarkOakSapling() {
     super("dark_oak_sapling", Texture.darkOakSapling);
+    localIntersect = true;
+    solid = false;
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {

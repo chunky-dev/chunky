@@ -93,13 +93,15 @@ public class TagBlockSpec implements BlockSpec {
           return new Water(level);
         }
         case "bubble_column":
-        case "lava":
-        case "bedrock":
           return new UnknownBlock(name);
+        case "lava":
+          return new UnknownBlock(name);
+        case "bedrock":
+          return new Bedrock();
         case "sand":
           return new Sand();
         case "red_sand":
-          return new UnknownBlock(name);
+          return new RedSand();
         case "gravel":
           return new Gravel();
         case "gold_ore":
@@ -159,15 +161,25 @@ public class TagBlockSpec implements BlockSpec {
         case "oak_leaves":
           return new OakLeaves();
         case "spruce_leaves":
+          return new SpruceLeaves();
         case "birch_leaves":
+          return new BirchLeaves();
         case "jungle_leaves":
+          return new JungleLeaves();
         case "acacia_leaves":
+          return new AcaciaLeaves();
         case "dark_oak_leaves":
+          return new DarkOakLeaves();
         case "sponge":
+          return new Sponge();
         case "wet_sponge":
+          return new WetSponge();
         case "glass":
+          return new Glass();
         case "lapis_ore":
+          return new LapisOre();
         case "lapis_block":
+          return new LapisBlock();
         case "dispenser":
           return new UnknownBlock(name);
         case "sandstone":
@@ -427,22 +439,39 @@ public class TagBlockSpec implements BlockSpec {
           return half.equals("lower") ? TallGrass.LOWER : TallGrass.UPPER;
         }
         case "large_fern":
+          return new UnknownBlock(name);
         case "white_stained_glass":
+          return new StainedGlassWhite();
         case "orange_stained_glass":
+          return new StainedGlassOrange();
         case "magenta_stained_glass":
+          return new StainedGlassMagenta();
         case "light_blue_stained_glass":
+          return new StainedGlassLightBlue();
         case "yellow_stained_glass":
+          return new StainedGlassYellow();
         case "lime_stained_glass":
+          return new StainedGlassLime();
         case "pink_stained_glass":
+          return new StainedGlassPink();
         case "gray_stained_glass":
+          return new StainedGlassGray();
         case "light_gray_stained_glass":
+          return new StainedGlassLightGray();
         case "cyan_stained_glass":
+          return new StainedGlassCyan();
         case "purple_stained_glass":
+          return new StainedGlassPurple();
         case "blue_stained_glass":
+          return new StainedGlassBlue();
         case "brown_stained_glass":
+          return new StainedGlassBrown();
         case "green_stained_glass":
+          return new StainedGlassGreen();
         case "red_stained_glass":
+          return new StainedGlassRed();
         case "black_stained_glass":
+          return new StainedGlassBlack();
         case "white_stained_glass_pane":
         case "orange_stained_glass_pane":
         case "magenta_stained_glass_pane":

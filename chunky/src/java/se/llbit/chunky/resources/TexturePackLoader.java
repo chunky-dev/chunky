@@ -1757,9 +1757,9 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/glass_lime", Texture.limeGlass)));
     allTextures.put("glass_magenta", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/magenta_stained_glass",
-            Texture.limeGlass),
+            Texture.magentaGlass),
         new SimpleTexture("assets/minecraft/textures/blocks/magenta_stained_glass",
-            Texture.limeGlass),
+            Texture.magentaGlass),
         new SimpleTexture("assets/minecraft/textures/blocks/glass_magenta", Texture.magentaGlass)));
     allTextures.put("glass_orange", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/orange_stained_glass",

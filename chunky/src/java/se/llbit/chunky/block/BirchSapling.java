@@ -8,6 +8,8 @@ import se.llbit.math.Ray;
 public class BirchSapling extends MinecraftBlock {
   public BirchSapling() {
     super("birch_sapling", Texture.birchSapling);
+    localIntersect = true;
+    solid = false;
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {
