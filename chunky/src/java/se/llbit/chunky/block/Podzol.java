@@ -6,14 +6,12 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class Podzol extends MinecraftBlock {
-  public static final Podzol INSTANCE = new Podzol();
-
   private static final Texture[] texture = {
       Texture.podzolSide, Texture.podzolSide, Texture.podzolSide, Texture.podzolSide,
       Texture.podzolTop, Texture.podzolSide,
   };
 
-  private Podzol() {
+  public Podzol() {
     super("podzol", Texture.podzolSide);
     localIntersect = true;
   }

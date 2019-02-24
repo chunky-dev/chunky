@@ -37,53 +37,53 @@ public class TagBlockSpec implements BlockSpec {
         case "void_air":
           return Air.INSTANCE;
         case "stone":
-          return Stone.INSTANCE;
+          return new Stone();
         case "granite":
-          return Granite.INSTANCE;
+          return new Granite();
         case "polished_granite":
-          return PolishedGranite.INSTANCE;
+          return new PolishedGranite();
         case "diorite":
-          return Diorite.INSTANCE;
+          return new Diorite();
         case "polished_diorite":
-          return PolishedDiorite.INSTANCE;
+          return new PolishedDiorite();
         case "andesite":
-          return Andesite.INSTANCE;
+          return new Andesite();
         case "polished_andesite":
-          return PolishedAndesite.INSTANCE;
+          return new PolishedAndesite();
         case "grass_block":
-          return GrassBlock.INSTANCE;
+          return new GrassBlock();
         case "dirt":
-          return Dirt.INSTANCE;
+          return new Dirt();
         case "coarse_dirt":
-          return CoarseDirt.INSTANCE;
+          return new CoarseDirt();
         case "podzol":
-          return Podzol.INSTANCE;
+          return new Podzol();
         case "cobblestone":
-          return Cobblestone.INSTANCE;
+          return new Cobblestone();
         case "oak_planks":
-          return OakPlanks.INSTANCE;
+          return new OakPlanks();
         case "spruce_planks":
-          return SprucePlanks.INSTANCE;
+          return new SprucePlanks();
         case "birch_planks":
-          return BirchPlanks.INSTANCE;
+          return new BirchPlanks();
         case "jungle_planks":
-          return JunglePlanks.INSTANCE;
+          return new JunglePlanks();
         case "acacia_planks":
-          return AcaciaPlanks.INSTANCE;
+          return new AcaciaPlanks();
         case "dark_oak_planks":
-          return DarkOakPlanks.INSTANCE;
+          return new DarkOakPlanks();
         case "oak_sapling":
-          return OakSapling.INSTANCE;
+          return new OakSapling();
         case "spruce_sapling":
-          return SpruceSapling.INSTANCE;
+          return new SpruceSapling();
         case "birch_sapling":
-          return BirchSapling.INSTANCE;
+          return new BirchSapling();
         case "jungle_sapling":
-          return JungleSapling.INSTANCE;
+          return new JungleSapling();
         case "acacia_sapling":
-          return AcaciaSapling.INSTANCE;
+          return new AcaciaSapling();
         case "dark_oak_sapling":
-          return DarkOakSapling.INSTANCE;
+          return new DarkOakSapling();
         case "water": {
           int level = 0;
           try {
@@ -97,23 +97,41 @@ public class TagBlockSpec implements BlockSpec {
         case "bedrock":
           return new UnknownBlock(name);
         case "sand":
-          return Sand.INSTANCE;
+          return new Sand();
         case "red_sand":
           return new UnknownBlock(name);
         case "gravel":
-          return Gravel.INSTANCE;
+          return new Gravel();
         case "gold_ore":
-          return GoldOre.INSTANCE;
+          return new GoldOre();
         case "iron_ore":
+          return new IronOre();
         case "coal_ore":
-          return new UnknownBlock(name);
-        case "oak_log":
-        case "spruce_log":
-        case "birch_log":
-        case "jungle_log":
-        case "acacia_log":
-          return AcaciaLog.INSTANCE;
-        case "dark_oak_log":
+          return new CoalOre();
+        case "oak_log": {
+          String axis = tag.get("Properties").get("axis").stringValue("y");
+          return new OakLog(axis);
+        }
+        case "spruce_log": {
+          String axis = tag.get("Properties").get("axis").stringValue("y");
+          return new SpruceLog(axis);
+        }
+        case "birch_log": {
+          String axis = tag.get("Properties").get("axis").stringValue("y");
+          return new BirchLog(axis);
+        }
+        case "jungle_log": {
+          String axis = tag.get("Properties").get("axis").stringValue("y");
+          return new JungleLog(axis);
+        }
+        case "acacia_log": {
+          String axis = tag.get("Properties").get("axis").stringValue("y");
+          return new AcaciaLog(axis);
+        }
+        case "dark_oak_log": {
+          String axis = tag.get("Properties").get("axis").stringValue("y");
+          return new DarkOakLog(axis);
+        }
         case "stripped_oak_log":
         case "stripped_spruce_log":
         case "stripped_birch_log":
@@ -127,14 +145,19 @@ public class TagBlockSpec implements BlockSpec {
         case "stripped_acacia_wood":
         case "stripped_dark_oak_wood":
         case "oak_wood":
+          return new OakWood();
         case "spruce_wood":
+          return new SpruceWood();
         case "birch_wood":
+          return new BirchWood();
         case "jungle_wood":
+          return new JungleWood();
         case "acacia_wood":
+          return new AcaciaWood();
         case "dark_oak_wood":
-          return new UnknownBlock(name);
+          return new DarkOakWood();
         case "oak_leaves":
-          return OakLeaves.INSTANCE;
+          return new OakLeaves();
         case "spruce_leaves":
         case "birch_leaves":
         case "jungle_leaves":
@@ -148,7 +171,7 @@ public class TagBlockSpec implements BlockSpec {
         case "dispenser":
           return new UnknownBlock(name);
         case "sandstone":
-          return Sandstone.INSTANCE;
+          return new Sandstone();
         case "chiseled_sandstone":
         case "cut_sandstone":
         case "note_block":
@@ -158,7 +181,7 @@ public class TagBlockSpec implements BlockSpec {
         case "cobweb":
           return new UnknownBlock(name);
         case "grass":
-          return Grass.INSTANCE;
+          return new Grass();
         case "fern":
         case "dead_bush":
         case "seagrass":
@@ -630,7 +653,7 @@ public class TagBlockSpec implements BlockSpec {
         case "redstone_wire":
           return new UnknownBlock(name);
         case "sugar_cane":
-          return SugarCane.INSTANCE;
+          return new SugarCane();
         case "kelp":
         case "kelp_plant":
         case "dried_kelp_block":

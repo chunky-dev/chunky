@@ -6,9 +6,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class BirchSapling extends MinecraftBlock {
-  public static final BirchSapling INSTANCE = new BirchSapling();
-
-  private BirchSapling() {
+  public BirchSapling() {
     super("birch_sapling", Texture.birchSapling);
   }
 

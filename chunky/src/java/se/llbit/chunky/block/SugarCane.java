@@ -6,9 +6,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class SugarCane extends MinecraftBlock {
-  public static final SugarCane INSTANCE = new SugarCane();
-
-  private SugarCane() {
+  public SugarCane() {
     super("sugar_cane", Texture.sugarCane);
     localIntersect = true;
     solid = false;

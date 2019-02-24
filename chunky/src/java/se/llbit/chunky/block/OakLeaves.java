@@ -7,9 +7,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class OakLeaves extends MinecraftBlock {
-  public static final OakLeaves INSTANCE = new OakLeaves();
-
-  private OakLeaves() {
+  public OakLeaves() {
     super("oak_leaves", Texture.oakLeaves);
     localIntersect = true;
     solid = false;

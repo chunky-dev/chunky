@@ -6,14 +6,12 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class Sandstone extends MinecraftBlock {
-  public static final Sandstone INSTANCE = new Sandstone();
-
   private static final Texture[] texture = {
       Texture.sandstoneSide, Texture.sandstoneSide, Texture.sandstoneSide,
       Texture.sandstoneSide, Texture.sandstoneTop, Texture.sandstoneBottom,
   };
 
-  private Sandstone() {
+  public Sandstone() {
     super("sandstone", Texture.sandstoneSide);
     localIntersect = true;
   }

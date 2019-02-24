@@ -6,9 +6,7 @@ import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
 public class GrassBlock extends MinecraftBlock {
-  public static final GrassBlock INSTANCE = new GrassBlock();
-
-  private GrassBlock() {
+  public GrassBlock() {
     super("grass_block", Texture.grassTop);
     localIntersect = true;
   }

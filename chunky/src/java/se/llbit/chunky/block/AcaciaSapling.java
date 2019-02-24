@@ -6,9 +6,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class AcaciaSapling extends MinecraftBlock {
-  public static final AcaciaSapling INSTANCE = new AcaciaSapling();
-
-  private AcaciaSapling() {
+  public AcaciaSapling() {
     super("acacia_sapling", Texture.acaciaSapling);
   }
 

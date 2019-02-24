@@ -6,9 +6,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class JungleSapling extends MinecraftBlock {
-  public static final JungleSapling INSTANCE = new JungleSapling();
-
-  private JungleSapling() {
+  public JungleSapling() {
     super("jungle_sapling", Texture.jungleSapling);
   }
 

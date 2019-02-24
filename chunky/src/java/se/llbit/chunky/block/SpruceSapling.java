@@ -6,9 +6,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class SpruceSapling extends MinecraftBlock {
-  public static final SpruceSapling INSTANCE = new SpruceSapling();
-
-  private SpruceSapling() {
+  public SpruceSapling() {
     super("spruce_sapling", Texture.spruceSapling);
   }
 

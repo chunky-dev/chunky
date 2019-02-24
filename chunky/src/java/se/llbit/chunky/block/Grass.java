@@ -6,9 +6,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class Grass extends MinecraftBlock {
-  public static final Grass INSTANCE = new Grass();
-
-  private Grass() {
+  public Grass() {
     super("grass", Texture.tallGrass);
     localIntersect = true;
     solid = false;

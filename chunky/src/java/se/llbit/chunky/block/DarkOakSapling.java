@@ -6,9 +6,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class DarkOakSapling extends MinecraftBlock {
-  public static final DarkOakSapling INSTANCE = new DarkOakSapling();
-
-  private DarkOakSapling() {
+  public DarkOakSapling() {
     super("dark_oak_sapling", Texture.darkOakSapling);
   }
 
