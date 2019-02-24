@@ -200,6 +200,7 @@ public class TagBlockSpec implements BlockSpec {
         case "lapis_block":
           return new LapisBlock();
         case "dispenser":
+          // TODO
           return new UnknownBlock(name);
         case "sandstone":
           return new Sandstone();
@@ -210,8 +211,14 @@ public class TagBlockSpec implements BlockSpec {
         case "note_block":
           return new NoteBlock();
         case "powered_rail":
+          // TODO
+          return new UnknownBlock(name);
         case "detector_rail":
+          // TODO
+          return new UnknownBlock(name);
         case "sticky_piston":
+          // TODO
+          return new UnknownBlock(name);
         case "cobweb":
           return new Cobweb();
         case "grass":
@@ -221,11 +228,22 @@ public class TagBlockSpec implements BlockSpec {
         case "dead_bush":
           return new DeadBush();
         case "seagrass":
+          // TODO 1.13
+          return new UnknownBlock(name);
         case "tall_seagrass":
+          // TODO 1.13
+          return new UnknownBlock(name);
         case "sea_pickle":
+          // TODO 1.13
+          return new UnknownBlock(name);
         case "piston":
+          // TODO
+          return new UnknownBlock(name);
         case "piston_head":
+          // TODO
+          return new UnknownBlock(name);
         case "moving_piston":
+          // TODO
           return new UnknownBlock(name);
         case "white_wool":
           return new WoolWhite();
@@ -286,9 +304,13 @@ public class TagBlockSpec implements BlockSpec {
         case "wither_rose":
           return new UnknownBlock(name);
         case "brown_mushroom":
+          return new BrownMushroom();
         case "red_mushroom":
+          return new RedMushroom();
         case "gold_block":
+          return new GoldBlock();
         case "iron_block":
+          return new IronBlock();
         case "oak_slab":
         case "spruce_slab":
         case "birch_slab":
@@ -313,7 +335,9 @@ public class TagBlockSpec implements BlockSpec {
         case "smooth_red_sandstone":
         case "smooth_sandstone":
         case "smooth_stone":
+          return new UnknownBlock(name);
         case "bricks":
+          return new Bricks();
         case "tnt":
         case "bookshelf":
         case "mossy_cobblestone":
@@ -379,14 +403,21 @@ public class TagBlockSpec implements BlockSpec {
         case "dark_oak_trapdoor":
         case "infested_stone":
         case "infested_cobblestone":
+          return new UnknownBlock(name);
         case "infested_stone_bricks":
-        case "infested_mossy_stone_bricks":
-        case "infested_cracked_stone_bricks":
-        case "infested_chiseled_stone_bricks":
         case "stone_bricks":
+          return new StoneBricks();
+        case "infested_mossy_stone_bricks":
         case "mossy_stone_bricks":
+          return new MossyStoneBricks();
+        case "infested_cracked_stone_bricks":
         case "cracked_stone_bricks":
+          return new CrackedStoneBricks();
+        case "infested_chiseled_stone_bricks":
         case "chiseled_stone_bricks":
+          return new ChiseledStoneBricks();
+        case "nether_bricks":
+          return new NetherBricks();
         case "brown_mushroom_block":
         case "red_mushroom_block":
         case "mushroom_stem":
@@ -404,13 +435,14 @@ public class TagBlockSpec implements BlockSpec {
         case "stone_brick_stairs":
         case "mycelium":
         case "lily_pad":
-        case "nether_bricks":
         case "nether_brick_fence":
         case "nether_brick_stairs":
         case "enchanting_table":
         case "end_portal_frame":
         case "end_stone":
+          return new UnknownBlock(name);
         case "end_stone_bricks":
+          return new EndStoneBricks();
         case "redstone_lamp":
         case "cocoa":
         case "sandstone_stairs":
@@ -484,13 +516,22 @@ public class TagBlockSpec implements BlockSpec {
         case "slime_block":
         case "grass_path":
         case "sunflower":
-        case "lilac":
-        case "rose_bush":
-        case "peony":
           return new UnknownBlock(name);
+        case "lilac": {
+          String half = tag.get("Properties").get("half").stringValue("lower");
+          return new Lilac(half);
+        }
+        case "rose_bush": {
+          String half = tag.get("Properties").get("half").stringValue("lower");
+          return new RoseBush(half);
+        }
+        case "peony": {
+          String half = tag.get("Properties").get("half").stringValue("lower");
+          return new Peony(half);
+        }
         case "tall_grass": {
           String half = tag.get("Properties").get("half").stringValue("lower");
-          return half.equals("lower") ? TallGrass.LOWER : TallGrass.UPPER;
+          return new TallGrass(half);
         }
         case "large_fern":
           return new UnknownBlock(name);
@@ -543,7 +584,9 @@ public class TagBlockSpec implements BlockSpec {
         case "red_stained_glass_pane":
         case "black_stained_glass_pane":
         case "prismarine":
+          return new UnknownBlock(name);
         case "prismarine_bricks":
+          return new PrismarineBricks();
         case "dark_prismarine":
         case "prismarine_stairs":
         case "prismarine_brick_stairs":
@@ -555,7 +598,9 @@ public class TagBlockSpec implements BlockSpec {
         case "red_sandstone_stairs":
         case "magma_block":
         case "nether_wart_block":
+          return new UnknownBlock(name);
         case "red_nether_bricks":
+          return new RedNetherBricks();
         case "bone_block":
         case "observer":
         case "shulker_box":

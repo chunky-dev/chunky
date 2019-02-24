@@ -6,11 +6,11 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class TallGrass extends MinecraftBlock {
-  public static final TallGrass UPPER = new TallGrass(Texture.doubleTallGrassTop);
-  public static final TallGrass LOWER = new TallGrass(Texture.doubleTallGrassBottom);
-
-  private TallGrass(Texture texture) {
-    super("tall_grass", texture);
+  public TallGrass(String half) {
+    super("tall_grass",
+        half.equals("upper")
+            ? Texture.doubleTallGrassTop
+            : Texture.doubleTallGrassBottom);
     localIntersect = true;
     solid = false;
   }
