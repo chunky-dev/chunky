@@ -1,6 +1,7 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.block.*;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.nbt.Tag;
 import se.llbit.util.NotNull;
 
@@ -8,7 +9,7 @@ public class TagBlockSpec implements BlockSpec {
   private static final int MAGIC = 0xE6FFE636;
   public final Tag tag;
 
-  public TagBlockSpec(@NotNull  Tag tag) {
+  public TagBlockSpec(@NotNull Tag tag) {
     this.tag = tag;
   }
 
@@ -119,54 +120,30 @@ public class TagBlockSpec implements BlockSpec {
           return new IronOre();
         case "coal_ore":
           return new CoalOre();
-        case "oak_log": {
-          String axis = tag.get("Properties").get("axis").stringValue("y");
-          return new OakLog(axis);
-        }
-        case "spruce_log": {
-          String axis = tag.get("Properties").get("axis").stringValue("y");
-          return new SpruceLog(axis);
-        }
-        case "birch_log": {
-          String axis = tag.get("Properties").get("axis").stringValue("y");
-          return new BirchLog(axis);
-        }
-        case "jungle_log": {
-          String axis = tag.get("Properties").get("axis").stringValue("y");
-          return new JungleLog(axis);
-        }
-        case "acacia_log": {
-          String axis = tag.get("Properties").get("axis").stringValue("y");
-          return new AcaciaLog(axis);
-        }
-        case "dark_oak_log": {
-          String axis = tag.get("Properties").get("axis").stringValue("y");
-          return new DarkOakLog(axis);
-        }
-        case "stripped_oak_log": {
-          String axis = tag.get("Properties").get("axis").stringValue("y");
-          return new StrippedOakLog(axis);
-        }
-        case "stripped_spruce_log": {
-          String axis = tag.get("Properties").get("axis").stringValue("y");
-          return new StrippedSpruceLog(axis);
-        }
-        case "stripped_birch_log": {
-          String axis = tag.get("Properties").get("axis").stringValue("y");
-          return new StrippedBirchLog(axis);
-        }
-        case "stripped_jungle_log": {
-          String axis = tag.get("Properties").get("axis").stringValue("y");
-          return new StrippedJungleLog(axis);
-        }
-        case "stripped_acacia_log": {
-          String axis = tag.get("Properties").get("axis").stringValue("y");
-          return new StrippedAcaciaLog(axis);
-        }
-        case "stripped_dark_oak_log": {
-          String axis = tag.get("Properties").get("axis").stringValue("y");
-          return new StrippedDarkOakLog(axis);
-        }
+        case "oak_log":
+          return log(tag, new Texture[] { Texture.oakWood, Texture.oakWoodTop });
+        case "spruce_log":
+          return log(tag, new Texture[] { Texture.spruceWood, Texture.spruceWoodTop });
+        case "birch_log":
+          return log(tag, new Texture[] { Texture.birchWood, Texture.birchWoodTop });
+        case "jungle_log":
+          return log(tag, new Texture[] { Texture.jungleWood, Texture.jungleTreeTop });
+        case "acacia_log":
+          return log(tag, new Texture[] { Texture.acaciaWood, Texture.acaciaWoodTop });
+        case "dark_oak_log":
+          return log(tag, new Texture[] { Texture.darkOakWood, Texture.darkOakWoodTop });
+        case "stripped_oak_log":
+          return log(tag, new Texture[] { Texture.strippedOakLog, Texture.strippedOakLogTop });
+        case "stripped_spruce_log":
+          return log(tag, new Texture[] { Texture.strippedSpruceLog, Texture.strippedSpruceLogTop });
+        case "stripped_birch_log":
+          return log(tag, new Texture[] { Texture.strippedBirchLog, Texture.strippedBirchLogTop });
+        case "stripped_jungle_log":
+          return log(tag, new Texture[] { Texture.strippedJungleLog, Texture.strippedJungleLogTop });
+        case "stripped_acacia_log":
+          return log(tag, new Texture[] { Texture.strippedAcaciaLog, Texture.strippedAcaciaLogTop });
+        case "stripped_dark_oak_log":
+          return log(tag, new Texture[] { Texture.strippedDarkOakLog, Texture.strippedDarkOakLogTop });
         case "stripped_oak_wood":
           return new StrippedOakWood();
         case "stripped_spruce_wood":
@@ -326,26 +303,19 @@ public class TagBlockSpec implements BlockSpec {
         case "iron_block":
           return new IronBlock();
         case "oak_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.oakPlanks);
         case "spruce_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.sprucePlanks);
         case "birch_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.birchPlanks);
         case "jungle_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.jungleTreePlanks);
         case "acacia_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.acaciaPlanks);
         case "dark_oak_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.darkOakPlanks);
         case "stone_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.slabSide, Texture.slabTop);
         case "smooth_stone_slab":
           // TODO
           return new UnknownBlock(name);
@@ -423,56 +393,23 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "purpur_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.purpurBlock);
         case "purpur_pillar":
-          // TODO
-          return new UnknownBlock(name);
+          return log(tag, new Texture[] { Texture.purpurPillarSide, Texture.purpurPillarTop });
         case "purpur_stairs":
-          // TODO
-          return new UnknownBlock(name);
-        case "oak_stairs": {
-          Tag properties = tag.get("Properties");
-          String half = properties.get("half").stringValue("bottom");
-          String shape = properties.get("shape").stringValue("straight");
-          String facing = properties.get("facing").stringValue("south");
-          return new OakStairs(half, shape, facing);
-        }
-        case "spruce_stairs": {
-          Tag properties = tag.get("Properties");
-          String half = properties.get("half").stringValue("bottom");
-          String shape = properties.get("shape").stringValue("straight");
-          String facing = properties.get("facing").stringValue("south");
-          return new SpruceStairs(half, shape, facing);
-        }
-        case "birch_stairs": {
-          Tag properties = tag.get("Properties");
-          String half = properties.get("half").stringValue("bottom");
-          String shape = properties.get("shape").stringValue("straight");
-          String facing = properties.get("facing").stringValue("south");
-          return new BirchStairs(half, shape, facing);
-        }
-        case "jungle_stairs": {
-          Tag properties = tag.get("Properties");
-          String half = properties.get("half").stringValue("bottom");
-          String shape = properties.get("shape").stringValue("straight");
-          String facing = properties.get("facing").stringValue("south");
-          return new JungleStairs(half, shape, facing);
-        }
-        case "acacia_stairs": {
-          Tag properties = tag.get("Properties");
-          String half = properties.get("half").stringValue("bottom");
-          String shape = properties.get("shape").stringValue("straight");
-          String facing = properties.get("facing").stringValue("south");
-          return new AcaciaStairs(half, shape, facing);
-        }
-        case "dark_oak_stairs": {
-          Tag properties = tag.get("Properties");
-          String half = properties.get("half").stringValue("bottom");
-          String shape = properties.get("shape").stringValue("straight");
-          String facing = properties.get("facing").stringValue("south");
-          return new DarkOakStairs(half, shape, facing);
-        }
+          return stairs(tag, Texture.purpurBlock);
+        case "oak_stairs":
+          return stairs(tag, Texture.oakPlanks);
+        case "spruce_stairs":
+          return stairs(tag, Texture.sprucePlanks);
+        case "birch_stairs":
+          return stairs(tag, Texture.birchPlanks);
+        case "jungle_stairs":
+          return stairs(tag, Texture.jungleTreePlanks);
+        case "acacia_stairs":
+          return stairs(tag, Texture.acaciaPlanks);
+        case "dark_oak_stairs":
+          return stairs(tag, Texture.darkOakPlanks);
         case "chest":
           // TODO
           return new UnknownBlock(name);
@@ -1963,6 +1900,42 @@ public class TagBlockSpec implements BlockSpec {
       }
     }
     return Air.INSTANCE;
+  }
+
+  private static String blockName(Tag tag) {
+    String name = tag.get("Name").stringValue();
+    if (name.startsWith("minecraft:")) {
+      name = name.substring(10); // Remove "minecraft:" prefix.
+    }
+    return name;
+  }
+
+  private static Block log(Tag tag, Texture[] textures) {
+    String name = blockName(tag);
+    String axis = tag.get("Properties").get("axis").stringValue("y");
+    return new Log(name, textures, axis);
+  }
+
+  private static Block slab(Tag tag, Texture texture) {
+    String name = blockName(tag);
+    String type = tag.get("Properties").get("type").stringValue("bottom");
+    return type.equals("double")
+        ? new MinecraftBlock(name, texture)
+        : new Slab(name, texture, type);
+  }
+
+  private static Block slab(Tag tag, Texture sideTexture, Texture topTexture) {
+    // TODO
+    return null;
+  }
+
+  private static Block stairs(Tag tag, Texture texture) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String half = properties.get("half").stringValue("bottom");
+    String shape = properties.get("shape").stringValue("straight");
+    String facing = properties.get("facing").stringValue("south");
+    return new Stairs(name, texture, half, shape, facing);
   }
 
 }
