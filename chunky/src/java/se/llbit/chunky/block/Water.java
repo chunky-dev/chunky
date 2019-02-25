@@ -17,6 +17,7 @@ public class Water extends MinecraftBlock {
     super(String.format("water (%d)", level), Texture.water);
     this.level = level;
     solid = false;
+    opaque = false;
     localIntersect = true;
     specular = 0.12f;
     ior = 1.333f;

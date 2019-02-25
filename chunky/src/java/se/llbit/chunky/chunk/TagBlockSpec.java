@@ -1742,8 +1742,8 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "barrier":
-          // TODO
-          return new UnknownBlock(name);
+          // Invisible.
+          return Air.INSTANCE;
       }
     }
     return Air.INSTANCE;
@@ -1807,16 +1807,16 @@ public class TagBlockSpec implements BlockSpec {
     switch (facing) {
       default:
       case "north":
-        direction = 0;
-        break;
-      case "east":
-        direction = 1;
-        break;
-      case "south":
         direction = 2;
         break;
-      case "west":
+      case "east":
         direction = 3;
+        break;
+      case "south":
+        direction = 0;
+        break;
+      case "west":
+        direction = 1;
         break;
     }
     return new GlazedTerracotta(name, texture, direction);
