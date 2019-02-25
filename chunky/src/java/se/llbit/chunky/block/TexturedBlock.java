@@ -17,7 +17,7 @@ public class TexturedBlock extends MinecraftBlock {
   }
 
   public TexturedBlock(String name,
-      Texture north, Texture south, Texture west, Texture east,
+      Texture north, Texture south, Texture east, Texture west,
       Texture top, Texture bottom) {
     super(name, north);
     texture = new Texture[] { north, south, west, east, top, bottom };

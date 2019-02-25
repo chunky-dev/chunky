@@ -639,6 +639,9 @@ public class Texture {
   public static final Texture bedRed = new Texture();
   public static final Texture bedBlack = new Texture();
 
+  public static final Texture kelp = new Texture();
+  public static final Texture kelpPlant = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 

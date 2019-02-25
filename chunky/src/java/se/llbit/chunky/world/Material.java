@@ -26,7 +26,7 @@ public abstract class Material {
   /**
    * The name of this material.
    */
-  protected final String name;
+  public final String name;
 
   /**
    * Index of refraction.

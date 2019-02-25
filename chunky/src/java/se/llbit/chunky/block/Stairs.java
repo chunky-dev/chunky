@@ -8,10 +8,19 @@ import se.llbit.math.Ray;
 public class Stairs extends MinecraftBlock {
   private final int flipped, facing, corner;
   private final boolean isCorner;
+  private final Texture side, top, bottom;
 
   public Stairs(String name, Texture texture, String half, String shape, String facing) {
+    this(name, texture, texture, texture, half, shape, facing);
+  }
+
+  public Stairs(String name, Texture side, Texture top, Texture bottom,
+      String half, String shape, String facing) {
     super(String.format("%s (half=%s, shape=%s, facing=%s)", name, half, shape, facing),
-        texture);
+        side);
+    this.side = side;
+    this.top = top;
+    this.bottom = bottom;
     localIntersect = true;
     solid = false;
     flipped = (half.equals("top")) ? 1 : 0;
@@ -108,6 +117,6 @@ public class Stairs extends MinecraftBlock {
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {
-    return StairModel.intersect(ray, texture, flipped, isCorner, corner, facing);
+    return StairModel.intersect(ray, side, top, bottom, flipped, isCorner, corner, facing);
   }
 }

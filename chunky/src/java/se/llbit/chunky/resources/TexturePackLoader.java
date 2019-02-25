@@ -3026,6 +3026,13 @@ public class TexturePackLoader {
     allTextures.put("stripped_dark_oak_log_top",
         new SimpleTexture("assets/minecraft/textures/block/stripped_dark_oak_log_top",
             Texture.strippedDarkOakLogTop));
+
+    allTextures.put("kelp",
+        new SimpleTexture("assets/minecraft/textures/block/kelp",
+            Texture.kelp));
+    allTextures.put("kelp_plant",
+        new SimpleTexture("assets/minecraft/textures/block/kelp_plant",
+            Texture.kelpPlant));
   }
 
   private static String[] texturePacks = { };

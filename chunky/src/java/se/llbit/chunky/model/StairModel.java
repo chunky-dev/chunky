@@ -160,15 +160,26 @@ public class StairModel {
     return hit;
   }
 
-  public static boolean intersect(Ray ray, Texture texture, Texture textureTop,
-      Texture textureBottom) {
-
-    boolean hit = intersect(ray, texture);
+  public static boolean intersect(Ray ray, Texture side, Texture top, Texture bottom) {
+    boolean hit = intersect(ray, side);
     if (hit) {
       if (ray.n.y > 0) {
-        textureTop.getColor(ray);
+        top.getColor(ray);
       } else if (ray.n.y < 0) {
-        textureBottom.getColor(ray);
+        bottom.getColor(ray);
+      }
+    }
+    return hit;
+  }
+
+  public static boolean intersect(Ray ray, Texture side, Texture top, Texture bottom,
+      int flipped, boolean isCorner, int corner, int rotation) {
+    boolean hit = intersect(ray, side, flipped, isCorner, corner, rotation);
+    if (hit) {
+      if (ray.n.y > 0) {
+        top.getColor(ray);
+      } else if (ray.n.y < 0) {
+        bottom.getColor(ray);
       }
     }
     return hit;

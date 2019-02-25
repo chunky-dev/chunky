@@ -9,7 +9,6 @@ public class Grass extends MinecraftBlock {
   public Grass() {
     super("grass", Texture.tallGrass);
     localIntersect = true;
-    solid = false;
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {

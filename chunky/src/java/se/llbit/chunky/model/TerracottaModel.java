@@ -70,9 +70,13 @@ public class TerracottaModel {
   }
 
   public static boolean intersect(Ray ray, Texture texture) {
+    int direction = ray.getBlockData() & 3;
+    return intersect(ray, texture, direction);
+  }
+
+  public static boolean intersect(Ray ray, Texture texture, int direction) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
-    int direction = ray.getBlockData() & 3;
     for (int i = 0; i < 6; ++i) {
       Quad face = faces[direction][i];
       if (face.intersect(ray)) {
