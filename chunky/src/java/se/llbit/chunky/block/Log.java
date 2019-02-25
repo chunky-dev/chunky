@@ -43,11 +43,11 @@ public class Log extends MinecraftBlock {
   private final Texture[] texture;
   private int direction;
 
-  public Log(String name, Texture[] texture, String direction) {
-    super(name, texture[0]);
+  public Log(String name, Texture[] texture, String axis) {
+    super(String.format("%s (axis=%s)", name, axis), texture[0]);
     this.texture = texture;
     localIntersect = true;
-    switch (direction) {
+    switch (axis) {
       case "y":
         this.direction = 0;
         break;

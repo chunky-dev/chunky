@@ -396,21 +396,41 @@ public class TagBlockSpec implements BlockSpec {
           String facing = properties.get("facing").stringValue("south");
           return new OakStairs(half, shape, facing);
         }
-        case "spruce_stairs":
-          // TODO
-          return new UnknownBlock(name);
-        case "birch_stairs":
-          // TODO
-          return new UnknownBlock(name);
-        case "jungle_stairs":
-          // TODO
-          return new UnknownBlock(name);
-        case "acacia_stairs":
-          // TODO
-          return new UnknownBlock(name);
-        case "dark_oak_stairs":
-          // TODO
-          return new UnknownBlock(name);
+        case "spruce_stairs": {
+          Tag properties = tag.get("Properties");
+          String half = properties.get("half").stringValue("bottom");
+          String shape = properties.get("shape").stringValue("straight");
+          String facing = properties.get("facing").stringValue("south");
+          return new SpruceStairs(half, shape, facing);
+        }
+        case "birch_stairs": {
+          Tag properties = tag.get("Properties");
+          String half = properties.get("half").stringValue("bottom");
+          String shape = properties.get("shape").stringValue("straight");
+          String facing = properties.get("facing").stringValue("south");
+          return new BirchStairs(half, shape, facing);
+        }
+        case "jungle_stairs": {
+          Tag properties = tag.get("Properties");
+          String half = properties.get("half").stringValue("bottom");
+          String shape = properties.get("shape").stringValue("straight");
+          String facing = properties.get("facing").stringValue("south");
+          return new JungleStairs(half, shape, facing);
+        }
+        case "acacia_stairs": {
+          Tag properties = tag.get("Properties");
+          String half = properties.get("half").stringValue("bottom");
+          String shape = properties.get("shape").stringValue("straight");
+          String facing = properties.get("facing").stringValue("south");
+          return new AcaciaStairs(half, shape, facing);
+        }
+        case "dark_oak_stairs": {
+          Tag properties = tag.get("Properties");
+          String half = properties.get("half").stringValue("bottom");
+          String shape = properties.get("shape").stringValue("straight");
+          String facing = properties.get("facing").stringValue("south");
+          return new DarkOakStairs(half, shape, facing);
+        }
         case "chest":
           // TODO
           return new UnknownBlock(name);
