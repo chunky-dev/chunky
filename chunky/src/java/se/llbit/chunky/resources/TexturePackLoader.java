@@ -1444,13 +1444,13 @@ public class TexturePackLoader {
         new IndexedTexture(0xE5, Texture.sandstoneDecorated)));
     allTextures.put("sandstone_smooth", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/cut_sandstone",
-            Texture.sandstoneSmooth),
+            Texture.sandstoneCut),
         new SimpleTexture("assets/minecraft/textures/blocks/cut_sandstone",
-            Texture.sandstoneSmooth),
+            Texture.sandstoneCut),
         new SimpleTexture("assets/minecraft/textures/blocks/sandstone_smooth",
-            Texture.sandstoneSmooth),
-        new SimpleTexture("textures/blocks/sandstone_smooth", Texture.sandstoneSmooth),
-        new IndexedTexture(0xE6, Texture.sandstoneSmooth)));
+            Texture.sandstoneCut),
+        new SimpleTexture("textures/blocks/sandstone_smooth", Texture.sandstoneCut),
+        new IndexedTexture(0xE6, Texture.sandstoneCut)));
     allTextures.put("anvil_top", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/anvil_top", Texture.anvilTop),
         new SimpleTexture("assets/minecraft/textures/blocks/anvil_top", Texture.anvilTop),
@@ -2268,11 +2268,11 @@ public class TexturePackLoader {
             Texture.redSandstoneDecorated)));
     allTextures.put("red_sandstone_smooth", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/cut_red_sandstone",
-            Texture.redSandstoneSmooth),
+            Texture.redSandstoneCut),
         new SimpleTexture("assets/minecraft/textures/blocks/cut_red_sandstone",
-            Texture.redSandstoneSmooth),
+            Texture.redSandstoneCut),
         new SimpleTexture("assets/minecraft/textures/blocks/red_sandstone_smooth",
-            Texture.redSandstoneSmooth)));
+            Texture.redSandstoneCut)));
 
     allTextures.put("spruce_door_upper", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/spruce_door_top",
@@ -2983,6 +2983,49 @@ public class TexturePackLoader {
 
     allTextures.put("armor_stand",
         new SimpleTexture("assets/minecraft/textures/entity/armorstand/wood", Texture.armorStand));
+
+    // Minecraft 1.13
+    allTextures.put("stripped_oak_log",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_oak_log",
+            Texture.strippedOakLog));
+    allTextures.put("stripped_oak_log_top",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_oak_log_top",
+            Texture.strippedOakLogTop));
+
+    allTextures.put("stripped_spruce_log",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_spruce_log",
+            Texture.strippedSpruceLog));
+    allTextures.put("stripped_spruce_log_top",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_spruce_log_top",
+            Texture.strippedSpruceLogTop));
+
+    allTextures.put("stripped_birch_log",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_birch_log",
+            Texture.strippedBirchLog));
+    allTextures.put("stripped_birch_log_top",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_birch_log_top",
+            Texture.strippedBirchLogTop));
+
+    allTextures.put("stripped_jungle_log",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_jungle_log",
+            Texture.strippedJungleLog));
+    allTextures.put("stripped_jungle_log_top",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_jungle_log_top",
+            Texture.strippedJungleLogTop));
+
+    allTextures.put("stripped_acacia_log",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_acacia_log",
+            Texture.strippedAcaciaLog));
+    allTextures.put("stripped_acacia_log_top",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_acacia_log_top",
+            Texture.strippedAcaciaLogTop));
+
+    allTextures.put("stripped_dark_oak_log",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_dark_oak_log",
+            Texture.strippedDarkOakLog));
+    allTextures.put("stripped_dark_oak_log_top",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_dark_oak_log_top",
+            Texture.strippedDarkOakLogTop));
   }
 
   private static String[] texturePacks = { };

@@ -172,11 +172,13 @@ public class Texture {
   public static final Texture sandstoneTop = new Texture();
   public static final Texture sandstoneBottom = new Texture();
   public static final Texture sandstoneDecorated = new Texture();
+  public static final Texture sandstoneCut = new Texture();
   public static final Texture sandstoneSmooth = new Texture();
   public static final Texture redSandstoneSide = new Texture();
   public static final Texture redSandstoneTop = new Texture();
   public static final Texture redSandstoneBottom = new Texture();
   public static final Texture redSandstoneDecorated = new Texture();
+  public static final Texture redSandstoneCut = new Texture();
   public static final Texture redSandstoneSmooth = new Texture();
   public static final Texture deadBush = new Texture("dead-bush");
   public static final Texture tallGrass = new Texture("tall-grass");
@@ -601,6 +603,24 @@ public class Texture {
   public static final Texture jungleDoorBottom = new Texture();
   public static final Texture acaciaDoorBottom = new Texture();
   public static final Texture darkOakDoorBottom = new Texture();
+
+  public static final Texture strippedOakLog = new Texture();
+  public static final Texture strippedOakLogTop = new Texture();
+
+  public static final Texture strippedDarkOakLog = new Texture();
+  public static final Texture strippedDarkOakLogTop = new Texture();
+
+  public static final Texture strippedSpruceLog = new Texture();
+  public static final Texture strippedSpruceLogTop = new Texture();
+
+  public static final Texture strippedBirchLog = new Texture();
+  public static final Texture strippedBirchLogTop = new Texture();
+
+  public static final Texture strippedJungleLog = new Texture();
+  public static final Texture strippedJungleLogTop = new Texture();
+
+  public static final Texture strippedAcaciaLog = new Texture();
+  public static final Texture strippedAcaciaLogTop = new Texture();
 
   public static final Texture bedWhite = new Texture();
   public static final Texture bedOrange = new Texture();

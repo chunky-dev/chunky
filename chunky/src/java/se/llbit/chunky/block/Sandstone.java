@@ -12,7 +12,7 @@ public class Sandstone extends MinecraftBlock {
   };
 
   public Sandstone() {
-    super("sandstone", Texture.sandstoneSide);
+    super("sandstone", texture[0]);
     localIntersect = true;
   }
 

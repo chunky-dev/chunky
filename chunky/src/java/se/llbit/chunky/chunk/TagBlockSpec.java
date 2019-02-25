@@ -31,6 +31,7 @@ public class TagBlockSpec implements BlockSpec {
       name = name.substring(10);
       // TODO: add a new class for each block type...
       // TODO: convert all old block IDs to the new block types.
+      // TODO: clean up - register block loaders in hash map instead
       switch (name) {
         case "air":
         case "cave_air":
@@ -140,31 +141,42 @@ public class TagBlockSpec implements BlockSpec {
           String axis = tag.get("Properties").get("axis").stringValue("y");
           return new DarkOakLog(axis);
         }
-        case "stripped_oak_log":
-          // TODO 1.13
-        case "stripped_spruce_log":
-          // TODO 1.13
-        case "stripped_birch_log":
-          // TODO 1.13
-        case "stripped_jungle_log":
-          // TODO 1.13
-        case "stripped_acacia_log":
-          // TODO 1.13
-        case "stripped_dark_oak_log":
-          // TODO 1.13
+        case "stripped_oak_log": {
+          String axis = tag.get("Properties").get("axis").stringValue("y");
+          return new StrippedOakLog(axis);
+        }
+        case "stripped_spruce_log": {
+          String axis = tag.get("Properties").get("axis").stringValue("y");
+          return new StrippedSpruceLog(axis);
+        }
+        case "stripped_birch_log": {
+          String axis = tag.get("Properties").get("axis").stringValue("y");
+          return new StrippedBirchLog(axis);
+        }
+        case "stripped_jungle_log": {
+          String axis = tag.get("Properties").get("axis").stringValue("y");
+          return new StrippedJungleLog(axis);
+        }
+        case "stripped_acacia_log": {
+          String axis = tag.get("Properties").get("axis").stringValue("y");
+          return new StrippedAcaciaLog(axis);
+        }
+        case "stripped_dark_oak_log": {
+          String axis = tag.get("Properties").get("axis").stringValue("y");
+          return new StrippedDarkOakLog(axis);
+        }
         case "stripped_oak_wood":
-          // TODO 1.13
+          return new StrippedOakWood();
         case "stripped_spruce_wood":
-          // TODO 1.13
+          return new StrippedSpruceWood();
         case "stripped_birch_wood":
-          // TODO 1.13
+          return new StrippedBirchWood();
         case "stripped_jungle_wood":
-          // TODO 1.13
+          return new StrippedJungleWood();
         case "stripped_acacia_wood":
-          // TODO 1.13
+          return new StrippedAcaciaWood();
         case "stripped_dark_oak_wood":
-          // TODO 1.13
-          return new UnknownBlock(name);
+          return new StrippedDarkOakWood();
         case "oak_wood":
           return new OakWood();
         case "spruce_wood":
@@ -332,33 +344,80 @@ public class TagBlockSpec implements BlockSpec {
         case "prismarine_brick_slab":
         case "dark_prismarine_slab":
         case "smooth_quartz":
+          return new UnknownBlock(name);
         case "smooth_red_sandstone":
+          return new SmoothRedSandstone();
         case "smooth_sandstone":
+          return new SmoothSandstone();
         case "smooth_stone":
           return new UnknownBlock(name);
         case "bricks":
           return new Bricks();
         case "tnt":
+          // TODO
+          return new UnknownBlock(name);
         case "bookshelf":
+          // TODO
+          return new UnknownBlock(name);
         case "mossy_cobblestone":
+          // TODO
+          return new UnknownBlock(name);
         case "obsidian":
+          // TODO
+          return new UnknownBlock(name);
         case "torch":
+          // TODO
+          return new UnknownBlock(name);
         case "wall_torch":
+          // TODO
+          return new UnknownBlock(name);
         case "end_rod":
+          // TODO
+          return new UnknownBlock(name);
         case "chorus_plant":
+          // TODO
+          return new UnknownBlock(name);
         case "chorus_flower":
+          // TODO
+          return new UnknownBlock(name);
         case "purpur_block":
+          // TODO
+          return new UnknownBlock(name);
         case "purpur_pillar":
+          // TODO
+          return new UnknownBlock(name);
         case "purpur_stairs":
-        case "oak_stairs":
+          // TODO
+          return new UnknownBlock(name);
+        case "oak_stairs": {
+          Tag properties = tag.get("Properties");
+          String half = properties.get("half").stringValue("bottom");
+          String shape = properties.get("shape").stringValue("straight");
+          String facing = properties.get("facing").stringValue("south");
+          return new OakStairs(half, shape, facing);
+        }
         case "spruce_stairs":
+          // TODO
+          return new UnknownBlock(name);
         case "birch_stairs":
+          // TODO
+          return new UnknownBlock(name);
         case "jungle_stairs":
+          // TODO
+          return new UnknownBlock(name);
         case "acacia_stairs":
+          // TODO
+          return new UnknownBlock(name);
         case "dark_oak_stairs":
+          // TODO
+          return new UnknownBlock(name);
         case "chest":
+          // TODO
+          return new UnknownBlock(name);
         case "diamond_ore":
+          return new DiamondOre();
         case "diamond_block":
+          return new DiamondBlock();
         case "crafting_table":
         case "farmland":
         case "furnace":
@@ -533,8 +592,10 @@ public class TagBlockSpec implements BlockSpec {
           String half = tag.get("Properties").get("half").stringValue("lower");
           return new TallGrass(half);
         }
-        case "large_fern":
-          return new UnknownBlock(name);
+        case "large_fern": {
+          String half = tag.get("Properties").get("half").stringValue("lower");
+          return new LargeFern(half);
+        }
         case "white_stained_glass":
           return new StainedGlassWhite();
         case "orange_stained_glass":
@@ -583,18 +644,24 @@ public class TagBlockSpec implements BlockSpec {
         case "green_stained_glass_pane":
         case "red_stained_glass_pane":
         case "black_stained_glass_pane":
-        case "prismarine":
           return new UnknownBlock(name);
+        case "prismarine":
+          return new Prismarine();
         case "prismarine_bricks":
           return new PrismarineBricks();
         case "dark_prismarine":
+          return new DarkPrismarine();
         case "prismarine_stairs":
         case "prismarine_brick_stairs":
         case "dark_prismarine_stairs":
         case "sea_lantern":
+          return new UnknownBlock(name);
         case "red_sandstone":
+          return new RedSandstone();
         case "chiseled_red_sandstone":
+          return new ChiseledRedSandstone();
         case "cut_red_sandstone":
+          return new CutRedSandstone();
         case "red_sandstone_stairs":
         case "magma_block":
         case "nether_wart_block":

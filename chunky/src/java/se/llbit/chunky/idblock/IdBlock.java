@@ -417,8 +417,8 @@ public class IdBlock extends Material {
             Texture.sandstoneDecorated, Texture.sandstoneTop, Texture.sandstoneBottom,},
 
         // smooth
-        {Texture.sandstoneSmooth, Texture.sandstoneSmooth, Texture.sandstoneSmooth,
-            Texture.sandstoneSmooth, Texture.sandstoneTop, Texture.sandstoneBottom,},};
+        {Texture.sandstoneCut, Texture.sandstoneCut, Texture.sandstoneCut,
+            Texture.sandstoneCut, Texture.sandstoneTop, Texture.sandstoneBottom,},};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TexturedBlockModel.intersect(ray, texture[ray.getBlockData() % 3]);
@@ -1958,8 +1958,8 @@ public class IdBlock extends Material {
             Texture.redSandstoneTop, Texture.redSandstoneBottom,},
 
         // smooth
-        {Texture.redSandstoneSmooth, Texture.redSandstoneSmooth, Texture.redSandstoneSmooth,
-            Texture.redSandstoneSmooth, Texture.redSandstoneTop, Texture.redSandstoneBottom,},};
+        {Texture.redSandstoneCut, Texture.redSandstoneCut, Texture.redSandstoneCut,
+            Texture.redSandstoneCut, Texture.redSandstoneTop, Texture.redSandstoneBottom,},};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
       return TexturedBlockModel.intersect(ray, texture[ray.getBlockData() % 3]);

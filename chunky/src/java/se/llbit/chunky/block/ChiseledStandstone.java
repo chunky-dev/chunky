@@ -12,7 +12,7 @@ public class ChiseledStandstone extends MinecraftBlock {
   };
 
   public ChiseledStandstone() {
-    super("chiseled_sandstone", Texture.sandstoneDecorated);
+    super("chiseled_sandstone", texture[0]);
     localIntersect = true;
   }
 
