@@ -5,19 +5,19 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
-public class ChiseledRedSandstone extends MinecraftBlock {
+public class Farmland extends MinecraftBlock {
   private static final Texture[] texture = {
-      Texture.redSandstoneDecorated, Texture.redSandstoneDecorated,
-      Texture.redSandstoneDecorated, Texture.redSandstoneDecorated,
-      Texture.redSandstoneTop, Texture.redSandstoneBottom,
+      Texture.podzolSide, Texture.podzolSide, Texture.podzolSide, Texture.podzolSide,
+      Texture.podzolTop, Texture.podzolSide,
   };
 
-  public ChiseledRedSandstone() {
-    super("chiseled_red_sandstone", texture[0]);
+  public Farmland() {
+    super("podzol", Texture.podzolSide);
     localIntersect = true;
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {
     return TexturedBlockModel.intersect(ray, texture);
   }
+
 }

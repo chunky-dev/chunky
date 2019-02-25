@@ -16,7 +16,18 @@ public class Slab extends MinecraftBlock {
     this.topTexture = topTexture;
     localIntersect = true;
     solid = false;
-    half = (type.equals("top")) ? 1 : 0;
+    switch (type) {
+      default:
+      case "top":
+        half = 1;
+        break;
+      case "bottom":
+        half = 0;
+        break;
+      case "double":
+        half = 2;
+        break;
+    }
   }
 
   public Slab(String name, Texture texture, String type) {
@@ -29,6 +40,9 @@ public class Slab extends MinecraftBlock {
 
       // upper half-block
       new AABB(0, 1, .5, 1, 0, 1),
+
+      // double slab
+      new AABB(0, 1, 0, 1, 0, 1),
   };
 
   @Override public boolean intersect(Ray ray, Scene scene) {

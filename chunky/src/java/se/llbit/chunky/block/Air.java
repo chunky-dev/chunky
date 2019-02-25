@@ -8,6 +8,7 @@ public class Air extends MinecraftBlock {
   private Air() {
     super("air", Texture.air);
     solid = false;
+    opaque = false;
     invisible = true;
   }
 }

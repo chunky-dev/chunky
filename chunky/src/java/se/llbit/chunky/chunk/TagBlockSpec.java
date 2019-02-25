@@ -40,54 +40,54 @@ public class TagBlockSpec implements BlockSpec {
           return Air.INSTANCE;
         case "infested_stone":
         case "stone":
-          return new Stone();
+          return new MinecraftBlock(name, Texture.stone);
         case "granite":
-          return new Granite();
+          return new MinecraftBlock(name, Texture.granite);
         case "polished_granite":
-          return new PolishedGranite();
+          return new MinecraftBlock(name, Texture.smoothGranite);
         case "diorite":
-          return new Diorite();
+          return new MinecraftBlock(name, Texture.diorite);
         case "polished_diorite":
-          return new PolishedDiorite();
+          return new MinecraftBlock(name, Texture.smoothDiorite);
         case "andesite":
-          return new Andesite();
+          return new MinecraftBlock(name, Texture.andesite);
         case "polished_andesite":
-          return new PolishedAndesite();
+          return new MinecraftBlock(name, Texture.smoothAndesite);
         case "grass_block":
           return new GrassBlock();
         case "dirt":
-          return new Dirt();
+          return new MinecraftBlock(name, Texture.dirt);
         case "coarse_dirt":
-          return new CoarseDirt();
+          return new MinecraftBlock(name, Texture.coarseDirt);
         case "podzol":
-          return new Podzol();
+          return new TexturedBlock(name, Texture.podzolSide, Texture.podzolTop, Texture.dirt);
         case "infested_cobblestone":
         case "cobblestone":
-          return new Cobblestone();
+          return new MinecraftBlock(name, Texture.cobblestone);
         case "oak_planks":
-          return new OakPlanks();
+          return new MinecraftBlock(name, Texture.oakPlanks);
         case "spruce_planks":
-          return new SprucePlanks();
+          return new MinecraftBlock(name, Texture.sprucePlanks);
         case "birch_planks":
-          return new BirchPlanks();
+          return new MinecraftBlock(name, Texture.birchPlanks);
         case "jungle_planks":
-          return new JunglePlanks();
+          return new MinecraftBlock(name, Texture.jungleTreePlanks);
         case "acacia_planks":
-          return new AcaciaPlanks();
+          return new MinecraftBlock(name, Texture.acaciaPlanks);
         case "dark_oak_planks":
-          return new DarkOakPlanks();
+          return new MinecraftBlock(name, Texture.darkOakPlanks);
         case "oak_sapling":
-          return new OakSapling();
+          return new SpriteBlock(name, Texture.oakSapling);
         case "spruce_sapling":
-          return new SpruceSapling();
+          return new SpriteBlock(name, Texture.spruceSapling);
         case "birch_sapling":
-          return new BirchSapling();
+          return new SpriteBlock(name, Texture.birchSapling);
         case "jungle_sapling":
-          return new JungleSapling();
+          return new SpriteBlock(name, Texture.jungleSapling);
         case "acacia_sapling":
-          return new AcaciaSapling();
+          return new SpriteBlock(name, Texture.acaciaSapling);
         case "dark_oak_sapling":
-          return new DarkOakSapling();
+          return new SpriteBlock(name, Texture.darkOakSapling);
         case "water": {
           int level = 0;
           try {
@@ -107,19 +107,19 @@ public class TagBlockSpec implements BlockSpec {
           return new Lava(level);
         }
         case "bedrock":
-          return new Bedrock();
+          return new MinecraftBlock(name, Texture.bedrock);
         case "sand":
-          return new Sand();
+          return new MinecraftBlock(name, Texture.sand);
         case "red_sand":
-          return new RedSand();
+          return new MinecraftBlock(name, Texture.redSand);
         case "gravel":
-          return new Gravel();
+          return new MinecraftBlock(name, Texture.gravel);
         case "gold_ore":
-          return new GoldOre();
+          return new MinecraftBlock(name, Texture.goldOre);
         case "iron_ore":
-          return new IronOre();
+          return new MinecraftBlock(name, Texture.ironOre);
         case "coal_ore":
-          return new CoalOre();
+          return new MinecraftBlock(name, Texture.coalOre);
         case "oak_log":
           return log(tag, new Texture[] { Texture.oakWood, Texture.oakWoodTop });
         case "spruce_log":
@@ -145,29 +145,29 @@ public class TagBlockSpec implements BlockSpec {
         case "stripped_dark_oak_log":
           return log(tag, new Texture[] { Texture.strippedDarkOakLog, Texture.strippedDarkOakLogTop });
         case "stripped_oak_wood":
-          return new StrippedOakWood();
+          return new MinecraftBlock(name, Texture.strippedOakLog);
         case "stripped_spruce_wood":
-          return new StrippedSpruceWood();
+          return new MinecraftBlock(name, Texture.strippedSpruceLog);
         case "stripped_birch_wood":
-          return new StrippedBirchWood();
+          return new MinecraftBlock(name, Texture.strippedBirchLog);
         case "stripped_jungle_wood":
-          return new StrippedJungleWood();
+          return new MinecraftBlock(name, Texture.strippedJungleLog);
         case "stripped_acacia_wood":
-          return new StrippedAcaciaWood();
+          return new MinecraftBlock(name, Texture.strippedAcaciaLog);
         case "stripped_dark_oak_wood":
-          return new StrippedDarkOakWood();
+          return new MinecraftBlock(name, Texture.strippedDarkOakLog);
         case "oak_wood":
-          return new OakWood();
+          return new MinecraftBlock(name, Texture.oakWood);
         case "spruce_wood":
-          return new SpruceWood();
+          return new MinecraftBlock(name, Texture.spruceWood);
         case "birch_wood":
-          return new BirchWood();
+          return new MinecraftBlock(name, Texture.birchWood);
         case "jungle_wood":
-          return new JungleWood();
+          return new MinecraftBlock(name, Texture.jungleWood);
         case "acacia_wood":
-          return new AcaciaWood();
+          return new MinecraftBlock(name, Texture.acaciaWood);
         case "dark_oak_wood":
-          return new DarkOakWood();
+          return new MinecraftBlock(name, Texture.darkOakWood);
         case "oak_leaves":
           return new OakLeaves();
         case "spruce_leaves":
@@ -181,26 +181,29 @@ public class TagBlockSpec implements BlockSpec {
         case "dark_oak_leaves":
           return new DarkOakLeaves();
         case "sponge":
-          return new Sponge();
+          return new MinecraftBlock(name, Texture.sponge);
         case "wet_sponge":
-          return new WetSponge();
+          return new SpriteBlock(name, Texture.wetSponge);
         case "glass":
-          return new Glass();
+          return new Glass(name, Texture.glass);
         case "lapis_ore":
-          return new LapisOre();
+          return new MinecraftBlock(name, Texture.lapisOre);
         case "lapis_block":
-          return new LapisBlock();
+          return new MinecraftBlock(name, Texture.lapisBlock);
         case "dispenser":
           // TODO
           return new UnknownBlock(name);
         case "sandstone":
-          return new Sandstone();
+          return new TexturedBlock(name, Texture.sandstoneSide,
+              Texture.sandstoneTop, Texture.sandstoneBottom);
         case "chiseled_sandstone":
-          return new ChiseledStandstone();
+          return new TexturedBlock(name, Texture.sandstoneDecorated,
+              Texture.sandstoneTop, Texture.sandstoneBottom);
         case "cut_sandstone":
-          return new CutSandstone();
+          return new TexturedBlock(name, Texture.sandstoneCut,
+              Texture.sandstoneTop, Texture.sandstoneBottom);
         case "note_block":
-          return new NoteBlock();
+          return new MinecraftBlock(name, Texture.jukeboxSide);
         case "powered_rail":
           // TODO
           return new UnknownBlock(name);
@@ -211,13 +214,13 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "cobweb":
-          return new Cobweb();
+          return new SpriteBlock(name, Texture.cobweb);
         case "grass":
           return new Grass();
         case "fern":
           return new Fern();
         case "dead_bush":
-          return new DeadBush();
+          return new SpriteBlock(name, Texture.deadBush);
         case "seagrass":
           // TODO 1.13
           return new UnknownBlock(name);
@@ -237,57 +240,57 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "white_wool":
-          return new WoolWhite();
+          return new MinecraftBlock(name, Texture.whiteWool);
         case "orange_wool":
-          return new WoolOrange();
+          return new MinecraftBlock(name, Texture.orangeWool);
         case "magenta_wool":
-          return new WoolMagenta();
+          return new MinecraftBlock(name, Texture.magentaWool);
         case "light_blue_wool":
-          return new WoolLightBlue();
+          return new MinecraftBlock(name, Texture.lightBlueWool);
         case "yellow_wool":
-          return new WoolYellow();
+          return new MinecraftBlock(name, Texture.yellowWool);
         case "lime_wool":
-          return new WoolLime();
+          return new MinecraftBlock(name, Texture.limeWool);
         case "pink_wool":
-          return new WoolPink();
+          return new MinecraftBlock(name, Texture.pinkWool);
         case "gray_wool":
-          return new WoolGray();
+          return new MinecraftBlock(name, Texture.grayWool);
         case "light_gray_wool":
-          return new WoolLightGray();
+          return new MinecraftBlock(name, Texture.lightGrayWool);
         case "cyan_wool":
-          return new WoolCyan();
+          return new MinecraftBlock(name, Texture.cyanWool);
         case "purple_wool":
-          return new WoolPurple();
+          return new MinecraftBlock(name, Texture.purpleWool);
         case "blue_wool":
-          return new WoolBlue();
+          return new MinecraftBlock(name, Texture.blueWool);
         case "brown_wool":
-          return new WoolBrown();
+          return new MinecraftBlock(name, Texture.brownWool);
         case "green_wool":
-          return new WoolGreen();
+          return new MinecraftBlock(name, Texture.greenWool);
         case "red_wool":
-          return new WoolRed();
+          return new MinecraftBlock(name, Texture.redWool);
         case "black_wool":
-          return new WoolBlack();
+          return new MinecraftBlock(name, Texture.blackWool);
         case "dandelion":
-          return new Dandelion();
+          return new SpriteBlock(name, Texture.dandelion);
         case "poppy":
-          return new Poppy();
+          return new SpriteBlock(name, Texture.poppy);
         case "blue_orchid":
-          return new BlueOrchid();
+          return new SpriteBlock(name, Texture.blueOrchid);
         case "allium":
-          return new Allium();
+          return new SpriteBlock(name, Texture.allium);
         case "azure_bluet":
-          return new AzureBluet();
+          return new SpriteBlock(name, Texture.azureBluet);
         case "red_tulip":
-          return new TulipRed();
+          return new SpriteBlock(name, Texture.redTulip);
         case "orange_tulip":
-          return new TulipOrange();
+          return new SpriteBlock(name, Texture.orangeTulip);
         case "white_tulip":
-          return new TulipWhite();
+          return new SpriteBlock(name, Texture.whiteTulip);
         case "pink_tulip":
-          return new TulipPink();
+          return new SpriteBlock(name, Texture.pinkTulip);
         case "oxeye_daisy":
-          return new OxeyeDaisy();
+          return new SpriteBlock(name, Texture.oxeyeDaisy);
         case "cornflower":
           return new UnknownBlock(name);
         case "lily_of_the_valley":
@@ -295,13 +298,13 @@ public class TagBlockSpec implements BlockSpec {
         case "wither_rose":
           return new UnknownBlock(name);
         case "brown_mushroom":
-          return new BrownMushroom();
+          return new SpriteBlock(name, Texture.brownMushroom);
         case "red_mushroom":
-          return new RedMushroom();
+          return new SpriteBlock(name, Texture.redMushroom);
         case "gold_block":
-          return new GoldBlock();
+          return new MinecraftBlock(name, Texture.goldBlock);
         case "iron_block":
-          return new IronBlock();
+          return new MinecraftBlock(name, Texture.ironBlock);
         case "oak_slab":
           return slab(tag, Texture.oakPlanks);
         case "spruce_slab":
@@ -315,68 +318,50 @@ public class TagBlockSpec implements BlockSpec {
         case "dark_oak_slab":
           return slab(tag, Texture.darkOakPlanks);
         case "stone_slab":
+        case "smooth_stone_slab": // Rename of stone_slab in 1.14.
           return slab(tag, Texture.slabSide, Texture.slabTop);
-        case "smooth_stone_slab":
-          // TODO
-          return new UnknownBlock(name);
         case "sandstone_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.sandstoneSide, Texture.sandstoneTop);
         case "petrified_oak_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.oakPlanks);
         case "cobblestone_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.cobblestone);
         case "brick_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.brick);
         case "stone_brick_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.stoneBrick);
         case "nether_brick_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.netherBrick);
         case "quartz_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.quartzSide, Texture.quartzTop);
         case "red_sandstone_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.redSandstoneSide, Texture.redSandstoneTop);
         case "purpur_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.purpurBlock);
         case "prismarine_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.prismarine);
         case "prismarine_brick_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.prismarineBricks);
         case "dark_prismarine_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.darkPrismarine);
         case "smooth_quartz":
           return new UnknownBlock(name);
         case "smooth_red_sandstone":
-          return new SmoothRedSandstone();
+          return new MinecraftBlock(name, Texture.redSandstoneTop);
         case "smooth_sandstone":
-          return new SmoothSandstone();
+          return new MinecraftBlock(name, Texture.sandstoneTop);
         case "smooth_stone":
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.slabTop);
         case "bricks":
-          return new Bricks();
+          return new MinecraftBlock(name, Texture.brick);
         case "tnt":
-          // TODO
-          return new UnknownBlock(name);
+          return new TexturedBlock(name, Texture.tntSide, Texture.tntTop, Texture.tntBottom);
         case "bookshelf":
-          // TODO
-          return new UnknownBlock(name);
+          return new TexturedBlock(name, Texture.bookshelf, Texture.oakPlanks);
         case "mossy_cobblestone":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.mossStone);
         case "obsidian":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.obsidian);
         case "torch":
           // TODO
           return new UnknownBlock(name);
@@ -414,15 +399,20 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "diamond_ore":
-          return new DiamondOre();
+          return new MinecraftBlock(name, Texture.diamondOre);
         case "diamond_block":
-          return new DiamondBlock();
+          return new MinecraftBlock(name, Texture.diamondBlock);
         case "crafting_table":
-          // TODO
+          return new TexturedBlock(name, Texture.workbenchFront, Texture.workbenchSide,
+              Texture.workbenchSide, Texture.workbenchFront, Texture.workbenchTop, Texture.oakPlanks);
+        case "farmland": {
+          int moisture = 0;
+          try {
+            moisture = Integer.parseInt(tag.get("Properties").get("moisture").stringValue("0"));
+          } catch (NumberFormatException ignored) {
+          }
           return new UnknownBlock(name);
-        case "farmland":
-          // TODO
-          return new UnknownBlock(name);
+        }
         case "furnace":
           // TODO
           return new UnknownBlock(name);
@@ -545,18 +535,18 @@ public class TagBlockSpec implements BlockSpec {
           return new UnknownBlock(name);
         case "infested_stone_bricks":
         case "stone_bricks":
-          return new StoneBricks();
+          return new MinecraftBlock(name, Texture.stoneBrick);
         case "infested_mossy_stone_bricks":
         case "mossy_stone_bricks":
-          return new MossyStoneBricks();
+          return new MinecraftBlock(name, Texture.mossyStoneBrick);
         case "infested_cracked_stone_bricks":
         case "cracked_stone_bricks":
-          return new CrackedStoneBricks();
+          return new MinecraftBlock(name, Texture.crackedStoneBrick);
         case "infested_chiseled_stone_bricks":
         case "chiseled_stone_bricks":
-          return new ChiseledStoneBricks();
+          return new MinecraftBlock(name, Texture.circleStoneBrick);
         case "nether_bricks":
-          return new NetherBricks();
+          return new MinecraftBlock(name, Texture.netherBrick);
         case "brown_mushroom_block":
           // TODO
           return new UnknownBlock(name);
@@ -623,7 +613,7 @@ public class TagBlockSpec implements BlockSpec {
         case "end_stone":
           return new UnknownBlock(name);
         case "end_stone_bricks":
-          return new EndStoneBricks();
+          return new MinecraftBlock(name, Texture.endBricks);
         case "redstone_lamp":
           // TODO
           return new UnknownBlock(name);
@@ -724,53 +714,37 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "white_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.whiteClay);
         case "orange_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.orangeClay);
         case "magenta_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.magentaClay);
         case "light_blue_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.lightBlueClay);
         case "yellow_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.yellowClay);
         case "lime_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.limeClay);
         case "pink_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.pinkClay);
         case "gray_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.grayClay);
         case "light_gray_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.lightGrayClay);
         case "cyan_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.cyanClay);
         case "purple_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.purpleClay);
         case "blue_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.blueClay);
         case "brown_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.brownClay);
         case "green_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.greenClay);
         case "red_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.redClay);
         case "black_terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.blackClay);
         case "iron_trapdoor":
           // TODO
           return new UnknownBlock(name);
@@ -826,8 +800,7 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "terracotta":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.hardenedClay);
         case "coal_block":
           // TODO
           return new UnknownBlock(name);
@@ -843,18 +816,12 @@ public class TagBlockSpec implements BlockSpec {
         case "sunflower":
           // TODO
           return new UnknownBlock(name);
-        case "lilac": {
-          String half = tag.get("Properties").get("half").stringValue("lower");
-          return new Lilac(half);
-        }
-        case "rose_bush": {
-          String half = tag.get("Properties").get("half").stringValue("lower");
-          return new RoseBush(half);
-        }
-        case "peony": {
-          String half = tag.get("Properties").get("half").stringValue("lower");
-          return new Peony(half);
-        }
+        case "lilac":
+          return largeFlower(tag, Texture.lilacTop, Texture.lilacBottom);
+        case "rose_bush":
+          return largeFlower(tag, Texture.roseBushTop, Texture.roseBushBottom);
+        case "peony":
+          return largeFlower(tag, Texture.peonyTop, Texture.peonyBottom);
         case "tall_grass": {
           String half = tag.get("Properties").get("half").stringValue("lower");
           return new TallGrass(half);
@@ -864,37 +831,37 @@ public class TagBlockSpec implements BlockSpec {
           return new LargeFern(half);
         }
         case "white_stained_glass":
-          return new StainedGlassWhite();
+          return new Glass(name, Texture.whiteGlass);
         case "orange_stained_glass":
-          return new StainedGlassOrange();
+          return new Glass(name, Texture.orangeGlass);
         case "magenta_stained_glass":
-          return new StainedGlassMagenta();
+          return new Glass(name, Texture.magentaGlass);
         case "light_blue_stained_glass":
-          return new StainedGlassLightBlue();
+          return new Glass(name, Texture.lightBlueGlass);
         case "yellow_stained_glass":
-          return new StainedGlassYellow();
+          return new Glass(name, Texture.yellowGlass);
         case "lime_stained_glass":
-          return new StainedGlassLime();
+          return new Glass(name, Texture.limeGlass);
         case "pink_stained_glass":
-          return new StainedGlassPink();
+          return new Glass(name, Texture.pinkGlass);
         case "gray_stained_glass":
-          return new StainedGlassGray();
+          return new Glass(name, Texture.grayGlass);
         case "light_gray_stained_glass":
-          return new StainedGlassLightGray();
+          return new Glass(name, Texture.lightGrayGlass);
         case "cyan_stained_glass":
-          return new StainedGlassCyan();
+          return new Glass(name, Texture.cyanGlass);
         case "purple_stained_glass":
-          return new StainedGlassPurple();
+          return new Glass(name, Texture.purpleGlass);
         case "blue_stained_glass":
-          return new StainedGlassBlue();
+          return new Glass(name, Texture.blueGlass);
         case "brown_stained_glass":
-          return new StainedGlassBrown();
+          return new Glass(name, Texture.brownGlass);
         case "green_stained_glass":
-          return new StainedGlassGreen();
+          return new Glass(name, Texture.greenGlass);
         case "red_stained_glass":
-          return new StainedGlassRed();
+          return new Glass(name, Texture.redGlass);
         case "black_stained_glass":
-          return new StainedGlassBlack();
+          return new Glass(name, Texture.blackGlass);
         case "white_stained_glass_pane":
           // TODO
           return new UnknownBlock(name);
@@ -944,11 +911,11 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "prismarine":
-          return new Prismarine();
+          return new MinecraftBlock(name, Texture.prismarine);
         case "prismarine_bricks":
-          return new PrismarineBricks();
+          return new MinecraftBlock(name, Texture.prismarineBricks);
         case "dark_prismarine":
-          return new DarkPrismarine();
+          return new MinecraftBlock(name, Texture.darkPrismarine);
         case "prismarine_stairs":
           // TODO
           return new UnknownBlock(name);
@@ -962,11 +929,14 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "red_sandstone":
-          return new RedSandstone();
+          return new TexturedBlock(name, Texture.redSandstoneSide,
+              Texture.redSandstoneTop, Texture.redSandstoneBottom);
         case "chiseled_red_sandstone":
-          return new ChiseledRedSandstone();
+          return new TexturedBlock(name, Texture.redSandstoneDecorated,
+              Texture.redSandstoneTop, Texture.redSandstoneBottom);
         case "cut_red_sandstone":
-          return new CutRedSandstone();
+          return new TexturedBlock(name, Texture.redSandstoneCut,
+              Texture.redSandstoneTop, Texture.redSandstoneBottom);
         case "red_sandstone_stairs":
           // TODO
           return new UnknownBlock(name);
@@ -977,7 +947,7 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "red_nether_bricks":
-          return new RedNetherBricks();
+          return new MinecraftBlock(name, Texture.redNetherBrick);
         case "bone_block":
           // TODO
           return new UnknownBlock(name);
@@ -1084,101 +1054,69 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "white_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteWhite);
         case "orange_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteOrange);
         case "magenta_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteMagenta);
         case "light_blue_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteLightBlue);
         case "yellow_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteYellow);
         case "lime_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteLime);
         case "pink_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePink);
         case "gray_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteGray);
         case "light_gray_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteSilver);
         case "cyan_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteCyan);
         case "purple_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePurple);
         case "blue_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteBlue);
         case "brown_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteBrown);
         case "green_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteGreen);
         case "red_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteRed);
         case "black_concrete":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concreteBlack);
         case "white_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderWhite);
         case "orange_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderOrange);
         case "magenta_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderMagenta);
         case "light_blue_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderLightBlue);
         case "yellow_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderYellow);
         case "lime_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderLime);
         case "pink_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderPink);
         case "gray_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderGray);
         case "light_gray_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderSilver);
         case "cyan_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderCyan);
         case "purple_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderPurple);
         case "blue_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderBlue);
         case "brown_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderBrown);
         case "green_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderGreen);
         case "red_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderRed);
         case "black_concrete_powder":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.concretePowderBlack);
         case "turtle_egg":
           // TODO
           return new UnknownBlock(name);
@@ -1324,11 +1262,9 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "end_stone_brick_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.stoneBrick);
         case "stone_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.cobblestone);
         case "smooth_sandstone_stairs":
           // TODO
           return new UnknownBlock(name);
@@ -1351,44 +1287,32 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "polished_granite_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.smoothGranite);
         case "smooth_red_sandstone_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.redSandstoneSmooth);
         case "mossy_stone_brick_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.mossyStoneBrick);
         case "polished_diorite_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.smoothDiorite);
         case "mossy_cobblestone_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.mossStone);
         case "end_stone_brick_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.endBricks);
         case "smooth_sandstone_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.sandstoneSmooth, Texture.sandstoneTop);
         case "smooth_quartz_slab":
-          // TODO
-          return new UnknownBlock(name);
+          // TODO 1.14
+          return slab(tag, Texture.quartzSide, Texture.quartzTop);
         case "granite_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.granite);
         case "andesite_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.andesite);
         case "red_nether_brick_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.redNetherBrick);
         case "polished_andesite_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.smoothAndesite);
         case "diorite_slab":
-          // TODO
-          return new UnknownBlock(name);
+          return slab(tag, Texture.diorite);
         case "brick_wall":
           // TODO
           return new UnknownBlock(name);
@@ -1512,7 +1436,7 @@ public class TagBlockSpec implements BlockSpec {
         case "redstone_wire":
           return new UnknownBlock(name);
         case "sugar_cane":
-          return new SugarCane();
+          return new SpriteBlock(name, Texture.sugarCane);
         case "kelp":
           // TODO
           return new UnknownBlock(name);
@@ -1910,6 +1834,13 @@ public class TagBlockSpec implements BlockSpec {
     return name;
   }
 
+  private static Block largeFlower(Tag tag, Texture top, Texture bottom) {
+    String name = tag.get("Name").stringValue();
+    String half = tag.get("Properties").get("half").stringValue("lower");
+    return new SpriteBlock(String.format("%s (half=%s)", name, half),
+        half.equals("upper") ? top : bottom);
+  }
+
   private static Block log(Tag tag, Texture[] textures) {
     String name = blockName(tag);
     String axis = tag.get("Properties").get("axis").stringValue("y");
@@ -1919,14 +1850,13 @@ public class TagBlockSpec implements BlockSpec {
   private static Block slab(Tag tag, Texture texture) {
     String name = blockName(tag);
     String type = tag.get("Properties").get("type").stringValue("bottom");
-    return type.equals("double")
-        ? new MinecraftBlock(name, texture)
-        : new Slab(name, texture, type);
+    return new Slab(name, texture, type);
   }
 
   private static Block slab(Tag tag, Texture sideTexture, Texture topTexture) {
-    // TODO
-    return null;
+    String name = blockName(tag);
+    String type = tag.get("Properties").get("type").stringValue("bottom");
+    return new Slab(name, sideTexture, topTexture, type);
   }
 
   private static Block stairs(Tag tag, Texture texture) {

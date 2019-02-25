@@ -10,6 +10,7 @@ public class SpriteBlock extends MinecraftBlock {
     super("cobweb", texture);
     localIntersect = true;
     solid = false;
+    opaque = false;
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {
