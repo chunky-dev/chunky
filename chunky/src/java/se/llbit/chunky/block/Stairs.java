@@ -9,6 +9,7 @@ public class Stairs extends MinecraftBlock {
   private final int flipped, facing, corner;
   private final boolean isCorner;
   private final Texture side, top, bottom;
+  private final String description;
 
   public Stairs(String name, Texture texture, String half, String shape, String facing) {
     this(name, texture, texture, texture, half, shape, facing);
@@ -16,8 +17,8 @@ public class Stairs extends MinecraftBlock {
 
   public Stairs(String name, Texture side, Texture top, Texture bottom,
       String half, String shape, String facing) {
-    super(String.format("%s (half=%s, shape=%s, facing=%s)", name, half, shape, facing),
-        side);
+    super(name, side);
+    this.description = String.format("half=%s, shape=%s, facing=%s", half, shape, facing);
     this.side = side;
     this.top = top;
     this.bottom = bottom;
@@ -118,5 +119,9 @@ public class Stairs extends MinecraftBlock {
 
   @Override public boolean intersect(Ray ray, Scene scene) {
     return StairModel.intersect(ray, side, top, bottom, flipped, isCorner, corner, facing);
+  }
+
+  @Override public String description() {
+    return description;
   }
 }

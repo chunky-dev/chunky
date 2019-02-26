@@ -183,7 +183,7 @@ public class TagBlockSpec implements BlockSpec {
         case "sponge":
           return new MinecraftBlock(name, Texture.sponge);
         case "wet_sponge":
-          return new SpriteBlock(name, Texture.wetSponge);
+          return new MinecraftBlock(name, Texture.wetSponge);
         case "glass":
           return new Glass(name, Texture.glass);
         case "lapis_ore":
@@ -1804,23 +1804,7 @@ public class TagBlockSpec implements BlockSpec {
   private static Block glazedTerracotta(Tag tag, Texture texture) {
     String name = blockName(tag);
     String facing = tag.get("Properties").get("facing").stringValue("south");
-    int direction;
-    switch (facing) {
-      default:
-      case "north":
-        direction = 2;
-        break;
-      case "east":
-        direction = 3;
-        break;
-      case "south":
-        direction = 0;
-        break;
-      case "west":
-        direction = 1;
-        break;
-    }
-    return new GlazedTerracotta(name, texture, direction);
+    return new GlazedTerracotta(name, texture, facing);
   }
 
   private static Block bed(Tag tag, Texture texture) {
@@ -1828,23 +1812,7 @@ public class TagBlockSpec implements BlockSpec {
     Tag properties = tag.get("Properties");
     String part = properties.get("part").stringValue("head");
     String facing = properties.get("facing").stringValue("south");
-    int direction;
-    switch (facing) {
-      default:
-      case "north":
-        direction = 2;
-        break;
-      case "east":
-        direction = 3;
-        break;
-      case "south":
-        direction = 0;
-        break;
-      case "west":
-        direction = 1;
-        break;
-    }
-    return new Bed(name, texture, part.equals("head") ? 1 : 0, direction);
+    return new Bed(name, texture, part, facing);
   }
 
   private static Block hugeMushroom(Tag tag, Texture skin) {

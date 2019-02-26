@@ -41,10 +41,12 @@ public class Log extends MinecraftBlock {
       {{0, 0, 0, 0, 0, 0}, {1, 1, 0, 0, 1, 1}, {0, 0, 1, 1, 0, 0}, {0, 0, 0, 0, 0, 0},};
 
   private final Texture[] texture;
+  private final String description;
   private int direction;
 
   public Log(String name, Texture side, Texture top, String axis) {
-    super(String.format("%s (axis=%s)", name, axis), side);
+    super(name, side);
+    this.description = "axis=" + axis;
     this.texture = new Texture[] { side, top };
     localIntersect = true;
     switch (axis) {
@@ -82,5 +84,9 @@ public class Log extends MinecraftBlock {
       ray.o.scaleAdd(ray.t, ray.d);
     }
     return hit;
+  }
+
+  @Override public String description() {
+    return description;
   }
 }

@@ -9,9 +9,11 @@ public class Slab extends MinecraftBlock {
   private final int half;
   private final Texture sideTexture;
   private final Texture topTexture;
+  private final String description;
 
   public Slab(String name, Texture sideTexture, Texture topTexture, String type) {
-    super(String.format("%s (type=%s)", name, type), sideTexture);
+    super(name, sideTexture);
+    this.description = String.format("type=%s", type);
     this.sideTexture = sideTexture;
     this.topTexture = topTexture;
     localIntersect = true;
@@ -61,4 +63,7 @@ public class Slab extends MinecraftBlock {
     return false;
   }
 
+  @Override public String description() {
+    return description;
+  }
 }

@@ -176,4 +176,8 @@ public class Lava extends MinecraftBlock {
     }
     return false;
   }
+
+  @Override public String description() {
+    return "level=" + level;
+  }
 }

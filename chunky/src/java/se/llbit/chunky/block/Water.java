@@ -292,4 +292,8 @@ public class Water extends MinecraftBlock {
     }
     return hit;
   }
+
+  @Override public String description() {
+    return String.format("level=%d", level);
+  }
 }

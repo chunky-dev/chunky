@@ -1974,8 +1974,12 @@ public class Scene implements JsonSerializable, Refreshable {
         if (traceTarget(ray) && ray.getCurrentMaterial() instanceof Block) {
           Block block = (Block) ray.getCurrentMaterial();
           buf.append(String.format("target: %.2f m\n", ray.distance));
-          buf.append(String.format("[%X] %s (%s)\n", ray.getCurrentData(), block,
-              block.description()));
+          buf.append(block.name);
+          String description = block.description();
+          if (!description.isEmpty()) {
+            buf.append(" (").append(description).append(")");
+          }
+          buf.append("\n");
         }
         Vector3 pos = camera.getPosition();
         buf.append(String.format("pos: (%.1f, %.1f, %.1f)", pos.x, pos.y, pos.z));
