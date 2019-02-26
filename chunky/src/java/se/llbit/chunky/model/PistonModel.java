@@ -141,29 +141,40 @@ public class PistonModel {
     retracted[4] = Model.rotateY(retracted[3]);
   }
 
-  static final Texture[][][] texture =
-      {{{Texture.pistonTop, Texture.pistonBottom, Texture.pistonSide, Texture.pistonSide,
-          Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
-          Texture.pistonSide, Texture.pistonSide,},
-
-          {Texture.pistonTopSticky, Texture.pistonBottom, Texture.pistonSide, Texture.pistonSide,
-              Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
-              Texture.pistonSide, Texture.pistonSide,},},
-
-          {{Texture.pistonInnerTop, Texture.pistonBottom, Texture.pistonSide, Texture.pistonSide,
-              Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
-              Texture.pistonSide, Texture.pistonSide,},
-
-              {Texture.pistonInnerTop, Texture.pistonBottom, Texture.pistonSide, Texture.pistonSide,
-                  Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
-                  Texture.pistonSide, Texture.pistonSide,},},};
+  static final Texture[][][] texture = {
+    {
+      {
+        Texture.pistonTop, Texture.pistonBottom, Texture.pistonSide, Texture.pistonSide,
+        Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
+        Texture.pistonSide, Texture.pistonSide,
+      }, {
+        Texture.pistonTopSticky, Texture.pistonBottom, Texture.pistonSide, Texture.pistonSide,
+        Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
+        Texture.pistonSide, Texture.pistonSide,
+      },
+    },
+    {
+      {
+        Texture.pistonInnerTop, Texture.pistonBottom, Texture.pistonSide, Texture.pistonSide,
+        Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
+        Texture.pistonSide, Texture.pistonSide,
+      }, {
+        Texture.pistonInnerTop, Texture.pistonBottom, Texture.pistonSide, Texture.pistonSide,
+        Texture.pistonSide, Texture.pistonSide, Texture.pistonSide, Texture.pistonSide,
+        Texture.pistonSide, Texture.pistonSide,
+      },
+    },
+  };
 
   public static boolean intersect(Ray ray, int isSticky) {
-    boolean hit = false;
     int isExtended = ray.getBlockData() >> 3;
-    Quad[] rot = isExtended == 1 ?
-        extended[(ray.getBlockData() & 7) % 6] :
-        retracted[(ray.getBlockData() & 7) % 6];
+    int facing = (ray.getBlockData() & 7) % 6;
+    return intersect(ray, isSticky, isExtended, facing);
+  }
+
+  public static boolean intersect(Ray ray, int isSticky, int isExtended, int facing) {
+    boolean hit = false;
+    Quad[] rot = isExtended == 1 ? extended[facing] : retracted[facing];
     ray.t = Double.POSITIVE_INFINITY;
     for (int i = 0; i < rot.length; ++i) {
       Quad side = rot[i];

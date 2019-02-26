@@ -211,8 +211,7 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "sticky_piston":
-          // TODO
-          return new UnknownBlock(name);
+          return piston(tag, true);
         case "cobweb":
           return new SpriteBlock(name, Texture.cobweb);
         case "grass":
@@ -231,14 +230,12 @@ public class TagBlockSpec implements BlockSpec {
           // TODO 1.13
           return new UnknownBlock(name);
         case "piston":
-          // TODO
-          return new UnknownBlock(name);
+          return piston(tag, false);
         case "piston_head":
-          // TODO
-          return new UnknownBlock(name);
+          return pistonHead(tag);
         case "moving_piston":
-          // TODO
-          return new UnknownBlock(name);
+          // Invisible.
+          return Air.INSTANCE;
         case "white_wool":
           return new MinecraftBlock(name, Texture.whiteWool);
         case "orange_wool":
@@ -1325,8 +1322,7 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "fire":
-          // TODO
-          return new UnknownBlock(name);
+          return new Fire();
         case "wheat":
           // TODO
           return new UnknownBlock(name);
@@ -1839,5 +1835,21 @@ public class TagBlockSpec implements BlockSpec {
       block = new SnowCovered(block);
     }
     return block;
+  }
+
+  private static Block piston(Tag tag, boolean isSticky) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String extended = properties.get("extended").stringValue("false");
+    String facing = properties.get("facing").stringValue("north");
+    return new Piston(name, isSticky, extended.equals("true"), facing);
+  }
+
+  private static Block pistonHead(Tag tag) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String facing = properties.get("facing").stringValue("north");
+    String type = properties.get("type").stringValue("normal");
+    return new PistonHead(name, type.equals("sticky"), facing);
   }
 }
