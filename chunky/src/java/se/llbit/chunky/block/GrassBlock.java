@@ -12,6 +12,7 @@ public class GrassBlock extends MinecraftBlock {
   }
 
   private static AABB aabb = new AABB(0, 1, 0, 1, 0, 1);
+
   @Override public boolean intersect(Ray ray, Scene scene) {
     ray.t = Double.POSITIVE_INFINITY;
     if (aabb.intersect(ray)) {

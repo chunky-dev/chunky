@@ -17,7 +17,7 @@ public class Lava extends MinecraftBlock {
   public final int level;
 
   public Lava(int level) {
-    super(String.format("lava (%d)", level), Texture.lava);
+    super("lava", Texture.lava);
     this.level = level;
     solid = false;
     localIntersect = true;

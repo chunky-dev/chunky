@@ -53,13 +53,14 @@ public class TagBlockSpec implements BlockSpec {
         case "polished_andesite":
           return new MinecraftBlock(name, Texture.smoothAndesite);
         case "grass_block":
-          return new GrassBlock();
+          return snowCovered(tag, new GrassBlock());
         case "dirt":
           return new MinecraftBlock(name, Texture.dirt);
         case "coarse_dirt":
           return new MinecraftBlock(name, Texture.coarseDirt);
         case "podzol":
-          return new TexturedBlock(name, Texture.podzolSide, Texture.podzolTop, Texture.dirt);
+          return snowCovered(tag,
+              new TexturedBlock(name, Texture.podzolSide, Texture.podzolTop, Texture.dirt));
         case "infested_cobblestone":
         case "cobblestone":
           return new MinecraftBlock(name, Texture.cobblestone);
@@ -168,17 +169,17 @@ public class TagBlockSpec implements BlockSpec {
         case "dark_oak_wood":
           return new MinecraftBlock(name, Texture.darkOakWood);
         case "oak_leaves":
-          return new OakLeaves();
+          return new Leaves(name, Texture.oakLeaves);
         case "spruce_leaves":
-          return new SpruceLeaves();
+          return new Leaves(name, Texture.spruceLeaves);
         case "birch_leaves":
-          return new BirchLeaves();
+          return new Leaves(name, Texture.birchLeaves);
         case "jungle_leaves":
-          return new JungleLeaves();
+          return new Leaves(name, Texture.jungleTreeLeaves);
         case "acacia_leaves":
-          return new AcaciaLeaves();
+          return new Leaves(name, Texture.acaciaLeaves);
         case "dark_oak_leaves":
-          return new DarkOakLeaves();
+          return new Leaves(name, Texture.darkOakLeaves);
         case "sponge":
           return new MinecraftBlock(name, Texture.sponge);
         case "wet_sponge":
@@ -1864,4 +1865,11 @@ public class TagBlockSpec implements BlockSpec {
         down.equals("true") ? skin : Texture.mushroomPores);
   }
 
+  private static Block snowCovered(Tag tag, Block block) {
+    String snowy = tag.get("Properties").get("snowy").stringValue("false");
+    if (snowy.equals("true")) {
+      block = new SnowCovered(block);
+    }
+    return block;
+  }
 }
