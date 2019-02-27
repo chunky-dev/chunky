@@ -191,8 +191,7 @@ public class TagBlockSpec implements BlockSpec {
         case "lapis_block":
           return new MinecraftBlock(name, Texture.lapisBlock);
         case "dispenser":
-          // TODO
-          return new UnknownBlock(name);
+          return dispenser(tag);
         case "sandstone":
           return new TexturedBlock(name, Texture.sandstoneSide,
               Texture.sandstoneTop, Texture.sandstoneBottom);
@@ -205,11 +204,9 @@ public class TagBlockSpec implements BlockSpec {
         case "note_block":
           return new MinecraftBlock(name, Texture.jukeboxSide);
         case "powered_rail":
-          // TODO
-          return new UnknownBlock(name);
+          return powered_rail(tag);
         case "detector_rail":
-          // TODO
-          return new UnknownBlock(name);
+          return rail(tag, Texture.detectorRail);
         case "sticky_piston":
           return piston(tag, true);
         case "cobweb":
@@ -417,8 +414,7 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "rail":
-          // TODO
-          return new UnknownBlock(name);
+          return rail(tag, Texture.rails);
         case "cobblestone_stairs":
           return stairs(tag, Texture.cobblestone);
         case "lever":
@@ -1851,5 +1847,27 @@ public class TagBlockSpec implements BlockSpec {
     String facing = properties.get("facing").stringValue("north");
     String type = properties.get("type").stringValue("normal");
     return new PistonHead(name, type.equals("sticky"), facing);
+  }
+
+  private static Block dispenser(Tag tag) {
+    String facing = tag.get("Properties").get("facing").stringValue("north");
+    return new Dispenser(facing);
+  }
+
+  private static Block rail(Tag tag, Texture straightTrack) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String shape = properties.get("shape").stringValue("north-south");
+    return new Rail(name, straightTrack, shape);
+  }
+
+  private static Block powered_rail(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String shape = properties.get("shape").stringValue("north-south");
+    String powered = properties.get("powered").stringValue("false");
+    Texture straightTrack = powered.equals("true")
+        ? Texture.poweredRailOn
+        : Texture.poweredRailOff;
+    return new Rail("powered_rail", straightTrack, shape);
   }
 }

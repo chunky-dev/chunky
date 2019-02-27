@@ -34,11 +34,19 @@ public class Log extends MinecraftBlock {
           new Vector4(0, 1, 0, 1)),
   };
 
-  private static final int[][] textureIndex =
-      {{0, 0, 0, 0, 1, 1}, {0, 0, 1, 1, 0, 0}, {1, 1, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}};
+  private static final int[][] textureIndex = {
+      {0, 0, 0, 0, 1, 1},
+      {0, 0, 1, 1, 0, 0},
+      {1, 1, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0}
+  };
 
-  private static final int[][] uv =
-      {{0, 0, 0, 0, 0, 0}, {1, 1, 0, 0, 1, 1}, {0, 0, 1, 1, 0, 0}, {0, 0, 0, 0, 0, 0},};
+  private static final int[][] uv = {
+      {0, 0, 0, 0, 0, 0},
+      {1, 1, 0, 0, 1, 1},
+      {0, 0, 1, 1, 0, 0},
+      {0, 0, 0, 0, 0, 0},
+  };
 
   private final Texture[] texture;
   private final String description;

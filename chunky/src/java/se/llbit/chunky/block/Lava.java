@@ -14,6 +14,8 @@ import static se.llbit.chunky.block.Water.CORNER_3;
 import static se.llbit.chunky.block.Water.FULL_BLOCK;
 
 public class Lava extends MinecraftBlock {
+  private static final AABB fullBlock = new AABB(0, 1, 0, 1, 0, 1);
+
   public final int level;
 
   public Lava(int level) {
@@ -23,8 +25,6 @@ public class Lava extends MinecraftBlock {
     localIntersect = true;
     emittance = 1.0f;
   }
-
-  private static AABB fullBlock = new AABB(0, 1, 0, 1, 0, 1);
 
   @Override public boolean intersect(Ray ray, Scene scene) {
     ray.t = Double.POSITIVE_INFINITY;

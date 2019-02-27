@@ -78,7 +78,7 @@ public class Water extends MinecraftBlock {
   public static final int CORNER_3 = 12;
 
   static {
-    // precompute normal map
+    // Precompute normal map.
     Texture waterHeight = new Texture("water-height");
     normalMapW = waterHeight.getWidth();
     normalMap = new float[normalMapW][normalMapW][2];

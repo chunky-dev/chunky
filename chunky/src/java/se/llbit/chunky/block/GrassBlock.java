@@ -6,12 +6,12 @@ import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
 public class GrassBlock extends MinecraftBlock {
+  private final static AABB aabb = new AABB(0, 1, 0, 1, 0, 1);
+
   public GrassBlock() {
     super("grass_block", Texture.grassTop);
     localIntersect = true;
   }
-
-  private static AABB aabb = new AABB(0, 1, 0, 1, 0, 1);
 
   @Override public boolean intersect(Ray ray, Scene scene) {
     ray.t = Double.POSITIVE_INFINITY;
