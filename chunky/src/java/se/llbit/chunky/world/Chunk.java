@@ -16,8 +16,8 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
 import se.llbit.chunky.map.IconLayer;
@@ -170,20 +170,16 @@ public class Chunk {
     Heightmap heightmap = world.heightmap();
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
-      String cv = chunkVersion(data);
-      if (cv.equals("1.13")) {
-        surface = IconLayer.MC_1_13;
-      } else if (cv.equals("1.12")) {
-        int[] heightmapData = extractHeightmapData(data);
-        byte[] biomeData = new byte[X_MAX * Z_MAX];
-        extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
-        byte[] chunkData = new byte[CHUNK_BYTES];
-        byte[] blockData = new byte[CHUNK_BYTES];
-        extractChunkData(data, chunkData, blockData);
-        updateHeightmap(heightmap, position, chunkData, heightmapData);
-        surface = new SurfaceLayer(world.currentDimension(), chunkData, biomeData, blockData);
-        queueTopography();
-      }
+      int[] heightmapData = extractHeightmapData(data);
+      byte[] biomeData = new byte[X_MAX * Z_MAX];
+      extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
+      byte[] chunkData = new byte[CHUNK_BYTES];
+      int[] blockData = new int[CHUNK_BYTES];
+      BlockPalette palette = new BlockPalette();
+      loadBlockData(data, blockData, palette);
+      updateHeightmap(heightmap, position, chunkData, heightmapData);
+      surface = new SurfaceLayer(world.currentDimension(), blockData, biomeData, palette);
+      queueTopography();
     } else {
       surface = IconLayer.CORRUPT;
     }

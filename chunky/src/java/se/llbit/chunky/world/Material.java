@@ -75,7 +75,8 @@ public abstract class Material {
    */
   public boolean subSurfaceScattering = false;
 
-  protected final Texture texture;
+  /** Base texture. */
+  public final Texture texture;
 
   public Material(String name, Texture texture) {
     this.name = name;

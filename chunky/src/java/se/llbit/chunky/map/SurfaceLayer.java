@@ -17,8 +17,11 @@
 package se.llbit.chunky.map;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.idblock.IdBlock;
-import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.Grass;
+import se.llbit.chunky.block.Leaves;
+import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -39,10 +42,10 @@ public class SurfaceLayer extends BitmapLayer {
   /**
    * Generate the surface bitmap.
    *
-   * @param dim         current dimension
-   * @param blocksArray block id array
+   * @param dim current dimension
+   * @param blocks block index array (indices into block palette)
    */
-  public SurfaceLayer(int dim, byte[] blocksArray, byte[] biomes, byte[] blockData) {
+  public SurfaceLayer(int dim, int[] blocks, byte[] biomes, BlockPalette palette) {
 
     bitmap = new int[Chunk.X_MAX * Chunk.Z_MAX];
     topo = new int[Chunk.X_MAX * Chunk.Z_MAX];
@@ -51,62 +54,47 @@ public class SurfaceLayer extends BitmapLayer {
 
         // Find the topmost non-empty block.
         int y = Chunk.Y_MAX - 1;
-        if (dim != -1) {
-          for (; y > 0; --y) {
-            int block = 0xFF & blocksArray[Chunk.chunkIndex(x, y, z)];
-            if (block != IdBlock.AIR.id)
-              break;
+        for (; y > 0; --y) {
+          if (palette.get(blocks[Chunk.chunkIndex(x, y, z)]) != Air.INSTANCE) {
+            break;
           }
-        } else {
-          // nether worlds have a ceiling that we want to skip
+        }
+        if (dim == -1) {
+          // Nether worlds have a ceiling that we want to skip.
           for (; y > 1; --y) {
-            int block = 0xFF & blocksArray[Chunk.chunkIndex(x, y, z)];
-            if (block != IdBlock.AIR.id)
+            if (palette.get(blocks[Chunk.chunkIndex(x, y, z)]) == Air.INSTANCE) {
               break;
-          }
-          for (; y > 1; --y) {
-            int block = 0xFF & blocksArray[Chunk.chunkIndex(x, y, z)];
-            if (block == IdBlock.AIR.id)
-              break;
+            }
           }
           for (; y > 1; --y) {
-            int block = 0xFF & blocksArray[Chunk.chunkIndex(x, y, z)];
-            if (block != IdBlock.AIR.id)
+            if (palette.get(blocks[Chunk.chunkIndex(x, y, z)]) != Air.INSTANCE) {
               break;
+            }
           }
         }
 
         float[] color = new float[4];
 
         for (; y >= 0 && color[3] < 1.f; ) {
-          IdBlock block = IdBlock.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
+          Block block = palette.get(blocks[Chunk.chunkIndex(x, y, z)]);
           float[] blockColor = new float[4];
           int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
 
-          int data = 0xFF & blockData[Chunk.chunkIndex(x, y, z) / 2];
-          data >>= (x % 2) * 4;
-          data &= 0xF;
+          if (block instanceof Leaves) {
+            ColorUtil.getRGBComponents(Biomes.getFoliageColor(biomeId), blockColor);
+            blockColor[3] = 1.f;// foliage colors don't include alpha
+            y -= 1;
+          } else if (block instanceof Grass) {
+            //case IdBlock.VINES_ID:
+            //case IdBlock.TALLGRASS_ID:
+            ColorUtil.getRGBComponents(Biomes.getGrassColor(biomeId), blockColor);
+            blockColor[3] = 1.f;// grass colors don't include alpha
 
-          switch (block.id) {
+            y -= 1;
+            // TODO:
+            //  } else if {
 
-            case IdBlock.LEAVES_ID:
-            case IdBlock.LEAVES2_ID:
-              ColorUtil.getRGBComponents(Biomes.getFoliageColor(biomeId), blockColor);
-              blockColor[3] = 1.f;// foliage colors don't include alpha
-
-              y -= 1;
-              break;
-
-            case IdBlock.GRASS_ID:
-            case IdBlock.VINES_ID:
-            case IdBlock.TALLGRASS_ID:
-              ColorUtil.getRGBComponents(Biomes.getGrassColor(biomeId), blockColor);
-              blockColor[3] = 1.f;// grass colors don't include alpha
-
-              y -= 1;
-              break;
-
-            case IdBlock.ICE_ID:
+            /*case IdBlock.ICE_ID:
               ColorUtil.getRGBAComponents(block.getTexture(data).getAvgColor(), blockColor);
               color = blend(color, blockColor);
               y -= 1;
@@ -133,9 +121,9 @@ public class SurfaceLayer extends BitmapLayer {
               ColorUtil.getRGBAComponents(Texture.water.getAvgColor(), blockColor);
               blockColor[3] = QuickMath.max(.5f, 1.f - depth / 32.f);
               break;
-
-            default:
-              ColorUtil.getRGBAComponents(block.getTexture(data).getAvgColor(), blockColor);
+              */
+          } else {
+              ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
 
               if (block.opaque && y > 64) {
                 float fade = QuickMath.min(0.6f, (y - World.SEA_LEVEL) / 60.f);
@@ -144,9 +132,7 @@ public class SurfaceLayer extends BitmapLayer {
                 blockColor[1] = (1 - fade) * blockColor[1] + fade;
                 blockColor[2] = (1 - fade) * blockColor[2] + fade;
               }
-
               y -= 1;
-              break;
           }
 
           color = blend(color, blockColor);
