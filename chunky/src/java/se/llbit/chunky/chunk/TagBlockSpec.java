@@ -357,11 +357,9 @@ public class TagBlockSpec implements BlockSpec {
         case "obsidian":
           return new MinecraftBlock(name, Texture.obsidian);
         case "torch":
-          // TODO
-          return new UnknownBlock(name);
+          return new Torch(name, Texture.torch);
         case "wall_torch":
-          // TODO
-          return new UnknownBlock(name);
+          return wall_torch(tag, Texture.torch);
         case "end_rod":
           // TODO
           return new UnknownBlock(name);
@@ -1368,7 +1366,7 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "redstone_wire":
-          return new UnknownBlock(name);
+          return redstone_wire(tag);
         case "sugar_cane":
           return new SpriteBlock(name, Texture.sugarCane);
         case "kelp":
@@ -1869,5 +1867,26 @@ public class TagBlockSpec implements BlockSpec {
         ? Texture.poweredRailOn
         : Texture.poweredRailOff;
     return new Rail("powered_rail", straightTrack, shape);
+  }
+
+  private static Block wall_torch(Tag tag, Texture texture) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String facing = properties.get("facing").stringValue("north");
+    return new WallTorch(name, texture, facing);
+  }
+
+  private static Block redstone_wire(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String north = properties.get("north").stringValue("none");
+    String south = properties.get("south").stringValue("none");
+    String east = properties.get("east").stringValue("none");
+    String west = properties.get("west").stringValue("none");
+    int power = 0;
+    try {
+      power = Integer.parseInt(properties.get("power").stringValue("0"));
+    } catch (NumberFormatException ignored) {
+    }
+    return new RedstoneWire(power, north, south, east, west);
   }
 }

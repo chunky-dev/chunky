@@ -20,6 +20,7 @@ public class Rail extends MinecraftBlock {
     };
     this.description = "shape=" + shape;
     localIntersect = true;
+    opaque = solid = false;
     switch (shape) {
       default:
       case "north_south":

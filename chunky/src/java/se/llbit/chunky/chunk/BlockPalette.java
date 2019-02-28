@@ -90,6 +90,9 @@ public class BlockPalette {
     materialProperties.put("minecraft:torch", block -> {
       block.emittance = 50.0f;
     });
+    materialProperties.put("minecraft:wall_torch", block -> {
+      block.emittance = 50.0f;
+    });
     materialProperties.put("minecraft:fire", block -> {
       block.emittance = 1.0f;
     });
