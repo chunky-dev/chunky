@@ -406,9 +406,10 @@ public class TagBlockSpec implements BlockSpec {
         }
         case "furnace":
           return furnace(tag);
-        case "ladder":
-          // TODO
-          return new UnknownBlock(name);
+        case "ladder": {
+          String facing = tag.get("Properties").get("facing").stringValue("north");
+          return new Ladder(facing);
+        }
         case "rail":
           return rail(tag, Texture.rails);
         case "cobblestone_stairs":
