@@ -197,6 +197,7 @@ public class Texture {
   public static final Texture poweredRailOn = new Texture();
   public static final Texture poweredRailOff = new Texture();
   public static final Texture detectorRail = new Texture();
+  public static final Texture detectorRailOn = new Texture();
   public static final Texture activatorRail = new Texture();
   public static final Texture activatorRailPowered = new Texture();
   public static final Texture whiteWool = new Texture("wool");

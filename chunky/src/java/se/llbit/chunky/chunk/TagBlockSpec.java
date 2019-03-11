@@ -206,7 +206,7 @@ public class TagBlockSpec implements BlockSpec {
         case "powered_rail":
           return powered_rail(tag);
         case "detector_rail":
-          return rail(tag, Texture.detectorRail);
+          return detector_rail(tag);
         case "sticky_piston":
           return piston(tag, true);
         case "cobweb":
@@ -388,8 +388,7 @@ public class TagBlockSpec implements BlockSpec {
         case "dark_oak_stairs":
           return stairs(tag, Texture.darkOakPlanks);
         case "chest":
-          // TODO
-          return new UnknownBlock(name);
+          return chest(tag);
         case "diamond_ore":
           return new MinecraftBlock(name, Texture.diamondOre);
         case "diamond_block":
@@ -1703,8 +1702,7 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "spawner":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlockTranslucent(name, Texture.monsterSpawner);
         case "nether_portal":
           // TODO
           return new UnknownBlock(name);
@@ -1859,14 +1857,22 @@ public class TagBlockSpec implements BlockSpec {
     return new Rail(name, straightTrack, shape);
   }
 
+  private static Block detector_rail(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String powered = properties.get("powered").stringValue("false");
+    Texture straightTrack = powered.equals("true")
+        ? Texture.detectorRailOn
+        : Texture.detectorRail;
+    return rail(tag, straightTrack);
+  }
+
   private static Block powered_rail(Tag tag) {
     Tag properties = tag.get("Properties");
-    String shape = properties.get("shape").stringValue("north-south");
     String powered = properties.get("powered").stringValue("false");
     Texture straightTrack = powered.equals("true")
         ? Texture.poweredRailOn
         : Texture.poweredRailOff;
-    return new Rail("powered_rail", straightTrack, shape);
+    return rail(tag, straightTrack);
   }
 
   private static Block wall_torch(Tag tag, Texture texture) {
@@ -1888,5 +1894,12 @@ public class TagBlockSpec implements BlockSpec {
     } catch (NumberFormatException ignored) {
     }
     return new RedstoneWire(power, north, south, east, west);
+  }
+
+  private static Block chest(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String facing = properties.get("facing").stringValue("north");
+    String type = properties.get("type").stringValue("single");
+    return new Chest(type, facing);
   }
 }

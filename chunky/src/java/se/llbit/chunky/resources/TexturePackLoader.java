@@ -1252,6 +1252,10 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/rail_detector", Texture.detectorRail),
         new SimpleTexture("textures/blocks/detectorRail", Texture.detectorRail),
         new IndexedTexture(0xC3, Texture.detectorRail)));
+    // Since 1.5:
+    allTextures.put("detector_rail_on", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/block/detector_rail_on", Texture.detectorRailOn),
+        new SimpleTexture("assets/minecraft/textures/blocks/rail_detector_powered", Texture.detectorRailOn)));
     allTextures.put("jungle_leaves", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/jungle_leaves",
             Texture.jungleTreeLeaves),
