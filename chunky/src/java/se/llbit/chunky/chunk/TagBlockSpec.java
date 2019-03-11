@@ -525,8 +525,7 @@ public class TagBlockSpec implements BlockSpec {
         case "melon":
           return new TexturedBlock(name, Texture.melonSide, Texture.melonTop);
         case "vine":
-          // TODO
-          return new UnknownBlock(name);
+          return vine(tag);
         case "oak_fence_gate":
           // TODO
           return new UnknownBlock(name);
@@ -1958,5 +1957,19 @@ public class TagBlockSpec implements BlockSpec {
         half,
         facing,
         open.equals("true"));
+  }
+
+  private Block vine(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String north = properties.get("north").stringValue("false");
+    String south = properties.get("south").stringValue("false");
+    String east = properties.get("east").stringValue("false");
+    String west = properties.get("west").stringValue("false");
+    String up = properties.get("up").stringValue("false");
+    return new Vine(north.equals("true"),
+        south.equals("true"),
+        east.equals("true"),
+        west.equals("true"),
+        up.equals("true"));
   }
 }
