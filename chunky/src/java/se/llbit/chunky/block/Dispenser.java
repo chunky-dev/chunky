@@ -8,23 +8,35 @@ import se.llbit.math.Ray;
 public class Dispenser extends MinecraftBlock {
   private static final Texture[][] texture = {
       // Facing down.
-      {Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop,
-          Texture.furnaceTop, Texture.dispenserFrontVertical},
+      {
+        Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop,
+        Texture.furnaceTop, Texture.dispenserFrontVertical
+      },
       // Facing up.
-      {Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop,
-          Texture.dispenserFrontVertical, Texture.furnaceTop},
+      {
+        Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop,
+        Texture.dispenserFrontVertical, Texture.furnaceTop
+      },
       // Facing north.
-      {Texture.dispenserFront, Texture.furnaceSide, Texture.furnaceSide, Texture.furnaceSide,
-          Texture.furnaceTop, Texture.furnaceTop,},
+      {
+        Texture.dispenserFront, Texture.furnaceSide, Texture.furnaceSide, Texture.furnaceSide,
+        Texture.furnaceTop, Texture.furnaceTop,
+      },
       // Facing south.
-      {Texture.furnaceSide, Texture.dispenserFront, Texture.furnaceSide, Texture.furnaceSide,
-          Texture.furnaceTop, Texture.furnaceTop,},
+      {
+        Texture.furnaceSide, Texture.dispenserFront, Texture.furnaceSide, Texture.furnaceSide,
+        Texture.furnaceTop, Texture.furnaceTop,
+      },
       // Facing east.
-      {Texture.furnaceSide, Texture.furnaceSide, Texture.furnaceSide, Texture.dispenserFront,
-          Texture.furnaceTop, Texture.furnaceTop,},
+      {
+        Texture.furnaceSide, Texture.furnaceSide, Texture.furnaceSide, Texture.dispenserFront,
+        Texture.furnaceTop, Texture.furnaceTop,
+      },
       // Facing west.
-      {Texture.furnaceSide, Texture.furnaceSide, Texture.dispenserFront, Texture.furnaceSide,
-          Texture.furnaceTop, Texture.furnaceTop,},
+      {
+        Texture.furnaceSide, Texture.furnaceSide, Texture.dispenserFront, Texture.furnaceSide,
+        Texture.furnaceTop, Texture.furnaceTop,
+      },
   };
 
   private final int facing;

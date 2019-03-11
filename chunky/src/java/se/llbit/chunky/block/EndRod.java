@@ -10,7 +10,7 @@ public class EndRod extends MinecraftBlock {
   private final String description;
 
   public EndRod(String facing) {
-    super("end_rod", Texture.dispenserFront);
+    super("end_rod", Texture.endRod);
     this.description = "facing=" + facing;
     localIntersect = true;
     opaque = false;

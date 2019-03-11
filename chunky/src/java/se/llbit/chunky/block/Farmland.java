@@ -6,7 +6,11 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class Farmland extends MinecraftBlock {
-  private static final Texture[] texture = {
+  private static final Texture[] moist = {
+      Texture.dirt, Texture.dirt, Texture.dirt, Texture.dirt,
+      Texture.farmlandWet, Texture.dirt,
+  };
+  private static final Texture[] dry = {
       Texture.dirt, Texture.dirt, Texture.dirt, Texture.dirt,
       Texture.farmlandDry, Texture.dirt,
   };
@@ -16,14 +20,10 @@ public class Farmland extends MinecraftBlock {
     super("farmland", Texture.farmlandWet);
     this.moisture = moisture;
     localIntersect = true;
-
-    if (moisture >= 7) {
-      texture[4] = Texture.farmlandWet;
-    }
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {
-    return TexturedBlockModel.intersect(ray, texture);
+    return TexturedBlockModel.intersect(ray, moisture >= 7 ? moist : dry);
   }
 
   @Override public String description() {

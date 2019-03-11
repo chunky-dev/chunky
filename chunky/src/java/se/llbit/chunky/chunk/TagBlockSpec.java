@@ -404,8 +404,7 @@ public class TagBlockSpec implements BlockSpec {
           return new Farmland(moisture);
         }
         case "furnace":
-          // TODO
-          return new UnknownBlock(name);
+          return furnace(tag);
         case "ladder":
           // TODO
           return new UnknownBlock(name);
@@ -1906,5 +1905,12 @@ public class TagBlockSpec implements BlockSpec {
     Tag properties = tag.get("Properties");
     String facing = properties.get("facing").stringValue("up");
     return new EndRod(facing);
+  }
+
+  private static Block furnace(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String facing = properties.get("facing").stringValue("north");
+    String lit = properties.get("lit").stringValue("false");
+    return new Furnace(facing, lit.equals("true"));
   }
 }

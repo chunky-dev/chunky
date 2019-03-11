@@ -33,7 +33,7 @@ public class Chest extends MinecraftBlock {
   private final String description;
 
   public Chest(String type, String facing) {
-    super("chest", Texture.dispenserFront);
+    super("chest", Texture.chestFront);
     this.description = String.format("type=%s, facing=%s", type, facing);
     localIntersect = true;
     opaque = false;
