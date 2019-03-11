@@ -21,7 +21,11 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Lava;
+import se.llbit.chunky.block.Sign;
+import se.llbit.chunky.block.WallSign;
 import se.llbit.chunky.block.Water;
+import se.llbit.chunky.entity.SignEntity;
+import se.llbit.chunky.entity.WallSignEntity;
 import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.entity.ArmorStand;
@@ -884,16 +888,14 @@ public class Scene implements JsonSerializable, Refreshable {
             int x = entityTag.get("x").intValue(0) - wx0; // Chunk-local coordinates.
             int z = entityTag.get("z").intValue(0) - wz0;
             int index = Chunk.chunkIndex(x, y, z);
-            /*int block = 0xFF & blocks[index];
+            Block block = palette.get(blocks[index]);
             // Metadata is the old block data (to be replaced in future Minecraft versions?).
-            int metadata = 0xFF & data[index / 2];
-            metadata >>= (x % 2) * 4;
-            metadata &= 0xF;
             Vector3 position = new Vector3(x + wx0, y, z + wz0);
+            if (block.isBlockEntity()) {
+              entities.add(block.toBlockEntity(position, entityTag));
+            }
+            /*
             switch (block) {
-              case Block.WALLSIGN_ID:
-                entities.add(new WallSignEntity(position, entityTag, metadata));
-                break;
               case Block.SIGNPOST_ID:
                 entities.add(new SignEntity(position, entityTag, metadata));
                 break;
@@ -919,7 +921,8 @@ public class Scene implements JsonSerializable, Refreshable {
                 entities.add(new WallBanner(position, metadata, entityTag));
                 break;
               }
-            }*/
+            }
+            */
           }
         }
       }

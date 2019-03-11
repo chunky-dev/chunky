@@ -23,6 +23,7 @@ import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Vector4;
 
+// TODO(1.14): handle new sign textures (birch, spruce, ...).
 public class SignTexture extends Texture {
 
   private static final double ww, hh, u0, v0;

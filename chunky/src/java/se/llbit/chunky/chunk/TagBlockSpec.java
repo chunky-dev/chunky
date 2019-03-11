@@ -1294,50 +1294,31 @@ public class TagBlockSpec implements BlockSpec {
         case "wheat":
           return wheat(tag);
         case "sign":
-          // TODO
-          return new UnknownBlock(name);
         case "oak_sign":
-          // TODO
-          return new UnknownBlock(name);
-        case "Sign":
-          // TODO
-          return new UnknownBlock(name);
+          return sign(tag, Texture.oakPlanks);
         case "wall_sign":
-          // TODO
-          return new UnknownBlock(name);
         case "oak_wall_sign":
-          // TODO
-          return new UnknownBlock(name);
+          return wallSign(tag, Texture.oakPlanks);
         case "spruce_sign":
-          // TODO
-          return new UnknownBlock(name);
+          return sign(tag, Texture.oakPlanks);
         case "spruce_wall_sign":
-          // TODO
-          return new UnknownBlock(name);
+          return wallSign(tag, Texture.oakPlanks);
         case "birch_sign":
-          // TODO
-          return new UnknownBlock(name);
+          return sign(tag, Texture.oakPlanks);
         case "birch_wall_sign":
-          // TODO
-          return new UnknownBlock(name);
+          return wallSign(tag, Texture.oakPlanks);
         case "jungle_sign":
-          // TODO
-          return new UnknownBlock(name);
+          return sign(tag, Texture.oakPlanks);
         case "jungle_wall_sign":
-          // TODO
-          return new UnknownBlock(name);
+          return wallSign(tag, Texture.oakPlanks);
         case "acacia_sign":
-          // TODO
-          return new UnknownBlock(name);
+          return sign(tag, Texture.oakPlanks);
         case "acacia_wall_sign":
-          // TODO
-          return new UnknownBlock(name);
+          return wallSign(tag, Texture.oakPlanks);
         case "dark_oak_sign":
-          // TODO
-          return new UnknownBlock(name);
+          return sign(tag, Texture.oakPlanks);
         case "dark_oak_wall_sign":
-          // TODO
-          return new UnknownBlock(name);
+          return wallSign(tag, Texture.oakPlanks);
         case "redstone_wire":
           return redstoneWire(tag);
         case "sugar_cane":
@@ -1915,5 +1896,21 @@ public class TagBlockSpec implements BlockSpec {
     Tag properties = tag.get("Properties");
     String facing = properties.get("facing").stringValue("up");
     return new ShulkerBox(name, texture.side, texture.top, texture.bottom, facing);
+  }
+
+  private static Block sign(Tag tag, Texture texture) {
+    String name = blockName(tag);
+    int rotation = 0;
+    try {
+      rotation = Integer.parseInt(tag.get("Properties").get("rotation").stringValue("0"));
+    } catch (NumberFormatException ignored) {
+    }
+    return new Sign(name, texture, rotation);
+  }
+
+  private static Block wallSign(Tag tag, Texture texture) {
+    String name = blockName(tag);
+    String facing = tag.get("Properties").get("facing").stringValue("north");
+    return new WallSign(name, texture, facing);
   }
 }

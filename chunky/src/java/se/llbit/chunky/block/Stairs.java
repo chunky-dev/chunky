@@ -5,7 +5,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
-public class Stairs extends MinecraftBlock {
+public class Stairs extends MinecraftBlockTranslucent {
   private final int flipped, facing, corner;
   private final boolean isCorner;
   private final Texture side, top, bottom;
