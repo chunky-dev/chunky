@@ -70,6 +70,7 @@ import se.llbit.png.PngFileWriter;
 import se.llbit.tiff.TiffFileWriter;
 import se.llbit.util.JsonSerializable;
 import se.llbit.util.MCDownloader;
+import se.llbit.util.MinecraftPRNG;
 import se.llbit.util.TaskTracker;
 import se.llbit.util.ZipExport;
 
@@ -885,8 +886,7 @@ public class Scene implements JsonSerializable, Refreshable {
                       long wx = cp.x * 16L + cx;
                       long wy = cy + 1;
                       long wz = cp.z * 16L + cz;
-                      long pr = (wx * 3129871L) ^ (wz * 116129781L) ^ (wy);
-                      pr = pr * pr * 42317861L + pr * 11L;
+                      long pr = MinecraftPRNG.rand(wx, wy, wz);
                       int dir = 3 & (int) (pr >> 16);
                       type |= (dir << BlockData.LILY_PAD_ROTATION);
                     }
@@ -897,8 +897,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   long wx = cp.x * 16L + cx;
                   long wy = cy + 1;
                   long wz = cp.z * 16L + cz;
-                  long pr = (wx * 3129871L) ^ (wz * 116129781L) ^ (wy);
-                  pr = pr * pr * 42317861L + pr * 11L;
+                  long pr = MinecraftPRNG.rand(wx, wy, wz);
                   int dir = 0xF & (int) (pr >> 16);
                   type |= (dir << BlockData.LILY_PAD_ROTATION);
                 }
