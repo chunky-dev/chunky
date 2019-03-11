@@ -460,8 +460,8 @@ public class TagBlockSpec implements BlockSpec {
         case "clay":
           return new MinecraftBlock(name, Texture.clay);
         case "jukebox":
-          // TODO
-          return new UnknownBlock(name);
+          return new TexturedBlock(name, Texture.jukeboxSide,
+              Texture.jukeboxTop, Texture.jukeboxSide);
         case "oak_fence":
           // TODO
           return new UnknownBlock(name);
