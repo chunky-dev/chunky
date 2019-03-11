@@ -417,26 +417,19 @@ public class TagBlockSpec implements BlockSpec {
         case "lever":
           return lever(tag);
         case "stone_pressure_plate":
-          // TODO
-          return new UnknownBlock(name);
+          return new PressurePlate(name, Texture.stone);
         case "oak_pressure_plate":
-          // TODO
-          return new UnknownBlock(name);
+          return new PressurePlate(name, Texture.oakPlanks);
         case "spruce_pressure_plate":
-          // TODO
-          return new UnknownBlock(name);
+          return new PressurePlate(name, Texture.sprucePlanks);
         case "birch_pressure_plate":
-          // TODO
-          return new UnknownBlock(name);
+          return new PressurePlate(name, Texture.birchPlanks);
         case "jungle_pressure_plate":
-          // TODO
-          return new UnknownBlock(name);
+          return new PressurePlate(name, Texture.jungleTreePlanks);
         case "acacia_pressure_plate":
-          // TODO
-          return new UnknownBlock(name);
+          return new PressurePlate(name, Texture.acaciaPlanks);
         case "dark_oak_pressure_plate":
-          // TODO
-          return new UnknownBlock(name);
+          return new PressurePlate(name, Texture.darkOakPlanks);
         case "redstone_ore":
           return new MinecraftBlock(name, Texture.redstoneOre);
         case "redstone_torch":
@@ -646,11 +639,9 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "light_weighted_pressure_plate":
-          // TODO
-          return new UnknownBlock(name);
+          return new PressurePlate(name, Texture.goldBlock);
         case "heavy_weighted_pressure_plate":
-          // TODO
-          return new UnknownBlock(name);
+          return new PressurePlate(name, Texture.ironBlock);
         case "daylight_detector":
           // TODO
           return new UnknownBlock(name);
