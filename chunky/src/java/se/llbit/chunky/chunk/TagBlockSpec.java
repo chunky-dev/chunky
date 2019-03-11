@@ -449,15 +449,20 @@ public class TagBlockSpec implements BlockSpec {
         case "stone_button":
           // TODO
           return new UnknownBlock(name);
-        case "snow":
-          return new MinecraftBlock(name, Texture.snowBlock);
+        case "snow": {
+          int layers = 0;
+          try {
+            layers = Integer.parseInt(tag.get("Properties").get("layers").stringValue("0"));
+          } catch (NumberFormatException ignored) {
+          }
+          return new Snow(layers);
+        }
         case "ice":
           return new MinecraftBlock(name, Texture.ice);
         case "snow_block":
           return new MinecraftBlock(name, Texture.snowBlock);
         case "cactus":
-          // TODO
-          return new UnknownBlock(name);
+          return new Cactus();
         case "clay":
           return new MinecraftBlock(name, Texture.clay);
         case "jukebox":
