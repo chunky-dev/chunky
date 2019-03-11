@@ -79,7 +79,7 @@ public class EndRodModel {
     return intersect(ray, data);
   }
 
-  private static boolean intersect(Ray ray, int data) {
+  public static boolean intersect(Ray ray, int data) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     for (Quad quad : facing[data % 6]) {

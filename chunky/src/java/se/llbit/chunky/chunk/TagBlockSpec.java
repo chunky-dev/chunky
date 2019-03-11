@@ -361,8 +361,7 @@ public class TagBlockSpec implements BlockSpec {
         case "wall_torch":
           return wall_torch(tag, Texture.torch);
         case "end_rod":
-          // TODO
-          return new UnknownBlock(name);
+          return end_rod(tag);
         case "chorus_plant":
           // TODO
           return new UnknownBlock(name);
@@ -1901,5 +1900,11 @@ public class TagBlockSpec implements BlockSpec {
     String facing = properties.get("facing").stringValue("north");
     String type = properties.get("type").stringValue("single");
     return new Chest(type, facing);
+  }
+
+  private static Block end_rod(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String facing = properties.get("facing").stringValue("up");
+    return new EndRod(facing);
   }
 }
