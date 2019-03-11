@@ -295,70 +295,6 @@ public class Chunk {
             for (Tag item : palette.asList()) {
               subpalette[paletteIndex] = blockPalette.put(item);
               paletteIndex += 1;
-              /*
-              String name = item.asCompound().get("Name").stringValue("");
-              if (name.startsWith("minecraft:")) {
-                Block block;
-                if (Block.idMap.containsKey(name)) {
-                  block = Block.idMap.get(name);
-                } else {
-                  switch (name) {
-                    case "infested_stone":
-                      block = Block.HIDDENSILVERFISH;
-                      break;
-                    case "granite":
-                      block = Block.STONE;
-                      bd[paletteIndex] = 1;
-                      break;
-                    case "diorite":
-                      block = Block.STONE;
-                      bd[paletteIndex] = 3;
-                      break;
-                    case "andesite":
-                      block = Block.STONE;
-                      bd[paletteIndex] = 5;
-                      break;
-                    case "grass_block":
-                      block = Block.GRASS;
-                      break;
-                    case "jungle_leaves":
-                      block = Block.LEAVES;
-                      bd[paletteIndex] = 3;
-                      break;
-                    case "jungle_log":
-                      block = Block.WOOD;
-                      bd[paletteIndex] = 3;
-                      break;
-                    case "oak_leaves":
-                      block = Block.LEAVES;
-                      bd[paletteIndex] = 0;
-                      break;
-                    case "oak_log":
-                      block = Block.WOOD;
-                      bd[paletteIndex] = 0;
-                      break;
-                    case "fern":
-                      block = Block.TALLGRASS;
-                      bd[paletteIndex] = 2;
-                      break;
-                    case "poppy":
-                      block = Block.FLOWER;
-                      bd[paletteIndex] = 0;
-                      break;
-                    case "dandelion":
-                      block = Block.DANDELION;
-                      bd[paletteIndex] = 0;
-                      break;
-                    default:
-                      if (!logged.contains(name)) {
-                        Log.info("Unknown block ID: " + name);
-                        logged.add(name);
-                      }
-                      block = Block.GOLDBLOCK;
-                  }
-                }
-                bp[paletteIndex++] = block.id;
-              }*/
             }
             BitBuffer buffer = new BitBuffer(blockStates.longArray(), bpb);
             int offset = SECTION_BYTES * yOffset;
@@ -371,7 +307,7 @@ public class Chunk {
             }
           }
         } else {
-          Log.error(">>> WIP <<< Old chunk format temp disabled.");
+          //Log.error(">>> WIP <<< Old chunk format temp disabled.");
           /*Tag blocksTag = section.get("Blocks");
           if (blocksTag.isByteArray(SECTION_BYTES)) {
             System.arraycopy(blocksTag.byteArray(), 0, blocks, SECTION_BYTES * yOffset,
