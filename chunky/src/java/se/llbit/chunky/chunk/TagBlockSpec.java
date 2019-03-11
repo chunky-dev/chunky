@@ -476,22 +476,21 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "pumpkin":
-          // TODO
-          return new UnknownBlock(name);
-        case "carved_pumpkin":
-          // TODO
-          return new UnknownBlock(name);
+          return new TexturedBlock(name, Texture.pumpkinSide, Texture.pumpkinTop);
+        case "carved_pumpkin": {
+          String facing = tag.get("Properties").get("facing").stringValue("north");
+          return new CarvedPumpkin(facing);
+        }
         case "netherrack":
           return new MinecraftBlock(name, Texture.netherrack);
         case "soul_sand":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.soulsand);
         case "glowstone":
-          // TODO
-          return new UnknownBlock(name);
-        case "jack_o_lantern":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.glowstone);
+        case "jack_o_lantern": {
+          String facing = tag.get("Properties").get("facing").stringValue("north");
+          return new JackOLantern(facing);
+        }
         case "oak_trapdoor":
           // TODO
           return new UnknownBlock(name);
@@ -1321,9 +1320,14 @@ public class TagBlockSpec implements BlockSpec {
         case "bamboo_sapling":
           // TODO
           return new UnknownBlock(name);
-        case "cake":
-          // TODO
-          return new UnknownBlock(name);
+        case "cake": {
+          int bites = 0;
+          try {
+            bites = Integer.parseInt(tag.get("Properties").get("bites").stringValue("0"));
+          } catch (NumberFormatException ignored) {
+          }
+          return new Cake(bites);
+        }
         case "white_bed":
           return bed(tag, Texture.bedWhite);
         case "orange_bed":
@@ -1643,9 +1647,10 @@ public class TagBlockSpec implements BlockSpec {
           return new UnknownBlock(name);
         case "spawner":
           return new MinecraftBlockTranslucent(name, Texture.monsterSpawner);
-        case "nether_portal":
-          // TODO
-          return new UnknownBlock(name);
+        case "nether_portal": {
+          String axis = tag.get("Properties").get("axis").stringValue("north");
+          return new NetherPortal(axis);
+        }
         case "end_portal":
           // TODO
           return new UnknownBlock(name);
