@@ -46,78 +46,78 @@ public class UpdateChecker extends Thread {
       if (!tryUpdate()) {
         listener.noUpdateAvailable();
       }
-    } catch (MalformedURLException e1) {
-      System.err.println("Malformed version info URL.");
-      listener.updateError("Failed to fetch version info from update site."
-          + " Malformed version info URL.");
-    } catch (IOException e1) {
-      System.err.println("Failed to fetch version info " + e1.getMessage());
-      listener.updateError(
-          "Failed to fetch version info from update site."
-              + " Either the server is down or the URL is wrong.");
-    } catch (SyntaxError e1) {
-      System.err.println("Version info JSON error: " + e1.getMessage());
-      listener.updateError("The downloaded version info was corrupt. Can not update at this time.");
     } catch (Throwable e1) {
-      System.err.println("Uncaught exception: " + e1.getMessage());
+      System.err.println("Unhandled exception: " + e1.getMessage());
       listener.updateError("Can not update at this time.");
     }
   }
 
-  private boolean tryUpdate() throws IOException, SyntaxError {
+  private boolean tryUpdate() {
     List<VersionInfo> candidates = new LinkedList<>();
 
-    candidates.add(getVersion(settings.updateSite + "latest.json"));
+    getVersion(candidates, settings.updateSite + "latest.json");
 
     if (settings.downloadSnapshots) {
-      candidates.add(getVersion(settings.updateSite + "snapshot.json"));
+      getVersion(candidates, settings.updateSite + "snapshot.json");
     }
 
     // Filter out corrupt versions.
     Iterator<VersionInfo> iter = candidates.iterator();
     while (iter.hasNext()) {
-      if (!iter.next().isValid()) {
+      VersionInfo version = iter.next();
+      if (!version.isValid()) {
+        System.err.println("Corrupted version info");
+        listener.updateError("Downloaded corrupted version info: " + version);
         iter.remove();
       }
     }
 
     if (candidates.isEmpty()) {
-      listener
-          .updateError("The downloaded version info was corrupt. Can not update at this moment.");
       return false;
-    } else {
-      // Find latest candidate.
-      VersionInfo latest = candidates.get(0);
-      for (VersionInfo candidate : candidates) {
-        if (candidate.compareTo(latest) < 0) {
-          latest = candidate;
-        }
-      }
-
-      // Check if more recent version than candidate is already installed.
-      List<VersionInfo> versions = ChunkyDeployer.availableVersions();
-      iter = versions.iterator();
-      while (iter.hasNext()) {
-        VersionInfo available = iter.next();
-        if (available.compareTo(latest) <= 0 && ChunkyDeployer
-            .checkVersionIntegrity(available.name)) {
-          // More recent version already installed and not corrupt.
-          return false;
-        }
-      }
-
-      // Install the candidate!
-      listener.updateAvailable(latest);
-      return true;
     }
+
+    // Find latest candidate.
+    VersionInfo latest = candidates.get(0);
+    for (VersionInfo candidate : candidates) {
+      if (candidate.compareTo(latest) < 0) {
+        latest = candidate;
+      }
+    }
+
+    // Check if more recent version than candidate is already installed.
+    List<VersionInfo> versions = ChunkyDeployer.availableVersions();
+    iter = versions.iterator();
+    while (iter.hasNext()) {
+      VersionInfo available = iter.next();
+      if (available.compareTo(latest) <= 0 && ChunkyDeployer
+          .checkVersionIntegrity(available.name)) {
+        // More recent version already installed and not corrupt.
+        return false;
+      }
+    }
+
+    // Install the candidate!
+    listener.updateAvailable(latest);
+    return true;
   }
 
-  private VersionInfo getVersion(String url) throws IOException, SyntaxError {
-    URL latestJson = new URL(url);
-    InputStream in = latestJson.openStream();
-    JsonParser parser = new JsonParser(in);
-    VersionInfo version = new VersionInfo(parser.parse().object());
-    in.close();
-    return version;
+  private void getVersion(List<VersionInfo> candidates, String url) {
+    try {
+      URL latestJson = new URL(url);
+      InputStream in = latestJson.openStream();
+      JsonParser parser = new JsonParser(in);
+      VersionInfo version = new VersionInfo(parser.parse().object());
+      in.close();
+      candidates.add(version);
+    } catch (MalformedURLException e1) {
+      System.err.println("Malformed version info URL.");
+      listener.updateError("Malformed version info/update site URL: " + url);
+    } catch (IOException e1) {
+      System.err.println("Failed to fetch version info " + e1.getMessage());
+      listener.updateError("Failed to fetch version info from URL: " + url);
+    } catch (SyntaxError e1) {
+      System.err.println("Version info JSON error: " + e1.getMessage());
+      listener.updateError("Downloaded corrupt version info.");
+    }
   }
 }
