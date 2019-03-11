@@ -1328,18 +1328,30 @@ public class TagBlockSpec implements BlockSpec {
           return bed(tag, Texture.bedRed);
         case "black_bed":
           return bed(tag, Texture.bedBlack);
-        case "pumpkin_stem":
-          // TODO
-          return new UnknownBlock(name);
-        case "attached_pumpkin_stem":
-          // TODO
-          return new UnknownBlock(name);
-        case "melon_stem":
-          // TODO
-          return new UnknownBlock(name);
-        case "attached_melon_stem":
-          // TODO
-          return new UnknownBlock(name);
+        case "pumpkin_stem": {
+          int age = 7;
+          try {
+            age = Integer.parseInt(tag.get("Properties").get("age").stringValue("7"));
+          } catch (NumberFormatException ignored) {
+          }
+          return new Stem(name, age);
+        }
+        case "attached_pumpkin_stem": {
+          String facing = tag.get("Properties").get("facing").stringValue("north");
+          return new AttachedStem(name, facing);
+        }
+        case "melon_stem": {
+          int age = 7;
+          try {
+            age = Integer.parseInt(tag.get("Properties").get("age").stringValue("7"));
+          } catch (NumberFormatException ignored) {
+          }
+          return new Stem(name, age);
+        }
+        case "attached_melon_stem": {
+          String facing = tag.get("Properties").get("facing").stringValue("north");
+          return new AttachedStem(name, facing);
+        }
         case "nether_wart":
           // TODO
           return new UnknownBlock(name);
