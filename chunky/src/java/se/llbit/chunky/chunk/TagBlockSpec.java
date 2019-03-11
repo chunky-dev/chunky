@@ -433,11 +433,9 @@ public class TagBlockSpec implements BlockSpec {
         case "redstone_ore":
           return new MinecraftBlock(name, Texture.redstoneOre);
         case "redstone_torch":
-          // TODO
-          return new UnknownBlock(name);
+          return redstoneTorch(tag);
         case "redstone_wall_torch":
-          // TODO
-          return new UnknownBlock(name);
+          return redstoneWallTorch(tag);
         case "stone_button":
           return button(tag, Texture.stone);
         case "snow": {
@@ -1816,6 +1814,22 @@ public class TagBlockSpec implements BlockSpec {
         ? Texture.poweredRailOn
         : Texture.poweredRailOff;
     return rail(tag, straightTrack);
+  }
+
+  private static boolean isLit(Tag tag) {
+    return tag.get("Properties").get("lit").stringValue("false").equals("true");
+  }
+
+  private static Block redstoneTorch(Tag tag) {
+    return new Torch("redstone_torch", isLit(tag)
+        ? Texture.redstoneTorchOn
+        : Texture.redstoneTorchOff);
+  }
+
+  private static Block redstoneWallTorch(Tag tag) {
+    return wallTorch(tag, isLit(tag)
+        ? Texture.redstoneTorchOn
+        : Texture.redstoneTorchOff);
   }
 
   private static Block wallTorch(Tag tag, Texture texture) {
