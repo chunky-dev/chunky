@@ -1274,8 +1274,8 @@ public class TagBlockSpec implements BlockSpec {
         case "kelp_plant":
           return new SpriteBlock(name, Texture.kelpPlant);
         case "dried_kelp_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new TexturedBlock(name,
+              Texture.driedKelpSide, Texture.driedKelpTop, Texture.driedKelpBottom);
         case "bamboo":
           // TODO
           return new UnknownBlock(name);

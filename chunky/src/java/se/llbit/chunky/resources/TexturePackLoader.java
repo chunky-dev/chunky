@@ -3047,11 +3047,19 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/dark_oak_trapdoor", Texture.darkOakTrapdoor));
 
     allTextures.put("kelp",
-        new SimpleTexture("assets/minecraft/textures/block/kelp",
-            Texture.kelp));
+        new SimpleTexture("assets/minecraft/textures/block/kelp", Texture.kelp));
     allTextures.put("kelp_plant",
-        new SimpleTexture("assets/minecraft/textures/block/kelp_plant",
-            Texture.kelpPlant));
+        new SimpleTexture("assets/minecraft/textures/block/kelp_plant", Texture.kelpPlant));
+
+    allTextures.put("dried_kelp_side",
+        new SimpleTexture("assets/minecraft/textures/block/dried_kelp_side",
+            Texture.driedKelpSide));
+    allTextures.put("dried_kelp_top",
+        new SimpleTexture("assets/minecraft/textures/block/dried_kelp_top",
+            Texture.driedKelpTop));
+    allTextures.put("dried_kelp_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/dried_kelp_bottom",
+            Texture.driedKelpBottom));
   }
 
   private static String[] texturePacks = { };

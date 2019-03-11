@@ -649,6 +649,10 @@ public class Texture {
   public static final Texture kelp = new Texture();
   public static final Texture kelpPlant = new Texture();
 
+  public static final Texture driedKelpSide = new Texture();
+  public static final Texture driedKelpTop = new Texture();
+  public static final Texture driedKelpBottom = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
