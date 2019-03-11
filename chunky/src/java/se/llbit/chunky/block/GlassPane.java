@@ -1,18 +1,21 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.model.FenceModel;
+import se.llbit.chunky.model.GlassPaneModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Ray;
 
-public class Fence extends MinecraftBlockTranslucent {
+public class GlassPane extends MinecraftBlockTranslucent {
   private final String description;
+  private final Texture topTexture;
   private final int connections;
 
-  public Fence(String name, Texture texture,
+  public GlassPane(String name, Texture side, Texture top,
       boolean north, boolean south, boolean east, boolean west) {
-    super(name, texture);
+    super(name, side);
+    topTexture = top;
     localIntersect = true;
     this.description = String.format("north=%s, south=%s, east=%s, west=%s",
         north, south, east, west);
@@ -33,7 +36,7 @@ public class Fence extends MinecraftBlockTranslucent {
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {
-    return FenceModel.intersect(ray, texture, connections);
+    return GlassPaneModel.intersect(ray, texture, topTexture, connections);
   }
 
   @Override public String description() {

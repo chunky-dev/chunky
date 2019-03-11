@@ -527,8 +527,7 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.glass, Texture.glassPaneTop);
         case "melon":
           return new TexturedBlock(name, Texture.melonSide, Texture.melonTop);
         case "vine":
@@ -791,53 +790,37 @@ public class TagBlockSpec implements BlockSpec {
         case "black_stained_glass":
           return new Glass(name, Texture.blackGlass);
         case "white_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.whiteGlass, Texture.whiteGlassPaneSide);
         case "orange_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.orangeGlass, Texture.orangeGlassPaneSide);
         case "magenta_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.magentaGlass, Texture.magentaGlassPaneSide);
         case "light_blue_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.lightBlueGlass, Texture.lightBlueGlassPaneSide);
         case "yellow_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.yellowGlass, Texture.yellowGlassPaneSide);
         case "lime_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.limeGlass, Texture.limeGlassPaneSide);
         case "pink_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.pinkGlass, Texture.pinkGlassPaneSide);
         case "gray_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.grayGlass, Texture.grayGlassPaneSide);
         case "light_gray_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.lightGrayGlass, Texture.lightGrayGlassPaneSide);
         case "cyan_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.cyanGlass, Texture.cyanGlassPaneSide);
         case "purple_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.purpleGlass, Texture.purpleGlassPaneSide);
         case "blue_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.blueGlass, Texture.blueGlassPaneSide);
         case "brown_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.brownGlass, Texture.brownGlassPaneSide);
         case "green_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.greenGlass, Texture.greenGlassPaneSide);
         case "red_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.redGlass, Texture.redGlassPaneSide);
         case "black_stained_glass_pane":
-          // TODO
-          return new UnknownBlock(name);
+          return glassPane(tag, Texture.blackGlass, Texture.blackGlassPaneSide);
         case "prismarine":
           return new MinecraftBlock(name, Texture.prismarine);
         case "prismarine_bricks":
@@ -1951,6 +1934,20 @@ public class TagBlockSpec implements BlockSpec {
     String east = properties.get("east").stringValue("false");
     String west = properties.get("west").stringValue("false");
     return new Fence(name, texture,
+        north.equals("true"),
+        south.equals("true"),
+        east.equals("true"),
+        west.equals("true"));
+  }
+
+  private Block glassPane(Tag tag, Texture side, Texture top) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String north = properties.get("north").stringValue("false");
+    String south = properties.get("south").stringValue("false");
+    String east = properties.get("east").stringValue("false");
+    String west = properties.get("west").stringValue("false");
+    return new GlassPane(name, side, top,
         north.equals("true"),
         south.equals("true"),
         east.equals("true"),
