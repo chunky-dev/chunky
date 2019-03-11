@@ -1267,8 +1267,7 @@ public class TagBlockSpec implements BlockSpec {
         case "dark_oak_door":
           return door(tag, Texture.darkOakDoorTop, Texture.darkOakDoorBottom);
         case "repeater":
-          // TODO
-          return new UnknownBlock(name);
+          return repeater(tag);
         case "comparator":
           // TODO
           return new UnknownBlock(name);
@@ -1931,5 +1930,18 @@ public class TagBlockSpec implements BlockSpec {
     String facing = properties.get("facing").stringValue("north");
     String powered = properties.get("powered").stringValue("false");
     return new Button(name, texture, face, facing, powered.equals("true"));
+  }
+
+  private static Block repeater(Tag tag) {
+    Tag properties = tag.get("Properties");
+    int delay = 1;
+    try {
+      delay = Integer.parseInt(properties.get("delay").stringValue("1"));
+    } catch (NumberFormatException ignored) {
+    }
+    String facing = properties.get("facing").stringValue("north");
+    String powered = properties.get("powered").stringValue("false");
+    String locked = properties.get("locked").stringValue("false");
+    return new Repeater(delay, facing, powered.equals("true"), locked.equals("true"));
   }
 }
