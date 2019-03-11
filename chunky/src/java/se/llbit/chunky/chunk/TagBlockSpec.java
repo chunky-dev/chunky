@@ -415,8 +415,7 @@ public class TagBlockSpec implements BlockSpec {
         case "cobblestone_stairs":
           return stairs(tag, Texture.cobblestone);
         case "lever":
-          // TODO
-          return new UnknownBlock(name);
+          return lever(tag);
         case "stone_pressure_plate":
           // TODO
           return new UnknownBlock(name);
@@ -1918,4 +1917,13 @@ public class TagBlockSpec implements BlockSpec {
     String facing = tag.get("Properties").get("facing").stringValue("north");
     return new WallSign(name, texture, facing);
   }
+
+  private static Block lever(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String face = properties.get("face").stringValue("floor");
+    String facing = properties.get("facing").stringValue("north");
+    String powered = properties.get("powered").stringValue("false");
+    return new Lever(face, facing, powered.equals("true"));
+  }
+
 }
