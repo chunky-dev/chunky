@@ -446,8 +446,7 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "stone_button":
-          // TODO
-          return new UnknownBlock(name);
+          return button(tag, Texture.stone);
         case "snow": {
           int layers = 0;
           try {
@@ -623,23 +622,17 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "oak_button":
-          // TODO
-          return new UnknownBlock(name);
+          return button(tag, Texture.oakPlanks);
         case "spruce_button":
-          // TODO
-          return new UnknownBlock(name);
+          return button(tag, Texture.sprucePlanks);
         case "birch_button":
-          // TODO
-          return new UnknownBlock(name);
+          return button(tag, Texture.birchPlanks);
         case "jungle_button":
-          // TODO
-          return new UnknownBlock(name);
+          return button(tag, Texture.jungleTreePlanks);
         case "acacia_button":
-          // TODO
-          return new UnknownBlock(name);
+          return button(tag, Texture.acaciaPlanks);
         case "dark_oak_button":
-          // TODO
-          return new UnknownBlock(name);
+          return button(tag, Texture.darkOakPlanks);
         case "anvil":
           // TODO
           return new UnknownBlock(name);
@@ -1926,4 +1919,12 @@ public class TagBlockSpec implements BlockSpec {
     return new Lever(face, facing, powered.equals("true"));
   }
 
+  private static Block button(Tag tag, Texture texture) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String face = properties.get("face").stringValue("floor");
+    String facing = properties.get("facing").stringValue("north");
+    String powered = properties.get("powered").stringValue("false");
+    return new Button(name, texture, face, facing, powered.equals("true"));
+  }
 }
