@@ -527,23 +527,17 @@ public class TagBlockSpec implements BlockSpec {
         case "vine":
           return vine(tag);
         case "oak_fence_gate":
-          // TODO
-          return new UnknownBlock(name);
+          return fenceGate(tag, Texture.oakPlanks);
         case "spruce_fence_gate":
-          // TODO
-          return new UnknownBlock(name);
+          return fenceGate(tag, Texture.sprucePlanks);
         case "birch_fence_gate":
-          // TODO
-          return new UnknownBlock(name);
+          return fenceGate(tag, Texture.sprucePlanks);
         case "jungle_fence_gate":
-          // TODO
-          return new UnknownBlock(name);
+          return fenceGate(tag, Texture.jungleTreePlanks);
         case "acacia_fence_gate":
-          // TODO
-          return new UnknownBlock(name);
+          return fenceGate(tag, Texture.acaciaPlanks);
         case "dark_oak_fence_gate":
-          // TODO
-          return new UnknownBlock(name);
+          return fenceGate(tag, Texture.darkOakPlanks);
         case "brick_stairs":
           return stairs(tag, Texture.brick);
         case "stone_brick_stairs":
@@ -1934,6 +1928,18 @@ public class TagBlockSpec implements BlockSpec {
         south.equals("true"),
         east.equals("true"),
         west.equals("true"));
+  }
+
+  private Block fenceGate(Tag tag, Texture texture) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String facing = properties.get("facing").stringValue("north");
+    String in_wall = properties.get("in_wall").stringValue("false");
+    String open = properties.get("open").stringValue("false");
+    return new FenceGate(name, texture,
+        facing,
+        in_wall.equals("true"),
+        open.equals("true"));
   }
 
   private Block glassPane(Tag tag, Texture side, Texture top) {
