@@ -27,13 +27,13 @@ import se.llbit.math.Vector4;
 
 public class IronBarsModel {
 
-  private static Quad[] core =
-      {new DoubleSidedQuad(new Vector3(.5, 1, 7 / 16.), new Vector3(.5, 1, 9 / 16.),
+  private static Quad[] core = {
+      new DoubleSidedQuad(new Vector3(.5, 1, 7 / 16.), new Vector3(.5, 1, 9 / 16.),
           new Vector3(.5, 0, 7 / 16.), new Vector4(7 / 16., 9 / 16., 1, 0)),
 
-          new DoubleSidedQuad(new Vector3(7 / 16., 1, .5), new Vector3(9 / 16., 1, .5),
-              new Vector3(7 / 16., 0, .5), new Vector4(7 / 16., 9 / 16., 1, 0)),};
-
+      new DoubleSidedQuad(new Vector3(7 / 16., 1, .5), new Vector3(9 / 16., 1, .5),
+          new Vector3(7 / 16., 0, .5), new Vector4(7 / 16., 9 / 16., 1, 0)),
+  };
 
   private static Quad[] coreTop = {
       // Top face.
@@ -42,7 +42,8 @@ public class IronBarsModel {
 
       // Bottom face.
       new DoubleSidedQuad(new Vector3(7 / 16., 0, 7 / 16.), new Vector3(9 / 16., 0, 7 / 16.),
-          new Vector3(7 / 16., 0, 9 / 16.), new Vector4(7 / 16., 9 / 16., 7 / 16., 9 / 16.)),};
+          new Vector3(7 / 16., 0, 9 / 16.), new Vector4(7 / 16., 9 / 16., 7 / 16., 9 / 16.)),
+  };
 
   private static Quad[][] connector = {
       // Front side.
@@ -72,7 +73,9 @@ public class IronBarsModel {
 
           // Bottom face.
           new DoubleSidedQuad(new Vector3(7 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 9 / 16.),
-              new Vector3(7 / 16., 0, 1), new Vector4(7 / 16., 9 / 16., 9 / 16., 1)),},};
+              new Vector3(7 / 16., 0, 1), new Vector4(7 / 16., 9 / 16., 9 / 16., 1)),
+      },
+  };
 
   private static Quad[][] panes = new Quad[4][];
 
@@ -85,10 +88,14 @@ public class IronBarsModel {
   }
 
   public static boolean intersect(Ray ray) {
-    int metadata = 0xF & (ray.getCurrentData() >> BlockData.GLASS_PANE_OFFSET);
+    int connections = 0xF & (ray.getCurrentData() >> BlockData.GLASS_PANE_OFFSET);
+    return intersect(ray, connections);
+  }
+
+  public static boolean intersect(Ray ray, int connections) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
-    if (metadata == 0) {
+    if (connections == 0) {
       for (Quad quad : core) {
         if (quad.intersect(ray)) {
           Texture.ironBars.getColor(ray);
@@ -113,7 +120,7 @@ public class IronBarsModel {
       }
     }
     for (int i = 0; i < 4; ++i) {
-      if ((metadata & (1 << i)) != 0) {
+      if ((connections & (1 << i)) != 0) {
         for (int j = 0; j < panes[i].length; ++j) {
           Quad quad = panes[i][j];
           if (quad.intersect(ray)) {

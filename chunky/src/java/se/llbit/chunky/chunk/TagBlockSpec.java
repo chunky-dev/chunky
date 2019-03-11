@@ -518,8 +518,7 @@ public class TagBlockSpec implements BlockSpec {
         case "mushroom_stem":
           return hugeMushroom(tag, Texture.mushroomStem);
         case "iron_bars":
-          // TODO
-          return new UnknownBlock(name);
+          return ironBars(tag);
         case "glass_pane":
           return glassPane(tag, Texture.glass, Texture.glassPaneTop);
         case "melon":
@@ -1942,6 +1941,18 @@ public class TagBlockSpec implements BlockSpec {
     String west = properties.get("west").stringValue("false");
     return new GlassPane(name, side, top,
         north.equals("true"),
+        south.equals("true"),
+        east.equals("true"),
+        west.equals("true"));
+  }
+
+  private Block ironBars(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String north = properties.get("north").stringValue("false");
+    String south = properties.get("south").stringValue("false");
+    String east = properties.get("east").stringValue("false");
+    String west = properties.get("west").stringValue("false");
+    return new IronBars(north.equals("true"),
         south.equals("true"),
         east.equals("true"),
         west.equals("true"));
