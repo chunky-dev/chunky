@@ -557,8 +557,8 @@ public class TagBlockSpec implements BlockSpec {
         case "stone_brick_stairs":
           return stairs(tag, Texture.stoneBrick);
         case "mycelium":
-          // TODO
-          return new UnknownBlock(name);
+          return snowCovered(tag,
+              new TexturedBlock(name, Texture.myceliumSide, Texture.myceliumTop, Texture.dirt));
         case "lily_pad":
           return new LilyPad();
         case "nether_brick_fence":
