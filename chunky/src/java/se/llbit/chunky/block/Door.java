@@ -6,7 +6,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 // TODO: hinge placement is wrong for some variants.
-public class Door extends MinecraftBlock {
+public class Door extends MinecraftBlockTranslucent {
   private final int facing, mirrored;
   private final String description;
 

@@ -431,6 +431,7 @@ public class Texture {
   public static final Texture endRod = new Texture();
 
   // [1.11] Shulker boxes.
+  public static final ShulkerTexture shulker = new ShulkerTexture();
   public static final ShulkerTexture shulkerBlack = new ShulkerTexture();
   public static final ShulkerTexture shulkerBlue = new ShulkerTexture();
   public static final ShulkerTexture shulkerBrown = new ShulkerTexture();

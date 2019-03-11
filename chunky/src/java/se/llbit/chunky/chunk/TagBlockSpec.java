@@ -1,6 +1,7 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.block.*;
+import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.nbt.Tag;
 import se.llbit.util.NotNull;
@@ -204,9 +205,9 @@ public class TagBlockSpec implements BlockSpec {
         case "note_block":
           return new MinecraftBlock(name, Texture.jukeboxSide);
         case "powered_rail":
-          return powered_rail(tag);
+          return poweredRail(tag);
         case "detector_rail":
-          return detector_rail(tag);
+          return detectorRail(tag);
         case "sticky_piston":
           return piston(tag, true);
         case "cobweb":
@@ -359,9 +360,9 @@ public class TagBlockSpec implements BlockSpec {
         case "torch":
           return new Torch(name, Texture.torch);
         case "wall_torch":
-          return wall_torch(tag, Texture.torch);
+          return wallTorch(tag, Texture.torch);
         case "end_rod":
-          return end_rod(tag);
+          return endRod(tag);
         case "chorus_plant":
           // TODO
           return new UnknownBlock(name);
@@ -901,56 +902,39 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulker);
         case "white_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerWhite);
         case "orange_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerOrange);
         case "magenta_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerMagenta);
         case "light_blue_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerLightBlue);
         case "yellow_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerYellow);
         case "lime_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerLime);
         case "pink_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerPink);
         case "gray_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerGray);
         case "light_gray_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerSilver);
         case "cyan_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerCyan);
         case "purple_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerPurple);
         case "blue_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerBlue);
         case "brown_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerBrown);
         case "green_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerGreen);
         case "red_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerRed);
         case "black_shulker_box":
-          // TODO
-          return new UnknownBlock(name);
+          return shulkerBox(tag, Texture.shulkerBlack);
         case "white_glazed_terracotta":
           return glazedTerracotta(tag, Texture.terracottaWhite);
         case "orange_glazed_terracotta":
@@ -1355,7 +1339,7 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "redstone_wire":
-          return redstone_wire(tag);
+          return redstoneWire(tag);
         case "sugar_cane":
           return new SpriteBlock(name, Texture.sugarCane);
         case "kelp":
@@ -1847,7 +1831,7 @@ public class TagBlockSpec implements BlockSpec {
     return new Rail(name, straightTrack, shape);
   }
 
-  private static Block detector_rail(Tag tag) {
+  private static Block detectorRail(Tag tag) {
     Tag properties = tag.get("Properties");
     String powered = properties.get("powered").stringValue("false");
     Texture straightTrack = powered.equals("true")
@@ -1856,7 +1840,7 @@ public class TagBlockSpec implements BlockSpec {
     return rail(tag, straightTrack);
   }
 
-  private static Block powered_rail(Tag tag) {
+  private static Block poweredRail(Tag tag) {
     Tag properties = tag.get("Properties");
     String powered = properties.get("powered").stringValue("false");
     Texture straightTrack = powered.equals("true")
@@ -1865,14 +1849,14 @@ public class TagBlockSpec implements BlockSpec {
     return rail(tag, straightTrack);
   }
 
-  private static Block wall_torch(Tag tag, Texture texture) {
+  private static Block wallTorch(Tag tag, Texture texture) {
     String name = blockName(tag);
     Tag properties = tag.get("Properties");
     String facing = properties.get("facing").stringValue("north");
     return new WallTorch(name, texture, facing);
   }
 
-  private static Block redstone_wire(Tag tag) {
+  private static Block redstoneWire(Tag tag) {
     Tag properties = tag.get("Properties");
     String north = properties.get("north").stringValue("none");
     String south = properties.get("south").stringValue("none");
@@ -1893,7 +1877,7 @@ public class TagBlockSpec implements BlockSpec {
     return new Chest(type, facing);
   }
 
-  private static Block end_rod(Tag tag) {
+  private static Block endRod(Tag tag) {
     Tag properties = tag.get("Properties");
     String facing = properties.get("facing").stringValue("up");
     return new EndRod(facing);
@@ -1924,5 +1908,12 @@ public class TagBlockSpec implements BlockSpec {
     String open = properties.get("open").stringValue("false");
     return new Door(name, half.equals("upper") ? upper : lower,
         facing, half, hinge, open.equals("true"));
+  }
+
+  private static Block shulkerBox(Tag tag, ShulkerTexture texture) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String facing = properties.get("facing").stringValue("up");
+    return new ShulkerBox(name, texture.side, texture.top, texture.bottom, facing);
   }
 }

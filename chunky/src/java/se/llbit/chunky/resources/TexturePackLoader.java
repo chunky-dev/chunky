@@ -2445,6 +2445,10 @@ public class TexturePackLoader {
             Texture.redNetherBrick)));
 
     // [1.11] Shulker boxes.
+    allTextures.put("shulker",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/entity/shulker/shulker",
+            Texture.shulker));
     allTextures.put("shulkerBlack",
         new ShulkerTextureLoader(
             "assets/minecraft/textures/entity/shulker/shulker_black",
