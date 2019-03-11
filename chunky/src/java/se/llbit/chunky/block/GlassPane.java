@@ -1,6 +1,5 @@
 package se.llbit.chunky.block;
 
-import se.llbit.chunky.model.FenceModel;
 import se.llbit.chunky.model.GlassPaneModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;

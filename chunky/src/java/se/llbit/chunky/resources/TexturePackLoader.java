@@ -3035,6 +3035,17 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/stripped_dark_oak_log_top",
             Texture.strippedDarkOakLogTop));
 
+    allTextures.put("birch_trapdoor",
+        new SimpleTexture("assets/minecraft/textures/block/birch_trapdoor", Texture.birchTrapdoor));
+    allTextures.put("spruce_trapdoor",
+        new SimpleTexture("assets/minecraft/textures/block/spruce_trapdoor", Texture.spruceTrapdoor));
+    allTextures.put("jungle_trapdoor",
+        new SimpleTexture("assets/minecraft/textures/block/jungle_trapdoor", Texture.jungleTrapdoor));
+    allTextures.put("acacia_trapdoor",
+        new SimpleTexture("assets/minecraft/textures/block/acacia_trapdoor", Texture.acaciaTrapdoor));
+    allTextures.put("dark_oak_trapdoor",
+        new SimpleTexture("assets/minecraft/textures/block/dark_oak_trapdoor", Texture.darkOakTrapdoor));
+
     allTextures.put("kelp",
         new SimpleTexture("assets/minecraft/textures/block/kelp",
             Texture.kelp));

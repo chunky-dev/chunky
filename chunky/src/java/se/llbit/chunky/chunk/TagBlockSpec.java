@@ -486,23 +486,17 @@ public class TagBlockSpec implements BlockSpec {
           return new JackOLantern(facing);
         }
         case "oak_trapdoor":
-          // TODO
-          return new UnknownBlock(name);
+          return trapdoor(tag, Texture.trapdoor);
         case "spruce_trapdoor":
-          // TODO
-          return new UnknownBlock(name);
+          return trapdoor(tag, Texture.spruceTrapdoor);
         case "birch_trapdoor":
-          // TODO
-          return new UnknownBlock(name);
+          return trapdoor(tag, Texture.birchTrapdoor);
         case "jungle_trapdoor":
-          // TODO
-          return new UnknownBlock(name);
+          return trapdoor(tag, Texture.jungleTrapdoor);
         case "acacia_trapdoor":
-          // TODO
-          return new UnknownBlock(name);
+          return trapdoor(tag, Texture.acaciaTrapdoor);
         case "dark_oak_trapdoor":
-          // TODO
-          return new UnknownBlock(name);
+          return trapdoor(tag, Texture.darkOakTrapdoor);
         case "infested_stone_bricks":
         case "stone_bricks":
           return new MinecraftBlock(name, Texture.stoneBrick);
@@ -1952,5 +1946,17 @@ public class TagBlockSpec implements BlockSpec {
         south.equals("true"),
         east.equals("true"),
         west.equals("true"));
+  }
+
+  private Block trapdoor(Tag tag, Texture texture) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String half = properties.get("half").stringValue("bottom");
+    String facing = properties.get("facing").stringValue("north");
+    String open = properties.get("open").stringValue("false");
+    return new Trapdoor(name, texture,
+        half,
+        facing,
+        open.equals("true"));
   }
 }
