@@ -1283,26 +1283,19 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "oak_door":
-          // TODO
-          return new UnknownBlock(name);
+          return door(tag, Texture.oakDoorTop, Texture.oakDoorBottom);
         case "iron_door":
-          // TODO
-          return new UnknownBlock(name);
+          return door(tag, Texture.ironDoorTop, Texture.ironDoorBottom);
         case "spruce_door":
-          // TODO
-          return new UnknownBlock(name);
+          return door(tag, Texture.spruceDoorTop, Texture.spruceDoorBottom);
         case "birch_door":
-          // TODO
-          return new UnknownBlock(name);
+          return door(tag, Texture.birchDoorTop, Texture.birchDoorBottom);
         case "jungle_door":
-          // TODO
-          return new UnknownBlock(name);
+          return door(tag, Texture.jungleDoorTop, Texture.jungleDoorBottom);
         case "acacia_door":
-          // TODO
-          return new UnknownBlock(name);
+          return door(tag, Texture.acaciaDoorTop, Texture.acaciaDoorBottom);
         case "dark_oak_door":
-          // TODO
-          return new UnknownBlock(name);
+          return door(tag, Texture.darkOakDoorTop, Texture.darkOakDoorBottom);
         case "repeater":
           // TODO
           return new UnknownBlock(name);
@@ -1920,5 +1913,16 @@ public class TagBlockSpec implements BlockSpec {
     } catch (NumberFormatException ignored) {
     }
     return new Wheat(age);
+  }
+
+  private static Block door(Tag tag, Texture upper, Texture lower) {
+    Tag properties = tag.get("Properties");
+    String name = blockName(tag);
+    String facing = properties.get("facing").stringValue("north");
+    String half = properties.get("half").stringValue("upper");
+    String hinge = properties.get("hinge").stringValue("right");
+    String open = properties.get("open").stringValue("false");
+    return new Door(name, half.equals("upper") ? upper : lower,
+        facing, half, hinge, open.equals("true"));
   }
 }

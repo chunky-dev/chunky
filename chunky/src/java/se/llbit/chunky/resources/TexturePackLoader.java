@@ -544,13 +544,13 @@ public class TexturePackLoader {
         new IndexedTexture(0x50, Texture.torch)));
     allTextures.put("oak_door_upper", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/oak_door_top",
-            Texture.woodenDoorTop),
+            Texture.oakDoorTop),
         new SimpleTexture("assets/minecraft/textures/blocks/oak_door_upper",
-            Texture.woodenDoorTop),
+            Texture.oakDoorTop),
         new SimpleTexture("assets/minecraft/textures/blocks/door_wood_upper",
-            Texture.woodenDoorTop),
-        new SimpleTexture("textures/blocks/doorWood_upper", Texture.woodenDoorTop),
-        new IndexedTexture(0x51, Texture.woodenDoorTop)));
+            Texture.oakDoorTop),
+        new SimpleTexture("textures/blocks/doorWood_upper", Texture.oakDoorTop),
+        new IndexedTexture(0x51, Texture.oakDoorTop)));
     allTextures.put("iron_door_upper", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/iron_door_top", Texture.ironDoorTop),
         new SimpleTexture("assets/minecraft/textures/blocks/iron_door_upper", Texture.ironDoorTop),
@@ -640,13 +640,13 @@ public class TexturePackLoader {
         new IndexedTexture(0x60, Texture.lever)));
     allTextures.put("oak_door_lower", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/oak_door_bottom",
-            Texture.woodenDoorBottom),
+            Texture.oakDoorBottom),
         new SimpleTexture("assets/minecraft/textures/blocks/oak_door_lower",
-            Texture.woodenDoorBottom),
+            Texture.oakDoorBottom),
         new SimpleTexture("assets/minecraft/textures/blocks/door_wood_lower",
-            Texture.woodenDoorBottom),
-        new SimpleTexture("textures/blocks/doorWood_lower", Texture.woodenDoorBottom),
-        new IndexedTexture(0x61, Texture.woodenDoorBottom)));
+            Texture.oakDoorBottom),
+        new SimpleTexture("textures/blocks/doorWood_lower", Texture.oakDoorBottom),
+        new IndexedTexture(0x61, Texture.oakDoorBottom)));
     allTextures.put("iron_door_lower", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/iron_door_bottom",
             Texture.ironDoorBottom),

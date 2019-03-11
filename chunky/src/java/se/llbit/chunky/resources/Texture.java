@@ -145,8 +145,8 @@ public class Texture {
   public static final Texture jukeboxSide = new Texture();
   public static final Texture jukeboxTop = new Texture();
   public static final Texture torch = new Texture("torch");
-  public static final Texture woodenDoorTop = new Texture();
-  public static final Texture woodenDoorBottom = new Texture();
+  public static final Texture oakDoorTop = new Texture();
+  public static final Texture oakDoorBottom = new Texture();
   public static final Texture ironDoorTop = new Texture();
   public static final Texture ironDoorBottom = new Texture();
   public static final Texture ladder = new Texture("ladder");

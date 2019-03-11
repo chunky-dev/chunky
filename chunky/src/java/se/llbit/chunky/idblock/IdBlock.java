@@ -772,7 +772,7 @@ public class IdBlock extends Material {
   public static final IdBlock SIGNPOST = new IdBlock(SIGNPOST_ID, "minecraft:standing_sign", Icon.signPost);
   public static final int WOODENDOOR_ID = 0x40;
   public static final IdBlock WOODENDOOR = new IdBlock(WOODENDOOR_ID, "minecraft:wooden_door", Icon.woodenDoor) {
-    final Texture[] texture = {Texture.woodenDoorBottom, Texture.woodenDoorTop};
+    final Texture[] texture = {Texture.oakDoorBottom, Texture.oakDoorTop};
 
     @Override public boolean intersect(Ray ray, Scene scene) {
       return DoorModel.intersect(ray, texture[ray.getBlockData() >>> 3]);
