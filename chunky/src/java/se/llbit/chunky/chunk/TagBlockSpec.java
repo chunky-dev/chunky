@@ -458,23 +458,17 @@ public class TagBlockSpec implements BlockSpec {
           return new TexturedBlock(name, Texture.jukeboxSide,
               Texture.jukeboxTop, Texture.jukeboxSide);
         case "oak_fence":
-          // TODO
-          return new UnknownBlock(name);
+          return fence(tag, Texture.oakPlanks);
         case "spruce_fence":
-          // TODO
-          return new UnknownBlock(name);
+          return fence(tag, Texture.sprucePlanks);
         case "birch_fence":
-          // TODO
-          return new UnknownBlock(name);
+          return fence(tag, Texture.birchPlanks);
         case "jungle_fence":
-          // TODO
-          return new UnknownBlock(name);
+          return fence(tag, Texture.jungleTreePlanks);
         case "acacia_fence":
-          // TODO
-          return new UnknownBlock(name);
+          return fence(tag, Texture.acaciaPlanks);
         case "dark_oak_fence":
-          // TODO
-          return new UnknownBlock(name);
+          return fence(tag, Texture.darkOakPlanks);
         case "pumpkin":
           return new TexturedBlock(name, Texture.pumpkinSide, Texture.pumpkinTop);
         case "carved_pumpkin": {
@@ -568,8 +562,7 @@ public class TagBlockSpec implements BlockSpec {
         case "lily_pad":
           return new LilyPad();
         case "nether_brick_fence":
-          // TODO
-          return new UnknownBlock(name);
+          return fence(tag, Texture.netherBrick);
         case "nether_brick_stairs":
           return stairs(tag, Texture.netherBrick);
         case "enchanting_table":
@@ -1948,5 +1941,19 @@ public class TagBlockSpec implements BlockSpec {
     String powered = properties.get("powered").stringValue("false");
     String locked = properties.get("locked").stringValue("false");
     return new Repeater(delay, facing, powered.equals("true"), locked.equals("true"));
+  }
+
+  private Block fence(Tag tag, Texture texture) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String north = properties.get("north").stringValue("false");
+    String south = properties.get("south").stringValue("false");
+    String east = properties.get("east").stringValue("false");
+    String west = properties.get("west").stringValue("false");
+    return new Fence(name, texture,
+        north.equals("true"),
+        south.equals("true"),
+        east.equals("true"),
+        west.equals("true"));
   }
 }
