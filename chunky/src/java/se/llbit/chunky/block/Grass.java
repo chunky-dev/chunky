@@ -8,6 +8,7 @@ import se.llbit.math.Ray;
 public class Grass extends MinecraftBlock {
   public Grass() {
     super("grass", Texture.tallGrass);
+    opaque = false;
     localIntersect = true;
   }
 

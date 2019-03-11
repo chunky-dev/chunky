@@ -1315,8 +1315,7 @@ public class TagBlockSpec implements BlockSpec {
         case "fire":
           return new Fire();
         case "wheat":
-          // TODO
-          return new UnknownBlock(name);
+          return wheat(tag);
         case "sign":
           // TODO
           return new UnknownBlock(name);
@@ -1912,5 +1911,14 @@ public class TagBlockSpec implements BlockSpec {
     String facing = properties.get("facing").stringValue("north");
     String lit = properties.get("lit").stringValue("false");
     return new Furnace(facing, lit.equals("true"));
+  }
+
+  private static Block wheat(Tag tag) {
+    int age = 7;
+    try {
+      age = Integer.parseInt(tag.get("Properties").get("age").stringValue("7"));
+    } catch (NumberFormatException ignored) {
+    }
+    return new Wheat(age);
   }
 }
