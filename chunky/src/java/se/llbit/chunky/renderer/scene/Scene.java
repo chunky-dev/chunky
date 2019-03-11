@@ -898,27 +898,9 @@ public class Scene implements JsonSerializable, Refreshable {
             }
             /*
             switch (block) {
-              case Block.SIGNPOST_ID:
-                entities.add(new SignEntity(position, entityTag, metadata));
-                break;
               case Block.HEAD_ID:
                 entities.add(new SkullEntity(position, entityTag, metadata));
                 break;
-              case Block.BED_ID: {
-                // Set color metadata for the bed.
-                int ox = x + wx0 - origin.x;
-                int oy = y - origin.y;
-                int oz = z + wz0 - origin.z;
-                int voxel = block
-                    | (metadata << BlockData.OFFSET)
-                    | (entityTag.get("color").intValue(0) << BlockData.BED_COLOR);
-                worldOctree.set(voxel, ox, oy, oz);
-                break;
-              }
-              case Block.STANDING_BANNER_ID: {
-                entities.add(new StandingBanner(position, metadata, entityTag));
-                break;
-              }
               case Block.WALL_BANNER_ID: {
                 entities.add(new WallBanner(position, metadata, entityTag));
                 break;

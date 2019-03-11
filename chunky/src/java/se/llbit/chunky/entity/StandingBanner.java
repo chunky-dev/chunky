@@ -165,7 +165,7 @@ public class StandingBanner extends Entity {
     this(position, rotation, parseDesign(entityTag));
   }
 
-  protected static JsonObject parseDesign(CompoundTag entityTag) {
+  public static JsonObject parseDesign(CompoundTag entityTag) {
     JsonObject design = new JsonObject();
     int base = entityTag.get("Base").intValue(BlockData.BANNER_WHITE);
     JsonArray patterns = new JsonArray();

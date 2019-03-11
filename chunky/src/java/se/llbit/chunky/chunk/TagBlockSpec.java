@@ -3,6 +3,7 @@ package se.llbit.chunky.chunk;
 import se.llbit.chunky.block.*;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.BlockData;
 import se.llbit.nbt.Tag;
 import se.llbit.util.NotNull;
 
@@ -684,8 +685,7 @@ public class TagBlockSpec implements BlockSpec {
         case "black_terracotta":
           return new MinecraftBlock(name, Texture.blackClay);
         case "iron_trapdoor":
-          // TODO
-          return new UnknownBlock(name);
+          return trapdoor(tag, Texture.ironTrapdoor);
         case "hay_block":
           return new TexturedBlock(name, Texture.hayBlockSide, Texture.hayBlockTop);
         case "white_carpet":
@@ -1470,53 +1470,37 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "white_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.whiteWool, BlockData.BANNER_WHITE);
         case "orange_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.orangeWool, BlockData.BANNER_ORANGE);
         case "magenta_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.magentaWool, BlockData.BANNER_MAGENTA);
         case "light_blue_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.lightBlueWool, BlockData.BANNER_LIGHT_BLUE);
         case "yellow_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.yellowWool, BlockData.BANNER_YELLOW);
         case "lime_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.limeWool, BlockData.BANNER_LIME);
         case "pink_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.pinkWool, BlockData.BANNER_PINK);
         case "gray_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.grayWool, BlockData.BANNER_GRAY);
         case "light_gray_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.lightGrayWool, BlockData.BANNER_SILVER);
         case "cyan_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.cyanWool, BlockData.BANNER_CYAN);
         case "purple_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.purpleWool, BlockData.BANNER_PURPLE);
         case "blue_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.blueWool, BlockData.BANNER_BLUE);
         case "brown_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.brownWool, BlockData.BANNER_BROWN);
         case "green_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.greenWool, BlockData.BANNER_GREEN);
         case "red_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.redWool, BlockData.BANNER_RED);
         case "black_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return banner(tag, Texture.blackWool, BlockData.BANNER_BLACK);
         case "white_wall_banner":
           // TODO
           return new UnknownBlock(name);
@@ -1637,12 +1621,10 @@ public class TagBlockSpec implements BlockSpec {
         case "structure_block":
           // TODO
           return new UnknownBlock(name);
-        case "structure_void":
-          // TODO
-          return new UnknownBlock(name);
         case "jigsaw_block":
           // TODO
           return new UnknownBlock(name);
+        case "structure_void":
         case "barrier":
           // Invisible.
           return Air.INSTANCE;
@@ -1880,6 +1862,16 @@ public class TagBlockSpec implements BlockSpec {
     } catch (NumberFormatException ignored) {
     }
     return new Sign(name, texture, rotation);
+  }
+
+  private static Block banner(Tag tag, Texture texture, int color) {
+    String name = blockName(tag);
+    int rotation = 0;
+    try {
+      rotation = Integer.parseInt(tag.get("Properties").get("rotation").stringValue("0"));
+    } catch (NumberFormatException ignored) {
+    }
+    return new Banner(name, texture, rotation, color);
   }
 
   private static Block wallSign(Tag tag, Texture texture) {
