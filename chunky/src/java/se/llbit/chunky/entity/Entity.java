@@ -70,6 +70,8 @@ abstract public class Entity {
         return WallBanner.fromJson(json);
       case "armor_stand":
         return ArmorStand.fromJson(json);
+      case "lily_pad":
+        return LilyPadEntity.fromJson(json);
     }
     return null;
   }

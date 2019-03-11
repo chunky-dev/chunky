@@ -572,8 +572,7 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "lily_pad":
-          // TODO
-          return new UnknownBlock(name);
+          return new LilyPad();
         case "nether_brick_fence":
           // TODO
           return new UnknownBlock(name);

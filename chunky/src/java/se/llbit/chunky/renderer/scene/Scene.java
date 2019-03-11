@@ -837,6 +837,11 @@ public class Scene implements JsonSerializable, Refreshable {
               Octree.Node octNode = new Octree.Node(blocks[index]);
               Block block = palette.get(blocks[index]);
 
+              if (block.isEntity()) {
+                Vector3 position = new Vector3(cx + cp.x * 16, cy, cz + cp.z * 16);
+                entities.add(block.toEntity(position));
+              }
+
               // TODO: is this code duplicated in OctreeFinalizer?
               if (cx > 0 && cx < 15 && cz > 0 && cz < 15 && cy > 0 && cy < 255 &&
                   block != stone && block.opaque) {
@@ -870,10 +875,7 @@ public class Scene implements JsonSerializable, Refreshable {
                       1 << Water.FULL_BLOCK);
                 }
               }
-              worldOctree.set(octNode,
-                  cx + cp.x * 16 - origin.x,
-                  cy - origin.y,
-                  cz + cp.z * 16 - origin.z);
+              worldOctree.set(octNode, x, cy - origin.y, z);
 
             }
           }
@@ -992,12 +994,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private void buildBvh() {
     final List<Primitive> primitives = new LinkedList<>();
-
-    worldOctree.visit((data1, x, y, z, size) -> {
-      if ((data1 & 0xF) == IdBlock.WATER_ID) {
-        WaterModel.addPrimitives(primitives, data1, x, y, z, 1 << size);
-      }
-    });
 
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
     for (Entity entity : entities) {

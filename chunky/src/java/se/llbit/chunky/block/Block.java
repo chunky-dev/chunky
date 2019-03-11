@@ -40,4 +40,13 @@ public abstract class Block extends Material {
     throw new Error("This block type can not be converted to a block entity: "
         + getClass().getSimpleName());
   }
+
+  public boolean isEntity() {
+    return false;
+  }
+
+  public Entity toEntity(Vector3 position) {
+    throw new Error("This block type can not be converted to an entity: "
+        + getClass().getSimpleName());
+  }
 }
