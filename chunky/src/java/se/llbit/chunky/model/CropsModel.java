@@ -25,18 +25,19 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class CropsModel {
-  private static Quad[] quads =
-      {new DoubleSidedQuad(new Vector3(1, 0, .25), new Vector3(0, 0, .25),
+  private static Quad[] quads = {
+      new DoubleSidedQuad(new Vector3(1, 0, .25), new Vector3(0, 0, .25),
           new Vector3(1, 1, .25), new Vector4(1, 0, 0, 1)),
 
-          new DoubleSidedQuad(new Vector3(0, 0, .75), new Vector3(1, 0, .75),
-              new Vector3(0, 1, .75), new Vector4(0, 1, 0, 1)),
+      new DoubleSidedQuad(new Vector3(0, 0, .75), new Vector3(1, 0, .75),
+          new Vector3(0, 1, .75), new Vector4(0, 1, 0, 1)),
 
-          new DoubleSidedQuad(new Vector3(.25, 0, 0), new Vector3(.25, 0, 1),
-              new Vector3(.25, 1, 0), new Vector4(0, 1, 0, 1)),
+      new DoubleSidedQuad(new Vector3(.25, 0, 0), new Vector3(.25, 0, 1),
+          new Vector3(.25, 1, 0), new Vector4(0, 1, 0, 1)),
 
-          new DoubleSidedQuad(new Vector3(.75, 0, 1), new Vector3(.75, 0, 0),
-              new Vector3(.75, 1, 1), new Vector4(1, 0, 0, 1)),};
+      new DoubleSidedQuad(new Vector3(.75, 0, 1), new Vector3(.75, 0, 0),
+          new Vector3(.75, 1, 1), new Vector4(1, 0, 0, 1)),
+  };
 
   public static boolean intersect(Ray ray, Texture texture) {
     boolean hit = false;

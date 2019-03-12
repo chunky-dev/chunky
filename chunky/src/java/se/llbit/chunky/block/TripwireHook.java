@@ -20,13 +20,13 @@ public class TripwireHook extends MinecraftBlockTranslucent {
         this.facing = 0;
         break;
       case "south":
-        this.facing = 2; //1;
+        this.facing = 2;
         break;
       case "west":
-        this.facing = 1; //2;
+        this.facing = 1;
         break;
       case "east":
-        this.facing = 3; //3;
+        this.facing = 3;
         break;
     }
   }

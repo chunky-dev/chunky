@@ -5,19 +5,19 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
-public class Wheat extends MinecraftBlock {
+public class Carrots extends MinecraftBlock {
   private static final Texture[] texture = {
-      Texture.crops0, Texture.crops1, Texture.crops2, Texture.crops3, Texture.crops4,
-      Texture.crops5, Texture.crops6, Texture.crops7
+      Texture.carrots0, Texture.carrots0, Texture.carrots1, Texture.carrots1,
+      Texture.carrots2, Texture.carrots2, Texture.carrots2, Texture.carrots3
   };
 
   private final int age;
 
-  public Wheat(int age) {
-    super("wheat", Texture.crops7);
+  public Carrots(int age) {
+    super("carrots", texture[texture.length - 1]);
     localIntersect = true;
     opaque = false;
-    this.age = age & 7;
+    this.age = age % texture.length;
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {

@@ -26,8 +26,8 @@ public enum ProjectionMode {
   STEREOGRAPHIC("Stereographic"),
   PANORAMIC("Panoramic (equirectangular)"),
   PANORAMIC_SLOT("Panoramic (slot)"),
-  ODS_LEFT("Omni‐directional Stereo (left eye)"),
-  ODS_RIGHT("Omni‐directional Stereo (right eye)");
+  ODS_LEFT("Omni‐directional Stereo (left hasEye)"),
+  ODS_RIGHT("Omni‐directional Stereo (right hasEye)");
 
   private final String niceName;
 

@@ -126,13 +126,14 @@ public class CauldronModel {
 
   };
 
-  private static final Texture[] tex =
-      {Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide,
-          Texture.cauldronTop, Texture.cauldronTop, Texture.cauldronTop, Texture.cauldronTop,
-          Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide,
-          Texture.cauldronInside, Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide,
-          Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide,
-          Texture.cauldronSide, Texture.cauldronInside,};
+  private static final Texture[] tex = {
+      Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide,
+      Texture.cauldronTop, Texture.cauldronTop, Texture.cauldronTop, Texture.cauldronTop,
+      Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide,
+      Texture.cauldronInside, Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide,
+      Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide, Texture.cauldronSide,
+      Texture.cauldronSide, Texture.cauldronInside,
+  };
 
   public static boolean intersect(Ray ray) {
     boolean hit = false;

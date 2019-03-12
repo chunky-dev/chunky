@@ -68,7 +68,7 @@ public class Icon extends Texture {
   public static final Icon water = new Icon("water");
   public static final Icon sun = new Icon("sun");
   public static final Icon question = new Icon("question");
-  public static final Icon eye = new Icon("eye");
+  public static final Icon eye = new Icon("hasEye");
   public static final Icon scale = new Icon("scale");
   public static final Texture grass = new Texture("grass-side-saturated");
   public static final Texture netherrack = new Texture("netherrack");

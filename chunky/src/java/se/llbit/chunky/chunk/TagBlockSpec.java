@@ -552,11 +552,12 @@ public class TagBlockSpec implements BlockSpec {
         case "nether_brick_stairs":
           return stairs(tag, Texture.netherBrick);
         case "enchanting_table":
-          // TODO
-          return new UnknownBlock(name);
-        case "end_portal_frame":
-          // TODO
-          return new UnknownBlock(name);
+          return new EnchantingTable();
+        case "end_portal_frame": {
+          // TODO: handle facing direction
+          String eye = tag.get("Properties").get("eye").stringValue("false");
+          return new EndPortalFrame(eye.equals("true"));
+        }
         case "end_stone":
           return new MinecraftBlock(name, Texture.endStone);
         case "end_stone_bricks":
@@ -566,8 +567,7 @@ public class TagBlockSpec implements BlockSpec {
           return new RedstoneLamp(lit.equals("true"));
         }
         case "cocoa":
-          // TODO
-          return new UnknownBlock(name);
+          return cocoa(tag);
         case "sandstone_stairs":
           return stairs(tag, Texture.sandstoneSide, Texture.sandstoneTop, Texture.sandstoneBottom);
         case "emerald_ore":
@@ -1345,15 +1345,30 @@ public class TagBlockSpec implements BlockSpec {
           String facing = tag.get("Properties").get("facing").stringValue("north");
           return new AttachedStem(name, facing);
         }
-        case "nether_wart":
-          // TODO
-          return new UnknownBlock(name);
-        case "brewing_stand":
-          // TODO
-          return new UnknownBlock(name);
-        case "cauldron":
-          // TODO
-          return new UnknownBlock(name);
+        case "nether_wart": {
+          int age = 3;
+          try {
+            age = Integer.parseInt(tag.get("Properties").get("age").stringValue("3"));
+          } catch (NumberFormatException ignored) {
+          }
+          return new NetherWart(age);
+        }
+        case "brewing_stand": {
+          Tag properties = tag.get("Properties");
+          String bottle0 = properties.get("has_bottle_0").stringValue("false");
+          String bottle1 = properties.get("has_bottle_1").stringValue("false");
+          String bottle2 = properties.get("has_bottle_2").stringValue("false");
+          return new BrewingStand(
+              bottle0.equals("true"), bottle1.equals("true"), bottle2.equals("true"));
+        }
+        case "cauldron": {
+          int level = 3;
+          try {
+            level = Integer.parseInt(tag.get("Properties").get("level").stringValue("3"));
+          } catch (NumberFormatException ignored) {
+          }
+          return new Cauldron(level);
+        }
         case "flower_pot":
           // TODO
           return new UnknownBlock(name);
@@ -1432,12 +1447,22 @@ public class TagBlockSpec implements BlockSpec {
         case "potted_wither_rose":
           // TODO
           return new UnknownBlock(name);
-        case "carrots":
-          // TODO
-          return new UnknownBlock(name);
-        case "potatoes":
-          // TODO
-          return new UnknownBlock(name);
+        case "carrots": {
+          int age = 8;
+          try {
+            age = Integer.parseInt(tag.get("Properties").get("age").stringValue("8"));
+          } catch (NumberFormatException ignored) {
+          }
+          return new Carrots(age);
+        }
+        case "potatoes": {
+          int age = 8;
+          try {
+            age = Integer.parseInt(tag.get("Properties").get("age").stringValue("8"));
+          } catch (NumberFormatException ignored) {
+          }
+          return new Potatoes(age);
+        }
         case "skeleton_skull":
           // TODO
           return new UnknownBlock(name);
@@ -1609,8 +1634,7 @@ public class TagBlockSpec implements BlockSpec {
           return new NetherPortal(axis);
         }
         case "end_portal":
-          // TODO
-          return new UnknownBlock(name);
+          return new EndPortal();
         case "end_gateway":
           // TODO
           return new UnknownBlock(name);
@@ -2011,5 +2035,16 @@ public class TagBlockSpec implements BlockSpec {
     String attached = properties.get("attached").stringValue("false");
     String powered = properties.get("powered").stringValue("false");
     return new TripwireHook(facing, powered.equals("true"));
+  }
+
+  private Block cocoa(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String facing = properties.get("facing").stringValue("north");
+    int age = 3;
+    try {
+      age = Integer.parseInt(properties.get("age").stringValue("7"));
+    } catch (NumberFormatException ignored) {
+    }
+    return new Cocoa(facing, age);
   }
 }

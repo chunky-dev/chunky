@@ -25,6 +25,11 @@ public class EndPortalFrameModel {
   private static AABB eyeOfTheEnder = new AABB(.25, .75, .75, 1, .25, .75);
 
   public static boolean intersect(Ray ray) {
+    boolean hasEye = (ray.getBlockData() & 4) != 0;
+    return intersect(ray, hasEye);
+  }
+
+  public static boolean intersect(Ray ray, boolean hasEye) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     if (frame.intersect(ray)) {
@@ -38,7 +43,7 @@ public class EndPortalFrameModel {
       ray.t = ray.tNext;
       hit = true;
     }
-    if ((ray.getBlockData() & 4) != 0 && eyeOfTheEnder.intersect(ray)) {
+    if (hasEye && eyeOfTheEnder.intersect(ray)) {
       if (ray.n.y > 0) {
         Texture.eyeOfTheEnder.getColor(ray);
       } else {
