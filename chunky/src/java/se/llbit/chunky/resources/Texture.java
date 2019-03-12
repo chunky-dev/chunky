@@ -52,6 +52,8 @@ public class Texture {
     }
   };
 
+  public static Texture black = new SolidColorTexture(new Vector4(0, 0, 0, 1));
+
   public static final Texture paintings = new Texture();
 
   public static final Texture air = new Texture("air");

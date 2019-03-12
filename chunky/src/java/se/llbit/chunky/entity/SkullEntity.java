@@ -68,8 +68,13 @@ public class SkullEntity extends Entity {
 
   @Override public Collection<Primitive> primitives(Vector3 offset) {
     Collection<Primitive> faces = new LinkedList<>();
+    double wallHeight = 0;
+    if (placement >= 2) {
+      wallHeight = 4 / 16.;
+    }
     Transform transform = Transform.NONE
-        .translate(position.x + offset.x + 0.5, position.y + offset.y + 4 / 16.,
+        .translate(position.x + offset.x + 0.5,
+            position.y + offset.y + 4 / 16. + wallHeight,
             position.z + offset.z + 0.5);
     EntityTexture texture;
     switch (type) {

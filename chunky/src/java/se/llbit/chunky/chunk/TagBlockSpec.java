@@ -1463,34 +1463,29 @@ public class TagBlockSpec implements BlockSpec {
         case "skeleton_skull":
           return skull(tag, Texture.skeleton, 0);
         case "skeleton_wall_skull":
-          // TODO
-          return new UnknownBlock(name);
+          return wallSkull(tag, Texture.skeleton, 0);
         case "wither_skeleton_skull":
           return skull(tag, Texture.wither, 1);
         case "wither_skeleton_wall_skull":
-          // TODO
-          return new UnknownBlock(name);
+          return wallSkull(tag, Texture.wither, 1);
         case "zombie_head":
           return skull(tag, Texture.zombie, 2);
         case "zombie_wall_head":
-          // TODO
-          return new UnknownBlock(name);
+          return wallSkull(tag, Texture.zombie, 2);
         case "player_head":
           return skull(tag, Texture.steve, 3);
         case "player_wall_head":
-          // TODO
-          return new UnknownBlock(name);
+          return wallSkull(tag, Texture.steve, 3);
         case "creeper_head":
           return skull(tag, Texture.creeper, 4);
         case "creeper_wall_head":
-          // TODO
-          return new UnknownBlock(name);
+          return wallSkull(tag, Texture.creeper, 4);
         case "dragon_head":
-          // TODO
-          return new UnknownBlock(name);
+          // TODO: render dragon head
+          return skull(tag, Texture.steve, 3);
         case "dragon_wall_head":
-          // TODO
-          return new UnknownBlock(name);
+          // TODO: render dragon head
+          return wallSkull(tag, Texture.steve, 3);
         case "white_banner":
           return banner(tag, Texture.whiteWool, BlockData.BANNER_WHITE);
         case "orange_banner":
@@ -1524,56 +1519,45 @@ public class TagBlockSpec implements BlockSpec {
         case "black_banner":
           return banner(tag, Texture.blackWool, BlockData.BANNER_BLACK);
         case "white_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.whiteWool, BlockData.BANNER_WHITE);
         case "orange_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.orangeWool, BlockData.BANNER_ORANGE);
         case "magenta_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.magentaWool, BlockData.BANNER_MAGENTA);
         case "light_blue_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.lightBlueWool, BlockData.BANNER_LIGHT_BLUE);
         case "yellow_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.yellowWool, BlockData.BANNER_YELLOW);
         case "lime_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.limeWool, BlockData.BANNER_LIME);
         case "pink_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.pinkWool, BlockData.BANNER_PINK);
         case "gray_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.grayWool, BlockData.BANNER_GRAY);
         case "light_gray_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.lightGrayWool, BlockData.BANNER_SILVER);
         case "cyan_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.cyanWool, BlockData.BANNER_CYAN);
         case "purple_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.purpleWool, BlockData.BANNER_PURPLE);
         case "blue_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.blueWool, BlockData.BANNER_BLUE);
         case "brown_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.brownWool, BlockData.BANNER_BROWN);
         case "green_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.greenWool, BlockData.BANNER_GREEN);
         case "red_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.redWool, BlockData.BANNER_RED);
         case "black_wall_banner":
-          // TODO
-          return new UnknownBlock(name);
-        case "beetroots":
-          // TODO
-          return new UnknownBlock(name);
+          return wallBanner(tag, Texture.blackWool, BlockData.BANNER_BLACK);
+        case "beetroots": {
+          int age = 3;
+          try {
+            age = Integer.parseInt(tag.get("Properties").get("age").stringValue("3"));
+          } catch (NumberFormatException ignored) {
+          }
+          return new Beetroots(age);
+        }
         case "loom":
           // TODO
           return new UnknownBlock(name);
@@ -1628,20 +1612,25 @@ public class TagBlockSpec implements BlockSpec {
         case "end_portal":
           return new EndPortal();
         case "end_gateway":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.black);
         case "command_block": {
           Tag properties = tag.get("Properties");
           String facing = properties.get("facing").stringValue("south");
           String conditional = properties.get("conditional").stringValue("false");
           return new CommandBlock(facing, conditional.equals("true"));
         }
-        case "chain_command_block":
-          // TODO
-          return new UnknownBlock(name);
-        case "repeating_command_block":
-          // TODO
-          return new UnknownBlock(name);
+        case "chain_command_block": {
+          Tag properties = tag.get("Properties");
+          String facing = properties.get("facing").stringValue("south");
+          String conditional = properties.get("conditional").stringValue("false");
+          return new ChainCommandBlock(facing, conditional.equals("true"));
+        }
+        case "repeating_command_block": {
+          Tag properties = tag.get("Properties");
+          String facing = properties.get("facing").stringValue("south");
+          String conditional = properties.get("conditional").stringValue("false");
+          return new RepeatingCommandBlock(facing, conditional.equals("true"));
+        }
         case "structure_block":
           // TODO
           return new UnknownBlock(name);
@@ -1890,6 +1879,12 @@ public class TagBlockSpec implements BlockSpec {
     return new Banner(name, texture, rotation, color);
   }
 
+  private static Block wallBanner(Tag tag, Texture texture, int color) {
+    String name = blockName(tag);
+    String facing = tag.get("Properties").get("facing").stringValue("north");
+    return new WallBanner(name, texture, facing, color);
+  }
+
   private static Block wallSign(Tag tag, Texture texture) {
     String name = blockName(tag);
     String facing = tag.get("Properties").get("facing").stringValue("north");
@@ -2059,5 +2054,11 @@ public class TagBlockSpec implements BlockSpec {
     } catch (NumberFormatException ignored) {
     }
     return new Head(name, texture, type, rotation);
+  }
+
+  private Block wallSkull(Tag tag, EntityTexture texture, int type) {
+    String name = blockName(tag);
+    String facing = tag.get("Properties").get("facing").stringValue("north");
+    return new WallHead(name, texture, type, facing);
   }
 }
