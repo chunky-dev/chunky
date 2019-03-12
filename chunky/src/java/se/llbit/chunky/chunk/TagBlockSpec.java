@@ -371,12 +371,30 @@ public class TagBlockSpec implements BlockSpec {
           return wallTorch(tag, Texture.torch);
         case "end_rod":
           return endRod(tag);
-        case "chorus_plant":
-          // TODO
-          return new UnknownBlock(name);
-        case "chorus_flower":
-          // TODO
-          return new UnknownBlock(name);
+        case "chorus_plant": {
+          Tag properties = tag.get("Properties");
+          String north = properties.get("north").stringValue("false");
+          String south = properties.get("south").stringValue("false");
+          String east = properties.get("east").stringValue("false");
+          String west = properties.get("west").stringValue("false");
+          String up = properties.get("up").stringValue("false");
+          String down = properties.get("down").stringValue("false");
+          return new ChorusPlant(
+              north.equals("true"),
+              south.equals("true"),
+              east.equals("true"),
+              west.equals("true"),
+              up.equals("true"),
+              down.equals("true"));
+        }
+        case "chorus_flower": {
+          int age = 0;
+          try {
+            age = Integer.parseInt(tag.get("Properties").get("age").stringValue("0"));
+          } catch (NumberFormatException ignored) {
+          }
+          return new ChorusFlower(age);
+        }
         case "purpur_block":
           return new MinecraftBlock(name, Texture.purpurBlock);
         case "purpur_pillar":
@@ -732,8 +750,7 @@ public class TagBlockSpec implements BlockSpec {
           // TODO: improve slime block!
           return new MinecraftBlock(name, Texture.slime);
         case "grass_path":
-          // TODO
-          return new UnknownBlock(name);
+          return new GrassPath();
         case "sunflower":
           // TODO
           return new UnknownBlock(name);

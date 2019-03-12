@@ -24,16 +24,23 @@ import se.llbit.math.Ray;
 public class ChorusPlantModel {
   private static AABB core = new AABB(4 / 16., 12 / 16., 4 / 16., 12 / 16., 4 / 16., 12 / 16.);
 
-  private static AABB[] connector = {new AABB(4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0, 0, 4 / 16.),
+  private static AABB[] connector = {
+      new AABB(4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0, 0, 4 / 16.),
       new AABB(4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0, 12 / 16., 1),
       new AABB(12 / 16., 1, 4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0),
       new AABB(0, 4 / 16., 4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0),
       // Above.
       new AABB(4 / 16., 12 / 16., 12 / 16.0, 1, 4 / 16.0, 12 / 16.0),
       // Below
-      new AABB(4 / 16., 12 / 16., 0, 4 / 16.0, 4 / 16.0, 12 / 16.0),};
+      new AABB(4 / 16., 12 / 16., 0, 4 / 16.0, 4 / 16.0, 12 / 16.0),
+  };
 
   public static boolean intersect(Ray ray) {
+    int connections = ray.getCurrentData() >> BlockData.OFFSET;
+    return intersect(ray, connections);
+  }
+
+  public static boolean intersect(Ray ray, int connections) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     if (core.intersect(ray)) {
@@ -42,7 +49,7 @@ public class ChorusPlantModel {
       hit = true;
     }
     for (int i = 0; i < 6; ++i) {
-      if (((ray.getCurrentData() >> BlockData.OFFSET) & (1 << i)) != 0) {
+      if ((connections & (1 << i)) != 0) {
         if (connector[i].intersect(ray)) {
           Texture.chorusPlant.getColor(ray);
           ray.t = ray.tNext;
