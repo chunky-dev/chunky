@@ -1123,45 +1123,33 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "polished_granite_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.smoothGranite);
         case "smooth_red_sandstone_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.redSandstoneTop);
         case "mossy_stone_brick_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.mossyStoneBrick);
         case "polished_diorite_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.smoothDiorite);
         case "mossy_cobblestone_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.mossStone);
         case "end_stone_brick_stairs":
           return stairs(tag, Texture.stoneBrick);
         case "stone_stairs":
           return stairs(tag, Texture.cobblestone);
         case "smooth_sandstone_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.sandstoneTop);
         case "smooth_quartz_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.quartzTop);
         case "granite_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.granite);
         case "andesite_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.andesite);
         case "red_nether_brick_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.redNetherBrick);
         case "polished_andesite_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.smoothAndesite);
         case "diorite_stairs":
-          // TODO
-          return new UnknownBlock(name);
+          return stairs(tag, Texture.diorite);
         case "polished_granite_slab":
           return slab(tag, Texture.smoothGranite);
         case "smooth_red_sandstone_slab":
