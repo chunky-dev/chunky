@@ -1,13 +1,12 @@
 package se.llbit.chunky.block;
 
-import se.llbit.chunky.model.DirectionalBlockModel;
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class Dropper extends MinecraftBlock {
-  final Texture[][] texture = {
+  private static final Texture[][] texture = {
       // Facing down.
       {
         Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop, Texture.furnaceTop,

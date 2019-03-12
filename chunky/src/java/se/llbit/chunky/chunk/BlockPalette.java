@@ -100,6 +100,9 @@ public class BlockPalette {
     materialProperties.put("minecraft:ice", block -> {
       block.ior = 1.31f;
     });
+    materialProperties.put("minecraft:frosted_ice", block -> {
+      block.ior = 1.31f;
+    });
     materialProperties.put("minecraft:glowstone", block -> {
       block.emittance = 1.0f;
     });
@@ -121,10 +124,12 @@ public class BlockPalette {
     materialProperties.put("minecraft:emerald_block", block -> {
       block.specular = 0.04f;
     });
+    materialProperties.put("minecraft:sea_lantern", block -> {
+      block.emittance = 0.5f;
+    });
     /*STAINED_GLASS.ior = 1.52f;
     GLASSPANE.ior = 1.52f;
     STAINED_GLASSPANE.ior = 1.52f;
-    SEALANTERN.emittance = 0.5f;
     ENDROD.emittance = 1.0f;
     FROSTEDICE.ior = 1.31f;
     MAGMA.emittance = 0.6f;*/

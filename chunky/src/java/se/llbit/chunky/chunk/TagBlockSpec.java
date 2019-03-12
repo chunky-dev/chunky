@@ -689,7 +689,7 @@ public class TagBlockSpec implements BlockSpec {
         case "iron_trapdoor":
           return trapdoor(tag, Texture.ironTrapdoor);
         case "hay_block":
-          return new TexturedBlock(name, Texture.hayBlockSide, Texture.hayBlockTop);
+          return log(tag, Texture.hayBlockSide, Texture.hayBlockTop);
         case "white_carpet":
           return new Carpet(name, Texture.whiteWool);
         case "orange_carpet":
@@ -828,8 +828,7 @@ public class TagBlockSpec implements BlockSpec {
         case "dark_prismarine_stairs":
           return stairs(tag, Texture.darkPrismarine);
         case "sea_lantern":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.seaLantern);
         case "red_sandstone":
           return new TexturedBlock(name, Texture.redSandstoneSide,
               Texture.redSandstoneTop, Texture.redSandstoneBottom);
@@ -853,9 +852,12 @@ public class TagBlockSpec implements BlockSpec {
           return new MinecraftBlock(name, Texture.redNetherBrick);
         case "bone_block":
           return log(tag, Texture.boneSide, Texture.boneTop);
-        case "observer":
-          // TODO
-          return new UnknownBlock(name);
+        case "observer": {
+          Tag properties = tag.get("Properties");
+          String facing = properties.get("facing").stringValue("south");
+          String powered = properties.get("powered").stringValue("false");
+          return new Observer(facing, powered.equals("true"));
+        }
         case "shulker_box":
           return shulkerBox(tag, Texture.shulker);
         case "white_shulker_box":
@@ -1600,9 +1602,14 @@ public class TagBlockSpec implements BlockSpec {
         case "campfire":
           // TODO
           return new UnknownBlock(name);
-        case "frosted_ice":
-          // TODO
-          return new UnknownBlock(name);
+        case "frosted_ice": {
+          int age = 3;
+          try {
+            age = Integer.parseInt(tag.get("Properties").get("age").stringValue("3"));
+          } catch (NumberFormatException ignored) {
+          }
+          return new FrostedIce(age);
+        }
         case "spawner":
           return new MinecraftBlockTranslucent(name, Texture.monsterSpawner);
         case "nether_portal": {

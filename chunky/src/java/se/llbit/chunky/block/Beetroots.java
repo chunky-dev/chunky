@@ -5,7 +5,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
-public class Beetroots extends MinecraftBlock {
+public class Beetroots extends MinecraftBlockTranslucent {
   private static final Texture[] texture = {
       Texture.beets0, Texture.beets1, Texture.beets2, Texture.beets3
   };
@@ -15,7 +15,6 @@ public class Beetroots extends MinecraftBlock {
   public Beetroots(int age) {
     super("beetroots", Texture.beets3);
     localIntersect = true;
-    opaque = false;
     this.age = age & 3;
   }
 

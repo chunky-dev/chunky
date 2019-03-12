@@ -5,7 +5,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
-public class Wheat extends MinecraftBlock {
+public class Wheat extends MinecraftBlockTranslucent {
   private static final Texture[] texture = {
       Texture.crops0, Texture.crops1, Texture.crops2, Texture.crops3, Texture.crops4,
       Texture.crops5, Texture.crops6, Texture.crops7
@@ -16,7 +16,6 @@ public class Wheat extends MinecraftBlock {
   public Wheat(int age) {
     super("wheat", Texture.crops7);
     localIntersect = true;
-    opaque = false;
     this.age = age & 7;
   }
 

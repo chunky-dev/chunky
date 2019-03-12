@@ -5,7 +5,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
-public class Carrots extends MinecraftBlock {
+public class Carrots extends MinecraftBlockTranslucent {
   private static final Texture[] texture = {
       Texture.carrots0, Texture.carrots0, Texture.carrots1, Texture.carrots1,
       Texture.carrots2, Texture.carrots2, Texture.carrots2, Texture.carrots3
@@ -16,7 +16,6 @@ public class Carrots extends MinecraftBlock {
   public Carrots(int age) {
     super("carrots", texture[texture.length - 1]);
     localIntersect = true;
-    opaque = false;
     this.age = age % texture.length;
   }
 

@@ -2394,6 +2394,15 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/end_rod", Texture.endRod),
         new SimpleTexture("assets/minecraft/textures/blocks/end_rod", Texture.endRod)));
 
+    allTextures.put("frosted_ice_0",
+        new SimpleTexture("assets/minecraft/textures/block/frosted_ice_0", Texture.frostedIce0));
+    allTextures.put("frosted_ice_1",
+        new SimpleTexture("assets/minecraft/textures/block/frosted_ice_1", Texture.frostedIce1));
+    allTextures.put("frosted_ice_2",
+        new SimpleTexture("assets/minecraft/textures/block/frosted_ice_2", Texture.frostedIce2));
+    allTextures.put("frosted_ice_3",
+        new SimpleTexture("assets/minecraft/textures/block/frosted_ice_3", Texture.frostedIce3));
+
     allTextures.put("fire_layer_0", new AlternateTextures(
         new AnimatedTextureLoader("assets/minecraft/textures/block/fire_0", Texture.fireLayer0),
         new AnimatedTextureLoader("assets/minecraft/textures/blocks/fire_layer_0",
@@ -2523,6 +2532,9 @@ public class TexturePackLoader {
             Texture.observerBack),
         new SimpleTexture("assets/minecraft/textures/blocks/observer_back",
             Texture.observerBack)));
+    allTextures.put("observer_back_on",
+        new SimpleTexture("assets/minecraft/textures/block/observer_back_on",
+            Texture.observerBackOn));
     allTextures.put("observer_front", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/observer_front",
             Texture.observerFront),
