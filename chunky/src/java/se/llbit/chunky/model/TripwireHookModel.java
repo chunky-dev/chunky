@@ -125,6 +125,10 @@ public class TripwireHookModel {
   public static boolean intersect(Ray ray) {
     int data = ray.getBlockData();
     int direction = data & 3;
+    return intersect(ray, direction, 1 & (data >> 2));
+  }
+
+  public static boolean intersect(Ray ray, int direction, int attached) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     if (box[direction].intersect(ray)) {
@@ -134,7 +138,7 @@ public class TripwireHookModel {
       hit = true;
     }
 
-    for (Quad quad : arm[direction][data >> 2]) {
+    for (Quad quad : arm[direction][attached]) {
       if (quad.intersect(ray)) {
         float[] color = Texture.tripwireHook.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
@@ -145,7 +149,7 @@ public class TripwireHookModel {
         }
       }
     }
-    for (Quad quad : hook[direction][data >> 2]) {
+    for (Quad quad : hook[direction][attached]) {
       if (quad.intersect(ray)) {
         float[] color = Texture.tripwireHook.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {

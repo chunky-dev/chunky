@@ -32,6 +32,10 @@ public class Vine extends MinecraftBlockTranslucent {
     if (up) {
       connections |= BlockData.CONNECTED_ABOVE;
     }
+    if (connections == 0) {
+      // If no side is true, render on south side.
+      connections = BlockData.CONNECTED_SOUTH;
+    }
     this.connections = connections;
   }
 

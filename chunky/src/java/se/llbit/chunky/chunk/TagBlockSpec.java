@@ -558,12 +558,13 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "end_stone":
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.endStone);
         case "end_stone_bricks":
           return new MinecraftBlock(name, Texture.endBricks);
-        case "redstone_lamp":
-          // TODO
-          return new UnknownBlock(name);
+        case "redstone_lamp": {
+          String lit = tag.get("Properties").get("lit").stringValue("false");
+          return new RedstoneLamp(lit.equals("true"));
+        }
         case "cocoa":
           // TODO
           return new UnknownBlock(name);
@@ -575,11 +576,9 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "tripwire_hook":
-          // TODO
-          return new UnknownBlock(name);
+          return tripwireHook(tag);
         case "tripwire":
-          // TODO
-          return new UnknownBlock(name);
+          return tripwire(tag);
         case "emerald_block":
           return new MinecraftBlock(name, Texture.emeraldBlock);
         case "beacon":
@@ -1992,5 +1991,25 @@ public class TagBlockSpec implements BlockSpec {
         east.equals("true"),
         west.equals("true"),
         up.equals("true"));
+  }
+
+  private Block tripwire(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String north = properties.get("north").stringValue("false");
+    String south = properties.get("south").stringValue("false");
+    String east = properties.get("east").stringValue("false");
+    String west = properties.get("west").stringValue("false");
+    return new Tripwire(north.equals("true"),
+        south.equals("true"),
+        east.equals("true"),
+        west.equals("true"));
+  }
+
+  private Block tripwireHook(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String facing = properties.get("facing").stringValue("north");
+    String attached = properties.get("attached").stringValue("false");
+    String powered = properties.get("powered").stringValue("false");
+    return new TripwireHook(facing, powered.equals("true"));
   }
 }

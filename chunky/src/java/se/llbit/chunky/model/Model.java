@@ -76,6 +76,18 @@ public class Model {
 
   /**
    * @param src source quads
+   * @return Quads rotated 90 degrees around the negative Y axis
+   */
+  public static Quad[] rotateNegY(Quad[] src) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].transform(Transform.NONE.rotateNegY());
+    }
+    return rot;
+  }
+
+  /**
+   * @param src source quads
    * @return UVTriangles rotated about the Y axis
    */
   public static UVTriangle[] rotateY(UVTriangle[] src) {

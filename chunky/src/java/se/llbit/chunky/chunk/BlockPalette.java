@@ -1,6 +1,7 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.RedstoneLamp;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
@@ -112,10 +113,16 @@ public class BlockPalette {
       block.emittance = 1.0f;
       block.ior = 1.52f;
     });
+    materialProperties.put("minecraft:redstone_lamp", block -> {
+      if (block instanceof RedstoneLamp && ((RedstoneLamp) block).isLit) {
+        block.emittance = 1.0f;
+      }
+    });
+    materialProperties.put("minecraft:emerald_block", block -> {
+      block.specular = 0.04f;
+    });
     /*STAINED_GLASS.ior = 1.52f;
     GLASSPANE.ior = 1.52f;
-    REDSTONELAMPON.emittance = 1.0f;
-    EMERALDBLOCK.specular = 0.04f;
     STAINED_GLASSPANE.ior = 1.52f;
     SEALANTERN.emittance = 0.5f;
     ENDROD.emittance = 1.0f;
