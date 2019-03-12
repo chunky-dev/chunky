@@ -207,8 +207,14 @@ public class TagBlockSpec implements BlockSpec {
           return new MinecraftBlock(name, Texture.jukeboxSide);
         case "powered_rail":
           return poweredRail(tag);
-        case "detector_rail":
-          return detectorRail(tag);
+        case "detector_rail": {
+          Tag properties = tag.get("Properties");
+          String powered = properties.get("powered").stringValue("false");
+          Texture straightTrack = powered.equals("true")
+              ? Texture.detectorRailOn
+              : Texture.detectorRail;
+          return rail(tag, straightTrack);
+        }
         case "sticky_piston":
           return piston(tag, true);
         case "cobweb":
@@ -622,28 +628,31 @@ public class TagBlockSpec implements BlockSpec {
         case "redstone_block":
           return new MinecraftBlock(name, Texture.redstoneBlock);
         case "nether_quartz_ore":
-          // TODO
-          return new UnknownBlock(name);
-        case "hopper":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.netherQuartzOre);
+        case "hopper": {
+          String facing = tag.get("Properties").get("facing").stringValue("down");
+          return new Hopper(facing);
+        }
         case "chiseled_quartz_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new TexturedBlock(name, Texture.quartzChiseled, Texture.quartzChiseledTop);
         case "quartz_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.quartzSide);
         case "quartz_pillar":
-          // TODO
-          return new UnknownBlock(name);
+          return log(tag, Texture.quartzPillar, Texture.quartzPillarTop);
         case "quartz_stairs":
           return stairs(tag, Texture.quartzSide, Texture.quartzTop, Texture.quartzBottom);
-        case "activator_rail":
-          // TODO
-          return new UnknownBlock(name);
-        case "dropper":
-          // TODO
-          return new UnknownBlock(name);
+        case "activator_rail": {
+          Tag properties = tag.get("Properties");
+          String powered = properties.get("powered").stringValue("false");
+          Texture straightTrack = powered.equals("true")
+              ? Texture.activatorRailPowered
+              : Texture.activatorRail;
+          return rail(tag, straightTrack);
+        }
+        case "dropper": {
+          String facing = tag.get("Properties").get("facing").stringValue("south");
+          return new Dropper(facing);
+        }
         case "white_terracotta":
           return new MinecraftBlock(name, Texture.whiteClay);
         case "orange_terracotta":
@@ -1625,9 +1634,12 @@ public class TagBlockSpec implements BlockSpec {
         case "end_gateway":
           // TODO
           return new UnknownBlock(name);
-        case "command_block":
-          // TODO
-          return new UnknownBlock(name);
+        case "command_block": {
+          Tag properties = tag.get("Properties");
+          String facing = properties.get("facing").stringValue("south");
+          String conditional = properties.get("conditional").stringValue("false");
+          return new CommandBlock(facing, conditional.equals("true"));
+        }
         case "chain_command_block":
           // TODO
           return new UnknownBlock(name);
@@ -1766,15 +1778,6 @@ public class TagBlockSpec implements BlockSpec {
     Tag properties = tag.get("Properties");
     String shape = properties.get("shape").stringValue("north-south");
     return new Rail(name, straightTrack, shape);
-  }
-
-  private static Block detectorRail(Tag tag) {
-    Tag properties = tag.get("Properties");
-    String powered = properties.get("powered").stringValue("false");
-    Texture straightTrack = powered.equals("true")
-        ? Texture.detectorRailOn
-        : Texture.detectorRail;
-    return rail(tag, straightTrack);
   }
 
   private static Block poweredRail(Tag tag) {

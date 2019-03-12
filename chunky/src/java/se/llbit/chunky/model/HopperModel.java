@@ -33,40 +33,47 @@ import se.llbit.math.Vector4;
  */
 public class HopperModel {
   private static final AABB[] boxes = new AABB[] {
-      // east
+      // East.
       new AABB(14 / 16., 1, 10 / 16., 1, 0, 1),
-      // west
+      // West.
       new AABB(0, 2 / 16., 10 / 16., 1, 0, 1),
-      // north
+      // North.
       new AABB(2 / 16., 14 / 16., 10 / 16., 1, 0, 2 / 16.),
-      // south
+      // South.
       new AABB(2 / 16., 14 / 16., 10 / 16., 1, 14 / 16., 1),
-      // center
-      new AABB(4 / 16., 12 / 16., 4 / 16., 10 / 16., 4 / 16., 12 / 16.),};
+      // Center.
+      new AABB(4 / 16., 12 / 16., 4 / 16., 10 / 16., 4 / 16., 12 / 16.),
+  };
 
   private static final AABB[] pipe = new AABB[] {
-      // bottom
+      // Bottom.
       new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
-      // bottom
+      // Bottom.
       new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
-      // facing north
+      // Facing north.
       new AABB(6 / 16., 10 / 16., 4 / 16., 8 / 16., 0, 4 / 16.),
-      // facing south
+      // Facing south.
       new AABB(6 / 16., 10 / 16., 4 / 16., 8 / 16., 12 / 16., 1),
-      // facing west
+      // Facing west.
       new AABB(0 / 16., 4 / 16., 4 / 16., 8 / 16., 6 / 16., 10 / 16.),
-      // facing east
+      // Facing east.
       new AABB(12 / 16., 1, 4 / 16., 8 / 16., 6 / 16., 10 / 16.),
-      // bottom
+      // Bottom.
       new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
-      // bottom
-      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),};
+      // Bottom.
+      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
+  };
 
   private static final Quad bottom = new DoubleSidedQuad(new Vector3(2 / 16., 10 / 16., 2 / 16.),
       new Vector3(14 / 16., 10 / 16., 2 / 16.), new Vector3(2 / 16., 10 / 16., 14 / 16.),
       new Vector4(2 / 16., 14 / 16., 2 / 16., 14 / 16.));
 
   public static boolean intersect(Ray ray) {
+    int direction = 7 & (ray.getCurrentData() >> BlockData.OFFSET);
+    return intersect(ray, direction);
+  }
+
+  public static boolean intersect(Ray ray, int direction) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     for (AABB box : boxes) {
@@ -81,8 +88,7 @@ public class HopperModel {
         hit = true;
       }
     }
-    int dir = 7 & (ray.getCurrentData() >> BlockData.OFFSET);
-    if (pipe[dir].intersect(ray)) {
+    if (pipe[direction].intersect(ray)) {
       if (ray.n.y > 0) {
         Texture.hopperInside.getColor(ray);
       } else {
