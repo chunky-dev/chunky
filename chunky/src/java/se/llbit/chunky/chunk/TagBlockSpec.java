@@ -1,6 +1,7 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.block.*;
+import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
@@ -1460,32 +1461,27 @@ public class TagBlockSpec implements BlockSpec {
           return new Potatoes(age);
         }
         case "skeleton_skull":
-          // TODO
-          return new UnknownBlock(name);
+          return skull(tag, Texture.skeleton, 0);
         case "skeleton_wall_skull":
           // TODO
           return new UnknownBlock(name);
         case "wither_skeleton_skull":
-          // TODO
-          return new UnknownBlock(name);
+          return skull(tag, Texture.wither, 1);
         case "wither_skeleton_wall_skull":
           // TODO
           return new UnknownBlock(name);
         case "zombie_head":
-          // TODO
-          return new UnknownBlock(name);
+          return skull(tag, Texture.zombie, 2);
         case "zombie_wall_head":
           // TODO
           return new UnknownBlock(name);
         case "player_head":
-          // TODO
-          return new UnknownBlock(name);
+          return skull(tag, Texture.steve, 3);
         case "player_wall_head":
           // TODO
           return new UnknownBlock(name);
         case "creeper_head":
-          // TODO
-          return new UnknownBlock(name);
+          return skull(tag, Texture.creeper, 4);
         case "creeper_wall_head":
           // TODO
           return new UnknownBlock(name);
@@ -2053,5 +2049,15 @@ public class TagBlockSpec implements BlockSpec {
         east.equals("true"),
         west.equals("true"),
         up.equals("true"));
+  }
+
+  private Block skull(Tag tag, EntityTexture texture, int type) {
+    String name = blockName(tag);
+    int rotation = 0;
+    try {
+      rotation = Integer.parseInt(tag.get("Properties").get("rotation").stringValue("0"));
+    } catch (NumberFormatException ignored) {
+    }
+    return new Head(name, texture, type, rotation);
   }
 }
