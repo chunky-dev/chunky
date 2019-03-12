@@ -1007,35 +1007,25 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "dead_tube_coral_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.deadTubeCoralBlock);
         case "dead_brain_coral_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.deadBrainCoralBlock);
         case "dead_bubble_coral_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.deadBubbleCoralBlock);
         case "dead_fire_coral_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.deadFireCoralBlock);
         case "dead_horn_coral_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.deadHornCoralBlock);
         case "tube_coral_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.tubeCoralBlock);
         case "brain_coral_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.brainCoralBlock);
         case "bubble_coral_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.bubbleCoralBlock);
         case "fire_coral_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.fireCoralBlock);
         case "horn_coral_block":
-          // TODO
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.hornCoralBlock);
         case "tube_coral":
           // TODO
           return new UnknownBlock(name);

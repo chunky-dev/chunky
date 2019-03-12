@@ -654,12 +654,25 @@ public class Texture {
   public static final Texture bedRed = new Texture();
   public static final Texture bedBlack = new Texture();
 
+  // [1.13]
   public static final Texture kelp = new Texture();
   public static final Texture kelpPlant = new Texture();
 
   public static final Texture driedKelpSide = new Texture();
   public static final Texture driedKelpTop = new Texture();
   public static final Texture driedKelpBottom = new Texture();
+
+  public static final Texture tubeCoralBlock = new Texture();
+  public static final Texture brainCoralBlock = new Texture();
+  public static final Texture bubbleCoralBlock = new Texture();
+  public static final Texture fireCoralBlock = new Texture();
+  public static final Texture hornCoralBlock = new Texture();
+
+  public static final Texture deadTubeCoralBlock = new Texture();
+  public static final Texture deadBrainCoralBlock = new Texture();
+  public static final Texture deadBubbleCoralBlock = new Texture();
+  public static final Texture deadFireCoralBlock = new Texture();
+  public static final Texture deadHornCoralBlock = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

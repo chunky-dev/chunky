@@ -3072,6 +3072,38 @@ public class TexturePackLoader {
     allTextures.put("dried_kelp_bottom",
         new SimpleTexture("assets/minecraft/textures/block/dried_kelp_bottom",
             Texture.driedKelpBottom));
+
+    allTextures.put("tube_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/tube_coral_block",
+            Texture.tubeCoralBlock));
+    allTextures.put("brain_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/brain_coral_block",
+            Texture.brainCoralBlock));
+    allTextures.put("bubble_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/bubble_coral_block",
+            Texture.bubbleCoralBlock));
+    allTextures.put("fire_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/fire_coral_block",
+            Texture.fireCoralBlock));
+    allTextures.put("horn_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/horn_coral_block",
+            Texture.hornCoralBlock));
+
+    allTextures.put("dead_tube_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/dead_tube_coral_block",
+            Texture.deadTubeCoralBlock));
+    allTextures.put("dead_brain_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/dead_brain_coral_block",
+            Texture.deadBrainCoralBlock));
+    allTextures.put("dead_bubble_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/dead_bubble_coral_block",
+            Texture.deadBubbleCoralBlock));
+    allTextures.put("dead_fire_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/dead_fire_coral_block",
+            Texture.deadFireCoralBlock));
+    allTextures.put("dead_horn_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/dead_horn_coral_block",
+            Texture.deadHornCoralBlock));
   }
 
   private static String[] texturePacks = { };
