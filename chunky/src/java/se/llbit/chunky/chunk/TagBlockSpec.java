@@ -1057,32 +1057,27 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "tube_coral_fan":
-          // TODO
-          return new UnknownBlock(name);
+          return new CoralFan(name, Texture.tubeCoralFan);
         case "tube_coral_wall_fan":
           // TODO
           return new UnknownBlock(name);
         case "brain_coral_fan":
-          // TODO
-          return new UnknownBlock(name);
+          return new CoralFan(name, Texture.brainCoralFan);
         case "brain_coral_wall_fan":
           // TODO
           return new UnknownBlock(name);
         case "bubble_coral_fan":
-          // TODO
-          return new UnknownBlock(name);
+          return new CoralFan(name, Texture.bubbleCoralFan);
         case "bubble_coral_wall_fan":
           // TODO
           return new UnknownBlock(name);
         case "fire_coral_fan":
-          // TODO
-          return new UnknownBlock(name);
+          return new CoralFan(name, Texture.fireCoralFan);
         case "fire_coral_wall_fan":
           // TODO
           return new UnknownBlock(name);
         case "horn_coral_fan":
-          // TODO
-          return new UnknownBlock(name);
+          return new CoralFan(name, Texture.hornCoralFan);
         case "horn_coral_wall_fan":
           // TODO
           return new UnknownBlock(name);

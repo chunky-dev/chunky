@@ -3104,6 +3104,23 @@ public class TexturePackLoader {
     allTextures.put("dead_horn_coral_block",
         new SimpleTexture("assets/minecraft/textures/block/dead_horn_coral_block",
             Texture.deadHornCoralBlock));
+
+    allTextures.put("tube_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/tube_coral_fan",
+            Texture.tubeCoralFan));
+    allTextures.put("brain_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/brain_coral_fan",
+            Texture.brainCoralFan));
+    allTextures.put("bubble_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/bubble_coral_fan",
+            Texture.bubbleCoralFan));
+    allTextures.put("fire_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/fire_coral_fan",
+            Texture.fireCoralFan));
+    allTextures.put("horn_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/horn_coral_fan",
+            Texture.hornCoralFan));
+
   }
 
   private static String[] texturePacks = { };

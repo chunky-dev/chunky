@@ -43,9 +43,9 @@ public class Quad {
   protected double d, xvl, yvl;
 
   /**
-   * Create new Quad
+   * Create new Quad by copying another quad and applying a transform.
    */
-  protected Quad(Quad other, Transform t) {
+  public Quad(Quad other, Transform t) {
     o.set(other.o);
     o.x -= .5;
     o.y -= .5;

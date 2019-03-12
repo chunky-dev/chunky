@@ -674,6 +674,12 @@ public class Texture {
   public static final Texture deadFireCoralBlock = new Texture();
   public static final Texture deadHornCoralBlock = new Texture();
 
+  public static final Texture tubeCoralFan = new Texture();
+  public static final Texture brainCoralFan = new Texture();
+  public static final Texture bubbleCoralFan = new Texture();
+  public static final Texture fireCoralFan = new Texture();
+  public static final Texture hornCoralFan = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
