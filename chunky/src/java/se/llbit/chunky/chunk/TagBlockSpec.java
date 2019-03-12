@@ -348,7 +348,7 @@ public class TagBlockSpec implements BlockSpec {
         case "dark_prismarine_slab":
           return slab(tag, Texture.darkPrismarine);
         case "smooth_quartz":
-          return new UnknownBlock(name);
+          return new MinecraftBlock(name, Texture.quartzTop);
         case "smooth_red_sandstone":
           return new MinecraftBlock(name, Texture.redSandstoneTop);
         case "smooth_sandstone":
@@ -626,14 +626,11 @@ public class TagBlockSpec implements BlockSpec {
         case "dark_oak_button":
           return button(tag, Texture.darkOakPlanks);
         case "anvil":
-          // TODO
-          return new UnknownBlock(name);
+          return anvil(tag, 0);
         case "chipped_anvil":
-          // TODO
-          return new UnknownBlock(name);
+          return anvil(tag, 1);
         case "damaged_anvil":
-          // TODO
-          return new UnknownBlock(name);
+          return anvil(tag, 2);
         case "trapped_chest":
           return chest(tag);
         case "light_weighted_pressure_plate":
@@ -751,9 +748,10 @@ public class TagBlockSpec implements BlockSpec {
           return new MinecraftBlock(name, Texture.slime);
         case "grass_path":
           return new GrassPath();
-        case "sunflower":
-          // TODO
-          return new UnknownBlock(name);
+        case "sunflower": {
+          String half = tag.get("Properties").get("half").stringValue("lower");
+          return new Sunflower(half);
+        }
         case "lilac":
           return largeFlower(tag, Texture.lilacTop, Texture.lilacBottom);
         case "rose_bush":
@@ -1245,8 +1243,7 @@ public class TagBlockSpec implements BlockSpec {
         case "repeater":
           return repeater(tag);
         case "comparator":
-          // TODO
-          return new UnknownBlock(name);
+          return comparator(tag);
         case "composter":
           // TODO
           return new UnknownBlock(name);
@@ -1945,6 +1942,14 @@ public class TagBlockSpec implements BlockSpec {
     return new Repeater(delay, facing, powered.equals("true"), locked.equals("true"));
   }
 
+  private static Block comparator(Tag tag) {
+    Tag properties = tag.get("Properties");
+    String facing = properties.get("facing").stringValue("north");
+    String powered = properties.get("powered").stringValue("false");
+    String mode = properties.get("mode").stringValue("compare");
+    return new Comparator(facing, mode, powered.equals("true"));
+  }
+
   private Block fence(Tag tag, Texture texture) {
     String name = blockName(tag);
     Tag properties = tag.get("Properties");
@@ -2084,5 +2089,12 @@ public class TagBlockSpec implements BlockSpec {
     String name = blockName(tag);
     String facing = tag.get("Properties").get("facing").stringValue("north");
     return new WallHead(name, texture, type, facing);
+  }
+
+  private Block anvil(Tag tag, int damage) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String facing = properties.get("facing").stringValue("north");
+    return new Anvil(name, facing, damage);
   }
 }

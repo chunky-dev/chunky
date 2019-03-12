@@ -22,7 +22,7 @@ import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 
 public class TallGrassModel extends SpriteModel {
-  private static final Texture[] tex = {Texture.deadBush, Texture.tallGrass, Texture.fern};
+  private static final Texture[] tex = { Texture.deadBush, Texture.tallGrass, Texture.fern };
 
   public static boolean intersect(Ray ray, Scene scene) {
     boolean hit = false;

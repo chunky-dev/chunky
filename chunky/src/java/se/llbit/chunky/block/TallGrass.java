@@ -5,7 +5,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
-public class TallGrass extends MinecraftBlock {
+public class TallGrass extends MinecraftBlockTranslucent {
   public TallGrass(String half) {
     super("tall_grass",
         half.equals("upper")

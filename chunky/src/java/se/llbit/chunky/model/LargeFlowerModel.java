@@ -24,39 +24,49 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class LargeFlowerModel {
-  protected static Quad[] quads =
-      {new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 1, 0),
+  protected static Quad[] quads = {
+      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 1, 0),
           new Vector4(0, 1, 0, 1)),
 
-          new Quad(new Vector3(1, 0, 1), new Vector3(0, 0, 0), new Vector3(1, 1, 1),
-              new Vector4(0, 1, 0, 1)),
+        new Quad(new Vector3(1, 0, 1), new Vector3(0, 0, 0), new Vector3(1, 1, 1),
+            new Vector4(0, 1, 0, 1)),
 
-          new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 1, 0),
-              new Vector4(0, 1, 0, 1)),
+        new Quad(new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 1, 0),
+            new Vector4(0, 1, 0, 1)),
 
-          new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(0, 1, 1),
-              new Vector4(0, 1, 0, 1)),};
-  protected static Quad[] sunflower =
-      {new Quad(new Vector3(14 / 16., 8 / 16., 2 / 16.), new Vector3(2 / 16., 16 / 16., 2 / 16.),
+        new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(0, 1, 1),
+            new Vector4(0, 1, 0, 1)),
+  };
+  protected static Quad[] sunflower = {
+      new Quad(new Vector3(14 / 16., 8 / 16., 2 / 16.), new Vector3(2 / 16., 16 / 16., 2 / 16.),
           new Vector3(14 / 16., 8 / 16., 14 / 16.),
           new Vector4(2 / 16., 14 / 16., 2 / 16., 14 / 16.)),
-          new Quad(new Vector3(2 / 16., 16 / 16., 2 / 16.),
-              new Vector3(14 / 16., 8 / 16., 2 / 16.), new Vector3(2 / 16., 16 / 16., 14 / 16.),
-              new Vector4(2 / 16., 14 / 16., 2 / 16., 14 / 16.)),};
+      new Quad(new Vector3(2 / 16., 16 / 16., 2 / 16.),
+          new Vector3(14 / 16., 8 / 16., 2 / 16.), new Vector3(2 / 16., 16 / 16., 14 / 16.),
+          new Vector4(2 / 16., 14 / 16., 2 / 16., 14 / 16.)),
+  };
 
-  final static Texture[][] tex =
-      {{Texture.sunflowerBottom, Texture.sunflowerTop}, {Texture.lilacBottom, Texture.lilacTop},
-          {Texture.doubleTallGrassBottom, Texture.doubleTallGrassTop},
-          {Texture.largeFernBottom, Texture.largeFernTop},
-          {Texture.roseBushBottom, Texture.roseBushTop}, {Texture.peonyBottom, Texture.peonyTop},};
+  final static Texture[][] tex = {
+      { Texture.sunflowerBottom, Texture.sunflowerTop },
+      { Texture.lilacBottom, Texture.lilacTop },
+      { Texture.doubleTallGrassBottom, Texture.doubleTallGrassTop },
+      { Texture.largeFernBottom, Texture.largeFernTop },
+      { Texture.roseBushBottom, Texture.roseBushTop },
+      { Texture.peonyBottom, Texture.peonyTop },
+  };
   final static Texture[] sunflowerTex = {Texture.sunflowerFront, Texture.sunflowerBack};
 
   public static boolean intersect(Ray ray, Scene scene) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
     int data = ray.getBlockData();
     int kind = (data & 7) % 6;
     int top = (data & 8) >> 3;
+    return intersect(ray, scene, kind, top);
+  }
+
+  public static boolean intersect(Ray ray, Scene scene,
+      int kind, int top) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
     for (Quad quad : quads) {
       if (quad.intersect(ray)) {
         float[] color = tex[kind][top].getColor(ray.u, ray.v);

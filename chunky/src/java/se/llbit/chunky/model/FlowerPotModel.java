@@ -44,34 +44,36 @@ public class FlowerPotModel {
 
   private static final AABB cactus = new AABB(6 / 16., 10 / 16., 4 / 16., 1, 6 / 16., 10 / 16.);
 
-  protected static Quad[] flower =
-      {new Quad(new Vector3(0, 4 / 16., 0), new Vector3(1, 4 / 16., 1), new Vector3(0, 1, 0),
+  protected static Quad[] flower = {
+      new Quad(new Vector3(0, 4 / 16., 0), new Vector3(1, 4 / 16., 1), new Vector3(0, 1, 0),
           new Vector4(0, 1, 0, 12 / 16.)),
 
-          new Quad(new Vector3(1, 4 / 16., 1), new Vector3(0, 4 / 16., 0), new Vector3(1, 1, 1),
-              new Vector4(0, 1, 0, 12 / 16.)),
+      new Quad(new Vector3(1, 4 / 16., 1), new Vector3(0, 4 / 16., 0), new Vector3(1, 1, 1),
+          new Vector4(0, 1, 0, 12 / 16.)),
 
-          new Quad(new Vector3(1, 4 / 16., 0), new Vector3(0, 4 / 16., 1), new Vector3(1, 1, 0),
-              new Vector4(0, 1, 0, 12 / 16.)),
+      new Quad(new Vector3(1, 4 / 16., 0), new Vector3(0, 4 / 16., 1), new Vector3(1, 1, 0),
+          new Vector4(0, 1, 0, 12 / 16.)),
 
-          new Quad(new Vector3(0, 4 / 16., 1), new Vector3(1, 4 / 16., 0), new Vector3(0, 1, 1),
-              new Vector4(0, 1, 0, 12 / 16.)),};
+      new Quad(new Vector3(0, 4 / 16., 1), new Vector3(1, 4 / 16., 0), new Vector3(0, 1, 1),
+          new Vector4(0, 1, 0, 12 / 16.)),
+  };
 
-  protected static Quad[] flowerSmall =
-      {new Quad(new Vector3(2 / 16., 4 / 16., 2 / 16.), new Vector3(14 / 16., 4 / 16., 14 / 16.),
+  protected static Quad[] flowerSmall = {
+      new Quad(new Vector3(2 / 16., 4 / 16., 2 / 16.), new Vector3(14 / 16., 4 / 16., 14 / 16.),
           new Vector3(2 / 16., 1, 2 / 16.), new Vector4(0, 1, 0, 1)),
 
-          new Quad(new Vector3(14 / 16., 4 / 16., 14 / 16.),
-              new Vector3(2 / 16., 4 / 16., 2 / 16.), new Vector3(14 / 16., 1, 14 / 16.),
-              new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(14 / 16., 4 / 16., 14 / 16.),
+          new Vector3(2 / 16., 4 / 16., 2 / 16.), new Vector3(14 / 16., 1, 14 / 16.),
+          new Vector4(0, 1, 0, 1)),
 
-          new Quad(new Vector3(14 / 16., 4 / 16., 2 / 16.),
-              new Vector3(2 / 16., 4 / 16., 14 / 16.), new Vector3(14 / 16., 1, 2 / 16.),
-              new Vector4(0, 1, 0, 1)),
+      new Quad(new Vector3(14 / 16., 4 / 16., 2 / 16.),
+          new Vector3(2 / 16., 4 / 16., 14 / 16.), new Vector3(14 / 16., 1, 2 / 16.),
+          new Vector4(0, 1, 0, 1)),
 
-          new Quad(new Vector3(2 / 16., 4 / 16., 14 / 16.),
-              new Vector3(14 / 16., 4 / 16., 2 / 16.), new Vector3(2 / 16., 1, 14 / 16.),
-              new Vector4(0, 1, 0, 1)),};
+      new Quad(new Vector3(2 / 16., 4 / 16., 14 / 16.),
+          new Vector3(14 / 16., 4 / 16., 2 / 16.), new Vector3(2 / 16., 1, 14 / 16.),
+          new Vector4(0, 1, 0, 1)),
+  };
 
   private static final Texture[] tex =
       {Texture.flowerPot, Texture.flowerPot, Texture.flowerPot, Texture.flowerPot, Texture.dirt,};
