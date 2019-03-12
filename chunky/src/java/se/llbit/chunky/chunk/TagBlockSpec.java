@@ -584,11 +584,9 @@ public class TagBlockSpec implements BlockSpec {
         case "beacon":
           return new Beacon();
         case "cobblestone_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.cobblestone);
         case "mossy_cobblestone_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.mossStone);
         case "oak_button":
           return button(tag, Texture.oakPlanks);
         case "spruce_button":
@@ -1174,41 +1172,29 @@ public class TagBlockSpec implements BlockSpec {
         case "diorite_slab":
           return slab(tag, Texture.diorite);
         case "brick_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.brick);
         case "prismarine_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.prismarineBricks);
         case "red_sandstone_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.redSandstoneSide);
         case "mossy_stone_brick_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.mossyStoneBrick);
         case "granite_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.granite);
         case "stone_brick_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.stoneBrick);
         case "nether_brick_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.netherBrick);
         case "andesite_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.andesite);
         case "red_nether_brick_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.redNetherBrick);
         case "sandstone_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.sandstoneSide);
         case "end_stone_brick_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.endBricks);
         case "diorite_wall":
-          // TODO
-          return new UnknownBlock(name);
+          return wall(tag, Texture.diorite);
         case "scaffolding":
           // TODO
           return new UnknownBlock(name);
@@ -2046,5 +2032,21 @@ public class TagBlockSpec implements BlockSpec {
     } catch (NumberFormatException ignored) {
     }
     return new Cocoa(facing, age);
+  }
+
+  private Block wall(Tag tag, Texture texture) {
+    String name = blockName(tag);
+    Tag properties = tag.get("Properties");
+    String north = properties.get("north").stringValue("false");
+    String south = properties.get("south").stringValue("false");
+    String east = properties.get("east").stringValue("false");
+    String west = properties.get("west").stringValue("false");
+    String up = properties.get("up").stringValue("false");
+    return new Wall(name, texture,
+        north.equals("true"),
+        south.equals("true"),
+        east.equals("true"),
+        west.equals("true"),
+        up.equals("true"));
   }
 }

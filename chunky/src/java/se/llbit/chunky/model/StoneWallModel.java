@@ -30,10 +30,15 @@ public class StoneWallModel {
       new AABB(0, .5, 0, 13 / 16.0, 5 / 16.0, 11 / 16.0)};
 
   public static boolean intersect(Ray ray, Texture texture) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
     int connections = 0xF & (ray.getCurrentData() >>> BlockData.STONEWALL_CONN);
     int midsection = 1 & (ray.getCurrentData() >>> BlockData.STONEWALL_CORNER);
+    return intersect(ray, texture, connections, midsection);
+  }
+
+  public static boolean intersect(Ray ray, Texture texture, int connections,
+      int midsection) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
     // figure out if we should draw the center post
     if (midsection != 0) {
       if (post.intersect(ray)) {
