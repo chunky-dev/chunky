@@ -610,15 +610,15 @@ public class TagBlockSpec implements BlockSpec {
           // TODO
           return new UnknownBlock(name);
         case "trapped_chest":
-          // TODO
-          return new UnknownBlock(name);
+          return chest(tag);
         case "light_weighted_pressure_plate":
           return new PressurePlate(name, Texture.goldBlock);
         case "heavy_weighted_pressure_plate":
           return new PressurePlate(name, Texture.ironBlock);
-        case "daylight_detector":
-          // TODO
-          return new UnknownBlock(name);
+        case "daylight_detector": {
+          String inverted = tag.get("Properties").get("inverted").stringValue("false");
+          return new DaylightDetector(inverted.equals("true"));
+        }
         case "redstone_block":
           return new MinecraftBlock(name, Texture.redstoneBlock);
         case "nether_quartz_ore":
@@ -1824,10 +1824,11 @@ public class TagBlockSpec implements BlockSpec {
   }
 
   private static Block chest(Tag tag) {
+    String name = blockName(tag);
     Tag properties = tag.get("Properties");
     String facing = properties.get("facing").stringValue("north");
     String type = properties.get("type").stringValue("single");
-    return new Chest(type, facing);
+    return new Chest(name, type, facing);
   }
 
   private static Block endRod(Tag tag) {
