@@ -572,9 +572,10 @@ public class TagBlockSpec implements BlockSpec {
           return stairs(tag, Texture.sandstoneSide, Texture.sandstoneTop, Texture.sandstoneBottom);
         case "emerald_ore":
           return new MinecraftBlock(name, Texture.emeraldOre);
-        case "ender_chest":
-          // TODO
-          return new UnknownBlock(name);
+        case "ender_chest": {
+          String facing = tag.get("Properties").get("facing").stringValue("north");
+          return new EnderChest(facing);
+        }
         case "tripwire_hook":
           return tripwireHook(tag);
         case "tripwire":
