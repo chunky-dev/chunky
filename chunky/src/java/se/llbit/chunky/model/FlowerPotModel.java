@@ -30,17 +30,47 @@ import se.llbit.math.Vector4;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class FlowerPotModel {
+  public enum Kind {
+    NONE,
+    POPPY,
+    DANDELION,
+    OAK_SAPLING,
+    SPRUCE_SAPLING,
+    BIRCH_SAPLING,
+    JUNGLE_SAPLING,
+    ACACIA_SAPLING,
+    DARK_OAK_SAPLING,
+    RED_MUSHROOM,
+    BROWN_MUSHROOM,
+    CACTUS,
+    DEAD_BUSH,
+    FERN,
+    BLUE_ORCHID,
+    ALLIUM,
+    AZURE_BLUET,
+    RED_TULIP,
+    ORANGE_TULIP,
+    WHITE_TULIP,
+    PINK_TULIP,
+    OXEYE_DAISY,
+    BAMBOO,
+    CORNFLOWER,
+    LILY_OF_THE_VALLEY,
+    WITHER_ROSE,
+  }
+
   private static final AABB[] boxes = {
-      // east
+      // East.
       new AABB(10 / 16., 11 / 16., 0, 6 / 16., 5 / 16., 11 / 16.),
-      // west
+      // West.
       new AABB(5 / 16., 6 / 16., 0, 6 / 16., 5 / 16., 11 / 16.),
-      // north
+      // North.
       new AABB(5 / 16., 11 / 16., 0, 6 / 16., 5 / 16., 6 / 16.),
-      // south
+      // South.
       new AABB(5 / 16., 11 / 16., 0, 6 / 16., 10 / 16., 11 / 16.),
-      // center
-      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),};
+      // Center.
+      new AABB(6 / 16., 10 / 16., 0, 4 / 16., 6 / 16., 10 / 16.),
+  };
 
   private static final AABB cactus = new AABB(6 / 16., 10 / 16., 4 / 16., 1, 6 / 16., 10 / 16.);
 
@@ -75,19 +105,17 @@ public class FlowerPotModel {
           new Vector4(0, 1, 0, 1)),
   };
 
-  private static final Texture[] tex =
-      {Texture.flowerPot, Texture.flowerPot, Texture.flowerPot, Texture.flowerPot, Texture.dirt,};
+  private static final Texture[] tex = {
+      Texture.flowerPot, Texture.flowerPot, Texture.flowerPot, Texture.flowerPot, Texture.dirt,
+  };
 
-  /**
-   * Find intersection between ray and block
-   *
-   * @param ray   ray to test
-   * @param scene scene reference
-   * @return <code>true</code> if the ray intersected the block
-   */
   public static boolean intersect(Ray ray, Scene scene) {
-    boolean hit = false;
     int flowerKind = ray.getBlockData();
+    return intersect(ray, scene, Kind.values()[flowerKind-1]);
+  }
+
+  public static boolean intersect(Ray ray, Scene scene, Kind kind) {
+    boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     for (int i = 0; i < boxes.length; ++i) {
       if (boxes[i].intersect(ray)) {
@@ -96,41 +124,46 @@ public class FlowerPotModel {
         hit = true;
       }
     }
-    switch (flowerKind) {
-      case 0:
-      default:
+    switch (kind) {
+      case NONE:
         break;
-      case 1:
+      case POPPY:
         hit |= intersect(flower, ray, Texture.poppy);
         break;
-      case 2:
+      case DANDELION:
         hit |= intersect(flower, ray, Texture.dandelion);
         break;
-      case 3:
+      case OAK_SAPLING:
         hit |= intersect(flowerSmall, ray, Texture.oakSapling);
         break;
-      case 4:
+      case SPRUCE_SAPLING:
         hit |= intersect(flowerSmall, ray, Texture.spruceSapling);
         break;
-      case 5:
+      case BIRCH_SAPLING:
         hit |= intersect(flowerSmall, ray, Texture.birchSapling);
         break;
-      case 6:
+      case JUNGLE_SAPLING:
         hit |= intersect(flowerSmall, ray, Texture.jungleSapling);
         break;
-      case 7:
+      case ACACIA_SAPLING:
+        hit |= intersect(flowerSmall, ray, Texture.acaciaSapling);
+        break;
+      case DARK_OAK_SAPLING:
+        hit |= intersect(flowerSmall, ray, Texture.darkOakSapling);
+        break;
+      case RED_MUSHROOM:
         hit |= intersect(flower, ray, Texture.redMushroom);
         break;
-      case 8:
+      case BROWN_MUSHROOM:
         hit |= intersect(flower, ray, Texture.brownMushroom);
         break;
-      case 9:
+      case CACTUS:
         hit |= cactus(ray);
         break;
-      case 10:
+      case DEAD_BUSH:
         hit |= intersect(flowerSmall, ray, Texture.deadBush);
         break;
-      case 11:
+      case FERN:
         if (intersect(flowerSmall, ray, Texture.fern)) {
           float[] biomeColor = ray.getBiomeGrassColor(scene);
           ray.color.x *= biomeColor[0];
@@ -138,6 +171,42 @@ public class FlowerPotModel {
           ray.color.z *= biomeColor[2];
           hit = true;
         }
+        break;
+      case BLUE_ORCHID:
+        hit |= intersect(flowerSmall, ray, Texture.blueOrchid);
+        break;
+      case ALLIUM:
+        hit |= intersect(flowerSmall, ray, Texture.allium);
+        break;
+      case AZURE_BLUET:
+        hit |= intersect(flowerSmall, ray, Texture.azureBluet);
+        break;
+      case RED_TULIP:
+        hit |= intersect(flowerSmall, ray, Texture.redTulip);
+        break;
+      case ORANGE_TULIP:
+        hit |= intersect(flowerSmall, ray, Texture.orangeTulip);
+        break;
+      case WHITE_TULIP:
+        hit |= intersect(flowerSmall, ray, Texture.whiteTulip);
+        break;
+      case PINK_TULIP:
+        hit |= intersect(flowerSmall, ray, Texture.pinkTulip);
+        break;
+      case OXEYE_DAISY:
+        hit |= intersect(flowerSmall, ray, Texture.oxeyeDaisy);
+        break;
+      case BAMBOO:
+        // TODO(1.14): upcoming block change
+        break;
+      case CORNFLOWER:
+        // TODO(1.14): upcoming block change
+        break;
+      case LILY_OF_THE_VALLEY:
+        // TODO(1.14): upcoming block change
+        break;
+      case WITHER_ROSE:
+        // TODO(1.14): upcoming block change
         break;
     }
     if (hit) {

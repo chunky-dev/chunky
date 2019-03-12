@@ -1,6 +1,7 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.block.*;
+import se.llbit.chunky.model.FlowerPotModel;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
@@ -1356,83 +1357,57 @@ public class TagBlockSpec implements BlockSpec {
           return new Cauldron(level);
         }
         case "flower_pot":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.NONE);
         case "potted_poppy":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.POPPY);
         case "potted_dandelion":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.DANDELION);
         case "potted_oak_sapling":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.OAK_SAPLING);
         case "potted_spruce_sapling":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.SPRUCE_SAPLING);
         case "potted_birch_sapling":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.BIRCH_SAPLING);
         case "potted_jungle_sapling":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.JUNGLE_SAPLING);
         case "potted_red_mushroom":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.RED_MUSHROOM);
         case "potted_brown_mushroom":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.BROWN_MUSHROOM);
         case "potted_cactus":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.CACTUS);
         case "potted_dead_bush":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.DEAD_BUSH);
         case "potted_fern":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.FERN);
         case "potted_acacia_sapling":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.ACACIA_SAPLING);
         case "potted_dark_oak_sapling":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.DARK_OAK_SAPLING);
         case "potted_blue_orchid":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.BLUE_ORCHID);
         case "potted_allium":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.ALLIUM);
         case "potted_azure_bluet":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.AZURE_BLUET);
         case "potted_red_tulip":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.RED_TULIP);
         case "potted_orange_tulip":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.ORANGE_TULIP);
         case "potted_white_tulip":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.WHITE_TULIP);
         case "potted_pink_tulip":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.PINK_TULIP);
         case "potted_oxeye_daisy":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.OXEYE_DAISY);
         case "potted_bamboo":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.BAMBOO);
         case "potted_cornflower":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.CORNFLOWER);
         case "potted_lily_of_the_valley":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.LILY_OF_THE_VALLEY);
         case "potted_wither_rose":
-          // TODO
-          return new UnknownBlock(name);
+          return new FlowerPot(name, FlowerPotModel.Kind.WITHER_ROSE);
         case "carrots": {
           int age = 8;
           try {
