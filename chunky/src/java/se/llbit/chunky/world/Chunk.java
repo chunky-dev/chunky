@@ -245,30 +245,6 @@ public class Chunk {
     return version;
   }
 
-  // OLD
-  private void extractChunkData(@NotNull Map<String, Tag> data, @NotNull byte[] blocks,
-      @NotNull byte[] blockData) {
-    Tag sections = data.get(LEVEL_SECTIONS);
-    if (sections.isList()) {
-      for (SpecificTag section : sections.asList()) {
-        Tag yTag = section.get("Y");
-        int yOffset = yTag.byteValue() & 0xFF;
-        if (!section.get("Palette").isList()) {
-          Tag blocksTag = section.get("Blocks");
-          if (blocksTag.isByteArray(SECTION_BYTES)) {
-            System.arraycopy(blocksTag.byteArray(), 0, blocks, SECTION_BYTES * yOffset,
-                SECTION_BYTES);
-          }
-          Tag dataTag = section.get("Data");
-          if (dataTag.isByteArray(SECTION_HALF_NIBBLES)) {
-            System.arraycopy(dataTag.byteArray(), 0, blockData, SECTION_HALF_NIBBLES * yOffset,
-                SECTION_HALF_NIBBLES);
-          }
-        }
-      }
-    }
-  }
-
   private void loadBlockData(@NotNull Map<String, Tag> data, @NotNull int[] blocks,
       BlockPalette blockPalette) {
     Tag sections = data.get(LEVEL_SECTIONS);

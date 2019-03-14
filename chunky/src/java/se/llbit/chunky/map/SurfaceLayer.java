@@ -20,8 +20,12 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Grass;
+import se.llbit.chunky.block.GrassBlock;
 import se.llbit.chunky.block.Leaves;
+import se.llbit.chunky.block.TallGrass;
+import se.llbit.chunky.block.Vine;
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -78,61 +82,52 @@ public class SurfaceLayer extends BitmapLayer {
         for (; y >= 0 && color[3] < 1.f; ) {
           Block block = palette.get(blocks[Chunk.chunkIndex(x, y, z)]);
           float[] blockColor = new float[4];
+          ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
           int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
 
           if (block instanceof Leaves) {
             ColorUtil.getRGBComponents(Biomes.getFoliageColor(biomeId), blockColor);
             blockColor[3] = 1.f;// foliage colors don't include alpha
             y -= 1;
-          } else if (block instanceof Grass) {
-            //case IdBlock.VINES_ID:
-            //case IdBlock.TALLGRASS_ID:
+          } else if (block instanceof GrassBlock || block instanceof Grass
+              || block instanceof TallGrass
+              || block instanceof Vine) {
             ColorUtil.getRGBComponents(Biomes.getGrassColor(biomeId), blockColor);
             blockColor[3] = 1.f;// grass colors don't include alpha
 
             y -= 1;
-            // TODO:
-            //  } else if {
+          } else if (block.name == "minecraft:ice") {
+            color = blend(color, blockColor);
+            y -= 1;
 
-            /*case IdBlock.ICE_ID:
-              ColorUtil.getRGBAComponents(block.getTexture(data).getAvgColor(), blockColor);
-              color = blend(color, blockColor);
-              y -= 1;
-
-              for (; y >= 0; --y) {
-                if (IdBlock.get(blocksArray[Chunk.chunkIndex(x, y, z)]).opaque) {
-                  ColorUtil.getRGBAComponents(block.getTexture(data).getAvgColor(), blockColor);
-                  break;
-                }
+            for (; y >= 0; --y) {
+              Block block1 = palette.get(blocks[Chunk.chunkIndex(x, y, z)]);
+              if (block1.opaque) {
+                ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
+                break;
               }
-              break;
+            }
+          } else if (block.isWater()) {
+            int depth = 1;
+            y -= 1;
+            for (; y >= 0; --y) {
+              Block block1 = palette.get(blocks[Chunk.chunkIndex(x, y, z)]);
+              if (!block1.isWater())
+                break;
+              depth += 1;
+            }
 
-            case IdBlock.WATER_ID:
-            case IdBlock.STATIONARYWATER_ID:
-              int depth = 1;
-              y -= 1;
-              for (; y >= 0; --y) {
-                IdBlock block1 = IdBlock.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
-                if (!block1.isWater())
-                  break;
-                depth += 1;
-              }
-
-              ColorUtil.getRGBAComponents(Texture.water.getAvgColor(), blockColor);
-              blockColor[3] = QuickMath.max(.5f, 1.f - depth / 32.f);
-              break;
-              */
+            ColorUtil.getRGBAComponents(Texture.water.getAvgColor(), blockColor);
+            blockColor[3] = QuickMath.max(.5f, 1.f - depth / 32.f);
           } else {
-              ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
-
-              if (block.opaque && y > 64) {
-                float fade = QuickMath.min(0.6f, (y - World.SEA_LEVEL) / 60.f);
-                fade = QuickMath.max(0.f, fade);
-                blockColor[0] = (1 - fade) * blockColor[0] + fade;
-                blockColor[1] = (1 - fade) * blockColor[1] + fade;
-                blockColor[2] = (1 - fade) * blockColor[2] + fade;
-              }
-              y -= 1;
+            if (block.opaque && y > 64) {
+              float fade = QuickMath.min(0.6f, (y - World.SEA_LEVEL) / 60.f);
+              fade = QuickMath.max(0.f, fade);
+              blockColor[0] = (1 - fade) * blockColor[0] + fade;
+              blockColor[1] = (1 - fade) * blockColor[1] + fade;
+              blockColor[2] = (1 - fade) * blockColor[2] + fade;
+            }
+            y -= 1;
           }
 
           color = blend(color, blockColor);
