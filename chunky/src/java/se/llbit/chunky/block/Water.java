@@ -61,8 +61,9 @@ public class Water extends MinecraftBlockTranslucent {
   static final Triangle[] southb = new Triangle[8];
 
   /** Water height levels. */
-  static final double height[] =
-      {14 / 16., 12.25 / 16., 10.5 / 16, 8.75 / 16, 7. / 16, 5.25 / 16, 3.5 / 16, 1.75 / 16};
+  static final double height[] = {
+      14 / 16., 12.25 / 16., 10.5 / 16, 8.75 / 16, 7. / 16, 5.25 / 16, 3.5 / 16, 1.75 / 16
+  };
 
   private static final float[][][] normalMap;
   private static final int normalMapW;
@@ -93,7 +94,7 @@ public class Water extends MinecraftBlockTranslucent {
       }
     }
 
-    // precompute water triangles
+    // Precompute water triangles.
     for (int i = 0; i < 8; ++i) {
       double c0 = height[i];
       for (int j = 0; j < 8; ++j) {
