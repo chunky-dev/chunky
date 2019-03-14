@@ -21,17 +21,13 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Lava;
-import se.llbit.chunky.block.Sign;
-import se.llbit.chunky.block.WallSign;
 import se.llbit.chunky.block.Water;
-import se.llbit.chunky.entity.SignEntity;
-import se.llbit.chunky.entity.WallSignEntity;
-import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
+import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.Postprocess;
@@ -74,7 +70,6 @@ import se.llbit.png.PngFileWriter;
 import se.llbit.tiff.TiffFileWriter;
 import se.llbit.util.JsonSerializable;
 import se.llbit.util.MCDownloader;
-import se.llbit.util.MinecraftPRNG;
 import se.llbit.util.NotNull;
 import se.llbit.util.TaskTracker;
 import se.llbit.util.ZipExport;
@@ -344,8 +339,9 @@ public class Scene implements JsonSerializable, Refreshable {
    * snapshots untouched.
    */
   public static void delete(String name, File sceneDir) {
-    String[] extensions =
-        {".json", ".dump", ".octree", ".foliage", ".grass", ".json.backup", ".dump.backup",};
+    String[] extensions = {
+        ".json", ".dump", ".octree2", ".foliage", ".grass", ".json.backup", ".dump.backup",
+    };
     for (String extension : extensions) {
       File file = new File(sceneDir, name + extension);
       if (file.isFile()) {
@@ -359,7 +355,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Export the scene to a zip file.
    */
   public static void exportToZip(String name, File targetFile) {
-    String[] extensions = {".json", ".dump", ".octree", ".foliage", ".grass",};
+    String[] extensions = { ".json", ".dump", ".octree2", ".foliage", ".grass", };
     ZipExport.zip(targetFile, PersistentSettings.getSceneDirectory(), name, extensions);
   }
 
@@ -1599,7 +1595,7 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   private synchronized void saveOctree(RenderContext context, TaskTracker progress) {
-    String fileName = name + ".octree";
+    String fileName = name + ".octree2";
     if (context.fileUnchangedSince(fileName, worldOctree.getTimestamp())) {
       Log.info("Skipping redundant Octree write");
       return;
@@ -1688,7 +1684,7 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   private synchronized boolean loadOctree(RenderContext context, TaskTracker progress) {
-    String fileName = name + ".octree";
+    String fileName = name + ".octree2";
     try (TaskTracker.Task task = progress.task("Loading octree", 2)) {
       task.update(1);
       Log.info("Loading octree " + fileName);
@@ -2249,6 +2245,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!actorArray.isEmpty()) {
       json.add("actors", actorArray);
     }
+
     return json;
   }
 

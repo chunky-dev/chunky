@@ -38,6 +38,9 @@ import se.llbit.chunky.world.Material;
  */
 public class Octree {
 
+  private static final int OCTREE_VERSION = 2;
+
+
   /** An Octree node. */
   public static class Node {
     /**
@@ -298,6 +301,8 @@ public class Octree {
    * @throws IOException
    */
   public void store(DataOutputStream out) throws IOException {
+    out.writeInt(OCTREE_VERSION);
+    palette.write(out);
     out.writeInt(depth);
     root.store(out);
   }
@@ -309,8 +314,14 @@ public class Octree {
    * @throws IOException
    */
   public static Octree load(DataInputStream in) throws IOException {
+    int version = in.readInt();
+    if (version != OCTREE_VERSION) {
+      throw new IOException("Incompatible octree format.");
+    }
+    BlockPalette palette = BlockPalette.read(in);
     int treeDepth = in.readInt();
     Octree tree = new Octree(treeDepth);
+    tree.palette = palette;
     tree.root.load(in);
     return tree;
   }
@@ -362,7 +373,7 @@ public class Octree {
 
     while (true) {
 
-      // add small offset past the intersection to avoid
+      // Add small offset past the intersection to avoid
       // recursion to the same octree node!
       x = (int) QuickMath.floor(ray.o.x + d.x * Ray.OFFSET);
       y = (int) QuickMath.floor(ray.o.y + d.y * Ray.OFFSET);

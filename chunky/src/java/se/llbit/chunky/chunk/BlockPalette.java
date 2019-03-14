@@ -6,6 +6,9 @@ import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,13 +16,15 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class BlockPalette {
+  private static final int BLOCK_PALETTE_VERSION = 1;
   public final int airId, stoneId;
+
+  private static final Map<String, Consumer<Block>> materialProperties = new HashMap<>();
 
   /** Stone blocks are used for filling invisible regions in the Octree. */
   public final Block stone;
 
   private final Map<BlockSpec, Integer> blockMap = new HashMap<>();
-  private static final Map<String, Consumer<Block>> materialProperties = new HashMap<>();
   private final List<Block> palette = new ArrayList<>();
 
   public BlockPalette() {
@@ -133,5 +138,35 @@ public class BlockPalette {
     ENDROD.emittance = 1.0f;
     FROSTEDICE.ior = 1.31f;
     MAGMA.emittance = 0.6f;*/
+  }
+
+  /**
+   * Writes the block specifications to file.
+   */
+  public void write(DataOutputStream out) throws IOException {
+    out.writeInt(BLOCK_PALETTE_VERSION);
+    BlockSpec[] specs = new BlockSpec[blockMap.size()];
+    for (Map.Entry<BlockSpec, Integer> entry : blockMap.entrySet()) {
+      specs[entry.getValue()] = entry.getKey();
+    }
+    out.writeInt(specs.length);
+    for (BlockSpec spec : specs) {
+      spec.serialize(out);
+    }
+  }
+
+  public static BlockPalette read(DataInputStream in) throws IOException {
+    int version = in.readInt();
+    if (version != BLOCK_PALETTE_VERSION) {
+      throw new IOException("Incompatible block palette format.");
+    }
+    int numBlocks = in.readInt();
+    BlockPalette palette = new BlockPalette();
+    for (int i = 0; i < numBlocks; ++i) {
+      BlockSpec spec = BlockSpec.deserialize(in);
+      palette.blockMap.put(spec, i);
+      palette.palette.add(spec.toBlock());
+    }
+    return palette;
   }
 }

@@ -10,12 +10,19 @@ import se.llbit.chunky.world.BlockData;
 import se.llbit.nbt.Tag;
 import se.llbit.util.NotNull;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 public class TagBlockSpec implements BlockSpec {
   private static final int MAGIC = 0xE6FFE636;
   public final Tag tag;
 
   public TagBlockSpec(@NotNull Tag tag) {
     this.tag = tag;
+  }
+
+  @Override public void serialize(DataOutputStream out) throws IOException {
+    tag.write(out);
   }
 
   @Override public int hashCode() {
