@@ -44,8 +44,6 @@ public class EmptyRegionChunk extends Chunk {
   private EmptyRegionChunk() {
     super(ChunkPosition.get(0, 0), EmptyWorld.instance);
     surface = CorruptLayer.INSTANCE;
-    caves = CorruptLayer.INSTANCE;
-    layer = CorruptLayer.INSTANCE;
   }
 
   @Override public synchronized void getBlockData(byte[] blocks, byte[] data, byte[] biomes,
@@ -63,28 +61,8 @@ public class EmptyRegionChunk extends Chunk {
     }
   }
 
-  @Override public void renderLayer(MapTile tile) {
-    renderEmpty(tile);
-  }
-
-  @Override public int layerColor() {
-    return 0xFF777777;
-  }
-
   @Override public void renderSurface(MapTile tile) {
     renderEmpty(tile);
-  }
-
-  @Override public int surfaceColor() {
-    return 0xFF777777;
-  }
-
-  @Override public void renderCaves(MapTile tile) {
-    renderEmpty(tile);
-  }
-
-  @Override public int caveColor() {
-    return 0xFF777777;
   }
 
   @Override public void renderBiomes(MapTile tile) {

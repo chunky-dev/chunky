@@ -39,91 +39,10 @@ public enum MapViewMode {
       }
     }
 
-    @Override public int getLayers(ChunkView view) {
-      if (view.scale >= 10) {
-        return Chunk.SURFACE_LAYER | Chunk.BIOME_LAYER;
-      } else {
-        return Chunk.BIOME_LAYER;
-      }
-    }
-
     @Override
-    public boolean bufferValid(ChunkView oldView, ChunkView newView, int oldLayer, int newLayer) {
-      return super.bufferValid(oldView, newView, oldLayer, newLayer) && (
+    public boolean bufferValid(ChunkView oldView, ChunkView newView) {
+      return super.bufferValid(oldView, newView) && (
           oldView.scale >= 10 && newView.scale >= 10 || oldView.scale < 10 && newView.scale < 10);
-    }
-
-    @Override public int getChunkColor(Chunk chunk) {
-      return chunk.biomeColor();
-    }
-  },
-
-  /**
-   * Renders a single layer.
-   */
-  LAYER("Layer") {
-    @Override public void render(Chunk chunk, MapTile tile) {
-      chunk.renderLayer(tile);
-    }
-
-    @Override public int getLayers(ChunkView view) {
-      return Chunk.BLOCK_LAYER;
-    }
-
-    @Override
-    public boolean bufferValid(ChunkView oldView, ChunkView newView, int oldLayer, int newLayer) {
-      return super.bufferValid(oldView, newView, oldLayer, newLayer) && oldLayer == newLayer;
-    }
-
-    @Override public int getChunkColor(Chunk chunk) {
-      return chunk.layerColor();
-    }
-  },
-
-  /**
-   * Renders the default surface view
-   */
-  SURFACE("Surface") {
-    @Override public void render(Chunk chunk, MapTile tile) {
-      chunk.renderSurface(tile);
-    }
-
-    @Override public int getLayers(ChunkView view) {
-      return Chunk.SURFACE_LAYER;
-    }
-
-    @Override public int getChunkColor(Chunk chunk) {
-      return chunk.surfaceColor();
-    }
-  },
-
-  /**
-   * Visualizes underground cavities.
-   */
-  CAVES("Caves") {
-    @Override public void render(Chunk chunk, MapTile tile) {
-      chunk.renderCaves(tile);
-    }
-
-    @Override public int getLayers(ChunkView view) {
-      return Chunk.CAVE_LAYER;
-    }
-
-    @Override public int getChunkColor(Chunk chunk) {
-      return chunk.caveColor();
-    }
-  },
-
-  /**
-   * Renders biome values only.
-   */
-  BIOMES("Biomes") {
-    @Override public void render(Chunk chunk, MapTile tile) {
-      chunk.renderBiomes(tile);
-    }
-
-    @Override public int getLayers(ChunkView view) {
-      return Chunk.BIOME_LAYER;
     }
 
     @Override public int getChunkColor(Chunk chunk) {
@@ -146,29 +65,18 @@ public enum MapViewMode {
    */
   abstract public void render(Chunk chunk, MapTile tile);
 
-  /**
-   * Layers to be loaded for this renderer.
-   */
-  abstract public int getLayers(ChunkView view);
-
-  public Set<String> getRequest(ChunkView view) {
-    int layers = getLayers(view);
+  public static Set<String> getRequest() {
     Set<String> request = new HashSet<>();
     request.add(Chunk.LEVEL_SECTIONS);
-    if ((layers & Chunk.BLOCK_LAYER) != 0 || (layers & Chunk.SURFACE_LAYER) != 0
-        || (layers & Chunk.BIOME_LAYER) != 0) {
-      request.add(Chunk.LEVEL_BIOMES);
-    }
-    if ((layers & Chunk.SURFACE_LAYER) != 0 || (layers & Chunk.CAVE_LAYER) != 0) {
-      request.add(Chunk.LEVEL_HEIGHTMAP);
-    }
+    request.add(Chunk.LEVEL_BIOMES);
+    request.add(Chunk.LEVEL_HEIGHTMAP);
     return request;
   }
 
   /**
    * @return {@code true} if the render buffer is still valid
    */
-  public boolean bufferValid(ChunkView oldView, ChunkView newView, int oldLayer, int newLayer) {
+  public boolean bufferValid(ChunkView oldView, ChunkView newView) {
     return oldView.chunkScale == newView.chunkScale;
   }
 

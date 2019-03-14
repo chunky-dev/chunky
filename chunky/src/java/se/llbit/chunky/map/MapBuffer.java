@@ -20,7 +20,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
-import se.llbit.chunky.ui.MapViewMode;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.png.PngFileWriter;
@@ -67,8 +66,7 @@ public class MapBuffer {
    * Called when this render buffer should buffer another view.
    */
   public synchronized void updateView(ChunkView newView, WorldMapLoader loader) {
-    boolean rebuild = newView.scale != view.scale || newView.renderer != view.renderer
-        || (newView.renderer == MapViewMode.LAYER && newView.layer != view.layer);
+    boolean rebuild = newView.scale != view.scale;
     updateView(newView, rebuild);
   }
 

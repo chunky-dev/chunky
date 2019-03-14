@@ -297,13 +297,6 @@ public class World implements Comparable<World> {
   }
 
   /**
-   * @return The current layer
-   */
-  public synchronized int currentLayer() {
-    return currentLayer;
-  }
-
-  /**
    * Get the data directory for the given dimension
    *
    * @param dimension the dimension

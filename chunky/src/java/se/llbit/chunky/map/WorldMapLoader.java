@@ -24,7 +24,6 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.ui.ChunkyFxController;
-import se.llbit.chunky.ui.MapViewMode;
 import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -38,6 +37,7 @@ import se.llbit.chunky.world.RegionParser;
 import se.llbit.chunky.world.RegionQueue;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
+import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 
 import java.io.File;
@@ -76,12 +76,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
     this.controller = controller;
 
     map.addListener((observable, oldValue, newValue) -> {
-      if (oldValue.layer != newValue.layer) {
-        world.setCurrentLayer(newValue.layer);
-        for (ChunkViewListener listener : viewListeners) {
-          listener.layerChanged(newValue.layer);
-        }
-      }
       if (newValue.shouldRepaint(oldValue)) {
         viewUpdated(newValue);
       }
@@ -168,8 +162,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
   public synchronized void viewUpdated(ChunkView mapView) {
     refresher.setView(mapView);
 
-    minimap = new ChunkView(mapView.x, mapView.z, minimapWidth, minimapHeight, 1,
-        MapViewMode.BIOMES, mapView.layer);
+    minimap = new ChunkView(mapView.x, mapView.z, minimapWidth, minimapHeight, 1);
 
     int rx0 = Math.min(minimap.prx0, mapView.prx0);
     int rx1 = Math.max(minimap.prx1, mapView.prx1);
@@ -192,8 +185,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
   public void setMapSize(int width, int height) {
     ChunkView mapView = map.get();
     if (width != mapView.width || height != mapView.height) {
-      map.set(new ChunkView(mapView.x, mapView.z, width, height, mapView.scale, mapView.renderer,
-          mapView.layer));
+      map.set(new ChunkView(mapView.x, mapView.z, width, height, mapView.scale));
     }
   }
 
@@ -229,17 +221,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
   public synchronized void panTo(double x, double z) {
     ChunkView mapView = map.get();
     map.set(new ChunkView(x, z,
-        mapView.width, mapView.height, mapView.scale, mapView.renderer,
-        mapView.layer));
-  }
-  /**
-   * Set the currently viewed layer.
-   */
-  public synchronized void setLayer(int layer) {
-    ChunkView mapView = map.get();
-    map.set(new ChunkView(mapView.x, mapView.z,
-        mapView.width, mapView.height, mapView.scale, mapView.renderer,
-        layer));
+        mapView.width, mapView.height, mapView.scale));
   }
 
   /**
@@ -284,13 +266,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
   }
 
   /**
-   * @return The current map renderer
-   */
-  public MapViewMode getChunkRenderer() {
-    return map.get().renderer;
-  }
-
-  /**
    * @return The chunk selection tracker
    */
   public ChunkSelectionTracker getChunkSelection() {
@@ -315,16 +290,9 @@ public class WorldMapLoader implements ChunkTopographyListener {
     regionQueue.add(region);
   }
 
-  public synchronized Vector3 getPosition() {
+  public synchronized Vector2 getPosition() {
     ChunkView mapView = map.get();
-    return new Vector3(mapView.x, world.currentLayer(), mapView.z);
-  }
-
-  /**
-   * @return The currently viewed layer
-   */
-  public synchronized int getLayer() {
-    return world.currentLayer();
+    return new Vector2(mapView.x, mapView.z);
   }
 
   @Override public void chunksTopographyUpdated(Chunk chunk) {
@@ -338,18 +306,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
   public synchronized void reloadWorld() {
     world.reload();
     notifyViewUpdated();
-  }
-
-  /**
-   * Set the current map renderer.
-   */
-  public synchronized void setRenderer(MapViewMode renderer) {
-    ChunkView mapView = map.get();
-    if (renderer != mapView.renderer) {
-      map.set(new ChunkView(mapView.x, mapView.z,
-              mapView.width, mapView.height, mapView.scale, renderer,
-              mapView.layer));
-    }
   }
 
   /**
@@ -454,8 +410,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
     blockScale = ChunkView.clampScale(blockScale);
     if (blockScale != mapView.scale) {
       map.set(new ChunkView(mapView.x, mapView.z,
-          mapView.width, mapView.height, blockScale,
-          mapView.renderer, mapView.layer));
+          mapView.width, mapView.height, blockScale));
     }
   }
 

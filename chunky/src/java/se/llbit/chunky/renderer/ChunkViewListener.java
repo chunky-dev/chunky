@@ -23,8 +23,6 @@ package se.llbit.chunky.renderer;
 public interface ChunkViewListener {
   void viewUpdated();
 
-  void layerChanged(int layer);
-
   void viewMoved();
 
   void cameraPositionUpdated();

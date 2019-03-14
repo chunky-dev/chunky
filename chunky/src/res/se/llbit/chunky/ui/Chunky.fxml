@@ -82,41 +82,20 @@
                                                 <ToggleButton fx:id="endBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="The End" toggleGroup="$dimension" />
                                              </children>
                                           </VBox>
-                                          <VBox layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
-                                             <children>
-                                                <Label text="Map View:" />
-                                                <ChoiceBox fx:id="mapViewCb" prefWidth="150.0" />
-                                             </children>
-                                          </VBox>
                                        </children>
                                     </HBox>
                                     <Separator prefWidth="200.0" />
-                                    <VBox>
-                                       <children>
-                                          <VBox alignment="CENTER_LEFT">
-                                             <children>
-                                                <Label text="Scale" />
-                                                <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10.0">
-                                                   <children>
-                                                      <TextField fx:id="scaleField" prefWidth="80.0" />
-                                                      <Slider fx:id="scaleSlider" max="128.0" maxWidth="1.7976931348623157E308" prefHeight="14.0" prefWidth="200.0" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </VBox>
-                                          <VBox alignment="CENTER_LEFT">
-                                             <children>
-                                                <Label text="Layer" />
-                                                <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10.0">
-                                                   <children>
-                                                      <TextField fx:id="layerField" prefWidth="80.0" />
-                                                      <Slider fx:id="layerSlider" max="128.0" maxWidth="1.7976931348623157E308" prefHeight="14.0" prefWidth="200.0" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </VBox>
-                                       </children>
-                                    </VBox>
+                                   <VBox alignment="CENTER_LEFT">
+                                     <children>
+                                       <Label text="Scale" />
+                                       <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10.0">
+                                         <children>
+                                           <TextField fx:id="scaleField" prefWidth="80.0" />
+                                           <Slider fx:id="scaleSlider" max="128.0" maxWidth="1.7976931348623157E308" prefHeight="14.0" prefWidth="200.0" />
+                                         </children>
+                                       </HBox>
+                                     </children>
+                                   </VBox>
                                     <Label text="Coordinates" />
                                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                                        <children>

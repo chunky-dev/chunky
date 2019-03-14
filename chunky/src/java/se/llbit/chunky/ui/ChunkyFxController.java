@@ -29,7 +29,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
@@ -110,15 +109,9 @@ public class ChunkyFxController
 
   @FXML private ToggleButton endBtn;
 
-  @FXML private ChoiceBox<MapViewMode> mapViewCb;
-
   @FXML private TextField scaleField;
 
-  @FXML private TextField layerField;
-
   @FXML private Slider scaleSlider;
-
-  @FXML private Slider layerSlider;
 
   @FXML private ToggleButton trackPlayerBtn;
 
@@ -216,15 +209,12 @@ public class ChunkyFxController
     DoubleProperty xProperty = new SimpleDoubleProperty(mapView.x);
     DoubleProperty zProperty = new SimpleDoubleProperty(mapView.z);
     IntegerProperty scaleProperty = new SimpleIntegerProperty(mapView.scale);
-    IntegerProperty layerProperty = new SimpleIntegerProperty(mapView.layer);
 
     // Bind controls with properties.
     xPosition.textProperty().bindBidirectional(xProperty, new NumberStringConverter());
     zPosition.textProperty().bindBidirectional(zProperty, new NumberStringConverter());
     scaleField.textProperty().bindBidirectional(scaleProperty, new NumberStringConverter());
     scaleSlider.valueProperty().bindBidirectional(scaleProperty);
-    layerField.textProperty().bindBidirectional(layerProperty, new NumberStringConverter());
-    layerSlider.valueProperty().bindBidirectional(layerProperty);
 
     // Add listeners to the properties to control the map view.
     GroupedChangeListener<Object> group = new GroupedChangeListener<>(null);
@@ -238,8 +228,6 @@ public class ChunkyFxController
     }));
     scaleProperty.addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> mapLoader.setScale(newValue.intValue())));
-    layerProperty.addListener(new GroupedChangeListener<>(group,
-        (observable, oldValue, newValue) -> mapLoader.setLayer(newValue.intValue())));
 
     // Add map view listener to control the individual value properties.
     mapLoader.getMapViewProperty().addListener(new GroupedChangeListener<>(group,
@@ -247,8 +235,6 @@ public class ChunkyFxController
           xProperty.set(newValue.x * 16);
           zProperty.set(newValue.z * 16);
           scaleProperty.set(newValue.scale);
-          layerProperty.set(newValue.layer);
-          mapViewCb.getSelectionModel().select(newValue.renderer);
         }));
 
     clearSelectionBtn2.setOnAction(e -> mapLoader.clearChunkSelection());
@@ -388,11 +374,6 @@ public class ChunkyFxController
 
     endBtn.setGraphic(new ImageView(Icon.endStone.fxImage()));
     endBtn.setOnAction(e -> mapLoader.setDimension(World.END_DIMENSION));
-
-    mapViewCb.getItems().addAll(MapViewMode.values());
-    mapViewCb.getSelectionModel().select(MapViewMode.AUTO);
-    mapViewCb.getSelectionModel().selectedItemProperty()
-        .addListener((item, prev, next) -> mapLoader.setRenderer(next));
 
     menuExit.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
     clearSelectionBtn.setOnAction(event -> mapLoader.clearChunkSelection());
@@ -538,9 +519,6 @@ public class ChunkyFxController
   }
 
   @Override public void viewUpdated() {
-  }
-
-  @Override public void layerChanged(int layer) {
   }
 
   @Override public void viewMoved() {

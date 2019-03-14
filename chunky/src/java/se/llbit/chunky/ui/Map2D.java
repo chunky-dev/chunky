@@ -110,12 +110,6 @@ public class Map2D implements ChunkUpdateListener, ChunkViewListener {
     repaintDirect();
   }
 
-  @Override public void layerChanged(int layer) {
-    if (mapLoader.getChunkRenderer() == MapViewMode.LAYER) {
-      repaintDirect();
-    }
-  }
-
   @Override public void viewMoved() {
     mapBuffer.redrawView(mapLoader);
     repaintDirect();

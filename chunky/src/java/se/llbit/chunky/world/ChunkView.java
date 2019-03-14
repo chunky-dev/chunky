@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.ui.MapViewMode;
 import se.llbit.math.QuickMath;
 
 /**
@@ -43,8 +42,7 @@ public class ChunkView {
   /**
    * A zero-size chunk view useful as a default chunk view for an uninitialized map.
    */
-  public static final ChunkView EMPTY = new ChunkView(0, 0, 0, 0, DEFAULT_BLOCK_SCALE,
-      MapViewMode.AUTO, World.SEA_LEVEL) {
+  public static final ChunkView EMPTY = new ChunkView(0, 0, 0, 0, DEFAULT_BLOCK_SCALE) {
     @Override public boolean isChunkVisible(int x, int z) {
       return false;
     }
@@ -53,10 +51,6 @@ public class ChunkView {
       return false;
     }
   };
-
-  public final MapViewMode renderer;
-
-  public final int layer;
 
   // Center position.
   public final double x;
@@ -92,18 +86,15 @@ public class ChunkView {
   public final int chunkScale;
 
 
-  public ChunkView(double x, double z, int width, int height, MapViewMode renderer, int layer) {
-    this(x, z, width, height, 16, renderer, layer);
+  public ChunkView(double x, double z, int width, int height) {
+    this(x, z, width, height, 16);
   }
 
   public ChunkView(ChunkView other) {
-    this(other.x, other.z, other.width, other.height, other.scale, other.renderer, other.layer);
+    this(other.x, other.z, other.width, other.height, other.scale);
   }
 
-  public ChunkView(double x, double z, int width, int height, int scale, MapViewMode renderer,
-      int layer) {
-    this.renderer = renderer;
-    this.layer = Math.max(0, Math.min(Chunk.Y_MAX - 1, layer));
+  public ChunkView(double x, double z, int width, int height, int scale) {
     scale = clampScale(scale);
     this.scale = scale;
     if (this.scale <= 12) {
@@ -172,9 +163,7 @@ public class ChunkView {
           && px0 == other.px0
           && px1 == other.px1
           && pz0 == other.pz0
-          && pz1 == other.pz1
-          && layer == other.layer
-          && renderer == other.renderer;
+          && pz1 == other.pz1;
     }
     return false;
   }
@@ -231,11 +220,7 @@ public class ChunkView {
     if (px0 != other.px0
         || px1 != other.px1
         || pz0 != other.pz0
-        || pz1 != other.pz1
-        || renderer != other.renderer) {
-      return true;
-    }
-    if (renderer == MapViewMode.LAYER && layer != other.layer) {
+        || pz1 != other.pz1) {
       return true;
     }
     return scale != other.scale;

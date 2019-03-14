@@ -19,8 +19,6 @@ package se.llbit.chunky.world;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
-import se.llbit.chunky.map.BlockLayer;
-import se.llbit.chunky.map.CaveLayer;
 import se.llbit.chunky.map.CorruptLayer;
 import se.llbit.chunky.map.MapTile;
 import se.llbit.chunky.map.SurfaceLayer;
@@ -71,24 +69,14 @@ public class Chunk {
   private static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
   private static final int CHUNK_BYTES = X_MAX * Y_MAX * Z_MAX;
 
-  public static final int BLOCK_LAYER = 1 << 0;
-  public static final int SURFACE_LAYER = 1 << 1;
-  public static final int CAVE_LAYER = 1 << 2;
-  public static final int BIOME_LAYER = 1 << 3;
-
   private final ChunkPosition position;
-  private int loadedLayer = -1;
-  protected volatile AbstractLayer layer = UnknownLayer.INSTANCE;
   protected volatile AbstractLayer surface = UnknownLayer.INSTANCE;
-  protected volatile AbstractLayer caves = UnknownLayer.INSTANCE;
   protected volatile AbstractLayer biomes = UnknownLayer.INSTANCE;
 
   private final World world;
 
   private int dataTimestamp = 0;
-  private int layerTimestamp = 0;
   private int surfaceTimestamp = 0;
-  private int cavesTimestamp = 0;
   private int biomesTimestamp = 0;
 
   public Chunk(ChunkPosition pos, World world) {
@@ -96,28 +84,8 @@ public class Chunk {
     this.position = pos;
   }
 
-  public void renderLayer(MapTile tile) {
-    layer.render(tile);
-  }
-
-  public int layerColor() {
-    return layer.getAvgColor();
-  }
-
   public void renderSurface(MapTile tile) {
     surface.render(tile);
-  }
-
-  public int surfaceColor() {
-    return surface.getAvgColor();
-  }
-
-  public void renderCaves(MapTile tile) {
-    caves.render(tile);
-  }
-
-  public int caveColor() {
-    return caves.getAvgColor();
   }
 
   public void renderBiomes(MapTile tile) {
@@ -156,8 +124,6 @@ public class Chunk {
    * Reset the rendered layers in this chunk.
    */
   public synchronized void reset() {
-    layer = UnknownLayer.INSTANCE;
-    caves = UnknownLayer.INSTANCE;
     surface = UnknownLayer.INSTANCE;
   }
 
@@ -173,36 +139,16 @@ public class Chunk {
    * layer, surface and cave maps.
    */
   public synchronized void loadChunk(WorldMapLoader loader) {
-
-    int requestedLayer = world.currentLayer();
-    MapViewMode renderer = loader.getChunkRenderer();
-    ChunkView view = loader.getMapView();
-
-    if (!shouldReloadChunk(renderer, view, requestedLayer)) {
+    if (!shouldReloadChunk()) {
       return;
     }
 
-    loadedLayer = requestedLayer;
+    Map<String, Tag> data = getChunkData(MapViewMode.getRequest());
 
-    Map<String, Tag> data = getChunkData(renderer.getRequest(view));
-
-    int layers = renderer.getLayers(view);
-    if ((layers & BLOCK_LAYER) != 0) {
-      layerTimestamp = dataTimestamp;
-      loadLayer(data, requestedLayer);
-    }
-    if ((layers & SURFACE_LAYER) != 0) {
-      surfaceTimestamp = dataTimestamp;
-      loadSurface(data);
-    }
-    if ((layers & BIOME_LAYER) != 0) {
-      biomesTimestamp = dataTimestamp;
-      loadBiomes(data);
-    }
-    if ((layers & CAVE_LAYER) != 0) {
-      cavesTimestamp = dataTimestamp;
-      loadCaves(data);
-    }
+    surfaceTimestamp = dataTimestamp;
+    loadSurface(data);
+    biomesTimestamp = dataTimestamp;
+    loadBiomes(data);
 
     world.chunkUpdated(position);
   }
@@ -237,41 +183,6 @@ public class Chunk {
       byte[] biomeData = new byte[X_MAX * Z_MAX];
       extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
       biomes = new BiomeLayer(biomeData);
-    }
-  }
-
-  private void loadLayer(Map<String, Tag> data, int requestedLayer) {
-    if (data == null) {
-      layer = CorruptLayer.INSTANCE;
-      return;
-    }
-
-    Tag sections = data.get(LEVEL_SECTIONS);
-    if (sections.isList()) {
-      byte[] biomeData = new byte[X_MAX * Z_MAX];
-      extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
-      byte[] chunkData = new byte[CHUNK_BYTES];
-      extractChunkData(data, chunkData, new byte[CHUNK_BYTES]);
-      layer = new BlockLayer(chunkData, biomeData, requestedLayer);
-    } else {
-      layer = CorruptLayer.INSTANCE;
-    }
-  }
-
-  private void loadCaves(Map<String, Tag> data) {
-    if (data == null) {
-      caves = CorruptLayer.INSTANCE;
-      return;
-    }
-
-    Tag sections = data.get(LEVEL_SECTIONS);
-    if (sections.isList()) {
-      int[] heightmapData = extractHeightmapData(data);
-      byte[] chunkData = new byte[CHUNK_BYTES];
-      extractChunkData(data, chunkData, new byte[CHUNK_BYTES]);
-      caves = new CaveLayer(chunkData, heightmapData);
-    } else {
-      caves = CorruptLayer.INSTANCE;
     }
   }
 
@@ -348,24 +259,10 @@ public class Chunk {
     }
   }
 
-  private boolean shouldReloadChunk(MapViewMode renderer, ChunkView view, int requestedLayer) {
+  private boolean shouldReloadChunk() {
     int timestamp = Integer.MAX_VALUE;
-    int layers = renderer.getLayers(view);
-    if ((layers & BLOCK_LAYER) != 0) {
-      if (requestedLayer != loadedLayer) {
-        return true;
-      }
-      timestamp = layerTimestamp;
-    }
-    if ((layers & SURFACE_LAYER) != 0) {
-      timestamp = Math.min(timestamp, surfaceTimestamp);
-    }
-    if ((layers & BIOME_LAYER) != 0) {
-      timestamp = Math.min(timestamp, biomesTimestamp);
-    }
-    if ((layers & CAVE_LAYER) != 0) {
-      timestamp = Math.min(timestamp, cavesTimestamp);
-    }
+    timestamp = Math.min(timestamp, surfaceTimestamp);
+    timestamp = Math.min(timestamp, biomesTimestamp);
     if (timestamp == 0) {
       return true;
     }

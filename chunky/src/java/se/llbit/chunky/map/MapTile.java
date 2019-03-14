@@ -16,13 +16,12 @@
  */
 package se.llbit.chunky.map;
 
-import javafx.scene.paint.Color;
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.ui.MapViewMode;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.Region;
-import se.llbit.math.ColorUtil;
 
 /**
  * A tile in the 2D world map or minimap. The tile contains either a chunk or a region.
@@ -65,7 +64,7 @@ public class MapTile {
   public void draw(MapBuffer buffer, WorldMapLoader mapLoader, ChunkView view) {
     if (scale >= 16) {
       Chunk chunk = mapLoader.getWorld().getChunk(pos);
-      view.renderer.render(chunk, this);
+      MapViewMode.AUTO.render(chunk, this);
       if (mapLoader.getChunkSelection().isSelected(pos)) {
         for (int i = 0; i < size * size; ++i) {
           pixels[i] = selectionTint(pixels[i]);
@@ -77,7 +76,7 @@ public class MapTile {
       for (int z = 0; z < 32; ++z) {
         for (int x = 0; x < 32; ++x) {
           Chunk chunk = region.getChunk(x, z);
-          pixels[pixelOffset] = view.renderer.getChunkColor(chunk);
+          pixels[pixelOffset] = MapViewMode.AUTO.getChunkColor(chunk);
           if (mapLoader.getChunkSelection().isSelected(chunk.getPosition())) {
             pixels[pixelOffset] = selectionTint(pixels[pixelOffset]);
           }

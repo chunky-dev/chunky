@@ -362,19 +362,15 @@ public class ChunkMap extends Map2D {
   public void onScroll(ScrollEvent event) {
     int diff = (int) (-event.getDeltaY() / event.getMultiplierY());
 
-    if (ctrlModifier) {
-      mapLoader.setLayer(mapLoader.getLayer() + diff);
+    int scale = mapLoader.getScale();
+    if ((scale - diff) <= 16) {
+      mapLoader.setScale(scale - diff);
+    } else if ((scale - diff * 4) <= 64) {
+      mapLoader.setScale(scale - diff * 4);
+    } else if ((scale - diff * 16) <= 128) {
+      mapLoader.setScale(scale - diff * 16);
     } else {
-      int scale = mapLoader.getScale();
-      if ((scale - diff) <= 16) {
-        mapLoader.setScale(scale - diff);
-      } else if ((scale - diff * 4) <= 64) {
-        mapLoader.setScale(scale - diff * 4);
-      } else if ((scale - diff * 16) <= 128) {
-        mapLoader.setScale(scale - diff * 16);
-      } else {
-        mapLoader.setScale(scale - diff * 64);
-      }
+      mapLoader.setScale(scale - diff * 64);
     }
   }
 
@@ -402,11 +398,7 @@ public class ChunkMap extends Map2D {
       ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
       ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
 
-      if (py == mapLoader.getLayer()) {
-        gc.drawImage(Icon.face.fxImage(), ppx, ppy, pw, pw);
-      } else {
-        gc.drawImage(Icon.face_t.fxImage(), ppx, ppy, pw, pw);
-      }
+      gc.drawImage(Icon.face.fxImage(), ppx, ppy, pw, pw);
     }
   }
 
@@ -426,11 +418,7 @@ public class ChunkMap extends Map2D {
     ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
     ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
 
-    if (py == mapLoader.getLayer()) {
-      gc.drawImage(Icon.home.fxImage(), ppx, ppy, pw, pw);
-    } else {
-      gc.drawImage(Icon.home_t.fxImage(), ppx, ppy, pw, pw);
-    }
+    gc.drawImage(Icon.home.fxImage(), ppx, ppy, pw, pw);
   }
 
   @Override public void cameraPositionUpdated() {
