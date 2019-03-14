@@ -16,27 +16,24 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.world.material.CloudMaterial;
+import se.llbit.chunky.block.Block;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ExtraMaterials {
-  public static final Map<String, Material> collections = new HashMap<>();
+// TODO: introduce block tags
+public class MaterialCollection {
+  public static final Map<String, Collection<Block>> collections = new LinkedHashMap<>();
   public static final Map<String, Material> idMap = new HashMap<>();
+
   static {
-    idMap.put("cloud", CloudMaterial.INSTANCE);
+    //collections.put("all:blocks", Arrays.asList(blocks));
+    //collections.put("all:water", Arrays.asList(IdBlock.WATER, IdBlock.STATIONARYWATER));
+    //collections.put("all:lava", Arrays.asList(IdBlock.LAVA, IdBlock.STATIONARYLAVA));
   }
 
   public static void loadDefaultMaterialProperties() {
-    for (Material material : idMap.values()) {
-      material.opaque = false;
-      material.solid = true;
-      material.localIntersect = false;
-      material.invisible = false;
-      material.emittance = 0;
-      material.specular = 0;
-      material.ior = 1.000293f;
-    }
   }
 }

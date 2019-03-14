@@ -16,15 +16,13 @@
  */
 package se.llbit.math;
 
-import java.util.Random;
-
 import org.apache.commons.math3.util.FastMath;
-
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Material;
+
+import java.util.Random;
 
 /**
  * The ray representation used for ray tracing.
@@ -382,11 +380,6 @@ public class Ray {
   public void setCurrentMaterial(Material mat, int data) {
     this.currentMaterial = mat;
     this.currentData = data;
-  }
-
-  public void setMaterial(int blockId) {
-    this.currentMaterial = IdBlock.get(blockId);
-    this.currentData = blockId;
   }
 
   public Material getPrevMaterial() {

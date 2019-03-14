@@ -713,7 +713,4 @@ public class Octree {
     return timestamp;
   }
 
-  public void visit(OctreeVisitor visitor) {
-    root.visit(visitor, 0, 0, 0, depth);
-  }
 }
