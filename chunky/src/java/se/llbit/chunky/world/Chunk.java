@@ -23,7 +23,6 @@ import se.llbit.chunky.map.BiomeLayer;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
 import se.llbit.chunky.map.SurfaceLayer;
-import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ErrorTag;
