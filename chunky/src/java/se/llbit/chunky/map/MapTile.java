@@ -66,12 +66,6 @@ public class MapTile {
     if (scale >= 16) {
       Chunk chunk = mapLoader.getWorld().getChunk(pos);
       view.renderer.render(chunk, this);
-      if (buffer.highlightEnabled()) {
-        Color fxColor = buffer.highlightColor();
-        int hlColor = ColorUtil.getArgb(fxColor.getRed(), fxColor.getGreen(), fxColor.getBlue(),
-            fxColor.getOpacity());
-        chunk.renderHighlight(this, buffer.highlightBlock(), hlColor);
-      }
       if (mapLoader.getChunkSelection().isSelected(pos)) {
         for (int i = 0; i < size * size; ++i) {
           pixels[i] = selectionTint(pixels[i]);

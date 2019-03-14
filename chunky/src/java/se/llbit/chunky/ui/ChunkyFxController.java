@@ -49,7 +49,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.WorldMapLoader;
@@ -64,7 +63,6 @@ import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
-import se.llbit.fx.LuxColorPicker;
 import se.llbit.fxutil.GroupedChangeListener;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
@@ -135,12 +133,6 @@ public class ChunkyFxController
   @FXML private Tab renderTab;
 
   @FXML private Tab aboutTab;
-
-  @FXML private CheckBox highlightBtn;
-
-  @FXML private ChoiceBox<Block> highlightCb;
-
-  @FXML private LuxColorPicker highlightColor;
 
   @FXML private Button editResourcePacks;
 
@@ -363,28 +355,6 @@ public class ChunkyFxController
     singleColorBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setSingleColorTextures(newValue);
     });
-
-    highlightBtn.setTooltip(new Tooltip("Highlight the selected block type in the current layer."));
-    highlightBtn.selectedProperty().bindBidirectional(mapLoader.highlightEnabledProperty());
-
-    highlightCb.getItems().addAll(
-        Block.get(Block.DIRT_ID), Block.get(Block.GRASS_ID), Block.get(Block.STONE_ID),
-        Block.get(Block.COBBLESTONE_ID), Block.get(Block.MOSSSTONE_ID),
-        Block.get(Block.IRONORE_ID), Block.get(Block.COALORE_ID),
-        Block.get(Block.REDSTONEORE_ID), Block.get(Block.DIAMONDORE_ID),
-        Block.get(Block.GOLDORE_ID), Block.get(Block.MONSTERSPAWNER_ID),
-        Block.get(Block.BRICKS_ID), Block.get(Block.CLAY_ID), Block.get(Block.LAPIS_ORE_ID),
-        Block.get(Block.EMERALDORE_ID), Block.get(Block.NETHERQUARTZORE_ID));
-    highlightCb.getSelectionModel().select(Block.get(Block.DIAMONDORE_ID));
-    highlightCb.getSelectionModel().selectedItemProperty().addListener((item, prev, next) -> {
-      mapLoader.highlightEnabledProperty().set(true);
-      mapLoader.highlightBlock(next);
-    });
-
-    highlightColor.setColor(mapLoader.highlightColor());
-    highlightColor.setTooltip(new Tooltip("Choose highlight color"));
-    highlightColor.colorProperty().addListener(
-        (observable, oldValue, newValue) -> mapLoader.highlightColor(newValue));
 
     trackPlayerBtn.selectedProperty().bindBidirectional(mapLoader.trackPlayerProperty());
     trackCameraBtn.selectedProperty().bindBidirectional(mapLoader.trackCameraProperty());

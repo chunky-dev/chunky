@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.map;
 
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Heightmap;
 
@@ -39,12 +38,6 @@ abstract public class AbstractLayer {
   abstract public void render(MapTile tile);
 
   public void renderTopography(ChunkPosition position, Heightmap heightmap) {
-  }
-
-  /**
-   * Render this layer
-   */
-  public void renderHighlight(MapTile tile, Block hlBlock, int hlColor) {
   }
 
   public int getAvgColor() {

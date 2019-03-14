@@ -165,19 +165,6 @@
                                     <Button fx:id="editResourcePacks" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Edit resource packs" />
                                     <CheckBox fx:id="singleColorBtn" mnemonicParsing="false" text="Single color textures (needs restart)" />
                                     <CheckBox fx:id="showLauncherBtn" mnemonicParsing="false" text="Show launcher when starting Chunky" />
-                                    <Separator prefWidth="200.0" />
-                                    <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                       <children>
-                                          <CheckBox fx:id="highlightBtn" mnemonicParsing="false" text="Highlight block type:" />
-                                          <ChoiceBox fx:id="highlightCb" prefWidth="150.0" />
-                                       </children>
-                                    </HBox>
-                                    <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                       <children>
-                                          <Label text="Highlight color:" />
-                                          <LuxColorPicker fx:id="highlightColor" />
-                                       </children>
-                                    </HBox>
                                  </children>
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

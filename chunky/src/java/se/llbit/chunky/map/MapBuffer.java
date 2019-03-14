@@ -20,9 +20,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
-import javafx.scene.paint.Color;
 import se.llbit.chunky.ui.MapViewMode;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.png.PngFileWriter;
@@ -56,10 +54,6 @@ public class MapBuffer {
   private WritableImage image = null;
   private boolean cached = false;
 
-  private boolean highlightEnabled = false;
-  private Block highlightBlock = Block.get(Block.DIAMONDORE_ID);
-  private Color highlightColor = Color.CRIMSON;
-
   private ChunkView view = ChunkView.EMPTY;
 
   private RingBuffer<MapTile> tileCache = new RingBuffer<>(140);
@@ -75,16 +69,6 @@ public class MapBuffer {
   public synchronized void updateView(ChunkView newView, WorldMapLoader loader) {
     boolean rebuild = newView.scale != view.scale || newView.renderer != view.renderer
         || (newView.renderer == MapViewMode.LAYER && newView.layer != view.layer);
-    if (newView.renderer == MapViewMode.LAYER) {
-      if (loader.highlightEnabled() != highlightEnabled
-          || loader.highlightBlock() != highlightBlock
-          || !loader.highlightColor().equals(highlightColor)) {
-        rebuild = true;
-        highlightEnabled = loader.highlightEnabled();
-        highlightBlock = loader.highlightBlock();
-        highlightColor = loader.highlightColor();
-      }
-    }
     updateView(newView, rebuild);
   }
 
@@ -260,18 +244,6 @@ public class MapBuffer {
     }
     gc.clearRect(0, 0, view.width, view.height);
     gc.drawImage(image, 0, 0);
-  }
-
-  public boolean highlightEnabled() {
-    return highlightEnabled;
-  }
-
-  public Block highlightBlock() {
-    return highlightBlock;
-  }
-
-  public Color highlightColor() {
-    return highlightColor;
   }
 
   /**

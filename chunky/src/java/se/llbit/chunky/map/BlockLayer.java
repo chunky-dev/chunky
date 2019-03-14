@@ -178,43 +178,6 @@ public class BlockLayer extends AbstractLayer {
     }
   }
 
-  /**
-   * Render block highlight.
-   */
-  @Override public synchronized void renderHighlight(MapTile tile, Block hlBlock, int hlColor) {
-
-    if (blocks == null) {
-      return;
-    }
-
-    if (tile.scale == 16) {
-      for (int z = 0; z < 16; ++z) {
-        for (int x = 0; x < 16; ++x) {
-          if (hlBlock.id == (0xFF & blocks[x * 16 + z])) {
-            tile.setPixel(x, z, hlColor);
-          }
-        }
-      }
-    } else if (tile.scale > 16) {
-      int blockScale = tile.scale / 16;
-      for (int x = 0; x < 16; ++x) {
-        for (int z = 0; z < 16; ++z) {
-          if (hlBlock.id == (0xFF & blocks[x * 16 + z])) {
-            int xp0 = x * blockScale;
-            int xp1 = xp0 + blockScale;
-            int zp0 = z * blockScale;
-            int zp1 = zp0 + blockScale;
-            for (int j = zp0; j < zp1; ++j) {
-              for (int i = xp0; i < xp1; ++i) {
-                tile.setPixel(i, j, hlColor);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
   @Override public int getAvgColor() {
     return avgColor;
   }

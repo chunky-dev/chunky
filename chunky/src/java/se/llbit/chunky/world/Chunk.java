@@ -169,13 +169,6 @@ public class Chunk {
   }
 
   /**
-   * Render block highlight.
-   */
-  public void renderHighlight(MapTile tile, Block hlBlock, int hlColor) {
-    layer.renderHighlight(tile, hlBlock, hlColor);
-  }
-
-  /**
    * Parse the chunk from the region file and render the current
    * layer, surface and cave maps.
    */
