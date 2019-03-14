@@ -87,7 +87,7 @@ public class WaterModel {
   /**
    * Block data offset for water above flag
    */
-  public static final int FULL_BLOCK = 12;
+  private static final int FULL_BLOCK = 12;
 
   static {
     // precompute normal map

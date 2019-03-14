@@ -2,6 +2,7 @@ package se.llbit.chunky.block;
 
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.Material;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
@@ -11,6 +12,10 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class Water extends MinecraftBlockTranslucent {
+
+  // Used only as starting material when camera is submerged.
+  public static final Water INSTANCE = new Water(0);
+
   public final int level;
 
   public Water(int level) {
@@ -24,6 +29,10 @@ public class Water extends MinecraftBlockTranslucent {
 
   @Override public boolean isWater() {
     return true;
+  }
+
+  @Override public boolean isSameMaterial(Material other) {
+    return other.isWater();
   }
 
   private static Quad[] fullBlock = {

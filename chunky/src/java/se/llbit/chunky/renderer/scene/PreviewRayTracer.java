@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer.scene;
 
 import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.math.Ray;
@@ -33,7 +34,7 @@ public class PreviewRayTracer implements RayTracer {
   @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
     if (scene.isInWater(ray)) {
-      ray.setCurrentMaterial(IdBlock.get(IdBlock.WATER_ID), 0);
+      ray.setCurrentMaterial(Water.INSTANCE, 0);
     } else {
       ray.setCurrentMaterial(Air.INSTANCE, 0);
     }

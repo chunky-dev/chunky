@@ -705,12 +705,13 @@ public class Scene implements JsonSerializable, Refreshable {
       worldOctree = new Octree(requiredDepth);
 
       if (waterHeight > 0) {
+        // TODO FIXME
         // Water world mode enabled, fill in water in empty blocks.
         // The water blocks are replaced later when the world chunks are loaded.
         for (int x = 0; x < (1 << worldOctree.depth); ++x) {
           for (int z = 0; z < (1 << worldOctree.depth); ++z) {
             for (int y = -origin.y; y < (-origin.y) + waterHeight - 1; ++y) {
-              worldOctree.set(IdBlock.WATER_ID | (1 << WaterModel.FULL_BLOCK), x, y, z);
+              worldOctree.set(IdBlock.WATER_ID | (1 << Water.FULL_BLOCK), x, y, z);
             }
           }
         }

@@ -25,6 +25,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.UnknownBlock;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.WaterModel;
@@ -639,7 +640,7 @@ public class Octree {
       }
 
       // Exit current octree leaf.
-      if ((node.type & (1 << WaterModel.FULL_BLOCK)) == 0) {
+      if ((node.getData() & (1 << Water.FULL_BLOCK)) == 0) {
         if (WaterModel.intersectTop(ray)) {
           ray.setCurrentMaterial(Air.INSTANCE, 0);
           return true;
