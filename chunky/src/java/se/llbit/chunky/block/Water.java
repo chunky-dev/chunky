@@ -10,14 +10,13 @@ import se.llbit.math.Triangle;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class Water extends MinecraftBlock {
+public class Water extends MinecraftBlockTranslucent {
   public final int level;
 
   public Water(int level) {
     super(String.format("water (%d)", level), Texture.water);
     this.level = level;
     solid = false;
-    opaque = false;
     localIntersect = true;
     specular = 0.12f;
     ior = 1.333f;

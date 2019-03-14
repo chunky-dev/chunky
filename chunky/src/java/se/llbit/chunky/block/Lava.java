@@ -13,7 +13,7 @@ import static se.llbit.chunky.block.Water.CORNER_2;
 import static se.llbit.chunky.block.Water.CORNER_3;
 import static se.llbit.chunky.block.Water.FULL_BLOCK;
 
-public class Lava extends MinecraftBlock {
+public class Lava extends MinecraftBlockTranslucent {
   private static final AABB fullBlock = new AABB(0, 1, 0, 1, 0, 1);
 
   public final int level;
