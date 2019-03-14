@@ -3121,6 +3121,9 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/horn_coral_fan",
             Texture.hornCoralFan));
 
+    allTextures.put("dragon",
+        new SimpleTexture("assets/minecraft/textures/entity/enderdragon/dragon",
+            Texture.dragon));
   }
 
   private static String[] texturePacks = { };

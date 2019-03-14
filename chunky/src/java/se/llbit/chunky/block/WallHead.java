@@ -10,9 +10,9 @@ import se.llbit.math.Vector3;
 public class WallHead extends MinecraftBlockTranslucent {
   private final String description;
   private final int facing;
-  private final int type;
+  private final SkullEntity.Kind type;
 
-  public WallHead(String name, EntityTexture texture, int type, String facing) {
+  public WallHead(String name, EntityTexture texture, SkullEntity.Kind type, String facing) {
     super(name, texture);
     localIntersect = true;
     invisible = true;

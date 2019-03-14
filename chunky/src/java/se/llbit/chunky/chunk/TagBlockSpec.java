@@ -1,6 +1,7 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.block.*;
+import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.FlowerPotModel;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.ShulkerTexture;
@@ -1425,31 +1426,29 @@ public class TagBlockSpec implements BlockSpec {
           return new Potatoes(age);
         }
         case "skeleton_skull":
-          return skull(tag, Texture.skeleton, 0);
+          return skull(tag, Texture.skeleton, SkullEntity.Kind.SKELETON);
         case "skeleton_wall_skull":
-          return wallSkull(tag, Texture.skeleton, 0);
+          return wallSkull(tag, Texture.skeleton, SkullEntity.Kind.SKELETON);
         case "wither_skeleton_skull":
-          return skull(tag, Texture.wither, 1);
+          return skull(tag, Texture.wither, SkullEntity.Kind.WITHER_SKELETON);
         case "wither_skeleton_wall_skull":
-          return wallSkull(tag, Texture.wither, 1);
+          return wallSkull(tag, Texture.wither, SkullEntity.Kind.WITHER_SKELETON);
         case "zombie_head":
-          return skull(tag, Texture.zombie, 2);
+          return skull(tag, Texture.zombie, SkullEntity.Kind.ZOMBIE);
         case "zombie_wall_head":
-          return wallSkull(tag, Texture.zombie, 2);
+          return wallSkull(tag, Texture.zombie, SkullEntity.Kind.ZOMBIE);
         case "player_head":
-          return skull(tag, Texture.steve, 3);
+          return skull(tag, Texture.steve, SkullEntity.Kind.PLAYER);
         case "player_wall_head":
-          return wallSkull(tag, Texture.steve, 3);
+          return wallSkull(tag, Texture.steve, SkullEntity.Kind.PLAYER);
         case "creeper_head":
-          return skull(tag, Texture.creeper, 4);
+          return skull(tag, Texture.creeper, SkullEntity.Kind.CREEPER);
         case "creeper_wall_head":
-          return wallSkull(tag, Texture.creeper, 4);
+          return wallSkull(tag, Texture.creeper, SkullEntity.Kind.CREEPER);
         case "dragon_head":
-          // TODO: render dragon head
-          return skull(tag, Texture.steve, 3);
+          return skull(tag, Texture.steve, SkullEntity.Kind.DRAGON);
         case "dragon_wall_head":
-          // TODO: render dragon head
-          return wallSkull(tag, Texture.steve, 3);
+          return wallSkull(tag, Texture.steve, SkullEntity.Kind.DRAGON);
         case "white_banner":
           return banner(tag, Texture.whiteWool, BlockData.BANNER_WHITE);
         case "orange_banner":
@@ -2023,7 +2022,7 @@ public class TagBlockSpec implements BlockSpec {
         up.equals("true"));
   }
 
-  private Block skull(Tag tag, EntityTexture texture, int type) {
+  private Block skull(Tag tag, EntityTexture texture, SkullEntity.Kind type) {
     String name = blockName(tag);
     int rotation = 0;
     try {
@@ -2033,7 +2032,7 @@ public class TagBlockSpec implements BlockSpec {
     return new Head(name, texture, type, rotation);
   }
 
-  private Block wallSkull(Tag tag, EntityTexture texture, int type) {
+  private Block wallSkull(Tag tag, EntityTexture texture, SkullEntity.Kind type) {
     String name = blockName(tag);
     String facing = tag.get("Properties").get("facing").stringValue("north");
     return new WallHead(name, texture, type, facing);

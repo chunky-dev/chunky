@@ -21,9 +21,11 @@ import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Box;
 import se.llbit.math.primitive.Primitive;
 
@@ -36,6 +38,7 @@ import java.util.LinkedList;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class HeadEntity extends Entity {
+
 
   /**
    * The rotation of the skull when attached to a wall.

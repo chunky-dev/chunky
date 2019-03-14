@@ -17,9 +17,9 @@ import java.util.LinkedList;
 public class Head extends MinecraftBlockTranslucent {
   private final String description;
   private final int rotation;
-  private final int type;
+  private final SkullEntity.Kind type;
 
-  public Head(String name, EntityTexture texture, int type, int rotation) {
+  public Head(String name, EntityTexture texture, SkullEntity.Kind type, int rotation) {
     super(name, texture);
     localIntersect = true;
     invisible = true;

@@ -490,6 +490,7 @@ public class Texture {
   public static final EntityTexture creeper = new EntityTexture();
   public static final EntityTexture skeleton = new EntityTexture();
   public static final EntityTexture wither = new EntityTexture();
+  public static final Texture dragon = new Texture();
 
   // [1.10] Bone, magma, nether wart block, red nether brick.
   public static final Texture boneSide = new Texture();
