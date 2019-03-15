@@ -27,8 +27,6 @@ import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
-import se.llbit.chunky.idblock.IdBlock;
-import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.Postprocess;
 import se.llbit.chunky.renderer.Refreshable;
@@ -45,6 +43,7 @@ import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.ExtraMaterials;
 import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.MaterialStore;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.WorldTexture;
 import se.llbit.json.Json;
@@ -64,6 +63,7 @@ import se.llbit.math.Vector3i;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
+import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
@@ -329,9 +329,6 @@ public class Scene implements JsonSerializable, Refreshable {
     sppTarget = PersistentSettings.getSppTargetDefault();
 
     worldOctree = new Octree(1);
-  }
-
-  private void addToPalette(IdBlock block) {
   }
 
   /**
@@ -705,19 +702,22 @@ public class Scene implements JsonSerializable, Refreshable {
       worldOctree = new Octree(requiredDepth);
 
       if (waterHeight > 0) {
+        CompoundTag waterTag = new CompoundTag();
+        waterTag.add("Name", new StringTag("minecraft:water"));
+        int waterId = worldOctree.palette.put(waterTag);
         // TODO FIXME
         // Water world mode enabled, fill in water in empty blocks.
         // The water blocks are replaced later when the world chunks are loaded.
         for (int x = 0; x < (1 << worldOctree.depth); ++x) {
           for (int z = 0; z < (1 << worldOctree.depth); ++z) {
             for (int y = -origin.y; y < (-origin.y) + waterHeight - 1; ++y) {
-              worldOctree.set(IdBlock.WATER_ID | (1 << Water.FULL_BLOCK), x, y, z);
+              worldOctree.set(new Octree.DataNode(waterId, 1 << Water.FULL_BLOCK), x, y, z);
             }
           }
         }
         for (int x = 0; x < (1 << worldOctree.depth); ++x) {
           for (int z = 0; z < (1 << worldOctree.depth); ++z) {
-            worldOctree.set(IdBlock.WATER_ID, x, (-origin.y) + waterHeight - 1, z);
+            worldOctree.set(waterId, x, (-origin.y) + waterHeight - 1, z);
           }
         }
       }
@@ -1228,7 +1228,7 @@ public class Scene implements JsonSerializable, Refreshable {
     WorkerState state = new WorkerState();
     state.ray = ray;
     if (isInWater(ray)) {
-      ray.setCurrentMaterial(IdBlock.get(IdBlock.WATER_ID), 0);
+      ray.setCurrentMaterial(Water.INSTANCE, 0);
     } else {
       ray.setCurrentMaterial(Air.INSTANCE, 0);
     }
@@ -2660,10 +2660,10 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void importMaterials() {
-    IdBlock.loadDefaultMaterialProperties();
+    MaterialStore.loadDefaultMaterialProperties();
     ExtraMaterials.loadDefaultMaterialProperties();
-    IdBlock.collections.forEach((name, coll) -> importMaterial(materials, name, coll));
-    IdBlock.idMap.forEach((name, block) -> importMaterial(materials, name, block));
+    MaterialStore.collections.forEach((name, coll) -> importMaterial(materials, name, coll));
+    MaterialStore.idMap.forEach((name, block) -> importMaterial(materials, name, block));
     ExtraMaterials.idMap.forEach((name, block) -> importMaterial(materials, name, block));
   }
 

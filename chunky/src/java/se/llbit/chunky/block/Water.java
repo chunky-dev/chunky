@@ -25,6 +25,7 @@ public class Water extends MinecraftBlockTranslucent {
     localIntersect = true;
     specular = 0.12f;
     ior = 1.333f;
+    refractive = true;
   }
 
   @Override public boolean isWater() {

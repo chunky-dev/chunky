@@ -19,7 +19,6 @@ package se.llbit.chunky.renderer.scene;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Water;
-import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
@@ -229,8 +228,8 @@ public class PathTracer implements RayTracer {
           // Refraction.
 
           // TODO: make this decision dependent on the material properties:
-          boolean doRefraction = currentMat.isWater() || prevMat.isWater() ||
-              currentMat == IdBlock.get(IdBlock.ICE_ID) || prevMat == IdBlock.get(IdBlock.ICE_ID);
+          boolean doRefraction =
+              currentMat.refractive || prevMat.refractive;
 
           // Refraction.
           float n1n2 = n1 / n2;

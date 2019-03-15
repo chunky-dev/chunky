@@ -16,8 +16,9 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.idblock.IdBlock;
 import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
 import se.llbit.chunky.map.IconLayer;
@@ -172,11 +173,10 @@ public class Chunk {
       int[] heightmapData = extractHeightmapData(data);
       byte[] biomeData = new byte[X_MAX * Z_MAX];
       extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
-      byte[] chunkData = new byte[CHUNK_BYTES];
       int[] blockData = new int[CHUNK_BYTES];
       BlockPalette palette = new BlockPalette();
       loadBlockData(data, blockData, palette);
-      updateHeightmap(heightmap, position, chunkData, heightmapData);
+      updateHeightmap(heightmap, position, blockData, heightmapData, palette);
       surface = new SurfaceLayer(world.currentDimension(), blockData, biomeData, palette);
       queueTopography();
     } else {
@@ -302,15 +302,15 @@ public class Chunk {
    * Load heightmap information from a chunk heightmap array
    * and insert into a quadtree.
    */
-  public static void updateHeightmap(Heightmap heightmap, ChunkPosition pos, byte[] blocksArray,
-      int[] chunkHeightmap) {
+  public static void updateHeightmap(Heightmap heightmap, ChunkPosition pos, int[] blocksArray,
+      int[] chunkHeightmap, BlockPalette palette) {
     for (int x = 0; x < 16; ++x) {
       for (int z = 0; z < 16; ++z) {
         int y = chunkHeightmap[z * 16 + x];
         y = Math.max(1, y - 1);
         for (; y > 1; --y) {
-          IdBlock block = IdBlock.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
-          if (block != IdBlock.AIR && !block.isWater())
+          Block block = palette.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
+          if (block != Air.INSTANCE && !block.isWater())
             break;
         }
         heightmap.set(y, pos.x * 16 + x, pos.z * 16 + z);

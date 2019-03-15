@@ -77,6 +77,7 @@ public abstract class Material {
 
   /** Base texture. */
   public final Texture texture;
+  public boolean refractive = false;
 
   public Material(String name, Texture texture) {
     this.name = name;

@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 // TODO: introduce block tags
-public class MaterialCollection {
+public class MaterialStore {
   public static final Map<String, Collection<Block>> collections = new LinkedHashMap<>();
   public static final Map<String, Material> idMap = new HashMap<>();
 

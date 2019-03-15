@@ -16,22 +16,14 @@
  */
 package se.llbit.chunky.model;
 
-import java.util.List;
-
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.idblock.IdBlock;
-import se.llbit.chunky.world.BlockData;
-import se.llbit.chunky.world.Material;
 import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Triangle;
-import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
-import se.llbit.math.primitive.Primitive;
-import se.llbit.math.primitive.TexturedTriangle;
 
 /**
  * A water block. The height of the top water block is slightly
@@ -358,42 +350,5 @@ public class WaterModel {
     ray.n.x += normalMap[u][v][0] / 2;
     ray.n.z += normalMap[u][v][1] / 2;
     ray.n.normalize();
-  }
-
-  // Adds lily pad objects.
-  public static void addPrimitives(List<Primitive> primitives, int data, int x, int y, int z,
-      int size) {
-    // Lily pad test.
-    if ((data & (1 << BlockData.LILY_PAD)) != 0) {
-      double height = y + 1 - 0.12;
-      Vector3 c1 = new Vector3(x, height, z);
-      Vector3 c2 = new Vector3(x, height, z + size);
-      Vector3 c3 = new Vector3(x + size, height, z + size);
-      Vector3 c4 = new Vector3(x + size, height, z);
-      Vector2 t1 = new Vector2(0, 0);
-      Vector2 t2 = new Vector2(0, 1);
-      Vector2 t3 = new Vector2(1, 1);
-      Vector2 t4 = new Vector2(1, 0);
-      int dir = 3 & (data >> BlockData.LILY_PAD_ROTATION);
-      Material lilyMaterial = IdBlock.get(IdBlock.LILY_PAD_ID);
-      switch (dir) {
-        case 0:
-          primitives.add(new TexturedTriangle(c1, c3, c2, t1, t3, t2, lilyMaterial));
-          primitives.add(new TexturedTriangle(c1, c4, c3, t1, t4, t3, lilyMaterial));
-          break;
-        case 1:
-          primitives.add(new TexturedTriangle(c1, c3, c2, t4, t2, t1, lilyMaterial));
-          primitives.add(new TexturedTriangle(c1, c4, c3, t4, t3, t2, lilyMaterial));
-          break;
-        case 2:
-          primitives.add(new TexturedTriangle(c1, c3, c2, t3, t1, t4, lilyMaterial));
-          primitives.add(new TexturedTriangle(c1, c4, c3, t3, t2, t1, lilyMaterial));
-          break;
-        case 3:
-          primitives.add(new TexturedTriangle(c1, c3, c2, t2, t4, t3, lilyMaterial));
-          primitives.add(new TexturedTriangle(c1, c4, c3, t2, t1, t4, lilyMaterial));
-          break;
-      }
-    }
   }
 }

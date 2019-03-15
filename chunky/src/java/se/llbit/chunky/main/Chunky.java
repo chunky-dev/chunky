@@ -41,7 +41,7 @@ import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
-import se.llbit.chunky.idblock.IdBlock;
+import se.llbit.chunky.world.MaterialStore;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Level;
@@ -98,7 +98,7 @@ public class Chunky {
 
   public Chunky(ChunkyOptions options) {
     this.options = options;
-    IdBlock.loadDefaultMaterialProperties();
+    MaterialStore.loadDefaultMaterialProperties();
   }
 
   /**

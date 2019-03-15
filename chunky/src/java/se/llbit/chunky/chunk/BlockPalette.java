@@ -74,6 +74,7 @@ public class BlockPalette {
     materialProperties.put("minecraft:water", block -> {
       block.specular = 0.12f;
       block.ior = 1.333f;
+      block.refractive = true;
     });
     materialProperties.put("minecraft:lava", block -> {
       block.emittance = 1.0f;
@@ -104,9 +105,11 @@ public class BlockPalette {
     });
     materialProperties.put("minecraft:ice", block -> {
       block.ior = 1.31f;
+      block.refractive = true;
     });
     materialProperties.put("minecraft:frosted_ice", block -> {
       block.ior = 1.31f;
+      block.refractive = true;
     });
     materialProperties.put("minecraft:glowstone", block -> {
       block.emittance = 1.0f;

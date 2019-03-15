@@ -27,8 +27,8 @@ public class TestScene {
    * <p>Regression test: https://www.reddit.com/r/chunky/comments/6l7vqd/chunky_snapshot_143alpha1/djuj3o6/
    */
   @Test public void testModifyMaterial1() {
-    new Scene().setEmittance(IdBlock.GRAVEL.getBlockName(), 0.3f);
-    new Scene().setSpecular(IdBlock.GRAVEL.getBlockName(), 0.3f);
-    new Scene().setIor(IdBlock.GRAVEL.getBlockName(), 0.3f);
+    new Scene().setEmittance("minecraft:gravel", 0.3f);
+    new Scene().setSpecular("minecraft:gravel", 0.3f);
+    new Scene().setIor("minecraft:gravel", 0.3f);
   }
 }
