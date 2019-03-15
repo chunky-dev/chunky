@@ -18,7 +18,6 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.junit.Test;
-import se.llbit.chunky.idblock.IdBlock;
 
 public class TestScene {
   /**
