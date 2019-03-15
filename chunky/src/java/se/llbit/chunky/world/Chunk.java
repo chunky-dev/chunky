@@ -23,6 +23,7 @@ import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
+import se.llbit.chunky.map.OldLayer;
 import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.math.QuickMath;
 import se.llbit.nbt.CompoundTag;
@@ -174,11 +175,16 @@ public class Chunk {
       byte[] biomeData = new byte[X_MAX * Z_MAX];
       extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
       int[] blockData = new int[CHUNK_BYTES];
-      BlockPalette palette = new BlockPalette();
-      loadBlockData(data, blockData, palette);
-      updateHeightmap(heightmap, position, blockData, heightmapData, palette);
-      surface = new SurfaceLayer(world.currentDimension(), blockData, biomeData, palette);
-      queueTopography();
+      String cv = chunkVersion(data);
+      if (cv.equals("1.13")) {
+        BlockPalette palette = new BlockPalette();
+        loadBlockData(data, blockData, palette);
+        updateHeightmap(heightmap, position, blockData, heightmapData, palette);
+        surface = new SurfaceLayer(world.currentDimension(), blockData, biomeData, palette);
+        queueTopography();
+      } else if (cv.equals("1.12")) {
+        surface = OldLayer.INSTANCE;
+      }
     } else {
       surface = IconLayer.CORRUPT;
     }
