@@ -84,7 +84,7 @@ public class ConsoleUpdater {
           return true;
       }
     }
-    String defaultUrl = settings.updateSite + "lib/" + lib.name;
+    String defaultUrl = settings.getResourceUrl("lib/" + lib.name);
     if (!lib.url.isEmpty()) {
       err.print("  retrying with URL=" + defaultUrl + "...");
     }

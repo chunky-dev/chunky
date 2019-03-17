@@ -55,10 +55,10 @@ public class UpdateChecker extends Thread {
   private boolean tryUpdate() {
     List<VersionInfo> candidates = new LinkedList<>();
 
-    getVersion(candidates, settings.updateSite + "latest.json");
+    getVersion(candidates, settings.getResourceUrl("latest.json"));
 
     if (settings.downloadSnapshots) {
-      getVersion(candidates, settings.updateSite + "snapshot.json");
+      getVersion(candidates, settings.getResourceUrl("snapshot.json"));
     }
 
     // Filter out corrupt versions.

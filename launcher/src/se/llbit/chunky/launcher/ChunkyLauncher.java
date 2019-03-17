@@ -49,7 +49,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final String LAUNCHER_VERSION = "v1.11.1";
+  public static final String LAUNCHER_VERSION = "v1.11.2";
 
   /**
    * Print a launch error message to the console.

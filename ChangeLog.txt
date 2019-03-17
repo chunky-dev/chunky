@@ -1,5 +1,6 @@
 LATEST
 
+* Added Update Site url setting in the launcher.
 * The render thread count setting now takes effect after restarting Chunky.
 * Fixed concurrency issues in the renderer.
 * Fixed issue causing the renderer to hang if clouds were enabled.

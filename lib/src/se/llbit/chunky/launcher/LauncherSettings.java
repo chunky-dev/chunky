@@ -110,4 +110,12 @@ public class LauncherSettings {
     File directory = SettingsDirectory.getSettingsDirectory();
     settings.save(directory, new File(directory, LAUNCHER_SETTINGS_FILE));
   }
+
+  public String getResourceUrl(String path) {
+    String updateSite = this.updateSite;
+    if (!updateSite.endsWith("/")) {
+      updateSite += "/";
+    }
+    return updateSite + path;
+  }
 }
