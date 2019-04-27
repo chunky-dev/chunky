@@ -39,8 +39,6 @@ import se.llbit.chunky.world.Material;
  */
 public class Octree {
 
-  private static final int OCTREE_VERSION = 2;
-
 
   /** An Octree node. */
   public static class Node {
@@ -193,8 +191,6 @@ public class Octree {
   private int cz = 0;
   private int cacheLevel;
 
-  public BlockPalette palette = new BlockPalette();
-
   /**
    * Create a new Octree. The dimensions of the Octree
    * are 2^levels.
@@ -290,7 +286,7 @@ public class Octree {
     return node;
   }
 
-  public Material getMaterial(int x, int y, int z) {
+  public Material getMaterial(int x, int y, int z, BlockPalette palette) {
     Node node = get(x, y, z);
     if (node.type == -1) return UnknownBlock.UNKNOWN;
     return palette.get(node.type);
@@ -302,8 +298,6 @@ public class Octree {
    * @throws IOException
    */
   public void store(DataOutputStream out) throws IOException {
-    out.writeInt(OCTREE_VERSION);
-    palette.write(out);
     out.writeInt(depth);
     root.store(out);
   }
@@ -315,14 +309,8 @@ public class Octree {
    * @throws IOException
    */
   public static Octree load(DataInputStream in) throws IOException {
-    int version = in.readInt();
-    if (version != OCTREE_VERSION) {
-      throw new IOException("Incompatible octree format.");
-    }
-    BlockPalette palette = BlockPalette.read(in);
     int treeDepth = in.readInt();
     Octree tree = new Octree(treeDepth);
-    tree.palette = palette;
     tree.root.load(in);
     return tree;
   }
@@ -345,22 +333,7 @@ public class Octree {
     return lx == 0 && ly == 0 && lz == 0;
   }
 
-  /**
-   * Test whether the ray intersects any voxel before exiting the Octree.
-   *
-   * @param ray   the ray
-   * @return {@code true} if the ray intersects a voxel
-   */
-  public boolean intersect(Scene scene, Ray ray) {
-    if (ray.getCurrentMaterial().isWater()) {
-      return exitWater(scene, ray);
-    } else {
-      return enterBlock(scene, ray);
-    }
-  }
-
-  private boolean enterBlock(Scene scene, Ray ray) {
-
+  public boolean enterBlock(Scene scene, Ray ray, BlockPalette palette) {
     int level;
     Octree.Node node;
     boolean first = true;
@@ -461,7 +434,6 @@ public class Octree {
       ray.setCurrentMaterial(currentBlock, node.getData());
 
       if (currentBlock.localIntersect) {
-
         if (currentBlock.intersect(ray, scene)) {
           if (prevBlock != currentBlock)
             return true;
@@ -529,7 +501,10 @@ public class Octree {
     }
   }
 
-  private boolean exitWater(Scene scene, Ray ray) {
+  /**
+   * Advance the ray until it leaves the current water body.
+   */
+  public boolean exitWater(Scene scene, Ray ray, BlockPalette palette) {
     int level;
     Octree.Node node;
     boolean first = true;

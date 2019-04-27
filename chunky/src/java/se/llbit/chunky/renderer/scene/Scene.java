@@ -36,6 +36,7 @@ import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.OctreeLoader;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -133,11 +134,6 @@ public class Scene implements JsonSerializable, Refreshable {
    * Default gamma for the gamma correction post process.
    */
   public static final float DEFAULT_GAMMA = 2.2f;
-
-  /**
-   * One over gamma.
-   */
-  public static final float DEFAULT_GAMMA_INV = 1 / DEFAULT_GAMMA;
 
   public static final boolean DEFAULT_EMITTERS_ENABLED = false;
 
@@ -251,10 +247,9 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected Vector3i origin = new Vector3i();
 
-  /**
-   * Octree
-   */
+  private BlockPalette palette;
   private Octree worldOctree;
+  private Octree waterOctree;
 
   /**
    * Entities in the scene.
@@ -328,7 +323,9 @@ public class Scene implements JsonSerializable, Refreshable {
     height = PersistentSettings.get3DCanvasHeight();
     sppTarget = PersistentSettings.getSppTargetDefault();
 
+    palette = new BlockPalette();
     worldOctree = new Octree(1);
+    waterOctree = new Octree(1);
   }
 
   /**
@@ -385,7 +382,9 @@ public class Scene implements JsonSerializable, Refreshable {
 
     // The octree reference is overwritten to save time.
     // When the other scene is changed it must create a new octree.
+    palette = other.palette;
     worldOctree = other.worldOctree;
+    waterOctree = other.waterOctree;
     entities = other.entities;
     actors = new LinkedList<>(other.actors); // Create a copy so that entity changes can be reset.
     profiles = other.profiles;
@@ -612,17 +611,8 @@ public class Scene implements JsonSerializable, Refreshable {
         hit = true;
       }
     }
-    Ray oct = new Ray(ray);
-    oct.setCurrentMaterial(ray.getPrevMaterial(), ray.getPrevData());
-    if (worldOctree.intersect(this, oct) && oct.distance < ray.t) {
-      ray.distance += oct.distance;
-      ray.o.set(oct.o);
-      ray.n.set(oct.n);
-      ray.color.set(oct.color);
-      ray.setPrevMaterial(oct.getPrevMaterial(), oct.getPrevData());
-      ray.setCurrentMaterial(oct.getCurrentMaterial(), oct.getCurrentData());
-      updateOpacity(ray);
-      return true;
+    if (worldIntersection(ray)) {
+      hit = true;
     }
     if (hit) {
       ray.distance += ray.t;
@@ -631,6 +621,52 @@ public class Scene implements JsonSerializable, Refreshable {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Test whether the ray intersects any voxel before exiting the Octree.
+   *
+   * @param ray   the ray
+   * @return {@code true} if the ray intersects a voxel
+   */
+  private boolean worldIntersection(Ray ray) {
+    Ray origin = new Ray(ray);
+    origin.setCurrentMaterial(ray.getPrevMaterial(), ray.getPrevData());
+    boolean hit = false;
+    if (ray.getCurrentMaterial().isWater()) {
+      Ray r = new Ray(origin);
+      r.setCurrentMaterial(origin.getPrevMaterial(), origin.getPrevData());
+      if (waterOctree.exitWater(this, r, palette) && r.distance < ray.t) {
+        ray.t = r.distance;
+        ray.n.set(r.n);
+        ray.color.set(r.color);
+        ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
+        ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
+        hit = true;
+      }
+    } else {
+      Ray r = new Ray(origin);
+      r.setCurrentMaterial(origin.getPrevMaterial(), origin.getPrevData());
+      if (waterOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
+        ray.t = r.distance;
+        ray.n.set(r.n);
+        ray.color.set(r.color);
+        ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
+        ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
+        hit = true;
+      }
+    }
+    Ray r = new Ray(origin);
+    r.setCurrentMaterial(origin.getPrevMaterial(), origin.getPrevData());
+    if (worldOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
+      ray.t = r.distance;
+      ray.n.set(r.n);
+      ray.color.set(r.color);
+      ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
+      ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
+      hit = true;
+    }
+    return hit;
   }
 
   public void updateOpacity(Ray ray) {
@@ -699,12 +735,14 @@ public class Scene implements JsonSerializable, Refreshable {
       int requiredDepth = calculateOctreeOrigin(chunksToLoad);
 
       // Create new octree to fit all chunks.
+      palette = new BlockPalette();
       worldOctree = new Octree(requiredDepth);
+      waterOctree = new Octree(requiredDepth);
 
       if (waterHeight > 0) {
         CompoundTag waterTag = new CompoundTag();
         waterTag.add("Name", new StringTag("minecraft:water"));
-        int waterId = worldOctree.palette.put(waterTag);
+        int waterId = palette.put(waterTag);
         // TODO FIXME
         // Water world mode enabled, fill in water in empty blocks.
         // The water blocks are replaced later when the world chunks are loaded.
@@ -768,7 +806,6 @@ public class Scene implements JsonSerializable, Refreshable {
     int[] blocks = new int[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
     byte[] biomes = new byte[Chunk.X_MAX * Chunk.Z_MAX];
 
-    BlockPalette palette = worldOctree.palette;
     Block stone = palette.stone;
 
     try (TaskTracker.Task task = progress.task("Loading chunks")) {
@@ -857,23 +894,28 @@ public class Scene implements JsonSerializable, Refreshable {
                   octNode = new Octree.Node(blocks[index]);
                 }
               }
-              if (cy + 1 < yMax && block.isWater()) {
-                int above = Chunk.chunkIndex(cx, cy + 1, cz);
-                Block aboveBlock = palette.get(blocks[above]);
-                if (aboveBlock.isWater()) {
-                  octNode = new Octree.DataNode(blocks[index],
-                      1 << Water.FULL_BLOCK);
+              if (block.isWaterFilled()) {
+                Octree.Node waterNode = new Octree.Node(palette.waterId);
+                if (cy + 1 < yMax) {
+                  int above = Chunk.chunkIndex(cx, cy + 1, cz);
+                  Block aboveBlock = palette.get(blocks[above]);
+                  if (aboveBlock.isWaterFilled()) {
+                    waterNode = new Octree.DataNode(palette.waterId, 1 << Water.FULL_BLOCK);
+                  }
+                }
+                waterOctree.set(waterNode, x, cy - origin.y, z);
+                if (block.isWater()) {
+                  // Don't keep the waterlogged block.
+                  octNode = new Octree.Node(palette.airId);
                 }
               } else if (cy + 1 < yMax && block instanceof Lava) {
                 int above = Chunk.chunkIndex(cx, cy + 1, cz);
                 Block aboveBlock = palette.get(blocks[above]);
                 if (aboveBlock instanceof Lava) {
-                  octNode = new Octree.DataNode(blocks[index],
-                      1 << Water.FULL_BLOCK);
+                  octNode = new Octree.DataNode(blocks[index], 1 << Water.FULL_BLOCK);
                 }
               }
               worldOctree.set(octNode, x, cy - origin.y, z);
-
             }
           }
         }
@@ -960,7 +1002,7 @@ public class Scene implements JsonSerializable, Refreshable {
         }
         task.update(target, done);
         done += 1;
-        OctreeFinalizer.finalizeChunk(worldOctree, origin, cp);
+        OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp);
       }
     }
 
@@ -1080,7 +1122,8 @@ public class Scene implements JsonSerializable, Refreshable {
     int xcenter = (xmax + xmin) / 2;
     int zcenter = (zmax + zmin) / 2;
     for (int y = Chunk.Y_MAX - 1; y >= 0; --y) {
-      Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z);
+      Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
+          palette);
       if (!(block instanceof Air)) {
         return new Vector3(xcenter, y + 5, zcenter);
       }
@@ -1606,7 +1649,7 @@ public class Scene implements JsonSerializable, Refreshable {
       Log.info("Saving octree " + fileName);
 
       try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName)))) {
-        worldOctree.store(out);
+        OctreeLoader.store(out, worldOctree, palette);
         worldOctree.setTimestamp(context.fileTimestamp(fileName));
 
         task.update(2);
@@ -1690,7 +1733,9 @@ public class Scene implements JsonSerializable, Refreshable {
       task.update(1);
       Log.info("Loading octree " + fileName);
       try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)))) {
-        worldOctree = Octree.load(in);
+        OctreeLoader loader = new OctreeLoader();
+        loader.load(in);
+        worldOctree = loader.octree;
         worldOctree.setTimestamp(context.fileTimestamp(fileName));
         task.update(2);
         Log.info("Octree loaded");
@@ -2093,12 +2138,12 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public boolean isInWater(Ray ray) {
-    if (worldOctree.isInside(ray.o)) {
+    if (waterOctree.isInside(ray.o)) {
       int x = (int) QuickMath.floor(ray.o.x);
       int y = (int) QuickMath.floor(ray.o.y);
       int z = (int) QuickMath.floor(ray.o.z);
-      Octree.Node node = worldOctree.get(x, y, z);
-      Material block = worldOctree.palette.get(node.type);
+      Octree.Node node = waterOctree.get(x, y, z);
+      Material block = palette.get(node.type);
       return block.isWater()
           && ((ray.o.y - y) < 0.875 || (0 != (node.getData() & (1 << Water.FULL_BLOCK))));
     } else {

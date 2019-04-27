@@ -7,9 +7,14 @@ import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
+import se.llbit.math.Transform;
 import se.llbit.math.Triangle;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
+import se.llbit.math.primitive.Primitive;
+
+import java.util.Collection;
+import java.util.List;
 
 public class Water extends MinecraftBlockTranslucent {
 
@@ -19,7 +24,7 @@ public class Water extends MinecraftBlockTranslucent {
   public final int level;
 
   public Water(int level) {
-    super(String.format("water (%d)", level), Texture.water);
+    super("water", Texture.water);
     this.level = level;
     solid = false;
     localIntersect = true;
@@ -36,25 +41,26 @@ public class Water extends MinecraftBlockTranslucent {
     return other.isWater();
   }
 
-  private static Quad[] fullBlock = {
-      // bottom
+  private static final Quad[] fullBlock = {
+      // Bottom.
       new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1)),
-      // top
+      // Top.
       new DoubleSidedQuad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 1, 1),
           new Vector4(0, 1, 0, 1)),
-      // west
+      // West.
       new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1)),
-      // east
+      // East.
       new DoubleSidedQuad(new Vector3(1, 0, 0), new Vector3(1, 1, 0), new Vector3(1, 0, 1),
           new Vector4(0, 1, 0, 1)),
-      // north
+      // North.
       new DoubleSidedQuad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 0, 0),
           new Vector4(0, 1, 0, 0)),
-      // south
+      // South.
       new DoubleSidedQuad(new Vector3(0, 1, 1), new Vector3(1, 1, 1), new Vector3(0, 0, 1),
-          new Vector4(0, 1, 0, 1)),};
+          new Vector4(0, 1, 0, 1)),
+  };
 
   static final DoubleSidedQuad bot =
       new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),

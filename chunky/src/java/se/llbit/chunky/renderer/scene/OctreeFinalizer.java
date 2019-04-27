@@ -18,6 +18,7 @@ package se.llbit.chunky.renderer.scene;
 
 import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
+import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.Material;
@@ -35,161 +36,96 @@ import se.llbit.math.Vector3i;
 public class OctreeFinalizer {
   /**
    * Finalize a chunk in the octree.
-   *
-   * @param octree Octree to finalize
+   * @param worldTree Octree to finalize
    * @param origin Origin of the octree
    * @param cp     Position of the chunk to finalize
    */
-  public static void finalizeChunk(Octree octree, Vector3i origin, ChunkPosition cp) {
+  public static void finalizeChunk(Octree worldTree, Octree waterTree, BlockPalette palette,
+      Vector3i origin, ChunkPosition cp) {
     for (int cy = 0 - origin.y; cy < Chunk.Y_MAX - origin.y; ++cy) {
       for (int cz = 0; cz < 16; ++cz) {
         int z = cz + cp.z * 16 - origin.z;
         for (int cx = 0; cx < 16; ++cx) {
           int x = cx + cp.x * 16 - origin.x;
-          processBlock(octree, x, cy, z);
+          processBlock(worldTree, waterTree, palette, x, cy, z);
         }
       }
     }
   }
 
-  private static void processBlock(Octree octree, int x, int cy, int z) {
-    Material mat = octree.getMaterial(x, cy, z);
+  private static void processBlock(Octree worldTree, Octree waterTree, BlockPalette palette, int x,
+      int cy, int z) {
+    Material mat = worldTree.getMaterial(x, cy, z, palette);
+    Material wmat = waterTree.getMaterial(x, cy, z, palette);
 
     // TODO: duplicated code? Check Scene.loadChunks()...
-          /*
-          // Set non-visible blocks to be stone, in order to merge large patches.
-          if ((cx == 0 || cx == 15 || cz == 0 || cz == 15) && cy > -origin.y
-              && cy < Chunk.Y_MAX - origin.y - 1 && type != Block.STONE_ID && block.opaque) {
-            if (Block.get(octree.get(x - 1, cy, z)).opaque && Block
-                .get(octree.get(x + 1, cy, z)).opaque && Block
-                .get(octree.get(x, cy - 1, z)).opaque && Block
-                .get(octree.get(x, cy + 1, z)).opaque && Block
-                .get(octree.get(x, cy, z - 1)).opaque && Block
-                .get(octree.get(x, cy, z + 1)).opaque) {
-              octree.set(Block.STONE_ID, x, cy, z);
-              continue;
-            }
-          }*/
+    /*
+    // Set non-visible blocks to be stone, in order to merge large patches.
+    if ((cx == 0 || cx == 15 || cz == 0 || cz == 15) && cy > -origin.y
+        && cy < Chunk.Y_MAX - origin.y - 1 && type != Block.STONE_ID && block.opaque) {
+      if (Block.get(octree.get(x - 1, cy, z)).opaque && Block
+          .get(octree.get(x + 1, cy, z)).opaque && Block
+          .get(octree.get(x, cy - 1, z)).opaque && Block
+          .get(octree.get(x, cy + 1, z)).opaque && Block
+          .get(octree.get(x, cy, z - 1)).opaque && Block
+          .get(octree.get(x, cy, z + 1)).opaque) {
+        octree.set(Block.STONE_ID, x, cy, z);
+        continue;
+      }
+    }*/
 
-    if (mat instanceof Water) {
-      Material above = octree.getMaterial(x, cy + 1, z);
+    if (wmat instanceof Water) {
+      Material above = waterTree.getMaterial(x, cy + 1, z, palette);
+      int level0 = 8 - ((Water) wmat).level;
       if (!above.isWater()) {
-        Water water = (Water) mat;
-
-        int level0 = 8 - water.level;
         int corner0 = level0;
         int corner1 = level0;
         int corner2 = level0;
         int corner3 = level0;
 
-        Octree.Node node = octree.get(x - 1, cy, z);
-        Material corner = octree.palette.get(node.type);
-        int fullBlock;
-        int level = level0;
-        if (corner.isWater()) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Water) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        int level = waterLevelAt(worldTree, waterTree, palette, x - 1, cy, z, level0);
         corner3 += level;
         corner0 += level;
 
-        node = octree.get(x - 1, cy, z + 1);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner.isWater()) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Water) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = waterLevelAt(worldTree, waterTree, palette, x - 1, cy, z + 1, level0);
         corner0 += level;
 
-        node = octree.get(x, cy, z + 1);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner.isWater()) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Water) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = waterLevelAt(worldTree, waterTree, palette, x, cy, z + 1, level0);
         corner0 += level;
         corner1 += level;
 
-        node = octree.get(x + 1, cy, z + 1);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner.isWater()) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Water) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = waterLevelAt(worldTree, waterTree, palette, x + 1, cy, z + 1, level0);
         corner1 += level;
 
-        node = octree.get(x + 1, cy, z);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner.isWater()) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Water) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = waterLevelAt(worldTree, waterTree, palette, x + 1, cy, z, level0);
         corner1 += level;
         corner2 += level;
 
-        node = octree.get(x + 1, cy, z - 1);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner.isWater()) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Water) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = waterLevelAt(worldTree, waterTree, palette, x + 1, cy, z - 1, level0);
         corner2 += level;
 
-        node = octree.get(x, cy, z - 1);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner.isWater()) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Water) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = waterLevelAt(worldTree, waterTree, palette, x, cy, z - 1, level0);
         corner2 += level;
         corner3 += level;
 
-        node = octree.get(x - 1, cy, z - 1);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner.isWater()) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Water) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = waterLevelAt(worldTree, waterTree, palette, x - 1, cy, z - 1, level0);
         corner3 += level;
 
         corner0 = Math.min(7, 8 - (corner0 / 4));
         corner1 = Math.min(7, 8 - (corner1 / 4));
         corner2 = Math.min(7, 8 - (corner2 / 4));
         corner3 = Math.min(7, 8 - (corner3 / 4));
-        node = octree.get(x, cy, z);
-        Octree.Node replaced = new Octree.DataNode(
+        Octree.Node node = waterTree.get(x, cy, z);
+        node = new Octree.DataNode(
             node.type,
             (corner0 << Water.CORNER_0)
                 | (corner1 << Water.CORNER_1)
                 | (corner2 << Water.CORNER_2)
                 | (corner3 << Water.CORNER_3));
-        octree.set(replaced, x, cy, z);
+        waterTree.set(node, x, cy, z);
       }
     } else if (mat instanceof Lava) {
-      Material above = octree.getMaterial(x, cy + 1, z);
+      Material above = worldTree.getMaterial(x, cy + 1, z, palette);
       if (!(above instanceof Lava)) {
         Lava lava = (Lava) mat;
 
@@ -199,113 +135,76 @@ public class OctreeFinalizer {
         int corner2 = level0;
         int corner3 = level0;
 
-        Octree.Node node = octree.get(x - 1, cy, z);
-        Material corner = octree.palette.get(node.type);
-        int fullBlock;
-        int level = level0;
-        if (corner instanceof Lava) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        int level = lavaLevelAt(worldTree, palette, x - 1, cy, z, level0);
         corner3 += level;
         corner0 += level;
 
-        node = octree.get(x - 1, cy, z + 1);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner instanceof Lava) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = lavaLevelAt(worldTree, palette, x - 1, cy, z + 1, level0);
         corner0 += level;
 
-        node = octree.get(x, cy, z + 1);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner instanceof Lava) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = lavaLevelAt(worldTree, palette, x, cy, z + 1, level0);
         corner0 += level;
         corner1 += level;
 
-        node = octree.get(x + 1, cy, z + 1);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner instanceof Lava) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = lavaLevelAt(worldTree, palette, x + 1, cy, z + 1, level0);
         corner1 += level;
 
-        node = octree.get(x + 1, cy, z);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner instanceof Lava) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = lavaLevelAt(worldTree, palette, x + 1, cy, z, level0);
         corner1 += level;
         corner2 += level;
 
-        node = octree.get(x + 1, cy, z - 1);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner instanceof Lava) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = lavaLevelAt(worldTree, palette, x + 1, cy, z - 1, level0);
         corner2 += level;
 
-        node = octree.get(x, cy, z - 1);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner instanceof Lava) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = lavaLevelAt(worldTree, palette, x, cy, z - 1, level0);
         corner2 += level;
         corner3 += level;
 
-        node = octree.get(x - 1, cy, z - 1);
-        corner = octree.palette.get(node.type);
-        level = level0;
-        if (corner instanceof Lava) {
-          fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-          level = 8 - (1 - fullBlock) * ((Lava) corner).level;
-        } else if (!corner.solid) {
-          level = 0;
-        }
+        level = lavaLevelAt(worldTree, palette, x - 1, cy, z - 1, level0);
         corner3 += level;
 
         corner0 = Math.min(7, 8 - (corner0 / 4));
         corner1 = Math.min(7, 8 - (corner1 / 4));
         corner2 = Math.min(7, 8 - (corner2 / 4));
         corner3 = Math.min(7, 8 - (corner3 / 4));
-        node = octree.get(x, cy, z);
+        Octree.Node node = worldTree.get(x, cy, z);
         Octree.Node replaced = new Octree.DataNode(
             node.type,
             (corner0 << Water.CORNER_0)
                 | (corner1 << Water.CORNER_1)
                 | (corner2 << Water.CORNER_2)
                 | (corner3 << Water.CORNER_3));
-        octree.set(replaced, x, cy, z);
+        worldTree.set(replaced, x, cy, z);
       }
     }
+  }
+
+  private static int waterLevelAt(Octree worldTree, Octree waterTree,
+      BlockPalette palette, int x, int cy, int z, int baseLevel) {
+    Octree.Node node = waterTree.get(x, cy, z);
+    Material corner = palette.get(node.type);
+    if (corner instanceof Water) {
+      int fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+      return 8 - (1 - fullBlock) * ((Water) corner).level;
+    } else if (corner.waterlogged) {
+      return 8;
+    } else if (!worldTree.getMaterial(x, cy, z, palette).solid) {
+      return 0;
+    }
+    return baseLevel;
+  }
+
+  private static int lavaLevelAt(Octree octree, BlockPalette palette,
+      int x, int cy, int z, int baseLevel) {
+    Octree.Node node = octree.get(x, cy, z);
+    Material corner = palette.get(node.type);
+    if (corner instanceof Lava) {
+      int fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
+      return 8 - (1 - fullBlock) * ((Lava) corner).level;
+    } else if (!corner.solid) {
+      return 0;
+    }
+    return baseLevel;
   }
 }
 

@@ -17,12 +17,12 @@ import java.util.function.Consumer;
 
 public class BlockPalette {
   private static final int BLOCK_PALETTE_VERSION = 1;
-  public final int airId, stoneId;
+  public final int airId, stoneId, waterId;
 
   private static final Map<String, Consumer<Block>> materialProperties = new HashMap<>();
 
   /** Stone blocks are used for filling invisible regions in the Octree. */
-  public final Block stone;
+  public final Block stone, water;
 
   private final Map<BlockSpec, Integer> blockMap = new HashMap<>();
   private final List<Block> palette = new ArrayList<>();
@@ -32,9 +32,13 @@ public class BlockPalette {
     airTag.add("Name", new StringTag("minecraft:air"));
     CompoundTag stoneTag = new CompoundTag();
     stoneTag.add("Name", new StringTag("minecraft:stone"));
+    CompoundTag waterTag = new CompoundTag();
+    waterTag.add("Name", new StringTag("minecraft:water"));
     airId = put(airTag);
     stoneId = put(stoneTag);
+    waterId = put(waterTag);
     stone = get(stoneId);
+    water = get(waterId);
   }
 
   /**
@@ -135,12 +139,22 @@ public class BlockPalette {
     materialProperties.put("minecraft:sea_lantern", block -> {
       block.emittance = 0.5f;
     });
+    materialProperties.put("minecraft:magma", block -> {
+      block.emittance = 0.6f;
+    });
+    materialProperties.put("minecraft:end_rod", block -> {
+      block.emittance = 1.0f;
+    });
+    materialProperties.put("minecraft:kelp", block -> {
+      block.waterlogged = true;
+    });
+    materialProperties.put("minecraft:kelp_plant", block -> {
+      block.waterlogged = true;
+    });
+    // TODO: handle glass panes (multiple different block names).
     /*STAINED_GLASS.ior = 1.52f;
     GLASSPANE.ior = 1.52f;
-    STAINED_GLASSPANE.ior = 1.52f;
-    ENDROD.emittance = 1.0f;
-    FROSTEDICE.ior = 1.31f;
-    MAGMA.emittance = 0.6f;*/
+    STAINED_GLASSPANE.ior = 1.52f;*/
   }
 
   /**
