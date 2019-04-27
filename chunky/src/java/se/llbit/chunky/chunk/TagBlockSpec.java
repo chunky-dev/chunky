@@ -109,7 +109,7 @@ public class TagBlockSpec implements BlockSpec {
           return new Water(level);
         }
         case "bubble_column":
-          return new UnknownBlock(name);
+          return new Water(0); // TODO: render bubbles!
         case "lava": {
           int level = 0;
           try {
@@ -236,11 +236,13 @@ public class TagBlockSpec implements BlockSpec {
         case "dead_bush":
           return new SpriteBlock(name, Texture.deadBush);
         case "seagrass":
-          // TODO 1.13
-          return new UnknownBlock(name);
-        case "tall_seagrass":
-          // TODO 1.13
-          return new UnknownBlock(name);
+          return new SpriteBlock(name, Texture.seagrass);
+        case "tall_seagrass": {
+          String half = tag.get("Properties").get("half").stringValue("lower");
+          return new SpriteBlock(name, half.equals("lower")
+              ? Texture.tallSeagrassBottom
+              : Texture.tallSeagrassTop);
+        }
         case "sea_pickle":
           // TODO 1.13
           return new UnknownBlock(name);

@@ -151,6 +151,12 @@ public class BlockPalette {
     materialProperties.put("minecraft:kelp_plant", block -> {
       block.waterlogged = true;
     });
+    materialProperties.put("minecraft:seagrass", block -> {
+      block.waterlogged = true;
+    });
+    materialProperties.put("minecraft:tall_seagrass", block -> {
+      block.waterlogged = true;
+    });
     // TODO: handle glass panes (multiple different block names).
     /*STAINED_GLASS.ior = 1.52f;
     GLASSPANE.ior = 1.52f;

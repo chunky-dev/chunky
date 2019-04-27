@@ -3063,6 +3063,13 @@ public class TexturePackLoader {
     allTextures.put("kelp_plant",
         new SimpleTexture("assets/minecraft/textures/block/kelp_plant", Texture.kelpPlant));
 
+    allTextures.put("seagrass",
+        new SimpleTexture("assets/minecraft/textures/block/seagrass", Texture.seagrass));
+    allTextures.put("tall_seagrass_top",
+        new SimpleTexture("assets/minecraft/textures/block/tall_seagrass_top", Texture.tallSeagrassTop));
+    allTextures.put("tall_seagrass_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/tall_seagrass_bottom", Texture.tallSeagrassBottom));
+
     allTextures.put("dried_kelp_side",
         new SimpleTexture("assets/minecraft/textures/block/dried_kelp_side",
             Texture.driedKelpSide));

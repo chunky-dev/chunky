@@ -630,13 +630,23 @@ public class Scene implements JsonSerializable, Refreshable {
    * @return {@code true} if the ray intersects a voxel
    */
   private boolean worldIntersection(Ray ray) {
-    Ray origin = new Ray(ray);
-    origin.setCurrentMaterial(ray.getPrevMaterial(), ray.getPrevData());
+    Ray start = new Ray(ray);
+    start.setCurrentMaterial(ray.getPrevMaterial(), ray.getPrevData());
     boolean hit = false;
-    if (ray.getCurrentMaterial().isWater()) {
-      Ray r = new Ray(origin);
-      r.setCurrentMaterial(origin.getPrevMaterial(), origin.getPrevData());
-      if (waterOctree.exitWater(this, r, palette) && r.distance < ray.t) {
+    Ray r = new Ray(start);
+    r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
+    if (worldOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
+      ray.t = r.distance;
+      ray.n.set(r.n);
+      ray.color.set(r.color);
+      ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
+      ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
+      hit = true;
+    }
+    if (start.getCurrentMaterial().isWater()) {
+      r = new Ray(start);
+      r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
+      if (waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
         ray.t = r.distance;
         ray.n.set(r.n);
         ray.color.set(r.color);
@@ -645,8 +655,8 @@ public class Scene implements JsonSerializable, Refreshable {
         hit = true;
       }
     } else {
-      Ray r = new Ray(origin);
-      r.setCurrentMaterial(origin.getPrevMaterial(), origin.getPrevData());
+      r = new Ray(start);
+      r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
       if (waterOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
         ray.t = r.distance;
         ray.n.set(r.n);
@@ -655,16 +665,6 @@ public class Scene implements JsonSerializable, Refreshable {
         ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
         hit = true;
       }
-    }
-    Ray r = new Ray(origin);
-    r.setCurrentMaterial(origin.getPrevMaterial(), origin.getPrevData());
-    if (worldOctree.enterBlock(this, r, palette) && r.distance < ray.t) {
-      ray.t = r.distance;
-      ray.n.set(r.n);
-      ray.color.set(r.color);
-      ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
-      ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
-      hit = true;
     }
     return hit;
   }

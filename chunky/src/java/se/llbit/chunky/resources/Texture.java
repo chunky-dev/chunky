@@ -658,6 +658,9 @@ public class Texture {
   // [1.13]
   public static final Texture kelp = new Texture();
   public static final Texture kelpPlant = new Texture();
+  public static final Texture seagrass = new Texture();
+  public static final Texture tallSeagrassTop = new Texture();
+  public static final Texture tallSeagrassBottom = new Texture();
 
   public static final Texture driedKelpSide = new Texture();
   public static final Texture driedKelpTop = new Texture();
