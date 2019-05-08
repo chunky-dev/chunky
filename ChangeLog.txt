@@ -1,5 +1,7 @@
 LATEST
 
+* Removed 2D map rendering modes.
+* Removed block highlighting in the 2D map.
 * Added Update Site url setting in the launcher.
 * The render thread count setting now takes effect after restarting Chunky.
 * Fixed concurrency issues in the renderer.
