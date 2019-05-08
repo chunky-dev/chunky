@@ -29,39 +29,45 @@ import javafx.beans.value.ObservableValue;
  * <p>The change listeners in a single group must all be invoked in the
  * same thread. The grouped change listeners do not mutually exclude
  * each other if they are called from different threads.
+ *
+ * <p>This class is not thread-safe: concurrent changes are not supported!
+ *
  * @param <T>
  */
 public class GroupedChangeListener<T> implements ChangeListener<T> {
   private final ChangeListener<T> listener;
-  private final GroupedChangeListener<?> groupOwner;
-  private boolean recursive = false;
+  private final ListenerGroup group;
+
 
   /**
-   * @param listener the nested change listener - called when the change listener
-   * should trigger (non-recursively only)
+   * Represents a group of change listeners which should not be invoked recursively.
    */
-  public GroupedChangeListener(ChangeListener<T> listener) {
-    this.listener = listener;
-    this.groupOwner = this;
+  public static class ListenerGroup {
+    private boolean recursive = false;
+  }
+
+  /** Creates a new change listener group. */
+  public static ListenerGroup newGroup() {
+    return new ListenerGroup();
   }
 
   /**
-   * @param groupOwner the representative change listener of this group
+   * @param group the group which this listener is linked to
    * @param listener the nested change listener - called when the change listener
    * should trigger (non-recursively only)
    */
-  public GroupedChangeListener(GroupedChangeListener<?> groupOwner, ChangeListener<T> listener) {
+  public GroupedChangeListener(ListenerGroup group, ChangeListener<T> listener) {
     this.listener = listener;
-    this.groupOwner = groupOwner;
+    this.group = group;
   }
 
   @Override public void changed(ObservableValue<? extends T> observable, T oldValue, T newValue) {
-    if (!groupOwner.recursive) {
+    if (!group.recursive) {
       try {
-        groupOwner.recursive = true;
+        group.recursive = true;
         listener.changed(observable, oldValue, newValue);
       } finally {
-        groupOwner.recursive = false;
+        group.recursive = false;
       }
     }
   }

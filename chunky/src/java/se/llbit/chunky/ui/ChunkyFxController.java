@@ -217,7 +217,7 @@ public class ChunkyFxController
     scaleSlider.valueProperty().bindBidirectional(scaleProperty);
 
     // Add listeners to the properties to control the map view.
-    GroupedChangeListener<Object> group = new GroupedChangeListener<>(null);
+    GroupedChangeListener.ListenerGroup group = GroupedChangeListener.newGroup();
     xProperty.addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
       ChunkView view = mapLoader.getMapView();
       mapLoader.panTo(newValue.doubleValue() / 16, view.z);
