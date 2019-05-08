@@ -36,7 +36,7 @@ import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.resources.OctreeLoader;
+import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -502,13 +502,7 @@ public class Scene implements JsonSerializable, Refreshable {
       mode = RenderMode.PAUSED;
     }
 
-    if (loadOctree(context, taskTracker)) {
-      boolean haveGrass = loadGrassTexture(context, taskTracker);
-      boolean haveFoliage = loadFoliageTexture(context, taskTracker);
-      if (!haveGrass || !haveFoliage) {
-        biomeColors = false;
-      }
-    } else {
+    if (!loadOctree(context, taskTracker)) {
       // Could not load stored octree.
       // Load the chunks from the world.
       if (loadedWorld == EmptyWorld.INSTANCE) {
@@ -1649,7 +1643,8 @@ public class Scene implements JsonSerializable, Refreshable {
       Log.info("Saving octree " + fileName);
 
       try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName)))) {
-        OctreeLoader.store(out, worldOctree, palette);
+        OctreeFileFormat.store(out, worldOctree, waterOctree, palette,
+            grassTexture, foliageTexture);
         worldOctree.setTimestamp(context.fileTimestamp(fileName));
 
         task.update(2);
@@ -1733,10 +1728,13 @@ public class Scene implements JsonSerializable, Refreshable {
       task.update(1);
       Log.info("Loading octree " + fileName);
       try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)))) {
-        OctreeLoader loader = new OctreeLoader();
-        loader.load(in);
-        worldOctree = loader.octree;
-        worldOctree.setTimestamp(context.fileTimestamp(fileName));
+        long fileTimestamp = context.fileTimestamp(fileName);
+        OctreeFileFormat.OctreeData data = OctreeFileFormat.load(in);
+        worldOctree = data.worldTree;
+        worldOctree.setTimestamp(fileTimestamp);
+        waterOctree = data.waterTree;
+        grassTexture = data.grassColors;
+        foliageTexture = data.foliageColors;
         task.update(2);
         Log.info("Octree loaded");
         calculateOctreeOrigin(chunks);
@@ -1745,43 +1743,7 @@ public class Scene implements JsonSerializable, Refreshable {
         buildActorBvh();
         return true;
       } catch (IOException e) {
-        Log.info("Failed to load chunk octree: missing file or incorrect format!", e);
-        return false;
-      }
-    }
-  }
-
-  private synchronized boolean loadGrassTexture(RenderContext context, TaskTracker progress) {
-    String fileName = name + ".grass";
-    try (TaskTracker.Task task = progress.task("Loading grass texture", 2)) {
-      task.update(1);
-      Log.info("Loading grass texture " + fileName);
-      try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)))) {
-        grassTexture = WorldTexture.load(in);
-        grassTexture.setTimestamp(context.fileTimestamp(fileName));
-        task.update(2);
-        Log.info("Grass texture loaded");
-        return true;
-      } catch (IOException e) {
-        Log.info("Failed to load grass texture!");
-        return false;
-      }
-    }
-  }
-
-  private synchronized boolean loadFoliageTexture(RenderContext context, TaskTracker progress) {
-    String fileName = name + ".foliage";
-    try (TaskTracker.Task task = progress.task("Loading foliage texture", 2)) {
-      task.update(1);
-      Log.info("Loading foliage texture " + fileName);
-      try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)))) {
-        foliageTexture = WorldTexture.load(in);
-        foliageTexture.setTimestamp(context.fileTimestamp(fileName));
-        task.update(2);
-        Log.info("Foliage texture loaded");
-        return true;
-      } catch (IOException e) {
-        Log.info("Failed to load foliage texture!");
+        Log.error("Failed to load chunk data!", e);
         return false;
       }
     }
