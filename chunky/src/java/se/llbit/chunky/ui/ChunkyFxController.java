@@ -90,71 +90,38 @@ public class ChunkyFxController
 
   @FXML private Canvas mapCanvas;
   @FXML private Canvas mapOverlay;
-
   @FXML private Canvas minimapCanvas;
-
   @FXML private MenuItem menuExit;
-
   @FXML private VBox rootContainer;
-
   @FXML private Button clearSelectionBtn;
-
   @FXML private Button changeWorldBtn;
-
   @FXML private Button reloadWorldBtn;
-
   @FXML private ToggleButton overworldBtn;
-
   @FXML private ToggleButton netherBtn;
-
   @FXML private ToggleButton endBtn;
-
   @FXML private TextField scaleField;
-
   @FXML private Slider scaleSlider;
-
   @FXML private ToggleButton trackPlayerBtn;
-
   @FXML private ToggleButton trackCameraBtn;
-
   @FXML private Tab mapViewTab;
-
   @FXML private Tab chunksTab;
-
   @FXML private Tab optionsTab;
-
   @FXML private Tab renderTab;
-
   @FXML private Tab aboutTab;
-
   @FXML private Button editResourcePacks;
-
   @FXML private CheckBox singleColorBtn;
-
   @FXML private CheckBox showLauncherBtn;
-
   @FXML private Button clearSelectionBtn2;
-
   @FXML private Button newSceneBtn;
-
   @FXML private Button loadSceneBtn;
-
   @FXML private Button openSceneDirBtn;
-
   @FXML private Button changeSceneDirBtn;
-
   @FXML private Hyperlink documentationLink;
-
   @FXML private Hyperlink gitHubLink;
-
   @FXML private Hyperlink issueTrackerLink;
-
   @FXML private Hyperlink forumLink;
-
   @FXML private Button creditsBtn;
-
   @FXML private TextField xPosition;
-
   @FXML private TextField zPosition;
   @FXML private Button deleteChunks;
   @FXML private Button exportZip;
