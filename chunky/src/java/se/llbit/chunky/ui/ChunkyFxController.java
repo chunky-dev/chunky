@@ -30,6 +30,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
@@ -86,11 +87,10 @@ public class ChunkyFxController
   private final Chunky chunky;
   private WorldMapLoader mapLoader;
   private ChunkMap map;
-  private Minimap minimap;
 
   @FXML private Canvas mapCanvas;
   @FXML private Canvas mapOverlay;
-  @FXML private Canvas minimapCanvas;
+  @FXML private Label mapName;
   @FXML private MenuItem menuExit;
   @FXML private VBox rootContainer;
   @FXML private Button clearSelectionBtn;
@@ -127,7 +127,6 @@ public class ChunkyFxController
   @FXML private Button exportZip;
   @FXML private Button renderPng;
   @FXML private StackPane mapPane;
-  @FXML private StackPane minimapPane;
   @FXML private TabPane tabPane;
 
   private RenderControlsFx controls = null;
@@ -138,23 +137,18 @@ public class ChunkyFxController
     this.chunky = chunky;
     mapLoader = new WorldMapLoader(this);
     map = new ChunkMap(mapLoader, this);
-    minimap = new Minimap(mapLoader, this);
     mapLoader.addViewListener(this);
     mapLoader.addViewListener(map);
-    mapLoader.addViewListener(minimap);
     mapLoader.getChunkSelection().addSelectionListener(this);
     mapLoader.getChunkSelection().addChunkUpdateListener(map);
-    mapLoader.getChunkSelection().addChunkUpdateListener(minimap);
     mapLoader.addWorldLoadListener(() -> {
       map.redrawMap();
-      minimap.redrawMap();
     });
   }
 
   @Override public void initialize(URL fxmlUrl, ResourceBundle resources) {
     Log.setReceiver(new UILogReceiver(), Level.ERROR, Level.WARNING);
     map.setCanvas(mapCanvas);
-    minimap.setCanvas(minimapCanvas);
 
     mapPane.widthProperty().addListener((observable, oldValue, newValue) -> {
       mapCanvas.setWidth(newValue.doubleValue());
@@ -346,7 +340,6 @@ public class ChunkyFxController
     clearSelectionBtn.setOnAction(event -> mapLoader.clearChunkSelection());
 
     mapLoader.setMapSize((int) mapCanvas.getWidth(), (int) mapCanvas.getHeight());
-    mapLoader.setMinimapSize((int) minimapCanvas.getWidth(), (int) minimapCanvas.getHeight());
     mapOverlay.setOnScroll(map::onScroll);
     mapOverlay.setOnMousePressed(map::onMousePressed);
     mapOverlay.setOnMouseReleased(map::onMouseReleased);
@@ -355,8 +348,9 @@ public class ChunkyFxController
     mapOverlay.addEventFilter(MouseEvent.ANY, event -> mapOverlay.requestFocus());
     mapOverlay.setOnKeyPressed(map::onKeyPressed);
     mapOverlay.setOnKeyReleased(map::onKeyReleased);
-    minimapCanvas.setOnMousePressed(minimap::onMousePressed);
 
+    mapLoader.addWorldLoadListener(
+        () -> mapName.setText(mapLoader.getWorld().levelName()));
     mapLoader.loadWorld(PersistentSettings.getLastWorld());
   }
 
@@ -499,18 +493,10 @@ public class ChunkyFxController
   @Override public void chunkSelectionChanged() {
   }
 
-  public Canvas getMinimapCanvas() {
-    return minimapCanvas;
-  }
-
   @Override public void regionUpdated(ChunkPosition region) {
   }
 
   @Override public void chunkUpdated(ChunkPosition region) {
-  }
-
-  public Minimap getMinimap() {
-    return minimap;
   }
 
   public Chunky getChunky() {

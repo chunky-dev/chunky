@@ -64,10 +64,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
   protected ChunkSelectionTracker chunkSelection = new ChunkSelectionTracker();
 
   private volatile ObjectProperty<ChunkView> map = new SimpleObjectProperty<>(ChunkView.EMPTY);
-  private volatile ChunkView minimap = ChunkView.EMPTY;
-
-  int minimapWidth = 100;
-  int minimapHeight = 100;
 
   private List<ChunkViewListener> viewListeners = new ArrayList<>();
   private List<Runnable> worldLoadListeners = new ArrayList<>();
@@ -127,7 +123,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
 
     newWorld.addChunkUpdateListener(controller);
     newWorld.addChunkUpdateListener(controller.getMap());
-    newWorld.addChunkUpdateListener(controller.getMinimap());
     chunkSelection.clearSelection();
 
     world = newWorld;
@@ -162,12 +157,10 @@ public class WorldMapLoader implements ChunkTopographyListener {
   public synchronized void viewUpdated(ChunkView mapView) {
     refresher.setView(mapView);
 
-    minimap = new ChunkView(mapView.x, mapView.z, minimapWidth, minimapHeight, 1);
-
-    int rx0 = Math.min(minimap.prx0, mapView.prx0);
-    int rx1 = Math.max(minimap.prx1, mapView.prx1);
-    int rz0 = Math.min(minimap.prz0, mapView.prz0);
-    int rz1 = Math.max(minimap.prz1, mapView.prz1);
+    int rx0 = mapView.prx0;
+    int rx1 = mapView.prx1;
+    int rz0 = mapView.prz0;
+    int rz1 = mapView.prz1;
 
     // Enqueue visible regions and chunks.
     for (int rx = rx0; rx <= rx1; ++rx) {
@@ -186,17 +179,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
     ChunkView mapView = map.get();
     if (width != mapView.width || height != mapView.height) {
       map.set(new ChunkView(mapView.x, mapView.z, width, height, mapView.scale));
-    }
-  }
-
-  /**
-   * Called when the minimap has been resized.
-   */
-  public void setMinimapSize(int width, int height) {
-    if (width != minimapWidth || height != minimapHeight) {
-      minimapWidth = width;
-      minimapHeight = height;
-      viewUpdated(map.get());
     }
   }
 
@@ -257,12 +239,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
    */
   public ObjectProperty<ChunkView> getMapViewProperty() {
     return map;
-  }
-  /**
-   * @return The current minimap view
-   */
-  public ChunkView getMinimapView() {
-    return minimap;
   }
 
   /**
