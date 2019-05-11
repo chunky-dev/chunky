@@ -23,6 +23,7 @@ import se.llbit.chunky.map.CorruptLayer;
 import se.llbit.chunky.map.MapTile;
 import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.chunky.map.UnknownLayer;
+import se.llbit.chunky.map.UnsupportedMC113Layer;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.ListTag;
@@ -164,15 +165,20 @@ public class Chunk {
     Heightmap heightmap = world.heightmap();
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
-      int[] heightmapData = extractHeightmapData(data);
-      byte[] biomeData = new byte[X_MAX * Z_MAX];
-      extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
-      byte[] chunkData = new byte[CHUNK_BYTES];
-      byte[] blockData = new byte[CHUNK_BYTES];
-      extractChunkData(data, chunkData, blockData);
-      updateHeightmap(heightmap, position, chunkData, heightmapData);
-      surface = new SurfaceLayer(world.currentDimension(), chunkData, biomeData, blockData);
-      queueTopography();
+      String cv = chunkVersion(data);
+      if (cv.equals("1.13")) {
+        surface = UnsupportedMC113Layer.INSTANCE;
+      } else if (cv.equals("1.12")) {
+        int[] heightmapData = extractHeightmapData(data);
+        byte[] biomeData = new byte[X_MAX * Z_MAX];
+        extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
+        byte[] chunkData = new byte[CHUNK_BYTES];
+        byte[] blockData = new byte[CHUNK_BYTES];
+        extractChunkData(data, chunkData, blockData);
+        updateHeightmap(heightmap, position, chunkData, heightmapData);
+        surface = new SurfaceLayer(world.currentDimension(), chunkData, biomeData, blockData);
+        queueTopography();
+      }
     } else {
       surface = CorruptLayer.INSTANCE;
     }
@@ -220,11 +226,29 @@ public class Chunk {
     }
   }
 
+  /** Detect Minecraft version that generated the chunk. */
+  private String chunkVersion(@NotNull Map<String, Tag> data) {
+    Tag sections = data.get(LEVEL_SECTIONS);
+    String version = "1.13";
+    if (sections.isList()) {
+      for (SpecificTag section : sections.asList()) {
+        if (!section.get("Palette").isList()) {
+          if (!version.equals("?") && section.get("Blocks").isByteArray(SECTION_BYTES)) {
+            version = "1.12";
+          } else {
+            version = "?";
+          }
+        }
+      }
+    }
+    return version;
+  }
+
   private void extractChunkData(@NotNull Map<String, Tag> data, @NotNull byte[] blocks,
       @NotNull byte[] blockData) {
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
-      for (SpecificTag section : ((ListTag) sections)) {
+      for (SpecificTag section : sections.asList()) {
         Tag yTag = section.get("Y");
         int yOffset = yTag.byteValue() & 0xFF;
         Tag blocksTag = section.get("Blocks");
