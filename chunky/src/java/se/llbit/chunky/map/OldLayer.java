@@ -38,11 +38,11 @@ public class OldLayer extends AbstractLayer {
       tile.setPixel(0, 0, averageColor);
     } else {
       // TODO: scale the image to the current tile size.
-      tile.drawImage(Icon.pencil.getBitmap());
+      tile.drawImage(Icon.MC_1_12.getBitmap());
     }
   }
 
-  private final int averageColor = Icon.pencil.getAvgColor();
+  private final int averageColor = Icon.MC_1_12.getAvgColor();
 
   @Override public int getAvgColor() {
     return averageColor;

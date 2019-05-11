@@ -53,6 +53,7 @@ public class Icon extends Texture {
   public static final Icon wrench = new Icon("wrench");
   public static final Icon pencil = new Icon("pencil");
   public static final Icon MC_1_13 = new Icon("1_13");
+  public static final Icon MC_1_12 = new Icon("1_12");
   public static final Icon map = new Icon("map");
   public static final Icon mapSelected = new Icon("map-selected");
   public static final Icon disk = new Icon("disk");
