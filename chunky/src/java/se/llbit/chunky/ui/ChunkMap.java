@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2019 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.ui;
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -28,7 +29,9 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.stage.PopupWindow;
+import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.WorldMapLoader;
+import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -36,6 +39,7 @@ import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.PlayerEntityData;
 import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -46,43 +50,52 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * UI component that draws a 2D Minecraft map.
+ * UI component for the 2D world map.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class ChunkMap extends Map2D {
-
+public class ChunkMap implements ChunkUpdateListener, ChunkViewListener {
   /** Controls the selection area when selecting visible chunks. */
   private static final double CHUNK_SELECT_RADIUS = -8 * 1.4142;
+  protected final WorldMapLoader mapLoader;
+  protected final ChunkyFxController controller;
+  protected final MapBuffer mapBuffer;
+  protected final ContextMenu contextMenu = new ContextMenu();
+  protected final MenuItem moveCameraHere;
+  protected final MenuItem selectVisible;
+  public Tooltip tooltip = new Tooltip();
+  public int lastX;
+  public int lastY;
+  public int clickX;
+  public int clickY;
 
+  /**
+   * The map view can be modified by external threads.
+   * Objects of type ChunkView are immutable, but each time
+   * we need to read the view we should only read the view
+   * reference once.
+   */
+  protected volatile ChunkView view = ChunkView.EMPTY;
   /**
    * Indicates whether or not the selection rectangle should be drawn.
    */
   protected volatile boolean selectRect = false;
-
-  private final ContextMenu contextMenu = new ContextMenu();
-  private final MenuItem moveCameraHere;
-  private final MenuItem selectVisible;
-
-  private volatile ChunkPosition start = ChunkPosition.get(0, 0);
-  private volatile ChunkPosition end = ChunkPosition.get(0, 0);
-
-  public int lastX;
-  public int lastY;
-
-  public int clickX;
-  public int clickY;
-
+  protected volatile ChunkPosition start = ChunkPosition.get(0, 0);
+  protected volatile ChunkPosition end = ChunkPosition.get(0, 0);
   protected boolean ctrlModifier = false;
   protected boolean shiftModifier = false;
-
   protected boolean dragging = false;
   protected boolean mouseDown = false;
 
-  public Tooltip tooltip = new Tooltip();
+  private Canvas canvas;
+  volatile boolean repaintQueued = false;
 
   public ChunkMap(final WorldMapLoader loader, final ChunkyFxController controller) {
-    super(loader, controller);
+    this.mapLoader = loader;
+    this.controller = controller;
+    mapBuffer = new MapBuffer();
+    moveCameraHere = new MenuItem("Move camera here");
+    selectVisible = new MenuItem("Select visible chunks");
 
     tooltip.setAutoHide(true);
     tooltip.setConsumeAutoHidingEvents(false);
@@ -100,7 +113,6 @@ public class ChunkMap extends Map2D {
     clearSelection.setGraphic(new ImageView(Icon.clear.fxImage()));
     clearSelection.setOnAction(event -> loader.clearChunkSelection());
 
-    moveCameraHere = new MenuItem("Move camera here");
     moveCameraHere.setOnAction(event -> {
       ChunkView theView = new ChunkView(view);  // Make thread-local copy.
       double scale = theView.scale;
@@ -109,7 +121,6 @@ public class ChunkMap extends Map2D {
       controller.moveCameraTo(x * 16, z * 16);
     });
 
-    selectVisible = new MenuItem("Select visible chunks");
     selectVisible.setGraphic(new ImageView(Icon.eye.fxImage()));
     selectVisible.setOnAction(event -> {
       ChunkView mapView = new ChunkView(view);  // Make thread-local copy.
@@ -123,6 +134,31 @@ public class ChunkMap extends Map2D {
         .addAll(createScene, loadScene, clearSelection, moveCameraHere, selectVisible);
   }
 
+  @Override public void chunkUpdated(ChunkPosition chunk) {
+    if (view.chunkScale >= 16) {
+      mapBuffer.drawTile(mapLoader, chunk);
+    } else {
+      regionUpdated(chunk.getRegionPosition());
+    }
+    repaintDeferred();
+  }
+
+  protected final void repaintDirect() {
+    if (!repaintQueued) {
+      repaint(canvas.getGraphicsContext2D());
+    }
+  }
+
+  protected final void repaintDeferred() {
+    if (!repaintQueued) {
+      repaintQueued = true;
+      Platform.runLater(() -> {
+        repaint(canvas.getGraphicsContext2D());
+        repaintQueued = false;
+      });
+    }
+  }
+
   /**
    * Draws a visualization of the 3D camera view on the 2D map.
    */
@@ -133,7 +169,7 @@ public class ChunkMap extends Map2D {
     if (controller.hasActiveRenderControls()) {
       // TODO: this can block for a long time, so it should ideally not be done on the JavaFX application thread.
       controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
-          scene -> drawViewBounds(gc, mapView, scene));
+          scene -> ChunkMap.drawViewBounds(gc, mapView, scene));
     }
   }
 
@@ -218,6 +254,37 @@ public class ChunkMap extends Map2D {
         progress.finishJob();
       }
     }
+  }
+
+  @Override public void regionUpdated(ChunkPosition region) {
+    if (view.scale < 16) {
+      mapBuffer.drawTile(mapLoader, region);
+      mapLoader.regionUpdated(region);
+      repaintDeferred();
+    }
+  }
+
+  /**
+   * Called when the map view has changed.
+   */
+  public synchronized void viewUpdated(ChunkView newView) {
+    setView(newView);
+    mapBuffer.updateView(view, mapLoader);
+  }
+
+  protected void setView(ChunkView newView) {
+    view = newView;
+  }
+
+  @Override public void viewUpdated() {
+    viewUpdated(mapLoader.getMapView());
+    mapBuffer.redrawView(mapLoader);
+    repaintDirect();
+  }
+
+  @Override public void viewMoved() {
+    mapBuffer.redrawView(mapLoader);
+    repaintDirect();
   }
 
   public int getWidth() {
@@ -374,8 +441,8 @@ public class ChunkMap extends Map2D {
     }
   }
 
-  @Override protected void repaint(GraphicsContext gc) {
-    super.repaint(gc);
+  protected void repaint(GraphicsContext gc) {
+    mapBuffer.drawBuffered(gc);
     drawPlayers(gc);
     drawSpawn(gc);
     drawSelectionRect(gc);
@@ -419,6 +486,16 @@ public class ChunkMap extends Map2D {
     ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
 
     gc.drawImage(Icon.home.fxImage(), ppx, ppy, pw, pw);
+  }
+
+  public ChunkView getView() {
+    return view;
+  }
+
+  public void redrawMap() {
+    mapBuffer.clearBuffer();
+    mapBuffer.redrawView(mapLoader);
+    repaintDeferred();
   }
 
   @Override public void cameraPositionUpdated() {
@@ -630,5 +707,9 @@ public class ChunkMap extends Map2D {
     int x2 = (int) v2.x;
     int y2 = (int) v2.y;
     gc.strokeLine(x1, y1, x2, y2);
+  }
+
+  public void setCanvas(Canvas canvas) {
+    this.canvas = canvas;
   }
 }
