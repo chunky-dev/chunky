@@ -16,9 +16,7 @@
  */
 package se.llbit.chunky.map;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.ZipExportJob;
@@ -48,11 +46,6 @@ import java.util.List;
 public class WorldMapLoader implements ChunkTopographyListener {
   private final ChunkyFxController controller;
 
-  private BooleanProperty trackPlayer =
-      new SimpleBooleanProperty(PersistentSettings.getFollowPlayer());
-  private BooleanProperty trackCamera =
-      new SimpleBooleanProperty(PersistentSettings.getFollowCamera());
-
   private World world = EmptyWorld.instance;
 
   private final RegionQueue regionQueue = new RegionQueue();
@@ -74,22 +67,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
     map.addListener((observable, oldValue, newValue) -> {
       if (newValue.shouldRepaint(oldValue)) {
         viewUpdated(newValue);
-      }
-    });
-
-    trackPlayer.addListener(e -> {
-      boolean track = trackPlayer.get();
-      PersistentSettings.setFollowPlayer(track);
-      if (track) {
-        panToPlayer();
-      }
-    });
-
-    trackCamera.addListener(e -> {
-      boolean track = trackCamera.get();
-      PersistentSettings.setFollowCamera(track);
-      if (track) {
-        controller.panToCamera();
       }
     });
 
@@ -399,14 +376,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
 
   public int getDimension() {
     return currentDimension;
-  }
-
-  public BooleanProperty trackPlayerProperty() {
-    return trackPlayer;
-  }
-
-  public BooleanProperty trackCameraProperty() {
-    return trackCamera;
   }
 
   public void drawCameraVisualization() {

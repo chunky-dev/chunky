@@ -17,8 +17,10 @@
 package se.llbit.chunky.ui;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
@@ -129,6 +131,11 @@ public class ChunkyFxController
   @FXML private StackPane mapPane;
   @FXML private TabPane tabPane;
 
+  private BooleanProperty trackPlayer =
+      new SimpleBooleanProperty(PersistentSettings.getFollowPlayer());
+  private BooleanProperty trackCamera =
+      new SimpleBooleanProperty(PersistentSettings.getFollowCamera());
+
   private RenderControlsFx controls = null;
   private Stage stage;
   private Path prevPngDir = null;
@@ -144,6 +151,23 @@ public class ChunkyFxController
     mapLoader.addWorldLoadListener(() -> {
       map.redrawMap();
     });
+
+    trackPlayer.addListener(e -> {
+      boolean track = trackPlayer.get();
+      PersistentSettings.setFollowPlayer(track);
+      if (track) {
+        mapLoader.panToPlayer();
+      }
+    });
+
+    trackCamera.addListener(e -> {
+      boolean track = trackCamera.get();
+      PersistentSettings.setFollowCamera(track);
+      if (track) {
+        panToCamera();
+      }
+    });
+
   }
 
   @Override public void initialize(URL fxmlUrl, ResourceBundle resources) {
@@ -303,8 +327,8 @@ public class ChunkyFxController
       PersistentSettings.setSingleColorTextures(newValue);
     });
 
-    trackPlayerBtn.selectedProperty().bindBidirectional(mapLoader.trackPlayerProperty());
-    trackCameraBtn.selectedProperty().bindBidirectional(mapLoader.trackCameraProperty());
+    trackPlayerBtn.selectedProperty().bindBidirectional(trackPlayer);
+    trackCameraBtn.selectedProperty().bindBidirectional(trackCamera);
 
     overworldBtn.setSelected(mapLoader.getDimension() == World.OVERWORLD_DIMENSION);
     overworldBtn.setTooltip(new Tooltip("Full of grass and Creepers!"));
@@ -483,8 +507,8 @@ public class ChunkyFxController
   }
 
   @Override public void viewMoved() {
-    mapLoader.trackPlayerProperty().set(false);
-    mapLoader.trackCameraProperty().set(false);
+    trackPlayer.set(false);
+    trackCamera.set(false);
   }
 
   @Override public void cameraPositionUpdated() {
