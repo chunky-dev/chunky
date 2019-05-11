@@ -65,7 +65,7 @@ public class MapBuffer {
   /**
    * Called when this render buffer should buffer another view.
    */
-  public synchronized void updateView(ChunkView newView, WorldMapLoader loader) {
+  public synchronized void updateView(ChunkView newView) {
     boolean rebuild = newView.scale != view.scale;
     updateView(newView, rebuild);
   }

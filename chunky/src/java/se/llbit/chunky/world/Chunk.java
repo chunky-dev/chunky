@@ -24,7 +24,6 @@ import se.llbit.chunky.map.MapTile;
 import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.chunky.map.UnknownLayer;
 import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.ui.MapViewMode;
 import se.llbit.nbt.Tag;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ErrorTag;
@@ -143,7 +142,11 @@ public class Chunk {
       return;
     }
 
-    Map<String, Tag> data = getChunkData(MapViewMode.getRequest());
+    Set<String> request = new HashSet<>();
+    request.add(Chunk.LEVEL_SECTIONS);
+    request.add(Chunk.LEVEL_BIOMES);
+    request.add(Chunk.LEVEL_HEIGHTMAP);
+    Map<String, Tag> data = getChunkData(request);
 
     surfaceTimestamp = dataTimestamp;
     loadSurface(data);
