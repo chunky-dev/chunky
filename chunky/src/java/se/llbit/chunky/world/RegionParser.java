@@ -51,7 +51,7 @@ public class RegionParser extends Thread {
         region.parse();
         for (Chunk chunk : region) {
           if (map.shouldPreload(chunk)) {
-            chunk.loadChunk(mapLoader);
+            chunk.loadChunk();
           }
         }
       }

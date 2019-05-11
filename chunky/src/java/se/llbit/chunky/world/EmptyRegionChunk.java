@@ -91,7 +91,7 @@ public class EmptyRegionChunk extends Chunk {
     // do nothing
   }
 
-  @Override public synchronized void loadChunk(WorldMapLoader loader) {
+  @Override public synchronized void loadChunk() {
     // do nothing
   }
 

@@ -23,13 +23,12 @@ import se.llbit.chunky.map.CorruptLayer;
 import se.llbit.chunky.map.MapTile;
 import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.chunky.map.UnknownLayer;
-import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.nbt.Tag;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.NamedTag;
 import se.llbit.nbt.SpecificTag;
+import se.llbit.nbt.Tag;
 import se.llbit.util.NotNull;
 
 import java.io.DataInputStream;
@@ -137,7 +136,7 @@ public class Chunk {
    * Parse the chunk from the region file and render the current
    * layer, surface and cave maps.
    */
-  public synchronized void loadChunk(WorldMapLoader loader) {
+  public synchronized void loadChunk() {
     if (!shouldReloadChunk()) {
       return;
     }
