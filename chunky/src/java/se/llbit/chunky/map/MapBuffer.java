@@ -148,7 +148,7 @@ public class MapBuffer {
 
   /**
    * Redraw all tiles in the current view.
-   * This draws to the map buffer, it does not render to the map canvas.
+   * This draws to the map buffer - it does not render to the map canvas.
    */
   public synchronized void redrawView(WorldMapLoader mapLoader) {
     int x0, x1, z0, z1;
@@ -202,6 +202,9 @@ public class MapBuffer {
    * so we do our own scaling here instead.
    */
   public synchronized void drawBuffered(GraphicsContext gc) {
+    if (view.width <= 0 || view.height <= 0) {
+      return;
+    }
     if (!cached) {
       if (image == null || image.getWidth() != view.width || image.getHeight() != view.height) {
         image = new WritableImage(view.width, view.height);

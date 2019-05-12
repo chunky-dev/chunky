@@ -53,8 +53,8 @@ import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
+import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
-import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
@@ -84,11 +84,12 @@ import java.util.ResourceBundle;
  * Controller for the main Chunky window.
  */
 public class ChunkyFxController
-    implements Initializable, ChunkViewListener, ChunkSelectionListener, ChunkUpdateListener {
+    implements Initializable, ChunkSelectionListener, ChunkUpdateListener {
 
   private final Chunky chunky;
   private WorldMapLoader mapLoader;
   private ChunkMap map;
+  private MapView mapView;
 
   @FXML private Canvas mapCanvas;
   @FXML private Canvas mapOverlay;
@@ -142,14 +143,20 @@ public class ChunkyFxController
 
   public ChunkyFxController(Chunky chunky) {
     this.chunky = chunky;
-    mapLoader = new WorldMapLoader(this);
-    map = new ChunkMap(mapLoader, this);
-    mapLoader.addViewListener(this);
-    mapLoader.addViewListener(map);
+    mapView = new MapView();
+    mapLoader = new WorldMapLoader(this, mapView);
+    map = new ChunkMap(mapLoader, this, mapView);
+    mapView.addViewListener(mapLoader);
+    mapView.addViewListener(map);
     mapLoader.getChunkSelection().addSelectionListener(this);
     mapLoader.getChunkSelection().addChunkUpdateListener(map);
     mapLoader.addWorldLoadListener(() -> {
       map.redrawMap();
+    });
+
+    map.setOnViewDragged(() -> {
+      trackPlayer.set(false);
+      trackCamera.set(false);
     });
 
     trackPlayer.addListener(e -> {
@@ -177,23 +184,23 @@ public class ChunkyFxController
     mapPane.widthProperty().addListener((observable, oldValue, newValue) -> {
       mapCanvas.setWidth(newValue.doubleValue());
       mapOverlay.setWidth(newValue.doubleValue());
-      mapLoader.setMapSize((int) mapCanvas.getWidth(), (int) mapCanvas.getHeight());
+      mapView.setMapSize((int) mapCanvas.getWidth(), (int) mapCanvas.getHeight());
     });
     mapPane.heightProperty().addListener((observable, oldValue, newValue) -> {
       mapCanvas.setHeight(newValue.doubleValue());
       mapOverlay.setHeight(newValue.doubleValue());
-      mapLoader.setMapSize((int) mapCanvas.getWidth(), (int) mapCanvas.getHeight());
+      mapView.setMapSize((int) mapCanvas.getWidth(), (int) mapCanvas.getHeight());
     });
 
     mapOverlay.setOnMouseExited(e -> map.tooltip.hide());
 
     // Set up property bindings for the map view.
-    ChunkView mapView = map.getView();  // Initial map view - only used to initialize controls.
+    ChunkView initialView = map.getView();  // Initial map view - only used to initialize controls.
 
     // A scale factor of 16 is used to convert map positions between block/chunk coordinates.
-    DoubleProperty xProperty = new SimpleDoubleProperty(mapView.x);
-    DoubleProperty zProperty = new SimpleDoubleProperty(mapView.z);
-    IntegerProperty scaleProperty = new SimpleIntegerProperty(mapView.scale);
+    DoubleProperty xProperty = new SimpleDoubleProperty(initialView.x);
+    DoubleProperty zProperty = new SimpleDoubleProperty(initialView.z);
+    IntegerProperty scaleProperty = new SimpleIntegerProperty(initialView.scale);
 
     // Bind controls with properties.
     xPosition.textProperty().bindBidirectional(xProperty, new NumberStringConverter());
@@ -204,18 +211,18 @@ public class ChunkyFxController
     // Add listeners to the properties to control the map view.
     GroupedChangeListener.ListenerGroup group = GroupedChangeListener.newGroup();
     xProperty.addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
-      ChunkView view = mapLoader.getMapView();
-      mapLoader.panTo(newValue.doubleValue() / 16, view.z);
+      ChunkView view = mapView.getMapView();
+      mapView.panTo(newValue.doubleValue() / 16, view.z);
     }));
     zProperty.addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
-      ChunkView view = mapLoader.getMapView();
-      mapLoader.panTo(view.x, newValue.doubleValue() / 16);
+      ChunkView view = mapView.getMapView();
+      mapView.panTo(view.x, newValue.doubleValue() / 16);
     }));
     scaleProperty.addListener(new GroupedChangeListener<>(group,
-        (observable, oldValue, newValue) -> mapLoader.setScale(newValue.intValue())));
+        (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
 
     // Add map view listener to control the individual value properties.
-    mapLoader.getMapViewProperty().addListener(new GroupedChangeListener<>(group,
+    mapView.getMapViewProperty().addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> {
           xProperty.set(newValue.x * 16);
           zProperty.set(newValue.z * 16);
@@ -363,7 +370,7 @@ public class ChunkyFxController
     menuExit.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
     clearSelectionBtn.setOnAction(event -> mapLoader.clearChunkSelection());
 
-    mapLoader.setMapSize((int) mapCanvas.getWidth(), (int) mapCanvas.getHeight());
+    mapView.setMapSize((int) mapCanvas.getWidth(), (int) mapCanvas.getHeight());
     mapOverlay.setOnScroll(map::onScroll);
     mapOverlay.setOnMousePressed(map::onMousePressed);
     mapOverlay.setOnMouseReleased(map::onMouseReleased);
@@ -484,7 +491,7 @@ public class ChunkyFxController
 
   public void panToCamera() {
     chunky.getRenderController().getSceneProvider()
-        .withSceneProtected(scene -> mapLoader.panTo(scene.camera().getPosition()));
+        .withSceneProtected(scene -> mapView.panTo(scene.camera().getPosition()));
   }
 
   public void moveCameraTo(double x, double z) {
@@ -501,17 +508,6 @@ public class ChunkyFxController
 
   public ChunkMap getMap() {
     return map;
-  }
-
-  @Override public void viewUpdated() {
-  }
-
-  @Override public void viewMoved() {
-    trackPlayer.set(false);
-    trackCamera.set(false);
-  }
-
-  @Override public void cameraPositionUpdated() {
   }
 
   @Override public void chunkSelectionChanged() {
@@ -554,5 +550,9 @@ public class ChunkyFxController
         }
       }).start();
     }
+  }
+
+  public MapView getMapView() {
+    return mapView;
   }
 }

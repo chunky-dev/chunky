@@ -30,7 +30,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.map.MapBuffer;
+import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
+import se.llbit.chunky.renderer.CameraViewListener;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.world.Chunk;
@@ -54,11 +56,12 @@ import java.io.IOException;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class ChunkMap implements ChunkUpdateListener, ChunkViewListener {
+public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraViewListener {
   /** Controls the selection area when selecting visible chunks. */
   private static final double CHUNK_SELECT_RADIUS = -8 * 1.4142;
   protected final WorldMapLoader mapLoader;
   protected final ChunkyFxController controller;
+  private MapView mapView;
   protected final MapBuffer mapBuffer;
   protected final ContextMenu contextMenu = new ContextMenu();
   protected final MenuItem moveCameraHere;
@@ -76,6 +79,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener {
    * reference once.
    */
   protected volatile ChunkView view = ChunkView.EMPTY;
+
   /**
    * Indicates whether or not the selection rectangle should be drawn.
    */
@@ -89,10 +93,13 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener {
 
   private Canvas canvas;
   volatile boolean repaintQueued = false;
+  private Runnable onViewDragged = () -> {};
 
-  public ChunkMap(final WorldMapLoader loader, final ChunkyFxController controller) {
+  public ChunkMap(final WorldMapLoader loader, final ChunkyFxController controller,
+      MapView mapView) {
     this.mapLoader = loader;
     this.controller = controller;
+    this.mapView = mapView;
     mapBuffer = new MapBuffer();
     moveCameraHere = new MenuItem("Move camera here");
     selectVisible = new MenuItem("Select visible chunks");
@@ -123,10 +130,10 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener {
 
     selectVisible.setGraphic(new ImageView(Icon.eye.fxImage()));
     selectVisible.setOnAction(event -> {
-      ChunkView mapView = new ChunkView(view);  // Make thread-local copy.
+      ChunkView chunkView = new ChunkView(view);  // Make thread-local copy.
       if (controller.getChunky().sceneInitialized()) {
         controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
-            scene -> selectVisibleChunks(mapView, loader, scene));
+            scene -> selectVisibleChunks(chunkView, loader, scene));
       }
     });
 
@@ -264,35 +271,21 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener {
     }
   }
 
-  /**
-   * Called when the map view has changed.
-   */
-  public synchronized void viewUpdated(ChunkView newView) {
-    setView(newView);
-    mapBuffer.updateView(view);
-  }
-
-  protected void setView(ChunkView newView) {
-    view = newView;
-  }
-
-  @Override public void viewUpdated() {
-    viewUpdated(mapLoader.getMapView());
-    mapBuffer.redrawView(mapLoader);
-    repaintDirect();
-  }
-
-  @Override public void viewMoved() {
+  @Override public void viewUpdated(ChunkView view) {
+    synchronized (this) {
+      this.view = view;
+      mapBuffer.updateView(view);
+    }
     mapBuffer.redrawView(mapLoader);
     repaintDirect();
   }
 
   public int getWidth() {
-    return mapLoader.getMapView().width;
+    return mapView.getMapView().width;
   }
 
   public int getHeight() {
-    return mapLoader.getMapView().height;
+    return mapView.getMapView().height;
   }
 
   public void onKeyPressed(KeyEvent keyEvent) {
@@ -333,7 +326,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener {
       selectRect = true;
     } else {
       dragging = true;
-      mapLoader.viewDragged(dx, dy);
+      mapView.viewDragged(dx, dy);
+      onViewDragged.run();
     }
   }
 
@@ -400,7 +394,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener {
         double scale = theView.scale;
         int cx = (int) QuickMath.floor(theView.x + (x - getWidth() / 2) / scale);
         int cz = (int) QuickMath.floor(theView.z + (y - getHeight() / 2) / scale);
-
         if (theView.scale >= 16) {
           mapLoader.toggleChunkSelection(cx, cz);
         } else {
@@ -429,15 +422,15 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener {
   public void onScroll(ScrollEvent event) {
     int diff = (int) (-event.getDeltaY() / event.getMultiplierY());
 
-    int scale = mapLoader.getScale();
+    int scale = mapView.getScale();
     if ((scale - diff) <= 16) {
-      mapLoader.setScale(scale - diff);
+      mapView.setScale(scale - diff);
     } else if ((scale - diff * 4) <= 64) {
-      mapLoader.setScale(scale - diff * 4);
+      mapView.setScale(scale - diff * 4);
     } else if ((scale - diff * 16) <= 128) {
-      mapLoader.setScale(scale - diff * 16);
+      mapView.setScale(scale - diff * 16);
     } else {
-      mapLoader.setScale(scale - diff * 64);
+      mapView.setScale(scale - diff * 64);
     }
   }
 
@@ -498,7 +491,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener {
     repaintDeferred();
   }
 
-  @Override public void cameraPositionUpdated() {
+  @Override public void cameraViewUpdated() {
     drawViewBounds(controller.getMapOverlay());
   }
 
@@ -711,5 +704,9 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener {
 
   public void setCanvas(Canvas canvas) {
     this.canvas = canvas;
+  }
+
+  public void setOnViewDragged(Runnable onViewDragged) {
+    this.onViewDragged = onViewDragged;
   }
 }

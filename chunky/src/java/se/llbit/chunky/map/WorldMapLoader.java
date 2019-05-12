@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2019 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -16,8 +16,6 @@
  */
 package se.llbit.chunky.map;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.renderer.ChunkViewListener;
@@ -35,7 +33,6 @@ import se.llbit.chunky.world.RegionParser;
 import se.llbit.chunky.world.RegionQueue;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
-import se.llbit.math.Vector2;
 import se.llbit.math.Vector3;
 
 import java.io.File;
@@ -43,8 +40,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class WorldMapLoader implements ChunkTopographyListener {
+public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListener {
   private final ChunkyFxController controller;
+  private MapView mapView;
 
   private World world = EmptyWorld.instance;
 
@@ -56,19 +54,11 @@ public class WorldMapLoader implements ChunkTopographyListener {
   private int currentDimension = PersistentSettings.getDimension();
   protected ChunkSelectionTracker chunkSelection = new ChunkSelectionTracker();
 
-  private volatile ObjectProperty<ChunkView> map = new SimpleObjectProperty<>(ChunkView.EMPTY);
-
-  private List<ChunkViewListener> viewListeners = new ArrayList<>();
   private List<Runnable> worldLoadListeners = new ArrayList<>();
 
-  public WorldMapLoader(ChunkyFxController controller) {
+  public WorldMapLoader(ChunkyFxController controller, MapView mapView) {
     this.controller = controller;
-
-    map.addListener((observable, oldValue, newValue) -> {
-      if (newValue.shouldRepaint(oldValue)) {
-        viewUpdated(newValue);
-      }
-    });
+    this.mapView = mapView;
 
     // Start worker threads.
     RegionParser[] regionParsers = new RegionParser[3];
@@ -113,7 +103,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
     if (playerPos != null) {
       panToPlayer();
     } else {
-      panTo(0, 0);
+      mapView.panTo(0, 0);
     }
 
     File newWorldDir = world.getWorldDirectory();
@@ -131,7 +121,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
   /**
    * Called when the map view has changed.
    */
-  public synchronized void viewUpdated(ChunkView mapView) {
+  @Override public synchronized void viewUpdated(ChunkView mapView) {
     refresher.setView(mapView);
 
     int rx0 = mapView.prx0;
@@ -145,42 +135,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
         regionQueue.add(ChunkPosition.get(rx, rz));
       }
     }
-
-    notifyViewUpdated();
-  }
-
-  /**
-   * Called when the map has been resized.
-   */
-  public void setMapSize(int width, int height) {
-    ChunkView mapView = map.get();
-    if (width != mapView.width || height != mapView.height) {
-      map.set(new ChunkView(mapView.x, mapView.z, width, height, mapView.scale));
-    }
-  }
-
-  /**
-   * Move the map view.
-   */
-  public synchronized void moveView(double dx, double dz) {
-    ChunkView mapView = map.get();
-    panTo(mapView.x + dx, mapView.z + dz);
-    viewUpdated(map.get());
-  }
-
-  /** Set the map view by block coordinates. */
-  public void panTo(Vector3 pos) {
-    // Convert from block coordinates to chunk coordinates.
-    panTo(pos.x / 16, pos.z / 16);
-  }
-
-  /**
-   * Move the map view.
-   */
-  public synchronized void panTo(double x, double z) {
-    ChunkView mapView = map.get();
-    map.set(new ChunkView(x, z,
-        mapView.width, mapView.height, mapView.scale));
   }
 
   /**
@@ -205,20 +159,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
   }
 
   /**
-   * @return The current map view
-   */
-  public ChunkView getMapView() {
-    return map.get();
-  }
-
-  /**
-   * @return The map view property.
-   */
-  public ObjectProperty<ChunkView> getMapViewProperty() {
-    return map;
-  }
-
-  /**
    * @return The chunk selection tracker
    */
   public ChunkSelectionTracker getChunkSelection() {
@@ -228,12 +168,8 @@ public class WorldMapLoader implements ChunkTopographyListener {
   public void panToPlayer() {
     Vector3 pos = world.playerPos();
     if (pos != null) {
-      panTo(pos);
+      mapView.panTo(pos);
     }
-  }
-
-  public void addViewListener(ChunkViewListener listener) {
-    viewListeners.add(listener);
   }
 
   /**
@@ -241,11 +177,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
    */
   public void regionUpdated(ChunkPosition region) {
     regionQueue.add(region);
-  }
-
-  public synchronized Vector2 getPosition() {
-    ChunkView mapView = map.get();
-    return new Vector2(mapView.x, mapView.z);
   }
 
   @Override public void chunksTopographyUpdated(Chunk chunk) {
@@ -258,7 +189,7 @@ public class WorldMapLoader implements ChunkTopographyListener {
    */
   public synchronized void reloadWorld() {
     world.reload();
-    notifyViewUpdated();
+    mapView.notifyViewUpdated();
   }
 
   /**
@@ -301,22 +232,6 @@ public class WorldMapLoader implements ChunkTopographyListener {
   }
 
   /**
-   * @return The current block scale of the map view
-   */
-  public int getScale() {
-    return map.get().scale;
-  }
-
-  /**
-   * Called when the map view has been dragged by the user.
-   */
-  public void viewDragged(int dx, int dy) {
-    double scale = getScale();
-    moveView(dx / scale, dy / scale);
-    viewListeners.forEach(ChunkViewListener::viewMoved);
-  }
-
-  /**
    * Select chunks within a rectangle.
    */
   public void selectChunks(int cx0, int cx1, int cz0, int cz1) {
@@ -355,30 +270,11 @@ public class WorldMapLoader implements ChunkTopographyListener {
     chunkSelection.selectRegion(world, cx, cz);
   }
 
-  /**
-   * Modify the block scale of the map view.
-   */
-  public synchronized void setScale(int blockScale) {
-    ChunkView mapView = map.get();
-    blockScale = ChunkView.clampScale(blockScale);
-    if (blockScale != mapView.scale) {
-      map.set(new ChunkView(mapView.x, mapView.z,
-          mapView.width, mapView.height, blockScale));
-    }
-  }
-
-  /**
-   * Notify view listeners that the view has changed.
-   */
-  private void notifyViewUpdated() {
-    viewListeners.forEach(ChunkViewListener::viewUpdated);
-  }
-
   public int getDimension() {
     return currentDimension;
   }
 
-  public void drawCameraVisualization() {
-    viewListeners.forEach(ChunkViewListener::cameraPositionUpdated);
+  public ChunkView getMapView() {
+    return mapView.getMapView();
   }
 }

@@ -38,7 +38,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.map.WorldMapLoader;
+import se.llbit.chunky.map.MapView;
+import se.llbit.chunky.renderer.CameraViewListener;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.CameraPreset;
@@ -83,7 +84,8 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   private DoubleProperty yaw = new SimpleDoubleProperty();
   private DoubleProperty pitch = new SimpleDoubleProperty();
   private DoubleProperty roll = new SimpleDoubleProperty();
-  private WorldMapLoader mapLoader;
+  private MapView mapView;
+  private CameraViewListener cameraViewListener;
 
   public CameraTab() throws IOException {
     parentTab = new Tab("Camera", this);
@@ -324,9 +326,9 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       zpos.set(pos.z);
     }
     if (PersistentSettings.getFollowCamera()) {
-      mapLoader.panTo(pos);
+      mapView.panTo(pos);
     }
-    mapLoader.drawCameraVisualization();
+    cameraViewListener.cameraViewUpdated();
   }
 
   private void updateCameraDirection() {
@@ -336,7 +338,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       pitch.set(QuickMath.radToDeg(camera.getPitch()));
       roll.set(QuickMath.radToDeg(camera.getRoll()));
     }
-    mapLoader.drawCameraVisualization();
+    cameraViewListener.cameraViewUpdated();
   }
 
   @Override public void onChunksLoaded() {
@@ -344,14 +346,15 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   }
 
   @Override public void setController(RenderControlsFxController controller) {
-    this.mapLoader = controller.getChunkyController().getMapLoader();
+    this.mapView = controller.getChunkyController().getMapView();
+    this.cameraViewListener = controller.getChunkyController().getMap();
 
     scene = controller.getRenderController().getSceneManager().getScene();
     scene.camera().setDirectionListener(this::updateCameraDirection);
     scene.camera().setPositionListener(this::updateCameraPosition);
     scene.camera().setProjectionListener(() -> {
       updateFov();
-      mapLoader.drawCameraVisualization();
+      cameraViewListener.cameraViewUpdated();
     });
   }
 }

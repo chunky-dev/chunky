@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2019 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -17,14 +16,8 @@
  */
 package se.llbit.chunky.renderer;
 
-import se.llbit.chunky.world.ChunkView;
-
-/**
- * Interface for listening to 2D world map view changes.
- */
-public interface ChunkViewListener {
-  /**
-   * Callback for when the view has changed (moved or scaled).
-   */
-  void viewUpdated(ChunkView view);
+/** Interface for listening to view changes for the current 3D camera. */
+public interface CameraViewListener {
+  /** Callback for when the camera view has changed. */
+  void cameraViewUpdated();
 }
