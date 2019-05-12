@@ -82,7 +82,7 @@ public class MapView {
   /**
    * Notify view listeners that the view has changed.
    */
-  void notifyViewUpdated() {
+  private void notifyViewUpdated() {
     ChunkView view = map.get();
     viewListeners.forEach(listener -> listener.viewUpdated(view));
   }

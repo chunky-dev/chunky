@@ -40,6 +40,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Dynamically loads regions and chunks for the 2D world map.
+ */
 public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListener {
   private final ChunkyFxController controller;
   private MapView mapView;
@@ -189,7 +192,6 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
    */
   public synchronized void reloadWorld() {
     world.reload();
-    mapView.notifyViewUpdated();
   }
 
   /**
