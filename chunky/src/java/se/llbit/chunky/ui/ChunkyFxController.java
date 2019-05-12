@@ -46,7 +46,6 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
@@ -95,7 +94,6 @@ public class ChunkyFxController
   @FXML private Canvas mapOverlay;
   @FXML private Label mapName;
   @FXML private MenuItem menuExit;
-  @FXML private VBox rootContainer;
   @FXML private Button clearSelectionBtn;
   @FXML private Button changeWorldBtn;
   @FXML private Button reloadWorldBtn;
@@ -407,9 +405,6 @@ public class ChunkyFxController
       Platform.exit();
       System.exit(0);
     });
-
-    rootContainer.prefHeightProperty().bind(scene.heightProperty());
-    rootContainer.prefWidthProperty().bind(scene.widthProperty());
   }
 
   /**
