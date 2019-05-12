@@ -19,6 +19,7 @@ package se.llbit.chunky.renderer;
 import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.SceneManager;
+import se.llbit.chunky.world.ChunkSelectionTracker;
 
 /**
  * Contains all state for the renderer.

@@ -17,16 +17,12 @@
 package se.llbit.chunky.map;
 
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.ui.ChunkyFxController;
-import se.llbit.chunky.ui.ProgressTracker;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkTopographyUpdater;
 import se.llbit.chunky.world.ChunkView;
-import se.llbit.chunky.world.DeleteChunksJob;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.RegionChangeMonitor;
 import se.llbit.chunky.world.RegionParser;
@@ -37,8 +33,8 @@ import se.llbit.math.Vector3;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Dynamically loads regions and chunks for the 2D world map.
@@ -55,9 +51,8 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   private final RegionChangeMonitor refresher = new RegionChangeMonitor(this);
 
   private int currentDimension = PersistentSettings.getDimension();
-  protected ChunkSelectionTracker chunkSelection = new ChunkSelectionTracker();
 
-  private List<Runnable> worldLoadListeners = new ArrayList<>();
+  private List<Consumer<World>> worldLoadListeners = new ArrayList<>();
 
   public WorldMapLoader(ChunkyFxController controller, MapView mapView) {
     this.controller = controller;
@@ -93,10 +88,8 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
 
     newWorld.addChunkUpdateListener(controller);
     newWorld.addChunkUpdateListener(controller.getMap());
-    chunkSelection.clearSelection();
 
     world = newWorld;
-    world.addChunkDeletionListener(chunkSelection);
     world.addChunkTopographyListener(this);
 
     // Dimension must be set before chunks are loaded.
@@ -114,10 +107,10 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
       PersistentSettings.setLastWorld(newWorldDir);
     }
 
-    worldLoadListeners.forEach(Runnable::run);
+    worldLoadListeners.forEach(listener -> listener.accept(newWorld));
   }
 
-  public void addWorldLoadListener(Runnable callback) {
+  public void addWorldLoadListener(Consumer<World> callback) {
     worldLoadListeners.add(callback);
   }
 
@@ -141,16 +134,9 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   }
 
   /**
-   * Select specific chunk.
-   */
-  public synchronized void selectChunk(int cx, int cz) {
-    chunkSelection.selectChunk(world, cx, cz);
-  }
-
-  /**
    * @return The current world
    */
-  public World getWorld() {
+  public synchronized World getWorld() {
     return world;
   }
 
@@ -159,13 +145,6 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
    */
   public String getWorldName() {
     return world.levelName();
-  }
-
-  /**
-   * @return The chunk selection tracker
-   */
-  public ChunkSelectionTracker getChunkSelection() {
-    return chunkSelection;
   }
 
   public void panToPlayer() {
@@ -195,13 +174,6 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   }
 
   /**
-   * Toggle chunk selection.
-   */
-  public synchronized void toggleChunkSelection(int cx, int cz) {
-    chunkSelection.toggleChunk(world, cx, cz);
-  }
-
-  /**
    * Set the current dimension.
    *
    * @param value Must be a valid dimension index
@@ -224,52 +196,6 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
    */
   public boolean isLoading() {
     return !regionQueue.isEmpty();
-  }
-
-  /**
-   * Clears the chunk selection.
-   */
-  public synchronized void clearChunkSelection() {
-    chunkSelection.clearSelection();
-  }
-
-  /**
-   * Select chunks within a rectangle.
-   */
-  public void selectChunks(int cx0, int cx1, int cz0, int cz1) {
-    chunkSelection.selectChunks(world, cx0, cz0, cx1, cz1);
-  }
-
-  /**
-   * Deselect chunks within a rectangle.
-   */
-  public void deselectChunks(int cx0, int cx1, int cz0, int cz1) {
-    chunkSelection.deselectChunks(cx0, cz0, cx1, cz1);
-  }
-
-  /**
-   * Delete the currently selected chunks from the current world.
-   */
-  public void deleteSelectedChunks(ProgressTracker progress) {
-    Collection<ChunkPosition> selected = chunkSelection.getSelection();
-    if (!selected.isEmpty() && !progress.isBusy()) {
-      DeleteChunksJob job = new DeleteChunksJob(world, selected, progress);
-      job.start();
-    }
-  }
-
-  /**
-   * Export the selected chunks to a zip file.
-   */
-  public synchronized void exportZip(File targetFile, ProgressTracker progress) {
-    new ZipExportJob(world, chunkSelection.getSelection(), targetFile, progress).start();
-  }
-
-  /**
-   * Select the region containing the given chunk.
-   */
-  public void selectRegion(int cx, int cz) {
-    chunkSelection.selectRegion(world, cx, cz);
   }
 
   public int getDimension() {

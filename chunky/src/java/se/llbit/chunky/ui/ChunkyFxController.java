@@ -52,6 +52,7 @@ import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
 import se.llbit.chunky.main.Chunky;
+import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.RenderContext;
@@ -60,7 +61,9 @@ import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.ui.render.RenderControlsFx;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionListener;
+import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
+import se.llbit.chunky.world.DeleteChunksJob;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkUpdateListener;
@@ -89,6 +92,7 @@ public class ChunkyFxController
   private WorldMapLoader mapLoader;
   private ChunkMap map;
   private MapView mapView;
+  protected ChunkSelectionTracker chunkSelection = new ChunkSelectionTracker();
 
   @FXML private Canvas mapCanvas;
   @FXML private Canvas mapOverlay;
@@ -143,12 +147,14 @@ public class ChunkyFxController
     this.chunky = chunky;
     mapView = new MapView();
     mapLoader = new WorldMapLoader(this, mapView);
-    map = new ChunkMap(mapLoader, this, mapView);
+    map = new ChunkMap(mapLoader, this, mapView, chunkSelection);
     mapView.addViewListener(mapLoader);
     mapView.addViewListener(map);
-    mapLoader.getChunkSelection().addSelectionListener(this);
-    mapLoader.getChunkSelection().addChunkUpdateListener(map);
-    mapLoader.addWorldLoadListener(() -> {
+    chunkSelection.addSelectionListener(this);
+    chunkSelection.addChunkUpdateListener(map);
+    mapLoader.addWorldLoadListener(world -> {
+      chunkSelection.clearSelection();
+      world.addChunkDeletionListener(chunkSelection);
       map.redrawMap();
     });
 
@@ -173,6 +179,31 @@ public class ChunkyFxController
       }
     });
 
+  }
+
+  /**
+   * Delete the currently selected chunks from the current world.
+   */
+  public void deleteSelectedChunks(ProgressTracker progress) {
+    Collection<ChunkPosition> selected = chunkSelection.getSelection();
+    if (!selected.isEmpty() && !progress.isBusy()) {
+      DeleteChunksJob job = new DeleteChunksJob(mapLoader.getWorld(), selected, progress);
+      job.start();
+    }
+  }
+
+  /**
+   * Export the selected chunks to a zip file.
+   */
+  public synchronized void exportZip(File targetFile, ProgressTracker progress) {
+    new ZipExportJob(mapLoader.getWorld(), chunkSelection.getSelection(), targetFile, progress).start();
+  }
+
+  /**
+   * Select the region containing the given chunk.
+   */
+  public void selectRegion(int cx, int cz) {
+    chunkSelection.selectRegion(mapLoader.getWorld(), cx, cz);
   }
 
   @Override public void initialize(URL fxmlUrl, ResourceBundle resources) {
@@ -227,7 +258,7 @@ public class ChunkyFxController
           scaleProperty.set(newValue.scale);
         }));
 
-    clearSelectionBtn2.setOnAction(e -> mapLoader.clearChunkSelection());
+    clearSelectionBtn2.setOnAction(e -> chunkSelection.clearSelection());
 
     deleteChunks.setTooltip(new Tooltip("Delete selected chunks."));
     deleteChunks.setOnAction(e -> {
@@ -236,7 +267,7 @@ public class ChunkyFxController
       alert.setContentText(
           "Do you really want to delete the selected chunks? This can not be undone.");
       if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
-        mapLoader.deleteSelectedChunks(ProgressTracker.NONE);
+        deleteSelectedChunks(ProgressTracker.NONE);
       }
     });
 
@@ -248,7 +279,7 @@ public class ChunkyFxController
       fileChooser.setInitialFileName(String.format("%s.zip", mapLoader.getWorldName()));
       File target = fileChooser.showSaveDialog(stage);
       if (target != null) {
-        mapLoader.exportZip(target, ProgressTracker.NONE);
+        exportZip(target, ProgressTracker.NONE);
       }
     });
 
@@ -366,7 +397,7 @@ public class ChunkyFxController
     endBtn.setOnAction(e -> mapLoader.setDimension(World.END_DIMENSION));
 
     menuExit.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
-    clearSelectionBtn.setOnAction(event -> mapLoader.clearChunkSelection());
+    clearSelectionBtn.setOnAction(event -> chunkSelection.clearSelection());
 
     mapView.setMapSize((int) mapCanvas.getWidth(), (int) mapCanvas.getHeight());
     mapOverlay.setOnScroll(map::onScroll);
@@ -379,7 +410,7 @@ public class ChunkyFxController
     mapOverlay.setOnKeyReleased(map::onKeyReleased);
 
     mapLoader.addWorldLoadListener(
-        () -> mapName.setText(mapLoader.getWorld().levelName()));
+        world -> mapName.setText(world.levelName()));
     mapLoader.loadWorld(PersistentSettings.getLastWorld());
   }
 
@@ -454,7 +485,7 @@ public class ChunkyFxController
     open3DView();
 
     // Load selected chunks.
-    Collection<ChunkPosition> selection = mapLoader.getChunkSelection().getSelection();
+    Collection<ChunkPosition> selection = chunkSelection.getSelection();
     if (selection.isEmpty()) {
       chunky.getSceneManager().getScene().camera().setView(0.0, QuickMath.degToRad(-68.0), 0.0);
       chunky.getSceneManager().getScene().camera().setPosition(new Vector3(0, 84, 0));
@@ -549,5 +580,9 @@ public class ChunkyFxController
 
   public MapView getMapView() {
     return mapView;
+  }
+
+  public ChunkSelectionTracker getChunkSelection() {
+    return chunkSelection;
   }
 }

@@ -37,6 +37,7 @@ import se.llbit.chunky.renderer.ChunkViewListener;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.PlayerEntityData;
@@ -61,6 +62,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   private static final double CHUNK_SELECT_RADIUS = -8 * 1.4142;
   protected final WorldMapLoader mapLoader;
   protected final ChunkyFxController controller;
+  protected final ChunkSelectionTracker chunkSelection;
   private MapView mapView;
   protected final MapBuffer mapBuffer;
   protected final ContextMenu contextMenu = new ContextMenu();
@@ -96,10 +98,11 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   private Runnable onViewDragged = () -> {};
 
   public ChunkMap(final WorldMapLoader loader, final ChunkyFxController controller,
-      MapView mapView) {
+      MapView mapView, ChunkSelectionTracker chunkSelection) {
     this.mapLoader = loader;
     this.controller = controller;
     this.mapView = mapView;
+    this.chunkSelection = chunkSelection;
     mapBuffer = new MapBuffer();
     moveCameraHere = new MenuItem("Move camera here");
     selectVisible = new MenuItem("Select visible chunks");
@@ -118,7 +121,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
     MenuItem clearSelection = new MenuItem("Clear selection");
     clearSelection.setGraphic(new ImageView(Icon.clear.fxImage()));
-    clearSelection.setOnAction(event -> loader.clearChunkSelection());
+    clearSelection.setOnAction(event -> chunkSelection.clearSelection());
 
     moveCameraHere.setOnAction(event -> {
       ChunkView theView = new ChunkView(view);  // Make thread-local copy.
@@ -133,7 +136,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       ChunkView chunkView = new ChunkView(view);  // Make thread-local copy.
       if (controller.getChunky().sceneInitialized()) {
         controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
-            scene -> selectVisibleChunks(chunkView, loader, scene));
+            scene -> selectVisibleChunks(chunkView, scene));
       }
     });
 
@@ -143,7 +146,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
   @Override public void chunkUpdated(ChunkPosition chunk) {
     if (view.chunkScale >= 16) {
-      mapBuffer.drawTile(mapLoader, chunk);
+      mapBuffer.drawTile(mapLoader, chunk, chunkSelection);
     } else {
       regionUpdated(chunk.getRegionPosition());
     }
@@ -189,9 +192,9 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       int z0 = Math.min(cp0.z, cp1.z);
       int z1 = Math.max(cp0.z, cp1.z);
       if (ctrlModifier) {
-        mapLoader.deselectChunks(x0, x1, z0, z1);
+        chunkSelection.deselectChunks(x0, z0, x1, z1);
       } else {
-        mapLoader.selectChunks(x0, x1, z0, z1);
+        chunkSelection.selectChunks(mapLoader.getWorld(), x0, z0, x1, z1);
       }
     }
   }
@@ -265,7 +268,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
   @Override public void regionUpdated(ChunkPosition region) {
     if (view.scale < 16) {
-      mapBuffer.drawTile(mapLoader, region);
+      mapBuffer.drawTile(mapLoader, region, chunkSelection);
       mapLoader.regionUpdated(region);
       repaintDeferred();
     }
@@ -276,7 +279,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       this.view = view;
       mapBuffer.updateView(view);
     }
-    mapBuffer.redrawView(mapLoader);
+    mapBuffer.redrawView(mapLoader, chunkSelection);
     repaintDirect();
   }
 
@@ -395,9 +398,9 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
         int cx = (int) QuickMath.floor(theView.x + (x - getWidth() / 2) / scale);
         int cz = (int) QuickMath.floor(theView.z + (y - getHeight() / 2) / scale);
         if (theView.scale >= 16) {
-          mapLoader.toggleChunkSelection(cx, cz);
+          chunkSelection.toggleChunk(mapLoader.getWorld(), cx, cz);
         } else {
-          mapLoader.selectRegion(cx, cz);
+          chunkSelection.selectRegion(mapLoader.getWorld(), cx, cz);
         }
       }
     } else {
@@ -487,7 +490,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
   public void redrawMap() {
     mapBuffer.clearBuffer();
-    mapBuffer.redrawView(mapLoader);
+    mapBuffer.redrawView(mapLoader, chunkSelection);
     repaintDeferred();
   }
 
@@ -495,8 +498,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     drawViewBounds(controller.getMapOverlay());
   }
 
-  public void selectVisibleChunks(ChunkView cv, WorldMapLoader loader,
-      se.llbit.chunky.renderer.scene.Scene scene) {
+  public void selectVisibleChunks(ChunkView cv, se.llbit.chunky.renderer.scene.Scene scene) {
     Camera camera = scene.camera();
     int width = scene.canvasWidth();
     int height = scene.canvasHeight();
@@ -531,6 +533,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     norm[3].cross(corners[0], corners[3]);
     norm[3].normalize();
 
+    World world = mapLoader.getWorld();
     for (int x = cv.px0; x <= cv.px1; ++x) {
       for (int z = cv.pz0; z <= cv.pz1; ++z) {
         // Chunk top center position:
@@ -538,7 +541,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
         pos.sub(o);
         if (norm[0].dot(pos) > CHUNK_SELECT_RADIUS && norm[1].dot(pos) > CHUNK_SELECT_RADIUS
             && norm[2].dot(pos) > CHUNK_SELECT_RADIUS && norm[3].dot(pos) > CHUNK_SELECT_RADIUS) {
-          loader.selectChunk(x, z);
+          chunkSelection.selectChunk(world, x, z);
         }
       }
     }

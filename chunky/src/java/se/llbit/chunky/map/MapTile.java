@@ -19,6 +19,7 @@ package se.llbit.chunky.map;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.Region;
 
@@ -52,19 +53,21 @@ public class MapTile {
     rebuild(position, view);
   }
 
-  public void drawCached(MapBuffer buffer, WorldMapLoader mapLoader, ChunkView view) {
+  public void drawCached(MapBuffer buffer, WorldMapLoader mapLoader, ChunkView view,
+      ChunkSelectionTracker selection) {
     if (isCached) {
       drawCached(buffer, view);
     } else {
-      draw(buffer, mapLoader, view);
+      draw(buffer, mapLoader, view, selection);
     }
   }
 
-  public void draw(MapBuffer buffer, WorldMapLoader mapLoader, ChunkView view) {
+  public void draw(MapBuffer buffer, WorldMapLoader mapLoader, ChunkView view,
+      ChunkSelectionTracker selection) {
     if (scale >= 16) {
       Chunk chunk = mapLoader.getWorld().getChunk(pos);
       renderChunk(chunk);
-      if (mapLoader.getChunkSelection().isSelected(pos)) {
+      if (selection.isSelected(pos)) {
         for (int i = 0; i < size * size; ++i) {
           pixels[i] = selectionTint(pixels[i]);
         }
@@ -76,7 +79,7 @@ public class MapTile {
         for (int x = 0; x < 32; ++x) {
           Chunk chunk = region.getChunk(x, z);
           pixels[pixelOffset] = chunk.biomeColor();
-          if (mapLoader.getChunkSelection().isSelected(chunk.getPosition())) {
+          if (selection.isSelected(chunk.getPosition())) {
             pixels[pixelOffset] = selectionTint(pixels[pixelOffset]);
           }
           pixelOffset += 1;

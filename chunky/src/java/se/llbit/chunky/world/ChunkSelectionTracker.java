@@ -118,8 +118,8 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
   /**
    * Adds a chunk to the selection.
    *
-   * @param cx    chunk x-position
-   * @param cz    chunk z-position
+   * @param cx chunk x-position
+   * @param cz chunk z-position
    */
   public synchronized void selectChunk(World world, int cx, int cz) {
     ChunkPosition chunk = ChunkPosition.get(cx, cz);
@@ -133,8 +133,8 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
   /**
    * Select the region containing the given chunk.
    *
-   * @param cx    chunk x-position
-   * @param cz    chunk z-position
+   * @param cx chunk x-position
+   * @param cz chunk z-position
    */
   public synchronized void selectRegion(World world, int cx, int cz) {
     ChunkPosition chunk = ChunkPosition.get(cx, cz);

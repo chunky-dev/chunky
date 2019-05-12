@@ -21,6 +21,7 @@ import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.png.PngFileWriter;
 import se.llbit.util.RingBuffer;
@@ -127,10 +128,11 @@ public class MapBuffer {
   /**
    * Redraws the given tile.
    */
-  public synchronized void drawTile(WorldMapLoader mapLoader, ChunkPosition chunk) {
+  public synchronized void drawTile(WorldMapLoader mapLoader, ChunkPosition chunk,
+      ChunkSelectionTracker selection) {
     MapTile tile = activeTiles.get(chunk);
     if (tile != null) {
-      tile.draw(this, mapLoader, view);
+      tile.draw(this, mapLoader, view, selection);
       cached = false;
     }
   }
@@ -138,10 +140,11 @@ public class MapBuffer {
   /**
    * Attempts to draw the tile using cached image.
    */
-  public synchronized void drawTileCached(WorldMapLoader mapLoader, ChunkPosition chunk) {
+  public synchronized void drawTileCached(WorldMapLoader mapLoader, ChunkPosition chunk,
+      ChunkSelectionTracker selection) {
     MapTile tile = activeTiles.get(chunk);
     if (tile != null) {
-      tile.drawCached(this, mapLoader, view);
+      tile.drawCached(this, mapLoader, view, selection);
       cached = false;
     }
   }
@@ -150,7 +153,8 @@ public class MapBuffer {
    * Redraw all tiles in the current view.
    * This draws to the map buffer - it does not render to the map canvas.
    */
-  public synchronized void redrawView(WorldMapLoader mapLoader) {
+  public synchronized void redrawView(WorldMapLoader mapLoader,
+      ChunkSelectionTracker selection) {
     int x0, x1, z0, z1;
     if (view.chunkScale >= 16) {
       x0 = view.px0;
@@ -165,7 +169,7 @@ public class MapBuffer {
     }
     for (int x = x0; x <= x1; ++x) {
       for (int z = z0; z <= z1; ++z) {
-        drawTileCached(mapLoader, ChunkPosition.get(x, z));
+        drawTileCached(mapLoader, ChunkPosition.get(x, z), selection);
       }
     }
   }
