@@ -16,11 +16,16 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.log.Log;
 
 /**
- * Parses regions
+ * Asynchronous region/chunk parser.
+ *
+ * <p>This is a worker thread for the dynamic world loader.
+ * It waits for region parse requests and loads visible chunks inside
+ * the requested region.
  *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
@@ -28,14 +33,16 @@ public class RegionParser extends Thread {
 
   private final WorldMapLoader mapLoader;
   private final RegionQueue queue;
+  private MapView mapView;
 
   /**
    * Create new region parser
    */
-  public RegionParser(WorldMapLoader loader, RegionQueue queue) {
+  public RegionParser(WorldMapLoader loader, RegionQueue queue, MapView mapView) {
     super("Region Parser");
     this.mapLoader = loader;
     this.queue = queue;
+    this.mapView = mapView;
   }
 
   @Override public void run() {
@@ -45,7 +52,7 @@ public class RegionParser extends Thread {
         Log.warn("Region parser shutting down abnormally.");
         return;
       }
-      ChunkView map = mapLoader.getMapView();
+      ChunkView map = mapView.getMapView();
       if (map.isRegionVisible(position)) {
         Region region = mapLoader.getWorld().getRegion(position);
         region.parse();

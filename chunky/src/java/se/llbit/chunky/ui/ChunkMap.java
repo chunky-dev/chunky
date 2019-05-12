@@ -393,7 +393,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       if (!dragging) {
         int x = (int) event.getX();
         int y = (int) event.getY();
-        ChunkView theView = mapLoader.getMapView();
+        ChunkView theView = mapView.getMapView();
         double scale = theView.scale;
         int cx = (int) QuickMath.floor(theView.x + (x - getWidth() / 2) / scale);
         int cz = (int) QuickMath.floor(theView.z + (y - getHeight() / 2) / scale);

@@ -54,15 +54,6 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
   }
 
   /**
-   * Remove a chunk update listener.
-   */
-  public synchronized void removeSelectionListener(ChunkSelectionListener listener) {
-    synchronized (chunkUpdateListeners) {
-      selectionListeners.remove(listener);
-    }
-  }
-
-  /**
    * Notify the chunk update listeners that chunks have been updated
    *
    * @param chunks the updated chunks

@@ -61,7 +61,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     // Start worker threads.
     RegionParser[] regionParsers = new RegionParser[3];
     for (int i = 0; i < regionParsers.length; ++i) {
-      regionParsers[i] = new RegionParser(this, regionQueue);
+      regionParsers[i] = new RegionParser(this, regionQueue, mapView);
       regionParsers[i].start();
     }
     topographyUpdater.start();
@@ -134,6 +134,8 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   }
 
   /**
+   * Get the current loaded world.
+   *
    * @return The current world
    */
   public synchronized World getWorld() {
@@ -141,6 +143,8 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   }
 
   /**
+   * Get the name of the current loaded world.
+   *
    * @return The name of the current world
    */
   public String getWorldName() {
@@ -155,7 +159,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   }
 
   /**
-   * The region was changed.
+   * Called to notify the world loader that a region was changed.
    */
   public void regionUpdated(ChunkPosition region) {
     regionQueue.add(region);
@@ -198,11 +202,10 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     return !regionQueue.isEmpty();
   }
 
+  /**
+   * Get the currently loaded dimension.
+   */
   public int getDimension() {
     return currentDimension;
-  }
-
-  public ChunkView getMapView() {
-    return mapView.getMapView();
   }
 }
