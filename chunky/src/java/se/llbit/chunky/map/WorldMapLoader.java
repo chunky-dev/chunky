@@ -24,7 +24,7 @@ import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkTopographyUpdater;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.EmptyWorld;
-import se.llbit.chunky.world.RegionChangeMonitor;
+import se.llbit.chunky.world.RegionChangeWatcher;
 import se.llbit.chunky.world.RegionParser;
 import se.llbit.chunky.world.RegionQueue;
 import se.llbit.chunky.world.World;
@@ -48,7 +48,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   private final RegionQueue regionQueue = new RegionQueue();
 
   private final ChunkTopographyUpdater topographyUpdater = new ChunkTopographyUpdater();
-  private final RegionChangeMonitor refresher = new RegionChangeMonitor(this);
+  private final RegionChangeWatcher refresher = new RegionChangeWatcher(this);
 
   private int currentDimension = PersistentSettings.getDimension();
 

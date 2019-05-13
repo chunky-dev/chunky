@@ -25,11 +25,11 @@ import se.llbit.chunky.map.WorldMapLoader;
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class RegionChangeMonitor extends Thread {
+public class RegionChangeWatcher extends Thread {
   private final WorldMapLoader mapLoader;
   private volatile ChunkView view = ChunkView.EMPTY;
 
-  public RegionChangeMonitor(WorldMapLoader loader) {
+  public RegionChangeWatcher(WorldMapLoader loader) {
     super("Region Refresher");
     this.mapLoader = loader;
   }
