@@ -80,6 +80,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -155,6 +156,8 @@ public class ChunkyFxController
     mapLoader.addWorldLoadListener(world -> {
       chunkSelection.clearSelection();
       world.addChunkDeletionListener(chunkSelection);
+      Optional<Vector3> playerPos = world.playerPos();
+      mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
       map.redrawMap();
     });
 
@@ -276,7 +279,7 @@ public class ChunkyFxController
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Export Chunks to Zip");
       fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Zip files", "*.zip"));
-      fileChooser.setInitialFileName(String.format("%s.zip", mapLoader.getWorldName()));
+      fileChooser.setInitialFileName(String.format("%s.zip", mapLoader.getWorld().levelName()));
       File target = fileChooser.showSaveDialog(stage);
       if (target != null) {
         exportZip(target, ProgressTracker.NONE);
@@ -288,7 +291,7 @@ public class ChunkyFxController
       fileChooser.setTitle("Export PNG");
       fileChooser
           .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("PNG images", "*.png"));
-      fileChooser.setInitialFileName(String.format("%s.png", mapLoader.getWorldName()));
+      fileChooser.setInitialFileName(String.format("%s.png", mapLoader.getWorld().levelName()));
       if (prevPngDir != null) {
         fileChooser.setInitialDirectory(prevPngDir.toFile());
       }
@@ -366,13 +369,14 @@ public class ChunkyFxController
     trackPlayerBtn.selectedProperty().bindBidirectional(trackPlayer);
     trackCameraBtn.selectedProperty().bindBidirectional(trackCamera);
 
-    overworldBtn.setSelected(mapLoader.getDimension() == World.OVERWORLD_DIMENSION);
+    int currentDimension = mapLoader.getDimension();
+    overworldBtn.setSelected(currentDimension == World.OVERWORLD_DIMENSION);
     overworldBtn.setTooltip(new Tooltip("Full of grass and Creepers!"));
 
-    netherBtn.setSelected(mapLoader.getDimension() == World.NETHER_DIMENSION);
-    netherBtn.setTooltip(new Tooltip("The land of Zombie Pigmen."));
+    netherBtn.setSelected(currentDimension == World.NETHER_DIMENSION);
+    netherBtn.setTooltip(new Tooltip("The land of Zombie Pig-men."));
 
-    endBtn.setSelected(mapLoader.getDimension() == World.END_DIMENSION);
+    endBtn.setSelected(currentDimension == World.END_DIMENSION);
     endBtn.setTooltip(new Tooltip("Watch out for the dragon."));
 
     changeWorldBtn.setOnAction(e -> {

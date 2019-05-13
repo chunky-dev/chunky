@@ -39,7 +39,7 @@ public class RegionChangeWatcher extends Thread {
       while (!isInterrupted()) {
         sleep(3000);
         final World world = mapLoader.getWorld();
-        if (world.loadAdditionalData(true)) {
+        if (world.reloadPlayerData()) {
           if (PersistentSettings.getFollowPlayer()) {
             Platform.runLater(mapLoader::panToPlayer);
           }

@@ -18,7 +18,6 @@ package se.llbit.chunky.world;
 
 import se.llbit.chunky.map.CorruptLayer;
 import se.llbit.chunky.map.MapTile;
-import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.nbt.CompoundTag;
 
 import java.util.Collection;
@@ -42,7 +41,7 @@ public class EmptyRegionChunk extends Chunk {
   }
 
   private EmptyRegionChunk() {
-    super(ChunkPosition.get(0, 0), EmptyWorld.instance);
+    super(ChunkPosition.get(0, 0), EmptyWorld.INSTANCE);
     surface = CorruptLayer.INSTANCE;
   }
 

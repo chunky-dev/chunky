@@ -16,20 +16,20 @@
  */
 package se.llbit.chunky.world;
 
+import java.util.Collections;
+
 /**
- * An empty or non-existent world.
+ * Represents an empty or non-existent world.
+ *
+ * <p>The singleton empty world is used when world loading fails.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class EmptyWorld extends World {
-
-  /**
-   * Singleton instance
-   */
-  public static final EmptyWorld instance = new EmptyWorld();
+  public static final EmptyWorld INSTANCE = new EmptyWorld();
 
   private EmptyWorld() {
-    super();
+    super("[empty world]", null, OVERWORLD_DIMENSION, Collections.emptySet(), false, 0, -1);
   }
 
   @Override public String toString() {

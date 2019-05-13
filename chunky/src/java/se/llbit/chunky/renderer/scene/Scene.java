@@ -33,6 +33,7 @@ import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
+import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.ExtraMaterials;
 import se.llbit.chunky.world.Heightmap;
 import se.llbit.chunky.world.Material;
@@ -71,6 +72,7 @@ import se.llbit.tiff.TiffFileWriter;
 import se.llbit.util.JsonSerializable;
 import se.llbit.util.MCDownloader;
 import se.llbit.util.MinecraftPRNG;
+import se.llbit.util.NotNull;
 import se.llbit.util.TaskTracker;
 import se.llbit.util.ZipExport;
 
@@ -244,7 +246,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * World reference.
    */
-  private World loadedWorld;
+  @NotNull private World loadedWorld = EmptyWorld.INSTANCE;
 
   /**
    * Octree origin.
@@ -491,17 +493,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!worldPath.isEmpty()) {
       File worldDirectory = new File(worldPath);
       if (World.isWorldDir(worldDirectory)) {
-        if (loadedWorld == null || loadedWorld.getWorldDirectory() == null || !loadedWorld
-            .getWorldDirectory().getAbsolutePath().equals(worldPath)) {
-
-          loadedWorld = new World(worldDirectory, true);
-          loadedWorld.setDimension(worldDimension);
-
-        } else if (loadedWorld.currentDimension() != worldDimension) {
-
-          loadedWorld.setDimension(worldDimension);
-
-        }
+        loadedWorld = World.loadWorld(worldDirectory, worldDimension, World.LoggedWarnings.NORMAL);
       } else {
         Log.info("Could not load world: " + worldPath);
       }
@@ -526,7 +518,7 @@ public class Scene implements JsonSerializable, Refreshable {
     } else {
       // Could not load stored octree.
       // Load the chunks from the world.
-      if (loadedWorld == null) {
+      if (loadedWorld == EmptyWorld.INSTANCE) {
         Log.warn("Could not load chunks (no world found for scene)");
       } else {
         loadChunks(taskTracker, loadedWorld, chunks);
@@ -672,12 +664,12 @@ public class Scene implements JsonSerializable, Refreshable {
    * Reload all loaded chunks.
    */
   public synchronized void reloadChunks(TaskTracker progress) {
-    if (loadedWorld == null) {
+    if (loadedWorld == EmptyWorld.INSTANCE) {
       Log.warn("Can not reload chunks for scene - world directory not found!");
       return;
     }
-    loadedWorld.setDimension(worldDimension);
-    loadedWorld.reload();
+    loadedWorld = World.loadWorld(loadedWorld.getWorldDirectory(), worldDimension,
+        World.LoggedWarnings.NORMAL);
     loadChunks(progress, loadedWorld, chunks);
     refresh();
   }

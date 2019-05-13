@@ -35,12 +35,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -55,44 +57,32 @@ import java.util.zip.ZipOutputStream;
  */
 public class World implements Comparable<World> {
 
-  /**
-   * The currently supported NBT version of level.dat files.
-   */
+  /** The currently supported NBT version of level.dat files. */
   public static final int NBT_VERSION = 19133;
 
-  /**
-   * Overworld dimension index
-   */
+  /** Overworld dimension index. */
   public static final int OVERWORLD_DIMENSION = 0;
 
-  /**
-   * Nether dimension index
-   */
+  /** Nether dimension index. */
   public static final int NETHER_DIMENSION = -1;
 
-  /**
-   * End dimension index
-   */
+  /** End dimension index. */
   public static final int END_DIMENSION = 1;
 
-  /**
-   * Default sea level. Used to be 64.
-   */
+  /** Default sea water level. */
   public static final int SEA_LEVEL = 63;
-  private static final int DEFAULT_LAYER = SEA_LEVEL;
 
   private final Map<ChunkPosition, Region> regionMap = new HashMap<>();
 
-  private int currentLayer = DEFAULT_LAYER;
-  private File worldDirectory = null;
-  private final Set<PlayerEntityData> playerEntities = new HashSet<>();
-  private boolean haveSpawnPos = false;
+  private final File worldDirectory;
+  private Set<PlayerEntityData> playerEntities;
+  private final boolean haveSpawnPos;
   private int playerDimension = 0;
-  private int dimension;
+  private final int dimension;
 
   private final Heightmap heightmap = new Heightmap();
 
-  private String levelName = "unknown";
+  private final String levelName;
 
   private final Collection<ChunkDeletionListener> chunkDeletionListeners = new LinkedList<>();
   private final Collection<ChunkTopographyListener> chunkTopographyListeners = new LinkedList<>();
@@ -103,34 +93,132 @@ public class World implements Comparable<World> {
 
   private int gameMode = 0;
 
-  private long seed;
+  private final long seed;
 
-  private long timestamp = 0;
-
-  /**
-   * Create new world.
-   */
-  public World(File worldDir, boolean logWarnings) {
-    this.worldDirectory = worldDir;
-    this.levelName = worldDir.getName();
-    loadAdditionalData(logWarnings);
-  }
-
-  protected World() {
-  }
+  /** Timestamp for level.dat when player data was last loaded. */
+  private long timestamp;
 
   /**
-   * Add a chunk deletion listener.
+   * @param levelName name of the world (not the world directory).
+   * @param worldDirectory Minecraft world directory.
+   * @param dimension the dimension to load.
+   * @param haveSpawnPos
+   * @param seed
+   * @param timestamp
    */
+  protected World(String levelName, File worldDirectory, int dimension,
+      Set<PlayerEntityData> playerEntities, boolean haveSpawnPos, long seed, long timestamp) {
+    this.levelName = levelName;
+    this.worldDirectory = worldDirectory;
+    this.dimension = dimension;
+    this.playerEntities = playerEntities;
+    this.haveSpawnPos = haveSpawnPos;
+    this.seed = seed;
+    this.timestamp = timestamp;
+  }
+
+  public enum LoggedWarnings {
+    NORMAL,
+    SILENT
+  }
+
+  /**
+   * Parse player location and level name.
+   *
+   * @return {@code true} if the world data was loaded
+   */
+  public static World loadWorld(File worldDirectory, int dimension, LoggedWarnings warnings) {
+    if (worldDirectory == null) {
+      return EmptyWorld.INSTANCE;
+    }
+    String levelName = worldDirectory.getName(); // Default level name.
+    File worldFile = new File(worldDirectory, "level.dat");
+    long modtime = worldFile.lastModified();
+    try (FileInputStream fin = new FileInputStream(worldFile);
+        InputStream gzin = new GZIPInputStream(fin);
+        DataInputStream in = new DataInputStream(gzin)) {
+      Set<String> request = new HashSet<>();
+      request.add(".Data.version");
+      request.add(".Data.RandomSeed");
+      request.add(".Data.Player");
+      request.add(".Data.LevelName");
+      request.add(".Data.GameType");
+      Map<String, Tag> result = NamedTag.quickParse(in, request);
+
+      Tag version = result.get(".Data.version");
+      if (warnings == LoggedWarnings.NORMAL && version.intValue() != NBT_VERSION) {
+        Log.warnf("The world format for the world %s is not supported by Chunky.\n" + "Will attempt to load the world anyway.",
+            levelName);
+      }
+      Tag player = result.get(".Data.Player");
+      Tag spawnX = player.get("SpawnX");
+      Tag spawnY = player.get("SpawnY");
+      Tag spawnZ = player.get("SpawnZ");
+      Tag gameType = result.get(".Data.GameType");
+      Tag randomSeed = result.get(".Data.RandomSeed");
+      levelName = result.get(".Data.LevelName").stringValue(levelName);
+
+      long seed = randomSeed.longValue(0);
+
+      Set<PlayerEntityData> playerEntities = new HashSet<>();
+      if (!player.isError()) {
+        playerEntities.add(new PlayerEntityData(player));
+      }
+      loadAdditionalPlayers(worldDirectory, playerEntities);
+
+      boolean haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
+
+      World world = new World(levelName, worldDirectory, dimension,
+          playerEntities, haveSpawnPos, seed, modtime);
+      world.spawnX = spawnX.intValue();
+      world.spawnY = spawnY.intValue();
+      world.spawnZ = spawnZ.intValue();
+      world.gameMode = gameType.intValue(0);
+      world.playerDimension = player.get("Dimension").intValue();
+      return world;
+    } catch (FileNotFoundException e) {
+      if (warnings == LoggedWarnings.NORMAL) {
+        Log.infof("Could not find level.dat file for world %s!", levelName);
+      }
+    } catch (IOException e) {
+      if (warnings == LoggedWarnings.NORMAL) {
+        Log.infof("Could not read the level.dat file for world %s!", levelName);
+      }
+    }
+    return EmptyWorld.INSTANCE;
+  }
+
+  /**
+   * Reload player data.
+   * @return {@code true} if player data was reloaded.
+   */
+  public synchronized boolean reloadPlayerData() {
+    if (worldDirectory == null) {
+      return false;
+    }
+    File worldFile = new File(worldDirectory, "level.dat");
+    long lastModified = worldFile.lastModified();
+    if (lastModified == timestamp) {
+      return false;
+    }
+    Log.infof("world %s: timestamp updated: reading player data", levelName);
+    timestamp = lastModified;
+    World temp = loadWorld(worldDirectory, dimension, LoggedWarnings.SILENT);
+    if (temp != EmptyWorld.INSTANCE) {
+      // Copy over new player data.
+      playerEntities = temp.playerEntities;
+    }
+    return true;
+  }
+
+/** Add a chunk deletion listener. */
   public void addChunkDeletionListener(ChunkDeletionListener listener) {
     synchronized (chunkDeletionListeners) {
       chunkDeletionListeners.add(listener);
     }
   }
 
-  /**
-   * Add a region discovery listener.
-   */
+  /** Add a region discovery listener. */
   public void addChunkUpdateListener(ChunkUpdateListener listener) {
     synchronized (chunkUpdateListeners) {
       chunkUpdateListeners.add(listener);
@@ -144,93 +232,12 @@ public class World implements Comparable<World> {
     }
   }
 
-  /**
-   * Set current dimension.
-   */
-  public synchronized void setDimension(int dimension) {
-    this.dimension = dimension;
+  private static void loadAdditionalPlayers(File worldDirectory, Set<PlayerEntityData> playerEntities) {
+    loadPlayerData(new File(worldDirectory, "players"), playerEntities);
+    loadPlayerData(new File(worldDirectory, "playerdata"), playerEntities);
   }
 
-  /**
-   * Parse player location and level name.
-   *
-   * @return {@code true} if the world data was loaded
-   */
-  public synchronized boolean loadAdditionalData(boolean logWarnings) {
-    try {
-      File worldFile = new File(worldDirectory, "level.dat");
-      long modtime = worldFile.lastModified();
-      if (timestamp == modtime) {
-        return false;
-      }
-      timestamp = modtime;
-      DataInputStream in = new DataInputStream(new GZIPInputStream(new FileInputStream(worldFile)));
-      Set<String> request = new HashSet<>();
-      request.add(".Data.version");
-      request.add(".Data.RandomSeed");
-      request.add(".Data.Player");
-      request.add(".Data.LevelName");
-      request.add(".Data.GameType");
-      Map<String, Tag> result = NamedTag.quickParse(in, request);
-
-      Tag version = result.get(".Data.version");
-      if (logWarnings && version.intValue() != NBT_VERSION) {
-        Log.warn("The world format for the world " + levelName + " is not supported by Chunky.\n"
-            + "Will attempt to load the world anyway.");
-      }
-      Tag player = result.get(".Data.Player");
-      Tag spawnX = player.get("SpawnX");
-      Tag spawnY = player.get("SpawnY");
-      Tag spawnZ = player.get("SpawnZ");
-      Tag gameType = result.get(".Data.GameType");
-      Tag randomSeed = result.get(".Data.RandomSeed");
-
-      playerDimension = player.get("Dimension").intValue();
-
-      gameMode = gameType.intValue(0);
-      seed = randomSeed.longValue(0);
-
-      playerEntities.clear();
-
-      if (!player.isError()) {
-        playerEntities.add(new PlayerEntityData(player));
-      }
-
-      int playerY = playerLocY();
-      if (playerY >= 0 && playerY <= Chunk.Y_MAX) {
-        currentLayer = playerY;
-      }
-
-      loadAdditionalPlayers();
-
-      this.spawnX = spawnX.intValue();
-      this.spawnY = spawnY.intValue();
-      this.spawnZ = spawnZ.intValue();
-      haveSpawnPos = !(spawnX.isError() || spawnY.isError() || spawnZ.isError());
-
-      levelName = result.get(".Data.LevelName").stringValue(levelName);
-
-      in.close();
-      return true;
-
-    } catch (FileNotFoundException e) {
-      if (logWarnings) {
-        Log.info("Could not find level.dat file for the world '" + levelName + "'!");
-      }
-    } catch (IOException e) {
-      if (logWarnings) {
-        Log.info("Could not read the level.dat file for the world '" + levelName + "'!");
-      }
-    }
-    return false;
-  }
-
-  private void loadAdditionalPlayers() {
-    loadAdditionalPlayers(new File(worldDirectory, "players"));
-    loadAdditionalPlayers(new File(worldDirectory, "playerdata"));
-  }
-
-  private void loadAdditionalPlayers(File playerdata) {
+  private static void loadPlayerData(File playerdata, Set<PlayerEntityData> playerEntities) {
     if (playerdata.isDirectory()) {
       File[] players = playerdata.listFiles();
       if (players != null) {
@@ -271,9 +278,7 @@ public class World implements Comparable<World> {
     }
   }
 
-  /**
-   * Set the region for the given position.
-   */
+  /** Set the region for the given position. */
   public synchronized void setRegion(ChunkPosition pos, Region region) {
     regionMap.put(pos, region);
   }
@@ -288,21 +293,12 @@ public class World implements Comparable<World> {
   }
 
   /**
-   * Set the current layer.
-   */
-  public synchronized void setCurrentLayer(int layer) {
-    if (layer != currentLayer) {
-      currentLayer = layer;
-    }
-  }
-
-  /**
-   * Get the data directory for the given dimension
+   * Get the data directory for the given dimension.
    *
    * @param dimension the dimension
    * @return File object pointing to the data directory
    */
-  public synchronized File getDataDirectory(int dimension) {
+  private synchronized File getDataDirectory(int dimension) {
     return dimension == 0 ?
         worldDirectory :
         new File(worldDirectory, "DIM" + dimension);
@@ -328,19 +324,21 @@ public class World implements Comparable<World> {
    * @return File object pointing to the region file directory for
    * the given dimension
    */
-  public synchronized File getRegionDirectory(int dimension) {
+  private synchronized File getRegionDirectory(int dimension) {
     return new File(getDataDirectory(dimension), "region");
   }
 
   /**
-   * @return vector with player position, or {@code null} if not available
+   * Get the current player position as an optional vector.
+   *
+   * <p>The result is empty if this is not a single player world.
    */
-  public synchronized Vector3 playerPos() {
+  public synchronized Optional<Vector3> playerPos() {
     if (!playerEntities.isEmpty() && playerDimension == dimension) {
       PlayerEntityData pos = playerEntities.iterator().next();
-      return new Vector3(pos.x, pos.y, pos.z);
+      return Optional.of(new Vector3(pos.x, pos.y, pos.z));
     } else {
-      return null;
+      return Optional.empty();
     }
   }
 
@@ -372,9 +370,7 @@ public class World implements Comparable<World> {
     return worldDirectory;
   }
 
-  /**
-   * Called when a new region has been discovered by the region parser.
-   */
+  /** Called when a new region has been discovered by the region parser. */
   public void regionDiscovered(ChunkPosition pos) {
     synchronized (this) {
       Region region = regionMap.get(pos);
@@ -385,9 +381,7 @@ public class World implements Comparable<World> {
     }
   }
 
-  /**
-   * Notify region update listeners.
-   */
+  /** Notify region update listeners. */
   private void fireChunkUpdated(ChunkPosition chunk) {
     synchronized (chunkUpdateListeners) {
       for (ChunkUpdateListener listener : chunkUpdateListeners) {
@@ -396,28 +390,12 @@ public class World implements Comparable<World> {
     }
   }
 
-  /**
-   * Notify region update listeners.
-   */
+  /** Notify region update listeners. */
   private void fireRegionUpdated(ChunkPosition region) {
     synchronized (chunkUpdateListeners) {
       for (ChunkUpdateListener listener : chunkUpdateListeners) {
         listener.regionUpdated(region);
       }
-    }
-  }
-
-  /**
-   * Clear the region map and remove all listeners.
-   */
-  public synchronized void dispose() {
-    regionMap.clear();
-
-    synchronized (chunkDeletionListeners) {
-      chunkDeletionListeners.clear();
-    }
-    synchronized (chunkUpdateListeners) {
-      chunkUpdateListeners.clear();
     }
   }
 
@@ -429,7 +407,7 @@ public class World implements Comparable<World> {
    * @throws IOException
    */
   public synchronized void exportChunksToZip(File target, Collection<ChunkPosition> chunks,
-      int dimension, ProgressTracker progress) throws IOException {
+      ProgressTracker progress) throws IOException {
 
     Map<ChunkPosition, Set<ChunkPosition>> regionMap = new HashMap<>();
 
@@ -502,8 +480,9 @@ public class World implements Comparable<World> {
 
       for (Pair<File, ChunkPosition> region : regions) {
 
-        if (progress.isInterrupted())
+        if (progress.isInterrupted()) {
           break;
+        }
 
         String regionDirectory = (region.thing1 == overworld) ?
             worldDirectory.getName() :
@@ -548,30 +527,22 @@ public class World implements Comparable<World> {
     return levelName + " (" + worldDirectory.getName() + ")";
   }
 
-  /**
-   * @return The name of the world, not the actual world directory
-   */
+  /** The name of this world (not the world directory name). */
   public String levelName() {
     return levelName;
   }
 
-  /**
-   * Called when a chunk has been updated.
-   */
+  /** Called when a chunk has been updated. */
   public void chunkUpdated(ChunkPosition chunk) {
     fireChunkUpdated(chunk);
   }
 
-  /**
-   * Called when a chunk has been updated.
-   */
+  /** Called when a chunk has been updated. */
   public void regionUpdated(ChunkPosition region) {
     fireRegionUpdated(region);
   }
 
-  /**
-   * Add a chunk discovery listener
-   */
+  /** Add a chunk discovery listener */
   public void addChunkTopographyListener(ChunkTopographyListener listener) {
     synchronized (chunkTopographyListeners) {
       chunkTopographyListeners.add(listener);
@@ -633,14 +604,6 @@ public class World implements Comparable<World> {
   }
 
   /**
-   * Clear the chunk map and reload the additional data.
-   */
-  public void reload() {
-    regionMap.clear();
-    loadAdditionalData(true);
-  }
-
-  /**
    * @return String describing the game-mode of this world
    */
   public String gameMode() {
@@ -657,7 +620,7 @@ public class World implements Comparable<World> {
   }
 
   @Override public int compareTo(World o) {
-    // Just compare the world names.
+    // Compares world names and directories.
     return toString().compareToIgnoreCase(o.toString());
   }
 

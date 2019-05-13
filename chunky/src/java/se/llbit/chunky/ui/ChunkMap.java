@@ -457,7 +457,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       int pz = (int) QuickMath.floor(player.z * blockScale);
       int ppx = px - (int) QuickMath.floor(mapView.x0 * mapView.scale);
       int ppy = pz - (int) QuickMath.floor(mapView.z0 * mapView.scale);
-      int pw = (int) QuickMath.max(8, QuickMath.min(16, blockScale * 2));
+      int pw = (int) QuickMath.max(16, QuickMath.min(32, blockScale * 4));
       ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
       ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
 

@@ -29,7 +29,6 @@ import se.llbit.chunky.world.RegionParser;
 import se.llbit.chunky.world.RegionQueue;
 import se.llbit.chunky.world.World;
 import se.llbit.chunky.world.listeners.ChunkTopographyListener;
-import se.llbit.math.Vector3;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,13 +42,14 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   private final ChunkyFxController controller;
   private MapView mapView;
 
-  private World world = EmptyWorld.instance;
+  private World world = EmptyWorld.INSTANCE;
 
   private final RegionQueue regionQueue = new RegionQueue();
 
   private final ChunkTopographyUpdater topographyUpdater = new ChunkTopographyUpdater();
   private final RegionChangeWatcher refresher = new RegionChangeWatcher(this);
 
+  /** The dimension to load in the current world. */
   private int currentDimension = PersistentSettings.getDimension();
 
   private List<Consumer<World>> worldLoadListeners = new ArrayList<>();
@@ -68,55 +68,33 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     refresher.start();
   }
 
-  public void loadWorld(File worldDir) {
-    if (worldDir != null && World.isWorldDir(worldDir)) {
-      loadWorld(new World(worldDir, false));
-    }
-  }
-
   /**
    * This is called when a new world is loaded, and when switching to a
    * different dimension.
-   *
-   * <p>NB: When switching dimension this is called with newWorld = world.
    */
-  public synchronized void loadWorld(World newWorld) {
-    // Dispose old world.
-    world.dispose();
-
-    newWorld.reload();
-
-    newWorld.addChunkUpdateListener(controller);
-    newWorld.addChunkUpdateListener(controller.getMap());
-
-    world = newWorld;
-    world.addChunkTopographyListener(this);
-
-    // Dimension must be set before chunks are loaded.
-    world.setDimension(currentDimension);
-
-    Vector3 playerPos = world.playerPos();
-    if (playerPos != null) {
-      panToPlayer();
-    } else {
-      mapView.panTo(0, 0);
+  public void loadWorld(File worldDir) {
+    if (World.isWorldDir(worldDir)) {
+      World newWorld = World.loadWorld(worldDir, currentDimension, World.LoggedWarnings.NORMAL);
+      newWorld.addChunkUpdateListener(controller);
+      newWorld.addChunkUpdateListener(controller.getMap());
+      newWorld.addChunkTopographyListener(this);
+      synchronized (this) {
+        world = newWorld;
+        File newWorldDir = world.getWorldDirectory();
+        if (newWorldDir != null) {
+          PersistentSettings.setLastWorld(newWorldDir);
+        }
+      }
+      worldLoadListeners.forEach(listener -> listener.accept(newWorld));
     }
-
-    File newWorldDir = world.getWorldDirectory();
-    if (newWorldDir != null) {
-      PersistentSettings.setLastWorld(newWorldDir);
-    }
-
-    worldLoadListeners.forEach(listener -> listener.accept(newWorld));
   }
 
+  /** Adds a listener to be notified when a new world has been loaded. */
   public void addWorldLoadListener(Consumer<World> callback) {
     worldLoadListeners.add(callback);
   }
 
-  /**
-   * Called when the map view has changed.
-   */
+  /** Called when the map view has changed to load the visible chunks. */
   @Override public synchronized void viewUpdated(ChunkView mapView) {
     refresher.setView(mapView);
 
@@ -125,7 +103,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     int rz0 = mapView.prz0;
     int rz1 = mapView.prz1;
 
-    // Enqueue visible regions and chunks.
+    // Enqueue visible regions and chunks to be loaded.
     for (int rx = rx0; rx <= rx1; ++rx) {
       for (int rz = rz0; rz <= rz1; ++rz) {
         regionQueue.add(ChunkPosition.get(rx, rz));
@@ -142,25 +120,12 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     return world;
   }
 
-  /**
-   * Get the name of the current loaded world.
-   *
-   * @return The name of the current world
-   */
-  public String getWorldName() {
-    return world.levelName();
+  /** Pan the map view to the player (if singleplayer world). */
+  public synchronized void panToPlayer() {
+    world.playerPos().ifPresent(pos -> mapView.panTo(pos));
   }
 
-  public void panToPlayer() {
-    Vector3 pos = world.playerPos();
-    if (pos != null) {
-      mapView.panTo(pos);
-    }
-  }
-
-  /**
-   * Called to notify the world loader that a region was changed.
-   */
+  /** Called to notify the world loader that a region was changed. */
   public void regionUpdated(ChunkPosition region) {
     regionQueue.add(region);
   }
@@ -174,13 +139,14 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
    * for the current world.
    */
   public synchronized void reloadWorld() {
-    world.reload();
+    world = World.loadWorld(world.getWorldDirectory(), currentDimension,
+        World.LoggedWarnings.NORMAL);
   }
 
   /**
    * Set the current dimension.
    *
-   * @param value Must be a valid dimension index
+   * @param value Must be a valid dimension index (0, -1, 1)
    */
   public void setDimension(int value) {
     if (value != currentDimension) {
@@ -191,20 +157,11 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
       // next dimension. However, this is a very ugly way to handle dimension
       // switching and it would probably be much better to just create a fresh
       // world instance to load.
-      loadWorld(world);
+      loadWorld(world.getWorldDirectory());
     }
   }
 
-  /**
-   * @return <code>true</code> if chunks or regions are currently being parsed
-   */
-  public boolean isLoading() {
-    return !regionQueue.isEmpty();
-  }
-
-  /**
-   * Get the currently loaded dimension.
-   */
+  /** Get the currently loaded dimension. */
   public int getDimension() {
     return currentDimension;
   }

@@ -32,7 +32,7 @@ public class EmptyRegion extends Region {
    * Create the empty region.
    */
   private EmptyRegion() {
-    super(ChunkPosition.get(0, 0), EmptyWorld.instance);
+    super(ChunkPosition.get(0, 0), EmptyWorld.INSTANCE);
   }
 
   @Override public Chunk getChunk(ChunkPosition pos) {

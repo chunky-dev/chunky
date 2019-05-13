@@ -57,7 +57,7 @@ public class ZipExportJob extends Thread {
         if (selected.isEmpty()) {
           world.exportWorldToZip(targetFile, progress);
         } else {
-          world.exportChunksToZip(targetFile, selected, world.currentDimension(), progress);
+          world.exportChunksToZip(targetFile, selected, progress);
         }
       } catch (FileNotFoundException e) {
         Log.error("Could not write zip file.", e);

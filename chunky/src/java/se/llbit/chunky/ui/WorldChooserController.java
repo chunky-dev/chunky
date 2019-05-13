@@ -85,7 +85,7 @@ public class WorldChooserController implements Initializable {
       TableRow<World> row = new TableRow<>();
       row.setOnMouseClicked(e -> {
         if (e.getClickCount() == 2 && !row.isEmpty()) {
-          mapLoader.loadWorld(row.getItem());
+          mapLoader.loadWorld(row.getItem().getWorldDirectory());
           e.consume();
           stage.close();
         }
@@ -121,7 +121,7 @@ public class WorldChooserController implements Initializable {
       File directory = chooser.showDialog(stage);
       if (directory != null) {
         if (directory.isDirectory()) {
-          mapLoader.loadWorld(new World(directory, false));
+          mapLoader.loadWorld(directory);
           stage.close();
         } else {
           Log.warn("Non-directory selected.");
@@ -130,7 +130,7 @@ public class WorldChooserController implements Initializable {
     });
     loadSelectedBtn.setOnAction(e -> {
       if (!worldTbl.getSelectionModel().isEmpty()) {
-        mapLoader.loadWorld(worldTbl.getSelectionModel().getSelectedItem());
+        mapLoader.loadWorld(worldTbl.getSelectionModel().getSelectedItem().getWorldDirectory());
         stage.close();
       }
     });
@@ -152,14 +152,15 @@ public class WorldChooserController implements Initializable {
 
     Task<List<World>> loadWorldsTask = new Task<List<World>>() {
       @Override
-      protected List<World> call() throws Exception {
+      protected List<World> call() {
         List<World> worlds = new ArrayList<>();
         if (worldSavesDir != null) {
           File[] worldDirs = worldSavesDir.listFiles();
           if (worldDirs != null) {
             for (File dir : worldDirs) {
               if (World.isWorldDir(dir)) {
-                worlds.add(new World(dir, false));
+                worlds.add(World.loadWorld(dir, World.OVERWORLD_DIMENSION,
+                    World.LoggedWarnings.SILENT));
               }
             }
           }
