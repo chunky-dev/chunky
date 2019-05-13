@@ -359,17 +359,6 @@ public class World implements Comparable<World> {
   }
 
   /**
-   * @return Player Y location, or -1 if not available
-   */
-  public synchronized int playerLocY() {
-    PlayerEntityData player = getPlayerPosition();
-    if (player != null) {
-      return (int) (player.y - 0.5);
-    }
-    return -1;
-  }
-
-  /**
    * @return The chunk heightmap
    */
   public Heightmap heightmap() {
@@ -688,14 +677,6 @@ public class World implements Comparable<World> {
       }
     }
     return list;
-  }
-
-  public synchronized PlayerEntityData getPlayerPosition() {
-    if (playerEntities.isEmpty()) {
-      return null;
-    } else {
-      return playerEntities.iterator().next();
-    }
   }
 
   public synchronized Collection<PlayerEntityData> getPlayerPositions() {
