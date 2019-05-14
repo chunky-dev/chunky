@@ -1,5 +1,6 @@
 LATEST
 
+* Replaced player icon.
 * Removed 2D map rendering modes.
 * Removed block highlighting in the 2D map.
 * Added Update Site url setting in the launcher.

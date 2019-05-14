@@ -466,7 +466,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       ppx = Math.min(mapView.width - pw, Math.max(0, ppx - pw / 2));
       ppy = Math.min(mapView.height - pw, Math.max(0, ppy - pw / 2));
 
-      gc.drawImage(Icon.face.fxImage(), ppx, ppy, pw, pw);
+      gc.drawImage(Icon.player.fxImage(), ppx, ppy, pw, pw);
     }
   }
 

@@ -76,6 +76,7 @@ public class Icon extends Texture {
   public static final Texture failed = new Icon("failed");
 
   public static final Icon face = new Icon("face");
+  public static final Icon player = new Icon("player");
   public static final Icon face_t = new Icon("face_t");
   public static final Icon home = new Icon("home");
   public static final Icon home_t = new Icon("home_t");
