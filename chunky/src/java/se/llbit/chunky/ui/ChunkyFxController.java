@@ -149,10 +149,8 @@ public class ChunkyFxController
     mapView = new MapView();
     mapLoader = new WorldMapLoader(this, mapView);
     map = new ChunkMap(mapLoader, this, mapView, chunkSelection);
-    mapView.addViewListener(mapLoader);
-    mapView.addViewListener(map);
     chunkSelection.addSelectionListener(this);
-    chunkSelection.addChunkUpdateListener(map);
+
     mapLoader.addWorldLoadListener(world -> {
       chunkSelection.clearSelection();
       world.addChunkDeletionListener(chunkSelection);
@@ -170,7 +168,7 @@ public class ChunkyFxController
       boolean track = trackPlayer.get();
       PersistentSettings.setFollowPlayer(track);
       if (track) {
-        mapLoader.panToPlayer();
+        mapLoader.withWorld(world -> world.playerPos().ifPresent(mapView::panTo));
       }
     });
 
@@ -200,13 +198,6 @@ public class ChunkyFxController
    */
   public synchronized void exportZip(File targetFile, ProgressTracker progress) {
     new ZipExportJob(mapLoader.getWorld(), chunkSelection.getSelection(), targetFile, progress).start();
-  }
-
-  /**
-   * Select the region containing the given chunk.
-   */
-  public void selectRegion(int cx, int cz) {
-    chunkSelection.selectRegion(mapLoader.getWorld(), cx, cz);
   }
 
   @Override public void initialize(URL fxmlUrl, ResourceBundle resources) {
@@ -279,7 +270,7 @@ public class ChunkyFxController
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Export Chunks to Zip");
       fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Zip files", "*.zip"));
-      fileChooser.setInitialFileName(String.format("%s.zip", mapLoader.getWorld().levelName()));
+      mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".zip"));
       File target = fileChooser.showSaveDialog(stage);
       if (target != null) {
         exportZip(target, ProgressTracker.NONE);
@@ -291,7 +282,7 @@ public class ChunkyFxController
       fileChooser.setTitle("Export PNG");
       fileChooser
           .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("PNG images", "*.png"));
-      fileChooser.setInitialFileName(String.format("%s.png", mapLoader.getWorld().levelName()));
+      mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".png"));
       if (prevPngDir != null) {
         fileChooser.setInitialDirectory(prevPngDir.toFile());
       }

@@ -103,6 +103,11 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     this.controller = controller;
     this.mapView = mapView;
     this.chunkSelection = chunkSelection;
+
+    // Register to listen for events:
+    mapView.addViewListener(this);
+    chunkSelection.addChunkUpdateListener(this);
+
     mapBuffer = new MapBuffer();
     moveCameraHere = new MenuItem("Move camera here");
     selectVisible = new MenuItem("Select visible chunks");

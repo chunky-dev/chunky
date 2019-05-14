@@ -18,30 +18,35 @@ package se.llbit.chunky.world;
 
 import javafx.application.Platform;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
+import se.llbit.chunky.renderer.ChunkViewListener;
 
 /**
  * Monitors filesystem for changes to region files.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class RegionChangeWatcher extends Thread {
+public class RegionChangeWatcher extends Thread implements ChunkViewListener {
   private final WorldMapLoader mapLoader;
+  private final MapView mapView;
   private volatile ChunkView view = ChunkView.EMPTY;
 
-  public RegionChangeWatcher(WorldMapLoader loader) {
+  public RegionChangeWatcher(WorldMapLoader loader, MapView mapView) {
     super("Region Refresher");
     this.mapLoader = loader;
+    this.mapView = mapView;
+    mapView.addViewListener(this);
   }
 
   @Override public void run() {
     try {
       while (!isInterrupted()) {
         sleep(3000);
-        final World world = mapLoader.getWorld();
+        World world = mapLoader.getWorld();
         if (world.reloadPlayerData()) {
           if (PersistentSettings.getFollowPlayer()) {
-            Platform.runLater(mapLoader::panToPlayer);
+            Platform.runLater(() -> world.playerPos().ifPresent(mapView::panTo));
           }
         }
         ChunkView theView = view;
@@ -70,8 +75,7 @@ public class RegionChangeWatcher extends Thread {
     }
   }
 
-  public void setView(ChunkView view) {
-    this.view = view;
+  @Override public synchronized void viewUpdated(ChunkView mapView) {
+    this.view = mapView;
   }
-
 }

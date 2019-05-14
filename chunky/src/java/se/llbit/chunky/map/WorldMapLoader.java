@@ -40,14 +40,12 @@ import java.util.function.Consumer;
  */
 public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListener {
   private final ChunkyFxController controller;
-  private MapView mapView;
 
   private World world = EmptyWorld.INSTANCE;
 
   private final RegionQueue regionQueue = new RegionQueue();
 
   private final ChunkTopographyUpdater topographyUpdater = new ChunkTopographyUpdater();
-  private final RegionChangeWatcher refresher = new RegionChangeWatcher(this);
 
   /** The dimension to load in the current world. */
   private int currentDimension = PersistentSettings.getDimension();
@@ -56,7 +54,8 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
 
   public WorldMapLoader(ChunkyFxController controller, MapView mapView) {
     this.controller = controller;
-    this.mapView = mapView;
+    mapView.addViewListener(this);
+    RegionChangeWatcher regionWatcher = new RegionChangeWatcher(this, mapView);
 
     // Start worker threads.
     RegionParser[] regionParsers = new RegionParser[3];
@@ -65,7 +64,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
       regionParsers[i].start();
     }
     topographyUpdater.start();
-    refresher.start();
+    regionWatcher.start();
   }
 
   /**
@@ -96,8 +95,6 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
 
   /** Called when the map view has changed to load the visible chunks. */
   @Override public synchronized void viewUpdated(ChunkView mapView) {
-    refresher.setView(mapView);
-
     int rx0 = mapView.prx0;
     int rx1 = mapView.prx1;
     int rz0 = mapView.prz0;
@@ -120,9 +117,8 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     return world;
   }
 
-  /** Pan the map view to the player (if singleplayer world). */
-  public synchronized void panToPlayer() {
-    world.playerPos().ifPresent(pos -> mapView.panTo(pos));
+  public synchronized void withWorld(Consumer<World> fun) {
+    fun.accept(world);
   }
 
   /** Called to notify the world loader that a region was changed. */
