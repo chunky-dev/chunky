@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.ui;
 
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -25,7 +26,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -47,7 +47,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
@@ -140,7 +139,6 @@ public class ChunkyFxController
       new SimpleBooleanProperty(PersistentSettings.getFollowCamera());
 
   private RenderControlsFx controls = null;
-  private Stage stage;
   private Path prevPngDir = null;
 
   public ChunkyFxController(Chunky chunky) {
@@ -270,7 +268,7 @@ public class ChunkyFxController
       fileChooser.setTitle("Export Chunks to Zip");
       fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Zip files", "*.zip"));
       mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".zip"));
-      File target = fileChooser.showSaveDialog(stage);
+      File target = fileChooser.showSaveDialog(exportZip.getScene().getWindow());
       if (target != null) {
         exportZip(target, ProgressTracker.NONE);
       }
@@ -285,7 +283,7 @@ public class ChunkyFxController
       if (prevPngDir != null) {
         fileChooser.setInitialDirectory(prevPngDir.toFile());
       }
-      File target = fileChooser.showSaveDialog(stage);
+      File target = fileChooser.showSaveDialog(exportZip.getScene().getWindow());
       if (target != null) {
         Path path = target.toPath();
         if (!target.getName().endsWith(".png")) {
@@ -406,10 +404,14 @@ public class ChunkyFxController
     mapLoader.addWorldLoadListener(
         world -> mapName.setText(world.levelName()));
     mapLoader.loadWorld(PersistentSettings.getLastWorld());
+
+    menuExit.setOnAction(event -> {
+      Platform.exit();
+      System.exit(0);
+    });
   }
 
-  public void setStageAndScene(ChunkyFx app, Stage stage, Scene scene) {
-    this.stage = stage;
+  public void setApplication(Application app) {
     documentationLink.setOnAction(
         e -> app.getHostServices().showDocument("http://chunky.llbit.se"));
 
@@ -421,15 +423,6 @@ public class ChunkyFxController
 
     forumLink.setOnAction(
         e -> app.getHostServices().showDocument("https://www.reddit.com/r/chunky"));
-
-    stage.setOnCloseRequest(event -> {
-      Platform.exit();
-      System.exit(0);
-    });
-    menuExit.setOnAction(event -> {
-      Platform.exit();
-      System.exit(0);
-    });
   }
 
   /**

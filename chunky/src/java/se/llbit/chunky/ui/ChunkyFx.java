@@ -17,6 +17,7 @@
 package se.llbit.chunky.ui;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -42,8 +43,12 @@ public class ChunkyFx extends Application {
     stage.setTitle(Chunky.getMainWindowTitle());
     Scene scene = new Scene(root);
     stage.setScene(scene);
-    controller.setStageAndScene(this, stage, scene);
+    controller.setApplication(this);
     stage.getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
+    stage.setOnCloseRequest(event -> {
+      Platform.exit();
+      System.exit(0);
+    });
     stage.show();
   }
 
