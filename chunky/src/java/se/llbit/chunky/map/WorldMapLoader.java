@@ -74,8 +74,6 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
   public void loadWorld(File worldDir) {
     if (World.isWorldDir(worldDir)) {
       World newWorld = World.loadWorld(worldDir, currentDimension, World.LoggedWarnings.NORMAL);
-      newWorld.addChunkUpdateListener(controller);
-      newWorld.addChunkUpdateListener(controller.getMap());
       newWorld.addChunkTopographyListener(this);
       synchronized (this) {
         world = newWorld;

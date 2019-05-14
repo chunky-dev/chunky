@@ -93,16 +93,21 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   protected boolean dragging = false;
   protected boolean mouseDown = false;
 
-  private Canvas canvas;
+  private final Canvas canvas;
+  private final Canvas mapOverlay;
+
   volatile boolean repaintQueued = false;
   private Runnable onViewDragged = () -> {};
 
-  public ChunkMap(final WorldMapLoader loader, final ChunkyFxController controller,
-      MapView mapView, ChunkSelectionTracker chunkSelection) {
+  public ChunkMap(WorldMapLoader loader, ChunkyFxController controller,
+      MapView mapView, ChunkSelectionTracker chunkSelection,
+      Canvas canvas, Canvas mapOverlay) {
     this.mapLoader = loader;
     this.controller = controller;
     this.mapView = mapView;
     this.chunkSelection = chunkSelection;
+    this.canvas = canvas;
+    this.mapOverlay = mapOverlay;
 
     // Register to listen for events:
     mapView.addViewListener(this);
@@ -360,7 +365,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       } else {
         tooltip.setText(hoveredChunk.toString());
       }
-      Canvas mapOverlay = controller.getMapOverlay();
       Scene scene = mapOverlay.getScene();
       if (mapOverlay.isFocused()) {
         tooltip.show(scene.getWindow(), scene.getWindow().getX(),
@@ -378,7 +382,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       clickY = lastY;
       moveCameraHere.setVisible(controller.hasActiveRenderControls());
       selectVisible.setVisible(controller.hasActiveRenderControls());
-      contextMenu.show(controller.getMapOverlay(), event.getScreenX(), event.getScreenY());
+      contextMenu.show(mapOverlay, event.getScreenX(), event.getScreenY());
     } else {
       if (contextMenu.isShowing()) {
         contextMenu.hide();
@@ -448,7 +452,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     drawSpawn(gc);
     drawSelectionRect(gc);
     if (controller.hasActiveRenderControls()) {
-      drawViewBounds(controller.getMapOverlay());
+      drawViewBounds(mapOverlay);
     }
   }
 
@@ -500,7 +504,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   }
 
   @Override public void cameraViewUpdated() {
-    drawViewBounds(controller.getMapOverlay());
+    drawViewBounds(mapOverlay);
   }
 
   public void selectVisibleChunks(ChunkView cv, se.llbit.chunky.renderer.scene.Scene scene) {
@@ -708,10 +712,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     int x2 = (int) v2.x;
     int y2 = (int) v2.y;
     gc.strokeLine(x1, y1, x2, y2);
-  }
-
-  public void setCanvas(Canvas canvas) {
-    this.canvas = canvas;
   }
 
   public void setOnViewDragged(Runnable onViewDragged) {

@@ -347,7 +347,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
 
   @Override public void setController(RenderControlsFxController controller) {
     this.mapView = controller.getChunkyController().getMapView();
-    this.cameraViewListener = controller.getChunkyController().getMap();
+    this.cameraViewListener = controller.getChunkyController();
 
     scene = controller.getRenderController().getSceneManager().getScene();
     scene.camera().setDirectionListener(this::updateCameraDirection);

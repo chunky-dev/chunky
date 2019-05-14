@@ -301,7 +301,7 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
   public void setStage(Stage stage) {
     this.stage = stage;
     stage.setOnHiding(e -> {
-      controller.getMap().cameraViewUpdated(); // Clear the camera view visualization.
+      controller.cameraViewUpdated(); // Clear the camera view visualization.
       scene.setRenderMode(RenderMode.PAUSED);
       scene.forceReset();
       if (canvas != null && canvas.isShowing()) {
@@ -310,7 +310,7 @@ public class RenderControlsFxController implements Initializable, RenderResetHan
     });
     stage.setOnShown(e -> {
       openPreview();
-      controller.getMap().cameraViewUpdated(); // Trigger redraw of camera view visualization.
+      controller.cameraViewUpdated(); // Trigger redraw of camera view visualization.
     });
   }
 

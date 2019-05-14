@@ -55,18 +55,17 @@ import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
+import se.llbit.chunky.renderer.CameraViewListener;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.ui.render.RenderControlsFx;
 import se.llbit.chunky.world.ChunkPosition;
-import se.llbit.chunky.world.ChunkSelectionListener;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.DeleteChunksJob;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
-import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.fxutil.GroupedChangeListener;
 import se.llbit.log.Level;
 import se.llbit.log.Log;
@@ -87,7 +86,7 @@ import java.util.ResourceBundle;
  * Controller for the main Chunky window.
  */
 public class ChunkyFxController
-    implements Initializable, ChunkSelectionListener, ChunkUpdateListener {
+    implements Initializable, CameraViewListener {
 
   private final Chunky chunky;
   private WorldMapLoader mapLoader;
@@ -147,39 +146,6 @@ public class ChunkyFxController
   public ChunkyFxController(Chunky chunky) {
     this.chunky = chunky;
     mapView = new MapView();
-    mapLoader = new WorldMapLoader(this, mapView);
-    map = new ChunkMap(mapLoader, this, mapView, chunkSelection);
-    chunkSelection.addSelectionListener(this);
-
-    mapLoader.addWorldLoadListener(world -> {
-      chunkSelection.clearSelection();
-      world.addChunkDeletionListener(chunkSelection);
-      Optional<Vector3> playerPos = world.playerPos();
-      mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
-      map.redrawMap();
-    });
-
-    map.setOnViewDragged(() -> {
-      trackPlayer.set(false);
-      trackCamera.set(false);
-    });
-
-    trackPlayer.addListener(e -> {
-      boolean track = trackPlayer.get();
-      PersistentSettings.setFollowPlayer(track);
-      if (track) {
-        mapLoader.withWorld(world -> world.playerPos().ifPresent(mapView::panTo));
-      }
-    });
-
-    trackCamera.addListener(e -> {
-      boolean track = trackCamera.get();
-      PersistentSettings.setFollowCamera(track);
-      if (track) {
-        panToCamera();
-      }
-    });
-
   }
 
   /**
@@ -202,7 +168,40 @@ public class ChunkyFxController
 
   @Override public void initialize(URL fxmlUrl, ResourceBundle resources) {
     Log.setReceiver(new UILogReceiver(), Level.ERROR, Level.WARNING);
-    map.setCanvas(mapCanvas);
+
+    mapLoader = new WorldMapLoader(this, mapView);
+    map = new ChunkMap(mapLoader, this, mapView, chunkSelection,
+        mapCanvas, mapOverlay);
+
+    mapLoader.addWorldLoadListener(world -> {
+      chunkSelection.clearSelection();
+      world.addChunkDeletionListener(chunkSelection);
+      Optional<Vector3> playerPos = world.playerPos();
+      mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
+      map.redrawMap();
+      world.addChunkUpdateListener(map);
+    });
+
+    map.setOnViewDragged(() -> {
+      trackPlayer.set(false);
+      trackCamera.set(false);
+    });
+
+    trackPlayer.addListener(e -> {
+      boolean track = trackPlayer.get();
+      PersistentSettings.setFollowPlayer(track);
+      if (track) {
+        mapLoader.withWorld(world -> world.playerPos().ifPresent(mapView::panTo));
+      }
+    });
+
+    trackCamera.addListener(e -> {
+      boolean track = trackCamera.get();
+      PersistentSettings.setFollowCamera(track);
+      if (track) {
+        panToCamera();
+      }
+    });
 
     mapPane.widthProperty().addListener((observable, oldValue, newValue) -> {
       mapCanvas.setWidth(newValue.doubleValue());
@@ -531,25 +530,12 @@ public class ChunkyFxController
     return map;
   }
 
-  @Override public void chunkSelectionChanged() {
-  }
-
-  @Override public void regionUpdated(ChunkPosition region) {
-  }
-
-  @Override public void chunkUpdated(ChunkPosition region) {
-  }
-
   public Chunky getChunky() {
     return chunky;
   }
 
   public WorldMapLoader getMapLoader() {
     return mapLoader;
-  }
-
-  public Canvas getMapOverlay() {
-    return mapOverlay;
   }
 
   public void openSceneDirectory() {
@@ -579,5 +565,9 @@ public class ChunkyFxController
 
   public ChunkSelectionTracker getChunkSelection() {
     return chunkSelection;
+  }
+
+  @Override public void cameraViewUpdated() {
+    map.cameraViewUpdated();
   }
 }
