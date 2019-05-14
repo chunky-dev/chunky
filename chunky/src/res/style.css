@@ -1,0 +1,8 @@
+.root {
+    -fx-base: rgb(30,30,30);
+    -fx-background: rgb(20,20,20);
+}
+
+ToggleButton:selected {
+    -fx-background-color: rgb(80,80,80);
+}

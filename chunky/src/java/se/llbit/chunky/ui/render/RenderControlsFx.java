@@ -38,7 +38,9 @@ public class RenderControlsFx extends Stage {
     Parent root = loader.load();
     RenderControlsFxController controller = loader.getController();
     setTitle("Render Controls");
-    setScene(new Scene(root));
+    Scene scene = new Scene(root);
+    setScene(scene);
+    scene.getStylesheets().add("style.css");
     controller.setController(fxController);
     controller.setStage(this);
     addEventFilter(KeyEvent.ANY, e -> {
