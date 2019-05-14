@@ -132,9 +132,14 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
    * Flush all cached chunks and regions, forcing them to be reloaded
    * for the current world.
    */
-  public synchronized void reloadWorld() {
-    world = World.loadWorld(world.getWorldDirectory(), currentDimension,
+  public void reloadWorld() {
+    World newWorld = World.loadWorld(world.getWorldDirectory(), currentDimension,
         World.LoggedWarnings.NORMAL);
+    newWorld.addChunkTopographyListener(this);
+    synchronized (this) {
+      world = newWorld;
+    }
+    worldLoadListeners.forEach(listener -> listener.accept(newWorld));
   }
 
   /**
