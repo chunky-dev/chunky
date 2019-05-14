@@ -52,6 +52,7 @@ public class MapView {
     ChunkView mapView = map.get();
     if (width != mapView.width || height != mapView.height) {
       map.set(new ChunkView(mapView.x, mapView.z, width, height, mapView.scale));
+      notifyViewUpdated();
     }
   }
 
