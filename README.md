@@ -4,6 +4,7 @@ Chunky is a Minecraft mapping and rendering tool.
 
 Quick links:
 
+* [![Join our Discord server!](https://raw.githubusercontent.com/llbit/chunky/master/misc/discord.png)](https://discord.gg/VqcHpsF)
 * [Documentation][1]
 * [Troubleshooting][2]
 * [Subreddit][3]
