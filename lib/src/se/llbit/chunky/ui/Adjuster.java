@@ -17,17 +17,12 @@
 package se.llbit.chunky.ui;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
@@ -105,5 +100,9 @@ public abstract class Adjuster<T extends Number> extends HBox {
     }
     listener = (observable, oldValue, newValue) -> changeConsumer.accept(clamp(newValue));
     value.addListener(listener);
+  }
+
+  public Property<Number> valueProperty() {
+    return value;
   }
 }

@@ -45,4 +45,5 @@ public class IntegerAdjuster extends SliderAdjuster<Integer> {
     }
     return result;
   }
+
 }

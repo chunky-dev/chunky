@@ -20,10 +20,8 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -34,7 +32,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
@@ -103,8 +100,7 @@ public class ChunkyFxController
   @FXML private ToggleButton overworldBtn;
   @FXML private ToggleButton netherBtn;
   @FXML private ToggleButton endBtn;
-  @FXML private TextField scaleField;
-  @FXML private Slider scaleSlider;
+  @FXML private IntegerAdjuster scale;
   @FXML private ToggleButton trackPlayerBtn;
   @FXML private ToggleButton trackCameraBtn;
   @FXML private Tab mapViewTab;
@@ -220,13 +216,12 @@ public class ChunkyFxController
     // A scale factor of 16 is used to convert map positions between block/chunk coordinates.
     DoubleProperty xProperty = new SimpleDoubleProperty(initialView.x);
     DoubleProperty zProperty = new SimpleDoubleProperty(initialView.z);
-    IntegerProperty scaleProperty = new SimpleIntegerProperty(initialView.scale);
 
     // Bind controls with properties.
     xPosition.textProperty().bindBidirectional(xProperty, new NumberStringConverter());
     zPosition.textProperty().bindBidirectional(zProperty, new NumberStringConverter());
-    scaleField.textProperty().bindBidirectional(scaleProperty, new NumberStringConverter());
-    scaleSlider.valueProperty().bindBidirectional(scaleProperty);
+    scale.setRange(0, 128);
+    scale.set(initialView.scale);
 
     // Add listeners to the properties to control the map view.
     GroupedChangeListener.ListenerGroup group = GroupedChangeListener.newGroup();
@@ -238,7 +233,7 @@ public class ChunkyFxController
       ChunkView view = mapView.getMapView();
       mapView.panTo(view.x, newValue.doubleValue() / 16);
     }));
-    scaleProperty.addListener(new GroupedChangeListener<>(group,
+    scale.valueProperty().addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
 
     // Add map view listener to control the individual value properties.
@@ -246,7 +241,7 @@ public class ChunkyFxController
         (observable, oldValue, newValue) -> {
           xProperty.set(newValue.x * 16);
           zProperty.set(newValue.z * 16);
-          scaleProperty.set(newValue.scale);
+          scale.set(newValue.scale);
         }));
 
     clearSelectionBtn2.setOnAction(e -> chunkSelection.clearSelection());

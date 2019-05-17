@@ -21,6 +21,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import se.llbit.chunky.ui.IntegerAdjuster?>
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
       xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
@@ -69,7 +70,7 @@
                            <content>
                               <VBox maxHeight="1.7976931348623157E308" spacing="5.0">
                                  <children>
-                                    <HBox prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+                                    <HBox prefHeight="100.0" spacing="20.0">
                                        <children>
                                           <VBox prefHeight="200.0" spacing="5.0">
                                              <children>
@@ -85,16 +86,10 @@
                                           </VBox>
                                        </children>
                                     </HBox>
-                                    <Separator prefWidth="200.0" />
+                                    <Separator />
                                    <VBox alignment="CENTER_LEFT">
                                      <children>
-                                       <Label text="Scale" />
-                                       <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10.0">
-                                         <children>
-                                           <TextField fx:id="scaleField" prefWidth="80.0" />
-                                           <Slider fx:id="scaleSlider" max="128.0" maxWidth="1.7976931348623157E308" prefHeight="14.0" prefWidth="200.0" />
-                                         </children>
-                                       </HBox>
+                                       <IntegerAdjuster fx:id="scale" name="Scale" />
                                      </children>
                                    </VBox>
                                     <Label text="Coordinates" />
@@ -125,7 +120,7 @@
                       </Tab>
                       <Tab fx:id="chunksTab" text="Chunks">
                            <content>
-                              <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+                              <VBox prefHeight="200.0" spacing="10.0">
                                  <children>
                                     <Button fx:id="clearSelectionBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Clear selection" />
                                     <Button fx:id="deleteChunks" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Delete selected chunks" />
@@ -182,7 +177,7 @@
                                     <Hyperlink fx:id="gitHubLink" text="GitHub Page" />
                                     <Hyperlink fx:id="issueTrackerLink" text="Issue Tracker" />
                                     <Hyperlink fx:id="forumLink" text="Discussion Forum" />
-                                    <Separator prefWidth="200.0" />
+                                    <Separator />
                                     <Label text="Chunky was created by Jesper Öqvist (jesper@llbit.se)" />
                                     <Button fx:id="creditsBtn" mnemonicParsing="false" text="View Credits" />
                                  </children>

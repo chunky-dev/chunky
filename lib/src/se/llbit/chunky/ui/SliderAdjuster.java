@@ -21,11 +21,7 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.util.converter.NumberStringConverter;
-
-import java.util.function.Consumer;
 
 /**
  * A control for editing numeric values with a slider and text field.
