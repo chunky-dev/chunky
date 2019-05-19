@@ -1,5 +1,9 @@
 LATEST
 
+* New single-window UI.
+* New default dark theme.
+* The UI theme can be changed by adding a stylesheet (style.css) to
+  the Chunky settings directory.
 * Replaced player icon.
 * Removed 2D map rendering modes.
 * Removed block highlighting in the 2D map.
