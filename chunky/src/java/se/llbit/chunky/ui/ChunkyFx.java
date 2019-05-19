@@ -42,7 +42,7 @@ public class ChunkyFx extends Application {
 
   private static Chunky chunkyInstance;
 
-  @Override public void start(Stage stage) throws Exception {
+  @Override public void start(Stage stage) {
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("Chunky.fxml"));
       ChunkyFxController controller = new ChunkyFxController(chunkyInstance);

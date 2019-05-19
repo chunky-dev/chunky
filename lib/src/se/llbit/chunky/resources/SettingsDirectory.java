@@ -55,7 +55,7 @@ public final class SettingsDirectory {
    * @return The configured settings directory, or {@code null}
    * if the settings directory could not be located.
    */
-  public static File getSettingsDirectory() {
+  public static File getSettingsDirectory() { // TODO: make this return Optional<File>.
     String chunkyHomeProperty = System.getProperty("chunky.home");
     if (chunkyHomeProperty != null && !chunkyHomeProperty.isEmpty()) {
       // We don't check if this is a valid settings directory because
