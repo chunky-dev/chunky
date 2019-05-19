@@ -194,5 +194,4 @@
     </right>
   </BorderPane>
   <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0" />
-  <stylesheets>style.css</stylesheets>
 </VBox>

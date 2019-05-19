@@ -26,7 +26,11 @@ import javafx.scene.control.Control;
 import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
+import se.llbit.chunky.resources.SettingsDirectory;
+
+import java.io.File;
 
 /**
  * The main window of the Chunky UI.
@@ -53,6 +57,12 @@ public class ChunkyFx extends Application {
         Platform.exit();
         System.exit(0);
       });
+      File stylesheet = new File(SettingsDirectory.getSettingsDirectory(), "style.css");
+      if (stylesheet.isFile()) {
+        scene.getStylesheets().add(stylesheet.toURI().toURL().toExternalForm());
+      } else {
+        scene.getStylesheets().add("style.css");
+      }
       stage.setWidth(1800);
       stage.setMaximized(true);
       stage.show();
