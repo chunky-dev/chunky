@@ -37,7 +37,6 @@ public class UnsupportedMC113Layer extends AbstractLayer {
     if (tile.scale == 1) {
       tile.setPixel(0, 0, averageColor);
     } else {
-      // TODO: scale the image to the current tile size.
       tile.drawImage(Icon.MC_1_13.getBitmap());
     }
   }

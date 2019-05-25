@@ -45,7 +45,7 @@ public class MapTile {
   /**
    * Size of the pixel buffer.
    */
-  public int size;
+  public int tileWidth;
 
   public boolean isCached = false;
 
@@ -68,7 +68,7 @@ public class MapTile {
       Chunk chunk = mapLoader.getWorld().getChunk(pos);
       renderChunk(chunk);
       if (selection.isSelected(pos)) {
-        for (int i = 0; i < size * size; ++i) {
+        for (int i = 0; i < tileWidth * tileWidth; ++i) {
           pixels[i] = selectionTint(pixels[i]);
         }
       }
@@ -111,32 +111,32 @@ public class MapTile {
       int x0;
       int z0;
       if (chunkMode) {
-        x0 = size * (pos.x - view.px0);
-        z0 = size * (pos.z - view.pz0);
+        x0 = tileWidth * (pos.x - view.px0);
+        z0 = tileWidth * (pos.z - view.pz0);
       } else {
-        x0 = size * (pos.x - view.prx0);
-        z0 = size * (pos.z - view.prz0);
+        x0 = tileWidth * (pos.x - view.prx0);
+        z0 = tileWidth * (pos.z - view.prz0);
       }
       int srcPos = 0;
-      for (int z = 0; z < size; ++z) {
-        buffer.copyPixels(pixels, srcPos, x0, z0 + z, size);
-        srcPos += size;
+      for (int z = 0; z < tileWidth; ++z) {
+        buffer.copyPixels(pixels, srcPos, x0, z0 + z, tileWidth);
+        srcPos += tileWidth;
       }
     }
   }
 
   public void setPixel(int x, int z, int argb) {
-    pixels[z * size + x] = argb;
+    pixels[z * tileWidth + x] = argb;
 
   }
 
   public void setPixels(int[] newPixels) {
-    System.arraycopy(newPixels, 0, pixels, 0, size * size);
+    System.arraycopy(newPixels, 0, pixels, 0, tileWidth * tileWidth);
   }
 
   public void fill(int argb) {
-    int[] pixels = new int[size * size];
-    for (int i = 0; i < size * size; ++i) {
+    int[] pixels = new int[tileWidth * tileWidth];
+    for (int i = 0; i < tileWidth * tileWidth; ++i) {
       pixels[i] = argb;
     }
     setPixels(pixels);
@@ -149,9 +149,9 @@ public class MapTile {
     chunkMode = scale >= 16;
     int newSize = chunkMode ? scale : 32;
     // Resize buffer if needed.
-    if (newSize != size) {
-      size = newSize;
-      pixels = new int[size * size];
+    if (newSize != tileWidth) {
+      tileWidth = newSize;
+      pixels = new int[tileWidth * tileWidth];
     }
   }
 
@@ -159,11 +159,10 @@ public class MapTile {
    * Draw a bitmap image to this map tile.
    */
   public void drawImage(BitmapImage image) {
-    // Safety check to see that the image has the correct size.
-    // This check fails when trying to draw static icons not rendered to the tile size.
-    // TODO: ensure that the image is always scaled to the tile size.
-    if (image.width == size || image.height == size) {
-      System.arraycopy(image.data, 0, pixels, 0, size * size);
+    // Safety check to ensure that the image has the correct size.
+    // This check fails when trying to draw static icons not matching the tile size.
+    if (image.width == tileWidth || image.height == tileWidth) {
+      System.arraycopy(image.data, 0, pixels, 0, tileWidth * tileWidth);
     }
   }
 }

@@ -439,7 +439,8 @@ public class ChunkyFxController
     // Bind controls with properties.
     xPosition.textProperty().bindBidirectional(xProperty, new NumberStringConverter());
     zPosition.textProperty().bindBidirectional(zProperty, new NumberStringConverter());
-    scale.setRange(0, 128);
+    scale.setRange(ChunkView.BLOCK_SCALE_MIN, ChunkView.BLOCK_SCALE_MAX);
+    scale.clampBoth();
     scale.set(initialView.scale);
 
     // Add listeners to the properties to control the map view.

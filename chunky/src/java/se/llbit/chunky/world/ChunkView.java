@@ -32,7 +32,7 @@ public class ChunkView {
   /**
    * Maximum block scale for the map view.
    */
-  public static final int BLOCK_SCALE_MAX = 32 * 16;
+  public static final int BLOCK_SCALE_MAX = 8 * 16;
 
   /**
    * Default block scale for the map view.
@@ -82,14 +82,15 @@ public class ChunkView {
 
   public final int width;
   public final int height;
+
+  /** The number of pixels per chunk in this view. */
   public final int scale;
+
+  /** The pixel width for rendering a chunk in this view. */
   public final int chunkScale;
 
 
-  public ChunkView(double x, double z, int width, int height) {
-    this(x, z, width, height, 16);
-  }
-
+  /** Copies an existing chunk view. */
   public ChunkView(ChunkView other) {
     this(other.x, other.z, other.width, other.height, other.scale);
   }
@@ -99,22 +100,20 @@ public class ChunkView {
     this.scale = scale;
     if (this.scale <= 12) {
       chunkScale = 1;
-    } else if (this.scale <= 12 * 16) {
-      chunkScale = 16;
     } else {
-      this.chunkScale = 16 * 16;
+      chunkScale = 16;
     }
     this.x = x;
     this.z = z;
-    double cw = width / (2. * this.scale);
-    double ch = height / (2. * this.scale);
+    double cw = width / (2.0 * this.scale);
+    double ch = height / (2.0 * this.scale);
     this.x0 = x - cw;
     this.x1 = x + cw;
     this.z0 = z - ch;
     this.z1 = z + ch;
     this.width = width;
     this.height = height;
-    // Visible chunks [integer coordinates]:
+    // Visible chunks (integer coordinates):
     cx0 = (int) QuickMath.floor(x0);
     cx1 = (int) QuickMath.floor(x1);
     cz0 = (int) QuickMath.floor(z0);
@@ -209,20 +208,5 @@ public class ChunkView {
    */
   public static int clampScale(int scale) {
     return Math.max(BLOCK_SCALE_MIN, Math.min(BLOCK_SCALE_MAX, scale));
-  }
-
-  /**
-   * @param other the previous view state
-   * @return {@code true} if changing to this view from the given old
-   * view should trigger a map repaint.
-   */
-  public boolean shouldRepaint(ChunkView other) {
-    if (px0 != other.px0
-        || px1 != other.px1
-        || pz0 != other.pz0
-        || pz1 != other.pz1) {
-      return true;
-    }
-    return scale != other.scale;
   }
 }

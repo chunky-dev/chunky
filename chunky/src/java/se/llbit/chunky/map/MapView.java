@@ -95,8 +95,7 @@ public class MapView {
     ChunkView mapView = map.get();
     blockScale = ChunkView.clampScale(blockScale);
     if (blockScale != mapView.scale) {
-      map.set(new ChunkView(mapView.x, mapView.z,
-          mapView.width, mapView.height, blockScale));
+      map.set(new ChunkView(mapView.x, mapView.z, mapView.width, mapView.height, blockScale));
       notifyViewUpdated();
     }
   }

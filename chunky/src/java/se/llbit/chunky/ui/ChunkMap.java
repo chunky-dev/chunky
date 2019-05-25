@@ -435,14 +435,13 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     int diff = (int) (-event.getDeltaY() / event.getMultiplierY());
 
     int scale = mapView.getScale();
-    if ((scale - diff) <= 16) {
-      mapView.setScale(scale - diff);
+    int newScale = scale - diff;
+    if (newScale <= 16) {
+      mapView.setScale(newScale);
     } else if ((scale - diff * 4) <= 64) {
       mapView.setScale(scale - diff * 4);
-    } else if ((scale - diff * 16) <= 128) {
-      mapView.setScale(scale - diff * 16);
     } else {
-      mapView.setScale(scale - diff * 64);
+      mapView.setScale(scale - diff * 16);
     }
   }
 

@@ -73,13 +73,13 @@ public class EmptyRegionChunk extends Chunk {
   }
 
   private void renderEmpty(MapTile tile) {
-    int[] pixels = new int[tile.size * tile.size];
-    for (int z = 0; z < tile.size; ++z) {
-      for (int x = 0; x < tile.size; ++x) {
-        if (x == z || x - tile.size / 2 == z || x + tile.size / 2 == z) {
-          pixels[z * tile.size + x] = 0xFF000000;
+    int[] pixels = new int[tile.tileWidth * tile.tileWidth];
+    for (int z = 0; z < tile.tileWidth; ++z) {
+      for (int x = 0; x < tile.tileWidth; ++x) {
+        if (x == z || x - tile.tileWidth / 2 == z || x + tile.tileWidth / 2 == z) {
+          pixels[z * tile.tileWidth + x] = 0xFF000000;
         } else {
-          pixels[z * tile.size + x] = COLOR;
+          pixels[z * tile.tileWidth + x] = COLOR;
         }
       }
     }
