@@ -868,6 +868,13 @@ public class Scene implements JsonSerializable, Refreshable {
               if (block.isEntity()) {
                 Vector3 position = new Vector3(cx + cp.x * 16, cy, cz + cp.z * 16);
                 entities.add(block.toEntity(position));
+                if (block.waterlogged) {
+                  block = palette.water;
+                  octNode = new Octree.Node(palette.waterId);
+                } else {
+                  block = Air.INSTANCE;
+                  octNode = new Octree.Node(palette.airId);
+                }
               }
 
               // TODO: is this code duplicated in OctreeFinalizer?
