@@ -666,6 +666,12 @@ public class Texture {
   public static final Texture driedKelpTop = new Texture();
   public static final Texture driedKelpBottom = new Texture();
 
+  public static final Texture tubeCoral = new Texture();
+  public static final Texture brainCoral = new Texture();
+  public static final Texture bubbleCoral = new Texture();
+  public static final Texture fireCoral = new Texture();
+  public static final Texture hornCoral = new Texture();
+
   public static final Texture tubeCoralBlock = new Texture();
   public static final Texture brainCoralBlock = new Texture();
   public static final Texture bubbleCoralBlock = new Texture();
@@ -683,6 +689,18 @@ public class Texture {
   public static final Texture bubbleCoralFan = new Texture();
   public static final Texture fireCoralFan = new Texture();
   public static final Texture hornCoralFan = new Texture();
+
+  public static final Texture deadTubeCoral = new Texture();
+  public static final Texture deadBrainCoral = new Texture();
+  public static final Texture deadBubbleCoral = new Texture();
+  public static final Texture deadFireCoral = new Texture();
+  public static final Texture deadHornCoral = new Texture();
+
+  public static final Texture deadTubeCoralFan = new Texture();
+  public static final Texture deadBrainCoralFan = new Texture();
+  public static final Texture deadBubbleCoralFan = new Texture();
+  public static final Texture deadFireCoralFan = new Texture();
+  public static final Texture deadHornCoralFan = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

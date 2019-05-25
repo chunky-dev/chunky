@@ -456,7 +456,7 @@ public class TagBlockSpec implements BlockSpec {
       case "furnace":
         return furnace(tag);
       case "ladder": {
-        String facing = tag.get("Properties").get("facing").stringValue("north");
+        String facing = getFacing(tag, "north");
         return new Ladder(facing);
       }
       case "rail":
@@ -521,7 +521,7 @@ public class TagBlockSpec implements BlockSpec {
       case "pumpkin":
         return new TexturedBlock(name, Texture.pumpkinSide, Texture.pumpkinTop);
       case "carved_pumpkin": {
-        String facing = tag.get("Properties").get("facing").stringValue("north");
+        String facing = getFacing(tag, "north");
         return new CarvedPumpkin(facing);
       }
       case "netherrack":
@@ -531,7 +531,7 @@ public class TagBlockSpec implements BlockSpec {
       case "glowstone":
         return new MinecraftBlock(name, Texture.glowstone);
       case "jack_o_lantern": {
-        String facing = tag.get("Properties").get("facing").stringValue("north");
+        String facing = getFacing(tag, "north");
         return new JackOLantern(facing);
       }
       case "oak_trapdoor":
@@ -621,7 +621,7 @@ public class TagBlockSpec implements BlockSpec {
       case "emerald_ore":
         return new MinecraftBlock(name, Texture.emeraldOre);
       case "ender_chest": {
-        String facing = tag.get("Properties").get("facing").stringValue("north");
+        String facing = getFacing(tag, "north");
         return new EnderChest(facing);
       }
       case "tripwire_hook":
@@ -669,7 +669,7 @@ public class TagBlockSpec implements BlockSpec {
       case "nether_quartz_ore":
         return new MinecraftBlock(name, Texture.netherQuartzOre);
       case "hopper": {
-        String facing = tag.get("Properties").get("facing").stringValue("down");
+        String facing = getFacing(tag, "down");
         return new Hopper(facing);
       }
       case "chiseled_quartz_block":
@@ -689,7 +689,7 @@ public class TagBlockSpec implements BlockSpec {
         return rail(tag, straightTrack);
       }
       case "dropper": {
-        String facing = tag.get("Properties").get("facing").stringValue("south");
+        String facing = getFacing(tag, "south");
         return new Dropper(facing);
       }
       case "white_terracotta":
@@ -892,7 +892,7 @@ public class TagBlockSpec implements BlockSpec {
         return log(tag, Texture.boneSide, Texture.boneTop);
       case "observer": {
         Tag properties = tag.get("Properties");
-        String facing = properties.get("facing").stringValue("south");
+        String facing = getFacing(tag, "south");
         String powered = properties.get("powered").stringValue("false");
         return new Observer(facing, powered.equals("true"));
       }
@@ -1050,90 +1050,65 @@ public class TagBlockSpec implements BlockSpec {
       case "horn_coral_block":
         return new MinecraftBlock(name, Texture.hornCoralBlock);
       case "tube_coral":
-        // TODO
-        return new UnknownBlock(name);
+        return new SpriteBlock(name, Texture.tubeCoral);
       case "brain_coral":
-        // TODO
-        return new UnknownBlock(name);
+        return new SpriteBlock(name, Texture.hornCoral);
       case "bubble_coral":
-        // TODO
-        return new UnknownBlock(name);
+        return new SpriteBlock(name, Texture.bubbleCoral);
       case "fire_coral":
-        // TODO
-        return new UnknownBlock(name);
+        return new SpriteBlock(name, Texture.fireCoral);
       case "horn_coral":
-        // TODO
-        return new UnknownBlock(name);
+        return new SpriteBlock(name, Texture.hornCoral);
       case "dead_tube_coral":
-        // TODO
-        return new UnknownBlock(name);
+        return new SpriteBlock(name, Texture.deadTubeCoral);
       case "dead_brain_coral":
-        // TODO
-        return new UnknownBlock(name);
+        return new SpriteBlock(name, Texture.deadBrainCoral);
       case "dead_bubble_coral":
-        // TODO
-        return new UnknownBlock(name);
+        return new SpriteBlock(name, Texture.deadBubbleCoral);
       case "dead_fire_coral":
-        // TODO
-        return new UnknownBlock(name);
+        return new SpriteBlock(name, Texture.deadFireCoral);
       case "dead_horn_coral":
-        // TODO
-        return new UnknownBlock(name);
+        return new SpriteBlock(name, Texture.deadHornCoral);
       case "tube_coral_fan":
-        return new CoralFan(name, Texture.tubeCoralFan);
+        return new CoralFan(name, "tube");
       case "tube_coral_wall_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new WallCoralFan(name, "tube", getFacing(tag, "north"));
       case "brain_coral_fan":
-        return new CoralFan(name, Texture.brainCoralFan);
+        return new CoralFan(name, "brain");
       case "brain_coral_wall_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new WallCoralFan(name, "brain", getFacing(tag, "north"));
       case "bubble_coral_fan":
-        return new CoralFan(name, Texture.bubbleCoralFan);
+        return new CoralFan(name, "bubble");
       case "bubble_coral_wall_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new WallCoralFan(name, "bubble", getFacing(tag, "north"));
       case "fire_coral_fan":
-        return new CoralFan(name, Texture.fireCoralFan);
+        return new CoralFan(name, "fire");
       case "fire_coral_wall_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new WallCoralFan(name, "fire", getFacing(tag, "north"));
       case "horn_coral_fan":
-        return new CoralFan(name, Texture.hornCoralFan);
+        return new CoralFan(name, "horn");
       case "horn_coral_wall_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new WallCoralFan(name, "horn", getFacing(tag, "north"));
       case "dead_tube_coral_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new CoralFan(name, "dead_tube");
       case "dead_tube_coral_wall_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new WallCoralFan(name, "dead_tube", getFacing(tag, "north"));
       case "dead_brain_coral_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new CoralFan(name, "dead_brain");
       case "dead_brain_coral_wall_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new WallCoralFan(name, "dead_brain", getFacing(tag, "north"));
       case "dead_bubble_coral_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new CoralFan(name, "dead_bubble");
       case "dead_bubble_coral_wall_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new WallCoralFan(name, "dead_bubble", getFacing(tag, "north"));
       case "dead_fire_coral_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new CoralFan(name, "dead_fire");
       case "dead_fire_coral_wall_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new WallCoralFan(name, "dead_fire", getFacing(tag, "north"));
       case "dead_horn_coral_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new CoralFan(name, "dead_horn");
       case "dead_horn_coral_wall_fan":
-        // TODO
-        return new UnknownBlock(name);
+        return new WallCoralFan(name, "dead_horn", getFacing(tag, "north"));
       case "blue_ice":
         // TODO
         return new UnknownBlock(name);
@@ -1338,10 +1313,8 @@ public class TagBlockSpec implements BlockSpec {
         }
         return new Stem(name, age);
       }
-      case "attached_pumpkin_stem": {
-        String facing = tag.get("Properties").get("facing").stringValue("north");
-        return new AttachedStem(name, facing);
-      }
+      case "attached_pumpkin_stem":
+        return new AttachedStem(name, getFacing(tag, "north"));
       case "melon_stem": {
         int age = 7;
         try {
@@ -1350,10 +1323,8 @@ public class TagBlockSpec implements BlockSpec {
         }
         return new Stem(name, age);
       }
-      case "attached_melon_stem": {
-        String facing = tag.get("Properties").get("facing").stringValue("north");
-        return new AttachedStem(name, facing);
-      }
+      case "attached_melon_stem":
+        return new AttachedStem(name, getFacing(tag, "north"));
       case "nether_wart": {
         int age = 3;
         try {
@@ -1604,19 +1575,18 @@ public class TagBlockSpec implements BlockSpec {
         return new MinecraftBlock(name, Texture.black);
       case "command_block": {
         Tag properties = tag.get("Properties");
-        String facing = properties.get("facing").stringValue("south");
         String conditional = properties.get("conditional").stringValue("false");
-        return new CommandBlock(facing, conditional.equals("true"));
+        return new CommandBlock(getFacing(tag, "south"), conditional.equals("true"));
       }
       case "chain_command_block": {
         Tag properties = tag.get("Properties");
-        String facing = properties.get("facing").stringValue("south");
+        String facing = getFacing(tag, "south");
         String conditional = properties.get("conditional").stringValue("false");
         return new ChainCommandBlock(facing, conditional.equals("true"));
       }
       case "repeating_command_block": {
         Tag properties = tag.get("Properties");
-        String facing = properties.get("facing").stringValue("south");
+        String facing = getFacing(tag, "south");
         String conditional = properties.get("conditional").stringValue("false");
         return new RepeatingCommandBlock(facing, conditional.equals("true"));
       }
@@ -1632,6 +1602,10 @@ public class TagBlockSpec implements BlockSpec {
         return Air.INSTANCE;
     }
     return new UnknownBlock(name);
+  }
+
+  private static String getFacing(Tag tag, String defaultValue) {
+    return tag.get("Properties").get("facing").stringValue(defaultValue);
   }
 
   private static String blockName(Tag tag) {
@@ -1672,7 +1646,7 @@ public class TagBlockSpec implements BlockSpec {
     Tag properties = tag.get("Properties");
     String half = properties.get("half").stringValue("bottom");
     String shape = properties.get("shape").stringValue("straight");
-    String facing = properties.get("facing").stringValue("south");
+    String facing = getFacing(tag, "south");
     return new Stairs(name, texture, half, shape, facing);
   }
 
@@ -1681,13 +1655,13 @@ public class TagBlockSpec implements BlockSpec {
     Tag properties = tag.get("Properties");
     String half = properties.get("half").stringValue("bottom");
     String shape = properties.get("shape").stringValue("straight");
-    String facing = properties.get("facing").stringValue("south");
+    String facing = getFacing(tag, "south");
     return new Stairs(name, side, top, bottom, half, shape, facing);
   }
 
   private static Block glazedTerracotta(Tag tag, Texture texture) {
     String name = blockName(tag);
-    String facing = tag.get("Properties").get("facing").stringValue("south");
+    String facing = getFacing(tag, "south");
     return new GlazedTerracotta(name, texture, facing);
   }
 
@@ -1695,7 +1669,7 @@ public class TagBlockSpec implements BlockSpec {
     String name = blockName(tag);
     Tag properties = tag.get("Properties");
     String part = properties.get("part").stringValue("head");
-    String facing = properties.get("facing").stringValue("south");
+    String facing = getFacing(tag, "south");
     return new Bed(name, texture, part, facing);
   }
 
@@ -1729,20 +1703,20 @@ public class TagBlockSpec implements BlockSpec {
     String name = blockName(tag);
     Tag properties = tag.get("Properties");
     String extended = properties.get("extended").stringValue("false");
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     return new Piston(name, isSticky, extended.equals("true"), facing);
   }
 
   private static Block pistonHead(Tag tag) {
     String name = blockName(tag);
     Tag properties = tag.get("Properties");
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     String type = properties.get("type").stringValue("normal");
     return new PistonHead(name, type.equals("sticky"), facing);
   }
 
   private static Block dispenser(Tag tag) {
-    String facing = tag.get("Properties").get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     return new Dispenser(facing);
   }
 
@@ -1780,8 +1754,7 @@ public class TagBlockSpec implements BlockSpec {
 
   private static Block wallTorch(Tag tag, Texture texture) {
     String name = blockName(tag);
-    Tag properties = tag.get("Properties");
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     return new WallTorch(name, texture, facing);
   }
 
@@ -1802,20 +1775,20 @@ public class TagBlockSpec implements BlockSpec {
   private static Block chest(Tag tag) {
     String name = blockName(tag);
     Tag properties = tag.get("Properties");
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     String type = properties.get("type").stringValue("single");
     return new Chest(name, type, facing);
   }
 
   private static Block endRod(Tag tag) {
     Tag properties = tag.get("Properties");
-    String facing = properties.get("facing").stringValue("up");
+    String facing = getFacing(tag, "up");
     return new EndRod(facing);
   }
 
   private static Block furnace(Tag tag) {
     Tag properties = tag.get("Properties");
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     String lit = properties.get("lit").stringValue("false");
     return new Furnace(facing, lit.equals("true"));
   }
@@ -1832,7 +1805,7 @@ public class TagBlockSpec implements BlockSpec {
   private static Block door(Tag tag, Texture upper, Texture lower) {
     Tag properties = tag.get("Properties");
     String name = blockName(tag);
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     String half = properties.get("half").stringValue("upper");
     String hinge = properties.get("hinge").stringValue("right");
     String open = properties.get("open").stringValue("false");
@@ -1843,7 +1816,7 @@ public class TagBlockSpec implements BlockSpec {
   private static Block shulkerBox(Tag tag, ShulkerTexture texture) {
     String name = blockName(tag);
     Tag properties = tag.get("Properties");
-    String facing = properties.get("facing").stringValue("up");
+    String facing = getFacing(tag, "up");
     return new ShulkerBox(name, texture.side, texture.top, texture.bottom, facing);
   }
 
@@ -1869,20 +1842,20 @@ public class TagBlockSpec implements BlockSpec {
 
   private static Block wallBanner(Tag tag, Texture texture, int color) {
     String name = blockName(tag);
-    String facing = tag.get("Properties").get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     return new WallBanner(name, texture, facing, color);
   }
 
   private static Block wallSign(Tag tag, Texture texture) {
     String name = blockName(tag);
-    String facing = tag.get("Properties").get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     return new WallSign(name, texture, facing);
   }
 
   private static Block lever(Tag tag) {
     Tag properties = tag.get("Properties");
     String face = properties.get("face").stringValue("floor");
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     String powered = properties.get("powered").stringValue("false");
     return new Lever(face, facing, powered.equals("true"));
   }
@@ -1891,7 +1864,7 @@ public class TagBlockSpec implements BlockSpec {
     String name = blockName(tag);
     Tag properties = tag.get("Properties");
     String face = properties.get("face").stringValue("floor");
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     String powered = properties.get("powered").stringValue("false");
     return new Button(name, texture, face, facing, powered.equals("true"));
   }
@@ -1903,7 +1876,7 @@ public class TagBlockSpec implements BlockSpec {
       delay = Integer.parseInt(properties.get("delay").stringValue("1"));
     } catch (NumberFormatException ignored) {
     }
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     String powered = properties.get("powered").stringValue("false");
     String locked = properties.get("locked").stringValue("false");
     return new Repeater(delay, facing, powered.equals("true"), locked.equals("true"));
@@ -1911,7 +1884,7 @@ public class TagBlockSpec implements BlockSpec {
 
   private static Block comparator(Tag tag) {
     Tag properties = tag.get("Properties");
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     String powered = properties.get("powered").stringValue("false");
     String mode = properties.get("mode").stringValue("compare");
     return new Comparator(facing, mode, powered.equals("true"));
@@ -1934,7 +1907,7 @@ public class TagBlockSpec implements BlockSpec {
   private Block fenceGate(Tag tag, Texture texture) {
     String name = blockName(tag);
     Tag properties = tag.get("Properties");
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     String in_wall = properties.get("in_wall").stringValue("false");
     String open = properties.get("open").stringValue("false");
     return new FenceGate(name, texture,
@@ -1973,7 +1946,7 @@ public class TagBlockSpec implements BlockSpec {
     String name = blockName(tag);
     Tag properties = tag.get("Properties");
     String half = properties.get("half").stringValue("bottom");
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     String open = properties.get("open").stringValue("false");
     return new Trapdoor(name, texture,
         half,
@@ -2009,15 +1982,15 @@ public class TagBlockSpec implements BlockSpec {
 
   private Block tripwireHook(Tag tag) {
     Tag properties = tag.get("Properties");
-    String facing = properties.get("facing").stringValue("north");
-    String attached = properties.get("attached").stringValue("false");
+    String facing = getFacing(tag, "north");
+    String attached = properties.get("attached").stringValue("false"); // TODO!
     String powered = properties.get("powered").stringValue("false");
     return new TripwireHook(facing, powered.equals("true"));
   }
 
   private Block cocoa(Tag tag) {
     Tag properties = tag.get("Properties");
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     int age = 3;
     try {
       age = Integer.parseInt(properties.get("age").stringValue("7"));
@@ -2054,14 +2027,14 @@ public class TagBlockSpec implements BlockSpec {
 
   private Block wallSkull(Tag tag, EntityTexture texture, SkullEntity.Kind type) {
     String name = blockName(tag);
-    String facing = tag.get("Properties").get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     return new WallHead(name, texture, type, facing);
   }
 
   private Block anvil(Tag tag, int damage) {
     String name = blockName(tag);
     Tag properties = tag.get("Properties");
-    String facing = properties.get("facing").stringValue("north");
+    String facing = getFacing(tag, "north");
     return new Anvil(name, facing, damage);
   }
 }

@@ -3080,6 +3080,22 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/dried_kelp_bottom",
             Texture.driedKelpBottom));
 
+    allTextures.put("tube_coral",
+        new SimpleTexture("assets/minecraft/textures/block/tube_coral",
+            Texture.tubeCoral));
+    allTextures.put("brain_coral",
+        new SimpleTexture("assets/minecraft/textures/block/brain_coral",
+            Texture.brainCoral));
+    allTextures.put("bubble_coral",
+        new SimpleTexture("assets/minecraft/textures/block/bubble_coral",
+            Texture.bubbleCoral));
+    allTextures.put("fire_coral",
+        new SimpleTexture("assets/minecraft/textures/block/fire_coral",
+            Texture.fireCoral));
+    allTextures.put("horn_coral",
+        new SimpleTexture("assets/minecraft/textures/block/horn_coral",
+            Texture.hornCoral));
+
     allTextures.put("tube_coral_block",
         new SimpleTexture("assets/minecraft/textures/block/tube_coral_block",
             Texture.tubeCoralBlock));
@@ -3127,6 +3143,38 @@ public class TexturePackLoader {
     allTextures.put("horn_coral_fan",
         new SimpleTexture("assets/minecraft/textures/block/horn_coral_fan",
             Texture.hornCoralFan));
+
+    allTextures.put("dead_tube_coral",
+        new SimpleTexture("assets/minecraft/textures/block/dead_tube_coral",
+            Texture.deadTubeCoral));
+    allTextures.put("dead_brain_coral",
+        new SimpleTexture("assets/minecraft/textures/block/dead_brain_coral",
+            Texture.deadBrainCoral));
+    allTextures.put("dead_bubble_coral",
+        new SimpleTexture("assets/minecraft/textures/block/dead_bubble_coral",
+            Texture.deadBubbleCoral));
+    allTextures.put("dead_fire_coral",
+        new SimpleTexture("assets/minecraft/textures/block/dead_fire_coral",
+            Texture.deadFireCoral));
+    allTextures.put("dead_horn_coral",
+        new SimpleTexture("assets/minecraft/textures/block/dead_horn_coral",
+            Texture.deadHornCoral));
+
+    allTextures.put("dead_tube_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/dead_tube_coral_fan",
+            Texture.deadTubeCoralFan));
+    allTextures.put("dead_brain_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/dead_brain_coral_fan",
+            Texture.deadBrainCoralFan));
+    allTextures.put("dead_bubble_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/dead_bubble_coral_fan",
+            Texture.deadBubbleCoralFan));
+    allTextures.put("dead_fire_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/dead_fire_coral_fan",
+            Texture.deadFireCoralFan));
+    allTextures.put("dead_horn_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/dead_horn_coral_fan",
+            Texture.deadHornCoralFan));
 
     allTextures.put("dragon",
         new SimpleTexture("assets/minecraft/textures/entity/enderdragon/dragon",
