@@ -127,9 +127,9 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     clearSelection.setGraphic(new ImageView(Icon.clear.fxImage()));
     clearSelection.setOnAction(event -> chunkSelection.clearSelection());
 
-    MenuItem loadChunks = new MenuItem("New scene from selection");
-    loadChunks.setGraphic(new ImageView(Icon.sky.fxImage()));
-    loadChunks.setOnAction(event -> {
+    MenuItem newScene = new MenuItem("New scene from selection");
+    newScene.setGraphic(new ImageView(Icon.sky.fxImage()));
+    newScene.setOnAction(event -> {
       SceneManager sceneManager = controller.getRenderController().getSceneManager();
       sceneManager
           .loadFreshChunks(mapLoader.getWorld(), controller.getChunkSelection().getSelection());
@@ -153,7 +153,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     });
 
     contextMenu.getItems()
-        .addAll(clearSelection, moveCameraHere, selectVisible, loadChunks);
+        .addAll(newScene, clearSelection, moveCameraHere, selectVisible);
   }
 
   @Override public void chunkUpdated(ChunkPosition chunk) {
