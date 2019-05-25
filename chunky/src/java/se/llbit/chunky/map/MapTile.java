@@ -134,14 +134,6 @@ public class MapTile {
     System.arraycopy(newPixels, 0, pixels, 0, tileWidth * tileWidth);
   }
 
-  public void fill(int argb) {
-    int[] pixels = new int[tileWidth * tileWidth];
-    for (int i = 0; i < tileWidth * tileWidth; ++i) {
-      pixels[i] = argb;
-    }
-    setPixels(pixels);
-  }
-
   public void rebuild(ChunkPosition newPos, ChunkView view) {
     isCached = false;
     pos = newPos;

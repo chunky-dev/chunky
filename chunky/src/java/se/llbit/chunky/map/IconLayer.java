@@ -1,4 +1,4 @@
-/* Copyright (c) 2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2014, 2019 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -19,29 +19,31 @@ package se.llbit.chunky.map;
 import se.llbit.chunky.world.Icon;
 
 /**
- * Represents a chunk with corrupt chunk data.
+ * Draws an icon in place of a chunk.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class UnsupportedMC113Layer extends AbstractLayer {
+public class IconLayer extends AbstractLayer {
 
-  /**
-   * Singleton instance.
-   */
-  public static final UnsupportedMC113Layer INSTANCE = new UnsupportedMC113Layer();
+  public static final IconLayer CORRUPT = new IconLayer(Icon.corruptLayer);
+  public static final IconLayer UNKNOWN = new IconLayer(Icon.unknown);
+  public static final IconLayer MC_1_13 = new IconLayer(Icon.MC_1_13);
 
-  private UnsupportedMC113Layer() {
+  private Icon icon;
+  private final int averageColor;
+
+  private IconLayer(Icon icon) {
+    this.icon = icon;
+    averageColor = icon.getAvgColor();
   }
 
   @Override public synchronized void render(MapTile tile) {
     if (tile.scale == 1) {
       tile.setPixel(0, 0, averageColor);
     } else {
-      tile.drawImage(Icon.MC_1_13.getBitmap());
+      tile.drawImage(icon.getBitmap());
     }
   }
-
-  private final int averageColor = Icon.MC_1_13.getAvgColor();
 
   @Override public int getAvgColor() {
     return averageColor;

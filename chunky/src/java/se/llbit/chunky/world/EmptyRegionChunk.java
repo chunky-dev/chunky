@@ -16,7 +16,7 @@
  */
 package se.llbit.chunky.world;
 
-import se.llbit.chunky.map.CorruptLayer;
+import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
 import se.llbit.nbt.CompoundTag;
 
@@ -42,7 +42,7 @@ public class EmptyRegionChunk extends Chunk {
 
   private EmptyRegionChunk() {
     super(ChunkPosition.get(0, 0), EmptyWorld.INSTANCE);
-    surface = CorruptLayer.INSTANCE;
+    surface = IconLayer.CORRUPT;
   }
 
   @Override public synchronized void getBlockData(byte[] blocks, byte[] data, byte[] biomes,

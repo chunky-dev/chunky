@@ -19,11 +19,9 @@ package se.llbit.chunky.world;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
-import se.llbit.chunky.map.CorruptLayer;
+import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
 import se.llbit.chunky.map.SurfaceLayer;
-import se.llbit.chunky.map.UnknownLayer;
-import se.llbit.chunky.map.UnsupportedMC113Layer;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ErrorTag;
 import se.llbit.nbt.ListTag;
@@ -69,8 +67,8 @@ public class Chunk {
   private static final int CHUNK_BYTES = X_MAX * Y_MAX * Z_MAX;
 
   private final ChunkPosition position;
-  protected volatile AbstractLayer surface = UnknownLayer.INSTANCE;
-  protected volatile AbstractLayer biomes = UnknownLayer.INSTANCE;
+  protected volatile AbstractLayer surface = IconLayer.UNKNOWN;
+  protected volatile AbstractLayer biomes = IconLayer.UNKNOWN;
 
   private final World world;
 
@@ -123,7 +121,7 @@ public class Chunk {
    * Reset the rendered layers in this chunk.
    */
   public synchronized void reset() {
-    surface = UnknownLayer.INSTANCE;
+    surface = IconLayer.UNKNOWN;
   }
 
   /**
@@ -151,14 +149,17 @@ public class Chunk {
     surfaceTimestamp = dataTimestamp;
     loadSurface(data);
     biomesTimestamp = dataTimestamp;
-    loadBiomes(data);
-
+    if (surface == IconLayer.MC_1_13) {
+      biomes = IconLayer.MC_1_13;
+    } else {
+      loadBiomes(data);
+    }
     world.chunkUpdated(position);
   }
 
   private void loadSurface(Map<String, Tag> data) {
     if (data == null) {
-      surface = CorruptLayer.INSTANCE;
+      surface = IconLayer.CORRUPT;
       return;
     }
 
@@ -167,7 +168,7 @@ public class Chunk {
     if (sections.isList()) {
       String cv = chunkVersion(data);
       if (cv.equals("1.13")) {
-        surface = UnsupportedMC113Layer.INSTANCE;
+        surface = IconLayer.MC_1_13;
       } else if (cv.equals("1.12")) {
         int[] heightmapData = extractHeightmapData(data);
         byte[] biomeData = new byte[X_MAX * Z_MAX];
@@ -180,13 +181,13 @@ public class Chunk {
         queueTopography();
       }
     } else {
-      surface = CorruptLayer.INSTANCE;
+      surface = IconLayer.CORRUPT;
     }
   }
 
   private void loadBiomes(Map<String, Tag> data) {
     if (data == null) {
-      biomes = CorruptLayer.INSTANCE;
+      biomes = IconLayer.CORRUPT;
     } else {
       byte[] biomeData = new byte[X_MAX * Z_MAX];
       extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
