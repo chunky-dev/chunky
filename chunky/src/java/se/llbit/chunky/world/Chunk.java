@@ -23,7 +23,6 @@ import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
-import se.llbit.chunky.map.OldLayer;
 import se.llbit.chunky.map.SurfaceLayer;
 import se.llbit.math.QuickMath;
 import se.llbit.nbt.CompoundTag;
@@ -154,8 +153,8 @@ public class Chunk {
     surfaceTimestamp = dataTimestamp;
     loadSurface(data);
     biomesTimestamp = dataTimestamp;
-    if (surface == IconLayer.MC_1_13) {
-      biomes = IconLayer.MC_1_13;
+    if (surface == IconLayer.MC_1_12) {
+      biomes = IconLayer.MC_1_12;
     } else {
       loadBiomes(data);
     }
@@ -183,7 +182,7 @@ public class Chunk {
         surface = new SurfaceLayer(world.currentDimension(), blockData, biomeData, palette);
         queueTopography();
       } else if (cv.equals("1.12")) {
-        surface = OldLayer.INSTANCE;
+        surface = IconLayer.MC_1_12;
       }
     } else {
       surface = IconLayer.CORRUPT;
