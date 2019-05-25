@@ -55,7 +55,7 @@
              maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
     <ToolPane fx:id="renderControls" prefWidth="350" />
     <TabPane fx:id="mainTabs" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
-      <Tab text="Map">
+      <Tab fx:id="worldMapTab" text="Map">
         <StackPane fx:id="mapPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="150.0" prefWidth="200.0">
           <Canvas fx:id="mapCanvas" height="600.0" width="695.0"/>
           <Canvas fx:id="mapOverlay" height="600.0" width="695.0"/>

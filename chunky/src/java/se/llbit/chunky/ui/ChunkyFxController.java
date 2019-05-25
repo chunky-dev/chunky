@@ -147,6 +147,7 @@ public class ChunkyFxController
   @FXML private SplitPane splitPane;
   @FXML private TabPane mapTabs;
   @FXML private TabPane mainTabs;
+  @FXML private Tab worldMapTab;
   @FXML private Tab previewTab;
 
   @FXML private TextField sceneNameField;
@@ -198,6 +199,10 @@ public class ChunkyFxController
 
   public RenderController getRenderController() {
     return renderController;
+  }
+
+  public void showWorldMap() {
+    mainTabs.getSelectionModel().select(worldMapTab);
   }
 
   public void showRenderPreview() {
@@ -390,9 +395,13 @@ public class ChunkyFxController
       chunkSelection.clearSelection();
       world.addChunkDeletionListener(chunkSelection);
       Optional<Vector3> playerPos = world.playerPos();
-      mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
-      map.redrawMap();
       world.addChunkUpdateListener(map);
+      Platform.runLater(() -> {
+        mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
+        map.redrawMap();
+        mapName.setText(world.levelName());
+        showWorldMap();
+      });
     });
 
     map.setOnViewDragged(() -> {
@@ -611,8 +620,6 @@ public class ChunkyFxController
     mapOverlay.setOnKeyPressed(map::onKeyPressed);
     mapOverlay.setOnKeyReleased(map::onKeyReleased);
 
-    mapLoader.addWorldLoadListener(
-        world -> mapName.setText(world.levelName()));
     mapLoader.loadWorld(PersistentSettings.getLastWorld());
 
     menuExit.setOnAction(event -> {
@@ -626,7 +633,7 @@ public class ChunkyFxController
     previewTab.setContent(canvas);
     sceneControls = new RenderControlsFxController(this, renderControls, canvas,
         chunky.getRenderController().getRenderer());
-    mainTabs.getSelectionModel().select(mapViewTab);
+    showWorldMap();
     mainTabs.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, newValue) -> {
           boolean finalize = newValue == previewTab;
@@ -635,6 +642,8 @@ public class ChunkyFxController
             scene.refresh();
           }
         });
+    worldMapTab.setGraphic(new ImageView(Icon.map.fxImage()));
+    previewTab.setGraphic(new ImageView(Icon.sky.fxImage()));
 
     saveFrameBtn.setOnAction(this::saveCurrentFrame);
     start.setGraphic(new ImageView(Icon.play.fxImage()));
