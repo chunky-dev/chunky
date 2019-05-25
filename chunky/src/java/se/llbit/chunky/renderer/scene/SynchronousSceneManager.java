@@ -171,7 +171,11 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
 
   @Override public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
+      int prevChunkCount = scene.numberOfChunks();
       scene.loadChunks(taskTracker, world, chunksToLoad);
+      if (prevChunkCount == 0) {
+        scene.moveCameraToCenter();
+      }
       scene.refresh();
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.setRenderMode(RenderMode.PREVIEW);

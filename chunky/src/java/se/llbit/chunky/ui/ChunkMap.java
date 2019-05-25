@@ -127,7 +127,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     clearSelection.setGraphic(new ImageView(Icon.clear.fxImage()));
     clearSelection.setOnAction(event -> chunkSelection.clearSelection());
 
-    MenuItem loadChunks = new MenuItem("Load selection in scene");
+    MenuItem loadChunks = new MenuItem("New scene from selection");
     loadChunks.setGraphic(new ImageView(Icon.sky.fxImage()));
     loadChunks.setOnAction(event -> {
       SceneManager sceneManager = controller.getRenderController().getSceneManager();
