@@ -707,6 +707,7 @@ public class Texture {
   public static final Texture turtleEggVeryCracked = new Texture();
 
   public static final Texture blueIce = new Texture();
+  public static final Texture seaPickle = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

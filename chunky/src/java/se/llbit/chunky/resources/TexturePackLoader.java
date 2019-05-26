@@ -3189,6 +3189,9 @@ public class TexturePackLoader {
     allTextures.put("blue_ice",
         new SimpleTexture("assets/minecraft/textures/block/blue_ice",
             Texture.blueIce));
+    allTextures.put("sea_pickle",
+        new SimpleTexture("assets/minecraft/textures/block/sea_pickle",
+            Texture.seaPickle));
 
     allTextures.put("dragon",
         new SimpleTexture("assets/minecraft/textures/entity/enderdragon/dragon",

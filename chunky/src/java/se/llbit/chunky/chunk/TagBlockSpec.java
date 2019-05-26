@@ -249,8 +249,7 @@ public class TagBlockSpec implements BlockSpec {
             : Texture.tallSeagrassTop);
       }
       case "sea_pickle":
-        // TODO 1.13
-        return new UnknownBlock(name);
+        return seaPickle(tag);
       case "piston":
         return piston(tag, false);
       case "piston_head":
@@ -1971,4 +1970,9 @@ public class TagBlockSpec implements BlockSpec {
     return new TurtleEgg(eggs, hatch);
   }
 
+  private static Block seaPickle(Tag tag) {
+    Tag properties = tag.get("Properties");
+    int pickles = stringToInt(properties.get("pickles"), 1);
+    return new SeaPickle(pickles, properties.get("waterlogged").stringValue("").equals("true"));
+  }
 }
