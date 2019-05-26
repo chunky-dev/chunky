@@ -785,7 +785,6 @@ public class SeaPickle extends MinecraftBlockTranslucent {
           float[] color = texture.getColor(ray.u, ray.v);
           if (color[3] > Ray.EPSILON) {
             ray.color.set(color);
-            texture.getColor(ray);
             ray.n.set(quad.n);
             ray.t = ray.tNext;
             hit = true;
