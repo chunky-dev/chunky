@@ -1090,8 +1090,7 @@ public class TagBlockSpec implements BlockSpec {
       case "dead_horn_coral_wall_fan":
         return new WallCoralFan(name, "dead_horn", getFacing(tag, "north"));
       case "blue_ice":
-        // TODO
-        return new UnknownBlock(name);
+        return new MinecraftBlock(name, Texture.blueIce);
       case "conduit":
         // TODO
         return new UnknownBlock(name);
