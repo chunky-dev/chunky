@@ -10,7 +10,7 @@ public class DaylightDetector extends MinecraftBlock {
 
   public DaylightDetector(boolean inverted) {
     super("daylight_detector",
-        inverted ? Texture.daylightDetectorTop : Texture.daylightDetectorInvertedTop);
+        inverted ? Texture.daylightDetectorInvertedTop : Texture.daylightDetectorTop);
     this.inverted = inverted;
     localIntersect = true;
   }
