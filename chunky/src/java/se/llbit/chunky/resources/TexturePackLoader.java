@@ -3176,6 +3176,16 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/dead_horn_coral_fan",
             Texture.deadHornCoralFan));
 
+    allTextures.put("turtle_egg",
+        new SimpleTexture("assets/minecraft/textures/block/turtle_egg",
+            Texture.turtleEgg));
+    allTextures.put("turtle_egg_slightly_cracked",
+        new SimpleTexture("assets/minecraft/textures/block/turtle_egg_slightly_cracked",
+            Texture.turtleEggSlightlyCracked));
+    allTextures.put("turtle_egg_very_cracked",
+        new SimpleTexture("assets/minecraft/textures/block/turtle_egg_very_cracked",
+            Texture.turtleEggVeryCracked));
+
     allTextures.put("dragon",
         new SimpleTexture("assets/minecraft/textures/entity/enderdragon/dragon",
             Texture.dragon));

@@ -702,6 +702,10 @@ public class Texture {
   public static final Texture deadFireCoralFan = new Texture();
   public static final Texture deadHornCoralFan = new Texture();
 
+  public static final Texture turtleEgg = new Texture();
+  public static final Texture turtleEggSlightlyCracked = new Texture();
+  public static final Texture turtleEggVeryCracked = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 

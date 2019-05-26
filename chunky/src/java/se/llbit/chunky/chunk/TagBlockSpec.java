@@ -1027,8 +1027,7 @@ public class TagBlockSpec implements BlockSpec {
       case "black_concrete_powder":
         return new MinecraftBlock(name, Texture.concretePowderBlack);
       case "turtle_egg":
-        // TODO
-        return new UnknownBlock(name);
+        return new TurtleEgg();
       case "dead_tube_coral_block":
         return new MinecraftBlock(name, Texture.deadTubeCoralBlock);
       case "dead_brain_coral_block":
