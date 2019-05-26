@@ -23,6 +23,7 @@ public class TagBlockSpec implements BlockSpec {
   }
 
   @Override public void serialize(DataOutputStream out) throws IOException {
+    out.write(0);
     tag.write(out);
   }
 

@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public interface BlockSpec {
   static BlockSpec deserialize(DataInputStream in) throws IOException {
-    int type = in.readInt();
+    int type = in.read();
     switch (type) {
       case 0:
         return new TagBlockSpec(NamedTag.read(in));

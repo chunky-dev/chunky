@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class BlockPalette {
-  private static final int BLOCK_PALETTE_VERSION = 1;
+  private static final int BLOCK_PALETTE_VERSION = 2;
   public final int airId, stoneId, waterId;
 
   private static final Map<String, Consumer<Block>> materialProperties = new HashMap<>();
