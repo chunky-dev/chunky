@@ -96,6 +96,10 @@ public abstract class Material {
     texture.getColor(ray);
   }
 
+  public float[] getColor(double u, double v) {
+    return texture.getColor(u, v);
+  }
+
   public JsonValue toJson() {
     return new JsonString("mat:" + name);
   }
