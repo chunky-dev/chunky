@@ -20,10 +20,10 @@ public class Trapdoor extends MinecraftBlockTranslucent {
     switch (facing) {
       default:
       case "north":
-        state = 1;
+        state = 0;
         break;
       case "south":
-        state = 0;
+        state = 1;
         break;
       case "east":
         state = 3;
