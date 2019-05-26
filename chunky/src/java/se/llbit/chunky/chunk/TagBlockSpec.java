@@ -7,6 +7,7 @@ import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
+import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.NotNull;
 
@@ -113,21 +114,13 @@ public class TagBlockSpec implements BlockSpec {
       case "dark_oak_sapling":
         return new SpriteBlock(name, Texture.darkOakSapling);
       case "water": {
-        int level = 0;
-        try {
-          level = Integer.parseInt(tag.get("Properties").get("level").stringValue("0"));
-        } catch (NumberFormatException ignored) {
-        }
+        int level = stringToInt(tag.get("Properties").get("level"), 0);
         return new Water(level);
       }
       case "bubble_column":
         return new Water(0); // TODO: render bubbles!
       case "lava": {
-        int level = 0;
-        try {
-          level = Integer.parseInt(tag.get("Properties").get("level").stringValue("0"));
-        } catch (NumberFormatException ignored) {
-        }
+        int level = stringToInt(tag.get("Properties").get("level"), 0);
         return new Lava(level);
       }
       case "bedrock":
@@ -411,11 +404,7 @@ public class TagBlockSpec implements BlockSpec {
             down.equals("true"));
       }
       case "chorus_flower": {
-        int age = 0;
-        try {
-          age = Integer.parseInt(tag.get("Properties").get("age").stringValue("0"));
-        } catch (NumberFormatException ignored) {
-        }
+        int age = stringToInt(tag.get("Properties").get("age"), 0);
         return new ChorusFlower(age);
       }
       case "purpur_block":
@@ -446,11 +435,7 @@ public class TagBlockSpec implements BlockSpec {
         return new TexturedBlock(name, Texture.workbenchFront, Texture.workbenchSide,
             Texture.workbenchSide, Texture.workbenchFront, Texture.workbenchTop, Texture.oakPlanks);
       case "farmland": {
-        int moisture = 0;
-        try {
-          moisture = Integer.parseInt(tag.get("Properties").get("moisture").stringValue("0"));
-        } catch (NumberFormatException ignored) {
-        }
+        int moisture = stringToInt(tag.get("Properties").get("moisture"), 0);
         return new Farmland(moisture);
       }
       case "furnace":
@@ -488,11 +473,7 @@ public class TagBlockSpec implements BlockSpec {
       case "stone_button":
         return button(tag, Texture.stone);
       case "snow": {
-        int layers = 0;
-        try {
-          layers = Integer.parseInt(tag.get("Properties").get("layers").stringValue("0"));
-        } catch (NumberFormatException ignored) {
-        }
+        int layers = stringToInt(tag.get("Properties").get("layers"), 0);
         return new Snow(layers);
       }
       case "ice":
@@ -1027,7 +1008,7 @@ public class TagBlockSpec implements BlockSpec {
       case "black_concrete_powder":
         return new MinecraftBlock(name, Texture.concretePowderBlack);
       case "turtle_egg":
-        return new TurtleEgg();
+        return turtleEgg(tag);
       case "dead_tube_coral_block":
         return new MinecraftBlock(name, Texture.deadTubeCoralBlock);
       case "dead_brain_coral_block":
@@ -1265,11 +1246,7 @@ public class TagBlockSpec implements BlockSpec {
         // TODO
         return new UnknownBlock(name);
       case "cake": {
-        int bites = 0;
-        try {
-          bites = Integer.parseInt(tag.get("Properties").get("bites").stringValue("0"));
-        } catch (NumberFormatException ignored) {
-        }
+        int bites = stringToInt(tag.get("Properties").get("bites"), 0);
         return new Cake(bites);
       }
       case "white_bed":
@@ -1305,31 +1282,19 @@ public class TagBlockSpec implements BlockSpec {
       case "black_bed":
         return bed(tag, Texture.bedBlack);
       case "pumpkin_stem": {
-        int age = 7;
-        try {
-          age = Integer.parseInt(tag.get("Properties").get("age").stringValue("7"));
-        } catch (NumberFormatException ignored) {
-        }
+        int age = stringToInt(tag.get("Properties").get("age"), 7);
         return new Stem(name, age);
       }
       case "attached_pumpkin_stem":
         return new AttachedStem(name, getFacing(tag, "north"));
       case "melon_stem": {
-        int age = 7;
-        try {
-          age = Integer.parseInt(tag.get("Properties").get("age").stringValue("7"));
-        } catch (NumberFormatException ignored) {
-        }
+        int age = stringToInt(tag.get("Properties").get("age"), 7);
         return new Stem(name, age);
       }
       case "attached_melon_stem":
         return new AttachedStem(name, getFacing(tag, "north"));
       case "nether_wart": {
-        int age = 3;
-        try {
-          age = Integer.parseInt(tag.get("Properties").get("age").stringValue("3"));
-        } catch (NumberFormatException ignored) {
-        }
+        int age = stringToInt(tag.get("Properties").get("age"), 3);
         return new NetherWart(age);
       }
       case "brewing_stand": {
@@ -1341,11 +1306,7 @@ public class TagBlockSpec implements BlockSpec {
             bottle0.equals("true"), bottle1.equals("true"), bottle2.equals("true"));
       }
       case "cauldron": {
-        int level = 3;
-        try {
-          level = Integer.parseInt(tag.get("Properties").get("level").stringValue("3"));
-        } catch (NumberFormatException ignored) {
-        }
+        int level = stringToInt(tag.get("Properties").get("level"), 3);
         return new Cauldron(level);
       }
       case "flower_pot":
@@ -1401,19 +1362,11 @@ public class TagBlockSpec implements BlockSpec {
       case "potted_wither_rose":
         return new FlowerPot(name, FlowerPotModel.Kind.WITHER_ROSE);
       case "carrots": {
-        int age = 8;
-        try {
-          age = Integer.parseInt(tag.get("Properties").get("age").stringValue("8"));
-        } catch (NumberFormatException ignored) {
-        }
+        int age = stringToInt(tag.get("Properties").get("age"), 7);
         return new Carrots(age);
       }
       case "potatoes": {
-        int age = 8;
-        try {
-          age = Integer.parseInt(tag.get("Properties").get("age").stringValue("8"));
-        } catch (NumberFormatException ignored) {
-        }
+        int age = stringToInt(tag.get("Properties").get("age"), 7);
         return new Potatoes(age);
       }
       case "skeleton_skull":
@@ -1505,11 +1458,7 @@ public class TagBlockSpec implements BlockSpec {
       case "black_wall_banner":
         return wallBanner(tag, Texture.blackWool, BlockData.BANNER_BLACK);
       case "beetroots": {
-        int age = 3;
-        try {
-          age = Integer.parseInt(tag.get("Properties").get("age").stringValue("3"));
-        } catch (NumberFormatException ignored) {
-        }
+        int age = stringToInt(tag.get("Properties").get("age"), 3);
         return new Beetroots(age);
       }
       case "loom":
@@ -1555,11 +1504,7 @@ public class TagBlockSpec implements BlockSpec {
         // TODO
         return new UnknownBlock(name);
       case "frosted_ice": {
-        int age = 3;
-        try {
-          age = Integer.parseInt(tag.get("Properties").get("age").stringValue("3"));
-        } catch (NumberFormatException ignored) {
-        }
+        int age = stringToInt(tag.get("Properties").get("age"), 3);
         return new FrostedIce(age);
       }
       case "spawner":
@@ -1605,6 +1550,17 @@ public class TagBlockSpec implements BlockSpec {
 
   private static String getFacing(Tag tag, String defaultValue) {
     return tag.get("Properties").get("facing").stringValue(defaultValue);
+  }
+
+  private static int stringToInt(Tag tag, int defaultValue) {
+    if (!(tag instanceof StringTag)) {
+      return defaultValue;
+    }
+    try {
+      return Integer.parseInt(tag.stringValue());
+    } catch (NumberFormatException ignored) {
+      return defaultValue;
+    }
   }
 
   private static String blockName(Tag tag) {
@@ -1763,11 +1719,7 @@ public class TagBlockSpec implements BlockSpec {
     String south = properties.get("south").stringValue("none");
     String east = properties.get("east").stringValue("none");
     String west = properties.get("west").stringValue("none");
-    int power = 0;
-    try {
-      power = Integer.parseInt(properties.get("power").stringValue("0"));
-    } catch (NumberFormatException ignored) {
-    }
+    int power = stringToInt(properties.get("power"), 0);
     return new RedstoneWire(power, north, south, east, west);
   }
 
@@ -1793,11 +1745,7 @@ public class TagBlockSpec implements BlockSpec {
   }
 
   private static Block wheat(Tag tag) {
-    int age = 7;
-    try {
-      age = Integer.parseInt(tag.get("Properties").get("age").stringValue("7"));
-    } catch (NumberFormatException ignored) {
-    }
+    int age = stringToInt(tag.get("Properties").get("age"), 7);
     return new Wheat(age);
   }
 
@@ -1821,21 +1769,13 @@ public class TagBlockSpec implements BlockSpec {
 
   private static Block sign(Tag tag, Texture texture) {
     String name = blockName(tag);
-    int rotation = 0;
-    try {
-      rotation = Integer.parseInt(tag.get("Properties").get("rotation").stringValue("0"));
-    } catch (NumberFormatException ignored) {
-    }
+    int rotation = stringToInt(tag.get("Properties").get("rotation"), 0);
     return new Sign(name, texture, rotation);
   }
 
   private static Block banner(Tag tag, Texture texture, int color) {
     String name = blockName(tag);
-    int rotation = 0;
-    try {
-      rotation = Integer.parseInt(tag.get("Properties").get("rotation").stringValue("0"));
-    } catch (NumberFormatException ignored) {
-    }
+    int rotation = stringToInt(tag.get("Properties").get("rotation"), 0);
     return new Banner(name, texture, rotation, color);
   }
 
@@ -1870,11 +1810,7 @@ public class TagBlockSpec implements BlockSpec {
 
   private static Block repeater(Tag tag) {
     Tag properties = tag.get("Properties");
-    int delay = 1;
-    try {
-      delay = Integer.parseInt(properties.get("delay").stringValue("1"));
-    } catch (NumberFormatException ignored) {
-    }
+    int delay = stringToInt(properties.get("delay"), 1);
     String facing = getFacing(tag, "north");
     String powered = properties.get("powered").stringValue("false");
     String locked = properties.get("locked").stringValue("false");
@@ -1990,11 +1926,7 @@ public class TagBlockSpec implements BlockSpec {
   private Block cocoa(Tag tag) {
     Tag properties = tag.get("Properties");
     String facing = getFacing(tag, "north");
-    int age = 3;
-    try {
-      age = Integer.parseInt(properties.get("age").stringValue("7"));
-    } catch (NumberFormatException ignored) {
-    }
+    int age = stringToInt(properties.get("age"), 2);
     return new Cocoa(facing, age);
   }
 
@@ -2016,11 +1948,7 @@ public class TagBlockSpec implements BlockSpec {
 
   private Block skull(Tag tag, EntityTexture texture, SkullEntity.Kind type) {
     String name = blockName(tag);
-    int rotation = 0;
-    try {
-      rotation = Integer.parseInt(tag.get("Properties").get("rotation").stringValue("0"));
-    } catch (NumberFormatException ignored) {
-    }
+    int rotation = stringToInt(tag.get("Properties").get("rotation"), 0);
     return new Head(name, texture, type, rotation);
   }
 
@@ -2036,4 +1964,12 @@ public class TagBlockSpec implements BlockSpec {
     String facing = getFacing(tag, "north");
     return new Anvil(name, facing, damage);
   }
+
+  private static Block turtleEgg(Tag tag) {
+    Tag properties = tag.get("Properties");
+    int eggs = stringToInt(properties.get("eggs"), 1);
+    int hatch = stringToInt(properties.get("hatch"), 0);
+    return new TurtleEgg(eggs, hatch);
+  }
+
 }
