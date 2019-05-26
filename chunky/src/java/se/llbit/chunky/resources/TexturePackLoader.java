@@ -3192,6 +3192,24 @@ public class TexturePackLoader {
     allTextures.put("sea_pickle",
         new SimpleTexture("assets/minecraft/textures/block/sea_pickle",
             Texture.seaPickle));
+    allTextures.put("conduit",
+        new SimpleTexture("assets/minecraft/textures/block/conduit",
+            Texture.conduit));
+    allTextures.put("structure_block",
+        new SimpleTexture("assets/minecraft/textures/block/structure_block",
+            Texture.structureBlock));
+    allTextures.put("structure_block_corner",
+        new SimpleTexture("assets/minecraft/textures/block/structure_block_corner",
+            Texture.structureBlockCorner));
+    allTextures.put("structure_block_data",
+        new SimpleTexture("assets/minecraft/textures/block/structure_block_data",
+            Texture.structureBlockData));
+    allTextures.put("structure_block_load",
+        new SimpleTexture("assets/minecraft/textures/block/structure_block_load",
+            Texture.structureBlockLoad));
+    allTextures.put("structure_block_save",
+        new SimpleTexture("assets/minecraft/textures/block/structure_block_save",
+            Texture.structureBlockSave));
 
     allTextures.put("dragon",
         new SimpleTexture("assets/minecraft/textures/entity/enderdragon/dragon",

@@ -708,6 +708,12 @@ public class Texture {
 
   public static final Texture blueIce = new Texture();
   public static final Texture seaPickle = new Texture();
+  public static final Texture conduit = new Texture();
+  public static final Texture structureBlock = new Texture();
+  public static final Texture structureBlockCorner = new Texture();
+  public static final Texture structureBlockData = new Texture();
+  public static final Texture structureBlockLoad = new Texture();
+  public static final Texture structureBlockSave = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

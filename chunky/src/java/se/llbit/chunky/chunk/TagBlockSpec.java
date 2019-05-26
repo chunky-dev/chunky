@@ -1091,8 +1091,7 @@ public class TagBlockSpec implements BlockSpec {
       case "blue_ice":
         return new MinecraftBlock(name, Texture.blueIce);
       case "conduit":
-        // TODO
-        return new UnknownBlock(name);
+        return new Conduit();
       case "polished_granite_stairs":
         return stairs(tag, Texture.smoothGranite);
       case "smooth_red_sandstone_stairs":
@@ -1533,8 +1532,7 @@ public class TagBlockSpec implements BlockSpec {
         return new RepeatingCommandBlock(facing, conditional.equals("true"));
       }
       case "structure_block":
-        // TODO
-        return new UnknownBlock(name);
+        return structureBlock(tag);
       case "jigsaw_block":
         // TODO
         return new UnknownBlock(name);
@@ -1974,5 +1972,26 @@ public class TagBlockSpec implements BlockSpec {
     Tag properties = tag.get("Properties");
     int pickles = stringToInt(properties.get("pickles"), 1);
     return new SeaPickle(pickles, properties.get("waterlogged").stringValue("").equals("true"));
+  }
+
+  private static Block structureBlock(Tag tag) {
+    Tag properties = tag.get("Properties");
+    Texture texture = Texture.structureBlock;
+    String mode = properties.get("mode").stringValue("");
+    switch (mode) {
+      case "corner":
+        texture = Texture.structureBlockCorner;
+        break;
+      case "data":
+        texture = Texture.structureBlockData;
+        break;
+      case "load":
+        texture = Texture.structureBlockLoad;
+        break;
+      case "save":
+        texture = Texture.structureBlockSave;
+        break;
+    }
+    return new MinecraftBlock("structure_block", texture);
   }
 }
