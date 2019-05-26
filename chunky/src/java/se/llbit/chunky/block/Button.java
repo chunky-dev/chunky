@@ -8,12 +8,14 @@ import se.llbit.math.Ray;
 public class Button extends MinecraftBlockTranslucent {
   private final int position;
   private final String description;
+  private final boolean powered; // TODO(llbit): render powered buttons
 
   public Button(String name, Texture texture,
       String face, String facing, boolean powered) {
     super(name, texture);
     this.description = String.format("face=%s, facing=%s, powered=%s",
         face, facing, powered);
+    this.powered = powered;
     localIntersect = true;
     // TODO handle rotation on top/bottom positions!
     switch (face) {
@@ -30,10 +32,10 @@ public class Button extends MinecraftBlockTranslucent {
             position = 3;
             break;
           case "west":
-            position = 1;
+            position = 2;
             break;
           case "east":
-            position = 2;
+            position = 1;
             break;
         }
         break;
