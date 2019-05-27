@@ -1,4 +1,4 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2019 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -25,7 +25,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -667,7 +666,7 @@ public class ChunkyFxController
         PersistentSettings.setSppTargetDefault(scene.getTargetSpp()));
   }
 
-  public void setApplication(Application app, Scene scene) {
+  public void setApplication(Application app) {
     documentationLink.setOnAction(
         e -> app.getHostServices().showDocument("http://chunky.llbit.se"));
 
@@ -679,8 +678,6 @@ public class ChunkyFxController
 
     forumLink.setOnAction(
         e -> app.getHostServices().showDocument("https://www.reddit.com/r/chunky"));
-
-    canvas.setScene(scene);
   }
 
   public void openSceneChooser() {

@@ -1,4 +1,4 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2019 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -19,7 +19,6 @@ package se.llbit.chunky.ui;
 import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ContextMenu;
@@ -34,7 +33,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.renderer.RenderMode;
@@ -152,70 +150,11 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     renderer.setCanvas(this);
 
     viewportBoundsProperty().addListener((observable, oldValue, newValue) -> updateCanvasPane());
-  }
 
-  private void updateCanvasPane() {
-    Bounds bounds = getViewportBounds();
-    canvasPane.setMinWidth(Math.max(canvas.getWidth() * canvas.getScaleX(), bounds.getWidth()));
-    canvasPane.setMinHeight(Math.max(canvas.getHeight() * canvas.getScaleY(), bounds.getHeight()));
-  }
-
-  private void updateCanvasScale(double scale) {
-    canvas.setScaleX(scale);
-    canvas.setScaleY(scale);
-    updateCanvasPane();
-  }
-
-  @Override public void repaint() {
-    if (painting.compareAndSet(false, true)) {
-      forceRepaint();
-    }
-  }
-
-  public void forceRepaint() {
-    painting.set(true);
-    renderer.withBufferedImage(bitmap -> {
-      if (bitmap.width == (int) image.getWidth()
-          && bitmap.height == (int) image.getHeight()) {
-        image.getPixelWriter().setPixels(0, 0, bitmap.width, bitmap.height, PIXEL_FORMAT,
-            bitmap.data, 0, bitmap.width);
-      }
-    });
-    Platform.runLater(() -> {
-      GraphicsContext gc = canvas.getGraphicsContext2D();
-      gc.drawImage(image, 0, 0);
-      painting.set(false);
-    });
-  }
-
-  public void setRenderListener(RenderStatusListener renderListener) {
-    this.renderListener = renderListener;
-  }
-
-  @Override public void sceneStatus(String status) {
-    Platform.runLater(() -> {
-      Point2D offset = localToScene(0, 0);
-      tooltip.setText(status);
-      tooltip.show(this,
-          offset.getX() + getScene().getX() + getScene().getWindow().getX(),
-          offset.getY() + getScene().getY() + getScene().getWindow().getY() + getHeight());
-    });
-  }
-
-  /**
-   * Should only be called on the JavaFX application thread.
-   */
-  public void setCanvasSize(int width, int height) {
-    canvas.setWidth(width);
-    canvas.setHeight(height);
-    if (image == null || width != image.getWidth() || height != image.getHeight()) {
-      image = new WritableImage(width, height);
-    }
-    updateCanvasScale(canvas.getScaleX());
-  }
-
-  public void setScene(Scene scene) {
-    scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+    // Register key event listener for keyboard navigation.
+    canvasPane.setFocusTraversable(true);
+    canvasPane.setOnMouseClicked(event -> canvasPane.requestFocus());
+    canvasPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
       if (!isVisible()) {
         return;
       }
@@ -277,5 +216,65 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
           break;
       }
     });
+  }
+
+  private void updateCanvasPane() {
+    Bounds bounds = getViewportBounds();
+    canvasPane.setMinWidth(Math.max(canvas.getWidth() * canvas.getScaleX(), bounds.getWidth()));
+    canvasPane.setMinHeight(Math.max(canvas.getHeight() * canvas.getScaleY(), bounds.getHeight()));
+  }
+
+  private void updateCanvasScale(double scale) {
+    canvas.setScaleX(scale);
+    canvas.setScaleY(scale);
+    updateCanvasPane();
+  }
+
+  @Override public void repaint() {
+    if (painting.compareAndSet(false, true)) {
+      forceRepaint();
+    }
+  }
+
+  public void forceRepaint() {
+    painting.set(true);
+    renderer.withBufferedImage(bitmap -> {
+      if (bitmap.width == (int) image.getWidth()
+          && bitmap.height == (int) image.getHeight()) {
+        image.getPixelWriter().setPixels(0, 0, bitmap.width, bitmap.height, PIXEL_FORMAT,
+            bitmap.data, 0, bitmap.width);
+      }
+    });
+    Platform.runLater(() -> {
+      GraphicsContext gc = canvas.getGraphicsContext2D();
+      gc.drawImage(image, 0, 0);
+      painting.set(false);
+    });
+  }
+
+  public void setRenderListener(RenderStatusListener renderListener) {
+    this.renderListener = renderListener;
+  }
+
+  @Override public void sceneStatus(String status) {
+    Platform.runLater(() -> {
+      Point2D offset = localToScene(0, 0);
+      tooltip.setText(status);
+      tooltip.show(this,
+          offset.getX() + getScene().getX() + getScene().getWindow().getX(),
+          offset.getY() + getScene().getY() + getScene().getWindow().getY() + getHeight());
+    });
+  }
+
+  /**
+   * Should only be called on the JavaFX application thread.
+   */
+  public void setCanvasSize(int width, int height) {
+    canvas.setWidth(width);
+    canvas.setHeight(height);
+    if (image == null || width != image.getWidth() || height != image.getHeight()) {
+      image = new WritableImage(width, height);
+    }
+    updateCanvasScale(canvas.getScaleX());
   }
 }
