@@ -19,6 +19,7 @@ package se.llbit.chunky.entity;
 
 import java.util.Collection;
 
+import se.llbit.chunky.block.CoralFan;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Vector3;
@@ -72,6 +73,10 @@ abstract public class Entity {
         return ArmorStand.fromJson(json);
       case "lily_pad":
         return LilyPadEntity.fromJson(json);
+      case "coral_fan":
+        return CoralFanEntity.fromJson(json);
+      case "wall_coral_fan":
+        return WallCoralFanEntity.fromJson(json);
     }
     return null;
   }

@@ -98,7 +98,8 @@ public class WallCoralFanEntity extends Entity {
 
   @Override public JsonValue toJson() {
     JsonObject json = new JsonObject();
-    json.add("kind", "coral_fan");
+    json.add("kind", "wall_coral_fan");
+    json.add("position", position.toJson());
     json.add("coral_type", coralType);
     json.add("facing", facing);
     return json;
@@ -111,6 +112,4 @@ public class WallCoralFanEntity extends Entity {
     String facing = json.get("facing").stringValue("north");
     return new WallCoralFanEntity(position, coralType, facing);
   }
-
-
 }

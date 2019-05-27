@@ -102,6 +102,7 @@ public class CoralFanEntity extends Entity {
   @Override public JsonValue toJson() {
     JsonObject json = new JsonObject();
     json.add("kind", "coral_fan");
+    json.add("position", position.toJson());
     json.add("coral_type", coralType);
     return json;
   }
