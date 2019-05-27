@@ -40,6 +40,13 @@ import se.llbit.log.Log;
  */
 public class Octree {
 
+  static final int BRANCH_NODE = -1;
+
+  /**
+   * The top bit of the type field in a serialized octree node is reserved for indicating
+   * if the node is a data node.
+   */
+  static final int DATA_FLAG = 0x80000000;
 
   /** An Octree node. */
   public static class Node {
@@ -73,7 +80,7 @@ public class Octree {
       children[5] = new Node(type);
       children[6] = new Node(type);
       children[7] = new Node(type);
-      type = -1;
+      type = BRANCH_NODE;
     }
 
     /**
@@ -86,13 +93,11 @@ public class Octree {
     }
 
     /**
-     * Serialize this node.
-     *
-     * @throws IOException
+     * Serializes this node to a data stream.
      */
     public void store(DataOutputStream out) throws IOException {
       out.writeInt(type);
-      if (type == -1) {
+      if (type == BRANCH_NODE) {
         for (int i = 0; i < 8; ++i) {
           children[i].store(out);
         }
@@ -104,21 +109,28 @@ public class Octree {
      *
      * @return the number of loaded octree nodes.
      */
-    public int load(DataInputStream in) throws IOException {
-      type = in.readInt();
-      int children = 0;
-      if (type == -1) {
-        this.children = new Node[8];
+    public static Node loadNode(DataInputStream in) throws IOException {
+      int type = in.readInt();
+      Node node;
+      if (type == BRANCH_NODE) {
+        node = new Node(BRANCH_NODE);
+        node.children = new Node[8];
         for (int i = 0; i < 8; ++i) {
-          this.children[i] = new Node(0);
-          children += this.children[i].load(in);
+          node.children[i] = loadNode(in);
+        }
+      } else {
+        if ((type & DATA_FLAG) == 0) {
+          node = new Node(type);
+        } else {
+          int data = in.readInt();
+          node = new DataNode(type ^ DATA_FLAG, data);
         }
       }
-      return children + 1;
+      return node;
     }
 
     public void visit(OctreeVisitor visitor, int x, int y, int z, int depth) {
-      if (type == -1) {
+      if (type == BRANCH_NODE) {
         int cx = x << 1;
         int cy = y << 1;
         int cz = z << 1;
@@ -157,6 +169,17 @@ public class Octree {
     public DataNode(int type, int data) {
       super(type);
       this.data = data;
+    }
+
+    @Override public void store(DataOutputStream out) throws IOException {
+      out.writeInt(type | DATA_FLAG);
+      if (type == BRANCH_NODE) {
+        for (int i = 0; i < 8; ++i) {
+          children[i].store(out);
+        }
+      } else {
+        out.writeInt(data);
+      }
     }
 
     @Override public int getData() {
@@ -201,8 +224,12 @@ public class Octree {
    * @param octreeDepth The number of levels in the Octree.
    */
   public Octree(int octreeDepth) {
+    this(octreeDepth, new Node(0));
+  }
+
+  public Octree(int octreeDepth, Node node) {
     depth = octreeDepth;
-    root = new Node(0);
+    root = node;
     parents = new Node[depth];
     cache = new Node[depth + 1];
     cache[depth] = root;
@@ -278,7 +305,9 @@ public class Octree {
     Node node;
     while (true) {
       node = cache[cacheLevel];
-      if (node.type != -1) break;
+      if (node.type != BRANCH_NODE) {
+        break;
+      }
       cacheLevel -= 1;
       cx = x >>> cacheLevel;
       cy = y >>> cacheLevel;
@@ -291,7 +320,9 @@ public class Octree {
 
   public Material getMaterial(int x, int y, int z, BlockPalette palette) {
     Node node = get(x, y, z);
-    if (node.type == -1) return UnknownBlock.UNKNOWN;
+    if (node.type == BRANCH_NODE) {
+      return UnknownBlock.UNKNOWN;
+    }
     return palette.get(node.type);
   }
 
@@ -313,9 +344,8 @@ public class Octree {
    */
   public static Octree load(DataInputStream in) throws IOException {
     int treeDepth = in.readInt();
-    Octree tree = new Octree(treeDepth);
-    int size = tree.root.load(in);
-    Log.info("Loaded octree with " + size + " nodes.");
+    Octree tree = new Octree(treeDepth, Node.loadNode(in));
+    //Log.info("Loaded octree with " + size + " nodes.");
     return tree;
   }
 
@@ -423,7 +453,7 @@ public class Octree {
 
       first = false;
 
-      while (node.type == -1) {
+      while (node.type == BRANCH_NODE) {
         level -= 1;
         lx = x >>> level;
         ly = y >>> level;
@@ -590,7 +620,7 @@ public class Octree {
 
       first = false;
 
-      while (node.type == -1) {
+      while (node.type == BRANCH_NODE) {
         level -= 1;
         lx = x >>> level;
         ly = y >>> level;
