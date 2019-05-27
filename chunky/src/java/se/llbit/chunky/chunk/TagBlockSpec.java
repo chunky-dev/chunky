@@ -24,6 +24,7 @@ public class TagBlockSpec implements BlockSpec {
 
   @Override public void serialize(DataOutputStream out) throws IOException {
     out.write(0);
+    System.out.format("tag: 0x%08X %s%n", tag.hashCode(), tag.toString());
     tag.write(out);
   }
 

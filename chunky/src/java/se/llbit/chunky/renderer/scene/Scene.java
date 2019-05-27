@@ -1742,6 +1742,7 @@ public class Scene implements JsonSerializable, Refreshable {
         waterOctree = data.waterTree;
         grassTexture = data.grassColors;
         foliageTexture = data.foliageColors;
+        palette = data.palette;
         task.update(2);
         Log.info("Octree loaded");
         calculateOctreeOrigin(chunks);

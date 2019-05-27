@@ -31,6 +31,7 @@ import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
+import se.llbit.log.Log;
 
 /**
  * A simple voxel Octree.
@@ -101,17 +102,19 @@ public class Octree {
     /**
      * Deserialize node.
      *
-     * @throws IOException
+     * @return the number of loaded octree nodes.
      */
-    public void load(DataInputStream in) throws IOException {
+    public int load(DataInputStream in) throws IOException {
       type = in.readInt();
+      int children = 0;
       if (type == -1) {
-        children = new Node[8];
+        this.children = new Node[8];
         for (int i = 0; i < 8; ++i) {
-          children[i] = new Node(0);
-          children[i].load(in);
+          this.children[i] = new Node(0);
+          children += this.children[i].load(in);
         }
       }
+      return children + 1;
     }
 
     public void visit(OctreeVisitor visitor, int x, int y, int z, int depth) {
@@ -311,7 +314,8 @@ public class Octree {
   public static Octree load(DataInputStream in) throws IOException {
     int treeDepth = in.readInt();
     Octree tree = new Octree(treeDepth);
-    tree.root.load(in);
+    int size = tree.root.load(in);
+    Log.info("Loaded octree with " + size + " nodes.");
     return tree;
   }
 

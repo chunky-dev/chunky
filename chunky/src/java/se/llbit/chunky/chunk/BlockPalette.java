@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class BlockPalette {
-  private static final int BLOCK_PALETTE_VERSION = 2;
+  private static final int BLOCK_PALETTE_VERSION = 3;
   public final int airId, stoneId, waterId;
 
   private static final Map<String, Consumer<Block>> materialProperties = new HashMap<>();
@@ -24,10 +24,12 @@ public class BlockPalette {
   /** Stone blocks are used for filling invisible regions in the Octree. */
   public final Block stone, water;
 
-  private final Map<BlockSpec, Integer> blockMap = new HashMap<>();
-  private final List<Block> palette = new ArrayList<>();
+  private final Map<BlockSpec, Integer> blockMap;
+  private final List<Block> palette;
 
-  public BlockPalette() {
+  public BlockPalette(Map<BlockSpec, Integer> initialMap, List<Block> initialList) {
+    this.blockMap = initialMap;
+    this.palette = initialList;
     CompoundTag airTag = new CompoundTag();
     airTag.add("Name", new StringTag("minecraft:air"));
     CompoundTag stoneTag = new CompoundTag();
@@ -39,6 +41,10 @@ public class BlockPalette {
     waterId = put(waterTag);
     stone = get(stoneId);
     water = get(waterId);
+  }
+
+  public BlockPalette() {
+    this(new HashMap<>(), new ArrayList<>());
   }
 
   /**
@@ -184,12 +190,13 @@ public class BlockPalette {
       throw new IOException("Incompatible block palette format.");
     }
     int numBlocks = in.readInt();
-    BlockPalette palette = new BlockPalette();
+    Map<BlockSpec, Integer> blockMap = new HashMap<>(numBlocks);
+    List<Block> blocks = new ArrayList<>(numBlocks);
     for (int i = 0; i < numBlocks; ++i) {
       BlockSpec spec = BlockSpec.deserialize(in);
-      palette.blockMap.put(spec, i);
-      palette.palette.add(spec.toBlock());
+      blockMap.put(spec, i);
+      blocks.add(spec.toBlock());
     }
-    return palette;
+    return new BlockPalette(blockMap, blocks);
   }
 }
