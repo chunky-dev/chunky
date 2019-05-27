@@ -24,6 +24,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 
@@ -45,6 +46,7 @@ public class ConfirmResetPopup extends Popup implements Initializable {
   @FXML private Text text;
   @FXML private Button accept;
   @FXML private Button cancel;
+  @FXML private BorderPane pane;
 
   private boolean fired = false;
   private final ChoiceListener acceptListener;
@@ -97,5 +99,11 @@ public class ConfirmResetPopup extends Popup implements Initializable {
     accept.setTooltip(new Tooltip("Discard changes and save render progress."));
     cancel.setText("Cancel");
     cancel.setOnAction(e -> onReject());
+    pane.setStyle(
+        "-fx-background-color: -fx-background;"
+        + "-fx-border-color: -fx-accent;"
+        + "-fx-border-style: solid;"
+        + "-fx-border-width: 1px;");
   }
+
 }
