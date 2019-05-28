@@ -153,7 +153,16 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
     // Register key event listener for keyboard navigation.
     canvasPane.setFocusTraversable(true);
+
+    // TODO(llbit): find better way of preventing the tab header from stealing focus?
+    // The canvas pane needs focus or else it will not receive keyboard events.
+    canvasPane.setOnMouseDragged(event -> {
+      if (!canvasPane.isFocused()) {
+        canvasPane.requestFocus();
+      }
+    });
     canvasPane.setOnMouseClicked(event -> canvasPane.requestFocus());
+
     canvasPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
       if (!isVisible()) {
         return;
