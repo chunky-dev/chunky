@@ -122,14 +122,10 @@ public class ChunkyFxController
   @FXML private Tab mapViewTab;
   @FXML private Tab chunksTab;
   @FXML private Tab optionsTab;
-  @FXML private Tab renderTab;
   @FXML private Tab aboutTab;
   @FXML private Button editResourcePacks;
   @FXML private CheckBox singleColorBtn;
   @FXML private CheckBox showLauncherBtn;
-  @FXML private Button clearSelectionBtn2;
-  @FXML private Button newSceneBtn;
-  @FXML private Button loadSceneBtn;
   @FXML private Button openSceneDirBtn;
   @FXML private Button changeSceneDirBtn;
   @FXML private Hyperlink documentationLink;
@@ -472,8 +468,6 @@ public class ChunkyFxController
           scale.set(newValue.scale);
         }));
 
-    clearSelectionBtn2.setOnAction(e -> chunkSelection.clearSelection());
-
     deleteChunks.setTooltip(new Tooltip("Delete selected chunks."));
     deleteChunks.setOnAction(e -> {
       Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -533,14 +527,12 @@ public class ChunkyFxController
     mapViewTab.setGraphic(new ImageView(Icon.map.fxImage()));
     chunksTab.setGraphic(new ImageView(Icon.mapSelected.fxImage()));
     optionsTab.setGraphic(new ImageView(Icon.wrench.fxImage()));
-    renderTab.setGraphic(new ImageView(Icon.sky.fxImage()));
     aboutTab.setGraphic(new ImageView(Icon.question.fxImage()));
 
     Collection<Tab> javaFxTabs = new ArrayList<>();
     javaFxTabs.add(mapViewTab);
     javaFxTabs.add(chunksTab);
     javaFxTabs.add(optionsTab);
-    javaFxTabs.add(renderTab);
     javaFxTabs.add(aboutTab);
     // Call the hook to let plugins add their tabs.
     javaFxTabs = chunky.getMainTabTransformer().apply(javaFxTabs);

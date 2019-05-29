@@ -131,19 +131,6 @@
           <Button fx:id="editResourcePacks" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Edit resource packs"/>
           <CheckBox fx:id="singleColorBtn" mnemonicParsing="false" text="Single color textures (needs restart)"/>
           <CheckBox fx:id="showLauncherBtn" mnemonicParsing="false" text="Show launcher when starting Chunky"/>
-        </VBox>
-      </Tab>
-      <Tab fx:id="renderTab" text="3D Render">
-        <VBox layoutX="40.0" layoutY="-13.0" spacing="10.0">
-          <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
-          </padding>
-          <Button fx:id="clearSelectionBtn2" mnemonicParsing="false" text="Clear Selection"/>
-          <HBox alignment="BASELINE_LEFT" spacing="10.0">
-            <Button fx:id="newSceneBtn" mnemonicParsing="false" text="New Scene"/>
-            <Label text="(Select chunks in the map first!)"/>
-          </HBox>
-          <Button fx:id="loadSceneBtn" mnemonicParsing="false" text="Load Scene"/>
           <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open Scene Directory"/>
           <Button fx:id="changeSceneDirBtn" mnemonicParsing="false" text="Change Scene Directory"/>
         </VBox>
