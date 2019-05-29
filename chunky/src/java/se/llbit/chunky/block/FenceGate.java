@@ -16,6 +16,7 @@ public class FenceGate extends MinecraftBlockTranslucent {
     super(name, texture);
     this.description = String.format("facing=%s, in_wall=%s, open=%s",
         facing, inWall, open);
+    solid = false;
     localIntersect = true;
     this.inWall = inWall ? 1 : 0;
     this.open = open ? 1 : 0;

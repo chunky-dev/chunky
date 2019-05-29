@@ -12,5 +12,6 @@ public class MinecraftBlock extends Block {
   public MinecraftBlock(String name, Texture texture) {
     super("minecraft:" + name, texture);
     opaque = true;
+    solid = true;
   }
 }

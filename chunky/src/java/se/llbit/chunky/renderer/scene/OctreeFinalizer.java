@@ -76,8 +76,9 @@ public class OctreeFinalizer {
 
     if (wmat instanceof Water) {
       Material above = waterTree.getMaterial(x, cy + 1, z, palette);
+      Material aboveBlock = worldTree.getMaterial(x, cy + 1, z, palette);
       int level0 = 8 - ((Water) wmat).level;
-      if (!above.isWater()) {
+      if (!above.isWater() && !aboveBlock.solid) {
         int corner0 = level0;
         int corner1 = level0;
         int corner2 = level0;

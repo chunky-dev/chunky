@@ -900,13 +900,13 @@ public class Scene implements JsonSerializable, Refreshable {
                 if (cy + 1 < yMax) {
                   int above = Chunk.chunkIndex(cx, cy + 1, cz);
                   Block aboveBlock = palette.get(blocks[above]);
-                  if (aboveBlock.isWaterFilled()) {
+                  if (aboveBlock.isWaterFilled() || aboveBlock.solid) {
                     waterNode = new Octree.DataNode(palette.waterId, 1 << Water.FULL_BLOCK);
                   }
                 }
                 waterOctree.set(waterNode, x, cy - origin.y, z);
                 if (block.isWater()) {
-                  // Don't keep the waterlogged block.
+                  // Move plain water blocks to the water octree.
                   octNode = new Octree.Node(palette.airId);
                 }
               } else if (cy + 1 < yMax && block instanceof Lava) {

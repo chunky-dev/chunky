@@ -13,6 +13,7 @@ public class Fence extends MinecraftBlockTranslucent {
   public Fence(String name, Texture texture,
       boolean north, boolean south, boolean east, boolean west) {
     super(name, texture);
+    solid = false;
     localIntersect = true;
     this.description = String.format("north=%s, south=%s, east=%s, west=%s",
         north, south, east, west);
