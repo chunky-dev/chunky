@@ -1,6 +1,7 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.RedstoneLamp;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.StringTag;
@@ -16,7 +17,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class BlockPalette {
-  private static final int BLOCK_PALETTE_VERSION = 3;
+  private static final int BLOCK_PALETTE_VERSION = 4;
   public final int airId, stoneId, waterId;
 
   private static final Map<String, Consumer<Block>> materialProperties = new HashMap<>();
@@ -53,7 +54,7 @@ public class BlockPalette {
    * @return the palette index of the block in this palette.
    */
   public int put(Tag tag) {
-    return put(new TagBlockSpec(tag));
+    return put(new BlockSpec(tag));
   }
 
   public int put(BlockSpec spec) {

@@ -1,48 +1,57 @@
-package se.llbit.chunky.chunk;
+package se.llbit.chunky.block;
 
-import se.llbit.chunky.block.*;
+import se.llbit.chunky.chunk.TagBlockBuilder;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.model.FlowerPotModel;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.ShulkerTexture;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
+import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.NotNull;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-public class TagBlockSpec implements BlockSpec {
-  private static final int MAGIC = 0xE6FFE636;
+public class BlockSpec {
   public final Tag tag;
 
-  public TagBlockSpec(@NotNull Tag tag) {
+  public BlockSpec(@NotNull Tag tag) {
     this.tag = tag;
   }
 
-  @Override public void serialize(DataOutputStream out) throws IOException {
-    out.write(0);
+  public static BlockSpec deserialize(DataInputStream in) throws IOException {
+    Tag tag = CompoundTag.read(in);
+    if (tag.isError()) {
+      throw new IOException("Error while reading block palette: " + tag.error());
+    }
+    return new BlockSpec(tag);
+  }
+
+  public void serialize(DataOutputStream out) throws IOException {
     System.out.format("tag: 0x%08X %s%n", tag.hashCode(), tag.toString());
     tag.write(out);
   }
 
   @Override public int hashCode() {
-    return MAGIC ^ tag.hashCode();
+    return tag.hashCode();
   }
 
   @Override public boolean equals(Object obj) {
-    return (obj instanceof TagBlockSpec)
-        && ((TagBlockSpec) obj).tag.equals(tag);
+    return (obj instanceof BlockSpec) && ((BlockSpec) obj).tag.equals(tag);
   }
 
   /**
    * Converts NBT block data to Chunky block object.
    */
-  @Override public Block toBlock() {
+  public Block toBlock() {
     // Reference: https://minecraft.gamepedia.com/Java_Edition_data_values#Blocks
-    String name = tag.get("Name").stringValue("minecraft:air");
+    String name = tag.get("Name").stringValue("unknown:unknown");
     if (name.startsWith("minecraft:")) {
       return maybeWaterlogged(blockFromTag(name.substring(10)));
     }
