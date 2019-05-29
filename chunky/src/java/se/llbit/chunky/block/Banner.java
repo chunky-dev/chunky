@@ -11,6 +11,9 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
+// Note: Mojang changed the ID values for banner colors in Minecraft 1.13,
+// for backward compatibility we need some way of mapping the old color IDs to the
+// new color IDs. This would require tracking the world format version somewhere.
 public class Banner extends MinecraftBlockTranslucent {
   private final int rotation, color;
 
