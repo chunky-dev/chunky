@@ -91,16 +91,16 @@ public class BlockPalette {
       block.emittance = 1.0f;
     });
     materialProperties.put("minecraft:glass", block -> {
-      block.emittance = 1.52f;
+      block.ior = 1.52f;
     });
     materialProperties.put("minecraft:gold_block", block -> {
-      block.emittance = 0.04f;
+      block.specular = 0.04f;
     });
     materialProperties.put("minecraft:diamond_block", block -> {
-      block.emittance = 0.04f;
+      block.specular = 0.04f;
     });
     materialProperties.put("minecraft:iron_block", block -> {
-      block.emittance = 0.04f;
+      block.specular = 0.04f;
     });
     materialProperties.put("minecraft:redstone_torch", block -> {
       block.emittance = 1.0f;
