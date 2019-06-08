@@ -637,7 +637,7 @@ public class Scene implements JsonSerializable, Refreshable {
       ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
       hit = true;
     }
-    if (start.getCurrentMaterial().isWater()) {
+    if (start.getCurrentMaterial().isWater() && start.getCurrentMaterial() != Water.OCEAN_WATER) {
       r = new Ray(start);
       r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
       if (waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
@@ -732,27 +732,6 @@ public class Scene implements JsonSerializable, Refreshable {
       palette = new BlockPalette();
       worldOctree = new Octree(requiredDepth);
       waterOctree = new Octree(requiredDepth);
-
-      if (waterHeight > 0) {
-        CompoundTag waterTag = new CompoundTag();
-        waterTag.add("Name", new StringTag("minecraft:water"));
-        int waterId = palette.put(waterTag);
-        // TODO FIXME
-        // Water world mode enabled, fill in water in empty blocks.
-        // The water blocks are replaced later when the world chunks are loaded.
-        for (int x = 0; x < (1 << worldOctree.depth); ++x) {
-          for (int z = 0; z < (1 << worldOctree.depth); ++z) {
-            for (int y = -origin.y; y < (-origin.y) + waterHeight - 1; ++y) {
-              worldOctree.set(new Octree.DataNode(waterId, 1 << Water.FULL_BLOCK), x, y, z);
-            }
-          }
-        }
-        for (int x = 0; x < (1 << worldOctree.depth); ++x) {
-          for (int z = 0; z < (1 << worldOctree.depth); ++z) {
-            worldOctree.set(waterId, x, (-origin.y) + waterHeight - 1, z);
-          }
-        }
-      }
 
       // Parse the regions first - force chunk lists to be populated!
       Set<ChunkPosition> regions = new HashSet<>();
@@ -2108,6 +2087,9 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public boolean isInWater(Ray ray) {
+    if (waterHeight > 0 && ray.o.y < waterHeight - 0.125) {
+      return true;
+    }
     if (waterOctree.isInside(ray.o)) {
       int x = (int) QuickMath.floor(ray.o.x);
       int y = (int) QuickMath.floor(ray.o.y);
@@ -2116,9 +2098,8 @@ public class Scene implements JsonSerializable, Refreshable {
       Material block = palette.get(node.type);
       return block.isWater()
           && ((ray.o.y - y) < 0.875 || (0 != (node.getData() & (1 << Water.FULL_BLOCK))));
-    } else {
-      return waterHeight > 0 && ray.o.y < waterHeight - 0.125;
     }
+    return false;
   }
 
   public boolean isInsideOctree(Vector3 vec) {

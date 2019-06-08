@@ -19,7 +19,9 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.block.Water;
+import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
+import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
@@ -111,13 +113,11 @@ public class PreviewRayTracer implements RayTracer {
       if (t > 0 && t < ray.t) {
         Vector3 vec = new Vector3();
         vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
-        if (!scene.isInsideOctree(vec)) {
-          ray.t = t;
-          Water.INSTANCE.getColor(ray);
-          ray.n.set(0, 1, 0);
-          ray.setCurrentMaterial(Water.INSTANCE, 0);
-          return true;
-        }
+        ray.t = t;
+        Water.INSTANCE.getColor(ray);
+        ray.n.set(0, 1, 0);
+        ray.setCurrentMaterial(Water.OCEAN_WATER, 1 << Water.FULL_BLOCK);
+        return true;
       }
     }
     if (ray.d.y > 0) {
@@ -125,13 +125,11 @@ public class PreviewRayTracer implements RayTracer {
       if (t > 0 && t < ray.t) {
         Vector3 vec = new Vector3();
         vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
-        if (!scene.isInsideOctree(vec)) {
-          ray.t = t;
-          Water.INSTANCE.getColor(ray);
-          ray.n.set(0, -1, 0);
-          ray.setCurrentMaterial(Air.INSTANCE, 0);
-          return true;
-        }
+        ray.t = t;
+        Water.INSTANCE.getColor(ray);
+        ray.n.set(0, -1, 0);
+        ray.setCurrentMaterial(Air.INSTANCE, 0);
+        return true;
       }
     }
     return false;
