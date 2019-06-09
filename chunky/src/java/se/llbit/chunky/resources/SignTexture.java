@@ -106,4 +106,11 @@ public class SignTexture extends Texture {
     }
   }
 
+  @Override public float[] getColor(double u, double v) {
+    float[] rgba = texture.getColor(u, v);
+    if (rgba[3] == 0) {
+      return Texture.signPost.getColor(u * ww + u0, v * hh + v0);
+    }
+    return rgba;
+  }
 }
