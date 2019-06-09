@@ -70,7 +70,7 @@ public class BlockPalette {
     return id;
   }
 
-  private void applyMaterial(Block block) {
+  private static void applyMaterial(Block block) {
     Consumer<Block> properties = materialProperties.get(block.name);
     if (properties != null) {
       properties.accept(block);
@@ -196,7 +196,9 @@ public class BlockPalette {
     for (int i = 0; i < numBlocks; ++i) {
       BlockSpec spec = BlockSpec.deserialize(in);
       blockMap.put(spec, i);
-      blocks.add(spec.toBlock());
+      Block block = spec.toBlock();
+      applyMaterial(block);
+      blocks.add(block);
     }
     return new BlockPalette(blockMap, blocks);
   }
