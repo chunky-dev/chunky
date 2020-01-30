@@ -323,7 +323,7 @@ public class PathTracer implements RayTracer {
       if (hit && prevMat.isWater()) {
         // Render water fog effect.
         double a = ray.distance / scene.waterVisibility;
-        double attenuation = 1 - QuickMath.min(1, a * a);
+        double attenuation = Math.exp(-a);
         ray.color.scale(attenuation);
       }
 
@@ -406,7 +406,7 @@ public class PathTracer implements RayTracer {
       attenuation.w *= mult;
       if (ray.getPrevMaterial().isWater()) {
         double a = ray.distance / scene.waterVisibility;
-        attenuation.w *= 1 - QuickMath.min(1, a * a);
+        attenuation.w *= Math.exp(-a);
       }
     }
   }

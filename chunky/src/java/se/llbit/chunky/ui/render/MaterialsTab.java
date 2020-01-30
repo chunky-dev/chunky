@@ -51,9 +51,11 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
 
   public MaterialsTab() {
     emittance.setName("Emittance");
+    emittance.setRange(0, 100);
     specular.setName("Specular");
     specular.setRange(0, 1);
     ior.setName("IoR");
+    ior.setRange(0, 5);
     ObservableList<String> blockIds = FXCollections.observableArrayList();
     blockIds.addAll(Block.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());
