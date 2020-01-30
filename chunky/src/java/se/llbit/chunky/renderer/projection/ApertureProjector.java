@@ -18,7 +18,6 @@ package se.llbit.chunky.renderer.projection;
 
 import java.util.Random;
 
-import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 /**
@@ -43,18 +42,11 @@ public class ApertureProjector implements Projector {
 
     d.scale(subjectDistance / d.z);
 
-    // find random point in aperture
-    double rx, ry;
-    while (true) {
-      rx = 2 * random.nextDouble() - 1;
-      ry = 2 * random.nextDouble() - 1;
-      double s = rx * rx + ry * ry;
-      if (s > Ray.EPSILON && s <= 1) {
-        rx *= aperture;
-        ry *= aperture;
-        break;
-      }
-    }
+    double r = Math.sqrt(random.nextDouble()) * aperture;
+    double theta = random.nextDouble() * Math.PI * 2.;
+    double rx = Math.cos(theta) * r;
+    double ry = Math.sin(theta) * r;
+    
 
     d.sub(rx, ry, 0);
     o.add(rx, ry, 0);
