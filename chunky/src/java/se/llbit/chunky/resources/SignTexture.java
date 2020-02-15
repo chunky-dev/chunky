@@ -16,14 +16,13 @@
  */
 package se.llbit.chunky.resources;
 
+import se.llbit.chunky.entity.SignEntity.Color;
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
-import se.llbit.chunky.entity.SignEntity.Color;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Vector4;
 
-// TODO(1.14): handle new sign textures (birch, spruce, ...).
 public class SignTexture extends Texture {
 
   private static final double ww, hh, u0, v0;
@@ -39,8 +38,10 @@ public class SignTexture extends Texture {
   }
 
   private final Texture texture;
+  private final Texture signTexture;
 
-  public SignTexture(JsonArray[] text) {
+  public SignTexture(JsonArray[] text, Texture signTexture) {
+    this.signTexture = signTexture;
     int xmargin = 4;
     int ymargin = 4;
     int gh = 10;
@@ -103,14 +104,14 @@ public class SignTexture extends Texture {
   @Override public void getColor(double u, double v, Vector4 c) {
     texture.getColor(u, v, c);
     if (c.w == 0) {
-      Texture.signPost.getColor(u * ww + u0, v * hh + v0, c);
+      signTexture.getColor(u * ww + u0, v * hh + v0, c);
     }
   }
 
   @Override public float[] getColor(double u, double v) {
     float[] rgba = texture.getColor(u, v);
     if (rgba[3] == 0) {
-      return Texture.signPost.getColor(u * ww + u0, v * hh + v0);
+      return signTexture.getColor(u * ww + u0, v * hh + v0);
     }
     return rgba;
   }

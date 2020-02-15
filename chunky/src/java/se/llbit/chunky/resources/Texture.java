@@ -723,6 +723,12 @@ public class Texture {
   public static final Texture loomFront = new Texture("loom-front");
   public static final Texture loomSide = new Texture("loom-side");
   public static final Texture loomTop = new Texture("loom-top");
+  public static final Texture acaciaSignPost = new Texture();
+  public static final Texture birchSignPost = new Texture();
+  public static final Texture darkOakSignPost = new Texture();
+  public static final Texture jungleSignPost = new Texture();
+  public static final Texture oakSignPost = new Texture();
+  public static final Texture spruceSignPost = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

@@ -42,6 +42,6 @@ public class WallSign extends MinecraftBlockTranslucent {
   }
 
   @Override public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
-    return new WallSignEntity(position, entityTag, facing);
+    return new WallSignEntity(position, entityTag, facing, texture);
   }
 }

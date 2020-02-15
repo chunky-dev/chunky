@@ -19,8 +19,8 @@ package se.llbit.chunky.entity;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
-import se.llbit.chunky.world.material.SignMaterial;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -168,17 +168,19 @@ public class SignEntity extends Entity {
 
   private final JsonArray[] text;
   private final int angle;
-  private final SignTexture texture;
+  private final SignTexture frontTexture;
+  private final Texture texture;
 
-  public SignEntity(Vector3 position, CompoundTag entityTag, int blockData) {
-    this(position, getTextLines(entityTag), blockData & 0xF);
+  public SignEntity(Vector3 position, CompoundTag entityTag, int blockData, Texture signTexture) {
+    this(position, getTextLines(entityTag), blockData & 0xF, signTexture);
   }
 
-  public SignEntity(Vector3 position, JsonArray[] text, int direction) {
+  public SignEntity(Vector3 position, JsonArray[] text, int direction, Texture signTexture) {
     super(position);
     this.text = text;
     this.angle = direction;
-    this.texture = new SignTexture(text);
+    this.frontTexture = new SignTexture(text, signTexture);
+    this.texture = signTexture;
   }
 
   /**
@@ -262,12 +264,7 @@ public class SignEntity extends Entity {
         .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     for (int i = 0; i < sides.length; ++i) {
       Quad quad = rot[angle][i];
-      Material material;
-      if (i != 0) {
-        material = SignMaterial.INSTANCE;
-      } else {
-        material = new TextureMaterial(texture);
-      }
+      Material material = new TextureMaterial(i == 0 ? frontTexture : texture);
       quad.addTriangles(primitives, material, transform);
     }
     return primitives;
@@ -279,6 +276,7 @@ public class SignEntity extends Entity {
     json.add("position", position.toJson());
     json.add("text", textToJson(text));
     json.add("direction", angle);
+    // TODO serialize sign type (spruce, oak, ...)
     return json;
   }
 
@@ -290,7 +288,8 @@ public class SignEntity extends Entity {
     position.fromJson(json.get("position").object());
     JsonArray[] text = textFromJson(json.get("text"));
     int direction = json.get("direction").intValue(0);
-    return new SignEntity(position, text, direction);
+    // TODO deserialize sign type (spruce, oak, ...)
+    return new SignEntity(position, text, direction, Texture.signPost);
   }
 
   /**

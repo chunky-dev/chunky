@@ -105,6 +105,7 @@ public class TexturePackLoader {
         new SimpleTexture("environment/sun", Sun.texture),// MC 1.5
         new SimpleTexture("terrain/sun", Sun.texture)));
     allTextures.put("sign", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/entity/signs/oak", Texture.signPost),// MC 1.14
         new SimpleTexture("assets/minecraft/textures/entity/sign", Texture.signPost),// MC 1.6
         new SimpleTexture("item/sign", Texture.signPost)));
     allTextures.put("clouds", new AlternateTextures(
@@ -3221,6 +3222,7 @@ public class TexturePackLoader {
     allTextures.put("barrel_bottom",
         new SimpleTexture("assets/minecraft/textures/block/barrel_bottom",
             Texture.barrelBottom));
+
     allTextures.put("loom_bottom",
         new SimpleTexture("assets/minecraft/textures/block/loom_bottom",
             Texture.loomBottom));
@@ -3233,6 +3235,19 @@ public class TexturePackLoader {
     allTextures.put("loom_top",
         new SimpleTexture("assets/minecraft/textures/block/loom_top",
             Texture.loomTop));
+
+    allTextures.put("sign_acacia",
+        new SimpleTexture("assets/minecraft/textures/entity/signs/acacia", Texture.acaciaSignPost));
+    allTextures.put("sign_birch",
+        new SimpleTexture("assets/minecraft/textures/entity/signs/birch", Texture.birchSignPost));
+    allTextures.put("sign_dark_oak",
+        new SimpleTexture("assets/minecraft/textures/entity/signs/dark_oak", Texture.darkOakSignPost));
+    allTextures.put("sign_jungle",
+        new SimpleTexture("assets/minecraft/textures/entity/signs/jungle", Texture.jungleSignPost));
+    allTextures.put("sign_oak",
+        new SimpleTexture("assets/minecraft/textures/entity/signs/oak", Texture.oakSignPost));
+    allTextures.put("sign_spruce",
+        new SimpleTexture("assets/minecraft/textures/entity/signs/spruce", Texture.spruceSignPost));
   }
 
   private static String[] texturePacks = { };
