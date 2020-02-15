@@ -3211,9 +3211,28 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/structure_block_save",
             Texture.structureBlockSave));
 
-    allTextures.put("dragon",
-        new SimpleTexture("assets/minecraft/textures/entity/enderdragon/dragon",
-            Texture.dragon));
+    // Minecraft 1.14
+    allTextures.put("barrel_top",
+        new SimpleTexture("assets/minecraft/textures/block/barrel_top",
+            Texture.barrelTop));
+    allTextures.put("barrel_side",
+        new SimpleTexture("assets/minecraft/textures/block/barrel_side",
+            Texture.barrelSide));
+    allTextures.put("barrel_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/barrel_bottom",
+            Texture.barrelBottom));
+    allTextures.put("loom_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/loom_bottom",
+            Texture.loomBottom));
+    allTextures.put("loom_front",
+        new SimpleTexture("assets/minecraft/textures/block/loom_front",
+            Texture.loomFront));
+    allTextures.put("loom_side",
+        new SimpleTexture("assets/minecraft/textures/block/loom_side",
+            Texture.loomSide));
+    allTextures.put("loom_top",
+        new SimpleTexture("assets/minecraft/textures/block/loom_top",
+            Texture.loomTop));
   }
 
   private static String[] texturePacks = { };

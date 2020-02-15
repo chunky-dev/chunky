@@ -715,6 +715,15 @@ public class Texture {
   public static final Texture structureBlockLoad = new Texture();
   public static final Texture structureBlockSave = new Texture();
 
+  // [1.14]
+  public static final Texture barrelTop = new Texture("barrel-top");
+  public static final Texture barrelSide = new Texture("barrel-side");
+  public static final Texture barrelBottom = new Texture("barrel-bottom");
+  public static final Texture loomBottom = new Texture("loom-bottom");
+  public static final Texture loomFront = new Texture("loom-front");
+  public static final Texture loomSide = new Texture("loom-side");
+  public static final Texture loomTop = new Texture("loom-top");
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 

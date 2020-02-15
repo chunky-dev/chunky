@@ -6,7 +6,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class TexturedBlock extends MinecraftBlock {
-  private final Texture[] texture;
+  protected final Texture[] texture;
 
   public TexturedBlock(String name, Texture side, Texture topBottom) {
     this(name, side, side, side, side, topBottom, topBottom);

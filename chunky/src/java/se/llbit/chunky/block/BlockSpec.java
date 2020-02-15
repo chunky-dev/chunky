@@ -1470,11 +1470,9 @@ public class BlockSpec {
         return new Beetroots(age);
       }
       case "loom":
-        // TODO
-        return new UnknownBlock(name);
+        return new TopBottomOrientedTexturedBlock(name, getFacing(tag,"north"), Texture.loomFront, Texture.loomSide, Texture.loomTop, Texture.loomBottom);
       case "barrel":
-        // TODO
-        return new UnknownBlock(name);
+        return new OrientedTexturedBlock(name, getFacing(tag, "north"), Texture.barrelSide, Texture.barrelTop, Texture.barrelBottom);
       case "smoker":
         // TODO
         return new UnknownBlock(name);
