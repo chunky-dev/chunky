@@ -200,13 +200,13 @@ public class FlowerPotModel {
         // TODO(1.14): upcoming block change
         break;
       case CORNFLOWER:
-        // TODO(1.14): upcoming block change
+        hit |= intersect(flowerSmall, ray, Texture.cornflower);
         break;
       case LILY_OF_THE_VALLEY:
-        // TODO(1.14): upcoming block change
+        hit |= intersect(flowerSmall, ray, Texture.lilyOfTheValley);
         break;
       case WITHER_ROSE:
-        // TODO(1.14): upcoming block change
+        hit |= intersect(flowerSmall, ray, Texture.witherRose);
         break;
     }
     if (hit) {
