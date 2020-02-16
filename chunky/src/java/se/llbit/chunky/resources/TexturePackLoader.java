@@ -3248,6 +3248,72 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/entity/signs/oak", Texture.oakSignPost));
     allTextures.put("sign_spruce",
         new SimpleTexture("assets/minecraft/textures/entity/signs/spruce", Texture.spruceSignPost));
+
+    allTextures.put("cartography_table_side1",
+        new SimpleTexture("assets/minecraft/textures/block/cartography_table_side1",
+            Texture.cartographyTableSide1));
+    allTextures.put("cartography_table_side2",
+        new SimpleTexture("assets/minecraft/textures/block/cartography_table_side2",
+            Texture.cartographyTableSide2));
+    allTextures.put("cartography_table_side3",
+        new SimpleTexture("assets/minecraft/textures/block/cartography_table_side3",
+            Texture.cartographyTableSide3));
+    allTextures.put("cartography_table_top",
+        new SimpleTexture("assets/minecraft/textures/block/cartography_table_top",
+            Texture.cartographyTableTop));
+
+    allTextures.put("fletching_table_front",
+        new SimpleTexture("assets/minecraft/textures/block/fletching_table_front",
+            Texture.fletchingTableFront));
+    allTextures.put("fletching_table_top",
+        new SimpleTexture("assets/minecraft/textures/block/fletching_table_top",
+            Texture.fletchingTableTop));
+    allTextures.put("fletching_table_side",
+        new SimpleTexture("assets/minecraft/textures/block/fletching_table_side",
+            Texture.fletchingTableSide));
+
+    allTextures.put("smithing_table_front",
+        new SimpleTexture("assets/minecraft/textures/block/smithing_table_front",
+            Texture.smithingTableFront));
+    allTextures.put("smithing_table_top",
+        new SimpleTexture("assets/minecraft/textures/block/smithing_table_top",
+            Texture.smithingTableTop));
+    allTextures.put("smithing_table_side",
+        new SimpleTexture("assets/minecraft/textures/block/smithing_table_side",
+            Texture.smithingTableSide));
+    allTextures.put("smithing_table_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/smithing_table_bottom",
+            Texture.smithingTableBottom));
+
+    allTextures.put("blast_furnace_top",
+        new SimpleTexture("assets/minecraft/textures/block/blast_furnace_top",
+            Texture.blastFurnaceTop));
+    allTextures.put("blast_furnace_side",
+        new SimpleTexture("assets/minecraft/textures/block/blast_furnace_side",
+            Texture.blastFurnaceSide));
+    allTextures.put("blast_furnace_front",
+        new SimpleTexture("assets/minecraft/textures/block/blast_furnace_front",
+            Texture.blastFurnaceFront));
+    allTextures.put("blast_furnace_front_on",
+        new SimpleTexture("assets/minecraft/textures/block/blast_furnace_front_on",
+            Texture.blastFurnaceFrontOn));
+
+    allTextures.put("smoker_top",
+        new SimpleTexture("assets/minecraft/textures/block/smoker_top",
+            Texture.smokerTop));
+    allTextures.put("smoker_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/smoker_bottom",
+            Texture.smokerBottom));
+    allTextures.put("smoker_side",
+        new SimpleTexture("assets/minecraft/textures/block/smoker_side",
+            Texture.smokerSide));
+    allTextures.put("smoker_front",
+        new SimpleTexture("assets/minecraft/textures/block/smoker_front",
+            Texture.smokerFront));
+    allTextures.put("smoker_front_on",
+        new SimpleTexture("assets/minecraft/textures/block/smoker_front_on",
+            Texture.smokerFrontOn));
+
   }
 
   private static String[] texturePacks = { };

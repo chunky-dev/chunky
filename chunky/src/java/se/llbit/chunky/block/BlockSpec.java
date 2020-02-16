@@ -1473,17 +1473,13 @@ public class BlockSpec {
             case "barrel":
                 return new OrientedTexturedBlock(name, getFacing(tag, "north"), Texture.barrelSide, Texture.barrelTop, Texture.barrelBottom);
             case "smoker":
-                // TODO
-                return new UnknownBlock(name);
+                return smoker(tag);
             case "blast_furnace":
-                // TODO
-                return new UnknownBlock(name);
+                return blastFurnace(tag);
             case "cartography_table":
-                // TODO
-                return new UnknownBlock(name);
-            case "fleching_table":
-                // TODO
-                return new UnknownBlock(name);
+                return new TexturedBlock(name, Texture.cartographyTableSide3, Texture.cartographyTableSide1, Texture.cartographyTableSide2, Texture.cartographyTableSide3, Texture.cartographyTableTop, Texture.darkOakPlanks);
+            case "fletching_table":
+                return new TexturedBlock(name, Texture.fletchingTableFront, Texture.fletchingTableFront, Texture.fletchingTableSide, Texture.fletchingTableSide, Texture.fletchingTableTop, Texture.birchPlanks);
             case "grindstone":
                 // TODO
                 return new UnknownBlock(name);
@@ -1491,8 +1487,7 @@ public class BlockSpec {
                 // TODO
                 return new UnknownBlock(name);
             case "smithing_table":
-                // TODO
-                return new UnknownBlock(name);
+                return new TexturedBlock(name, Texture.smithingTableFront, Texture.smithingTableFront, Texture.smithingTableSide, Texture.smithingTableSide, Texture.smithingTableTop, Texture.smithingTableBottom);
             case "stonecutter":
                 // TODO
                 return new UnknownBlock(name);
@@ -1746,6 +1741,20 @@ public class BlockSpec {
         String facing = getFacing(tag, "north");
         String lit = properties.get("lit").stringValue("false");
         return new Furnace(facing, lit.equals("true"));
+    }
+
+    private static Block smoker(Tag tag) {
+        Tag properties = tag.get("Properties");
+        String facing = getFacing(tag, "north");
+        String lit = properties.get("lit").stringValue("false");
+        return new TopBottomOrientedTexturedBlock("smoker", facing, lit.equals("true") ? Texture.smokerFrontOn : Texture.smokerFront, Texture.smokerSide, Texture.smokerTop, Texture.smokerBottom);
+    }
+
+    private static Block blastFurnace(Tag tag) {
+        Tag properties = tag.get("Properties");
+        String facing = getFacing(tag, "north");
+        String lit = properties.get("lit").stringValue("false");
+        return new TopBottomOrientedTexturedBlock("blast_furnace", facing, lit.equals("true") ? Texture.blastFurnaceFrontOn : Texture.blastFurnaceFront, Texture.blastFurnaceSide, Texture.blastFurnaceTop);
     }
 
     private static Block wheat(Tag tag) {

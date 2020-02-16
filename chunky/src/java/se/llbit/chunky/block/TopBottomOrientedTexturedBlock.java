@@ -10,8 +10,8 @@ public class TopBottomOrientedTexturedBlock extends OrientedTexturedBlock {
     private static final int[][] uvRotationMap = {
             {0, 0, 0, 0, 0, 0}, // up, unused
             {0, 0, 0, 0, 0, 0}, // down, unused
-            {0, 0, 0, 0, 2, 0}, // north todo
-            {0, 0, 0, 0, 0, 2}, // south todo
+            {0, 0, 0, 0, 2, 0}, // north
+            {0, 0, 0, 0, 0, 2}, // south
             {0, 0, 0, 0, 1, 1}, // west
             {0, 0, 0, 0, 3, 3}, // east
     };
@@ -24,6 +24,10 @@ public class TopBottomOrientedTexturedBlock extends OrientedTexturedBlock {
             {2, 3, 0, 1, 4, 5}, // west
             {1, 2, 3, 0, 4, 5}, // east
     };
+
+    public TopBottomOrientedTexturedBlock(String name, String facing, Texture front, Texture side, Texture top) {
+        this(name, facing, front, side, side, side, top, top);
+    }
 
     public TopBottomOrientedTexturedBlock(String name, String facing, Texture front, Texture side, Texture top, Texture bottom) {
         this(name, facing, front, side, side, side, top, bottom);

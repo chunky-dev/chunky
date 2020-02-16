@@ -716,19 +716,39 @@ public class Texture {
   public static final Texture structureBlockSave = new Texture();
 
   // [1.14]
-  public static final Texture barrelTop = new Texture("barrel-top");
-  public static final Texture barrelSide = new Texture("barrel-side");
-  public static final Texture barrelBottom = new Texture("barrel-bottom");
-  public static final Texture loomBottom = new Texture("loom-bottom");
-  public static final Texture loomFront = new Texture("loom-front");
-  public static final Texture loomSide = new Texture("loom-side");
-  public static final Texture loomTop = new Texture("loom-top");
+  public static final Texture barrelTop = new Texture();
+  public static final Texture barrelSide = new Texture();
+  public static final Texture barrelBottom = new Texture();
+  public static final Texture loomBottom = new Texture();
+  public static final Texture loomFront = new Texture();
+  public static final Texture loomSide = new Texture();
+  public static final Texture loomTop = new Texture();
   public static final Texture acaciaSignPost = new Texture();
   public static final Texture birchSignPost = new Texture();
   public static final Texture darkOakSignPost = new Texture();
   public static final Texture jungleSignPost = new Texture();
   public static final Texture oakSignPost = new Texture();
   public static final Texture spruceSignPost = new Texture();
+  public static final Texture cartographyTableSide1 = new Texture();
+  public static final Texture cartographyTableSide2 = new Texture();
+  public static final Texture cartographyTableSide3 = new Texture();
+  public static final Texture cartographyTableTop = new Texture();
+  public static final Texture fletchingTableFront = new Texture();
+  public static final Texture fletchingTableSide = new Texture();
+  public static final Texture fletchingTableTop = new Texture();
+  public static final Texture smithingTableFront = new Texture();
+  public static final Texture smithingTableSide = new Texture();
+  public static final Texture smithingTableTop = new Texture();
+  public static final Texture smithingTableBottom = new Texture();
+  public static final Texture blastFurnaceTop = new Texture();
+  public static final Texture blastFurnaceSide = new Texture();
+  public static final Texture blastFurnaceFrontOn = new Texture();
+  public static final Texture blastFurnaceFront = new Texture();
+  public static final Texture smokerTop = new Texture();
+  public static final Texture smokerSide = new Texture();
+  public static final Texture smokerBottom = new Texture();
+  public static final Texture smokerFrontOn = new Texture();
+  public static final Texture smokerFront = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
