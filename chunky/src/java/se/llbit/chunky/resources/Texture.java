@@ -749,6 +749,14 @@ public class Texture {
   public static final Texture smokerBottom = new Texture();
   public static final Texture smokerFrontOn = new Texture();
   public static final Texture smokerFront = new Texture();
+  public static final Texture sweetBerryBushStage0 = new Texture();
+  public static final Texture sweetBerryBushStage1 = new Texture();
+  public static final Texture sweetBerryBushStage2 = new Texture();
+  public static final Texture sweetBerryBushStage3 = new Texture();
+  public static final Texture cornflower = new Texture();
+  public static final Texture lilyOfTheValley = new Texture();
+  public static final Texture witherRose = new Texture();
+  public static final Texture bambooSapling = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

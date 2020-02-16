@@ -320,11 +320,11 @@ public class BlockSpec {
             case "oxeye_daisy":
                 return new SpriteBlock(name, Texture.oxeyeDaisy);
             case "cornflower":
-                return new UnknownBlock(name);
+                return new SpriteBlock(name, Texture.cornflower);
             case "lily_of_the_valley":
-                return new UnknownBlock(name);
+                return new SpriteBlock(name, Texture.lilyOfTheValley);
             case "wither_rose":
-                return new UnknownBlock(name);
+                return new SpriteBlock(name, Texture.witherRose);
             case "brown_mushroom":
                 return new SpriteBlock(name, Texture.brownMushroom);
             case "red_mushroom":
@@ -1250,8 +1250,7 @@ public class BlockSpec {
                 // TODO
                 return new UnknownBlock(name);
             case "bamboo_sapling":
-                // TODO
-                return new UnknownBlock(name);
+                return new SpriteBlock(name, Texture.bambooSapling);
             case "cake": {
                 int bites = stringToInt(tag.get("Properties").get("bites"), 0);
                 return new Cake(bites);
@@ -1497,9 +1496,10 @@ public class BlockSpec {
             case "lantern":
                 // TODO
                 return new UnknownBlock(name);
-            case "sweet_berry_bush":
-                // TODO
-                return new UnknownBlock(name);
+            case "sweet_berry_bush": {
+                int age = stringToInt(tag.get("Properties").get("age"), 3);
+                return new SweetBerryBush(age);
+            }
             case "campfire":
                 // TODO
                 return new UnknownBlock(name);

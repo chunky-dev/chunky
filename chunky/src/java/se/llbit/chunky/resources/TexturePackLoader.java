@@ -3314,6 +3314,24 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/smoker_front_on",
             Texture.smokerFrontOn));
 
+    addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage0", Texture.sweetBerryBushStage0);
+    addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage1", Texture.sweetBerryBushStage1);
+    addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage2", Texture.sweetBerryBushStage2);
+    addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage3", Texture.sweetBerryBushStage3);
+
+    addSimpleTexture("assets/minecraft/textures/block/cornflower", Texture.cornflower);
+    addSimpleTexture("assets/minecraft/textures/block/lily_of_the_valley", Texture.lilyOfTheValley);
+    addSimpleTexture("assets/minecraft/textures/block/wither_rose", Texture.witherRose);
+    addSimpleTexture("assets/minecraft/textures/block/bamboo_stage0", Texture.bambooSapling);
+  }
+
+  private static void addSimpleTexture(String file, Texture texture) {
+    String[] path = file.split("/");
+    addSimpleTexture(path[path.length - 1], file, texture);
+  }
+
+  private static void addSimpleTexture(String name, String file, Texture texture) {
+    allTextures.put(name, new SimpleTexture(file, texture));
   }
 
   private static String[] texturePacks = { };
