@@ -89,17 +89,20 @@ public class WallSignEntity extends Entity {
   private final int orientation;
   private final SignTexture frontTexture;
   private final Texture texture;
+  private final String material;
 
-  public WallSignEntity(Vector3 position, CompoundTag entityTag, int blockData, Texture signTexture) {
-    this(position, SignEntity.getTextLines(entityTag), blockData % 6, signTexture);
+  public WallSignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
+    this(position, SignEntity.getTextLines(entityTag), blockData % 6, material);
   }
 
-  public WallSignEntity(Vector3 position, JsonArray[] text, int direction, Texture signTexture) {
+  public WallSignEntity(Vector3 position, JsonArray[] text, int direction, String material) {
     super(position);
+    Texture signTexture = SignEntity.textureFromMaterial(material);
     this.orientation = direction;
     this.text = text;
     this.frontTexture = new SignTexture(text, signTexture);
     this.texture = signTexture;
+    this.material = material;
   }
 
   @Override public Collection<Primitive> primitives(Vector3 offset) {
@@ -121,7 +124,7 @@ public class WallSignEntity extends Entity {
     json.add("position", position.toJson());
     json.add("text", SignEntity.textToJson(text));
     json.add("direction", orientation);
-    // TODO serialize sign type (spruce, oak, ...)
+    json.add("material", material);
     return json;
   }
 
@@ -133,7 +136,7 @@ public class WallSignEntity extends Entity {
     position.fromJson(json.get("position").object());
     JsonArray[] text = SignEntity.textFromJson(json.get("text"));
     int direction = json.get("direction").intValue(0);
-    // TODO deserialize sign type (spruce, oak, ...)
-    return new WallSignEntity(position, text, direction, Texture.signPost);
+    String material = json.get("material").stringValue("oak");
+    return new WallSignEntity(position, text, direction, material);
   }
 }

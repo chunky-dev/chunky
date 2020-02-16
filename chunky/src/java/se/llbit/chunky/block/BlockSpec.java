@@ -1211,30 +1211,30 @@ public class BlockSpec {
                 return wheat(tag);
             case "sign":
             case "oak_sign":
-                return sign(tag, Texture.oakSignPost);
+                return sign(tag, "oak");
             case "wall_sign":
             case "oak_wall_sign":
-                return wallSign(tag, Texture.oakSignPost);
+                return wallSign(tag, "oak");
             case "spruce_sign":
-                return sign(tag, Texture.spruceSignPost);
+                return sign(tag, "spruce");
             case "spruce_wall_sign":
-                return wallSign(tag, Texture.spruceSignPost);
+                return wallSign(tag, "spruce");
             case "birch_sign":
-                return sign(tag, Texture.birchSignPost);
+                return sign(tag, "birch");
             case "birch_wall_sign":
-                return wallSign(tag, Texture.birchSignPost);
+                return wallSign(tag, "birch");
             case "jungle_sign":
-                return sign(tag, Texture.jungleSignPost);
+                return sign(tag, "jungle");
             case "jungle_wall_sign":
-                return wallSign(tag, Texture.jungleSignPost);
+                return wallSign(tag, "jungle");
             case "acacia_sign":
-                return sign(tag, Texture.acaciaSignPost);
+                return sign(tag, "acacia");
             case "acacia_wall_sign":
-                return wallSign(tag, Texture.acaciaSignPost);
+                return wallSign(tag, "acacia");
             case "dark_oak_sign":
-                return sign(tag, Texture.darkOakSignPost);
+                return sign(tag, "dark_oak");
             case "dark_oak_wall_sign":
-                return wallSign(tag, Texture.darkOakSignPost);
+                return wallSign(tag, "dark_oak");
             case "redstone_wire":
                 return redstoneWire(tag);
             case "sugar_cane":
@@ -1771,10 +1771,10 @@ public class BlockSpec {
         return new ShulkerBox(name, texture.side, texture.top, texture.bottom, facing);
     }
 
-    private static Block sign(Tag tag, Texture texture) {
+    private static Block sign(Tag tag, String material) {
         String name = blockName(tag);
         int rotation = stringToInt(tag.get("Properties").get("rotation"), 0);
-        return new Sign(name, texture, rotation);
+        return new Sign(name, material, rotation);
     }
 
     private static Block banner(Tag tag, Texture texture, int color) {
@@ -1789,10 +1789,10 @@ public class BlockSpec {
         return new WallBanner(name, texture, facing, color);
     }
 
-    private static Block wallSign(Tag tag, Texture texture) {
+    private static Block wallSign(Tag tag, String material) {
         String name = blockName(tag);
         String facing = getFacing(tag, "north");
-        return new WallSign(name, texture, facing);
+        return new WallSign(name, material, facing);
     }
 
     private static Block lever(Tag tag) {

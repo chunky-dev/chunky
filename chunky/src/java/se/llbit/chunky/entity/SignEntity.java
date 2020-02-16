@@ -170,17 +170,20 @@ public class SignEntity extends Entity {
   private final int angle;
   private final SignTexture frontTexture;
   private final Texture texture;
+  private final String material;
 
-  public SignEntity(Vector3 position, CompoundTag entityTag, int blockData, Texture signTexture) {
-    this(position, getTextLines(entityTag), blockData & 0xF, signTexture);
+  public SignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
+    this(position, getTextLines(entityTag), blockData & 0xF, material);
   }
 
-  public SignEntity(Vector3 position, JsonArray[] text, int direction, Texture signTexture) {
+  public SignEntity(Vector3 position, JsonArray[] text, int direction, String material) {
     super(position);
+    Texture signTexture = SignEntity.textureFromMaterial(material);
     this.text = text;
     this.angle = direction;
     this.frontTexture = new SignTexture(text, signTexture);
     this.texture = signTexture;
+    this.material = material;
   }
 
   /**
@@ -276,7 +279,7 @@ public class SignEntity extends Entity {
     json.add("position", position.toJson());
     json.add("text", textToJson(text));
     json.add("direction", angle);
-    // TODO serialize sign type (spruce, oak, ...)
+    json.add("material", material);
     return json;
   }
 
@@ -288,8 +291,8 @@ public class SignEntity extends Entity {
     position.fromJson(json.get("position").object());
     JsonArray[] text = textFromJson(json.get("text"));
     int direction = json.get("direction").intValue(0);
-    // TODO deserialize sign type (spruce, oak, ...)
-    return new SignEntity(position, text, direction, Texture.signPost);
+    String material = json.get("material").stringValue("oak");
+    return new SignEntity(position, text, direction, material);
   }
 
   /**
@@ -317,4 +320,23 @@ public class SignEntity extends Entity {
     return text;
   }
 
+  public static Texture textureFromMaterial(String material) {
+    switch (material) {
+      case "oak":
+        return Texture.oakSignPost;
+      case "spruce":
+        return Texture.spruceSignPost;
+      case "birch":
+        return Texture.birchSignPost;
+      case "jungle":
+        return Texture.jungleSignPost;
+      case "acacia":
+        return Texture.acaciaSignPost;
+      case "dark_oak":
+        return Texture.darkOakSignPost;
+      // TODO [1.16] Add crimson and warped signs
+      default:
+        throw new IllegalArgumentException("Unknown sign material: " + material);
+    }
+  }
 }
