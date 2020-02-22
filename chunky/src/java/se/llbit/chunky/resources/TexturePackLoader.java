@@ -3314,6 +3314,16 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/smoker_front_on",
             Texture.smokerFrontOn));
 
+    allTextures.put("honey_block_top",
+        new SimpleTexture("assets/minecraft/textures/block/honey_block_top",
+            Texture.honeyBlockTop));
+    allTextures.put("honey_block_side",
+        new SimpleTexture("assets/minecraft/textures/block/honey_block_side",
+            Texture.honeyBlockSide));
+    allTextures.put("honey_block_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/honey_block_bottom",
+            Texture.honeyBlockBottom));
+
     addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage0", Texture.sweetBerryBushStage0);
     addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage1", Texture.sweetBerryBushStage1);
     addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage2", Texture.sweetBerryBushStage2);

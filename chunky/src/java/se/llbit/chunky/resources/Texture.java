@@ -758,6 +758,11 @@ public class Texture {
   public static final Texture witherRose = new Texture();
   public static final Texture bambooSapling = new Texture();
 
+  // [1.15]
+  public static final Texture honeyBlockTop = new Texture();
+  public static final Texture honeyBlockSide = new Texture();
+  public static final Texture honeyBlockBottom = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 

@@ -1506,6 +1506,8 @@ public class BlockSpec {
                 int age = stringToInt(tag.get("Properties").get("age"), 3);
                 return new FrostedIce(age);
             }
+            case "honey_block":
+                return new Honey();
             case "spawner":
                 return new MinecraftBlockTranslucent(name, Texture.monsterSpawner);
             case "nether_portal": {
