@@ -3314,16 +3314,6 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/smoker_front_on",
             Texture.smokerFrontOn));
 
-    allTextures.put("honey_block_top",
-        new SimpleTexture("assets/minecraft/textures/block/honey_block_top",
-            Texture.honeyBlockTop));
-    allTextures.put("honey_block_side",
-        new SimpleTexture("assets/minecraft/textures/block/honey_block_side",
-            Texture.honeyBlockSide));
-    allTextures.put("honey_block_bottom",
-        new SimpleTexture("assets/minecraft/textures/block/honey_block_bottom",
-            Texture.honeyBlockBottom));
-
     addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage0", Texture.sweetBerryBushStage0);
     addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage1", Texture.sweetBerryBushStage1);
     addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage2", Texture.sweetBerryBushStage2);
@@ -3333,6 +3323,23 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/lily_of_the_valley", Texture.lilyOfTheValley);
     addSimpleTexture("assets/minecraft/textures/block/wither_rose", Texture.witherRose);
     addSimpleTexture("assets/minecraft/textures/block/bamboo_stage0", Texture.bambooSapling);
+
+    addSimpleTexture("assets/minecraft/textures/block/honey_block_top", Texture.honeyBlockTop);
+    addSimpleTexture("assets/minecraft/textures/block/honey_block_side", Texture.honeyBlockSide);
+    addSimpleTexture("assets/minecraft/textures/block/honey_block_bottom", Texture.honeyBlockBottom);
+
+    addSimpleTexture("assets/minecraft/textures/block/beehive_end", Texture.beehiveEnd);
+    addSimpleTexture("assets/minecraft/textures/block/beehive_side", Texture.beehiveSide);
+    addSimpleTexture("assets/minecraft/textures/block/beehive_front", Texture.beehiveFront);
+    addSimpleTexture("assets/minecraft/textures/block/beehive_front_honey", Texture.beehiveFrontHoney);
+
+    addSimpleTexture("assets/minecraft/textures/block/bee_nest_top", Texture.beeNestTop);
+    addSimpleTexture("assets/minecraft/textures/block/bee_nest_bottom", Texture.beeNestBottom);
+    addSimpleTexture("assets/minecraft/textures/block/bee_nest_side", Texture.beeNestSide);
+    addSimpleTexture("assets/minecraft/textures/block/bee_nest_front", Texture.beeNestFront);
+    addSimpleTexture("assets/minecraft/textures/block/bee_nest_front_honey", Texture.beeNestFrontHoney);
+
+    addSimpleTexture("assets/minecraft/textures/block/honeycomb_block", Texture.honeycombBlock);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

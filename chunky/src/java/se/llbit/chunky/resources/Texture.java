@@ -762,6 +762,16 @@ public class Texture {
   public static final Texture honeyBlockTop = new Texture();
   public static final Texture honeyBlockSide = new Texture();
   public static final Texture honeyBlockBottom = new Texture();
+  public static final Texture beeNestFront = new Texture();
+  public static final Texture beeNestFrontHoney = new Texture();
+  public static final Texture beeNestSide = new Texture();
+  public static final Texture beeNestTop = new Texture();
+  public static final Texture beeNestBottom = new Texture();
+  public static final Texture beehiveFront = new Texture();
+  public static final Texture beehiveFrontHoney = new Texture();
+  public static final Texture beehiveSide = new Texture();
+  public static final Texture beehiveEnd = new Texture();
+  public static final Texture honeycombBlock = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

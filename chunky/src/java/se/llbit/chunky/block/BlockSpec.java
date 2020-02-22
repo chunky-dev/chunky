@@ -1508,6 +1508,12 @@ public class BlockSpec {
             }
             case "honey_block":
                 return new Honey();
+            case "bee_nest":
+                return beeNest(tag);
+            case "beehive":
+                return beehive(tag);
+            case "honeycomb_block":
+                return new MinecraftBlock("honeycomb_block", Texture.honeycombBlock);
             case "spawner":
                 return new MinecraftBlockTranslucent(name, Texture.monsterSpawner);
             case "nether_portal": {
@@ -1756,6 +1762,20 @@ public class BlockSpec {
         String facing = getFacing(tag, "north");
         String lit = properties.get("lit").stringValue("false");
         return new TopBottomOrientedTexturedBlock("blast_furnace", facing, lit.equals("true") ? Texture.blastFurnaceFrontOn : Texture.blastFurnaceFront, Texture.blastFurnaceSide, Texture.blastFurnaceTop);
+    }
+
+    private static Block beeNest(Tag tag) {
+        Tag properties = tag.get("Properties");
+        String facing = getFacing(tag, "north");
+        int honeyLevel = stringToInt(properties.get("honey_level"), 0);
+        return new TopBottomOrientedTexturedBlock("smoker", facing, honeyLevel == 5 ? Texture.beeNestFrontHoney : Texture.beeNestFront, Texture.beeNestSide, Texture.beeNestTop, Texture.beeNestBottom);
+    }
+
+    private static Block beehive(Tag tag) {
+        Tag properties = tag.get("Properties");
+        String facing = getFacing(tag, "north");
+        int honeyLevel = stringToInt(properties.get("honey_level"), 0);
+        return new TopBottomOrientedTexturedBlock("smoker", facing, honeyLevel == 5 ? Texture.beehiveFrontHoney : Texture.beehiveFront, Texture.beehiveSide, Texture.beehiveEnd, Texture.beehiveEnd);
     }
 
     private static Block wheat(Tag tag) {
