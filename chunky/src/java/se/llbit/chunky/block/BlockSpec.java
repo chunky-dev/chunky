@@ -757,8 +757,7 @@ public class BlockSpec {
             case "packed_ice":
                 return new MinecraftBlock(name, Texture.packedIce);
             case "slime_block":
-                // TODO: improve slime block!
-                return new MinecraftBlock(name, Texture.slime);
+                return new Slime();
             case "grass_path":
                 return new GrassPath();
             case "sunflower": {
