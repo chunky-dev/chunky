@@ -154,11 +154,13 @@ public class TexturePackLoader {
         new IndexedTexture(0x04, Texture.oakPlanks)));
     allTextures.put("stone slab side", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/stone_slab_side", Texture.slabSide),
+        new SimpleTexture("assets/minecraft/textures/block/stone", Texture.slabSide),
         new SimpleTexture("assets/minecraft/textures/blocks/stone_slab_side", Texture.slabSide),
         new SimpleTexture("textures/blocks/stoneslab_side", Texture.slabSide),
         new IndexedTexture(0x05, Texture.slabSide)));
     allTextures.put("stone slab top", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/stone_slab_top", Texture.slabTop),
+        new SimpleTexture("assets/minecraft/textures/block/stone", Texture.slabTop),
         new SimpleTexture("assets/minecraft/textures/blocks/stone_slab_top", Texture.slabTop),
         new SimpleTexture("textures/blocks/stoneslab_top", Texture.slabTop),
         new IndexedTexture(0x06, Texture.slabTop)));
@@ -3334,6 +3336,9 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/composter_side", Texture.composterSide);
     addSimpleTexture("assets/minecraft/textures/block/composter_compost", Texture.composterCompost);
     addSimpleTexture("assets/minecraft/textures/block/composter_ready", Texture.composterReady);
+
+    addSimpleTexture("assets/minecraft/textures/block/smooth_stone", Texture.smoothStone);
+    addSimpleTexture("assets/minecraft/textures/block/smooth_stone_slab_side", Texture.smoothStoneSlabSide);
 
     addSimpleTexture("assets/minecraft/textures/block/honey_block_top", Texture.honeyBlockTop);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_side", Texture.honeyBlockSide);

@@ -77,6 +77,8 @@ public class Texture {
   public static final Texture cauldronInside = new Texture();
   public static final Texture cauldronTop = new Texture();
   public static final Texture cauldronBottom = new Texture();
+  public static final Texture smoothStone = new Texture();
+  public static final Texture smoothStoneSlabSide = new Texture();
   public static final Texture slabTop = new Texture("stone-slab");
   public static final Texture slabSide = new Texture("double-stone-slab");
   public static final Texture brick = new Texture("bricks");
@@ -180,7 +182,6 @@ public class Texture {
   public static final Texture sandstoneBottom = new Texture();
   public static final Texture sandstoneDecorated = new Texture();
   public static final Texture sandstoneCut = new Texture();
-  public static final Texture sandstoneSmooth = new Texture();
   public static final Texture redSandstoneSide = new Texture();
   public static final Texture redSandstoneTop = new Texture();
   public static final Texture redSandstoneBottom = new Texture();

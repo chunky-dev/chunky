@@ -346,8 +346,9 @@ public class BlockSpec {
             case "dark_oak_slab":
                 return slab(tag, Texture.darkOakPlanks);
             case "stone_slab":
-            case "smooth_stone_slab": // Rename of stone_slab in 1.14.
-                return slab(tag, Texture.slabSide, Texture.slabTop);
+                return slab(tag, Texture.stone);
+            case "smooth_stone_slab": // introduced in 1.14, previously called stone_slab (and the stone_slab above didn't exist)
+                return slab(tag, Texture.smoothStoneSlabSide, Texture.smoothStone);
             case "sandstone_slab":
                 return slab(tag, Texture.sandstoneSide, Texture.sandstoneTop);
             case "petrified_oak_slab":
@@ -379,7 +380,7 @@ public class BlockSpec {
             case "smooth_sandstone":
                 return new MinecraftBlock(name, Texture.sandstoneTop);
             case "smooth_stone":
-                return new MinecraftBlock(name, Texture.slabTop);
+                return new MinecraftBlock(name, Texture.smoothStone);
             case "bricks":
                 return new MinecraftBlock(name, Texture.brick);
             case "tnt":
@@ -1142,7 +1143,7 @@ public class BlockSpec {
             case "end_stone_brick_slab":
                 return slab(tag, Texture.endBricks);
             case "smooth_sandstone_slab":
-                return slab(tag, Texture.sandstoneSmooth, Texture.sandstoneTop);
+                return slab(tag, Texture.sandstoneTop);
             case "smooth_quartz_slab":
                 return slab(tag, Texture.quartzBottom, Texture.quartzBottom);
             case "granite_slab":
