@@ -757,6 +757,15 @@ public class Texture {
   public static final Texture lilyOfTheValley = new Texture();
   public static final Texture witherRose = new Texture();
   public static final Texture bambooSapling = new Texture();
+  public static final Texture lecternBase = new Texture();
+  public static final Texture lecternFront = new Texture();
+  public static final Texture lecternSides = new Texture();
+  public static final Texture lecternTop = new Texture();
+  public static final Texture composterTop = new Texture();
+  public static final Texture composterBottom = new Texture();
+  public static final Texture composterSide = new Texture();
+  public static final Texture composterCompost = new Texture();
+  public static final Texture composterReady = new Texture();
 
   // [1.15]
   public static final Texture honeyBlockTop = new Texture();

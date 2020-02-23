@@ -1202,8 +1202,7 @@ public class BlockSpec {
             case "comparator":
                 return comparator(tag);
             case "composter":
-                // TODO
-                return new UnknownBlock(name);
+                return composter(tag);
             case "fire":
                 return new Fire();
             case "wheat":
@@ -1762,6 +1761,12 @@ public class BlockSpec {
         String facing = getFacing(tag, "north");
         String lit = properties.get("lit").stringValue("false");
         return new TopBottomOrientedTexturedBlock("blast_furnace", facing, lit.equals("true") ? Texture.blastFurnaceFrontOn : Texture.blastFurnaceFront, Texture.blastFurnaceSide, Texture.blastFurnaceTop);
+    }
+
+    private static Block composter(Tag tag) {
+        Tag properties = tag.get("Properties");
+        int level = stringToInt(properties.get("level"), 0);
+        return new Composter(level);
     }
 
     private static Block beeNest(Tag tag) {

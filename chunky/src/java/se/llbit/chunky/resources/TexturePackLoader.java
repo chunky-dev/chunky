@@ -3324,6 +3324,17 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/wither_rose", Texture.witherRose);
     addSimpleTexture("assets/minecraft/textures/block/bamboo_stage0", Texture.bambooSapling);
 
+    addSimpleTexture("assets/minecraft/textures/block/lectern_base", Texture.lecternBase);
+    addSimpleTexture("assets/minecraft/textures/block/lectern_front", Texture.lecternFront);
+    addSimpleTexture("assets/minecraft/textures/block/lectern_sides", Texture.lecternSides);
+    addSimpleTexture("assets/minecraft/textures/block/lectern_top", Texture.lecternTop);
+
+    addSimpleTexture("assets/minecraft/textures/block/composter_top", Texture.composterTop);
+    addSimpleTexture("assets/minecraft/textures/block/composter_bottom", Texture.composterBottom);
+    addSimpleTexture("assets/minecraft/textures/block/composter_side", Texture.composterSide);
+    addSimpleTexture("assets/minecraft/textures/block/composter_compost", Texture.composterCompost);
+    addSimpleTexture("assets/minecraft/textures/block/composter_ready", Texture.composterReady);
+
     addSimpleTexture("assets/minecraft/textures/block/honey_block_top", Texture.honeyBlockTop);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_side", Texture.honeyBlockSide);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_bottom", Texture.honeyBlockBottom);
