@@ -5,7 +5,7 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
-public class Slab extends MinecraftBlock {
+public class Slab extends MinecraftBlockTranslucent {
   private final static AABB[] aabb = {
       // Lower half-block.
       new AABB(0, 1, 0, .5, 0, 1),
