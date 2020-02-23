@@ -1500,6 +1500,10 @@ public class BlockSpec {
             case "campfire":
                 // TODO
                 return new UnknownBlock(name);
+            case "cut_sandstone_slab":
+                return slab(tag, Texture.sandstoneCut, Texture.sandstoneTop);
+            case "cut_red_sandstone_slab":
+                return slab(tag, Texture.redSandstoneCut, Texture.redSandstoneTop);
             case "frosted_ice": {
                 int age = stringToInt(tag.get("Properties").get("age"), 3);
                 return new FrostedIce(age);
