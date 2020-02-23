@@ -482,7 +482,7 @@ public class BlockSpec {
             case "stone_button":
                 return button(tag, Texture.stone);
             case "snow": {
-                int layers = stringToInt(tag.get("Properties").get("layers"), 0);
+                int layers = stringToInt(tag.get("Properties").get("layers"), 1);
                 return new Snow(layers);
             }
             case "ice":

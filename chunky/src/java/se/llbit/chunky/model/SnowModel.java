@@ -68,7 +68,7 @@ public class SnowModel {
   public static boolean intersect(Ray ray, int layers) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
-    for (Quad quad : quads[layers & 7]) {
+    for (Quad quad : quads[layers - 1]) {
       if (quad.intersect(ray)) {
         Texture.snowBlock.getColor(ray);
         ray.n.set(quad.n);
