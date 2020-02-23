@@ -373,7 +373,7 @@ public class BlockSpec {
             case "dark_prismarine_slab":
                 return slab(tag, Texture.darkPrismarine);
             case "smooth_quartz":
-                return new MinecraftBlock(name, Texture.quartzTop);
+                return new MinecraftBlock(name, Texture.quartzBottom);
             case "smooth_red_sandstone":
                 return new MinecraftBlock(name, Texture.redSandstoneTop);
             case "smooth_sandstone":
@@ -1118,7 +1118,7 @@ public class BlockSpec {
             case "smooth_sandstone_stairs":
                 return stairs(tag, Texture.sandstoneTop);
             case "smooth_quartz_stairs":
-                return stairs(tag, Texture.quartzTop);
+                return stairs(tag, Texture.quartzBottom);
             case "granite_stairs":
                 return stairs(tag, Texture.granite);
             case "andesite_stairs":
@@ -1144,8 +1144,7 @@ public class BlockSpec {
             case "smooth_sandstone_slab":
                 return slab(tag, Texture.sandstoneSmooth, Texture.sandstoneTop);
             case "smooth_quartz_slab":
-                // TODO 1.14
-                return slab(tag, Texture.quartzSide, Texture.quartzTop);
+                return slab(tag, Texture.quartzBottom, Texture.quartzBottom);
             case "granite_slab":
                 return slab(tag, Texture.granite);
             case "andesite_slab":
