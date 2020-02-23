@@ -1132,7 +1132,7 @@ public class BlockSpec {
             case "polished_granite_slab":
                 return slab(tag, Texture.smoothGranite);
             case "smooth_red_sandstone_slab":
-                return slab(tag, Texture.redSandstoneSmooth);
+                return slab(tag, Texture.redSandstoneTop);
             case "mossy_stone_brick_slab":
                 return slab(tag, Texture.mossyStoneBrick);
             case "polished_diorite_slab":
