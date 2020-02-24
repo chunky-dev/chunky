@@ -1113,9 +1113,9 @@ public class BlockSpec {
             case "mossy_cobblestone_stairs":
                 return stairs(tag, Texture.mossStone);
             case "end_stone_brick_stairs":
-                return stairs(tag, Texture.stoneBrick);
+                return stairs(tag, Texture.endBricks);
             case "stone_stairs":
-                return stairs(tag, Texture.cobblestone);
+                return stairs(tag, Texture.stone);
             case "smooth_sandstone_stairs":
                 return stairs(tag, Texture.sandstoneTop);
             case "smooth_quartz_stairs":
