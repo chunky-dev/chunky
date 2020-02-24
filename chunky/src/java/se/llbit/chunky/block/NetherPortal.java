@@ -29,7 +29,7 @@ public class NetherPortal extends MinecraftBlockTranslucent {
   private final String description;
 
   public NetherPortal(String axis) {
-    super("snow", Texture.portal);
+    super("nether_portal", Texture.portal);
     localIntersect = true;
     this.description = "axis=" + axis;
     switch (axis) {
@@ -51,7 +51,6 @@ public class NetherPortal extends MinecraftBlockTranslucent {
     texture.getColor(ray);
     ray.n.set(quad[axis].n);
     ray.t = ray.tNext;
-    ray.color.w = 1;
     ray.distance += ray.t;
     ray.o.scaleAdd(ray.t, ray.d);
     return true;
