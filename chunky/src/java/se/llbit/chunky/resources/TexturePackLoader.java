@@ -3345,6 +3345,11 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/bamboo_large_leaves", Texture.bambooLargeLeaves);
     addSimpleTexture("assets/minecraft/textures/block/bamboo_singleleaf", Texture.bambooSingleLeaf);
 
+    addSimpleTexture("assets/minecraft/textures/block/stonecutter_bottom", Texture.stonecutterBottom);
+    addSimpleTexture("assets/minecraft/textures/block/stonecutter_top", Texture.stonecutterTop);
+    addSimpleTexture("assets/minecraft/textures/block/stonecutter_side", Texture.stonecutterSide);
+    addSimpleTexture("assets/minecraft/textures/block/stonecutter_saw", Texture.stonecutterSaw);
+
     addSimpleTexture("assets/minecraft/textures/block/honey_block_top", Texture.honeyBlockTop);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_side", Texture.honeyBlockSide);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_bottom", Texture.honeyBlockBottom);

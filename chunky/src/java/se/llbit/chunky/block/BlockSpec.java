@@ -1485,8 +1485,7 @@ public class BlockSpec {
             case "smithing_table":
                 return new TexturedBlock(name, Texture.smithingTableFront, Texture.smithingTableFront, Texture.smithingTableSide, Texture.smithingTableSide, Texture.smithingTableTop, Texture.smithingTableBottom);
             case "stonecutter":
-                // TODO
-                return new UnknownBlock(name);
+                return new Stonecutter(getFacing(tag, "north"));
             case "bell":
                 // TODO
                 return new UnknownBlock(name);

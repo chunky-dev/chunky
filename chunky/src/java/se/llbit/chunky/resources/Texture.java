@@ -770,6 +770,10 @@ public class Texture {
   public static final Texture bambooSmallLeaves = new Texture();
   public static final Texture bambooLargeLeaves = new Texture();
   public static final Texture bambooSingleLeaf = new Texture();
+  public static final Texture stonecutterBottom = new Texture();
+  public static final Texture stonecutterTop = new Texture();
+  public static final Texture stonecutterSide = new Texture();
+  public static final Texture stonecutterSaw = new Texture();
 
   // [1.15]
   public static final Texture honeyBlockTop = new Texture();
