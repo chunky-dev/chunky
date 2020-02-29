@@ -1839,8 +1839,8 @@ public class Scene implements JsonSerializable, Refreshable {
           float aces_d = 0.59f;
           float aces_e = 0.14f;
           r = QuickMath.max(QuickMath.min((r * (aces_a * r + aces_b)) / (r * (aces_c * r + aces_d) + aces_e), 1), 0);
-          g = QuickMath.max(QuickMath.min((g * (aces_a * g + aces_b)) / (r * (aces_c * g + aces_d) + aces_e), 1), 0);
-          b = QuickMath.max(QuickMath.min((b * (aces_a * b + aces_b)) / (r * (aces_c * b + aces_d) + aces_e), 1), 0);
+          g = QuickMath.max(QuickMath.min((g * (aces_a * g + aces_b)) / (g * (aces_c * g + aces_d) + aces_e), 1), 0);
+          b = QuickMath.max(QuickMath.min((b * (aces_a * b + aces_b)) / (b * (aces_c * b + aces_d) + aces_e), 1), 0);
           break;
         case TONEMAP3:
           // http://filmicgames.com/archives/75
