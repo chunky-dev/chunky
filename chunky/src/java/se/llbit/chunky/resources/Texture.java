@@ -774,6 +774,9 @@ public class Texture {
   public static final Texture stonecutterTop = new Texture();
   public static final Texture stonecutterSide = new Texture();
   public static final Texture stonecutterSaw = new Texture();
+  public static final Texture grindstonePivot = new Texture();
+  public static final Texture grindstoneRound = new Texture();
+  public static final Texture grindstoneSide = new Texture();
 
   // [1.15]
   public static final Texture honeyBlockTop = new Texture();

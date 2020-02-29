@@ -3350,6 +3350,10 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/stonecutter_side", Texture.stonecutterSide);
     addSimpleTexture("assets/minecraft/textures/block/stonecutter_saw", Texture.stonecutterSaw);
 
+    addSimpleTexture("assets/minecraft/textures/block/grindstone_pivot", Texture.grindstonePivot);
+    addSimpleTexture("assets/minecraft/textures/block/grindstone_round", Texture.grindstoneRound);
+    addSimpleTexture("assets/minecraft/textures/block/grindstone_side", Texture.grindstoneSide);
+
     addSimpleTexture("assets/minecraft/textures/block/honey_block_top", Texture.honeyBlockTop);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_side", Texture.honeyBlockSide);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_bottom", Texture.honeyBlockBottom);

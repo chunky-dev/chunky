@@ -1476,9 +1476,11 @@ public class BlockSpec {
                 return new TexturedBlock(name, Texture.cartographyTableSide3, Texture.cartographyTableSide1, Texture.cartographyTableSide2, Texture.cartographyTableSide3, Texture.cartographyTableTop, Texture.darkOakPlanks);
             case "fletching_table":
                 return new TexturedBlock(name, Texture.fletchingTableFront, Texture.fletchingTableFront, Texture.fletchingTableSide, Texture.fletchingTableSide, Texture.fletchingTableTop, Texture.birchPlanks);
-            case "grindstone":
-                // TODO
-                return new UnknownBlock(name);
+            case "grindstone": {
+                String face = tag.get("Properties").get("face").stringValue("floor");
+                String facing = getFacing(tag, "north");
+                return new Grindstone(face, facing);
+            }
             case "lectern":
                 // TODO
                 return new UnknownBlock(name);
