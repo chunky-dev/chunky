@@ -769,6 +769,7 @@ public class Texture {
   public static final Texture bambooStalk = new Texture();
   public static final Texture bambooSmallLeaves = new Texture();
   public static final Texture bambooLargeLeaves = new Texture();
+  public static final Texture bambooSingleLeaf = new Texture();
 
   // [1.15]
   public static final Texture honeyBlockTop = new Texture();

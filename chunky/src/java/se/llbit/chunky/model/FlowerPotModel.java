@@ -105,6 +105,52 @@ public class FlowerPotModel {
           new Vector4(0, 1, 0, 1)),
   };
 
+  private static Quad[] bamboo = {
+      new Quad(
+          new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
+          new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
+          new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
+          new Vector4(13 / 16.0, 15 / 16.0, 1 - 0 / 16.0, 1 - 2 / 16.0)),
+      new Quad(
+          new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+          new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
+          new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
+          new Vector4(13 / 16.0, 15 / 16.0, 4 / 16.0, 6 / 16.0)),
+      new Quad(
+        new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+        new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
+        new Vector3(7 / 16.0, 16 / 16.0, 7 / 16.0),
+        new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0)),
+      new Quad(
+        new Vector3(9 / 16.0, 0 / 16.0, 9 / 16.0),
+        new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
+        new Vector3(9 / 16.0, 16 / 16.0, 9 / 16.0),
+        new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0)),
+      new Quad(
+        new Vector3(9 / 16.0, 0 / 16.0, 7 / 16.0),
+        new Vector3(7 / 16.0, 0 / 16.0, 7 / 16.0),
+        new Vector3(9 / 16.0, 16 / 16.0, 7 / 16.0),
+        new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0)),
+      new Quad(
+        new Vector3(7 / 16.0, 0 / 16.0, 9 / 16.0),
+        new Vector3(9 / 16.0, 0 / 16.0, 9 / 16.0),
+        new Vector3(7 / 16.0, 16 / 16.0, 9 / 16.0),
+        new Vector4(6 / 16.0, 8 / 16.0, 0 / 16.0, 16 / 16.0))
+  };
+
+  private static Quad[] bambooLeaf = {
+      new Quad(
+          new Vector3(16 / 16.0, 2 / 16.0, 8 / 16.0),
+          new Vector3(0 / 16.0, 2 / 16.0, 8 / 16.0),
+          new Vector3(16 / 16.0, 18 / 16.0, 8 / 16.0),
+          new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)),
+      new Quad(
+        new Vector3(0 / 16.0, 2 / 16.0, 8 / 16.0),
+        new Vector3(16 / 16.0, 2 / 16.0, 8 / 16.0),
+        new Vector3(0 / 16.0, 18 / 16.0, 8 / 16.0),
+        new Vector4(16 / 16.0, 0 / 16.0, 0 / 16.0, 16 / 16.0))
+  };
+
   private static final Texture[] tex = {
       Texture.flowerPot, Texture.flowerPot, Texture.flowerPot, Texture.flowerPot, Texture.dirt,
   };
@@ -197,7 +243,8 @@ public class FlowerPotModel {
         hit |= intersect(flowerSmall, ray, Texture.oxeyeDaisy);
         break;
       case BAMBOO:
-        // TODO(1.14): upcoming block change
+        hit |= intersect(bamboo, ray, Texture.bambooStalk);
+        hit |= intersect(bambooLeaf, ray, Texture.bambooSingleLeaf);
         break;
       case CORNFLOWER:
         hit |= intersect(flowerSmall, ray, Texture.cornflower);
