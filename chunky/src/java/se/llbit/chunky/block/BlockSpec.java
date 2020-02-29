@@ -1245,8 +1245,7 @@ public class BlockSpec {
                 return new TexturedBlock(name,
                         Texture.driedKelpSide, Texture.driedKelpTop, Texture.driedKelpBottom);
             case "bamboo":
-                // TODO
-                return new UnknownBlock(name);
+                return bamboo(tag);
             case "bamboo_sapling":
                 return new SpriteBlock(name, Texture.bambooSapling);
             case "cake": {
@@ -1771,6 +1770,13 @@ public class BlockSpec {
         Tag properties = tag.get("Properties");
         int level = stringToInt(properties.get("level"), 0);
         return new Composter(level);
+    }
+
+    private static Block bamboo(Tag tag) {
+        Tag properties = tag.get("Properties");
+        int age = stringToInt(properties.get("age"), 0);
+        String leaves = properties.get("leaves").stringValue("none");
+        return new Bamboo(age, leaves);
     }
 
     private static Block beeNest(Tag tag) {

@@ -766,6 +766,9 @@ public class Texture {
   public static final Texture composterSide = new Texture();
   public static final Texture composterCompost = new Texture();
   public static final Texture composterReady = new Texture();
+  public static final Texture bambooStalk = new Texture();
+  public static final Texture bambooSmallLeaves = new Texture();
+  public static final Texture bambooLargeLeaves = new Texture();
 
   // [1.15]
   public static final Texture honeyBlockTop = new Texture();

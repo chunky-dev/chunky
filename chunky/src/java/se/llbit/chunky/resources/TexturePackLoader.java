@@ -3340,6 +3340,10 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/smooth_stone", Texture.smoothStone);
     addSimpleTexture("assets/minecraft/textures/block/smooth_stone_slab_side", Texture.smoothStoneSlabSide);
 
+    addSimpleTexture("assets/minecraft/textures/block/bamboo_stalk", Texture.bambooStalk);
+    addSimpleTexture("assets/minecraft/textures/block/bamboo_small_leaves", Texture.bambooSmallLeaves);
+    addSimpleTexture("assets/minecraft/textures/block/bamboo_large_leaves", Texture.bambooLargeLeaves);
+
     addSimpleTexture("assets/minecraft/textures/block/honey_block_top", Texture.honeyBlockTop);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_side", Texture.honeyBlockSide);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_bottom", Texture.honeyBlockBottom);
