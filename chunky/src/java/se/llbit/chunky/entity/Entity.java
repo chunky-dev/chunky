@@ -77,6 +77,8 @@ abstract public class Entity {
         return CoralFanEntity.fromJson(json);
       case "wall_coral_fan":
         return WallCoralFanEntity.fromJson(json);
+      case "lectern":
+        return Lectern.fromJson(json);
     }
     return null;
   }

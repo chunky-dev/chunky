@@ -1482,8 +1482,7 @@ public class BlockSpec {
                 return new Grindstone(face, facing);
             }
             case "lectern":
-                // TODO
-                return new UnknownBlock(name);
+                return new Lectern(getFacing(tag, "north"));
             case "smithing_table":
                 return new TexturedBlock(name, Texture.smithingTableFront, Texture.smithingTableFront, Texture.smithingTableSide, Texture.smithingTableSide, Texture.smithingTableTop, Texture.smithingTableBottom);
             case "stonecutter":
