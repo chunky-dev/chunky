@@ -25,7 +25,7 @@ import java.io.File;
 public class LauncherSettings {
   private static final int DEFAULT_MEMORY_LIMIT = 1024;
   public static final String LAUNCHER_SETTINGS_FILE = "chunky-launcher.json";
-  public static final String DEFAULT_UPDATE_SITE = "http://chunkyupdate.llbit.se/";
+  public static final String DEFAULT_UPDATE_SITE = "http://chunkyupdate.lemaik.de/";
 
   public String javaDir = "";
   public int memoryLimit = DEFAULT_MEMORY_LIMIT;
