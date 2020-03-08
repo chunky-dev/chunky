@@ -777,6 +777,9 @@ public class Texture {
   public static final Texture grindstonePivot = new Texture();
   public static final Texture grindstoneRound = new Texture();
   public static final Texture grindstoneSide = new Texture();
+  public static final Texture campfireLog = new Texture();
+  public static final Texture campfireLogLit = new Texture();
+  public static final Texture campfireFire = new Texture();
 
   // [1.15]
   public static final Texture honeyBlockTop = new Texture();

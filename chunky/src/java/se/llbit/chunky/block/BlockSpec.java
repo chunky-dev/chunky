@@ -1498,8 +1498,7 @@ public class BlockSpec {
                 return new SweetBerryBush(age);
             }
             case "campfire":
-                // TODO
-                return new UnknownBlock(name);
+                return new Campfire(getFacing(tag, "north"), isLit(tag));
             case "cut_sandstone_slab":
                 return slab(tag, Texture.sandstoneCut, Texture.sandstoneTop);
             case "cut_red_sandstone_slab":

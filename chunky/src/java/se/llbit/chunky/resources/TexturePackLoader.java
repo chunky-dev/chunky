@@ -3354,6 +3354,10 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/grindstone_round", Texture.grindstoneRound);
     addSimpleTexture("assets/minecraft/textures/block/grindstone_side", Texture.grindstoneSide);
 
+    addSimpleTexture("assets/minecraft/textures/block/campfire_log", Texture.campfireLog);
+    addSimpleTexture("assets/minecraft/textures/block/campfire_log_lit", Texture.campfireLogLit);
+    addSimpleTexture("assets/minecraft/textures/block/campfire_fire", Texture.campfireFire);
+
     addSimpleTexture("assets/minecraft/textures/block/honey_block_top", Texture.honeyBlockTop);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_side", Texture.honeyBlockSide);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_bottom", Texture.honeyBlockBottom);

@@ -2,6 +2,7 @@ package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockSpec;
+import se.llbit.chunky.block.Campfire;
 import se.llbit.chunky.block.RedstoneLamp;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.StringTag;
@@ -163,6 +164,11 @@ public class BlockPalette {
     });
     materialProperties.put("minecraft:tall_seagrass", block -> {
       block.waterlogged = true;
+    });
+    materialProperties.put("minecraft:campfire", block -> {
+      if (block instanceof Campfire && ((Campfire)block).isLit) {
+        block.emittance = 1.0f;
+      }
     });
     // TODO: handle glass panes (multiple different block names).
     /*STAINED_GLASS.ior = 1.52f;
