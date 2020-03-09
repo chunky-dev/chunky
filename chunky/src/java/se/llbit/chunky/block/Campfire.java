@@ -1,10 +1,12 @@
 package se.llbit.chunky.block;
 
+import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.model.CampfireModel;
-import se.llbit.chunky.model.StonecutterModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
+import se.llbit.nbt.CompoundTag;
 
 public class Campfire extends MinecraftBlockTranslucent {
     private final String facing;
@@ -12,14 +14,25 @@ public class Campfire extends MinecraftBlockTranslucent {
 
     public Campfire(String facing, boolean lit) {
         super("campfire", Texture.campfireLog);
+        invisible = true;
+        opaque = false;
         localIntersect = true;
         this.facing = facing;
         this.isLit = lit;
-        // TODO the fire is 1/16th higher than a block, so this must be an entity
     }
 
     @Override
     public boolean intersect(Ray ray, Scene scene) {
-        return CampfireModel.intersect(ray, facing, isLit);
+        return false;
+    }
+
+    @Override
+    public boolean isBlockEntity() {
+        return true;
+    }
+
+    @Override
+    public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+        return new se.llbit.chunky.entity.Campfire(position, this.facing, this.isLit);
     }
 }
