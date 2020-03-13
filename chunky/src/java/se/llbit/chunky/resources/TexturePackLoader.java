@@ -3358,6 +3358,9 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/campfire_log_lit", Texture.campfireLogLit);
     addSimpleTexture("assets/minecraft/textures/block/campfire_fire", Texture.campfireFire);
 
+    addSimpleTexture("assets/minecraft/textures/block/lantern", Texture.lantern);
+
+    // Minecraft 1.15
     addSimpleTexture("assets/minecraft/textures/block/honey_block_top", Texture.honeyBlockTop);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_side", Texture.honeyBlockSide);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_bottom", Texture.honeyBlockBottom);

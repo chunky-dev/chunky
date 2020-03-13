@@ -1491,8 +1491,7 @@ public class BlockSpec {
                 // TODO
                 return new UnknownBlock(name);
             case "lantern":
-                // TODO
-                return new UnknownBlock(name);
+                return new Lantern(tag.get("Properties").get("hanging").stringValue("false").equals("true"));
             case "sweet_berry_bush": {
                 int age = stringToInt(tag.get("Properties").get("age"), 3);
                 return new SweetBerryBush(age);

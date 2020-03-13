@@ -265,6 +265,7 @@ public class CampfireModel {
     }
 
     private static Quad rotateFire(Quad quad) {
+        // TODO rescale the fire after rotation
         double rotatedWidth = 14.4 * Math.cos(Math.toRadians(45));
         return new Quad(quad, Transform.NONE.rotateY(Math.toRadians(45)));
     }
