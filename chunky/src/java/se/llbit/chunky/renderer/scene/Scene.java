@@ -2494,7 +2494,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
-    if (json.get("entities").isArray()) {
+    if (json.get("entities").isArray() || json.get("actors").isArray()) {
       entities = new LinkedList<>();
       actors = new LinkedList<>();
       // Previously poseable entities were stored in the entities array
