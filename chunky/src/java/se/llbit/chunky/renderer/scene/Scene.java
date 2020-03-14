@@ -84,16 +84,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -172,7 +164,7 @@ public class Scene implements JsonSerializable, Refreshable {
       new Vector3(PersistentSettings.getFogColorRed(), PersistentSettings.getFogColorGreen(),
           PersistentSettings.getFogColorBlue());
   public int sdfVersion = -1;
-  public String name = "default";
+  public String name = "default_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
   /**
    * Canvas width.
