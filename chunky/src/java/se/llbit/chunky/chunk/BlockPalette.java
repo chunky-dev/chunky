@@ -129,7 +129,7 @@ public class BlockPalette {
     materialProperties.put("minecraft:portal", block -> {
       block.emittance = 0.4f;
     });
-    materialProperties.put("minecraft:jackolantern", block -> {
+    materialProperties.put("minecraft:jack_o_lantern", block -> {
       block.emittance = 1.0f;
     });
     materialProperties.put("minecraft:beacon", block -> {
