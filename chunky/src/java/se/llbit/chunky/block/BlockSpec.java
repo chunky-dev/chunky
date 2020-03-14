@@ -511,20 +511,16 @@ public class BlockSpec {
                 return fence(tag, Texture.darkOakPlanks);
             case "pumpkin":
                 return new TexturedBlock(name, Texture.pumpkinSide, Texture.pumpkinTop);
-            case "carved_pumpkin": {
-                String facing = getFacing(tag, "north");
-                return new CarvedPumpkin(facing);
-            }
+            case "carved_pumpkin":
+                return new TopBottomOrientedTexturedBlock(name, getFacing(tag, "north"), Texture.pumpkinFront, Texture.pumpkinSide, Texture.pumpkinTop);
             case "netherrack":
                 return new MinecraftBlock(name, Texture.netherrack);
             case "soul_sand":
                 return new MinecraftBlock(name, Texture.soulsand);
             case "glowstone":
                 return new MinecraftBlock(name, Texture.glowstone);
-            case "jack_o_lantern": {
-                String facing = getFacing(tag, "north");
-                return new JackOLantern(facing);
-            }
+            case "jack_o_lantern":
+                return new TopBottomOrientedTexturedBlock(name, getFacing(tag, "north"), Texture.jackolanternFront, Texture.pumpkinSide, Texture.pumpkinTop);
             case "oak_trapdoor":
                 return trapdoor(tag, Texture.trapdoor);
             case "spruce_trapdoor":
