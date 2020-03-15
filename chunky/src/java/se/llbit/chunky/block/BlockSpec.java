@@ -1177,8 +1177,7 @@ public class BlockSpec {
             case "diorite_wall":
                 return wall(tag, Texture.diorite);
             case "scaffolding":
-                // TODO
-                return new UnknownBlock(name);
+                return new Scaffolding(tag.get("Properties").get("bottom").stringValue("false").equals("true"));
             case "oak_door":
                 return door(tag, Texture.oakDoorTop, Texture.oakDoorBottom);
             case "iron_door":

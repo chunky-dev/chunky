@@ -782,6 +782,9 @@ public class Texture {
   public static final Texture campfireFire = new Texture();
   public static final Texture lantern = new Texture();
   public static final Texture bellBody = new Texture();
+  public static final Texture scaffoldingTop = new Texture();
+  public static final Texture scaffoldingSide = new Texture();
+  public static final Texture scaffoldingBottom = new Texture();
 
   // [1.15]
   public static final Texture honeyBlockTop = new Texture();

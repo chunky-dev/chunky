@@ -3362,6 +3362,10 @@ public class TexturePackLoader {
 
     addSimpleTexture("assets/minecraft/textures/entity/bell/bell_body", Texture.bellBody);
 
+    addSimpleTexture("assets/minecraft/textures/block/scaffolding_top", Texture.scaffoldingTop);
+    addSimpleTexture("assets/minecraft/textures/block/scaffolding_side", Texture.scaffoldingSide);
+    addSimpleTexture("assets/minecraft/textures/block/scaffolding_bottom", Texture.scaffoldingBottom);
+
     // Minecraft 1.15
     addSimpleTexture("assets/minecraft/textures/block/honey_block_top", Texture.honeyBlockTop);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_side", Texture.honeyBlockSide);
