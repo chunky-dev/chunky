@@ -1484,8 +1484,7 @@ public class BlockSpec {
             case "stonecutter":
                 return new Stonecutter(getFacing(tag, "north"));
             case "bell":
-                // TODO
-                return new UnknownBlock(name);
+                return new Bell(getFacing(tag, "north"), tag.get("Properties").get("attachment").stringValue("floor"));
             case "lantern":
                 return new Lantern(tag.get("Properties").get("hanging").stringValue("false").equals("true"));
             case "sweet_berry_bush": {

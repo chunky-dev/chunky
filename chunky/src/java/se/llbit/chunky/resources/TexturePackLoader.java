@@ -3360,6 +3360,8 @@ public class TexturePackLoader {
 
     addSimpleTexture("assets/minecraft/textures/block/lantern", Texture.lantern);
 
+    addSimpleTexture("assets/minecraft/textures/entity/bell/bell_body", Texture.bellBody);
+
     // Minecraft 1.15
     addSimpleTexture("assets/minecraft/textures/block/honey_block_top", Texture.honeyBlockTop);
     addSimpleTexture("assets/minecraft/textures/block/honey_block_side", Texture.honeyBlockSide);

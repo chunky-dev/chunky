@@ -781,6 +781,7 @@ public class Texture {
   public static final Texture campfireLogLit = new Texture();
   public static final Texture campfireFire = new Texture();
   public static final Texture lantern = new Texture();
+  public static final Texture bellBody = new Texture();
 
   // [1.15]
   public static final Texture honeyBlockTop = new Texture();
