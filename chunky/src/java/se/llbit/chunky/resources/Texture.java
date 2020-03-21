@@ -801,6 +801,19 @@ public class Texture {
   public static final Texture beehiveEnd = new Texture();
   public static final Texture honeycombBlock = new Texture();
 
+  // [1.16]
+  public static final Texture soulSoil = new Texture();
+  public static final Texture crimsonNylium = new Texture();
+  public static final Texture crimsonNyliumSide = new Texture();
+  public static final Texture warpedNylium = new Texture();
+  public static final Texture warpedNyliumSide = new Texture();
+  public static final Texture netherGoldOre = new Texture();
+  public static final Texture targetSide = new Texture();
+  public static final Texture targetTop = new Texture();
+  public static final Texture netheriteBlock = new Texture();
+  public static final Texture shroomlight = new Texture();
+  public static final Texture warpedWartBlock = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 

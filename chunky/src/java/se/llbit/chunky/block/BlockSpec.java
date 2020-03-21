@@ -1540,6 +1540,22 @@ public class BlockSpec {
             case "jigsaw_block":
                 // TODO
                 return new UnknownBlock(name);
+            case "soul_soil":
+                return new MinecraftBlock("soul_soil", Texture.soulSoil);
+            case "crimson_nylium":
+                return new TexturedBlock("crimson_nylium", Texture.crimsonNyliumSide, Texture.crimsonNylium, Texture.netherrack);
+            case "warped_nylium":
+                return new TexturedBlock("warped_nylium", Texture.warpedNyliumSide, Texture.warpedNylium, Texture.netherrack);
+            case "nether_gold_ore":
+                return new MinecraftBlock("nether_gold_ore", Texture.netherGoldOre);
+            case "target":
+                return new TexturedBlock("target", Texture.targetSide, Texture.targetTop);
+            case "netherite_block":
+                return new MinecraftBlock("netherite_block", Texture.netheriteBlock);
+            case "shroomlight":
+                return new MinecraftBlock("shroomlight", Texture.shroomlight);
+            case "warped_wart_block":
+                return new MinecraftBlock("warped_wart_block", Texture.warpedWartBlock);
             case "structure_void":
             case "barrier":
                 // Invisible.

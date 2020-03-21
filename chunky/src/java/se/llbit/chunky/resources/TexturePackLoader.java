@@ -3383,6 +3383,19 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/bee_nest_front_honey", Texture.beeNestFrontHoney);
 
     addSimpleTexture("assets/minecraft/textures/block/honeycomb_block", Texture.honeycombBlock);
+
+    // Minecraft 1.16
+    addSimpleTexture("assets/minecraft/textures/block/soul_soil", Texture.soulSoil);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_nylium", Texture.crimsonNylium);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_nylium_side", Texture.crimsonNyliumSide);
+    addSimpleTexture("assets/minecraft/textures/block/warped_nylium", Texture.warpedNylium);
+    addSimpleTexture("assets/minecraft/textures/block/warped_nylium_side", Texture.warpedNyliumSide);
+    addSimpleTexture("assets/minecraft/textures/block/nether_gold_ore", Texture.netherGoldOre);
+    addSimpleTexture("assets/minecraft/textures/block/target_top", Texture.targetTop);
+    addSimpleTexture("assets/minecraft/textures/block/target_side", Texture.targetSide);
+    addSimpleTexture("assets/minecraft/textures/block/netherite_block", Texture.netheriteBlock);
+    addSimpleTexture("assets/minecraft/textures/block/shroomlight", Texture.shroomlight);
+    addSimpleTexture("assets/minecraft/textures/block/warped_wart_block", Texture.warpedWartBlock);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
