@@ -856,6 +856,9 @@ public class Texture {
   public static final Texture warpedDoorBottom = new Texture();
   public static final Texture crimsonTrapdoor = new Texture();
   public static final Texture warpedTrapdoor = new Texture();
+  public static final Texture soulFire = new Texture();
+  public static final AnimatedTexture soulFireLayer0 = new AnimatedTexture("soul_fire");
+  public static final AnimatedTexture soulFireLayer1 = new AnimatedTexture("soul_fire");
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

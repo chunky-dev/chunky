@@ -182,6 +182,9 @@ public class BlockPalette {
     materialProperties.put("minecraft:soul_fire_wall_torch", block -> {
       block.emittance = 35.0f;
     });
+    materialProperties.put("minecraft:soul_fire", block -> {
+      block.emittance = 0.6f;
+    });
     materialProperties.put("minecraft:crying_obsidian", block -> {
       block.emittance = 0.6f;
     });

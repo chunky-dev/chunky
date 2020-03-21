@@ -3439,6 +3439,8 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/warped_door_bottom", Texture.warpedDoorBottom);
     addSimpleTexture("assets/minecraft/textures/block/crimson_trapdoor", Texture.crimsonTrapdoor);
     addSimpleTexture("assets/minecraft/textures/block/warped_trapdoor", Texture.warpedTrapdoor);
+    allTextures.put("soul_fire_layer_0", new AnimatedTextureLoader("assets/minecraft/textures/block/soul_fire_0", Texture.soulFireLayer0));
+    allTextures.put("soul_fire_layer_1", new AnimatedTextureLoader("assets/minecraft/textures/block/soul_fire_1", Texture.soulFireLayer1));
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

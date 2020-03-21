@@ -1654,6 +1654,8 @@ public class BlockSpec {
                 return trapdoor(tag, Texture.crimsonTrapdoor);
             case "warped_trapdoor":
                 return trapdoor(tag, Texture.warpedTrapdoor);
+            case "soul_fire":
+                return new SoulFire();
             case "structure_void":
             case "barrier":
                 // Invisible.
