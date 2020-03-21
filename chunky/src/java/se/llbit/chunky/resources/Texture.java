@@ -846,6 +846,16 @@ public class Texture {
   public static final Texture respawnAnchorSide2 = new Texture();
   public static final Texture respawnAnchorSide3 = new Texture();
   public static final Texture respawnAnchorSide4 = new Texture();
+  public static final Texture crimsonSignPost = new Texture();
+  public static final Texture warpedSignPost = new Texture();
+  public static final Texture crimsonPlanks = new Texture();
+  public static final Texture warpedPlanks = new Texture();
+  public static final Texture crimsonDoorTop = new Texture();
+  public static final Texture crimsonDoorBottom = new Texture();
+  public static final Texture warpedDoorTop = new Texture();
+  public static final Texture warpedDoorBottom = new Texture();
+  public static final Texture crimsonTrapdoor = new Texture();
+  public static final Texture warpedTrapdoor = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

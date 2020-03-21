@@ -3429,6 +3429,16 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side2", Texture.respawnAnchorSide2);
     addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side3", Texture.respawnAnchorSide3);
     addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side4", Texture.respawnAnchorSide4);
+    addSimpleTexture("assets/minecraft/textures/entity/signs/crimson", Texture.crimsonSignPost);
+    addSimpleTexture("assets/minecraft/textures/entity/signs/warped", Texture.warpedSignPost);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_planks", Texture.crimsonPlanks);
+    addSimpleTexture("assets/minecraft/textures/block/warped_planks", Texture.warpedPlanks);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_door_top", Texture.crimsonDoorTop);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_door_bottom", Texture.crimsonDoorBottom);
+    addSimpleTexture("assets/minecraft/textures/block/warped_door_top", Texture.warpedDoorTop);
+    addSimpleTexture("assets/minecraft/textures/block/warped_door_bottom", Texture.warpedDoorBottom);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_trapdoor", Texture.crimsonTrapdoor);
+    addSimpleTexture("assets/minecraft/textures/block/warped_trapdoor", Texture.warpedTrapdoor);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

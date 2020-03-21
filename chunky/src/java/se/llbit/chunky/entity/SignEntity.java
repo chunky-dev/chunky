@@ -334,7 +334,10 @@ public class SignEntity extends Entity {
         return Texture.acaciaSignPost;
       case "dark_oak":
         return Texture.darkOakSignPost;
-      // TODO [1.16] Add crimson and warped signs
+      case "crimson":
+        return Texture.crimsonSignPost;
+      case "warped":
+        return Texture.warpedSignPost;
       default:
         throw new IllegalArgumentException("Unknown sign material: " + material);
     }

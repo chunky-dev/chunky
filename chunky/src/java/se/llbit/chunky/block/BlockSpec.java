@@ -1610,6 +1610,50 @@ public class BlockSpec {
                 return wallTorch(tag, Texture.soulFireTorch);
             case "respawn_anchor":
                 return new RespawnAnchor(stringToInt(tag.get("Properties").get("charges"), 0));
+            case "crimson_sign":
+                return sign(tag, "crimson");
+            case "crimson_wall_sign":
+                return wallSign(tag, "crimson");
+            case "warped_sign":
+                return sign(tag, "warped");
+            case "warped_wall_sign":
+                return wallSign(tag, "warped");
+            case "crimson_planks":
+                return new MinecraftBlock(name, Texture.crimsonPlanks);
+            case "warped_planks":
+                return new MinecraftBlock(name, Texture.warpedPlanks);
+            case "crimson_pressure_plate":
+                return new PressurePlate(name, Texture.crimsonPlanks);
+            case "warped_pressure_plate":
+                return new PressurePlate(name, Texture.warpedPlanks);
+            case "crimson_slab":
+                return slab(tag, Texture.crimsonPlanks);
+            case "warped_slab":
+                return slab(tag, Texture.warpedPlanks);
+            case "crimson_stairs":
+                return stairs(tag, Texture.crimsonPlanks);
+            case "warped_stairs":
+                return stairs(tag, Texture.warpedPlanks);
+            case "crimson_fence":
+                return fence(tag, Texture.crimsonPlanks);
+            case "warped_fence":
+                return fence(tag, Texture.warpedPlanks);
+            case "crimson_fence_gate":
+                return fenceGate(tag, Texture.crimsonPlanks);
+            case "warped_fence_gate":
+                return fenceGate(tag, Texture.warpedPlanks);
+            case "crimson_button":
+                return button(tag, Texture.crimsonPlanks);
+            case "warped_button":
+                return button(tag, Texture.warpedPlanks);
+            case "crimson_door":
+                return door(tag, Texture.crimsonDoorTop, Texture.crimsonDoorBottom);
+            case "warped_door":
+                return door(tag, Texture.warpedDoorTop, Texture.warpedDoorBottom);
+            case "crimson_trapdoor":
+                return trapdoor(tag, Texture.crimsonTrapdoor);
+            case "warped_trapdoor":
+                return trapdoor(tag, Texture.warpedTrapdoor);
             case "structure_void":
             case "barrier":
                 // Invisible.
