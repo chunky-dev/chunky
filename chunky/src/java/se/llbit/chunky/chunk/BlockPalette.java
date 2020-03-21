@@ -182,6 +182,9 @@ public class BlockPalette {
     materialProperties.put("minecraft:soul_fire_wall_torch", block -> {
       block.emittance = 35.0f;
     });
+    materialProperties.put("minecraft:crying_obsidian", block -> {
+      block.emittance = 0.6f;
+    });
     materialProperties.put("minecraft:respawn_anchor", block -> {
       if (block instanceof RespawnAnchor) {
         int charges = ((RespawnAnchor)block).charges;
