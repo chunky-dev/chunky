@@ -3422,6 +3422,13 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/weeping_vines", Texture.weepingVines);
     addSimpleTexture("assets/minecraft/textures/block/weeping_vines_plant", Texture.weepingVinesPlant);
     addSimpleTexture("assets/minecraft/textures/block/soul_fire_torch", Texture.soulFireTorch);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_top", Texture.respawnAnchorTop);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_bottom", Texture.respawnAnchorBottom);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side0", Texture.respawnAnchorSide0);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side1", Texture.respawnAnchorSide1);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side2", Texture.respawnAnchorSide2);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side3", Texture.respawnAnchorSide3);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side4", Texture.respawnAnchorSide4);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

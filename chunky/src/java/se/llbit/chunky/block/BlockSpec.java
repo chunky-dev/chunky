@@ -1608,6 +1608,8 @@ public class BlockSpec {
                 return new Torch(name, Texture.soulFireTorch);
             case "soul_fire_wall_torch":
                 return wallTorch(tag, Texture.soulFireTorch);
+            case "respawn_anchor":
+                return new RespawnAnchor(stringToInt(tag.get("Properties").get("charges"), 0));
             case "structure_void":
             case "barrier":
                 // Invisible.

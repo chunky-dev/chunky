@@ -839,6 +839,13 @@ public class Texture {
   public static final Texture weepingVines = new Texture();
   public static final Texture weepingVinesPlant = new Texture();
   public static final Texture soulFireTorch = new Texture();
+  public static final Texture respawnAnchorTop = new Texture();
+  public static final Texture respawnAnchorBottom = new Texture();
+  public static final Texture respawnAnchorSide0 = new Texture();
+  public static final Texture respawnAnchorSide1 = new Texture();
+  public static final Texture respawnAnchorSide2 = new Texture();
+  public static final Texture respawnAnchorSide3 = new Texture();
+  public static final Texture respawnAnchorSide4 = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

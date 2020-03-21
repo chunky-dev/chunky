@@ -1,9 +1,6 @@
 package se.llbit.chunky.chunk;
 
-import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.BlockSpec;
-import se.llbit.chunky.block.Campfire;
-import se.llbit.chunky.block.RedstoneLamp;
+import se.llbit.chunky.block.*;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
@@ -184,6 +181,14 @@ public class BlockPalette {
     });
     materialProperties.put("minecraft:soul_fire_wall_torch", block -> {
       block.emittance = 35.0f;
+    });
+    materialProperties.put("minecraft:respawn_anchor", block -> {
+      if (block instanceof RespawnAnchor) {
+        int charges = ((RespawnAnchor)block).charges;
+        if (charges > 0) {
+          block.emittance = 1.0f / 15 * (charges * 4 - 2);
+        }
+      }
     });
     // TODO: handle glass panes (multiple different block names).
     /*STAINED_GLASS.ior = 1.52f;
