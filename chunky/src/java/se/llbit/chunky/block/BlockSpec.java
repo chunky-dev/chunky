@@ -1596,6 +1596,18 @@ public class BlockSpec {
                 return log(tag, Texture.strippedCrimsonStem, Texture.strippedCrimsonStemTop);
             case "soul_fire_lantern":
                 return new Lantern("soul_fire_lantern", Texture.soulFireLantern, tag.get("Properties").get("hanging").stringValue("false").equals("true"));
+            case "twisting_vines":
+                return new SpriteBlock("twisting_vines", Texture.twistingVines);
+            case "twisting_vines_plant":
+                return new SpriteBlock("twisting_vines_plant", Texture.twistingVinesPlant);
+            case "weeping_vines":
+                return new SpriteBlock("weeping_vines", Texture.weepingVines);
+            case "weeping_vines_plant":
+                return new SpriteBlock("weeping_vines_plant", Texture.weepingVinesPlant);
+            case "soul_fire_torch":
+                return new Torch(name, Texture.soulFireTorch);
+            case "soul_fire_wall_torch":
+                return wallTorch(tag, Texture.soulFireTorch);
             case "structure_void":
             case "barrier":
                 // Invisible.

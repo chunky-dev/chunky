@@ -179,6 +179,12 @@ public class BlockPalette {
     materialProperties.put("minecraft:soul_fire_lantern", block -> {
       block.emittance = 0.6f;
     });
+    materialProperties.put("minecraft:soul_fire_torch", block -> {
+      block.emittance = 35.0f;
+    });
+    materialProperties.put("minecraft:soul_fire_wall_torch", block -> {
+      block.emittance = 35.0f;
+    });
     // TODO: handle glass panes (multiple different block names).
     /*STAINED_GLASS.ior = 1.52f;
     GLASSPANE.ior = 1.52f;

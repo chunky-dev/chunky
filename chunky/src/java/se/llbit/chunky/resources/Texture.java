@@ -834,6 +834,11 @@ public class Texture {
   public static final Texture strippedCrimsonStem = new Texture();
   public static final Texture strippedCrimsonStemTop = new Texture();
   public static final Texture soulFireLantern = new Texture();
+  public static final Texture twistingVines = new Texture();
+  public static final Texture twistingVinesPlant = new Texture();
+  public static final Texture weepingVines = new Texture();
+  public static final Texture weepingVinesPlant = new Texture();
+  public static final Texture soulFireTorch = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

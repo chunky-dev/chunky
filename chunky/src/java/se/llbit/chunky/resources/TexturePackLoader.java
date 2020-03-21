@@ -3417,6 +3417,11 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/stripped_crimson_stem", Texture.strippedCrimsonStem);
     addSimpleTexture("assets/minecraft/textures/block/stripped_crimson_stem_top", Texture.strippedCrimsonStemTop);
     addSimpleTexture("assets/minecraft/textures/block/soul_fire_lantern", Texture.soulFireLantern);
+    addSimpleTexture("assets/minecraft/textures/block/twisting_vines", Texture.twistingVines);
+    addSimpleTexture("assets/minecraft/textures/block/twisting_vines_plant", Texture.twistingVinesPlant);
+    addSimpleTexture("assets/minecraft/textures/block/weeping_vines", Texture.weepingVines);
+    addSimpleTexture("assets/minecraft/textures/block/weeping_vines_plant", Texture.weepingVinesPlant);
+    addSimpleTexture("assets/minecraft/textures/block/soul_fire_torch", Texture.soulFireTorch);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
