@@ -8,15 +8,15 @@ import se.llbit.math.Ray;
 public class Lantern extends MinecraftBlockTranslucent {
     private final boolean hanging;
 
-    public Lantern(boolean hanging) {
-        super("lantern", Texture.lantern);
+    public Lantern(String name, Texture texture, boolean hanging) {
+        super(name, texture);
         this.hanging = hanging;
         localIntersect = true;
     }
 
     @Override
     public boolean intersect(Ray ray, Scene scene) {
-        return LanternModel.intersect(ray, this.hanging);
+        return LanternModel.intersect(ray, this.hanging, this.texture);
     }
 
     @Override

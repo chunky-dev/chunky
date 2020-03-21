@@ -57,6 +57,8 @@ public class FlowerPotModel {
     CORNFLOWER,
     LILY_OF_THE_VALLEY,
     WITHER_ROSE,
+    WARPED_FUNGUS,
+    CRIMSON_FUNGUS
   }
 
   private static final AABB[] boxes = {
@@ -255,6 +257,10 @@ public class FlowerPotModel {
       case WITHER_ROSE:
         hit |= intersect(flowerSmall, ray, Texture.witherRose);
         break;
+      case WARPED_FUNGUS:
+        hit |= intersect(flowerSmall, ray, Texture.warpedFungus);
+      case CRIMSON_FUNGUS:
+        hit |= intersect(flowerSmall, ray, Texture.crimsonFungus);
     }
     if (hit) {
       ray.color.w = 1;

@@ -3396,6 +3396,27 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/netherite_block", Texture.netheriteBlock);
     addSimpleTexture("assets/minecraft/textures/block/shroomlight", Texture.shroomlight);
     addSimpleTexture("assets/minecraft/textures/block/warped_wart_block", Texture.warpedWartBlock);
+    addSimpleTexture("assets/minecraft/textures/block/basalt_top", Texture.basaltTop);
+    addSimpleTexture("assets/minecraft/textures/block/basalt_side", Texture.basaltSide);
+    addSimpleTexture("assets/minecraft/textures/block/polished_basalt_top", Texture.polishedBasaltTop);
+    addSimpleTexture("assets/minecraft/textures/block/polished_basalt_side", Texture.polishedBasaltSide);
+    addSimpleTexture("assets/minecraft/textures/block/ancient_debris_top", Texture.ancientDebrisTop);
+    addSimpleTexture("assets/minecraft/textures/block/ancient_debris_side", Texture.ancientDebrisSide);
+    addSimpleTexture("assets/minecraft/textures/block/warped_fungus", Texture.warpedFungus);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_fungus", Texture.crimsonFungus);
+    addSimpleTexture("assets/minecraft/textures/block/nether_sprouts", Texture.netherSprouts);
+    addSimpleTexture("assets/minecraft/textures/block/warped_roots", Texture.warpedRoots);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_roots", Texture.crimsonRoots);
+    addSimpleTexture("assets/minecraft/textures/block/crying_obsidian", Texture.cryingObsidian);
+    addSimpleTexture("assets/minecraft/textures/block/warped_stem", Texture.warpedStem);
+    addSimpleTexture("assets/minecraft/textures/block/warped_stem_top", Texture.warpedStemTop);
+    addSimpleTexture("assets/minecraft/textures/block/stripped_warped_stem", Texture.strippedWarpedStem);
+    addSimpleTexture("assets/minecraft/textures/block/stripped_warped_stem_top", Texture.strippedWarpedStemTop);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_stem", Texture.crimsonStem);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_stem_top", Texture.crimsonStemTop);
+    addSimpleTexture("assets/minecraft/textures/block/stripped_crimson_stem", Texture.strippedCrimsonStem);
+    addSimpleTexture("assets/minecraft/textures/block/stripped_crimson_stem_top", Texture.strippedCrimsonStemTop);
+    addSimpleTexture("assets/minecraft/textures/block/soul_fire_lantern", Texture.soulFireLantern);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

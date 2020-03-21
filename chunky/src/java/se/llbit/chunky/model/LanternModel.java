@@ -7,8 +7,6 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class LanternModel {
-    private static final Texture texture = Texture.lantern;
-
     private static final Quad[] quads = new Quad[]{
             new Quad(
                     new Vector3(5 / 16.0, 7 / 16.0, 11 / 16.0),
@@ -201,7 +199,7 @@ public class LanternModel {
             )
     };
 
-    public static boolean intersect(Ray ray, boolean hanging) {
+    public static boolean intersect(Ray ray, boolean hanging, Texture texture) {
         boolean hit = false;
         ray.t = Double.POSITIVE_INFINITY;
 

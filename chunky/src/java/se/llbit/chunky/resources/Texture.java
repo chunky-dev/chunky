@@ -813,6 +813,27 @@ public class Texture {
   public static final Texture netheriteBlock = new Texture();
   public static final Texture shroomlight = new Texture();
   public static final Texture warpedWartBlock = new Texture();
+  public static final Texture basaltSide = new Texture();
+  public static final Texture basaltTop = new Texture();
+  public static final Texture polishedBasaltSide = new Texture();
+  public static final Texture polishedBasaltTop = new Texture();
+  public static final Texture ancientDebrisSide = new Texture();
+  public static final Texture ancientDebrisTop = new Texture();
+  public static final Texture warpedFungus = new Texture();
+  public static final Texture crimsonFungus = new Texture();
+  public static final Texture netherSprouts = new Texture();
+  public static final Texture warpedRoots = new Texture();
+  public static final Texture crimsonRoots = new Texture();
+  public static final Texture cryingObsidian = new Texture();
+  public static final Texture warpedStem = new Texture();
+  public static final Texture warpedStemTop = new Texture();
+  public static final Texture strippedWarpedStem = new Texture();
+  public static final Texture strippedWarpedStemTop = new Texture();
+  public static final Texture crimsonStem = new Texture();
+  public static final Texture crimsonStemTop = new Texture();
+  public static final Texture strippedCrimsonStem = new Texture();
+  public static final Texture strippedCrimsonStemTop = new Texture();
+  public static final Texture soulFireLantern = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

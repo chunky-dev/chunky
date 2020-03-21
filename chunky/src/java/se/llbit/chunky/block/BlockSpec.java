@@ -1359,6 +1359,10 @@ public class BlockSpec {
                 return new FlowerPot(name, FlowerPotModel.Kind.LILY_OF_THE_VALLEY);
             case "potted_wither_rose":
                 return new FlowerPot(name, FlowerPotModel.Kind.WITHER_ROSE);
+            case "potted_warped_fungus":
+                return new FlowerPot(name, FlowerPotModel.Kind.WARPED_FUNGUS);
+            case "potted_crimson_fungus":
+                return new FlowerPot(name, FlowerPotModel.Kind.CRIMSON_FUNGUS);
             case "carrots": {
                 int age = stringToInt(tag.get("Properties").get("age"), 7);
                 return new Carrots(age);
@@ -1485,7 +1489,7 @@ public class BlockSpec {
             case "bell":
                 return new Bell(getFacing(tag, "north"), tag.get("Properties").get("attachment").stringValue("floor"));
             case "lantern":
-                return new Lantern(tag.get("Properties").get("hanging").stringValue("false").equals("true"));
+                return new Lantern("lantern", Texture.lantern, tag.get("Properties").get("hanging").stringValue("false").equals("true"));
             case "sweet_berry_bush": {
                 int age = stringToInt(tag.get("Properties").get("age"), 3);
                 return new SweetBerryBush(age);
@@ -1556,6 +1560,42 @@ public class BlockSpec {
                 return new MinecraftBlock("shroomlight", Texture.shroomlight);
             case "warped_wart_block":
                 return new MinecraftBlock("warped_wart_block", Texture.warpedWartBlock);
+            case "basalt":
+                return log(tag, Texture.basaltSide, Texture.basaltTop);
+            case "polished_basalt":
+                return log(tag, Texture.polishedBasaltSide, Texture.polishedBasaltTop);
+            case "ancient_debris":
+                return new TexturedBlock("ancient_debris", Texture.ancientDebrisSide, Texture.ancientDebrisTop);
+            case "warped_fungus":
+                return new SpriteBlock("warped_fungus", Texture.warpedFungus);
+            case "crimson_fungus":
+                return new SpriteBlock("crimson_fungus", Texture.crimsonFungus);
+            case "nether_sprouts":
+                return new SpriteBlock("nether_sprouts", Texture.netherSprouts);
+            case "warped_roots":
+                return new SpriteBlock("warped_roots", Texture.warpedRoots);
+            case "crimson_roots":
+                return new SpriteBlock("crimson_roots", Texture.crimsonRoots);
+            case "crying_obsidian":
+                return new MinecraftBlock("crying_obsidian", Texture.cryingObsidian);
+            case "warped_hyphae":
+                return log(tag, Texture.warpedStem, Texture.warpedStem);
+            case "stripped_warped_hyphae":
+                return log(tag, Texture.strippedWarpedStem, Texture.strippedWarpedStem);
+            case "warped_stem":
+                return log(tag, Texture.warpedStem, Texture.warpedStemTop);
+            case "stripped_warped_stem":
+                return log(tag, Texture.strippedWarpedStem, Texture.strippedWarpedStemTop);
+            case "crimson_hyphae":
+                return log(tag, Texture.crimsonStem, Texture.crimsonStem);
+            case "stripped_crimson_hyphae":
+                return log(tag, Texture.strippedCrimsonStem, Texture.strippedCrimsonStem);
+            case "crimson_stem":
+                return log(tag, Texture.crimsonStem, Texture.crimsonStemTop);
+            case "stripped_crimson_stem":
+                return log(tag, Texture.strippedCrimsonStem, Texture.strippedCrimsonStemTop);
+            case "soul_fire_lantern":
+                return new Lantern("soul_fire_lantern", Texture.soulFireLantern, tag.get("Properties").get("hanging").stringValue("false").equals("true"));
             case "structure_void":
             case "barrier":
                 // Invisible.
