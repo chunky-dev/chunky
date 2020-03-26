@@ -589,9 +589,9 @@ public class BlockSpec {
             case "enchanting_table":
                 return new EnchantingTable();
             case "end_portal_frame": {
-                // TODO: handle facing direction
                 String eye = tag.get("Properties").get("eye").stringValue("false");
-                return new EndPortalFrame(eye.equals("true"));
+                String facing = getFacing(tag, "north");
+                return new EndPortalFrame(eye.equals("true"), facing);
             }
             case "end_stone":
                 return new MinecraftBlock(name, Texture.endStone);

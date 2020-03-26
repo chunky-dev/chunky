@@ -6,19 +6,23 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 
 public class EndPortalFrame extends MinecraftBlockTranslucent {
-  public final boolean hasEye;
+    private final boolean hasEye;
+    private final String facing;
 
-  public EndPortalFrame(boolean eye) {
-    super("end_portal_frame", Texture.endPortalFrameSide);
-    this.hasEye = eye;
-    localIntersect = true;
-  }
+    public EndPortalFrame(boolean eye, String facing) {
+        super("end_portal_frame", Texture.endPortalFrameSide);
+        this.hasEye = eye;
+        this.facing = facing;
+        localIntersect = true;
+    }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return EndPortalFrameModel.intersect(ray, hasEye);
-  }
+    @Override
+    public boolean intersect(Ray ray, Scene scene) {
+        return EndPortalFrameModel.intersect(ray, hasEye, facing);
+    }
 
-  @Override public String description() {
-    return "eye=" + hasEye;
-  }
+    @Override
+    public String description() {
+        return "eye=" + hasEye + ",facing=" + facing;
+    }
 }

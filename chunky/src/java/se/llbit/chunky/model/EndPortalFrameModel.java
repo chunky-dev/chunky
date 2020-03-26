@@ -17,46 +17,152 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.AABB;
-import se.llbit.math.Ray;
+import se.llbit.math.*;
 
 public class EndPortalFrameModel {
-  private static AABB frame = new AABB(0, 1, 0, 13 / 16.0, 0, 1);
-  private static AABB eyeOfTheEnder = new AABB(.25, .75, 13 / 16.0, 1, .25, .75);
+    private static final Quad[] endPortalQuadsNorth = new Quad[]{
+            new Quad(
+                    new Vector3(0 / 16.0, 13 / 16.0, 16 / 16.0),
+                    new Vector3(16 / 16.0, 13 / 16.0, 16 / 16.0),
+                    new Vector3(0 / 16.0, 13 / 16.0, 0 / 16.0),
+                    new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+            ),
+            new Quad(
+                    new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
+                    new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
+                    new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
+                    new Vector4(0 / 16.0, 16 / 16.0, 0 / 16.0, 16 / 16.0)
+            ),
+            new Quad(
+                    new Vector3(0 / 16.0, 13 / 16.0, 16 / 16.0),
+                    new Vector3(0 / 16.0, 13 / 16.0, 0 / 16.0),
+                    new Vector3(0 / 16.0, 0 / 16.0, 16 / 16.0),
+                    new Vector4(16 / 16.0, 0 / 16.0, 13 / 16.0, 0 / 16.0)
+            ),
+            new Quad(
+                    new Vector3(16 / 16.0, 13 / 16.0, 0 / 16.0),
+                    new Vector3(16 / 16.0, 13 / 16.0, 16 / 16.0),
+                    new Vector3(16 / 16.0, 0 / 16.0, 0 / 16.0),
+                    new Vector4(16 / 16.0, 0 / 16.0, 13 / 16.0, 0 / 16.0)
+            ),
+            new Quad(
+                    new Vector3(0 / 16.0, 13 / 16.0, 0 / 16.0),
+                    new Vector3(16 / 16.0, 13 / 16.0, 0 / 16.0),
+                    new Vector3(0 / 16.0, 0 / 16.0, 0 / 16.0),
+                    new Vector4(16 / 16.0, 0 / 16.0, 13 / 16.0, 0 / 16.0)
+            ),
+            new Quad(
+                    new Vector3(16 / 16.0, 13 / 16.0, 16 / 16.0),
+                    new Vector3(0 / 16.0, 13 / 16.0, 16 / 16.0),
+                    new Vector3(16 / 16.0, 0 / 16.0, 16 / 16.0),
+                    new Vector4(16 / 16.0, 0 / 16.0, 13 / 16.0, 0 / 16.0)
+            )};
 
-  public static boolean intersect(Ray ray) {
-    boolean hasEye = (ray.getBlockData() & 4) != 0;
-    return intersect(ray, hasEye);
-  }
+    private static final Quad[][] orientedEndPortalQuads = new Quad[4][];
 
-  public static boolean intersect(Ray ray, boolean hasEye) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    if (frame.intersect(ray)) {
-      if (ray.n.y > 0) {
-        Texture.endPortalFrameTop.getColor(ray);
-      } else if (ray.n.y < 0) {
-        Texture.endStone.getColor(ray);
-      } else {
-        Texture.endPortalFrameSide.getColor(ray);
-      }
-      ray.t = ray.tNext;
-      hit = true;
+    private static final Texture[] tex = new Texture[]{
+            Texture.endPortalFrameTop, Texture.endStone,
+            Texture.endPortalFrameSide, Texture.endPortalFrameSide, Texture.endPortalFrameSide, Texture.endPortalFrameSide
+    };
+
+    private static final Quad[] eyeOfEnderQuadsNorth = new Quad[]{
+            new Quad(
+                    new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+                    new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+                    new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+                    new Vector4(4 / 16.0, 12 / 16.0, 4 / 16.0, 12 / 16.0)
+            ),
+            new Quad(
+                    new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+                    new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+                    new Vector3(4 / 16.0, 13 / 16.0, 12 / 16.0),
+                    new Vector4(12 / 16.0, 4 / 16.0, 16 / 16.0, 13 / 16.0)
+            ),
+            new Quad(
+                    new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+                    new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+                    new Vector3(12 / 16.0, 13 / 16.0, 4 / 16.0),
+                    new Vector4(12 / 16.0, 4 / 16.0, 16 / 16.0, 13 / 16.0)
+            ),
+            new Quad(
+                    new Vector3(4 / 16.0, 16 / 16.0, 4 / 16.0),
+                    new Vector3(12 / 16.0, 16 / 16.0, 4 / 16.0),
+                    new Vector3(4 / 16.0, 13 / 16.0, 4 / 16.0),
+                    new Vector4(12 / 16.0, 4 / 16.0, 16 / 16.0, 13 / 16.0)
+            ),
+            new Quad(
+                    new Vector3(12 / 16.0, 16 / 16.0, 12 / 16.0),
+                    new Vector3(4 / 16.0, 16 / 16.0, 12 / 16.0),
+                    new Vector3(12 / 16.0, 13 / 16.0, 12 / 16.0),
+                    new Vector4(12 / 16.0, 4 / 16.0, 16 / 16.0, 13 / 16.0)
+            )
+    };
+
+    private static final Quad[][] orientedEyeOfEnderQuads = new Quad[4][];
+
+    static {
+        orientedEndPortalQuads[0] = endPortalQuadsNorth;
+        orientedEndPortalQuads[1] = Model.rotateY(orientedEndPortalQuads[0]);
+        orientedEndPortalQuads[2] = Model.rotateY(orientedEndPortalQuads[1]);
+        orientedEndPortalQuads[3] = Model.rotateY(orientedEndPortalQuads[2]);
+
+        orientedEyeOfEnderQuads[0] = eyeOfEnderQuadsNorth;
+        orientedEyeOfEnderQuads[1] = Model.rotateY(orientedEyeOfEnderQuads[0]);
+        orientedEyeOfEnderQuads[2] = Model.rotateY(orientedEyeOfEnderQuads[1]);
+        orientedEyeOfEnderQuads[3] = Model.rotateY(orientedEyeOfEnderQuads[2]);
     }
-    if (hasEye && eyeOfTheEnder.intersect(ray)) {
-      if (ray.n.y > 0) {
-        Texture.eyeOfTheEnder.getColor(ray);
-      } else {
-        Texture.eyeOfTheEnder.getColor(ray);
-      }
-      ray.t = ray.tNext;
-      hit = true;
+
+    public static boolean intersect(Ray ray, boolean hasEye, String facing) {
+        boolean hit = false;
+        ray.t = Double.POSITIVE_INFINITY;
+
+        Quad[] quads = orientedEndPortalQuads[getOrientationIndex(facing)];
+        for (int i = 0; i < quads.length; i++) {
+            Quad quad = quads[i];
+            if (quad.intersect(ray)) {
+                float[] color = tex[i].getColor(ray.u, ray.v);
+                if (color[3] > Ray.EPSILON) {
+                    ray.color.set(color);
+                    ray.t = ray.tNext;
+                    ray.n.set(quad.n);
+                    hit = true;
+                }
+            }
+        }
+
+        if (hasEye) {
+            for (Quad quad : orientedEyeOfEnderQuads[getOrientationIndex(facing)]) {
+                if (quad.intersect(ray)) {
+                    float[] color = Texture.eyeOfTheEnder.getColor(ray.u, ray.v);
+                    if (color[3] > Ray.EPSILON) {
+                        ray.color.set(color);
+                        ray.t = ray.tNext;
+                        ray.n.set(quad.n);
+                        hit = true;
+                    }
+                }
+            }
+        }
+
+        if (hit) {
+            ray.distance += ray.t;
+            ray.o.scaleAdd(ray.t, ray.d);
+        }
+        return hit;
     }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+
+    private static int getOrientationIndex(String facing) {
+        switch (facing) {
+            case "north":
+                return 0;
+            case "east":
+                return 1;
+            case "south":
+                return 2;
+            case "west":
+                return 3;
+            default:
+                return 0;
+        }
     }
-    return hit;
-  }
 }
