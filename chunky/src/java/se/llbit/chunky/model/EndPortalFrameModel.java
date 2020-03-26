@@ -21,8 +21,8 @@ import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
 public class EndPortalFrameModel {
-  private static AABB frame = new AABB(0, 1, 0, .75, 0, 1);
-  private static AABB eyeOfTheEnder = new AABB(.25, .75, .75, 1, .25, .75);
+  private static AABB frame = new AABB(0, 1, 0, 13 / 16.0, 0, 1);
+  private static AABB eyeOfTheEnder = new AABB(.25, .75, 13 / 16.0, 1, .25, .75);
 
   public static boolean intersect(Ray ray) {
     boolean hasEye = (ray.getBlockData() & 4) != 0;
