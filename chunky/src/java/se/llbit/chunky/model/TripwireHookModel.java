@@ -17,154 +17,652 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
-import se.llbit.math.AABB;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class TripwireHookModel {
-  private static final AABB boxNorth = new AABB(6 / 16., 10 / 16., 1 / 16., 9 / 16., 0, 2 / 16.);
+    private static final Texture hookT = Texture.tripwireHook;
+    private static final Texture wood = Texture.oakPlanks;
+    private static final Texture tripwire = Texture.tripwire;
 
-  private static final AABB[] box = new AABB[4];
+    private static final Texture[] tex = new Texture[]{
+            hookT, hookT, hookT, hookT, hookT, hookT, hookT, hookT, hookT, hookT,
+            wood, wood, wood, wood, wood, wood, wood, wood, wood, wood, wood, wood
+    };
 
-  private static final Quad[] armQuads = {
-      // north
-      new Quad(new Vector3(9 / 16., 7 / 16., 0), new Vector3(7 / 16., 7 / 16., 0),
-          new Vector3(9 / 16., 9 / 16., 0), new Vector4(9 / 16., 7 / 16., 0, 2 / 16.)),
+    private static final Quad[][] quads = Model.rotateYNESW(Model.join(
+            Model.rotateX(new Quad[]{
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 4.6 / 16.0, 11.5 / 16.0),
+                            new Vector3(9.8 / 16.0, 4.6 / 16.0, 11.5 / 16.0),
+                            new Vector3(6.2 / 16.0, 4.6 / 16.0, 7.9 / 16.0),
+                            new Vector4(5 / 16.0, 11 / 16.0, 7 / 16.0, 13 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 3.8 / 16.0, 7.9 / 16.0),
+                            new Vector3(9.8 / 16.0, 3.8 / 16.0, 7.9 / 16.0),
+                            new Vector3(6.2 / 16.0, 3.8 / 16.0, 11.5 / 16.0),
+                            new Vector4(5 / 16.0, 11 / 16.0, 7 / 16.0, 13 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 4.6 / 16.0, 11.5 / 16.0),
+                            new Vector3(6.2 / 16.0, 4.6 / 16.0, 7.9 / 16.0),
+                            new Vector3(6.2 / 16.0, 3.8 / 16.0, 11.5 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(9.8 / 16.0, 4.6 / 16.0, 7.9 / 16.0),
+                            new Vector3(9.8 / 16.0, 4.6 / 16.0, 11.5 / 16.0),
+                            new Vector3(9.8 / 16.0, 3.8 / 16.0, 7.9 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 4.6 / 16.0, 7.9 / 16.0),
+                            new Vector3(9.8 / 16.0, 4.6 / 16.0, 7.9 / 16.0),
+                            new Vector3(6.2 / 16.0, 3.8 / 16.0, 7.9 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(9.8 / 16.0, 4.6 / 16.0, 11.5 / 16.0),
+                            new Vector3(6.2 / 16.0, 4.6 / 16.0, 11.5 / 16.0),
+                            new Vector3(9.8 / 16.0, 3.8 / 16.0, 11.5 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 4.6 / 16.0, 10.3 / 16.0),
+                            new Vector3(8.6 / 16.0, 4.6 / 16.0, 10.3 / 16.0),
+                            new Vector3(7.4 / 16.0, 3.8 / 16.0, 10.3 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.6 / 16.0, 4.6 / 16.0, 9.1 / 16.0),
+                            new Vector3(7.4 / 16.0, 4.6 / 16.0, 9.1 / 16.0),
+                            new Vector3(8.6 / 16.0, 3.8 / 16.0, 9.1 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 4.6 / 16.0, 9.1 / 16.0),
+                            new Vector3(7.4 / 16.0, 4.6 / 16.0, 10.3 / 16.0),
+                            new Vector3(7.4 / 16.0, 3.8 / 16.0, 9.1 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.6 / 16.0, 4.6 / 16.0, 10.3 / 16.0),
+                            new Vector3(8.6 / 16.0, 4.6 / 16.0, 9.1 / 16.0),
+                            new Vector3(8.6 / 16.0, 3.8 / 16.0, 10.3 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 13 / 16.0, 12 / 16.0)
+                    )}, Math.toRadians(-45), new Vector3(0.6, 6 / 16.0, 5.2 / 16.0)),
+            Model.rotateX(new Quad[]{
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector4(7 / 16.0, 9 / 16.0, 9 / 16.0, 14 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector3(8.8 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 14 / 16.0),
+                            new Vector4(7 / 16.0, 9 / 16.0, 2 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 14 / 16.0),
+                            new Vector4(7 / 16.0, 2 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(8.8 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector4(14 / 16.0, 9 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(8.8 / 16.0, 5.2 / 16.0, 14 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 7 / 16.0, 5 / 16.0)
+                    )}, Math.toRadians(45), new Vector3(0.5, 6 / 16.0, 14 / 16.0)),
+            new Quad[]{
+                    new Quad(
+                            new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(10 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(6 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector4(6 / 16.0, 10 / 16.0, 14 / 16.0, 16 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector3(10 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector3(6 / 16.0, 1 / 16.0, 16 / 16.0),
+                            new Vector4(6 / 16.0, 10 / 16.0, 0 / 16.0, 2 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(6 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(6 / 16.0, 1 / 16.0, 16 / 16.0),
+                            new Vector4(2 / 16.0, 0 / 16.0, 9 / 16.0, 1 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(10 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(10 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(10 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector4(16 / 16.0, 14 / 16.0, 9 / 16.0, 1 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(10 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(6 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector4(10 / 16.0, 6 / 16.0, 9 / 16.0, 1 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(10 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(10 / 16.0, 1 / 16.0, 16 / 16.0),
+                            new Vector4(10 / 16.0, 6 / 16.0, 9 / 16.0, 1 / 16.0)
+                    )
+            }));
 
-      // south
-      new Quad(new Vector3(7 / 16., 7 / 16., .5), new Vector3(9 / 16., 7 / 16., .5),
-          new Vector3(7 / 16., 9 / 16., .5), new Vector4(7 / 16., 9 / 16., 0, 2 / 16.)),
+    private static final Quad[][] quadsPowered = Model.rotateYNESW(Model.join(new Quad[]{
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 5 / 16.0, 10.3 / 16.0),
+                            new Vector3(9.8 / 16.0, 5 / 16.0, 10.3 / 16.0),
+                            new Vector3(6.2 / 16.0, 5 / 16.0, 6.7 / 16.0),
+                            new Vector4(5 / 16.0, 11 / 16.0, 7 / 16.0, 13 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector3(9.8 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 10.3 / 16.0),
+                            new Vector4(5 / 16.0, 11 / 16.0, 7 / 16.0, 13 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 5 / 16.0, 10.3 / 16.0),
+                            new Vector3(6.2 / 16.0, 5 / 16.0, 6.7 / 16.0),
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 10.3 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(9.8 / 16.0, 5 / 16.0, 6.7 / 16.0),
+                            new Vector3(9.8 / 16.0, 5 / 16.0, 10.3 / 16.0),
+                            new Vector3(9.8 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 5 / 16.0, 6.7 / 16.0),
+                            new Vector3(9.8 / 16.0, 5 / 16.0, 6.7 / 16.0),
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(9.8 / 16.0, 5 / 16.0, 10.3 / 16.0),
+                            new Vector3(6.2 / 16.0, 5 / 16.0, 10.3 / 16.0),
+                            new Vector3(9.8 / 16.0, 4.2 / 16.0, 10.3 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 5 / 16.0, 9.1 / 16.0),
+                            new Vector3(8.6 / 16.0, 5 / 16.0, 9.1 / 16.0),
+                            new Vector3(7.4 / 16.0, 4.2 / 16.0, 9.1 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.6 / 16.0, 5 / 16.0, 7.9 / 16.0),
+                            new Vector3(7.4 / 16.0, 5 / 16.0, 7.9 / 16.0),
+                            new Vector3(8.6 / 16.0, 4.2 / 16.0, 7.9 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 5 / 16.0, 7.9 / 16.0),
+                            new Vector3(7.4 / 16.0, 5 / 16.0, 9.1 / 16.0),
+                            new Vector3(7.4 / 16.0, 4.2 / 16.0, 7.9 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.6 / 16.0, 5 / 16.0, 9.1 / 16.0),
+                            new Vector3(8.6 / 16.0, 5 / 16.0, 7.9 / 16.0),
+                            new Vector3(8.6 / 16.0, 4.2 / 16.0, 9.1 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 13 / 16.0, 12 / 16.0)
+                    )},
+            Model.rotateX(new Quad[]{
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector4(7 / 16.0, 9 / 16.0, 9 / 16.0, 14 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector3(8.8 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 14 / 16.0),
+                            new Vector4(7 / 16.0, 9 / 16.0, 2 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 14 / 16.0),
+                            new Vector4(7 / 16.0, 2 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(8.8 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector4(14 / 16.0, 9 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(8.8 / 16.0, 5.2 / 16.0, 14 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 7 / 16.0, 5 / 16.0)
+                    )}, Math.toRadians(-22.5), new Vector3(0.6, 6 / 16.0, 14 / 16.0)),
+            new Quad[]{
+                    new Quad(
+                            new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(10 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(6 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector4(6 / 16.0, 10 / 16.0, 14 / 16.0, 16 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector3(10 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector3(6 / 16.0, 1 / 16.0, 16 / 16.0),
+                            new Vector4(6 / 16.0, 10 / 16.0, 0 / 16.0, 2 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(6 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(6 / 16.0, 1 / 16.0, 16 / 16.0),
+                            new Vector4(2 / 16.0, 0 / 16.0, 9 / 16.0, 1 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(10 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(10 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(10 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector4(16 / 16.0, 14 / 16.0, 9 / 16.0, 1 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(10 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(6 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector4(10 / 16.0, 6 / 16.0, 9 / 16.0, 1 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(10 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(10 / 16.0, 1 / 16.0, 16 / 16.0),
+                            new Vector4(10 / 16.0, 6 / 16.0, 9 / 16.0, 1 / 16.0)
+                    )
+            }));
 
-      // west
-      new Quad(new Vector3(7 / 16., 9 / 16., 0), new Vector3(7 / 16., 7 / 16., 0),
-          new Vector3(7 / 16., 9 / 16., .5), new Vector4(7 / 16., 9 / 16., 0, 7 / 16.)),
+    private static final Texture[] texAttached = new Texture[]{
+            tripwire, tripwire, hookT, hookT, hookT, hookT, hookT, hookT, hookT, hookT, hookT, hookT,
+            wood, wood, wood, wood, wood, wood, wood, wood, wood, wood, wood, wood
+    };
 
-      // east
-      new Quad(new Vector3(9 / 16., 9 / 16., .5), new Vector3(9 / 16., 7 / 16., .5),
-          new Vector3(9 / 16., 9 / 16., 0), new Vector4(9 / 16., 7 / 16., 7 / 16., 0)),
+    private static final Quad[][] quadsAttached = Model.rotateYNESW(Model.join(
+            Model.rotateX(new Quad[]{
+                    new Quad(
+                            new Vector3(8.25 / 16.0, 1.5 / 16.0, 6.7 / 16.0),
+                            new Vector3(8.25 / 16.0, 1.5 / 16.0, 0 / 16.0),
+                            new Vector3(7.75 / 16.0, 1.5 / 16.0, 6.7 / 16.0),
+                            new Vector4(0 / 16.0, 16 / 16.0, 8 / 16.0, 10 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.25 / 16.0, 1.5 / 16.0, 0 / 16.0),
+                            new Vector3(8.25 / 16.0, 1.5 / 16.0, 6.7 / 16.0),
+                            new Vector3(7.75 / 16.0, 1.5 / 16.0, 0 / 16.0),
+                            new Vector4(0 / 16.0, 16 / 16.0, 10 / 16.0, 8 / 16.0)
+                    ),
+            }, Math.toRadians(-22.5), new Vector3(0.5, 0, 0)), // TODO rescale
+            Model.rotateX(new Quad[]{
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 5 / 16.0, 10.3 / 16.0),
+                            new Vector3(9.8 / 16.0, 5 / 16.0, 10.3 / 16.0),
+                            new Vector3(6.2 / 16.0, 5 / 16.0, 6.7 / 16.0),
+                            new Vector4(5 / 16.0, 11 / 16.0, 7 / 16.0, 13 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector3(9.8 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 10.3 / 16.0),
+                            new Vector4(5 / 16.0, 11 / 16.0, 7 / 16.0, 13 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 5 / 16.0, 10.3 / 16.0),
+                            new Vector3(6.2 / 16.0, 5 / 16.0, 6.7 / 16.0),
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 10.3 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(9.8 / 16.0, 5 / 16.0, 6.7 / 16.0),
+                            new Vector3(9.8 / 16.0, 5 / 16.0, 10.3 / 16.0),
+                            new Vector3(9.8 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 5 / 16.0, 6.7 / 16.0),
+                            new Vector3(9.8 / 16.0, 5 / 16.0, 6.7 / 16.0),
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(9.8 / 16.0, 5 / 16.0, 10.3 / 16.0),
+                            new Vector3(6.2 / 16.0, 5 / 16.0, 10.3 / 16.0),
+                            new Vector3(9.8 / 16.0, 4.2 / 16.0, 10.3 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 5 / 16.0, 9.1 / 16.0),
+                            new Vector3(8.6 / 16.0, 5 / 16.0, 9.1 / 16.0),
+                            new Vector3(7.4 / 16.0, 4.2 / 16.0, 9.1 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.6 / 16.0, 5 / 16.0, 7.9 / 16.0),
+                            new Vector3(7.4 / 16.0, 5 / 16.0, 7.9 / 16.0),
+                            new Vector3(8.6 / 16.0, 4.2 / 16.0, 7.9 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 5 / 16.0, 7.9 / 16.0),
+                            new Vector3(7.4 / 16.0, 5 / 16.0, 9.1 / 16.0),
+                            new Vector3(7.4 / 16.0, 4.2 / 16.0, 7.9 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.6 / 16.0, 5 / 16.0, 9.1 / 16.0),
+                            new Vector3(8.6 / 16.0, 5 / 16.0, 7.9 / 16.0),
+                            new Vector3(8.6 / 16.0, 4.2 / 16.0, 9.1 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 13 / 16.0, 12 / 16.0)
+                    )
+            }, Math.toRadians(-22.5), new Vector3(0.5, 4.2 / 16, 6.7 / 16)),
 
-      // top
-      new Quad(new Vector3(9 / 16., 9 / 16., 0), new Vector3(7 / 16., 9 / 16., 0),
-          new Vector3(9 / 16., 9 / 16., .5), new Vector4(7 / 16., 9 / 16., 0, 7 / 16.)),
+            new Quad[]{
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector4(7 / 16.0, 9 / 16.0, 9 / 16.0, 14 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector3(8.8 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 14 / 16.0),
+                            new Vector4(7 / 16.0, 9 / 16.0, 2 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 14 / 16.0),
+                            new Vector4(7 / 16.0, 2 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(8.8 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector4(14 / 16.0, 9 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(8.8 / 16.0, 5.2 / 16.0, 14 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(10 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(6 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector4(6 / 16.0, 10 / 16.0, 14 / 16.0, 16 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector3(10 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector3(6 / 16.0, 1 / 16.0, 16 / 16.0),
+                            new Vector4(6 / 16.0, 10 / 16.0, 0 / 16.0, 2 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(6 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(6 / 16.0, 1 / 16.0, 16 / 16.0),
+                            new Vector4(2 / 16.0, 0 / 16.0, 9 / 16.0, 1 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(10 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(10 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(10 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector4(16 / 16.0, 14 / 16.0, 9 / 16.0, 1 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(10 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(6 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector4(10 / 16.0, 6 / 16.0, 9 / 16.0, 1 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(10 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(10 / 16.0, 1 / 16.0, 16 / 16.0),
+                            new Vector4(10 / 16.0, 6 / 16.0, 9 / 16.0, 1 / 16.0)
+                    )
+            }));
 
-      // bottom
-      new Quad(new Vector3(7 / 16., 7 / 16., 0), new Vector3(9 / 16., 7 / 16., 0),
-          new Vector3(7 / 16., 7 / 16., .5), new Vector4(7 / 16., 9 / 16., 0, 7 / 16.)),};
+    private static final Quad[][] quadsAttachedPowered = Model.rotateYNESW(Model.join(
+            Model.rotateX(new Quad[]{
+                    new Quad(
+                            new Vector3(8.25 / 16.0, 0.5 / 16.0, 6.7 / 16.0),
+                            new Vector3(8.25 / 16.0, 0.5 / 16.0, 0 / 16.0),
+                            new Vector3(7.75 / 16.0, 0.5 / 16.0, 6.7 / 16.0),
+                            new Vector4(0 / 16.0, 16 / 16.0, 8 / 16.0, 10 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.25 / 16.0, 0.5 / 16.0, 0 / 16.0),
+                            new Vector3(8.25 / 16.0, 0.5 / 16.0, 6.7 / 16.0),
+                            new Vector3(7.75 / 16.0, 0.5 / 16.0, 0 / 16.0),
+                            new Vector4(0 / 16.0, 16 / 16.0, 10 / 16.0, 8 / 16.0)
+                    ),
+            }, Math.toRadians(-22.5), new Vector3(0.5, 0, 0)), // TODO rescale
+            new Quad[]{
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 10.3 / 16.0),
+                            new Vector3(9.8 / 16.0, 4.2 / 16.0, 10.3 / 16.0),
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector4(5 / 16.0, 11 / 16.0, 7 / 16.0, 13 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 3.4 / 16.0, 6.7 / 16.0),
+                            new Vector3(9.8 / 16.0, 3.4 / 16.0, 6.7 / 16.0),
+                            new Vector3(6.2 / 16.0, 3.4 / 16.0, 10.3 / 16.0),
+                            new Vector4(5 / 16.0, 11 / 16.0, 7 / 16.0, 13 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 10.3 / 16.0),
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector3(6.2 / 16.0, 3.4 / 16.0, 10.3 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(9.8 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector3(9.8 / 16.0, 4.2 / 16.0, 10.3 / 16.0),
+                            new Vector3(9.8 / 16.0, 3.4 / 16.0, 6.7 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector3(9.8 / 16.0, 4.2 / 16.0, 6.7 / 16.0),
+                            new Vector3(6.2 / 16.0, 3.4 / 16.0, 6.7 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(9.8 / 16.0, 4.2 / 16.0, 10.3 / 16.0),
+                            new Vector3(6.2 / 16.0, 4.2 / 16.0, 10.3 / 16.0),
+                            new Vector3(9.8 / 16.0, 3.4 / 16.0, 10.3 / 16.0),
+                            new Vector4(11 / 16.0, 5 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 4.2 / 16.0, 9.1 / 16.0),
+                            new Vector3(8.6 / 16.0, 4.2 / 16.0, 9.1 / 16.0),
+                            new Vector3(7.4 / 16.0, 3.4 / 16.0, 9.1 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.6 / 16.0, 4.2 / 16.0, 7.9 / 16.0),
+                            new Vector3(7.4 / 16.0, 4.2 / 16.0, 7.9 / 16.0),
+                            new Vector3(8.6 / 16.0, 3.4 / 16.0, 7.9 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 4.2 / 16.0, 7.9 / 16.0),
+                            new Vector3(7.4 / 16.0, 4.2 / 16.0, 9.1 / 16.0),
+                            new Vector3(7.4 / 16.0, 3.4 / 16.0, 7.9 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 8 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.6 / 16.0, 4.2 / 16.0, 9.1 / 16.0),
+                            new Vector3(8.6 / 16.0, 4.2 / 16.0, 7.9 / 16.0),
+                            new Vector3(8.6 / 16.0, 3.4 / 16.0, 9.1 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 13 / 16.0, 12 / 16.0)
+                    ),
+            },
+            Model.rotateX(new Quad[]{
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector4(7 / 16.0, 9 / 16.0, 9 / 16.0, 14 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector3(8.8 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 14 / 16.0),
+                            new Vector4(7 / 16.0, 9 / 16.0, 2 / 16.0, 7 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 14 / 16.0),
+                            new Vector4(7 / 16.0, 2 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(8.8 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector4(14 / 16.0, 9 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 10 / 16.0),
+                            new Vector3(7.4 / 16.0, 5.2 / 16.0, 10 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(8.8 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
+                            new Vector3(8.8 / 16.0, 5.2 / 16.0, 14 / 16.0),
+                            new Vector4(9 / 16.0, 7 / 16.0, 7 / 16.0, 5 / 16.0)
+                    ),
+            }, Math.toRadians(-22.5), new Vector3(0.5, 6 / 16.0, 14 / 16.0)),
+            new Quad[]{
+                    new Quad(
+                            new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(10 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(6 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector4(6 / 16.0, 10 / 16.0, 14 / 16.0, 16 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector3(10 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector3(6 / 16.0, 1 / 16.0, 16 / 16.0),
+                            new Vector4(6 / 16.0, 10 / 16.0, 0 / 16.0, 2 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(6 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(6 / 16.0, 1 / 16.0, 16 / 16.0),
+                            new Vector4(2 / 16.0, 0 / 16.0, 9 / 16.0, 1 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(10 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(10 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(10 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector4(16 / 16.0, 14 / 16.0, 9 / 16.0, 1 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(6 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(10 / 16.0, 9 / 16.0, 14 / 16.0),
+                            new Vector3(6 / 16.0, 1 / 16.0, 14 / 16.0),
+                            new Vector4(10 / 16.0, 6 / 16.0, 9 / 16.0, 1 / 16.0)
+                    ),
+                    new Quad(
+                            new Vector3(10 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
+                            new Vector3(10 / 16.0, 1 / 16.0, 16 / 16.0),
+                            new Vector4(10 / 16.0, 6 / 16.0, 9 / 16.0, 1 / 16.0)
+                    )
+            }));
 
-  private static final Quad[] hookQuads = {
-      // north
-      new Quad(new Vector3(9.5 / 16., 7.75 / 16., 6.5 / 16.),
-          new Vector3(6.5 / 16., 7.75 / 16., 6.5 / 16.),
-          new Vector3(9.5 / 16., 8.25 / 16., 6.5 / 16.),
-          new Vector4(11 / 16., 5 / 16., 11 / 16., 13 / 16.)),
+    public static boolean intersect(Ray ray, int direction, boolean attached, boolean powered) {
+        boolean hit = false;
+        ray.t = Double.POSITIVE_INFINITY;
 
-      // south
-      new Quad(new Vector3(6.5 / 16., 7.75 / 16., 9.5 / 16.),
-          new Vector3(9.5 / 16., 7.75 / 16., 9.5 / 16.),
-          new Vector3(6.5 / 16., 8.25 / 16., 9.5 / 16.),
-          new Vector4(5 / 16., 11 / 16., 7 / 16., 9 / 16.)),
-
-      // west
-      new Quad(new Vector3(6.5 / 16., 8.25 / 16., 6.5 / 16.),
-          new Vector3(6.5 / 16., 7.75 / 16., 6.5 / 16.),
-          new Vector3(6.5 / 16., 8.25 / 16., 9.5 / 16.),
-          new Vector4(5 / 16., 7 / 16., 7 / 16., 13 / 16.)),
-
-      // east
-      new Quad(new Vector3(9.5 / 16., 8.25 / 16., 9.5 / 16.),
-          new Vector3(9.5 / 16., 7.75 / 16., 9.5 / 16.),
-          new Vector3(9.5 / 16., 8.25 / 16., 6.5 / 16.),
-          new Vector4(11 / 16., 9 / 16., 13 / 16., 7 / 16.)),
-
-      // top
-      new Quad(new Vector3(9.5 / 16., 8.25 / 16., 6.5 / 16.),
-          new Vector3(6.5 / 16., 8.25 / 16., 6.5 / 16.),
-          new Vector3(9.5 / 16., 8.25 / 16., 9.5 / 16.),
-          new Vector4(5 / 16., 11 / 16., 7 / 16., 13 / 16.)),
-
-      // bottom
-      new Quad(new Vector3(6.5 / 16., 7.75 / 16., 6.5 / 16.),
-          new Vector3(9.5 / 16., 7.75 / 16., 6.5 / 16.),
-          new Vector3(6.5 / 16., 7.75 / 16., 9.5 / 16.),
-          new Vector4(5 / 16., 11 / 16., 7 / 16., 13 / 16.)),};
-
-  private static final Quad[][][] arm = new Quad[4][4][];
-  private static final Quad[][][] hook = new Quad[4][4][];
-
-  static {
-    box[0] = boxNorth;
-    box[1] = box[0].getYRotated();
-    box[2] = box[1].getYRotated();
-    box[3] = box[2].getYRotated();
-
-    // unarmed
-    arm[0][0] = Model.translate(Model.rotateX(armQuads, -Math.PI / 4), 0, 3.3 / 16., -1.3 / 16.);
-    hook[0][0] = Model.translate(Model.rotateX(hookQuads, Math.PI / 4), 0, 2.3 / 16., -.6 / 16);
-
-    // armed
-    arm[0][1] = Model.translate(Model.rotateX(armQuads, Math.PI / 25), 0, -2.5 / 16., 0);
-    hook[0][1] = Model.translate(Model.rotateX(hookQuads, Math.PI / 16), 0, -2.3 / 16., 1 / 16.);
-
-    // tripped
-    arm[0][2] = Model.translate(Model.rotateX(armQuads, Math.PI / 8), 0, -5 / 16., 0);
-    hook[0][2] = Model.translate(hookQuads, 0, -4.1 / 16., 1 / 16.);
-
-    arm[0][3] = arm[0][2];
-    hook[0][3] = hook[0][2];
-
-    for (int i = 1; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        arm[i][j] = Model.rotateY(arm[i - 1][j]);
-        hook[i][j] = Model.rotateY(hook[i - 1][j]);
-      }
-    }
-  }
-
-  public static boolean intersect(Ray ray) {
-    int data = ray.getBlockData();
-    int direction = data & 3;
-    return intersect(ray, direction, 1 & (data >> 2));
-  }
-
-  public static boolean intersect(Ray ray, int direction, int attached) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    if (box[direction].intersect(ray)) {
-      ray.t = ray.tNext;
-      Texture.oakPlanks.getColor(ray);
-      ray.color.w = 1;
-      hit = true;
-    }
-
-    for (Quad quad : arm[direction][attached]) {
-      if (quad.intersect(ray)) {
-        float[] color = Texture.tripwireHook.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          hit = true;
+        if (attached) {
+            if (powered) {
+                hit = intersect(quadsAttachedPowered[direction], texAttached, ray);
+            } else {
+                hit = intersect(quadsAttached[direction], texAttached, ray);
+            }
+        } else {
+            if (powered) {
+                hit = intersect(quadsPowered[direction], tex, ray);
+            } else {
+                hit = intersect(quads[direction], tex, ray);
+            }
         }
-      }
-    }
-    for (Quad quad : hook[direction][attached]) {
-      if (quad.intersect(ray)) {
-        float[] color = Texture.tripwireHook.getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          ray.n.set(quad.n);
-          hit = true;
+
+        if (hit) {
+            ray.distance += ray.t;
+            ray.o.scaleAdd(ray.t, ray.d);
         }
-      }
+        return hit;
     }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+
+    private static boolean intersect(Quad[] quads, Texture[] tex, Ray ray) {
+        boolean hit = false;
+        for (int i = 0; i < quads.length; ++i) {
+            Quad quad = quads[i];
+            if (quad.intersect(ray)) {
+                float[] color = tex[i].getColor(ray.u, ray.v);
+                if (color[3] > Ray.EPSILON) {
+                    ray.color.set(color);
+                    ray.t = ray.tNext;
+                    ray.n.set(quad.n);
+                    hit = true;
+                }
+            }
+        }
+        return hit;
     }
-    return hit;
-  }
 }
 

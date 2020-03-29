@@ -2079,7 +2079,7 @@ public class BlockSpec {
         String facing = getFacing(tag, "north");
         String attached = properties.get("attached").stringValue("false"); // TODO!
         String powered = properties.get("powered").stringValue("false");
-        return new TripwireHook(facing, powered.equals("true"));
+        return new TripwireHook(facing, attached.equals("true"), powered.equals("true"));
     }
 
     private Block cocoa(Tag tag) {
