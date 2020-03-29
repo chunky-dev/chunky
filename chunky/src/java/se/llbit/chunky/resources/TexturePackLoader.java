@@ -1584,7 +1584,10 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/hopper_inside", Texture.hopperInside),
         new SimpleTexture("assets/minecraft/textures/blocks/hopper_inside", Texture.hopperInside),
         new SimpleTexture("textures/blocks/hopper_inside", Texture.hopperInside)));
-    // TODO hopper top
+    allTextures.put("hopper_top", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/block/hopper_top", Texture.hopperTop),
+        new SimpleTexture("assets/minecraft/textures/blocks/hopper_top", Texture.hopperTop),
+        new SimpleTexture("textures/blocks/hopper_top", Texture.hopperTop)));
 
     // MC 1.6
     allTextures.put("hay_block_side", new AlternateTextures(

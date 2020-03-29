@@ -2077,7 +2077,7 @@ public class BlockSpec {
     private Block tripwireHook(Tag tag) {
         Tag properties = tag.get("Properties");
         String facing = getFacing(tag, "north");
-        String attached = properties.get("attached").stringValue("false"); // TODO!
+        String attached = properties.get("attached").stringValue("false");
         String powered = properties.get("powered").stringValue("false");
         return new TripwireHook(facing, attached.equals("true"), powered.equals("true"));
     }

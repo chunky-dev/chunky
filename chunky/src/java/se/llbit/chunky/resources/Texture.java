@@ -330,6 +330,7 @@ public class Texture {
   public static final Texture comparatorOn = new Texture();
   public static final Texture hopperOutside = new Texture();
   public static final Texture hopperInside = new Texture();
+  public static final Texture hopperTop = new Texture();
   public static final Texture slime = new Texture();
 
   // [1.6] Hay Block, Hardened Clay, Coal Block

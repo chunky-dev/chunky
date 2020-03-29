@@ -79,7 +79,11 @@ public class HopperModel {
     for (AABB box : boxes) {
       if (box.intersect(ray)) {
         if (ray.n.y > 0) {
-          Texture.hopperInside.getColor(ray);
+          if (box == boxes[boxes.length - 1]) {
+            Texture.hopperInside.getColor(ray);
+          } else {
+            Texture.hopperTop.getColor(ray);
+          }
         } else {
           Texture.hopperOutside.getColor(ray);
         }
