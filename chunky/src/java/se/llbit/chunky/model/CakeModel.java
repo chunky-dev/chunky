@@ -23,52 +23,63 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class CakeModel {
-  private static Quad[] quads = {
-      // front
-      new Quad(new Vector3(.9375, 0, .0625), new Vector3(.0625, 0, .0625),
-          new Vector3(.9375, .5, .0625), new Vector4(.9375, .0625, 0, .5)),
+    private static Quad[][] quads = new Quad[7][];
 
-      // back
-      new Quad(new Vector3(.0625, 0, .9375), new Vector3(.9375, 0, .9375),
-          new Vector3(.0625, .5, .9375), new Vector4(.0625, .9375, 0, .5)),
+    static {
+        int[] fromX = new int[]{1, 3, 5, 7, 9, 11, 13};
+        for (int i = 0; i < 7; i++) {
+            double xMin = fromX[i] / 16.0;
+            quads[i] = new Quad[]{
+                    // front
+                    new Quad(new Vector3(.9375, 0, .0625), new Vector3(xMin, 0, .0625),
+                            new Vector3(.9375, .5, .0625), new Vector4(.9375, xMin, 0, .5)),
 
-      // right
-      new Quad(new Vector3(.0625, 0, .0625), new Vector3(.0625, 0, .9375),
-          new Vector3(.0625, .5, .0625), new Vector4(.0625, .9375, 0, .5)),
+                    // back
+                    new Quad(new Vector3(xMin, 0, .9375), new Vector3(.9375, 0, .9375),
+                            new Vector3(xMin, .5, .9375), new Vector4(xMin, .9375, 0, .5)),
 
-      // left
-      new Quad(new Vector3(.9375, 0, .9375), new Vector3(.9375, 0, .0625),
-          new Vector3(.9375, .5, .9375), new Vector4(.9375, .0625, 0, .5)),
+                    // right
+                    new Quad(new Vector3(xMin, 0, .0625), new Vector3(xMin, 0, .9375),
+                            new Vector3(xMin, .5, .0625), new Vector4(0.0625, .9375, 0, .5)),
 
-      // top
-      new Quad(new Vector3(.9375, .5, .0625), new Vector3(.0625, .5, .0625),
-          new Vector3(.9375, .5, .9375), new Vector4(.9375, .0625, .0625, .9375)),
+                    // left
+                    new Quad(new Vector3(.9375, 0, .9375), new Vector3(.9375, 0, .0625),
+                            new Vector3(.9375, .5, .9375), new Vector4(.9375, 0.0625, 0, .5)),
 
-      // bottom
-      new Quad(new Vector3(.0625, 0, .0625), new Vector3(.9375, 0, .0625),
-          new Vector3(.0625, 0, .9375), new Vector4(.0625, .9375, .0625, .9375)),};
+                    // top
+                    new Quad(new Vector3(.9375, .5, .0625), new Vector3(xMin, .5, .0625),
+                            new Vector3(.9375, .5, .9375), new Vector4(.9375, xMin, .9375, .0625)),
 
-  public static boolean intersect(Ray ray) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (Quad quad : quads) {
-      if (quad.intersect(ray)) {
-        if (quad.n.y > 0)
-          Texture.cakeTop.getColor(ray);
-        else if (quad.n.y < 0)
-          Texture.cakeBottom.getColor(ray);
-        else
-          Texture.cakeSide.getColor(ray);
-        ray.n.set(quad.n);
-        ray.t = ray.tNext;
-        hit = true;
-      }
+                    // bottom
+                    new Quad(new Vector3(xMin, 0, .0625), new Vector3(.9375, 0, .0625),
+                            new Vector3(xMin, 0, .9375), new Vector4(xMin, .9375, .0625, .9375))
+            };
+        }
     }
-    if (hit) {
-      ray.color.w = 1;
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
+
+    public static boolean intersect(Ray ray, int bites) {
+        boolean hit = false;
+        ray.t = Double.POSITIVE_INFINITY;
+        for (Quad quad : quads[bites]) {
+            if (quad.intersect(ray)) {
+                if (quad.n.y > 0)
+                    Texture.cakeTop.getColor(ray);
+                else if (quad.n.y < 0)
+                    Texture.cakeBottom.getColor(ray);
+                else if (quad.n.x >= 0 || bites == 0)
+                    Texture.cakeSide.getColor(ray);
+                else
+                    Texture.cakeInside.getColor(ray);
+                ray.n.set(quad.n);
+                ray.t = ray.tNext;
+                hit = true;
+            }
+        }
+        if (hit) {
+            ray.color.w = 1;
+            ray.distance += ray.t;
+            ray.o.scaleAdd(ray.t, ray.d);
+        }
+        return hit;
     }
-    return hit;
-  }
 }
