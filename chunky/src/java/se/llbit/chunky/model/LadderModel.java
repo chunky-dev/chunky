@@ -26,19 +26,19 @@ import se.llbit.math.Vector4;
 public class LadderModel {
   protected static Quad[] quads = {
       // West.
-      new DoubleSidedQuad(new Vector3(1, 0, 0), new Vector3(1, 0, 1), new Vector3(1, 1, 0),
+      new DoubleSidedQuad(new Vector3(0.95, 0, 0), new Vector3(0.95, 0, 1), new Vector3(0.95, 1, 0),
           new Vector4(0, 1, 0, 1)),
 
       // East.
-      new DoubleSidedQuad(new Vector3(0, 0, 1), new Vector3(0, 0, 0), new Vector3(0, 1, 1),
+      new DoubleSidedQuad(new Vector3(0.05, 0, 1), new Vector3(0.05, 0, 0), new Vector3(0.05, 1, 1),
           new Vector4(1, 0, 0, 1)),
 
       // North.
-      new DoubleSidedQuad(new Vector3(1, 0, 1), new Vector3(0, 0, 1), new Vector3(1, 1, 1),
+      new DoubleSidedQuad(new Vector3(1, 0, 0.95), new Vector3(0, 0, 0.95), new Vector3(1, 1, 0.95),
           new Vector4(1, 0, 0, 1)),
 
       // South.
-      new DoubleSidedQuad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 1, 0),
+      new DoubleSidedQuad(new Vector3(0, 0, 0.05), new Vector3(1, 0, 0.05), new Vector3(0, 1, 0.05),
           new Vector4(0, 1, 0, 1)),
   };
 
