@@ -2434,6 +2434,8 @@ public class TexturePackLoader {
             Texture.skeleton));
     allTextures.put("wither",
         new EntityTextureLoader("assets/minecraft/textures/entity/wither/wither", Texture.wither));
+    allTextures.put("dragon",
+        new EntityTextureLoader("assets/minecraft/textures/entity/enderdragon/dragon", Texture.dragon));
 
     // Minecraft 1.10 blocks.
     allTextures.put("boneSide", new AlternateTextures(
