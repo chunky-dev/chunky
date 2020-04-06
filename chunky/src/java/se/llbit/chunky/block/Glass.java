@@ -6,13 +6,13 @@ import se.llbit.chunky.world.Material;
 public class Glass extends MinecraftBlock {
   public Glass(String name, Texture texture) {
     super(name, texture);
-    localIntersect = true;
     opaque = false;
     solid = true;
     ior = 1.52f;
   }
 
-  @Override public boolean isSameMaterial(Material other) {
-    return other instanceof Glass;
+  @Override
+  public boolean isSameMaterial(Material other) {
+    return other instanceof Glass && ((Glass) other).name.equals(this.name); // same name means same color
   }
 }
