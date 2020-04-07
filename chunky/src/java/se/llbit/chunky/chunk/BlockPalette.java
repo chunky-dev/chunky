@@ -88,9 +88,44 @@ public class BlockPalette {
     materialProperties.put("minecraft:lava", block -> {
       block.emittance = 1.0f;
     });
-    materialProperties.put("minecraft:glass", block -> {
+    Consumer<Block> glassConfig = block -> {
       block.ior = 1.52f;
-    });
+      block.refractive = true;
+    };
+    materialProperties.put("minecraft:glass", glassConfig);
+    materialProperties.put("minecraft:glass_pane", glassConfig);
+    materialProperties.put("minecraft:white_stained_glass", glassConfig);
+    materialProperties.put("minecraft:orange_stained_glass", glassConfig);
+    materialProperties.put("minecraft:magenta_stained_glass", glassConfig);
+    materialProperties.put("minecraft:light_blue_stained_glass", glassConfig);
+    materialProperties.put("minecraft:yellow_stained_glass", glassConfig);
+    materialProperties.put("minecraft:lime_stained_glass", glassConfig);
+    materialProperties.put("minecraft:pink_stained_glass", glassConfig);
+    materialProperties.put("minecraft:gray_stained_glass", glassConfig);
+    materialProperties.put("minecraft:light_gray_stained_glass", glassConfig);
+    materialProperties.put("minecraft:cyan_stained_glass", glassConfig);
+    materialProperties.put("minecraft:purple_stained_glass", glassConfig);
+    materialProperties.put("minecraft:blue_stained_glass", glassConfig);
+    materialProperties.put("minecraft:brown_stained_glass", glassConfig);
+    materialProperties.put("minecraft:green_stained_glass", glassConfig);
+    materialProperties.put("minecraft:red_stained_glass", glassConfig);
+    materialProperties.put("minecraft:black_stained_glass", glassConfig);
+    materialProperties.put("minecraft:white_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:orange_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:magenta_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:light_blue_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:yellow_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:lime_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:pink_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:gray_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:light_gray_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:cyan_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:purple_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:blue_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:brown_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:green_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:red_stained_glass_pane", glassConfig);
+    materialProperties.put("minecraft:black_stained_glass_pane", glassConfig);
     materialProperties.put("minecraft:gold_block", block -> {
       block.specular = 0.04f;
     });
@@ -196,10 +231,6 @@ public class BlockPalette {
         }
       }
     });
-    // TODO: handle glass panes (multiple different block names).
-    /*STAINED_GLASS.ior = 1.52f;
-    GLASSPANE.ior = 1.52f;
-    STAINED_GLASSPANE.ior = 1.52f;*/
   }
 
   /**
