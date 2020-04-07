@@ -86,6 +86,10 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -1472,14 +1476,14 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Save a snapshot
    */
-  public void saveSnapshot(File directory, TaskTracker progress) {
+  public void saveSnapshot(File directory, TaskTracker progress, int threadCount) {
     if (directory == null) {
       Log.error("Can't save snapshot: bad output directory!");
       return;
     }
     String fileName = String.format("%s-%d%s", name, spp, outputMode.getExtension());
     File targetFile = new File(directory, fileName);
-    computeAlpha(progress);
+    computeAlpha(progress, threadCount);
     if (!finalized) {
       postProcessFrame(progress);
     }
@@ -1488,11 +1492,9 @@ public class Scene implements JsonSerializable, Refreshable {
 
   /**
    * Save the current frame as a PNG image.
-   * @throws IOException
    */
-  public synchronized void saveFrame(File targetFile, TaskTracker progress)
-      throws IOException {
-    computeAlpha(progress);
+  public synchronized void saveFrame(File targetFile, TaskTracker progress, int threadCount) {
+    computeAlpha(progress, threadCount);
     if (!finalized) {
       postProcessFrame(progress);
     }
@@ -1502,20 +1504,32 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Compute the alpha channel.
    */
-  private void computeAlpha(TaskTracker progress) {
+  private void computeAlpha(TaskTracker progress, int threadCount) {
     if (transparentSky) {
       if (outputMode == OutputMode.TIFF_32) {
         Log.warn("Can not use transparent sky with TIFF output mode.");
       } else {
         try (TaskTracker.Task task = progress.task("Computing alpha channel")) {
-          WorkerState state = new WorkerState();
-          state.ray = new Ray();
-          for (int x = 0; x < width; ++x) {
-            task.update(width, x + 1);
-            for (int y = 0; y < height; ++y) {
-              computeAlpha(x, y, state);
-            }
+          ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+          AtomicInteger done = new AtomicInteger(0);
+          int colWidth = width / threadCount;
+          for (int x = 0; x < width; x += colWidth) {
+            final int currentX = x;
+            executor.submit(() -> {
+              WorkerState state = new WorkerState();
+              state.ray = new Ray();
+              for(int xc = currentX; xc < currentX + colWidth && xc < width; xc++) {
+                for (int y = 0; y < height; ++y) {
+                  computeAlpha(xc, y, state);
+                }
+                task.update(width, done.incrementAndGet());
+              }
+            });
           }
+          executor.shutdown();
+          executor.awaitTermination(1, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+          Log.warn("Failed to compute alpha channel", e);
         }
       }
     }

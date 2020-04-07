@@ -132,7 +132,7 @@ public class Chunky {
     renderer.setOnFrameCompleted((scene, spp) -> {
       if (SnapshotControl.DEFAULT.saveSnapshot(scene, spp)) {
         // Save the current frame.
-        scene.saveSnapshot(context.getSceneDirectory(), taskTracker);
+        scene.saveSnapshot(context.getSceneDirectory(), taskTracker, getRenderContext().numRenderThreads());
       }
 
       if (SnapshotControl.DEFAULT.saveRenderDump(scene, spp)) {
@@ -299,7 +299,7 @@ public class Chunky {
             System.out.println("Image output mode: TIFF32");
             break;
         }
-        scene.saveFrame(new File(options.imageOutputFile), taskTracker);
+        scene.saveFrame(new File(options.imageOutputFile), taskTracker, getRenderContext().numRenderThreads());
         System.out.println("Saved snapshot to " + options.imageOutputFile);
         return 0;
       }
