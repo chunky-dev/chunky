@@ -235,13 +235,13 @@ public class StandingBanner extends Entity {
         filename = "diagonal_left";
         break;
       case "rud":
-        filename = "diagonal_up_right";
+        filename = "diagonal_right"; // swapped in mc, see rd
         break;
       case "lud":
         filename = "diagonal_up_left";
         break;
       case "rd":
-        filename = "diagonal_right";
+        filename = "diagonal_up_right"; // swapped in mc, see rud
         break;
       case "vh":
         filename = "half_vertical";
