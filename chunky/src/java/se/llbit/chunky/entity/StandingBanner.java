@@ -312,6 +312,9 @@ public class StandingBanner extends Entity {
       case "moj":
         filename = "mojang";
         break;
+      case "pig":
+        filename = "piglin";
+        break;
     }
     if (filename.isEmpty()) {
       return Texture.bannerBase.getBitmap();
