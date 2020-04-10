@@ -1674,6 +1674,16 @@ public class BlockSpec {
                 return new MinecraftBlock("gilded_blackstone", Texture.gildedBlackstone);
             case "soul_campfire":
                 return new Campfire("soul_campfire", se.llbit.chunky.entity.Campfire.Kind.SOUL_CAMPFIRE, getFacing(tag, "north"), isLit(tag));
+            case "polished_blackstone":
+                return new MinecraftBlock("polished_blackstone", Texture.polishedBlackstone);
+            case "polished_blackstone_slab":
+                return slab(tag, Texture.polishedBlackstone);
+            case "polished_blackstone_stairs":
+                return stairs(tag, Texture.polishedBlackstone);
+            case "polished_blackstone_wall":
+                return wall(tag, Texture.polishedBlackstone);
+            case "chiseled_polished_blackstone":
+                return new MinecraftBlock("chiseled_polished_blackstone", Texture.chiseledPolishedBlackstone);
             case "structure_void":
             case "barrier":
                 // Invisible.

@@ -3455,6 +3455,8 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/gilded_blackstone", Texture.gildedBlackstone);
     addSimpleTexture("assets/minecraft/textures/block/soul_campfire_log_lit", Texture.soulCampfireLogLit);
     addSimpleTexture("assets/minecraft/textures/block/soul_campfire_fire", Texture.soulCampfireFire);
+    addSimpleTexture("assets/minecraft/textures/block/polished_blackstone", Texture.polishedBlackstone);
+    addSimpleTexture("assets/minecraft/textures/block/chiseled_polished_blackstone", Texture.chiseledPolishedBlackstone);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
