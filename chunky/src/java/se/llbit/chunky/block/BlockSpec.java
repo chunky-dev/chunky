@@ -1495,7 +1495,7 @@ public class BlockSpec {
                 return new SweetBerryBush(age);
             }
             case "campfire":
-                return new Campfire(getFacing(tag, "north"), isLit(tag));
+                return new Campfire("campfire", se.llbit.chunky.entity.Campfire.Kind.CAMPFIRE, getFacing(tag, "north"), isLit(tag));
             case "cut_sandstone_slab":
                 return slab(tag, Texture.sandstoneCut, Texture.sandstoneTop);
             case "cut_red_sandstone_slab":
@@ -1672,6 +1672,8 @@ public class BlockSpec {
                 return new MinecraftBlock("cracked_nether_bricks", Texture.crackedNetherBricks);
             case "gilded_blackstone":
                 return new MinecraftBlock("gilded_blackstone", Texture.gildedBlackstone);
+            case "soul_campfire":
+                return new Campfire("soul_campfire", se.llbit.chunky.entity.Campfire.Kind.SOUL_CAMPFIRE, getFacing(tag, "north"), isLit(tag));
             case "structure_void":
             case "barrier":
                 // Invisible.

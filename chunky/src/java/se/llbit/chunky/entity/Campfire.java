@@ -18,18 +18,36 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 public class Campfire extends Entity {
+    public enum Kind {
+        CAMPFIRE(1.0f),
+        SOUL_CAMPFIRE(0.6f);
+
+        final float emittance;
+
+        Kind(float emittance) {
+            this.emittance = emittance;
+        }
+    }
+
     private static final Texture log = Texture.campfireLog;
     private static final Texture litlog = Texture.campfireLogLit;
     private static final Texture fire = Texture.campfireFire;
+    private static final Texture soullitlog = Texture.soulCampfireLogLit;
+    private static final Texture soulfire = Texture.soulCampfireFire;
 
     private static final Texture[] tex = new Texture[]{
             log, log, log, log, log, log, log, log, log, log, log, log, log, log, log,
             log, log, log, log, log, log, log, log, log, log, log, log, log,
     };
 
-    private static final Texture[] texLit = new Texture[]{
+    private static final Texture[] texLitCampfire = new Texture[]{
             log, log, log, litlog, log, log, log, litlog, log, log, litlog, litlog, log, log, litlog,
             log, log, log, log, litlog, log, log, litlog, litlog, litlog, log, log, log, fire, fire, fire, fire
+    };
+
+    private static final Texture[] texLitSoulCampfire = new Texture[]{
+            log, log, log, soullitlog, log, log, log, soullitlog, log, log, soullitlog, soullitlog, log, log, soullitlog,
+            log, log, log, log, soullitlog, log, log, soullitlog, soullitlog, soullitlog, log, log, log, soulfire, soulfire, soulfire, soulfire
     };
 
     private static final Quad[] quads = new Quad[]{
@@ -237,21 +255,24 @@ public class Campfire extends Entity {
     }
 
     private static Quad rotateFire(Quad quad) {
-        double rotatedWidth = 14.4 * Math.cos(Math.toRadians(45));
+        double rotatedWidth = 14.4 * Math.cos(Math.toRadians(45)); // TODO rescale
         return new Quad(quad, Transform.NONE.rotateY(Math.toRadians(45)));
     }
 
+    private final Campfire.Kind kind;
     private final String facing;
     private final boolean isLit;
 
-    public Campfire(Vector3 position, String facing, boolean lit) {
+    public Campfire(Campfire.Kind kind, Vector3 position, String facing, boolean lit) {
         super(position);
+        this.kind = kind;
         this.facing = facing;
         this.isLit = lit;
     }
 
     public Campfire(JsonObject json) {
         super(JsonUtil.vec3FromJsonObject(json.get("position")));
+        this.kind = Campfire.Kind.valueOf(json.get("campfireKind").stringValue("CAMPFIRE"));
         this.facing = json.get("facing").stringValue("north");
         this.isLit = json.get("lit").boolValue(true);
     }
@@ -263,11 +284,11 @@ public class Campfire extends Entity {
                 .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
         int facing = getOrientationIndex(this.facing);
         int n = isLit ? orientedQuads[facing].length : orientedQuads[facing].length - 4;
-        Texture[] textures = isLit ? texLit : tex;
+        Texture[] textures = isLit ? (kind == Kind.SOUL_CAMPFIRE ? texLitSoulCampfire : texLitCampfire) : tex;
         for (int i = 0; i < n; i++) {
             Material material = new TextureMaterial(textures[i]);
             if (isLit && i >= n - 4) {
-                material.emittance = 1.0f;
+                material.emittance = kind.emittance;
             }
             orientedQuads[facing][i].addTriangles(faces, material, transform);
         }
@@ -278,6 +299,7 @@ public class Campfire extends Entity {
     public JsonValue toJson() {
         JsonObject json = new JsonObject();
         json.add("kind", "campfire");
+        json.add("campfireKind", kind.name());
         json.add("position", position.toJson());
         json.add("facing", facing);
         json.add("lit", isLit);

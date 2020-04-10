@@ -867,6 +867,8 @@ public class Texture {
   public static final Texture chiseledNetherBricks = new Texture();
   public static final Texture crackedNetherBricks = new Texture();
   public static final Texture gildedBlackstone = new Texture();
+  public static final Texture soulCampfireLogLit = new Texture();
+  public static final Texture soulCampfireFire = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
