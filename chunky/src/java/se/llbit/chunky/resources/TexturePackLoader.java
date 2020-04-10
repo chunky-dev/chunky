@@ -3450,6 +3450,9 @@ public class TexturePackLoader {
     allTextures.put("soul_fire_layer_1", new AnimatedTextureLoader("assets/minecraft/textures/block/soul_fire_1", Texture.soulFireLayer1));
     addSimpleTexture("assets/minecraft/textures/block/blackstone", Texture.blackstone);
     addSimpleTexture("assets/minecraft/textures/block/blackstone_top", Texture.blackstoneTop);
+    addSimpleTexture("assets/minecraft/textures/block/chiseled_nether_bricks", Texture.chiseledNetherBricks);
+    addSimpleTexture("assets/minecraft/textures/block/cracked_nether_bricks", Texture.crackedNetherBricks);
+    addSimpleTexture("assets/minecraft/textures/block/gilded_blackstone", Texture.gildedBlackstone);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

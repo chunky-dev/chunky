@@ -1666,6 +1666,12 @@ public class BlockSpec {
                 return stairs(tag, Texture.blackstone, Texture.blackstoneTop, Texture.blackstoneTop);
             case "blackstone_wall":
                 return wall(tag, Texture.blackstone);
+            case "chiseled_nether_bricks":
+                return new MinecraftBlock("chiseled_nether_bricks", Texture.chiseledNetherBricks);
+            case "cracked_nether_bricks":
+                return new MinecraftBlock("cracked_nether_bricks", Texture.crackedNetherBricks);
+            case "gilded_blackstone":
+                return new MinecraftBlock("gilded_blackstone", Texture.gildedBlackstone);
             case "structure_void":
             case "barrier":
                 // Invisible.
