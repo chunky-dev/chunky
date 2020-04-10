@@ -21,13 +21,20 @@ import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
 public class ChorusFlowerModel {
-  private static AABB[] boxes = {new AABB(0, 1, 2 / 16., 14 / 16., 2 / 16., 14 / 16.),
+  private static AABB[] boxes = {
+      new AABB(0, 1, 2 / 16., 14 / 16., 2 / 16., 14 / 16.),
       new AABB(2 / 16., 14 / 16., 0, 1, 2 / 16., 14 / 16.),
-      new AABB(2 / 16., 14 / 16., 2 / 16., 14 / 16., 0, 1),};
+      new AABB(2 / 16., 14 / 16., 2 / 16., 14 / 16., 0, 1),
+  };
 
   public static boolean intersect(Ray ray) {
+    int age = ray.getBlockData();
+    return intersect(ray, age);
+  }
+
+  public static boolean intersect(Ray ray, int age) {
     boolean hit = false;
-    Texture texture = ray.getBlockData() < 5 ? Texture.chorusFlower : Texture.chorusFlowerDead;
+    Texture texture = age < 5 ? Texture.chorusFlower : Texture.chorusFlowerDead;
     ray.t = Double.POSITIVE_INFINITY;
     for (AABB aabb : boxes) {
       if (aabb.intersect(ray)) {

@@ -52,6 +52,8 @@ public class Texture {
     }
   };
 
+  public static Texture black = new SolidColorTexture(new Vector4(0, 0, 0, 1));
+
   public static final Texture paintings = new Texture();
 
   public static final Texture air = new Texture("air");
@@ -75,6 +77,8 @@ public class Texture {
   public static final Texture cauldronInside = new Texture();
   public static final Texture cauldronTop = new Texture();
   public static final Texture cauldronBottom = new Texture();
+  public static final Texture smoothStone = new Texture();
+  public static final Texture smoothStoneSlabSide = new Texture();
   public static final Texture slabTop = new Texture("stone-slab");
   public static final Texture slabSide = new Texture("double-stone-slab");
   public static final Texture brick = new Texture("bricks");
@@ -145,13 +149,18 @@ public class Texture {
   public static final Texture jukeboxSide = new Texture();
   public static final Texture jukeboxTop = new Texture();
   public static final Texture torch = new Texture("torch");
-  public static final Texture woodenDoorTop = new Texture();
-  public static final Texture woodenDoorBottom = new Texture();
+  public static final Texture oakDoorTop = new Texture();
+  public static final Texture oakDoorBottom = new Texture();
   public static final Texture ironDoorTop = new Texture();
   public static final Texture ironDoorBottom = new Texture();
   public static final Texture ladder = new Texture("ladder");
   public static final Texture trapdoor = new Texture("trapdoor");
   public static final Texture ironTrapdoor = new Texture("trapdoor");
+  public static final Texture birchTrapdoor = new Texture("trapdoor");
+  public static final Texture spruceTrapdoor = new Texture("trapdoor");
+  public static final Texture jungleTrapdoor = new Texture("trapdoor");
+  public static final Texture acaciaTrapdoor = new Texture("trapdoor");
+  public static final Texture darkOakTrapdoor = new Texture("trapdoor");
   public static final Texture ironBars = new Texture("iron-bars");
   public static final Texture farmlandWet = new Texture();
   public static final Texture farmlandDry = new Texture();
@@ -172,12 +181,12 @@ public class Texture {
   public static final Texture sandstoneTop = new Texture();
   public static final Texture sandstoneBottom = new Texture();
   public static final Texture sandstoneDecorated = new Texture();
-  public static final Texture sandstoneSmooth = new Texture();
+  public static final Texture sandstoneCut = new Texture();
   public static final Texture redSandstoneSide = new Texture();
   public static final Texture redSandstoneTop = new Texture();
   public static final Texture redSandstoneBottom = new Texture();
   public static final Texture redSandstoneDecorated = new Texture();
-  public static final Texture redSandstoneSmooth = new Texture();
+  public static final Texture redSandstoneCut = new Texture();
   public static final Texture deadBush = new Texture("dead-bush");
   public static final Texture tallGrass = new Texture("tall-grass");
   public static final Texture fern = new Texture();
@@ -195,6 +204,7 @@ public class Texture {
   public static final Texture poweredRailOn = new Texture();
   public static final Texture poweredRailOff = new Texture();
   public static final Texture detectorRail = new Texture();
+  public static final Texture detectorRailOn = new Texture();
   public static final Texture activatorRail = new Texture();
   public static final Texture activatorRailPowered = new Texture();
   public static final Texture whiteWool = new Texture("wool");
@@ -320,6 +330,7 @@ public class Texture {
   public static final Texture comparatorOn = new Texture();
   public static final Texture hopperOutside = new Texture();
   public static final Texture hopperInside = new Texture();
+  public static final Texture hopperTop = new Texture();
   public static final Texture slime = new Texture();
 
   // [1.6] Hay Block, Hardened Clay, Coal Block
@@ -428,6 +439,7 @@ public class Texture {
   public static final Texture endRod = new Texture();
 
   // [1.11] Shulker boxes.
+  public static final ShulkerTexture shulker = new ShulkerTexture();
   public static final ShulkerTexture shulkerBlack = new ShulkerTexture();
   public static final ShulkerTexture shulkerBlue = new ShulkerTexture();
   public static final ShulkerTexture shulkerBrown = new ShulkerTexture();
@@ -447,6 +459,7 @@ public class Texture {
 
   // [1.11] Observer block.
   public static final Texture observerBack = new Texture();
+  public static final Texture observerBackOn = new Texture();
   public static final Texture observerFront = new Texture();
   public static final Texture observerSide = new Texture();
   public static final Texture observerTop = new Texture();
@@ -478,6 +491,7 @@ public class Texture {
   public static final EntityTexture creeper = new EntityTexture();
   public static final EntityTexture skeleton = new EntityTexture();
   public static final EntityTexture wither = new EntityTexture();
+  public static final EntityTexture dragon = new EntityTexture();
 
   // [1.10] Bone, magma, nether wart block, red nether brick.
   public static final Texture boneSide = new Texture();
@@ -590,6 +604,11 @@ public class Texture {
   public static final Texture acaciaWood = new Texture("wood");
   public static final Texture darkOakWood = new Texture("wood");
 
+  public static final Texture frostedIce0 = new Texture();
+  public static final Texture frostedIce1 = new Texture();
+  public static final Texture frostedIce2 = new Texture();
+  public static final Texture frostedIce3 = new Texture();
+
   public static final Texture spruceDoorTop = new Texture();
   public static final Texture birchDoorTop = new Texture();
   public static final Texture jungleDoorTop = new Texture();
@@ -601,6 +620,24 @@ public class Texture {
   public static final Texture jungleDoorBottom = new Texture();
   public static final Texture acaciaDoorBottom = new Texture();
   public static final Texture darkOakDoorBottom = new Texture();
+
+  public static final Texture strippedOakLog = new Texture();
+  public static final Texture strippedOakLogTop = new Texture();
+
+  public static final Texture strippedDarkOakLog = new Texture();
+  public static final Texture strippedDarkOakLogTop = new Texture();
+
+  public static final Texture strippedSpruceLog = new Texture();
+  public static final Texture strippedSpruceLogTop = new Texture();
+
+  public static final Texture strippedBirchLog = new Texture();
+  public static final Texture strippedBirchLogTop = new Texture();
+
+  public static final Texture strippedJungleLog = new Texture();
+  public static final Texture strippedJungleLogTop = new Texture();
+
+  public static final Texture strippedAcaciaLog = new Texture();
+  public static final Texture strippedAcaciaLogTop = new Texture();
 
   public static final Texture bedWhite = new Texture();
   public static final Texture bedOrange = new Texture();
@@ -618,6 +655,225 @@ public class Texture {
   public static final Texture bedGreen = new Texture();
   public static final Texture bedRed = new Texture();
   public static final Texture bedBlack = new Texture();
+
+  // [1.13]
+  public static final Texture kelp = new Texture();
+  public static final Texture kelpPlant = new Texture();
+  public static final Texture seagrass = new Texture();
+  public static final Texture tallSeagrassTop = new Texture();
+  public static final Texture tallSeagrassBottom = new Texture();
+
+  public static final Texture driedKelpSide = new Texture();
+  public static final Texture driedKelpTop = new Texture();
+  public static final Texture driedKelpBottom = new Texture();
+
+  public static final Texture tubeCoral = new Texture();
+  public static final Texture brainCoral = new Texture();
+  public static final Texture bubbleCoral = new Texture();
+  public static final Texture fireCoral = new Texture();
+  public static final Texture hornCoral = new Texture();
+
+  public static final Texture tubeCoralBlock = new Texture();
+  public static final Texture brainCoralBlock = new Texture();
+  public static final Texture bubbleCoralBlock = new Texture();
+  public static final Texture fireCoralBlock = new Texture();
+  public static final Texture hornCoralBlock = new Texture();
+
+  public static final Texture deadTubeCoralBlock = new Texture();
+  public static final Texture deadBrainCoralBlock = new Texture();
+  public static final Texture deadBubbleCoralBlock = new Texture();
+  public static final Texture deadFireCoralBlock = new Texture();
+  public static final Texture deadHornCoralBlock = new Texture();
+
+  public static final Texture tubeCoralFan = new Texture();
+  public static final Texture brainCoralFan = new Texture();
+  public static final Texture bubbleCoralFan = new Texture();
+  public static final Texture fireCoralFan = new Texture();
+  public static final Texture hornCoralFan = new Texture();
+
+  public static final Texture deadTubeCoral = new Texture();
+  public static final Texture deadBrainCoral = new Texture();
+  public static final Texture deadBubbleCoral = new Texture();
+  public static final Texture deadFireCoral = new Texture();
+  public static final Texture deadHornCoral = new Texture();
+
+  public static final Texture deadTubeCoralFan = new Texture();
+  public static final Texture deadBrainCoralFan = new Texture();
+  public static final Texture deadBubbleCoralFan = new Texture();
+  public static final Texture deadFireCoralFan = new Texture();
+  public static final Texture deadHornCoralFan = new Texture();
+
+  public static final Texture turtleEgg = new Texture();
+  public static final Texture turtleEggSlightlyCracked = new Texture();
+  public static final Texture turtleEggVeryCracked = new Texture();
+
+  public static final Texture blueIce = new Texture();
+  public static final Texture seaPickle = new Texture();
+  public static final Texture conduit = new Texture();
+  public static final Texture structureBlock = new Texture();
+  public static final Texture structureBlockCorner = new Texture();
+  public static final Texture structureBlockData = new Texture();
+  public static final Texture structureBlockLoad = new Texture();
+  public static final Texture structureBlockSave = new Texture();
+
+  // [1.14]
+  public static final Texture barrelTop = new Texture();
+  public static final Texture barrelSide = new Texture();
+  public static final Texture barrelBottom = new Texture();
+  public static final Texture loomBottom = new Texture();
+  public static final Texture loomFront = new Texture();
+  public static final Texture loomSide = new Texture();
+  public static final Texture loomTop = new Texture();
+  public static final Texture acaciaSignPost = new Texture();
+  public static final Texture birchSignPost = new Texture();
+  public static final Texture darkOakSignPost = new Texture();
+  public static final Texture jungleSignPost = new Texture();
+  public static final Texture oakSignPost = new Texture();
+  public static final Texture spruceSignPost = new Texture();
+  public static final Texture cartographyTableSide1 = new Texture();
+  public static final Texture cartographyTableSide2 = new Texture();
+  public static final Texture cartographyTableSide3 = new Texture();
+  public static final Texture cartographyTableTop = new Texture();
+  public static final Texture fletchingTableFront = new Texture();
+  public static final Texture fletchingTableSide = new Texture();
+  public static final Texture fletchingTableTop = new Texture();
+  public static final Texture smithingTableFront = new Texture();
+  public static final Texture smithingTableSide = new Texture();
+  public static final Texture smithingTableTop = new Texture();
+  public static final Texture smithingTableBottom = new Texture();
+  public static final Texture blastFurnaceTop = new Texture();
+  public static final Texture blastFurnaceSide = new Texture();
+  public static final Texture blastFurnaceFrontOn = new Texture();
+  public static final Texture blastFurnaceFront = new Texture();
+  public static final Texture smokerTop = new Texture();
+  public static final Texture smokerSide = new Texture();
+  public static final Texture smokerBottom = new Texture();
+  public static final Texture smokerFrontOn = new Texture();
+  public static final Texture smokerFront = new Texture();
+  public static final Texture sweetBerryBushStage0 = new Texture();
+  public static final Texture sweetBerryBushStage1 = new Texture();
+  public static final Texture sweetBerryBushStage2 = new Texture();
+  public static final Texture sweetBerryBushStage3 = new Texture();
+  public static final Texture cornflower = new Texture();
+  public static final Texture lilyOfTheValley = new Texture();
+  public static final Texture witherRose = new Texture();
+  public static final Texture bambooSapling = new Texture();
+  public static final Texture lecternBase = new Texture();
+  public static final Texture lecternFront = new Texture();
+  public static final Texture lecternSides = new Texture();
+  public static final Texture lecternTop = new Texture();
+  public static final Texture composterTop = new Texture();
+  public static final Texture composterBottom = new Texture();
+  public static final Texture composterSide = new Texture();
+  public static final Texture composterCompost = new Texture();
+  public static final Texture composterReady = new Texture();
+  public static final Texture bambooStalk = new Texture();
+  public static final Texture bambooSmallLeaves = new Texture();
+  public static final Texture bambooLargeLeaves = new Texture();
+  public static final Texture bambooSingleLeaf = new Texture();
+  public static final Texture stonecutterBottom = new Texture();
+  public static final Texture stonecutterTop = new Texture();
+  public static final Texture stonecutterSide = new Texture();
+  public static final Texture stonecutterSaw = new Texture();
+  public static final Texture grindstonePivot = new Texture();
+  public static final Texture grindstoneRound = new Texture();
+  public static final Texture grindstoneSide = new Texture();
+  public static final Texture campfireLog = new Texture();
+  public static final Texture campfireLogLit = new Texture();
+  public static final Texture campfireFire = new Texture();
+  public static final Texture lantern = new Texture();
+  public static final Texture bellBody = new Texture();
+  public static final Texture scaffoldingTop = new Texture();
+  public static final Texture scaffoldingSide = new Texture();
+  public static final Texture scaffoldingBottom = new Texture();
+
+  // [1.15]
+  public static final Texture honeyBlockTop = new Texture();
+  public static final Texture honeyBlockSide = new Texture();
+  public static final Texture honeyBlockBottom = new Texture();
+  public static final Texture beeNestFront = new Texture();
+  public static final Texture beeNestFrontHoney = new Texture();
+  public static final Texture beeNestSide = new Texture();
+  public static final Texture beeNestTop = new Texture();
+  public static final Texture beeNestBottom = new Texture();
+  public static final Texture beehiveFront = new Texture();
+  public static final Texture beehiveFrontHoney = new Texture();
+  public static final Texture beehiveSide = new Texture();
+  public static final Texture beehiveEnd = new Texture();
+  public static final Texture honeycombBlock = new Texture();
+
+  // [1.16]
+  public static final Texture soulSoil = new Texture();
+  public static final Texture crimsonNylium = new Texture();
+  public static final Texture crimsonNyliumSide = new Texture();
+  public static final Texture warpedNylium = new Texture();
+  public static final Texture warpedNyliumSide = new Texture();
+  public static final Texture netherGoldOre = new Texture();
+  public static final Texture targetSide = new Texture();
+  public static final Texture targetTop = new Texture();
+  public static final Texture netheriteBlock = new Texture();
+  public static final Texture shroomlight = new Texture();
+  public static final Texture warpedWartBlock = new Texture();
+  public static final Texture basaltSide = new Texture();
+  public static final Texture basaltTop = new Texture();
+  public static final Texture polishedBasaltSide = new Texture();
+  public static final Texture polishedBasaltTop = new Texture();
+  public static final Texture ancientDebrisSide = new Texture();
+  public static final Texture ancientDebrisTop = new Texture();
+  public static final Texture warpedFungus = new Texture();
+  public static final Texture crimsonFungus = new Texture();
+  public static final Texture netherSprouts = new Texture();
+  public static final Texture warpedRoots = new Texture();
+  public static final Texture crimsonRoots = new Texture();
+  public static final Texture cryingObsidian = new Texture();
+  public static final Texture warpedStem = new Texture();
+  public static final Texture warpedStemTop = new Texture();
+  public static final Texture strippedWarpedStem = new Texture();
+  public static final Texture strippedWarpedStemTop = new Texture();
+  public static final Texture crimsonStem = new Texture();
+  public static final Texture crimsonStemTop = new Texture();
+  public static final Texture strippedCrimsonStem = new Texture();
+  public static final Texture strippedCrimsonStemTop = new Texture();
+  public static final Texture soulFireLantern = new Texture();
+  public static final Texture twistingVines = new Texture();
+  public static final Texture twistingVinesPlant = new Texture();
+  public static final Texture weepingVines = new Texture();
+  public static final Texture weepingVinesPlant = new Texture();
+  public static final Texture soulFireTorch = new Texture();
+  public static final Texture respawnAnchorTop = new Texture();
+  public static final Texture respawnAnchorBottom = new Texture();
+  public static final Texture respawnAnchorSide0 = new Texture();
+  public static final Texture respawnAnchorSide1 = new Texture();
+  public static final Texture respawnAnchorSide2 = new Texture();
+  public static final Texture respawnAnchorSide3 = new Texture();
+  public static final Texture respawnAnchorSide4 = new Texture();
+  public static final Texture crimsonSignPost = new Texture();
+  public static final Texture warpedSignPost = new Texture();
+  public static final Texture crimsonPlanks = new Texture();
+  public static final Texture warpedPlanks = new Texture();
+  public static final Texture crimsonDoorTop = new Texture();
+  public static final Texture crimsonDoorBottom = new Texture();
+  public static final Texture warpedDoorTop = new Texture();
+  public static final Texture warpedDoorBottom = new Texture();
+  public static final Texture crimsonTrapdoor = new Texture();
+  public static final Texture warpedTrapdoor = new Texture();
+  public static final Texture soulFire = new Texture();
+  public static final AnimatedTexture soulFireLayer0 = new AnimatedTexture("soul_fire");
+  public static final AnimatedTexture soulFireLayer1 = new AnimatedTexture("soul_fire");
+  public static final Texture lodestoneSide = new Texture();
+  public static final Texture lodestoneTop = new Texture();
+  public static final Texture blackstone = new Texture();
+  public static final Texture blackstoneTop = new Texture();
+  public static final Texture chiseledNetherBricks = new Texture();
+  public static final Texture crackedNetherBricks = new Texture();
+  public static final Texture gildedBlackstone = new Texture();
+  public static final Texture soulCampfireLogLit = new Texture();
+  public static final Texture soulCampfireFire = new Texture();
+  public static final Texture polishedBlackstone = new Texture();
+  public static final Texture chiseledPolishedBlackstone = new Texture();
+  public static final Texture polishedBlackstoneBricks = new Texture();
+  public static final Texture crackedPolishedBlackstoneBricks = new Texture();
+  public static final Texture quartzBricks = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

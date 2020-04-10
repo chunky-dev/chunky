@@ -30,10 +30,15 @@ public class TripwireModel {
 
       // east-west
       new Quad(new Vector3(1, 1 / 16., 7.75 / 16), new Vector3(0, 1 / 16., 7.75 / 16),
-          new Vector3(1, 1 / 16., 8.25 / 16), new Vector4(0, 1, 14 / 16., 1)),};
+          new Vector3(1, 1 / 16., 8.25 / 16), new Vector4(0, 1, 14 / 16., 1)),
+  };
 
   public static boolean intersection(Ray ray) {
     int direction = (ray.getCurrentData() >> 12) & 1;
+    return intersection(ray, direction);
+  }
+
+  public static boolean intersection(Ray ray, int direction) {
     ray.t = Double.POSITIVE_INFINITY;
     Quad quad = wire[direction];
     if (quad.intersect(ray)) {

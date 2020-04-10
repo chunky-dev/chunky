@@ -19,6 +19,11 @@ package se.llbit.chunky.model;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.UVTriangle;
+import se.llbit.math.Vector3;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Utility methods for quads and triangles.
@@ -63,6 +68,21 @@ public class Model {
   }
 
   /**
+   * @param src   source quads
+   * @return Quads rotated about the X axis by some angle
+   */
+  public static Quad[] rotateX(Quad[] src, double angle, Vector3 origin) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].transform(Transform.NONE
+              .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
+              .rotateX(angle)
+              .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5));
+    }
+    return rot;
+  }
+
+  /**
    * @param src source quads
    * @return Quads rotated 90 degrees around the Y axis
    */
@@ -70,6 +90,31 @@ public class Model {
     Quad[] rot = new Quad[src.length];
     for (int i = 0; i < src.length; ++i) {
       rot[i] = src[i].transform(Transform.NONE.rotateY());
+    }
+    return rot;
+  }
+
+  /**
+   * @param src source quads
+   * @return Quads rotated 0, 90, 180 and 270 degrees around the Y axis
+   */
+  public static Quad[][] rotateYNESW(Quad[] src) {
+    Quad[][] rot = new Quad[4][];
+    rot[0] = src;
+    rot[1] = rotateY(rot[0]);
+    rot[2] = rotateY(rot[1]);
+    rot[3] = rotateY(rot[2]);
+    return rot;
+  }
+
+  /**
+   * @param src source quads
+   * @return Quads rotated 90 degrees around the negative Y axis
+   */
+  public static Quad[] rotateNegY(Quad[] src) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i].transform(Transform.NONE.rotateNegY());
     }
     return rot;
   }
@@ -149,4 +194,15 @@ public class Model {
     return out;
   }
 
+  /**
+   * @param models source quads
+   * @return All quads merged into a single array
+   */
+  public static Quad[] join(Quad[]...models) {
+    List<Quad> all = new ArrayList<>();
+    for (Quad[] quads : models) {
+      Collections.addAll(all, quads);
+    }
+    return all.toArray(new Quad[all.size()]);
+  }
 }

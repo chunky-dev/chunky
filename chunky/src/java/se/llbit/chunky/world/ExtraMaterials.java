@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExtraMaterials {
+  public static final Map<String, Material> collections = new HashMap<>();
   public static final Map<String, Material> idMap = new HashMap<>();
   static {
     idMap.put("cloud", CloudMaterial.INSTANCE);

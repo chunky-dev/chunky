@@ -179,8 +179,15 @@ public class ChestModel {
   }
 
   public static boolean intersect(Ray ray, Texture[] texture) {
+    int type = ray.getCurrentData() >> 16;
+    int facing = ray.getBlockData();
+    return intersect(ray, texture, type, facing);
+  }
+
+  public static boolean intersect(Ray ray, Texture[] texture,
+      int type, int facing) {
     boolean hit = false;
-    Quad[] rot = variants[(ray.getCurrentData() >> 16) % 3][ray.getBlockData() % 6];
+    Quad[] rot = variants[type % 3][facing % 6];
     ray.t = Double.POSITIVE_INFINITY;
     for (int i = 0; i < rot.length; ++i) {
       Quad side = rot[i];

@@ -105,6 +105,7 @@ public class TexturePackLoader {
         new SimpleTexture("environment/sun", Sun.texture),// MC 1.5
         new SimpleTexture("terrain/sun", Sun.texture)));
     allTextures.put("sign", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/entity/signs/oak", Texture.signPost),// MC 1.14
         new SimpleTexture("assets/minecraft/textures/entity/sign", Texture.signPost),// MC 1.6
         new SimpleTexture("item/sign", Texture.signPost)));
     allTextures.put("clouds", new AlternateTextures(
@@ -153,11 +154,13 @@ public class TexturePackLoader {
         new IndexedTexture(0x04, Texture.oakPlanks)));
     allTextures.put("stone slab side", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/stone_slab_side", Texture.slabSide),
+        new SimpleTexture("assets/minecraft/textures/block/stone", Texture.slabSide),
         new SimpleTexture("assets/minecraft/textures/blocks/stone_slab_side", Texture.slabSide),
         new SimpleTexture("textures/blocks/stoneslab_side", Texture.slabSide),
         new IndexedTexture(0x05, Texture.slabSide)));
     allTextures.put("stone slab top", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/stone_slab_top", Texture.slabTop),
+        new SimpleTexture("assets/minecraft/textures/block/stone", Texture.slabTop),
         new SimpleTexture("assets/minecraft/textures/blocks/stone_slab_top", Texture.slabTop),
         new SimpleTexture("textures/blocks/stoneslab_top", Texture.slabTop),
         new IndexedTexture(0x06, Texture.slabTop)));
@@ -544,13 +547,13 @@ public class TexturePackLoader {
         new IndexedTexture(0x50, Texture.torch)));
     allTextures.put("oak_door_upper", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/oak_door_top",
-            Texture.woodenDoorTop),
+            Texture.oakDoorTop),
         new SimpleTexture("assets/minecraft/textures/blocks/oak_door_upper",
-            Texture.woodenDoorTop),
+            Texture.oakDoorTop),
         new SimpleTexture("assets/minecraft/textures/blocks/door_wood_upper",
-            Texture.woodenDoorTop),
-        new SimpleTexture("textures/blocks/doorWood_upper", Texture.woodenDoorTop),
-        new IndexedTexture(0x51, Texture.woodenDoorTop)));
+            Texture.oakDoorTop),
+        new SimpleTexture("textures/blocks/doorWood_upper", Texture.oakDoorTop),
+        new IndexedTexture(0x51, Texture.oakDoorTop)));
     allTextures.put("iron_door_upper", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/iron_door_top", Texture.ironDoorTop),
         new SimpleTexture("assets/minecraft/textures/blocks/iron_door_upper", Texture.ironDoorTop),
@@ -640,13 +643,13 @@ public class TexturePackLoader {
         new IndexedTexture(0x60, Texture.lever)));
     allTextures.put("oak_door_lower", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/oak_door_bottom",
-            Texture.woodenDoorBottom),
+            Texture.oakDoorBottom),
         new SimpleTexture("assets/minecraft/textures/blocks/oak_door_lower",
-            Texture.woodenDoorBottom),
+            Texture.oakDoorBottom),
         new SimpleTexture("assets/minecraft/textures/blocks/door_wood_lower",
-            Texture.woodenDoorBottom),
-        new SimpleTexture("textures/blocks/doorWood_lower", Texture.woodenDoorBottom),
-        new IndexedTexture(0x61, Texture.woodenDoorBottom)));
+            Texture.oakDoorBottom),
+        new SimpleTexture("textures/blocks/doorWood_lower", Texture.oakDoorBottom),
+        new IndexedTexture(0x61, Texture.oakDoorBottom)));
     allTextures.put("iron_door_lower", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/iron_door_bottom",
             Texture.ironDoorBottom),
@@ -1252,6 +1255,10 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/rail_detector", Texture.detectorRail),
         new SimpleTexture("textures/blocks/detectorRail", Texture.detectorRail),
         new IndexedTexture(0xC3, Texture.detectorRail)));
+    // Since 1.5:
+    allTextures.put("detector_rail_on", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/block/detector_rail_on", Texture.detectorRailOn),
+        new SimpleTexture("assets/minecraft/textures/blocks/rail_detector_powered", Texture.detectorRailOn)));
     allTextures.put("jungle_leaves", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/jungle_leaves",
             Texture.jungleTreeLeaves),
@@ -1444,13 +1451,13 @@ public class TexturePackLoader {
         new IndexedTexture(0xE5, Texture.sandstoneDecorated)));
     allTextures.put("sandstone_smooth", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/cut_sandstone",
-            Texture.sandstoneSmooth),
+            Texture.sandstoneCut),
         new SimpleTexture("assets/minecraft/textures/blocks/cut_sandstone",
-            Texture.sandstoneSmooth),
+            Texture.sandstoneCut),
         new SimpleTexture("assets/minecraft/textures/blocks/sandstone_smooth",
-            Texture.sandstoneSmooth),
-        new SimpleTexture("textures/blocks/sandstone_smooth", Texture.sandstoneSmooth),
-        new IndexedTexture(0xE6, Texture.sandstoneSmooth)));
+            Texture.sandstoneCut),
+        new SimpleTexture("textures/blocks/sandstone_smooth", Texture.sandstoneCut),
+        new IndexedTexture(0xE6, Texture.sandstoneCut)));
     allTextures.put("anvil_top", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/anvil_top", Texture.anvilTop),
         new SimpleTexture("assets/minecraft/textures/blocks/anvil_top", Texture.anvilTop),
@@ -1577,7 +1584,10 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/hopper_inside", Texture.hopperInside),
         new SimpleTexture("assets/minecraft/textures/blocks/hopper_inside", Texture.hopperInside),
         new SimpleTexture("textures/blocks/hopper_inside", Texture.hopperInside)));
-    // TODO hopper top
+    allTextures.put("hopper_top", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/block/hopper_top", Texture.hopperTop),
+        new SimpleTexture("assets/minecraft/textures/blocks/hopper_top", Texture.hopperTop),
+        new SimpleTexture("textures/blocks/hopper_top", Texture.hopperTop)));
 
     // MC 1.6
     allTextures.put("hay_block_side", new AlternateTextures(
@@ -1757,9 +1767,9 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/blocks/glass_lime", Texture.limeGlass)));
     allTextures.put("glass_magenta", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/magenta_stained_glass",
-            Texture.limeGlass),
+            Texture.magentaGlass),
         new SimpleTexture("assets/minecraft/textures/blocks/magenta_stained_glass",
-            Texture.limeGlass),
+            Texture.magentaGlass),
         new SimpleTexture("assets/minecraft/textures/blocks/glass_magenta", Texture.magentaGlass)));
     allTextures.put("glass_orange", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/orange_stained_glass",
@@ -2268,11 +2278,11 @@ public class TexturePackLoader {
             Texture.redSandstoneDecorated)));
     allTextures.put("red_sandstone_smooth", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/cut_red_sandstone",
-            Texture.redSandstoneSmooth),
+            Texture.redSandstoneCut),
         new SimpleTexture("assets/minecraft/textures/blocks/cut_red_sandstone",
-            Texture.redSandstoneSmooth),
+            Texture.redSandstoneCut),
         new SimpleTexture("assets/minecraft/textures/blocks/red_sandstone_smooth",
-            Texture.redSandstoneSmooth)));
+            Texture.redSandstoneCut)));
 
     allTextures.put("spruce_door_upper", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/spruce_door_top",
@@ -2390,6 +2400,15 @@ public class TexturePackLoader {
         new SimpleTexture("assets/minecraft/textures/block/end_rod", Texture.endRod),
         new SimpleTexture("assets/minecraft/textures/blocks/end_rod", Texture.endRod)));
 
+    allTextures.put("frosted_ice_0",
+        new SimpleTexture("assets/minecraft/textures/block/frosted_ice_0", Texture.frostedIce0));
+    allTextures.put("frosted_ice_1",
+        new SimpleTexture("assets/minecraft/textures/block/frosted_ice_1", Texture.frostedIce1));
+    allTextures.put("frosted_ice_2",
+        new SimpleTexture("assets/minecraft/textures/block/frosted_ice_2", Texture.frostedIce2));
+    allTextures.put("frosted_ice_3",
+        new SimpleTexture("assets/minecraft/textures/block/frosted_ice_3", Texture.frostedIce3));
+
     allTextures.put("fire_layer_0", new AlternateTextures(
         new AnimatedTextureLoader("assets/minecraft/textures/block/fire_0", Texture.fireLayer0),
         new AnimatedTextureLoader("assets/minecraft/textures/blocks/fire_layer_0",
@@ -2418,6 +2437,8 @@ public class TexturePackLoader {
             Texture.skeleton));
     allTextures.put("wither",
         new EntityTextureLoader("assets/minecraft/textures/entity/wither/wither", Texture.wither));
+    allTextures.put("dragon",
+        new EntityTextureLoader("assets/minecraft/textures/entity/enderdragon/dragon", Texture.dragon));
 
     // Minecraft 1.10 blocks.
     allTextures.put("boneSide", new AlternateTextures(
@@ -2441,6 +2462,10 @@ public class TexturePackLoader {
             Texture.redNetherBrick)));
 
     // [1.11] Shulker boxes.
+    allTextures.put("shulker",
+        new ShulkerTextureLoader(
+            "assets/minecraft/textures/entity/shulker/shulker",
+            Texture.shulker));
     allTextures.put("shulkerBlack",
         new ShulkerTextureLoader(
             "assets/minecraft/textures/entity/shulker/shulker_black",
@@ -2515,6 +2540,9 @@ public class TexturePackLoader {
             Texture.observerBack),
         new SimpleTexture("assets/minecraft/textures/blocks/observer_back",
             Texture.observerBack)));
+    allTextures.put("observer_back_on",
+        new SimpleTexture("assets/minecraft/textures/block/observer_back_on",
+            Texture.observerBackOn));
     allTextures.put("observer_front", new AlternateTextures(
         new SimpleTexture("assets/minecraft/textures/block/observer_front",
             Texture.observerFront),
@@ -2983,6 +3011,464 @@ public class TexturePackLoader {
 
     allTextures.put("armor_stand",
         new SimpleTexture("assets/minecraft/textures/entity/armorstand/wood", Texture.armorStand));
+
+    // Minecraft 1.13
+    allTextures.put("stripped_oak_log",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_oak_log",
+            Texture.strippedOakLog));
+    allTextures.put("stripped_oak_log_top",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_oak_log_top",
+            Texture.strippedOakLogTop));
+
+    allTextures.put("stripped_spruce_log",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_spruce_log",
+            Texture.strippedSpruceLog));
+    allTextures.put("stripped_spruce_log_top",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_spruce_log_top",
+            Texture.strippedSpruceLogTop));
+
+    allTextures.put("stripped_birch_log",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_birch_log",
+            Texture.strippedBirchLog));
+    allTextures.put("stripped_birch_log_top",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_birch_log_top",
+            Texture.strippedBirchLogTop));
+
+    allTextures.put("stripped_jungle_log",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_jungle_log",
+            Texture.strippedJungleLog));
+    allTextures.put("stripped_jungle_log_top",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_jungle_log_top",
+            Texture.strippedJungleLogTop));
+
+    allTextures.put("stripped_acacia_log",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_acacia_log",
+            Texture.strippedAcaciaLog));
+    allTextures.put("stripped_acacia_log_top",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_acacia_log_top",
+            Texture.strippedAcaciaLogTop));
+
+    allTextures.put("stripped_dark_oak_log",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_dark_oak_log",
+            Texture.strippedDarkOakLog));
+    allTextures.put("stripped_dark_oak_log_top",
+        new SimpleTexture("assets/minecraft/textures/block/stripped_dark_oak_log_top",
+            Texture.strippedDarkOakLogTop));
+
+    allTextures.put("birch_trapdoor",
+        new SimpleTexture("assets/minecraft/textures/block/birch_trapdoor", Texture.birchTrapdoor));
+    allTextures.put("spruce_trapdoor",
+        new SimpleTexture("assets/minecraft/textures/block/spruce_trapdoor", Texture.spruceTrapdoor));
+    allTextures.put("jungle_trapdoor",
+        new SimpleTexture("assets/minecraft/textures/block/jungle_trapdoor", Texture.jungleTrapdoor));
+    allTextures.put("acacia_trapdoor",
+        new SimpleTexture("assets/minecraft/textures/block/acacia_trapdoor", Texture.acaciaTrapdoor));
+    allTextures.put("dark_oak_trapdoor",
+        new SimpleTexture("assets/minecraft/textures/block/dark_oak_trapdoor", Texture.darkOakTrapdoor));
+
+    allTextures.put("kelp",
+        new SimpleTexture("assets/minecraft/textures/block/kelp", Texture.kelp));
+    allTextures.put("kelp_plant",
+        new SimpleTexture("assets/minecraft/textures/block/kelp_plant", Texture.kelpPlant));
+
+    allTextures.put("seagrass",
+        new SimpleTexture("assets/minecraft/textures/block/seagrass", Texture.seagrass));
+    allTextures.put("tall_seagrass_top",
+        new SimpleTexture("assets/minecraft/textures/block/tall_seagrass_top", Texture.tallSeagrassTop));
+    allTextures.put("tall_seagrass_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/tall_seagrass_bottom", Texture.tallSeagrassBottom));
+
+    allTextures.put("dried_kelp_side",
+        new SimpleTexture("assets/minecraft/textures/block/dried_kelp_side",
+            Texture.driedKelpSide));
+    allTextures.put("dried_kelp_top",
+        new SimpleTexture("assets/minecraft/textures/block/dried_kelp_top",
+            Texture.driedKelpTop));
+    allTextures.put("dried_kelp_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/dried_kelp_bottom",
+            Texture.driedKelpBottom));
+
+    allTextures.put("tube_coral",
+        new SimpleTexture("assets/minecraft/textures/block/tube_coral",
+            Texture.tubeCoral));
+    allTextures.put("brain_coral",
+        new SimpleTexture("assets/minecraft/textures/block/brain_coral",
+            Texture.brainCoral));
+    allTextures.put("bubble_coral",
+        new SimpleTexture("assets/minecraft/textures/block/bubble_coral",
+            Texture.bubbleCoral));
+    allTextures.put("fire_coral",
+        new SimpleTexture("assets/minecraft/textures/block/fire_coral",
+            Texture.fireCoral));
+    allTextures.put("horn_coral",
+        new SimpleTexture("assets/minecraft/textures/block/horn_coral",
+            Texture.hornCoral));
+
+    allTextures.put("tube_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/tube_coral_block",
+            Texture.tubeCoralBlock));
+    allTextures.put("brain_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/brain_coral_block",
+            Texture.brainCoralBlock));
+    allTextures.put("bubble_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/bubble_coral_block",
+            Texture.bubbleCoralBlock));
+    allTextures.put("fire_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/fire_coral_block",
+            Texture.fireCoralBlock));
+    allTextures.put("horn_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/horn_coral_block",
+            Texture.hornCoralBlock));
+
+    allTextures.put("dead_tube_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/dead_tube_coral_block",
+            Texture.deadTubeCoralBlock));
+    allTextures.put("dead_brain_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/dead_brain_coral_block",
+            Texture.deadBrainCoralBlock));
+    allTextures.put("dead_bubble_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/dead_bubble_coral_block",
+            Texture.deadBubbleCoralBlock));
+    allTextures.put("dead_fire_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/dead_fire_coral_block",
+            Texture.deadFireCoralBlock));
+    allTextures.put("dead_horn_coral_block",
+        new SimpleTexture("assets/minecraft/textures/block/dead_horn_coral_block",
+            Texture.deadHornCoralBlock));
+
+    allTextures.put("tube_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/tube_coral_fan",
+            Texture.tubeCoralFan));
+    allTextures.put("brain_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/brain_coral_fan",
+            Texture.brainCoralFan));
+    allTextures.put("bubble_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/bubble_coral_fan",
+            Texture.bubbleCoralFan));
+    allTextures.put("fire_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/fire_coral_fan",
+            Texture.fireCoralFan));
+    allTextures.put("horn_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/horn_coral_fan",
+            Texture.hornCoralFan));
+
+    allTextures.put("dead_tube_coral",
+        new SimpleTexture("assets/minecraft/textures/block/dead_tube_coral",
+            Texture.deadTubeCoral));
+    allTextures.put("dead_brain_coral",
+        new SimpleTexture("assets/minecraft/textures/block/dead_brain_coral",
+            Texture.deadBrainCoral));
+    allTextures.put("dead_bubble_coral",
+        new SimpleTexture("assets/minecraft/textures/block/dead_bubble_coral",
+            Texture.deadBubbleCoral));
+    allTextures.put("dead_fire_coral",
+        new SimpleTexture("assets/minecraft/textures/block/dead_fire_coral",
+            Texture.deadFireCoral));
+    allTextures.put("dead_horn_coral",
+        new SimpleTexture("assets/minecraft/textures/block/dead_horn_coral",
+            Texture.deadHornCoral));
+
+    allTextures.put("dead_tube_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/dead_tube_coral_fan",
+            Texture.deadTubeCoralFan));
+    allTextures.put("dead_brain_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/dead_brain_coral_fan",
+            Texture.deadBrainCoralFan));
+    allTextures.put("dead_bubble_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/dead_bubble_coral_fan",
+            Texture.deadBubbleCoralFan));
+    allTextures.put("dead_fire_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/dead_fire_coral_fan",
+            Texture.deadFireCoralFan));
+    allTextures.put("dead_horn_coral_fan",
+        new SimpleTexture("assets/minecraft/textures/block/dead_horn_coral_fan",
+            Texture.deadHornCoralFan));
+
+    allTextures.put("turtle_egg",
+        new SimpleTexture("assets/minecraft/textures/block/turtle_egg",
+            Texture.turtleEgg));
+    allTextures.put("turtle_egg_slightly_cracked",
+        new SimpleTexture("assets/minecraft/textures/block/turtle_egg_slightly_cracked",
+            Texture.turtleEggSlightlyCracked));
+    allTextures.put("turtle_egg_very_cracked",
+        new SimpleTexture("assets/minecraft/textures/block/turtle_egg_very_cracked",
+            Texture.turtleEggVeryCracked));
+
+    allTextures.put("blue_ice",
+        new SimpleTexture("assets/minecraft/textures/block/blue_ice",
+            Texture.blueIce));
+    allTextures.put("sea_pickle",
+        new SimpleTexture("assets/minecraft/textures/block/sea_pickle",
+            Texture.seaPickle));
+    allTextures.put("conduit",
+        new SimpleTexture("assets/minecraft/textures/block/conduit",
+            Texture.conduit));
+    allTextures.put("structure_block",
+        new SimpleTexture("assets/minecraft/textures/block/structure_block",
+            Texture.structureBlock));
+    allTextures.put("structure_block_corner",
+        new SimpleTexture("assets/minecraft/textures/block/structure_block_corner",
+            Texture.structureBlockCorner));
+    allTextures.put("structure_block_data",
+        new SimpleTexture("assets/minecraft/textures/block/structure_block_data",
+            Texture.structureBlockData));
+    allTextures.put("structure_block_load",
+        new SimpleTexture("assets/minecraft/textures/block/structure_block_load",
+            Texture.structureBlockLoad));
+    allTextures.put("structure_block_save",
+        new SimpleTexture("assets/minecraft/textures/block/structure_block_save",
+            Texture.structureBlockSave));
+
+    // Minecraft 1.14
+    allTextures.put("barrel_top",
+        new SimpleTexture("assets/minecraft/textures/block/barrel_top",
+            Texture.barrelTop));
+    allTextures.put("barrel_side",
+        new SimpleTexture("assets/minecraft/textures/block/barrel_side",
+            Texture.barrelSide));
+    allTextures.put("barrel_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/barrel_bottom",
+            Texture.barrelBottom));
+
+    allTextures.put("loom_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/loom_bottom",
+            Texture.loomBottom));
+    allTextures.put("loom_front",
+        new SimpleTexture("assets/minecraft/textures/block/loom_front",
+            Texture.loomFront));
+    allTextures.put("loom_side",
+        new SimpleTexture("assets/minecraft/textures/block/loom_side",
+            Texture.loomSide));
+    allTextures.put("loom_top",
+        new SimpleTexture("assets/minecraft/textures/block/loom_top",
+            Texture.loomTop));
+
+    allTextures.put("sign_acacia",
+        new SimpleTexture("assets/minecraft/textures/entity/signs/acacia", Texture.acaciaSignPost));
+    allTextures.put("sign_birch",
+        new SimpleTexture("assets/minecraft/textures/entity/signs/birch", Texture.birchSignPost));
+    allTextures.put("sign_dark_oak",
+        new SimpleTexture("assets/minecraft/textures/entity/signs/dark_oak", Texture.darkOakSignPost));
+    allTextures.put("sign_jungle",
+        new SimpleTexture("assets/minecraft/textures/entity/signs/jungle", Texture.jungleSignPost));
+    allTextures.put("sign_oak",
+        new SimpleTexture("assets/minecraft/textures/entity/signs/oak", Texture.oakSignPost));
+    allTextures.put("sign_spruce",
+        new SimpleTexture("assets/minecraft/textures/entity/signs/spruce", Texture.spruceSignPost));
+
+    allTextures.put("cartography_table_side1",
+        new SimpleTexture("assets/minecraft/textures/block/cartography_table_side1",
+            Texture.cartographyTableSide1));
+    allTextures.put("cartography_table_side2",
+        new SimpleTexture("assets/minecraft/textures/block/cartography_table_side2",
+            Texture.cartographyTableSide2));
+    allTextures.put("cartography_table_side3",
+        new SimpleTexture("assets/minecraft/textures/block/cartography_table_side3",
+            Texture.cartographyTableSide3));
+    allTextures.put("cartography_table_top",
+        new SimpleTexture("assets/minecraft/textures/block/cartography_table_top",
+            Texture.cartographyTableTop));
+
+    allTextures.put("fletching_table_front",
+        new SimpleTexture("assets/minecraft/textures/block/fletching_table_front",
+            Texture.fletchingTableFront));
+    allTextures.put("fletching_table_top",
+        new SimpleTexture("assets/minecraft/textures/block/fletching_table_top",
+            Texture.fletchingTableTop));
+    allTextures.put("fletching_table_side",
+        new SimpleTexture("assets/minecraft/textures/block/fletching_table_side",
+            Texture.fletchingTableSide));
+
+    allTextures.put("smithing_table_front",
+        new SimpleTexture("assets/minecraft/textures/block/smithing_table_front",
+            Texture.smithingTableFront));
+    allTextures.put("smithing_table_top",
+        new SimpleTexture("assets/minecraft/textures/block/smithing_table_top",
+            Texture.smithingTableTop));
+    allTextures.put("smithing_table_side",
+        new SimpleTexture("assets/minecraft/textures/block/smithing_table_side",
+            Texture.smithingTableSide));
+    allTextures.put("smithing_table_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/smithing_table_bottom",
+            Texture.smithingTableBottom));
+
+    allTextures.put("blast_furnace_top",
+        new SimpleTexture("assets/minecraft/textures/block/blast_furnace_top",
+            Texture.blastFurnaceTop));
+    allTextures.put("blast_furnace_side",
+        new SimpleTexture("assets/minecraft/textures/block/blast_furnace_side",
+            Texture.blastFurnaceSide));
+    allTextures.put("blast_furnace_front",
+        new SimpleTexture("assets/minecraft/textures/block/blast_furnace_front",
+            Texture.blastFurnaceFront));
+    allTextures.put("blast_furnace_front_on",
+        new SimpleTexture("assets/minecraft/textures/block/blast_furnace_front_on",
+            Texture.blastFurnaceFrontOn));
+
+    allTextures.put("smoker_top",
+        new SimpleTexture("assets/minecraft/textures/block/smoker_top",
+            Texture.smokerTop));
+    allTextures.put("smoker_bottom",
+        new SimpleTexture("assets/minecraft/textures/block/smoker_bottom",
+            Texture.smokerBottom));
+    allTextures.put("smoker_side",
+        new SimpleTexture("assets/minecraft/textures/block/smoker_side",
+            Texture.smokerSide));
+    allTextures.put("smoker_front",
+        new SimpleTexture("assets/minecraft/textures/block/smoker_front",
+            Texture.smokerFront));
+    allTextures.put("smoker_front_on",
+        new SimpleTexture("assets/minecraft/textures/block/smoker_front_on",
+            Texture.smokerFrontOn));
+
+    addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage0", Texture.sweetBerryBushStage0);
+    addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage1", Texture.sweetBerryBushStage1);
+    addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage2", Texture.sweetBerryBushStage2);
+    addSimpleTexture("assets/minecraft/textures/block/sweet_berry_bush_stage3", Texture.sweetBerryBushStage3);
+
+    addSimpleTexture("assets/minecraft/textures/block/cornflower", Texture.cornflower);
+    addSimpleTexture("assets/minecraft/textures/block/lily_of_the_valley", Texture.lilyOfTheValley);
+    addSimpleTexture("assets/minecraft/textures/block/wither_rose", Texture.witherRose);
+    addSimpleTexture("assets/minecraft/textures/block/bamboo_stage0", Texture.bambooSapling);
+
+    addSimpleTexture("assets/minecraft/textures/block/lectern_base", Texture.lecternBase);
+    addSimpleTexture("assets/minecraft/textures/block/lectern_front", Texture.lecternFront);
+    addSimpleTexture("assets/minecraft/textures/block/lectern_sides", Texture.lecternSides);
+    addSimpleTexture("assets/minecraft/textures/block/lectern_top", Texture.lecternTop);
+
+    addSimpleTexture("assets/minecraft/textures/block/composter_top", Texture.composterTop);
+    addSimpleTexture("assets/minecraft/textures/block/composter_bottom", Texture.composterBottom);
+    addSimpleTexture("assets/minecraft/textures/block/composter_side", Texture.composterSide);
+    addSimpleTexture("assets/minecraft/textures/block/composter_compost", Texture.composterCompost);
+    addSimpleTexture("assets/minecraft/textures/block/composter_ready", Texture.composterReady);
+
+    addSimpleTexture("assets/minecraft/textures/block/smooth_stone", Texture.smoothStone);
+    addSimpleTexture("assets/minecraft/textures/block/smooth_stone_slab_side", Texture.smoothStoneSlabSide);
+
+    addSimpleTexture("assets/minecraft/textures/block/bamboo_stalk", Texture.bambooStalk);
+    addSimpleTexture("assets/minecraft/textures/block/bamboo_small_leaves", Texture.bambooSmallLeaves);
+    addSimpleTexture("assets/minecraft/textures/block/bamboo_large_leaves", Texture.bambooLargeLeaves);
+    addSimpleTexture("assets/minecraft/textures/block/bamboo_singleleaf", Texture.bambooSingleLeaf);
+
+    addSimpleTexture("assets/minecraft/textures/block/stonecutter_bottom", Texture.stonecutterBottom);
+    addSimpleTexture("assets/minecraft/textures/block/stonecutter_top", Texture.stonecutterTop);
+    addSimpleTexture("assets/minecraft/textures/block/stonecutter_side", Texture.stonecutterSide);
+    addSimpleTexture("assets/minecraft/textures/block/stonecutter_saw", Texture.stonecutterSaw);
+
+    addSimpleTexture("assets/minecraft/textures/block/grindstone_pivot", Texture.grindstonePivot);
+    addSimpleTexture("assets/minecraft/textures/block/grindstone_round", Texture.grindstoneRound);
+    addSimpleTexture("assets/minecraft/textures/block/grindstone_side", Texture.grindstoneSide);
+
+    addSimpleTexture("assets/minecraft/textures/block/campfire_log", Texture.campfireLog);
+    addSimpleTexture("assets/minecraft/textures/block/campfire_log_lit", Texture.campfireLogLit);
+    addSimpleTexture("assets/minecraft/textures/block/campfire_fire", Texture.campfireFire);
+
+    addSimpleTexture("assets/minecraft/textures/block/lantern", Texture.lantern);
+
+    addSimpleTexture("assets/minecraft/textures/entity/bell/bell_body", Texture.bellBody);
+
+    addSimpleTexture("assets/minecraft/textures/block/scaffolding_top", Texture.scaffoldingTop);
+    addSimpleTexture("assets/minecraft/textures/block/scaffolding_side", Texture.scaffoldingSide);
+    addSimpleTexture("assets/minecraft/textures/block/scaffolding_bottom", Texture.scaffoldingBottom);
+
+    // Minecraft 1.15
+    addSimpleTexture("assets/minecraft/textures/block/honey_block_top", Texture.honeyBlockTop);
+    addSimpleTexture("assets/minecraft/textures/block/honey_block_side", Texture.honeyBlockSide);
+    addSimpleTexture("assets/minecraft/textures/block/honey_block_bottom", Texture.honeyBlockBottom);
+
+    addSimpleTexture("assets/minecraft/textures/block/beehive_end", Texture.beehiveEnd);
+    addSimpleTexture("assets/minecraft/textures/block/beehive_side", Texture.beehiveSide);
+    addSimpleTexture("assets/minecraft/textures/block/beehive_front", Texture.beehiveFront);
+    addSimpleTexture("assets/minecraft/textures/block/beehive_front_honey", Texture.beehiveFrontHoney);
+
+    addSimpleTexture("assets/minecraft/textures/block/bee_nest_top", Texture.beeNestTop);
+    addSimpleTexture("assets/minecraft/textures/block/bee_nest_bottom", Texture.beeNestBottom);
+    addSimpleTexture("assets/minecraft/textures/block/bee_nest_side", Texture.beeNestSide);
+    addSimpleTexture("assets/minecraft/textures/block/bee_nest_front", Texture.beeNestFront);
+    addSimpleTexture("assets/minecraft/textures/block/bee_nest_front_honey", Texture.beeNestFrontHoney);
+
+    addSimpleTexture("assets/minecraft/textures/block/honeycomb_block", Texture.honeycombBlock);
+
+    // Minecraft 1.16
+    addSimpleTexture("assets/minecraft/textures/block/soul_soil", Texture.soulSoil);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_nylium", Texture.crimsonNylium);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_nylium_side", Texture.crimsonNyliumSide);
+    addSimpleTexture("assets/minecraft/textures/block/warped_nylium", Texture.warpedNylium);
+    addSimpleTexture("assets/minecraft/textures/block/warped_nylium_side", Texture.warpedNyliumSide);
+    addSimpleTexture("assets/minecraft/textures/block/nether_gold_ore", Texture.netherGoldOre);
+    addSimpleTexture("assets/minecraft/textures/block/target_top", Texture.targetTop);
+    addSimpleTexture("assets/minecraft/textures/block/target_side", Texture.targetSide);
+    addSimpleTexture("assets/minecraft/textures/block/netherite_block", Texture.netheriteBlock);
+    addSimpleTexture("assets/minecraft/textures/block/shroomlight", Texture.shroomlight);
+    addSimpleTexture("assets/minecraft/textures/block/warped_wart_block", Texture.warpedWartBlock);
+    addSimpleTexture("assets/minecraft/textures/block/basalt_top", Texture.basaltTop);
+    addSimpleTexture("assets/minecraft/textures/block/basalt_side", Texture.basaltSide);
+    addSimpleTexture("assets/minecraft/textures/block/polished_basalt_top", Texture.polishedBasaltTop);
+    addSimpleTexture("assets/minecraft/textures/block/polished_basalt_side", Texture.polishedBasaltSide);
+    addSimpleTexture("assets/minecraft/textures/block/ancient_debris_top", Texture.ancientDebrisTop);
+    addSimpleTexture("assets/minecraft/textures/block/ancient_debris_side", Texture.ancientDebrisSide);
+    addSimpleTexture("assets/minecraft/textures/block/warped_fungus", Texture.warpedFungus);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_fungus", Texture.crimsonFungus);
+    addSimpleTexture("assets/minecraft/textures/block/nether_sprouts", Texture.netherSprouts);
+    addSimpleTexture("assets/minecraft/textures/block/warped_roots", Texture.warpedRoots);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_roots", Texture.crimsonRoots);
+    addSimpleTexture("assets/minecraft/textures/block/crying_obsidian", Texture.cryingObsidian);
+    addSimpleTexture("assets/minecraft/textures/block/warped_stem", Texture.warpedStem);
+    addSimpleTexture("assets/minecraft/textures/block/warped_stem_top", Texture.warpedStemTop);
+    addSimpleTexture("assets/minecraft/textures/block/stripped_warped_stem", Texture.strippedWarpedStem);
+    addSimpleTexture("assets/minecraft/textures/block/stripped_warped_stem_top", Texture.strippedWarpedStemTop);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_stem", Texture.crimsonStem);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_stem_top", Texture.crimsonStemTop);
+    addSimpleTexture("assets/minecraft/textures/block/stripped_crimson_stem", Texture.strippedCrimsonStem);
+    addSimpleTexture("assets/minecraft/textures/block/stripped_crimson_stem_top", Texture.strippedCrimsonStemTop);
+    addSimpleTexture("assets/minecraft/textures/block/soul_fire_lantern", Texture.soulFireLantern);
+    addSimpleTexture("assets/minecraft/textures/block/twisting_vines", Texture.twistingVines);
+    addSimpleTexture("assets/minecraft/textures/block/twisting_vines_plant", Texture.twistingVinesPlant);
+    addSimpleTexture("assets/minecraft/textures/block/weeping_vines", Texture.weepingVines);
+    addSimpleTexture("assets/minecraft/textures/block/weeping_vines_plant", Texture.weepingVinesPlant);
+    addSimpleTexture("assets/minecraft/textures/block/soul_fire_torch", Texture.soulFireTorch);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_top", Texture.respawnAnchorTop);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_bottom", Texture.respawnAnchorBottom);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side0", Texture.respawnAnchorSide0);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side1", Texture.respawnAnchorSide1);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side2", Texture.respawnAnchorSide2);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side3", Texture.respawnAnchorSide3);
+    addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side4", Texture.respawnAnchorSide4);
+    addSimpleTexture("assets/minecraft/textures/entity/signs/crimson", Texture.crimsonSignPost);
+    addSimpleTexture("assets/minecraft/textures/entity/signs/warped", Texture.warpedSignPost);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_planks", Texture.crimsonPlanks);
+    addSimpleTexture("assets/minecraft/textures/block/warped_planks", Texture.warpedPlanks);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_door_top", Texture.crimsonDoorTop);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_door_bottom", Texture.crimsonDoorBottom);
+    addSimpleTexture("assets/minecraft/textures/block/warped_door_top", Texture.warpedDoorTop);
+    addSimpleTexture("assets/minecraft/textures/block/warped_door_bottom", Texture.warpedDoorBottom);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_trapdoor", Texture.crimsonTrapdoor);
+    addSimpleTexture("assets/minecraft/textures/block/warped_trapdoor", Texture.warpedTrapdoor);
+    addSimpleTexture("assets/minecraft/textures/block/lodestone_side", Texture.lodestoneSide);
+    addSimpleTexture("assets/minecraft/textures/block/lodestone_top", Texture.lodestoneTop);
+    allTextures.put("soul_fire_layer_0", new AnimatedTextureLoader("assets/minecraft/textures/block/soul_fire_0", Texture.soulFireLayer0));
+    allTextures.put("soul_fire_layer_1", new AnimatedTextureLoader("assets/minecraft/textures/block/soul_fire_1", Texture.soulFireLayer1));
+    addSimpleTexture("assets/minecraft/textures/block/blackstone", Texture.blackstone);
+    addSimpleTexture("assets/minecraft/textures/block/blackstone_top", Texture.blackstoneTop);
+    addSimpleTexture("assets/minecraft/textures/block/chiseled_nether_bricks", Texture.chiseledNetherBricks);
+    addSimpleTexture("assets/minecraft/textures/block/cracked_nether_bricks", Texture.crackedNetherBricks);
+    addSimpleTexture("assets/minecraft/textures/block/gilded_blackstone", Texture.gildedBlackstone);
+    addSimpleTexture("assets/minecraft/textures/block/soul_campfire_log_lit", Texture.soulCampfireLogLit);
+    addSimpleTexture("assets/minecraft/textures/block/soul_campfire_fire", Texture.soulCampfireFire);
+    addSimpleTexture("assets/minecraft/textures/block/polished_blackstone", Texture.polishedBlackstone);
+    addSimpleTexture("assets/minecraft/textures/block/chiseled_polished_blackstone", Texture.chiseledPolishedBlackstone);
+    addSimpleTexture("assets/minecraft/textures/block/polished_blackstone_bricks", Texture.polishedBlackstoneBricks);
+    addSimpleTexture("assets/minecraft/textures/block/cracked_polished_blackstone_bricks", Texture.crackedPolishedBlackstoneBricks);
+    addSimpleTexture("assets/minecraft/textures/block/quartz_bricks", Texture.quartzBricks);
+  }
+
+  private static void addSimpleTexture(String file, Texture texture) {
+    String[] path = file.split("/");
+    addSimpleTexture(path[path.length - 1], file, texture);
+  }
+
+  private static void addSimpleTexture(String name, String file, Texture texture) {
+    allTextures.put(name, new SimpleTexture(file, texture));
   }
 
   private static String[] texturePacks = { };

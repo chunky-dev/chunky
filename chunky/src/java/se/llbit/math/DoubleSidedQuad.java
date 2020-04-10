@@ -23,7 +23,7 @@ package se.llbit.math;
  */
 public class DoubleSidedQuad extends Quad {
 
-  private DoubleSidedQuad(Quad other, Transform t) {
+  public DoubleSidedQuad(Quad other, Transform t) {
     super(other, t);
   }
 

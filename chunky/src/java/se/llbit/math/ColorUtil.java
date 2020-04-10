@@ -303,4 +303,32 @@ public final class ColorUtil {
     getRGBAComponents(argb, rgba);
     return Color.color(rgba[0], rgba[1], rgba[2], rgba[3]);
   }
+
+  /**
+   * Overlay the two colors. The result is written into the first vector.
+   * @param target RGBA color vector, will be set to the result
+   * @param overlayColor Second color (RGBA)
+   */
+  public static void overlayColor(Vector4 target, float[] overlayColor) {
+    double a = overlayColor[3];
+    double alpha = (1 - target.w) * a + target.w;
+    target.x = ((1 - target.w) * a * overlayColor[0] + target.w * target.x) / alpha;
+    target.y = ((1 - target.w) * a * overlayColor[1] + target.w * target.y) / alpha;
+    target.z = ((1 - target.w) * a * overlayColor[2] + target.w * target.z) / alpha;
+    target.w = alpha;
+  }
+
+  /**
+   * Overlay the two colors. The result is written into the first vector.
+   * @param target RGBA color vector, will be set to the result
+   * @param overlayColor Second color vector (RGBA)
+   */
+  public static void overlayColor(Vector4 target, Vector4 overlayColor) {
+    double a = overlayColor.w;
+    double alpha = (1 - target.w) * a + target.w;
+    target.x = ((1 - target.w) * a * overlayColor.x + target.w * target.x) / alpha;
+    target.y = ((1 - target.w) * a * overlayColor.y + target.w * target.y) / alpha;
+    target.z = ((1 - target.w) * a * overlayColor.z + target.w * target.z) / alpha;
+    target.w = alpha;
+  }
 }

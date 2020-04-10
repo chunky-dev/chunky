@@ -137,10 +137,14 @@ public class ComparatorModel {
    * @return <code>true</code> if the block was intersected
    */
   public static boolean intersect(Ray ray, int powered) {
-    boolean hit = false;
     int data = ray.getBlockData();
     int direction = data & 3;
     int active = (data >> 2) & 1;
+    return intersect(ray, direction, active, powered);
+  }
+
+  public static boolean intersect(Ray ray, int direction, int active, int powered) {
+    boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     for (Quad face : rot[direction]) {
       if (face.intersect(ray)) {

@@ -26,7 +26,7 @@ public abstract class Material {
   /**
    * The name of this material.
    */
-  protected final String name;
+  public final String name;
 
   /**
    * Index of refraction.
@@ -75,7 +75,12 @@ public abstract class Material {
    */
   public boolean subSurfaceScattering = false;
 
-  protected final Texture texture;
+  /** Base texture. */
+  public final Texture texture;
+
+  public boolean refractive = false;
+
+  public boolean waterlogged = false;
 
   public Material(String name, Texture texture) {
     this.name = name;
@@ -111,5 +116,13 @@ public abstract class Material {
 
   public boolean isWater() {
     return false;
+  }
+
+  public boolean isWaterFilled() {
+    return waterlogged || isWater();
+  }
+
+  public boolean isSameMaterial(Material other) {
+    return other == this;
   }
 }

@@ -86,9 +86,13 @@ public class DirectionalBlockModel {
    * texture, and texture[2] is the side texture.
    */
   public static boolean intersect(Ray ray, Texture[] textures) {
+    int direction = ray.getBlockData() & 7;
+    return intersect(ray, textures, direction);
+  }
+
+  public static boolean intersect(Ray ray, Texture[] textures, int direction) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
-    int direction = ray.getBlockData() & 7;
     for (int i = 0; i < 6; ++i) {
       Quad face = faces[direction][i];
       if (face.intersect(ray)) {

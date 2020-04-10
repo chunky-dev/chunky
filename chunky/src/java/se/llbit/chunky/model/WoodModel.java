@@ -52,7 +52,6 @@ public class WoodModel {
       // bottom
       new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1),
           new Vector4(0, 1, 0, 1)),
-
   };
 
   private static final int[][] textureIndex =

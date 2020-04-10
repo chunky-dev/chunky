@@ -32,20 +32,26 @@ import se.llbit.math.Vector4;
 public class MelonStemModel {
 
   private static final Quad[][] growth = new Quad[8][2];
-  private static final Quad[] ripe =
-      {new DoubleSidedQuad(new Vector3(0, 0, .5), new Vector3(1, 0, .5), new Vector3(0, 1, .5),
+  private static final Quad[] ripe = {
+      new DoubleSidedQuad(new Vector3(0, 0, .5), new Vector3(1, 0, .5), new Vector3(0, 1, .5),
           new Vector4(0, 1, 0, 1)),
-          new DoubleSidedQuad(new Vector3(0, 0, .5), new Vector3(1, 0, .5),
-              new Vector3(0, 1, .5), new Vector4(1, 0, 0, 1)),
-          new DoubleSidedQuad(new Vector3(.5, 0, 0), new Vector3(.5, 0, 1),
-              new Vector3(.5, 1, 0), new Vector4(0, 1, 0, 1)),
-          new DoubleSidedQuad(new Vector3(.5, 0, 0), new Vector3(.5, 0, 1),
-              new Vector3(.5, 1, 0), new Vector4(1, 0, 0, 1)),};
-  private static final double[][] stemColor =
-      {{0, 0xE2 / 255., 0x10 / 255.}, {0, 0xE2 / 255., 0x10 / 255.}, {0, 0xE2 / 255., 0x10 / 255.},
-          {0, 0xCC / 255., 0x06 / 255.}, {0x5F / 255., 0xC8 / 255., 0x03 / 255.},
-          {0x65 / 255., 0xC2 / 255., 0x06 / 255.}, {0xA0 / 255., 0xB8 / 255., 0},
-          {0xBF / 255., 0xB6 / 255., 0},};
+      new DoubleSidedQuad(new Vector3(0, 0, .5), new Vector3(1, 0, .5),
+          new Vector3(0, 1, .5), new Vector4(1, 0, 0, 1)),
+      new DoubleSidedQuad(new Vector3(.5, 0, 0), new Vector3(.5, 0, 1),
+          new Vector3(.5, 1, 0), new Vector4(0, 1, 0, 1)),
+      new DoubleSidedQuad(new Vector3(.5, 0, 0), new Vector3(.5, 0, 1),
+          new Vector3(.5, 1, 0), new Vector4(1, 0, 0, 1)),
+  };
+  private static final double[][] stemColor = {
+      {0, 0xE2 / 255., 0x10 / 255.},
+      {0, 0xE2 / 255., 0x10 / 255.},
+      {0, 0xE2 / 255., 0x10 / 255.},
+      {0, 0xCC / 255., 0x06 / 255.},
+      {0x5F / 255., 0xC8 / 255., 0x03 / 255.},
+      {0x65 / 255., 0xC2 / 255., 0x06 / 255.},
+      {0xA0 / 255., 0xB8 / 255., 0},
+      {0xBF / 255., 0xB6 / 255., 0},
+  };
 
   static {
     for (int height = 0; height < 8; ++height) {

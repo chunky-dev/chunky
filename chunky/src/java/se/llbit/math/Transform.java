@@ -145,6 +145,25 @@ public class Transform {
   }
 
   /**
+   * Rotation by 90 degrees around the negative Y axis.
+   */
+  public final Transform rotateNegY() {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 o) {
+        double tmp = o.x;
+        o.x = o.z;
+        o.z = -tmp;
+      }
+
+      @Override public void applyRotScale(Vector3 o) {
+        double tmp = o.x;
+        o.x = o.z;
+        o.z = -tmp;
+      }
+    });
+  }
+
+  /**
    * Rotation by 90 degrees around the X axis
    */
   public final Transform rotateX() {
