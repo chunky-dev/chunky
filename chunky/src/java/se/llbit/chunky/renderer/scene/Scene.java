@@ -69,11 +69,7 @@ import se.llbit.nbt.Tag;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
 import se.llbit.tiff.TiffFileWriter;
-import se.llbit.util.JsonSerializable;
-import se.llbit.util.MCDownloader;
-import se.llbit.util.NotNull;
-import se.llbit.util.TaskTracker;
-import se.llbit.util.ZipExport;
+import se.llbit.util.*;
 
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -1525,12 +1521,25 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void postProcessFrame(TaskTracker progress) {
     try (TaskTracker.Task task = progress.task("Finalizing frame")) {
-      for (int x = 0; x < width; ++x) {
-        task.update(width, x + 1);
-        for (int y = 0; y < height; ++y) {
-          finalizePixel(x, y);
-        }
+      int threadCount=16;
+      ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+      AtomicInteger done = new AtomicInteger(0);
+      int colWidth = width / threadCount;
+      for (int x = 0; x < width; x += colWidth) {
+        final int currentX = x;
+        executor.submit(() -> {
+          for(int xc = currentX; xc < currentX + colWidth && xc < width; xc++) {
+            for (int y = 0; y < height; ++y) {
+              finalizePixel(xc, y);
+            }
+            task.update(width, done.incrementAndGet());
+          }
+        });
       }
+      executor.shutdown();
+      executor.awaitTermination(1, TimeUnit.DAYS);
+    } catch (InterruptedException e) {
+      Log.error("Finalizing frame failed", e);
     }
   }
 
