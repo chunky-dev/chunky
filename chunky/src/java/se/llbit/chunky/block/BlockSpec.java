@@ -2139,13 +2139,7 @@ public class BlockSpec {
         String east = properties.get("east").stringValue("false");
         String west = properties.get("west").stringValue("false");
         String up = properties.get("up").stringValue("false");
-        // TODO [1.16] "true"/"false" becomes "low"/"tall"/"none", with a different block model for "tall"
-        return new Wall(name, texture,
-                north.equals("true") || north.equals("low") || north.equals("tall"),
-                south.equals("true") || south.equals("low") || south.equals("tall"),
-                east.equals("true") || east.equals("low") || east.equals("tall"),
-                west.equals("true") || west.equals("low") || west.equals("tall"),
-                up.equals("true"));
+        return new Wall(name, texture, north, south, east, west, up.equals("true"));
     }
 
     private Block skull(Tag tag, EntityTexture texture, SkullEntity.Kind type) {
