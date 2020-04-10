@@ -871,6 +871,7 @@ public class Texture {
   public static final Texture soulCampfireFire = new Texture();
   public static final Texture polishedBlackstone = new Texture();
   public static final Texture chiseledPolishedBlackstone = new Texture();
+  public static final Texture polishedBlackstoneBricks = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
