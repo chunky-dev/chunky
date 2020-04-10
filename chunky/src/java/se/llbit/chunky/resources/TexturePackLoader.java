@@ -3448,6 +3448,8 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/lodestone_top", Texture.lodestoneTop);
     allTextures.put("soul_fire_layer_0", new AnimatedTextureLoader("assets/minecraft/textures/block/soul_fire_0", Texture.soulFireLayer0));
     allTextures.put("soul_fire_layer_1", new AnimatedTextureLoader("assets/minecraft/textures/block/soul_fire_1", Texture.soulFireLayer1));
+    addSimpleTexture("assets/minecraft/textures/block/blackstone", Texture.blackstone);
+    addSimpleTexture("assets/minecraft/textures/block/blackstone_top", Texture.blackstoneTop);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

@@ -862,6 +862,8 @@ public class Texture {
   public static final AnimatedTexture soulFireLayer1 = new AnimatedTexture("soul_fire");
   public static final Texture lodestoneSide = new Texture();
   public static final Texture lodestoneTop = new Texture();
+  public static final Texture blackstone = new Texture();
+  public static final Texture blackstoneTop = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

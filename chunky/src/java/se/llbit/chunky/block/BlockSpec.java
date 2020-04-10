@@ -1658,6 +1658,14 @@ public class BlockSpec {
                 return new SoulFire();
             case "lodestone":
                 return new TexturedBlock("lodestone", Texture.lodestoneSide, Texture.lodestoneTop);
+            case "blackstone":
+                return new TexturedBlock("blackstone", Texture.blackstone, Texture.blackstoneTop, Texture.blackstone);
+            case "blackstone_slab":
+                return slab(tag, Texture.blackstoneTop, Texture.blackstoneTop);
+            case "blackstone_stairs":
+                return stairs(tag, Texture.blackstone, Texture.blackstoneTop, Texture.blackstoneTop);
+            case "blackstone_wall":
+                return wall(tag, Texture.blackstone);
             case "structure_void":
             case "barrier":
                 // Invisible.
@@ -2097,11 +2105,12 @@ public class BlockSpec {
         String east = properties.get("east").stringValue("false");
         String west = properties.get("west").stringValue("false");
         String up = properties.get("up").stringValue("false");
+        // TODO [1.16] "true"/"false" becomes "low"/"tall"/"none", with a different block model for "tall"
         return new Wall(name, texture,
-                north.equals("true"),
-                south.equals("true"),
-                east.equals("true"),
-                west.equals("true"),
+                north.equals("true") || north.equals("low") || north.equals("tall"),
+                south.equals("true") || south.equals("low") || south.equals("tall"),
+                east.equals("true") || east.equals("low") || east.equals("tall"),
+                west.equals("true") || west.equals("low") || west.equals("tall"),
                 up.equals("true"));
     }
 
