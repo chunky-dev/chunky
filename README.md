@@ -26,7 +26,7 @@ If you have any questions, please don't hesitate to reach out via Reddit, Discor
 ## Frequently Asked Questions
 
 <details>
-<summary>Why is there noise/grain/random bright dots in the render?</summary>
+<summary><strong>Why is there noise/grain/random bright dots in the render?</strong></summary>
 
 This is not a bug, but an unfortunate effect of [the rendering algorithm][9] used in Chunky. Torches and other small light sources cause a very random illumination and it takes a long time to render such light nicely.
 
@@ -37,13 +37,13 @@ Another way of removing the noise is using the [Denoiser Plugin][10]. While this
 </details>
 
 <details>
-<summary>How long does it take to render an image?</summary>
+<summary><strong>How long does it take to render an image?</strong></summary>
 
 This depends on your CPU, the size of the image and the lighting conditions of the scene you are rendering. You can use the tips from the previous answer to get away with shorter render times.
 </details>
 
 <details>
-<summary>Why do I see blue question marks or red crosses instead of blocks?</summary>
+<summary><strong>Why do I see blue question marks or red crosses instead of blocks?</strong></summary>
 
 Chunky renders blue question marks for unsupported blocks. Maybe your Chunky version is outdated or the block is not yet supported. If the latter is the case, please file a bug report.
 
@@ -51,7 +51,7 @@ Red crosses are caused by missing textures. Please ensure that you're using a te
 </details>
 
 <details>
-<summary>Why can I only open 1.12 worlds but not 1.13+ worlds (or vice versa)?</summary>
+<summary><strong>Why can I only open 1.12 worlds but not 1.13+ worlds (or vice versa)?</strong></summary>
 
 Minecraft 1.13 introduced a new world format that is incompatible with the old format. Chunky 2 is only compatible with the new world format and Chunky 1 is only compatible with the old world format.
 
@@ -59,31 +59,31 @@ We [have plans][14] to improve this one day. For now, you'll need to use the app
 </details>
 
 <details>
-<summary>Is GPU rendering supported?</summary>
+<summary><strong>Is GPU rendering supported?</strong></summary>
 
 GPU support is not actively being worked on right now. If you'd like to tackle this, PRs are welcome!
 </details>
 
 <details>
-<summary>Why are mobs not rendered?</summary>
+<summary><strong>Why are mobs not rendered?</strong></summary>
 
 Chunky currently can't render all entities. Future support for rendering more entities is planned, so stay tuned!
 </details>
 
 <details>
-<summary>Can Chunky render mod blocks?</summary>
+<summary><strong>Can Chunky render mod blocks?</strong></summary>
 
 No. Due to the vast number of mods, this is not feasible at the moment.
 </details>
 
 <details>
-<summary>Where can I find good skymaps?</summary>
+<summary><strong>Where can I find good skymaps?</strong></summary>
 
 The [skymaps page][11] has some good links. Another good place is the #skymaps channel on our Discord server.
 </details>
 
 <details>
-<summary>Chunky keeps freezing or crashing</summary>
+<summary><strong>Chunky keeps freezing or crashing</strong></summary>
 
 Chunky uses a lot of memory. If Chunky has too little memory to work with it
 may slow down to a crawl or crash. The memory limit can be increased in the
@@ -91,7 +91,7 @@ Chunky Launcher.
 </details>
 
 <details>
-<summary>Rendering using the command line (Headless Mode)</summary>
+<summary><strong>Rendering using the command line (Headless Mode)</strong></summary>
 
 It is possible to render a scene from the command line. First set up a scene
 using the GUI. Don't forget to save the scene. Then run the following on the
@@ -105,7 +105,7 @@ Where SceneName is the name of the scene to render. You can read more about
 </details>
 
 <details>
-<summary>Shutdown when render completes on Unix-like Systems (Mac OS X, Linux, BSD)</summary>
+<summary><strong>Shutdown when render completes on Unix-like Systems (Mac OS X, Linux, BSD)</strong></summary>
 
 In the Advanced tab of the Render Controls window, you can check the checkbox
 that says "Shutdown when render completes" to shut down your computer when the
