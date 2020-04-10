@@ -1692,6 +1692,14 @@ public class BlockSpec {
                 return stairs(tag, Texture.polishedBlackstoneBricks);
             case "polished_blackstone_brick_wall":
                 return wall(tag, Texture.polishedBlackstoneBricks);
+            case "cracked_polished_blackstone_bricks":
+                return new MinecraftBlock("cracked_polished_blackstone_bricks", Texture.crackedPolishedBlackstoneBricks);
+            case "polished_blackstone_button":
+                return button(tag, Texture.polishedBlackstone);
+            case "polished_blackstone_pressure_plate":
+                return new PressurePlate(name, Texture.polishedBlackstone);
+            case "quartz_bricks":
+                return new MinecraftBlock(name, Texture.quartzBricks);
             case "structure_void":
             case "barrier":
                 // Invisible.
