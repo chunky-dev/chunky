@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2019 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -22,11 +22,16 @@ import java.io.IOException;
 
 import org.apache.commons.math3.util.FastMath;
 
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.UnknownBlock;
+import se.llbit.chunky.block.Water;
+import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.world.Material;
+import se.llbit.log.Log;
 
 /**
  * A simple voxel Octree.
@@ -35,10 +40,16 @@ import se.llbit.chunky.world.Material;
  */
 public class Octree {
 
+  static final int BRANCH_NODE = -1;
+
   /**
-   * An Octree node
+   * The top bit of the type field in a serialized octree node is reserved for indicating
+   * if the node is a data node.
    */
-  public static final class Node {
+  static final int DATA_FLAG = 0x80000000;
+
+  /** An Octree node. */
+  public static class Node {
     /**
      * The node type. Type is -1 if it's a non-leaf node.
      */
@@ -69,7 +80,7 @@ public class Octree {
       children[5] = new Node(type);
       children[6] = new Node(type);
       children[7] = new Node(type);
-      type = -1;
+      type = BRANCH_NODE;
     }
 
     /**
@@ -82,13 +93,11 @@ public class Octree {
     }
 
     /**
-     * Serialize this node.
-     *
-     * @throws IOException
+     * Serializes this node to a data stream.
      */
     public void store(DataOutputStream out) throws IOException {
       out.writeInt(type);
-      if (type == -1) {
+      if (type == BRANCH_NODE) {
         for (int i = 0; i < 8; ++i) {
           children[i].store(out);
         }
@@ -98,21 +107,30 @@ public class Octree {
     /**
      * Deserialize node.
      *
-     * @throws IOException
+     * @return the number of loaded octree nodes.
      */
-    public void load(DataInputStream in) throws IOException {
-      type = in.readInt();
-      if (type == -1) {
-        children = new Node[8];
+    public static Node loadNode(DataInputStream in) throws IOException {
+      int type = in.readInt();
+      Node node;
+      if (type == BRANCH_NODE) {
+        node = new Node(BRANCH_NODE);
+        node.children = new Node[8];
         for (int i = 0; i < 8; ++i) {
-          children[i] = new Node(0);
-          children[i].load(in);
+          node.children[i] = loadNode(in);
+        }
+      } else {
+        if ((type & DATA_FLAG) == 0) {
+          node = new Node(type);
+        } else {
+          int data = in.readInt();
+          node = new DataNode(type ^ DATA_FLAG, data);
         }
       }
+      return node;
     }
 
     public void visit(OctreeVisitor visitor, int x, int y, int z, int depth) {
-      if (type == -1) {
+      if (type == BRANCH_NODE) {
         int cx = x << 1;
         int cy = y << 1;
         int cz = z << 1;
@@ -128,8 +146,54 @@ public class Octree {
         visitor.visit(type, x << depth, y << depth, z << depth, depth);
       }
     }
+
+    public int getData() {
+      return 0;
+    }
+
+    @Override public boolean equals(Object obj) {
+      if (obj != null && obj.getClass() == Node.class) {
+        return ((Node) obj).type == type;
+      }
+      return false;
+    }
   }
 
+
+  /**
+   * An octree node with extra data.
+   */
+  static public final class DataNode extends Node {
+    final int data;
+
+    public DataNode(int type, int data) {
+      super(type);
+      this.data = data;
+    }
+
+    @Override public void store(DataOutputStream out) throws IOException {
+      out.writeInt(type | DATA_FLAG);
+      if (type == BRANCH_NODE) {
+        for (int i = 0; i < 8; ++i) {
+          children[i].store(out);
+        }
+      } else {
+        out.writeInt(data);
+      }
+    }
+
+    @Override public int getData() {
+      return data;
+    }
+
+    @Override public boolean equals(Object obj) {
+      if (obj instanceof DataNode) {
+        DataNode node = ((DataNode) obj);
+        return node.type == type && node.data == data;
+      }
+      return false;
+    }
+  }
 
   /**
    * Recursive depth of the octree
@@ -160,8 +224,12 @@ public class Octree {
    * @param octreeDepth The number of levels in the Octree.
    */
   public Octree(int octreeDepth) {
+    this(octreeDepth, new Node(0));
+  }
+
+  public Octree(int octreeDepth, Node node) {
     depth = octreeDepth;
-    root = new Node(0);
+    root = node;
     parents = new Node[depth];
     cache = new Node[depth + 1];
     cache[depth] = root;
@@ -174,35 +242,44 @@ public class Octree {
    * @param type The new voxel type to be set
    */
   public synchronized void set(int type, int x, int y, int z) {
+    set(new Node(type), x, y, z);
+  }
+
+  /**
+   * Set the voxel type at the given coordinates.
+   *
+   * @param data The new voxel to insert.
+   */
+  public synchronized void set(Node data, int x, int y, int z) {
     Node node = root;
-    int parentLvl = depth - 1;
-    int level = parentLvl;
+    int parentLevel = depth - 1;
+    int position = 0;
     for (int i = depth - 1; i >= 0; --i) {
-      level = i;
       parents[i] = node;
 
-      if (node.type == type) {
+      if (node.equals(data)) {
         return;
       } else if (node.children == null) {
         node.subdivide();
-        parentLvl = i;
+        parentLevel = i;
       }
 
       int xbit = 1 & (x >> i);
       int ybit = 1 & (y >> i);
       int zbit = 1 & (z >> i);
-      node = node.children[(xbit << 2) | (ybit << 1) | zbit];
+      position = (xbit << 2) | (ybit << 1) | zbit;
+      node = node.children[position];
 
     }
-    node.type = type;
+    parents[0].children[position] = data;
 
-    // merge nodes where all children have been set to the same type
-    for (int i = level; i <= parentLvl; ++i) {
+    // Merge nodes where all children have been set to the same type.
+    for (int i = 0; i <= parentLevel; ++i) {
       Node parent = parents[i];
 
       boolean allSame = true;
       for (Node child : parent.children) {
-        if (child.type != node.type) {
+        if (!child.equals(node)) {
           allSame = false;
           break;
         }
@@ -215,19 +292,22 @@ public class Octree {
         break;
       }
     }
-
   }
 
   /**
    * @return The voxel type at the given coordinates
    */
-  public synchronized int get(int x, int y, int z) {
+  public synchronized Node get(int x, int y, int z) {
     while (cacheLevel < depth && ((x >>> cacheLevel) != cx ||
         (y >>> cacheLevel) != cy || (z >>> cacheLevel) != cz))
       cacheLevel += 1;
 
-    int type;
-    while ((type = cache[cacheLevel].type) == -1) {
+    Node node;
+    while (true) {
+      node = cache[cacheLevel];
+      if (node.type != BRANCH_NODE) {
+        break;
+      }
       cacheLevel -= 1;
       cx = x >>> cacheLevel;
       cy = y >>> cacheLevel;
@@ -235,7 +315,15 @@ public class Octree {
       cache[cacheLevel] =
           cache[cacheLevel + 1].children[((cx & 1) << 2) | ((cy & 1) << 1) | (cz & 1)];
     }
-    return type;
+    return node;
+  }
+
+  public Material getMaterial(int x, int y, int z, BlockPalette palette) {
+    Node node = get(x, y, z);
+    if (node.type == BRANCH_NODE) {
+      return UnknownBlock.UNKNOWN;
+    }
+    return palette.get(node.type);
   }
 
   /**
@@ -256,8 +344,8 @@ public class Octree {
    */
   public static Octree load(DataInputStream in) throws IOException {
     int treeDepth = in.readInt();
-    Octree tree = new Octree(treeDepth);
-    tree.root.load(in);
+    Octree tree = new Octree(treeDepth, Node.loadNode(in));
+    //Log.info("Loaded octree with " + size + " nodes.");
     return tree;
   }
 
@@ -279,22 +367,7 @@ public class Octree {
     return lx == 0 && ly == 0 && lz == 0;
   }
 
-  /**
-   * Test whether the ray intersects any voxel before exiting the Octree.
-   *
-   * @param ray   the ray
-   * @return {@code true} if the ray intersects a voxel
-   */
-  public boolean intersect(Scene scene, Ray ray) {
-    if (ray.getCurrentMaterial().isWater()) {
-      return exitWater(scene, ray);
-    } else {
-      return enterBlock(scene, ray);
-    }
-  }
-
-  private boolean enterBlock(Scene scene, Ray ray) {
-
+  public boolean enterBlock(Scene scene, Ray ray, BlockPalette palette) {
     int level;
     Octree.Node node;
     boolean first = true;
@@ -308,7 +381,7 @@ public class Octree {
 
     while (true) {
 
-      // add small offset past the intersection to avoid
+      // Add small offset past the intersection to avoid
       // recursion to the same octree node!
       x = (int) QuickMath.floor(ray.o.x + d.x * Ray.OFFSET);
       y = (int) QuickMath.floor(ray.o.y + d.y * Ray.OFFSET);
@@ -380,7 +453,7 @@ public class Octree {
 
       first = false;
 
-      while (node.type == -1) {
+      while (node.type == BRANCH_NODE) {
         level -= 1;
         lx = x >>> level;
         ly = y >>> level;
@@ -388,14 +461,13 @@ public class Octree {
         node = node.children[((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)];
       }
 
-      Block currentBlock = Block.get(node.type);
+      Block currentBlock = palette.get(node.type);
       Material prevBlock = ray.getCurrentMaterial();
 
       ray.setPrevMaterial(prevBlock, ray.getCurrentData());
-      ray.setCurrentMaterial(currentBlock, node.type);
+      ray.setCurrentMaterial(currentBlock, node.getData());
 
       if (currentBlock.localIntersect) {
-
         if (currentBlock.intersect(ray, scene)) {
           if (prevBlock != currentBlock)
             return true;
@@ -404,11 +476,11 @@ public class Octree {
           continue;
         } else {
           // Exit ray from this local block.
-          ray.setCurrentMaterial(Block.AIR, 0); // Current material is air.
+          ray.setCurrentMaterial(Air.INSTANCE, 0); // Current material is air.
           ray.exitBlock(x, y, z);
           continue;
         }
-      } else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Block.AIR) {
+      } else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Air.INSTANCE) {
         TexturedBlockModel.getIntersectionColor(ray);
         return true;
       }
@@ -463,8 +535,10 @@ public class Octree {
     }
   }
 
-  private boolean exitWater(Scene scene, Ray ray) {
-
+  /**
+   * Advance the ray until it leaves the current water body.
+   */
+  public boolean exitWater(Scene scene, Ray ray, BlockPalette palette) {
     int level;
     Octree.Node node;
     boolean first = true;
@@ -546,7 +620,7 @@ public class Octree {
 
       first = false;
 
-      while (node.type == -1) {
+      while (node.type == BRANCH_NODE) {
         level -= 1;
         lx = x >>> level;
         ly = y >>> level;
@@ -554,7 +628,7 @@ public class Octree {
         node = node.children[((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)];
       }
 
-      Block currentBlock = Block.get(node.type);
+      Block currentBlock = palette.get(node.type);
       Material prevBlock = ray.getCurrentMaterial();
 
       ray.setPrevMaterial(prevBlock, ray.getCurrentData());
@@ -563,10 +637,10 @@ public class Octree {
       if (!currentBlock.isWater()) {
         if (currentBlock.localIntersect) {
           if (!currentBlock.intersect(ray, scene)) {
-            ray.setCurrentMaterial(Block.AIR, 0);
+            ray.setCurrentMaterial(Air.INSTANCE, 0);
           }
           return true;
-        } else if (currentBlock != Block.AIR) {
+        } else if (currentBlock != Air.INSTANCE) {
           TexturedBlockModel.getIntersectionColor(ray);
           return true;
         } else {
@@ -575,9 +649,9 @@ public class Octree {
       }
 
       // Exit current octree leaf.
-      if ((node.type & (1 << WaterModel.FULL_BLOCK)) == 0) {
+      if ((node.getData() & (1 << Water.FULL_BLOCK)) == 0) {
         if (WaterModel.intersectTop(ray)) {
-          ray.setCurrentMaterial(Block.AIR, 0);
+          ray.setCurrentMaterial(Air.INSTANCE, 0);
           return true;
         } else {
           ray.exitBlock(x, y, z);
@@ -648,7 +722,4 @@ public class Octree {
     return timestamp;
   }
 
-  public void visit(OctreeVisitor visitor) {
-    root.visit(visitor, 0, 0, 0, depth);
-  }
 }

@@ -19,8 +19,8 @@ package se.llbit.chunky.entity;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
-import se.llbit.chunky.world.material.SignMaterial;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -168,17 +168,22 @@ public class SignEntity extends Entity {
 
   private final JsonArray[] text;
   private final int angle;
-  private final SignTexture texture;
+  private final SignTexture frontTexture;
+  private final Texture texture;
+  private final String material;
 
-  public SignEntity(Vector3 position, CompoundTag entityTag, int blockData) {
-    this(position, getTextLines(entityTag), blockData & 0xF);
+  public SignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
+    this(position, getTextLines(entityTag), blockData & 0xF, material);
   }
 
-  public SignEntity(Vector3 position, JsonArray[] text, int direction) {
+  public SignEntity(Vector3 position, JsonArray[] text, int direction, String material) {
     super(position);
+    Texture signTexture = SignEntity.textureFromMaterial(material);
     this.text = text;
     this.angle = direction;
-    this.texture = new SignTexture(text);
+    this.frontTexture = new SignTexture(text, signTexture);
+    this.texture = signTexture;
+    this.material = material;
   }
 
   /**
@@ -262,12 +267,7 @@ public class SignEntity extends Entity {
         .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
     for (int i = 0; i < sides.length; ++i) {
       Quad quad = rot[angle][i];
-      Material material;
-      if (i != 0) {
-        material = SignMaterial.INSTANCE;
-      } else {
-        material = new TextureMaterial(texture);
-      }
+      Material material = new TextureMaterial(i == 0 ? frontTexture : texture);
       quad.addTriangles(primitives, material, transform);
     }
     return primitives;
@@ -279,6 +279,7 @@ public class SignEntity extends Entity {
     json.add("position", position.toJson());
     json.add("text", textToJson(text));
     json.add("direction", angle);
+    json.add("material", material);
     return json;
   }
 
@@ -290,7 +291,8 @@ public class SignEntity extends Entity {
     position.fromJson(json.get("position").object());
     JsonArray[] text = textFromJson(json.get("text"));
     int direction = json.get("direction").intValue(0);
-    return new SignEntity(position, text, direction);
+    String material = json.get("material").stringValue("oak");
+    return new SignEntity(position, text, direction, material);
   }
 
   /**
@@ -318,4 +320,26 @@ public class SignEntity extends Entity {
     return text;
   }
 
+  public static Texture textureFromMaterial(String material) {
+    switch (material) {
+      case "oak":
+        return Texture.oakSignPost;
+      case "spruce":
+        return Texture.spruceSignPost;
+      case "birch":
+        return Texture.birchSignPost;
+      case "jungle":
+        return Texture.jungleSignPost;
+      case "acacia":
+        return Texture.acaciaSignPost;
+      case "dark_oak":
+        return Texture.darkOakSignPost;
+      case "crimson":
+        return Texture.crimsonSignPost;
+      case "warped":
+        return Texture.warpedSignPost;
+      default:
+        throw new IllegalArgumentException("Unknown sign material: " + material);
+    }
+  }
 }

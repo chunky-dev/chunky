@@ -1,55 +1,47 @@
-/*
- * Copyright (c) 2017 Jesper Öqvist <jesper@llbit.se>
- *
- * This file is part of Chunky.
- *
- * Chunky is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Chunky is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
- */
 package se.llbit.chunky.block;
 
+import se.llbit.chunky.model.FenceGateModel;
+import se.llbit.chunky.model.FenceModel;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
+import se.llbit.math.Ray;
 
-public class FenceGate extends Block {
-  public FenceGate(int id, String name, Texture texture) {
-    super(id, name, texture);
-  }
+public class FenceGate extends MinecraftBlockTranslucent {
+  private final String description;
+  private final int facing, inWall, open;
 
-  @Override public boolean isFenceGate() {
-    return true;
-  }
-
-  @Override public boolean isFenceConnector(int data, int direction) {
-    if (direction == BlockData.NORTH || direction == BlockData.SOUTH) {
-      return (data & 0x1) != 0;
-    } else {
-      return (data & 0x1) == 0;
+  public FenceGate(String name, Texture texture,
+      String facing, boolean inWall, boolean open) {
+    super(name, texture);
+    this.description = String.format("facing=%s, in_wall=%s, open=%s",
+        facing, inWall, open);
+    solid = false;
+    localIntersect = true;
+    this.inWall = inWall ? 1 : 0;
+    this.open = open ? 1 : 0;
+    switch (facing) {
+      default:
+      case "north":
+        this.facing = 2;
+        break;
+      case "south":
+        this.facing = 0;
+        break;
+      case "west":
+        this.facing = 1;
+        break;
+      case "east":
+        this.facing = 3;
+        break;
     }
   }
 
-  @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
-    if (direction == BlockData.NORTH || direction == BlockData.SOUTH) {
-      return (data & 0x1) != 0;
-    } else {
-      return (data & 0x1) == 0;
-    }
+  @Override public boolean intersect(Ray ray, Scene scene) {
+    return FenceGateModel.intersect(ray, texture, facing, inWall, open);
   }
 
-  @Override public boolean isStoneWallConnector(int data, int direction) {
-    if (direction == BlockData.NORTH || direction == BlockData.SOUTH) {
-      return (data & 0x1) != 0;
-    } else {
-      return (data & 0x1) == 0;
-    }
+  @Override public String description() {
+    return description;
   }
 }

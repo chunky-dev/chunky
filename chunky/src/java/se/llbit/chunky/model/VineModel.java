@@ -27,25 +27,25 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class VineModel {
-  protected static Quad[] quads = {
-      // south
-      new DoubleSidedQuad(new Vector3(1, 0, 15 / 16.), new Vector3(0, 0, 15 / 16.),
-          new Vector3(1, 1, 15 / 16.), new Vector4(1, 0, 0, 1)),
-
-      // west
-      new DoubleSidedQuad(new Vector3(1 / 16., 0, 1), new Vector3(1 / 16., 0, 0),
-          new Vector3(1 / 16., 1, 1), new Vector4(1, 0, 0, 1)),
-
-      // north
+  protected static final Quad[] quads = {
+      // North.
       new DoubleSidedQuad(new Vector3(0, 0, 1 / 16.), new Vector3(1, 0, 1 / 16.),
           new Vector3(0, 1, 1 / 16.), new Vector4(0, 1, 0, 1)),
 
-      // east
+      // South.
+      new DoubleSidedQuad(new Vector3(1, 0, 15 / 16.), new Vector3(0, 0, 15 / 16.),
+          new Vector3(1, 1, 15 / 16.), new Vector4(1, 0, 0, 1)),
+
+      // East.
       new DoubleSidedQuad(new Vector3(15 / 16., 0, 0), new Vector3(15 / 16., 0, 1),
           new Vector3(15 / 16., 1, 0), new Vector4(0, 1, 0, 1)),
 
-      // top
-      new Quad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 1, 1),
+      // West.
+      new DoubleSidedQuad(new Vector3(1 / 16., 0, 1), new Vector3(1 / 16., 0, 0),
+          new Vector3(1 / 16., 1, 1), new Vector4(1, 0, 0, 1)),
+
+      // Top.
+      new DoubleSidedQuad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 1, 1),
           new Vector4(0, 1, 0, 1)),
 
   };
@@ -87,6 +87,35 @@ public class VineModel {
           ray.n.set(quad.n);
           ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
           hit = true;
+        }
+      }
+    }
+    if (hit) {
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
+
+  public static boolean intersect(Ray ray, Scene scene, int connections) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    for (int i = 0; i < quads.length; ++i) {
+      if ((connections & (1 << i)) != 0) {
+        Quad quad = quads[i];
+        if (quad.intersect(ray)) {
+          float[] color = Texture.vines.getColor(ray.u, ray.v);
+          if (color[3] > Ray.EPSILON) {
+            ray.color.set(color);
+            float[] biomeColor = ray.getBiomeFoliageColor(scene);
+            ray.color.x *= biomeColor[0];
+            ray.color.y *= biomeColor[1];
+            ray.color.z *= biomeColor[2];
+            ray.t = ray.tNext;
+            ray.n.set(quad.n);
+            ray.n.scale(QuickMath.signum(-ray.d.dot(quad.n)));
+            hit = true;
+          }
         }
       }
     }

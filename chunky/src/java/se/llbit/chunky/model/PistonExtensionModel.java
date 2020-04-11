@@ -104,9 +104,14 @@ public class PistonExtensionModel {
               Texture.pistonSide, Texture.pistonSide,},};
 
   public static boolean intersect(Ray ray) {
-    boolean hit = false;
     int isSticky = ray.getBlockData() >> 3;
-    Quad[] rot = extension[(ray.getBlockData() & 7) % 6];
+    int facing = (ray.getBlockData() & 7) % 6;
+    return intersect(ray, isSticky, facing);
+  }
+
+  public static boolean intersect(Ray ray, int isSticky, int facing) {
+    boolean hit = false;
+    Quad[] rot = extension[facing];
     ray.t = Double.POSITIVE_INFINITY;
     for (int i = 0; i < rot.length; ++i) {
       Quad side = rot[i];

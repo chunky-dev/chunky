@@ -147,14 +147,17 @@ public class LeverModel {
   }
 
   public static boolean intersect(Ray ray) {
+    int metadata = ray.getBlockData();
+    int activated = (metadata >> 3) & 1;
+    int position = (metadata & 7);
+    return intersect(ray, position, activated);
+  }
+
+  public static boolean intersect(Ray ray, int position, int activated) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
 
-    int metadata = ray.getBlockData();
-    int activated = (metadata >> 3) & 1;
-    int direction = (metadata & 7);
-
-    for (Quad quad : baseRotated[direction][activated]) {
+    for (Quad quad : baseRotated[position][activated]) {
       if (quad.intersect(ray)) {
         Texture.cobblestone.getColor(ray);
         ray.n.set(quad.n);
@@ -163,7 +166,7 @@ public class LeverModel {
       }
     }
 
-    for (Quad quad : leverRotated[direction][activated]) {
+    for (Quad quad : leverRotated[position][activated]) {
       if (quad.intersect(ray)) {
         Texture.lever.getColor(ray);
         ray.n.set(quad.n);

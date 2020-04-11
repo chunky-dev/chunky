@@ -23,16 +23,35 @@ import se.llbit.math.Ray;
 public class FenceModel {
   private static AABB post = new AABB(6 / 16., 10 / 16., 0, 1, 6 / 16., 10 / 16.);
 
-  private static AABB[][] plank = {{new AABB(7 / 16.0, 9 / 16.0, 6 / 16.0, 9 / 16.0, 0, .4),
-      new AABB(7 / 16.0, 9 / 16.0, 12 / 16.0, 15 / 16.0, 0, .4),},
-      {new AABB(7 / 16.0, 9 / 16.0, 6 / 16.0, 9 / 16.0, .6, 1),
-          new AABB(7 / 16.0, 9 / 16.0, 12 / 16.0, 15 / 16.0, .6, 1),},
-      {new AABB(.6, 1, 6 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0),
-          new AABB(.6, 1, 12 / 16.0, 15 / 16.0, 7 / 16.0, 9 / 16.0),},
-      {new AABB(0, .4, 6 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0),
-          new AABB(0, .4, 12 / 16.0, 15 / 16.0, 7 / 16.0, 9 / 16.0),},};
+  private static AABB[][] plank = {
+      // Connected north.
+      {
+        new AABB(7 / 16.0, 9 / 16.0, 6 / 16.0, 9 / 16.0, 0, .4),
+        new AABB(7 / 16.0, 9 / 16.0, 12 / 16.0, 15 / 16.0, 0, .4),
+      },
+      // Connected south.
+      {
+        new AABB(7 / 16.0, 9 / 16.0, 6 / 16.0, 9 / 16.0, .6, 1),
+        new AABB(7 / 16.0, 9 / 16.0, 12 / 16.0, 15 / 16.0, .6, 1),
+      },
+      // Connected east.
+      {
+        new AABB(.6, 1, 6 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0),
+        new AABB(.6, 1, 12 / 16.0, 15 / 16.0, 7 / 16.0, 9 / 16.0),
+      },
+      // Connected west.
+      {
+        new AABB(0, .4, 6 / 16.0, 9 / 16.0, 7 / 16.0, 9 / 16.0),
+        new AABB(0, .4, 12 / 16.0, 15 / 16.0, 7 / 16.0, 9 / 16.0),
+      },
+  };
 
   public static boolean intersect(Ray ray, Texture texture) {
+    int connections = ray.getBlockData();
+    return intersect(ray, texture, connections);
+  }
+
+  public static boolean intersect(Ray ray, Texture texture, int connections) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     if (post.intersect(ray)) {
@@ -41,7 +60,7 @@ public class FenceModel {
       hit = true;
     }
     for (int i = 0; i < 4; ++i) {
-      if ((ray.getBlockData() & (1 << i)) != 0) {
+      if ((connections & (1 << i)) != 0) {
         for (AABB aabb : plank[i]) {
           if (aabb.intersect(ray)) {
             texture.getColor(ray);

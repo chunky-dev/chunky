@@ -59,7 +59,8 @@ public class CocoaPlantModel {
 
       // bottom
       new Quad(new Vector3(4 / 16., 3 / 16., 7 / 16.), new Vector3(12 / 16., 3 / 16., 7 / 16.),
-          new Vector3(4 / 16., 3 / 16., 15 / 16.), new Vector4(0, 7 / 16., 9 / 16., 1)),};
+          new Vector3(4 / 16., 3 / 16., 15 / 16.), new Vector4(0, 7 / 16., 9 / 16., 1)),
+  };
   private static final Quad[] medium = {
       // front
       new Quad(new Vector3(11 / 16., 5 / 16., 9 / 16.), new Vector3(5 / 16., 5 / 16., 9 / 16.),
@@ -87,7 +88,8 @@ public class CocoaPlantModel {
 
       // bottom
       new Quad(new Vector3(5 / 16., 5 / 16., 9 / 16.), new Vector3(11 / 16., 5 / 16., 9 / 16.),
-          new Vector3(5 / 16., 5 / 16., 15 / 16.), new Vector4(0, 6 / 16., 10 / 16., 1)),};
+          new Vector3(5 / 16., 5 / 16., 15 / 16.), new Vector4(0, 6 / 16., 10 / 16., 1)),
+  };
   private static final Quad[] small = {
       // front
       new Quad(new Vector3(10 / 16., 7 / 16., 11 / 16.), new Vector3(6 / 16., 7 / 16., 11 / 16.),
@@ -116,7 +118,8 @@ public class CocoaPlantModel {
 
       // bottom
       new Quad(new Vector3(6 / 16., 7 / 16., 11 / 16.), new Vector3(10 / 16., 7 / 16., 11 / 16.),
-          new Vector3(6 / 16., 7 / 16., 15 / 16.), new Vector4(0, 4 / 16., 12 / 16., 1)),};
+          new Vector3(6 / 16., 7 / 16., 15 / 16.), new Vector4(0, 4 / 16., 12 / 16., 1)),
+  };
   private static final Quad stemNorth =
       new DoubleSidedQuad(new Vector3(.5, 12 / 16., .5), new Vector3(.5, 12 / 16., 1),
           new Vector3(.5, 1, .5), new Vector4(.5, 1, 12 / 16., 1));
@@ -143,26 +146,30 @@ public class CocoaPlantModel {
 
   public static boolean intersect(Ray ray) {
     int data = 0xF & (ray.getCurrentData() >> BlockData.OFFSET);
-    int size = data >> 2;
+    int age = data >> 2;
     int direction = 3 & data;
+    return intersect(ray, direction, age);
+  }
+
+  public static boolean intersect(Ray ray, int facing, int age) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
-    for (Quad quad : fruit[size][direction]) {
+    for (Quad quad : fruit[age][facing]) {
       if (quad.intersect(ray)) {
-        tex[size].getColor(ray);
+        tex[age].getColor(ray);
         ray.color.w = 1;
         ray.t = ray.tNext;
         ray.n.set(quad.n);
         hit = true;
       }
     }
-    if (stem[direction].intersect(ray)) {
-      float[] color = tex[size].getColor(ray.u, ray.v);
+    if (stem[facing].intersect(ray)) {
+      float[] color = tex[age].getColor(ray.u, ray.v);
       if (color[3] > Ray.EPSILON) {
         ray.color.set(color);
         ray.t = ray.tNext;
-        ray.n.set(stem[direction].n);
-        ray.n.scale(QuickMath.signum(-ray.d.dot(stem[direction].n)));
+        ray.n.set(stem[facing].n);
+        ray.n.scale(QuickMath.signum(-ray.d.dot(stem[facing].n)));
         hit = true;
       }
     }

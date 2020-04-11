@@ -17,6 +17,7 @@
 package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.math.DoubleSidedQuad;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -24,25 +25,30 @@ import se.llbit.math.Vector4;
 
 public class LadderModel {
   protected static Quad[] quads = {
-      // west
-      new Quad(new Vector3(1, 0, 0), new Vector3(1, 0, 1), new Vector3(1, 1, 0),
+      // West.
+      new DoubleSidedQuad(new Vector3(0.95, 0, 0), new Vector3(0.95, 0, 1), new Vector3(0.95, 1, 0),
           new Vector4(0, 1, 0, 1)),
 
-      // east
-      new Quad(new Vector3(0, 0, 1), new Vector3(0, 0, 0), new Vector3(0, 1, 1),
+      // East.
+      new DoubleSidedQuad(new Vector3(0.05, 0, 1), new Vector3(0.05, 0, 0), new Vector3(0.05, 1, 1),
           new Vector4(1, 0, 0, 1)),
 
-      // north
-      new Quad(new Vector3(1, 0, 1), new Vector3(0, 0, 1), new Vector3(1, 1, 1),
+      // North.
+      new DoubleSidedQuad(new Vector3(1, 0, 0.95), new Vector3(0, 0, 0.95), new Vector3(1, 1, 0.95),
           new Vector4(1, 0, 0, 1)),
 
-      // south
-      new Quad(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 1, 0),
+      // South.
+      new DoubleSidedQuad(new Vector3(0, 0, 0.05), new Vector3(1, 0, 0.05), new Vector3(0, 1, 0.05),
           new Vector4(0, 1, 0, 1)),
   };
 
   public static boolean intersect(Ray ray) {
-    Quad quad = quads[ray.getBlockData() % 4];
+    int facing = ray.getBlockData();
+    return intersect(ray, facing);
+  }
+
+  public static boolean intersect(Ray ray, int facing) {
+    Quad quad = quads[facing % 4];
     ray.t = Double.POSITIVE_INFINITY;
     if (quad.intersect(ray)) {
       float[] color = Texture.ladder.getColor(ray.u, ray.v);

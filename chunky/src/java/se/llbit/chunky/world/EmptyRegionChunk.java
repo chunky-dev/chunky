@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
 import se.llbit.nbt.CompoundTag;
@@ -45,18 +46,15 @@ public class EmptyRegionChunk extends Chunk {
     surface = IconLayer.CORRUPT;
   }
 
-  @Override public synchronized void getBlockData(byte[] blocks, byte[] data, byte[] biomes,
-      Collection<CompoundTag> tileEntities, Collection<CompoundTag> entities) {
+  @Override public synchronized void getBlockData(int[] blocks, byte[] biomes,
+      Collection<CompoundTag> tileEntities, Collection<CompoundTag> entities,
+      BlockPalette palette) {
     for (int i = 0; i < X_MAX * Y_MAX * Z_MAX; ++i) {
       blocks[i] = 0;
     }
 
     for (int i = 0; i < X_MAX * Z_MAX; ++i) {
       biomes[i] = 0;
-    }
-
-    for (int i = 0; i < (X_MAX * Y_MAX * Z_MAX) / 2; ++i) {
-      data[i] = 0;
     }
   }
 

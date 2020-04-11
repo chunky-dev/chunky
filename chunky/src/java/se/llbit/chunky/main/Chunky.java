@@ -41,7 +41,7 @@ import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
-import se.llbit.chunky.block.Block;
+import se.llbit.chunky.world.MaterialStore;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Level;
@@ -98,7 +98,7 @@ public class Chunky {
 
   public Chunky(ChunkyOptions options) {
     this.options = options;
-    Block.loadDefaultMaterialProperties();
+    MaterialStore.loadDefaultMaterialProperties();
   }
 
   /**
@@ -132,7 +132,7 @@ public class Chunky {
     renderer.setOnFrameCompleted((scene, spp) -> {
       if (SnapshotControl.DEFAULT.saveSnapshot(scene, spp)) {
         // Save the current frame.
-        scene.saveSnapshot(context.getSceneDirectory(), taskTracker);
+        scene.saveSnapshot(context.getSceneDirectory(), taskTracker, getRenderContext().numRenderThreads());
       }
 
       if (SnapshotControl.DEFAULT.saveRenderDump(scene, spp)) {
@@ -299,7 +299,7 @@ public class Chunky {
             System.out.println("Image output mode: TIFF32");
             break;
         }
-        scene.saveFrame(new File(options.imageOutputFile), taskTracker);
+        scene.saveFrame(new File(options.imageOutputFile), taskTracker, getRenderContext().numRenderThreads());
         System.out.println("Saved snapshot to " + options.imageOutputFile);
         return 0;
       }

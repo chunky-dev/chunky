@@ -29,19 +29,27 @@ import se.llbit.math.Ray;
 public class AnvilModel {
   private static final AABB[][] boxes = {
       // north-south
-      {new AABB(3 / 16., 13 / 16., 10 / 16., 1, 0, 1),
-          new AABB(2 / 16., 14 / 16., 0, 4 / 16., 2 / 16., 14 / 16.),
-          new AABB(4 / 16., 12 / 16., 4 / 16., 5 / 16., 3 / 16., 13 / 16.),
-          new AABB(6 / 16., 10 / 16., 5 / 16., 10 / 16., 4 / 16., 12 / 16.),},
+      {
+        new AABB(3 / 16., 13 / 16., 10 / 16., 1, 0, 1),
+        new AABB(2 / 16., 14 / 16., 0, 4 / 16., 2 / 16., 14 / 16.),
+        new AABB(4 / 16., 12 / 16., 4 / 16., 5 / 16., 3 / 16., 13 / 16.),
+        new AABB(6 / 16., 10 / 16., 5 / 16., 10 / 16., 4 / 16., 12 / 16.),
+      },
       // east-west
-      {new AABB(0, 1, 10 / 16., 1, 3 / 16., 13 / 16.),
-          new AABB(2 / 16., 14 / 16., 0, 4 / 16., 2 / 16., 14 / 16.),
-          new AABB(3 / 16., 13 / 16., 4 / 16., 5 / 16., 4 / 16., 12 / 16.),
-          new AABB(4 / 16., 12 / 16., 5 / 16., 10 / 16., 6 / 16., 10 / 16.),},};
+      {
+        new AABB(0, 1, 10 / 16., 1, 3 / 16., 13 / 16.),
+        new AABB(2 / 16., 14 / 16., 0, 4 / 16., 2 / 16., 14 / 16.),
+        new AABB(3 / 16., 13 / 16., 4 / 16., 5 / 16., 4 / 16., 12 / 16.),
+        new AABB(4 / 16., 12 / 16., 5 / 16., 10 / 16., 6 / 16., 10 / 16.),
+      },
+  };
 
-  public static final Texture[] topTexture =
-      {Texture.anvilTop, Texture.anvilTopDamaged1, Texture.anvilTopDamaged2,
-          Texture.anvilTopDamaged2};
+  public static final Texture[] topTexture = {
+      Texture.anvilTop,
+      Texture.anvilTopDamaged1,
+      Texture.anvilTopDamaged2,
+      Texture.anvilTopDamaged2
+  };
 
   /**
    * Find intersection between ray and block
@@ -52,6 +60,10 @@ public class AnvilModel {
     int data = ray.getCurrentData() >> BlockData.OFFSET;
     int orientation = 1 & data;
     int damage = 3 & (data >> 2);
+    return intersect(ray, orientation, damage);
+  }
+
+  public static boolean intersect(Ray ray, int orientation, int damage) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     for (int i = 0; i < boxes[0].length; ++i) {

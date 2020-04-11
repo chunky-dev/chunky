@@ -22,7 +22,7 @@ import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 
 public class TallGrassModel extends SpriteModel {
-  private static final Texture[] tex = {Texture.deadBush, Texture.tallGrass, Texture.fern};
+  private static final Texture[] tex = { Texture.deadBush, Texture.tallGrass, Texture.fern };
 
   public static boolean intersect(Ray ray, Scene scene) {
     boolean hit = false;
@@ -39,6 +39,31 @@ public class TallGrassModel extends SpriteModel {
             ray.color.y *= biomeColor[1];
             ray.color.z *= biomeColor[2];
           }
+          ray.n.set(quad.n);
+          ray.t = ray.tNext;
+          hit = true;
+        }
+      }
+    }
+    if (hit) {
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
+
+  public static boolean intersect(Ray ray, Scene scene, Texture texture) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    for (Quad quad : quads) {
+      if (quad.intersect(ray)) {
+        float[] color = texture.getColor(ray.u, ray.v);
+        if (color[3] > Ray.EPSILON) {
+          ray.color.set(color);
+          float[] biomeColor = ray.getBiomeGrassColor(scene);
+          ray.color.x *= biomeColor[0];
+          ray.color.y *= biomeColor[1];
+          ray.color.z *= biomeColor[2];
           ray.n.set(quad.n);
           ray.t = ray.tNext;
           hit = true;

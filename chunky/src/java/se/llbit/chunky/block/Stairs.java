@@ -1,97 +1,127 @@
-/*
- * Copyright (c) 2017 Jesper Öqvist <jesper@llbit.se>
- *
- * This file is part of Chunky.
- *
- * Chunky is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Chunky is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
- */
 package se.llbit.chunky.block;
 
+import se.llbit.chunky.model.StairModel;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.BlockData;
+import se.llbit.math.Ray;
 
-public class Stairs extends Block {
-  public Stairs(int id, String name, Texture texture) {
-    super(id, name, texture);
+public class Stairs extends MinecraftBlockTranslucent {
+  private final int flipped, facing, corner;
+  private final boolean isCorner;
+  private final Texture side, top, bottom;
+  private final String description;
+
+  public Stairs(String name, Texture texture, String half, String shape, String facing) {
+    this(name, texture, texture, texture, half, shape, facing);
   }
 
-  @Override public boolean isFenceConnector(int data, int direction) {
-    switch (direction) {
-      case BlockData.NORTH:
-        return (data & 0x3) == BlockData.SOUTH;
-      case BlockData.SOUTH:
-        return (data & 0x3) == BlockData.NORTH;
-      case BlockData.EAST:
-        return (data & 0x3) == BlockData.WEST;
-      case BlockData.WEST:
-        return (data & 0x3) == BlockData.EAST;
+  public Stairs(String name, Texture side, Texture top, Texture bottom,
+      String half, String shape, String facing) {
+    super(name, side);
+    this.description = String.format("half=%s, shape=%s, facing=%s", half, shape, facing);
+    this.side = side;
+    this.top = top;
+    this.bottom = bottom;
+    localIntersect = true;
+    solid = false;
+    flipped = (half.equals("top")) ? 1 : 0;
+    switch (facing) {
+      default:
+      case "east":
+        this.facing = 0;
+        break;
+      case "west":
+        this.facing = 1;
+        break;
+      case "south":
+        this.facing = 2;
+        break;
+      case "north":
+        this.facing = 3;
+        break;
     }
-    return false;
+    isCorner = !shape.equals("straight");
+    switch (shape) {
+      default:
+      case "straight":
+        this.corner = 0;
+        break;
+      case "outer_right":
+        switch (facing) {
+          default:
+          case "east":
+            this.corner = 0;
+            break;
+          case "west":
+            this.corner = 3;
+            break;
+          case "south":
+            this.corner = 1;
+            break;
+          case "north":
+            this.corner = 2;
+            break;
+        }
+        break;
+      case "outer_left":
+        switch (facing) {
+          default:
+          case "east":
+            this.corner = 2;
+            break;
+          case "west":
+            this.corner = 1;
+            break;
+          case "south":
+            this.corner = 0;
+            break;
+          case "north":
+            this.corner = 3;
+            break;
+        }
+        break;
+      case "inner_right":
+        switch (facing) {
+          default:
+          case "east":
+            this.corner = 0+4;
+            break;
+          case "west":
+            this.corner = 3+4;
+            break;
+          case "south":
+            this.corner = 1+4;
+            break;
+          case "north":
+            this.corner = 2+4;
+            break;
+        }
+        break;
+      case "inner_left":
+        switch (facing) {
+          default:
+          case "east":
+            this.corner = 2+4;
+            break;
+          case "west":
+            this.corner = 1+4;
+            break;
+          case "south":
+            this.corner = 0+4;
+            break;
+          case "north":
+            this.corner = 3+4;
+            break;
+        }
+        break;
+    }
   }
 
-  @Override public boolean isNetherBrickFenceConnector(int data, int direction) {
-    switch (direction) {
-      case BlockData.NORTH:
-        return (data & 0x3) == BlockData.SOUTH;
-      case BlockData.SOUTH:
-        return (data & 0x3) == BlockData.NORTH;
-      case BlockData.EAST:
-        return (data & 0x3) == BlockData.WEST;
-      case BlockData.WEST:
-        return (data & 0x3) == BlockData.EAST;
-    }
-    return false;
+  @Override public boolean intersect(Ray ray, Scene scene) {
+    return StairModel.intersect(ray, side, top, bottom, flipped, isCorner, corner, facing);
   }
 
-  @Override public boolean isStoneWallConnector(int data, int direction) {
-    switch (direction) {
-      case BlockData.NORTH:
-        return (data & 0x3) == BlockData.SOUTH;
-      case BlockData.SOUTH:
-        return (data & 0x3) == BlockData.NORTH;
-      case BlockData.EAST:
-        return (data & 0x3) == BlockData.WEST;
-      case BlockData.WEST:
-        return (data & 0x3) == BlockData.EAST;
-    }
-    return false;
-  }
-
-  @Override public boolean isGlassPaneConnector(int data, int direction) {
-    switch (direction) {
-      case BlockData.NORTH:
-        return (data & 0x3) == BlockData.SOUTH;
-      case BlockData.SOUTH:
-        return (data & 0x3) == BlockData.NORTH;
-      case BlockData.EAST:
-        return (data & 0x3) == BlockData.WEST;
-      case BlockData.WEST:
-        return (data & 0x3) == BlockData.EAST;
-    }
-    return false;
-  }
-
-  @Override public boolean isIronBarsConnector(int data, int direction) {
-    switch (direction) {
-      case BlockData.NORTH:
-        return (data & 0x3) == BlockData.SOUTH;
-      case BlockData.SOUTH:
-        return (data & 0x3) == BlockData.NORTH;
-      case BlockData.EAST:
-        return (data & 0x3) == BlockData.WEST;
-      case BlockData.WEST:
-        return (data & 0x3) == BlockData.EAST;
-    }
-    return false;
+  @Override public String description() {
+    return description;
   }
 }

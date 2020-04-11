@@ -18,14 +18,12 @@
       <CheckBox fx:id="stillWater" mnemonicParsing="false" text="Still water" />
       <DoubleAdjuster fx:id="waterVisibility" />
       <DoubleAdjuster fx:id="waterOpacity" />
-      <Label text="Note: All chunks are reloaded when changing Water World options." />
       <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
         <children>
-            <CheckBox fx:id="waterWorld" mnemonicParsing="false" text="Water World mode" />
-               <Separator orientation="VERTICAL" />
+          <CheckBox fx:id="waterPlane" mnemonicParsing="false" text="Water Plane" />
+          <Separator orientation="VERTICAL" />
           <Label text="Water height:" />
           <TextField fx:id="waterHeight" />
-          <Button fx:id="applyWaterHeight" mnemonicParsing="false" text="Apply" />
         </children>
       </HBox>
       <Separator prefWidth="200.0" />

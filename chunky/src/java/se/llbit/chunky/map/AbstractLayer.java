@@ -25,7 +25,7 @@ import java.io.OutputStream;
 /**
  * A layer describes the visible part of a chunk.
  * <p>
- * A chunk typically stores three layers;
+ * A chunk typically stores three layers:
  * current layer, cave layer and surface layer.
  *
  * @author Jesper Öqvist (jesper@llbit.se)

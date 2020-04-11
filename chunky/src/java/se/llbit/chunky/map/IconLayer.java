@@ -28,6 +28,7 @@ public class IconLayer extends AbstractLayer {
   public static final IconLayer CORRUPT = new IconLayer(Icon.corruptLayer);
   public static final IconLayer UNKNOWN = new IconLayer(Icon.unknown);
   public static final IconLayer MC_1_13 = new IconLayer(Icon.MC_1_13);
+  public static final IconLayer MC_1_12 = new IconLayer(Icon.MC_1_12);
 
   private Icon icon;
   private final int averageColor;

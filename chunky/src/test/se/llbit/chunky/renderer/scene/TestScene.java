@@ -18,7 +18,6 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.junit.Test;
-import se.llbit.chunky.block.Block;
 
 public class TestScene {
   /**
@@ -27,8 +26,8 @@ public class TestScene {
    * <p>Regression test: https://www.reddit.com/r/chunky/comments/6l7vqd/chunky_snapshot_143alpha1/djuj3o6/
    */
   @Test public void testModifyMaterial1() {
-    new Scene().setEmittance(Block.GRAVEL.getBlockName(), 0.3f);
-    new Scene().setSpecular(Block.GRAVEL.getBlockName(), 0.3f);
-    new Scene().setIor(Block.GRAVEL.getBlockName(), 0.3f);
+    new Scene().setEmittance("minecraft:gravel", 0.3f);
+    new Scene().setSpecular("minecraft:gravel", 0.3f);
+    new Scene().setIor("minecraft:gravel", 0.3f);
   }
 }
