@@ -352,18 +352,22 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     double z = mapView.z + (event.getY() - getHeight() / 2.0) / scale;
     int cx = (int) QuickMath.floor(x);
     int cz = (int) QuickMath.floor(z);
-    int bx = (int) QuickMath.floor((x - cx) * 16);
-    int bz = (int) QuickMath.floor((z - cz) * 16);
+    int bx = (int) QuickMath.floor((x - cx) * Chunk.X_MAX);
+    int bz = (int) QuickMath.floor((z - cz) * Chunk.Z_MAX);
     bx = Math.max(0, Math.min(Chunk.X_MAX - 1, bx));
     bz = Math.max(0, Math.min(Chunk.Z_MAX - 1, bz));
+    // Calculate the world block position of the cursor
+    int worldBlockX = cx * Chunk.X_MAX + bx;
+    int worldBlockZ = cz * Chunk.Z_MAX + bz;
     ChunkPosition cp = ChunkPosition.get(cx, cz);
     if (!mouseDown) {
       Chunk hoveredChunk = mapLoader.getWorld().getChunk(cp);
       if (!hoveredChunk.isEmpty()) {
         tooltip.setText(
-            String.format("%s, %s", hoveredChunk.toString(), hoveredChunk.biomeAt(bx, bz)));
+            String.format("%s, %s\nBlock: [%s, %s]", hoveredChunk.toString(), hoveredChunk.biomeAt(bx, bz), worldBlockX, worldBlockZ));
       } else {
-        tooltip.setText(hoveredChunk.toString());
+        tooltip.setText(
+            String.format("%s\nBlock: [%s, %s]", hoveredChunk.toString(), worldBlockX, worldBlockZ));
       }
       Scene scene = mapOverlay.getScene();
       if (mapOverlay.isFocused()) {
