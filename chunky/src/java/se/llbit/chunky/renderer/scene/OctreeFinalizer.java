@@ -47,32 +47,30 @@ public class OctreeFinalizer {
         int z = cz + cp.z * 16 - origin.z;
         for (int cx = 0; cx < 16; ++cx) {
           int x = cx + cp.x * 16 - origin.x;
-          processBlock(worldTree, waterTree, palette, x, cy, z);
+          processBlock(worldTree, waterTree, palette, x, cy, z, origin);
         }
       }
     }
   }
 
   private static void processBlock(Octree worldTree, Octree waterTree, BlockPalette palette, int x,
-      int cy, int z) {
+      int cy, int z, Vector3i origin) {
     Material mat = worldTree.getMaterial(x, cy, z, palette);
     Material wmat = waterTree.getMaterial(x, cy, z, palette);
 
-    // TODO: duplicated code? Check Scene.loadChunks()...
-    /*
     // Set non-visible blocks to be stone, in order to merge large patches.
-    if ((cx == 0 || cx == 15 || cz == 0 || cz == 15) && cy > -origin.y
-        && cy < Chunk.Y_MAX - origin.y - 1 && type != Block.STONE_ID && block.opaque) {
-      if (Block.get(octree.get(x - 1, cy, z)).opaque && Block
-          .get(octree.get(x + 1, cy, z)).opaque && Block
-          .get(octree.get(x, cy - 1, z)).opaque && Block
-          .get(octree.get(x, cy + 1, z)).opaque && Block
-          .get(octree.get(x, cy, z - 1)).opaque && Block
-          .get(octree.get(x, cy, z + 1)).opaque) {
-        octree.set(Block.STONE_ID, x, cy, z);
-        continue;
+    if (cy > -origin.y && cy < Chunk.Y_MAX - origin.y - 1 && worldTree.get(x, cy, z).type != palette.stoneId) {
+      Material b1 = worldTree.getMaterial(x - 1, cy, z, palette),
+          b2 = worldTree.getMaterial(x + 1, cy, z, palette),
+          b3 = worldTree.getMaterial(x, cy, z - 1, palette),
+          b4 = worldTree.getMaterial(x, cy, z + 1, palette),
+          b5 = worldTree.getMaterial(x, cy - 1, z, palette),
+          b6 = worldTree.getMaterial(x, cy + 1, z, palette);
+
+      if (b1.opaque && b2.opaque && b3.opaque && b4.opaque && b5.opaque && b6.opaque) {
+        worldTree.set(palette.stoneId, x, cy, z);
       }
-    }*/
+    }
 
     if (wmat instanceof Water) {
       Material above = waterTree.getMaterial(x, cy + 1, z, palette);

@@ -852,24 +852,6 @@ public class Scene implements JsonSerializable, Refreshable {
                 }
               }
 
-              // TODO: is this code duplicated in OctreeFinalizer?
-              if (cx > 0 && cx < 15 && cz > 0 && cz < 15 && cy > 0 && cy < 255 &&
-                  block != stone && block.opaque) {
-                // Set obscured blocks to stone. This makes adjacent obscured
-                // blocks able to be merged into larger octree nodes
-                // even if they had different block types originally.
-                Block b1 = palette.get(blocks[index - 1]),
-                    b2 = palette.get(blocks[index + 1]),
-                    b3 = palette.get(blocks[index - Chunk.X_MAX]),
-                    b4 = palette.get(blocks[index + Chunk.X_MAX]),
-                    b5 = palette.get(blocks[index - Chunk.X_MAX * Chunk.Z_MAX]),
-                    b6 = palette.get(blocks[index + Chunk.X_MAX * Chunk.Z_MAX]);
-                if (b1.opaque && b2.opaque && b3.opaque && b4.opaque && b5.opaque && b6.opaque) {
-                  block = palette.stone;
-                  blocks[index] = palette.stoneId;
-                  octNode = new Octree.Node(blocks[index]);
-                }
-              }
               if (block.isWaterFilled()) {
                 Octree.Node waterNode = new Octree.Node(palette.waterId);
                 if (cy + 1 < yMax) {
