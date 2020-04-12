@@ -17,8 +17,8 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.entity.SignEntity.Color;
-import se.llbit.chunky.resources.texturepack.FontTexture;
-import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
+import se.llbit.chunky.resources.texturepack.FontTextureLoader;
+import se.llbit.chunky.resources.texturepack.FontTextureLoader.Glyph;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Vector4;
@@ -42,17 +42,16 @@ public class SignTexture extends Texture {
 
   public SignTexture(JsonArray[] text, Texture signTexture) {
     this.signTexture = signTexture;
-    int xmargin = 4;
-    int ymargin = 4;
-    int gh = 10;
-    int width = 90 + xmargin * 2;
-    int height = gh * 4 + ymargin * 2;
+    int ymargin = 1;
+    int lineHeight = 10;
+    int width = 96;
+    int height = 48;
     BitmapImage img = new BitmapImage(width, height);
     int[] data = img.data;
     int ystart = ymargin;
     for (JsonArray line : text) {
       if (line.isEmpty()) {
-        ystart += gh;
+        ystart += lineHeight;
         continue;
       }
       int lineWidth = 0;
@@ -60,55 +59,50 @@ public class SignTexture extends Texture {
         String textLine = textItem.object().get("text").stringValue("");
         for (int j = 0; j < textLine.length(); ++j) {
           char c = textLine.charAt(j);
-          Glyph glyph = FontTexture.glyphs[0xFF & c];
-          lineWidth += glyph.width;
+          Glyph glyph = FontTextureLoader.glyphs.get(c);
+          lineWidth += glyph != null ? glyph.width : 0;
         }
       }
-      int xstart = (width - lineWidth) / 2;
+      int xstart = (int) Math.ceil((width - lineWidth) / 2.0);
       for (JsonValue textItem : line) {
         String textLine = textItem.object().get("text").stringValue("");
         Color color = Color.get(textItem.object().get("color").intValue(0));
 
         for (int j = 0; j < textLine.length(); ++j) {
           char c = textLine.charAt(j);
-          Glyph glyph = FontTexture.glyphs[0xFF & c];
-          int k = 0;
-          int y = ystart;
-          for (int py = 0; py < 8; ++py) {
-            k += glyph.xmin;
-            int x = xstart;
-            for (int px = glyph.xmin; px <= glyph.xmax; ++px) {
-              int bit;
-              if (k < 32) {
-                bit = glyph.top & (1 << k);
-              } else {
-                bit = glyph.bot & (1 << (k - 32));
+          Glyph glyph = FontTextureLoader.glyphs.get(c);
+          if (glyph != null) {
+            int y = ystart - glyph.ascent + lineHeight;
+
+            for (int py = 0; py < glyph.height; ++py) {
+              int x = xstart;
+              for (int px = glyph.xmin; px <= glyph.xmax; ++px) {
+                if ((glyph.lines[py] & (1 << px)) != 0) {
+                  data[y * width + x] = color.rgbColor;
+                }
+                x += 1;
               }
-              if (bit != 0) {
-                data[y * width + x] = color.rgbColor;
-              }
-              k += 1;
-              x += 1;
+              y += 1;
             }
-            k += 7 - glyph.xmax;
-            y += 1;
+            xstart += glyph.width;
           }
-          xstart += glyph.width;
         }
       }
-      ystart += gh;
+      ystart += lineHeight;
     }
     texture = new Texture(img);
   }
 
-  @Override public void getColor(double u, double v, Vector4 c) {
+  @Override
+  public void getColor(double u, double v, Vector4 c) {
     texture.getColor(u, v, c);
     if (c.w == 0) {
       signTexture.getColor(u * ww + u0, v * hh + v0, c);
     }
   }
 
-  @Override public float[] getColor(double u, double v) {
+  @Override
+  public float[] getColor(double u, double v) {
     float[] rgba = texture.getColor(u, v);
     if (rgba[3] == 0) {
       return signTexture.getColor(u * ww + u0, v * hh + v0);
