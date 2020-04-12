@@ -17,6 +17,8 @@
 package se.llbit.chunky.main;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.block.BlockProvider;
+import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.plugin.ChunkyPlugin;
 import se.llbit.chunky.plugin.TabTransformer;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
@@ -394,5 +396,12 @@ public class Chunky {
 
   public TabTransformer getMainTabTransformer() {
     return mainTabTransformer;
+  }
+
+  /**
+   * Registers a block provider to add support for blocks.
+   */
+  public void registerBlockProvider(BlockProvider blockProvider) {
+    BlockSpec.blockProviders.add(blockProvider);
   }
 }
