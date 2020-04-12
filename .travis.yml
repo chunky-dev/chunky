@@ -8,5 +8,9 @@ addons:
     packages:
       - oracle-java8-installer
 
+# TODO Drop this when jdk 11 is supported
+# oraclejdk8 isn't available on more recent distributions
+dist: trusty
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
