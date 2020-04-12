@@ -72,10 +72,8 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
     postprocessingMode.getSelectionModel().selectedItemProperty().addListener(
         (observable, oldValue, newValue) -> {
           scene.setPostprocess(newValue);
-          if (scene.getMode() != RenderMode.PREVIEW) {
-            scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
-            controller.getCanvas().forceRepaint();
-          }
+          scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
+          controller.getCanvas().forceRepaint();
         });
     exposure.setName("Exposure");
     exposure.setRange(Scene.MIN_EXPOSURE, Scene.MAX_EXPOSURE);
@@ -83,10 +81,8 @@ public class PostprocessingTab extends ScrollPane implements RenderControlsTab, 
     exposure.clampMin();
     exposure.onValueChange(value -> {
       scene.setExposure(value);
-      if (scene.getMode() != RenderMode.PREVIEW) {
-        scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
-        controller.getCanvas().forceRepaint();
-      }
+      scene.postProcessFrame(new TaskTracker(ProgressListener.NONE));
+      controller.getCanvas().forceRepaint();
     });
   }
 }

@@ -1521,7 +1521,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void postProcessFrame(TaskTracker progress) {
     try (TaskTracker.Task task = progress.task("Finalizing frame")) {
-      int threadCount=16;
+      int threadCount = PersistentSettings.getNumThreads();
       ExecutorService executor = Executors.newFixedThreadPool(threadCount);
       AtomicInteger done = new AtomicInteger(0);
       int colWidth = width / threadCount;
