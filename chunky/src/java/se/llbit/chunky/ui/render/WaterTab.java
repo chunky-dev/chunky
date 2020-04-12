@@ -105,7 +105,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @Override public void initialize(URL location, ResourceBundle resources) {
     waterVisibility.setName("Water visibility");
     waterVisibility.setTooltip("Visibility depth under water.");
-    waterVisibility.setRange(0, 20);
+    waterVisibility.setRange(0, 50);
     waterVisibility.clampMin();
     waterVisibility.onValueChange(value -> scene.setWaterVisibility(value));
 
