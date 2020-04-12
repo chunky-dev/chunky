@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2019 Jesper Öqvist <jesper@llbit.se>
  *
  * This file is part of Chunky.
  *
@@ -14,17 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
-package se.llbit.chunky.world.material;
+package se.llbit.chunky.resources;
 
-import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Material;
+import se.llbit.math.ColorUtil;
+import se.llbit.math.Vector4;
 
-public class SignMaterial extends Material {
+public class SolidColorTexture extends Texture {
 
-  public static final SignMaterial INSTANCE = new SignMaterial();
+  private final Vector4 color;
 
-  private SignMaterial() {
-    super("sign", Texture.signPost);
+  public SolidColorTexture(Vector4 color) {
+    this.color = color;
+    this.avgColor = ColorUtil.getArgb(color);
+  }
+
+  @Override public void getColor(double u, double v, Vector4 c) {
+    c.set(color);
   }
 
 }

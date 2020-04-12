@@ -26,15 +26,17 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class BrewingStandModel {
-  private static final AABB[] boxes =
-      new AABB[] {new AABB(7 / 16., 9 / 16., 0, 14 / 16., 7 / 16., 9 / 16.),
-          new AABB(9 / 16., 15 / 16., 0, 2 / 16., 5 / 16., 11 / 16.),
-          new AABB(2 / 16., 8 / 16., 0, 2 / 16., 9 / 16., 15 / 16.),
-          new AABB(2 / 16., 8 / 16., 0, 2 / 16., 1 / 16., 7 / 16.),};
+  private static final AABB[] boxes = {
+      new AABB(7 / 16., 9 / 16., 0, 14 / 16., 7 / 16., 9 / 16.),
+      new AABB(9 / 16., 15 / 16., 0, 2 / 16., 5 / 16., 11 / 16.),
+      new AABB(2 / 16., 8 / 16., 0, 2 / 16., 9 / 16., 15 / 16.),
+      new AABB(2 / 16., 8 / 16., 0, 2 / 16., 1 / 16., 7 / 16.),
+  };
 
-  private static final Texture[] tex =
-      {Texture.brewingStandSide, Texture.brewingStandBase, Texture.brewingStandBase,
-          Texture.brewingStandBase,};
+  private static final Texture[] tex = {
+      Texture.brewingStandSide, Texture.brewingStandBase,
+      Texture.brewingStandBase, Texture.brewingStandBase,
+  };
 
   private static final Quad[] quads = new Quad[] {
       // east
@@ -47,13 +49,17 @@ public class BrewingStandModel {
 
       // northwest 330
       new DoubleSidedQuad(new Vector3(.46, 0, 7 / 16.), new Vector3(.25, 0, .067),
-          new Vector3(.46, 1, 7 / 16.), new Vector4(9 / 16., 1, 0, 1)),};
+          new Vector3(.46, 1, 7 / 16.), new Vector4(9 / 16., 1, 0, 1)),
+  };
 
   public static boolean intersect(Ray ray) {
     int data = ray.getBlockData();
+    return intersect(ray, data);
+  }
+
+  public static boolean intersect(Ray ray, int data) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
-
     for (int i = 0; i < boxes.length; ++i) {
       if (boxes[i].intersect(ray)) {
         ray.t = ray.tNext;

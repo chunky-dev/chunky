@@ -165,9 +165,9 @@ public class StandingBanner extends Entity {
     this(position, rotation, parseDesign(entityTag));
   }
 
-  protected static JsonObject parseDesign(CompoundTag entityTag) {
+  public static JsonObject parseDesign(CompoundTag entityTag) {
     JsonObject design = new JsonObject();
-    int base = entityTag.get("Base").intValue(BlockData.BANNER_WHITE);
+    int base = entityTag.get("Base").intValue(BlockData.COLOR_WHITE);
     JsonArray patterns = new JsonArray();
     ListTag listTag = entityTag.get("Patterns").asList();
     for (SpecificTag tag : listTag) {
@@ -235,13 +235,13 @@ public class StandingBanner extends Entity {
         filename = "diagonal_left";
         break;
       case "rud":
-        filename = "diagonal_up_right";
+        filename = "diagonal_right"; // swapped in mc, see rd
         break;
       case "lud":
         filename = "diagonal_up_left";
         break;
       case "rd":
-        filename = "diagonal_right";
+        filename = "diagonal_up_right"; // swapped in mc, see rud
         break;
       case "vh":
         filename = "half_vertical";
@@ -312,6 +312,9 @@ public class StandingBanner extends Entity {
       case "moj":
         filename = "mojang";
         break;
+      case "pig":
+        filename = "piglin";
+        break;
     }
     if (filename.isEmpty()) {
       return Texture.bannerBase.getBitmap();
@@ -354,52 +357,52 @@ public class StandingBanner extends Entity {
   public static float[] getColor(int colorCode) {
     int color = 0;
     switch (colorCode) {
-      case BlockData.BANNER_BLACK:
+      case BlockData.COLOR_BLACK:
         color = 0x000000;
         break;
-      case BlockData.BANNER_BLUE:
+      case BlockData.COLOR_BLUE:
         color = 0x454FC4;
         break;
-      case BlockData.BANNER_BROWN:
+      case BlockData.COLOR_BROWN:
         color = 0x96613A;
         break;
-      case BlockData.BANNER_CYAN:
+      case BlockData.COLOR_CYAN:
         color = 0x1CC6C6;
         break;
-      case BlockData.BANNER_GRAY:
+      case BlockData.COLOR_GRAY:
         color = 0x6E7B80;
         break;
-      case BlockData.BANNER_GREEN:
+      case BlockData.COLOR_GREEN:
         color = 0x81AA1E;
         break;
-      case BlockData.BANNER_LIGHT_BLUE:
+      case BlockData.COLOR_LIGHT_BLUE:
         color = 0x39AFD5;
         break;
-      case BlockData.BANNER_LIME:
+      case BlockData.COLOR_LIME:
         color = 0x89D520;
         break;
-      case BlockData.BANNER_MAGENTA:
+      case BlockData.COLOR_MAGENTA:
         color = 0xCF51C5;
         break;
-      case BlockData.BANNER_ORANGE:
+      case BlockData.COLOR_ORANGE:
         color = 0xD76F19;
         break;
-      case BlockData.BANNER_PINK:
+      case BlockData.COLOR_PINK:
         color = 0xCF7691;
         break;
-      case BlockData.BANNER_PURPLE:
+      case BlockData.COLOR_PURPLE:
         color = 0x9536C9;
         break;
-      case BlockData.BANNER_RED:
+      case BlockData.COLOR_RED:
         color = 0xCC352C;
         break;
-      case BlockData.BANNER_SILVER:
+      case BlockData.COLOR_SILVER:
         color = 0xCCCCCC;
         break;
-      case BlockData.BANNER_WHITE:
+      case BlockData.COLOR_WHITE:
         color = 0xFFFFFF;
         break;
-      case BlockData.BANNER_YELLOW:
+      case BlockData.COLOR_YELLOW:
         color = 0xE6C438;
         break;
     }
@@ -409,9 +412,9 @@ public class StandingBanner extends Entity {
   }
 
   public static Material getBannerTexture(JsonObject design) {
-    int base = design.get("base").asInt(BlockData.BANNER_WHITE);
+    int base = design.get("base").asInt(BlockData.COLOR_WHITE);
     JsonArray patterns = design.get("patterns").array();
-    if (base == BlockData.BANNER_WHITE && patterns.isEmpty()) {
+    if (base == BlockData.COLOR_WHITE && patterns.isEmpty()) {
       return new TextureMaterial(Texture.bannerBase);
     }
     Texture cachedTexture = TextureCache.get(design);
@@ -429,7 +432,7 @@ public class StandingBanner extends Entity {
     float[] col = new float[4];
     float[] com = new float[4];
     tinted.blit(plain, 0, 0);
-    if (base != BlockData.BANNER_WHITE) {
+    if (base != BlockData.COLOR_WHITE) {
       for (int y = 0; y < 41 * scale; ++y) {
         for (int x = 0; x < 42 * scale; ++x) {
           int argb = plain.getPixel(x, y);
@@ -447,7 +450,7 @@ public class StandingBanner extends Entity {
       if (bitmap.width != plain.width || bitmap.height != plain.height) {
         Log.info("Banner pattern does not match base texture size.");
       } else {
-        color = getColor(pattern.object().get("color").intValue(BlockData.BANNER_BLACK));
+        color = getColor(pattern.object().get("color").intValue(BlockData.COLOR_BLACK));
         for (int y = 0; y < 41 * scale; ++y) {
           for (int x = 0; x < 42 * scale; ++x) {
             int argb = bitmap.getPixel(x, y);

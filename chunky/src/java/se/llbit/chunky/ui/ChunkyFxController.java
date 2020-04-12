@@ -338,7 +338,7 @@ public class ChunkyFxController
     renderer.setOnFrameCompleted((scene1, spp) -> {
       if (SnapshotControl.DEFAULT.saveSnapshot(scene1, spp)) {
         // Save the current frame.
-        scene1.saveSnapshot(renderController.getContext().getSceneDirectory(), taskTracker);
+        scene1.saveSnapshot(renderController.getContext().getSceneDirectory(), taskTracker, renderController.getContext().numRenderThreads());
       }
 
       if (SnapshotControl.DEFAULT.saveRenderDump(scene1, spp)) {
@@ -705,16 +705,12 @@ public class ChunkyFxController
     File target = fileChooser.showSaveDialog(saveFrameBtn.getScene().getWindow());
     if (target != null) {
       saveFrameDirectory = target.getParentFile();
-      try {
-        if (!target.getName().endsWith(extension)) {
-          target = new File(target.getPath() + extension);
-        }
-        // TODO:
-        //scene.saveFrame(target, taskTracker);
-        scene.saveFrame(target, new TaskTracker(ProgressListener.NONE));
-      } catch (IOException e1) {
-        Log.error("Failed to save current frame", e1);
+      if (!target.getName().endsWith(extension)) {
+        target = new File(target.getPath() + extension);
       }
+      // TODO:
+      //scene.saveFrame(target, taskTracker);
+      scene.saveFrame(target, new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
     }
   }
 

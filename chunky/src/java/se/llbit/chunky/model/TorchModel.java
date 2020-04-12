@@ -111,10 +111,14 @@ public class TorchModel {
   }
 
   public static boolean intersect(Ray ray, Texture texture) {
+    int rot = ray.getBlockData() % 6;
+    return intersect(ray, texture, rot);
+  }
+
+  public static boolean intersect(Ray ray, Texture texture, int rot) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     float[] color = null;
-    int rot = ray.getBlockData() % 6;
     for (Quad quad : rotQuads[rot]) {
       if (quad.intersect(ray)) {
         float[] c = texture.getColor(ray.u, ray.v);

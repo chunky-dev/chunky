@@ -50,11 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.ResourceBundle;
@@ -319,7 +315,7 @@ public class PluginManagerController implements Initializable {
         plugin.add("error",
             String.format("Missing plugin manifest file (plugin.json) in %s.", jar));
       }
-    } catch (IOException e) {
+    } catch (IOException | FileSystemNotFoundException e) {
       plugin.add("error",
           String.format("Failed to read plugin %s (%s).", jar, e.getMessage()));
     }

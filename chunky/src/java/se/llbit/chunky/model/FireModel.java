@@ -38,9 +38,7 @@ public class FireModel {
           new Quad(new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(0, 1, 1),
               new Vector4(1, 0, 0, 1)),};
 
-  private static final AnimatedTexture[] texture = {Texture.fireLayer0, Texture.fireLayer1};
-
-  public static boolean intersect(Ray ray) {
+  public static boolean intersect(Ray ray, AnimatedTexture[] texture) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     int i = 0xF & (ray.getCurrentData() >> BlockData.LILY_PAD_ROTATION);

@@ -16,8 +16,12 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.MinecraftBlock;
+import se.llbit.chunky.block.Water;
+import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
-import se.llbit.chunky.block.Block;
+import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
@@ -32,9 +36,9 @@ public class PreviewRayTracer implements RayTracer {
   @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
     if (scene.isInWater(ray)) {
-      ray.setCurrentMaterial(Block.get(Block.WATER_ID), 0);
+      ray.setCurrentMaterial(Water.INSTANCE, 0);
     } else {
-      ray.setCurrentMaterial(Block.AIR, 0);
+      ray.setCurrentMaterial(Air.INSTANCE, 0);
     }
     while (true) {
       if (!nextIntersection(scene, ray)) {
@@ -42,14 +46,14 @@ public class PreviewRayTracer implements RayTracer {
           break;
         }
         break;
-      } else if (ray.getCurrentMaterial() != Block.AIR && ray.color.w > 0) {
+      } else if (ray.getCurrentMaterial() != Air.INSTANCE && ray.color.w > 0) {
         break;
       } else {
         ray.o.scaleAdd(Ray.OFFSET, ray.d);
       }
     }
 
-    if (ray.getCurrentMaterial() == Block.AIR) {
+    if (ray.getCurrentMaterial() == Air.INSTANCE) {
       scene.sky.getSkySpecularColor(ray);
     } else {
       scene.sun.flatShading(ray);
@@ -98,7 +102,7 @@ public class PreviewRayTracer implements RayTracer {
       scene.updateOpacity(ray);
       return true;
     } else {
-      ray.setCurrentMaterial(Block.AIR, 0);
+      ray.setCurrentMaterial(Air.INSTANCE, 0);
       return false;
     }
   }
@@ -109,13 +113,11 @@ public class PreviewRayTracer implements RayTracer {
       if (t > 0 && t < ray.t) {
         Vector3 vec = new Vector3();
         vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
-        if (!scene.isInsideOctree(vec)) {
-          ray.t = t;
-          Block.get(Block.WATER_ID).getColor(ray);
-          ray.n.set(0, 1, 0);
-          ray.setCurrentMaterial(Block.get(Block.WATER_ID), 0);
-          return true;
-        }
+        ray.t = t;
+        Water.INSTANCE.getColor(ray);
+        ray.n.set(0, 1, 0);
+        ray.setCurrentMaterial(Water.OCEAN_WATER, 1 << Water.FULL_BLOCK);
+        return true;
       }
     }
     if (ray.d.y > 0) {
@@ -123,13 +125,11 @@ public class PreviewRayTracer implements RayTracer {
       if (t > 0 && t < ray.t) {
         Vector3 vec = new Vector3();
         vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
-        if (!scene.isInsideOctree(vec)) {
-          ray.t = t;
-          Block.get(Block.WATER_ID).getColor(ray);
-          ray.n.set(0, -1, 0);
-          ray.setCurrentMaterial(Block.AIR, 0);
-          return true;
-        }
+        ray.t = t;
+        Water.INSTANCE.getColor(ray);
+        ray.n.set(0, -1, 0);
+        ray.setCurrentMaterial(Air.INSTANCE, 0);
+        return true;
       }
     }
     return false;
@@ -151,7 +151,7 @@ public class PreviewRayTracer implements RayTracer {
           } else {
             ray.color.set(0.25, 0.25, 0.25, 1);
           }
-          ray.setCurrentMaterial(Block.get(Block.STONE_ID), 0);
+          ray.setCurrentMaterial(MinecraftBlock.STONE, 0);
           ray.n.set(0, 1, 0);
           return true;
         }

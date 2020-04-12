@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.model;
 
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
 import se.llbit.math.QuickMath;
@@ -34,7 +35,7 @@ public class LavaModel {
   public static boolean intersect(Ray ray) {
     ray.t = Double.POSITIVE_INFINITY;
     int data = ray.getCurrentData();
-    int isFull = (data >> WaterModel.FULL_BLOCK) & 1;
+    int isFull = (data >> Water.FULL_BLOCK) & 1;
 
     if (isFull != 0) {
       if (fullBlock.intersect(ray)) {

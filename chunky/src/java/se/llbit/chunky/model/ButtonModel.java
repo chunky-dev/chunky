@@ -74,8 +74,13 @@ public class ButtonModel {
   }
 
   public static boolean intersect(Ray ray, Texture texture) {
+    int position = ray.getBlockData();
+    return intersect(ray, texture, position);
+  }
+
+  public static boolean intersect(Ray ray, Texture texture, int position) {
     boolean hit = false;
-    Quad[] rotated = variant[ray.getBlockData() & 7];
+    Quad[] rotated = variant[position & 7];
     ray.t = Double.POSITIVE_INFINITY;
     for (Quad quad : rotated) {
       if (quad.intersect(ray)) {

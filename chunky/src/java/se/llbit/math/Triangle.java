@@ -40,10 +40,9 @@ public class Triangle {
   private final double uv2;
 
   /**
-   * Construct a new triangle.
+   * Build a triangle from corner vertices.
    */
   public Triangle(Vector3 v0, Vector3 v1, Vector3 v2) {
-
     o = new Vector3(v0);
 
     n = new Vector3();
@@ -62,6 +61,20 @@ public class Triangle {
     uu = u.dot(u);
     vv = v.dot(v);
     uv2 = uv * uv;
+  }
+
+  /** Copy a triangle with offset. */
+  public Triangle(Triangle other, Vector3 offset) {
+    n = other.n;
+    o = new Vector3(other.o);
+    o.add(offset);
+    u = other.u;
+    v = other.v;
+    d = other.d;
+    uv = other.uv;
+    uu = other.uu;
+    vv = other.vv;
+    uv2 = other.uv2;
   }
 
   /**

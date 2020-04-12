@@ -22,21 +22,27 @@ import se.llbit.math.AABB;
 import se.llbit.math.Ray;
 
 public class FenceGateModel {
-  private static AABB[] closed =
-      {new AABB(0, .125, .3125, 1, .4375, .5625), new AABB(.375, .625, .375, .9375, .4375, .5625),
-          new AABB(.875, 1, .3125, 1, .4375, .5625),
+  private static AABB[] closed = {
+      new AABB(0, .125, .3125, 1, .4375, .5625),
+      new AABB(.375, .625, .375, .9375, .4375, .5625),
+      new AABB(.875, 1, .3125, 1, .4375, .5625),
 
-          new AABB(.125, .875, .375, .5625, .4375, .5625),
-          new AABB(.125, .875, .75, .9375, .4375, .5625),};
+      new AABB(.125, .875, .375, .5625, .4375, .5625),
+      new AABB(.125, .875, .75, .9375, .4375, .5625),
+  };
 
-  private static AABB[] open =
-      {new AABB(0, .125, .3125, 1, .4375, .5625), new AABB(.875, 1, .3125, 1, .4375, .5625),
+  private static AABB[] open = {
+      new AABB(0, .125, .3125, 1, .4375, .5625),
+      new AABB(.875, 1, .3125, 1, .4375, .5625),
 
-          new AABB(0, .125, .375, .5625, .5625, .8125), new AABB(0, .125, .75, .9375, .5625, .8125),
-          new AABB(0, .125, .375, .9375, .8125, .9375),
+      new AABB(0, .125, .375, .5625, .5625, .8125),
+      new AABB(0, .125, .75, .9375, .5625, .8125),
+      new AABB(0, .125, .375, .9375, .8125, .9375),
 
-          new AABB(.875, 1, .375, .5625, .5625, .8125), new AABB(.875, 1, .75, .9375, .5625, .8125),
-          new AABB(.875, 1, .375, .9375, .8125, .9375),};
+      new AABB(.875, 1, .375, .5625, .5625, .8125),
+      new AABB(.875, 1, .75, .9375, .5625, .8125),
+      new AABB(.875, 1, .375, .9375, .8125, .9375),
+  };
 
   private static AABB[][][][] rot = new AABB[2][2][4][];
 
@@ -64,12 +70,17 @@ public class FenceGateModel {
   }
 
   public static boolean intersect(Ray ray, Texture texture) {
-    boolean hit = false;
     int isOpen = (ray.getBlockData() >> 2) & 1;
-    int direction = ray.getBlockData() & 3;
-    int isLow = (ray.getCurrentData() >> BlockData.FENCEGATE_LOW) & 1;
+    int facing = ray.getBlockData() & 3;
+    int inWall = (ray.getCurrentData() >> BlockData.FENCEGATE_LOW) & 1;
+    return intersect(ray, texture, facing, inWall, isOpen);
+  }
+
+  public static boolean intersect(Ray ray, Texture texture,
+      int facing, int inWall, int isOpen) {
+    boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
-    for (AABB box : rot[isLow][isOpen][direction]) {
+    for (AABB box : rot[inWall][isOpen][facing]) {
       if (box.intersect(ray)) {
         texture.getColor(ray);
         ray.t = ray.tNext;

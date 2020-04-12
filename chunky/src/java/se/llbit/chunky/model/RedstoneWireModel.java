@@ -129,9 +129,13 @@ public class RedstoneWireModel {
   }
 
   public static boolean intersect(Ray ray) {
-    int data = ray.getCurrentData();
-    boolean hit = false;
     int power = ray.getBlockData();
+    int data = ray.getCurrentData();
+    return intersect(ray, power, data);
+  }
+
+  public static boolean intersect(Ray ray, int power, int data) {
+    boolean hit = false;
     int connection = 0xF & (data >> BlockData.RSW_EAST_CONNECTION);
     ray.t = Double.POSITIVE_INFINITY;
     Quad quad = quads[connection];

@@ -17,7 +17,7 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.Air;
 import se.llbit.chunky.resources.HDRTexture;
 import se.llbit.chunky.resources.PFMTexture;
 import se.llbit.chunky.resources.Texture;
@@ -967,7 +967,7 @@ public class Sky implements JsonSerializable {
   private static void exitCloud(Ray ray, double t) {
     ray.t = t;
     ray.color.set(CloudMaterial.color);
-    ray.setCurrentMaterial(Block.AIR, 0);
+    ray.setCurrentMaterial(Air.INSTANCE, 0);
   }
 
   private static boolean inCloud(double x, double z) {

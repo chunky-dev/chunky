@@ -49,9 +49,8 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
   @FXML private CheckBox stillWater;
   @FXML private DoubleAdjuster waterVisibility;
   @FXML private DoubleAdjuster waterOpacity;
-  @FXML private CheckBox waterWorld;
+  @FXML private CheckBox waterPlane;
   @FXML private TextField waterHeight;
-  @FXML private Button applyWaterHeight;
   @FXML private CheckBox useCustomWaterColor;
   @FXML private LuxColorPicker waterColor;
   @FXML private Button saveDefaults;
@@ -83,7 +82,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     if (waterHeight != 0) {
       waterHeightProp.set(scene.getWaterHeight());
     }
-    waterWorld.setSelected(scene.getWaterHeight() != 0);
+    waterPlane.setSelected(scene.getWaterHeight() != 0);
     useCustomWaterColor.setSelected(scene.getUseCustomWaterColor());
     stillWater.setSelected(scene.stillWaterEnabled());
     waterVisibility.set(scene.getWaterVisibility());
@@ -125,31 +124,21 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     }
     waterHeight.textProperty().bindBidirectional(waterHeightProp, new NumberStringConverter());
     waterHeightProp.set(initialWaterHeight);
-
-    applyWaterHeight.setOnAction(e -> {
-      boolean needsReload;
-      if (waterWorld.isSelected()) {
-        needsReload = scene.setWaterHeight(waterHeightProp.get());
+    waterHeightProp.addListener((observable, oldValue, newValue) -> {
+      if (waterPlane.isSelected()) {
+        scene.setWaterHeight(newValue.intValue());
       } else {
-        needsReload = scene.setWaterHeight(0);
-      }
-      if (needsReload) {
-        controller.getSceneManager().reloadChunks();
+        scene.setWaterHeight(0);
       }
     });
 
-    waterWorld.setTooltip(
+    waterPlane.setTooltip(
         new Tooltip("In Water World mode, an infinite ocean surrounds the loaded chunks."));
-    waterWorld.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      int waterHeight;
+    waterPlane.selectedProperty().addListener((observable, oldValue, newValue) -> {
       if (newValue) {
-        waterHeight = waterHeightProp.get();
+        scene.setWaterHeight(waterHeightProp.get());
       } else {
-        waterHeight = 0;
-      }
-      if (waterHeight != scene.getWaterHeight()) {
-        renderControls.showPopup(
-            "Click the Apply button to apply this setting and reload all chunks.", waterWorld);
+        scene.setWaterHeight(0);
       }
     });
 

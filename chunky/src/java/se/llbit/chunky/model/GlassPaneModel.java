@@ -64,7 +64,9 @@ public class GlassPaneModel {
 
           // Bottom face.
           new Quad(new Vector3(7 / 16., 0, 9 / 16.), new Vector3(9 / 16., 0, 9 / 16.),
-              new Vector3(7 / 16., 0, 1), new Vector4(7 / 16., 9 / 16., 9 / 16., 1)),},};
+              new Vector3(7 / 16., 0, 1), new Vector4(7 / 16., 9 / 16., 9 / 16., 1)),
+      },
+  };
 
   private static Quad[][] panes = new Quad[4][];
 
@@ -78,6 +80,11 @@ public class GlassPaneModel {
 
   public static boolean intersect(Ray ray, Texture sideTexture, Texture topTexture) {
     int metadata = 0xF & (ray.getCurrentData() >> BlockData.GLASS_PANE_OFFSET);
+    return intersect(ray, sideTexture, topTexture, metadata);
+  }
+
+  public static boolean intersect(Ray ray, Texture sideTexture, Texture topTexture,
+      int metadata) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     if (core.intersect(ray)) {

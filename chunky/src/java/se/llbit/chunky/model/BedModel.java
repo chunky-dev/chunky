@@ -207,16 +207,19 @@ public class BedModel {
   }
 
   public static boolean intersect(Ray ray) {
-    boolean hit = false;
     int isHead = (ray.getBlockData() >> 3) & 1;
     int angle = ray.getBlockData() & 3;
     int bedColor = 0xF & (ray.getCurrentData() >> BlockData.BED_COLOR);
+    return intersect(ray, texture[bedColor], isHead, angle);
+  }
 
+  public static boolean intersect(Ray ray, Texture texture, int isHead, int angle) {
+    boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
 
     for (Quad quad : rot[isHead][angle]) {
       if (quad.intersect(ray)) {
-        float[] color = texture[bedColor].getColor(ray.u, ray.v);
+        float[] color = texture.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.n.set(quad.n);

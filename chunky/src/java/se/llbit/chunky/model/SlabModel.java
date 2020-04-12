@@ -26,7 +26,8 @@ public class SlabModel {
       new AABB(0, 1, 0, .5, 0, 1),
 
       // upper half-block
-      new AABB(0, 1, .5, 1, 0, 1),};
+      new AABB(0, 1, .5, 1, 0, 1),
+  };
 
   public static boolean intersect(Ray ray, Texture sideTexture, Texture topTexture) {
     int which = (ray.getBlockData() & 0x8) >> 3;

@@ -75,9 +75,14 @@ public class EndRodModel {
   }
 
   public static boolean intersect(Ray ray) {
+    int data = ray.getBlockData();
+    return intersect(ray, data);
+  }
+
+  public static boolean intersect(Ray ray, int data) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
-    for (Quad quad : facing[ray.getBlockData() % 6]) {
+    for (Quad quad : facing[data % 6]) {
       if (quad.intersect(ray)) {
         Texture.endRod.getColor(ray);
         ray.t = ray.tNext;

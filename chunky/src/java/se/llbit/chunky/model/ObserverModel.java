@@ -82,9 +82,13 @@ public class ObserverModel {
   private static final int[] textureIndex = {3, 3, 2, 2, 1, 0};
 
   public static boolean intersect(Ray ray, Texture[] textures) {
+    int direction = ray.getBlockData() & 7;
+    return intersect(ray, textures, direction);
+  }
+
+  public static boolean intersect(Ray ray, Texture[] textures, int direction) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
-    int direction = ray.getBlockData() & 7;
     for (int i = 0; i < 6; ++i) {
       Quad face = faces[direction][i];
       if (face.intersect(ray)) {

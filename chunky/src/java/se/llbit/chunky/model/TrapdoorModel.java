@@ -188,18 +188,22 @@ public class TrapdoorModel {
   };
 
   public static boolean intersect(Ray ray, Texture texture) {
-    boolean hit = false;
-    Quad[] state;
     int data = ray.getBlockData();
+    return intersect(ray, texture, data);
+  }
+
+  public static boolean intersect(Ray ray, Texture texture, int state) {
+    boolean hit = false;
+    Quad[] model;
     ray.t = Double.POSITIVE_INFINITY;
-    if ((ray.getBlockData() & 4) == 0) {
+    if ((state & 4) == 0) {
       // Not open - top or bottom?
-      state = faces[data >> 3];
+      model = faces[state >> 3];
     } else {
       // Open
-      state = faces[(data & 3) + 2];
+      model = faces[(state & 3) + 2];
     }
-    for (Quad face : state) {
+    for (Quad face : model) {
       if (face.intersect(ray)) {
         float[] color = texture.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {

@@ -22,8 +22,8 @@ import java.util.LinkedList;
 
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.SignTexture;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
-import se.llbit.chunky.world.material.SignMaterial;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
@@ -87,17 +87,22 @@ public class WallSignEntity extends Entity {
 
   private final JsonArray[] text;
   private final int orientation;
-  private final SignTexture texture;
+  private final SignTexture frontTexture;
+  private final Texture texture;
+  private final String material;
 
-  public WallSignEntity(Vector3 position, CompoundTag entityTag, int blockData) {
-    this(position, SignEntity.getTextLines(entityTag), blockData % 6);
+  public WallSignEntity(Vector3 position, CompoundTag entityTag, int blockData, String material) {
+    this(position, SignEntity.getTextLines(entityTag), blockData % 6, material);
   }
 
-  public WallSignEntity(Vector3 position, JsonArray[] text, int direction) {
+  public WallSignEntity(Vector3 position, JsonArray[] text, int direction, String material) {
     super(position);
+    Texture signTexture = SignEntity.textureFromMaterial(material);
     this.orientation = direction;
     this.text = text;
-    this.texture = new SignTexture(text);
+    this.frontTexture = new SignTexture(text, signTexture);
+    this.texture = signTexture;
+    this.material = material;
   }
 
   @Override public Collection<Primitive> primitives(Vector3 offset) {
@@ -107,12 +112,7 @@ public class WallSignEntity extends Entity {
     Quad[] quads = faces[orientation];
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
-      Material material;
-      if (i != 0) {
-        material = SignMaterial.INSTANCE;
-      } else {
-        material = new TextureMaterial(texture);
-      }
+      Material material = new TextureMaterial(i == 0 ? frontTexture : texture);
       quad.addTriangles(primitives, material, transform);
     }
     return primitives;
@@ -124,6 +124,7 @@ public class WallSignEntity extends Entity {
     json.add("position", position.toJson());
     json.add("text", SignEntity.textToJson(text));
     json.add("direction", orientation);
+    json.add("material", material);
     return json;
   }
 
@@ -135,6 +136,7 @@ public class WallSignEntity extends Entity {
     position.fromJson(json.get("position").object());
     JsonArray[] text = SignEntity.textFromJson(json.get("text"));
     int direction = json.get("direction").intValue(0);
-    return new WallSignEntity(position, text, direction);
+    String material = json.get("material").stringValue("oak");
+    return new WallSignEntity(position, text, direction, material);
   }
 }
