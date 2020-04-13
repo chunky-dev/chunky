@@ -15,7 +15,7 @@ Chunky is a Minecraft rendering tool that uses Path Tracing to create realistic 
 
 ## Quick start guide
 
-_Prerequisites:_ Chunky requires Java 8. If you haven't installed it yet, [get it from here][13]. Make sure that you have installed the 64-bit version if you have a 64-bit operating system (you most likely do).
+_Prerequisites:_ Chunky requires Java 8 and it is recommended to install the 64-bit version if you have a 64-bit operating system (you most likely do). If you haven't installed it yet, [get it from here][13].
 
 1. Download [the Chunky Launcher][12] and open it
 2. Install the latest version of Chunky by clicking on _Check for Updates_
