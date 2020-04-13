@@ -196,5 +196,5 @@ See the file `licenses/commons-math.txt` for the copyright notices.
 [10]: https://github.com/leMaik/chunky-denoiser
 [11]: https://chunky.llbit.se/skymaps.html
 [12]: http://chunkyupdate.lemaik.de/ChunkyLauncher.jar
-[13]: https://java.com/download/
+[13]: https://www.java.com/en/download/manual.jsp
 [14]: https://github.com/llbit/chunky/issues/553
