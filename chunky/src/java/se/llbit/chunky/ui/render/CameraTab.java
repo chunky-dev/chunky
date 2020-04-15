@@ -75,6 +75,8 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   @FXML private DoubleAdjuster fov;
   @FXML private DoubleAdjuster dof;
   @FXML private DoubleAdjuster subjectDistance;
+  @FXML private TextField shiftX;
+  @FXML private TextField shiftY;
   @FXML private Button autofocus;
 
   private DoubleProperty xpos = new SimpleDoubleProperty();
@@ -83,6 +85,8 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
   private DoubleProperty yaw = new SimpleDoubleProperty();
   private DoubleProperty pitch = new SimpleDoubleProperty();
   private DoubleProperty roll = new SimpleDoubleProperty();
+  private DoubleProperty xshift = new SimpleDoubleProperty();
+  private DoubleProperty yshift = new SimpleDoubleProperty();
   private MapView mapView;
   private CameraViewListener cameraViewListener;
 
@@ -101,6 +105,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
     updateFov();
     updateDof();
     updateSubjectDistance();
+    updateShift();
   }
 
   @Override public String getTabTitle() {
@@ -126,6 +131,11 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
 
   private void updateFov() {
     fov.set(scene.camera().getFov());
+  }
+
+  private void updateShift() {
+    xshift.set(scene.camera().getShiftX());
+    yshift.set(scene.camera().getShiftY());
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
@@ -158,6 +168,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
           updateSubjectDistance();
           updateCameraPosition();
           updateCameraDirection();
+          updateShift();
         } else {
           // Create new camera preset.
           cameras.getItems().add(newValue);
@@ -190,6 +201,7 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
         updateSubjectDistance();
         updateCameraPosition();
         updateCameraDirection();
+        updateShift();
         cameras.getSelectionModel().selectedItemProperty().addListener(cameraSelectionListener);
       }
     });
@@ -279,6 +291,19 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       updateDof();
       updateSubjectDistance();
     });
+
+    shiftX.setTooltip(new Tooltip("Horizontal lense shift (relative to the image height)."));
+    shiftX.textProperty().bindBidirectional(xshift, new NumberStringConverter());
+    shiftY.setTooltip(new Tooltip("Vertical lense shift (relative to the image height)."));
+    shiftY.textProperty().bindBidirectional(yshift, new NumberStringConverter());
+
+    EventHandler<KeyEvent> shiftHandler = e -> {
+      if (e.getCode() == KeyCode.ENTER) {
+        scene.camera().setShift(xshift.doubleValue(), yshift.doubleValue());
+      }
+    };
+    shiftX.addEventFilter(KeyEvent.KEY_PRESSED, shiftHandler);
+    shiftY.addEventFilter(KeyEvent.KEY_PRESSED, shiftHandler);
   }
 
   private void generateNextCameraName() {

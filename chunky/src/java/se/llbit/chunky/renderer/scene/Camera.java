@@ -30,6 +30,7 @@ import se.llbit.chunky.renderer.projection.ParallelProjector;
 import se.llbit.chunky.renderer.projection.PinholeProjector;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.projection.Projector;
+import se.llbit.chunky.renderer.projection.ShiftProjector;
 import se.llbit.chunky.renderer.projection.SphericalApertureProjector;
 import se.llbit.chunky.renderer.projection.StereographicProjector;
 import se.llbit.chunky.world.Chunk;
@@ -115,6 +116,16 @@ public class Camera implements JsonSerializable {
   private double roll = 0;
 
   /**
+   * X shift.
+   */
+  private double shiftX = 0;
+
+  /**
+   * Y shift.
+   */
+  private double shiftY = 0;
+
+  /**
    * Transform to rotate from camera space to world space (not including
    * translation).
    */
@@ -167,6 +178,8 @@ public class Camera implements JsonSerializable {
     fov = other.fov;
     subjectDistance = other.subjectDistance;
     worldWidth = other.worldWidth;
+    this.shiftX = other.shiftX;
+    this.shiftY = other.shiftY;
     initProjector();
     updateTransform();
   }
@@ -181,6 +194,13 @@ public class Camera implements JsonSerializable {
         new SphericalApertureProjector(p, subjectDistance / dof, subjectDistance);
   }
 
+  private Projector applyShift(Projector p) {
+    if(Math.abs(shiftX) > 0 || Math.abs(shiftY) > 0) {
+      return new ShiftProjector(p, shiftX, shiftY);
+    }
+    return p;
+  }
+
   /**
    * Creates projector based on the current camera settings.
    */
@@ -189,11 +209,11 @@ public class Camera implements JsonSerializable {
       default:
         Log.errorf("Unknown projection mode: %s, using standard mode", projectionMode);
       case PINHOLE:
-        return applyDoF(new PinholeProjector(fov), subjectDistance);
+        return applyShift(applyDoF(new PinholeProjector(fov), subjectDistance));
       case PARALLEL:
-        return applyDoF(
+        return applyShift(applyDoF(
             new ForwardDisplacementProjector(new ParallelProjector(worldWidth, fov), -worldWidth),
-            subjectDistance + worldWidth);
+            subjectDistance + worldWidth));
       case FISHEYE:
         return applySphericalDoF(new FisheyeProjector(fov));
       case PANORAMIC_SLOT:
@@ -275,6 +295,18 @@ public class Camera implements JsonSerializable {
     initProjector();
     onViewChange();
     projectionListener.run();
+  }
+
+  /**
+   * Set camera shift
+   * @param x horizontal shift, relative to the image height
+   * @param y vertical shift, relative to the image height
+   */
+  public synchronized void setShift(double x, double y) {
+    shiftX = x;
+    shiftY = y;
+    initProjector();
+    onViewChange();
   }
 
   /**
@@ -522,6 +554,20 @@ public class Camera implements JsonSerializable {
   }
 
   /**
+   * @return The current camera shift in x direction
+   */
+  public double getShiftX() {
+    return shiftX;
+  }
+
+  /**
+   * @return The current camera shift in y direction
+   */
+  public double getShiftY() {
+    return shiftY;
+  }
+
+  /**
    * Update the world size. This is the maximum X/Z dimension value. The world size affects
    * the parallel projector which uses the world size to avoid clipping chunks.
    *
@@ -567,6 +613,12 @@ public class Camera implements JsonSerializable {
       camera.add("dof", dof);
     }
     camera.add("focalOffset", subjectDistance);
+
+    JsonObject shift = new JsonObject();
+    shift.add("x", shiftX);
+    shift.add("y", shiftY);
+    camera.add("shift", shift);
+
     return camera;
   }
 
@@ -591,6 +643,11 @@ public class Camera implements JsonSerializable {
     } else {
       dof = json.get("dof").doubleValue(dof);
     }
+
+    JsonObject shift = json.get("shift").object();
+    shiftX = shift.get("x").doubleValue(0);
+    shiftY = shift.get("y").doubleValue(0);
+
     initProjector();
     updateTransform();
   }
