@@ -28,6 +28,7 @@ package se.llbit.math;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Transform {
+
   /**
    * Used to sequence two separate transformations.
    */
@@ -121,6 +122,24 @@ public class Transform {
 
       @Override public void applyRotScale(Vector3 v) {
         v.scale(scale);
+      }
+    });
+  }
+
+  public final Transform scale(double scaleX, double scaleY, double scaleZ) {
+    return chain(new Transform(){
+      @Override
+      public void apply(Vector3 v) {
+        v.x*=scaleX;
+        v.y*=scaleY;
+        v.z*=scaleZ;
+      }
+
+      @Override
+      public void applyRotScale(Vector3 v) {
+        v.x*=scaleX;
+        v.y*=scaleY;
+        v.z*=scaleZ;
       }
     });
   }
@@ -240,24 +259,33 @@ public class Transform {
   }
 
   /**
-   * Mirror in Y axis
-   */
-  public final Transform mirrorY() {
-    return chain(new Transform() {
-      @Override public void apply(Vector3 o) {
-        o.x = -o.x;
-        o.y = -o.y;
-      }
-    });
-  }
-
-  /**
    * Mirror in X axis
    */
   public final Transform mirrorX() {
     return chain(new Transform() {
       @Override public void apply(Vector3 o) {
         o.x = -o.x;
+      }
+    });
+  }
+
+  /**
+   * Mirror in Y axis
+   */
+  public final Transform mirrorY() {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 o) {
+        o.y= -o.y;
+      }
+    });
+  }
+
+  /**
+   * Mirror in Z axis
+   */
+  public final Transform mirrorZ() {
+    return chain(new Transform() {
+      @Override public void apply(Vector3 o) {
         o.z = -o.z;
       }
     });

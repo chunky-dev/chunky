@@ -1,0 +1,579 @@
+package se.llbit.chunky.block;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.AnimatedTexture;
+import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.Texture;
+import se.llbit.json.JsonArray;
+import se.llbit.json.JsonMember;
+import se.llbit.json.JsonObject;
+import se.llbit.json.JsonParser;
+import se.llbit.json.JsonParser.SyntaxError;
+import se.llbit.json.JsonValue;
+import se.llbit.math.AABB;
+import se.llbit.math.Quad;
+import se.llbit.math.Ray;
+import se.llbit.math.Transform;
+import se.llbit.math.Vector3;
+import se.llbit.nbt.Tag;
+import se.llbit.resources.ImageLoader;
+
+public class ResourcepackBlockProvider implements BlockProvider {
+  private final Map<String, BlockVariants> blocks = new HashMap<>();
+
+  public ResourcepackBlockProvider(File file) throws IOException {
+    try (FileSystem zip =
+        FileSystems.newFileSystem(URI.create("jar:" + file.toURI()), Collections.emptyMap())) {
+      JsonModelLoader modelLoader = new JsonModelLoader();
+      Files.list(zip.getPath("assets"))
+          .filter(Files::isDirectory)
+          .map(assetProvider -> assetProvider.resolve("blockstates"))
+          .filter(Files::isDirectory)
+          .forEach(
+              assets -> {
+                final String assetsName = assets.getParent().getFileName().toString();
+                try {
+                  Files.list(assets)
+                      .forEach(
+                          block -> {
+                            String blockName = block.getFileName().toString();
+                            blockName = blockName.substring(0, blockName.length() - 5);
+
+                            BlockVariants variants = new BlockVariants();
+                            try {
+                              JsonObject blockStates =
+                                  new JsonParser(Files.newInputStream(block)).parse().object();
+                              if (blockStates.get("variants").isObject()) {
+                                for (JsonMember blockState :
+                                    blockStates.get("variants").object().members) {
+                                  // TODO add support for pseudo-random models
+                                  String modelName =
+                                      blockState.getValue().isArray()
+                                          ? blockState
+                                              .getValue()
+                                              .array()
+                                              .get(0)
+                                              .object()
+                                              .get("model")
+                                              .stringValue("unknown:unknown")
+                                          : blockState
+                                              .getValue()
+                                              .object()
+                                              .get("model")
+                                              .stringValue("unknown:unknown");
+                                  // TODO handle rotation
+                                  if (modelName.equals("minecraft:block/air")) {
+                                    variants.variants.add(new SimpleBlockVariant(Air.INSTANCE));
+                                  } else {
+                                    variants.variants.add(
+                                        new VariantsBlockVariant(
+                                            blockState.getName(),
+                                            modelLoader.loadBlockModel(zip, modelName, blockName)));
+                                  }
+                                }
+                              } else if (blockStates.get("multipart").isArray()) {
+                                // TODO add multipart block support
+                                BlockVariantMultipart multipartBlockVariant =
+                                    new BlockVariantMultipart(blockName);
+                                for (JsonValue part : blockStates.get("multipart").array()) {
+                                  String modelName =
+                                      part.object().get("apply").isArray()
+                                          ? part.object()
+                                              .get("apply")
+                                              .array()
+                                              .get(0) // TODO
+                                              .object()
+                                              .get("model")
+                                              .stringValue("unknown:unknown")
+                                          : part.object()
+                                              .get("apply")
+                                              .object()
+                                              .get("model")
+                                              .stringValue("unknown:unknown");
+
+                                  multipartBlockVariant.addPart(
+                                      new MultipartBlockVariant(
+                                          part.object().get("when").object(),
+                                          modelLoader.loadBlockModel(zip, modelName, blockName)));
+                                }
+                                variants.variants.add(multipartBlockVariant);
+                              } else {
+                                throw new Error("Unsupported block " + blockName);
+                              }
+                            } catch (IOException | SyntaxError e) {
+                              throw new Error(e);
+                            }
+
+                            blocks.put(assetsName + ":" + blockName, variants);
+                          });
+                } catch (IOException e) {
+                  throw new Error(e);
+                }
+              });
+    }
+  }
+
+  @Override
+  public Block getBlockByTag(String name, Tag tag) {
+    BlockVariants variants = blocks.get(name);
+    return variants != null ? variants.getBlock(tag) : null;
+  }
+
+  @Override
+  public Collection<String> getSupportedBlocks() {
+    return blocks.keySet();
+  }
+
+  private static class BlockVariants {
+    private final List<BlockVariant> variants = new ArrayList<>();
+
+    public Block getBlock(Tag tag) {
+      Tag properties = tag.get("Properties");
+      for (BlockVariant variant : variants) {
+        if (variant.isMatch(properties)) {
+          return variant.getBlock(properties);
+        }
+      }
+      return UnknownBlock.UNKNOWN;
+    }
+  }
+
+  private interface BlockVariant {
+    boolean isMatch(Tag properties);
+
+    Block getBlock(Tag properties);
+  }
+
+  private static class SimpleBlockVariant implements BlockVariant {
+    private final Block block;
+
+    private SimpleBlockVariant(Block block) {
+      this.block = block;
+    }
+
+    @Override
+    public boolean isMatch(Tag properties) {
+      return true;
+    }
+
+    @Override
+    public Block getBlock(Tag properties) {
+      return block;
+    }
+  }
+
+  private static class VariantsBlockVariant implements BlockVariant {
+    protected final Map<String, String> conditions = new HashMap<>();
+    private final Block model;
+
+    private VariantsBlockVariant(String conditions, Block model) {
+      this.model = model;
+
+      for (String condition : conditions.split(",")) {
+        String[] parts = condition.trim().split("=");
+        if (parts.length < 2) {
+          break;
+        }
+        this.conditions.put(parts[0], parts[1]);
+      }
+
+      // TODO handle rotation
+      // this.model = model.rotate(x, y, z);
+    }
+
+    protected VariantsBlockVariant(Block model) {
+      this.model = model;
+    }
+
+    @Override
+    public boolean isMatch(Tag properties) {
+      for (Entry<String, String> property : conditions.entrySet()) {
+        if (!properties.get(property.getKey()).stringValue("").equals(property.getValue())) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    @Override
+    public Block getBlock(Tag properties) {
+      return model;
+    }
+  }
+
+  private static class BlockVariantMultipart implements BlockVariant {
+    private final String name;
+    private final List<VariantsBlockVariant> parts = new ArrayList<>();
+
+    private BlockVariantMultipart(String name) {
+      this.name = name;
+    }
+
+    public void addPart(VariantsBlockVariant part) {
+      parts.add(part);
+    }
+
+    @Override
+    public boolean isMatch(Tag properties) {
+      return true;
+    }
+
+    @Override
+    public Block getBlock(Tag properties) {
+      List<JsonModel> applicableParts = new ArrayList<>();
+      for (VariantsBlockVariant part : parts) {
+        if (part.isMatch(properties)) {
+          Block partBlock = part.getBlock(properties);
+          if (partBlock instanceof JsonModel) {
+            applicableParts.add((JsonModel) partBlock);
+          } else {
+            throw new Error("Multipart model part is not a JsonModel");
+          }
+        }
+      }
+      return new MultipartJsonModel(name, applicableParts.toArray(new JsonModel[0]));
+    }
+  }
+
+  private static class MultipartBlockVariant extends VariantsBlockVariant {
+    private MultipartBlockVariant(JsonObject when, Block model) {
+      super(model);
+      for (JsonMember condition : when.members) {
+        this.conditions.put(condition.getName(), condition.getValue().stringValue(""));
+      }
+    }
+  }
+
+  private static class JsonModelLoader {
+    private final Map<String, JsonObject> models = new HashMap<>();
+    private final Map<String, Texture> textures = new HashMap<>();
+
+    public Texture getTexture(FileSystem zip, String textureName) {
+      Texture texture = textures.get(textureName);
+      if (texture == null) {
+        String[] parts = textureName.split(":");
+        if (parts.length < 2) {
+          parts = new String[] {"minecraft", parts[0]};
+        }
+        // TODO <= 1.12 texture paths are prefixed
+        try (InputStream inputStream =
+            Files.newInputStream(zip.getPath("assets", parts[0], "textures", parts[1] + ".png"))) {
+          BitmapImage image = ImageLoader.read(inputStream);
+          if (image.width == image.height) {
+            // textures are always squared...
+            texture = new Texture(image);
+          } else {
+            // ...unless they are animated
+            texture = new AnimatedTexture(image);
+          }
+        } catch (IOException e) {
+          throw new Error("Could not load texture " + textureName, e);
+        }
+      }
+      return texture;
+    }
+
+    private JsonObject getModel(FileSystem zip, String modelName) {
+      JsonObject model = models.get(modelName);
+      if (model == null) {
+        String[] parts = modelName.split(":");
+        if (parts.length < 2) {
+          parts = new String[] {"minecraft", parts[0]};
+        }
+        // TODO <= 1.12 model paths are prefixed
+        try (InputStream inputStream =
+            Files.newInputStream(zip.getPath("assets", parts[0], "models", parts[1] + ".json"))) {
+          model = new JsonParser(inputStream).parse().object();
+          models.put(modelName, model);
+        } catch (IOException | SyntaxError e) {
+          throw new Error("Could not load block model " + modelName, e);
+        }
+      }
+      return model;
+    }
+
+    public Block loadBlockModel(FileSystem zip, String model, String blockName) {
+      if (model.equals("unknown:unknown")) {
+        return UnknownBlock.UNKNOWN;
+      }
+
+      JsonModel block = new JsonModel(blockName, Texture.air);
+      JsonObject blockDefinition = getModel(zip, model);
+      block.applyDefinition(blockDefinition, name -> this.getTexture(zip, name));
+      while (!blockDefinition.get("parent").stringValue("block/block").equals("block/block")) {
+        String parentName = blockDefinition.get("parent").stringValue("block/block");
+        blockDefinition = this.getModel(zip, parentName);
+        block.applyDefinition(blockDefinition, name -> this.getTexture(zip, name));
+        if (parentName.equals("block/cube_all")) {
+          block.texture = block.textures.get("all");
+          block.localIntersect = false;
+        }
+      }
+
+      // TODO resolve parents up to block/block
+      return block;
+    }
+  }
+
+  private static class JsonModelFace {
+    private Quad quad;
+    private String texture;
+    private Transform transform = Transform.NONE;
+    private int tintindex;
+
+    public JsonModelFace(String direction, JsonObject face, Vector3 from, Vector3 to) {
+      if (face.get("texture").stringValue("").length() < 2) {
+        throw new Error(face.toCompactString());
+      }
+      this.texture = face.get("texture").stringValue("").substring(1);
+      this.tintindex = face.get("tintindex").intValue(-1);
+      int rotation = face.get("rotation").intValue(0);
+      JsonArray uv = face.get("uv").isArray() ? face.get("uv").array() : null;
+      // TODO cullface
+
+      // TODO QUADS PLEASE
+      double lx = to.x - from.x;
+      double ly = to.y - from.y;
+      double lz = to.z - from.z;
+      if (direction.equals("up")) {
+        this.transform = this.transform.translate(-from.x / 16, -from.z / 16, 0).scale(16/lx,16/lz,1);
+      }
+
+      if (direction.equals("up")) {
+        this.transform = this.transform.translate(-0.5, -0.5, 0).mirrorY().translate(0.5, 0.5, 0);
+      }
+
+      if (uv != null) {
+        double x1 = uv.get(0).doubleValue(0);
+        double x2 = uv.get(2).doubleValue(16);
+        double y1 = uv.get(1).doubleValue(0);
+        double y2 = uv.get(3).doubleValue(16);
+
+        this.transform =
+            this.transform.scale((x2 - x1) / 16, (y2 - y1) / 16, 1).translate(x1 / 16, y1 / 16, 0);
+      }
+
+      if (rotation != 0) {
+        this.transform =
+            this.transform
+                .translate(-0.5, -0.5, 0)
+                .rotateZ(Math.toRadians(rotation))
+                .translate(0.5, 0.5, 0);
+      }
+    }
+
+    public float[] getColor(Ray ray, Scene scene, Texture texture) {
+      // TODO uv handling
+      float[] color;
+      if (transform == null) {
+        color = texture.getColor(ray.u, ray.v);
+      } else {
+        Vector3 uv = new Vector3(ray.u, ray.v, 0.0);
+        this.transform.apply(uv);
+        color = texture.getColor(uv.x, uv.y);
+      }
+
+      if (tintindex == 0) {
+        float[] biomeColor = ray.getBiomeGrassColor(scene);
+        color = color.clone();
+        if (color[3] > Ray.EPSILON) {
+          // TODO handle transparency correctly
+          color[0] *= biomeColor[0];
+          color[1] *= biomeColor[1];
+          color[2] *= biomeColor[2];
+        }
+      }
+
+      return color;
+    }
+  }
+
+  private static class JsonModelElement {
+    private JsonModel model;
+    private AABB box;
+    private JsonModelFace[] faces = new JsonModelFace[6]; // up,down,north,east,south,west
+
+    public JsonModelElement(JsonModel model, JsonObject element) {
+      this.model = model;
+
+      Vector3 from =
+          new Vector3(
+              element.get("from").asArray().get(0).asDouble(0),
+              element.get("from").asArray().get(1).asDouble(0),
+              element.get("from").asArray().get(2).asDouble(0));
+      Vector3 to =
+          new Vector3(
+              element.get("to").asArray().get(0).asDouble(0),
+              element.get("to").asArray().get(1).asDouble(0),
+              element.get("to").asArray().get(2).asDouble(0));
+      if (to.x <= 16 && to.y <= 16 && to.z <= 16) {
+        this.box = new AABB(from.x / 16, to.x / 16, from.y / 16, to.y / 16, from.z / 16, to.z / 16);
+      } else {
+        // TODO this means that the block that contains this element must be rendered as an entity
+      }
+
+      for (JsonMember face : element.get("faces").object().members) {
+        JsonModelFace modelFace =
+            new JsonModelFace(face.getName(), face.getValue().object(), from, to);
+        switch (face.getName()) {
+          case "up":
+            faces[0] = modelFace;
+            break;
+          case "down":
+            faces[1] = modelFace;
+            break;
+          case "north":
+            faces[2] = modelFace;
+            break;
+          case "east":
+            faces[3] = modelFace;
+            break;
+          case "south":
+            faces[4] = modelFace;
+            break;
+          case "west":
+            faces[5] = modelFace;
+            break;
+        }
+      }
+    }
+
+    public boolean intersect(Ray ray, Scene scene) {
+      if (this.box != null) {
+        boolean hit = false;
+        if (box.intersect(ray)) {
+          int faceIndex = -1;
+          Vector3 rayNormal = ray.getNormal();
+          if (rayNormal.y > 0) {
+            faceIndex = 0;
+          } else if (rayNormal.y < 0) {
+            faceIndex = 1;
+          } else if (rayNormal.x < 0) {
+            faceIndex = 5;
+          } else if (rayNormal.x > 0) {
+            faceIndex = 3;
+          } else if (rayNormal.z < 0) {
+            faceIndex = 2;
+          } else if (rayNormal.z > 0) {
+            faceIndex = 4;
+          }
+
+          if (faceIndex >= 0) {
+            JsonModelFace face = faces[faceIndex];
+            if (face != null) {
+              float[] color = face.getColor(ray, scene, model.textures.get(face.texture));
+              if (color[3] > Ray.EPSILON) {
+                ray.color.set(color);
+                hit = true;
+              }
+            }
+          }
+
+          if (hit) {
+            ray.t = ray.tNext;
+            return true;
+          }
+        }
+      } else {
+        // TODO quad based models for everything that's not a simple opaque cube?
+      }
+      return false;
+    }
+  }
+
+  private static class JsonModel extends Block {
+    private Map<String, Texture> textures = new HashMap<>();
+    private List<JsonModelElement> elements = new ArrayList<>();
+
+    public JsonModel(String name, Texture texture) {
+      super(name, texture);
+      localIntersect = true;
+      opaque = false;
+    }
+
+    public void applyDefinition(JsonObject modelDefinition, Function<String, Texture> getTexture) {
+      if (modelDefinition.get("textures").isObject()) {
+        for (JsonMember texture : modelDefinition.get("textures").object().members) {
+          if (texture.getValue().stringValue("").charAt(0) == '#') {
+            Texture referencedTexture =
+                textures.get(texture.getValue().stringValue("").substring(1));
+            if (referencedTexture == null) {
+              throw new Error("Unknown referenced texture " + texture.getValue().stringValue(""));
+            }
+            textures.put(texture.getName(), referencedTexture);
+          } else {
+            textures.put(texture.getName(), getTexture.apply(texture.getValue().stringValue("")));
+          }
+        }
+      }
+
+      if (modelDefinition.get("elements").isArray()) {
+        for (JsonValue e : modelDefinition.get("elements").array()) {
+          elements.add(new JsonModelElement(this, e.asObject()));
+        }
+      }
+
+      // TODO this block is opaque, if and only if all faces have cullface set
+    }
+
+    @Override
+    public boolean intersect(Ray ray, Scene scene) {
+      boolean hit = false;
+      ray.t = Double.POSITIVE_INFINITY;
+      for (JsonModelElement element : elements) {
+        hit |= element.intersect(ray, scene);
+      }
+      if (hit) {
+        ray.color.w = 1;
+        ray.distance += ray.t;
+        ray.o.scaleAdd(ray.t, ray.d);
+      }
+      return hit;
+    }
+  }
+
+  private static class MultipartJsonModel extends Block {
+    private final JsonModel[] parts;
+
+    public MultipartJsonModel(String name, JsonModel[] parts) {
+      super(name, parts[0].texture);
+      localIntersect = true;
+      opaque = false;
+      this.parts = parts;
+
+      // TODO this block is opaque if one of the parts is opaque
+    }
+
+    @Override
+    public boolean intersect(Ray ray, Scene scene) {
+      boolean hit = false;
+      ray.t = Double.POSITIVE_INFINITY;
+      for (JsonModel part : parts) {
+        for (JsonModelElement element : part.elements) {
+          hit |= element.intersect(ray, scene);
+        }
+      }
+      if (hit) {
+        ray.color.w = 1;
+        ray.distance += ray.t;
+        ray.o.scaleAdd(ray.t, ray.d);
+      }
+      return hit;
+    }
+  }
+}
