@@ -402,6 +402,6 @@ public class Chunky {
    * Registers a block provider to add support for blocks.
    */
   public void registerBlockProvider(BlockProvider blockProvider) {
-    BlockSpec.blockProviders.add(blockProvider);
+    BlockSpec.blockProviders.add(0, blockProvider);
   }
 }
