@@ -22,6 +22,7 @@ import se.llbit.chunky.block.BlockProvider;
 import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockProvider;
 import se.llbit.chunky.block.legacy.LegacyMinecraftBlockProvider;
+import se.llbit.chunky.block.ResourcepackBlockProvider;
 import se.llbit.chunky.main.CommandLineOptions.Mode;
 import se.llbit.chunky.plugin.*;
 import se.llbit.chunky.plugin.loader.PluginManager;
@@ -106,8 +107,14 @@ public class Chunky {
 
   public Chunky(ChunkyOptions options) {
     this.options = options;
-    registerBlockProvider(new MinecraftBlockProvider());
-    registerBlockProvider(new LegacyMinecraftBlockProvider());
+    // registerBlockProvider(new MinecraftBlockProvider());
+    // registerBlockProvider(new LegacyMinecraftBlockProvider());
+    try {
+      registerBlockProvider(new ResourcepackBlockProvider(
+        new File("/home/maik/.minecraft/versions/20w15a/20w15a.jar")));
+    } catch (IOException e) {
+      Log.error("Could not load blocks", e);
+    }
   }
 
   /**
