@@ -3462,6 +3462,7 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/polished_blackstone_bricks", Texture.polishedBlackstoneBricks);
     addSimpleTexture("assets/minecraft/textures/block/cracked_polished_blackstone_bricks", Texture.crackedPolishedBlackstoneBricks);
     addSimpleTexture("assets/minecraft/textures/block/quartz_bricks", Texture.quartzBricks);
+    addSimpleTexture("assets/minecraft/textures/block/chain", Texture.chain);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
