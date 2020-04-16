@@ -1699,6 +1699,8 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new PressurePlate(name, Texture.polishedBlackstone);
       case "quartz_bricks":
         return new MinecraftBlock(name, Texture.quartzBricks);
+      case "chain":
+        return new Chain("chain", Texture.chain);
       case "structure_void":
       case "barrier":
         // Invisible.
