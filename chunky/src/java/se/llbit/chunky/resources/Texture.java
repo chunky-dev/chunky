@@ -825,6 +825,8 @@ public class Texture {
   public static final Texture netherSprouts = new Texture();
   public static final Texture warpedRoots = new Texture();
   public static final Texture crimsonRoots = new Texture();
+  public static final Texture warpedRootsPot = new Texture();
+  public static final Texture crimsonRootsPot = new Texture();
   public static final Texture cryingObsidian = new Texture();
   public static final Texture warpedStem = new Texture();
   public static final Texture warpedStemTop = new Texture();

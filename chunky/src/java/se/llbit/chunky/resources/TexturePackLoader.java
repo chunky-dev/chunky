@@ -3412,6 +3412,8 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/nether_sprouts", Texture.netherSprouts);
     addSimpleTexture("assets/minecraft/textures/block/warped_roots", Texture.warpedRoots);
     addSimpleTexture("assets/minecraft/textures/block/crimson_roots", Texture.crimsonRoots);
+    addSimpleTexture("assets/minecraft/textures/block/warped_roots_pot", Texture.warpedRootsPot);
+    addSimpleTexture("assets/minecraft/textures/block/crimson_roots_pot", Texture.crimsonRootsPot);
     addSimpleTexture("assets/minecraft/textures/block/crying_obsidian", Texture.cryingObsidian);
     addSimpleTexture("assets/minecraft/textures/block/warped_stem", Texture.warpedStem);
     addSimpleTexture("assets/minecraft/textures/block/warped_stem_top", Texture.warpedStemTop);

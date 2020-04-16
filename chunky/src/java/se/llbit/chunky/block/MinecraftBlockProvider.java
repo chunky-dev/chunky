@@ -1312,6 +1312,10 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new FlowerPot(name, FlowerPotModel.Kind.WARPED_FUNGUS);
       case "potted_crimson_fungus":
         return new FlowerPot(name, FlowerPotModel.Kind.CRIMSON_FUNGUS);
+      case "potted_crimson_roots":
+        return new FlowerPot(name, FlowerPotModel.Kind.CRIMSON_ROOTS);
+      case "potted_warped_roots":
+        return new FlowerPot(name, FlowerPotModel.Kind.WARPED_ROOTS);
       case "carrots":
         return new Carrots(BlockProvider.stringToInt(tag.get("Properties").get("age"), 7));
       case "potatoes":
