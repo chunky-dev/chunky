@@ -51,7 +51,6 @@ public class JsonFontTextureLoader extends TextureLoader {
 
   @Override
   public boolean load(ZipFile texturePack, String topLevelDir) {
-    if (true) return false;
     Texture.fonts.clear();
     Texture.fonts.setGlyph(' ', new Glyph(new int[8], 0, 2, 8, 8, 7));
 
