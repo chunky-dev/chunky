@@ -82,9 +82,12 @@ public class FontTextureLoader extends TextureLoader {
 
     JsonArray fontDefinitions;
     try (InputStream is = texturePack.getInputStream(new ZipEntry(topLevelDir + fontDefinition))) {
+      if (is == null) {
+        return false;
+      }
       fontDefinitions = new JsonParser(is).parse().asObject().get("providers").asArray();
     } catch (IOException | SyntaxError e) {
-      Log.error("Could not load font definitions", e);
+      // Safe to ignore - will be handled implicitly later.
       return false;
     }
 
@@ -98,6 +101,10 @@ public class FontTextureLoader extends TextureLoader {
       try (InputStream imageStream =
           texturePack.getInputStream(
               new ZipEntry(topLevelDir + "assets/minecraft/textures/" + texture))) {
+        if (imageStream == null) {
+          Log.error("Could not load font texture " + texture);
+          return false;
+        }
         spritemap = ImageLoader.read(imageStream);
       } catch (IOException e) {
         Log.error("Could not load font texture " + texture, e);
