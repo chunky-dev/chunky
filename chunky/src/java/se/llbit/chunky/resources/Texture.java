@@ -20,6 +20,7 @@ import javafx.scene.image.Image;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -55,6 +56,7 @@ public class Texture {
   public static Texture black = new SolidColorTexture(new Vector4(0, 0, 0, 1));
 
   public static final Texture paintings = new Texture();
+  public static final FontTexture fonts = new FontTexture();
 
   public static final Texture air = new Texture("air");
   public static final Texture stone = new Texture("stone");

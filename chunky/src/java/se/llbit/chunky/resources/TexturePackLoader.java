@@ -25,7 +25,8 @@ import se.llbit.chunky.resources.texturepack.ChestTexture;
 import se.llbit.chunky.resources.texturepack.CloudsTexture;
 import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
 import se.llbit.chunky.resources.texturepack.FoliageColorTexture;
-import se.llbit.chunky.resources.texturepack.FontTextureLoader;
+import se.llbit.chunky.resources.texturepack.AsciiFontTextureLoader;
+import se.llbit.chunky.resources.texturepack.JsonFontTextureLoader;
 import se.llbit.chunky.resources.texturepack.GrassColorTexture;
 import se.llbit.chunky.resources.texturepack.IndexedTexture;
 import se.llbit.chunky.resources.texturepack.LargeChestTexture;
@@ -2421,7 +2422,9 @@ public class TexturePackLoader {
     allTextures.put("paintings_zetterstrand",
         new SimpleTexture("assets/minecraft/textures/painting/paintings_kristoffer_zetterstrand",
             Texture.paintings));
-    allTextures.put("font_default", new FontTextureLoader("assets/minecraft/font/default.json"));
+    allTextures.put("font_default", new AlternateTextures(
+        new JsonFontTextureLoader("assets/minecraft/font/default.json"), // MC 1.13
+        new AsciiFontTextureLoader("assets/minecraft/textures/font/ascii"))); // MC 1.6
 
     allTextures.put("alex",
         new ThinArmEntityTextureLoader("assets/minecraft/textures/entity/alex", Texture.alex));

@@ -19,11 +19,11 @@ package se.llbit.chunky.resources.texturepack;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
@@ -32,36 +32,10 @@ import se.llbit.log.Log;
 import se.llbit.resources.ImageLoader;
 
 /** @author Jesper Öqvist <jesper@llbit.se> */
-public class FontTextureLoader extends TextureLoader {
-  public static Map<Character, Glyph> glyphs = new HashMap<>();
-
-  public static class Glyph {
-    public final int[] lines;
-    public final int xmin;
-    public final int xmax;
-    public final int width;
-    public final int spriteWidth;
-    public final int height;
-    public final int ascent;
-
-    public Glyph(int[] lines, int xmin, int xmax, int width, int height, int ascent) {
-      this.lines = lines;
-      this.xmin = xmin;
-      this.xmax = xmax;
-      if (xmax >= xmin) {
-        this.width = xmax - xmin + 2;
-      } else {
-        this.width = 8;
-      }
-      this.spriteWidth = width;
-      this.height = height;
-      this.ascent = ascent;
-    }
-  }
-
+public class JsonFontTextureLoader extends TextureLoader {
   private final String fontDefinition;
 
-  public FontTextureLoader(String fontDefinition) {
+  public JsonFontTextureLoader(String fontDefinition) {
     this.fontDefinition = fontDefinition;
   }
 
@@ -77,8 +51,9 @@ public class FontTextureLoader extends TextureLoader {
 
   @Override
   public boolean load(ZipFile texturePack, String topLevelDir) {
-    glyphs.clear();
-    glyphs.put(' ', new Glyph(new int[8], 0, 2, 8, 8, 7));
+    if (true) return false;
+    Texture.fonts.clear();
+    Texture.fonts.setGlyph(' ', new Glyph(new int[8], 0, 2, 8, 8, 7));
 
     JsonArray fontDefinitions;
     try (InputStream is = texturePack.getInputStream(new ZipEntry(topLevelDir + fontDefinition))) {
@@ -123,8 +98,8 @@ public class FontTextureLoader extends TextureLoader {
       for (JsonValue charactersLine : fontDefinition.asObject().get("chars").asArray()) {
         x = 0;
         for (char character : charactersLine.stringValue("").toCharArray()) {
-          if (!glyphs.containsKey(character)) {
-            loadGlyph(spritemap, x, y, character, width, height, ascent);
+          if (!Texture.fonts.containsGlyph(character)) {
+            Texture.fonts.loadGlyph(spritemap, x, y, character, width, height, ascent);
           }
           x++;
         }
@@ -138,27 +113,5 @@ public class FontTextureLoader extends TextureLoader {
   @Override
   protected boolean load(String file, ZipFile texturePack) {
     return super.load(file, texturePack);
-  }
-
-  private static void loadGlyph(
-      BitmapImage spritemap, int x0, int y0, char ch, int width, int height, int ascent) {
-    int xmin = width;
-    int xmax = 0;
-    int[] lines = new int[height];
-    for (int i = 0; i < height; ++i) {
-      for (int j = 0; j < width; ++j) {
-        int rgb = spritemap.getPixel(x0 * width + j, y0 * height + i);
-        if (rgb != 0) {
-          lines[i] |= 1 << j;
-          if (j < xmin) {
-            xmin = j;
-          }
-          if (j > xmax) {
-            xmax = j;
-          }
-        }
-      }
-    }
-    glyphs.put(ch, new Glyph(lines, xmin, xmax, width, height, ascent));
   }
 }
