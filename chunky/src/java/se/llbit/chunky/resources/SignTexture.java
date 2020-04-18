@@ -17,8 +17,7 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.entity.SignEntity.Color;
-import se.llbit.chunky.resources.texturepack.FontTextureLoader;
-import se.llbit.chunky.resources.texturepack.FontTextureLoader.Glyph;
+import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Vector4;
@@ -59,7 +58,7 @@ public class SignTexture extends Texture {
         String textLine = textItem.object().get("text").stringValue("");
         for (int j = 0; j < textLine.length(); ++j) {
           char c = textLine.charAt(j);
-          Glyph glyph = FontTextureLoader.glyphs.get(c);
+          Glyph glyph = Texture.fonts.getGlyph(c);
           lineWidth += glyph != null ? glyph.width : 0;
         }
       }
@@ -70,7 +69,7 @@ public class SignTexture extends Texture {
 
         for (int j = 0; j < textLine.length(); ++j) {
           char c = textLine.charAt(j);
-          Glyph glyph = FontTextureLoader.glyphs.get(c);
+          Glyph glyph = Texture.fonts.getGlyph(c);
           if (glyph != null) {
             int y = ystart - glyph.ascent + lineHeight;
 
