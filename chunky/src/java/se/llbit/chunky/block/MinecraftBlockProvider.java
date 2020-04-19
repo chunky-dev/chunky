@@ -377,7 +377,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "dark_oak_stairs":
         return stairs(tag, Texture.darkOakPlanks);
       case "chest":
-        return chest(tag);
+        return chest(tag, false);
       case "diamond_ore":
         return new MinecraftBlock(name, Texture.diamondOre);
       case "diamond_block":
@@ -596,7 +596,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "damaged_anvil":
         return anvil(tag, 2);
       case "trapped_chest":
-        return chest(tag);
+        return chest(tag, true);
       case "light_weighted_pressure_plate":
         return new PressurePlate(name, Texture.goldBlock);
       case "heavy_weighted_pressure_plate":
@@ -1852,12 +1852,12 @@ public class MinecraftBlockProvider implements BlockProvider {
     return new RedstoneWire(power, north, south, east, west);
   }
 
-  private static Block chest(Tag tag) {
+  private static Block chest(Tag tag, boolean trapped) {
     String name = BlockProvider.blockName(tag);
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag, "north");
     String type = properties.get("type").stringValue("single");
-    return new Chest(name, type, facing);
+    return new Chest(name, type, facing, trapped);
   }
 
   private static Block endRod(Tag tag) {
