@@ -17,6 +17,8 @@
  */
 package se.llbit.chunky.resources;
 
+import org.apache.commons.math3.util.FastMath;
+
 /**
  * A container for bitmap image data in int ARGB format.
  *
@@ -162,4 +164,16 @@ public class BitmapImage {
     return rotated;
   }
 
+  /**
+   * Puts image A above image B and returns the result.
+   * @param a Image A
+   * @param b Image B
+   * @return a new image with a on top of b
+   */
+  public static BitmapImage concatY(BitmapImage a, BitmapImage b) {
+    BitmapImage img = new BitmapImage(FastMath.max(a.width, b.width), a.height + b.height);
+    img.blit(a, 0, 0);
+    img.blit(b, 0, a.height, 0, 0, b.width, b.height);
+    return img;
+  }
 }

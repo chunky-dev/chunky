@@ -7,33 +7,58 @@ import se.llbit.math.Ray;
 
 public class Chest extends MinecraftBlock {
   private static final Texture[][] texture = {
-      // Single.
-      {
-        Texture.chestFront, Texture.chestBack, Texture.chestLeft, Texture.chestRight,
-        Texture.chestTop, Texture.chestBottom, Texture.chestLock, Texture.chestLock,
-        Texture.chestLock, Texture.chestLock, Texture.chestLock,
-      },
+    // Single.
+    {
+      Texture.chestFront, Texture.chestBack, Texture.chestLeft, Texture.chestRight,
+      Texture.chestTop, Texture.chestBottom, Texture.chestLock, Texture.chestLock,
+      Texture.chestLock, Texture.chestLock, Texture.chestLock,
+    },
 
-      // Left.
-      {
-        Texture.largeChestFrontLeft, Texture.largeChestBackLeft, Texture.largeChestLeft,
-        Texture.largeChestTopLeft, Texture.largeChestBottomLeft, Texture.chestLock,
-        Texture.chestLock, Texture.chestLock, Texture.chestLock,
-      },
+    // Left.
+    {
+      Texture.largeChestFrontLeft, Texture.largeChestBackLeft, Texture.largeChestLeft,
+      Texture.largeChestTopLeft, Texture.largeChestBottomLeft, Texture.chestLock,
+      Texture.chestLock, Texture.chestLock, Texture.chestLock,
+    },
 
-      // Right.
-      {
-        Texture.largeChestFrontRight, Texture.largeChestBackRight, Texture.largeChestRight,
-        Texture.largeChestTopRight, Texture.largeChestBottomRight, Texture.chestLock,
-        Texture.chestLock, Texture.chestLock, Texture.chestLock,
-      }
+    // Right.
+    {
+      Texture.largeChestFrontRight, Texture.largeChestBackRight, Texture.largeChestRight,
+      Texture.largeChestTopRight, Texture.largeChestBottomRight, Texture.chestLock,
+      Texture.chestLock, Texture.chestLock, Texture.chestLock,
+    }
+  };
+
+  private static final Texture[][] textureTrapped = {
+    // Single.
+    {
+      Texture.trappedChestFront, Texture.trappedChestBack, Texture.trappedChestLeft, Texture.trappedChestRight,
+      Texture.trappedChestTop, Texture.trappedChestBottom, Texture.trappedChestLock, Texture.trappedChestLock,
+      Texture.trappedChestLock, Texture.trappedChestLock, Texture.trappedChestLock,
+    },
+
+    // Left.
+    {
+      Texture.largeTrappedChestFrontLeft, Texture.largeTrappedChestBackLeft, Texture.largeTrappedChestLeft,
+      Texture.largeTrappedChestTopLeft, Texture.largeTrappedChestBottomLeft, Texture.trappedChestLock,
+      Texture.trappedChestLock, Texture.trappedChestLock, Texture.trappedChestLock,
+    },
+
+    // Right.
+    {
+      Texture.largeTrappedChestFrontRight, Texture.largeTrappedChestBackRight, Texture.largeTrappedChestRight,
+      Texture.largeTrappedChestTopRight, Texture.largeTrappedChestBottomRight, Texture.trappedChestLock,
+      Texture.trappedChestLock, Texture.trappedChestLock, Texture.trappedChestLock,
+    }
   };
 
   private final int type, facing;
+  private final boolean trapped;
   private final String description;
 
-  public Chest(String name, String type, String facing) {
-    super(name, Texture.chestFront);
+  public Chest(String name, String type, String facing, boolean trapped) {
+    super(name, trapped ? Texture.trappedChestFront : Texture.chestFront);
+    this.trapped = trapped;
     this.description = String.format("type=%s, facing=%s", type, facing);
     localIntersect = true;
     opaque = false;
@@ -66,11 +91,13 @@ public class Chest extends MinecraftBlock {
     }
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
-    return ChestModel.intersect(ray, texture[type], type, facing);
+  @Override
+  public boolean intersect(Ray ray, Scene scene) {
+    return ChestModel.intersect(ray, trapped ? textureTrapped[type] : texture[type], type, facing);
   }
 
-  @Override public String description() {
+  @Override
+  public String description() {
     return description;
   }
 }
