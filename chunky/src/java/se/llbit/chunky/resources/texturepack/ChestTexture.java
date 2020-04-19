@@ -16,19 +16,22 @@
  */
 package se.llbit.chunky.resources.texturepack;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.ZipFile;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.resources.ImageLoader;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipFile;
-
-/**
- * @author Jesper Öqvist <jesper@llbit.se>
- */
+/** @author Jesper Öqvist <jesper@llbit.se> */
 public class ChestTexture extends TextureLoader {
+  public enum Layout {
+    OLD_LAYOUT,
+    NEW_LAYOUT, // new texture layout introduced in MC 1.15
+  }
+
   private final String file;
+  private Layout layout;
   private final Texture lock;
   private final Texture top;
   private final Texture bottom;
@@ -37,9 +40,30 @@ public class ChestTexture extends TextureLoader {
   private final Texture front;
   private final Texture back;
 
-  public ChestTexture(String file, Texture lock, Texture top, Texture bottom, Texture left,
-      Texture right, Texture front, Texture back) {
+  public ChestTexture(
+      String file,
+      Texture lock,
+      Texture top,
+      Texture bottom,
+      Texture left,
+      Texture right,
+      Texture front,
+      Texture back) {
+    this(file, Layout.OLD_LAYOUT, lock, top, bottom, left, right, front, back);
+  }
+
+  public ChestTexture(
+      String file,
+      Layout layout,
+      Texture lock,
+      Texture top,
+      Texture bottom,
+      Texture left,
+      Texture right,
+      Texture front,
+      Texture back) {
     this.file = file;
+    this.layout = layout;
     this.lock = lock;
     this.top = top;
     this.bottom = bottom;
@@ -49,7 +73,8 @@ public class ChestTexture extends TextureLoader {
     this.back = back;
   }
 
-  @Override protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
+  @Override
+  protected boolean load(InputStream imageStream) throws IOException, TextureFormatError {
     BitmapImage spritemap = ImageLoader.read(imageStream);
     if (spritemap.width != spritemap.height || spritemap.width % 16 != 0) {
       throw new TextureFormatError(
@@ -59,66 +84,75 @@ public class ChestTexture extends TextureLoader {
     int imgW = spritemap.width;
     int scale = imgW / (16 * 4);
 
-    lock.setTexture(loadChestTexture(spritemap, scale, 0, 0));
-    top.setTexture(loadChestTexture(spritemap, scale, 1, 0));
-    bottom.setTexture(loadChestTexture(spritemap, scale, 2, 1));
-    left.setTexture(loadChestTexture(spritemap, scale, 0, 2));
-    front.setTexture(loadChestTexture(spritemap, scale, 1, 2));
-    right.setTexture(loadChestTexture(spritemap, scale, 2, 2));
-    back.setTexture(loadChestTexture(spritemap, scale, 3, 2));
+    if (layout == Layout.NEW_LAYOUT) {
+      lock.setTexture(getSprite(spritemap, scale, 0, 0, 8, 8, false, false)); // TODO flip
+      top.setTexture(getSprite(spritemap, scale, 28, 0, 14, 14, true, true));
+      bottom.setTexture(getSprite(spritemap, scale, 14, 19, 14, 14, true, true));
+      right.setTexture(
+          BitmapImage.concatY(
+              getSprite(spritemap, scale, 0, 15, 14, 4, false, true),
+              getSprite(spritemap, scale, 0, 33, 14, 10, false, true)));
+      left.setTexture(
+          BitmapImage.concatY(
+              getSprite(spritemap, scale, 28, 15, 14, 4, true, true),
+              getSprite(spritemap, scale, 28, 33, 14, 10, true, true)));
+      front.setTexture(
+          BitmapImage.concatY(
+              getSprite(spritemap, scale, 42, 15, 14, 4, false, true),
+              getSprite(spritemap, scale, 42, 33, 14, 10, false, true)));
+      back.setTexture(
+          BitmapImage.concatY(
+              getSprite(spritemap, scale, 14, 15, 14, 4, true, true),
+              getSprite(spritemap, scale, 14, 33, 14, 10, true, true)));
+    } else {
+      lock.setTexture(getSprite(spritemap, scale, 0, 0, 8, 8, false, false));
+      top.setTexture(getSprite(spritemap, scale, 14, 0, 14, 14, true, false));
+      bottom.setTexture(getSprite(spritemap, scale, 28, 19, 14, 14, true, false));
+      right.setTexture(
+          BitmapImage.concatY(
+              getSprite(spritemap, scale, 0, 14, 14, 4, true, false),
+              getSprite(spritemap, scale, 0, 33, 14, 10, true, false)));
+      left.setTexture(
+          BitmapImage.concatY(
+              getSprite(spritemap, scale, 28, 14, 14, 4, false, false),
+              getSprite(spritemap, scale, 28, 33, 14, 10, false, false)));
+      front.setTexture(
+          BitmapImage.concatY(
+              getSprite(spritemap, scale, 14, 14, 14, 4, true, false),
+              getSprite(spritemap, scale, 14, 33, 14, 10, true, false)));
+      back.setTexture(
+          BitmapImage.concatY(
+              getSprite(spritemap, scale, 42, 14, 14, 4, false, false),
+              getSprite(spritemap, scale, 42, 33, 14, 10, false, false)));
+    }
     return true;
   }
 
-  private static BitmapImage loadChestTexture(BitmapImage spritemap, int scale, int u, int v) {
-    BitmapImage img = new BitmapImage(scale * 16, scale * 16);
-    int x0 = 14 * u * scale;
-    int x1 = 14 * (u + 1) * scale;
-    if (v == 0) {
-      int y0 = 0;
-      int y1 = 14 * scale;
-      for (int y = y0; y < y1; ++y) {
-        int sy = y - y0 + scale;
-        for (int x = x0; x < x1; ++x) {
-          int sx = x - x0 + scale;
-          img.setPixel(sx, sy, spritemap.getPixel(x, y));
-        }
-      }
-    } else if (v == 1) {
-      int y0 = (14 + 5) * scale;
-      int y1 = (14 * 2 + 5) * scale;
-      for (int y = y0; y < y1; ++y) {
-        int sy = y - y0 + scale; // TODO: why + scale?
-        for (int x = x0; x < x1; ++x) {
-          int sx = x - x0 + scale;
-          img.setPixel(sx, sy, spritemap.getPixel(x, y));
-        }
-      }
-    } else /*if (v == 2)*/ {
-      int y0 = 14 * scale;
-      int y1 = (14 + 5) * scale;
-      for (int y = y0; y < y1; ++y) {
-        int sy = y - y0 + scale;
-        for (int x = x0; x < x1; ++x) {
-          int sx = x - x0 + scale;
-          img.setPixel(sx, sy, spritemap.getPixel(x, y));
-        }
-      }
-      y0 = (14 * 2 + 6) * scale;
-      y1 = (14 * 3 + 1) * scale;
-      for (int y = y0; y < y1; ++y) {
-        int sy = y - y0 + 6 * scale;
-        for (int x = x0; x < x1; ++x) {
-          int sx = x - x0 + scale;
-          img.setPixel(sx, sy, spritemap.getPixel(x, y));
-        }
-      }
+  private static BitmapImage getSprite(
+      BitmapImage spritemap,
+      int scale,
+      int x0,
+      int y0,
+      int width,
+      int height,
+      boolean hFlip,
+      boolean vFlip) {
+    BitmapImage img = new BitmapImage(scale * width, scale * height);
 
+    img.blit(spritemap, 0, 0, x0 * scale, y0 * scale, (x0 + width) * scale, (y0 + height) * scale);
+
+    if (hFlip) {
+      img = img.hFlipped();
     }
+    if (vFlip) {
+      img = img.vFlipped();
+    }
+
     return img;
   }
 
-  @Override public boolean load(ZipFile texturePack, String topLevelDir) {
+  @Override
+  public boolean load(ZipFile texturePack, String topLevelDir) {
     return load(topLevelDir + file, texturePack);
   }
 }
-

@@ -32,49 +32,49 @@ public class ChestModel {
   protected static final Quad[] single = {
       // north
       new Quad(new Vector3(.9375, 0, .0625), new Vector3(.0625, 0, .0625),
-          new Vector3(.9375, .875, .0625), new Vector4(.9375, .0625, .0625, .9375)),
+          new Vector3(.9375, .875, .0625), new Vector4(1, 0, 0, 1)),
 
       // south
       new Quad(new Vector3(.0625, 0, .9375), new Vector3(.9375, 0, .9375),
-          new Vector3(.0625, .875, .9375), new Vector4(.0625, .9375, .0625, .9375)),
+          new Vector3(.0625, .875, .9375), new Vector4(0, 1, 0, 1)),
 
       // west
       new Quad(new Vector3(.0625, 0, .0625), new Vector3(.0625, 0, .9375),
-          new Vector3(.0625, .875, .0625), new Vector4(.0625, .9375, .0625, .9375)),
+          new Vector3(.0625, .875, .0625), new Vector4(0, 1, 0, 1)),
 
       // east
       new Quad(new Vector3(.9375, 0, .9375), new Vector3(.9375, 0, .0625),
-          new Vector3(.9375, .875, .9375), new Vector4(.9375, .0625, .0625, .9375)),
+          new Vector3(.9375, .875, .9375), new Vector4(1, 0, 0, 1)),
 
       // top
       new Quad(new Vector3(.9375, .875, .0625), new Vector3(.0625, .875, .0625),
-          new Vector3(.9375, .875, .9375), new Vector4(.9375, .0625, .0625, .9375)),
+          new Vector3(.9375, .875, .9375), new Vector4(1, 0, 0, 1)),
 
       // bottom
       new Quad(new Vector3(.0625, 0, .0625), new Vector3(.9375, 0, .0625),
-          new Vector3(.0625, 0, .9375), new Vector4(.0625, .9375, .0625, .9375)),
+          new Vector3(.0625, 0, .9375), new Vector4(0, 1, 0, 1)),
 
       // -- lock
 
       // north
       new Quad(new Vector3(.5626, .4375, 0), new Vector3(.4375, .4375, 0),
-          new Vector3(.5626, .6875, 0), new Vector4(.25, .125, .625, .875)),
+          new Vector3(.5626, .6875, 0), new Vector4(.125, .375, .375, .875)),
 
       // west
       new Quad(new Vector3(.4375, .4375, 0), new Vector3(.4375, .4375, .0625),
-          new Vector3(.4375, .6875, 0), new Vector4(.25, .3125, .625, .875)),
+          new Vector3(.4375, .6875, 0), new Vector4(.625, .75, .375, .875)),
 
       // east
       new Quad(new Vector3(.5626, .4375, .0625), new Vector3(.5626, .4375, 0),
-          new Vector3(.5626, .6875, .0625), new Vector4(.0625, .125, .625, .875)),
+          new Vector3(.5626, .6875, .0625), new Vector4(0, .125, .375, .875)),
 
       // top
       new Quad(new Vector3(.5626, .6875, 0), new Vector3(.4375, .6875, 0),
-          new Vector3(.5626, .6875, .0625), new Vector4(.125, .25, .875, .9375)),
+          new Vector3(.5626, .6875, .0625), new Vector4(.125, .375, .875, 1)),
 
       // bottom
       new Quad(new Vector3(.4375, .4375, 0), new Vector3(.5626, .4375, 0),
-          new Vector3(.4375, .4375, .0625), new Vector4(.375, .25, .875, .9375)),
+          new Vector3(.4375, .4375, .0625), new Vector4(.625, .375, .875, 1)),
 
   };
 
@@ -82,23 +82,23 @@ public class ChestModel {
   protected static final Quad[] left = {
       // north
       new Quad(new Vector3(1, 0, .0625), new Vector3(.0625, 0, .0625),
-          new Vector3(1, .875, .0625), new Vector4(1, .0625, .0625, .9375)),
+          new Vector3(1, .875, .0625), new Vector4(1, 0, 0, 1)),
 
       // south
       new Quad(new Vector3(.0625, 0, .9375), new Vector3(1, 0, .9375),
-          new Vector3(.0625, .875, .9375), new Vector4(.0625, 1, .0625, .9375)),
+          new Vector3(.0625, .875, .9375), new Vector4(0, 1, 0, 1)),
 
       // west
       new Quad(new Vector3(.0625, 0, .0625), new Vector3(.0625, 0, .9375),
-          new Vector3(.0625, .875, .0625), new Vector4(.0625, .9375, .0625, .9375)),
+          new Vector3(.0625, .875, .0625), new Vector4(0, 1, 0, 1)),
 
       // top
       new Quad(new Vector3(1, .875, .0625), new Vector3(.0625, .875, .0625),
-          new Vector3(1, .875, .9375), new Vector4(1, .0625, .0625, .9375)),
+          new Vector3(1, .875, .9375), new Vector4(1, 0, 0, 1)),
 
       // bottom
       new Quad(new Vector3(.0625, 0, .0625), new Vector3(1, 0, .0625),
-          new Vector3(.0625, 0, .9375), new Vector4(.0625, 1, .0625, .9375)),
+          new Vector3(.0625, 0, .9375), new Vector4(0, 1, 0, 1)),
 
       // -- lock
 
@@ -122,23 +122,23 @@ public class ChestModel {
   protected static final Quad[] right = {
       // north
       new Quad(new Vector3(.9375, 0, .0625), new Vector3(0, 0, .0625),
-          new Vector3(.9375, .875, .0625), new Vector4(.9375, 0, .0625, .9375)),
+          new Vector3(.9375, .875, .0625), new Vector4(1, 0, 0, 1)),
 
       // south
       new Quad(new Vector3(0, 0, .9375), new Vector3(.9375, 0, .9375),
-          new Vector3(0, .875, .9375), new Vector4(0, .9375, .0625, .9375)),
+          new Vector3(0, .875, .9375), new Vector4(0, 1, 0, 1)),
 
       // east
       new Quad(new Vector3(.9375, 0, .9375), new Vector3(.9375, 0, .0625),
-          new Vector3(.9375, .875, .9375), new Vector4(.9375, .0625, .0625, .9375)),
+          new Vector3(.9375, .875, .9375), new Vector4(1, 0, 0, 1)),
 
       // top
       new Quad(new Vector3(.9375, .875, .0625), new Vector3(0, .875, .0625),
-          new Vector3(.9375, .875, .9375), new Vector4(.9375, 0, .0625, .9375)),
+          new Vector3(.9375, .875, .9375), new Vector4(1, 0, 0, 1)),
 
       // bottom
       new Quad(new Vector3(0, 0, .0625), new Vector3(.9375, 0, .0625), new Vector3(0, 0, .9375),
-          new Vector4(0, .9375, .0625, .9375)),
+          new Vector4(0, 1, 0, 1)),
 
       // -- lock
 
