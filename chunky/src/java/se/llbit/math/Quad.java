@@ -41,16 +41,12 @@ public class Quad {
    */
   public final boolean doubleSided;
 
-  /**
-   * Normal vector
-   */
+  /** Normal vector */
   public Vector3 n = new Vector3();
 
   protected double d, xvl, yvl;
 
-  /**
-   * Create new Quad by copying another quad and applying a transform.
-   */
+  /** Create new Quad by copying another quad and applying a transform. */
   public Quad(Quad other, Transform t) {
     this.doubleSided = other.doubleSided;
     o.set(other.o);
@@ -73,9 +69,7 @@ public class Quad {
     uv.set(other.uv);
   }
 
-  /**
-   * Create transformed Quad
-   */
+  /** Create transformed Quad */
   public Quad(Quad other, Matrix3 t) {
     this.doubleSided = other.doubleSided;
     o.set(other.o);
@@ -191,9 +185,7 @@ public class Quad {
     return false;
   }
 
-  /**
-   * @return Scaled copy of this quad
-   */
+  /** @return Scaled copy of this quad */
   public Quad getScaled(double scale) {
     Matrix3 transform = new Matrix3();
     transform.scale(scale);
@@ -222,10 +214,17 @@ public class Quad {
         new Vector2(u1, v1), material, doubleSided));
   }
 
-  /**
-   * Build a transformed copy of this quad.
-   */
+  /** Build a transformed copy of this quad. */
   public Quad transform(Transform transform) {
     return new Quad(this, transform);
+  }
+
+  /** Check if this quad fits into a 1x1x1 cube. */
+  public boolean fitsInBlock() {
+    if (o.x < 0 || o.x > 1 || o.y < 0 || o.y > 1 || o.z < 0 || o.z > 1) return false;
+    Vector3 t = new Vector3(o);
+    t.add(xv);
+    t.add(yv);
+    return !(t.x < 0 || t.x > 1 || t.y < 0 || t.y > 1 || t.z < 0 || t.z > 1);
   }
 }

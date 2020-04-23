@@ -11,25 +11,33 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
+import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.AnimatedTexture;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 import se.llbit.math.AABB;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
+import se.llbit.math.primitive.Primitive;
+import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 import se.llbit.resources.ImageLoader;
 
@@ -37,6 +45,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
   private final Map<String, BlockVariants> blocks = new HashMap<>();
 
   public ResourcepackBlockProvider(File file) throws IOException {
+    Log.info("Loading blocks from " + file.getAbsolutePath());
     try (FileSystem zip =
         FileSystems.newFileSystem(URI.create("jar:" + file.toURI()), Collections.emptyMap())) {
       JsonModelLoader modelLoader = new JsonModelLoader();
@@ -246,6 +255,9 @@ public class ResourcepackBlockProvider implements BlockProvider {
           }
         }
       }
+      /*if (applicableParts.isEmpty()) {
+        Log.warn("Empty multipart model for block " + name + " (" + properties.dumpTree() + ")");
+      }*/
       return new MultipartJsonModel(name, applicableParts.toArray(new JsonModel[0]));
     }
   }
@@ -333,7 +345,6 @@ public class ResourcepackBlockProvider implements BlockProvider {
   private static class JsonModelFace {
     private Quad quad;
     private String texture;
-    private Transform transform = Transform.NONE;
     private int tintindex;
 
     public JsonModelFace(String direction, JsonObject face, Vector3 from, Vector3 to) {
@@ -346,53 +357,107 @@ public class ResourcepackBlockProvider implements BlockProvider {
       JsonArray uv = face.get("uv").isArray() ? face.get("uv").array() : null;
       // TODO cullface
 
-      // TODO QUADS PLEASE
-      double lx = to.x - from.x;
-      double ly = to.y - from.y;
-      double lz = to.z - from.z;
       if (direction.equals("up")) {
-        this.transform = this.transform.translate(-from.x / 16, -from.z / 16, 0).scale(16/lx,16/lz,1);
-      }
+        this.quad =
+            new Quad(
+                new Vector3(from.x / 16, to.y / 16, to.z / 16),
+                new Vector3(to.x / 16, to.y / 16, to.z / 16),
+                new Vector3(from.x / 16, to.y / 16, from.z / 16),
+                uv != null
+                    ? new Vector4(
+                        uv.get(0).doubleValue(from.x) / 16,
+                        uv.get(2).doubleValue(to.x) / 16,
+                        1 - uv.get(3).doubleValue(to.z) / 16,
+                        1 - uv.get(1).doubleValue(from.z) / 16)
+                    : new Vector4(from.x / 16, to.x / 16, 1 - to.z / 16, 1 - from.z / 16));
 
-      if (direction.equals("up")) {
-        this.transform = this.transform.translate(-0.5, -0.5, 0).mirrorY().translate(0.5, 0.5, 0);
-      }
+        if (rotation > 0) {
+          quad =
+              quad.transform(
+                  Transform.NONE
+                      .translate(-from.x / 16, 0, -from.z / 16)
+                      .rotateY(-FastMath.toRadians(rotation)));
+        }
+      } else if (direction.equals("down")) {
+        this.quad =
+            new Quad(
+                new Vector3(from.x / 16, from.y / 16, from.z / 16),
+                new Vector3(to.x / 16, from.y / 16, from.z / 16),
+                new Vector3(from.x / 16, from.y / 16, to.z / 16),
+                uv != null
+                    ? new Vector4(
+                        uv.get(0).doubleValue(from.x) / 16,
+                        uv.get(2).doubleValue(to.x) / 16,
+                        1 - uv.get(3).doubleValue(to.z) / 16,
+                        1 - uv.get(1).doubleValue(from.z) / 16)
+                    : new Vector4(from.x / 16, to.x / 16, 1 - to.z / 16, 1 - from.z / 16));
 
-      if (uv != null) {
-        double x1 = uv.get(0).doubleValue(0);
-        double x2 = uv.get(2).doubleValue(16);
-        double y1 = uv.get(1).doubleValue(0);
-        double y2 = uv.get(3).doubleValue(16);
-
-        this.transform =
-            this.transform.scale((x2 - x1) / 16, (y2 - y1) / 16, 1).translate(x1 / 16, y1 / 16, 0);
-      }
-
-      if (rotation != 0) {
-        this.transform =
-            this.transform
-                .translate(-0.5, -0.5, 0)
-                .rotateZ(Math.toRadians(rotation))
-                .translate(0.5, 0.5, 0);
+        if (rotation > 0) {
+          quad = quad.transform(Transform.NONE.rotateY(-FastMath.toRadians(rotation)));
+        }
+      } else if (direction.equals("west")) {
+        this.quad =
+            new Quad(
+                new Vector3(from.x / 16, to.y / 16, to.z / 16),
+                new Vector3(from.x / 16, to.y / 16, from.z / 16),
+                new Vector3(from.x / 16, from.y / 16, to.z / 16),
+                uv != null
+                    ? new Vector4(
+                        uv.get(0).doubleValue(to.z) / 16,
+                        uv.get(2).doubleValue(from.z) / 16,
+                        1 - uv.get(1).doubleValue(from.y) / 16,
+                        1 - uv.get(3).doubleValue(to.y) / 16)
+                    : new Vector4(to.z / 16, from.z / 16, 1 - from.y / 16, 1 - to.y / 16));
+      } else if (direction.equals("east")) {
+        this.quad =
+            new Quad(
+                new Vector3(to.x / 16, to.y / 16, from.z / 16),
+                new Vector3(to.x / 16, to.y / 16, to.z / 16),
+                new Vector3(to.x / 16, from.y / 16, from.z / 16),
+                uv != null
+                    ? new Vector4(
+                        uv.get(2).doubleValue(to.z) / 16,
+                        uv.get(0).doubleValue(from.z) / 16,
+                        1 - uv.get(1).doubleValue(from.y) / 16,
+                        1 - uv.get(3).doubleValue(to.y) / 16)
+                    : new Vector4(to.z / 16, from.z / 16, 1 - from.y / 16, 1 - to.y / 16));
+      } else if (direction.equals("north")) {
+        this.quad =
+            new Quad(
+                new Vector3(from.x / 16, to.y / 16, from.z / 16),
+                new Vector3(to.x / 16, to.y / 16, from.z / 16),
+                new Vector3(from.x / 16, from.y / 16, from.z / 16),
+                uv != null
+                    ? new Vector4(
+                        uv.get(0).doubleValue(to.x) / 16,
+                        uv.get(2).doubleValue(from.x) / 16,
+                        1 - uv.get(1).doubleValue(from.y) / 16,
+                        1 - uv.get(3).doubleValue(to.y) / 16)
+                    : new Vector4(to.x / 16, from.x / 16, 1 - from.y / 16, 1 - to.y / 16));
+      } else if (direction.equals("south")) {
+        this.quad =
+            new Quad(
+                new Vector3(to.x / 16, to.y / 16, to.z / 16),
+                new Vector3(from.x / 16, to.y / 16, to.z / 16),
+                new Vector3(to.x / 16, from.y / 16, to.z / 16),
+                uv != null
+                    ? new Vector4(
+                        uv.get(0).doubleValue(to.x) / 16,
+                        uv.get(2).doubleValue(from.x) / 16,
+                        1 - uv.get(1).doubleValue(from.y) / 16,
+                        1 - uv.get(3).doubleValue(to.y) / 16)
+                    : new Vector4(to.x / 16, from.x / 16, 1 - from.y / 16, 1 - to.y / 16));
       }
     }
 
     public float[] getColor(Ray ray, Scene scene, Texture texture) {
-      // TODO uv handling
       float[] color;
-      if (transform == null) {
-        color = texture.getColor(ray.u, ray.v);
-      } else {
-        Vector3 uv = new Vector3(ray.u, ray.v, 0.0);
-        this.transform.apply(uv);
-        color = texture.getColor(uv.x, uv.y);
-      }
+      color = texture.getColor(ray.u, ray.v);
 
       if (tintindex == 0) {
         float[] biomeColor = ray.getBiomeGrassColor(scene);
         color = color.clone();
         if (color[3] > Ray.EPSILON) {
-          // TODO handle transparency correctly
           color[0] *= biomeColor[0];
           color[1] *= biomeColor[1];
           color[2] *= biomeColor[2];
@@ -421,11 +486,6 @@ public class ResourcepackBlockProvider implements BlockProvider {
               element.get("to").asArray().get(0).asDouble(0),
               element.get("to").asArray().get(1).asDouble(0),
               element.get("to").asArray().get(2).asDouble(0));
-      if (to.x <= 16 && to.y <= 16 && to.z <= 16) {
-        this.box = new AABB(from.x / 16, to.x / 16, from.y / 16, to.y / 16, from.z / 16, to.z / 16);
-      } else {
-        // TODO this means that the block that contains this element must be rendered as an entity
-      }
 
       for (JsonMember face : element.get("faces").object().members) {
         JsonModelFace modelFace =
@@ -449,6 +509,47 @@ public class ResourcepackBlockProvider implements BlockProvider {
           case "west":
             faces[5] = modelFace;
             break;
+        }
+      }
+
+      if (element.get("rotation").isObject()) {
+        JsonObject rotation = element.get("rotation").object();
+        double angle = FastMath.toRadians(rotation.get("angle").doubleValue(0));
+        Vector3 origin =
+            new Vector3(
+                rotation.get("origin").array().get(0).doubleValue(0) / 16,
+                rotation.get("origin").array().get(1).doubleValue(0) / 16,
+                rotation.get("origin").array().get(2).doubleValue(0) / 16);
+        Transform transform = null;
+        switch (rotation.get("axis").stringValue("y")) {
+          case "x":
+            transform =
+                Transform.NONE
+                    .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
+                    .rotateX(angle)
+                    .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5);
+            break;
+          case "y":
+            transform =
+                Transform.NONE
+                    .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
+                    .rotateY(angle)
+                    .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5);
+            break;
+          case "z":
+            transform =
+                Transform.NONE
+                    .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
+                    .rotateZ(angle)
+                    .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5);
+            break;
+        }
+
+        for (JsonModelFace face : faces) {
+          if (face != null) {
+            face.quad = face.quad.transform(transform);
+            // TODO rescale
+          }
         }
       }
     }
@@ -491,6 +592,34 @@ public class ResourcepackBlockProvider implements BlockProvider {
         }
       } else {
         // TODO quad based models for everything that's not a simple opaque cube?
+        boolean hit = false;
+
+        for (int faceIndex = 0; faceIndex < 6; faceIndex++) {
+          JsonModelFace face = faces[faceIndex];
+          if (face != null && face.quad != null && face.quad.intersect(ray)) {
+            float[] color = face.getColor(ray, scene, model.textures.get(face.texture));
+            if (color[3] > Ray.EPSILON) {
+              ray.color.set(color);
+              ray.n.set(face.quad.n);
+              ray.t = ray.tNext;
+              hit = true;
+            }
+          }
+        }
+
+        if (hit) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    public boolean requiresBlockEntity() {
+      for (JsonModelFace face : faces) {
+        if (face != null && face.quad != null && !face.quad.fitsInBlock()) {
+          return true;
+        }
       }
       return false;
     }
@@ -528,7 +657,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
         }
       }
 
-      // TODO this block is opaque, if and only if all faces have cullface set
+      // TODO this block is opaque if and only if all faces have cullface set
     }
 
     @Override
@@ -545,13 +674,45 @@ public class ResourcepackBlockProvider implements BlockProvider {
       }
       return hit;
     }
+
+    @Override
+    public boolean isBlockEntity() {
+      return elements.stream().anyMatch(JsonModelElement::requiresBlockEntity);
+    }
+
+    @Override
+    public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+      return new Entity(position) {
+        @Override
+        public Collection<Primitive> primitives(Vector3 offset) {
+          Collection<Primitive> faces = new LinkedList<>();
+          Transform transform =
+              Transform.NONE.translate(
+                  position.x + offset.x, position.y + offset.y, position.z + offset.z);
+          for (JsonModelElement element : elements) {
+            for (JsonModelFace face : element.faces) {
+              if (face != null && face.quad != null) {
+                face.quad.addTriangles(
+                    faces, new TextureMaterial(textures.get(face.texture)), transform);
+              }
+            }
+          }
+          return faces;
+        }
+
+        @Override
+        public JsonValue toJson() {
+          return new JsonObject();
+        }
+      };
+    }
   }
 
   private static class MultipartJsonModel extends Block {
     private final JsonModel[] parts;
 
     public MultipartJsonModel(String name, JsonModel[] parts) {
-      super(name, parts[0].texture);
+      super(name, parts.length > 0 ? parts[0].texture : Texture.EMPTY_TEXTURE);
       localIntersect = true;
       opaque = false;
       this.parts = parts;
@@ -574,6 +735,43 @@ public class ResourcepackBlockProvider implements BlockProvider {
         ray.o.scaleAdd(ray.t, ray.d);
       }
       return hit;
+    }
+
+    @Override
+    public boolean isBlockEntity() {
+      for (JsonModel part : parts) {
+        if (part.isBlockEntity()) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+      return new Entity(position) {
+        @Override
+        public Collection<Primitive> primitives(Vector3 offset) {
+          Collection<Primitive> faces = new LinkedList<>();
+          Transform transform =
+              Transform.NONE.translate(
+                  position.x + offset.x, position.y + offset.y, position.z + offset.z);
+          for (JsonModel part : parts) {
+            for (JsonModelElement element : part.elements) {
+              for (JsonModelFace face : element.faces) {
+                face.quad.addTriangles(
+                    faces, new TextureMaterial(part.textures.get(face.texture)), transform);
+              }
+            }
+          }
+          return faces;
+        }
+
+        @Override
+        public JsonValue toJson() {
+          return new JsonObject();
+        }
+      };
     }
   }
 }
