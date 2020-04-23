@@ -158,7 +158,10 @@ public class BlockPalette {
     materialProperties.put("minecraft:glowstone", block -> {
       block.emittance = 1.0f;
     });
-    materialProperties.put("minecraft:portal", block -> {
+    materialProperties.put("minecraft:portal", block -> { // MC <1.13
+      block.emittance = 0.4f;
+    });
+    materialProperties.put("minecraft:nether_portal", block -> { // MC >=1.13
       block.emittance = 0.4f;
     });
     materialProperties.put("minecraft:jack_o_lantern", block -> {
