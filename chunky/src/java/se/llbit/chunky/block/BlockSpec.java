@@ -2,18 +2,6 @@ package se.llbit.chunky.block;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import se.llbit.log.Log;
-import se.llbit.nbt.CompoundTag;
-import se.llbit.nbt.StringTag;
-import se.llbit.nbt.Tag;
-import se.llbit.util.NotNull;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
