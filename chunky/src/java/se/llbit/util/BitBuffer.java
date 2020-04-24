@@ -23,6 +23,7 @@ public class BitBuffer {
   private final long[] data;
   private final int stride;
   private final int mask;
+  private final boolean aligned;
 
   // Current 8-byte position:
   private int offset;
@@ -33,11 +34,14 @@ public class BitBuffer {
   /**
    * @param data the data (immutable).
    * @param stride the number of bits to read at a time (1-32).
+   * @param aligned whether or not the bits are aligned at 8-byte boundaries or not
    */
-  public BitBuffer(long[] data, int stride) {
+  public BitBuffer(long[] data, int stride, boolean aligned) {
     this.data = data;
     this.stride = stride;
+    this.aligned = aligned;
     mask = (1 << stride) - 1;
+    shift = 0;
   }
 
   public int read() {
@@ -45,22 +49,32 @@ public class BitBuffer {
     if (shift + stride < 64) {
       res = (int) (data[offset] >>> shift) & mask;
       shift += stride;
+      if (aligned && shift + stride > 64) {
+        offset += 1;
+        shift = 0;
+      }
     } else {
       if (shift + stride == 64) {
         res = (int) (data[offset] >>> shift) & mask;
         offset += 1;
         shift = 0;
       } else {
-        // High bits:
-        int bits = 64 - shift;
-        res = (int) (data[offset] >>> shift);
-        offset += 1;
-        int rem = stride - bits;
-        // Low bits:
-        res |= ((int) data[offset] & ((1 << rem) - 1)) << bits;
-        shift = rem;
+        if (aligned) {
+          res = (int) (data[offset] >>> shift) & mask;
+          shift += stride;
+        } else {
+          // High bits:
+          int bits = 64 - shift;
+          res = (int) (data[offset] >>> shift);
+          offset += 1;
+          int rem = stride - bits;
+          // Low bits:
+          res |= ((int) data[offset] & ((1 << rem) - 1)) << bits;
+          shift = rem;
+        }
       }
     }
+
     return res;
   }
 }

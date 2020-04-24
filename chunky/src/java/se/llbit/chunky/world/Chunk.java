@@ -269,13 +269,17 @@ public class Chunk {
           Tag blockStates = section.get("BlockStates");
 
           if (blockStates.isLongArray(dataSize)) {
+            // since 20w17a, block states are aligned to 64-bit boundaries, so there are 64 % bpb
+            // unused bits per block state; if so, the array is longer than the expected data size
+            boolean isAligned = blockStates.longArray().length > dataSize;
+
             int[] subpalette = new int[palette.size()];
             int paletteIndex = 0;
             for (Tag item : palette.asList()) {
               subpalette[paletteIndex] = blockPalette.put(item);
               paletteIndex += 1;
             }
-            BitBuffer buffer = new BitBuffer(blockStates.longArray(), bpb);
+            BitBuffer buffer = new BitBuffer(blockStates.longArray(), bpb, isAligned);
             int offset = SECTION_BYTES * yOffset;
             for (int i = 0; i < SECTION_BYTES; ++i) {
               int b0 = buffer.read();
