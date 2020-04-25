@@ -211,13 +211,22 @@ public class BlockPalette {
     materialProperties.put("minecraft:shroomlight", block -> {
       block.emittance = 1.0f;
     });
-    materialProperties.put("minecraft:soul_fire_lantern", block -> {
+    materialProperties.put("minecraft:soul_fire_lantern", block -> { // MC 20w06a-20w16a
       block.emittance = 0.6f;
     });
-    materialProperties.put("minecraft:soul_fire_torch", block -> {
+    materialProperties.put("minecraft:soul_lantern", block -> { // MC >= 20w17a
+      block.emittance = 0.6f;
+    });
+    materialProperties.put("minecraft:soul_fire_torch", block -> { // MC 20w06a-20w16a
       block.emittance = 35.0f;
     });
-    materialProperties.put("minecraft:soul_fire_wall_torch", block -> {
+    materialProperties.put("minecraft:soul_torch", block -> { // MC >= 20w17a
+      block.emittance = 35.0f;
+    });
+    materialProperties.put("minecraft:soul_fire_wall_torch", block -> { // MC 20w06a-20w16a
+      block.emittance = 35.0f;
+    });
+    materialProperties.put("minecraft:soul_wall_torch", block -> { // MC >= 20w17a
       block.emittance = 35.0f;
     });
     materialProperties.put("minecraft:soul_fire", block -> {
