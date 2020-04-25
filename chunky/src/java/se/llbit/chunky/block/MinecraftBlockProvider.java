@@ -1582,9 +1582,10 @@ public class MinecraftBlockProvider implements BlockProvider {
         return log(tag, Texture.crimsonStem, Texture.crimsonStemTop);
       case "stripped_crimson_stem":
         return log(tag, Texture.strippedCrimsonStem, Texture.strippedCrimsonStemTop);
-      case "soul_fire_lantern":
+      case "soul_fire_lantern": // 20w06a - 20w16a
+      case "soul_lantern": // since 20w17a
         return new Lantern(
-            "soul_fire_lantern",
+            name,
             Texture.soulFireLantern,
             tag.get("Properties").get("hanging").stringValue("false").equals("true"));
       case "twisting_vines":
@@ -1595,9 +1596,11 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new SpriteBlock("weeping_vines", Texture.weepingVines);
       case "weeping_vines_plant":
         return new SpriteBlock("weeping_vines_plant", Texture.weepingVinesPlant);
-      case "soul_fire_torch":
+      case "soul_fire_torch": // 20w06a - 20w16a
+      case "soul_torch": // since 20w17a
         return new Torch(name, Texture.soulFireTorch);
-      case "soul_fire_wall_torch":
+      case "soul_fire_wall_torch": // 20w06a - 20w16a
+      case "soul_wall_torch": // since 20w17a
         return wallTorch(tag, Texture.soulFireTorch);
       case "respawn_anchor":
         return new RespawnAnchor(
