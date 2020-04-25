@@ -41,7 +41,6 @@ public class BitBuffer {
     this.stride = stride;
     this.aligned = aligned;
     mask = (1 << stride) - 1;
-    shift = 0;
   }
 
   public int read() {
@@ -58,20 +57,15 @@ public class BitBuffer {
         res = (int) (data[offset] >>> shift) & mask;
         offset += 1;
         shift = 0;
-      } else {
-        if (aligned) {
-          res = (int) (data[offset] >>> shift) & mask;
-          shift += stride;
-        } else {
-          // High bits:
-          int bits = 64 - shift;
-          res = (int) (data[offset] >>> shift);
-          offset += 1;
-          int rem = stride - bits;
-          // Low bits:
-          res |= ((int) data[offset] & ((1 << rem) - 1)) << bits;
-          shift = rem;
-        }
+      } else { // only reached if aligned is false
+        // High bits:
+        int bits = 64 - shift;
+        res = (int) (data[offset] >>> shift);
+        offset += 1;
+        int rem = stride - bits;
+        // Low bits:
+        res |= ((int) data[offset] & ((1 << rem) - 1)) << bits;
+        shift = rem;
       }
     }
 
