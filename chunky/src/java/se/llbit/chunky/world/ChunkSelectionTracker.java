@@ -191,6 +191,19 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
   }
 
   /**
+   * Select the given chunks.
+   * @param chunks Chunks to select
+   */
+  public void setSelection(Collection<ChunkPosition> chunks) {
+    Set<ChunkPosition> prev = new HashSet<>(selected);
+    selected.clear();
+    selected.addAll(chunks);
+    prev.addAll(chunks);
+    notifyChunksUpdated(prev);
+    notifyChunkSelectionChange();
+  }
+
+  /**
    * @return <code>true</code> if the given chunk position is selected
    */
   public boolean isSelected(ChunkPosition chunk) {

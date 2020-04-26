@@ -2638,6 +2638,10 @@ public class Scene implements JsonSerializable, Refreshable {
     return chunks.size();
   }
 
+  public Collection<ChunkPosition> getChunks() {
+    return Collections.unmodifiableCollection(chunks);
+  }
+
   /**
    * Clears the reset reason and returns the previous reason.
    * @return the current reset reason

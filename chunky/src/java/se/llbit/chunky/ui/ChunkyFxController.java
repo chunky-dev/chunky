@@ -323,6 +323,7 @@ public class ChunkyFxController
         updateTitle();
         refreshSettings();
         guiUpdateLatch.countDown();
+        getChunkSelection().setSelection(chunky.getSceneManager().getScene().getChunks());
       });
       new Thread(() -> {
         try {
