@@ -203,4 +203,11 @@ public class ChunkSelectionTracker implements ChunkDeletionListener {
   public synchronized Collection<ChunkPosition> getSelection() {
     return new LinkedList<>(selected);
   }
+
+  /**
+   * @return The number of selected chunks
+   */
+  public int size() {
+    return selected.size();
+  }
 }

@@ -364,10 +364,10 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       Chunk hoveredChunk = mapLoader.getWorld().getChunk(cp);
       if (!hoveredChunk.isEmpty()) {
         tooltip.setText(
-            String.format("%s, %s\nBlock: [%s, %s]", hoveredChunk.toString(), hoveredChunk.biomeAt(bx, bz), worldBlockX, worldBlockZ));
+            String.format("%s, %s\nBlock: [%s, %s]\n%d chunks selected", hoveredChunk.toString(), hoveredChunk.biomeAt(bx, bz), worldBlockX, worldBlockZ, chunkSelection.size()));
       } else {
         tooltip.setText(
-            String.format("%s\nBlock: [%s, %s]", hoveredChunk.toString(), worldBlockX, worldBlockZ));
+            String.format("%s\nBlock: [%s, %s]\n%d chunks selected", hoveredChunk.toString(), worldBlockX, worldBlockZ, chunkSelection.size()));
       }
       Scene scene = mapOverlay.getScene();
       if (mapOverlay.isFocused()) {
