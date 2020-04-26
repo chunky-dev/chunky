@@ -43,7 +43,7 @@ public class ResourceLoadOrderEditor extends Stage {
 
   private static File prevDir = null;
 
-  public ResourceLoadOrderEditor() {
+  public ResourceLoadOrderEditor(Runnable onResourcesChanged) {
     VBox content = new VBox();
     content.setSpacing(10);
     content.setPadding(new Insets(10));
@@ -58,6 +58,7 @@ public class ResourceLoadOrderEditor extends Stage {
       pathList.getItems().toArray(paths);
       TexturePackLoader.loadTexturePacks(paths, true);
       TextureCache.reset();
+      onResourcesChanged.run();
       hide();
     });
     Button up = new Button("Up");
