@@ -24,7 +24,7 @@ import se.llbit.math.Ray;
 // TODO: fetch color from biome?
 public class LilyPadMaterial extends Material {
 
-  private static final int COLOR = 0x009218;
+  private static final int COLOR = 0x208030;
   private static final float[] lilyPadColor = new float[4];
 
   static {
@@ -35,12 +35,25 @@ public class LilyPadMaterial extends Material {
     super("lily_pad", Texture.lilyPad);
   }
 
-  @Override public void getColor(Ray ray) {
+  @Override
+  public void getColor(Ray ray) {
     super.getColor(ray);
     if (ray.color.w > Ray.EPSILON) {
       ray.color.x *= lilyPadColor[0];
       ray.color.y *= lilyPadColor[1];
       ray.color.z *= lilyPadColor[2];
     }
+  }
+
+  @Override
+  public float[] getColor(double u, double v) {
+    float[] color = super.getColor(u, v);
+    if (color[3] > Ray.EPSILON) {
+      color = color.clone();
+      color[0] *= lilyPadColor[0];
+      color[1] *= lilyPadColor[1];
+      color[2] *= lilyPadColor[2];
+    }
+    return color;
   }
 }
