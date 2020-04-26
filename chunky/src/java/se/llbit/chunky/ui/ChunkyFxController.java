@@ -543,7 +543,9 @@ public class ChunkyFxController
         new Tooltip("Select resource packs Chunky uses to load textures."));
     editResourcePacks.setGraphic(new ImageView(Icon.pencil.fxImage()));
     editResourcePacks.setOnAction(e -> {
-      ResourceLoadOrderEditor editor = new ResourceLoadOrderEditor();
+      ResourceLoadOrderEditor editor = new ResourceLoadOrderEditor(() -> {
+        scene.refresh();
+      });
       editor.show();
     });
 
