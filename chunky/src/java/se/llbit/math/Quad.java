@@ -65,8 +65,8 @@ public class Quad {
     t.applyRotScale(xv);
     t.applyRotScale(yv);
     t.applyRotScale(n);
-    xvl = other.xvl;
-    yvl = other.yvl;
+    xvl = 1 / xv.lengthSquared();
+    yvl = 1 / yv.lengthSquared();
     d = -n.dot(o);
     uv.set(other.uv);
     textureRotation = other.textureRotation;
@@ -89,8 +89,8 @@ public class Quad {
     t.transform(xv);
     t.transform(yv);
     t.transform(n);
-    xvl = other.xvl;
-    yvl = other.yvl;
+    xvl = 1 / xv.lengthSquared();
+    yvl = 1 / yv.lengthSquared();
     d = -n.dot(o);
     uv.set(other.uv);
     textureRotation = other.textureRotation;
@@ -181,8 +181,10 @@ public class Quad {
 
         if (u >= 0 && u <= 1 && v >= 0 && v <= 1) {
           // TODO this could be simplified because textureRotation is only used in 90° steps
-          double pu = (u - 0.5) * Math.cos(textureRotation) - (v - 0.5) * Math.sin(textureRotation) + 0.5;
-          double pv = (u - 0.5) * Math.sin(textureRotation) + (v - 0.5) * Math.cos(textureRotation) + 0.5;
+          double pu =
+              (u - 0.5) * Math.cos(textureRotation) - (v - 0.5) * Math.sin(textureRotation) + 0.5;
+          double pv =
+              (u - 0.5) * Math.sin(textureRotation) + (v - 0.5) * Math.cos(textureRotation) + 0.5;
           ray.u = uv.x + pu * uv.y;
           ray.v = uv.z + pv * uv.w;
           ray.tNext = t;
