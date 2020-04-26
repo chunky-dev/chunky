@@ -3458,12 +3458,18 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/crimson_stem_top", Texture.crimsonStemTop);
     addSimpleTexture("assets/minecraft/textures/block/stripped_crimson_stem", Texture.strippedCrimsonStem);
     addSimpleTexture("assets/minecraft/textures/block/stripped_crimson_stem_top", Texture.strippedCrimsonStemTop);
-    addSimpleTexture("assets/minecraft/textures/block/soul_fire_lantern", Texture.soulFireLantern);
+    allTextures.put("soul_lantern", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/block/soul_fire_lantern", Texture.soulFireLantern), // MC 20w06a-20w16a
+        new SimpleTexture("assets/minecraft/textures/block/soul_lantern", Texture.soulFireLantern) // MC >= 20w17a
+    ));
     addSimpleTexture("assets/minecraft/textures/block/twisting_vines", Texture.twistingVines);
     addSimpleTexture("assets/minecraft/textures/block/twisting_vines_plant", Texture.twistingVinesPlant);
     addSimpleTexture("assets/minecraft/textures/block/weeping_vines", Texture.weepingVines);
     addSimpleTexture("assets/minecraft/textures/block/weeping_vines_plant", Texture.weepingVinesPlant);
-    addSimpleTexture("assets/minecraft/textures/block/soul_fire_torch", Texture.soulFireTorch);
+    allTextures.put("soul_torch", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/block/soul_fire_torch", Texture.soulFireTorch), // MC 20w06a-20w16a
+        new SimpleTexture("assets/minecraft/textures/block/soul_torch", Texture.soulFireTorch) // MC >= 20w17a
+    ));
     addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_top", Texture.respawnAnchorTop);
     addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_bottom", Texture.respawnAnchorBottom);
     addSimpleTexture("assets/minecraft/textures/block/respawn_anchor_side0", Texture.respawnAnchorSide0);
