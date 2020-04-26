@@ -41,6 +41,8 @@ public class Quad {
    */
   public final boolean doubleSided;
 
+  public double textureRotation = 0;
+
   /** Normal vector */
   public Vector3 n = new Vector3();
 
@@ -67,6 +69,7 @@ public class Quad {
     yvl = other.yvl;
     d = -n.dot(o);
     uv.set(other.uv);
+    textureRotation = other.textureRotation;
   }
 
   /** Create transformed Quad */
@@ -90,6 +93,7 @@ public class Quad {
     yvl = other.yvl;
     d = -n.dot(o);
     uv.set(other.uv);
+    textureRotation = other.textureRotation;
   }
 
   /**
@@ -174,9 +178,13 @@ public class Quad {
         u *= xvl;
         v = ix * yv.x + iy * yv.y + iz * yv.z;
         v *= yvl;
+
         if (u >= 0 && u <= 1 && v >= 0 && v <= 1) {
-          ray.u = uv.x + u * uv.y;
-          ray.v = uv.z + v * uv.w;
+          // TODO this could be simplified because textureRotation is only used in 90° steps
+          double pu = (u - 0.5) * Math.cos(textureRotation) - (v - 0.5) * Math.sin(textureRotation) + 0.5;
+          double pv = (u - 0.5) * Math.sin(textureRotation) + (v - 0.5) * Math.cos(textureRotation) + 0.5;
+          ray.u = uv.x + pu * uv.y;
+          ray.v = uv.z + pv * uv.w;
           ray.tNext = t;
           return true;
         }
@@ -208,6 +216,7 @@ public class Quad {
     double u1 = uv.x + uv.y;
     double v0 = uv.z;
     double v1 = uv.z + uv.w;
+    // TODO texture rotation
     primitives.add(new TexturedTriangle(c0, c2, c1, new Vector2(u0, v0), new Vector2(u0, v1),
         new Vector2(u1, v0), material, doubleSided));
     primitives.add(new TexturedTriangle(c1, c2, c3, new Vector2(u1, v0), new Vector2(u0, v1),
