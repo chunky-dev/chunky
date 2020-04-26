@@ -71,54 +71,56 @@ public class ResourcepackBlockProvider implements BlockProvider {
                                 for (JsonMember blockState :
                                     blockStates.get("variants").object().members) {
                                   // TODO add support for pseudo-random models
-                                  String modelName =
+                                  JsonObject blockDefinition =
                                       blockState.getValue().isArray()
-                                          ? blockState
-                                              .getValue()
-                                              .array()
-                                              .get(0)
-                                              .object()
-                                              .get("model")
-                                              .stringValue("unknown:unknown")
-                                          : blockState
-                                              .getValue()
-                                              .object()
-                                              .get("model")
-                                              .stringValue("unknown:unknown");
-                                  // TODO handle rotation
+                                          ? blockState.getValue().array().get(0).object()
+                                          : blockState.getValue().object();
+                                  String modelName =
+                                      blockDefinition.get("model").stringValue("unknown:unknown");
                                   if (modelName.equals("minecraft:block/air")) {
                                     variants.variants.add(new SimpleBlockVariant(Air.INSTANCE));
                                   } else {
+                                    Block model =
+                                        modelLoader.loadBlockModel(zip, modelName, blockName);
+                                    if (model instanceof JsonModel) {
+                                      if (blockDefinition.get("y").doubleValue(0) > 0) {
+                                        ((JsonModel) model)
+                                            .rotateY(
+                                                blockDefinition.get("y").intValue(0),
+                                                blockDefinition.get("uvlock").boolValue(false));
+                                      }
+                                      // TODO rotateX, rotateZ
+                                    }
+
                                     variants.variants.add(
-                                        new VariantsBlockVariant(
-                                            blockState.getName(),
-                                            modelLoader.loadBlockModel(zip, modelName, blockName)));
+                                        new VariantsBlockVariant(blockState.getName(), model));
                                   }
                                 }
                               } else if (blockStates.get("multipart").isArray()) {
-                                // TODO add multipart block support
                                 BlockVariantMultipart multipartBlockVariant =
                                     new BlockVariantMultipart(blockName);
                                 for (JsonValue part : blockStates.get("multipart").array()) {
-                                  String modelName =
+                                  JsonObject blockDefinition =
                                       part.object().get("apply").isArray()
-                                          ? part.object()
-                                              .get("apply")
-                                              .array()
-                                              .get(0) // TODO
-                                              .object()
-                                              .get("model")
-                                              .stringValue("unknown:unknown")
-                                          : part.object()
-                                              .get("apply")
-                                              .object()
-                                              .get("model")
-                                              .stringValue("unknown:unknown");
+                                          ? part.object().get("apply").array().get(0).object()
+                                          : part.object().get("apply").object();
+                                  String modelName =
+                                      blockDefinition.get("model").stringValue("unknown:unknown");
 
+                                  Block model =
+                                      modelLoader.loadBlockModel(zip, modelName, blockName);
+                                  if (model instanceof JsonModel) {
+                                    if (blockDefinition.get("y").doubleValue(0) > 0) {
+                                      ((JsonModel) model)
+                                          .rotateY(
+                                              blockDefinition.get("y").intValue(0),
+                                              blockDefinition.get("uvlock").boolValue(false));
+                                    }
+                                    // TODO rotateX, rotateZ
+                                  }
                                   multipartBlockVariant.addPart(
                                       new MultipartBlockVariant(
-                                          part.object().get("when").object(),
-                                          modelLoader.loadBlockModel(zip, modelName, blockName)));
+                                          part.object().get("when").object(), model));
                                 }
                                 variants.variants.add(multipartBlockVariant);
                               } else {
@@ -726,6 +728,23 @@ public class ResourcepackBlockProvider implements BlockProvider {
           return new JsonObject();
         }
       };
+    }
+
+    public void rotateY(int angle, boolean uvlock) {
+      for (JsonModelElement element : elements) {
+        for (JsonModelFace face : element.faces) {
+          if (face != null && face.quad != null)
+            face.quad = face.quad.transform(Transform.NONE.rotateY(-Math.toRadians(angle)));
+        }
+        if (uvlock) {
+          if (element.faces[0] != null && element.faces[0].quad != null) {
+            element.faces[0].quad.textureRotation -= Math.toRadians(angle);
+          }
+          if (element.faces[1] != null && element.faces[1].quad != null) {
+            element.faces[1].quad.textureRotation -= Math.toRadians(angle);
+          }
+        }
+      }
     }
   }
 
