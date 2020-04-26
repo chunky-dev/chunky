@@ -355,7 +355,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
       this.tintindex = face.get("tintindex").intValue(-1);
       int rotation = face.get("rotation").intValue(0);
       JsonArray uv = face.get("uv").isArray() ? face.get("uv").array() : null;
-      // TODO cullface
+      // TODO cullface, uvlock of the parent
 
       if (direction.equals("up")) {
         this.quad =
@@ -372,11 +372,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
                     : new Vector4(from.x / 16, to.x / 16, 1 - to.z / 16, 1 - from.z / 16));
 
         if (rotation > 0) {
-          quad =
-              quad.transform(
-                  Transform.NONE
-                      .translate(-from.x / 16, 0, -from.z / 16)
-                      .rotateY(-FastMath.toRadians(rotation)));
+          quad.textureRotation = FastMath.toRadians(rotation); // -angle or +angle?
         }
       } else if (direction.equals("down")) {
         this.quad =
@@ -393,7 +389,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
                     : new Vector4(from.x / 16, to.x / 16, 1 - to.z / 16, 1 - from.z / 16));
 
         if (rotation > 0) {
-          quad = quad.transform(Transform.NONE.rotateY(-FastMath.toRadians(rotation)));
+          quad.textureRotation = FastMath.toRadians(rotation); // -angle or +angle?
         }
       } else if (direction.equals("west")) {
         this.quad =
@@ -403,11 +399,15 @@ public class ResourcepackBlockProvider implements BlockProvider {
                 new Vector3(from.x / 16, from.y / 16, to.z / 16),
                 uv != null
                     ? new Vector4(
-                        uv.get(0).doubleValue(to.z) / 16,
                         uv.get(2).doubleValue(from.z) / 16,
+                        uv.get(0).doubleValue(to.z) / 16,
                         1 - uv.get(1).doubleValue(from.y) / 16,
                         1 - uv.get(3).doubleValue(to.y) / 16)
-                    : new Vector4(to.z / 16, from.z / 16, 1 - from.y / 16, 1 - to.y / 16));
+                    : new Vector4(from.z / 16, to.z / 16, from.y / 16, to.y / 16));
+
+        if (rotation > 0) {
+          quad.textureRotation = FastMath.toRadians(rotation);
+        }
       } else if (direction.equals("east")) {
         this.quad =
             new Quad(
@@ -421,6 +421,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
                         1 - uv.get(1).doubleValue(from.y) / 16,
                         1 - uv.get(3).doubleValue(to.y) / 16)
                     : new Vector4(to.z / 16, from.z / 16, 1 - from.y / 16, 1 - to.y / 16));
+
+        if (rotation > 0) {
+          quad.textureRotation = FastMath.toRadians(rotation);
+        }
       } else if (direction.equals("north")) {
         this.quad =
             new Quad(
@@ -434,6 +438,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
                         1 - uv.get(1).doubleValue(from.y) / 16,
                         1 - uv.get(3).doubleValue(to.y) / 16)
                     : new Vector4(to.x / 16, from.x / 16, 1 - from.y / 16, 1 - to.y / 16));
+
+        if (rotation > 0) {
+          quad.textureRotation = FastMath.toRadians(rotation); // -angle or +angle?
+        }
       } else if (direction.equals("south")) {
         this.quad =
             new Quad(
@@ -447,6 +455,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
                         1 - uv.get(1).doubleValue(from.y) / 16,
                         1 - uv.get(3).doubleValue(to.y) / 16)
                     : new Vector4(to.x / 16, from.x / 16, 1 - from.y / 16, 1 - to.y / 16));
+
+        if (rotation > 0) {
+          quad.textureRotation = FastMath.toRadians(rotation); // -angle or +angle?
+        }
       }
     }
 
@@ -628,6 +640,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
   private static class JsonModel extends Block {
     private Map<String, Texture> textures = new HashMap<>();
     private List<JsonModelElement> elements = new ArrayList<>();
+    private boolean isBlockEntity = false;
 
     public JsonModel(String name, Texture texture) {
       super(name, texture);
@@ -653,7 +666,11 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
       if (modelDefinition.get("elements").isArray()) {
         for (JsonValue e : modelDefinition.get("elements").array()) {
-          elements.add(new JsonModelElement(this, e.asObject()));
+          JsonModelElement element = new JsonModelElement(this, e.asObject());
+          elements.add(element);
+          if (element.requiresBlockEntity()) {
+            this.isBlockEntity = true;
+          }
         }
       }
 
@@ -662,6 +679,9 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
     @Override
     public boolean intersect(Ray ray, Scene scene) {
+      if (isBlockEntity()) {
+        return false;
+      }
       boolean hit = false;
       ray.t = Double.POSITIVE_INFINITY;
       for (JsonModelElement element : elements) {
@@ -677,7 +697,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
     @Override
     public boolean isBlockEntity() {
-      return elements.stream().anyMatch(JsonModelElement::requiresBlockEntity);
+      return isBlockEntity;
     }
 
     @Override
@@ -702,6 +722,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
         @Override
         public JsonValue toJson() {
+          // TODO
           return new JsonObject();
         }
       };
