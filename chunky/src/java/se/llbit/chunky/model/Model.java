@@ -198,7 +198,7 @@ public class Model {
    * @param models source quads
    * @return All quads merged into a single array
    */
-  public static Quad[] join(Quad[]...models) {
+  public static Quad[] join(Quad[]... models) {
     List<Quad> all = new ArrayList<>();
     for (Quad[] quads : models) {
       Collections.addAll(all, quads);

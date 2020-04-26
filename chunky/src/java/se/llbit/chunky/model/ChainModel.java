@@ -8,28 +8,30 @@ import se.llbit.math.Vector4;
 
 public class ChainModel {
   private static final Quad[] quads =
-      new Quad[] {
-        new Quad(
-            new Vector3(6.5 / 16.0, 16 / 16.0, 8 / 16.0),
-            new Vector3(9.5 / 16.0, 16 / 16.0, 8 / 16.0),
-            new Vector3(6.5 / 16.0, 0 / 16.0, 8 / 16.0),
-            new Vector4(3 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)),
-        new Quad(
-            new Vector3(9.5 / 16.0, 16 / 16.0, 8 / 16.0),
-            new Vector3(6.5 / 16.0, 16 / 16.0, 8 / 16.0),
-            new Vector3(9.5 / 16.0, 0 / 16.0, 8 / 16.0),
-            new Vector4(3 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)),
-        new Quad(
-            new Vector3(8 / 16.0, 16 / 16.0, 9.5 / 16.0),
-            new Vector3(8 / 16.0, 16 / 16.0, 6.5 / 16.0),
-            new Vector3(8 / 16.0, 0 / 16.0, 9.5 / 16.0),
-            new Vector4(6 / 16.0, 3 / 16.0, 16 / 16.0, 0 / 16.0)),
-        new Quad(
-            new Vector3(8 / 16.0, 16 / 16.0, 6.5 / 16.0),
-            new Vector3(8 / 16.0, 16 / 16.0, 9.5 / 16.0),
-            new Vector3(8 / 16.0, 0 / 16.0, 6.5 / 16.0),
-            new Vector4(6 / 16.0, 3 / 16.0, 16 / 16.0, 0 / 16.0))
-      };
+      Model.rotateY(
+          new Quad[] {
+            new Quad(
+                new Vector3(6.5 / 16.0, 16 / 16.0, 8 / 16.0),
+                new Vector3(9.5 / 16.0, 16 / 16.0, 8 / 16.0),
+                new Vector3(6.5 / 16.0, 0 / 16.0, 8 / 16.0),
+                new Vector4(3 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)),
+            new Quad(
+                new Vector3(9.5 / 16.0, 16 / 16.0, 8 / 16.0),
+                new Vector3(6.5 / 16.0, 16 / 16.0, 8 / 16.0),
+                new Vector3(9.5 / 16.0, 0 / 16.0, 8 / 16.0),
+                new Vector4(3 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)),
+            new Quad(
+                new Vector3(8 / 16.0, 16 / 16.0, 9.5 / 16.0),
+                new Vector3(8 / 16.0, 16 / 16.0, 6.5 / 16.0),
+                new Vector3(8 / 16.0, 0 / 16.0, 9.5 / 16.0),
+                new Vector4(6 / 16.0, 3 / 16.0, 16 / 16.0, 0 / 16.0)),
+            new Quad(
+                new Vector3(8 / 16.0, 16 / 16.0, 6.5 / 16.0),
+                new Vector3(8 / 16.0, 16 / 16.0, 9.5 / 16.0),
+                new Vector3(8 / 16.0, 0 / 16.0, 6.5 / 16.0),
+                new Vector4(6 / 16.0, 3 / 16.0, 16 / 16.0, 0 / 16.0))
+          },
+          Math.toRadians(45));
 
   public static boolean intersect(Ray ray) {
     boolean hit = false;
