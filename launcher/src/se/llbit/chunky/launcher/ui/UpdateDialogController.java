@@ -289,7 +289,7 @@ public final class UpdateDialogController implements Initializable {
       }
       // Using the library URL failed.
       // Try downloading the library from the default update site.
-      String defaultUrl = launcher.settings.updateSite + "lib/" + lib.name;
+      String defaultUrl = launcher.settings.getResourceUrl("lib/" + lib.name);
       if (result != DownloadStatus.SUCCESS) {
         result = ChunkyLauncher.tryDownload(libDir, lib, defaultUrl);
       }
