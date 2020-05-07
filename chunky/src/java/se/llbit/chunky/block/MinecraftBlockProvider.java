@@ -1340,6 +1340,8 @@ public class MinecraftBlockProvider implements BlockProvider {
         return skull(tag, Texture.creeper, SkullEntity.Kind.CREEPER);
       case "creeper_wall_head":
         return wallSkull(tag, Texture.creeper, SkullEntity.Kind.CREEPER);
+      case "dragon_egg":
+        return new DragonEgg();
       case "dragon_head":
         return skull(tag, Texture.steve, SkullEntity.Kind.DRAGON);
       case "dragon_wall_head":
