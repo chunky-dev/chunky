@@ -1466,7 +1466,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!finalized) {
       postProcessFrame(progress);
     }
-    writeImage(targetFile, progress);
+    writeImage(targetFile, outputMode, progress);
   }
 
   /**
@@ -1477,19 +1477,19 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!finalized) {
       postProcessFrame(progress);
     }
-    writeImage(targetFile, progress);
+    writeImage(targetFile, outputMode, progress);
   }
 
   /**
    * Save the current frame as a PNG or TIFF image into the given output stream.
    */
-  public synchronized void writeFrame(OutputStream out, TaskTracker progress, int threadCount)
+  public synchronized void writeFrame(OutputStream out, OutputMode mode, TaskTracker progress, int threadCount)
       throws IOException {
     computeAlpha(progress, threadCount);
     if (!finalized) {
       postProcessFrame(progress);
     }
-    writeImage(out, progress);
+    writeImage(out, mode, progress);
   }
 
   /**
@@ -1561,17 +1561,17 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @param out output stream to write to.
    */
-  private void writeImage(OutputStream out, TaskTracker progress) throws IOException {
-    if (outputMode == OutputMode.PNG) {
+  private void writeImage(OutputStream out, OutputMode mode, TaskTracker progress) throws IOException {
+    if (mode == OutputMode.PNG) {
       writePng(out, progress);
-    } else if (outputMode == OutputMode.TIFF_32) {
+    } else if (mode == OutputMode.TIFF_32) {
       writeTiff(out, progress);
     }
   }
 
-  private void writeImage(File targetFile, TaskTracker progress) {
+  private void writeImage(File targetFile, OutputMode mode, TaskTracker progress) {
     try (FileOutputStream out = new FileOutputStream(targetFile)) {
-      writeImage(out, progress);
+      writeImage(out, mode, progress);
     } catch (IOException e) {
       Log.warn("Failed to write file: " + targetFile.getAbsolutePath(), e);
     }

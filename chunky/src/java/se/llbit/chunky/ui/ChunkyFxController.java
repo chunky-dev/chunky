@@ -730,7 +730,7 @@ public class ChunkyFxController
       PipedOutputStream out = new PipedOutputStream(in);
       new Thread(() -> {
         try {
-          scene.writeFrame(out, new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
+          scene.writeFrame(out, OutputMode.PNG, new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
         } catch (IOException e) {
           Log.warn("Failed to copy image to clipboard", e);
         }
