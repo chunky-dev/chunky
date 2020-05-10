@@ -16,6 +16,8 @@
  */
 package se.llbit.png;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import se.llbit.util.TaskTracker;
 
@@ -43,6 +45,13 @@ public class PngFileWriter implements AutoCloseable {
   public PngFileWriter(OutputStream out) throws IOException {
     this.out = new DataOutputStream(out);
     this.out.writeLong(PNG_SIGNATURE);
+  }
+
+  /**
+   * @throws IOException
+   */
+  public PngFileWriter(File file) throws IOException {
+    this(new FileOutputStream(file));
   }
 
   /**

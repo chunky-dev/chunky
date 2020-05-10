@@ -16,6 +16,8 @@
  */
 package se.llbit.tiff;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
@@ -45,6 +47,13 @@ public class TiffFileWriter implements AutoCloseable {
     out.write(0x4D);
     out.write(0x00);
     out.write(0x2A);
+  }
+
+  /**
+   * @throws IOException
+   */
+  public TiffFileWriter(File file) throws IOException {
+    this(new FileOutputStream(file));
   }
 
   /**
