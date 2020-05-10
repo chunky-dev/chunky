@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import java.io.FileOutputStream;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.Air;
@@ -1465,18 +1466,30 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!finalized) {
       postProcessFrame(progress);
     }
-    writeImage(targetFile, progress);
+    writeImage(targetFile, outputMode, progress);
   }
 
   /**
-   * Save the current frame as a PNG image.
+   * Save the current frame as a PNG or TIFF image.
    */
   public synchronized void saveFrame(File targetFile, TaskTracker progress, int threadCount) {
     computeAlpha(progress, threadCount);
     if (!finalized) {
       postProcessFrame(progress);
     }
-    writeImage(targetFile, progress);
+    writeImage(targetFile, outputMode, progress);
+  }
+
+  /**
+   * Save the current frame as a PNG or TIFF image into the given output stream.
+   */
+  public synchronized void writeFrame(OutputStream out, OutputMode mode, TaskTracker progress, int threadCount)
+      throws IOException {
+    computeAlpha(progress, threadCount);
+    if (!finalized) {
+      postProcessFrame(progress);
+    }
+    writeImage(out, mode, progress);
   }
 
   /**
@@ -1546,30 +1559,39 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Write buffer data to image.
    *
-   * @param targetFile file to write to.
+   * @param out output stream to write to.
    */
-  private void writeImage(File targetFile, TaskTracker progress) {
-    if (outputMode == OutputMode.PNG) {
-      writePng(targetFile, progress);
-    } else if (outputMode == OutputMode.TIFF_32) {
-      writeTiff(targetFile, progress);
+  private void writeImage(OutputStream out, OutputMode mode, TaskTracker progress) throws IOException {
+    if (mode == OutputMode.PNG) {
+      writePng(out, progress);
+    } else if (mode == OutputMode.TIFF_32) {
+      writeTiff(out, progress);
+    }
+  }
+
+  private void writeImage(File targetFile, OutputMode mode, TaskTracker progress) {
+    try (FileOutputStream out = new FileOutputStream(targetFile)) {
+      writeImage(out, mode, progress);
+    } catch (IOException e) {
+      Log.warn("Failed to write file: " + targetFile.getAbsolutePath(), e);
     }
   }
 
   /**
    * Write PNG image.
    *
-   * @param targetFile file to write to.
+   * @param out output stream to write to.
    */
-  private void writePng(File targetFile, TaskTracker progress) {
+  private void writePng(OutputStream out, TaskTracker progress) throws IOException {
     try (TaskTracker.Task task = progress.task("Writing PNG");
-        PngFileWriter writer = new PngFileWriter(targetFile)) {
+        PngFileWriter writer = new PngFileWriter(out)) {
       if (transparentSky) {
         writer.write(backBuffer.data, alphaChannel, width, height, task);
       } else {
         writer.write(backBuffer.data, width, height, task);
       }
-      if (camera.getProjectionMode() == ProjectionMode.PANORAMIC && camera.getFov() >= 179
+      if (camera.getProjectionMode() == ProjectionMode.PANORAMIC
+          && camera.getFov() >= 179
           && camera.getFov() <= 181) {
         String xmp = "";
         xmp += "<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>\n";
@@ -1596,22 +1618,18 @@ public class Scene implements JsonSerializable, Refreshable {
         ITXT iTXt = new ITXT("XML:com.adobe.xmp", xmp);
         writer.writeChunk(iTXt);
       }
-    } catch (IOException e) {
-      Log.warn("Failed to write PNG file: " + targetFile.getAbsolutePath(), e);
     }
   }
 
   /**
    * Write TIFF image.
    *
-   * @param targetFile file to write to.
+   * @param out output stream to write to.
    */
-  private void writeTiff(File targetFile, TaskTracker progress) {
+  private void writeTiff(OutputStream out, TaskTracker progress) throws IOException {
     try (TaskTracker.Task task = progress.task("Writing TIFF");
-        TiffFileWriter writer = new TiffFileWriter(targetFile)) {
+        TiffFileWriter writer = new TiffFileWriter(out)) {
       writer.write32(this, task);
-    } catch (IOException e) {
-      Log.warn("Failed to write TIFF file: " + targetFile.getAbsolutePath(), e);
     }
   }
 

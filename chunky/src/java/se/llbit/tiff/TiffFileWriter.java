@@ -20,8 +20,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.IOException;
 
 /**
@@ -40,8 +39,8 @@ public class TiffFileWriter implements AutoCloseable {
 
   private final DataOutputStream out;
 
-  public TiffFileWriter(File file) throws IOException {
-    out = new DataOutputStream(new FileOutputStream(file));
+  public TiffFileWriter(OutputStream out) throws IOException {
+    this.out = new DataOutputStream(out);
     out.write(0x4D);
     out.write(0x4D);
     out.write(0x00);

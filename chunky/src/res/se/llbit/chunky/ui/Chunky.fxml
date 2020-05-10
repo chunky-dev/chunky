@@ -49,6 +49,7 @@
       </tooltip>
     </Button>
     <Button fx:id="saveFrameBtn" mnemonicParsing="false" text="Save current frame" />
+    <Button fx:id="copyFrameBtn" mnemonicParsing="false" text="Copy current frame" />
   </HBox>
   <SplitPane fx:id="splitPane"
              VBox.vgrow="ALWAYS"

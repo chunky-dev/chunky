@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.ui;
 
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -41,7 +43,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -150,6 +155,7 @@ public class ChunkyFxController
   @FXML private Button loadScene;
 
   @FXML private Button saveFrameBtn;
+  @FXML private Button copyFrameBtn;
   @FXML private ProgressBar progressBar;
   @FXML private Label progressLbl;
   @FXML private Label etaLbl;
@@ -640,6 +646,7 @@ public class ChunkyFxController
     previewTab.setGraphic(new ImageView(Icon.sky.fxImage()));
 
     saveFrameBtn.setOnAction(this::saveCurrentFrame);
+    copyFrameBtn.setOnAction(this::copyCurrentFrame);
     start.setGraphic(new ImageView(Icon.play.fxImage()));
     start.setTooltip(new Tooltip("Start rendering."));
     start.setOnAction(e -> scene.startRender());
@@ -714,6 +721,25 @@ public class ChunkyFxController
       // TODO:
       //scene.saveFrame(target, taskTracker);
       scene.saveFrame(target, new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
+    }
+  }
+
+  private void copyCurrentFrame(Event event) {
+    try {
+      PipedInputStream in = new PipedInputStream();
+      PipedOutputStream out = new PipedOutputStream(in);
+      new Thread(() -> {
+        try {
+          scene.writeFrame(out, OutputMode.PNG, new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
+        } catch (IOException e) {
+          Log.warn("Failed to copy image to clipboard", e);
+        }
+      }).start();
+      ClipboardContent content = new ClipboardContent();
+      content.putImage(new Image(in));
+      Clipboard.getSystemClipboard().setContent(content);
+    } catch(IOException e) {
+      Log.warn("Failed to copy image to clipboard", e);
     }
   }
 

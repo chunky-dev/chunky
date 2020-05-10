@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.map;
 
+import java.io.FileOutputStream;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
@@ -266,7 +267,7 @@ public class MapBuffer {
     int height = view.height;
     int[] pixels = new int[width * height];
     image.getPixelReader().getPixels(0, 0, width, height, PIXEL_FORMAT, pixels, 0, width);
-    try (PngFileWriter pngWriter = new PngFileWriter(targetFile)) {
+    try (PngFileWriter pngWriter = new PngFileWriter(new FileOutputStream(targetFile))) {
       pngWriter.write(pixels, width, height, TaskTracker.Task.NONE);
     }
   }
