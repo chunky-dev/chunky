@@ -1529,8 +1529,14 @@ public class MinecraftBlockProvider implements BlockProvider {
         }
       case "structure_block":
         return structureBlock(tag);
-      case "jigsaw_block":
-        return null; // TODO
+      case "jigsaw":
+        // TODO [20w13a] the jigsaw block supports 12 orientations saved in the orientations tag
+        return new OrientedTexturedBlock(
+            "jigsaw",
+            BlockProvider.facing(tag, "up"),
+            Texture.jigsawSide,
+            Texture.jigsawTop,
+            Texture.jigsawBottom);
       case "soul_soil":
         return new MinecraftBlock("soul_soil", Texture.soulSoil);
       case "crimson_nylium":

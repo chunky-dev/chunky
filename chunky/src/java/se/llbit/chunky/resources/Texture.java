@@ -788,6 +788,9 @@ public class Texture {
   public static final Texture scaffoldingTop = new Texture();
   public static final Texture scaffoldingSide = new Texture();
   public static final Texture scaffoldingBottom = new Texture();
+  public static final Texture jigsawTop = new Texture();
+  public static final Texture jigsawSide = new Texture();
+  public static final Texture jigsawBottom = new Texture();
 
   // [1.15]
   public static final Texture honeyBlockTop = new Texture();
