@@ -58,7 +58,7 @@ public class SkymapSettings extends VBox implements Initializable {
     loadSkymap.setOnAction(e -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Choose Sky Texture");
-      fileChooser.setSelectedExtensionFilter(
+      fileChooser.getExtensionFilters().add(
           new FileChooser.ExtensionFilter("Sky textures", "*.png", "*.jpg", "*.hdr", "*.pfm"));
       if (lastDirectory != null && lastDirectory.isDirectory()) {
         fileChooser.setInitialDirectory(lastDirectory);

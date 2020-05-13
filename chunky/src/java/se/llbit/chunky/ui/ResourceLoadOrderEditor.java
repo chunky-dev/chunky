@@ -92,7 +92,7 @@ public class ResourceLoadOrderEditor extends Stage {
     addResourcePack.setOnAction(event -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Choose Resource Pack");
-      fileChooser.setSelectedExtensionFilter(
+      fileChooser.getExtensionFilters().add(
           new FileChooser.ExtensionFilter("Resource Packs", "*.zip"));
       setInitialDirectory(fileChooser);
       File resourcePack = fileChooser.showOpenDialog(this);

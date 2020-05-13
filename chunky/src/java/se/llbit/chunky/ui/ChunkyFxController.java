@@ -490,7 +490,7 @@ public class ChunkyFxController
     exportZip.setOnAction(e -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Export Chunks to Zip");
-      fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Zip files", "*.zip"));
+      fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip files", "*.zip"));
       mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".zip"));
       File target = fileChooser.showSaveDialog(exportZip.getScene().getWindow());
       if (target != null) {
@@ -502,7 +502,7 @@ public class ChunkyFxController
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Export PNG");
       fileChooser
-          .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("PNG images", "*.png"));
+          .getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG images", "*.png"));
       mapLoader.withWorld(world -> fileChooser.setInitialFileName(world.levelName() + ".png"));
       if (prevPngDir != null) {
         fileChooser.setInitialDirectory(prevPngDir.toFile());
@@ -701,13 +701,13 @@ public class ChunkyFxController
     String extension = ".png";
     switch (outputMode) {
       case PNG:
-        fileChooser.setSelectedExtensionFilter(
+        fileChooser.getExtensionFilters().add(
             new FileChooser.ExtensionFilter("PNG files", "*.png"));
         break;
       case TIFF_32:
         extension = ".tiff";
-        fileChooser.setSelectedExtensionFilter(
-            new FileChooser.ExtensionFilter("PNG files", "*.png"));
+        fileChooser.getExtensionFilters().add(
+            new FileChooser.ExtensionFilter("TIFF files", "*.tiff"));
         break;
     }
     fileChooser.setInitialFileName(String.format("%s-%d%s",

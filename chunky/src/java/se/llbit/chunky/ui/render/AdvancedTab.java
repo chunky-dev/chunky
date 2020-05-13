@@ -82,7 +82,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Merge Render Dump");
       fileChooser
-          .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Render dumps", "*.dump"));
+          .getExtensionFilters().add(new FileChooser.ExtensionFilter("Render dumps", "*.dump"));
       File dump = fileChooser.showOpenDialog(getScene().getWindow());
       if (dump != null) {
         // TODO: remove cast.

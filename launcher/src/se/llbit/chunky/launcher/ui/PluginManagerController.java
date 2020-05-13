@@ -91,7 +91,7 @@ public class PluginManagerController implements Initializable {
     addButton.setOnAction(e -> {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Select Plugin Jar");
-      fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Jar", "*.jar"));
+      fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Jar", "*.jar"));
       File jar = fileChooser.showOpenDialog(addButton.getScene().getWindow());
       if (jar != null) {
         File pluginsDir = SettingsDirectory.getPluginsDirectory();
