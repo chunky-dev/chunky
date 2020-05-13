@@ -94,7 +94,7 @@ public class Poser extends Stage implements Initializable {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Load Skin");
       fileChooser
-          .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
+          .getExtensionFilters().add(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
       File skinFile = fileChooser.showOpenDialog(getScene().getWindow());
       if (skinFile != null) {
         // TODO

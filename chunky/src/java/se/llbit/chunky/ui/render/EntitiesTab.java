@@ -177,7 +177,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
           FileChooser fileChooser = new FileChooser();
           fileChooser.setTitle("Load Skin");
           fileChooser
-              .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
+              .getExtensionFilters().add(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
           File skinFile = fileChooser.showOpenDialog(getScene().getWindow());
           if (skinFile != null) {
             player.setTexture(skinFile.getAbsolutePath());

@@ -84,7 +84,7 @@ public class SceneChooserController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Export Scene");
         fileChooser
-            .setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Zip files", "*.zip"));
+            .getExtensionFilters().add(new FileChooser.ExtensionFilter("Zip files", "*.zip"));
         fileChooser.setInitialFileName(String.format("%s.zip", sceneName));
         File targetFile = fileChooser.showSaveDialog(stage);
         if (targetFile != null) {
