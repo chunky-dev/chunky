@@ -1662,8 +1662,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "lodestone":
         return new TexturedBlock("lodestone", Texture.lodestoneSide, Texture.lodestoneTop);
       case "blackstone":
-        return new TexturedBlock(
-            "blackstone", Texture.blackstone, Texture.blackstoneTop, Texture.blackstone);
+        return new TexturedBlock("blackstone", Texture.blackstone, Texture.blackstoneTop);
       case "blackstone_slab":
         return slab(tag, Texture.blackstoneTop, Texture.blackstoneTop);
       case "blackstone_stairs":
