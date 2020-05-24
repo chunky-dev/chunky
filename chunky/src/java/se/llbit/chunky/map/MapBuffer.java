@@ -231,7 +231,12 @@ public class MapBuffer {
           int destX = 0;
           int pixelOffset = (sourceY + y) * width + sourceX;
           for (int x = 0; x < (view.width / scale); ++x) {
-            int pixel = pixels[pixelOffset++];
+            pixelOffset++;
+            if (pixelOffset >= pixels.length) {
+              // view was updated while painting, so stop painting
+              return;
+            }
+            int pixel = pixels[pixelOffset];
             while (diffX < scale && destX < view.width) {
               scaled[index++] = pixel;
               diffX += 1;
