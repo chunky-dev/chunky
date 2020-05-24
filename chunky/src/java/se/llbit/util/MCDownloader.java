@@ -24,13 +24,12 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-
 import javax.net.ssl.HttpsURLConnection;
-
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
+import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 
@@ -41,25 +40,79 @@ import se.llbit.json.PrettyPrinter;
  */
 public class MCDownloader {
 
-  /**
-   * Download a Minecraft Jar by version name.
-   */
-  public static void downloadMC(String version, File destDir) throws IOException {
-    String theUrl = String
-        .format("https://s3.amazonaws.com/Minecraft.Download/versions/%s/%s.jar", version, version);
-    File destination = new File(destDir, "minecraft.jar");
+  /** Download a Minecraft Jar by version name. */
+  public static void downloadMC(String version, File destination) throws IOException {
+    String theUrl = getClientUrl(getVersionManifestUrl(version));
     System.out.println("url: " + theUrl);
     System.out.println("destination: " + destination.getAbsolutePath());
     URL url = new URL(theUrl);
     ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
-    FileOutputStream out = new FileOutputStream(destination);
-    out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
-    out.close();
+    try (FileOutputStream out = new FileOutputStream(destination)) {
+      out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+    }
+    inChannel.close();
   }
 
   /**
-   * Download a player skin by player name.
+   * Get the version manifest url for the given Minecraft version.
+   *
+   * @param version Minecraft version, e.g. 20w16a or 1.12
+   * @return URL of the version manifest, to be used with {@link #getClientUrl}
+   * @throws IOException if the download failed or the version is unknown
    */
+  private static String getVersionManifestUrl(final String version) throws IOException {
+    HttpsURLConnection conn =
+        (HttpsURLConnection)
+            new URL("https://launchermeta.mojang.com/mc/game/version_manifest.json")
+                .openConnection();
+    int responseCode = conn.getResponseCode();
+    if (responseCode == 200) {
+      try (JsonParser parser = new JsonParser(conn.getInputStream())) {
+        JsonObject parsed = parser.parse().asObject();
+        for (JsonValue versionData : parsed.get("versions").asArray()) {
+          if (versionData.asObject().get("id").asString("").equals(version)) {
+            return versionData.asObject().get("url").asString("");
+          }
+        }
+        throw new IOException("Unknown version: " + version);
+      } catch (SyntaxError e) {
+        throw new IOException("Could not parse versions file", e);
+      }
+    } else {
+      throw new IOException("Could not fetch versions file (status " + responseCode + ")");
+    }
+  }
+
+  /**
+   * Get the download URL of the minecraft.jar from the given version manifest url.
+   *
+   * @param versionManifestUrl URL of the version manifest
+   * @return URL of the minecraft.jar
+   * @throws IOException if the download failed
+   */
+  private static String getClientUrl(final String versionManifestUrl) throws IOException {
+    HttpsURLConnection conn = (HttpsURLConnection) new URL(versionManifestUrl).openConnection();
+    int responseCode = conn.getResponseCode();
+    if (responseCode == 200) {
+      try (JsonParser parser = new JsonParser(conn.getInputStream())) {
+        return parser
+            .parse()
+            .asObject()
+            .get("downloads")
+            .asObject()
+            .get("client")
+            .asObject()
+            .get("url")
+            .asString("");
+      } catch (SyntaxError e) {
+        throw new IOException("Could not parse versions file", e);
+      }
+    } else {
+      throw new IOException("Could not fetch versions file (status " + responseCode + ")");
+    }
+  }
+
+  /** Download a player skin by player name. */
   public static void downloadSkin(String name, File destDir) throws IOException {
     String theUrl = String.format("http://s3.amazonaws.com/MinecraftSkins/%s.png", name);
     File destination = new File(destDir, name + ".skin.png");
@@ -82,11 +135,8 @@ public class MCDownloader {
         new File(PersistentSettings.cacheDirectory(), Util.cacheEncode(key.hashCode()));
     JsonArray cache;
     if (cacheFile.exists()) {
-      FileInputStream in = new FileInputStream(cacheFile);
-      JsonParser cacheParse = new JsonParser(in);
-      try {
+      try (JsonParser cacheParse = new JsonParser(new FileInputStream(cacheFile))) {
         cache = cacheParse.parse().array();
-        in.close();
         for (JsonValue entry : cache) {
           if (entry.array().get(0).stringValue("").equals(key)) {
             return entry.array().get(1).object();
@@ -104,8 +154,7 @@ public class MCDownloader {
     int responseCode = conn.getResponseCode();
     JsonObject profile;
     if (responseCode == 200) {
-      try {
-        JsonParser parser = new JsonParser(conn.getInputStream());
+      try (JsonParser parser = new JsonParser(conn.getInputStream())) {
         profile = parser.parse().object();
         // TODO unparse base64 data.
       } catch (JsonParser.SyntaxError e) {
@@ -123,10 +172,10 @@ public class MCDownloader {
     if (!PersistentSettings.cacheDirectory().isDirectory()) {
       PersistentSettings.cacheDirectory().mkdirs();
     }
-    FileOutputStream out = new FileOutputStream(cacheFile);
-    PrettyPrinter jsonOut = new PrettyPrinter("", new PrintStream(out));
-    cache.prettyPrint(jsonOut);
-    out.close();
+    try (FileOutputStream out = new FileOutputStream(cacheFile)) {
+      PrettyPrinter jsonOut = new PrettyPrinter("", new PrintStream(out));
+      cache.prettyPrint(jsonOut);
+    }
     return profile;
   }
 }
