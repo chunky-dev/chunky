@@ -315,16 +315,16 @@ public class CommandLineOptions {
       mode = Mode.NOTHING;
       String version = arguments.get(0);
       try {
-        File dir = new File(PersistentSettings.settingsDirectory(), "resources");
-        if (!dir.exists()) {
+        File resourcesDir = new File(PersistentSettings.settingsDirectory(), "resources");
+        if (!resourcesDir.exists()) {
           //noinspection ResultOfMethodCallIgnored
-          dir.mkdir();
+          resourcesDir.mkdir();
         }
-        if (!dir.isDirectory()) {
-          System.err.println("Failed to create destination directory " + dir.getAbsolutePath());
+        if (!resourcesDir.isDirectory()) {
+          System.err.println("Failed to create destination directory " + resourcesDir.getAbsolutePath());
         }
         System.out.println("Downloading Minecraft " + version + "...");
-        MCDownloader.downloadMC(version, dir);
+        MCDownloader.downloadMC(version, new File(resourcesDir, "minecraft.jar"));
         System.out.println("Done!");
       } catch (MalformedURLException e) {
         System.err.println("Malformed URL (" + e.getMessage() + ")");
