@@ -32,10 +32,10 @@ public interface BlockData {
   int RSW_WEST_CONNECTION = 13;
   int RSW_NORTH_CONNECTION = 14;
   int RSW_SOUTH_CONNECTION = 15;
-  int RSW_EAST_SIDE = 16;
-  int RSW_WEST_SIDE = 17;
-  int RSW_NORTH_SIDE = 18;
-  int RSW_SOUTH_SIDE = 19;
+  int RSW_EAST_UP = 16;
+  int RSW_WEST_UP = 17;
+  int RSW_NORTH_UP = 18;
+  int RSW_SOUTH_UP = 19;
   int VINE_TOP = 12;
 
   int GLASS_PANE_OFFSET = 12;
