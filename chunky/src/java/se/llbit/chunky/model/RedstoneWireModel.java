@@ -151,7 +151,7 @@ public class RedstoneWireModel {
         hit = true;
       }
     }
-    if ((data & (1 << BlockData.RSW_EAST_SIDE)) != 0) {
+    if ((data & (1 << BlockData.RSW_EAST_UP)) != 0) {
       if (eastSide.intersect(ray)) {
         float[] color = Texture.redstoneWire.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
@@ -165,7 +165,7 @@ public class RedstoneWireModel {
         }
       }
     }
-    if ((data & (1 << BlockData.RSW_WEST_SIDE)) != 0) {
+    if ((data & (1 << BlockData.RSW_WEST_UP)) != 0) {
       if (westSide.intersect(ray)) {
         float[] color = Texture.redstoneWire.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
@@ -179,7 +179,7 @@ public class RedstoneWireModel {
         }
       }
     }
-    if ((data & (1 << BlockData.RSW_NORTH_SIDE)) != 0) {
+    if ((data & (1 << BlockData.RSW_NORTH_UP)) != 0) {
       if (northSide.intersect(ray)) {
         float[] color = Texture.redstoneWire.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
@@ -193,7 +193,7 @@ public class RedstoneWireModel {
         }
       }
     }
-    if ((data & (1 << BlockData.RSW_SOUTH_SIDE)) != 0) {
+    if ((data & (1 << BlockData.RSW_SOUTH_UP)) != 0) {
       if (southSide.intersect(ray)) {
         float[] color = Texture.redstoneWire.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
