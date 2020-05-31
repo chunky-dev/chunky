@@ -368,30 +368,32 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Import scene state from another scene.
    */
-  public synchronized void copyState(Scene other) {
-    loadedWorld = other.loadedWorld;
-    worldPath = other.worldPath;
-    worldDimension = other.worldDimension;
+  public synchronized void copyState(Scene other, boolean copyChunks) {
+    if (copyChunks) {
+      loadedWorld = other.loadedWorld;
+      worldPath = other.worldPath;
+      worldDimension = other.worldDimension;
 
-    // The octree reference is overwritten to save time.
-    // When the other scene is changed it must create a new octree.
-    palette = other.palette;
-    worldOctree = other.worldOctree;
-    waterOctree = other.waterOctree;
-    entities = other.entities;
-    actors = new LinkedList<>(other.actors); // Create a copy so that entity changes can be reset.
-    profiles = other.profiles;
-    bvh = other.bvh;
-    actorBvh = other.actorBvh;
-    renderActors = other.renderActors;
-    grassTexture = other.grassTexture;
-    foliageTexture = other.foliageTexture;
-    origin.set(other.origin);
+      // The octree reference is overwritten to save time.
+      // When the other scene is changed it must create a new octree.
+      palette = other.palette;
+      worldOctree = other.worldOctree;
+      waterOctree = other.waterOctree;
+      entities = other.entities;
+      actors = new LinkedList<>(other.actors); // Create a copy so that entity changes can be reset.
+      profiles = other.profiles;
+      bvh = other.bvh;
+      actorBvh = other.actorBvh;
+      renderActors = other.renderActors;
+      grassTexture = other.grassTexture;
+      foliageTexture = other.foliageTexture;
+      origin.set(other.origin);
+
+      chunks = other.chunks;
+    }
 
     // Copy material properties.
     materials = other.materials;
-
-    chunks = other.chunks;
 
     exposure = other.exposure;
     name = other.name; // TODO: Safe to remove this? Name is copied in copyTransients().
@@ -432,6 +434,13 @@ public class Scene implements JsonSerializable, Refreshable {
       alphaChannel = other.alphaChannel;
       samples = other.samples;
     }
+  }
+
+  /**
+   * Import scene state from another scene.
+   */
+  public synchronized void copyState(Scene other) {
+    copyState(other, true);
   }
 
   /**
@@ -2376,8 +2385,9 @@ public class Scene implements JsonSerializable, Refreshable {
     Scene newScene = sceneFactory.newScene();
     newScene.initBuffers();
     newScene.setName(name);
-    copyState(newScene);
+    copyState(newScene, false);
     copyTransients(newScene);
+    moveCameraToCenter();
     forceReset = true;
     resetReason = ResetReason.SETTINGS_CHANGED;
     mode = RenderMode.PREVIEW;

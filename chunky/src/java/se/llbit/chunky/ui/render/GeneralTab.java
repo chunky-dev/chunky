@@ -21,7 +21,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -57,6 +60,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
   @FXML private Button openSceneDirBtn;
   @FXML private Button exportSettings;
   @FXML private Button importSettings;
+  @FXML private Button restoreDefaults;
   @FXML private Button loadSelectedChunks;
   @FXML private Button reloadChunks;
   @FXML private ComboBox<String> canvasSize;
@@ -145,6 +149,17 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         }
       }
     });
+
+    restoreDefaults.setOnAction(
+        event -> {
+          Alert alert = new Alert(AlertType.CONFIRMATION);
+          alert.setTitle("Restore default settings");
+          alert.setContentText("Do you really want to reset all scene settings?");
+          if (alert.showAndWait().get() == ButtonType.OK) {
+            scene.resetScene(scene.name, controller.getContext().getChunky().getSceneFactory());
+            chunkyFxController.refreshSettings();
+          }
+        });
 
     loadPlayers.setTooltip(new Tooltip("Enable/disable player entity loading. "
         + "Takes effect on next scene creation."));
