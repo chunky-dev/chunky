@@ -645,6 +645,14 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         case "diamond_leggings":
           loader = simpleTexture("models/armor/diamond_layer_2", texture);
           break;
+        case "netherite_boots":
+        case "netherite_helmet":
+        case "netherite_chestplate":
+          loader = simpleTexture("models/armor/netherite_layer_1", texture);
+          break;
+        case "netherite_leggings":
+          loader = simpleTexture("models/armor/netherite_layer_2", texture);
+          break;
         default:
           Log.warnf("Unknown item ID: %s%n", id);
       }
