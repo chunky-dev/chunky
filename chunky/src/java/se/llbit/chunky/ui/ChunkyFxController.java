@@ -777,7 +777,7 @@ public class ChunkyFxController
     }
   }
 
-  private void refreshSettings() {
+  public void refreshSettings() {
     targetSpp.set(scene.getTargetSpp());
     sceneControls.refreshSettings();
   }

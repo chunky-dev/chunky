@@ -11,16 +11,18 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
 
+<?import javafx.scene.layout.FlowPane?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
     <VBox spacing="10.0">
       <children>
-        <HBox spacing="10.0">
+        <FlowPane hgap="10" vgap="10">
           <children>
             <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open scene directory" />
             <Button fx:id="exportSettings" mnemonicParsing="false" text="Export settings" />
             <Button fx:id="importSettings" mnemonicParsing="false" text="Import settings" />
+            <Button fx:id="restoreDefaults" mnemonicParsing="false" text="Restore default settings" />
           </children>
-        </HBox>
+        </FlowPane>
         <HBox spacing="10.0">
           <children>
             <Button fx:id="loadSelectedChunks" mnemonicParsing="false" text="Load selected chunks" />
