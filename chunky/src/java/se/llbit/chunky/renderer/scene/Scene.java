@@ -2384,7 +2384,9 @@ public class Scene implements JsonSerializable, Refreshable {
     boolean finalizeBufferPrev = finalizeBuffer;  // Remember the finalize setting.
     Scene newScene = sceneFactory.newScene();
     newScene.initBuffers();
-    newScene.setName(name);
+    if (name != null) {
+      newScene.setName(name);
+    }
     copyState(newScene, false);
     copyTransients(newScene);
     moveCameraToCenter();
