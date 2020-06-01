@@ -161,7 +161,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     synchronized (scene) {
       scene.clear();
       scene.loadChunks(taskTracker, world, chunksToLoad);
-      scene.moveCameraToCenter();
+      scene.resetScene(null, context.getChunky().getSceneFactory());
       scene.refresh();
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.setRenderMode(RenderMode.PREVIEW);
