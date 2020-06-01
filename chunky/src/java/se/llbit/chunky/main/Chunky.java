@@ -56,6 +56,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created by
@@ -241,12 +243,18 @@ public class Chunky {
     }
     Path pluginsPath = pluginsDirectory.toPath();
     JsonArray plugins = PersistentSettings.getPlugins();
+    Set<String> loadedPlugins = new HashSet<>();
     for (JsonValue value : plugins) {
       String jarName = value.asString("");
       if (!jarName.isEmpty()) {
         Log.info("Loading plugin: " + value);
         try {
           ChunkyPlugin.load(pluginsPath.resolve(jarName).toRealPath().toFile(), (plugin, manifest) -> {
+            String pluginName = manifest.get("name").asString("");
+            if (loadedPlugins.contains(pluginName)) {
+              Log.warnf("Multiple plugins with the same name (\"%s\") are enabled. Loading multiple versions of the same plugin can lead to strange behavior.", pluginName);
+            }
+            loadedPlugins.add(pluginName);
             try {
               plugin.attach(this);
             } catch (Throwable t) {
