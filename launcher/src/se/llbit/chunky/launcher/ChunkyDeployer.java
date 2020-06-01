@@ -340,14 +340,7 @@ public final class ChunkyDeployer {
    * @return command in string form
    */
   public static String commandString(List<String> command) {
-    StringBuilder sb = new StringBuilder();
-    for (String part : command) {
-      if (sb.length() > 0) {
-        sb.append(" ");
-      }
-      sb.append(part);
-    }
-    return sb.toString();
+    return String.join(" ", command);
   }
 
   private static List<String> buildCommandLine(VersionInfo version, LauncherSettings settings) {
