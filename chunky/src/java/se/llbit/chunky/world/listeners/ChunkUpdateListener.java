@@ -19,7 +19,7 @@ package se.llbit.chunky.world.listeners;
 import se.llbit.chunky.world.ChunkPosition;
 
 public interface ChunkUpdateListener {
-  void regionUpdated(ChunkPosition region);
+  default void regionUpdated(ChunkPosition region) {}
 
-  void chunkUpdated(ChunkPosition region);
+  default void chunkUpdated(ChunkPosition region) {}
 }

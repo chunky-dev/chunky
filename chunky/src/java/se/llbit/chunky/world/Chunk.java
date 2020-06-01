@@ -80,6 +80,8 @@ public class Chunk {
   private int surfaceTimestamp = 0;
   private int biomesTimestamp = 0;
 
+  private String version;
+
   public Chunk(ChunkPosition pos, World world) {
     this.world = world;
     this.position = pos;
@@ -151,6 +153,7 @@ public class Chunk {
     Map<String, Tag> data = getChunkData(request);
 
     surfaceTimestamp = dataTimestamp;
+    version = chunkVersion(data);
     loadSurface(data);
     biomesTimestamp = dataTimestamp;
     if (surface == IconLayer.MC_1_12) {
@@ -174,14 +177,13 @@ public class Chunk {
       byte[] biomeData = new byte[X_MAX * Z_MAX];
       extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
       int[] blockData = new int[CHUNK_BYTES];
-      String cv = chunkVersion(data);
-      if (cv.equals("1.13")) {
+      if (version.equals("1.13")) {
         BlockPalette palette = new BlockPalette();
         loadBlockData(data, blockData, palette);
         updateHeightmap(heightmap, position, blockData, heightmapData, palette);
         surface = new SurfaceLayer(world.currentDimension(), blockData, biomeData, palette);
         queueTopography();
-      } else if (cv.equals("1.12")) {
+      } else if (version.equals("1.12")) {
         surface = IconLayer.MC_1_12;
       }
     } else {
@@ -232,7 +234,7 @@ public class Chunk {
   }
 
   /** Detect Minecraft version that generated the chunk. */
-  private String chunkVersion(@NotNull Map<String, Tag> data) {
+  private static String chunkVersion(@NotNull Map<String, Tag> data) {
     Tag sections = data.get(LEVEL_SECTIONS);
     String version = "?";
     if (sections.isList()) {
@@ -248,7 +250,7 @@ public class Chunk {
     return version;
   }
 
-  private void loadBlockData(@NotNull Map<String, Tag> data, @NotNull int[] blocks,
+  private static void loadBlockData(@NotNull Map<String, Tag> data, @NotNull int[] blocks,
       BlockPalette blockPalette) {
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
@@ -439,5 +441,12 @@ public class Chunk {
     } else {
       return "unknown";
     }
+  }
+
+  /**
+   * @return The version of this chunk (1.12, 1.13 or ?)
+   */
+  public String getVersion() {
+    return version;
   }
 }

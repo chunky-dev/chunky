@@ -71,12 +71,14 @@ import se.llbit.chunky.renderer.SnapshotControl;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.RenderResetHandler;
+import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
 import se.llbit.chunky.world.DeleteChunksJob;
 import se.llbit.chunky.world.Icon;
 import se.llbit.chunky.world.World;
+import se.llbit.chunky.world.listeners.ChunkUpdateListener;
 import se.llbit.fx.ToolPane;
 import se.llbit.fxutil.GroupedChangeListener;
 import se.llbit.log.Level;
@@ -393,18 +395,38 @@ public class ChunkyFxController
     map = new ChunkMap(mapLoader, this, mapView, chunkSelection,
         mapCanvas, mapOverlay);
 
-    mapLoader.addWorldLoadListener(world -> {
-      chunkSelection.clearSelection();
-      world.addChunkDeletionListener(chunkSelection);
-      Optional<Vector3> playerPos = world.playerPos();
-      world.addChunkUpdateListener(map);
-      Platform.runLater(() -> {
-        mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
-        map.redrawMap();
-        mapName.setText(world.levelName());
-        showWorldMap();
-      });
-    });
+    mapLoader.addWorldLoadListener(
+        world -> {
+          chunkSelection.clearSelection();
+          world.addChunkDeletionListener(chunkSelection);
+          Optional<Vector3> playerPos = world.playerPos();
+          world.addChunkUpdateListener(map);
+          world.addChunkUpdateListener(
+              new ChunkUpdateListener() {
+                private boolean warningShown = false;
+
+                @Override
+                public void chunkUpdated(ChunkPosition chunkPosition) {
+                  if (!warningShown) {
+                  String version = world.getChunk(chunkPosition).getVersion();
+                  if (version != null && !version.equals("1.13")) {
+                      warningShown = true;
+                      Log.warn(
+                          "This version of Chunky only supports worlds created with Minecraft 1.13 or later. " +
+                          "To render worlds from older Minecraft versions, please use Chunky 1.4.x or convert it to the new format using a current version of Minecraft.");
+                    }
+                  }
+                }
+              });
+
+          Platform.runLater(
+              () -> {
+                mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
+                map.redrawMap();
+                mapName.setText(world.levelName());
+                showWorldMap();
+              });
+        });
 
     map.setOnViewDragged(() -> {
       trackPlayer.set(false);
