@@ -30,7 +30,7 @@ public class Furnace extends MinecraftBlock {
               Texture.furnaceTop, Texture.furnaceTop,
           },
       },
-      // Unlit.
+      // Lit.
       {
           // Facing north.
           {

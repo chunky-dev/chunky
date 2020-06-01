@@ -1879,32 +1879,44 @@ public class MinecraftBlockProvider implements BlockProvider {
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag);
     String lit = properties.get("lit").stringValue("false");
-    return new Furnace(facing, lit.equals("true"));
+    Block furnace = new Furnace(facing, lit.equals("true"));
+    if(lit.equals("true")) {
+      furnace.emittance = 0.6f;
+    }
+    return furnace;
   }
 
   private static Block smoker(Tag tag) {
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag);
     String lit = properties.get("lit").stringValue("false");
-    return new TopBottomOrientedTexturedBlock(
+    Block smoker = new TopBottomOrientedTexturedBlock(
         "smoker",
         facing,
         lit.equals("true") ? Texture.smokerFrontOn : Texture.smokerFront,
         Texture.smokerSide,
         Texture.smokerTop,
         Texture.smokerBottom);
+    if(lit.equals("true")) {
+      smoker.emittance = 0.6f;
+    }
+    return smoker;
   }
 
   private static Block blastFurnace(Tag tag) {
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag);
     String lit = properties.get("lit").stringValue("false");
-    return new TopBottomOrientedTexturedBlock(
+    Block blastFurnace = new TopBottomOrientedTexturedBlock(
         "blast_furnace",
         facing,
         lit.equals("true") ? Texture.blastFurnaceFrontOn : Texture.blastFurnaceFront,
         Texture.blastFurnaceSide,
         Texture.blastFurnaceTop);
+    if(lit.equals("true")) {
+      blastFurnace.emittance = 0.6f;
+    }
+    return blastFurnace;
   }
 
   private static Block composter(Tag tag) {
