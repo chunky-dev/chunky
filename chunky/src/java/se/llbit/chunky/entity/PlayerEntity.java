@@ -194,9 +194,11 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     Collection<Primitive> primitives = new LinkedList<>();
     Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
     head.transform(Transform.NONE
+        .translate(0, 4 / 16., 0)
         .rotateX(headPose.x)
         .rotateY(headPose.y)
         .rotateZ(headPose.z)
+        .translate(0, -4 / 16., 0)
         .scale(headScale)
         .translate(0, 28 / 16., 0)
         .chain(worldTransform));
