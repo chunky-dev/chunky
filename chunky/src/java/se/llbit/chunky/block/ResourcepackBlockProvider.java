@@ -614,7 +614,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
             float[] color = face.getColor(ray, scene, model.textures.get(face.texture));
             if (color[3] > Ray.EPSILON) {
               ray.color.set(color);
-              ray.n.set(face.quad.n);
+              ray.setNormal(face.quad.n);
               ray.t = ray.tNext;
               hit = true;
             }
