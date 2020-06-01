@@ -320,7 +320,8 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
 
     // Add chest armor.
     JsonObject chestItem = gear.get("chest").object();
-    if (!chestItem.isEmpty()) {
+    if (!chestItem.isEmpty() && !chestItem.get("id").asString("").equals("minecraft:elytra")) {
+      // TODO render the elytra
       Transform transform = Transform.NONE
           .translate(0, -5 / 16.0, 0)
           .rotateX(chestPose.x)
