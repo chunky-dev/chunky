@@ -205,6 +205,21 @@ public class BlockPalette {
         block.emittance = 1.0f;
       }
     });
+    materialProperties.put("minecraft:furnace", block -> {
+      if(block instanceof Furnace && ((Furnace)block).isLit()) {
+        block.emittance = 1.0f;
+      }
+    });
+    materialProperties.put("minecraft:smoker", block -> {
+      if(block instanceof Smoker && ((Smoker)block).isLit()) {
+        block.emittance = 1.0f;
+      }
+    });
+    materialProperties.put("minecraft:blast_furnace", block -> {
+      if(block instanceof BlastFurnace && ((BlastFurnace)block).isLit()) {
+        block.emittance = 1.0f;
+      }
+    });
     materialProperties.put("minecraft:lantern", block -> {
       block.emittance = 1.0f;
     });
