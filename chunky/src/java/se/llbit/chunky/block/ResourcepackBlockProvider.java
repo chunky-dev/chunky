@@ -83,13 +83,24 @@ public class ResourcepackBlockProvider implements BlockProvider {
                                     Block model =
                                         modelLoader.loadBlockModel(zip, modelName, blockName);
                                     if (model instanceof JsonModel) {
+                                      if (blockDefinition.get("x").doubleValue(0) > 0) {
+                                        ((JsonModel) model)
+                                            .rotateX(
+                                                blockDefinition.get("x").intValue(0),
+                                                blockDefinition.get("uvlock").boolValue(false));
+                                      }
                                       if (blockDefinition.get("y").doubleValue(0) > 0) {
                                         ((JsonModel) model)
                                             .rotateY(
                                                 blockDefinition.get("y").intValue(0),
                                                 blockDefinition.get("uvlock").boolValue(false));
                                       }
-                                      // TODO rotateX, rotateZ
+                                      if (blockDefinition.get("z").doubleValue(0) > 0) {
+                                        ((JsonModel) model)
+                                            .rotateZ(
+                                                blockDefinition.get("z").intValue(0),
+                                                blockDefinition.get("uvlock").boolValue(false));
+                                      }
                                     }
 
                                     variants.variants.add(
@@ -109,14 +120,26 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
                                   Block model =
                                       modelLoader.loadBlockModel(zip, modelName, blockName);
+
                                   if (model instanceof JsonModel) {
+                                    if (blockDefinition.get("x").doubleValue(0) > 0) {
+                                      ((JsonModel) model)
+                                          .rotateX(
+                                              blockDefinition.get("x").intValue(0),
+                                              blockDefinition.get("uvlock").boolValue(false));
+                                    }
                                     if (blockDefinition.get("y").doubleValue(0) > 0) {
                                       ((JsonModel) model)
                                           .rotateY(
                                               blockDefinition.get("y").intValue(0),
                                               blockDefinition.get("uvlock").boolValue(false));
                                     }
-                                    // TODO rotateX, rotateZ
+                                    if (blockDefinition.get("z").doubleValue(0) > 0) {
+                                      ((JsonModel) model)
+                                          .rotateZ(
+                                              blockDefinition.get("z").intValue(0),
+                                              blockDefinition.get("uvlock").boolValue(false));
+                                    }
                                   }
                                   multipartBlockVariant.addPart(
                                       new MultipartBlockVariant(
@@ -484,7 +507,6 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
   private static class JsonModelElement {
     private JsonModel model;
-    private AABB box;
     private JsonModelFace[] faces = new JsonModelFace[6]; // up,down,north,east,south,west
 
     public JsonModelElement(JsonModel model, JsonObject element) {
@@ -569,64 +591,22 @@ public class ResourcepackBlockProvider implements BlockProvider {
     }
 
     public boolean intersect(Ray ray, Scene scene) {
-      if (this.box != null) {
-        boolean hit = false;
-        if (box.intersect(ray)) {
-          int faceIndex = -1;
-          Vector3 rayNormal = ray.getNormal();
-          if (rayNormal.y > 0) {
-            faceIndex = 0;
-          } else if (rayNormal.y < 0) {
-            faceIndex = 1;
-          } else if (rayNormal.x < 0) {
-            faceIndex = 5;
-          } else if (rayNormal.x > 0) {
-            faceIndex = 3;
-          } else if (rayNormal.z < 0) {
-            faceIndex = 2;
-          } else if (rayNormal.z > 0) {
-            faceIndex = 4;
-          }
+      boolean hit = false;
 
-          if (faceIndex >= 0) {
-            JsonModelFace face = faces[faceIndex];
-            if (face != null) {
-              float[] color = face.getColor(ray, scene, model.textures.get(face.texture));
-              if (color[3] > Ray.EPSILON) {
-                ray.color.set(color);
-                hit = true;
-              }
-            }
-          }
-
-          if (hit) {
+      for (int faceIndex = 0; faceIndex < 6; faceIndex++) {
+        JsonModelFace face = faces[faceIndex];
+        if (face != null && face.quad != null && face.quad.intersect(ray)) {
+          float[] color = face.getColor(ray, scene, model.textures.get(face.texture));
+          if (color[3] > Ray.EPSILON) {
+            ray.color.set(color);
+            ray.setNormal(face.quad.n);
             ray.t = ray.tNext;
-            return true;
+            hit = true;
           }
-        }
-      } else {
-        // TODO quad based models for everything that's not a simple opaque cube?
-        boolean hit = false;
-
-        for (int faceIndex = 0; faceIndex < 6; faceIndex++) {
-          JsonModelFace face = faces[faceIndex];
-          if (face != null && face.quad != null && face.quad.intersect(ray)) {
-            float[] color = face.getColor(ray, scene, model.textures.get(face.texture));
-            if (color[3] > Ray.EPSILON) {
-              ray.color.set(color);
-              ray.setNormal(face.quad.n);
-              ray.t = ray.tNext;
-              hit = true;
-            }
-          }
-        }
-
-        if (hit) {
-          return true;
         }
       }
 
-      return false;
+      return hit;
     }
 
     public boolean requiresBlockEntity() {
@@ -730,11 +710,32 @@ public class ResourcepackBlockProvider implements BlockProvider {
       };
     }
 
+    public void rotateX(int angle, boolean uvlock) {
+      for (JsonModelElement element : elements) {
+        for (JsonModelFace face : element.faces) {
+          if (face != null && face.quad != null) {
+            // TODO angle sign might be wrong
+            face.quad = face.quad.transform(Transform.NONE.rotateX(-Math.toRadians(angle)));
+          }
+        }
+        if (uvlock) {
+          // TODO angle sign might be wrong
+          if (element.faces[3] != null && element.faces[3].quad != null) {
+            element.faces[3].quad.textureRotation -= Math.toRadians(angle);
+          }
+          if (element.faces[5] != null && element.faces[5].quad != null) {
+            element.faces[5].quad.textureRotation -= Math.toRadians(angle);
+          }
+        }
+      }
+    }
+
     public void rotateY(int angle, boolean uvlock) {
       for (JsonModelElement element : elements) {
         for (JsonModelFace face : element.faces) {
-          if (face != null && face.quad != null)
+          if (face != null && face.quad != null) {
             face.quad = face.quad.transform(Transform.NONE.rotateY(-Math.toRadians(angle)));
+          }
         }
         if (uvlock) {
           if (element.faces[0] != null && element.faces[0].quad != null) {
@@ -742,6 +743,26 @@ public class ResourcepackBlockProvider implements BlockProvider {
           }
           if (element.faces[1] != null && element.faces[1].quad != null) {
             element.faces[1].quad.textureRotation -= Math.toRadians(angle);
+          }
+        }
+      }
+    }
+
+    public void rotateZ(int angle, boolean uvlock) {
+      for (JsonModelElement element : elements) {
+        for (JsonModelFace face : element.faces) {
+          if (face != null && face.quad != null) {
+            // TODO angle sign might be wrong
+            face.quad = face.quad.transform(Transform.NONE.rotateZ(-Math.toRadians(angle)));
+          }
+        }
+        if (uvlock) {
+          // TODO angle sign might be wrong
+          if (element.faces[2] != null && element.faces[2].quad != null) {
+            element.faces[2].quad.textureRotation -= Math.toRadians(angle);
+          }
+          if (element.faces[4] != null && element.faces[4].quad != null) {
+            element.faces[4].quad.textureRotation -= Math.toRadians(angle);
           }
         }
       }
