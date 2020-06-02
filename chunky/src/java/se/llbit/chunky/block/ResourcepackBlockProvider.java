@@ -428,7 +428,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
                         uv.get(0).doubleValue(to.z) / 16,
                         1 - uv.get(1).doubleValue(from.y) / 16,
                         1 - uv.get(3).doubleValue(to.y) / 16)
-                    : new Vector4(from.z / 16, to.z / 16, from.y / 16, to.y / 16));
+                    : new Vector4(from.z / 16, to.z / 16, to.y / 16, from.y / 16));
 
         if (rotation > 0) {
           quad.textureRotation = FastMath.toRadians(rotation);
@@ -445,7 +445,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
                         uv.get(0).doubleValue(from.z) / 16,
                         1 - uv.get(1).doubleValue(from.y) / 16,
                         1 - uv.get(3).doubleValue(to.y) / 16)
-                    : new Vector4(to.z / 16, from.z / 16, 1 - from.y / 16, 1 - to.y / 16));
+                    : new Vector4(to.z / 16, from.z / 16, to.y / 16, from.y / 16));
 
         if (rotation > 0) {
           quad.textureRotation = FastMath.toRadians(rotation);
@@ -462,7 +462,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
                         uv.get(2).doubleValue(from.x) / 16,
                         1 - uv.get(1).doubleValue(from.y) / 16,
                         1 - uv.get(3).doubleValue(to.y) / 16)
-                    : new Vector4(to.x / 16, from.x / 16, 1 - from.y / 16, 1 - to.y / 16));
+                    : new Vector4(to.x / 16, from.x / 16, to.y / 16, from.y / 16));
 
         if (rotation > 0) {
           quad.textureRotation = FastMath.toRadians(rotation); // -angle or +angle?
@@ -479,7 +479,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
                         uv.get(2).doubleValue(from.x) / 16,
                         1 - uv.get(1).doubleValue(from.y) / 16,
                         1 - uv.get(3).doubleValue(to.y) / 16)
-                    : new Vector4(to.x / 16, from.x / 16, 1 - from.y / 16, 1 - to.y / 16));
+                    : new Vector4(to.x / 16, from.x / 16, to.y / 16, from.y / 16));
 
         if (rotation > 0) {
           quad.textureRotation = FastMath.toRadians(rotation); // -angle or +angle?
