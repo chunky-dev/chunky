@@ -564,6 +564,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
                     .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
                     .rotateX(angle)
                     .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5);
+            if (rotation.get("rescale").boolValue(false)) {
+              double factor = 1 / FastMath.cos(angle);
+              transform = transform.scale(1, factor, factor);
+            }
             break;
           case "y":
             transform =
@@ -571,6 +575,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
                     .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
                     .rotateY(angle)
                     .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5);
+            if (rotation.get("rescale").boolValue(false)) {
+              double factor = 1 / FastMath.cos(angle);
+              transform = transform.scale(factor, 1, factor);
+            }
             break;
           case "z":
             transform =
@@ -578,13 +586,16 @@ public class ResourcepackBlockProvider implements BlockProvider {
                     .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
                     .rotateZ(angle)
                     .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5);
+            if (rotation.get("rescale").boolValue(false)) {
+              double factor = 1 / FastMath.cos(angle);
+              transform = transform.scale(factor, factor, 1);
+            }
             break;
         }
 
         for (JsonModelFace face : faces) {
           if (face != null) {
             face.quad = face.quad.transform(transform);
-            // TODO rescale
           }
         }
       }
