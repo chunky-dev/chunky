@@ -971,7 +971,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     chunks = loadedChunks;
-    camera.setWorldSize(1 << worldOctree.depth);
+    camera.setWorldSize(1 << worldOctree.getDepth());
     buildBvh();
     buildActorBvh();
     Log.info(String.format("Loaded %d chunks", numChunks));
@@ -1749,7 +1749,7 @@ public class Scene implements JsonSerializable, Refreshable {
         task.update(2);
         Log.info("Octree loaded");
         calculateOctreeOrigin(chunks);
-        camera.setWorldSize(1 << worldOctree.depth);
+        camera.setWorldSize(1 << worldOctree.getDepth());
         buildBvh();
         buildActorBvh();
         return true;
