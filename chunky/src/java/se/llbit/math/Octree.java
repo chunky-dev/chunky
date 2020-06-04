@@ -319,4 +319,12 @@ public class Octree {
     return implementation.getDepth();
   }
 
+  /**
+   * Replace the implementation for the packed one
+   */
+  public void pack() {
+//    if(implementation instanceof NodeBasedOctree)
+//      implementation = new PackedOctree(implementation.getDepth(), ((NodeBasedOctree)implementation).root);
+  }
+
 }
