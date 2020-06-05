@@ -352,7 +352,8 @@ public class ResourcepackBlockProvider implements BlockProvider {
       JsonModel block = new JsonModel(blockName, Texture.air);
       JsonObject blockDefinition = getModel(zip, model);
       block.applyDefinition(blockDefinition, name -> this.getTexture(zip, name));
-      while (!blockDefinition.get("parent").stringValue("block/block").equals("block/block")) {
+      while (!blockDefinition.get("parent").isUnknown()
+          && !blockDefinition.get("parent").stringValue("block/block").equals("block/block")) {
         String parentName = blockDefinition.get("parent").stringValue("block/block");
         blockDefinition = this.getModel(zip, parentName);
         block.applyDefinition(blockDefinition, name -> this.getTexture(zip, name));
