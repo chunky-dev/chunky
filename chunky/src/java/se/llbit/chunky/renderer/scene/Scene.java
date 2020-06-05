@@ -55,13 +55,7 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
-import se.llbit.math.BVH;
-import se.llbit.math.ColorUtil;
-import se.llbit.math.Octree;
-import se.llbit.math.QuickMath;
-import se.llbit.math.Ray;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector3i;
+import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
@@ -971,7 +965,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     chunks = loadedChunks;
-    camera.setWorldSize(1 << worldOctree.depth);
+    camera.setWorldSize(1 << worldOctree.getDepth());
     buildBvh();
     buildActorBvh();
     Log.info(String.format("Loaded %d chunks", numChunks));
@@ -1737,9 +1731,17 @@ public class Scene implements JsonSerializable, Refreshable {
     try (TaskTracker.Task task = progress.task("Loading octree", 2)) {
       task.update(1);
       Log.info("Loading octree " + fileName);
-      try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)))) {
+      try {
         long fileTimestamp = context.fileTimestamp(fileName);
-        OctreeFileFormat.OctreeData data = OctreeFileFormat.load(in);
+        OctreeFileFormat.OctreeData data;
+        try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)))) {
+          data = OctreeFileFormat.load(in);
+        } catch(PackedOctree.OctreeTooBigException e) {
+          // Octree too big, reload file and force loading as NodeBasedOctree
+          Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
+          DataInputStream inRetry = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)));
+          data = OctreeFileFormat.load(inRetry, true);
+        }
         worldOctree = data.worldTree;
         worldOctree.setTimestamp(fileTimestamp);
         waterOctree = data.waterTree;
@@ -1749,7 +1751,7 @@ public class Scene implements JsonSerializable, Refreshable {
         task.update(2);
         Log.info("Octree loaded");
         calculateOctreeOrigin(chunks);
-        camera.setWorldSize(1 << worldOctree.depth);
+        camera.setWorldSize(1 << worldOctree.getDepth());
         buildBvh();
         buildActorBvh();
         return true;
