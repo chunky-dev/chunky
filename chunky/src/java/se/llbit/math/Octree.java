@@ -214,7 +214,7 @@ public class Octree {
 
   private OctreeImplementation implementation;
 
-  static private boolean usePacked = true;
+  static private boolean usePacked = !System.getProperty("chunky.useLegacyOctree", "false").equals("true");
 
   /**
    * Create a new Octree. The dimensions of the Octree
