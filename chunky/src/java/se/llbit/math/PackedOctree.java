@@ -9,7 +9,6 @@ import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
-import sun.jvm.hotspot.oops.BranchData;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -20,9 +19,6 @@ import static se.llbit.math.Octree.BRANCH_NODE;
  * This is a packed representation of an octree
  * the whole octree is stored in a int array to reduce memory usage and
  * hopefully improve performance by being more cache-friendly
- *
- * (At least for now) this version only implements a subset of what is needed,
- * it is intented to be
  */
 public class PackedOctree implements Octree.OctreeImplementation {
   /**
@@ -46,11 +42,29 @@ public class PackedOctree implements Octree.OctreeImplementation {
    *  Note: I think only leaf nodes can have additional data. If that is indeed the case
    *  we could potentially optimize further by only storing the index for branch nodes
    */
-  private final int[] treeData;
-
-  private final int depth;
+  private int[] treeData;
 
   /**
+   * When adding nodes to the octree, the treeData array may have to grow
+   * We implement a simple growing dynamic array, like an ArrayList
+   * We don't we use ArrayList because it only works with objects
+   * and having an array of Integer instead of int would increase the memory usage.
+   * size gives us the size of the dynamic array, the capacity is given by treeData.length
+   */
+  private int size;
+  /**
+   * When removing nodes form the tree, it leaves holes in the array.
+   * Those holes could be reused later when new nodes need to be added
+   * We use a free list to keep of the location of the holes.
+   * freeHead gives use the index of the head of the free list, if it is -1, there is no
+   * holes that can be reused and the size of the array must be increased
+   */
+  private int freeHead;
+
+  private int depth;
+
+  /**
+   * Constructor building a tree from an existing NodeBasedOctree
    * We build the tree by walking an existing tree and recreating it in this format
    * @param depth The depth of the tree
    * @param root The root of the tree to recreate
@@ -58,8 +72,25 @@ public class PackedOctree implements Octree.OctreeImplementation {
   public PackedOctree(int depth, Octree.Node root) {
     this.depth = depth;
     int nodeCount = nodeCount(root);
-    treeData = new int[nodeCount*2];
+    int arraySize = Math.max(nodeCount*2, 64);
+    treeData = new int[arraySize];
     addNode(root, 0, 2);
+    freeHead = -1; // No holes
+    size = nodeCount*2;
+  }
+
+  /**
+   * Constructs an empty octree
+   * @param depth The depth of the tree
+   */
+  public PackedOctree(int depth) {
+    this.depth = depth;
+    treeData = new int[64];
+    // Add a root node
+    treeData[0] = 0;
+    treeData[1] = 0;
+    size = 2;
+    freeHead = -1;
   }
 
   private static int nodeCount(Octree.Node node) {
@@ -101,14 +132,153 @@ public class PackedOctree implements Octree.OctreeImplementation {
     }
   }
 
+  /**
+   * Finds space in the array to put 8 nodes
+   * We find space by searching in the free list
+   * if this fails we append at the end of the array
+   * if the size is greater than the capacity, we allocate a new array
+   * @return the index at the beginning of a free space in the array of size 16 ints (8 nodes)
+   */
+  private int findSpace() {
+    // Look in free list
+    if(freeHead != -1) {
+      int index = freeHead;
+      freeHead = treeData[freeHead];
+      return index;
+    }
+
+    // append in array if we have the capacity
+    if(size+16 <= treeData.length) {
+      int index = size;
+      size += 16;
+      return index;
+    }
+
+    // We need to grow the array
+    int[] newArray = new int[(int)Math.ceil(treeData.length*1.5)];
+    System.arraycopy(treeData, 0, newArray, 0, size);
+    treeData = newArray;
+    // and then append
+    int index = size;
+    size += 16;
+    return index;
+    // FIXME If the array has a really small capacity (less than 32 ints) newArray may not have enough additional space
+  }
+
+  /**
+   * free space at the given index, simply add the 16 ints block beginning at index to the free list
+   * @param index the index of the beginning of the block to free
+   */
+  private void freeSpace(int index) {
+    treeData[index] = freeHead;
+    freeHead = index;
+  }
+
+  /**
+   * Subdivide a node, give to each child the same type and data that this node previously had
+   * @param nodeIndex The index of the node to subdivide
+   */
+  private void subdivideNode(int nodeIndex) {
+    int childrenIndex = findSpace();
+    for(int i = 0; i < 8; ++i) {
+      treeData[childrenIndex + 2*i] = treeData[nodeIndex]; // copy type
+      treeData[childrenIndex + 2*i + 1] = treeData[nodeIndex+1]; // copy data
+    }
+    treeData[nodeIndex] = childrenIndex; // Make the node a parent node pointing to its children
+    treeData[nodeIndex+1] = 0; // reset its data
+  }
+
+  /**
+   * Merge a parent node so it becomes a leaf node
+   * @param nodeIndex The index of the node to merge
+   * @param typeNegation The negation of the type (the value directly stored in the array)
+   */
+  private void mergeNode(int nodeIndex, int typeNegation) {
+    int childrenIndex = treeData[nodeIndex];
+    freeSpace(childrenIndex); // Delete children
+    treeData[nodeIndex] = typeNegation; // Make the node a leaf one
+  }
+
+  /**
+   * Compare two nodes
+   * @param firstNodeIndex The index of the first node
+   * @param secondNodeIndex The index of the second node
+   * @return true id the nodes compare equals, false otherwise
+   */
+  private boolean nodeEquals(int firstNodeIndex, int secondNodeIndex) {
+    boolean firstIsBranch = treeData[firstNodeIndex] > 0;
+    boolean secondIsBranch = treeData[secondNodeIndex] > 0;
+    return ((firstIsBranch && secondIsBranch) || treeData[firstNodeIndex] == treeData[secondNodeIndex]) // compare types
+      && treeData[firstNodeIndex+1] == treeData[secondNodeIndex+1]; // compare data
+    // FIXME possible bug here as we always compare the data even when dealing with nodes that don't really have data
+    // The data int could potentially contain some junk leftover of a previous node
+    // In theory it should be reset to 0 but we need to be careful
+  }
+
+  /**
+   * Compare two nodes
+   * @param firstNodeIndex The index of the first node
+   * @param secondNode The second node (most likely outside of tree)
+   * @return true id the nodes compare equals, false otherwise
+   */
+  private boolean nodeEquals(int firstNodeIndex, Octree.Node secondNode) {
+    boolean firstIsBranch = treeData[firstNodeIndex] > 0;
+    boolean secondIsBranch = (secondNode.type == BRANCH_NODE);
+    return ((firstIsBranch && secondIsBranch) || -treeData[firstNodeIndex] == secondNode.type) // compare types (don't forget that in the tree the negation of the type is stored)
+            && treeData[firstNodeIndex+1] == secondNode.getData(); // compare data
+  }
+
   @Override
   public void set(int type, int x, int y, int z) {
-    throw new RuntimeException("Not implemented");
+    set(new Octree.Node(type), x, y, z);
   }
 
   @Override
   public void set(Octree.Node data, int x, int y, int z) {
-    throw new RuntimeException("Not implemented");
+    int[] parents = new int[depth]; // better to put as a field to preventallocation at each invocation?
+    int nodeIndex = 0;
+    int parentLevel = depth - 1;
+    int position = 0;
+    for (int i = depth - 1; i >= 0; --i) {
+      parents[i] = nodeIndex;
+
+      if (nodeEquals(nodeIndex, data)) {
+        return;
+      } else if (treeData[nodeIndex] <= 0) { // It's a leaf node
+        subdivideNode(nodeIndex);
+        parentLevel = i;
+      }
+
+      int xbit = 1 & (x >> i);
+      int ybit = 1 & (y >> i);
+      int zbit = 1 & (z >> i);
+      position = (xbit << 2) | (ybit << 1) | zbit;
+      nodeIndex = treeData[nodeIndex] + position*2;
+
+    }
+    int finalNodeIndex = treeData[parents[0]] + position*2;
+    treeData[finalNodeIndex] = -data.type; // Store negation of the type
+    treeData[finalNodeIndex] = data.getData();
+
+    // Merge nodes where all children have been set to the same type.
+    for (int i = 0; i <= parentLevel; ++i) {
+      int parentIndex = parents[i];
+
+      boolean allSame = true;
+      for(int j = 0; j < 8; ++j) {
+        int childIndex = treeData[parentIndex] + 2*j;
+        if(!nodeEquals(childIndex, nodeIndex)) {
+          allSame = false;
+          break;
+        }
+      }
+
+      if (allSame) {
+        mergeNode(parentIndex, treeData[nodeIndex]);
+      } else {
+        break;
+      }
+    }
   }
 
   private int getNodeIndex(int x, int y, int z) {
