@@ -11,6 +11,7 @@ import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -488,5 +489,10 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
 
   public int getDepth() {
     return depth;
+  }
+
+  public static NodeBasedOctree load(DataInputStream in) throws IOException {
+    int treeDepth = in.readInt();
+    return new NodeBasedOctree(treeDepth, Octree.Node.loadNode(in));
   }
 }

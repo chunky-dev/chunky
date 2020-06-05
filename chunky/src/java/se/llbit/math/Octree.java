@@ -58,7 +58,7 @@ public class Octree {
    * The top bit of the type field in a serialized octree node is reserved for indicating
    * if the node is a data node.
    */
-  static final int DATA_FLAG = 0x80000000;
+  public static final int DATA_FLAG = 0x80000000;
 
   /** An Octree node. */
   public static class Node {
@@ -214,8 +214,7 @@ public class Octree {
 
   private OctreeImplementation implementation;
 
-
-  static private boolean usePacked = false;
+  static private boolean usePacked = true;
 
   /**
    * Create a new Octree. The dimensions of the Octree
@@ -232,6 +231,10 @@ public class Octree {
 
   public Octree(int octreeDepth, Node node) {
     implementation = new NodeBasedOctree(octreeDepth, node);
+  }
+
+  protected Octree(OctreeImplementation impl) {
+    implementation = impl;
   }
 
   /**
@@ -279,10 +282,11 @@ public class Octree {
    * @throws IOException
    */
   public static Octree load(DataInputStream in) throws IOException {
-    int treeDepth = in.readInt();
-    Octree tree = new Octree(treeDepth, Node.loadNode(in));
-    //Log.info("Loaded octree with " + size + " nodes.");
-    return tree;
+    if(usePacked) {
+      return new Octree(PackedOctree.load(in));
+    } else {
+      return new Octree(NodeBasedOctree.load(in));
+    }
   }
 
   /**

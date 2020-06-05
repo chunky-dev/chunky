@@ -10,10 +10,12 @@ import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 import static se.llbit.math.Octree.BRANCH_NODE;
+import static se.llbit.math.Octree.DATA_FLAG;
 
 /**
  * This is a packed representation of an octree
@@ -39,8 +41,9 @@ public class PackedOctree implements Octree.OctreeImplementation {
    *  This implementation is inspired by this stackoverflow answer
    *  https://stackoverflow.com/questions/41946007/efficient-and-well-explained-implementation-of-a-quadtree-for-2d-collision-det#answer-48330314
    *
-   *  Note: I think only leaf nodes can have additional data. If that is indeed the case
+   *  Note: Only leaf nodes can have additional data. In theory
    *  we could potentially optimize further by only storing the index for branch nodes
+   *  by that would make other operations more complex. Most likely not worth it but could be an idea
    */
   private int[] treeData;
 
@@ -316,7 +319,8 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
   @Override
   public void store(DataOutputStream output) throws IOException {
-    throw new RuntimeException("Not implemented");
+    output.writeInt(depth);
+    storeNode(output, 0);
   }
 
   @Override
@@ -674,5 +678,52 @@ public class PackedOctree implements Octree.OctreeImplementation {
   @Override
   public int getDepth() {
     return depth;
+  }
+
+  public static PackedOctree load(DataInputStream in) throws IOException {
+    int depth = in.readInt();
+    PackedOctree tree = new PackedOctree(depth);
+    tree.loadNode(in, 0);
+    return tree;
+  }
+
+  private void loadNode(DataInputStream in, int nodeIndex) throws IOException {
+    int type = in.readInt();
+    if(type == BRANCH_NODE) {
+      int childrenIndex = findSpace();
+      treeData[nodeIndex] = childrenIndex;
+      treeData[nodeIndex+1] = 0; // store 0 as data
+      for (int i = 0; i < 8; ++i) {
+        loadNode(in, childrenIndex + 2*i);
+      }
+    } else {
+      if ((type & DATA_FLAG) == 0) {
+        treeData[nodeIndex] = -type; // negation of type
+        treeData[nodeIndex+1] = 0; // store 0 to be sure we don't have uninitialized garbage
+      } else {
+        int data = in.readInt();
+        treeData[nodeIndex] = -(type ^ DATA_FLAG);
+        treeData[nodeIndex+1] = data;
+      }
+    }
+  }
+
+  private void storeNode(DataOutputStream out, int nodeIndex) throws IOException {
+    int type = treeData[nodeIndex] > 0 ? BRANCH_NODE : -treeData[nodeIndex];
+    if(type == BRANCH_NODE) {
+      out.writeInt(type);
+      for(int i = 0; i < 8; ++i) {
+        int childIndex = treeData[nodeIndex] + 2*i;
+        storeNode(out, childIndex);
+      }
+    } else {
+      boolean isDataNode = (treeData[nodeIndex+1] != 0);
+      if(isDataNode) {
+        out.writeInt(type | DATA_FLAG);
+        out.writeInt(treeData[nodeIndex+1]);
+      } else {
+        out.writeInt(type);
+      }
+    }
   }
 }
