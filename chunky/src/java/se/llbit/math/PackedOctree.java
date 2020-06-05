@@ -258,7 +258,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
     }
     int finalNodeIndex = treeData[parents[0]] + position*2;
     treeData[finalNodeIndex] = -data.type; // Store negation of the type
-    treeData[finalNodeIndex] = data.getData();
+    treeData[finalNodeIndex+1] = data.getData();
 
     // Merge nodes where all children have been set to the same type.
     for (int i = 0; i <= parentLevel; ++i) {

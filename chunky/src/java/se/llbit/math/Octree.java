@@ -215,6 +215,8 @@ public class Octree {
   private OctreeImplementation implementation;
 
 
+  static private boolean usePacked = false;
+
   /**
    * Create a new Octree. The dimensions of the Octree
    * are 2^levels.
@@ -222,7 +224,10 @@ public class Octree {
    * @param octreeDepth The number of levels in the Octree.
    */
   public Octree(int octreeDepth) {
-    this(octreeDepth, new Node(0));
+    if(usePacked)
+      implementation = new PackedOctree(octreeDepth);
+    else
+      implementation = new NodeBasedOctree(octreeDepth, new Node(0));
   }
 
   public Octree(int octreeDepth, Node node) {
@@ -323,8 +328,9 @@ public class Octree {
    * Replace the implementation for the packed one
    */
   public void pack() {
-    if(implementation instanceof NodeBasedOctree)
-      implementation = new PackedOctree(implementation.getDepth(), ((NodeBasedOctree)implementation).root);
+    if(usePacked)
+      if(implementation instanceof NodeBasedOctree)
+        implementation = new PackedOctree(implementation.getDepth(), ((NodeBasedOctree)implementation).root);
   }
 
 }
