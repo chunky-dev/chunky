@@ -969,9 +969,6 @@ public class Scene implements JsonSerializable, Refreshable {
     buildBvh();
     buildActorBvh();
     Log.info(String.format("Loaded %d chunks", numChunks));
-
-    worldOctree.pack();
-    waterOctree.pack();
   }
 
   private void buildBvh() {
@@ -1757,8 +1754,6 @@ public class Scene implements JsonSerializable, Refreshable {
         camera.setWorldSize(1 << worldOctree.getDepth());
         buildBvh();
         buildActorBvh();
-        worldOctree.pack();
-        waterOctree.pack();
         return true;
       } catch (IOException e) {
         Log.error("Failed to load chunk data!", e);

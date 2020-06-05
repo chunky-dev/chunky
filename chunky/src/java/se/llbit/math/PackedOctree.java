@@ -89,12 +89,14 @@ public class PackedOctree implements Octree.OctreeImplementation {
    */
   public PackedOctree(int depth, Octree.Node root) {
     this.depth = depth;
-    int nodeCount = nodeCount(root);
-    int arraySize = Math.max(nodeCount*2, 64);
-    treeData = new int[arraySize];
+    long nodeCount = nodeCount(root);
+    long arraySize = Math.max(nodeCount*2, 64);
+    if(arraySize > (long)MAX_ARRAY_SIZE)
+      throw new OctreeTooBigException();
+    treeData = new int[(int)arraySize];
     addNode(root, 0, 2);
     freeHead = -1; // No holes
-    size = nodeCount*2;
+    size = (int)nodeCount*2;
   }
 
   /**
@@ -111,7 +113,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
     freeHead = -1;
   }
 
-  private static int nodeCount(Octree.Node node) {
+  private static long nodeCount(Octree.Node node) {
     if(node.type == BRANCH_NODE) {
       return 1
         + nodeCount(node.children[0])

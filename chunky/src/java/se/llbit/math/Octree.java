@@ -367,7 +367,11 @@ public class Octree {
 
   private void switchToNodeBased() {
     if(implementation instanceof PackedOctree) {
-      implementation = ((PackedOctree)implementation).toNodeBasedOctree();
+      try {
+        implementation = ((PackedOctree) implementation).toNodeBasedOctree();
+      } catch(PackedOctree.OctreeTooBigException e) {
+        // If octree is too big, do nothing, keep the node based implementation
+      }
     }
   }
 
