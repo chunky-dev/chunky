@@ -1886,25 +1886,18 @@ public class MinecraftBlockProvider implements BlockProvider {
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag);
     String lit = properties.get("lit").stringValue("false");
-    return new TopBottomOrientedTexturedBlock(
-        "smoker",
+    return new Smoker(
         facing,
-        lit.equals("true") ? Texture.smokerFrontOn : Texture.smokerFront,
-        Texture.smokerSide,
-        Texture.smokerTop,
-        Texture.smokerBottom);
+        lit.equals("true"));
   }
 
   private static Block blastFurnace(Tag tag) {
     Tag properties = tag.get("Properties");
     String facing = BlockProvider.facing(tag);
     String lit = properties.get("lit").stringValue("false");
-    return new TopBottomOrientedTexturedBlock(
-        "blast_furnace",
+    return new BlastFurnace(
         facing,
-        lit.equals("true") ? Texture.blastFurnaceFrontOn : Texture.blastFurnaceFront,
-        Texture.blastFurnaceSide,
-        Texture.blastFurnaceTop);
+        lit.equals("true"));
   }
 
   private static Block composter(Tag tag) {

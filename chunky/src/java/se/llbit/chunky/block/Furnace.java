@@ -80,6 +80,10 @@ public class Furnace extends MinecraftBlock {
     }
   }
 
+  public boolean isLit() {
+    return lit > 0;
+  }
+
   @Override public boolean intersect(Ray ray, Scene scene) {
     return TexturedBlockModel.intersect(ray, texture[lit][facing]);
   }
