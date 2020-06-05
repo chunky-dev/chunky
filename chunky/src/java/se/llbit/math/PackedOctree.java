@@ -44,8 +44,17 @@ public class PackedOctree implements Octree.OctreeImplementation {
    *  Note: Only leaf nodes can have additional data. In theory
    *  we could potentially optimize further by only storing the index for branch nodes
    *  by that would make other operations more complex. Most likely not worth it but could be an idea
+   *
+   *  When dealing with huge octree, the maximum size of an array may be a limitation
+   *  When this occurs this implementation wan no longer be used and we must fallback on another one.
+   *  Here we'll throw an exception that the caller can catch
    */
   private int[] treeData;
+
+  /**
+   * The max size of an array we allow is a bit less than the max value an integer can have
+   */
+  private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 16;
 
   /**
    * When adding nodes to the octree, the treeData array may have to grow
@@ -65,6 +74,12 @@ public class PackedOctree implements Octree.OctreeImplementation {
   private int freeHead;
 
   private int depth;
+
+  /**
+   * A custom exception that signals the octree is too big for this implementation
+   */
+  public static class OctreeTooBigException extends RuntimeException {
+  }
 
   /**
    * Constructor building a tree from an existing NodeBasedOctree
@@ -158,7 +173,20 @@ public class PackedOctree implements Octree.OctreeImplementation {
     }
 
     // We need to grow the array
-    int[] newArray = new int[(int)Math.ceil(treeData.length*1.5)];
+    long newSize = (long)Math.ceil(treeData.length*1.5);
+    // We need to check the array won't be too big
+    if(newSize > (long)MAX_ARRAY_SIZE) {
+      // We can allocate less memory than initially wanted if the next block will still be able to fit
+      // If not, this implementation isn't suitable
+      if(MAX_ARRAY_SIZE - treeData.length > 16) {
+        // If by making the new array be of size MAX_ARRAY_SIZE we can still fit the block requested
+        newSize = MAX_ARRAY_SIZE;
+      } else {
+        // array is too big
+        throw new OctreeTooBigException();
+      }
+    }
+    int[] newArray = new int[(int)newSize];
     System.arraycopy(treeData, 0, newArray, 0, size);
     treeData = newArray;
     // and then append
@@ -724,6 +752,36 @@ public class PackedOctree implements Octree.OctreeImplementation {
       } else {
         out.writeInt(type);
       }
+    }
+  }
+
+  /**
+   * Convert this tree to the equivalent NodeBasedOctree
+   * @return The NodeBasedOctree
+   */
+  public NodeBasedOctree toNodeBasedOctree() {
+    return new NodeBasedOctree(depth, convertNode(0));
+  }
+
+  /**
+   * Convert a node to the NodeBasedOctree node format
+   * @param nodeIndex The index of the node to convert
+   * @return The converted node
+   */
+  private Octree.Node convertNode(int nodeIndex) {
+    if(treeData[nodeIndex] > 0) {
+      // branch node
+      Octree.Node node = new Octree.Node(BRANCH_NODE);
+      node.children = new Octree.Node[8];
+      for(int i = 0; i < 8; ++i) {
+        int childIndex = treeData[nodeIndex] + 2*i;
+        node.children[i] = convertNode(childIndex);
+      }
+      return node;
+    } else {
+      boolean isDataNode = (treeData[nodeIndex+1] != 0);
+      return isDataNode ? new Octree.DataNode(treeData[nodeIndex], treeData[nodeIndex+1])
+                        : new Octree.Node(treeData[nodeIndex]);
     }
   }
 }

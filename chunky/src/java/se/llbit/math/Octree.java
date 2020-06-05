@@ -243,7 +243,14 @@ public class Octree {
    * @param type The new voxel type to be set
    */
   public synchronized void set(int type, int x, int y, int z) {
-    implementation.set(type, x, y, z);
+    try {
+      implementation.set(type, x, y, z);
+    } catch(PackedOctree.OctreeTooBigException e) {
+      // Octree is too big, switch implementation and retry
+      Log.warn("Octree is too big, falling back to old (slower and bigger) implementation.");
+      switchToNodeBased();
+      implementation.set(type, x, y, z);
+    }
   }
 
   /**
@@ -252,7 +259,14 @@ public class Octree {
    * @param data The new voxel to insert.
    */
   public synchronized void set(Node data, int x, int y, int z) {
-    implementation.set(data, x, y, z);
+    try {
+      implementation.set(data, x, y, z);
+    } catch(PackedOctree.OctreeTooBigException e) {
+      // Octree is too big, switch implementation and retry
+      Log.warn("Octree is too big, falling back to old (slower and bigger) implementation.");
+      switchToNodeBased();
+      implementation.set(data, x, y, z);
+    }
   }
 
   /**
@@ -286,6 +300,20 @@ public class Octree {
       return new Octree(PackedOctree.load(in));
     } else {
       return new Octree(NodeBasedOctree.load(in));
+    }
+  }
+
+  /**
+   * Deserialize the octree from a data input stream.
+   * @param forceNodeBased Forces the tree to be deserialized as a NodeBasedOctree
+   * @return The deserialized octree
+   * @throws IOException
+   */
+  public static Octree load(DataInputStream in, boolean forceNodeBased) throws IOException {
+    if(forceNodeBased) {
+      return new Octree(NodeBasedOctree.load(in));
+    } else {
+      return load(in);
     }
   }
 
@@ -335,6 +363,12 @@ public class Octree {
     if(usePacked)
       if(implementation instanceof NodeBasedOctree)
         implementation = new PackedOctree(implementation.getDepth(), ((NodeBasedOctree)implementation).root);
+  }
+
+  private void switchToNodeBased() {
+    if(implementation instanceof PackedOctree) {
+      implementation = ((PackedOctree)implementation).toNodeBasedOctree();
+    }
   }
 
 }
