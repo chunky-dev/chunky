@@ -142,11 +142,14 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
           </padding>
           <Label text="Links:"/>
-          <Hyperlink fx:id="documentationLink" text="Online Documentation"/>
+          <Hyperlink fx:id="originalDocumentationLink" text="Online Documentation"/>
+          <Hyperlink fx:id="documentationLink" text="Chunky 2.1 Documentation"/>
           <Hyperlink fx:id="gitHubLink" text="GitHub Page"/>
           <Hyperlink fx:id="issueTrackerLink" text="Issue Tracker"/>
           <Hyperlink fx:id="forumLink" text="Discussion Forum"/>
-          <Separator/>
+          <Hyperlink fx:id="discordLink" text="Discord Server" />
+          <Hyperlink fx:id="guideLink" text="jackt8's Guide to Chunky" />
+          <Separator />
           <Label text="Chunky was created by Jesper Öqvist (jesper@llbit.se)"/>
           <Button fx:id="creditsBtn" mnemonicParsing="false" text="View Credits"/>
         </VBox>

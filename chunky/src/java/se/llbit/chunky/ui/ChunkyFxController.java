@@ -136,9 +136,12 @@ public class ChunkyFxController
   @FXML private Button openSceneDirBtn;
   @FXML private Button changeSceneDirBtn;
   @FXML private Hyperlink documentationLink;
+  @FXML private Hyperlink originalDocumentationLink;
   @FXML private Hyperlink gitHubLink;
   @FXML private Hyperlink issueTrackerLink;
   @FXML private Hyperlink forumLink;
+  @FXML private Hyperlink discordLink;
+  @FXML private Hyperlink guideLink;
   @FXML private Button creditsBtn;
   @FXML private TextField xPosition;
   @FXML private TextField zPosition;
@@ -692,6 +695,9 @@ public class ChunkyFxController
 
   public void setApplication(Application app) {
     documentationLink.setOnAction(
+        e -> app.getHostServices().showDocument("https://lemaik.github.io/chunky"));
+
+    originalDocumentationLink.setOnAction(
         e -> app.getHostServices().showDocument("http://chunky.llbit.se"));
 
     issueTrackerLink.setOnAction(
@@ -702,6 +708,12 @@ public class ChunkyFxController
 
     forumLink.setOnAction(
         e -> app.getHostServices().showDocument("https://www.reddit.com/r/chunky"));
+
+    discordLink.setOnAction(
+        e -> app.getHostServices().showDocument("https://discord.com/invite/VqcHpsF"));
+
+    guideLink.setOnAction(
+        e -> app.getHostServices().showDocument("https://jackjt8.github.io/ChunkyGuide/"));
   }
 
   public void openSceneChooser() {
