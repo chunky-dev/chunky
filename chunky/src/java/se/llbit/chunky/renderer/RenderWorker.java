@@ -74,7 +74,7 @@ public class RenderWorker extends Thread {
 
         // Sleep to manage CPU utilization.
         if (jobTime > SLEEP_INTERVAL) {
-          if (manager.cpuLoad < 100) {
+          if (manager.cpuLoad < 100 && manager.getBufferedScene().getMode() != RenderMode.PREVIEW) {
             // sleep = jobTime * (1-utilization) / utilization
             double load = (100.0 - manager.cpuLoad) / manager.cpuLoad;
             sleep((long) ((jobTime / 1000000.0) * load));
