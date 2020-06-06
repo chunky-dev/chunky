@@ -43,7 +43,6 @@ public class RenderWorker extends Thread {
   protected final WorkerState state;
   protected final RayTracer previewRayTracer;
   protected final RayTracer rayTracer;
-  protected long jobTime = 0;
 
   /**
    * Create a new render worker, slave to a given render manager.
@@ -64,11 +63,14 @@ public class RenderWorker extends Thread {
     state.ray = new Ray();
   }
 
-  @Override public void run() {
+  @Override
+  public void run() {
+    long jobTime = 0;
     try {
       while (!isInterrupted()) {
+        RenderTile job = manager.getNextJob();
         long jobStart = System.nanoTime();
-        work(manager.getNextJob());
+        work(job);
         jobTime += System.nanoTime() - jobStart;
         manager.jobDone();
 
@@ -77,7 +79,7 @@ public class RenderWorker extends Thread {
           if (manager.cpuLoad < 100 && manager.getBufferedScene().getMode() != RenderMode.PREVIEW) {
             // sleep = jobTime * (1-utilization) / utilization
             double load = (100.0 - manager.cpuLoad) / manager.cpuLoad;
-            sleep((long) ((jobTime / 1000000.0) * load));
+            sleep((long) (jobTime / 1000000.0 * load));
           }
           jobTime = 0;
         }
@@ -85,8 +87,7 @@ public class RenderWorker extends Thread {
     } catch (InterruptedException ignored) {
       // Interrupted.
     } catch (Throwable e) {
-      Log.error("Render worker " + id +
-          " crashed with uncaught exception.", e);
+      Log.error("Render worker " + id + " crashed with uncaught exception.", e);
     }
   }
 
@@ -212,5 +213,4 @@ public class RenderWorker extends Thread {
         }
     }
   }
-
 }
