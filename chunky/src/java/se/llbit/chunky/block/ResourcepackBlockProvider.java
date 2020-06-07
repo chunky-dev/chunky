@@ -8,6 +8,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -30,7 +32,6 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
 import se.llbit.log.Log;
-import se.llbit.math.AABB;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Transform;
@@ -141,9 +142,15 @@ public class ResourcepackBlockProvider implements BlockProvider {
                                               blockDefinition.get("uvlock").boolValue(false));
                                     }
                                   }
-                                  multipartBlockVariant.addPart(
-                                      new MultipartBlockVariant(
-                                          part.object().get("when").object(), model));
+                                  JsonObject conditions = part.object().get("when").object();
+                                  if (conditions.get("OR").isArray()) {
+                                    multipartBlockVariant.addPart(
+                                        new MultipartBlockVariant(
+                                            conditions.get("OR").array(), model));
+                                  } else {
+                                    multipartBlockVariant.addPart(
+                                        new MultipartBlockVariant(conditions, model));
+                                  }
                                 }
                                 variants.variants.add(multipartBlockVariant);
                               } else {
@@ -211,13 +218,14 @@ public class ResourcepackBlockProvider implements BlockProvider {
     }
   }
 
-  private static class VariantsBlockVariant implements BlockVariant {
+  private interface Condition {
+    boolean isSatisfied(Tag properties);
+  }
+
+  private static class BlockStateCondition implements Condition {
     protected final Map<String, String> conditions = new HashMap<>();
-    private final Block model;
 
-    private VariantsBlockVariant(String conditions, Block model) {
-      this.model = model;
-
+    private BlockStateCondition(String conditions) {
       for (String condition : conditions.split(",")) {
         String[] parts = condition.trim().split("=");
         if (parts.length < 2) {
@@ -225,23 +233,59 @@ public class ResourcepackBlockProvider implements BlockProvider {
         }
         this.conditions.put(parts[0], parts[1]);
       }
+    }
+
+    public BlockStateCondition(JsonObject conditions) {
+      for (JsonMember member : conditions.members) {
+        this.conditions.put(member.getName(), member.getValue().stringValue(""));
+      }
+    }
+
+    @Override
+    public boolean isSatisfied(Tag properties) {
+      for (Entry<String, String> property : conditions.entrySet()) {
+        if (Arrays.stream(property.getValue().split("\\|"))
+            .noneMatch(value -> properties.get(property.getKey()).stringValue("").equals(value))) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  private static class OrCondition implements Condition {
+    private final List<Condition> children;
+
+    private OrCondition(List<Condition> children) {
+      this.children = children;
+    }
+
+    @Override
+    public boolean isSatisfied(Tag properties) {
+      return children.stream().anyMatch(c -> c.isSatisfied(properties));
+    }
+  }
+
+  private static class VariantsBlockVariant implements BlockVariant {
+    private final Block model;
+    private final Condition condition;
+
+    private VariantsBlockVariant(String conditions, Block model) {
+      this.model = model;
+      this.condition = new BlockStateCondition(conditions);
 
       // TODO handle rotation
       // this.model = model.rotate(x, y, z);
     }
 
-    protected VariantsBlockVariant(Block model) {
+    protected VariantsBlockVariant(Condition condition, Block model) {
+      this.condition = condition;
       this.model = model;
     }
 
     @Override
     public boolean isMatch(Tag properties) {
-      for (Entry<String, String> property : conditions.entrySet()) {
-        if (!properties.get(property.getKey()).stringValue("").equals(property.getValue())) {
-          return false;
-        }
-      }
-      return true;
+      return this.condition.isSatisfied(properties);
     }
 
     @Override
@@ -289,10 +333,16 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
   private static class MultipartBlockVariant extends VariantsBlockVariant {
     private MultipartBlockVariant(JsonObject when, Block model) {
-      super(model);
-      for (JsonMember condition : when.members) {
-        this.conditions.put(condition.getName(), condition.getValue().stringValue(""));
-      }
+      super(new BlockStateCondition(when), model);
+    }
+
+    private MultipartBlockVariant(JsonArray when, Block model) {
+      super(
+          new OrCondition(
+              when.elements.stream()
+                  .map(condition -> new BlockStateCondition(when.object()))
+                  .collect(Collectors.toList())),
+          model);
     }
   }
 
@@ -352,14 +402,14 @@ public class ResourcepackBlockProvider implements BlockProvider {
       JsonModel block = new JsonModel(blockName, Texture.air);
       JsonObject blockDefinition = getModel(zip, model);
       block.applyDefinition(blockDefinition, name -> this.getTexture(zip, name));
-      while (!blockDefinition.get("parent").isUnknown()
-          && !blockDefinition.get("parent").stringValue("block/block").equals("block/block")) {
+      while (!blockDefinition.get("parent").isUnknown()) {
         String parentName = blockDefinition.get("parent").stringValue("block/block");
         blockDefinition = this.getModel(zip, parentName);
         block.applyDefinition(blockDefinition, name -> this.getTexture(zip, name));
         if (parentName.equals("block/cube_all")) {
           block.texture = block.textures.get("all");
           block.localIntersect = false;
+          break;
         }
       }
 
