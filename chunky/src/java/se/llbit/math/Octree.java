@@ -360,18 +360,20 @@ public class Octree {
    * Replace the implementation for the packed one
    */
   public void pack() {
-    if(usePacked)
-      if(implementation instanceof NodeBasedOctree)
-        implementation = new PackedOctree(implementation.getDepth(), ((NodeBasedOctree)implementation).root);
+    if(usePacked) {
+      if(implementation instanceof NodeBasedOctree) {
+        try {
+          implementation = new PackedOctree(implementation.getDepth(), ((NodeBasedOctree) implementation).root);
+        } catch(PackedOctree.OctreeTooBigException e) {
+          // If octree is too big, do nothing, keep the node based implementation
+        }
+      }
+    }
   }
 
   private void switchToNodeBased() {
     if(implementation instanceof PackedOctree) {
-      try {
-        implementation = ((PackedOctree) implementation).toNodeBasedOctree();
-      } catch(PackedOctree.OctreeTooBigException e) {
-        // If octree is too big, do nothing, keep the node based implementation
-      }
+      implementation = ((PackedOctree) implementation).toNodeBasedOctree();
     }
   }
 
