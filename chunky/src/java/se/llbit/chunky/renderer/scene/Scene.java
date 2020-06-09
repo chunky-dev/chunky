@@ -38,6 +38,7 @@ import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
+import se.llbit.chunky.ui.render.MaterialsTab;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -571,6 +572,11 @@ public class Scene implements JsonSerializable, Refreshable {
   public boolean getEmittersEnabled() {
     return emittersEnabled;
   }
+
+  /**
+   * @return The <code>BlockPallete</code> for the scene
+   */
+  public BlockPalette getPalette() { return palette; }
 
   /**
    * Trace a ray in this scene. This offsets the ray origin to
@@ -2692,7 +2698,11 @@ public class Scene implements JsonSerializable, Refreshable {
     MaterialStore.loadDefaultMaterialProperties();
     ExtraMaterials.loadDefaultMaterialProperties();
     MaterialStore.collections.forEach((name, coll) -> importMaterial(materials, name, coll));
-    MaterialStore.idMap.forEach((name, block) -> importMaterial(materials, name, block));
+    MaterialStore.idMap.forEach((name) -> {
+      palette.updateProperties(name, block -> {
+        importMaterial(materials, name, block);
+      });
+    });
     ExtraMaterials.idMap.forEach((name, block) -> importMaterial(materials, name, block));
   }
 
@@ -2723,9 +2733,11 @@ public class Scene implements JsonSerializable, Refreshable {
    * Modifies the emittance property for the given material.
    */
   public void setEmittance(String materialName, float value) {
+    System.out.println("emittance changed");
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("emittance", Json.of(value));
     materials.put(materialName, material);
+    System.out.println(materials);
     refresh();
   }
 

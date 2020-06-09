@@ -17,16 +17,18 @@
 package se.llbit.chunky.world;
 
 import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.BlockProvider;
+import se.llbit.chunky.block.BlockSpec;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 // TODO: introduce block tags
 public class MaterialStore {
   public static final Map<String, Collection<Block>> collections = new LinkedHashMap<>();
-  public static final Map<String, Material> idMap = new HashMap<>();
+  public static final Collection<String> idMap = new ArrayList<String>();
 
   static {
     //collections.put("all:blocks", Arrays.asList(blocks));
@@ -35,5 +37,6 @@ public class MaterialStore {
   }
 
   public static void loadDefaultMaterialProperties() {
+    BlockSpec.blockProviders.forEach(provider -> idMap.addAll(provider.getSupportedBlockList()));
   }
 }

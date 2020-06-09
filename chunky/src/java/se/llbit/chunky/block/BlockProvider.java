@@ -3,8 +3,16 @@ package se.llbit.chunky.block;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 
+import java.util.Collection;
+
 public interface BlockProvider {
   Block getBlockByTag(String name, Tag tag);
+
+  /**
+   *
+   * @return A collection of block IDs that this provider provides.
+   */
+  Collection<String> getSupportedBlockList();
 
   static String facing(Tag tag, String defaultValue) {
     return tag.get("Properties").get("facing").stringValue(defaultValue);

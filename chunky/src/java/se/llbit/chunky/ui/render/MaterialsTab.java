@@ -29,8 +29,10 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.*;
+import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.world.ExtraMaterials;
@@ -40,6 +42,7 @@ import se.llbit.chunky.world.MaterialStore;
 import java.net.URL;
 import java.util.Collection;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 // TODO: customization of textures, base color, etc.
 public class MaterialsTab extends HBox implements RenderControlsTab, Initializable {
@@ -60,7 +63,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     ObservableList<String> blockIds = FXCollections.observableArrayList();
     blockIds.addAll(MaterialStore.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());
-    blockIds.addAll(MaterialStore.idMap.keySet());
+    blockIds.addAll(MaterialStore.idMap);
     FilteredList<String> filteredList = new FilteredList<>(blockIds);
     listView = new ListView<>(filteredList);
     listView.getSelectionModel().selectedItemProperty().addListener(
@@ -118,8 +121,13 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
         ior.set(material.ior);
         materialExists = true;
       }
-    } else if (MaterialStore.idMap.containsKey(materialName)) {
-      Material material = MaterialStore.idMap.get(materialName);
+    } else if (MaterialStore.idMap.contains(materialName)) {
+      BlockPalette palette = scene.getPalette();
+      Block material = new MinecraftBlock(materialName.substring(10), Texture.air);
+      if(palette.hasDefinition(materialName)) { //If the palette has a definition for the block, grab it.
+        Consumer<Block> def = scene.getPalette().getProperties(materialName);
+        def.accept(material);
+      }
       if (material != null) {
         emittance.set(material.emittance);
         specular.set(material.specular);
@@ -128,6 +136,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       }
     }
     if (materialExists) {
+      System.out.println(materialName);
       emittance.onValueChange(value -> scene.setEmittance(materialName, value.floatValue()));
       specular.onValueChange(value -> scene.setSpecular(materialName, value.floatValue()));
       ior.onValueChange(value -> scene.setIor(materialName, value.floatValue()));

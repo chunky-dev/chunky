@@ -46,6 +46,14 @@ public class BlockPalette {
     this(new HashMap<>(), new ArrayList<>());
   }
 
+  public Consumer<Block> getProperties(String id) {
+    return materialProperties.get(id);
+  }
+
+  public boolean hasDefinition(String id) {
+    return materialProperties.containsKey(id);
+  }
+
   /**
    * Adds a new block to the palette and returns the palette index.
    * @param tag NBT tag for the block.
@@ -66,6 +74,16 @@ public class BlockPalette {
     applyMaterial(block);
     palette.add(block);
     return id;
+  }
+
+  public void updateProperties(String name, Consumer<Block> properties) {
+    //TODO definitely needs some optimizing
+    materialProperties.put(name, properties);
+    blockMap.forEach((spec, id) -> {
+      Block block = spec.toBlock();
+      applyMaterial(block);
+      palette.set(id, block);
+    });
   }
 
   private static void applyMaterial(Block block) {
