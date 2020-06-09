@@ -77,7 +77,6 @@ public class BlockPalette {
   }
 
   public void updateProperties(String name, Consumer<Block> properties) {
-    //TODO definitely needs some optimizing
     materialProperties.put(name, properties);
     blockMap.forEach((spec, id) -> {
       Block block = spec.toBlock();
