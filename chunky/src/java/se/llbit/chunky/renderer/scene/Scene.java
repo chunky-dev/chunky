@@ -2565,12 +2565,16 @@ public class Scene implements JsonSerializable, Refreshable {
    * forces the rendering to restart.
    */
   @Override public synchronized void refresh() {
+    refresh(ResetReason.SETTINGS_CHANGED);
+  }
+
+  private synchronized void refresh(ResetReason reason) {
     if (mode == RenderMode.PAUSED) {
       mode = RenderMode.RENDERING;
     }
     spp = 0;
     renderTime = 0;
-    setResetReason(ResetReason.SETTINGS_CHANGED);
+    setResetReason(reason);
     notifyAll();
   }
 
@@ -2733,12 +2737,10 @@ public class Scene implements JsonSerializable, Refreshable {
    * Modifies the emittance property for the given material.
    */
   public void setEmittance(String materialName, float value) {
-    System.out.println("emittance changed");
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("emittance", Json.of(value));
     materials.put(materialName, material);
-    System.out.println(materials);
-    refresh();
+    refresh(ResetReason.MATERIALS_CHANGED);
   }
 
   /**
@@ -2748,7 +2750,7 @@ public class Scene implements JsonSerializable, Refreshable {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("specular", Json.of(value));
     materials.put(materialName, material);
-    refresh();
+    refresh(ResetReason.MATERIALS_CHANGED);
   }
 
   /**
@@ -2758,7 +2760,7 @@ public class Scene implements JsonSerializable, Refreshable {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("ior", Json.of(value));
     materials.put(materialName, material);
-    refresh();
+    refresh(ResetReason.MATERIALS_CHANGED);
   }
 
   /**

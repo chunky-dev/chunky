@@ -136,7 +136,6 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       }
     }
     if (materialExists) {
-      System.out.println(materialName);
       emittance.onValueChange(value -> scene.setEmittance(materialName, value.floatValue()));
       specular.onValueChange(value -> scene.setSpecular(materialName, value.floatValue()));
       ior.onValueChange(value -> scene.setIor(materialName, value.floatValue()));
