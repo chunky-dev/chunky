@@ -1114,7 +1114,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "brick_wall":
         return wall(tag, Texture.brick);
       case "prismarine_wall":
-        return wall(tag, Texture.prismarineBricks);
+        return wall(tag, Texture.prismarine);
       case "red_sandstone_wall":
         return wall(tag, Texture.redSandstoneSide);
       case "mossy_stone_brick_wall":
