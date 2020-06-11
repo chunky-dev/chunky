@@ -21,25 +21,18 @@ package se.llbit.chunky.renderer;
  * Indicates the reason a render needs to be reset.
  */
 public enum ResetReason {
-  NONE(false, false),
-  MODE_CHANGE(false, false),
-  MATERIALS_CHANGED(true, true),
-  SETTINGS_CHANGED(true, false),
-  SCENE_LOADED(true, true);
+  NONE(false),
+  MODE_CHANGE(false),
+  MATERIALS_CHANGED(true),
+  SETTINGS_CHANGED(true),
+  SCENE_LOADED(true);
 
   /** Determines if the non-transitive scene state needs to be modified. */
   private final boolean overwriteState;
-  private final boolean reloadMaterials;
 
-  ResetReason(boolean overwrite, boolean reload) {
+  ResetReason(boolean overwrite) {
     overwriteState = overwrite;
-    reloadMaterials = reload;
   }
-
-  public boolean reloadMaterials() {
-    return reloadMaterials;
-  }
-
   public boolean overwriteState() {
     return overwriteState;
   }

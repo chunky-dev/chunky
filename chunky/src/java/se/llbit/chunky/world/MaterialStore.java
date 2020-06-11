@@ -28,13 +28,13 @@ import java.util.Map;
 // TODO: introduce block tags
 public class MaterialStore {
   public static final Map<String, Collection<Block>> collections = new LinkedHashMap<>();
-  public static final Collection<String> idMap = new ArrayList<String>();
+  public static final Collection<String> blockIds = new ArrayList<String>();
 
   static {
     //collections.put("all:blocks", Arrays.asList(blocks));
     //collections.put("all:water", Arrays.asList(IdBlock.WATER, IdBlock.STATIONARYWATER));
     //collections.put("all:lava", Arrays.asList(IdBlock.LAVA, IdBlock.STATIONARYLAVA));
-    BlockSpec.blockProviders.forEach(provider -> idMap.addAll(provider.getSupportedBlocks()));
+    BlockSpec.blockProviders.forEach(provider -> blockIds.addAll(provider.getSupportedBlocks()));
   }
 
   public static void loadDefaultMaterialProperties() {

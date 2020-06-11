@@ -12,7 +12,7 @@ public interface BlockProvider {
    *
    * @return A collection of block IDs that this provider provides.
    */
-  Collection<String> getSupportedBlockList();
+  Collection<String> getSupportedBlocks();
 
   static String facing(Tag tag, String defaultValue) {
     return tag.get("Properties").get("facing").stringValue(defaultValue);

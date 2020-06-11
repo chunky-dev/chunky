@@ -63,7 +63,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     ObservableList<String> blockIds = FXCollections.observableArrayList();
     blockIds.addAll(MaterialStore.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());
-    blockIds.addAll(MaterialStore.idMap);
+    blockIds.addAll(MaterialStore.blockIds);
     FilteredList<String> filteredList = new FilteredList<>(blockIds);
     listView = new ListView<>(filteredList);
     listView.getSelectionModel().selectedItemProperty().addListener(
@@ -121,7 +121,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
         ior.set(material.ior);
         materialExists = true;
       }
-    } else if (MaterialStore.idMap.contains(materialName)) {
+    } else if (MaterialStore.blockIds.contains(materialName)) {
       BlockPalette palette = scene.getPalette();
       Block material = new MinecraftBlock(materialName.substring(10), Texture.air);
       if(palette.hasDefinition(materialName)) { //If the palette has a definition for the block, grab it.

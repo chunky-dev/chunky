@@ -76,10 +76,15 @@ public class BlockPalette {
     return id;
   }
 
+  /**
+   * Updates the material of the block and reapplies properties to all blocks in the palette
+   * @param name the id of the block to be updated
+   * @param properties the properties to set the block to
+   */
   public void updateProperties(String name, Consumer<Block> properties) {
     materialProperties.put(name, properties);
     blockMap.forEach((spec, id) -> {
-      Block block = spec.toBlock();
+      Block block = palette.get(id);
       applyMaterial(block);
       palette.set(id, block);
     });

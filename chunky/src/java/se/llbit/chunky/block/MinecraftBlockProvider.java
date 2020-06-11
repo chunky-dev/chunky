@@ -14,7 +14,7 @@ import java.util.Collection;
 
 public class MinecraftBlockProvider implements BlockProvider {
 
-  String[] blockList = new String[] {
+  private static final String[] blockList = new String[] {
           "minecraft:acacia_button",
           "minecraft:acacia_door",
           "minecraft:acacia_fence_gate",
@@ -782,7 +782,7 @@ public class MinecraftBlockProvider implements BlockProvider {
   };
 
   @Override
-  public Collection<String> getSupportedBlockList() {
+  public Collection<String> getSupportedBlocks() {
     return Arrays.asList(blockList);
   }
 
