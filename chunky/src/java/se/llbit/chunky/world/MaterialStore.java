@@ -34,9 +34,10 @@ public class MaterialStore {
     //collections.put("all:blocks", Arrays.asList(blocks));
     //collections.put("all:water", Arrays.asList(IdBlock.WATER, IdBlock.STATIONARYWATER));
     //collections.put("all:lava", Arrays.asList(IdBlock.LAVA, IdBlock.STATIONARYLAVA));
+    BlockSpec.blockProviders.forEach(provider -> idMap.addAll(provider.getSupportedBlocks()));
   }
 
   public static void loadDefaultMaterialProperties() {
-    BlockSpec.blockProviders.forEach(provider -> idMap.addAll(provider.getSupportedBlockList()));
+
   }
 }
