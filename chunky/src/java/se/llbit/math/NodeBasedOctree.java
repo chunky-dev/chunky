@@ -29,9 +29,10 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
   /**
    * Root node
    */
-  public final Octree.Node root;
+  public Octree.Node root;
 
   private final Octree.Node[] parents;
+  private final int[] positions;
   private final Octree.Node[] cache;
   private int cx = 0;
   private int cy = 0;
@@ -42,6 +43,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
     depth = octreeDepth;
     root = node;
     parents = new Octree.Node[depth];
+    positions = new int[depth];
     cache = new Octree.Node[depth + 1];
     cache[depth] = root;
     cacheLevel = depth;
@@ -71,6 +73,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
       int ybit = 1 & (y >> i);
       int zbit = 1 & (z >> i);
       position = (xbit << 2) | (ybit << 1) | zbit;
+      positions[i] = position;
       node = node.children[position];
 
     }
@@ -82,14 +85,28 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
 
       boolean allSame = true;
       for (Octree.Node child : parent.children) {
-        if (!child.equals(node)) {
+        if (!child.equals(data)) {
           allSame = false;
           break;
         }
       }
 
       if (allSame) {
-        parent.merge(node.type);
+        // The parent node needs to be replaced by a DataNode if children have data
+        if(data.getData() != 0) {
+          if(i < parentLevel) {
+            // We need to find the grand parent and find which child of the grand parent
+            // the parent is to replace it
+            Octree.Node grandparent = parents[i+1];
+            int parentPosition = positions[i+1];
+            grandparent.children[parentPosition] = new Octree.DataNode(data.type, data.getData());
+          } else {
+            // The parent is the root
+            root = new Octree.DataNode(data.type, data.getData());
+          }
+        } else {
+          parent.merge(data.type);
+        }
         cacheLevel = FastMath.max(i, cacheLevel);
       } else {
         break;
