@@ -226,10 +226,11 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * @param nodeIndex The index of the node to merge
    * @param typeNegation The negation of the type (the value directly stored in the array)
    */
-  private void mergeNode(int nodeIndex, int typeNegation) {
+  private void mergeNode(int nodeIndex, int typeNegation, int data) {
     int childrenIndex = treeData[nodeIndex];
     freeSpace(childrenIndex); // Delete children
     treeData[nodeIndex] = typeNegation; // Make the node a leaf one
+    treeData[nodeIndex+1] = data;
   }
 
   /**
@@ -307,7 +308,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
       }
 
       if (allSame) {
-        mergeNode(parentIndex, treeData[nodeIndex]);
+        mergeNode(parentIndex, treeData[nodeIndex], treeData[nodeIndex+1]);
       } else {
         break;
       }
