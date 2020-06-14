@@ -164,11 +164,12 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
     return lx == 0 && ly == 0 && lz == 0;
   }
 
+  // Moves the ray to the boundary of the octree. Returns false when the ray doesn't intersect the octree.
   private boolean enterOctree(Ray ray) {
     double nx = 0, ny = 0, nz = 0;
     double octree_size = 1 << depth;
 
-    // AABB intersection
+    // AABB intersection with the octree boundaries
     double tMin, tMax;
     double invDirX = 1 / ray.d.x;
     if (invDirX >= 0) {
