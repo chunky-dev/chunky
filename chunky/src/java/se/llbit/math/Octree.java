@@ -327,6 +327,10 @@ public class Octree {
     return implementation.isInside(o);
   }
 
+  /**
+   * Advance the ray until it intersects with the geometry inside the octree
+   * @return {@code false} if the ray didn't intersect
+   */
   public boolean enterBlock(Scene scene, Ray ray, BlockPalette palette) {
     return implementation.enterBlock(scene, ray, palette);
   }

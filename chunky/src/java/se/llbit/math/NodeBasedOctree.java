@@ -164,7 +164,11 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
     return lx == 0 && ly == 0 && lz == 0;
   }
 
-  // Moves the ray to the boundary of the octree. Returns false when the ray doesn't intersect the octree.
+  /**
+   * Moves the ray to the of the octree.
+   * @param ray Ray that will be moved to the boundary of the octree. The origin, distance and normals will be modified.
+   * @return {@code false} if the ray doesn't intersect the octree.
+   */
   private boolean enterOctree(Ray ray) {
     double nx, ny, nz;
     double octree_size = 1 << depth;
@@ -254,6 +258,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
       if (lx != 0 || ly != 0 || lz != 0)
         return false; // outside of octree!
 
+      // Descend the tree to find the current leaf node
       Octree.Node node = root;
       int level = depth;
       while (node.type == BRANCH_NODE) {
@@ -264,6 +269,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
         node = node.children[((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)];
       }
 
+      // Test intersection
       Block currentBlock = palette.get(node.type);
       Material prevBlock = ray.getCurrentMaterial();
 
@@ -292,6 +298,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
       int nx = 0, ny = 0, nz = 0;
       double tNear = Double.POSITIVE_INFINITY;
 
+      // Testing all six sides of the current leaf node and advancing to the closest intersection
       double t = ((lx << level) - ray.o.x) / ray.d.x;
       if (t > Ray.EPSILON) {
         tNear = t;
@@ -346,6 +353,8 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
       return false;
 
     while (true) {
+      // Add small offset past the intersection to avoid
+      // recursion to the same octree node!
       int x = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
       int y = (int) QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
       int z = (int) QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
@@ -355,8 +364,9 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
       int lz = z >>> depth;
 
       if (lx != 0 || ly != 0 || lz != 0)
-        return false;
+        return false; // outside of octree!
 
+      // Descend the tree to find the current leaf node
       Octree.Node node = root;
       int level = depth;
       while (node.type == BRANCH_NODE) {
@@ -367,6 +377,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
         node = node.children[((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)];
       }
 
+      // Test intersection
       Block currentBlock = palette.get(node.type);
       Material prevBlock = ray.getCurrentMaterial();
 
@@ -387,7 +398,6 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
         }
       }
 
-      // Exit current octree leaf.
       if ((node.getData() & (1 << Water.FULL_BLOCK)) == 0) {
         if (WaterModel.intersectTop(ray)) {
           ray.setCurrentMaterial(Air.INSTANCE, 0);
@@ -398,9 +408,11 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
         }
       }
 
+      // Exit current octree leaf.
       double nx = 0, ny = 0, nz = 0;
       double tNear = Double.POSITIVE_INFINITY;
 
+      // Testing all six sides of the current leaf node and advancing to the closest intersection
       double t = ((lx << level) - ray.o.x) / ray.d.x;
       if (t > Ray.EPSILON) {
         tNear = t;
