@@ -166,7 +166,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
 
   // Moves the ray to the boundary of the octree. Returns false when the ray doesn't intersect the octree.
   private boolean enterOctree(Ray ray) {
-    double nx = 0, ny = 0, nz = 0;
+    double nx, ny, nz;
     double octree_size = 1 << depth;
 
     // AABB intersection with the octree boundaries
@@ -342,87 +342,23 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
 
   @Override
   public boolean exitWater(Scene scene, Ray ray, BlockPalette palette) {
-    int level;
-    Octree.Node node;
-    boolean first = true;
-
-    int lx, ly, lz;
-    int x, y, z;
-    int nx = 0, ny = 0, nz = 0;
-    double tNear = Double.POSITIVE_INFINITY;
-    double t;
-    Vector3 d = ray.d;
+    if (!isInside(ray.o) && !enterOctree(ray))
+      return false;
 
     while (true) {
+      int x = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
+      int y = (int) QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
+      int z = (int) QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
 
-      x = (int) QuickMath.floor(ray.o.x + d.x * Ray.OFFSET);
-      y = (int) QuickMath.floor(ray.o.y + d.y * Ray.OFFSET);
-      z = (int) QuickMath.floor(ray.o.z + d.z * Ray.OFFSET);
+      int lx = x >>> depth;
+      int ly = y >>> depth;
+      int lz = z >>> depth;
 
-      node = root;
-      level = depth;
-      lx = x >>> level;
-      ly = y >>> level;
-      lz = z >>> level;
+      if (lx != 0 || ly != 0 || lz != 0)
+        return false;
 
-      if (lx != 0 || ly != 0 || lz != 0) {
-
-        // only check octree intersection if this is the first iteration
-        if (first) {
-          // test if it is entering the octree
-          t = -ray.o.x / d.x;
-          if (t > Ray.EPSILON) {
-            tNear = t;
-            nx = 1;
-            ny = nz = 0;
-          }
-          t = ((1 << level) - ray.o.x) / d.x;
-          if (t < tNear && t > Ray.EPSILON) {
-            tNear = t;
-            nx = -1;
-            ny = nz = 0;
-          }
-          t = -ray.o.y / d.y;
-          if (t < tNear && t > Ray.EPSILON) {
-            tNear = t;
-            ny = 1;
-            nx = nz = 0;
-          }
-          t = ((1 << level) - ray.o.y) / d.y;
-          if (t < tNear && t > Ray.EPSILON) {
-            tNear = t;
-            ny = -1;
-            nx = nz = 0;
-          }
-          t = -ray.o.z / d.z;
-          if (t < tNear && t > Ray.EPSILON) {
-            tNear = t;
-            nz = 1;
-            nx = ny = 0;
-          }
-          t = ((1 << level) - ray.o.z) / d.z;
-          if (t < tNear && t > Ray.EPSILON) {
-            tNear = t;
-            nz = -1;
-            nx = ny = 0;
-          }
-
-          if (tNear < Double.MAX_VALUE) {
-            ray.o.scaleAdd(tNear, d);
-            ray.n.set(nx, ny, nz);
-            ray.distance += tNear;
-            tNear = Double.POSITIVE_INFINITY;
-            continue;
-          } else {
-            return false;// outside of octree!
-          }
-        } else {
-          return false;// outside of octree!
-        }
-      }
-
-      first = false;
-
+      Octree.Node node = root;
+      int level = depth;
       while (node.type == BRANCH_NODE) {
         level -= 1;
         lx = x >>> level;
@@ -462,13 +398,16 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
         }
       }
 
-      t = ((lx << level) - ray.o.x) / d.x;
+      double nx = 0, ny = 0, nz = 0;
+      double tNear = Double.POSITIVE_INFINITY;
+
+      double t = ((lx << level) - ray.o.x) / ray.d.x;
       if (t > Ray.EPSILON) {
         tNear = t;
         nx = 1;
         ny = nz = 0;
       } else {
-        t = (((lx + 1) << level) - ray.o.x) / d.x;
+        t = (((lx + 1) << level) - ray.o.x) / ray.d.x;
         if (t < tNear && t > Ray.EPSILON) {
           tNear = t;
           nx = -1;
@@ -476,13 +415,13 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
         }
       }
 
-      t = ((ly << level) - ray.o.y) / d.y;
+      t = ((ly << level) - ray.o.y) / ray.d.y;
       if (t < tNear && t > Ray.EPSILON) {
         tNear = t;
         ny = 1;
         nx = nz = 0;
       } else {
-        t = (((ly + 1) << level) - ray.o.y) / d.y;
+        t = (((ly + 1) << level) - ray.o.y) / ray.d.y;
         if (t < tNear && t > Ray.EPSILON) {
           tNear = t;
           ny = -1;
@@ -490,13 +429,13 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
         }
       }
 
-      t = ((lz << level) - ray.o.z) / d.z;
+      t = ((lz << level) - ray.o.z) / ray.d.z;
       if (t < tNear && t > Ray.EPSILON) {
         tNear = t;
         nz = 1;
         nx = ny = 0;
       } else {
-        t = (((lz + 1) << level) - ray.o.z) / d.z;
+        t = (((lz + 1) << level) - ray.o.z) / ray.d.z;
         if (t < tNear && t > Ray.EPSILON) {
           tNear = t;
           nz = -1;
@@ -504,10 +443,9 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
         }
       }
 
-      ray.o.scaleAdd(tNear, d);
+      ray.o.scaleAdd(tNear, ray.d);
       ray.n.set(nx, ny, nz);
       ray.distance += tNear;
-      tNear = Double.POSITIVE_INFINITY;
     }
   }
 
