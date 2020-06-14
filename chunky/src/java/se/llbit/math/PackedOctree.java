@@ -369,53 +369,72 @@ public class PackedOctree implements Octree.OctreeImplementation {
   }
 
   private boolean enterOctree(Ray ray) {
-    double tNear = Double.POSITIVE_INFINITY;
     double nx = 0, ny = 0, nz = 0;
     double octree_size = 1 << depth;
 
-    double t = -ray.o.x / ray.d.x;
-    if (t > Ray.EPSILON) {
-      tNear = t;
+    // AABB intersection
+    double tMin, tMax;
+    double invDirX = 1 / ray.d.x;
+    if (invDirX >= 0) {
+      tMin = -ray.o.x * invDirX;
+      tMax = (octree_size - ray.o.x) * invDirX;
+
+      nx = -1;
+      ny = nz = 0;
+    } else {
+      tMin = (octree_size - ray.o.x) * invDirX;
+      tMax = -ray.o.x * invDirX;
+
       nx = 1;
       ny = nz = 0;
     }
-    t = (octree_size - ray.o.x) / ray.d.x;
-    if (t < tNear && t > Ray.EPSILON) {
-      tNear = t;
-      nx = -1;
-      ny = nz = 0;
-    }
-    t = -ray.o.y / ray.d.y;
-    if (t < tNear && t > Ray.EPSILON) {
-      tNear = t;
-      ny = 1;
-      nx = nz = 0;
-    }
-    t = (octree_size - ray.o.y) / ray.d.y;
-    if (t < tNear && t > Ray.EPSILON) {
-      tNear = t;
-      ny = -1;
-      nx = nz = 0;
-    }
-    t = -ray.o.z / ray.d.z;
-    if (t < tNear && t > Ray.EPSILON) {
-      tNear = t;
-      nz = 1;
-      nx = ny = 0;
-    }
-    t = (octree_size - ray.o.z) / ray.d.z;
-    if (t < tNear && t > Ray.EPSILON) {
-      tNear = t;
-      nz = -1;
-      nx = ny = 0;
+
+    double tYMin, tYMax;
+    double invDirY = 1 / ray.d.y;
+    if (invDirY >= 0) {
+      tYMin = -ray.o.y * invDirY;
+      tYMax = (octree_size - ray.o.y) * invDirY;
+    } else {
+      tYMin = (octree_size - ray.o.y) * invDirY;
+      tYMax = -ray.o.y * invDirY;
     }
 
-    if (tNear == Double.POSITIVE_INFINITY)
+    if ((tMin > tYMax) || (tYMin > tMax))
       return false;
 
-    ray.o.scaleAdd(tNear, ray.d);
+    if (tYMin > tMin) {
+      tMin = tYMin;
+
+      ny = -FastMath.signum(ray.d.y);
+      nx = nz = 0;
+    }
+
+    if (tYMax < tMax)
+      tMax = tYMax;
+
+    double tZMin, tZMax;
+    double invDirZ = 1 / ray.d.z;
+    if (invDirZ >= 0) {
+      tZMin = -ray.o.z * invDirZ;
+      tZMax = (octree_size - ray.o.z) * invDirZ;
+    } else {
+      tZMin = (octree_size - ray.o.z) * invDirZ;
+      tZMax = -ray.o.z * invDirZ;
+    }
+
+    if ((tMin > tZMax) || (tZMin > tMax))
+      return false;
+
+    if (tZMin > tMin) {
+      tMin = tZMin;
+
+      nz = -FastMath.signum(ray.d.y);
+      nx = ny = 0;
+    }
+
+    ray.o.scaleAdd(tMin, ray.d);
     ray.n.set(nx, ny, nz);
-    ray.distance += tNear;
+    ray.distance += tMin;
     return true;
   }
 
