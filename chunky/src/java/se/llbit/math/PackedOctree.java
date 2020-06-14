@@ -428,9 +428,12 @@ public class PackedOctree implements Octree.OctreeImplementation {
     if (tZMin > tMin) {
       tMin = tZMin;
 
-      nz = -FastMath.signum(ray.d.y);
+      nz = -FastMath.signum(ray.d.z);
       nx = ny = 0;
     }
+
+    if (tMin < 0)
+      return false;
 
     ray.o.scaleAdd(tMin, ray.d);
     ray.n.set(nx, ny, nz);
