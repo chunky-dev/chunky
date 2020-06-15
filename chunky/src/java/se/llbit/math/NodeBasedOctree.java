@@ -239,11 +239,17 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
     return true;
   }
 
+  /**
+   *  {@inheritDoc}
+   */
   @Override
   public boolean enterBlock(Scene scene, Ray ray, BlockPalette palette) {
     if (!isInside(ray.o) && !enterOctree(ray))
       return false;
 
+    // Marching is done in a top-down fashion: at each step, the octree is descended from the root to find the leaf
+    // node the ray is in. Terminating the march is then decided based on the block type in that leaf node. Finally the
+    // ray is advanced to the boundary of the current leaf node and the next, ready for the next iteration.
     while (true) {
       // Add small offset past the intersection to avoid
       // recursion to the same octree node!
@@ -347,11 +353,17 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
     }
   }
 
+  /**
+   *  {@inheritDoc}
+   */
   @Override
   public boolean exitWater(Scene scene, Ray ray, BlockPalette palette) {
     if (!isInside(ray.o) && !enterOctree(ray))
       return false;
 
+    // Marching is done in a top-down fashion: at each step, the octree is descended from the root to find the leaf
+    // node the ray is in. Terminating the march is then decided based on the block type in that leaf node. Finally the
+    // ray is advanced to the boundary of the current leaf node and the next, ready for the next iteration.
     while (true) {
       // Add small offset past the intersection to avoid
       // recursion to the same octree node!

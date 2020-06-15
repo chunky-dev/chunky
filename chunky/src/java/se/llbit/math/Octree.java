@@ -47,7 +47,19 @@ public class Octree {
     Material getMaterial(int x, int y, int z, BlockPalette palette);
     void store(DataOutputStream output) throws IOException;
     boolean isInside(Vector3 pos);
+
+    /**
+     * Intersects the ray with the geometry inside the octree.
+     *
+     * @return {@code false} if the ray did not hit the geometry
+     */
     boolean enterBlock(Scene scene, Ray ray, BlockPalette palette);
+
+    /**
+     * Advance the ray until it leaves the current water body.
+     *
+     * @return {@code false} if the ray doesn't hit anything
+     */
     boolean exitWater(Scene scene, Ray ray, BlockPalette palette);
     int getDepth();
   }
