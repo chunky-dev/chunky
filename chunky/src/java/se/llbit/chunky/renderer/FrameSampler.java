@@ -19,7 +19,7 @@ public abstract class FrameSampler {
    * Queries the FrameSampler for the next job in the queue. Blocks until one is available.
    * @return the next job for a RenderWorker
    */
-  public abstract RenderTile getNextJob();
+  public abstract RenderTile getNextJob() throws InterruptedException;
 
   /**
    * Add a sample for pixel (x, y).
