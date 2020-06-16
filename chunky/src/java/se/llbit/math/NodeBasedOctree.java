@@ -165,7 +165,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
   }
 
   /**
-   * Moves the ray to the of the octree.
+   * Moves the ray to the boundary of the octree.
    * @param ray Ray that will be moved to the boundary of the octree. The origin, distance and normals will be modified.
    * @return {@code false} if the ray doesn't intersect the octree.
    */
