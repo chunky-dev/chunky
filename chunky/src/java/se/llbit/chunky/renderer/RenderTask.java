@@ -20,13 +20,44 @@ package se.llbit.chunky.renderer;
  * Describes part of the canvas to be rendered by a render worker.
  */
 public class RenderTask {
+  /**
+   * {@see RenderTask.Kind}
+   */
+  public final Kind kind;
+
+  /**
+   * The rectangle of pixels to render. Unused in the case of END_FRAME tasks.
+   */
   public final int x0, x1, y0, y1;
 
+  public static final RenderTask END_FRAME = new RenderTask(Kind.END_FRAME);
+
+  public enum Kind {
+    /**
+     * Render the given rectangle
+     */
+    RENDER,
+
+    /**
+     * Synchronize with the RenderManager
+     */
+    END_FRAME
+  }
+
   public RenderTask(int x0, int x1, int y0, int y1) {
+    this.kind = Kind.RENDER;
     this.x0 = x0;
-    this.x1 = x1;
     this.y0 = y0;
+    this.x1 = x1;
     this.y1 = y1;
+  }
+
+  private RenderTask(Kind kind) {
+    this.kind = kind;
+    this.x0 = 0;
+    this.y0 = 0;
+    this.x1 = 0;
+    this.y1 = 0;
   }
 
   @Override public String toString() {

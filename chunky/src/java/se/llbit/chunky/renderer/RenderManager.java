@@ -23,6 +23,7 @@ import se.llbit.util.TaskTracker;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
@@ -60,15 +61,6 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    * quiescent.
    */
   private final Scene bufferedScene;
-
-  /** Gives the next tile index for a worker. */
-  private volatile RenderTask[] tileQueue = new RenderTask[0];
-  private final Object jobMonitor = new Object();
-  private int numJobs = 0, lastJob = 0;
-  private final AtomicInteger nextJob = new AtomicInteger(0);
-
-  /** Latch for waiting on workers to finish the current frame. */
-  private CountDownLatch frameFinished = new CountDownLatch(Integer.MAX_VALUE);
 
   private Collection<RenderStatusListener> listeners = new ArrayList<>();
 
@@ -145,7 +137,6 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
             }
           });
         }
-        initializeJobQueue();
 
         if (mode == RenderMode.PREVIEW) {
           previewLoop();
@@ -195,7 +186,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    * the render state is changed externally.
    * @throws InterruptedException
    */
-  private void pathTraceLoop() throws InterruptedException {
+  private void pathTraceLoop() throws InterruptedException, BrokenBarrierException {
     while (true) {
       sceneProvider.withSceneProtected(scene -> {
         synchronized (bufferedScene) {
@@ -269,7 +260,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
     }
   }
 
-  private void previewLoop() throws InterruptedException {
+  private void previewLoop() throws InterruptedException, BrokenBarrierException {
     long frameStart;
 
     renderTask.update("Preview", 2, 0, "");
@@ -319,57 +310,32 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
   /**
    * Assign render jobs to tiles of the canvas.
    */
-  private void initializeJobQueue() {
+  private void feedWorkersJobs() throws InterruptedException {
     int canvasWidth = bufferedScene.canvasWidth();
     int canvasHeight = bufferedScene.canvasHeight();
-    numJobs = ((canvasWidth + (tileWidth - 1)) / tileWidth)
-        * ((canvasHeight + (tileWidth - 1)) / tileWidth);
-    if (tileQueue.length != numJobs) {
-      tileQueue = new RenderTask[numJobs];
-    }
     int xjobs = (canvasWidth + (tileWidth - 1)) / tileWidth;
+    int yjobs = (canvasHeight + (tileWidth - 1)) / tileWidth;
+    int numJobs = xjobs * yjobs;
+
     for (int job = 0; job < numJobs; ++job) {
       // Calculate pixel bounds for this job.
       int x0 = tileWidth * (job % xjobs);
       int x1 = Math.min(x0 + tileWidth, canvasWidth);
       int y0 = tileWidth * (job / xjobs);
       int y1 = Math.min(y0 + tileWidth, canvasHeight);
-      tileQueue[job] = new RenderTask(x0, x1, y0, y1);
+      jobQueue.put(new RenderTask(x0, x1, y0, y1));
     }
-  }
-
-  private void waitOnWorkers() throws InterruptedException {
-    frameFinished.await();
   }
 
   /**
    * Adds new jobs to the job queue and releases the workers.
    */
-  private void startNextFrame() {
+  private void startNextFrame() throws BrokenBarrierException, InterruptedException {
     int nextSpp = bufferedScene.spp + RenderConstants.SPP_PER_PASS;
     bufferedScene.setBufferFinalization(finalizeAllFrames
         || snapshotControl.saveSnapshot(bufferedScene, nextSpp));
-    frameFinished = new CountDownLatch(numJobs);
-    synchronized (jobMonitor) {
-      lastJob += numJobs;
-      jobMonitor.notifyAll();
-    }
-  }
 
-  @Override public RenderTask getNextJob() throws InterruptedException {
-    int job = nextJob.getAndIncrement();
-    if (job >= lastJob) {
-      synchronized (jobMonitor) {
-        while (job >= lastJob) {
-          jobMonitor.wait();
-        }
-      }
-    }
-    return tileQueue[lastJob - job - 1];
-  }
-
-  @Override public void jobDone() {
-    frameFinished.countDown();
+    feedWorkersJobs();
   }
 
   @Override public Scene getBufferedScene() {

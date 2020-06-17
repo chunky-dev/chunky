@@ -20,6 +20,10 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.RayTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+
 /**
  * Base class for render managers.
  *
@@ -36,15 +40,20 @@ public abstract class AbstractRenderManager extends Thread {
   protected SceneProvider sceneProvider;
   private RayTracer previewRayTracer;
   private RayTracer rayTracer;
+  protected ArrayBlockingQueue<RenderTask> jobQueue;
+  private CyclicBarrier barrier;
 
   public AbstractRenderManager(RenderContext context) {
     super("Render Manager");
 
     this.numThreads = context.numRenderThreads();
     this.tileWidth = context.tileWidth();
-    previewRayTracer = context.getChunky().getPreviewRayTracerFactory().newRayTracer();
-    rayTracer = context.getChunky().getRayTracerFactory().newRayTracer();
-    workerFactory = context.workerFactory;
+    this.previewRayTracer = context.getChunky().getPreviewRayTracerFactory().newRayTracer();
+    this.rayTracer = context.getChunky().getRayTracerFactory().newRayTracer();
+    this.workerFactory = context.workerFactory;
+
+    this.jobQueue = new ArrayBlockingQueue<>(numThreads * 2);
+    this.barrier = new CyclicBarrier(numThreads + 1); // the +1 is the RenderManager itself
   }
 
   /**
@@ -69,12 +78,30 @@ public abstract class AbstractRenderManager extends Thread {
    * @return description of tile to be rendered.
    * @throws InterruptedException
    */
-  public abstract RenderTask getNextJob() throws InterruptedException;
+  public final RenderTask getNextJob() throws InterruptedException {
+    return jobQueue.take();
+  }
 
   /**
-   * Report finished job.
+   * Synchronize with the RenderManager. Called by RenderWorkers to signal all jobs are done.
+   * @throws BrokenBarrierException
+   * @throws InterruptedException
    */
-  public abstract void jobDone();
+  public final void awaitEndOfFrame() throws BrokenBarrierException, InterruptedException {
+    barrier.await();
+  }
+
+  /**
+   * Queues up END_FRAME tasks and wait for all workers to reach the barrier
+   * @throws InterruptedException
+   * @throws BrokenBarrierException
+   */
+  protected final void waitOnWorkers() throws InterruptedException, BrokenBarrierException {
+    for (int i = 0; i < numThreads; ++i) {
+      jobQueue.put(RenderTask.END_FRAME);
+    }
+    barrier.await();
+  }
 
   public void setSceneProvider(SceneProvider sceneProvider) {
     this.sceneProvider = sceneProvider;

@@ -65,29 +65,47 @@ public class RenderWorker extends Thread {
 
   @Override
   public void run() {
-    long jobTime = 0;
     try {
       while (!isInterrupted()) {
-        RenderTask job = manager.getNextJob();
-        long jobStart = System.nanoTime();
-        work(job);
-        jobTime += System.nanoTime() - jobStart;
-        manager.jobDone();
-
-        // Sleep to manage CPU utilization.
-        if (jobTime > SLEEP_INTERVAL) {
-          if (manager.cpuLoad < 100 && manager.getBufferedScene().getMode() != RenderMode.PREVIEW) {
-            // sleep = jobTime * (1-utilization) / utilization
-            double load = (100.0 - manager.cpuLoad) / manager.cpuLoad;
-            sleep((long) (jobTime / 1000000.0 * load));
-          }
-          jobTime = 0;
-        }
+        frameLoop();
+        manager.awaitEndOfFrame();
       }
     } catch (InterruptedException ignored) {
       // Interrupted.
     } catch (Throwable e) {
       Log.error("Render worker " + id + " crashed with uncaught exception.", e);
+    }
+  }
+
+  /**
+   * Complete render tasks until an END_FRAME task is received
+   * @throws InterruptedException
+   */
+  private void frameLoop() throws InterruptedException {
+    long jobTime = 0;
+    while (true) {
+      RenderTask job = manager.getNextJob();
+
+      switch (job.kind) {
+        case RENDER:
+          long jobStart = System.nanoTime();
+          work(job);
+          jobTime += System.nanoTime() - jobStart;
+
+          // Sleep to manage CPU utilization.
+          if (jobTime > SLEEP_INTERVAL) {
+            if (manager.cpuLoad < 100 && manager.getBufferedScene().getMode() != RenderMode.PREVIEW) {
+              // sleep = jobTime * (1-utilization) / utilization
+              double load = (100.0 - manager.cpuLoad) / manager.cpuLoad;
+              sleep((long) (jobTime / 1000000.0 * load));
+            }
+            jobTime = 0;
+          }
+          break;
+
+        case END_FRAME:
+          return;
+      }
     }
   }
 
