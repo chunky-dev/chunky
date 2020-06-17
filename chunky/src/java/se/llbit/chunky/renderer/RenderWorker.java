@@ -68,7 +68,7 @@ public class RenderWorker extends Thread {
     long jobTime = 0;
     try {
       while (!isInterrupted()) {
-        RenderTile job = manager.getNextJob();
+        RenderTask job = manager.getNextJob();
         long jobStart = System.nanoTime();
         work(job);
         jobTime += System.nanoTime() - jobStart;
@@ -96,7 +96,7 @@ public class RenderWorker extends Thread {
    *
    * @param tile describes the tile to be rendered.
    */
-  private void work(RenderTile tile) {
+  private void work(RenderTask tile) {
     Scene scene = manager.getBufferedScene();
 
     Random random = state.random;

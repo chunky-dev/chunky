@@ -69,7 +69,7 @@ public abstract class AbstractRenderManager extends Thread {
    * @return description of tile to be rendered.
    * @throws InterruptedException
    */
-  public abstract RenderTile getNextJob() throws InterruptedException;
+  public abstract RenderTask getNextJob() throws InterruptedException;
 
   /**
    * Report finished job.

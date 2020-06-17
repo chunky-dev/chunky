@@ -19,10 +19,10 @@ package se.llbit.chunky.renderer;
 /**
  * Describes part of the canvas to be rendered by a render worker.
  */
-public class RenderTile {
+public class RenderTask {
   public final int x0, x1, y0, y1;
 
-  public RenderTile(int x0, int x1, int y0, int y1) {
+  public RenderTask(int x0, int x1, int y0, int y1) {
     this.x0 = x0;
     this.x1 = x1;
     this.y0 = y0;

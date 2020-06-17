@@ -18,7 +18,7 @@ public class UniformFrameSampler extends FrameSampler {
   private final double[] samples;
 
   private final Scene scene;
-  private volatile RenderTile[] tileQueue = new RenderTile[0];
+  private volatile RenderTask[] tileQueue = new RenderTask[0];
   private final Object jobMonitor = new Object();
   private int numJobs = 0, lastJob = 0;
   private final AtomicInteger nextJob = new AtomicInteger(0);
@@ -48,7 +48,7 @@ public class UniformFrameSampler extends FrameSampler {
     numJobs = ((canvasWidth + (tileWidth - 1)) / tileWidth)
             * ((canvasHeight + (tileWidth - 1)) / tileWidth);
     if (tileQueue.length != numJobs) {
-      tileQueue = new RenderTile[numJobs];
+      tileQueue = new RenderTask[numJobs];
     }
     int xjobs = (canvasWidth + (tileWidth - 1)) / tileWidth;
     for (int job = 0; job < numJobs; ++job) {
@@ -57,7 +57,7 @@ public class UniformFrameSampler extends FrameSampler {
       int x1 = Math.min(x0 + tileWidth, canvasWidth);
       int y0 = tileWidth * (job / xjobs);
       int y1 = Math.min(y0 + tileWidth, canvasHeight);
-      tileQueue[job] = new RenderTile(x0, x1, y0, y1);
+      tileQueue[job] = new RenderTask(x0, x1, y0, y1);
     }
   }
 
@@ -67,7 +67,7 @@ public class UniformFrameSampler extends FrameSampler {
   }
 
   @Override
-  public RenderTile getNextJob() throws InterruptedException {
+  public RenderTask getNextJob() throws InterruptedException {
     int job = nextJob.getAndIncrement();
     if (job >= lastJob) {
       synchronized (jobMonitor) {
