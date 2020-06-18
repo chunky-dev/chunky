@@ -5,21 +5,24 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
+import se.llbit.util.TaskTracker;
+
+import java.util.concurrent.BlockingQueue;
 
 /**
  * A FrameSampler decides how samples are taken and reconstructs the image from them.
  */
 public abstract class FrameSampler {
   /**
-   * Signals the sampler to start a new frame.
+   * Feed sample jobs to the workers for the current frame.
+   * @param jobQueue
    */
-  public abstract void startNewFrame();
+  public abstract void sampleFrame(BlockingQueue<RenderTask> jobQueue) throws InterruptedException;
 
   /**
-   * Queries the FrameSampler for the next job in the queue. Blocks until one is available.
-   * @return the next job for a RenderWorker
+   * Called by the RenderManager once all render tasks for the current frame are finished.
    */
-  public abstract RenderTask getNextJob() throws InterruptedException;
+  public abstract void onFrameFinish();
 
   /**
    * Add a sample for pixel (x, y).
@@ -128,4 +131,13 @@ public abstract class FrameSampler {
     pixel[1] = g;
     pixel[2] = b;
   }
+
+  /**
+   * Merges the samples of the provided sampler.
+   * @param otherSampler The sampler from which the samples must be merged
+   * @param taskTracker A task tracker to follow the progress of the merge
+   * @throws IllegalArgumentException when {@code otherSampler} is of the wrong type or the wrong size
+   */
+  public abstract void mergeWith(FrameSampler otherSampler, TaskTracker taskTracker)
+          throws IllegalArgumentException;
 }

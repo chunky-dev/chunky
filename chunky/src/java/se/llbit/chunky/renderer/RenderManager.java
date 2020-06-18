@@ -21,6 +21,7 @@ import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
 import se.llbit.util.TaskTracker;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.BrokenBarrierException;
@@ -64,6 +65,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
   private Collection<RenderStatusListener> listeners = new ArrayList<>();
 
+  private FrameSampler frameSampler;
+
   private BiConsumer<Long, Integer> renderCompletionListener = (time, sps) -> {};
   private BiConsumer<Scene, Integer> frameCompletionListener = (scene, spp) -> {};
   private TaskTracker.Task renderTask = TaskTracker.Task.NONE;
@@ -98,6 +101,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
       workers[i] = workerFactory.buildWorker(this, i, seed + i);
       workers[i].start();
     }
+
+    frameSampler = new UniformFrameSampler(bufferedScene, tileWidth, RenderConstants.SPP_PER_PASS);
   }
 
   @Override public synchronized void addRenderListener(RenderStatusListener listener) {
@@ -203,6 +208,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
         long frameStart = System.currentTimeMillis();
         startNextFrame();
         waitOnWorkers();
+        frameSampler.onFrameFinish();
         bufferedScene.swapBuffers();
         bufferedScene.renderTime += System.currentTimeMillis() - frameStart;
       }
@@ -283,6 +289,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
         frameStart = System.currentTimeMillis();
         startNextFrame();
         waitOnWorkers();
+        frameSampler.onFrameFinish();
         bufferedScene.swapBuffers();
         sendSceneStatus(bufferedScene.sceneStatus());
         bufferedScene.renderTime += System.currentTimeMillis() - frameStart;
@@ -308,26 +315,6 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
   }
 
   /**
-   * Assign render jobs to tiles of the canvas.
-   */
-  private void feedWorkersJobs() throws InterruptedException {
-    int canvasWidth = bufferedScene.canvasWidth();
-    int canvasHeight = bufferedScene.canvasHeight();
-    int xjobs = (canvasWidth + (tileWidth - 1)) / tileWidth;
-    int yjobs = (canvasHeight + (tileWidth - 1)) / tileWidth;
-    int numJobs = xjobs * yjobs;
-
-    for (int job = 0; job < numJobs; ++job) {
-      // Calculate pixel bounds for this job.
-      int x0 = tileWidth * (job % xjobs);
-      int x1 = Math.min(x0 + tileWidth, canvasWidth);
-      int y0 = tileWidth * (job / xjobs);
-      int y1 = Math.min(y0 + tileWidth, canvasHeight);
-      jobQueue.put(new RenderTask(x0, x1, y0, y1));
-    }
-  }
-
-  /**
    * Adds new jobs to the job queue and releases the workers.
    */
   private void startNextFrame() throws BrokenBarrierException, InterruptedException {
@@ -335,7 +322,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
     bufferedScene.setBufferFinalization(finalizeAllFrames
         || snapshotControl.saveSnapshot(bufferedScene, nextSpp));
 
-    feedWorkersJobs();
+    frameSampler.sampleFrame(jobQueue);
   }
 
   @Override public Scene getBufferedScene() {
