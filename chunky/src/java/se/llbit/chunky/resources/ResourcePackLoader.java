@@ -39,6 +39,7 @@ public class ResourcePackLoader {
     ResourcePackLoader.PACK_LOADER_FACTORIES.add(ResourcePackBiomeLoader::new);
     ResourcePackLoader.PACK_LOADER_FACTORIES.add(ResourcePackPaintingLoader::new);
     ResourcePackLoader.PACK_LOADER_FACTORIES.add(ResourcePackBannerPatternLoader::new);
+    ResourcePackLoader.PACK_LOADER_FACTORIES.add(BlockModelLoader::new);
   }
 
   public interface PackLoader {
