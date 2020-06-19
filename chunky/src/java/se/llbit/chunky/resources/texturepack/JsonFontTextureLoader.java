@@ -96,9 +96,9 @@ public class JsonFontTextureLoader extends TextureLoader {
       int x, y = 0;
       for (JsonValue charactersLine : fontDefinition.asObject().get("chars").asArray()) {
         x = 0;
-        for (char character : charactersLine.stringValue("").toCharArray()) {
-          if (!Texture.fonts.containsGlyph(character)) {
-            Texture.fonts.loadGlyph(spritemap, x, y, character, width, height, ascent);
+        for (int codePoint : charactersLine.stringValue("").codePoints().toArray()) {
+          if (!Texture.fonts.containsGlyph(codePoint)) {
+            Texture.fonts.loadGlyph(spritemap, x, y, codePoint, width, height, ascent);
           }
           x++;
         }

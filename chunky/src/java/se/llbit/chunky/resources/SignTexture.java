@@ -56,8 +56,7 @@ public class SignTexture extends Texture {
       int lineWidth = 0;
       for (JsonValue textItem : line) {
         String textLine = textItem.object().get("text").stringValue("");
-        for (int j = 0; j < textLine.length(); ++j) {
-          char c = textLine.charAt(j);
+        for (int c : textLine.codePoints().toArray()) {
           Glyph glyph = Texture.fonts.getGlyph(c);
           lineWidth += glyph != null ? glyph.width : 0;
         }
@@ -67,8 +66,7 @@ public class SignTexture extends Texture {
         String textLine = textItem.object().get("text").stringValue("");
         Color color = Color.get(textItem.object().get("color").intValue(0));
 
-        for (int j = 0; j < textLine.length(); ++j) {
-          char c = textLine.charAt(j);
+        for (int c : textLine.codePoints().toArray()) {
           Glyph glyph = Texture.fonts.getGlyph(c);
           if (glyph != null) {
             int y = ystart - glyph.ascent + lineHeight;
