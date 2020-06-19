@@ -919,7 +919,7 @@ public class MinecraftBlockProvider implements BlockProvider {
     "minecraft:zombie_wall_head",
   }; // Stop! Do not add more blocks here, use the static initializer and the addBlock(s) methods instead.
 
-  private static final Map<String, BiFunction<String, Tag, Block>> blocks = new HashMap<>();
+  public static final Map<String, BiFunction<String, Tag, Block>> blocks = new HashMap<>();
 
   private static void addBlock(String name, BiFunction<String, Tag, Block> factory) {
     blocks.put("minecraft:" + name, factory);

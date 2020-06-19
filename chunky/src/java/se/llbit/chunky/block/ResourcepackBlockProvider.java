@@ -7,22 +7,20 @@ import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.NoSuchFileException;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.block.minecraft.Air;
+import se.llbit.chunky.block.minecraft.UnknownBlock;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.AnimatedTexture;
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
@@ -31,7 +29,6 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
-import se.llbit.log.Log;
 import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 import se.llbit.math.Transform;
@@ -43,131 +40,164 @@ import se.llbit.nbt.Tag;
 import se.llbit.resources.ImageLoader;
 
 public class ResourcepackBlockProvider implements BlockProvider {
-  private final Map<String, BlockVariants> blocks = new HashMap<>();
+  public static final Map<String, BlockVariants> blocks = new HashMap<>();
 
-  public ResourcepackBlockProvider(File file) throws IOException {
-    Log.info("Loading blocks from " + file.getAbsolutePath());
-    try (FileSystem zip =
-        FileSystems.newFileSystem(URI.create("jar:" + file.toURI()), Collections.emptyMap())) {
-      JsonModelLoader modelLoader = new JsonModelLoader();
-      Files.list(zip.getPath("assets"))
+  /*
+  public void loadBlocks(List<File> files) throws IOException {
+    blocks.clear();
+    try (MultiFileSystem effectiveResources =
+           new MultiFileSystem(
+             files.stream()
+               .map(
+                 f -> {
+                   try {
+                     return FileSystems.newFileSystem(
+                       URI.create("jar:" + f.toURI()), Collections.emptyMap());
+                   } catch (IOException e) {
+                     throw new RuntimeException("Could not open resource pack " + f, e);
+                   }
+                 })
+               .toArray(FileSystem[]::new))) {
+
+      for (FileSystem resourcePack : effectiveResources.fileSystems) {
+        JsonModelLoader modelLoader = new JsonModelLoader();
+        Files.list(resourcePack.getPath("assets"))
           .filter(Files::isDirectory)
           .map(assetProvider -> assetProvider.resolve("blockstates"))
           .filter(Files::isDirectory)
           .forEach(
-              assets -> {
-                final String assetsName = assets.getParent().getFileName().toString();
-                try {
-                  Files.list(assets)
-                      .forEach(
-                          block -> {
-                            String blockName = block.getFileName().toString();
-                            blockName = blockName.substring(0, blockName.length() - 5);
+            assets -> {
+              final String assetsName = assets.getParent().getFileName().toString();
+              try {
+                Files.list(assets)
+                  .filter(path -> path.getFileName().toString().endsWith(".json"))
+                  .forEach(
+                    block -> {
+                      String blockName = block.getFileName().toString();
+                      blockName =
+                        blockName.substring(0, blockName.length() - ".json".length());
+                      String fqBlockName = assetsName + ":" + blockName;
 
-                            BlockVariants variants = new BlockVariants();
-                            try {
-                              JsonObject blockStates =
-                                  new JsonParser(Files.newInputStream(block)).parse().object();
-                              if (blockStates.get("variants").isObject()) {
-                                for (JsonMember blockState :
-                                    blockStates.get("variants").object().members) {
-                                  // TODO add support for pseudo-random models
-                                  JsonObject blockDefinition =
-                                      blockState.getValue().isArray()
-                                          ? blockState.getValue().array().get(0).object()
-                                          : blockState.getValue().object();
-                                  String modelName =
-                                      blockDefinition.get("model").stringValue("unknown:unknown");
-                                  if (modelName.equals("minecraft:block/air")) {
-                                    variants.variants.add(new SimpleBlockVariant(Air.INSTANCE));
-                                  } else {
-                                    Block model =
-                                        modelLoader.loadBlockModel(zip, modelName, blockName);
-                                    if (model instanceof JsonModel) {
-                                      if (blockDefinition.get("x").doubleValue(0) > 0) {
-                                        ((JsonModel) model)
-                                            .rotateX(
-                                                blockDefinition.get("x").intValue(0),
-                                                blockDefinition.get("uvlock").boolValue(false));
-                                      }
-                                      if (blockDefinition.get("y").doubleValue(0) > 0) {
-                                        ((JsonModel) model)
-                                            .rotateY(
-                                                blockDefinition.get("y").intValue(0),
-                                                blockDefinition.get("uvlock").boolValue(false));
-                                      }
-                                      if (blockDefinition.get("z").doubleValue(0) > 0) {
-                                        ((JsonModel) model)
-                                            .rotateZ(
-                                                blockDefinition.get("z").intValue(0),
-                                                blockDefinition.get("uvlock").boolValue(false));
-                                      }
-                                    }
+                      if (blocks.containsKey(fqBlockName)) {
+                        // this block was already provided by a different resource pack
+                        return;
+                      }
 
-                                    variants.variants.add(
-                                        new VariantsBlockVariant(blockState.getName(), model));
-                                  }
+                      try (JsonParser parser =
+                             new JsonParser(Files.newInputStream(block))) {
+                        BlockVariants variants = new BlockVariants();
+
+                        JsonObject blockStates = parser.parse().object();
+                        if (blockStates.get("variants").isObject()) {
+                          for (JsonMember blockState :
+                            blockStates.get("variants").object().members) {
+                            // TODO add support for pseudo-random models
+                            JsonObject blockDefinition =
+                              blockState.getValue().isArray()
+                                ? blockState.getValue().array().get(0).object()
+                                : blockState.getValue().object();
+                            String modelName =
+                              blockDefinition.get("model").stringValue("unknown:unknown");
+                            if (modelName.equals("minecraft:block/air")) {
+                              variants.variants.add(new SimpleBlockVariant(Air.INSTANCE));
+                            } else {
+                              Block model =
+                                modelLoader.loadBlockModel(
+                                  effectiveResources, modelName, fqBlockName);
+                              if (model instanceof JsonModel) {
+                                if (blockDefinition.get("x").doubleValue(0) > 0) {
+                                  ((JsonModel) model)
+                                    .rotateX(
+                                      blockDefinition.get("x").intValue(0),
+                                      blockDefinition.get("uvlock").boolValue(false));
                                 }
-                              } else if (blockStates.get("multipart").isArray()) {
-                                BlockVariantMultipart multipartBlockVariant =
-                                    new BlockVariantMultipart(blockName);
-                                for (JsonValue part : blockStates.get("multipart").array()) {
-                                  JsonObject blockDefinition =
-                                      part.object().get("apply").isArray()
-                                          ? part.object().get("apply").array().get(0).object()
-                                          : part.object().get("apply").object();
-                                  String modelName =
-                                      blockDefinition.get("model").stringValue("unknown:unknown");
-
-                                  Block model =
-                                      modelLoader.loadBlockModel(zip, modelName, blockName);
-
-                                  if (model instanceof JsonModel) {
-                                    if (blockDefinition.get("x").doubleValue(0) > 0) {
-                                      ((JsonModel) model)
-                                          .rotateX(
-                                              blockDefinition.get("x").intValue(0),
-                                              blockDefinition.get("uvlock").boolValue(false));
-                                    }
-                                    if (blockDefinition.get("y").doubleValue(0) > 0) {
-                                      ((JsonModel) model)
-                                          .rotateY(
-                                              blockDefinition.get("y").intValue(0),
-                                              blockDefinition.get("uvlock").boolValue(false));
-                                    }
-                                    if (blockDefinition.get("z").doubleValue(0) > 0) {
-                                      ((JsonModel) model)
-                                          .rotateZ(
-                                              blockDefinition.get("z").intValue(0),
-                                              blockDefinition.get("uvlock").boolValue(false));
-                                    }
-                                  }
-                                  JsonObject conditions = part.object().get("when").object();
-                                  if (conditions.get("OR").isArray()) {
-                                    multipartBlockVariant.addPart(
-                                        new MultipartBlockVariant(
-                                            conditions.get("OR").array(), model));
-                                  } else {
-                                    multipartBlockVariant.addPart(
-                                        new MultipartBlockVariant(conditions, model));
-                                  }
+                                if (blockDefinition.get("y").doubleValue(0) > 0) {
+                                  ((JsonModel) model)
+                                    .rotateY(
+                                      blockDefinition.get("y").intValue(0),
+                                      blockDefinition.get("uvlock").boolValue(false));
                                 }
-                                variants.variants.add(multipartBlockVariant);
-                              } else {
-                                throw new Error("Unsupported block " + blockName);
+                                if (blockDefinition.get("z").doubleValue(0) > 0) {
+                                  ((JsonModel) model)
+                                    .rotateZ(
+                                      blockDefinition.get("z").intValue(0),
+                                      blockDefinition.get("uvlock").boolValue(false));
+                                }
                               }
-                            } catch (IOException | SyntaxError e) {
-                              throw new Error(e);
-                            }
 
-                            blocks.put(assetsName + ":" + blockName, variants);
-                          });
-                } catch (IOException e) {
-                  throw new Error(e);
-                }
-              });
+                              variants.variants.add(
+                                new VariantsBlockVariant(blockState.getName(), model));
+                            }
+                          }
+                        } else if (blockStates.get("multipart").isArray()) {
+                          BlockVariantMultipart multipartBlockVariant =
+                            new BlockVariantMultipart(blockName);
+                          for (JsonValue part : blockStates.get("multipart").array()) {
+                            JsonObject blockDefinition =
+                              part.object().get("apply").isArray()
+                                ? part.object().get("apply").array().get(0).object()
+                                : part.object().get("apply").object();
+                            String modelName =
+                              blockDefinition.get("model").stringValue("unknown:unknown");
+
+                            Block model =
+                              modelLoader.loadBlockModel(
+                                effectiveResources, modelName, fqBlockName);
+
+                            if (model instanceof JsonModel) {
+                              if (blockDefinition.get("x").doubleValue(0) > 0) {
+                                ((JsonModel) model)
+                                  .rotateX(
+                                    blockDefinition.get("x").intValue(0),
+                                    blockDefinition.get("uvlock").boolValue(false));
+                              }
+                              if (blockDefinition.get("y").doubleValue(0) > 0) {
+                                ((JsonModel) model)
+                                  .rotateY(
+                                    blockDefinition.get("y").intValue(0),
+                                    blockDefinition.get("uvlock").boolValue(false));
+                              }
+                              if (blockDefinition.get("z").doubleValue(0) > 0) {
+                                ((JsonModel) model)
+                                  .rotateZ(
+                                    blockDefinition.get("z").intValue(0),
+                                    blockDefinition.get("uvlock").boolValue(false));
+                              }
+                            }
+                            JsonObject conditions = part.object().get("when").object();
+                            if (conditions.get("OR").isArray()) {
+                              multipartBlockVariant.addPart(
+                                new MultipartBlockVariant(
+                                  conditions.get("OR").array(), model));
+                            } else {
+                              multipartBlockVariant.addPart(
+                                new MultipartBlockVariant(conditions, model));
+                            }
+                          }
+                          variants.variants.add(multipartBlockVariant);
+                        } else {
+                          throw new RuntimeException("Unsupported block " + fqBlockName);
+                        }
+
+                        blocks.put(assetsName + ":" + blockName, variants);
+                      } catch (IOException | SyntaxError | RuntimeException e) {
+                        System.out.println(
+                          "Could not load block "
+                            + fqBlockName
+                            + " from "
+                            + resourcePack.getFileStores().iterator().next().name());
+                      }
+                    });
+              } catch (IOException e) {
+                System.out.println(
+                  "Could not read resource pack "
+                    + resourcePack.getFileStores().iterator().next().name());
+              }
+            });
+      }
     }
   }
+  */
 
   @Override
   public Block getBlockByTag(String name, Tag tag) {
@@ -180,8 +210,8 @@ public class ResourcepackBlockProvider implements BlockProvider {
     return blocks.keySet();
   }
 
-  private static class BlockVariants {
-    private final List<BlockVariant> variants = new ArrayList<>();
+  public static class BlockVariants {
+    public final List<BlockVariant> variants = new ArrayList<>();
 
     public Block getBlock(Tag tag) {
       Tag properties = tag.get("Properties");
@@ -190,6 +220,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
           return variant.getBlock(properties);
         }
       }
+      // throw new RuntimeException("Could not find block model for " + properties.toString());
       return UnknownBlock.UNKNOWN;
     }
   }
@@ -200,10 +231,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
     Block getBlock(Tag properties);
   }
 
-  private static class SimpleBlockVariant implements BlockVariant {
+  public static class SimpleBlockVariant implements BlockVariant {
     private final Block block;
 
-    private SimpleBlockVariant(Block block) {
+    public SimpleBlockVariant(Block block) {
       this.block = block;
     }
 
@@ -245,7 +276,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
     public boolean isSatisfied(Tag properties) {
       for (Entry<String, String> property : conditions.entrySet()) {
         if (Arrays.stream(property.getValue().split("\\|"))
-            .noneMatch(value -> properties.get(property.getKey()).stringValue("").equals(value))) {
+          .noneMatch(value -> properties.get(property.getKey()).stringValue("").equals(value))) {
           return false;
         }
       }
@@ -266,11 +297,11 @@ public class ResourcepackBlockProvider implements BlockProvider {
     }
   }
 
-  private static class VariantsBlockVariant implements BlockVariant {
+  public static class VariantsBlockVariant implements BlockVariant {
     private final Block model;
     private final Condition condition;
 
-    private VariantsBlockVariant(String conditions, Block model) {
+    public VariantsBlockVariant(String conditions, Block model) {
       this.model = model;
       this.condition = new BlockStateCondition(conditions);
 
@@ -278,7 +309,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
       // this.model = model.rotate(x, y, z);
     }
 
-    protected VariantsBlockVariant(Condition condition, Block model) {
+    public VariantsBlockVariant(Condition condition, Block model) {
       this.condition = condition;
       this.model = model;
     }
@@ -294,11 +325,11 @@ public class ResourcepackBlockProvider implements BlockProvider {
     }
   }
 
-  private static class BlockVariantMultipart implements BlockVariant {
+  public static class BlockVariantMultipart implements BlockVariant {
     private final String name;
     private final List<VariantsBlockVariant> parts = new ArrayList<>();
 
-    private BlockVariantMultipart(String name) {
+    public BlockVariantMultipart(String name) {
       this.name = name;
     }
 
@@ -320,7 +351,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
           if (partBlock instanceof JsonModel) {
             applicableParts.add((JsonModel) partBlock);
           } else {
-            throw new Error("Multipart model part is not a JsonModel");
+            throw new RuntimeException("Multipart model part is not a JsonModel");
           }
         }
       }
@@ -331,35 +362,35 @@ public class ResourcepackBlockProvider implements BlockProvider {
     }
   }
 
-  private static class MultipartBlockVariant extends VariantsBlockVariant {
-    private MultipartBlockVariant(JsonObject when, Block model) {
+  public static class MultipartBlockVariant extends VariantsBlockVariant {
+    public MultipartBlockVariant(JsonObject when, Block model) {
       super(new BlockStateCondition(when), model);
     }
 
-    private MultipartBlockVariant(JsonArray when, Block model) {
+    public MultipartBlockVariant(JsonArray when, Block model) {
       super(
-          new OrCondition(
-              when.elements.stream()
-                  .map(condition -> new BlockStateCondition(when.object()))
-                  .collect(Collectors.toList())),
-          model);
+        new OrCondition(
+          when.elements.stream()
+            .map(condition -> new BlockStateCondition(when.object()))
+            .collect(Collectors.toList())),
+        model);
     }
   }
 
-  private static class JsonModelLoader {
+  public static class JsonModelLoader {
     private final Map<String, JsonObject> models = new HashMap<>();
     private final Map<String, Texture> textures = new HashMap<>();
 
-    public Texture getTexture(FileSystem zip, String textureName) {
+    public Texture getTexture(LayeredResourcePacks fs, String textureName) {
       Texture texture = textures.get(textureName);
       if (texture == null) {
         String[] parts = textureName.split(":");
         if (parts.length < 2) {
-          parts = new String[] {"minecraft", parts[0]};
+          parts = new String[]{"minecraft", parts[0]};
         }
         // TODO <= 1.12 texture paths are prefixed
         try (InputStream inputStream =
-            Files.newInputStream(zip.getPath("assets", parts[0], "textures", parts[1] + ".png"))) {
+               fs.getInputStream(String.join("/", "assets", parts[0], "textures", parts[1] + ".png")).get()) {
           BitmapImage image = ImageLoader.read(inputStream);
           if (image.width == image.height) {
             // textures are always squared...
@@ -368,49 +399,63 @@ public class ResourcepackBlockProvider implements BlockProvider {
             // ...unless they are animated
             texture = new AnimatedTexture(image);
           }
+          textures.put(textureName, texture);
         } catch (IOException e) {
-          throw new Error("Could not load texture " + textureName, e);
+          throw new RuntimeException("Could not load texture " + textureName, e);
+          // textures.put(textureName, Texture.unknown);
+          // return Texture.unknown;
         }
       }
       return texture;
     }
 
-    private JsonObject getModel(FileSystem zip, String modelName) {
+    private JsonObject getModel(LayeredResourcePacks resourcePacks, String modelName) {
       JsonObject model = models.get(modelName);
       if (model == null) {
         String[] parts = modelName.split(":");
         if (parts.length < 2) {
-          parts = new String[] {"minecraft", parts[0]};
+          parts = new String[]{"minecraft", parts[0]};
         }
         // TODO <= 1.12 model paths are prefixed
-        try (InputStream inputStream =
-            Files.newInputStream(zip.getPath("assets", parts[0], "models", parts[1] + ".json"))) {
-          model = new JsonParser(inputStream).parse().object();
+        List<String> path = new ArrayList<>();
+        path.add("assets");
+        path.add(parts[0]);
+        path.add("models");
+        path.addAll(Arrays.stream((parts[1] + ".json").split("/")).toList());
+        try (JsonParser parser =
+               new JsonParser(resourcePacks.getInputStream(String.join("/", path)).get())) {
+          model = parser.parse().object();
           models.put(modelName, model);
         } catch (IOException | SyntaxError e) {
-          throw new Error("Could not load block model " + modelName, e);
+          System.out.println("MODEL NOT FOUND: " + path);
+          throw new RuntimeException("Could not load block model " + modelName, e);
         }
       }
       return model;
     }
 
-    public Block loadBlockModel(FileSystem zip, String model, String blockName) {
+    public Block loadBlockModel(LayeredResourcePacks resourcePacks, String model, String blockName) {
       if (model.equals("unknown:unknown")) {
-        return UnknownBlock.UNKNOWN;
+        throw new RuntimeException("unknown block model for " + blockName);
+        // return UnknownBlock.UNKNOWN;
       }
 
       JsonModel block = new JsonModel(blockName, Texture.air);
-      JsonObject blockDefinition = getModel(zip, model);
-      block.applyDefinition(blockDefinition, name -> this.getTexture(zip, name));
-      while (!blockDefinition.get("parent").isUnknown()) {
-        String parentName = blockDefinition.get("parent").stringValue("block/block");
-        blockDefinition = this.getModel(zip, parentName);
-        block.applyDefinition(blockDefinition, name -> this.getTexture(zip, name));
-        if (parentName.equals("block/cube_all")) {
-          block.texture = block.textures.get("all");
-          block.localIntersect = false;
-          break;
+      JsonObject blockDefinition = this.getModel(resourcePacks, model);
+      block.applyDefinition(blockDefinition, name -> this.getTexture(resourcePacks, name));
+      try {
+        while (!blockDefinition.get("parent").isUnknown()) {
+          String parentName = blockDefinition.get("parent").stringValue("block/block");
+          blockDefinition = this.getModel(resourcePacks, parentName);
+          block.applyDefinition(blockDefinition, name -> this.getTexture(resourcePacks, name));
+          block.texture = block.textures.get("particle");
+          if (parentName.equals("block/cube_all")) {
+            block.localIntersect = false;
+            break;
+          }
         }
+      } catch (RuntimeException e) {
+        System.out.println("Parent chain could not be applied");
       }
 
       // TODO resolve parents up to block/block
@@ -425,7 +470,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
     public JsonModelFace(String direction, JsonObject face, Vector3 from, Vector3 to) {
       if (face.get("texture").stringValue("").length() < 2) {
-        throw new Error(face.toCompactString());
+        throw new RuntimeException(face.toCompactString());
       }
       this.texture = face.get("texture").stringValue("").substring(1);
       this.tintindex = face.get("tintindex").intValue(-1);
@@ -435,102 +480,102 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
       if (direction.equals("up")) {
         this.quad =
-            new Quad(
-                new Vector3(from.x / 16, to.y / 16, to.z / 16),
-                new Vector3(to.x / 16, to.y / 16, to.z / 16),
-                new Vector3(from.x / 16, to.y / 16, from.z / 16),
-                uv != null
-                    ? new Vector4(
-                        uv.get(0).doubleValue(from.x) / 16,
-                        uv.get(2).doubleValue(to.x) / 16,
-                        1 - uv.get(3).doubleValue(to.z) / 16,
-                        1 - uv.get(1).doubleValue(from.z) / 16)
-                    : new Vector4(from.x / 16, to.x / 16, 1 - to.z / 16, 1 - from.z / 16));
+          new Quad(
+            new Vector3(from.x / 16, to.y / 16, to.z / 16),
+            new Vector3(to.x / 16, to.y / 16, to.z / 16),
+            new Vector3(from.x / 16, to.y / 16, from.z / 16),
+            uv != null
+              ? new Vector4(
+              uv.get(0).doubleValue(from.x) / 16,
+              uv.get(2).doubleValue(to.x) / 16,
+              1 - uv.get(3).doubleValue(to.z) / 16,
+              1 - uv.get(1).doubleValue(from.z) / 16)
+              : new Vector4(from.x / 16, to.x / 16, 1 - to.z / 16, 1 - from.z / 16));
 
         if (rotation > 0) {
           quad.textureRotation = FastMath.toRadians(rotation); // -angle or +angle?
         }
       } else if (direction.equals("down")) {
         this.quad =
-            new Quad(
-                new Vector3(from.x / 16, from.y / 16, from.z / 16),
-                new Vector3(to.x / 16, from.y / 16, from.z / 16),
-                new Vector3(from.x / 16, from.y / 16, to.z / 16),
-                uv != null
-                    ? new Vector4(
-                        uv.get(0).doubleValue(from.x) / 16,
-                        uv.get(2).doubleValue(to.x) / 16,
-                        1 - uv.get(3).doubleValue(to.z) / 16,
-                        1 - uv.get(1).doubleValue(from.z) / 16)
-                    : new Vector4(from.x / 16, to.x / 16, 1 - to.z / 16, 1 - from.z / 16));
+          new Quad(
+            new Vector3(from.x / 16, from.y / 16, from.z / 16),
+            new Vector3(to.x / 16, from.y / 16, from.z / 16),
+            new Vector3(from.x / 16, from.y / 16, to.z / 16),
+            uv != null
+              ? new Vector4(
+              uv.get(0).doubleValue(from.x) / 16,
+              uv.get(2).doubleValue(to.x) / 16,
+              1 - uv.get(3).doubleValue(to.z) / 16,
+              1 - uv.get(1).doubleValue(from.z) / 16)
+              : new Vector4(from.x / 16, to.x / 16, 1 - to.z / 16, 1 - from.z / 16));
 
         if (rotation > 0) {
           quad.textureRotation = FastMath.toRadians(rotation); // -angle or +angle?
         }
       } else if (direction.equals("west")) {
         this.quad =
-            new Quad(
-                new Vector3(from.x / 16, to.y / 16, to.z / 16),
-                new Vector3(from.x / 16, to.y / 16, from.z / 16),
-                new Vector3(from.x / 16, from.y / 16, to.z / 16),
-                uv != null
-                    ? new Vector4(
-                        uv.get(2).doubleValue(from.z) / 16,
-                        uv.get(0).doubleValue(to.z) / 16,
-                        1 - uv.get(1).doubleValue(from.y) / 16,
-                        1 - uv.get(3).doubleValue(to.y) / 16)
-                    : new Vector4(from.z / 16, to.z / 16, to.y / 16, from.y / 16));
+          new Quad(
+            new Vector3(from.x / 16, to.y / 16, to.z / 16),
+            new Vector3(from.x / 16, to.y / 16, from.z / 16),
+            new Vector3(from.x / 16, from.y / 16, to.z / 16),
+            uv != null
+              ? new Vector4(
+              uv.get(2).doubleValue(from.z) / 16,
+              uv.get(0).doubleValue(to.z) / 16,
+              1 - uv.get(1).doubleValue(from.y) / 16,
+              1 - uv.get(3).doubleValue(to.y) / 16)
+              : new Vector4(from.z / 16, to.z / 16, to.y / 16, from.y / 16));
 
         if (rotation > 0) {
           quad.textureRotation = FastMath.toRadians(rotation);
         }
       } else if (direction.equals("east")) {
         this.quad =
-            new Quad(
-                new Vector3(to.x / 16, to.y / 16, from.z / 16),
-                new Vector3(to.x / 16, to.y / 16, to.z / 16),
-                new Vector3(to.x / 16, from.y / 16, from.z / 16),
-                uv != null
-                    ? new Vector4(
-                        uv.get(2).doubleValue(to.z) / 16,
-                        uv.get(0).doubleValue(from.z) / 16,
-                        1 - uv.get(1).doubleValue(from.y) / 16,
-                        1 - uv.get(3).doubleValue(to.y) / 16)
-                    : new Vector4(to.z / 16, from.z / 16, to.y / 16, from.y / 16));
+          new Quad(
+            new Vector3(to.x / 16, to.y / 16, from.z / 16),
+            new Vector3(to.x / 16, to.y / 16, to.z / 16),
+            new Vector3(to.x / 16, from.y / 16, from.z / 16),
+            uv != null
+              ? new Vector4(
+              uv.get(2).doubleValue(to.z) / 16,
+              uv.get(0).doubleValue(from.z) / 16,
+              1 - uv.get(1).doubleValue(from.y) / 16,
+              1 - uv.get(3).doubleValue(to.y) / 16)
+              : new Vector4(to.z / 16, from.z / 16, to.y / 16, from.y / 16));
 
         if (rotation > 0) {
           quad.textureRotation = FastMath.toRadians(rotation);
         }
       } else if (direction.equals("north")) {
         this.quad =
-            new Quad(
-                new Vector3(from.x / 16, to.y / 16, from.z / 16),
-                new Vector3(to.x / 16, to.y / 16, from.z / 16),
-                new Vector3(from.x / 16, from.y / 16, from.z / 16),
-                uv != null
-                    ? new Vector4(
-                        uv.get(0).doubleValue(to.x) / 16,
-                        uv.get(2).doubleValue(from.x) / 16,
-                        1 - uv.get(1).doubleValue(from.y) / 16,
-                        1 - uv.get(3).doubleValue(to.y) / 16)
-                    : new Vector4(to.x / 16, from.x / 16, to.y / 16, from.y / 16));
+          new Quad(
+            new Vector3(from.x / 16, to.y / 16, from.z / 16),
+            new Vector3(to.x / 16, to.y / 16, from.z / 16),
+            new Vector3(from.x / 16, from.y / 16, from.z / 16),
+            uv != null
+              ? new Vector4(
+              uv.get(0).doubleValue(to.x) / 16,
+              uv.get(2).doubleValue(from.x) / 16,
+              1 - uv.get(1).doubleValue(from.y) / 16,
+              1 - uv.get(3).doubleValue(to.y) / 16)
+              : new Vector4(to.x / 16, from.x / 16, to.y / 16, from.y / 16));
 
         if (rotation > 0) {
           quad.textureRotation = FastMath.toRadians(rotation); // -angle or +angle?
         }
       } else if (direction.equals("south")) {
         this.quad =
-            new Quad(
-                new Vector3(to.x / 16, to.y / 16, to.z / 16),
-                new Vector3(from.x / 16, to.y / 16, to.z / 16),
-                new Vector3(to.x / 16, from.y / 16, to.z / 16),
-                uv != null
-                    ? new Vector4(
-                        uv.get(0).doubleValue(to.x) / 16,
-                        uv.get(2).doubleValue(from.x) / 16,
-                        1 - uv.get(1).doubleValue(from.y) / 16,
-                        1 - uv.get(3).doubleValue(to.y) / 16)
-                    : new Vector4(to.x / 16, from.x / 16, to.y / 16, from.y / 16));
+          new Quad(
+            new Vector3(to.x / 16, to.y / 16, to.z / 16),
+            new Vector3(from.x / 16, to.y / 16, to.z / 16),
+            new Vector3(to.x / 16, from.y / 16, to.z / 16),
+            uv != null
+              ? new Vector4(
+              uv.get(0).doubleValue(to.x) / 16,
+              uv.get(2).doubleValue(from.x) / 16,
+              1 - uv.get(1).doubleValue(from.y) / 16,
+              1 - uv.get(3).doubleValue(to.y) / 16)
+              : new Vector4(to.x / 16, from.x / 16, to.y / 16, from.y / 16));
 
         if (rotation > 0) {
           quad.textureRotation = FastMath.toRadians(rotation); // -angle or +angle?
@@ -564,19 +609,19 @@ public class ResourcepackBlockProvider implements BlockProvider {
       this.model = model;
 
       Vector3 from =
-          new Vector3(
-              element.get("from").asArray().get(0).asDouble(0),
-              element.get("from").asArray().get(1).asDouble(0),
-              element.get("from").asArray().get(2).asDouble(0));
+        new Vector3(
+          element.get("from").asArray().get(0).asDouble(0),
+          element.get("from").asArray().get(1).asDouble(0),
+          element.get("from").asArray().get(2).asDouble(0));
       Vector3 to =
-          new Vector3(
-              element.get("to").asArray().get(0).asDouble(0),
-              element.get("to").asArray().get(1).asDouble(0),
-              element.get("to").asArray().get(2).asDouble(0));
+        new Vector3(
+          element.get("to").asArray().get(0).asDouble(0),
+          element.get("to").asArray().get(1).asDouble(0),
+          element.get("to").asArray().get(2).asDouble(0));
 
       for (JsonMember face : element.get("faces").object().members) {
         JsonModelFace modelFace =
-            new JsonModelFace(face.getName(), face.getValue().object(), from, to);
+          new JsonModelFace(face.getName(), face.getValue().object(), from, to);
         switch (face.getName()) {
           case "up":
             faces[0] = modelFace;
@@ -603,18 +648,18 @@ public class ResourcepackBlockProvider implements BlockProvider {
         JsonObject rotation = element.get("rotation").object();
         double angle = FastMath.toRadians(rotation.get("angle").doubleValue(0));
         Vector3 origin =
-            new Vector3(
-                rotation.get("origin").array().get(0).doubleValue(0) / 16,
-                rotation.get("origin").array().get(1).doubleValue(0) / 16,
-                rotation.get("origin").array().get(2).doubleValue(0) / 16);
+          new Vector3(
+            rotation.get("origin").array().get(0).doubleValue(0) / 16,
+            rotation.get("origin").array().get(1).doubleValue(0) / 16,
+            rotation.get("origin").array().get(2).doubleValue(0) / 16);
         Transform transform = null;
         switch (rotation.get("axis").stringValue("y")) {
           case "x":
             transform =
-                Transform.NONE
-                    .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
-                    .rotateX(angle)
-                    .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5);
+              Transform.NONE
+                .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
+                .rotateX(angle)
+                .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5);
             if (rotation.get("rescale").boolValue(false)) {
               double factor = 1 / FastMath.cos(angle);
               transform = transform.scale(1, factor, factor);
@@ -622,10 +667,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
             break;
           case "y":
             transform =
-                Transform.NONE
-                    .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
-                    .rotateY(angle)
-                    .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5);
+              Transform.NONE
+                .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
+                .rotateY(angle)
+                .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5);
             if (rotation.get("rescale").boolValue(false)) {
               double factor = 1 / FastMath.cos(angle);
               transform = transform.scale(factor, 1, factor);
@@ -633,10 +678,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
             break;
           case "z":
             transform =
-                Transform.NONE
-                    .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
-                    .rotateZ(angle)
-                    .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5);
+              Transform.NONE
+                .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
+                .rotateZ(angle)
+                .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5);
             if (rotation.get("rescale").boolValue(false)) {
               double factor = 1 / FastMath.cos(angle);
               transform = transform.scale(factor, factor, 1);
@@ -681,7 +726,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
     }
   }
 
-  private static class JsonModel extends Block {
+  public static class JsonModel extends Block {
     private Map<String, Texture> textures = new HashMap<>();
     private List<JsonModelElement> elements = new ArrayList<>();
     private boolean isBlockEntity = false;
@@ -697,9 +742,11 @@ public class ResourcepackBlockProvider implements BlockProvider {
         for (JsonMember texture : modelDefinition.get("textures").object().members) {
           if (texture.getValue().stringValue("").charAt(0) == '#') {
             Texture referencedTexture =
-                textures.get(texture.getValue().stringValue("").substring(1));
+              textures.get(texture.getValue().stringValue("").substring(1));
             if (referencedTexture == null) {
-              throw new Error("Unknown referenced texture " + texture.getValue().stringValue(""));
+              referencedTexture = Texture.unknown;
+              // throw new RuntimeException("Unknown referenced texture " +
+              // texture.getValue().stringValue(""));
             }
             textures.put(texture.getName(), referencedTexture);
           } else {
@@ -724,7 +771,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
     @Override
     public boolean intersect(Ray ray, Scene scene) {
       if (isBlockEntity()) {
-        return false;
+        //return false;
       }
       boolean hit = false;
       ray.t = Double.POSITIVE_INFINITY;
@@ -751,13 +798,13 @@ public class ResourcepackBlockProvider implements BlockProvider {
         public Collection<Primitive> primitives(Vector3 offset) {
           Collection<Primitive> faces = new LinkedList<>();
           Transform transform =
-              Transform.NONE.translate(
-                  position.x + offset.x, position.y + offset.y, position.z + offset.z);
+            Transform.NONE.translate(
+              position.x + offset.x, position.y + offset.y, position.z + offset.z);
           for (JsonModelElement element : elements) {
             for (JsonModelFace face : element.faces) {
               if (face != null && face.quad != null) {
                 face.quad.addTriangles(
-                    faces, new TextureMaterial(textures.get(face.texture)), transform);
+                  faces, new TextureMaterial(textures.get(face.texture)), transform);
               }
             }
           }
@@ -845,6 +892,9 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
     @Override
     public boolean intersect(Ray ray, Scene scene) {
+      if (isBlockEntity()) {
+        //return false;
+      }
       boolean hit = false;
       ray.t = Double.POSITIVE_INFINITY;
       for (JsonModel part : parts) {
@@ -867,7 +917,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
           return true;
         }
       }
-      return false;
+      return true;
     }
 
     @Override
@@ -877,13 +927,15 @@ public class ResourcepackBlockProvider implements BlockProvider {
         public Collection<Primitive> primitives(Vector3 offset) {
           Collection<Primitive> faces = new LinkedList<>();
           Transform transform =
-              Transform.NONE.translate(
-                  position.x + offset.x, position.y + offset.y, position.z + offset.z);
+            Transform.NONE.translate(
+              position.x + offset.x, position.y + offset.y, position.z + offset.z);
           for (JsonModel part : parts) {
             for (JsonModelElement element : part.elements) {
               for (JsonModelFace face : element.faces) {
-                face.quad.addTriangles(
+                if (face != null && face.quad != null) {
+                  face.quad.addTriangles(
                     faces, new TextureMaterial(part.textures.get(face.texture)), transform);
+                }
               }
             }
           }
