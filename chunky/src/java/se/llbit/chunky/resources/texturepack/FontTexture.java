@@ -29,26 +29,39 @@ public class FontTexture {
     }
   }
 
-  private Map<Character, Glyph> glyphs = new HashMap<>();
+  /** Maps code points to glyphs */
+  private Map<Integer, Glyph> glyphs = new HashMap<>();
 
-  public Glyph getGlyph(char c) {
-    return glyphs.get(c);
+  public Glyph getGlyph(int codePoint) {
+    return glyphs.get(codePoint);
   }
 
-  public void setGlyph(char c, Glyph glyph) {
-    glyphs.put(c, glyph);
+  public void setGlyph(int codePoint, Glyph glyph) {
+    glyphs.put(codePoint, glyph);
   }
 
-  public boolean containsGlyph(char c) {
-    return glyphs.containsKey(c);
+  public boolean containsGlyph(int codePoint) {
+    return glyphs.containsKey(codePoint);
   }
 
   public void clear() {
     glyphs.clear();
   }
 
+  /**
+   * Load a glyph from a spritemap where all glyphs have the same dimensions.
+   *
+   * @param spritemap Spritemap
+   * @param x0 Column of the glyph
+   * @param y0 Row of the glyph
+   * @param codePoint Code point the glyph corresponds to
+   * @param width Width of the glyphs, in pixels
+   * @param height Height of the glyphs, in pixels
+   * @param ascent The number of pixels to move the glyph up in the line, used e.g. for accents on
+   *     capital letters
+   */
   void loadGlyph(
-      BitmapImage spritemap, int x0, int y0, char ch, int width, int height, int ascent) {
+      BitmapImage spritemap, int x0, int y0, int codePoint, int width, int height, int ascent) {
     int xmin = width;
     int xmax = 0;
     int[] lines = new int[height];
@@ -66,6 +79,6 @@ public class FontTexture {
         }
       }
     }
-    setGlyph(ch, new Glyph(lines, xmin, xmax, width, height, ascent));
+    setGlyph(codePoint, new Glyph(lines, xmin, xmax, width, height, ascent));
   }
 }
