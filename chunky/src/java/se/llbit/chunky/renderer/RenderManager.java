@@ -129,6 +129,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
           sceneProvider.withSceneProtected(scene -> {
             if (reason.overwriteState()) {
               bufferedScene.copyState(scene);
+            }
+            if(reason == ResetReason.MATERIALS_CHANGED || reason == ResetReason.SCENE_LOADED) {
               scene.importMaterials();
             }
             bufferedScene.copyTransients(scene);

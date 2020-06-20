@@ -14,11 +14,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * The block palette maps every block type to a numeric ID and can get the <code>{@link Block}</code>
+ * instance that corresponds to an ID. Only one instance of every block configuration will be created and then
+ * re-used for all blocks of that type with the same configuration (i.e. the same block data).
+ * The numerical IDs are used to efficiently store the blocks in the octree.
+ *
+ * This class also manages material properties.
+ */
 public class BlockPalette {
   private static final int BLOCK_PALETTE_VERSION = 4;
   public final int airId, stoneId, waterId;
 
-  private static final Map<String, Consumer<Block>> materialProperties = new HashMap<>();
+  private final Map<String, Consumer<Block>> materialProperties;
 
   /** Stone blocks are used for filling invisible regions in the Octree. */
   public final Block stone, water;
@@ -29,6 +37,7 @@ public class BlockPalette {
   public BlockPalette(Map<BlockSpec, Integer> initialMap, List<Block> initialList) {
     this.blockMap = initialMap;
     this.palette = initialList;
+    this.materialProperties = getDefaultMaterialProperties();
     CompoundTag airTag = new CompoundTag();
     airTag.add("Name", new StringTag("minecraft:air"));
     CompoundTag stoneTag = new CompoundTag();
@@ -48,6 +57,7 @@ public class BlockPalette {
 
   /**
    * Adds a new block to the palette and returns the palette index.
+   *
    * @param tag NBT tag for the block.
    * @return the palette index of the block in this palette.
    */
@@ -68,30 +78,68 @@ public class BlockPalette {
     return id;
   }
 
-  private static void applyMaterial(Block block) {
+  public Block get(int id) {
+    return palette.get(id);
+  }
+
+  /**
+   * Updates the material properties of the block and applies them.
+   *
+   * @param name the id of the block to be updated, e.g. "minecraft:stone"
+   * @param properties function that modifies the block's properties
+   */
+  public void updateProperties(String name, Consumer<Block> properties) {
+    materialProperties.put(name, properties);
+    blockMap.forEach(
+        (spec, id) -> {
+          Block block = palette.get(id);
+          if (block.name.equals(name)) {
+            applyMaterial(block);
+          }
+        });
+  }
+
+  /**
+   * Apply the material properties that were registered via <code>
+   * {@link #updateProperties(String, Consumer)}</code> to the given block.
+   *
+   * @param block Block to apply the material configuration to
+   */
+  public void applyMaterial(Block block) {
     Consumer<Block> properties = materialProperties.get(block.name);
     if (properties != null) {
       properties.accept(block);
     }
   }
 
-  public Block get(int id) {
-    return palette.get(id);
+  /**
+   * Apply all material properties that were registered with <code>
+   * {@link #updateProperties(String, Consumer)}</code> for all blocks in this palette.
+   */
+  public void applyMaterials() {
+    palette.forEach(this::applyMaterial);
   }
 
-  static {
-    materialProperties.put("minecraft:water", block -> {
-      block.specular = 0.12f;
-      block.ior = 1.333f;
-      block.refractive = true;
-    });
-    materialProperties.put("minecraft:lava", block -> {
-      block.emittance = 1.0f;
-    });
-    Consumer<Block> glassConfig = block -> {
-      block.ior = 1.52f;
-      block.refractive = true;
-    };
+  /** @return Default material properties. */
+  public static Map<String, Consumer<Block>> getDefaultMaterialProperties() {
+    Map<String, Consumer<Block>> materialProperties = new HashMap<>();
+    materialProperties.put(
+        "minecraft:water",
+        block -> {
+          block.specular = 0.12f;
+          block.ior = 1.333f;
+          block.refractive = true;
+        });
+    materialProperties.put(
+        "minecraft:lava",
+        block -> {
+          block.emittance = 1.0f;
+        });
+    Consumer<Block> glassConfig =
+        block -> {
+          block.ior = 1.52f;
+          block.refractive = true;
+        };
     materialProperties.put("minecraft:glass", glassConfig);
     materialProperties.put("minecraft:glass_pane", glassConfig);
     materialProperties.put("minecraft:white_stained_glass", glassConfig);
@@ -258,11 +306,10 @@ public class BlockPalette {
         }
       }
     });
+    return materialProperties;
   }
 
-  /**
-   * Writes the block specifications to file.
-   */
+  /** Writes the block specifications to file. */
   public void write(DataOutputStream out) throws IOException {
     out.writeInt(BLOCK_PALETTE_VERSION);
     BlockSpec[] specs = new BlockSpec[blockMap.size()];
@@ -286,9 +333,7 @@ public class BlockPalette {
     for (int i = 0; i < numBlocks; ++i) {
       BlockSpec spec = BlockSpec.deserialize(in);
       blockMap.put(spec, i);
-      Block block = spec.toBlock();
-      applyMaterial(block);
-      blocks.add(block);
+      blocks.add(spec.toBlock());
     }
     return new BlockPalette(blockMap, blocks);
   }

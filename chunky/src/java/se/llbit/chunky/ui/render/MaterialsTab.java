@@ -29,8 +29,10 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.*;
+import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.world.ExtraMaterials;
@@ -40,6 +42,7 @@ import se.llbit.chunky.world.MaterialStore;
 import java.net.URL;
 import java.util.Collection;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 // TODO: customization of textures, base color, etc.
 public class MaterialsTab extends HBox implements RenderControlsTab, Initializable {
@@ -60,7 +63,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     ObservableList<String> blockIds = FXCollections.observableArrayList();
     blockIds.addAll(MaterialStore.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());
-    blockIds.addAll(MaterialStore.idMap.keySet());
+    blockIds.addAll(MaterialStore.blockIds);
     FilteredList<String> filteredList = new FilteredList<>(blockIds);
     listView = new ListView<>(filteredList);
     listView.getSelectionModel().selectedItemProperty().addListener(
@@ -118,14 +121,13 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
         ior.set(material.ior);
         materialExists = true;
       }
-    } else if (MaterialStore.idMap.containsKey(materialName)) {
-      Material material = MaterialStore.idMap.get(materialName);
-      if (material != null) {
-        emittance.set(material.emittance);
-        specular.set(material.specular);
-        ior.set(material.ior);
-        materialExists = true;
-      }
+    } else if (MaterialStore.blockIds.contains(materialName)) {
+      Block block = new MinecraftBlock(materialName.substring(10), Texture.air);
+      scene.getPalette().applyMaterial(block);
+      emittance.set(block.emittance);
+      specular.set(block.specular);
+      ior.set(block.ior);
+      materialExists = true;
     }
     if (materialExists) {
       emittance.onValueChange(value -> scene.setEmittance(materialName, value.floatValue()));

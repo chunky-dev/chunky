@@ -38,6 +38,7 @@ import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
+import se.llbit.chunky.ui.render.MaterialsTab;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -571,6 +572,11 @@ public class Scene implements JsonSerializable, Refreshable {
   public boolean getEmittersEnabled() {
     return emittersEnabled;
   }
+
+  /**
+   * @return The <code>BlockPallete</code> for the scene
+   */
+  public BlockPalette getPalette() { return palette; }
 
   /**
    * Trace a ray in this scene. This offsets the ray origin to
@@ -1748,6 +1754,7 @@ public class Scene implements JsonSerializable, Refreshable {
         grassTexture = data.grassColors;
         foliageTexture = data.foliageColors;
         palette = data.palette;
+        palette.applyMaterials();
         task.update(2);
         Log.info("Octree loaded");
         calculateOctreeOrigin(chunks);
@@ -2559,12 +2566,16 @@ public class Scene implements JsonSerializable, Refreshable {
    * forces the rendering to restart.
    */
   @Override public synchronized void refresh() {
+    refresh(ResetReason.SETTINGS_CHANGED);
+  }
+
+  private synchronized void refresh(ResetReason reason) {
     if (mode == RenderMode.PAUSED) {
       mode = RenderMode.RENDERING;
     }
     spp = 0;
     renderTime = 0;
-    setResetReason(ResetReason.SETTINGS_CHANGED);
+    setResetReason(reason);
     notifyAll();
   }
 
@@ -2689,21 +2700,24 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void importMaterials() {
-    MaterialStore.loadDefaultMaterialProperties();
     ExtraMaterials.loadDefaultMaterialProperties();
     MaterialStore.collections.forEach((name, coll) -> importMaterial(materials, name, coll));
-    MaterialStore.idMap.forEach((name, block) -> importMaterial(materials, name, block));
-    ExtraMaterials.idMap.forEach((name, block) -> importMaterial(materials, name, block));
-  }
-
-  private void importMaterial(Map<String, JsonValue> propertyMap, String name, Material material) {
-    JsonValue value = propertyMap.get(name);
-    if (value != null) {
-      JsonObject properties = value.object();
-      material.emittance = properties.get("emittance").floatValue(material.emittance);
-      material.specular = properties.get("specular").floatValue(material.specular);
-      material.ior = properties.get("ior").floatValue(material.ior);
-    }
+    MaterialStore.blockIds.forEach((name) -> {
+      JsonValue properties = materials.get(name);
+      if (properties != null) {
+        palette.updateProperties(name, block -> {
+          block.emittance = properties.asObject().get("emittance").floatValue(block.emittance);
+          block.specular = properties.asObject().get("specular").floatValue(block.specular);
+          block.ior = properties.asObject().get("ior").floatValue(block.ior);
+        });
+      }
+    });
+    ExtraMaterials.idMap.forEach((name, material) -> {JsonValue properties = materials.get(name);
+      if (properties != null) {
+        material.emittance = properties.asObject().get("emittance").floatValue(material.emittance);
+        material.specular = properties.asObject().get("specular").floatValue(material.specular);
+        material.ior = properties.asObject().get("ior").floatValue(material.ior);
+      }});
   }
 
   private void importMaterial(Map<String, JsonValue> propertyMap, String name,
@@ -2726,7 +2740,7 @@ public class Scene implements JsonSerializable, Refreshable {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("emittance", Json.of(value));
     materials.put(materialName, material);
-    refresh();
+    refresh(ResetReason.MATERIALS_CHANGED);
   }
 
   /**
@@ -2736,7 +2750,7 @@ public class Scene implements JsonSerializable, Refreshable {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("specular", Json.of(value));
     materials.put(materialName, material);
-    refresh();
+    refresh(ResetReason.MATERIALS_CHANGED);
   }
 
   /**
@@ -2746,7 +2760,7 @@ public class Scene implements JsonSerializable, Refreshable {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("ior", Json.of(value));
     materials.put(materialName, material);
-    refresh();
+    refresh(ResetReason.MATERIALS_CHANGED);
   }
 
   /**

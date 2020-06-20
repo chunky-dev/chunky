@@ -23,6 +23,7 @@ package se.llbit.chunky.renderer;
 public enum ResetReason {
   NONE(false),
   MODE_CHANGE(false),
+  MATERIALS_CHANGED(true),
   SETTINGS_CHANGED(true),
   SCENE_LOADED(true);
 
@@ -32,7 +33,6 @@ public enum ResetReason {
   ResetReason(boolean overwrite) {
     overwriteState = overwrite;
   }
-
   public boolean overwriteState() {
     return overwriteState;
   }
