@@ -2703,21 +2703,21 @@ public class Scene implements JsonSerializable, Refreshable {
     ExtraMaterials.loadDefaultMaterialProperties();
     MaterialStore.collections.forEach((name, coll) -> importMaterial(materials, name, coll));
     MaterialStore.blockIds.forEach((name) -> {
-      palette.updateProperties(name, block -> {
-        importMaterial(materials, name, block);
-      });
+      JsonValue properties = materials.get(name);
+      if (properties != null) {
+        palette.updateProperties(name, block -> {
+          block.emittance = properties.asObject().get("emittance").floatValue(block.emittance);
+          block.specular = properties.asObject().get("specular").floatValue(block.specular);
+          block.ior = properties.asObject().get("ior").floatValue(block.ior);
+        });
+      }
     });
-    ExtraMaterials.idMap.forEach((name, material) -> importMaterial(materials, name, material));
-  }
-
-  private void importMaterial(Map<String, JsonValue> propertyMap, String name, Material material) {
-    JsonValue value = propertyMap.get(name);
-    if (value != null) {
-      JsonObject properties = value.object();
-      material.emittance = properties.get("emittance").floatValue(material.emittance);
-      material.specular = properties.get("specular").floatValue(material.specular);
-      material.ior = properties.get("ior").floatValue(material.ior);
-    }
+    ExtraMaterials.idMap.forEach((name, material) -> {JsonValue properties = materials.get(name);
+      if (properties != null) {
+        material.emittance = properties.asObject().get("emittance").floatValue(material.emittance);
+        material.specular = properties.asObject().get("specular").floatValue(material.specular);
+        material.ior = properties.asObject().get("ior").floatValue(material.ior);
+      }});
   }
 
   private void importMaterial(Map<String, JsonValue> propertyMap, String name,
