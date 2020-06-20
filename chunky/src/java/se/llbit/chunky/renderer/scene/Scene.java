@@ -1754,6 +1754,7 @@ public class Scene implements JsonSerializable, Refreshable {
         grassTexture = data.grassColors;
         foliageTexture = data.foliageColors;
         palette = data.palette;
+        palette.applyMaterials();
         task.update(2);
         Log.info("Octree loaded");
         calculateOctreeOrigin(chunks);
@@ -2706,7 +2707,7 @@ public class Scene implements JsonSerializable, Refreshable {
         importMaterial(materials, name, block);
       });
     });
-    ExtraMaterials.idMap.forEach((name, block) -> importMaterial(materials, name, block));
+    ExtraMaterials.idMap.forEach((name, material) -> importMaterial(materials, name, material));
   }
 
   private void importMaterial(Map<String, JsonValue> propertyMap, String name, Material material) {

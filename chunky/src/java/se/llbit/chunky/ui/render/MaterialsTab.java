@@ -122,18 +122,12 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
         materialExists = true;
       }
     } else if (MaterialStore.blockIds.contains(materialName)) {
-      BlockPalette palette = scene.getPalette();
-      Block material = new MinecraftBlock(materialName.substring(10), Texture.air);
-      if(palette.hasDefinition(materialName)) { //If the palette has a definition for the block, grab it.
-        Consumer<Block> def = scene.getPalette().getProperties(materialName);
-        def.accept(material);
-      }
-      if (material != null) {
-        emittance.set(material.emittance);
-        specular.set(material.specular);
-        ior.set(material.ior);
-        materialExists = true;
-      }
+      Block block = new MinecraftBlock(materialName.substring(10), Texture.air);
+      scene.getPalette().applyMaterial(block);
+      emittance.set(block.emittance);
+      specular.set(block.specular);
+      ior.set(block.ior);
+      materialExists = true;
     }
     if (materialExists) {
       emittance.onValueChange(value -> scene.setEmittance(materialName, value.floatValue()));
