@@ -12,10 +12,6 @@ import se.llbit.util.NotNull;
 public class BlockSpec {
   public static final List<BlockProvider> blockProviders = new LinkedList<>();
 
-  static {
-    blockProviders.add(new MinecraftBlockProvider());
-  }
-
   private final Tag tag;
 
   public BlockSpec(@NotNull Tag tag) {

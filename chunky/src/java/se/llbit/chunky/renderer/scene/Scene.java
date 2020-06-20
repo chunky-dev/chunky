@@ -2699,7 +2699,6 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public void importMaterials() {
-    MaterialStore.loadDefaultMaterialProperties();
     ExtraMaterials.loadDefaultMaterialProperties();
     MaterialStore.collections.forEach((name, coll) -> importMaterial(materials, name, coll));
     MaterialStore.blockIds.forEach((name) -> {

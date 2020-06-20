@@ -8,7 +8,6 @@ import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.nbt.Tag;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
