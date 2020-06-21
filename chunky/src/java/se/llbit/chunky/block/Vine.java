@@ -37,6 +37,8 @@ public class Vine extends MinecraftBlockTranslucent {
       connections = BlockData.CONNECTED_SOUTH;
     }
     this.connections = connections;
+
+    this.solid = false;
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {
