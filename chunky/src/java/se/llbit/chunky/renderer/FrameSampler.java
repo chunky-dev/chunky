@@ -16,8 +16,52 @@ import java.util.concurrent.BlockingQueue;
  * A FrameSampler decides how samples are taken and reconstructs the image from them.
  */
 public abstract class FrameSampler {
-  public static final byte SAMPLER_TYPE_UNIFORM = 1;
-  public static final byte SAMPLER_TYPE_ADAPTIVE = 2;
+  public enum Type {
+    /**
+     * {@see UniformFrameSampler}
+     */
+    UNIFORM(1),
+
+    /**
+     * {@see AdaptiveFrameSampler}
+     */
+    ADAPTIVE(2);
+
+    /**
+     * This tag is used to determine the type of the sampler when (de)serializing from and to
+     * data streams.
+     */
+    public final byte tag;
+
+    private Type(int tag) {
+      this.tag = (byte)tag;
+    }
+
+    /**
+     * Returns the enum variant associated with the given tag.
+     * @param tag The tag representing the type
+     * @return The enum variant associated with the given tag
+     * @throws IllegalArgumentException if an invalid tag was given
+     */
+    public static Type from(byte tag) throws IllegalArgumentException {
+      switch (tag) {
+        case 1:
+          return UNIFORM;
+        case 2:
+          return ADAPTIVE;
+        default:
+          throw new IllegalArgumentException("Invalid frame sampler type: " + (int)tag);
+      }
+    }
+
+    /**
+     * Returns this type as a byte value.
+     * @return a byte representing this type.
+     */
+    public byte asByte() {
+      return this.tag;
+    }
+  }
 
   /**
    * Feed sample jobs to the workers for the current frame.
@@ -145,15 +189,17 @@ public abstract class FrameSampler {
    * @throws IOException
    */
   public static FrameSampler read(DataInput inStream) throws IOException {
-    byte samplerType = inStream.readByte();
+    Type samplerType = Type.from(inStream.readByte());
 
     switch (samplerType) {
-      case SAMPLER_TYPE_UNIFORM:
+      case UNIFORM:
         return new UniformFrameSampler(inStream);
-      case SAMPLER_TYPE_ADAPTIVE:
+      case ADAPTIVE:
         throw new NotImplementedException();
       default:
-        throw new IOException("Invalid frame sampler type: " + (int)samplerType);
+        // if the tag is not a valid type, Type.from() will throw an exception, otherwise we're
+        // guaranteed a valid Type, which means this default statement should never be reached.
+        throw new RuntimeException("Reached unreachable statement");
     }
   }
 

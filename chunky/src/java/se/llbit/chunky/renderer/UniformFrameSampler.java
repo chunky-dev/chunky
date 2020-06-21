@@ -155,7 +155,7 @@ public class UniformFrameSampler extends FrameSampler {
 
   @Override
   public void write(DataOutput outStream) throws IOException {
-    outStream.writeByte(SAMPLER_TYPE_UNIFORM);
+    outStream.writeByte(Type.UNIFORM.asByte());
 
     outStream.writeInt(width);
     outStream.writeInt(height);
