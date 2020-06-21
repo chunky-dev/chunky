@@ -1,11 +1,9 @@
 package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.util.TaskTracker;
 
 import java.io.*;
 import java.util.concurrent.BlockingQueue;
-import java.util.zip.GZIPInputStream;
 
 /**
  * A frame sampler that takes the same amount of samples for each pixel.
@@ -115,12 +113,12 @@ public class UniformFrameSampler extends FrameSampler {
   }
 
   @Override
-  public void addSample(int x, int y, double r, double g, double b, int sample_count) {
+  public void addSample(int x, int y, double r, double g, double b, int sampleCount) {
     int index = (x + y * width) * 3;
 
-    samples[index + 0] = (samples[index + 0] * spp + r * sample_count) / (spp + sample_count);
-    samples[index + 1] = (samples[index + 1] * spp + g * sample_count) / (spp + sample_count);
-    samples[index + 2] = (samples[index + 2] * spp + b * sample_count) / (spp + sample_count);
+    samples[index + 0] = (samples[index + 0] * spp + r * sampleCount) / (spp + sampleCount);
+    samples[index + 1] = (samples[index + 1] * spp + g * sampleCount) / (spp + sampleCount);
+    samples[index + 2] = (samples[index + 2] * spp + b * sampleCount) / (spp + sampleCount);
   }
 
   @Override

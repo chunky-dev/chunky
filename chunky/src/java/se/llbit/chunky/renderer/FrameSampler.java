@@ -5,7 +5,6 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
-import se.llbit.util.TaskTracker;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.DataInput;
@@ -38,9 +37,9 @@ public abstract class FrameSampler {
    * @param r radiance value in the red channel
    * @param g radiance value in the green channel
    * @param b radiance value in the blue channel
-   * @param sample_count the number of samples taken to reach the given radiance
+   * @param sampleCount the number of samples taken to reach the given radiance
    */
-  public abstract void addSample(int x, int y, double r, double g, double b, int sample_count);
+  public abstract void addSample(int x, int y, double r, double g, double b, int sampleCount);
 
   /**
    * Reconstructs pixel (x, y) from the samples and writes it to the output bitmap.
