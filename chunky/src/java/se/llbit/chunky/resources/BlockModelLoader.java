@@ -4,6 +4,7 @@ import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.ResourcepackBlockProvider;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.world.MaterialStore;
 import se.llbit.chunky.world.model.JsonModel;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
@@ -133,6 +134,9 @@ public class BlockModelLoader implements ResourcePackLoader.PackLoader {
             + block.path().toString());
       }
     });
+
+    MaterialStore.blockIds.addAll(blocks.keySet());
+
     return false;
   }
 }
