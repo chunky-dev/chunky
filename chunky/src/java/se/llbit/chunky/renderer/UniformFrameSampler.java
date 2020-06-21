@@ -3,36 +3,81 @@ package se.llbit.chunky.renderer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
+import java.io.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.zip.GZIPInputStream;
 
 /**
- * This frame sampler takes the same amount of samples for each pixel.
+ * A frame sampler that takes the same amount of samples for each pixel.
  */
 public class UniformFrameSampler extends FrameSampler {
 
   // TODO Document all the member values:
   private int spp;
 
-  private final int tileWidth;
-  private final int sppPerFrame;
   private final int width;
   private final int height;
   private final double[] samples;
+  private final int sppPerFrame;
+  private volatile RenderTask[] tiles;
+  private final int tileWidth;
 
-  private volatile RenderTask[] tiles = new RenderTask[0];
-  private int numJobs = 0;
-
+  /**
+   * Creates a UniformFrameSampler from a scene.
+   * @param scene the scene that defines how large the buffers must be
+   * @param tileWidth the size of tiles for render workers
+   * @param sppPerFrame number of samples per pixels to take each frame
+   */
   public UniformFrameSampler(Scene scene, int tileWidth, int sppPerFrame) {
     int width = scene.width;
     int height = scene.height;
 
     this.spp = 0;
 
-    this.tileWidth = tileWidth;
-    this.sppPerFrame = sppPerFrame;
     this.width = width;
     this.height = height;
     this.samples = new double[width * height * 3];
+    this.sppPerFrame = sppPerFrame;
+    this.tileWidth = tileWidth;
+
+    initializeTiles();
+  }
+
+  /**
+   * Reads a UniformFrameSampler from the given input stream.
+   * The format must conform with UniformFrameSampler.write().
+   * @param inStream the data stream from which the uniform sample is read
+   * @throws IOException
+   */
+  public UniformFrameSampler(DataInput inStream) throws IOException {
+    this.width = inStream.readInt();
+    this.height = inStream.readInt();
+    this.spp = inStream.readInt();
+    this.tileWidth = inStream.readInt();
+    this.sppPerFrame = inStream.readInt();
+
+    this.samples = new double[width * height];
+    for (int index = 0; index < samples.length; ++index) {
+      this.samples[index] = inStream.readDouble();
+    }
+
+    initializeTiles();
+  }
+
+  /**
+   * Creates a UniformFrameSampler from a legacy render dump.
+   * @param legacyDump the legacy dump from which data will be extracted
+   * @param tileWidth the size of tiles for render workers
+   * @param sppPerFrame number of samples per pixels to take each frame
+   */
+  public UniformFrameSampler(LegacyDump legacyDump, int tileWidth, int sppPerFrame) {
+    this.width = legacyDump.width;
+    this.height = legacyDump.height;
+    this.spp = legacyDump.spp;
+    this.samples = legacyDump.samples;
+
+    this.sppPerFrame = sppPerFrame;
+    this.tileWidth = tileWidth;
 
     initializeTiles();
   }
@@ -43,7 +88,7 @@ public class UniformFrameSampler extends FrameSampler {
   private void initializeTiles() {
     int xjobs = (width + (tileWidth - 1)) / tileWidth;
     int yjobs = (height + (tileWidth - 1)) / tileWidth;
-    numJobs = xjobs * yjobs;
+    int numJobs = xjobs * yjobs;
     if (tiles.length != numJobs) {
       tiles = new RenderTask[numJobs];
     }
@@ -88,38 +133,40 @@ public class UniformFrameSampler extends FrameSampler {
   }
 
   @Override
-  public void mergeWith(FrameSampler otherSampler, TaskTracker taskTracker) throws IllegalArgumentException {
-    try (TaskTracker.Task task = taskTracker.task("Merge dumps")) {
-      if (!(otherSampler instanceof UniformFrameSampler)) {
-        throw new IllegalArgumentException(
-                "A UniformFrameSampler can only merge with another UniformFrameSampler"
-        );
-      }
+  public void mergeWith(FrameSampler otherSampler) throws IllegalArgumentException {
+    if (!(otherSampler instanceof UniformFrameSampler)) {
+      throw new IllegalArgumentException(
+              "A UniformFrameSampler can only merge with another UniformFrameSampler"
+      );
+    }
 
-      UniformFrameSampler other = (UniformFrameSampler) otherSampler;
-      if (other.width != this.width || other.height != this.height) {
-        throw new IllegalArgumentException("Sizes differ, cannot merge");
-      }
+    UniformFrameSampler other = (UniformFrameSampler) otherSampler;
+    if (other.width != this.width || other.height != this.height) {
+      throw new IllegalArgumentException("Sizes differ, cannot merge");
+    }
 
-      double thisWeight = (double)spp / (spp + other.spp);
-      double otherWeight = 1 - thisWeight;
+    double thisWeight = (double)spp / (spp + other.spp);
+    double otherWeight = 1 - thisWeight;
 
-      for (int y = 0; y < height; ++y) {
-        task.update(height, y + 1);
-        for (int x = 0; x < width; ++x) {
-          int index = (x + y * width) * 3;
-          this.samples[index + 0] = this.samples[index + 0] * thisWeight
-                  + other.samples[index + 0] * otherWeight;
-          this.samples[index + 1] = this.samples[index + 1] * thisWeight
-                  + other.samples[index + 1] * otherWeight;
-          this.samples[index + 2] = this.samples[index + 2] * thisWeight
-                  + other.samples[index + 2] * otherWeight;
-        }
-      }
+    for (int index = 0; index < samples.length; ++index) {
+      this.samples[index] = this.samples[index] * thisWeight + other.samples[index] * otherWeight;
+    }
 
-      spp += other.spp;
-    } catch (IllegalArgumentException e) {
-      throw e;
+    spp += other.spp;
+  }
+
+  @Override
+  public void write(DataOutput outStream) throws IOException {
+    outStream.writeByte(SAMPLER_TYPE_UNIFORM);
+
+    outStream.writeInt(width);
+    outStream.writeInt(height);
+    outStream.writeInt(spp);
+    outStream.writeInt(tileWidth);
+    outStream.writeInt(sppPerFrame);
+
+    for (double value : samples) {
+      outStream.writeDouble(value);
     }
   }
 }

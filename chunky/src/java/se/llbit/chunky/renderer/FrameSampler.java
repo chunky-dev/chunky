@@ -6,13 +6,20 @@ import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.util.TaskTracker;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
 /**
  * A FrameSampler decides how samples are taken and reconstructs the image from them.
  */
 public abstract class FrameSampler {
+  public static final byte SAMPLER_TYPE_UNIFORM = 1;
+  public static final byte SAMPLER_TYPE_ADAPTIVE = 2;
+
   /**
    * Feed sample jobs to the workers for the current frame.
    * @param jobQueue
@@ -133,11 +140,35 @@ public abstract class FrameSampler {
   }
 
   /**
+   * Reads a frame sampler from the given input stream.
+   * @param inStream the stream from which the frame sampler will be read
+   * @return the frame sampler that was read from the input stream
+   * @throws IOException
+   */
+  public static FrameSampler read(DataInput inStream) throws IOException {
+    byte samplerType = inStream.readByte();
+
+    switch (samplerType) {
+      case SAMPLER_TYPE_UNIFORM:
+        return new UniformFrameSampler(inStream);
+      case SAMPLER_TYPE_ADAPTIVE:
+        throw new NotImplementedException();
+      default:
+        throw new IOException("Invalid frame sampler type: " + (int)samplerType);
+    }
+  }
+
+  /**
+   * Writes the frame sampler to the output stream (to dump it to file for instance).
+   * @param outStream the output stream the frame sampler will be written to
+   */
+  public abstract void write(DataOutput outStream) throws IOException;
+
+  /**
    * Merges the samples of the provided sampler.
    * @param otherSampler The sampler from which the samples must be merged
-   * @param taskTracker A task tracker to follow the progress of the merge
    * @throws IllegalArgumentException when {@code otherSampler} is of the wrong type or the wrong size
    */
-  public abstract void mergeWith(FrameSampler otherSampler, TaskTracker taskTracker)
+  public abstract void mergeWith(FrameSampler otherSampler)
           throws IllegalArgumentException;
 }
