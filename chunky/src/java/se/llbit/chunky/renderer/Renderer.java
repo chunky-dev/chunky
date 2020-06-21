@@ -21,6 +21,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.util.TaskTracker;
 
+import java.io.File;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -76,6 +77,28 @@ public interface Renderer {
   RenderStatus getRenderStatus();
 
   /**
+   * Save the render state.
+   * @param outputFile the name of the dump file
+   * @param taskTracker progress tracking for this save operation
+   */
+  void saveDump(File outputFile, TaskTracker taskTracker);
+
+  /**
+   * Load the render state from the specified file.
+   * @param inputFile the name of the file from which to load the render state
+   * @param taskTracker progress tracking for this load operation
+   * @return {@code true} if loading was successful
+   */
+  boolean loadDump(File inputFile, TaskTracker taskTracker);
+
+  /**
+   * Saves a snapshot of the current frame to the given directory.
+   * @param directory the directory in which the snapshot will be saved
+   * @param taskTracker progress tracking for this save operation
+   */
+  void saveSnapshot(File directory, TaskTracker taskTracker);
+
+  /**
    * Start up the renderer.
    *
    * <p>This should start all worker threads used by the renderer.
@@ -89,8 +112,6 @@ public interface Renderer {
    * @throws InterruptedException
    */
   void join() throws InterruptedException;
-
-  void withSampleBufferProtected(SampleBufferConsumer consumer);
 
   /**
    * Shut down the renderer.
