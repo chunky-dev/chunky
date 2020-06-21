@@ -78,25 +78,25 @@ public interface Renderer {
 
   /**
    * Save the render state.
-   * @param outputFile the name of the dump file
+   * @param outputFile the in which the dump will be saved
    * @param taskTracker progress tracking for this save operation
    */
   void saveDump(File outputFile, TaskTracker taskTracker);
 
   /**
    * Load the render state from the specified file.
-   * @param inputFile the name of the file from which to load the render state
+   * @param inputFile the file from which to load the render state
    * @param taskTracker progress tracking for this load operation
    * @return {@code true} if loading was successful
    */
   boolean loadDump(File inputFile, TaskTracker taskTracker);
 
   /**
-   * Saves a snapshot of the current frame to the given directory.
-   * @param directory the directory in which the snapshot will be saved
+   * Saves a snapshot of the current frame.
+   * @param outputFile the file in which the snapshot will be saved
    * @param taskTracker progress tracking for this save operation
    */
-  void saveSnapshot(File directory, TaskTracker taskTracker);
+  void saveSnapshot(File outputFile, TaskTracker taskTracker);
 
   /**
    * Start up the renderer.
