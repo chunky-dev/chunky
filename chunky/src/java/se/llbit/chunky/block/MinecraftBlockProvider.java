@@ -2306,13 +2306,20 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "structure_block":
         return structureBlock(tag);
       case "jigsaw":
-        // TODO [20w13a] the jigsaw block supports 12 orientations saved in the orientations tag
-        return new OrientedTexturedBlock(
-            "jigsaw",
-            BlockProvider.facing(tag, "up"),
-            Texture.jigsawSide,
-            Texture.jigsawTop,
-            Texture.jigsawBottom);
+        {
+          // as of 20w13a (1.16), the jigsaw block supports 12 orientations saved in the orientation tag
+          Tag orientation = tag.get("Properties").get("orientation");
+          if (orientation.isError()) {
+            return new OrientedTexturedBlock(
+                "jigsaw",
+                BlockProvider.facing(tag, "up"),
+                Texture.jigsawSide,
+                Texture.jigsawTop,
+                Texture.jigsawBottom);
+          } else {
+            return new JigsawBlock("jigsaw", orientation.stringValue("north_up"));
+          }
+        }
       case "soul_soil":
         return new MinecraftBlock("soul_soil", Texture.soulSoil);
       case "crimson_nylium":

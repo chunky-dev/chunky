@@ -882,6 +882,7 @@ public class Texture {
   public static final Texture crackedPolishedBlackstoneBricks = new Texture();
   public static final Texture quartzBricks = new Texture();
   public static final Texture chain = new Texture();
+  public static final Texture jigsawLock = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
