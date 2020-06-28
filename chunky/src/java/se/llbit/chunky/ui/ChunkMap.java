@@ -222,6 +222,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   private void drawSelectionRect(GraphicsContext gc) {
     ChunkView mapView = new ChunkView(view);  // Make thread-local copy.
 
+    double scale = mapView.scale / (float)mapView.chunkScale;
+
     ChunkPosition cp = end;
     gc.setStroke(javafx.scene.paint.Color.RED);
 
@@ -232,26 +234,26 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       int x1 = Math.max(cp0.x, cp1.x);
       int z0 = Math.min(cp0.z, cp1.z);
       int z1 = Math.max(cp0.z, cp1.z);
-      x0 = (int) (mapView.scale * (x0 - mapView.x0));
-      z0 = (int) (mapView.scale * (z0 - mapView.z0));
-      x1 = (int) (mapView.scale * (x1 - mapView.x0 + 1));
-      z1 = (int) (mapView.scale * (z1 - mapView.z0 + 1));
+      x0 = (int) (Math.round((mapView.scale * (x0 - mapView.x0)) / scale - 1) * scale);
+      z0 = (int) (Math.round((mapView.scale * (z0 - mapView.z0)) / scale) * scale);
+      x1 = (int) (Math.round((mapView.scale * (x1 - mapView.x0 + 1)) / scale - 1) * scale);
+      z1 = (int) (Math.round((mapView.scale * (z1 - mapView.z0 + 1)) / scale) * scale);
       gc.strokeRect(x0, z0, x1 - x0, z1 - z0);
     } else {
       // Test if hovered chunk is visible.
       if (mapView.isChunkVisible(cp)) {
 
         if (mapView.scale >= 16) {
-          int x0 = (int) (mapView.scale * (cp.x - mapView.x0));
-          int y0 = (int) (mapView.scale * (cp.z - mapView.z0));
+          int x0 = (int) (Math.round((mapView.scale * (cp.x - mapView.x0)) / scale - 1) * scale);
+          int y0 = (int) (Math.round((mapView.scale * (cp.z - mapView.z0)) / scale) * scale);
           int blockScale = mapView.scale;
           gc.strokeRect(x0, y0, blockScale, blockScale);
         } else {
           // Hovered region.
           int rx = cp.x >> 5;
           int rz = cp.z >> 5;
-          int x0 = (int) (mapView.scale * (rx * 32 - mapView.x0));
-          int y0 = (int) (mapView.scale * (rz * 32 - mapView.z0));
+          int x0 = (int) (Math.round((mapView.scale * (rx * 32 - mapView.x0)) / scale - 1) * scale);
+          int y0 = (int) (Math.round((mapView.scale * (rz * 32 - mapView.z0)) / scale) * scale);
           gc.strokeRect(x0, y0, mapView.scale * 32, mapView.scale * 32);
         }
       }
