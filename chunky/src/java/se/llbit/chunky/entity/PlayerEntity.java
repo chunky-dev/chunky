@@ -195,11 +195,11 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
     head.transform(Transform.NONE
         .translate(0, 4 / 16., 0)
+        .scale(headScale)
         .rotateX(headPose.x)
         .rotateY(headPose.y)
         .rotateZ(headPose.z)
         .translate(0, -4 / 16., 0)
-        .scale(headScale)
         .translate(0, 28 / 16., 0)
         .chain(worldTransform));
     head.addFrontFaces(primitives, texture, texture.headFront);
@@ -210,9 +210,12 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     head.addBottomFaces(primitives, texture, texture.headBottom);
     Box hat = new Box(-4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16.);
     hat.transform(Transform.NONE
+        .translate(0, 4 / 16., 0)
+        .scale(headScale)
         .rotateX(headPose.x)
         .rotateY(headPose.y)
         .rotateZ(headPose.z)
+        .translate(0, -4 / 16., 0)
         .translate(0, 28.2 / 16., 0)
         .chain(worldTransform));
     hat.addFrontFaces(primitives, texture, texture.hatFront);
@@ -309,11 +312,12 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     if (!headItem.isEmpty()) {
       Transform transform = Transform.NONE
           .translate(-0.5, -0.5, -0.5)
+          .translate(0, 4.2 / 16.0, 0)
+          .scale(headScale)
           .rotateX(headPose.x)
           .rotateY(headPose.y)
           .rotateZ(headPose.z)
-          .scale(headScale)
-          .translate(0, 28 / 16.0, 0)
+          .translate(0, (28 - 4) / 16.0, 0)
           .chain(worldTransform);
       addModel(faces, getHelmModel(headItem), transform);
     }
