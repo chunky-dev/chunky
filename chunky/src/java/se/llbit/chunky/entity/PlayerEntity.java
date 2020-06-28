@@ -309,11 +309,12 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     if (!headItem.isEmpty()) {
       Transform transform = Transform.NONE
           .translate(-0.5, -0.5, -0.5)
+          .translate(0, 4.2 / 16.0, 0)
+          .scale(headScale)
           .rotateX(headPose.x)
           .rotateY(headPose.y)
           .rotateZ(headPose.z)
-          .scale(headScale)
-          .translate(0, 28 / 16.0, 0)
+          .translate(0, (28 - 4) / 16.0, 0)
           .chain(worldTransform);
       addModel(faces, getHelmModel(headItem), transform);
     }
