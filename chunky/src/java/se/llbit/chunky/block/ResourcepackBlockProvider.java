@@ -302,11 +302,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
     private final Condition condition;
 
     public VariantsBlockVariant(String conditions, Block model) {
-      this.model = model;
-      this.condition = new BlockStateCondition(conditions);
-
-      // TODO handle rotation
-      // this.model = model.rotate(x, y, z);
+      this(new BlockStateCondition(conditions), model);
     }
 
     public VariantsBlockVariant(Condition condition, Block model) {
@@ -770,8 +766,8 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
     @Override
     public boolean intersect(Ray ray, Scene scene) {
-      if (isBlockEntity()) {
-        //return false;
+      if (isEntity()) {
+        return false;
       }
       boolean hit = false;
       ray.t = Double.POSITIVE_INFINITY;
@@ -787,12 +783,12 @@ public class ResourcepackBlockProvider implements BlockProvider {
     }
 
     @Override
-    public boolean isBlockEntity() {
+    public boolean isEntity() {
       return isBlockEntity;
     }
 
     @Override
-    public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+    public Entity toEntity(Vector3 position) {
       return new Entity(position) {
         @Override
         public Collection<Primitive> primitives(Vector3 offset) {
@@ -803,8 +799,12 @@ public class ResourcepackBlockProvider implements BlockProvider {
           for (JsonModelElement element : elements) {
             for (JsonModelFace face : element.faces) {
               if (face != null && face.quad != null) {
-                face.quad.addTriangles(
-                  faces, new TextureMaterial(textures.get(face.texture)), transform);
+                Texture texture = textures.get(face.texture);
+                if (texture != null) {
+                  face.quad.addTriangles(faces, new TextureMaterial(texture), transform);
+                } else {
+                  System.out.println("Missing texture " + face.texture + " for " + name);
+                }
               }
             }
           }
@@ -892,8 +892,8 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
     @Override
     public boolean intersect(Ray ray, Scene scene) {
-      if (isBlockEntity()) {
-        //return false;
+      if (isEntity()) {
+        return false;
       }
       boolean hit = false;
       ray.t = Double.POSITIVE_INFINITY;
@@ -911,9 +911,9 @@ public class ResourcepackBlockProvider implements BlockProvider {
     }
 
     @Override
-    public boolean isBlockEntity() {
+    public boolean isEntity() {
       for (JsonModel part : parts) {
-        if (part.isBlockEntity()) {
+        if (part.isEntity()) {
           return true;
         }
       }
@@ -921,7 +921,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
     }
 
     @Override
-    public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+    public Entity toEntity(Vector3 position) {
       return new Entity(position) {
         @Override
         public Collection<Primitive> primitives(Vector3 offset) {
@@ -933,8 +933,12 @@ public class ResourcepackBlockProvider implements BlockProvider {
             for (JsonModelElement element : part.elements) {
               for (JsonModelFace face : element.faces) {
                 if (face != null && face.quad != null) {
-                  face.quad.addTriangles(
-                    faces, new TextureMaterial(part.textures.get(face.texture)), transform);
+                  Texture texture = part.textures.get(face.texture);
+                  if (texture != null) {
+                    face.quad.addTriangles(faces, new TextureMaterial(texture), transform);
+                  } else {
+                    System.out.println("Missing texture " + face.texture + " for " + name);
+                  }
                 }
               }
             }
