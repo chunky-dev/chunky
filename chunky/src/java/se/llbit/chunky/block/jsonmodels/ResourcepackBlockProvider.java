@@ -620,7 +620,9 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
     public float[] getColor(Ray ray, Scene scene, Texture texture) {
       float[] color;
-      color = texture.getColor(ray.u, ray.v);
+      if (texture == null) {
+        color = new float[]{0.0f, 0.0f, 0.0f, 0.0f};
+      } else color = texture.getColor(ray.u, ray.v);
 
       if (tintindex == 0) {
         float[] biomeColor = ray.getBiomeGrassColor(scene);
