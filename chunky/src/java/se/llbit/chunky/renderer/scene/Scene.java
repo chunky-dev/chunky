@@ -2808,13 +2808,20 @@ public class Scene implements JsonSerializable, Refreshable {
    * @return The directory for this specific scene
    */
   public File getSceneDirectory() {
-    if (!sceneDirectory.exists()) { //First we check if the current scene has the newer version of the scene storage already
-      //If it doesnt, we can assume that either we are loading a new scene OR we are loading an existing scene
 
-      //To determine that, we want to first check if the json description file exists in the base scene directory. And,
-      //if it does exist, we know that the scene is being loaded from a previous scene
+    //If this file doesnt exist, we assume we are making a new scene, loading an old scene from the scene directory,
+    //or loading an old scene from THAT scenes directory (eg. scenes/some_scene/)
+    if (!sceneDirectory.exists()) {
+
+      //We first want to determine if the scene is being loaded from the scene directory, if it is, we simply return
+      //the default scene directory. (This would imply the old, non organized, scene storage format)
       File descFile = new File(PersistentSettings.getSceneDirectory(), name + Scene.EXTENSION);
       if (descFile.exists()) return PersistentSettings.getSceneDirectory();
+
+      //If that file didnt exist, we now want to determine if the scene is being loaded from the scenes specific directory
+      //(the new directory based format), so we check if it has a description file within the scenes specific folder
+      descFile = new File(PersistentSettings.getSceneDirectory() + File.separator + name, name + Scene.EXTENSION);
+      if (descFile.exists()) return descFile.getParentFile();
 
       //If it doesnt exist there, we can assume that the scene is a new scene, so we attempt to create a new directory
       //for this scene, and if that doesnt work, we default to the base scene directory.

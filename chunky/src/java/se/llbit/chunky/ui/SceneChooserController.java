@@ -171,7 +171,7 @@ public class SceneChooserController implements Initializable {
     Collections.sort(fileList);
     for (File sceneFile : fileList) {
 
-      try (JsonParser parser = new JsonParser(new FileInputStream(new File(sceneDir, sceneFile.getName())))){
+      try (JsonParser parser = new JsonParser(new FileInputStream(new File(sceneFile.getParentFile(), sceneFile.getName())))){
         SceneListItem item = new SceneListItem(parser.parse().object(), sceneFile);
         scenes.add(item);
 
