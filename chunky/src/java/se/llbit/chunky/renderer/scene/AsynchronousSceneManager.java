@@ -93,13 +93,13 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
    *
    * @param name the name of the scene to load.
    */
-  @Override public synchronized void loadScene(String name) {
+  @Override public synchronized void loadScene(File parentDirectory, String name) {
     if (currentTask != null) {
       Log.warn("Can't load scene right now.");
     } else {
       currentTask = () -> {
         try {
-          sceneManager.loadScene(name);
+          sceneManager.loadScene(parentDirectory, name);
         } catch (IOException e) {
           Log.warn("Could not load scene.\nReason: " + e.getMessage());
         } catch (InterruptedException e) {
@@ -182,13 +182,13 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
    *
    * @return the preferred scene name
    */
-  public static String preferredSceneName(RenderContext context, String name) {
+  public static String preferredSceneName(RenderContext context, File parentDirectory, String name) {
     String suffix = "";
     name = sanitizedSceneName(name);
     int count = 0;
     do {
       String targetName = name + suffix;
-      if (sceneNameIsAvailable(context, targetName)) {
+      if (sceneNameIsAvailable(context, parentDirectory, targetName)) {
         return targetName;
       }
       count += 1;
@@ -255,8 +255,8 @@ public class AsynchronousSceneManager extends Thread implements SceneManager {
    * @return <code>true</code> if the scene name does not collide with an
    * already existing scene
    */
-  public static boolean sceneNameIsAvailable(RenderContext context, String sceneName) {
-    return !context.getSceneDescriptionFile(sceneName).exists();
+  public static boolean sceneNameIsAvailable(RenderContext context, File parentDirectory, String sceneName) {
+    return !context.getSceneDescriptionFile(parentDirectory.getAbsolutePath(), sceneName).exists();
   }
 
   /**

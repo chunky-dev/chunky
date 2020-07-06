@@ -27,19 +27,22 @@ import java.util.List;
  * Utility functions for handling saved scenes.
  */
 public class SceneHelper {
+
   /**
    * @return a list of available scene description files in the given scene
    * directory
    */
   public static List<File> getAvailableSceneFiles(File sceneDir) {
-    File[] sceneFiles = sceneDir
-        .listFiles((dir, name) -> name.endsWith(Scene.EXTENSION));
-    if (sceneFiles != null) {
-      List<File> fileList = new ArrayList<>(sceneFiles.length);
-      Collections.addAll(fileList, sceneFiles);
-      return fileList;
-    } else {
-      return Collections.emptyList();
+    //Get all the files with either a .json extension or get all directories in the given folder since scenes can be held in directories now.
+    File[] sceneList = sceneDir.listFiles((dir, name) ->  name.endsWith(Scene.EXTENSION) || new File(dir + File.separator + name).isDirectory());
+    if (sceneList == null) return Collections.emptyList();
+
+    List<File> allFiles = new ArrayList<>();
+    for (File file : sceneList) {
+      //If the file was a directory, we just run this method on that folder, otherwise, we know it's a json file, so we add it to the "allFiles" list
+      if (file.isDirectory()) allFiles.addAll(getAvailableSceneFiles(file));
+      else allFiles.add(file);
     }
+    return allFiles;
   }
 }

@@ -109,7 +109,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         String sceneName = storedScene.name();
         Log.info("Saving scene " + sceneName);
 
-        File sceneDir = context.getSceneDirectory();
+        File sceneDir = storedScene.getSceneDirectory();
         if (!sceneDir.isDirectory()) {
           Log.warn("Scene directory does not exist. Creating directory at: "
               + sceneDir.getAbsolutePath());
@@ -121,8 +121,8 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         }
 
         // Create backup of scene description and current render dump.
-        storedScene.backupFile(context, context.getSceneDescriptionFile(sceneName));
-        storedScene.backupFile(context, sceneName + ".dump");
+        storedScene.backupFile(context, context.getSceneDescriptionFile(sceneName, sceneName));
+        storedScene.backupFile(context, sceneDir + File.separator + sceneName + ".dump");
 
         // Copy render status over from the renderer.
         RenderStatus status = renderer.getRenderStatus();
@@ -136,14 +136,14 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     }
   }
 
-  @Override public void loadScene(String sceneName)
+  @Override public void loadScene(File parentDirectory, String sceneName)
       throws IOException, InterruptedException {
 
     // Do not change lock ordering here.
     // Lock order: scene -> storedScene.
     synchronized (scene) {
       try (TaskTracker.Task ignored = taskTracker.task("Loading scene", 1)) {
-        scene.loadScene(context, sceneName, taskTracker);
+        scene.loadScene(context, parentDirectory, sceneName, taskTracker);
       }
 
       // Update progress bar.

@@ -350,7 +350,18 @@ public class ChunkyFxController
     renderer.setOnFrameCompleted((scene1, spp) -> {
       if (SnapshotControl.DEFAULT.saveSnapshot(scene1, spp)) {
         // Save the current frame.
-        scene1.saveSnapshot(renderController.getContext().getSceneDirectory(), taskTracker, renderController.getContext().numRenderThreads());
+        File snapshotDirectory;
+
+        //If the scene is currently within the scene folder (not its own) we want to stick with using the old method
+        //of storing it in the scene folder, along with snapshots
+        if (scene.getSceneDirectory().equals(PersistentSettings.getSceneDirectory())) {
+          snapshotDirectory = PersistentSettings.getSceneDirectory();
+        } else {
+          //Otherwise, if its in the new file structure, we want to create a snapshots directory inside its current directory.
+          snapshotDirectory = new File(scene.getSceneDirectory() + File.separator + "snapshots");
+          if (!snapshotDirectory.exists() && snapshotDirectory.mkdirs()) Log.error("Unable to save snapshot. The necessary directories may not have been created!");
+        }
+        scene.saveSnapshot(snapshotDirectory, taskTracker, renderController.getContext().numRenderThreads());
       }
 
       if (SnapshotControl.DEFAULT.saveRenderDump(scene1, spp)) {
@@ -821,9 +832,14 @@ public class ChunkyFxController
     // stage.setTitle(chunky.getSceneManager().getScene().name());
   }
 
-  public void loadScene(String sceneName) {
+  /**
+   * Loads a scene into chunky
+   * @param parentDirectory The directory which holds the scene description file
+   * @param sceneName The name of the scene. NOTE: Do not include extension.
+   */
+  public void loadScene(File parentDirectory, String sceneName) {
     try {
-      chunky.getSceneManager().loadScene(sceneName);
+      chunky.getSceneManager().loadScene(parentDirectory, sceneName);
     } catch (IOException | InterruptedException e) {
       Log.error("Failed to load scene", e);
     }

@@ -137,7 +137,18 @@ public class Chunky {
     renderer.setOnFrameCompleted((scene, spp) -> {
       if (SnapshotControl.DEFAULT.saveSnapshot(scene, spp)) {
         // Save the current frame.
-        scene.saveSnapshot(context.getSceneDirectory(), taskTracker, getRenderContext().numRenderThreads());
+        File snapshotDirectory;
+
+        //If the scene is currently within the scene folder (not its own) we want to stick with using the old method
+        //of storing it in the scene folder, along with snapshots
+        if (scene.getSceneDirectory().equals(PersistentSettings.getSceneDirectory())) {
+          snapshotDirectory = PersistentSettings.getSceneDirectory();
+        } else {
+          //Otherwise, if its in the new file structure, we want to create a snapshots directory inside its current directory.
+          snapshotDirectory = new File(scene.getSceneDirectory() + File.separator + "snapshots");
+          if (!snapshotDirectory.exists() && snapshotDirectory.mkdirs()) Log.error("Unable to save snapshot. The necessary directories may not have been created!");
+        }
+        scene.saveSnapshot(snapshotDirectory, taskTracker, getRenderContext().numRenderThreads());
       }
 
       if (SnapshotControl.DEFAULT.saveRenderDump(scene, spp)) {
@@ -161,7 +172,7 @@ public class Chunky {
     });
 
     try {
-      sceneManager.loadScene(options.sceneName);
+      sceneManager.loadScene(options.sceneDir, options.sceneName);
       if (options.target != -1) {
         sceneManager.getScene().setTargetSpp(options.target);
       }
