@@ -359,7 +359,7 @@ public class ChunkyFxController
         } else {
           //Otherwise, if its in the new file structure, we want to create a snapshots directory inside its current directory.
           snapshotDirectory = new File(scene.getSceneDirectory() + File.separator + "snapshots");
-          if (!snapshotDirectory.exists() && snapshotDirectory.mkdirs()) Log.error("Unable to save snapshot. The necessary directories may not have been created!");
+          if (!snapshotDirectory.exists() && !snapshotDirectory.mkdirs()) Log.error("Unable to save snapshot. The necessary directories may not have been created!");
         }
         scene.saveSnapshot(snapshotDirectory, taskTracker, renderController.getContext().numRenderThreads());
       }
