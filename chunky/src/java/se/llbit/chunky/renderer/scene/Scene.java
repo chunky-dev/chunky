@@ -161,7 +161,6 @@ public class Scene implements JsonSerializable, Refreshable {
           PersistentSettings.getFogColorBlue());
   public int sdfVersion = -1;
   public String name = "default_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-  private File sceneDirectory;
 
   /**
    * Canvas width.
@@ -311,7 +310,6 @@ public class Scene implements JsonSerializable, Refreshable {
     width = PersistentSettings.get3DCanvasWidth();
     height = PersistentSettings.get3DCanvasHeight();
     sppTarget = PersistentSettings.getSppTargetDefault();
-    sceneDirectory = new File(PersistentSettings.getSceneDirectory() + File.separator + name);
 
     palette = new BlockPalette();
     worldOctree = new Octree(1);
@@ -451,8 +449,7 @@ public class Scene implements JsonSerializable, Refreshable {
     try (TaskTracker.Task task = taskTracker.task("Saving scene", 2)) {
       task.update(1);
 
-      getSceneDirectory();
-      try (BufferedOutputStream out = new BufferedOutputStream(context.getSceneDescriptionOutputStream(getSceneDirectory().getAbsolutePath(), name))) {
+      try (BufferedOutputStream out = new BufferedOutputStream(context.getSceneDescriptionOutputStream(name))) {
         saveDescription(out);
       }
 
@@ -468,9 +465,9 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @param sceneName file name of the scene to load
    */
-  public synchronized void loadScene(RenderContext context, File parentDirectory, String sceneName,
+  public synchronized void loadScene(RenderContext context, String sceneName,
       TaskTracker taskTracker) throws IOException, InterruptedException {
-    loadDescription(context.getSceneDescriptionInputStream(parentDirectory.getAbsolutePath(), sceneName));
+    loadDescription(context.getSceneDescriptionInputStream(sceneName));
 
     if (sdfVersion < SDF_VERSION) {
       Log.warn("Old scene version detected! The scene may not have been loaded correctly.");
@@ -1406,7 +1403,6 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public synchronized void copyTransients(Scene other) {
     name = other.name;
-    sceneDirectory = other.sceneDirectory;
     postprocess = other.postprocess;
     exposure = other.exposure;
     dumpFrequency = other.dumpFrequency;
@@ -1647,7 +1643,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private synchronized void saveOctree(RenderContext context, TaskTracker progress) {
     String fileName = name + ".octree2";
-    if (context.fileUnchangedSince(getSceneDirectory().getAbsolutePath(), fileName, worldOctree.getTimestamp())) {
+    if (context.fileUnchangedSince(fileName, worldOctree.getTimestamp())) {
       Log.info("Skipping redundant Octree write");
       return;
     }
@@ -1655,10 +1651,10 @@ public class Scene implements JsonSerializable, Refreshable {
       task.update(1);
       Log.info("Saving octree " + fileName);
 
-      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(getSceneDirectory().getAbsolutePath(), fileName)))) {
+      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName)))) {
         OctreeFileFormat.store(out, worldOctree, waterOctree, palette,
             grassTexture, foliageTexture);
-        worldOctree.setTimestamp(context.fileTimestamp(getSceneDirectory().getAbsolutePath(), fileName));
+        worldOctree.setTimestamp(context.fileTimestamp(fileName));
 
         task.update(2);
         Log.info("Octree saved");
@@ -1671,16 +1667,16 @@ public class Scene implements JsonSerializable, Refreshable {
   private synchronized void saveGrassTexture(RenderContext context,
       TaskTracker progress) {
     String fileName = name + ".grass";
-    if (context.fileUnchangedSince(getSceneDirectory().getAbsolutePath(), fileName, grassTexture.getTimestamp())) {
+    if (context.fileUnchangedSince(fileName, grassTexture.getTimestamp())) {
       Log.info("Skipping redundant grass texture write");
       return;
     }
     try (TaskTracker.Task task = progress.task("Saving grass texture", 2)) {
       task.update(1);
       Log.info("Saving grass texture " + fileName);
-      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(getSceneDirectory().getAbsolutePath(), fileName)))) {
+      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName)))) {
         grassTexture.store(out);
-        grassTexture.setTimestamp(context.fileTimestamp(getSceneDirectory().getAbsolutePath(), fileName));
+        grassTexture.setTimestamp(context.fileTimestamp(fileName));
         task.update(2);
         Log.info("Grass texture saved");
       } catch (IOException e) {
@@ -1691,16 +1687,16 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private synchronized void saveFoliageTexture(RenderContext context, TaskTracker progress) {
     String fileName = name + ".foliage";
-    if (context.fileUnchangedSince(getSceneDirectory().getAbsolutePath(), fileName, foliageTexture.getTimestamp())) {
+    if (context.fileUnchangedSince(fileName, foliageTexture.getTimestamp())) {
       Log.info("Skipping redundant foliage texture write");
       return;
     }
     try (TaskTracker.Task task = progress.task("Saving foliage texture", 2)) {
       task.update(1);
       Log.info("Saving foliage texture " + fileName);
-      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(getSceneDirectory().getAbsolutePath(), fileName)))) {
+      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName)))) {
         foliageTexture.store(out);
-        foliageTexture.setTimestamp(context.fileTimestamp(getSceneDirectory().getAbsolutePath(), fileName));
+        foliageTexture.setTimestamp(context.fileTimestamp(fileName));
         task.update(2);
         Log.info("Foliage texture saved");
       } catch (IOException e) {
@@ -1715,7 +1711,7 @@ public class Scene implements JsonSerializable, Refreshable {
       task.update(1);
       Log.info("Saving render dump " + fileName);
       try (DataOutputStream out = new DataOutputStream(
-          new GZIPOutputStream(context.getSceneFileOutputStream(getSceneDirectory().getAbsolutePath(), fileName)))) {
+          new GZIPOutputStream(context.getSceneFileOutputStream(fileName)))) {
         out.writeInt(width);
         out.writeInt(height);
         out.writeInt(spp);
@@ -1741,14 +1737,14 @@ public class Scene implements JsonSerializable, Refreshable {
       task.update(1);
       Log.info("Loading octree " + fileName);
       try {
-        long fileTimestamp = context.fileTimestamp(getSceneDirectory().getAbsolutePath(), fileName);
+        long fileTimestamp = context.fileTimestamp(fileName);
         OctreeFileFormat.OctreeData data;
-        try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(getSceneDirectory().getAbsolutePath(), fileName)))) {
+        try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)))) {
           data = OctreeFileFormat.load(in);
         } catch(PackedOctree.OctreeTooBigException e) {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
-          DataInputStream inRetry = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(getSceneDirectory().getAbsolutePath(), fileName)));
+          DataInputStream inRetry = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)));
           data = OctreeFileFormat.load(inRetry, true);
         }
         worldOctree = data.worldTree;
@@ -1787,7 +1783,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * @return {@code true} if the render dump was successfully loaded
    */
   private boolean tryLoadDump(RenderContext context, String fileName, TaskTracker taskTracker) {
-    File dumpFile = context.getSceneFile(getSceneDirectory().getAbsolutePath(), fileName);
+    File dumpFile = context.getSceneFile(fileName);
     if (!dumpFile.isFile()) {
       if (spp != 0) {
         // The scene state says the render had some progress, so we should warn
@@ -2349,7 +2345,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
   /** Create a backup of a scene file. */
   public void backupFile(RenderContext context, String fileName) {
-    File renderDir = getSceneDirectory();
+    File renderDir = context.getSceneDirectory();
     File file = new File(renderDir, fileName);
     backupFile(context, file);
   }
@@ -2359,7 +2355,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (file.exists()) {
       // Try to create backup. It is not a problem if we fail this.
       String backupFileName = file.getName() + ".backup";
-      File renderDir = getSceneDirectory();
+      File renderDir = context.getSceneDirectory();
           File backup = new File(renderDir, backupFileName);
       if (backup.exists()) {
         //noinspection ResultOfMethodCallIgnored
@@ -2801,37 +2797,6 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setYClipMax(int yClipMax) {
     this.yClipMax = yClipMax;
-  }
-
-  /**
-   * This will get (and resolve) the scene specific folder in the scenes directory.
-   * @return The directory for this specific scene
-   */
-  public File getSceneDirectory() {
-
-    //If this file doesnt exist, we assume we are making a new scene, loading an old scene from the scene directory,
-    //or loading an old scene from THAT scenes directory (eg. scenes/some_scene/)
-    if (!sceneDirectory.exists()) {
-
-      //We first want to determine if the scene is being loaded from the scene directory, if it is, we simply return
-      //the default scene directory. (This would imply the old, non organized, scene storage format)
-      File descFile = new File(PersistentSettings.getSceneDirectory(), name + Scene.EXTENSION);
-      if (descFile.exists()) return PersistentSettings.getSceneDirectory();
-
-      //If that file didnt exist, we now want to determine if the scene is being loaded from the scenes specific directory
-      //(the new directory based format), so we check if it has a description file within the scenes specific folder
-      descFile = new File(PersistentSettings.getSceneDirectory() + File.separator + name, name + Scene.EXTENSION);
-      if (descFile.exists()) return descFile.getParentFile();
-
-      //If it doesnt exist there, we can assume that the scene is a new scene, so we attempt to create a new directory
-      //for this scene, and if that doesnt work, we default to the base scene directory.
-      else if (!sceneDirectory.mkdirs()) {
-        Log.error("Specific scene folder could not be created. Defaulting to the scene directory.");
-        return PersistentSettings.getSceneDirectory();
-
-      } else return sceneDirectory;//Otherwise, all is happy and we have a directory for this scene :D
-    } else return sceneDirectory;
-
   }
 
 }

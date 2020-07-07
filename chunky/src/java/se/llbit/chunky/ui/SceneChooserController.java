@@ -103,7 +103,7 @@ public class SceneChooserController implements Initializable {
         alert.setContentText(String.format("Are you sure you want to delete the scene %s? "
             + "All files for the scene, except snapshot images, will be deleted.", scene.sceneName));
         if (alert.showAndWait().get() == ButtonType.OK) {
-          Scene.delete(scene.sceneName, scene.location);
+          Scene.delete(scene.sceneName, scene.sceneDirectory);
           sceneTbl.getItems().remove(sceneTbl.getSelectionModel().getSelectedItem());
         }
       }
@@ -140,7 +140,7 @@ public class SceneChooserController implements Initializable {
           if (scene.sceneName.isEmpty()) {
             Log.error("Can't load scene with unknown filename.");
           } else {
-            controller.loadScene(scene.location, scene.sceneName);
+            controller.loadScene(scene.sceneName);
             e.consume();
             stage.close();
           }
@@ -154,7 +154,7 @@ public class SceneChooserController implements Initializable {
         if (scene.sceneName.isEmpty()) {
           Log.error("Can't load scene with unknown filename.");
         } else {
-          controller.loadScene(scene.location, scene.sceneName);
+          controller.loadScene(scene.sceneName);
           stage.close();
         }
       }
@@ -201,11 +201,11 @@ public class SceneChooserController implements Initializable {
     /**
      * What folder the scene is in
      */
-    private final File location;
+    private final File sceneDirectory;
 
     private SceneListItem(JsonObject scene, File sceneFile) {
       sceneName = sceneFile.getName().substring(0, sceneFile.getName().length() - Scene.EXTENSION.length());
-      location = sceneFile.getParentFile();
+      sceneDirectory = sceneFile.getParentFile();
       chunkSize = scene.get("chunkList").array().size();
       dimensions = String.format("%sx%s", scene.get("width").intValue(400), scene.get("height").intValue(400));
       sppCount = scene.get("spp").intValue(0);
@@ -219,7 +219,7 @@ public class SceneChooserController implements Initializable {
 
     @Override
     public String toString() {
-      return String.format("Name:%s, Chunks:%d, Size:%s, Spp:%d, Time:%s, Location:%s", sceneName, chunkSize, dimensions, sppCount, renderTime, location.getName());
+      return String.format("Name:%s, Chunks:%d, Size:%s, Spp:%d, Time:%s, Location:%s", sceneName, chunkSize, dimensions, sppCount, renderTime, sceneDirectory.getName());
     }
   }
 

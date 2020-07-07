@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.RenderStatus;
@@ -109,7 +110,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         String sceneName = storedScene.name();
         Log.info("Saving scene " + sceneName);
 
-        File sceneDir = storedScene.getSceneDirectory();
+        File sceneDir = context.getSceneDirectory();
         if (!sceneDir.isDirectory()) {
           Log.warn("Scene directory does not exist. Creating directory at: "
               + sceneDir.getAbsolutePath());
@@ -121,8 +122,8 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         }
 
         // Create backup of scene description and current render dump.
-        storedScene.backupFile(context, context.getSceneDescriptionFile(sceneName, sceneName));
-        storedScene.backupFile(context, sceneDir + File.separator + sceneName + ".dump");
+        storedScene.backupFile(context, context.getSceneDescriptionFile(sceneName));
+        storedScene.backupFile(context, new File(sceneDir, sceneName + ".dump"));
 
         // Copy render status over from the renderer.
         RenderStatus status = renderer.getRenderStatus();
@@ -136,14 +137,15 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     }
   }
 
-  @Override public void loadScene(File parentDirectory, String sceneName)
+  @Override public void loadScene(String sceneName)
       throws IOException, InterruptedException {
 
     // Do not change lock ordering here.
     // Lock order: scene -> storedScene.
     synchronized (scene) {
       try (TaskTracker.Task ignored = taskTracker.task("Loading scene", 1)) {
-        scene.loadScene(context, parentDirectory, sceneName, taskTracker);
+        context.setSceneDirectory(resolveSceneDirectory(sceneName));
+        scene.loadScene(context, sceneName, taskTracker);
       }
 
       // Update progress bar.
@@ -160,6 +162,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   @Override public void loadFreshChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
       scene.clear();
+      context.setSceneDirectory(resolveSceneDirectory(scene.name));
       scene.loadChunks(taskTracker, world, chunksToLoad);
       scene.resetScene(null, context.getChunky().getSceneFactory());
       scene.refresh();
@@ -172,6 +175,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   @Override public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
       int prevChunkCount = scene.numberOfChunks();
+      context.setSceneDirectory(resolveSceneDirectory(scene.name));
       scene.loadChunks(taskTracker, world, chunksToLoad);
       if (prevChunkCount == 0) {
         scene.moveCameraToCenter();
@@ -285,6 +289,50 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         scene.clearResetFlags();
       }
     }
+  }
+
+  /**
+   * Find and resolve the directory for a given scene name. If the scene is saved in the /scenes/ folder, it will return
+   * the scenes folder.
+   *
+   * If the scene is found in a folder inside the /scenes/ directory (eg. /scenes/some_scene/) that directory will be
+   * returned.
+   *
+   * Otherwise, a new directory in the /scenes/ folder will be created for the given scene and that said directory will
+   * be returned.
+   *
+   * @param sceneName The name of the scene to resolve the directory for.
+   * @return The directory holding the given scene
+   */
+  private File resolveSceneDirectory(String sceneName) {
+    File defaultDirectory = new File(PersistentSettings.getSceneDirectory(), sceneName);
+    //If this file doesnt exist, we assume we are making a new scene, loading an old scene from the scene directory,
+    //or loading an old scene from THAT scenes directory (eg. scenes/some_scene/)
+    if (!defaultDirectory.exists()) {
+      //We first want to determine if the scene is being loaded from the scene directory, if it is, we simply return
+      //the default scene directory. (This would imply the old, non organized, scene storage format)
+      File descFile = new File(PersistentSettings.getSceneDirectory(), sceneName + Scene.EXTENSION);
+      if (descFile.exists()) {
+        return PersistentSettings.getSceneDirectory();
+      }
+
+      //If that file didnt exist, we now want to determine if the scene is being loaded from the scenes specific directory
+      //(the new directory based format), so we check if it has a description file within the scenes specific folder
+      descFile = new File(PersistentSettings.getSceneDirectory() + File.separator + sceneName, sceneName + Scene.EXTENSION);
+      if (descFile.exists()) {
+        return descFile.getParentFile();
+      }
+
+      //If it doesnt exist there, we can assume that the scene is a new scene, so we attempt to create a new directory
+      //for this scene, and if that doesnt work, we default to the base scene directory.
+      else if (!defaultDirectory.mkdirs()) {
+        Log.warn("Specific scene folder could not be created. Defaulting to the scene directory.");
+        return PersistentSettings.getSceneDirectory();
+
+      } else {
+        return defaultDirectory;//Otherwise, all is happy and we have a directory for this scene :D
+      }
+    } else return defaultDirectory;
   }
 
 }

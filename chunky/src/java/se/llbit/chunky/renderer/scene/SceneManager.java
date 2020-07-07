@@ -19,7 +19,6 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.World;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -35,7 +34,7 @@ public interface SceneManager {
   /**
    * Load a saved scene.
    */
-  void loadScene(File parentDirectory, String sceneName) throws IOException, InterruptedException;
+  void loadScene(String sceneName) throws IOException, InterruptedException;
 
   /**
    * Load chunks and reset camera and scene.

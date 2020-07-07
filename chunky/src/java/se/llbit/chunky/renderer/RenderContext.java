@@ -38,6 +38,7 @@ public class RenderContext {
   protected final Chunky chunky;
   protected final ChunkyOptions config;
   public AbstractRenderManager.WorkerFactory workerFactory = RenderWorker::new;
+  private File sceneDirectory;
 
   /**
    * Construct a new render context.
@@ -45,6 +46,7 @@ public class RenderContext {
   public RenderContext(Chunky chunky) {
     this.chunky = chunky;
     this.config = chunky.options;
+    this.sceneDirectory = config.sceneDir;
   }
 
   public Chunky getChunky() {
@@ -52,10 +54,19 @@ public class RenderContext {
   }
 
   /**
+   * Set the saving/loading directory of the current scene.
+   * @param sceneDirectory The directory the scene should be saved/loaded to/from
+   */
+  public void setSceneDirectory(File sceneDirectory) {
+    System.out.println("Set scene directory to " + sceneDirectory.getAbsolutePath());
+    this.sceneDirectory = sceneDirectory;
+  }
+
+  /**
    * @return File handle to the scene directory.
    */
   public File getSceneDirectory() {
-    return config.sceneDir;
+    return sceneDirectory;
   }
 
   /**
@@ -66,53 +77,58 @@ public class RenderContext {
   }
 
   /**
+   * @param descriptionFileName The name of the scene description file. NOTE: Do not include extension
    * @return Scene description file
    */
-  public File getSceneDescriptionFile(String path, String descriptionFileName) {
-    return getSceneFile(path, descriptionFileName + Scene.EXTENSION);
+  public File getSceneDescriptionFile(String descriptionFileName) {
+    return getSceneFile(descriptionFileName + Scene.EXTENSION);
   }
 
   /**
+   * @param descriptionFileName The name of the scene description file. NOTE: Do not include extension
    * @return Input stream for the scene description
-   * @throws FileNotFoundException
+   * @throws FileNotFoundException If the file does not exist.
    */
-  public InputStream getSceneDescriptionInputStream(String path, String descriptionFileName) throws FileNotFoundException {
-    return getSceneFileInputStream(path, descriptionFileName + Scene.EXTENSION);
+  public InputStream getSceneDescriptionInputStream(String descriptionFileName) throws FileNotFoundException {
+    return getSceneFileInputStream(descriptionFileName + Scene.EXTENSION);
   }
 
   /**
+   * @param descriptionFileName The name of the scene description file. NOTE: Do not include extension
    * @return Output stream for the scene description
-   * @throws FileNotFoundException
+   * @throws FileNotFoundException If the file does not exist.
    */
-  public OutputStream getSceneDescriptionOutputStream(String path, String descriptionFileName)
+  public OutputStream getSceneDescriptionOutputStream(String descriptionFileName)
       throws FileNotFoundException {
-    return getSceneFileOutputStream(path, descriptionFileName + Scene.EXTENSION);
+    return getSceneFileOutputStream(descriptionFileName + Scene.EXTENSION);
   }
 
   /**
    * Gets the directory of the given scene file.
-   * @param path The absolute path to the folder holding the scene file.
    * @param fileName the filename WITH the extension
    * @return A File object. NOTE: The file object may not exist yet.
    */
-  public File getSceneFile(String path, String fileName) {
-    return new File(path, fileName);
+  public File getSceneFile(String fileName) {
+    ensureSceneDirectory();
+    return new File(sceneDirectory, fileName);
   }
 
   /**
+   * @param fileName the filename WITH the extension
    * @return Input stream for the given scene file
-   * @throws FileNotFoundException
+   * @throws FileNotFoundException If the file does not exist.
    */
-  public InputStream getSceneFileInputStream(String path, String fileName) throws FileNotFoundException {
-    return new FileInputStream(getSceneFile(path, fileName));
+  public InputStream getSceneFileInputStream(String fileName) throws FileNotFoundException {
+    return new FileInputStream(getSceneFile(fileName));
   }
 
   /**
+   * @param fileName the filename WITH the extension
    * @return Output stream for the given scene file
-   * @throws FileNotFoundException
+   * @throws FileNotFoundException If the file does not exist.
    */
-  public OutputStream getSceneFileOutputStream(String path, String fileName) throws FileNotFoundException {
-    return new FileOutputStream(getSceneFile(path, fileName));
+  public OutputStream getSceneFileOutputStream(String fileName) throws FileNotFoundException {
+    return new FileOutputStream(getSceneFile(fileName));
   }
 
   /**
@@ -123,18 +139,29 @@ public class RenderContext {
   }
 
   /**
+   * @param fileName the filename WITH the extension
    * @param timestamp the last file modification timestamp to compare against
    * @return {@code true} if the file has not changed since timestamp
    */
-  public boolean fileUnchangedSince(String path, String fileName, long timestamp) {
-    File file = getSceneFile(path, fileName);
+  public boolean fileUnchangedSince(String fileName, long timestamp) {
+    File file = getSceneFile(fileName);
     return file.exists() && file.lastModified() == timestamp;
   }
 
   /**
+   * @param fileName the filename WITH the extension
    * @return last modification timestamp
    */
-  public long fileTimestamp(String path, String fileName) {
-    return getSceneFile(path, fileName).lastModified();
+  public long fileTimestamp(String fileName) {
+    return getSceneFile(fileName).lastModified();
   }
+
+  /**
+   * Ensures the scene directory specified exists
+   */
+  private void ensureSceneDirectory() {
+    if (sceneDirectory.exists()) return;
+    sceneDirectory.mkdirs();
+  }
+
 }
