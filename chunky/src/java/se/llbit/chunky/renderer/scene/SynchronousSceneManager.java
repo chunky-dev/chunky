@@ -306,31 +306,25 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
    */
   private File resolveSceneDirectory(String sceneName) {
     File defaultDirectory = new File(PersistentSettings.getSceneDirectory(), sceneName);
-    //If this file doesnt exist, we assume we are making a new scene, loading an old scene from the scene directory,
-    //or loading an old scene from THAT scenes directory (eg. scenes/some_scene/)
+
     if (!defaultDirectory.exists()) {
-      //We first want to determine if the scene is being loaded from the scene directory, if it is, we simply return
-      //the default scene directory. (This would imply the old, non organized, scene storage format)
+
       File descFile = new File(PersistentSettings.getSceneDirectory(), sceneName + Scene.EXTENSION);
       if (descFile.exists()) {
         return PersistentSettings.getSceneDirectory();
       }
 
-      //If that file didnt exist, we now want to determine if the scene is being loaded from the scenes specific directory
-      //(the new directory based format), so we check if it has a description file within the scenes specific folder
       descFile = new File(PersistentSettings.getSceneDirectory() + File.separator + sceneName, sceneName + Scene.EXTENSION);
       if (descFile.exists()) {
         return descFile.getParentFile();
       }
 
-      //If it doesnt exist there, we can assume that the scene is a new scene, so we attempt to create a new directory
-      //for this scene, and if that doesnt work, we default to the base scene directory.
       else if (!defaultDirectory.mkdirs()) {
         Log.warn("Specific scene folder could not be created. Defaulting to the scene directory.");
         return PersistentSettings.getSceneDirectory();
 
       } else {
-        return defaultDirectory;//Otherwise, all is happy and we have a directory for this scene :D
+        return defaultDirectory;
       }
     } else return defaultDirectory;
   }

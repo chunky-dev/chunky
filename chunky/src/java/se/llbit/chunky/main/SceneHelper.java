@@ -41,7 +41,7 @@ public class SceneHelper {
 
     List<File> sceneFiles = new ArrayList<>();
     for (File file : sceneList) {
-      //If the file was a directory, we just run this method on that folder, otherwise, we know it's a json file, so we add it to the "allFiles" list
+      //If the file was a directory, we just run this method on that folder, otherwise, we know it's a json file, so we add it to the "sceneFiles" list
       if (file.isDirectory()) {
         sceneFiles.addAll(getAvailableSceneFiles(file));
       } else {
