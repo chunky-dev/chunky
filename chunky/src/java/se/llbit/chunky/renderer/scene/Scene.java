@@ -1470,6 +1470,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
     String fileName = String.format("%s-%d%s", name, spp, outputMode.getExtension());
     File targetFile = new File(directory, fileName);
+    if (!directory.exists()) directory.mkdirs();
     computeAlpha(progress, threadCount);
     if (!finalized) {
       postProcessFrame(progress);
