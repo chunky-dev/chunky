@@ -349,8 +349,8 @@ public class ChunkyFxController
     renderer.setSnapshotControl(SnapshotControl.DEFAULT);
     renderer.setOnFrameCompleted((scene1, spp) -> {
       if (SnapshotControl.DEFAULT.saveSnapshot(scene1, spp)) {
-        // Save the current frame.
-        scene1.saveSnapshot(renderController.getContext().getSceneDirectory(), taskTracker, renderController.getContext().numRenderThreads());
+
+        scene1.saveSnapshot(new File(renderController.getContext().getSceneDirectory(), "snapshots"), taskTracker, renderController.getContext().numRenderThreads());
       }
 
       if (SnapshotControl.DEFAULT.saveRenderDump(scene1, spp)) {
@@ -821,6 +821,10 @@ public class ChunkyFxController
     // stage.setTitle(chunky.getSceneManager().getScene().name());
   }
 
+  /**
+   * Loads a scene into chunky
+   * @param sceneName The name of the scene. NOTE: Do not include extension.
+   */
   public void loadScene(String sceneName) {
     try {
       chunky.getSceneManager().loadScene(sceneName);

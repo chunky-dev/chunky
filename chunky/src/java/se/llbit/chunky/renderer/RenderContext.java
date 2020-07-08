@@ -38,6 +38,7 @@ public class RenderContext {
   protected final Chunky chunky;
   protected final ChunkyOptions config;
   public AbstractRenderManager.WorkerFactory workerFactory = RenderWorker::new;
+  private File sceneDirectory;
 
   /**
    * Construct a new render context.
@@ -45,6 +46,7 @@ public class RenderContext {
   public RenderContext(Chunky chunky) {
     this.chunky = chunky;
     this.config = chunky.options;
+    this.sceneDirectory = config.sceneDir;
   }
 
   public Chunky getChunky() {
@@ -52,10 +54,18 @@ public class RenderContext {
   }
 
   /**
+   * Set the saving/loading directory of the current scene.
+   * @param sceneDirectory The directory the scene should be saved/loaded to/from
+   */
+  public void setSceneDirectory(File sceneDirectory) {
+    this.sceneDirectory = sceneDirectory;
+  }
+
+  /**
    * @return File handle to the scene directory.
    */
   public File getSceneDirectory() {
-    return config.sceneDir;
+    return sceneDirectory;
   }
 
   /**
@@ -66,6 +76,7 @@ public class RenderContext {
   }
 
   /**
+   * @param sceneName The name of the scene description file without the file extension
    * @return Scene description file
    */
   public File getSceneDescriptionFile(String sceneName) {
@@ -73,16 +84,18 @@ public class RenderContext {
   }
 
   /**
+   * @param sceneName The name of the scene description file without the file extension
    * @return Input stream for the scene description
-   * @throws FileNotFoundException
+   * @throws FileNotFoundException If the file does not exist.
    */
   public InputStream getSceneDescriptionInputStream(String sceneName) throws FileNotFoundException {
     return getSceneFileInputStream(sceneName + Scene.EXTENSION);
   }
 
   /**
+   * @param sceneName The name of the scene description file without the file extension
    * @return Output stream for the scene description
-   * @throws FileNotFoundException
+   * @throws FileNotFoundException If the file does not exist.
    */
   public OutputStream getSceneDescriptionOutputStream(String sceneName)
       throws FileNotFoundException {
@@ -90,23 +103,28 @@ public class RenderContext {
   }
 
   /**
-   * @return Input stream for the given scene file
+   * Gets the directory of the given scene file.
+   * @param fileName the filename with the extension
+   * @return A File object. Note, the file object may not exist yet and the directory leading to the file will be created.
    */
   public File getSceneFile(String fileName) {
-    return new File(config.sceneDir, fileName);
+    ensureSceneDirectory();
+    return new File(sceneDirectory, fileName);
   }
 
   /**
+   * @param fileName the filename with the extension
    * @return Input stream for the given scene file
-   * @throws FileNotFoundException
+   * @throws FileNotFoundException If the file does not exist.
    */
   public InputStream getSceneFileInputStream(String fileName) throws FileNotFoundException {
     return new FileInputStream(getSceneFile(fileName));
   }
 
   /**
+   * @param fileName the filename with the extension
    * @return Output stream for the given scene file
-   * @throws FileNotFoundException
+   * @throws FileNotFoundException If the file does not exist.
    */
   public OutputStream getSceneFileOutputStream(String fileName) throws FileNotFoundException {
     return new FileOutputStream(getSceneFile(fileName));
@@ -120,6 +138,7 @@ public class RenderContext {
   }
 
   /**
+   * @param fileName the filename with the extension
    * @param timestamp the last file modification timestamp to compare against
    * @return {@code true} if the file has not changed since timestamp
    */
@@ -129,9 +148,19 @@ public class RenderContext {
   }
 
   /**
+   * @param fileName the filename with the extension
    * @return last modification timestamp
    */
   public long fileTimestamp(String fileName) {
     return getSceneFile(fileName).lastModified();
   }
+
+  /**
+   * Ensures the scene directory specified exists
+   */
+  private void ensureSceneDirectory() {
+    if (sceneDirectory.exists()) return;
+    sceneDirectory.mkdirs();
+  }
+
 }

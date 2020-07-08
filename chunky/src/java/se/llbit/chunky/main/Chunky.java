@@ -136,8 +136,7 @@ public class Chunky {
     renderer.setSnapshotControl(SnapshotControl.DEFAULT);
     renderer.setOnFrameCompleted((scene, spp) -> {
       if (SnapshotControl.DEFAULT.saveSnapshot(scene, spp)) {
-        // Save the current frame.
-        scene.saveSnapshot(context.getSceneDirectory(), taskTracker, getRenderContext().numRenderThreads());
+        scene.saveSnapshot(new File(getRenderContext().getSceneDirectory(), "snapshots"), taskTracker, getRenderContext().numRenderThreads());
       }
 
       if (SnapshotControl.DEFAULT.saveRenderDump(scene, spp)) {

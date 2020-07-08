@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.RenderStatus;
@@ -122,7 +123,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
 
         // Create backup of scene description and current render dump.
         storedScene.backupFile(context, context.getSceneDescriptionFile(sceneName));
-        storedScene.backupFile(context, sceneName + ".dump");
+        storedScene.backupFile(context, new File(sceneDir, sceneName + ".dump"));
 
         // Copy render status over from the renderer.
         RenderStatus status = renderer.getRenderStatus();
@@ -143,6 +144,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     // Lock order: scene -> storedScene.
     synchronized (scene) {
       try (TaskTracker.Task ignored = taskTracker.task("Loading scene", 1)) {
+        context.setSceneDirectory(resolveSceneDirectory(sceneName));
         scene.loadScene(context, sceneName, taskTracker);
       }
 
@@ -160,6 +162,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   @Override public void loadFreshChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
       scene.clear();
+      context.setSceneDirectory(resolveSceneDirectory(scene.name));
       scene.loadChunks(taskTracker, world, chunksToLoad);
       scene.resetScene(null, context.getChunky().getSceneFactory());
       scene.refresh();
@@ -172,6 +175,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   @Override public void loadChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
       int prevChunkCount = scene.numberOfChunks();
+      context.setSceneDirectory(resolveSceneDirectory(scene.name));
       scene.loadChunks(taskTracker, world, chunksToLoad);
       if (prevChunkCount == 0) {
         scene.moveCameraToCenter();
@@ -285,6 +289,44 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         scene.clearResetFlags();
       }
     }
+  }
+
+  /**
+   * Find and resolve the directory for a given scene name. If the scene is saved in the /scenes/ folder, it will return
+   * the scenes folder.
+   *
+   * If the scene is found in a folder inside the /scenes/ directory (eg. /scenes/some_scene/) that directory will be
+   * returned.
+   *
+   * Otherwise, a new directory in the /scenes/ folder will be created for the given scene and that said directory will
+   * be returned.
+   *
+   * @param sceneName The name of the scene to resolve the directory for.
+   * @return The directory holding the given scene
+   */
+  private File resolveSceneDirectory(String sceneName) {
+    File defaultDirectory = new File(PersistentSettings.getSceneDirectory(), sceneName);
+
+    if (!defaultDirectory.exists()) {
+
+      File descFile = new File(PersistentSettings.getSceneDirectory(), sceneName + Scene.EXTENSION);
+      if (descFile.exists()) {
+        return PersistentSettings.getSceneDirectory();
+      }
+
+      descFile = new File(PersistentSettings.getSceneDirectory() + File.separator + sceneName, sceneName + Scene.EXTENSION);
+      if (descFile.exists()) {
+        return descFile.getParentFile();
+      }
+
+      else if (!defaultDirectory.mkdirs()) {
+        Log.warn("Specific scene folder could not be created. Defaulting to the scene directory.");
+        return PersistentSettings.getSceneDirectory();
+
+      } else {
+        return defaultDirectory;
+      }
+    } else return defaultDirectory;
   }
 
 }

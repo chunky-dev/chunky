@@ -391,7 +391,6 @@ public class Scene implements JsonSerializable, Refreshable {
     materials = other.materials;
 
     exposure = other.exposure;
-    name = other.name; // TODO: Safe to remove this? Name is copied in copyTransients().
 
     stillWater = other.stillWater;
     waterOpacity = other.waterOpacity;
@@ -1471,6 +1470,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
     String fileName = String.format("%s-%d%s", name, spp, outputMode.getExtension());
     File targetFile = new File(directory, fileName);
+    if (!directory.exists()) directory.mkdirs();
     computeAlpha(progress, threadCount);
     if (!finalized) {
       postProcessFrame(progress);
@@ -2357,7 +2357,7 @@ public class Scene implements JsonSerializable, Refreshable {
       // Try to create backup. It is not a problem if we fail this.
       String backupFileName = file.getName() + ".backup";
       File renderDir = context.getSceneDirectory();
-      File backup = new File(renderDir, backupFileName);
+          File backup = new File(renderDir, backupFileName);
       if (backup.exists()) {
         //noinspection ResultOfMethodCallIgnored
         backup.delete();
@@ -2799,4 +2799,5 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setYClipMax(int yClipMax) {
     this.yClipMax = yClipMax;
   }
+
 }
