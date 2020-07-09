@@ -122,6 +122,7 @@ public class Chunky {
     Renderer renderer = rendererFactory.newRenderer(context, true);
     SynchronousSceneManager sceneManager = new SynchronousSceneManager(context, renderer);
     renderer.setSceneProvider(sceneManager);
+    renderController = new RenderController(context, renderer, sceneManager, sceneManager);
     TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
         (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
           @Override
