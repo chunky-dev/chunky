@@ -310,7 +310,7 @@ public class Chunky {
             System.out.println("Image output mode: TIFF32");
             break;
         }
-        scene.saveFrame(new File(options.imageOutputFile), taskTracker, getRenderContext().numRenderThreads());
+        scene.saveFrame(new File(options.imageOutputFile), taskTracker, context.numRenderThreads());
         System.out.println("Saved snapshot to " + options.imageOutputFile);
         return 0;
       }
