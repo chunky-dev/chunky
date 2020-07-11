@@ -40,9 +40,9 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
   /**
    * The max size of an array we allow is a bit less than the max value an integer can have
    */
-  private static final int MAX_ARRAY_SIZE = 1 << 30; // MAX_INT is 2^31 - 1 but it is useful to use a power of 2 so we use the biggest power of 2 that is small that MAX_INT
-  private final long SUB_ARRAY_MASK = MAX_ARRAY_SIZE - 1;
-  private final long FULL_ARRAY_MASK = ~SUB_ARRAY_MASK;
+  private static final int MAX_ARRAY_SIZE = 1 << 30; // MAX_INT is 2^31 - 1 but it is useful to use a power of 2 so we use the biggest power of 2 that is smaller than MAX_INT
+  private static final long SUB_ARRAY_MASK = MAX_ARRAY_SIZE - 1;
+  private static final long FULL_ARRAY_MASK = ~SUB_ARRAY_MASK;
   private static final int FULL_ARRAY_SHIFT = 30;
 
   /**
@@ -508,16 +508,12 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
       int level = depth;
       long nodeIndex = 0;
       while(getAt(nodeIndex) > 0) {
-//        System.out.printf("%d at level %d\n", getAt(nodeIndex), level);
         level -= 1;
         lx = x >>> level;
         ly = y >>> level;
         lz = z >>> level;
         nodeIndex = getAt(nodeIndex) + (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1));
       }
-//      System.out.printf("%d at level %d\n", getAt(nodeIndex), level);
-
-      //System.exit(0);
 
       long value = getAt(nodeIndex);
 
