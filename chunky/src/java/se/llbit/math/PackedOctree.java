@@ -76,6 +76,39 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
   private int depth;
 
+  private static final class NodeId implements Octree.NodeId {
+    int nodeIndex;
+
+    public NodeId(int nodeIndex) {
+      this.nodeIndex = nodeIndex;
+    }
+  }
+
+  @Override
+  public Octree.NodeId getRoot() {
+    return new NodeId(0);
+  }
+
+  @Override
+  public boolean isBranch(Octree.NodeId node) {
+    return treeData[((NodeId)node).nodeIndex] > 0;
+  }
+
+  @Override
+  public Octree.NodeId getChild(Octree.NodeId parent, int childNo) {
+    return new NodeId(treeData[((NodeId)parent).nodeIndex] + 2*childNo);
+  }
+
+  @Override
+  public int getType(Octree.NodeId node) {
+    return -treeData[((NodeId)node).nodeIndex];
+  }
+
+  @Override
+  public int getData(Octree.NodeId node) {
+    return treeData[((NodeId)node).nodeIndex+1];
+  }
+
   /**
    * A custom exception that signals the octree is too big for this implementation
    */
@@ -83,21 +116,20 @@ public class PackedOctree implements Octree.OctreeImplementation {
   }
 
   /**
-   * Constructor building a tree from an existing NodeBasedOctree
-   * We build the tree by walking an existing tree and recreating it in this format
+   * Constructor building a tree with capacity for some nodes
    * @param depth The depth of the tree
-   * @param root The root of the tree to recreate
+   * @param nodeCount The number of nodes this tree will contain
    */
-  public PackedOctree(int depth, Octree.Node root) {
+  public PackedOctree(int depth, long nodeCount) {
     this.depth = depth;
-    long nodeCount = nodeCount(root);
     long arraySize = Math.max(nodeCount*2, 64);
     if(arraySize > (long)MAX_ARRAY_SIZE)
       throw new OctreeTooBigException();
     treeData = new int[(int)arraySize];
-    addNode(root, 0, 2);
+    treeData[0] = 0;
+    treeData[1] = 0;
+    size = 2;
     freeHead = -1; // No holes
-    size = (int)nodeCount*2;
   }
 
   /**
@@ -112,45 +144,6 @@ public class PackedOctree implements Octree.OctreeImplementation {
     treeData[1] = 0;
     size = 2;
     freeHead = -1;
-  }
-
-  private static long nodeCount(Octree.Node node) {
-    if(node.type == BRANCH_NODE) {
-      return 1
-        + nodeCount(node.children[0])
-        + nodeCount(node.children[1])
-        + nodeCount(node.children[2])
-        + nodeCount(node.children[3])
-        + nodeCount(node.children[4])
-        + nodeCount(node.children[5])
-        + nodeCount(node.children[6])
-        + nodeCount(node.children[7]);
-    } else {
-      return 1;
-    }
-  }
-
-  /**
-   * Add a node at the next free index and call recursively on children
-   * @param node The node to add
-   * @param nodeIndex The index of the node currently being added
-   * @param nextFreeIndex The next free index before adding the node
-   * @return The next free index after adding the subtree
-   */
-  private int addNode(Octree.Node node, int nodeIndex, int nextFreeIndex) {
-    // Unconditionally add data
-    treeData[nodeIndex+1] = node.getData();
-    if(node.type == BRANCH_NODE) {
-      treeData[nodeIndex] = nextFreeIndex;
-      int newNextFreeIndex = nextFreeIndex + 8*2;
-      for(int i = 0; i < 8; ++i) {
-        newNextFreeIndex = addNode(node.children[i], nextFreeIndex+2*i, newNextFreeIndex);
-      }
-      return newNextFreeIndex;
-    } else {
-      treeData[nodeIndex] = -node.type; // Store the negation of the type
-      return nextFreeIndex;
-    }
   }
 
   /**
@@ -356,331 +349,6 @@ public class PackedOctree implements Octree.OctreeImplementation {
   }
 
   @Override
-  public boolean isInside(Vector3 o) {
-    int x = (int) QuickMath.floor(o.x);
-    int y = (int) QuickMath.floor(o.y);
-    int z = (int) QuickMath.floor(o.z);
-
-    int lx = x >>> depth;
-    int ly = y >>> depth;
-    int lz = z >>> depth;
-
-    return lx == 0 && ly == 0 && lz == 0;
-  }
-
-  /**
-   * Moves the ray to the boundary of the octree.
-   * @param ray Ray that will be moved to the boundary of the octree. The origin, distance and normals will be modified.
-   * @return {@code false} if the ray doesn't intersect the octree.
-   */
-  private boolean enterOctree(Ray ray) {
-    double nx, ny, nz;
-    double octree_size = 1 << depth;
-
-    // AABB intersection with the octree boundary
-    double tMin, tMax;
-    double invDirX = 1 / ray.d.x;
-    if (invDirX >= 0) {
-      tMin = -ray.o.x * invDirX;
-      tMax = (octree_size - ray.o.x) * invDirX;
-
-      nx = -1;
-      ny = nz = 0;
-    } else {
-      tMin = (octree_size - ray.o.x) * invDirX;
-      tMax = -ray.o.x * invDirX;
-
-      nx = 1;
-      ny = nz = 0;
-    }
-
-    double tYMin, tYMax;
-    double invDirY = 1 / ray.d.y;
-    if (invDirY >= 0) {
-      tYMin = -ray.o.y * invDirY;
-      tYMax = (octree_size - ray.o.y) * invDirY;
-    } else {
-      tYMin = (octree_size - ray.o.y) * invDirY;
-      tYMax = -ray.o.y * invDirY;
-    }
-
-    if ((tMin > tYMax) || (tYMin > tMax))
-      return false;
-
-    if (tYMin > tMin) {
-      tMin = tYMin;
-
-      ny = -FastMath.signum(ray.d.y);
-      nx = nz = 0;
-    }
-
-    if (tYMax < tMax)
-      tMax = tYMax;
-
-    double tZMin, tZMax;
-    double invDirZ = 1 / ray.d.z;
-    if (invDirZ >= 0) {
-      tZMin = -ray.o.z * invDirZ;
-      tZMax = (octree_size - ray.o.z) * invDirZ;
-    } else {
-      tZMin = (octree_size - ray.o.z) * invDirZ;
-      tZMax = -ray.o.z * invDirZ;
-    }
-
-    if ((tMin > tZMax) || (tZMin > tMax))
-      return false;
-
-    if (tZMin > tMin) {
-      tMin = tZMin;
-
-      nz = -FastMath.signum(ray.d.z);
-      nx = ny = 0;
-    }
-
-    if (tMin < 0)
-      return false;
-
-    ray.o.scaleAdd(tMin, ray.d);
-    ray.n.set(nx, ny, nz);
-    ray.distance += tMin;
-    return true;
-  }
-
-  /**
-   *  {@inheritDoc}
-   */
-  @Override
-  public boolean enterBlock(Scene scene, Ray ray, BlockPalette palette) {
-    if (!isInside(ray.o) && !enterOctree(ray))
-      return false;
-
-    // Marching is done in a top-down fashion: at each step, the octree is descended from the root to find the leaf
-    // node the ray is in. Terminating the march is then decided based on the block type in that leaf node. Finally the
-    // ray is advanced to the boundary of the current leaf node and the next, ready for the next iteration.
-    while (true) {
-      // Add small offset past the intersection to avoid
-      // recursion to the same octree node!
-      int x = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
-      int y = (int) QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
-      int z = (int) QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
-
-      int lx = x >>> depth;
-      int ly = y >>> depth;
-      int lz = z >>> depth;
-
-      if (lx != 0 || ly != 0 || lz != 0)
-          return false; // outside of octree!
-
-      // Descend the tree to find the current leaf node
-      int level = depth;
-      int nodeIndex = 0;
-      while(treeData[nodeIndex] > 0) {
-        level -= 1;
-        lx = x >>> level;
-        ly = y >>> level;
-        lz = z >>> level;
-        nodeIndex = treeData[nodeIndex] + (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)) * 2;
-      }
-
-      // Test intersection
-      Block currentBlock = palette.get(-treeData[nodeIndex]);
-      Material prevBlock = ray.getCurrentMaterial();
-
-      ray.setPrevMaterial(prevBlock, ray.getCurrentData());
-      ray.setCurrentMaterial(currentBlock, treeData[nodeIndex+1]);
-
-      if (currentBlock.localIntersect) {
-        if (currentBlock.intersect(ray, scene)) {
-          if (prevBlock != currentBlock)
-            return true;
-
-          ray.o.scaleAdd(Ray.OFFSET, ray.d);
-          continue;
-        } else {
-          // Exit ray from this local block.
-          ray.setCurrentMaterial(Air.INSTANCE, 0); // Current material is air.
-          ray.exitBlock(x, y, z);
-          continue;
-        }
-      } else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Air.INSTANCE) {
-        TexturedBlockModel.getIntersectionColor(ray);
-        return true;
-      }
-
-      // No intersection, exit current octree leaf.
-      int nx = 0, ny = 0, nz = 0;
-      double tNear = Double.POSITIVE_INFINITY;
-
-      // Testing all six sides of the current leaf node and advancing to the closest intersection
-      double t = ((lx << level) - ray.o.x) / ray.d.x;
-      if (t > Ray.EPSILON) {
-        tNear = t;
-        nx = 1;
-        ny = nz = 0;
-      } else {
-        t = (((lx + 1) << level) - ray.o.x) / ray.d.x;
-        if (t < tNear && t > Ray.EPSILON) {
-          tNear = t;
-          nx = -1;
-          ny = nz = 0;
-        }
-      }
-
-      t = ((ly << level) - ray.o.y) / ray.d.y;
-      if (t < tNear && t > Ray.EPSILON) {
-        tNear = t;
-        ny = 1;
-        nx = nz = 0;
-      } else {
-        t = (((ly + 1) << level) - ray.o.y) / ray.d.y;
-        if (t < tNear && t > Ray.EPSILON) {
-          tNear = t;
-          ny = -1;
-          nx = nz = 0;
-        }
-      }
-
-      t = ((lz << level) - ray.o.z) / ray.d.z;
-      if (t < tNear && t > Ray.EPSILON) {
-        tNear = t;
-        nz = 1;
-        nx = ny = 0;
-      } else {
-        t = (((lz + 1) << level) - ray.o.z) / ray.d.z;
-        if (t < tNear && t > Ray.EPSILON) {
-          tNear = t;
-          nz = -1;
-          nx = ny = 0;
-        }
-      }
-
-      ray.o.scaleAdd(tNear, ray.d);
-      ray.n.set(nx, ny, nz);
-      ray.distance += tNear;
-    }
-  }
-
-  /**
-   *  {@inheritDoc}
-   */
-  @Override
-  public boolean exitWater(Scene scene, Ray ray, BlockPalette palette) {
-    if (!isInside(ray.o) && !enterOctree(ray))
-      return false;
-
-    // Marching is done in a top-down fashion: at each step, the octree is descended from the root to find the leaf
-    // node the ray is in. Terminating the march is then decided based on the block type in that leaf node. Finally the
-    // ray is advanced to the boundary of the current leaf node and the next, ready for the next iteration.
-    while (true) {
-      // Add small offset past the intersection to avoid
-      // recursion to the same octree node!
-      int x = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
-      int y = (int) QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
-      int z = (int) QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
-
-      int lx = x >>> depth;
-      int ly = y >>> depth;
-      int lz = z >>> depth;
-
-      if (lx != 0 || ly != 0 || lz != 0)
-        return false; // outside of octree!
-
-      // Descend the tree to find the current leaf node
-      int nodeIndex = 0;
-      int level = depth;
-      while(treeData[nodeIndex] > 0) {
-        level -= 1;
-        lx = x >>> level;
-        ly = y >>> level;
-        lz = z >>> level;
-        nodeIndex = treeData[nodeIndex] + (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)) * 2;
-      }
-
-      // Test intersection
-      Block currentBlock = palette.get(-treeData[nodeIndex]);
-      Material prevBlock = ray.getCurrentMaterial();
-
-      ray.setPrevMaterial(prevBlock, ray.getCurrentData());
-      ray.setCurrentMaterial(currentBlock, treeData[nodeIndex+1]);
-
-      if (!currentBlock.isWater()) {
-        if (currentBlock.localIntersect) {
-          if (!currentBlock.intersect(ray, scene)) {
-            ray.setCurrentMaterial(Air.INSTANCE, 0);
-          }
-          return true;
-        } else if (currentBlock != Air.INSTANCE) {
-          TexturedBlockModel.getIntersectionColor(ray);
-          return true;
-        } else {
-          return true;
-        }
-      }
-
-      if ((treeData[nodeIndex+1] & (1 << Water.FULL_BLOCK)) == 0) {
-        if (WaterModel.intersectTop(ray)) {
-          ray.setCurrentMaterial(Air.INSTANCE, 0);
-          return true;
-        } else {
-          ray.exitBlock(x, y, z);
-          continue;
-        }
-      }
-
-      // No intersection, exit current octree leaf.
-      int nx = 0, ny = 0, nz = 0;
-      double tNear = Double.POSITIVE_INFINITY;
-
-      // Testing all six sides of the current leaf node and advancing to the closest intersection
-      double t = ((lx << level) - ray.o.x) / ray.d.x;
-      if (t > Ray.EPSILON) {
-        tNear = t;
-        nx = 1;
-        ny = nz = 0;
-      } else {
-        t = (((lx + 1) << level) - ray.o.x) / ray.d.x;
-        if (t < tNear && t > Ray.EPSILON) {
-          tNear = t;
-          nx = -1;
-          ny = nz = 0;
-        }
-      }
-
-      t = ((ly << level) - ray.o.y) / ray.d.y;
-      if (t < tNear && t > Ray.EPSILON) {
-        tNear = t;
-        ny = 1;
-        nx = nz = 0;
-      } else {
-        t = (((ly + 1) << level) - ray.o.y) / ray.d.y;
-        if (t < tNear && t > Ray.EPSILON) {
-          tNear = t;
-          ny = -1;
-          nx = nz = 0;
-        }
-      }
-
-      t = ((lz << level) - ray.o.z) / ray.d.z;
-      if (t < tNear && t > Ray.EPSILON) {
-        tNear = t;
-        nz = 1;
-        nx = ny = 0;
-      } else {
-        t = (((lz + 1) << level) - ray.o.z) / ray.d.z;
-        if (t < tNear && t > Ray.EPSILON) {
-          tNear = t;
-          nz = -1;
-          nx = ny = 0;
-        }
-      }
-
-      ray.o.scaleAdd(tNear, ray.d);
-      ray.n.set(nx, ny, nz);
-      ray.distance += tNear;
-    }
-  }
-
-  @Override
   public int getDepth() {
     return depth;
   }
@@ -688,6 +356,13 @@ public class PackedOctree implements Octree.OctreeImplementation {
   public static PackedOctree load(DataInputStream in) throws IOException {
     int depth = in.readInt();
     PackedOctree tree = new PackedOctree(depth);
+    tree.loadNode(in, 0);
+    return tree;
+  }
+
+  public static PackedOctree loadWithNodeCount(long nodeCount, DataInputStream in) throws IOException {
+    int depth = in.readInt();
+    PackedOctree tree = new PackedOctree(depth, nodeCount);
     tree.loadNode(in, 0);
     return tree;
   }
@@ -760,5 +435,50 @@ public class PackedOctree implements Octree.OctreeImplementation {
       return isDataNode ? new Octree.DataNode(treeData[nodeIndex], treeData[nodeIndex+1])
                         : new Octree.Node(treeData[nodeIndex]);
     }
+  }
+
+  @Override
+  public long nodeCount() {
+    return countNodes(0);
+  }
+
+  private long countNodes(int nodeIndex) {
+    if(treeData[nodeIndex] > 0) {
+      long total = 1;
+      for(int i = 0; i < 8; ++i)
+        total += countNodes(treeData[nodeIndex] + 2*i);
+      return total;
+    } else {
+      return 1;
+    }
+  }
+
+  static public void initImplementation() {
+    Octree.addImplementationFactory("PACKED", new Octree.ImplementationFactory() {
+      @Override
+      public Octree.OctreeImplementation create(int depth) {
+        return new PackedOctree(depth);
+      }
+
+      @Override
+      public Octree.OctreeImplementation load(DataInputStream in) throws IOException {
+        return PackedOctree.load(in);
+      }
+
+      @Override
+      public Octree.OctreeImplementation loadWithNodeCount(long nodeCount, DataInputStream in) throws IOException {
+        return PackedOctree.loadWithNodeCount(nodeCount, in);
+      }
+
+      @Override
+      public boolean isOfType(Octree.OctreeImplementation implementation) {
+        return implementation instanceof PackedOctree;
+      }
+
+      @Override
+      public String getDescription() {
+        return "Memory efficient octree implementation, doesn't work for octree with 2^31 nodes, i.e. scenes of 400k chunks. Should be enough for most use case.";
+      }
+    });
   }
 }

@@ -413,5 +413,14 @@ public final class PersistentSettings {
     cacheDir = new File(settingsDir, "cache");
     settings.load(settingsFile);
   }
+
+  public static void setOctreeImplementation(String implementation) {
+    settings.setString("octreeImplementation", implementation);
+    save();
+  }
+
+  public static String getOctreeImplementation() {
+    return settings.getString("octreeImplementation", "PACKED");
+  }
 }
 

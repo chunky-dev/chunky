@@ -24,7 +24,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.PersistentSettings;
@@ -35,10 +34,13 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.ShutdownAlert;
+import se.llbit.math.Octree;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initializable {
@@ -53,6 +55,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private CheckBox shutdown;
   @FXML private CheckBox fastFog;
   @FXML private ChoiceBox<OutputMode> outputMode;
+  @FXML private ChoiceBox<String> octreeImplementation;
 
   public AdvancedTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("AdvancedTab.fxml"));
@@ -105,6 +108,26 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       PersistentSettings.setNumRenderThreads(value);
       renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
     });
+
+    ArrayList<String> implNames = new ArrayList<>();
+    StringBuilder tooltipTextBuilder = new StringBuilder();
+    for(Map.Entry<String, Octree.ImplementationFactory> entry : Octree.getEntries()) {
+      implNames.add(entry.getKey());
+      tooltipTextBuilder.append(entry.getKey());
+      tooltipTextBuilder.append(": ");
+      tooltipTextBuilder.append(entry.getValue().getDescription());
+      tooltipTextBuilder.append('\n');
+    }
+    tooltipTextBuilder.append("Requires reloading chunks to take effect.");
+    octreeImplementation.getItems().addAll(implNames.toArray(new String[implNames.size()]));
+    octreeImplementation.getSelectionModel().selectedItemProperty()
+      .addListener((observable, oldvalue, newvalue) -> {
+        scene.setOctreeImplementation(newvalue);
+        PersistentSettings.setOctreeImplementation(newvalue);
+      });
+    octreeImplementation.setTooltip(new Tooltip(
+      tooltipTextBuilder.toString()
+    ));
   }
 
   public boolean shutdownAfterCompletedRender() {
@@ -117,6 +140,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
+    octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
   }
 
   @Override public String getTabTitle() {
