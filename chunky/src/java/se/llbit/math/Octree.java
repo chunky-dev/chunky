@@ -19,13 +19,11 @@ package se.llbit.math;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.TexturedBlockModel;
@@ -688,33 +686,23 @@ public class Octree {
       return;
     }
 
-    // Here we use a PipedStream to pipe what the old implementation stores
-    // to what the new will load.
-    // With this method both octree will exist side-by-side during the conversion
-    // If this proves to be a problem, we could store to a temporary file instead
+    // This function is called as to provide a fallback when
+    // an implementation isn't suitable, we assume it means
+    // that chunky is already using a lot of memory so we save the octree on disk
+    // and reload it with another implementation
     long nodeCount = implementation.nodeCount();
-    AtomicReference<OctreeImplementation> newOctree = new AtomicReference<>();
-    PipedOutputStream out = new PipedOutputStream();
-    PipedInputStream in = new PipedInputStream(out);
-    Thread readerThread = new Thread(() -> {
-      try {
-        OctreeImplementation impl = factory.loadWithNodeCount(nodeCount, new DataInputStream(in));
-        newOctree.set(impl);
-      } catch(IOException e) {
-        e.printStackTrace();
-      }
-    });
-    readerThread.start();
-    implementation.store(new DataOutputStream(out));
-    try {
-      readerThread.join();
-    } catch(InterruptedException e) {
-      e.printStackTrace();
-    }
-    in.close();
+    File tempFile = File.createTempFile("octree-conversion", ".bin");
+    DataOutputStream out = new DataOutputStream(new FileOutputStream(tempFile));
+    implementation.store(out);
+    out.flush();
     out.close();
+    implementation = null; // Allow th gc to free memory during construction of the new octree
 
-    implementation = newOctree.get();
+    DataInputStream in = new DataInputStream(new FileInputStream(tempFile));
+    implementation = factory.loadWithNodeCount(nodeCount, in);
+    in.close();
+
+    tempFile.delete();
   }
 
   public static void addImplementationFactory(String name, ImplementationFactory factory) {
