@@ -19,6 +19,8 @@ package se.llbit.math;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.math3.util.FastMath;
 
@@ -63,6 +65,19 @@ public class Octree {
     boolean exitWater(Scene scene, Ray ray, BlockPalette palette);
     int getDepth();
   }
+
+  public enum ImplementationEnum {
+    NODE,
+    PACKED,
+    BIGPACKED
+  }
+
+  private interface ImplementationFactory {
+    OctreeImplementation create(int depth);
+    OctreeImplementation load(DataInputStream in) throws IOException;
+  }
+
+  static private Map<ImplementationEnum, ImplementationFactory> factories = new HashMap<>();
 
   public static final int BRANCH_NODE = -1;
 
@@ -234,15 +249,10 @@ public class Octree {
    *
    * @param octreeDepth The number of levels in the Octree.
    */
-  public Octree(int octreeDepth) {
-    if(usePacked)
-      implementation = new BigPackedOctree(octreeDepth);
-    else
-      implementation = new NodeBasedOctree(octreeDepth, new Node(0));
-  }
-
-  public Octree(int octreeDepth, Node node) {
-    implementation = new NodeBasedOctree(octreeDepth, node);
+  public Octree(ImplementationEnum impl, int octreeDepth) {
+    implementation = factories.get(impl).create(octreeDepth);
+    System.out.printf("Creating octree with %s implementation\n", impl.name());
+    Thread.dumpStack();
   }
 
   protected Octree(OctreeImplementation impl) {
@@ -307,26 +317,8 @@ public class Octree {
    * @return The deserialized octree
    * @throws IOException
    */
-  public static Octree load(DataInputStream in) throws IOException {
-    if(usePacked) {
-      return new Octree(BigPackedOctree.load(in));
-    } else {
-      return new Octree(NodeBasedOctree.load(in));
-    }
-  }
-
-  /**
-   * Deserialize the octree from a data input stream.
-   * @param forceNodeBased Forces the tree to be deserialized as a NodeBasedOctree
-   * @return The deserialized octree
-   * @throws IOException
-   */
-  public static Octree load(DataInputStream in, boolean forceNodeBased) throws IOException {
-    if(forceNodeBased) {
-      return new Octree(NodeBasedOctree.load(in));
-    } else {
-      return load(in);
-    }
+  public static Octree load(ImplementationEnum impl, DataInputStream in) throws IOException {
+    return new Octree(factories.get(impl).load(in));
   }
 
   /**
@@ -393,4 +385,42 @@ public class Octree {
     }
   }
 
+
+  static {
+    factories.put(ImplementationEnum.NODE, new ImplementationFactory() {
+      @Override
+      public OctreeImplementation create(int depth) {
+        return new NodeBasedOctree(depth, new Node(0));
+      }
+
+      @Override
+      public OctreeImplementation load(DataInputStream in) throws IOException {
+        return NodeBasedOctree.load(in);
+      }
+    });
+
+    factories.put(ImplementationEnum.PACKED, new ImplementationFactory() {
+      @Override
+      public OctreeImplementation create(int depth) {
+        return new PackedOctree(depth);
+      }
+
+      @Override
+      public OctreeImplementation load(DataInputStream in) throws IOException {
+        return PackedOctree.load(in);
+      }
+    });
+
+    factories.put(ImplementationEnum.BIGPACKED, new ImplementationFactory() {
+      @Override
+      public OctreeImplementation create(int depth) {
+        return new BigPackedOctree(depth);
+      }
+
+      @Override
+      public OctreeImplementation load(DataInputStream in) throws IOException {
+        return BigPackedOctree.load(in);
+      }
+    });
+  }
 }

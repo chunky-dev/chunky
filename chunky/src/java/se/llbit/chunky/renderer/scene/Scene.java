@@ -38,7 +38,6 @@ import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
-import se.llbit.chunky.ui.render.MaterialsTab;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -60,7 +59,6 @@ import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
-import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
@@ -300,6 +298,11 @@ public class Scene implements JsonSerializable, Refreshable {
   private boolean forceReset = false;
 
   /**
+   * The octree implementation to use
+   */
+  private Octree.ImplementationEnum octreeImplementation = Octree.ImplementationEnum.PACKED;
+
+  /**
    * Creates a scene with all default settings.
    *
    * <p>Note: this does not initialize the render buffers for the scene!
@@ -312,8 +315,8 @@ public class Scene implements JsonSerializable, Refreshable {
     sppTarget = PersistentSettings.getSppTargetDefault();
 
     palette = new BlockPalette();
-    worldOctree = new Octree(1);
-    waterOctree = new Octree(1);
+    worldOctree = new Octree(octreeImplementation, 1);
+    waterOctree = new Octree(octreeImplementation, 1);
   }
 
   /**
@@ -428,6 +431,8 @@ public class Scene implements JsonSerializable, Refreshable {
       alphaChannel = other.alphaChannel;
       samples = other.samples;
     }
+
+    octreeImplementation = other.octreeImplementation;
   }
 
   /**
@@ -731,8 +736,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
       // Create new octree to fit all chunks.
       palette = new BlockPalette();
-      worldOctree = new Octree(requiredDepth);
-      waterOctree = new Octree(requiredDepth);
+      worldOctree = new Octree(octreeImplementation, requiredDepth);
+      waterOctree = new Octree(octreeImplementation, requiredDepth);
 
       // Parse the regions first - force chunk lists to be populated!
       Set<ChunkPosition> regions = new HashSet<>();
@@ -1741,12 +1746,12 @@ public class Scene implements JsonSerializable, Refreshable {
         long fileTimestamp = context.fileTimestamp(fileName);
         OctreeFileFormat.OctreeData data;
         try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)))) {
-          data = OctreeFileFormat.load(in);
+          data = OctreeFileFormat.load(in, octreeImplementation);
         } catch(PackedOctree.OctreeTooBigException e) {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
           DataInputStream inRetry = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)));
-          data = OctreeFileFormat.load(inRetry, true);
+          data = OctreeFileFormat.load(inRetry, Octree.ImplementationEnum.NODE);
         }
         worldOctree = data.worldTree;
         worldOctree.setTimestamp(fileTimestamp);
@@ -2275,6 +2280,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!actorArray.isEmpty()) {
       json.add("actors", actorArray);
     }
+    json.add("octreeImplementation", octreeImplementation.ordinal());
 
     return json;
   }
@@ -2559,6 +2565,10 @@ public class Scene implements JsonSerializable, Refreshable {
         actors.add(entity);
       }
     }
+
+    octreeImplementation = Octree.ImplementationEnum.values()[
+      json.get("octreeImplementation").asInt(Octree.ImplementationEnum.PACKED.ordinal())
+    ];
   }
 
   /**
@@ -2798,6 +2808,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setYClipMax(int yClipMax) {
     this.yClipMax = yClipMax;
+  }
+
+  public Octree.ImplementationEnum getOctreeImplementation() {
+    return octreeImplementation;
+  }
+
+  public void setOctreeImplementation(Octree.ImplementationEnum octreeImplementation) {
+    this.octreeImplementation = octreeImplementation;
   }
 
 }

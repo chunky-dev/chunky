@@ -24,7 +24,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.PersistentSettings;
@@ -35,6 +34,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.ShutdownAlert;
+import se.llbit.math.Octree;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +53,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private CheckBox shutdown;
   @FXML private CheckBox fastFog;
   @FXML private ChoiceBox<OutputMode> outputMode;
+  @FXML private ChoiceBox<Octree.ImplementationEnum> octreeImplementation;
 
   public AdvancedTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("AdvancedTab.fxml"));
@@ -105,6 +106,10 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       PersistentSettings.setNumRenderThreads(value);
       renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
     });
+
+    octreeImplementation.getItems().addAll(Octree.ImplementationEnum.values());
+    octreeImplementation.getSelectionModel().selectedItemProperty()
+      .addListener((observable, oldvalue, newvalue) -> scene.setOctreeImplementation(newvalue));
   }
 
   public boolean shutdownAfterCompletedRender() {
@@ -117,6 +122,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     renderThreads.set(PersistentSettings.getNumThreads());
     cpuLoad.set(PersistentSettings.getCPULoad());
     rayDepth.set(scene.getRayDepth());
+    octreeImplementation.getSelectionModel().select(scene.getOctreeImplementation());
   }
 
   @Override public String getTabTitle() {

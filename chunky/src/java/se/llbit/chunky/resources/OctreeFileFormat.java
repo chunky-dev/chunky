@@ -32,9 +32,9 @@ public class OctreeFileFormat {
    * Load octrees and grass/foliage textures from a file.
    *
    * @param in input stream for the file to load the scene from.
-   * @param forceNodeBased Forces the octrees to be loaded as NodeBasedOctree
+   * @param impl The octree implementation to use
    */
-  public static OctreeData load(DataInputStream in, boolean forceNodeBased) throws IOException {
+  public static OctreeData load(DataInputStream in, Octree.ImplementationEnum impl) throws IOException {
     int version = in.readInt();
     if (version != OCTREE_VERSION) {
       throw new IOException(String.format(
@@ -43,20 +43,11 @@ public class OctreeFileFormat {
     }
     OctreeData data = new OctreeData();
     data.palette = BlockPalette.read(in);
-    data.worldTree = Octree.load(in, forceNodeBased);
-    data.waterTree = Octree.load(in, forceNodeBased);
+    data.worldTree = Octree.load(impl, in);
+    data.waterTree = Octree.load(impl, in);
     data.grassColors = WorldTexture.load(in);
     data.foliageColors = WorldTexture.load(in);
     return data;
-  }
-
-  /**
-   * Load octrees and grass/foliage textures from a file.
-   *
-   * @param in input stream for the file to load the scene from.
-   */
-  public static OctreeData load(DataInputStream in) throws IOException {
-    return load(in, false);
   }
 
   /**
