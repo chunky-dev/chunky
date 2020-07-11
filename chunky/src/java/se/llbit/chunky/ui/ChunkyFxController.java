@@ -71,7 +71,7 @@ import se.llbit.chunky.renderer.SnapshotControl;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.RenderResetHandler;
-import se.llbit.chunky.world.Chunk;
+import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.ChunkPosition;
 import se.llbit.chunky.world.ChunkSelectionTracker;
 import se.llbit.chunky.world.ChunkView;
@@ -363,7 +363,7 @@ public class ChunkyFxController
     renderer.setRenderTask(taskTracker.backgroundTask());
 
     saveScene.setGraphic(new ImageView(Icon.disk.fxImage()));
-    saveScene.setOnAction(e -> asyncSceneManager.saveScene());
+    saveScene.setOnAction(e -> saveSceneSafe(sceneNameField.getText()));
 
     loadScene.setGraphic(new ImageView(Icon.load.fxImage()));
     loadScene.setOnAction(e -> openSceneChooser());
@@ -385,12 +385,7 @@ public class ChunkyFxController
       }
       return change;
     }));
-    sceneNameField.textProperty().addListener((observable, oldValue, newValue) -> {
-      scene.setName(newValue);
-      renderController.getSceneProvider().withSceneProtected(scene1 -> scene1.setName(newValue));
-      updateTitle();
-    });
-    sceneNameField.setOnAction(event -> asyncSceneManager.saveScene());
+    sceneNameField.setOnAction(event -> saveSceneSafe(sceneNameField.getText()));
 
     Log.setReceiver(new UILogReceiver(), Level.ERROR, Level.WARNING);
 
@@ -890,4 +885,21 @@ public class ChunkyFxController
   @Override public void cameraViewUpdated() {
     map.cameraViewUpdated();
   }
+
+  private void saveSceneSafe(String sceneName) {
+    File oldFormat = new File(PersistentSettings.getSceneDirectory(), sceneName + Scene.EXTENSION);
+    File newFormat = new File(PersistentSettings.getSceneDirectory(), sceneName);
+    if (oldFormat.exists() || newFormat.exists()) {
+      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      alert.setTitle("Overwrite Existing Scene");
+      alert.setContentText("A scene with that name exists. You will overwrite the existing scene, are you sure you want to continue?");
+
+      if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
+    }
+    scene.setName(sceneName);
+    renderController.getSceneProvider().withSceneProtected(scene1 -> scene1.setName(sceneName));
+    updateTitle();
+    asyncSceneManager.saveScene();
+  }
+
 }
