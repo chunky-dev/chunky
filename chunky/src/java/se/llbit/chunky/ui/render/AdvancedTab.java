@@ -113,6 +113,12 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
         scene.setOctreeImplementation(newvalue);
         PersistentSettings.setOctreeImplementation(newvalue.ordinal());
       });
+    octreeImplementation.setTooltip(new Tooltip(
+"NODE: The legacy octree implementation, memory inefficient but can work with scene of any size\n"
+      + "PACKED: Memory efficient octree implementation, doesn't work for octree with 2^31 nodes, i.e. scenes of 400k chunks. "
+      + "Should be enough for most use case.\n"
+      + "BIGPACKED: Almost as memory efficient  as PACKED but doesn't have a limitation on the size of the octree."
+    ));
   }
 
   public boolean shutdownAfterCompletedRender() {
