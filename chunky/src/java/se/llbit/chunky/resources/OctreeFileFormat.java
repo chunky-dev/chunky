@@ -34,7 +34,7 @@ public class OctreeFileFormat {
    * @param in input stream for the file to load the scene from.
    * @param impl The octree implementation to use
    */
-  public static OctreeData load(DataInputStream in, Octree.ImplementationEnum impl) throws IOException {
+  public static OctreeData load(DataInputStream in, String impl) throws IOException {
     int version = in.readInt();
     if (version != OCTREE_VERSION) {
       throw new IOException(String.format(

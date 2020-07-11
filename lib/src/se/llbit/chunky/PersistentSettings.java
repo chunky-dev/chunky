@@ -414,13 +414,13 @@ public final class PersistentSettings {
     settings.load(settingsFile);
   }
 
-  public static void setOctreeImplementation(int ordinal) {
-    settings.setInt("octreeImplementation", ordinal);
+  public static void setOctreeImplementation(String implementation) {
+    settings.setString("octreeImplementation", implementation);
     save();
   }
 
-  public static int getOctreeImplementation() {
-    return settings.getInt("octreeImplementation", 1); // Packed Octree hardcoded as an int, not nice
+  public static String getOctreeImplementation() {
+    return settings.getString("octreeImplementation", "PACKED");
   }
 }
 

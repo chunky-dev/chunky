@@ -66,18 +66,19 @@ public class Octree {
     int getDepth();
   }
 
-  public enum ImplementationEnum {
-    NODE,
-    PACKED,
-    BIGPACKED
-  }
-
-  private interface ImplementationFactory {
+  public interface ImplementationFactory {
     OctreeImplementation create(int depth);
     OctreeImplementation load(DataInputStream in) throws IOException;
   }
 
-  static private Map<ImplementationEnum, ImplementationFactory> factories = new HashMap<>();
+  static private Map<String, ImplementationFactory> factories = new HashMap<>();
+  static public final String DEFAULT_IMPLEMENTATION = "PACKED";
+  static private ImplementationFactory getImplementationFactory(String implementation) {
+    if(factories.containsKey(implementation))
+      return factories.get(implementation);
+    Log.warn(String.format("Unknown octree implementation specified, using %s", DEFAULT_IMPLEMENTATION));
+    return factories.get(DEFAULT_IMPLEMENTATION);
+  }
 
   public static final int BRANCH_NODE = -1;
 
@@ -249,8 +250,8 @@ public class Octree {
    *
    * @param octreeDepth The number of levels in the Octree.
    */
-  public Octree(ImplementationEnum impl, int octreeDepth) {
-    implementation = factories.get(impl).create(octreeDepth);
+  public Octree(String impl, int octreeDepth) {
+    implementation = getImplementationFactory(impl).create(octreeDepth);
   }
 
   protected Octree(OctreeImplementation impl) {
@@ -315,8 +316,8 @@ public class Octree {
    * @return The deserialized octree
    * @throws IOException
    */
-  public static Octree load(ImplementationEnum impl, DataInputStream in) throws IOException {
-    return new Octree(factories.get(impl).load(in));
+  public static Octree load(String impl, DataInputStream in) throws IOException {
+    return new Octree(getImplementationFactory(impl).load(in));
   }
 
   /**
@@ -385,7 +386,7 @@ public class Octree {
 
 
   static {
-    factories.put(ImplementationEnum.NODE, new ImplementationFactory() {
+    factories.put("NODE", new ImplementationFactory() {
       @Override
       public OctreeImplementation create(int depth) {
         return new NodeBasedOctree(depth, new Node(0));
@@ -397,7 +398,7 @@ public class Octree {
       }
     });
 
-    factories.put(ImplementationEnum.PACKED, new ImplementationFactory() {
+    factories.put("PACKED", new ImplementationFactory() {
       @Override
       public OctreeImplementation create(int depth) {
         return new PackedOctree(depth);
@@ -409,7 +410,7 @@ public class Octree {
       }
     });
 
-    factories.put(ImplementationEnum.BIGPACKED, new ImplementationFactory() {
+    factories.put("BIGPACKED", new ImplementationFactory() {
       @Override
       public OctreeImplementation create(int depth) {
         return new BigPackedOctree(depth);
@@ -420,5 +421,9 @@ public class Octree {
         return BigPackedOctree.load(in);
       }
     });
+  }
+
+  public static void addImplementationFactory(String name, ImplementationFactory factory) {
+    factories.put(name, factory);
   }
 }

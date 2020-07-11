@@ -300,8 +300,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * The octree implementation to use
    */
-  private Octree.ImplementationEnum octreeImplementation
-          = Octree.ImplementationEnum.values()[PersistentSettings.getOctreeImplementation()];
+  private String octreeImplementation = PersistentSettings.getOctreeImplementation();
 
   /**
    * Creates a scene with all default settings.
@@ -1752,7 +1751,7 @@ public class Scene implements JsonSerializable, Refreshable {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
           DataInputStream inRetry = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)));
-          data = OctreeFileFormat.load(inRetry, Octree.ImplementationEnum.NODE);
+          data = OctreeFileFormat.load(inRetry, "NODE");
         }
         worldOctree = data.worldTree;
         worldOctree.setTimestamp(fileTimestamp);
@@ -2281,7 +2280,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!actorArray.isEmpty()) {
       json.add("actors", actorArray);
     }
-    json.add("octreeImplementation", octreeImplementation.ordinal());
+    json.add("octreeImplementation", octreeImplementation);
 
     return json;
   }
@@ -2567,9 +2566,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
-    octreeImplementation = Octree.ImplementationEnum.values()[
-      json.get("octreeImplementation").asInt(Octree.ImplementationEnum.PACKED.ordinal())
-    ];
+    octreeImplementation = json.get("octreeImplementation").asString(Octree.DEFAULT_IMPLEMENTATION);
   }
 
   /**
@@ -2811,11 +2808,11 @@ public class Scene implements JsonSerializable, Refreshable {
     this.yClipMax = yClipMax;
   }
 
-  public Octree.ImplementationEnum getOctreeImplementation() {
+  public String getOctreeImplementation() {
     return octreeImplementation;
   }
 
-  public void setOctreeImplementation(Octree.ImplementationEnum octreeImplementation) {
+  public void setOctreeImplementation(String octreeImplementation) {
     this.octreeImplementation = octreeImplementation;
   }
 

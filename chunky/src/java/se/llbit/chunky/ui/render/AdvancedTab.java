@@ -53,7 +53,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private CheckBox shutdown;
   @FXML private CheckBox fastFog;
   @FXML private ChoiceBox<OutputMode> outputMode;
-  @FXML private ChoiceBox<Octree.ImplementationEnum> octreeImplementation;
+  @FXML private ChoiceBox<String> octreeImplementation;
 
   public AdvancedTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("AdvancedTab.fxml"));
@@ -107,17 +107,18 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
     });
 
-    octreeImplementation.getItems().addAll(Octree.ImplementationEnum.values());
+    octreeImplementation.getItems().addAll("NODE", "PACKED", "BIGPACKED");
     octreeImplementation.getSelectionModel().selectedItemProperty()
       .addListener((observable, oldvalue, newvalue) -> {
         scene.setOctreeImplementation(newvalue);
-        PersistentSettings.setOctreeImplementation(newvalue.ordinal());
+        PersistentSettings.setOctreeImplementation(newvalue);
       });
     octreeImplementation.setTooltip(new Tooltip(
 "NODE: The legacy octree implementation, memory inefficient but can work with scene of any size\n"
       + "PACKED: Memory efficient octree implementation, doesn't work for octree with 2^31 nodes, i.e. scenes of 400k chunks. "
       + "Should be enough for most use case.\n"
-      + "BIGPACKED: Almost as memory efficient as PACKED but doesn't have a limitation on the size of the octree."
+      + "BIGPACKED: Almost as memory efficient as PACKED but doesn't have a limitation on the size of the octree.\n"
+      + "Requires reloading chunks to take effect."
     ));
   }
 
