@@ -251,8 +251,6 @@ public class Octree {
    */
   public Octree(ImplementationEnum impl, int octreeDepth) {
     implementation = factories.get(impl).create(octreeDepth);
-    System.out.printf("Creating octree with %s implementation\n", impl.name());
-    Thread.dumpStack();
   }
 
   protected Octree(OctreeImplementation impl) {

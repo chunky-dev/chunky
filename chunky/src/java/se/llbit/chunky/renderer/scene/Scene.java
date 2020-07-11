@@ -300,7 +300,8 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * The octree implementation to use
    */
-  private Octree.ImplementationEnum octreeImplementation = Octree.ImplementationEnum.PACKED;
+  private Octree.ImplementationEnum octreeImplementation
+          = Octree.ImplementationEnum.values()[PersistentSettings.getOctreeImplementation()];
 
   /**
    * Creates a scene with all default settings.

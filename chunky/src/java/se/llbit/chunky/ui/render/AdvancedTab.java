@@ -109,7 +109,10 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
     octreeImplementation.getItems().addAll(Octree.ImplementationEnum.values());
     octreeImplementation.getSelectionModel().selectedItemProperty()
-      .addListener((observable, oldvalue, newvalue) -> scene.setOctreeImplementation(newvalue));
+      .addListener((observable, oldvalue, newvalue) -> {
+        scene.setOctreeImplementation(newvalue);
+        PersistentSettings.setOctreeImplementation(newvalue.ordinal());
+      });
   }
 
   public boolean shutdownAfterCompletedRender() {
