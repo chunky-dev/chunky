@@ -236,7 +236,7 @@ public class Octree {
    */
   public Octree(int octreeDepth) {
     if(usePacked)
-      implementation = new PackedOctree(octreeDepth);
+      implementation = new BigPackedOctree(octreeDepth);
     else
       implementation = new NodeBasedOctree(octreeDepth, new Node(0));
   }
@@ -309,7 +309,7 @@ public class Octree {
    */
   public static Octree load(DataInputStream in) throws IOException {
     if(usePacked) {
-      return new Octree(PackedOctree.load(in));
+      return new Octree(BigPackedOctree.load(in));
     } else {
       return new Octree(NodeBasedOctree.load(in));
     }
@@ -379,7 +379,7 @@ public class Octree {
     if(usePacked) {
       if(implementation instanceof NodeBasedOctree) {
         try {
-          implementation = new PackedOctree(implementation.getDepth(), ((NodeBasedOctree) implementation).root);
+          implementation = new BigPackedOctree(implementation.getDepth(), ((NodeBasedOctree) implementation).root);
         } catch(PackedOctree.OctreeTooBigException e) {
           // If octree is too big, do nothing, keep the node based implementation
         }
