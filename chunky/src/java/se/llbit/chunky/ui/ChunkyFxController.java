@@ -891,8 +891,8 @@ public class ChunkyFxController
     File newFormat = new File(PersistentSettings.getSceneDirectory(), sceneName);
     if (oldFormat.exists() || newFormat.exists()) {
       Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-      alert.setTitle("Overwrite Existing Scene");
-      alert.setContentText("A scene with that name exists. You will overwrite the existing scene, are you sure you want to continue?");
+      alert.setTitle("Overwrite existing scene");
+      alert.setContentText("A scene with that name already exists. This will overwrite the existing scene, are you sure you want to continue?");
 
       if (alert.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
     }
