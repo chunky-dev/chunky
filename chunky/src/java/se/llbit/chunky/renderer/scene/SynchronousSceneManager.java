@@ -109,8 +109,8 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       synchronized (storedScene) {
         String sceneName = storedScene.name();
         Log.info("Saving scene " + sceneName);
-
-        File sceneDir = context.getSceneDirectory();
+        File sceneDir = resolveSceneDirectory(sceneName);
+        context.setSceneDirectory(sceneDir);
         if (!sceneDir.isDirectory()) {
           Log.warn("Scene directory does not exist. Creating directory at: "
               + sceneDir.getAbsolutePath());
@@ -323,10 +323,8 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         Log.warn("Specific scene folder could not be created. Defaulting to the scene directory.");
         return PersistentSettings.getSceneDirectory();
 
-      } else {
-        return defaultDirectory;
       }
-    } else return defaultDirectory;
+    }
+    return defaultDirectory;
   }
-
 }
