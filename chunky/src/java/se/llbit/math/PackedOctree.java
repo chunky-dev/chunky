@@ -474,6 +474,11 @@ public class PackedOctree implements Octree.OctreeImplementation {
       public boolean isOfType(Octree.OctreeImplementation implementation) {
         return implementation instanceof PackedOctree;
       }
+
+      @Override
+      public String getDescription() {
+        return "Memory efficient octree implementation, doesn't work for octree with 2^31 nodes, i.e. scenes of 400k chunks. Should be enough for most use case.";
+      }
     });
   }
 }

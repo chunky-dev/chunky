@@ -39,6 +39,8 @@ import se.llbit.math.Octree;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initializable {
@@ -107,18 +109,24 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
     });
 
-    octreeImplementation.getItems().addAll("NODE", "PACKED", "BIGPACKED");
+    ArrayList<String> implNames = new ArrayList<>();
+    StringBuilder tooltipTextBuilder = new StringBuilder();
+    for(Map.Entry<String, Octree.ImplementationFactory> entry : Octree.getEntries()) {
+      implNames.add(entry.getKey());
+      tooltipTextBuilder.append(entry.getKey());
+      tooltipTextBuilder.append(": ");
+      tooltipTextBuilder.append(entry.getValue().getDescription());
+      tooltipTextBuilder.append('\n');
+    }
+    tooltipTextBuilder.append("Requires reloading chunks to take effect.");
+    octreeImplementation.getItems().addAll(implNames.toArray(new String[implNames.size()]));
     octreeImplementation.getSelectionModel().selectedItemProperty()
       .addListener((observable, oldvalue, newvalue) -> {
         scene.setOctreeImplementation(newvalue);
         PersistentSettings.setOctreeImplementation(newvalue);
       });
     octreeImplementation.setTooltip(new Tooltip(
-"NODE: The legacy octree implementation, memory inefficient but can work with scene of any size\n"
-      + "PACKED: Memory efficient octree implementation, doesn't work for octree with 2^31 nodes, i.e. scenes of 400k chunks. "
-      + "Should be enough for most use case.\n"
-      + "BIGPACKED: Almost as memory efficient as PACKED but doesn't have a limitation on the size of the octree.\n"
-      + "Requires reloading chunks to take effect."
+      tooltipTextBuilder.toString()
     ));
   }
 

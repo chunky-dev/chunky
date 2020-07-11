@@ -230,6 +230,11 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
       public boolean isOfType(Octree.OctreeImplementation implementation) {
         return implementation instanceof NodeBasedOctree;
       }
+
+      @Override
+      public String getDescription() {
+        return "The legacy octree implementation, memory inefficient but can work with scene of any size.";
+      }
     });
   }
 }

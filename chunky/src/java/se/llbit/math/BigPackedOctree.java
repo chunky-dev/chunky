@@ -476,6 +476,11 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
       public boolean isOfType(Octree.OctreeImplementation implementation) {
         return implementation instanceof BigPackedOctree;
       }
+
+      @Override
+      public String getDescription() {
+        return "Almost as memory efficient as PACKED but doesn't have a limitation on the size of the octree.";
+      }
     });
   }
 }

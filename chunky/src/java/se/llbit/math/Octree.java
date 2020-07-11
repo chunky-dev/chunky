@@ -61,6 +61,7 @@ public class Octree {
     OctreeImplementation load(DataInputStream in) throws IOException;
     OctreeImplementation loadWithNodeCount(long nodeCount, DataInputStream in) throws IOException;
     boolean isOfType(OctreeImplementation implementation);
+    String getDescription();
   }
 
   static private Map<String, ImplementationFactory> factories = new HashMap<>();
@@ -262,7 +263,7 @@ public class Octree {
       try {
         switchImplementation("NODE");
       } catch(IOException ioException) {
-        ioException.printStackTrace();
+        throw new RuntimeException("Couldn't switch the octree implementation to NODE", ioException);
       }
       implementation.set(type, x, y, z);
     }
@@ -282,7 +283,7 @@ public class Octree {
       try {
         switchImplementation("NODE");
       } catch(IOException ioException) {
-        ioException.printStackTrace();
+        throw new RuntimeException("Couldn't switch the octree implementation to NODE", ioException);
       }
       implementation.set(data, x, y, z);
     }
@@ -713,5 +714,9 @@ public class Octree {
     NodeBasedOctree.initImplementation();
     PackedOctree.initImplementation();
     BigPackedOctree.initImplementation();
+  }
+
+  public static Iterable<Map.Entry<String, ImplementationFactory>> getEntries() {
+    return factories.entrySet();
   }
 }
