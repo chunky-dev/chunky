@@ -481,4 +481,44 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
     int treeDepth = in.readInt();
     return new NodeBasedOctree(treeDepth, Octree.Node.loadNode(in));
   }
+
+  @Override
+  public long nodeCount() {
+    return countNodes(root);
+  }
+
+  private long countNodes(Octree.Node node) {
+    if(node.type == BRANCH_NODE) {
+      long total = 1;
+      for(int i = 0; i < 8; ++i)
+        total += countNodes(node.children[i]);
+      return total;
+    } else {
+      return 1;
+    }
+  }
+
+  static public void initImplementation() {
+    Octree.addImplementationFactory("NODE", new Octree.ImplementationFactory() {
+      @Override
+      public Octree.OctreeImplementation create(int depth) {
+        return new NodeBasedOctree(depth, new Octree.Node(0));
+      }
+
+      @Override
+      public Octree.OctreeImplementation load(DataInputStream in) throws IOException {
+        return NodeBasedOctree.load(in);
+      }
+
+      @Override
+      public Octree.OctreeImplementation loadWithNodeCount(long nodeCount, DataInputStream in) throws IOException {
+        return NodeBasedOctree.load(in);
+      }
+
+      @Override
+      public boolean isOfType(Octree.OctreeImplementation implementation) {
+        return implementation instanceof NodeBasedOctree;
+      }
+    });
+  }
 }

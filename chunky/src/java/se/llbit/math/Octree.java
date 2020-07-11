@@ -16,11 +16,10 @@
  */
 package se.llbit.math;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.math3.util.FastMath;
 
@@ -64,11 +63,14 @@ public class Octree {
      */
     boolean exitWater(Scene scene, Ray ray, BlockPalette palette);
     int getDepth();
+    long nodeCount();
   }
 
   public interface ImplementationFactory {
     OctreeImplementation create(int depth);
     OctreeImplementation load(DataInputStream in) throws IOException;
+    OctreeImplementation loadWithNodeCount(long nodeCount, DataInputStream in) throws IOException;
+    boolean isOfType(OctreeImplementation implementation);
   }
 
   static private Map<String, ImplementationFactory> factories = new HashMap<>();
@@ -269,7 +271,11 @@ public class Octree {
     } catch(PackedOctree.OctreeTooBigException e) {
       // Octree is too big, switch implementation and retry
       Log.warn("Octree is too big, falling back to old (slower and bigger) implementation.");
-      switchToNodeBased();
+      try {
+        switchImplementation("NODE");
+      } catch(IOException ioException) {
+        ioException.printStackTrace();
+      }
       implementation.set(type, x, y, z);
     }
   }
@@ -285,7 +291,11 @@ public class Octree {
     } catch(PackedOctree.OctreeTooBigException e) {
       // Octree is too big, switch implementation and retry
       Log.warn("Octree is too big, falling back to old (slower and bigger) implementation.");
-      switchToNodeBased();
+      try {
+        switchImplementation("NODE");
+      } catch(IOException ioException) {
+        ioException.printStackTrace();
+      }
       implementation.set(data, x, y, z);
     }
   }
@@ -364,66 +374,53 @@ public class Octree {
   }
 
   /**
-   * Replace the implementation for the packed one
+   * Switch between any two implementation by reusing the load and store methods of
+   * the octree implementations
+   * @param newImplementation The new Octree implementation
    */
-  public void pack() {
-    if(usePacked) {
-      if(implementation instanceof NodeBasedOctree) {
-        try {
-          implementation = new BigPackedOctree(implementation.getDepth(), ((NodeBasedOctree) implementation).root);
-        } catch(PackedOctree.OctreeTooBigException e) {
-          // If octree is too big, do nothing, keep the node based implementation
-        }
-      }
+  public void switchImplementation(String newImplementation) throws IOException {
+    ImplementationFactory factory = getImplementationFactory(newImplementation);
+    if(factory.isOfType(implementation)) {
+      // Already correct implementation
+      return;
     }
-  }
 
-  private void switchToNodeBased() {
-    if(implementation instanceof PackedOctree) {
-      implementation = ((PackedOctree) implementation).toNodeBasedOctree();
+    // Here we use a PipedStream to pipe what the old implementation stores
+    // to what the new will load.
+    // With this method both octree will exist side-by-side during the conversion
+    // If this proves to be a problem, we could store to a temporary file instead
+    long nodeCount = implementation.nodeCount();
+    AtomicReference<OctreeImplementation> newOctree = new AtomicReference<>();
+    PipedOutputStream out = new PipedOutputStream();
+    PipedInputStream in = new PipedInputStream(out);
+    Thread readerThread = new Thread(() -> {
+      try {
+        OctreeImplementation impl = factory.loadWithNodeCount(nodeCount, new DataInputStream(in));
+        newOctree.set(impl);
+      } catch(IOException e) {
+        e.printStackTrace();
+      }
+    });
+    readerThread.start();
+    implementation.store(new DataOutputStream(out));
+    try {
+      readerThread.join();
+    } catch(InterruptedException e) {
+      e.printStackTrace();
     }
-  }
+    in.close();
+    out.close();
 
-
-  static {
-    factories.put("NODE", new ImplementationFactory() {
-      @Override
-      public OctreeImplementation create(int depth) {
-        return new NodeBasedOctree(depth, new Node(0));
-      }
-
-      @Override
-      public OctreeImplementation load(DataInputStream in) throws IOException {
-        return NodeBasedOctree.load(in);
-      }
-    });
-
-    factories.put("PACKED", new ImplementationFactory() {
-      @Override
-      public OctreeImplementation create(int depth) {
-        return new PackedOctree(depth);
-      }
-
-      @Override
-      public OctreeImplementation load(DataInputStream in) throws IOException {
-        return PackedOctree.load(in);
-      }
-    });
-
-    factories.put("BIGPACKED", new ImplementationFactory() {
-      @Override
-      public OctreeImplementation create(int depth) {
-        return new BigPackedOctree(depth);
-      }
-
-      @Override
-      public OctreeImplementation load(DataInputStream in) throws IOException {
-        return BigPackedOctree.load(in);
-      }
-    });
+    implementation = newOctree.get();
   }
 
   public static void addImplementationFactory(String name, ImplementationFactory factory) {
     factories.put(name, factory);
+  }
+
+  static {
+    NodeBasedOctree.initImplementation();
+    PackedOctree.initImplementation();
+    BigPackedOctree.initImplementation();
   }
 }

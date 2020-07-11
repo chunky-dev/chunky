@@ -83,21 +83,20 @@ public class PackedOctree implements Octree.OctreeImplementation {
   }
 
   /**
-   * Constructor building a tree from an existing NodeBasedOctree
-   * We build the tree by walking an existing tree and recreating it in this format
+   * Constructor building a tree with capacity for some nodes
    * @param depth The depth of the tree
-   * @param root The root of the tree to recreate
+   * @param nodeCount The number of nodes this tree will contain
    */
-  public PackedOctree(int depth, Octree.Node root) {
+  public PackedOctree(int depth, long nodeCount) {
     this.depth = depth;
-    long nodeCount = nodeCount(root);
     long arraySize = Math.max(nodeCount*2, 64);
     if(arraySize > (long)MAX_ARRAY_SIZE)
       throw new OctreeTooBigException();
     treeData = new int[(int)arraySize];
-    addNode(root, 0, 2);
+    treeData[0] = 0;
+    treeData[1] = 0;
+    size = 2;
     freeHead = -1; // No holes
-    size = (int)nodeCount*2;
   }
 
   /**
@@ -112,45 +111,6 @@ public class PackedOctree implements Octree.OctreeImplementation {
     treeData[1] = 0;
     size = 2;
     freeHead = -1;
-  }
-
-  private static long nodeCount(Octree.Node node) {
-    if(node.type == BRANCH_NODE) {
-      return 1
-        + nodeCount(node.children[0])
-        + nodeCount(node.children[1])
-        + nodeCount(node.children[2])
-        + nodeCount(node.children[3])
-        + nodeCount(node.children[4])
-        + nodeCount(node.children[5])
-        + nodeCount(node.children[6])
-        + nodeCount(node.children[7]);
-    } else {
-      return 1;
-    }
-  }
-
-  /**
-   * Add a node at the next free index and call recursively on children
-   * @param node The node to add
-   * @param nodeIndex The index of the node currently being added
-   * @param nextFreeIndex The next free index before adding the node
-   * @return The next free index after adding the subtree
-   */
-  private int addNode(Octree.Node node, int nodeIndex, int nextFreeIndex) {
-    // Unconditionally add data
-    treeData[nodeIndex+1] = node.getData();
-    if(node.type == BRANCH_NODE) {
-      treeData[nodeIndex] = nextFreeIndex;
-      int newNextFreeIndex = nextFreeIndex + 8*2;
-      for(int i = 0; i < 8; ++i) {
-        newNextFreeIndex = addNode(node.children[i], nextFreeIndex+2*i, newNextFreeIndex);
-      }
-      return newNextFreeIndex;
-    } else {
-      treeData[nodeIndex] = -node.type; // Store the negation of the type
-      return nextFreeIndex;
-    }
   }
 
   /**
@@ -692,6 +652,13 @@ public class PackedOctree implements Octree.OctreeImplementation {
     return tree;
   }
 
+  public static PackedOctree loadWithNodeCount(long nodeCount, DataInputStream in) throws IOException {
+    int depth = in.readInt();
+    PackedOctree tree = new PackedOctree(depth, nodeCount);
+    tree.loadNode(in, 0);
+    return tree;
+  }
+
   private void loadNode(DataInputStream in, int nodeIndex) throws IOException {
     int type = in.readInt();
     if(type == BRANCH_NODE) {
@@ -760,5 +727,45 @@ public class PackedOctree implements Octree.OctreeImplementation {
       return isDataNode ? new Octree.DataNode(treeData[nodeIndex], treeData[nodeIndex+1])
                         : new Octree.Node(treeData[nodeIndex]);
     }
+  }
+
+  @Override
+  public long nodeCount() {
+    return countNodes(0);
+  }
+
+  private long countNodes(int nodeIndex) {
+    if(treeData[nodeIndex] > 0) {
+      long total = 1;
+      for(int i = 0; i < 8; ++i)
+        total += countNodes(treeData[nodeIndex] + 2*i);
+      return total;
+    } else {
+      return 1;
+    }
+  }
+
+  static public void initImplementation() {
+    Octree.addImplementationFactory("PACKED", new Octree.ImplementationFactory() {
+      @Override
+      public Octree.OctreeImplementation create(int depth) {
+        return new PackedOctree(depth);
+      }
+
+      @Override
+      public Octree.OctreeImplementation load(DataInputStream in) throws IOException {
+        return PackedOctree.load(in);
+      }
+
+      @Override
+      public Octree.OctreeImplementation loadWithNodeCount(long nodeCount, DataInputStream in) throws IOException {
+        return PackedOctree.loadWithNodeCount(nodeCount, in);
+      }
+
+      @Override
+      public boolean isOfType(Octree.OctreeImplementation implementation) {
+        return implementation instanceof PackedOctree;
+      }
+    });
   }
 }

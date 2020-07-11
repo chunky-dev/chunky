@@ -70,18 +70,16 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
   private int depth;
 
   /**
-   * Constructor building a tree from an existing NodeBasedOctree
-   * We build the tree by walking an existing tree and recreating it in this format
+   * Constructor building a tree with capacity for some nodes
    * @param depth The depth of the tree
-   * @param root The root of the tree to recreate
+   * @param nodeCount The number of nodes this tree will contain
    */
-  public BigPackedOctree(int depth, Octree.Node root) {
+  public BigPackedOctree(int depth, long nodeCount) {
     this.depth = depth;
-    long nodeCount = nodeCount(root);
     initTreeData(nodeCount);
-    addNode(root, 0, 2);
     freeHead = -1; // No holes
-    size = nodeCount;
+    setAt(0, 0);
+    size = 1;
   }
 
   /**
@@ -127,43 +125,6 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
 
   private static long valueFromTypeData(int type, int data) {
     return (long)(-type) << 32 | data;
-  }
-
-  private static long nodeCount(Octree.Node node) {
-    if(node.type == BRANCH_NODE) {
-      return 1
-        + nodeCount(node.children[0])
-        + nodeCount(node.children[1])
-        + nodeCount(node.children[2])
-        + nodeCount(node.children[3])
-        + nodeCount(node.children[4])
-        + nodeCount(node.children[5])
-        + nodeCount(node.children[6])
-        + nodeCount(node.children[7]);
-    } else {
-      return 1;
-    }
-  }
-
-  /**
-   * Add a node at the next free index and call recursively on children
-   * @param node The node to add
-   * @param nodeIndex The index of the node currently being added
-   * @param nextFreeIndex The next free index before adding the node
-   * @return The next free index after adding the subtree
-   */
-  private long addNode(Octree.Node node, long nodeIndex, long nextFreeIndex) {
-    if(node.type == BRANCH_NODE) {
-      setAt(nodeIndex, nextFreeIndex);
-      long newNextFreeIndex = nextFreeIndex + 8;
-      for(int i = 0; i < 8; ++i) {
-        newNextFreeIndex = addNode(node.children[i], nextFreeIndex+i, newNextFreeIndex);
-      }
-      return newNextFreeIndex;
-    } else {
-      setAt(nodeIndex, valueFromTypeData(node.type, node.getData()));
-      return nextFreeIndex;
-    }
   }
 
   /**
@@ -729,6 +690,13 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
     return tree;
   }
 
+  public static BigPackedOctree loadWithNodeCount(long nodeCount, DataInputStream in) throws IOException {
+    int depth = in.readInt();
+    BigPackedOctree tree = new BigPackedOctree(depth, nodeCount);
+    tree.loadNode(in, 0);
+    return tree;
+  }
+
   private void loadNode(DataInputStream in, long nodeIndex) throws IOException {
     int type = in.readInt();
     if(type == BRANCH_NODE) {
@@ -765,5 +733,45 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
         out.writeInt(type);
       }
     }
+  }
+
+  @Override
+  public long nodeCount() {
+    return countNodes(0);
+  }
+
+  private long countNodes(long nodeIndex) {
+    if(getAt(nodeIndex) > 0) {
+      long total = 1;
+      for(int i = 0; i < 8; ++i)
+        total += countNodes(getAt(nodeIndex) + i);
+      return total;
+    } else {
+      return 1;
+    }
+  }
+
+  static public void initImplementation() {
+    Octree.addImplementationFactory("BIGPACKED", new Octree.ImplementationFactory() {
+      @Override
+      public Octree.OctreeImplementation create(int depth) {
+        return new BigPackedOctree(depth);
+      }
+
+      @Override
+      public Octree.OctreeImplementation load(DataInputStream in) throws IOException {
+        return BigPackedOctree.load(in);
+      }
+
+      @Override
+      public Octree.OctreeImplementation loadWithNodeCount(long nodeCount, DataInputStream in) throws IOException {
+        return BigPackedOctree.loadWithNodeCount(nodeCount, in);
+      }
+
+      @Override
+      public boolean isOfType(Octree.OctreeImplementation implementation) {
+        return implementation instanceof BigPackedOctree;
+      }
+    });
   }
 }
