@@ -407,36 +407,6 @@ public class PackedOctree implements Octree.OctreeImplementation {
     }
   }
 
-  /**
-   * Convert this tree to the equivalent NodeBasedOctree
-   * @return The NodeBasedOctree
-   */
-  public NodeBasedOctree toNodeBasedOctree() {
-    return new NodeBasedOctree(depth, convertNode(0));
-  }
-
-  /**
-   * Convert a node to the NodeBasedOctree node format
-   * @param nodeIndex The index of the node to convert
-   * @return The converted node
-   */
-  private Octree.Node convertNode(int nodeIndex) {
-    if(treeData[nodeIndex] > 0) {
-      // branch node
-      Octree.Node node = new Octree.Node(BRANCH_NODE);
-      node.children = new Octree.Node[8];
-      for(int i = 0; i < 8; ++i) {
-        int childIndex = treeData[nodeIndex] + 2*i;
-        node.children[i] = convertNode(childIndex);
-      }
-      return node;
-    } else {
-      boolean isDataNode = (treeData[nodeIndex+1] != 0);
-      return isDataNode ? new Octree.DataNode(treeData[nodeIndex], treeData[nodeIndex+1])
-                        : new Octree.Node(treeData[nodeIndex]);
-    }
-  }
-
   @Override
   public long nodeCount() {
     return countNodes(0);
