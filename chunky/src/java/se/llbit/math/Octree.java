@@ -242,6 +242,7 @@ public class Octree {
    * @param octreeDepth The number of levels in the Octree.
    */
   public Octree(String impl, int octreeDepth) {
+    Log.infof("Building new octree (%s)", impl);
     implementation = getImplementationFactory(impl).create(octreeDepth);
   }
 
@@ -316,6 +317,7 @@ public class Octree {
    * @throws IOException
    */
   public static Octree load(String impl, DataInputStream in) throws IOException {
+    Log.infof("Loading octree (%s)", impl);
     return new Octree(getImplementationFactory(impl).load(in));
   }
 
@@ -686,6 +688,8 @@ public class Octree {
       // Already correct implementation
       return;
     }
+
+    Log.infof("Changing octree implementation (%s)", newImplementation);
 
     // This function is called as to provide a fallback when
     // an implementation isn't suitable, we assume it means
