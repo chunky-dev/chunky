@@ -2566,7 +2566,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
-    octreeImplementation = json.get("octreeImplementation").asString(Octree.DEFAULT_IMPLEMENTATION);
+    octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
   }
 
   /**
