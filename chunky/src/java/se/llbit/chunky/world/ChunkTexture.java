@@ -64,7 +64,7 @@ public class ChunkTexture {
    */
   public void store(DataOutputStream out) throws IOException {
     for (int i = 0; i < Chunk.X_MAX * Chunk.Z_MAX; ++i) {
-      out.writeFloat(data[i*30]);
+      out.writeFloat(data[i*3]);
       out.writeFloat(data[i*3 + 1]);
       out.writeFloat(data[i*3 + 2]);
     }
