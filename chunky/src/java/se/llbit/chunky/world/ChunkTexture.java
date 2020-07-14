@@ -27,7 +27,7 @@ import java.io.IOException;
  */
 public class ChunkTexture {
 
-  float[][] data = new float[Chunk.X_MAX * Chunk.Z_MAX][3];
+  float[] data = new float[Chunk.X_MAX * Chunk.Z_MAX * 3];
 
   /**
    * Create new texture
@@ -42,17 +42,19 @@ public class ChunkTexture {
    */
   public void set(int x, int z, float[] frgb) {
     int index = x + z * Chunk.X_MAX;
-    data[index][0] = frgb[0];
-    data[index][1] = frgb[1];
-    data[index][2] = frgb[2];
+    data[index*3] = frgb[0];
+    data[index*3 + 1] = frgb[1];
+    data[index*3 + 2] = frgb[2];
   }
 
   /**
    * @return RGB color components at (x, z)
    */
   public float[] get(int x, int z) {
+    float[] result = new float[3];
     int index = x + z * Chunk.X_MAX;
-    return data[index];
+    System.arraycopy(data, index*3, result, 0, 3);
+    return result;
   }
 
   /**
@@ -62,9 +64,9 @@ public class ChunkTexture {
    */
   public void store(DataOutputStream out) throws IOException {
     for (int i = 0; i < Chunk.X_MAX * Chunk.Z_MAX; ++i) {
-      out.writeFloat(data[i][0]);
-      out.writeFloat(data[i][1]);
-      out.writeFloat(data[i][2]);
+      out.writeFloat(data[i*30]);
+      out.writeFloat(data[i*3 + 1]);
+      out.writeFloat(data[i*3 + 2]);
     }
   }
 
@@ -77,9 +79,9 @@ public class ChunkTexture {
   public static ChunkTexture load(DataInputStream in) throws IOException {
     ChunkTexture texture = new ChunkTexture();
     for (int i = 0; i < Chunk.X_MAX * Chunk.Z_MAX; ++i) {
-      texture.data[i][0] = in.readFloat();
-      texture.data[i][1] = in.readFloat();
-      texture.data[i][2] = in.readFloat();
+      texture.data[i*3] = in.readFloat();
+      texture.data[i*3 + 1] = in.readFloat();
+      texture.data[i*3 + 2] = in.readFloat();
     }
     return texture;
   }
