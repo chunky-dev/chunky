@@ -930,7 +930,7 @@ public class Texture {
   protected int height;
   protected int avgColor;
   private float[] avgColorLinear;
-  private float[][] linear;
+  private float[] linear;
 
   private Image fxImage = null;
 
@@ -959,18 +959,20 @@ public class Texture {
     int[] data = image.data;
     width = image.width;
     height = image.height;
-    linear = new float[width * height][4];
+    linear = new float[width * height * 4];
+    float[] pixelBuffer = new float[4];
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
         int index = width * y + x;
-        ColorUtil.getRGBAComponents(data[index], linear[index]);
-        linear[index][0] = (float) FastMath.pow(linear[index][0], Scene.DEFAULT_GAMMA);
-        linear[index][1] = (float) FastMath.pow(linear[index][1], Scene.DEFAULT_GAMMA);
-        linear[index][2] = (float) FastMath.pow(linear[index][2], Scene.DEFAULT_GAMMA);
-        avgColorLinear[0] += linear[index][3] * linear[index][0];
-        avgColorLinear[1] += linear[index][3] * linear[index][1];
-        avgColorLinear[2] += linear[index][3] * linear[index][2];
-        avgColorLinear[3] += linear[index][3];
+        ColorUtil.getRGBAComponents(data[index], pixelBuffer);
+        linear[index*4] = (float) FastMath.pow(pixelBuffer[0], Scene.DEFAULT_GAMMA);
+        linear[index*4 + 1] = (float) FastMath.pow(pixelBuffer[1], Scene.DEFAULT_GAMMA);
+        linear[index*4 + 2] = (float) FastMath.pow(pixelBuffer[2], Scene.DEFAULT_GAMMA);
+        linear[index*4 + 3] = pixelBuffer[3];
+        avgColorLinear[0] += linear[index*4 + 3] * linear[index*4];
+        avgColorLinear[1] += linear[index*4 + 3] * linear[index*4 + 1];
+        avgColorLinear[2] += linear[index*4 + 3] * linear[index*4 + 2];
+        avgColorLinear[3] += linear[index*4 + 3];
       }
     }
 
@@ -984,10 +986,10 @@ public class Texture {
       for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
           int index = width * y + x;
-          linear[index][0] = avgColorFlat[0];
-          linear[index][1] = avgColorFlat[1];
-          linear[index][2] = avgColorFlat[2];
-          linear[index][3] = 1;
+          linear[index*4] = avgColorFlat[0];
+          linear[index*4 + 1] = avgColorFlat[1];
+          linear[index*4 + 2] = avgColorFlat[2];
+          linear[index*4 + 3] = 1;
         }
       }
     }
@@ -1033,7 +1035,10 @@ public class Texture {
    * @return color
    */
   public final float[] getColor(int x, int y) {
-    return linear[width * y + x];
+    // TODO Not allocate here
+    float[] result = new float[4];
+    System.arraycopy(linear, (width * y + x) * 4, result, 0, 4);
+    return result;
   }
 
   /**
