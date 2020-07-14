@@ -82,9 +82,6 @@ public class Water extends MinecraftBlockTranslucent {
       14 / 16., 12.25 / 16., 10.5 / 16, 8.75 / 16, 7. / 16, 5.25 / 16, 3.5 / 16, 1.75 / 16
   };
 
-  private static final float[][][] normalMap;
-  private static final int normalMapW;
-
   /**
    * Block data offset for water above flag.
    */
@@ -95,22 +92,6 @@ public class Water extends MinecraftBlockTranslucent {
   public static final int CORNER_3 = 12;
 
   static {
-    // Precompute normal map.
-    Texture waterHeight = new Texture("water-height");
-    normalMapW = waterHeight.getWidth();
-    normalMap = new float[normalMapW][normalMapW][2];
-    for (int u = 0; u < normalMapW; ++u) {
-      for (int v = 0; v < normalMapW; ++v) {
-
-        float hx0 = (waterHeight.getColorWrapped(u, v) & 0xFF) / 255.f;
-        float hx1 = (waterHeight.getColorWrapped(u + 1, v) & 0xFF) / 255.f;
-        float hz0 = (waterHeight.getColorWrapped(u, v) & 0xFF) / 255.f;
-        float hz1 = (waterHeight.getColorWrapped(u, v + 1) & 0xFF) / 255.f;
-        normalMap[u][v][0] = hx1 - hx0;
-        normalMap[u][v][1] = hz1 - hz0;
-      }
-    }
-
     // Precompute water triangles.
     for (int i = 0; i < 8; ++i) {
       double c0 = height[i];

@@ -73,7 +73,7 @@ public class WaterModel {
   static final double height[] =
       {14 / 16., 12.25 / 16., 10.5 / 16, 8.75 / 16, 7. / 16, 5.25 / 16, 3.5 / 16, 1.75 / 16};
 
-  private static final float[][][] normalMap;
+  private static final float[] normalMap;
   private static final int normalMapW;
 
   /**
@@ -85,7 +85,7 @@ public class WaterModel {
     // precompute normal map
     Texture waterHeight = new Texture("water-height");
     normalMapW = waterHeight.getWidth();
-    normalMap = new float[normalMapW][normalMapW][2];
+    normalMap = new float[normalMapW*normalMapW*2];
     for (int u = 0; u < normalMapW; ++u) {
       for (int v = 0; v < normalMapW; ++v) {
 
@@ -93,8 +93,8 @@ public class WaterModel {
         float hx1 = (waterHeight.getColorWrapped(u + 1, v) & 0xFF) / 255.f;
         float hz0 = (waterHeight.getColorWrapped(u, v) & 0xFF) / 255.f;
         float hz1 = (waterHeight.getColorWrapped(u, v + 1) & 0xFF) / 255.f;
-        normalMap[u][v][0] = hx1 - hx0;
-        normalMap[u][v][1] = hz1 - hz0;
+        normalMap[(u*normalMapW + v) * 2] = hx1 - hx0;
+        normalMap[(u*normalMapW + v) * 2 + 1] = hz1 - hz0;
       }
     }
 
@@ -341,14 +341,14 @@ public class WaterModel {
     double z = ray.o.z / w - QuickMath.floor(ray.o.z / w);
     int u = (int) (x * normalMapW - Ray.EPSILON);
     int v = (int) ((1 - z) * normalMapW - Ray.EPSILON);
-    ray.n.set(normalMap[u][v][0], .15f, normalMap[u][v][1]);
+    ray.n.set(normalMap[(u*normalMapW + v) * 2], .15f, normalMap[(u*normalMapW + v) * 2 + 1]);
     w = (1 << 1);
     x = ray.o.x / w - QuickMath.floor(ray.o.x / w);
     z = ray.o.z / w - QuickMath.floor(ray.o.z / w);
     u = (int) (x * normalMapW - Ray.EPSILON);
     v = (int) ((1 - z) * normalMapW - Ray.EPSILON);
-    ray.n.x += normalMap[u][v][0] / 2;
-    ray.n.z += normalMap[u][v][1] / 2;
+    ray.n.x += normalMap[(u*normalMapW + v) * 2] / 2;
+    ray.n.z += normalMap[(u*normalMapW + v) * 2 + 1] / 2;
     ray.n.normalize();
   }
 }
