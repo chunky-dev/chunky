@@ -89,12 +89,12 @@ public class PreviewRayTracer implements RayTracer {
     if (scene.sky().cloudsEnabled()) {
       hit = scene.sky().cloudIntersection(scene, ray);
     }
-    if (scene.waterHeight > 0) {
-      hit = waterIntersection(scene, ray) || hit;
-    }
     if (scene.intersect(ray)) {
       // Octree tracer handles updating distance.
       return true;
+    }
+    if (scene.waterHeight > 0) {
+      hit = waterIntersection(scene, ray) || hit;
     }
     if (hit) {
       ray.distance += ray.t;
