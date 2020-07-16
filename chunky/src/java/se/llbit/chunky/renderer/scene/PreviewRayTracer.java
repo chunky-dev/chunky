@@ -89,12 +89,12 @@ public class PreviewRayTracer implements RayTracer {
     if (scene.sky().cloudsEnabled()) {
       hit = scene.sky().cloudIntersection(scene, ray);
     }
+    if (scene.waterHeight > 0) {
+      hit = waterIntersection(scene, ray) || hit;
+    }
     if (scene.intersect(ray)) {
       // Octree tracer handles updating distance.
       return true;
-    }
-    if (scene.waterHeight > 0) {
-      hit = waterIntersection(scene, ray) || hit;
     }
     if (hit) {
       ray.distance += ray.t;
@@ -111,8 +111,6 @@ public class PreviewRayTracer implements RayTracer {
     if (ray.d.y < 0) {
       double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
-        Vector3 vec = new Vector3();
-        vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
         ray.t = t;
         Water.INSTANCE.getColor(ray);
         ray.n.set(0, 1, 0);
@@ -123,8 +121,6 @@ public class PreviewRayTracer implements RayTracer {
     if (ray.d.y > 0) {
       double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
-        Vector3 vec = new Vector3();
-        vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
         ray.t = t;
         Water.INSTANCE.getColor(ray);
         ray.n.set(0, -1, 0);
