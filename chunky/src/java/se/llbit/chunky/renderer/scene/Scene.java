@@ -643,16 +643,18 @@ public class Scene implements JsonSerializable, Refreshable {
       ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
       hit = true;
     }
-    if (start.getCurrentMaterial().isWater() && start.getCurrentMaterial() != Water.OCEAN_WATER) {
-      r = new Ray(start);
-      r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
-      if (waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
-        ray.t = r.distance;
-        ray.n.set(r.n);
-        ray.color.set(r.color);
-        ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
-        ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
-        hit = true;
+    if (start.getCurrentMaterial().isWater()) {
+      if(start.getCurrentMaterial() != Water.OCEAN_WATER) {
+        r = new Ray(start);
+        r.setCurrentMaterial(start.getPrevMaterial(), start.getPrevData());
+        if(waterOctree.exitWater(this, r, palette) && r.distance < ray.t - Ray.EPSILON) {
+          ray.t = r.distance;
+          ray.n.set(r.n);
+          ray.color.set(r.color);
+          ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
+          ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
+          hit = true;
+        }
       }
     } else {
       r = new Ray(start);
