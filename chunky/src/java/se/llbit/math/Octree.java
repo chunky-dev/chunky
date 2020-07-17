@@ -76,6 +76,13 @@ public class Octree {
   public static final int BRANCH_NODE = -1;
 
   /**
+   * A special type that indicate that we don't care about nodes with this type
+   * (The value is chosen to behave like a normal type i.e first bit not set
+   * and so that when serialized with data, it is not confused for a branch node)
+   */
+  public static final int WHATEVER_TYPE = 0x7FFFFFFE;
+
+  /**
    * The top bit of the type field in a serialized octree node is reserved for indicating
    * if the node is a data node.
    */
