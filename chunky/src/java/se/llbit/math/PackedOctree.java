@@ -438,7 +438,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
   private void finalizationNode(int nodeIndex) {
     boolean canMerge = true;
-    int mergedType = WHATEVER_TYPE;
+    int mergedType = -WHATEVER_TYPE;
     int mergedData = 0;
     for(int i = 0; i < 8; ++i) {
       int childIndex = treeData[nodeIndex] + 2 * i;
@@ -450,10 +450,10 @@ public class PackedOctree implements Octree.OctreeImplementation {
         }
       }
       if(canMerge) {
-        if(mergedType == WHATEVER_TYPE) {
+        if(mergedType == -WHATEVER_TYPE) {
           mergedType = treeData[childIndex];
           mergedData = treeData[childIndex + 1];
-        } else if(!(treeData[childIndex] == WHATEVER_TYPE || (treeData[childIndex] == mergedType && treeData[childIndex + 1] == mergedData))) {
+        } else if(!(treeData[childIndex] == -WHATEVER_TYPE || (treeData[childIndex] == mergedType && treeData[childIndex + 1] == mergedData))) {
           canMerge = false;
         }
       }
