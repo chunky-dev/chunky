@@ -929,6 +929,10 @@ public class Scene implements JsonSerializable, Refreshable {
     Set<ChunkPosition> chunkSet = new HashSet<>(chunksToLoad);
 
     try (TaskTracker.Task task = progress.task("Finalizing octree")) {
+
+      worldOctree.startFinalization();
+      waterOctree.startFinalization();
+
       int done = 0;
       int target = chunksToLoad.size();
       for (ChunkPosition cp : chunksToLoad) {
@@ -976,6 +980,9 @@ public class Scene implements JsonSerializable, Refreshable {
         done += 1;
         OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp);
       }
+
+      worldOctree.endFinalization();
+      waterOctree.endFinalization();
     }
 
     chunks = loadedChunks;

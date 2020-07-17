@@ -16,8 +16,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static se.llbit.math.Octree.BRANCH_NODE;
-import static se.llbit.math.Octree.DATA_FLAG;
+import static se.llbit.math.Octree.*;
+import static se.llbit.math.Octree.WHATEVER_TYPE;
 
 /**
  * This is a big packed representation of an octree
@@ -452,6 +452,36 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
       return total;
     } else {
       return 1;
+    }
+  }
+
+  @Override
+  public void endFinalization() {
+    // There is a bunch of WHATEVER nodes we should try to merge
+    finalizationNode(0);
+  }
+
+  private void finalizationNode(long nodeIndex) {
+    boolean canMerge = true;
+    int mergedType = WHATEVER_TYPE;
+    int mergedData = 0;
+    for(int i = 0; i < 8; ++i) {
+      long childIndex = getAt(nodeIndex) + i;
+      if(getAt(childIndex) > 0) {
+        canMerge = false;
+        finalizationNode(childIndex);
+      } else if(canMerge) {
+        if(mergedType == WHATEVER_TYPE) {
+          long value = getAt(childIndex);
+          mergedType = typeFromValue(value);
+          mergedData = dataFromValue(value);
+        } else if(!(typeFromValue(getAt(childIndex)) == WHATEVER_TYPE || getAt(childIndex) == valueFromTypeData(mergedType, mergedData))) {
+          canMerge = false;
+        }
+      }
+    }
+    if(canMerge) {
+      mergeNode(nodeIndex, valueFromTypeData(mergedType, mergedData));
     }
   }
 

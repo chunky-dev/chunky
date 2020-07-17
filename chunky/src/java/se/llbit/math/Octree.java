@@ -52,6 +52,8 @@ public class Octree {
     NodeId getChild(NodeId parent, int childNo);
     int getType(NodeId node);
     int getData(NodeId node);
+    default void startFinalization() {}
+    default void endFinalization() {}
   }
 
   public interface NodeId {}
@@ -682,6 +684,14 @@ public class Octree {
 
   public int getDepth() {
     return implementation.getDepth();
+  }
+
+  public void startFinalization() {
+    implementation.startFinalization();
+  }
+
+  public void endFinalization() {
+    implementation.endFinalization();
   }
 
   /**

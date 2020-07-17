@@ -59,7 +59,7 @@ public class OctreeFinalizer {
     Material wmat = waterTree.getMaterial(x, cy, z, palette);
 
     // Set non-visible blocks to be stone, in order to merge large patches.
-    if (cy > -origin.y && cy < Chunk.Y_MAX - origin.y - 1 && worldTree.get(x, cy, z).type != palette.stoneId) {
+    if (cy > -origin.y && cy < Chunk.Y_MAX - origin.y - 1) {
       Material b1 = worldTree.getMaterial(x - 1, cy, z, palette),
           b2 = worldTree.getMaterial(x + 1, cy, z, palette),
           b3 = worldTree.getMaterial(x, cy, z - 1, palette),
@@ -68,7 +68,7 @@ public class OctreeFinalizer {
           b6 = worldTree.getMaterial(x, cy + 1, z, palette);
 
       if (b1.opaque && b2.opaque && b3.opaque && b4.opaque && b5.opaque && b6.opaque) {
-        worldTree.set(palette.stoneId, x, cy, z);
+        worldTree.set(BlockPalette.WHATEVER_ID, x, cy, z);
       }
     }
 

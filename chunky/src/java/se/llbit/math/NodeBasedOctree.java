@@ -16,6 +16,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import static se.llbit.math.Octree.BRANCH_NODE;
+import static se.llbit.math.Octree.WHATEVER_TYPE;
 
 /**
  * This is the classic node-based implementation of an octree
@@ -206,6 +207,46 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
       return total;
     } else {
       return 1;
+    }
+  }
+
+  @Override
+  public void endFinalization() {
+    // There is a bunch of WHATEVER nodes we should try to merge
+    finalizationNode(root, null, 0);
+  }
+
+  private void finalizationNode(Octree.Node node, Octree.Node parent, int childNo) {
+    boolean canMerge = true;
+    int mergedType = WHATEVER_TYPE;
+    int mergedData = 0;
+    for(int i = 0; i < 8; ++i) {
+      Octree.Node child = node.children[i];
+      if(child.type == BRANCH_NODE) {
+        canMerge = false;
+        finalizationNode(child, node, i);
+      } else if(canMerge) {
+        if(mergedType == WHATEVER_TYPE) {
+          mergedType = child.type;
+          mergedData = child.getData();
+        } else if(!(child.type == WHATEVER_TYPE || (child.type == mergedType && child.getData() == mergedData))) {
+          canMerge = false;
+        }
+      }
+    }
+    if(canMerge) {
+      if(mergedData == 0) {
+        // No need to use a DataNode
+        node.merge(mergedType);
+      } else {
+        // We need to replace the node by a new node in its parent
+        if(parent == null) {
+          // node is the root
+          root = new Octree.DataNode(mergedType, mergedData);
+        } else {
+          parent.children[childNo] = new Octree.DataNode(mergedType, mergedData);
+        }
+      }
     }
   }
 
