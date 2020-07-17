@@ -468,9 +468,13 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
     for(int i = 0; i < 8; ++i) {
       long childIndex = getAt(nodeIndex) + i;
       if(getAt(childIndex) > 0) {
-        canMerge = false;
         finalizationNode(childIndex);
-      } else if(canMerge) {
+        // The node may have been merged, retest if it still a branch node
+        if(getAt(childIndex) > 0) {
+          canMerge = false;
+        }
+      }
+      if(canMerge) {
         if(mergedType == WHATEVER_TYPE) {
           long value = getAt(childIndex);
           mergedType = typeFromValue(value);

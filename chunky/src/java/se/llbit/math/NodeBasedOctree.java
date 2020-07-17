@@ -223,9 +223,13 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
     for(int i = 0; i < 8; ++i) {
       Octree.Node child = node.children[i];
       if(child.type == BRANCH_NODE) {
-        canMerge = false;
-        finalizationNode(child, node, i);
-      } else if(canMerge) {
+        finalizationNode(child, node, i);// The node may have been merged, retest if it still a branch node
+        child = node.children[i];
+        if(child.type == BRANCH_NODE) {
+          canMerge = false;
+        }
+      }
+      if(canMerge) {
         if(mergedType == WHATEVER_TYPE) {
           mergedType = child.type;
           mergedData = child.getData();

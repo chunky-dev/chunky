@@ -687,11 +687,13 @@ public class Octree {
   }
 
   public void startFinalization() {
+    System.out.printf("%d nodes before finalization\n", implementation.nodeCount()); // TODO Remove
     implementation.startFinalization();
   }
 
   public void endFinalization() {
     implementation.endFinalization();
+    System.out.printf("%d nodes after finalization\n", implementation.nodeCount()); // TODO Remove
   }
 
   /**

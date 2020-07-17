@@ -443,9 +443,13 @@ public class PackedOctree implements Octree.OctreeImplementation {
     for(int i = 0; i < 8; ++i) {
       int childIndex = treeData[nodeIndex] + 2 * i;
       if(treeData[childIndex] > 0) {
-        canMerge = false;
         finalizationNode(childIndex);
-      } else if(canMerge) {
+        // The node may have been merged, retest if it still a branch node
+        if(treeData[childIndex] > 0) {
+          canMerge = false;
+        }
+      }
+      if(canMerge) {
         if(mergedType == WHATEVER_TYPE) {
           mergedType = treeData[childIndex];
           mergedData = treeData[childIndex + 1];
