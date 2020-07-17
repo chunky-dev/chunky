@@ -851,43 +851,62 @@ public class Scene implements JsonSerializable, Refreshable {
             for (int cx = 0; cx < 16; ++cx) {
               int x = cx + cp.x * 16 - origin.x;
               int index = Chunk.chunkIndex(cx, cy, cz);
-              Octree.Node octNode = new Octree.Node(blocks[index]);
-              Block block = palette.get(blocks[index]);
 
-              if (block.isEntity()) {
-                Vector3 position = new Vector3(cx + cp.x * 16, cy, cz + cp.z * 16);
-                entities.add(block.toEntity(position));
-                if (block.waterlogged) {
-                  block = palette.water;
-                  octNode = new Octree.Node(palette.waterId);
-                } else {
-                  block = Air.INSTANCE;
-                  octNode = new Octree.Node(palette.airId);
-                }
-              }
+              // Check if the block is hidden, if so make it "whatever"
+              boolean isHidden =
+                      (cy > yMin && cy < yMax - 1)
+                      && (cx > 0 && cx < 15)
+                      && (cz > 0 && cz < 15)
+                      && palette.get(blocks[Chunk.chunkIndex(cx+1, cy, cz)]).opaque
+                      && palette.get(blocks[Chunk.chunkIndex(cx-1, cy, cz)]).opaque
+                      && palette.get(blocks[Chunk.chunkIndex(cx, cy+1, cz)]).opaque
+                      && palette.get(blocks[Chunk.chunkIndex(cx, cy-1, cz)]).opaque
+                      && palette.get(blocks[Chunk.chunkIndex(cx, cy, cz+1)]).opaque
+                      && palette.get(blocks[Chunk.chunkIndex(cx, cy, cz-1)]).opaque;
 
-              if (block.isWaterFilled()) {
-                Octree.Node waterNode = new Octree.Node(palette.waterId);
-                if (cy + 1 < yMax) {
-                  int above = Chunk.chunkIndex(cx, cy + 1, cz);
-                  Block aboveBlock = palette.get(blocks[above]);
-                  if (aboveBlock.isWaterFilled() || aboveBlock.solid) {
-                    waterNode = new Octree.DataNode(palette.waterId, 1 << Water.FULL_BLOCK);
+              if(isHidden) {
+                // Store "whatever" in the octrees
+                Octree.Node whateverNode = new Octree.Node(Octree.WHATEVER_TYPE);
+                worldOctree.set(whateverNode, x, cy - origin.y, z);
+              } else {
+                Octree.Node octNode = new Octree.Node(blocks[index]);
+                Block block = palette.get(blocks[index]);
+
+                if (block.isEntity()) {
+                  Vector3 position = new Vector3(cx + cp.x * 16, cy, cz + cp.z * 16);
+                  entities.add(block.toEntity(position));
+                  if (block.waterlogged) {
+                    block = palette.water;
+                    octNode = new Octree.Node(palette.waterId);
+                  } else {
+                    block = Air.INSTANCE;
+                    octNode = new Octree.Node(palette.airId);
                   }
                 }
-                waterOctree.set(waterNode, x, cy - origin.y, z);
-                if (block.isWater()) {
-                  // Move plain water blocks to the water octree.
-                  octNode = new Octree.Node(palette.airId);
+
+                if (block.isWaterFilled()) {
+                  Octree.Node waterNode = new Octree.Node(palette.waterId);
+                  if (cy + 1 < yMax) {
+                    int above = Chunk.chunkIndex(cx, cy + 1, cz);
+                    Block aboveBlock = palette.get(blocks[above]);
+                    if (aboveBlock.isWaterFilled() || aboveBlock.solid) {
+                      waterNode = new Octree.DataNode(palette.waterId, 1 << Water.FULL_BLOCK);
+                    }
+                  }
+                  waterOctree.set(waterNode, x, cy - origin.y, z);
+                  if (block.isWater()) {
+                    // Move plain water blocks to the water octree.
+                    octNode = new Octree.Node(palette.airId);
+                  }
+                } else if (cy + 1 < yMax && block instanceof Lava) {
+                  int above = Chunk.chunkIndex(cx, cy + 1, cz);
+                  Block aboveBlock = palette.get(blocks[above]);
+                  if (aboveBlock instanceof Lava) {
+                    octNode = new Octree.DataNode(blocks[index], 1 << Water.FULL_BLOCK);
+                  }
                 }
-              } else if (cy + 1 < yMax && block instanceof Lava) {
-                int above = Chunk.chunkIndex(cx, cy + 1, cz);
-                Block aboveBlock = palette.get(blocks[above]);
-                if (aboveBlock instanceof Lava) {
-                  octNode = new Octree.DataNode(blocks[index], 1 << Water.FULL_BLOCK);
-                }
+                worldOctree.set(octNode, x, cy - origin.y, z);
               }
-              worldOctree.set(octNode, x, cy - origin.y, z);
             }
           }
         }
@@ -978,7 +997,7 @@ public class Scene implements JsonSerializable, Refreshable {
         }
         task.update(target, done);
         done += 1;
-        OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp);
+        OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
       }
 
       worldOctree.endFinalization();
