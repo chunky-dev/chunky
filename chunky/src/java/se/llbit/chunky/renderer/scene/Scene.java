@@ -654,6 +654,8 @@ public class Scene implements JsonSerializable, Refreshable {
           ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
           ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
           hit = true;
+        } else if(ray.getPrevMaterial() == Air.INSTANCE) {
+          ray.setPrevMaterial(Water.INSTANCE, 1 << Water.FULL_BLOCK);
         }
       }
     } else {
