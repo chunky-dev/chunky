@@ -867,7 +867,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
               if(isHidden) {
                 // Store "whatever" in the octrees
-                Octree.Node whateverNode = new Octree.Node(Octree.WHATEVER_TYPE);
+                Octree.Node whateverNode = new Octree.Node(Octree.ANY_TYPE);
                 worldOctree.set(whateverNode, x, cy - origin.y, z);
               } else {
                 Octree.Node octNode = new Octree.Node(blocks[index]);

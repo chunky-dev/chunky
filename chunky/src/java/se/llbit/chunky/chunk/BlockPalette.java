@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 public class BlockPalette {
   private static final int BLOCK_PALETTE_VERSION = 4;
   public final int airId, stoneId, waterId;
-  public static final int WHATEVER_ID = Octree.WHATEVER_TYPE;
+  public static final int ANY_ID = Octree.ANY_TYPE;
 
   private final Map<String, Consumer<Block>> materialProperties;
 
@@ -81,7 +81,7 @@ public class BlockPalette {
   }
 
   public Block get(int id) {
-    if(id == WHATEVER_ID)
+    if(id == ANY_ID)
       return stone;
     return palette.get(id);
   }

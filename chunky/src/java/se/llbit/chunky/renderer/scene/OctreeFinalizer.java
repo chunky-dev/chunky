@@ -59,7 +59,7 @@ public class OctreeFinalizer {
 
   private static void hideBlocks(Octree worldTree, BlockPalette palette, int x,
                                  int cy, int z, int yMin, int yMax, Vector3i origin) {
-    // Set non-visible blocks to be stone, in order to merge large patches.
+    // Set non-visible blocks to be any block, in order to merge large patches.
     int y = cy - origin.y;
     if (cy > yMin && cy < yMax - 1) {
       boolean isHidden =
@@ -70,7 +70,7 @@ public class OctreeFinalizer {
               && worldTree.getMaterial(x, y - 1, z, palette).opaque
               && worldTree.getMaterial(x, y + 1, z, palette).opaque;
       if (isHidden) {
-        worldTree.set(BlockPalette.WHATEVER_ID, x, y, z);
+        worldTree.set(BlockPalette.ANY_ID, x, y, z);
       }
     }
   }

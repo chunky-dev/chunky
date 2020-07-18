@@ -1,22 +1,15 @@
 package se.llbit.math;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.block.Air;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.UnknownBlock;
-import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.model.TexturedBlockModel;
-import se.llbit.chunky.model.WaterModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static se.llbit.math.Octree.BRANCH_NODE;
-import static se.llbit.math.Octree.WHATEVER_TYPE;
+import static se.llbit.math.Octree.*;
 
 /**
  * This is the classic node-based implementation of an octree
@@ -218,7 +211,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
 
   private void finalizationNode(Octree.Node node, Octree.Node parent, int childNo) {
     boolean canMerge = true;
-    int mergedType = WHATEVER_TYPE;
+    int mergedType = ANY_TYPE;
     int mergedData = 0;
     for(int i = 0; i < 8; ++i) {
       Octree.Node child = node.children[i];
@@ -230,10 +223,10 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
         }
       }
       if(canMerge) {
-        if(mergedType == WHATEVER_TYPE) {
+        if(mergedType == ANY_TYPE) {
           mergedType = child.type;
           mergedData = child.getData();
-        } else if(!(child.type == WHATEVER_TYPE || (child.type == mergedType && child.getData() == mergedData))) {
+        } else if(!(child.type == ANY_TYPE || (child.type == mergedType && child.getData() == mergedData))) {
           canMerge = false;
         }
       }

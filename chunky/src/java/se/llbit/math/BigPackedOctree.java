@@ -1,14 +1,7 @@
 package se.llbit.math;
 
-import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.block.Air;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.UnknownBlock;
-import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.model.TexturedBlockModel;
-import se.llbit.chunky.model.WaterModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
@@ -17,7 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static se.llbit.math.Octree.*;
-import static se.llbit.math.Octree.WHATEVER_TYPE;
 
 /**
  * This is a big packed representation of an octree
@@ -463,7 +455,7 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
 
   private void finalizationNode(long nodeIndex) {
     boolean canMerge = true;
-    int mergedType = WHATEVER_TYPE;
+    int mergedType = ANY_TYPE;
     int mergedData = 0;
     for(int i = 0; i < 8; ++i) {
       long childIndex = getAt(nodeIndex) + i;
@@ -475,11 +467,11 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
         }
       }
       if(canMerge) {
-        if(mergedType == WHATEVER_TYPE) {
+        if(mergedType == ANY_TYPE) {
           long value = getAt(childIndex);
           mergedType = typeFromValue(value);
           mergedData = dataFromValue(value);
-        } else if(!(typeFromValue(getAt(childIndex)) == WHATEVER_TYPE || getAt(childIndex) == valueFromTypeData(mergedType, mergedData))) {
+        } else if(!(typeFromValue(getAt(childIndex)) == ANY_TYPE || getAt(childIndex) == valueFromTypeData(mergedType, mergedData))) {
           canMerge = false;
         }
       }
