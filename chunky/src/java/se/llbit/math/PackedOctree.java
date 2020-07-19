@@ -1,22 +1,14 @@
 package se.llbit.math;
 
-import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.block.Air;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.UnknownBlock;
-import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.model.TexturedBlockModel;
-import se.llbit.chunky.model.WaterModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static se.llbit.math.Octree.BRANCH_NODE;
-import static se.llbit.math.Octree.DATA_FLAG;
+import static se.llbit.math.Octree.*;
 
 /**
  * This is a packed representation of an octree
@@ -26,29 +18,29 @@ import static se.llbit.math.Octree.DATA_FLAG;
 public class PackedOctree implements Octree.OctreeImplementation {
   /**
    * The whole tree data is store in a int array
-   *
+   * <p>
    * Each node is made of several values :
-   *  - the node type (could be a branch node or the type of block contained)
-   *  - optional additional data
-   *  - the index of its first child (if branch node)
-   *
-   *  As nodes are stored linearly, we place siblings nodes in a row and so
-   *  we only need the index of the first child as the following are just after
-   *
-   *  The node type is always positive, we can use this knowledge to compress the node to 2 ints:
-   *  one will contains the index of the first child if it is positive or the negation of the type
-   *  the other will contain the additional data
-   *
-   *  This implementation is inspired by this stackoverflow answer
-   *  https://stackoverflow.com/questions/41946007/efficient-and-well-explained-implementation-of-a-quadtree-for-2d-collision-det#answer-48330314
-   *
-   *  Note: Only leaf nodes can have additional data. In theory
-   *  we could potentially optimize further by only storing the index for branch nodes
-   *  by that would make other operations more complex. Most likely not worth it but could be an idea
-   *
-   *  When dealing with huge octree, the maximum size of an array may be a limitation
-   *  When this occurs this implementation wan no longer be used and we must fallback on another one.
-   *  Here we'll throw an exception that the caller can catch
+   * - the node type (could be a branch node or the type of block contained)
+   * - optional additional data
+   * - the index of its first child (if branch node)
+   * <p>
+   * As nodes are stored linearly, we place siblings nodes in a row and so
+   * we only need the index of the first child as the following are just after
+   * <p>
+   * The node type is always positive, we can use this knowledge to compress the node to 2 ints:
+   * one will contains the index of the first child if it is positive or the negation of the type
+   * the other will contain the additional data
+   * <p>
+   * This implementation is inspired by this stackoverflow answer
+   * https://stackoverflow.com/questions/41946007/efficient-and-well-explained-implementation-of-a-quadtree-for-2d-collision-det#answer-48330314
+   * <p>
+   * Note: Only leaf nodes can have additional data. In theory
+   * we could potentially optimize further by only storing the index for branch nodes
+   * by that would make other operations more complex. Most likely not worth it but could be an idea
+   * <p>
+   * When dealing with huge octree, the maximum size of an array may be a limitation
+   * When this occurs this implementation wan no longer be used and we must fallback on another one.
+   * Here we'll throw an exception that the caller can catch
    */
   private int[] treeData;
 
@@ -91,22 +83,22 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
   @Override
   public boolean isBranch(Octree.NodeId node) {
-    return treeData[((NodeId)node).nodeIndex] > 0;
+    return treeData[((NodeId) node).nodeIndex] > 0;
   }
 
   @Override
   public Octree.NodeId getChild(Octree.NodeId parent, int childNo) {
-    return new NodeId(treeData[((NodeId)parent).nodeIndex] + 2*childNo);
+    return new NodeId(treeData[((NodeId) parent).nodeIndex] + 2 * childNo);
   }
 
   @Override
   public int getType(Octree.NodeId node) {
-    return -treeData[((NodeId)node).nodeIndex];
+    return -treeData[((NodeId) node).nodeIndex];
   }
 
   @Override
   public int getData(Octree.NodeId node) {
-    return treeData[((NodeId)node).nodeIndex+1];
+    return treeData[((NodeId) node).nodeIndex + 1];
   }
 
   /**
@@ -117,15 +109,16 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
   /**
    * Constructor building a tree with capacity for some nodes
-   * @param depth The depth of the tree
+   *
+   * @param depth     The depth of the tree
    * @param nodeCount The number of nodes this tree will contain
    */
   public PackedOctree(int depth, long nodeCount) {
     this.depth = depth;
-    long arraySize = Math.max(nodeCount*2, 64);
-    if(arraySize > (long)MAX_ARRAY_SIZE)
+    long arraySize = Math.max(nodeCount * 2, 64);
+    if(arraySize > (long) MAX_ARRAY_SIZE)
       throw new OctreeTooBigException();
-    treeData = new int[(int)arraySize];
+    treeData = new int[(int) arraySize];
     treeData[0] = 0;
     treeData[1] = 0;
     size = 2;
@@ -134,6 +127,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
   /**
    * Constructs an empty octree
+   *
    * @param depth The depth of the tree
    */
   public PackedOctree(int depth) {
@@ -151,6 +145,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * We find space by searching in the free list
    * if this fails we append at the end of the array
    * if the size is greater than the capacity, we allocate a new array
+   *
    * @return the index at the beginning of a free space in the array of size 16 ints (8 nodes)
    */
   private int findSpace() {
@@ -162,16 +157,16 @@ public class PackedOctree implements Octree.OctreeImplementation {
     }
 
     // append in array if we have the capacity
-    if(size+16 <= treeData.length) {
+    if(size + 16 <= treeData.length) {
       int index = size;
       size += 16;
       return index;
     }
 
     // We need to grow the array
-    long newSize = (long)Math.ceil(treeData.length*1.5);
+    long newSize = (long) Math.ceil(treeData.length * 1.5);
     // We need to check the array won't be too big
-    if(newSize > (long)MAX_ARRAY_SIZE) {
+    if(newSize > (long) MAX_ARRAY_SIZE) {
       // We can allocate less memory than initially wanted if the next block will still be able to fit
       // If not, this implementation isn't suitable
       if(MAX_ARRAY_SIZE - treeData.length > 16) {
@@ -182,7 +177,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
         throw new OctreeTooBigException();
       }
     }
-    int[] newArray = new int[(int)newSize];
+    int[] newArray = new int[(int) newSize];
     System.arraycopy(treeData, 0, newArray, 0, size);
     treeData = newArray;
     // and then append
@@ -194,6 +189,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
   /**
    * free space at the given index, simply add the 16 ints block beginning at index to the free list
+   *
    * @param index the index of the beginning of the block to free
    */
   private void freeSpace(int index) {
@@ -203,33 +199,36 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
   /**
    * Subdivide a node, give to each child the same type and data that this node previously had
+   *
    * @param nodeIndex The index of the node to subdivide
    */
   private void subdivideNode(int nodeIndex) {
     int childrenIndex = findSpace();
     for(int i = 0; i < 8; ++i) {
-      treeData[childrenIndex + 2*i] = treeData[nodeIndex]; // copy type
-      treeData[childrenIndex + 2*i + 1] = treeData[nodeIndex+1]; // copy data
+      treeData[childrenIndex + 2 * i] = treeData[nodeIndex]; // copy type
+      treeData[childrenIndex + 2 * i + 1] = treeData[nodeIndex + 1]; // copy data
     }
     treeData[nodeIndex] = childrenIndex; // Make the node a parent node pointing to its children
-    treeData[nodeIndex+1] = 0; // reset its data
+    treeData[nodeIndex + 1] = 0; // reset its data
   }
 
   /**
    * Merge a parent node so it becomes a leaf node
-   * @param nodeIndex The index of the node to merge
+   *
+   * @param nodeIndex    The index of the node to merge
    * @param typeNegation The negation of the type (the value directly stored in the array)
    */
   private void mergeNode(int nodeIndex, int typeNegation, int data) {
     int childrenIndex = treeData[nodeIndex];
     freeSpace(childrenIndex); // Delete children
     treeData[nodeIndex] = typeNegation; // Make the node a leaf one
-    treeData[nodeIndex+1] = data;
+    treeData[nodeIndex + 1] = data;
   }
 
   /**
    * Compare two nodes
-   * @param firstNodeIndex The index of the first node
+   *
+   * @param firstNodeIndex  The index of the first node
    * @param secondNodeIndex The index of the second node
    * @return true id the nodes compare equals, false otherwise
    */
@@ -237,7 +236,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
     boolean firstIsBranch = treeData[firstNodeIndex] > 0;
     boolean secondIsBranch = treeData[secondNodeIndex] > 0;
     return ((firstIsBranch && secondIsBranch) || treeData[firstNodeIndex] == treeData[secondNodeIndex]) // compare types
-      && treeData[firstNodeIndex+1] == treeData[secondNodeIndex+1]; // compare data
+            && treeData[firstNodeIndex + 1] == treeData[secondNodeIndex + 1]; // compare data
     // FIXME possible bug here as we always compare the data even when dealing with nodes that don't really have data
     // The data int could potentially contain some junk leftover of a previous node
     // In theory it should be reset to 0 but we need to be careful
@@ -245,15 +244,16 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
   /**
    * Compare two nodes
+   *
    * @param firstNodeIndex The index of the first node
-   * @param secondNode The second node (most likely outside of tree)
+   * @param secondNode     The second node (most likely outside of tree)
    * @return true id the nodes compare equals, false otherwise
    */
   private boolean nodeEquals(int firstNodeIndex, Octree.Node secondNode) {
     boolean firstIsBranch = treeData[firstNodeIndex] > 0;
     boolean secondIsBranch = (secondNode.type == BRANCH_NODE);
     return ((firstIsBranch && secondIsBranch) || -treeData[firstNodeIndex] == secondNode.type) // compare types (don't forget that in the tree the negation of the type is stored)
-            && treeData[firstNodeIndex+1] == secondNode.getData(); // compare data
+            && treeData[firstNodeIndex + 1] == secondNode.getData(); // compare data
   }
 
   @Override
@@ -267,12 +267,12 @@ public class PackedOctree implements Octree.OctreeImplementation {
     int nodeIndex = 0;
     int parentLevel = depth - 1;
     int position = 0;
-    for (int i = depth - 1; i >= 0; --i) {
+    for(int i = depth - 1; i >= 0; --i) {
       parents[i] = nodeIndex;
 
-      if (nodeEquals(nodeIndex, data)) {
+      if(nodeEquals(nodeIndex, data)) {
         return;
-      } else if (treeData[nodeIndex] <= 0) { // It's a leaf node
+      } else if(treeData[nodeIndex] <= 0) { // It's a leaf node
         subdivideNode(nodeIndex);
         parentLevel = i;
       }
@@ -281,28 +281,28 @@ public class PackedOctree implements Octree.OctreeImplementation {
       int ybit = 1 & (y >> i);
       int zbit = 1 & (z >> i);
       position = (xbit << 2) | (ybit << 1) | zbit;
-      nodeIndex = treeData[nodeIndex] + position*2;
+      nodeIndex = treeData[nodeIndex] + position * 2;
 
     }
-    int finalNodeIndex = treeData[parents[0]] + position*2;
+    int finalNodeIndex = treeData[parents[0]] + position * 2;
     treeData[finalNodeIndex] = -data.type; // Store negation of the type
-    treeData[finalNodeIndex+1] = data.getData();
+    treeData[finalNodeIndex + 1] = data.getData();
 
     // Merge nodes where all children have been set to the same type.
-    for (int i = 0; i <= parentLevel; ++i) {
+    for(int i = 0; i <= parentLevel; ++i) {
       int parentIndex = parents[i];
 
       boolean allSame = true;
       for(int j = 0; j < 8; ++j) {
-        int childIndex = treeData[parentIndex] + 2*j;
+        int childIndex = treeData[parentIndex] + 2 * j;
         if(!nodeEquals(childIndex, nodeIndex)) {
           allSame = false;
           break;
         }
       }
 
-      if (allSame) {
-        mergeNode(parentIndex, treeData[nodeIndex], treeData[nodeIndex+1]);
+      if(allSame) {
+        mergeNode(parentIndex, treeData[nodeIndex], treeData[nodeIndex + 1]);
       } else {
         break;
       }
@@ -326,7 +326,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
   public Octree.Node get(int x, int y, int z) {
     int nodeIndex = getNodeIndex(x, y, z);
 
-    Octree.Node node = new Octree.DataNode(treeData[nodeIndex] > 0 ? BRANCH_NODE : -treeData[nodeIndex], treeData[nodeIndex+1]);
+    Octree.Node node = new Octree.DataNode(treeData[nodeIndex] > 0 ? BRANCH_NODE : -treeData[nodeIndex], treeData[nodeIndex + 1]);
 
     // Return dummy Node, will work if only type and data are used, breaks if children are needed
     return node;
@@ -372,18 +372,18 @@ public class PackedOctree implements Octree.OctreeImplementation {
     if(type == BRANCH_NODE) {
       int childrenIndex = findSpace();
       treeData[nodeIndex] = childrenIndex;
-      treeData[nodeIndex+1] = 0; // store 0 as data
-      for (int i = 0; i < 8; ++i) {
-        loadNode(in, childrenIndex + 2*i);
+      treeData[nodeIndex + 1] = 0; // store 0 as data
+      for(int i = 0; i < 8; ++i) {
+        loadNode(in, childrenIndex + 2 * i);
       }
     } else {
-      if ((type & DATA_FLAG) == 0) {
+      if((type & DATA_FLAG) == 0) {
         treeData[nodeIndex] = -type; // negation of type
-        treeData[nodeIndex+1] = 0; // store 0 to be sure we don't have uninitialized garbage
+        treeData[nodeIndex + 1] = 0; // store 0 to be sure we don't have uninitialized garbage
       } else {
         int data = in.readInt();
         treeData[nodeIndex] = -(type ^ DATA_FLAG);
-        treeData[nodeIndex+1] = data;
+        treeData[nodeIndex + 1] = data;
       }
     }
   }
@@ -393,14 +393,14 @@ public class PackedOctree implements Octree.OctreeImplementation {
     if(type == BRANCH_NODE) {
       out.writeInt(type);
       for(int i = 0; i < 8; ++i) {
-        int childIndex = treeData[nodeIndex] + 2*i;
+        int childIndex = treeData[nodeIndex] + 2 * i;
         storeNode(out, childIndex);
       }
     } else {
-      boolean isDataNode = (treeData[nodeIndex+1] != 0);
+      boolean isDataNode = (treeData[nodeIndex + 1] != 0);
       if(isDataNode) {
         out.writeInt(type | DATA_FLAG);
-        out.writeInt(treeData[nodeIndex+1]);
+        out.writeInt(treeData[nodeIndex + 1]);
       } else {
         out.writeInt(type);
       }
@@ -416,10 +416,43 @@ public class PackedOctree implements Octree.OctreeImplementation {
     if(treeData[nodeIndex] > 0) {
       long total = 1;
       for(int i = 0; i < 8; ++i)
-        total += countNodes(treeData[nodeIndex] + 2*i);
+        total += countNodes(treeData[nodeIndex] + 2 * i);
       return total;
     } else {
       return 1;
+    }
+  }
+
+  @Override
+  public void endFinalization() {
+    // There is a bunch of ANY_TYPE nodes we should try to merge
+    finalizationNode(0);
+  }
+
+  private void finalizationNode(int nodeIndex) {
+    boolean canMerge = true;
+    int mergedType = -ANY_TYPE;
+    int mergedData = 0;
+    for(int i = 0; i < 8; ++i) {
+      int childIndex = treeData[nodeIndex] + 2 * i;
+      if(treeData[childIndex] > 0) {
+        finalizationNode(childIndex);
+        // The node may have been merged, retest if it still a branch node
+        if(treeData[childIndex] > 0) {
+          canMerge = false;
+        }
+      }
+      if(canMerge) {
+        if(mergedType == -ANY_TYPE) {
+          mergedType = treeData[childIndex];
+          mergedData = treeData[childIndex + 1];
+        } else if(!(treeData[childIndex] == -ANY_TYPE || (treeData[childIndex] == mergedType && treeData[childIndex + 1] == mergedData))) {
+          canMerge = false;
+        }
+      }
+    }
+    if(canMerge) {
+      mergeNode(nodeIndex, mergedType, mergedData);
     }
   }
 

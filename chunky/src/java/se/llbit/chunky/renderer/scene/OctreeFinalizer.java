@@ -41,36 +41,44 @@ public class OctreeFinalizer {
    * @param cp     Position of the chunk to finalize
    */
   public static void finalizeChunk(Octree worldTree, Octree waterTree, BlockPalette palette,
-      Vector3i origin, ChunkPosition cp) {
-    for (int cy = 0 - origin.y; cy < Chunk.Y_MAX - origin.y; ++cy) {
+      Vector3i origin, ChunkPosition cp, int yMin, int yMax) {
+    for (int cy = yMin; cy < yMax; ++cy) {
       for (int cz = 0; cz < 16; ++cz) {
         int z = cz + cp.z * 16 - origin.z;
         for (int cx = 0; cx < 16; ++cx) {
           int x = cx + cp.x * 16 - origin.x;
-          processBlock(worldTree, waterTree, palette, x, cy, z, origin);
+          // process blocks that are at the edge of the chunk, the other should have be taken care of during th loading
+          if(cy == yMin || cy == yMax-1 || cz == 0 || cz == 15 || cx == 0 || cx == 15) {
+            hideBlocks(worldTree, palette, x, cy, z, yMin, yMax, origin);
+            processBlock(worldTree, waterTree, palette, x, cy, z);
+          }
         }
       }
     }
   }
 
-  private static void processBlock(Octree worldTree, Octree waterTree, BlockPalette palette, int x,
-      int cy, int z, Vector3i origin) {
-    Material mat = worldTree.getMaterial(x, cy, z, palette);
-    Material wmat = waterTree.getMaterial(x, cy, z, palette);
-
-    // Set non-visible blocks to be stone, in order to merge large patches.
-    if (cy > -origin.y && cy < Chunk.Y_MAX - origin.y - 1 && worldTree.get(x, cy, z).type != palette.stoneId) {
-      Material b1 = worldTree.getMaterial(x - 1, cy, z, palette),
-          b2 = worldTree.getMaterial(x + 1, cy, z, palette),
-          b3 = worldTree.getMaterial(x, cy, z - 1, palette),
-          b4 = worldTree.getMaterial(x, cy, z + 1, palette),
-          b5 = worldTree.getMaterial(x, cy - 1, z, palette),
-          b6 = worldTree.getMaterial(x, cy + 1, z, palette);
-
-      if (b1.opaque && b2.opaque && b3.opaque && b4.opaque && b5.opaque && b6.opaque) {
-        worldTree.set(palette.stoneId, x, cy, z);
+  private static void hideBlocks(Octree worldTree, BlockPalette palette, int x,
+                                 int cy, int z, int yMin, int yMax, Vector3i origin) {
+    // Set non-visible blocks to be any block, in order to merge large patches.
+    int y = cy - origin.y;
+    if (cy > yMin && cy < yMax - 1) {
+      boolean isHidden =
+              worldTree.getMaterial(x - 1, y, z, palette).opaque
+              && worldTree.getMaterial(x + 1, y, z, palette).opaque
+              && worldTree.getMaterial(x, y, z - 1, palette).opaque
+              && worldTree.getMaterial(x, y, z + 1, palette).opaque
+              && worldTree.getMaterial(x, y - 1, z, palette).opaque
+              && worldTree.getMaterial(x, y + 1, z, palette).opaque;
+      if (isHidden) {
+        worldTree.set(BlockPalette.ANY_ID, x, y, z);
       }
     }
+  }
+
+  private static void processBlock(Octree worldTree, Octree waterTree, BlockPalette palette, int x,
+      int cy, int z) {
+    Material mat = worldTree.getMaterial(x, cy, z, palette);
+    Material wmat = waterTree.getMaterial(x, cy, z, palette);
 
     if (wmat instanceof Water) {
       Material above = waterTree.getMaterial(x, cy + 1, z, palette);

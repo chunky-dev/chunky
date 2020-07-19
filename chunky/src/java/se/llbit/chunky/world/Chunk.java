@@ -18,6 +18,8 @@ package se.llbit.chunky.world;
 
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.Lava;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
@@ -349,6 +351,32 @@ public class Chunk {
         }
       }
     }
+  }
+
+  public static int waterLevelAt(int[] blocks, BlockPalette palette, int cx, int cy, int cz, int baseLevel) {
+    Material corner = palette.get(blocks[chunkIndex(cx, cy, cz)]);
+    if (corner.isWater()) {
+      Material above = palette.get(blocks[Chunk.chunkIndex(cx, cy+1, cz)]);
+      boolean isFullBlock = above.isWaterFilled() || above.solid;
+      return isFullBlock ? 8 : 8 - ((Water) corner).level;
+    } else if (corner.waterlogged) {
+      return 8;
+    } else if (!corner.solid) {
+      return 0;
+    }
+    return baseLevel;
+  }
+
+  public static int lavaLevelAt(int[] blocks, BlockPalette palette, int cx, int cy, int cz, int baseLevel) {
+    Material corner = palette.get(blocks[chunkIndex(cx, cy, cz)]);
+    if (corner instanceof Lava) {
+      Material above = palette.get(blocks[Chunk.chunkIndex(cx, cy+1, cz)]);
+      boolean isFullBlock = above instanceof Lava;
+      return isFullBlock ? 8 : 8 - ((Lava) corner).level;
+    } else if (!corner.solid) {
+      return 0;
+    }
+    return baseLevel;
   }
 
   /**

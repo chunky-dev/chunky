@@ -1,21 +1,15 @@
 package se.llbit.math;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.block.Air;
-import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.UnknownBlock;
-import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.model.TexturedBlockModel;
-import se.llbit.chunky.model.WaterModel;
-import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static se.llbit.math.Octree.BRANCH_NODE;
+import static se.llbit.math.Octree.*;
 
 /**
  * This is the classic node-based implementation of an octree
@@ -206,6 +200,50 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
       return total;
     } else {
       return 1;
+    }
+  }
+
+  @Override
+  public void endFinalization() {
+    // There is a bunch of ANY_TYPE nodes we should try to merge
+    finalizationNode(root, null, 0);
+  }
+
+  private void finalizationNode(Octree.Node node, Octree.Node parent, int childNo) {
+    boolean canMerge = true;
+    int mergedType = ANY_TYPE;
+    int mergedData = 0;
+    for(int i = 0; i < 8; ++i) {
+      Octree.Node child = node.children[i];
+      if(child.type == BRANCH_NODE) {
+        finalizationNode(child, node, i);// The node may have been merged, retest if it still a branch node
+        child = node.children[i];
+        if(child.type == BRANCH_NODE) {
+          canMerge = false;
+        }
+      }
+      if(canMerge) {
+        if(mergedType == ANY_TYPE) {
+          mergedType = child.type;
+          mergedData = child.getData();
+        } else if(!(child.type == ANY_TYPE || (child.type == mergedType && child.getData() == mergedData))) {
+          canMerge = false;
+        }
+      }
+    }
+    if(canMerge) {
+      if(mergedData == 0) {
+        // No need to use a DataNode
+        node.merge(mergedType);
+      } else {
+        // We need to replace the node by a new node in its parent
+        if(parent == null) {
+          // node is the root
+          root = new Octree.DataNode(mergedType, mergedData);
+        } else {
+          parent.children[childNo] = new Octree.DataNode(mergedType, mergedData);
+        }
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.block.*;
+import se.llbit.math.Octree;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
@@ -25,6 +26,7 @@ import java.util.function.Consumer;
 public class BlockPalette {
   private static final int BLOCK_PALETTE_VERSION = 4;
   public final int airId, stoneId, waterId;
+  public static final int ANY_ID = Octree.ANY_TYPE;
 
   private final Map<String, Consumer<Block>> materialProperties;
 
@@ -79,6 +81,8 @@ public class BlockPalette {
   }
 
   public Block get(int id) {
+    if(id == ANY_ID)
+      return stone;
     return palette.get(id);
   }
 

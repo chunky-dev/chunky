@@ -52,6 +52,8 @@ public class Octree {
     NodeId getChild(NodeId parent, int childNo);
     int getType(NodeId node);
     int getData(NodeId node);
+    default void startFinalization() {}
+    default void endFinalization() {}
   }
 
   public interface NodeId {}
@@ -74,6 +76,13 @@ public class Octree {
   }
 
   public static final int BRANCH_NODE = -1;
+
+  /**
+   * A special type that indicate that we don't care about nodes with this type
+   * (The value is chosen to behave like a normal type i.e first bit not set
+   * and so that when serialized with data, it is not confused for a branch node)
+   */
+  public static final int ANY_TYPE = 0x7FFFFFFE;
 
   /**
    * The top bit of the type field in a serialized octree node is reserved for indicating
@@ -675,6 +684,14 @@ public class Octree {
 
   public int getDepth() {
     return implementation.getDepth();
+  }
+
+  public void startFinalization() {
+    implementation.startFinalization();
+  }
+
+  public void endFinalization() {
+    implementation.endFinalization();
   }
 
   /**
