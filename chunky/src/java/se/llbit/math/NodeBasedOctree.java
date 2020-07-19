@@ -205,7 +205,7 @@ public class NodeBasedOctree implements Octree.OctreeImplementation {
 
   @Override
   public void endFinalization() {
-    // There is a bunch of WHATEVER nodes we should try to merge
+    // There is a bunch of ANY_TYPE nodes we should try to merge
     finalizationNode(root, null, 0);
   }
 

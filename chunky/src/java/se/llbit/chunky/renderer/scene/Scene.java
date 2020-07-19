@@ -852,7 +852,7 @@ public class Scene implements JsonSerializable, Refreshable {
               int x = cx + cp.x * 16 - origin.x;
               int index = Chunk.chunkIndex(cx, cy, cz);
 
-              // Check if the block is hidden, if so make it "whatever"
+              // Change the type of hidden blocks to ANY_TYPE
               boolean notOnEdge =
                       (cy > yMin && cy < yMax - 1)
                       && (cx > 0 && cx < 15)
@@ -866,9 +866,7 @@ public class Scene implements JsonSerializable, Refreshable {
                       && palette.get(blocks[Chunk.chunkIndex(cx, cy, cz-1)]).opaque;
 
               if(isHidden) {
-                // Store "whatever" in the octrees
-                Octree.Node whateverNode = new Octree.Node(Octree.ANY_TYPE);
-                worldOctree.set(whateverNode, x, cy - origin.y, z);
+                worldOctree.set(new Octree.Node(Octree.ANY_TYPE), x, cy - origin.y, z);
               } else {
                 Octree.Node octNode = new Octree.Node(blocks[index]);
                 Block block = palette.get(blocks[index]);
