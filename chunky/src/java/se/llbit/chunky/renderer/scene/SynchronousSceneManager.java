@@ -112,8 +112,6 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         File sceneDir = resolveSceneDirectory(sceneName);
         context.setSceneDirectory(sceneDir);
         if (!sceneDir.isDirectory()) {
-          Log.warn("Scene directory does not exist. Creating directory at: "
-              + sceneDir.getAbsolutePath());
           boolean success = sceneDir.mkdirs();
           if (!success) {
             Log.warn("Failed to create scene directory: " + sceneDir.getAbsolutePath());
@@ -317,12 +315,6 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
       descFile = new File(PersistentSettings.getSceneDirectory() + File.separator + sceneName, sceneName + Scene.EXTENSION);
       if (descFile.exists()) {
         return descFile.getParentFile();
-      }
-
-      else if (!defaultDirectory.mkdirs()) {
-        Log.warn("Specific scene folder could not be created. Defaulting to the scene directory.");
-        return PersistentSettings.getSceneDirectory();
-
       }
     }
     return defaultDirectory;

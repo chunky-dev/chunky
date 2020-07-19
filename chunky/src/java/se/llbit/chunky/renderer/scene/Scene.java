@@ -2490,7 +2490,7 @@ public class Scene implements JsonSerializable, Refreshable {
       // Try to create backup. It is not a problem if we fail this.
       String backupFileName = file.getName() + ".backup";
       File renderDir = context.getSceneDirectory();
-          File backup = new File(renderDir, backupFileName);
+      File backup = new File(renderDir, backupFileName);
       if (backup.exists()) {
         //noinspection ResultOfMethodCallIgnored
         backup.delete();

@@ -108,7 +108,6 @@ public class RenderContext {
    * @return A File object. Note, the file object may not exist yet and the directory leading to the file will be created.
    */
   public File getSceneFile(String fileName) {
-    ensureSceneDirectory();
     return new File(sceneDirectory, fileName);
   }
 
@@ -127,6 +126,7 @@ public class RenderContext {
    * @throws FileNotFoundException If the file does not exist.
    */
   public OutputStream getSceneFileOutputStream(String fileName) throws FileNotFoundException {
+    ensureSceneDirectory();
     return new FileOutputStream(getSceneFile(fileName));
   }
 
