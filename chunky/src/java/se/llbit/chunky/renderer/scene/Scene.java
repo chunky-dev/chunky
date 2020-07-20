@@ -341,7 +341,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public static void exportToZip(String name, File targetFile) {
     String[] extensions = { ".json", ".dump", ".octree2", ".foliage", ".grass", };
-    ZipExport.zip(targetFile, PersistentSettings.getSceneDirectory(), name, extensions);
+    ZipExport.zip(targetFile, SynchronousSceneManager.resolveSceneDirectory(name), name, extensions);
   }
 
   /**
