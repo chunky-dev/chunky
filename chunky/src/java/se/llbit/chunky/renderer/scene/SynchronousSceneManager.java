@@ -302,7 +302,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
    * @param sceneName The name of the scene to resolve the directory for.
    * @return The directory holding the given scene
    */
-  private File resolveSceneDirectory(String sceneName) {
+  public static File resolveSceneDirectory(String sceneName) {
     File defaultDirectory = new File(PersistentSettings.getSceneDirectory(), sceneName);
 
     if (!defaultDirectory.exists()) {
