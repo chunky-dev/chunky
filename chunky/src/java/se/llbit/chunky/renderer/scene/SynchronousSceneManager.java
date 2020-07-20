@@ -160,9 +160,9 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   @Override public void loadFreshChunks(World world, Collection<ChunkPosition> chunksToLoad) {
     synchronized (scene) {
       scene.clear();
-      context.setSceneDirectory(resolveSceneDirectory(scene.name));
       scene.loadChunks(taskTracker, world, chunksToLoad);
       scene.resetScene(null, context.getChunky().getSceneFactory());
+      context.setSceneDirectory(resolveSceneDirectory(scene.name));
       scene.refresh();
       scene.setResetReason(ResetReason.SCENE_LOADED);
       scene.setRenderMode(RenderMode.PREVIEW);
