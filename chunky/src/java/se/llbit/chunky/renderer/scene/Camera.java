@@ -242,6 +242,7 @@ public class Camera implements JsonSerializable {
   public void setPosition(Vector3 v) {
     pos.set(v);
     onViewChange();
+    positionListener.run();
   }
 
   /**
