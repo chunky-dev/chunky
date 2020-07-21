@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.math3.util.FastMath;
 
+import org.apache.commons.math3.util.Pair;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Water;
@@ -54,6 +55,18 @@ public class Octree {
     int getData(NodeId node);
     default void startFinalization() {}
     default void endFinalization() {}
+    default Pair<NodeId, Integer> getWithLevel(int x, int y, int z) {
+      NodeId node = getRoot();
+      int level = getDepth();
+      while(isBranch(node)) {
+        level -= 1;
+        int lx = x >>> level;
+        int ly = y >>> level;
+        int lz = z >>> level;
+        node = getChild(node, (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)));
+      }
+      return new Pair<>(node, level);
+    }
   }
 
   public interface NodeId {}
@@ -456,17 +469,13 @@ public class Octree {
       if (lx != 0 || ly != 0 || lz != 0)
         return false; // outside of octree!
 
-      // Descend the tree to find the current leaf node
-      int level = depth;
-      NodeId node = implementation.getRoot();
-      int nodeIndex = 0;
-      while(implementation.isBranch(node)) {
-        level -= 1;
-        lx = x >>> level;
-        ly = y >>> level;
-        lz = z >>> level;
-        node = implementation.getChild(node, (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)));
-      }
+      Pair<NodeId, Integer> nodeAndLevel = implementation.getWithLevel(x, y, z);
+      NodeId node = nodeAndLevel.getFirst();
+      int level = nodeAndLevel.getSecond();
+
+      lx = x >>> level;
+      ly = y >>> level;
+      lz = z >>> level;
 
       // Test intersection
       Block currentBlock = palette.get(implementation.getType(node));
@@ -574,15 +583,9 @@ public class Octree {
         return false; // outside of octree!
 
       // Descend the tree to find the current leaf node
-      NodeId node = implementation.getRoot();
-      int level = depth;
-      while(implementation.isBranch(node)) {
-        level -= 1;
-        lx = x >>> level;
-        ly = y >>> level;
-        lz = z >>> level;
-        node = implementation.getChild(node, (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)));
-      }
+      Pair<NodeId, Integer> nodeAndLevel = implementation.getWithLevel(x, y, z);
+      NodeId node = nodeAndLevel.getFirst();
+      int level = nodeAndLevel.getSecond();
 
       // Test intersection
       Block currentBlock = palette.get(implementation.getType(node));
