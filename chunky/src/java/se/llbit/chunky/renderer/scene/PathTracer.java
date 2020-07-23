@@ -113,7 +113,7 @@ public class PathTracer implements RayTracer {
       float n1 = prevMat.ior;
       float n2 = currentMat.ior;
 
-      if (prevMat == Air.INSTANCE) {
+      if (prevMat == Air.INSTANCE || prevMat.isWater()) {
         airDistance = ray.distance;
       }
 
