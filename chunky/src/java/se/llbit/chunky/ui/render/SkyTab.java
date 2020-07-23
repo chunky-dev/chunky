@@ -104,6 +104,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     fogDensity.setTooltip("Fog thickness. Set to 0 to disable volumetric fog effect.");
     fogDensity.setRange(0, 2);
     fogDensity.clampMin();
+    fogDensity.makeLogarithmic();
     fogDensity.onValueChange(value -> scene.setFogDensity(value));
 
     skyFogDensity.setTooltip(
