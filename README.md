@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://material-ui.com/" rel="noopener" target="_blank"><img width="100" src="https://raw.githubusercontent.com/llbit/chunky-docs/master/images/logo.png" alt="Chunky logo"></a>
+  <a href="http://chunky.llbit.se" rel="noopener" target="_blank"><img width="100" src="https://raw.githubusercontent.com/llbit/chunky-docs/master/images/logo.png" alt="Chunky logo"></a>
 </p>
 <h1 align="center">Chunky</h1>
 <div align="center">
@@ -139,11 +139,9 @@ rendering tips are available at the [Chunky Documentation page][1]. For more ins
 
 ## Hacking on Chunky
 
-To build Chunky, run the `gradlew` script in the project root directory:
+To build Chunky, run the `gradlew` script in the project root directory: `./gradlew jar`
 
-   ./gradlew jar
-
-This just builds the core libraries. To build an installable file takes
+This just builds the core libraries. Building an installable file takes
 a bit more work; [refer to this repository][7].
 
 Chunky is split into four subprojects:
