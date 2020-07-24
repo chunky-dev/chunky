@@ -939,6 +939,10 @@ public class Sky implements JsonSerializable {
       if (t > tExit) {
         return false;
       }
+      if (nx == 0 && ny == 0 && nz == 0) {
+        // fix ray.n being set to zero (issue #643)
+        return false;
+      }
       ray.n.set(nx, ny, nz);
       enterCloud(ray, t + t_offset);
       return true;
