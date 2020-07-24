@@ -587,6 +587,10 @@ public class Octree {
       NodeId node = nodeAndLevel.getFirst();
       int level = nodeAndLevel.getSecond();
 
+      lx = x >>> level;
+      ly = y >>> level;
+      lz = z >>> level;
+
       // Test intersection
       Block currentBlock = palette.get(implementation.getType(node));
       Material prevBlock = ray.getCurrentMaterial();
