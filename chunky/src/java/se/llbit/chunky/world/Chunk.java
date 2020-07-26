@@ -428,18 +428,22 @@ public class Chunk {
     if (biomesTag.isByteArray(X_MAX * Z_MAX) || biomesTag.isIntArray(X_MAX * Z_MAX)) {
       extractBiomeData(biomesTag, biomes);
     }
-    if (sections.isList() && tileEntitiesTag.isList()
-        && entitiesTag.isList()) {
+
+    if (sections.isList()) {
       loadBlockData(data, blocks, blockPalette);
-      ListTag list = (ListTag) entitiesTag;
-      for (SpecificTag tag : list) {
-        if (tag.isCompoundTag())
-          entities.add((CompoundTag) tag);
+
+      if (entitiesTag.isList()) {
+        for (SpecificTag tag : (ListTag) entitiesTag) {
+          if (tag.isCompoundTag())
+            entities.add((CompoundTag) tag);
+        }
       }
-      list = (ListTag) tileEntitiesTag;
-      for (SpecificTag tag : list) {
-        if (tag.isCompoundTag())
-          tileEntities.add((CompoundTag) tag);
+
+      if (tileEntitiesTag.isList()) {
+        for (SpecificTag tag : (ListTag) tileEntitiesTag) {
+          if (tag.isCompoundTag())
+            tileEntities.add((CompoundTag) tag);
+        }
       }
     }
   }
