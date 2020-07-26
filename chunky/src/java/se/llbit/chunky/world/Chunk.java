@@ -357,7 +357,7 @@ public class Chunk {
     Material corner = palette.get(blocks[chunkIndex(cx, cy, cz)]);
     if (corner.isWater()) {
       Material above = palette.get(blocks[Chunk.chunkIndex(cx, cy+1, cz)]);
-      boolean isFullBlock = above.isWaterFilled() || above.solid;
+      boolean isFullBlock = above.isWaterFilled();
       return isFullBlock ? 8 : 8 - ((Water) corner).level;
     } else if (corner.waterlogged) {
       return 8;
