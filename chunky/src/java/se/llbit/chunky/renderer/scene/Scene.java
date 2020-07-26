@@ -888,7 +888,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   if (cy + 1 < yMax) {
                     int above = Chunk.chunkIndex(cx, cy + 1, cz);
                     Block aboveBlock = palette.get(blocks[above]);
-                    if (aboveBlock.isWaterFilled() || aboveBlock.solid) {
+                    if (aboveBlock.isWaterFilled()) {
                       waterNode = new Octree.DataNode(palette.waterId, 1 << Water.FULL_BLOCK);
                     }
                   }
