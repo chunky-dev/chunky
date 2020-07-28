@@ -538,7 +538,9 @@ public class ChunkyFxController
       }
     });
 
-    openSceneDirBtn.setOnAction(e -> openSceneDirectory());
+    openSceneDirBtn.setTooltip(
+        new Tooltip("Open the directory where Chunky stores scene descriptions and renders."));
+    openSceneDirBtn.setOnAction(e -> openDirectory(chunky.options.sceneDir));
 
     changeSceneDirBtn.setOnAction(e -> SceneDirectoryPicker.changeSceneDirectory(chunky.options));
 
@@ -853,9 +855,8 @@ public class ChunkyFxController
     return mapLoader;
   }
 
-  public void openSceneDirectory() {
-    File sceneDir = chunky.options.sceneDir;
-    if (sceneDir != null) {
+  public void openDirectory(File directory) {
+    if (directory != null && directory.isDirectory()) {
       // Running Desktop.open() on the JavaFX application thread seems to
       // lock up the application on Linux, so we create a new thread to run that.
       // This StackOverflow question seems to ask about the same bug:
@@ -863,12 +864,12 @@ public class ChunkyFxController
       new Thread(() -> {
         try {
           if (Desktop.isDesktopSupported()) {
-            Desktop.getDesktop().open(sceneDir);
+            Desktop.getDesktop().open(directory);
           } else {
             Log.warn("Can not open system file browser.");
           }
         } catch (IOException e1) {
-          Log.warn("Failed to open scene directory.", e1);
+          Log.warn("Failed to open directory.", e1);
         }
       }).start();
     }

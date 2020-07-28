@@ -132,8 +132,8 @@
           <Button fx:id="editResourcePacks" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Edit resource packs"/>
           <CheckBox fx:id="singleColorBtn" mnemonicParsing="false" text="Single color textures (needs restart)"/>
           <CheckBox fx:id="showLauncherBtn" mnemonicParsing="false" text="Show launcher when starting Chunky"/>
-          <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open Scene Directory"/>
-          <Button fx:id="changeSceneDirBtn" mnemonicParsing="false" text="Change Scene Directory"/>
+          <Button fx:id="openSceneDirBtn" mnemonicParsing="false" text="Open Scenes Directory"/>
+          <Button fx:id="changeSceneDirBtn" mnemonicParsing="false" text="Change Scenes Directory"/>
         </VBox>
       </Tab>
       <Tab fx:id="aboutTab" text="About">
