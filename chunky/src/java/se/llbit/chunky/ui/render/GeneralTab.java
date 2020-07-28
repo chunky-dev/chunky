@@ -217,8 +217,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
       renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
     });
     openSceneDirBtn.setTooltip(
-        new Tooltip("Open the directory where Chunky stores scene descriptions and renders."));
-    openSceneDirBtn.setOnAction(e -> chunkyFxController.openSceneDirectory());
+        new Tooltip("Open the directory where Chunky stores the scene description and renders of this scene."));
+    openSceneDirBtn.setOnAction(e -> chunkyFxController.openDirectory(chunkyFxController.getRenderController().getContext().getSceneDirectory()));
     loadSelectedChunks
         .setTooltip(new Tooltip("Load the chunks that are currently selected in the map view"));
     loadSelectedChunks.setOnAction(e -> {
