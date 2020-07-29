@@ -7,23 +7,12 @@ import se.llbit.math.Ray;
 
 public class Chain extends MinecraftBlockTranslucent {
 
-  private final int axis;
+  private final String axis;
 
   public Chain(String name, Texture texture, String axis) {
     super(name, texture);
     localIntersect = true;
-    switch(axis) {
-      default:
-      case "y":
-        this.axis = 0;
-        break;
-      case "x":
-        this.axis = 1;
-        break;
-      case "z":
-        this.axis = 2;
-        break;
-    }
+    this.axis = axis;
   }
 
   @Override

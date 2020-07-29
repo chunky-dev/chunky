@@ -2654,7 +2654,7 @@ public class MinecraftBlockProvider implements BlockProvider {
   }
 
   private static Block chain(Tag tag, String name, Texture texture) {
-    String axis = tag.get("Properties").get("axis").stringValue("north");
+    String axis = tag.get("Properties").get("axis").stringValue("y");
     return new Chain(name, texture, axis);
   }
 
