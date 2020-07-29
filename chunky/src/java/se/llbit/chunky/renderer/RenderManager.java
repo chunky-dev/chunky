@@ -24,7 +24,7 @@ import se.llbit.util.TaskTracker;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -64,8 +64,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
   /** Gives the next tile index for a worker. */
   private volatile RenderTile[] tileQueue = new RenderTile[0];
   private final Object jobMonitor = new Object();
-  private int numJobs = 0, lastJob = 0;
-  private final AtomicInteger nextJob = new AtomicInteger(0);
+  private int numJobs = 0;
+  private long lastJob = 0;
+  private final AtomicLong nextJob = new AtomicLong(0);
 
   /** Latch for waiting on workers to finish the current frame. */
   private CountDownLatch frameFinished = new CountDownLatch(Integer.MAX_VALUE);
@@ -357,7 +358,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
   }
 
   @Override public RenderTile getNextJob() throws InterruptedException {
-    int job = nextJob.getAndIncrement();
+    long job = nextJob.getAndIncrement();
     if (job >= lastJob) {
       synchronized (jobMonitor) {
         while (job >= lastJob) {
@@ -365,7 +366,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
         }
       }
     }
-    return tileQueue[lastJob - job - 1];
+    return tileQueue[(int)((lastJob - job - 1) % numJobs)];
   }
 
   @Override public void jobDone() {
