@@ -2493,7 +2493,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "quartz_bricks":
         return new MinecraftBlock(name, Texture.quartzBricks);
       case "chain":
-        return new Chain("chain", Texture.chain);
+        return chain(tag, "chain", Texture.chain);
       case "structure_void":
       case "barrier":
         // Invisible.
@@ -2651,6 +2651,11 @@ public class MinecraftBlockProvider implements BlockProvider {
     String facing = BlockProvider.facing(tag, "north");
     String type = properties.get("type").stringValue("single");
     return new Chest(name, type, facing, trapped);
+  }
+
+  private static Block chain(Tag tag, String name, Texture texture) {
+    String axis = tag.get("Properties").get("axis").stringValue("north");
+    return new Chain(name, texture, axis);
   }
 
   private static Block endRod(Tag tag) {
