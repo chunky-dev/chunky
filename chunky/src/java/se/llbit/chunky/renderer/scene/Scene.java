@@ -751,7 +751,7 @@ public class Scene implements JsonSerializable, Refreshable {
       palette = new BlockPalette();
       worldOctree = new Octree(octreeImplementation, requiredDepth);
       waterOctree = new Octree(octreeImplementation, requiredDepth);
-      emitterGrid = new Grid(requiredDepth, 32); // TODO Make configurable
+      emitterGrid = new Grid(requiredDepth, 10); // TODO Make configurable
 
       // Parse the regions first - force chunk lists to be populated!
       Set<ChunkPosition> regions = new HashSet<>();

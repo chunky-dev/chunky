@@ -96,4 +96,17 @@ public class Grid {
     int emitterIndex = cell.indexes.get(randomIndex);
     return emitterPositions.get(emitterIndex);
   }
+
+  public List<EmitterPosition> getEmitterPositions(int x, int y, int z) {
+    int gridX = x / cellSize;
+    int gridY = y / cellSize;
+    int gridZ = z / cellSize;
+    int index = cellIndex(gridX, gridY, gridZ);
+    Cell cell = grid[index];
+    List<EmitterPosition> pos = new ArrayList<>();
+    for(Integer i : cell.indexes) {
+      pos.add(emitterPositions.get(i));
+    }
+    return pos;
+  }
 }
