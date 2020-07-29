@@ -62,8 +62,13 @@ public class Grid {
       for(int dy = -1; dy <= 1; ++dy) {
         for(int dx = -1; dx <= 1; ++dx) {
           for(int dz = -1; dz <= 1; ++dz) {
-            int index = cellIndex(gridX+dx, gridY+dy, gridZ+dz);
-            grid[index].indexes.add(i);
+            int x = gridX+dx;
+            int y = gridY+dy;
+            int z = gridZ+dz;
+            if(x >= 0 && x < gridSize && y>= 0 && y < gridSize && z >= 0 && z < gridSize) {
+              int index = cellIndex(x, y, z);
+              grid[index].indexes.add(i);
+            }
           }
         }
       }
@@ -79,12 +84,14 @@ public class Grid {
    * @param random
    * @return
    */
-  EmitterPosition sampleEmitterPosition(int x, int y, int z, Random random) {
+  public EmitterPosition sampleEmitterPosition(int x, int y, int z, Random random) {
     int gridX = x / cellSize;
     int gridY = y / cellSize;
     int gridZ = z / cellSize;
     int index = cellIndex(gridX, gridY, gridZ);
     Cell cell = grid[index];
+    if(cell.indexes.size() == 0)
+      return null;
     int randomIndex = random.nextInt(cell.indexes.size());
     int emitterIndex = cell.indexes.get(randomIndex);
     return emitterPositions.get(emitterIndex);

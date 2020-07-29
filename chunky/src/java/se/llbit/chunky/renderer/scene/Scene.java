@@ -297,6 +297,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private boolean forceReset = false;
 
+  private Grid emitterGrid;
+
   /**
    * The octree implementation to use
    */
@@ -317,6 +319,7 @@ public class Scene implements JsonSerializable, Refreshable {
     palette = new BlockPalette();
     worldOctree = new Octree(octreeImplementation, 1);
     waterOctree = new Octree(octreeImplementation, 1);
+    emitterGrid = new Grid(1, 16);
   }
 
   /**
@@ -388,6 +391,8 @@ public class Scene implements JsonSerializable, Refreshable {
       origin.set(other.origin);
 
       chunks = other.chunks;
+
+      emitterGrid = other.emitterGrid;
     }
 
     // Copy material properties.
@@ -462,6 +467,7 @@ public class Scene implements JsonSerializable, Refreshable {
       saveGrassTexture(context, taskTracker);
       saveFoliageTexture(context, taskTracker);
       saveDump(context, taskTracker);
+      // TODO Save Grid
     }
   }
 
@@ -512,6 +518,9 @@ public class Scene implements JsonSerializable, Refreshable {
         loadChunks(taskTracker, loadedWorld, chunks);
       }
     }
+
+    // TODO Load Grid
+
     notifyAll();
   }
 
@@ -742,6 +751,7 @@ public class Scene implements JsonSerializable, Refreshable {
       palette = new BlockPalette();
       worldOctree = new Octree(octreeImplementation, requiredDepth);
       waterOctree = new Octree(octreeImplementation, requiredDepth);
+      emitterGrid = new Grid(requiredDepth, 32); // TODO Make configurable
 
       // Parse the regions first - force chunk lists to be populated!
       Set<ChunkPosition> regions = new HashSet<>();
@@ -1003,6 +1013,11 @@ public class Scene implements JsonSerializable, Refreshable {
                   }
                 }
                 worldOctree.set(octNode, x, cy - origin.y, z);
+
+                if(block.emittance > 1e-4) {
+                  emitterGrid.addEmitter(x, cy-origin.y, z);
+                }
+
               }
             }
           }
@@ -1100,6 +1115,8 @@ public class Scene implements JsonSerializable, Refreshable {
       worldOctree.endFinalization();
       waterOctree.endFinalization();
     }
+
+    emitterGrid.prepare();
 
     chunks = loadedChunks;
     camera.setWorldSize(1 << worldOctree.getDepth());
@@ -2933,6 +2950,10 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setYClipMax(int yClipMax) {
     this.yClipMax = yClipMax;
+  }
+
+  public Grid getEmitterGrid() {
+    return emitterGrid;
   }
 
   public String getOctreeImplementation() {
