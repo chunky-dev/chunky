@@ -7,7 +7,7 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class ChainModel {
-  private static final Quad[] quads =
+  private static final Quad[] quadsY =
       Model.rotateY(
           new Quad[] {
             new Quad(
@@ -33,11 +33,36 @@ public class ChainModel {
           },
           Math.toRadians(45));
 
-  public static boolean intersect(Ray ray) {
+  private static Quad[][] axis = new Quad[3][];
+
+  static {
+    Quad[] quadsX = Model.rotateZ(quadsY);
+    Quad[] quadsZ = Model.rotateX(quadsY);
+
+    axis[0] = quadsY;
+    axis[1] = quadsX;
+    axis[2] = quadsZ;
+  }
+
+  public static boolean intersect(Ray ray, String axisName) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
 
-    for (Quad quad : quads) {
+    int axisId;
+    switch(axisName) {
+      default:
+      case "y":
+        axisId = 0;
+        break;
+      case "x":
+        axisId = 1;
+        break;
+      case "z":
+        axisId = 2;
+        break;
+    }
+
+    for (Quad quad : axis[axisId]) {
       if (quad.intersect(ray)) {
         float[] color = Texture.chain.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
