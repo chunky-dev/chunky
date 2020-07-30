@@ -51,23 +51,17 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
   }
 
   public void setRange(double min, double max) {
-    if (min < 0.01 && min >= 0) {
-      sliderMin = 0.01;
-    } else {
-      sliderMin = min;
-    }
+    setRange(min, max, min < 0.01 && min >= 0 ? 0.01 : min);
+  }
+
+  public void setRange(double min, double max, double sliderMin) {
+    this.sliderMin = sliderMin;
     this.min = min;
     this.max = max;
     if (!logarithmic) {
       valueSlider.setMin(min);
       valueSlider.setMax(max);
     }
-  }
-
-  public void setRange(double min, double max, double SliderMin) {
-    sliderMin = SliderMin;
-    this.min = min;
-    this.max = max;
   }
 
   /**
