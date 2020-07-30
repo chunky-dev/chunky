@@ -64,8 +64,8 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
     }
   }
 
-  public void setRange2(double min, double max) {
-    sliderMin = 0.001;
+  public void setRange(double min, double max, double SliderMin) {
+    sliderMin = SliderMin;
     this.min = min;
     this.max = max;
   }
