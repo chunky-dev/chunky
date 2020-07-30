@@ -64,6 +64,12 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
     }
   }
 
+  public void setRange2(double min, double max) {
+    sliderMin = 0.001;
+    this.min = min;
+    this.max = max;
+  }
+
   /**
    * Make the adjuster use a logarithmic mapping for the slider position.
    */
