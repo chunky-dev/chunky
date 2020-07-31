@@ -153,7 +153,10 @@ public class Chunk {
     request.add(Chunk.LEVEL_BIOMES);
     request.add(Chunk.LEVEL_HEIGHTMAP);
     Map<String, Tag> data = getChunkData(request);
-
+    // TODO: improve error handling here.
+    if (data == null) {
+      return;
+    }
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
     loadSurface(data);
