@@ -286,6 +286,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     canvas.setScaleX(scale);
     canvas.setScaleY(scale);
     updateCanvasPane();
+    guideGroup.setScaleX(scale);
+    guideGroup.setScaleY(scale);
   }
 
   @Override public void repaint() {
