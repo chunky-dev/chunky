@@ -19,8 +19,10 @@ package se.llbit.chunky.ui;
 import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -34,6 +36,8 @@ import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.stage.PopupWindow;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.RenderStatusListener;
@@ -59,6 +63,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
   private final AtomicBoolean painting = new AtomicBoolean(false);
   private final Canvas canvas;
+  private final Group guideGroup;
   private final StackPane canvasPane;
   private final Renderer renderer;
   private int lastX;
@@ -87,6 +92,42 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     canvasPane = new StackPane(canvas);
     setContent(canvasPane);
 
+    guideGroup = new Group();
+    Line hGuide1 = new Line();
+    Line hGuide2 = new Line();
+    Line vGuide1 = new Line();
+    Line vGuide2 = new Line();
+    guideGroup.getChildren().addAll(hGuide1, hGuide2, vGuide1, vGuide2);
+    canvasPane.getChildren().add(guideGroup);
+
+    hGuide1.setVisible(false);
+    hGuide1.setStroke(Color.rgb(0, 0, 0, 0.5));
+    hGuide1.setStartX(0);
+    hGuide1.endXProperty().bind(canvas.widthProperty());
+    hGuide1.startYProperty().bind(canvas.heightProperty().divide(3));
+    hGuide1.endYProperty().bind(hGuide1.startYProperty());
+
+    hGuide2.setVisible(false);
+    hGuide2.setStroke(Color.rgb(0, 0, 0, 0.5));
+    hGuide2.setStartX(0);
+    hGuide2.endXProperty().bind(canvas.widthProperty());
+    hGuide2.startYProperty().bind(canvas.heightProperty().multiply(2 / 3.0));
+    hGuide2.endYProperty().bind(hGuide2.startYProperty());
+
+    vGuide1.setVisible(false);
+    vGuide1.setStroke(Color.rgb(0, 0, 0, 0.5));
+    vGuide1.setStartY(0);
+    vGuide1.endYProperty().bind(canvas.heightProperty());
+    vGuide1.startXProperty().bind(canvas.widthProperty().divide(3));
+    vGuide1.endXProperty().bind(vGuide1.startXProperty());
+
+    vGuide2.setVisible(false);
+    vGuide2.setStroke(Color.rgb(0, 0, 0, 0.5));
+    vGuide2.setStartY(0);
+    vGuide2.endYProperty().bind(canvas.heightProperty());
+    vGuide2.startXProperty().bind(canvas.widthProperty().multiply(2 / 3.0));
+    vGuide2.endXProperty().bind(vGuide2.startXProperty());
+
     canvas.setOnMousePressed(e -> {
       lastX = (int) e.getX();
       lastY = (int) e.getY();
@@ -114,6 +155,14 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
         scene.forceReset();
       }
     });
+    CheckMenuItem showGuides = new CheckMenuItem("Show guides");
+    showGuides.setSelected(false);
+    showGuides.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      hGuide1.setVisible(newValue);
+      hGuide2.setVisible(newValue);
+      vGuide1.setVisible(newValue);
+      vGuide2.setVisible(newValue);
+    });
     Menu canvasScale = new Menu("Canvas scale");
     ToggleGroup scaleGroup = new ToggleGroup();
     for (int percent : new int[] { 25, 50, 75, 100, 150, 200, 300, 400 }) {
@@ -125,7 +174,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       item.setOnAction(e -> updateCanvasScale(percent / 100.0));
       canvasScale.getItems().add(item);
     }
-    contextMenu.getItems().addAll(setTarget, canvasScale);
+    contextMenu.getItems().addAll(setTarget, showGuides, canvasScale);
 
     canvas.setOnMouseClicked(event -> {
       if (event.getButton() == MouseButton.SECONDARY) {
