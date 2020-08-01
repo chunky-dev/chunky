@@ -1,5 +1,6 @@
 package se.llbit.chunky.block;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,7 +85,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
                       }
 
                       try (JsonParser parser =
-                             new JsonParser(Files.newInputStream(block))) {
+                             new JsonParser(skipBom(Files.newInputStream(block)))) {
                         BlockVariants variants = new BlockVariants();
 
                         JsonObject blockStates = parser.parse().object();
@@ -419,12 +420,11 @@ public class ResourcepackBlockProvider implements BlockProvider {
         path.add("models");
         path.addAll(Arrays.stream((parts[1] + ".json").split("/")).toList());
         try (JsonParser parser =
-               new JsonParser(resourcePacks.getInputStream(String.join("/", path)).get())) {
+               new JsonParser(skipBom(resourcePacks.getInputStream(String.join("/", path)).get()))) {
           model = parser.parse().object();
           models.put(modelName, model);
         } catch (IOException | SyntaxError e) {
-          System.out.println("MODEL NOT FOUND: " + path);
-          throw new RuntimeException("Could not load block model " + modelName, e);
+          throw new RuntimeException("Could not load block model " + modelName + " from " + path, e);
         }
       }
       return model;
@@ -952,5 +952,23 @@ public class ResourcepackBlockProvider implements BlockProvider {
         }
       };
     }
+  }
+
+  /**
+   * The JSON parser doesn't support parsing JSON files that start with a BOM. This skips the BOM,
+   * if present, and returns a new input stream that wraps the old one and starts after the BOM.
+   *
+   * @param inputStream Input stream
+   * @return New input stream that wraps the old one and starts after the BOM
+   * @throws IOException If creating new input stream fails
+   */
+  private static InputStream skipBom(InputStream inputStream) throws IOException {
+    BufferedInputStream buf = new BufferedInputStream(inputStream);
+    buf.mark(3);
+    if (buf.read() != 0xef || buf.read() != 0xbb || buf.read() != 0xbf) {
+      buf.reset();
+      return buf;
+    }
+    return buf;
   }
 }
