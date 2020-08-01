@@ -221,7 +221,9 @@ public class ResourcepackBlockProvider implements BlockProvider {
           return variant.getBlock(properties);
         }
       }
-      // throw new RuntimeException("Could not find block model for " + properties.toString());
+      System.err.println(
+          "Could not find block model for " + tag.get("Name").stringValue() + " " + properties
+              .toString());
       return UnknownBlock.UNKNOWN;
     }
   }
@@ -398,9 +400,10 @@ public class ResourcepackBlockProvider implements BlockProvider {
           }
           textures.put(textureName, texture);
         } catch (IOException e) {
-          throw new RuntimeException("Could not load texture " + textureName, e);
-          // textures.put(textureName, Texture.unknown);
-          // return Texture.unknown;
+          // throw new RuntimeException("Could not load texture " + textureName, e);
+          System.err.println("Could not load texture " + textureName);
+          textures.put(textureName, Texture.unknown);
+          return Texture.unknown;
         }
       }
       return texture;
@@ -432,8 +435,8 @@ public class ResourcepackBlockProvider implements BlockProvider {
 
     public Block loadBlockModel(LayeredResourcePacks resourcePacks, String model, String blockName) {
       if (model.equals("unknown:unknown")) {
-        throw new RuntimeException("unknown block model for " + blockName);
-        // return UnknownBlock.UNKNOWN;
+        System.err.println("unknown block model for " + blockName);
+        return UnknownBlock.UNKNOWN;
       }
 
       JsonModel block = new JsonModel(blockName, Texture.air);
