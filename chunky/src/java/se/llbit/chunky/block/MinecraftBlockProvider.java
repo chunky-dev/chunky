@@ -2506,8 +2506,7 @@ public class MinecraftBlockProvider implements BlockProvider {
   public static Block largeFlower(Tag tag, Texture top, Texture bottom) {
     String name = BlockProvider.blockName(tag);
     String half = tag.get("Properties").get("half").stringValue("lower");
-    return new SpriteBlock(
-        String.format("%s (half=%s)", name, half), half.equals("upper") ? top : bottom);
+    return new SpriteBlock(name, half.equals("upper") ? top : bottom);
   }
 
   public static Block log(Tag tag, Texture side, Texture top) {
