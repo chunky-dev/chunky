@@ -28,13 +28,7 @@ import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
-import se.llbit.chunky.renderer.OutputMode;
-import se.llbit.chunky.renderer.Postprocess;
-import se.llbit.chunky.renderer.Refreshable;
-import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.RenderMode;
-import se.llbit.chunky.renderer.ResetReason;
-import se.llbit.chunky.renderer.WorkerState;
+import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
@@ -193,6 +187,8 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean saveSnapshots = false;
   protected boolean emittersEnabled = DEFAULT_EMITTERS_ENABLED;
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
+  protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.None;
+
   protected boolean sunEnabled = true;
   /**
    * Water opacity modifier.
@@ -410,6 +406,7 @@ public class Scene implements JsonSerializable, Refreshable {
     sunEnabled = other.sunEnabled;
     emittersEnabled = other.emittersEnabled;
     emitterIntensity = other.emitterIntensity;
+    emitterSamplingStrategy = other.emitterSamplingStrategy;
     transparentSky = other.transparentSky;
     fogDensity = other.fogDensity;
     skyFogDensity = other.skyFogDensity;
@@ -2454,6 +2451,7 @@ public class Scene implements JsonSerializable, Refreshable {
       json.add("actors", actorArray);
     }
     json.add("octreeImplementation", octreeImplementation);
+    json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
 
     return json;
   }
@@ -2740,6 +2738,8 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
+
+    emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString("None"));
   }
 
   /**
@@ -2993,4 +2993,14 @@ public class Scene implements JsonSerializable, Refreshable {
     this.octreeImplementation = octreeImplementation;
   }
 
+  public EmitterSamplingStrategy getEmitterSamplingStrategy() {
+    return emitterSamplingStrategy;
+  }
+
+  public void setEmitterSamplingStrategy(EmitterSamplingStrategy emitterSamplingStrategy) {
+    if(this.emitterSamplingStrategy != emitterSamplingStrategy) {
+      this.emitterSamplingStrategy = emitterSamplingStrategy;
+      refresh();
+    }
+  }
 }

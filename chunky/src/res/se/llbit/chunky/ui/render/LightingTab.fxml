@@ -10,12 +10,19 @@
 
 <?import se.llbit.chunky.ui.AngleAdjuster?>
 <?import se.llbit.fx.LuxColorPicker?>
+<?import javafx.scene.control.ChoiceBox?>
 <fx:root type="javafx.scene.control.ScrollPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
     <VBox spacing="10.0">
       <children>
         <DoubleAdjuster fx:id="skyIntensity" maxWidth="1.7976931348623157E308" />
         <CheckBox fx:id="enableEmitters" mnemonicParsing="false" text="Enable emitters" />
         <DoubleAdjuster fx:id="emitterIntensity" maxWidth="1.7976931348623157E308" />
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+          <children>
+            <Label text="Emitter Sampling Strategy:" />
+            <ChoiceBox fx:id="emitterSamplingStrategy"/>
+          </children>
+        </HBox>
         <CheckBox fx:id="enableSunlight" mnemonicParsing="false" text="Enable sunlight" />
         <CheckBox fx:id="drawSun" mnemonicParsing="false" text="Draw sun" />
         <DoubleAdjuster fx:id="sunIntensity" maxWidth="1.7976931348623157E308" />

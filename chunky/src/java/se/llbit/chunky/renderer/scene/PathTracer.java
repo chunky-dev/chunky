@@ -20,6 +20,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.model.WaterModel;
+import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.WorkerState;
 import se.llbit.chunky.world.Material;
 import se.llbit.math.*;
@@ -165,20 +166,17 @@ public class PathTracer implements RayTracer {
               ray.emittance.z = ray.color.z * ray.color.z *
                   currentMat.emittance * scene.emitterIntensity;
               hit = true;
-            } else if(scene.emittersEnabled) {
+            } else if(scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.None) {
               // Sample emitter
-              boolean sampleOne = ray.depth != 0;
+              boolean sampleOne = scene.emitterSamplingStrategy == EmitterSamplingStrategy.One;
               if(sampleOne) {
                 Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
                 if(pos != null) {
-                  // TODO Sampling a random point on the model would be better than using a random point in the middle of the cube
                   indirectEmitterColor = sampleEmitter(scene, ray, pos,  random);
                 }
               } else {
-                int count = 0;
                 for(Grid.EmitterPosition pos : scene.getEmitterGrid().getEmitterPositions((int) ray.o.x, (int) ray.o.y, (int) ray.o.z)) {
                   indirectEmitterColor.scaleAdd(1, sampleEmitter(scene, ray, pos, random));
-                  ++count;
                 }
               }
             }
@@ -408,13 +406,13 @@ public class PathTracer implements RayTracer {
     Vector4 indirectEmitterColor = new Vector4();
     Ray emitterRay = new Ray();
     emitterRay.set(ray);
-    double indirectEmitterCoef;
+    // TODO Sampling a random point on the model would be better than using a random point in the middle of the cube
     Vector3 target = new Vector3(pos.x + 0.5 + (random.nextDouble() - 0.5) / 8, pos.y + 0.5 + (random.nextDouble() - 0.5) / 8, pos.z + 0.5 + (random.nextDouble() - 0.5) / 8);
     emitterRay.d.set(target);
     emitterRay.d.sub(emitterRay.o);
     double distance = emitterRay.d.length();
     emitterRay.d.normalize();
-    indirectEmitterCoef = emitterRay.d.dot(emitterRay.n);
+    double indirectEmitterCoef = emitterRay.d.dot(emitterRay.n);
     if(indirectEmitterCoef > 0) {
       emitterRay.emittance.set(0, 0, 0);
       emitterRay.o.scaleAdd(Ray.EPSILON, emitterRay.d);
