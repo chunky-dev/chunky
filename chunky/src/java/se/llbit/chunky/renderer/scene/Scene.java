@@ -467,7 +467,7 @@ public class Scene implements JsonSerializable, Refreshable {
       saveGrassTexture(context, taskTracker);
       saveFoliageTexture(context, taskTracker);
       saveDump(context, taskTracker);
-      // TODO Save Grid
+      saveGrid(context, taskTracker);
     }
   }
 
@@ -509,7 +509,10 @@ public class Scene implements JsonSerializable, Refreshable {
       mode = RenderMode.PAUSED;
     }
 
-    if (!loadOctree(context, taskTracker)) {
+    // Try loading the grid unconditionally for now
+    boolean gridLoaded = loadGrid(context, taskTracker);
+    boolean octreeLoaded = loadOctree(context, taskTracker);
+    if (!gridLoaded || !octreeLoaded) {
       // Could not load stored octree.
       // Load the chunks from the world.
       if (loadedWorld == EmptyWorld.INSTANCE) {
@@ -518,8 +521,6 @@ public class Scene implements JsonSerializable, Refreshable {
         loadChunks(taskTracker, loadedWorld, chunks);
       }
     }
-
-    // TODO Load Grid
 
     notifyAll();
   }
@@ -1791,6 +1792,20 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
+  private synchronized void saveGrid(RenderContext context, TaskTracker progress) {
+    String filename = name + ".grid";
+    // TODO Not save when unchanged?
+    try(TaskTracker.Task task = progress.task("Saving Grid")) {
+      Log.info("Saving Grig " + filename);
+
+      try(DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(filename)))) {
+        emitterGrid.store(out);
+      } catch(IOException e) {
+        Log.warn("Couldn't save Grid", e);
+      }
+    }
+  }
+
   private synchronized void saveOctree(RenderContext context, TaskTracker progress) {
     String fileName = name + ".octree2";
     if (context.fileUnchangedSince(fileName, worldOctree.getTimestamp())) {
@@ -1877,6 +1892,20 @@ public class Scene implements JsonSerializable, Refreshable {
         Log.info("Render dump saved");
       } catch (IOException e) {
         Log.warn("IO exception while saving render dump!", e);
+      }
+    }
+  }
+
+  private synchronized boolean loadGrid(RenderContext context, TaskTracker progress) {
+    String filename = name + ".grid";
+    try(TaskTracker.Task task = progress.task("Loading grid")) {
+      Log.info("Load grid " + filename);
+      try(DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename)))) {
+        emitterGrid = Grid.load(in);
+        return true;
+      } catch(IOException e) {
+        Log.info("Couldn't load the grid", e);
+        return false;
       }
     }
   }
