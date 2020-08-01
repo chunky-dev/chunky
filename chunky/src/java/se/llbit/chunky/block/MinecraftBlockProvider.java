@@ -396,8 +396,7 @@ public class MinecraftBlockProvider implements BlockProvider {
           "minecraft:light_gray_wall_banner",
           "minecraft:light_gray_wool",
           "minecraft:light_weighted_pressure_plate",
-          "minecraft:lilac (half=lower)",
-          "minecraft:lilac (half=upper)",
+          "minecraft:lilac",
           "minecraft:lily_of_the_valley",
           "minecraft:lily_pad",
           "minecraft:lime_banner",
@@ -486,8 +485,7 @@ public class MinecraftBlockProvider implements BlockProvider {
           "minecraft:orange_wool",
           "minecraft:oxeye_daisy",
           "minecraft:packed_ice",
-          "minecraft:peony (half=lower)",
-          "minecraft:peony (half=upper)",
+          "minecraft:peony",
           "minecraft:petrified_oak_slab",
           "minecraft:pink_banner",
           "minecraft:pink_bed",
@@ -623,8 +621,7 @@ public class MinecraftBlockProvider implements BlockProvider {
           "minecraft:repeater",
           "minecraft:repeating_command_block",
           "minecraft:respawn_anchor",
-          "minecraft:rose_bush (half=lower)",
-          "minecraft:rose_bush (half=upper)",
+          "minecraft:rose_bush",
           "minecraft:sand",
           "minecraft:sandstone",
           "minecraft:sandstone_slab",
@@ -2509,8 +2506,7 @@ public class MinecraftBlockProvider implements BlockProvider {
   public static Block largeFlower(Tag tag, Texture top, Texture bottom) {
     String name = BlockProvider.blockName(tag);
     String half = tag.get("Properties").get("half").stringValue("lower");
-    return new SpriteBlock(
-        String.format("%s (half=%s)", name, half), half.equals("upper") ? top : bottom);
+    return new SpriteBlock(name, half.equals("upper") ? top : bottom);
   }
 
   public static Block log(Tag tag, Texture side, Texture top) {
