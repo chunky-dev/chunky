@@ -19,6 +19,7 @@ package se.llbit.chunky.world.region;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.SimpleChunkData;
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.world.Chunk;
@@ -31,8 +32,7 @@ import se.llbit.log.Log;
  * Asynchronous region/chunk parser.
  *
  * <p>This is a worker thread for the dynamic world loader.
- * It waits for region parse requests and loads visible chunks inside
- * the requested region.
+ * It waits for region parse requests and loads visible chunks inside the requested region.
  *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
@@ -40,19 +40,23 @@ public class RegionParser extends Thread {
 
   private final WorldMapLoader mapLoader;
   private final RegionQueue queue;
-  private MapView mapView;
+  private final MapView mapView;
+  private final BlockProviderRegistry blockProviders;
 
   /**
    * Create new region parser
    */
-  public RegionParser(WorldMapLoader loader, RegionQueue queue, MapView mapView) {
+  public RegionParser(WorldMapLoader loader, RegionQueue queue, MapView mapView,
+      BlockProviderRegistry blockProviders) {
     super("Region Parser");
     this.mapLoader = loader;
     this.queue = queue;
     this.mapView = mapView;
+    this.blockProviders = blockProviders;
   }
 
-  @Override public void run() {
+  @Override
+  public void run() {
     while (!isInterrupted()) {
       ChunkPosition position = queue.poll();
       if (position == null) {
@@ -67,7 +71,7 @@ public class RegionParser extends Thread {
         ChunkData chunkData = world.createChunkData();
         for (Chunk chunk : region) {
           if (map.shouldPreload(chunk)) {
-            if(chunk.loadChunk(chunkData, mapView.getYMin(), mapView.getYMax())) {
+            if(chunk.loadChunk(chunkData, mapView.getYMin(), mapView.getYMax(), blockProviders)) {
               chunkData.clear();
             }
           }

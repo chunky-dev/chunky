@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.EmptyChunkData;
@@ -84,7 +85,7 @@ public class EmptyRegionChunk extends Chunk {
     // do nothing
   }
 
-  @Override public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax) {
+  @Override public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax, BlockProviderRegistry blockProviders) {
     return false;
   }
 

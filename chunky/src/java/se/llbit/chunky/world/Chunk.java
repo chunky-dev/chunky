@@ -22,6 +22,11 @@ import java.util.Set;
 
 import se.llbit.chunky.block.*;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
+import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.BlockProviderRegistry;
+import se.llbit.chunky.block.Lava;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.EmptyChunkData;
@@ -133,7 +138,7 @@ public class Chunk {
    * layer, surface and cave maps.
    * @return whether the input chunkdata was modified
    */
-  public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax) {
+  public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax, BlockProviderRegistry blockProviders) {
     if (!shouldReloadChunk()) {
       return false;
     }
@@ -151,7 +156,7 @@ public class Chunk {
 
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
-    loadSurface(data, chunkData, yMin, yMax);
+    loadSurface(data, chunkData, yMin, yMax, blockProviders);
     biomesTimestamp = dataTimestamp;
     if (surface == IconLayer.MC_1_12) {
       biomes = IconLayer.MC_1_12;
@@ -162,7 +167,7 @@ public class Chunk {
     return true;
   }
 
-  private void loadSurface(Map<String, Tag> data, ChunkData chunkData, int yMin, int yMax) {
+  private void loadSurface(Map<String, Tag> data, ChunkData chunkData, int yMin, int yMax, BlockProviderRegistry blockProviders) {
     if (data == null) {
       surface = IconLayer.CORRUPT;
       return;
@@ -173,7 +178,7 @@ public class Chunk {
     if (sections.isList()) {
       extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
       if (version.equals("1.13") || version.equals("1.12")) {
-        BlockPalette palette = new BlockPalette();
+        BlockPalette palette = new BlockPalette(blockProviders);
         palette.unsynchronize(); //only this RegionParser will use this palette
         loadBlockData(data, chunkData, palette, yMin, yMax);
         int[] heightmapData = extractHeightmapData(data, chunkData);

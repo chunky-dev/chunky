@@ -7,7 +7,7 @@ import se.llbit.nbt.Tag;
 import java.util.Collection;
 
 public interface BlockProvider {
-  Block getBlockByTag(String name, Tag tag);
+  Block getBlockByTag(String name, Tag tag, BlockProviderRegistry blockProviders);
 
   /**
    *

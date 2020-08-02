@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.BlockProvider;
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.legacy.blocks.*;
 import se.llbit.log.Log;
 import se.llbit.nbt.CompoundTag;
@@ -12,7 +13,7 @@ import se.llbit.nbt.Tag;
 public class LegacyMinecraftBlockProvider implements BlockProvider {
 
   @Override
-  public Block getBlockByTag(String name, Tag tag) {
+  public Block getBlockByTag(String name, Tag tag, BlockProviderRegistry blockProviders) {
     if (!name.startsWith("#legacy_minecraft:")) {
       return null;
     }
@@ -26,16 +27,16 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "grass_block":
       case "mycelium":
       case "podzol":
-        return new LegacySnowCoverableBlock(name, ctag);
+        return new LegacySnowCoverableBlock(name, ctag, blockProviders);
       case "vine":
-        return new LegacyVine(name, ctag);
+        return new LegacyVine(name, ctag, blockProviders);
       case "pumpkin_stem":
-        return new LegacyPumpkinStem(name, ctag);
+        return new LegacyPumpkinStem(name, ctag, blockProviders);
       case "melon_stem":
-        return new LegacyMelonStem(name, ctag);
+        return new LegacyMelonStem(name, ctag, blockProviders);
       case "chest":
       case "trapped_chest":
-        return new LegacyChest(name, ctag);
+        return new LegacyChest(name, ctag, blockProviders);
       case "oak_door":
       case "iron_door":
       case "spruce_door":
@@ -43,7 +44,7 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "jungle_door":
       case "acacia_door":
       case "dark_oak_door":
-        return new LegacyDoorPart(name, ctag);
+        return new LegacyDoorPart(name, ctag, blockProviders);
       case "oak_stairs":
       case "cobblestone_stairs":
       case "brick_stairs":
@@ -58,27 +59,27 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "dark_oak_stairs":
       case "red_sandstone_stairs":
       case "purpur_stairs":
-        return new LegacyStairs(name, ctag);
+        return new LegacyStairs(name, ctag, blockProviders);
       case "iron_bars":
-        return new LegacyIronBars(name, ctag);
+        return new LegacyIronBars(name, ctag, blockProviders);
       case "redstone_wire":
-        return new LegacyRedstoneWire(name, ctag);
+        return new LegacyRedstoneWire(name, ctag, blockProviders);
       case "oak_fence_gate":
       case "spruce_fence_gate":
       case "birch_fence_gate":
       case "jungle_fence_gate":
       case "dark_oak_fence_gate":
       case "acacia_fence_gate":
-        return new LegacyFenceGate(name, ctag);
+        return new LegacyFenceGate(name, ctag, blockProviders);
       case "chorus_plant":
-        return new LegacyChorusPlant(name, ctag);
+        return new LegacyChorusPlant(name, ctag, blockProviders);
       case "sunflower":
       case "lilac":
       case "tall_grass":
       case "large_fern":
       case "rose_bush":
       case "peony":
-        return new LegacyLargeFlower(name, ctag);
+        return new LegacyLargeFlower(name, ctag, blockProviders);
       case "glass_pane":
       case "white_stained_glass_pane":
       case "orange_stained_glass_pane":
@@ -96,9 +97,9 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "green_stained_glass_pane":
       case "red_stained_glass_pane":
       case "black_stained_glass_pane":
-        return new LegacyGlassPane(name, ctag);
+        return new LegacyGlassPane(name, ctag, blockProviders);
       case "red_bed":
-        return new LegacyBed(name, ctag);
+        return new LegacyBed(name, ctag, blockProviders);
       case "oak_fence":
       case "nether_brick_fence":
       case "spruce_fence":
@@ -106,12 +107,12 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "jungle_fence":
       case "dark_oak_fence":
       case "acacia_fence":
-        return new LegacyFence(name, ctag);
+        return new LegacyFence(name, ctag, blockProviders);
       case "flower_pot":
-        return new LegacyFlowerPot(name, ctag);
+        return new LegacyFlowerPot(name, ctag, blockProviders);
       case "cobblestone_wall":
       case "mossy_cobblestone_wall":
-        return new LegacyCobblestoneWall(name, ctag);
+        return new LegacyCobblestoneWall(name, ctag, blockProviders);
       case "skull":
         return new LegacySkull(name, ctag);
       case "banner":
@@ -119,11 +120,11 @@ public class LegacyMinecraftBlockProvider implements BlockProvider {
       case "wall_banner":
         return new LegacyWallBanner(name, ctag);
       case "tripwire":
-        return new LegacyTripwire(name, ctag);
+        return new LegacyTripwire(name, ctag, blockProviders);
       case "nether_portal":
-        return new LegacyNetherPortal(name, ctag);
+        return new LegacyNetherPortal(name, ctag, blockProviders);
       case "fire":
-        return new LegacyFire(name, ctag);
+        return new LegacyFire(name, ctag, blockProviders);
     }
     Log.warn("Unsupported legacy block: " + name);
     return null;

@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlockUtils;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
@@ -9,8 +10,9 @@ import se.llbit.nbt.CompoundTag;
 
 public class LegacyChorusPlant extends UnfinalizedLegacyBlock {
 
-  public LegacyChorusPlant(String name, CompoundTag tag) {
-    super(name, tag);
+  public LegacyChorusPlant(String name, CompoundTag tag,
+      BlockProviderRegistry blockProviders) {
+    super(name, tag, blockProviders);
   }
 
   @Override

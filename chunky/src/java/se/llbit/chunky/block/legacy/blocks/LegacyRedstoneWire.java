@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.Repeater;
 import se.llbit.chunky.block.legacy.LegacyBlockUtils;
@@ -10,8 +11,9 @@ import se.llbit.nbt.CompoundTag;
 
 public class LegacyRedstoneWire extends UnfinalizedLegacyBlock {
 
-  public LegacyRedstoneWire(String name, CompoundTag tag) {
-    super(name, tag);
+  public LegacyRedstoneWire(String name, CompoundTag tag,
+      BlockProviderRegistry blockProviders) {
+    super(name, tag, blockProviders);
   }
 
   @Override
@@ -20,35 +22,43 @@ public class LegacyRedstoneWire extends UnfinalizedLegacyBlock {
     String east, north, south, west;
     east = north = south = west = "none";
 
-    if (isRedstoneConnector(state.getMaterial(-1, 0, 0), 1))
+    if (isRedstoneConnector(state.getMaterial(-1, 0, 0), 1)) {
       west = "side";
-    else if (isAir(state.getMaterial(-1, 0, 0)) && isRedstone(state.getMaterial(-1, -1, 0)))
+    } else if (isAir(state.getMaterial(-1, 0, 0)) && isRedstone(state.getMaterial(-1, -1, 0))) {
       west = "side";
+    }
 
-    if (isRedstoneConnector(state.getMaterial(1, 0, 0), 1))
+    if (isRedstoneConnector(state.getMaterial(1, 0, 0), 1)) {
       east = "side";
-    else if (isAir(state.getMaterial(1, 0, 0)) && isRedstone(state.getMaterial(1, -1, 0)))
+    } else if (isAir(state.getMaterial(1, 0, 0)) && isRedstone(state.getMaterial(1, -1, 0))) {
       east = "side";
+    }
 
-    if (isRedstoneConnector(state.getMaterial(0, 0, -1), 0))
+    if (isRedstoneConnector(state.getMaterial(0, 0, -1), 0)) {
       north = "side";
-    else if (isAir(state.getMaterial(0, 0, -1)) && isRedstone(state.getMaterial(0, -1, -1)))
+    } else if (isAir(state.getMaterial(0, 0, -1)) && isRedstone(state.getMaterial(0, -1, -1))) {
       north = "side";
+    }
 
-    if (isRedstoneConnector(state.getMaterial(0, 0, 1), 0))
+    if (isRedstoneConnector(state.getMaterial(0, 0, 1), 0)) {
       south = "side";
-    else if (isAir(state.getMaterial(0, 0, 1)) && isRedstone(state.getMaterial(0, -1, 1)))
+    } else if (isAir(state.getMaterial(0, 0, 1)) && isRedstone(state.getMaterial(0, -1, 1))) {
       south = "side";
+    }
 
     if (state.getMaterial(0, 1, 0).name.equals("minecraft:air")) {
-      if (state.getMaterial(-1, 0, 0).solid && isRedstone(state.getMaterial(-1, 1, 0)))
+      if (state.getMaterial(-1, 0, 0).solid && isRedstone(state.getMaterial(-1, 1, 0))) {
         west = "up";
-      if (state.getMaterial(1, 0, 0).solid && isRedstone(state.getMaterial(1, 1, 0)))
+      }
+      if (state.getMaterial(1, 0, 0).solid && isRedstone(state.getMaterial(1, 1, 0))) {
         east = "up";
-      if (state.getMaterial(0, 0, -1).solid && isRedstone(state.getMaterial(0, 1, -1)))
+      }
+      if (state.getMaterial(0, 0, -1).solid && isRedstone(state.getMaterial(0, 1, -1))) {
         north = "up";
-      if (state.getMaterial(0, 0, 1).solid && isRedstone(state.getMaterial(0, 1, 1)))
+      }
+      if (state.getMaterial(0, 0, 1).solid && isRedstone(state.getMaterial(0, 1, 1))) {
         south = "up";
+      }
     }
 
     CompoundTag tag = LegacyBlocks.createTag("redstone_wire");
@@ -80,7 +90,7 @@ public class LegacyRedstoneWire extends UnfinalizedLegacyBlock {
 
       case "repeater":
         if (block instanceof Repeater) {
-          return ((Repeater) block).getFacing()%2 == side;
+          return ((Repeater) block).getFacing() % 2 == side;
         }
     }
     return false;

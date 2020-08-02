@@ -1,6 +1,7 @@
 package se.llbit.chunky.block.legacy.blocks;
 
 import se.llbit.chunky.block.BlockFace;
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
@@ -12,9 +13,11 @@ public class LegacyMelonStem extends UnfinalizedLegacyBlock {
       BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
   };
 
-  public LegacyMelonStem(String name, CompoundTag tag) {
-    super(name, tag);
+  public LegacyMelonStem(String name, CompoundTag tag,
+      BlockProviderRegistry blockProviders) {
+    super(name, tag, blockProviders);
   }
+
 
   @Override
   public void finalizeBlock(FinalizationState state) {

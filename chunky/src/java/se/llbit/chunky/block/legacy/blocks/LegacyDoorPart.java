@@ -1,6 +1,7 @@
 package se.llbit.chunky.block.legacy.blocks;
 
 import se.llbit.chunky.block.BlockFace;
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.Door;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
@@ -10,8 +11,9 @@ import se.llbit.nbt.CompoundTag;
 
 public class LegacyDoorPart extends UnfinalizedLegacyBlock {
 
-  public LegacyDoorPart(String name, CompoundTag tag) {
-    super(name, tag);
+  public LegacyDoorPart(String name, CompoundTag tag,
+      BlockProviderRegistry blockProviders) {
+    super(name, tag, blockProviders);
   }
 
   @Override
@@ -65,10 +67,10 @@ public class LegacyDoorPart extends UnfinalizedLegacyBlock {
   }
 
   private static final BlockFace[] bottomFacingMap = new BlockFace[]{
-    BlockFace.EAST,
-    BlockFace.SOUTH,
-    BlockFace.WEST,
-    BlockFace.NORTH
+      BlockFace.EAST,
+      BlockFace.SOUTH,
+      BlockFace.WEST,
+      BlockFace.NORTH
   };
 
   private static BlockFace getFacing(int bottomData) {

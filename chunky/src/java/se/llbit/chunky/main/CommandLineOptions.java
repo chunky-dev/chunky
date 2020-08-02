@@ -415,7 +415,8 @@ public class CommandLineOptions {
         return;
       }
       try {
-        Scene scene = new Scene();
+        Chunky chunky = new Chunky(options);
+        Scene scene = new Scene(chunky);
         try (FileInputStream in = new FileInputStream(sceneFile)) {
           scene.loadDescription(in);
         }

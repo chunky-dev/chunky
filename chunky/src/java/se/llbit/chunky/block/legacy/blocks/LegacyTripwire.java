@@ -1,6 +1,7 @@
 package se.llbit.chunky.block.legacy.blocks;
 
 import se.llbit.chunky.block.BlockFace;
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.Tripwire;
 import se.llbit.chunky.block.TripwireHook;
@@ -12,8 +13,9 @@ import se.llbit.nbt.Tag;
 
 public class LegacyTripwire extends UnfinalizedLegacyBlock {
 
-  public LegacyTripwire(String name, CompoundTag tag) {
-    super(name, tag);
+  public LegacyTripwire(String name, CompoundTag tag,
+      BlockProviderRegistry blockProviders) {
+    super(name, tag, blockProviders);
   }
 
   @Override

@@ -17,9 +17,19 @@
  */
 package se.llbit.chunky.main;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.BlockProvider;
-import se.llbit.chunky.block.BlockSpec;
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.MinecraftBlockProvider;
 import se.llbit.chunky.block.legacy.LegacyMinecraftBlockProvider;
 import se.llbit.chunky.main.CommandLineOptions.Mode;
@@ -57,11 +67,11 @@ import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
 /**
- * Chunky is a Minecraft mapping and rendering tool created byJesper Öqvist (jesper@llbit.se).
+ * Chunky is a Minecraft mapping and rendering tool created by Jesper Öqvist (jesper@llbit.se).
  *
  * <p>Read more about Chunky at <a href="https://chunky.llbit.se">https://chunky.llbit.se</a>.
  */
-public class Chunky {
+public class Chunky implements BlockProviderRegistry {
 
   /**
    * A log receiver suitable for headless rendering.
@@ -81,11 +91,22 @@ public class Chunky {
 
   public final ChunkyOptions options;
   private RenderController renderController;
-  private SceneFactory sceneFactory = SceneFactory.DEFAULT;
+  private SceneFactory sceneFactory = new SceneFactory() {
+    @Override
+    public Scene newScene() {
+      return new Scene(Chunky.this);
+    }
+
+    @Override
+    public Scene copyScene(Scene scene) {
+      return new Scene(scene);
+    }
+  };
   private RenderContextFactory renderContextFactory = RenderContext::new;
   private RenderManagerFactory renderManagerFactory = DefaultRenderManager::new;
   private RenderControlsTabTransformer renderControlsTabTransformer = tabs -> tabs;
   private TabTransformer mainTabTransformer = tabs -> tabs;
+  private final List<BlockProvider> blockProviders = new LinkedList<>();
   private boolean headless = false;
 
   private static ForkJoinPool commonThreads;
@@ -291,7 +312,7 @@ public class Chunky {
     try {
       File file = options.getSceneDescriptionFile();
       try (FileInputStream in = new FileInputStream(file)) {
-        Scene scene = new Scene();
+        Scene scene = new Scene(this);
         scene.loadDescription(in); // Load description to get current SPP & canvas size.
         RenderContext context = new RenderContext(this);
         context.setSceneDirectory(file.getParentFile());
@@ -469,9 +490,15 @@ public class Chunky {
    * Registers a block provider to add support for blocks.
    */
   @PluginApi
+  @Override()
   public void registerBlockProvider(BlockProvider blockProvider) {
-    BlockSpec.blockProviders.add(0, blockProvider);
-    MaterialStore.blockIds.addAll(blockProvider.getSupportedBlocks());
+    blockProviders.add(0, blockProvider);
+    MaterialStore.blockIds.addAll(blockProvider.getSupportedBlocks()); // TODO
+  }
+
+  @Override()
+  public Collection<BlockProvider> getBlockProviders() {
+    return blockProviders;
   }
 
   /**

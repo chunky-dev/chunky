@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.Snow;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
@@ -9,8 +10,9 @@ import se.llbit.nbt.CompoundTag;
 
 public class LegacySnowCoverableBlock extends UnfinalizedLegacyBlock {
 
-  public LegacySnowCoverableBlock(String name, CompoundTag tag) {
-    super(name, tag);
+  public LegacySnowCoverableBlock(String name, CompoundTag tag,
+      BlockProviderRegistry blockProviders) {
+    super(name, tag, blockProviders);
   }
 
   @Override
@@ -22,7 +24,7 @@ public class LegacySnowCoverableBlock extends UnfinalizedLegacyBlock {
         Material above = state.getMaterial(0, 1, 0);
         if (above instanceof Snow || above.name.equals("minecraft:snow_block")) {
           state.replaceCurrentBlock(LegacyBlocks
-              .boolTag(LegacyBlocks.createTag(block.name), "snowy", true));
+              .boolTag(LegacyBlocks.createTag(name), "snowy", true));
           return;
         }
       }

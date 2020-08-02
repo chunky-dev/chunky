@@ -17,6 +17,11 @@
 package se.llbit.chunky.resources;
 
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
+import se.llbit.chunky.block.BlockProviderRegistry;
+import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.world.WorldTexture;
+import se.llbit.math.Octree;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -25,10 +30,7 @@ import java.io.PipedOutputStream;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
-import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.world.WorldTexture;
 import se.llbit.log.Log;
-import se.llbit.math.Octree;
 
 public class OctreeFileFormat {
 
@@ -46,8 +48,10 @@ public class OctreeFileFormat {
    *
    * @param in   input stream for the file to load the scene from.
    * @param impl The octree implementation to use
+   * @param blockProviders
    */
-  public static OctreeData load(DataInputStream in, String impl) throws IOException {
+  public static OctreeData load(DataInputStream in, String impl,
+      BlockProviderRegistry blockProviders) throws IOException {
     int version = in.readInt();
     if (version < MIN_OCTREE_VERSION || version > OCTREE_VERSION) {
       throw new IOException(String.format(
@@ -55,7 +59,7 @@ public class OctreeFileFormat {
           MIN_OCTREE_VERSION, OCTREE_VERSION, version));
     }
     OctreeData data = new OctreeData();
-    data.palette = BlockPalette.read(in);
+    data.palette = BlockPalette.read(in, blockProviders);
     data.worldTree = Octree.load(impl, version < 5 ? convertDataNodes(data.palette, in) : in);
     data.waterTree = Octree.load(impl, version < 5 ? convertDataNodes(data.palette, in) : in);
     data.grassColors = WorldTexture.load(in);

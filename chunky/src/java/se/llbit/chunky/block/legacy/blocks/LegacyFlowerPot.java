@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.block.legacy.UnfinalizedLegacyBlock;
@@ -8,8 +9,9 @@ import se.llbit.nbt.Tag;
 
 public class LegacyFlowerPot extends UnfinalizedLegacyBlock {
 
-  public LegacyFlowerPot(String name, CompoundTag tag) {
-    super(name, tag);
+  public LegacyFlowerPot(String name, CompoundTag tag,
+      BlockProviderRegistry blockProviders) {
+    super(name, tag, blockProviders);
   }
 
   @Override

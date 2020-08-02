@@ -1,5 +1,6 @@
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
@@ -49,7 +50,8 @@ public class ImposterCubicChunk extends Chunk {
    * layer, surface and cave maps.
    * @return whether the input chunkdata was modified
    */
-  public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax) {
+  @Override
+  public synchronized boolean loadChunk(ChunkData chunkData, int yMin, int yMax, BlockProviderRegistry blockProviders) {
     if (!shouldReloadChunk()) {
       return false;
     }
@@ -65,7 +67,7 @@ public class ImposterCubicChunk extends Chunk {
     }
 
     surfaceTimestamp = dataTimestamp;
-    loadSurfaceCubic(data, chunkData, yMin, yMax);
+    loadSurfaceCubic(data, chunkData, yMin, yMax, blockProviders);
     biomes = IconLayer.UNKNOWN;
 
     biomesTimestamp = dataTimestamp;
@@ -79,14 +81,14 @@ public class ImposterCubicChunk extends Chunk {
     return true;
   }
 
-  private void loadSurfaceCubic(Map<Integer, Map<String, Tag>> data, ChunkData chunkData, int yMin, int yMax) {
+  private void loadSurfaceCubic(Map<Integer, Map<String, Tag>> data, ChunkData chunkData, int yMin, int yMax, BlockProviderRegistry blockProviders) {
     if (data == null) {
       surface = IconLayer.CORRUPT;
       return;
     }
 
     Heightmap heightmap = world.heightmap();
-    BlockPalette palette = new BlockPalette();
+    BlockPalette palette = new BlockPalette(blockProviders);
 
     for (Map.Entry<Integer, Map<String, Tag>> entry : data.entrySet()) {
       Integer yPos = entry.getKey();

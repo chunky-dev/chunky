@@ -3,16 +3,12 @@ package se.llbit.chunky.block;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
 import se.llbit.util.NbtUtil;
 import se.llbit.util.NotNull;
 
 public class BlockSpec {
-
-  public static final List<BlockProvider> blockProviders = new LinkedList<>();
 
   private final Tag tag;
 
@@ -44,11 +40,13 @@ public class BlockSpec {
 
   /**
    * Converts NBT block data to Chunky block object.
+   *
+   * @param blockProviders
    */
-  public Block toBlock() {
+  public Block toBlock(BlockProviderRegistry blockProviders) {
     String name = tag.get("Name").stringValue("unknown:unknown");
-    for (BlockProvider provider : blockProviders) {
-      Block block = provider.getBlockByTag(name, tag);
+    for (BlockProvider provider : blockProviders.getBlockProviders()) {
+      Block block = provider.getBlockByTag(name, tag, blockProviders);
       if (block != null) {
         return maybeWaterlogged(block);
       }

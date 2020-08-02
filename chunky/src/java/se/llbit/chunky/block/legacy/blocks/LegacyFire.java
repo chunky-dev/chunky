@@ -1,6 +1,7 @@
 package se.llbit.chunky.block.legacy.blocks;
 
 import se.llbit.chunky.block.BlockFace;
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlockUtils;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
@@ -15,8 +16,9 @@ import se.llbit.nbt.CompoundTag;
  */
 public class LegacyFire extends UnfinalizedLegacyBlock {
 
-  public LegacyFire(String name, CompoundTag tag) {
-    super(name, tag);
+  public LegacyFire(String name, CompoundTag tag,
+      BlockProviderRegistry blockProviders) {
+    super(name, tag, blockProviders);
   }
 
   @Override
@@ -27,9 +29,11 @@ public class LegacyFire extends UnfinalizedLegacyBlock {
         state.getY() > state.getYMin() && isTopBurnable(state.getMaterial(BlockFace.DOWN));
 
     // a side is burning if the adjacent block at that side is flammable
-    LegacyBlocks.boolTag(tag, "north", !floorFire && isFlammable(state.getMaterial(BlockFace.NORTH)));
+    LegacyBlocks
+        .boolTag(tag, "north", !floorFire && isFlammable(state.getMaterial(BlockFace.NORTH)));
     LegacyBlocks.boolTag(tag, "east", !floorFire && isFlammable(state.getMaterial(BlockFace.EAST)));
-    LegacyBlocks.boolTag(tag, "south", !floorFire && isFlammable(state.getMaterial(BlockFace.SOUTH)));
+    LegacyBlocks
+        .boolTag(tag, "south", !floorFire && isFlammable(state.getMaterial(BlockFace.SOUTH)));
     LegacyBlocks.boolTag(tag, "west", !floorFire && isFlammable(state.getMaterial(BlockFace.WEST)));
 
     // the up side is visible if this burning on top of the bottom below and the block above is flammable
@@ -51,7 +55,8 @@ public class LegacyFire extends UnfinalizedLegacyBlock {
         (name.endsWith("_fence") && !name.equals("nether_brick_fence")) ||
         name.endsWith("_fence_gate") ||
         name.equals("oak_stairs") || name.equals("spruce_stairs") || name.equals("birch_stairs") ||
-        name.equals("jungle_stairs") || name.equals("acacia_stairs") || name.equals("dark_oak_stairs") ||
+        name.equals("jungle_stairs") || name.equals("acacia_stairs") || name
+        .equals("dark_oak_stairs") ||
         name.equals("tnt") ||
         name.equals("vine") ||
         name.equals("bookshelf") ||

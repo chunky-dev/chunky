@@ -1,5 +1,6 @@
 package se.llbit.chunky.block.legacy.blocks;
 
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.legacy.LegacyBlockUtils;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
@@ -9,15 +10,16 @@ import se.llbit.nbt.CompoundTag;
 
 public class LegacyLargeFlower extends UnfinalizedLegacyBlock {
 
-  public LegacyLargeFlower(String name, CompoundTag tag) {
-    super(name, tag);
+  public LegacyLargeFlower(String name, CompoundTag tag,
+      BlockProviderRegistry blockProviders) {
+    super(name, tag, blockProviders);
   }
 
   @Override
   public void finalizeBlock(FinalizationState state) {
     CompoundTag newTag;
 
-    if ((this.data&8) != 0) {
+    if ((this.data & 8) != 0) {
       Material bottom = state.getMaterial(0, -1, 0);
 
       if (bottom instanceof LegacyLargeFlower) {

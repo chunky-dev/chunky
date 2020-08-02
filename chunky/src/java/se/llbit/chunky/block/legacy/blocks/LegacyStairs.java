@@ -1,6 +1,7 @@
 package se.llbit.chunky.block.legacy.blocks;
 
 import se.llbit.chunky.block.BlockFace;
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.block.Stairs;
 import se.llbit.chunky.block.legacy.LegacyBlocks;
@@ -10,8 +11,9 @@ import se.llbit.nbt.CompoundTag;
 
 public class LegacyStairs extends UnfinalizedLegacyBlock {
 
-  public LegacyStairs(String name, CompoundTag tag) {
-    super(name, tag);
+  public LegacyStairs(String name, CompoundTag tag,
+      BlockProviderRegistry blockProviders) {
+    super(name, tag, blockProviders);
   }
 
   @Override
@@ -232,10 +234,10 @@ public class LegacyStairs extends UnfinalizedLegacyBlock {
   }
 
   private static final BlockFace[] facingMap = new BlockFace[]{
-    BlockFace.EAST,
-    BlockFace.WEST,
-    BlockFace.SOUTH,
-    BlockFace.NORTH
+      BlockFace.EAST,
+      BlockFace.WEST,
+      BlockFace.SOUTH,
+      BlockFace.NORTH
   };
 
   /**

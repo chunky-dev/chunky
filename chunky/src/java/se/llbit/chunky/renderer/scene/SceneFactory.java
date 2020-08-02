@@ -18,15 +18,6 @@
 package se.llbit.chunky.renderer.scene;
 
 public interface SceneFactory {
-  SceneFactory DEFAULT = new SceneFactory() {
-    @Override public Scene newScene() {
-      return new Scene();
-    }
-
-    @Override public Scene copyScene(Scene scene) {
-      return new Scene(scene);
-    }
-  };
 
   /**
    * Creates a new scene with the default configuration.
@@ -34,11 +25,10 @@ public interface SceneFactory {
   Scene newScene();
 
   /**
-   * Creates a scene which copies the state of another scene.
-   * Some data like the sample buffer will be shared between the
-   * two scenes.
+   * Creates a scene which copies the state of another scene. Some data like the sample buffer will
+   * be shared between the two scenes.
+   *
    * @param scene the scene to copy
    */
   Scene copyScene(Scene scene);
-
 }

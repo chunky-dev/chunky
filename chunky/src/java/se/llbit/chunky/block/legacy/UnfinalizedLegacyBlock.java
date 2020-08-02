@@ -1,6 +1,8 @@
 package se.llbit.chunky.block.legacy;
 
 import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.BlockProvider;
+import se.llbit.chunky.block.BlockProviderRegistry;
 import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.FinalizationState;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -37,8 +39,8 @@ public abstract class UnfinalizedLegacyBlock extends Block {
    */
   protected final CompoundTag tag;
 
-  public UnfinalizedLegacyBlock(String name, CompoundTag tag) {
-    this(name, new BlockSpec(tag.get("Block")).toBlock(), tag);
+  public UnfinalizedLegacyBlock(String name, CompoundTag tag, BlockProviderRegistry blockProviders) {
+    this(name, new BlockSpec(tag.get("Block")).toBlock(blockProviders), tag);
     solid = block.solid;
     opaque = block.opaque;
     localIntersect = true;

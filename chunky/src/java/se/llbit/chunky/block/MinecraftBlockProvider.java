@@ -926,7 +926,7 @@ public class MinecraftBlockProvider implements BlockProvider {
   }
 
   @Override
-  public Block getBlockByTag(String namespacedName, Tag tag) {
+  public Block getBlockByTag(String namespacedName, Tag tag, BlockProviderRegistry blockProviders) {
     String name = namespacedName.substring(10); // drop the minecraft: prefix
     switch (name) {
       case "air":
