@@ -187,7 +187,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean saveSnapshots = false;
   protected boolean emittersEnabled = DEFAULT_EMITTERS_ENABLED;
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
-  protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.None;
+  protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
 
   protected boolean sunEnabled = true;
   /**
@@ -464,7 +464,7 @@ public class Scene implements JsonSerializable, Refreshable {
       saveGrassTexture(context, taskTracker);
       saveFoliageTexture(context, taskTracker);
       saveDump(context, taskTracker);
-      saveGrid(context, taskTracker);
+      saveEmitterGrid(context, taskTracker);
     }
   }
 
@@ -507,10 +507,10 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     // Try loading the grid unconditionally for now
-    boolean gridLoaded = loadGrid(context, taskTracker);
+    boolean emiiterGridLoaded = loadEmitterGrid(context, taskTracker);
     boolean octreeLoaded = loadOctree(context, taskTracker);
-    if (!gridLoaded || !octreeLoaded) {
-      // Could not load stored octree.
+    if (!emiiterGridLoaded || !octreeLoaded) {
+      // Could not load stored octree or emitter grid.
       // Load the chunks from the world.
       if (loadedWorld == EmptyWorld.INSTANCE) {
         Log.warn("Could not load chunks (no world found for scene)");
@@ -1789,8 +1789,8 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  private synchronized void saveGrid(RenderContext context, TaskTracker progress) {
-    String filename = name + ".grid";
+  private synchronized void saveEmitterGrid(RenderContext context, TaskTracker progress) {
+    String filename = name + ".emittergrid";
     // TODO Not save when unchanged?
     try(TaskTracker.Task task = progress.task("Saving Grid")) {
       Log.info("Saving Grig " + filename);
@@ -1893,8 +1893,8 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  private synchronized boolean loadGrid(RenderContext context, TaskTracker progress) {
-    String filename = name + ".grid";
+  private synchronized boolean loadEmitterGrid(RenderContext context, TaskTracker progress) {
+    String filename = name + ".emittergrid";
     try(TaskTracker.Task task = progress.task("Loading grid")) {
       Log.info("Load grid " + filename);
       try(DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename)))) {
@@ -2739,7 +2739,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
     octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
 
-    emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString("None"));
+    emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString("NONE"));
   }
 
   /**

@@ -166,9 +166,9 @@ public class PathTracer implements RayTracer {
               ray.emittance.z = ray.color.z * ray.color.z *
                   currentMat.emittance * scene.emitterIntensity;
               hit = true;
-            } else if(scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.None) {
+            } else if(scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE) {
               // Sample emitter
-              boolean sampleOne = scene.emitterSamplingStrategy == EmitterSamplingStrategy.One;
+              boolean sampleOne = scene.emitterSamplingStrategy == EmitterSamplingStrategy.ONE;
               if(sampleOne) {
                 Grid.EmitterPosition pos = scene.getEmitterGrid().sampleEmitterPosition((int) ray.o.x, (int) ray.o.y, (int) ray.o.z, random);
                 if(pos != null) {
@@ -402,6 +402,15 @@ public class PathTracer implements RayTracer {
     return hit;
   }
 
+  /**
+   * Cast a shadow ray from the intersection point (given by ray) to the emitter
+   * at position pos. Returns the contribution of this emitter (0 if the emitter is occluded)
+   * @param scene The scene being rendered
+   * @param ray The ray that generated the intersection
+   * @param pos The position of the emitter to sample
+   * @param random RNG
+   * @return The contribution of the emitter
+   */
   private static Vector4 sampleEmitter(Scene scene, Ray ray, Grid.EmitterPosition pos, Random random) {
     Vector4 indirectEmitterColor = new Vector4();
     Ray emitterRay = new Ray();
