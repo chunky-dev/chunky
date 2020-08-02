@@ -16,8 +16,8 @@
  */
 package se.llbit.chunky.world;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import se.llbit.chunky.block.Block;
@@ -25,5 +25,5 @@ import se.llbit.chunky.block.Block;
 // TODO: introduce block tags
 public class MaterialStore {
   public static final Map<String, Collection<Block>> collections = new LinkedHashMap<>();
-  public static final Collection<String> blockIds = new ArrayList<>();
+  public static final Collection<String> blockIds = new HashSet<>();
 }
