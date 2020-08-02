@@ -357,6 +357,9 @@ public class ResourcepackBlockProvider implements BlockProvider {
       /*if (applicableParts.isEmpty()) {
         Log.warn("Empty multipart model for block " + name + " (" + properties.dumpTree() + ")");
       }*/
+      if (applicableParts.size() == 1) {
+        return applicableParts.get(0);
+      }
       return new MultipartJsonModel(name, applicableParts.toArray(new JsonModel[0]));
     }
   }
@@ -448,7 +451,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
         return new MinecraftBlock(blockName, block.textures.get("all"));
       } else if (parentName.equals("block/cube") || parentName.equals("minecraft:block/cube")) {
         // System.out.println("optimized block/cube");
-        block.solid = true;
+        block.opaque = true;
       } else if (parentName.equals("block/tinted_cross") || parentName
           .equals("minecraft:block/tinted_cross") || parentName.equals("block/cross") || parentName
           .equals("minecraft:block/cross")) {
@@ -466,7 +469,7 @@ public class ResourcepackBlockProvider implements BlockProvider {
             return new MinecraftBlock(blockName, block.textures.get("all"));
           } else if (parentName.equals("block/cube") || parentName.equals("minecraft:block/cube")) {
             // System.out.println("optimized block/cube");
-            block.solid = true;
+            block.opaque = true;
           } else if (parentName.equals("block/tinted_cross") || parentName
               .equals("minecraft:block/tinted_cross") || parentName.equals("block/cross")
               || parentName
@@ -913,10 +916,8 @@ public class ResourcepackBlockProvider implements BlockProvider {
     public MultipartJsonModel(String name, JsonModel[] parts) {
       super(name, parts.length > 0 ? parts[0].texture : Texture.EMPTY_TEXTURE);
       localIntersect = true;
-      opaque = false;
+      opaque = Arrays.stream(parts).anyMatch(b -> b.opaque); // this block is opaque if one of the parts is opaque
       this.parts = parts;
-
-      // TODO this block is opaque if one of the parts is opaque
     }
 
     @Override
