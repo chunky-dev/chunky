@@ -55,7 +55,7 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
   }
 
   public void setRange(double min, double max, double sliderMin) {
-    this.sliderMin = sliderMin;
+    this.sliderMin = 0.001; // TODO Figure out why using double `sliderMin` here leads to a 4.9E-324 in DoubleAdjuster.java but hardcoding doubles doesn't.
     this.min = min;
     this.max = max;
     if (!logarithmic) {
