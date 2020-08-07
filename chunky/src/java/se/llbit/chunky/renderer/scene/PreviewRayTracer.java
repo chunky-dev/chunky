@@ -72,6 +72,9 @@ public class PreviewRayTracer implements RayTracer {
         break;
       } else {
         occlusion *= (1 - ray.color.w);
+        if (occlusion == 0) {
+          return 1; // occlusion can't become > 0 anymore
+        }
         ray.o.scaleAdd(Ray.OFFSET, ray.d);
       }
     }
