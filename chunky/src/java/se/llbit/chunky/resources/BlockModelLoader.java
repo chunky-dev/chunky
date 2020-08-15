@@ -1,7 +1,7 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.ResourcepackBlockProvider;
+import se.llbit.chunky.block.jsonmodels.ResourcepackBlockProvider;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.MaterialStore;
@@ -14,7 +14,7 @@ import se.llbit.json.JsonValue;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static se.llbit.chunky.block.ResourcepackBlockProvider.blocks;
+import static se.llbit.chunky.block.jsonmodels.ResourcepackBlockProvider.blocks;
 
 public class BlockModelLoader implements ResourcePackLoader.PackLoader {
   @Override

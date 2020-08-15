@@ -1,4 +1,4 @@
-package se.llbit.chunky.block;
+package se.llbit.chunky.block.jsonmodels;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -11,10 +11,14 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.BlockProvider;
+import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.minecraft.UnknownBlock;
 import se.llbit.chunky.entity.Entity;
@@ -218,7 +222,13 @@ public class ResourcepackBlockProvider implements BlockProvider {
       Tag properties = tag.get("Properties");
       for (BlockVariant variant : variants) {
         if (variant.isMatch(properties)) {
-          return variant.getBlock(properties);
+          Block block = variant.getBlock(properties);
+          if (block instanceof JsonModel) {
+            return ((JsonModel) block).toQuadBlock();
+          } else if (block instanceof MultipartJsonModel) {
+            return ((MultipartJsonModel) block).toQuadBlock();
+          }
+          return block;
         }
       }
       System.err.println(
@@ -761,6 +771,27 @@ public class ResourcepackBlockProvider implements BlockProvider {
       opaque = false;
     }
 
+    private Texture getTexture(String name) {
+      return textures.get(name);
+    }
+
+    public QuadBlock toQuadBlock() {
+      JsonModelFace[] faces = elements.stream()
+          .flatMap(element -> Arrays.stream(element.faces).filter(Objects::nonNull))
+          .toArray(JsonModelFace[]::new);
+      Texture[] textures = Arrays.stream(faces)
+          .map(f -> this.textures.get(f.texture))
+          .toArray(Texture[]::new);
+      Quad[] quads = Arrays.stream(faces)
+          .map(f -> f.tintindex >= 0 ? new TintedQuad(f.quad, f.tintindex) : f.quad)
+          .toArray(Quad[]::new);
+
+      QuadBlock qb = new QuadBlock(name, this.textures.getOrDefault("up", Texture.unknown), quads,
+          textures, isEntity());
+      qb.opaque = opaque;
+      return qb;
+    }
+
     public void applyDefinition(JsonObject modelDefinition, Function<String, Texture> getTexture) {
       if (modelDefinition.get("textures").isObject()) {
         for (JsonMember texture : modelDefinition.get("textures").object().members) {
@@ -918,6 +949,43 @@ public class ResourcepackBlockProvider implements BlockProvider {
       localIntersect = true;
       opaque = Arrays.stream(parts).anyMatch(b -> b.opaque); // this block is opaque if one of the parts is opaque
       this.parts = parts;
+    }
+
+    public QuadBlock toQuadBlock() {
+      List<JsonModelFace> faces = new ArrayList<>();
+      for (JsonModel part : parts) {
+        for (JsonModelElement element : part.elements) {
+          for (JsonModelFace face : element.faces) {
+            if (face != null) {
+              faces.add(face);
+            }
+          }
+        }
+      }
+
+      List<Texture> textures = new ArrayList<>();
+      Texture upTexture = Texture.unknown;
+      for (JsonModel part : parts) {
+        Texture newUp = part.getTexture("up");
+        if (newUp != null) {
+          upTexture = newUp;
+        }
+        for (JsonModelElement element : part.elements) {
+          for (JsonModelFace face : element.faces) {
+            if (face != null) {
+              textures.add(part.getTexture(face.texture));
+            }
+          }
+        }
+      }
+
+      QuadBlock qb = new QuadBlock(name, upTexture,
+          faces.stream().map(f -> f.tintindex >= 0 ? new TintedQuad(f.quad, f.tintindex) : f.quad)
+              .toArray(Quad[]::new),
+          textures.toArray(
+              new Texture[0]), isEntity());
+      qb.opaque = opaque;
+      return qb;
     }
 
     @Override
