@@ -813,7 +813,8 @@ public class ResourcepackBlockProvider implements BlockProvider {
       if (modelDefinition.get("elements").isArray()) {
         for (JsonValue e : modelDefinition.get("elements").array()) {
           JsonModelElement element = new JsonModelElement(this, e.asObject());
-          elements.add(element);
+          // prepend to make overlays work (e.g. for the grass block)
+          elements.add(0, element);
           if (element.requiresBlockEntity()) {
             this.isBlockEntity = true;
           }
