@@ -82,6 +82,7 @@ public class HeadEntity extends Entity {
         .translate(position.x + offset.x + 0.5, position.y + offset.y + 4 / 16.,
             position.z + offset.z + 0.5);
     Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
+    Box hat = new Box(-4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16.);
     switch (placement) {
       case 0:
         // Unused.
@@ -89,25 +90,33 @@ public class HeadEntity extends Entity {
       case 1:
         // On floor.
         head.transform(Transform.NONE.rotateY(-rotation * Math.PI / 8));
+        hat.transform(Transform.NONE.rotateY(-rotation * Math.PI / 8));
         break;
       case 2:
         // Facing north.
         head.transform(Transform.NONE.translate(0, 0, 4 / 16.));
+        hat.transform(Transform.NONE.translate(0, 0, 4 / 16.));
         break;
       case 3:
         // Facing south.
         head.transform(Transform.NONE.translate(0, 0, 4 / 16.));
+        hat.transform(Transform.NONE.translate(0, 0, 4 / 16.));
         head.transform(Transform.NONE.rotateY(Math.PI));
+        hat.transform(Transform.NONE.rotateY(Math.PI));
         break;
       case 4:
         // Facing west.
         head.transform(Transform.NONE.translate(0, 0, 4 / 16.));
+        hat.transform(Transform.NONE.translate(0, 0, 4 / 16.));
         head.transform(Transform.NONE.rotateY(QuickMath.HALF_PI));
+        hat.transform(Transform.NONE.rotateY(QuickMath.HALF_PI));
         break;
       case 5:
         // Facing east.
         head.transform(Transform.NONE.translate(0, 0, 4 / 16.));
+        hat.transform(Transform.NONE.translate(0, 0, 4 / 16.));
         head.transform(Transform.NONE.rotateY(-QuickMath.HALF_PI));
+        hat.transform(Transform.NONE.rotateY(-QuickMath.HALF_PI));
         break;
     }
     head.transform(transform);
@@ -117,6 +126,13 @@ public class HeadEntity extends Entity {
     head.addBottomFaces(faces, texture, texture.headBottom);
     head.addRightFaces(faces, texture, texture.headRight);
     head.addLeftFaces(faces, texture, texture.headLeft);
+    hat.transform(transform);
+    hat.addFrontFaces(faces, texture, texture.hatFront);
+    hat.addBackFaces(faces, texture, texture.hatBack);
+    hat.addLeftFaces(faces, texture, texture.hatLeft);
+    hat.addRightFaces(faces, texture, texture.hatRight);
+    hat.addTopFaces(faces, texture, texture.hatTop);
+    hat.addBottomFaces(faces, texture, texture.hatBottom);
     return faces;
   }
 
