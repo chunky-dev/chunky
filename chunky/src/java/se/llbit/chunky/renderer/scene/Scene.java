@@ -28,13 +28,7 @@ import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
-import se.llbit.chunky.renderer.OutputMode;
-import se.llbit.chunky.renderer.Postprocess;
-import se.llbit.chunky.renderer.Refreshable;
-import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.renderer.RenderMode;
-import se.llbit.chunky.renderer.ResetReason;
-import se.llbit.chunky.renderer.WorkerState;
+import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
@@ -193,6 +187,8 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean saveSnapshots = false;
   protected boolean emittersEnabled = DEFAULT_EMITTERS_ENABLED;
   protected double emitterIntensity = DEFAULT_EMITTER_INTENSITY;
+  protected EmitterSamplingStrategy emitterSamplingStrategy = EmitterSamplingStrategy.NONE;
+
   protected boolean sunEnabled = true;
   /**
    * Water opacity modifier.
@@ -297,6 +293,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private boolean forceReset = false;
 
+  private Grid emitterGrid;
+
   /**
    * The octree implementation to use
    */
@@ -317,6 +315,7 @@ public class Scene implements JsonSerializable, Refreshable {
     palette = new BlockPalette();
     worldOctree = new Octree(octreeImplementation, 1);
     waterOctree = new Octree(octreeImplementation, 1);
+    emitterGrid = new Grid(1, 16);
   }
 
   /**
@@ -388,6 +387,8 @@ public class Scene implements JsonSerializable, Refreshable {
       origin.set(other.origin);
 
       chunks = other.chunks;
+
+      emitterGrid = other.emitterGrid;
     }
 
     // Copy material properties.
@@ -405,6 +406,7 @@ public class Scene implements JsonSerializable, Refreshable {
     sunEnabled = other.sunEnabled;
     emittersEnabled = other.emittersEnabled;
     emitterIntensity = other.emitterIntensity;
+    emitterSamplingStrategy = other.emitterSamplingStrategy;
     transparentSky = other.transparentSky;
     fogDensity = other.fogDensity;
     skyFogDensity = other.skyFogDensity;
@@ -462,6 +464,7 @@ public class Scene implements JsonSerializable, Refreshable {
       saveGrassTexture(context, taskTracker);
       saveFoliageTexture(context, taskTracker);
       saveDump(context, taskTracker);
+      saveEmitterGrid(context, taskTracker);
     }
   }
 
@@ -503,8 +506,11 @@ public class Scene implements JsonSerializable, Refreshable {
       mode = RenderMode.PAUSED;
     }
 
-    if (!loadOctree(context, taskTracker)) {
-      // Could not load stored octree.
+    // Try loading the grid unconditionally for now
+    boolean emiiterGridLoaded = loadEmitterGrid(context, taskTracker);
+    boolean octreeLoaded = loadOctree(context, taskTracker);
+    if (!emiiterGridLoaded || !octreeLoaded) {
+      // Could not load stored octree or emitter grid.
       // Load the chunks from the world.
       if (loadedWorld == EmptyWorld.INSTANCE) {
         Log.warn("Could not load chunks (no world found for scene)");
@@ -512,6 +518,7 @@ public class Scene implements JsonSerializable, Refreshable {
         loadChunks(taskTracker, loadedWorld, chunks);
       }
     }
+
     notifyAll();
   }
 
@@ -742,6 +749,7 @@ public class Scene implements JsonSerializable, Refreshable {
       palette = new BlockPalette();
       worldOctree = new Octree(octreeImplementation, requiredDepth);
       waterOctree = new Octree(octreeImplementation, requiredDepth);
+      emitterGrid = new Grid(requiredDepth, 10); // TODO Make configurable
 
       // Parse the regions first - force chunk lists to be populated!
       Set<ChunkPosition> regions = new HashSet<>();
@@ -1003,6 +1011,11 @@ public class Scene implements JsonSerializable, Refreshable {
                   }
                 }
                 worldOctree.set(octNode, x, cy - origin.y, z);
+
+                if(block.emittance > 1e-4) {
+                  emitterGrid.addEmitter(x, cy-origin.y, z);
+                }
+
               }
             }
           }
@@ -1100,6 +1113,8 @@ public class Scene implements JsonSerializable, Refreshable {
       worldOctree.endFinalization();
       waterOctree.endFinalization();
     }
+
+    emitterGrid.prepare();
 
     chunks = loadedChunks;
     camera.setWorldSize(1 << worldOctree.getDepth());
@@ -1774,6 +1789,20 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
+  private synchronized void saveEmitterGrid(RenderContext context, TaskTracker progress) {
+    String filename = name + ".emittergrid";
+    // TODO Not save when unchanged?
+    try(TaskTracker.Task task = progress.task("Saving Grid")) {
+      Log.info("Saving Grig " + filename);
+
+      try(DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(filename)))) {
+        emitterGrid.store(out);
+      } catch(IOException e) {
+        Log.warn("Couldn't save Grid", e);
+      }
+    }
+  }
+
   private synchronized void saveOctree(RenderContext context, TaskTracker progress) {
     String fileName = name + ".octree2";
     if (context.fileUnchangedSince(fileName, worldOctree.getTimestamp())) {
@@ -1860,6 +1889,20 @@ public class Scene implements JsonSerializable, Refreshable {
         Log.info("Render dump saved");
       } catch (IOException e) {
         Log.warn("IO exception while saving render dump!", e);
+      }
+    }
+  }
+
+  private synchronized boolean loadEmitterGrid(RenderContext context, TaskTracker progress) {
+    String filename = name + ".emittergrid";
+    try(TaskTracker.Task task = progress.task("Loading grid")) {
+      Log.info("Load grid " + filename);
+      try(DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename)))) {
+        emitterGrid = Grid.load(in);
+        return true;
+      } catch(IOException e) {
+        Log.info("Couldn't load the grid", e);
+        return false;
       }
     }
   }
@@ -2408,6 +2451,7 @@ public class Scene implements JsonSerializable, Refreshable {
       json.add("actors", actorArray);
     }
     json.add("octreeImplementation", octreeImplementation);
+    json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
 
     return json;
   }
@@ -2694,6 +2738,8 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
+
+    emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString("NONE"));
   }
 
   /**
@@ -2935,6 +2981,10 @@ public class Scene implements JsonSerializable, Refreshable {
     this.yClipMax = yClipMax;
   }
 
+  public Grid getEmitterGrid() {
+    return emitterGrid;
+  }
+
   public String getOctreeImplementation() {
     return octreeImplementation;
   }
@@ -2943,4 +2993,14 @@ public class Scene implements JsonSerializable, Refreshable {
     this.octreeImplementation = octreeImplementation;
   }
 
+  public EmitterSamplingStrategy getEmitterSamplingStrategy() {
+    return emitterSamplingStrategy;
+  }
+
+  public void setEmitterSamplingStrategy(EmitterSamplingStrategy emitterSamplingStrategy) {
+    if(this.emitterSamplingStrategy != emitterSamplingStrategy) {
+      this.emitterSamplingStrategy = emitterSamplingStrategy;
+      refresh();
+    }
+  }
 }

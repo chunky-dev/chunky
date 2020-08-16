@@ -22,9 +22,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
+import se.llbit.chunky.renderer.EmitterSamplingStrategy;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.renderer.scene.Sun;
@@ -51,6 +53,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML private CheckBox enableSunlight;
   @FXML private CheckBox drawSun;
   @FXML private LuxColorPicker sunColor;
+  @FXML private ChoiceBox<EmitterSamplingStrategy> emitterSamplingStrategy;
 
   private ChangeListener<Color> sunColorListener = (observable, oldValue, newValue) ->
       scene.sun().setColor(ColorUtil.fromFx(newValue));
@@ -101,6 +104,13 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     drawSun.setTooltip(new Tooltip("Draws the sun texture on top of the skymap."));
 
     sunColor.colorProperty().addListener(sunColorListener);
+
+    emitterSamplingStrategy.getItems().addAll(EmitterSamplingStrategy.values());
+    emitterSamplingStrategy.getSelectionModel().selectedItemProperty()
+            .addListener((observable, oldvalue, newvalue) -> {
+              scene.setEmitterSamplingStrategy(newvalue);
+            });
+    emitterSamplingStrategy.setTooltip(new Tooltip("Determine how emitters are sampled at each bounce"));
   }
 
   @Override public void setController(RenderControlsFxController controller) {
@@ -119,6 +129,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     sunColor.colorProperty().removeListener(sunColorListener);
     sunColor.setColor(ColorUtil.toFx(scene.sun().getColor()));
     sunColor.colorProperty().addListener(sunColorListener);
+    emitterSamplingStrategy.getSelectionModel().select(scene.getEmitterSamplingStrategy());
   }
 
   @Override public String getTabTitle() {
