@@ -17,20 +17,28 @@
  */
 package se.llbit.chunky.entity;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.util.Collection;
+import java.util.LinkedList;
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texturepack.EntityTextureLoader;
+import se.llbit.chunky.resources.texturepack.TextureFormatError;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Quad;
+import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Box;
 import se.llbit.math.primitive.Primitive;
-
-import java.util.Collection;
-import java.util.LinkedList;
+import se.llbit.util.Util;
 
 /**
  * A mob head (skull) entity.
@@ -50,17 +58,25 @@ public class HeadEntity extends Entity {
    */
   private final int placement;
 
-  private final EntityTexture texture;
+  /**
+   * The URL of the skin that is used for this entity.
+   */
+  private final String skin;
 
-  public HeadEntity(Vector3 position, EntityTexture texture, int rotation, int placement) {
+  public HeadEntity(Vector3 position, String skin, int rotation, int placement) {
     super(position);
-    this.texture = texture;
+    this.skin = skin;
     this.rotation = rotation;
     this.placement = placement;
-    // TODO(jesper): add SkullOwner handling.
   }
 
-  @Override public Collection<Primitive> primitives(Vector3 offset) {
+  @Override
+  public Collection<Primitive> primitives(Vector3 offset) {
+    EntityTexture texture = Texture.steve;
+    if (skin != null && !skin.isEmpty()) {
+      texture = downloadSkin();
+    }
+
     Collection<Primitive> faces = new LinkedList<>();
     Transform transform = Transform.NONE
         .translate(position.x + offset.x + 0.5, position.y + offset.y + 4 / 16.,
@@ -104,13 +120,52 @@ public class HeadEntity extends Entity {
     return faces;
   }
 
-  @Override public JsonValue toJson() {
+  /**
+   * Download the skin or take it from the cache.
+   *
+   * @return The downloaded/cached skin or the steve skin if the download failed
+   */
+  private EntityTexture downloadSkin() {
+    EntityTexture texture = new EntityTexture();
+    EntityTextureLoader loader = new EntityTextureLoader(skin, texture);
+    String key = skin + ":skin";
+    File cacheFile = new File(PersistentSettings.cacheDirectory(),
+        Util.cacheEncode(key.hashCode()));
+    if (cacheFile.exists()) {
+      try {
+        loader.load(cacheFile);
+        return texture;
+      } catch (IOException | TextureFormatError e) {
+        // ignore, try download below
+      }
+    }
+    try (ReadableByteChannel inChannel = Channels.newChannel(new URL(skin).openStream());
+        FileOutputStream out = new FileOutputStream(cacheFile)) {
+      out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+    } catch (IOException e) {
+      Log.warn("Failed to download skin from " + skin, e);
+      return Texture.steve;
+    }
+    try {
+      loader.load(cacheFile);
+      return texture;
+    } catch (IOException | TextureFormatError e) {
+      cacheFile.delete();
+      Log.warn("Failed to load skin downloaded from " + skin, e);
+    }
+
+    return EntityTexture.steve;
+  }
+
+  @Override
+  public JsonValue toJson() {
     JsonObject json = new JsonObject();
-    json.add("kind", "skull");
+    json.add("kind", "head");
     json.add("position", position.toJson());
     //json.add("type", type);
     json.add("rotation", rotation);
     json.add("placement", placement);
+    json.add("skin", skin);
     return json;
   }
 
@@ -120,7 +175,8 @@ public class HeadEntity extends Entity {
     //int type = json.get("type").intValue(0);
     int rotation = json.get("rotation").intValue(0);
     int placement = json.get("placement").intValue(0);
-    return new HeadEntity(position, Texture.steve, rotation, placement);
+    String skin = json.get("skin").stringValue("");
+    return new HeadEntity(position, skin, rotation, placement);
   }
 
 
