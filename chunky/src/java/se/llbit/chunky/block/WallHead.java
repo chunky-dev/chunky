@@ -1,13 +1,17 @@
 package se.llbit.chunky.block;
 
 import se.llbit.chunky.entity.Entity;
+import se.llbit.chunky.entity.HeadEntity;
 import se.llbit.chunky.entity.SkullEntity;
+import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
+import se.llbit.nbt.CompoundTag;
 
 public class WallHead extends MinecraftBlockTranslucent {
+
   private final String description;
   private final int facing;
   private final SkullEntity.Kind type;
@@ -35,19 +39,35 @@ public class WallHead extends MinecraftBlockTranslucent {
     }
   }
 
-  @Override public boolean intersect(Ray ray, Scene scene) {
+  @Override
+  public boolean intersect(Ray ray, Scene scene) {
     return false;
   }
 
-  @Override public String description() {
+  @Override
+  public String description() {
     return description;
   }
 
-  @Override public boolean isEntity() {
-    return true;
+  @Override
+  public boolean isEntity() {
+    return type != Kind.PLAYER;
   }
 
-  @Override public Entity toEntity(Vector3 position) {
+  @Override
+  public Entity toEntity(Vector3 position) {
     return new SkullEntity(position, type, 0, facing);
+  }
+
+  @Override
+  public boolean isBlockEntity() {
+    return type == Kind.PLAYER;
+  }
+
+  @Override
+  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+    String textureUrl = Head.getTextureUrl(entityTag);
+    return textureUrl != null ? new HeadEntity(position, textureUrl, 0, facing)
+        : new SkullEntity(position, type, 0, facing);
   }
 }

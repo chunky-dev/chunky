@@ -63,6 +63,8 @@ abstract public class Entity {
         return WallSignEntity.fromJson(json);
       case "skull":
         return SkullEntity.fromJson(json);
+      case "head":
+        return HeadEntity.fromJson(json);
       case "player":
         return PlayerEntity.fromJson(json);
       case "standing_banner":
