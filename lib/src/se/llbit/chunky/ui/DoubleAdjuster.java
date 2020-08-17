@@ -22,26 +22,17 @@ import javafx.beans.property.SimpleDoubleProperty;
  * A double adjuster stores double precision floating point values.
  */
 public class DoubleAdjuster extends SliderAdjuster<Double> {
-  private double min = Double.MIN_VALUE;
-  private double max = Double.MAX_VALUE;
-
   public DoubleAdjuster() {
     super(new SimpleDoubleProperty());
-  }
-
-  @Override public void setRange(double min, double max) {
-    super.setRange(min, max);
-    this.min = min;
-    this.max = max;
   }
 
   @Override protected Double clamp(Number value) {
     double result = value.doubleValue();
     if (clampMax) {
-      result = Math.min(result, max);
+      result = Math.min(result, getMax());
     }
     if (clampMin) {
-      result = Math.max(result, min);
+      result = Math.max(result, getMin());
     }
     return result;
   }

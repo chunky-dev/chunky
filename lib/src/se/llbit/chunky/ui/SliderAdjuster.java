@@ -64,6 +64,14 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
     }
   }
 
+  public double getMin() {
+    return min;
+  }
+
+  public double getMax() {
+    return max;
+  }
+
   /**
    * Make the adjuster use a logarithmic mapping for the slider position.
    */
