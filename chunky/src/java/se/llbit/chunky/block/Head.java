@@ -15,6 +15,7 @@ import se.llbit.log.Log;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.Tag;
 
 public class Head extends MinecraftBlockTranslucent {
 
@@ -64,14 +65,21 @@ public class Head extends MinecraftBlockTranslucent {
   }
 
   public static String getTextureUrl(CompoundTag entityTag) {
-    String textureBase64 = entityTag.get("SkullOwner").get("Properties").get("textures").get(0)
+    Tag ownerTag = entityTag.get("Owner"); // used by skulls
+    if (!ownerTag.isCompoundTag()) {
+      ownerTag = entityTag.get("SkullOwner"); // used by player heads
+    }
+    String textureBase64 = ownerTag.get("Properties").get("textures").get(0)
         .get("Value").stringValue();
-    try (JsonParser parser = new JsonParser(
-        new ByteArrayInputStream(Base64.getDecoder().decode(textureBase64)))) {
-      return parser.parse().asObject().get("textures").asObject().get("SKIN").asObject().get("url")
-          .stringValue(null);
-    } catch (IOException | SyntaxError e) {
-      Log.warn("Could not get skull texture", e);
+    if (!textureBase64.isEmpty()) {
+      try (JsonParser parser = new JsonParser(
+          new ByteArrayInputStream(Base64.getDecoder().decode(textureBase64)))) {
+        return parser.parse().asObject().get("textures").asObject().get("SKIN").asObject()
+            .get("url")
+            .stringValue(null);
+      } catch (IOException | SyntaxError e) {
+        Log.warn("Could not get skull texture", e);
+      }
     }
     return null;
   }
