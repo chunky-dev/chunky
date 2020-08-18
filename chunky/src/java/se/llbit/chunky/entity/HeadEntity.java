@@ -78,8 +78,13 @@ public class HeadEntity extends Entity {
     }
 
     Collection<Primitive> faces = new LinkedList<>();
+    double wallHeight = 0;
+    if (placement >= 2) {
+      wallHeight = 4 / 16.;
+    }
     Transform transform = Transform.NONE
-        .translate(position.x + offset.x + 0.5, position.y + offset.y + 4 / 16.,
+        .translate(position.x + offset.x + 0.5,
+            position.y + offset.y + 4 / 16. + wallHeight,
             position.z + offset.z + 0.5);
     Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
     Box hat = new Box(-4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16.);
@@ -89,34 +94,31 @@ public class HeadEntity extends Entity {
         break;
       case 1:
         // On floor.
-        head.transform(Transform.NONE.rotateY(-rotation * Math.PI / 8));
-        hat.transform(Transform.NONE.rotateY(-rotation * Math.PI / 8));
+        transform = Transform.NONE.rotateY(-rotation * Math.PI / 8)
+            .chain(transform);
         break;
       case 2:
         // Facing north.
-        head.transform(Transform.NONE.translate(0, 0, 4 / 16.));
-        hat.transform(Transform.NONE.translate(0, 0, 4 / 16.));
+        transform = Transform.NONE.translate(0, 0, 4 / 16.)
+            .chain(transform);
         break;
       case 3:
         // Facing south.
-        head.transform(Transform.NONE.translate(0, 0, 4 / 16.));
-        hat.transform(Transform.NONE.translate(0, 0, 4 / 16.));
-        head.transform(Transform.NONE.rotateY(Math.PI));
-        hat.transform(Transform.NONE.rotateY(Math.PI));
+        transform = Transform.NONE.translate(0, 0, 4 / 16.)
+            .rotateY(Math.PI)
+            .chain(transform);
         break;
       case 4:
         // Facing west.
-        head.transform(Transform.NONE.translate(0, 0, 4 / 16.));
-        hat.transform(Transform.NONE.translate(0, 0, 4 / 16.));
-        head.transform(Transform.NONE.rotateY(QuickMath.HALF_PI));
-        hat.transform(Transform.NONE.rotateY(QuickMath.HALF_PI));
+        transform = Transform.NONE.translate(0, 0, 4 / 16.)
+            .rotateY(QuickMath.HALF_PI)
+            .chain(transform);
         break;
       case 5:
         // Facing east.
-        head.transform(Transform.NONE.translate(0, 0, 4 / 16.));
-        hat.transform(Transform.NONE.translate(0, 0, 4 / 16.));
-        head.transform(Transform.NONE.rotateY(-QuickMath.HALF_PI));
-        hat.transform(Transform.NONE.rotateY(-QuickMath.HALF_PI));
+        transform = Transform.NONE.translate(0, 0, 4 / 16.)
+            .rotateY(-QuickMath.HALF_PI)
+            .chain(transform);
         break;
     }
     head.transform(transform);
