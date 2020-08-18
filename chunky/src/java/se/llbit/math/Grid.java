@@ -43,18 +43,26 @@ public class Grid {
   }
 
   private final int gridSize;
-  private Cell[] grid;
+  private final Cell[] grid;
 
   public Grid(int octreeDepth, int cellSize) {
     this.cellSize = cellSize;
     long totalSize = (1L << octreeDepth);
     this.gridSize = (int) ((totalSize + (cellSize-1)) / cellSize);
+    grid = new Cell[gridSize*gridSize*gridSize];
+    for(int i = 0; i < grid.length; ++i) {
+      grid[i] = new Cell();
+    }
   }
 
   // Constructor used by the load method
   private Grid(int gridSize, int cellSize, int overloadSelectFlag /*unused*/) {
     this.gridSize = gridSize;
     this.cellSize = cellSize;
+    grid = new Cell[gridSize*gridSize*gridSize];
+    for(int i = 0; i < grid.length; ++i) {
+      grid[i] = new Cell();
+    }
   }
 
   public void addEmitter(int x, int y, int z) {
@@ -70,11 +78,6 @@ public class Grid {
    * Builds the grid itself
    */
   public void prepare() {
-    grid = new Cell[gridSize*gridSize*gridSize];
-    for(int i = 0; i < grid.length; ++i) {
-      grid[i] = new Cell();
-    }
-
     for(int i = 0; i < emitterPositions.size(); ++i) {
       EmitterPosition pos = emitterPositions.get(i);
       int gridX = pos.x / cellSize;
@@ -182,9 +185,8 @@ public class Grid {
       grid.emitterPositions.add(new EmitterPosition(x, y, z));
     }
 
-    grid.grid = new Cell[gridSize*gridSize*gridSize];
     for(int cellIndex = 0; cellIndex < grid.grid.length; ++cellIndex) {
-      Cell cell = new Cell();
+      Cell cell = grid.grid[cellIndex];
       int posNo = in.readInt();
       for(int posIndex = 0; posIndex < posNo; ++posIndex) {
         int index = in.readInt();
