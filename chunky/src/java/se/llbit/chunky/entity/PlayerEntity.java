@@ -208,7 +208,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     head.addRightFaces(primitives, texture, texture.headRight);
     head.addTopFaces(primitives, texture, texture.headTop);
     head.addBottomFaces(primitives, texture, texture.headBottom);
-    Box hat = new Box(-4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16.);
+    Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
     hat.transform(Transform.NONE
         .translate(0, 4 / 16., 0)
         .scale(headScale)
