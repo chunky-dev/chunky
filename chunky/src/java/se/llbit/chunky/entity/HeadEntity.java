@@ -87,7 +87,7 @@ public class HeadEntity extends Entity {
             position.y + offset.y + 4 / 16. + wallHeight,
             position.z + offset.z + 0.5);
     Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
-    Box hat = new Box(-4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16., -4.2 / 16., 4.2 / 16.);
+    Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
     switch (placement) {
       case 0:
         // Unused.
