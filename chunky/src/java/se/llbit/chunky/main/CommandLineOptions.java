@@ -281,7 +281,7 @@ public class CommandLineOptions {
       }
     });
 
-    registerOption("-reset", new Range(1), arguments -> {
+    registerOption("-reset", new Range(1, 2), arguments -> {
       mode = Mode.NOTHING;
       if (arguments.size() == 2) {
         options.sceneName = arguments.get(1);
