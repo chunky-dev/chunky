@@ -357,6 +357,7 @@ public class CommandLineOptions {
           scene.loadDescription(in);
         }
         RenderContext context = new RenderContext(new Chunky(options));
+        context.setSceneDirectory(sceneFile.getParentFile());
         TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
             TaskTracker.Task::new,
             (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
