@@ -285,6 +285,7 @@ public class Chunky {
         Scene scene = new Scene();
         scene.loadDescription(in); // Load description to get current SPP & canvas size.
         RenderContext context = new RenderContext(this);
+        context.setSceneDirectory(file.getParentFile());
         TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
             TaskTracker.Task::new,
             (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {

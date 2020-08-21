@@ -75,11 +75,18 @@ public class ChunkyOptions {
       return new File(sceneName);
     } else {
       if (sceneDir != null) {
+        File thisSceneDir = new File(sceneDir, sceneName);
+        if (thisSceneDir.isDirectory()) {
+          return new File(thisSceneDir, sceneName + Scene.EXTENSION);
+        }
         return new File(sceneDir, sceneName + Scene.EXTENSION);
       } else {
+        File thisSceneDir = new File(PersistentSettings.getSceneDirectory(), sceneName);
+        if (thisSceneDir.isDirectory()) {
+          return new File(thisSceneDir, sceneName + Scene.EXTENSION);
+        }
         return new File(PersistentSettings.getSceneDirectory(), sceneName + Scene.EXTENSION);
       }
     }
   }
-
 }

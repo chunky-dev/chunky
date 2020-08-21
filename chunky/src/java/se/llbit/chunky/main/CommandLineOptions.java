@@ -71,11 +71,10 @@ public class CommandLineOptions {
           "  -tile-width <NUM>      use the specified job tile width",
           "  -target <NUM>          override target SPP to be NUM in headless mode",
           "  -set <NAME> <VALUE>    set a global configuration option and exit",
-          "  -reset <NAME>          reset a global configuration option and exit",
           "  -set <NAME> <VALUE> <SCENE>",
           "                         set a configuration option for a scene and exit",
-          "  -reset <NAME>          reset a global option to its default value",
-          "  -reset <NAME> <SCENE>  reset an option for a particular scene",
+          "  -reset <NAME>          reset a global option to its default value and exit",
+          "  -reset <NAME> <SCENE>  reset an option for a particular scene and exit",
           "  -download-mc <VERSION> download the given Minecraft version and exit",
           "  -list-scenes           print a list of all scenes in the scene directory",
           "  -merge-dump <SCENE> <PATH>",
@@ -282,7 +281,7 @@ public class CommandLineOptions {
       }
     });
 
-    registerOption("-reset", new Range(1), arguments -> {
+    registerOption("-reset", new Range(1, 2), arguments -> {
       mode = Mode.NOTHING;
       if (arguments.size() == 2) {
         options.sceneName = arguments.get(1);
@@ -357,6 +356,7 @@ public class CommandLineOptions {
           scene.loadDescription(in);
         }
         RenderContext context = new RenderContext(new Chunky(options));
+        context.setSceneDirectory(sceneFile.getParentFile());
         TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
             TaskTracker.Task::new,
             (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
