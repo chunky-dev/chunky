@@ -179,9 +179,9 @@ public class Quad {
     double v0 = uv.z;
     double v1 = uv.z + uv.w;
     primitives.add(new TexturedTriangle(c0, c2, c1, new Vector2(u0, v0), new Vector2(u0, v1),
-        new Vector2(u1, v0), material));
+        new Vector2(u1, v0), material, false));
     primitives.add(new TexturedTriangle(c1, c2, c3, new Vector2(u1, v0), new Vector2(u0, v1),
-        new Vector2(u1, v1), material));
+        new Vector2(u1, v1), material, false));
   }
 
   /**

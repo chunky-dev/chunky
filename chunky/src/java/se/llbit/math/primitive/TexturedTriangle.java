@@ -39,6 +39,7 @@ public class TexturedTriangle implements Primitive {
   private final Vector2 t2;
   private final Vector2 t3;
   private final Material material;
+  private final boolean doubleSided;
 
   /**
    * @param c1 first corner
@@ -47,6 +48,16 @@ public class TexturedTriangle implements Primitive {
    */
   public TexturedTriangle(Vector3 c1, Vector3 c2, Vector3 c3, Vector2 t1, Vector2 t2,
       Vector2 t3, Material material) {
+    this(c1, c2, c3, t1, t2, t3, material, true);
+  }
+
+  /**
+   * @param c1 first corner
+   * @param c2 second corner
+   * @param c3 third corner
+   */
+  public TexturedTriangle(Vector3 c1, Vector3 c2, Vector3 c3, Vector2 t1, Vector2 t2,
+      Vector2 t3, Material material, boolean doubleSided) {
     e1.sub(c2, c1);
     e2.sub(c3, c1);
     o.set(c1);
@@ -56,6 +67,7 @@ public class TexturedTriangle implements Primitive {
     this.t2 = new Vector2(t3);
     this.t3 = new Vector2(t1);
     this.material = material;
+    this.doubleSided = doubleSided;
 
     bounds = AABB.bounds(c1, c2, c3);
   }
@@ -68,7 +80,11 @@ public class TexturedTriangle implements Primitive {
 
     pvec.cross(ray.d, e2);
     double det = e1.dot(pvec);
-    if (det > -EPSILON && det < EPSILON) {
+    if (doubleSided) {
+      if (det > -EPSILON && det < EPSILON) {
+        return false;
+      }
+    } else if (det > -EPSILON) {
       return false;
     }
     double recip = 1 / det;
