@@ -494,6 +494,7 @@ public class Texture {
   public static final EntityTexture skeleton = new EntityTexture();
   public static final EntityTexture wither = new EntityTexture();
   public static final EntityTexture dragon = new EntityTexture();
+  public static final EntityTexture book = new EntityTexture();
 
   // [1.10] Bone, magma, nether wart block, red nether brick.
   public static final Texture boneSide = new Texture();

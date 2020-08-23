@@ -2229,7 +2229,9 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new Grindstone(
             tag.get("Properties").get("face").stringValue("floor"), BlockProvider.facing(tag));
       case "lectern":
-        return new Lectern(BlockProvider.facing(tag));
+        return new Lectern(
+            BlockProvider.facing(tag),
+            tag.get("Properties").get("has_book").stringValue("false").equals("true"));
       case "smithing_table":
         return new TexturedBlock(
             name,
