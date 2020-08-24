@@ -12,6 +12,7 @@ import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
+import se.llbit.util.JsonUtil;
 
 public class Book extends Entity {
 
@@ -175,17 +176,49 @@ public class Book extends Entity {
   private double openAngle;
   private double pageAngleA;
   private double pageAngleB;
+  private double pitch;
+  private double yaw;
 
-  protected Book(Vector3 position, double openAngle, double pageAngleA, double pageAngleB) {
+  public Book(Vector3 position, double openAngle, double pageAngleA, double pageAngleB) {
     super(position);
     this.openAngle = openAngle;
     this.pageAngleA = pageAngleA;
     this.pageAngleB = pageAngleB;
   }
 
+  public Book(JsonObject json) {
+    this(JsonUtil.vec3FromJsonObject(json.get("position")),
+        json.get("openAngle").doubleValue(0),
+        json.get("pageAngleA").doubleValue(0),
+        json.get("pageAngleB").doubleValue(0));
+    setPitch(json.get("pitch").asDouble(0));
+    setYaw(json.get("yaw").asDouble(0));
+  }
+
+  public double getPitch() {
+    return pitch;
+  }
+
+  public void setPitch(double pitch) {
+    this.pitch = pitch;
+  }
+
+  public double getYaw() {
+    return yaw;
+  }
+
+  public void setYaw(double yaw) {
+    this.yaw = yaw;
+  }
+
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
     return primitives(Transform.NONE
+        .translate(-0.5, -0.5, -0.5)
+        .rotateX(getPitch())
+        .translate(0, 0, 0)
+        .rotateY(getYaw())
+        .translate(0.5, 0.5, 0.5)
         .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
   }
 
@@ -242,9 +275,15 @@ public class Book extends Entity {
     JsonObject json = new JsonObject();
     json.add("kind", "book");
     json.add("position", position.toJson());
-    json.add("openedAngle", openAngle);
+    json.add("openAngle", openAngle);
     json.add("pageAngleA", pageAngleA);
     json.add("pageAngleB", pageAngleB);
+    json.add("pitch", getPitch());
+    json.add("yaw", getYaw());
     return json;
+  }
+
+  public static Entity fromJson(JsonObject json) {
+    return new Book(json);
   }
 }

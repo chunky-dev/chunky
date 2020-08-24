@@ -175,20 +175,32 @@ public class Lectern extends Entity {
     }
 
     if (hasBook) {
-      Transform bookTransform = Transform.NONE.translate(-0.5, -0.5, -0.5)
-          .rotateX(Math.toRadians(90 - 22.5))
-          .translate(0, 0, -2 / 16.0)
-          .rotateY(Math.PI)
-          .translate(0.5, 0.5, 0.5)
-          .translate(0, 8.5 / 16.0, 0)
-          .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z);
+      Vector3 bookPosition = new Vector3(position);
+      bookPosition.add(0, 8.5 / 16.0, 0);
+
+      switch (this.facing) {
+        case "north":
+          bookPosition.add(0, 0, -2 / 16.0);
+          break;
+        case "east":
+          bookPosition.add(2 / 16.0, 0, 0);
+          break;
+        case "south":
+          bookPosition.add(0, 0, 2 / 16.0);
+          break;
+        case "west":
+          bookPosition.add(-2 / 16.0, 0, 0);
+          break;
+      }
 
       double openAngle = Math.PI / 32;
       double pageAngleA = Math.PI / 8;
       double pageAngleB = Math.PI - Math.PI / 8;
 
-      Book book = new Book(position, openAngle, pageAngleA, pageAngleB);
-      faces.addAll(book.primitives(bookTransform));
+      Book book = new Book(bookPosition, openAngle, pageAngleA, pageAngleB);
+      book.setPitch(Math.toRadians(90 - 22.5));
+      book.setYaw(getBookYaw(this.facing));
+      faces.addAll(book.primitives(offset));
     }
 
     return faces;
@@ -218,6 +230,21 @@ public class Lectern extends Entity {
         return 2;
       case "west":
         return 3;
+      default:
+        return 0;
+    }
+  }
+
+  private static double getBookYaw(String facing) {
+    switch (facing) {
+      case "north":
+        return 0;
+      case "east":
+        return -Math.PI / 2;
+      case "south":
+        return Math.PI;
+      case "west":
+        return Math.PI / 2;
       default:
         return 0;
     }
