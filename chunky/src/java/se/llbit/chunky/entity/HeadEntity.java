@@ -24,7 +24,10 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.WeakHashMap;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
@@ -47,6 +50,8 @@ import se.llbit.util.Util;
  */
 public class HeadEntity extends Entity {
 
+  private static final Map<String, EntityTexture> textureCache = Collections
+      .synchronizedMap(new WeakHashMap<>());
 
   /**
    * The rotation of the skull when attached to a wall.
@@ -144,35 +149,36 @@ public class HeadEntity extends Entity {
    * @return The downloaded/cached skin or the steve skin if the download failed
    */
   private EntityTexture downloadSkin() {
-    EntityTexture texture = new EntityTexture();
-    EntityTextureLoader loader = new EntityTextureLoader(skin, texture);
-    String key = skin + ":skin";
-    File cacheFile = new File(PersistentSettings.cacheDirectory(),
-        Util.cacheEncode(key.hashCode()));
-    if (cacheFile.exists()) {
+    return textureCache.computeIfAbsent(skin, (skinUrl) -> {
+      EntityTexture texture = new EntityTexture();
+      EntityTextureLoader loader = new EntityTextureLoader(skinUrl, texture);
+      File cacheFile = new File(PersistentSettings.cacheDirectory(),
+          Util.cacheEncode((skin + ":skin").hashCode()));
+      if (cacheFile.exists()) {
+        try {
+          loader.load(cacheFile);
+          return texture;
+        } catch (IOException | TextureFormatError e) {
+          // ignore, try download below
+        }
+      }
+      try (ReadableByteChannel inChannel = Channels.newChannel(new URL(skinUrl).openStream());
+          FileOutputStream out = new FileOutputStream(cacheFile)) {
+        out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+      } catch (IOException e) {
+        Log.warn("Failed to download skin from " + skinUrl, e);
+        return Texture.steve;
+      }
       try {
         loader.load(cacheFile);
         return texture;
       } catch (IOException | TextureFormatError e) {
-        // ignore, try download below
+        cacheFile.delete();
+        Log.warn("Failed to load skin downloaded from " + skinUrl, e);
       }
-    }
-    try (ReadableByteChannel inChannel = Channels.newChannel(new URL(skin).openStream());
-        FileOutputStream out = new FileOutputStream(cacheFile)) {
-      out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
-    } catch (IOException e) {
-      Log.warn("Failed to download skin from " + skin, e);
-      return Texture.steve;
-    }
-    try {
-      loader.load(cacheFile);
-      return texture;
-    } catch (IOException | TextureFormatError e) {
-      cacheFile.delete();
-      Log.warn("Failed to load skin downloaded from " + skin, e);
-    }
 
-    return EntityTexture.steve;
+      return EntityTexture.steve;
+    });
   }
 
   @Override

@@ -1,16 +1,14 @@
 package se.llbit.chunky.block;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.HeadEntity;
 import se.llbit.chunky.entity.SkullEntity;
 import se.llbit.chunky.entity.SkullEntity.Kind;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.EntityTexture;
-import se.llbit.json.JsonParser;
-import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.log.Log;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -19,6 +17,8 @@ import se.llbit.nbt.Tag;
 
 public class Head extends MinecraftBlockTranslucent {
 
+  private static final Pattern SKIN_URL_FROM_OBJECT = Pattern
+      .compile("\"?SKIN\"?\\s*:\\s*\\{\\s*\"?url\"?\\s*:\\s*\"(.+?)\"");
   private final String description;
   private final int rotation;
   private final SkullEntity.Kind type;
@@ -72,12 +72,17 @@ public class Head extends MinecraftBlockTranslucent {
     String textureBase64 = ownerTag.get("Properties").get("textures").get(0)
         .get("Value").stringValue();
     if (!textureBase64.isEmpty()) {
-      try (JsonParser parser = new JsonParser(
-          new ByteArrayInputStream(Base64.getDecoder().decode(textureBase64)))) {
-        return parser.parse().asObject().get("textures").asObject().get("SKIN").asObject()
-            .get("url")
-            .stringValue(null);
-      } catch (IOException | SyntaxError e) {
+      try {
+        String decoded = new String(Base64.getDecoder().decode(textureBase64));
+        // the decoded string might not be valid json (sometimes keys are not quoted)
+        Matcher matcher = SKIN_URL_FROM_OBJECT.matcher(decoded);
+        if (matcher.find()) {
+          return matcher.group(1);
+        } else {
+          Log.warn("Could not get skull texture");
+        }
+      } catch (IllegalArgumentException e) {
+        // base64 decoding error
         Log.warn("Could not get skull texture", e);
       }
     }
