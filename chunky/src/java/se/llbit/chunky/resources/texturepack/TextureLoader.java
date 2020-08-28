@@ -66,10 +66,9 @@ public abstract class TextureLoader {
    * @throws IOException
    */
   public boolean load(File file) throws IOException, TextureFormatError {
-    FileInputStream in = new FileInputStream(file);
-    boolean result = load(in);
-    in.close();
-    return result;
+    try (FileInputStream in = new FileInputStream(file)) {
+      return load(in);
+    }
   }
 
   /**
