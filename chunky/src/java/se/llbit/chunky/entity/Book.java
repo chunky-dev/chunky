@@ -182,8 +182,8 @@ public class Book extends Entity {
   public Book(Vector3 position, double openAngle, double pageAngleA, double pageAngleB) {
     super(position);
     this.openAngle = openAngle;
-    this.pageAngleA = pageAngleA;
-    this.pageAngleB = pageAngleB;
+    this.pageAngleA = Math.max(openAngle, pageAngleA);
+    this.pageAngleB = Math.min(Math.PI - openAngle, pageAngleB);
   }
 
   public Book(JsonObject json) {
@@ -227,8 +227,7 @@ public class Book extends Entity {
 
     for (Quad quad : Model
         .translate(Model.rotateY(leftCover, -openAngle),
-            -1 / 16.0, 0,
-            0)) {
+            -1 / 16.0, 0, 0)) {
       quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
     }
 
@@ -239,27 +238,29 @@ public class Book extends Entity {
       quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
     }
 
+    double pagesDistance = 0.01 + ((1 - openAngle * 2 / Math.PI)) / 16.0; // TODO
+
     for (Quad quad : Model
-        .translate(Model.rotateY(Model.translate(leftPages, 0, 0, 1.01 / 16.0), -openAngle),
-            0, 0, -1.01 / 16.0)) {
+        .translate(Model.rotateY(Model.translate(leftPages, 0, 0, pagesDistance), -openAngle),
+            0, 0, -pagesDistance)) {
       quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
     }
 
     for (Quad quad : Model
-        .translate(Model.rotateY(Model.translate(rightPages, 0, 0, 1.01 / 16.0), openAngle),
-            0, 0, -1.01 / 16.0)) {
+        .translate(Model.rotateY(Model.translate(rightPages, 0, 0, pagesDistance), openAngle),
+            0, 0, -pagesDistance)) {
       quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
     }
 
     for (Quad quad : Model
-        .translate(Model.rotateY(Model.translate(pageA, 0, 0, 1.01 / 16.0), pageAngleA),
-            0, 0, -1.01 / 16.0)) {
+        .translate(Model.rotateY(Model.translate(pageA, -0.5, 0, -pagesDistance), pageAngleA),
+            0.5, 0, pagesDistance)) {
       quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
     }
 
     for (Quad quad : Model
-        .translate(Model.rotateY(Model.translate(pageB, 0, 0, 1.01 / 16.0), pageAngleB),
-            0, 0, -1.01 / 16.0)) {
+        .translate(Model.rotateY(Model.translate(pageB, 0.5, 0, -pagesDistance), pageAngleB),
+            -0.5, 0, pagesDistance)) {
       quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
     }
 

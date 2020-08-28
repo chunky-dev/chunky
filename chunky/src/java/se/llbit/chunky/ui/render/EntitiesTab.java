@@ -34,6 +34,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.entity.ArmorStand;
+import se.llbit.chunky.entity.Book;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.Geared;
 import se.llbit.chunky.entity.PlayerEntity;
@@ -75,6 +76,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       } else {
         if (entity instanceof ArmorStand) {
           kind = "Armor stand";
+        } else if (entity instanceof Book) {
+          kind = "Book";
         } else {
           kind = "Other";
         }

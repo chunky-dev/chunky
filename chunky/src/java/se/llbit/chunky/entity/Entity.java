@@ -83,6 +83,8 @@ abstract public class Entity {
         return Lectern.fromJson(json);
       case "campfire":
         return Campfire.fromJson(json);
+      case "book":
+        return Book.fromJson(json);
     }
     return null;
   }
