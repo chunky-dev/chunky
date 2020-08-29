@@ -9,6 +9,7 @@ import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Quad;
+import se.llbit.math.Ray;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
@@ -214,42 +215,61 @@ public class Book extends Entity implements Poseable {
   public Collection<Primitive> primitives(Transform transform) {
     Collection<Primitive> faces = new LinkedList<>();
 
+    double pageAngle = (Math.PI - openAngle) / 2;
     for (Quad quad : Model
-        .translate(Model.rotateY(leftCover, -openAngle),
+        .translate(Model.rotateY(leftCover, -pageAngle),
             -1 / 16.0, 0, 0)) {
       quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
     }
 
     for (Quad quad : Model
-        .translate(Model.rotateY(rightCover, openAngle),
+        .translate(Model.rotateY(rightCover, pageAngle),
             1 / 16.0, 0,
             0)) {
       quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
     }
 
-    double pagesDistance = (1 - Math.sin(Math.PI / 2 - openAngle)) / 16.0;
+    double pagesDistance = (1 - Math.sin(Math.PI / 2 - pageAngle)) / 16.0;
 
-    for (Quad quad : leftPages) {
-      quad.addTriangles(faces, new TextureMaterial(Texture.book),
-          Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(-openAngle)
+    for (int i = 0; i < leftPages.length; i++) {
+      if (i == 5 && openAngle < Ray.EPSILON) {
+        continue; // the cover would overlay the pages if the book is closed
+      }
+      if (i == 4 && (pageAngleA >= (Math.PI + openAngle) / 2
+          || pageAngleB >= (Math.PI + openAngle) / 2)) {
+        continue; // the a single angle is clamped to the right pages, which would overlay this face
+      }
+      leftPages[i].addTriangles(faces, new TextureMaterial(Texture.book),
+          Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(-pageAngle)
               .translate(0.5, 0.5, 0.5 - 1.01 / 16.0 + pagesDistance).chain(transform));
     }
 
-    for (Quad quad : rightPages) {
-      quad.addTriangles(faces, new TextureMaterial(Texture.book),
-          Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(openAngle)
+    for (int i = 0; i < rightPages.length; i++) {
+      if (i == 5 && openAngle < Ray.EPSILON) {
+        continue; // the cover would overlay the pages if the book is closed
+      }
+      if (i == 4 && (pageAngleA <= (Math.PI - openAngle) / 2
+          || pageAngleB <= (Math.PI - openAngle) / 2)) {
+        continue; // the a single angle is clamped to the right pages, which would overlay this face
+      }
+      rightPages[i].addTriangles(faces, new TextureMaterial(Texture.book),
+          Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(pageAngle)
               .translate(0.5, 0.5, 0.5 - 1.01 / 16.0 + pagesDistance).chain(transform));
     }
 
+    double clampedPageAngleA = Math
+        .min((Math.PI + openAngle) / 2, Math.max((Math.PI - openAngle) / 2, pageAngleA));
     for (Quad quad : pageA) {
       quad.addTriangles(faces, new TextureMaterial(Texture.book),
-          Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(pageAngleA)
+          Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(clampedPageAngleA)
               .translate(0.5, 0.5, 0.5 - 1.01 / 16.0 + pagesDistance).chain(transform));
     }
 
+    double clampedPageAngleB = Math
+        .min((Math.PI + openAngle) / 2, Math.max((Math.PI - openAngle) / 2, pageAngleB));
     for (Quad quad : pageB) {
       quad.addTriangles(faces, new TextureMaterial(Texture.book),
-          Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(pageAngleB)
+          Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(clampedPageAngleB)
               .translate(0.5, 0.5, 0.5 - 1.01 / 16.0 + pagesDistance).chain(transform));
     }
 
@@ -308,5 +328,29 @@ public class Book extends Entity implements Poseable {
   @Override
   public boolean hasHead() {
     return false;
+  }
+
+  public double getOpenAngle() {
+    return openAngle;
+  }
+
+  public void setOpenAngle(double openAngle) {
+    this.openAngle = openAngle;
+  }
+
+  public double getPageAngleA() {
+    return pageAngleA;
+  }
+
+  public void setPageAngleA(double pageAngleA) {
+    this.pageAngleA = pageAngleA;
+  }
+
+  public double getPageAngleB() {
+    return pageAngleB;
+  }
+
+  public void setPageAngleB(double pageAngleB) {
+    this.pageAngleB = pageAngleB;
   }
 }
