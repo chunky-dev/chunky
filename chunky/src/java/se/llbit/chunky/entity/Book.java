@@ -38,37 +38,37 @@ public class Book extends Entity {
           new Vector3(8 / 16.0, 12 / 16.0, 6.99 / 16.0),
           new Vector3(3 / 16.0, 12 / 16.0, 6.99 / 16.0),
           new Vector3(8 / 16.0, 12 / 16.0, 7.99 / 16.0),
-          new Vector4(1 / 64.0, 6 / 64.0, 1 - 10 / 32.00, 1 - 11 / 32.0) //ok
+          new Vector4(1 / 64.0, 6 / 64.0, 1 - 10 / 32.00, 1 - 11 / 32.0)
       ),
       new Quad(
           new Vector3(3 / 16.0, 4 / 16.0, 6.99 / 16.0),
           new Vector3(8 / 16.0, 4 / 16.0, 6.99 / 16.0),
           new Vector3(3 / 16.0, 4 / 16.0, 7.99 / 16.0),
-          new Vector4(6 / 64.0, 11 / 64.0, 1 - 10 / 32.00, 1 - 11 / 32.0) //ok
+          new Vector4(6 / 64.0, 11 / 64.0, 1 - 10 / 32.00, 1 - 11 / 32.0)
       ),
       new Quad(
           new Vector3(3 / 16.0, 12 / 16.0, 7.99 / 16.0),
           new Vector3(3 / 16.0, 12 / 16.0, 6.99 / 16.0),
           new Vector3(3 / 16.0, 4 / 16.0, 7.99 / 16.0),
-          new Vector4(0 / 64.0, 1 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0) //ok
+          new Vector4(0 / 64.0, 1 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0)
       ),
       new Quad(
           new Vector3(8 / 16.0, 12 / 16.0, 6.99 / 16.0),
           new Vector3(8 / 16.0, 12 / 16.0, 7.99 / 16.0),
           new Vector3(8 / 16.0, 4 / 16.0, 6.99 / 16.0),
-          new Vector4(6 / 64.0, 7 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0) //ok
+          new Vector4(6 / 64.0, 7 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0)
       ),
       new Quad(
           new Vector3(3 / 16.0, 12 / 16.0, 6.99 / 16.0),
           new Vector3(8 / 16.0, 12 / 16.0, 6.99 / 16.0),
           new Vector3(3 / 16.0, 4 / 16.0, 6.99 / 16.0),
-          new Vector4(7 / 64.0, 12 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0) //ok
+          new Vector4(7 / 64.0, 12 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0)
       ),
       new Quad(
           new Vector3(8 / 16.0, 12 / 16.0, 7.99 / 16.0),
           new Vector3(3 / 16.0, 12 / 16.0, 7.99 / 16.0),
           new Vector3(8 / 16.0, 4 / 16.0, 7.99 / 16.0),
-          new Vector4(1 / 64.0, 6 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0) //ok
+          new Vector4(1 / 64.0, 6 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0)
       )
   };
 
@@ -109,37 +109,37 @@ public class Book extends Entity {
           new Vector3(13 / 16.0, 12 / 16.0, 6.99 / 16.0),
           new Vector3(8 / 16.0, 12 / 16.0, 6.99 / 16.0),
           new Vector3(13 / 16.0, 12 / 16.0, 7.99 / 16.0),
-          new Vector4(13 / 64.0, 18 / 64.0, 1 - 10 / 32.00, 1 - 11 / 32.0) //ok
+          new Vector4(13 / 64.0, 18 / 64.0, 1 - 10 / 32.00, 1 - 11 / 32.0)
       ),
       new Quad(
           new Vector3(8 / 16.0, 4 / 16.0, 6.99 / 16.0),
           new Vector3(13 / 16.0, 4 / 16.0, 6.99 / 16.0),
           new Vector3(8 / 16.0, 4 / 16.0, 7.99 / 16.0),
-          new Vector4(18 / 64.0, 23 / 64.0, 1 - 10 / 32.00, 1 - 11 / 32.0) //ok
+          new Vector4(18 / 64.0, 23 / 64.0, 1 - 10 / 32.00, 1 - 11 / 32.0)
       ),
       new Quad(
           new Vector3(8 / 16.0, 12 / 16.0, 7.99 / 16.0),
           new Vector3(8 / 16.0, 12 / 16.0, 6.99 / 16.0),
           new Vector3(8 / 16.0, 4 / 16.0, 7.99 / 16.0),
-          new Vector4(12 / 64.0, 13 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0) //ok
+          new Vector4(12 / 64.0, 13 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0)
       ),
       new Quad(
           new Vector3(13 / 16.0, 12 / 16.0, 6.99 / 16.0),
           new Vector3(13 / 16.0, 12 / 16.0, 7.99 / 16.0),
           new Vector3(13 / 16.0, 4 / 16.0, 6.99 / 16.0),
-          new Vector4(18 / 64.0, 19 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0) //ok
+          new Vector4(18 / 64.0, 19 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0)
       ),
       new Quad(
           new Vector3(8 / 16.0, 12 / 16.0, 6.99 / 16.0),
           new Vector3(13 / 16.0, 12 / 16.0, 6.99 / 16.0),
           new Vector3(8 / 16.0, 4 / 16.0, 6.99 / 16.0),
-          new Vector4(13 / 64.0, 18 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0) //ok
+          new Vector4(13 / 64.0, 18 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0)
       ),
       new Quad(
           new Vector3(13 / 16.0, 12 / 16.0, 7.99 / 16.0),
           new Vector3(8 / 16.0, 12 / 16.0, 7.99 / 16.0),
           new Vector3(13 / 16.0, 4 / 16.0, 7.99 / 16.0),
-          new Vector4(19 / 64.0, 24 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0) //ok
+          new Vector4(19 / 64.0, 24 / 64.0, 1 - 19 / 32.00, 1 - 11 / 32.0)
       ),
   };
 
@@ -238,30 +238,30 @@ public class Book extends Entity {
       quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
     }
 
-    double pagesDistance = 0.01 + ((1 - openAngle * 2 / Math.PI)) / 16.0; // TODO
+    double pagesDistance = (1 - Math.sin(Math.PI / 2 - openAngle)) / 16.0;
 
-    for (Quad quad : Model
-        .translate(Model.rotateY(Model.translate(leftPages, 0, 0, pagesDistance), -openAngle),
-            0, 0, -pagesDistance)) {
-      quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
+    for (Quad quad : leftPages) {
+      quad.addTriangles(faces, new TextureMaterial(Texture.book),
+          Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(-openAngle)
+              .translate(0.5, 0.5, 0.5 - 1.01 / 16.0 + pagesDistance).chain(transform));
     }
 
-    for (Quad quad : Model
-        .translate(Model.rotateY(Model.translate(rightPages, 0, 0, pagesDistance), openAngle),
-            0, 0, -pagesDistance)) {
-      quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
+    for (Quad quad : rightPages) {
+      quad.addTriangles(faces, new TextureMaterial(Texture.book),
+          Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(openAngle)
+              .translate(0.5, 0.5, 0.5 - 1.01 / 16.0 + pagesDistance).chain(transform));
     }
 
-    for (Quad quad : Model
-        .translate(Model.rotateY(Model.translate(pageA, -0.5, 0, -pagesDistance), pageAngleA),
-            0.5, 0, pagesDistance)) {
-      quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
+    for (Quad quad : pageA) {
+      quad.addTriangles(faces, new TextureMaterial(Texture.book),
+          Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(pageAngleA)
+              .translate(0.5, 0.5, 0.5 - 1.01 / 16.0 + pagesDistance).chain(transform));
     }
 
-    for (Quad quad : Model
-        .translate(Model.rotateY(Model.translate(pageB, 0.5, 0, -pagesDistance), pageAngleB),
-            -0.5, 0, pagesDistance)) {
-      quad.addTriangles(faces, new TextureMaterial(Texture.book), transform);
+    for (Quad quad : pageB) {
+      quad.addTriangles(faces, new TextureMaterial(Texture.book),
+          Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(pageAngleB)
+              .translate(0.5, 0.5, 0.5 - 1.01 / 16.0 + pagesDistance).chain(transform));
     }
 
     for (Quad quad : middleCover) {
