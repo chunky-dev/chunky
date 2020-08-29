@@ -193,11 +193,11 @@ public class Lectern extends Entity {
           break;
       }
 
-      double openAngle = Math.PI / 32;
-      double pageAngleA = Math.PI / 8;
-      double pageAngleB = Math.PI - Math.PI / 8;
-
-      Book book = new Book(bookPosition, openAngle, pageAngleA, pageAngleB);
+      Book book = new Book(
+          bookPosition,
+          Math.PI - Math.PI / 16,
+          Math.PI / 8,
+          Math.PI - Math.PI / 8);
       book.setPitch(Math.toRadians(90 - 22.5));
       book.setYaw(getBookYaw(this.facing));
       faces.addAll(book.primitives(offset));

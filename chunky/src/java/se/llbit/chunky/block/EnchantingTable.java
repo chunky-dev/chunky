@@ -33,7 +33,7 @@ public class EnchantingTable extends MinecraftBlockTranslucent {
     newPosition.add(0, 0.35, 0);
     Book book = new Book(
         newPosition,
-        Math.toRadians(11.25),
+        Math.PI - Math.PI / 16,
         Math.toRadians(30),
         Math.toRadians(180 - 30));
     book.setPitch(Math.toRadians(80));
