@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import se.llbit.chunky.model.Model;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.material.TextureMaterial;
+import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Quad;
@@ -14,7 +15,7 @@ import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
 
-public class Book extends Entity {
+public class Book extends Entity implements Poseable {
 
   private static final Quad[] leftCover = new Quad[]{
       // left cover
@@ -176,48 +177,36 @@ public class Book extends Entity {
   private double openAngle;
   private double pageAngleA;
   private double pageAngleB;
-  private double pitch;
-  private double yaw;
+  private final JsonObject pose;
+  private double scale = 1;
 
   public Book(Vector3 position, double openAngle, double pageAngleA, double pageAngleB) {
     super(position);
     this.openAngle = openAngle;
     this.pageAngleA = Math.max(openAngle, pageAngleA);
     this.pageAngleB = Math.min(Math.PI - openAngle, pageAngleB);
+    this.pose = new JsonObject();
+    pose.add("all", JsonUtil.vec3ToJson(new Vector3(0, 0, 0)));
   }
 
   public Book(JsonObject json) {
-    this(JsonUtil.vec3FromJsonObject(json.get("position")),
-        json.get("openAngle").doubleValue(0),
-        json.get("pageAngleA").doubleValue(0),
-        json.get("pageAngleB").doubleValue(0));
-    setPitch(json.get("pitch").asDouble(0));
-    setYaw(json.get("yaw").asDouble(0));
-  }
-
-  public double getPitch() {
-    return pitch;
-  }
-
-  public void setPitch(double pitch) {
-    this.pitch = pitch;
-  }
-
-  public double getYaw() {
-    return yaw;
-  }
-
-  public void setYaw(double yaw) {
-    this.yaw = yaw;
+    super(JsonUtil.vec3FromJsonObject(json.get("position")));
+    this.openAngle = json.get("openAngle").doubleValue(0);
+    this.pageAngleA = json.get("pageAngleA").doubleValue(0);
+    this.pageAngleB = json.get("pageAngleB").doubleValue(0);
+    this.scale = json.get("scale").asDouble(1);
+    this.pose = json.get("pose").object();
   }
 
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
+    Vector3 allPose = JsonUtil.vec3FromJsonArray(this.pose.get("all"));
     return primitives(Transform.NONE
         .translate(-0.5, -0.5, -0.5)
-        .rotateX(getPitch())
-        .translate(0, 0, 0)
-        .rotateY(getYaw())
+        .scale(scale)
+        .rotateX(allPose.x)
+        .rotateY(allPose.y)
+        .rotateZ(allPose.z)
         .translate(0.5, 0.5, 0.5)
         .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
   }
@@ -279,12 +268,45 @@ public class Book extends Entity {
     json.add("openAngle", openAngle);
     json.add("pageAngleA", pageAngleA);
     json.add("pageAngleB", pageAngleB);
-    json.add("pitch", getPitch());
-    json.add("yaw", getYaw());
+    json.add("scale", getScale());
+    json.add("pose", pose);
     return json;
   }
 
   public static Entity fromJson(JsonObject json) {
     return new Book(json);
+  }
+
+  @Override
+  public String[] partNames() {
+    return new String[]{"all"};
+  }
+
+  @Override
+  public double getScale() {
+    return scale;
+  }
+
+  @Override
+  public void setScale(double value) {
+    this.scale = value;
+  }
+
+  public void setPitch(double pitch) {
+    pose.get("all").array().set(0, Json.of(pitch));
+  }
+
+  public void setYaw(double yaw) {
+    pose.get("all").array().set(1, Json.of(yaw));
+  }
+
+  @Override
+  public JsonObject getPose() {
+    return pose;
+  }
+
+  @Override
+  public boolean hasHead() {
+    return false;
   }
 }

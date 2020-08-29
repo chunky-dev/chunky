@@ -203,17 +203,22 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         poseable.setScale(value);
         scene.rebuildActorBvh();
       });
+      controls.getChildren().add(scale);
 
-      DoubleAdjuster headScale = new DoubleAdjuster();
-      headScale.setName("Head scale");
-      headScale.setTooltip("Modifies entity head scale.");
-      headScale.set(poseable.getHeadScale());
-      headScale.setRange(0.1, 10);
-      headScale.onValueChange(value -> {
-        poseable.setHeadScale(value);
-        scene.rebuildActorBvh();
-      });
+      if (poseable.hasHead()) {
+        DoubleAdjuster headScale = new DoubleAdjuster();
+        headScale.setName("Head scale");
+        headScale.setTooltip("Modifies entity head scale.");
+        headScale.set(poseable.getHeadScale());
+        headScale.setRange(0.1, 10);
+        headScale.onValueChange(value -> {
+          poseable.setHeadScale(value);
+          scene.rebuildActorBvh();
+        });
+        controls.getChildren().add(headScale);
+      }
 
+      String[] partNames = poseable.partNames();
       ChoiceBox<String> partList = new ChoiceBox<>();
       partList.setTooltip(new Tooltip("Select the part of the entity to adjust."));
       partList.getItems().setAll(poseable.partNames());
@@ -222,6 +227,9 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       poseBox.setSpacing(10.0);
       poseBox.setAlignment(Pos.CENTER_LEFT);
       poseBox.getChildren().addAll(new Label("Pose part"), partList);
+      if (partNames.length > 1) {
+        controls.getChildren().add(poseBox);
+      }
 
       AngleAdjuster yaw = new AngleAdjuster();
       yaw.setTooltip("Modifies yaw of currently selected entity part.");
@@ -265,7 +273,9 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         scene.rebuildActorBvh();
       });
 
-      controls.getChildren().addAll(scale, headScale, poseBox, pitch, yaw, roll);
+      if (partNames.length > 0) {
+        controls.getChildren().addAll(pitch, yaw, roll);
+      }
     }
 
     if (entity instanceof Geared) {
@@ -321,7 +331,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       entityTable.getItems().add(data);
       entityTable.getSelectionModel().select(data);
     });
-    delete.setTooltip(new Tooltip("Delete the selected player."));
+    delete.setTooltip(new Tooltip("Delete the selected entity."));
     delete.setOnAction(e -> withEntity(entity -> {
       scene.removeEntity(entity);
       update(scene);

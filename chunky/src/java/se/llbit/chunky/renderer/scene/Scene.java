@@ -28,6 +28,7 @@ import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
+import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
@@ -1034,7 +1035,12 @@ public class Scene implements JsonSerializable, Refreshable {
             // Metadata is the old block data (to be replaced in future Minecraft versions?).
             Vector3 position = new Vector3(x + wx0, y, z + wz0);
             if (block.isBlockEntity()) {
-              entities.add(block.toBlockEntity(position, entityTag));
+              Entity blockEntity = block.toBlockEntity(position, entityTag);
+              if (blockEntity instanceof Poseable ){
+                actors.add(blockEntity);
+              } else {
+                entities.add(blockEntity);
+              }
             }
             /*
             switch (block) {
