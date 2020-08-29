@@ -246,9 +246,9 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       partList.getSelectionModel().selectedItemProperty().addListener(
           (observable, oldValue, part) ->
               withPose(entity, part, partPose -> {
-                pitch.set(partPose.get(0).asDouble(0));
-                yaw.set(partPose.get(1).asDouble(0));
-                roll.set(partPose.get(2).asDouble(0));
+                pitch.set(Math.toDegrees(partPose.get(0).asDouble(0)));
+                yaw.set(Math.toDegrees(partPose.get(1).asDouble(0)));
+                roll.set(Math.toDegrees(partPose.get(2).asDouble(0)));
             }
           ));
 
