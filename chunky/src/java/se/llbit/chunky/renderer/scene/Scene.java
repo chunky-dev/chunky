@@ -1036,8 +1036,18 @@ public class Scene implements JsonSerializable, Refreshable {
             Vector3 position = new Vector3(x + wx0, y, z + wz0);
             if (block.isBlockEntity()) {
               Entity blockEntity = block.toBlockEntity(position, entityTag);
-              if (blockEntity instanceof Poseable ){
-                actors.add(blockEntity);
+              if (blockEntity instanceof Poseable) {
+                // don't add the actor again if it was already loaded from json
+                if (actors.stream().noneMatch(actor -> {
+                  if (actor.getClass().equals(blockEntity.getClass())) {
+                    Vector3 distance = new Vector3(actor.position);
+                    distance.sub(blockEntity.position);
+                    return distance.lengthSquared() < Ray.EPSILON;
+                  }
+                  return false;
+                })) {
+                  actors.add(blockEntity);
+                }
               } else {
                 entities.add(blockEntity);
               }

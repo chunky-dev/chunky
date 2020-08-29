@@ -76,10 +76,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       } else {
         if (entity instanceof ArmorStand) {
           kind = "Armor stand";
-        } else if (entity instanceof Book) {
-          kind = "Book";
         } else {
-          kind = "Other";
+          kind = entity.getClass().getSimpleName();
         }
         name = "entity";
       }
