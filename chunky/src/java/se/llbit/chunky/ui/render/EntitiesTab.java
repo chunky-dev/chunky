@@ -34,6 +34,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.entity.ArmorStand;
+import se.llbit.chunky.entity.Book;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.Geared;
 import se.llbit.chunky.entity.PlayerEntity;
@@ -76,7 +77,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         if (entity instanceof ArmorStand) {
           kind = "Armor stand";
         } else {
-          kind = "Other";
+          kind = entity.getClass().getSimpleName();
         }
         name = "entity";
       }
@@ -190,8 +191,44 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         controls.getChildren().addAll(modelBox, skinBox);
       }
 
-      DoubleAdjuster scale = new DoubleAdjuster();
+      if (entity instanceof Book) {
+        Book book = (Book) entity;
 
+        DoubleAdjuster openingAngle = new DoubleAdjuster();
+        openingAngle.setName("Opening angle");
+        openingAngle.setTooltip("Modifies the book's opening angle.");
+        openingAngle.set(Math.toDegrees(book.getOpenAngle()));
+        openingAngle.setRange(0, 180);
+        openingAngle.onValueChange(value -> {
+          book.setOpenAngle(Math.toRadians(value));
+          scene.rebuildActorBvh();
+        });
+        controls.getChildren().add(openingAngle);
+
+        DoubleAdjuster page1Angle = new DoubleAdjuster();
+        page1Angle.setName("Page 1 angle");
+        page1Angle.setTooltip("Modifies the book's first visible page's angle.");
+        page1Angle.set(Math.toDegrees(book.getPageAngleA()));
+        page1Angle.setRange(0, 180);
+        page1Angle.onValueChange(value -> {
+          book.setPageAngleA(Math.toRadians(value));
+          scene.rebuildActorBvh();
+        });
+        controls.getChildren().add(page1Angle);
+
+        DoubleAdjuster page2Angle = new DoubleAdjuster();
+        page2Angle.setName("Page 2 angle");
+        page2Angle.setTooltip("Modifies the book's second visible page's angle.");
+        page2Angle.set(Math.toDegrees(book.getPageAngleB()));
+        page2Angle.setRange(0, 180);
+        page2Angle.onValueChange(value -> {
+          book.setPageAngleB(Math.toRadians(value));
+          scene.rebuildActorBvh();
+        });
+        controls.getChildren().add(page2Angle);
+      }
+
+      DoubleAdjuster scale = new DoubleAdjuster();
       scale.setName("Scale");
       scale.setTooltip("Modifies entity scale.");
       scale.set(poseable.getScale());
@@ -200,17 +237,22 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         poseable.setScale(value);
         scene.rebuildActorBvh();
       });
+      controls.getChildren().add(scale);
 
-      DoubleAdjuster headScale = new DoubleAdjuster();
-      headScale.setName("Head scale");
-      headScale.setTooltip("Modifies entity head scale.");
-      headScale.set(poseable.getHeadScale());
-      headScale.setRange(0.1, 10);
-      headScale.onValueChange(value -> {
-        poseable.setHeadScale(value);
-        scene.rebuildActorBvh();
-      });
+      if (poseable.hasHead()) {
+        DoubleAdjuster headScale = new DoubleAdjuster();
+        headScale.setName("Head scale");
+        headScale.setTooltip("Modifies entity head scale.");
+        headScale.set(poseable.getHeadScale());
+        headScale.setRange(0.1, 10);
+        headScale.onValueChange(value -> {
+          poseable.setHeadScale(value);
+          scene.rebuildActorBvh();
+        });
+        controls.getChildren().add(headScale);
+      }
 
+      String[] partNames = poseable.partNames();
       ChoiceBox<String> partList = new ChoiceBox<>();
       partList.setTooltip(new Tooltip("Select the part of the entity to adjust."));
       partList.getItems().setAll(poseable.partNames());
@@ -219,6 +261,9 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       poseBox.setSpacing(10.0);
       poseBox.setAlignment(Pos.CENTER_LEFT);
       poseBox.getChildren().addAll(new Label("Pose part"), partList);
+      if (partNames.length > 1) {
+        controls.getChildren().add(poseBox);
+      }
 
       AngleAdjuster yaw = new AngleAdjuster();
       yaw.setTooltip("Modifies yaw of currently selected entity part.");
@@ -235,9 +280,9 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       partList.getSelectionModel().selectedItemProperty().addListener(
           (observable, oldValue, part) ->
               withPose(entity, part, partPose -> {
-                pitch.set(partPose.get(0).asDouble(0));
-                yaw.set(partPose.get(1).asDouble(0));
-                roll.set(partPose.get(2).asDouble(0));
+                pitch.set(Math.toDegrees(partPose.get(0).asDouble(0)));
+                yaw.set(Math.toDegrees(partPose.get(1).asDouble(0)));
+                roll.set(Math.toDegrees(partPose.get(2).asDouble(0)));
             }
           ));
 
@@ -262,7 +307,9 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         scene.rebuildActorBvh();
       });
 
-      controls.getChildren().addAll(scale, headScale, poseBox, pitch, yaw, roll);
+      if (partNames.length > 0) {
+        controls.getChildren().addAll(pitch, yaw, roll);
+      }
     }
 
     if (entity instanceof Geared) {
@@ -318,7 +365,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       entityTable.getItems().add(data);
       entityTable.getSelectionModel().select(data);
     });
-    delete.setTooltip(new Tooltip("Delete the selected player."));
+    delete.setTooltip(new Tooltip("Delete the selected entity."));
     delete.setOnAction(e -> withEntity(entity -> {
       scene.removeEntity(entity);
       update(scene);

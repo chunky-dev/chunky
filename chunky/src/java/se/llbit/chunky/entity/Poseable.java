@@ -37,8 +37,9 @@ public interface Poseable {
   double getScale();
   void setScale(double value);
 
-  double getHeadScale();
-  void setHeadScale(double value);
+  default boolean hasHead() { return true; }
+  default double getHeadScale() { return 1; }
+  default void setHeadScale(double value) {};
 
   Vector3 getPosition();
 
