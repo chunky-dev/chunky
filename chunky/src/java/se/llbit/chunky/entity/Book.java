@@ -237,7 +237,7 @@ public class Book extends Entity implements Poseable {
       }
       if (i == 4 && (pageAngleA >= (Math.PI + openAngle) / 2
           || pageAngleB >= (Math.PI + openAngle) / 2)) {
-        continue; // the a single angle is clamped to the right pages, which would overlay this face
+        continue; // a single page is clamped to the left pages box, which would overlay this face
       }
       leftPages[i].addTriangles(faces, new TextureMaterial(Texture.book),
           Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(-pageAngle)
@@ -250,7 +250,7 @@ public class Book extends Entity implements Poseable {
       }
       if (i == 4 && (pageAngleA <= (Math.PI - openAngle) / 2
           || pageAngleB <= (Math.PI - openAngle) / 2)) {
-        continue; // the a single angle is clamped to the right pages, which would overlay this face
+            continue; // a single page is clamped to the right pages box, which would overlay this face
       }
       rightPages[i].addTriangles(faces, new TextureMaterial(Texture.book),
           Transform.NONE.translate(-0.5, -0.5, -0.5 + 1.01 / 16.0).rotateY(pageAngle)
