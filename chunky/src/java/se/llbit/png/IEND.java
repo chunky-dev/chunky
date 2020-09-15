@@ -36,11 +36,13 @@ public class IEND extends PngChunk {
    * @throws IOException
    */
   public IEND() throws IOException {
-    CrcOutputStream crcOutputStream = new CrcOutputStream();
-    DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
-    crcOut.writeInt(CHUNK_TYPE);
-    crc = crcOutputStream.getCRC();
-    crcOut.close();
+    try (
+      CrcOutputStream crcOutputStream = new CrcOutputStream();
+      DataOutputStream crcOut = new DataOutputStream(crcOutputStream)
+    ) {
+      crcOut.writeInt(CHUNK_TYPE);
+      crc = crcOutputStream.getCRC();
+    }
   }
 
   @Override public int getChunkType() {

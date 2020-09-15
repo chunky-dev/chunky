@@ -46,11 +46,12 @@ public class MCDownloader {
     System.out.println("url: " + theUrl);
     System.out.println("destination: " + destination.getAbsolutePath());
     URL url = new URL(theUrl);
-    ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
-    try (FileOutputStream out = new FileOutputStream(destination)) {
+    try (
+      ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
+      FileOutputStream out = new FileOutputStream(destination)
+    ) {
       out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
     }
-    inChannel.close();
   }
 
   /**
@@ -117,10 +118,12 @@ public class MCDownloader {
     String theUrl = String.format("http://s3.amazonaws.com/MinecraftSkins/%s.png", name);
     File destination = new File(destDir, name + ".skin.png");
     URL url = new URL(theUrl);
-    ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
-    FileOutputStream out = new FileOutputStream(destination);
-    out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
-    out.close();
+    try (
+      ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
+      FileOutputStream out = new FileOutputStream(destination)
+    ) {
+      out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+    }
   }
 
   /**

@@ -61,34 +61,35 @@ public class IHDR extends PngChunk {
   }
 
   @Override protected void writeChunkData(DataOutputStream out) throws IOException {
-    CrcOutputStream crcOutputStream = new CrcOutputStream();
-    DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
+    try (
+      CrcOutputStream crcOutputStream = new CrcOutputStream();
+      DataOutputStream crcOut = new DataOutputStream(crcOutputStream);
+    ) {
+      crcOut.writeInt(CHUNK_TYPE);
 
-    crcOut.writeInt(CHUNK_TYPE);
+      crcOut.writeInt(width);
+      out.writeInt(width);
 
-    crcOut.writeInt(width);
-    out.writeInt(width);
+      crcOut.writeInt(height);
+      out.writeInt(height);
 
-    crcOut.writeInt(height);
-    out.writeInt(height);
+      crcOut.writeByte(bitDepth);
+      out.writeByte(bitDepth);
 
-    crcOut.writeByte(bitDepth);
-    out.writeByte(bitDepth);
+      crcOut.writeByte(colorType);
+      out.writeByte(colorType);
 
-    crcOut.writeByte(colorType);
-    out.writeByte(colorType);
+      crcOut.writeByte(COMPRESSION_METHOD);
+      out.writeByte(COMPRESSION_METHOD);
 
-    crcOut.writeByte(COMPRESSION_METHOD);
-    out.writeByte(COMPRESSION_METHOD);
+      crcOut.writeByte(FILTER_METHOD);
+      out.writeByte(FILTER_METHOD);
 
-    crcOut.writeByte(FILTER_METHOD);
-    out.writeByte(FILTER_METHOD);
+      crcOut.writeByte(INTERLACE_METHOD);
+      out.writeByte(INTERLACE_METHOD);
 
-    crcOut.writeByte(INTERLACE_METHOD);
-    out.writeByte(INTERLACE_METHOD);
-
-    crc = crcOutputStream.getCRC();
-    crcOut.close();
+      crc = crcOutputStream.getCRC();
+    }
   }
 
   @Override public int getChunkLength() {

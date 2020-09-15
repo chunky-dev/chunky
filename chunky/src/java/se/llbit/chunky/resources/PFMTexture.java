@@ -30,9 +30,10 @@ import se.llbit.log.Log;
 public class PFMTexture extends AbstractHdriTexture {
 
   public PFMTexture(File file) {
-    try {
+    try (
       FileInputStream in = new FileInputStream(file);
-      Scanner scan = new Scanner(in);
+      Scanner scan = new Scanner(in)
+    ) {
       String fmt = scan.next();
       int components = 3;
       switch (fmt) {
@@ -58,30 +59,30 @@ public class PFMTexture extends AbstractHdriTexture {
         //				scale = endianScale;
       }
       scan.close();
-      RandomAccessFile f = new RandomAccessFile(file, "r");
-      long len = f.length();
-      long start = len - width * height * components * 4;
-      buf = new float[width * height * 3];
-      int offset = 0;
+      try (RandomAccessFile f = new RandomAccessFile(file, "r")) {
+        long len = f.length();
+        long start = len - width * height * components * 4;
+        buf = new float[width * height * 3];
+        int offset = 0;
 
-      FileChannel channel = f.getChannel();
-      MappedByteBuffer byteBuf = channel.map(FileChannel.MapMode.READ_ONLY, start, buf.length * 4);
-      if (bigEndian) {
-        byteBuf.order(ByteOrder.BIG_ENDIAN);
-      } else {
-        byteBuf.order(ByteOrder.LITTLE_ENDIAN);
-      }
-      while (offset < buf.length) {
-        if (components == 3) {
-          buf[offset + 0] = byteBuf.getFloat();
-          buf[offset + 1] = byteBuf.getFloat();
-          buf[offset + 2] = byteBuf.getFloat();
+        FileChannel channel = f.getChannel();
+        MappedByteBuffer byteBuf = channel.map(FileChannel.MapMode.READ_ONLY, start, buf.length * 4);
+        if (bigEndian) {
+          byteBuf.order(ByteOrder.BIG_ENDIAN);
         } else {
-          buf[offset + 0] = buf[offset + 1] = buf[offset + 2] = byteBuf.getFloat();
+          byteBuf.order(ByteOrder.LITTLE_ENDIAN);
         }
-        offset += 3;
+        while (offset < buf.length) {
+          if (components == 3) {
+            buf[offset + 0] = byteBuf.getFloat();
+            buf[offset + 1] = byteBuf.getFloat();
+            buf[offset + 2] = byteBuf.getFloat();
+          } else {
+            buf[offset + 0] = buf[offset + 1] = buf[offset + 2] = byteBuf.getFloat();
+          }
+          offset += 3;
+        }
       }
-      f.close();
     } catch (IOException e) {
       Log.error("Error loading PFM image: " + e.getMessage());
       e.printStackTrace();

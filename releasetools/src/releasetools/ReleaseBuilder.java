@@ -70,15 +70,13 @@ public class ReleaseBuilder {
   }
 
   private static String readReleaseNotes(String path) {
-    try {
-      File file = new File(path);
-      Scanner in = new Scanner(new FileInputStream(file));
+    File file = new File(path);
+    try (Scanner in = new Scanner(new FileInputStream(file))) {
       StringBuilder sb = new StringBuilder();
       while (in.hasNextLine()) {
         sb.append(in.nextLine());
         sb.append(SYS_NL);
       }
-      in.close();
       return sb.toString();
     } catch (IOException e) {
       System.err.println("WARNING: Failed to read release notes! " + e.getMessage());
@@ -88,9 +86,8 @@ public class ReleaseBuilder {
   }
 
   private static String readChangeLog(String path) {
-    try {
-      File file = new File(path);
-      Scanner in = new Scanner(new FileInputStream(file));
+    File file = new File(path);
+    try (Scanner in = new Scanner(new FileInputStream(file))) {
       in.nextLine();
       StringBuilder sb = new StringBuilder();
       while (in.hasNextLine()) {
@@ -101,7 +98,6 @@ public class ReleaseBuilder {
         sb.append(line);
         sb.append(SYS_NL);
       }
-      in.close();
       return sb.toString();
     } catch (IOException e) {
       System.err.println("WARNING: Failed to read ChangeLog! " + e.getMessage());
@@ -119,20 +115,14 @@ public class ReleaseBuilder {
   private static void buildVersionInfo(String versionName, String notes) {
     try {
       // Write composed release notes to build dir.
-      PrintWriter out = null;
-      try {
-        File targetFile = new File("build", "release_notes-" + versionName + ".txt");
-        System.out.println("Writing file " + targetFile);
-        out = new PrintWriter(targetFile);
+      File targetFile = new File("build", "release_notes-" + versionName + ".txt");
+      System.out.println("Writing file " + targetFile);
+      try (PrintWriter out = new PrintWriter(targetFile)) {
         out.print(notes);
       } catch (IOException e) {
         System.err.println("Failed to write release notes (" + e.getMessage() + ")");
         System.exit(1);
         return;
-      } finally {
-        if (out != null) {
-          out.close();
-        }
       }
 
       File chunkyCore = new File("build/chunky-core-" + versionName + ".jar");

@@ -721,15 +721,14 @@ public class Octree {
     // and reload it with another implementation
     long nodeCount = implementation.nodeCount();
     File tempFile = File.createTempFile("octree-conversion", ".bin");
-    DataOutputStream out = new DataOutputStream(new FileOutputStream(tempFile));
-    implementation.store(out);
-    out.flush();
-    out.close();
+    try (DataOutputStream out = new DataOutputStream(new FileOutputStream(tempFile))) {
+      implementation.store(out);
+    }
     implementation = null; // Allow th gc to free memory during construction of the new octree
 
-    DataInputStream in = new DataInputStream(new FileInputStream(tempFile));
-    implementation = factory.loadWithNodeCount(nodeCount, in);
-    in.close();
+    try (DataInputStream in = new DataInputStream(new FileInputStream(tempFile))) {
+      implementation = factory.loadWithNodeCount(nodeCount, in);
+    }
 
     tempFile.delete();
   }
