@@ -297,20 +297,9 @@ public class Chunky {
         scene.loadDump(context, taskTracker); // Load the render dump.
         OutputMode outputMode = scene.getOutputMode();
         if (options.imageOutputFile.isEmpty()) {
-          String extension = ".png";
-          if (outputMode == OutputMode.TIFF_32) {
-            extension = ".tiff";
-          }
-          options.imageOutputFile = String.format("%s-%d%s", scene.name(), scene.spp, extension);
+          options.imageOutputFile = String.format("%s-%d%s", scene.name(), scene.spp, outputMode.getExtension());
         }
-        switch (outputMode) {
-          case PNG:
-            System.out.println("Image output mode: PNG");
-            break;
-          case TIFF_32:
-            System.out.println("Image output mode: TIFF32");
-            break;
-        }
+        System.out.println("Image output mode: " + outputMode);
         scene.saveFrame(new File(options.imageOutputFile), taskTracker, context.numRenderThreads());
         System.out.println("Saved snapshot to " + options.imageOutputFile);
         return 0;

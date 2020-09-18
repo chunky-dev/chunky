@@ -53,6 +53,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.launcher.LauncherSettings;
@@ -728,30 +729,27 @@ public class ChunkyFxController
     if (saveFrameDirectory != null && saveFrameDirectory.isDirectory()) {
       fileChooser.setInitialDirectory(saveFrameDirectory);
     }
-    OutputMode outputMode = scene.getOutputMode();
-    String extension = ".png";
-    switch (outputMode) {
-      case PNG:
-        fileChooser.getExtensionFilters().add(
-            new FileChooser.ExtensionFilter("PNG files", "*.png"));
-        break;
-      case TIFF_32:
-        extension = ".tiff";
-        fileChooser.getExtensionFilters().add(
-            new FileChooser.ExtensionFilter("TIFF files", "*.tiff"));
-        break;
+    for (OutputMode mode : OutputMode.values()) {
+      fileChooser.getExtensionFilters().add(new ExtensionFilter(mode.toString(), "*" + mode.getExtension()));
     }
-    fileChooser.setInitialFileName(String.format("%s-%d%s",
-        scene.name(), renderer.getRenderStatus().getSpp(), extension));
+    fileChooser.getExtensionFilters().stream().filter(
+        e -> e.getExtensions().get(0).substring(1).equals(scene.getOutputMode().getExtension()))
+        .findFirst().ifPresent(fileChooser::setSelectedExtensionFilter);
+    fileChooser.setInitialFileName(String.format("%s-%d",
+        scene.name(), renderer.getRenderStatus().getSpp()));
     File target = fileChooser.showSaveDialog(saveFrameBtn.getScene().getWindow());
     if (target != null) {
+      String extension = fileChooser.selectedExtensionFilterProperty().get().getExtensions().get(0).substring(1);
+      if (extension.isEmpty()) {
+        extension = scene.getOutputMode().getExtension();
+      }
       saveFrameDirectory = target.getParentFile();
       if (!target.getName().endsWith(extension)) {
         target = new File(target.getPath() + extension);
       }
-      // TODO:
-      //scene.saveFrame(target, taskTracker);
-      scene.saveFrame(target, new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
+      // TODO: use a task tracker for progress display
+      scene.saveFrame(target, OutputMode.fromExtension(extension),
+          new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
     }
   }
 
