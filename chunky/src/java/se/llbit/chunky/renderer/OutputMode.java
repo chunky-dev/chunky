@@ -39,7 +39,7 @@ public enum OutputMode {
     }
 
     @Override public String getExtension() {
-      return ".tif";
+      return ".tiff";
     }
   };
 
@@ -50,6 +50,17 @@ public enum OutputMode {
       return OutputMode.valueOf(name);
     } catch (IllegalArgumentException e) {
       return DEFAULT;
+    }
+  }
+
+  public static OutputMode fromExtension(String extension) {
+    switch (extension) {
+      case ".png":
+        return PNG;
+      case ".tiff":
+        return TIFF_32;
+      default:
+        return DEFAULT;
     }
   }
 

@@ -1642,14 +1642,21 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Save the current frame as a PNG or TIFF image.
+   * Save the current frame as a PNG or TIFF image, depending on this scene's outputMode.
    */
   public synchronized void saveFrame(File targetFile, TaskTracker progress, int threadCount) {
+    this.saveFrame(targetFile, outputMode, progress, threadCount);
+  }
+
+  /**
+   * Save the current frame as a PNG or TIFF image.
+   */
+  public synchronized void saveFrame(File targetFile, OutputMode mode, TaskTracker progress, int threadCount) {
     computeAlpha(progress, threadCount);
     if (!finalized) {
       postProcessFrame(progress);
     }
-    writeImage(targetFile, outputMode, progress);
+    writeImage(targetFile, mode, progress);
   }
 
   /**
