@@ -33,11 +33,9 @@ public class HDRTexture extends AbstractHdriTexture {
     // rendering system (http://radsite.lbl.gov/). I studied the sources
     // (src/common/color.c) to understand how RADIANCE worked, then wrote this
     // code from scratch in an attempt to implement the same interface.
-    try {
-      RandomAccessFile raf = new RandomAccessFile(file, "r");
+    try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
       String fmt = raf.readLine();
       if (!fmt.equals("#?RADIANCE")) {
-        raf.close();
         throw new Error("not a recognized HDR format! Can only handle RGBE!");
       }
       boolean haveFormat = false;
@@ -54,18 +52,15 @@ public class HDRTexture extends AbstractHdriTexture {
         }
       }
       if (!haveFormat) {
-        raf.close();
         throw new Error("could not find image format!");
       }
       if (!format.equals("FORMAT=32-bit_rle_rgbe")) {
-        raf.close();
         throw new Error("only 32-bit RGBE HDR format supported!");
       }
       String resolution = raf.readLine();
       Pattern regex = Pattern.compile("-Y\\s(\\d+)\\s\\+X\\s(\\d+)");
       Matcher matcher = regex.matcher(resolution);
       if (!matcher.matches()) {
-        raf.close();
         throw new Error("unrecognized pixel order");
       }
       width = Integer.parseInt(matcher.group(2));
@@ -106,7 +101,6 @@ public class HDRTexture extends AbstractHdriTexture {
           offset += 3;
         }
       }
-      raf.close();
     } catch (IOException e) {
       Log.error("Error loading HRD image: " + e.getMessage());
       e.printStackTrace();

@@ -91,11 +91,9 @@ public final class JsonSettings {
         return;
       }
     }
-    try {
-      OutputStream out = new FileOutputStream(file);
-      PrettyPrinter pp = new PrettyPrinter("  ", new PrintStream(out));
+    try (OutputStream out = new FileOutputStream(file);
+         PrettyPrinter pp = new PrettyPrinter("  ", new PrintStream(out))) {
       json.prettyPrint(pp);
-      out.close();
       Log.info("Saved settings to " + file.getAbsolutePath());
     } catch (IOException e) {
       Log.warnf("Warning: Failed to save settings to %s: %s",

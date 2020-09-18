@@ -41,16 +41,13 @@ public class ZipExport {
    * @param extensions file extensions to include
    */
   public static void zip(File archive, File sceneDir, String sceneName, String[] extensions) {
-    try {
+    try (
       FileOutputStream fos = new FileOutputStream(archive);
-      ZipOutputStream zos = new ZipOutputStream(fos);
-
+      ZipOutputStream zos = new ZipOutputStream(fos)
+    ) {
       for (String extension : extensions) {
         addToZipFile(zos, sceneDir, sceneName, sceneName + extension);
       }
-
-      zos.close();
-      fos.close();
     } catch (IOException e) {
       Log.error(e);
     }
@@ -59,16 +56,16 @@ public class ZipExport {
   private static void addToZipFile(ZipOutputStream zos, File sceneDir, String prefix,
       String fileName) throws IOException {
     File file = new File(sceneDir, fileName);
-    FileInputStream fis = new FileInputStream(file);
-    ZipEntry zipEntry = new ZipEntry(prefix + "/" + fileName);
-    zos.putNextEntry(zipEntry);
+    try (FileInputStream fis = new FileInputStream(file)) {
+      ZipEntry zipEntry = new ZipEntry(prefix + "/" + fileName);
+      zos.putNextEntry(zipEntry);
 
-    byte[] bytes = new byte[4096];
-    int length;
-    while ((length = fis.read(bytes)) >= 0) {
-      zos.write(bytes, 0, length);
+      byte[] bytes = new byte[4096];
+      int length;
+      while ((length = fis.read(bytes)) >= 0) {
+        zos.write(bytes, 0, length);
+      }
+      zos.closeEntry();
     }
-    zos.closeEntry();
-    fis.close();
   }
 }

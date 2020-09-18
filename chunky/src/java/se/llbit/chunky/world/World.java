@@ -503,15 +503,15 @@ public class World implements Comparable<World> {
    */
   private void writeLevelDatToZip(ZipOutputStream zout) throws IOException {
     File levelDat = new File(worldDirectory, "level.dat");
-    FileInputStream in = new FileInputStream(levelDat);
-    zout.putNextEntry(new ZipEntry(worldDirectory.getName() + "/" + "level.dat"));
-    byte[] buf = new byte[4096];
-    int len;
-    while ((len = in.read(buf)) > 0) {
-      zout.write(buf, 0, len);
+    try (FileInputStream in = new FileInputStream(levelDat)) {
+      zout.putNextEntry(new ZipEntry(worldDirectory.getName() + "/" + "level.dat"));
+      byte[] buf = new byte[4096];
+      int len;
+      while ((len = in.read(buf)) > 0) {
+        zout.write(buf, 0, len);
+      }
+      zout.closeEntry();
     }
-    zout.closeEntry();
-    in.close();
   }
 
   private void appendRegionToZip(ZipOutputStream zout, File regionDirectory,

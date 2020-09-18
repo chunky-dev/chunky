@@ -104,11 +104,13 @@ public class UpdateChecker extends Thread {
   private void getVersion(List<VersionInfo> candidates, String url) {
     try {
       URL latestJson = new URL(url);
-      InputStream in = latestJson.openStream();
-      JsonParser parser = new JsonParser(in);
-      VersionInfo version = new VersionInfo(parser.parse().object());
-      in.close();
-      candidates.add(version);
+      try (
+        InputStream in = latestJson.openStream();
+        JsonParser parser = new JsonParser(in)
+      ) {
+        VersionInfo version = new VersionInfo(parser.parse().object());
+        candidates.add(version);
+      }
     } catch (MalformedURLException e1) {
       System.err.println("Malformed version info URL.");
       listener.updateError("Malformed version info/update site URL: " + url);

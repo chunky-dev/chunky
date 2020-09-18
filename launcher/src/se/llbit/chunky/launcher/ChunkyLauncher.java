@@ -285,10 +285,12 @@ public class ChunkyLauncher {
   public static DownloadStatus tryDownload(File libDir, VersionInfo.Library lib, String theUrl) {
     try {
       URL url = new URL(theUrl);
-      ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
-      FileOutputStream out = new FileOutputStream(lib.getFile(libDir));
-      out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
-      out.close();
+      try (
+        ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
+        FileOutputStream out = new FileOutputStream(lib.getFile(libDir))
+      ) {
+        out.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
+      }
       VersionInfo.LibraryStatus status = lib.testIntegrity(libDir);
       if (status == VersionInfo.LibraryStatus.PASSED) {
         return DownloadStatus.SUCCESS;
