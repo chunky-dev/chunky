@@ -1202,7 +1202,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "stone_button":
         return button(tag, Texture.stone);
       case "snow":
-        return new Snow(BlockProvider.stringToInt(tag.get("Properties").get("layers"), 1));
+        return new Snow(Math.max(1, Math.min(8, BlockProvider.stringToInt(tag.get("Properties").get("layers"), 1))));
       case "ice":
         return new MinecraftBlock(name, Texture.ice);
       case "snow_block":
