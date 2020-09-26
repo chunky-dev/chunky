@@ -20,6 +20,7 @@ import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.BlockProvider;
 import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockProvider;
+import se.llbit.chunky.main.CommandLineOptions.Mode;
 import se.llbit.chunky.plugin.ChunkyPlugin;
 import se.llbit.chunky.plugin.TabTransformer;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
@@ -61,8 +62,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Chunky is a Minecraft mapping and rendering tool created by
- * Jesper Öqvist (jesper@llbit.se).
+ * Chunky is a Minecraft mapping and rendering tool created byJesper Öqvist (jesper@llbit.se).
  *
  * <p>Read more about Chunky at <a href="https://chunky.llbit.se">https://chunky.llbit.se</a>.
  */
@@ -93,6 +93,7 @@ public class Chunky {
   private RayTracerFactory rayTracerFactory = PathTracer::new;
   private RenderControlsTabTransformer renderControlsTabTransformer = tabs -> tabs;
   private TabTransformer mainTabTransformer = tabs -> tabs;
+  private boolean headless = false;
 
   /**
    * @return The title of the main window. Includes the current version string.
@@ -118,11 +119,9 @@ public class Chunky {
     HeadlessErrorTrackingLogger logger = new HeadlessErrorTrackingLogger();
     Log.setReceiver(logger, Level.INFO, Level.WARNING, Level.ERROR);
 
-    RenderContext context = renderContextFactory.newRenderContext(this);
-    Renderer renderer = rendererFactory.newRenderer(context, true);
-    SynchronousSceneManager sceneManager = new SynchronousSceneManager(context, renderer);
-    renderer.setSceneProvider(sceneManager);
-    renderController = new RenderController(context, renderer, sceneManager, sceneManager);
+    SynchronousSceneManager sceneManager = (SynchronousSceneManager) getRenderController()
+        .getSceneManager();
+    Renderer renderer = getRenderController().getRenderer();
     TaskTracker taskTracker = new TaskTracker(new ConsoleProgressListener(),
         (tracker, previous, name, size) -> new TaskTracker.Task(tracker, previous, name, size) {
           @Override
@@ -137,7 +136,8 @@ public class Chunky {
     renderer.setSnapshotControl(SnapshotControl.DEFAULT);
     renderer.setOnFrameCompleted((scene, spp) -> {
       if (SnapshotControl.DEFAULT.saveSnapshot(scene, spp)) {
-        scene.saveSnapshot(new File(getRenderContext().getSceneDirectory(), "snapshots"), taskTracker, getRenderContext().numRenderThreads());
+        scene.saveSnapshot(new File(getRenderContext().getSceneDirectory(), "snapshots"),
+            taskTracker, getRenderContext().numRenderThreads());
       }
 
       if (SnapshotControl.DEFAULT.saveRenderDump(scene, spp)) {
@@ -156,7 +156,8 @@ public class Chunky {
       int minutes = (int) ((time / 60000) % 60);
       int hours = (int) (time / 3600000);
       System.out.println(String
-          .format("Total rendering time: %d hours, %d minutes, %d seconds", hours, minutes, seconds));
+          .format("Total rendering time: %d hours, %d minutes, %d seconds", hours, minutes,
+              seconds));
       System.out.println("Average samples per second (SPS): " + sps);
     });
 
@@ -192,8 +193,8 @@ public class Chunky {
   }
 
   /**
-   * Main entry point for Chunky. Chunky should normally be started via
-   * the launcher which sets up the classpath with all dependencies.
+   * Main entry point for Chunky. Chunky should normally be started via the launcher which sets up
+   * the classpath with all dependencies.
    */
   public static void main(final String[] args) {
     CommandLineOptions cmdline = new CommandLineOptions(args);
@@ -205,6 +206,7 @@ public class Chunky {
     int exitCode = 0;
     if (cmdline.mode != CommandLineOptions.Mode.NOTHING) {
       Chunky chunky = new Chunky(cmdline.options);
+      chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.SNAPSHOT;
       chunky.loadPlugins();
 
       try {
@@ -250,20 +252,23 @@ public class Chunky {
       if (!jarName.isEmpty()) {
         Log.info("Loading plugin: " + value);
         try {
-          ChunkyPlugin.load(pluginsPath.resolve(jarName).toRealPath().toFile(), (plugin, manifest) -> {
-            String pluginName = manifest.get("name").asString("");
-            if (loadedPlugins.contains(pluginName)) {
-              Log.warnf("Multiple plugins with the same name (\"%s\") are enabled. Loading multiple versions of the same plugin can lead to strange behavior.", pluginName);
-            }
-            loadedPlugins.add(pluginName);
-            try {
-              plugin.attach(this);
-            } catch (Throwable t) {
-              Log.error("Plugin " + jarName + " failed to load.", t);
-            }
-            Log.infof("Plugin loaded: %s %s", manifest.get("name").asString(""),
-                manifest.get("version").asString(""));
-          });
+          ChunkyPlugin
+              .load(pluginsPath.resolve(jarName).toRealPath().toFile(), (plugin, manifest) -> {
+                String pluginName = manifest.get("name").asString("");
+                if (loadedPlugins.contains(pluginName)) {
+                  Log.warnf(
+                      "Multiple plugins with the same name (\"%s\") are enabled. Loading multiple versions of the same plugin can lead to strange behavior.",
+                      pluginName);
+                }
+                loadedPlugins.add(pluginName);
+                try {
+                  plugin.attach(this);
+                } catch (Throwable t) {
+                  Log.error("Plugin " + jarName + " failed to load.", t);
+                }
+                Log.infof("Plugin loaded: %s %s", manifest.get("name").asString(""),
+                    manifest.get("version").asString(""));
+              });
         } catch (Throwable t) {
           Log.error("Plugin " + jarName + " failed to load.", t);
         }
@@ -297,7 +302,8 @@ public class Chunky {
         scene.loadDump(context, taskTracker); // Load the render dump.
         OutputMode outputMode = scene.getOutputMode();
         if (options.imageOutputFile.isEmpty()) {
-          options.imageOutputFile = String.format("%s-%d%s", scene.name(), scene.spp, outputMode.getExtension());
+          options.imageOutputFile = String
+              .format("%s-%d%s", scene.name(), scene.spp, outputMode.getExtension());
         }
         System.out.println("Image output mode: " + outputMode);
         scene.saveFrame(new File(options.imageOutputFile), taskTracker, context.numRenderThreads());
@@ -320,14 +326,23 @@ public class Chunky {
 
   public RenderController getRenderController() {
     if (renderController == null) {
+      // The renderController initialization is deferred to its first usage because plugins may want to overwrite
+      // factories (which would require a new RenderController) but still add listeners e.g. to the Renderer which would
+      // then be overwritten.
       RenderContext context = renderContextFactory.newRenderContext(this);
-      Renderer renderer = rendererFactory.newRenderer(context, false);
-      AsynchronousSceneManager sceneManager = new AsynchronousSceneManager(context, renderer);
-      SceneProvider sceneProvider = sceneManager.getSceneProvider();
-      renderer.setSceneProvider(sceneProvider);
-      renderer.start();
-      sceneManager.start();
-      renderController = new RenderController(context, renderer, sceneManager, sceneProvider);
+      Renderer renderer = rendererFactory.newRenderer(context, headless);
+      if (headless) {
+        SynchronousSceneManager sceneManager = new SynchronousSceneManager(context, renderer);
+        renderer.setSceneProvider(sceneManager);
+        renderController = new RenderController(context, renderer, sceneManager, sceneManager);
+      } else {
+        AsynchronousSceneManager sceneManager = new AsynchronousSceneManager(context, renderer);
+        SceneProvider sceneProvider = sceneManager.getSceneProvider();
+        renderer.setSceneProvider(sceneProvider);
+        renderer.start();
+        sceneManager.start();
+        renderController = new RenderController(context, renderer, sceneManager, sceneProvider);
+      }
     }
     return renderController;
   }
