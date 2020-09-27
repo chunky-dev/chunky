@@ -117,7 +117,7 @@ public class SurfaceLayer extends BitmapLayer {
               depth += 1;
             }
 
-            ColorUtil.getRGBAComponents(Texture.water.getAvgColor(), blockColor);
+            ColorUtil.getRGBAComponents(Biomes.getWaterColor(biomeId), blockColor);
             blockColor[3] = QuickMath.max(.5f, 1.f - depth / 32.f);
           } else {
             if (block.opaque && y > 64) {
