@@ -26,7 +26,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class OctreeFileFormat {
-  private static final int OCTREE_VERSION = 3;
+  private static final int MIN_OCTREE_VERSION = 3;
+  private static final int OCTREE_VERSION = 4;
 
   /**
    * Load octrees and grass/foliage textures from a file.
@@ -36,10 +37,10 @@ public class OctreeFileFormat {
    */
   public static OctreeData load(DataInputStream in, String impl) throws IOException {
     int version = in.readInt();
-    if (version != OCTREE_VERSION) {
+    if (version < MIN_OCTREE_VERSION || version > OCTREE_VERSION) {
       throw new IOException(String.format(
-          "Incompatible octree format: wrong version number (expected %d, was %d).",
-          OCTREE_VERSION, version));
+          "Incompatible octree format: wrong version number (expected %d up to %d, was %d).",
+          MIN_OCTREE_VERSION, OCTREE_VERSION, version));
     }
     OctreeData data = new OctreeData();
     data.palette = BlockPalette.read(in);
@@ -47,15 +48,18 @@ public class OctreeFileFormat {
     data.waterTree = Octree.load(impl, in);
     data.grassColors = WorldTexture.load(in);
     data.foliageColors = WorldTexture.load(in);
+    if (version >= 4) {
+      data.waterColors = WorldTexture.load(in);
+    }
     return data;
   }
 
   /**
-   * Save octrees and grass/foliage textures to a file.
+   * Save octrees and grass/foliage/water textures to a file.
    */
   public static void store(DataOutputStream out, Octree octree,
       Octree waterTree, BlockPalette palette,
-      WorldTexture grassColors, WorldTexture foliageColors)
+      WorldTexture grassColors, WorldTexture foliageColors, WorldTexture waterColors)
       throws IOException {
     out.writeInt(OCTREE_VERSION);
     palette.write(out);
@@ -63,11 +67,12 @@ public class OctreeFileFormat {
     waterTree.store(out);
     grassColors.store(out);
     foliageColors.store(out);
+    waterColors.store(out);
   }
 
   public static class OctreeData {
     public Octree worldTree, waterTree;
-    public WorldTexture grassColors, foliageColors;
+    public WorldTexture grassColors, foliageColors, waterColors;
     public BlockPalette palette;
   }
 }

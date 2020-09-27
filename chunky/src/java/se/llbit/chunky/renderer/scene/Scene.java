@@ -266,6 +266,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private WorldTexture grassTexture = new WorldTexture();
   private WorldTexture foliageTexture = new WorldTexture();
+  private WorldTexture waterTexture;
 
   /** This is the 8-bit channel frame buffer. */
   protected BitmapImage frontBuffer;
@@ -385,6 +386,7 @@ public class Scene implements JsonSerializable, Refreshable {
       renderActors = other.renderActors;
       grassTexture = other.grassTexture;
       foliageTexture = other.foliageTexture;
+      waterTexture = other.waterTexture;
       origin.set(other.origin);
 
       chunks = other.chunks;
@@ -453,7 +455,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * @throws InterruptedException
    */
   public synchronized void saveScene(RenderContext context, TaskTracker taskTracker)
-      throws IOException, InterruptedException {
+      throws IOException {
     try (TaskTracker.Task task = taskTracker.task("Saving scene", 2)) {
       task.update(1);
 
@@ -688,6 +690,11 @@ public class Scene implements JsonSerializable, Refreshable {
         ray.color.x = waterColor.x;
         ray.color.y = waterColor.y;
         ray.color.z = waterColor.z;
+      } else {
+        float[] waterColor = ray.getBiomeWaterColor(this);
+        ray.color.x *= waterColor[0];
+        ray.color.y *= waterColor[1];
+        ray.color.z *= waterColor[2];
       }
       ray.color.w = waterOpacity;
     }
@@ -1070,6 +1077,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
     grassTexture = new WorldTexture();
     foliageTexture = new WorldTexture();
+    waterTexture = new WorldTexture();
 
     Set<ChunkPosition> chunkSet = new HashSet<>(chunksToLoad);
 
@@ -1090,6 +1098,7 @@ public class Scene implements JsonSerializable, Refreshable {
             int nsum = 0;
             float[] grassMix = {0, 0, 0};
             float[] foliageMix = {0, 0, 0};
+            float[] waterMix = {0, 0, 0};
             for (int sx = x - 1; sx <= x + 1; ++sx) {
               int wx = cp.x * 16 + sx;
               for (int sz = z - 1; sz <= z + 1; ++sz) {
@@ -1107,6 +1116,10 @@ public class Scene implements JsonSerializable, Refreshable {
                   foliageMix[0] += foliageColor[0];
                   foliageMix[1] += foliageColor[1];
                   foliageMix[2] += foliageColor[2];
+                  float[] waterColor = Biomes.getWaterColorLinear(biomeId);
+                  waterMix[0] += waterColor[0];
+                  waterMix[1] += waterColor[1];
+                  waterMix[2] += waterColor[2];
                 }
               }
             }
@@ -1119,6 +1132,11 @@ public class Scene implements JsonSerializable, Refreshable {
             foliageMix[1] /= nsum;
             foliageMix[2] /= nsum;
             foliageTexture.set(cp.x * 16 + x - origin.x, cp.z * 16 + z - origin.z, foliageMix);
+
+            waterMix[0] /= nsum;
+            waterMix[1] /= nsum;
+            waterMix[2] /= nsum;
+            waterTexture.set(cp.x * 16 + x - origin.x, cp.z * 16 + z - origin.z, waterMix);
           }
         }
         task.update(target, done);
@@ -1838,13 +1856,13 @@ public class Scene implements JsonSerializable, Refreshable {
 
       try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName)))) {
         OctreeFileFormat.store(out, worldOctree, waterOctree, palette,
-            grassTexture, foliageTexture);
+            grassTexture, foliageTexture, waterTexture);
         worldOctree.setTimestamp(context.fileTimestamp(fileName));
 
         task.update(2);
         Log.info("Octree saved");
       } catch (IOException e) {
-        Log.warn("IO exception while saving octree!", e);
+        Log.warn("IO exception while saving octree", e);
       }
     }
   }
@@ -1951,6 +1969,7 @@ public class Scene implements JsonSerializable, Refreshable {
         waterOctree = data.waterTree;
         grassTexture = data.grassColors;
         foliageTexture = data.foliageColors;
+        waterTexture = data.waterColors;
         palette = data.palette;
         palette.applyMaterials();
         task.update(2);
@@ -2261,6 +2280,19 @@ public class Scene implements JsonSerializable, Refreshable {
       return grassTexture.get(x, z);
     } else {
       return Biomes.getGrassColorLinear(0);
+    }
+  }
+
+  /**
+   * @param x X coordinate in octree space
+   * @param z Z coordinate in octree space
+   * @return Water color for the given coordinates
+   */
+  public float[] getWaterColor(int x, int z) {
+    if (biomeColors && waterTexture != null) {
+      return waterTexture.get(x, z);
+    } else {
+      return Biomes.getWaterColorLinear(0);
     }
   }
 

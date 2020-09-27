@@ -47,12 +47,12 @@ public class Biomes {
       new Biome("extreme hills", 0.2, 0.3, 0x606060, 0x75B646);
   private static final Biome forest = new Biome("forest", 0.7, 0.8, 0x056621, 0x4A8F3A);
   private static final Biome taiga = new Biome("taiga", 0.05, 0.8, 0x00DD2D, 0x478852);
-  private static final Biome swampland = new Biome("swampland", 0.8, 0.9, 0x07F9B2, 0x3e5226);
+  private static final Biome swampland = new Biome("swampland", 0.8, 0.9, 0x07F9B2, 0x3e5226, 0x617b64);
   private static final Biome river = new Biome("river", 0.5, 0.5, 0x0000FF, 0x75B646);
   private static final Biome hell = new Biome("hell", 1.0, 0.0, 0xFF0000, 0x75B646);
   private static final Biome sky = new Biome("sky", 0.5, 0.5, 0x8080FF, 0x75B646);
-  private static final Biome frozenOcean = new Biome("frozen ocean", 0.0, 0.5, 0x9090A0, 0x7A9C91);
-  private static final Biome frozenRiver = new Biome("frozen river", 0.0, 0.5, 0xA0A0FF, 0x7A9C91);
+  private static final Biome frozenOcean = new Biome("frozen ocean", 0.0, 0.5, 0x9090A0, 0x7A9C91, 0x3938c9);
+  private static final Biome frozenRiver = new Biome("frozen river", 0.0, 0.5, 0xA0A0FF, 0x7A9C91, 0x3938c9);
   private static final Biome icePlains = new Biome("ice plains", 0.0, 0.5, 0xFFFFFF, 0x7A9C91);
   private static final Biome iceMountains =
       new Biome("ice mountains", 0.0, 0.5, 0xA0A0A0, 0x7A9C91);
@@ -92,6 +92,9 @@ public class Biomes {
   private static final Biome mesaPlateauF =
       new Biome("mesa plateau f", 2.0, 0.0, 0xB09765, 0xAEA42A);
   private static final Biome mesaPlateau = new Biome("mesa plateau", 2.0, 0.0, 0xCA8C65, 0xAEA42A);
+  private static final Biome warmOcean = new Biome("warm ocean", 0.5, 0.5, 0x000070, 0x71A74D, 0x43d5ee);
+  private static final Biome lukewarmOcean = new Biome("warm ocean", 0.5, 0.5, 0x000070, 0x71A74D, 0x45adf2);
+  private static final Biome coldOcean = new Biome("warm ocean", 0.5, 0.5, 0x000070, 0x71A74D, 0x3d57d6);
 
   private static final Biome biomes[] =
       {ocean, plains, desert, extremeHills, forest, taiga, swampland, river, hell, sky, frozenOcean,
@@ -99,8 +102,8 @@ public class Biomes {
           desertHills, forestHills, taigaHills, extremeHillsEdge, jungle, jungleHills, jungleEdge,
           deepOcean, stoneBeach, coldBeach, birchForest, birchForestHills, roofedForest, coldTaiga,
           coldTaigaHills, megaTaiga, megaTaigaHills, extremeHillsPlus, savanna, savannaPlateau,
-          mesa, mesaPlateauF, mesaPlateau, unknown, unknown, unknown, unknown, unknown, unknown,
-          unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
+          mesa, mesaPlateauF, mesaPlateau, unknown, unknown, unknown, unknown, warmOcean, lukewarmOcean,
+          coldOcean, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
           unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
           unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
           unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown,
@@ -112,16 +115,20 @@ public class Biomes {
 
   private static int[] grassColor = new int[128];
   private static int[] foliageColor = new int[128];
+  private static int[] waterColor = new int[128];
   private static float[][] grassColorLinear = new float[grassColor.length][3];
   private static float[][] foliageColorLinear = new float[grassColor.length][3];
+  private static float[][] waterColorLinear = new float[grassColor.length][3];
 
   static {
     for (int i = 0; i < biomes.length; ++i) {
       grassColor[i] = biomes[i].grassColor;
       foliageColor[i] = grassColor[i];
+      waterColor[i] = biomes[i].waterColor;
     }
     gammaCorrectColors(grassColor, grassColorLinear);
     gammaCorrectColors(foliageColor, foliageColorLinear);
+    gammaCorrectColors(waterColor, waterColorLinear);
   }
 
   /**
@@ -187,6 +194,14 @@ public class Biomes {
 
   /**
    * @param biomeId truncated to [0,127]
+   * @return Water color for the given biome ID
+   */
+  public static int getWaterColor(int biomeId) {
+    return waterColor[BIOME_MASK & biomeId];
+  }
+
+  /**
+   * @param biomeId truncated to [0,127]
    * @return Linear biome color for the given biome ID
    */
   public static float[] getGrassColorLinear(int biomeId) {
@@ -199,6 +214,14 @@ public class Biomes {
    */
   public static float[] getFoliageColorLinear(int biomeId) {
     return foliageColorLinear[BIOME_MASK & biomeId];
+  }
+
+  /**
+   * @param biomeId truncated to [0,127]
+   * @return Linear water color for the given biome ID
+   */
+  public static float[] getWaterColorLinear(int biomeId) {
+    return waterColorLinear[BIOME_MASK & biomeId];
   }
 
   /**
