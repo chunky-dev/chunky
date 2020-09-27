@@ -29,7 +29,9 @@ import se.llbit.math.QuickMath;
  */
 public class Biomes {
   public static final int BIOME_MASK = 0xFF;
-  private static final int SWAMP_ID = 6;
+  private static final int[] SWAMP_IDS = { 6, 134 };
+  private static final int[] BADLANDS_IDS = { 37, 38, 39, 165, 166, 167 };
+  private static final int[] DARK_FOREST_IDS = { 29, 157 };
 
   private static final Biome unknown = new Biome("unknown", 0.5, 0.5, 0x7E7E7E, 0x7E7E7E, 0x7E7E7E);
 
@@ -181,6 +183,22 @@ public class Biomes {
    */
   public static void loadGrassColors(BitmapImage texture) {
     loadColorsFromTexture(grassColor, texture);
+    
+    // Dark forest biomes' grass color is retrieved normally, then averaged with 0x28340A to produce the final color
+    float[] color = new float[3];
+    for (int id : DARK_FOREST_IDS) {
+      ColorUtil.getRGBComponents(grassColor[id], color);
+      color[0] += 40 / 255.f;
+      color[1] += 52 / 255.f;
+      color[2] += 10 / 255.f;
+      grassColor[id] = ColorUtil.getRGB(color[0] / 2, color[1] / 2, color[2] / 2);
+    }
+    
+    // Badland biome's grass color is hardcoded
+    for (int id : BADLANDS_IDS) {
+      grassColor[id] = 0x90814D;
+    }
+    
     gammaCorrectColors(grassColor, grassColorLinear);
   }
 
@@ -189,6 +207,12 @@ public class Biomes {
    */
   public static void loadFoliageColors(BitmapImage texture) {
     loadColorsFromTexture(foliageColor, texture);
+
+    // Badland biome's foliage colors are hardcoded
+    for (int id : BADLANDS_IDS) {
+      foliageColor[id] = 0x9E814D;
+    }
+
     gammaCorrectColors(foliageColor, foliageColorLinear);
   }
 
@@ -200,8 +224,12 @@ public class Biomes {
       int color = texture.getPixel((int) ((1 - temp) * 255), (int) ((1 - rain) * 255));
       dest[i] = color;
     }
-    // Swamp get special treatment.
-    dest[SWAMP_ID] = ((dest[SWAMP_ID] & 0xFEFEFE) + 0x4E0E4E) / 2;
+
+    // Swamp biome's grass and foliage colors are hardcoded
+    // (actually perlin noise with two colors in Java Edition, for we use one color as in Bedrock Edition)
+    for (int id : SWAMP_IDS) {
+      dest[id] = 0x6A7039;
+    }
   }
 
   private static void gammaCorrectColors(int[] src, float[][] dest) {
