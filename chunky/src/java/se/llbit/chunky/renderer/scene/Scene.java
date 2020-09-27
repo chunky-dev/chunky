@@ -464,8 +464,6 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       saveOctree(context, taskTracker);
-      saveGrassTexture(context, taskTracker);
-      saveFoliageTexture(context, taskTracker);
       saveDump(context, taskTracker);
       saveEmitterGrid(context, taskTracker);
     }
@@ -1863,47 +1861,6 @@ public class Scene implements JsonSerializable, Refreshable {
         Log.info("Octree saved");
       } catch (IOException e) {
         Log.warn("IO exception while saving octree", e);
-      }
-    }
-  }
-
-  private synchronized void saveGrassTexture(RenderContext context,
-      TaskTracker progress) {
-    String fileName = name + ".grass";
-    if (context.fileUnchangedSince(fileName, grassTexture.getTimestamp())) {
-      Log.info("Skipping redundant grass texture write");
-      return;
-    }
-    try (TaskTracker.Task task = progress.task("Saving grass texture", 2)) {
-      task.update(1);
-      Log.info("Saving grass texture " + fileName);
-      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName)))) {
-        grassTexture.store(out);
-        grassTexture.setTimestamp(context.fileTimestamp(fileName));
-        task.update(2);
-        Log.info("Grass texture saved");
-      } catch (IOException e) {
-        Log.warn("IO exception while saving octree!", e);
-      }
-    }
-  }
-
-  private synchronized void saveFoliageTexture(RenderContext context, TaskTracker progress) {
-    String fileName = name + ".foliage";
-    if (context.fileUnchangedSince(fileName, foliageTexture.getTimestamp())) {
-      Log.info("Skipping redundant foliage texture write");
-      return;
-    }
-    try (TaskTracker.Task task = progress.task("Saving foliage texture", 2)) {
-      task.update(1);
-      Log.info("Saving foliage texture " + fileName);
-      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName)))) {
-        foliageTexture.store(out);
-        foliageTexture.setTimestamp(context.fileTimestamp(fileName));
-        task.update(2);
-        Log.info("Foliage texture saved");
-      } catch (IOException e) {
-        Log.warn("IO exception while saving octree!", e);
       }
     }
   }
