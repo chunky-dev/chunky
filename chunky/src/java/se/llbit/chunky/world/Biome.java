@@ -30,11 +30,18 @@ public class Biome {
    */
   public int grassColor;
 
+  public int waterColor;
+
   public Biome(String name, double temp, double rain, int mapColor, int grassColor) {
+    this(name, temp, rain, mapColor, grassColor, 0x3f76e4);
+  }
+
+  public Biome(String name, double temp, double rain, int mapColor, int grassColor, int waterColor) {
     this.name = name;
     this.temp = (float) temp;
     this.rain = (float) rain;
     this.mapColor = 0xFF000000 | mapColor;
     this.grassColor = grassColor;
+    this.waterColor = waterColor;
   }
 }

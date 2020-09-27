@@ -259,6 +259,13 @@ public class Ray {
   }
 
   /**
+   * @return water color for the current block
+   */
+  public float[] getBiomeWaterColor(Scene scene) {
+    return scene.getWaterColor((int) (o.x + d.x * OFFSET), (int) (o.z + d.z * OFFSET));
+  }
+
+  /**
    * Set this ray to a random diffuse reflection of the input ray.
    */
   public final void diffuseReflection(Ray ray, Random random) {
