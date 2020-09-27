@@ -26,22 +26,28 @@ public class Biome {
   public int mapColor;
 
   /**
-   * Default grass/foliage color before loading from resource pack.
+   * Default grass color before loading from resource pack.
    */
   public int grassColor;
 
+  /**
+   * Default foliage color before loading from resource pack.
+   */
+  public int foliageColor;
+
   public int waterColor;
 
-  public Biome(String name, double temp, double rain, int mapColor, int grassColor) {
-    this(name, temp, rain, mapColor, grassColor, 0x3f76e4);
+  public Biome(String name, double temp, double rain, int mapColor, int grassColor, int foliageColor) {
+    this(name, temp, rain, mapColor, grassColor, foliageColor, 0x3f76e4);
   }
 
-  public Biome(String name, double temp, double rain, int mapColor, int grassColor, int waterColor) {
+  public Biome(String name, double temp, double rain, int mapColor, int grassColor, int foliageColor, int waterColor) {
     this.name = name;
     this.temp = (float) temp;
     this.rain = (float) rain;
     this.mapColor = 0xFF000000 | mapColor;
     this.grassColor = grassColor;
+    this.foliageColor = foliageColor;
     this.waterColor = waterColor;
   }
 }
