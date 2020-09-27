@@ -215,9 +215,23 @@ public class Chunk {
   private void extractBiomeData(@NotNull Tag biomesTag, byte[] output) {
     if (biomesTag.isByteArray(X_MAX * Z_MAX)) {
       System.arraycopy(biomesTag.byteArray(), 0, output, 0, X_MAX * Z_MAX);
+    } else if (biomesTag.isIntArray(1024)) {
+      // Since Minecraft 1.15, biome IDs are stored in an int vector with 1024 entries.
+      // Each entry stores the biome for a 4x4x4 cube, sorted by X, Z, Y. For now, we use the biome at y=0.
+      int[] data = biomesTag.intArray();
+      for (int x = 0; x < 4; x++) {
+        for (int z = 0; z < 4; z++) {
+          for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+              output[(x * 4 + i) * 16 + z * 4 + j] = (byte) data[x * 4 + z];
+            }
+          }
+        }
+      }
+      // TODO add support for different biomes in the same XZ coordinate (i.e. for the nether)
     } else if (biomesTag.isIntArray(X_MAX * Z_MAX)) {
-      // Since Minecraft 1.13, biome IDs are stored in an int vector.
-      // TODO(llbit): do we need to use ints to store biome IDs for Minecraft 1.13+?
+      // Since Minecraft 1.13, biome IDs are stored in an int vector with 256 entries (one for each XZ position).
+      // TODO(llbit): do we need to use ints to store biome IDs for Minecraft 1.13+? (not yet, the highest ID is 173)
       int[] data = biomesTag.intArray();
       for (int i = 0; i < X_MAX * Z_MAX; ++i) {
         output[i] = (byte) data[i];
