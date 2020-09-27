@@ -52,6 +52,14 @@ public class WorldTexture {
   }
 
   /**
+   * @return True if this texture contains a RGB color components at (x, z)
+   */
+  public boolean contains(int x, int z) {
+    ChunkPosition cp = ChunkPosition.get(x >> 4, z >> 4);
+    return map.containsKey(cp);
+  }
+
+  /**
    * @return RGB color components at (x, z)
    */
   public float[] get(int x, int z) {

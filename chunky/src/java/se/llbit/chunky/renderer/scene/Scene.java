@@ -2246,8 +2246,12 @@ public class Scene implements JsonSerializable, Refreshable {
    * @return Water color for the given coordinates
    */
   public float[] getWaterColor(int x, int z) {
-    if (biomeColors && waterTexture != null) {
-      return waterTexture.get(x, z);
+    if (biomeColors && waterTexture != null && waterTexture.contains(x, z)) {
+      float[] color = waterTexture.get(x, z);
+      if (color[0] > 0 || color[1] > 0 || color[2] > 0) {
+        return color;
+      }
+      return Biomes.getWaterColorLinear(0);
     } else {
       return Biomes.getWaterColorLinear(0);
     }
