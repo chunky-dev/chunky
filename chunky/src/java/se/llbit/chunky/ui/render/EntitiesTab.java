@@ -322,7 +322,9 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         TextField gearField = new TextField();
         gearField.setOnAction(event -> {
           JsonObject gear = new JsonObject();
-          gear.add("id", gearField.getText());
+          if (!gearField.getText().trim().isEmpty()) {
+            gear.add("id", gearField.getText());
+          }
           geared.getGear().set(slot, gear);
           scene.rebuildActorBvh();
         });
