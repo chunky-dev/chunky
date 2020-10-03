@@ -1,12 +1,13 @@
-#### Problem <!--Describe the problem that this PR fixes-->
-<!--Optionally refer to the issue detailing the bug: #<issue number> -->
-
-#### Proposed changes 
-<!--A few words on how the problem was solved or shortcuts found-->
+**Problem** <!--Describe the problem and refer to the open issue id any with: #<issue number> -->
 
 
-<details><summary>Metrics</summary> 
-    <!--Performance metrics if anything was improved upon-->
+
+**Proposed changes** <!--A few words on how the problem was solved or shortcuts found-->
+
+
+
+<details><summary><b>Metrics</b></summary> 
+<!--Performance metrics if relevant goes here-->
     
     
     
