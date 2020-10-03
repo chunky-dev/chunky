@@ -1,3 +1,12 @@
+---
+name: Bug report
+about: Create a short report detailing the bug
+title: "[BUG]: *Insert name of issue*"
+labels: bug
+assignees: ''
+
+---
+
 **Describe the bug**
 <!--A clear and concise description of what the bug is and it's impact.-->
 
