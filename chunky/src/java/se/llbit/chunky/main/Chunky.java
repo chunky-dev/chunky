@@ -180,12 +180,15 @@ public class Chunky {
       return 0;
     } catch (FileNotFoundException e) {
       System.err.format("Scene \"%s\" not found!%n", options.sceneName);
+      e.printStackTrace();
       return 1;
     } catch (IOException e) {
       System.err.format("IO error while loading scene (%s)%n", e.getMessage());
+      e.printStackTrace();
       return 1;
     } catch (InterruptedException e) {
       System.err.println("Interrupted while loading scene");
+      e.printStackTrace();
       return 1;
     } finally {
       renderer.shutdown();
@@ -312,6 +315,7 @@ public class Chunky {
       }
     } catch (IOException e) {
       System.err.println("Failed to dump snapshot: " + e.getMessage());
+      e.printStackTrace();
       return 1;
     }
   }
