@@ -1839,8 +1839,9 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param out output stream to write to.
    */
   private void writePfm(OutputStream out, TaskTracker progress) throws IOException {
-    try (PfmFileWriter writer = new PfmFileWriter(out)) {
-      writer.write(this, progress);
+    try (TaskTracker.Task task = progress.task("Writing PFM Rows", canvasHeight());
+         PfmFileWriter writer = new PfmFileWriter(out)) {
+      writer.write(this, task);
     }
   }
 
@@ -1848,7 +1849,7 @@ public class Scene implements JsonSerializable, Refreshable {
     String filename = name + ".emittergrid";
     // TODO Not save when unchanged?
     try(TaskTracker.Task task = progress.task("Saving Grid")) {
-      Log.info("Saving Grig " + filename);
+      Log.info("Saving Grid " + filename);
 
       try(DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(filename)))) {
         emitterGrid.store(out);
