@@ -1384,6 +1384,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (rayDepth != value) {
       rayDepth = value;
       PersistentSettings.setRayDepth(rayDepth);
+      refresh();
     }
   }
 
