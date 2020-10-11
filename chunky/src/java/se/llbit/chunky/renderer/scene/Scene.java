@@ -55,6 +55,7 @@ import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
+import se.llbit.pfm.PfmFileWriter;
 import se.llbit.png.ITXT;
 import se.llbit.png.PngFileWriter;
 import se.llbit.tiff.TiffFileWriter;
@@ -1692,8 +1693,8 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   private void computeAlpha(TaskTracker progress, int threadCount) {
     if (transparentSky) {
-      if (outputMode == OutputMode.TIFF_32) {
-        Log.warn("Can not use transparent sky with TIFF output mode.");
+      if (outputMode == OutputMode.TIFF_32 || outputMode == OutputMode.PFM) {
+        Log.warn("Can not use transparent sky with TIFF or PFM output modes. Use PNG instead.");
       } else {
         try (TaskTracker.Task task = progress.task("Computing alpha channel")) {
           ExecutorService executor = Executors.newFixedThreadPool(threadCount);
@@ -1761,6 +1762,10 @@ public class Scene implements JsonSerializable, Refreshable {
       writePng(out, progress);
     } else if (mode == OutputMode.TIFF_32) {
       writeTiff(out, progress);
+    } else if (mode == OutputMode.PFM) {
+      writePfm(out, progress);
+    } else {
+      Log.warn("Unknown Output Type");
     }
   }
 
@@ -1828,11 +1833,23 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
+  /**
+   * Write PFM image.
+   *
+   * @param out output stream to write to.
+   */
+  private void writePfm(OutputStream out, TaskTracker progress) throws IOException {
+    try (TaskTracker.Task task = progress.task("Writing PFM Rows", canvasHeight());
+         PfmFileWriter writer = new PfmFileWriter(out)) {
+      writer.write(this, task);
+    }
+  }
+
   private synchronized void saveEmitterGrid(RenderContext context, TaskTracker progress) {
     String filename = name + ".emittergrid";
     // TODO Not save when unchanged?
     try(TaskTracker.Task task = progress.task("Saving Grid")) {
-      Log.info("Saving Grig " + filename);
+      Log.info("Saving Grid " + filename);
 
       try(DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(filename)))) {
         emitterGrid.store(out);

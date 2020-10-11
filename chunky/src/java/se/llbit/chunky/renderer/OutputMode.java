@@ -41,6 +41,19 @@ public enum OutputMode {
     @Override public String getExtension() {
       return ".tiff";
     }
+  },
+
+  /**
+   * PFM with 32-bit color channels.
+   */
+  PFM {
+    @Override public String toString() {
+      return "PFM, Portable FloatMap (32-bit)";
+    }
+
+    @Override public String getExtension() {
+      return ".pfm";
+    }
   };
 
   public static final OutputMode DEFAULT = PNG;
@@ -59,6 +72,8 @@ public enum OutputMode {
         return PNG;
       case ".tiff":
         return TIFF_32;
+      case ".pfm":
+        return PFM;
       default:
         return DEFAULT;
     }
