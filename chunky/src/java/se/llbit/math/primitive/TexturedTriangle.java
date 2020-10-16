@@ -114,7 +114,7 @@ public class TexturedTriangle implements Primitive {
       float[] color = material.getColor(ray.u, ray.v);
       if (color[3] > 0) {
         ray.color.set(color);
-        ray.setCurrentMaterial(material, 0);
+        ray.setCurrentMaterial(material);
         ray.t = t;
         ray.n.set(n);
         return true;

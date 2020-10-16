@@ -21,7 +21,7 @@ public class Water extends MinecraftBlockTranslucent {
   public static final Water INSTANCE = new Water(0);
   
   // Used only as starting material when camera is submerged.
-  public static final Water OCEAN_WATER = new Water(0);
+  public static final Water OCEAN_WATER = new Water(0, 1 << Water.FULL_BLOCK);
 
   public final int level;
   public final int data;

@@ -385,19 +385,20 @@ public class Ray {
     this.prevData = data;
   }
 
+  public void setCurrentMaterial(Material mat) {
+    this.currentMaterial = mat;
+    if (mat instanceof Water) {
+      this.currentData = ((Water) mat).data;
+    } else if (mat instanceof Lava) {
+      this.currentData = ((Lava) mat).data;
+    } else {
+      this.currentData = 0;
+    }
+  }
+
   public void setCurrentMaterial(Material mat, int data) {
     this.currentMaterial = mat;
-    if (data == 0) {
-      if (mat instanceof Water) {
-        this.currentData = ((Water) mat).data;
-      } else if (mat instanceof Lava) {
-        this.currentData = ((Lava) mat).data;
-      } else {
-        this.currentData = 0;
-      }
-    } else {
-      this.currentData = data;
-    }
+    this.currentData = data;
   }
 
   public Material getPrevMaterial() {

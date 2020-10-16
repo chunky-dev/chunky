@@ -487,7 +487,7 @@ public class Octree {
       Material prevBlock = ray.getCurrentMaterial();
 
       ray.setPrevMaterial(prevBlock, ray.getCurrentData());
-      ray.setCurrentMaterial(currentBlock, 0);
+      ray.setCurrentMaterial(currentBlock);
 
       if (currentBlock.localIntersect) {
         if (currentBlock.intersect(ray, scene)) {
@@ -498,7 +498,7 @@ public class Octree {
           continue;
         } else {
           // Exit ray from this local block.
-          ray.setCurrentMaterial(Air.INSTANCE, 0); // Current material is air.
+          ray.setCurrentMaterial(Air.INSTANCE); // Current material is air.
           ray.exitBlock(x, y, z);
           continue;
         }
@@ -601,12 +601,12 @@ public class Octree {
       Material prevBlock = ray.getCurrentMaterial();
 
       ray.setPrevMaterial(prevBlock, ray.getCurrentData());
-      ray.setCurrentMaterial(currentBlock, 0);
+      ray.setCurrentMaterial(currentBlock);
 
       if (!currentBlock.isWater()) {
         if (currentBlock.localIntersect) {
           if (!currentBlock.intersect(ray, scene)) {
-            ray.setCurrentMaterial(Air.INSTANCE, 0);
+            ray.setCurrentMaterial(Air.INSTANCE);
           }
           return true;
         } else if (currentBlock != Air.INSTANCE) {
@@ -619,7 +619,7 @@ public class Octree {
 
       if (!(currentBlock instanceof Water && ((Water) currentBlock).isFullBlock())) {
         if (WaterModel.intersectTop(ray)) {
-          ray.setCurrentMaterial(Air.INSTANCE, 0);
+          ray.setCurrentMaterial(Air.INSTANCE);
           return true;
         } else {
           ray.exitBlock(x, y, z);

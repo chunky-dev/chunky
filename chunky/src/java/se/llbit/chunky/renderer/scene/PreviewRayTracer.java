@@ -36,9 +36,9 @@ public class PreviewRayTracer implements RayTracer {
   @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
     if (scene.isInWater(ray)) {
-      ray.setCurrentMaterial(Water.INSTANCE, 0);
+      ray.setCurrentMaterial(Water.INSTANCE);
     } else {
-      ray.setCurrentMaterial(Air.INSTANCE, 0);
+      ray.setCurrentMaterial(Air.INSTANCE);
     }
     while (true) {
       if (!nextIntersection(scene, ray)) {
@@ -105,7 +105,7 @@ public class PreviewRayTracer implements RayTracer {
       scene.updateOpacity(ray);
       return true;
     } else {
-      ray.setCurrentMaterial(Air.INSTANCE, 0);
+      ray.setCurrentMaterial(Air.INSTANCE);
       return false;
     }
   }
@@ -117,7 +117,7 @@ public class PreviewRayTracer implements RayTracer {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
         ray.n.set(0, 1, 0);
-        ray.setCurrentMaterial(Water.OCEAN_WATER, 1 << Water.FULL_BLOCK);
+        ray.setCurrentMaterial(Water.OCEAN_WATER);
         return true;
       }
     }
@@ -127,7 +127,7 @@ public class PreviewRayTracer implements RayTracer {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
         ray.n.set(0, -1, 0);
-        ray.setCurrentMaterial(Air.INSTANCE, 0);
+        ray.setCurrentMaterial(Air.INSTANCE);
         return true;
       }
     }
@@ -150,7 +150,7 @@ public class PreviewRayTracer implements RayTracer {
           } else {
             ray.color.set(0.25, 0.25, 0.25, 1);
           }
-          ray.setCurrentMaterial(MinecraftBlock.STONE, 0);
+          ray.setCurrentMaterial(MinecraftBlock.STONE);
           ray.n.set(0, 1, 0);
           return true;
         }

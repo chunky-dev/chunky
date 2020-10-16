@@ -1412,9 +1412,9 @@ public class Scene implements JsonSerializable, Refreshable {
     WorkerState state = new WorkerState();
     state.ray = ray;
     if (isInWater(ray)) {
-      ray.setCurrentMaterial(Water.INSTANCE, 0);
+      ray.setCurrentMaterial(Water.INSTANCE);
     } else {
-      ray.setCurrentMaterial(Air.INSTANCE, 0);
+      ray.setCurrentMaterial(Air.INSTANCE);
     }
     camera.getTargetDirection(ray);
     ray.o.x -= origin.x;
