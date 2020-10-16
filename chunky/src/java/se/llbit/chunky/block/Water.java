@@ -18,20 +18,31 @@ import java.util.List;
 
 public class Water extends MinecraftBlockTranslucent {
 
-  // Used only as starting material when camera is submerged.
   public static final Water INSTANCE = new Water(0);
+  
+  // Used only as starting material when camera is submerged.
   public static final Water OCEAN_WATER = new Water(0);
 
   public final int level;
+  public final int data;
 
-  public Water(int level) {
+  public Water(int level, int data) {
     super("water", Texture.water);
     this.level = level;
+    this.data = data;
     solid = false;
     localIntersect = true;
     specular = 0.12f;
     ior = 1.333f;
     refractive = true;
+  }
+
+  public Water(int level) {
+    this(level, 0);
+  }
+
+  public boolean isFullBlock() {
+    return (this.data & (1 << FULL_BLOCK)) != 0;
   }
 
   @Override public boolean isWater() {

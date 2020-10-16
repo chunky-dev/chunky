@@ -381,7 +381,7 @@ public class CauldronModel {
         ray.n.set(water.n);
       }
       ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());
-      ray.setCurrentMaterial(Water.INSTANCE, Water.FULL_BLOCK);
+      ray.setCurrentMaterial(Water.INSTANCE, 0);
       ray.t = ray.tNext;
     }
     if (hit) {

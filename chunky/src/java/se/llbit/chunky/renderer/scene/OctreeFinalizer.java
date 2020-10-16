@@ -26,19 +26,20 @@ import se.llbit.math.Octree;
 import se.llbit.math.Vector3i;
 
 /**
- * Processes the Octree after it has been loaded and updates block states for
- * blocks that depend on neighbor blocks. Octree finalization is be done after
- * all chunks have been loaded because before then we can't reliably test for
- * neighbor blocks.
+ * Processes the Octree after it has been loaded and updates block states for blocks that depend on
+ * neighbor blocks. Octree finalization is be done after all chunks have been loaded because before
+ * then we can't reliably test for neighbor blocks.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class OctreeFinalizer {
+
   /**
    * Finalize a chunk in the octree.
+   *
    * @param worldTree Octree to finalize
-   * @param origin Origin of the octree
-   * @param cp     Position of the chunk to finalize
+   * @param origin    Origin of the octree
+   * @param cp        Position of the chunk to finalize
    */
   public static void finalizeChunk(Octree worldTree, Octree waterTree, BlockPalette palette,
       Vector3i origin, ChunkPosition cp, int yMin, int yMax) {
@@ -48,7 +49,7 @@ public class OctreeFinalizer {
         for (int cx = 0; cx < 16; ++cx) {
           int x = cx + cp.x * 16 - origin.x;
           // process blocks that are at the edge of the chunk, the other should have be taken care of during th loading
-          if(cy == yMin || cy == yMax-1 || cz == 0 || cz == 15 || cx == 0 || cx == 15) {
+          if (cy == yMin || cy == yMax - 1 || cz == 0 || cz == 15 || cx == 0 || cx == 15) {
             hideBlocks(worldTree, palette, x, cy, z, yMin, yMax, origin);
             processBlock(worldTree, waterTree, palette, x, cy, z);
           }
@@ -58,12 +59,12 @@ public class OctreeFinalizer {
   }
 
   private static void hideBlocks(Octree worldTree, BlockPalette palette, int x,
-                                 int cy, int z, int yMin, int yMax, Vector3i origin) {
+      int cy, int z, int yMin, int yMax, Vector3i origin) {
     // Set non-visible blocks to be any block, in order to merge large patches.
     int y = cy - origin.y;
     if (cy > yMin && cy < yMax - 1) {
       boolean isHidden =
-              worldTree.getMaterial(x - 1, y, z, palette).opaque
+          worldTree.getMaterial(x - 1, y, z, palette).opaque
               && worldTree.getMaterial(x + 1, y, z, palette).opaque
               && worldTree.getMaterial(x, y, z - 1, palette).opaque
               && worldTree.getMaterial(x, y, z + 1, palette).opaque
@@ -122,14 +123,11 @@ public class OctreeFinalizer {
         corner1 = Math.min(7, 8 - (corner1 / 4));
         corner2 = Math.min(7, 8 - (corner2 / 4));
         corner3 = Math.min(7, 8 - (corner3 / 4));
-        Octree.Node node = waterTree.get(x, cy, z);
-        node = new Octree.DataNode(
-            node.type,
-            (corner0 << Water.CORNER_0)
-                | (corner1 << Water.CORNER_1)
-                | (corner2 << Water.CORNER_2)
-                | (corner3 << Water.CORNER_3));
-        waterTree.set(node, x, cy, z);
+
+        waterTree.set(palette.getWaterId(((Water) wmat).level, (corner0 << Water.CORNER_0)
+            | (corner1 << Water.CORNER_1)
+            | (corner2 << Water.CORNER_2)
+            | (corner3 << Water.CORNER_3)), x, cy, z);
       }
     } else if (mat instanceof Lava) {
       Material above = worldTree.getMaterial(x, cy + 1, z, palette);
@@ -174,14 +172,13 @@ public class OctreeFinalizer {
         corner1 = Math.min(7, 8 - (corner1 / 4));
         corner2 = Math.min(7, 8 - (corner2 / 4));
         corner3 = Math.min(7, 8 - (corner3 / 4));
-        Octree.Node node = worldTree.get(x, cy, z);
-        Octree.Node replaced = new Octree.DataNode(
-            node.type,
+        worldTree.set(palette.getLavaId(
+            lava.level,
             (corner0 << Water.CORNER_0)
                 | (corner1 << Water.CORNER_1)
                 | (corner2 << Water.CORNER_2)
-                | (corner3 << Water.CORNER_3));
-        worldTree.set(replaced, x, cy, z);
+                | (corner3 << Water.CORNER_3)
+        ), x, cy, z);
       }
     }
   }
@@ -191,8 +188,9 @@ public class OctreeFinalizer {
     Octree.Node node = waterTree.get(x, cy, z);
     Material corner = palette.get(node.type);
     if (corner instanceof Water) {
-      int fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-      return 8 - (1 - fullBlock) * ((Water) corner).level;
+      Material above = palette.get(waterTree.get(x, cy + 1, z).type);
+      boolean isFullBlock = above.isWaterFilled();
+      return isFullBlock ? 8 : 8 - ((Water) corner).level;
     } else if (corner.waterlogged) {
       return 8;
     } else if (!worldTree.getMaterial(x, cy, z, palette).solid) {
@@ -206,8 +204,9 @@ public class OctreeFinalizer {
     Octree.Node node = octree.get(x, cy, z);
     Material corner = palette.get(node.type);
     if (corner instanceof Lava) {
-      int fullBlock = (node.getData() >> Water.FULL_BLOCK) & 1;
-      return 8 - (1 - fullBlock) * ((Lava) corner).level;
+      Material above = palette.get(octree.get(x, cy + 1, z).type);
+      boolean isFullBlock = above instanceof Lava;
+      return isFullBlock ? 8 : 8 - ((Lava) corner).level;
     } else if (!corner.solid) {
       return 0;
     }

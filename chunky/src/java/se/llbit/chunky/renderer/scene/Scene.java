@@ -803,8 +803,6 @@ public class Scene implements JsonSerializable, Refreshable {
     int[] blocks = new int[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
     byte[] biomes = new byte[Chunk.X_MAX * Chunk.Z_MAX];
 
-    Block stone = palette.stone;
-
     try (TaskTracker.Task task = progress.task("Loading chunks")) {
       int done = 1;
       int target = chunksToLoad.size();
@@ -868,19 +866,19 @@ public class Scene implements JsonSerializable, Refreshable {
 
               // Change the type of hidden blocks to ANY_TYPE
               boolean notOnEdge =
-                      (cy > yMin && cy < yMax - 1)
+                  (cy > yMin && cy < yMax - 1)
                       && (cx > 0 && cx < 15)
                       && (cz > 0 && cz < 15);
               boolean isHidden = notOnEdge
-                      && palette.get(blocks[Chunk.chunkIndex(cx+1, cy, cz)]).opaque
-                      && palette.get(blocks[Chunk.chunkIndex(cx-1, cy, cz)]).opaque
-                      && palette.get(blocks[Chunk.chunkIndex(cx, cy+1, cz)]).opaque
-                      && palette.get(blocks[Chunk.chunkIndex(cx, cy-1, cz)]).opaque
-                      && palette.get(blocks[Chunk.chunkIndex(cx, cy, cz+1)]).opaque
-                      && palette.get(blocks[Chunk.chunkIndex(cx, cy, cz-1)]).opaque;
+                  && palette.get(blocks[Chunk.chunkIndex(cx + 1, cy, cz)]).opaque
+                  && palette.get(blocks[Chunk.chunkIndex(cx - 1, cy, cz)]).opaque
+                  && palette.get(blocks[Chunk.chunkIndex(cx, cy + 1, cz)]).opaque
+                  && palette.get(blocks[Chunk.chunkIndex(cx, cy - 1, cz)]).opaque
+                  && palette.get(blocks[Chunk.chunkIndex(cx, cy, cz + 1)]).opaque
+                  && palette.get(blocks[Chunk.chunkIndex(cx, cy, cz - 1)]).opaque;
 
-              if(isHidden) {
-                worldOctree.set(new Octree.Node(Octree.ANY_TYPE), x, cy - origin.y, z);
+              if (isHidden) {
+                worldOctree.set(Octree.ANY_TYPE, x, cy - origin.y, z);
               } else {
                 Octree.Node octNode = new Octree.Node(blocks[index]);
                 Block block = palette.get(blocks[index]);
@@ -903,16 +901,16 @@ public class Scene implements JsonSerializable, Refreshable {
                     int above = Chunk.chunkIndex(cx, cy + 1, cz);
                     Block aboveBlock = palette.get(blocks[above]);
                     if (aboveBlock.isWaterFilled()) {
-                      waterNode = new Octree.DataNode(palette.waterId, 1 << Water.FULL_BLOCK);
+                      waterNode = new Octree.Node(palette.getWaterId(8, 1 << Water.FULL_BLOCK));
                     }
                   }
                   if (block.isWater()) {
                     // Move plain water blocks to the water octree.
                     octNode = new Octree.Node(palette.airId);
 
-                    if(notOnEdge) {
+                    if (notOnEdge) {
                       // Perform water computation now for water blocks that are not on th edge of the chunk
-                      if(waterNode.getData() == 0) {
+                      if (((Water) palette.get(waterNode.type)).data == 0) {
                         // Test if the block has not already be marked as full
                         int level0 = 8 - ((Water) block).level;
                         int corner0 = level0;
@@ -952,12 +950,11 @@ public class Scene implements JsonSerializable, Refreshable {
                         corner1 = Math.min(7, 8 - (corner1 / 4));
                         corner2 = Math.min(7, 8 - (corner2 / 4));
                         corner3 = Math.min(7, 8 - (corner3 / 4));
-                        waterNode = new Octree.DataNode(
-                                waterNode.type,
-                                (corner0 << Water.CORNER_0)
-                                        | (corner1 << Water.CORNER_1)
-                                        | (corner2 << Water.CORNER_2)
-                                        | (corner3 << Water.CORNER_3));
+                        waterNode = new Octree.Node(
+                            palette.getWaterId(((Water) block).level, (corner0 << Water.CORNER_0)
+                                | (corner1 << Water.CORNER_1)
+                                | (corner2 << Water.CORNER_2)
+                                | (corner3 << Water.CORNER_3)));
                       }
                     }
                   }
@@ -966,10 +963,11 @@ public class Scene implements JsonSerializable, Refreshable {
                   int above = Chunk.chunkIndex(cx, cy + 1, cz);
                   Block aboveBlock = palette.get(blocks[above]);
                   if (aboveBlock instanceof Lava) {
-                    octNode = new Octree.DataNode(blocks[index], 1 << Water.FULL_BLOCK);
-                  } else if(notOnEdge) {
+                    octNode = new Octree.Node(
+                        palette.getLavaId(((Lava) block).level, 1 << Water.FULL_BLOCK));
+                  } else if (notOnEdge) {
                     // Compute lava level for blocks not on edge
-                    Lava lava = (Lava)block;
+                    Lava lava = (Lava) block;
                     int level0 = 8 - lava.level;
                     int corner0 = level0;
                     int corner1 = level0;
@@ -1008,18 +1006,19 @@ public class Scene implements JsonSerializable, Refreshable {
                     corner1 = Math.min(7, 8 - (corner1 / 4));
                     corner2 = Math.min(7, 8 - (corner2 / 4));
                     corner3 = Math.min(7, 8 - (corner3 / 4));
-                    octNode = new Octree.DataNode(
-                            octNode.type,
-                            (corner0 << Water.CORNER_0)
+                    octNode = new Octree.Node(palette.getLavaId(
+                        lava.level,
+                        (corner0 << Water.CORNER_0)
                             | (corner1 << Water.CORNER_1)
                             | (corner2 << Water.CORNER_2)
-                            | (corner3 << Water.CORNER_3));
+                            | (corner3 << Water.CORNER_3)
+                    ));
                   }
                 }
                 worldOctree.set(octNode, x, cy - origin.y, z);
 
-                if(block.emittance > 1e-4) {
-                  emitterGrid.addEmitter(x, cy-origin.y, z);
+                if (block.emittance > 1e-4) {
+                  emitterGrid.addEmitter(x, cy - origin.y, z);
                 }
 
               }
@@ -2321,7 +2320,7 @@ public class Scene implements JsonSerializable, Refreshable {
       Octree.Node node = waterOctree.get(x, y, z);
       Material block = palette.get(node.type);
       return block.isWater()
-          && ((ray.o.y - y) < 0.875 || (0 != (node.getData() & (1 << Water.FULL_BLOCK))));
+          && ((ray.o.y - y) < 0.875 || ((Water) block).isFullBlock());
     }
     return false;
   }
