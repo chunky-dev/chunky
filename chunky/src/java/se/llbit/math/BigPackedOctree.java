@@ -409,14 +409,12 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
   private void storeNode(DataOutputStream out, long nodeIndex) throws IOException {
     long value = getAt(nodeIndex);
     int type = value > 0 ? BRANCH_NODE : typeFromValue(value);
+    out.writeInt(type);
     if(type == BRANCH_NODE) {
-      out.writeInt(type);
       for(int i = 0; i < 8; ++i) {
         long childIndex = getAt(nodeIndex) + i;
         storeNode(out, childIndex);
       }
-    } else {
-      out.writeInt(type);
     }
   }
 

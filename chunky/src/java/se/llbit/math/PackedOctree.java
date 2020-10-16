@@ -376,14 +376,12 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
   private void storeNode(DataOutputStream out, int nodeIndex) throws IOException {
     int type = treeData[nodeIndex] > 0 ? BRANCH_NODE : -treeData[nodeIndex];
+    out.writeInt(type);
     if(type == BRANCH_NODE) {
-      out.writeInt(type);
       for(int i = 0; i < 8; ++i) {
         int childIndex = treeData[nodeIndex] + i;
         storeNode(out, childIndex);
       }
-    } else {
-      out.writeInt(type);
     }
   }
 
