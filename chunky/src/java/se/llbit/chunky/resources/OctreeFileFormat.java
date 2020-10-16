@@ -79,7 +79,7 @@ public class OctreeFileFormat {
     Thread convertThread = new Thread(() -> {
       try (DataOutputStream out = new DataOutputStream(pipedOut)) {
         out.writeInt(in.readInt()); // depth
-        
+
         long remainingNodes = 1;
         while (remainingNodes > 0) {
           int type = in.readInt();

@@ -214,7 +214,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * @param nodeIndex    The index of the node to merge
    * @param typeNegation The negation of the type (the value directly stored in the array)
    */
-  private void mergeNode(int nodeIndex, int typeNegation, int data) {
+  private void mergeNode(int nodeIndex, int typeNegation) {
     int childrenIndex = treeData[nodeIndex];
     freeSpace(childrenIndex); // Delete children
     treeData[nodeIndex] = typeNegation; // Make the node a leaf one
@@ -231,9 +231,6 @@ public class PackedOctree implements Octree.OctreeImplementation {
     boolean firstIsBranch = treeData[firstNodeIndex] > 0;
     boolean secondIsBranch = treeData[secondNodeIndex] > 0;
     return ((firstIsBranch && secondIsBranch) || treeData[firstNodeIndex] == treeData[secondNodeIndex]); // compare types
-    // FIXME possible bug here as we always compare the data even when dealing with nodes that don't really have data
-    // The data int could potentially contain some junk leftover of a previous node
-    // In theory it should be reset to 0 but we need to be careful
   }
 
   /**
@@ -294,7 +291,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
       }
 
       if(allSame) {
-        mergeNode(parentIndex, treeData[nodeIndex], 0);
+        mergeNode(parentIndex, treeData[nodeIndex]);
       } else {
         break;
       }
@@ -433,7 +430,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
       }
     }
     if(canMerge) {
-      mergeNode(nodeIndex, mergedType, 0);
+      mergeNode(nodeIndex, mergedType);
     }
   }
 
