@@ -97,7 +97,7 @@ public class BlockPalette {
    * @throws IllegalArgumentException If the level is out of range
    */
   public int getWaterId(int level, int data) {
-    if (level < 0 || level > 8) {
+    if (level < 0 || level > 15) {
       throw new IllegalArgumentException("Invalid water level " + level);
     }
     CompoundTag tag = new CompoundTag();
@@ -118,7 +118,7 @@ public class BlockPalette {
    * @throws IllegalArgumentException If the level is out of range
    */
   public int getLavaId(int level, int data) {
-    if (level < 0 || level > 8) {
+    if (level < 0 || level > 15) {
       throw new IllegalArgumentException("Invalid lava level " + level);
     }
     CompoundTag tag = new CompoundTag();

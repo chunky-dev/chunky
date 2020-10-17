@@ -21,7 +21,7 @@ public class Lava extends MinecraftBlockTranslucent {
 
   public Lava(int level, int data) {
     super("lava", Texture.lava);
-    this.level = level;
+    this.level = level % 8;
     this.data = data;
     solid = false;
     localIntersect = true;

@@ -28,7 +28,7 @@ public class Water extends MinecraftBlockTranslucent {
 
   public Water(int level, int data) {
     super("water", Texture.water);
-    this.level = level;
+    this.level = level % 8;
     this.data = data;
     solid = false;
     localIntersect = true;
