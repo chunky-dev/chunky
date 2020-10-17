@@ -3,6 +3,7 @@ package se.llbit.chunky.chunk;
 import se.llbit.chunky.block.*;
 import se.llbit.math.Octree;
 import se.llbit.nbt.CompoundTag;
+import se.llbit.nbt.IntTag;
 import se.llbit.nbt.StringTag;
 import se.llbit.nbt.Tag;
 
@@ -84,6 +85,48 @@ public class BlockPalette {
     if(id == ANY_ID)
       return stone;
     return palette.get(id);
+  }
+
+  /**
+   * Get the index for a water block with the given level and data. If it doesn't exist, it is
+   * created.
+   *
+   * @param level Water level
+   * @param data  Water data (for corner levels)
+   * @return Index of the water block in this palette
+   * @throws IllegalArgumentException If the level is out of range
+   */
+  public int getWaterId(int level, int data) {
+    if (level < 0 || level > 8) {
+      throw new IllegalArgumentException("Invalid water level " + level);
+    }
+    CompoundTag tag = new CompoundTag();
+    tag.add("Name", new StringTag("minecraft:water$chunky"));
+    tag.add("level", new IntTag(level));
+    tag.add("data", new IntTag(data));
+    BlockSpec spec = new BlockSpec(tag);
+    return put(spec);
+  }
+
+  /**
+   * Get the index for a lava block with the given level and data. If it doesn't exist, it is
+   * created.
+   *
+   * @param level Lava level
+   * @param data  Lava data (for corner levels)
+   * @return Index of the lava block in this palette
+   * @throws IllegalArgumentException If the level is out of range
+   */
+  public int getLavaId(int level, int data) {
+    if (level < 0 || level > 8) {
+      throw new IllegalArgumentException("Invalid lava level " + level);
+    }
+    CompoundTag tag = new CompoundTag();
+    tag.add("Name", new StringTag("minecraft:lava$chunky"));
+    tag.add("level", new IntTag(level));
+    tag.add("data", new IntTag(data));
+    BlockSpec spec = new BlockSpec(tag);
+    return put(spec);
   }
 
   /**

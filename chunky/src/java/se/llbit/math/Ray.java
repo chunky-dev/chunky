@@ -18,6 +18,8 @@ package se.llbit.math;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.Air;
+import se.llbit.chunky.block.Lava;
+import se.llbit.chunky.block.Water;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.BlockData;
 import se.llbit.chunky.world.Material;
@@ -51,8 +53,8 @@ public class Ray {
   public Vector3 n = new Vector3();
 
   /**
-   * Distance traveled in current medium. This is updated after all intersection
-   * tests have run and the final t value has been found.
+   * Distance traveled in current medium. This is updated after all intersection tests have run and
+   * the final t value has been found.
    */
   public double distance;
 
@@ -97,9 +99,9 @@ public class Ray {
   public double t;
 
   /**
-   * Distance to next potential intersection. The tNext value is stored by
-   * subroutines when calculating a potential next hit point. This can then be
-   * stored in the t variable based on further decision making.
+   * Distance to next potential intersection. The tNext value is stored by subroutines when
+   * calculating a potential next hit point. This can then be stored in the t variable based on
+   * further decision making.
    */
   public double tNext;
 
@@ -163,8 +165,7 @@ public class Ray {
   }
 
   /**
-   * The block data value is a 4-bit integer value describing properties of the
-   * current block.
+   * The block data value is a 4-bit integer value describing properties of the current block.
    *
    * @return current block data (sometimes called metadata).
    */
@@ -185,8 +186,8 @@ public class Ray {
   }
 
   /**
-   * Find the exit point from the given block for this ray. This marches the ray
-   * forward - i.e. updates ray origin directly.
+   * Find the exit point from the given block for this ray. This marches the ray forward - i.e.
+   * updates ray origin directly.
    *
    * @param bx block x coordinate
    * @param by block y coordinate
@@ -384,6 +385,17 @@ public class Ray {
     this.prevData = data;
   }
 
+  public void setCurrentMaterial(Material mat) {
+    this.currentMaterial = mat;
+    if (mat instanceof Water) {
+      this.currentData = ((Water) mat).data;
+    } else if (mat instanceof Lava) {
+      this.currentData = ((Lava) mat).data;
+    } else {
+      this.currentData = 0;
+    }
+  }
+
   public void setCurrentMaterial(Material mat, int data) {
     this.currentMaterial = mat;
     this.currentData = data;
@@ -397,10 +409,24 @@ public class Ray {
     return currentMaterial;
   }
 
+  /**
+   * Get the data of the previous block. This used to contain the block data but as of Chunky 2,
+   * every block variant gets its own Block instance and this field is only used for water and lava
+   * levels.
+   *
+   * @return Data of the previous block (if water or lava), 0 otherwise
+   */
   public int getPrevData() {
     return prevData;
   }
 
+  /**
+   * Get the data of the current block. This used to contain the block data but as of Chunky 2,
+   * every block variant gets its own Block instance and this field is only used for water and lava
+   * levels.
+   *
+   * @return Data of the current block (if water or lava), 0 otherwise
+   */
   public int getCurrentData() {
     return currentData;
   }

@@ -969,13 +969,13 @@ public class Sky implements JsonSerializable {
   private static void enterCloud(Ray ray, double t) {
     ray.t = t;
     ray.color.set(CloudMaterial.color);
-    ray.setCurrentMaterial(CloudMaterial.INSTANCE, 0);
+    ray.setCurrentMaterial(CloudMaterial.INSTANCE);
   }
 
   private static void exitCloud(Ray ray, double t) {
     ray.t = t;
     ray.color.set(CloudMaterial.color);
-    ray.setCurrentMaterial(Air.INSTANCE, 0);
+    ray.setCurrentMaterial(Air.INSTANCE);
   }
 
   private static boolean inCloud(double x, double z) {

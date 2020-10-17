@@ -43,9 +43,9 @@ public class PathTracer implements RayTracer {
   @Override public void trace(Scene scene, WorkerState state) {
     Ray ray = state.ray;
     if (scene.isInWater(ray)) {
-      ray.setCurrentMaterial(Water.INSTANCE, 0);
+      ray.setCurrentMaterial(Water.INSTANCE);
     } else {
-      ray.setCurrentMaterial(Air.INSTANCE, 0);
+      ray.setCurrentMaterial(Air.INSTANCE);
     }
     pathTrace(scene, ray, state, 1, true);
   }
@@ -376,7 +376,7 @@ public class PathTracer implements RayTracer {
           Ray.EPSILON, airDistance - Ray.EPSILON);
       atmos.o.scaleAdd(offset, od, ox);
       sun.getRandomSunDirection(atmos, random);
-      atmos.setCurrentMaterial(Air.INSTANCE, 0);
+      atmos.setCurrentMaterial(Air.INSTANCE);
 
       double fogDensity = scene.getFogDensity() * EXTINCTION_FACTOR;
       double extinction = Math.exp(-airDistance * fogDensity);

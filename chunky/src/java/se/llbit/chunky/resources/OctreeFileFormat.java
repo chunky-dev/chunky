@@ -16,23 +16,30 @@
  */
 package se.llbit.chunky.resources;
 
-import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.renderer.RenderContext;
-import se.llbit.chunky.world.WorldTexture;
-import se.llbit.math.Octree;
+import static se.llbit.math.Octree.DATA_FLAG;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import se.llbit.chunky.block.Block;
+import se.llbit.chunky.block.Lava;
+import se.llbit.chunky.block.Water;
+import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.world.WorldTexture;
+import se.llbit.log.Log;
+import se.llbit.math.Octree;
 
 public class OctreeFileFormat {
+
   private static final int MIN_OCTREE_VERSION = 3;
-  private static final int OCTREE_VERSION = 4;
+  private static final int OCTREE_VERSION = 5;
 
   /**
    * Load octrees and grass/foliage textures from a file.
    *
-   * @param in input stream for the file to load the scene from.
+   * @param in   input stream for the file to load the scene from.
    * @param impl The octree implementation to use
    */
   public static OctreeData load(DataInputStream in, String impl) throws IOException {
@@ -44,14 +51,66 @@ public class OctreeFileFormat {
     }
     OctreeData data = new OctreeData();
     data.palette = BlockPalette.read(in);
-    data.worldTree = Octree.load(impl, in);
-    data.waterTree = Octree.load(impl, in);
+    data.worldTree = Octree.load(impl, version < 5 ? convertDataNodes(data.palette, in) : in);
+    data.waterTree = Octree.load(impl, version < 5 ? convertDataNodes(data.palette, in) : in);
     data.grassColors = WorldTexture.load(in);
     data.foliageColors = WorldTexture.load(in);
     if (version >= 4) {
       data.waterColors = WorldTexture.load(in);
     }
     return data;
+  }
+
+  /**
+   * This converts a v3-v4 octree to v5 while loading it. In v5, data nodes (only used for water and
+   * lava) were replaced by new per-variant types.
+   *
+   * @param palette Block palette for the octree, new block variants for water and lava will be
+   *                added to it
+   * @param in      Input stream of a v3 or v4 octree
+   * @return Input stream of a v5 octree
+   * @throws IOException If reading or writing a streams fails
+   * @see <a href="https://github.com/chunky-dev/chunky/pull/704">PR #704</a>
+   */
+  private static DataInputStream convertDataNodes(BlockPalette palette, final DataInputStream in)
+      throws IOException {
+    final PipedOutputStream pipedOut = new PipedOutputStream();
+    PipedInputStream resultingStream = new PipedInputStream(pipedOut);
+    Thread convertThread = new Thread(() -> {
+      try (DataOutputStream out = new DataOutputStream(pipedOut)) {
+        out.writeInt(in.readInt()); // depth
+
+        long remainingNodes = 1;
+        while (remainingNodes > 0) {
+          int type = in.readInt();
+          remainingNodes--;
+          if (type == Octree.BRANCH_NODE) {
+            out.writeInt(type);
+            remainingNodes += 8;
+          } else {
+            if ((type & DATA_FLAG) == 0) {
+              out.writeInt(type);
+            } else {
+              int typeOnly = type ^ DATA_FLAG;
+              int data = in.readInt();
+              Block block = palette.get(typeOnly);
+              if (block instanceof Water) {
+                out.writeInt(palette.getWaterId(((Water) block).level, data));
+              } else if (block instanceof Lava) {
+                out.writeInt(palette.getWaterId(((Lava) block).level, data));
+              } else {
+                out.writeInt(typeOnly);
+              }
+            }
+          }
+        }
+      } catch (IOException e) {
+        Log.error("Octree conversion failed", e);
+      }
+    });
+    convertThread.setDaemon(true);
+    convertThread.start();
+    return new DataInputStream(resultingStream);
   }
 
   /**
@@ -71,6 +130,7 @@ public class OctreeFileFormat {
   }
 
   public static class OctreeData {
+
     public Octree worldTree, waterTree;
     public WorldTexture grassColors, foliageColors, waterColors;
     public BlockPalette palette;

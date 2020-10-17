@@ -846,10 +846,14 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new SpriteBlock(name, Texture.darkOakSapling);
       case "water":
         return new Water(BlockProvider.stringToInt(tag.get("Properties").get("level"), 0));
+      case "water$chunky":
+        return new Water(tag.get("level").intValue(), tag.get("data").intValue());
       case "bubble_column":
         return new Water(0); // TODO: render bubbles!
       case "lava":
         return new Lava(BlockProvider.stringToInt(tag.get("Properties").get("level"), 0));
+      case "lava$chunky":
+        return new Lava(tag.get("level").intValue(), tag.get("data").intValue());
       case "bedrock":
         return new MinecraftBlock(name, Texture.bedrock);
       case "sand":

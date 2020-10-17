@@ -88,7 +88,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
   @Override
   public Octree.NodeId getChild(Octree.NodeId parent, int childNo) {
-    return new NodeId(treeData[((NodeId) parent).nodeIndex] + 2 * childNo);
+    return new NodeId(treeData[((NodeId) parent).nodeIndex] + childNo);
   }
 
   @Override
@@ -98,7 +98,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
   @Override
   public int getData(Octree.NodeId node) {
-    return treeData[((NodeId) node).nodeIndex + 1];
+    return 0;
   }
 
   /**
@@ -115,13 +115,12 @@ public class PackedOctree implements Octree.OctreeImplementation {
    */
   public PackedOctree(int depth, long nodeCount) {
     this.depth = depth;
-    long arraySize = Math.max(nodeCount * 2, 64);
+    long arraySize = Math.max(nodeCount, 64);
     if(arraySize > (long) MAX_ARRAY_SIZE)
       throw new OctreeTooBigException();
     treeData = new int[(int) arraySize];
     treeData[0] = 0;
-    treeData[1] = 0;
-    size = 2;
+    size = 1;
     freeHead = -1; // No holes
   }
 
@@ -135,8 +134,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
     treeData = new int[64];
     // Add a root node
     treeData[0] = 0;
-    treeData[1] = 0;
-    size = 2;
+    size = 1;
     freeHead = -1;
   }
 
@@ -205,11 +203,9 @@ public class PackedOctree implements Octree.OctreeImplementation {
   private void subdivideNode(int nodeIndex) {
     int childrenIndex = findSpace();
     for(int i = 0; i < 8; ++i) {
-      treeData[childrenIndex + 2 * i] = treeData[nodeIndex]; // copy type
-      treeData[childrenIndex + 2 * i + 1] = treeData[nodeIndex + 1]; // copy data
+      treeData[childrenIndex + i] = treeData[nodeIndex]; // copy type
     }
     treeData[nodeIndex] = childrenIndex; // Make the node a parent node pointing to its children
-    treeData[nodeIndex + 1] = 0; // reset its data
   }
 
   /**
@@ -218,11 +214,10 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * @param nodeIndex    The index of the node to merge
    * @param typeNegation The negation of the type (the value directly stored in the array)
    */
-  private void mergeNode(int nodeIndex, int typeNegation, int data) {
+  private void mergeNode(int nodeIndex, int typeNegation) {
     int childrenIndex = treeData[nodeIndex];
     freeSpace(childrenIndex); // Delete children
     treeData[nodeIndex] = typeNegation; // Make the node a leaf one
-    treeData[nodeIndex + 1] = data;
   }
 
   /**
@@ -235,11 +230,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
   private boolean nodeEquals(int firstNodeIndex, int secondNodeIndex) {
     boolean firstIsBranch = treeData[firstNodeIndex] > 0;
     boolean secondIsBranch = treeData[secondNodeIndex] > 0;
-    return ((firstIsBranch && secondIsBranch) || treeData[firstNodeIndex] == treeData[secondNodeIndex]) // compare types
-            && treeData[firstNodeIndex + 1] == treeData[secondNodeIndex + 1]; // compare data
-    // FIXME possible bug here as we always compare the data even when dealing with nodes that don't really have data
-    // The data int could potentially contain some junk leftover of a previous node
-    // In theory it should be reset to 0 but we need to be careful
+    return ((firstIsBranch && secondIsBranch) || treeData[firstNodeIndex] == treeData[secondNodeIndex]); // compare types
   }
 
   /**
@@ -252,8 +243,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
   private boolean nodeEquals(int firstNodeIndex, Octree.Node secondNode) {
     boolean firstIsBranch = treeData[firstNodeIndex] > 0;
     boolean secondIsBranch = (secondNode.type == BRANCH_NODE);
-    return ((firstIsBranch && secondIsBranch) || -treeData[firstNodeIndex] == secondNode.type) // compare types (don't forget that in the tree the negation of the type is stored)
-            && treeData[firstNodeIndex + 1] == secondNode.getData(); // compare data
+    return ((firstIsBranch && secondIsBranch) || -treeData[firstNodeIndex] == secondNode.type); // compare types (don't forget that in the tree the negation of the type is stored)
   }
 
   @Override
@@ -281,12 +271,11 @@ public class PackedOctree implements Octree.OctreeImplementation {
       int ybit = 1 & (y >> i);
       int zbit = 1 & (z >> i);
       position = (xbit << 2) | (ybit << 1) | zbit;
-      nodeIndex = treeData[nodeIndex] + position * 2;
+      nodeIndex = treeData[nodeIndex] + position;
 
     }
-    int finalNodeIndex = treeData[parents[0]] + position * 2;
+    int finalNodeIndex = treeData[parents[0]] + position;
     treeData[finalNodeIndex] = -data.type; // Store negation of the type
-    treeData[finalNodeIndex + 1] = data.getData();
 
     // Merge nodes where all children have been set to the same type.
     for(int i = 0; i <= parentLevel; ++i) {
@@ -294,7 +283,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
       boolean allSame = true;
       for(int j = 0; j < 8; ++j) {
-        int childIndex = treeData[parentIndex] + 2 * j;
+        int childIndex = treeData[parentIndex] + j;
         if(!nodeEquals(childIndex, nodeIndex)) {
           allSame = false;
           break;
@@ -302,7 +291,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
       }
 
       if(allSame) {
-        mergeNode(parentIndex, treeData[nodeIndex], treeData[nodeIndex + 1]);
+        mergeNode(parentIndex, treeData[nodeIndex]);
       } else {
         break;
       }
@@ -317,7 +306,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
       int lx = x >>> level;
       int ly = y >>> level;
       int lz = z >>> level;
-      nodeIndex = treeData[nodeIndex] + (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)) * 2;
+      nodeIndex = treeData[nodeIndex] + (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1));
     }
     return nodeIndex;
   }
@@ -326,7 +315,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
   public Octree.Node get(int x, int y, int z) {
     int nodeIndex = getNodeIndex(x, y, z);
 
-    Octree.Node node = new Octree.DataNode(treeData[nodeIndex] > 0 ? BRANCH_NODE : -treeData[nodeIndex], treeData[nodeIndex + 1]);
+    Octree.Node node = new Octree.Node(treeData[nodeIndex] > 0 ? BRANCH_NODE : -treeData[nodeIndex]);
 
     // Return dummy Node, will work if only type and data are used, breaks if children are needed
     return node;
@@ -372,37 +361,26 @@ public class PackedOctree implements Octree.OctreeImplementation {
     if(type == BRANCH_NODE) {
       int childrenIndex = findSpace();
       treeData[nodeIndex] = childrenIndex;
-      treeData[nodeIndex + 1] = 0; // store 0 as data
       for(int i = 0; i < 8; ++i) {
-        loadNode(in, childrenIndex + 2 * i);
+        loadNode(in, childrenIndex + i);
       }
     } else {
       if((type & DATA_FLAG) == 0) {
         treeData[nodeIndex] = -type; // negation of type
-        treeData[nodeIndex + 1] = 0; // store 0 to be sure we don't have uninitialized garbage
       } else {
         int data = in.readInt();
         treeData[nodeIndex] = -(type ^ DATA_FLAG);
-        treeData[nodeIndex + 1] = data;
       }
     }
   }
 
   private void storeNode(DataOutputStream out, int nodeIndex) throws IOException {
     int type = treeData[nodeIndex] > 0 ? BRANCH_NODE : -treeData[nodeIndex];
+    out.writeInt(type);
     if(type == BRANCH_NODE) {
-      out.writeInt(type);
       for(int i = 0; i < 8; ++i) {
-        int childIndex = treeData[nodeIndex] + 2 * i;
+        int childIndex = treeData[nodeIndex] + i;
         storeNode(out, childIndex);
-      }
-    } else {
-      boolean isDataNode = (treeData[nodeIndex + 1] != 0);
-      if(isDataNode) {
-        out.writeInt(type | DATA_FLAG);
-        out.writeInt(treeData[nodeIndex + 1]);
-      } else {
-        out.writeInt(type);
       }
     }
   }
@@ -416,7 +394,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
     if(treeData[nodeIndex] > 0) {
       long total = 1;
       for(int i = 0; i < 8; ++i)
-        total += countNodes(treeData[nodeIndex] + 2 * i);
+        total += countNodes(treeData[nodeIndex] + i);
       return total;
     } else {
       return 1;
@@ -432,9 +410,8 @@ public class PackedOctree implements Octree.OctreeImplementation {
   private void finalizationNode(int nodeIndex) {
     boolean canMerge = true;
     int mergedType = -ANY_TYPE;
-    int mergedData = 0;
     for(int i = 0; i < 8; ++i) {
-      int childIndex = treeData[nodeIndex] + 2 * i;
+      int childIndex = treeData[nodeIndex] + i;
       if(treeData[childIndex] > 0) {
         finalizationNode(childIndex);
         // The node may have been merged, retest if it still a branch node
@@ -445,14 +422,13 @@ public class PackedOctree implements Octree.OctreeImplementation {
       if(canMerge) {
         if(mergedType == -ANY_TYPE) {
           mergedType = treeData[childIndex];
-          mergedData = treeData[childIndex + 1];
-        } else if(!(treeData[childIndex] == -ANY_TYPE || (treeData[childIndex] == mergedType && treeData[childIndex + 1] == mergedData))) {
+        } else if(!(treeData[childIndex] == -ANY_TYPE || (treeData[childIndex] == mergedType))) {
           canMerge = false;
         }
       }
     }
     if(canMerge) {
-      mergeNode(nodeIndex, mergedType, mergedData);
+      mergeNode(nodeIndex, mergedType);
     }
   }
 
