@@ -111,7 +111,8 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
             .addListener((observable, oldvalue, newvalue) -> {
               scene.setEmitterSamplingStrategy(newvalue);
               if(newvalue != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() == null)
-                Log.warn("The world need to be reloaded for emitter sampling to work");
+                // TODO add nice UI dialog for this
+                Log.warn("The world needs to be reloaded for emitter sampling to work");
             });
     emitterSamplingStrategy.setTooltip(new Tooltip("Determine how emitters are sampled at each bounce"));
   }

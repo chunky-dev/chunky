@@ -512,12 +512,11 @@ public class Scene implements JsonSerializable, Refreshable {
       mode = RenderMode.PAUSED;
     }
 
-    // Try loading the grid unconditionally for now
-    boolean emitterGridLoaded = true;
+    boolean emitterGridNeedChunkReload = false;
     if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
-      emitterGridLoaded = loadEmitterGrid(context, taskTracker);
+      emitterGridNeedChunkReload = !loadEmitterGrid(context, taskTracker);
     boolean octreeLoaded = loadOctree(context, taskTracker);
-    if (!emitterGridLoaded || !octreeLoaded) {
+    if (emitterGridNeedChunkReload || !octreeLoaded) {
       // Could not load stored octree or emitter grid.
       // Load the chunks from the world.
       if (loadedWorld == EmptyWorld.INSTANCE) {
@@ -1025,7 +1024,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 }
                 worldOctree.set(octNode, x, cy - origin.y, z);
 
-                if (emitterGrid != null & block.emittance > 1e-4) {
+                if (emitterGrid != null && block.emittance > 1e-4) {
                   emitterGrid.addEmitter(x, cy - origin.y, z);
                 }
 
