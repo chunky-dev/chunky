@@ -298,6 +298,10 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private Grid emitterGrid;
 
+  private int gridSize = PersistentSettings.getGridSizeDefault();
+
+  private boolean preventNormalEmitterWithSampling = PersistentSettings.getPreventNormalEmitterWithSampling();
+
   /**
    * The octree implementation to use
    */
@@ -759,7 +763,7 @@ public class Scene implements JsonSerializable, Refreshable {
       worldOctree = new Octree(octreeImplementation, requiredDepth);
       waterOctree = new Octree(octreeImplementation, requiredDepth);
       if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
-        emitterGrid = new Grid(requiredDepth, 10); // TODO Make configurable
+        emitterGrid = new Grid(requiredDepth, gridSize);
 
       // Parse the regions first - force chunk lists to be populated!
       Set<ChunkPosition> regions = new HashSet<>();
@@ -3042,5 +3046,22 @@ public class Scene implements JsonSerializable, Refreshable {
       this.emitterSamplingStrategy = emitterSamplingStrategy;
       refresh();
     }
+  }
+
+  public int getGridSize() {
+    return gridSize;
+  }
+
+  public void setGridSize(int gridSize) {
+    this.gridSize = gridSize;
+  }
+
+  public boolean isPreventNormalEmitterWithSampling() {
+    return preventNormalEmitterWithSampling;
+  }
+
+  public void setPreventNormalEmitterWithSampling(boolean preventNormalEmitterWithSampling) {
+    this.preventNormalEmitterWithSampling = preventNormalEmitterWithSampling;
+    refresh();
   }
 }
