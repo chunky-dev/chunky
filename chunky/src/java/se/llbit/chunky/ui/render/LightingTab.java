@@ -34,6 +34,7 @@ import se.llbit.chunky.ui.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.fx.LuxColorPicker;
+import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 
@@ -109,6 +110,8 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
     emitterSamplingStrategy.getSelectionModel().selectedItemProperty()
             .addListener((observable, oldvalue, newvalue) -> {
               scene.setEmitterSamplingStrategy(newvalue);
+              if(newvalue != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() == null)
+                Log.warn("The world need to be reloaded for emitter sampling to work");
             });
     emitterSamplingStrategy.setTooltip(new Tooltip("Determine how emitters are sampled at each bounce"));
   }

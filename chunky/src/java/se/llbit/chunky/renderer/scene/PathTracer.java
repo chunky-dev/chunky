@@ -166,7 +166,7 @@ public class PathTracer implements RayTracer {
               ray.emittance.z = ray.color.z * ray.color.z *
                   currentMat.emittance * scene.emitterIntensity;
               hit = true;
-            } else if(scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE) {
+            } else if(scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
               // Sample emitter
               boolean sampleOne = scene.emitterSamplingStrategy == EmitterSamplingStrategy.ONE;
               if(sampleOne) {
