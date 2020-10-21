@@ -298,6 +298,10 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private Grid emitterGrid;
 
+  private int gridSize = PersistentSettings.getGridSizeDefault();
+
+  private boolean preventNormalEmitterWithSampling = PersistentSettings.getPreventNormalEmitterWithSampling();
+
   /**
    * The octree implementation to use
    */
@@ -318,7 +322,7 @@ public class Scene implements JsonSerializable, Refreshable {
     palette = new BlockPalette();
     worldOctree = new Octree(octreeImplementation, 1);
     waterOctree = new Octree(octreeImplementation, 1);
-    emitterGrid = new Grid(1, 16);
+    emitterGrid = null;
   }
 
   /**
@@ -508,10 +512,11 @@ public class Scene implements JsonSerializable, Refreshable {
       mode = RenderMode.PAUSED;
     }
 
-    // Try loading the grid unconditionally for now
-    boolean emiiterGridLoaded = loadEmitterGrid(context, taskTracker);
+    boolean emitterGridNeedChunkReload = false;
+    if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
+      emitterGridNeedChunkReload = !loadEmitterGrid(context, taskTracker);
     boolean octreeLoaded = loadOctree(context, taskTracker);
-    if (!emiiterGridLoaded || !octreeLoaded) {
+    if (emitterGridNeedChunkReload || !octreeLoaded) {
       // Could not load stored octree or emitter grid.
       // Load the chunks from the world.
       if (loadedWorld == EmptyWorld.INSTANCE) {
@@ -756,7 +761,8 @@ public class Scene implements JsonSerializable, Refreshable {
       palette = new BlockPalette();
       worldOctree = new Octree(octreeImplementation, requiredDepth);
       waterOctree = new Octree(octreeImplementation, requiredDepth);
-      emitterGrid = new Grid(requiredDepth, 10); // TODO Make configurable
+      if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
+        emitterGrid = new Grid(requiredDepth, gridSize);
 
       // Parse the regions first - force chunk lists to be populated!
       Set<ChunkPosition> regions = new HashSet<>();
@@ -1018,7 +1024,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 }
                 worldOctree.set(octNode, x, cy - origin.y, z);
 
-                if (block.emittance > 1e-4) {
+                if (emitterGrid != null && block.emittance > 1e-4) {
                   emitterGrid.addEmitter(x, cy - origin.y, z);
                 }
 
@@ -1146,7 +1152,8 @@ public class Scene implements JsonSerializable, Refreshable {
       waterOctree.endFinalization();
     }
 
-    emitterGrid.prepare();
+    if(emitterGrid != null)
+      emitterGrid.prepare();
 
     chunks = loadedChunks;
     camera.setWorldSize(1 << worldOctree.getDepth());
@@ -1846,6 +1853,9 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   private synchronized void saveEmitterGrid(RenderContext context, TaskTracker progress) {
+    if(emitterGrid == null)
+      return;
+
     String filename = name + ".emittergrid";
     // TODO Not save when unchanged?
     try(TaskTracker.Task task = progress.task("Saving Grid")) {
@@ -3035,5 +3045,22 @@ public class Scene implements JsonSerializable, Refreshable {
       this.emitterSamplingStrategy = emitterSamplingStrategy;
       refresh();
     }
+  }
+
+  public int getGridSize() {
+    return gridSize;
+  }
+
+  public void setGridSize(int gridSize) {
+    this.gridSize = gridSize;
+  }
+
+  public boolean isPreventNormalEmitterWithSampling() {
+    return preventNormalEmitterWithSampling;
+  }
+
+  public void setPreventNormalEmitterWithSampling(boolean preventNormalEmitterWithSampling) {
+    this.preventNormalEmitterWithSampling = preventNormalEmitterWithSampling;
+    refresh();
   }
 }

@@ -422,5 +422,21 @@ public final class PersistentSettings {
   public static String getOctreeImplementation() {
     return settings.getString("octreeImplementation", "PACKED");
   }
+
+  public static void setGridSizeDefault(int value) {
+    settings.setInt("gridSize", value);
+  }
+
+  public static int getGridSizeDefault() {
+    return settings.getInt("gridSize", 10);
+  }
+
+  public static void setPreventNormalEmitterWithSampling(boolean value) {
+    settings.setBool("preventNormalEmitterWithSampling", value);
+  }
+
+  public static boolean getPreventNormalEmitterWithSampling() {
+    return settings.getBool("preventNormalEmitterWithSampling", false);
+  }
 }
 

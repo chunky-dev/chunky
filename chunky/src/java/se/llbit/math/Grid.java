@@ -33,36 +33,30 @@ public class Grid {
   private final int cellSize;
   private List<EmitterPosition> emitterPositions = new ArrayList<>(); // Stored as an object array, may need to be flattened later to improve memory usage
 
-  // Instead of each Cell storing its indexes, we could have a single flat array
-  // that is the concatenation of each of those arrays and each cell would have to only
-  // store the start and end (or size) of their subarray
-  // This would also mean that Cells would only be 2 ints and could be stored directly in a flat array
-  // But this would make the implementation more complex so we'll se later
+  // Cells are only used during the grid preparation
   private static class Cell {
     public List<Integer> indexes = new ArrayList<>();
   }
 
   private final int gridSize;
-  private final Cell[] grid;
+  // This array is the concatenation of every index of EmitterPosition for every cell
+  private int[] positionIndexes;
+  // This array holds 2 ints per cell, the index to the start of its section
+  // in the positionIndexes array and the size of its section
+  private int[] constructedGrid;
+  // This way of storing the data is more difficult to manipulate but more
+  // memory efficient by virtue of only having 2 flat arrays
 
   public Grid(int octreeDepth, int cellSize) {
     this.cellSize = cellSize;
     long totalSize = (1L << octreeDepth);
     this.gridSize = (int) ((totalSize + (cellSize-1)) / cellSize);
-    grid = new Cell[gridSize*gridSize*gridSize];
-    for(int i = 0; i < grid.length; ++i) {
-      grid[i] = new Cell();
-    }
   }
 
   // Constructor used by the load method
   private Grid(int gridSize, int cellSize, int overloadSelectFlag /*unused*/) {
     this.gridSize = gridSize;
     this.cellSize = cellSize;
-    grid = new Cell[gridSize*gridSize*gridSize];
-    for(int i = 0; i < grid.length; ++i) {
-      grid[i] = new Cell();
-    }
   }
 
   public void addEmitter(int x, int y, int z) {
@@ -78,6 +72,10 @@ public class Grid {
    * Builds the grid itself
    */
   public void prepare() {
+    Cell[] gridDuringConstruction = new Cell[gridSize * gridSize * gridSize];
+
+    int numberOfPositionIndex = 0;
+
     for(int i = 0; i < emitterPositions.size(); ++i) {
       EmitterPosition pos = emitterPositions.get(i);
       int gridX = pos.x / cellSize;
@@ -92,11 +90,34 @@ public class Grid {
             int z = gridZ+dz;
             if(x >= 0 && x < gridSize && y>= 0 && y < gridSize && z >= 0 && z < gridSize) {
               int index = cellIndex(x, y, z);
-              grid[index].indexes.add(i);
+              if(gridDuringConstruction[index] == null)
+                gridDuringConstruction[index] = new Cell();
+              gridDuringConstruction[index].indexes.add(i);
+              ++numberOfPositionIndex;
             }
           }
         }
       }
+    }
+
+    positionIndexes = new int[numberOfPositionIndex];
+    constructedGrid = new int[gridSize*gridSize*gridSize*2];
+    int constructedGridCurrentIndex = 0;
+
+    for(int i = 0; i < gridDuringConstruction.length; ++i) {
+      if(gridDuringConstruction[i] == null) {
+        constructedGrid[2*i] = constructedGridCurrentIndex;
+        constructedGrid[2*i+1] = 0;
+        continue;
+      }
+
+      int numberOfIndexes = gridDuringConstruction[i].indexes.size();
+      for(int j = 0; j < numberOfIndexes; ++j) {
+        positionIndexes[constructedGridCurrentIndex+j] = gridDuringConstruction[i].indexes.get(j);
+      }
+      constructedGrid[2*i] = constructedGridCurrentIndex;
+      constructedGrid[2*i+1] = numberOfIndexes;
+      constructedGridCurrentIndex += numberOfIndexes;
     }
   }
 
@@ -109,11 +130,14 @@ public class Grid {
     int gridY = y / cellSize;
     int gridZ = z / cellSize;
     int index = cellIndex(gridX, gridY, gridZ);
-    Cell cell = grid[index];
-    if(cell.indexes.size() == 0)
+
+    int start = constructedGrid[2*index];
+    int size = constructedGrid[2*index+1];
+
+    if(size == 0)
       return null;
-    int randomIndex = random.nextInt(cell.indexes.size());
-    int emitterIndex = cell.indexes.get(randomIndex);
+    int randomIndex = random.nextInt(size);
+    int emitterIndex = positionIndexes[start+randomIndex];
     return emitterPositions.get(emitterIndex);
   }
 
@@ -125,10 +149,11 @@ public class Grid {
     int gridY = y / cellSize;
     int gridZ = z / cellSize;
     int index = cellIndex(gridX, gridY, gridZ);
-    Cell cell = grid[index];
+    int start = constructedGrid[2*index];
+    int size = constructedGrid[2*index+1];
     List<EmitterPosition> pos = new ArrayList<>();
-    for(Integer i : cell.indexes) {
-      pos.add(emitterPositions.get(i));
+    for(int i = 0; i < size; ++i) {
+      pos.add(emitterPositions.get(positionIndexes[start+i]));
     }
     return pos;
   }
@@ -152,10 +177,12 @@ public class Grid {
     }
 
     // Write, for each cell, how many emitters are contained and their indexes in the array written earlier
-    for(Cell cell : grid) {
-      out.writeInt(cell.indexes.size());
-      for(int index : cell.indexes) {
-        out.writeInt(index);
+    for(int i = 0; i < gridSize*gridSize*gridSize; ++i) {
+      int start = constructedGrid[2*i];
+      int size = constructedGrid[2*i+1];
+      out.writeInt(size);
+      for(int j = 0; j < size; ++j) {
+        out.writeInt(positionIndexes[start+j]);
       }
     }
   }
@@ -185,15 +212,25 @@ public class Grid {
       grid.emitterPositions.add(new EmitterPosition(x, y, z));
     }
 
-    for(int cellIndex = 0; cellIndex < grid.grid.length; ++cellIndex) {
-      Cell cell = grid.grid[cellIndex];
-      int posNo = in.readInt();
-      for(int posIndex = 0; posIndex < posNo; ++posIndex) {
+    int cellCount = gridSize*gridSize*gridSize;
+    ArrayList<Integer> positionIndexesList = new ArrayList<>();
+    int constructedGridCurrentIndex = 0;
+    grid.constructedGrid = new int[cellCount*2];
+
+    for(int cellIndex = 0; cellIndex < cellCount; ++cellIndex) {
+      int numberOfIndexes = in.readInt();
+      for(int posIndex = 0; posIndex < numberOfIndexes; ++posIndex) {
         int index = in.readInt();
-        cell.indexes.add(index);
+        positionIndexesList.add(index);
       }
-      grid.grid[cellIndex] = cell;
+      grid.constructedGrid[2*cellIndex] = constructedGridCurrentIndex;
+      grid.constructedGrid[2*cellIndex + 1] = numberOfIndexes;
+      constructedGridCurrentIndex += numberOfIndexes;
     }
+
+    grid.positionIndexes = new int[positionIndexesList.size()];
+    for(int i = 0; i < positionIndexesList.size(); ++i)
+      grid.positionIndexes[i] = positionIndexesList.get(i);
 
     return grid;
   }
