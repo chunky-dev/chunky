@@ -155,9 +155,9 @@ public class PackedOctree implements Octree.OctreeImplementation {
     }
 
     // append in array if we have the capacity
-    if(size + 16 <= treeData.length) {
+    if(size + 8 <= treeData.length) {
       int index = size;
-      size += 16;
+      size += 8;
       return index;
     }
 
@@ -167,7 +167,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
     if(newSize > (long) MAX_ARRAY_SIZE) {
       // We can allocate less memory than initially wanted if the next block will still be able to fit
       // If not, this implementation isn't suitable
-      if(MAX_ARRAY_SIZE - treeData.length > 16) {
+      if(MAX_ARRAY_SIZE - treeData.length > 8) {
         // If by making the new array be of size MAX_ARRAY_SIZE we can still fit the block requested
         newSize = MAX_ARRAY_SIZE;
       } else {
@@ -180,9 +180,8 @@ public class PackedOctree implements Octree.OctreeImplementation {
     treeData = newArray;
     // and then append
     int index = size;
-    size += 16;
+    size += 8;
     return index;
-    // FIXME If the array has a really small capacity (less than 32 ints) newArray may not have enough additional space
   }
 
   /**
