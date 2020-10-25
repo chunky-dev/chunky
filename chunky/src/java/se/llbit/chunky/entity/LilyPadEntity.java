@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 public class LilyPadEntity extends Entity {
-
+  private static final Material lilyMaterial = new LilyPadMaterial();
   private final int rotation;
 
   public LilyPadEntity(Vector3 position) {
@@ -56,7 +56,6 @@ public class LilyPadEntity extends Entity {
     Vector2 t2 = new Vector2(0, 1);
     Vector2 t3 = new Vector2(1, 1);
     Vector2 t4 = new Vector2(1, 0);
-    Material lilyMaterial = new LilyPadMaterial();
     Collection<Primitive> primitives = new LinkedList<>();
     switch (rotation) {
       case 0:
