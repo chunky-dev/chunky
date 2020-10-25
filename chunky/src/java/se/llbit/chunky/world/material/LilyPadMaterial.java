@@ -21,7 +21,6 @@ import se.llbit.chunky.world.Material;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Ray;
 
-// TODO: fetch color from biome?
 public class LilyPadMaterial extends Material {
 
   private static final int COLOR = 0x208030;
@@ -29,6 +28,7 @@ public class LilyPadMaterial extends Material {
 
   static {
     ColorUtil.getRGBAComponents(COLOR, lilyPadColor);
+    ColorUtil.toLinear(lilyPadColor);
   }
 
   public LilyPadMaterial() {

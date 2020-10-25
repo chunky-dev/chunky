@@ -919,9 +919,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "oak_leaves":
         return new Leaves(name, Texture.oakLeaves);
       case "spruce_leaves":
-        return new Leaves(name, Texture.spruceLeaves);
+        return new Leaves(name, Texture.spruceLeaves, 0x619961);
       case "birch_leaves":
-        return new Leaves(name, Texture.birchLeaves);
+        return new Leaves(name, Texture.birchLeaves, 0x80a755);
       case "jungle_leaves":
         return new Leaves(name, Texture.jungleTreeLeaves);
       case "acacia_leaves":
