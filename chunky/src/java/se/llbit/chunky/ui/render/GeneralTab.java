@@ -41,6 +41,7 @@ import se.llbit.chunky.ui.ChunkyFxController;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.RenderControlsFxController;
+import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Icon;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
@@ -113,6 +114,7 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     biomeColors.setSelected(scene.biomeColorsEnabled());
     saveSnapshots.setSelected(scene.shouldSaveSnapshots());
     reloadChunks.setDisable(scene.numberOfChunks() == 0);
+    loadSelectedChunks.setDisable(mapLoader.getWorld() instanceof EmptyWorld || mapLoader.getWorld() == null);
   }
 
   @Override public String getTabTitle() {
@@ -289,6 +291,9 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     this.renderControls = controls;
     this.chunkyFxController = controls.getChunkyController();
     this.mapLoader = chunkyFxController.getMapLoader();
+    mapLoader.addWorldLoadListener(world -> {
+      loadSelectedChunks.setDisable(world instanceof EmptyWorld || world == null);
+    });
     this.controller = controls.getRenderController();
     this.scene = this.controller.getSceneManager().getScene();
   }
