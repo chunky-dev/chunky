@@ -34,8 +34,7 @@ public class LeafModel {
       float[] color = texture.getColor(ray.u, ray.v);
       if (color[3] > Ray.EPSILON) {
         ray.color.set(color);
-        float[] biomeColor;
-        biomeColor = ray.getBiomeFoliageColor(scene);
+        float[] biomeColor = ray.getBiomeFoliageColor(scene);
         ray.color.x *= biomeColor[0];
         ray.color.y *= biomeColor[1];
         ray.color.z *= biomeColor[2];
