@@ -52,6 +52,7 @@ import java.util.Set;
  */
 public class Chunk {
 
+  public static final String DATAVERSION = ".DataVersion";
   public static final String LEVEL_HEIGHTMAP = ".Level.HeightMap";
   public static final String LEVEL_SECTIONS = ".Level.Sections";
   public static final String LEVEL_BIOMES = ".Level.Biomes";
@@ -71,6 +72,8 @@ public class Chunk {
   private static final int SECTION_BYTES = X_MAX * SECTION_Y_MAX * Z_MAX;
   private static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
   private static final int CHUNK_BYTES = X_MAX * Y_MAX * Z_MAX;
+
+  private static final int DATAVERSION_20w17a = 2529;
 
   private final ChunkPosition position;
   protected volatile AbstractLayer surface = IconLayer.UNKNOWN;
@@ -149,6 +152,7 @@ public class Chunk {
     }
 
     Set<String> request = new HashSet<>();
+    request.add(Chunk.DATAVERSION);
     request.add(Chunk.LEVEL_SECTIONS);
     request.add(Chunk.LEVEL_BIOMES);
     request.add(Chunk.LEVEL_HEIGHTMAP);
@@ -283,7 +287,6 @@ public class Chunk {
           int bpb = 4;
           if (palette.size() > 16) {
             bpb = QuickMath.log2(QuickMath.nextPow2(palette.size()));
-            //bpb = QuickMath.log2(palette.size());
           }
 
           int dataSize = (4096 * bpb) / 64;
@@ -292,7 +295,12 @@ public class Chunk {
           if (blockStates.isLongArray(dataSize)) {
             // since 20w17a, block states are aligned to 64-bit boundaries, so there are 64 % bpb
             // unused bits per block state; if so, the array is longer than the expected data size
-            boolean isAligned = blockStates.longArray().length > dataSize;
+            boolean isAligned = data.get(DATAVERSION).intValue() >= DATAVERSION_20w17a;
+            if (isAligned) {
+              // entries are 64-bit-padded, re-calculate the bits per block
+              // this is the dataSize calculation from above reverted, we know the actual data size
+              bpb = blockStates.longArray().length / 64;
+            }
 
             int[] subpalette = new int[palette.size()];
             int paletteIndex = 0;
@@ -429,6 +437,7 @@ public class Chunk {
     }
 
     Set<String> request = new HashSet<>();
+    request.add(DATAVERSION);
     request.add(LEVEL_SECTIONS);
     request.add(LEVEL_BIOMES);
     request.add(LEVEL_ENTITIES);
