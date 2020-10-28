@@ -295,7 +295,7 @@ public class Chunk {
           if (blockStates.isLongArray(dataSize)) {
             // since 20w17a, block states are aligned to 64-bit boundaries, so there are 64 % bpb
             // unused bits per block state; if so, the array is longer than the expected data size
-            boolean isAligned = data.get(DATAVERSION).intValue() > DATAVERSION_20w17a;
+            boolean isAligned = data.get(DATAVERSION).intValue() >= DATAVERSION_20w17a;
             if (isAligned) {
               // entries are 64-bit-padded, re-calculate the bits per block
               // this is the dataSize calculation from above reverted, we know the actual data size
