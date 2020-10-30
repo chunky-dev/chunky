@@ -466,6 +466,8 @@ public class ResourcepackBlockProvider implements BlockProvider {
           .equals("minecraft:block/tinted_cross") || parentName.equals("block/cross") || parentName
           .equals("minecraft:block/cross")) {
         block.supportsOpacity = false;
+      } else if(blockDefinition.isEmpty()) {
+        return Air.INSTANCE;
       }
       try {
         while (!blockDefinition.get("parent").isUnknown()) {
