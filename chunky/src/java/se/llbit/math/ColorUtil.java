@@ -28,6 +28,15 @@ import se.llbit.chunky.renderer.scene.Scene;
  */
 public final class ColorUtil {
 
+  // Look up table used to speed up gamma correction
+  public static final float[] toLinearLut = new float[256];
+
+  static {
+    for(int i = 0; i < 256; i++) {
+      toLinearLut[i] = (float)Math.pow(i / 255.0, Scene.DEFAULT_GAMMA);
+    }
+  }
+
   private ColorUtil() {
   }
 
@@ -168,6 +177,16 @@ public final class ColorUtil {
     frgb[0] = (0xFF & (irgb >> 16)) / 255.0;
     frgb[1] = (0xFF & (irgb >> 8)) / 255.0;
     frgb[2] = (0xFF & irgb) / 255.0;
+  }
+
+  /**
+   * Get the RGBA color component gamma corrected from an ARGB int
+   */
+  public static void getRGBAComponentsGammaCorrected(int argb, float[] components) {
+    components[3] = (argb >>> 24) / 255.0f;
+    components[0] = toLinearLut[(0xFF & (argb >> 16))];
+    components[1] = toLinearLut[(0xFF & (argb >> 8))];
+    components[2] = toLinearLut[(0xFF & argb)];
   }
 
   /**

@@ -931,7 +931,8 @@ public class Texture {
   protected int height;
   protected int avgColor;
   private float[] avgColorLinear;
-  private float[] linear;
+  private boolean useAverageColor = false;
+  private float[] avgColorFlat;
 
   private Image fxImage = null;
 
@@ -960,38 +961,26 @@ public class Texture {
     int[] data = image.data;
     width = image.width;
     height = image.height;
-    linear = new float[width * height * 4];
     float[] pixelBuffer = new float[4];
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
         int index = width * y + x;
-        ColorUtil.getRGBAComponents(data[index], pixelBuffer);
-        linear[index*4] = (float) FastMath.pow(pixelBuffer[0], Scene.DEFAULT_GAMMA);
-        linear[index*4 + 1] = (float) FastMath.pow(pixelBuffer[1], Scene.DEFAULT_GAMMA);
-        linear[index*4 + 2] = (float) FastMath.pow(pixelBuffer[2], Scene.DEFAULT_GAMMA);
-        linear[index*4 + 3] = pixelBuffer[3];
-        avgColorLinear[0] += linear[index*4 + 3] * linear[index*4];
-        avgColorLinear[1] += linear[index*4 + 3] * linear[index*4 + 1];
-        avgColorLinear[2] += linear[index*4 + 3] * linear[index*4 + 2];
-        avgColorLinear[3] += linear[index*4 + 3];
+        ColorUtil.getRGBAComponentsGammaCorrected(data[index], pixelBuffer);
+        avgColorLinear[0] += pixelBuffer[3] * pixelBuffer[0];
+        avgColorLinear[1] += pixelBuffer[3] * pixelBuffer[1];
+        avgColorLinear[2] += pixelBuffer[3] * pixelBuffer[2];
+        avgColorLinear[3] += pixelBuffer[3];
       }
     }
 
-    if (PersistentSettings.getSingleColorTextures()) {
-      float[] avgColorFlat = {0, 0, 0};
+    useAverageColor = PersistentSettings.getSingleColorTextures();
+    if (useAverageColor) {
+      avgColorFlat = new float[4];
       if (avgColorLinear[3] > 0.001) {
         avgColorFlat[0] = avgColorLinear[0] / avgColorLinear[3];
         avgColorFlat[1] = avgColorLinear[1] / avgColorLinear[3];
         avgColorFlat[2] = avgColorLinear[2] / avgColorLinear[3];
-      }
-      for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-          int index = width * y + x;
-          linear[index*4] = avgColorFlat[0];
-          linear[index*4 + 1] = avgColorFlat[1];
-          linear[index*4 + 2] = avgColorFlat[2];
-          linear[index*4 + 3] = 1;
-        }
+        avgColorFlat[3] = 1;
       }
     }
 
@@ -1036,9 +1025,10 @@ public class Texture {
    * @return color
    */
   public final float[] getColor(int x, int y) {
-    // TODO Not allocate here
+    if(useAverageColor)
+      return avgColorFlat;
     float[] result = new float[4];
-    System.arraycopy(linear, (width * y + x) * 4, result, 0, 4);
+    ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
     return result;
   }
 
