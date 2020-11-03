@@ -29,10 +29,10 @@ import se.llbit.chunky.renderer.scene.Scene;
 public final class ColorUtil {
 
   // Look up table used to speed up gamma correction
-  public static final float[] toLinearLut = new float[256];
+  private static final float[] toLinearLut = new float[256];
 
   static {
-    for(int i = 0; i < 256; i++) {
+    for (int i = 0; i < 256; i++) {
       toLinearLut[i] = (float)Math.pow(i / 255.0, Scene.DEFAULT_GAMMA);
     }
   }
