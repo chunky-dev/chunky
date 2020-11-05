@@ -1974,7 +1974,9 @@ public class Scene implements JsonSerializable, Refreshable {
     if (!tryLoadDump(context, name + ".dump", taskTracker)) {
       // Failed to load the default render dump - try the backup file.
       if (!tryLoadDump(context, name + ".dump.backup", taskTracker)) {
-        spp = 0;  // Set spp = 0 because we don't have the old render state.
+        // we don't have the old render state, so reset spp and render time
+        spp = 0;
+        renderTime = 0;
         return false;
       }
     }
