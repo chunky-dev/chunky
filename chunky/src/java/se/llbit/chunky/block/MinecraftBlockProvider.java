@@ -1486,7 +1486,8 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.packedIce);
       case "slime_block":
         return new Slime();
-      case "grass_path":
+      case "grass_path": // renamed to dirt_path in 20w45a
+      case "dirt_path":
         return new GrassPath();
       case "sunflower":
         {

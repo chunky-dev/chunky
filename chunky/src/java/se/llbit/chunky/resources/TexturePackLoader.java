@@ -2394,11 +2394,11 @@ public class TexturePackLoader {
 
     // Minecraft 1.9 blocks.
     allTextures.put("grass_path_side", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/block/grass_path_side",
-            Texture.grassPathSide),
-        new SimpleTexture("assets/minecraft/textures/blocks/grass_path_side",
-            Texture.grassPathSide)));
+        new SimpleTexture("assets/minecraft/textures/block/dirt_path_side", Texture.grassPathSide), // 20w45a
+        new SimpleTexture("assets/minecraft/textures/block/grass_path_side", Texture.grassPathSide),
+        new SimpleTexture("assets/minecraft/textures/blocks/grass_path_side", Texture.grassPathSide)));
     allTextures.put("grass_path_top", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/block/dirt_path_top", Texture.grassPathTop), // 20w45a
         new SimpleTexture("assets/minecraft/textures/block/grass_path_top", Texture.grassPathTop),
         new SimpleTexture("assets/minecraft/textures/blocks/grass_path_top", Texture.grassPathTop)));
     allTextures.put("end_bricks", new AlternateTextures(
