@@ -885,6 +885,25 @@ public class Texture {
   public static final Texture chain = new Texture();
   public static final Texture jigsawLock = new Texture();
 
+  // [1.17]
+  public static final Texture candle = new Texture();
+  public static final Texture whiteCandle = new Texture();
+  public static final Texture orangeCandle = new Texture();
+  public static final Texture magentaCandle = new Texture();
+  public static final Texture lightBlueCandle = new Texture();
+  public static final Texture yellowCandle = new Texture();
+  public static final Texture limeCandle = new Texture();
+  public static final Texture pinkCandle = new Texture();
+  public static final Texture grayCandle = new Texture();
+  public static final Texture lightGrayCandle = new Texture();
+  public static final Texture cyanCandle = new Texture();
+  public static final Texture purpleCandle = new Texture();
+  public static final Texture blueCandle = new Texture();
+  public static final Texture brownCandle = new Texture();
+  public static final Texture greenCandle = new Texture();
+  public static final Texture redCandle = new Texture();
+  public static final Texture blackCandle = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 

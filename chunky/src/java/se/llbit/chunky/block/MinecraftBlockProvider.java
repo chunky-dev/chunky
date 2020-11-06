@@ -2500,6 +2500,40 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.quartzBricks);
       case "chain":
         return chain(tag, "chain", Texture.chain);
+      case "candle_cake":
+        return new CakeWithCandle("candle_cake", Texture.candle);
+      case "white_candle_cake":
+        return new CakeWithCandle("white_candle_cake", Texture.whiteCandle);
+      case "orange_candle_cake":
+        return new CakeWithCandle("orange_candle_cake", Texture.orangeCandle);
+      case "magenta_candle_cake":
+        return new CakeWithCandle("magenta_candle_cake", Texture.magentaCandle);
+      case "light_blue_candle_cake":
+        return new CakeWithCandle("light_blue_candle_cake", Texture.lightBlueCandle);
+      case "yellow_candle_cake":
+        return new CakeWithCandle("yellow_candle_cake", Texture.yellowCandle);
+      case "lime_candle_cake":
+        return new CakeWithCandle("lime_candle_cake", Texture.limeCandle);
+      case "pink_candle_cake":
+        return new CakeWithCandle("pink_candle_cake", Texture.pinkCandle);
+      case "gray_candle_cake":
+        return new CakeWithCandle("gray_candle_cake", Texture.grayCandle);
+      case "light_gray_candle_cake":
+        return new CakeWithCandle("light_gray_candle_cake", Texture.lightGrayCandle);
+      case "cyan_candle_cake":
+        return new CakeWithCandle("cyan_candle_cake", Texture.cyanCandle);
+      case "purple_candle_cake":
+        return new CakeWithCandle("purple_candle_cake", Texture.purpleCandle);
+      case "blue_candle_cake":
+        return new CakeWithCandle("blue_candle_cake", Texture.blueCandle);
+      case "brown_candle_cake":
+        return new CakeWithCandle("brown_candle_cake", Texture.brownCandle);
+      case "green_candle_cake":
+        return new CakeWithCandle("green_candle_cake", Texture.greenCandle);
+      case "red_candle_cake":
+        return new CakeWithCandle("red_candle_cake", Texture.redCandle);
+      case "black_candle_cake":
+        return new CakeWithCandle("black_candle_cake", Texture.blackCandle);
       case "structure_void":
       case "barrier":
         // Invisible.
