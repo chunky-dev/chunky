@@ -2534,6 +2534,40 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new CakeWithCandle("red_candle_cake", Texture.redCandle);
       case "black_candle_cake":
         return new CakeWithCandle("black_candle_cake", Texture.blackCandle);
+      case "candle":
+        return new Candle("candle", Texture.candle);
+      case "white_candle":
+        return new Candle("white_candle", Texture.whiteCandle);
+      case "orange_candle":
+        return new Candle("orange_candle", Texture.orangeCandle);
+      case "magenta_candle":
+        return new Candle("magenta_candle", Texture.magentaCandle);
+      case "light_blue_candle":
+        return new Candle("light_blue_candle", Texture.lightBlueCandle);
+      case "yellow_candle":
+        return new Candle("yellow_candle", Texture.yellowCandle);
+      case "lime_candle":
+        return new Candle("lime_candle", Texture.limeCandle);
+      case "pink_candle":
+        return new Candle("pink_candle", Texture.pinkCandle);
+      case "gray_candle":
+        return new Candle("gray_candle", Texture.grayCandle);
+      case "light_gray_candle":
+        return new Candle("light_gray_candle", Texture.lightGrayCandle);
+      case "cyan_candle":
+        return new Candle("cyan_candle", Texture.cyanCandle);
+      case "purple_candle":
+        return new Candle("purple_candle", Texture.purpleCandle);
+      case "blue_candle":
+        return new Candle("blue_candle", Texture.blueCandle);
+      case "brown_candle":
+        return new Candle("brown_candle", Texture.brownCandle);
+      case "green_candle":
+        return new Candle("green_candle", Texture.greenCandle);
+      case "red_candle":
+        return new Candle("red_candle", Texture.redCandle);
+      case "black_candle":
+        return new Candle("black_candle", Texture.blackCandle);
       case "structure_void":
       case "barrier":
         // Invisible.
