@@ -2568,6 +2568,16 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new Candle("red_candle", Texture.redCandle);
       case "black_candle":
         return new Candle("black_candle", Texture.blackCandle);
+      case "copper_ore":
+        return new MinecraftBlock("copper_ore", Texture.copperOre);
+      case "calcite":
+        return new MinecraftBlock("calcite", Texture.calcite);
+      case "tuff":
+        return new MinecraftBlock("tuff", Texture.tuff);
+      case "amethyst_block":
+        return new MinecraftBlock("amethyst_block", Texture.amethyst);
+      case "budding_amethyst":
+        return new MinecraftBlock("budding_amethyst", Texture.buddingAmethyst);
       case "structure_void":
       case "barrier":
         // Invisible.

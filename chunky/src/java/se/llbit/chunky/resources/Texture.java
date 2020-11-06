@@ -903,6 +903,11 @@ public class Texture {
   public static final Texture greenCandle = new Texture();
   public static final Texture redCandle = new Texture();
   public static final Texture blackCandle = new Texture();
+  public static final Texture copperOre = new Texture();
+  public static final Texture calcite = new Texture();
+  public static final Texture tuff = new Texture();
+  public static final Texture amethyst = new Texture();
+  public static final Texture buddingAmethyst = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

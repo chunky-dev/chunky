@@ -3530,6 +3530,11 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/green_candle", Texture.greenCandle);
     addSimpleTexture("assets/minecraft/textures/block/red_candle", Texture.redCandle);
     addSimpleTexture("assets/minecraft/textures/block/black_candle", Texture.blackCandle);
+    addSimpleTexture("assets/minecraft/textures/block/copper_ore", Texture.copperOre);
+    addSimpleTexture("assets/minecraft/textures/block/calcite", Texture.calcite);
+    addSimpleTexture("assets/minecraft/textures/block/tuff", Texture.tuff);
+    addSimpleTexture("assets/minecraft/textures/block/amethyst_block", Texture.amethyst);
+    addSimpleTexture("assets/minecraft/textures/block/budding_amethyst", Texture.buddingAmethyst);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
