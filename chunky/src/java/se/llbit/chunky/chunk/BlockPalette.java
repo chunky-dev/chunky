@@ -230,6 +230,9 @@ public class BlockPalette {
     materialProperties.put("minecraft:iron_block", block -> {
       block.specular = 0.04f;
     });
+    materialProperties.put("minecraft:iron_bars", block -> {
+      block.specular = 0.04f;
+    });
     materialProperties.put("minecraft:redstone_torch", block -> {
       block.emittance = 1.0f;
     });
