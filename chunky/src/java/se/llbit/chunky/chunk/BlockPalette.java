@@ -353,6 +353,8 @@ public class BlockPalette {
         }
       }
     });
+    Consumer<Block> copperConfig = block -> { block.specular = 0.04f; };
+    materialProperties.put("minecraft:lightning_rod", copperConfig);
     return materialProperties;
   }
 

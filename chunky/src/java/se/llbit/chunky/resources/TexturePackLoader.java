@@ -3543,6 +3543,7 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/lightly_weathered_cut_copper", Texture.lightlyWeatheredCutCopperBlock);
     addSimpleTexture("assets/minecraft/textures/block/semi_weathered_cut_copper", Texture.semiWeatheredCutCopperBlock);
     addSimpleTexture("assets/minecraft/textures/block/weathered_cut_copper", Texture.weatheredCutCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/lightning_rod", Texture.lightningRod);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
