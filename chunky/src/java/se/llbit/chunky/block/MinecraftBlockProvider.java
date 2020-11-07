@@ -2601,6 +2601,28 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.semiWeatheredCutCopperBlock);
       case "weathered_cut_copper":
         return new MinecraftBlock(name, Texture.weatheredCutCopperBlock);
+      case "cut_copper_stairs":
+      case "waxed_cut_copper_stairs":
+        return stairs(tag, Texture.cutCopperBlock);
+      case "lightly_weathered_cut_copper_stairs":
+      case "waxed_lightly_weathered_cut_copper_stairs":
+        return stairs(tag, Texture.lightlyWeatheredCutCopperBlock);
+      case "semi_weathered_cut_copper_stairs":
+      case "waxed_semi_weathered_cut_copper_stairs":
+        return stairs(tag, Texture.semiWeatheredCutCopperBlock);
+      case "weathered_cut_copper_stairs":
+        return stairs(tag, Texture.weatheredCutCopperBlock);
+      case "cut_copper_slab":
+      case "waxed_cut_copper_slab":
+        return slab(tag, Texture.cutCopperBlock);
+      case "lightly_weathered_cut_copper_slab":
+      case "waxed_lightly_weathered_cut_copper_slab":
+        return slab(tag, Texture.lightlyWeatheredCutCopperBlock);
+      case "semi_weathered_cut_copper_slab":
+      case "waxed_semi_weathered_cut_copper_slab":
+        return slab(tag, Texture.semiWeatheredCutCopperBlock);
+      case "weathered_cut_copper_slab":
+        return slab(tag, Texture.weatheredCutCopperBlock);
       case "structure_void":
       case "barrier":
         // Invisible.
