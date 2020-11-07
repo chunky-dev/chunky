@@ -908,6 +908,14 @@ public class Texture {
   public static final Texture tuff = new Texture();
   public static final Texture amethyst = new Texture();
   public static final Texture buddingAmethyst = new Texture();
+  public static final Texture copperBlock = new Texture();
+  public static final Texture lightlyWeatheredCopperBlock = new Texture();
+  public static final Texture semiWeatheredCopperBlock = new Texture();
+  public static final Texture weatheredCopperBlock = new Texture();
+  public static final Texture cutCopperBlock = new Texture();
+  public static final Texture lightlyWeatheredCutCopperBlock = new Texture();
+  public static final Texture semiWeatheredCutCopperBlock = new Texture();
+  public static final Texture weatheredCutCopperBlock = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

@@ -3535,6 +3535,14 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/tuff", Texture.tuff);
     addSimpleTexture("assets/minecraft/textures/block/amethyst_block", Texture.amethyst);
     addSimpleTexture("assets/minecraft/textures/block/budding_amethyst", Texture.buddingAmethyst);
+    addSimpleTexture("assets/minecraft/textures/block/copper_block", Texture.copperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/lightly_weathered_copper_block", Texture.lightlyWeatheredCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/semi_weathered_copper_block", Texture.semiWeatheredCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/weathered_copper_block", Texture.weatheredCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/cut_copper", Texture.cutCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/lightly_weathered_cut_copper", Texture.lightlyWeatheredCutCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/semi_weathered_cut_copper", Texture.semiWeatheredCutCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/weathered_cut_copper", Texture.weatheredCutCopperBlock);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

@@ -2579,6 +2579,28 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock("amethyst_block", Texture.amethyst);
       case "budding_amethyst":
         return new MinecraftBlock("budding_amethyst", Texture.buddingAmethyst);
+      case "copper_block":
+      case "waxed_copper":
+        return new MinecraftBlock(name, Texture.copperBlock);
+      case "lightly_weathered_copper_block":
+      case "waxed_lightly_weathered_copper":
+        return new MinecraftBlock(name, Texture.lightlyWeatheredCopperBlock);
+      case "semi_weathered_copper_block":
+      case "waxed_semi_weathered_copper":
+        return new MinecraftBlock(name, Texture.semiWeatheredCopperBlock);
+      case "weathered_copper_block":
+        return new MinecraftBlock(name, Texture.weatheredCopperBlock);
+      case "cut_copper":
+      case "waxed_cut_copper":
+        return new MinecraftBlock(name, Texture.cutCopperBlock);
+      case "lightly_weathered_cut_copper":
+      case "waxed_lightly_weathered_cut_copper":
+        return new MinecraftBlock(name, Texture.lightlyWeatheredCutCopperBlock);
+      case "semi_weathered_cut_copper":
+      case "waxed_semi_weathered_cut_copper":
+        return new MinecraftBlock(name, Texture.semiWeatheredCutCopperBlock);
+      case "weathered_cut_copper":
+        return new MinecraftBlock(name, Texture.weatheredCutCopperBlock);
       case "structure_void":
       case "barrier":
         // Invisible.
