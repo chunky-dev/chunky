@@ -2609,6 +2609,18 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new LavaCauldron();
       case "lightning_rod":
         return new LightningRod(BlockProvider.facing(tag, "up"));
+      case "small_amethyst_bud":
+        return new AmethystCluster(name, Texture.smallAmethystBud, BlockProvider.facing(tag, "up"),
+            isLit(tag, true));
+      case "medium_amethyst_bud":
+        return new AmethystCluster(name, Texture.mediumAmethystBud, BlockProvider.facing(tag, "up"),
+            isLit(tag, true));
+      case "large_amethyst_bud":
+        return new AmethystCluster(name, Texture.largeAmethystBud, BlockProvider.facing(tag, "up"),
+            isLit(tag, true));
+      case "amethyst_cluster":
+        return new AmethystCluster(name, Texture.amethystCluster, BlockProvider.facing(tag, "up"),
+            isLit(tag, true));
       case "structure_void":
       case "barrier":
         // Invisible.
@@ -2732,6 +2744,11 @@ public class MinecraftBlockProvider implements BlockProvider {
 
   private static boolean isLit(Tag tag) {
     return tag.get("Properties").get("lit").stringValue("false").equals("true");
+  }
+
+  private static boolean isLit(Tag tag, boolean defaultValue) {
+    return tag.get("Properties").get("lit").stringValue(Boolean.toString(defaultValue))
+        .equals("true");
   }
 
   private static Block redstoneTorch(Tag tag) {

@@ -917,6 +917,10 @@ public class Texture {
   public static final Texture semiWeatheredCutCopperBlock = new Texture();
   public static final Texture weatheredCutCopperBlock = new Texture();
   public static final Texture lightningRod = new Texture();
+  public static final Texture smallAmethystBud = new Texture();
+  public static final Texture mediumAmethystBud = new Texture();
+  public static final Texture largeAmethystBud = new Texture();
+  public static final Texture amethystCluster = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

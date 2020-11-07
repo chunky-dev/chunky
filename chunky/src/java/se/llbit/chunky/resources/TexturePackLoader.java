@@ -3544,6 +3544,10 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/semi_weathered_cut_copper", Texture.semiWeatheredCutCopperBlock);
     addSimpleTexture("assets/minecraft/textures/block/weathered_cut_copper", Texture.weatheredCutCopperBlock);
     addSimpleTexture("assets/minecraft/textures/block/lightning_rod", Texture.lightningRod);
+    addSimpleTexture("assets/minecraft/textures/block/small_amethyst_bud", Texture.smallAmethystBud);
+    addSimpleTexture("assets/minecraft/textures/block/medium_amethyst_bud", Texture.mediumAmethystBud);
+    addSimpleTexture("assets/minecraft/textures/block/large_amethyst_bud", Texture.largeAmethystBud);
+    addSimpleTexture("assets/minecraft/textures/block/amethyst_cluster", Texture.amethystCluster);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

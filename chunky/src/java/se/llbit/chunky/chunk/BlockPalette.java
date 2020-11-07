@@ -384,6 +384,26 @@ public class BlockPalette {
     materialProperties.put("minecraft:waxed_lightly_weathered_cut_copper_slab", lightlyWeatheredCopperConfig);
     materialProperties.put("minecraft:waxed_semi_weathered_cut_copper_slab", semiWeatheredCopperConfig);
     materialProperties.put("minecraft:lightning_rod", copperConfig);
+    materialProperties.put("minecraft:small_amethyst_bud", block -> {
+      if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
+        block.emittance = 1.0f / 15f;
+      }
+    });
+    materialProperties.put("minecraft:medium_amethyst_bud", block -> {
+      if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
+        block.emittance = 1.0f / 15f * 2;
+      }
+    });
+    materialProperties.put("minecraft:large_amethyst_bud", block -> {
+      if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
+        block.emittance = 1.0f / 15f * 4;
+      }
+    });
+    materialProperties.put("minecraft:amethyst_cluster", block -> {
+      if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
+        block.emittance = 1.0f / 15f * 5;
+      }
+    });
     return materialProperties;
   }
 
