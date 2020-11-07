@@ -2036,7 +2036,8 @@ public class MinecraftBlockProvider implements BlockProvider {
               bottle0.equals("true"), bottle1.equals("true"), bottle2.equals("true"));
         }
       case "cauldron":
-        return new Cauldron(BlockProvider.stringToInt(tag.get("Properties").get("level"), 3));
+      case "water_cauldron":
+        return new Cauldron(name, BlockProvider.stringToInt(tag.get("Properties").get("level"), 3));
       case "flower_pot":
         return new FlowerPot(name, FlowerPotModel.Kind.NONE);
       case "potted_poppy":
@@ -2623,6 +2624,8 @@ public class MinecraftBlockProvider implements BlockProvider {
         return slab(tag, Texture.semiWeatheredCutCopperBlock);
       case "weathered_cut_copper_slab":
         return slab(tag, Texture.weatheredCutCopperBlock);
+      case "lava_cauldron":
+        return new LavaCauldron();
       case "structure_void":
       case "barrier":
         // Invisible.
