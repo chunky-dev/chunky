@@ -921,6 +921,7 @@ public class Texture {
   public static final Texture mediumAmethystBud = new Texture();
   public static final Texture largeAmethystBud = new Texture();
   public static final Texture amethystCluster = new Texture();
+  public static final Texture tintedGlass = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

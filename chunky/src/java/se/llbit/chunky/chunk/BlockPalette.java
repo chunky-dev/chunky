@@ -404,6 +404,7 @@ public class BlockPalette {
         block.emittance = 1.0f / 15f * 5;
       }
     });
+    materialProperties.put("minecraft:tinted_glass", glassConfig);
     return materialProperties;
   }
 

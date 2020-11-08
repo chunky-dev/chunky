@@ -2621,6 +2621,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "amethyst_cluster":
         return new AmethystCluster(name, Texture.amethystCluster, BlockProvider.facing(tag, "up"),
             isLit(tag, true));
+      case "tinted_glass":
+        return new TintedGlass();
       case "structure_void":
       case "barrier":
         // Invisible.
