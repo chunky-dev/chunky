@@ -129,6 +129,10 @@ public class Grid {
     int gridX = x / cellSize;
     int gridY = y / cellSize;
     int gridZ = z / cellSize;
+
+    if(isOOB(gridX) || isOOB(gridY) || isOOB(gridZ))
+      return null;
+
     int index = cellIndex(gridX, gridY, gridZ);
 
     int start = constructedGrid[2*index];
@@ -141,6 +145,11 @@ public class Grid {
     return emitterPositions.get(emitterIndex);
   }
 
+  private boolean isOOB(int coord)
+  {
+    return coord < 0 || coord >= gridSize;
+  }
+
   /**
    * Get the list of emitters position close from a given point
    */
@@ -148,10 +157,14 @@ public class Grid {
     int gridX = x / cellSize;
     int gridY = y / cellSize;
     int gridZ = z / cellSize;
+
+    List<EmitterPosition> pos = new ArrayList<>();
+    if(isOOB(gridX) || isOOB(gridY) || isOOB(gridZ))
+      return pos;
+
     int index = cellIndex(gridX, gridY, gridZ);
     int start = constructedGrid[2*index];
     int size = constructedGrid[2*index+1];
-    List<EmitterPosition> pos = new ArrayList<>();
     for(int i = 0; i < size; ++i) {
       pos.add(emitterPositions.get(positionIndexes[start+i]));
     }
