@@ -130,7 +130,7 @@ public class Grid {
     int gridY = y / cellSize;
     int gridZ = z / cellSize;
 
-    if(isOOB(gridX) || isOOB(gridY) || isOOB(gridZ))
+    if(isOutOfBounds(gridX, gridY, gridZ))
       return null;
 
     int index = cellIndex(gridX, gridY, gridZ);
@@ -145,9 +145,11 @@ public class Grid {
     return emitterPositions.get(emitterIndex);
   }
 
-  private boolean isOOB(int coord)
+  private boolean isOutOfBounds(int x, int y, int z)
   {
-    return coord < 0 || coord >= gridSize;
+    return x < 0 || x >= gridSize
+        || y < 0 || y >= gridSize
+        || z < 0 || z >= gridSize;
   }
 
   /**
@@ -159,7 +161,7 @@ public class Grid {
     int gridZ = z / cellSize;
 
     List<EmitterPosition> pos = new ArrayList<>();
-    if(isOOB(gridX) || isOOB(gridY) || isOOB(gridZ))
+    if(isOutOfBounds(gridX, gridY, gridZ))
       return pos;
 
     int index = cellIndex(gridX, gridY, gridZ);
