@@ -129,6 +129,10 @@ public class Grid {
     int gridX = x / cellSize;
     int gridY = y / cellSize;
     int gridZ = z / cellSize;
+
+    if(isOutOfBounds(gridX, gridY, gridZ))
+      return null;
+
     int index = cellIndex(gridX, gridY, gridZ);
 
     int start = constructedGrid[2*index];
@@ -141,6 +145,13 @@ public class Grid {
     return emitterPositions.get(emitterIndex);
   }
 
+  private boolean isOutOfBounds(int x, int y, int z)
+  {
+    return x < 0 || x >= gridSize
+        || y < 0 || y >= gridSize
+        || z < 0 || z >= gridSize;
+  }
+
   /**
    * Get the list of emitters position close from a given point
    */
@@ -148,10 +159,14 @@ public class Grid {
     int gridX = x / cellSize;
     int gridY = y / cellSize;
     int gridZ = z / cellSize;
+
+    List<EmitterPosition> pos = new ArrayList<>();
+    if(isOutOfBounds(gridX, gridY, gridZ))
+      return pos;
+
     int index = cellIndex(gridX, gridY, gridZ);
     int start = constructedGrid[2*index];
     int size = constructedGrid[2*index+1];
-    List<EmitterPosition> pos = new ArrayList<>();
     for(int i = 0; i < size; ++i) {
       pos.add(emitterPositions.get(positionIndexes[start+i]));
     }
