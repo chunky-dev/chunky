@@ -416,6 +416,8 @@ public class CauldronModel {
         ray.t = ray.tNext;
         ray.n.set(lava.n);
         hit = true;
+
+        // set the current material to lava so that only the lava is emissive and not the cauldron
         ray.setPrevMaterial(ray.getCurrentMaterial(), ray.getCurrentData());
         ray.setCurrentMaterial(new Lava(7));
       }

@@ -4,7 +4,7 @@ import se.llbit.chunky.resources.Texture;
 
 public class AmethystCluster extends SpriteBlock {
 
-  public final boolean lit;
+  private final boolean lit;
 
   public AmethystCluster(String name, Texture texture, String facing, boolean lit) {
     super(name, texture, facing);

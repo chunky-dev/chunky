@@ -2484,73 +2484,73 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "chain":
         return chain(tag, "chain", Texture.chain);
       case "candle_cake":
-        return new CakeWithCandle("candle_cake", Texture.candle);
+        return candleCake(tag, Texture.candle);
       case "white_candle_cake":
-        return new CakeWithCandle("white_candle_cake", Texture.whiteCandle);
+        return candleCake(tag, Texture.whiteCandle);
       case "orange_candle_cake":
-        return new CakeWithCandle("orange_candle_cake", Texture.orangeCandle);
+        return candleCake(tag, Texture.orangeCandle);
       case "magenta_candle_cake":
-        return new CakeWithCandle("magenta_candle_cake", Texture.magentaCandle);
+        return candleCake(tag, Texture.magentaCandle);
       case "light_blue_candle_cake":
-        return new CakeWithCandle("light_blue_candle_cake", Texture.lightBlueCandle);
+        return candleCake(tag, Texture.lightBlueCandle);
       case "yellow_candle_cake":
-        return new CakeWithCandle("yellow_candle_cake", Texture.yellowCandle);
+        return candleCake(tag, Texture.yellowCandle);
       case "lime_candle_cake":
-        return new CakeWithCandle("lime_candle_cake", Texture.limeCandle);
+        return candleCake(tag, Texture.limeCandle);
       case "pink_candle_cake":
-        return new CakeWithCandle("pink_candle_cake", Texture.pinkCandle);
+        return candleCake(tag, Texture.pinkCandle);
       case "gray_candle_cake":
-        return new CakeWithCandle("gray_candle_cake", Texture.grayCandle);
+        return candleCake(tag, Texture.grayCandle);
       case "light_gray_candle_cake":
-        return new CakeWithCandle("light_gray_candle_cake", Texture.lightGrayCandle);
+        return candleCake(tag, Texture.lightGrayCandle);
       case "cyan_candle_cake":
-        return new CakeWithCandle("cyan_candle_cake", Texture.cyanCandle);
+        return candleCake(tag, Texture.cyanCandle);
       case "purple_candle_cake":
-        return new CakeWithCandle("purple_candle_cake", Texture.purpleCandle);
+        return candleCake(tag, Texture.purpleCandle);
       case "blue_candle_cake":
-        return new CakeWithCandle("blue_candle_cake", Texture.blueCandle);
+        return candleCake(tag, Texture.blueCandle);
       case "brown_candle_cake":
-        return new CakeWithCandle("brown_candle_cake", Texture.brownCandle);
+        return candleCake(tag, Texture.brownCandle);
       case "green_candle_cake":
-        return new CakeWithCandle("green_candle_cake", Texture.greenCandle);
+        return candleCake(tag, Texture.greenCandle);
       case "red_candle_cake":
-        return new CakeWithCandle("red_candle_cake", Texture.redCandle);
+        return candleCake(tag, Texture.redCandle);
       case "black_candle_cake":
-        return new CakeWithCandle("black_candle_cake", Texture.blackCandle);
+        return candleCake(tag, Texture.blackCandle);
       case "candle":
-        return new Candle("candle", Texture.candle);
+        return candle(tag, Texture.candle);
       case "white_candle":
-        return new Candle("white_candle", Texture.whiteCandle);
+        return candle(tag, Texture.whiteCandle);
       case "orange_candle":
-        return new Candle("orange_candle", Texture.orangeCandle);
+        return candle(tag, Texture.orangeCandle);
       case "magenta_candle":
-        return new Candle("magenta_candle", Texture.magentaCandle);
+        return candle(tag, Texture.magentaCandle);
       case "light_blue_candle":
-        return new Candle("light_blue_candle", Texture.lightBlueCandle);
+        return candle(tag, Texture.lightBlueCandle);
       case "yellow_candle":
-        return new Candle("yellow_candle", Texture.yellowCandle);
+        return candle(tag, Texture.yellowCandle);
       case "lime_candle":
-        return new Candle("lime_candle", Texture.limeCandle);
+        return candle(tag, Texture.limeCandle);
       case "pink_candle":
-        return new Candle("pink_candle", Texture.pinkCandle);
+        return candle(tag, Texture.pinkCandle);
       case "gray_candle":
-        return new Candle("gray_candle", Texture.grayCandle);
+        return candle(tag, Texture.grayCandle);
       case "light_gray_candle":
-        return new Candle("light_gray_candle", Texture.lightGrayCandle);
+        return candle(tag, Texture.lightGrayCandle);
       case "cyan_candle":
-        return new Candle("cyan_candle", Texture.cyanCandle);
+        return candle(tag, Texture.cyanCandle);
       case "purple_candle":
-        return new Candle("purple_candle", Texture.purpleCandle);
+        return candle(tag, Texture.purpleCandle);
       case "blue_candle":
-        return new Candle("blue_candle", Texture.blueCandle);
+        return candle(tag, Texture.blueCandle);
       case "brown_candle":
-        return new Candle("brown_candle", Texture.brownCandle);
+        return candle(tag, Texture.brownCandle);
       case "green_candle":
-        return new Candle("green_candle", Texture.greenCandle);
+        return candle(tag, Texture.greenCandle);
       case "red_candle":
-        return new Candle("red_candle", Texture.redCandle);
+        return candle(tag, Texture.redCandle);
       case "black_candle":
-        return new Candle("black_candle", Texture.blackCandle);
+        return candle(tag, Texture.blackCandle);
       case "copper_ore":
         return new MinecraftBlock("copper_ore", Texture.copperOre);
       case "calcite":
@@ -3097,5 +3097,18 @@ public class MinecraftBlockProvider implements BlockProvider {
         break;
     }
     return new MinecraftBlock("structure_block", texture);
+  }
+
+  private static Block candle(Tag tag, Texture candleTexture) {
+    Tag properties = tag.get("Properties");
+    return new Candle(BlockProvider.blockName(tag), candleTexture,
+        BlockProvider.stringToInt(properties.get("candles"), 1),
+        properties.get("lit").stringValue("false").equals("true"));
+  }
+
+  private static Block candleCake(Tag tag, Texture candleTexture) {
+    Tag properties = tag.get("Properties");
+    return new CakeWithCandle(BlockProvider.blockName(tag), candleTexture,
+        properties.get("lit").stringValue("false").equals("true"));
   }
 }

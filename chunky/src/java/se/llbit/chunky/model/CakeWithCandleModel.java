@@ -120,7 +120,7 @@ public class CakeWithCandleModel {
       }, Math.toRadians(45)));
 
 
-  public static boolean intersect(Ray ray, Texture candle) {
+  public static boolean intersect(Ray ray, Texture candle, boolean lit) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
 
