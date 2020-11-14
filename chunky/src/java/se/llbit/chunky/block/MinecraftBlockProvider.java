@@ -599,6 +599,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:potted_warped_roots",
       "minecraft:potted_white_tulip",
       "minecraft:potted_wither_rose",
+      "minecraft:powder_snow",
       "minecraft:powered_rail",
       "minecraft:prismarine_bricks",
       "minecraft:prismarine_brick_slab",
@@ -2699,6 +2700,8 @@ public class MinecraftBlockProvider implements BlockProvider {
             isLit(tag, true));
       case "tinted_glass":
         return new TintedGlass();
+      case "powder_snow":
+        return new MinecraftBlock(name, Texture.powderSnow);
       case "structure_void":
       case "barrier":
         // Invisible.

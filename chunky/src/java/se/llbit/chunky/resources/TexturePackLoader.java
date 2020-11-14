@@ -3550,6 +3550,7 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/large_amethyst_bud", Texture.largeAmethystBud);
     addSimpleTexture("assets/minecraft/textures/block/amethyst_cluster", Texture.amethystCluster);
     addSimpleTexture("assets/minecraft/textures/block/tinted_glass", Texture.tintedGlass);
+    addSimpleTexture("assets/minecraft/textures/block/powder_snow", Texture.powderSnow);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
