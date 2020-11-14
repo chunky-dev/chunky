@@ -3,10 +3,8 @@ package se.llbit.chunky.entity;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.stream.StreamSupport;
+import se.llbit.chunky.block.Candle;
 import se.llbit.chunky.model.Model;
-import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.world.Material;
-import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
@@ -51,19 +49,29 @@ public class FlameParticles extends Entity {
   );
 
   private final Vector3[] flames;
+  private final double scale;
 
-  public FlameParticles(Vector3 position, Vector3[] flames) {
+  public FlameParticles(Vector3 position, double scale, Vector3[] flames) {
     super(position);
     this.flames = flames;
+    this.scale = scale;
+  }
+
+  public FlameParticles(Vector3 position, Vector3[] flames) {
+    this(position, 1, flames);
+  }
+
+  public FlameParticles(Vector3 position, double scale) {
+    this(position, scale, new Vector3[]{position});
   }
 
   public FlameParticles(Vector3 position) {
-    super(position);
-    this.flames = new Vector3[]{position};
+    this(position, 1);
   }
 
   public FlameParticles(JsonObject json) {
     super(JsonUtil.vec3FromJsonObject(json.get("position")));
+    this.scale = json.get("scale").asDouble(1.0);
     if (json.get("particles").isArray()) {
       this.flames = StreamSupport.stream(json.get("particles").array().spliterator(), false)
           .map(JsonUtil::vec3FromJsonObject)
@@ -79,7 +87,13 @@ public class FlameParticles extends Entity {
     for (Vector3 flameOffset : flames) {
       for (Quad quad : quads) {
         quad.addTriangles(faces, Candle.flameMaterial,
-            Transform.NONE.translate(offset).translate(position).translate(flameOffset));
+            Transform.NONE
+                .translate(-0.5, -1 / 16.0, -0.5)
+                .scale(scale)
+                .translate(0.5, 1 / 16.0, 0.5)
+                .translate(flameOffset)
+                .translate(offset)
+                .translate(position));
       }
     }
     return faces;
@@ -90,6 +104,7 @@ public class FlameParticles extends Entity {
     JsonObject json = new JsonObject();
     json.add("kind", "flameParticles");
     json.add("position", position.toJson());
+    json.add("scale", scale);
     if (flames.length > 1 || !position.equals(flames[0])) {
       JsonArray particles = new JsonArray();
       for (Vector3 particle : flames) {
