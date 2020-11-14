@@ -47,7 +47,10 @@ public class Grid {
   // This way of storing the data is more difficult to manipulate but more
   // memory efficient by virtue of only having 2 flat arrays
 
+  // Only used during construction
   private int minX, maxX, minY, maxY, minZ, maxZ;
+
+  private int offsetX, sizeX, offsetY, sizeY, offsetZ, sizeZ;
 
   public Grid(int octreeDepth, int cellSize) {
     this.cellSize = cellSize;
@@ -65,22 +68,29 @@ public class Grid {
 
   public void addEmitter(int x, int y, int z) {
     emitterPositions.add(new EmitterPosition(x, y, z));
-    if(minX == -1 || x / cellSize < minX)
-      minX = x / cellSize;
-    if(maxX == -1 || x / cellSize > maxX)
-      maxX = x / cellSize;
-    if(minY == -1 || y / cellSize < minY)
-      minY = y / cellSize;
-    if(maxY == -1 || y / cellSize > maxY)
-      maxY = y / cellSize;
-    if(minZ == -1 || z / cellSize < minZ)
-      minZ = z / cellSize;
-    if(maxZ == -1 || z / cellSize > maxZ)
-      maxZ = z / cellSize;
+    if(minX == -1 || x < minX)
+      minX = x;
+    if(maxX == -1 || x  > maxX)
+      maxX = x;
+    if(minY == -1 || y < minY)
+      minY = y;
+    if(maxY == -1 || y > maxY)
+      maxY = y;
+    if(minZ == -1 || z < minZ)
+      minZ = z;
+    if(maxZ == -1 || z > maxZ)
+      maxZ = z;
   }
 
   private int cellIndex(int x, int y, int z) {
-    return (((y - minY + 1) * (maxX - minX + 3)) + (x - minX + 1)) * (maxZ - minZ + 3) + (z - minZ + 1);
+    return (((y - offsetY) * sizeX) + (x - offsetX)) * sizeZ + (z - offsetZ);
+  }
+
+  private boolean isOutOfBounds(int x, int y, int z)
+  {
+    return x < offsetX || x >= sizeX + offsetX
+            || y < offsetY || y >= sizeY + offsetY
+            || z < offsetZ || z >= sizeZ + offsetZ;
   }
 
   /**
@@ -88,7 +98,14 @@ public class Grid {
    * Builds the grid itself
    */
   public void prepare() {
-    Cell[] gridDuringConstruction = new Cell[(maxX - minX + 3) * (maxY - minY + 3) * (maxZ - minZ + 3)];
+    offsetX = minX / cellSize - 1;
+    offsetY = minY / cellSize - 1;
+    offsetZ = minZ / cellSize - 1;
+    sizeX = maxX / cellSize - minX / cellSize + 3;
+    sizeY = maxY / cellSize - minY / cellSize + 3;
+    sizeZ = maxZ / cellSize - minZ / cellSize + 3;
+
+    Cell[] gridDuringConstruction = new Cell[sizeX * sizeY * sizeZ];
 
     int numberOfPositionIndex = 0;
 
@@ -104,7 +121,7 @@ public class Grid {
             int x = gridX+dx;
             int y = gridY+dy;
             int z = gridZ+dz;
-            if(x >= minX-1 && x <= maxX+1 && y >= minY-1 && y <= maxY+1 && z >= minZ-1 && z <= maxZ+1) {
+            if(!isOutOfBounds(x, y, z)) {
               int index = cellIndex(x, y, z);
               if(gridDuringConstruction[index] == null)
                 gridDuringConstruction[index] = new Cell();
@@ -117,7 +134,7 @@ public class Grid {
     }
 
     positionIndexes = new int[numberOfPositionIndex];
-    constructedGrid = new int[(maxX - minX + 3) * (maxY - minY + 3) * (maxZ - minZ + 3)*2];
+    constructedGrid = new int[sizeX * sizeY * sizeZ * 2];
     int constructedGridCurrentIndex = 0;
 
     for(int i = 0; i < gridDuringConstruction.length; ++i) {
@@ -159,13 +176,6 @@ public class Grid {
     int randomIndex = random.nextInt(size);
     int emitterIndex = positionIndexes[start+randomIndex];
     return emitterPositions.get(emitterIndex);
-  }
-
-  private boolean isOutOfBounds(int x, int y, int z)
-  {
-    return x < minX-1 || x > maxX+1
-        || y < minY-1 || y > maxY+1
-        || z < minZ-1 || z > maxZ+1;
   }
 
   /**
