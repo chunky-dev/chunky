@@ -32,20 +32,9 @@ public class ExtraMaterials {
   }
 
   public static void loadDefaultMaterialProperties() {
-    CloudMaterial.INSTANCE.opaque = false;
-    CloudMaterial.INSTANCE.solid = true;
-    CloudMaterial.INSTANCE.localIntersect = false;
-    CloudMaterial.INSTANCE.invisible = false;
-    CloudMaterial.INSTANCE.emittance = 0;
-    CloudMaterial.INSTANCE.specular = 0;
-    CloudMaterial.INSTANCE.ior = 1.000293f;
+    CloudMaterial.INSTANCE.restoreDefaults();
 
-    Candle.flameMaterial.opaque = false;
-    Candle.flameMaterial.solid = true;
-    Candle.flameMaterial.localIntersect = false;
-    Candle.flameMaterial.invisible = false;
+    Candle.flameMaterial.restoreDefaults();
     Candle.flameMaterial.emittance = 1.0f;
-    Candle.flameMaterial.specular = 0;
-    Candle.flameMaterial.ior = 0;
   }
 }

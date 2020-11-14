@@ -88,6 +88,18 @@ public abstract class Material {
   }
 
   /**
+   * Restore the default material properties.
+   */
+  public void restoreDefaults() {
+    ior = 1.000293f;
+    opaque = false;
+    solid = true;
+    specular = 0;
+    emittance = 0;
+    subSurfaceScattering = false;
+  }
+
+  /**
    * Retrieves the texture based on the block data.
    *
    * @param blockData [0,16]

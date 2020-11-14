@@ -27,4 +27,9 @@ public class CloudMaterial extends Material {
     super("cloud", Texture.air);
   }
 
+  @Override
+  public void restoreDefaults() {
+    super.restoreDefaults();
+
+  }
 }
