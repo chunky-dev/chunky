@@ -903,6 +903,7 @@ public class Texture {
   public static final Texture greenCandle = new Texture();
   public static final Texture redCandle = new Texture();
   public static final Texture blackCandle = new Texture();
+  public static final Texture flameParticle = new Texture();
   public static final Texture copperOre = new Texture();
   public static final Texture calcite = new Texture();
   public static final Texture tuff = new Texture();

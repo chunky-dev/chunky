@@ -1,9 +1,12 @@
 package se.llbit.chunky.block;
 
+import se.llbit.chunky.entity.Entity;
+import se.llbit.chunky.entity.FlameParticles;
 import se.llbit.chunky.model.CandleModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
 
 public class Candle extends MinecraftBlockTranslucent {
 
@@ -25,11 +28,51 @@ public class Candle extends MinecraftBlockTranslucent {
 
   @Override
   public boolean intersect(Ray ray, Scene scene) {
-    return CandleModel.intersect(ray, candle, candles, isLit());
+    return CandleModel.intersect(ray, candle, candles);
+  }
+
+  @Override
+  public boolean isEntity() {
+    return isLit();
+  }
+
+  @Override
+  public boolean isBlockWithEntity() {
+    return true;
+  }
+
+  @Override
+  public Entity toEntity(Vector3 position) {
+    switch (candles) {
+      case 1:
+        return new FlameParticles(position, new Vector3[]{
+            new Vector3(0, 7 / 16.0, 0)
+        });
+      case 2:
+        return new FlameParticles(position, new Vector3[]{
+            new Vector3(-2 / 16.0, 6 / 16.0, 0),
+            new Vector3(2 / 16.0, 7 / 16.0, -1 / 16.0)
+        });
+      case 3:
+        return new FlameParticles(position, new Vector3[]{
+            new Vector3(0, 4 / 16.0, 2 / 16.0),
+            new Vector3(-2 / 16.0, 6 / 16.0, 0),
+            new Vector3(1 / 16.0, 7 / 16.0, -1 / 16.0)
+        });
+      case 4:
+        return new FlameParticles(position, new Vector3[]{
+            new Vector3(-1 / 16.0, 4 / 16.0, 1 / 16.0),
+            new Vector3(2 / 16.0, 6 / 16.0, 1 / 16.0),
+            new Vector3(-2 / 16.0, 6 / 16.0, -2 / 16.0),
+            new Vector3(1 / 16.0, 7 / 16.0, -2 / 16.0)
+        });
+      default:
+        return new FlameParticles(position, new Vector3[0]);
+    }
   }
 
   @Override
   public String description() {
-    return "candles=" + candle + ", lit=" + isLit();
+    return "candles=" + candles + ", lit=" + isLit();
   }
 }

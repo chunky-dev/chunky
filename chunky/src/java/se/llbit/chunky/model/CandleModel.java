@@ -679,7 +679,7 @@ public class CandleModel {
       )
   };
 
-  public static boolean intersect(Ray ray, Texture candle, int candles, boolean isLit) {
+  public static boolean intersect(Ray ray, Texture candle, int candles) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
 

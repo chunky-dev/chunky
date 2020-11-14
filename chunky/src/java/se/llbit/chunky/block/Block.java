@@ -12,6 +12,7 @@ import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
 public abstract class Block extends Material {
+
   public Block(String name, Texture texture) {
     super(name, texture);
   }
@@ -20,7 +21,8 @@ public abstract class Block extends Material {
     return TexturedBlockModel.intersect(ray, texture);
   }
 
-  @Override public JsonValue toJson() {
+  @Override
+  public JsonValue toJson() {
     return new JsonString(name);
   }
 
@@ -28,7 +30,8 @@ public abstract class Block extends Material {
     return "";
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return name;
   }
 
@@ -42,6 +45,15 @@ public abstract class Block extends Material {
   }
 
   public boolean isEntity() {
+    return false;
+  }
+
+  /**
+   * If this returns true, the block won't be removed from the octree even if this is an entity
+   * (i.e. {@link #isEntity()} returns true). This can be used for blocks that also contain
+   * entities, e.g. candle (where the candle flame is an entity).
+   */
+  public boolean isBlockWithEntity() {
     return false;
   }
 
