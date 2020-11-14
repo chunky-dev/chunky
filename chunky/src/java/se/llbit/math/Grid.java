@@ -53,14 +53,14 @@ public class Grid {
     this.cellSize = cellSize;
     long totalSize = (1L << octreeDepth);
     this.gridSize = (int) ((totalSize + (cellSize-1)) / cellSize);
-    minX = maxX = minY = maxY = minZ = maxZ = 1;
+    minX = maxX = minY = maxY = minZ = maxZ = -1;
   }
 
   // Constructor used by the load method
   private Grid(int gridSize, int cellSize, int overloadSelectFlag /*unused*/) {
     this.gridSize = gridSize;
     this.cellSize = cellSize;
-    minX = maxX = minY = maxY = minZ = maxZ = 1;
+    minX = maxX = minY = maxY = minZ = maxZ = -1;
   }
 
   public void addEmitter(int x, int y, int z) {
