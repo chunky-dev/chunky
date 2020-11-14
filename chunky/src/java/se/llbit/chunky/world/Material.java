@@ -35,12 +35,6 @@ public abstract class Material {
   public float ior = 1.000293f;
 
   /**
-   * Set to true if there is a local intersection model
-   * for this block.
-   */
-  public boolean localIntersect = false;
-
-  /**
    * A block is opaque if it occupies an entire voxel
    * and no light can pass through it.
    */
@@ -56,14 +50,6 @@ public abstract class Material {
    * The specular coefficient controlling how shiny the block appears.
    */
   public float specular = 0;
-
-  /**
-   * Invisible blocks are not rendered as regular voxels
-   * (they are not added to the voxel octree).
-   * This is used for blocks that are rendered as entities,
-   * and blocks that are not implemented yet.
-   */
-  public boolean invisible = false;
 
   /**
    * The amount of light the material emits.

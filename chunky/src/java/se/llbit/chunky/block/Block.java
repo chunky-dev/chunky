@@ -13,6 +13,20 @@ import se.llbit.nbt.CompoundTag;
 
 public abstract class Block extends Material {
 
+  /**
+   * Set to true if there is a local intersection model
+   * for this block.
+   */
+  public boolean localIntersect = false;
+
+  /**
+   * Invisible blocks are not rendered as regular voxels
+   * (they are not added to the voxel octree).
+   * This is used for blocks that are rendered as entities,
+   * and blocks that are not implemented yet.
+   */
+  public boolean invisible = false;
+
   public Block(String name, Texture texture) {
     super(name, texture);
   }
