@@ -5,10 +5,14 @@ import se.llbit.chunky.entity.FlameParticles;
 import se.llbit.chunky.model.CandleModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
 public class Candle extends MinecraftBlockTranslucent {
+
+  public static final Material flameMaterial = new TextureMaterial(Texture.flameParticle);
 
   private final Texture candle;
   private final int candles;

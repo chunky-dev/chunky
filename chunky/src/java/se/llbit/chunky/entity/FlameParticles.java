@@ -50,12 +50,6 @@ public class FlameParticles extends Entity {
       }, Math.toRadians(-45))
   );
 
-  private static final Material flameMaterial = new TextureMaterial(Texture.flameParticle);
-
-  static {
-    flameMaterial.emittance = 1.0f;
-  }
-
   private final Vector3[] flames;
 
   public FlameParticles(Vector3 position, Vector3[] flames) {
@@ -84,7 +78,7 @@ public class FlameParticles extends Entity {
     Collection<Primitive> faces = new LinkedList<>();
     for (Vector3 flameOffset : flames) {
       for (Quad quad : quads) {
-        quad.addTriangles(faces, flameMaterial,
+        quad.addTriangles(faces, Candle.flameMaterial,
             Transform.NONE.translate(offset).translate(position).translate(flameOffset));
       }
     }
