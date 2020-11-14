@@ -316,6 +316,28 @@ public class Campfire extends Entity {
   private static int getOrientationIndex(String facing) {
     switch (facing) {
       case "north":
+          return 0;
+      case "east":
+          return 1;
+      case "south":
+          return 2;
+      case "west":
+          return 3;
+      default:
+          return 0;
+    }
+  }
+
+  @Override
+  public Vector3 getEmitterPosition() {
+    if(isLit)
+      return new Vector3(position.x + 0.5, position.y + 0.625, position.z + 0.5);
+    else
+      return null;
+  }
+  private static int getOrientationIndex(String facing) {
+    switch (facing) {
+      case "north":
         return 0;
       case "east":
         return 1;

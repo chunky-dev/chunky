@@ -21,13 +21,13 @@ public class Grid {
    * The maximum distance where an emitter can be found in some cases is 2*cellSize-1 blocks away.
    */
   public static class EmitterPosition {
-    public EmitterPosition(int x, int y, int z) {
+    public EmitterPosition(float x, float y, float z) {
       this.x = x;
       this.y = y;
       this.z = z;
     }
 
-    public int x, y, z;
+    public float x, y, z;
   }
 
   private final int cellSize;
@@ -56,20 +56,20 @@ public class Grid {
     minX = maxX = minY = maxY = minZ = maxZ = -1;
   }
 
-  public void addEmitter(int x, int y, int z) {
+  public void addEmitter(float x, float y, float z) {
     emitterPositions.add(new EmitterPosition(x, y, z));
     if(minX == -1 || x < minX)
-      minX = x;
+      minX = (int) x;
     if(maxX == -1 || x  > maxX)
-      maxX = x;
+      maxX = (int) x;
     if(minY == -1 || y < minY)
-      minY = y;
+      minY = (int) y;
     if(maxY == -1 || y > maxY)
-      maxY = y;
+      maxY = (int) y;
     if(minZ == -1 || z < minZ)
-      minZ = z;
+      minZ = (int) z;
     if(maxZ == -1 || z > maxZ)
-      maxZ = z;
+      maxZ = (int) z;
   }
 
   private int cellIndex(int x, int y, int z) {
@@ -101,9 +101,9 @@ public class Grid {
 
     for(int i = 0; i < emitterPositions.size(); ++i) {
       EmitterPosition pos = emitterPositions.get(i);
-      int gridX = pos.x / cellSize;
-      int gridY = pos.y / cellSize;
-      int gridZ = pos.z / cellSize;
+      int gridX = (int) (pos.x / cellSize);
+      int gridY = (int) (pos.y / cellSize);
+      int gridZ = (int) (pos.z / cellSize);
       // Add the emitter to its cell and all neighboring cells
       for(int dy = -1; dy <= 1; ++dy) {
         for(int dx = -1; dx <= 1; ++dx) {
@@ -206,11 +206,11 @@ public class Grid {
 
     // Write every emitter position
     out.writeInt(emitterPositions.size());
-    for(EmitterPosition pos : emitterPositions) {
-      out.writeInt(pos.x);
-      out.writeInt(pos.y);
-      out.writeInt(pos.z);
-    }
+//    for(EmitterPosition pos : emitterPositions) {
+//      out.writeInt(pos.x);
+//      out.writeInt(pos.y);
+//      out.writeInt(pos.z);
+//    }
 
     // Write, for each cell, how many emitters are contained and their indexes in the array written earlier
     for(int i = 0; i < sizeX*sizeY*sizeZ; ++i) {

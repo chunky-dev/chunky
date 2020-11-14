@@ -1028,7 +1028,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 worldOctree.set(octNode, x, cy - origin.y, z);
 
                 if (emitterGrid != null && block.emittance > 1e-4) {
-                  emitterGrid.addEmitter(x, cy - origin.y, z);
+                  emitterGrid.addEmitter(x + 0.5f, cy - origin.y + 0.5f, z + 0.5f);
                 }
 
               }
@@ -1064,6 +1064,9 @@ public class Scene implements JsonSerializable, Refreshable {
                 }
               } else {
                 entities.add(blockEntity);
+                Vector3 emitterPos = blockEntity.getEmitterPosition();
+                if(emitterPos != null)
+                  emitterGrid.addEmitter((float)emitterPos.x - origin.x, (float)emitterPos.y - origin.y, (float)emitterPos.z - origin.z);
               }
             }
             /*

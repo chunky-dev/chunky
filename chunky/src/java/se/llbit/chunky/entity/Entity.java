@@ -38,6 +38,8 @@ abstract public class Entity {
 
   abstract public Collection<Primitive> primitives(Vector3 offset);
 
+  public Vector3 getEmitterPosition() { return null; }
+
   /**
    * Marshalls this entity to JSON.
    *
