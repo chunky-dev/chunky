@@ -358,7 +358,41 @@ public class CauldronModel {
           side, side
       };
 
-  public static boolean intersect(Ray ray, boolean stillWater, int level) {
+  public static boolean intersect(Ray ray, int level, Texture contentTexture) {
+    boolean hit = false;
+    ray.t = Double.POSITIVE_INFINITY;
+    for (int i = 0; i < quads.length; ++i) {
+      Quad quad = quads[i];
+      if (quad.intersect(ray)) {
+        float[] color = tex[i].getColor(ray.u, ray.v);
+        if (color[3] > Ray.EPSILON) {
+          ray.color.set(color);
+          ray.t = ray.tNext;
+          ray.n.set(quad.n);
+          hit = true;
+        }
+      }
+    }
+
+    Quad water = waterLevels[level];
+    if (water != null && water.intersect(ray)) {
+      float[] color = contentTexture.getColor(ray.u, ray.v);
+      if (color[3] > Ray.EPSILON) {
+        ray.color.set(color);
+        ray.t = ray.tNext;
+        ray.n.set(water.n);
+        hit = true;
+      }
+    }
+
+    if (hit) {
+      ray.distance += ray.t;
+      ray.o.scaleAdd(ray.t, ray.d);
+    }
+    return hit;
+  }
+
+  public static boolean intersectWithWater(Ray ray, boolean stillWater, int level) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
     for (int i = 0; i < quads.length; ++i) {
@@ -386,6 +420,7 @@ public class CauldronModel {
       ray.setCurrentMaterial(Water.INSTANCE);
       ray.t = ray.tNext;
     }
+
     if (hit) {
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
@@ -408,6 +443,7 @@ public class CauldronModel {
         }
       }
     }
+
     Quad lava = waterLevels[3];
     if (lava.intersect(ray)) {
       float[] color = Texture.lava.getColor(ray.u, ray.v);
@@ -422,6 +458,7 @@ public class CauldronModel {
         ray.setCurrentMaterial(new Lava(7));
       }
     }
+
     if (hit) {
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
