@@ -2394,11 +2394,11 @@ public class TexturePackLoader {
 
     // Minecraft 1.9 blocks.
     allTextures.put("grass_path_side", new AlternateTextures(
-        new SimpleTexture("assets/minecraft/textures/block/grass_path_side",
-            Texture.grassPathSide),
-        new SimpleTexture("assets/minecraft/textures/blocks/grass_path_side",
-            Texture.grassPathSide)));
+        new SimpleTexture("assets/minecraft/textures/block/dirt_path_side", Texture.grassPathSide), // 20w45a
+        new SimpleTexture("assets/minecraft/textures/block/grass_path_side", Texture.grassPathSide),
+        new SimpleTexture("assets/minecraft/textures/blocks/grass_path_side", Texture.grassPathSide)));
     allTextures.put("grass_path_top", new AlternateTextures(
+        new SimpleTexture("assets/minecraft/textures/block/dirt_path_top", Texture.grassPathTop), // 20w45a
         new SimpleTexture("assets/minecraft/textures/block/grass_path_top", Texture.grassPathTop),
         new SimpleTexture("assets/minecraft/textures/blocks/grass_path_top", Texture.grassPathTop)));
     allTextures.put("end_bricks", new AlternateTextures(
@@ -3511,6 +3511,45 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/quartz_bricks", Texture.quartzBricks);
     addSimpleTexture("assets/minecraft/textures/block/chain", Texture.chain);
     addSimpleTexture("assets/minecraft/textures/block/jigsaw_lock", Texture.jigsawLock);
+
+    // Minecraft 1.17
+    addSimpleTexture("assets/minecraft/textures/block/candle", Texture.candle);
+    addSimpleTexture("assets/minecraft/textures/block/white_candle", Texture.whiteCandle);
+    addSimpleTexture("assets/minecraft/textures/block/orange_candle", Texture.orangeCandle);
+    addSimpleTexture("assets/minecraft/textures/block/magenta_candle", Texture.magentaCandle);
+    addSimpleTexture("assets/minecraft/textures/block/light_blue_candle", Texture.lightBlueCandle);
+    addSimpleTexture("assets/minecraft/textures/block/yellow_candle", Texture.yellowCandle);
+    addSimpleTexture("assets/minecraft/textures/block/lime_candle", Texture.limeCandle);
+    addSimpleTexture("assets/minecraft/textures/block/pink_candle", Texture.pinkCandle);
+    addSimpleTexture("assets/minecraft/textures/block/gray_candle", Texture.grayCandle);
+    addSimpleTexture("assets/minecraft/textures/block/light_gray_candle", Texture.lightGrayCandle);
+    addSimpleTexture("assets/minecraft/textures/block/cyan_candle", Texture.cyanCandle);
+    addSimpleTexture("assets/minecraft/textures/block/purple_candle", Texture.purpleCandle);
+    addSimpleTexture("assets/minecraft/textures/block/blue_candle", Texture.blueCandle);
+    addSimpleTexture("assets/minecraft/textures/block/brown_candle", Texture.brownCandle);
+    addSimpleTexture("assets/minecraft/textures/block/green_candle", Texture.greenCandle);
+    addSimpleTexture("assets/minecraft/textures/block/red_candle", Texture.redCandle);
+    addSimpleTexture("assets/minecraft/textures/block/black_candle", Texture.blackCandle);
+    addSimpleTexture("assets/minecraft/textures/particle/flame", Texture.flameParticle);
+    addSimpleTexture("assets/minecraft/textures/block/copper_ore", Texture.copperOre);
+    addSimpleTexture("assets/minecraft/textures/block/calcite", Texture.calcite);
+    addSimpleTexture("assets/minecraft/textures/block/tuff", Texture.tuff);
+    addSimpleTexture("assets/minecraft/textures/block/amethyst_block", Texture.amethyst);
+    addSimpleTexture("assets/minecraft/textures/block/budding_amethyst", Texture.buddingAmethyst);
+    addSimpleTexture("assets/minecraft/textures/block/copper_block", Texture.copperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/lightly_weathered_copper_block", Texture.lightlyWeatheredCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/semi_weathered_copper_block", Texture.semiWeatheredCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/weathered_copper_block", Texture.weatheredCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/cut_copper", Texture.cutCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/lightly_weathered_cut_copper", Texture.lightlyWeatheredCutCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/semi_weathered_cut_copper", Texture.semiWeatheredCutCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/weathered_cut_copper", Texture.weatheredCutCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/lightning_rod", Texture.lightningRod);
+    addSimpleTexture("assets/minecraft/textures/block/small_amethyst_bud", Texture.smallAmethystBud);
+    addSimpleTexture("assets/minecraft/textures/block/medium_amethyst_bud", Texture.mediumAmethystBud);
+    addSimpleTexture("assets/minecraft/textures/block/large_amethyst_bud", Texture.largeAmethystBud);
+    addSimpleTexture("assets/minecraft/textures/block/amethyst_cluster", Texture.amethystCluster);
+    addSimpleTexture("assets/minecraft/textures/block/tinted_glass", Texture.tintedGlass);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

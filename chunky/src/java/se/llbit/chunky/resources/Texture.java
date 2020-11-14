@@ -885,6 +885,45 @@ public class Texture {
   public static final Texture chain = new Texture();
   public static final Texture jigsawLock = new Texture();
 
+  // [1.17]
+  public static final Texture candle = new Texture();
+  public static final Texture whiteCandle = new Texture();
+  public static final Texture orangeCandle = new Texture();
+  public static final Texture magentaCandle = new Texture();
+  public static final Texture lightBlueCandle = new Texture();
+  public static final Texture yellowCandle = new Texture();
+  public static final Texture limeCandle = new Texture();
+  public static final Texture pinkCandle = new Texture();
+  public static final Texture grayCandle = new Texture();
+  public static final Texture lightGrayCandle = new Texture();
+  public static final Texture cyanCandle = new Texture();
+  public static final Texture purpleCandle = new Texture();
+  public static final Texture blueCandle = new Texture();
+  public static final Texture brownCandle = new Texture();
+  public static final Texture greenCandle = new Texture();
+  public static final Texture redCandle = new Texture();
+  public static final Texture blackCandle = new Texture();
+  public static final Texture flameParticle = new Texture();
+  public static final Texture copperOre = new Texture();
+  public static final Texture calcite = new Texture();
+  public static final Texture tuff = new Texture();
+  public static final Texture amethyst = new Texture();
+  public static final Texture buddingAmethyst = new Texture();
+  public static final Texture copperBlock = new Texture();
+  public static final Texture lightlyWeatheredCopperBlock = new Texture();
+  public static final Texture semiWeatheredCopperBlock = new Texture();
+  public static final Texture weatheredCopperBlock = new Texture();
+  public static final Texture cutCopperBlock = new Texture();
+  public static final Texture lightlyWeatheredCutCopperBlock = new Texture();
+  public static final Texture semiWeatheredCutCopperBlock = new Texture();
+  public static final Texture weatheredCutCopperBlock = new Texture();
+  public static final Texture lightningRod = new Texture();
+  public static final Texture smallAmethystBud = new Texture();
+  public static final Texture mediumAmethystBud = new Texture();
+  public static final Texture largeAmethystBud = new Texture();
+  public static final Texture amethystCluster = new Texture();
+  public static final Texture tintedGlass = new Texture();
+
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
 
