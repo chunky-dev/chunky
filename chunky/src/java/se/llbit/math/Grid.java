@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Grid {
-  private static final int GRID_FORMAT_VERSION = 1;
+  private static final int GRID_FORMAT_VERSION = 2;
 
   /**
    * Holds a 3D grid of blocks cube
@@ -206,11 +206,11 @@ public class Grid {
 
     // Write every emitter position
     out.writeInt(emitterPositions.size());
-//    for(EmitterPosition pos : emitterPositions) {
-//      out.writeInt(pos.x);
-//      out.writeInt(pos.y);
-//      out.writeInt(pos.z);
-//    }
+    for(EmitterPosition pos : emitterPositions) {
+      out.writeFloat(pos.x);
+      out.writeFloat(pos.y);
+      out.writeFloat(pos.z);
+    }
 
     // Write, for each cell, how many emitters are contained and their indexes in the array written earlier
     for(int i = 0; i < sizeX*sizeY*sizeZ; ++i) {
@@ -262,9 +262,16 @@ public class Grid {
     int emitterNo = in.readInt();
     grid.emitterPositions = new ArrayList<>(emitterNo);
     for(int i = 0; i < emitterNo; ++i) {
-      int x = in.readInt();
-      int y = in.readInt();
-      int z = in.readInt();
+      float x, y, z;
+      if(version < 2) {
+        x = in.readInt() + 0.5f;
+        y = in.readInt() + 0.5f;
+        z = in.readInt() + 0.5f;
+      } else {
+        x = in.readFloat();
+        y = in.readFloat();
+        z = in.readFloat();
+      }
       grid.emitterPositions.add(new EmitterPosition(x, y, z));
     }
 
