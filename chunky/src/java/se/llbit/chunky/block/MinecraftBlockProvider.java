@@ -600,6 +600,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:potted_white_tulip",
       "minecraft:potted_wither_rose",
       "minecraft:powder_snow",
+      "minecraft:powder_snow_cauldron",
       "minecraft:powered_rail",
       "minecraft:prismarine_bricks",
       "minecraft:prismarine_brick_slab",
@@ -2702,6 +2703,9 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new TintedGlass();
       case "powder_snow":
         return new MinecraftBlock(name, Texture.powderSnow);
+      case "powder_snow_cauldron":
+        return new PowderSnowCauldron(
+            BlockProvider.stringToInt(tag.get("Properties").get("level"), 3));
       case "structure_void":
       case "barrier":
         // Invisible.
