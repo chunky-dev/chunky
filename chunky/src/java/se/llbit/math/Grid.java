@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Grid {
-  private static final int GRID_FORMAT_VERSION = 0;
+  private static final int GRID_FORMAT_VERSION = 1;
 
   /**
    * Holds a 3D grid of blocks cube
@@ -38,7 +38,6 @@ public class Grid {
     public List<Integer> indexes = new ArrayList<>();
   }
 
-  private final int gridSize;
   // This array is the concatenation of every index of EmitterPosition for every cell
   private int[] positionIndexes;
   // This array holds 2 ints per cell, the index to the start of its section
@@ -52,16 +51,7 @@ public class Grid {
 
   private int offsetX, sizeX, offsetY, sizeY, offsetZ, sizeZ;
 
-  public Grid(int octreeDepth, int cellSize) {
-    this.cellSize = cellSize;
-    long totalSize = (1L << octreeDepth);
-    this.gridSize = (int) ((totalSize + (cellSize-1)) / cellSize);
-    minX = maxX = minY = maxY = minZ = maxZ = -1;
-  }
-
-  // Constructor used by the load method
-  private Grid(int gridSize, int cellSize, int overloadSelectFlag /*unused*/) {
-    this.gridSize = gridSize;
+  public Grid(int cellSize) {
     this.cellSize = cellSize;
     minX = maxX = minY = maxY = minZ = maxZ = -1;
   }
@@ -206,11 +196,13 @@ public class Grid {
   public void store(DataOutputStream out) throws IOException {
     out.writeInt(GRID_FORMAT_VERSION);
 
-    out.writeInt(gridSize);
     out.writeInt(cellSize);
-
-    if(true)
-    return;
+    out.writeInt(offsetX);
+    out.writeInt(sizeX);
+    out.writeInt(offsetY);
+    out.writeInt(sizeY);
+    out.writeInt(offsetZ);
+    out.writeInt(sizeZ);
 
     // Write every emitter position
     out.writeInt(emitterPositions.size());
@@ -221,7 +213,7 @@ public class Grid {
     }
 
     // Write, for each cell, how many emitters are contained and their indexes in the array written earlier
-    for(int i = 0; i < gridSize*gridSize*gridSize; ++i) {
+    for(int i = 0; i < sizeX*sizeY*sizeZ; ++i) {
       int start = constructedGrid[2*i];
       int size = constructedGrid[2*i+1];
       out.writeInt(size);
@@ -242,9 +234,14 @@ public class Grid {
       throw new RuntimeException("Unknown grid format version, can't load the grid");
     }
 
-    int gridSize = in.readInt();
     int cellSize = in.readInt();
-    Grid grid = new Grid(gridSize, cellSize, 0);
+    Grid grid = new Grid(cellSize);
+    grid.offsetX = in.readInt();
+    grid.sizeX = in.readInt();
+    grid.offsetY = in.readInt();
+    grid.sizeY = in.readInt();
+    grid.offsetZ = in.readInt();
+    grid.sizeZ = in.readInt();
 
     // Read emitter positions
     int emitterNo = in.readInt();
@@ -256,7 +253,7 @@ public class Grid {
       grid.emitterPositions.add(new EmitterPosition(x, y, z));
     }
 
-    int cellCount = gridSize*gridSize*gridSize;
+    int cellCount = grid.sizeX*grid.sizeY*grid.sizeZ;
     ArrayList<Integer> positionIndexesList = new ArrayList<>();
     int constructedGridCurrentIndex = 0;
     grid.constructedGrid = new int[cellCount*2];

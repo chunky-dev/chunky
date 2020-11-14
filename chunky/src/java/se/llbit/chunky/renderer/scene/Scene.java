@@ -763,7 +763,7 @@ public class Scene implements JsonSerializable, Refreshable {
       worldOctree = new Octree(octreeImplementation, requiredDepth);
       waterOctree = new Octree(octreeImplementation, requiredDepth);
       if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
-        emitterGrid = new Grid(requiredDepth, gridSize);
+        emitterGrid = new Grid(gridSize);
 
       // Parse the regions first - force chunk lists to be populated!
       Set<ChunkPosition> regions = new HashSet<>();
@@ -1926,7 +1926,7 @@ public class Scene implements JsonSerializable, Refreshable {
       try(DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename)))) {
         emitterGrid = Grid.load(in);
         return true;
-      } catch(IOException e) {
+      } catch(Exception e) {
         Log.info("Couldn't load the grid", e);
         return false;
       }
