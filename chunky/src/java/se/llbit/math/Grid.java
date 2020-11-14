@@ -230,18 +230,33 @@ public class Grid {
    */
   public static Grid load(DataInputStream in) throws IOException {
     int version = in.readInt();
-    if(version != GRID_FORMAT_VERSION) {
+    if(version > GRID_FORMAT_VERSION) {
       throw new RuntimeException("Unknown grid format version, can't load the grid");
     }
 
-    int cellSize = in.readInt();
-    Grid grid = new Grid(cellSize);
-    grid.offsetX = in.readInt();
-    grid.sizeX = in.readInt();
-    grid.offsetY = in.readInt();
-    grid.sizeY = in.readInt();
-    grid.offsetZ = in.readInt();
-    grid.sizeZ = in.readInt();
+    Grid grid;
+
+    if(version == 0) {
+      int gridSize = in.readInt();
+      int cellSize = in.readInt();
+      grid = new Grid(cellSize);
+      grid.offsetX = 0;
+      grid.sizeX = gridSize;
+      grid.offsetY = 0;
+      grid.sizeY = gridSize;
+      grid.offsetZ = 0;
+      grid.sizeZ = gridSize;
+    } else {
+      int cellSize = in.readInt();
+      grid = new Grid(cellSize);
+      grid.offsetX = in.readInt();
+      grid.sizeX = in.readInt();
+      grid.offsetY = in.readInt();
+      grid.sizeY = in.readInt();
+      grid.offsetZ = in.readInt();
+      grid.sizeZ = in.readInt();
+    }
+
 
     // Read emitter positions
     int emitterNo = in.readInt();
