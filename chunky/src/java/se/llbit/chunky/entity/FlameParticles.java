@@ -8,10 +8,7 @@ import se.llbit.chunky.model.Model;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Quad;
-import se.llbit.math.Transform;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
 
@@ -117,5 +114,14 @@ public class FlameParticles extends Entity {
 
   public static Entity fromJson(JsonObject json) {
     return new FlameParticles(json);
+  }
+
+  @Override
+  public Grid.EmitterPosition[] getEmitterPosition() {
+    Grid.EmitterPosition[] pos = new Grid.EmitterPosition[flames.length];
+    for(int i = 0; i < flames.length; i++) {
+      pos[i] = new Grid.EmitterPosition((float)(position.x + 0.5 + flames[i].x), (float)(position.y + flames[i].y), (float)(position.z + 0.5 + flames[i].z), 1.0f/32);
+    }
+    return pos;
   }
 }

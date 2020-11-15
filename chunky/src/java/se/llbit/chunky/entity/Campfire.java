@@ -8,10 +8,7 @@ import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Quad;
-import se.llbit.math.Transform;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
 
@@ -316,15 +313,26 @@ public class Campfire extends Entity {
   private static int getOrientationIndex(String facing) {
     switch (facing) {
       case "north":
-        return 0;
+          return 0;
       case "east":
-        return 1;
+          return 1;
       case "south":
-        return 2;
+          return 2;
       case "west":
-        return 3;
+          return 3;
       default:
-        return 0;
+          return 0;
     }
+  }
+
+  @Override
+  public Grid.EmitterPosition[] getEmitterPosition() {
+    if(isLit) {
+      Grid.EmitterPosition[] pos = new Grid.EmitterPosition[1];
+      pos[0] = new Grid.EmitterPosition((float)(position.x + 0.5), (float)(position.y + 0.625), (float)(position.z + 0.5));
+      return pos;
+    }
+    else
+      return new Grid.EmitterPosition[0];
   }
 }

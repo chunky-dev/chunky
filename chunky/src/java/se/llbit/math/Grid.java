@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Grid {
-  private static final int GRID_FORMAT_VERSION = 1;
+  private static final int GRID_FORMAT_VERSION = 2;
 
   /**
    * Holds a 3D grid of blocks cube
@@ -21,13 +21,21 @@ public class Grid {
    * The maximum distance where an emitter can be found in some cases is 2*cellSize-1 blocks away.
    */
   public static class EmitterPosition {
-    public EmitterPosition(int x, int y, int z) {
+    public EmitterPosition(float x, float y, float z) {
       this.x = x;
       this.y = y;
       this.z = z;
+      radius = 1.0f / 8;
+    }
+    public EmitterPosition(float x, float y, float z, float radius) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.radius = radius;
     }
 
-    public int x, y, z;
+    public float x, y, z;
+    public float radius;
   }
 
   private final int cellSize;
@@ -56,20 +64,20 @@ public class Grid {
     minX = maxX = minY = maxY = minZ = maxZ = -1;
   }
 
-  public void addEmitter(int x, int y, int z) {
-    emitterPositions.add(new EmitterPosition(x, y, z));
-    if(minX == -1 || x < minX)
-      minX = x;
-    if(maxX == -1 || x  > maxX)
-      maxX = x;
-    if(minY == -1 || y < minY)
-      minY = y;
-    if(maxY == -1 || y > maxY)
-      maxY = y;
-    if(minZ == -1 || z < minZ)
-      minZ = z;
-    if(maxZ == -1 || z > maxZ)
-      maxZ = z;
+  public void addEmitter(EmitterPosition pos) {
+    emitterPositions.add(pos);
+    if(minX == -1 || pos.x < minX)
+      minX = (int) pos.x;
+    if(maxX == -1 || pos.x  > maxX)
+      maxX = (int) pos.x;
+    if(minY == -1 || pos.y < minY)
+      minY = (int) pos.y;
+    if(maxY == -1 || pos.y > maxY)
+      maxY = (int) pos.y;
+    if(minZ == -1 || pos.z < minZ)
+      minZ = (int) pos.z;
+    if(maxZ == -1 || pos.z > maxZ)
+      maxZ = (int) pos.z;
   }
 
   private int cellIndex(int x, int y, int z) {
@@ -101,9 +109,9 @@ public class Grid {
 
     for(int i = 0; i < emitterPositions.size(); ++i) {
       EmitterPosition pos = emitterPositions.get(i);
-      int gridX = pos.x / cellSize;
-      int gridY = pos.y / cellSize;
-      int gridZ = pos.z / cellSize;
+      int gridX = (int) (pos.x / cellSize);
+      int gridY = (int) (pos.y / cellSize);
+      int gridZ = (int) (pos.z / cellSize);
       // Add the emitter to its cell and all neighboring cells
       for(int dy = -1; dy <= 1; ++dy) {
         for(int dx = -1; dx <= 1; ++dx) {
@@ -207,9 +215,10 @@ public class Grid {
     // Write every emitter position
     out.writeInt(emitterPositions.size());
     for(EmitterPosition pos : emitterPositions) {
-      out.writeInt(pos.x);
-      out.writeInt(pos.y);
-      out.writeInt(pos.z);
+      out.writeFloat(pos.x);
+      out.writeFloat(pos.y);
+      out.writeFloat(pos.z);
+      out.writeFloat(pos.radius);
     }
 
     // Write, for each cell, how many emitters are contained and their indexes in the array written earlier
@@ -262,10 +271,18 @@ public class Grid {
     int emitterNo = in.readInt();
     grid.emitterPositions = new ArrayList<>(emitterNo);
     for(int i = 0; i < emitterNo; ++i) {
-      int x = in.readInt();
-      int y = in.readInt();
-      int z = in.readInt();
-      grid.emitterPositions.add(new EmitterPosition(x, y, z));
+      if(version < 2) {
+        float x = in.readInt() + 0.5f;
+        float y = in.readInt() + 0.5f;
+        float z = in.readInt() + 0.5f;
+        grid.emitterPositions.add(new EmitterPosition(x, y, z));
+      } else {
+        float x = in.readFloat();
+        float y = in.readFloat();
+        float z = in.readFloat();
+        float radius = in.readFloat();
+        grid.emitterPositions.add(new EmitterPosition(x, y, z, radius));
+      }
     }
 
     int cellCount = grid.sizeX*grid.sizeY*grid.sizeZ;

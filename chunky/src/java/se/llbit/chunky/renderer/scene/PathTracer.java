@@ -221,6 +221,11 @@ public class PathTracer implements RayTracer {
                     reflected.color.y + reflected.emittance.y) + (indirectEmitterColor.y));
                 ray.color.z = ray.color.z * (emittance + directLightB * scene.sun.emittance.z + (
                     reflected.color.z + reflected.emittance.z) + (indirectEmitterColor.z));
+              } else if(indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
+                hit = true;
+                ray.color.x *= indirectEmitterColor.x;
+                ray.color.y *= indirectEmitterColor.y;
+                ray.color.z *= indirectEmitterColor.z;
               }
 
             } else {
@@ -234,6 +239,11 @@ public class PathTracer implements RayTracer {
                     ray.color.y * (emittance + (reflected.color.y + reflected.emittance.y) + (indirectEmitterColor.y));
                 ray.color.z =
                     ray.color.z * (emittance + (reflected.color.z + reflected.emittance.z) + (indirectEmitterColor.z));
+              } else if(indirectEmitterColor.x > Ray.EPSILON || indirectEmitterColor.y > Ray.EPSILON || indirectEmitterColor.z > Ray.EPSILON) {
+                hit = true;
+                ray.color.x *= indirectEmitterColor.x;
+                ray.color.y *= indirectEmitterColor.y;
+                ray.color.z *= indirectEmitterColor.z;
               }
             }
           }
@@ -416,7 +426,7 @@ public class PathTracer implements RayTracer {
     Ray emitterRay = new Ray();
     emitterRay.set(ray);
     // TODO Sampling a random point on the model would be better than using a random point in the middle of the cube
-    Vector3 target = new Vector3(pos.x + 0.5 + (random.nextDouble() - 0.5) / 8, pos.y + 0.5 + (random.nextDouble() - 0.5) / 8, pos.z + 0.5 + (random.nextDouble() - 0.5) / 8);
+    Vector3 target = new Vector3(pos.x + (random.nextDouble() - 0.5) * pos.radius, pos.y + (random.nextDouble() - 0.5) * pos.radius, pos.z  + (random.nextDouble() - 0.5) * pos.radius);
     emitterRay.d.set(target);
     emitterRay.d.sub(emitterRay.o);
     double distance = emitterRay.d.length();
