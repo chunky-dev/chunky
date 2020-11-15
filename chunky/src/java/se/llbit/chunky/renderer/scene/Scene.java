@@ -893,7 +893,17 @@ public class Scene implements JsonSerializable, Refreshable {
 
                 if (block.isEntity()) {
                   Vector3 position = new Vector3(cx + cp.x * 16, cy, cz + cp.z * 16);
-                  entities.add(block.toEntity(position));
+                  Entity entity = block.toEntity(position);
+                  entities.add(entity);
+                  if(emitterGrid != null) {
+                    Grid.EmitterPosition emitterPos = entity.getEmitterPosition();
+                    if(emitterPos != null) {
+                      emitterPos.x -= origin.x;
+                      emitterPos.y -= origin.y;
+                      emitterPos.z -= origin.z;
+                      emitterGrid.addEmitter(emitterPos);
+                    }
+                  }
                   if (!block.isBlockWithEntity()) {
                     if (block.waterlogged) {
                       block = palette.water;
@@ -1028,7 +1038,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 worldOctree.set(octNode, x, cy - origin.y, z);
 
                 if (emitterGrid != null && block.emittance > 1e-4) {
-                  emitterGrid.addEmitter(x + 0.5f, cy - origin.y + 0.5f, z + 0.5f);
+                  emitterGrid.addEmitter(new Grid.EmitterPosition(x + 0.5f, cy - origin.y + 0.5f, z + 0.5f));
                 }
 
               }
@@ -1064,9 +1074,15 @@ public class Scene implements JsonSerializable, Refreshable {
                 }
               } else {
                 entities.add(blockEntity);
-                Vector3 emitterPos = blockEntity.getEmitterPosition();
-                if(emitterPos != null)
-                  emitterGrid.addEmitter((float)emitterPos.x - origin.x, (float)emitterPos.y - origin.y, (float)emitterPos.z - origin.z);
+                if(emitterGrid != null) {
+                  Grid.EmitterPosition emitterPos = blockEntity.getEmitterPosition();
+                  if(emitterPos != null) {
+                    emitterPos.x -= origin.x;
+                    emitterPos.y -= origin.y;
+                    emitterPos.z -= origin.z;
+                    emitterGrid.addEmitter(emitterPos);
+                  }
+                }
               }
             }
             /*

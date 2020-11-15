@@ -8,10 +8,7 @@ import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Quad;
-import se.llbit.math.Transform;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
 
@@ -329,9 +326,9 @@ public class Campfire extends Entity {
   }
 
   @Override
-  public Vector3 getEmitterPosition() {
+  public Grid.EmitterPosition getEmitterPosition() {
     if(isLit)
-      return new Vector3(position.x + 0.5, position.y + 0.625, position.z + 0.5);
+      return new Grid.EmitterPosition((float)(position.x + 0.5), (float)(position.y + 0.625), (float)(position.z + 0.5));
     else
       return null;
   }

@@ -20,6 +20,7 @@ package se.llbit.chunky.entity;
 import java.util.Collection;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.Grid;
 import se.llbit.math.Vector3;
 import se.llbit.math.primitive.Primitive;
 
@@ -38,7 +39,7 @@ abstract public class Entity {
 
   abstract public Collection<Primitive> primitives(Vector3 offset);
 
-  public Vector3 getEmitterPosition() { return null; }
+  public Grid.EmitterPosition getEmitterPosition() { return null; }
 
   /**
    * Marshalls this entity to JSON.
