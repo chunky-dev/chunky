@@ -896,8 +896,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   Entity entity = block.toEntity(position);
                   entities.add(entity);
                   if(emitterGrid != null) {
-                    Grid.EmitterPosition emitterPos = entity.getEmitterPosition();
-                    if(emitterPos != null) {
+                    for(Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
                       emitterPos.x -= origin.x;
                       emitterPos.y -= origin.y;
                       emitterPos.z -= origin.z;
@@ -1075,8 +1074,7 @@ public class Scene implements JsonSerializable, Refreshable {
               } else {
                 entities.add(blockEntity);
                 if(emitterGrid != null) {
-                  Grid.EmitterPosition emitterPos = blockEntity.getEmitterPosition();
-                  if(emitterPos != null) {
+                  for(Grid.EmitterPosition emitterPos : blockEntity.getEmitterPosition()) {
                     emitterPos.x -= origin.x;
                     emitterPos.y -= origin.y;
                     emitterPos.z -= origin.z;

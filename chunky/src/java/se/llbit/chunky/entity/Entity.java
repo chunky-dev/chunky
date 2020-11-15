@@ -39,7 +39,7 @@ abstract public class Entity {
 
   abstract public Collection<Primitive> primitives(Vector3 offset);
 
-  public Grid.EmitterPosition getEmitterPosition() { return null; }
+  public Grid.EmitterPosition[] getEmitterPosition() { return new Grid.EmitterPosition[0]; }
 
   /**
    * Marshalls this entity to JSON.

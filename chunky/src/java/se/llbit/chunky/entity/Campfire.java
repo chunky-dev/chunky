@@ -326,11 +326,14 @@ public class Campfire extends Entity {
   }
 
   @Override
-  public Grid.EmitterPosition getEmitterPosition() {
-    if(isLit)
-      return new Grid.EmitterPosition((float)(position.x + 0.5), (float)(position.y + 0.625), (float)(position.z + 0.5));
+  public Grid.EmitterPosition[] getEmitterPosition() {
+    if(isLit) {
+      Grid.EmitterPosition[] pos = new Grid.EmitterPosition[1];
+      pos[0] = new Grid.EmitterPosition((float)(position.x + 0.5), (float)(position.y + 0.625), (float)(position.z + 0.5));
+      return pos;
+    }
     else
-      return null;
+      return new Grid.EmitterPosition[0];
   }
   private static int getOrientationIndex(String facing) {
     switch (facing) {
