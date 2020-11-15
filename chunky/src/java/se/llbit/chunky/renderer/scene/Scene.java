@@ -2500,6 +2500,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
     json.add("octreeImplementation", octreeImplementation);
     json.add("emitterSamplingStrategy", emitterSamplingStrategy.name());
+    json.add("preventNormalEmitterWithSampling", preventNormalEmitterWithSampling);
 
     return json;
   }
@@ -2788,6 +2789,7 @@ public class Scene implements JsonSerializable, Refreshable {
     octreeImplementation = json.get("octreeImplementation").asString(PersistentSettings.getOctreeImplementation());
 
     emitterSamplingStrategy = EmitterSamplingStrategy.valueOf(json.get("emitterSamplingStrategy").asString("NONE"));
+    preventNormalEmitterWithSampling = json.get("preventNormalEmitterWithSampling").asBoolean(PersistentSettings.getPreventNormalEmitterWithSampling());
   }
 
   /**
