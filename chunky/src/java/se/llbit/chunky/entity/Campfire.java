@@ -335,18 +335,4 @@ public class Campfire extends Entity {
     else
       return new Grid.EmitterPosition[0];
   }
-  private static int getOrientationIndex(String facing) {
-    switch (facing) {
-      case "north":
-        return 0;
-      case "east":
-        return 1;
-      case "south":
-        return 2;
-      case "west":
-        return 3;
-      default:
-        return 0;
-    }
-  }
 }
