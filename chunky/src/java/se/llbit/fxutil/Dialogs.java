@@ -5,7 +5,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 
-public class AlertFactory {
+public class Dialogs {
 
   /**
    * Create an alert dialog of the given type that will resize to the text content properly on

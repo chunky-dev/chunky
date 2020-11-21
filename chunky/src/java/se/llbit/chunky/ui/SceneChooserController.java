@@ -33,6 +33,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import se.llbit.chunky.main.SceneHelper;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.fxutil.Dialogs;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.log.Log;
@@ -98,7 +99,7 @@ public class SceneChooserController implements Initializable {
           Log.error("Can not delete scene with unknown filename.");
           return;
         }
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert alert = Dialogs.createAlert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Delete Scene");
         alert.setContentText(String.format("Are you sure you want to delete the scene %s? "
             + "All files for the scene, except snapshot images, will be deleted.", scene.sceneName));

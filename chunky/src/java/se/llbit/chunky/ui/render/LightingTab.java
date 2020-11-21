@@ -38,7 +38,7 @@ import se.llbit.chunky.ui.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.fx.LuxColorPicker;
-import se.llbit.fxutil.AlertFactory;
+import se.llbit.fxutil.Dialogs;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 
@@ -116,7 +116,7 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
         .addListener((observable, oldvalue, newvalue) -> {
           scene.setEmitterSamplingStrategy(newvalue);
           if (newvalue != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() == null) {
-            Alert warning = AlertFactory.createAlert(AlertType.CONFIRMATION);
+            Alert warning = Dialogs.createAlert(AlertType.CONFIRMATION);
             warning.setContentText("The selected chunks need to be reloaded in order for emitter sampling to work.");
             warning.getButtonTypes().setAll(
               ButtonType.CANCEL,
