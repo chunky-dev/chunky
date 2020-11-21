@@ -21,6 +21,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
@@ -34,7 +38,7 @@ import se.llbit.chunky.ui.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.fx.LuxColorPicker;
-import se.llbit.log.Log;
+import se.llbit.fxutil.AlertFactory;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 
@@ -43,6 +47,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class LightingTab extends ScrollPane implements RenderControlsTab, Initializable {
+  private RenderControlsFxController controller;
   private Scene scene;
 
   @FXML private DoubleAdjuster skyIntensity;
@@ -108,16 +113,30 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
 
     emitterSamplingStrategy.getItems().addAll(EmitterSamplingStrategy.values());
     emitterSamplingStrategy.getSelectionModel().selectedItemProperty()
-            .addListener((observable, oldvalue, newvalue) -> {
-              scene.setEmitterSamplingStrategy(newvalue);
-              if(newvalue != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() == null)
-                // TODO add nice UI dialog for this
-                Log.warn("The world needs to be reloaded for emitter sampling to work");
-            });
+        .addListener((observable, oldvalue, newvalue) -> {
+          scene.setEmitterSamplingStrategy(newvalue);
+          if (newvalue != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() == null) {
+            Alert warning = AlertFactory.createAlert(AlertType.CONFIRMATION);
+            warning.setContentText("The selected chunks need to be reloaded in order for emitter sampling to work.");
+            warning.getButtonTypes().setAll(
+              ButtonType.CANCEL,
+              new ButtonType("Reload chunks", ButtonData.FINISH));
+            warning.setTitle("Chunk reload required");
+            ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
+            if (result.getButtonData() == ButtonData.FINISH) {
+              controller.getRenderController().getSceneManager().reloadChunks();
+            } else {
+              scene.setEmitterSamplingStrategy(EmitterSamplingStrategy.NONE);
+              emitterSamplingStrategy.getSelectionModel().select(EmitterSamplingStrategy.NONE);
+            }
+          }
+        });
     emitterSamplingStrategy.setTooltip(new Tooltip("Determine how emitters are sampled at each bounce"));
   }
 
-  @Override public void setController(RenderControlsFxController controller) {
+  @Override
+  public void setController(RenderControlsFxController controller) {
+    this.controller = controller;
     scene = controller.getRenderController().getSceneManager().getScene();
   }
 
