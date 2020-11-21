@@ -125,9 +125,6 @@ public class LightingTab extends ScrollPane implements RenderControlsTab, Initia
             ButtonType result = warning.showAndWait().orElse(ButtonType.CANCEL);
             if (result.getButtonData() == ButtonData.FINISH) {
               controller.getRenderController().getSceneManager().reloadChunks();
-            } else {
-              scene.setEmitterSamplingStrategy(EmitterSamplingStrategy.NONE);
-              emitterSamplingStrategy.getSelectionModel().select(EmitterSamplingStrategy.NONE);
             }
           }
         });
