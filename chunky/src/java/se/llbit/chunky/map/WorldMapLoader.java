@@ -78,6 +78,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
       if (world != null) {
         world.removeChunkTopographyListener(this);
       }
+      boolean isSameWorld = !(world instanceof EmptyWorld) && worldDir.equals(world.getWorldDirectory());
       World newWorld = World.loadWorld(worldDir, currentDimension, World.LoggedWarnings.NORMAL);
       newWorld.addChunkTopographyListener(this);
       synchronized (this) {
@@ -89,7 +90,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
           PersistentSettings.setLastWorld(newWorldDir);
         }
       }
-      worldLoadListeners.forEach(listener -> listener.accept(newWorld, false));
+      worldLoadListeners.forEach(listener -> listener.accept(newWorld, isSameWorld));
     }
   }
 
