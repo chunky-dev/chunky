@@ -3551,6 +3551,17 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/amethyst_cluster", Texture.amethystCluster);
     addSimpleTexture("assets/minecraft/textures/block/tinted_glass", Texture.tintedGlass);
     addSimpleTexture("assets/minecraft/textures/block/powder_snow", Texture.powderSnow);
+    addSimpleTexture("assets/minecraft/textures/block/dripstone_block", Texture.dripstoneBlock);
+    addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_down_base", Texture.pointedDripstoneDownBase);
+    addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_down_frustum", Texture.pointedDripstoneDownFrustum);
+    addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_down_middle", Texture.pointedDripstoneDownMiddle);
+    addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_down_tip", Texture.pointedDripstoneDownTip);
+    addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_down_tip_merge", Texture.pointedDripstoneDownTipMerge);
+    addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_up_base", Texture.pointedDripstoneUpBase);
+    addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_up_frustum", Texture.pointedDripstoneUpFrustum);
+    addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_up_middle", Texture.pointedDripstoneUpMiddle);
+    addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_up_tip", Texture.pointedDripstoneUpTip);
+    addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_up_tip_merge", Texture.pointedDripstoneUpTipMerge);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

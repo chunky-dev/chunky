@@ -2706,6 +2706,13 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "powder_snow_cauldron":
         return new PowderSnowCauldron(
             BlockProvider.stringToInt(tag.get("Properties").get("level"), 3));
+      case "dripstone_block":
+        return new MinecraftBlock(name, Texture.dripstoneBlock);
+      case "pointed_dripstone":
+        return new PointedDripstone(
+            tag.get("Properties").get("thickness").stringValue("tip"),
+            tag.get("Properties").get("vertical_direction").stringValue("up"),
+            tag.get("Properties").get("waterlogged").stringValue("").equals("true"));
       case "structure_void":
       case "barrier":
         // Invisible.

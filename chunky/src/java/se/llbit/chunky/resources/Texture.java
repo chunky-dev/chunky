@@ -924,6 +924,17 @@ public class Texture {
   public static final Texture amethystCluster = new Texture();
   public static final Texture tintedGlass = new Texture();
   public static final Texture powderSnow = new Texture();
+  public static final Texture dripstoneBlock = new Texture();
+  public static final Texture pointedDripstoneDownBase = new Texture();
+  public static final Texture pointedDripstoneDownFrustum = new Texture();
+  public static final Texture pointedDripstoneDownMiddle = new Texture();
+  public static final Texture pointedDripstoneDownTip = new Texture();
+  public static final Texture pointedDripstoneDownTipMerge = new Texture();
+  public static final Texture pointedDripstoneUpBase = new Texture();
+  public static final Texture pointedDripstoneUpFrustum = new Texture();
+  public static final Texture pointedDripstoneUpMiddle = new Texture();
+  public static final Texture pointedDripstoneUpTip = new Texture();
+  public static final Texture pointedDripstoneUpTipMerge = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
