@@ -427,9 +427,9 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       "{\"elements\":[{\"from\":[3,3,3],\"to\":[13,13,13],\"faces\":{\"up\":{\"uv\":[2,0,4,4],\"texture\":\"#texture\"},\"east\":{\"uv\":[0,4,2,8],\"texture\":\"#texture\"},\"west\":{\"uv\":[4,4,6,8],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,4,4,8],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,4,8,8],\"texture\":\"#texture\"}}}]}";
 
   private static final String headJson =
-      "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[2,0,4,2],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,2],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,2,4,4],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,2,0,4],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,2,4,4],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,2,8,4],\"texture\":\"#texture\"}}}]}";
+      "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[4,2,2,0],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,2],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,2,4,4],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,2,0,4],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,2,4,4],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,2,8,4],\"texture\":\"#texture\"}}},{\"from\":[3.75,3.75,3.75],\"to\":[12.25,12.25,12.25],\"faces\":{\"up\":{\"uv\":[12,2,10,0],\"texture\":\"#texture\"},\"down\":{\"uv\":[12,0,14,2],\"texture\":\"#texture\"},\"east\":{\"uv\":[14,2,12,4],\"texture\":\"#texture\"},\"west\":{\"uv\":[10,2,8,4],\"texture\":\"#texture\"},\"north\":{\"uv\":[10,2,12,4],\"texture\":\"#texture\"},\"south\":{\"uv\":[14,2,14,4],\"texture\":\"#texture\"}}}]}";
 
-  // The difference between skullJson/headJson is that skullJson is textured with a half as tall texture.
+  // The difference between skullJson/headJson is that skullJson is textured with a half as tall texture and has no hat.
   private static final String skullJson =
       "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[2,0,4,4],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,4],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,4,4,8],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,4,0,8],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,4,4,8],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,4,8,8],\"texture\":\"#texture\"}}}]}";
 
