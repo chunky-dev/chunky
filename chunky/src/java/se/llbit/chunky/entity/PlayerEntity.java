@@ -192,22 +192,26 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         .rotateZ(allPose.z)
         .translate(worldOffset);
     Collection<Primitive> primitives = new LinkedList<>();
-    Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
-    head.transform(Transform.NONE
-        .translate(0, 4 / 16., 0)
-        .scale(headScale)
-        .rotateX(headPose.x)
-        .rotateY(headPose.y)
-        .rotateZ(headPose.z)
-        .translate(0, -4 / 16., 0)
-        .translate(0, 28 / 16., 0)
-        .chain(worldTransform));
-    head.addFrontFaces(primitives, texture, texture.headFront);
-    head.addBackFaces(primitives, texture, texture.headBack);
-    head.addLeftFaces(primitives, texture, texture.headLeft);
-    head.addRightFaces(primitives, texture, texture.headRight);
-    head.addTopFaces(primitives, texture, texture.headTop);
-    head.addBottomFaces(primitives, texture, texture.headBottom);
+    if (!gear.get("head").object().get("id").stringValue("").equals("minecraft:player_head") &&
+        !gear.get("head").object().get("id").stringValue("").equals("minecraft:skull")
+    ) {
+      Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
+      head.transform(Transform.NONE
+          .translate(0, 4 / 16., 0)
+          .scale(headScale)
+          .rotateX(headPose.x)
+          .rotateY(headPose.y)
+          .rotateZ(headPose.z)
+          .translate(0, -4 / 16., 0)
+          .translate(0, 28 / 16., 0)
+          .chain(worldTransform));
+      head.addFrontFaces(primitives, texture, texture.headFront);
+      head.addBackFaces(primitives, texture, texture.headBack);
+      head.addLeftFaces(primitives, texture, texture.headLeft);
+      head.addRightFaces(primitives, texture, texture.headRight);
+      head.addTopFaces(primitives, texture, texture.headTop);
+      head.addBottomFaces(primitives, texture, texture.headBottom);
+    }
     Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
     hat.transform(Transform.NONE
         .translate(0, 4 / 16., 0)
