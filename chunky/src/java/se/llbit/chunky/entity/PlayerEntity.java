@@ -217,23 +217,24 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       head.addRightFaces(primitives, texture, texture.headRight);
       head.addTopFaces(primitives, texture, texture.headTop);
       head.addBottomFaces(primitives, texture, texture.headBottom);
+
+      Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
+      hat.transform(Transform.NONE
+          .translate(0, 4 / 16., 0)
+          .scale(headScale)
+          .rotateX(headPose.x)
+          .rotateY(headPose.y)
+          .rotateZ(headPose.z)
+          .translate(0, -4 / 16., 0)
+          .translate(0, 28.2 / 16., 0)
+          .chain(worldTransform));
+      hat.addFrontFaces(primitives, texture, texture.hatFront);
+      hat.addBackFaces(primitives, texture, texture.hatBack);
+      hat.addLeftFaces(primitives, texture, texture.hatLeft);
+      hat.addRightFaces(primitives, texture, texture.hatRight);
+      hat.addTopFaces(primitives, texture, texture.hatTop);
+      hat.addBottomFaces(primitives, texture, texture.hatBottom);
     }
-    Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
-    hat.transform(Transform.NONE
-        .translate(0, 4 / 16., 0)
-        .scale(headScale)
-        .rotateX(headPose.x)
-        .rotateY(headPose.y)
-        .rotateZ(headPose.z)
-        .translate(0, -4 / 16., 0)
-        .translate(0, 28.2 / 16., 0)
-        .chain(worldTransform));
-    hat.addFrontFaces(primitives, texture, texture.hatFront);
-    hat.addBackFaces(primitives, texture, texture.hatBack);
-    hat.addLeftFaces(primitives, texture, texture.hatLeft);
-    hat.addRightFaces(primitives, texture, texture.hatRight);
-    hat.addTopFaces(primitives, texture, texture.hatTop);
-    hat.addBottomFaces(primitives, texture, texture.hatBottom);
     Box chest = new Box(-4 / 16., 4 / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     chest.transform(Transform.NONE
         .translate(0, -5 / 16., 0)
