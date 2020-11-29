@@ -372,6 +372,8 @@ public class ArmorStand extends Entity implements Poseable, Geared {
   private final JsonObject gear;
   private final JsonObject pose;
   private final boolean showArms;
+  private final boolean invisible;
+  private final boolean noBasePlate;
 
   public ArmorStand(JsonObject json) {
     super(JsonUtil.vec3FromJsonObject(json.get("position")));
@@ -380,6 +382,8 @@ public class ArmorStand extends Entity implements Poseable, Geared {
     this.showArms = json.get("showArms").asBoolean(false);
     this.gear = json.get("gear").object();
     this.pose = json.get("pose").object();
+    this.invisible = json.get("invisible").asBoolean(false);
+    this.noBasePlate = json.get("noBasePlate").asBoolean(false);
   }
 
   public ArmorStand(Vector3 position, Tag tag) {
@@ -420,6 +424,8 @@ public class ArmorStand extends Entity implements Poseable, Geared {
     pose.add("rightArm", JsonUtil.listTagToJson(poseTag.get("RightArm")));
     pose.add("leftLeg", JsonUtil.listTagToJson(poseTag.get("LeftLeg")));
     pose.add("rightLeg", JsonUtil.listTagToJson(poseTag.get("RightLeg")));
+    invisible = tag.get("Invisible").boolValue(false);
+    noBasePlate = tag.get("NoBasePlate").boolValue(false);
   }
 
   @Override public Collection<Primitive> primitives(Vector3 offset) {
@@ -430,13 +436,6 @@ public class ArmorStand extends Entity implements Poseable, Geared {
         position.x + offset.x,
         position.y + offset.y,
         position.z + offset.z);
-
-    // Add the base - not rotated or scaled.
-    Transform transform = Transform.NONE.translate(-0.5, 0, -0.5).translate(worldOffset);
-    for (Quad quad : base) {
-      quad.addTriangles(primitives, material, transform);
-    }
-
 
     double armWidth = 2;
     JsonObject pose = new JsonObject();
@@ -476,74 +475,86 @@ public class ArmorStand extends Entity implements Poseable, Geared {
     PlayerEntity.addArmor(primitives, gear, pose, armWidth, worldTransform,
         headScale);
 
-    if (showArms) {
+    Transform transform = Transform.NONE.translate(-0.5, 0, -0.5).translate(worldOffset);
+
+    if (!invisible) {
+      if (!noBasePlate) {
+        // Add the base - not rotated or scaled.
+        for (Quad quad : base) {
+          quad.addTriangles(primitives, material, transform);
+        }
+      }
+
+      if (showArms) {
+        transform = Transform.NONE
+            .translate(0, -5 / 16., 0)
+            .rotateX(leftArmPose.x)
+            .rotateY(leftArmPose.y)
+            .rotateZ(leftArmPose.z)
+            .translate(-(4 + armWidth) / 16., 23 / 16., 0)
+            .chain(worldTransform);
+        for (Quad quad : leftArm) {
+          quad.addTriangles(primitives, material, transform);
+        }
+
+        transform = Transform.NONE
+            .translate(0, -5 / 16., 0)
+            .rotateX(rightArmPose.x)
+            .rotateY(rightArmPose.y)
+            .rotateZ(rightArmPose.z)
+            .translate((4 + armWidth) / 16., 23 / 16., 0)
+            .chain(worldTransform);
+        for (Quad quad : rightArm) {
+          quad.addTriangles(primitives, material, transform);
+        }
+      }
+
       transform = Transform.NONE
           .translate(0, -5 / 16., 0)
-          .rotateX(leftArmPose.x)
-          .rotateY(leftArmPose.y)
-          .rotateZ(leftArmPose.z)
-          .translate(-(4 + armWidth) / 16., 23 / 16., 0)
+          .rotateX(leftLegPose.x)
+          .rotateY(leftLegPose.y)
+          .rotateZ(leftLegPose.z)
+          .translate(-2 / 16., 11.5 / 16., 0)
           .chain(worldTransform);
-      for (Quad quad : leftArm) {
+      for (Quad quad : leftLeg) {
         quad.addTriangles(primitives, material, transform);
       }
 
       transform = Transform.NONE
           .translate(0, -5 / 16., 0)
-          .rotateX(rightArmPose.x)
-          .rotateY(rightArmPose.y)
-          .rotateZ(rightArmPose.z)
-          .translate((4 + armWidth) / 16., 23 / 16., 0)
+          .rotateX(rightLegPose.x)
+          .rotateY(rightLegPose.y)
+          .rotateZ(rightLegPose.z)
+          .translate(2 / 16., 11.5 / 16., 0)
           .chain(worldTransform);
-      for (Quad quad : rightArm) {
+      for (Quad quad : rightLeg) {
+        quad.addTriangles(primitives, material, transform);
+      }
+
+      transform = Transform.NONE
+          .translate(0, -5 / 16., 0)
+          .rotateX(chestPose.x)
+          .rotateY(chestPose.y)
+          .rotateZ(chestPose.z)
+          .translate(0, (5 + 18) / 16., 0)
+          .chain(worldTransform);
+      for (Quad quad : torso) {
+        quad.addTriangles(primitives, material, transform);
+      }
+
+      transform = Transform.NONE
+          .translate(0, 2 / 16.0, 0)
+          .rotateX(headPose.x)
+          .rotateY(headPose.y)
+          .rotateZ(headPose.z)
+          .scale(headScale)
+          .translate(0, 24 / 16.0, 0)
+          .chain(worldTransform);
+      for (Quad quad : neck) {
         quad.addTriangles(primitives, material, transform);
       }
     }
 
-    transform = Transform.NONE
-        .translate(0, -5 / 16., 0)
-        .rotateX(leftLegPose.x)
-        .rotateY(leftLegPose.y)
-        .rotateZ(leftLegPose.z)
-        .translate(-2 / 16., 11.5 / 16., 0)
-        .chain(worldTransform);
-    for (Quad quad : leftLeg) {
-      quad.addTriangles(primitives, material, transform);
-    }
-
-    transform = Transform.NONE
-        .translate(0, -5 / 16., 0)
-        .rotateX(rightLegPose.x)
-        .rotateY(rightLegPose.y)
-        .rotateZ(rightLegPose.z)
-        .translate(2 / 16., 11.5 / 16., 0)
-        .chain(worldTransform);
-    for (Quad quad : rightLeg) {
-      quad.addTriangles(primitives, material, transform);
-    }
-
-    transform = Transform.NONE
-        .translate(0, -5 / 16., 0)
-        .rotateX(chestPose.x)
-        .rotateY(chestPose.y)
-        .rotateZ(chestPose.z)
-        .translate(0, (5 + 18) / 16., 0)
-        .chain(worldTransform);
-    for (Quad quad : torso) {
-      quad.addTriangles(primitives, material, transform);
-    }
-
-    transform = Transform.NONE
-        .translate(0, 2 / 16.0, 0)
-        .rotateX(headPose.x)
-        .rotateY(headPose.y)
-        .rotateZ(headPose.z)
-        .scale(headScale)
-        .translate(0, 24 / 16.0, 0)
-        .chain(worldTransform);
-    for (Quad quad : neck) {
-      quad.addTriangles(primitives, material, transform);
-    }
     return primitives;
   }
 
@@ -556,6 +567,8 @@ public class ArmorStand extends Entity implements Poseable, Geared {
     json.add("showArms", showArms);
     json.add("gear", gear);
     json.add("pose", pose);
+    json.add("invisible", invisible);
+    json.add("noBasePlate", noBasePlate);
     return json;
   }
 
