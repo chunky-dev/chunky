@@ -152,6 +152,9 @@ public class HeadEntity extends Entity {
     return textureCache.computeIfAbsent(skin, (skinUrl) -> {
       EntityTexture texture = new EntityTexture();
       EntityTextureLoader loader = new EntityTextureLoader(skinUrl, texture);
+      if (!PersistentSettings.cacheDirectory().isDirectory()) {
+        PersistentSettings.cacheDirectory().mkdirs();
+      }
       File cacheFile = new File(PersistentSettings.cacheDirectory(),
           Util.cacheEncode((skin + ":skin").hashCode()));
       if (cacheFile.exists()) {
