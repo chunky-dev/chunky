@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.entity;
 
+import se.llbit.chunky.block.Head;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
@@ -118,6 +119,11 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       // Skull type is stored in the damage field.
       int damage = tag.get("Damage").shortValue();
       item.add("type", damage);
+    } else if (id.equals("minecraft:player_head")) {
+      Tag skinTag = tag.get("tag").get("SkullOwner").get("Properties").get("textures").get(0).get("Value");
+      if (!skinTag.isError()) {
+        item.add("skin", Head.getTextureUrl(tag.get("tag").asCompound()));
+      }
     }
     return item;
   }
@@ -534,6 +540,8 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           json = parseJson(skullJson);
           break;
       }
+    } else if (id.equals("minecraft:player_head")) {
+      json = parseJson(headJson);
     }
     Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
@@ -666,6 +674,9 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           break;
         case "turtle_helmet":
           loader = simpleTexture("models/armor/turtle_layer_1", texture);
+          break;
+        case "player_head":
+          texture = HeadEntity.downloadTexture(item.get("skin").asString(""));
           break;
         default:
           Log.warnf("Unknown item ID: %s%n", id);
