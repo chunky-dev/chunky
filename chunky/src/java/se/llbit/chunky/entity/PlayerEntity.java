@@ -17,6 +17,7 @@
  */
 package se.llbit.chunky.entity;
 
+import se.llbit.chunky.block.Head;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.resources.EntityTexture;
 import se.llbit.chunky.resources.Texture;
@@ -118,6 +119,11 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       // Skull type is stored in the damage field.
       int damage = tag.get("Damage").shortValue();
       item.add("type", damage);
+    } else if (id.equals("minecraft:player_head")) {
+      Tag skinTag = tag.get("tag").get("SkullOwner").get("Properties").get("textures").get(0).get("Value");
+      if (!skinTag.isError()) {
+        item.add("skin", Head.getTextureUrl(tag.get("tag").asCompound()));
+      }
     }
     return item;
   }
@@ -192,38 +198,43 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         .rotateZ(allPose.z)
         .translate(worldOffset);
     Collection<Primitive> primitives = new LinkedList<>();
-    Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
-    head.transform(Transform.NONE
-        .translate(0, 4 / 16., 0)
-        .scale(headScale)
-        .rotateX(headPose.x)
-        .rotateY(headPose.y)
-        .rotateZ(headPose.z)
-        .translate(0, -4 / 16., 0)
-        .translate(0, 28 / 16., 0)
-        .chain(worldTransform));
-    head.addFrontFaces(primitives, texture, texture.headFront);
-    head.addBackFaces(primitives, texture, texture.headBack);
-    head.addLeftFaces(primitives, texture, texture.headLeft);
-    head.addRightFaces(primitives, texture, texture.headRight);
-    head.addTopFaces(primitives, texture, texture.headTop);
-    head.addBottomFaces(primitives, texture, texture.headBottom);
-    Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
-    hat.transform(Transform.NONE
-        .translate(0, 4 / 16., 0)
-        .scale(headScale)
-        .rotateX(headPose.x)
-        .rotateY(headPose.y)
-        .rotateZ(headPose.z)
-        .translate(0, -4 / 16., 0)
-        .translate(0, 28.2 / 16., 0)
-        .chain(worldTransform));
-    hat.addFrontFaces(primitives, texture, texture.hatFront);
-    hat.addBackFaces(primitives, texture, texture.hatBack);
-    hat.addLeftFaces(primitives, texture, texture.hatLeft);
-    hat.addRightFaces(primitives, texture, texture.hatRight);
-    hat.addTopFaces(primitives, texture, texture.hatTop);
-    hat.addBottomFaces(primitives, texture, texture.hatBottom);
+    if (!gear.get("head").object().get("id").stringValue("").equals("minecraft:player_head") &&
+        !gear.get("head").object().get("id").stringValue("").equals("minecraft:skull")
+    ) {
+      Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
+      head.transform(Transform.NONE
+          .translate(0, 4 / 16., 0)
+          .scale(headScale)
+          .rotateX(headPose.x)
+          .rotateY(headPose.y)
+          .rotateZ(headPose.z)
+          .translate(0, -4 / 16., 0)
+          .translate(0, 28 / 16., 0)
+          .chain(worldTransform));
+      head.addFrontFaces(primitives, texture, texture.headFront);
+      head.addBackFaces(primitives, texture, texture.headBack);
+      head.addLeftFaces(primitives, texture, texture.headLeft);
+      head.addRightFaces(primitives, texture, texture.headRight);
+      head.addTopFaces(primitives, texture, texture.headTop);
+      head.addBottomFaces(primitives, texture, texture.headBottom);
+
+      Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
+      hat.transform(Transform.NONE
+          .translate(0, 4 / 16., 0)
+          .scale(headScale)
+          .rotateX(headPose.x)
+          .rotateY(headPose.y)
+          .rotateZ(headPose.z)
+          .translate(0, -4 / 16., 0)
+          .translate(0, 28.2 / 16., 0)
+          .chain(worldTransform));
+      hat.addFrontFaces(primitives, texture, texture.hatFront);
+      hat.addBackFaces(primitives, texture, texture.hatBack);
+      hat.addLeftFaces(primitives, texture, texture.hatLeft);
+      hat.addRightFaces(primitives, texture, texture.hatRight);
+      hat.addTopFaces(primitives, texture, texture.hatTop);
+      hat.addBottomFaces(primitives, texture, texture.hatBottom);
+    }
     Box chest = new Box(-4 / 16., 4 / 16., -6 / 16., 6 / 16., -2 / 16., 2 / 16.);
     chest.transform(Transform.NONE
         .translate(0, -5 / 16., 0)
@@ -417,9 +428,9 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
       "{\"elements\":[{\"from\":[3,3,3],\"to\":[13,13,13],\"faces\":{\"up\":{\"uv\":[2,0,4,4],\"texture\":\"#texture\"},\"east\":{\"uv\":[0,4,2,8],\"texture\":\"#texture\"},\"west\":{\"uv\":[4,4,6,8],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,4,4,8],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,4,8,8],\"texture\":\"#texture\"}}}]}";
 
   private static final String headJson =
-      "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[2,0,4,2],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,2],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,2,4,4],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,2,0,4],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,2,4,4],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,2,8,4],\"texture\":\"#texture\"}}}]}";
+      "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[4,2,2,0],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,2],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,2,4,4],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,2,0,4],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,2,4,4],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,2,8,4],\"texture\":\"#texture\"}}},{\"from\":[3.75,3.75,3.75],\"to\":[12.25,12.25,12.25],\"faces\":{\"up\":{\"uv\":[12,2,10,0],\"texture\":\"#texture\"},\"down\":{\"uv\":[12,0,14,2],\"texture\":\"#texture\"},\"east\":{\"uv\":[14,2,12,4],\"texture\":\"#texture\"},\"west\":{\"uv\":[10,2,8,4],\"texture\":\"#texture\"},\"north\":{\"uv\":[10,2,12,4],\"texture\":\"#texture\"},\"south\":{\"uv\":[14,2,14,4],\"texture\":\"#texture\"}}}]}";
 
-  // The difference between skullJson/headJson is that skullJson is textured with a half as tall texture.
+  // The difference between skullJson/headJson is that skullJson is textured with a half as tall texture and has no hat.
   private static final String skullJson =
       "{\"elements\":[{\"from\":[4,4,4],\"to\":[12,12,12],\"faces\":{\"up\":{\"uv\":[2,0,4,4],\"texture\":\"#texture\"},\"down\":{\"uv\":[4,0,6,4],\"texture\":\"#texture\"},\"east\":{\"uv\":[6,4,4,8],\"texture\":\"#texture\"},\"west\":{\"uv\":[2,4,0,8],\"texture\":\"#texture\"},\"north\":{\"uv\":[2,4,4,8],\"texture\":\"#texture\"},\"south\":{\"uv\":[6,4,8,8],\"texture\":\"#texture\"}}}]}";
 
@@ -530,6 +541,8 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           json = parseJson(skullJson);
           break;
       }
+    } else if (id.equals("minecraft:player_head")) {
+      json = parseJson(headJson);
     }
     Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
@@ -662,6 +675,9 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           break;
         case "turtle_helmet":
           loader = simpleTexture("models/armor/turtle_layer_1", texture);
+          break;
+        case "player_head":
+          texture = HeadEntity.downloadTexture(item.get("skin").asString(""));
           break;
         default:
           Log.warnf("Unknown item ID: %s%n", id);
