@@ -577,6 +577,7 @@ public class ChunkyFxController
     editResourcePacks.setOnAction(e -> {
       ResourceLoadOrderEditor editor = new ResourceLoadOrderEditor(() -> {
         scene.refresh();
+        scene.rebuildBvh();
       });
       editor.show();
     });
