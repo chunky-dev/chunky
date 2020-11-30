@@ -3666,6 +3666,7 @@ public class TexturePackLoader {
    * last used texture pack.
    */
   public static void loadTexturePacks(@NotNull String[] texturePacks, boolean remember) {
+    TextureCache.reset();
     TexturePackLoader.texturePacks = texturePacks;
     Set<Map.Entry<String, TextureLoader>> toLoad = allTextures.entrySet();
     for (String path : texturePacks) {

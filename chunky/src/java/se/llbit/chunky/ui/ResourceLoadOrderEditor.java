@@ -57,7 +57,6 @@ public class ResourceLoadOrderEditor extends Stage {
       String[] paths = new String[pathList.getItems().size()];
       pathList.getItems().toArray(paths);
       TexturePackLoader.loadTexturePacks(paths, true);
-      TextureCache.reset();
       onResourcesChanged.run();
       hide();
     });
