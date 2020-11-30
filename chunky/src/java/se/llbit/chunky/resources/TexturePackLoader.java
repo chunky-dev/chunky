@@ -3681,7 +3681,7 @@ public class TexturePackLoader {
         }
       }
     }
-    if (!toLoad.isEmpty()) {
+    if (!toLoad.isEmpty() && !PersistentSettings.getDisableDefaultTextures()) {
       // If there are textures left to load we try to load the default textures.
       File defaultResources = MinecraftFinder.getMinecraftJar();
       if (defaultResources != null) {
@@ -3798,7 +3798,7 @@ public class TexturePackLoader {
         }
       }
     }
-    if (!toLoad.isEmpty()) {
+    if (!toLoad.isEmpty() && !PersistentSettings.getDisableDefaultTextures()) {
       // If there are textures left to load we try to load the default textures.
       File defaultResources = MinecraftFinder.getMinecraftJar();
       if (defaultResources != null) {
