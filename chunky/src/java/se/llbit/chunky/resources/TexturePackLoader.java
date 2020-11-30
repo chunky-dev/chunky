@@ -3666,6 +3666,8 @@ public class TexturePackLoader {
    * last used texture pack.
    */
   public static void loadTexturePacks(@NotNull String[] texturePacks, boolean remember) {
+    TextureCache.reset();
+    TexturePackLoader.texturePacks = texturePacks;
     Set<Map.Entry<String, TextureLoader>> toLoad = allTextures.entrySet();
     for (String path : texturePacks) {
       if (!path.isEmpty()) {
@@ -3681,7 +3683,7 @@ public class TexturePackLoader {
         }
       }
     }
-    if (!toLoad.isEmpty()) {
+    if (!toLoad.isEmpty() && !PersistentSettings.getDisableDefaultTextures()) {
       // If there are textures left to load we try to load the default textures.
       File defaultResources = MinecraftFinder.getMinecraftJar();
       if (defaultResources != null) {
@@ -3798,7 +3800,7 @@ public class TexturePackLoader {
         }
       }
     }
-    if (!toLoad.isEmpty()) {
+    if (!toLoad.isEmpty() && !PersistentSettings.getDisableDefaultTextures()) {
       // If there are textures left to load we try to load the default textures.
       File defaultResources = MinecraftFinder.getMinecraftJar();
       if (defaultResources != null) {

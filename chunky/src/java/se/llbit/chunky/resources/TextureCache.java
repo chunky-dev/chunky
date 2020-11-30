@@ -16,14 +16,16 @@
  */
 package se.llbit.chunky.resources;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Cache for texture lookups for infrequently used textures.
  */
 public class TextureCache {
-  private static Map<Object, Texture> map = new HashMap<>();
+
+  private static Map<Object, Texture> map = Collections.synchronizedMap(new WeakHashMap<>());
 
   public static Texture get(Object key) {
     return map.get(key);
@@ -34,7 +36,6 @@ public class TextureCache {
   }
 
   public static void reset() {
-    // TODO: make thread safe.
     map.clear();
   }
 

@@ -134,6 +134,7 @@ public class ChunkyFxController
   @FXML private Tab aboutTab;
   @FXML private Button editResourcePacks;
   @FXML private CheckBox singleColorBtn;
+  @FXML private CheckBox disableDefaultTexturesBtn;
   @FXML private CheckBox showLauncherBtn;
   @FXML private Button openSceneDirBtn;
   @FXML private Button changeSceneDirBtn;
@@ -576,6 +577,7 @@ public class ChunkyFxController
     editResourcePacks.setOnAction(e -> {
       ResourceLoadOrderEditor editor = new ResourceLoadOrderEditor(() -> {
         scene.refresh();
+        scene.rebuildBvh();
       });
       editor.show();
     });
@@ -595,6 +597,11 @@ public class ChunkyFxController
     singleColorBtn.setSelected(PersistentSettings.getSingleColorTextures());
     singleColorBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       PersistentSettings.setSingleColorTextures(newValue);
+    });
+
+    disableDefaultTexturesBtn.setSelected(PersistentSettings.getDisableDefaultTextures());
+    disableDefaultTexturesBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      PersistentSettings.setDisableDefaultTextures(newValue);
     });
 
     trackPlayerBtn.selectedProperty().bindBidirectional(trackPlayer);

@@ -1202,6 +1202,15 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
+   * Rebuild the actors and the other blocks bounding volume hierarchy.
+   */
+  public void rebuildBvh() {
+    buildBvh();
+    buildActorBvh();
+    refresh();
+  }
+
+  /**
    * Rebuild the actors bounding volume hierarchy.
    */
   public void rebuildActorBvh() {
