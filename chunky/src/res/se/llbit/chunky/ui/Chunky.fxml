@@ -149,7 +149,7 @@
           <Hyperlink fx:id="issueTrackerLink" text="Issue Tracker"/>
           <Hyperlink fx:id="forumLink" text="Discussion Forum"/>
           <Hyperlink fx:id="discordLink" text="Discord Server" />
-          <Hyperlink fx:id="guideLink" text="jackt8's Guide to Chunky" />
+          <Hyperlink fx:id="guideLink" text="jackjt8's Guide to Chunky" />
           <Separator />
           <Label text="Chunky was created by Jesper Öqvist (jesper@llbit.se)"/>
           <Button fx:id="creditsBtn" mnemonicParsing="false" text="View Credits"/>
