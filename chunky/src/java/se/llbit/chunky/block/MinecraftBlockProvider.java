@@ -679,6 +679,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:sandstone_stairs",
       "minecraft:sandstone_wall",
       "minecraft:scaffolding",
+      "minecraft:sculk_sensor",
       "minecraft:seagrass",
       "minecraft:sea_lantern",
       "minecraft:sea_pickle",
@@ -2715,6 +2716,8 @@ public class MinecraftBlockProvider implements BlockProvider {
             tag.get("Properties").get("thickness").stringValue("tip"),
             tag.get("Properties").get("vertical_direction").stringValue("up"),
             tag.get("Properties").get("waterlogged").stringValue("").equals("true"));
+      case "sculk_sensor":
+        return new SculkSensor(tag.get("Properties").get("sculk_sensor_phase").stringValue("cooldown"));
       case "structure_void":
       case "barrier":
         // Invisible.

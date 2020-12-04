@@ -935,6 +935,11 @@ public class Texture {
   public static final Texture pointedDripstoneUpMiddle = new Texture();
   public static final Texture pointedDripstoneUpTip = new Texture();
   public static final Texture pointedDripstoneUpTipMerge = new Texture();
+  public static final Texture sculkSensorBottom = new Texture();
+  public static final Texture sculkSensorSide = new Texture();
+  public static final Texture sculkSensorTendrilActive = new Texture();
+  public static final Texture sculkSensorTendrilInactive = new Texture();
+  public static final Texture sculkSensorTop = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
