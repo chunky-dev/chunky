@@ -116,7 +116,7 @@ public class Biomes {
   private static final Biome crimsonForest = new Biome("Crimson Forest", 2, 0, 0xDD0808, 0xBFB755, 0xAEA42A);
   private static final Biome warpedForest = new Biome("Warped Forest", 2, 0, 0x49907B, 0xBFB755, 0xAEA42A);
   private static final Biome basaltDeltas = new Biome("Basalt Deltas", 2, 0, 0x403636, 0xBFB755, 0xAEA42A);
-  private static final Biome dripstoneCaves = new Biome("Dripstone Caves", 0.8, 0.4, 0x7B6254, 0x91BD59, 0x77AB2F); // TODO rain value is speculative
+  private static final Biome dripstoneCaves = new Biome("Dripstone Caves", 0.8, 0.4, 0x7B6254, 0x91BD59, 0x77AB2F);
 
   private static final Biome[] biomes = {
       ocean, plains, desert, mountains, forest, taiga, swamp, river,
