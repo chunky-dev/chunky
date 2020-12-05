@@ -405,6 +405,11 @@ public class BlockPalette {
       }
     });
     materialProperties.put("minecraft:tinted_glass", glassConfig);
+    materialProperties.put("minecraft:sculk_sensor", block -> {
+      if (block instanceof SculkSensor && ((SculkSensor) block).isActive()) {
+        block.emittance = 1.0f / 15f;
+      }
+    });
     return materialProperties;
   }
 

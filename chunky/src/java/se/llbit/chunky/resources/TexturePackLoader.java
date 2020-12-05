@@ -3562,6 +3562,11 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_up_middle", Texture.pointedDripstoneUpMiddle);
     addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_up_tip", Texture.pointedDripstoneUpTip);
     addSimpleTexture("assets/minecraft/textures/block/pointed_dripstone_up_tip_merge", Texture.pointedDripstoneUpTipMerge);
+    addSimpleTexture("assets/minecraft/textures/block/sculk_sensor_bottom", Texture.sculkSensorBottom);
+    addSimpleTexture("assets/minecraft/textures/block/sculk_sensor_side", Texture.sculkSensorSide);
+    addSimpleTexture("assets/minecraft/textures/block/sculk_sensor_tendril_active", Texture.sculkSensorTendrilActive);
+    addSimpleTexture("assets/minecraft/textures/block/sculk_sensor_tendril_inactive", Texture.sculkSensorTendrilInactive);
+    addSimpleTexture("assets/minecraft/textures/block/sculk_sensor_top", Texture.sculkSensorTop);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
