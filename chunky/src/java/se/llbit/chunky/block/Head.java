@@ -18,7 +18,7 @@ import se.llbit.nbt.Tag;
 public class Head extends MinecraftBlockTranslucent {
 
   private static final Pattern SKIN_URL_FROM_OBJECT = Pattern
-      .compile("\"?SKIN\"?\\s*:\\s*\\{\\s*\"?url\"?\\s*:\\s*\"(.+?)\"");
+      .compile("\"?SKIN\"?\\s*:\\s*\\{.+?\"?url\"?\\s*:\\s*\"(.+?)\"");
   private final String description;
   private final int rotation;
   private final SkullEntity.Kind type;
