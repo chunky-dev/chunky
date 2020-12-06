@@ -122,7 +122,10 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
     } else if (id.equals("minecraft:player_head")) {
       Tag skinTag = tag.get("tag").get("SkullOwner").get("Properties").get("textures").get(0).get("Value");
       if (!skinTag.isError()) {
-        item.add("skin", Head.getTextureUrl(tag.get("tag").asCompound()));
+        String skinUrl = Head.getTextureUrl(tag.get("tag").asCompound());
+        if (skinUrl != null && !skinUrl.isEmpty()) {
+          item.add("skin", skinUrl);
+        }
       }
     }
     return item;
@@ -677,7 +680,10 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           loader = simpleTexture("models/armor/turtle_layer_1", texture);
           break;
         case "player_head":
-          texture = HeadEntity.downloadTexture(item.get("skin").asString(""));
+          String skin = item.get("skin").asString("");
+          if (!skin.isEmpty()) {
+            texture = HeadEntity.downloadTexture(skin);
+          }
           break;
         default:
           Log.warnf("Unknown item ID: %s%n", id);
