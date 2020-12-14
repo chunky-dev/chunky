@@ -1,5 +1,6 @@
 package se.llbit.math;
 
+import org.apache.commons.math3.util.Pair;
 import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.Material;
@@ -295,6 +296,20 @@ public class PackedOctree implements Octree.OctreeImplementation {
         break;
       }
     }
+  }
+
+  @Override
+  public Pair<Octree.NodeId, Integer> getWithLevel(int x, int y, int z) {
+    int nodeIndex = 0;
+    int level = depth;
+    while(treeData[nodeIndex] > 0) {
+      level -= 1;
+      int lx = x >>> level;
+      int ly = y >>> level;
+      int lz = z >>> level;
+      nodeIndex = treeData[nodeIndex] + (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1));
+    }
+    return new Pair<>(new NodeId(nodeIndex), level);
   }
 
   private int getNodeIndex(int x, int y, int z) {
