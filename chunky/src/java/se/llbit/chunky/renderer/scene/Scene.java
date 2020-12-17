@@ -26,6 +26,7 @@ import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
+import se.llbit.chunky.entity.Lectern;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
@@ -894,15 +895,31 @@ public class Scene implements JsonSerializable, Refreshable {
                 if (block.isEntity()) {
                   Vector3 position = new Vector3(cx + cp.x * 16, cy, cz + cp.z * 16);
                   Entity entity = block.toEntity(position);
-                  entities.add(entity);
-                  if(emitterGrid != null) {
-                    for(Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
-                      emitterPos.x -= origin.x;
-                      emitterPos.y -= origin.y;
-                      emitterPos.z -= origin.z;
-                      emitterGrid.addEmitter(emitterPos);
+
+                  if (entity instanceof Poseable && !(entity instanceof Lectern && !((Lectern)entity).hasBook())) {
+                    // don't add the actor again if it was already loaded from json
+                    if (actors.stream().noneMatch(actor -> {
+                      if (actor.getClass().equals(entity.getClass())) {
+                        Vector3 distance = new Vector3(actor.position);
+                        distance.sub(entity.position);
+                        return distance.lengthSquared() < Ray.EPSILON;
+                      }
+                      return false;
+                    })) {
+                      actors.add(entity);
+                    }
+                  } else {
+                    entities.add(entity);
+                    if(emitterGrid != null) {
+                      for(Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
+                        emitterPos.x -= origin.x;
+                        emitterPos.y -= origin.y;
+                        emitterPos.z -= origin.z;
+                        emitterGrid.addEmitter(emitterPos);
+                      }
                     }
                   }
+
                   if (!block.isBlockWithEntity()) {
                     if (block.waterlogged) {
                       block = palette.water;

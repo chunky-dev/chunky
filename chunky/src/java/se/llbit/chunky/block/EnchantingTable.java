@@ -7,7 +7,6 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
-import se.llbit.nbt.CompoundTag;
 
 public class EnchantingTable extends MinecraftBlockTranslucent {
 
@@ -23,12 +22,17 @@ public class EnchantingTable extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public boolean isBlockEntity() {
+  public boolean isEntity() {
     return true;
   }
 
   @Override
-  public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
+  public boolean isBlockWithEntity() {
+    return true;
+  }
+
+  @Override
+  public Entity toEntity(Vector3 position) {
     Vector3 newPosition = new Vector3(position);
     newPosition.add(0, 0.35, 0);
     Book book = new Book(
