@@ -268,7 +268,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private WorldTexture grassTexture = new WorldTexture();
   private WorldTexture foliageTexture = new WorldTexture();
-  private WorldTexture waterTexture;
+  private WorldTexture waterTexture = new WorldTexture();
 
   /** This is the 8-bit channel frame buffer. */
   protected BitmapImage frontBuffer;
