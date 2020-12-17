@@ -14,7 +14,7 @@ import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
 
-public class Lectern extends Entity {
+public class Lectern extends Entity implements Poseable {
 
   private static final Quad[] quadsNorth = new Quad[]{
       new Quad(
@@ -145,18 +145,28 @@ public class Lectern extends Entity {
   };
 
   private final String facing;
-  private final boolean hasBook;
+  private final Book book;
 
   public Lectern(Vector3 position, String facing, boolean hasBook) {
     super(position);
     this.facing = facing;
-    this.hasBook = hasBook;
+    if (hasBook) {
+      this.book = createBookEntity(position, facing);
+    } else {
+      this.book = null;
+    }
   }
 
   public Lectern(JsonObject json) {
     super(JsonUtil.vec3FromJsonObject(json.get("position")));
     this.facing = json.get("facing").stringValue("north");
-    this.hasBook = json.get("hasBook").boolValue(false);
+    if (json.get("book").isObject()) {
+      this.book = Book.fromJson(json.get("book").object());
+    } else if (json.get("hasBook").asBoolean(false)) {
+      this.book = createBookEntity(getPosition(), facing);
+    } else {
+      this.book = null;
+    }
   }
 
   @Override
@@ -174,32 +184,7 @@ public class Lectern extends Entity {
               transform);
     }
 
-    if (hasBook) {
-      Vector3 bookPosition = new Vector3(position);
-      bookPosition.add(0, 8.5 / 16.0, 0);
-
-      switch (this.facing) {
-        case "north":
-          bookPosition.add(0, 0, -2 / 16.0);
-          break;
-        case "east":
-          bookPosition.add(2 / 16.0, 0, 0);
-          break;
-        case "south":
-          bookPosition.add(0, 0, 2 / 16.0);
-          break;
-        case "west":
-          bookPosition.add(-2 / 16.0, 0, 0);
-          break;
-      }
-
-      Book book = new Book(
-          bookPosition,
-          Math.PI - Math.PI / 16,
-          Math.PI / 8,
-          Math.PI - Math.PI / 8);
-      book.setPitch(Math.toRadians(90 - 22.5));
-      book.setYaw(getBookYaw(this.facing));
+    if (book != null) {
       faces.addAll(book.primitives(offset));
     }
 
@@ -212,8 +197,18 @@ public class Lectern extends Entity {
     json.add("kind", "lectern");
     json.add("position", position.toJson());
     json.add("facing", facing);
-    json.add("hasBook", hasBook);
+    if (book != null) {
+      json.add("book", book.toJson());
+    }
     return json;
+  }
+
+  public Book getBook() {
+    return book;
+  }
+
+  public boolean hasBook() {
+    return book != null;
   }
 
   public static Entity fromJson(JsonObject json) {
@@ -248,5 +243,62 @@ public class Lectern extends Entity {
       default:
         return 0;
     }
+  }
+
+  private static Book createBookEntity(Vector3 position, String facing) {
+    Vector3 bookPosition = new Vector3(position);
+    bookPosition.add(0, 8.5 / 16.0, 0);
+
+    switch (facing) {
+      case "north":
+        bookPosition.add(0, 0, -2 / 16.0);
+        break;
+      case "east":
+        bookPosition.add(2 / 16.0, 0, 0);
+        break;
+      case "south":
+        bookPosition.add(0, 0, 2 / 16.0);
+        break;
+      case "west":
+        bookPosition.add(-2 / 16.0, 0, 0);
+        break;
+    }
+
+    Book book = new Book(
+        bookPosition,
+        Math.PI - Math.PI / 16,
+        Math.PI / 8,
+        Math.PI - Math.PI / 8);
+    book.setPitch(Math.toRadians(90 - 22.5));
+    book.setYaw(getBookYaw(facing));
+
+    return book;
+  }
+
+  @Override
+  public String[] partNames() {
+    return book != null ? book.partNames() : new String[0];
+  }
+
+  @Override
+  public double getScale() {
+    return book != null ? book.getScale() : 1;
+  }
+
+  @Override
+  public void setScale(double value) {
+    if (book != null) {
+      book.setScale(value);
+    }
+  }
+
+  @Override
+  public JsonObject getPose() {
+    return book != null ? book.getPose() : null;
+  }
+
+  @Override
+  public boolean hasHead() {
+    return false;
   }
 }

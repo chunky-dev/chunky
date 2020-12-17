@@ -16,6 +16,14 @@
  */
 package se.llbit.chunky.ui.render;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.function.Consumer;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -37,6 +45,7 @@ import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Book;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.Geared;
+import se.llbit.chunky.entity.Lectern;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.renderer.scene.PlayerModel;
@@ -49,19 +58,12 @@ import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
 import se.llbit.math.Vector3;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.function.Consumer;
-
 public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initializable {
+
   private Scene scene;
 
   static class EntityData {
+
     public final Entity entity;
     public final String name;
     private String kind;
@@ -87,15 +89,18 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       return profile.get("name").stringValue("Unknown");
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
       return "" + entity;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
       return entity.hashCode();
     }
 
-    @Override public boolean equals(Object obj) {
+    @Override
+    public boolean equals(Object obj) {
       // Identity comparison is used to ensure that the table in the
       // entities tab is properly updated after rebuilding the scene.
       if (obj instanceof EntityData) {
@@ -109,17 +114,28 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     }
   }
 
-  @FXML private TableView<EntityData> entityTable;
-  @FXML private TableColumn<EntityData, String> nameCol;
-  @FXML private TableColumn<EntityData, String> kindCol;
-  @FXML private Button delete;
-  @FXML private Button add;
-  @FXML private Button cameraToPlayer;
-  @FXML private Button playerToCamera;
-  @FXML private Button playerToTarget;
-  @FXML private Button faceCamera;
-  @FXML private Button faceTarget;
-  @FXML private VBox controls;
+  @FXML
+  private TableView<EntityData> entityTable;
+  @FXML
+  private TableColumn<EntityData, String> nameCol;
+  @FXML
+  private TableColumn<EntityData, String> kindCol;
+  @FXML
+  private Button delete;
+  @FXML
+  private Button add;
+  @FXML
+  private Button cameraToPlayer;
+  @FXML
+  private Button playerToCamera;
+  @FXML
+  private Button playerToTarget;
+  @FXML
+  private Button faceCamera;
+  @FXML
+  private Button faceTarget;
+  @FXML
+  private VBox controls;
 
   public EntitiesTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("EntitiesTab.fxml"));
@@ -128,7 +144,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     loader.load();
   }
 
-  @Override public void update(Scene scene) {
+  @Override
+  public void update(Scene scene) {
     // TODO: it might be better to always just rebuild the whole table.
     Collection<EntityData> missing = new HashSet<>(entityTable.getItems());
     for (Entity entity : scene.getActors()) {
@@ -141,11 +158,13 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     entityTable.getItems().removeAll(missing);
   }
 
-  @Override public String getTabTitle() {
+  @Override
+  public String getTabTitle() {
     return "Entities";
   }
 
-  @Override public Node getTabContent() {
+  @Override
+  public Node getTabContent() {
     return this;
   }
 
@@ -178,7 +197,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
           FileChooser fileChooser = new FileChooser();
           fileChooser.setTitle("Load Skin");
           fileChooser
-              .getExtensionFilters().add(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
+              .getExtensionFilters()
+              .add(new FileChooser.ExtensionFilter("Minecraft skin", "*.png"));
           File skinFile = fileChooser.showOpenDialog(getScene().getWindow());
           if (skinFile != null) {
             player.setTexture(skinFile.getAbsolutePath());
@@ -191,41 +211,48 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         controls.getChildren().addAll(modelBox, skinBox);
       }
 
-      if (entity instanceof Book) {
-        Book book = (Book) entity;
+      if (entity instanceof Book || entity instanceof Lectern) {
+        Book book;
+        if (entity instanceof Lectern) {
+          book = ((Lectern) entity).getBook();
+        } else {
+          book = (Book) entity;
+        }
 
-        DoubleAdjuster openingAngle = new DoubleAdjuster();
-        openingAngle.setName("Opening angle");
-        openingAngle.setTooltip("Modifies the book's opening angle.");
-        openingAngle.set(Math.toDegrees(book.getOpenAngle()));
-        openingAngle.setRange(0, 180);
-        openingAngle.onValueChange(value -> {
-          book.setOpenAngle(Math.toRadians(value));
-          scene.rebuildActorBvh();
-        });
-        controls.getChildren().add(openingAngle);
+        if (book != null) {
+          DoubleAdjuster openingAngle = new DoubleAdjuster();
+          openingAngle.setName("Opening angle");
+          openingAngle.setTooltip("Modifies the book's opening angle.");
+          openingAngle.set(Math.toDegrees(book.getOpenAngle()));
+          openingAngle.setRange(0, 180);
+          openingAngle.onValueChange(value -> {
+            book.setOpenAngle(Math.toRadians(value));
+            scene.rebuildActorBvh();
+          });
+          controls.getChildren().add(openingAngle);
 
-        DoubleAdjuster page1Angle = new DoubleAdjuster();
-        page1Angle.setName("Page 1 angle");
-        page1Angle.setTooltip("Modifies the book's first visible page's angle.");
-        page1Angle.set(Math.toDegrees(book.getPageAngleA()));
-        page1Angle.setRange(0, 180);
-        page1Angle.onValueChange(value -> {
-          book.setPageAngleA(Math.toRadians(value));
-          scene.rebuildActorBvh();
-        });
-        controls.getChildren().add(page1Angle);
+          DoubleAdjuster page1Angle = new DoubleAdjuster();
+          page1Angle.setName("Page 1 angle");
+          page1Angle.setTooltip("Modifies the book's first visible page's angle.");
+          page1Angle.set(Math.toDegrees(book.getPageAngleA()));
+          page1Angle.setRange(0, 180);
+          page1Angle.onValueChange(value -> {
+            book.setPageAngleA(Math.toRadians(value));
+            scene.rebuildActorBvh();
+          });
+          controls.getChildren().add(page1Angle);
 
-        DoubleAdjuster page2Angle = new DoubleAdjuster();
-        page2Angle.setName("Page 2 angle");
-        page2Angle.setTooltip("Modifies the book's second visible page's angle.");
-        page2Angle.set(Math.toDegrees(book.getPageAngleB()));
-        page2Angle.setRange(0, 180);
-        page2Angle.onValueChange(value -> {
-          book.setPageAngleB(Math.toRadians(value));
-          scene.rebuildActorBvh();
-        });
-        controls.getChildren().add(page2Angle);
+          DoubleAdjuster page2Angle = new DoubleAdjuster();
+          page2Angle.setName("Page 2 angle");
+          page2Angle.setTooltip("Modifies the book's second visible page's angle.");
+          page2Angle.set(Math.toDegrees(book.getPageAngleB()));
+          page2Angle.setRange(0, 180);
+          page2Angle.onValueChange(value -> {
+            book.setPageAngleB(Math.toRadians(value));
+            scene.rebuildActorBvh();
+          });
+          controls.getChildren().add(page2Angle);
+        }
       }
 
       DoubleAdjuster scale = new DoubleAdjuster();
@@ -280,11 +307,11 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
       partList.getSelectionModel().selectedItemProperty().addListener(
           (observable, oldValue, part) ->
               withPose(entity, part, partPose -> {
-                pitch.set(Math.toDegrees(partPose.get(0).asDouble(0)));
-                yaw.set(Math.toDegrees(partPose.get(1).asDouble(0)));
-                roll.set(Math.toDegrees(partPose.get(2).asDouble(0)));
-            }
-          ));
+                    pitch.set(Math.toDegrees(partPose.get(0).asDouble(0)));
+                    yaw.set(Math.toDegrees(partPose.get(1).asDouble(0)));
+                    roll.set(Math.toDegrees(partPose.get(2).asDouble(0)));
+                  }
+              ));
 
       partList.getSelectionModel().selectFirst(); // Updates the pose parameters.
 
@@ -335,7 +362,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     }
   }
 
-  @Override public void initialize(URL location, ResourceBundle resources) {
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
     add.setTooltip(new Tooltip("Add a player at the target position."));
     add.setOnAction(e -> {
       Collection<Entity> entities = scene.getActors();
@@ -411,7 +439,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         scene.rebuildActorBvh();
       }
     }));
-    faceTarget.setTooltip(new Tooltip("Makes the selected player look at the current view target."));
+    faceTarget
+        .setTooltip(new Tooltip("Makes the selected player look at the current view target."));
     faceTarget.setOnAction(e -> withEntity(entity -> {
       Vector3 target = scene.getTargetPosition();
       if (target != null && entity instanceof Poseable) {
@@ -453,7 +482,8 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
     }
   }
 
-  @Override public void setController(RenderControlsFxController controller) {
+  @Override
+  public void setController(RenderControlsFxController controller) {
     scene = controller.getRenderController().getSceneManager().getScene();
   }
 }
