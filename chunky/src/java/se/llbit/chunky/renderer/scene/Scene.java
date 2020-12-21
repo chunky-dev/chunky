@@ -16,7 +16,8 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import java.io.FileOutputStream;
+import java.io.*;
+
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.Air;
@@ -33,6 +34,7 @@ import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.FloatingPointCompressor;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
@@ -62,15 +64,6 @@ import se.llbit.png.PngFileWriter;
 import se.llbit.tiff.TiffFileWriter;
 import se.llbit.util.*;
 
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -89,6 +82,8 @@ import java.util.zip.GZIPOutputStream;
  */
 public class Scene implements JsonSerializable, Refreshable {
 
+  private static final byte[] DUMP_FORMAT_MAGIC_NUMBER = {0x44, 0x55, 0x4D, 0x50};
+  private static final int DUMP_FORMAT_VERSION = 1;
   public static final int DEFAULT_DUMP_FREQUENCY = 500;
   public static final String EXTENSION = ".json";
 
@@ -1943,22 +1938,16 @@ public class Scene implements JsonSerializable, Refreshable {
     try (TaskTracker.Task task = progress.task("Saving render dump", 2)) {
       task.update(1);
       Log.info("Saving render dump " + fileName);
-      try (DataOutputStream out = new DataOutputStream(
-          new GZIPOutputStream(context.getSceneFileOutputStream(fileName)))) {
-        out.writeInt(width);
-        out.writeInt(height);
-        out.writeInt(spp);
-        out.writeLong(renderTime);
-        for (int x = 0; x < width; ++x) {
-          task.update(width, x + 1);
-          for (int y = 0; y < height; ++y) {
-            out.writeDouble(samples[(y * width + x) * 3 + 0]);
-            out.writeDouble(samples[(y * width + x) * 3 + 1]);
-            out.writeDouble(samples[(y * width + x) * 3 + 2]);
-          }
-        }
-        Log.info("Render dump saved");
-      } catch (IOException e) {
+      try(OutputStream out = context.getSceneFileOutputStream(fileName)) {
+        out.write(DUMP_FORMAT_MAGIC_NUMBER);
+        DataOutputStream dataOutput = new DataOutputStream(out);
+        dataOutput.writeInt(DUMP_FORMAT_VERSION);
+        dataOutput.writeInt(width);
+        dataOutput.writeInt(height);
+        dataOutput.writeInt(spp);
+        dataOutput.writeLong(renderTime);
+        FloatingPointCompressor.compress(samples, out);
+      } catch(IOException e) {
         Log.warn("IO exception while saving render dump!", e);
       }
     }
@@ -2042,35 +2031,64 @@ public class Scene implements JsonSerializable, Refreshable {
       }
       return false;
     }
-    try (DataInputStream in = new DataInputStream(new GZIPInputStream(new FileInputStream(dumpFile)));
-        TaskTracker.Task task = taskTracker.task("Loading render dump", 2)) {
-      task.update(1);
-      Log.info("Reading render dump " + fileName);
-      int dumpWidth = in.readInt();
-      int dumpHeight = in.readInt();
-      if (dumpWidth != width || dumpHeight != height) {
-        Log.warn("Render dump discarded: incorrect width or height!");
-        return false;
-      }
-      spp = in.readInt();
-      renderTime = in.readLong();
+    try(PushbackInputStream input = new PushbackInputStream(new FileInputStream(dumpFile), 4)) {
+      byte[] magicNumber = new byte[4];
+      input.read(magicNumber, 0, 4);
+      if(Arrays.equals(magicNumber, DUMP_FORMAT_MAGIC_NUMBER)) {
+        // Format with a version number
+        try(DataInputStream dataInput = new DataInputStream(input);
+            TaskTracker.Task task = taskTracker.task("Loading render dump", 2)) {
+          int dumpVersion = dataInput.readInt();
+          if(dumpVersion == 1) {
+            task.update(1);
+            Log.info("Reading render dump " + fileName);
+            int dumpWidth = dataInput.readInt();
+            int dumpHeight = dataInput.readInt();
+            if (dumpWidth != width || dumpHeight != height) {
+              Log.warn("Render dump discarded: incorrect width or height!");
+              return false;
+            }
+            spp = dataInput.readInt();
+            renderTime = dataInput.readLong();
 
-      for (int x = 0; x < width; ++x) {
-        task.update(width, x + 1);
-        for (int y = 0; y < height; ++y) {
-          samples[(y * width + x) * 3 + 0] = in.readDouble();
-          samples[(y * width + x) * 3 + 1] = in.readDouble();
-          samples[(y * width + x) * 3 + 2] = in.readDouble();
-          finalizePixel(x, y);
+            FloatingPointCompressor.decompress(samples, input);
+          }
+        }
+      } else {
+        // Old format that is a gzipped stream, the header needs to be pushed back
+        input.unread(magicNumber, 0, 4);
+        try (DataInputStream in = new DataInputStream(new GZIPInputStream(input));
+             TaskTracker.Task task = taskTracker.task("Loading render dump", 2)) {
+          task.update(1);
+          Log.info("Reading render dump " + fileName);
+          int dumpWidth = in.readInt();
+          int dumpHeight = in.readInt();
+          if (dumpWidth != width || dumpHeight != height) {
+            Log.warn("Render dump discarded: incorrect width or height!");
+            return false;
+          }
+          spp = in.readInt();
+          renderTime = in.readLong();
+
+          for (int x = 0; x < width; ++x) {
+            task.update(width, x + 1);
+            for (int y = 0; y < height; ++y) {
+              samples[(y * width + x) * 3 + 0] = in.readDouble();
+              samples[(y * width + x) * 3 + 1] = in.readDouble();
+              samples[(y * width + x) * 3 + 2] = in.readDouble();
+              finalizePixel(x, y);
+            }
+          }
         }
       }
-      Log.info("Render dump loaded: " + fileName);
-      return true;
     } catch (IOException e) {
       // The render dump was possibly corrupt.
       Log.warn("Failed to load render dump", e);
       return false;
     }
+
+    Log.info("Render dump loaded: " + fileName);
+    return true;
   }
 
   /**
