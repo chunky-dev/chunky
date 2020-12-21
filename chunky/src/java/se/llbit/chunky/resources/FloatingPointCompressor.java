@@ -135,7 +135,7 @@ public class FloatingPointCompressor {
   public static void compress(double[] input, OutputStream output) throws IOException {
     try(BufferedOutputStream out = new BufferedOutputStream(output)) {
       if(input.length % 3 != 0)
-        throw new RuntimeException("Dump doesn't have a multiple of 3 values");
+        throw new IllegalArgumentException("Dump doesn't have a multiple of 3 values");
       int pixels = input.length/3;
       int size = pixels-1;
       EncoderDecoder rEncoder = new EncoderDecoder();
@@ -158,10 +158,10 @@ public class FloatingPointCompressor {
     }
   }
 
-  public static void decompress(double[] output, InputStream input) throws IOException {
+  public static void decompress(InputStream input, double[] output) throws IOException {
     try(BufferedInputStream in = new BufferedInputStream(input)) {
       if(output.length % 3 != 0)
-        throw new RuntimeException("Dump doesn't have a multiple of 3 values");
+        throw new IllegalArgumentException("Dump doesn't have a multiple of 3 values");
       int pixels = output.length/3;
       int size = pixels-1;
       EncoderDecoder rDecoder = new EncoderDecoder();
