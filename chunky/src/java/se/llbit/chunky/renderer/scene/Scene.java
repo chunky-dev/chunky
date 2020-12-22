@@ -1066,6 +1066,10 @@ public class Scene implements JsonSerializable, Refreshable {
             int x = entityTag.get("x").intValue(0) - wx0; // Chunk-local coordinates.
             int z = entityTag.get("z").intValue(0) - wz0;
             int index = Chunk.chunkIndex(x, y, z);
+            if (index < 0 || index >= blocks.length) {
+              // Block entity is out of range (bad chunk data?), ignore it
+              continue;
+            }
             Block block = palette.get(blocks[index]);
             // Metadata is the old block data (to be replaced in future Minecraft versions?).
             Vector3 position = new Vector3(x + wx0, y, z + wz0);
