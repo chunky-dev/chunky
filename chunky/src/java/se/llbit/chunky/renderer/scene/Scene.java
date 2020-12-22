@@ -2051,7 +2051,7 @@ public class Scene implements JsonSerializable, Refreshable {
             spp = dataInput.readInt();
             renderTime = dataInput.readLong();
 
-            FloatingPointCompressor.decompress(samples, input);
+            FloatingPointCompressor.decompress(input, samples);
           }
         }
       } else {
