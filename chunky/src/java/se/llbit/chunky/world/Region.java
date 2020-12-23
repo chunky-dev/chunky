@@ -255,6 +255,11 @@ public class Region implements Iterable<Chunk> {
         return null;
       }
 
+      if (chunkSize <= 0) {
+        System.err.println("Error: invalid chunk size: " + chunkSize);
+        return null;
+      }
+
       byte[] buf = new byte[chunkSize - 1];
       file.read(buf);
       ByteArrayInputStream in = new ByteArrayInputStream(buf);
