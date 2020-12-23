@@ -504,6 +504,9 @@ public class Octree {
         }
       } else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Air.INSTANCE) {
         TexturedBlockModel.getIntersectionColor(ray);
+        if (currentBlock.opaque) {
+          ray.color.w = 1;
+        }
         return true;
       }
 
@@ -611,6 +614,9 @@ public class Octree {
           return true;
         } else if (currentBlock != Air.INSTANCE) {
           TexturedBlockModel.getIntersectionColor(ray);
+          if (currentBlock.opaque) {
+            ray.color.w = 1;
+          }
           return true;
         } else {
           return true;
