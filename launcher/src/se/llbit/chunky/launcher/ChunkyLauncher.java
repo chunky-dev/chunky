@@ -23,6 +23,8 @@ import se.llbit.chunky.launcher.ui.DebugConsole;
 import se.llbit.chunky.launcher.ui.FirstTimeSetupDialog;
 import se.llbit.chunky.resources.SettingsDirectory;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -73,8 +75,6 @@ public class ChunkyLauncher {
        * we strip that and start regularly, but without launcher. The --launcher
        * option overrides everything else and forces the launcher to appear.
        */
-
-      // TODO(llbit): the control flow for launching Chunky needs to be simplified.
 
       boolean forceLauncher = false;
       LaunchMode mode = LaunchMode.GUI;
@@ -224,11 +224,18 @@ public class ChunkyLauncher {
         // Javafx error
         if(retryIfMissingJavafx)
           JavaFxLocator.retryWithJavafx(args);
-        System.err.println("Error: Java cannot find javafx.");
-        System.err.println("If you are using a JVM for java 11 or later, " +
-                "javafx is no longer shipped alongside and must be installed separately");
-        System.err.println("If you already have javafx installed, you need to run chunky with the command:");
-        System.err.println("java --module-path <path/to/javafx/lib> --add-modules javafx.controls,javafx.fxml -jar <path/to/ChunkyLauncher.jar>");
+        String[] errorMessages = new String[]{
+          "Error: Java cannot find javafx.",
+          "If you are using a JVM for java 11 or later, " +
+                  "javafx is no longer shipped alongside and must be installed separately",
+          "If you already have javafx installed, you need to run chunky with the command:",
+          "java --module-path <path/to/javafx/lib> --add-modules javafx.controls,javafx.fxml -jar <path/to/ChunkyLauncher.jar>"
+        };
+        if(!GraphicsEnvironment.isHeadless())
+          JOptionPane.showMessageDialog(null, errorMessages, "Cannot find javafx", JOptionPane.ERROR_MESSAGE);
+        for(String message : errorMessages) {
+          System.err.println(message);
+        }
       }
       e.printStackTrace(System.err);
     }

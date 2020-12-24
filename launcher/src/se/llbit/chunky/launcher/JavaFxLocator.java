@@ -7,33 +7,31 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class JavaFxLocator {
 
 
-  private static final String[] javafxPathCandidates;
+  private static final List<String> javafxPathCandidates;
 
   static {
-    String[] javafxPathCandidates1;
+    javafxPathCandidates = new ArrayList<>();
+    javafxPathCandidates.add("C:/Program Files/openjfx/lib");
+    javafxPathCandidates.add("/usr/share/openjfx/lib");
+    javafxPathCandidates.add("/usr/lib/jvm/java-11-openjdk/lib");
+    javafxPathCandidates.add("/usr/lib/jvm/java-12-openjdk/lib");
+    javafxPathCandidates.add("/usr/lib/jvm/java-13-openjdk/lib");
+    javafxPathCandidates.add("/usr/lib/jvm/java-14-openjdk/lib");
+    javafxPathCandidates.add("/usr/lib/jvm/java-15-openjdk/lib");
+
+    javafxPathCandidates.add(System.getProperty("java.home", "") + File.separator + "lib"); // java home
+    javafxPathCandidates.add(System.getProperty("user.dir", "") + File.separator + "lib"); // working directory
     try {
-      javafxPathCandidates1 = new String[]{
-              "C:/Program Files/openjfx/lib",
-              System.getProperty("java.home", "") + File.separator + "lib", // java home
-              new File(ChunkyLauncher.class.getProtectionDomain().getCodeSource().getLocation().toURI())
-                      .toPath().getParent().toAbsolutePath().toString() + File.separator + "lib", // directory of the .jar
-              System.getProperty("user.dir", "") + File.separator + "lib", // working directory
-              "/usr/share/openjfx/lib",
-              "/usr/lib/jvm/java-11-openjdk/lib",
-              "/usr/lib/jvm/java-12-openjdk/lib",
-              "/usr/lib/jvm/java-13-openjdk/lib",
-              "/usr/lib/jvm/java-14-openjdk/lib",
-              "/usr/lib/jvm/java-15-openjdk/lib",
-      };
+      javafxPathCandidates.add(new File(ChunkyLauncher.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+              .toPath().getParent().toAbsolutePath().toString() + File.separator + "lib"); // directory of the .jar
     } catch(URISyntaxException e) {
       e.printStackTrace();
-      javafxPathCandidates1 = new String[0];
     }
-    javafxPathCandidates = javafxPathCandidates1;
   }
 
   private static boolean validJavafxDirectory(Path dir) {
@@ -47,7 +45,7 @@ public class JavaFxLocator {
   private static void runWithJavafx(Path javafxDir, String[] args) {
     // https://stackoverflow.com/questions/4159802/how-can-i-restart-a-java-application
     ArrayList<String> cmd = new ArrayList<>();
-    cmd.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
+    cmd.add(JreUtil.javaCommand(""));
     cmd.addAll(ManagementFactory.getRuntimeMXBean().getInputArguments());
     cmd.add("--module-path");
     cmd.add(javafxDir.toAbsolutePath().toString());
