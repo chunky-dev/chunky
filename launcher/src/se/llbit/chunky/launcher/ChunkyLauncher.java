@@ -89,7 +89,8 @@ public class ChunkyLauncher {
 
       if(args.length > 0) {
         mode = LaunchMode.HEADLESS;
-        for(String arg : args) {
+        for(int i = 0; i < args.length; i++) {
+          String arg = args[i];
           switch(arg) {
             case "--nolauncher":
               mode = LaunchMode.GUI;
@@ -148,9 +149,20 @@ public class ChunkyLauncher {
               return;
             case "--noRetryJavafx":
               retryIfMissingJavafx = false;
-              // if this is the only option, we want the launcher
-              if(args.length == 1)
+              // if this is the only option, with "--javaOptions" "<param>" we want the launcher
+              if(args.length == 3)
                 forceLauncher = true;
+              break;
+            case "--javaOptions":
+              if(i == args.length-1) {
+                System.err.println("--javaOptions must be followed by the options to can chunky with");
+                System.exit(1);
+              }
+              if(settings.javaOptions.isEmpty())
+                settings.javaOptions = args[i+1];
+              else if(!settings.javaOptions.contains(args[i+1]))
+                settings.javaOptions = args[i + 1] + " " + settings.javaOptions;
+              ++i;
               break;
             default:
               if(!headlessOptions.isEmpty()) {

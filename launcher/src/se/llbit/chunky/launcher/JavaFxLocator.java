@@ -56,7 +56,15 @@ public class JavaFxLocator {
     cmd.add(ManagementFactory.getRuntimeMXBean().getClassPath());
     cmd.add(ChunkyLauncher.class.getName());
     cmd.addAll(Arrays.asList(args));
-    cmd.add("--noRetryJavafx"); // Make sure this doesn't end up as a fork bomb
+    cmd.add("--noRetryJavafx"); // Make sure this doesn't end up as a fork bomb*
+    // add the options again so the launcher can use them for chunky
+    cmd.add("--javaOptions");
+    StringBuilder javaOptions = new StringBuilder();
+    javaOptions.append("--module-path ");
+    javaOptions.append(javafxDir.toAbsolutePath().toString());
+    javaOptions.append(" --add-modules ");
+    javaOptions.append("javafx.controls,javafx.fxml");
+    cmd.add(javaOptions.toString());
 
     ProcessBuilder builder = new ProcessBuilder(cmd);
     builder.inheritIO();
