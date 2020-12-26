@@ -16,6 +16,7 @@
  */
 package se.llbit.math;
 
+import java.util.Random;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.block.minecraft.Air;
 import se.llbit.chunky.block.minecraft.Lava;
@@ -23,8 +24,6 @@ import se.llbit.chunky.block.minecraft.Water;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.sky.Sun;
 import se.llbit.chunky.world.Material;
-
-import java.util.Random;
 
 /**
  * The ray representation used for ray tracing.
@@ -68,6 +67,16 @@ public class Ray {
    * Accumulated color value.
    */
   public Vector4 color = new Vector4();
+
+  /**
+   * Emittance of previously intersected surface.
+   */
+  public double emittanceValue = 0;
+
+  /**
+   * Emittance of previously intersected surface (used for emitter sampling).
+   */
+  public Vector3 emittance = new Vector3();
 
   /**
    * Previous material.
@@ -145,6 +154,8 @@ public class Ray {
     currentMaterial = Air.INSTANCE;
     depth = 0;
     color.set(0, 0, 0, 0);
+    emittance.set(0, 0, 0);
+    emittanceValue = 0;
     specular = true;
   }
 
@@ -161,6 +172,8 @@ public class Ray {
     n.set(other.n);
     geomN.set(other.geomN);
     color.set(0, 0, 0, 0);
+    emittance.set(0, 0, 0);
+    emittanceValue = 0;
     specular = other.specular;
   }
 

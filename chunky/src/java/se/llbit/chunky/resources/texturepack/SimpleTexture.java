@@ -23,6 +23,7 @@ import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -65,6 +66,40 @@ public class SimpleTexture extends TextureLoader {
   @Override
   public boolean load(LayeredResourcePacks texturePack) {
     return load(file, texturePack);
+  }
+
+  @Override
+  public boolean load(String file, Path texturePack) {
+    boolean loaded = super.load(file, texturePack);
+    if (loaded) {
+      try (InputStream in = Files.newInputStream(texturePack.resolve(file + "_s.png"))) {
+        // LabPBR uses the alpha channel for the emission map
+        // Some resource packs use the blue channel (Red=Smoothness, Green=Metalness, Blue=Emission)
+        // (In BSL, this option is called "Old PBR + Emissive")
+        BitmapImage specularMap = ImageLoader.read(in);
+        byte[] emissionMap = new byte[specularMap.width * specularMap.height];
+        boolean hasEmission = false;
+        for (int y = 0; y < specularMap.height; ++y) {
+          for (int x = 0; x < specularMap.width; ++x) {
+            // blue
+            if ((emissionMap[y * specularMap.width + x] = (byte) (
+              specularMap.data[y * specularMap.width + x] & 0xFF)) != (byte) 0x00) {
+              hasEmission = true;
+            }
+
+            // alpha
+            // emissionMap[y * specularMap.width + x] = (byte) (
+            //    specularMap.data[(y * specularMap.width + x) * 4] >>> 24);
+          }
+        }
+        if (hasEmission) {
+          texture.setEmissionMap(emissionMap);
+        }
+      } catch (IOException e) {
+        // Safe to ignore
+      }
+    }
+    return loaded;
   }
 
   @Override

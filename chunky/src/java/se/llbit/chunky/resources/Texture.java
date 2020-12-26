@@ -1527,6 +1527,7 @@ public class Texture {
   private float[] avgColorFlat;
 
   private Image fxImage = null;
+  private byte[] emissionMap;
 
   public Texture() {
     this(ImageLoader.missingImage);
@@ -1583,6 +1584,23 @@ public class Texture {
         FastMath.pow(avgColorLinear[2], 1 / Scene.DEFAULT_GAMMA), avgColorLinear[3]);
   }
 
+  public void setEmissionMap(byte[] emissionMap) {
+    this.emissionMap = emissionMap;
+  }
+
+  public double getEmittanceAt(double u, double v) {
+    if (this.emissionMap == null) {
+      return 0;
+    }
+    int x = (int) (u * width - Ray.EPSILON);
+    int y = (int) ((1 - v) * height - Ray.EPSILON);
+    int rawValue = emissionMap[y * width + x] & 0xFF;
+    if (rawValue == 255) {
+      return 0;
+    }
+    return rawValue / 254.0;
+  }
+
   /**
    * Get linear color values.
    */
@@ -1597,6 +1615,7 @@ public class Texture {
    */
   public void getColor(Ray ray) {
     getColor(ray.u, ray.v, ray.color);
+    ray.emittanceValue = getEmittanceAt(ray.u, ray.v);
   }
 
   /**

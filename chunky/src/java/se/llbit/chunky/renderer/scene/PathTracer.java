@@ -233,7 +233,7 @@ public class PathTracer implements RayTracer {
       // Quadratic emittance mapping, so a pixel that's 50% darker will emit only 25% as much light
       // This is arbitrary but gives pretty good results in most cases.
       emittance = new Vector3(ray.color.x * ray.color.x, ray.color.y * ray.color.y, ray.color.z * ray.color.z);
-      emittance.scale(currentMat.emittance * scene.emitterIntensity);
+      emittance.scale(currentMat.emittance * ray.emittanceValue * scene.emitterIntensity);
 
       hit = true;
     } else if (scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
@@ -512,6 +512,7 @@ public class PathTracer implements RayTracer {
         e /= Math.max(distance * distance, 1);
         e *= pos.block.surfaceArea(face);
         e *= emitterRay.getCurrentMaterial().emittance;
+        e *= emitterRay.emittanceValue;
         e *= scene.emitterIntensity;
         e *= scaler;
 
