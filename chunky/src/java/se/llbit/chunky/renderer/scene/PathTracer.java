@@ -233,11 +233,11 @@ public class PathTracer implements RayTracer {
 
       emittance = addEmitted;
       ray.emittance.x = ray.color.x * ray.color.x *
-        currentMat.emittance * scene.emitterIntensity;
+        currentMat.emittance * ray.emittanceValue * scene.emitterIntensity;
       ray.emittance.y = ray.color.y * ray.color.y *
-        currentMat.emittance * scene.emitterIntensity;
+        currentMat.emittance * ray.emittanceValue * scene.emitterIntensity;
       ray.emittance.z = ray.color.z * ray.color.z *
-        currentMat.emittance * scene.emitterIntensity;
+        currentMat.emittance * ray.emittanceValue * scene.emitterIntensity;
 
       hit = true;
     } else if (scene.emittersEnabled && scene.emitterSamplingStrategy != EmitterSamplingStrategy.NONE && scene.getEmitterGrid() != null) {
@@ -523,6 +523,7 @@ public class PathTracer implements RayTracer {
         e /= Math.max(distance * distance, 1);
         e *= pos.block.surfaceArea(face);
         e *= emitterRay.getCurrentMaterial().emittance;
+        e *= emitterRay.emittanceValue;
         e *= scene.emitterIntensity;
         e *= scaler;
 
