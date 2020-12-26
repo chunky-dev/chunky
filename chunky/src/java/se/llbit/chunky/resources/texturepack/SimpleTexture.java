@@ -19,6 +19,8 @@ package se.llbit.chunky.resources.texturepack;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.pbr.EmissionMap;
+import se.llbit.chunky.resources.pbr.OldPbrEmissionMap;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
@@ -43,6 +45,11 @@ public class SimpleTexture extends TextureLoader {
 
   @Override
   protected boolean load(InputStream imageStream) throws IOException {
+    texture.setTexture(getTextureOrFirstFrame(imageStream));
+    return true;
+  }
+
+  private static BitmapImage getTextureOrFirstFrame(InputStream imageStream) throws IOException {
     BitmapImage image = ImageLoader.read(imageStream);
 
     if (image.height > image.width) {
@@ -56,11 +63,10 @@ public class SimpleTexture extends TextureLoader {
           frame0.setPixel(x, y, image.getPixel(x, y));
         }
       }
-      texture.setTexture(frame0);
+      return frame0;
     } else {
-      texture.setTexture(image);
+      return image;
     }
-    return true;
   }
 
   @Override
@@ -76,23 +82,9 @@ public class SimpleTexture extends TextureLoader {
         // LabPBR uses the alpha channel for the emission map
         // Some resource packs use the blue channel (Red=Smoothness, Green=Metalness, Blue=Emission)
         // (In BSL, this option is called "Old PBR + Emissive")
-        BitmapImage specularMap = ImageLoader.read(in);
-        byte[] emissionMap = new byte[specularMap.width * specularMap.height];
-        boolean hasEmission = false;
-        for (int y = 0; y < specularMap.height; ++y) {
-          for (int x = 0; x < specularMap.width; ++x) {
-            // blue
-            if ((emissionMap[y * specularMap.width + x] = (byte) (
-              specularMap.data[y * specularMap.width + x] & 0xFF)) != (byte) 0x00) {
-              hasEmission = true;
-            }
-
-            // alpha
-            // emissionMap[y * specularMap.width + x] = (byte) (
-            //    specularMap.data[(y * specularMap.width + x) * 4] >>> 24);
-          }
-        }
-        if (hasEmission) {
+        BitmapImage specularMap = getTextureOrFirstFrame(in);
+        EmissionMap emissionMap = new OldPbrEmissionMap();
+        if (emissionMap.load(specularMap)) {
           texture.setEmissionMap(emissionMap);
         }
       } catch (IOException e) {

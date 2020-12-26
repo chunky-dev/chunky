@@ -20,6 +20,7 @@ import javafx.scene.image.Image;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.resources.pbr.EmissionMap;
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.TexturePath;
 import se.llbit.fxutil.FxImageUtil;
@@ -1527,7 +1528,7 @@ public class Texture {
   private float[] avgColorFlat;
 
   private Image fxImage = null;
-  private byte[] emissionMap;
+  private EmissionMap emissionMap = EmissionMap.EMPTY;
 
   public Texture() {
     this(ImageLoader.missingImage);
@@ -1584,21 +1585,12 @@ public class Texture {
         FastMath.pow(avgColorLinear[2], 1 / Scene.DEFAULT_GAMMA), avgColorLinear[3]);
   }
 
-  public void setEmissionMap(byte[] emissionMap) {
+  public void setEmissionMap(EmissionMap emissionMap) {
     this.emissionMap = emissionMap;
   }
 
   public double getEmittanceAt(double u, double v) {
-    if (this.emissionMap == null) {
-      return 0;
-    }
-    int x = (int) (u * width - Ray.EPSILON);
-    int y = (int) ((1 - v) * height - Ray.EPSILON);
-    int rawValue = emissionMap[y * width + x] & 0xFF;
-    if (rawValue == 255) {
-      return 0;
-    }
-    return rawValue / 254.0;
+    return emissionMap.getEmittanceAt(u, v);
   }
 
   /**
