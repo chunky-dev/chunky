@@ -138,6 +138,13 @@ public class RenderContext {
   }
 
   /**
+   * @return The samples per pixel per pass
+   */
+  public int sppPerPass() {
+    return config.sppPerPass;
+  }
+
+  /**
    * @param fileName the filename with the extension
    * @param timestamp the last file modification timestamp to compare against
    * @return {@code true} if the file has not changed since timestamp

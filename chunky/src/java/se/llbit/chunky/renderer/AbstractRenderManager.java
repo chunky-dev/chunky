@@ -42,6 +42,7 @@ public abstract class AbstractRenderManager extends Thread {
 
     this.numThreads = context.numRenderThreads();
     this.tileWidth = context.tileWidth();
+    this.sppPerPass = context.sppPerPass();
     previewRayTracer = context.getChunky().getPreviewRayTracerFactory().newRayTracer();
     rayTracer = context.getChunky().getRayTracerFactory().newRayTracer();
     workerFactory = context.workerFactory;
@@ -56,6 +57,11 @@ public abstract class AbstractRenderManager extends Thread {
    * Tile width
    */
   protected final int tileWidth;
+
+  /**
+   * Samples per pixel per pass
+   */
+  protected final int sppPerPass;
 
   /**
    * CPU load percentage.

@@ -221,7 +221,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
       canvas.repaint();
 
       synchronized (bufferedScene) {
-        bufferedScene.spp += RenderConstants.SPP_PER_PASS;
+        bufferedScene.spp += sppPerPass;
         int currentSpp = bufferedScene.spp;
         frameCompletionListener.accept(bufferedScene, currentSpp);
         updateRenderProgress();
@@ -347,7 +347,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    * Adds new jobs to the job queue and releases the workers.
    */
   private void startNextFrame() {
-    int nextSpp = bufferedScene.spp + RenderConstants.SPP_PER_PASS;
+    int nextSpp = bufferedScene.spp + sppPerPass;
     bufferedScene.setBufferFinalization(finalizeAllFrames
         || snapshotControl.saveSnapshot(bufferedScene, nextSpp));
     frameFinished = new CountDownLatch(numJobs);
