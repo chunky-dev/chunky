@@ -100,13 +100,6 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
     this.headless = headless;
     bufferedScene = context.getChunky().getSceneFactory().newScene();
-
-    long seed = System.currentTimeMillis();
-    workers = new Thread[numThreads];
-    for (int i = 0; i < numThreads; ++i) {
-      workers[i] = workerFactory.buildWorker(this, i, seed + i);
-      workers[i].start();
-    }
   }
 
   @Override public synchronized void addRenderListener(RenderStatusListener listener) {
@@ -123,6 +116,13 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
   @Override public void run() {
     try {
+      long seed = System.currentTimeMillis();
+      workers = new Thread[numThreads];
+      for (int i = 0; i < numThreads; ++i) {
+        workers[i] = workerFactory.buildWorker(this, i, seed + i);
+        workers[i].start();
+      }
+
       while (!isInterrupted()) {
         ResetReason reason = sceneProvider.awaitSceneStateChange();
 
@@ -413,9 +413,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    * Stop render workers.
    */
   private synchronized void stopWorkers() {
-    // Halt all worker threads.
-    for (int i = 0; i < numThreads; ++i) {
-      workers[i].interrupt();
+    for (Thread worker : workers) {
+      worker.interrupt();
     }
   }
 
