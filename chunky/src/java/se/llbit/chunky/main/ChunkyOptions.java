@@ -40,6 +40,7 @@ public class ChunkyOptions {
   public int target = -1;
 
   public int tileWidth = RenderConstants.TILE_WIDTH_DEFAULT;
+  public int sppPerPass = RenderConstants.SPP_PER_PASS_DEFAULT;
 
   /** Ignore scene loading errors when starting a headless render. */
   public boolean force = false;

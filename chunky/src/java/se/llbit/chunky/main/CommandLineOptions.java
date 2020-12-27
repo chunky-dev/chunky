@@ -68,7 +68,8 @@ public class CommandLineOptions {
           "  -snapshot <SCENE> [PNG] create a snapshot of the specified scene",
           "  -scene-dir <DIR>       use the directory DIR for loading/saving scenes",
           "  -threads <NUM>         use the specified number of threads for rendering",
-          "  -tile-width <NUM>      use the specified job tile width",
+          "  -tile-width <NUM>      use the specified tile width for rendering",
+          "  -spp-per-pass <NUM>    use the specified samples per pixel per pass for rendering",
           "  -target <NUM>          override target SPP to be NUM in headless mode",
           "  -set <NAME> <VALUE>    set a global configuration option and exit",
           "  -set <NAME> <VALUE> <SCENE>",
@@ -210,6 +211,9 @@ public class CommandLineOptions {
 
     registerOption("-tile-width", new Range(1),
         arguments -> options.tileWidth = Math.max(1, Integer.parseInt(arguments.get(0))));
+
+    registerOption("-spp-per-pass", new Range(1),
+        arguments -> options.sppPerPass = Math.max(1, Integer.parseInt(arguments.get(0))));
 
     registerOption("-version", new Range(0), arguments -> {
       mode = Mode.NOTHING;
