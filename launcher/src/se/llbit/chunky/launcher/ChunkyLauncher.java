@@ -58,7 +58,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ChunkyLauncher {
 
-  public static final String LAUNCHER_VERSION = "v1.11.4";
+  public static final String LAUNCHER_VERSION = "v1.12.0";
 
   /**
    * Print a launch error message to the console.
@@ -367,14 +367,14 @@ public class ChunkyLauncher {
 
   private static void showJavafxError() {
     String[] errorMessages = new String[]{
-            "Error: Java cannot find javaFX.",
-            "If you are using a JVM for java 11 or later, " +
-                    "javaFX is no longer shipped alongside and must be installed separately",
-            "If you already have javaFX installed, you need to run chunky with the command:",
-            "java --module-path <path/to/javaFX/lib> --add-modules javafx.controls,javafx.fxml -jar <path/to/ChunkyLauncher.jar>"
+            "Error: Java cannot find JavaFX.",
+            "If you are using a JVM for Java 11 or later, " +
+                    "JavaFX is no longer shipped alongside and must be installed separately.",
+            "If you already have JavaFX installed, you need to run Chunky with the command:",
+            "java --module-path <path/to/JavaFX/lib> --add-modules javafx.controls,javafx.fxml -jar <path/to/ChunkyLauncher.jar>"
     };
     String faqLink = "https://chunky.lemaik.de/java11";
-    String faqMessage = "Check out this page for more information on how to use chunky with javaFX";
+    String faqMessage = "Check out this page for more information on how to use Chunky with JavaFX";
     if(!GraphicsEnvironment.isHeadless()) {
       JTextField faqLabel;
       if(Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
@@ -416,7 +416,7 @@ public class ChunkyLauncher {
               }).toArray(),
               faqLabel
       };
-      JOptionPane.showMessageDialog(null, dialogContent, "Cannot find javaFX", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(null, dialogContent, "Cannot find JavaFX", JOptionPane.ERROR_MESSAGE);
     }
     for(String message : errorMessages) {
       System.err.println(message);
