@@ -23,15 +23,24 @@ import se.llbit.chunky.launcher.ui.DebugConsole;
 import se.llbit.chunky.launcher.ui.FirstTimeSetupDialog;
 import se.llbit.chunky.resources.SettingsDirectory;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.font.TextAttribute;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -61,150 +70,182 @@ public class ChunkyLauncher {
   }
 
   public static void main(String[] args) throws FileNotFoundException {
-    final LauncherSettings settings = new LauncherSettings();
-    settings.load();
+    boolean retryIfMissingJavafx = true;
 
-		/*
-		 * If there are command line arguments then we assume that Chunky should run
-     * in headless mode, unless the --nolauncher command is present in which case
-		 * we strip that and start regularly, but without launcher. The --launcher
-		 * option overrides everything else and forces the launcher to appear.
-		 */
+    try {
+      final LauncherSettings settings = new LauncherSettings();
+      settings.load();
 
-    // TODO(llbit): the control flow for launching Chunky needs to be simplified.
+      /*
+       * If there are command line arguments then we assume that Chunky should run
+       * in headless mode, unless the --nolauncher command is present in which case
+       * we strip that and start regularly, but without launcher. The --launcher
+       * option overrides everything else and forces the launcher to appear.
+       */
 
-    boolean forceLauncher = false;
-    LaunchMode mode = LaunchMode.GUI;
-    String headlessOptions = "";
+      boolean forceLauncher = false;
+      LaunchMode mode = LaunchMode.GUI;
+      String headlessOptions = "";
 
-    if (args.length > 0) {
-      mode = LaunchMode.HEADLESS;
-      for (String arg : args) {
-        switch (arg) {
-          case "--nolauncher":
-            mode = LaunchMode.GUI;
-            break;
-          case "--launcher":
-            forceLauncher = true;
-            break;
-          case "--version":
-            System.out.println("Chunky Launcher " + LAUNCHER_VERSION);
-            return;
-          case "--verbose":
-            settings.verboseLauncher = true;
-            break;
-          case "--console":
-            settings.forceGuiConsole = true;
-            break;
-          case "--update":
-          case "--updateAlpha":
-            if (arg.equals("--updateAlpha")) {
-              System.out.println("Checking for Chunky alpha/snapshot updates..");
-              settings.downloadSnapshots = true;
-            } else {
-              System.out.println("Checking for updates..");
-            }
-            UpdateChecker updateThread = new UpdateChecker(settings, new UpdateListener() {
-              @Override public void updateError(String message) {
+      if(args.length > 0) {
+        mode = LaunchMode.HEADLESS;
+        for(int i = 0; i < args.length; i++) {
+          String arg = args[i];
+          switch(arg) {
+            case "--nolauncher":
+              mode = LaunchMode.GUI;
+              break;
+            case "--launcher":
+              forceLauncher = true;
+              break;
+            case "--version":
+              System.out.println("Chunky Launcher " + LAUNCHER_VERSION);
+              return;
+            case "--verbose":
+              settings.verboseLauncher = true;
+              break;
+            case "--console":
+              settings.forceGuiConsole = true;
+              break;
+            case "--update":
+            case "--updateAlpha":
+              if(arg.equals("--updateAlpha")) {
+                System.out.println("Checking for Chunky alpha/snapshot updates..");
+                settings.downloadSnapshots = true;
+              } else {
+                System.out.println("Checking for updates..");
               }
-
-              @Override public void updateAvailable(VersionInfo latest) {
-                try {
-                  headlessCreateSettingsDirectory();
-                } catch (FileNotFoundException e) {
-                  throw new Error(e);
+              UpdateChecker updateThread = new UpdateChecker(settings, new UpdateListener() {
+                @Override
+                public void updateError(String message) {
                 }
-                System.out.println("Downloading Chunky " + latest + ":");
-                ConsoleUpdater.update(latest, settings);
-              }
 
-              @Override public void noUpdateAvailable() {
-                System.out.println("No updates found.");
-                if (!settings.downloadSnapshots) {
-                  System.out
-                      .println("Alpha/snapshot updates are disabled, enable with --updateAlpha");
+                @Override
+                public void updateAvailable(VersionInfo latest) {
+                  try {
+                    headlessCreateSettingsDirectory();
+                  } catch(FileNotFoundException e) {
+                    throw new Error(e);
+                  }
+                  System.out.println("Downloading Chunky " + latest + ":");
+                  ConsoleUpdater.update(latest, settings);
                 }
+
+                @Override
+                public void noUpdateAvailable() {
+                  System.out.println("No updates found.");
+                  if(!settings.downloadSnapshots) {
+                    System.out
+                            .println("Alpha/snapshot updates are disabled, enable with --updateAlpha");
+                  }
+                }
+              });
+              updateThread.start();
+              return;
+            case "--setup":
+              // Configure launcher settings.
+              doSetup(settings);
+              settings.save();
+              return;
+            case "--noRetryJavafx":
+              retryIfMissingJavafx = false;
+              // if this is the only option, with "--javaOptions" "<param>" we want the launcher
+              if(args.length == 3)
+                forceLauncher = true;
+              break;
+            case "--javaOptions":
+              if(i == args.length-1) {
+                System.err.println("--javaOptions must be followed by the options to can chunky with");
+                System.exit(1);
               }
-            });
-            updateThread.start();
-            return;
-          case "--setup":
-            // Configure launcher settings.
-            doSetup(settings);
-            settings.save();
-            return;
-          default:
-            if (!headlessOptions.isEmpty()) {
-              headlessOptions += " ";
-            }
-            headlessOptions += arg;
-            break;
-        }
-      }
-      if (forceLauncher) {
-        mode = LaunchMode.GUI;
-      }
-    }
-
-    ChunkyDeployer.LoggerBuilder loggerBuilder = () -> {
-      if (settings.forceGuiConsole || (!settings.headless && settings.debugConsole)) {
-        AtomicReference<DebugConsole> console = new AtomicReference<>(null);
-        CountDownLatch latch = new CountDownLatch(1);
-        ChunkyLauncherFx.withLauncher(settings, stage -> {
-          DebugConsole debugConsole = new DebugConsole(settings.closeConsoleOnExit);
-          debugConsole.show();
-          console.set(debugConsole);
-          latch.countDown();
-        });
-        try {
-          latch.await();
-        } catch (InterruptedException ignored) {
-          // Ignored.
-        }
-        return console.get();
-      } else {
-        return new ConsoleLogger();
-      }
-    };
-
-    if (mode == LaunchMode.HEADLESS) {
-      // Chunky is being run from the console, i.e. headless mode.
-      headlessCreateSettingsDirectory();
-      settings.debugConsole = true;
-      settings.headless = true;
-      settings.chunkyOptions = headlessOptions;
-      ChunkyDeployer.deploy(settings); // Install the embedded version.
-      VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
-      if (ChunkyDeployer.canLaunch(version, null, false)) {
-        int exitCode = ChunkyDeployer.launchChunky(settings, version, LaunchMode.HEADLESS,
-            ChunkyLauncher::launchFailure, loggerBuilder);
-        if (exitCode != 0) {
-          System.exit(exitCode);
-        }
-      } else {
-        System.err.println("Could not launch selected Chunky version. Try updating with --update");
-        System.exit(1);
-      }
-    } else {
-      final boolean finalForceLauncher = forceLauncher;
-      // A callback is used to decide if the launcher should be displayed after
-      // the first time setup dialog has been shown (if needed).
-      firstTimeSetup(settings, () -> {
-        ChunkyDeployer.deploy(settings); // Install the embedded version.
-
-        if (!finalForceLauncher && !settings.showLauncher) {
-          // Skip the launcher only if we can launch this version.
-          VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
-          if (ChunkyDeployer.canLaunch(version, null, false)) {
-            if (ChunkyDeployer.launchChunky(settings, version, LaunchMode.GUI,
-                ChunkyLauncher::launchFailure,
-                loggerBuilder) == 0) {
-              return false;
-            }
+              if(settings.javaOptions.isEmpty())
+                settings.javaOptions = args[i+1];
+              else if(!settings.javaOptions.contains(args[i+1]))
+                settings.javaOptions = args[i + 1] + " " + settings.javaOptions;
+              ++i;
+              break;
+            default:
+              if(!headlessOptions.isEmpty()) {
+                headlessOptions += " ";
+              }
+              headlessOptions += arg;
+              break;
           }
         }
-        return true;
-      });
+        if(forceLauncher) {
+          mode = LaunchMode.GUI;
+        }
+      }
+
+      ChunkyDeployer.LoggerBuilder loggerBuilder = () -> {
+        if(settings.forceGuiConsole || (!settings.headless && settings.debugConsole)) {
+          AtomicReference<DebugConsole> console = new AtomicReference<>(null);
+          CountDownLatch latch = new CountDownLatch(1);
+          ChunkyLauncherFx.withLauncher(settings, stage -> {
+            DebugConsole debugConsole = new DebugConsole(settings.closeConsoleOnExit);
+            debugConsole.show();
+            console.set(debugConsole);
+            latch.countDown();
+          });
+          try {
+            latch.await();
+          } catch(InterruptedException ignored) {
+            // Ignored.
+          }
+          return console.get();
+        } else {
+          return new ConsoleLogger();
+        }
+      };
+
+      if(mode == LaunchMode.HEADLESS) {
+        // Chunky is being run from the console, i.e. headless mode.
+        headlessCreateSettingsDirectory();
+        settings.debugConsole = true;
+        settings.headless = true;
+        settings.chunkyOptions = headlessOptions;
+        ChunkyDeployer.deploy(settings); // Install the embedded version.
+        VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
+        if(ChunkyDeployer.canLaunch(version, null, false)) {
+          int exitCode = ChunkyDeployer.launchChunky(settings, version, LaunchMode.HEADLESS,
+                  ChunkyLauncher::launchFailure, loggerBuilder);
+          if(exitCode != 0) {
+            System.exit(exitCode);
+          }
+        } else {
+          System.err.println("Could not launch selected Chunky version. Try updating with --update");
+          System.exit(1);
+        }
+      } else {
+        final boolean finalForceLauncher = forceLauncher;
+        // A callback is used to decide if the launcher should be displayed after
+        // the first time setup dialog has been shown (if needed).
+        firstTimeSetup(settings, () -> {
+          ChunkyDeployer.deploy(settings); // Install the embedded version.
+
+          if(!finalForceLauncher && !settings.showLauncher) {
+            // Skip the launcher only if we can launch this version.
+            VersionInfo version = ChunkyDeployer.resolveVersion(settings.version);
+            if(ChunkyDeployer.canLaunch(version, null, false)) {
+              if(ChunkyDeployer.launchChunky(settings, version, LaunchMode.GUI,
+                      ChunkyLauncher::launchFailure,
+                      loggerBuilder) == 0) {
+                return false;
+              }
+            }
+          }
+          return true;
+        });
+      }
+    } catch(NoClassDefFoundError e) {
+      String cause = e.getMessage();
+      if(cause.contains("javafx")) {
+        // Javafx error
+        if(retryIfMissingJavafx)
+          JavaFxLocator.retryWithJavafx(args);
+        showJavafxError();
+      }
+      e.printStackTrace(System.err);
     }
   }
 
@@ -322,5 +363,64 @@ public class ChunkyLauncher {
     } else {
       return String.format("%.1f %s", fSize, unit);
     }
+  }
+
+  private static void showJavafxError() {
+    String[] errorMessages = new String[]{
+            "Error: Java cannot find javaFX.",
+            "If you are using a JVM for java 11 or later, " +
+                    "javaFX is no longer shipped alongside and must be installed separately",
+            "If you already have javaFX installed, you need to run chunky with the command:",
+            "java --module-path <path/to/javaFX/lib> --add-modules javafx.controls,javafx.fxml -jar <path/to/ChunkyLauncher.jar>"
+    };
+    String faqLink = "https://chunky.lemaik.de/java11";
+    String faqMessage = "Check out this page for more information on how to use chunky with javaFX";
+    if(!GraphicsEnvironment.isHeadless()) {
+      JTextField faqLabel;
+      if(Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+        faqLabel = new JTextField(faqMessage);
+        Font font = faqLabel.getFont();
+        Map attributes = font.getAttributes();
+        attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+        faqLabel.setFont(font.deriveFont(attributes));
+        faqLabel.setForeground(Color.BLUE.darker());
+        faqLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        faqLabel.setEditable(false);
+        faqLabel.setBackground(null);
+        faqLabel.setBorder(null);
+        faqLabel.addMouseListener(new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            try {
+              Desktop.getDesktop().browse(new URI(faqLink));
+            } catch(IOException | URISyntaxException ioException) {
+              ioException.printStackTrace();
+            }
+          }
+        });
+      } else {
+        faqLabel = new JTextField(String.format("%s: %s", faqMessage, faqLink));
+        faqLabel.setEditable(false);
+        faqLabel.setBackground(null);
+        faqLabel.setBorder(null);
+        faqLabel.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
+      }
+      Object[] dialogContent = {
+              Arrays.stream(errorMessages).map(msg -> {
+                JTextField field = new JTextField(msg);
+                field.setEditable(false);
+                field.setBackground(null);
+                field.setBorder(null);
+                field.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
+                return field;
+              }).toArray(),
+              faqLabel
+      };
+      JOptionPane.showMessageDialog(null, dialogContent, "Cannot find javaFX", JOptionPane.ERROR_MESSAGE);
+    }
+    for(String message : errorMessages) {
+      System.err.println(message);
+    }
+    System.err.printf("%s: %s\n", faqMessage, faqLink);
   }
 }
