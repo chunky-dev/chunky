@@ -89,7 +89,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     horizonOffset.onValueChange(value -> scene.sky().setHorizonOffset(value));
 
     cloudSize.setName("Cloud size");
-    cloudSize.setRange(0.1, 128);
+    cloudSize.setRange(0, 128);
     cloudSize.clampMin();
     cloudSize.makeLogarithmic();
     cloudSize.onValueChange(value -> scene.sky().setCloudSize(value));
@@ -102,7 +102,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     cloudZ.onValueChange(value -> scene.sky().setCloudZOffset(value));
 
     fogDensity.setTooltip("Fog thickness. Set to 0 to disable volumetric fog effect.");
-    fogDensity.setRange(0, 1, 0.001);
+    fogDensity.setRange(0, 1);
     fogDensity.makeLogarithmic();
     fogDensity.clampMin();
     fogDensity.onValueChange(value -> scene.setFogDensity(value));
