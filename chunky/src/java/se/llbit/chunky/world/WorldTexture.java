@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class WorldTexture {
 
-  private final Map<ChunkPosition, ChunkTexture> map = new HashMap<>();
+  private final Map<Long, ChunkTexture> map = new HashMap<>();
 
   /**
    * Timestamp of last serialization.
@@ -42,7 +42,7 @@ public class WorldTexture {
    * @param frgb RGB color components
    */
   public void set(int x, int z, float[] frgb) {
-    ChunkPosition cp = ChunkPosition.get(x >> 4, z >> 4);
+    long cp = ((long) x >> 4) << 32 | ((z >> 4) & 0xffffffffL);
     ChunkTexture ct = map.get(cp);
     if (ct == null) {
       ct = new ChunkTexture();
@@ -55,7 +55,7 @@ public class WorldTexture {
    * @return True if this texture contains a RGB color components at (x, z)
    */
   public boolean contains(int x, int z) {
-    ChunkPosition cp = ChunkPosition.get(x >> 4, z >> 4);
+    long cp = ((long) x >> 4) << 32 | ((z >> 4) & 0xffffffffL);
     return map.containsKey(cp);
   }
 
@@ -63,7 +63,7 @@ public class WorldTexture {
    * @return RGB color components at (x, z)
    */
   public float[] get(int x, int z) {
-    ChunkPosition cp = ChunkPosition.get(x >> 4, z >> 4);
+    long cp = ((long) x >> 4) << 32 | ((z >> 4) & 0xffffffffL);
     ChunkTexture ct = map.get(cp);
     if (ct == null) {
       ct = new ChunkTexture();
@@ -79,11 +79,11 @@ public class WorldTexture {
    */
   public void store(DataOutputStream out) throws IOException {
     out.writeInt(map.size());
-    for (Map.Entry<ChunkPosition, ChunkTexture> entry : map.entrySet()) {
-      ChunkPosition pos = entry.getKey();
+    for (Map.Entry<Long, ChunkTexture> entry : map.entrySet()) {
+      long pos = entry.getKey();
       ChunkTexture texture = entry.getValue();
-      out.writeInt(pos.x);
-      out.writeInt(pos.z);
+      out.writeInt((int) (pos >> 32));
+      out.writeInt((int) pos);
       texture.store(out);
     }
   }
@@ -101,7 +101,7 @@ public class WorldTexture {
       int x = in.readInt();
       int z = in.readInt();
       ChunkTexture tile = ChunkTexture.load(in);
-      texture.map.put(ChunkPosition.get(x, z), tile);
+      texture.map.put(((long) x) << 32 | (z & 0xffffffffL), tile);
     }
     return texture;
   }
