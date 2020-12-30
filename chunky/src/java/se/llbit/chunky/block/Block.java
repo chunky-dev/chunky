@@ -14,7 +14,9 @@ import se.llbit.nbt.CompoundTag;
 public abstract class Block extends Material {
 
   /**
-   * Set to true if there is a local intersection model for this block.
+   * Set to true if there is a local intersection model for this block. If this is set to
+   * <code>false</code> (default), this block is assumed to be an opaque cube block and {@link
+   * #intersect(Ray, Scene)} will never be called.
    */
   public boolean localIntersect = false;
 
