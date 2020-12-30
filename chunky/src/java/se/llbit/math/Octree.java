@@ -320,7 +320,7 @@ public class Octree {
   /**
    * @return The voxel type at the given coordinates
    */
-  public synchronized Node get(int x, int y, int z) {
+  public Node get(int x, int y, int z) {
     return implementation.get(x, y, z);
   }
 
