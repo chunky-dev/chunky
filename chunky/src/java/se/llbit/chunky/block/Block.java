@@ -14,16 +14,14 @@ import se.llbit.nbt.CompoundTag;
 public abstract class Block extends Material {
 
   /**
-   * Set to true if there is a local intersection model
-   * for this block.
+   * Set to true if there is a local intersection model for this block.
    */
   public boolean localIntersect = false;
 
   /**
-   * Invisible blocks are not rendered as regular voxels
-   * (they are not added to the voxel octree).
-   * This is used for blocks that are rendered as entities,
-   * and blocks that are not implemented yet.
+   * Invisible blocks are not rendered as regular voxels (they are not added to the voxel octree).
+   * This is used for blocks that are rendered as entities, and blocks that are not implemented
+   * yet.
    */
   public boolean invisible = false;
 
@@ -31,6 +29,15 @@ public abstract class Block extends Material {
     super(name, texture);
   }
 
+  /**
+   * Intersect the given ray in the given scene with this block and update the Ray's color, distance
+   * and origin accordingly. Note that the alpha component of the ray color must be positive if and
+   * only if it hits (i.e. this method returns true) and zero otherwise.
+   *
+   * @param ray   Ray
+   * @param scene Scene
+   * @return True if the ray hit this block, false if not
+   */
   public boolean intersect(Ray ray, Scene scene) {
     return TexturedBlockModel.intersect(ray, texture);
   }

@@ -110,6 +110,7 @@ public class HopperModel {
       } else {
         Texture.hopperOutside.getColor(ray);
       }
+      ray.color.w = 1;
       ray.t = ray.tNext;
       hit = true;
     }
