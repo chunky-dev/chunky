@@ -79,7 +79,7 @@ public class Head extends MinecraftBlockTranslucent {
         if (matcher.find()) {
           return matcher.group(1);
         } else {
-          Log.warn("Could not get skull texture");
+          Log.warn("Could not get skull texture from json: " + decoded);
         }
       } catch (IllegalArgumentException e) {
         // base64 decoding error
