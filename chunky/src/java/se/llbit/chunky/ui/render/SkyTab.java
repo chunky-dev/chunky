@@ -89,7 +89,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     horizonOffset.onValueChange(value -> scene.sky().setHorizonOffset(value));
 
     cloudSize.setName("Cloud size");
-    cloudSize.setRange(0, 128);
+    cloudSize.setRange(0.1, 128);
     cloudSize.clampMin();
     cloudSize.makeLogarithmic();
     cloudSize.onValueChange(value -> scene.sky().setCloudSize(value));
