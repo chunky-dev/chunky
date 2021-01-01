@@ -23,8 +23,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
 
-//import se.llbit.chunky.launcher.ConsoleLogger;
-
 /**
  * A control for editing numeric values with a slider and text field.
  */
