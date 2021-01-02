@@ -40,10 +40,7 @@ public class FloatingPointCompressor {
       return Long.numberOfLeadingZeros(value) / 8;
     }
 
-    private static final double LN_2 = Math.log(2);
-
     private byte encodeSingle(double d) {
-      //double storedValue = Math.log(d) / LN_2;
       long bits = Double.doubleToRawLongBits(d);
 
       long xoredValue = predictFcm() ^ bits;
@@ -110,7 +107,7 @@ public class FloatingPointCompressor {
       long dfcmPrediction = predictDfcm();
 
       byte choiceBit = (byte) (header & 1);
-      byte encodedZeroBytes = (byte) (header >>> 1);
+      byte encodedZeroBytes = (byte) ((header >>> 1) & 0x07);
 
       if(choiceBit == 1)
         prediction = dfcmPrediction;
@@ -171,19 +168,19 @@ public class FloatingPointCompressor {
         int idx = 3*i;
 
         byte rGroupedHeader = (byte) in.read();
-        byte rFirstHeader = (byte) (rGroupedHeader >>> 4);
+        byte rFirstHeader = (byte) ((rGroupedHeader >>> 4) & 0x0F);
         byte rSecondHeader = (byte) (rGroupedHeader & 0x0F);
         output[idx] = rDecoder.decodeSingle(rFirstHeader, in);
         output[idx+3] = rDecoder.decodeSingle(rSecondHeader, in);
 
         byte gGroupedHeader = (byte) in.read();
-        byte gFirstHeader = (byte) (gGroupedHeader >>> 4);
+        byte gFirstHeader = (byte) ((gGroupedHeader >>> 4) & 0x0F);
         byte gSecondHeader = (byte) (gGroupedHeader & 0x0F);
         output[idx+1] = gDecoder.decodeSingle(gFirstHeader, in);
         output[idx+4] = gDecoder.decodeSingle(gSecondHeader, in);
 
         byte bGroupedHeader = (byte) in.read();
-        byte bFirstHeader = (byte) (bGroupedHeader >>> 4);
+        byte bFirstHeader = (byte) ((bGroupedHeader >>> 4) & 0x0F);
         byte bSecondHeader = (byte) (bGroupedHeader & 0x0F);
         output[idx+2] = bDecoder.decodeSingle(bFirstHeader, in);
         output[idx+5] = bDecoder.decodeSingle(bSecondHeader, in);
@@ -193,19 +190,19 @@ public class FloatingPointCompressor {
       if(pixels % 2 == 1) {
         int idx = 3*size;
         byte rGroupedHeader = (byte) in.read();
-        byte rFirstHeader = (byte) (rGroupedHeader >>> 4);
+        byte rFirstHeader = (byte) ((rGroupedHeader >>> 4) & 0x0F);
         byte rSecondHeader = (byte) (rGroupedHeader & 0x0F);
         output[idx] = rDecoder.decodeSingle(rFirstHeader, in);
         rDecoder.decodeSingle(rSecondHeader, in); // discard
 
         byte gGroupedHeader = (byte) in.read();
-        byte gFirstHeader = (byte) (gGroupedHeader >>> 4);
+        byte gFirstHeader = (byte) ((gGroupedHeader >>> 4) & 0x0F);
         byte gSecondHeader = (byte) (gGroupedHeader & 0x0F);
         output[idx+1] = gDecoder.decodeSingle(gFirstHeader, in);
         gDecoder.decodeSingle(gSecondHeader, in); // discard
 
         byte bGroupedHeader = (byte) in.read();
-        byte bFirstHeader = (byte) (bGroupedHeader >>> 4);
+        byte bFirstHeader = (byte) ((bGroupedHeader >>> 4) & 0x0F);
         byte bSecondHeader = (byte) (bGroupedHeader & 0x0F);
         output[idx+2] = bDecoder.decodeSingle(bFirstHeader, in);
         bDecoder.decodeSingle(bSecondHeader, in); // discard
