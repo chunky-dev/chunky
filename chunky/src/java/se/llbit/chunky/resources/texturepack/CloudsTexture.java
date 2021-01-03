@@ -54,5 +54,10 @@ public class CloudsTexture extends TextureLoader {
   public boolean load(LayeredResourcePacks texturePack) {
     return super.load(file, texturePack);
   }
+
+  @Override
+  public void reset() {
+    Clouds.clear();
+  }
 }
 

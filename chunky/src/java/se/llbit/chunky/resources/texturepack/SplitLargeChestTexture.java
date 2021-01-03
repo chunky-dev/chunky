@@ -123,4 +123,18 @@ public class SplitLargeChestTexture extends TextureLoader {
 
     return img;
   }
+
+  @Override
+  public void reset() {
+    if(left!=null) {
+      left.reset();
+    }
+    if (right != null) {
+      right.reset();
+    }
+    top.reset();
+    bottom.reset();
+    front.reset();
+    back.reset();
+  }
 }

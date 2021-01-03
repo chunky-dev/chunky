@@ -22,15 +22,11 @@ package se.llbit.chunky.world;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class Clouds {
+
   private static long[][] clouds = new long[32][32];
 
   static {
-    // zero the cloud data
-    for (int i = 0; i < 32; ++i) {
-      for (int j = 0; j < 32; ++j) {
-        clouds[i][j] = 0L;
-      }
-    }
+    clear();
   }
 
   /**
@@ -61,5 +57,14 @@ public class Clouds {
     int subx = x & 7;
     int suby = y & 7;
     clouds[tilex][tiley] |= ((long) (v & 1)) << (suby * 8 + subx);
+  }
+
+  public static void clear() {
+    // zero the cloud data
+    for (int i = 0; i < 32; ++i) {
+      for (int j = 0; j < 32; ++j) {
+        clouds[i][j] = 0L;
+      }
+    }
   }
 }

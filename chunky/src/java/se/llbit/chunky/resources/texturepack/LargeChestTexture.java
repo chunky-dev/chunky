@@ -132,4 +132,18 @@ public class LargeChestTexture extends TextureLoader {
 
     return img;
   }
+
+  @Override
+  public void reset() {
+    left.reset();
+    right.reset();
+    topLeft.reset();
+    topRight.reset();
+    frontLeft.reset();
+    frontRight.reset();
+    bottomLeft.reset();
+    bottomRight.reset();
+    backLeft.reset();
+    backRight.reset();
+  }
 }
