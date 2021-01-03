@@ -16,6 +16,18 @@ public interface EmissionMap {
     }
   };
 
+  EmissionMap DEFAULT = new EmissionMap() {
+    @Override
+    public boolean load(BitmapImage texture) {
+      return false;
+    }
+
+    @Override
+    public double getEmittanceAt(double u, double v) {
+      return 1;
+    }
+  };
+
   /**
    * Load the emission map from the given texture. If this returns false, there is no emission map
    * available.
