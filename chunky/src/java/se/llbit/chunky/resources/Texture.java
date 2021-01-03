@@ -1607,7 +1607,9 @@ public class Texture {
    */
   public void getColor(Ray ray) {
     getColor(ray.u, ray.v, ray.color);
-    ray.emittanceValue = getEmittanceAt(ray.u, ray.v);
+    if (ray.getCurrentMaterial().emittance > 0) {
+      ray.emittanceValue = getEmittanceAt(ray.u, ray.v);
+    }
   }
 
   /**
