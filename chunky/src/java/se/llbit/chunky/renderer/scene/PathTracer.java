@@ -231,9 +231,9 @@ public class PathTracer implements RayTracer {
     float emittance = 0;
     Vector4 indirectEmitterColor = new Vector4(0, 0, 0, 0);
 
-    if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance > Ray.EPSILON) {
+    if (scene.emittersEnabled && (!scene.isPreventNormalEmitterWithSampling() || scene.getEmitterSamplingStrategy() == EmitterSamplingStrategy.NONE || ray.depth == 0) && currentMat.emittance * ray.emittanceValue > Ray.EPSILON) {
 
-      emittance = addEmitted;
+      emittance = (float) (addEmitted * ray.emittanceValue);
       ray.emittance.x = ray.color.x * ray.color.x *
         currentMat.emittance * ray.emittanceValue * scene.emitterIntensity;
       ray.emittance.y = ray.color.y * ray.color.y *
