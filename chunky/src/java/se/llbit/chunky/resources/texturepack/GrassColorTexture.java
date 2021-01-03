@@ -48,5 +48,9 @@ public class GrassColorTexture extends TextureLoader {
   public boolean load(Path texturePack) {
     return load(file, texturePack);
   }
+
+  @Override
+  public void reset() {
+  }
 }
 

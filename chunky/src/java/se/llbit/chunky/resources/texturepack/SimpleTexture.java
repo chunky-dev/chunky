@@ -103,4 +103,9 @@ public class SimpleTexture extends TextureLoader {
   public String toString() {
     return "texture:" + file;
   }
+
+  @Override
+  public void reset() {
+    texture.reset();
+  }
 }

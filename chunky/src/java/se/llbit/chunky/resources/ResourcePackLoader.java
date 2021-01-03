@@ -18,6 +18,7 @@
 package se.llbit.chunky.resources;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.chunky.world.biome.Biomes;
 import se.llbit.log.Log;
 
@@ -126,6 +127,12 @@ public class ResourcePackLoader {
     List<PackLoader> loaders = PACK_LOADER_FACTORIES.stream()
       .map(PackLoaderFactory::create)
       .collect(Collectors.toList());
+
+
+    // reset all textures to get predictable output regardless of what was loaded previously
+    for (TextureLoader loader : TexturePackLoader.ALL_TEXTURES.values()) {
+      loader.reset();
+    }
 
     if (!reloadResourcePacks(loaders)) {
       Log.info(buildMissingResourcesErrorMessage(loaders));

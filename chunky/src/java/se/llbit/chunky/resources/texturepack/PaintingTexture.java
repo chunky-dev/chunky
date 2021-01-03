@@ -51,6 +51,11 @@ public class PaintingTexture extends TextureLoader {
   }
 
   @Override
+  public void reset() {
+    texture.reset();
+  }
+
+  @Override
   public String toString() {
     return "texture:" + file;
   }
