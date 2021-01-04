@@ -1,6 +1,7 @@
 package se.llbit.chunky.resources.pbr;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.math.Ray;
 
 /**
  * Emission map that follows the old PBR format. In BSL this option is called "Old PBR + Emissive"
@@ -21,7 +22,7 @@ public class OldPbrEmissionMap implements EmissionMap {
     boolean hasEmission = false;
     for (int y = 0; y < texture.height; ++y) {
       for (int x = 0; x < texture.width; ++x) {
-        // blue
+        // blue channel
         if ((data[y * texture.width + x] = (byte) (
             texture.data[y * texture.width + x] & 0xFF)) != (byte) 0x00) {
           hasEmission = true;
@@ -33,8 +34,8 @@ public class OldPbrEmissionMap implements EmissionMap {
 
   @Override
   public double getEmittanceAt(double u, double v) {
-    int x = (int) (u * width);
-    int y = (int) ((1 - v) * height);
+    int x = (int) (u * width - Ray.EPSILON);
+    int y = (int) ((1 - v) * height - Ray.EPSILON);
     int rawValue = data[y * width + x] & 0xFF;
     return rawValue / 255.0;
   }
