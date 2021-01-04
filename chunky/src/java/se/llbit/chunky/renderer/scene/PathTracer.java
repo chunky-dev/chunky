@@ -69,6 +69,7 @@ public class PathTracer implements RayTracer {
         if (ray.getPrevMaterial().isWater()) {
           ray.color.set(0, 0, 0, 1);
           ray.emittanceValue = 0;
+          ray.reflectanceValue = 0;
           hit = true;
         } else if (ray.depth == 0) {
           // Direct sky hit.
@@ -103,7 +104,7 @@ public class PathTracer implements RayTracer {
         }
       }
 
-      float pSpecular = currentMat.specular;
+      float pSpecular = (float) (currentMat.specular * ray.reflectanceValue);
 
       double pDiffuse = scene.fancierTranslucency ? 1 - Math.sqrt(1 - ray.color.w) : ray.color.w;
 
@@ -168,6 +169,7 @@ public class PathTracer implements RayTracer {
     if (!hit) {
       ray.color.set(0, 0, 0, 1);
       ray.emittanceValue = 0;
+      ray.reflectanceValue = 0;
       if (firstReflection) {
         airDistance = ray.distance;
       }

@@ -21,6 +21,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.pbr.EmissionMap;
+import se.llbit.chunky.resources.pbr.ReflectanceMap;
 import se.llbit.chunky.resources.texturepack.FontTexture;
 import se.llbit.chunky.resources.texturepack.TexturePath;
 import se.llbit.fxutil.FxImageUtil;
@@ -1469,6 +1470,7 @@ public class Texture {
 
   private Image fxImage = null;
   private EmissionMap emissionMap = EmissionMap.DEFAULT;
+  private ReflectanceMap reflectanceMap = ReflectanceMap.DEFAULT;
 
   public Texture() {
     this(ImageLoader.missingImage);
@@ -1541,6 +1543,14 @@ public class Texture {
     return emissionMap.getEmittanceAt(u, v);
   }
 
+  public void setReflectanceMap(ReflectanceMap reflectanceMap) {
+    this.reflectanceMap = reflectanceMap;
+  }
+
+  public double getReflectanceAt(double u, double v) {
+    return reflectanceMap.getReflectanceAt(u, v);
+  }
+
   /**
    * Get linear color values.
    */
@@ -1557,6 +1567,9 @@ public class Texture {
     getColor(ray.u, ray.v, ray.color);
     if (ray.getCurrentMaterial().emittance > 0) {
       ray.emittanceValue = getEmittanceAt(ray.u, ray.v);
+    }
+    if (ray.getCurrentMaterial().specular > 0) {
+      ray.reflectanceValue = getReflectanceAt(ray.u, ray.v);
     }
   }
 
@@ -1685,5 +1698,6 @@ public class Texture {
   public void reset() {
     setTexture(ImageLoader.missingImage);
     setEmissionMap(EmissionMap.DEFAULT);
+    setReflectanceMap(ReflectanceMap.DEFAULT);
   }
 }
