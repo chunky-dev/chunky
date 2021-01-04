@@ -19,9 +19,7 @@ package se.llbit.chunky.resources.texturepack;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.LayeredResourcePacks;
 import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.resources.pbr.EmissionMap;
-import se.llbit.chunky.resources.pbr.LabPbrEmissionMap;
-import se.llbit.chunky.resources.pbr.OldPbrEmissionMap;
+import se.llbit.chunky.resources.pbr.*;
 import se.llbit.resources.ImageLoader;
 
 import java.io.IOException;
@@ -77,8 +75,8 @@ public class SimpleTexture extends TextureLoader {
   @Override
   public boolean load(String file, LayeredResourcePacks texturePack) {
     boolean loaded = super.load(file, texturePack);
-    String emittanceFormat = System.getProperty("chunky.pbr.emittance", "");
-    if (emittanceFormat.equals("oldpbr") || emittanceFormat.equals("labpbr")) {
+    String specularFormat = System.getProperty("chunky.pbr.specular", "");
+    if (specularFormat.equals("oldpbr") || specularFormat.equals("labpbr")) {
       Optional<InputStream> in;
       try {
         in = texturePack.getInputStream(file + "_s.png");
@@ -93,18 +91,34 @@ public class SimpleTexture extends TextureLoader {
         // Some resource packs use the blue channel (Red=Smoothness, Green=Metalness, Blue=Emission)
         // (In BSL, this option is called "Old PBR + Emissive")
         BitmapImage specularMap = getTextureOrFirstFrame(in.get());
-        EmissionMap emissionMap = emittanceFormat.equals("oldpbr") ? new OldPbrEmissionMap()
+        EmissionMap emissionMap = specularFormat.equals("oldpbr") ? new OldPbrEmissionMap()
           : new LabPbrEmissionMap();
         if (emissionMap.load(specularMap)) {
           texture.setEmissionMap(emissionMap);
         } else {
           texture.setEmissionMap(EmissionMap.EMPTY);
         }
+        ReflectanceMap reflectanceMap =
+          specularFormat.equals("oldpbr") ? new OldPbrReflectanceMap() :
+            new LabPbrReflectanceMap();
+        if (reflectanceMap.load(specularMap)) {
+          texture.setReflectanceMap(reflectanceMap);
+        } else {
+          texture.setReflectanceMap(ReflectanceMap.EMPTY);
+        }
       } catch (IOException e) {
         // Safe to ignore
         texture.setEmissionMap(EmissionMap.EMPTY);
+        texture.setReflectanceMap(ReflectanceMap.EMPTY);
+      } finally {
+        try {
+          in.get().close();
+        } catch (IOException e) {
+          // ignore
+        }
       }
     }
+
     return loaded;
   }
 
