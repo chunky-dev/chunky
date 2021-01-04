@@ -42,7 +42,7 @@ public interface EmissionMap {
    *
    * @param u u component of the texture coordinate [0...1]
    * @param v v component of the texture coordinate [0...1]
-   * @return Emittance [0...1] at the given texture coordinate.
+   * @return Emittance [0...1] at the given texture coordinate
    */
   double getEmittanceAt(double u, double v);
 }

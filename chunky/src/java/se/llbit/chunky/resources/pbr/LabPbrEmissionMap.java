@@ -1,6 +1,7 @@
 package se.llbit.chunky.resources.pbr;
 
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.math.Ray;
 
 /**
  * Emission map that follows the labPBR format.
@@ -35,8 +36,8 @@ public class LabPbrEmissionMap implements EmissionMap {
 
   @Override
   public double getEmittanceAt(double u, double v) {
-    int x = (int) (u * width);
-    int y = (int) ((1 - v) * height);
+    int x = (int) (u * width - Ray.EPSILON);
+    int y = (int) ((1 - v) * height - Ray.EPSILON);
     int rawValue = data[y * width + x] & 0xFF;
     if (rawValue == 255) {
       return 0;
