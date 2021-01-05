@@ -45,12 +45,15 @@ public class GenericChunkData implements ChunkData {
 
   @Override
   public void setBlockAt(int x, int y, int z, int block) {
+    if(block == 0)
+      return;
+
     int sectionY = y >> 4;
     if(minSectionY > sectionY)
       minSectionY = sectionY;
     if(maxSectionY < sectionY)
       maxSectionY = sectionY;
-    SectionData sectionData = sections.getIfAbsentPut(sectionY, new SectionData(sectionY));
+    SectionData sectionData = sections.getIfAbsentPut(sectionY, () -> new SectionData(sectionY));
     sectionData.blocks[chunkIndex(x & (X_MAX - 1), y & (SECTION_Y_MAX - 1), z & (Z_MAX - 1))] = block;
   }
 
