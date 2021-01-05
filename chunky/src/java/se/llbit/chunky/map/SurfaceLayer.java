@@ -57,20 +57,21 @@ public class SurfaceLayer extends BitmapLayer {
       for (int z = 0; z < Chunk.Z_MAX; ++z) {
 
         // Find the topmost non-empty block.
-        int y = Chunk.Y_MAX - 1;
-        for (; y > 0; --y) {
+        int y = chunkData.maxY();
+        int minY = chunkData.minY();
+        for (; y > minY; --y) {
           if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
             break;
           }
         }
         if (dim == -1) {
           // Nether worlds have a ceiling that we want to skip.
-          for (; y > 1; --y) {
+          for (; y > minY+1; --y) {
             if (palette.get(chunkData.getBlockAt(x, y, z)) == Air.INSTANCE) {
               break;
             }
           }
-          for (; y > 1; --y) {
+          for (; y > minY+1; --y) {
             if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
               break;
             }
@@ -79,7 +80,7 @@ public class SurfaceLayer extends BitmapLayer {
 
         float[] color = new float[4];
 
-        for (; y >= 0 && color[3] < 1.f; ) {
+        for (; y >= minY && color[3] < 1.f; ) {
           Block block = palette.get(chunkData.getBlockAt(x, y, z));
           float[] blockColor = new float[4];
           ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
@@ -100,7 +101,7 @@ public class SurfaceLayer extends BitmapLayer {
             color = blend(color, blockColor);
             y -= 1;
 
-            for (; y >= 0; --y) {
+            for (; y >= minY; --y) {
               Block block1 = palette.get(chunkData.getBlockAt(x, y, z));
               if (block1.opaque) {
                 ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
@@ -110,7 +111,7 @@ public class SurfaceLayer extends BitmapLayer {
           } else if (block.isWater()) {
             int depth = 1;
             y -= 1;
-            for (; y >= 0; --y) {
+            for (; y >= minY; --y) {
               Block block1 = palette.get(chunkData.getBlockAt(x, y, z));
               if (!block1.isWater())
                 break;

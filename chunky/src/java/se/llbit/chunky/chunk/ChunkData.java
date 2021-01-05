@@ -5,6 +5,10 @@ import se.llbit.nbt.CompoundTag;
 import java.util.Collection;
 
 public interface ChunkData {
+  int minY();
+
+  int maxY();
+
   int getBlockAt(int x, int y, int z);
 
   void setBlockAt(int x, int y, int z, int block);

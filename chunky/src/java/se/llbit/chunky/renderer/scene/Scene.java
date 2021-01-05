@@ -802,8 +802,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Heightmap biomeIdMap = new Heightmap();
 
-    int yMin = Math.max(0, yClipMin);
-    int yMax = Math.min(256, yClipMax);
+    int yGlobalMin = Integer.MAX_VALUE; //Initial values, to be overwritten by loaded chunks
+    int yGlobalMax = Integer.MIN_VALUE;
 
     ChunkData chunkData = null;
 
@@ -821,6 +821,10 @@ public class Scene implements JsonSerializable, Refreshable {
         loadedChunks.add(cp);
 
         chunkData = world.getChunk(cp).getChunkData(chunkData, palette);
+        int yMin = chunkData.minY();
+        int yMax = chunkData.maxY()+1;
+        yGlobalMin = Math.min(yGlobalMin, yMin);
+        yGlobalMax = Math.min(yGlobalMax, yMax);
         numChunks += 1;
 
         int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
@@ -829,7 +833,7 @@ public class Scene implements JsonSerializable, Refreshable {
           int wz = cz + wz0;
           for (int cx = 0; cx < 16; ++cx) {
             int wx = cx + wx0;
-            int biomeId = 0xFF & chunkData.getBiomeAt(cx, 0, cz);
+            int biomeId = 0xFF & chunkData.getBiomeAt(cx, 0, cz); // TODO add vertical biomes support (1.15+)
             biomeIdMap.set(biomeId, wx, wz);
           }
         }
@@ -858,7 +862,7 @@ public class Scene implements JsonSerializable, Refreshable {
           }
         }
 
-        for (int cy = yMin; cy < yMax; ++cy) {
+        for (int cy = yMin; cy < yMax; ++cy) { //Uses chunk min and max, rather than globa - minor optimisation for pre1.13 worlds
           for (int cz = 0; cz < 16; ++cz) {
             int z = cz + cp.z * 16 - origin.z;
             for (int cx = 0; cx < 16; ++cx) {
@@ -1170,7 +1174,7 @@ public class Scene implements JsonSerializable, Refreshable {
         }
         task.update(target, done);
         done += 1;
-        OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
+        OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yGlobalMin, yGlobalMax);
       }
 
       worldOctree.endFinalization();

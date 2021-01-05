@@ -184,7 +184,6 @@ public class Chunk {
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
       int[] heightmapData = extractHeightmapData(data);
-      byte[] biomeData = new byte[X_MAX * Z_MAX];
       extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
       if (version.equals("1.13")) {
         BlockPalette palette = new BlockPalette();
