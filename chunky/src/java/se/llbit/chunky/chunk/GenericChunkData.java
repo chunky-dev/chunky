@@ -75,10 +75,10 @@ public class GenericChunkData implements ChunkData {
   public void clear() {
     minSectionY = Integer.MAX_VALUE;
     maxSectionY = Integer.MIN_VALUE;
-    sections = new IntObjectHashMap<>();
+    sections.clear();
     biomes = new byte[X_MAX * Chunk.Z_MAX];
-    tileEntities = new ArrayList<>();
-    entities = new ArrayList<>();
+    tileEntities.clear();
+    entities.clear();
   }
 
   private static class SectionData {
