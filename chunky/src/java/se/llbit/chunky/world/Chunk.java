@@ -183,7 +183,7 @@ public class Chunk {
     Heightmap heightmap = world.heightmap();
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
-      int[] heightmapData = extractHeightmapData(data);
+      int[] heightmapData = extractHeightmapData(data, chunkData);
       extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
       if (version.equals("1.13")) {
         BlockPalette palette = new BlockPalette();
@@ -253,14 +253,14 @@ public class Chunk {
     }
   }
 
-  private int[] extractHeightmapData(@NotNull Map<String, Tag> data) {
+  private int[] extractHeightmapData(@NotNull Map<String, Tag> data, ChunkData chunkData) {
     Tag heightmapTag = data.get(LEVEL_HEIGHTMAP);
     if (heightmapTag.isIntArray(X_MAX * Z_MAX)) {
       return heightmapTag.intArray();
     } else {
       int[] fallback = new int[X_MAX * Z_MAX];
       for (int i = 0; i < fallback.length; ++i) {
-        fallback[i] = Y_MAX - 1;
+        fallback[i] = chunkData.maxY();
       }
       return fallback;
     }
