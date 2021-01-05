@@ -26,7 +26,7 @@ public class GenericChunkData implements ChunkData {
   }
 
   @Override
-  public int blockAt(int x, int y, int z) {
+  public int getBlockAt(int x, int y, int z) {
     SectionData sectionData = sections.get(y >> 4);
     if (sectionData == null)
       return 0;
@@ -45,7 +45,7 @@ public class GenericChunkData implements ChunkData {
   }
 
   @Override
-  public boolean blockOnEdge(int x, int y, int z) {
+  public boolean isBlockOnEdge(int x, int y, int z) {
     return y <= minSectionY << 4 || y >= ((maxSectionY << 4) | 0xF)
       || x <= 0 || x >= 15
       || z <= 0 || z >= 15;

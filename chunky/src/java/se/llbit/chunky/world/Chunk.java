@@ -16,8 +16,6 @@
  */
 package se.llbit.chunky.world;
 
-import com.sun.istack.internal.Nullable;
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Lava;
@@ -223,7 +221,7 @@ public class Chunk {
       byte[] data = biomesTag.byteArray();
       int i = 0;
       for(int x = 0; x < X_MAX; x++) {
-        for(int z = 0; z < X_MAX; z++) {
+        for(int z = 0; z < Z_MAX; z++) {
           output.setBiomeAt(x, 0, z, data[i]);
           i++;
         }
@@ -248,7 +246,7 @@ public class Chunk {
       int[] data = biomesTag.intArray();
       int i = 0;
       for(int x = 0; x < X_MAX; x++) {
-        for(int z = 0; z < X_MAX; z++) {
+        for(int z = 0; z < Z_MAX; z++) {
           output.setBiomeAt(x, 0, z, (byte) data[i]);
           i++;
         }
@@ -363,7 +361,7 @@ public class Chunk {
         int y = chunkHeightmap[z * 16 + x];
         y = Math.max(1, y - 1);
         for (; y > 1; --y) {
-          Block block = palette.get(chunkData.blockAt(x, y, z));
+          Block block = palette.get(chunkData.getBlockAt(x, y, z));
           if (block != Air.INSTANCE && !block.isWater())
             break;
         }
@@ -397,9 +395,9 @@ public class Chunk {
 
   public static int waterLevelAt(ChunkData chunkData, BlockPalette palette, int cx, int cy, int cz,
                                  int baseLevel) {
-    Material corner = palette.get(chunkData.blockAt(cx, cy, cz));
+    Material corner = palette.get(chunkData.getBlockAt(cx, cy, cz));
     if (corner.isWater()) {
-      Material above = palette.get(chunkData.blockAt(cx, cy+1, cz));
+      Material above = palette.get(chunkData.getBlockAt(cx, cy+1, cz));
       boolean isFullBlock = above.isWaterFilled();
       return isFullBlock ? 8 : 8 - ((Water) corner).level;
     } else if (corner.waterlogged) {
@@ -412,9 +410,9 @@ public class Chunk {
 
   public static int lavaLevelAt(ChunkData chunkData, BlockPalette palette, int cx, int cy, int cz,
                                 int baseLevel) {
-    Material corner = palette.get(chunkData.blockAt(cx, cy, cz));
+    Material corner = palette.get(chunkData.getBlockAt(cx, cy, cz));
     if (corner instanceof Lava) {
-      Material above = palette.get(chunkData.blockAt(cx, cy+1, cz));
+      Material above = palette.get(chunkData.getBlockAt(cx, cy+1, cz));
       boolean isFullBlock = above instanceof Lava;
       return isFullBlock ? 8 : 8 - ((Lava) corner).level;
     } else if (!corner.solid) {

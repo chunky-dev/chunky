@@ -5,11 +5,11 @@ import se.llbit.nbt.CompoundTag;
 import java.util.Collection;
 
 public interface ChunkData {
-  int blockAt(int x, int y, int z);
+  int getBlockAt(int x, int y, int z);
 
   void setBlockAt(int x, int y, int z, int block);
 
-  boolean blockOnEdge(int x, int y, int z);
+  boolean isBlockOnEdge(int x, int y, int z);
 
   Collection<CompoundTag> getTileEntities();
 

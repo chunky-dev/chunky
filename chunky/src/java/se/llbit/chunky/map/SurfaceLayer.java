@@ -59,19 +59,19 @@ public class SurfaceLayer extends BitmapLayer {
         // Find the topmost non-empty block.
         int y = Chunk.Y_MAX - 1;
         for (; y > 0; --y) {
-          if (palette.get(chunkData.blockAt(x, y, z)) != Air.INSTANCE) {
+          if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
             break;
           }
         }
         if (dim == -1) {
           // Nether worlds have a ceiling that we want to skip.
           for (; y > 1; --y) {
-            if (palette.get(chunkData.blockAt(x, y, z)) == Air.INSTANCE) {
+            if (palette.get(chunkData.getBlockAt(x, y, z)) == Air.INSTANCE) {
               break;
             }
           }
           for (; y > 1; --y) {
-            if (palette.get(chunkData.blockAt(x, y, z)) != Air.INSTANCE) {
+            if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
               break;
             }
           }
@@ -80,7 +80,7 @@ public class SurfaceLayer extends BitmapLayer {
         float[] color = new float[4];
 
         for (; y >= 0 && color[3] < 1.f; ) {
-          Block block = palette.get(chunkData.blockAt(x, y, z));
+          Block block = palette.get(chunkData.getBlockAt(x, y, z));
           float[] blockColor = new float[4];
           ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
           int biomeId = 0xFF & chunkData.getBiomeAt(x, 0, z);
@@ -101,7 +101,7 @@ public class SurfaceLayer extends BitmapLayer {
             y -= 1;
 
             for (; y >= 0; --y) {
-              Block block1 = palette.get(chunkData.blockAt(x, y, z));
+              Block block1 = palette.get(chunkData.getBlockAt(x, y, z));
               if (block1.opaque) {
                 ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
                 break;
@@ -111,7 +111,7 @@ public class SurfaceLayer extends BitmapLayer {
             int depth = 1;
             y -= 1;
             for (; y >= 0; --y) {
-              Block block1 = palette.get(chunkData.blockAt(x, y, z));
+              Block block1 = palette.get(chunkData.getBlockAt(x, y, z));
               if (!block1.isWater())
                 break;
               depth += 1;
