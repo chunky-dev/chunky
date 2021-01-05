@@ -121,7 +121,7 @@ public class SurfaceLayer extends BitmapLayer {
             ColorUtil.getRGBAComponents(Biomes.getWaterColor(biomeId), blockColor);
             blockColor[3] = QuickMath.max(.5f, 1.f - depth / 32.f);
           } else {
-            if (block.opaque && y > 64) {
+            if (block.opaque && y > World.SEA_LEVEL+1) {
               float fade = QuickMath.min(0.6f, (y - World.SEA_LEVEL) / 60.f);
               fade = QuickMath.max(0.f, fade);
               blockColor[0] = (1 - fade) * blockColor[0] + fade;
