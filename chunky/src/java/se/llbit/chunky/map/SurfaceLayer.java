@@ -97,7 +97,7 @@ public class SurfaceLayer extends BitmapLayer {
             blockColor[3] = 1.f;// grass colors don't include alpha
 
             y -= 1;
-          } else if (block.name == "minecraft:ice") {
+          } else if (block.name.equals("minecraft:ice")) {
             color = blend(color, blockColor);
             y -= 1;
 
