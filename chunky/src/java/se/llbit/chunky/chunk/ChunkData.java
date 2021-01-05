@@ -1,6 +1,7 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.nbt.CompoundTag;
+import se.llbit.util.NotNull;
 
 import java.util.Collection;
 
@@ -15,11 +16,11 @@ public interface ChunkData {
 
   boolean isBlockOnEdge(int x, int y, int z);
 
-  Collection<CompoundTag> getTileEntities();
+  @NotNull Collection<CompoundTag> getTileEntities();
 
-  Collection<CompoundTag> getEntities();
+  @NotNull Collection<CompoundTag> getEntities();
 
-  byte getBiomeAt(int x, int y, int z);
+  byte getBiomeAt(int x, int y, int z); //TODO: int biomes for modded biome support
 
   void setBiomeAt(int x, int y, int z, byte biome);
 

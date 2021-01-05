@@ -3,6 +3,7 @@ package se.llbit.chunky.chunk;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.nbt.CompoundTag;
+import se.llbit.util.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +14,7 @@ public class GenericChunkData implements ChunkData {
   private Integer minSectionY = Integer.MAX_VALUE;
   private Integer maxSectionY = Integer.MIN_VALUE;
 
-  private IntObjectHashMap<SectionData> sections;
+  private final IntObjectHashMap<SectionData> sections;
   public byte[] biomes;
   public Collection<CompoundTag> tileEntities;
   public Collection<CompoundTag> entities;
@@ -21,8 +22,6 @@ public class GenericChunkData implements ChunkData {
   public GenericChunkData() {
     sections = new IntObjectHashMap<>();
     biomes = new byte[X_MAX * Z_MAX];
-    tileEntities = new ArrayList<>();
-    entities = new ArrayList<>();
   }
 
   @Override
@@ -64,13 +63,19 @@ public class GenericChunkData implements ChunkData {
       || z <= 0 || z >= 15;
   }
 
-  @Override
+  @NotNull @Override
   public Collection<CompoundTag> getTileEntities() {
+    if(tileEntities == null) {
+      tileEntities = new ArrayList<>();
+    }
     return tileEntities;
   }
 
-  @Override
+  @NotNull @Override
   public Collection<CompoundTag> getEntities() {
+    if(entities == null) {
+      entities = new ArrayList<>();
+    }
     return entities;
   }
 
