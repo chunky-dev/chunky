@@ -292,6 +292,7 @@ public class Chunk {
       for (SpecificTag section : sections.asList()) {
         Tag yTag = section.get("Y");
         int sectionY = yTag.byteValue() & 0xFF;
+        int sectionMinBlockY = sectionY << 4;
 
         if (section.get("Palette").isList()) {
           ListTag palette = section.get("Palette").asList();
@@ -322,11 +323,12 @@ public class Chunk {
             }
             BitBuffer buffer = new BitBuffer(blockStates.longArray(), bpb, isAligned);
             for (int y = 0; y < SECTION_Y_MAX; y++) {
-              for(int x = 0; x < X_MAX; x++) {
-                for (int z = 0; z < Z_MAX; z++) {
+              int blockY = sectionMinBlockY + y;
+              for (int z = 0; z < Z_MAX; z++) {
+                for(int x = 0; x < X_MAX; x++) {
                   int b0 = buffer.read();
                   if (b0 < subpalette.length) {
-                    chunkData.setBlockAt(x, y, z, subpalette[b0]);
+                    chunkData.setBlockAt(x, blockY, z, subpalette[b0]);
                   }
                 }
               }
