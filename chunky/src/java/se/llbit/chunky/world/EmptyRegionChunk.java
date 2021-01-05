@@ -16,8 +16,10 @@
  */
 package se.llbit.chunky.world;
 
+import com.sun.istack.internal.Nullable;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
 
@@ -44,8 +46,13 @@ public class EmptyRegionChunk extends Chunk {
     surface = IconLayer.CORRUPT;
   }
 
-  @Override public synchronized void getBlockData(ChunkData chunkData,
-                                                  BlockPalette palette) {
+  @Override public synchronized ChunkData getChunkData(ChunkData chunkData, BlockPalette palette) {
+    if (chunkData == null) {
+      chunkData = new GenericChunkData();
+    } else {
+      chunkData.clear();
+    }
+    return chunkData;
   }
 
   @Override public void renderSurface(MapTile tile) {
