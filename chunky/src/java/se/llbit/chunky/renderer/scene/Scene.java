@@ -228,6 +228,9 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected Vector3i origin = new Vector3i();
 
+  protected int yMax = 0;
+  protected int yMin = 0;
+
   private BlockPalette palette;
   private Octree worldOctree;
   private Octree waterOctree;
@@ -739,8 +742,19 @@ public class Scene implements JsonSerializable, Refreshable {
       return;
     }
 
+    ChunkData chunkData = null;
     Set<ChunkPosition> loadedChunks = new HashSet<>();
     int numChunks = 0;
+
+    List<ChunkData> loadedChunkData = new ArrayList<>();
+    palette = new BlockPalette();
+
+    for (ChunkPosition cp : chunksToLoad) {
+      chunkData = world.getChunk(cp).getChunkData(null, palette);
+      loadedChunkData.add(chunkData);
+      yMin = Math.min(yMin, chunkData.minY());
+      yMax = Math.max(yMax, chunkData.maxY()+1);
+    }
 
     try (TaskTracker.Task task = progress.task("Loading regions")) {
       task.update(2, 1);
@@ -756,7 +770,6 @@ public class Scene implements JsonSerializable, Refreshable {
       int requiredDepth = calculateOctreeOrigin(chunksToLoad);
 
       // Create new octree to fit all chunks.
-      palette = new BlockPalette();
       worldOctree = new Octree(octreeImplementation, requiredDepth);
       waterOctree = new Octree(octreeImplementation, requiredDepth);
       if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
@@ -802,14 +815,11 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Heightmap biomeIdMap = new Heightmap();
 
-    int yGlobalMin = Integer.MAX_VALUE; //Initial values, to be overwritten by loaded chunks
-    int yGlobalMax = Integer.MIN_VALUE;
-
-    ChunkData chunkData = null;
-
     try (TaskTracker.Task task = progress.task("Loading chunks")) {
       int done = 1;
       int target = chunksToLoad.size();
+
+      int dataIdx = 0;
       for (ChunkPosition cp : chunksToLoad) {
         task.update(target, done);
         done += 1;
@@ -820,11 +830,10 @@ public class Scene implements JsonSerializable, Refreshable {
 
         loadedChunks.add(cp);
 
-        chunkData = world.getChunk(cp).getChunkData(chunkData, palette);
+        chunkData = loadedChunkData.get(dataIdx);
+        dataIdx++;
         int yMin = chunkData.minY();
         int yMax = chunkData.maxY()+1;
-        yGlobalMin = Math.min(yGlobalMin, yMin);
-        yGlobalMax = Math.min(yGlobalMax, yMax);
         numChunks += 1;
 
         int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
@@ -1174,7 +1183,7 @@ public class Scene implements JsonSerializable, Refreshable {
         }
         task.update(target, done);
         done += 1;
-        OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yGlobalMin, yGlobalMax);
+        OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
       }
 
       worldOctree.endFinalization();
@@ -1254,11 +1263,11 @@ public class Scene implements JsonSerializable, Refreshable {
     zmin *= 16;
     zmax *= 16;
 
-    int maxDimension = Math.max(Chunk.Y_MAX, Math.max(xmax - xmin, zmax - zmin));
+    int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
     int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
 
     int xroom = (1 << requiredDepth) - (xmax - xmin);
-    int yroom = (1 << requiredDepth) - Chunk.Y_MAX;
+    int yroom = (1 << requiredDepth) - (yMax - yMin);
     int zroom = (1 << requiredDepth) - (zmax - zmin);
 
     origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
@@ -1308,7 +1317,8 @@ public class Scene implements JsonSerializable, Refreshable {
     zmax *= 16;
     int xcenter = (xmax + xmin) / 2;
     int zcenter = (zmax + zmin) / 2;
-    for (int y = Chunk.Y_MAX - 1; y >= 0; --y) {
+    int ycenter = (yMax + yMin) / 2;
+    for (int y = ycenter+128; y >= ycenter-128; --y) {
       Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
           palette);
       if (!(block instanceof Air)) {
