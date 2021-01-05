@@ -16,11 +16,14 @@
  */
 package se.llbit.chunky.world;
 
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.map.AbstractLayer;
 import se.llbit.chunky.map.BiomeLayer;
 import se.llbit.chunky.map.IconLayer;
@@ -38,10 +41,7 @@ import se.llbit.util.NotNull;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class represents a loaded or not-yet-loaded chunk in the world.
@@ -68,7 +68,7 @@ public class Chunk {
   /** Chunk depth. */
   public static final int Z_MAX = 16;
 
-  private static final int SECTION_Y_MAX = 16;
+  public static final int SECTION_Y_MAX = 16;
   private static final int SECTION_BYTES = X_MAX * SECTION_Y_MAX * Z_MAX;
   private static final int SECTION_HALF_NIBBLES = SECTION_BYTES / 2;
   private static final int CHUNK_BYTES = X_MAX * Y_MAX * Z_MAX;
@@ -161,19 +161,21 @@ public class Chunk {
     if (data == null) {
       return;
     }
+    GenericChunkData chunkData = new GenericChunkData();
+
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
-    loadSurface(data);
+    loadSurface(data, chunkData);
     biomesTimestamp = dataTimestamp;
     if (surface == IconLayer.MC_1_12) {
       biomes = IconLayer.MC_1_12;
     } else {
-      loadBiomes(data);
+      loadBiomes(data, chunkData);
     }
     world.chunkUpdated(position);
   }
 
-  private void loadSurface(Map<String, Tag> data) {
+  private void loadSurface(Map<String, Tag> data, ChunkData chunkData) {
     if (data == null) {
       surface = IconLayer.CORRUPT;
       return;
@@ -184,13 +186,12 @@ public class Chunk {
     if (sections.isList()) {
       int[] heightmapData = extractHeightmapData(data);
       byte[] biomeData = new byte[X_MAX * Z_MAX];
-      extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
-      int[] blockData = new int[CHUNK_BYTES];
+      extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
       if (version.equals("1.13")) {
         BlockPalette palette = new BlockPalette();
-        loadBlockData(data, blockData, palette);
-        updateHeightmap(heightmap, position, blockData, heightmapData, palette);
-        surface = new SurfaceLayer(world.currentDimension(), blockData, biomeData, palette);
+        loadBlockData(data, chunkData, palette);
+        updateHeightmap(heightmap, position, chunkData, heightmapData, palette);
+        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette);
         queueTopography();
       } else if (version.equals("1.12")) {
         surface = IconLayer.MC_1_12;
@@ -200,12 +201,12 @@ public class Chunk {
     }
   }
 
-  private void loadBiomes(Map<String, Tag> data) {
+  private void loadBiomes(Map<String, Tag> data, ChunkData chunkData) {
     if (data == null) {
       biomes = IconLayer.CORRUPT;
     } else {
       byte[] biomeData = new byte[X_MAX * Z_MAX];
-      extractBiomeData(data.get(LEVEL_BIOMES), biomeData);
+      extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
       biomes = new BiomeLayer(biomeData);
     }
   }
@@ -216,9 +217,16 @@ public class Chunk {
    * @param biomesTag the .Level.Biomes NBT tag to load data from.
    * @param output a byte array of length 16x16.
    */
-  private void extractBiomeData(@NotNull Tag biomesTag, byte[] output) {
+  private void extractBiomeData(@NotNull Tag biomesTag, ChunkData output) {
     if (biomesTag.isByteArray(X_MAX * Z_MAX)) {
-      System.arraycopy(biomesTag.byteArray(), 0, output, 0, X_MAX * Z_MAX);
+      byte[] data = biomesTag.byteArray();
+      int i = 0;
+      for(int x = 0; x < X_MAX; x++) {
+        for(int z = 0; z < X_MAX; z++) {
+          output.setBiomeAt(x, 0, z, data[i]);
+          i++;
+        }
+      }
     } else if (biomesTag.isIntArray(1024)) {
       // Since Minecraft 1.15, biome IDs are stored in an int vector with 1024 entries.
       // Each entry stores the biome for a 4x4x4 cube, sorted by X, Z, Y. For now, we use the biome at y=0.
@@ -227,7 +235,7 @@ public class Chunk {
         for (int z = 0; z < 4; z++) {
           for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-              output[(x * 4 + i) * 16 + z * 4 + j] = (byte) data[x * 4 + z];
+              output.setBiomeAt((x * 4 + i), 0, z * 4 + j, (byte) data[x * 4 + z]);
             }
           }
         }
@@ -237,8 +245,12 @@ public class Chunk {
       // Since Minecraft 1.13, biome IDs are stored in an int vector with 256 entries (one for each XZ position).
       // TODO(llbit): do we need to use ints to store biome IDs for Minecraft 1.13+? (not yet, the highest ID is 173)
       int[] data = biomesTag.intArray();
-      for (int i = 0; i < X_MAX * Z_MAX; ++i) {
-        output[i] = (byte) data[i];
+      int i = 0;
+      for(int x = 0; x < X_MAX; x++) {
+        for(int z = 0; z < X_MAX; z++) {
+          output.setBiomeAt(x, 0, z, (byte) data[i]);
+          i++;
+        }
       }
     }
   }
@@ -273,13 +285,13 @@ public class Chunk {
     return version;
   }
 
-  private static void loadBlockData(@NotNull Map<String, Tag> data, @NotNull int[] blocks,
+  private static void loadBlockData(@NotNull Map<String, Tag> data, @NotNull ChunkData chunkData,
       BlockPalette blockPalette) {
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
         Tag yTag = section.get("Y");
-        int yOffset = yTag.byteValue() & 0xFF;
+        int sectionY = yTag.byteValue() & 0xFF;
 
         if (section.get("Palette").isList()) {
           ListTag palette = section.get("Palette").asList();
@@ -309,13 +321,15 @@ public class Chunk {
               paletteIndex += 1;
             }
             BitBuffer buffer = new BitBuffer(blockStates.longArray(), bpb, isAligned);
-            int offset = SECTION_BYTES * yOffset;
-            for (int i = 0; i < SECTION_BYTES; ++i) {
-              int b0 = buffer.read();
-              if (b0 < subpalette.length) {
-                blocks[offset] = subpalette[b0];
+            for (int y = 0; y < SECTION_Y_MAX; y++) {
+              for(int x = 0; x < X_MAX; x++) {
+                for (int z = 0; z < Z_MAX; z++) {
+                  int b0 = buffer.read();
+                  if (b0 < subpalette.length) {
+                    chunkData.setBlockAt(x, y, z, subpalette[b0]);
+                  }
+                }
               }
-              offset += 1;
             }
           }
         } else {
@@ -327,7 +341,7 @@ public class Chunk {
           }
           Tag dataTag = section.get("Data");
           if (dataTag.isByteArray(SECTION_HALF_NIBBLES)) {
-            System.arraycopy(dataTag.byteArray(), 0, blockData, SECTION_HALF_NIBBLES * yOffset,
+            System.arraycopy(dataTag.byteArray(), 0, blockData, SECTION_HALF_NIBBLES * sectionY,
                 SECTION_HALF_NIBBLES);
           }*/
         }
@@ -339,14 +353,14 @@ public class Chunk {
    * Load heightmap information from a chunk heightmap array
    * and insert into a quadtree.
    */
-  public static void updateHeightmap(Heightmap heightmap, ChunkPosition pos, int[] blocksArray,
+  public static void updateHeightmap(Heightmap heightmap, ChunkPosition pos, ChunkData chunkData,
       int[] chunkHeightmap, BlockPalette palette) {
     for (int x = 0; x < 16; ++x) {
       for (int z = 0; z < 16; ++z) {
         int y = chunkHeightmap[z * 16 + x];
         y = Math.max(1, y - 1);
         for (; y > 1; --y) {
-          Block block = palette.get(blocksArray[Chunk.chunkIndex(x, y, z)]);
+          Block block = palette.get(chunkData.blockAt(x, y, z));
           if (block != Air.INSTANCE && !block.isWater())
             break;
         }
@@ -378,10 +392,11 @@ public class Chunk {
     }
   }
 
-  public static int waterLevelAt(int[] blocks, BlockPalette palette, int cx, int cy, int cz, int baseLevel) {
-    Material corner = palette.get(blocks[chunkIndex(cx, cy, cz)]);
+  public static int waterLevelAt(ChunkData chunkData, BlockPalette palette, int cx, int cy, int cz,
+                                 int baseLevel) {
+    Material corner = palette.get(chunkData.blockAt(cx, cy, cz));
     if (corner.isWater()) {
-      Material above = palette.get(blocks[Chunk.chunkIndex(cx, cy+1, cz)]);
+      Material above = palette.get(chunkData.blockAt(cx, cy+1, cz));
       boolean isFullBlock = above.isWaterFilled();
       return isFullBlock ? 8 : 8 - ((Water) corner).level;
     } else if (corner.waterlogged) {
@@ -392,10 +407,11 @@ public class Chunk {
     return baseLevel;
   }
 
-  public static int lavaLevelAt(int[] blocks, BlockPalette palette, int cx, int cy, int cz, int baseLevel) {
-    Material corner = palette.get(blocks[chunkIndex(cx, cy, cz)]);
+  public static int lavaLevelAt(ChunkData chunkData, BlockPalette palette, int cx, int cy, int cz,
+                                int baseLevel) {
+    Material corner = palette.get(chunkData.blockAt(cx, cy, cz));
     if (corner instanceof Lava) {
-      Material above = palette.get(blocks[Chunk.chunkIndex(cx, cy+1, cz)]);
+      Material above = palette.get(chunkData.blockAt(cx, cy+1, cz));
       boolean isFullBlock = above instanceof Lava;
       return isFullBlock ? 8 : 8 - ((Lava) corner).level;
     } else if (!corner.solid) {
@@ -422,20 +438,10 @@ public class Chunk {
   /**
    * Load the block data for this chunk.
    *
-   * @param blocks block order: y, z, x.
+   * @param chunkData the chunk data for this chunk
+   * @param palette
    */
-  public synchronized void getBlockData(int[] blocks, byte[] biomes,
-      Collection<CompoundTag> tileEntities, Collection<CompoundTag> entities,
-      BlockPalette blockPalette) {
-
-    for (int i = 0; i < CHUNK_BYTES; ++i) {
-      blocks[i] = blockPalette.airId;
-    }
-
-    for (int i = 0; i < X_MAX * Z_MAX; ++i) {
-      biomes[i] = 0;
-    }
-
+  public synchronized void getBlockData(ChunkData chunkData, BlockPalette palette) {
     Set<String> request = new HashSet<>();
     request.add(DATAVERSION);
     request.add(LEVEL_SECTIONS);
@@ -452,23 +458,23 @@ public class Chunk {
     Tag entitiesTag = data.get(LEVEL_ENTITIES);
     Tag tileEntitiesTag = data.get(LEVEL_TILEENTITIES);
     if (biomesTag.isByteArray(X_MAX * Z_MAX) || biomesTag.isIntArray(X_MAX * Z_MAX)) {
-      extractBiomeData(biomesTag, biomes);
+      extractBiomeData(biomesTag, chunkData);
     }
 
     if (sections.isList()) {
-      loadBlockData(data, blocks, blockPalette);
+      loadBlockData(data, chunkData, palette);
 
       if (entitiesTag.isList()) {
         for (SpecificTag tag : (ListTag) entitiesTag) {
           if (tag.isCompoundTag())
-            entities.add((CompoundTag) tag);
+            chunkData.getEntities().add((CompoundTag) tag);
         }
       }
 
       if (tileEntitiesTag.isList()) {
         for (SpecificTag tag : (ListTag) tileEntitiesTag) {
           if (tag.isCompoundTag())
-            tileEntities.add((CompoundTag) tag);
+            chunkData.getTileEntities().add((CompoundTag) tag);
         }
       }
     }

@@ -25,6 +25,7 @@ import se.llbit.chunky.block.Leaves;
 import se.llbit.chunky.block.TallGrass;
 import se.llbit.chunky.block.Vine;
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
@@ -47,10 +48,9 @@ public class SurfaceLayer extends BitmapLayer {
    * Generate the surface bitmap.
    *
    * @param dim current dimension
-   * @param blocks block index array (indices into block palette)
+   * @param chunkData data for the chunk
    */
-  public SurfaceLayer(int dim, int[] blocks, byte[] biomes, BlockPalette palette) {
-
+  public SurfaceLayer(int dim, ChunkData chunkData, BlockPalette palette) {
     bitmap = new int[Chunk.X_MAX * Chunk.Z_MAX];
     topo = new int[Chunk.X_MAX * Chunk.Z_MAX];
     for (int x = 0; x < Chunk.X_MAX; ++x) {
@@ -59,19 +59,19 @@ public class SurfaceLayer extends BitmapLayer {
         // Find the topmost non-empty block.
         int y = Chunk.Y_MAX - 1;
         for (; y > 0; --y) {
-          if (palette.get(blocks[Chunk.chunkIndex(x, y, z)]) != Air.INSTANCE) {
+          if (palette.get(chunkData.blockAt(x, y, z)) != Air.INSTANCE) {
             break;
           }
         }
         if (dim == -1) {
           // Nether worlds have a ceiling that we want to skip.
           for (; y > 1; --y) {
-            if (palette.get(blocks[Chunk.chunkIndex(x, y, z)]) == Air.INSTANCE) {
+            if (palette.get(chunkData.blockAt(x, y, z)) == Air.INSTANCE) {
               break;
             }
           }
           for (; y > 1; --y) {
-            if (palette.get(blocks[Chunk.chunkIndex(x, y, z)]) != Air.INSTANCE) {
+            if (palette.get(chunkData.blockAt(x, y, z)) != Air.INSTANCE) {
               break;
             }
           }
@@ -80,10 +80,10 @@ public class SurfaceLayer extends BitmapLayer {
         float[] color = new float[4];
 
         for (; y >= 0 && color[3] < 1.f; ) {
-          Block block = palette.get(blocks[Chunk.chunkIndex(x, y, z)]);
+          Block block = palette.get(chunkData.blockAt(x, y, z));
           float[] blockColor = new float[4];
           ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
-          int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(x, z)];
+          int biomeId = 0xFF & chunkData.getBiomeAt(x, 0, z);
 
           if (block instanceof Leaves) {
             ColorUtil.getRGBComponents(Biomes.getFoliageColor(biomeId), blockColor);
@@ -101,7 +101,7 @@ public class SurfaceLayer extends BitmapLayer {
             y -= 1;
 
             for (; y >= 0; --y) {
-              Block block1 = palette.get(blocks[Chunk.chunkIndex(x, y, z)]);
+              Block block1 = palette.get(chunkData.blockAt(x, y, z));
               if (block1.opaque) {
                 ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
                 break;
@@ -111,7 +111,7 @@ public class SurfaceLayer extends BitmapLayer {
             int depth = 1;
             y -= 1;
             for (; y >= 0; --y) {
-              Block block1 = palette.get(blocks[Chunk.chunkIndex(x, y, z)]);
+              Block block1 = palette.get(chunkData.blockAt(x, y, z));
               if (!block1.isWater())
                 break;
               depth += 1;
