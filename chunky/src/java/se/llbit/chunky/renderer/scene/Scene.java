@@ -2127,7 +2127,7 @@ public class Scene implements JsonSerializable, Refreshable {
         case NONE:
           break;
         case TONEMAP1:
-          // http://filmicgames.com/archives/75
+          // http://filmicworlds.com/blog/filmic-tonemapping-operators/
           r = QuickMath.max(0, r - 0.004);
           r = (r * (6.2 * r + .5)) / (r * (6.2 * r + 1.7) + 0.06);
           g = QuickMath.max(0, g - 0.004);
@@ -2145,9 +2145,12 @@ public class Scene implements JsonSerializable, Refreshable {
           r = QuickMath.max(QuickMath.min((r * (aces_a * r + aces_b)) / (r * (aces_c * r + aces_d) + aces_e), 1), 0);
           g = QuickMath.max(QuickMath.min((g * (aces_a * g + aces_b)) / (g * (aces_c * g + aces_d) + aces_e), 1), 0);
           b = QuickMath.max(QuickMath.min((b * (aces_a * b + aces_b)) / (b * (aces_c * b + aces_d) + aces_e), 1), 0);
+          r = FastMath.pow(r, 1 / DEFAULT_GAMMA);
+          g = FastMath.pow(g, 1 / DEFAULT_GAMMA);
+          b = FastMath.pow(b, 1 / DEFAULT_GAMMA);
           break;
         case TONEMAP3:
-          // http://filmicgames.com/archives/75
+          // http://filmicworlds.com/blog/filmic-tonemapping-operators/
           float hA = 0.15f;
           float hB = 0.50f;
           float hC = 0.10f;
