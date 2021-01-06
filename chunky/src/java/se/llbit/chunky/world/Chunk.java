@@ -219,8 +219,8 @@ public class Chunk {
     if (biomesTag.isByteArray(X_MAX * Z_MAX)) {
       byte[] data = biomesTag.byteArray();
       int i = 0;
-      for(int x = 0; x < X_MAX; x++) {
-        for(int z = 0; z < Z_MAX; z++) {
+      for(int z = 0; z < Z_MAX; z++) {
+        for(int x = 0; x < X_MAX; x++) {
           output.setBiomeAt(x, 0, z, data[i]);
           i++;
         }
@@ -233,7 +233,7 @@ public class Chunk {
         for (int z = 0; z < 4; z++) {
           for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-              output.setBiomeAt((x * 4 + i), 0, z * 4 + j, (byte) data[x * 4 + z]);
+              output.setBiomeAt((x * 4 + i), 0, z * 4 + j, (byte) data[z * 4 + x]);
             }
           }
         }
@@ -244,8 +244,8 @@ public class Chunk {
       // TODO(llbit): do we need to use ints to store biome IDs for Minecraft 1.13+? (not yet, the highest ID is 173)
       int[] data = biomesTag.intArray();
       int i = 0;
-      for(int x = 0; x < X_MAX; x++) {
-        for(int z = 0; z < Z_MAX; z++) {
+      for(int z = 0; z < Z_MAX; z++) {
+        for(int x = 0; x < X_MAX; x++) {
           output.setBiomeAt(x, 0, z, (byte) data[i]);
           i++;
         }
