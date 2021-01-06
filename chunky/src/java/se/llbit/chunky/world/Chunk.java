@@ -183,11 +183,11 @@ public class Chunk {
     Heightmap heightmap = world.heightmap();
     Tag sections = data.get(LEVEL_SECTIONS);
     if (sections.isList()) {
-      int[] heightmapData = extractHeightmapData(data, chunkData);
       extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
       if (version.equals("1.13")) {
         BlockPalette palette = new BlockPalette();
         loadBlockData(data, chunkData, palette);
+        int[] heightmapData = extractHeightmapData(data, chunkData);
         updateHeightmap(heightmap, position, chunkData, heightmapData, palette);
         surface = new SurfaceLayer(world.currentDimension(), chunkData, palette);
         queueTopography();
