@@ -1,12 +1,14 @@
 package se.llbit.chunky.chunk;
 
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.util.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 import static se.llbit.chunky.world.Chunk.*;
 
@@ -14,13 +16,13 @@ public class GenericChunkData implements ChunkData {
   private Integer minSectionY = Integer.MAX_VALUE;
   private Integer maxSectionY = Integer.MIN_VALUE;
 
-  private final IntObjectHashMap<SectionData> sections;
+  private final Int2ObjectOpenHashMap<SectionData> sections;
   public byte[] biomes;
   public Collection<CompoundTag> tileEntities;
   public Collection<CompoundTag> entities;
 
   public GenericChunkData() {
-    sections = new IntObjectHashMap<>();
+    sections = new Int2ObjectOpenHashMap<>();
     biomes = new byte[X_MAX * Z_MAX];
   }
 
@@ -52,7 +54,7 @@ public class GenericChunkData implements ChunkData {
       minSectionY = sectionY;
     if(maxSectionY < sectionY)
       maxSectionY = sectionY;
-    SectionData sectionData = sections.getIfAbsentPut(sectionY, () -> new SectionData(sectionY));
+    SectionData sectionData = sections.computeIfAbsent(sectionY, SectionData::new);
     sectionData.blocks[chunkIndex(x & (X_MAX - 1), y & (SECTION_Y_MAX - 1), z & (Z_MAX - 1))] = block;
   }
 
@@ -99,6 +101,14 @@ public class GenericChunkData implements ChunkData {
     entities.clear();
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    GenericChunkData that = (GenericChunkData) o;
+    return Objects.equals(minSectionY, that.minSectionY) && Objects.equals(maxSectionY, that.maxSectionY) && Objects.equals(sections, that.sections) && Arrays.equals(biomes, that.biomes) && Objects.equals(tileEntities, that.tileEntities) && Objects.equals(entities, that.entities);
+  }
+
   private static class SectionData {
     public final int sectionY;
     public final int[] blocks;
@@ -110,6 +120,21 @@ public class GenericChunkData implements ChunkData {
     public SectionData(int sectionY, int[] blocks) {
       this.sectionY = sectionY;
       this.blocks = blocks;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      SectionData that = (SectionData) o;
+      return sectionY == that.sectionY && Arrays.equals(blocks, that.blocks);
+    }
+
+    @Override
+    public int hashCode() {
+      int result = Objects.hash(sectionY);
+      result = 31 * result + Arrays.hashCode(blocks);
+      return result;
     }
   }
 }
