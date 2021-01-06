@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.world;
 
-import com.sun.istack.internal.Nullable;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
