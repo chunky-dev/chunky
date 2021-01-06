@@ -433,6 +433,16 @@ public class PathTracer implements RayTracer {
     emitterRay.d.normalize();
     double indirectEmitterCoef = emitterRay.d.dot(emitterRay.n);
     if(indirectEmitterCoef > 0) {
+      // Here We need to invert the material.
+      // The fact that the dot product is > 0 guarantees that the ray is going away from the surface
+      // it just met. This means the ray is going from the block just hit to the previous material (usually air or water)
+      // TODO If/when normal mapping is implemented, indirectEmitterCoef will be computed with the mapped normal
+      //      but the dot product with the original geometry normal will still need to be computed
+      //      to ensure the emitterRay isn't going through the geometry
+      Material prev = emitterRay.getPrevMaterial();
+      int prevData = emitterRay.getPrevData();
+      emitterRay.setPrevMaterial(emitterRay.getCurrentMaterial(), emitterRay.getCurrentData());
+      emitterRay.setCurrentMaterial(prev, prevData);
       emitterRay.emittance.set(0, 0, 0);
       emitterRay.o.scaleAdd(Ray.EPSILON, emitterRay.d);
       PreviewRayTracer.nextIntersection(scene, emitterRay);
