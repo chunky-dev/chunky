@@ -17,6 +17,7 @@
 package se.llbit.chunky.world;
 
 import se.llbit.chunky.resources.Texture;
+import se.llbit.json.JsonObject;
 import se.llbit.json.JsonString;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Ray;
@@ -24,25 +25,28 @@ import se.llbit.math.Ray;
 public abstract class Material {
 
   /**
+   * Index of refraction of air.
+   */
+  private static final float DEFAULT_IOR = 1.000293f;
+
+  /**
    * The name of this material.
    */
   public final String name;
 
   /**
-   * Index of refraction.
-   * Default value is equal to the IoR for air.
+   * Index of refraction. Default value is equal to the IoR for air.
    */
-  public float ior = 1.000293f;
+  public float ior = DEFAULT_IOR;
 
   /**
-   * A block is opaque if it occupies an entire voxel
-   * and no light can pass through it.
+   * A block is opaque if it occupies an entire voxel and no light can pass through it.
    */
   public boolean opaque = false;
 
   /**
-   * The solid property controls various block behaviours like
-   * if the block connects to fences, gates, walls, etc.
+   * The solid property controls various block behaviours like if the block connects to fences,
+   * gates, walls, etc.
    */
   public boolean solid = true;
 
@@ -57,11 +61,19 @@ public abstract class Material {
   public float emittance = 0;
 
   /**
+   * The (linear) roughness controlling how rough a shiny block appears. A value of 0 makes the
+   * surface perfectly specular, a value of 1 makes it diffuse.
+   */
+  public float roughness = 0f;
+
+  /**
    * Subsurface scattering property.
    */
   public boolean subSurfaceScattering = false;
 
-  /** Base texture. */
+  /**
+   * Base texture.
+   */
   public final Texture texture;
 
   public boolean refractive = false;
@@ -77,11 +89,12 @@ public abstract class Material {
    * Restore the default material properties.
    */
   public void restoreDefaults() {
-    ior = 1.000293f;
+    ior = DEFAULT_IOR;
     opaque = false;
     solid = true;
     specular = 0;
     emittance = 0;
+    roughness = 0;
     subSurfaceScattering = false;
   }
 
@@ -107,9 +120,11 @@ public abstract class Material {
     return new JsonString("mat:" + name);
   }
 
-  public static Material fromJson(JsonValue json) {
-    // TODO: implement this?
-    throw new UnsupportedOperationException("Can not export material as JSON.");
+  public void loadMaterialProperties(JsonObject json) {
+    ior = json.get("ior").floatValue(ior);
+    specular = json.get("specular").floatValue(specular);
+    emittance = json.get("emittance").floatValue(emittance);
+    roughness = json.get("roughness").floatValue(roughness);
   }
 
   public boolean isWater() {
@@ -122,5 +137,13 @@ public abstract class Material {
 
   public boolean isSameMaterial(Material other) {
     return other == this;
+  }
+
+  public double getPerceptualSmoothness() {
+    return 1 - Math.sqrt(roughness);
+  }
+
+  public void setPerceptualSmoothness(double perceptualSmoothness) {
+    roughness = (float) Math.pow(1 - perceptualSmoothness, 2);
   }
 }
