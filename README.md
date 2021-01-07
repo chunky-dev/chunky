@@ -183,6 +183,7 @@ See the file `licenses/commons-math.txt` for the copyright notices.
 * **FastUtil by Sebastiano Vigna**.
   FastUtil is covered by Apache License, version 2.0. 
 See the file `licenses/Apache-2.0.txt` for the full license text.
+See the file `licenses/fast-util.txt` for the copyright notice.
 
 [1]: http://chunky.llbit.se
 [2]: http://chunky.llbit.se/troubleshooting.html

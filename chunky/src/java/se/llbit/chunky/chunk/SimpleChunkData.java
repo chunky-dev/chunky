@@ -19,9 +19,9 @@ import static se.llbit.chunky.world.Chunk.*;
 public class SimpleChunkData implements ChunkData {
 
   private int[] blocks;
-  public byte[] biomes;
-  public Collection<CompoundTag> tileEntities;
-  public Collection<CompoundTag> entities;
+  private byte[] biomes;
+  private Collection<CompoundTag> tileEntities;
+  private Collection<CompoundTag> entities;
 
   public SimpleChunkData() {
     blocks = new int[X_MAX * Y_MAX * Z_MAX];
@@ -33,7 +33,7 @@ public class SimpleChunkData implements ChunkData {
   }
 
   @Override public int maxY() {
-    return 256;
+    return 255;
   }
 
   @Override public int getBlockAt(int x, int y, int z) {

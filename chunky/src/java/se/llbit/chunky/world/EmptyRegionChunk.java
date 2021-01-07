@@ -45,13 +45,13 @@ public class EmptyRegionChunk extends Chunk {
     surface = IconLayer.CORRUPT;
   }
 
-  @Override public synchronized ChunkData getChunkData(ChunkData chunkData, BlockPalette palette) {
-    if (chunkData == null) {
-      chunkData = new GenericChunkData();
+  @Override public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette) {
+    if (reuseChunkData == null) {
+      reuseChunkData = new GenericChunkData();
     } else {
-      chunkData.clear();
+      reuseChunkData.clear();
     }
-    return chunkData;
+    return reuseChunkData;
   }
 
   @Override public void renderSurface(MapTile tile) {

@@ -438,10 +438,10 @@ public class Chunk {
   /**
    * Load the block data for this chunk.
    *
-   * @param chunkData to be reused, if null one is created
+   * @param reuseChunkData to be reused, if null one is created
    * @param palette
    */
-  public synchronized ChunkData getChunkData(ChunkData chunkData, BlockPalette palette) {
+  public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette) {
     Set<String> request = new HashSet<>();
     request.add(DATAVERSION);
     request.add(LEVEL_SECTIONS);
@@ -449,28 +449,28 @@ public class Chunk {
     request.add(LEVEL_ENTITIES);
     request.add(LEVEL_TILEENTITIES);
     Map<String, Tag> data = getChunkData(request);
-    if(chunkData == null) {
-      chunkData = new GenericChunkData();
+    if(reuseChunkData == null) {
+      reuseChunkData = new GenericChunkData();
     } else {
-      chunkData.clear();
+      reuseChunkData.clear();
     }
     // TODO: improve error handling here.
     if (data == null) {
-      return chunkData;
+      return reuseChunkData;
     }
     Tag sections = data.get(LEVEL_SECTIONS);
     Tag biomesTag = data.get(LEVEL_BIOMES);
     Tag entitiesTag = data.get(LEVEL_ENTITIES);
     Tag tileEntitiesTag = data.get(LEVEL_TILEENTITIES);
     if (biomesTag.isByteArray(X_MAX * Z_MAX) || biomesTag.isIntArray(X_MAX * Z_MAX)) {
-      extractBiomeData(biomesTag, chunkData);
+      extractBiomeData(biomesTag, reuseChunkData);
     }
 
     if (sections.isList()) {
-      loadBlockData(data, chunkData, palette);
+      loadBlockData(data, reuseChunkData, palette);
 
       if (entitiesTag.isList()) {
-        Collection<CompoundTag> entities = chunkData.getEntities();
+        Collection<CompoundTag> entities = reuseChunkData.getEntities();
         for (SpecificTag tag : (ListTag) entitiesTag) {
           if (tag.isCompoundTag())
             entities.add((CompoundTag) tag);
@@ -478,14 +478,14 @@ public class Chunk {
       }
 
       if (tileEntitiesTag.isList()) {
-        Collection<CompoundTag> tileEntities = chunkData.getTileEntities();
+        Collection<CompoundTag> tileEntities = reuseChunkData.getTileEntities();
         for (SpecificTag tag : (ListTag) tileEntitiesTag) {
           if (tag.isCompoundTag())
             tileEntities.add((CompoundTag) tag);
         }
       }
     }
-    return chunkData;
+    return reuseChunkData;
   }
 
   /**

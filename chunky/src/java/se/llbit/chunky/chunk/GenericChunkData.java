@@ -22,9 +22,9 @@ public class GenericChunkData implements ChunkData {
   private Integer maxSectionY = Integer.MIN_VALUE;
 
   private final Int2ObjectOpenHashMap<SectionData> sections;
-  public byte[] biomes;
-  public Collection<CompoundTag> tileEntities;
-  public Collection<CompoundTag> entities;
+  private byte[] biomes;
+  private Collection<CompoundTag> tileEntities;
+  private Collection<CompoundTag> entities;
 
   public GenericChunkData() {
     sections = new Int2ObjectOpenHashMap<>();
