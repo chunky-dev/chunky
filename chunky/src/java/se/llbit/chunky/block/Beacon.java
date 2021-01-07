@@ -15,7 +15,7 @@ import se.llbit.nbt.CompoundTag;
 
 public class Beacon extends MinecraftBlockTranslucent {
 
-  public Beacon(boolean beamOn) {
+  public Beacon() {
     super("beacon", Texture.beacon);
     localIntersect = true;
     solid = false;
