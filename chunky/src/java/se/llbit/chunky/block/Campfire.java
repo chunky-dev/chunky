@@ -28,7 +28,7 @@ public class Campfire extends MinecraftBlockTranslucent {
     }
 
     @Override
-    public boolean isBlockEntity() {
+    public boolean isBlockEntity(CompoundTag entityTag) {
         return true;
     }
 

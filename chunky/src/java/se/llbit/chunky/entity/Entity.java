@@ -89,6 +89,8 @@ abstract public class Entity {
         return Book.fromJson(json);
       case "flameParticles":
         return FlameParticles.fromJson(json);
+      case "beaconBeam":
+        return BeaconBeam.fromJson(json);
     }
     return null;
   }

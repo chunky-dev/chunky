@@ -60,7 +60,7 @@ public class WallHead extends MinecraftBlockTranslucent {
   }
 
   @Override
-  public boolean isBlockEntity() {
+  public boolean isBlockEntity(CompoundTag entityTag) {
     return type == Kind.PLAYER;
   }
 

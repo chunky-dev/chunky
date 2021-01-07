@@ -313,6 +313,7 @@ public class Texture {
   public static final Texture potatoes2 = new Texture();
   public static final Texture potatoes3 = new Texture();
   public static final Texture beacon = new Texture();
+  public static final Texture beaconBeam = new Texture();
   public static final Texture anvilSide = new Texture();
   public static final Texture anvilTop = new Texture();
   public static final Texture anvilTopDamaged1 = new Texture();

@@ -40,7 +40,7 @@ public class WallSign extends MinecraftBlockTranslucent {
     return false;
   }
 
-  @Override public boolean isBlockEntity() {
+  @Override public boolean isBlockEntity(CompoundTag entityTag) {
     return true;
   }
 

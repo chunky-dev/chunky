@@ -1427,7 +1427,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "emerald_block":
         return new MinecraftBlock(name, Texture.emeraldBlock);
       case "beacon":
-        return new Beacon();
+
+        return new Beacon(true);
       case "cobblestone_wall":
         return wall(tag, Texture.cobblestone);
       case "mossy_cobblestone_wall":

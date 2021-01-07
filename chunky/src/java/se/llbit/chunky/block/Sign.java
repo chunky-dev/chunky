@@ -25,7 +25,7 @@ public class Sign extends MinecraftBlockTranslucent {
     return false;
   }
 
-  @Override public boolean isBlockEntity() {
+  @Override public boolean isBlockEntity(CompoundTag entityTag) {
     return true;
   }
 
