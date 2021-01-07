@@ -51,6 +51,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
   private final DoubleAdjuster emittance = new DoubleAdjuster();
   private final DoubleAdjuster specular = new DoubleAdjuster();
   private final DoubleAdjuster ior = new DoubleAdjuster();
+  private final DoubleAdjuster perceptualSmoothness = new DoubleAdjuster();
   private final ListView<String> listView;
 
   public MaterialsTab() {
@@ -60,6 +61,8 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     specular.setRange(0, 1);
     ior.setName("IoR");
     ior.setRange(0, 5);
+    perceptualSmoothness.setName("Smoothness");
+    perceptualSmoothness.setRange(0, 1);
     ObservableList<String> blockIds = FXCollections.observableArrayList();
     blockIds.addAll(MaterialStore.collections.keySet());
     blockIds.addAll(ExtraMaterials.idMap.keySet());
@@ -75,7 +78,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
     settings.setSpacing(10);
     settings.getChildren().addAll(
         new Label("Material Properties"),
-        emittance, specular, ior,
+        emittance, specular, perceptualSmoothness, ior,
         new Label("(set to zero to disable)"));
     setPadding(new Insets(10));
     setSpacing(15);
@@ -103,15 +106,18 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       double emAcc = 0;
       double specAcc = 0;
       double iorAcc = 0;
+      double perceptualSmoothnessAcc = 0;
       Collection<Block> blocks = MaterialStore.collections.get(materialName);
       for (Block block : blocks) {
         emAcc += block.emittance;
         specAcc += block.specular;
         iorAcc += block.ior;
+        perceptualSmoothnessAcc += block.getPerceptualSmoothness();
       }
       emittance.set(emAcc / blocks.size());
       specular.set(specAcc / blocks.size());
       ior.set(iorAcc / blocks.size());
+      perceptualSmoothness.set(perceptualSmoothnessAcc / blocks.size());
       materialExists = true;
     } else if (ExtraMaterials.idMap.containsKey(materialName)) {
       Material material = ExtraMaterials.idMap.get(materialName);
@@ -119,6 +125,7 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
         emittance.set(material.emittance);
         specular.set(material.specular);
         ior.set(material.ior);
+        perceptualSmoothness.set(material.getPerceptualSmoothness());
         materialExists = true;
       }
     } else if (MaterialStore.blockIds.contains(materialName)) {
@@ -127,16 +134,19 @@ public class MaterialsTab extends HBox implements RenderControlsTab, Initializab
       emittance.set(block.emittance);
       specular.set(block.specular);
       ior.set(block.ior);
+      perceptualSmoothness.set(block.getPerceptualSmoothness());
       materialExists = true;
     }
     if (materialExists) {
       emittance.onValueChange(value -> scene.setEmittance(materialName, value.floatValue()));
       specular.onValueChange(value -> scene.setSpecular(materialName, value.floatValue()));
       ior.onValueChange(value -> scene.setIor(materialName, value.floatValue()));
+      perceptualSmoothness.onValueChange(value -> scene.setPerceptualSmoothness(materialName, value.floatValue()));
     } else {
       emittance.onValueChange(value -> {});
       specular.onValueChange(value -> {});
       ior.onValueChange(value -> {});
+      perceptualSmoothness.onValueChange(value -> {});
     }
   }
 

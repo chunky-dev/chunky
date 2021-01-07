@@ -324,11 +324,75 @@ public class Ray {
   /**
    * Set this ray to the specular reflection of the input ray.
    */
-  public final void specularReflection(Ray ray) {
+  public final void specularReflection(Ray ray, Random random) {
     set(ray);
-    d.scaleAdd(-2 * ray.d.dot(ray.n), ray.n, ray.d);
-    o.scaleAdd(0.00001, ray.n);
     currentMaterial = prevMaterial;
+
+    double roughness = ray.getCurrentMaterial().roughness;
+    if (roughness > Ray.EPSILON) {
+      // For rough specular reflections, we interpolate linearly between the diffuse ray direction and the specular direction,
+      // which is inspired by https://blog.demofox.org/2020/06/06/casual-shadertoy-path-tracing-2-image-improvement-and-glossy-reflections/
+      // This gives good-looking results, although a microfacet-based model would be more physically correct.
+
+      // 1. get specular reflection direction
+      Vector3 specularDirection = new Vector3(d);
+      specularDirection.scaleAdd(-2 * ray.d.dot(ray.n), ray.n, ray.d);
+
+      // 2. get diffuse reflection direction (stored in this.d)
+      // get random point on unit disk
+      double x1 = random.nextDouble();
+      double x2 = random.nextDouble();
+      double r = FastMath.sqrt(x1);
+      double theta = 2 * Math.PI * x2;
+
+      // project to point on hemisphere in tangent space
+      double tx = r * FastMath.cos(theta);
+      double ty = r * FastMath.sin(theta);
+      double tz = FastMath.sqrt(1 - x1);
+
+      // transform from tangent space to world space
+      double xx, xy, xz;
+      double ux, uy, uz;
+      double vx, vy, vz;
+
+      if (QuickMath.abs(n.x) > .1) {
+        xx = 0;
+        xy = 1;
+        xz = 0;
+      } else {
+        xx = 1;
+        xy = 0;
+        xz = 0;
+      }
+
+      ux = xy * n.z - xz * n.y;
+      uy = xz * n.x - xx * n.z;
+      uz = xx * n.y - xy * n.x;
+
+      r = 1 / FastMath.sqrt(ux * ux + uy * uy + uz * uz);
+
+      ux *= r;
+      uy *= r;
+      uz *= r;
+
+      vx = uy * n.z - uz * n.y;
+      vy = uz * n.x - ux * n.z;
+      vz = ux * n.y - uy * n.x;
+
+      d.x = ux * tx + vx * ty + n.x * tz;
+      d.y = uy * tx + vy * ty + n.y * tz;
+      d.z = uz * tx + vz * ty + n.z * tz;
+
+      // 3. scale d to be roughness * dDiffuse + (1 - roughness) * dSpecular
+      d.scale(roughness);
+      d.scaleAdd(1 - roughness, specularDirection);
+      d.normalize();
+      o.scaleAdd(0.00001, d);
+    } else {
+      // roughness is zero, do a specular reflection
+      d.scaleAdd(-2 * ray.d.dot(ray.n), ray.n, ray.d);
+      o.scaleAdd(0.00001, ray.n);
+    }
   }
 
   /**

@@ -3005,17 +3005,14 @@ public class Scene implements JsonSerializable, Refreshable {
       JsonValue properties = materials.get(name);
       if (properties != null) {
         palette.updateProperties(name, block -> {
-          block.emittance = properties.asObject().get("emittance").floatValue(block.emittance);
-          block.specular = properties.asObject().get("specular").floatValue(block.specular);
-          block.ior = properties.asObject().get("ior").floatValue(block.ior);
+          block.loadMaterialProperties(properties.asObject());
         });
       }
     });
-    ExtraMaterials.idMap.forEach((name, material) -> {JsonValue properties = materials.get(name);
+    ExtraMaterials.idMap.forEach((name, material) -> {
+      JsonValue properties = materials.get(name);
       if (properties != null) {
-        material.emittance = properties.asObject().get("emittance").floatValue(material.emittance);
-        material.specular = properties.asObject().get("specular").floatValue(material.specular);
-        material.ior = properties.asObject().get("ior").floatValue(material.ior);
+        material.loadMaterialProperties(properties.asObject());
       }});
   }
 
@@ -3025,9 +3022,7 @@ public class Scene implements JsonSerializable, Refreshable {
     if (value != null) {
       JsonObject properties = value.object();
       for (Material material : materials) {
-        material.emittance = properties.get("emittance").floatValue(material.emittance);
-        material.specular = properties.get("specular").floatValue(material.specular);
-        material.ior = properties.get("ior").floatValue(material.ior);
+        material.loadMaterialProperties(properties);
       }
     }
   }
@@ -3058,6 +3053,16 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setIor(String materialName, float value) {
     JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
     material.set("ior", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
+   * Modifies the roughness property for the given material.
+   */
+  public void setPerceptualSmoothness(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("roughness", Json.of(Math.pow(1 - value, 2)));
     materials.put(materialName, material);
     refresh(ResetReason.MATERIALS_CHANGED);
   }
