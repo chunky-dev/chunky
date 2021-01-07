@@ -68,21 +68,19 @@ public class BeaconBeam extends Entity implements Poseable {
     return primitives(Transform.NONE
         .translate(-0.5, -0.5, -0.5)
         .scale(scale)
-        .rotateX(allPose.x)
-        .rotateY(allPose.y)
-        .rotateZ(allPose.z)
+        .rotateY(allPose.y) // Ignore x and z rotation because it breaks the beam into segments
         .translate(0.5, 0.5, 0.5)
         .translate(position.x + offset.x, position.y + offset.y, position.z + offset.z));
   }
 
   public Collection<Primitive> primitives(Transform transform) {
     Collection<Primitive> faces = new LinkedList<>();
-    //Have 1 block tall model and repeat it for height.
+    //Have 1 block tall model and repeat it for height * scale.
     //This addresses the texture stretching problem and
     //allows for the height to be changed.
     for (int i = 0; i < height; i++) {
       for (Quad quad : beam) {
-        quad.addTriangles(faces, beaconBeamMaterial, transform.translate(0.0, 1.0 * i, 0.0));
+        quad.addTriangles(faces, beaconBeamMaterial, transform.translate(0.0, 1.0 * i * scale, 0.0));
       }
     }
     return faces;
