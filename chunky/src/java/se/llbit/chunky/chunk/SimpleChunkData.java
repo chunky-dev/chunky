@@ -19,12 +19,14 @@ public class SimpleChunkData implements ChunkData {
 
   private int[] blocks;
   private byte[] biomes;
-  private Collection<CompoundTag> tileEntities;
-  private Collection<CompoundTag> entities;
+  private final Collection<CompoundTag> tileEntities;
+  private final Collection<CompoundTag> entities;
 
   public SimpleChunkData() {
     blocks = new int[X_MAX * Y_MAX * Z_MAX];
     biomes = new byte[X_MAX * Z_MAX];
+    tileEntities = new ArrayList<>();
+    entities = new ArrayList<>();
   }
 
   @Override public int minY() {
@@ -56,9 +58,6 @@ public class SimpleChunkData implements ChunkData {
   }
 
   @Override public Collection<CompoundTag> getTileEntities() {
-    if(tileEntities == null) {
-      tileEntities = new ArrayList<>();
-    }
     return tileEntities;
   }
 
@@ -68,9 +67,6 @@ public class SimpleChunkData implements ChunkData {
   }
 
   @Override public Collection<CompoundTag> getEntities() {
-    if(entities == null) {
-      entities = new ArrayList<>();
-    }
     return entities;
   }
 

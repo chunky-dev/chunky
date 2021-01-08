@@ -22,12 +22,14 @@ public class GenericChunkData implements ChunkData {
 
   private final Int2ObjectOpenHashMap<SectionData> sections;
   private byte[] biomes;
-  private Collection<CompoundTag> tileEntities;
-  private Collection<CompoundTag> entities;
+  private final Collection<CompoundTag> tileEntities;
+  private final Collection<CompoundTag> entities;
 
   public GenericChunkData() {
     sections = new Int2ObjectOpenHashMap<>();
     biomes = new byte[X_MAX * Z_MAX];
+    tileEntities = new ArrayList<>();
+    entities = new ArrayList<>();
   }
 
   @Override public int minY() {
@@ -65,9 +67,6 @@ public class GenericChunkData implements ChunkData {
   }
 
   @Override public Collection<CompoundTag> getTileEntities() {
-    if(tileEntities == null) {
-      tileEntities = new ArrayList<>();
-    }
     return tileEntities;
   }
 
@@ -77,9 +76,6 @@ public class GenericChunkData implements ChunkData {
   }
 
   @Override public Collection<CompoundTag> getEntities() {
-    if(entities == null) {
-      entities = new ArrayList<>();
-    }
     return entities;
   }
 
