@@ -3,16 +3,17 @@ package se.llbit.chunky.entity;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.TextureMaterial;
-import se.llbit.json.Json;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
-import se.llbit.math.*;
+import se.llbit.math.Quad;
+import se.llbit.math.Transform;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
-import se.llbit.nbt.CompoundTag;
 import se.llbit.util.JsonUtil;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 public class BeaconBeam extends Entity implements Poseable {
 
@@ -74,7 +75,7 @@ public class BeaconBeam extends Entity implements Poseable {
   }
 
   public Collection<Primitive> primitives(Transform transform) {
-    Collection<Primitive> faces = new LinkedList<>();
+    ArrayList<Primitive> faces = new ArrayList<>();
     //Have 1 block tall model and repeat it for height * scale.
     //This addresses the texture stretching problem and
     //allows for the height to be changed.
