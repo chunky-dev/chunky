@@ -261,7 +261,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         IntegerAdjuster height = new IntegerAdjuster();
         height.setName("Height");
         height.setTooltip("Modifies the height of the beam. Useful if your scene is taller than the world height.");
-        height.set(256);
+        height.set(beam.getHeight());
         height.setRange(1, 512);
         height.onValueChange(value -> {
           beam.setHeight(value);
