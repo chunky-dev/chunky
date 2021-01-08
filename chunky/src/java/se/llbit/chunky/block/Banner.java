@@ -30,7 +30,7 @@ public class Banner extends MinecraftBlockTranslucent {
     return false;
   }
 
-  @Override public boolean isBlockEntity(CompoundTag entityTag) {
+  @Override public boolean isBlockEntity() {
     return true;
   }
 

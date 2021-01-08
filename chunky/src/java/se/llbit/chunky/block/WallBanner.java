@@ -40,7 +40,7 @@ public class WallBanner extends MinecraftBlockTranslucent {
     return false;
   }
 
-  @Override public boolean isBlockEntity(CompoundTag entityTag) {
+  @Override public boolean isBlockEntity() {
     return true;
   }
 

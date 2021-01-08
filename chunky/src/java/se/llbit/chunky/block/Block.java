@@ -58,7 +58,7 @@ public abstract class Block extends Material {
     return name;
   }
 
-  public boolean isBlockEntity(CompoundTag entityTag) {
+  public boolean isBlockEntity() {
     return false;
   }
 

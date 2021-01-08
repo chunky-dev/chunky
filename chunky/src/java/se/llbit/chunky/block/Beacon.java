@@ -28,11 +28,14 @@ public class Beacon extends MinecraftBlockTranslucent {
   @Override
   public boolean isBlockWithEntity() { return true; }
 
-  @Override public boolean isBlockEntity(CompoundTag entityTag) {
-    return entityTag.get("Levels").intValue(0) > 0;
+  @Override public boolean isBlockEntity() {
+    return true;
   }
 
   @Override public Entity toBlockEntity(Vector3 position, CompoundTag entityTag) {
-    return new BeaconBeam(position);
+    if (entityTag.get("Levels").intValue(0) > 0) {
+      return new BeaconBeam(position);
+    }
+    return null;
   }
 }
