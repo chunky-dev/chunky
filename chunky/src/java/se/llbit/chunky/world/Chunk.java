@@ -470,18 +470,16 @@ public class Chunk {
       loadBlockData(data, reuseChunkData, palette);
 
       if (entitiesTag.isList()) {
-        Collection<CompoundTag> entities = reuseChunkData.getEntities();
         for (SpecificTag tag : (ListTag) entitiesTag) {
           if (tag.isCompoundTag())
-            entities.add((CompoundTag) tag);
+            reuseChunkData.addEntity((CompoundTag) tag);
         }
       }
 
       if (tileEntitiesTag.isList()) {
-        Collection<CompoundTag> tileEntities = reuseChunkData.getTileEntities();
         for (SpecificTag tag : (ListTag) tileEntitiesTag) {
           if (tag.isCompoundTag())
-            tileEntities.add((CompoundTag) tag);
+            reuseChunkData.addTileEntity((CompoundTag) tag);
         }
       }
     }

@@ -18,7 +18,7 @@ package se.llbit.chunky.world;
 
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
-import se.llbit.chunky.chunk.GenericChunkData;
+import se.llbit.chunky.chunk.EmptyChunkData;
 import se.llbit.chunky.map.IconLayer;
 import se.llbit.chunky.map.MapTile;
 
@@ -47,7 +47,7 @@ public class EmptyRegionChunk extends Chunk {
 
   @Override public synchronized ChunkData getChunkData(ChunkData reuseChunkData, BlockPalette palette) {
     if (reuseChunkData == null) {
-      reuseChunkData = new GenericChunkData();
+      reuseChunkData = new EmptyChunkData();
     } else {
       reuseChunkData.clear();
     }

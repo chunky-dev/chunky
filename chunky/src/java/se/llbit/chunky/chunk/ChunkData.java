@@ -15,13 +15,13 @@ import java.util.Collection;
  */
 public interface ChunkData {
   /**
-   * Minimum block Y in this chunk
+   * Minimum INCLUSIVE block Y in this chunk
    * @return Can return a set value or adapt to blocks added
    */
   int minY();
 
   /**
-   * Maximum block Y in this chunk
+   * Maximum INCLUSIVE block Y in this chunk
    * @return Can return a set value or adapt to blocks added
    */
   int maxY();
@@ -51,16 +51,26 @@ public interface ChunkData {
   boolean isBlockOnEdge(int x, int y, int z);
 
   /**
-   * Will be added to at any point
    * @return Collection of the tile entities in the chunk
    */
-  @NotNull Collection<CompoundTag> getTileEntities();
+  Collection<CompoundTag> getTileEntities();
 
   /**
-   * Will be added to at any point
+   * Adds a tile entity to the chunk
+   * @param tileEntity the tile entity to be added
+   */
+  void addTileEntity(CompoundTag tileEntity);
+
+  /**
    * @return Collection of the entities in the chunk
    */
-  @NotNull Collection<CompoundTag> getEntities();
+  Collection<CompoundTag> getEntities();
+
+  /**
+   * Adds an entity to the chunk
+   * @param entity the entity to be added
+   */
+  void addEntity(CompoundTag entity);
 
   /**
    * @param x X position of the requested biome

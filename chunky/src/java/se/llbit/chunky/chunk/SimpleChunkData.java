@@ -2,7 +2,6 @@ package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.world.Chunk;
 import se.llbit.nbt.CompoundTag;
-import se.llbit.util.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,18 +55,28 @@ public class SimpleChunkData implements ChunkData {
     return false;
   }
 
-  @NotNull @Override public Collection<CompoundTag> getTileEntities() {
+  @Override public Collection<CompoundTag> getTileEntities() {
     if(tileEntities == null) {
       tileEntities = new ArrayList<>();
     }
     return tileEntities;
   }
 
-  @NotNull @Override public Collection<CompoundTag> getEntities() {
+  @Override
+  public void addTileEntity(CompoundTag tileEntity) {
+    tileEntities.add(tileEntity);
+  }
+
+  @Override public Collection<CompoundTag> getEntities() {
     if(entities == null) {
       entities = new ArrayList<>();
     }
     return entities;
+  }
+
+  @Override
+  public void addEntity(CompoundTag entity) {
+    entities.add(entity);
   }
 
   @Override public byte getBiomeAt(int x, int y, int z) {
