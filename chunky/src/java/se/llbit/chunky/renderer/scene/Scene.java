@@ -26,6 +26,7 @@ import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.Lectern;
@@ -228,7 +229,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected Vector3i origin = new Vector3i();
 
-  protected int yMax = 0;
+  protected int yMax = 256;
   protected int yMin = 0;
 
   private BlockPalette palette;
@@ -742,19 +743,8 @@ public class Scene implements JsonSerializable, Refreshable {
       return;
     }
 
-    ChunkData chunkData = null;
     Set<ChunkPosition> loadedChunks = new HashSet<>();
     int numChunks = 0;
-
-    List<ChunkData> loadedChunkData = new ArrayList<>();
-    palette = new BlockPalette();
-
-    for (ChunkPosition cp : chunksToLoad) {
-      chunkData = world.getChunk(cp).getChunkData(null, palette);
-      loadedChunkData.add(chunkData);
-      yMin = Math.min(yMin, chunkData.minY());
-      yMax = Math.max(yMax, chunkData.maxY()+1);
-    }
 
     try (TaskTracker.Task task = progress.task("Loading regions")) {
       task.update(2, 1);
@@ -770,6 +760,7 @@ public class Scene implements JsonSerializable, Refreshable {
       int requiredDepth = calculateOctreeOrigin(chunksToLoad);
 
       // Create new octree to fit all chunks.
+      palette = new BlockPalette();
       worldOctree = new Octree(octreeImplementation, requiredDepth);
       waterOctree = new Octree(octreeImplementation, requiredDepth);
       if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
@@ -815,11 +806,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Heightmap biomeIdMap = new Heightmap();
 
+    yMin = Math.max(0, yClipMin);
+    yMax = Math.min(256, yClipMax);
+
+    ChunkData chunkData = new SimpleChunkData();
+
     try (TaskTracker.Task task = progress.task("Loading chunks")) {
       int done = 1;
       int target = chunksToLoad.size();
-
-      int dataIdx = 0;
       for (ChunkPosition cp : chunksToLoad) {
         task.update(target, done);
         done += 1;
@@ -830,10 +824,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
         loadedChunks.add(cp);
 
-        chunkData = loadedChunkData.get(dataIdx);
-        dataIdx++;
-        int yMin = chunkData.minY();
-        int yMax = chunkData.maxY()+1;
+        world.getChunk(cp).getChunkData(chunkData, palette);
         numChunks += 1;
 
         int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
