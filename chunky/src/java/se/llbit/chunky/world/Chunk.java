@@ -203,9 +203,8 @@ public class Chunk {
     if (data == null) {
       biomes = IconLayer.CORRUPT;
     } else {
-      byte[] biomeData = new byte[X_MAX * Z_MAX];
       extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
-      biomes = new BiomeLayer(biomeData);
+      biomes = new BiomeLayer(chunkData);
     }
   }
 
