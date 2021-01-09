@@ -459,10 +459,6 @@ public class Octree {
 
     double distance = Ray.EPSILON;
 
-    int x = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
-    int y = (int) QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
-    int z = (int) QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
-
     // floating point division are slower than multiplication so we cache them
     // We also try to limit the number of time the ray origin is updated
     // as it would require to recompute those values
@@ -479,6 +475,9 @@ public class Octree {
     while (true) {
       // Add small offset past the intersection to avoid
       // recursion to the same octree node!
+      int x = (int) Math.floor(ray.o.x + ray.d.x * distance);
+      int y = (int) Math.floor(ray.o.y + ray.d.y * distance);
+      int z = (int) Math.floor(ray.o.z + ray.d.z * distance);
 
       int lx = x >>> depth;
       int ly = y >>> depth;
@@ -517,9 +516,6 @@ public class Octree {
           offsetX = -ray.o.x * invDx;
           offsetY = -ray.o.y * invDy;
           offsetZ = -ray.o.z * invDz;
-          x = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
-          y = (int) QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
-          z = (int) QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
           continue;
         } else {
           // Exit ray from this local block.
@@ -528,9 +524,6 @@ public class Octree {
           offsetX = -ray.o.x * invDx;
           offsetY = -ray.o.y * invDy;
           offsetZ = -ray.o.z * invDz;
-          x = (int) QuickMath.floor(ray.o.x + ray.d.x * Ray.OFFSET);
-          y = (int) QuickMath.floor(ray.o.y + ray.d.y * Ray.OFFSET);
-          z = (int) QuickMath.floor(ray.o.z + ray.d.z * Ray.OFFSET);
           continue;
         }
       } else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Air.INSTANCE) {
@@ -590,10 +583,9 @@ public class Octree {
         nx = ny = 0;
       }
 
+      ray.n.set(nx, ny, nz);
+
       distance = tNear + Ray.EPSILON;
-      x = (int) QuickMath.floor(ray.o.x + ray.d.x * (distance + Ray.OFFSET));
-      y = (int) QuickMath.floor(ray.o.y + ray.d.y * (distance + Ray.OFFSET));
-      z = (int) QuickMath.floor(ray.o.z + ray.d.z * (distance + Ray.OFFSET));
     }
   }
 
