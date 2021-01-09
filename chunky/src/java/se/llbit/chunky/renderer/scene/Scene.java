@@ -25,6 +25,8 @@ import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.Lectern;
@@ -226,6 +228,9 @@ public class Scene implements JsonSerializable, Refreshable {
    * Octree origin.
    */
   protected Vector3i origin = new Vector3i();
+
+  protected int yMax = 256;
+  protected int yMin = 0;
 
   private BlockPalette palette;
   private Octree worldOctree;
@@ -801,11 +806,10 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Heightmap biomeIdMap = new Heightmap();
 
-    int yMin = Math.max(0, yClipMin);
-    int yMax = Math.min(256, yClipMax);
+    yMin = Math.max(0, yClipMin);
+    yMax = Math.min(256, yClipMax);
 
-    int[] blocks = new int[Chunk.X_MAX * Chunk.Y_MAX * Chunk.Z_MAX];
-    byte[] biomes = new byte[Chunk.X_MAX * Chunk.Z_MAX];
+    ChunkData chunkData = new SimpleChunkData();
 
     try (TaskTracker.Task task = progress.task("Loading chunks")) {
       int done = 1;
@@ -820,10 +824,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
         loadedChunks.add(cp);
 
-        Collection<CompoundTag> tileEntities = new LinkedList<>();
-        Collection<CompoundTag> chunkEntities = new LinkedList<>();
-        world.getChunk(cp).getBlockData(blocks, biomes, tileEntities, chunkEntities,
-            palette);
+        world.getChunk(cp).getChunkData(chunkData, palette);
         numChunks += 1;
 
         int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
@@ -832,13 +833,13 @@ public class Scene implements JsonSerializable, Refreshable {
           int wz = cz + wz0;
           for (int cx = 0; cx < 16; ++cx) {
             int wx = cx + wx0;
-            int biomeId = 0xFF & biomes[Chunk.chunkXZIndex(cx, cz)];
+            int biomeId = 0xFF & chunkData.getBiomeAt(cx, 0, cz); // TODO add vertical biomes support (1.15+)
             biomeIdMap.set(biomeId, wx, wz);
           }
         }
 
         // Load entities from the chunk:
-        for (CompoundTag tag : chunkEntities) {
+        for (CompoundTag tag : chunkData.getEntities()) {
           Tag posTag = tag.get("Pos");
           if (posTag.isList()) {
             ListTag pos = posTag.asList();
@@ -861,31 +862,28 @@ public class Scene implements JsonSerializable, Refreshable {
           }
         }
 
-        for (int cy = yMin; cy < yMax; ++cy) {
+        for (int cy = yMin; cy < yMax; ++cy) { //Uses chunk min and max, rather than globa - minor optimisation for pre1.13 worlds
           for (int cz = 0; cz < 16; ++cz) {
             int z = cz + cp.z * 16 - origin.z;
             for (int cx = 0; cx < 16; ++cx) {
               int x = cx + cp.x * 16 - origin.x;
-              int index = Chunk.chunkIndex(cx, cy, cz);
 
               // Change the type of hidden blocks to ANY_TYPE
-              boolean notOnEdge =
-                  (cy > yMin && cy < yMax - 1)
-                      && (cx > 0 && cx < 15)
-                      && (cz > 0 && cz < 15);
+              boolean notOnEdge = !chunkData.isBlockOnEdge(cx, cy, cz);
               boolean isHidden = notOnEdge
-                  && palette.get(blocks[Chunk.chunkIndex(cx + 1, cy, cz)]).opaque
-                  && palette.get(blocks[Chunk.chunkIndex(cx - 1, cy, cz)]).opaque
-                  && palette.get(blocks[Chunk.chunkIndex(cx, cy + 1, cz)]).opaque
-                  && palette.get(blocks[Chunk.chunkIndex(cx, cy - 1, cz)]).opaque
-                  && palette.get(blocks[Chunk.chunkIndex(cx, cy, cz + 1)]).opaque
-                  && palette.get(blocks[Chunk.chunkIndex(cx, cy, cz - 1)]).opaque;
+                  && palette.get(chunkData.getBlockAt(cx + 1, cy, cz)).opaque
+                  && palette.get(chunkData.getBlockAt(cx - 1, cy, cz)).opaque
+                  && palette.get(chunkData.getBlockAt(cx, cy + 1, cz)).opaque
+                  && palette.get(chunkData.getBlockAt(cx, cy - 1, cz)).opaque
+                  && palette.get(chunkData.getBlockAt(cx, cy, cz + 1)).opaque
+                  && palette.get(chunkData.getBlockAt(cx, cy, cz - 1)).opaque;
 
               if (isHidden) {
                 worldOctree.set(Octree.ANY_TYPE, x, cy - origin.y, z);
               } else {
-                Octree.Node octNode = new Octree.Node(blocks[index]);
-                Block block = palette.get(blocks[index]);
+                int currentBlock = chunkData.getBlockAt(cx, cy, cz);
+                Octree.Node octNode = new Octree.Node(currentBlock);
+                Block block = palette.get(currentBlock);
 
                 if (block.isEntity()) {
                   Vector3 position = new Vector3(cx + cp.x * 16, cy, cz + cp.z * 16);
@@ -929,9 +927,7 @@ public class Scene implements JsonSerializable, Refreshable {
                 if (block.isWaterFilled()) {
                   Octree.Node waterNode = new Octree.Node(palette.waterId);
                   if (cy + 1 < yMax) {
-                    int above = Chunk.chunkIndex(cx, cy + 1, cz);
-                    Block aboveBlock = palette.get(blocks[above]);
-                    if (aboveBlock.isWaterFilled()) {
+                    if (palette.get(chunkData.getBlockAt(cx, cy + 1, cz)).isWaterFilled()) {
                       waterNode = new Octree.Node(palette.getWaterId(8, 1 << Water.FULL_BLOCK));
                     }
                   }
@@ -949,32 +945,32 @@ public class Scene implements JsonSerializable, Refreshable {
                         int corner2 = level0;
                         int corner3 = level0;
 
-                        int level = Chunk.waterLevelAt(blocks, palette, cx - 1, cy, cz, level0);
+                        int level = Chunk.waterLevelAt(chunkData, palette, cx - 1, cy, cz, level0);
                         corner3 += level;
                         corner0 += level;
 
-                        level = Chunk.waterLevelAt(blocks, palette, cx - 1, cy, cz + 1, level0);
+                        level = Chunk.waterLevelAt(chunkData, palette, cx - 1, cy, cz + 1, level0);
                         corner0 += level;
 
-                        level = Chunk.waterLevelAt(blocks, palette, cx, cy, cz + 1, level0);
+                        level = Chunk.waterLevelAt(chunkData, palette, cx, cy, cz + 1, level0);
                         corner0 += level;
                         corner1 += level;
 
-                        level = Chunk.waterLevelAt(blocks, palette, cx + 1, cy, cz + 1, level0);
+                        level = Chunk.waterLevelAt(chunkData, palette, cx + 1, cy, cz + 1, level0);
                         corner1 += level;
 
-                        level = Chunk.waterLevelAt(blocks, palette, cx + 1, cy, cz, level0);
+                        level = Chunk.waterLevelAt(chunkData, palette, cx + 1, cy, cz, level0);
                         corner1 += level;
                         corner2 += level;
 
-                        level = Chunk.waterLevelAt(blocks, palette, cx + 1, cy, cz - 1, level0);
+                        level = Chunk.waterLevelAt(chunkData, palette, cx + 1, cy, cz - 1, level0);
                         corner2 += level;
 
-                        level = Chunk.waterLevelAt(blocks, palette, cx, cy, cz - 1, level0);
+                        level = Chunk.waterLevelAt(chunkData, palette, cx, cy, cz - 1, level0);
                         corner2 += level;
                         corner3 += level;
 
-                        level = Chunk.waterLevelAt(blocks, palette, cx - 1, cy, cz - 1, level0);
+                        level = Chunk.waterLevelAt(chunkData, palette, cx - 1, cy, cz - 1, level0);
                         corner3 += level;
 
                         corner0 = Math.min(7, 8 - (corner0 / 4));
@@ -991,9 +987,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   }
                   waterOctree.set(waterNode, x, cy - origin.y, z);
                 } else if (cy + 1 < yMax && block instanceof Lava) {
-                  int above = Chunk.chunkIndex(cx, cy + 1, cz);
-                  Block aboveBlock = palette.get(blocks[above]);
-                  if (aboveBlock instanceof Lava) {
+                  if (palette.get(chunkData.getBlockAt(cx, cy+1, cz)) instanceof Lava) {
                     octNode = new Octree.Node(
                         palette.getLavaId(((Lava) block).level, 1 << Water.FULL_BLOCK));
                   } else if (notOnEdge) {
@@ -1005,32 +999,32 @@ public class Scene implements JsonSerializable, Refreshable {
                     int corner2 = level0;
                     int corner3 = level0;
 
-                    int level = Chunk.lavaLevelAt(blocks, palette, cx - 1, cy, cz, level0);
+                    int level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, cy, cz, level0);
                     corner3 += level;
                     corner0 += level;
 
-                    level = Chunk.lavaLevelAt(blocks, palette, cx - 1, cy, cz + 1, level0);
+                    level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, cy, cz + 1, level0);
                     corner0 += level;
 
-                    level = Chunk.lavaLevelAt(blocks, palette, cx, cy, cz + 1, level0);
+                    level = Chunk.lavaLevelAt(chunkData, palette, cx, cy, cz + 1, level0);
                     corner0 += level;
                     corner1 += level;
 
-                    level = Chunk.lavaLevelAt(blocks, palette, cx + 1, cy, cz + 1, level0);
+                    level = Chunk.lavaLevelAt(chunkData, palette, cx + 1, cy, cz + 1, level0);
                     corner1 += level;
 
-                    level = Chunk.lavaLevelAt(blocks, palette, cx + 1, cy, cz, level0);
+                    level = Chunk.lavaLevelAt(chunkData, palette, cx + 1, cy, cz, level0);
                     corner1 += level;
                     corner2 += level;
 
-                    level = Chunk.lavaLevelAt(blocks, palette, cx + 1, cy, cz - 1, level0);
+                    level = Chunk.lavaLevelAt(chunkData, palette, cx + 1, cy, cz - 1, level0);
                     corner2 += level;
 
-                    level = Chunk.lavaLevelAt(blocks, palette, cx, cy, cz - 1, level0);
+                    level = Chunk.lavaLevelAt(chunkData, palette, cx, cy, cz - 1, level0);
                     corner2 += level;
                     corner3 += level;
 
-                    level = Chunk.lavaLevelAt(blocks, palette, cx - 1, cy, cz - 1, level0);
+                    level = Chunk.lavaLevelAt(chunkData, palette, cx - 1, cy, cz - 1, level0);
                     corner3 += level;
 
                     corner0 = Math.min(7, 8 - (corner0 / 4));
@@ -1060,17 +1054,16 @@ public class Scene implements JsonSerializable, Refreshable {
         // Block entities are also called "tile entities". These are extra bits of metadata
         // about certain blocks or entities.
         // Block entities are loaded after the base block data so that metadata can be updated.
-        for (CompoundTag entityTag : tileEntities) {
+        for (CompoundTag entityTag : chunkData.getTileEntities()) {
           int y = entityTag.get("y").intValue(0);
           if (y >= yClipMin && y <= yClipMax) {
             int x = entityTag.get("x").intValue(0) - wx0; // Chunk-local coordinates.
             int z = entityTag.get("z").intValue(0) - wz0;
-            int index = Chunk.chunkIndex(x, y, z);
-            if (index < 0 || index >= blocks.length) {
+            if (x < 0 || x > 15 || z < 0 || z > 15) {
               // Block entity is out of range (bad chunk data?), ignore it
               continue;
             }
-            Block block = palette.get(blocks[index]);
+            Block block = palette.get(chunkData.getBlockAt(x, y, z));
             // Metadata is the old block data (to be replaced in future Minecraft versions?).
             Vector3 position = new Vector3(x + wx0, y, z + wz0);
             if (block.isBlockEntity()) {
@@ -1261,11 +1254,11 @@ public class Scene implements JsonSerializable, Refreshable {
     zmin *= 16;
     zmax *= 16;
 
-    int maxDimension = Math.max(Chunk.Y_MAX, Math.max(xmax - xmin, zmax - zmin));
+    int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
     int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
 
     int xroom = (1 << requiredDepth) - (xmax - xmin);
-    int yroom = (1 << requiredDepth) - Chunk.Y_MAX;
+    int yroom = (1 << requiredDepth) - (yMax - yMin);
     int zroom = (1 << requiredDepth) - (zmax - zmin);
 
     origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
@@ -1315,7 +1308,8 @@ public class Scene implements JsonSerializable, Refreshable {
     zmax *= 16;
     int xcenter = (xmax + xmin) / 2;
     int zcenter = (zmax + zmin) / 2;
-    for (int y = Chunk.Y_MAX - 1; y >= 0; --y) {
+    int ycenter = (yMax + yMin) / 2;
+    for (int y = ycenter+128; y >= ycenter-128; --y) {
       Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
           palette);
       if (!(block instanceof Air)) {

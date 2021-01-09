@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.map;
 
+import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.math.ColorUtil;
@@ -28,16 +29,19 @@ public class BiomeLayer extends BitmapLayer {
   /**
    * Load biome IDs into layer.
    */
-  public BiomeLayer(byte[] chunkBiomes) {
+  public BiomeLayer(ChunkData chunkData) {
     biomes = new byte[Chunk.X_MAX * Chunk.Z_MAX];
-    System.arraycopy(chunkBiomes, 0, biomes, 0, biomes.length);
     double[] sum = new double[3];
     double[] rgb = new double[3];
-    for (byte biome : biomes) {
-      ColorUtil.getRGBComponents(Biomes.getColor(biome), rgb);
-      sum[0] += rgb[0];
-      sum[1] += rgb[1];
-      sum[2] += rgb[2];
+    for(int x = 0; x < Chunk.X_MAX; x++) {
+      for(int z = 0; z < Chunk.Z_MAX; z++) {
+        byte biome = chunkData.getBiomeAt(x, 0, z);
+        biomes[Chunk.chunkXZIndex(x, z)] = biome;
+        ColorUtil.getRGBComponents(Biomes.getColor(biome), rgb);
+        sum[0] += rgb[0];
+        sum[1] += rgb[1];
+        sum[2] += rgb[2];
+      }
     }
     sum[0] /= biomes.length;
     sum[1] /= biomes.length;

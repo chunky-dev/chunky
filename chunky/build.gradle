@@ -6,6 +6,7 @@ mainClassName = 'se.llbit.chunky.main.Chunky'
 archivesBaseName = 'chunky-core'
 
 dependencies {
+  compile 'it.unimi.dsi:fastutil:8.4.4'
   compile 'org.apache.commons:commons-math3:3.2'
   compile configurations.nbtlib
   compile configurations.cplib
