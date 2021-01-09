@@ -42,6 +42,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import se.llbit.chunky.entity.ArmorStand;
+import se.llbit.chunky.entity.BeaconBeam;
 import se.llbit.chunky.entity.Book;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.entity.Geared;
@@ -52,6 +53,7 @@ import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
+import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
@@ -253,6 +255,19 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
           });
           controls.getChildren().add(page2Angle);
         }
+      }
+      else if(entity instanceof BeaconBeam) {
+        BeaconBeam beam = (BeaconBeam) entity;
+        IntegerAdjuster height = new IntegerAdjuster();
+        height.setName("Height");
+        height.setTooltip("Modifies the height of the beam. Useful if your scene is taller than the world height.");
+        height.set(beam.getHeight());
+        height.setRange(1, 512);
+        height.onValueChange(value -> {
+          beam.setHeight(value);
+          scene.rebuildActorBvh();
+        });
+        controls.getChildren().add(height);
       }
 
       DoubleAdjuster scale = new DoubleAdjuster();

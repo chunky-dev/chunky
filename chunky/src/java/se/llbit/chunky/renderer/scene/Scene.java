@@ -1068,6 +1068,9 @@ public class Scene implements JsonSerializable, Refreshable {
             Vector3 position = new Vector3(x + wx0, y, z + wz0);
             if (block.isBlockEntity()) {
               Entity blockEntity = block.toBlockEntity(position, entityTag);
+              if (blockEntity == null) {
+                continue;
+              }
               if (blockEntity instanceof Poseable) {
                 // don't add the actor again if it was already loaded from json
                 if (actors.stream().noneMatch(actor -> {
