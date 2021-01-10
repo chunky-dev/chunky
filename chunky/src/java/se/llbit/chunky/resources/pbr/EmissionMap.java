@@ -1,41 +1,20 @@
 package se.llbit.chunky.resources.pbr;
 
-import se.llbit.chunky.resources.BitmapImage;
-
 public interface EmissionMap {
 
   EmissionMap EMPTY = new EmissionMap() {
-    @Override
-    public boolean load(BitmapImage texture) {
-      return false;
-    }
-
-    @Override
-    public double getEmittanceAt(double u, double v) {
-      return 0;
-    }
-  };
-
-  EmissionMap DEFAULT = new EmissionMap() {
-    @Override
-    public boolean load(BitmapImage texture) {
-      return false;
-    }
-
     @Override
     public double getEmittanceAt(double u, double v) {
       return 1;
     }
   };
 
-  /**
-   * Load the emission map from the given texture. If this returns false, there is no emission map
-   * available.
-   *
-   * @param texture Texture in ARGB format
-   * @return true if the texture contains an emission map, false otherwise
-   */
-  boolean load(BitmapImage texture);
+  EmissionMap DEFAULT = new EmissionMap() {
+    @Override
+    public double getEmittanceAt(double u, double v) {
+      return 1;
+    }
+  };
 
   /**
    * Get the emittance at the given texture coordinate.
