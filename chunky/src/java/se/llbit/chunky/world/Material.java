@@ -64,7 +64,7 @@ public abstract class Material {
    * The (linear) roughness controlling how rough a shiny block appears. A value of 0 makes the
    * surface perfectly specular, a value of 1 makes it diffuse.
    */
-  public float roughness = 0f;
+  public float roughness = 0;
 
   /**
    * The metalness value controls how metal-y a block appears. In reality this is a boolean value
