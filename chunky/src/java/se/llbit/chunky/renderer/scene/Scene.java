@@ -726,6 +726,7 @@ public class Scene implements JsonSerializable, Refreshable {
       ray.color.set(r.color);
       ray.emittanceValue = r.emittanceValue;
       ray.reflectanceValue = r.reflectanceValue;
+      ray.roughnessValue = r.roughnessValue;
       ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
       ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
       hit = true;
@@ -739,6 +740,7 @@ public class Scene implements JsonSerializable, Refreshable {
         ray.color.set(r.color);
         ray.emittanceValue = r.emittanceValue;
         ray.reflectanceValue = r.reflectanceValue;
+        ray.roughnessValue = r.roughnessValue;
         ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
         ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
         hit = true;
@@ -754,6 +756,7 @@ public class Scene implements JsonSerializable, Refreshable {
         ray.color.set(r.color);
         ray.emittanceValue = r.emittanceValue;
         ray.reflectanceValue = r.reflectanceValue;
+        ray.roughnessValue = r.roughnessValue;
         ray.setPrevMaterial(r.getPrevMaterial(), r.getPrevData());
         ray.setCurrentMaterial(r.getCurrentMaterial(), r.getCurrentData());
         hit = true;
