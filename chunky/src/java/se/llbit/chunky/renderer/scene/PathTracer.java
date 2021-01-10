@@ -70,6 +70,7 @@ public class PathTracer implements RayTracer {
           ray.color.set(0, 0, 0, 1);
           ray.emittanceValue = 0;
           ray.reflectanceValue = 0;
+          ray.roughnessValue = 0;
           hit = true;
         } else if (ray.depth == 0) {
           // Direct sky hit.
@@ -172,6 +173,7 @@ public class PathTracer implements RayTracer {
       ray.color.set(0, 0, 0, 1);
       ray.emittanceValue = 0;
       ray.reflectanceValue = 0;
+      ray.roughnessValue = 0;
       if (firstReflection) {
         airDistance = ray.distance;
       }

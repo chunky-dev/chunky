@@ -1635,6 +1635,7 @@ public class Texture {
     }
     if (ray.getCurrentMaterial().specular > 0) {
       ray.reflectanceValue = getReflectanceAt(ray.u, ray.v);
+      ray.roughnessValue = getRoughnessAt(ray.u, ray.v);
     }
   }
 

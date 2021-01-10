@@ -79,6 +79,11 @@ public class Ray {
   public double reflectanceValue = 0;
 
   /**
+   * The smoothness of the previously intersected surface.
+   */
+  public double roughnessValue = 0;
+
+  /**
    * Emittance of previously intersected surface (used for emitter sampling).
    */
   public Vector3 emittance = new Vector3();
@@ -162,6 +167,7 @@ public class Ray {
     emittance.set(0, 0, 0);
     emittanceValue = 0;
     reflectanceValue = 0;
+    roughnessValue = 0;
     specular = true;
   }
 
@@ -181,6 +187,7 @@ public class Ray {
     emittance.set(0, 0, 0);
     emittanceValue = 0;
     reflectanceValue = 0;
+    roughnessValue = 0;
     specular = other.specular;
   }
 
@@ -446,7 +453,7 @@ public class Ray {
     set(ray);
     currentMaterial = prevMaterial;
 
-    double roughness = ray.getCurrentMaterial().roughness;
+    double roughness = 1 - (1 - ray.roughnessValue) * (1 - ray.getCurrentMaterial().roughness);
     if (roughness > Ray.EPSILON) {
       // For rough specular reflections, we interpolate linearly between the diffuse ray direction and the specular direction,
       // which is inspired by https://blog.demofox.org/2020/06/06/casual-shadertoy-path-tracing-2-image-improvement-and-glossy-reflections/
