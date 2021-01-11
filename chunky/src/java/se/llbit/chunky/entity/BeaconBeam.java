@@ -74,7 +74,7 @@ public class BeaconBeam extends Entity implements Poseable {
   public Collection<Primitive> primitives(Vector3 offset) {
     Vector3 allPose = JsonUtil.vec3FromJsonArray(this.pose.get("all"));
     ArrayList<Primitive> faces = new ArrayList<>();
-    BeaconBeamMaterial using = new BeaconBeamMaterial(0x000000);
+    BeaconBeamMaterial using = new BeaconBeamMaterial(0xFFFFFF);
     //Have 1 block tall model and repeat it for height * scale.
     //This addresses the texture stretching problem and
     //allows for the height to be changed.
