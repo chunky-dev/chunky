@@ -1,12 +1,6 @@
 package se.llbit.chunky.entity;
 
-import se.llbit.chunky.block.Beacon;
-import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.resources.texturepack.ColoredTexture;
-import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.BeaconBeamMaterial;
-import se.llbit.chunky.world.material.TextureMaterial;
-import se.llbit.json.JsonArray;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
