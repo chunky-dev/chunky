@@ -1,8 +1,13 @@
 package se.llbit.chunky.entity;
 
+import se.llbit.chunky.block.Beacon;
 import se.llbit.chunky.resources.Texture;
+import se.llbit.chunky.resources.texturepack.ColoredTexture;
 import se.llbit.chunky.world.Material;
+import se.llbit.chunky.world.material.BeaconBeamMaterial;
 import se.llbit.chunky.world.material.TextureMaterial;
+import se.llbit.json.JsonArray;
+import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Quad;
@@ -14,10 +19,10 @@ import se.llbit.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BeaconBeam extends Entity implements Poseable {
-
-  public static final Material beaconBeamMaterial = new TextureMaterial(Texture.beaconBeam);
 
   private static final Quad[] beam = new Quad[]{
       new Quad(
@@ -49,6 +54,7 @@ public class BeaconBeam extends Entity implements Poseable {
   private final JsonObject pose;
   private double scale = 1;
   private int height = 256;
+  private Map<Integer, BeaconBeamMaterial> materials = new HashMap<>();
 
   public BeaconBeam(Vector3 position) {
     super(position);
@@ -61,18 +67,30 @@ public class BeaconBeam extends Entity implements Poseable {
     this.scale = json.get("scale").asDouble(1);
     this.height = json.get("height").asInt(256);
     this.pose = json.get("pose").object();
+
+    JsonObject materialsList = json.get("beamMaterials").object();
+    for (JsonMember obj : materialsList.members) {
+      BeaconBeamMaterial mat = new BeaconBeamMaterial(0xFFFFFF);
+      mat.loadMaterialProperties(obj.value.object());
+      materials.put(Integer.parseInt(obj.name), mat);
+    }
   }
 
   @Override
   public Collection<Primitive> primitives(Vector3 offset) {
     Vector3 allPose = JsonUtil.vec3FromJsonArray(this.pose.get("all"));
     ArrayList<Primitive> faces = new ArrayList<>();
+    BeaconBeamMaterial using = new BeaconBeamMaterial(0x000000);
     //Have 1 block tall model and repeat it for height * scale.
     //This addresses the texture stretching problem and
     //allows for the height to be changed.
     for (int i = 0; i < height; i++) {
+      if (materials.containsKey(i)) {
+        using = materials.get(i);
+      }
+
       for (Quad quad : beam) {
-        quad.addTriangles(faces, beaconBeamMaterial,
+        quad.addTriangles(faces, using,
             Transform.NONE.translate(-0.5, -0.5, -0.5)
                 .scale(scale)
                 .translate(0.0, i * scale, 0.0)
@@ -95,6 +113,16 @@ public class BeaconBeam extends Entity implements Poseable {
     json.add("height", height);
     json.add("scale", getScale());
     json.add("pose", pose);
+
+    JsonObject materialsList = new JsonObject();
+    for (int i : materials.keySet()) {
+      BeaconBeamMaterial material = materials.get(i);
+      JsonObject object = new JsonObject(materials.size());
+      material.saveMaterialProperties(object);
+      materialsList.add(String.valueOf(i), object);
+    }
+
+    json.add("beamMaterials", materialsList);
     return json;
   }
 
@@ -133,5 +161,9 @@ public class BeaconBeam extends Entity implements Poseable {
 
   public void setHeight(int height) {
     this.height = height;
+  }
+
+  public Map<Integer, BeaconBeamMaterial> getMaterials() {
+    return materials;
   }
 }
