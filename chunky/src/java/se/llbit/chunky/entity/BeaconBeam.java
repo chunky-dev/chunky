@@ -54,6 +54,7 @@ public class BeaconBeam extends Entity implements Poseable {
     super(position);
     this.pose = new JsonObject();
     pose.add("all", JsonUtil.vec3ToJson(new Vector3(0, 0, 0)));
+    materials.put(0, new BeaconBeamMaterial(0xFFFFFF));
   }
 
   public BeaconBeam(JsonObject json) {

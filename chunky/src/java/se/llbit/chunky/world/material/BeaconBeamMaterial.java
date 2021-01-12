@@ -17,10 +17,14 @@ public class BeaconBeamMaterial extends Material {
         updateColor(color);
     }
 
-    private void updateColor(int color) {
+    public void updateColor(int color) {
         this.color = color;
         ColorUtil.getRGBAComponents(color, beamColor);
         ColorUtil.toLinear(beamColor);
+    }
+
+    public int getColorInt() {
+        return color;
     }
 
     @Override
