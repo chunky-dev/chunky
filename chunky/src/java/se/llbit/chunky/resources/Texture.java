@@ -21,6 +21,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.texturepack.FontTexture;
+import se.llbit.fxutil.FxImageUtil;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -1166,7 +1167,7 @@ public class Texture {
 
   public Image fxImage() {
     if (fxImage == null) {
-      fxImage = ImageTools.toFxImage(image);
+      fxImage = FxImageUtil.toFxImage(image);
     }
     return fxImage;
   }
