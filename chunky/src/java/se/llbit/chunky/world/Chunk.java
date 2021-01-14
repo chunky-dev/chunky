@@ -268,18 +268,17 @@ public class Chunk {
   /** Detect Minecraft version that generated the chunk. */
   private static String chunkVersion(@NotNull Map<String, Tag> data) {
     Tag sections = data.get(LEVEL_SECTIONS);
-    String version = "?";
     if (sections.isList()) {
-      version = "1.13";
       for (SpecificTag section : sections.asList()) {
         if (!section.get("Palette").isList()) {
-          if (!version.equals("?") && section.get("Blocks").isByteArray(SECTION_BYTES)) {
-            version = "1.12";
+          if (section.get("Blocks").isByteArray(SECTION_BYTES)) {
+            return "1.12";
           }
         }
       }
+      return "1.13";
     }
-    return version;
+    return "?";
   }
 
   private static void loadBlockData(@NotNull Map<String, Tag> data, @NotNull ChunkData chunkData,

@@ -222,10 +222,9 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   @Override public boolean pollSceneStateChange() {
     if (scene.shouldRefresh() && (scene.getForceReset() || resetHandler.allowSceneRefresh())) {
       return true;
-    } else if (scene.getMode() != storedScene.getMode()) {
-      return true;
+    } else {
+      return scene.getMode() != storedScene.getMode();
     }
-    return false;
   }
 
   @Override public void withSceneProtected(Consumer<Scene> fun) {
