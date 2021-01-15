@@ -34,31 +34,28 @@ import java.io.IOException;
 public class UILogReceiver extends Receiver {
 
   private ChunkyErrorDialog errorDialog = null;
+  private ChunkyErrorDialog warningDialog = null;
 
   @Override public void logEvent(Level level, final String message) {
+    Platform.runLater(() -> {
+      createOrGetDialogContainer(level).addMessageAndShow(message);
+    });
+  }
+
+  private ChunkyErrorDialog createOrGetDialogContainer(Level level) {
     switch (level) {
       case INFO:
       case WARNING:
-        Platform.runLater(() -> {
-          Alert warning = Dialogs.createAlert(Alert.AlertType.WARNING);
-          warning.setContentText(message);
-          warning.show();
-        });
-        break;
+        if (warningDialog == null)
+          try { warningDialog = new ChunkyErrorDialog(level); }
+          catch (IOException e) { throw new Error("Failed to create warning dialog", e); }
+        return warningDialog;
       case ERROR:
-        Platform.runLater(() -> {
-          if (errorDialog == null) {
-            try {
-              errorDialog = new ChunkyErrorDialog();
-            } catch (IOException e) {
-              throw new Error("Failed to create error dialog", e);
-            }
-          }
-          errorDialog.addErrorMessage(message);
-          errorDialog.show();
-        });
-        break;
+      default:
+        if (errorDialog == null)
+          try { errorDialog = new ChunkyErrorDialog(level); }
+          catch (IOException e) { throw new Error("Failed to create error dialog", e); }
+        return errorDialog;
     }
   }
-
 }

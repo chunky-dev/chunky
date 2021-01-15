@@ -17,7 +17,13 @@
 package se.llbit.log;
 
 public enum Level {
-  ERROR,
-  WARNING,
-  INFO
+  ERROR("Error"),
+  WARNING("Warning"),
+  INFO("Info");
+
+  public final String name;
+
+  Level(String name) {
+    this.name = name;
+  }
 }
