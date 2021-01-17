@@ -62,11 +62,11 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
     FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlName(errorType)));
     loader.setController(this);
     Parent root = loader.load();
-    setTitle(errorType.name+" Summary");
+    setTitle(errorType.name + " Summary");
     getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
     setScene(new Scene(root));
     addEventFilter(KeyEvent.ANY, e -> {
-      if (e.getCode() == KeyCode.ESCAPE && e.getEventType()==KeyEvent.KEY_RELEASED) {
+      if (e.getCode() == KeyCode.ESCAPE && e.getEventType() == KeyEvent.KEY_RELEASED) {
         e.consume();
         close();
       }

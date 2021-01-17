@@ -46,15 +46,23 @@ public class UILogReceiver extends Receiver {
     switch (level) {
       case INFO:
       case WARNING:
-        if (warningDialog == null)
-          try { warningDialog = new ChunkyErrorDialog(level); }
-          catch (IOException e) { throw new Error("Failed to create warning dialog", e); }
+        if (warningDialog == null) {
+          try { 
+            warningDialog = new ChunkyErrorDialog(level); 
+          } catch (IOException e) { 
+            throw new Error("Failed to create warning dialog", e); 
+          }
+        }
         return warningDialog;
       case ERROR:
       default:
-        if (errorDialog == null)
-          try { errorDialog = new ChunkyErrorDialog(level); }
-          catch (IOException e) { throw new Error("Failed to create error dialog", e); }
+        if (errorDialog == null) {
+          try { 
+            errorDialog = new ChunkyErrorDialog(level); 
+          } catch (IOException e) {
+            throw new Error("Failed to create error dialog", e); 
+          }
+        }
         return errorDialog;
     }
   }
