@@ -346,7 +346,30 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           .rotateZ(headPose.z)
           .translate(0, (28 - 4) / 16.0, 0)
           .chain(worldTransform);
-      addModel(faces, getHelmModel(headItem), transform);
+      String headItemId = headItem.get("id").asString("");
+      if (headItemId.equals("minecraft:dragon_head")) {
+        SkullEntity skull = new SkullEntity(new Vector3(), Kind.DRAGON, 0, 1);
+        faces.addAll(skull.dragonHeadPrimitives(Transform.NONE.translate(0.5, 0.5, 0.5).scale(1.2).chain(transform)));
+      } else if (headItemId.equals("minecraft:carved_pumpkin")) {
+        Box hat = new Box(-4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16., -4.25 / 16., 4.25 / 16.);
+        hat.transform(Transform.NONE
+            .translate(0, 4 / 16., 0)
+            .scale(headScale)
+            .rotateX(headPose.x)
+            .rotateY(headPose.y)
+            .rotateZ(headPose.z)
+            .translate(0, -4 / 16., 0)
+            .translate(0, 28.2 / 16., 0)
+            .chain(worldTransform));
+        hat.addFrontFaces(faces, Texture.pumpkinFront, new Vector4(0, 1, 0, 1));
+        hat.addBackFaces(faces, Texture.pumpkinSide, new Vector4(1, 0, 0, 1));
+        hat.addLeftFaces(faces, Texture.pumpkinSide, new Vector4(0, 1, 0, 1));
+        hat.addRightFaces(faces, Texture.pumpkinSide, new Vector4(0, 1, 0, 1));
+        hat.addTopFaces(faces, Texture.pumpkinTop, new Vector4(1, 0, 1, 0));
+        hat.addBottomFaces(faces, Texture.pumpkinTop, new Vector4(0, 1, 0, 1));
+      } else {
+        addModel(faces, getHelmModel(headItem), transform);
+      }
     }
 
     // Add chest armor.
@@ -714,6 +737,9 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           if (!skin.isEmpty()) {
             texture = HeadEntity.downloadTexture(skin);
           }
+          break;
+        case "carved_pumpkin":
+          // nothing to do but this item is supported
           break;
         default:
           Log.warnf("Unknown item ID: %s%n", id);
