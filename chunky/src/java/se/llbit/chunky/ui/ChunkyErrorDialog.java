@@ -62,7 +62,7 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
     FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlName(errorType)));
     loader.setController(this);
     Parent root = loader.load();
-    setTitle(errorType.name + " Summary");
+    setTitle(getLevelName(errorType) + " Summary");
     getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
     setScene(new Scene(root));
     addEventFilter(KeyEvent.ANY, e -> {
@@ -109,7 +109,7 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
     BorderPane.setMargin(dismiss, new Insets(10, 0, 0, 0));
     pane.setBottom(dismiss);
 
-    Tab tab = new Tab(type.name + " " + messageCount, pane);
+    Tab tab = new Tab(getLevelName(type) + " " + messageCount, pane);
     tabPane.getTabs().add(tab);
 
     dismiss.setOnAction(event -> {
@@ -120,15 +120,27 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
     });
   }
 
-  private String fxmlName(Level l)
+  private String fxmlName(Level level)
   {
-    switch (l) {
-      default:
-        // To prevent crash should this happen (it shouldn't), use Error.
-      case ERROR:
-        return "DialogError.fxml";
+    switch (level) {
       case WARNING:
-        return "DialogWarning.fxml";
+        return "WarningDialog.fxml";
+      case ERROR:
+      default: // To prevent crash should this happen (it shouldn't), use Error.
+        return "ErrorDialog.fxml";
+    }
+  }
+
+  private String getLevelName(Level level) {
+    switch (level) {
+      case WARNING:
+        return "Warning";
+      case ERROR:
+        return "Error";
+      case INFO:
+        return "Info";
+      default:
+        return ""; // should never happen
     }
   }
 }
