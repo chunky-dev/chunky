@@ -201,9 +201,7 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
         .rotateZ(allPose.z)
         .translate(worldOffset);
     Collection<Primitive> primitives = new LinkedList<>();
-    if (!gear.get("head").object().get("id").stringValue("").equals("minecraft:player_head") &&
-        !gear.get("head").object().get("id").stringValue("").equals("minecraft:skull")
-    ) {
+    if (!shouldHidePlayerHead(gear.get("head").object().get("id").stringValue(""))) {
       Box head = new Box(-4 / 16., 4 / 16., -4 / 16., 4 / 16., -4 / 16., 4 / 16.);
       head.transform(Transform.NONE
           .translate(0, 4 / 16., 0)
@@ -307,6 +305,21 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
 
     addArmor(primitives, gear, pose, armWidth, worldTransform, headScale);
     return primitives;
+  }
+
+  private static boolean shouldHidePlayerHead(String helmetItemId) {
+    switch (helmetItemId) {
+      case "minecraft:skull":
+      case "minecraft:skeleton_skull":
+      case "minecraft:player_head":
+      case "minecraft:zombie_head":
+      case "minecraft:wither_skeleton_skull":
+      case "minecraft:creeper_head":
+      case "minecraft:dragon_head":
+        return true;
+      default:
+        return false;
+    }
   }
 
   public static void addArmor(Collection<Primitive> faces,
@@ -544,8 +557,11 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
           json = parseJson(skullJson);
           break;
       }
-    } else if (id.equals("minecraft:player_head")) {
+    } else if (id.equals("minecraft:player_head") || id.equals("minecraft:zombie_head")) {
       json = parseJson(headJson);
+    } else if (id.equals("minecraft:skeleton_skull") || id.equals("minecraft:wither_skeleton_skull")
+        || id.equals("minecraft:creeper_head")) {
+      json = parseJson(skullJson);
     }
     Map<String, Texture> textureMap = Collections.singletonMap("#texture", getTexture(item));
     return new CubeModel(JsonModel.fromJson(json), 16, textureMap);
@@ -619,13 +635,27 @@ public class PlayerEntity extends Entity implements Poseable, Geared {
               break;
             case 5:
               // Dragon head.
-              // TODO: fixme
-              textureId = "entity/skeleton/wither_skeleton";
+              textureId = "entity/enderdragon/dragon";
               break;
           }
           loader = simpleTexture(textureId, texture);
           break;
         }
+        case "skeleton_skull":
+          loader = simpleTexture("entity/skeleton/skeleton", texture);
+          break;
+        case "wither_skeleton_skull":
+          loader = simpleTexture("entity/skeleton/wither_skeleton", texture);
+          break;
+        case "zombie_head":
+          loader = simpleTexture("entity/zombie/zombie", texture);
+          break;
+        case "creeper_head":
+          loader = simpleTexture("entity/creeper/creeper", texture);
+          break;
+        case "dragon_head":
+          loader = simpleTexture("entity/enderdragon/dragon", texture);
+          break;
         case "leather_boots":
         case "leather_helmet":
         case "leather_chestplate":

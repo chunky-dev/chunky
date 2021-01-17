@@ -472,8 +472,7 @@ public class ArmorStand extends Entity implements Poseable, Geared {
         .rotateY(allPose.y)
         .rotateZ(allPose.z)
         .translate(worldOffset);
-    PlayerEntity.addArmor(primitives, gear, pose, armWidth, worldTransform,
-        headScale);
+    PlayerEntity.addArmor(primitives, gear, pose, armWidth, worldTransform, headScale);
 
     Transform transform = Transform.NONE.translate(-0.5, 0, -0.5).translate(worldOffset);
 
