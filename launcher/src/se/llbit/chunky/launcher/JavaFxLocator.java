@@ -60,9 +60,9 @@ public class JavaFxLocator {
     // add the options again so the launcher can use them for chunky
     cmd.add("--javaOptions");
     StringBuilder javaOptions = new StringBuilder();
-    javaOptions.append("--module-path ");
+    javaOptions.append("--module-path \\\"");
     javaOptions.append(javafxDir.toAbsolutePath().toString());
-    javaOptions.append(" --add-modules ");
+    javaOptions.append("\\\" --add-modules ");
     javaOptions.append("javafx.controls,javafx.fxml");
     cmd.add(javaOptions.toString());
 
