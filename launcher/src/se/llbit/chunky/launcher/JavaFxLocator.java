@@ -60,9 +60,10 @@ public class JavaFxLocator {
     // add the options again so the launcher can use them for chunky
     cmd.add("--javaOptions");
     StringBuilder javaOptions = new StringBuilder();
-    javaOptions.append("--module-path \\\"");
-    javaOptions.append(javafxDir.toAbsolutePath().toString());
-    javaOptions.append("\\\" --add-modules ");
+    javaOptions.append("--module-path ");
+    // Escape the path twice to make the second launcher pass the options to Chunky retaining the double speechmarks (fixes paths with spaces)
+    javaOptions.append("\\\"" + javafxDir.toAbsolutePath().toString() + "\\\"");
+    javaOptions.append(" --add-modules ");
     javaOptions.append("javafx.controls,javafx.fxml");
     cmd.add(javaOptions.toString());
 
