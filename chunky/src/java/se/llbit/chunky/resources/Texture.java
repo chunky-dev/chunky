@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -1017,14 +1018,12 @@ public class Texture {
     // Gamma correct the texture.
     avgColorLinear = new float[] {0, 0, 0, 0};
 
-    int[] data = image.data;
     width = image.width;
     height = image.height;
     float[] pixelBuffer = new float[4];
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
-        int index = width * y + x;
-        ColorUtil.getRGBAComponentsGammaCorrected(data[index], pixelBuffer);
+        ColorUtil.getRGBAComponentsGammaCorrected(image.getPixel(x,y), pixelBuffer);
         avgColorLinear[0] += pixelBuffer[3] * pixelBuffer[0];
         avgColorLinear[1] += pixelBuffer[3] * pixelBuffer[1];
         avgColorLinear[2] += pixelBuffer[3] * pixelBuffer[2];
@@ -1087,7 +1086,7 @@ public class Texture {
     if(useAverageColor)
       return avgColorFlat;
     float[] result = new float[4];
-    ColorUtil.getRGBAComponentsGammaCorrected(image.data[width*y + x], result);
+    ColorUtil.getRGBAComponentsGammaCorrected(image.getPixel(x, y), result);
     return result;
   }
 
@@ -1171,11 +1170,6 @@ public class Texture {
       fxImage = FxImageUtil.toFxImage(image);
     }
     return fxImage;
-  }
-
-  /** Access the raw image data for this texture. */
-  public int[] getData() {
-    return image.data;
   }
 
   public BitmapImage getBitmap() {

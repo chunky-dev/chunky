@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -54,13 +55,12 @@ public class SkymapTexture extends Texture {
       float[] c = new float[4];
       for (int y = y0; y <= y1; ++y) {
         for (int x = x0; x <= x1; ++x) {
-          int index = width * y + x;
-          ColorUtil.getRGBAComponents(image.data[index], c);
+          ColorUtil.getRGBAComponents(image.getPixel(x, y), c);
           ColorUtil.getRGBAComponents(image.getPixel(x, y), c);
           c[0] = (float) FastMath.pow(c[0], Scene.DEFAULT_GAMMA);
           c[1] = (float) FastMath.pow(c[1], Scene.DEFAULT_GAMMA);
           c[2] = (float) FastMath.pow(c[2], Scene.DEFAULT_GAMMA);
-          image.data[index] = ColorUtil.getRGB(c);
+          image.setPixel(x, y, ColorUtil.getRGB(c));
         }
       }
     }

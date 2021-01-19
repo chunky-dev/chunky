@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
+import java.util.function.LongConsumer;
+import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
@@ -53,7 +55,7 @@ abstract class DumpFormat {
       readSamples(
         inputStream,
         scene,
-        pixelProgress -> updateTask(task, scene, pixelProgress)
+        pixelProgress -> updateTask(task, scene, (int)pixelProgress) // TODO fix progress reporting for long indexes
       );
     }
   }
@@ -74,17 +76,17 @@ abstract class DumpFormat {
   protected void readSamples(
     DataInputStream inputStream,
     Scene scene,
-    IntConsumer pixelProgress
+    LongConsumer pixelProgress
   ) throws IOException {
-    double[] buffer = scene.getSampleBuffer();
+    SampleBuffer buffer = scene.getSampleBuffer();
     readSamples(
       inputStream,
       scene,
       (pixelIndex, r, g, b) -> {
-        int index = 3 * pixelIndex;
-        buffer[index] = r;
-        buffer[index + 1] = g;
-        buffer[index + 2] = b;
+        long index = 3 * pixelIndex;
+        buffer.set(index, r);
+        buffer.set(index + 1, g);
+        buffer.set(index + 2, b);
       },
       pixelProgress
     );
@@ -102,7 +104,7 @@ abstract class DumpFormat {
       int previousSpp = scene.spp;
       long previousRenderTime = scene.renderTime;
       readHeader(inputStream, scene);
-      mergeSamples(inputStream, previousSpp, scene, task::update);
+      mergeSamples(inputStream, previousSpp, scene, progress -> task.update((int) progress)); // TODO fix task progress for long indexes
       scene.spp += previousSpp;
       scene.renderTime += previousRenderTime;
     }
@@ -112,20 +114,18 @@ abstract class DumpFormat {
     DataInputStream inputStream,
     int previousSpp,
     Scene scene,
-    IntConsumer pixelProgress
+    LongConsumer pixelProgress
   ) throws IOException {
     int dumpSpp = scene.spp;
     double sa = previousSpp / (double) (previousSpp + dumpSpp);
     double sb = 1 - sa;
-    double[] buffer = scene.getSampleBuffer();
+    SampleBuffer buffer = scene.getSampleBuffer();
     readSamples(
       inputStream,
       scene,
       (pixelIndex, r, g, b) -> {
-        int index = 3 * pixelIndex;
-        buffer[index] = buffer[index] * sa + r * sb;
-        buffer[index + 1] = buffer[index + 1] * sa + g * sb;
-        buffer[index + 2] = buffer[index + 2] * sa + b * sb;
+        long index = 3 * pixelIndex;
+        buffer.addSample(index, sa, sb, r, g, b);
       },
       pixelProgress
     );
@@ -135,7 +135,7 @@ abstract class DumpFormat {
     DataInputStream inputStream,
     Scene scene,
     PixelConsumer consumer,
-    IntConsumer pixelProgress
+    LongConsumer pixelProgress
   ) throws IOException;
 
   public void save(
@@ -151,7 +151,7 @@ abstract class DumpFormat {
       writeSamples(
         outputStream,
         scene,
-        pixelProgress -> updateTask(task, scene, pixelProgress)
+        pixelProgress -> updateTask(task, scene, (int) pixelProgress) // TODO fix task updates for long values
       );
       outputStream.flush();
     }
@@ -170,7 +170,7 @@ abstract class DumpFormat {
   protected abstract void writeSamples(
     DataOutputStream outputStream,
     Scene scene,
-    IntConsumer pixelProgress
+    LongConsumer pixelProgress
   ) throws IOException;
 
   private void updateTask(

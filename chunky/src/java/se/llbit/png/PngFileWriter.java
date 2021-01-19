@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2015 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -19,6 +20,9 @@ package se.llbit.png;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+
+import se.llbit.chunky.renderer.scene.SampleBuffer;
+import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.util.TaskTracker;
 
 import java.io.DataOutputStream;
@@ -75,16 +79,15 @@ public class PngFileWriter implements AutoCloseable {
   /**
    * Write the image to a PNG file.
    */
-  public void write(int[] data, int width, int height, TaskTracker.Task task)
+  public void write(BitmapImage data, int width, int height, TaskTracker.Task task)
       throws IOException {
     writeChunk(new IHDR(width, height));
     IDATWriter idat = new IDATWriter();
-    int i = 0;
     for (int y = 0; y < height; ++y) {
       task.update(height, y);
       idat.write(IDAT.FILTER_TYPE_NONE); // Scanline header.
       for (int x = 0; x < width; ++x) {
-        int rgb = data[i++];
+        int rgb = data.getPixel(x, y);
         idat.write((rgb >> 16) & 0xFF);
         idat.write((rgb >> 8) & 0xFF);
         idat.write(rgb & 0xFF);
@@ -97,21 +100,19 @@ public class PngFileWriter implements AutoCloseable {
   /**
    * Write the image to a PNG file.
    */
-  public void write(int[] data, byte[] alpha, int width, int height,
-      TaskTracker.Task task) throws IOException {
+  public void write(BitmapImage data, SampleBuffer alpha, int width, int height,
+                    TaskTracker.Task task) throws IOException {
     writeChunk(new IHDR(width, height, IHDR.COLOR_TYPE_RGBA));
     IDATWriter idat = new IDATWriter();
-    int i = 0;
     for (int y = 0; y < height; ++y) {
       task.update(height, y);
       idat.write(IDAT.FILTER_TYPE_NONE); // Scanline header.
       for (int x = 0; x < width; ++x) {
-        int rgb = data[i];
+        int rgb = data.getPixel(x,y);
         idat.write((rgb >> 16) & 0xFF);
         idat.write((rgb >> 8) & 0xFF);
         idat.write(rgb & 0xFF);
-        idat.write(alpha[i]);
-        i += 1;
+        idat.write(alpha.alphaGet(x,y));
       }
       task.update(height, y + 1);
     }

@@ -1,4 +1,5 @@
-/* Copyright (c) 2016-2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -57,6 +58,16 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private static final WritablePixelFormat<IntBuffer> PIXEL_FORMAT =
       PixelFormat.getIntArgbInstance();
 
+  // This sets the maximum "Render Preview" canvas size to 4k by 4k,
+  // for sizes any larger cause a strange crash in JavaFX.
+  // Currently, this only shows the 4k by 4k top-left corner of renders
+  // which are larger than this. Future task: be able to pan around on
+  // the Render Preview canvas. (Kind-of exists, but again, loading the
+  // whole image leads to mysterious crashes.)
+  // Oh, and also, the crash happens at different minimum canvas sizes
+  // unique to each computer.
+  private static final int MAX_CANVAS_SIZE = 4096;
+
   private final se.llbit.chunky.renderer.scene.Scene renderScene;
 
   private WritableImage image;
@@ -86,7 +97,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     synchronized (scene) {
       canvas.setWidth(scene.width);
       canvas.setHeight(scene.height);
-      image = new WritableImage(scene.width, scene.height);
+      image = new WritableImage(
+            Math.min(scene.width, MAX_CANVAS_SIZE),
+            Math.min(scene.height, MAX_CANVAS_SIZE));
     }
 
     canvasPane = new StackPane(canvas);
@@ -299,10 +312,13 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   public void forceRepaint() {
     painting.set(true);
     renderer.withBufferedImage(bitmap -> {
-      if (bitmap.width == (int) image.getWidth()
-          && bitmap.height == (int) image.getHeight()) {
-        image.getPixelWriter().setPixels(0, 0, bitmap.width, bitmap.height, PIXEL_FORMAT,
-            bitmap.data, 0, bitmap.width);
+      int width = Math.min(bitmap.width, MAX_CANVAS_SIZE);
+      int height = Math.min(bitmap.height, MAX_CANVAS_SIZE);
+      if (width == (int) image.getWidth()
+          && height == (int) image.getHeight()) {
+        for (int row = 0; row < height; row++)
+          image.getPixelWriter().setPixels(0, row, width, 1, PIXEL_FORMAT,
+              bitmap.getRow_Unsafe(row), 0, width);
       }
     });
     Platform.runLater(() -> {
@@ -330,10 +346,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
    * Should only be called on the JavaFX application thread.
    */
   public void setCanvasSize(int width, int height) {
-    canvas.setWidth(width);
-    canvas.setHeight(height);
+    canvas.setWidth(Math.min(width, MAX_CANVAS_SIZE));
+    canvas.setHeight(Math.min(height, MAX_CANVAS_SIZE));
     if (image == null || width != image.getWidth() || height != image.getHeight()) {
-      image = new WritableImage(width, height);
+      image = new WritableImage(Math.min(width, MAX_CANVAS_SIZE), Math.min(height, MAX_CANVAS_SIZE));
     }
     updateCanvasScale(canvas.getScaleX());
   }

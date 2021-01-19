@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -18,6 +19,7 @@ package se.llbit.chunky.renderer;
 
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.RayTracer;
+import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.log.Log;
 import se.llbit.math.QuickMath;
@@ -108,12 +110,12 @@ public class RenderWorker extends Thread {
     double halfWidth = width / (2.0 * height);
     double invHeight = 1.0 / height;
 
-    double[] samples = scene.getSampleBuffer();
+    SampleBuffer samples = scene.getSampleBuffer();
     final Camera cam = scene.camera();
 
     if (scene.getMode() != RenderMode.PREVIEW) {
       for (int y = tile.y0; y < tile.y1; ++y) {
-        int offset = y * width * 3 + tile.x0 * 3;
+        int offset = tile.x0 * 3;
         for (int x = tile.x0; x < tile.x1; ++x) {
 
           double sr = 0;
@@ -133,10 +135,7 @@ public class RenderWorker extends Thread {
             sg += ray.color.y;
             sb += ray.color.z;
           }
-          double sinv = 1.0 / (scene.spp + manager.sppPerPass);
-          samples[offset + 0] = (samples[offset + 0] * scene.spp + sr) * sinv;
-          samples[offset + 1] = (samples[offset + 1] * scene.spp + sg) * sinv;
-          samples[offset + 2] = (samples[offset + 2] * scene.spp + sb) * sinv;
+          samples.addSample(x, y, scene.spp, manager.sppPerPass, sr, sg, sb);
 
           if (scene.shouldFinalizeBuffer()) {
             scene.finalizePixel(x, y);
@@ -172,9 +171,7 @@ public class RenderWorker extends Thread {
           // Draw the crosshairs.
           if (x == width / 2 && (y >= height / 2 - 5 && y <= height / 2 + 5) || y == height / 2 && (
               x >= width / 2 - 5 && x <= width / 2 + 5)) {
-            samples[(y * width + x) * 3 + 0] = 0xFF;
-            samples[(y * width + x) * 3 + 1] = 0xFF;
-            samples[(y * width + x) * 3 + 2] = 0xFF;
+            samples.setPixel(x,y,0xFF,0xFF,0xFF);
             scene.finalizePixel(x, y);
             continue;
           }
@@ -195,19 +192,17 @@ public class RenderWorker extends Thread {
             ray.color.w = 1;
           }
 
-          samples[(y * width + x) * 3 + 0] = ray.color.x;
-          samples[(y * width + x) * 3 + 1] = ray.color.y;
-          samples[(y * width + x) * 3 + 2] = ray.color.z;
+          samples.setPixel(x,y,ray.color.x,ray.color.y,ray.color.z);
 
           scene.finalizePixel(x, y);
 
           if (firstFrame) {
             if (y % 2 == 0 && x < (width - 1)) {
               // Copy the current pixel to the next one.
-              scene.copyPixel(y * width + x, 1);
+              scene.copyPixel(x, y, 1);
             } else if (y % 2 != 0 && x > 0) {
               // Copy the next pixel to this pixel.
-              scene.copyPixel(y * width + x, -1);
+              scene.copyPixel(x, y, -1);
             }
           }
         }

@@ -1,4 +1,5 @@
-/* Copyright (c) 2017-2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2017-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2017-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -20,6 +21,7 @@ import org.junit.Test;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.main.ChunkyOptions;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.json.JsonObject;
@@ -47,25 +49,24 @@ public class TestBlankRender {
    * close enough to the expected color.
    */
   private static void renderAndCheckSamples(Scene scene, double[] expected)
-      throws InterruptedException {
-    double[] samples = render(scene);
-    int offset = 0;
-    for (int i = 0; i < WIDTH * HEIGHT; ++i) {
-      // Check each channel value:
-      for (int cc = 0; cc < 3; ++cc) {
-        if (samples[offset + cc] < expected[cc] - 0.005
-            || samples[offset + cc] > expected[cc] + 0.005) {
-          assertEquals("Sampled pixel is outside expected value range.",
-              expected[cc], samples[offset + cc], 0.005);
-          fail("Sampled pixel is outside expected value range.");
-        }
-      }
-      offset += 3;
-    }
+        throws InterruptedException {
+    SampleBuffer samples = render(scene);
+    long valueCount = samples.sampleCount();
+    for (int y = 0; y < HEIGHT; y++)
+      for (int x = 0; x < WIDTH; x++)
+        // Check each channel value:
+        for (int c = 0; c < 3; ++c)
+          if (samples.get(x, y, c) < expected[c]-0.005
+                || samples.get(x, y, c) > expected[c]+0.005)
+          {
+            assertEquals("Sampled pixel is outside expected value range.",
+                  expected[c], samples.get(x, y, c), 0.005);
+            fail("Sampled pixel is outside expected value range.");
+          }
   }
 
   /** Renders a scene and returns the resulting sample buffer. */
-  private static double[] render(Scene scene) throws InterruptedException {
+  private static SampleBuffer render(Scene scene) throws InterruptedException {
     // A single worker thread is used, with fixed PRNG seed.
     // This makes the path tracing results deterministic.
     ChunkyOptions options = ChunkyOptions.getDefaults();
@@ -73,7 +74,7 @@ public class TestBlankRender {
     Chunky chunky = new Chunky(options);
     RenderContext context = new RenderContext(chunky);
     context.workerFactory =
-        (renderManager, index, seed) -> new RenderWorker(renderManager, index, 0);
+          (renderManager, index, seed) -> new RenderWorker(renderManager, index, 0);
     RenderManager renderer = new RenderManager(context, true);
     renderer.setSceneProvider(new MockSceneProvider(scene));
     renderer.start();
@@ -82,12 +83,16 @@ public class TestBlankRender {
   }
 
   /** Compares two sample buffers. */
-  private static void compareSamples(double[] expected, double[] actual, int size, double delta)
-      throws InterruptedException {
-    for (int i = 0; i < size; ++i) {
-      if (actual[i] < expected[i] - delta || actual[i] > expected[i] + delta) {
+  private static void compareSamples(SampleBuffer expected, SampleBuffer actual, double delta)
+        throws InterruptedException {
+    long valueCount = expected.sampleCount();
+    double act, exp;
+    for (long i = 0; i < valueCount; ++i) {
+      act = actual.get(i);
+      exp = expected.get(i);
+      if (act < exp - delta || act > exp + delta) {
         assertEquals("Sampled pixel is outside expected value range.",
-            expected[i], actual[i], delta);
+            exp, act, delta);
         fail("Sampled pixel is outside expected value range.");
       }
     }
@@ -169,14 +174,12 @@ public class TestBlankRender {
     scene.camera().setProjectionMode(ProjectionMode.PANORAMIC);
     scene.camera().setFoV(100);
 
-    int size = 3 * WIDTH * HEIGHT;
-    double[] samples1 = new double[size];
-    System.arraycopy(render(scene), 0, samples1, 0, size);
+    SampleBuffer samples1 = new SampleBuffer(render(scene));
 
     JsonObject json = scene.toJson();
     scene.fromJson(json);
     scene.setRenderMode(RenderMode.RENDERING); // Un-pause after JSON import.
 
-    compareSamples(samples1, render(scene), size, 0.005);
+    compareSamples(samples1, render(scene), 0.005);
   }
 }

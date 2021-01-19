@@ -1,4 +1,5 @@
-/* Copyright (c) 2021 Chunky contributors
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -287,9 +288,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * should really be moved somewhere else and not be so tightly
    * coupled to the scene settings.
    */
-  protected double[] samples;
-
-  private byte[] alphaChannel;
+  protected SampleBuffer samples;
 
   private boolean finalized = false;
 
@@ -358,8 +357,8 @@ public class Scene implements JsonSerializable, Refreshable {
   public synchronized void initBuffers() {
     frontBuffer = new BitmapImage(width, height);
     backBuffer = new BitmapImage(width, height);
-    alphaChannel = new byte[width * height];
-    samples = new double[width * height * 3];
+    samples = new SampleBuffer(width,height);
+    samples.alphaInit();
   }
 
   /**
@@ -442,8 +441,8 @@ public class Scene implements JsonSerializable, Refreshable {
       height = other.height;
       backBuffer = other.backBuffer;
       frontBuffer = other.frontBuffer;
-      alphaChannel = other.alphaChannel;
       samples = other.samples;
+      // alphaChannel = other.alphaChannel;
     }
 
     octreeImplementation = other.octreeImplementation;
@@ -1849,9 +1848,9 @@ public class Scene implements JsonSerializable, Refreshable {
     try (TaskTracker.Task task = taskTracker.task("Writing PNG");
         PngFileWriter writer = new PngFileWriter(out)) {
       if (transparentSky) {
-        writer.write(backBuffer.data, alphaChannel, width, height, task);
+        writer.write(backBuffer, samples, width, height, task);
       } else {
-        writer.write(backBuffer.data, width, height, task);
+        writer.write(backBuffer, width, height, task);
       }
       if (camera.getProjectionMode() == ProjectionMode.PANORAMIC
           && camera.getFov() >= 179
@@ -2067,9 +2066,9 @@ public class Scene implements JsonSerializable, Refreshable {
     finalized = true;
     double[] result = new double[3];
     postProcessPixel(x, y, result);
-    backBuffer.data[y * width + x] = ColorUtil
+    backBuffer.setPixel(x, y, ColorUtil
         .getRGB(QuickMath.min(1, result[0]), QuickMath.min(1, result[1]),
-            QuickMath.min(1, result[2]));
+            QuickMath.min(1, result[2])));
   }
 
   /**
@@ -2078,10 +2077,9 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param result the resulting color values are written to this array
    */
   public void postProcessPixel(int x, int y, double[] result) {
-    int index = (y * width + x) * 3;
-    double r = samples[index];
-    double g = samples[index + 1];
-    double b = samples[index + 2];
+    double r = samples.get(x,y,0);
+    double g = samples.get(x,y,1);
+    double b = samples.get(x,y,2);
 
     r *= exposure;
     g *= exposure;
@@ -2195,14 +2193,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
     occlusion += PreviewRayTracer.skyOcclusion(this, state);
 
-    alphaChannel[y * width + x] = (byte) (255 * occlusion * 0.25 + 0.5);
+    samples.alphaSet(x,y,(byte) (255 * occlusion * 0.25 + 0.5));
   }
 
   /**
    * Copies a pixel in-buffer.
    */
-  public void copyPixel(int jobId, int offset) {
-    backBuffer.data[jobId + offset] = backBuffer.data[jobId];
+  public void copyPixel(int jobId_x, int jobId_y, int offset) {
+    backBuffer.setPixel(jobId_x + offset, jobId_y, backBuffer.getPixel(jobId_x, jobId_y));
   }
 
   /**
@@ -2260,7 +2258,7 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @return The sample buffer for this scene
    */
-  public double[] getSampleBuffer() {
+  public SampleBuffer getSampleBuffer() {
     return samples;
   }
 

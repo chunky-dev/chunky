@@ -1,6 +1,24 @@
+/* Copyright (c) 2020-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2020-2021 Chunky contributors
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package se.llbit.pfm;
 
 import se.llbit.chunky.renderer.Postprocess;
+import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
@@ -65,7 +83,7 @@ public class PfmFileWriter implements AutoCloseable {
 
     // one or the other will be used, depending on if postprocessing is enabled.
     double[] pixel = new double[3];
-    double[] sampleBuffer = scene.getSampleBuffer();
+    SampleBuffer sampleBuffer = scene.getSampleBuffer();
 
     // write each row...
     for (int y = height-1; y >= 0; y--) {
@@ -78,8 +96,11 @@ public class PfmFileWriter implements AutoCloseable {
       // get the row's data as floats
       if (scene.postprocess == Postprocess.NONE)
         // from raw pixel data
-        for (int x = 0; x < 3*width; x++)
-          floatBuffer.put((float)sampleBuffer[y*width*3+x]);
+        for (int x = 0; x < width; x++) {
+          floatBuffer.put((float)sampleBuffer.get(x, y, 0));
+          floatBuffer.put((float)sampleBuffer.get(x, y, 1));
+          floatBuffer.put((float)sampleBuffer.get(x, y, 2));
+        }
       else
         // or from post processor
         for (int x = 0; x < width; x++) {

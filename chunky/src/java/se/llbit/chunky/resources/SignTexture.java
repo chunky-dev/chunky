@@ -1,4 +1,5 @@
-/* Copyright (c) 2015 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2015-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2015-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -46,7 +47,6 @@ public class SignTexture extends Texture {
     int width = 96;
     int height = 48;
     BitmapImage img = new BitmapImage(width, height);
-    int[] data = img.data;
     int ystart = ymargin;
     for (JsonArray line : text) {
       if (line.isEmpty()) {
@@ -75,7 +75,7 @@ public class SignTexture extends Texture {
               int x = xstart;
               for (int px = glyph.xmin; px <= glyph.xmax; ++px) {
                 if ((glyph.lines[py] & (1 << px)) != 0) {
-                  data[y * width + x] = color.rgbColor;
+                  img.setPixel(x, y, color.rgbColor);
                 }
                 x += 1;
               }

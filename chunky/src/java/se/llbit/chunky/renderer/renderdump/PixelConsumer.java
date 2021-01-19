@@ -24,5 +24,5 @@ public interface PixelConsumer {
    * @param g          Green pixel value
    * @param b          Blue pixel value
    */
-  void consume(int pixelIndex, double r, double g, double b);
+  void consume(long pixelIndex, double r, double g, double b);
 }
