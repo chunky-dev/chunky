@@ -27,27 +27,27 @@ import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
 public class VineModel {
+
   protected static final Quad[] quads = {
-      // North.
-      new DoubleSidedQuad(new Vector3(0, 0, 1 / 16.), new Vector3(1, 0, 1 / 16.),
-          new Vector3(0, 1, 1 / 16.), new Vector4(0, 1, 0, 1)),
+      // North
+      new DoubleSidedQuad(new Vector3(0, 0, 0.8 / 16), new Vector3(1, 0, 0.8 / 16),
+          new Vector3(0, 1, 0.8 / 16), new Vector4(0, 1, 0, 1)),
 
-      // South.
-      new DoubleSidedQuad(new Vector3(1, 0, 15 / 16.), new Vector3(0, 0, 15 / 16.),
-          new Vector3(1, 1, 15 / 16.), new Vector4(1, 0, 0, 1)),
+      // South
+      new DoubleSidedQuad(new Vector3(1, 0, 15.2 / 16), new Vector3(0, 0, 15.2 / 16),
+          new Vector3(1, 1, 15.2 / 16), new Vector4(1, 0, 0, 1)),
 
-      // East.
-      new DoubleSidedQuad(new Vector3(15 / 16., 0, 0), new Vector3(15 / 16., 0, 1),
-          new Vector3(15 / 16., 1, 0), new Vector4(0, 1, 0, 1)),
+      // East
+      new DoubleSidedQuad(new Vector3(15.2 / 16, 0, 0), new Vector3(15.2 / 16, 0, 1),
+          new Vector3(15.2 / 16, 1, 0), new Vector4(0, 1, 0, 1)),
 
-      // West.
-      new DoubleSidedQuad(new Vector3(1 / 16., 0, 1), new Vector3(1 / 16., 0, 0),
-          new Vector3(1 / 16., 1, 1), new Vector4(1, 0, 0, 1)),
+      // West
+      new DoubleSidedQuad(new Vector3(0.8 / 16, 0, 1), new Vector3(0.8 / 16, 0, 0),
+          new Vector3(0.8 / 16, 1, 1), new Vector4(1, 0, 0, 1)),
 
-      // Top.
-      new DoubleSidedQuad(new Vector3(0, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 1, 1),
-          new Vector4(0, 1, 0, 1)),
-
+      // Top
+      new DoubleSidedQuad(new Vector3(0, 15.2 / 16, 0), new Vector3(1, 15.2 / 16, 0),
+          new Vector3(0, 15.2 / 16, 1), new Vector4(0, 1, 0, 1)),
   };
 
   public static boolean intersect(Ray ray, Scene scene) {
