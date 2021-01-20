@@ -306,6 +306,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:glass",
       "minecraft:glass_pane",
       "minecraft:glowstone",
+      "minecraft:glow_lichen",
       "minecraft:gold_block",
       "minecraft:gold_ore",
       "minecraft:granite",
@@ -2718,6 +2719,15 @@ public class MinecraftBlockProvider implements BlockProvider {
             tag.get("Properties").get("waterlogged").stringValue("").equals("true"));
       case "sculk_sensor":
         return new SculkSensor(tag.get("Properties").get("sculk_sensor_phase").stringValue("cooldown"));
+      case "glow_lichen":
+        return new GlowLichen(
+            tag.get("Properties").get("north").stringValue("false").equals("true"),
+            tag.get("Properties").get("south").stringValue("false").equals("true"),
+            tag.get("Properties").get("east").stringValue("false").equals("true"),
+            tag.get("Properties").get("west").stringValue("false").equals("true"),
+            tag.get("Properties").get("up").stringValue("false").equals("true"),
+            tag.get("Properties").get("down").stringValue("false").equals("true")
+        );
       case "structure_void":
       case "barrier":
         // Invisible.

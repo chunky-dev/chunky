@@ -942,6 +942,7 @@ public class Texture {
   public static final Texture sculkSensorTendrilActive = new Texture();
   public static final Texture sculkSensorTendrilInactive = new Texture();
   public static final Texture sculkSensorTop = new Texture();
+  public static final Texture glowLichen = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

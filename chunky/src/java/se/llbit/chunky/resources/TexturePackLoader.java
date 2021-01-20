@@ -3568,6 +3568,7 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/sculk_sensor_tendril_active", Texture.sculkSensorTendrilActive);
     addSimpleTexture("assets/minecraft/textures/block/sculk_sensor_tendril_inactive", Texture.sculkSensorTendrilInactive);
     addSimpleTexture("assets/minecraft/textures/block/sculk_sensor_top", Texture.sculkSensorTop);
+    addSimpleTexture("assets/minecraft/textures/block/glow_lichen", Texture.glowLichen);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
