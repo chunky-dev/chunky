@@ -1,3 +1,19 @@
+/* Copyright (c) 2020-2021 Chunky contributors
+ *
+ * This file is part of Chunky.
+ *
+ * Chunky is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Chunky is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package se.llbit.math;
 
 import org.apache.commons.math3.util.Pair;
@@ -67,6 +83,9 @@ public class PackedOctree implements Octree.OctreeImplementation {
    */
   private int freeHead;
 
+  /**
+   * The depth of the Octree records how many subdivisions are needed to represent a single, individual block.
+   */
   private int depth;
 
   private static final class NodeId implements Octree.NodeId {
@@ -246,25 +265,35 @@ public class PackedOctree implements Octree.OctreeImplementation {
     return ((firstIsBranch && secondIsBranch) || -treeData[firstNodeIndex] == secondNode.type); // compare types (don't forget that in the tree the negation of the type is stored)
   }
 
+  /**
+   * Sets a specified block within the octree to a specific palette value, subdividing and merging as needed.
+   *
+   * x, y, z are in octree coordinates, NOT world coordinates.
+   */
   @Override
   public void set(int type, int x, int y, int z) {
     set(new Octree.Node(type), x, y, z);
   }
 
+  /**
+   * Sets a specified block within the octree to a specific palette value, subdividing and merging as needed.
+   *
+   * x, y, z are in octree coordinates, NOT world coordinates.
+   */
   @Override
   public void set(Octree.Node data, int x, int y, int z) {
-    int[] parents = new int[depth]; // better to put as a field to preventallocation at each invocation?
+    int[] parents = new int[depth]; // better to put as a field to prevent allocation at each invocation?
     int nodeIndex = 0;
-    int parentLevel = depth - 1;
     int position = 0;
+
+    // root is at the end of the array, its direct parent is at the front.
     for(int i = depth - 1; i >= 0; --i) {
       parents[i] = nodeIndex;
 
-      if(nodeEquals(nodeIndex, data)) {
+      if(nodeEquals(nodeIndex, data)) { // Everything in this region is already of this blocktype.
         return;
       } else if(treeData[nodeIndex] <= 0) { // It's a leaf node
         subdivideNode(nodeIndex);
-        parentLevel = i;
       }
 
       int xbit = 1 & (x >> i);
@@ -278,7 +307,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
     treeData[finalNodeIndex] = -data.type; // Store negation of the type
 
     // Merge nodes where all children have been set to the same type.
-    for(int i = 0; i <= parentLevel; ++i) {
+    for(int i = 0; i < depth; ++i) {
       int parentIndex = parents[i];
 
       boolean allSame = true;
@@ -298,6 +327,13 @@ public class PackedOctree implements Octree.OctreeImplementation {
     }
   }
 
+  /**
+   * Gets a NodeID and depth of the node that is (or contains) the specified block.
+   *
+   * Note: The creation of the Pair\<\> object seems to be a major time consumer in the actual tracing algorithm. (called from Octree.enterBlock)
+   *
+   * x, y, z are in octree coordinates, NOT world coordinates.
+   */
   @Override
   public Pair<Octree.NodeId, Integer> getWithLevel(int x, int y, int z) {
     int nodeIndex = 0;
@@ -312,19 +348,34 @@ public class PackedOctree implements Octree.OctreeImplementation {
     return new Pair<>(new NodeId(nodeIndex), level);
   }
 
+  /**
+   * Gets the array index of the node which is (or contains) the block specified, via a binary (octnary?) search.
+   *
+   * x, y, z are in octree coordinates, NOT world coordinates.
+   */
   private int getNodeIndex(int x, int y, int z) {
     int nodeIndex = 0;
     int level = depth;
     while(treeData[nodeIndex] > 0) {
       level -= 1;
-      int lx = x >>> level;
-      int ly = y >>> level;
-      int lz = z >>> level;
-      nodeIndex = treeData[nodeIndex] + (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1));
+      int lx = 1 & (x >>> level);
+      int ly = 1 & (y >>> level);
+      int lz = 1 & (z >>> level);
+      nodeIndex = treeData[nodeIndex] + ((lx << 2) | (ly << 1) | lz);
     }
     return nodeIndex;
   }
 
+  /**
+   * Creates an octree node which represents the PackedOctree node which is (or contains) the
+   * block specified.
+   *
+   * This node is not actually used within this PackedOctree, as it is stored inline in the
+   * array here. This is just a Node object which wraps the values that the PackedOctree node
+   * would have.
+   *
+   * x, y, z are in octree coordinates, NOT world coordinates.
+   */
   @Override
   public Octree.Node get(int x, int y, int z) {
     int nodeIndex = getNodeIndex(x, y, z);
@@ -335,6 +386,11 @@ public class PackedOctree implements Octree.OctreeImplementation {
     return node;
   }
 
+  /**
+   * Gets the block material type from the BlockPalette of the node which is (or contains) the block specified.
+   *
+   * x, y, z are in octree coordinates, NOT world coordinates.
+   */
   @Override
   public Material getMaterial(int x, int y, int z, BlockPalette palette) {
     // Building the dummy node is useless here
@@ -345,6 +401,12 @@ public class PackedOctree implements Octree.OctreeImplementation {
     return palette.get(-treeData[nodeIndex]);
   }
 
+  /**
+   * Stores this PackedOctree into its serialized form.
+   *
+   * Note: Branching nodes will not store child array addresses, but instead
+   * will be flagged as branches (can be reconstituted on load).
+   */
   @Override
   public void store(DataOutputStream output) throws IOException {
     output.writeInt(depth);
@@ -356,6 +418,13 @@ public class PackedOctree implements Octree.OctreeImplementation {
     return depth;
   }
 
+  /**
+   * Create a new PackedOctree loaded from an InputStream without a node count.
+   *
+   * This defaults to a tiny octree that can only hold a few nodes to begin with (not
+   * enough for any typical singular chunk), and needing to increase its size and copy
+   * the array many many times to fit a normal scene. Use "loadWithNodeCount" if possible.
+   */
   public static PackedOctree load(DataInputStream in) throws IOException {
     int depth = in.readInt();
     PackedOctree tree = new PackedOctree(depth);
@@ -363,6 +432,12 @@ public class PackedOctree implements Octree.OctreeImplementation {
     return tree;
   }
 
+  /**
+   * Create a new PackedOctree loaded from an InputStream with a node count.
+   *
+   * Node count allows for creating an array for this packed octree of the correct size
+   * first, without needing to resize and copy the array (which is slow).
+   */
   public static PackedOctree loadWithNodeCount(long nodeCount, DataInputStream in) throws IOException {
     int depth = in.readInt();
     PackedOctree tree = new PackedOctree(depth, nodeCount);
@@ -370,6 +445,9 @@ public class PackedOctree implements Octree.OctreeImplementation {
     return tree;
   }
 
+  /**
+   * Recursively read this node in from its serialized form from an InputStream (probably from a file).
+   */
   private void loadNode(DataInputStream in, int nodeIndex) throws IOException {
     int type = in.readInt();
     if(type == BRANCH_NODE) {
@@ -388,64 +466,102 @@ public class PackedOctree implements Octree.OctreeImplementation {
     }
   }
 
+  /**
+   * Serialize this node and its children (recursively) to an OutputStream so it can be saved to a file.
+   */
   private void storeNode(DataOutputStream out, int nodeIndex) throws IOException {
+    // Branches are stored as branch markers, not the index (index is for array form only)
+    // Otherwise store its palette type (positive of stored value)
     int type = treeData[nodeIndex] > 0 ? BRANCH_NODE : -treeData[nodeIndex];
     out.writeInt(type);
+
+    // And if its a branch, recursively store its children.
+    // Note: this stores Depth-First, NOT Breadth-First.
     if(type == BRANCH_NODE) {
       for(int i = 0; i < 8; ++i) {
-        int childIndex = treeData[nodeIndex] + i;
-        storeNode(out, childIndex);
+        storeNode(out, treeData[nodeIndex] + i);
       }
     }
   }
 
+  /**
+   * Recursively count number of subnodes in this octree.
+   */
   @Override
   public long nodeCount() {
+    // Start counting from root node.
     return countNodes(0);
   }
 
+  /**
+   * Recursively count subnodes (including this one) from the specified node.
+   * @param nodeIndex Index of starting node.
+   */
   private long countNodes(int nodeIndex) {
     if(treeData[nodeIndex] > 0) {
-      long total = 1;
+      long total = 1; // this node
       for(int i = 0; i < 8; ++i)
         total += countNodes(treeData[nodeIndex] + i);
       return total;
-    } else {
-      return 1;
     }
+    // leaf node -> just this node
+    return 1;
   }
 
+  /**
+   * Merge all nodes that can be merged together.
+   */
   @Override
   public void endFinalization() {
     // There is a bunch of ANY_TYPE nodes we should try to merge
     finalizationNode(0);
   }
 
+  /**
+   * Merges all branching nodes of entirely one type and "ANY_TYPE" nodes.
+   * @param nodeIndex Starting node index to begin recursive merge attempt
+   */
   private void finalizationNode(int nodeIndex) {
-    boolean canMerge = true;
+    // Flag for still mergeable at this level. Set to false when different child node types, or when a child still has branches.
+    boolean isStillMergeable = true;
+    // The type to merge to. Will be ANY_TYPE, until the first node of another type is found (then taking on that value).
     int mergedType = -ANY_TYPE;
+
+    // For each child node...
     for(int i = 0; i < 8; ++i) {
       int childIndex = treeData[nodeIndex] + i;
+
+      // If branches, recursively attempt merge on it.
       if(treeData[childIndex] > 0) {
         finalizationNode(childIndex);
-        // The node may have been merged, retest if it still a branch node
+
+        // If child node did not merge, we cannot merge.
         if(treeData[childIndex] > 0) {
-          canMerge = false;
+          isStillMergeable = false;
         }
       }
-      if(canMerge) {
+
+      // If we haven't yet disqualified a merge, check if the child's type is compatible for a merge.
+      if(isStillMergeable) {
+        // If no non-ANY_TYPE merge type selected, try to set it to this new block's.
         if(mergedType == -ANY_TYPE) {
           mergedType = treeData[childIndex];
+
+          // Else we have already selected a type. Make sure this block is compatible with that merge.
         } else if(!(treeData[childIndex] == -ANY_TYPE || (treeData[childIndex] == mergedType))) {
-          canMerge = false;
+          isStillMergeable = false;
         }
       }
     }
-    if(canMerge) {
+    // Now if it is still mergeable, all children of this node are leaves of type "mergedType" or ANY_TYPE, so merging to mergedType.
+    if(isStillMergeable) {
       mergeNode(nodeIndex, mergedType);
     }
   }
 
+  /**
+   * Add PackedOctree to OctreeImplementationFactory so Packed can be created and loaded via by name.
+   */
   static public void initImplementation() {
     Octree.addImplementationFactory("PACKED", new Octree.ImplementationFactory() {
       @Override
