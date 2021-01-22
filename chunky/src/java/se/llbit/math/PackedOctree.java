@@ -181,8 +181,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * Method also marks returned index as used (by removing from free list or
    * incrementing size)
    *
-   * @return the index at the beginning of a free space in the array of size 16 ints
-   *         (8 nodes)
+   * @return the index at the beginning of a free space in the array of size 8 ints
    */
   private int findSpace() {
     // Look in free list
