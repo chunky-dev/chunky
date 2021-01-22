@@ -52,7 +52,7 @@ public class BeaconBeamMaterial extends Material {
     @Override
     public void loadMaterialProperties(JsonObject json) {
         super.loadMaterialProperties(json);
-        updateColor(json.get("color").asInt(0xFFFFFF));
+        updateColor(json.get("color").asInt(0xF9FFFE));
     }
 
     public void saveMaterialProperties(JsonObject json) {
