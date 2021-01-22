@@ -350,7 +350,7 @@ public class SkullEntity extends Entity {
     return faces;
   }
 
-  private Collection<Primitive> dragonHeadPrimitives(Transform transform) {
+  public Collection<Primitive> dragonHeadPrimitives(Transform transform) {
     transform = Transform.NONE.translate(-0.5, -0.5, -0.5 - 1.5 / 16.)
         .chain(transform)
         .translate(0, 0.5 - 4/16., 0);
