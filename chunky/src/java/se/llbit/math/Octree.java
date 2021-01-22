@@ -504,6 +504,9 @@ public class Octree {
       if (currentBlock.localIntersect) {
         // Other functions expect the ray origin to be in the block they test so here time
         // to update it
+        // Updating the origin also means that new offsetX/offsetY/offsetZ must be computed
+        // but that is done a after the intersection test only if necessary
+        // and not if we are leaving the function anyway
         ray.o.scaleAdd(distance, ray.d);
         ray.distance += distance;
         distance = 0;
