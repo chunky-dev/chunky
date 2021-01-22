@@ -34,30 +34,21 @@ import static se.llbit.math.Octree.*;
  */
 public class PackedOctree implements Octree.OctreeImplementation {
   /**
-   * The whole tree data is store in a int array
+   * The entirety of the octree data is store in an int array.
    * <p>
-   * Each node is made of several values :
-   * - the node type (could be a branch node or the type of block contained)
-   * - optional additional data
-   * - the index of its first child (if branch node)
+   * Each node is made of a single integer value, which is either posative or negative.
+   * - Positive index -> Branch node; int is the index of first child (the other 7 follow sequentially).
+   * - Negative index -> Leaf node; int is the negation of the BlockPalette ID.
    * <p>
    * As nodes are stored linearly, we place siblings nodes in a row and so
    * we only need the index of the first child as the following are just after
    * <p>
-   * The node type is always positive, we can use this knowledge to compress the node to 2 ints:
-   * one will contains the index of the first child if it is positive or the negation of the type
-   * the other will contain the additional data
-   * <p>
    * This implementation is inspired by this stackoverflow answer
    * https://stackoverflow.com/questions/41946007/efficient-and-well-explained-implementation-of-a-quadtree-for-2d-collision-det#answer-48330314
    * <p>
-   * Note: Only leaf nodes can have additional data. In theory
-   * we could potentially optimize further by only storing the index for branch nodes
-   * by that would make other operations more complex. Most likely not worth it but could be an idea
-   * <p>
-   * When dealing with huge octree, the maximum size of an array may be a limitation
+   * When dealing with huge octree, the maximum size of an array may be a limitation.
    * When this occurs this implementation wan no longer be used and we must fallback on another one.
-   * Here we'll throw an exception that the caller can catch
+   * Here we'll throw an exception that the caller can catch.
    */
   private int[] treeData;
 
@@ -67,27 +58,36 @@ public class PackedOctree implements Octree.OctreeImplementation {
   private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 16;
 
   /**
-   * When adding nodes to the octree, the treeData array may have to grow
-   * We implement a simple growing dynamic array, like an ArrayList
-   * We don't we use ArrayList because it only works with objects
-   * and having an array of Integer instead of int would increase the memory usage.
-   * size gives us the size of the dynamic array, the capacity is given by treeData.length
+   * The size of the dynamic array. Capacity is given by treeData.length.
+   *
+   * Java's built in ArrayList isn't used as generics don't work with primitives, and
+   * Integer objects are object wrappers and will be references to somewhere else in
+   * memory, not to mention other overhead. In the end, array of Integers would end up
+   * using more than triple the memory and be slower.
    */
   private int size;
+
   /**
-   * When removing nodes form the tree, it leaves holes in the array.
-   * Those holes could be reused later when new nodes need to be added
-   * We use a free list to keep of the location of the holes.
-   * freeHead gives use the index of the head of the free list, if it is -1, there is no
-   * holes that can be reused and the size of the array must be increased
+   * When removing nodes form the tree, it leaves holes in the array. Those holes
+   * could be reused later when new nodes need to be added.
+   *
+   * freeHead is the "root node" of the singly linked list that keeps
+   * track of free locations (by holding nodes in their places).
+   *
+   * If freeHead is -1, there is no holes that can be reused and the size of the array
+   * must be increased.
    */
   private int freeHead;
 
   /**
-   * The depth of the Octree records how many subdivisions are needed to represent a single, individual block.
+   * The depth of the Octree records how many subdivisions are needed to represent a
+   * single, individual block.
    */
   private int depth;
 
+  /**
+   * NodeId implementation for a int array PackedOctree.
+   */
   private static final class NodeId implements Octree.NodeId {
     int nodeIndex;
 
@@ -95,6 +95,23 @@ public class PackedOctree implements Octree.OctreeImplementation {
       this.nodeIndex = nodeIndex;
     }
   }
+
+  /**
+   * A custom exception that signals the octree is too big for this implementation
+   */
+  public static class OctreeTooBigException extends RuntimeException {
+  }
+
+  /**
+   * The default size to start octree size at. Can start larger if specified, but
+   * not smaller.
+   */
+  private static final int DEFAULT_INITIAL_SIZE = 64;
+
+  /**
+   * How much larger to make the array when dynamically resizing to make more space.
+   */
+  private static final double ARRAY_RESIZE_MULTIPLIER = 1.5;
 
   @Override
   public Octree.NodeId getRoot() {
@@ -122,12 +139,6 @@ public class PackedOctree implements Octree.OctreeImplementation {
   }
 
   /**
-   * A custom exception that signals the octree is too big for this implementation
-   */
-  public static class OctreeTooBigException extends RuntimeException {
-  }
-
-  /**
    * Constructor building a tree with capacity for some nodes
    *
    * @param depth     The depth of the tree
@@ -135,13 +146,15 @@ public class PackedOctree implements Octree.OctreeImplementation {
    */
   public PackedOctree(int depth, long nodeCount) {
     this.depth = depth;
-    long arraySize = Math.max(nodeCount, 64);
+    long arraySize = Math.max(nodeCount, DEFAULT_INITIAL_SIZE);
     if(arraySize > (long) MAX_ARRAY_SIZE)
       throw new OctreeTooBigException();
     treeData = new int[(int) arraySize];
+    // Add a root node
     treeData[0] = 0;
     size = 1;
-    freeHead = -1; // No holes
+    // No holes
+    freeHead = -1;
   }
 
   /**
@@ -151,25 +164,32 @@ public class PackedOctree implements Octree.OctreeImplementation {
    */
   public PackedOctree(int depth) {
     this.depth = depth;
-    treeData = new int[64];
+    treeData = new int[DEFAULT_INITIAL_SIZE];
     // Add a root node
     treeData[0] = 0;
     size = 1;
+    // No holes
     freeHead = -1;
   }
 
   /**
-   * Finds space in the array to put 8 nodes
-   * We find space by searching in the free list
-   * if this fails we append at the end of the array
-   * if the size is greater than the capacity, we allocate a new array
+   * Finds an open space in the array to put 8 nodes.
    *
-   * @return the index at the beginning of a free space in the array of size 16 ints (8 nodes)
+   * Checks free list first, then tries to append at the end of the array,
+   * reallocating and extending the array if needed.
+   *
+   * Method also marks returned index as used (by removing from free list or
+   * incrementing size)
+   *
+   * @return the index at the beginning of a free space in the array of size 16 ints
+   *         (8 nodes)
    */
   private int findSpace() {
     // Look in free list
     if(freeHead != -1) {
+      // get and return first value
       int index = freeHead;
+      // advance freeHead down the linked list.
       freeHead = treeData[freeHead];
       return index;
     }
@@ -182,30 +202,31 @@ public class PackedOctree implements Octree.OctreeImplementation {
     }
 
     // We need to grow the array
-    long newSize = (long) Math.ceil(treeData.length * 1.5);
+    long newSize = (long) Math.ceil(treeData.length * ARRAY_RESIZE_MULTIPLIER);
     // We need to check the array won't be too big
     if(newSize > (long) MAX_ARRAY_SIZE) {
       // We can allocate less memory than initially wanted if the next block will still be able to fit
       // If not, this implementation isn't suitable
-      if(MAX_ARRAY_SIZE - treeData.length > 8) {
+      if(MAX_ARRAY_SIZE - size > 8) {
         // If by making the new array be of size MAX_ARRAY_SIZE we can still fit the block requested
         newSize = MAX_ARRAY_SIZE;
       } else {
-        // array is too big
+        // array is too big for this datatype
         throw new OctreeTooBigException();
       }
     }
+    // Allocate new array and copy existing contents over
     int[] newArray = new int[(int) newSize];
     System.arraycopy(treeData, 0, newArray, 0, size);
     treeData = newArray;
-    // and then append
+    // and increase size marker
     int index = size;
     size += 8;
     return index;
   }
 
   /**
-   * free space at the given index, simply add the 16 ints block beginning at index to the free list
+   * free space at the given index, simply add the 8 ints block beginning at index to the free list
    *
    * @param index the index of the beginning of the block to free
    */
@@ -220,11 +241,15 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * @param nodeIndex The index of the node to subdivide
    */
   private void subdivideNode(int nodeIndex) {
-    int childrenIndex = findSpace();
+    // Allocate space for children
+    int firstChildIndex = findSpace();
+
+    // Copy type to all children
     for(int i = 0; i < 8; ++i) {
-      treeData[childrenIndex + i] = treeData[nodeIndex]; // copy type
+      treeData[firstChildIndex + i] = treeData[nodeIndex];
     }
-    treeData[nodeIndex] = childrenIndex; // Make the node a parent node pointing to its children
+    // Make this parent node a branching node pointing to its children.
+    treeData[nodeIndex] = firstChildIndex;
   }
 
   /**
@@ -240,7 +265,9 @@ public class PackedOctree implements Octree.OctreeImplementation {
   }
 
   /**
-   * Compare two nodes
+   * Compare two nodes, in array, by index.
+   *
+   * True if both branching, or same type.
    *
    * @param firstNodeIndex  The index of the first node
    * @param secondNodeIndex The index of the second node
@@ -253,7 +280,9 @@ public class PackedOctree implements Octree.OctreeImplementation {
   }
 
   /**
-   * Compare two nodes
+   * Compare two nodes.
+   *
+   * True if both branching, or same type.
    *
    * @param firstNodeIndex The index of the first node
    * @param secondNode     The second node (most likely outside of tree)
@@ -283,8 +312,8 @@ public class PackedOctree implements Octree.OctreeImplementation {
   @Override
   public void set(Octree.Node data, int x, int y, int z) {
     int[] parents = new int[depth]; // better to put as a field to prevent allocation at each invocation?
-    int nodeIndex = 0;
-    int position = 0;
+    int nodeIndex = 0; // start at root
+    int position;
 
     // root is at the end of the array, its direct parent is at the front.
     for(int i = depth - 1; i >= 0; --i) {
@@ -292,10 +321,13 @@ public class PackedOctree implements Octree.OctreeImplementation {
 
       if(nodeEquals(nodeIndex, data)) { // Everything in this region is already of this blocktype.
         return;
-      } else if(treeData[nodeIndex] <= 0) { // It's a leaf node
+      }
+
+      if(treeData[nodeIndex] <= 0) { // It's a leaf node
         subdivideNode(nodeIndex);
       }
 
+      // Determine index of child (to go to next)
       int xbit = 1 & (x >> i);
       int ybit = 1 & (y >> i);
       int zbit = 1 & (z >> i);
@@ -303,13 +335,14 @@ public class PackedOctree implements Octree.OctreeImplementation {
       nodeIndex = treeData[nodeIndex] + position;
 
     }
-    int finalNodeIndex = treeData[parents[0]] + position;
-    treeData[finalNodeIndex] = -data.type; // Store negation of the type
+    // store type into final node (this specific block coordinate's node)
+    treeData[nodeIndex] = -data.type; // Negation of BlockPalette type stored
 
-    // Merge nodes where all children have been set to the same type.
+    // Merge nodes where all children have been set to the same type, starting from the bottom.
     for(int i = 0; i < depth; ++i) {
       int parentIndex = parents[i];
 
+      // assert each child is of same type
       boolean allSame = true;
       for(int j = 0; j < 8; ++j) {
         int childIndex = treeData[parentIndex] + j;
@@ -319,6 +352,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
         }
       }
 
+      // If all same type, join them. Else, parents can't join, so break merge loop.
       if(allSame) {
         mergeNode(parentIndex, treeData[nodeIndex]);
       } else {
