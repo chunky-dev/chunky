@@ -1,4 +1,5 @@
-/* Copyright (c) 2010-2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2010-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -35,6 +36,14 @@ import se.llbit.log.Log;
 
 /**
  * A simple voxel Octree.
+ *
+ * An octree is like a binary tree, except instead of being "bi"nary, it is an
+ * "oct"tree, where each parent node has eight children instead of two. Octrees
+ * are better suited for 3d scenes such as storing voxels (since subdividing a
+ * cube gives 8 cubes of half the side length.)
+ *
+ * In this class, blocks are stored such that a ray that is traversing the scene
+ * can determine what block it is in or will hit in O(log(n)) time.
  *
  * @author Jesper Öqvist (jesper@llbit.se)
  */
