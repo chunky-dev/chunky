@@ -457,7 +457,7 @@ public class Octree {
 
     int depth = implementation.getDepth();
 
-    double distance = Ray.EPSILON;
+    double distance = 0;
 
     // floating point division are slower than multiplication so we cache them
     // We also try to limit the number of time the ray origin is updated
@@ -475,9 +475,9 @@ public class Octree {
     while (true) {
       // Add small offset past the intersection to avoid
       // recursion to the same octree node!
-      int x = (int) Math.floor(ray.o.x + ray.d.x * distance);
-      int y = (int) Math.floor(ray.o.y + ray.d.y * distance);
-      int z = (int) Math.floor(ray.o.z + ray.d.z * distance);
+      int x = (int) Math.floor(ray.o.x + ray.d.x * (distance + Ray.OFFSET));
+      int y = (int) Math.floor(ray.o.y + ray.d.y * (distance + Ray.OFFSET));
+      int z = (int) Math.floor(ray.o.z + ray.d.z * (distance + Ray.OFFSET));
 
       int lx = x >>> depth;
       int ly = y >>> depth;
@@ -504,10 +504,9 @@ public class Octree {
       if (currentBlock.localIntersect) {
         // Other functions expect the ray origin to be in the block they test so here time
         // to update it
-        distance -= Ray.EPSILON;
         ray.o.scaleAdd(distance, ray.d);
         ray.distance += distance;
-        distance = Ray.EPSILON;
+        distance = 0;
         if (currentBlock.intersect(ray, scene)) {
           if (prevBlock != currentBlock)
             return true;
@@ -528,7 +527,6 @@ public class Octree {
         }
       } else if (!currentBlock.isSameMaterial(prevBlock) && currentBlock != Air.INSTANCE) {
         // Origin and distance of ray need to be updated
-        distance -= Ray.EPSILON;
         ray.o.scaleAdd(distance, ray.d);
         ray.distance += distance;
         TexturedBlockModel.getIntersectionColor(ray);
@@ -547,37 +545,37 @@ public class Octree {
       // The computation involves a multiplication and an addition so we could use a fma (need java 9+)
       // but according to measurement, performance are identical
       double t = (lx << level) * invDx + offsetX;
-      if (t > distance) {
+      if (t > distance + Ray.EPSILON) {
         tNear = t;
         nx = 1;
       }
       t = ((lx + 1) << level) * invDx + offsetX;
-      if (t < tNear && t > distance) {
+      if (t < tNear && t > distance + Ray.EPSILON) {
         tNear = t;
         nx = -1;
       }
 
       t = (ly << level) * invDy + offsetY;
-      if (t < tNear && t > distance) {
+      if (t < tNear && t > distance + Ray.EPSILON) {
         tNear = t;
         ny = 1;
         nx = 0;
       }
       t = ((ly + 1) << level) * invDy + offsetY;
-      if (t < tNear && t > distance) {
+      if (t < tNear && t > distance + Ray.EPSILON) {
         tNear = t;
         ny = -1;
         nx = 0;
       }
 
       t = (lz << level) * invDz + offsetZ;
-      if (t < tNear && t > distance) {
+      if (t < tNear && t > distance + Ray.EPSILON) {
         tNear = t;
         nz = 1;
         nx = ny = 0;
       }
       t = ((lz + 1) << level) * invDz + offsetZ;
-      if (t < tNear && t > distance) {
+      if (t < tNear && t > distance + Ray.EPSILON) {
         tNear = t;
         nz = -1;
         nx = ny = 0;
@@ -585,7 +583,7 @@ public class Octree {
 
       ray.n.set(nx, ny, nz);
 
-      distance = tNear + Ray.EPSILON;
+      distance = tNear;
     }
   }
 
