@@ -33,6 +33,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
+import se.llbit.log.Level;
 
 import java.io.IOException;
 import java.net.URL;
@@ -49,20 +50,23 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
 
   @FXML TabPane tabPane;
 
-  private int errorCount = 0;
+  private int messageCount = 0;
+  private final Level type;
 
   /**
    * Initialize the error dialog.
    */
-  public ChunkyErrorDialog() throws IOException {
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("ErrorDialog.fxml"));
+  public ChunkyErrorDialog(Level errorType) throws IOException {
+    type = errorType;
+
+    FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlName(errorType)));
     loader.setController(this);
     Parent root = loader.load();
-    setTitle("Error Summary");
+    setTitle(getLevelName(errorType) + " Summary");
     getIcons().add(new Image(getClass().getResourceAsStream("/chunky-icon.png")));
     setScene(new Scene(root));
     addEventFilter(KeyEvent.ANY, e -> {
-      if (e.getCode() == KeyCode.ESCAPE) {
+      if (e.getCode() == KeyCode.ESCAPE && e.getEventType() == KeyEvent.KEY_RELEASED) {
         e.consume();
         close();
       }
@@ -75,8 +79,18 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
   /**
    * Add a log record to be displayed by this error dialog.
    */
-  public synchronized void addErrorMessage(String message) {
-    errorCount += 1;
+  public synchronized void addMessageAndShow(String message) {
+    addMessage(message);
+    this.show();
+    this.setAlwaysOnTop(true); // will probably fail.
+    this.toFront();
+  }
+
+  /**
+   * Add a log record to be displayed by this error dialog.
+   */
+  private synchronized void addMessage(String message) {
+    messageCount += 1;
 
     BorderPane.setMargin(tabPane, new Insets(10, 0, 0, 0));
 
@@ -95,7 +109,7 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
     BorderPane.setMargin(dismiss, new Insets(10, 0, 0, 0));
     pane.setBottom(dismiss);
 
-    Tab tab = new Tab("Error " + errorCount, pane);
+    Tab tab = new Tab(getLevelName(type) + " " + messageCount, pane);
     tabPane.getTabs().add(tab);
 
     dismiss.setOnAction(event -> {
@@ -106,4 +120,27 @@ public class ChunkyErrorDialog extends Stage implements Initializable {
     });
   }
 
+  private String fxmlName(Level level)
+  {
+    switch (level) {
+      case WARNING:
+        return "WarningDialog.fxml";
+      case ERROR:
+      default: // To prevent crash should this happen (it shouldn't), use Error.
+        return "ErrorDialog.fxml";
+    }
+  }
+
+  private String getLevelName(Level level) {
+    switch (level) {
+      case WARNING:
+        return "Warning";
+      case ERROR:
+        return "Error";
+      case INFO:
+        return "Info";
+      default:
+        return ""; // should never happen
+    }
+  }
 }

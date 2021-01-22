@@ -26,7 +26,6 @@ import se.llbit.chunky.block.TallGrass;
 import se.llbit.chunky.block.Vine;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
-import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
 import se.llbit.chunky.world.ChunkPosition;
@@ -80,7 +79,7 @@ public class SurfaceLayer extends BitmapLayer {
 
         float[] color = new float[4];
 
-        for (; y >= minY && color[3] < 1.f; ) {
+        while (y >= minY && color[3] < 1.f) {
           Block block = palette.get(chunkData.getBlockAt(x, y, z));
           float[] blockColor = new float[4];
           ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
@@ -97,7 +96,7 @@ public class SurfaceLayer extends BitmapLayer {
             blockColor[3] = 1.f;// grass colors don't include alpha
 
             y -= 1;
-          } else if (block.name == "minecraft:ice") {
+          } else if (block.name.equals("minecraft:ice")) {
             color = blend(color, blockColor);
             y -= 1;
 
