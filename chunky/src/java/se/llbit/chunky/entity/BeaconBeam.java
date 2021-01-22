@@ -1,12 +1,18 @@
 package se.llbit.chunky.entity;
 
+import se.llbit.chunky.block.Beacon;
+import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.BeaconBeamMaterial;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.math.ColorUtil;
+import se.llbit.math.Octree;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
 import se.llbit.math.Vector3;
+import se.llbit.math.Vector3i;
 import se.llbit.math.Vector4;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.util.JsonUtil;
@@ -48,13 +54,12 @@ public class BeaconBeam extends Entity implements Poseable {
   private final JsonObject pose;
   private double scale = 1;
   private int height = 256;
-  private Map<Integer, BeaconBeamMaterial> materials = new HashMap<>();
+  private final Map<Integer, BeaconBeamMaterial> materials = new HashMap<>();
 
   public BeaconBeam(Vector3 position) {
     super(position);
     this.pose = new JsonObject();
     pose.add("all", JsonUtil.vec3ToJson(new Vector3(0, 0, 0)));
-    materials.put(0, new BeaconBeamMaterial(0xFFFFFF));
   }
 
   public BeaconBeam(JsonObject json) {
@@ -65,10 +70,106 @@ public class BeaconBeam extends Entity implements Poseable {
 
     JsonObject materialsList = json.get("beamMaterials").object();
     for (JsonMember obj : materialsList.members) {
-      BeaconBeamMaterial mat = new BeaconBeamMaterial(0xFFFFFF);
+      BeaconBeamMaterial mat = new BeaconBeamMaterial(0xF9FFFE);
       mat.loadMaterialProperties(obj.value.object());
       materials.put(Integer.parseInt(obj.name), mat);
     }
+  }
+
+  @Override
+  public void loadDataFromOctree(Octree octree, BlockPalette palette, Vector3i origin) {
+    int firstColor = 0xF9FFFE;
+    boolean foundFirst = false;
+    this.materials.put(0, new BeaconBeamMaterial(0xF9FFFE));
+
+    //Start i at 1 so the first beacon is not checked.
+    //Stop i at 256 even if the beam is taller because the Octree will wrap the coordinates.
+    for (int i = 1; i < height && (i + position.y) < 256; i++) {
+      Material blockMaterial = octree.getMaterial((int)(position.x - origin.x), (int)(position.y + i - origin.y), (int)(position.z - origin.z), palette);
+      int color = colorfromMaterial(blockMaterial);
+      if(color != -1) {
+        if (!foundFirst) {
+          this.materials.put(i, new BeaconBeamMaterial(color));
+          firstColor = color;
+          foundFirst = true;
+        } else {
+          float[] foundColor = new float[3];
+          float[] baseColor = new float[3];
+
+          ColorUtil.getRGBComponents(color, foundColor);
+          ColorUtil.getRGBComponents(firstColor, baseColor);
+
+          int newColor = ColorUtil.getRGB((foundColor[0] + baseColor[0]) / 2.0f, (foundColor[1] + baseColor[1]) / 2.0f, (foundColor[2] + baseColor[2]) / 2.0f);
+          this.materials.put(i, new BeaconBeamMaterial(newColor));
+        }
+      }
+    }
+  }
+
+  private int colorfromMaterial(Material blockMaterial) {
+    if(blockMaterial instanceof Beacon) {
+      return 0xF9FFFE;
+    }
+    if(blockMaterial.name.endsWith("_stained_glass") || blockMaterial.name.endsWith("_stained_glass_pane")) {
+      String prefix;
+      if(blockMaterial.name.endsWith("_stained_glass")) {
+        prefix = blockMaterial.name.substring(10, blockMaterial.name.length() - 14);
+      } else {
+        prefix = blockMaterial.name.substring(10, blockMaterial.name.length() - 19);
+      }
+      switch (prefix) {
+        default:
+        case "white": {
+          return 0xF9FFFE;
+        }
+        case "orange": {
+          return 0xF9801D;
+        }
+        case "magenta": {
+          return 0xC74EBD;
+        }
+        case "light_blue": {
+          return 0x3AB3DA;
+        }
+        case "yellow": {
+          return 0xFED83D;
+        }
+        case "lime": {
+          return 0x80C71F;
+        }
+        case "pink": {
+          return 0xF38BAA;
+        }
+        case "gray": {
+          return 0x474F52;
+        }
+        case "light_gray": {
+          return 0x9D9D97;
+        }
+        case "cyan": {
+          return 0x169C9C;
+        }
+        case "purple": {
+          return 0x8932B8;
+        }
+        case "blue": {
+          return 0x3C44AA;
+        }
+        case "brown": {
+          return 0x835432;
+        }
+        case "green": {
+          return 0x5E7C16;
+        }
+        case "red": {
+          return 0xB02E26;
+        }
+        case "black": {
+          return 0x1D1D21;
+        }
+      }
+    }
+    return -1;
   }
 
   @Override

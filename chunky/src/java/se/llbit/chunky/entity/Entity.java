@@ -18,10 +18,14 @@
 package se.llbit.chunky.entity;
 
 import java.util.Collection;
+
+import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
 import se.llbit.math.Grid;
+import se.llbit.math.Octree;
 import se.llbit.math.Vector3;
+import se.llbit.math.Vector3i;
 import se.llbit.math.primitive.Primitive;
 
 /**
@@ -40,6 +44,8 @@ abstract public class Entity {
   abstract public Collection<Primitive> primitives(Vector3 offset);
 
   public Grid.EmitterPosition[] getEmitterPosition() { return new Grid.EmitterPosition[0]; }
+
+  public void loadDataFromOctree(Octree octree, BlockPalette palette, Vector3i origin) {}
 
   /**
    * Marshalls this entity to JSON.

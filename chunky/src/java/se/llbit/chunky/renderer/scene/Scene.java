@@ -1184,6 +1184,10 @@ public class Scene implements JsonSerializable, Refreshable {
       waterOctree.endFinalization();
     }
 
+    for (Entity entity : actors) {
+      entity.loadDataFromOctree(worldOctree, palette, origin);
+    }
+
     if(emitterGrid != null)
       emitterGrid.prepare();
 
