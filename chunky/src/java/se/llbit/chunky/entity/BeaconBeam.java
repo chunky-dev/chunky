@@ -70,7 +70,7 @@ public class BeaconBeam extends Entity implements Poseable {
 
     JsonObject materialsList = json.get("beamMaterials").object();
     for (JsonMember obj : materialsList.members) {
-      BeaconBeamMaterial mat = new BeaconBeamMaterial(0xF9FFFE);
+      BeaconBeamMaterial mat = new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR);
       mat.loadMaterialProperties(obj.value.object());
       materials.put(Integer.parseInt(obj.name), mat);
     }
@@ -78,9 +78,9 @@ public class BeaconBeam extends Entity implements Poseable {
 
   @Override
   public void loadDataFromOctree(Octree octree, BlockPalette palette, Vector3i origin) {
-    int firstColor = 0xF9FFFE;
+    int firstColor = BeaconBeamMaterial.DEFAULT_COLOR;
     boolean foundFirst = false;
-    this.materials.put(0, new BeaconBeamMaterial(0xF9FFFE));
+    this.materials.put(0, new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR));
 
     //Start i at 1 so the first beacon is not checked.
     //Stop i at 256 even if the beam is taller because the Octree will wrap the coordinates.
@@ -176,7 +176,7 @@ public class BeaconBeam extends Entity implements Poseable {
   public Collection<Primitive> primitives(Vector3 offset) {
     Vector3 allPose = JsonUtil.vec3FromJsonArray(this.pose.get("all"));
     ArrayList<Primitive> faces = new ArrayList<>();
-    BeaconBeamMaterial using = new BeaconBeamMaterial(0xFFFFFF);
+    BeaconBeamMaterial using = new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR);
     //Have 1 block tall model and repeat it for height * scale.
     //This addresses the texture stretching problem and
     //allows for the height to be changed.

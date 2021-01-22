@@ -367,7 +367,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         Button addButton = new Button("Add");
         addButton.setOnAction(e -> {
           if (!beam.getMaterials().keySet().contains(layerHeightProp.get())) {
-            beam.getMaterials().put(layerHeightProp.get(), new BeaconBeamMaterial(0xF9FFFE));
+            beam.getMaterials().put(layerHeightProp.get(), new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR));
             colorHeightList.getItems().add(layerHeightProp.get());
             scene.rebuildActorBvh();
           }

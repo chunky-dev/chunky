@@ -8,6 +8,7 @@ import se.llbit.math.Ray;
 
 public class BeaconBeamMaterial extends Material {
 
+    public static final int DEFAULT_COLOR = 0xF9FFFE;
     private int color;
     private float[] beamColor = new float[4];
 
@@ -52,7 +53,7 @@ public class BeaconBeamMaterial extends Material {
     @Override
     public void loadMaterialProperties(JsonObject json) {
         super.loadMaterialProperties(json);
-        updateColor(json.get("color").asInt(0xF9FFFE));
+        updateColor(json.get("color").asInt(DEFAULT_COLOR));
     }
 
     public void saveMaterialProperties(JsonObject json) {
