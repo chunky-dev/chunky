@@ -6,6 +6,19 @@ if (project.version =~ /\d+\.\d+(\.\d+)?-.+/) {
   println 'Building snapshot version.'
 }
 
+plugins {
+  id 'org.openjfx.javafxplugin' version '0.0.8' apply false
+}
+
+if (JavaVersion.current().isJava11Compatible()) {
+  apply plugin: 'org.openjfx.javafxplugin'
+
+  javafx {
+    version = "11"
+    modules = ['javafx.controls', 'javafx.fxml']
+  }
+}
+
 allprojects {
   repositories {
     mavenCentral()
