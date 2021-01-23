@@ -1,12 +1,15 @@
 package se.llbit.chunky.entity;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import se.llbit.chunky.block.Beacon;
+import se.llbit.chunky.block.Block;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.world.Material;
 import se.llbit.chunky.world.material.BeaconBeamMaterial;
 import se.llbit.json.JsonMember;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonValue;
+import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Octree;
 import se.llbit.math.Quad;
@@ -19,8 +22,9 @@ import se.llbit.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BeaconBeam extends Entity implements Poseable {
 
@@ -54,7 +58,7 @@ public class BeaconBeam extends Entity implements Poseable {
   private final JsonObject pose;
   private double scale = 1;
   private int height = 256;
-  private final Map<Integer, BeaconBeamMaterial> materials = new HashMap<>();
+  private final Int2ObjectOpenHashMap<BeaconBeamMaterial> materials = new Int2ObjectOpenHashMap<>();
 
   public BeaconBeam(Vector3 position) {
     super(position);
@@ -82,11 +86,11 @@ public class BeaconBeam extends Entity implements Poseable {
     boolean foundFirst = false;
     this.materials.put(0, new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR));
 
-    //Start i at 1 so the first beacon is not checked.
-    //Stop i at 256 even if the beam is taller because the Octree will wrap the coordinates.
-    for (int i = 1; i < height && (i + position.y) < 256; i++) {
+    //Start i at 1 so the first beacon block is not checked. This would cause the base beam color to always be white.
+    //Stop iterating if the we get outside octree.
+    for (int i = 1; i < height && octree.isInside(new Vector3((position.x - origin.x), (position.y + i - origin.y), (position.z - origin.z))); i++) {
       Material blockMaterial = octree.getMaterial((int)(position.x - origin.x), (int)(position.y + i - origin.y), (int)(position.z - origin.z), palette);
-      int color = colorfromMaterial(blockMaterial);
+      int color = getColorFromBlock((Block)blockMaterial);
       if(color != -1) {
         if (!foundFirst) {
           this.materials.put(i, new BeaconBeamMaterial(color));
@@ -106,21 +110,20 @@ public class BeaconBeam extends Entity implements Poseable {
     }
   }
 
-  private int colorfromMaterial(Material blockMaterial) {
+  private int getColorFromBlock(Block blockMaterial) {
     if(blockMaterial instanceof Beacon) {
-      return 0xF9FFFE;
+      return BeaconBeamMaterial.DEFAULT_COLOR;
     }
-    if(blockMaterial.name.endsWith("_stained_glass") || blockMaterial.name.endsWith("_stained_glass_pane")) {
-      String prefix;
-      if(blockMaterial.name.endsWith("_stained_glass")) {
-        prefix = blockMaterial.name.substring(10, blockMaterial.name.length() - 14);
-      } else {
-        prefix = blockMaterial.name.substring(10, blockMaterial.name.length() - 19);
-      }
+    Pattern stainedGlassPattern = Pattern.compile("(minecraft:)?(.+?)_stained_glass(_pane)?");
+    Matcher matcher = stainedGlassPattern.matcher(blockMaterial.name);
+    if (matcher.find()) {
+      String prefix = matcher.group(2);
       switch (prefix) {
-        default:
+        default: {
+          Log.warn("Unknown stained glass type found: " + prefix);
+        }
         case "white": {
-          return 0xF9FFFE;
+          return BeaconBeamMaterial.DEFAULT_COLOR;
         }
         case "orange": {
           return 0xF9801D;
