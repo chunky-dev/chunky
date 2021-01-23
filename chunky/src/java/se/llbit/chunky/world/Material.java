@@ -67,6 +67,15 @@ public abstract class Material {
   public float roughness = 0f;
 
   /**
+   * The metalness value controls how metal-y a block appears. In reality this is a boolean value
+   * but in practice usually a float is used in PBR to allow adding dirt or scratches on metals
+   * without increasing the texture resolution.
+   * Metals only do specular reflection for certain wavelengths (effectively tinting the reflection)
+   * and have no diffuse reflection. The albedo color is used for tinting.
+   */
+  public float metalness = 0;
+
+  /**
    * Subsurface scattering property.
    */
   public boolean subSurfaceScattering = false;
@@ -125,6 +134,7 @@ public abstract class Material {
     specular = json.get("specular").floatValue(specular);
     emittance = json.get("emittance").floatValue(emittance);
     roughness = json.get("roughness").floatValue(roughness);
+    metalness = json.get("metalness").floatValue(metalness);
   }
 
   public boolean isWater() {
