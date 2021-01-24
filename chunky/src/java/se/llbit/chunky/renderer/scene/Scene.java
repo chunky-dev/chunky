@@ -35,8 +35,8 @@ import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.resources.FloatingPointCompressor;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
@@ -1941,23 +1941,14 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public synchronized void saveDump(RenderContext context, TaskTracker taskTracker) {
-    String fileName = name + ".dump";
-    try (TaskTracker.Task task = taskTracker.task("Saving render dump", 2)) {
-      task.update(1);
-      Log.info("Saving render dump " + fileName);
-      try(OutputStream out = context.getSceneFileOutputStream(fileName)) {
-        out.write(DUMP_FORMAT_MAGIC_NUMBER);
-        DataOutputStream dataOutput = new DataOutputStream(out);
-        dataOutput.writeInt(DUMP_FORMAT_VERSION);
-        dataOutput.writeInt(width);
-        dataOutput.writeInt(height);
-        dataOutput.writeInt(spp);
-        dataOutput.writeLong(renderTime);
-        FloatingPointCompressor.compress(samples, out);
-      } catch(IOException e) {
-        Log.warn("IO exception while saving render dump!", e);
-      }
+    File dumpFile = context.getSceneFile(name + ".dump");
+    Log.info("Saving render dump: " + dumpFile);
+    try {
+      RenderDump.save(dumpFile, this, taskTracker);
+    } catch (IOException e) {
+      Log.warn("IO exception while saving render dump!", e);
     }
+    Log.info("Render dump saved: " + dumpFile);
   }
 
   private synchronized boolean loadEmitterGrid(RenderContext context, TaskTracker taskTracker) {
@@ -2045,61 +2036,16 @@ public class Scene implements JsonSerializable, Refreshable {
       }
       return false;
     }
-    try(PushbackInputStream input = new PushbackInputStream(new FileInputStream(dumpFile), 4)) {
-      byte[] magicNumber = new byte[4];
-      input.read(magicNumber, 0, 4);
-      if(Arrays.equals(magicNumber, DUMP_FORMAT_MAGIC_NUMBER)) {
-        // Format with a version number
-        try(DataInputStream dataInput = new DataInputStream(input);
-            TaskTracker.Task task = taskTracker.task("Loading render dump", 2)) {
-          int dumpVersion = dataInput.readInt();
-          if(dumpVersion == 1) {
-            task.update(1);
-            Log.info("Reading render dump " + fileName);
-            int dumpWidth = dataInput.readInt();
-            int dumpHeight = dataInput.readInt();
-            if (dumpWidth != width || dumpHeight != height) {
-              Log.warn("Render dump discarded: incorrect width or height!");
-              return false;
-            }
-            spp = dataInput.readInt();
-            renderTime = dataInput.readLong();
 
-            FloatingPointCompressor.decompress(input, samples);
-          }
-        }
-      } else {
-        // Old format that is a gzipped stream, the header needs to be pushed back
-        input.unread(magicNumber, 0, 4);
-        try (DataInputStream in = new DataInputStream(new GZIPInputStream(input));
-             TaskTracker.Task task = taskTracker.task("Loading render dump", 2)) {
-          task.update(1);
-          Log.info("Reading render dump " + fileName);
-          int dumpWidth = in.readInt();
-          int dumpHeight = in.readInt();
-          if (dumpWidth != width || dumpHeight != height) {
-            Log.warn("Render dump discarded: incorrect width or height!");
-            return false;
-          }
-          spp = in.readInt();
-          renderTime = in.readLong();
-
-          for (int x = 0; x < width; ++x) {
-            task.update(width, x + 1);
-            for (int y = 0; y < height; ++y) {
-              samples[(y * width + x) * 3 + 0] = in.readDouble();
-              samples[(y * width + x) * 3 + 1] = in.readDouble();
-              samples[(y * width + x) * 3 + 2] = in.readDouble();
-              finalizePixel(x, y);
-            }
-          }
-        }
-      }
-    } catch (IOException e) {
+    Log.info("Loading render dump: " + dumpFile);
+    try {
+      RenderDump.load(dumpFile, this, taskTracker);
+    } catch (IOException | IllegalStateException e) {
       // The render dump was possibly corrupt.
-      Log.warn("Failed to load render dump", e);
+      Log.warn("IO exception while loading render dump!", e);
       return false;
     }
+    postProcessFrame(taskTracker);
 
     Log.info("Render dump loaded: " + fileName);
     return true;
@@ -2124,9 +2070,10 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param result the resulting color values are written to this array
    */
   public void postProcessPixel(int x, int y, double[] result) {
-    double r = samples[(y * width + x) * 3 + 0];
-    double g = samples[(y * width + x) * 3 + 1];
-    double b = samples[(y * width + x) * 3 + 2];
+    int index = (y * width + x) * 3;
+    double r = samples[index];
+    double g = samples[index + 1];
+    double b = samples[index + 2];
 
     r *= exposure;
     g *= exposure;
@@ -2371,45 +2318,13 @@ public class Scene implements JsonSerializable, Refreshable {
    * Merge a render dump into this scene.
    */
   public void mergeDump(File dumpFile, TaskTracker taskTracker) {
-    int dumpSpp;
-    long dumpTime;
-    try (TaskTracker.Task task = taskTracker.task("Merging render dump", 2);
-        DataInputStream in = new DataInputStream(
-            new GZIPInputStream(new FileInputStream(dumpFile)))) {
-      task.update(1);
-      Log.info("Loading render dump " + dumpFile.getAbsolutePath());
-      int dumpWidth = in.readInt();
-      int dumpHeight = in.readInt();
-      if (dumpWidth != width || dumpHeight != height) {
-        Log.warn("Render dump discarded: incorrect width or height!");
-        return;
-      }
-      dumpSpp = in.readInt();
-      dumpTime = in.readLong();
-
-      double sa = spp / (double) (spp + dumpSpp);
-      double sb = 1 - sa;
-
-      for (int x = 0; x < width; ++x) {
-        task.update(width, x + 1);
-        for (int y = 0; y < height; ++y) {
-          samples[(y * width + x) * 3 + 0] =
-              samples[(y * width + x) * 3 + 0] * sa + in.readDouble() * sb;
-          samples[(y * width + x) * 3 + 1] =
-              samples[(y * width + x) * 3 + 1] * sa + in.readDouble() * sb;
-          samples[(y * width + x) * 3 + 2] =
-              samples[(y * width + x) * 3 + 2] * sa + in.readDouble() * sb;
-          finalizePixel(x, y);
-        }
-      }
-      Log.info("Render dump loaded");
-
-      // Update render status.
-      spp += dumpSpp;
-      renderTime += dumpTime;
+    Log.info("Merging render dump: " + dumpFile);
+    try {
+      RenderDump.merge(dumpFile, this, taskTracker);
     } catch (IOException e) {
-      Log.info("Render dump not loaded");
+      Log.warn("IO exception while merging render dump!", e);
     }
+    Log.info("Render dump merged: " + dumpFile);
   }
 
   public void setSaveSnapshots(boolean value) {
