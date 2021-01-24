@@ -507,9 +507,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
-    if (loadDump(context, taskTracker)) {
-      postProcessFrame(taskTracker);
-    }
+    loadDump(context, taskTracker);
 
     if (spp == 0) {
       mode = RenderMode.PREVIEW;
@@ -2321,6 +2319,7 @@ public class Scene implements JsonSerializable, Refreshable {
     Log.info("Merging render dump: " + dumpFile);
     try {
       RenderDump.merge(dumpFile, this, taskTracker);
+      postProcessFrame(taskTracker);
     } catch (IOException e) {
       Log.warn("IO exception while merging render dump!", e);
     }
