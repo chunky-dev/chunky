@@ -1933,7 +1933,7 @@ public class Scene implements JsonSerializable, Refreshable {
         task.update(2);
         Log.info("Octree saved");
       } catch (IOException e) {
-        Log.warn("IO exception while saving octree", e);
+        Log.warn("Failed to save the octree", e);
       }
     }
   }
@@ -1944,7 +1944,7 @@ public class Scene implements JsonSerializable, Refreshable {
     try {
       RenderDump.save(dumpFile, this, taskTracker);
     } catch (IOException e) {
-      Log.warn("IO exception while saving render dump!", e);
+      Log.warn("Failed to save the render dump", e);
     }
     Log.info("Render dump saved: " + dumpFile);
   }
@@ -1957,7 +1957,7 @@ public class Scene implements JsonSerializable, Refreshable {
         emitterGrid = Grid.load(in);
         return true;
       } catch(Exception e) {
-        Log.info("Couldn't load the grid", e);
+        Log.info("Failed to load the grid", e);
         return false;
       }
     }
@@ -2040,7 +2040,7 @@ public class Scene implements JsonSerializable, Refreshable {
       RenderDump.load(dumpFile, this, taskTracker);
     } catch (IOException | IllegalStateException e) {
       // The render dump was possibly corrupt.
-      Log.warn("IO exception while loading render dump!", e);
+      Log.warn("Failed to load the render dump", e);
       return false;
     }
     postProcessFrame(taskTracker);
@@ -2320,10 +2320,10 @@ public class Scene implements JsonSerializable, Refreshable {
     try {
       RenderDump.merge(dumpFile, this, taskTracker);
       postProcessFrame(taskTracker);
+      Log.info("Render dump merged: " + dumpFile);
     } catch (IOException e) {
-      Log.warn("IO exception while merging render dump!", e);
+      Log.warn("Failed to merge the render dump", e);
     }
-    Log.info("Render dump merged: " + dumpFile);
   }
 
   public void setSaveSnapshots(boolean value) {
