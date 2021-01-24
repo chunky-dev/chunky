@@ -17,11 +17,11 @@
 package se.llbit.chunky.renderer.renderdump;
 
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.util.TaskTracker;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.function.IntConsumer;
 
 class CompressedFloatDumpFormat extends DumpFormat {
 
@@ -31,31 +31,31 @@ class CompressedFloatDumpFormat extends DumpFormat {
   }
 
   @Override
-  public void readBody(
+  public void readSamples(
     DataInputStream inputStream,
     Scene scene,
     PixelConsumer consumer,
-    TaskTracker.Task task
+    IntConsumer pixelProgress
   ) throws IOException {
     double[] buffer = scene.getSampleBuffer();
     FloatingPointCompressor.decompress(
       inputStream,
       buffer.length,
       consumer,
-      pixelIndex -> task.update(1 + pixelIndex)
+      pixelProgress
     );
   }
 
   @Override
-  public void writeBody(
+  public void writeSamples(
     DataOutputStream outputStream,
     Scene scene,
-    TaskTracker.Task task
+    IntConsumer pixelProgress
   ) throws IOException {
     FloatingPointCompressor.compress(
       outputStream,
       scene.getSampleBuffer(),
-      pixelIndex -> task.update(1 + pixelIndex)
+      pixelProgress
     );
   }
 }

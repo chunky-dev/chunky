@@ -17,11 +17,11 @@
 package se.llbit.chunky.renderer.renderdump;
 
 import se.llbit.chunky.renderer.scene.Scene;
-import se.llbit.util.TaskTracker;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.function.IntConsumer;
 
 class ClassicDumpFormat extends DumpFormat {
 
@@ -31,11 +31,11 @@ class ClassicDumpFormat extends DumpFormat {
   }
 
   @Override
-  public void readBody(
+  public void readSamples(
     DataInputStream inputStream,
     Scene scene,
     PixelConsumer consumer,
-    TaskTracker.Task task
+    IntConsumer pixelProgress
   ) throws IOException {
     int pixelIndex;
     double r, g, b;
@@ -47,16 +47,16 @@ class ClassicDumpFormat extends DumpFormat {
         g = inputStream.readDouble();
         b = inputStream.readDouble();
         consumer.consume(pixelIndex, r, g, b);
-        task.update(1 + pixelIndex);
+        pixelProgress.accept(pixelIndex);
       }
     }
   }
 
   @Override
-  public void writeBody(
+  public void writeSamples(
     DataOutputStream outputStream,
     Scene scene,
-    TaskTracker.Task task
+    IntConsumer pixelProgress
   ) throws IOException {
     double[] samples = scene.getSampleBuffer();
     int pixelIndex, index;
@@ -68,7 +68,7 @@ class ClassicDumpFormat extends DumpFormat {
         outputStream.writeDouble(samples[index]);
         outputStream.writeDouble(samples[index + 1]);
         outputStream.writeDouble(samples[index + 2]);
-        task.update(1 + pixelIndex);
+        pixelProgress.accept(pixelIndex);
       }
     }
   }

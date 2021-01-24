@@ -22,20 +22,24 @@ import se.llbit.util.TaskTracker;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.function.IntConsumer;
 
+/**
+ * A dump format reads a render dump from a DataInputStream into the scene/
+ * writes a render dump from the scene into a DataOutputStream.
+ *
+ * The input stream is expected to do _not_ contain the magic number and version number -
+ * they should have been read before calling load (logic for that in RenderDump class).
+ * The output stream is expected to contain the magic number and version number -
+ * they should have been written before calling save (logic for that in RenderDump class).
+ *
+ * The "header" of a dump typically contains width, height, spp and renderTime
+ * and is the same for all currently implemented formats.
+ * The strategy for reading/writing the samples (from the buffer in the scene)
+ * has to be implemented.
+ */
 abstract class DumpFormat {
 
-  /**
-   * Used in the calculation of the total loading/saving task size
-   */
-  protected int getProgressSize(Scene scene) {
-    return 1 + scene.width * scene.height;
-  }
-
-  /**
-   * The input stream is expected to start with the header of the dump,
-   * magic number and version number should have been read before calling load.
-   */
   public void load(
     DataInputStream inputStream,
     Scene scene,
@@ -43,17 +47,16 @@ abstract class DumpFormat {
   ) throws IOException, IllegalStateException {
     try (TaskTracker.Task task = taskTracker.task(
       "Loading render dump",
-      getProgressSize(scene)
+      scene.width * scene.height
     )) {
-      readHeader(inputStream, scene, task);
-      loadBody(inputStream, scene, task);
+      readHeader(inputStream, scene);
+      readSamples(inputStream, scene, task::update);
     }
   }
 
   protected void readHeader(
     DataInputStream inputStream,
-    Scene scene,
-    TaskTracker.Task task
+    Scene scene
   ) throws IOException, IllegalStateException {
     int width = inputStream.readInt();
     int height = inputStream.readInt();
@@ -62,32 +65,27 @@ abstract class DumpFormat {
     }
     scene.spp = inputStream.readInt();
     scene.renderTime = inputStream.readLong();
-    task.update(1);
   }
 
-  protected void loadBody(
+  protected void readSamples(
     DataInputStream inputStream,
     Scene scene,
-    TaskTracker.Task task
+    IntConsumer pixelProgress
   ) throws IOException {
     double[] buffer = scene.getSampleBuffer();
-    readBody(
+    readSamples(
       inputStream,
       scene,
       (pixelIndex, r, g, b) -> {
         int index = 3 * pixelIndex;
-        buffer[index]     = r;
+        buffer[index] = r;
         buffer[index + 1] = g;
         buffer[index + 2] = b;
       },
-      task
+      pixelProgress
     );
   }
 
-  /**
-   * The input stream is expected to start with the header of the dump,
-   * magic number and version number should have been read before calling load.
-   */
   public void merge(
     DataInputStream inputStream,
     Scene scene,
@@ -95,51 +93,47 @@ abstract class DumpFormat {
   ) throws IOException, IllegalStateException {
     try (TaskTracker.Task task = taskTracker.task(
       "Merging render dump",
-      getProgressSize(scene)
+      scene.width * scene.height
     )) {
       int previousSpp = scene.spp;
       long previousRenderTime = scene.renderTime;
-      readHeader(inputStream, scene, task);
-      mergeBody(inputStream, previousSpp, scene, task);
+      readHeader(inputStream, scene);
+      mergeSamples(inputStream, previousSpp, scene, task::update);
       scene.spp += previousSpp;
       scene.renderTime += previousRenderTime;
     }
   }
 
-  protected void mergeBody(
+  protected void mergeSamples(
     DataInputStream inputStream,
     int previousSpp,
     Scene scene,
-    TaskTracker.Task task
+    IntConsumer pixelProgress
   ) throws IOException {
     int dumpSpp = scene.spp;
     double sa = previousSpp / (double) (previousSpp + dumpSpp);
     double sb = 1 - sa;
     double[] buffer = scene.getSampleBuffer();
-    readBody(
+    readSamples(
       inputStream,
       scene,
       (pixelIndex, r, g, b) -> {
         int index = 3 * pixelIndex;
-        buffer[index]     = buffer[index]     * sa + r * sb;
+        buffer[index] = buffer[index] * sa + r * sb;
         buffer[index + 1] = buffer[index + 1] * sa + g * sb;
         buffer[index + 2] = buffer[index + 2] * sa + b * sb;
       },
-      task
+      pixelProgress
     );
   }
 
-  protected abstract void readBody(
+  protected abstract void readSamples(
     DataInputStream inputStream,
     Scene scene,
     PixelConsumer consumer,
-    TaskTracker.Task task
+    IntConsumer pixelProgress
   ) throws IOException;
 
-  /**
-   * The output stream is expected to start with the header of the dump,
-   * magic number and version number should have been written before calling save.
-   */
   public void save(
     DataOutputStream outputStream,
     Scene scene,
@@ -147,29 +141,27 @@ abstract class DumpFormat {
   ) throws IOException {
     try (TaskTracker.Task task = taskTracker.task(
       "Saving render dump",
-      getProgressSize(scene)
+      scene.width * scene.height
     )) {
-      writeHeader(outputStream, scene, task);
-      writeBody(outputStream, scene, task);
+      writeHeader(outputStream, scene);
+      writeSamples(outputStream, scene, task::update);
       outputStream.flush();
     }
   }
 
   protected void writeHeader(
     DataOutputStream outputStream,
-    Scene scene,
-    TaskTracker.Task task
+    Scene scene
   ) throws IOException {
     outputStream.writeInt(scene.width);
     outputStream.writeInt(scene.height);
     outputStream.writeInt(scene.spp);
     outputStream.writeLong(scene.renderTime);
-    task.update(1);
   }
 
-  protected abstract void writeBody(
+  protected abstract void writeSamples(
     DataOutputStream outputStream,
     Scene scene,
-    TaskTracker.Task task
+    IntConsumer pixelProgress
   ) throws IOException;
 }
