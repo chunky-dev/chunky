@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
-import com.sun.scenario.effect.impl.state.RenderState;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
@@ -29,16 +28,6 @@ class ClassicDumpFormat extends DumpFormat {
   public static final DumpFormat INSTANCE = new ClassicDumpFormat();
 
   private ClassicDumpFormat() {
-  }
-
-  @Override
-  public int getVersion() {
-    return 0; // this format did not use a version
-  }
-
-  @Override
-  protected int getBodyProgressSize(Scene scene) {
-    return scene.width * scene.height;
   }
 
   @Override

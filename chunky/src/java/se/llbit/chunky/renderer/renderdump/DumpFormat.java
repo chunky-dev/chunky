@@ -22,51 +22,14 @@ import se.llbit.util.TaskTracker;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 abstract class DumpFormat {
-  private static final SortedMap<Integer, DumpFormat> DUMP_FORMATS = new TreeMap<>();
-  public static final DumpFormat CLASSIC_DUMP_FORMAT;
-  public static final DumpFormat DEFAULT_DUMP_FORMAT;
-
-  static {
-    CLASSIC_DUMP_FORMAT = ClassicDumpFormat.INSTANCE;
-    registerDumpFormat(CLASSIC_DUMP_FORMAT);
-    registerDumpFormat(CompressedFloatDumpFormat.INSTANCE);
-    DEFAULT_DUMP_FORMAT = getNewestDumpFormat();
-  }
-
-  public static void registerDumpFormat(DumpFormat format) {
-    DUMP_FORMATS.put(format.getVersion(), format);
-  }
-
-  public static DumpFormat getDumpFormatForVersion(int dumpVersion) throws IOException {
-    DumpFormat format = DUMP_FORMATS.get(dumpVersion);
-    if (format == null) {
-      throw new IOException("Unknown dump format version \"" + dumpVersion + "\"");
-    }
-    return format;
-  }
-
-  public static DumpFormat getNewestDumpFormat() {
-    return DUMP_FORMATS.get(DUMP_FORMATS.lastKey());
-  }
-
-  public abstract int getVersion();
 
   /**
    * Used in the calculation of the total loading/saving task size
    */
-  protected int getHeaderProgressSize(Scene scene) {
-    return 1;
-  }
-
-  /**
-   * Used in the calculation of the total loading/saving task size
-   */
-  protected int getBodyProgressSize(Scene scene) {
-    return 1;
+  protected int getProgressSize(Scene scene) {
+    return 1 + scene.width * scene.height;
   }
 
   /**
@@ -80,7 +43,7 @@ abstract class DumpFormat {
   ) throws IOException, IllegalStateException {
     try (TaskTracker.Task task = taskTracker.task(
       "Loading render dump",
-      getHeaderProgressSize(scene) + getBodyProgressSize(scene)
+      getProgressSize(scene)
     )) {
       readHeader(inputStream, scene, task);
       loadBody(inputStream, scene, task);
@@ -132,7 +95,7 @@ abstract class DumpFormat {
   ) throws IOException, IllegalStateException {
     try (TaskTracker.Task task = taskTracker.task(
       "Merging render dump",
-      getHeaderProgressSize(scene) + getBodyProgressSize(scene)
+      getProgressSize(scene)
     )) {
       int previousSpp = scene.spp;
       long previousRenderTime = scene.renderTime;
@@ -184,7 +147,7 @@ abstract class DumpFormat {
   ) throws IOException {
     try (TaskTracker.Task task = taskTracker.task(
       "Saving render dump",
-      getHeaderProgressSize(scene) + getBodyProgressSize(scene)
+      getProgressSize(scene)
     )) {
       writeHeader(outputStream, scene, task);
       writeBody(outputStream, scene, task);

@@ -31,16 +31,6 @@ class CompressedFloatDumpFormat extends DumpFormat {
   }
 
   @Override
-  public int getVersion() {
-    return 1;
-  }
-
-  @Override
-  protected int getBodyProgressSize(Scene scene) {
-    return scene.width * scene.height;
-  }
-
-  @Override
   public void readBody(
     DataInputStream inputStream,
     Scene scene,

@@ -31,6 +31,17 @@ import java.util.zip.GZIPInputStream;
 public class RenderDump {
   static final byte[] DUMP_FORMAT_MAGIC_NUMBER = {0x44, 0x55, 0x4D, 0x50};
 
+  static final int CURRENT_DUMP_VERSION = 1;
+
+  private static DumpFormat getDumpFormatForVersion(int version) {
+    switch(version) {
+      case 1:
+        return CompressedFloatDumpFormat.INSTANCE;
+      default:
+        return ClassicDumpFormat.INSTANCE;
+    }
+  }
+
   /**
    * Load a scene dump from the given file into the scene.
    * This overwrites ssp, renderTime and samples in the scene.
@@ -55,13 +66,13 @@ public class RenderDump {
 
         DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
         int dumpVersion = dataInputStream.readInt();
-        DumpFormat.getDumpFormatForVersion(dumpVersion)
+        getDumpFormatForVersion(dumpVersion)
           .load(dataInputStream, scene, taskTracker);
       } else {
         // Old format that is a gzipped stream, the header needs to be pushed back
         pushbackInputStream.unread(magicNumber, 0, 4);
         DataInputStream dataInputStream = new DataInputStream(new GZIPInputStream(pushbackInputStream));
-        DumpFormat.CLASSIC_DUMP_FORMAT
+        getDumpFormatForVersion(0)
           .load(dataInputStream, scene, taskTracker);
       }
     }
@@ -91,13 +102,13 @@ public class RenderDump {
 
         DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
         int dumpVersion = dataInputStream.readInt();
-        DumpFormat.getDumpFormatForVersion(dumpVersion)
+        getDumpFormatForVersion(dumpVersion)
           .merge(dataInputStream, scene, taskTracker);
       } else {
         // Old format that is a gzipped stream, the header needs to be pushed back
         pushbackInputStream.unread(magicNumber, 0, 4);
         DataInputStream dataInputStream = new DataInputStream(new GZIPInputStream(pushbackInputStream));
-        DumpFormat.CLASSIC_DUMP_FORMAT
+        getDumpFormatForVersion(0)
           .merge(dataInputStream, scene, taskTracker);
       }
     }
@@ -111,8 +122,8 @@ public class RenderDump {
     try (FileOutputStream fileOutputStream = new FileOutputStream(dumpFile)) {
       fileOutputStream.write(DUMP_FORMAT_MAGIC_NUMBER);
       DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
-      DumpFormat format = DumpFormat.DEFAULT_DUMP_FORMAT;
-      dataOutputStream.writeInt(format.getVersion());
+      DumpFormat format = getDumpFormatForVersion(CURRENT_DUMP_VERSION);
+      dataOutputStream.writeInt(CURRENT_DUMP_VERSION);
       format.save(dataOutputStream, scene, taskTracker);
     }
   }
