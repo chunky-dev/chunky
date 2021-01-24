@@ -19,9 +19,7 @@ package se.llbit.chunky.world;
 import java.util.HashMap;
 import java.util.Map;
 
-import se.llbit.chunky.block.Beacon;
 import se.llbit.chunky.block.Candle;
-import se.llbit.chunky.entity.BeaconBeam;
 import se.llbit.chunky.entity.Campfire;
 import se.llbit.chunky.world.material.CloudMaterial;
 
@@ -35,7 +33,6 @@ public class ExtraMaterials {
     idMap.put("candle_flame", Candle.flameMaterial);
     idMap.put("campfire_flame", Campfire.flameMaterial);
     idMap.put("soul_campfire_flame", Campfire.soulFlameMaterial);
-    idMap.put("beacon_beam", BeaconBeam.beaconBeamMaterial);
   }
 
   public static void loadDefaultMaterialProperties() {
@@ -49,8 +46,5 @@ public class ExtraMaterials {
 
     Campfire.soulFlameMaterial.restoreDefaults();
     Campfire.soulFlameMaterial.emittance = 0.6f;
-
-    BeaconBeam.beaconBeamMaterial.restoreDefaults();
-    BeaconBeam.beaconBeamMaterial.emittance = 1.0f;
   }
 }

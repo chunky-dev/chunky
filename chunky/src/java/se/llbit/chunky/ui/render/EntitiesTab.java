@@ -24,15 +24,21 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Consumer;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -41,6 +47,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.util.converter.NumberStringConverter;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.BeaconBeam;
 import se.llbit.chunky.entity.Book;
@@ -55,9 +62,12 @@ import se.llbit.chunky.ui.AngleAdjuster;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
+import se.llbit.chunky.world.material.BeaconBeamMaterial;
+import se.llbit.fx.LuxColorPicker;
 import se.llbit.json.Json;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonObject;
+import se.llbit.math.ColorUtil;
 import se.llbit.math.Vector3;
 
 public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initializable {
@@ -268,6 +278,106 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
           scene.rebuildActorBvh();
         });
         controls.getChildren().add(height);
+
+        HBox beamColor = new HBox();
+        VBox listControls = new VBox();
+        VBox propertyControls = new VBox();
+
+        listControls.setMaxWidth(200);
+        beamColor.setPadding(new Insets(10));
+        beamColor.setSpacing(15);
+        propertyControls.setSpacing(10);
+
+        DoubleAdjuster emittance = new DoubleAdjuster();
+        emittance.setName("Emittance");
+        emittance.setRange(0, 100);
+
+        DoubleAdjuster specular = new DoubleAdjuster();
+        specular.setName("Specular");
+        specular.setRange(0, 1);
+
+        DoubleAdjuster ior = new DoubleAdjuster();
+        ior.setName("IoR");
+        ior.setRange(0, 5);
+
+        DoubleAdjuster perceptualSmoothness = new DoubleAdjuster();
+        perceptualSmoothness.setName("Smoothness");
+        perceptualSmoothness.setRange(0, 1);
+
+        LuxColorPicker beamColorPicker = new LuxColorPicker();
+
+        ObservableList<Integer> colorHeights = FXCollections.observableArrayList();
+        colorHeights.addAll(beam.getMaterials().keySet());
+        ListView<Integer> colorHeightList = new ListView<>(colorHeights);
+        colorHeightList.setMaxHeight(150.0);
+        colorHeightList.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, heightIndex) -> {
+
+              BeaconBeamMaterial beamMat = beam.getMaterials().get(heightIndex);
+              emittance.set(beamMat.emittance);
+              specular.set(beamMat.specular);
+              ior.set(beamMat.ior);
+              perceptualSmoothness.set(beamMat.getPerceptualSmoothness());
+              beamColorPicker.setColor(ColorUtil.toFx(beamMat.getColorInt()));
+
+              emittance.onValueChange(value -> {
+                beamMat.emittance = value.floatValue();
+                scene.rebuildActorBvh();
+              });
+              specular.onValueChange(value -> {
+                beamMat.specular = value.floatValue();
+                scene.rebuildActorBvh();
+              });
+              ior.onValueChange(value -> {
+                beamMat.ior = value.floatValue();
+                scene.rebuildActorBvh();
+              });
+              perceptualSmoothness.onValueChange(value -> {
+                beamMat.setPerceptualSmoothness(value);
+                scene.rebuildActorBvh();
+              });
+            }
+        );
+        beamColorPicker.colorProperty().addListener(
+            (observableColor, oldColorValue, newColorValue) -> {
+              Integer index = colorHeightList.getSelectionModel().getSelectedItem();
+              if (index != null) {
+                beam.getMaterials().get(index).updateColor(ColorUtil.getRGB(ColorUtil.fromFx(newColorValue)));
+                scene.rebuildActorBvh();
+              }
+            }
+        );
+        
+        HBox listButtons = new HBox();
+        listButtons.setPadding(new Insets(10));
+        listButtons.setSpacing(15);
+        Button deleteButton = new Button("Delete");
+        deleteButton.setOnAction(e -> { 
+          Integer index = colorHeightList.getSelectionModel().getSelectedItem();
+          if (index != null && index != 0) { //Prevent removal of the bottom layer
+            beam.getMaterials().remove(index);
+            colorHeightList.getItems().removeAll(index);
+            scene.rebuildActorBvh();
+          }
+        });
+        IntegerProperty layerHeightProp = new SimpleIntegerProperty();
+        TextField layerInput = new TextField();
+        layerInput.setMaxWidth(50);
+        layerInput.textProperty().bindBidirectional(layerHeightProp, new NumberStringConverter());
+        Button addButton = new Button("Add");
+        addButton.setOnAction(e -> {
+          if (!beam.getMaterials().containsKey(layerHeightProp.get())) { //Don't allow duplicate indices
+            beam.getMaterials().put(layerHeightProp.get(), new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR));
+            colorHeightList.getItems().add(layerHeightProp.get());
+            scene.rebuildActorBvh();
+          }
+        });
+        
+        listButtons.getChildren().addAll(deleteButton, layerInput, addButton);
+        propertyControls.getChildren().addAll(emittance, specular, perceptualSmoothness, ior, beamColorPicker);
+        listControls.getChildren().addAll(new Label("Start Height:"), colorHeightList, listButtons);
+        beamColor.getChildren().addAll(listControls, propertyControls);
+        controls.getChildren().add(beamColor);
       }
 
       DoubleAdjuster scale = new DoubleAdjuster();
