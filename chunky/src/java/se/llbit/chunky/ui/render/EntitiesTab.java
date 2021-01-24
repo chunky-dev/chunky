@@ -366,7 +366,7 @@ public class EntitiesTab extends ScrollPane implements RenderControlsTab, Initia
         layerInput.textProperty().bindBidirectional(layerHeightProp, new NumberStringConverter());
         Button addButton = new Button("Add");
         addButton.setOnAction(e -> {
-          if (!beam.getMaterials().keySet().contains(layerHeightProp.get())) {
+          if (!beam.getMaterials().containsKey(layerHeightProp.get())) { //Don't allow duplicate indices
             beam.getMaterials().put(layerHeightProp.get(), new BeaconBeamMaterial(BeaconBeamMaterial.DEFAULT_COLOR));
             colorHeightList.getItems().add(layerHeightProp.get());
             scene.rebuildActorBvh();

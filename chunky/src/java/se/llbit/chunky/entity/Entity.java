@@ -45,6 +45,13 @@ abstract public class Entity {
 
   public Grid.EmitterPosition[] getEmitterPosition() { return new Grid.EmitterPosition[0]; }
 
+  /**
+   * Called on every entity in a scene to allow it to load it's data from other blocks in the Octree.
+   *
+   * @param octree The scene's worldOctree
+   * @param palette The scene's block palate
+   * @param origin The Octree's origin
+   */
   public void loadDataFromOctree(Octree octree, BlockPalette palette, Vector3i origin) {}
 
   /**

@@ -97,6 +97,7 @@ public class BeaconBeam extends Entity implements Poseable {
           firstColor = color;
           foundFirst = true;
         } else {
+          //If this is not the first block to change the color, the new beam color is the average of the first color and the color of this block
           float[] foundColor = new float[3];
           float[] baseColor = new float[3];
 
@@ -172,7 +173,7 @@ public class BeaconBeam extends Entity implements Poseable {
         }
       }
     }
-    return -1;
+    return -1; // Return -1 if block doesn't change beam color
   }
 
   @Override
