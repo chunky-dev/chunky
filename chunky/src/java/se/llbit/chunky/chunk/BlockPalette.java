@@ -223,15 +223,21 @@ public class BlockPalette {
     materialProperties.put("minecraft:black_stained_glass_pane", glassConfig);
     materialProperties.put("minecraft:gold_block", block -> {
       block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.9);
     });
     materialProperties.put("minecraft:diamond_block", block -> {
       block.specular = 0.04f;
     });
     materialProperties.put("minecraft:iron_block", block -> {
       block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.9);
     });
     materialProperties.put("minecraft:iron_bars", block -> {
       block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.9);
     });
     materialProperties.put("minecraft:redstone_torch", block -> {
       block.emittance = 1.0f;
@@ -356,9 +362,18 @@ public class BlockPalette {
         }
       }
     });
-    Consumer<Block> copperConfig = block -> { block.specular = 0.04f; };
-    Consumer<Block> lightlyWeatheredCopperConfig = block -> { block.specular = 0.66f * 0.04f; };
-    Consumer<Block> semiWeatheredCopperConfig = block -> { block.specular = 0.33f * 0.04f; };
+    Consumer<Block> copperConfig = block -> {
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.75);
+    };
+    Consumer<Block> lightlyWeatheredCopperConfig = block -> {
+      block.metalness = 0.66f;
+      block.setPerceptualSmoothness(0.75);
+    };
+    Consumer<Block> semiWeatheredCopperConfig = block -> {
+      block.metalness = 0.66f;
+      block.setPerceptualSmoothness(0.75);
+    };
     materialProperties.put("minecraft:copper_block", copperConfig);
     materialProperties.put("minecraft:lightly_weathered_copper_block", lightlyWeatheredCopperConfig);
     materialProperties.put("minecraft:semi_weathered_copper_block", semiWeatheredCopperConfig);
