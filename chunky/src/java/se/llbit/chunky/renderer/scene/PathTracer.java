@@ -125,8 +125,11 @@ public class PathTracer implements RayTracer {
         continue;
       }
 
-      if (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular) {
-        // Specular reflection.
+      float pMetal = currentMat.metalness;
+      boolean doMetal = pMetal > Ray.EPSILON && random.nextFloat() < pMetal;
+
+      if (doMetal || (pSpecular > Ray.EPSILON && random.nextFloat() < pSpecular)) {
+        // Specular reflection (metals only do specular reflection).
 
         firstReflection = false;
 
@@ -135,9 +138,16 @@ public class PathTracer implements RayTracer {
           reflected.specularReflection(ray, random);
 
           if (pathTrace(scene, reflected, state, 1, false)) {
-            ray.color.x = reflected.color.x;
-            ray.color.y = reflected.color.y;
-            ray.color.z = reflected.color.z;
+            if (doMetal) {
+              // use the albedo color as specular color
+              ray.color.x *= reflected.color.x;
+              ray.color.y *= reflected.color.y;
+              ray.color.z *= reflected.color.z;
+            } else {
+              ray.color.x = reflected.color.x;
+              ray.color.y = reflected.color.y;
+              ray.color.z = reflected.color.z;
+            }
             hit = true;
           }
         }

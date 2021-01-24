@@ -3073,6 +3073,16 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
+   * Modifies the metalness property for the given material.
+   */
+  public void setMetalness(String materialName, float value) {
+    JsonObject material = materials.getOrDefault(materialName, new JsonObject()).object();
+    material.set("metalness", Json.of(value));
+    materials.put(materialName, material);
+    refresh(ResetReason.MATERIALS_CHANGED);
+  }
+
+  /**
    * Renders a fog effect over the sky near the horizon.
    */
   public void addSkyFog(Ray ray) {
