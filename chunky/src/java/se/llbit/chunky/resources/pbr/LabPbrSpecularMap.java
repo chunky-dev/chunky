@@ -9,13 +9,14 @@ import se.llbit.math.Ray;
  * @see <a href="https://github.com/rre36/lab-pbr/wiki/Specular-Texture-Details#alpha">Specular
  * Texture details</a>
  */
-public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, RoughnessMap {
+public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, RoughnessMap, MetalnessMap {
 
   private final int width;
   private final int height;
   private byte[] emissionMap;
   private byte[] reflectanceMap;
   private double[] roughnessMap;
+  private boolean hasMetalness;
 
   public LabPbrSpecularMap(BitmapImage texture) {
     width = texture.width;
@@ -38,19 +39,22 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
 
     reflectanceMap = new byte[texture.width * texture.height];
     boolean hasReflectance = false;
+    hasMetalness = false;
     for (int y = 0; y < texture.height; ++y) {
       for (int x = 0; x < texture.width; ++x) {
         // green channel (0 to 299 are f0, where 229 is 229/255 reflectance (about 90%)
         int value = (texture.data[y * texture.width + x] >>> 8) & 0xFF;
-        if (value > 0 && value < 230) {
+        if (value > 0) {
           hasReflectance = true;
-          reflectanceMap[y * texture.width + x] = (byte) value;
-        } else {
-          // values from 230 to 255 represent metals (hard-coded metals not yet supported)
         }
+        if (value >= 230) {
+          // values from 230 to 255 represent metals (hard-coded metals not yet supported)
+          hasMetalness = true;
+        }
+        reflectanceMap[y * texture.width + x] = (byte) value;
       }
     }
-    if (!hasReflectance) {
+    if (!hasReflectance && !hasMetalness) {
       reflectanceMap = null;
     }
 
@@ -97,11 +101,30 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
     int x = (int) (u * width - Ray.EPSILON);
     int y = (int) ((1 - v) * height - Ray.EPSILON);
     int rawValue = reflectanceMap[y * width + x] & 0xFF;
+    if (rawValue >= 230) {
+      // values from 230 to 255 represent metals (hard-coded metals not yet supported)
+      return 0;
+    }
     return rawValue / 255.0;
   }
 
   public boolean hasReflectance() {
     return reflectanceMap != null;
+  }
+
+  @Override
+  public float getMetalnessAt(double u, double v) {
+    if (reflectanceMap == null) {
+      return 0;
+    }
+    int x = (int) (u * width - Ray.EPSILON);
+    int y = (int) ((1 - v) * height - Ray.EPSILON);
+    int rawValue = reflectanceMap[y * width + x] & 0xFF;
+    return rawValue >= 230 ? 1 : 0;
+  }
+
+  public boolean hasMetalness() {
+    return hasMetalness;
   }
 
   @Override
