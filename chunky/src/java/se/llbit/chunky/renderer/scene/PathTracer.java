@@ -71,6 +71,7 @@ public class PathTracer implements RayTracer {
           ray.emittanceValue = 0;
           ray.reflectanceValue = 0;
           ray.roughnessValue = 0;
+          ray.metalnessValue = 0;
           hit = true;
         } else if (ray.depth == 0) {
           // Direct sky hit.
@@ -130,7 +131,7 @@ public class PathTracer implements RayTracer {
       }
       Vector4 cumulativeColor = new Vector4(0, 0, 0, 0);
       Ray next = new Ray();
-      float pMetal = currentMat.metalness;
+      float pMetal = currentMat.metalness * ray.metalnessValue;
       // Reusing first rays - a simplified form of "branched path tracing" (what Blender used to call it before they implemented something fancier)
       // The initial rays cast into the scene are very similar between each sample, since they are almost entirely a function of the pixel coordinates
       // Because of that, casting those initial rays on every sample is redundant and can be skipped
@@ -172,6 +173,7 @@ public class PathTracer implements RayTracer {
       ray.emittanceValue = 0;
       ray.reflectanceValue = 0;
       ray.roughnessValue = 0;
+      ray.metalnessValue = 0;
       if (firstReflection) {
         airDistance = ray.distance;
       }

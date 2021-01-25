@@ -8,12 +8,12 @@ import se.llbit.math.Ray;
  * The emission map is stored in the blue channel, the reflectance map in the green channel and the
  * roughness uses the red channel.
  */
-public class OldPbrSpecularMap implements EmissionMap, ReflectanceMap, RoughnessMap {
+public class OldPbrSpecularMap implements EmissionMap, RoughnessMap, MetalnessMap {
 
   private final int width;
   private final int height;
   private byte[] emissionMap;
-  private byte[] reflectanceMap;
+  private byte[] metalnessMap;
   private byte[] roughnessMap;
 
   public OldPbrSpecularMap(BitmapImage texture) {
@@ -35,19 +35,19 @@ public class OldPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
       emissionMap = null;
     }
 
-    reflectanceMap = new byte[texture.width * texture.height];
-    boolean hasReflectance = false;
+    metalnessMap = new byte[texture.width * texture.height];
+    boolean hasMetalness = false;
     for (int y = 0; y < texture.height; ++y) {
       for (int x = 0; x < texture.width; ++x) {
         // green channel
-        if ((reflectanceMap[y * texture.width + x] = (byte) (
+        if ((metalnessMap[y * texture.width + x] = (byte) (
             texture.data[y * texture.width + x] >>> 8)) != (byte) 0x00) {
-          hasReflectance = true;
+          hasMetalness = true;
         }
       }
     }
-    if (!hasReflectance) {
-      reflectanceMap = null;
+    if (!hasMetalness) {
+      metalnessMap = null;
     }
 
     roughnessMap = new byte[texture.width * texture.height];
@@ -80,15 +80,15 @@ public class OldPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
   }
 
   @Override
-  public double getReflectanceAt(double u, double v) {
+  public float getMetalnessAt(double u, double v) {
     int x = (int) (u * width - Ray.EPSILON);
     int y = (int) ((1 - v) * height - Ray.EPSILON);
-    int rawValue = reflectanceMap[y * width + x] & 0xFF;
-    return rawValue / 255.0;
+    int rawValue = metalnessMap[y * width + x] & 0xFF;
+    return rawValue / 255f;
   }
 
-  public boolean hasReflectance() {
-    return reflectanceMap != null;
+  public boolean hasMetalness() {
+    return metalnessMap != null;
   }
 
   @Override

@@ -21,6 +21,7 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.pbr.EmissionMap;
+import se.llbit.chunky.resources.pbr.MetalnessMap;
 import se.llbit.chunky.resources.pbr.ReflectanceMap;
 import se.llbit.chunky.resources.pbr.RoughnessMap;
 import se.llbit.chunky.resources.texturepack.FontTexture;
@@ -1473,6 +1474,7 @@ public class Texture {
   private EmissionMap emissionMap = EmissionMap.DEFAULT;
   private ReflectanceMap reflectanceMap = ReflectanceMap.DEFAULT;
   private RoughnessMap roughnessMap = RoughnessMap.DEFAULT;
+  private MetalnessMap metalnessMap = MetalnessMap.DEFAULT;
 
   public Texture() {
     this(ImageLoader.missingImage);
@@ -1561,6 +1563,14 @@ public class Texture {
     return roughnessMap.getRoughnessAt(u, v);
   }
 
+  public void setMetalnessMap(MetalnessMap metalnessMap) {
+    this.metalnessMap = metalnessMap;
+  }
+
+  public float getMetalnessAt(double u, double v) {
+    return metalnessMap.getMetalnessAt(u, v);
+  }
+
   /**
    * Get linear color values.
    */
@@ -1578,9 +1588,10 @@ public class Texture {
     if (ray.getCurrentMaterial().emittance > 0) {
       ray.emittanceValue = getEmittanceAt(ray.u, ray.v);
     }
-    if (ray.getCurrentMaterial().specular > 0) {
+    if (ray.getCurrentMaterial().specular > 0 || ray.getCurrentMaterial().metalness > 0) {
       ray.reflectanceValue = getReflectanceAt(ray.u, ray.v);
       ray.roughnessValue = getRoughnessAt(ray.u, ray.v);
+      ray.metalnessValue = getMetalnessAt(ray.u, ray.v);
     }
   }
 
@@ -1711,5 +1722,6 @@ public class Texture {
     setEmissionMap(EmissionMap.DEFAULT);
     setReflectanceMap(ReflectanceMap.DEFAULT);
     setRoughnessMap(RoughnessMap.DEFAULT);
+    setMetalnessMap(MetalnessMap.DEFAULT);
   }
 }
