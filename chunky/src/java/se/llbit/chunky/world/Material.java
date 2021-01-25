@@ -53,27 +53,31 @@ public abstract class Material {
   /**
    * The specular coefficient controlling how shiny the block appears.
    */
-  public float specular = 0;
+  public float specular =
+      System.getProperty("chunky.pbr.updateMaterialDefaults", "false").equals("true") ? 1 : 0;
 
   /**
    * The amount of light the material emits.
    */
-  public float emittance = 0;
+  public float emittance =
+      System.getProperty("chunky.pbr.updateMaterialDefaults", "false").equals("true") ? 1 : 0;
 
   /**
    * The (linear) roughness controlling how rough a shiny block appears. A value of 0 makes the
    * surface perfectly specular, a value of 1 makes it diffuse.
    */
-  public float roughness = 0;
+  public float roughness =
+      System.getProperty("chunky.pbr.updateMaterialDefaults", "false").equals("true") ? 1 : 0;
 
   /**
    * The metalness value controls how metal-y a block appears. In reality this is a boolean value
    * but in practice usually a float is used in PBR to allow adding dirt or scratches on metals
-   * without increasing the texture resolution.
-   * Metals only do specular reflection for certain wavelengths (effectively tinting the reflection)
-   * and have no diffuse reflection. The albedo color is used for tinting.
+   * without increasing the texture resolution. Metals only do specular reflection for certain
+   * wavelengths (effectively tinting the reflection) and have no diffuse reflection. The albedo
+   * color is used for tinting.
    */
-  public float metalness = 0;
+  public float metalness =
+      System.getProperty("chunky.pbr.updateMaterialDefaults", "false").equals("true") ? 1 : 0;
 
   /**
    * Subsurface scattering property.
@@ -101,9 +105,14 @@ public abstract class Material {
     ior = DEFAULT_IOR;
     opaque = false;
     solid = true;
-    specular = 0;
-    emittance = 0;
-    roughness = 0;
+    specular =
+        System.getProperty("chunky.pbr.updateMaterialDefaults", "false").equals("true") ? 1 : 0;
+    emittance =
+        System.getProperty("chunky.pbr.updateMaterialDefaults", "false").equals("true") ? 1 : 0;
+    roughness =
+        System.getProperty("chunky.pbr.updateMaterialDefaults", "false").equals("true") ? 1 : 0;
+    metalness =
+        System.getProperty("chunky.pbr.updateMaterialDefaults", "false").equals("true") ? 1 : 0;
     subSurfaceScattering = false;
   }
 
