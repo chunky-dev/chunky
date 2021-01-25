@@ -5,7 +5,7 @@ public interface EmissionMap {
   EmissionMap EMPTY = new EmissionMap() {
     @Override
     public double getEmittanceAt(double u, double v) {
-      return 1;
+      return 0;
     }
   };
 
