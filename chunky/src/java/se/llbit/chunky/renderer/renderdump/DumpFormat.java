@@ -50,7 +50,11 @@ abstract class DumpFormat {
       scene.width * scene.height
     )) {
       readHeader(inputStream, scene);
-      readSamples(inputStream, scene, task::update);
+      readSamples(
+        inputStream,
+        scene,
+        pixelProgress -> updateTask(task, scene, pixelProgress)
+      );
     }
   }
 
@@ -144,7 +148,11 @@ abstract class DumpFormat {
       scene.width * scene.height
     )) {
       writeHeader(outputStream, scene);
-      writeSamples(outputStream, scene, task::update);
+      writeSamples(
+        outputStream,
+        scene,
+        pixelProgress -> updateTask(task, scene, pixelProgress)
+      );
       outputStream.flush();
     }
   }
@@ -164,4 +172,17 @@ abstract class DumpFormat {
     Scene scene,
     IntConsumer pixelProgress
   ) throws IOException;
+
+  private void updateTask(
+    TaskTracker.Task task,
+    Scene scene,
+    int pixelProgress
+  ) {
+    int x = scene.width * scene.height / 100;
+    // reduce number of update calls (performance reasons)
+    // this results in steps of 1% progress each
+    if (pixelProgress % x == 0) {
+      task.update(pixelProgress);
+    }
+  }
 }
