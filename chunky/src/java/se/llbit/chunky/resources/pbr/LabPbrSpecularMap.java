@@ -44,7 +44,7 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
       for (int x = 0; x < texture.width; ++x) {
         // green channel (0 to 299 are f0, where 229 is 229/255 reflectance (about 90%)
         int value = (texture.data[y * texture.width + x] >>> 8) & 0xFF;
-        if (value > 0) {
+        if (value > 0 && value < 230) {
           hasReflectance = true;
         }
         if (value >= 230) {
@@ -96,7 +96,7 @@ public class LabPbrSpecularMap implements EmissionMap, ReflectanceMap, Roughness
   @Override
   public double getReflectanceAt(double u, double v) {
     if (reflectanceMap == null) {
-      return 1;
+      return 0;
     }
     int x = (int) (u * width - Ray.EPSILON);
     int y = (int) ((1 - v) * height - Ray.EPSILON);
