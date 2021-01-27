@@ -138,33 +138,37 @@ public class Sun implements JsonSerializable {
 
   private boolean drawTexture = true;
 
+  private NishitaSky skyModel;
+
   /**
    * Calculate skylight for ray using Preetham day sky model.
    */
   public void calcSkyLight(Ray ray, double horizonOffset) {
-    double cosTheta = ray.d.y;
-    cosTheta += horizonOffset * (1 - cosTheta);
-    if (cosTheta < 0)
-      cosTheta = 0;
-    double cosGamma = ray.d.dot(sw);
-    double gamma = FastMath.acos(cosGamma);
-    double cos2Gamma = cosGamma * cosGamma;
-    double x = zenith_x * perezF(cosTheta, gamma, cos2Gamma, A.x, B.x, C.x, D.x, E.x) * f0_x;
-    double y = zenith_y * perezF(cosTheta, gamma, cos2Gamma, A.y, B.y, C.y, D.y, E.y) * f0_y;
-    double z = zenith_Y * perezF(cosTheta, gamma, cos2Gamma, A.z, B.z, C.z, D.z, E.z) * f0_Y;
-    if (y <= Ray.EPSILON) {
-      ray.color.set(0, 0, 0, 1);
-    } else {
-      double f = (z / y);
-      double x2 = x * f;
-      double y2 = z;
-      double z2 = (1 - x - y) * f;
-      // CIE to RGB M^-1 matrix from http://www.brucelindbloom.com/Eqn_RGB_XYZ_Matrix.html
-      ray.color.set(2.3706743 * x2 - 0.9000405 * y2 - 0.4706338 * z2,
-          -0.513885 * x2 + 1.4253036 * y2 + 0.0885814 * z2,
-          0.0052982 * x2 - 0.0146949 * y2 + 1.0093968 * z2, 1);
-      ray.color.scale(0.045);
-    }
+//    double cosTheta = ray.d.y;
+//    cosTheta += horizonOffset * (1 - cosTheta);
+//    if (cosTheta < 0)
+//      cosTheta = 0;
+//    double cosGamma = ray.d.dot(sw);
+//    double gamma = FastMath.acos(cosGamma);
+//    double cos2Gamma = cosGamma * cosGamma;
+//    double x = zenith_x * perezF(cosTheta, gamma, cos2Gamma, A.x, B.x, C.x, D.x, E.x) * f0_x;
+//    double y = zenith_y * perezF(cosTheta, gamma, cos2Gamma, A.y, B.y, C.y, D.y, E.y) * f0_y;
+//    double z = zenith_Y * perezF(cosTheta, gamma, cos2Gamma, A.z, B.z, C.z, D.z, E.z) * f0_Y;
+//    if (y <= Ray.EPSILON) {
+//      ray.color.set(0, 0, 0, 1);
+//    } else {
+//      double f = (z / y);
+//      double x2 = x * f;
+//      double y2 = z;
+//      double z2 = (1 - x - y) * f;
+//      // CIE to RGB M^-1 matrix from http://www.brucelindbloom.com/Eqn_RGB_XYZ_Matrix.html
+//      ray.color.set(2.3706743 * x2 - 0.9000405 * y2 - 0.4706338 * z2,
+//          -0.513885 * x2 + 1.4253036 * y2 + 0.0885814 * z2,
+//          0.0052982 * x2 - 0.0146949 * y2 + 1.0093968 * z2, 1);
+//      ray.color.scale(0.045);
+//    }
+    Vector3 color = this.skyModel.calcIncidentLight(ray);
+    ray.color.set(color.x, color.y, color.z, 1);
   }
 
   private double chroma(double turb, double turb2, double sunTheta, double[][] matrix) {
@@ -225,6 +229,8 @@ public class Sun implements JsonSerializable {
     emittance.scale(FastMath.pow(intensity, Scene.DEFAULT_GAMMA));
 
     updateSkylightValues();
+
+    skyModel = new NishitaSky(this);
   }
 
   /**
