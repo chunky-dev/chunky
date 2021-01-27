@@ -246,7 +246,7 @@ public class Sun implements JsonSerializable {
    * Sun altitude from the horizon.
    */
   public void setAltitude(double value) {
-    altitude = QuickMath.clamp(value, 0, Math.PI / 2);
+    altitude = value;
     initSun();
     scene.refresh();
   }

@@ -11,14 +11,14 @@ public class NishitaSky {
     private Sun sun;
     private Vector3 sunPosition;
 
-    private double earthRadius = 6350e3;
-    private double atmThickness = 6e4;
+    private double earthRadius = 6360e3;
+    private double atmThickness = 100e3;
 
-    private double rayleighScale = 7994;
-    private double mieScale = 1200;
+    private double rayleighScale = 8e3;
+    private double mieScale = 1.2e3;
 
-    private Vector3 betaR = new Vector3(6.8e-6, 13.5e-6, 33.1e-6);
-    private Vector3 betaM = new Vector3(22e-6, 22e-6, 22e-6);
+    private Vector3 betaR = new Vector3(3.8e-6, 13.5e-6, 33.1e-6);
+    private Vector3 betaM = new Vector3(21e-6, 21e-6, 21e-6);
 
     private int samples = 16;
     private int samplesLight = 8;
