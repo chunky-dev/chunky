@@ -55,7 +55,7 @@ public class NishitaSky {
         double mu = direction.dot(sunPosition);
         double phaseR = (3 / (16 * PI)) * (1 + mu*mu);
         double g = 0.76;
-        double phaseM = (3 / (8 * PI)) * ((1 - g*g) * ((1 + mu*mu) / (2 + g*g)) * (FastMath.pow(1 + g*g - 2*g*mu, 1.5)));
+        double phaseM = 3 / (8 * PI) * ((1 - g*g) * (1 + mu*mu)) / ((2 + g*g) * FastMath.pow(1 + g*g - 2*g*mu, 1.5));
 
         Vector3 sumR = new Vector3(0, 0, 0);
         Vector3 sumM = new Vector3(0, 0, 0);
