@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -35,8 +35,8 @@ import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.resources.FloatingPointCompressor;
 import se.llbit.chunky.resources.OctreeFileFormat;
 import se.llbit.chunky.world.Biomes;
 import se.llbit.chunky.world.Chunk;
@@ -481,8 +481,11 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @param sceneName file name of the scene to load
    */
-  public synchronized void loadScene(RenderContext context, String sceneName,
-      TaskTracker taskTracker) throws IOException, InterruptedException {
+  public synchronized void loadScene(
+    RenderContext context,
+    String sceneName,
+    TaskTracker taskTracker
+  ) throws IOException, InterruptedException {
     loadDescription(context.getSceneDescriptionInputStream(sceneName));
 
     if (sdfVersion < SDF_VERSION) {
@@ -504,9 +507,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
-    if (loadDump(context, taskTracker)) {
-      postProcessFrame(taskTracker);
-    }
+    loadDump(context, taskTracker);
 
     if (spp == 0) {
       mode = RenderMode.PREVIEW;
@@ -718,14 +719,14 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Reload all loaded chunks.
    */
-  public synchronized void reloadChunks(TaskTracker progress) {
+  public synchronized void reloadChunks(TaskTracker taskTracker) {
     if (loadedWorld == EmptyWorld.INSTANCE) {
       Log.warn("Can not reload chunks for scene - world directory not found!");
       return;
     }
     loadedWorld = World.loadWorld(loadedWorld.getWorldDirectory(), worldDimension,
         World.LoggedWarnings.NORMAL);
-    loadChunks(progress, loadedWorld, chunks);
+    loadChunks(taskTracker, loadedWorld, chunks);
     refresh();
   }
 
@@ -736,8 +737,11 @@ public class Scene implements JsonSerializable, Refreshable {
    * The octree finalizer is then run to compute block properties like fence
    * connectedness.
    */
-  public synchronized void loadChunks(TaskTracker progress, World world,
-      Collection<ChunkPosition> chunksToLoad) {
+  public synchronized void loadChunks(
+    TaskTracker taskTracker,
+    World world,
+    Collection<ChunkPosition> chunksToLoad
+  ) {
 
     if (world == null) {
       return;
@@ -746,7 +750,7 @@ public class Scene implements JsonSerializable, Refreshable {
     Set<ChunkPosition> loadedChunks = new HashSet<>();
     int numChunks = 0;
 
-    try (TaskTracker.Task task = progress.task("Loading regions")) {
+    try (TaskTracker.Task task = taskTracker.task("Loading regions")) {
       task.update(2, 1);
 
       loadedWorld = world;
@@ -777,7 +781,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
-    try (TaskTracker.Task task = progress.task("Loading entities")) {
+    try (TaskTracker.Task task = taskTracker.task("Loading entities")) {
       entities = new LinkedList<>();
       if (actors.isEmpty() && PersistentSettings.getLoadPlayers()) {
         // We don't load actor entities if some already exists. Loading actor entities
@@ -811,7 +815,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
     ChunkData chunkData = new SimpleChunkData();
 
-    try (TaskTracker.Task task = progress.task("Loading chunks")) {
+    try (TaskTracker.Task task = taskTracker.task("Loading chunks")) {
       int done = 1;
       int target = chunksToLoad.size();
       for (ChunkPosition cp : chunksToLoad) {
@@ -1117,7 +1121,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Set<ChunkPosition> chunkSet = new HashSet<>(chunksToLoad);
 
-    try (TaskTracker.Task task = progress.task("Finalizing octree")) {
+    try (TaskTracker.Task task = taskTracker.task("Finalizing octree")) {
 
       worldOctree.startFinalization();
       waterOctree.startFinalization();
@@ -1700,7 +1704,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * Save a snapshot
    */
-  public void saveSnapshot(File directory, TaskTracker progress, int threadCount) {
+  public void saveSnapshot(File directory, TaskTracker taskTracker, int threadCount) {
     if (directory == null) {
       Log.error("Can't save snapshot: bad output directory!");
       return;
@@ -1708,52 +1712,52 @@ public class Scene implements JsonSerializable, Refreshable {
     String fileName = String.format("%s-%d%s", name, spp, outputMode.getExtension());
     File targetFile = new File(directory, fileName);
     if (!directory.exists()) directory.mkdirs();
-    computeAlpha(progress, threadCount);
+    computeAlpha(taskTracker, threadCount);
     if (!finalized) {
-      postProcessFrame(progress);
+      postProcessFrame(taskTracker);
     }
-    writeImage(targetFile, outputMode, progress);
+    writeImage(targetFile, outputMode, taskTracker);
   }
 
   /**
    * Save the current frame as a PNG or TIFF image, depending on this scene's outputMode.
    */
-  public synchronized void saveFrame(File targetFile, TaskTracker progress, int threadCount) {
-    this.saveFrame(targetFile, outputMode, progress, threadCount);
+  public synchronized void saveFrame(File targetFile, TaskTracker taskTracker, int threadCount) {
+    this.saveFrame(targetFile, outputMode, taskTracker, threadCount);
   }
 
   /**
    * Save the current frame as a PNG or TIFF image.
    */
-  public synchronized void saveFrame(File targetFile, OutputMode mode, TaskTracker progress, int threadCount) {
-    computeAlpha(progress, threadCount);
+  public synchronized void saveFrame(File targetFile, OutputMode mode, TaskTracker taskTracker, int threadCount) {
+    computeAlpha(taskTracker, threadCount);
     if (!finalized) {
-      postProcessFrame(progress);
+      postProcessFrame(taskTracker);
     }
-    writeImage(targetFile, mode, progress);
+    writeImage(targetFile, mode, taskTracker);
   }
 
   /**
    * Save the current frame as a PNG or TIFF image into the given output stream.
    */
-  public synchronized void writeFrame(OutputStream out, OutputMode mode, TaskTracker progress, int threadCount)
+  public synchronized void writeFrame(OutputStream out, OutputMode mode, TaskTracker taskTracker, int threadCount)
       throws IOException {
-    computeAlpha(progress, threadCount);
+    computeAlpha(taskTracker, threadCount);
     if (!finalized) {
-      postProcessFrame(progress);
+      postProcessFrame(taskTracker);
     }
-    writeImage(out, mode, progress);
+    writeImage(out, mode, taskTracker);
   }
 
   /**
    * Compute the alpha channel.
    */
-  private void computeAlpha(TaskTracker progress, int threadCount) {
+  private void computeAlpha(TaskTracker taskTracker, int threadCount) {
     if (transparentSky) {
       if (outputMode == OutputMode.TIFF_32 || outputMode == OutputMode.PFM) {
         Log.warn("Can not use transparent sky with TIFF or PFM output modes. Use PNG instead.");
       } else {
-        try (TaskTracker.Task task = progress.task("Computing alpha channel")) {
+        try (TaskTracker.Task task = taskTracker.task("Computing alpha channel")) {
           ExecutorService executor = Executors.newFixedThreadPool(threadCount);
           AtomicInteger done = new AtomicInteger(0);
           int colWidth = width / threadCount;
@@ -1785,8 +1789,8 @@ public class Scene implements JsonSerializable, Refreshable {
    * <p>This is normally done by the render workers during rendering,
    * but in some cases an separate post processing pass is needed.
    */
-  public void postProcessFrame(TaskTracker progress) {
-    try (TaskTracker.Task task = progress.task("Finalizing frame")) {
+  public void postProcessFrame(TaskTracker taskTracker) {
+    try (TaskTracker.Task task = taskTracker.task("Finalizing frame")) {
       int threadCount = PersistentSettings.getNumThreads();
       ExecutorService executor = Executors.newFixedThreadPool(threadCount);
       AtomicInteger done = new AtomicInteger(0);
@@ -1814,21 +1818,21 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @param out output stream to write to.
    */
-  private void writeImage(OutputStream out, OutputMode mode, TaskTracker progress) throws IOException {
+  private void writeImage(OutputStream out, OutputMode mode, TaskTracker taskTracker) throws IOException {
     if (mode == OutputMode.PNG) {
-      writePng(out, progress);
+      writePng(out, taskTracker);
     } else if (mode == OutputMode.TIFF_32) {
-      writeTiff(out, progress);
+      writeTiff(out, taskTracker);
     } else if (mode == OutputMode.PFM) {
-      writePfm(out, progress);
+      writePfm(out, taskTracker);
     } else {
       Log.warn("Unknown Output Type");
     }
   }
 
-  private void writeImage(File targetFile, OutputMode mode, TaskTracker progress) {
+  private void writeImage(File targetFile, OutputMode mode, TaskTracker taskTracker) {
     try (FileOutputStream out = new FileOutputStream(targetFile)) {
-      writeImage(out, mode, progress);
+      writeImage(out, mode, taskTracker);
     } catch (IOException e) {
       Log.warn("Failed to write file: " + targetFile.getAbsolutePath(), e);
     }
@@ -1839,8 +1843,8 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @param out output stream to write to.
    */
-  private void writePng(OutputStream out, TaskTracker progress) throws IOException {
-    try (TaskTracker.Task task = progress.task("Writing PNG");
+  private void writePng(OutputStream out, TaskTracker taskTracker) throws IOException {
+    try (TaskTracker.Task task = taskTracker.task("Writing PNG");
         PngFileWriter writer = new PngFileWriter(out)) {
       if (transparentSky) {
         writer.write(backBuffer.data, alphaChannel, width, height, task);
@@ -1883,8 +1887,8 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @param out output stream to write to.
    */
-  private void writeTiff(OutputStream out, TaskTracker progress) throws IOException {
-    try (TaskTracker.Task task = progress.task("Writing TIFF");
+  private void writeTiff(OutputStream out, TaskTracker taskTracker) throws IOException {
+    try (TaskTracker.Task task = taskTracker.task("Writing TIFF");
         TiffFileWriter writer = new TiffFileWriter(out)) {
       writer.write32(this, task);
     }
@@ -1895,20 +1899,20 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @param out output stream to write to.
    */
-  private void writePfm(OutputStream out, TaskTracker progress) throws IOException {
-    try (TaskTracker.Task task = progress.task("Writing PFM Rows", canvasHeight());
+  private void writePfm(OutputStream out, TaskTracker taskTracker) throws IOException {
+    try (TaskTracker.Task task = taskTracker.task("Writing PFM Rows", canvasHeight());
          PfmFileWriter writer = new PfmFileWriter(out)) {
       writer.write(this, task);
     }
   }
 
-  private synchronized void saveEmitterGrid(RenderContext context, TaskTracker progress) {
+  private synchronized void saveEmitterGrid(RenderContext context, TaskTracker taskTracker) {
     if(emitterGrid == null)
       return;
 
     String filename = name + ".emittergrid";
     // TODO Not save when unchanged?
-    try(TaskTracker.Task task = progress.task("Saving Grid")) {
+    try(TaskTracker.Task task = taskTracker.task("Saving Grid")) {
       Log.info("Saving Grid " + filename);
 
       try(DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(filename)))) {
@@ -1919,13 +1923,13 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  private synchronized void saveOctree(RenderContext context, TaskTracker progress) {
+  private synchronized void saveOctree(RenderContext context, TaskTracker taskTracker) {
     String fileName = name + ".octree2";
     if (context.fileUnchangedSince(fileName, worldOctree.getTimestamp())) {
       Log.info("Skipping redundant Octree write");
       return;
     }
-    try (TaskTracker.Task task = progress.task("Saving octree", 2)) {
+    try (TaskTracker.Task task = taskTracker.task("Saving octree", 2)) {
       task.update(1);
       Log.info("Saving octree " + fileName);
 
@@ -1937,48 +1941,39 @@ public class Scene implements JsonSerializable, Refreshable {
         task.update(2);
         Log.info("Octree saved");
       } catch (IOException e) {
-        Log.warn("IO exception while saving octree", e);
+        Log.warn("Failed to save the octree", e);
       }
     }
   }
 
-  public synchronized void saveDump(RenderContext context, TaskTracker progress) {
-    String fileName = name + ".dump";
-    try (TaskTracker.Task task = progress.task("Saving render dump", 2)) {
-      task.update(1);
-      Log.info("Saving render dump " + fileName);
-      try(OutputStream out = context.getSceneFileOutputStream(fileName)) {
-        out.write(DUMP_FORMAT_MAGIC_NUMBER);
-        DataOutputStream dataOutput = new DataOutputStream(out);
-        dataOutput.writeInt(DUMP_FORMAT_VERSION);
-        dataOutput.writeInt(width);
-        dataOutput.writeInt(height);
-        dataOutput.writeInt(spp);
-        dataOutput.writeLong(renderTime);
-        FloatingPointCompressor.compress(samples, out);
-      } catch(IOException e) {
-        Log.warn("IO exception while saving render dump!", e);
-      }
+  public synchronized void saveDump(RenderContext context, TaskTracker taskTracker) {
+    File dumpFile = context.getSceneFile(name + ".dump");
+    Log.info("Saving render dump: " + dumpFile);
+    try(FileOutputStream outputStream = new FileOutputStream(dumpFile)){
+      RenderDump.save(outputStream, this, taskTracker);
+    } catch (IOException e) {
+      Log.warn("Failed to save the render dump", e);
     }
+    Log.info("Render dump saved: " + dumpFile);
   }
 
-  private synchronized boolean loadEmitterGrid(RenderContext context, TaskTracker progress) {
+  private synchronized boolean loadEmitterGrid(RenderContext context, TaskTracker taskTracker) {
     String filename = name + ".emittergrid";
-    try(TaskTracker.Task task = progress.task("Loading grid")) {
+    try(TaskTracker.Task task = taskTracker.task("Loading grid")) {
       Log.info("Load grid " + filename);
       try(DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename)))) {
         emitterGrid = Grid.load(in);
         return true;
       } catch(Exception e) {
-        Log.info("Couldn't load the grid", e);
+        Log.info("Failed to load the grid", e);
         return false;
       }
     }
   }
 
-  private synchronized boolean loadOctree(RenderContext context, TaskTracker progress) {
+  private synchronized boolean loadOctree(RenderContext context, TaskTracker taskTracker) {
     String fileName = name + ".octree2";
-    try (TaskTracker.Task task = progress.task("Loading octree", 2)) {
+    try (TaskTracker.Task task = taskTracker.task("Loading octree", 2)) {
       task.update(1);
       Log.info("Loading octree " + fileName);
       try {
@@ -2014,7 +2009,10 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public synchronized boolean loadDump(RenderContext context, TaskTracker taskTracker) {
+  public synchronized boolean loadDump(
+    RenderContext context,
+    TaskTracker taskTracker
+  ) {
     if (!tryLoadDump(context, name + ".dump", taskTracker)) {
       // Failed to load the default render dump - try the backup file.
       if (!tryLoadDump(context, name + ".dump.backup", taskTracker)) {
@@ -2030,7 +2028,11 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @return {@code true} if the render dump was successfully loaded
    */
-  private boolean tryLoadDump(RenderContext context, String fileName, TaskTracker taskTracker) {
+  private boolean tryLoadDump(
+    RenderContext context,
+    String fileName,
+    TaskTracker taskTracker
+  ) {
     File dumpFile = context.getSceneFile(fileName);
     if (!dumpFile.isFile()) {
       if (spp != 0) {
@@ -2040,61 +2042,16 @@ public class Scene implements JsonSerializable, Refreshable {
       }
       return false;
     }
-    try(PushbackInputStream input = new PushbackInputStream(new FileInputStream(dumpFile), 4)) {
-      byte[] magicNumber = new byte[4];
-      input.read(magicNumber, 0, 4);
-      if(Arrays.equals(magicNumber, DUMP_FORMAT_MAGIC_NUMBER)) {
-        // Format with a version number
-        try(DataInputStream dataInput = new DataInputStream(input);
-            TaskTracker.Task task = taskTracker.task("Loading render dump", 2)) {
-          int dumpVersion = dataInput.readInt();
-          if(dumpVersion == 1) {
-            task.update(1);
-            Log.info("Reading render dump " + fileName);
-            int dumpWidth = dataInput.readInt();
-            int dumpHeight = dataInput.readInt();
-            if (dumpWidth != width || dumpHeight != height) {
-              Log.warn("Render dump discarded: incorrect width or height!");
-              return false;
-            }
-            spp = dataInput.readInt();
-            renderTime = dataInput.readLong();
 
-            FloatingPointCompressor.decompress(input, samples);
-          }
-        }
-      } else {
-        // Old format that is a gzipped stream, the header needs to be pushed back
-        input.unread(magicNumber, 0, 4);
-        try (DataInputStream in = new DataInputStream(new GZIPInputStream(input));
-             TaskTracker.Task task = taskTracker.task("Loading render dump", 2)) {
-          task.update(1);
-          Log.info("Reading render dump " + fileName);
-          int dumpWidth = in.readInt();
-          int dumpHeight = in.readInt();
-          if (dumpWidth != width || dumpHeight != height) {
-            Log.warn("Render dump discarded: incorrect width or height!");
-            return false;
-          }
-          spp = in.readInt();
-          renderTime = in.readLong();
-
-          for (int x = 0; x < width; ++x) {
-            task.update(width, x + 1);
-            for (int y = 0; y < height; ++y) {
-              samples[(y * width + x) * 3 + 0] = in.readDouble();
-              samples[(y * width + x) * 3 + 1] = in.readDouble();
-              samples[(y * width + x) * 3 + 2] = in.readDouble();
-              finalizePixel(x, y);
-            }
-          }
-        }
-      }
-    } catch (IOException e) {
+    Log.info("Loading render dump: " + dumpFile);
+    try(FileInputStream inputStream = new FileInputStream(dumpFile)) {
+      RenderDump.load(inputStream, this, taskTracker);
+    } catch (IOException | IllegalStateException e) {
       // The render dump was possibly corrupt.
-      Log.warn("Failed to load render dump", e);
+      Log.warn("Failed to load the render dump", e);
       return false;
     }
+    postProcessFrame(taskTracker);
 
     Log.info("Render dump loaded: " + fileName);
     return true;
@@ -2119,9 +2076,10 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param result the resulting color values are written to this array
    */
   public void postProcessPixel(int x, int y, double[] result) {
-    double r = samples[(y * width + x) * 3 + 0];
-    double g = samples[(y * width + x) * 3 + 1];
-    double b = samples[(y * width + x) * 3 + 2];
+    int index = (y * width + x) * 3;
+    double r = samples[index];
+    double g = samples[index + 1];
+    double b = samples[index + 2];
 
     r *= exposure;
     g *= exposure;
@@ -2366,44 +2324,13 @@ public class Scene implements JsonSerializable, Refreshable {
    * Merge a render dump into this scene.
    */
   public void mergeDump(File dumpFile, TaskTracker taskTracker) {
-    int dumpSpp;
-    long dumpTime;
-    try (TaskTracker.Task task = taskTracker.task("Merging render dump", 2);
-        DataInputStream in = new DataInputStream(
-            new GZIPInputStream(new FileInputStream(dumpFile)))) {
-      task.update(1);
-      Log.info("Loading render dump " + dumpFile.getAbsolutePath());
-      int dumpWidth = in.readInt();
-      int dumpHeight = in.readInt();
-      if (dumpWidth != width || dumpHeight != height) {
-        Log.warn("Render dump discarded: incorrect width or height!");
-        return;
-      }
-      dumpSpp = in.readInt();
-      dumpTime = in.readLong();
-
-      double sa = spp / (double) (spp + dumpSpp);
-      double sb = 1 - sa;
-
-      for (int x = 0; x < width; ++x) {
-        task.update(width, x + 1);
-        for (int y = 0; y < height; ++y) {
-          samples[(y * width + x) * 3 + 0] =
-              samples[(y * width + x) * 3 + 0] * sa + in.readDouble() * sb;
-          samples[(y * width + x) * 3 + 1] =
-              samples[(y * width + x) * 3 + 1] * sa + in.readDouble() * sb;
-          samples[(y * width + x) * 3 + 2] =
-              samples[(y * width + x) * 3 + 2] * sa + in.readDouble() * sb;
-          finalizePixel(x, y);
-        }
-      }
-      Log.info("Render dump loaded");
-
-      // Update render status.
-      spp += dumpSpp;
-      renderTime += dumpTime;
+    Log.info("Merging render dump: " + dumpFile);
+    try(FileInputStream inputStream = new FileInputStream(dumpFile)) {
+      RenderDump.merge(inputStream, this, taskTracker);
+      postProcessFrame(taskTracker);
+      Log.info("Render dump merged: " + dumpFile);
     } catch (IOException e) {
-      Log.info("Render dump not loaded");
+      Log.warn("Failed to merge the render dump", e);
     }
   }
 
