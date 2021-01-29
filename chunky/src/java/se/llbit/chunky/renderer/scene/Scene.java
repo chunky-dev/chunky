@@ -1941,8 +1941,8 @@ public class Scene implements JsonSerializable, Refreshable {
   public synchronized void saveDump(RenderContext context, TaskTracker taskTracker) {
     File dumpFile = context.getSceneFile(name + ".dump");
     Log.info("Saving render dump: " + dumpFile);
-    try {
-      RenderDump.save(dumpFile, this, taskTracker);
+    try(FileOutputStream outputStream = new FileOutputStream(dumpFile)){
+      RenderDump.save(outputStream, this, taskTracker);
     } catch (IOException e) {
       Log.warn("Failed to save the render dump", e);
     }
@@ -2036,8 +2036,8 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     Log.info("Loading render dump: " + dumpFile);
-    try {
-      RenderDump.load(dumpFile, this, taskTracker);
+    try(FileInputStream inputStream = new FileInputStream(dumpFile)) {
+      RenderDump.load(inputStream, this, taskTracker);
     } catch (IOException | IllegalStateException e) {
       // The render dump was possibly corrupt.
       Log.warn("Failed to load the render dump", e);
@@ -2317,8 +2317,8 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void mergeDump(File dumpFile, TaskTracker taskTracker) {
     Log.info("Merging render dump: " + dumpFile);
-    try {
-      RenderDump.merge(dumpFile, this, taskTracker);
+    try(FileInputStream inputStream = new FileInputStream(dumpFile)) {
+      RenderDump.merge(inputStream, this, taskTracker);
       postProcessFrame(taskTracker);
       Log.info("Render dump merged: " + dumpFile);
     } catch (IOException e) {

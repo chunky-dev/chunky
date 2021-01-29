@@ -34,7 +34,7 @@ public class RenderDump {
   static final int CURRENT_DUMP_VERSION = 1;
 
   private static DumpFormat getDumpFormatForVersion(int version) {
-    switch(version) {
+    switch (version) {
       case 1:
         return CompressedFloatDumpFormat.INSTANCE;
       default:
@@ -50,31 +50,29 @@ public class RenderDump {
    * @throws IOException           If the dump format is unknown or file access fails
    */
   public static void load(
-    File dumpFile,
+    InputStream inputStream,
     Scene scene,
     TaskTracker taskTracker
   ) throws IOException, IllegalStateException {
     int magicNumberLength = DUMP_FORMAT_MAGIC_NUMBER.length;
-    try (FileInputStream fileInputStream = new FileInputStream(dumpFile)) {
 
-      PushbackInputStream pushbackInputStream = new PushbackInputStream(fileInputStream, magicNumberLength);
-      byte[] magicNumber = new byte[magicNumberLength];
+    PushbackInputStream pushbackInputStream = new PushbackInputStream(inputStream, magicNumberLength);
+    byte[] magicNumber = new byte[magicNumberLength];
 
-      // If the file starts with the magic number, it is the new format containing a version number
-      if (pushbackInputStream.read(magicNumber, 0, magicNumberLength) == magicNumberLength
-        && Arrays.equals(DUMP_FORMAT_MAGIC_NUMBER, magicNumber)) {
+    // If the file starts with the magic number, it is the new format containing a version number
+    if (pushbackInputStream.read(magicNumber, 0, magicNumberLength) == magicNumberLength
+      && Arrays.equals(DUMP_FORMAT_MAGIC_NUMBER, magicNumber)) {
 
-        DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
-        int dumpVersion = dataInputStream.readInt();
-        getDumpFormatForVersion(dumpVersion)
-          .load(dataInputStream, scene, taskTracker);
-      } else {
-        // Old format that is a gzipped stream, the header needs to be pushed back
-        pushbackInputStream.unread(magicNumber, 0, 4);
-        DataInputStream dataInputStream = new DataInputStream(new GZIPInputStream(pushbackInputStream));
-        getDumpFormatForVersion(0)
-          .load(dataInputStream, scene, taskTracker);
-      }
+      DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
+      int dumpVersion = dataInputStream.readInt();
+      getDumpFormatForVersion(dumpVersion)
+        .load(dataInputStream, scene, taskTracker);
+    } else {
+      // Old format that is a gzipped stream, the header needs to be pushed back
+      pushbackInputStream.unread(magicNumber, 0, 4);
+      DataInputStream dataInputStream = new DataInputStream(new GZIPInputStream(pushbackInputStream));
+      getDumpFormatForVersion(0)
+        .load(dataInputStream, scene, taskTracker);
     }
   }
 
@@ -86,45 +84,41 @@ public class RenderDump {
    * @throws IOException           If the dump format is unknown or file access fails
    */
   public static void merge(
-    File dumpFile,
+    InputStream inputStream,
     Scene scene,
     TaskTracker taskTracker
   ) throws IOException, IllegalStateException {
     int magicNumberLength = DUMP_FORMAT_MAGIC_NUMBER.length;
-    try (FileInputStream fileInputStream = new FileInputStream(dumpFile)) {
 
-      PushbackInputStream pushbackInputStream = new PushbackInputStream(fileInputStream, magicNumberLength);
-      byte[] magicNumber = new byte[magicNumberLength];
+    PushbackInputStream pushbackInputStream = new PushbackInputStream(inputStream, magicNumberLength);
+    byte[] magicNumber = new byte[magicNumberLength];
 
-      // If the file starts with the magic number, it is the new format containing a version number
-      if (pushbackInputStream.read(magicNumber, 0, magicNumberLength) == magicNumberLength
-        && Arrays.equals(DUMP_FORMAT_MAGIC_NUMBER, magicNumber)) {
+    // If the file starts with the magic number, it is the new format containing a version number
+    if (pushbackInputStream.read(magicNumber, 0, magicNumberLength) == magicNumberLength
+      && Arrays.equals(DUMP_FORMAT_MAGIC_NUMBER, magicNumber)) {
 
-        DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
-        int dumpVersion = dataInputStream.readInt();
-        getDumpFormatForVersion(dumpVersion)
-          .merge(dataInputStream, scene, taskTracker);
-      } else {
-        // Old format that is a gzipped stream, the header needs to be pushed back
-        pushbackInputStream.unread(magicNumber, 0, 4);
-        DataInputStream dataInputStream = new DataInputStream(new GZIPInputStream(pushbackInputStream));
-        getDumpFormatForVersion(0)
-          .merge(dataInputStream, scene, taskTracker);
-      }
+      DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
+      int dumpVersion = dataInputStream.readInt();
+      getDumpFormatForVersion(dumpVersion)
+        .merge(dataInputStream, scene, taskTracker);
+    } else {
+      // Old format that is a gzipped stream, the header needs to be pushed back
+      pushbackInputStream.unread(magicNumber, 0, 4);
+      DataInputStream dataInputStream = new DataInputStream(new GZIPInputStream(pushbackInputStream));
+      getDumpFormatForVersion(0)
+        .merge(dataInputStream, scene, taskTracker);
     }
   }
 
   public static void save(
-    File dumpFile,
+    OutputStream outputStream,
     Scene scene,
     TaskTracker taskTracker
   ) throws IOException {
-    try (FileOutputStream fileOutputStream = new FileOutputStream(dumpFile)) {
-      fileOutputStream.write(DUMP_FORMAT_MAGIC_NUMBER);
-      DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
-      DumpFormat format = getDumpFormatForVersion(CURRENT_DUMP_VERSION);
-      dataOutputStream.writeInt(CURRENT_DUMP_VERSION);
-      format.save(dataOutputStream, scene, taskTracker);
-    }
+    outputStream.write(DUMP_FORMAT_MAGIC_NUMBER);
+    DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+    DumpFormat format = getDumpFormatForVersion(CURRENT_DUMP_VERSION);
+    dataOutputStream.writeInt(CURRENT_DUMP_VERSION);
+    format.save(dataOutputStream, scene, taskTracker);
   }
 }
