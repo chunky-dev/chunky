@@ -421,6 +421,8 @@ public class Scene implements JsonSerializable, Refreshable {
     fogDensity = other.fogDensity;
     skyFogDensity = other.skyFogDensity;
     fastFog = other.fastFog;
+    yClipMin = other.yClipMin;
+    yClipMax = other.yClipMax;
 
     camera.set(other.camera);
     sky.set(other.sky);
@@ -866,7 +868,7 @@ public class Scene implements JsonSerializable, Refreshable {
           }
         }
 
-        for (int cy = yMin; cy < yMax; ++cy) { //Uses chunk min and max, rather than globa - minor optimisation for pre1.13 worlds
+        for (int cy = yMin; cy < yMax; ++cy) { //Uses chunk min and max, rather than global - minor optimisation for pre1.13 worlds
           for (int cz = 0; cz < 16; ++cz) {
             int z = cz + cp.z * 16 - origin.z;
             for (int cx = 0; cx < 16; ++cx) {
@@ -2679,8 +2681,8 @@ public class Scene implements JsonSerializable, Refreshable {
       initBuffers();
     }
 
-    yClipMin = json.get("yClipMin").asInt(0);
-    yClipMax = json.get("yClipMax").asInt(256);
+    yClipMin = json.get("yClipMin").asInt(yClipMin);
+    yClipMax = json.get("yClipMax").asInt(yClipMax);
 
     exposure = json.get("exposure").doubleValue(exposure);
     postprocess = Postprocess.get(json.get("postprocess").stringValue(postprocess.name()));
