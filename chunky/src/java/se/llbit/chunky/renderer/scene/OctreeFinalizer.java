@@ -48,7 +48,7 @@ public class OctreeFinalizer {
         int z = cz + cp.z * 16 - origin.z;
         for (int cx = 0; cx < 16; ++cx) {
           int x = cx + cp.x * 16 - origin.x;
-          // process blocks that are at the edge of the chunk, the other should have be taken care of during th loading
+          // process blocks that are at the edge of the chunk, the other should have be taken care of during the loading
           if (cy == yMin || cy == yMax - 1 || cz == 0 || cz == 15 || cx == 0 || cx == 15) {
             hideBlocks(worldTree, palette, x, cy, z, yMin, yMax, origin);
             processBlock(worldTree, waterTree, palette, x, cy, z);
