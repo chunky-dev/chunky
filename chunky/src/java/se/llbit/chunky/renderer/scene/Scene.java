@@ -332,7 +332,7 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public static void delete(String name, File sceneDir) {
     String[] extensions = {
-        ".json", ".dump", ".octree2", ".foliage", ".grass", ".json.backup", ".dump.backup",
+        ".json", ".dump", ".octree2", ".emittergrid", ".foliage", ".grass", ".json.backup", ".dump.backup",
     };
     for (String extension : extensions) {
       File file = new File(sceneDir, name + extension);
@@ -347,7 +347,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Export the scene to a zip file.
    */
   public static void exportToZip(String name, File targetFile) {
-    String[] extensions = { ".json", ".dump", ".octree2", ".foliage", ".grass", };
+    String[] extensions = { ".json", ".dump", ".octree2", ".foliage", ".grass", ".emittergrid", };
     ZipExport.zip(targetFile, SynchronousSceneManager.resolveSceneDirectory(name), name, extensions);
   }
 

@@ -46,7 +46,10 @@ public class ZipExport {
       ZipOutputStream zos = new ZipOutputStream(fos)
     ) {
       for (String extension : extensions) {
-        addToZipFile(zos, sceneDir, sceneName, sceneName + extension);
+        File file = new File(sceneDir, sceneName + extension);
+        if (file.exists()) {
+          addToZipFile(zos, sceneDir, sceneName, file);
+        }
       }
     } catch (IOException e) {
       Log.error(e);
@@ -54,10 +57,9 @@ public class ZipExport {
   }
 
   private static void addToZipFile(ZipOutputStream zos, File sceneDir, String prefix,
-      String fileName) throws IOException {
-    File file = new File(sceneDir, fileName);
+      File file) throws IOException {
     try (FileInputStream fis = new FileInputStream(file)) {
-      ZipEntry zipEntry = new ZipEntry(prefix + "/" + fileName);
+      ZipEntry zipEntry = new ZipEntry(prefix + "/" + file.getName());
       zos.putNextEntry(zipEntry);
 
       byte[] bytes = new byte[4096];
