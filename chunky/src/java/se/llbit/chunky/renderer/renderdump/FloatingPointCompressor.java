@@ -156,8 +156,7 @@ public class FloatingPointCompressor {
     LongConsumer pixelProgress
   ) throws IOException {
     try (BufferedOutputStream out = new BufferedOutputStream(output)) {
-      long size = input.pixelCount() - 1;
-
+      long size = input.numberOfPixels() - 1;
       EncoderDecoder rEncoder = new EncoderDecoder();
       EncoderDecoder gEncoder = new EncoderDecoder();
       EncoderDecoder bEncoder = new EncoderDecoder();
@@ -171,7 +170,7 @@ public class FloatingPointCompressor {
       }
 
       // Add the last one and a special terminator if there is an odd number
-      if (input.pixelCount() % 2 == 1) {
+      if (input.numberOfPixels() % 2 == 1) {
         long idx = 3 * size;
         rEncoder.encodeSingleWithOddTerminator(input.get(idx + 0), out);
         gEncoder.encodeSingleWithOddTerminator(input.get(idx + 1), out);
@@ -246,17 +245,5 @@ public class FloatingPointCompressor {
         pixelProgress.accept(size);
       }
     }
-  }
-
-  public static void decompress(
-    InputStream input,
-    SampleBuffer output,
-    LongConsumer pixelProgress
-  ) throws IOException {
-    decompress(input, output.pixelCount() * 3, (index, r, g, b) -> {
-      output.set(index, r);
-      output.set(index + 1, g);
-      output.set(index + 2, b);
-    }, pixelProgress);
   }
 }

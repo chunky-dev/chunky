@@ -40,7 +40,7 @@ class CompressedFloatDumpFormat extends DumpFormat {
   ) throws IOException {
     FloatingPointCompressor.decompress(
       inputStream,
-      scene.getSampleBuffer().pixelCount() * 3,
+      scene.getSampleBuffer().numberOfDoubles(),
       consumer,
       pixelProgress
     );

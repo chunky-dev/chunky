@@ -112,7 +112,7 @@ public class PngFileWriter implements AutoCloseable {
         idat.write((rgb >> 16) & 0xFF);
         idat.write((rgb >> 8) & 0xFF);
         idat.write(rgb & 0xFF);
-        idat.write(alpha.alphaGet(x,y));
+        idat.write(alpha.getAlpha(x,y));
       }
       task.update(height, y + 1);
     }

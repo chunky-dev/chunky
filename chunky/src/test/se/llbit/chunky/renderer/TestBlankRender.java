@@ -51,7 +51,7 @@ public class TestBlankRender {
   private static void renderAndCheckSamples(Scene scene, double[] expected)
         throws InterruptedException {
     SampleBuffer samples = render(scene);
-    long valueCount = samples.sampleCount();
+    long valueCount = samples.numberOfDoubles();
     for (int y = 0; y < HEIGHT; y++)
       for (int x = 0; x < WIDTH; x++)
         // Check each channel value:
@@ -85,7 +85,7 @@ public class TestBlankRender {
   /** Compares two sample buffers. */
   private static void compareSamples(SampleBuffer expected, SampleBuffer actual, double delta)
         throws InterruptedException {
-    long valueCount = expected.sampleCount();
+    long valueCount = expected.numberOfDoubles();
     double act, exp;
     for (long i = 0; i < valueCount; ++i) {
       act = actual.get(i);

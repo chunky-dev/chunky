@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer;
 
+import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
@@ -128,6 +129,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
         synchronized (bufferedScene) {
           sceneProvider.withSceneProtected(scene -> {
+            if (reason != ResetReason.MODE_CHANGE && reason != ResetReason.SCENE_LOADED) {
+              scene.getSampleBuffer().reset();
+            }
             if (reason.overwriteState()) {
               bufferedScene.copyState(scene);
             }
@@ -434,10 +438,10 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
     return status;
   }
 
-  @Override public void withSampleBufferProtected(SampleBufferConsumer consumer) {
+  @Override public void withSampleBufferProtected(Consumer<SampleBuffer> consumer) {
     // Synchronizing on bufferedScene ensures that we are outside the frame rendering loop.
     synchronized (bufferedScene) {
-      consumer.accept(bufferedScene.getSampleBuffer(), bufferedScene.width, bufferedScene.height);
+      consumer.accept(bufferedScene.getSampleBuffer());
     }
   }
 

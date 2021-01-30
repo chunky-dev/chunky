@@ -16,117 +16,196 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import java.util.Arrays;
 import se.llbit.math.ColorUtil;
 
+/**
+ * Holds the samples (render's pixels) as a 2d array of doubles, also tracking SPP per pixel (not
+ * fully implemented, eg. Scene#spp is still in use.)
+ */
 public class SampleBuffer {
-  public final int width;   // = rowSize/3, used for alpha
-  public final int rowSize; // = width * 3, used for samples
 
-  public final int height;   // = rowCount
-  public final int rowCount; // = height
+  public final int width;      // = width        "width"
+  public final int rowSize;    // = width * 3    used for samples, (x3 for rgb next to each other)
+  public final int rowSizeSpp; // = width        used for SPP and alpha
 
+  public final int height;      // = height      "height"
+  public final int rowCount;    // = height * 1  used for samples
+  public final int rowCountSpp; // = height      used for SPP and alpha
+
+  protected int[][] spp;     // for non-uniform sample distribution
   protected final double[][] samples;
-  // protected int[][] spp;     // for non-uniform sample distribution
   protected byte[][] alpha;
 
   public SampleBuffer(int width, int height) {
     this.height = height;
     this.rowCount = height;
+    this.rowCountSpp = height;
 
     this.width = width;
     this.rowSize = 3 * width;
+    this.rowSizeSpp = width;
 
     this.samples = new double[rowCount][rowSize];
+    this.spp = new int[rowCountSpp][rowSizeSpp];
   }
 
   public SampleBuffer(SampleBuffer toCopy) {
     this.height = toCopy.height;
     this.rowCount = toCopy.height;
+    this.rowCountSpp = toCopy.height;
 
     this.width = toCopy.width;
     this.rowSize = 3 * toCopy.width;
+    this.rowSizeSpp = toCopy.width;
 
     this.samples = new double[rowCount][rowSize];
-    for (int row = 0; row < rowCount; row++)
-      System.arraycopy(toCopy.samples[row],0,this.samples[row],0,rowSize);
+    for (int row = 0; row < rowCount; row++) {
+      System.arraycopy(toCopy.samples[row], 0, this.samples[row], 0, rowSize);
+    }
 
-    if (toCopy.alpha!=null)
-    {
-      alphaInit();
-      for (int row = 0; row < rowCount; row++)
+    this.spp = new int[rowCountSpp][rowSizeSpp];
+    for (int row = 0; row < rowCountSpp; row++) {
+      System.arraycopy(toCopy.spp[row], 0, this.spp[row], 0, rowSizeSpp);
+    }
+
+    if (toCopy.alpha != null) {
+      enableAlpha();
+      for (int row = 0; row < rowCount; row++) {
         System.arraycopy(toCopy.alpha[row], 0, this.alpha[row], 0, width);
+      }
     }
   }
 
-  public long pixelCount() {
-    return width*(long)height;
+  public long numberOfPixels() {
+    return width * (long) height;
   }
 
-  public long sampleCount() {
-    return 3L*width*height;
+  public long numberOfDoubles() {
+    return 3L * width * height;
   }
 
   public double get(long index) {
-    return samples[(int)(index/rowSize)][(int)(index%rowSize)];
+    return samples[(int) (index / rowSize)][(int) (index % rowSize)];
   }
 
   public double get(int x, int y, int o) {
-    return samples[y][3*x+o];
+    return samples[y][3 * x + o];
   }
 
   public void set(long index, double value) {
-    samples[(int)(index/rowSize)][(int)(index%rowSize)] = value;
+    samples[(int) (index / rowSize)][(int) (index % rowSize)] = value;
   }
 
   public void set(int x, int y, int o, double value) {
-    samples[y][x*3+o] = value;
+    samples[y][x * 3 + o] = value;
   }
 
   public int getArgb(int x, int y) {
-    return ColorUtil.getArgb(get(x,y,0),get(x,y,1),get(x,y,2),0xFF);
+    return ColorUtil.getArgb(get(x, y, 0), get(x, y, 1), get(x, y, 2), 0xFF);
   }
 
-  public void addSample(int x, int y, int old_spp, int spp_increase, double r, double g, double b) {
-    double sinv = 1.0 / (old_spp + spp_increase);
-    set(x,y,0,sinv*(get(x,y,0)*old_spp+r));
-    set(x,y,1,sinv*(get(x,y,1)*old_spp+g));
-    set(x,y,2,sinv*(get(x,y,2)*old_spp+b));
+  /**
+   * @param count The number of samples that this is the sum of. Use for "sppPerPass" where multiple
+   *              SPP is added each pass.
+   * @param r     Sum of red values (Not average, this will be divided by 'weight')
+   * @param g     Sum of green values (Not average, this will be divided by 'weight')
+   * @param b     Sum of blue values (Not average, this will be divided by 'weight')
+   */
+  public void addSamples(int x, int y, int count, double r, double g, double b) {
+    int old_spp = getSpp(x, y);
+    double sinv = 1.0 / (old_spp + count);
+    set(x, y, 0, sinv * (get(x, y, 0) * old_spp + r));
+    set(x, y, 1, sinv * (get(x, y, 1) * old_spp + g));
+    set(x, y, 2, sinv * (get(x, y, 2) * old_spp + b));
+    addSpp(x, y, count);
   }
 
-  public void addSample(long index, double old_spp, double spp_increase, double r, double g, double b) {
-    double sinv = 1.0 / (old_spp + spp_increase);
-    set(index, sinv * (get(index) * old_spp + r));
-    set(index + 1, sinv * (get(index + 1) * old_spp + g));
-    set(index + 2, sinv * (get(index + 2) * old_spp + b));
+  public void addSamples(long index, int count, double r, double g, double b) {
+    int oldSpp = getSpp(index);
+    double sinv = 1.0 / (oldSpp + count);
+    set(index, sinv * (get(index) * oldSpp + r));
+    set(index + 1, sinv * (get(index + 1) * oldSpp + g));
+    set(index + 2, sinv * (get(index + 2) * oldSpp + b));
+    addSpp(index, count);
   }
 
   public void setPixel(int x, int y, double r, double g, double b) {
-    set(x,y,0,r);
-    set(x,y,1,g);
-    set(x,y,2,b);
+    set(x, y, 0, r);
+    set(x, y, 1, g);
+    set(x, y, 2, b);
   }
 
 
-  public void alphaInit() {
-    alpha = new byte[rowCount][rowSize];
+  public int getSpp(int x, int y) {
+    return spp[y][x];
   }
 
-  public byte alphaGet(int x, int y) {
+  public int getSpp(long index) {
+    return spp[(int) (index / rowSize)][(int) (index % rowSize)];
+  }
+
+  protected void addSpp(int x, int y, int sppIncrease) {
+    spp[y][x] += sppIncrease;
+  }
+
+  protected void addSpp(long index, int sppIncrease) {
+    spp[(int) (index / rowSize)][(int) (index % rowSize)] += sppIncrease;
+  }
+
+  public void setSampleWithSpp(int x, int y, int spp, double r, double g, double b) {
+    set(x, y, 0, r);
+    set(x, y, 0, g);
+    set(x, y, 0, b);
+    this.spp[y][x] = spp;
+  }
+
+  public void reset() {
+    setGlobalSpp(0);
+  }
+
+  public void enableAlpha() {
+    alpha = new byte[rowCountSpp][rowSizeSpp];
+  }
+
+  public byte getAlpha(int x, int y) {
+    if (alpha == null) {
+      return 1;
+    }
     return alpha[y][x];
   }
 
-  public void alphaSet(int x, int y, byte value) {
+  public void setAlpha(int x, int y, byte value) {
+    if (alpha == null) {
+      enableAlpha();
+    }
     alpha[y][x] = value;
   }
 
-  public byte[] alphaCompile() {
+  public byte[] getAlphaChannelAsArray() {
     // This fails at an image size of about 46 000 x 46 000. (2100 megapixels)
-    if (((long)width)*height>Integer.MAX_VALUE)
-      throw new IndexOutOfBoundsException("Alpha too large. Cannot fit within a single array. Single arrays should only be used for small images, such as textures or MapTiles, not full renders!");
+    if (((long) width) * height > Integer.MAX_VALUE) {
+      throw new IndexOutOfBoundsException(
+          "Alpha too large. Cannot fit within a single array. Single arrays should " +
+              "only be used for small images, such as textures or MapTiles, not full renders!");
+    }
 
-    byte[] copy = new byte[width*height];
-    for (int row = 0; row < rowCount; row++)
-      System.arraycopy(alpha[row],0,copy,row*width,width);
+    byte[] copy = new byte[width * height];
+    if (alpha != null) {
+      for (int row = 0; row < rowCount; row++) {
+        System.arraycopy(alpha[row], 0, copy, row * width, width);
+      }
+    } else {
+      for (int idx = 0; idx < width * height; idx++) {
+        copy[idx] = 1;
+      }
+    }
     return copy;
+  }
+
+  public void setGlobalSpp(int spp) {
+    for (int[] ints : this.spp) {
+      Arrays.fill(ints, spp);
+    }
   }
 }

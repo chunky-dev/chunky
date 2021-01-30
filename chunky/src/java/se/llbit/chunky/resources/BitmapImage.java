@@ -18,7 +18,6 @@
 package se.llbit.chunky.resources;
 
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.log.Log;
 
 /**
  * A container for bitmap image data in int ARGB format.
@@ -77,13 +76,14 @@ public class BitmapImage {
    */
   public void blit(BitmapImage source, int x0, int y0) {
     for (int y = 0; y < source.height; ++y)
-      System.arraycopy(source.data[y], 0, data[y0+y], x0, source.width);
+      System.arraycopy(source.data[y], 0, data[y0 + y], x0, source.width);
   }
 
   /**
    * Copies a region of the source bitmap into this bitmap at the given (x0, y0) position.
-   * @param x0 destination x position
-   * @param y0 destination y position
+   *
+   * @param x0  destination x position
+   * @param y0  destination y position
    * @param sx0 source x start position
    * @param sy0 source y start position
    * @param sx1 source x end position
@@ -91,7 +91,7 @@ public class BitmapImage {
    */
   public void blit(BitmapImage source, int x0, int y0, int sx0, int sy0, int sx1, int sy1) {
     for (int y = 0; y < sy1 - sy0; ++y)
-      System.arraycopy(source.data[sy0+y], sx0, data[y0+y], x0, sx1 - sx0);
+      System.arraycopy(source.data[sy0 + y], sx0, data[y0 + y], x0, sx1 - sx0);
   }
 
   /**
@@ -166,6 +166,7 @@ public class BitmapImage {
 
   /**
    * Puts image A above image B and returns the result.
+   *
    * @param a Image A
    * @param b Image B
    * @return a new image with a on top of b
@@ -177,12 +178,11 @@ public class BitmapImage {
     return img;
   }
 
-  @Deprecated
-  public void setData(int[] image) {
+  private void setData(int[] image) {
     // Check for size mismatch
-    if (image.length<width*height)
-      throw new IllegalArgumentException("Size not matched. Expected "
-          +width+"*"+height+"="+(width*height)+" but got "+image.length);
+    if (image.length < width * height)
+      throw new IllegalArgumentException("Size not matched. Expected " + width + "*" + height + "=" + (width * height)
+          + " but got " + image.length);
 
     for (int row = 0; row < height; row++)
       System.arraycopy(image, width * row, data[row], 0, width);
@@ -192,11 +192,11 @@ public class BitmapImage {
   // (eg Scene.backBuffer), where this will fail.
   @Deprecated
   public int[] toIntArray() {
-    if (((long)width)*height>Integer.MAX_VALUE)
+    if (((long) width) * height > Integer.MAX_VALUE)
       throw new IndexOutOfBoundsException("Bitmap too large. Cannot fit within a single array. This should only be used for small images, such as textures or MapTiles, not full renders!");
-    int[] copy = new int[width*height];
-    for (int row = 0; row<height; row++)
-      System.arraycopy(data[row],0,copy,width*row,width);
+    int[] copy = new int[width * height];
+    for (int row = 0; row < height; row++)
+      System.arraycopy(data[row], 0, copy, width * row, width);
     return copy;
   }
 

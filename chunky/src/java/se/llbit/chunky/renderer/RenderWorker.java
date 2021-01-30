@@ -135,7 +135,7 @@ public class RenderWorker extends Thread {
             sg += ray.color.y;
             sb += ray.color.z;
           }
-          samples.addSample(x, y, scene.spp, manager.sppPerPass, sr, sg, sb);
+          samples.addSamples(x, y, manager.sppPerPass, sr, sg, sb);
 
           if (scene.shouldFinalizeBuffer()) {
             scene.finalizePixel(x, y);

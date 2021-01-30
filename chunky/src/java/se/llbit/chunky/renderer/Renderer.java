@@ -66,10 +66,6 @@ public interface Renderer {
 
   void withBufferedImage(Consumer<BitmapImage> bitmap);
 
-  interface SampleBufferConsumer {
-    void accept(SampleBuffer samples, int width, int height);
-  }
-
   void addSceneStatusListener(SceneStatusListener listener);
 
   void removeSceneStatusListener(SceneStatusListener listener);
@@ -91,7 +87,7 @@ public interface Renderer {
    */
   void join() throws InterruptedException;
 
-  void withSampleBufferProtected(SampleBufferConsumer consumer);
+  void withSampleBufferProtected(Consumer<SampleBuffer> consumer);
 
   /**
    * Shut down the renderer.

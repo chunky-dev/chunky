@@ -24,7 +24,6 @@ import se.llbit.util.TaskTracker;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.function.IntConsumer;
 
 /**
  * A dump format reads a render dump from a DataInputStream into the scene/
@@ -57,6 +56,7 @@ abstract class DumpFormat {
         scene,
         pixelProgress -> updateTask(task, scene, (int)pixelProgress) // TODO fix progress reporting for long indexes
       );
+      scene.getSampleBuffer().setGlobalSpp(scene.spp);
     }
   }
 
@@ -104,7 +104,7 @@ abstract class DumpFormat {
       int previousSpp = scene.spp;
       long previousRenderTime = scene.renderTime;
       readHeader(inputStream, scene);
-      mergeSamples(inputStream, previousSpp, scene, progress -> task.update((int) progress)); // TODO fix task progress for long indexes
+      mergeSamples(inputStream, scene, progress -> task.update((int) progress)); // TODO fix task progress for long indexes
       scene.spp += previousSpp;
       scene.renderTime += previousRenderTime;
     }
@@ -112,20 +112,16 @@ abstract class DumpFormat {
 
   protected void mergeSamples(
     DataInputStream inputStream,
-    int previousSpp,
     Scene scene,
     LongConsumer pixelProgress
   ) throws IOException {
     int dumpSpp = scene.spp;
-    double sa = previousSpp / (double) (previousSpp + dumpSpp);
-    double sb = 1 - sa;
     SampleBuffer buffer = scene.getSampleBuffer();
     readSamples(
       inputStream,
       scene,
       (pixelIndex, r, g, b) -> {
-        long index = 3 * pixelIndex;
-        buffer.addSample(index, sa, sb, r, g, b);
+        buffer.addSamples(3 * pixelIndex, dumpSpp, r, g, b);
       },
       pixelProgress
     );

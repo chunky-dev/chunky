@@ -358,7 +358,8 @@ public class Scene implements JsonSerializable, Refreshable {
     frontBuffer = new BitmapImage(width, height);
     backBuffer = new BitmapImage(width, height);
     samples = new SampleBuffer(width,height);
-    samples.alphaInit();
+    if (transparentSky())
+      samples.enableAlpha();
   }
 
   /**
@@ -442,7 +443,6 @@ public class Scene implements JsonSerializable, Refreshable {
       backBuffer = other.backBuffer;
       frontBuffer = other.frontBuffer;
       samples = other.samples;
-      // alphaChannel = other.alphaChannel;
     }
 
     octreeImplementation = other.octreeImplementation;
@@ -1579,6 +1579,9 @@ public class Scene implements JsonSerializable, Refreshable {
   public void setTransparentSky(boolean value) {
     if (value != transparentSky) {
       transparentSky = value;
+      if (transparentSky) {
+        getSampleBuffer().enableAlpha();
+      }
       refresh();
     }
   }
@@ -2020,6 +2023,9 @@ public class Scene implements JsonSerializable, Refreshable {
         // we don't have the old render state, so reset spp and render time
         spp = 0;
         renderTime = 0;
+        if (samples != null) {
+          samples.reset();
+        }
         return false;
       }
     }
@@ -2193,7 +2199,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
     occlusion += PreviewRayTracer.skyOcclusion(this, state);
 
-    samples.alphaSet(x,y,(byte) (255 * occlusion * 0.25 + 0.5));
+    samples.setAlpha(x,y,(byte) (255 * occlusion * 0.25 + 0.5));
   }
 
   /**
