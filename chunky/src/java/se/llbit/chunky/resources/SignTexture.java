@@ -74,7 +74,7 @@ public class SignTexture extends Texture {
             for (int py = 0; py < glyph.height; ++py) {
               int x = xstart;
               for (int px = glyph.xmin; px <= glyph.xmax; ++px) {
-                if ((glyph.lines[py] & (1 << px)) != 0) {
+                if ((glyph.lines[py] & (1 << px)) != 0 && x >= 0 && x < width) {
                   img.setPixel(x, y, color.rgbColor);
                 }
                 x += 1;
