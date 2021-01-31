@@ -25,6 +25,7 @@ public enum ResetReason {
   MODE_CHANGE(false),
   MATERIALS_CHANGED(true),
   SETTINGS_CHANGED(true),
+  SETTINGS_CHANGED_FORCE_RESET(true),
   SCENE_LOADED(true);
 
   /** Determines if the non-transitive scene state needs to be modified. */

@@ -782,6 +782,7 @@ public class ChunkyFxController
 
   @Override  public boolean allowSceneRefresh() {
     if (scene.getResetReason() == ResetReason.SCENE_LOADED
+        || scene.getResetReason() == ResetReason.SETTINGS_CHANGED_FORCE_RESET
         || renderer.getRenderStatus().getRenderTime() < SCENE_EDIT_GRACE_PERIOD) {
       return true;
     } else {

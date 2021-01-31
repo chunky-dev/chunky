@@ -260,14 +260,14 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   }
 
   /**
-   * Discard pending scene changes.
+   * Apply pending scene changes.
    */
   public void applySceneChanges() {
     // Lock order: scene -> storedScene.
     synchronized (scene) {
       synchronized (storedScene) {
-        // Setting SCENE_LOADED will force the reset.
-        scene.setResetReason(ResetReason.SCENE_LOADED);
+        // Setting SETTINGS_CHANGED_FORCE_RESET will force the reset.
+        scene.setResetReason(ResetReason.SETTINGS_CHANGED_FORCE_RESET);
 
         // Wake up the threads waiting in awaitSceneStateChange().
         scene.notifyAll();
@@ -276,7 +276,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
   }
 
   /**
-   * Apply pending scene changes.
+   * Discard pending scene changes.
    */
   public void discardSceneChanges() {
     // Lock order: scene -> storedScene.
