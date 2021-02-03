@@ -72,7 +72,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   private Vector2 target = new Vector2(0, 0);
   private Tooltip tooltip = new Tooltip();
 
-  private boolean fitToScreen = false;
+  private boolean fitToScreen = true;
 
   private RenderStatusListener renderListener;
 
@@ -171,9 +171,6 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     for (int percent : new int[] { 25, 50, 75, 100, 150, 200, 300, 400 }) {
       RadioMenuItem item = new RadioMenuItem(String.format("%d%%", percent));
       item.setToggleGroup(scaleGroup);
-      if (percent == 100) {
-        item.setSelected(true);
-      }
       item.setOnAction(e -> {
         updateCanvasScale(percent / 100.0);
         fitToScreen = false;
@@ -182,6 +179,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     }
 
     RadioMenuItem item = new RadioMenuItem("Fit to Screen");
+    item.setSelected(true);
     item.setToggleGroup(scaleGroup);
     item.setOnAction(e -> {
       fitToScreen = true;
@@ -341,8 +339,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
     double width = canvas.getWidth();
     double height = canvas.getHeight();
-    double fitWidth = canvasPane.getMinWidth();
-    double fitHeight = canvasPane.getMinHeight();
+    double fitWidth = this.getWidth();
+    double fitHeight = this.getHeight();
 
     double scaleX = fitWidth / width;
     double scaleY = fitHeight / height;
