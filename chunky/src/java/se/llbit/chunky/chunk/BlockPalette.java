@@ -375,8 +375,8 @@ public class BlockPalette {
       block.setPerceptualSmoothness(0.75);
     };
     materialProperties.put("minecraft:copper_block", copperConfig);
-    materialProperties.put("minecraft:exposed_copper_block", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:weathered_copper_block", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:exposed_copper", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:weathered_copper", semiWeatheredCopperConfig);
     materialProperties.put("minecraft:cut_copper", copperConfig);
     materialProperties.put("minecraft:exposed_cut_copper", lightlyWeatheredCopperConfig);
     materialProperties.put("minecraft:weathered_cut_copper", semiWeatheredCopperConfig);
@@ -386,7 +386,7 @@ public class BlockPalette {
     materialProperties.put("minecraft:cut_copper_slab", copperConfig);
     materialProperties.put("minecraft:exposed_cut_copper_slab", lightlyWeatheredCopperConfig);
     materialProperties.put("minecraft:weathered_cut_copper_slab", semiWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_copper", copperConfig);
+    materialProperties.put("minecraft:waxed_copper_block", copperConfig);
     materialProperties.put("minecraft:waxed_exposed_copper", lightlyWeatheredCopperConfig);
     materialProperties.put("minecraft:waxed_weathered_copper", semiWeatheredCopperConfig);
     materialProperties.put("minecraft:waxed_cut_copper", copperConfig);

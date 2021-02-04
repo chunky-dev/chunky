@@ -428,7 +428,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:light_gray_terracotta",
       "minecraft:light_gray_wall_banner",
       "minecraft:light_gray_wool",
-      "minecraft:exposed_copper_block",
+      "minecraft:exposed_copper",
       "minecraft:exposed_cut_copper",
       "minecraft:exposed_cut_copper_slab",
       "minecraft:exposed_cut_copper_stairs",
@@ -686,7 +686,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:seagrass",
       "minecraft:sea_lantern",
       "minecraft:sea_pickle",
-      "minecraft:weathered_copper_block",
+      "minecraft:weathered_copper",
       "minecraft:weathered_cut_copper",
       "minecraft:weathered_cut_copper_slab",
       "minecraft:weathered_cut_copper_stairs",
@@ -807,7 +807,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:warped_wart_block",
       "minecraft:water_cauldron",
       "minecraft:water",
-      "minecraft:waxed_copper",
+      "minecraft:waxed_copper_block",
       "minecraft:waxed_cut_copper",
       "minecraft:waxed_cut_copper_slab",
       "minecraft:waxed_cut_copper_stairs",
@@ -819,7 +819,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:waxed_weathered_cut_copper",
       "minecraft:waxed_weathered_cut_copper_slab",
       "minecraft:waxed_weathered_cut_copper_stairs",
-      "minecraft:oxidized_copper_block",
+      "minecraft:oxidized_copper",
       "minecraft:oxidized_cut_copper",
       "minecraft:oxidized_cut_copper_slab",
       "minecraft:oxidized_cut_copper_stairs",
@@ -2646,49 +2646,49 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "budding_amethyst":
         return new MinecraftBlock("budding_amethyst", Texture.buddingAmethyst);
       case "copper_block":
-      case "waxed_copper":
+      case "waxed_copper_block":
         return new MinecraftBlock(name, Texture.copperBlock);
-      case "exposed_copper_block":
+      case "exposed_copper":
       case "waxed_exposed_copper":
-        return new MinecraftBlock(name, Texture.exposedCopperBlock);
-      case "weathered_copper_block":
+        return new MinecraftBlock(name, Texture.exposedCopper);
+      case "weathered_copper":
       case "waxed_weathered_copper":
-        return new MinecraftBlock(name, Texture.weatheredCopperBlock);
-      case "oxidized_copper_block":
-        return new MinecraftBlock(name, Texture.oxidizedCopperBlock);
+        return new MinecraftBlock(name, Texture.weatheredCopper);
+      case "oxidized_copper":
+        return new MinecraftBlock(name, Texture.oxidizedCopper);
       case "cut_copper":
       case "waxed_cut_copper":
-        return new MinecraftBlock(name, Texture.cutCopperBlock);
+        return new MinecraftBlock(name, Texture.cutCopper);
       case "exposed_cut_copper":
       case "waxed_exposed_cut_copper":
-        return new MinecraftBlock(name, Texture.exposedCutCopperBlock);
+        return new MinecraftBlock(name, Texture.exposedCutCopper);
       case "weathered_cut_copper":
       case "waxed_weathered_cut_copper":
-        return new MinecraftBlock(name, Texture.weatheredCutCopperBlock);
+        return new MinecraftBlock(name, Texture.weatheredCutCopper);
       case "oxidized_cut_copper":
-        return new MinecraftBlock(name, Texture.oxidizedCutCopperBlock);
+        return new MinecraftBlock(name, Texture.oxidizedCutCopper);
       case "cut_copper_stairs":
       case "waxed_cut_copper_stairs":
-        return stairs(tag, Texture.cutCopperBlock);
+        return stairs(tag, Texture.cutCopper);
       case "exposed_cut_copper_stairs":
       case "waxed_exposed_cut_copper_stairs":
-        return stairs(tag, Texture.exposedCutCopperBlock);
+        return stairs(tag, Texture.exposedCutCopper);
       case "weathered_cut_copper_stairs":
       case "waxed_weathered_cut_copper_stairs":
-        return stairs(tag, Texture.weatheredCutCopperBlock);
+        return stairs(tag, Texture.weatheredCutCopper);
       case "oxidized_cut_copper_stairs":
-        return stairs(tag, Texture.oxidizedCutCopperBlock);
+        return stairs(tag, Texture.oxidizedCutCopper);
       case "cut_copper_slab":
       case "waxed_cut_copper_slab":
-        return slab(tag, Texture.cutCopperBlock);
+        return slab(tag, Texture.cutCopper);
       case "exposed_cut_copper_slab":
       case "waxed_exposed_cut_copper_slab":
-        return slab(tag, Texture.exposedCutCopperBlock);
+        return slab(tag, Texture.exposedCutCopper);
       case "weathered_cut_copper_slab":
       case "waxed_weathered_cut_copper_slab":
-        return slab(tag, Texture.weatheredCutCopperBlock);
+        return slab(tag, Texture.weatheredCutCopper);
       case "oxidized_cut_copper_slab":
-        return slab(tag, Texture.oxidizedCutCopperBlock);
+        return slab(tag, Texture.oxidizedCutCopper);
       case "lava_cauldron":
         return new LavaCauldron();
       case "lightning_rod":
