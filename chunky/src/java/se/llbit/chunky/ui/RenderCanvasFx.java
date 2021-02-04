@@ -178,14 +178,14 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       canvasScale.getItems().add(item);
     }
 
-    RadioMenuItem item = new RadioMenuItem("Fit to Screen");
-    item.setSelected(true);
-    item.setToggleGroup(scaleGroup);
-    item.setOnAction(e -> {
+    RadioMenuItem fit = new RadioMenuItem("Fit to Screen");
+    fit.setSelected(true);
+    fit.setToggleGroup(scaleGroup);
+    fit.setOnAction(e -> {
       fitToScreen = true;
       updateCanvasFit();
     });
-    canvasScale.getItems().add(item);
+    canvasScale.getItems().add(fit);
 
     contextMenu.getItems().addAll(setTarget, showGuides, canvasScale);
 
@@ -224,6 +224,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
       }
     });
     canvasPane.setOnMouseClicked(event -> canvasPane.requestFocus());
+
+    canvasPane.setOnMouseEntered(e -> {
+      updateCanvasFit();
+    });
 
     canvasPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
       if (!isVisible()) {
@@ -349,6 +353,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   }
 
   @Override public void repaint() {
+    updateCanvasFit();
     if (painting.compareAndSet(false, true)) {
       forceRepaint();
     }
