@@ -41,6 +41,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:anvil",
       "minecraft:attached_melon_stem",
       "minecraft:attached_pumpkin_stem",
+      "minecraft:azalea",
       "minecraft:azure_bluet",
       "minecraft:bamboo",
       "minecraft:bamboo_sapling",
@@ -299,6 +300,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:fire_coral_wall_fan",
       "minecraft:fire",
       "minecraft:fletching_table",
+      "minecraft:flowering_azalea",
       "minecraft:flower_pot",
       "minecraft:frosted_ice",
       "minecraft:furnace",
@@ -2728,6 +2730,10 @@ public class MinecraftBlockProvider implements BlockProvider {
             tag.get("Properties").get("up").stringValue("false").equals("true"),
             tag.get("Properties").get("down").stringValue("false").equals("true")
         );
+      case "azalea":
+        return new Azalea(name, Texture.azaleaTop, Texture.azaleaSide);
+      case "flowering_azalea":
+        return new Azalea(name, Texture.floweringAzaleaTop, Texture.floweringAzaleaSide);
       case "structure_void":
       case "barrier":
         // Invisible.

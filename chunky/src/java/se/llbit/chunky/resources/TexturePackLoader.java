@@ -3569,6 +3569,11 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/sculk_sensor_tendril_inactive", Texture.sculkSensorTendrilInactive);
     addSimpleTexture("assets/minecraft/textures/block/sculk_sensor_top", Texture.sculkSensorTop);
     addSimpleTexture("assets/minecraft/textures/block/glow_lichen", Texture.glowLichen);
+    addSimpleTexture("assets/minecraft/textures/block/azalea_plant", Texture.azaleaPlant);
+    addSimpleTexture("assets/minecraft/textures/block/azalea_top", Texture.azaleaTop);
+    addSimpleTexture("assets/minecraft/textures/block/azalea_side", Texture.azaleaSide);
+    addSimpleTexture("assets/minecraft/textures/block/flowering_azalea_top", Texture.floweringAzaleaTop);
+    addSimpleTexture("assets/minecraft/textures/block/flowering_azalea_side", Texture.floweringAzaleaSide);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
