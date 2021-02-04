@@ -70,6 +70,7 @@ abstract class DumpFormat {
       throw new IllegalStateException("Scene size does not match dump size");
     }
     scene.spp = inputStream.readInt();
+    scene.getSampleBuffer().setGlobalSpp(scene.spp);
     scene.renderTime = inputStream.readLong();
   }
 
@@ -121,7 +122,7 @@ abstract class DumpFormat {
       inputStream,
       scene,
       (pixelIndex, r, g, b) -> {
-        buffer.addSamples(3 * pixelIndex, dumpSpp, r, g, b);
+        buffer.mergeSamples(3 * pixelIndex, dumpSpp, r, g, b);
       },
       pixelProgress
     );

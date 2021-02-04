@@ -74,6 +74,7 @@ public class RenderDumpTests {
     scene.setCanvasSize(width, height);
     scene.spp = spp;
     scene.renderTime = renderTime;
+    scene.getSampleBuffer().setGlobalSpp(spp);
     return scene;
   }
 

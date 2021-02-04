@@ -121,13 +121,32 @@ public class SampleBuffer {
     addSpp(x, y, count);
   }
 
+  /**
+   * @param count The number of samples that this is the sum of. Use for "sppPerPass" where multiple
+   *              SPP is added each pass.
+   * @param r     Sum of red values (Not average, this will be divided by 'weight')
+   * @param g     Sum of green values (Not average, this will be divided by 'weight')
+   * @param b     Sum of blue values (Not average, this will be divided by 'weight')
+   */
   public void addSamples(long index, int count, double r, double g, double b) {
-    int oldSpp = getSpp(index);
+    int oldSpp = getSpp(index/3);
     double sinv = 1.0 / (oldSpp + count);
     set(index, sinv * (get(index) * oldSpp + r));
     set(index + 1, sinv * (get(index + 1) * oldSpp + g));
     set(index + 2, sinv * (get(index + 2) * oldSpp + b));
-    addSpp(index, count);
+    addSpp(index/3, count);
+  }
+
+  /**
+   * r g b values should be actual rgb value: eg for a red value of 90% and 20 samples, 0.9 should be passed as r.
+   */
+  public void mergeSamples(long index, int count, double r, double g, double b) {
+    int oldSpp = getSpp(index / 3);
+    double sinv = 1.0 / (oldSpp + count);
+    set(index, sinv * (get(index) * oldSpp + r * count));
+    set(index + 1, sinv * (get(index + 1) * oldSpp + g * count));
+    set(index + 2, sinv * (get(index + 2) * oldSpp + b * count));
+    addSpp(index / 3, count);
   }
 
   public void setPixel(int x, int y, double r, double g, double b) {
@@ -142,7 +161,7 @@ public class SampleBuffer {
   }
 
   public int getSpp(long index) {
-    return spp[(int) (index / rowSize)][(int) (index % rowSize)];
+    return spp[(int) (index / rowSizeSpp)][(int) (index % rowSizeSpp)];
   }
 
   protected void addSpp(int x, int y, int sppIncrease) {
@@ -150,7 +169,7 @@ public class SampleBuffer {
   }
 
   protected void addSpp(long index, int sppIncrease) {
-    spp[(int) (index / rowSize)][(int) (index % rowSize)] += sppIncrease;
+    spp[(int) (index / rowSizeSpp)][(int) (index % rowSizeSpp)] += sppIncrease;
   }
 
   public void setSampleWithSpp(int x, int y, int spp, double r, double g, double b) {
