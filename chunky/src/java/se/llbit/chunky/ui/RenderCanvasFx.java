@@ -305,10 +305,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     guideGroup.setScaleY(scale);
   }
 
-    if (painting.compareAndSet(false, true)) {
   @Override
   public void repaint() {
-    if (enablePreview && painting.compareAndSet(false, true)) {
+    if (painting.compareAndSet(false, true)) {
       forceRepaint();
     }
   }
