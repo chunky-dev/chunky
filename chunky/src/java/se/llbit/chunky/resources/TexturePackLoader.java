@@ -3538,13 +3538,13 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/amethyst_block", Texture.amethyst);
     addSimpleTexture("assets/minecraft/textures/block/budding_amethyst", Texture.buddingAmethyst);
     addSimpleTexture("assets/minecraft/textures/block/copper_block", Texture.copperBlock);
-    addSimpleTexture("assets/minecraft/textures/block/lightly_weathered_copper_block", Texture.lightlyWeatheredCopperBlock);
-    addSimpleTexture("assets/minecraft/textures/block/semi_weathered_copper_block", Texture.semiWeatheredCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/exposed_copper_block", Texture.exposedCopperBlock);
     addSimpleTexture("assets/minecraft/textures/block/weathered_copper_block", Texture.weatheredCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/oxidized_copper_block", Texture.oxidizedCopperBlock);
     addSimpleTexture("assets/minecraft/textures/block/cut_copper", Texture.cutCopperBlock);
-    addSimpleTexture("assets/minecraft/textures/block/lightly_weathered_cut_copper", Texture.lightlyWeatheredCutCopperBlock);
-    addSimpleTexture("assets/minecraft/textures/block/semi_weathered_cut_copper", Texture.semiWeatheredCutCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/exposed_cut_copper", Texture.exposedCutCopperBlock);
     addSimpleTexture("assets/minecraft/textures/block/weathered_cut_copper", Texture.weatheredCutCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/oxidized_cut_copper", Texture.oxidizedCutCopperBlock);
     addSimpleTexture("assets/minecraft/textures/block/lightning_rod", Texture.lightningRod);
     addSimpleTexture("assets/minecraft/textures/block/small_amethyst_bud", Texture.smallAmethystBud);
     addSimpleTexture("assets/minecraft/textures/block/medium_amethyst_bud", Texture.mediumAmethystBud);
