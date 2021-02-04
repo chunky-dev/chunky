@@ -3574,6 +3574,8 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/azalea_side", Texture.azaleaSide);
     addSimpleTexture("assets/minecraft/textures/block/flowering_azalea_top", Texture.floweringAzaleaTop);
     addSimpleTexture("assets/minecraft/textures/block/flowering_azalea_side", Texture.floweringAzaleaSide);
+    addSimpleTexture("assets/minecraft/textures/block/azalea_leaves", Texture.azaleaLeaves);
+    addSimpleTexture("assets/minecraft/textures/block/azalea_leaves_flowers", Texture.azaleaLeavesFlowers);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

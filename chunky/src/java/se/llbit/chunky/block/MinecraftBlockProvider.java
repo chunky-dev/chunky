@@ -42,6 +42,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:attached_melon_stem",
       "minecraft:attached_pumpkin_stem",
       "minecraft:azalea",
+      "minecraft:azalea_leaves",
+      "minecraft:azalea_leaves_flowers",
       "minecraft:azure_bluet",
       "minecraft:bamboo",
       "minecraft:bamboo_sapling",
@@ -2734,6 +2736,10 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new Azalea(name, Texture.azaleaTop, Texture.azaleaSide);
       case "flowering_azalea":
         return new Azalea(name, Texture.floweringAzaleaTop, Texture.floweringAzaleaSide);
+      case "azalea_leaves":
+        return new AzaleaLeaves(name, Texture.azaleaLeaves);
+      case "azalea_leaves_flowers":
+        return new AzaleaLeaves(name, Texture.azaleaLeavesFlowers);
       case "structure_void":
       case "barrier":
         // Invisible.

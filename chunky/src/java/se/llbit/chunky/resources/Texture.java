@@ -948,6 +948,8 @@ public class Texture {
   public static Texture azaleaPlant = new Texture();
   public static Texture floweringAzaleaTop = new Texture();
   public static Texture floweringAzaleaSide = new Texture();
+  public static Texture azaleaLeaves = new Texture();
+  public static Texture azaleaLeavesFlowers = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
