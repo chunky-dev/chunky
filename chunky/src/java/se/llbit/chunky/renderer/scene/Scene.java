@@ -988,6 +988,10 @@ public class Scene implements JsonSerializable, Refreshable {
                                 | (corner2 << Water.CORNER_2)
                                 | (corner3 << Water.CORNER_3)));
                       }
+                    } else {
+                      // Water computation for water blocks on the edge of a chunk is done by the OctreeFinalizer but we need the water level information
+                      waterNode = new Octree.Node(
+                          palette.getWaterId(((Water) block).level, 0));
                     }
                   }
                   waterOctree.set(waterNode, x, cy - origin.y, z);
