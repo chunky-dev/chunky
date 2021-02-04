@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer.renderdump;
 
 import org.junit.Test;
+import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.ProgressListener;
 import se.llbit.util.TaskTracker;
@@ -107,7 +108,7 @@ public class RenderDumpTests {
     Scene scene = createTestScene(testWidth, testHeight, 0, 0);
     ByteArrayInputStream inputStream = new ByteArrayInputStream(getTestDump(dumpName));
     RenderDump.load(inputStream, scene, taskTracker);
-    assertArrayEquals(testSampleBuffer, scene.getSampleBuffer(), 0.0);
+    assertArrayEquals(testSampleBuffer, compileSampleBuffer(scene.getSampleBuffer()), 0.0);
     assertEquals(testSPP, scene.spp);
     assertEquals(testRenderTime, scene.renderTime);
   }
@@ -129,13 +130,13 @@ public class RenderDumpTests {
     double[] postMergeSamples = {0.75, 1.0, 1.5, 0.25, 0.5, 1.0, 1.5, 1.25, 1.75};
 
     Scene scene = createTestScene(testWidth, testHeight, spp, renderTime);
-    System.arraycopy(preMergeSamples, 0, scene.getSampleBuffer(), 0, preMergeSamples.length);
+    fillSampleBuffer(preMergeSamples, scene.getSampleBuffer());
 
     ByteArrayInputStream inputStream = new ByteArrayInputStream(getTestDump(dumpName));
     RenderDump.merge(inputStream, scene, taskTracker);
     assertEquals(spp + testSPP, scene.spp);
     assertEquals(renderTime + testRenderTime, scene.renderTime);
-    assertArrayEquals(postMergeSamples, Arrays.copyOf(scene.getSampleBuffer(), postMergeSamples.length), 0.0);
+    assertArrayEquals(postMergeSamples, compileSampleBuffer(scene.getSampleBuffer(), postMergeSamples.length), 0.0);
   }
 
   /**
@@ -148,9 +149,31 @@ public class RenderDumpTests {
 
   public void saveDumpTest(String dumpName) throws IOException {
     Scene scene = createTestScene(testWidth, testHeight, testSPP, testRenderTime);
-    System.arraycopy(testSampleBuffer, 0, scene.getSampleBuffer(), 0, testSampleBuffer.length);
+    fillSampleBuffer(testSampleBuffer, scene.getSampleBuffer());
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     RenderDump.save(outputStream, scene, taskTracker);
     assertArrayEquals(getTestDump(dumpName), outputStream.toByteArray());
+  }
+
+
+
+  private double[] compileSampleBuffer(SampleBuffer sampleBuffer) {
+    return compileSampleBuffer(sampleBuffer, sampleBuffer.rowCount*sampleBuffer.rowSize);
+  }
+
+  private double[] compileSampleBuffer(SampleBuffer sampleBuffer, int len) {
+    double[] ret = new double[len];
+    for (int i = 0; i<len; i++)
+      ret[i]=sampleBuffer.get(i);
+    return ret;
+  }
+
+  private void fillSampleBuffer(double[] src, SampleBuffer dest) {
+    fillSampleBuffer(src, dest, Math.min(src.length, dest.rowCount*dest.rowSize));
+  }
+
+  private void fillSampleBuffer(double[] src, SampleBuffer dest, int len) {
+    for (int i = 0; i<len; i++)
+      dest.set(i,src[i]);
   }
 }
