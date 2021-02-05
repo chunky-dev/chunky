@@ -943,13 +943,14 @@ public class Texture {
   public static final Texture sculkSensorTendrilInactive = new Texture();
   public static final Texture sculkSensorTop = new Texture();
   public static final Texture glowLichen = new Texture();
-  public static Texture azaleaTop = new Texture();
-  public static Texture azaleaSide = new Texture();
-  public static Texture azaleaPlant = new Texture();
-  public static Texture floweringAzaleaTop = new Texture();
-  public static Texture floweringAzaleaSide = new Texture();
-  public static Texture azaleaLeaves = new Texture();
-  public static Texture azaleaLeavesFlowers = new Texture();
+  public static final Texture azaleaTop = new Texture();
+  public static final Texture azaleaSide = new Texture();
+  public static final Texture azaleaPlant = new Texture();
+  public static final Texture floweringAzaleaTop = new Texture();
+  public static final Texture floweringAzaleaSide = new Texture();
+  public static final Texture azaleaLeaves = new Texture();
+  public static final Texture azaleaLeavesFlowers = new Texture();
+  public static final Texture mossBlock = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

@@ -481,6 +481,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:mossy_stone_brick_slab",
       "minecraft:mossy_stone_brick_stairs",
       "minecraft:mossy_stone_brick_wall",
+      "minecraft:moss_block",
+      "minecraft:moss_carpet",
       "minecraft:moving_piston",
       "minecraft:mushroom_stem",
       "minecraft:mycelium",
@@ -2740,6 +2742,10 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new AzaleaLeaves(name, Texture.azaleaLeaves);
       case "azalea_leaves_flowers":
         return new AzaleaLeaves(name, Texture.azaleaLeavesFlowers);
+      case "moss_block":
+        return new MinecraftBlock(name, Texture.mossBlock);
+      case "moss_carpet":
+        return new Carpet(name, Texture.mossBlock);
       case "structure_void":
       case "barrier":
         // Invisible.
