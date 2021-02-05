@@ -7,7 +7,7 @@ import se.llbit.math.Vector3;
 
 import static java.lang.Math.PI;
 
-public class NishitaSky {
+public class NishitaSky implements SkySimulated{
     private Sun sun;
     private Vector3 sunPosition;
 
@@ -25,7 +25,18 @@ public class NishitaSky {
 
     private double sunIntensity;
 
+    public NishitaSky() {
+        this.sun = null;
+        sunPosition = new Vector3(0, 1, 0);
+        sunIntensity = 1;
+    }
+
     public NishitaSky(Sun sun) {
+        this.updateSun(sun);
+    }
+
+    @Override
+    public void updateSun(Sun sun) {
         this.sun = sun;
 
         double theta = sun.getAzimuth();
@@ -36,6 +47,17 @@ public class NishitaSky {
         sunIntensity = sun.getIntensity();
     }
 
+    @Override
+    public String getName() {
+        return "Nishita";
+    }
+
+    @Override
+    public String getTooltip() {
+        return "A slower, more realistic and flexible sky model.";
+    }
+
+    @Override
     public Vector3 calcIncidentLight(Ray ray) {
         Vector3 origin = new Vector3(0, ray.o.y + earthRadius + 1, 0);
         Vector3 direction = ray.d;

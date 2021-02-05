@@ -162,6 +162,17 @@ public class Sky implements JsonSerializable {
   /** Current sky rendering mode. */
   private SkyMode mode = SkyMode.DEFAULT;
 
+  /** Simulated skies. */
+  public final static List<SkySimulated> skies = new ArrayList<>();
+
+  static {
+    skies.add(new PreethamSky());
+    skies.add(new NishitaSky());
+  }
+
+  /** Simulated sky mode. */
+  private int simulatedSkyMode = 0;
+
   public Sky(Scene sceneDescription) {
     this.scene = sceneDescription;
     makeDefaultGradient(gradient);
@@ -214,6 +225,7 @@ public class Sky implements JsonSerializable {
     gradient = new ArrayList<>(other.gradient);
     color.set(other.color);
     mode = other.mode;
+    simulatedSkyMode = other.simulatedSkyMode;
     for (int i = 0; i < 6; ++i) {
       skybox[i] = other.skybox[i];
       skyboxFileName[i] = other.skyboxFileName[i];
@@ -251,7 +263,8 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SIMULATED: {
-        scene.sun().calcSkyLight(ray, horizonOffset);
+        Vector3 color = skies.get(simulatedSkyMode).calcIncidentLight(ray);
+        ray.color.set(color.x, color.y, color.z, 1);
         break;
       }
       case SKYMAP_PANORAMIC: {
@@ -501,6 +514,21 @@ public class Sky implements JsonSerializable {
    */
   public SkyMode getSkyMode() {
     return mode;
+  }
+
+  /**
+   * Set the simulated sky rendering mode.
+   */
+  public void setSimulatedSkyMode(int mode) {
+    this.simulatedSkyMode = mode;
+    scene.refresh();
+  }
+
+  /**
+   * @return Current simulated sky mode.
+   */
+  public int getSimulatedSkyMode(int mode) {
+    return this.simulatedSkyMode;
   }
 
   @Override public JsonObject toJson() {
