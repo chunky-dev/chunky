@@ -239,6 +239,26 @@ public class BlockPalette {
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.9);
     });
+    materialProperties.put("minecraft:iron_door", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.8);
+    });
+    materialProperties.put("minecraft:iron_trapdoor", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.8);
+    });
+    materialProperties.put("minecraft:cauldron", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.7);
+    });
+    materialProperties.put("minecraft:hopper", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.7);
+    });
     materialProperties.put("minecraft:redstone_torch", block -> {
       block.emittance = 1.0f;
     });
