@@ -259,6 +259,11 @@ public class BlockPalette {
       block.metalness = 1.0f;
       block.setPerceptualSmoothness(0.7);
     });
+    materialProperties.put("minecraft:chain", block -> {
+      block.specular = 0.04f;
+      block.metalness = 1.0f;
+      block.setPerceptualSmoothness(0.9);
+    });
     materialProperties.put("minecraft:redstone_torch", block -> {
       block.emittance = 1.0f;
     });
