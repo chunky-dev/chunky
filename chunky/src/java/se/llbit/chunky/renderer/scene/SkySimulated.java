@@ -7,23 +7,23 @@ import se.llbit.math.Vector3;
  * Interface for simulated skies.
  */
 public interface SkySimulated {
-    /**
-     * Update the sky with a new sun object.
-     */
-    void updateSun(Sun sun);
+  /**
+   * Update the sky with a new sun object.
+   */
+  void updateSun(Sun sun);
 
-    /**
-     * Calculate the sky color for a given ray.
-     */
-    Vector3 calcIncidentLight(Ray ray);
+  /**
+   * Calculate the sky color for a given ray.
+   */
+  Vector3 calcIncidentLight(Ray ray);
 
-    /**
-     * Get the friendly name.
-     */
-    String getName();
+  /**
+   * Get the friendly name.
+   */
+  String getName();
 
-    /**
-     * Get the sky tooltip.
-     */
-    String getTooltip();
+  /**
+   * Get the sky renderer tooltip.
+   */
+  String getTooltip();
 }
