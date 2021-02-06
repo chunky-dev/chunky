@@ -428,6 +428,16 @@ public class BlockPalette {
     materialProperties.put("minecraft:glow_lichen", block -> {
       block.emittance = 1.0f / 15f * 7;
     });
+    materialProperties.put("minecraft:cave_vines_body", block -> {
+      if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
+        block.emittance = 1.0f / 15f * 14;
+      }
+    });
+    materialProperties.put("minecraft:cave_vines_head", block -> {
+      if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
+        block.emittance = 1.0f / 15f * 14;
+      }
+    });
     return materialProperties;
   }
 

@@ -951,6 +951,12 @@ public class Texture {
   public static final Texture azaleaLeaves = new Texture();
   public static final Texture azaleaLeavesFlowers = new Texture();
   public static final Texture mossBlock = new Texture();
+  public static final Texture caveVinesBody = new Texture();
+  public static final Texture caveVinesHead = new Texture();
+  public static final Texture caveVinesBodyLit = new Texture();
+  public static final Texture caveVinesHeadLit = new Texture();
+  public static final Texture hangingRoots = new Texture();
+  public static final Texture rootedDirt = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

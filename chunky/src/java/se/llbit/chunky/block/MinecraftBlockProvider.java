@@ -150,6 +150,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:carved_pumpkin",
       "minecraft:cauldron",
       "minecraft:cave_air",
+      "minecraft:cave_vines_body",
+      "minecraft:cave_vines_head",
       "minecraft:chain_command_block",
       "minecraft:chain",
       "minecraft:chest",
@@ -350,6 +352,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:green_wall_banner",
       "minecraft:green_wool",
       "minecraft:grindstone",
+      "minecraft:hanging_roots",
       "minecraft:hay_block",
       "minecraft:heavy_weighted_pressure_plate",
       "minecraft:honey_block",
@@ -679,6 +682,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:repeater",
       "minecraft:repeating_command_block",
       "minecraft:respawn_anchor",
+      "minecraft:rooted_dirt",
       "minecraft:rose_bush",
       "minecraft:sand",
       "minecraft:sandstone",
@@ -2746,6 +2750,13 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.mossBlock);
       case "moss_carpet":
         return new Carpet(name, Texture.mossBlock);
+      case "cave_vines_body":
+      case "cave_vines_head":
+        return new CaveVines(name, tag.get("Properties").get("berries").stringValue("false").equals("true"));
+      case "hanging_roots":
+        return new SpriteBlock(name, Texture.hangingRoots);
+      case "rooted_dirt":
+        return new MinecraftBlock(name, Texture.rootedDirt);
       case "structure_void":
       case "barrier":
         // Invisible.
