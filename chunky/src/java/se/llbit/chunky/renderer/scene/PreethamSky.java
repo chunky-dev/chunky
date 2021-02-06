@@ -62,29 +62,9 @@ public class PreethamSky implements SkySimulated {
   private Sun sun;
 
   /**
-   * Create a new sky renderer without an existing sun.
-   * TODO: This may cause null pointer exception?
+   * Create a new sky renderer.
    */
   public PreethamSky() {
-    this.sun = null;
-  }
-
-  public PreethamSky(Sun sun) {
-    updateSun(sun);
-  }
-
-  @Override
-  public void updateSun(Sun sun) {
-    this.sun = sun;
-
-    double theta = sun.getAzimuth();
-    double phi = sun.getAltitude();
-
-    double r = QuickMath.abs(FastMath.cos(phi));
-
-    sw.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
-
-    updateSkylightValues();
   }
 
   @Override
@@ -98,8 +78,17 @@ public class PreethamSky implements SkySimulated {
   }
 
   @Override
-  public Vector3 calcIncidentLight(Ray ray) {
+  public Vector3 calcIncidentLight(Ray ray, Sun sun, double horizonOffset) {
+    // Update the sun
+    this.sun = sun;
+    double theta = sun.getAzimuth();
+    double phi = sun.getAltitude();
+    double r = QuickMath.abs(FastMath.cos(phi));
+    sw.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
+    updateSkylightValues();
+
     double cosTheta = ray.d.y;
+    cosTheta += horizonOffset;
     if (cosTheta < 0)
       cosTheta = 0;
     double cosGamma = ray.d.dot(sw);

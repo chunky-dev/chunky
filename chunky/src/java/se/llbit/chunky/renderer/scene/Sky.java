@@ -264,7 +264,7 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SIMULATED: {
-        Vector3 color = skies.get(simulatedSkyMode).calcIncidentLight(ray);
+        Vector3 color = skies.get(simulatedSkyMode).calcIncidentLight(ray, scene.sun, horizonOffset);
         ray.color.set(color.x, color.y, color.z, 1);
         break;
       }

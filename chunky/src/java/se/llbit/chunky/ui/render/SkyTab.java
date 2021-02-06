@@ -120,6 +120,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
       int selected = simulatedSky.getSelectionModel().getSelectedIndex();
       scene.sky().setSimulatedSkyMode(selected);
     });
+    simulatedSky.setTooltip(new Tooltip(skiesTooltip(Sky.skies)));
 
     cloudSize.setName("Cloud size");
     cloudSize.setRange(0.1, 128);
@@ -224,5 +225,17 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
 
   public void gradientChanged(List<Vector4> gradient) {
     scene.sky().setGradient(gradient);
+  }
+
+  private static String skiesTooltip(List<SkySimulated> skies) {
+    StringBuilder tipString = new StringBuilder("Sky Renderers:");
+    for (SkySimulated sky : skies) {
+      tipString.append("\n");
+      tipString.append(sky.getName());
+      tipString.append(": ");
+      tipString.append(sky.getTooltip());
+    }
+
+    return tipString.toString();
   }
 }

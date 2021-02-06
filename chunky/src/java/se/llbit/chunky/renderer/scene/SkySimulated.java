@@ -8,14 +8,9 @@ import se.llbit.math.Vector3;
  */
 public interface SkySimulated {
   /**
-   * Update the sky with a new sun object.
-   */
-  void updateSun(Sun sun);
-
-  /**
    * Calculate the sky color for a given ray.
    */
-  Vector3 calcIncidentLight(Ray ray);
+  Vector3 calcIncidentLight(Ray ray, Sun sun, double horizonOffset);
 
   /**
    * Get the friendly name.

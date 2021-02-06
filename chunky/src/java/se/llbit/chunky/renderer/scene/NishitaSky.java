@@ -12,48 +12,24 @@ import static java.lang.Math.PI;
  * https://www.scratchapixel.com/lessons/procedural-generation-virtual-worlds/simulating-sky/simulating-colors-of-the-sky
  */
 public class NishitaSky implements SkySimulated {
-  private Sun sun;
-  private Vector3 sunPosition;
-
   // Atmospheric constants
   // TODO: Adjust through gui?
-  private double earthRadius = 6360e3;
-  private double atmThickness = 100e3;
+  private final double earthRadius = 6360e3;
+  private final double atmThickness = 100e3;
 
-  private double rayleighScale = 8e3;
-  private double mieScale = 1.2e3;
+  private final double rayleighScale = 8e3;
+  private final double mieScale = 1.2e3;
 
-  private Vector3 betaR = new Vector3(3.8e-6, 13.5e-6, 33.1e-6);
-  private Vector3 betaM = new Vector3(21e-6, 21e-6, 21e-6);
+  private final Vector3 betaR = new Vector3(3.8e-6, 13.5e-6, 33.1e-6);
+  private final Vector3 betaM = new Vector3(21e-6, 21e-6, 21e-6);
 
-  private int samples = 16;
-  private int samplesLight = 8;
-
-  private double sunIntensity;
+  private final int samples = 16;
+  private final int samplesLight = 8;
 
   /**
-   * Create a new sky renderer without an existing sun. Defaults to sun directly overhead
+   * Create a new sky renderer.
    */
   public NishitaSky() {
-    this.sun = null;
-    sunPosition = new Vector3(0, 1, 0);
-    sunIntensity = 1;
-  }
-
-  public NishitaSky(Sun sun) {
-    this.updateSun(sun);
-  }
-
-  @Override
-  public void updateSun(Sun sun) {
-    this.sun = sun;
-
-    double theta = sun.getAzimuth();
-    double phi = sun.getAltitude();
-    double r = QuickMath.abs(FastMath.cos(phi));
-    sunPosition = new Vector3(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
-
-    sunIntensity = sun.getIntensity();
   }
 
   @Override
@@ -67,10 +43,18 @@ public class NishitaSky implements SkySimulated {
   }
 
   @Override
-  public Vector3 calcIncidentLight(Ray ray) {
+  public Vector3 calcIncidentLight(Ray ray, Sun sun, double horizonOffset) {
+    // Get sun information
+    double theta = sun.getAzimuth();
+    double phi = sun.getAltitude();
+    double r = QuickMath.abs(FastMath.cos(phi));
+    Vector3 sunPosition = new Vector3(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
+    double sunIntensity = sun.getIntensity();
+
     // Render from just above the surface of "earth"
     Vector3 origin = new Vector3(0, ray.o.y + earthRadius + 1, 0);
     Vector3 direction = ray.d;
+    direction.y += horizonOffset * (1 - direction.y);
 
     // Calculate the distance from the origin to the edge of the atmosphere
     double distance = sphereIntersect(origin, direction, earthRadius + atmThickness);
@@ -173,11 +157,19 @@ public class NishitaSky implements SkySimulated {
       currentDist += segmentLength;
     }
 
-    return new Vector3(
+    Vector3 color = new Vector3(
         (sumR.x*betaR.x*phaseR + sumM.x*betaM.x*phaseM) * sunIntensity * 5,
         (sumR.y*betaR.y*phaseR + sumM.y*betaM.y*phaseM) * sunIntensity * 5,
         (sumR.z*betaR.z*phaseR + sumM.z*betaM.z*phaseM) * sunIntensity * 5
     );
+
+    color.set(
+        color.x < 1.413 ? FastMath.pow(color.x * 0.38317, 1.0/2.2) : 1.0 - FastMath.exp(-color.x),
+        color.y < 1.413 ? FastMath.pow(color.y * 0.38317, 1.0/2.2) : 1.0 - FastMath.exp(-color.y),
+        color.z < 1.413 ? FastMath.pow(color.z * 0.38317, 1.0/2.2) : 1.0 - FastMath.exp(-color.z)
+    );
+
+    return color;
   }
 
   /** Calculate the distance from <code>origin</code> to the edge of a sphere centered at (0, 0, 0) in <code>direction</code>.*/
