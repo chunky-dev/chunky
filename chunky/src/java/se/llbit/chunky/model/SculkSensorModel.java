@@ -67,7 +67,7 @@ public class SculkSensorModel {
               new Vector3(7 / 16.0, 8 / 16.0, 3 / 16.0),
               new Vector4(4 / 16.0, 12 / 16.0, 8 / 16.0, 0 / 16.0)
           ),
-      }, Math.toRadians(45), new Vector3(3 / 16.0 - 0.5, 0, 3 / 16.0 - 0.5)),
+      }, Math.toRadians(45), new Vector3(3 / 16.0, 0, 3 / 16.0)),
       Model.rotateY(new Quad[]{
           new Quad(
               new Vector3(9 / 16.0, 16 / 16.0, 3 / 16.0),
@@ -81,7 +81,7 @@ public class SculkSensorModel {
               new Vector3(17 / 16.0, 8 / 16.0, 3 / 16.0),
               new Vector4(12 / 16.0, 4 / 16.0, 8 / 16.0, 0 / 16.0)
           ),
-      }, Math.toRadians(-45), new Vector3(13 / 16.0 - 0.5, 0, 3 / 16.0 - 0.5)),
+      }, Math.toRadians(-45), new Vector3(13 / 16.0, 0, 3 / 16.0)),
       Model.rotateY(new Quad[]{
           new Quad(
               new Vector3(9 / 16.0, 16 / 16.0, 13 / 16.0),
@@ -95,7 +95,7 @@ public class SculkSensorModel {
               new Vector3(17 / 16.0, 8 / 16.0, 13 / 16.0),
               new Vector4(12 / 16.0, 4 / 16.0, 8 / 16.0, 0 / 16.0)
           ),
-      }, Math.toRadians(45), new Vector3(13 / 16.0 - 0.5, 0, 13 / 16.0 - 0.5)),
+      }, Math.toRadians(45), new Vector3(13 / 16.0, 0, 13 / 16.0)),
       Model.rotateY(new Quad[]{
           new Quad(
               new Vector3(-1 / 16.0, 16 / 16.0, 13 / 16.0),
@@ -109,7 +109,7 @@ public class SculkSensorModel {
               new Vector3(7 / 16.0, 8 / 16.0, 13 / 16.0),
               new Vector4(4 / 16.0, 12 / 16.0, 8 / 16.0, 0 / 16.0)
           )
-      }, Math.toRadians(-45), new Vector3(3 / 16.0 - 0.5, 0, 13 / 16.0 - 0.5))
+      }, Math.toRadians(-45), new Vector3(3 / 16.0, 0, 13 / 16.0))
   );
 
   public static boolean intersect(Ray ray, boolean active) {
