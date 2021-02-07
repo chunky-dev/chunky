@@ -957,6 +957,10 @@ public class Texture {
   public static final Texture caveVinesHeadLit = new Texture();
   public static final Texture hangingRoots = new Texture();
   public static final Texture rootedDirt = new Texture();
+  public static final Texture bigDripleafStem = new Texture();
+  public static final Texture bigDripleafTop = new Texture();
+  public static final Texture bigDripleafSide = new Texture();
+  public static final Texture bigDripleafTip = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

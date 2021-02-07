@@ -3583,6 +3583,10 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/cave_vines_head_lit", Texture.caveVinesHeadLit);
     addSimpleTexture("assets/minecraft/textures/block/hanging_roots", Texture.hangingRoots);
     addSimpleTexture("assets/minecraft/textures/block/rooted_dirt", Texture.rootedDirt);
+    addSimpleTexture("assets/minecraft/textures/block/big_dripleaf_stem", Texture.bigDripleafStem);
+    addSimpleTexture("assets/minecraft/textures/block/big_dripleaf_top", Texture.bigDripleafTop);
+    addSimpleTexture("assets/minecraft/textures/block/big_dripleaf_side", Texture.bigDripleafSide);
+    addSimpleTexture("assets/minecraft/textures/block/big_dripleaf_tip", Texture.bigDripleafTip);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

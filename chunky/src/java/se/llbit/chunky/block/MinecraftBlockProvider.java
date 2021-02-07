@@ -56,6 +56,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:bee_nest",
       "minecraft:beetroots",
       "minecraft:bell",
+      "minecraft:big_dripleaf",
+      "minecraft:big_dripleaf_stem",
       "minecraft:birch_button",
       "minecraft:birch_door",
       "minecraft:birch_fence_gate",
@@ -2757,6 +2759,10 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new SpriteBlock(name, Texture.hangingRoots);
       case "rooted_dirt":
         return new MinecraftBlock(name, Texture.rootedDirt);
+      case "big_dripleaf_stem":
+        return new BigDripleafStem(BlockProvider.facing(tag, "north"));
+      case "big_dripleaf":
+        return new BigDripleaf(BlockProvider.facing(tag, "north"), tag.get("Properties").get("tilt").stringValue("none"));
       case "structure_void":
       case "barrier":
         // Invisible.
