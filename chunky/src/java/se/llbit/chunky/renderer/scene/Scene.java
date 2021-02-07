@@ -1330,7 +1330,7 @@ public class Scene implements JsonSerializable, Refreshable {
     int xcenter = (xmax + xmin) / 2;
     int zcenter = (zmax + zmin) / 2;
     int ycenter = (yMax + yMin) / 2;
-    for (int y = ycenter+128; y >= ycenter-128; --y) {
+    for (int y = Math.min(ycenter+127, yMax); y >= Math.max(ycenter-128, yMin); --y) {
       Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
           palette);
       if (!(block instanceof Air)) {
