@@ -164,7 +164,7 @@ public class Sky implements JsonSerializable {
   private SkyMode mode = SkyMode.DEFAULT;
 
   /** Simulated skies. */
-  public final static List<SkySimulated> skies = new ArrayList<>();
+  public final static List<SimulatedSky> skies = new ArrayList<>();
 
   static {
     skies.add(new PreethamSky());
@@ -264,7 +264,7 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SIMULATED: {
-        Vector3 color = skies.get(simulatedSkyMode).calcIncidentLight(ray, scene.sun, horizonOffset);
+        Vector3 color = skies.get(simulatedSkyMode).calcIncidentLight(ray, horizonOffset);
         ray.color.set(color.x, color.y, color.z, 1);
         break;
       }
@@ -530,6 +530,13 @@ public class Sky implements JsonSerializable {
    */
   public int getSimulatedSkyMode(int mode) {
     return this.simulatedSkyMode;
+  }
+
+  /**
+   * Update the current simulated sky
+   */
+  public void updateSimSky(Sun sun) {
+    skies.get(simulatedSkyMode).updateSun(sun);
   }
 
   @Override public JsonObject toJson() {

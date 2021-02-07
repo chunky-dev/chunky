@@ -5,7 +5,7 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
-public class PreethamSky implements SkySimulated {
+public class PreethamSky implements SimulatedSky {
   private static final double xZenithChroma[][] =
       {{0.00166, -0.00375, 0.00209, 0}, {-0.02903, 0.06377, -0.03203, 0.00394},
           {0.11693, -0.21196, 0.06052, 0.25886},};
@@ -68,6 +68,16 @@ public class PreethamSky implements SkySimulated {
   }
 
   @Override
+  public void updateSun(Sun sun) {
+    this.sun = sun;
+    double theta = sun.getAzimuth();
+    double phi = sun.getAltitude();
+    double r = QuickMath.abs(FastMath.cos(phi));
+    sw.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
+    updateSkylightValues();
+  }
+
+  @Override
   public String getName() {
     return "Preetham";
   }
@@ -78,15 +88,7 @@ public class PreethamSky implements SkySimulated {
   }
 
   @Override
-  public Vector3 calcIncidentLight(Ray ray, Sun sun, double horizonOffset) {
-    // Update the sun
-    this.sun = sun;
-    double theta = sun.getAzimuth();
-    double phi = sun.getAltitude();
-    double r = QuickMath.abs(FastMath.cos(phi));
-    sw.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
-    updateSkylightValues();
-
+  public Vector3 calcIncidentLight(Ray ray, double horizonOffset) {
     double cosTheta = ray.d.y;
     cosTheta += horizonOffset;
     if (cosTheta < 0)

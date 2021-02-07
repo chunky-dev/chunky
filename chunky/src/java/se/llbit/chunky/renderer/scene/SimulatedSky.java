@@ -6,11 +6,16 @@ import se.llbit.math.Vector3;
 /**
  * Interface for simulated skies.
  */
-public interface SkySimulated {
+public interface SimulatedSky {
+  /**
+   * Update the sun
+   */
+  void updateSun(Sun sun);
+
   /**
    * Calculate the sky color for a given ray.
    */
-  Vector3 calcIncidentLight(Ray ray, Sun sun, double horizonOffset);
+  Vector3 calcIncidentLight(Ray ray, double horizonOffset);
 
   /**
    * Get the friendly name.

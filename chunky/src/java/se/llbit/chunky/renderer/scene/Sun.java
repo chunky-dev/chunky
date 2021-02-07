@@ -196,6 +196,8 @@ public class Sun implements JsonSerializable {
     emittance.set(color);
     emittance.scale(FastMath.pow(intensity, Scene.DEFAULT_GAMMA));
 
+    ((Scene)scene).sky().updateSimSky(this);
+
     updateSkylightValues();
   }
 

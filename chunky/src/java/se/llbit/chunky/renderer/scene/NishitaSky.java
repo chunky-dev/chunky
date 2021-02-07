@@ -11,7 +11,7 @@ import static java.lang.Math.PI;
  * Nishita sky model based on:
  * https://www.scratchapixel.com/lessons/procedural-generation-virtual-worlds/simulating-sky/simulating-colors-of-the-sky
  */
-public class NishitaSky implements SkySimulated {
+public class NishitaSky implements SimulatedSky {
   // Atmospheric constants
   // TODO: Adjust through gui?
   private final double earthRadius = 6360e3;
@@ -26,10 +26,22 @@ public class NishitaSky implements SkySimulated {
   private final int samples = 16;
   private final int samplesLight = 8;
 
+  private Vector3 sunPosition = new Vector3(0, 1, 0);
+  private double sunIntensity = 1;
+
   /**
    * Create a new sky renderer.
    */
   public NishitaSky() {
+  }
+
+  @Override
+  public void updateSun(Sun sun) {
+    double theta = sun.getAzimuth();
+    double phi = sun.getAltitude();
+    double r = QuickMath.abs(FastMath.cos(phi));
+    sunPosition.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
+    sunIntensity = sun.getIntensity();
   }
 
   @Override
@@ -43,14 +55,7 @@ public class NishitaSky implements SkySimulated {
   }
 
   @Override
-  public Vector3 calcIncidentLight(Ray ray, Sun sun, double horizonOffset) {
-    // Get sun information
-    double theta = sun.getAzimuth();
-    double phi = sun.getAltitude();
-    double r = QuickMath.abs(FastMath.cos(phi));
-    Vector3 sunPosition = new Vector3(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
-    double sunIntensity = sun.getIntensity();
-
+  public Vector3 calcIncidentLight(Ray ray, double horizonOffset) {
     // Render from just above the surface of "earth"
     Vector3 origin = new Vector3(0, ray.o.y + earthRadius + 1, 0);
     Vector3 direction = ray.d;

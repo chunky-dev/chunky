@@ -33,8 +33,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.SimulatedSky;
 import se.llbit.chunky.renderer.scene.Sky;
-import se.llbit.chunky.renderer.scene.SkySimulated;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.GradientEditor;
 import se.llbit.chunky.ui.RenderControlsFxController;
@@ -64,7 +64,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   @FXML private LuxColorPicker fogColor;
   private final VBox simulatedSettings = new VBox();
   private DoubleAdjuster horizonOffset = new DoubleAdjuster();
-  private ChoiceBox<SkySimulated> simulatedSky = new ChoiceBox<>();
+  private ChoiceBox<SimulatedSky> simulatedSky = new ChoiceBox<>();
   private final GradientEditor gradientEditor = new GradientEditor(this);
   private final LuxColorPicker colorPicker = new LuxColorPicker();
   private final VBox colorEditor = new VBox(colorPicker);
@@ -100,15 +100,15 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     simulatedSettings.getChildren().add(0, simulatedSkyBox);
     simulatedSky.getItems().addAll(Sky.skies);
     simulatedSky.setValue(Sky.skies.get(0));
-    simulatedSky.setConverter(new StringConverter<SkySimulated>() {
+    simulatedSky.setConverter(new StringConverter<SimulatedSky>() {
       @Override
-      public String toString(SkySimulated object) {
+      public String toString(SimulatedSky object) {
         return object.getName();
       }
 
       @Override
-      public SkySimulated fromString(String string) {
-        for (SkySimulated sky : simulatedSky.getItems()) {
+      public SimulatedSky fromString(String string) {
+        for (SimulatedSky sky : simulatedSky.getItems()) {
           if (string.equals(sky.getName())) {
             return sky;
           }
@@ -227,9 +227,9 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     scene.sky().setGradient(gradient);
   }
 
-  private static String skiesTooltip(List<SkySimulated> skies) {
+  private static String skiesTooltip(List<SimulatedSky> skies) {
     StringBuilder tipString = new StringBuilder("Sky Renderers:");
-    for (SkySimulated sky : skies) {
+    for (SimulatedSky sky : skies) {
       tipString.append("\n");
       tipString.append(sky.getName());
       tipString.append(": ");
