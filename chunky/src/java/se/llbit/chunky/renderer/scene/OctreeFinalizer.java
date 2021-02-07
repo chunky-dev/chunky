@@ -85,7 +85,7 @@ public class OctreeFinalizer {
       Material above = waterTree.getMaterial(x, cy + 1, z, palette);
       Material aboveBlock = worldTree.getMaterial(x, cy + 1, z, palette);
       int level0 = 8 - ((Water) wmat).level;
-      if (!above.isWater() && !aboveBlock.solid) {
+      if (!above.isWaterFilled() && !aboveBlock.solid) {
         int corner0 = level0;
         int corner1 = level0;
         int corner2 = level0;
@@ -128,6 +128,8 @@ public class OctreeFinalizer {
             | (corner1 << Water.CORNER_1)
             | (corner2 << Water.CORNER_2)
             | (corner3 << Water.CORNER_3)), x, cy, z);
+      } else if (above.isWaterFilled()) {
+        waterTree.set(palette.getWaterId(0, 1 << Water.FULL_BLOCK), x, cy, z);
       }
     } else if (mat instanceof Lava) {
       Material above = worldTree.getMaterial(x, cy + 1, z, palette);
