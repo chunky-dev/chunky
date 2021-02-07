@@ -731,6 +731,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:soul_wall_torch",
       "minecraft:spawner",
       "minecraft:sponge",
+      "minecraft:spore_blossom",
       "minecraft:spruce_button",
       "minecraft:spruce_door",
       "minecraft:spruce_fence_gate",
@@ -2766,6 +2767,8 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new BigDripleaf(BlockProvider.facing(tag, "north"), tag.get("Properties").get("tilt").stringValue("none"));
       case "small_dripleaf":
         return new SmallDripleaf(tag.get("Properties").get("half").stringValue("lower"));
+      case "spore_blossom":
+        return new SporeBlossom();
       case "structure_void":
       case "barrier":
         // Invisible.
