@@ -961,6 +961,8 @@ public class Texture {
   public static final Texture bigDripleafTop = new Texture();
   public static final Texture bigDripleafSide = new Texture();
   public static final Texture bigDripleafTip = new Texture();
+  public static final Texture smallDripleafTop = new Texture();
+  public static final Texture smallDripleafSide = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

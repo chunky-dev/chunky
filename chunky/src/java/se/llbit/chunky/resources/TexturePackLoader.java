@@ -3587,6 +3587,8 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/big_dripleaf_top", Texture.bigDripleafTop);
     addSimpleTexture("assets/minecraft/textures/block/big_dripleaf_side", Texture.bigDripleafSide);
     addSimpleTexture("assets/minecraft/textures/block/big_dripleaf_tip", Texture.bigDripleafTip);
+    addSimpleTexture("assets/minecraft/textures/block/small_dripleaf_top", Texture.smallDripleafTop);
+    addSimpleTexture("assets/minecraft/textures/block/small_dripleaf_side", Texture.smallDripleafSide);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

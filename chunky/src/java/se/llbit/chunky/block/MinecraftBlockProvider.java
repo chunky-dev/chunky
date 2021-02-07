@@ -706,6 +706,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:skeleton_wall_skull",
       "minecraft:slime_block",
       "minecraft:small_amethyst_bud",
+      "minecraft:small_dripleaf",
       "minecraft:smithing_table",
       "minecraft:smoker",
       "minecraft:smooth_quartz",
@@ -2763,6 +2764,8 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new BigDripleafStem(BlockProvider.facing(tag, "north"));
       case "big_dripleaf":
         return new BigDripleaf(BlockProvider.facing(tag, "north"), tag.get("Properties").get("tilt").stringValue("none"));
+      case "small_dripleaf":
+        return new SmallDripleaf(tag.get("Properties").get("half").stringValue("lower"));
       case "structure_void":
       case "barrier":
         // Invisible.
