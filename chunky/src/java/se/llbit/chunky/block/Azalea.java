@@ -15,6 +15,7 @@ public class Azalea extends MinecraftBlockTranslucent {
     this.top = top;
     this.side = side;
     localIntersect = true;
+    solid = false;
   }
 
   @Override

@@ -69,7 +69,7 @@ public class Model {
 
   /**
    * @param src    source quads
-   * @param origin origin of the rotation axis, relative to the north/west/bottom corner of a block
+   * @param origin origin of the rotation axis, relative to  0,0,0 (the north/west/bottom corner of a block)
    * @return Quads rotated about the X axis by some angle around the given origin
    */
   public static Quad[] rotateX(Quad[] src, double angle, Vector3 origin) {
@@ -150,7 +150,7 @@ public class Model {
 
   /**
    * @param src    source quads
-   * @param origin origin of the rotation axis, relative to the north/west/bottom corner of a block
+   * @param origin origin of the rotation axis, relative to 0,0,0 (the north/west/bottom corner of a block)
    * @return Quads rotated about the Y axis by some angle around the given origin
    */
   public static Quad[] rotateY(Quad[] src, double angle, Vector3 origin) {
@@ -194,7 +194,7 @@ public class Model {
 
   /**
    * @param src    source quads
-   * @param origin origin of the rotation axis, relative to the north/west/bottom corner of a block
+   * @param origin origin of the rotation axis, relative to 0,0,0 (the north/west/bottom corner of a block)
    * @return Quads rotated about the Z axis by some angle around the given origin
    */
   public static Quad[] rotateZ(Quad[] src, double angle, Vector3 origin) {

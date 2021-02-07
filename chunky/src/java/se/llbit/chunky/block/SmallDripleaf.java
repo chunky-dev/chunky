@@ -13,7 +13,6 @@ public class SmallDripleaf extends MinecraftBlockTranslucent {
     super("small_dripleaf", Texture.smallDripleafTop);
     this.half = half;
     localIntersect = true;
-    opaque = false;
     solid = false;
   }
 
