@@ -41,6 +41,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:anvil",
       "minecraft:attached_melon_stem",
       "minecraft:attached_pumpkin_stem",
+      "minecraft:azalea",
+      "minecraft:azalea_leaves",
+      "minecraft:azalea_leaves_flowers",
       "minecraft:azure_bluet",
       "minecraft:bamboo",
       "minecraft:bamboo_sapling",
@@ -53,6 +56,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:bee_nest",
       "minecraft:beetroots",
       "minecraft:bell",
+      "minecraft:big_dripleaf",
+      "minecraft:big_dripleaf_stem",
       "minecraft:birch_button",
       "minecraft:birch_door",
       "minecraft:birch_fence_gate",
@@ -147,6 +152,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:carved_pumpkin",
       "minecraft:cauldron",
       "minecraft:cave_air",
+      "minecraft:cave_vines_body",
+      "minecraft:cave_vines_head",
       "minecraft:chain_command_block",
       "minecraft:chain",
       "minecraft:chest",
@@ -299,6 +306,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:fire_coral_wall_fan",
       "minecraft:fire",
       "minecraft:fletching_table",
+      "minecraft:flowering_azalea",
       "minecraft:flower_pot",
       "minecraft:frosted_ice",
       "minecraft:furnace",
@@ -346,6 +354,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:green_wall_banner",
       "minecraft:green_wool",
       "minecraft:grindstone",
+      "minecraft:hanging_roots",
       "minecraft:hay_block",
       "minecraft:heavy_weighted_pressure_plate",
       "minecraft:honey_block",
@@ -426,10 +435,10 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:light_gray_terracotta",
       "minecraft:light_gray_wall_banner",
       "minecraft:light_gray_wool",
-      "minecraft:lightly_weathered_copper_block",
-      "minecraft:lightly_weathered_cut_copper",
-      "minecraft:lightly_weathered_cut_copper_slab",
-      "minecraft:lightly_weathered_cut_copper_stairs",
+      "minecraft:exposed_copper",
+      "minecraft:exposed_cut_copper",
+      "minecraft:exposed_cut_copper_slab",
+      "minecraft:exposed_cut_copper_stairs",
       "minecraft:lightning_rod",
       "minecraft:light_weighted_pressure_plate",
       "minecraft:lilac",
@@ -477,6 +486,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:mossy_stone_brick_slab",
       "minecraft:mossy_stone_brick_stairs",
       "minecraft:mossy_stone_brick_wall",
+      "minecraft:moss_block",
+      "minecraft:moss_carpet",
       "minecraft:moving_piston",
       "minecraft:mushroom_stem",
       "minecraft:mycelium",
@@ -673,6 +684,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:repeater",
       "minecraft:repeating_command_block",
       "minecraft:respawn_anchor",
+      "minecraft:rooted_dirt",
       "minecraft:rose_bush",
       "minecraft:sand",
       "minecraft:sandstone",
@@ -684,16 +696,17 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:seagrass",
       "minecraft:sea_lantern",
       "minecraft:sea_pickle",
-      "minecraft:semi_weathered_copper_block",
-      "minecraft:semi_weathered_cut_copper",
-      "minecraft:semi_weathered_cut_copper_slab",
-      "minecraft:semi_weathered_cut_copper_stairs",
+      "minecraft:weathered_copper",
+      "minecraft:weathered_cut_copper",
+      "minecraft:weathered_cut_copper_slab",
+      "minecraft:weathered_cut_copper_stairs",
       "minecraft:shroomlight",
       "minecraft:shulker_box",
       "minecraft:skeleton_skull",
       "minecraft:skeleton_wall_skull",
       "minecraft:slime_block",
       "minecraft:small_amethyst_bud",
+      "minecraft:small_dripleaf",
       "minecraft:smithing_table",
       "minecraft:smoker",
       "minecraft:smooth_quartz",
@@ -718,6 +731,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:soul_wall_torch",
       "minecraft:spawner",
       "minecraft:sponge",
+      "minecraft:spore_blossom",
       "minecraft:spruce_button",
       "minecraft:spruce_door",
       "minecraft:spruce_fence_gate",
@@ -805,22 +819,22 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:warped_wart_block",
       "minecraft:water_cauldron",
       "minecraft:water",
-      "minecraft:waxed_copper",
+      "minecraft:waxed_copper_block",
       "minecraft:waxed_cut_copper",
       "minecraft:waxed_cut_copper_slab",
       "minecraft:waxed_cut_copper_stairs",
-      "minecraft:waxed_lightly_weathered_copper",
-      "minecraft:waxed_lightly_weathered_cut_copper",
-      "minecraft:waxed_lightly_weathered_cut_copper_slab",
-      "minecraft:waxed_lightly_weathered_cut_copper_stairs",
-      "minecraft:waxed_semi_weathered_copper",
-      "minecraft:waxed_semi_weathered_cut_copper",
-      "minecraft:waxed_semi_weathered_cut_copper_slab",
-      "minecraft:waxed_semi_weathered_cut_copper_stairs",
-      "minecraft:weathered_copper_block",
-      "minecraft:weathered_cut_copper",
-      "minecraft:weathered_cut_copper_slab",
-      "minecraft:weathered_cut_copper_stairs",
+      "minecraft:waxed_exposed_copper",
+      "minecraft:waxed_exposed_cut_copper",
+      "minecraft:waxed_exposed_cut_copper_slab",
+      "minecraft:waxed_exposed_cut_copper_stairs",
+      "minecraft:waxed_weathered_copper",
+      "minecraft:waxed_weathered_cut_copper",
+      "minecraft:waxed_weathered_cut_copper_slab",
+      "minecraft:waxed_weathered_cut_copper_stairs",
+      "minecraft:oxidized_copper",
+      "minecraft:oxidized_cut_copper",
+      "minecraft:oxidized_cut_copper_slab",
+      "minecraft:oxidized_cut_copper_stairs",
       "minecraft:weeping_vines",
       "minecraft:weeping_vines_plant",
       "minecraft:wet_sponge",
@@ -2644,49 +2658,49 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "budding_amethyst":
         return new MinecraftBlock("budding_amethyst", Texture.buddingAmethyst);
       case "copper_block":
-      case "waxed_copper":
+      case "waxed_copper_block":
         return new MinecraftBlock(name, Texture.copperBlock);
-      case "lightly_weathered_copper_block":
-      case "waxed_lightly_weathered_copper":
-        return new MinecraftBlock(name, Texture.lightlyWeatheredCopperBlock);
-      case "semi_weathered_copper_block":
-      case "waxed_semi_weathered_copper":
-        return new MinecraftBlock(name, Texture.semiWeatheredCopperBlock);
-      case "weathered_copper_block":
-        return new MinecraftBlock(name, Texture.weatheredCopperBlock);
+      case "exposed_copper":
+      case "waxed_exposed_copper":
+        return new MinecraftBlock(name, Texture.exposedCopper);
+      case "weathered_copper":
+      case "waxed_weathered_copper":
+        return new MinecraftBlock(name, Texture.weatheredCopper);
+      case "oxidized_copper":
+        return new MinecraftBlock(name, Texture.oxidizedCopper);
       case "cut_copper":
       case "waxed_cut_copper":
-        return new MinecraftBlock(name, Texture.cutCopperBlock);
-      case "lightly_weathered_cut_copper":
-      case "waxed_lightly_weathered_cut_copper":
-        return new MinecraftBlock(name, Texture.lightlyWeatheredCutCopperBlock);
-      case "semi_weathered_cut_copper":
-      case "waxed_semi_weathered_cut_copper":
-        return new MinecraftBlock(name, Texture.semiWeatheredCutCopperBlock);
+        return new MinecraftBlock(name, Texture.cutCopper);
+      case "exposed_cut_copper":
+      case "waxed_exposed_cut_copper":
+        return new MinecraftBlock(name, Texture.exposedCutCopper);
       case "weathered_cut_copper":
-        return new MinecraftBlock(name, Texture.weatheredCutCopperBlock);
+      case "waxed_weathered_cut_copper":
+        return new MinecraftBlock(name, Texture.weatheredCutCopper);
+      case "oxidized_cut_copper":
+        return new MinecraftBlock(name, Texture.oxidizedCutCopper);
       case "cut_copper_stairs":
       case "waxed_cut_copper_stairs":
-        return stairs(tag, Texture.cutCopperBlock);
-      case "lightly_weathered_cut_copper_stairs":
-      case "waxed_lightly_weathered_cut_copper_stairs":
-        return stairs(tag, Texture.lightlyWeatheredCutCopperBlock);
-      case "semi_weathered_cut_copper_stairs":
-      case "waxed_semi_weathered_cut_copper_stairs":
-        return stairs(tag, Texture.semiWeatheredCutCopperBlock);
+        return stairs(tag, Texture.cutCopper);
+      case "exposed_cut_copper_stairs":
+      case "waxed_exposed_cut_copper_stairs":
+        return stairs(tag, Texture.exposedCutCopper);
       case "weathered_cut_copper_stairs":
-        return stairs(tag, Texture.weatheredCutCopperBlock);
+      case "waxed_weathered_cut_copper_stairs":
+        return stairs(tag, Texture.weatheredCutCopper);
+      case "oxidized_cut_copper_stairs":
+        return stairs(tag, Texture.oxidizedCutCopper);
       case "cut_copper_slab":
       case "waxed_cut_copper_slab":
-        return slab(tag, Texture.cutCopperBlock);
-      case "lightly_weathered_cut_copper_slab":
-      case "waxed_lightly_weathered_cut_copper_slab":
-        return slab(tag, Texture.lightlyWeatheredCutCopperBlock);
-      case "semi_weathered_cut_copper_slab":
-      case "waxed_semi_weathered_cut_copper_slab":
-        return slab(tag, Texture.semiWeatheredCutCopperBlock);
+        return slab(tag, Texture.cutCopper);
+      case "exposed_cut_copper_slab":
+      case "waxed_exposed_cut_copper_slab":
+        return slab(tag, Texture.exposedCutCopper);
       case "weathered_cut_copper_slab":
-        return slab(tag, Texture.weatheredCutCopperBlock);
+      case "waxed_weathered_cut_copper_slab":
+        return slab(tag, Texture.weatheredCutCopper);
+      case "oxidized_cut_copper_slab":
+        return slab(tag, Texture.oxidizedCutCopper);
       case "lava_cauldron":
         return new LavaCauldron();
       case "lightning_rod":
@@ -2728,6 +2742,33 @@ public class MinecraftBlockProvider implements BlockProvider {
             tag.get("Properties").get("up").stringValue("false").equals("true"),
             tag.get("Properties").get("down").stringValue("false").equals("true")
         );
+      case "azalea":
+        return new Azalea(name, Texture.azaleaTop, Texture.azaleaSide);
+      case "flowering_azalea":
+        return new Azalea(name, Texture.floweringAzaleaTop, Texture.floweringAzaleaSide);
+      case "azalea_leaves":
+        return new AzaleaLeaves(name, Texture.azaleaLeaves);
+      case "azalea_leaves_flowers":
+        return new AzaleaLeaves(name, Texture.azaleaLeavesFlowers);
+      case "moss_block":
+        return new MinecraftBlock(name, Texture.mossBlock);
+      case "moss_carpet":
+        return new Carpet(name, Texture.mossBlock);
+      case "cave_vines_body":
+      case "cave_vines_head":
+        return new CaveVines(name, tag.get("Properties").get("berries").stringValue("false").equals("true"));
+      case "hanging_roots":
+        return new SpriteBlock(name, Texture.hangingRoots);
+      case "rooted_dirt":
+        return new MinecraftBlock(name, Texture.rootedDirt);
+      case "big_dripleaf_stem":
+        return new BigDripleafStem(BlockProvider.facing(tag, "north"));
+      case "big_dripleaf":
+        return new BigDripleaf(BlockProvider.facing(tag, "north"), tag.get("Properties").get("tilt").stringValue("none"));
+      case "small_dripleaf":
+        return new SmallDripleaf(tag.get("Properties").get("half").stringValue("lower"));
+      case "spore_blossom":
+        return new SporeBlossom();
       case "structure_void":
       case "barrier":
         // Invisible.

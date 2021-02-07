@@ -400,29 +400,29 @@ public class BlockPalette {
       block.setPerceptualSmoothness(0.75);
     };
     materialProperties.put("minecraft:copper_block", copperConfig);
-    materialProperties.put("minecraft:lightly_weathered_copper_block", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:semi_weathered_copper_block", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:exposed_copper", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:weathered_copper", semiWeatheredCopperConfig);
     materialProperties.put("minecraft:cut_copper", copperConfig);
-    materialProperties.put("minecraft:lightly_weathered_cut_copper", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:semi_weathered_cut_copper", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:exposed_cut_copper", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:weathered_cut_copper", semiWeatheredCopperConfig);
     materialProperties.put("minecraft:cut_copper_stairs", copperConfig);
-    materialProperties.put("minecraft:lightly_weathered_cut_copper_stairs", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:semi_weathered_cut_copper_stairs", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:exposed_cut_copper_stairs", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:weathered_cut_copper_stairs", semiWeatheredCopperConfig);
     materialProperties.put("minecraft:cut_copper_slab", copperConfig);
-    materialProperties.put("minecraft:lightly_weathered_cut_copper_slab", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:semi_weathered_cut_copper_slab", semiWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_copper", copperConfig);
-    materialProperties.put("minecraft:waxed_lightly_weathered_copper", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_semi_weathered_copper", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:exposed_cut_copper_slab", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:weathered_cut_copper_slab", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_copper_block", copperConfig);
+    materialProperties.put("minecraft:waxed_exposed_copper", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_weathered_copper", semiWeatheredCopperConfig);
     materialProperties.put("minecraft:waxed_cut_copper", copperConfig);
-    materialProperties.put("minecraft:waxed_lightly_weathered_cut_copper", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_semi_weathered_cut_copper", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_exposed_cut_copper", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_weathered_cut_copper", semiWeatheredCopperConfig);
     materialProperties.put("minecraft:waxed_cut_copper_stairs", copperConfig);
-    materialProperties.put("minecraft:waxed_lightly_weathered_cut_copper_stairs", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_semi_weathered_cut_copper_stairs", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_exposed_cut_copper_stairs", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_weathered_cut_copper_stairs", semiWeatheredCopperConfig);
     materialProperties.put("minecraft:waxed_cut_copper_slab", copperConfig);
-    materialProperties.put("minecraft:waxed_lightly_weathered_cut_copper_slab", lightlyWeatheredCopperConfig);
-    materialProperties.put("minecraft:waxed_semi_weathered_cut_copper_slab", semiWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_exposed_cut_copper_slab", lightlyWeatheredCopperConfig);
+    materialProperties.put("minecraft:waxed_weathered_cut_copper_slab", semiWeatheredCopperConfig);
     materialProperties.put("minecraft:lightning_rod", copperConfig);
     materialProperties.put("minecraft:small_amethyst_bud", block -> {
       if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
@@ -452,6 +452,16 @@ public class BlockPalette {
     });
     materialProperties.put("minecraft:glow_lichen", block -> {
       block.emittance = 1.0f / 15f * 7;
+    });
+    materialProperties.put("minecraft:cave_vines_body", block -> {
+      if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
+        block.emittance = 1.0f / 15f * 14;
+      }
+    });
+    materialProperties.put("minecraft:cave_vines_head", block -> {
+      if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
+        block.emittance = 1.0f / 15f * 14;
+      }
     });
     return materialProperties;
   }

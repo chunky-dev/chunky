@@ -104,6 +104,8 @@ abstract public class Entity {
         return FlameParticles.fromJson(json);
       case "beaconBeam":
         return BeaconBeam.fromJson(json);
+      case "sporeBlossom":
+        return SporeBlossom.fromJson(json);
     }
     return null;
   }
