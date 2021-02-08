@@ -46,8 +46,7 @@ public class SkyCache {
    */
   public SkyCache(Sky sky) {
     this.sky = sky;
-    skyTexture = new double[skyResolution+1][skyResolution+1][3];
-    reset(sky);
+    skyTexture = null;
   }
 
   /** Check if this cache needs to be updated */
@@ -57,8 +56,14 @@ public class SkyCache {
 
   /** Reset the sky cache */
   public void reset(Sky sky) {
-    version += 1;
     simSky = sky.getSimulatedSky();
+
+    // Sky has not yet been initialized. No need to reset.
+    if (skyTexture == null) {
+      return;
+    }
+
+    version += 1;
     for (int i = 0; i < skyResolution+1; i++) {
       for (int j = 0; j < skyResolution+1; j++) {
         for (int k = 0; k < 3; k++) {
@@ -71,8 +76,7 @@ public class SkyCache {
   /** Adjust the sky resolution and reset the cache */
   public void setSkyResolution(int skyResolution) {
     this.skyResolution = skyResolution;
-    skyTexture = new double[skyResolution+1][skyResolution+1][3];
-    reset(this.sky);
+    skyTexture = null;
   }
 
   /** Get the current sky resolution */
@@ -85,6 +89,11 @@ public class SkyCache {
    * bilinearly interpolated.
    */
   public Vector3 calcIncidentLight(Ray ray, double horizonOffset) {
+    if (skyTexture == null) {
+      skyTexture = new double[skyResolution+1][skyResolution+1][3];
+      reset(sky);
+    }
+
     double theta = FastMath.atan2(ray.d.z, ray.d.x);
     theta /= PI*2;
     theta = ((theta % 1) + 1) % 1;
