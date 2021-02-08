@@ -7,18 +7,32 @@ import se.llbit.math.Vector3;
 
 import static java.lang.Math.PI;
 
-public class SkyBaker {
+public class SkyCache {
+  // Sky texture array
   private double[][][] skyTexture;
+
+  // Default resolution is 1024x1024. Should be more than enough for any simulated sky.
   private int skyResolution = 1024;
+
   private SimulatedSky simSky;
   private Sky sky;
 
-  public SkyBaker(Sky sky) {
+  /**
+   * An on-the-fly sky cache. Automatically calculates sky colors as they are requested and caches them. Any repeat
+   * requests will pull from the cache.
+   *
+   * Default cache size is 1024x1024 with bilinear interpolation which seems to work well for all simulated sky
+   * modes.
+   *
+   * @param sky Sky object to pull sky renderer from.
+   */
+  public SkyCache(Sky sky) {
     this.sky = sky;
     skyTexture = new double[skyResolution+1][skyResolution+1][3];
     reset();
   }
 
+  /** Reset the sky cache */
   public void reset() {
     simSky = sky.getSimulatedSky();
     for (int i = 0; i < skyResolution+1; i++) {
@@ -30,16 +44,22 @@ public class SkyBaker {
     }
   }
 
+  /** Adjust the sky resolution and reset the cache */
   public void setSkyResolution(int skyResolution) {
     this.skyResolution = skyResolution;
     skyTexture = new double[skyResolution+1][skyResolution+1][3];
     reset();
   }
 
+  /** Get the current sky resolution */
   public int getSkyResolution() {
     return this.skyResolution;
   }
 
+  /**
+   * Calculate the incident light. Will automatically pull from the cache or calculate new values. Cache values are
+   * bilinearly interpolated.
+   */
   public Vector3 calcIncidentLight(Ray ray, double horizonOffset) {
     double theta = FastMath.atan2(ray.d.z, ray.d.x);
     theta /= PI*2;
@@ -49,10 +69,12 @@ public class SkyBaker {
     return getColorInterpolated(theta, phi);
   }
 
+  // Linear interpolation between 2 points in 1 dimension
   private double interp1D(double x, double x0, double x1, double y0, double y1) {
     return y0 + (x - x0)*(y1-y0)/(x1-x0);
   }
 
+  // Calculate the bilinearly interpolated value from the cache.
   private Vector3 getColorInterpolated(double normX, double normY) {
     double x = normX * skyResolution;
     double y = normY * skyResolution;
@@ -74,6 +96,7 @@ public class SkyBaker {
     return new Vector3(color[0], color[1], color[2]);
   }
 
+  // Calculate the sky color for a pixel on the cache.
   private void bake(int x, int y) {
     Ray ray = new Ray();
 

@@ -174,12 +174,12 @@ public class Sky implements JsonSerializable {
   /** Simulated sky mode. */
   private int simulatedSkyMode = 0;
 
-  private SkyBaker skyBaker;
+  private final SkyCache skyCache;
 
   public Sky(Scene sceneDescription) {
     this.scene = sceneDescription;
     makeDefaultGradient(gradient);
-    skyBaker = new SkyBaker(this);
+    skyCache = new SkyCache(this);
   }
 
   /**
@@ -267,8 +267,7 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SIMULATED: {
-        Vector3 color = skyBaker.calcIncidentLight(ray, horizonOffset);
-//        Vector3 color = skies.get(simulatedSkyMode).calcIncidentLight(ray, horizonOffset);
+        Vector3 color = skyCache.calcIncidentLight(ray, horizonOffset);
         ray.color.set(color.x, color.y, color.z, 1);
         break;
       }
@@ -539,16 +538,16 @@ public class Sky implements JsonSerializable {
   /**
    * Update the current simulated sky
    */
-  public void updateSimSky(Sun sun) {
+  public void updateSimulatedSky(Sun sun) {
     skies.get(simulatedSkyMode).updateSun(sun);
-    skyBaker.reset();
+    skyCache.reset();
   }
 
   /**
    * Set the simulated sky cache resolution
    */
   public void setSkyCacheResolution(int resolution) {
-    skyBaker.setSkyResolution(resolution);
+    skyCache.setSkyResolution(resolution);
   }
 
   @Override public JsonObject toJson() {
@@ -637,6 +636,7 @@ public class Sky implements JsonSerializable {
       }
       case SIMULATED: {
         simulatedSkyMode = json.get("simulatedSky").intValue(simulatedSkyMode);
+        break;
       }
       default:
         break;

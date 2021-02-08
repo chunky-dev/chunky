@@ -13,6 +13,11 @@ public interface SimulatedSky {
   void updateSun(Sun sun);
 
   /**
+   * Check if the sky needs an update with a new sun.
+   */
+  boolean needUpdate(Sun sun);
+
+  /**
    * Calculate the sky color for a given ray.
    */
   Vector3 calcIncidentLight(Ray ray, double horizonOffset);

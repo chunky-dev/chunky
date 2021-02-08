@@ -5,6 +5,8 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+import static java.lang.Math.PI;
+
 public class PreethamSky implements SimulatedSky {
   private static final double xZenithChroma[][] =
       {{0.00166, -0.00375, 0.00209, 0}, {-0.02903, 0.06377, -0.03203, 0.00394},
@@ -57,24 +59,35 @@ public class PreethamSky implements SimulatedSky {
   private double f0_x;
   private double f0_y;
 
+  // Final sun position vector to prevent unnecessary reallocation
   private final Vector3 sw = new Vector3();
 
-  private Sun sun;
+  // Spherical sun position for faster update checking
+  private double theta;
+  private double phi;
 
   /**
    * Create a new sky renderer.
    */
   public PreethamSky() {
+    // Initialize sun as overhead
+    sw.set(0, 1, 0);
+    updateSkylightValues(PI/2);
   }
 
   @Override
   public void updateSun(Sun sun) {
-    this.sun = sun;
-    double theta = sun.getAzimuth();
-    double phi = sun.getAltitude();
+    theta = sun.getAzimuth();
+    phi = sun.getAltitude();
     double r = QuickMath.abs(FastMath.cos(phi));
     sw.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
-    updateSkylightValues();
+    updateSkylightValues(sun.getAltitude());
+  }
+
+  @Override
+  public boolean needUpdate(Sun sun) {
+    return theta != sun.getAzimuth() ||
+           phi != sun.getAltitude();
   }
 
   @Override
@@ -118,11 +131,11 @@ public class PreethamSky implements SimulatedSky {
     }
   }
 
-  private void updateSkylightValues() {
-    double sunTheta = Math.PI / 2 - sun.getAltitude();
+  private void updateSkylightValues(double altitude) {
+    double sunTheta = PI / 2 - altitude;
     double cosTheta = FastMath.cos(sunTheta);
     double cos2Theta = cosTheta * cosTheta;
-    double chi = (4.0 / 9.0 - turb / 120.0) * (Math.PI - 2 * sunTheta);
+    double chi = (4.0 / 9.0 - turb / 120.0) * (PI - 2 * sunTheta);
     zenith_Y = (4.0453 * turb - 4.9710) * Math.tan(chi) - 0.2155 * turb + 2.4192;
     zenith_Y = (zenith_Y < 0) ? -zenith_Y : zenith_Y;
     zenith_x = chroma(turb, turb2, sunTheta, xZenithChroma);

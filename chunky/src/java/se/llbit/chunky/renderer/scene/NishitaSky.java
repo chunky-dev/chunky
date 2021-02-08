@@ -8,26 +8,29 @@ import se.llbit.math.Vector3;
 import static java.lang.Math.PI;
 
 /**
- * Nishita sky model based on:
- * https://www.scratchapixel.com/lessons/procedural-generation-virtual-worlds/simulating-sky/simulating-colors-of-the-sky
+ * Nishita sky model based on the code presented in <a href="https://www.scratchapixel.com/lessons/procedural-generation-virtual-worlds/simulating-sky/simulating-colors-of-the-sky">Scratchapixel 2.0</a>.
  */
 public class NishitaSky implements SimulatedSky {
   // Atmospheric constants
-  // TODO: Adjust through gui?
-  private final double earthRadius = 6360e3;
-  private final double atmThickness = 100e3;
+  private static final double EARTH_RADIUS = 6360e3;
+  private static final double ATM_THICKNESS = 100e3;
 
-  private final double rayleighScale = 8e3;
-  private final double mieScale = 1.2e3;
+  private static final double RAYLEIGH_SCALE = 8e3;
+  private static final double MIE_SCALE = 1.2e3;
 
-  private final Vector3 betaR = new Vector3(3.8e-6, 13.5e-6, 33.1e-6);
-  private final Vector3 betaM = new Vector3(21e-6, 21e-6, 21e-6);
+  private static final Vector3 BETA_R = new Vector3(3.8e-6, 13.5e-6, 33.1e-6);
+  private static final Vector3 BETA_M = new Vector3(21e-6, 21e-6, 21e-6);
 
-  private final int samples = 16;
-  private final int samplesLight = 8;
+  private static final int SAMPLES = 16;
+  private static final int SAMPLES_LIGHT = 8;
 
-  private Vector3 sunPosition = new Vector3(0, 1, 0);
+  // Sun position vector. Final to prevent unnecessary reallocation
+  private final Vector3 sunPosition = new Vector3(0, 1, 0);
   private double sunIntensity = 1;
+
+  // Sun position in spherical form for faster update checking
+  private double theta;
+  private double phi;
 
   /**
    * Create a new sky renderer.
@@ -37,11 +40,18 @@ public class NishitaSky implements SimulatedSky {
 
   @Override
   public void updateSun(Sun sun) {
-    double theta = sun.getAzimuth();
-    double phi = sun.getAltitude();
+    theta = sun.getAzimuth();
+    phi = sun.getAltitude();
     double r = QuickMath.abs(FastMath.cos(phi));
     sunPosition.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
     sunIntensity = sun.getIntensity();
+  }
+
+  @Override
+  public boolean needUpdate(Sun sun) {
+    return sunIntensity != sun.getIntensity() ||
+           theta != sun.getAzimuth() ||
+           phi != sun.getAltitude();
   }
 
   @Override
@@ -57,18 +67,19 @@ public class NishitaSky implements SimulatedSky {
   @Override
   public Vector3 calcIncidentLight(Ray ray, double horizonOffset) {
     // Render from just above the surface of "earth"
-    Vector3 origin = new Vector3(0, ray.o.y + earthRadius + 1, 0);
+    Vector3 origin = new Vector3(0, ray.o.y + EARTH_RADIUS + 1, 0);
     Vector3 direction = ray.d;
     direction.y += horizonOffset * (1 - direction.y);
 
     // Calculate the distance from the origin to the edge of the atmosphere
-    double distance = sphereIntersect(origin, direction, earthRadius + atmThickness);
+    double distance = sphereIntersect(origin, direction, EARTH_RADIUS + ATM_THICKNESS);
     if (distance == -1) {
       // No intersection, black
       return new Vector3(0, 0, 0);
     }
 
-    double segmentLength = distance / samples;
+    // Ray march segment length
+    double segmentLength = distance / SAMPLES;
     double currentDist = 0;
 
     double optDepthR = 0;
@@ -82,9 +93,11 @@ public class NishitaSky implements SimulatedSky {
     Vector3 sumR = new Vector3(0, 0, 0);
     Vector3 sumM = new Vector3(0, 0, 0);
 
+    // Primary sample values
     Vector3 samplePosition = new Vector3();
     double height, hr, hm;
 
+    // Sun sampling values
     Vector3 sunSamplePosition = new Vector3();
     double sunLength, sunSegment, sunCurrent, optDepthSunR, optDepthSunM, sunHeight;
 
@@ -92,22 +105,22 @@ public class NishitaSky implements SimulatedSky {
     Vector3 attenuation = new Vector3();
 
     // Primary ray march out towards space
-    for (int i = 0; i < samples; i++) {
+    for (int i = 0; i < SAMPLES; i++) {
       samplePosition.set(
           origin.x + (currentDist + segmentLength/2) * direction.x,
           origin.y + (currentDist + segmentLength/2) * direction.y,
           origin.z + (currentDist + segmentLength/2) * direction.z
       );
-      height = samplePosition.length() - earthRadius;
+      height = samplePosition.length() - EARTH_RADIUS;
 
-      hr = FastMath.exp(-height / rayleighScale) * segmentLength;
-      hm = FastMath.exp(-height / mieScale) * segmentLength;
+      hr = FastMath.exp(-height / RAYLEIGH_SCALE) * segmentLength;
+      hm = FastMath.exp(-height / MIE_SCALE) * segmentLength;
       optDepthR += hr;
       optDepthM += hm;
 
       // Calculate the distance from the current point to the atmosphere in the direction of the sun
-      sunLength = sphereIntersect(samplePosition, sunPosition, earthRadius + atmThickness);
-      sunSegment = sunLength / samplesLight;
+      sunLength = sphereIntersect(samplePosition, sunPosition, EARTH_RADIUS + ATM_THICKNESS);
+      sunSegment = sunLength / SAMPLES_LIGHT;
       sunCurrent = 0;
 
       optDepthSunR = 0;
@@ -115,29 +128,30 @@ public class NishitaSky implements SimulatedSky {
 
       // Ray march towards the sun
       boolean flag = false;
-      for (int j = 0; j < samplesLight; j++) {
+      for (int j = 0; j < SAMPLES_LIGHT; j++) {
         sunSamplePosition.set(
             samplePosition.x + (sunCurrent + sunSegment/2) * sunPosition.x,
             samplePosition.y + (sunCurrent + sunSegment/2) * sunPosition.y,
             samplePosition.z + (sunCurrent + sunSegment/2) * sunPosition.z
         );
-        sunHeight = sunSamplePosition.length() - earthRadius;
+        sunHeight = sunSamplePosition.length() - EARTH_RADIUS;
         if (sunHeight < 0) {
           flag = true;
           break;
         }
 
-        optDepthSunR += FastMath.exp(-sunHeight / rayleighScale) * sunSegment;
-        optDepthSunM += FastMath.exp(-sunHeight / mieScale) * sunSegment;
+        optDepthSunR += FastMath.exp(-sunHeight / RAYLEIGH_SCALE) * sunSegment;
+        optDepthSunM += FastMath.exp(-sunHeight / MIE_SCALE) * sunSegment;
 
         sunCurrent += sunSegment;
       }
 
+      // Only execute if we successfully march out of the atmosphere
       if (!flag) {
         tau.set(
-            betaR.x * (optDepthR + optDepthSunR) + betaM.x * 1.1 * (optDepthM + optDepthSunM),
-            betaR.y * (optDepthR + optDepthSunR) + betaM.y * 1.1 * (optDepthM + optDepthSunM),
-            betaR.z * (optDepthR + optDepthSunR) + betaM.z * 1.1 * (optDepthM + optDepthSunM)
+            BETA_R.x * (optDepthR + optDepthSunR) + BETA_M.x * 1.1 * (optDepthM + optDepthSunM),
+            BETA_R.y * (optDepthR + optDepthSunR) + BETA_M.y * 1.1 * (optDepthM + optDepthSunM),
+            BETA_R.z * (optDepthR + optDepthSunR) + BETA_M.z * 1.1 * (optDepthM + optDepthSunM)
         );
 
         attenuation.set(
@@ -163,11 +177,12 @@ public class NishitaSky implements SimulatedSky {
     }
 
     Vector3 color = new Vector3(
-        (sumR.x*betaR.x*phaseR + sumM.x*betaM.x*phaseM) * sunIntensity * 5,
-        (sumR.y*betaR.y*phaseR + sumM.y*betaM.y*phaseM) * sunIntensity * 5,
-        (sumR.z*betaR.z*phaseR + sumM.z*betaM.z*phaseM) * sunIntensity * 5
+        (sumR.x* BETA_R.x*phaseR + sumM.x* BETA_M.x*phaseM) * sunIntensity * 5,
+        (sumR.y* BETA_R.y*phaseR + sumM.y* BETA_M.y*phaseM) * sunIntensity * 5,
+        (sumR.z* BETA_R.z*phaseR + sumM.z* BETA_M.z*phaseM) * sunIntensity * 5
     );
 
+    // Tone-mapping function for more realistic colors
     color.set(
         color.x < 1.413 ? FastMath.pow(color.x * 0.38317, 1.0/2.2) : 1.0 - FastMath.exp(-color.x),
         color.y < 1.413 ? FastMath.pow(color.y * 0.38317, 1.0/2.2) : 1.0 - FastMath.exp(-color.y),
