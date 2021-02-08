@@ -61,6 +61,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML
   private CheckBox fastFog;
   @FXML
+  private IntegerAdjuster cacheResolution;
+  @FXML
   private ChoiceBox<OutputMode> outputMode;
   @FXML
   private ChoiceBox<String> octreeImplementation;
@@ -113,6 +115,14 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     fastFog.setTooltip(new Tooltip("Enable faster fog rendering algorithm."));
     fastFog.selectedProperty()
             .addListener((observable, oldValue, newValue) -> scene.setFastFog(newValue));
+    cacheResolution.setName("Sky cache resolution");
+    cacheResolution.setTooltip("Resolution of sky cache.");
+    cacheResolution.setRange(1, 4096);
+    cacheResolution.clampMin();
+    cacheResolution.set(1024);
+    cacheResolution.onValueChange(value -> {
+      scene.sky().setSkyCacheResolution(value);
+    });
     renderThreads.setName("Render threads");
     renderThreads.setTooltip("Number of rendering threads.");
     renderThreads.setRange(1, 20);
