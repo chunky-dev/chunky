@@ -49,21 +49,33 @@ public class SkyCache {
     skyTexture = null;
   }
 
-  /** Check if this cache needs to be updated */
-  public boolean needUpdate(SkyCache cache) {
-    return this.version < cache.version || this.simSky != cache.simSky;
+  /** Sync this cache with another cache */
+  public void syncCache(SkyCache cache) {
+    if (this.skyResolution != cache.skyResolution) {
+      setSkyResolution(cache.skyResolution);
+    }
+
+    if (this.simSky != cache.simSky) {
+      this.simSky = cache.simSky;
+      skyTexture = null;
+    }
+
+    if (this.version != cache.version) {
+      this.version = cache.version;
+      skyTexture = null;
+    }
   }
 
   /** Reset the sky cache */
   public void reset(Sky sky) {
     simSky = sky.getSimulatedSky();
+    version += 1;
 
     // Sky has not yet been initialized. No need to reset.
     if (skyTexture == null) {
       return;
     }
 
-    version += 1;
     for (int i = 0; i < skyResolution+1; i++) {
       for (int j = 0; j < skyResolution+1; j++) {
         for (int k = 0; k < 3; k++) {

@@ -235,13 +235,8 @@ public class Sky implements JsonSerializable {
       skyboxFileName[i] = other.skyboxFileName[i];
     }
 
-    // These are expensive! Only call if necessary.
-    if (skyCache.needUpdate(other.skyCache)) {
-      setSimulatedSkyMode(other.simulatedSkyMode);
-    }
-    if (other.skyCache.getSkyResolution() != this.skyCache.getSkyResolution()) {
-      setSkyCacheResolution(other.skyCache.getSkyResolution());
-    }
+    this.simulatedSkyMode = other.simulatedSkyMode;
+    this.skyCache.syncCache(other.skyCache);
   }
 
   /**
