@@ -230,6 +230,7 @@ public class Sky implements JsonSerializable {
     color.set(other.color);
     mode = other.mode;
     setSimulatedSkyMode(other.simulatedSkyMode);
+    setSkyCacheResolution(other.skyCache.getSkyResolution());
     for (int i = 0; i < 6; ++i) {
       skybox[i] = other.skybox[i];
       skyboxFileName[i] = other.skyboxFileName[i];
