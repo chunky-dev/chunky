@@ -17,6 +17,7 @@
 package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
@@ -24,7 +25,7 @@ import se.llbit.math.Vector3;
 import static java.lang.Math.PI;
 
 public class SkyCache {
-  // Sky texture array
+  // Sky texture array, HSV colors
   private double[][][] skyTexture;
 
   // Default resolution is 1024x1024. Should be more than enough for any simulated sky.
@@ -111,7 +112,9 @@ public class SkyCache {
     theta = ((theta % 1) + 1) % 1;
     double phi = (FastMath.asin(QuickMath.clamp(ray.d.y + horizonOffset, -1, 1)) + PI/2) / PI;
 
-    return getColorInterpolated(theta, phi);
+    Vector3 color = getColorInterpolated(theta, phi);
+    ColorUtil.RGBfromHSL(color, color.x, color.y, color.z);
+    return color;
   }
 
   // Linear interpolation between 2 points in 1 dimension
@@ -151,6 +154,7 @@ public class SkyCache {
     ray.d.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
 
     Vector3 color = simSky.calcIncidentLight(ray, 0);
+    ColorUtil.RGBtoHSL(color, color.x, color.y, color.z);
     skyTexture[x][y][0] = color.x;
     skyTexture[x][y][1] = color.y;
     skyTexture[x][y][2] = color.z;
