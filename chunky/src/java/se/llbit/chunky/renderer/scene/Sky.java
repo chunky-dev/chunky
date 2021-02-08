@@ -229,7 +229,7 @@ public class Sky implements JsonSerializable {
     gradient = new ArrayList<>(other.gradient);
     color.set(other.color);
     mode = other.mode;
-    simulatedSkyMode = other.simulatedSkyMode;
+    setSimulatedSkyMode(other.simulatedSkyMode);
     for (int i = 0; i < 6; ++i) {
       skybox[i] = other.skybox[i];
       skyboxFileName[i] = other.skyboxFileName[i];
@@ -525,6 +525,7 @@ public class Sky implements JsonSerializable {
    */
   public void setSimulatedSkyMode(int mode) {
     this.simulatedSkyMode = mode;
+    skyCache.reset(this);
     scene.refresh();
   }
 
@@ -540,7 +541,7 @@ public class Sky implements JsonSerializable {
    */
   public void updateSimulatedSky(Sun sun) {
     skies.get(simulatedSkyMode).updateSun(sun);
-    skyCache.reset();
+    skyCache.reset(this);
   }
 
   /**
@@ -635,7 +636,7 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SIMULATED: {
-        simulatedSkyMode = json.get("simulatedSky").intValue(simulatedSkyMode);
+        setSimulatedSkyMode(json.get("simulatedSky").intValue(simulatedSkyMode));
         break;
       }
       default:

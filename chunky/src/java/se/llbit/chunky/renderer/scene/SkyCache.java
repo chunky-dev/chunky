@@ -45,11 +45,11 @@ public class SkyCache {
   public SkyCache(Sky sky) {
     this.sky = sky;
     skyTexture = new double[skyResolution+1][skyResolution+1][3];
-    reset();
+    reset(sky);
   }
 
   /** Reset the sky cache */
-  public void reset() {
+  public void reset(Sky sky) {
     simSky = sky.getSimulatedSky();
     for (int i = 0; i < skyResolution+1; i++) {
       for (int j = 0; j < skyResolution+1; j++) {
@@ -64,7 +64,7 @@ public class SkyCache {
   public void setSkyResolution(int skyResolution) {
     this.skyResolution = skyResolution;
     skyTexture = new double[skyResolution+1][skyResolution+1][3];
-    reset();
+    reset(this.sky);
   }
 
   /** Get the current sky resolution */
@@ -97,10 +97,10 @@ public class SkyCache {
     int floorX = (int) QuickMath.clamp(x, 0, skyResolution-1);
     int floorY = (int) QuickMath.clamp(y, 0, skyResolution-1);
 
-    if (skyTexture[floorX][floorY][0] == -1) bake(floorX, floorY);
-    if (skyTexture[floorX][floorY+1][0] == -1) bake(floorX, floorY+1);
-    if (skyTexture[floorX+1][floorY][0] == -1) bake(floorX+1, floorY);
-    if (skyTexture[floorX+1][floorY+1][0] == -1) bake(floorX+1, floorY+1);
+    if (skyTexture[floorX][floorY][0] < 0) bake(floorX, floorY);
+    if (skyTexture[floorX][floorY+1][0] < 0) bake(floorX, floorY+1);
+    if (skyTexture[floorX+1][floorY][0] < 0) bake(floorX+1, floorY);
+    if (skyTexture[floorX+1][floorY+1][0] < 0) bake(floorX+1, floorY+1);
 
     double[] color = new double[3];
     for (int i = 0; i < 3; i++) {
@@ -116,11 +116,8 @@ public class SkyCache {
   private void bake(int x, int y) {
     Ray ray = new Ray();
 
-    int i = x;
-    int j = y;
-
-    double theta = ((double) i / skyResolution) * 2 * PI;
-    double phi = ((double) j / skyResolution) * PI - PI/2;
+    double theta = ((double) x / skyResolution) * 2 * PI;
+    double phi = ((double) y / skyResolution) * PI - PI/2;
     double r = FastMath.cos(phi);
     ray.d.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
 
