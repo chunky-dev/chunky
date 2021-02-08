@@ -33,6 +33,8 @@ public class SkyCache {
   private SimulatedSky simSky;
   private Sky sky;
 
+  private int version = 0;
+
   /**
    * An on-the-fly sky cache. Automatically calculates sky colors as they are requested and caches them. Any repeat
    * requests will pull from the cache.
@@ -48,8 +50,14 @@ public class SkyCache {
     reset(sky);
   }
 
+  /** Check if this cache needs to be updated */
+  public boolean needUpdate(SkyCache cache) {
+    return this.version < cache.version || this.simSky != cache.simSky;
+  }
+
   /** Reset the sky cache */
   public void reset(Sky sky) {
+    version += 1;
     simSky = sky.getSimulatedSky();
     for (int i = 0; i < skyResolution+1; i++) {
       for (int j = 0; j < skyResolution+1; j++) {

@@ -175,6 +175,7 @@ public class Sky implements JsonSerializable {
   private int simulatedSkyMode = 0;
 
   private final SkyCache skyCache;
+  private int cacheVersion = 0;
 
   public Sky(Scene sceneDescription) {
     this.scene = sceneDescription;
@@ -235,7 +236,7 @@ public class Sky implements JsonSerializable {
     }
 
     // These are expensive! Only call if necessary.
-    if (other.getSimulatedSky() != this.getSimulatedSky()) {
+    if (skyCache.needUpdate(other.skyCache)) {
       setSimulatedSkyMode(other.simulatedSkyMode);
     }
     if (other.skyCache.getSkyResolution() != this.skyCache.getSkyResolution()) {
