@@ -198,6 +198,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
 
   @Override public void update(Scene scene) {
     skyMode.getSelectionModel().select(scene.sky().getSkyMode());
+    simulatedSky.getSelectionModel().select(scene.sky().getSimulatedSky());
     cloudsEnabled.setSelected(scene.sky().cloudsEnabled());
     transparentSkyEnabled.setSelected(scene.transparentSky());
     cloudSize.set(scene.sky().cloudSize());

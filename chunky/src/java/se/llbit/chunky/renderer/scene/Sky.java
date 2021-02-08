@@ -587,6 +587,10 @@ public class Sky implements JsonSerializable {
         sky.add("skybox", array);
         break;
       }
+      case SIMULATED: {
+        sky.add("simulatedSky", simulatedSkyMode);
+        break;
+      }
       default: {
         break;
       }
@@ -630,6 +634,9 @@ public class Sky implements JsonSerializable {
           skyboxFileName[i] = value.stringValue(skyboxFileName[i]);
         }
         break;
+      }
+      case SIMULATED: {
+        simulatedSkyMode = json.get("simulatedSky").intValue(simulatedSkyMode);
       }
       default:
         break;
