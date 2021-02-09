@@ -147,7 +147,6 @@ public class Sky implements JsonSerializable {
   private final Scene scene;
   private double rotation = 0;
   private boolean mirrored = true;
-  private double horizonOffset = 0.1;
   private boolean cloudsEnabled = false;
   private double cloudSize = DEFAULT_CLOUD_SIZE;
   private final Vector3 cloudOffset = new Vector3(0, DEFAULT_CLOUD_HEIGHT, 0);
@@ -218,7 +217,6 @@ public class Sky implements JsonSerializable {
    * Set the sky equal to other sky.
    */
   public void set(Sky other) {
-    horizonOffset = other.horizonOffset;
     cloudsEnabled = other.cloudsEnabled;
     cloudOffset.set(other.cloudOffset);
     cloudSize = other.cloudSize;
@@ -270,7 +268,7 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SIMULATED: {
-        Vector3 color = skyCache.calcIncidentLight(ray, horizonOffset);
+        Vector3 color = skyCache.calcIncidentLight(ray);
         ray.color.set(color.x, color.y, color.z, 1);
         break;
       }
@@ -560,7 +558,6 @@ public class Sky implements JsonSerializable {
     sky.add("skyMirrored", mirrored);
     sky.add("skyLight", skyLightModifier);
     sky.add("mode", mode.name());
-    sky.add("horizonOffset", horizonOffset);
     sky.add("cloudsEnabled", cloudsEnabled);
     sky.add("cloudSize", cloudSize);
     sky.add("cloudOffset", cloudOffset.toJson());
@@ -606,7 +603,6 @@ public class Sky implements JsonSerializable {
     mirrored = json.get("skyMirrored").boolValue(mirrored);
     skyLightModifier = json.get("skyLight").doubleValue(skyLightModifier);
     mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
-    horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
     cloudsEnabled = json.get("cloudsEnabled").boolValue(cloudsEnabled);
     cloudSize = json.get("cloudSize").doubleValue(cloudSize);
     if (json.get("cloudOffset").isObject()) {
@@ -764,19 +760,6 @@ public class Sky implements JsonSerializable {
       return prevTexture;
     }
   }
-
-  public void setHorizonOffset(double newValue) {
-    newValue = Math.min(1, Math.max(0, newValue));
-    if (newValue != horizonOffset) {
-      horizonOffset = newValue;
-      scene.refresh();
-    }
-  }
-
-  public double getHorizonOffset() {
-    return horizonOffset;
-  }
-
 
   public void setCloudSize(double newValue) {
     if (newValue != cloudSize) {

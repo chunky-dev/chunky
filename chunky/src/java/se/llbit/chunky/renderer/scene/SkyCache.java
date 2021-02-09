@@ -101,7 +101,7 @@ public class SkyCache {
    * Calculate the incident light. Will automatically pull from the cache or calculate new values. Cache values are
    * bilinearly interpolated.
    */
-  public Vector3 calcIncidentLight(Ray ray, double horizonOffset) {
+  public Vector3 calcIncidentLight(Ray ray) {
     if (skyTexture == null) {
       skyTexture = new double[skyResolution+1][skyResolution+1][3];
       reset(sky);
@@ -110,7 +110,7 @@ public class SkyCache {
     double theta = FastMath.atan2(ray.d.z, ray.d.x);
     theta /= PI*2;
     theta = ((theta % 1) + 1) % 1;
-    double phi = (FastMath.asin(QuickMath.clamp(ray.d.y + horizonOffset, -1, 1)) + PI/2) / PI;
+    double phi = (FastMath.asin(QuickMath.clamp(ray.d.y, -1, 1)) + PI/2) / PI;
 
     Vector3 color = getColorInterpolated(theta, phi);
     ColorUtil.RGBfromHSL(color, color.x, color.y, color.z);
@@ -153,7 +153,7 @@ public class SkyCache {
     double r = FastMath.cos(phi);
     ray.d.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
 
-    Vector3 color = simSky.calcIncidentLight(ray, 0);
+    Vector3 color = simSky.calcIncidentLight(ray);
     ColorUtil.RGBtoHSL(color, color.x, color.y, color.z);
     skyTexture[x][y][0] = color.x;
     skyTexture[x][y][1] = color.y;
