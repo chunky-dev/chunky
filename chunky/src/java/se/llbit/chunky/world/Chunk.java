@@ -287,7 +287,7 @@ public class Chunk {
     if (sections.isList()) {
       for (SpecificTag section : sections.asList()) {
         Tag yTag = section.get("Y");
-        int sectionY = yTag.byteValue() & 0xFF;
+        int sectionY = yTag.byteValue();
         int sectionMinBlockY = sectionY << 4;
 
         if (section.get("Palette").isList()) {

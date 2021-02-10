@@ -93,6 +93,8 @@ public class World implements Comparable<World> {
 
   private int gameMode = 0;
 
+  private int versionId;
+
   private final long seed;
 
   /** Timestamp for level.dat when player data was last loaded. */
@@ -139,6 +141,7 @@ public class World implements Comparable<World> {
         DataInputStream in = new DataInputStream(gzin)) {
       Set<String> request = new HashSet<>();
       request.add(".Data.version");
+      request.add(".Data.Version.Id");
       request.add(".Data.RandomSeed");
       request.add(".Data.Player");
       request.add(".Data.LevelName");
@@ -150,6 +153,7 @@ public class World implements Comparable<World> {
         Log.warnf("The world format for the world %s is not supported by Chunky.\n" + "Will attempt to load the world anyway.",
             levelName);
       }
+      Tag versionId = result.get(".Data.Version.Id");
       Tag player = result.get(".Data.Player");
       Tag spawnX = player.get("SpawnX");
       Tag spawnY = player.get("SpawnY");
@@ -175,6 +179,7 @@ public class World implements Comparable<World> {
       world.spawnZ = spawnZ.intValue();
       world.gameMode = gameType.intValue(0);
       world.playerDimension = player.get("Dimension").intValue();
+      world.versionId = versionId.intValue();
       return world;
     } catch (FileNotFoundException e) {
       if (warnings == LoggedWarnings.NORMAL) {
@@ -579,6 +584,10 @@ public class World implements Comparable<World> {
    */
   public double spawnPosX() {
     return spawnX;
+  }
+
+  public int getVersionId() {
+    return versionId;
   }
 
   /**
