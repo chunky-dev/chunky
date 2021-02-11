@@ -1,4 +1,5 @@
-/* Copyright (c) 2010-2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2010-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -326,6 +327,10 @@ public class Chunky {
 
   public boolean sceneInitialized() {
     return renderController != null;
+  }
+
+  public void setRendererFactory(RendererFactory rendererFactory) {
+    this.rendererFactory = rendererFactory;
   }
 
   public RenderController getRenderController() {

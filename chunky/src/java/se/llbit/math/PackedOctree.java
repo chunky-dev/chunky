@@ -50,7 +50,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * When this occurs this implementation wan no longer be used and we must fallback on another one.
    * Here we'll throw an exception that the caller can catch.
    */
-  private int[] treeData;
+  public int[] treeData;
 
   /**
    * The max size of an array we allow is a bit less than the max value an integer can have

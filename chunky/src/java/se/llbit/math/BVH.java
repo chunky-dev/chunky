@@ -1,4 +1,5 @@
-/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2014-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2014-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -44,9 +45,9 @@ public class BVH {
   }
 
 
-  static abstract class Node {
-    protected final AABB bb;
-    protected final Primitive[] primitives;
+  public static abstract class Node {
+    public final AABB bb;
+    public final Primitive[] primitives;
 
     /**
      * Create a new BVH node.
@@ -72,9 +73,9 @@ public class BVH {
   }
 
 
-  static class Group extends Node {
-    protected final Node child1;
-    protected final Node child2;
+  public static class Group extends Node {
+    public final Node child1;
+    public final Node child2;
     private final int numPrimitives;
 
     /**
@@ -538,4 +539,7 @@ public class BVH {
     return root.bb.hitTest(ray) && root.anyIntersection(ray);
   }
 
+  public Node getRoot() {
+    return root;
+  }
 }

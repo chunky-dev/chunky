@@ -780,6 +780,10 @@ public class Octree {
     tempFile.delete();
   }
 
+  public OctreeImplementation getImplementation() {
+    return implementation;
+  }
+
   public static void addImplementationFactory(String name, ImplementationFactory factory) {
     factories.put(name, factory);
   }

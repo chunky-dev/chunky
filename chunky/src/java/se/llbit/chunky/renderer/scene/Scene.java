@@ -1,4 +1,4 @@
-/* Copyright (c) 2021 Chunky contributors
+/* Copyright (c) 2013-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -3062,6 +3062,14 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setOctreeImplementation(String octreeImplementation) {
     this.octreeImplementation = octreeImplementation;
+  }
+
+  public Octree getWorldOctree() {
+    return worldOctree;
+  }
+
+  public Octree getWaterOctree() {
+    return waterOctree;
   }
 
   public EmitterSamplingStrategy getEmitterSamplingStrategy() {
