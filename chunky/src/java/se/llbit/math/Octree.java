@@ -30,6 +30,7 @@ import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.model.WaterModel;
+import se.llbit.chunky.plugin.API;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.world.Material;
 import se.llbit.log.Log;
@@ -780,6 +781,7 @@ public class Octree {
     tempFile.delete();
   }
 
+  @API
   public OctreeImplementation getImplementation() {
     return implementation;
   }

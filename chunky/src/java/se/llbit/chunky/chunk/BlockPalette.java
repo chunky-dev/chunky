@@ -17,6 +17,7 @@
 package se.llbit.chunky.chunk;
 
 import se.llbit.chunky.block.*;
+import se.llbit.chunky.plugin.API;
 import se.llbit.math.Octree;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.IntTag;
@@ -482,6 +483,7 @@ public class BlockPalette {
     return materialProperties;
   }
 
+  @API
   public List<Block> getPalette() {
     return palette;
   }

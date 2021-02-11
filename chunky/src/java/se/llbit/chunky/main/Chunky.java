@@ -22,6 +22,7 @@ import se.llbit.chunky.block.BlockProvider;
 import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockProvider;
 import se.llbit.chunky.main.CommandLineOptions.Mode;
+import se.llbit.chunky.plugin.API;
 import se.llbit.chunky.plugin.ChunkyPlugin;
 import se.llbit.chunky.plugin.TabTransformer;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
@@ -329,6 +330,7 @@ public class Chunky {
     return renderController != null;
   }
 
+  @API
   public void setRendererFactory(RendererFactory rendererFactory) {
     this.rendererFactory = rendererFactory;
   }
