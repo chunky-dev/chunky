@@ -18,5 +18,5 @@
 package se.llbit.chunky.plugin;
 
 /** Mark something that is only used by plugins. Check before removing/modifying anything marked with this. */
-public @interface API {
+public @interface PluginApi {
 }

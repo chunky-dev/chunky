@@ -18,7 +18,7 @@ package se.llbit.math;
 
 import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.plugin.API;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
@@ -44,7 +44,7 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
    *    and the long can simply be compared with 0 to determine if it is a branch or a leaf)
    *
    */
-  @API
+  @PluginApi
   public ArrayList<long[]> treeData = new ArrayList<>();
 
   /**

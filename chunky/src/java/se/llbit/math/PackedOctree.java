@@ -19,7 +19,7 @@ package se.llbit.math;
 import org.apache.commons.math3.util.Pair;
 import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
-import se.llbit.chunky.plugin.API;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
@@ -51,7 +51,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * When this occurs this implementation wan no longer be used and we must fallback on another one.
    * Here we'll throw an exception that the caller can catch.
    */
-  @API
+  @PluginApi
   public int[] treeData;
 
   /**

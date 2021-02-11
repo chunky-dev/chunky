@@ -33,7 +33,7 @@ import se.llbit.chunky.entity.Lectern;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
-import se.llbit.chunky.plugin.API;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
@@ -3065,12 +3065,12 @@ public class Scene implements JsonSerializable, Refreshable {
     this.octreeImplementation = octreeImplementation;
   }
 
-  @API
+  @PluginApi
   public Octree getWorldOctree() {
     return worldOctree;
   }
 
-  @API
+  @PluginApi
   public Octree getWaterOctree() {
     return waterOctree;
   }

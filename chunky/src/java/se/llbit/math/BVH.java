@@ -17,7 +17,7 @@
  */
 package se.llbit.math;
 
-import se.llbit.chunky.plugin.API;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.math.primitive.MutableAABB;
 import se.llbit.math.primitive.Primitive;
 
@@ -45,7 +45,7 @@ public class BVH {
     SAH_MA,
   }
 
-  @API
+  @PluginApi
   public static abstract class Node {
     public final AABB bb;
     public final Primitive[] primitives;
@@ -73,7 +73,7 @@ public class BVH {
     abstract public int size();
   }
 
-  @API
+  @PluginApi
   public static class Group extends Node {
     public final Node child1;
     public final Node child2;
@@ -127,7 +127,7 @@ public class BVH {
     }
   }
 
-  @API
+  @PluginApi
   public static class Leaf extends Node {
 
     public Leaf(Primitive[] primitives) {
