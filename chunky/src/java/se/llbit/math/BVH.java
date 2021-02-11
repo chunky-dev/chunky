@@ -127,7 +127,7 @@ public class BVH {
   }
 
 
-  static class Leaf extends Node {
+  public static class Leaf extends Node {
 
     public Leaf(Primitive[] primitives) {
       super(primitives);
