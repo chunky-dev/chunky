@@ -43,8 +43,8 @@ public class BigPackedOctree implements Octree.OctreeImplementation {
    *    and the lower 32 bits are the node data (that way, for a leaf node the sign bit will be set
    *    and the long can simply be compared with 0 to determine if it is a branch or a leaf)
    *
+   * Note: This is public for some plugins. Stability is not guaranteed.
    */
-  @PluginApi
   public ArrayList<long[]> treeData = new ArrayList<>();
 
   /**

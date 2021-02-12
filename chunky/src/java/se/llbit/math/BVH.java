@@ -45,7 +45,7 @@ public class BVH {
     SAH_MA,
   }
 
-  @PluginApi
+  /** Note: this is public for some plugins. Stability is not guaranteed. */
   public static abstract class Node {
     public final AABB bb;
     public final Primitive[] primitives;
@@ -73,7 +73,7 @@ public class BVH {
     abstract public int size();
   }
 
-  @PluginApi
+  /** Note: this is public for some plugins. Stability is not guaranteed. */
   public static class Group extends Node {
     public final Node child1;
     public final Node child2;
@@ -127,7 +127,7 @@ public class BVH {
     }
   }
 
-  @PluginApi
+  /** Note: this is public for some plugins. Stability is not guaranteed. */
   public static class Leaf extends Node {
 
     public Leaf(Primitive[] primitives) {

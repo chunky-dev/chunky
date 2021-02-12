@@ -50,8 +50,9 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * When dealing with huge octree, the maximum size of an array may be a limitation.
    * When this occurs this implementation wan no longer be used and we must fallback on another one.
    * Here we'll throw an exception that the caller can catch.
+   *
+   * Note: This is public for some plugins. Stability is not guaranteed.
    */
-  @PluginApi
   public int[] treeData;
 
   /**
