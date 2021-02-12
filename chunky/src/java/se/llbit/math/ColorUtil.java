@@ -251,6 +251,36 @@ public final class ColorUtil {
     return String.format("%02X%02X%02X", (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
   }
 
+  public static void RGBtoHSL(Vector3 hsl, double r, double g, double b) {
+    r = QuickMath.clamp(r, 0, 1);
+    g = QuickMath.clamp(g, 0, 1);
+    b = QuickMath.clamp(b, 0, 1);
+
+    double cmax = FastMath.max(FastMath.max(r, g), b);
+    double cmin = FastMath.min(FastMath.min(r, g), b);
+    double delta = cmax - cmin;
+    double lightness = (cmax + cmin) / 2;
+
+    double hue;
+    if (delta == 0) {
+      hue = 0;
+    } else if (cmax == r) {
+      hue = (((g - b) / delta) % 6) / 6.0;
+    } else if (cmax == g) {
+      hue = (((b - r) / delta) + 2) / 6.0;
+    } else {
+      hue = (((r - g) / delta) + 4) / 6.0;
+    }
+
+    hsl.set(hue, cmax == 0 ? 0 : delta / (1 - FastMath.abs(2*lightness - 1)), lightness);
+  }
+
+  public static Vector3 RGBtoHSL(double r, double g, double b) {
+    Vector3 color = new Vector3();
+    RGBtoHSL(color, r, g, b);
+    return color;
+  }
+
   public static void RGBfromHSL(Vector3 rgb, double hue, double saturation, double lightness) {
     double c = Math.min(1, (1 - Math.abs(2 * lightness - 1)) * saturation);
     double h = hue * 6;

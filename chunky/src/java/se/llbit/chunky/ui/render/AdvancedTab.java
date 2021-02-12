@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016 - 2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016 - 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -61,6 +62,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML
   private CheckBox fastFog;
   @FXML
+  private IntegerAdjuster cacheResolution;
+  @FXML
   private ChoiceBox<OutputMode> outputMode;
   @FXML
   private ChoiceBox<String> octreeImplementation;
@@ -113,6 +116,14 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     fastFog.setTooltip(new Tooltip("Enable faster fog rendering algorithm."));
     fastFog.selectedProperty()
             .addListener((observable, oldValue, newValue) -> scene.setFastFog(newValue));
+    cacheResolution.setName("Sky cache resolution");
+    cacheResolution.setTooltip("Resolution of the sky cache. Lower values will use less memory and improve performance but can cause sky artifacts.");
+    cacheResolution.setRange(1, 4096);
+    cacheResolution.clampMin();
+    cacheResolution.set(128);
+    cacheResolution.onValueChange(value -> {
+      scene.sky().setSkyCacheResolution(value);
+    });
     renderThreads.setName("Render threads");
     renderThreads.setTooltip("Number of rendering threads.");
     renderThreads.setRange(1, 20);
