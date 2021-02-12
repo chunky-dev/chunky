@@ -197,7 +197,7 @@ public class Sun implements JsonSerializable {
     emittance.scale(FastMath.pow(intensity, Scene.DEFAULT_GAMMA));
 
     Sky sky = ((Scene) scene).sky();
-    if (sky.getSkyMode() == Sky.SkyMode.SIMULATED && sky.getSimulatedSky().needUpdate(this)) {
+    if (sky.getSkyMode() == Sky.SkyMode.SIMULATED) {
       sky.updateSimulatedSky(this);
     }
 

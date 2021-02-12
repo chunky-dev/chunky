@@ -117,10 +117,10 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     fastFog.selectedProperty()
             .addListener((observable, oldValue, newValue) -> scene.setFastFog(newValue));
     cacheResolution.setName("Sky cache resolution");
-    cacheResolution.setTooltip("Resolution of sky cache.");
+    cacheResolution.setTooltip("Resolution of the sky cache. Lower values will use less memory and improve performance but can cause sky artifacts.");
     cacheResolution.setRange(1, 4096);
     cacheResolution.clampMin();
-    cacheResolution.set(1024);
+    cacheResolution.set(128);
     cacheResolution.onValueChange(value -> {
       scene.sky().setSkyCacheResolution(value);
     });

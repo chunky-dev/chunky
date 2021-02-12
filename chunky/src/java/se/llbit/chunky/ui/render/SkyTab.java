@@ -225,7 +225,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
       tipString.append("\n");
       tipString.append(sky.getName());
       tipString.append(": ");
-      tipString.append(sky.getTooltip());
+      tipString.append(sky.getDescription());
     }
 
     return tipString.toString();

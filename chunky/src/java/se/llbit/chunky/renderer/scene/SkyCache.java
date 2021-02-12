@@ -28,8 +28,8 @@ public class SkyCache {
   // Sky texture array, HSV colors
   private double[][][] skyTexture;
 
-  // Default resolution is 1024x1024. Should be more than enough for any simulated sky.
-  private int skyResolution = 1024;
+  // Default resolution is 128x128. Should be enough for most simulated skies.
+  private int skyResolution = 128;
 
   private SimulatedSky simSky;
   private Sky sky;

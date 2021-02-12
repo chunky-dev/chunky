@@ -92,18 +92,17 @@ public class PreethamSky implements SimulatedSky {
   }
 
   @Override
-  public void updateSun(Sun sun) {
-    theta = sun.getAzimuth();
-    phi = sun.getAltitude();
-    double r = QuickMath.abs(FastMath.cos(phi));
-    sw.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
-    updateSkylightValues(sun.getAltitude());
-  }
+  public boolean updateSun(Sun sun) {
+    if (theta != sun.getAltitude() || phi != sun.getAltitude()) {
+      theta = sun.getAzimuth();
+      phi = sun.getAltitude();
+      double r = QuickMath.abs(FastMath.cos(phi));
+      sw.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
+      updateSkylightValues(sun.getAltitude());
 
-  @Override
-  public boolean needUpdate(Sun sun) {
-    return theta != sun.getAzimuth() ||
-           phi != sun.getAltitude();
+      return true;
+    }
+    return false;
   }
 
   @Override
@@ -112,7 +111,7 @@ public class PreethamSky implements SimulatedSky {
   }
 
   @Override
-  public String getTooltip() {
+  public String getDescription() {
     return "A fast daytime sky model.";
   }
 

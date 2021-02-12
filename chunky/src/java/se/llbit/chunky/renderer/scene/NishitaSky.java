@@ -55,19 +55,17 @@ public class NishitaSky implements SimulatedSky {
   }
 
   @Override
-  public void updateSun(Sun sun) {
-    theta = sun.getAzimuth();
-    phi = sun.getAltitude();
-    double r = QuickMath.abs(FastMath.cos(phi));
-    sunPosition.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
-    sunIntensity = sun.getIntensity();
-  }
+  public boolean updateSun(Sun sun) {
+    if (sunIntensity != sun.getIntensity() || theta != sun.getAzimuth() || phi != sun.getAltitude()) {
+      theta = sun.getAzimuth();
+      phi = sun.getAltitude();
+      double r = QuickMath.abs(FastMath.cos(phi));
+      sunPosition.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
+      sunIntensity = sun.getIntensity();
 
-  @Override
-  public boolean needUpdate(Sun sun) {
-    return sunIntensity != sun.getIntensity() ||
-           theta != sun.getAzimuth() ||
-           phi != sun.getAltitude();
+      return true;
+    }
+    return false;
   }
 
   @Override
@@ -76,7 +74,7 @@ public class NishitaSky implements SimulatedSky {
   }
 
   @Override
-  public String getTooltip() {
+  public String getDescription() {
     return "A slower, more realistic and flexible sky model.";
   }
 

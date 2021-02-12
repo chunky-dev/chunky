@@ -42,10 +42,7 @@ import se.llbit.util.JsonUtil;
 import se.llbit.util.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -171,7 +168,7 @@ public class Sky implements JsonSerializable {
   }
 
   /** Simulated sky mode. */
-  private int simulatedSkyMode = 0;
+  private SimulatedSky simulatedSkyMode = skies.get(0);
 
   private final SkyCache skyCache;
   private int cacheVersion = 0;
@@ -525,7 +522,8 @@ public class Sky implements JsonSerializable {
    * Set the simulated sky rendering mode.
    */
   public void setSimulatedSkyMode(int mode) {
-    this.simulatedSkyMode = mode;
+    this.simulatedSkyMode = skies.get(mode);
+    this.simulatedSkyMode.updateSun(scene.sun);
     skyCache.reset(this);
     scene.refresh();
   }
@@ -534,15 +532,16 @@ public class Sky implements JsonSerializable {
    * @return Current simulated sky.
    */
   public SimulatedSky getSimulatedSky() {
-    return skies.get(simulatedSkyMode);
+    return simulatedSkyMode;
   }
 
   /**
    * Update the current simulated sky
    */
   public void updateSimulatedSky(Sun sun) {
-    skies.get(simulatedSkyMode).updateSun(sun);
-    skyCache.reset(this);
+    if (simulatedSkyMode.updateSun(sun)) {
+      skyCache.reset(this);
+    }
   }
 
   /**
@@ -588,7 +587,8 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SIMULATED: {
-        sky.add("simulatedSky", simulatedSkyMode);
+        sky.add("simulatedSky", simulatedSkyMode.getName());
+        sky.add("skyCacheResolution", skyCache.getSkyResolution());
         break;
       }
       default: {
@@ -635,7 +635,15 @@ public class Sky implements JsonSerializable {
         break;
       }
       case SIMULATED: {
-        setSimulatedSkyMode(json.get("simulatedSky").intValue(simulatedSkyMode));
+        skyCache.setSkyResolution(json.get("skyCacheResolution").asInt(skyCache.getSkyResolution()));
+
+        String simSkyName = json.get("simulatedSky").asString(simulatedSkyMode.getName());
+        Optional<SimulatedSky> match = skies.stream().filter(skyMode -> skyMode.getName().equals(simSkyName)).findAny();
+
+        simulatedSkyMode = match.orElseGet(() -> simulatedSkyMode);
+        simulatedSkyMode.updateSun(scene.sun());
+        skyCache.reset(this);
+        scene.refresh();
         break;
       }
       default:

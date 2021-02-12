@@ -24,14 +24,9 @@ import se.llbit.math.Vector3;
  */
 public interface SimulatedSky {
   /**
-   * Update the sun
+   * Update the sun if necessary. Returns true if the sun was updated (and cache needs to be purged).
    */
-  void updateSun(Sun sun);
-
-  /**
-   * Check if the sky needs an update with a new sun.
-   */
-  boolean needUpdate(Sun sun);
+  boolean updateSun(Sun sun);
 
   /**
    * Calculate the sky color for a given ray.
@@ -46,5 +41,5 @@ public interface SimulatedSky {
   /**
    * Get the sky renderer tooltip.
    */
-  String getTooltip();
+  String getDescription();
 }
