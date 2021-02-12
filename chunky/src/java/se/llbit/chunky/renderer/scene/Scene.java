@@ -744,11 +744,13 @@ public class Scene implements JsonSerializable, Refreshable {
       return;
     }
 
-    boolean isTallWorld = world.getVersionId() >= 2694;
-    if(isTallWorld) { //snapshot 21w06a, treat as -64 - 320
+    boolean isTallWorld = world.getVersionId() >= World.VERSION_21W06A;
+    if(isTallWorld) {
+      // snapshot 21w06a or later, treat as -64 - 320
       yMin = Math.max(-64, yClipMin);
       yMax = Math.min(320, yClipMax);
-    } else { //Treat as 0 - 256 world
+    } else {
+      // treat as 0 - 256 world
       yMin = Math.max(0, yClipMin);
       yMax = Math.min(256, yClipMax);
     }

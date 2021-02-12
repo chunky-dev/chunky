@@ -72,6 +72,9 @@ public class World implements Comparable<World> {
   /** Default sea water level. */
   public static final int SEA_LEVEL = 63;
 
+  /** Minimum level.dat data version of tall worlds (21w06a). */
+  public static final int VERSION_21W06A = 2694;
+
   private final Map<ChunkPosition, Region> regionMap = new HashMap<>();
 
   private final File worldDirectory;
