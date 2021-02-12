@@ -81,6 +81,7 @@ public class PreethamSky implements SimulatedSky {
   // Spherical sun position for faster update checking
   private double theta;
   private double phi;
+  private double horizonOffset = 0;
 
   /**
    * Create a new sky renderer.
@@ -92,13 +93,15 @@ public class PreethamSky implements SimulatedSky {
   }
 
   @Override
-  public boolean updateSun(Sun sun) {
-    if (theta != sun.getAltitude() || phi != sun.getAltitude()) {
+  public boolean updateSun(Sun sun, double horizonOffset) {
+    if (theta != sun.getAltitude() || phi != sun.getAltitude() || this.horizonOffset != horizonOffset) {
       theta = sun.getAzimuth();
       phi = sun.getAltitude();
       double r = QuickMath.abs(FastMath.cos(phi));
       sw.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
       updateSkylightValues(sun.getAltitude());
+
+      this.horizonOffset = horizonOffset;
 
       return true;
     }
@@ -118,6 +121,7 @@ public class PreethamSky implements SimulatedSky {
   @Override
   public Vector3 calcIncidentLight(Ray ray) {
     double cosTheta = ray.d.y;
+    cosTheta += horizonOffset;
     if (cosTheta < 0)
       cosTheta = 0;
     double cosGamma = ray.d.dot(sw);

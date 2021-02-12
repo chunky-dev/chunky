@@ -169,9 +169,9 @@ public class Sky implements JsonSerializable {
 
   /** Simulated sky mode. */
   private SimulatedSky simulatedSkyMode = skies.get(0);
+  double horizonOffset = 0;
 
   private final SkyCache skyCache;
-  private int cacheVersion = 0;
 
   public Sky(Scene sceneDescription) {
     this.scene = sceneDescription;
@@ -225,6 +225,7 @@ public class Sky implements JsonSerializable {
     gradient = new ArrayList<>(other.gradient);
     color.set(other.color);
     mode = other.mode;
+    horizonOffset = other.horizonOffset;
     for (int i = 0; i < 6; ++i) {
       skybox[i] = other.skybox[i];
       skyboxFileName[i] = other.skyboxFileName[i];
@@ -523,7 +524,7 @@ public class Sky implements JsonSerializable {
    */
   public void setSimulatedSkyMode(int mode) {
     this.simulatedSkyMode = skies.get(mode);
-    this.simulatedSkyMode.updateSun(scene.sun);
+    this.simulatedSkyMode.updateSun(scene.sun, horizonOffset);
     skyCache.reset(this);
     scene.refresh();
   }
@@ -539,7 +540,7 @@ public class Sky implements JsonSerializable {
    * Update the current simulated sky
    */
   public void updateSimulatedSky(Sun sun) {
-    if (simulatedSkyMode.updateSun(sun)) {
+    if (simulatedSkyMode.updateSun(sun, horizonOffset)) {
       skyCache.reset(this);
     }
   }
@@ -557,6 +558,7 @@ public class Sky implements JsonSerializable {
     sky.add("skyMirrored", mirrored);
     sky.add("skyLight", skyLightModifier);
     sky.add("mode", mode.name());
+    sky.add("horizonOffset", horizonOffset);
     sky.add("cloudsEnabled", cloudsEnabled);
     sky.add("cloudSize", cloudSize);
     sky.add("cloudOffset", cloudOffset.toJson());
@@ -603,6 +605,7 @@ public class Sky implements JsonSerializable {
     mirrored = json.get("skyMirrored").boolValue(mirrored);
     skyLightModifier = json.get("skyLight").doubleValue(skyLightModifier);
     mode = SkyMode.get(json.get("mode").stringValue(mode.name()));
+    horizonOffset = json.get("horizonOffset").doubleValue(horizonOffset);
     cloudsEnabled = json.get("cloudsEnabled").boolValue(cloudsEnabled);
     cloudSize = json.get("cloudSize").doubleValue(cloudSize);
     if (json.get("cloudOffset").isObject()) {
@@ -641,7 +644,7 @@ public class Sky implements JsonSerializable {
         Optional<SimulatedSky> match = skies.stream().filter(skyMode -> skyMode.getName().equals(simSkyName)).findAny();
 
         simulatedSkyMode = match.orElseGet(() -> simulatedSkyMode);
-        simulatedSkyMode.updateSun(scene.sun());
+        simulatedSkyMode.updateSun(scene.sun(), horizonOffset);
         skyCache.reset(this);
         scene.refresh();
         break;
@@ -767,6 +770,18 @@ public class Sky implements JsonSerializable {
       Log.errorf("Failed to load skymap: %s (file does not exist)", fileName);
       return prevTexture;
     }
+  }
+
+  public void setHorizonOffset(double newValue) {
+    newValue = Math.min(1, Math.max(0, newValue));
+    if (newValue != horizonOffset) {
+      horizonOffset = newValue;
+      scene.refresh();
+    }
+  }
+
+  public double getHorizonOffset() {
+    return horizonOffset;
   }
 
   public void setCloudSize(double newValue) {

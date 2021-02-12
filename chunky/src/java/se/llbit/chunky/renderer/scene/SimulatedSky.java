@@ -26,7 +26,7 @@ public interface SimulatedSky {
   /**
    * Update the sun if necessary. Returns true if the sun was updated (and cache needs to be purged).
    */
-  boolean updateSun(Sun sun);
+  boolean updateSun(Sun sun, double horizonOffset);
 
   /**
    * Calculate the sky color for a given ray.

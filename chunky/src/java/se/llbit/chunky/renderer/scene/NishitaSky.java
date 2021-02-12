@@ -43,6 +43,7 @@ public class NishitaSky implements SimulatedSky {
   // Sun position vector. Final to prevent unnecessary reallocation
   private final Vector3 sunPosition = new Vector3(0, 1, 0);
   private double sunIntensity = 1;
+  private double horizonOffset = 0;
 
   // Sun position in spherical form for faster update checking
   private double theta;
@@ -55,13 +56,15 @@ public class NishitaSky implements SimulatedSky {
   }
 
   @Override
-  public boolean updateSun(Sun sun) {
-    if (sunIntensity != sun.getIntensity() || theta != sun.getAzimuth() || phi != sun.getAltitude()) {
+  public boolean updateSun(Sun sun, double horizonOffset) {
+    if (sunIntensity != sun.getIntensity() || theta != sun.getAzimuth() || phi != sun.getAltitude() || this.horizonOffset != horizonOffset) {
       theta = sun.getAzimuth();
       phi = sun.getAltitude();
       double r = QuickMath.abs(FastMath.cos(phi));
       sunPosition.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
       sunIntensity = sun.getIntensity();
+
+      this.horizonOffset = horizonOffset;
 
       return true;
     }
@@ -83,6 +86,7 @@ public class NishitaSky implements SimulatedSky {
     // Render from just above the surface of "earth"
     Vector3 origin = new Vector3(0, ray.o.y + EARTH_RADIUS + 1, 0);
     Vector3 direction = ray.d;
+    direction.y += horizonOffset * (1 - direction.y);
 
     // Calculate the distance from the origin to the edge of the atmosphere
     double distance = sphereIntersect(origin, direction, EARTH_RADIUS + ATM_THICKNESS);

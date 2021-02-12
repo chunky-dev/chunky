@@ -63,6 +63,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   @FXML private DoubleAdjuster skyFogDensity;
   @FXML private LuxColorPicker fogColor;
   private final VBox simulatedSettings = new VBox();
+  private DoubleAdjuster horizonOffset = new DoubleAdjuster();
   private ChoiceBox<SimulatedSky> simulatedSky = new ChoiceBox<>();
   private final GradientEditor gradientEditor = new GradientEditor(this);
   private final LuxColorPicker colorPicker = new LuxColorPicker();
@@ -86,6 +87,13 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   }
 
   @Override public void initialize(URL location, ResourceBundle resources) {
+    simulatedSettings.getChildren().add(horizonOffset);
+    horizonOffset.setName("Horizon offset");
+    horizonOffset.setTooltip("Moves the simulated horizon.");
+    horizonOffset.setRange(0, 1);
+    horizonOffset.clampBoth();
+    horizonOffset.onValueChange(value -> scene.sky().setHorizonOffset(value));
+
     HBox simulatedSkyBox = new HBox(new Label("Sky Mode:"), simulatedSky);
     simulatedSkyBox.setSpacing(10);
     simulatedSkyBox.setAlignment(Pos.CENTER_LEFT);
@@ -202,6 +210,8 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     fogColor.colorProperty().removeListener(fogColorListener);
     fogColor.setColor(ColorUtil.toFx(scene.getFogColor()));
     fogColor.colorProperty().addListener(fogColorListener);
+    horizonOffset.set(scene.sky().getHorizonOffset());
+    simulatedSky.setValue(scene.sky().getSimulatedSky());
     gradientEditor.setGradient(scene.sky().getGradient());
     colorPicker.setColor(ColorUtil.toFx(scene.sky().getColor()));
     skyboxSettings.update(scene);
