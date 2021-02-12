@@ -30,16 +30,18 @@ import se.llbit.math.Vector3;
 public class TexturedTriangle implements Primitive {
 
   private static final double EPSILON = 0.000001;
-  private final Vector3 e1 = new Vector3(0, 0, 0);
-  private final Vector3 e2 = new Vector3(0, 0, 0);
-  private final Vector3 o = new Vector3(0, 0, 0);
-  private final Vector3 n = new Vector3(0, 0, 0);
-  private final AABB bounds;
-  private final Vector2 t1;
-  private final Vector2 t2;
-  private final Vector2 t3;
-  private final Material material;
-  private final boolean doubleSided;
+
+  /** Note: this is public for some plugins. Stability is not guaranteed. */
+  public final Vector3 e1 = new Vector3(0, 0, 0);
+  public final Vector3 e2 = new Vector3(0, 0, 0);
+  public final Vector3 o = new Vector3(0, 0, 0);
+  public final Vector3 n = new Vector3(0, 0, 0);
+  public final AABB bounds;
+  public final Vector2 t1;
+  public final Vector2 t2;
+  public final Vector2 t3;
+  public final Material material;
+  public final boolean doubleSided;
 
   /**
    * @param c1 first corner

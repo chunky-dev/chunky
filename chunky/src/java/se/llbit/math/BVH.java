@@ -1,4 +1,5 @@
-/* Copyright (c) 2014 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2014-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2014-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -16,6 +17,7 @@
  */
 package se.llbit.math;
 
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.math.primitive.MutableAABB;
 import se.llbit.math.primitive.Primitive;
 
@@ -43,10 +45,10 @@ public class BVH {
     SAH_MA,
   }
 
-
-  static abstract class Node {
-    protected final AABB bb;
-    protected final Primitive[] primitives;
+  /** Note: this is public for some plugins. Stability is not guaranteed. */
+  public static abstract class Node {
+    public final AABB bb;
+    public final Primitive[] primitives;
 
     /**
      * Create a new BVH node.
@@ -71,10 +73,10 @@ public class BVH {
     abstract public int size();
   }
 
-
-  static class Group extends Node {
-    protected final Node child1;
-    protected final Node child2;
+  /** Note: this is public for some plugins. Stability is not guaranteed. */
+  public static class Group extends Node {
+    public final Node child1;
+    public final Node child2;
     private final int numPrimitives;
 
     /**
@@ -125,8 +127,8 @@ public class BVH {
     }
   }
 
-
-  static class Leaf extends Node {
+  /** Note: this is public for some plugins. Stability is not guaranteed. */
+  public static class Leaf extends Node {
 
     public Leaf(Primitive[] primitives) {
       super(primitives);
@@ -538,4 +540,7 @@ public class BVH {
     return root.bb.hitTest(ray) && root.anyIntersection(ray);
   }
 
+  public Node getRoot() {
+    return root;
+  }
 }

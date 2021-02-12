@@ -1,4 +1,4 @@
-/* Copyright (c) 2021 Chunky contributors
+/* Copyright (c) 2013-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -33,6 +33,7 @@ import se.llbit.chunky.entity.Lectern;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
@@ -3062,6 +3063,16 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setOctreeImplementation(String octreeImplementation) {
     this.octreeImplementation = octreeImplementation;
+  }
+
+  @PluginApi
+  public Octree getWorldOctree() {
+    return worldOctree;
+  }
+
+  @PluginApi
+  public Octree getWaterOctree() {
+    return waterOctree;
   }
 
   public EmitterSamplingStrategy getEmitterSamplingStrategy() {
