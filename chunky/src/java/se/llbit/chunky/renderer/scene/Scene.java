@@ -26,6 +26,7 @@ import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
@@ -750,6 +751,17 @@ public class Scene implements JsonSerializable, Refreshable {
       return;
     }
 
+    boolean isTallWorld = world.getVersionId() >= World.VERSION_21W06A;
+    if(isTallWorld) {
+      // snapshot 21w06a or later, treat as -64 - 320
+      yMin = Math.max(-64, yClipMin);
+      yMax = Math.min(320, yClipMax);
+    } else {
+      // treat as 0 - 256 world
+      yMin = Math.max(0, yClipMin);
+      yMax = Math.min(256, yClipMax);
+    }
+
     Set<ChunkPosition> loadedChunks = new HashSet<>();
     int numChunks = 0;
 
@@ -813,10 +825,12 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Heightmap biomeIdMap = new Heightmap();
 
-    yMin = Math.max(0, yClipMin);
-    yMax = Math.min(256, yClipMax);
-
-    ChunkData chunkData = new SimpleChunkData();
+    ChunkData chunkData;
+    if(isTallWorld) { //snapshot 21w06a, treat as -64 - 320
+      chunkData = new GenericChunkData();
+    } else { //Treat as 0 - 256 world
+      chunkData = new SimpleChunkData();
+    }
 
     try (TaskTracker.Task task = taskTracker.task("Loading chunks")) {
       int done = 1;
@@ -1602,8 +1616,8 @@ public class Scene implements JsonSerializable, Refreshable {
    * @return {@code true} if the water height value was changed.
    */
   public boolean setWaterHeight(int value) {
-    value = Math.max(0, value);
-    value = Math.min(256, value);
+    value = Math.max(yMin, value);
+    value = Math.min(yMax, value);
     if (value != waterHeight) {
       waterHeight = value;
       refresh();

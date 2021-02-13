@@ -43,6 +43,7 @@ import se.llbit.chunky.ui.RenderCanvasFx;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.world.EmptyWorld;
 import se.llbit.chunky.world.Icon;
+import se.llbit.chunky.world.World;
 import se.llbit.fxutil.Dialogs;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
@@ -205,14 +206,12 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     canvasSize.setEditable(true);
     canvasSize.getItems().addAll("400x400", "1024x768", "960x540", "1920x1080");
     canvasSize.valueProperty().addListener(canvasSizeListener);
-    yMax.setRange(0, 256);
     yMax.setTooltip(
         "Blocks above this Y value are not loaded. Requires reloading chunks to take effect.");
     yMax.onValueChange(value -> {
       scene.setYClipMax(value);
       renderControls.showPopup("Reload the chunks for this to take effect.", yMax);
     });
-    yMin.setRange(0, 256);
     yMin.setTooltip(
         "Blocks below this Y value are not loaded. Requires reloading chunks to take effect.");
     yMin.onValueChange(value -> {
@@ -295,7 +294,19 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     mapLoader.addWorldLoadListener(world -> {
       loadSelectedChunks.setDisable(world instanceof EmptyWorld || world == null);
     });
+    mapLoader.addWorldLoadListener(this::updateYClipSlidersRanges);
+    updateYClipSlidersRanges(mapLoader.getWorld());
     this.controller = controls.getRenderController();
     this.scene = this.controller.getSceneManager().getScene();
+  }
+
+  private void updateYClipSlidersRanges(World world) {
+    if (world != null && world.getVersionId() >= World.VERSION_21W06A) {
+      yMin.setRange(-64, 320);
+      yMax.setRange(-64, 320);
+    } else {
+      yMin.setRange(0, 256);
+      yMax.setRange(0, 256);
+    }
   }
 }
