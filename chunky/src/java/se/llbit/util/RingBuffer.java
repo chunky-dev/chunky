@@ -54,6 +54,8 @@ public class RingBuffer<T> {
     if (size == 0) {
       throw new NoSuchElementException("Buffer is empty.");
     }
+
+    @SuppressWarnings("unchecked")
     T result = (T) data[remove];
     remove = (remove + 1) % capacity;
     size -= 1;
