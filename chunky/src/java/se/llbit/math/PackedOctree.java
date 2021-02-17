@@ -19,6 +19,7 @@ package se.llbit.math;
 import org.apache.commons.math3.util.Pair;
 import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.world.Material;
 
 import java.io.DataInputStream;
@@ -49,8 +50,10 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * When dealing with huge octree, the maximum size of an array may be a limitation.
    * When this occurs this implementation wan no longer be used and we must fallback on another one.
    * Here we'll throw an exception that the caller can catch.
+   *
+   * Note: This is public for some plugins. Stability is not guaranteed.
    */
-  private int[] treeData;
+  public int[] treeData;
 
   /**
    * The max size of an array we allow is a bit less than the max value an integer can have

@@ -12,28 +12,28 @@ public class GlowLichenModel {
 
   protected static final Quad[] quads = {
       // North
-      new DoubleSidedQuad(new Vector3(0, 0, 0.01 / 16), new Vector3(1, 0, 0.01 / 16),
-          new Vector3(0, 1, 0.01 / 16), new Vector4(0, 1, 0, 1)),
+      new DoubleSidedQuad(new Vector3(0, 0, 0.1 / 16), new Vector3(1, 0, 0.1 / 16),
+          new Vector3(0, 1, 0.1 / 16), new Vector4(0, 1, 0, 1)),
 
       // South
-      new DoubleSidedQuad(new Vector3(1, 0, 15.99 / 16), new Vector3(0, 0, 15.99 / 16),
-          new Vector3(1, 1, 15.99 / 16), new Vector4(1, 0, 0, 1)),
+      new DoubleSidedQuad(new Vector3(1, 0, 15.9 / 16), new Vector3(0, 0, 15.9 / 16),
+          new Vector3(1, 1, 15.9 / 16), new Vector4(1, 0, 0, 1)),
 
       // East
-      new DoubleSidedQuad(new Vector3(15.99 / 16, 0, 0), new Vector3(15.99 / 16, 0, 1),
-          new Vector3(15.99 / 16, 1, 0), new Vector4(0, 1, 0, 1)),
+      new DoubleSidedQuad(new Vector3(15.9 / 16, 0, 0), new Vector3(15.9 / 16, 0, 1),
+          new Vector3(15.9 / 16, 1, 0), new Vector4(0, 1, 0, 1)),
 
       // West
-      new DoubleSidedQuad(new Vector3(0.01 / 16, 0, 1), new Vector3(0.01 / 16, 0, 0),
-          new Vector3(0.01 / 16, 1, 1), new Vector4(1, 0, 0, 1)),
+      new DoubleSidedQuad(new Vector3(0.1 / 16, 0, 1), new Vector3(0.1 / 16, 0, 0),
+          new Vector3(0.1 / 16, 1, 1), new Vector4(1, 0, 0, 1)),
 
       // Top
-      new DoubleSidedQuad(new Vector3(0, 15.99 / 16, 0), new Vector3(1, 15.99 / 16, 0),
-          new Vector3(0, 15.99 / 16, 1), new Vector4(0, 1, 0, 1)),
+      new DoubleSidedQuad(new Vector3(0, 15.9 / 16, 0), new Vector3(1, 15.9 / 16, 0),
+          new Vector3(0, 15.9 / 16, 1), new Vector4(0, 1, 0, 1)),
 
       // Bottom
-      new DoubleSidedQuad(new Vector3(0, 0.01 / 16, 0), new Vector3(1, 0.01 / 16, 0),
-          new Vector3(0, 0.01 / 16, 1), new Vector4(0, 1, 0, 1)),
+      new DoubleSidedQuad(new Vector3(0, 0.1 / 16, 0), new Vector3(1, 0.1 / 16, 0),
+          new Vector3(0, 0.1 / 16, 1), new Vector4(0, 1, 0, 1)),
   };
 
   public static boolean intersect(Ray ray, int connections) {

@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016 - 2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016 - 2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -20,6 +21,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -27,8 +29,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 import se.llbit.chunky.renderer.scene.Scene;
+import se.llbit.chunky.renderer.scene.SimulatedSky;
 import se.llbit.chunky.renderer.scene.Sky;
 import se.llbit.chunky.ui.DoubleAdjuster;
 import se.llbit.chunky.ui.GradientEditor;
@@ -59,6 +64,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   @FXML private LuxColorPicker fogColor;
   private final VBox simulatedSettings = new VBox();
   private DoubleAdjuster horizonOffset = new DoubleAdjuster();
+  private ChoiceBox<SimulatedSky> simulatedSky = new ChoiceBox<>();
   private final GradientEditor gradientEditor = new GradientEditor(this);
   private final LuxColorPicker colorPicker = new LuxColorPicker();
   private final VBox colorEditor = new VBox(colorPicker);
@@ -87,6 +93,34 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     horizonOffset.setRange(0, 1);
     horizonOffset.clampBoth();
     horizonOffset.onValueChange(value -> scene.sky().setHorizonOffset(value));
+
+    HBox simulatedSkyBox = new HBox(new Label("Sky Mode:"), simulatedSky);
+    simulatedSkyBox.setSpacing(10);
+    simulatedSkyBox.setAlignment(Pos.CENTER_LEFT);
+    simulatedSettings.getChildren().add(0, simulatedSkyBox);
+    simulatedSky.getItems().addAll(Sky.skies);
+    simulatedSky.setValue(Sky.skies.get(0));
+    simulatedSky.setConverter(new StringConverter<SimulatedSky>() {
+      @Override
+      public String toString(SimulatedSky object) {
+        return object.getName();
+      }
+
+      @Override
+      public SimulatedSky fromString(String string) {
+        for (SimulatedSky sky : simulatedSky.getItems()) {
+          if (string.equals(sky.getName())) {
+            return sky;
+          }
+        }
+        return null;
+      }
+    });
+    simulatedSky.setOnAction((event) -> {
+      int selected = simulatedSky.getSelectionModel().getSelectedIndex();
+      scene.sky().setSimulatedSkyMode(selected);
+    });
+    simulatedSky.setTooltip(new Tooltip(skiesTooltip(Sky.skies)));
 
     cloudSize.setName("Cloud size");
     cloudSize.setRange(0.1, 128);
@@ -164,6 +198,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
 
   @Override public void update(Scene scene) {
     skyMode.getSelectionModel().select(scene.sky().getSkyMode());
+    simulatedSky.getSelectionModel().select(scene.sky().getSimulatedSky());
     cloudsEnabled.setSelected(scene.sky().cloudsEnabled());
     transparentSkyEnabled.setSelected(scene.transparentSky());
     cloudSize.set(scene.sky().cloudSize());
@@ -176,6 +211,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     fogColor.setColor(ColorUtil.toFx(scene.getFogColor()));
     fogColor.colorProperty().addListener(fogColorListener);
     horizonOffset.set(scene.sky().getHorizonOffset());
+    simulatedSky.setValue(scene.sky().getSimulatedSky());
     gradientEditor.setGradient(scene.sky().getGradient());
     colorPicker.setColor(ColorUtil.toFx(scene.sky().getColor()));
     skyboxSettings.update(scene);
@@ -191,5 +227,17 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
 
   public void gradientChanged(List<Vector4> gradient) {
     scene.sky().setGradient(gradient);
+  }
+
+  private static String skiesTooltip(List<SimulatedSky> skies) {
+    StringBuilder tipString = new StringBuilder("Sky Renderers:");
+    for (SimulatedSky sky : skies) {
+      tipString.append("\n");
+      tipString.append(sky.getName());
+      tipString.append(": ");
+      tipString.append(sky.getDescription());
+    }
+
+    return tipString.toString();
   }
 }

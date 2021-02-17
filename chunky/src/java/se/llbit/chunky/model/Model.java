@@ -68,16 +68,21 @@ public class Model {
   }
 
   /**
-   * @param src source quads
-   * @return Quads rotated about the X axis by some angle
+   * @param src    source quads
+   * @param origin origin of the rotation axis, relative to  0,0,0 (the north/west/bottom corner of a block)
+   * @return Quads rotated about the X axis by some angle around the given origin
    */
   public static Quad[] rotateX(Quad[] src, double angle, Vector3 origin) {
     Quad[] rot = new Quad[src.length];
     for (int i = 0; i < src.length; ++i) {
-      rot[i] = src[i].transform(Transform.NONE
-          .translate(-origin.x + 0.5, -origin.y + 0.5, -origin.z + 0.5)
-          .rotateX(angle)
-          .translate(origin.x - 0.5, origin.y - 0.5, origin.z - 0.5));
+      rot[i] = src[i]
+          .transform(Transform.NONE
+              .translate(-origin.x, -origin.y, -origin.z)
+              .translate(0.5, 0.5, 0.5)
+              .rotateX(angle)
+              .translate(origin)
+              .translate(-0.5, -0.5, -0.5)
+          );
     }
     return rot;
   }
@@ -145,15 +150,20 @@ public class Model {
 
   /**
    * @param src    source quads
-   * @param origin origin of the rotation axis, relative to the center of a block
+   * @param origin origin of the rotation axis, relative to 0,0,0 (the north/west/bottom corner of a block)
    * @return Quads rotated about the Y axis by some angle around the given origin
    */
   public static Quad[] rotateY(Quad[] src, double angle, Vector3 origin) {
     Quad[] rot = new Quad[src.length];
     for (int i = 0; i < src.length; ++i) {
       rot[i] = src[i]
-          .transform(Transform.NONE.translate(-origin.x, -origin.y, -origin.z).rotateY(angle)
-              .translate(origin));
+          .transform(Transform.NONE
+              .translate(-origin.x, -origin.y, -origin.z)
+              .translate(0.5, 0.5, 0.5)
+              .rotateY(angle)
+              .translate(origin)
+              .translate(-0.5, -0.5, -0.5)
+          );
     }
     return rot;
   }
@@ -178,6 +188,26 @@ public class Model {
     Quad[] rot = new Quad[src.length];
     for (int i = 0; i < src.length; ++i) {
       rot[i] = src[i].transform(Transform.NONE.rotateZ(angle));
+    }
+    return rot;
+  }
+
+  /**
+   * @param src    source quads
+   * @param origin origin of the rotation axis, relative to 0,0,0 (the north/west/bottom corner of a block)
+   * @return Quads rotated about the Z axis by some angle around the given origin
+   */
+  public static Quad[] rotateZ(Quad[] src, double angle, Vector3 origin) {
+    Quad[] rot = new Quad[src.length];
+    for (int i = 0; i < src.length; ++i) {
+      rot[i] = src[i]
+          .transform(Transform.NONE
+              .translate(-origin.x, -origin.y, -origin.z)
+              .translate(0.5, 0.5, 0.5)
+              .rotateZ(angle)
+              .translate(origin)
+              .translate(-0.5, -0.5, -0.5)
+          );
     }
     return rot;
   }

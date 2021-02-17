@@ -1,4 +1,5 @@
-/* Copyright (c) 2010-2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2010-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2010-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -21,6 +22,7 @@ import se.llbit.chunky.block.BlockProvider;
 import se.llbit.chunky.block.BlockSpec;
 import se.llbit.chunky.block.MinecraftBlockProvider;
 import se.llbit.chunky.main.CommandLineOptions.Mode;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.plugin.ChunkyPlugin;
 import se.llbit.chunky.plugin.TabTransformer;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
@@ -326,6 +328,11 @@ public class Chunky {
 
   public boolean sceneInitialized() {
     return renderController != null;
+  }
+
+  @PluginApi
+  public void setRendererFactory(RendererFactory rendererFactory) {
+    this.rendererFactory = rendererFactory;
   }
 
   public RenderController getRenderController() {

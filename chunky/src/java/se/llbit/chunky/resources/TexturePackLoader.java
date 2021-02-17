@@ -3538,13 +3538,13 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/amethyst_block", Texture.amethyst);
     addSimpleTexture("assets/minecraft/textures/block/budding_amethyst", Texture.buddingAmethyst);
     addSimpleTexture("assets/minecraft/textures/block/copper_block", Texture.copperBlock);
-    addSimpleTexture("assets/minecraft/textures/block/lightly_weathered_copper_block", Texture.lightlyWeatheredCopperBlock);
-    addSimpleTexture("assets/minecraft/textures/block/semi_weathered_copper_block", Texture.semiWeatheredCopperBlock);
-    addSimpleTexture("assets/minecraft/textures/block/weathered_copper_block", Texture.weatheredCopperBlock);
-    addSimpleTexture("assets/minecraft/textures/block/cut_copper", Texture.cutCopperBlock);
-    addSimpleTexture("assets/minecraft/textures/block/lightly_weathered_cut_copper", Texture.lightlyWeatheredCutCopperBlock);
-    addSimpleTexture("assets/minecraft/textures/block/semi_weathered_cut_copper", Texture.semiWeatheredCutCopperBlock);
-    addSimpleTexture("assets/minecraft/textures/block/weathered_cut_copper", Texture.weatheredCutCopperBlock);
+    addSimpleTexture("assets/minecraft/textures/block/exposed_copper", Texture.exposedCopper);
+    addSimpleTexture("assets/minecraft/textures/block/weathered_copper", Texture.weatheredCopper);
+    addSimpleTexture("assets/minecraft/textures/block/oxidized_copper", Texture.oxidizedCopper);
+    addSimpleTexture("assets/minecraft/textures/block/cut_copper", Texture.cutCopper);
+    addSimpleTexture("assets/minecraft/textures/block/exposed_cut_copper", Texture.exposedCutCopper);
+    addSimpleTexture("assets/minecraft/textures/block/weathered_cut_copper", Texture.weatheredCutCopper);
+    addSimpleTexture("assets/minecraft/textures/block/oxidized_cut_copper", Texture.oxidizedCutCopper);
     addSimpleTexture("assets/minecraft/textures/block/lightning_rod", Texture.lightningRod);
     addSimpleTexture("assets/minecraft/textures/block/small_amethyst_bud", Texture.smallAmethystBud);
     addSimpleTexture("assets/minecraft/textures/block/medium_amethyst_bud", Texture.mediumAmethystBud);
@@ -3569,6 +3569,28 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/sculk_sensor_tendril_inactive", Texture.sculkSensorTendrilInactive);
     addSimpleTexture("assets/minecraft/textures/block/sculk_sensor_top", Texture.sculkSensorTop);
     addSimpleTexture("assets/minecraft/textures/block/glow_lichen", Texture.glowLichen);
+    addSimpleTexture("assets/minecraft/textures/block/azalea_plant", Texture.azaleaPlant);
+    addSimpleTexture("assets/minecraft/textures/block/azalea_top", Texture.azaleaTop);
+    addSimpleTexture("assets/minecraft/textures/block/azalea_side", Texture.azaleaSide);
+    addSimpleTexture("assets/minecraft/textures/block/flowering_azalea_top", Texture.floweringAzaleaTop);
+    addSimpleTexture("assets/minecraft/textures/block/flowering_azalea_side", Texture.floweringAzaleaSide);
+    addSimpleTexture("assets/minecraft/textures/block/azalea_leaves", Texture.azaleaLeaves);
+    addSimpleTexture("assets/minecraft/textures/block/azalea_leaves_flowers", Texture.azaleaLeavesFlowers);
+    addSimpleTexture("assets/minecraft/textures/block/moss_block", Texture.mossBlock);
+    addSimpleTexture("assets/minecraft/textures/block/cave_vines_body", Texture.caveVinesBody);
+    addSimpleTexture("assets/minecraft/textures/block/cave_vines_head", Texture.caveVinesHead);
+    addSimpleTexture("assets/minecraft/textures/block/cave_vines_body_lit", Texture.caveVinesBodyLit);
+    addSimpleTexture("assets/minecraft/textures/block/cave_vines_head_lit", Texture.caveVinesHeadLit);
+    addSimpleTexture("assets/minecraft/textures/block/hanging_roots", Texture.hangingRoots);
+    addSimpleTexture("assets/minecraft/textures/block/rooted_dirt", Texture.rootedDirt);
+    addSimpleTexture("assets/minecraft/textures/block/big_dripleaf_stem", Texture.bigDripleafStem);
+    addSimpleTexture("assets/minecraft/textures/block/big_dripleaf_top", Texture.bigDripleafTop);
+    addSimpleTexture("assets/minecraft/textures/block/big_dripleaf_side", Texture.bigDripleafSide);
+    addSimpleTexture("assets/minecraft/textures/block/big_dripleaf_tip", Texture.bigDripleafTip);
+    addSimpleTexture("assets/minecraft/textures/block/small_dripleaf_top", Texture.smallDripleafTop);
+    addSimpleTexture("assets/minecraft/textures/block/small_dripleaf_side", Texture.smallDripleafSide);
+    addSimpleTexture("assets/minecraft/textures/block/spore_blossom", Texture.sporeBlossom);
+    addSimpleTexture("assets/minecraft/textures/block/spore_blossom_base", Texture.sporeBlossomBase);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

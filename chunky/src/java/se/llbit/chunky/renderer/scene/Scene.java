@@ -27,6 +27,7 @@ import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
+import se.llbit.chunky.chunk.GenericChunkData;
 import se.llbit.chunky.chunk.SimpleChunkData;
 import se.llbit.chunky.entity.ArmorStand;
 import se.llbit.chunky.entity.Entity;
@@ -34,6 +35,7 @@ import se.llbit.chunky.entity.Lectern;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
+import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
@@ -748,6 +750,17 @@ public class Scene implements JsonSerializable, Refreshable {
       return;
     }
 
+    boolean isTallWorld = world.getVersionId() >= World.VERSION_21W06A;
+    if(isTallWorld) {
+      // snapshot 21w06a or later, treat as -64 - 320
+      yMin = Math.max(-64, yClipMin);
+      yMax = Math.min(320, yClipMax);
+    } else {
+      // treat as 0 - 256 world
+      yMin = Math.max(0, yClipMin);
+      yMax = Math.min(256, yClipMax);
+    }
+
     Set<ChunkPosition> loadedChunks = new HashSet<>();
     int numChunks = 0;
 
@@ -811,10 +824,12 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Heightmap biomeIdMap = new Heightmap();
 
-    yMin = Math.max(0, yClipMin);
-    yMax = Math.min(256, yClipMax);
-
-    ChunkData chunkData = new SimpleChunkData();
+    ChunkData chunkData;
+    if(isTallWorld) { //snapshot 21w06a, treat as -64 - 320
+      chunkData = new GenericChunkData();
+    } else { //Treat as 0 - 256 world
+      chunkData = new SimpleChunkData();
+    }
 
     try (TaskTracker.Task task = taskTracker.task("Loading chunks")) {
       int done = 1;
@@ -1329,7 +1344,7 @@ public class Scene implements JsonSerializable, Refreshable {
     int xcenter = (xmax + xmin) / 2;
     int zcenter = (zmax + zmin) / 2;
     int ycenter = (yMax + yMin) / 2;
-    for (int y = ycenter+128; y >= ycenter-128; --y) {
+    for (int y = Math.min(ycenter+127, yMax); y >= Math.max(ycenter-128, yMin); --y) {
       Material block = worldOctree.getMaterial(xcenter - origin.x, y - origin.y, zcenter - origin.z,
           palette);
       if (!(block instanceof Air)) {
@@ -1603,8 +1618,8 @@ public class Scene implements JsonSerializable, Refreshable {
    * @return {@code true} if the water height value was changed.
    */
   public boolean setWaterHeight(int value) {
-    value = Math.max(0, value);
-    value = Math.min(256, value);
+    value = Math.max(yMin, value);
+    value = Math.min(yMax, value);
     if (value != waterHeight) {
       waterHeight = value;
       refresh();
@@ -3066,6 +3081,16 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setOctreeImplementation(String octreeImplementation) {
     this.octreeImplementation = octreeImplementation;
+  }
+
+  @PluginApi
+  public Octree getWorldOctree() {
+    return worldOctree;
+  }
+
+  @PluginApi
+  public Octree getWaterOctree() {
+    return waterOctree;
   }
 
   public EmitterSamplingStrategy getEmitterSamplingStrategy() {

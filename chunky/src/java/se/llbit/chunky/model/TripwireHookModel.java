@@ -97,7 +97,7 @@ public class TripwireHookModel {
                             new Vector3(8.6 / 16.0, 4.6 / 16.0, 9.1 / 16.0),
                             new Vector3(8.6 / 16.0, 3.8 / 16.0, 10.3 / 16.0),
                             new Vector4(9 / 16.0, 7 / 16.0, 13 / 16.0, 12 / 16.0)
-                    )}, Math.toRadians(-45), new Vector3(0.6, 6 / 16.0, 5.2 / 16.0)),
+                    )}, Math.toRadians(-45), new Vector3(0.5, 6 / 16.0, 5.2 / 16.0)),
             Model.rotateX(new Quad[]{
                     new Quad(
                             new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
@@ -271,7 +271,7 @@ public class TripwireHookModel {
                             new Vector3(7.4 / 16.0, 6.8 / 16.0, 14 / 16.0),
                             new Vector3(8.8 / 16.0, 5.2 / 16.0, 14 / 16.0),
                             new Vector4(9 / 16.0, 7 / 16.0, 7 / 16.0, 5 / 16.0)
-                    )}, Math.toRadians(-22.5), new Vector3(0.6, 6 / 16.0, 14 / 16.0)),
+                    )}, Math.toRadians(-22.5), new Vector3(0.5, 6 / 16.0, 14 / 16.0)),
             new Quad[]{
                     new Quad(
                             new Vector3(6 / 16.0, 9 / 16.0, 16 / 16.0),
