@@ -189,12 +189,13 @@ public class SmallDripleafModel {
   static {
     Texture top = Texture.smallDripleafTop;
     Texture side = Texture.smallDripleafSide;
-    Texture stem = Texture.bigDripleafStem;
+    Texture stemTop = Texture.smallDripleafStemTop;
+    Texture stemBottom = Texture.smallDripleafStemBottom;
     topTextures = new Texture[]{
         top, top, top, top, top, top, side, side, side, side, side, side, side, side, side, side,
-        side, side, stem, stem, stem, stem
+        side, side, stemTop, stemTop, stemTop, stemTop
     };
-    bottomTextures = new Texture[]{stem, stem, stem, stem};
+    bottomTextures = new Texture[]{stemBottom, stemBottom, stemBottom, stemBottom};
   }
 
   public static boolean intersect(Ray ray, String half) {
