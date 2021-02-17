@@ -964,6 +964,8 @@ public class Texture {
   public static final Texture bigDripleafTip = new Texture();
   public static final Texture smallDripleafTop = new Texture();
   public static final Texture smallDripleafSide = new Texture();
+  public static final Texture smallDripleafStemTop = new Texture();
+  public static final Texture smallDripleafStemBottom = new Texture();
   public static final Texture sporeBlossom = new Texture();
   public static final Texture sporeBlossomBase = new Texture();
 
