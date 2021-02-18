@@ -1,4 +1,5 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -28,8 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Rendering context - keeps track of the Chunky configuration
- * used for rendering.
+ * Rendering context - keeps track of the Chunky configuration used for rendering.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
@@ -55,6 +55,7 @@ public class RenderContext {
 
   /**
    * Set the saving/loading directory of the current scene.
+   *
    * @param sceneDirectory The directory the scene should be saved/loaded to/from
    */
   public void setSceneDirectory(File sceneDirectory) {
@@ -97,15 +98,16 @@ public class RenderContext {
    * @return Output stream for the scene description
    * @throws FileNotFoundException If the file does not exist.
    */
-  public OutputStream getSceneDescriptionOutputStream(String sceneName)
-      throws FileNotFoundException {
+  public OutputStream getSceneDescriptionOutputStream(String sceneName) throws FileNotFoundException {
     return getSceneFileOutputStream(sceneName + Scene.EXTENSION);
   }
 
   /**
    * Gets the directory of the given scene file.
+   *
    * @param fileName the filename with the extension
-   * @return A File object. Note, the file object may not exist yet and the directory leading to the file will be created.
+   * @return A File object. Note, the file object may not exist yet and the directory leading to the file will be
+   * created.
    */
   public File getSceneFile(String fileName) {
     ensureSceneDirectory();
@@ -145,7 +147,7 @@ public class RenderContext {
   }
 
   /**
-   * @param fileName the filename with the extension
+   * @param fileName  the filename with the extension
    * @param timestamp the last file modification timestamp to compare against
    * @return {@code true} if the file has not changed since timestamp
    */
@@ -166,8 +168,8 @@ public class RenderContext {
    * Ensures the scene directory specified exists
    */
   private void ensureSceneDirectory() {
-    if (sceneDirectory.exists()) return;
+    if (sceneDirectory.exists())
+      return;
     sceneDirectory.mkdirs();
   }
-
 }

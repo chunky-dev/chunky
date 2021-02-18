@@ -1,4 +1,5 @@
-/* Copyright (c) 2013-2021 Chunky contributors
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -15,8 +16,6 @@
  * along with Chunky.  If not, see <http://www.gnu.org/licenses/>.
  */
 package se.llbit.chunky.renderer.scene;
-
-import java.io.*;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
@@ -68,6 +67,7 @@ import se.llbit.png.PngFileWriter;
 import se.llbit.tiff.TiffFileWriter;
 import se.llbit.util.*;
 
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -485,18 +485,14 @@ public class Scene implements JsonSerializable, Refreshable {
    *
    * @param sceneName file name of the scene to load
    */
-  public synchronized void loadScene(
-    RenderContext context,
-    String sceneName,
-    TaskTracker taskTracker
-  ) throws IOException, InterruptedException {
+  public synchronized void loadScene(RenderContext context, String sceneName, TaskTracker taskTracker)
+      throws IOException {
     loadDescription(context.getSceneDescriptionInputStream(sceneName));
 
     if (sdfVersion < SDF_VERSION) {
       Log.warn("Old scene version detected! The scene may not have been loaded correctly.");
     } else if (sdfVersion > SDF_VERSION) {
-      Log.warn(
-          "This scene was created with a newer version of Chunky! The scene may not have been loaded correctly.");
+      Log.warn("This scene was created with a newer version of Chunky! The scene may not have been loaded correctly.");
     }
 
     // Load the configured skymap file.
@@ -520,7 +516,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     boolean emitterGridNeedChunkReload = false;
-    if(emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
+    if (emitterSamplingStrategy != EmitterSamplingStrategy.NONE)
       emitterGridNeedChunkReload = !loadEmitterGrid(context, taskTracker);
     boolean octreeLoaded = loadOctree(context, taskTracker);
     if (emitterGridNeedChunkReload || !octreeLoaded) {
@@ -728,8 +724,7 @@ public class Scene implements JsonSerializable, Refreshable {
       Log.warn("Can not reload chunks for scene - world directory not found!");
       return;
     }
-    loadedWorld = World.loadWorld(loadedWorld.getWorldDirectory(), worldDimension,
-        World.LoggedWarnings.NORMAL);
+    loadedWorld = World.loadWorld(loadedWorld.getWorldDirectory(), worldDimension, World.LoggedWarnings.NORMAL);
     loadChunks(taskTracker, loadedWorld, chunks);
     refresh();
   }
@@ -741,18 +736,12 @@ public class Scene implements JsonSerializable, Refreshable {
    * The octree finalizer is then run to compute block properties like fence
    * connectedness.
    */
-  public synchronized void loadChunks(
-    TaskTracker taskTracker,
-    World world,
-    Collection<ChunkPosition> chunksToLoad
-  ) {
-
-    if (world == null) {
+  public synchronized void loadChunks(TaskTracker taskTracker, World world, Collection<ChunkPosition> chunksToLoad) {
+    if (world == null)
       return;
-    }
 
     boolean isTallWorld = world.getVersionId() >= World.VERSION_21W06A;
-    if(isTallWorld) {
+    if (isTallWorld) {
       // snapshot 21w06a or later, treat as -64 - 320
       yMin = Math.max(-64, yClipMin);
       yMax = Math.min(320, yClipMax);
@@ -826,7 +815,7 @@ public class Scene implements JsonSerializable, Refreshable {
     Heightmap biomeIdMap = new Heightmap();
 
     ChunkData chunkData;
-    if(isTallWorld) { //snapshot 21w06a, treat as -64 - 320
+    if (isTallWorld) { //snapshot 21w06a, treat as -64 - 320
       chunkData = new GenericChunkData();
     } else { //Treat as 0 - 256 world
       chunkData = new SimpleChunkData();
@@ -924,8 +913,8 @@ public class Scene implements JsonSerializable, Refreshable {
                     }
                   } else {
                     entities.add(entity);
-                    if(emitterGrid != null) {
-                      for(Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
+                    if (emitterGrid != null) {
+                      for (Grid.EmitterPosition emitterPos : entity.getEmitterPosition()) {
                         emitterPos.x -= origin.x;
                         emitterPos.y -= origin.y;
                         emitterPos.z -= origin.z;
@@ -1217,7 +1206,7 @@ public class Scene implements JsonSerializable, Refreshable {
       entity.loadDataFromOctree(worldOctree, palette, origin);
     }
 
-    if(emitterGrid != null)
+    if (emitterGrid != null)
       emitterGrid.prepare();
 
     chunks = loadedChunks;
@@ -1732,7 +1721,9 @@ public class Scene implements JsonSerializable, Refreshable {
     }
     String fileName = String.format("%s-%d%s", name, spp, outputMode.getExtension());
     File targetFile = new File(directory, fileName);
-    if (!directory.exists()) directory.mkdirs();
+    if (!directory.exists()) {
+      directory.mkdirs();
+    }
     computeAlpha(taskTracker, threadCount);
     if (!finalized) {
       postProcessFrame(taskTracker);
@@ -1928,17 +1919,17 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   private synchronized void saveEmitterGrid(RenderContext context, TaskTracker taskTracker) {
-    if(emitterGrid == null)
+    if (emitterGrid == null)
       return;
 
     String filename = name + ".emittergrid";
     // TODO Not save when unchanged?
-    try(TaskTracker.Task task = taskTracker.task("Saving Grid")) {
+    try (TaskTracker.Task task = taskTracker.task("Saving Grid")) {
       Log.info("Saving Grid " + filename);
 
-      try(DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(filename)))) {
+      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(filename)))) {
         emitterGrid.store(out);
-      } catch(IOException e) {
+      } catch (IOException e) {
         Log.warn("Couldn't save Grid", e);
       }
     }
@@ -1970,7 +1961,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public synchronized void saveDump(RenderContext context, TaskTracker taskTracker) {
     File dumpFile = context.getSceneFile(name + ".dump");
     Log.info("Saving render dump: " + dumpFile);
-    try(FileOutputStream outputStream = new FileOutputStream(dumpFile)){
+    try (FileOutputStream outputStream = new FileOutputStream(dumpFile)) {
       RenderDump.save(outputStream, this, taskTracker);
     } catch (IOException e) {
       Log.warn("Failed to save the render dump", e);
@@ -1980,12 +1971,12 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private synchronized boolean loadEmitterGrid(RenderContext context, TaskTracker taskTracker) {
     String filename = name + ".emittergrid";
-    try(TaskTracker.Task task = taskTracker.task("Loading grid")) {
+    try (TaskTracker.Task task = taskTracker.task("Loading grid")) {
       Log.info("Load grid " + filename);
-      try(DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename)))) {
+      try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename)))) {
         emitterGrid = Grid.load(in);
         return true;
-      } catch(Exception e) {
+      } catch (Exception e) {
         Log.info("Failed to load the grid", e);
         return false;
       }
@@ -2002,7 +1993,7 @@ public class Scene implements JsonSerializable, Refreshable {
         OctreeFileFormat.OctreeData data;
         try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)))) {
           data = OctreeFileFormat.load(in, octreeImplementation);
-        } catch(PackedOctree.OctreeTooBigException e) {
+        } catch (PackedOctree.OctreeTooBigException e) {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
           DataInputStream inRetry = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)));
@@ -2030,10 +2021,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  public synchronized boolean loadDump(
-    RenderContext context,
-    TaskTracker taskTracker
-  ) {
+  public synchronized boolean loadDump(RenderContext context, TaskTracker taskTracker) {
     if (!tryLoadDump(context, name + ".dump", taskTracker)) {
       // Failed to load the default render dump - try the backup file.
       if (!tryLoadDump(context, name + ".dump.backup", taskTracker)) {
@@ -2049,11 +2037,7 @@ public class Scene implements JsonSerializable, Refreshable {
   /**
    * @return {@code true} if the render dump was successfully loaded
    */
-  private boolean tryLoadDump(
-    RenderContext context,
-    String fileName,
-    TaskTracker taskTracker
-  ) {
+  private boolean tryLoadDump(RenderContext context, String fileName, TaskTracker taskTracker) {
     File dumpFile = context.getSceneFile(fileName);
     if (!dumpFile.isFile()) {
       if (spp != 0) {
@@ -2065,7 +2049,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     Log.info("Loading render dump: " + dumpFile);
-    try(FileInputStream inputStream = new FileInputStream(dumpFile)) {
+    try (FileInputStream inputStream = new FileInputStream(dumpFile)) {
       RenderDump.load(inputStream, this, taskTracker);
     } catch (IOException | IllegalStateException e) {
       // The render dump was possibly corrupt.
@@ -2087,8 +2071,7 @@ public class Scene implements JsonSerializable, Refreshable {
     double[] result = new double[3];
     postProcessPixel(x, y, result);
     backBuffer.data[y * width + x] = ColorUtil
-        .getRGB(QuickMath.min(1, result[0]), QuickMath.min(1, result[1]),
-            QuickMath.min(1, result[2]));
+        .getRGB(QuickMath.min(1, result[0]), QuickMath.min(1, result[1]), QuickMath.min(1, result[2]));
   }
 
   /**

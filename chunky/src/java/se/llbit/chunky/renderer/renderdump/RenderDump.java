@@ -19,13 +19,19 @@ package se.llbit.chunky.renderer.renderdump;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PushbackInputStream;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 
 /**
- * Logic for loading render dumps using the correct strategy from DumpFormat for the given dump version.
- * Automatically falls back to classic format if no format version is found in the dump file.
+ * Logic for loading render dumps using the correct strategy from DumpFormat for the given dump version. Automatically
+ * falls back to classic format if no format version is found in the dump file.
+ * <p>
  * TODO for diligent contributors: clean up code duplication
  */
 public class RenderDump {
@@ -43,78 +49,62 @@ public class RenderDump {
   }
 
   /**
-   * Load a scene dump from the given file into the scene.
-   * This overwrites ssp, renderTime and samples in the scene.
+   * Load a scene dump from the given file into the scene. This overwrites ssp, renderTime and samples in the scene.
    *
    * @throws IllegalStateException If the width or height of the scene do not match the width or height in the dump.
    * @throws IOException           If the dump format is unknown or file access fails
    */
-  public static void load(
-    InputStream inputStream,
-    Scene scene,
-    TaskTracker taskTracker
-  ) throws IOException, IllegalStateException {
+  public static void load(InputStream inputStream, Scene scene, TaskTracker taskTracker)
+      throws IOException, IllegalStateException {
     int magicNumberLength = DUMP_FORMAT_MAGIC_NUMBER.length;
 
     PushbackInputStream pushbackInputStream = new PushbackInputStream(inputStream, magicNumberLength);
     byte[] magicNumber = new byte[magicNumberLength];
 
     // If the file starts with the magic number, it is the new format containing a version number
-    if (pushbackInputStream.read(magicNumber, 0, magicNumberLength) == magicNumberLength
-      && Arrays.equals(DUMP_FORMAT_MAGIC_NUMBER, magicNumber)) {
+    if (magicNumberLength == pushbackInputStream.read(magicNumber, 0, magicNumberLength)
+        && Arrays.equals(DUMP_FORMAT_MAGIC_NUMBER, magicNumber)) {
 
       DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
       int dumpVersion = dataInputStream.readInt();
-      getDumpFormatForVersion(dumpVersion)
-        .load(dataInputStream, scene, taskTracker);
+      getDumpFormatForVersion(dumpVersion).load(dataInputStream, scene, taskTracker);
     } else {
       // Old format that is a gzipped stream, the header needs to be pushed back
       pushbackInputStream.unread(magicNumber, 0, 4);
       DataInputStream dataInputStream = new DataInputStream(new GZIPInputStream(pushbackInputStream));
-      getDumpFormatForVersion(0)
-        .load(dataInputStream, scene, taskTracker);
+      getDumpFormatForVersion(0).load(dataInputStream, scene, taskTracker);
     }
   }
 
   /**
-   * Merge a scene dump from the given file into the scene.
-   * This overwrites ssp, renderTime and samples in the scene.
+   * Merge a scene dump from the given file into the scene. This overwrites ssp, renderTime and samples in the scene.
    *
    * @throws IllegalStateException If the width or height of the scene do not match the width or height in the dump.
    * @throws IOException           If the dump format is unknown or file access fails
    */
-  public static void merge(
-    InputStream inputStream,
-    Scene scene,
-    TaskTracker taskTracker
-  ) throws IOException, IllegalStateException {
+  public static void merge(InputStream inputStream, Scene scene, TaskTracker taskTracker)
+      throws IOException, IllegalStateException {
     int magicNumberLength = DUMP_FORMAT_MAGIC_NUMBER.length;
 
     PushbackInputStream pushbackInputStream = new PushbackInputStream(inputStream, magicNumberLength);
     byte[] magicNumber = new byte[magicNumberLength];
 
     // If the file starts with the magic number, it is the new format containing a version number
-    if (pushbackInputStream.read(magicNumber, 0, magicNumberLength) == magicNumberLength
-      && Arrays.equals(DUMP_FORMAT_MAGIC_NUMBER, magicNumber)) {
+    if (magicNumberLength == pushbackInputStream.read(magicNumber, 0, magicNumberLength)
+        && Arrays.equals(DUMP_FORMAT_MAGIC_NUMBER, magicNumber)) {
 
       DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
       int dumpVersion = dataInputStream.readInt();
-      getDumpFormatForVersion(dumpVersion)
-        .merge(dataInputStream, scene, taskTracker);
+      getDumpFormatForVersion(dumpVersion).merge(dataInputStream, scene, taskTracker);
     } else {
       // Old format that is a gzipped stream, the header needs to be pushed back
       pushbackInputStream.unread(magicNumber, 0, 4);
       DataInputStream dataInputStream = new DataInputStream(new GZIPInputStream(pushbackInputStream));
-      getDumpFormatForVersion(0)
-        .merge(dataInputStream, scene, taskTracker);
+      getDumpFormatForVersion(0).merge(dataInputStream, scene, taskTracker);
     }
   }
 
-  public static void save(
-    OutputStream outputStream,
-    Scene scene,
-    TaskTracker taskTracker
-  ) throws IOException {
+  public static void save(OutputStream outputStream, Scene scene, TaskTracker taskTracker) throws IOException {
     outputStream.write(DUMP_FORMAT_MAGIC_NUMBER);
     DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
     DumpFormat format = getDumpFormatForVersion(CURRENT_DUMP_VERSION);
