@@ -65,6 +65,8 @@ public class NishitaSky implements SimulatedSky {
       sunIntensity = sun.getIntensity();
 
       this.horizonOffset = horizonOffset;
+      sunPosition.y += horizonOffset;
+      sunPosition.normalize();
 
       return true;
     }
@@ -86,7 +88,8 @@ public class NishitaSky implements SimulatedSky {
     // Render from just above the surface of "earth"
     Vector3 origin = new Vector3(0, ray.o.y + EARTH_RADIUS + 1, 0);
     Vector3 direction = ray.d;
-    direction.y += horizonOffset * (1 - direction.y);
+    direction.y += horizonOffset;
+    direction.normalize();
 
     // Calculate the distance from the origin to the edge of the atmosphere
     double distance = sphereIntersect(origin, direction, EARTH_RADIUS + ATM_THICKNESS);
