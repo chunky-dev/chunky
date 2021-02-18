@@ -16,9 +16,11 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
-import se.llbit.util.TaskTracker;
-
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.function.IntConsumer;
 
 /**
@@ -148,11 +150,7 @@ public class FloatingPointCompressor {
     }
   }
 
-  public static void compress(
-    OutputStream output,
-    double[] input,
-    IntConsumer pixelProgress
-  ) throws IOException {
+  public static void compress(OutputStream output, double[] input, IntConsumer pixelProgress) throws IOException {
     try (BufferedOutputStream out = new BufferedOutputStream(output)) {
       if (input.length % 3 != 0)
         throw new IllegalArgumentException("Dump doesn't have a multiple of 3 values");
@@ -183,12 +181,8 @@ public class FloatingPointCompressor {
     }
   }
 
-  public static void decompress(
-    InputStream input,
-    int bufferLength,
-    PixelConsumer consumer,
-    IntConsumer pixelProgress
-  ) throws IOException {
+  public static void decompress(InputStream input, int bufferLength, PixelConsumer consumer, IntConsumer pixelProgress)
+      throws IOException {
     try (BufferedInputStream in = new BufferedInputStream(input)) {
       if (bufferLength % 3 != 0)
         throw new IllegalArgumentException("Dump doesn't have a multiple of 3 values");

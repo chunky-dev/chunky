@@ -31,31 +31,13 @@ class CompressedFloatDumpFormat extends DumpFormat {
   }
 
   @Override
-  public void readSamples(
-    DataInputStream inputStream,
-    Scene scene,
-    PixelConsumer consumer,
-    IntConsumer pixelProgress
-  ) throws IOException {
-    double[] buffer = scene.getSampleBuffer();
-    FloatingPointCompressor.decompress(
-      inputStream,
-      buffer.length,
-      consumer,
-      pixelProgress
-    );
+  public void readSamples(DataInputStream inputStream, Scene scene, PixelConsumer consumer, IntConsumer pixelProgress)
+      throws IOException {
+    FloatingPointCompressor.decompress(inputStream, scene.getSampleBuffer().length, consumer, pixelProgress);
   }
 
   @Override
-  public void writeSamples(
-    DataOutputStream outputStream,
-    Scene scene,
-    IntConsumer pixelProgress
-  ) throws IOException {
-    FloatingPointCompressor.compress(
-      outputStream,
-      scene.getSampleBuffer(),
-      pixelProgress
-    );
+  public void writeSamples(DataOutputStream outputStream, Scene scene, IntConsumer pixelProgress) throws IOException {
+    FloatingPointCompressor.compress(outputStream, scene.getSampleBuffer(), pixelProgress);
   }
 }
