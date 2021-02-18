@@ -33,12 +33,8 @@ class ClassicDumpFormat extends DumpFormat {
   }
 
   @Override
-  public void readSamples(
-    DataInputStream inputStream,
-    Scene scene,
-    PixelConsumer consumer,
-    LongConsumer pixelProgress
-  ) throws IOException {
+  public void readSamples(DataInputStream inputStream, Scene scene, PixelConsumer consumer, LongConsumer pixelProgress)
+      throws IOException {
     int pixelIndex;
     double r, g, b;
     // Warning: This format writes in columns instead of rows
@@ -55,11 +51,7 @@ class ClassicDumpFormat extends DumpFormat {
   }
 
   @Override
-  public void writeSamples(
-    DataOutputStream outputStream,
-    Scene scene,
-    LongConsumer pixelProgress
-  ) throws IOException {
+  public void writeSamples(DataOutputStream outputStream, Scene scene, LongConsumer pixelProgress) throws IOException {
     SampleBuffer samples = scene.getSampleBuffer();
     int pixelIndex, index;
     // Warning: This format writes in columns instead of rows

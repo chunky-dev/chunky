@@ -16,12 +16,14 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
-import java.util.function.LongConsumer;
 import se.llbit.chunky.renderer.scene.SampleBuffer;
-import se.llbit.util.TaskTracker;
 
-import java.io.*;
-import java.util.function.IntConsumer;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.function.LongConsumer;
 
 /**
  * Implementation of the FPC algorithm
@@ -150,11 +152,7 @@ public class FloatingPointCompressor {
     }
   }
 
-  public static void compress(
-    SampleBuffer input,
-    OutputStream output,
-    LongConsumer pixelProgress
-  ) throws IOException {
+  public static void compress(SampleBuffer input, OutputStream output, LongConsumer pixelProgress) throws IOException {
     try (BufferedOutputStream out = new BufferedOutputStream(output)) {
       long size = input.numberOfPixels() - 1;
       EncoderDecoder rEncoder = new EncoderDecoder();
@@ -180,12 +178,8 @@ public class FloatingPointCompressor {
     }
   }
 
-  public static void decompress(
-      InputStream input,
-      long bufferLength,
-      PixelConsumer consumer,
-      LongConsumer pixelProgress
-  ) throws IOException {
+  public static void decompress(InputStream input, long bufferLength, PixelConsumer consumer, LongConsumer pixelProgress)
+      throws IOException {
     try (BufferedInputStream in = new BufferedInputStream(input)) {
       if (bufferLength % 3 != 0)
         throw new IllegalArgumentException("Dump doesn't have a multiple of 3 values");
