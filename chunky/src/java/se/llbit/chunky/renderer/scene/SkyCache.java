@@ -34,8 +34,6 @@ public class SkyCache {
   private SimulatedSky simSky;
   private Sky sky;
 
-  private int version = 0;
-
   /**
    * An on-the-fly sky cache. Automatically calculates sky colors as they are requested and caches them. Any repeat
    * requests will pull from the cache.
@@ -52,25 +50,14 @@ public class SkyCache {
 
   /** Sync this cache with another cache */
   public void syncCache(SkyCache cache) {
-    if (this.skyResolution != cache.skyResolution) {
-      setSkyResolution(cache.skyResolution);
-    }
-
-    if (this.simSky != cache.simSky) {
-      this.simSky = cache.simSky;
-      skyTexture = null;
-    }
-
-    if (this.version != cache.version) {
-      this.version = cache.version;
-      skyTexture = null;
-    }
+    this.skyResolution = cache.skyResolution;
+    this.simSky = cache.simSky;
+    skyTexture = null;
   }
 
   /** Reset the sky cache */
   public void reset(Sky sky) {
     simSky = sky.getSimulatedSky();
-    version += 1;
 
     // Sky has not yet been initialized. No need to reset.
     if (skyTexture == null) {

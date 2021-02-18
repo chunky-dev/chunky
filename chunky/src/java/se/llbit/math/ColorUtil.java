@@ -1,4 +1,5 @@
-/* Copyright (c) 2012 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -272,7 +273,7 @@ public final class ColorUtil {
       hue = (((r - g) / delta) + 4) / 6.0;
     }
 
-    hsl.set(hue, cmax == 0 ? 0 : delta / (1 - FastMath.abs(2*lightness - 1)), lightness);
+    hsl.set(hue, delta < Ray.EPSILON ? 0 : delta / (1 - FastMath.abs(2*lightness - 1)), lightness);
   }
 
   public static Vector3 RGBtoHSL(double r, double g, double b) {
