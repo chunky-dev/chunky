@@ -427,9 +427,7 @@ public class Sky implements JsonSerializable {
         getSkyDiffuseColorInner(ray);
       }
     }
-    if (scene.sunEnabled) {
-      addSunColor(ray);
-    }
+    addSunColor(ray);
     //ray.color.scale(skyLightModifier);
     ray.color.w = 1;
   }
@@ -439,9 +437,7 @@ public class Sky implements JsonSerializable {
    */
   public void getSkySpecularColor(Ray ray) {
     getSkyColor(ray);
-    if (scene.sunEnabled) {
-      addSunColor(ray);
-    }
+    addSunColor(ray);
   }
 
   /**
