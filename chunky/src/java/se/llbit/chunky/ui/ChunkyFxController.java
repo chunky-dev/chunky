@@ -332,7 +332,7 @@ public class ChunkyFxController
       Platform.runLater(() -> {
         synchronized (scene) {
           sceneNameField.setText(scene.name());
-          canvas.setCanvasSize(scene.width, scene.height);
+          canvas.setCanvasSize(scene.subareaWidth(), scene.subareaHeight());
         }
         updateTitle();
         refreshSettings();

@@ -238,27 +238,27 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
     });
     makeDefaultSize.setTooltip(new Tooltip("Make the current canvas size the default."));
     makeDefaultSize.setOnAction(e -> PersistentSettings
-        .set3DCanvasSize(scene.canvasWidth(), scene.canvasHeight()));
+        .set3DCanvasSize(scene.renderWidth(), scene.renderHeight()));
     setDefaultYMin.setTooltip(new Tooltip("Make this the default lower Y clip plane."));
     setDefaultYMin.setOnAction(e -> PersistentSettings.setYClipMin(yMin.get()));
     setDefaultYMax.setTooltip(new Tooltip("Make this the default upper Y clip plane."));
     setDefaultYMax.setOnAction(e -> PersistentSettings.setYClipMax(yMax.get()));
     scale15.setTooltip(new Tooltip("Halve canvas width and height."));
     scale05.setOnAction(e -> {
-      int width = scene.canvasWidth() / 2;
-      int height = scene.canvasHeight() / 2;
+      int width = scene.renderWidth() / 2;
+      int height = scene.renderHeight() / 2;
       setCanvasSize(width, height);
     });
     scale15.setTooltip(new Tooltip("Multiply canvas width and height by 1.5."));
     scale15.setOnAction(e -> {
-      int width = (int) (scene.canvasWidth() * 1.5);
-      int height = (int) (scene.canvasHeight() * 1.5);
+      int width = (int) (scene.renderWidth() * 1.5);
+      int height = (int) (scene.renderHeight() * 1.5);
       setCanvasSize(width, height);
     });
     scale20.setTooltip(new Tooltip("Multiply canvas width and height by 2.0."));
     scale20.setOnAction(e -> {
-      int width = scene.canvasWidth() * 2;
-      int height = scene.canvasHeight() * 2;
+      int width = scene.renderWidth() * 2;
+      int height = scene.renderHeight() * 2;
       setCanvasSize(width, height);
     });
   }
@@ -272,8 +272,8 @@ public class GeneralTab extends ScrollPane implements RenderControlsTab, Initial
         int width = Integer.parseInt(matcher.group(1));
         int height = Integer.parseInt(matcher.group(2));
         RenderCanvasFx canvas = renderControls.getCanvas();
-        canvas.setCanvasSize(width, height);
         scene.setCanvasSize(width, height);
+        canvas.setCanvasSize(width, height);
       } else {
         Log.info("Failed to set canvas size: format must be <width>x<height>!");
       }

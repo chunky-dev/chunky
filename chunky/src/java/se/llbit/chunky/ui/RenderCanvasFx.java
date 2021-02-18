@@ -69,7 +69,7 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
   // Oh, and also, the crash happens at different minimum canvas sizes
   // unique to each computer.
   private static final int REDUCED_CANVAS_MAX_SIZE = 4096; // TODO: set via command line/launcher arg?
-  private boolean previewShouldSubsample = false;
+  private boolean previewShouldSubsample = true;
 
   private final se.llbit.chunky.renderer.scene.Scene renderScene;
 
@@ -100,9 +100,9 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
     canvas = new Canvas();
     synchronized (scene) {
-      canvas.setWidth(scene.width);
-      canvas.setHeight(scene.height);
-      Pair<Integer, Integer> scaledSize = getScaledSize(scene.width, scene.height, REDUCED_CANVAS_MAX_SIZE);
+      canvas.setWidth(scene.subareaWidth());
+      canvas.setHeight(scene.subareaHeight());
+      Pair<Integer, Integer> scaledSize = getScaledSize(scene.subareaWidth(), scene.subareaHeight(), REDUCED_CANVAS_MAX_SIZE);
       image = new WritableImage(scaledSize.thing1, scaledSize.thing2);
     }
 

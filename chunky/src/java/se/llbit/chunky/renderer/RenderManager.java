@@ -241,8 +241,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    * @return the current rendering speed in samples per second (SPS)
    */
   private int samplesPerSecond() {
-    int canvasWidth = bufferedScene.canvasWidth();
-    int canvasHeight = bufferedScene.canvasHeight();
+    long canvasWidth = bufferedScene.subareaWidth();
+    long canvasHeight = bufferedScene.subareaHeight();
     long pixelsPerFrame = canvasWidth * canvasHeight;
     double renderTime = bufferedScene.renderTime / 1000.0;
     return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
@@ -325,8 +325,8 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    * Assign render jobs to tiles of the canvas.
    */
   private void initializeJobQueue() {
-    int canvasWidth = bufferedScene.canvasWidth();
-    int canvasHeight = bufferedScene.canvasHeight();
+    int canvasWidth = bufferedScene.subareaWidth();
+    int canvasHeight = bufferedScene.subareaHeight();
     numJobs = ((canvasWidth + (tileWidth - 1)) / tileWidth)
         * ((canvasHeight + (tileWidth - 1)) / tileWidth);
     if (tileQueue.length != numJobs) {
@@ -335,6 +335,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
     int xjobs = (canvasWidth + (tileWidth - 1)) / tileWidth;
     for (int job = 0; job < numJobs; ++job) {
       // Calculate pixel bounds for this job.
+      // Note: these pixel bounds are indexed to the cropped film's origin, not the full render's origin.
       int x0 = tileWidth * (job % xjobs);
       int x1 = Math.min(x0 + tileWidth, canvasWidth);
       int y0 = tileWidth * (job / xjobs);

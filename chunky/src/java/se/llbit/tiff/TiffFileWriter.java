@@ -217,8 +217,8 @@ public class TiffFileWriter implements AutoCloseable {
    * Write an image as a 32-bit per channel TIFF file.
    */
   public void write32(Scene scene, TaskTracker.Task task) throws IOException {
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    int width = scene.subareaWidth();
+    int height = scene.subareaHeight();
     writeHeader(width, height, 4);
     for (int y = 0; y < height; ++y) {
       task.update(height, y);

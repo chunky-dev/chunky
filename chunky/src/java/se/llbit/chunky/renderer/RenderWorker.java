@@ -104,11 +104,11 @@ public class RenderWorker extends Thread {
     Random random = state.random;
     Ray ray = state.ray;
 
-    int width = scene.canvasWidth();
-    int height = scene.canvasHeight();
+    int cx = scene.crop_x;
+    int cy = scene.crop_y;
 
-    double halfWidth = width / (2.0 * height);
-    double invHeight = 1.0 / height;
+    double halfWidth = scene.renderWidth() / (2.0 * scene.renderHeight());
+    double invHeight = 1.0 / scene.renderHeight();
 
     SampleBuffer samples = scene.getSampleBuffer();
     final Camera cam = scene.camera();
@@ -126,8 +126,9 @@ public class RenderWorker extends Thread {
             double oy = random.nextDouble();
             double ox = random.nextDouble();
 
-            cam.calcViewRay(ray, random, (-halfWidth + (x + ox) * invHeight),
-                (-.5 + (y + oy) * invHeight));
+            cam.calcViewRay(ray, random,
+                (-halfWidth + (cx + x + ox) * invHeight),
+                (-.5 + (cy + y + oy) * invHeight));
 
             scene.rayTrace(rayTracer, state);
 
@@ -146,6 +147,10 @@ public class RenderWorker extends Thread {
       }
 
     } else {
+      int width = scene.subareaWidth();
+      int height = scene.subareaHeight();
+      boolean isFullRender = scene.renderWidth()==width && scene.renderHeight()==height;
+
       // Preview rendering.
       Ray target = new Ray(ray);
       boolean hit = scene.traceTarget(target);
@@ -169,15 +174,17 @@ public class RenderWorker extends Thread {
           }
 
           // Draw the crosshairs.
-          if (x == width / 2 && (y >= height / 2 - 5 && y <= height / 2 + 5) || y == height / 2 && (
-              x >= width / 2 - 5 && x <= width / 2 + 5)) {
+          if (isFullRender && (
+              (x == width / 2 && y >= height / 2 - 5 && y <= height / 2 + 5) ||
+              (y == height / 2 && x >= width / 2 - 5 && x <= width / 2 + 5)
+          )) {
             samples.setPixel(x,y,0xFF,0xFF,0xFF);
             scene.finalizePixel(x, y);
             continue;
           }
 
-          cam.calcViewRay(ray, random, (-halfWidth + (double) x * invHeight),
-              (-.5 + (double) y * invHeight));
+          cam.calcViewRay(ray, random, (-halfWidth + (double) (x+cx) * invHeight),
+              (-.5 + (double) (y+cy) * invHeight));
 
           scene.rayTrace(previewRayTracer, state);
 

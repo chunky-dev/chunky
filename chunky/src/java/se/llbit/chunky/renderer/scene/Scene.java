@@ -157,15 +157,19 @@ public class Scene implements JsonSerializable, Refreshable {
   public int sdfVersion = -1;
   public String name = "default_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
-  /**
-   * Canvas width.
-   */
+  /** Rendering canvas width. */
+  private int subareaWidth;
+  /** Full output image's width. */
   public int width;
 
-  /**
-   * Canvas height.
-   */
+  /** Canvas height. */
+  private int subareaHeight;
+  /** Full output image's height. */
   public int height;
+
+  // From top left corner:
+  public int crop_x;
+  public int crop_y;
 
   public Postprocess postprocess = Postprocess.DEFAULT;
   public OutputMode outputMode = OutputMode.DEFAULT;
@@ -319,6 +323,9 @@ public class Scene implements JsonSerializable, Refreshable {
   public Scene() {
     width = PersistentSettings.get3DCanvasWidth();
     height = PersistentSettings.get3DCanvasHeight();
+    crop_x = crop_y = 0;
+    subareaWidth = width;
+    subareaHeight = height;
     sppTarget = PersistentSettings.getSppTargetDefault();
 
     palette = new BlockPalette();
@@ -357,9 +364,9 @@ public class Scene implements JsonSerializable, Refreshable {
    * scene and after scene canvas size changes.
    */
   public synchronized void initBuffers() {
-    frontBuffer = new BitmapImage(width, height);
-    backBuffer = new BitmapImage(width, height);
-    samples = new SampleBuffer(width,height);
+    frontBuffer = new BitmapImage(subareaWidth, subareaHeight);
+    backBuffer = new BitmapImage(subareaWidth, subareaHeight);
+    samples = new SampleBuffer(subareaWidth, subareaHeight);
     if (transparentSky())
       samples.enableAlpha();
   }
@@ -442,6 +449,10 @@ public class Scene implements JsonSerializable, Refreshable {
     if (samples != other.samples) {
       width = other.width;
       height = other.height;
+      crop_x = other.crop_x;
+      crop_y = other.crop_y;
+      subareaWidth = other.subareaWidth;
+      subareaHeight = other.subareaHeight;
       backBuffer = other.backBuffer;
       frontBuffer = other.frontBuffer;
       samples = other.samples;
@@ -1702,26 +1713,35 @@ public class Scene implements JsonSerializable, Refreshable {
   public synchronized void setCanvasSize(int canvasWidth, int canvasHeight) {
     int newWidth = Math.max(MIN_CANVAS_WIDTH, canvasWidth);
     int newHeight = Math.max(MIN_CANVAS_HEIGHT, canvasHeight);
-    if (newWidth != width || newHeight != height) {
+    if (newWidth != width || newHeight != height || crop_x != 0 || crop_y != 0 || subareaWidth != width || subareaHeight != height) {
       width = newWidth;
       height = newHeight;
+      crop_x = crop_y = 0;
+      subareaWidth = width;
+      subareaHeight = height;
       initBuffers();
       refresh();
     }
   }
 
-  /**
-   * @return Canvas width
-   */
-  public int canvasWidth() {
+  /** @return Canvas width */
+  public int renderWidth() {
     return width;
   }
 
-  /**
-   * @return Canvas height
-   */
-  public int canvasHeight() {
+  /** @return Canvas height */
+  public int renderHeight() {
     return height;
+  }
+
+  /** @return Subarea width */
+  public int subareaWidth() {
+    return subareaWidth;
+  }
+
+  /** @return Subarea height */
+  public int subareaHeight() {
+    return subareaHeight;
   }
 
   /**
@@ -1869,6 +1889,8 @@ public class Scene implements JsonSerializable, Refreshable {
   private void writePng(OutputStream out, TaskTracker taskTracker) throws IOException {
     try (TaskTracker.Task task = taskTracker.task("Writing PNG");
         PngFileWriter writer = new PngFileWriter(out)) {
+      int width = subareaWidth;
+      int height = subareaHeight;
       if (transparentSky) {
         writer.write(backBuffer, samples, width, height, task);
       } else {
@@ -1923,7 +1945,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * @param out output stream to write to.
    */
   private void writePfm(OutputStream out, TaskTracker taskTracker) throws IOException {
-    try (TaskTracker.Task task = taskTracker.task("Writing PFM Rows", canvasHeight());
+    try (TaskTracker.Task task = taskTracker.task("Writing PFM Rows", renderHeight());
          PfmFileWriter writer = new PfmFileWriter(out)) {
       writer.write(this, task);
     }
@@ -2444,6 +2466,12 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("name", name);
     json.add("width", width);
     json.add("height", height);
+    JsonArray crop = new JsonArray(4);
+    crop.add(crop_x);
+    crop.add(crop_y);
+    crop.add(subareaWidth);
+    crop.add(subareaHeight);
+    json.add("crop", crop);
     json.add("yClipMin", yClipMin);
     json.add("yClipMax", yClipMax);
     json.add("exposure", exposure);
@@ -2698,9 +2726,20 @@ public class Scene implements JsonSerializable, Refreshable {
 
     int newWidth = json.get("width").intValue(width);
     int newHeight = json.get("height").intValue(height);
-    if (width != newWidth || height != newHeight || samples == null) {
+    JsonArray crop = json.get("crop").array();
+    int newCropX = crop.get(0).intValue(0);
+    int newCropY = crop.get(1).intValue(0);
+    int newCropWidth = crop.get(2).intValue(newWidth);
+    int newCropHeight = crop.get(3).intValue(newHeight);
+    if (samples == null || width != newWidth || height != newHeight
+        || newCropX != crop_x || newCropWidth != subareaWidth
+        || newCropY != crop_y || newCropHeight != subareaHeight) {
       width = newWidth;
       height = newHeight;
+      crop_x = newCropX;
+      crop_y = newCropY;
+      subareaWidth = newCropWidth;
+      subareaHeight = newCropHeight;
       initBuffers();
     }
 
