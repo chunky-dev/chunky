@@ -19,9 +19,11 @@ package se.llbit.chunky.resources;
 import javafx.scene.image.Image;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.projection.ApertureProjector;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.pbr.EmissionMap;
 import se.llbit.chunky.resources.pbr.MetalnessMap;
+import se.llbit.chunky.resources.pbr.NormalMap;
 import se.llbit.chunky.resources.pbr.ReflectanceMap;
 import se.llbit.chunky.resources.pbr.RoughnessMap;
 import se.llbit.chunky.resources.texturepack.FontTexture;
@@ -1538,6 +1540,7 @@ public class Texture {
   private ReflectanceMap reflectanceMap = ReflectanceMap.DEFAULT;
   private RoughnessMap roughnessMap = RoughnessMap.DEFAULT;
   private MetalnessMap metalnessMap = MetalnessMap.DEFAULT;
+  private NormalMap normalMap;
 
   public Texture() {
     this(ImageLoader.missingImage);
@@ -1624,6 +1627,14 @@ public class Texture {
 
   public float getMetalnessAt(double u, double v) {
     return metalnessMap.getMetalnessAt(u, v);
+  }
+
+  public NormalMap getNormalMap() {
+    return normalMap;
+  }
+
+  public void setNormalMap(NormalMap normalMap) {
+    this.normalMap = normalMap;
   }
 
   /**
@@ -1782,5 +1793,6 @@ public class Texture {
     setReflectanceMap(ReflectanceMap.DEFAULT);
     setRoughnessMap(RoughnessMap.DEFAULT);
     setMetalnessMap(MetalnessMap.DEFAULT);
+    setNormalMap(null);
   }
 }

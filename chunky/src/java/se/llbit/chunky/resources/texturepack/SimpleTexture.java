@@ -75,45 +75,59 @@ public class SimpleTexture extends TextureLoader {
   @Override
   public boolean load(String file, LayeredResourcePacks texturePack) {
     boolean loaded = super.load(file, texturePack);
-    String specularFormat = System.getProperty("chunky.pbr.specular", "");
+    String specularFormat = System.getProperty("chunky.pbr.specular", "labpbr");
     if (specularFormat.equals("oldpbr") || specularFormat.equals("labpbr")) {
-      Optional<InputStream> in;
+      Optional<InputStream> in = Optional.empty();
       try {
         in = texturePack.getInputStream(file + "_s.png");
       } catch (IOException e) {
-        return false;
       }
-      if (in.isEmpty()) {
-        return false;
-      }
-      try {
-        // LabPBR uses the alpha channel for the emission map
-        // Some resource packs use the blue channel (Red=Smoothness, Green=Metalness, Blue=Emission)
-        // (In BSL, this option is called "Old PBR + Emissive")
-        if (specularFormat.equals("oldpbr")) {
-          OldPbrSpecularMap specular = new OldPbrSpecularMap(getTextureOrFirstFrame(in.get()));
-          texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
-          texture.setReflectanceMap(ReflectanceMap.DEFAULT);
-          texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
-        } else if (specularFormat.equals("labpbr")) {
-          LabPbrSpecularMap specular = new LabPbrSpecularMap(getTextureOrFirstFrame(in.get()));
-          texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
-          texture.setReflectanceMap(specular.hasReflectance() ? specular : ReflectanceMap.EMPTY);
-          texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
-          texture.setMetalnessMap(specular.hasMetalness() ? specular : MetalnessMap.EMPTY);
-        }
-      } catch (IOException e) {
-        // Safe to ignore
-        texture.setEmissionMap(EmissionMap.EMPTY);
-        texture.setReflectanceMap(ReflectanceMap.EMPTY);
-        texture.setRoughnessMap(RoughnessMap.EMPTY);
-        texture.setMetalnessMap(MetalnessMap.EMPTY);
-      } finally {
+      if (in.isPresent()) {
         try {
-          in.get().close();
+          // LabPBR uses the alpha channel for the emission map
+          // Some resource packs use the blue channel (Red=Smoothness, Green=Metalness, Blue=Emission)
+          // (In BSL, this option is called "Old PBR + Emissive")
+          if (specularFormat.equals("oldpbr")) {
+            OldPbrSpecularMap specular = new OldPbrSpecularMap(getTextureOrFirstFrame(in.get()));
+            texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
+            texture.setReflectanceMap(ReflectanceMap.DEFAULT);
+            texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
+          } else if (specularFormat.equals("labpbr")) {
+            LabPbrSpecularMap specular = new LabPbrSpecularMap(getTextureOrFirstFrame(in.get()));
+            texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
+            texture.setReflectanceMap(specular.hasReflectance() ? specular : ReflectanceMap.EMPTY);
+            texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
+            texture.setMetalnessMap(specular.hasMetalness() ? specular : MetalnessMap.EMPTY);
+          }
         } catch (IOException e) {
-          // ignore
+          // Safe to ignore
+          texture.setEmissionMap(EmissionMap.EMPTY);
+          texture.setReflectanceMap(ReflectanceMap.EMPTY);
+          texture.setRoughnessMap(RoughnessMap.EMPTY);
+          texture.setMetalnessMap(MetalnessMap.EMPTY);
+        } finally {
+          try {
+            in.get().close();
+          } catch (IOException e) {
+            // ignore
+          }
         }
+      }
+    }
+    if (System.getProperty("chunky.pbr.normal", "false").equals("true")) {
+      Optional<InputStream> in = Optional.empty();
+      try {
+        in = texturePack.getInputStream(file + "_n.png");
+      } catch (IOException e) {
+      }
+      if (in.isPresent()) {
+        try {
+          texture.setNormalMap(new NormalMap(getTextureOrFirstFrame(in.get())));
+        } catch (IOException e) {
+          texture.setNormalMap(null);
+        }
+      } else {
+        texture.setNormalMap(null);
       }
     }
 
