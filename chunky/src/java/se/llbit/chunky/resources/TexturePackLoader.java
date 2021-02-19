@@ -3593,6 +3593,11 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/small_dripleaf_stem_bottom", Texture.smallDripleafStemBottom);
     addSimpleTexture("assets/minecraft/textures/block/spore_blossom", Texture.sporeBlossom);
     addSimpleTexture("assets/minecraft/textures/block/spore_blossom_base", Texture.sporeBlossomBase);
+    addSimpleTexture("assets/minecraft/textures/block/grimstone", Texture.grimstone);
+    addSimpleTexture("assets/minecraft/textures/block/polished_grimstone", Texture.polishedGrimstone);
+    addSimpleTexture("assets/minecraft/textures/block/chiseled_grimstone", Texture.chiseledGrimstone);
+    addSimpleTexture("assets/minecraft/textures/block/grimstone_bricks", Texture.grimstoneBricks);
+    addSimpleTexture("assets/minecraft/textures/block/grimstone_tiles", Texture.grimstoneTiles);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
