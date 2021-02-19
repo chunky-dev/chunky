@@ -20,6 +20,7 @@ import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.pbr.LabPbrSpecularMap;
 import se.llbit.chunky.resources.pbr.MetalnessMap;
+import se.llbit.chunky.resources.pbr.NormalMap;
 import se.llbit.chunky.resources.pbr.OldPbrSpecularMap;
 import se.llbit.chunky.resources.pbr.EmissionMap;
 import se.llbit.chunky.resources.pbr.ReflectanceMap;
@@ -80,7 +81,7 @@ public class SimpleTexture extends TextureLoader {
   @Override
   public boolean load(String file, Path texturePack) {
     boolean loaded = super.load(file, texturePack);
-    String specularFormat = System.getProperty("chunky.pbr.specular", "");
+    String specularFormat = System.getProperty("chunky.pbr.specular", "labpbr");
     if (specularFormat.equals("oldpbr") || specularFormat.equals("labpbr")) {
       try (InputStream in = Files.newInputStream(texturePack.resolve(file + "_s.png"))) {
         // LabPBR uses the alpha channel for the emission map
@@ -104,6 +105,17 @@ public class SimpleTexture extends TextureLoader {
         texture.setReflectanceMap(ReflectanceMap.EMPTY);
         texture.setRoughnessMap(RoughnessMap.EMPTY);
           texture.setMetalnessMap(MetalnessMap.EMPTY);
+      }
+    }
+    if (System.getProperty("chunky.pbr.normal", "false").equals("true")) {
+      try (InputStream in = texturePack.getInputStream(new ZipEntry(file + "_n.png"))) {
+        if (in != null) {
+          texture.setNormalMap(new NormalMap(getTextureOrFirstFrame(in)));
+        } else {
+          texture.setNormalMap(null);
+        }
+      } catch (IOException e) {
+        // Safe to ignore
       }
     }
 
