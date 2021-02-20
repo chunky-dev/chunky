@@ -83,25 +83,28 @@ class UncompressedSppDump extends DumpFormat {
     outputStream.writeChars(SECTION_HEADER_SAMPLES);
 
     //****SAMPLES****//
-    try (TaskTracker.Task task = taskTracker.task("Saving render dump - Samples", pixelRange.widthZ())){
-      for (int y = pixelRange.zmin; y < pixelRange.zmax; y++)
+    int taskCoef = pixelRange.widthX();
+    try (TaskTracker.Task task = taskTracker.task("Saving render dump - Samples", taskCoef * pixelRange.widthZ())) {
+      for (int y = pixelRange.zmin; y < pixelRange.zmax; y++) {
         for (int x = pixelRange.xmin; x < pixelRange.xmax; x++) {
-          outputStream.writeDouble(samples.get(x,y,0));
-          outputStream.writeDouble(samples.get(x,y,1));
-          outputStream.writeDouble(samples.get(x,y,2));
-//          task.update(x * pixelRange.widthX() + y);
+          outputStream.writeDouble(samples.get(x, y, 0));
+          outputStream.writeDouble(samples.get(x, y, 1));
+          outputStream.writeDouble(samples.get(x, y, 2));
         }
+        task.update(taskCoef * (y - pixelRange.zmin));
+      }
       outputStream.flush();
     }
 
     outputStream.writeChars(SECTION_HEADER_SPP);
 
     //****SPP****//
-    try (TaskTracker.Task task = taskTracker.task("Saving render dump - Sample Count", pixelRange.widthZ())) {
+    taskCoef = pixelRange.widthX();
+    try (TaskTracker.Task task = taskTracker.task("Saving render dump - Sample Count", taskCoef * pixelRange.widthZ())) {
       for (int y = pixelRange.zmin; y < pixelRange.zmax; y++) {
         for (int x = pixelRange.xmin; x < pixelRange.xmax; x++)
           outputStream.writeInt(samples.getSpp(x, y));
-//        task.update(y-pixelRange.zmin);
+        task.update(taskCoef * (y - pixelRange.zmin));
       }
     }
     outputStream.writeChars(SECTION_HEADER_EOF);
@@ -114,7 +117,7 @@ class UncompressedSppDump extends DumpFormat {
     SampleBuffer samples;
     int width, height;
 
-    try (TaskTracker.Task task = taskTracker.task("Loading render dump - Header", scene.renderWidth() * scene.renderHeight())) {
+    try (TaskTracker.Task task = taskTracker.task("Loading render dump - Header", 1)) {
       int renderWidth = inputStream.readInt();
       int renderHeight = inputStream.readInt();
 
@@ -140,29 +143,30 @@ class UncompressedSppDump extends DumpFormat {
       long flags = inputStream.readLong();
     }
 
-    if (!(""+inputStream.readChar()+inputStream.readChar()+inputStream.readChar()).equals(SECTION_HEADER_SAMPLES))
+    if (!("" + inputStream.readChar() + inputStream.readChar() + inputStream.readChar()).equals(SECTION_HEADER_SAMPLES))
       throw new StreamCorruptedException("Expected Sample Marker");
 
-    try (TaskTracker.Task task = taskTracker.task("Loading render dump - Samples", scene.renderWidth() * scene.renderHeight())) {
-      for (int y = 0; y < height; y++)
-        for (int x = 0; x < width; x++) {
-          samples.setPixel(x,y,inputStream.readDouble(),inputStream.readDouble(),inputStream.readDouble());
-//          task.update(x * width + y);
-        }
+    int taskCoef = scene.renderWidth();
+    try (TaskTracker.Task task = taskTracker.task("Loading render dump - Samples", taskCoef * scene.renderHeight())) {
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++)
+          samples.setPixel(x, y, inputStream.readDouble(), inputStream.readDouble(), inputStream.readDouble());
+        task.update(taskCoef * y);
+      }
     }
 
-    if (!(""+inputStream.readChar()+inputStream.readChar()+inputStream.readChar()).equals(SECTION_HEADER_SPP))
+    if (!("" + inputStream.readChar() + inputStream.readChar() + inputStream.readChar()).equals(SECTION_HEADER_SPP))
       throw new StreamCorruptedException("Expected SPP Marker");
 
-    try (TaskTracker.Task task = taskTracker.task("Loading render dump - Sample Count", scene.renderWidth() * scene.renderHeight())) {
-      for (int y = 0; y < height; y++)
-        for (int x = 0; x < width; x++) {
+    try (TaskTracker.Task task = taskTracker.task("Loading render dump - Sample Count", taskCoef * scene.renderHeight())) {
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++)
           samples.setSpp(x, y, inputStream.readInt());
-//          task.update(x * width + y);
-        }
+        task.update(taskCoef * y);
+      }
     }
 
-    if (!(""+inputStream.readChar()+inputStream.readChar()+inputStream.readChar()).equals(SECTION_HEADER_EOF))
+    if (!("" + inputStream.readChar() + inputStream.readChar() + inputStream.readChar()).equals(SECTION_HEADER_EOF))
       throw new StreamCorruptedException("Expected Done Marker");
 
     inputStream.close();
@@ -181,7 +185,7 @@ class UncompressedSppDump extends DumpFormat {
     SampleBuffer sb1 = scene.getSampleBuffer();
     SampleBuffer sb2 = o.getSampleBuffer();
 
-    if (scene.width!=o.width || scene.height!=o.height)
+    if (scene.width != o.width || scene.height != o.height)
       throw new Error("Failed to merge render dump - wrong canvas size.");
 
     int sxm = scene.crop_x;
@@ -196,22 +200,22 @@ class UncompressedSppDump extends DumpFormat {
 
     int xmin = FastMath.min(scene.crop_x, o.crop_x);
     int ymin = FastMath.min(scene.crop_y, o.crop_y);
-    int xmax = FastMath.max(scene.crop_x+scene.subareaWidth,o.crop_x+o.subareaWidth);
-    int ymax = FastMath.max(scene.crop_y+scene.subareaHeight,o.crop_y+o.subareaHeight);
+    int xmax = FastMath.max(scene.crop_x + scene.subareaWidth, o.crop_x + o.subareaWidth);
+    int ymax = FastMath.max(scene.crop_y + scene.subareaHeight, o.crop_y + o.subareaHeight);
     scene.crop_x = xmin;
     scene.crop_y = ymin;
-    scene.subareaWidth = xmax-xmin;
-    scene.subareaHeight = ymax-ymin;
+    scene.subareaWidth = xmax - xmin;
+    scene.subareaHeight = ymax - ymin;
     scene.initBuffers();
 
     SampleBuffer out = scene.getSampleBuffer();
 
-    int index,spp;
-    double r,g,b;
-    for (int y=0; y<sh; y++)
-      for (int x=0; x<sw; x++) {
+    int index, spp;
+    double r, g, b;
+    for (int y = 0; y < sh; y++)
+      for (int x = 0; x < sw; x++) {
         spp = sb1.getSpp(x, y);
-        if (spp!=0) {
+        if (spp != 0) {
           r = sb1.get(x, y, 0);
           g = sb1.get(x, y, 1);
           b = sb1.get(x, y, 2);
@@ -220,14 +224,14 @@ class UncompressedSppDump extends DumpFormat {
         }
       }
 
-    for (int y=0; y<oh; y++)
-      for (int x=0; x<ow; x++) {
+    for (int y = 0; y < oh; y++)
+      for (int x = 0; x < ow; x++) {
         spp = sb2.getSpp(x, y);
-        if (spp!=0) {
+        if (spp != 0) {
           r = sb2.get(x, y, 0);
           g = sb2.get(x, y, 1);
           b = sb2.get(x, y, 2);
-          index = (y + oym -ymin) * scene.subareaWidth + (x + oxm-xmin);
+          index = (y + oym - ymin) * scene.subareaWidth + (x + oxm - xmin);
           out.mergeSamples(index, spp, r, g, b);
         }
       }
@@ -246,7 +250,7 @@ class UncompressedSppDump extends DumpFormat {
     boolean done = false;
     for (int y = 0; y < sampleBuffer.rowCountSpp && !done; y++)
       for (int x = 0; x < sampleBuffer.rowSizeSpp && !done; x++)
-        if (sampleBuffer.getSpp(x, y)>0) {
+        if (sampleBuffer.getSpp(x, y) > 0) {
           ret.include(x, y);
           done = true;
         }
@@ -255,13 +259,13 @@ class UncompressedSppDump extends DumpFormat {
     // If no pixel found, dump can be empty.
     // TODO: if maxSPP in scene is 0, can return this directly without traversal.
     if (ret.equals(new IntBoundingBox()))
-      return ret.include(0,0);
+      return ret.include(0, 0);
 
     // Find lowest pixel...
-    done=false;
-    for (int y = sampleBuffer.rowCountSpp-1; y >= 0 && !done; y--)
+    done = false;
+    for (int y = sampleBuffer.rowCountSpp - 1; y >= 0 && !done; y--)
       for (int x = 0; x < sampleBuffer.rowSizeSpp && !done; x++)
-        if (sampleBuffer.getSpp(x, y)>0) {
+        if (sampleBuffer.getSpp(x, y) > 0) {
           ret.include(x, y);
           done = true;
         }
@@ -271,7 +275,7 @@ class UncompressedSppDump extends DumpFormat {
     done = false;
     for (int x = 0; x < sampleBuffer.rowSizeSpp && !done; x++)
       for (int y = 0; y < sampleBuffer.rowCountSpp && !done; y++)
-        if (sampleBuffer.getSpp(x, y)>0) {
+        if (sampleBuffer.getSpp(x, y) > 0) {
           ret.include(x, y);
           done = true;
         }
@@ -279,9 +283,9 @@ class UncompressedSppDump extends DumpFormat {
 
     // Find rightmost pixel...
     done = false;
-    for (int x = sampleBuffer.rowSizeSpp-1; x >= 0 && !done; x--)
+    for (int x = sampleBuffer.rowSizeSpp - 1; x >= 0 && !done; x--)
       for (int y = 0; y < sampleBuffer.rowCountSpp && !done; y++)
-        if (sampleBuffer.getSpp(x, y)>0) {
+        if (sampleBuffer.getSpp(x, y) > 0) {
           ret.include(x, y);
           done = true;
         }

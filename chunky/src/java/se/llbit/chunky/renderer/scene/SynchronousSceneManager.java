@@ -260,11 +260,11 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         try {
           storedScene = context.getChunky().getSceneFactory().copyScene(scene);
           String sceneName = scene.name();
-          String tempName = "zzzMERGETEMP"+(Instant.now().toString().replaceAll("[^0-9A-Za-z]",""));
+          String tempName = "zzzMERGETEMP" + (Instant.now().toString().replaceAll("[^0-9A-Za-z]", ""));
           storedScene.setName(tempName);
           saveScene();
           loadScene(tempName);
-          Scene.delete(tempName,PersistentSettings.getSceneDirectory());
+          Scene.delete(tempName, resolveSceneDirectory(tempName));
           scene.setName(sceneName);
           onSceneLoaded.run();
         } catch (IOException | InterruptedException e) {
