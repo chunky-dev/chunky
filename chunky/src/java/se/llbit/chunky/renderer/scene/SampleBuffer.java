@@ -16,12 +16,13 @@
  */
 package se.llbit.chunky.renderer.scene;
 
-import java.util.Arrays;
 import se.llbit.math.ColorUtil;
 
+import java.util.Arrays;
+
 /**
- * Holds the samples (render's pixels) as a 2d array of doubles, also tracking SPP per pixel (not
- * fully implemented, eg. Scene#spp is still in use.)
+ * Holds the samples (render's pixels) as a 2d array of doubles, also tracking SPP per pixel (not fully implemented, eg.
+ * Scene#spp is still in use.)
  */
 public class SampleBuffer {
 
@@ -106,8 +107,8 @@ public class SampleBuffer {
   }
 
   /**
-   * @param count The number of samples that this is the sum of. Use for "sppPerPass" where multiple
-   *              SPP is added each pass.
+   * @param count The number of samples that this is the sum of. Use for "sppPerPass" where multiple SPP is added each
+   *              pass.
    * @param r     Sum of red values (Not average, this will be divided by 'weight')
    * @param g     Sum of green values (Not average, this will be divided by 'weight')
    * @param b     Sum of blue values (Not average, this will be divided by 'weight')
@@ -122,26 +123,28 @@ public class SampleBuffer {
   }
 
   /**
-   * @param count The number of samples that this is the sum of. Use for "sppPerPass" where multiple
-   *              SPP is added each pass.
+   * @param count The number of samples that this is the sum of. Use for "sppPerPass" where multiple SPP is added each
+   *              pass.
    * @param r     Sum of red values (Not average, this will be divided by 'weight')
    * @param g     Sum of green values (Not average, this will be divided by 'weight')
    * @param b     Sum of blue values (Not average, this will be divided by 'weight')
    */
   public void addSamples(long index, int count, double r, double g, double b) {
-    int oldSpp = getSpp(index/3);
+    int oldSpp = getSpp(index);
+    index *= 3;
     double sinv = 1.0 / (oldSpp + count);
     set(index, sinv * (get(index) * oldSpp + r));
     set(index + 1, sinv * (get(index + 1) * oldSpp + g));
     set(index + 2, sinv * (get(index + 2) * oldSpp + b));
-    addSpp(index/3, count);
+    addSpp(index / 3, count);
   }
 
   /**
    * r g b values should be actual rgb value: eg for a red value of 90% and 20 samples, 0.9 should be passed as r.
    */
   public void mergeSamples(long index, int count, double r, double g, double b) {
-    int oldSpp = getSpp(index / 3);
+    int oldSpp = getSpp(index);
+    index *= 3;
     double sinv = 1.0 / (oldSpp + count);
     set(index, sinv * (get(index) * oldSpp + r * count));
     set(index + 1, sinv * (get(index + 1) * oldSpp + g * count));
@@ -168,11 +171,19 @@ public class SampleBuffer {
     spp[y][x] += sppIncrease;
   }
 
+  public void setSpp(int x, int y, int spp) {
+    this.spp[y][x] = spp;
+  }
+
   protected void addSpp(long index, int sppIncrease) {
     spp[(int) (index / rowSizeSpp)][(int) (index % rowSizeSpp)] += sppIncrease;
   }
 
-  public void setSampleWithSpp(int x, int y, int spp, double r, double g, double b) {
+  public void setSpp(long index, int spp) {
+    this.spp[(int) (index / rowSizeSpp)][(int) (index % rowSizeSpp)] = spp;
+  }
+
+  public void setPixelWithSpp(int x, int y, double r, double g, double b, int spp) {
     set(x, y, 0, r);
     set(x, y, 0, g);
     set(x, y, 0, b);

@@ -16,7 +16,6 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
-import java.util.function.LongConsumer;
 import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
@@ -24,6 +23,7 @@ import se.llbit.util.TaskTracker;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.function.LongConsumer;
 
 /**
  * A dump format reads a render dump from a DataInputStream into the scene/ writes a render dump from the scene into a
@@ -73,9 +73,28 @@ abstract class DumpFormat {
     readSamples(inputStream, scene, px, pixelProgress);
   }
 
+  //  protected void readSpp(DataInputStream inputStream, Scene scene, LongConsumer pixelProgress) throws IOException {
+  //    SampleBuffer buffer = scene.getSampleBuffer();
+  //    readSpp(inputStream, scene, buffer::setSpp, pixelProgress);
+  //  }
+  //
+  //  protected void readSpp(DataInputStream inputStream,
+  //                         Scene scene,
+  //                         BiConsumer<Long, Integer> sppConsumer,
+  //                         LongConsumer pixelProgress)
+  //      throws IOException {
+  //    throw new IllegalStateException("This dump format has not implemented an SPP processor.");
+  //  }
+  //
+  //
+  //
   public void merge(DataInputStream inputStream, Scene scene, TaskTracker taskTracker)
       throws IOException, IllegalStateException {
     try (TaskTracker.Task task = taskTracker.task("Merging render dump", scene.renderWidth() * scene.renderHeight())) {
+      if (scene.getSampleBuffer().width != scene.width || scene.getSampleBuffer().height != scene.height) {
+        throw new Error("Failed to merge render dump - wrong canvas size.");
+      }
+
       int previousSpp = scene.spp;
       long previousRenderTime = scene.renderTime;
 
@@ -90,7 +109,7 @@ abstract class DumpFormat {
       throws IOException {
     int dumpSpp = scene.spp;
     SampleBuffer buffer = scene.getSampleBuffer();
-    PixelConsumer px = (pixelIndex, r, g, b) -> buffer.mergeSamples(3 * pixelIndex, dumpSpp, r, g, b);
+    PixelConsumer px = (pixelIndex, r, g, b) -> buffer.mergeSamples(pixelIndex, dumpSpp, r, g, b);
     readSamples(inputStream, scene, px, pixelProgress);
   }
 
@@ -118,20 +137,20 @@ abstract class DumpFormat {
   protected abstract void writeSamples(DataOutputStream outputStream, Scene scene, LongConsumer pixelProgress)
       throws IOException;
 
-  private void updateTask(TaskTracker.Task task, Scene scene, long pixelProgress) {
+  protected void updateTask(TaskTracker.Task task, Scene scene, long pixelProgress) {
 
-    if (((long)scene.renderWidth()) * scene.renderHeight() <= Integer.MAX_VALUE) {
+    if (((long) scene.renderWidth()) * scene.renderHeight() <= Integer.MAX_VALUE) {
       int x = scene.renderWidth() * scene.renderHeight() / 100;
       // reduce number of update calls (performance reasons)
       // this results in steps of 1% progress each
       if (pixelProgress % x == 0) {
-        task.update((int)pixelProgress);
+        task.update((int) pixelProgress);
       }
     } else {
       // If larger than int max, give .1% progress updates as 1/1000 instead of out of full value (would overflow)
-      long x = ((long) scene.renderWidth())*scene.renderHeight() / 1000;
+      long x = ((long) scene.renderWidth()) * scene.renderHeight() / 1000;
       if (pixelProgress % x == 0)
-        task.update((int)(pixelProgress/x));
+        task.update((int) (pixelProgress / x));
     }
   }
 }

@@ -1,4 +1,5 @@
-/* Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -31,6 +32,7 @@ import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.function.Consumer;
 
@@ -61,7 +63,7 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
    * expired a reset confirm dialog will be shown before applying any further
    * non-transitory changes to the stored scene state.
    */
-  private final Scene storedScene;
+  private Scene storedScene;
 
   private final RenderContext context;
 
@@ -249,13 +251,27 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
    */
   protected void mergeDump(File dumpFile) {
     synchronized (scene) {
-      renderer.withSampleBufferProtected(samples ->{
-        if (samples.width != scene.width || samples.height != scene.height) {
-          throw new Error("Failed to merge render dump - wrong canvas size.");
-        }
+      renderer.withSampleBufferProtected(samples -> {
+        // Attempt a merge.
         scene.mergeDump(dumpFile, taskTracker);
+
+        // Merges can be funky. Save to file, because that helps sometimes...
+        // Oh, and it might also require a reload from file to work. Dunno why.
+        try {
+          storedScene = context.getChunky().getSceneFactory().copyScene(scene);
+          String sceneName = scene.name();
+          String tempName = "zzzMERGETEMP"+(Instant.now().toString().replaceAll("[^0-9A-Za-z]",""));
+          storedScene.setName(tempName);
+          saveScene();
+          loadScene(tempName);
+          Scene.delete(tempName,PersistentSettings.getSceneDirectory());
+          scene.setName(sceneName);
+          onSceneLoaded.run();
+        } catch (IOException | InterruptedException e) {
+          e.printStackTrace();
+          Log.error(e);
+        }
       });
-      scene.setResetReason(ResetReason.SCENE_LOADED);
     }
   }
 

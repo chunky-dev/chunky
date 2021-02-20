@@ -35,14 +35,16 @@ import java.util.zip.GZIPInputStream;
  * TODO for diligent contributors: clean up code duplication
  */
 public class RenderDump {
-  static final byte[] DUMP_FORMAT_MAGIC_NUMBER = {0x44, 0x55, 0x4D, 0x50};
+  static final byte[] DUMP_FORMAT_MAGIC_NUMBER = {0x44, 0x55, 0x4D, 0x50}; // ASCII for "DUMP"
 
-  static final int CURRENT_DUMP_VERSION = 1;
+  static final int CURRENT_DUMP_VERSION = 2;
 
   private static DumpFormat getDumpFormatForVersion(int version) {
     switch (version) {
       case 1:
         return CompressedFloatDumpFormat.INSTANCE;
+      case 2:
+        return UncompressedSppDump.INSTANCE;
       default:
         return ClassicDumpFormat.INSTANCE;
     }

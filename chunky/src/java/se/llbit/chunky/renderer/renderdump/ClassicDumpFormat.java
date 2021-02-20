@@ -16,14 +16,13 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
-import java.util.function.LongConsumer;
 import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
 
 class ClassicDumpFormat extends DumpFormat {
 

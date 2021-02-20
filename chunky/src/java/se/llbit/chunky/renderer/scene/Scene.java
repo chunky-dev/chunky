@@ -86,13 +86,11 @@ import java.util.zip.GZIPOutputStream;
  */
 public class Scene implements JsonSerializable, Refreshable {
 
-  private static final byte[] DUMP_FORMAT_MAGIC_NUMBER = {0x44, 0x55, 0x4D, 0x50};
-  private static final int DUMP_FORMAT_VERSION = 1;
   public static final int DEFAULT_DUMP_FREQUENCY = 500;
   public static final String EXTENSION = ".json";
 
   /** The current Scene Description Format (SDF) version. */
-  public static final int SDF_VERSION = 9;
+  public static final int SDF_VERSION = 10;
 
   protected static final double fSubSurface = 0.3;
 
@@ -157,12 +155,12 @@ public class Scene implements JsonSerializable, Refreshable {
   public String name = "default_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
   /** Rendering canvas width. */
-  private int subareaWidth;
+  public int subareaWidth;
   /** Full output image's width. */
   public int width;
 
   /** Canvas height. */
-  private int subareaHeight;
+  public int subareaHeight;
   /** Full output image's height. */
   public int height;
 
@@ -366,6 +364,7 @@ public class Scene implements JsonSerializable, Refreshable {
     frontBuffer = new BitmapImage(subareaWidth, subareaHeight);
     backBuffer = new BitmapImage(subareaWidth, subareaHeight);
     samples = new SampleBuffer(subareaWidth, subareaHeight);
+    spp = 0;
     if (transparentSky())
       samples.enableAlpha();
   }
@@ -2709,10 +2708,13 @@ public class Scene implements JsonSerializable, Refreshable {
     int newWidth = json.get("width").intValue(width);
     int newHeight = json.get("height").intValue(height);
     JsonArray crop = json.get("crop").array();
-    int newCropX = crop.get(0).intValue(0);
-    int newCropY = crop.get(1).intValue(0);
-    int newCropWidth = crop.get(2).intValue(newWidth);
-    int newCropHeight = crop.get(3).intValue(newHeight);
+    int newCropX=0, newCropY=0, newCropWidth=newWidth, newCropHeight=newHeight;
+    try {
+      newCropX = crop.get(0).intValue(0);
+      newCropY = crop.get(1).intValue(0);
+      newCropWidth = crop.get(2).intValue(newWidth);
+      newCropHeight = crop.get(3).intValue(newHeight);
+    } catch (IndexOutOfBoundsException ignored) {}
     if (samples == null || width != newWidth || height != newHeight
         || newCropX != crop_x || newCropWidth != subareaWidth
         || newCropY != crop_y || newCropHeight != subareaHeight) {

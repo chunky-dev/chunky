@@ -25,6 +25,8 @@ import se.llbit.util.TaskTracker;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
@@ -100,15 +102,15 @@ public class RenderDumpTests {
 
   @Test
   public void mergeClassicFormatDumpTest() throws IOException {
-    mergeDumpTest("classicFormatDump");
+    fullMergeDumpTest("classicFormatDump");
   }
 
   @Test
   public void mergeCompressedFloatFormatDumpTest() throws IOException {
-    mergeDumpTest("compressedFloatFormatDump");
+    fullMergeDumpTest("compressedFloatFormatDump");
   }
 
-  public void mergeDumpTest(String dumpName) throws IOException {
+  public void fullMergeDumpTest(String dumpName) throws IOException {
     int spp = 100;
     long renderTime = 123456L;
     double[] preMergeSamples = {0.5, 1.0, 2.0, 0.5, 1.0, 2.0, 2.0, 1.5, 2.5};
@@ -124,26 +126,62 @@ public class RenderDumpTests {
     assertArrayEquals(postMergeSamples, compileSampleBuffer(scene.getSampleBuffer(), postMergeSamples.length), 0.0);
   }
 
-  /**
-   * it is currently not expected to write the old format (but it would be possible)
-   */
   @Test
-  public void saveCompressedFloatFormatDumpTest() throws IOException {
-    saveDumpTest("compressedFloatFormatDump");
+  public void uncompressedSppDumpTest() throws IOException {
+    Scene scene = createTestScene(7, 5, 0, 0);
+    scene.width=7;scene.height=5;
+    RenderDump.load(UNCOMPRESSED_DUMP_WITH_SPP_A.get(), scene, taskTracker);
+    assert scene.width == 7 && scene.height == 5
+        : "Read UncompressedSppDump dimensions failed.";
+    assert scene.crop_x == 0 && scene.crop_y == 1 && scene.subareaWidth == 4 && scene.subareaHeight == 4
+        : "Read UncompressedSppDump crop locations failed.";
+    assertEquals("Read UncompressedSppDump black pixel", 0x01000000, scene.getSampleBuffer().getArgb(1,1));
+    assertEquals("Read UncompressedSppDump colored pixel", 0x011A4D33, scene.getSampleBuffer().getArgb(0,2));
+    assertEquals("Read UncompressedSppDump spp 0", 0, scene.getSampleBuffer().getSpp(1,1));
+    assertEquals("Read UncompressedSppDump spp", 3, scene.getSampleBuffer().getSpp(0,2));
+    assertEquals("Read UncompressedSppDump spp", 15, scene.getSampleBuffer().getSpp(1,2));
+    assertArrayEquals("Read UncompressedSppDump spp", UNCOMPRESSED_SPP_A, compileSampleBufferSpp(scene.getSampleBuffer()));
+
+    RenderDump.merge(UNCOMPRESSED_DUMP_WITH_SPP_B.get(), scene, taskTracker);
+
+
+    assertArrayEquals("Merge UncompressedSppDump spp", UNCOMPRESSED_SPP_MERGED, compileSampleBufferSpp(scene.getSampleBuffer()));
+//    assertArrayEquals(expected, compileSampleBuffer(scene.getSampleBuffer()));
   }
 
-  public void saveDumpTest(String dumpName) throws IOException {
+//  /**
+//   * it is currently not expected to write the old format (but it would be possible)
+//   */
+//  @Test
+//  public void saveCompressedFloatFormatDumpTest() throws IOException {
+//    saveDumpTest("compressedFloatFormatDump");
+//  }
+
+  @Test
+  public void saveDumpTest() throws IOException {
     Scene scene = createTestScene(testWidth, testHeight, testSPP, testRenderTime);
     fillSampleBuffer(testSampleBuffer, scene.getSampleBuffer());
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     RenderDump.save(outputStream, scene, taskTracker);
-    assertArrayEquals(getTestDump(dumpName), outputStream.toByteArray());
+    byte[] save = outputStream.toByteArray();
+    // CompressedFloatDumpFormat -> 5945, 0x9792E1E1
+    // UncompressedSppDump -> 11274, 0x895CCEF9
+    assertEquals(11274, save.length);
+    assertEquals(0x895CCEF9, Arrays.hashCode(save));
+//    assertArrayEquals(getTestDump(dumpName), save);
   }
 
 
 
   private double[] compileSampleBuffer(SampleBuffer sampleBuffer) {
     return compileSampleBuffer(sampleBuffer, sampleBuffer.rowCount*sampleBuffer.rowSize);
+  }
+  private int[] compileSampleBufferSpp(SampleBuffer sampleBuffer) {
+    int len = (int) sampleBuffer.numberOfPixels();
+    int[] ret = new int[len];
+    for (int i = 0; i<len; i++)
+      ret[i]=sampleBuffer.getSpp(i);
+    return ret;
   }
 
   private double[] compileSampleBuffer(SampleBuffer sampleBuffer, int len) {
@@ -170,4 +208,116 @@ public class RenderDumpTests {
     put("classicFormatDump", CLASSIC_TEST_DUMP_STRING);
     put("compressedFloatFormatDump", TEST_DUMP_STRING_COMPRESSED);
   }};
+
+  public static final int[] UNCOMPRESSED_SPP_A, UNCOMPRESSED_SPP_B, UNCOMPRESSED_SPP_MERGED = new int[]{
+      0,  0,    0,   0, 1,
+      0,  0,    2,   2, 0,
+      0,  0,    2, 100, 0,
+      3, 15, 1800,1460, 5,
+      0,  7,    0,   0, 0
+  };
+
+  public static final TestStreamBuilder UNCOMPRESSED_DUMP_WITH_SPP_A =
+      new TestStreamBuilder(
+          RenderDump.DUMP_FORMAT_MAGIC_NUMBER,     // File Header
+          2,          // Version
+          7, 5,       // Render Size
+          0, 1, 4, 4, // Dump's Range (bottom left 4x4)
+          0, 1200,    // SPP range within range
+          654321L,    // Render Time
+          0L,         // Dump Flags (currently unused)
+
+          "sam",      // Samples Header
+          //0d,  0d,  0d,   0d,   0d,  0d,   0d, 0d, 0d,   0.0d, 0.0d, 0.0d,    0d, 0d, 0d,
+          0.0d,  0d,  0d,   0d,   0d,  0d,   1d, 2d, 3d,   0.5d, 1.0d, 2.0d, // 0d, 0d, 0d,
+          0.0d,  0d,  0d,   0d,   0d,  0d,   3d, 2d, 1d,   0.5d, 1.0d, 2.0d, // 0d, 0d, 0d,
+          0.1d, .3d, .2d,  .4d, 1.7d, 43d,   2d, 3d, 4d,   2.0d, 1.5d, 2.5d, // 0d, 0d, 0d,
+          0.0d,  0d,  0d,   0d,   0d,  0d,   0d, 0d, 0d,   0.0d, 0.0d, 0.0d, // 0d, 0d, 0d,
+
+          "spp",      // SPP Header
+          (UNCOMPRESSED_SPP_A = new int[]{
+              0,  0,    2,   1,
+              0,  0,    0,  50,
+              3, 15, 1200, 730,
+              0,  7,    0,   0
+          }),
+
+          "dun"       // Completion Marker
+      );
+  public static final TestStreamBuilder UNCOMPRESSED_DUMP_WITH_SPP_B =
+      new TestStreamBuilder(
+          RenderDump.DUMP_FORMAT_MAGIC_NUMBER,     // File Header
+          2,          // Version
+          7, 5,       // Render Size
+          2, 0, 3, 4, // Dump's Range (middle column 3x4)
+          0, 1000,    // SPP range within range
+          123456L,    // Render Time
+          0L,         // Dump Flags (currently unused)
+
+          "sam",      // Samples Header
+          /*0d,0d,0d,   0d,0d,0d,*/  0d, 0d, 0d,   0d, 0d, 0d,   0d, 1d, 0d,
+          /*0d,0d,0d,   0d,0d,0d,*/  3d, 2d, 1d,   1d, 1d, 1d,   0d, 0d, 0d,
+          /*0d,0d,0d,   0d,0d,0d,*/  1d, 2d, 3d,   0d, 0d, 0d,   0d, 0d, 0d,
+          /*0d,0d,0d,   0d,0d,0d,*/  4d, 3d, 2d,   1d, 1d, 1d,   1d, 0d, 1d,
+          //0d,0d,0d,   0d,0d,0d,    0d, 0d, 0d,   0d, 0d, 0d,   0d, 0d, 0d,
+
+          "spp",      // SPP Header
+          (UNCOMPRESSED_SPP_B = new int[]{
+                0,   0, 1,
+                0,   1, 0,
+                2,  50, 0,
+              600, 730, 5
+          }),
+
+          "dun"       // Completion Marker
+      );
+
+  public static class TestStreamBuilder {
+    final Object[] stream;
+    private TestStreamBuilder(Object... stream) {
+      this.stream = stream;
+    }
+    public InputStream get() {
+      ByteBuffer bb = ByteBuffer.allocate(size());
+      for (Object o : stream) {
+        if (o instanceof Double)
+          bb.putDouble((Double) o);
+        else if (o instanceof Integer)
+          bb.putInt((Integer)o);
+        else if (o instanceof String)
+          for (char c : ((String) o).toCharArray())
+            bb.putChar(c);
+        else if (o instanceof Long)
+          bb.putLong((Long)o);
+        else if (o instanceof byte[])
+          for (byte b : (byte[]) o)
+            bb.put(b);
+        else if (o instanceof int[])
+          for (int i : (int[]) o)
+            bb.putInt(i);
+        else
+          throw new IllegalArgumentException("Unexpected object type: " + o.getClass());
+      }
+      return new ByteArrayInputStream(bb.array());
+    }
+
+    private int size() {
+      int count = 0;
+      for (Object o : stream) {
+        if (o instanceof Double || o instanceof Long)
+          count += 8;
+        else if (o instanceof Integer)
+          count += 4;
+        else if (o instanceof String)
+          count += ((String) o).length();
+        else if (o instanceof byte[])
+          count += ((byte[]) o).length;
+        else if (o instanceof int[])
+          count += 4*((int[]) o).length;
+        else
+          throw new IllegalArgumentException("Unexpected object type: " + o.getClass());
+      }
+      return count+16;
+    }
+  }
 }
