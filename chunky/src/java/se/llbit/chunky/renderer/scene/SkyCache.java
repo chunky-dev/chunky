@@ -22,7 +22,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.stream.IntStream;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.renderer.scene.Sky.SkyMode;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -37,7 +36,6 @@ public class SkyCache {
   private int skyResolution = 128;
 
   private SimulatedSky simSky;
-  private Sky sky;
 
   /**
    * An on-the-fly sky cache. Automatically calculates sky colors as they are requested and caches
@@ -49,45 +47,47 @@ public class SkyCache {
    * @param sky Sky object to pull sky renderer from.
    */
   public SkyCache(Sky sky) {
-    this.sky = sky;
-    precalculateSky(sky);
+    simSky = sky.getSimulatedSky();
+    precalculateSky();
+  }
+
+  /**
+   * Set this cache's content to the content of another cache.
+   */
+  public synchronized void set(SkyCache cache) {
+    this.skyResolution = cache.skyResolution;
+    this.simSky = cache.simSky;
+    this.skyTexture = cache.skyTexture;
   }
 
   /**
    * Fill the sky cache
    */
-  public synchronized void precalculateSky(Sky sky) {
-    if (sky.getSkyMode() == SkyMode.SIMULATED) {
-      simSky = sky.getSimulatedSky();
-      if (skyTexture == null || skyTexture.length != skyResolution + 1) {
-        skyTexture = new double[skyResolution + 1][skyResolution + 1][3];
-      }
+  public synchronized void precalculateSky() {
+    double[][][] skyTexture = new double[skyResolution + 1][skyResolution + 1][3];
 
-      ForkJoinPool pool = new ForkJoinPool(PersistentSettings.getNumThreads());
-      pool.submit(() -> {
-        IntStream.range(0, skyResolution + 1).parallel().forEach(i -> {
-          for (int j = 0; j < skyResolution + 1; j++) {
-            Vector3 c = getSkyColorAt(i, j);
-            skyTexture[i][j][0] = c.x;
-            skyTexture[i][j][1] = c.y;
-            skyTexture[i][j][2] = c.z;
-          }
-        });
-      }).join();
-      pool.shutdownNow();
-    } else {
-      skyTexture = null;
-    }
+    ForkJoinPool pool = new ForkJoinPool(PersistentSettings.getNumThreads());
+    pool.submit(() -> {
+      IntStream.range(0, skyResolution + 1).parallel().forEach(i -> {
+        for (int j = 0; j < skyResolution + 1; j++) {
+          Vector3 c = getSkyColorAt(i, j);
+          skyTexture[i][j][0] = c.x;
+          skyTexture[i][j][1] = c.y;
+          skyTexture[i][j][2] = c.z;
+        }
+      });
+    }).join();
+    pool.shutdownNow();
+
+    this.skyTexture = skyTexture;
   }
 
   /**
    * Adjust the sky resolution and reset the cache
    */
   public void setSkyResolution(int skyResolution) {
-    if (skyResolution != this.skyResolution) {
-      this.skyResolution = skyResolution;
-      precalculateSky(sky);
-    }
+    this.skyResolution = skyResolution;
+    precalculateSky();
   }
 
   /**
@@ -95,6 +95,11 @@ public class SkyCache {
    */
   public int getSkyResolution() {
     return this.skyResolution;
+  }
+
+  public void setSimulatedSkyMode(SimulatedSky skyMode) {
+    this.simSky = skyMode;
+    precalculateSky();
   }
 
   /**

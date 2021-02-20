@@ -427,8 +427,8 @@ public class Scene implements JsonSerializable, Refreshable {
     yClipMax = other.yClipMax;
 
     camera.set(other.camera);
-    sky.set(other.sky);
     sun.set(other.sun);
+    sky.set(other.sky);
 
     waterHeight = other.waterHeight;
 
