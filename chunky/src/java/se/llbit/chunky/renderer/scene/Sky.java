@@ -231,8 +231,8 @@ public class Sky implements JsonSerializable {
       skyboxFileName[i] = other.skyboxFileName[i];
     }
 
-    this.simulatedSkyMode = other.simulatedSkyMode;
-    this.skyCache.syncCache(other.skyCache);
+    simulatedSkyMode = other.simulatedSkyMode;
+    skyCache.precalculateSky(this);
   }
 
   /**
@@ -521,7 +521,7 @@ public class Sky implements JsonSerializable {
   public void setSimulatedSkyMode(int mode) {
     this.simulatedSkyMode = skies.get(mode);
     this.simulatedSkyMode.updateSun(scene.sun, horizonOffset);
-    skyCache.reset(this);
+    skyCache.precalculateSky(this);
     scene.refresh();
   }
 
@@ -537,7 +537,7 @@ public class Sky implements JsonSerializable {
    */
   public void updateSimulatedSky(Sun sun) {
     if (simulatedSkyMode.updateSun(sun, horizonOffset)) {
-      skyCache.reset(this);
+      skyCache.precalculateSky(this);
     }
   }
 
@@ -641,7 +641,7 @@ public class Sky implements JsonSerializable {
 
         simulatedSkyMode = match.orElseGet(() -> simulatedSkyMode);
         simulatedSkyMode.updateSun(scene.sun(), horizonOffset);
-        skyCache.reset(this);
+        skyCache.precalculateSky(this);
         scene.refresh();
         break;
       }

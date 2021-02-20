@@ -18,7 +18,11 @@ package se.llbit.chunky.renderer.scene;
 
 import static java.lang.Math.PI;
 
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.IntStream;
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.renderer.scene.Sky.SkyMode;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -46,35 +50,33 @@ public class SkyCache {
    */
   public SkyCache(Sky sky) {
     this.sky = sky;
-    skyTexture = null;
+    precalculateSky(sky);
   }
 
   /**
-   * Sync this cache with another cache
+   * Fill the sky cache
    */
-  public synchronized void syncCache(SkyCache cache) {
-    this.skyResolution = cache.skyResolution;
-    this.simSky = cache.simSky;
-    skyTexture = null;
-  }
-
-  /**
-   * Reset the sky cache
-   */
-  public synchronized void reset(Sky sky) {
-    simSky = sky.getSimulatedSky();
-
-    // Sky has not yet been initialized. No need to reset.
-    if (skyTexture == null) {
-      return;
-    }
-
-    for (int i = 0; i < skyResolution + 1; i++) {
-      for (int j = 0; j < skyResolution + 1; j++) {
-        for (int k = 0; k < 3; k++) {
-          skyTexture[i][j][k] = -1;
-        }
+  public synchronized void precalculateSky(Sky sky) {
+    if (sky.getSkyMode() == SkyMode.SIMULATED) {
+      simSky = sky.getSimulatedSky();
+      if (skyTexture == null || skyTexture.length != skyResolution + 1) {
+        skyTexture = new double[skyResolution + 1][skyResolution + 1][3];
       }
+
+      ForkJoinPool pool = new ForkJoinPool(PersistentSettings.getNumThreads());
+      pool.submit(() -> {
+        IntStream.range(0, skyResolution + 1).parallel().forEach(i -> {
+          for (int j = 0; j < skyResolution + 1; j++) {
+            Vector3 c = getSkyColorAt(i, j);
+            skyTexture[i][j][0] = c.x;
+            skyTexture[i][j][1] = c.y;
+            skyTexture[i][j][2] = c.z;
+          }
+        });
+      }).join();
+      pool.shutdownNow();
+    } else {
+      skyTexture = null;
     }
   }
 
@@ -82,8 +84,10 @@ public class SkyCache {
    * Adjust the sky resolution and reset the cache
    */
   public void setSkyResolution(int skyResolution) {
-    this.skyResolution = skyResolution;
-    skyTexture = null;
+    if (skyResolution != this.skyResolution) {
+      this.skyResolution = skyResolution;
+      precalculateSky(sky);
+    }
   }
 
   /**
@@ -98,13 +102,6 @@ public class SkyCache {
    * Cache values are bilinearly interpolated.
    */
   public Vector3 calcIncidentLight(Ray ray) {
-    synchronized (this) {
-      if (skyTexture == null) {
-        skyTexture = new double[skyResolution + 1][skyResolution + 1][3];
-        reset(sky);
-      }
-    }
-
     double theta = FastMath.atan2(ray.d.z, ray.d.x);
     theta /= PI * 2;
     theta = ((theta % 1) + 1) % 1;
@@ -129,21 +126,6 @@ public class SkyCache {
     int floorX = (int) QuickMath.clamp(x, 0, skyResolution - 1);
     int floorY = (int) QuickMath.clamp(y, 0, skyResolution - 1);
 
-    synchronized (this) {
-      if (skyTexture[floorX][floorY][0] < 0) {
-        bake(floorX, floorY);
-      }
-      if (skyTexture[floorX][floorY + 1][0] < 0) {
-        bake(floorX, floorY + 1);
-      }
-      if (skyTexture[floorX + 1][floorY][0] < 0) {
-        bake(floorX + 1, floorY);
-      }
-      if (skyTexture[floorX + 1][floorY + 1][0] < 0) {
-        bake(floorX + 1, floorY + 1);
-      }
-    }
-
     double[] color = new double[3];
     for (int i = 0; i < 3; i++) {
       double y0 = interp1D(x, floorX, floorX + 1, skyTexture[floorX][floorY][i],
@@ -158,7 +140,7 @@ public class SkyCache {
   /**
    * Calculate the sky color for a pixel on the cache.
    */
-  private void bake(int x, int y) {
+  private Vector3 getSkyColorAt(int x, int y) {
     Ray ray = new Ray();
 
     double theta = ((double) x / skyResolution) * 2 * PI;
@@ -168,11 +150,6 @@ public class SkyCache {
 
     Vector3 color = simSky.calcIncidentLight(ray);
     ColorUtil.RGBtoHSL(color, color.x, color.y, color.z);
-
-    synchronized (this) {
-      skyTexture[x][y][0] = color.x;
-      skyTexture[x][y][1] = color.y;
-      skyTexture[x][y][2] = color.z;
-    }
+    return color;
   }
 }
