@@ -94,7 +94,7 @@ public class PreethamSky implements SimulatedSky {
 
   @Override
   public boolean updateSun(Sun sun, double horizonOffset) {
-    if (theta != sun.getAltitude() || phi != sun.getAltitude() || this.horizonOffset != horizonOffset) {
+    if (theta != sun.getAzimuth() || phi != sun.getAltitude() || this.horizonOffset != horizonOffset) {
       theta = sun.getAzimuth();
       phi = sun.getAltitude();
       double r = QuickMath.abs(FastMath.cos(phi));
