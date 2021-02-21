@@ -27,6 +27,11 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 
+/**
+ * A sky cache. Precalculates sky colors and them uses cached values with bilinear interpolation.
+ * <p>
+ * Default cache size is 128x128 which seems to work well for all simulated sky modes.
+ */
 public class SkyCache {
 
   // Sky texture array, HSV colors
@@ -38,13 +43,9 @@ public class SkyCache {
   private SimulatedSky simSky;
 
   /**
-   * An on-the-fly sky cache. Automatically calculates sky colors as they are requested and caches
-   * them. Any repeat requests will pull from the cache.
-   * <p>
-   * Default cache size is 1024x1024 with bilinear interpolation which seems to work well for all
-   * simulated sky modes.
+   * Create a new sky cache for the given sky configuration and precalculate the sky texture.
    *
-   * @param sky Sky object to pull sky renderer from.
+   * @param sky Sky object to pull sky renderer from
    */
   public SkyCache(Sky sky) {
     simSky = sky.getSimulatedSky();
@@ -61,7 +62,10 @@ public class SkyCache {
   }
 
   /**
-   * Fill the sky cache
+   * Recalculate the cached sky texture.
+   * <p>
+   * The setters already invoke this method automatically so this only needs to be called manually
+   * e.g. if the sun position changes.
    */
   public synchronized void precalculateSky() {
     double[][][] skyTexture = new double[skyResolution + 1][skyResolution + 1][3];
@@ -83,7 +87,9 @@ public class SkyCache {
   }
 
   /**
-   * Adjust the sky resolution and reset the cache
+   * Adjust the sky resolution and update the precalculated sky.
+   *
+   * @param skyResolution New resolution (width and height) in pixels
    */
   public void setSkyResolution(int skyResolution) {
     this.skyResolution = skyResolution;
@@ -91,20 +97,30 @@ public class SkyCache {
   }
 
   /**
-   * Get the current sky resolution
+   * Get the current sky resolution.
+   *
+   * @return Sky resolution (width and height) in pixels
    */
   public int getSkyResolution() {
     return this.skyResolution;
   }
 
+  /**
+   * Set the sky simulation and update the precalculated sky.
+   *
+   * @param skyMode Simulated sky mode
+   */
   public void setSimulatedSkyMode(SimulatedSky skyMode) {
     this.simSky = skyMode;
     precalculateSky();
   }
 
   /**
-   * Calculate the incident light. Will automatically pull from the cache or calculate new values.
-   * Cache values are bilinearly interpolated.
+   * Calculate the incident light for the given ray. This uses bilinearly interpolated precalculated
+   * values.
+   *
+   * @param ray Ray to calculate the incident light for
+   * @return Incident light color (RGB)
    */
   public Vector3 calcIncidentLight(Ray ray) {
     double theta = FastMath.atan2(ray.d.z, ray.d.x);
@@ -118,7 +134,7 @@ public class SkyCache {
   }
 
   // Linear interpolation between 2 points in 1 dimension
-  private double interp1D(double x, double x0, double x1, double y0, double y1) {
+  private static double interp1D(double x, double x0, double x1, double y0, double y1) {
     return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
   }
 
