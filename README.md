@@ -23,113 +23,108 @@ _Prerequisites:_ Chunky requires **Java 8**. It is recommended to have the **64-
 
 If you have any questions, please don't hesitate to reach out via Reddit, Discord or GitHub.
 
+
 ## Frequently Asked Questions
 
 <details>
 <summary><strong>Why is there noise/grain/random bright dots in the render?</strong></summary>
 
-This is not a bug, but an unfortunate effect of [the rendering algorithm][9] used in Chunky. Torches and other small light sources cause a very random illumination and it takes a long time to render such light nicely.
-
-
-You can disable emitters under the Lighting tab in the Render Controls dialog to remove most of the random bright dots. Note that rendering for a longer time will eventually remove the noise, though it may take a very long time.
-
-Another way of removing the noise is using the [Denoiser Plugin][10]. While this can yield good results in most cases, it may distort the image in some cases.
+> This is not a bug, but an unfortunate effect of [the rendering algorithm][9] used in Chunky. Torches and other small light sources cause a very random illumination and it takes a long time to render such light nicely.
+> 
+> You can disable emitters under the Lighting tab in the Render Controls dialog to remove most of the random bright dots. Note that rendering for a longer time will eventually remove the noise, though it may take a very long time.
+> 
+> Another way of removing the noise is using the [Denoiser Plugin][10]. While this can yield good results in most cases, it may distort the image in some cases.
 </details>
 
 <details>
 <summary><strong>How long does it take to render an image?</strong></summary>
 
-This depends on your CPU, the size of the image and the lighting conditions of the scene you are rendering. You can use the tips from the previous answer to get away with shorter render times.
+> This depends on your CPU, the size of the image and the lighting conditions of the scene you are rendering. You can use the tips from the previous answer to get away with shorter render times.
 </details>
 
 <details>
 <summary><strong>Why do I see blue question marks or red crosses instead of blocks?</strong></summary>
 
-Chunky renders blue question marks for unsupported blocks. Maybe your Chunky version is outdated or the block is not yet supported. If the latter is the case, please file a bug report.
-
-Red crosses are caused by missing textures. Please ensure that you're using a texturepack for the Minecraft version for the world you are rendering.
+> Chunky renders blue question marks for unsupported blocks. Maybe your Chunky version is outdated or the block is not yet supported. If the latter is the case, please file a bug report.
+> 
+> Red crosses are caused by missing textures. Please ensure that you're using a texturepack for the Minecraft version for the world you are rendering.
 </details>
 
 <details>
 <summary><strong>Why can I only open 1.12 worlds but not 1.13+ worlds (or vice versa)?</strong></summary>
 
-Minecraft 1.13 introduced a new world format that is incompatible with the old format. Chunky 2 is only compatible with the new world format and Chunky 1 is only compatible with the old world format.
-
-We [have plans][14] to improve this one day. For now, you'll need to use the appropriate Chunky version for your Minecraft version.
+> Minecraft 1.13 introduced a new world format that is incompatible with the old format. Chunky 2 is only compatible with the new world format and Chunky 1 is only compatible with the old world format.
+> 
+> We [have plans][14] to improve this one day. For now, you'll need to use the appropriate Chunky version for your Minecraft version.
 </details>
 
 <details>
 <summary><strong>Is GPU rendering supported?</strong></summary>
 
-GPU support is not actively being worked on right now. If you'd like to tackle this, PRs are welcome!
+> GPU support is not actively being worked on right now. If you'd like to tackle this, PRs are welcome!
 </details>
 
 <details>
 <summary><strong>Why are mobs not rendered?</strong></summary>
 
-Chunky currently can't render all entities. Future support for rendering more entities is planned, so stay tuned!
+> Chunky currently can't render all entities. Future support for rendering more entities is planned, so stay tuned!
 </details>
 
 <details>
 <summary><strong>Can Chunky render mod blocks?</strong></summary>
 
-No. Due to the vast number of mods, this is not feasible at the moment.
+> No. Due to the vast number of mods, this is not feasible at the moment.
 </details>
 
 <details>
 <summary><strong>Where can I find good skymaps?</strong></summary>
 
-The [skymaps page][11] has some good links. Another good place is the #skymaps channel on our Discord server.
+> The [skymaps page][11] has some good links. Another good place is the #skymaps channel on our Discord server.
 </details>
 
 <details>
 <summary><strong>Chunky keeps freezing or crashing</strong></summary>
 
-Chunky uses a lot of memory. If Chunky has too little memory to work with it
-may slow down to a crawl or crash. The memory limit can be increased in the
-Chunky Launcher.
+> Chunky uses a lot of memory. If Chunky has too little memory to work with it may slow down to a crawl or crash. The memory limit can be increased in the Chunky Launcher.
 </details>
 
 <details>
 <summary><strong>Rendering using the command line (Headless Mode)</strong></summary>
 
-It is possible to render a scene from the command line. First set up a scene
+> It is possible to render a scene from the command line. First set up a scene
 using the GUI. Don't forget to save the scene. Then run the following on the
 command line:
-
-    java -jar chunky.jar -render SceneName
-
-
-Where SceneName is the name of the scene to render. You can read more about
-[headless rendering here.][5]
+> 
+>     java -jar chunky.jar -render SceneName
+>
+> Where SceneName is the name of the scene to render. You can read more about [headless rendering here.][5]
 </details>
 
 <details>
 <summary><strong>Shutdown when render completes on Unix-like Systems (Mac OS X, Linux, BSD)</strong></summary>
 
-In the Advanced tab of the Render Controls window, you can check the checkbox
+> In the Advanced tab of the Render Controls window, you can check the checkbox
 that says "Shutdown when render completes" to shut down your computer when the
 set SPP target is reached.  (This can be toggled while rendering.)
-
-On Unix-like systems, the `shutdown` terminal command has to be run as root
+> 
+> On Unix-like systems, the `shutdown` terminal command has to be run as root
 using `sudo`.  For various reasons, Chunky cannot prompt for the password to
 `sudo`, so you must configure your system to allow the command to run without a
 password.
-
-Open a terminal (such as bash) and run `sudo visudo`, providing your password.
-
-Add the following line at the end of the file: (press Insert to type)
-
-    %user_name ALL=(ALL) NOPASSWD: /sbin/shutdown
-
-
-Replace `user_name` with your username.
-
-Press Escape, then type `:wq`.
-
-You may need to restart or log out and in for this to take effect.
-
-This will only allow `sudo shutdown` to run without a password; no other
+> 
+> Open a terminal (such as bash) and run `sudo visudo`, providing your password.
+> 
+> Add the following line at the end of the file: (press Insert to type)
+> 
+>     %user_name ALL=(ALL) NOPASSWD: /sbin/shutdown
+>
+> Replace `user_name` with your username.
+> 
+> Press Escape, then type `:wq`.
+> 
+> You may need to restart or log out and in for this to take effect.
+> 
+> This will only allow `sudo shutdown` to run without a password; no other
 commands run with `sudo` will be affected.
 </details>
 
