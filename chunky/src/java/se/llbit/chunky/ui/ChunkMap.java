@@ -104,6 +104,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   volatile boolean repaintQueued = false;
   private Runnable onViewDragged = () -> {};
 
+  private AtomicBoolean scheduledUpdate = new AtomicBoolean(false);
+
   public ChunkMap(WorldMapLoader loader, ChunkyFxController controller,
       MapView mapView, ChunkSelectionTracker chunkSelection,
       Canvas canvas, Canvas mapOverlay) {
@@ -192,9 +194,18 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     GraphicsContext gc = canvas.getGraphicsContext2D();
     gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-    // `withSceneProtected` may block for a long time here, so submit it to the common thread pool. ChunkyMap must be run on the main thread.
-    controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
-            scene -> Platform.runLater(() -> ChunkMap.drawViewBounds(gc, mapView, scene)));
+    // `withSceneProtected` will block for a long time when a new scene is loaded. This bocks in the JavaFX thread and
+    // freezes the user interface. Here we check if there has already been an update scheduled, and if not will schedule
+    // one. Draw view bounds must be run on the JavaFX thread.
+    if (!scheduledUpdate.get()) {
+      scheduledUpdate.set(true);
+      Chunky.getCommonThreads().submit(() -> controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
+              scene -> Platform.runLater(() -> {
+                ChunkMap.drawViewBounds(gc, mapView, scene);
+                scheduledUpdate.set(false);
+              }
+      )));
+    }
   }
 
   protected synchronized void selectWithinRect() {
