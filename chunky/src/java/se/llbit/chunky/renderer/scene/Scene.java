@@ -33,6 +33,7 @@ import se.llbit.chunky.entity.Lectern;
 import se.llbit.chunky.entity.PaintingEntity;
 import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.renderer.*;
 import se.llbit.chunky.renderer.projection.ProjectionMode;
@@ -70,11 +71,13 @@ import se.llbit.util.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -1770,26 +1773,25 @@ public class Scene implements JsonSerializable, Refreshable {
         Log.warn("Can not use transparent sky with TIFF or PFM output modes. Use PNG instead.");
       } else {
         try (TaskTracker.Task task = taskTracker.task("Computing alpha channel")) {
-          ExecutorService executor = Executors.newFixedThreadPool(threadCount);
           AtomicInteger done = new AtomicInteger(0);
-          int colWidth = width / threadCount;
-          for (int x = 0; x < width; x += colWidth) {
-            final int currentX = x;
-            executor.submit(() -> {
+
+          Chunky.getCommonThreads().submit(() -> {
+            IntStream.range(0, width).parallel().forEach(x -> {
               WorkerState state = new WorkerState();
               state.ray = new Ray();
-              for(int xc = currentX; xc < currentX + colWidth && xc < width; xc++) {
-                for (int y = 0; y < height; ++y) {
-                  computeAlpha(xc, y, state);
-                }
-                task.update(width, done.incrementAndGet());
+
+              for (int y = 0; y < height; y++) {
+                computeAlpha(x, y, state);
               }
+
+              task.update(width, done.incrementAndGet());
             });
-          }
-          executor.shutdown();
-          executor.awaitTermination(1, TimeUnit.DAYS);
+          }).get();
+
         } catch (InterruptedException e) {
           Log.warn("Failed to compute alpha channel", e);
+        } catch (ExecutionException e) {
+          Log.error("Failed to compute alpha channel", e);
         }
       }
     }
@@ -1803,24 +1805,17 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public void postProcessFrame(TaskTracker taskTracker) {
     try (TaskTracker.Task task = taskTracker.task("Finalizing frame")) {
-      int threadCount = PersistentSettings.getNumThreads();
-      ExecutorService executor = Executors.newFixedThreadPool(threadCount);
       AtomicInteger done = new AtomicInteger(0);
-      int colWidth = width / threadCount;
-      for (int x = 0; x < width; x += colWidth) {
-        final int currentX = x;
-        executor.submit(() -> {
-          for(int xc = currentX; xc < currentX + colWidth && xc < width; xc++) {
-            for (int y = 0; y < height; ++y) {
-              finalizePixel(xc, y);
-            }
-            task.update(width, done.incrementAndGet());
+      Chunky.getCommonThreads().submit(() -> {
+        IntStream.range(0, width).parallel().forEach(x -> {
+          for (int y = 0; y < height; y++) {
+            finalizePixel(x, y);
           }
+
+          task.update(width, done.incrementAndGet());
         });
-      }
-      executor.shutdown();
-      executor.awaitTermination(1, TimeUnit.DAYS);
-    } catch (InterruptedException e) {
+      }).get();
+    } catch (InterruptedException | ExecutionException e) {
       Log.error("Finalizing frame failed", e);
     }
   }

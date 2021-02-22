@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -30,6 +31,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.stage.PopupWindow;
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
@@ -53,6 +55,7 @@ import se.llbit.math.Vector3;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * UI component for the 2D world map.
@@ -188,9 +191,10 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     ChunkView mapView = new ChunkView(view);  // Make thread-local copy.
     GraphicsContext gc = canvas.getGraphicsContext2D();
     gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-    // TODO: this can block for a long time, so it should ideally not be done on the JavaFX application thread.
+
+    // `withSceneProtected` may block for a long time here, so submit it to the common thread pool. ChunkyMap must be run on the main thread.
     controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
-        scene -> ChunkMap.drawViewBounds(gc, mapView, scene));
+            scene -> Platform.runLater(() -> ChunkMap.drawViewBounds(gc, mapView, scene)));
   }
 
   protected synchronized void selectWithinRect() {
