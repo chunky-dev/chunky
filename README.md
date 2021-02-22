@@ -7,7 +7,7 @@
 Chunky is a Minecraft rendering tool that uses Path Tracing to create realistic images of your Minecraft worlds.
 
 [Discord server][15] ·
-[Documentation][8] ·
+[Documentation][1] ·
 [Troubleshooting][2] ·
 [Subreddit][3]
 </div>
@@ -166,7 +166,7 @@ when in doubt.
 
 ## Copyright & License
 
-Chunky is Copyright (c) 2010-2019, Jesper Öqvist <jesper@llbit.se>
+Chunky is Copyright (c) 2010-2021, Jesper Öqvist <jesper@llbit.se> and [Chunky Contributors][8]. 
 
 Permission to modify and redistribute is granted under the terms of
 the GPLv3 license. See the file `LICENSE` for the full license.
@@ -192,7 +192,7 @@ See the file `licenses/fast-util.txt` for the copyright notice.
 [5]: http://chunky.llbit.se/headless.html
 [6]: https://google.github.io/styleguide/javaguide.html
 [7]: https://github.com/llbit/chunky-releasetools
-[8]: https://lemaik.github.io/chunky/
+[8]: https://github.com/chunky-dev/chunky/graphs/contributors
 [9]: https://chunky.llbit.se/path_tracing.html
 [10]: https://github.com/leMaik/chunky-denoiser
 [11]: https://chunky.llbit.se/skymaps.html
