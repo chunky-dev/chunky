@@ -2044,15 +2044,17 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public synchronized boolean loadDump(RenderContext context, TaskTracker taskTracker) {
-    if (!tryLoadDump(context, name + ".dump", taskTracker)) {
+    Runnable logWarning;
+    if (null != (logWarning=tryLoadDump(context, name + ".dump", taskTracker))) {
       // Failed to load the default render dump - try the backup file.
-      if (!tryLoadDump(context, name + ".dump.backup", taskTracker)) {
+      if (null != tryLoadDump(context, name + ".dump.backup", taskTracker)) {
         // we don't have the old render state, so reset spp and render time
         spp = 0;
         renderTime = 0;
         if (samples != null) {
           samples.reset();
         }
+        logWarning.run();
         return false;
       }
     }
@@ -2060,31 +2062,40 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * @return {@code true} if the render dump was successfully loaded
+   * @return Returns null on successful dump loaf, and a Runnable that will log a warning on a failed load.
    */
-  private boolean tryLoadDump(RenderContext context, String fileName, TaskTracker taskTracker) {
+  private Runnable tryLoadDump(RenderContext context, String fileName, TaskTracker taskTracker) {
     File dumpFile = context.getSceneFile(fileName);
     if (!dumpFile.isFile()) {
       if (spp != 0) {
         // The scene state says the render had some progress, so we should warn
         // that the render dump does not exist.
-        Log.warn("Render dump not found: " + fileName);
+        return ()->Log.warn("Render dump not found: " + fileName);
       }
-      return false;
+      return ()->{};
     }
 
     Log.info("Loading render dump: " + dumpFile);
+    int crop_x = this.crop_x;
+    int crop_y = this.crop_y;
+    int subareaWidth = this.subareaWidth;
+    int subareaHeight = this.subareaHeight;
     try (FileInputStream inputStream = new FileInputStream(dumpFile)) {
       RenderDump.load(inputStream, this, taskTracker);
     } catch (IOException | IllegalStateException e) {
-      // The render dump was possibly corrupt.
-      Log.warn("Failed to load the render dump", e);
-      return false;
+      // reset crop size
+      this.crop_x = crop_x;
+      this.crop_y = crop_y;
+      this.subareaWidth = subareaWidth;
+      this.subareaHeight = subareaHeight;
+
+      // The render dump was possibly corrupt, or empty
+      return ()->Log.warn("Failed to load the render dump", e);
     }
     postProcessFrame(taskTracker);
 
     Log.info("Render dump loaded: " + fileName);
-    return true;
+    return null;
   }
 
   /**
@@ -2714,7 +2725,9 @@ public class Scene implements JsonSerializable, Refreshable {
       newCropY = crop.get(1).intValue(0);
       newCropWidth = crop.get(2).intValue(newWidth);
       newCropHeight = crop.get(3).intValue(newHeight);
-    } catch (IndexOutOfBoundsException ignored) {}
+    } catch (IndexOutOfBoundsException ignored) {
+      Log.info("Crop area missing or unable to read from scene.");
+    }
     if (samples == null || width != newWidth || height != newHeight
         || newCropX != crop_x || newCropWidth != subareaWidth
         || newCropY != crop_y || newCropHeight != subareaHeight) {
