@@ -192,7 +192,6 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   protected void drawViewBounds(Canvas canvas) {
     ChunkView mapView = new ChunkView(view);  // Make thread-local copy.
     GraphicsContext gc = canvas.getGraphicsContext2D();
-    gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
     // `withSceneProtected` will block for a long time when a new scene is loaded. This bocks in the JavaFX thread and
     // freezes the user interface. Here we check if there has already been an update scheduled, and if not will schedule
@@ -201,6 +200,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       scheduledUpdate.set(true);
       Chunky.getCommonThreads().submit(() -> controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
               scene -> Platform.runLater(() -> {
+                gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
                 ChunkMap.drawViewBounds(gc, mapView, scene);
                 scheduledUpdate.set(false);
               }
