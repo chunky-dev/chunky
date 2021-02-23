@@ -62,6 +62,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * Chunky is a Minecraft mapping and rendering tool created byJesper Öqvist (jesper@llbit.se).
@@ -96,6 +97,8 @@ public class Chunky {
   private RenderControlsTabTransformer renderControlsTabTransformer = tabs -> tabs;
   private TabTransformer mainTabTransformer = tabs -> tabs;
   private boolean headless = false;
+
+  private static ForkJoinPool commonThreads;
 
   /**
    * @return The title of the main window. Includes the current version string.
@@ -210,6 +213,8 @@ public class Chunky {
 
     int exitCode = 0;
     if (cmdline.mode != CommandLineOptions.Mode.NOTHING) {
+      commonThreads = new ForkJoinPool(PersistentSettings.getNumThreads());
+
       Chunky chunky = new Chunky(cmdline.options);
       chunky.headless = cmdline.mode == Mode.HEADLESS_RENDER || cmdline.mode == Mode.SNAPSHOT;
       chunky.loadPlugins();
@@ -320,6 +325,16 @@ public class Chunky {
       e.printStackTrace();
       return 1;
     }
+  }
+
+  /**
+   * Get the common thread pool.
+   */
+  public static ForkJoinPool getCommonThreads() {
+    if (commonThreads == null) {
+      commonThreads = new ForkJoinPool(PersistentSettings.getNumThreads());
+    }
+    return commonThreads;
   }
 
   public synchronized SceneManager getSceneManager() {

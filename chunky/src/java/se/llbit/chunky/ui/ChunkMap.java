@@ -1,4 +1,5 @@
-/* Copyright (c) 2012-2019 Jesper Öqvist <jesper@llbit.se>
+/* Copyright (c) 2012-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2012-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -30,6 +31,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.stage.PopupWindow;
+import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.map.MapBuffer;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
@@ -53,6 +55,7 @@ import se.llbit.math.Vector3;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * UI component for the 2D world map.
@@ -100,6 +103,8 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
 
   volatile boolean repaintQueued = false;
   private Runnable onViewDragged = () -> {};
+
+  private AtomicBoolean scheduledUpdate = new AtomicBoolean(false);
 
   public ChunkMap(WorldMapLoader loader, ChunkyFxController controller,
       MapView mapView, ChunkSelectionTracker chunkSelection,
@@ -187,10 +192,20 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   protected void drawViewBounds(Canvas canvas) {
     ChunkView mapView = new ChunkView(view);  // Make thread-local copy.
     GraphicsContext gc = canvas.getGraphicsContext2D();
-    gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-    // TODO: this can block for a long time, so it should ideally not be done on the JavaFX application thread.
-    controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
-        scene -> ChunkMap.drawViewBounds(gc, mapView, scene));
+
+    // `withSceneProtected` will block for a long time when a new scene is loaded. This bocks in the JavaFX thread and
+    // freezes the user interface. Here we check if there has already been an update scheduled, and if not will schedule
+    // one. Draw view bounds must be run on the JavaFX thread.
+    if (!scheduledUpdate.get()) {
+      scheduledUpdate.set(true);
+      Chunky.getCommonThreads().submit(() -> controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
+              scene -> Platform.runLater(() -> {
+                gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+                ChunkMap.drawViewBounds(gc, mapView, scene);
+                scheduledUpdate.set(false);
+              }
+      )));
+    }
   }
 
   protected synchronized void selectWithinRect() {

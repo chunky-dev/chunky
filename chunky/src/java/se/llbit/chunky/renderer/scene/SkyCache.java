@@ -18,10 +18,11 @@ package se.llbit.chunky.renderer.scene;
 
 import static java.lang.Math.PI;
 
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
 import org.apache.commons.math3.util.FastMath;
-import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.main.Chunky;
+import se.llbit.log.Log;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
@@ -70,18 +71,23 @@ public class SkyCache {
   public synchronized void precalculateSky() {
     double[][][] skyTexture = new double[skyResolution + 1][skyResolution + 1][3];
 
-    ForkJoinPool pool = new ForkJoinPool(PersistentSettings.getNumThreads());
-    pool.submit(() -> {
-      IntStream.range(0, skyResolution + 1).parallel().forEach(i -> {
-        for (int j = 0; j < skyResolution + 1; j++) {
-          Vector3 c = getSkyColorAt(i, j);
-          skyTexture[i][j][0] = c.x;
-          skyTexture[i][j][1] = c.y;
-          skyTexture[i][j][2] = c.z;
-        }
-      });
-    }).join();
-    pool.shutdownNow();
+    try {
+      Chunky.getCommonThreads().submit(() -> {
+        IntStream.range(0, skyResolution + 1).parallel().forEach(i -> {
+          for (int j = 0; j < skyResolution + 1; j++) {
+            Vector3 c = getSkyColorAt(i, j);
+            skyTexture[i][j][0] = c.x;
+            skyTexture[i][j][1] = c.y;
+            skyTexture[i][j][2] = c.z;
+          }
+        });
+      }).get();
+    } catch (InterruptedException e) {
+      // Stopped
+    } catch (ExecutionException e) {
+      Log.error(e);
+      return;
+    }
 
     this.skyTexture = skyTexture;
   }
