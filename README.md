@@ -128,6 +128,9 @@ password.
 commands run with `sudo` will be affected.
 </details>
 
+> The [Chunky SpigotMC plugin](https://www.spigotmc.org/resources/chunky.81534/) is an unfortunate name collision and is unrelated to this project. Chunky (SpigotMC plugin) is a handy plugin to quickly pre-generate server chunks should you need that functionality. You can also find [Chunky (SpigotMC Plugin) on GitHub](https://github.com/pop4959/Chunky).
+</details>
+
 More information about Chunky, including a short getting started guide and
 rendering tips are available at the [Chunky Documentation page][1]. For more insights into Chunky's development, see the [development blog][4].
 
