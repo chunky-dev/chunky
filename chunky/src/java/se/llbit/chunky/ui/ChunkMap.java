@@ -55,7 +55,9 @@ import se.llbit.math.Vector3;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * UI component for the 2D world map.
@@ -63,6 +65,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Jesper Öqvist <jesper@llbit.se>
  */
 public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraViewListener {
+  /** Minimum time between JavaFX draws due to chunk updates. */
+  private final long MAX_CHUNK_UPDATE_RATE = 1000/3;
+
   /** Controls the selection area when selecting visible chunks. */
   private static final double CHUNK_SELECT_RADIUS = -8 * 1.4142;
   protected final WorldMapLoader mapLoader;
@@ -101,10 +106,11 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   private final Canvas canvas;
   private final Canvas mapOverlay;
 
-  volatile boolean repaintQueued = false;
+  private volatile boolean repaintQueued = false;
+  private volatile boolean scheduledUpdate = false;
+  private volatile long lastRedraw = 0;
   private Runnable onViewDragged = () -> {};
-
-  private AtomicBoolean scheduledUpdate = new AtomicBoolean(false);
+  private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
   public ChunkMap(WorldMapLoader loader, ChunkyFxController controller,
       MapView mapView, ChunkSelectionTracker chunkSelection,
@@ -164,10 +170,10 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   @Override public void chunkUpdated(ChunkPosition chunk) {
     if (view.chunkScale >= 16) {
       mapBuffer.drawTile(mapLoader, chunk, chunkSelection);
+      repaintRatelimited();
     } else {
       regionUpdated(chunk.getRegionPosition());
     }
-    repaintDeferred();
   }
 
   protected final void repaintDirect() {
@@ -186,6 +192,28 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     }
   }
 
+  protected final void repaintRatelimited() {
+    if (lastRedraw == -1) {
+      return;
+    }
+
+    long delay = (lastRedraw + MAX_CHUNK_UPDATE_RATE) - System.currentTimeMillis();
+    if (delay > 0) {
+
+      // Prevent redraw from occurring until this is done.
+      lastRedraw = -1;
+
+      executor.schedule(() -> {
+        lastRedraw = System.currentTimeMillis();
+        repaintDeferred();
+      }, delay, TimeUnit.MILLISECONDS);
+    } else {
+      // No need to be ratelimited, redraw now
+      lastRedraw = System.currentTimeMillis();
+      repaintDeferred();
+    }
+  }
+
   /**
    * Draws a visualization of the 3D camera view on the 2D map.
    */
@@ -196,14 +224,14 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     // `withSceneProtected` will block for a long time when a new scene is loaded. This bocks in the JavaFX thread and
     // freezes the user interface. Here we check if there has already been an update scheduled, and if not will schedule
     // one. Draw view bounds must be run on the JavaFX thread.
-    if (!scheduledUpdate.get()) {
-      scheduledUpdate.set(true);
-      Chunky.getCommonThreads().submit(() -> controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
-              scene -> Platform.runLater(() -> {
-                gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-                ChunkMap.drawViewBounds(gc, mapView, scene);
-                scheduledUpdate.set(false);
-              }
+    if (!scheduledUpdate) {
+      scheduledUpdate = true;
+      executor.submit(() -> controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
+        scene -> Platform.runLater(() -> {
+          gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+          ChunkMap.drawViewBounds(gc, mapView, scene);
+          scheduledUpdate = false;
+        }
       )));
     }
   }
@@ -297,7 +325,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     if (view.scale < 16) {
       mapBuffer.drawTile(mapLoader, region, chunkSelection);
       mapLoader.regionUpdated(region);
-      repaintDeferred();
+      repaintRatelimited();
     }
   }
 

@@ -328,7 +328,7 @@ public class Chunky {
   }
 
   /**
-   * Get the common thread pool.
+   * Get the common thread pool. This should only be used for parallelized processing, not for wait tasks.
    */
   public static ForkJoinPool getCommonThreads() {
     if (commonThreads == null) {
