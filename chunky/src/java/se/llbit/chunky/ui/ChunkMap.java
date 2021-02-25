@@ -55,6 +55,9 @@ import se.llbit.math.Vector3;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * UI component for the 2D world map.
@@ -107,6 +110,7 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
   private volatile boolean scheduledUpdate = false;
   private volatile long lastRedraw = 0;
   private Runnable onViewDragged = () -> {};
+  private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
   public ChunkMap(WorldMapLoader loader, ChunkyFxController controller,
       MapView mapView, ChunkSelectionTracker chunkSelection,
@@ -193,21 +197,16 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
       return;
     }
 
-    long redrawTime = lastRedraw + MAX_CHUNK_UPDATE_RATE;
-    if (System.currentTimeMillis() < redrawTime) {
+    long delay = (lastRedraw + MAX_CHUNK_UPDATE_RATE) - System.currentTimeMillis();
+    if (delay > 0) {
 
       // Prevent redraw from occurring until this is done.
       lastRedraw = -1;
 
-      Chunky.getCommonThreads().execute(() -> {
-        long delay = redrawTime - System.currentTimeMillis();
-        if (delay > 0) {
-          try { Thread.sleep(delay); }
-          catch (InterruptedException ignored) {}
-        }
+      executor.schedule(() -> {
         lastRedraw = System.currentTimeMillis();
         repaintDeferred();
-      });
+      }, delay, TimeUnit.MILLISECONDS);
     } else {
       // No need to be ratelimited, redraw now
       lastRedraw = System.currentTimeMillis();
@@ -227,12 +226,12 @@ public class ChunkMap implements ChunkUpdateListener, ChunkViewListener, CameraV
     // one. Draw view bounds must be run on the JavaFX thread.
     if (!scheduledUpdate) {
       scheduledUpdate = true;
-      Chunky.getCommonThreads().submit(() -> controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
-              scene -> Platform.runLater(() -> {
-                gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-                ChunkMap.drawViewBounds(gc, mapView, scene);
-                scheduledUpdate = false;
-              }
+      executor.submit(() -> controller.getChunky().getRenderController().getSceneProvider().withSceneProtected(
+        scene -> Platform.runLater(() -> {
+          gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+          ChunkMap.drawViewBounds(gc, mapView, scene);
+          scheduledUpdate = false;
+        }
       )));
     }
   }
