@@ -445,4 +445,13 @@ public class Chunky {
     BlockSpec.blockProviders.add(0, blockProvider);
     MaterialStore.blockIds.addAll(blockProvider.getSupportedBlocks());
   }
+
+  /**
+   * Check if this Chunky instance is running in headless mode.
+   * @return True if this Chunky instance is running in headless mode, false otherwise
+   */
+  @PluginApi
+  public boolean isHeadless() {
+    return headless;
+  }
 }
