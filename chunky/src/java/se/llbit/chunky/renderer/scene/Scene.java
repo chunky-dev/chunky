@@ -71,10 +71,7 @@ import se.llbit.util.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
@@ -817,17 +814,31 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Heightmap biomeIdMap = new Heightmap();
 
-    ChunkData chunkData;
+    ChunkData chunkData1;
+    ChunkData chunkData2;
     if (isTallWorld) { //snapshot 21w06a, treat as -64 - 320
-      chunkData = new GenericChunkData();
+      chunkData1 = new GenericChunkData(); // chunk loading will switch between these two, using one asynchronously to load the data
+      chunkData2 = new GenericChunkData(); // while the other is used to add to the octree
     } else { //Treat as 0 - 256 world
-      chunkData = new SimpleChunkData();
+      chunkData1 = new SimpleChunkData();
+      chunkData2 = new SimpleChunkData();
     }
 
     try (TaskTracker.Task task = taskTracker.task("Loading chunks")) {
       int done = 1;
       int target = chunksToLoad.size();
-      for (ChunkPosition cp : chunksToLoad) {
+
+      boolean usingFirstChunkData = true;
+
+      ChunkPosition[] chunkPositions = chunksToLoad.toArray(new ChunkPosition[0]);
+
+      ForkJoinPool commonThreads = Chunky.getCommonThreads();
+      ForkJoinTask<?> nextChunkDataTask = commonThreads.submit(() -> { //Initialise first chunk data for the for loop
+        world.getChunk(chunkPositions[0]).getChunkData(chunkData1, palette);
+      });
+      for (int i = 0; i < chunkPositions.length; i++) {
+        ChunkPosition cp = chunkPositions[i];
+
         task.update(target, done);
         done += 1;
 
@@ -837,7 +848,39 @@ public class Scene implements JsonSerializable, Refreshable {
 
         loadedChunks.add(cp);
 
-        world.getChunk(cp).getChunkData(chunkData, palette);
+        try {
+          nextChunkDataTask.get();
+        } catch(InterruptedException ignored) { // If except, load the chunk synchronously
+          if(usingFirstChunkData) {
+            world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette);
+          }
+          else {
+            world.getChunk(chunkPositions[i]).getChunkData(chunkData2, palette);
+          }
+        } catch(ExecutionException e) {
+          throw new RuntimeException(e.getCause());
+        }
+
+        ChunkData chunkData; //the chunk data to be used for THIS iteration
+        {
+          ChunkData nextChunkData; //the chunk data to be used for the next iteration
+          if (usingFirstChunkData) {
+            chunkData = chunkData1;
+            nextChunkData = chunkData2;
+          } else {
+            chunkData = chunkData2;
+            nextChunkData = chunkData1;
+          }
+          usingFirstChunkData = !usingFirstChunkData;
+
+          if (i + 1 < chunkPositions.length) { //if has next request next
+            int finalI = i;
+            nextChunkDataTask = commonThreads.submit(() -> {
+              world.getChunk(chunkPositions[finalI + 1]).getChunkData(nextChunkData, palette);
+            });
+          }
+        }
+
         numChunks += 1;
 
         int wx0 = cp.x * 16; // Start of this chunk in world coordinates.
