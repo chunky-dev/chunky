@@ -3598,6 +3598,7 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/chiseled_grimstone", Texture.chiseledGrimstone);
     addSimpleTexture("assets/minecraft/textures/block/grimstone_bricks", Texture.grimstoneBricks);
     addSimpleTexture("assets/minecraft/textures/block/grimstone_tiles", Texture.grimstoneTiles);
+    addSimpleTexture("assets/minecraft/textures/block/smooth_basalt", Texture.smoothBasalt);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

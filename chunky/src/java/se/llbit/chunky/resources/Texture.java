@@ -972,6 +972,7 @@ public class Texture {
   public static final Texture chiseledGrimstone = new Texture();
   public static final Texture grimstoneBricks = new Texture();
   public static final Texture grimstoneTiles = new Texture();
+  public static final Texture smoothBasalt = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();

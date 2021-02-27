@@ -726,6 +726,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:small_dripleaf",
       "minecraft:smithing_table",
       "minecraft:smoker",
+      "minecraft:smooth_basalt",
       "minecraft:smooth_quartz",
       "minecraft:smooth_quartz_slab",
       "minecraft:smooth_quartz_stairs",
@@ -2820,6 +2821,8 @@ public class MinecraftBlockProvider implements BlockProvider {
         return stairs(tag, Texture.grimstoneTiles);
       case "chiseled_grimstone":
         return new MinecraftBlock(name, Texture.chiseledGrimstone);
+      case "smooth_basalt":
+        return new MinecraftBlock(name, Texture.smoothBasalt);
       case "structure_void":
       case "barrier":
         // Invisible.
