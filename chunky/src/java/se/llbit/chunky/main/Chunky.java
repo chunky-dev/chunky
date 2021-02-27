@@ -26,7 +26,6 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.plugin.ChunkyPlugin;
 import se.llbit.chunky.plugin.TabTransformer;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
-import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.RayTracerFactory;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderContextFactory;
@@ -36,6 +35,7 @@ import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.RendererFactory;
 import se.llbit.chunky.renderer.SceneProvider;
 import se.llbit.chunky.renderer.SnapshotControl;
+import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.PreviewRayTracer;
@@ -310,7 +310,7 @@ public class Chunky {
               }
             });
         scene.loadDump(context, taskTracker); // Load the render dump.
-        OutputMode outputMode = scene.getOutputMode();
+        PictureExportFormat outputMode = scene.getOutputMode();
         if (options.imageOutputFile.isEmpty()) {
           options.imageOutputFile = String
               .format("%s-%d%s", scene.name(), scene.spp, outputMode.getExtension());

@@ -17,6 +17,34 @@
  */
 package se.llbit.chunky.renderer.scene;
 
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.stream.IntStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.*;
@@ -32,8 +60,15 @@ import se.llbit.chunky.entity.PlayerEntity;
 import se.llbit.chunky.entity.Poseable;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.plugin.PluginApi;
-import se.llbit.chunky.renderer.*;
-import se.llbit.chunky.renderer.projection.ProjectionMode;
+import se.llbit.chunky.renderer.EmitterSamplingStrategy;
+import se.llbit.chunky.renderer.export.PictureExportFormats;
+import se.llbit.chunky.renderer.Postprocess;
+import se.llbit.chunky.renderer.Refreshable;
+import se.llbit.chunky.renderer.RenderContext;
+import se.llbit.chunky.renderer.RenderMode;
+import se.llbit.chunky.renderer.ResetReason;
+import se.llbit.chunky.renderer.WorkerState;
+import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.renderdump.RenderDump;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.chunky.resources.OctreeFileFormat;
@@ -54,7 +89,15 @@ import se.llbit.json.JsonParser;
 import se.llbit.json.JsonValue;
 import se.llbit.json.PrettyPrinter;
 import se.llbit.log.Log;
-import se.llbit.math.*;
+import se.llbit.math.BVH;
+import se.llbit.math.ColorUtil;
+import se.llbit.math.Grid;
+import se.llbit.math.Octree;
+import se.llbit.math.PackedOctree;
+import se.llbit.math.QuickMath;
+import se.llbit.math.Ray;
+import se.llbit.math.Vector3;
+import se.llbit.math.Vector3i;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
@@ -164,7 +207,7 @@ public class Scene implements JsonSerializable, Refreshable {
   public int height;
 
   public Postprocess postprocess = Postprocess.DEFAULT;
-  public OutputMode outputMode = OutputMode.DEFAULT;
+  public PictureExportFormat outputMode = PictureExportFormats.PNG;
   public long renderTime;
   /**
    * Current SPP for the scene.
@@ -1766,30 +1809,34 @@ public class Scene implements JsonSerializable, Refreshable {
       Log.error("Can't save snapshot: bad output directory!");
       return;
     }
-    String fileName = String.format("%s-%d%s", name, spp, outputMode.getExtension());
+    String fileName = String.format("%s-%d%s", name, spp, getOutputMode().getExtension());
     File targetFile = new File(directory, fileName);
     if (!directory.exists()) {
       directory.mkdirs();
     }
-    computeAlpha(taskTracker, threadCount);
+    if (getOutputMode().isTransparencySupported()) {
+      computeAlpha(taskTracker);
+    }
     if (!finalized) {
       postProcessFrame(taskTracker);
     }
-    writeImage(targetFile, outputMode, taskTracker);
+    writeImage(targetFile, getOutputMode(), taskTracker);
   }
 
   /**
    * Save the current frame as a PNG or TIFF image, depending on this scene's outputMode.
    */
   public synchronized void saveFrame(File targetFile, TaskTracker taskTracker, int threadCount) {
-    this.saveFrame(targetFile, outputMode, taskTracker, threadCount);
+    this.saveFrame(targetFile, getOutputMode(), taskTracker, threadCount);
   }
 
   /**
    * Save the current frame as a PNG or TIFF image.
    */
-  public synchronized void saveFrame(File targetFile, OutputMode mode, TaskTracker taskTracker, int threadCount) {
-    computeAlpha(taskTracker, threadCount);
+  public synchronized void saveFrame(File targetFile, PictureExportFormat mode, TaskTracker taskTracker, int threadCount) {
+    if (mode.isTransparencySupported()) {
+      computeAlpha(taskTracker);
+    }
     if (!finalized) {
       postProcessFrame(taskTracker);
     }
@@ -1797,24 +1844,26 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Save the current frame as a PNG or TIFF image into the given output stream.
+   * Save the current frame into the given output stream, using the given format.
    */
-  public synchronized void writeFrame(OutputStream out, OutputMode mode, TaskTracker taskTracker, int threadCount)
+  public synchronized void writeFrame(OutputStream out, PictureExportFormat mode, TaskTracker taskTracker, int threadCount)
       throws IOException {
-    computeAlpha(taskTracker, threadCount);
+    if (mode.isTransparencySupported()) {
+      computeAlpha(taskTracker);
+    }
     if (!finalized) {
       postProcessFrame(taskTracker);
     }
-    writeImage(out, mode, taskTracker);
+    mode.write(out, this, taskTracker);
   }
 
   /**
    * Compute the alpha channel.
    */
-  private void computeAlpha(TaskTracker taskTracker, int threadCount) {
+  private void computeAlpha(TaskTracker taskTracker) {
     if (transparentSky) {
-      if (outputMode == OutputMode.TIFF_32 || outputMode == OutputMode.PFM) {
-        Log.warn("Can not use transparent sky with TIFF or PFM output modes. Use PNG instead.");
+      if (!this.getOutputMode().isTransparencySupported()) {
+        Log.warn("Can not use transparent sky with " + this.getOutputMode().getName() +  " output mode. Use PNG instead.");
       } else {
         try (TaskTracker.Task task = taskTracker.task("Computing alpha channel")) {
           AtomicInteger done = new AtomicInteger(0);
@@ -1864,96 +1913,11 @@ public class Scene implements JsonSerializable, Refreshable {
     }
   }
 
-  /**
-   * Write buffer data to image.
-   *
-   * @param out output stream to write to.
-   */
-  private void writeImage(OutputStream out, OutputMode mode, TaskTracker taskTracker) throws IOException {
-    if (mode == OutputMode.PNG) {
-      writePng(out, taskTracker);
-    } else if (mode == OutputMode.TIFF_32) {
-      writeTiff(out, taskTracker);
-    } else if (mode == OutputMode.PFM) {
-      writePfm(out, taskTracker);
-    } else {
-      Log.warn("Unknown Output Type");
-    }
-  }
-
-  private void writeImage(File targetFile, OutputMode mode, TaskTracker taskTracker) {
+  private void writeImage(File targetFile, PictureExportFormat mode, TaskTracker taskTracker) {
     try (FileOutputStream out = new FileOutputStream(targetFile)) {
-      writeImage(out, mode, taskTracker);
+      mode.write(out, this, taskTracker);
     } catch (IOException e) {
       Log.warn("Failed to write file: " + targetFile.getAbsolutePath(), e);
-    }
-  }
-
-  /**
-   * Write PNG image.
-   *
-   * @param out output stream to write to.
-   */
-  private void writePng(OutputStream out, TaskTracker taskTracker) throws IOException {
-    try (TaskTracker.Task task = taskTracker.task("Writing PNG");
-        PngFileWriter writer = new PngFileWriter(out)) {
-      if (transparentSky) {
-        writer.write(backBuffer.data, alphaChannel, width, height, task);
-      } else {
-        writer.write(backBuffer.data, width, height, task);
-      }
-      if (camera.getProjectionMode() == ProjectionMode.PANORAMIC
-          && camera.getFov() >= 179
-          && camera.getFov() <= 181) {
-        String xmp = "";
-        xmp += "<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>\n";
-        xmp += " <rdf:Description rdf:about=''\n";
-        xmp += "   xmlns:GPano='http://ns.google.com/photos/1.0/panorama/'>\n";
-        xmp += " <GPano:CroppedAreaImageHeightPixels>";
-        xmp += height;
-        xmp += "</GPano:CroppedAreaImageHeightPixels>\n";
-        xmp += " <GPano:CroppedAreaImageWidthPixels>";
-        xmp += width;
-        xmp += "</GPano:CroppedAreaImageWidthPixels>\n";
-        xmp += " <GPano:CroppedAreaLeftPixels>0</GPano:CroppedAreaLeftPixels>\n";
-        xmp += " <GPano:CroppedAreaTopPixels>0</GPano:CroppedAreaTopPixels>\n";
-        xmp += " <GPano:FullPanoHeightPixels>";
-        xmp += height;
-        xmp += "</GPano:FullPanoHeightPixels>\n";
-        xmp += " <GPano:FullPanoWidthPixels>";
-        xmp += width;
-        xmp += "</GPano:FullPanoWidthPixels>\n";
-        xmp += " <GPano:ProjectionType>equirectangular</GPano:ProjectionType>\n";
-        xmp += " <GPano:UsePanoramaViewer>True</GPano:UsePanoramaViewer>\n";
-        xmp += " </rdf:Description>\n";
-        xmp += " </rdf:RDF>";
-        ITXT iTXt = new ITXT("XML:com.adobe.xmp", xmp);
-        writer.writeChunk(iTXt);
-      }
-    }
-  }
-
-  /**
-   * Write TIFF image.
-   *
-   * @param out output stream to write to.
-   */
-  private void writeTiff(OutputStream out, TaskTracker taskTracker) throws IOException {
-    try (TaskTracker.Task task = taskTracker.task("Writing TIFF");
-        TiffFileWriter writer = new TiffFileWriter(out)) {
-      writer.write32(this, task);
-    }
-  }
-
-  /**
-   * Write PFM image.
-   *
-   * @param out output stream to write to.
-   */
-  private void writePfm(OutputStream out, TaskTracker taskTracker) throws IOException {
-    try (TaskTracker.Task task = taskTracker.task("Writing PFM Rows", canvasHeight());
-         PfmFileWriter writer = new PfmFileWriter(out)) {
-      writer.write(this, task);
     }
   }
 
@@ -2306,6 +2270,22 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
+   * Get the back buffer of the current frame (in ARGB format).
+   * @return Back buffer
+   */
+  public BitmapImage getBackBuffer() {
+    return backBuffer;
+  }
+
+  /**
+   * Get the alpha channel of the current frame.
+   * @return Alpha channel of the current frame
+   */
+  public byte[] getAlphaChannel() {
+    return alphaChannel;
+  }
+
+  /**
    * @return <code>true</code> if the rendered buffer should be finalized
    */
   public boolean shouldFinalizeBuffer() {
@@ -2466,7 +2446,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("yClipMax", yClipMax);
     json.add("exposure", exposure);
     json.add("postprocess", postprocess.name());
-    json.add("outputMode", outputMode.name());
+    json.add("outputMode", outputMode.getName());
     json.add("renderTime", renderTime);
     json.add("spp", spp);
     json.add("sppTarget", sppTarget);
@@ -2727,7 +2707,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     exposure = json.get("exposure").doubleValue(exposure);
     postprocess = Postprocess.get(json.get("postprocess").stringValue(postprocess.name()));
-    outputMode = OutputMode.get(json.get("outputMode").stringValue(outputMode.name()));
+    outputMode = PictureExportFormats.getFormat(json.get("outputMode").stringValue(outputMode.getName())).orElse(
+        PictureExportFormats.PNG);
     sppTarget = json.get("sppTarget").intValue(sppTarget);
     rayDepth = json.get("rayDepth").intValue(rayDepth);
     if (!json.get("pathTrace").isUnknown()) {
@@ -2943,11 +2924,11 @@ public class Scene implements JsonSerializable, Refreshable {
     return fogDensity > 0.0;
   }
 
-  public OutputMode getOutputMode() {
+  public PictureExportFormat getOutputMode() {
     return outputMode;
   }
 
-  public void setOutputMode(OutputMode mode) {
+  public void setOutputMode(PictureExportFormat mode) {
     outputMode = mode;
   }
 
