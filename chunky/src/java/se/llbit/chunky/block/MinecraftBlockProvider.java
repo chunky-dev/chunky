@@ -158,7 +158,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:chain",
       "minecraft:chest",
       "minecraft:chipped_anvil",
-      "minecraft:chiseled_grimstone",
+      "minecraft:chiseled_deepslate",
       "minecraft:chiseled_nether_bricks",
       "minecraft:chiseled_polished_blackstone",
       "minecraft:chiseled_quartz_block",
@@ -171,6 +171,10 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:coal_block",
       "minecraft:coal_ore",
       "minecraft:coarse_dirt",
+      "minecraft:cobbled_deepslate",
+      "minecraft:cobbled_deepslate_wall",
+      "minecraft:cobbled_deepslate_slab",
+      "minecraft:cobbled_deepslate_stairs",
       "minecraft:cobblestone",
       "minecraft:cobblestone_slab",
       "minecraft:cobblestone_stairs",
@@ -270,6 +274,20 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:dead_tube_coral_fan",
       "minecraft:dead_tube_coral",
       "minecraft:dead_tube_coral_wall_fan",
+      "minecraft:deepslate",
+      "minecraft:deepslate_bricks",
+      "minecraft:deepslate_brick_wall",
+      "minecraft:deepslate_brick_slab",
+      "minecraft:deepslate_brick_stairs",
+      "minecraft:deepslate_tiles",
+      "minecraft:deepslate_tile_wall",
+      "minecraft:deepslate_tile_slab",
+      "minecraft:deepslate_tile_stairs",
+      "minecraft:deepslate_gold_ore",
+      "minecraft:deepslate_iron_ore",
+      "minecraft:deepslate_diamond_ore",
+      "minecraft:deepslate_lapis_ore",
+      "minecraft:deepslate_redstone_ore",
       "minecraft:detector_rail",
       "minecraft:diamond_block",
       "minecraft:diamond_ore",
@@ -354,18 +372,6 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:green_terracotta",
       "minecraft:green_wall_banner",
       "minecraft:green_wool",
-      "minecraft:grimstone",
-      "minecraft:grimstone_wall",
-      "minecraft:grimstone_slab",
-      "minecraft:grimstone_stairs",
-      "minecraft:grimstone_bricks",
-      "minecraft:grimstone_brick_wall",
-      "minecraft:grimstone_brick_slab",
-      "minecraft:grimstone_brick_stairs",
-      "minecraft:grimstone_tiles",
-      "minecraft:grimstone_tile_wall",
-      "minecraft:grimstone_tile_slab",
-      "minecraft:grimstone_tile_stairs",
       "minecraft:grindstone",
       "minecraft:hanging_roots",
       "minecraft:hay_block",
@@ -595,10 +601,10 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:polished_granite",
       "minecraft:polished_granite_slab",
       "minecraft:polished_granite_stairs",
-      "minecraft:polished_grimstone",
-      "minecraft:polished_grimstone_wall",
-      "minecraft:polished_grimstone_slab",
-      "minecraft:polished_grimstone_stairs",
+      "minecraft:polished_deepslate",
+      "minecraft:polished_deepslate_wall",
+      "minecraft:polished_deepslate_slab",
+      "minecraft:polished_deepslate_stairs",
       "minecraft:poppy",
       "minecraft:potatoes",
       "minecraft:potted_acacia_sapling",
@@ -726,6 +732,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:small_dripleaf",
       "minecraft:smithing_table",
       "minecraft:smoker",
+      "minecraft:smooth_basalt",
       "minecraft:smooth_quartz",
       "minecraft:smooth_quartz_slab",
       "minecraft:smooth_quartz_stairs",
@@ -2786,40 +2793,54 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new SmallDripleaf(tag.get("Properties").get("half").stringValue("lower"));
       case "spore_blossom":
         return new SporeBlossom();
-      case "grimstone":
-        return new MinecraftBlock(name, Texture.grimstone);
-      case "grimstone_wall":
-        return wall(tag, Texture.grimstone);
-      case "grimstone_slab":
-        return slab(tag, Texture.grimstone);
-      case "grimstone_stairs":
-        return stairs(tag, Texture.grimstone);
-      case "polished_grimstone":
-        return new MinecraftBlock(name, Texture.polishedGrimstone);
-      case "polished_grimstone_wall":
-        return wall(tag, Texture.polishedGrimstone);
-      case "polished_grimstone_slab":
-        return slab(tag, Texture.polishedGrimstone);
-      case "polished_grimstone_stairs":
-        return stairs(tag, Texture.polishedGrimstone);
-      case "grimstone_bricks":
-        return new MinecraftBlock(name, Texture.grimstoneBricks);
-      case "grimstone_brick_wall":
-        return wall(tag, Texture.grimstoneBricks);
-      case "grimstone_brick_slab":
-        return slab(tag, Texture.grimstoneBricks);
-      case "grimstone_brick_stairs":
-        return stairs(tag, Texture.grimstoneBricks);
-      case "grimstone_tiles":
-        return new MinecraftBlock(name, Texture.grimstoneTiles);
-      case "grimstone_tile_wall":
-        return wall(tag, Texture.grimstoneTiles);
-      case "grimstone_tile_slab":
-        return slab(tag, Texture.grimstoneTiles);
-      case "grimstone_tile_stairs":
-        return stairs(tag, Texture.grimstoneTiles);
-      case "chiseled_grimstone":
-        return new MinecraftBlock(name, Texture.chiseledGrimstone);
+      case "deepslate":
+        return new TexturedBlock(name, Texture.deepslate, Texture.deepslateTop);
+      case "deepslate_gold_ore":
+        return new MinecraftBlock(name, Texture.deepslateGoldOre);
+      case "deepslate_iron_ore":
+        return new MinecraftBlock(name, Texture.deepslateIronOre);
+      case "deepslate_diamond_ore":
+        return new MinecraftBlock(name, Texture.deepslateDiamondOre);
+      case "deepslate_lapis_ore":
+        return new MinecraftBlock(name, Texture.deepslateLapisOre);
+      case "deepslate_redstone_ore":
+        return new MinecraftBlock(name, Texture.deepslateRedstoneOre);
+      case "cobbled_deepslate":
+        return new MinecraftBlock(name, Texture.cobbledDeepslate);
+      case "cobbled_deepslate_wall":
+        return wall(tag, Texture.cobbledDeepslate);
+      case "cobbled_deepslate_slab":
+        return slab(tag, Texture.cobbledDeepslate);
+      case "cobbled_deepslate_stairs":
+        return stairs(tag, Texture.cobbledDeepslate);
+      case "polished_deepslate":
+        return new MinecraftBlock(name, Texture.polishedDeepslate);
+      case "polished_deepslate_wall":
+        return wall(tag, Texture.polishedDeepslate);
+      case "polished_deepslate_slab":
+        return slab(tag, Texture.polishedDeepslate);
+      case "polished_deepslate_stairs":
+        return stairs(tag, Texture.polishedDeepslate);
+      case "deepslate_bricks":
+        return new MinecraftBlock(name, Texture.deepslateBricks);
+      case "deepslate_brick_wall":
+        return wall(tag, Texture.deepslateBricks);
+      case "deepslate_brick_slab":
+        return slab(tag, Texture.deepslateBricks);
+      case "deepslate_brick_stairs":
+        return stairs(tag, Texture.deepslateBricks);
+      case "deepslate_tiles":
+        return new MinecraftBlock(name, Texture.deepslateTiles);
+      case "deepslate_tile_wall":
+        return wall(tag, Texture.deepslateTiles);
+      case "deepslate_tile_slab":
+        return slab(tag, Texture.deepslateTiles);
+      case "deepslate_tile_stairs":
+        return stairs(tag, Texture.deepslateTiles);
+      case "chiseled_deepslate":
+        return new MinecraftBlock(name, Texture.chiseledDeepslate);
+      case "smooth_basalt":
+        return new MinecraftBlock(name, Texture.smoothBasalt);
       case "structure_void":
       case "barrier":
         // Invisible.
