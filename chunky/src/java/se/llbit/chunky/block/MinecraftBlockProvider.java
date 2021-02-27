@@ -274,6 +274,20 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:dead_tube_coral_fan",
       "minecraft:dead_tube_coral",
       "minecraft:dead_tube_coral_wall_fan",
+      "minecraft:deepslate",
+      "minecraft:deepslate_bricks",
+      "minecraft:deepslate_brick_wall",
+      "minecraft:deepslate_brick_slab",
+      "minecraft:deepslate_brick_stairs",
+      "minecraft:deepslate_tiles",
+      "minecraft:deepslate_tile_wall",
+      "minecraft:deepslate_tile_slab",
+      "minecraft:deepslate_tile_stairs",
+      "minecraft:deepslate_gold_ore",
+      "minecraft:deepslate_iron_ore",
+      "minecraft:deepslate_diamond_ore",
+      "minecraft:deepslate_lapis_ore",
+      "minecraft:deepslate_redstone_ore",
       "minecraft:detector_rail",
       "minecraft:diamond_block",
       "minecraft:diamond_ore",
@@ -358,15 +372,6 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:green_terracotta",
       "minecraft:green_wall_banner",
       "minecraft:green_wool",
-      "minecraft:deepslate",
-      "minecraft:deepslate_bricks",
-      "minecraft:deepslate_brick_wall",
-      "minecraft:deepslate_brick_slab",
-      "minecraft:deepslate_brick_stairs",
-      "minecraft:deepslate_tiles",
-      "minecraft:deepslate_tile_wall",
-      "minecraft:deepslate_tile_slab",
-      "minecraft:deepslate_tile_stairs",
       "minecraft:grindstone",
       "minecraft:hanging_roots",
       "minecraft:hay_block",
@@ -2790,6 +2795,16 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new SporeBlossom();
       case "deepslate":
         return new TexturedBlock(name, Texture.deepslate, Texture.deepslateTop);
+      case "deepslate_gold_ore":
+        return new MinecraftBlock(name, Texture.deepslateGoldOre);
+      case "deepslate_iron_ore":
+        return new MinecraftBlock(name, Texture.deepslateIronOre);
+      case "deepslate_diamond_ore":
+        return new MinecraftBlock(name, Texture.deepslateDiamondOre);
+      case "deepslate_lapis_ore":
+        return new MinecraftBlock(name, Texture.deepslateLapisOre);
+      case "deepslate_redstone_ore":
+        return new MinecraftBlock(name, Texture.deepslateRedstoneOre);
       case "cobbled_deepslate":
         return new MinecraftBlock(name, Texture.cobbledDeepslate);
       case "cobbled_deepslate_wall":

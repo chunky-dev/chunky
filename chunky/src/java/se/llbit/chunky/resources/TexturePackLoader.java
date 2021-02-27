@@ -3601,6 +3601,11 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/deepslate_tiles", Texture.deepslateTiles);
     addSimpleTexture("assets/minecraft/textures/block/smooth_basalt", Texture.smoothBasalt);
     addSimpleTexture("assets/minecraft/textures/block/cobbled_deepslate", Texture.cobbledDeepslate);
+    addSimpleTexture("assets/minecraft/textures/block/deepslate_gold_ore", Texture.deepslateGoldOre);
+    addSimpleTexture("assets/minecraft/textures/block/deepslate_iron_ore", Texture.deepslateIronOre);
+    addSimpleTexture("assets/minecraft/textures/block/deepslate_diamond_ore", Texture.deepslateDiamondOre);
+    addSimpleTexture("assets/minecraft/textures/block/deepslate_lapis_ore", Texture.deepslateLapisOre);
+    addSimpleTexture("assets/minecraft/textures/block/deepslate_redstone_ore", Texture.deepslateRedstoneOre);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

@@ -975,6 +975,11 @@ public class Texture {
   public static final Texture deepslateTiles = new Texture();
   public static final Texture smoothBasalt = new Texture();
   public static final Texture cobbledDeepslate = new Texture();
+  public static final Texture deepslateGoldOre = new Texture();
+  public static final Texture deepslateIronOre = new Texture();
+  public static final Texture deepslateDiamondOre = new Texture();
+  public static final Texture deepslateLapisOre = new Texture();
+  public static final Texture deepslateRedstoneOre = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
