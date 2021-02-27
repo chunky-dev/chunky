@@ -3593,12 +3593,14 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/small_dripleaf_stem_bottom", Texture.smallDripleafStemBottom);
     addSimpleTexture("assets/minecraft/textures/block/spore_blossom", Texture.sporeBlossom);
     addSimpleTexture("assets/minecraft/textures/block/spore_blossom_base", Texture.sporeBlossomBase);
-    addSimpleTexture("assets/minecraft/textures/block/grimstone", Texture.grimstone);
-    addSimpleTexture("assets/minecraft/textures/block/polished_grimstone", Texture.polishedGrimstone);
-    addSimpleTexture("assets/minecraft/textures/block/chiseled_grimstone", Texture.chiseledGrimstone);
-    addSimpleTexture("assets/minecraft/textures/block/grimstone_bricks", Texture.grimstoneBricks);
-    addSimpleTexture("assets/minecraft/textures/block/grimstone_tiles", Texture.grimstoneTiles);
+    addSimpleTexture("assets/minecraft/textures/block/deepslate", Texture.deepslate);
+    addSimpleTexture("assets/minecraft/textures/block/deepslate_top", Texture.deepslateTop);
+    addSimpleTexture("assets/minecraft/textures/block/polished_deepslate", Texture.polishedDeepslate);
+    addSimpleTexture("assets/minecraft/textures/block/chiseled_deepslate", Texture.chiseledDeepslate);
+    addSimpleTexture("assets/minecraft/textures/block/deepslate_bricks", Texture.deepslateBricks);
+    addSimpleTexture("assets/minecraft/textures/block/deepslate_tiles", Texture.deepslateTiles);
     addSimpleTexture("assets/minecraft/textures/block/smooth_basalt", Texture.smoothBasalt);
+    addSimpleTexture("assets/minecraft/textures/block/cobbled_deepslate", Texture.cobbledDeepslate);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {

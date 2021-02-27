@@ -967,12 +967,14 @@ public class Texture {
   public static final Texture smallDripleafStemBottom = new Texture();
   public static final Texture sporeBlossom = new Texture();
   public static final Texture sporeBlossomBase = new Texture();
-  public static final Texture grimstone = new Texture();
-  public static final Texture polishedGrimstone = new Texture();
-  public static final Texture chiseledGrimstone = new Texture();
-  public static final Texture grimstoneBricks = new Texture();
-  public static final Texture grimstoneTiles = new Texture();
+  public static final Texture deepslate = new Texture();
+  public static final Texture deepslateTop = new Texture();
+  public static final Texture polishedDeepslate = new Texture();
+  public static final Texture chiseledDeepslate = new Texture();
+  public static final Texture deepslateBricks = new Texture();
+  public static final Texture deepslateTiles = new Texture();
   public static final Texture smoothBasalt = new Texture();
+  public static final Texture cobbledDeepslate = new Texture();
 
   /** Banner base texture. */
   public static final Texture bannerBase = new Texture();
