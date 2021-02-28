@@ -8,12 +8,12 @@ import se.llbit.math.Ray;
  * The emission map is stored in the blue channel, the reflectance map in the green channel and the
  * roughness uses the red channel.
  */
-public class OldPbrSpecularMap implements EmissionMap, RoughnessMap, MetalnessMap {
+public class OldPbrSpecularMap implements EmissionMap, RoughnessMap, ReflectanceMap {
 
   private final int width;
   private final int height;
   private byte[] emissionMap;
-  private byte[] metalnessMap;
+  private byte[] reflectanceMap;
   private byte[] roughnessMap;
 
   public OldPbrSpecularMap(BitmapImage texture) {
@@ -35,26 +35,27 @@ public class OldPbrSpecularMap implements EmissionMap, RoughnessMap, MetalnessMa
       emissionMap = null;
     }
 
-    metalnessMap = new byte[texture.width * texture.height];
-    boolean hasMetalness = false;
+    reflectanceMap = new byte[texture.width * texture.height];
+    boolean hasReflectance = false;
     for (int y = 0; y < texture.height; ++y) {
       for (int x = 0; x < texture.width; ++x) {
         // green channel
-        if ((metalnessMap[y * texture.width + x] = (byte) (
-            texture.data[y * texture.width + x] >>> 8)) != (byte) 0x00) {
-          hasMetalness = true;
+        int value = (texture.data[y * texture.width + x] >>> 8) & 0xFF;
+        if (value > 0) {
+          hasReflectance = true;
         }
+        reflectanceMap[y * texture.width + x] = (byte) value;
       }
     }
-    if (!hasMetalness) {
-      metalnessMap = null;
+    if (!hasReflectance) {
+      reflectanceMap = null;
     }
 
     roughnessMap = new byte[texture.width * texture.height];
     boolean hasRoughness = false;
     for (int y = 0; y < texture.height; ++y) {
       for (int x = 0; x < texture.width; ++x) {
-        // red channel stores smoothness
+        // red channel stores roughness
         int value = ((texture.data[y * texture.width + x] >> 16) & 0xFF);
         if (value < 255) {
           hasRoughness = true;
@@ -80,15 +81,15 @@ public class OldPbrSpecularMap implements EmissionMap, RoughnessMap, MetalnessMa
   }
 
   @Override
-  public float getMetalnessAt(double u, double v) {
+  public double getReflectanceAt(double u, double v) {
     int x = (int) (u * width - Ray.EPSILON);
     int y = (int) ((1 - v) * height - Ray.EPSILON);
-    int rawValue = metalnessMap[y * width + x] & 0xFF;
+    int rawValue = reflectanceMap[y * width + x] & 0xFF;
     return rawValue / 255f;
   }
 
-  public boolean hasMetalness() {
-    return metalnessMap != null;
+  public boolean hasReflectance() {
+    return reflectanceMap != null;
   }
 
   @Override

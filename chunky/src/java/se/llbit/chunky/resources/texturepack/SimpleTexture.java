@@ -90,8 +90,9 @@ public class SimpleTexture extends TextureLoader {
           if (specularFormat.equals("oldpbr")) {
             OldPbrSpecularMap specular = new OldPbrSpecularMap(getTextureOrFirstFrame(in.get()));
             texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
-            texture.setReflectanceMap(ReflectanceMap.DEFAULT);
+            texture.setReflectanceMap(specular.hasReflectance() ? specular : ReflectanceMap.EMPTY);
             texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
+            texture.setMetalnessMap(MetalnessMap.EMPTY);
           } else if (specularFormat.equals("labpbr")) {
             LabPbrSpecularMap specular = new LabPbrSpecularMap(getTextureOrFirstFrame(in.get()));
             texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
