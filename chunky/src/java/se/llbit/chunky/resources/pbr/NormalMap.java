@@ -68,7 +68,7 @@ public class NormalMap {
   private void apply(Matrix3 tbn, Vector3 vec, double u, double v) {
     Vector3 n =
         this.normals[
-            (int) (v * height - Ray.EPSILON) * width + (int) (u * width - Ray.EPSILON)];
+            (int) ((1 - v) * height - Ray.EPSILON) * width + (int) (u * width - Ray.EPSILON)];
     if (n.lengthSquared() > 0) {
       vec.set(n);
       tbn.transform(vec);
@@ -79,7 +79,7 @@ public class NormalMap {
   private void apply(Quad quad, Vector3 vec, double u, double v) {
     Vector3 n =
         this.normals[
-            (int) (v * height - Ray.EPSILON) * width + (int) (u * width - Ray.EPSILON)];
+            (int) ((1 - v) * height - Ray.EPSILON) * width + (int) (u * width - Ray.EPSILON)];
     if (n.lengthSquared() > 0) {
       vec.set(n);
       quad.tbn.transform(vec);
