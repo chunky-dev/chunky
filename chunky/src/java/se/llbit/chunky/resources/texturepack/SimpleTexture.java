@@ -90,8 +90,9 @@ public class SimpleTexture extends TextureLoader {
         if (specularFormat.equals("oldpbr")) {
           OldPbrSpecularMap specular = new OldPbrSpecularMap(getTextureOrFirstFrame(in));
           texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
-          texture.setReflectanceMap(ReflectanceMap.DEFAULT);
+          texture.setReflectanceMap(specular.hasReflectance() ? specular : ReflectanceMap.EMPTY);
           texture.setRoughnessMap(specular.hasRoughness() ? specular : RoughnessMap.EMPTY);
+          texture.setMetalnessMap(MetalnessMap.EMPTY);
         } else if (specularFormat.equals("labpbr")) {
           LabPbrSpecularMap specular = new LabPbrSpecularMap(getTextureOrFirstFrame(in));
           texture.setEmissionMap(specular.hasEmission() ? specular : EmissionMap.EMPTY);
@@ -104,18 +105,15 @@ public class SimpleTexture extends TextureLoader {
         texture.setEmissionMap(EmissionMap.EMPTY);
         texture.setReflectanceMap(ReflectanceMap.EMPTY);
         texture.setRoughnessMap(RoughnessMap.EMPTY);
-          texture.setMetalnessMap(MetalnessMap.EMPTY);
+        texture.setMetalnessMap(MetalnessMap.EMPTY);
       }
     }
     if (System.getProperty("chunky.pbr.normal", "false").equals("true")) {
-      try (InputStream in = texturePack.getInputStream(new ZipEntry(file + "_n.png"))) {
-        if (in != null) {
-          texture.setNormalMap(new NormalMap(getTextureOrFirstFrame(in)));
-        } else {
-          texture.setNormalMap(null);
-        }
+      try (InputStream in = Files.newInputStream(texturePack.resolve(file + "_n.png"))) {
+        texture.setNormalMap(new NormalMap(getTextureOrFirstFrame(in)));
       } catch (IOException e) {
         // Safe to ignore
+        texture.setNormalMap(null);
       }
     }
 
