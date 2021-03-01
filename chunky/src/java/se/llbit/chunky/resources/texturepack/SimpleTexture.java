@@ -115,7 +115,9 @@ public class SimpleTexture extends TextureLoader {
         }
       }
     }
-    if (System.getProperty("chunky.pbr.normal", "false").equals("true")) {
+
+    String normalFormat = System.getProperty("chunky.pbr.normal", "");
+    if (normalFormat.equals("oldpbr") || normalFormat.equals("labpbr")) {
       Optional<InputStream> in = Optional.empty();
       try {
         in = texturePack.getInputStream(file + "_n.png");
@@ -123,7 +125,11 @@ public class SimpleTexture extends TextureLoader {
       }
       if (in.isPresent()) {
         try {
-          texture.setNormalMap(new NormalMap(getTextureOrFirstFrame(in.get())));
+          if (normalFormat.equals("oldpbr")) {
+            texture.setNormalMap(new OldPbrNormalMap(getTextureOrFirstFrame(in.get())));
+          } else if (normalFormat.equals("labpbr")) {
+            texture.setNormalMap(new LabPbrNormalMap(getTextureOrFirstFrame(in.get())));
+          }
         } catch (IOException e) {
           texture.setNormalMap(null);
         }
