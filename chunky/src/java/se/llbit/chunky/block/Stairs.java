@@ -10,6 +10,7 @@ public class Stairs extends MinecraftBlockTranslucent {
   private final boolean isCorner;
   private final Texture side, top, bottom;
   private final String description;
+  private final StairModel model;
 
   public Stairs(String name, Texture texture, String half, String shape, String facing) {
     this(name, texture, texture, texture, half, shape, facing);
@@ -115,10 +116,12 @@ public class Stairs extends MinecraftBlockTranslucent {
         }
         break;
     }
+
+    this.model = new StairModel(side, top, bottom, flipped, isCorner, corner, this.facing);
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {
-    return StairModel.intersect(ray, side, top, bottom, flipped, isCorner, corner, facing);
+    return model.intersect(ray,scene);
   }
 
   @Override public String description() {
