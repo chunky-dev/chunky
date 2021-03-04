@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 /**
@@ -52,7 +54,7 @@ public class BlockPalette {
   public final Block stone, water;
 
   private final Map<BlockSpec, Integer> blockMap;
-  private final List<Block> palette;
+  private List<Block> palette;
 
   public BlockPalette(Map<BlockSpec, Integer> initialMap, List<Block> initialList) {
     this.blockMap = initialMap;
@@ -72,7 +74,11 @@ public class BlockPalette {
   }
 
   public BlockPalette() {
-    this(new HashMap<>(), new ArrayList<>());
+    this(new ConcurrentHashMap<>(), new CopyOnWriteArrayList<>());
+  }
+
+  public void finalise() {
+    palette = new ArrayList<>(palette);
   }
 
   /**
