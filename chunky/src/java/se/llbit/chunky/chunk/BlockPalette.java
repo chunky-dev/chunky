@@ -27,12 +27,10 @@ import se.llbit.nbt.Tag;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
@@ -42,6 +40,12 @@ import java.util.function.Consumer;
  * The numerical IDs are used to efficiently store the blocks in the octree.
  *
  * This class also manages material properties.
+ *
+ * <p>Before <code>{@link BlockPalette#finalise()}</code> is called, <code>{@link BlockPalette}</code> is thread safe
+ * for N writer and N reader threads. It locks on <code>{@link BlockPalette#put(BlockSpec)}</code>, and has concurrent
+ * data structures to achieve this.</p>
+ *
+ * After <code>{@link BlockPalette#finalise()}</code> is called, it's should be treated as entirely unsafe for > 1 thread
  */
 public class BlockPalette {
   private static final int BLOCK_PALETTE_VERSION = 4;
@@ -55,6 +59,8 @@ public class BlockPalette {
 
   private final Map<BlockSpec, Integer> blockMap;
   private List<Block> palette;
+
+  private ReentrantLock lock = new ReentrantLock();
 
   public BlockPalette(Map<BlockSpec, Integer> initialMap, List<Block> initialList) {
     this.blockMap = initialMap;
@@ -77,8 +83,18 @@ public class BlockPalette {
     this(new ConcurrentHashMap<>(), new CopyOnWriteArrayList<>());
   }
 
+  /**
+   * should be called when no threads are acting on the palette
+   *
+   * replaces the lock with one that doesn't lock
+   * switches the palette list for a non-concurrent one
+   */
   public void finalise() {
     palette = new ArrayList<>(palette);
+    lock = new ReentrantLock() {
+      @Override public void lock() { }
+      @Override public void unlock() { }
+    };
   }
 
   /**
@@ -91,17 +107,26 @@ public class BlockPalette {
     return put(new BlockSpec(tag));
   }
 
+  /**
+   * locks to avoid race conditions between writer threads
+   */
   public int put(BlockSpec spec) {
-    Integer id = blockMap.get(spec);
-    if (id != null) {
+    final ReentrantLock lock = this.lock;
+    lock.lock();
+    try {
+      Integer id = blockMap.get(spec);
+      if (id != null) {
+        return id;
+      }
+      id = palette.size();
+      blockMap.put(spec, id);
+      Block block = spec.toBlock();
+      applyMaterial(block);
+      palette.add(block);
       return id;
+    } finally {
+      lock.unlock();
     }
-    id = palette.size();
-    blockMap.put(spec, id);
-    Block block = spec.toBlock();
-    applyMaterial(block);
-    palette.add(block);
-    return id;
   }
 
   public Block get(int id) {

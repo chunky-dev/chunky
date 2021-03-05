@@ -19,10 +19,7 @@ package se.llbit.chunky.renderer.scene;
 
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.block.Air;
-import se.llbit.chunky.block.Block;
-import se.llbit.chunky.block.Lava;
-import se.llbit.chunky.block.Water;
+import se.llbit.chunky.block.*;
 import se.llbit.chunky.chunk.BlockPalette;
 import se.llbit.chunky.chunk.ChunkData;
 import se.llbit.chunky.chunk.GenericChunkData;
@@ -832,8 +829,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
       ChunkPosition[] chunkPositions = chunksToLoad.toArray(new ChunkPosition[0]);
 
-      ForkJoinPool commonThreads = Chunky.getCommonThreads();
-      ForkJoinTask<?> nextChunkDataTask = commonThreads.submit(() -> { //Initialise first chunk data for the for loop
+      ExecutorService executor = Executors.newSingleThreadExecutor();
+      Future<?> nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
         world.getChunk(chunkPositions[0]).getChunkData(chunkData1, palette);
       });
       for (int i = 0; i < chunkPositions.length; i++) {
@@ -849,8 +846,9 @@ public class Scene implements JsonSerializable, Refreshable {
         loadedChunks.add(cp);
 
         try {
-          nextChunkDataTask.get();
-        } catch(InterruptedException ignored) { // If except, load the chunk synchronously
+          nextChunkDataTask.get(50, TimeUnit.MILLISECONDS);
+        } catch(TimeoutException | InterruptedException ignored) { // If except, load the chunk synchronously
+          System.out.println(ignored.getCause().getMessage());
           if(usingFirstChunkData) {
             world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette);
           }
@@ -874,8 +872,8 @@ public class Scene implements JsonSerializable, Refreshable {
           usingFirstChunkData = !usingFirstChunkData;
 
           if (i + 1 < chunkPositions.length) { //if has next request next
-            int finalI = i;
-            nextChunkDataTask = commonThreads.submit(() -> {
+            final int finalI = i;
+            nextChunkDataTask = executor.submit(() -> { //Initialise first chunk data for the for loop
               world.getChunk(chunkPositions[finalI + 1]).getChunkData(nextChunkData, palette);
             });
           }
@@ -1169,6 +1167,7 @@ public class Scene implements JsonSerializable, Refreshable {
           }
         }
       }
+      executor.shutdown();
     }
 
     palette.finalise();
