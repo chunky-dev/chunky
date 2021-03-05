@@ -84,11 +84,10 @@ public class BlockPalette {
   }
 
   /**
-   * should be called when no threads are acting on the palette
+   * This method should be called when no threads are acting on the palette anymore.
    *
-   * replaces the lock with one that doesn't lock
-   * switches the palette list for a non-concurrent one
-   * This is done to not limit render performance once async chunk loading is done
+   * It replaces the lock with one that does nothing and switches the palette list for a non-concurrent one.
+   * This is done to not limit render performance once async chunk loading is done.
    */
   public void unsynchronize() {
     palette = new ArrayList<>(palette);
