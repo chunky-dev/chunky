@@ -1170,7 +1170,7 @@ public class Scene implements JsonSerializable, Refreshable {
       executor.shutdown();
     }
 
-    palette.finalise();
+    palette.unsynchronize();
 
     grassTexture = new WorldTexture();
     foliageTexture = new WorldTexture();

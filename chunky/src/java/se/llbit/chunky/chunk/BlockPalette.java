@@ -41,11 +41,11 @@ import java.util.function.Consumer;
  *
  * This class also manages material properties.
  *
- * <p>Before <code>{@link BlockPalette#finalise()}</code> is called, <code>{@link BlockPalette}</code> is thread safe
+ * <p>Before <code>{@link BlockPalette#unsynchronize()}</code> is called, <code>{@link BlockPalette}</code> is thread safe
  * for N writer and N reader threads. It locks on <code>{@link BlockPalette#put(BlockSpec)}</code>, and has concurrent
  * data structures to achieve this.</p>
  *
- * After <code>{@link BlockPalette#finalise()}</code> is called, it's should be treated as entirely unsafe for > 1 thread
+ * After <code>{@link BlockPalette#unsynchronize()}</code> is called, it's should be treated as entirely unsafe for > 1 thread
  */
 public class BlockPalette {
   private static final int BLOCK_PALETTE_VERSION = 4;
@@ -88,8 +88,9 @@ public class BlockPalette {
    *
    * replaces the lock with one that doesn't lock
    * switches the palette list for a non-concurrent one
+   * This is done to not limit render performance once async chunk loading is done
    */
-  public void finalise() {
+  public void unsynchronize() {
     palette = new ArrayList<>(palette);
     lock = new ReentrantLock() {
       @Override public void lock() { }
