@@ -45,7 +45,7 @@ import java.util.function.Consumer;
  * for N writer and N reader threads. It locks on <code>{@link BlockPalette#put(BlockSpec)}</code>, and has concurrent
  * data structures to achieve this.</p>
  *
- * After <code>{@link BlockPalette#unsynchronize()}</code> is called, it's should be treated as entirely unsafe for > 1 thread
+ * After <code>{@link BlockPalette#unsynchronize()}</code> is called, it is only safe to be read by multiple threads concurrently.
  */
 public class BlockPalette {
   private static final int BLOCK_PALETTE_VERSION = 4;
