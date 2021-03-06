@@ -207,6 +207,7 @@ public class ChunkyFxController
       });
     }
   };
+  private final TaskTracker taskTracker = new TaskTracker(progressListener);
 
   public RenderController getRenderController() {
     return renderController;
@@ -327,7 +328,6 @@ public class ChunkyFxController
     asyncSceneManager =
         (AsynchronousSceneManager) renderController.getSceneManager();
     asyncSceneManager.setResetHandler(this);
-    TaskTracker taskTracker = new TaskTracker(progressListener);
     asyncSceneManager.setTaskTracker(taskTracker);
     asyncSceneManager.setOnSceneLoaded(() -> {
       CountDownLatch guiUpdateLatch = new CountDownLatch(1);
@@ -757,8 +757,7 @@ public class ChunkyFxController
       if (!target.getName().endsWith(format.getExtension())) {
         target = new File(target.getPath() + format.getExtension());
       }
-      // TODO: use a task tracker for progress display
-      scene.saveFrame(target, format, new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
+      scene.saveFrame(target, format, taskTracker, renderController.getContext().numRenderThreads());
     }
   }
 
