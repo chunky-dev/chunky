@@ -27,9 +27,11 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
+import javafx.util.StringConverter;
 import se.llbit.chunky.PersistentSettings;
-import se.llbit.chunky.renderer.OutputMode;
+import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.RenderController;
+import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.IntegerAdjuster;
@@ -64,7 +66,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML
   private IntegerAdjuster cacheResolution;
   @FXML
-  private ChoiceBox<OutputMode> outputMode;
+  private ChoiceBox<PictureExportFormat> outputMode;
   @FXML
   private ChoiceBox<String> octreeImplementation;
   @FXML
@@ -81,7 +83,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    outputMode.getItems().addAll(OutputMode.values());
+    outputMode.getItems().addAll(PictureExportFormats.getFormats());
     cpuLoad.setName("CPU utilization");
     cpuLoad.setTooltip("CPU utilization percentage per render thread.");
     cpuLoad.setRange(1, 100);
@@ -106,6 +108,17 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       if(dump != null) {
         // TODO: remove cast.
         ((AsynchronousSceneManager) controller.getSceneManager()).mergeRenderDump(dump);
+      }
+    });
+    outputMode.setConverter(new StringConverter<PictureExportFormat>() {
+      @Override
+      public String toString(PictureExportFormat object) {
+        return object.getName();
+      }
+
+      @Override
+      public PictureExportFormat fromString(String string) {
+        return PictureExportFormats.getFormat(string).get();
       }
     });
     outputMode.getSelectionModel().selectedItemProperty()

@@ -26,7 +26,6 @@ import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.chunky.plugin.ChunkyPlugin;
 import se.llbit.chunky.plugin.TabTransformer;
 import se.llbit.chunky.renderer.ConsoleProgressListener;
-import se.llbit.chunky.renderer.OutputMode;
 import se.llbit.chunky.renderer.RayTracerFactory;
 import se.llbit.chunky.renderer.RenderContext;
 import se.llbit.chunky.renderer.RenderContextFactory;
@@ -36,6 +35,7 @@ import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.RendererFactory;
 import se.llbit.chunky.renderer.SceneProvider;
 import se.llbit.chunky.renderer.SnapshotControl;
+import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.PreviewRayTracer;
@@ -310,7 +310,7 @@ public class Chunky {
               }
             });
         scene.loadDump(context, taskTracker); // Load the render dump.
-        OutputMode outputMode = scene.getOutputMode();
+        PictureExportFormat outputMode = scene.getOutputMode();
         if (options.imageOutputFile.isEmpty()) {
           options.imageOutputFile = String
               .format("%s-%d%s", scene.name(), scene.spp, outputMode.getExtension());
@@ -373,10 +373,12 @@ public class Chunky {
     return renderController;
   }
 
+  @PluginApi
   public void setRenderContextFactory(RenderContextFactory renderContextFactory) {
     this.renderContextFactory = renderContextFactory;
   }
 
+  @PluginApi
   public RenderContextFactory getRenderContextFactory() {
     return renderContextFactory;
   }
@@ -385,26 +387,32 @@ public class Chunky {
     return getRenderController().getContext();
   }
 
+  @PluginApi
   public void setSceneFactory(SceneFactory sceneFactory) {
     this.sceneFactory = sceneFactory;
   }
 
+  @PluginApi
   public SceneFactory getSceneFactory() {
     return sceneFactory;
   }
 
+  @PluginApi
   public void setPreviewRayTracerFactory(RayTracerFactory previewRayTracerFactory) {
     this.previewRayTracerFactory = previewRayTracerFactory;
   }
 
+  @PluginApi
   public RayTracerFactory getPreviewRayTracerFactory() {
     return previewRayTracerFactory;
   }
 
+  @PluginApi
   public void setRayTracerFactory(RayTracerFactory rayTracerFactory) {
     this.rayTracerFactory = rayTracerFactory;
   }
 
+  @PluginApi
   public RayTracerFactory getRayTracerFactory() {
     return rayTracerFactory;
   }
@@ -415,11 +423,13 @@ public class Chunky {
    * <p>Note: To behave nice with other plugins, please call to the previous
    * tab transformer.
    */
+  @PluginApi
   public void setRenderControlsTabTransformer(
       RenderControlsTabTransformer renderControlsTabTransformer) {
     this.renderControlsTabTransformer = renderControlsTabTransformer;
   }
 
+  @PluginApi
   public RenderControlsTabTransformer getRenderControlsTabTransformer() {
     return renderControlsTabTransformer;
   }
@@ -430,10 +440,12 @@ public class Chunky {
    * <p>Note: To behave nice with other plugins, please call to the previous
    * tab transformer.
    */
+  @PluginApi
   public void setMainTabTransformer(TabTransformer mainTabTransformer) {
     this.mainTabTransformer = mainTabTransformer;
   }
 
+  @PluginApi
   public TabTransformer getMainTabTransformer() {
     return mainTabTransformer;
   }
@@ -441,8 +453,18 @@ public class Chunky {
   /**
    * Registers a block provider to add support for blocks.
    */
+  @PluginApi
   public void registerBlockProvider(BlockProvider blockProvider) {
     BlockSpec.blockProviders.add(0, blockProvider);
     MaterialStore.blockIds.addAll(blockProvider.getSupportedBlocks());
+  }
+
+  /**
+   * Check if this Chunky instance is running in headless mode.
+   * @return True if this Chunky instance is running in headless mode, false otherwise
+   */
+  @PluginApi
+  public boolean isHeadless() {
+    return headless;
   }
 }
