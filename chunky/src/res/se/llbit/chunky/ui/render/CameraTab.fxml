@@ -56,7 +56,7 @@
                 <TextField fx:id="posX" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" />
                 <TextField fx:id="posY" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" />
                 <TextField fx:id="posZ" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="3" />
-                <Label text="Lense shift:" GridPane.rowIndex="2" />
+                <Label text="Lens shift:" GridPane.rowIndex="2" />
                 <TextField fx:id="shiftX" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                 <TextField fx:id="shiftY" prefHeight="26.0" prefWidth="86.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
               </children>
