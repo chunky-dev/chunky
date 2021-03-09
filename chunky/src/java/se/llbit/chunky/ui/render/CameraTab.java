@@ -292,9 +292,9 @@ public class CameraTab extends ScrollPane implements RenderControlsTab, Initiali
       updateSubjectDistance();
     });
 
-    shiftX.setTooltip(new Tooltip("Horizontal lense shift (relative to the image height)."));
+    shiftX.setTooltip(new Tooltip("Horizontal lens shift (relative to the image height)."));
     shiftX.textProperty().bindBidirectional(xshift, new NumberStringConverter());
-    shiftY.setTooltip(new Tooltip("Vertical lense shift (relative to the image height)."));
+    shiftY.setTooltip(new Tooltip("Vertical lens shift (relative to the image height)."));
     shiftY.textProperty().bindBidirectional(yshift, new NumberStringConverter());
 
     EventHandler<KeyEvent> shiftHandler = e -> {
