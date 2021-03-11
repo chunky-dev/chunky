@@ -16,8 +16,22 @@
  */
 package se.llbit.chunky.ui;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.net.URL;
+import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -62,13 +76,14 @@ import se.llbit.chunky.main.ZipExportJob;
 import se.llbit.chunky.map.MapView;
 import se.llbit.chunky.map.WorldMapLoader;
 import se.llbit.chunky.renderer.CameraViewListener;
-import se.llbit.chunky.renderer.OutputMode;
+import se.llbit.chunky.renderer.export.PictureExportFormats;
 import se.llbit.chunky.renderer.RenderController;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.RenderStatusListener;
 import se.llbit.chunky.renderer.Renderer;
 import se.llbit.chunky.renderer.ResetReason;
 import se.llbit.chunky.renderer.SnapshotControl;
+import se.llbit.chunky.renderer.export.PictureExportFormat;
 import se.llbit.chunky.renderer.scene.AsynchronousSceneManager;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.RenderResetHandler;
@@ -88,19 +103,6 @@ import se.llbit.log.Log;
 import se.llbit.math.Vector3;
 import se.llbit.util.ProgressListener;
 import se.llbit.util.TaskTracker;
-
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Controller for the main Chunky window.
@@ -205,6 +207,7 @@ public class ChunkyFxController
       });
     }
   };
+  private final TaskTracker taskTracker = new TaskTracker(progressListener);
 
   public RenderController getRenderController() {
     return renderController;
@@ -325,7 +328,6 @@ public class ChunkyFxController
     asyncSceneManager =
         (AsynchronousSceneManager) renderController.getSceneManager();
     asyncSceneManager.setResetHandler(this);
-    TaskTracker taskTracker = new TaskTracker(progressListener);
     asyncSceneManager.setTaskTracker(taskTracker);
     asyncSceneManager.setOnSceneLoaded(() -> {
       CountDownLatch guiUpdateLatch = new CountDownLatch(1);
@@ -737,27 +739,25 @@ public class ChunkyFxController
     if (saveFrameDirectory != null && saveFrameDirectory.isDirectory()) {
       fileChooser.setInitialDirectory(saveFrameDirectory);
     }
-    for (OutputMode mode : OutputMode.values()) {
-      fileChooser.getExtensionFilters().add(new ExtensionFilter(mode.toString(), "*" + mode.getExtension()));
+    Map<ExtensionFilter, PictureExportFormat> filters = new IdentityHashMap<>();
+    for (PictureExportFormat mode : PictureExportFormats.getFormats()) {
+      ExtensionFilter filter = new ExtensionFilter(mode.getDescription(), "*" + mode.getExtension());
+      fileChooser.getExtensionFilters().add(filter);
+      filters.put(filter, mode);
     }
     fileChooser.getExtensionFilters().stream().filter(
-        e -> e.getExtensions().get(0).substring(1).equals(scene.getOutputMode().getExtension()))
+        e -> filters.get(e).equals(scene.outputMode))
         .findFirst().ifPresent(fileChooser::setSelectedExtensionFilter);
     fileChooser.setInitialFileName(String.format("%s-%d",
         scene.name(), renderer.getRenderStatus().getSpp()));
     File target = fileChooser.showSaveDialog(saveFrameBtn.getScene().getWindow());
     if (target != null) {
-      String extension = fileChooser.selectedExtensionFilterProperty().get().getExtensions().get(0).substring(1);
-      if (extension.isEmpty()) {
-        extension = scene.getOutputMode().getExtension();
-      }
       saveFrameDirectory = target.getParentFile();
-      if (!target.getName().endsWith(extension)) {
-        target = new File(target.getPath() + extension);
+      PictureExportFormat format = filters.getOrDefault(fileChooser.selectedExtensionFilterProperty().get(), PictureExportFormats.PNG);
+      if (!target.getName().endsWith(format.getExtension())) {
+        target = new File(target.getPath() + format.getExtension());
       }
-      // TODO: use a task tracker for progress display
-      scene.saveFrame(target, OutputMode.fromExtension(extension),
-          new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
+      scene.saveFrame(target, format, taskTracker, renderController.getContext().numRenderThreads());
     }
   }
 
@@ -767,7 +767,7 @@ public class ChunkyFxController
       PipedOutputStream out = new PipedOutputStream(in);
       new Thread(() -> {
         try {
-          scene.writeFrame(out, OutputMode.PNG, new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
+          scene.writeFrame(out, PictureExportFormats.PNG, new TaskTracker(ProgressListener.NONE), renderController.getContext().numRenderThreads());
         } catch (IOException e) {
           Log.warn("Failed to copy image to clipboard", e);
         }

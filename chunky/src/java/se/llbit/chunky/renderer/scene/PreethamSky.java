@@ -94,12 +94,18 @@ public class PreethamSky implements SimulatedSky {
 
   @Override
   public boolean updateSun(Sun sun, double horizonOffset) {
-    if (theta != sun.getAzimuth() || phi != sun.getAltitude() || this.horizonOffset != horizonOffset) {
+    // Clamp sky to be above horizon and follow sun properly
+    double alt = QuickMath.clamp(sun.getAltitude(), 0, PI);
+    if (alt > PI/2) {
+      alt = PI - alt;
+    }
+
+    if (theta != sun.getAzimuth() || phi != alt || this.horizonOffset != horizonOffset) {
       theta = sun.getAzimuth();
-      phi = sun.getAltitude();
+      phi = alt;
       double r = QuickMath.abs(FastMath.cos(phi));
       sw.set(FastMath.cos(theta) * r, FastMath.sin(phi), FastMath.sin(theta) * r);
-      updateSkylightValues(sun.getAltitude());
+      updateSkylightValues(alt);
 
       this.horizonOffset = horizonOffset;
 
