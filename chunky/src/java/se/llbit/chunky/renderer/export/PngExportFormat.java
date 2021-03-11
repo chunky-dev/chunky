@@ -34,11 +34,12 @@ public class PngExportFormat implements PictureExportFormat {
     try (TaskTracker.Task task = taskTracker.task("Writing PNG");
         PngFileWriter writer = new PngFileWriter(out)) {
       BitmapImage backBuffer = scene.getBackBuffer();
+      int width = scene.subareaWidth();
+      int height = scene.subareaHeight();
       if (scene.transparentSky()) {
-        writer.write(backBuffer.data, scene.getAlphaChannel(), scene.canvasWidth(),
-            scene.canvasHeight(), task);
+        writer.write(backBuffer, scene.getSampleBuffer(), width, height, task);
       } else {
-        writer.write(backBuffer.data, scene.canvasWidth(), scene.canvasHeight(), task);
+        writer.write(backBuffer, width, height, task);
       }
       if (scene.camera().getProjectionMode() == ProjectionMode.PANORAMIC
           && scene.camera().getFov() >= 179
@@ -48,18 +49,18 @@ public class PngExportFormat implements PictureExportFormat {
         xmp += " <rdf:Description rdf:about=''\n";
         xmp += "   xmlns:GPano='http://ns.google.com/photos/1.0/panorama/'>\n";
         xmp += " <GPano:CroppedAreaImageHeightPixels>";
-        xmp += scene.canvasHeight();
+        xmp += scene.renderHeight();
         xmp += "</GPano:CroppedAreaImageHeightPixels>\n";
         xmp += " <GPano:CroppedAreaImageWidthPixels>";
-        xmp += scene.canvasWidth();
+        xmp += scene.renderWidth();
         xmp += "</GPano:CroppedAreaImageWidthPixels>\n";
         xmp += " <GPano:CroppedAreaLeftPixels>0</GPano:CroppedAreaLeftPixels>\n";
         xmp += " <GPano:CroppedAreaTopPixels>0</GPano:CroppedAreaTopPixels>\n";
         xmp += " <GPano:FullPanoHeightPixels>";
-        xmp += scene.canvasHeight();
+        xmp += scene.renderHeight();
         xmp += "</GPano:FullPanoHeightPixels>\n";
         xmp += " <GPano:FullPanoWidthPixels>";
-        xmp += scene.canvasWidth();
+        xmp += scene.renderWidth();
         xmp += "</GPano:FullPanoWidthPixels>\n";
         xmp += " <GPano:ProjectionType>equirectangular</GPano:ProjectionType>\n";
         xmp += " <GPano:UsePanoramaViewer>True</GPano:UsePanoramaViewer>\n";
