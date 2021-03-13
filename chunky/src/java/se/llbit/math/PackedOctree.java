@@ -16,6 +16,7 @@
  */
 package se.llbit.math;
 
+import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
 import org.apache.commons.math3.util.Pair;
 import se.llbit.chunky.block.UnknownBlock;
@@ -135,6 +136,10 @@ public class PackedOctree implements Octree.OctreeImplementation {
   @Override
   public int getType(Octree.NodeId node) {
     return -treeData[((NodeId) node).nodeIndex];
+  }
+
+  private int getTypeFromIndex(int nodeIndex) {
+    return -treeData[nodeIndex];
   }
 
   @Override
@@ -372,7 +377,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * x, y, z are in octree coordinates, NOT world coordinates.
    */
   @Override
-  public IntObjectImmutablePair<Octree.NodeId> getWithLevel(int x, int y, int z) {
+  public void getWithLevel(IntIntMutablePair typeAndLevel, int x, int y, int z) {
     int nodeIndex = 0;
     int level = depth;
     while(treeData[nodeIndex] > 0) {
@@ -382,7 +387,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
       int lz = z >>> level;
       nodeIndex = treeData[nodeIndex] + (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1));
     }
-    return new IntObjectImmutablePair<>(level, new NodeId(nodeIndex));
+    typeAndLevel.left(getTypeFromIndex(nodeIndex)).right(level);
   }
 
   /**

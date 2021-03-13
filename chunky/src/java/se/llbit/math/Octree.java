@@ -21,6 +21,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
 import org.apache.commons.math3.util.FastMath;
 
@@ -67,7 +68,7 @@ public class Octree {
     int getData(NodeId node);
     default void startFinalization() {}
     default void endFinalization() {}
-    default IntObjectImmutablePair<NodeId> getWithLevel(int x, int y, int z) {
+    default void getWithLevel(IntIntMutablePair typeAndLevel, int x, int y, int z) {
       NodeId node = getRoot();
       int level = getDepth();
       while(isBranch(node)) {
@@ -77,7 +78,7 @@ public class Octree {
         int lz = z >>> level;
         node = getChild(node, (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)));
       }
-      return new IntObjectImmutablePair<>(level, node);
+      typeAndLevel.right(level).left(getType(node));
     }
   }
 
@@ -479,6 +480,8 @@ public class Octree {
     double offsetY = -ray.o.y * invDy;
     double offsetZ = -ray.o.z * invDz;
 
+    IntIntMutablePair typeAndLevel = new IntIntMutablePair(0, 0);
+
     // Marching is done in a top-down fashion: at each step, the octree is descended from the root to find the leaf
     // node the ray is in. Terminating the march is then decided based on the block type in that leaf node. Finally the
     // ray is advanced to the boundary of the current leaf node and the next, ready for the next iteration.
@@ -496,16 +499,16 @@ public class Octree {
       if (lx != 0 || ly != 0 || lz != 0)
         return false; // outside of octree!
 
-      IntObjectImmutablePair<NodeId> nodeAndLevel = implementation.getWithLevel(x, y, z);
-      NodeId node = nodeAndLevel.right();
-      int level = nodeAndLevel.leftInt();
+      implementation.getWithLevel(typeAndLevel, x, y, z);
+      int type = typeAndLevel.leftInt();
+      int level = typeAndLevel.rightInt();
 
       lx = x >>> level;
       ly = y >>> level;
       lz = z >>> level;
 
       // Test intersection
-      Block currentBlock = palette.get(implementation.getType(node));
+      Block currentBlock = palette.get(type);
       Material prevBlock = ray.getCurrentMaterial();
 
       ray.setPrevMaterial(prevBlock, ray.getCurrentData());
@@ -613,6 +616,8 @@ public class Octree {
     // Marching is done in a top-down fashion: at each step, the octree is descended from the root to find the leaf
     // node the ray is in. Terminating the march is then decided based on the block type in that leaf node. Finally the
     // ray is advanced to the boundary of the current leaf node and the next, ready for the next iteration.
+
+    IntIntMutablePair typeAndLevel = new IntIntMutablePair(0, 0);
     while (true) {
       // Add small offset past the intersection to avoid
       // recursion to the same octree node!
@@ -628,16 +633,16 @@ public class Octree {
         return false; // outside of octree!
 
       // Descend the tree to find the current leaf node
-      IntObjectImmutablePair<NodeId> nodeAndLevel = implementation.getWithLevel(x, y, z);
-      NodeId node = nodeAndLevel.right();
-      int level = nodeAndLevel.leftInt();
+      implementation.getWithLevel(typeAndLevel, x, y, z);
+      int type = typeAndLevel.leftInt();
+      int level = typeAndLevel.rightInt();
 
       lx = x >>> level;
       ly = y >>> level;
       lz = z >>> level;
 
       // Test intersection
-      Block currentBlock = palette.get(implementation.getType(node));
+      Block currentBlock = palette.get(type);
       Material prevBlock = ray.getCurrentMaterial();
 
       ray.setPrevMaterial(prevBlock, ray.getCurrentData());
