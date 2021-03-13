@@ -212,7 +212,9 @@ public class Chunky {
     }
 
     int exitCode = 0;
-    if (cmdline.mode != CommandLineOptions.Mode.NOTHING) {
+    if (cmdline.mode == CommandLineOptions.Mode.NOTHING) {
+      exitCode = cmdline.exitCode;
+    } else {
       commonThreads = new ForkJoinPool(PersistentSettings.getNumThreads());
 
       Chunky chunky = new Chunky(cmdline.options);
@@ -235,9 +237,9 @@ public class Chunky {
         Log.error("Unchecked exception caused Chunky to close.", t);
         exitCode = 2;
       }
-      if (exitCode != 0) {
-        System.exit(exitCode);
-      }
+    }
+    if (exitCode != 0) {
+      System.exit(exitCode);
     }
   }
 
@@ -309,7 +311,10 @@ public class Chunky {
                 // Don't report task state to progress listener.
               }
             });
-        scene.loadDump(context, taskTracker); // Load the render dump.
+        if (!scene.loadDump(context, taskTracker)) {
+          System.err.println("Failed to load the dump file found for this scene");
+          return 1;
+        }
         PictureExportFormat outputMode = scene.getOutputMode();
         if (options.imageOutputFile.isEmpty()) {
           options.imageOutputFile = String
