@@ -527,7 +527,13 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public synchronized void loadScene(RenderContext context, String sceneName, TaskTracker taskTracker)
       throws IOException {
-    loadDescription(context.getSceneDescriptionInputStream(sceneName));
+    try {
+      loadDescription(context.getSceneDescriptionInputStream(sceneName));
+    } catch (FileNotFoundException e) {
+      // scene.json not found, try loading the backup file
+      Log.info("Scene description file not found, trying to load the backup file instead", e);
+      loadDescription(context.getSceneFileInputStream(sceneName + Scene.EXTENSION + ".backup"));
+    }
 
     if (sdfVersion < SDF_VERSION) {
       Log.warn("Old scene version detected! The scene may not have been loaded correctly.");

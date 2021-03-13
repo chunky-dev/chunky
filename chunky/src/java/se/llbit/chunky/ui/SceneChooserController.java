@@ -205,7 +205,9 @@ public class SceneChooserController implements Initializable {
     private final File sceneDirectory;
 
     private SceneListItem(JsonObject scene, File sceneFile) {
-      sceneName = sceneFile.getName().substring(0, sceneFile.getName().length() - Scene.EXTENSION.length());
+      sceneName = sceneFile.getName().substring(0, sceneFile.getName().length() - (
+          sceneFile.getName().endsWith(".backup") ? 7 + Scene.EXTENSION.length()
+              : Scene.EXTENSION.length()));
       sceneDirectory = sceneFile.getParentFile();
       chunkSize = scene.get("chunkList").array().size();
       dimensions = String.format("%sx%s", scene.get("width").intValue(400), scene.get("height").intValue(400));

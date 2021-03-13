@@ -34,7 +34,7 @@ public class SceneHelper {
    */
   public static List<File> getAvailableSceneFiles(File sceneDir) {
     //Get all the files with either a .json extension or get all directories in the given folder since scenes can be held in directories now.
-    File[] sceneList = sceneDir.listFiles((dir, name) ->  name.endsWith(Scene.EXTENSION) || new File(dir, name).isDirectory());
+    File[] sceneList = sceneDir.listFiles((dir, name) ->  name.endsWith(Scene.EXTENSION)  || name.endsWith(Scene.EXTENSION + ".backup")|| new File(dir, name).isDirectory());
     if (sceneList == null) {
       return Collections.emptyList();
     }
