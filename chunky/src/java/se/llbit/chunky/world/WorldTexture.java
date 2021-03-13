@@ -16,10 +16,11 @@
  */
 package se.llbit.chunky.world;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ import java.util.Map;
  */
 public class WorldTexture {
 
-  private final Map<Long, ChunkTexture> map = new HashMap<>();
+  private final Long2ObjectOpenHashMap<ChunkTexture> map = new Long2ObjectOpenHashMap<>();
 
   /**
    * Timestamp of last serialization.
