@@ -16,6 +16,7 @@
  */
 package se.llbit.math;
 
+import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
 import org.apache.commons.math3.util.Pair;
 import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
@@ -371,7 +372,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
    * x, y, z are in octree coordinates, NOT world coordinates.
    */
   @Override
-  public Pair<Octree.NodeId, Integer> getWithLevel(int x, int y, int z) {
+  public IntObjectImmutablePair<Octree.NodeId> getWithLevel(int x, int y, int z) {
     int nodeIndex = 0;
     int level = depth;
     while(treeData[nodeIndex] > 0) {
@@ -381,7 +382,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
       int lz = z >>> level;
       nodeIndex = treeData[nodeIndex] + (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1));
     }
-    return new Pair<>(new NodeId(nodeIndex), level);
+    return new IntObjectImmutablePair<>(level, new NodeId(nodeIndex));
   }
 
   /**

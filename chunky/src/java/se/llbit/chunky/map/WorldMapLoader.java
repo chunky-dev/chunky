@@ -58,7 +58,7 @@ public class WorldMapLoader implements ChunkTopographyListener, ChunkViewListene
     RegionChangeWatcher regionWatcher = new RegionChangeWatcher(this, mapView);
 
     // Start worker threads.
-    RegionParser[] regionParsers = new RegionParser[Integer.parseInt(System.getProperty("chunky.mapLoaderThreads", "3"))];
+    RegionParser[] regionParsers = new RegionParser[Integer.parseInt(System.getProperty("chunky.mapLoaderThreads", "12"))];
     for (int i = 0; i < regionParsers.length; ++i) {
       regionParsers[i] = new RegionParser(this, regionQueue, mapView);
       regionParsers[i].start();

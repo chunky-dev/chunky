@@ -21,9 +21,9 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
 import org.apache.commons.math3.util.FastMath;
 
-import org.apache.commons.math3.util.Pair;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Water;
@@ -67,7 +67,7 @@ public class Octree {
     int getData(NodeId node);
     default void startFinalization() {}
     default void endFinalization() {}
-    default Pair<NodeId, Integer> getWithLevel(int x, int y, int z) {
+    default IntObjectImmutablePair<NodeId> getWithLevel(int x, int y, int z) {
       NodeId node = getRoot();
       int level = getDepth();
       while(isBranch(node)) {
@@ -77,7 +77,7 @@ public class Octree {
         int lz = z >>> level;
         node = getChild(node, (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)));
       }
-      return new Pair<>(node, level);
+      return new IntObjectImmutablePair<>(level, node);
     }
   }
 
@@ -496,9 +496,9 @@ public class Octree {
       if (lx != 0 || ly != 0 || lz != 0)
         return false; // outside of octree!
 
-      Pair<NodeId, Integer> nodeAndLevel = implementation.getWithLevel(x, y, z);
-      NodeId node = nodeAndLevel.getFirst();
-      int level = nodeAndLevel.getSecond();
+      IntObjectImmutablePair<NodeId> nodeAndLevel = implementation.getWithLevel(x, y, z);
+      NodeId node = nodeAndLevel.right();
+      int level = nodeAndLevel.leftInt();
 
       lx = x >>> level;
       ly = y >>> level;
@@ -628,9 +628,9 @@ public class Octree {
         return false; // outside of octree!
 
       // Descend the tree to find the current leaf node
-      Pair<NodeId, Integer> nodeAndLevel = implementation.getWithLevel(x, y, z);
-      NodeId node = nodeAndLevel.getFirst();
-      int level = nodeAndLevel.getSecond();
+      IntObjectImmutablePair<NodeId> nodeAndLevel = implementation.getWithLevel(x, y, z);
+      NodeId node = nodeAndLevel.right();
+      int level = nodeAndLevel.leftInt();
 
       lx = x >>> level;
       ly = y >>> level;
