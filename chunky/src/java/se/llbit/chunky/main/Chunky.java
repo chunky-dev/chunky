@@ -309,7 +309,10 @@ public class Chunky {
                 // Don't report task state to progress listener.
               }
             });
-        scene.loadDump(context, taskTracker); // Load the render dump.
+        if (!scene.loadDump(context, taskTracker)) {
+          System.err.println("Failed to load the dump file found for this scene");
+          return 1;
+        }
         PictureExportFormat outputMode = scene.getOutputMode();
         if (options.imageOutputFile.isEmpty()) {
           options.imageOutputFile = String
