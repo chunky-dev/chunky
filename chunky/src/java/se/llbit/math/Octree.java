@@ -68,7 +68,7 @@ public class Octree {
     int getData(NodeId node);
     default void startFinalization() {}
     default void endFinalization() {}
-    default void getWithLevel(IntIntMutablePair typeAndLevel, int x, int y, int z) {
+    default void getWithLevel(IntIntMutablePair outTypeAndLevel, int x, int y, int z) {
       NodeId node = getRoot();
       int level = getDepth();
       while(isBranch(node)) {
@@ -78,7 +78,7 @@ public class Octree {
         int lz = z >>> level;
         node = getChild(node, (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1)));
       }
-      typeAndLevel.right(level).left(getType(node));
+      outTypeAndLevel.right(level).left(getType(node));
     }
   }
 

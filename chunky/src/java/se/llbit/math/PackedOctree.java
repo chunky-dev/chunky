@@ -372,12 +372,12 @@ public class PackedOctree implements Octree.OctreeImplementation {
   /**
    * Gets a NodeID and depth of the node that is (or contains) the specified block.
    *
-   * Note: The creation of the Pair\<\> object seems to be a major time consumer in the actual tracing algorithm. (called from Octree.enterBlock)
+   * @param outTypeAndLevel is the reusable output type and level parameters, this is to save on allocation of {@code org.apache.commons.math3.util.Pair} and {@code PackedOctree.NodeId}
    *
-   * x, y, z are in octree coordinates, NOT world coordinates.
+   * @param x,y,z are in octree coordinates, NOT world coordinates.
    */
   @Override
-  public void getWithLevel(IntIntMutablePair typeAndLevel, int x, int y, int z) {
+  public void getWithLevel(IntIntMutablePair outTypeAndLevel, int x, int y, int z) {
     int nodeIndex = 0;
     int level = depth;
     while(treeData[nodeIndex] > 0) {
@@ -387,7 +387,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
       int lz = z >>> level;
       nodeIndex = treeData[nodeIndex] + (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1));
     }
-    typeAndLevel.left(getTypeFromIndex(nodeIndex)).right(level);
+    outTypeAndLevel.left(getTypeFromIndex(nodeIndex)).right(level);
   }
 
   /**
