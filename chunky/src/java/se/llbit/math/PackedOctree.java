@@ -374,7 +374,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
    *
    * @param outTypeAndLevel is the reusable output type and level parameters, this is to save on allocation of {@code org.apache.commons.math3.util.Pair} and {@code PackedOctree.NodeId}
    *
-   * @param x,y,z are in octree coordinates, NOT world coordinates.
+   * x, y, z are in octree coordinates, NOT world coordinates.
    */
   @Override
   public void getWithLevel(IntIntMutablePair outTypeAndLevel, int x, int y, int z) {
