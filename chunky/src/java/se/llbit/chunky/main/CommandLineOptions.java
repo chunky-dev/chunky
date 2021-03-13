@@ -174,7 +174,7 @@ public class CommandLineOptions {
           } else {
             throw new ArgumentError(String.format(
                 "Missing argument for %s option. Found %d arguments, expected %d.",
-                flag, i + 1, numOptions.start));
+                flag, i, numOptions.start));
           }
         }
         optionArguments.add(arguments.remove(0));
