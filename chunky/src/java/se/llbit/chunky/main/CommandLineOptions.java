@@ -95,9 +95,18 @@ public class CommandLineOptions {
           "  --verbose             verbose logging in the launcher",
           "  --console             show the GUI console in headless mode");
 
+  /**
+   * True if any command line option provided was invalid.
+   */
   protected boolean configurationError = false;
 
   protected Mode mode = Mode.DEFAULT;
+
+  /**
+   * Exit code to exit the application with if mode is DEFAULT
+   * (i.e. if the argument handlers did all the work).
+   */
+  protected int exitCode = 0;
 
   protected ChunkyOptions options = ChunkyOptions.getDefaults();
 
@@ -331,10 +340,13 @@ public class CommandLineOptions {
         System.out.println("Done!");
       } catch (MalformedURLException e) {
         System.err.println("Malformed URL (" + e.getMessage() + ")");
+        exitCode = 1;
       } catch (FileNotFoundException e) {
         System.err.println("File not found (" + e.getMessage() + ")");
+        exitCode = 1;
       } catch (IOException e) {
         System.err.println("Download failed (" + e.getMessage() + ")");
+        exitCode = 1;
       }
     });
 
@@ -346,12 +358,14 @@ public class CommandLineOptions {
       if (!dumpfile.isFile()) {
         Log.error("Not a valid render dump file: " + dumpPath);
         configurationError = true;
+        exitCode = 1;
         return;
       }
       File sceneFile = options.getSceneDescriptionFile();
       if (!sceneFile.isFile()) {
         Log.error("Not a valid scene: " + options.sceneName);
         configurationError = true;
+        exitCode = 1;
         return;
       }
       try {
@@ -378,6 +392,7 @@ public class CommandLineOptions {
         }
       } catch (IOException e) {
         Log.error("Failed to merge render dump.", e);
+        exitCode = 1;
       }
     });
 

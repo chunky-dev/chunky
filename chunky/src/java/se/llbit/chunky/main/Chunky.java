@@ -212,7 +212,9 @@ public class Chunky {
     }
 
     int exitCode = 0;
-    if (cmdline.mode != CommandLineOptions.Mode.NOTHING) {
+    if (cmdline.mode == CommandLineOptions.Mode.NOTHING) {
+      exitCode = cmdline.exitCode;
+    } else {
       commonThreads = new ForkJoinPool(PersistentSettings.getNumThreads());
 
       Chunky chunky = new Chunky(cmdline.options);
@@ -235,9 +237,9 @@ public class Chunky {
         Log.error("Unchecked exception caused Chunky to close.", t);
         exitCode = 2;
       }
-      if (exitCode != 0) {
-        System.exit(exitCode);
-      }
+    }
+    if (exitCode != 0) {
+      System.exit(exitCode);
     }
   }
 
