@@ -1039,7 +1039,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   Octree.Node waterNode = new Octree.Node(palette.waterId);
                   if (cy + 1 < yMax) {
                     if (palette.get(chunkData.getBlockAt(cx, cy + 1, cz)).isWaterFilled()) {
-                      waterNode = new Octree.Node(palette.getWaterId(8, 1 << Water.FULL_BLOCK));
+                      waterNode = new Octree.Node(palette.getWaterId(0, 1 << Water.FULL_BLOCK));
                     }
                   }
                   if (block.isWater()) {
@@ -1048,8 +1048,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
                     if (notOnEdge) {
                       // Perform water computation now for water blocks that are not on th edge of the chunk
+                      // Test if the block has not already be marked as full
                       if (((Water) palette.get(waterNode.type)).data == 0) {
-                        // Test if the block has not already be marked as full
                         int level0 = 8 - ((Water) block).level;
                         int corner0 = level0;
                         int corner1 = level0;
@@ -1103,8 +1103,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   waterOctree.set(waterNode, x, cy - origin.y, z);
                 } else if (cy + 1 < yMax && block instanceof Lava) {
                   if (palette.get(chunkData.getBlockAt(cx, cy+1, cz)) instanceof Lava) {
-                    octNode = new Octree.Node(
-                        palette.getLavaId(((Lava) block).level, 1 << Water.FULL_BLOCK));
+                    octNode = new Octree.Node(palette.getLavaId(0, 1 << Water.FULL_BLOCK));
                   } else if (notOnEdge) {
                     // Compute lava level for blocks not on edge
                     Lava lava = (Lava) block;
