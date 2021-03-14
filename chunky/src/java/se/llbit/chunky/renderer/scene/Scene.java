@@ -271,7 +271,13 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected Vector3i origin = new Vector3i();
 
+  /**
+   * Actual upper y bound (might be lower than yClipMax).
+   */
   protected int yMax = 256;
+  /**
+   * Actual lower y bound (might be higher than yClipMin).
+   */
   protected int yMin = 0;
 
   private BlockPalette palette;
@@ -436,6 +442,8 @@ public class Scene implements JsonSerializable, Refreshable {
       foliageTexture = other.foliageTexture;
       waterTexture = other.waterTexture;
       origin.set(other.origin);
+      yMin = other.yMin;
+      yMax = other.yMax;
 
       chunks = other.chunks;
 
@@ -2450,6 +2458,8 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("height", height);
     json.add("yClipMin", yClipMin);
     json.add("yClipMax", yClipMax);
+    json.add("yMin", yMin);
+    json.add("yMax", yMax);
     json.add("exposure", exposure);
     json.add("postprocess", postprocess.name());
     json.add("outputMode", outputMode.getName());
@@ -2710,6 +2720,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     yClipMin = json.get("yClipMin").asInt(yClipMin);
     yClipMax = json.get("yClipMax").asInt(yClipMax);
+    yMin = json.get("yMin").asInt(Math.max(yClipMin, yMin));
+    yMax = json.get("yMax").asInt(Math.min(yClipMax, yMax));
 
     exposure = json.get("exposure").doubleValue(exposure);
     postprocess = Postprocess.get(json.get("postprocess").stringValue(postprocess.name()));
