@@ -796,9 +796,9 @@ public class Scene implements JsonSerializable, Refreshable {
 
     boolean isTallWorld = world.getVersionId() >= World.VERSION_21W06A;
     if (isTallWorld) {
-      // snapshot 21w06a or later, treat as -64 - 320
-      yMin = Math.max(-64, yClipMin);
-      yMax = Math.min(320, yClipMax);
+      // snapshot 21w06a or later, don't limit yMin/yMax to allow custom height worlds
+      yMin = yClipMin;
+      yMax = yClipMax;
     } else {
       // treat as 0 - 256 world
       yMin = Math.max(0, yClipMin);
