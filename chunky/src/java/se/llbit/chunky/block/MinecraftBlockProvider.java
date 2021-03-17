@@ -152,8 +152,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:carved_pumpkin",
       "minecraft:cauldron",
       "minecraft:cave_air",
-      "minecraft:cave_vines_body",
-      "minecraft:cave_vines_head",
+      "minecraft:cave_vines_plant",
+      "minecraft:cave_vines",
       "minecraft:chain_command_block",
       "minecraft:chain",
       "minecraft:chest",
@@ -2734,7 +2734,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "lava_cauldron":
         return new LavaCauldron();
       case "lightning_rod":
-        return new LightningRod(BlockProvider.facing(tag, "up"));
+        return new LightningRod(BlockProvider.facing(tag, "up"), tag.get("Properties").get("powered").stringValue("false").equals("true"));
       case "small_amethyst_bud":
         return new AmethystCluster(name, Texture.smallAmethystBud, BlockProvider.facing(tag, "up"),
             isLit(tag, true));
@@ -2784,9 +2784,10 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.mossBlock);
       case "moss_carpet":
         return new Carpet(name, Texture.mossBlock);
-      case "cave_vines_body":
-      case "cave_vines_head":
-        return new CaveVines(name, tag.get("Properties").get("berries").stringValue("false").equals("true"));
+      case "cave_vines_plant":
+        return new CaveVines(name, tag.get("Properties").get("berries").stringValue("false").equals("true"), true);
+      case "cave_vines":
+        return new CaveVines(name, tag.get("Properties").get("berries").stringValue("false").equals("true"), false);
       case "hanging_roots":
         return new SpriteBlock(name, Texture.hangingRoots);
       case "rooted_dirt":
@@ -2796,7 +2797,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "big_dripleaf":
         return new BigDripleaf(BlockProvider.facing(tag, "north"), tag.get("Properties").get("tilt").stringValue("none"));
       case "small_dripleaf":
-        return new SmallDripleaf(tag.get("Properties").get("half").stringValue("lower"));
+        return new SmallDripleaf(BlockProvider.facing(tag, "north"), tag.get("Properties").get("half").stringValue("lower"));
       case "spore_blossom":
         return new SporeBlossom();
       case "deepslate":

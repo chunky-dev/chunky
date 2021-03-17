@@ -88,13 +88,14 @@ public class LightningRodModel {
     orientedQuads[5] = Model.rotateY(orientedQuads[3]);
   }
 
-  public static boolean intersect(Ray ray, String facing) {
+  public static boolean intersect(Ray ray, String facing, boolean powered) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
+    Texture texture = powered ? Texture.lightningRodOn : Texture.lightningRod;
 
     for (Quad quad : orientedQuads[getOrientationIndex(facing)]) {
       if (quad.intersect(ray)) {
-        float[] color = Texture.lightningRod.getColor(ray.u, ray.v);
+        float[] color = texture.getColor(ray.u, ray.v);
         if (color[3] > Ray.EPSILON) {
           ray.color.set(color);
           ray.t = ray.tNext;
