@@ -2797,7 +2797,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "big_dripleaf":
         return new BigDripleaf(BlockProvider.facing(tag, "north"), tag.get("Properties").get("tilt").stringValue("none"));
       case "small_dripleaf":
-        return new SmallDripleaf(tag.get("Properties").get("half").stringValue("lower"));
+        return new SmallDripleaf(BlockProvider.facing(tag, "north"), tag.get("Properties").get("half").stringValue("lower"));
       case "spore_blossom":
         return new SporeBlossom();
       case "deepslate":
