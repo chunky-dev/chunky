@@ -26,4 +26,8 @@ public class LightningRod extends MinecraftBlockTranslucent {
   public String description() {
     return "facing=" + facing + ", powered=" + powered;
   }
+
+  public boolean isPowered() {
+    return powered;
+  }
 }
