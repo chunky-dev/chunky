@@ -152,8 +152,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:carved_pumpkin",
       "minecraft:cauldron",
       "minecraft:cave_air",
-      "minecraft:cave_vines_body",
-      "minecraft:cave_vines_head",
+      "minecraft:cave_vines_plant",
+      "minecraft:cave_vines",
       "minecraft:chain_command_block",
       "minecraft:chain",
       "minecraft:chest",
@@ -2784,9 +2784,10 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.mossBlock);
       case "moss_carpet":
         return new Carpet(name, Texture.mossBlock);
-      case "cave_vines_body":
-      case "cave_vines_head":
-        return new CaveVines(name, tag.get("Properties").get("berries").stringValue("false").equals("true"));
+      case "cave_vines_plant":
+        return new CaveVines(name, tag.get("Properties").get("berries").stringValue("false").equals("true"), true);
+      case "cave_vines":
+        return new CaveVines(name, tag.get("Properties").get("berries").stringValue("false").equals("true"), false);
       case "hanging_roots":
         return new SpriteBlock(name, Texture.hangingRoots);
       case "rooted_dirt":

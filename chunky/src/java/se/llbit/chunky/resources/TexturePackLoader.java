@@ -3577,10 +3577,10 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/azalea_leaves", Texture.azaleaLeaves);
     addSimpleTexture("assets/minecraft/textures/block/azalea_leaves_flowers", Texture.azaleaLeavesFlowers);
     addSimpleTexture("assets/minecraft/textures/block/moss_block", Texture.mossBlock);
-    addSimpleTexture("assets/minecraft/textures/block/cave_vines_body", Texture.caveVinesBody);
-    addSimpleTexture("assets/minecraft/textures/block/cave_vines_head", Texture.caveVinesHead);
-    addSimpleTexture("assets/minecraft/textures/block/cave_vines_body_lit", Texture.caveVinesBodyLit);
-    addSimpleTexture("assets/minecraft/textures/block/cave_vines_head_lit", Texture.caveVinesHeadLit);
+    addSimpleTexture("assets/minecraft/textures/block/cave_vines_plant", Texture.caveVinesPlant);
+    addSimpleTexture("assets/minecraft/textures/block/cave_vines", Texture.caveVines);
+    addSimpleTexture("assets/minecraft/textures/block/cave_vines_plant_lit", Texture.caveVinesPlantLit);
+    addSimpleTexture("assets/minecraft/textures/block/cave_vines_lit", Texture.caveVinesLit);
     addSimpleTexture("assets/minecraft/textures/block/hanging_roots", Texture.hangingRoots);
     addSimpleTexture("assets/minecraft/textures/block/rooted_dirt", Texture.rootedDirt);
     addSimpleTexture("assets/minecraft/textures/block/big_dripleaf_stem", Texture.bigDripleafStem);

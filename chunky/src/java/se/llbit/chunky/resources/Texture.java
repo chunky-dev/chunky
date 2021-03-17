@@ -951,10 +951,10 @@ public class Texture {
   public static final Texture azaleaLeaves = new Texture();
   public static final Texture azaleaLeavesFlowers = new Texture();
   public static final Texture mossBlock = new Texture();
-  public static final Texture caveVinesBody = new Texture();
-  public static final Texture caveVinesHead = new Texture();
-  public static final Texture caveVinesBodyLit = new Texture();
-  public static final Texture caveVinesHeadLit = new Texture();
+  public static final Texture caveVinesPlant = new Texture();
+  public static final Texture caveVinesPlantLit = new Texture();
+  public static final Texture caveVines = new Texture();
+  public static final Texture caveVinesLit = new Texture();
   public static final Texture hangingRoots = new Texture();
   public static final Texture rootedDirt = new Texture();
   public static final Texture bigDripleafStem = new Texture();
