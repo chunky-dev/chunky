@@ -2734,7 +2734,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "lava_cauldron":
         return new LavaCauldron();
       case "lightning_rod":
-        return new LightningRod(BlockProvider.facing(tag, "up"));
+        return new LightningRod(BlockProvider.facing(tag, "up"), tag.get("Properties").get("powered").stringValue("false").equals("true"));
       case "small_amethyst_bud":
         return new AmethystCluster(name, Texture.smallAmethystBud, BlockProvider.facing(tag, "up"),
             isLit(tag, true));

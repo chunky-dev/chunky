@@ -3611,6 +3611,7 @@ public class TexturePackLoader {
     addSimpleTexture("assets/minecraft/textures/block/deepslate_coal_ore", Texture.deepslateCoalOre);
     addSimpleTexture("assets/minecraft/textures/block/deepslate_copper_ore", Texture.deepslateCopperOre);
     addSimpleTexture("assets/minecraft/textures/block/deepslate_emerald_ore", Texture.deepslateEmeraldOre);
+    addSimpleTexture("assets/minecraft/textures/block/lightning_rod_on", Texture.lightningRodOn);
   }
 
   private static void addSimpleTexture(String file, Texture texture) {
