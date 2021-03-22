@@ -111,7 +111,11 @@ public class SceneChooserController implements Initializable {
     });
     nameCol.setCellValueFactory(data -> {
       SceneListItem scene = data.getValue();
-      return new ReadOnlyStringWrapper(scene.sceneName);
+      if (scene.isBackup) {
+        return new ReadOnlyStringWrapper(scene.sceneName + " [backup]");
+      } else {
+        return new ReadOnlyStringWrapper(scene.sceneName);
+      }
     });
     chunkCountCol.setCellValueFactory(data -> {
       SceneListItem scene = data.getValue();
@@ -203,13 +207,20 @@ public class SceneChooserController implements Initializable {
      * What folder the scene is in
      */
     private final File sceneDirectory;
+    /**
+     * Whether this scene description file is a backup file and the original .json is missing.
+     */
+    private final boolean isBackup;
 
     private SceneListItem(JsonObject scene, File sceneFile) {
-      sceneName = sceneFile.getName().substring(0, sceneFile.getName().length() - Scene.EXTENSION.length());
+      sceneName = sceneFile.getName().substring(0, sceneFile.getName().length() - (
+          sceneFile.getName().endsWith(".backup") ? 7 + Scene.EXTENSION.length()
+              : Scene.EXTENSION.length()));
       sceneDirectory = sceneFile.getParentFile();
       chunkSize = scene.get("chunkList").array().size();
       dimensions = String.format("%sx%s", scene.get("width").intValue(400), scene.get("height").intValue(400));
       sppCount = scene.get("spp").intValue(0);
+      isBackup = sceneFile.getName().endsWith(".backup");
 
       long renderTime = scene.get("renderTime").longValue(0);
       int seconds = (int) ((renderTime / 1000) % 60);

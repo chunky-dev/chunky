@@ -152,8 +152,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:carved_pumpkin",
       "minecraft:cauldron",
       "minecraft:cave_air",
-      "minecraft:cave_vines_body",
-      "minecraft:cave_vines_head",
+      "minecraft:cave_vines_plant",
+      "minecraft:cave_vines",
       "minecraft:chain_command_block",
       "minecraft:chain",
       "minecraft:chest",
@@ -188,6 +188,8 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:copper_block",
       "minecraft:copper_ore",
       "minecraft:cornflower",
+      "minecraft:cracked_deepslate_bricks",
+      "minecraft:cracked_deepslate_tiles",
       "minecraft:cracked_nether_bricks",
       "minecraft:cracked_polished_blackstone_bricks",
       "minecraft:cracked_stone_bricks",
@@ -288,6 +290,9 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:deepslate_diamond_ore",
       "minecraft:deepslate_lapis_ore",
       "minecraft:deepslate_redstone_ore",
+      "minecraft:deepslate_coal_ore",
+      "minecraft:deepslate_copper_ore",
+      "minecraft:deepslate_emerald_ore",
       "minecraft:detector_rail",
       "minecraft:diamond_block",
       "minecraft:diamond_ore",
@@ -387,6 +392,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:infested_chiseled_stone_bricks",
       "minecraft:infested_cobblestone",
       "minecraft:infested_cracked_stone_bricks",
+      "minecraft:infested_deepslate",
       "minecraft:infested_mossy_stone_bricks",
       "minecraft:infested_stone_bricks",
       "minecraft:infested_stone",
@@ -2728,7 +2734,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "lava_cauldron":
         return new LavaCauldron();
       case "lightning_rod":
-        return new LightningRod(BlockProvider.facing(tag, "up"));
+        return new LightningRod(BlockProvider.facing(tag, "up"), tag.get("Properties").get("powered").stringValue("false").equals("true"));
       case "small_amethyst_bud":
         return new AmethystCluster(name, Texture.smallAmethystBud, BlockProvider.facing(tag, "up"),
             isLit(tag, true));
@@ -2778,9 +2784,10 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.mossBlock);
       case "moss_carpet":
         return new Carpet(name, Texture.mossBlock);
-      case "cave_vines_body":
-      case "cave_vines_head":
-        return new CaveVines(name, tag.get("Properties").get("berries").stringValue("false").equals("true"));
+      case "cave_vines_plant":
+        return new CaveVines(name, tag.get("Properties").get("berries").stringValue("false").equals("true"), true);
+      case "cave_vines":
+        return new CaveVines(name, tag.get("Properties").get("berries").stringValue("false").equals("true"), false);
       case "hanging_roots":
         return new SpriteBlock(name, Texture.hangingRoots);
       case "rooted_dirt":
@@ -2790,10 +2797,11 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "big_dripleaf":
         return new BigDripleaf(BlockProvider.facing(tag, "north"), tag.get("Properties").get("tilt").stringValue("none"));
       case "small_dripleaf":
-        return new SmallDripleaf(tag.get("Properties").get("half").stringValue("lower"));
+        return new SmallDripleaf(BlockProvider.facing(tag, "north"), tag.get("Properties").get("half").stringValue("lower"));
       case "spore_blossom":
         return new SporeBlossom();
       case "deepslate":
+      case "infested_deepslate":
         return new TexturedBlock(name, Texture.deepslate, Texture.deepslateTop);
       case "deepslate_gold_ore":
         return new MinecraftBlock(name, Texture.deepslateGoldOre);
@@ -2841,6 +2849,16 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.chiseledDeepslate);
       case "smooth_basalt":
         return new MinecraftBlock(name, Texture.smoothBasalt);
+      case "cracked_deepslate_bricks":
+        return new MinecraftBlock(name, Texture.crackedDeepslateBricks);
+      case "cracked_deepslate_tiles":
+        return new MinecraftBlock(name, Texture.crackedDeepslateTiles);
+      case "deepslate_coal_ore":
+        return new MinecraftBlock(name, Texture.deepslateCoalOre);
+      case "deepslate_copper_ore":
+        return new MinecraftBlock(name, Texture.deepslateCopperOre);
+      case "deepslate_emerald_ore":
+        return new MinecraftBlock(name, Texture.deepslateEmeraldOre);
       case "structure_void":
       case "barrier":
         // Invisible.

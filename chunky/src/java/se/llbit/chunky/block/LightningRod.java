@@ -8,20 +8,26 @@ import se.llbit.math.Ray;
 public class LightningRod extends MinecraftBlockTranslucent {
 
   private final String facing;
+  private final boolean powered;
 
-  public LightningRod(String facing) {
+  public LightningRod(String facing, boolean powered) {
     super("lightning_rod", Texture.lightningRod);
+    this.powered = powered;
     localIntersect = true;
     this.facing = facing;
   }
 
   @Override
   public boolean intersect(Ray ray, Scene scene) {
-    return LightningRodModel.intersect(ray, facing);
+    return LightningRodModel.intersect(ray, facing, powered);
   }
 
   @Override
   public String description() {
-    return "facing=" + facing;
+    return "facing=" + facing + ", powered=" + powered;
+  }
+
+  public boolean isPowered() {
+    return powered;
   }
 }

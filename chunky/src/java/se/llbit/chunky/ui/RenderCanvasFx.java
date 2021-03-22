@@ -327,8 +327,8 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     layout();
 
     if (fitToScreen) {
-      setVvalue((getVmin() + getVmax())/2);
-      setHvalue((getHmin() + getHmax())/2);
+      setVvalue(0.5);
+      setHvalue(0.5);
     } else {
       double scaleX = canvas.getScaleX();
       double scrollX = getHvalue();
@@ -363,7 +363,10 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
     double scaleX = fitWidth / width;
     double scaleY = fitHeight / height;
 
-    updateCanvasScale(Math.min(scaleX, scaleY) * 0.95);
+    double scale = Math.min(scaleX, scaleY);
+    scale = Math.floor(scale * 0.99 * 8) / 8;
+
+    updateCanvasScale(scale);
   }
 
   @Override

@@ -273,7 +273,13 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected Vector3i origin = new Vector3i();
 
+  /**
+   * Actual upper y bound (might be lower than yClipMax).
+   */
   protected int yMax = 256;
+  /**
+   * Actual lower y bound (might be higher than yClipMin).
+   */
   protected int yMin = 0;
 
   private BlockPalette palette;
@@ -441,6 +447,8 @@ public class Scene implements JsonSerializable, Refreshable {
       foliageTexture = other.foliageTexture;
       waterTexture = other.waterTexture;
       origin.set(other.origin);
+      yMin = other.yMin;
+      yMax = other.yMax;
 
       chunks = other.chunks;
 
@@ -535,7 +543,13 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public synchronized void loadScene(RenderContext context, String sceneName, TaskTracker taskTracker)
       throws IOException {
-    loadDescription(context.getSceneDescriptionInputStream(sceneName));
+    try {
+      loadDescription(context.getSceneDescriptionInputStream(sceneName));
+    } catch (FileNotFoundException e) {
+      // scene.json not found, try loading the backup file
+      Log.info("Scene description file not found, trying to load the backup file instead", e);
+      loadDescription(context.getSceneFileInputStream(sceneName + Scene.EXTENSION + ".backup"));
+    }
 
     if (sdfVersion < SDF_VERSION) {
       Log.warn("Old scene version detected! The scene may not have been loaded correctly.");
@@ -790,9 +804,9 @@ public class Scene implements JsonSerializable, Refreshable {
 
     boolean isTallWorld = world.getVersionId() >= World.VERSION_21W06A;
     if (isTallWorld) {
-      // snapshot 21w06a or later, treat as -64 - 320
-      yMin = Math.max(-64, yClipMin);
-      yMax = Math.min(320, yClipMax);
+      // snapshot 21w06a or later, don't limit yMin/yMax to allow custom height worlds
+      yMin = yClipMin;
+      yMax = yClipMax;
     } else {
       // treat as 0 - 256 world
       yMin = Math.max(0, yClipMin);
@@ -898,8 +912,13 @@ public class Scene implements JsonSerializable, Refreshable {
 
         try {
           nextChunkDataTask.get(50, TimeUnit.MILLISECONDS);
-        } catch(TimeoutException | InterruptedException ignored) { // If except, load the chunk synchronously
-          System.out.println(ignored.getCause().getMessage());
+        } catch(TimeoutException | InterruptedException logged) { // If except, load the chunk synchronously
+          if (logged instanceof TimeoutException) {
+            Log.info("Chunk loading timed out.");
+          } else {
+            Log.warn("Chunky loading interrupted.", logged);
+          }
+
           if(usingFirstChunkData) {
             world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette);
           }
@@ -1033,7 +1052,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   Octree.Node waterNode = new Octree.Node(palette.waterId);
                   if (cy + 1 < yMax) {
                     if (palette.get(chunkData.getBlockAt(cx, cy + 1, cz)).isWaterFilled()) {
-                      waterNode = new Octree.Node(palette.getWaterId(8, 1 << Water.FULL_BLOCK));
+                      waterNode = new Octree.Node(palette.getWaterId(0, 1 << Water.FULL_BLOCK));
                     }
                   }
                   if (block.isWater()) {
@@ -1042,8 +1061,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
                     if (notOnEdge) {
                       // Perform water computation now for water blocks that are not on th edge of the chunk
+                      // Test if the block has not already be marked as full
                       if (((Water) palette.get(waterNode.type)).data == 0) {
-                        // Test if the block has not already be marked as full
                         int level0 = 8 - ((Water) block).level;
                         int corner0 = level0;
                         int corner1 = level0;
@@ -1097,8 +1116,7 @@ public class Scene implements JsonSerializable, Refreshable {
                   waterOctree.set(waterNode, x, cy - origin.y, z);
                 } else if (cy + 1 < yMax && block instanceof Lava) {
                   if (palette.get(chunkData.getBlockAt(cx, cy+1, cz)) instanceof Lava) {
-                    octNode = new Octree.Node(
-                        palette.getLavaId(((Lava) block).level, 1 << Water.FULL_BLOCK));
+                    octNode = new Octree.Node(palette.getLavaId(0, 1 << Water.FULL_BLOCK));
                   } else if (notOnEdge) {
                     // Compute lava level for blocks not on edge
                     Lava lava = (Lava) block;
@@ -2475,6 +2493,8 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("crop", crop);
     json.add("yClipMin", yClipMin);
     json.add("yClipMax", yClipMax);
+    json.add("yMin", yMin);
+    json.add("yMax", yMax);
     json.add("exposure", exposure);
     json.add("postprocess", postprocess.name());
     json.add("outputMode", outputMode.getName());
@@ -2751,6 +2771,8 @@ public class Scene implements JsonSerializable, Refreshable {
 
     yClipMin = json.get("yClipMin").asInt(yClipMin);
     yClipMax = json.get("yClipMax").asInt(yClipMax);
+    yMin = json.get("yMin").asInt(Math.max(yClipMin, yMin));
+    yMax = json.get("yMax").asInt(Math.min(yClipMax, yMax));
 
     exposure = json.get("exposure").doubleValue(exposure);
     postprocess = Postprocess.get(json.get("postprocess").stringValue(postprocess.name()));

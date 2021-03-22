@@ -7,10 +7,12 @@ import se.llbit.math.Ray;
 
 public class SmallDripleaf extends MinecraftBlockTranslucent {
 
+  private final String facing;
   private final String half;
 
-  public SmallDripleaf(String half) {
+  public SmallDripleaf(String facing, String half) {
     super("small_dripleaf", Texture.smallDripleafTop);
+    this.facing = facing;
     this.half = half;
     localIntersect = true;
     solid = false;
@@ -18,11 +20,11 @@ public class SmallDripleaf extends MinecraftBlockTranslucent {
 
   @Override
   public boolean intersect(Ray ray, Scene scene) {
-    return SmallDripleafModel.intersect(ray, half);
+    return SmallDripleafModel.intersect(ray, facing, half);
   }
 
   @Override
   public String description() {
-    return "half=" + half;
+    return "facing=" + facing + ", half=" + half;
   }
 }

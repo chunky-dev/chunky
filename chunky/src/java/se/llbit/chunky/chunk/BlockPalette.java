@@ -471,7 +471,12 @@ public class BlockPalette {
     materialProperties.put("minecraft:waxed_cut_copper_slab", copperConfig);
     materialProperties.put("minecraft:waxed_exposed_cut_copper_slab", lightlyWeatheredCopperConfig);
     materialProperties.put("minecraft:waxed_weathered_cut_copper_slab", semiWeatheredCopperConfig);
-    materialProperties.put("minecraft:lightning_rod", copperConfig);
+    materialProperties.put("minecraft:lightning_rod", block -> {
+      // apply copper attributes only to non-powered lightning rods
+      if (block instanceof LightningRod && !((LightningRod) block).isPowered()) {
+        copperConfig.accept(block);
+      }
+    });
     materialProperties.put("minecraft:small_amethyst_bud", block -> {
       if (block instanceof AmethystCluster && ((AmethystCluster) block).isLit()) {
         block.emittance = 1.0f / 15f;
@@ -501,12 +506,12 @@ public class BlockPalette {
     materialProperties.put("minecraft:glow_lichen", block -> {
       block.emittance = 1.0f / 15f * 7;
     });
-    materialProperties.put("minecraft:cave_vines_body", block -> {
+    materialProperties.put("minecraft:cave_vines_plant", block -> {
       if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
         block.emittance = 1.0f / 15f * 14;
       }
     });
-    materialProperties.put("minecraft:cave_vines_head", block -> {
+    materialProperties.put("minecraft:cave_vines", block -> {
       if (block instanceof CaveVines && ((CaveVines) block).hasBerries()) {
         block.emittance = 1.0f / 15f * 14;
       }

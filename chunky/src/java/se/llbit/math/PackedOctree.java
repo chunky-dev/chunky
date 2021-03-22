@@ -16,6 +16,8 @@
  */
 package se.llbit.math;
 
+import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
+import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
 import org.apache.commons.math3.util.Pair;
 import se.llbit.chunky.block.UnknownBlock;
 import se.llbit.chunky.chunk.BlockPalette;
@@ -134,6 +136,10 @@ public class PackedOctree implements Octree.OctreeImplementation {
   @Override
   public int getType(Octree.NodeId node) {
     return -treeData[((NodeId) node).nodeIndex];
+  }
+
+  private int getTypeFromIndex(int nodeIndex) {
+    return -treeData[nodeIndex];
   }
 
   @Override
@@ -366,12 +372,12 @@ public class PackedOctree implements Octree.OctreeImplementation {
   /**
    * Gets a NodeID and depth of the node that is (or contains) the specified block.
    *
-   * Note: The creation of the Pair\<\> object seems to be a major time consumer in the actual tracing algorithm. (called from Octree.enterBlock)
+   * @param outTypeAndLevel is the reusable output type and level parameters, this is to save on allocation of {@code org.apache.commons.math3.util.Pair} and {@code PackedOctree.NodeId}
    *
    * x, y, z are in octree coordinates, NOT world coordinates.
    */
   @Override
-  public Pair<Octree.NodeId, Integer> getWithLevel(int x, int y, int z) {
+  public void getWithLevel(IntIntMutablePair outTypeAndLevel, int x, int y, int z) {
     int nodeIndex = 0;
     int level = depth;
     while(treeData[nodeIndex] > 0) {
@@ -381,7 +387,7 @@ public class PackedOctree implements Octree.OctreeImplementation {
       int lz = z >>> level;
       nodeIndex = treeData[nodeIndex] + (((lx & 1) << 2) | ((ly & 1) << 1) | (lz & 1));
     }
-    return new Pair<>(new NodeId(nodeIndex), level);
+    outTypeAndLevel.left(getTypeFromIndex(nodeIndex)).right(level);
   }
 
   /**

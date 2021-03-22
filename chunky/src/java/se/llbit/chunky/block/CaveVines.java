@@ -6,16 +6,16 @@ public class CaveVines extends SpriteBlock {
 
   private final boolean berries;
 
-  public CaveVines(String name, boolean berries) {
-    super(name, getTexture(name.endsWith("_body"), berries));
+  public CaveVines(String name, boolean berries, boolean body) {
+    super(name, getTexture(body, berries));
     this.berries = berries;
   }
 
   private static Texture getTexture(boolean body, boolean lit) {
     if (body) {
-      return lit ? Texture.caveVinesBodyLit : Texture.caveVinesBody;
+      return lit ? Texture.caveVinesPlantLit : Texture.caveVinesPlant;
     }
-    return lit ? Texture.caveVinesHeadLit : Texture.caveVinesHead;
+    return lit ? Texture.caveVinesLit : Texture.caveVines;
   }
 
   public boolean hasBerries() {
