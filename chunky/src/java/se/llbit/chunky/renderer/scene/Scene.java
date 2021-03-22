@@ -904,8 +904,13 @@ public class Scene implements JsonSerializable, Refreshable {
 
         try {
           nextChunkDataTask.get(50, TimeUnit.MILLISECONDS);
-        } catch(TimeoutException | InterruptedException ignored) { // If except, load the chunk synchronously
-          System.out.println(ignored.getCause().getMessage());
+        } catch(TimeoutException | InterruptedException logged) { // If except, load the chunk synchronously
+          if (logged instanceof TimeoutException) {
+            Log.info("Chunk loading timed out.");
+          } else {
+            Log.warn("Chunky loading interrupted.", logged);
+          }
+
           if(usingFirstChunkData) {
             world.getChunk(chunkPositions[i]).getChunkData(chunkData1, palette);
           }
