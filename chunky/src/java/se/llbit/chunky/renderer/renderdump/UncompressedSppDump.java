@@ -84,16 +84,12 @@ class UncompressedSppDump extends DumpFormat {
         throw new NoDataException();
     }
 
-    outputStream.writeChars(SECTION_HEADER_SAMPLES);
-    long start;
     //****SAMPLES****//
+    outputStream.writeChars(SECTION_HEADER_SAMPLES);
     int taskCoef = pixelRange.widthX();
     try (TaskTracker.Task task = taskTracker.task("Saving render dump - Samples", taskCoef * pixelRange.widthZ())) {
-      start = System.currentTimeMillis();
       // compile and write each row
-      System.out.println(3*(pixelRange.xmax-pixelRange.xmin)*Double.BYTES);
       ByteBuffer bb = ByteBuffer.allocate(3*(pixelRange.xmax-pixelRange.xmin)*Double.BYTES+samples.rowSizeSpp*Integer.BYTES);
-      System.out.println(bb.capacity());
       for (int y = pixelRange.zmin; y < pixelRange.zmax; y++) {
         for (int x = pixelRange.xmin; x < pixelRange.xmax; x++) {
           bb.putDouble(samples.get(x, y, 0));
@@ -105,7 +101,6 @@ class UncompressedSppDump extends DumpFormat {
         bb.rewind();
         task.update(taskCoef * (y - pixelRange.zmin));
       }
-      System.out.println(System.currentTimeMillis()-start);
     }
 
     outputStream.writeChars(SECTION_HEADER_EOF);
