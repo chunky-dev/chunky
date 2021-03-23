@@ -531,7 +531,10 @@ public class Scene implements JsonSerializable, Refreshable {
       }
 
       saveOctree(context, taskTracker);
-      saveDump(context, taskTracker);
+      if (spp>0)
+        saveDump(context, taskTracker);
+//    else
+//      delete existing dumps;
       saveEmitterGrid(context, taskTracker);
     }
   }

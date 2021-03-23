@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
+import org.apache.commons.math3.exception.NoDataException;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
@@ -26,6 +27,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.StreamCorruptedException;
+import java.nio.ByteBuffer;
 import java.util.function.LongConsumer;
 
 /**
@@ -41,7 +43,8 @@ class UncompressedSppDump extends DumpFormat {
 
   // These must be 3 characters each. Just because.
   public static final String SECTION_HEADER_SAMPLES = "sam";
-  public static final String SECTION_HEADER_SPP = "spp";
+  // SECTION_HEADER_SPP has been joined into SECTION_HEADER_SAMPLES to make merging more memory efficient.
+  //public static final String SECTION_HEADER_SPP = "spp";
   public static final String SECTION_HEADER_EOF = "dun";
 
   private UncompressedSppDump() {
@@ -52,14 +55,13 @@ class UncompressedSppDump extends DumpFormat {
     IntBoundingBox pixelRange;
     SampleBuffer samples = scene.getSampleBuffer();
 
-    //****HEADER****//
-    try (TaskTracker.Task task = taskTracker.task("Saving render dump - Header", 5)) {
-      pixelRange = calculateRange(scene.getSampleBuffer(), task);
-      task.update(4);
+    if(scene.spp<=0)
+      throw new NoDataException();
 
-      // TODO: save hash of the scene
-      //outputStream.writeInt(scene.toJson().toString().hashCode());
-      task.update(5);
+    //****HEADER****//
+    try (TaskTracker.Task task = taskTracker.task("Saving render dump - Header", 1)) {
+      pixelRange = calculateRange(scene.getSampleBuffer());
+      task.update(1);
 
       // Render size:
       outputStream.writeInt(scene.renderWidth());
@@ -77,38 +79,36 @@ class UncompressedSppDump extends DumpFormat {
       // For future use; flag compression for this save format maybe?
       long saveflags = 0x0000000000000000L;
       outputStream.writeLong(saveflags);
+
+      if (pixelRange.widthX()<=0 || pixelRange.widthZ()<=0)
+        throw new NoDataException();
     }
 
-
     outputStream.writeChars(SECTION_HEADER_SAMPLES);
-
+    long start;
     //****SAMPLES****//
     int taskCoef = pixelRange.widthX();
     try (TaskTracker.Task task = taskTracker.task("Saving render dump - Samples", taskCoef * pixelRange.widthZ())) {
+      start = System.currentTimeMillis();
+      // compile and write each row
+      System.out.println(3*(pixelRange.xmax-pixelRange.xmin)*Double.BYTES);
+      ByteBuffer bb = ByteBuffer.allocate(3*(pixelRange.xmax-pixelRange.xmin)*Double.BYTES+samples.rowSizeSpp*Integer.BYTES);
+      System.out.println(bb.capacity());
       for (int y = pixelRange.zmin; y < pixelRange.zmax; y++) {
         for (int x = pixelRange.xmin; x < pixelRange.xmax; x++) {
-          outputStream.writeDouble(samples.get(x, y, 0));
-          outputStream.writeDouble(samples.get(x, y, 1));
-          outputStream.writeDouble(samples.get(x, y, 2));
+          bb.putDouble(samples.get(x, y, 0));
+          bb.putDouble(samples.get(x, y, 1));
+          bb.putDouble(samples.get(x, y, 2));
+          bb.putInt(samples.getSpp(x,y));
         }
+        outputStream.write(bb.array());
+        bb.rewind();
         task.update(taskCoef * (y - pixelRange.zmin));
       }
-      outputStream.flush();
+      System.out.println(System.currentTimeMillis()-start);
     }
 
-    outputStream.writeChars(SECTION_HEADER_SPP);
-
-    //****SPP****//
-    taskCoef = pixelRange.widthX();
-    try (TaskTracker.Task task = taskTracker.task("Saving render dump - Sample Count", taskCoef * pixelRange.widthZ())) {
-      for (int y = pixelRange.zmin; y < pixelRange.zmax; y++) {
-        for (int x = pixelRange.xmin; x < pixelRange.xmax; x++)
-          outputStream.writeInt(samples.getSpp(x, y));
-        task.update(taskCoef * (y - pixelRange.zmin));
-      }
-    }
     outputStream.writeChars(SECTION_HEADER_EOF);
-
     outputStream.close();
   }
 
@@ -146,22 +146,17 @@ class UncompressedSppDump extends DumpFormat {
     if (!("" + inputStream.readChar() + inputStream.readChar() + inputStream.readChar()).equals(SECTION_HEADER_SAMPLES))
       throw new StreamCorruptedException("Expected Sample Marker");
 
+    ByteBuffer bb = ByteBuffer.allocate(width*Double.BYTES*3+width*Integer.BYTES);
     int taskCoef = scene.renderWidth();
     try (TaskTracker.Task task = taskTracker.task("Loading render dump - Samples", taskCoef * scene.renderHeight())) {
       for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++)
-          samples.setPixel(x, y, inputStream.readDouble(), inputStream.readDouble(), inputStream.readDouble());
-        task.update(taskCoef * y);
-      }
-    }
-
-    if (!("" + inputStream.readChar() + inputStream.readChar() + inputStream.readChar()).equals(SECTION_HEADER_SPP))
-      throw new StreamCorruptedException("Expected SPP Marker");
-
-    try (TaskTracker.Task task = taskTracker.task("Loading render dump - Sample Count", taskCoef * scene.renderHeight())) {
-      for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++)
-          samples.setSpp(x, y, inputStream.readInt());
+        inputStream.readFully(bb.array(),0,bb.capacity());
+        bb.rewind();
+        for (int x = 0; x < width; x++) {
+          samples.setPixel(x, y, bb.getDouble(), bb.getDouble(), bb.getDouble());
+          samples.setSpp(x,y,bb.getInt());
+        }
+        bb.rewind();
         task.update(taskCoef * y);
       }
     }
@@ -241,7 +236,7 @@ class UncompressedSppDump extends DumpFormat {
 
 
 
-  private IntBoundingBox calculateRange(SampleBuffer sampleBuffer, TaskTracker.Task task) {
+  private IntBoundingBox calculateRange(SampleBuffer sampleBuffer) {
 
     // On a full render, each loop will exit on first index tested, and will complete in constant time.
 
@@ -254,7 +249,6 @@ class UncompressedSppDump extends DumpFormat {
           ret.include(x, y);
           done = true;
         }
-    task.update(1);
 
     // If no pixel found, dump can be empty.
     // TODO: if maxSPP in scene is 0, can return this directly without traversal.
@@ -269,7 +263,6 @@ class UncompressedSppDump extends DumpFormat {
           ret.include(x, y);
           done = true;
         }
-    task.update(2);
 
     // Find leftmost pixel...
     done = false;
@@ -279,7 +272,6 @@ class UncompressedSppDump extends DumpFormat {
           ret.include(x, y);
           done = true;
         }
-    task.update(3);
 
     // Find rightmost pixel...
     done = false;
