@@ -165,9 +165,9 @@ public class RenderDumpTests {
     RenderDump.save(outputStream, scene, taskTracker);
     byte[] save = outputStream.toByteArray();
     // CompressedFloatDumpFormat -> 5945, 0x9792E1E1
-    // UncompressedSppDump -> 11274, 0x895CCEF9
-    assertEquals(11274, save.length);
-    assertEquals(0x895CCEF9, Arrays.hashCode(save));
+    // UncompressedSppDump -> 11268, 0xD8D57CA6
+    assertEquals(11268, save.length);
+    assertEquals(0xD8D57CA6, Arrays.hashCode(save));
 //    assertArrayEquals(getTestDump(dumpName), save);
   }
 
@@ -209,7 +209,19 @@ public class RenderDumpTests {
     put("compressedFloatFormatDump", TEST_DUMP_STRING_COMPRESSED);
   }};
 
-  public static final int[] UNCOMPRESSED_SPP_A, UNCOMPRESSED_SPP_B, UNCOMPRESSED_SPP_MERGED = new int[]{
+  public static final int[] UNCOMPRESSED_SPP_A = new int[]{
+      0,  0,    2,   1,
+      0,  0,    0,  50,
+      3, 15, 1200, 730,
+      0,  7,    0,   0
+  };
+  public static final int[] UNCOMPRESSED_SPP_B = new int[]{
+      0,   0, 1,
+      0,   1, 0,
+      2,  50, 0,
+      600, 730, 5
+  };
+  public static final int[] UNCOMPRESSED_SPP_MERGED = new int[]{
       0,  0,    0,   0, 1,
       0,  0,    2,   2, 0,
       0,  0,    2, 100, 0,
@@ -228,19 +240,19 @@ public class RenderDumpTests {
           0L,         // Dump Flags (currently unused)
 
           "sam",      // Samples Header
-          //0d,  0d,  0d,   0d,   0d,  0d,   0d, 0d, 0d,   0.0d, 0.0d, 0.0d,    0d, 0d, 0d,
-          0.0d,  0d,  0d,   0d,   0d,  0d,   1d, 2d, 3d,   0.5d, 1.0d, 2.0d, // 0d, 0d, 0d,
-          0.0d,  0d,  0d,   0d,   0d,  0d,   3d, 2d, 1d,   0.5d, 1.0d, 2.0d, // 0d, 0d, 0d,
-          0.1d, .3d, .2d,  .4d, 1.7d, 43d,   2d, 3d, 4d,   2.0d, 1.5d, 2.5d, // 0d, 0d, 0d,
-          0.0d,  0d,  0d,   0d,   0d,  0d,   0d, 0d, 0d,   0.0d, 0.0d, 0.0d, // 0d, 0d, 0d,
+          //0d,  0d,  0d,        0d,   0d,  0d,         0d, 0d, 0d,          0.0d, 0.0d, 0.0d,           0d, 0d, 0d,
+          0.0d,  0d,  0d, 0,     0d,   0d,  0d,  0,     1d, 2d, 3d,    2,    0.5d, 1.0d, 2.0d,   1,   // 0d, 0d, 0d,
+          0.0d,  0d,  0d, 0,     0d,   0d,  0d,  0,     3d, 2d, 1d,    0,    0.5d, 1.0d, 2.0d,  50,   // 0d, 0d, 0d,
+          0.1d, .3d, .2d, 3,    .4d, 1.7d, 43d, 15,     2d, 3d, 4d, 1200,    2.0d, 1.5d, 2.5d, 730,   // 0d, 0d, 0d,
+          0.0d,  0d,  0d, 0,     0d,   0d,  0d,  7,     0d, 0d, 0d,    0,    0.0d, 0.0d, 0.0d,   0,   // 0d, 0d, 0d,
 
-          "spp",      // SPP Header
-          (UNCOMPRESSED_SPP_A = new int[]{
-              0,  0,    2,   1,
-              0,  0,    0,  50,
-              3, 15, 1200, 730,
-              0,  7,    0,   0
-          }),
+//          "spp",      // SPP Header
+//          (UNCOMPRESSED_SPP_A = new int[]{
+//              0,  0,    2,   1,
+//              0,  0,    0,  50,
+//              3, 15, 1200, 730,
+//              0,  7,    0,   0
+//          }),
 
           "dun"       // Completion Marker
       );
@@ -255,19 +267,19 @@ public class RenderDumpTests {
           0L,         // Dump Flags (currently unused)
 
           "sam",      // Samples Header
-          /*0d,0d,0d,   0d,0d,0d,*/  0d, 0d, 0d,   0d, 0d, 0d,   0d, 1d, 0d,
-          /*0d,0d,0d,   0d,0d,0d,*/  3d, 2d, 1d,   1d, 1d, 1d,   0d, 0d, 0d,
-          /*0d,0d,0d,   0d,0d,0d,*/  1d, 2d, 3d,   0d, 0d, 0d,   0d, 0d, 0d,
-          /*0d,0d,0d,   0d,0d,0d,*/  4d, 3d, 2d,   1d, 1d, 1d,   1d, 0d, 1d,
-          //0d,0d,0d,   0d,0d,0d,    0d, 0d, 0d,   0d, 0d, 0d,   0d, 0d, 0d,
+          /*0d,0d,0d,   0d,0d,0d,*/  0d, 0d, 0d,   0,    0d, 0d, 0d,   0,    0d, 1d, 0d, 1,
+          /*0d,0d,0d,   0d,0d,0d,*/  3d, 2d, 1d,   0,    1d, 1d, 1d,   1,    0d, 0d, 0d, 0,
+          /*0d,0d,0d,   0d,0d,0d,*/  1d, 2d, 3d,   2,    0d, 0d, 0d,  50,    0d, 0d, 0d, 0,
+          /*0d,0d,0d,   0d,0d,0d,*/  4d, 3d, 2d, 600,    1d, 1d, 1d, 730,    1d, 0d, 1d, 5,
+          //0d,0d,0d,   0d,0d,0d,    0d, 0d, 0d,         0d, 0d, 0d,         0d, 0d, 0d,
 
-          "spp",      // SPP Header
-          (UNCOMPRESSED_SPP_B = new int[]{
-                0,   0, 1,
-                0,   1, 0,
-                2,  50, 0,
-              600, 730, 5
-          }),
+//          "spp",      // SPP Header
+//          (UNCOMPRESSED_SPP_B = new int[]{
+//                0,   0, 1,
+//                0,   1, 0,
+//                2,  50, 0,
+//              600, 730, 5
+//          }),
 
           "dun"       // Completion Marker
       );
