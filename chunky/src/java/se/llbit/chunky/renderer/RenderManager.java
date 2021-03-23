@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.renderer;
 
+import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.SampleBuffer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.BitmapImage;
@@ -241,11 +242,9 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
    * @return the current rendering speed in samples per second (SPS)
    */
   private int samplesPerSecond() {
-    long canvasWidth = bufferedScene.subareaWidth();
-    long canvasHeight = bufferedScene.subareaHeight();
-    long pixelsPerFrame = canvasWidth * canvasHeight;
+    long totalPixelsSampled = bufferedScene.getSampleBuffer().numberOfSamples();
     double renderTime = bufferedScene.renderTime / 1000.0;
-    return (int) ((bufferedScene.spp * pixelsPerFrame) / renderTime);
+    return (int) FastMath.round(totalPixelsSampled / renderTime);
   }
 
   private void updateRenderProgress() {

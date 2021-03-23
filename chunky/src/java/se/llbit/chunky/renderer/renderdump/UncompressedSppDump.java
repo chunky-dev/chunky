@@ -88,7 +88,9 @@ class UncompressedSppDump extends DumpFormat {
     outputStream.writeChars(SECTION_HEADER_SAMPLES);
     int taskCoef = pixelRange.widthX();
     try (TaskTracker.Task task = taskTracker.task("Saving render dump - Samples", taskCoef * pixelRange.widthZ())) {
-      // compile and write each row
+
+      // compile and write each row as tuples of <red, green, blue, spp> in a byte buffer.
+      // Have enough space for an entire row of pixels which have 3 doubles and an integer per pixel.
       ByteBuffer bb = ByteBuffer.allocate(3*(pixelRange.xmax-pixelRange.xmin)*Double.BYTES+samples.rowSizeSpp*Integer.BYTES);
       for (int y = pixelRange.zmin; y < pixelRange.zmax; y++) {
         for (int x = pixelRange.xmin; x < pixelRange.xmax; x++) {
@@ -97,7 +99,9 @@ class UncompressedSppDump extends DumpFormat {
           bb.putDouble(samples.get(x, y, 2));
           bb.putInt(samples.getSpp(x,y));
         }
+        // Write the compiled row
         outputStream.write(bb.array());
+        // Reset buffer so it can be reused.
         bb.rewind();
         task.update(taskCoef * (y - pixelRange.zmin));
       }
@@ -135,6 +139,7 @@ class UncompressedSppDump extends DumpFormat {
 
       scene.renderTime = inputStream.readLong();
 
+      // For future use; flag compression for this save format maybe?
       long flags = inputStream.readLong();
     }
 

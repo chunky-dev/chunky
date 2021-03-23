@@ -37,6 +37,7 @@ public class SampleBuffer {
   protected int[][] spp;     // for non-uniform sample distribution
   protected final double[][] samples;
   protected byte[][] alpha;
+  protected long totalSamples;
 
   public SampleBuffer(int width, int height) {
     this.height = height;
@@ -84,6 +85,10 @@ public class SampleBuffer {
 
   public long numberOfDoubles() {
     return 3L * width * height;
+  }
+
+  public long numberOfSamples() {
+    return totalSamples;
   }
 
   public double get(long index) {
@@ -168,25 +173,32 @@ public class SampleBuffer {
   }
 
   protected void addSpp(int x, int y, int sppIncrease) {
+    totalSamples += sppIncrease;
     spp[y][x] += sppIncrease;
   }
 
   public void setSpp(int x, int y, int spp) {
+    totalSamples += spp - this.spp[y][x];
     this.spp[y][x] = spp;
   }
 
   protected void addSpp(long index, int sppIncrease) {
+    totalSamples += sppIncrease;
     spp[(int) (index / rowSizeSpp)][(int) (index % rowSizeSpp)] += sppIncrease;
   }
 
   public void setSpp(long index, int spp) {
-    this.spp[(int) (index / rowSizeSpp)][(int) (index % rowSizeSpp)] = spp;
+    int x = (int) (index % rowSizeSpp);
+    int y = (int) (index / rowSizeSpp);
+    totalSamples += spp-this.spp[y][x];
+    this.spp[y][x] = spp;
   }
 
   public void setPixelWithSpp(int x, int y, double r, double g, double b, int spp) {
     set(x, y, 0, r);
-    set(x, y, 0, g);
-    set(x, y, 0, b);
+    set(x, y, 1, g);
+    set(x, y, 2, b);
+    totalSamples += spp - this.spp[y][x];
     this.spp[y][x] = spp;
   }
 
@@ -234,6 +246,7 @@ public class SampleBuffer {
   }
 
   public void setGlobalSpp(int spp) {
+    totalSamples = 0;
     for (int[] ints : this.spp) {
       Arrays.fill(ints, spp);
     }
