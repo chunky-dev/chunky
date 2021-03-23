@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.world;
 
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+
 import java.io.DataInputStream;
 import java.io.InputStream;
 
@@ -31,7 +33,7 @@ public class ChunkDataSource {
   public ChunkDataSource(int timestamp, InputStream in) {
     this.timestamp = timestamp;
     if (in != null) {
-      this.inputStream = new DataInputStream(in);
+      this.inputStream = new DataInputStream(new FastBufferedInputStream(in));
     } else {
       this.inputStream = null;
     }
