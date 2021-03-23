@@ -16,8 +16,9 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -101,7 +102,7 @@ public class FloatingPointCompressor {
       return header;
     }
 
-    public void encodePair(double first, double second, BufferedOutputStream output) throws IOException {
+    public void encodePair(double first, double second, OutputStream output) throws IOException {
       bytesWritten = 1;
       byte headerFirst = encodeSingle(first);
       byte headerSecond = encodeSingle(second);
@@ -111,7 +112,7 @@ public class FloatingPointCompressor {
       output.write(smallBuffer, 0, bytesWritten);
     }
 
-    public void encodeSingleWithOddTerminator(double val, BufferedOutputStream output) throws IOException {
+    public void encodeSingleWithOddTerminator(double val, OutputStream output) throws IOException {
       bytesWritten = 1;
       byte headerFirst = encodeSingle(val);
       byte headerSecond = 0b1100; // Pretend we have 7 zero bytes but the 8th byte is 0 as well
@@ -123,7 +124,7 @@ public class FloatingPointCompressor {
       output.write(smallBuffer, 0, bytesWritten);
     }
 
-    public double decodeSingle(byte header, BufferedInputStream input) throws IOException {
+    public double decodeSingle(byte header, InputStream input) throws IOException {
       long prediction = predictFcm();
       long dfcmPrediction = predictDfcm();
 
@@ -151,7 +152,7 @@ public class FloatingPointCompressor {
   }
 
   public static void compress(OutputStream output, double[] input, IntConsumer pixelProgress) throws IOException {
-    try (BufferedOutputStream out = new BufferedOutputStream(output)) {
+    try (FastBufferedOutputStream out = new FastBufferedOutputStream(output)) {
       if (input.length % 3 != 0)
         throw new IllegalArgumentException("Dump doesn't have a multiple of 3 values");
 
@@ -183,7 +184,7 @@ public class FloatingPointCompressor {
 
   public static void decompress(InputStream input, int bufferLength, PixelConsumer consumer, IntConsumer pixelProgress)
       throws IOException {
-    try (BufferedInputStream in = new BufferedInputStream(input)) {
+    try (FastBufferedInputStream in = new FastBufferedInputStream(input)) {
       if (bufferLength % 3 != 0)
         throw new IllegalArgumentException("Dump doesn't have a multiple of 3 values");
 
