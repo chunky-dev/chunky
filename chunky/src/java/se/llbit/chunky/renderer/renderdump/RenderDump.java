@@ -108,7 +108,7 @@ public class RenderDump {
 
   public static void save(OutputStream outputStream, Scene scene, TaskTracker taskTracker) throws IOException {
     outputStream.write(DUMP_FORMAT_MAGIC_NUMBER);
-    DataOutputStream dataOutputStream = new DataOutputStream(new FastBufferedOutputStream(outputStream));
+    DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
     DumpFormat format = getDumpFormatForVersion(CURRENT_DUMP_VERSION);
     dataOutputStream.writeInt(CURRENT_DUMP_VERSION);
     format.save(dataOutputStream, scene, taskTracker);
