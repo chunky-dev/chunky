@@ -238,7 +238,9 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean stillWater = PersistentSettings.getStillWater();
   protected boolean useCustomWaterColor = PersistentSettings.getUseCustomWaterColor();
 
-  protected int waterHeight = 0;
+  protected boolean waterPlaneEnabled = false;
+  protected double waterPlaneHeight = World.SEA_LEVEL;
+  protected boolean waterPlaneOffsetEnabled = true;
 
   /**
    * Enables fast fog algorithm
@@ -478,7 +480,9 @@ public class Scene implements JsonSerializable, Refreshable {
     sun.set(other.sun);
     sky.set(other.sky);
 
-    waterHeight = other.waterHeight;
+    waterPlaneEnabled = other.waterPlaneEnabled;
+    waterPlaneHeight = other.waterPlaneHeight;
+    waterPlaneOffsetEnabled = other.waterPlaneOffsetEnabled;
 
     spp = other.spp;
     renderTime = other.renderTime;
@@ -1708,26 +1712,68 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Set the ocean water height.
-   *
-   * @return {@code true} if the water height value was changed.
+   * Set the water world mode option.
    */
-  public boolean setWaterHeight(int value) {
-    value = Math.max(yMin, value);
-    value = Math.min(yMax, value);
-    if (value != waterHeight) {
-      waterHeight = value;
+  public void setWaterPlaneEnabled(boolean enabled) {
+    if (enabled != waterPlaneEnabled) {
+      waterPlaneEnabled = enabled;
       refresh();
-      return true;
     }
-    return false;
   }
 
   /**
-   * @return The ocean water height
+   * @return {@code true} if the water world mode is enabled
    */
-  public int getWaterHeight() {
-    return waterHeight;
+  public boolean isWaterPlaneEnabled() {
+    return waterPlaneEnabled;
+  }
+
+  /**
+   * Set the water world mode ocean height.
+   */
+  public void setWaterPlaneHeight(double height) {
+    // do we really want to limit this?
+    height = Math.max(yMin, height);
+    height = Math.min(yMax, height);
+    if (height != waterPlaneHeight) {
+      waterPlaneHeight = height;
+      refresh();
+    }
+  }
+
+  /**
+   * @return The water world mode ocean height
+   */
+  public double getWaterPlaneHeight() {
+    if(waterPlaneOffsetEnabled) {
+      return waterPlaneHeight - Water.TOP_BLOCK_GAP;
+    } else {
+      return waterPlaneHeight;
+    }
+  }
+  public double getWaterPlaneHeight(boolean withoutOffset) {
+    if(withoutOffset) {
+      return waterPlaneHeight;
+    } else {
+      return getWaterPlaneHeight();
+    }
+  }
+
+  /**
+   * Set the water world mode height offset option.
+   */
+  public void setWaterPlaneOffsetEnabled(boolean enabled) {
+    if (enabled != waterPlaneOffsetEnabled) {
+      waterPlaneOffsetEnabled = enabled;
+      refresh();
+    }
+  }
+
+  /**
+   * @return {@code true} if the water world mode height offset is enabled
+   */
+  public boolean isWaterPlaneOffsetEnabled() {
+    return waterPlaneOffsetEnabled;
   }
 
   /**
@@ -2384,7 +2430,7 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public boolean isInWater(Ray ray) {
-    if (waterHeight > 0 && ray.o.y < waterHeight - 0.125) {
+    if (isWaterPlaneEnabled() && ray.o.y < getWaterPlaneHeight()) {
       return true;
     }
     if (waterOctree.isInside(ray.o)) {
@@ -2498,7 +2544,9 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("transparentSky", transparentSky);
     json.add("fogDensity", fogDensity);
     json.add("skyFogDensity", skyFogDensity);
-    json.add("waterHeight", waterHeight);
+    json.add("waterWorldEnabled", waterPlaneEnabled);
+    json.add("waterWorldHeight", waterPlaneHeight);
+    json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
     json.add("renderActors", renderActors);
 
     if (!worldPath.isEmpty()) {
@@ -2729,8 +2777,9 @@ public class Scene implements JsonSerializable, Refreshable {
 
     exposure = json.get("exposure").doubleValue(exposure);
     postprocess = Postprocess.get(json.get("postprocess").stringValue(postprocess.name()));
-    outputMode = PictureExportFormats.getFormat(json.get("outputMode").stringValue(outputMode.getName())).orElse(
-        PictureExportFormats.PNG);
+    outputMode = PictureExportFormats
+      .getFormat(json.get("outputMode").stringValue(outputMode.getName()))
+      .orElse(PictureExportFormats.PNG);
     sppTarget = json.get("sppTarget").intValue(sppTarget);
     rayDepth = json.get("rayDepth").intValue(rayDepth);
     if (!json.get("pathTrace").isUnknown()) {
@@ -2765,7 +2814,19 @@ public class Scene implements JsonSerializable, Refreshable {
     transparentSky = json.get("transparentSky").boolValue(transparentSky);
     fogDensity = json.get("fogDensity").doubleValue(fogDensity);
     skyFogDensity = json.get("skyFogDensity").doubleValue(skyFogDensity);
-    waterHeight = json.get("waterHeight").intValue(waterHeight);
+
+    if(!json.get("waterHeight").isUnknown()) {
+      // fallback for older scene versions were waterPlane was enabled by using height = 0
+      waterPlaneHeight = json.get("waterHeight").doubleValue(waterPlaneHeight);
+      waterPlaneEnabled = waterPlaneHeight > 0;
+      waterPlaneOffsetEnabled = true;
+    } else {
+      waterPlaneEnabled = json.get("waterWorldEnabled").boolValue(waterPlaneEnabled);
+      waterPlaneHeight = json.get("waterWorldHeight").doubleValue(waterPlaneHeight);
+      waterPlaneOffsetEnabled = json.get("waterWorldHeightOffsetEnabled")
+        .boolValue(waterPlaneOffsetEnabled);
+    }
+
     renderActors = json.get("renderActors").boolValue(renderActors);
     materials = json.get("materials").object().copy().toMap();
 

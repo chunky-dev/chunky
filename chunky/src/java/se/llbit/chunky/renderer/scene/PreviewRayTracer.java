@@ -19,11 +19,10 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.block.Water;
-import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -92,7 +91,7 @@ public class PreviewRayTracer implements RayTracer {
     if (scene.sky().cloudsEnabled()) {
       hit = scene.sky().cloudIntersection(scene, ray);
     }
-    if (scene.waterHeight > 0) {
+    if (scene.isWaterPlaneEnabled()) {
       hit = waterIntersection(scene, ray) || hit;
     }
     if (scene.intersect(ray)) {
@@ -112,7 +111,7 @@ public class PreviewRayTracer implements RayTracer {
 
   private static boolean waterIntersection(Scene scene, Ray ray) {
     if (ray.d.y < 0) {
-      double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
+      double t = (scene.getWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
@@ -122,7 +121,7 @@ public class PreviewRayTracer implements RayTracer {
       }
     }
     if (ray.d.y > 0) {
-      double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
+      double t = (scene.getWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
