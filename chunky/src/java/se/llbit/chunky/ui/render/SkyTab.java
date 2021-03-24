@@ -18,6 +18,8 @@
 package se.llbit.chunky.ui.render;
 
 import javafx.beans.value.ChangeListener;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -72,6 +74,12 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
   private final SkymapSettings skymapSettings = new SkymapSettings();
   private ChangeListener<? super javafx.scene.paint.Color> fogColorListener =
       (observable, oldValue, newValue) -> scene.setFogColor(ColorUtil.fromFx(newValue));
+  private ChangeListener<? super javafx.scene.paint.Color> skyColorListener =
+      (observable, oldValue, newValue) -> scene.sky().setColor(ColorUtil.fromFx(newValue));
+  private EventHandler<ActionEvent> simSkyListener = event -> {
+    int selected = simulatedSky.getSelectionModel().getSelectedIndex();
+    scene.sky().setSimulatedSkyMode(selected);
+  };
 
   public SkyTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("SkyTab.fxml"));
@@ -116,10 +124,7 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
         return null;
       }
     });
-    simulatedSky.setOnAction((event) -> {
-      int selected = simulatedSky.getSelectionModel().getSelectedIndex();
-      scene.sky().setSimulatedSkyMode(selected);
-    });
+    simulatedSky.setOnAction(simSkyListener);
     simulatedSky.setTooltip(new Tooltip(skiesTooltip(Sky.skies)));
 
     cloudSize.setName("Cloud size");
@@ -192,13 +197,14 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     });
     fogColor.colorProperty().addListener(fogColorListener);
 
-    colorPicker.colorProperty().addListener(
-        (observable, oldValue, newValue) -> scene.sky().setColor(ColorUtil.fromFx(newValue)));
+    colorPicker.colorProperty().addListener(skyColorListener);
   }
 
   @Override public void update(Scene scene) {
     skyMode.getSelectionModel().select(scene.sky().getSkyMode());
+    simulatedSky.setOnAction(null);
     simulatedSky.getSelectionModel().select(scene.sky().getSimulatedSky());
+    simulatedSky.setOnAction(simSkyListener);
     cloudsEnabled.setSelected(scene.sky().cloudsEnabled());
     transparentSkyEnabled.setSelected(scene.transparentSky());
     cloudSize.set(scene.sky().cloudSize());
@@ -213,7 +219,9 @@ public class SkyTab extends ScrollPane implements RenderControlsTab, Initializab
     horizonOffset.set(scene.sky().getHorizonOffset());
     simulatedSky.setValue(scene.sky().getSimulatedSky());
     gradientEditor.setGradient(scene.sky().getGradient());
+    colorPicker.colorProperty().removeListener(skyColorListener);
     colorPicker.setColor(ColorUtil.toFx(scene.sky().getColor()));
+    colorPicker.colorProperty().addListener(skyColorListener);
     skyboxSettings.update(scene);
   }
 
