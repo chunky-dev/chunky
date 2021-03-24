@@ -235,9 +235,11 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected double waterOpacity = PersistentSettings.getWaterOpacity();
   protected double waterVisibility = PersistentSettings.getWaterVisibility();
-  protected int waterHeight = PersistentSettings.getWaterHeight();
   protected boolean stillWater = PersistentSettings.getStillWater();
   protected boolean useCustomWaterColor = PersistentSettings.getUseCustomWaterColor();
+
+  protected int waterHeight = 0;
+
   /**
    * Enables fast fog algorithm
    */

@@ -118,12 +118,8 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     stillWater.selectedProperty()
         .addListener((observable, oldValue, newValue) -> scene.setStillWater(newValue));
 
-    int initialWaterHeight = PersistentSettings.getWaterHeight();
-    if (initialWaterHeight == 0) {
-      initialWaterHeight = World.SEA_LEVEL;
-    }
     waterHeight.textProperty().bindBidirectional(waterHeightProp, new NumberStringConverter());
-    waterHeightProp.set(initialWaterHeight);
+    waterHeightProp.set(World.SEA_LEVEL);
     waterHeightProp.addListener((observable, oldValue, newValue) -> {
       if (waterPlane.isSelected()) {
         scene.setWaterHeight(newValue.intValue());
@@ -153,7 +149,6 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
       PersistentSettings.setStillWater(scene.stillWaterEnabled());
       PersistentSettings.setWaterOpacity(scene.getWaterOpacity());
       PersistentSettings.setWaterVisibility(scene.getWaterVisibility());
-      PersistentSettings.setWaterHeight(scene.getWaterHeight());
       boolean useCustomWaterColor = scene.getUseCustomWaterColor();
       PersistentSettings.setUseCustomWaterColor(useCustomWaterColor);
       if (useCustomWaterColor) {
