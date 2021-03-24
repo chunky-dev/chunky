@@ -19,6 +19,8 @@ import java.util.List;
 public class Water extends MinecraftBlockTranslucent {
 
   public static final Water INSTANCE = new Water(0);
+
+  public static final double TOP_BLOCK_GAP = 0.125;
   
   // Used only as starting material when camera is submerged.
   public static final Water OCEAN_WATER = new Water(0, 1 << Water.FULL_BLOCK);
