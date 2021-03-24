@@ -1732,9 +1732,6 @@ public class Scene implements JsonSerializable, Refreshable {
    * Set the water world mode ocean height.
    */
   public void setWaterPlaneHeight(double height) {
-    // do we really want to limit this?
-    height = Math.max(yMin, height);
-    height = Math.min(yMax, height);
     if (height != waterPlaneHeight) {
       waterPlaneHeight = height;
       refresh();
@@ -1745,17 +1742,16 @@ public class Scene implements JsonSerializable, Refreshable {
    * @return The water world mode ocean height
    */
   public double getWaterPlaneHeight() {
+    return waterPlaneHeight;
+  }
+  /**
+   * @return The effective water world mode ocean height influenced by waterPlaneOffsetEnabled
+   */
+  public double getEffectiveWaterPlaneHeight() {
     if(waterPlaneOffsetEnabled) {
       return waterPlaneHeight - Water.TOP_BLOCK_GAP;
     } else {
       return waterPlaneHeight;
-    }
-  }
-  public double getWaterPlaneHeight(boolean withoutOffset) {
-    if(withoutOffset) {
-      return waterPlaneHeight;
-    } else {
-      return getWaterPlaneHeight();
     }
   }
 
@@ -2430,7 +2426,7 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public boolean isInWater(Ray ray) {
-    if (isWaterPlaneEnabled() && ray.o.y < getWaterPlaneHeight()) {
+    if (isWaterPlaneEnabled() && ray.o.y < getEffectiveWaterPlaneHeight()) {
       return true;
     }
     if (waterOctree.isInside(ray.o)) {

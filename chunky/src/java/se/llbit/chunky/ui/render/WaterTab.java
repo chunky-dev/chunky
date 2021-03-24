@@ -86,7 +86,7 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
 
     waterPlaneEnabled.setSelected(scene.isWaterPlaneEnabled());
     waterPlaneHeight.setRange(scene.yClipMin, scene.yClipMax);
-    waterPlaneHeight.set(scene.getWaterPlaneHeight(true));
+    waterPlaneHeight.set(scene.getWaterPlaneHeight());
     waterPlaneOffsetEnabled.setSelected(scene.isWaterPlaneOffsetEnabled());
   }
 
@@ -142,12 +142,12 @@ public class WaterTab extends ScrollPane implements RenderControlsTab, Initializ
     waterPlaneEnabled.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setWaterPlaneEnabled(newValue)
     );
+
     waterPlaneHeight.setName("Water height");
     waterPlaneHeight.setTooltip("The default ocean height is " + World.SEA_LEVEL + ".");
     waterPlaneHeight.clampBoth();
     waterPlaneHeight.onValueChange(value -> scene.setWaterPlaneHeight(value));
-    Slider slider = waterPlaneHeight.getSlider();
-    slider.setBlockIncrement(0.5);
+
     waterPlaneOffsetEnabled.selectedProperty().addListener((observable, oldValue, newValue) ->
       scene.setWaterPlaneOffsetEnabled(newValue)
     );

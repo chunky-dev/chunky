@@ -111,7 +111,7 @@ public class PreviewRayTracer implements RayTracer {
 
   private static boolean waterIntersection(Scene scene, Ray ray) {
     if (ray.d.y < 0) {
-      double t = (scene.getWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
+      double t = (scene.getEffectiveWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
@@ -121,7 +121,7 @@ public class PreviewRayTracer implements RayTracer {
       }
     }
     if (ray.d.y > 0) {
-      double t = (scene.getWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
+      double t = (scene.getEffectiveWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
         ray.t = t;
         Water.INSTANCE.getColor(ray);

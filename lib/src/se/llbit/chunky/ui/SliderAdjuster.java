@@ -73,10 +73,6 @@ public abstract class SliderAdjuster<T extends Number> extends Adjuster<T> {
     return max;
   }
 
-  public Slider getSlider() {
-    return valueSlider;
-  }
-
   /**
    * Make the adjuster use a logarithmic mapping for the slider position.
    */
