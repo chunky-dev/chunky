@@ -80,7 +80,7 @@ abstract class DumpFormat {
       readHeader(inputStream, scene);
       mergeSamples(inputStream, previousSpp, scene, prog -> {
         if (prog % width == 0)
-          task.update(width);
+          task.update(prog/width);
       });
       scene.spp += previousSpp;
       scene.renderTime += previousRenderTime;
