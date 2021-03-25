@@ -45,6 +45,9 @@ import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.*;
@@ -1966,7 +1969,7 @@ public class Scene implements JsonSerializable, Refreshable {
       task.update(1);
       Log.info("Saving octree " + fileName);
 
-      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName)))) {
+      try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName))))) {
         OctreeFileFormat.store(out, worldOctree, waterOctree, palette,
             grassTexture, foliageTexture, waterTexture);
         worldOctree.setTimestamp(context.fileTimestamp(fileName));
@@ -1994,7 +1997,7 @@ public class Scene implements JsonSerializable, Refreshable {
     String filename = name + ".emittergrid";
     try (TaskTracker.Task task = taskTracker.task("Loading grid")) {
       Log.info("Load grid " + filename);
-      try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename)))) {
+      try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename))))) {
         emitterGrid = Grid.load(in);
         return true;
       } catch (Exception e) {
@@ -2012,12 +2015,12 @@ public class Scene implements JsonSerializable, Refreshable {
       try {
         long fileTimestamp = context.fileTimestamp(fileName);
         OctreeFileFormat.OctreeData data;
-        try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)))) {
+        try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName))))) {
           data = OctreeFileFormat.load(in, octreeImplementation);
         } catch (PackedOctree.OctreeTooBigException e) {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
-          DataInputStream inRetry = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)));
+          DataInputStream inRetry = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName))));
           data = OctreeFileFormat.load(inRetry, "NODE");
         }
         worldOctree = data.worldTree;

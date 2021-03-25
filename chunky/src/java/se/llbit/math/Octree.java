@@ -23,6 +23,8 @@ import java.util.Map;
 
 import it.unimi.dsi.fastutil.ints.IntIntMutablePair;
 import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import org.apache.commons.math3.util.FastMath;
 
 import se.llbit.chunky.block.Air;
@@ -774,12 +776,12 @@ public class Octree {
     // and reload it with another implementation
     long nodeCount = implementation.nodeCount();
     File tempFile = File.createTempFile("octree-conversion", ".bin");
-    try (DataOutputStream out = new DataOutputStream(new FileOutputStream(tempFile))) {
+    try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new FileOutputStream(tempFile)))) {
       implementation.store(out);
     }
     implementation = null; // Allow th gc to free memory during construction of the new octree
 
-    try (DataInputStream in = new DataInputStream(new FileInputStream(tempFile))) {
+    try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new FileInputStream(tempFile)))) {
       implementation = factory.loadWithNodeCount(nodeCount, in);
     }
 

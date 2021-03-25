@@ -23,6 +23,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Lava;
 import se.llbit.chunky.block.Water;
@@ -77,7 +80,7 @@ public class OctreeFileFormat {
     final PipedOutputStream pipedOut = new PipedOutputStream();
     PipedInputStream resultingStream = new PipedInputStream(pipedOut);
     Thread convertThread = new Thread(() -> {
-      try (DataOutputStream out = new DataOutputStream(pipedOut)) {
+      try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(pipedOut))) {
         out.writeInt(in.readInt()); // depth
 
         long remainingNodes = 1;
