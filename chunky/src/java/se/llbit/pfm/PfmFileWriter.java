@@ -75,19 +75,10 @@ public class PfmFileWriter implements AutoCloseable {
       ByteBuffer buffer = ByteBuffer.allocate(width*3*4).order(byteOrder);
       FloatBuffer floatBuffer = buffer.asFloatBuffer();
 
-      // get the row's data as floats
-      if (scene.postprocess == Postprocess.NONE)
-        // from raw pixel data
+      // get the row's data as floats from raw pixel data
+      // (ignore post processing because that would clip the color range and defeat the purpose of HDR)
         for (int x = 0; x < 3*width; x++)
           floatBuffer.put((float)sampleBuffer[y*width*3+x]);
-      else
-        // or from post processor
-        for (int x = 0; x < width; x++) {
-          scene.postProcessPixel(x, y, pixel);
-          floatBuffer.put((float)pixel[0]);
-          floatBuffer.put((float)pixel[1]);
-          floatBuffer.put((float)pixel[2]);
-        }
 
       // Write buffer to stream
       out.write(buffer.array());
