@@ -2011,15 +2011,20 @@ public class Scene implements JsonSerializable, Refreshable {
       task.update(1);
       Log.info("Saving octree " + fileName);
 
+      boolean saved = false;
       try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName))))) {
         OctreeFileFormat.store(out, worldOctree, waterOctree, palette,
             grassTexture, foliageTexture, waterTexture);
-        worldOctree.setTimestamp(context.fileTimestamp(fileName));
+        saved = true;
 
         task.update(2);
         Log.info("Octree saved");
       } catch (IOException e) {
         Log.warn("Failed to save the octree", e);
+      }
+
+      if (saved) {
+        worldOctree.setTimestamp(context.fileTimestamp(fileName));
       }
     }
   }
