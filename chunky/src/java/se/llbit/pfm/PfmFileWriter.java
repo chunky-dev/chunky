@@ -76,6 +76,7 @@ public class PfmFileWriter implements AutoCloseable {
       FloatBuffer floatBuffer = buffer.asFloatBuffer();
 
       // get the row's data as floats from raw pixel data
+      // (ignore post processing because that would clip the color range and defeat the purpose of HDR)
         for (int x = 0; x < 3*width; x++)
           floatBuffer.put((float)sampleBuffer[y*width*3+x]);
 
