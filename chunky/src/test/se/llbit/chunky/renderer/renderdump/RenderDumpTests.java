@@ -140,7 +140,7 @@ public class RenderDumpTests {
     assertEquals("Read UncompressedSppDump spp 0", 0, scene.getSampleBuffer().getSpp(1,1));
     assertEquals("Read UncompressedSppDump spp", 3, scene.getSampleBuffer().getSpp(0,2));
     assertEquals("Read UncompressedSppDump spp", 15, scene.getSampleBuffer().getSpp(1,2));
-    assertArrayEquals("Read UncompressedSppDump spp", UNCOMPRESSED_SPP_A, compileSampleBufferSpp(scene.getSampleBuffer()));
+    assertArrayEquals("Read UncompressedSppDump spp", UNCOMPRESSED_SPP_A, compileSampleBufferSpp(scene.getSampleBuffer(), 4, 4));
 
     RenderDump.merge(UNCOMPRESSED_DUMP_WITH_SPP_B.get(), scene, taskTracker);
 
@@ -181,6 +181,15 @@ public class RenderDumpTests {
     int[] ret = new int[len];
     for (int i = 0; i<len; i++)
       ret[i]=sampleBuffer.getSpp(i);
+    return ret;
+  }
+  private int[] compileSampleBufferSpp(SampleBuffer sampleBuffer, int width, int height) {
+    int len = width * height;
+    int[] ret = new int[len];
+    int i = 0;
+    for (int y = 0; y < height; y++)
+      for (int x = 0; x < width; x++)
+        ret[i++] = sampleBuffer.getSpp(x, y);
     return ret;
   }
 
