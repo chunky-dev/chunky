@@ -145,7 +145,7 @@ public class Chunk {
    * Parse the chunk from the region file and render the current
    * layer, surface and cave maps.
    */
-  public synchronized void loadChunk() {
+  public synchronized void loadChunk(ChunkData chunkData) {
     if (!shouldReloadChunk()) {
       return;
     }
@@ -160,7 +160,6 @@ public class Chunk {
     if (data == null) {
       return;
     }
-    ChunkData chunkData = new GenericChunkData();
 
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
