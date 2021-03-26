@@ -93,22 +93,12 @@ public class PfmFileWriter implements AutoCloseable {
       ByteBuffer buffer = ByteBuffer.allocate(width*3*4).order(byteOrder);
       FloatBuffer floatBuffer = buffer.asFloatBuffer();
 
-      // get the row's data as floats
-      if (scene.postprocess == Postprocess.NONE)
-        // from raw pixel data
-        for (int x = 0; x < width; x++) {
-          floatBuffer.put((float)sampleBuffer.get(x, y, 0));
-          floatBuffer.put((float)sampleBuffer.get(x, y, 1));
-          floatBuffer.put((float)sampleBuffer.get(x, y, 2));
-        }
-      else
-        // or from post processor
-        for (int x = 0; x < width; x++) {
-          scene.postProcessPixel(x, y, pixel);
-          floatBuffer.put((float)pixel[0]);
-          floatBuffer.put((float)pixel[1]);
-          floatBuffer.put((float)pixel[2]);
-        }
+      // from raw pixel data
+      for (int x = 0; x < width; x++) {
+        floatBuffer.put((float)sampleBuffer.get(x, y, 0));
+        floatBuffer.put((float)sampleBuffer.get(x, y, 1));
+        floatBuffer.put((float)sampleBuffer.get(x, y, 2));
+      }
 
       // Write buffer to stream
       out.write(buffer.array());

@@ -16,6 +16,8 @@
  */
 package se.llbit.chunky.renderer.renderdump;
 
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
@@ -88,7 +90,7 @@ public class RenderDump {
       throws IOException, IllegalStateException {
     int magicNumberLength = DUMP_FORMAT_MAGIC_NUMBER.length;
 
-    PushbackInputStream pushbackInputStream = new PushbackInputStream(inputStream, magicNumberLength);
+    PushbackInputStream pushbackInputStream = new PushbackInputStream(new FastBufferedInputStream(inputStream), magicNumberLength);
     byte[] magicNumber = new byte[magicNumberLength];
 
     // If the file starts with the magic number, it is the new format containing a version number

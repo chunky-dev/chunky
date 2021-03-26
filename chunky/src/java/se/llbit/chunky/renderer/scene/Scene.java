@@ -45,6 +45,9 @@ import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.*;
@@ -239,9 +242,13 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   protected double waterOpacity = PersistentSettings.getWaterOpacity();
   protected double waterVisibility = PersistentSettings.getWaterVisibility();
-  protected int waterHeight = PersistentSettings.getWaterHeight();
   protected boolean stillWater = PersistentSettings.getStillWater();
   protected boolean useCustomWaterColor = PersistentSettings.getUseCustomWaterColor();
+
+  protected boolean waterPlaneEnabled = false;
+  protected double waterPlaneHeight = World.SEA_LEVEL;
+  protected boolean waterPlaneOffsetEnabled = true;
+
   /**
    * Enables fast fog algorithm
    */
@@ -483,7 +490,9 @@ public class Scene implements JsonSerializable, Refreshable {
     sun.set(other.sun);
     sky.set(other.sky);
 
-    waterHeight = other.waterHeight;
+    waterPlaneEnabled = other.waterPlaneEnabled;
+    waterPlaneHeight = other.waterPlaneHeight;
+    waterPlaneOffsetEnabled = other.waterPlaneOffsetEnabled;
 
     spp = other.spp;
     renderTime = other.renderTime;
@@ -1722,26 +1731,64 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * Set the ocean water height.
-   *
-   * @return {@code true} if the water height value was changed.
+   * Set the water world mode option.
    */
-  public boolean setWaterHeight(int value) {
-    value = Math.max(yMin, value);
-    value = Math.min(yMax, value);
-    if (value != waterHeight) {
-      waterHeight = value;
+  public void setWaterPlaneEnabled(boolean enabled) {
+    if (enabled != waterPlaneEnabled) {
+      waterPlaneEnabled = enabled;
       refresh();
-      return true;
     }
-    return false;
   }
 
   /**
-   * @return The ocean water height
+   * @return {@code true} if the water world mode is enabled
    */
-  public int getWaterHeight() {
-    return waterHeight;
+  public boolean isWaterPlaneEnabled() {
+    return waterPlaneEnabled;
+  }
+
+  /**
+   * Set the water world mode ocean height.
+   */
+  public void setWaterPlaneHeight(double height) {
+    if (height != waterPlaneHeight) {
+      waterPlaneHeight = height;
+      refresh();
+    }
+  }
+
+  /**
+   * @return The water world mode ocean height
+   */
+  public double getWaterPlaneHeight() {
+    return waterPlaneHeight;
+  }
+  /**
+   * @return The effective water world mode ocean height influenced by waterPlaneOffsetEnabled
+   */
+  public double getEffectiveWaterPlaneHeight() {
+    if(waterPlaneOffsetEnabled) {
+      return waterPlaneHeight - Water.TOP_BLOCK_GAP;
+    } else {
+      return waterPlaneHeight;
+    }
+  }
+
+  /**
+   * Set the water world mode height offset option.
+   */
+  public void setWaterPlaneOffsetEnabled(boolean enabled) {
+    if (enabled != waterPlaneOffsetEnabled) {
+      waterPlaneOffsetEnabled = enabled;
+      refresh();
+    }
+  }
+
+  /**
+   * @return {@code true} if the water world mode height offset is enabled
+   */
+  public boolean isWaterPlaneOffsetEnabled() {
+    return waterPlaneOffsetEnabled;
   }
 
   /**
@@ -1989,15 +2036,20 @@ public class Scene implements JsonSerializable, Refreshable {
       task.update(1);
       Log.info("Saving octree " + fileName);
 
-      try (DataOutputStream out = new DataOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName)))) {
+      boolean saved = false;
+      try (DataOutputStream out = new DataOutputStream(new FastBufferedOutputStream(new GZIPOutputStream(context.getSceneFileOutputStream(fileName))))) {
         OctreeFileFormat.store(out, worldOctree, waterOctree, palette,
             grassTexture, foliageTexture, waterTexture);
-        worldOctree.setTimestamp(context.fileTimestamp(fileName));
+        saved = true;
 
         task.update(2);
         Log.info("Octree saved");
       } catch (IOException e) {
         Log.warn("Failed to save the octree", e);
+      }
+
+      if (saved) {
+        worldOctree.setTimestamp(context.fileTimestamp(fileName));
       }
     }
   }
@@ -2017,7 +2069,7 @@ public class Scene implements JsonSerializable, Refreshable {
     String filename = name + ".emittergrid";
     try (TaskTracker.Task task = taskTracker.task("Loading grid")) {
       Log.info("Load grid " + filename);
-      try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename)))) {
+      try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(context.getSceneFileInputStream(filename))))) {
         emitterGrid = Grid.load(in);
         return true;
       } catch (Exception e) {
@@ -2035,12 +2087,12 @@ public class Scene implements JsonSerializable, Refreshable {
       try {
         long fileTimestamp = context.fileTimestamp(fileName);
         OctreeFileFormat.OctreeData data;
-        try (DataInputStream in = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)))) {
+        try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName))))) {
           data = OctreeFileFormat.load(in, octreeImplementation);
         } catch (PackedOctree.OctreeTooBigException e) {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
-          DataInputStream inRetry = new DataInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName)));
+          DataInputStream inRetry = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName))));
           data = OctreeFileFormat.load(inRetry, "NODE");
         }
         worldOctree = data.worldTree;
@@ -2412,7 +2464,7 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   public boolean isInWater(Ray ray) {
-    if (waterHeight > 0 && ray.o.y < waterHeight - 0.125) {
+    if (isWaterPlaneEnabled() && ray.o.y < getEffectiveWaterPlaneHeight()) {
       return true;
     }
     if (waterOctree.isInside(ray.o)) {
@@ -2532,7 +2584,9 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("transparentSky", transparentSky);
     json.add("fogDensity", fogDensity);
     json.add("skyFogDensity", skyFogDensity);
-    json.add("waterHeight", waterHeight);
+    json.add("waterWorldEnabled", waterPlaneEnabled);
+    json.add("waterWorldHeight", waterPlaneHeight);
+    json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
     json.add("renderActors", renderActors);
 
     if (!worldPath.isEmpty()) {
@@ -2779,8 +2833,9 @@ public class Scene implements JsonSerializable, Refreshable {
 
     exposure = json.get("exposure").doubleValue(exposure);
     postprocess = Postprocess.get(json.get("postprocess").stringValue(postprocess.name()));
-    outputMode = PictureExportFormats.getFormat(json.get("outputMode").stringValue(outputMode.getName())).orElse(
-        PictureExportFormats.PNG);
+    outputMode = PictureExportFormats
+      .getFormat(json.get("outputMode").stringValue(outputMode.getName()))
+      .orElse(PictureExportFormats.PNG);
     sppTarget = json.get("sppTarget").intValue(sppTarget);
     rayDepth = json.get("rayDepth").intValue(rayDepth);
     if (!json.get("pathTrace").isUnknown()) {
@@ -2815,7 +2870,19 @@ public class Scene implements JsonSerializable, Refreshable {
     transparentSky = json.get("transparentSky").boolValue(transparentSky);
     fogDensity = json.get("fogDensity").doubleValue(fogDensity);
     skyFogDensity = json.get("skyFogDensity").doubleValue(skyFogDensity);
-    waterHeight = json.get("waterHeight").intValue(waterHeight);
+
+    if(!json.get("waterHeight").isUnknown()) {
+      // fallback for older scene versions were waterPlane was enabled by using height = 0
+      waterPlaneHeight = json.get("waterHeight").doubleValue(waterPlaneHeight);
+      waterPlaneEnabled = waterPlaneHeight > 0;
+      waterPlaneOffsetEnabled = true;
+    } else {
+      waterPlaneEnabled = json.get("waterWorldEnabled").boolValue(waterPlaneEnabled);
+      waterPlaneHeight = json.get("waterWorldHeight").doubleValue(waterPlaneHeight);
+      waterPlaneOffsetEnabled = json.get("waterWorldHeightOffsetEnabled")
+        .boolValue(waterPlaneOffsetEnabled);
+    }
+
     renderActors = json.get("renderActors").boolValue(renderActors);
     materials = json.get("materials").object().copy().toMap();
 

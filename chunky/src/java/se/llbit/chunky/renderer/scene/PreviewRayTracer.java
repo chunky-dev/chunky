@@ -19,11 +19,10 @@ package se.llbit.chunky.renderer.scene;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.MinecraftBlock;
 import se.llbit.chunky.block.Water;
-import se.llbit.chunky.model.WaterModel;
 import se.llbit.chunky.renderer.WorkerState;
-import se.llbit.chunky.world.BlockData;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
+import se.llbit.math.Vector4;
 
 /**
  * @author Jesper Öqvist <jesper@llbit.se>
@@ -92,7 +91,7 @@ public class PreviewRayTracer implements RayTracer {
     if (scene.sky().cloudsEnabled()) {
       hit = scene.sky().cloudIntersection(scene, ray);
     }
-    if (scene.waterHeight > 0) {
+    if (scene.isWaterPlaneEnabled()) {
       hit = waterIntersection(scene, ray) || hit;
     }
     if (scene.intersect(ray)) {
@@ -112,7 +111,7 @@ public class PreviewRayTracer implements RayTracer {
 
   private static boolean waterIntersection(Scene scene, Ray ray) {
     if (ray.d.y < 0) {
-      double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
+      double t = (scene.getEffectiveWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
@@ -122,7 +121,7 @@ public class PreviewRayTracer implements RayTracer {
       }
     }
     if (ray.d.y > 0) {
-      double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
+      double t = (scene.getEffectiveWaterPlaneHeight() - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
@@ -134,26 +133,60 @@ public class PreviewRayTracer implements RayTracer {
     return false;
   }
 
+  // Chunk pattern config
+  private static final double chunkPatternLineWidth = 0.5; // in blocks
+  private static final double chunkPatternLinePosition = 8 - chunkPatternLineWidth / 2;
+  private static final Vector4 chunkPatternFillColor =
+    new Vector4(0.8, 0.8, 0.8, 1.0);
+  private static final Vector4 chunkPatternLineColor =
+    new Vector4(0.25, 0.25, 0.25, 1.0);
+  private static final Vector4 chunkPatternFillColorSubmerged =
+    new Vector4(0.6, 0.6, 0.8, 1.0);
+  private static final Vector4 chunkPatternLineColorSubmerged =
+    new Vector4(0.05, 0.05, 0.25, 1.0);
+  private static final double chunkPatternInsideOctreeColorFactor = 0.75;
+
+  /**
+   * Projects a chunk border pattern onto the bottom plane of the octree (yMin).
+   * Changes colors for chunks inside the octree and submerged scenes.
+   * Use only in preview mode - the ray should hit the sky in a real render.
+   */
   private static boolean mapIntersection(Scene scene, Ray ray) {
-    if (ray.d.y < 0) {
-      double t = (scene.waterHeight - .125 - ray.o.y - scene.origin.y) / ray.d.y;
+    if (ray.d.y < 0) { // ray going below horizon
+      double t = (scene.yMin - ray.o.y - scene.origin.y) / ray.d.y;
       if (t > 0 && t < ray.t) {
         Vector3 vec = new Vector3();
         vec.scaleAdd(t + Ray.OFFSET, ray.d, ray.o);
-        if (!scene.isInsideOctree(vec)) {
-          ray.t = t;
-          ray.o.set(vec);
-          double xm = (ray.o.x % 16.0 + 16.0) % 16.0;
-          double zm = (ray.o.z % 16.0 + 16.0) % 16.0;
-          if (xm > 0.6 && zm > 0.6) {
-            ray.color.set(0.8, 0.8, 0.8, 1);
+        // must be submerged if water plane is enabled otherwise ray already had collided with water
+        boolean isSubmerged = scene.isWaterPlaneEnabled();
+        boolean insideOctree = scene.isInsideOctree(vec);
+        ray.t = t;
+        ray.o.set(vec);
+        double xm = ((ray.o.x) % 16.0 + 16.0) % 16.0;
+        double zm = ((ray.o.z) % 16.0 + 16.0) % 16.0;
+        if (
+          (xm < chunkPatternLinePosition || xm > chunkPatternLinePosition + chunkPatternLineWidth) &&
+            (zm < chunkPatternLinePosition || zm > chunkPatternLinePosition + chunkPatternLineWidth)
+        ) { // chunk fill
+          if (isSubmerged) {
+            ray.color.set(chunkPatternFillColorSubmerged);
           } else {
-            ray.color.set(0.25, 0.25, 0.25, 1);
+            ray.color.set(chunkPatternFillColor);
           }
-          ray.setCurrentMaterial(MinecraftBlock.STONE);
-          ray.n.set(0, 1, 0);
-          return true;
+        } else { // chunk border
+          if (isSubmerged) {
+            ray.color.set(chunkPatternLineColorSubmerged);
+          } else {
+            ray.color.set(chunkPatternLineColor);
+          }
         }
+        if(insideOctree) {
+          ray.color.scale(chunkPatternInsideOctreeColorFactor);
+        }
+        // handle like a solid horizontal plane
+        ray.setCurrentMaterial(MinecraftBlock.STONE);
+        ray.n.set(0, 1, 0);
+        return true;
       }
     }
     return false;

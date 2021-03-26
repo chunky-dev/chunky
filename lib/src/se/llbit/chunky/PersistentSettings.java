@@ -35,7 +35,6 @@ public final class PersistentSettings {
 
   public static final double DEFAULT_WATER_OPACITY = .42;
   public static final double DEFAULT_WATER_VISIBILITY = 9;
-  public static final int DEFAULT_WATER_HEIGHT = 0;
 
   public static final double DEFAULT_WATER_RED = 0.03;
   public static final double DEFAULT_WATER_GREEN = 0.13;
@@ -303,15 +302,6 @@ public final class PersistentSettings {
 
   public static double getWaterVisibility() {
     return settings.getDouble("waterVisibility", DEFAULT_WATER_VISIBILITY);
-  }
-
-  public static void setWaterHeight(int value) {
-    settings.setInt("waterHeight", value);
-    save();
-  }
-
-  public static int getWaterHeight() {
-    return settings.getInt("waterHeight", DEFAULT_WATER_HEIGHT);
   }
 
   public static void setUseCustomWaterColor(boolean value) {
