@@ -132,6 +132,7 @@ class UncompressedSppDump extends DumpFormat {
       width = scene.subareaWidth = inputStream.readInt();
       height = scene.subareaHeight = inputStream.readInt();
 
+      // This was already called by load scene, if crop sizes in dump were accurate.
       scene.initBuffers();
       samples = scene.getSampleBuffer();
 
@@ -194,8 +195,8 @@ class UncompressedSppDump extends DumpFormat {
 
       ox = inputStream.readInt();
       oy = inputStream.readInt();
-      ow = scene.subareaWidth = inputStream.readInt();
-      oh = scene.subareaHeight = inputStream.readInt();
+      ow = inputStream.readInt();
+      oh = inputStream.readInt();
       omx = ox+ow;
       omy = oy+oh;
 

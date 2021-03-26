@@ -218,17 +218,17 @@ public class RenderDumpTests {
   };
   // These are duplicated below where it is interleaved with sample values.
   public static final int[] UNCOMPRESSED_SPP_B = new int[]{
-      0,   0, 1,
-      0,   1, 0,
-      2,  50, 0,
+        0,   0, 1,
+        0,   1, 0,
+        2,  50, 0,
       600, 730, 5
   };
   public static final int[] UNCOMPRESSED_SPP_MERGED = new int[]{
-      0,  0,    0,   0, 1,
-      0,  0,    2,   2, 0,
-      0,  0,    2, 100, 0,
-      3, 15, 1800,1460, 5,
-      0,  7,    0,   0, 0
+      0,  0,    0,    0, 1,
+      0,  0,    2,    2, 0,
+      0,  0,    2,  100, 0,
+      3, 15, 1800, 1460, 5,
+      0,  7,    0,    0, 0
   };
 
   public static final TestStreamBuilder UNCOMPRESSED_DUMP_WITH_SPP_A =
