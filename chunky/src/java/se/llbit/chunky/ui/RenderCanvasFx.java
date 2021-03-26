@@ -386,17 +386,18 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
 
       int decimateRatio = bitmap.width / width;
 
-      if (width == Math.round((float) image.getWidth()) && height == Math.round((float) image.getHeight())) {
-        if (previewShouldSubsample) {
-          for (int row = 0; row < height; row++) {
-            image.getPixelWriter().setPixels(0, row, width, 1, PIXEL_FORMAT, subsampleRow(bitmap, row * decimateRatio
-                , decimateRatio), 0, width);
-          }
-        } else {
-          for (int row = 0; row < height; row++) {
-            image.getPixelWriter().setPixels(0, row, width, 1, PIXEL_FORMAT, decimateRow(bitmap, row * decimateRatio,
-                decimateRatio), 0, width);
-          }
+      if (width != Math.round((float) image.getWidth()) || height != Math.round((float) image.getHeight()))
+        setCanvasSize(width, height);
+
+      if (previewShouldSubsample) {
+        for (int row = 0; row < height; row++) {
+          image.getPixelWriter().setPixels(0, row, width, 1, PIXEL_FORMAT,
+              subsampleRow(bitmap, row * decimateRatio, decimateRatio), 0, width);
+        }
+      } else {
+        for (int row = 0; row < height; row++) {
+          image.getPixelWriter().setPixels(0, row, width, 1, PIXEL_FORMAT,
+              decimateRow(bitmap, row * decimateRatio, decimateRatio), 0, width);
         }
       }
     });

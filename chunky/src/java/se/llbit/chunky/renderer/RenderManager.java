@@ -148,6 +148,7 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
 
               // Notify the scene listeners (this triggers a canvas repaint).
               sendSceneStatus(bufferedScene.sceneStatus());
+              canvas.repaint();
             }
           });
         }

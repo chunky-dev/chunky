@@ -117,7 +117,7 @@ class UncompressedSppDump extends DumpFormat {
   @Override
   public void load(DataInputStream inputStream, Scene scene, TaskTracker taskTracker) throws IOException {
     SampleBuffer samples;
-    int width, height;
+    int width, height, cx, cy;
 
     try (TaskTracker.Task task = taskTracker.task("Loading render dump - Header", 1)) {
       int renderWidth = inputStream.readInt();
@@ -127,13 +127,21 @@ class UncompressedSppDump extends DumpFormat {
         throw new IllegalStateException("Scene size does not match dump size");
       }
 
-      scene.crop_x = inputStream.readInt();
-      scene.crop_y = inputStream.readInt();
-      width = scene.subareaWidth = inputStream.readInt();
-      height = scene.subareaHeight = inputStream.readInt();
+      cx = inputStream.readInt();
+      cy = inputStream.readInt();
+      width = inputStream.readInt();
+      height = inputStream.readInt();
 
-      // This was already called by load scene, if crop sizes in dump were accurate.
-      scene.initBuffers();
+      // If no change, then the existing buffer can be used.
+      if (cx != scene.crop_x || cy != scene.crop_y || width != scene.subareaWidth || height != scene.subareaHeight) {
+        scene.initBuffers();
+
+        scene.crop_x = cx;
+        scene.crop_y = cy;
+        scene.subareaWidth = width;
+        scene.subareaHeight = height;
+      }
+
       samples = scene.getSampleBuffer();
 
       int sppmin = inputStream.readInt();
@@ -185,6 +193,7 @@ class UncompressedSppDump extends DumpFormat {
     int sx, sy, sw, sh, smx, smy; // "Scene ..." crop_x, crop_y, width, height, max_x, max_y
     int fx, fy, fw, fh, fmx, fmy; // "Final ..." crop_x, crop_y, width, height, max_x, max_y
     SampleBuffer ss, fs;
+    boolean expanding = false;
 
     try (TaskTracker.Task task = taskTracker.task("Merging - Loading render dump - Header", 1)) {
       int renderWidth = inputStream.readInt();
@@ -216,12 +225,13 @@ class UncompressedSppDump extends DumpFormat {
 
       ss = scene.getSampleBuffer();
       if (fx!=sx || fy!=sy || fmx!=smx || fmy!=smy) {
+        expanding = true;
         scene.crop_x = fx;
         scene.crop_y = fy;
         scene.subareaWidth = fw;
         scene.subareaHeight = fh;
+        scene.initBuffers();
       }
-      scene.initBuffers();
       fs = scene.getSampleBuffer();
 
       int sppmin = inputStream.readInt();
@@ -235,9 +245,10 @@ class UncompressedSppDump extends DumpFormat {
       long flags = inputStream.readLong();
     }
 
-    try (TaskTracker.Task task = taskTracker.task("Merging - Copying old render dump", 1)) {
-      fs.copyPixels(ss, 0, 0, sx-fx, sy-fy, sw, sh);
-    }
+    if (expanding)
+      try (TaskTracker.Task task = taskTracker.task("Merging - Copying old render dump", 1)) {
+        fs.copyPixels(ss, 0, 0, sx-fx, sy-fy, sw, sh);
+      }
 
     if (!("" + inputStream.readChar() + inputStream.readChar() + inputStream.readChar()).equals(SECTION_HEADER_SAMPLES))
       throw new StreamCorruptedException("Merging - Expected Sample Marker");
