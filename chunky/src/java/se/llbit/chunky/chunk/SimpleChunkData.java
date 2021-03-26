@@ -34,7 +34,7 @@ public class SimpleChunkData implements ChunkData {
   }
 
   @Override public int maxY() {
-    return 255;
+    return 256;
   }
 
   @Override public int getBlockAt(int x, int y, int z) {

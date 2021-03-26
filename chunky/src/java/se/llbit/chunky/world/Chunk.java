@@ -259,7 +259,7 @@ public class Chunk {
     } else {
       int[] fallback = new int[X_MAX * Z_MAX];
       for (int i = 0; i < fallback.length; ++i) {
-        fallback[i] = chunkData.maxY();
+        fallback[i] = chunkData.maxY()-1;
       }
       return fallback;
     }
