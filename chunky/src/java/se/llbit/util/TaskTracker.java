@@ -114,6 +114,32 @@ public class TaskTracker {
       this.eta = eta;
       update();
     }
+
+    /** Changes the task name and state. Calculates eta. */
+    public void update(String task, int target, int done, long startTime) {
+      long etaSeconds = 0;
+      if (done > 0) {
+        etaSeconds = ((target - done) * (System.currentTimeMillis() - startTime) / 1000) / done;
+      }
+      if (etaSeconds > 0) {
+        int seconds = (int) ((etaSeconds) % 60);
+        int minutes = (int) ((etaSeconds / 60) % 60);
+        int hours = (int) (etaSeconds / 3600);
+        String eta = String.format("%d:%02d:%02d", hours, minutes, seconds);
+        update(task, target, done, eta);
+      } else {
+        update(task, target, done, "");
+      }
+    }
+
+    /** Set the current progress and calculate eta. */
+    public void update(int target, int done, long startTime) {
+      this.update(this.taskName, target, done, startTime);
+    }
+
+    public void update(int done, long startTime) {
+      this.update(this.taskName, this.target, done, startTime);
+    }
   }
 
   private void updateProgress(String taskName, int target, int done, String eta) {

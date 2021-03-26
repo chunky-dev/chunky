@@ -888,6 +888,7 @@ public class Scene implements JsonSerializable, Refreshable {
     try (TaskTracker.Task task = taskTracker.task("Loading chunks")) {
       int done = 1;
       int target = chunksToLoad.size();
+      long startTime = System.currentTimeMillis();
 
       boolean usingFirstChunkData = true;
 
@@ -900,7 +901,7 @@ public class Scene implements JsonSerializable, Refreshable {
       for (int i = 0; i < chunkPositions.length; i++) {
         ChunkPosition cp = chunkPositions[i];
 
-        task.update(target, done);
+        task.update(target, done, startTime);
         done += 1;
 
         if (loadedChunks.contains(cp)) {
@@ -1253,6 +1254,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
       int done = 0;
       int target = chunksToLoad.size();
+      long startTime = System.currentTimeMillis();
       for (ChunkPosition cp : chunksToLoad) {
 
         // Finalize grass and foliage textures.
@@ -1304,7 +1306,7 @@ public class Scene implements JsonSerializable, Refreshable {
             waterTexture.set(cp.x * 16 + x - origin.x, cp.z * 16 + z - origin.z, waterMix);
           }
         }
-        task.update(target, done);
+        task.update(target, done, startTime);
         done += 1;
         OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
       }
