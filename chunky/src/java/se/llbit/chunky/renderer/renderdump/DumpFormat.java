@@ -109,7 +109,7 @@ abstract class DumpFormat {
       throws IOException {
     int dumpSpp = scene.spp;
     SampleBuffer buffer = scene.getSampleBuffer();
-    PixelConsumer px = (pixelIndex, r, g, b) -> buffer.mergeSamples(pixelIndex, dumpSpp, r, g, b);
+    PixelConsumer px = (pixelIndex, r, g, b) -> buffer.mergeSamples(pixelIndex, r, g, b, dumpSpp);
     readSamples(inputStream, scene, px, pixelProgress);
   }
 

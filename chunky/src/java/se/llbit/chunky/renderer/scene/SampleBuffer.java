@@ -112,13 +112,13 @@ public class SampleBuffer {
   }
 
   /**
-   * @param count The number of samples that this is the sum of. Use for "sppPerPass" where multiple SPP is added each
-   *              pass.
    * @param r     Sum of red values (Not average, this will be divided by 'weight')
    * @param g     Sum of green values (Not average, this will be divided by 'weight')
    * @param b     Sum of blue values (Not average, this will be divided by 'weight')
+   * @param count The number of samples that this is the sum of. Use for "sppPerPass" where multiple SPP is added each
+   *              pass.
    */
-  public void addSamples(int x, int y, int count, double r, double g, double b) {
+  public void addSamples(int x, int y, double r, double g, double b, int count) {
     int old_spp = getSpp(x, y);
     double sinv = 1.0 / (old_spp + count);
     set(x, y, 0, sinv * (get(x, y, 0) * old_spp + r));
@@ -128,13 +128,13 @@ public class SampleBuffer {
   }
 
   /**
-   * @param count The number of samples that this is the sum of. Use for "sppPerPass" where multiple SPP is added each
-   *              pass.
    * @param r     Sum of red values (Not average, this will be divided by 'weight')
    * @param g     Sum of green values (Not average, this will be divided by 'weight')
    * @param b     Sum of blue values (Not average, this will be divided by 'weight')
+   * @param count The number of samples that this is the sum of. Use for "sppPerPass" where multiple SPP is added each
+   *              pass.
    */
-  public void addSamples(long index, int count, double r, double g, double b) {
+  public void addSamples(long index, double r, double g, double b, int count) {
     int oldSpp = getSpp(index);
     index *= 3;
     double sinv = 1.0 / (oldSpp + count);
@@ -147,7 +147,19 @@ public class SampleBuffer {
   /**
    * r g b values should be actual rgb value: eg for a red value of 90% and 20 samples, 0.9 should be passed as r.
    */
-  public void mergeSamples(long index, int count, double r, double g, double b) {
+  public void mergeSamples(int x, int y, double r, double g, double b, int count) {
+    int oldSpp = getSpp(x, y);
+    double sinv = 1.0 / (oldSpp + count);
+    set(x, y, 0, sinv * (get(x, y, 0) * oldSpp + r * count));
+    set(x, y, 1, sinv * (get(x, y, 1) * oldSpp + g * count));
+    set(x, y, 2, sinv * (get(x, y, 2) * oldSpp + b * count));
+    addSpp(x, y, count);
+  }
+
+  /**
+   * r g b values should be actual rgb value: eg for a red value of 90% and 20 samples, 0.9 should be passed as r.
+   */
+  public void mergeSamples(long index, double r, double g, double b, int count) {
     int oldSpp = getSpp(index);
     index *= 3;
     double sinv = 1.0 / (oldSpp + count);
@@ -200,6 +212,23 @@ public class SampleBuffer {
     set(x, y, 2, b);
     totalSamples += spp - this.spp[y][x];
     this.spp[y][x] = spp;
+  }
+
+  public void copyPixels(SampleBuffer src, int src_x, int src_y, int dest_x, int dest_y, int width, int height) {
+
+    for (int y = 0; y < height; y++)
+      System.arraycopy(src.samples[src_y + y], 3 * src_x, this.samples[dest_y + y], 3 * dest_x, 3 * width);
+
+    for (int y=0; y<height; y++)
+      for (int x=0; x<width; x++)
+        totalSamples-=getSpp(x+dest_x,y+dest_y);
+
+    for (int y = 0; y < height; y++)
+      System.arraycopy(src.spp[src_y + y], src_x, this.spp[dest_y + y], dest_x, width);
+
+    for (int y=0; y<height; y++)
+      for (int x=0; x<width; x++)
+        totalSamples+=getSpp(x+dest_x,y+dest_y);
   }
 
   public void reset() {

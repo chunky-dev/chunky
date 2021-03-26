@@ -2084,7 +2084,7 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   /**
-   * @return Returns null on successful dump loaf, and a Runnable that will log a warning on a failed load.
+   * @return Returns null on successful dump load, and a Runnable that will log a warning on a failed load.
    */
   private Runnable tryLoadDump(RenderContext context, String fileName, TaskTracker taskTracker) {
     File dumpFile = context.getSceneFile(fileName);

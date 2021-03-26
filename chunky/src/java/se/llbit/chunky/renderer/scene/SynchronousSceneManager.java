@@ -102,11 +102,13 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
     this.onChunksLoaded = onChunksLoaded;
   }
 
-  @Override public Scene getScene() {
+  @Override
+  public Scene getScene() {
     return scene;
   }
 
-  @Override public void saveScene() throws InterruptedException {
+  @Override
+  public void saveScene() throws InterruptedException {
     try {
       synchronized (storedScene) {
         String sceneName = storedScene.name();
@@ -256,7 +258,10 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
         scene.mergeDump(dumpFile, taskTracker);
 
         // Merges can be funky. Save to file, because that helps sometimes...
-        // Oh, and it might also require a reload from file to work. Dunno why.
+        // Oh, and it might also require a reload from file to work.
+        //
+        // I can't seem to update JavaFx to use the new frontbuffer and backbuffer that get allocated when a
+        // merge calls scene.initbuffers to generate a new RenderBuffer, that is, without reloading from file.
         try {
           storedScene = context.getChunky().getSceneFactory().copyScene(scene);
           String sceneName = scene.name();
@@ -264,9 +269,47 @@ public class SynchronousSceneManager implements SceneProvider, SceneManager {
           storedScene.setName(tempName);
           saveScene();
           loadScene(tempName);
-          Scene.delete(tempName, resolveSceneDirectory(tempName));
+          File sceneDir = resolveSceneDirectory(tempName);
+          Scene.delete(tempName, sceneDir);
+          sceneDir.delete();
           scene.setName(sceneName);
           onSceneLoaded.run();
+
+          // This... doesn't work. I think its calling the right methods and such to reset the scene and
+          // saving the same stuff (sans octree etc), but putting the files into system temp folder... But
+          // the scene's preview still gets broken and stays broken until a manual reload.
+          // tldr; the following code doesnt solve the problem. :(
+
+          //  //saveScene();
+          //  File dir = new File(System.getProperty("java.io.tmpdir"), "chunky");
+          //  dir.mkdirs();
+          //  File tempDescFile = new File(dir, tempName + Scene.EXTENSION);
+          //  File tempDumpFile = new File(dir, tempName + ".dump");
+          //  try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(tempDescFile))) {
+          //    storedScene.saveDescription(out);
+          //  }
+          //  try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(tempDumpFile))) {
+          //    RenderDump.save(out, storedScene, taskTracker);
+          //  }
+          //
+          //  //loadScene();
+          //  synchronized (scene) {
+          //    try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(tempDescFile))) {
+          //      scene.loadDescription(in);
+          //    }
+          //    try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(tempDumpFile))) {
+          //      RenderDump.load(in, scene, taskTracker);
+          //    }
+          //    scene.setName(sceneName);
+          //    taskTracker.backgroundTask().update("Rendering", scene.getTargetSpp(), scene.spp);
+          //  }
+          //
+          //  onSceneLoaded.run();
+          //
+          //  // Cleanup
+          //  tempDescFile.delete();
+          //  tempDumpFile.delete();
+
         } catch (IOException | InterruptedException e) {
           e.printStackTrace();
           Log.error(e);

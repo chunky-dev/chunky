@@ -31,11 +31,14 @@ import java.nio.ByteBuffer;
 import java.util.function.LongConsumer;
 
 /**
- * This is a dump format for chunky that should allow for storing of SPP per pixel in addition to actual sample values.
+ * This is a dump format for chunky that should allow for storing of SPP per pixel in addition to actual sample values,
+ * as well as supporting dumps that only contain data for an area that is not the whole image.
  *
- * TODO: Allow for only storing partial regions and/or defining regions of SPPs.
- * TODO:  - Possibly deflate + huffman coding of spp values? That should have very good compression
- * TODO:    (~<50 bytes for all but the antithetical cases)
+ * TODO: - Possibly deflate + huffman coding of spp values? That should have very good compression
+ *         (~<50 bytes for entirety of SPP for all cases but the antithetical cases)
+ *         BUT: splitting spp from interleaved makes it harder to merge with O(1) memory.
+ *         POSSIBLE SOLUTION: deflate SPP counts before samples, which will lead to tiny storage for SPP, which can be
+ *                            pulled from as needed.
  */
 class UncompressedSppDump extends DumpFormat {
 
@@ -76,7 +79,7 @@ class UncompressedSppDump extends DumpFormat {
       outputStream.writeInt(scene.spp); // TODO: store spp min and max instead of only one value
       outputStream.writeLong(scene.renderTime);
 
-      // For future use; flag compression for this save format maybe?
+      // For future use; flags for gzip'd data / SPP interleaving or as an array?
       long saveflags = 0x0000000000000000L;
       outputStream.writeLong(saveflags);
 
@@ -97,7 +100,7 @@ class UncompressedSppDump extends DumpFormat {
           bb.putDouble(samples.get(x, y, 0));
           bb.putDouble(samples.get(x, y, 1));
           bb.putDouble(samples.get(x, y, 2));
-          bb.putInt(samples.getSpp(x,y));
+          bb.putInt(samples.getSpp(x, y));
         }
         // Write the compiled row
         outputStream.write(bb.array());
@@ -139,7 +142,7 @@ class UncompressedSppDump extends DumpFormat {
 
       scene.renderTime = inputStream.readLong();
 
-      // For future use; flag compression for this save format maybe?
+      // For future use; flags for gzip'd data / SPP interleaving or as an array?
       long flags = inputStream.readLong();
     }
 
@@ -150,11 +153,11 @@ class UncompressedSppDump extends DumpFormat {
     int taskCoef = scene.renderWidth();
     try (TaskTracker.Task task = taskTracker.task("Loading render dump - Samples", taskCoef * scene.renderHeight())) {
       for (int y = 0; y < height; y++) {
-        inputStream.readFully(bb.array(),0,bb.capacity());
+        inputStream.readFully(bb.array(), 0, bb.capacity());
         bb.rewind();
         for (int x = 0; x < width; x++) {
           samples.setPixel(x, y, bb.getDouble(), bb.getDouble(), bb.getDouble());
-          samples.setSpp(x,y,bb.getInt());
+          samples.setSpp(x, y, bb.getInt());
         }
         bb.rewind();
         task.update(taskCoef * y);
@@ -173,63 +176,88 @@ class UncompressedSppDump extends DumpFormat {
     // Didnt want to duplicate all that code, so going to try just having 3 sample buffers at one time, instead of 2...
     // (thought it could be 0 if we merge from two files directly into a third file, but it isnt setup to do that atm.)
 
-    Scene o = new Scene(scene);
-    o.initBuffers(); // replaces o's SampleBuffer
-    load(inputStream, o, taskTracker);
+    // If safe, a copy of the scene is stored so that if the merge fails it can be reverted and nothing will be lost.
+    // Unsafe may lose all progress, so it is recommended to save first.
+    Boolean mergeSafely = false;
 
-    SampleBuffer sb1 = scene.getSampleBuffer();
-    SampleBuffer sb2 = o.getSampleBuffer();
+    int ox, oy, ow, oh, omx, omy; // "Other ..." crop_x, crop_y, width, height, max_x, max_y
+    int sx, sy, sw, sh, smx, smy; // "Scene ..." crop_x, crop_y, width, height, max_x, max_y
+    int fx, fy, fw, fh, fmx, fmy; // "Final ..." crop_x, crop_y, width, height, max_x, max_y
+    SampleBuffer ss, fs;
 
-    if (scene.width != o.width || scene.height != o.height)
-      throw new Error("Failed to merge render dump - wrong canvas size.");
+    try (TaskTracker.Task task = taskTracker.task("Merging - Loading render dump - Header", 1)) {
+      int renderWidth = inputStream.readInt();
+      int renderHeight = inputStream.readInt();
 
-    int sxm = scene.crop_x;
-    int sw = scene.subareaWidth;
-    int sym = scene.crop_y;
-    int sh = scene.subareaHeight;
+      if (scene.width != renderWidth || scene.height != renderHeight)
+        throw new Error("Failed to merge render dump - wrong canvas size.");
 
-    int oxm = o.crop_x;
-    int ow = o.subareaWidth;
-    int oym = o.crop_y;
-    int oh = o.subareaHeight;
+      ox = inputStream.readInt();
+      oy = inputStream.readInt();
+      ow = scene.subareaWidth = inputStream.readInt();
+      oh = scene.subareaHeight = inputStream.readInt();
+      omx = ox+ow;
+      omy = oy+oh;
 
-    int xmin = FastMath.min(scene.crop_x, o.crop_x);
-    int ymin = FastMath.min(scene.crop_y, o.crop_y);
-    int xmax = FastMath.max(scene.crop_x + scene.subareaWidth, o.crop_x + o.subareaWidth);
-    int ymax = FastMath.max(scene.crop_y + scene.subareaHeight, o.crop_y + o.subareaHeight);
-    scene.crop_x = xmin;
-    scene.crop_y = ymin;
-    scene.subareaWidth = xmax - xmin;
-    scene.subareaHeight = ymax - ymin;
-    scene.initBuffers();
+      sx = scene.crop_x;
+      sy = scene.crop_y;
+      sw = scene.subareaWidth;
+      sh = scene.subareaHeight;
+      smx = sx+sw;
+      smy = sy+sh;
 
-    SampleBuffer out = scene.getSampleBuffer();
+      fx = FastMath.min(sx, ox);
+      fy = FastMath.min(sy, oy);
+      fmx = FastMath.max(smx, omx);
+      fmy = FastMath.max(smy, omy);
+      fw = fmx-fx;
+      fh = fmy-fy;
 
-    int index, spp;
-    double r, g, b;
-    for (int y = 0; y < sh; y++)
-      for (int x = 0; x < sw; x++) {
-        spp = sb1.getSpp(x, y);
-        if (spp != 0) {
-          r = sb1.get(x, y, 0);
-          g = sb1.get(x, y, 1);
-          b = sb1.get(x, y, 2);
-          index = (y + sym - ymin) * scene.subareaWidth + (x + sxm - xmin);
-          out.mergeSamples(index, spp, r, g, b);
-        }
+      ss = scene.getSampleBuffer();
+      if (fx!=sx || fy!=sy || fmx!=smx || fmy!=smy) {
+        scene.crop_x = fx;
+        scene.crop_y = fy;
+        scene.subareaWidth = fw;
+        scene.subareaHeight = fh;
       }
+      scene.initBuffers();
+      fs = scene.getSampleBuffer();
 
-    for (int y = 0; y < oh; y++)
-      for (int x = 0; x < ow; x++) {
-        spp = sb2.getSpp(x, y);
-        if (spp != 0) {
-          r = sb2.get(x, y, 0);
-          g = sb2.get(x, y, 1);
-          b = sb2.get(x, y, 2);
-          index = (y + oym - ymin) * scene.subareaWidth + (x + oxm - xmin);
-          out.mergeSamples(index, spp, r, g, b);
-        }
+      int sppmin = inputStream.readInt();
+//      scene.spp_min += sppmin; // TODO: store spp min and max instead of only one value
+      int sppmax = inputStream.readInt();
+      scene.spp += sppmax; // TODO: store spp min and max instead of only one value
+
+      scene.renderTime += inputStream.readLong();
+
+      // For future use; flags for gzip'd data / SPP interleaving or as an array?
+      long flags = inputStream.readLong();
+    }
+
+    try (TaskTracker.Task task = taskTracker.task("Merging - Copying old render dump", 1)) {
+      fs.copyPixels(ss, 0, 0, sx-fx, sy-fy, sw, sh);
+    }
+
+    if (!("" + inputStream.readChar() + inputStream.readChar() + inputStream.readChar()).equals(SECTION_HEADER_SAMPLES))
+      throw new StreamCorruptedException("Merging - Expected Sample Marker");
+
+    ByteBuffer bb = ByteBuffer.allocate(ow*Double.BYTES*3+ow*Integer.BYTES);
+    int taskCoef = ow;
+    try (TaskTracker.Task task = taskTracker.task("Merging - Loading render dump - Samples", taskCoef * oh)) {
+      for (int y = 0; y < oh; y++) {
+        inputStream.readFully(bb.array(), 0, bb.capacity());
+        bb.rewind();
+
+        for (int x=0; x<ow; x++)
+          fs.mergeSamples(x+ox-fx, y+oy-fy, bb.getDouble(), bb.getDouble(), bb.getDouble(), bb.getInt());
+
+        bb.rewind();
+        task.update(taskCoef * y);
       }
+    }
+
+    if (!("" + inputStream.readChar() + inputStream.readChar() + inputStream.readChar()).equals(SECTION_HEADER_EOF))
+      throw new StreamCorruptedException("Merging - Expected Done Marker");
   }
 
 
