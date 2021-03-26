@@ -16,9 +16,13 @@ import static se.llbit.chunky.world.Chunk.*;
  * 2d Biomes only
  */
 public class SimpleChunkData implements ChunkData {
+  /** These final fields are never written to, and are instead used for quickly setting existing blocks/biomes arrays
+   to all zeros, in {@link SimpleChunkData#clear()} */
+  private static final int[] emptyBlocks = new int[X_MAX * Y_MAX * Z_MAX];
+  private static final byte[] emptyBiomes = new byte[X_MAX * Z_MAX];
 
-  private int[] blocks;
-  private byte[] biomes;
+  private final int[] blocks;
+  private final byte[] biomes;
   private final Collection<CompoundTag> tileEntities;
   private final Collection<CompoundTag> entities;
 
@@ -84,8 +88,9 @@ public class SimpleChunkData implements ChunkData {
   }
 
   @Override public void clear() {
-    blocks = new int[X_MAX * Y_MAX * Z_MAX];
-    biomes = new byte[X_MAX * Chunk.Z_MAX];
+    //Quickly set all values to zero. Explanation here: https://github.com/chunky-dev/chunky/pull/866#issuecomment-808490741
+    System.arraycopy(emptyBlocks, 0, blocks, 0, emptyBlocks.length);
+    System.arraycopy(emptyBiomes, 0, biomes, 0, emptyBiomes.length);
     tileEntities.clear();
     entities.clear();
   }
