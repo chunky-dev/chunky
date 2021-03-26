@@ -1941,12 +1941,12 @@ public class Scene implements JsonSerializable, Refreshable {
     try (TaskTracker.Task task = taskTracker.task("Finalizing frame")) {
       AtomicInteger done = new AtomicInteger(0);
       Chunky.getCommonThreads().submit(() -> {
-        IntStream.range(0, width).parallel().forEach(x -> {
-          for (int y = 0; y < height; y++) {
+        IntStream.range(0, subareaWidth).parallel().forEach(x -> {
+          for (int y = 0; y < subareaHeight; y++) {
             finalizePixel(x, y);
           }
 
-          task.update(width, done.incrementAndGet());
+          task.update(subareaWidth, done.incrementAndGet());
         });
       }).get();
     } catch (InterruptedException | ExecutionException e) {
