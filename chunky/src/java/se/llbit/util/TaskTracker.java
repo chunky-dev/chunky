@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky Contributors
  *
  * This file is part of Chunky.
  *
@@ -52,11 +53,9 @@ public class TaskTracker {
 
   public static class Task implements AutoCloseable {
     public static final Task NONE = new Task(null, null, "None", 1) {
-      @Override protected void update() {
-      }
-
-      @Override public void close() {
-      }
+      @Override protected void update() { }
+      @Override public void close() { }
+      @Override public void update(String task, int target, int done, long startTime) { }
     };
 
     private String taskName;
