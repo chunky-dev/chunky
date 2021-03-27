@@ -1397,11 +1397,7 @@ public class Scene implements JsonSerializable, Refreshable {
     int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
     int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
 
-    int xroom = (1 << requiredDepth) - (xmax - xmin);
-    int yroom = (1 << requiredDepth) - (yMax - yMin);
-    int zroom = (1 << requiredDepth) - (zmax - zmin);
-
-    origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
+    origin.set(xmin, 0, zmin);
     return requiredDepth;
   }
 
