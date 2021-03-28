@@ -20,6 +20,8 @@ import se.llbit.chunky.entity.SignEntity.Color;
 import se.llbit.chunky.resources.texturepack.FontTexture.Glyph;
 import se.llbit.json.JsonArray;
 import se.llbit.json.JsonValue;
+import se.llbit.math.ColorUtil;
+import se.llbit.math.Ray;
 import se.llbit.math.Vector4;
 
 public class SignTexture extends Texture {
@@ -36,8 +38,9 @@ public class SignTexture extends Texture {
     hh = v1 - v0;
   }
 
-  private final Texture texture;
   private final Texture signTexture;
+  private final PalettizedBitmapImage textColor;
+  private final BinaryBitmapImage textMask;
 
   public SignTexture(JsonArray[] text, Texture signTexture) {
     this.signTexture = signTexture;
@@ -45,65 +48,74 @@ public class SignTexture extends Texture {
     int lineHeight = 10;
     int width = 96;
     int height = 48;
-    BitmapImage img = new BitmapImage(width, height);
-    int[] data = img.data;
     int ystart = ymargin;
-    for (JsonArray line : text) {
-      if (line.isEmpty()) {
-        ystart += lineHeight;
-        continue;
+    boolean allEmpty = true;
+    for(JsonArray line : text) {
+      if(!line.isEmpty()) {
+        allEmpty = false;
+        break;
       }
-      int lineWidth = 0;
-      for (JsonValue textItem : line) {
-        String textLine = textItem.object().get("text").stringValue("");
-        for (int c : textLine.codePoints().toArray()) {
-          Glyph glyph = Texture.fonts.getGlyph(c);
-          lineWidth += glyph != null ? glyph.width : 0;
+    }
+    if(allEmpty) {
+      textColor = null;
+      textMask = null;
+    } else {
+      textColor = new PalettizedBitmapImage(width, height);
+      textMask = new BinaryBitmapImage(width, height);
+      for(JsonArray line : text) {
+        if(line.isEmpty()) {
+          ystart += lineHeight;
+          continue;
         }
-      }
-      int xstart = (int) Math.ceil((width - lineWidth) / 2.0);
-      for (JsonValue textItem : line) {
-        String textLine = textItem.object().get("text").stringValue("");
-        Color color = Color.get(textItem.object().get("color").intValue(0));
-
-        for (int c : textLine.codePoints().toArray()) {
-          Glyph glyph = Texture.fonts.getGlyph(c);
-          if (glyph != null) {
-            int y = ystart - glyph.ascent + lineHeight;
-
-            for (int py = 0; py < glyph.height; ++py) {
-              int x = xstart;
-              for (int px = glyph.xmin; px <= glyph.xmax; ++px) {
-                if ((glyph.lines[py] & (1 << px)) != 0) {
-                  data[y * width + x] = color.rgbColor;
-                }
-                x += 1;
-              }
-              y += 1;
-            }
-            xstart += glyph.width;
+        int lineWidth = 0;
+        for(JsonValue textItem : line) {
+          String textLine = textItem.object().get("text").stringValue("");
+          for(int c : textLine.codePoints().toArray()) {
+            Glyph glyph = Texture.fonts.getGlyph(c);
+            lineWidth += glyph != null ? glyph.width : 0;
           }
         }
-      }
-      ystart += lineHeight;
-    }
-    texture = new Texture(img);
-  }
+        int xstart = (int) Math.ceil((width - lineWidth) / 2.0);
+        for(JsonValue textItem : line) {
+          String textLine = textItem.object().get("text").stringValue("");
+          Color color = Color.get(textItem.object().get("color").intValue(0));
 
-  @Override
-  public void getColor(double u, double v, Vector4 c) {
-    texture.getColor(u, v, c);
-    if (c.w == 0) {
-      signTexture.getColor(u * ww + u0, v * hh + v0, c);
+          for(int c : textLine.codePoints().toArray()) {
+            Glyph glyph = Texture.fonts.getGlyph(c);
+            if(glyph != null) {
+              int y = ystart - glyph.ascent + lineHeight;
+
+              for(int py = 0; py < glyph.height; ++py) {
+                int x = xstart;
+                for(int px = glyph.xmin; px <= glyph.xmax; ++px) {
+                  if((glyph.lines[py] & (1 << px)) != 0) {
+                    textColor.setPixel(x, y, color.id);
+                    textMask.setPixel(x, y, true);
+                  }
+                  x += 1;
+                }
+                y += 1;
+              }
+              xstart += glyph.width;
+            }
+          }
+        }
+        ystart += lineHeight;
+      }
     }
   }
 
   @Override
   public float[] getColor(double u, double v) {
-    float[] rgba = texture.getColor(u, v);
-    if (rgba[3] == 0) {
+    int x = (int)(u * 96 - Ray.EPSILON);
+    int y = (int) ((1 - v) * 48 - Ray.EPSILON);
+    if(textMask != null && textMask.getPixel(x, y)) {
+      float[] result = new float[4];
+      Color characterColor = Color.get(textColor.getPixel(x, y));
+      ColorUtil.getRGBAComponentsGammaCorrected(characterColor.rgbColor, result);
+      return result;
+    } else {
       return signTexture.getColor(u * ww + u0, v * hh + v0);
     }
-    return rgba;
   }
 }
