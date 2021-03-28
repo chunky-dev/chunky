@@ -37,9 +37,12 @@ public class TexturedTriangle implements Primitive {
   public final Vector3 o = new Vector3(0, 0, 0);
   public final Vector3 n = new Vector3(0, 0, 0);
   public final AABB bounds;
-  public final Vector2 t1;
-  public final Vector2 t2;
-  public final Vector2 t3;
+  private final double t1u;
+  private final double t1v;
+  private final double t2u;
+  private final double t2v;
+  private final double t3u;
+  private final double t3v;
   public final Material material;
   public final boolean doubleSided;
 
@@ -65,9 +68,12 @@ public class TexturedTriangle implements Primitive {
     o.set(c1);
     n.cross(e2, e1);
     n.normalize();
-    this.t1 = new Vector2(t2);
-    this.t2 = new Vector2(t3);
-    this.t3 = new Vector2(t1);
+    t1u = t1.x;
+    t1v = t1.y;
+    t2u = t2.x;
+    t2v = t2.y;
+    t3u = t3.x;
+    t3v = t3.y;
     this.material = material;
     this.doubleSided = doubleSided;
 
@@ -111,8 +117,8 @@ public class TexturedTriangle implements Primitive {
 
     if (t > EPSILON && t < ray.t) {
       double w = 1 - u - v;
-      ray.u = t1.x * u + t2.x * v + t3.x * w;
-      ray.v = t1.y * u + t2.y * v + t3.y * w;
+      ray.u = t1u * u + t2u * v + t3u * w;
+      ray.v = t1v * u + t2v * v + t3v * w;
       float[] color = material.getColor(ray.u, ray.v);
       if (color[3] > 0) {
         ray.color.set(color);
