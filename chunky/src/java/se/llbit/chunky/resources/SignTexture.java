@@ -42,6 +42,14 @@ public class SignTexture extends Texture {
   private final PalettizedBitmapImage textColor;
   private final BinaryBitmapImage textMask;
 
+  static private boolean hasVisibleCharacter(JsonArray line) {
+    for(JsonValue textItem : line) {
+      if(!textItem.object().get("text").stringValue("").trim().isEmpty())
+        return true;
+    }
+    return false;
+  }
+
   public SignTexture(JsonArray[] text, Texture signTexture) {
     this.signTexture = signTexture;
     int ymargin = 1;
@@ -51,7 +59,7 @@ public class SignTexture extends Texture {
     int ystart = ymargin;
     boolean allEmpty = true;
     for(JsonArray line : text) {
-      if(!line.isEmpty()) {
+      if(hasVisibleCharacter(line)) {
         allEmpty = false;
         break;
       }
@@ -110,10 +118,8 @@ public class SignTexture extends Texture {
     int x = (int)(u * 96 - Ray.EPSILON);
     int y = (int) ((1 - v) * 48 - Ray.EPSILON);
     if(textMask != null && textMask.getPixel(x, y)) {
-      float[] result = new float[4];
       Color characterColor = Color.get(textColor.getPixel(x, y));
-      ColorUtil.getRGBAComponentsGammaCorrected(characterColor.rgbColor, result);
-      return result;
+      return characterColor.linearColor;
     } else {
       return signTexture.getColor(u * ww + u0, v * hh + v0);
     }

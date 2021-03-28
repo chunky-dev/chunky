@@ -36,7 +36,7 @@ public class BinaryBitmapImage {
     int index = y * width + x;
     int byteIndex = index / 8;
     int bitIndex = index % 8;
-    int bit = 1 << (7 - bitIndex);
+    int bit = 1 << bitIndex;
     if(value)
       // set the bit
       data[byteIndex] |= bit;
@@ -49,7 +49,7 @@ public class BinaryBitmapImage {
     int index = y * width + x;
     int byteIndex = index / 8;
     int bitIndex = index % 8;
-    int bit = 1 << (7 - bitIndex);
+    int bit = 1 << bitIndex;
     return (data[byteIndex] & bit) != 0;
   }
 }

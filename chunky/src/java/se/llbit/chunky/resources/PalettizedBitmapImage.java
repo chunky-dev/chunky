@@ -17,7 +17,7 @@
 package se.llbit.chunky.resources;
 
 /**
- * A image type using 4 bit per pixel
+ * A image type using 4 bits per pixel, supporting up to 16 colors.
  */
 public class PalettizedBitmapImage {
   public final int width;
