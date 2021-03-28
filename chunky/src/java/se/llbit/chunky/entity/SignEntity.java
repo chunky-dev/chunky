@@ -27,10 +27,7 @@ import se.llbit.json.JsonObject;
 import se.llbit.json.JsonParser;
 import se.llbit.json.JsonParser.SyntaxError;
 import se.llbit.json.JsonValue;
-import se.llbit.math.Quad;
-import se.llbit.math.Transform;
-import se.llbit.math.Vector3;
-import se.llbit.math.Vector4;
+import se.llbit.math.*;
 import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.Tag;
@@ -64,6 +61,7 @@ public class SignEntity extends Entity {
 
     public final int id;
     public final int rgbColor;
+    public final float[] linearColor;
 
     private static final Map<String, Color> map = new HashMap<>();
 
@@ -89,14 +87,12 @@ public class SignEntity extends Entity {
     Color(int id, int color) {
       this.id = id;
       this.rgbColor = color;
+      this.linearColor = new float[4];
+      ColorUtil.getRGBAComponentsGammaCorrected(rgbColor, linearColor);
     }
 
     public static Color get(String color) {
-      if (map.containsKey(color)) {
-        return map.get(color);
-      } else {
-        return Color.BLACK;
-      }
+      return map.getOrDefault(color, Color.BLACK);
     }
 
     public static Color get(int id) {
