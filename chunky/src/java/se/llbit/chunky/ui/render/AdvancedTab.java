@@ -72,7 +72,7 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML
   private ChoiceBox<String> octreeImplementation;
   @FXML
-  private ChoiceBox<BVH.Method> bvhMethod;
+  private ChoiceBox<String> bvhMethod;
   @FXML
   private IntegerAdjuster gridSize;
   @FXML
@@ -150,38 +150,38 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
       renderControls.showPopup("This change takes effect after restarting Chunky.", renderThreads);
     });
 
-    ArrayList<String> implNames = new ArrayList<>();
+    ArrayList<String> octreeNames = new ArrayList<>();
     StringBuilder tooltipTextBuilder = new StringBuilder();
     for(Map.Entry<String, Octree.ImplementationFactory> entry : Octree.getEntries()) {
-      implNames.add(entry.getKey());
+      octreeNames.add(entry.getKey());
       tooltipTextBuilder.append(entry.getKey());
       tooltipTextBuilder.append(": ");
       tooltipTextBuilder.append(entry.getValue().getDescription());
       tooltipTextBuilder.append('\n');
     }
     tooltipTextBuilder.append("Requires reloading chunks to take effect.");
-    octreeImplementation.getItems().addAll(implNames.toArray(new String[implNames.size()]));
+    octreeImplementation.getItems().addAll(octreeNames);
     octreeImplementation.getSelectionModel().selectedItemProperty()
             .addListener((observable, oldvalue, newvalue) -> {
               scene.setOctreeImplementation(newvalue);
               PersistentSettings.setOctreeImplementation(newvalue);
             });
-    octreeImplementation.setTooltip(new Tooltip(
-            tooltipTextBuilder.toString()
-    ));
+    octreeImplementation.setTooltip(new Tooltip(tooltipTextBuilder.toString()));
 
+    ArrayList<String> bvhNames = new ArrayList<>();
     StringBuilder bvhMethodBuilder = new StringBuilder();
-    for (BVH.Method method : BVH.Method.values()) {
-      bvhMethodBuilder.append(method.name());
+    for (Map.Entry<String, BVH.ImplementationFactory> entry : BVH.factories.entrySet()) {
+      bvhNames.add(entry.getKey());
+      bvhMethodBuilder.append(entry.getKey());
       bvhMethodBuilder.append(": ");
-      bvhMethodBuilder.append(method.tooltip);
+      bvhMethodBuilder.append(entry.getValue().getTooltip());
       bvhMethodBuilder.append('\n');
     }
     bvhMethodBuilder.append("Requires reloading chunks to take effect.");
-    bvhMethod.getItems().addAll(BVH.Method.values());
-    bvhMethod.getSelectionModel().select(BVH.Method.valueOf(PersistentSettings.getBvhMethod()));
+    bvhMethod.getItems().addAll(bvhNames);
+    bvhMethod.getSelectionModel().select(PersistentSettings.getBvhMethod());
     bvhMethod.getSelectionModel().selectedItemProperty()
-            .addListener(((observable, oldValue, newValue) -> PersistentSettings.setBvhMethod(newValue.name())));
+            .addListener(((observable, oldValue, newValue) -> PersistentSettings.setBvhMethod(newValue)));
     bvhMethod.setTooltip(new Tooltip(bvhMethodBuilder.toString()));
 
     gridSize.setRange(4, 64);

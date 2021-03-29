@@ -1327,7 +1327,7 @@ public class Scene implements JsonSerializable, Refreshable {
     for (Entity entity : entities) {
       primitives.addAll(entity.primitives(worldOffset));
     }
-    bvh = new BVH(primitives, BVH.methodFromString(PersistentSettings.getBvhMethod()));
+    bvh = new BVH(primitives);
   }
 
   private void buildActorBvh() {
@@ -1336,7 +1336,7 @@ public class Scene implements JsonSerializable, Refreshable {
     for (Entity entity : actors) {
       actorPrimitives.addAll(entity.primitives(worldOffset));
     }
-    actorBvh = new BVH(actorPrimitives, BVH.methodFromString(PersistentSettings.getBvhMethod()));
+    actorBvh = new BVH(actorPrimitives);
   }
 
   /**

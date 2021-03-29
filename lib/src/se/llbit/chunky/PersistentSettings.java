@@ -420,7 +420,7 @@ public final class PersistentSettings {
   }
 
   public static String getBvhMethod() {
-    return settings.getString("bvhMethod", "MIDPOINT");
+    return settings.getString("bvhMethod", "SAH_MA");
   }
 
   public static void setGridSizeDefault(int value) {
