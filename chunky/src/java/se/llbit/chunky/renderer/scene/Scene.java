@@ -1326,40 +1326,36 @@ public class Scene implements JsonSerializable, Refreshable {
 
     chunks = loadedChunks;
     camera.setWorldSize(1 << worldOctree.getDepth());
-    try (TaskTracker.Task task = taskTracker.task("Building BVH")) {
-      buildBvh(task);
-      buildActorBvh(task);
-    }
+    buildBvh();
+    buildActorBvh();
     Log.info(String.format("Loaded %d chunks", numChunks));
   }
 
-  private void buildBvh(TaskTracker.Task task) {
-    task.update("Building world BVH", 1, 0);
+  private void buildBvh() {
     final List<Primitive> primitives = new LinkedList<>();
 
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
     for (Entity entity : entities) {
       primitives.addAll(entity.primitives(worldOffset));
     }
-    bvh = new BVH(primitives, BVH.methodFromString(PersistentSettings.getBvhMethod()), task);
+    bvh = new BVH(primitives, BVH.methodFromString(PersistentSettings.getBvhMethod()));
   }
 
-  private void buildActorBvh(TaskTracker.Task task) {
-    task.update("Building actor BVH", 1, 0);
+  private void buildActorBvh() {
     final List<Primitive> actorPrimitives = new LinkedList<>();
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
     for (Entity entity : actors) {
       actorPrimitives.addAll(entity.primitives(worldOffset));
     }
-    actorBvh = new BVH(actorPrimitives, BVH.methodFromString(PersistentSettings.getBvhMethod()), task);
+    actorBvh = new BVH(actorPrimitives, BVH.methodFromString(PersistentSettings.getBvhMethod()));
   }
 
   /**
    * Rebuild the actors and the other blocks bounding volume hierarchy.
    */
   public void rebuildBvh() {
-    buildBvh(TaskTracker.Task.NONE);
-    buildActorBvh(TaskTracker.Task.NONE);
+    buildBvh();
+    buildActorBvh();
     refresh();
   }
 
@@ -1367,7 +1363,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Rebuild the actors bounding volume hierarchy.
    */
   public void rebuildActorBvh() {
-    buildActorBvh(TaskTracker.Task.NONE);
+    buildActorBvh();
     refresh();
   }
 
@@ -2086,8 +2082,8 @@ public class Scene implements JsonSerializable, Refreshable {
         Log.info("Octree loaded");
         calculateOctreeOrigin(chunks);
         camera.setWorldSize(1 << worldOctree.getDepth());
-        buildBvh(task);
-        buildActorBvh(task);
+        buildBvh();
+        buildActorBvh();
         return true;
       } catch (IOException e) {
         Log.error("Failed to load chunk data!", e);

@@ -24,7 +24,6 @@ import se.llbit.chunky.main.Chunky;
 import se.llbit.log.Log;
 import se.llbit.math.primitive.MutableAABB;
 import se.llbit.math.primitive.Primitive;
-import se.llbit.util.TaskTracker;
 
 import java.util.*;
 
@@ -207,12 +206,10 @@ public class BVH {
    * Construct a new BVH containing the given primitives.
    */
   public BVH(List<Primitive> primitives) {
-    this(primitives, DEFAULT_METHOD, TaskTracker.Task.NONE);
+    this(primitives, DEFAULT_METHOD);
   }
 
-  public BVH(List<Primitive> primitives, Method method, TaskTracker.Task task) {
-    task.update(primitives.size(), 0);
-
+  public BVH(List<Primitive> primitives, Method method) {
     Node root;
 
     IntArrayList data = new IntArrayList();
@@ -220,15 +217,15 @@ public class BVH {
 
     switch (method) {
       case SAH:
-        root = constructSAH(primitives.toArray(new Primitive[0]), task);
+        root = constructSAH(primitives.toArray(new Primitive[0]));
         depth = packNode(root, data, primitivesList)+2;
         break;
       case SAH_MA:
-        root = constructSAH_MA(primitives.toArray(new Primitive[0]), task);
+        root = constructSAH_MA(primitives.toArray(new Primitive[0]));
         depth = packNode(root, data, primitivesList)+2;
         break;
       default:
-        root = constructMidpointSplit(primitives.toArray(new Primitive[0]), task);
+        root = constructMidpointSplit(primitives.toArray(new Primitive[0]));
         depth = packNode(root, data, primitivesList)+2;
     }
 
@@ -294,9 +291,7 @@ public class BVH {
    *
    * @return root node of constructed BVH
    */
-  private Node constructMidpointSplit(Primitive[] primitives, TaskTracker.Task task) {
-    int progress = 0;
-    long startTime = System.currentTimeMillis();
+  private Node constructMidpointSplit(Primitive[] primitives) {
     Stack<Node> nodes = new Stack<>();
     Stack<Action> actions = new Stack<>();
     Stack<Primitive[]> chunks = new Stack<>();
@@ -310,9 +305,6 @@ public class BVH {
         Primitive[] chunk = chunks.pop();
         if (chunk.length < SPLIT_LIMIT) {
           nodes.push(new Leaf(chunk));
-
-          progress += chunk.length;
-          task.update(progress, startTime, 16384);
         } else {
           splitMidpointMajorAxis(chunk, actions, chunks);
         }
@@ -371,9 +363,7 @@ public class BVH {
    *
    * @return root node of constructed BVH
    */
-  private Node constructSAH(Primitive[] primitives, TaskTracker.Task task) {
-    int progress = 0;
-    long startTime = System.currentTimeMillis();
+  private Node constructSAH(Primitive[] primitives) {
     Stack<Node> nodes = new Stack<>();
     Stack<Action> actions = new Stack<>();
     Stack<Primitive[]> chunks = new Stack<>();
@@ -387,9 +377,6 @@ public class BVH {
         Primitive[] chunk = chunks.pop();
         if (chunk.length < SPLIT_LIMIT) {
           nodes.push(new Leaf(chunk));
-
-          progress += chunk.length;
-          task.update(progress, startTime, 16384);
         } else {
           splitSAH(chunk, actions, chunks);
         }
@@ -404,9 +391,7 @@ public class BVH {
    *
    * @return root node of constructed BVH
    */
-  private Node constructSAH_MA(Primitive[] primitives, TaskTracker.Task task) {
-    int progress = 0;
-    long startTime = System.currentTimeMillis();
+  private Node constructSAH_MA(Primitive[] primitives) {
     Stack<Node> nodes = new Stack<>();
     Stack<Action> actions = new Stack<>();
     Stack<Primitive[]> chunks = new Stack<>();
@@ -420,9 +405,6 @@ public class BVH {
         Primitive[] chunk = chunks.pop();
         if (chunk.length < SPLIT_LIMIT) {
           nodes.push(new Leaf(chunk));
-
-          progress += chunk.length;
-          task.update(progress, startTime, 16384);
         } else {
           splitSAH_MA(chunk, actions, chunks);
         }
