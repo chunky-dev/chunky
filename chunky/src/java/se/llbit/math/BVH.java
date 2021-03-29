@@ -37,7 +37,7 @@ public class BVH {
   /**
    * Indicates whether to use SAH for construction.
    */
-  private static final Method METHOD = Method.MIDPOINT;
+  private static final Method METHOD = Method.SAH_MA;
 
 
   private enum Method {
@@ -161,6 +161,7 @@ public class BVH {
   private static final int SPLIT_LIMIT = 4;
 
   public final int[] packed;
+  public final int depth;
   public final ArrayList<Primitive[]> packedPrimitives;
 
 
@@ -222,7 +223,7 @@ public class BVH {
 
     IntArrayList data = new IntArrayList();
     packedPrimitives = new ArrayList<>();
-    packNode(root, data, packedPrimitives);
+    depth = packNode(root, data, packedPrimitives)+2;
     packed = data.toIntArray();
     packedPrimitives.trimToSize();
   }
@@ -232,21 +233,26 @@ public class BVH {
     MERGE,
   }
 
-  private void packNode(Node node, IntArrayList data, ArrayList<Primitive[]> primitives) {
+  private int packNode(Node node, IntArrayList data, ArrayList<Primitive[]> primitives) {
     int index = data.size();
+    int depth;
     data.add(0);  // Next child (to be set)
     packAabb(node.bb, data);
 
     if (node instanceof Group) {
-      packNode(((Group) node).child1, data, primitives);
+      depth = packNode(((Group) node).child1, data, primitives);
       data.set(index, data.size()); // Second child location
-      packNode(((Group) node).child2, data, primitives);
+      depth = FastMath.max(packNode(((Group) node).child2, data, primitives), depth);
     } else if (node instanceof BVH.Leaf) {
+      depth = 1;
       data.set(index, -primitives.size());  // Negative number = pointer to primitives array
       primitives.add(node.primitives);
     } else {
+      depth = 0;
       data.set(index, index+7); // Skip this
     }
+
+    return depth+1;
   }
 
   private void packAabb(AABB box, IntArrayList data) {
@@ -258,14 +264,10 @@ public class BVH {
     data.add(Float.floatToIntBits((float) box.zmax));
   }
 
-  private double quickAabbIntersect(Ray ray, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax) {
+  private double quickAabbIntersect(Ray ray, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax, double rx, double ry, double rz) {
     if (ray.o.x >= xmin && ray.o.x <= xmax && ray.o.y >= ymin && ray.o.y <= ymax && ray.o.z >= zmin && ray.o.z <= zmax) {
       return 0;
     }
-
-    double rx = 1 / ray.d.x;
-    double ry = 1 / ray.d.y;
-    double rz = 1 / ray.d.z;
 
     double tx1 = (xmin - ray.o.x) * rx;
     double tx2 = (xmax - ray.o.x) * rx;
@@ -587,58 +589,51 @@ public class BVH {
   public boolean closestIntersection(Ray ray) {
     boolean hit = false;
     int currentNode = 0;
-    boolean intersected = false;
-    IntStack nodesToVisit = new IntArrayList(32);
+    IntStack nodesToVisit = new IntArrayList(depth);
+
+    double rx = 1 / ray.d.x;
+    double ry = 1 / ray.d.y;
+    double rz = 1 / ray.d.z;
 
     while (true) {
-      if (intersected || quickAabbIntersect(ray, Float.intBitsToFloat(packed[currentNode+1]), Float.intBitsToFloat(packed[currentNode+2]),
-                                                 Float.intBitsToFloat(packed[currentNode+3]), Float.intBitsToFloat(packed[currentNode+4]),
-                                                 Float.intBitsToFloat(packed[currentNode+5]), Float.intBitsToFloat(packed[currentNode+6])) != -1) {
-        if (packed[currentNode] <= 0) {
-          // Is leaf
-          int primIndex = -packed[currentNode];
-          for (Primitive primitive : packedPrimitives.get(primIndex)) {
-            if (primitive.intersect(ray)) {
-              hit = true;
-            }
-          }
-
-          if (nodesToVisit.isEmpty()) break;
-          currentNode = nodesToVisit.popInt();
-        } else {
-          // Is branch, find closest node
-          int offset = currentNode+7;
-          double t1 = quickAabbIntersect(ray, Float.intBitsToFloat(packed[offset+1]), Float.intBitsToFloat(packed[offset+2]),
-                                              Float.intBitsToFloat(packed[offset+3]), Float.intBitsToFloat(packed[offset+4]),
-                                              Float.intBitsToFloat(packed[offset+5]), Float.intBitsToFloat(packed[offset+6]));
-          offset = packed[currentNode];
-          double t2 = quickAabbIntersect(ray, Float.intBitsToFloat(packed[offset+1]), Float.intBitsToFloat(packed[offset+2]),
-                                              Float.intBitsToFloat(packed[offset+3]), Float.intBitsToFloat(packed[offset+4]),
-                                              Float.intBitsToFloat(packed[offset+5]), Float.intBitsToFloat(packed[offset+6]));
-
-          if (t1 == -1 && t2 == -1) {
-            if (nodesToVisit.isEmpty()) break;
-            currentNode = nodesToVisit.popInt();
-          } else if (t2 == -1) {
-            currentNode += 7;
-            intersected = true;
-          } else if (t1 == -1) {
-            currentNode = packed[currentNode];
-            intersected = true;
-          } else if (t1 < t2) {
-            intersected = true;
-            nodesToVisit.push(packed[currentNode]);
-            currentNode += 7;
-          } else {
-            intersected = true;
-            nodesToVisit.push(currentNode+7);
-            currentNode = packed[currentNode];
-          }
+      if (packed[currentNode] <= 0) {
+        // Is leaf
+        int primIndex = -packed[currentNode];
+        for (Primitive primitive : packedPrimitives.get(primIndex)) {
+          hit = primitive.intersect(ray) || hit;
         }
-      } else {
-        // Missed branch
+
         if (nodesToVisit.isEmpty()) break;
         currentNode = nodesToVisit.popInt();
+      } else {
+        // Is branch, find closest node
+        int offset = currentNode+7;
+        double t1 = quickAabbIntersect(ray, Float.intBitsToFloat(packed[offset+1]), Float.intBitsToFloat(packed[offset+2]),
+                                            Float.intBitsToFloat(packed[offset+3]), Float.intBitsToFloat(packed[offset+4]),
+                                            Float.intBitsToFloat(packed[offset+5]), Float.intBitsToFloat(packed[offset+6]),
+                rx, ry, rz);
+        offset = packed[currentNode];
+        double t2 = quickAabbIntersect(ray, Float.intBitsToFloat(packed[offset+1]), Float.intBitsToFloat(packed[offset+2]),
+                                            Float.intBitsToFloat(packed[offset+3]), Float.intBitsToFloat(packed[offset+4]),
+                                            Float.intBitsToFloat(packed[offset+5]), Float.intBitsToFloat(packed[offset+6]),
+                rx, ry, rz);
+
+        if (t1 == -1 || t1 > ray.t) {
+          if (t2 == -1 || t2 > ray.t) {
+            if (nodesToVisit.isEmpty()) break;
+            currentNode = nodesToVisit.popInt();
+          } else {
+            currentNode = packed[currentNode];
+          }
+        } else if (t2 == -1 || t2 > ray.t) {
+          currentNode += 7;
+        } else if (t1 < t2) {
+          nodesToVisit.push(packed[currentNode]);
+          currentNode += 7;
+        } else {
+          nodesToVisit.push(currentNode + 7);
+          currentNode = packed[currentNode];
+        }
       }
     }
 
