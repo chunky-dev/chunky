@@ -139,6 +139,19 @@ public class TaskTracker {
     public void update(int done, long startTime) {
       this.update(this.taskName, this.target, done, startTime);
     }
+
+    /** Ratelimited update. Only update when the new progress is greater than the old progress + {@code interval} */
+    public void updateInterval(int target, int done, long startTime, int interval) {
+      if (target != this.target || done > this.done + interval) {
+        this.update(target, done, startTime);
+      }
+    }
+
+    public void updateInterval(int done, long startTime, int interval) {
+      if (done > this.done + interval) {
+        this.update(done, startTime);
+      }
+    }
   }
 
   private void updateProgress(String taskName, int target, int done, String eta) {
