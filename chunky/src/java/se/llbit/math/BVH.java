@@ -17,14 +17,12 @@
  */
 package se.llbit.math;
 
-import se.llbit.chunky.plugin.PluginApi;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import org.apache.commons.math3.util.FastMath;
 import se.llbit.math.primitive.MutableAABB;
 import se.llbit.math.primitive.Primitive;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Bounding Volume Hierarchy based on AABBs.
@@ -159,7 +157,8 @@ public class BVH {
 
   private static final int SPLIT_LIMIT = 4;
 
-  Node root;
+  public int[] packed;
+  public ArrayList<Primitive[]> packedPrimitives;
 
 
   interface Selector {
@@ -205,22 +204,79 @@ public class BVH {
    * Construct a new BVH containing the given primitives.
    */
   public BVH(List<Primitive> primitives) {
+    Node root;
+
     switch (METHOD) {
-      case MIDPOINT:
-        root = constructMidpointSplit(primitives.toArray(new Primitive[primitives.size()]));
-        break;
       case SAH:
-        root = constructSAH(primitives.toArray(new Primitive[primitives.size()]));
+        root = constructSAH(primitives.toArray(new Primitive[0]));
         break;
       case SAH_MA:
-        root = constructSAH_MA(primitives.toArray(new Primitive[primitives.size()]));
+        root = constructSAH_MA(primitives.toArray(new Primitive[0]));
         break;
+      default:
+        root = constructMidpointSplit(primitives.toArray(new Primitive[0]));
     }
+
+    IntArrayList data = new IntArrayList();
+    packedPrimitives = new ArrayList<>();
+    packNode(root, data, packedPrimitives);
+    packed = data.toIntArray();
+    packedPrimitives.trimToSize();
   }
 
   enum Action {
     PUSH,
     MERGE,
+  }
+
+  private void packNode(Node node, IntArrayList data, ArrayList<Primitive[]> primitives) {
+    int index = data.size();
+    data.add(0);  // Next child (to be set)
+    packAabb(node.bb, data);
+
+    if (node instanceof Group) {
+      packNode(((Group) node).child1, data, primitives);
+      data.set(index, data.size()); // Second child location
+      packNode(((Group) node).child2, data, primitives);
+    } else if (node instanceof BVH.Leaf) {
+      data.set(index, -primitives.size());  // Negative number = pointer to primitives array
+      primitives.add(node.primitives);
+    } else {
+      data.set(index, index+7); // Skip this
+    }
+  }
+
+  private void packAabb(AABB box, IntArrayList data) {
+    data.add(Float.floatToIntBits((float) box.xmin));
+    data.add(Float.floatToIntBits((float) box.xmax));
+    data.add(Float.floatToIntBits((float) box.ymin));
+    data.add(Float.floatToIntBits((float) box.ymax));
+    data.add(Float.floatToIntBits((float) box.zmin));
+    data.add(Float.floatToIntBits((float) box.zmax));
+  }
+
+  private boolean quickAabbIntersect(Ray ray, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax) {
+    if (ray.o.x >= xmin && ray.o.x <= xmax && ray.o.y >= ymin && ray.o.y <= ymax && ray.o.z >= zmin && ray.o.z <= zmax) {
+      return true;
+    }
+
+    double rx = 1 / ray.d.x;
+    double ry = 1 / ray.d.y;
+    double rz = 1 / ray.d.z;
+
+    double tx1 = (xmin - ray.o.x) * rx;
+    double tx2 = (xmax - ray.o.x) * rx;
+
+    double ty1 = (ymin - ray.o.y) * ry;
+    double ty2 = (ymax - ray.o.y) * ry;
+
+    double tz1 = (zmin - ray.o.z) * rz;
+    double tz2 = (zmax - ray.o.z) * rz;
+
+    double tmin = FastMath.max(FastMath.max(FastMath.min(tx1, tx2), FastMath.min(ty1, ty2)), FastMath.min(tz1, tz2));
+    double tmax = FastMath.min(FastMath.min(FastMath.max(tx1, tx2), FastMath.max(ty1, ty2)), FastMath.max(tz1, tz2));
+
+    return tmin <= tmax+Ray.OFFSET && tmin >= 0;
   }
 
   /**
@@ -526,21 +582,40 @@ public class BVH {
    * @return {@code true} if there exists any intersection
    */
   public boolean closestIntersection(Ray ray) {
-    return root.bb.hitTest(ray) && root.closestIntersection(ray);
-  }
+    boolean hit = false;
+    int toVisit = 0;
+    int currentNode = 0;
+    int[] nodesToVisit = new int[64];
 
-  /**
-   * Find any intersection between the ray and any object in the BVH. For simple
-   * intersection tests this method is quicker. The closest point search costs a
-   * bit more.
-   *
-   * @return {@code true} if there exists any intersection
-   */
-  public boolean anyIntersection(Ray ray) {
-    return root.bb.hitTest(ray) && root.anyIntersection(ray);
-  }
+    while (true) {
+      int[] node = Arrays.copyOfRange(packed, currentNode, currentNode+7);
 
-  public Node getRoot() {
-    return root;
+      if (quickAabbIntersect(ray, Float.intBitsToFloat(node[1]), Float.intBitsToFloat(node[2]),
+                                  Float.intBitsToFloat(node[3]), Float.intBitsToFloat(node[4]),
+                                  Float.intBitsToFloat(node[5]), Float.intBitsToFloat(node[6]))) {
+        if (node[0] <= 0) {
+          // Is leaf
+          int primIndex = -node[0];
+          for (Primitive primitive : packedPrimitives.get(primIndex)) {
+            if (primitive.intersect(ray)) {
+              hit = true;
+            }
+          }
+
+          if (toVisit == 0) break;
+          currentNode = nodesToVisit[--toVisit];
+        } else {
+          // Is branch
+          nodesToVisit[toVisit++] = node[0];
+          currentNode += 7;
+        }
+      } else {
+        // Missed branch
+        if (toVisit == 0) break;
+        currentNode = nodesToVisit[--toVisit];
+      }
+    }
+
+    return hit;
   }
 }
