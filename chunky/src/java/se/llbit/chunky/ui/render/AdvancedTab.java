@@ -37,12 +37,14 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.ShutdownAlert;
+import se.llbit.math.BVH;
 import se.llbit.math.Octree;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -69,6 +71,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   private ChoiceBox<PictureExportFormat> outputMode;
   @FXML
   private ChoiceBox<String> octreeImplementation;
+  @FXML
+  private ChoiceBox<BVH.Method> bvhMethod;
   @FXML
   private IntegerAdjuster gridSize;
   @FXML
@@ -165,6 +169,20 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     octreeImplementation.setTooltip(new Tooltip(
             tooltipTextBuilder.toString()
     ));
+
+    StringBuilder bvhMethodBuilder = new StringBuilder();
+    for (BVH.Method method : BVH.Method.values()) {
+      bvhMethodBuilder.append(method.name());
+      bvhMethodBuilder.append(": ");
+      bvhMethodBuilder.append(method.tooltip);
+      bvhMethodBuilder.append('\n');
+    }
+    bvhMethodBuilder.append("Requires reloading chunks to take effect.");
+    bvhMethod.getItems().addAll(BVH.Method.values());
+    bvhMethod.getSelectionModel().select(BVH.Method.valueOf(PersistentSettings.getBvhMethod()));
+    bvhMethod.getSelectionModel().selectedItemProperty()
+            .addListener(((observable, oldValue, newValue) -> PersistentSettings.setBvhMethod(newValue.name())));
+    bvhMethod.setTooltip(new Tooltip(bvhMethodBuilder.toString()));
 
     gridSize.setRange(4, 64);
     gridSize.setName("Emitter grid size");

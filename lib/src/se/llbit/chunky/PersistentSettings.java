@@ -85,7 +85,7 @@ public final class PersistentSettings {
     changeSettingsDirectory(directory);
   }
 
-  private static void save() {
+  public static void save() {
     settings.save(settingsDir, settingsFile);
   }
 
@@ -411,6 +411,15 @@ public final class PersistentSettings {
 
   public static String getOctreeImplementation() {
     return settings.getString("octreeImplementation", "PACKED");
+  }
+
+  public static void setBvhMethod(String method) {
+    settings.setString("bvhMethod", method);
+    save();
+  }
+
+  public static String getBvhMethod() {
+    return settings.getString("bvhMethod", "MIDPOINT");
   }
 
   public static void setGridSizeDefault(int value) {

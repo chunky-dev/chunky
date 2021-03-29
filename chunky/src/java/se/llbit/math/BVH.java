@@ -21,6 +21,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntStack;
 import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.main.Chunky;
+import se.llbit.log.Log;
 import se.llbit.math.primitive.MutableAABB;
 import se.llbit.math.primitive.Primitive;
 
@@ -35,9 +36,14 @@ import static se.llbit.math.Ray.OFFSET;
  */
 public class BVH {
   public enum Method {
-    MIDPOINT,
-    SAH,
-    SAH_MA,
+    MIDPOINT ("Fast and simple, but not optimal BVH building method."),
+    SAH      ("Slow but nearly optimal BVH building method."),
+    SAH_MA   ("Slow but nearly optimal BVH building method. Faster than SAH but might not be as optimal.");
+
+    public final String tooltip;
+    Method(String tooltip) {
+      this.tooltip = tooltip;
+    }
   }
 
   public static final Method DEFAULT_METHOD = Method.MIDPOINT;
@@ -225,6 +231,15 @@ public class BVH {
 
     packed = data.toIntArray();
     packedPrimitives = primitivesList.toArray(new Primitive[0][]);
+  }
+
+  public static Method methodFromString(String method) {
+    try {
+      return Method.valueOf(method);
+    } catch (IllegalArgumentException e) {
+      Log.warn(method + " is not a valid BVH build method.", e);
+      return DEFAULT_METHOD;
+    }
   }
 
   /**
