@@ -20,6 +20,7 @@ package se.llbit.math;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntStack;
 import org.apache.commons.math3.util.FastMath;
+import se.llbit.chunky.main.Chunky;
 import se.llbit.math.primitive.MutableAABB;
 import se.llbit.math.primitive.Primitive;
 
@@ -33,21 +34,17 @@ import static se.llbit.math.Ray.OFFSET;
  * @author Jesper Öqvist <jesper.oqvist@cs.lth.se>
  */
 public class BVH {
-
-  /**
-   * Indicates whether to use SAH for construction.
-   */
-  private static final Method METHOD = Method.SAH_MA;
-
-
-  private enum Method {
+  public enum Method {
     MIDPOINT,
     SAH,
     SAH_MA,
   }
 
-  /** Note: this is public for some plugins. Stability is not guaranteed. */
-  public static abstract class Node {
+  public static final Method DEFAULT_METHOD = Method.MIDPOINT;
+  public static final int SPLIT_LIMIT = 4;
+
+
+  private static abstract class Node {
     public final AABB bb;
     public final Primitive[] primitives;
 
@@ -74,8 +71,7 @@ public class BVH {
     abstract public int size();
   }
 
-  /** Note: this is public for some plugins. Stability is not guaranteed. */
-  public static class Group extends Node {
+  private static class Group extends Node {
     public final Node child1;
     public final Node child2;
     private final int numPrimitives;
@@ -128,8 +124,7 @@ public class BVH {
     }
   }
 
-  /** Note: this is public for some plugins. Stability is not guaranteed. */
-  public static class Leaf extends Node {
+  private static class Leaf extends Node {
 
     public Leaf(Primitive[] primitives) {
       super(primitives);
@@ -158,17 +153,14 @@ public class BVH {
   }
 
 
-  private static final int SPLIT_LIMIT = 4;
-
+  /** Note: This is public for some plugins. Stability is not guaranteed. */
   public final int[] packed;
   public final int depth;
-  public final ArrayList<Primitive[]> packedPrimitives;
+  public final Primitive[][] packedPrimitives;
 
-
-  interface Selector {
+  private interface Selector {
     boolean select(AABB bounds, double split);
   }
-
 
   private final Comparator<Primitive> cmpX = (g1, g2) -> {
     AABB b1 = g1.bounds();
@@ -208,31 +200,40 @@ public class BVH {
    * Construct a new BVH containing the given primitives.
    */
   public BVH(List<Primitive> primitives) {
+    this(primitives, DEFAULT_METHOD);
+  }
+
+  public BVH(List<Primitive> primitives, Method method) {
     Node root;
 
-    switch (METHOD) {
+    IntArrayList data = new IntArrayList();
+    ArrayList<Primitive[]> primitivesList = new ArrayList<>(primitives.size()/SPLIT_LIMIT);
+
+    switch (method) {
       case SAH:
         root = constructSAH(primitives.toArray(new Primitive[0]));
+        depth = packNode(root, data, primitivesList)+2;
         break;
       case SAH_MA:
         root = constructSAH_MA(primitives.toArray(new Primitive[0]));
+        depth = packNode(root, data, primitivesList)+2;
         break;
       default:
         root = constructMidpointSplit(primitives.toArray(new Primitive[0]));
+        depth = packNode(root, data, primitivesList)+2;
     }
 
-    IntArrayList data = new IntArrayList();
-    packedPrimitives = new ArrayList<>();
-    depth = packNode(root, data, packedPrimitives)+2;
     packed = data.toIntArray();
-    packedPrimitives.trimToSize();
+    packedPrimitives = primitivesList.toArray(new Primitive[0][]);
   }
 
-  enum Action {
-    PUSH,
-    MERGE,
-  }
-
+  /**
+   * Recursive algorithm to pack a node-based BVH into an int(ArrayList). Nodes are packed as follows:
+   * int 0: Second child index. If this is a leaf, it is the negation of the index of the corresponding list of primitives.
+   *        The first child immediately follows this (byte 8+). The second child starts at the index pointed to by this int.
+   * int 1-6: AABB bounds stored as floats. Float bits are converted into int bits for more compact storage.
+   * This compact array storage helps decrease memory usage.
+   */
   private int packNode(Node node, IntArrayList data, ArrayList<Primitive[]> primitives) {
     int index = data.size();
     int depth;
@@ -255,6 +256,7 @@ public class BVH {
     return depth+1;
   }
 
+  /** Pack an AABB into 6 floats (and store the bits in 6 consecutive ints). */
   private void packAabb(AABB box, IntArrayList data) {
     data.add(Float.floatToIntBits((float) box.xmin));
     data.add(Float.floatToIntBits((float) box.xmax));
@@ -264,24 +266,9 @@ public class BVH {
     data.add(Float.floatToIntBits((float) box.zmax));
   }
 
-  private double quickAabbIntersect(Ray ray, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax, double rx, double ry, double rz) {
-    if (ray.o.x >= xmin && ray.o.x <= xmax && ray.o.y >= ymin && ray.o.y <= ymax && ray.o.z >= zmin && ray.o.z <= zmax) {
-      return 0;
-    }
-
-    double tx1 = (xmin - ray.o.x) * rx;
-    double tx2 = (xmax - ray.o.x) * rx;
-
-    double ty1 = (ymin - ray.o.y) * ry;
-    double ty2 = (ymax - ray.o.y) * ry;
-
-    double tz1 = (zmin - ray.o.z) * rz;
-    double tz2 = (zmax - ray.o.z) * rz;
-
-    double tmin = FastMath.max(FastMath.max(FastMath.min(tx1, tx2), FastMath.min(ty1, ty2)), FastMath.min(tz1, tz2));
-    double tmax = FastMath.min(FastMath.min(FastMath.max(tx1, tx2), FastMath.max(ty1, ty2)), FastMath.max(tz1, tz2));
-
-    return tmin <= tmax+ OFFSET && tmin >= 0 ? tmin : -1;
+  private enum Action {
+    PUSH,
+    MERGE,
   }
 
   /**
@@ -325,15 +312,15 @@ public class BVH {
     if (xl >= yl && xl >= zl) {
       splitPos = bb.xmin + (bb.xmax - bb.xmin) / 2;
       selector = selectX;
-      Arrays.sort(chunk, cmpX);
+      Chunky.getCommonThreads().submit(() -> Arrays.parallelSort(chunk, cmpX)).join();
     } else if (yl >= xl && yl >= zl) {
       splitPos = bb.ymin + (bb.ymax - bb.ymin) / 2;
       selector = selectY;
-      Arrays.sort(chunk, cmpY);
+      Chunky.getCommonThreads().submit(() -> Arrays.parallelSort(chunk, cmpY)).join();
     } else {
       splitPos = bb.zmin + (bb.zmax - bb.zmin) / 2;
       selector = selectZ;
-      Arrays.sort(chunk, cmpZ);
+      Chunky.getCommonThreads().submit(() -> Arrays.parallelSort(chunk, cmpZ)).join();
     }
 
     int split;
@@ -385,6 +372,7 @@ public class BVH {
 
   /**
    * Construct a BVH using Surface Area Heuristic (SAH)
+   * This splits along the major axis which usually gets good results.
    *
    * @return root node of constructed BVH
    */
@@ -423,7 +411,7 @@ public class BVH {
     double[] sr = new double[end];
 
     Comparator<Primitive> cmp = cmpX;
-    Arrays.sort(chunk, cmpX);
+    Chunky.getCommonThreads().submit(() -> Arrays.parallelSort(chunk, cmpX)).join();
     for (int i = 0; i < end - 1; ++i) {
       bounds.expand(chunk[i].bounds());
       sl[i] = bounds.surfaceArea();
@@ -441,7 +429,7 @@ public class BVH {
       }
     }
 
-    Arrays.sort(chunk, cmpY);
+    Chunky.getCommonThreads().submit(() -> Arrays.parallelSort(chunk, cmpY)).join();
     for (int i = 0; i < end - 1; ++i) {
       bounds.expand(chunk[i].bounds());
       sl[i] = bounds.surfaceArea();
@@ -460,7 +448,7 @@ public class BVH {
       }
     }
 
-    Arrays.sort(chunk, cmpZ);
+    Chunky.getCommonThreads().submit(() -> Arrays.parallelSort(chunk, cmpZ)).join();
     for (int i = 0; i < end - 1; ++i) {
       bounds.expand(chunk[i].bounds());
       sl[i] = bounds.surfaceArea();
@@ -480,7 +468,8 @@ public class BVH {
     }
 
     if (cmp != cmpZ) {
-      Arrays.sort(chunk, cmp);
+      Comparator<Primitive> finalCmp = cmp;
+      Chunky.getCommonThreads().submit(() -> Arrays.parallelSort(chunk, finalCmp)).join();
     }
 
     split += 1;
@@ -499,6 +488,7 @@ public class BVH {
 
   /**
    * Split a chunk based on Surface Area Heuristic of all possible splits.
+   * This splits along the major axis which usually gets good results.
    */
   private void splitSAH_MA(Primitive[] chunk, Stack<Action> actions, Stack<Primitive[]> chunks) {
     AABB bb = bb(chunk);
@@ -508,7 +498,6 @@ public class BVH {
     Comparator<Primitive> cmp;
     if (xl >= yl && xl >= zl) {
       cmp = cmpX;
-      Arrays.sort(chunk, cmpX);
     } else if (yl >= xl && yl >= zl) {
       cmp = cmpY;
     } else {
@@ -523,7 +512,7 @@ public class BVH {
     double[] sl = new double[end];
     double[] sr = new double[end];
 
-    Arrays.sort(chunk, cmp);
+    Chunky.getCommonThreads().submit(() -> Arrays.parallelSort(chunk, cmp)).join();
     for (int i = 0; i < end - 1; ++i) {
       bounds.expand(chunk[i].bounds());
       sl[i] = bounds.surfaceArea();
@@ -555,41 +544,17 @@ public class BVH {
     actions.push(Action.PUSH);
   }
 
-  private static AABB bb(Primitive[] primitives) {
-    double xmin = Double.POSITIVE_INFINITY;
-    double xmax = Double.NEGATIVE_INFINITY;
-    double ymin = Double.POSITIVE_INFINITY;
-    double ymax = Double.NEGATIVE_INFINITY;
-    double zmin = Double.POSITIVE_INFINITY;
-    double zmax = Double.NEGATIVE_INFINITY;
-
-    for (Primitive primitive : primitives) {
-      AABB bb = primitive.bounds();
-      if (bb.xmin < xmin)
-        xmin = bb.xmin;
-      if (bb.xmax > xmax)
-        xmax = bb.xmax;
-      if (bb.ymin < ymin)
-        ymin = bb.ymin;
-      if (bb.ymax > ymax)
-        ymax = bb.ymax;
-      if (bb.zmin < zmin)
-        zmin = bb.zmin;
-      if (bb.zmax > zmax)
-        zmax = bb.zmax;
-    }
-    return new AABB(xmin, xmax, ymin, ymax, zmin, zmax);
-  }
-
   /**
-   * Find closest intersection between the ray and any object in the BVH.
+   * Find closest intersection between the ray and any object in the BVH. This uses a recursion-less algorithm
+   * based on the compact BVH traversal algorithm presented in:
+   * http://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies.html#Traversal
    *
    * @return {@code true} if there exists any intersection
    */
   public boolean closestIntersection(Ray ray) {
     boolean hit = false;
     int currentNode = 0;
-    IntStack nodesToVisit = new IntArrayList(depth);
+    IntStack nodesToVisit = new IntArrayList(depth/2);
 
     double rx = 1 / ray.d.x;
     double ry = 1 / ray.d.y;
@@ -599,7 +564,7 @@ public class BVH {
       if (packed[currentNode] <= 0) {
         // Is leaf
         int primIndex = -packed[currentNode];
-        for (Primitive primitive : packedPrimitives.get(primIndex)) {
+        for (Primitive primitive : packedPrimitives[primIndex]) {
           hit = primitive.intersect(ray) || hit;
         }
 
@@ -638,5 +603,55 @@ public class BVH {
     }
 
     return hit;
+  }
+
+  /**
+   * Perform a fast AABB intersection with cached reciprocal direction. This is a branchless approach based on:
+   * https://gamedev.stackexchange.com/a/146362
+   */
+  private double quickAabbIntersect(Ray ray, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax, double rx, double ry, double rz) {
+    if (ray.o.x >= xmin && ray.o.x <= xmax && ray.o.y >= ymin && ray.o.y <= ymax && ray.o.z >= zmin && ray.o.z <= zmax) {
+      return 0;
+    }
+
+    double tx1 = (xmin - ray.o.x) * rx;
+    double tx2 = (xmax - ray.o.x) * rx;
+
+    double ty1 = (ymin - ray.o.y) * ry;
+    double ty2 = (ymax - ray.o.y) * ry;
+
+    double tz1 = (zmin - ray.o.z) * rz;
+    double tz2 = (zmax - ray.o.z) * rz;
+
+    double tmin = FastMath.max(FastMath.max(FastMath.min(tx1, tx2), FastMath.min(ty1, ty2)), FastMath.min(tz1, tz2));
+    double tmax = FastMath.min(FastMath.min(FastMath.max(tx1, tx2), FastMath.max(ty1, ty2)), FastMath.max(tz1, tz2));
+
+    return tmin <= tmax+ OFFSET && tmin >= 0 ? tmin : -1;
+  }
+
+  private static AABB bb(Primitive[] primitives) {
+    double xmin = Double.POSITIVE_INFINITY;
+    double xmax = Double.NEGATIVE_INFINITY;
+    double ymin = Double.POSITIVE_INFINITY;
+    double ymax = Double.NEGATIVE_INFINITY;
+    double zmin = Double.POSITIVE_INFINITY;
+    double zmax = Double.NEGATIVE_INFINITY;
+
+    for (Primitive primitive : primitives) {
+      AABB bb = primitive.bounds();
+      if (bb.xmin < xmin)
+        xmin = bb.xmin;
+      if (bb.xmax > xmax)
+        xmax = bb.xmax;
+      if (bb.ymin < ymin)
+        ymin = bb.ymin;
+      if (bb.ymax > ymax)
+        ymax = bb.ymax;
+      if (bb.zmin < zmin)
+        zmin = bb.zmin;
+      if (bb.zmax > zmax)
+        zmax = bb.zmax;
+    }
+    return new AABB(xmin, xmax, ymin, ymax, zmin, zmax);
   }
 }

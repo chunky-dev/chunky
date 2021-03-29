@@ -259,6 +259,7 @@ public class Scene implements JsonSerializable, Refreshable {
   protected boolean biomeColors = true;
   protected boolean transparentSky = false;
   protected boolean renderActors = true;
+  public BVH.Method bvhMethod = BVH.Method.MIDPOINT;
   protected Collection<ChunkPosition> chunks = new ArrayList<>();
   protected JsonObject cameraPresets = new JsonObject();
   /**
@@ -1338,7 +1339,7 @@ public class Scene implements JsonSerializable, Refreshable {
     for (Entity entity : entities) {
       primitives.addAll(entity.primitives(worldOffset));
     }
-    bvh = new BVH(primitives);
+    bvh = new BVH(primitives, bvhMethod);
   }
 
   private void buildActorBvh() {
@@ -1347,7 +1348,7 @@ public class Scene implements JsonSerializable, Refreshable {
     for (Entity entity : actors) {
       actorPrimitives.addAll(entity.primitives(worldOffset));
     }
-    actorBvh = new BVH(actorPrimitives);
+    actorBvh = new BVH(actorPrimitives, bvhMethod);
   }
 
   /**
@@ -2552,6 +2553,7 @@ public class Scene implements JsonSerializable, Refreshable {
     json.add("waterWorldHeight", waterPlaneHeight);
     json.add("waterWorldHeightOffsetEnabled", waterPlaneOffsetEnabled);
     json.add("renderActors", renderActors);
+    json.add("bvhMethod", bvhMethod.name());
 
     if (!worldPath.isEmpty()) {
       // Save world info.
@@ -2832,6 +2834,11 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     renderActors = json.get("renderActors").boolValue(renderActors);
+    try {
+      bvhMethod = BVH.Method.valueOf(json.get("bvhMethod").stringValue(bvhMethod.name()));
+    } catch (IllegalArgumentException e) {
+      Log.warn("Unknown BVH method. Using " + bvhMethod.toString(), e);
+    }
     materials = json.get("materials").object().copy().toMap();
 
     // Load world info.
