@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2016 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Jesper Öqvist <jesper@llbit.se>
+ * Copyright (c) 2016-2021 Chunky contributors
  *
  * This file is part of Chunky.
  *
@@ -35,7 +36,6 @@ import org.apache.commons.math3.util.FastMath;
 import se.llbit.chunky.renderer.scene.Camera;
 import se.llbit.chunky.renderer.scene.PlayerModel;
 import se.llbit.chunky.ui.DoubleAdjuster;
-import se.llbit.json.Json;
 import se.llbit.math.BVH;
 import se.llbit.math.ColorUtil;
 import se.llbit.math.Matrix3;
@@ -48,7 +48,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.IntBuffer;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.ResourceBundle;
 
 /**
