@@ -22,10 +22,7 @@ import se.llbit.chunky.main.Chunky;
 import se.llbit.log.Log;
 import se.llbit.math.primitive.Primitive;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Stack;
+import java.util.*;
 
 import static se.llbit.math.BVH.SPLIT_LIMIT;
 
@@ -34,11 +31,13 @@ public class MidpointBVH extends BinaryBVH {
         BVH.factories.put("MIDPOINT", new BVH.ImplementationFactory() {
             @Override
             public BVH.BVHImplementation create(Collection<Entity> entities, Vector3 worldOffset) {
-                LinkedList<Primitive> primitives = new LinkedList<>();
+                List<Primitive> primitives = new ArrayList<>();
                 for (Entity entity : entities) {
                     primitives.addAll(entity.primitives(worldOffset));
                 }
-                return new MidpointBVH(primitives.toArray(new Primitive[0]));
+                Primitive[] allPrimitives = primitives.toArray(new Primitive[0]);
+                primitives = null; // Allow the collection to be garbage collected during construction when only the array is used
+                return new MidpointBVH(allPrimitives);
             }
 
             @Override
