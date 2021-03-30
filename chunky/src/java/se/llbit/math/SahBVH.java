@@ -32,11 +32,13 @@ public class SahBVH extends BinaryBVH {
         BVH.factories.put("SAH", new BVH.ImplementationFactory() {
             @Override
             public BVH.BVHImplementation create(Collection<Entity> entities, Vector3 worldOffset) {
-                LinkedList<Primitive> primitives = new LinkedList<>();
+                List<Primitive> primitives = new ArrayList<>();
                 for (Entity entity : entities) {
                     primitives.addAll(entity.primitives(worldOffset));
                 }
-                return new SahBVH(primitives.toArray(new Primitive[0]));
+                Primitive[] allPrimitives = primitives.toArray(new Primitive[0]);
+                primitives = null; // Allow the collection to be garbage collected during construction when only the array is used
+                return new SahBVH(allPrimitives);
             }
 
             @Override

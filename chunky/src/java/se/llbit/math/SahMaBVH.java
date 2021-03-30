@@ -32,11 +32,13 @@ public class SahMaBVH extends BinaryBVH {
         BVH.factories.put("SAH_MA", new BVH.ImplementationFactory() {
             @Override
             public BVH.BVHImplementation create(Collection<Entity> entities, Vector3 worldOffset) {
-                LinkedList<Primitive> primitives = new LinkedList<>();
+                List<Primitive> primitives = new ArrayList<>();
                 for (Entity entity : entities) {
                     primitives.addAll(entity.primitives(worldOffset));
                 }
-                return new SahMaBVH(primitives.toArray(new Primitive[0]));
+                Primitive[] allPrimitives = primitives.toArray(new Primitive[0]);
+                primitives = null; // Allow the collection to be garbage collected during construction when only the array is used
+                return new SahMaBVH(allPrimitives);
             }
 
             @Override
@@ -49,6 +51,7 @@ public class SahMaBVH extends BinaryBVH {
     public SahMaBVH(Primitive[] primitives) {
         Node root = constructSAH_MA(primitives);
         pack(root);
+        System.out.printf("primitives: %d\n", primitives.length);
         Log.info("Built SAH_MA BVH with depth: " + this.depth);
     }
 

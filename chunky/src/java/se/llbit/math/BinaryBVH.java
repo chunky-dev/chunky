@@ -40,37 +40,27 @@ public abstract class BinaryBVH implements BVH.BVHImplementation {
 
     public static abstract class Node {
         public final AABB bb;
-        public final Primitive[] primitives;
-
-        /**
-         * Create a new BVH node.
-         */
-        public Node(Primitive[] primitives) {
-            this.bb = bb(primitives);
-            this.primitives = primitives;
-        }
 
         /**
          * Create new BVH node with specific bounds.
          */
-        public Node(AABB bb, Primitive[] primitives) {
+        public Node(AABB bb) {
             this.bb = bb;
-            this.primitives = primitives;
         }
 
         abstract public int size();
     }
 
     public static class Group extends Node {
-        public final Node child1;
-        public final Node child2;
+        public Node child1;
+        public Node child2;
         private final int numPrimitives;
 
         /**
          * Create a new BVH node.
          */
         public Group(Node child1, Node child2) {
-            super(child1.bb.expand(child2.bb), new Primitive[0]);
+            super(child1.bb.expand(child2.bb));
             this.numPrimitives = child1.size() + child2.size();
             this.child1 = child1;
             this.child2 = child2;
@@ -83,8 +73,11 @@ public abstract class BinaryBVH implements BVH.BVHImplementation {
     }
 
     public static class Leaf extends Node {
+        public final Primitive[] primitives;
+
         public Leaf(Primitive[] primitives) {
-            super(primitives);
+            super(bb(primitives));
+            this.primitives = primitives;
         }
 
         @Override public int size() {
@@ -155,13 +148,16 @@ public abstract class BinaryBVH implements BVH.BVHImplementation {
         packAabb(node.bb, data);
 
         if (node instanceof Group) {
-            depth = packNode(((Group) node).child1, data, primitives);
+            Group group = (Group)node;
+            depth = packNode(group.child1, data, primitives);
+            group.child1 = null; // make it possible to gc the subtree
             data.set(index, data.size()); // Second child location
-            depth = FastMath.max(packNode(((Group) node).child2, data, primitives), depth);
+            depth = FastMath.max(packNode(group.child2, data, primitives), depth);
+            group.child2 = null; // idem
         } else if (node instanceof Leaf) {
             depth = 1;
             data.set(index, -primitives.size());  // Negative number = pointer to primitives array
-            primitives.add(node.primitives);
+            primitives.add(((Leaf) node).primitives);
         } else {
             depth = 0;
             data.set(index, index+7); // Skip this
