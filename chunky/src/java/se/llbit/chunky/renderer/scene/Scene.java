@@ -300,8 +300,8 @@ public class Scene implements JsonSerializable, Refreshable {
   /** Upper Y clip plane. */
   public int yClipMax = PersistentSettings.getYClipMax();
 
-  private BVH bvh = new BVH(Collections.emptyList());
-  private BVH actorBvh = new BVH(Collections.emptyList());
+  private BVH bvh = new BVH(Collections.emptyList(), new Vector3());
+  private BVH actorBvh = new BVH(Collections.emptyList(), new Vector3());
 
   /**
    * Preview frame interlacing counter.
@@ -1321,22 +1321,13 @@ public class Scene implements JsonSerializable, Refreshable {
   }
 
   private void buildBvh() {
-    final List<Primitive> primitives = new LinkedList<>();
-
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    for (Entity entity : entities) {
-      primitives.addAll(entity.primitives(worldOffset));
-    }
-    bvh = new BVH(primitives);
+    bvh = new BVH(entities, worldOffset);
   }
 
   private void buildActorBvh() {
-    final List<Primitive> actorPrimitives = new LinkedList<>();
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    for (Entity entity : actors) {
-      actorPrimitives.addAll(entity.primitives(worldOffset));
-    }
-    actorBvh = new BVH(actorPrimitives);
+    actorBvh = new BVH(actors, worldOffset);
   }
 
   /**

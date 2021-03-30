@@ -17,14 +17,13 @@
  */
 package se.llbit.math;
 
+import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.log.Log;
 import se.llbit.math.primitive.MutableAABB;
 import se.llbit.math.primitive.Primitive;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Stack;
+import java.util.*;
 
 import static se.llbit.math.BVH.SPLIT_LIMIT;
 
@@ -32,8 +31,12 @@ public class SahMaBVH extends BinaryBVH {
     public static void initImplementation() {
         BVH.factories.put("SAH_MA", new BVH.ImplementationFactory() {
             @Override
-            public BVH.BVHImplementation create(Primitive[] primitives) {
-                return new SahMaBVH(primitives);
+            public BVH.BVHImplementation create(Collection<Entity> entities, Vector3 worldOffset) {
+                LinkedList<Primitive> primitives = new LinkedList<>();
+                for (Entity entity : entities) {
+                    primitives.addAll(entity.primitives(worldOffset));
+                }
+                return new SahMaBVH(primitives.toArray(new Primitive[0]));
             }
 
             @Override

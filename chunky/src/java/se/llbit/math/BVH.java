@@ -18,10 +18,11 @@
 package se.llbit.math;
 
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.entity.Entity;
 import se.llbit.math.primitive.Primitive;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,7 +38,7 @@ public class BVH {
   }
 
   public interface ImplementationFactory {
-    BVHImplementation create(Primitive[] primitives);
+    BVHImplementation create(Collection<Entity> entities, Vector3 worldOffset);
     String getTooltip();
   }
 
@@ -58,8 +59,8 @@ public class BVH {
   /**
    * Construct a new BVH containing the given primitives.
    */
-  public BVH(List<Primitive> primitives) {
-    implementation = getImplementationFactory(PersistentSettings.getBvhMethod()).create(primitives.toArray(new Primitive[0]));
+  public BVH(Collection<Entity> entities, Vector3 worldOffset) {
+    implementation = getImplementationFactory(PersistentSettings.getBvhMethod()).create(entities, worldOffset);
   }
 
   public boolean closestIntersection(Ray ray) {
