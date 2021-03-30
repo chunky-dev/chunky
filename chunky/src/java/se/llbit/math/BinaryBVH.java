@@ -28,6 +28,10 @@ import java.util.Comparator;
 import static se.llbit.math.BVH.SPLIT_LIMIT;
 import static se.llbit.math.Ray.OFFSET;
 
+/**
+ * An abstract class for BinaryBVHs. This provides helper methods for packing a node based BVH into a more compact
+ * and faster array based BVH. It also provides an implementation for {@code closestIntersection}.
+ */
 public abstract class BinaryBVH implements BVH.BVHImplementation {
     /** Note: This is public for some plugins. Stability is not guaranteed. */
     public int[] packed;
@@ -142,7 +146,7 @@ public abstract class BinaryBVH implements BVH.BVHImplementation {
      * int 0: Second child index. If this is a leaf, it is the negation of the index of the corresponding list of primitives.
      *        The first child immediately follows this (byte 8+). The second child starts at the index pointed to by this int.
      * int 1-6: AABB bounds stored as floats. Float bits are converted into int bits for more compact storage.
-     * This compact array storage helps decrease memory usage.
+     * This compact array storage helps decrease memory usage and increases intersection speed.
      */
     public int packNode(Node node, IntArrayList data, ArrayList<Primitive[]> primitives) {
         int index = data.size();

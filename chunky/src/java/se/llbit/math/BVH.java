@@ -19,7 +19,7 @@ package se.llbit.math;
 
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.Entity;
-import se.llbit.math.primitive.Primitive;
+import se.llbit.chunky.plugin.PluginApi;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,7 +42,13 @@ public class BVH {
     String getTooltip();
   }
 
+  /**
+   * Map containing all known implementation (factories) and their name. Elements are addressed by the String name.
+   * Values must implement {@code BVH.ImplementationFactory}.
+   */
+  @PluginApi
   public static Map<String, ImplementationFactory> factories = new HashMap<>();
+
   public static final String DEFAULT_IMPLEMENTATION = "SAH_MA";
   public static ImplementationFactory getImplementationFactory(String name) {
     return factories.getOrDefault(name, factories.get(DEFAULT_IMPLEMENTATION));
@@ -57,12 +63,16 @@ public class BVH {
   public final BVHImplementation implementation;
 
   /**
-   * Construct a new BVH containing the given primitives.
+   * Construct a new BVH containing the given entities. This will generate the BVH using the
+   * persistent BVH method (default is SAH_MA).
    */
   public BVH(Collection<Entity> entities, Vector3 worldOffset) {
     implementation = getImplementationFactory(PersistentSettings.getBvhMethod()).create(entities, worldOffset);
   }
 
+  /**
+   * Calculate the closest intersection between a ray and a primitive in this BVH. Algorithm is implementation dependent.
+   */
   public boolean closestIntersection(Ray ray) {
     return implementation.closestIntersection(ray);
   }
