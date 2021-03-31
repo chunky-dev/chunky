@@ -150,7 +150,7 @@ public abstract class BinaryBVH implements BVH.BVHImplementation {
         if (node instanceof Group) {
             Group group = (Group)node;
             depth = packNode(group.child1, data, primitives);
-            group.child1 = null; // make it possible to gc the subtree
+            group.child1 = null; // Make it possible to gc the subtree
             data.set(index, data.size()); // Second child location
             depth = FastMath.max(packNode(group.child2, data, primitives), depth);
             group.child2 = null; // idem
@@ -160,7 +160,7 @@ public abstract class BinaryBVH implements BVH.BVHImplementation {
             primitives.add(((Leaf) node).primitives);
         } else {
             depth = 0;
-            data.set(index, index+7); // Skip this
+            data.set(index, index+7); // Skip this (should not happen)
         }
 
         return depth+1;

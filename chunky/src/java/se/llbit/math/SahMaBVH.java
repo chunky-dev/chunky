@@ -51,7 +51,6 @@ public class SahMaBVH extends BinaryBVH {
     public SahMaBVH(Primitive[] primitives) {
         Node root = constructSAH_MA(primitives);
         pack(root);
-        System.out.printf("primitives: %d\n", primitives.length);
         Log.info("Built SAH_MA BVH with depth: " + this.depth);
     }
 
