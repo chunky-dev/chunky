@@ -16,7 +16,7 @@ public class JavaFxLocator {
 
   static {
     javafxPathCandidates = new ArrayList<>();
-    javafxPathCandidates.add("C:/Program Files/openjfx/lib");
+    javafxPathCandidates.add("C:\\Program Files\\openjfx\\lib");
     javafxPathCandidates.add("/usr/share/openjfx/lib");
     javafxPathCandidates.add("/usr/lib/jvm/java-11-openjdk/lib");
     javafxPathCandidates.add("/usr/lib/jvm/java-12-openjdk/lib");
@@ -61,8 +61,12 @@ public class JavaFxLocator {
     cmd.add("--javaOptions");
     StringBuilder javaOptions = new StringBuilder();
     javaOptions.append("--module-path ");
-    // Escape the path twice to make the second launcher pass the options to Chunky retaining the double speechmarks (fixes paths with spaces)
-    javaOptions.append("\\\"" + javafxDir.toAbsolutePath().toString() + "\\\"");
+    if (System.getProperty("os.name").startsWith("Windows")) {
+      // Escape the path twice to make the second launcher pass the options to Chunky retaining the double speechmarks (fixes paths with spaces)
+      javaOptions.append("\\\"" + javafxDir.toAbsolutePath().toString() + "\\\"");
+    } else {
+      javaOptions.append(javafxDir.toAbsolutePath().toString());
+    }
     javaOptions.append(" --add-modules ");
     javaOptions.append("javafx.controls,javafx.fxml");
     cmd.add(javaOptions.toString());
