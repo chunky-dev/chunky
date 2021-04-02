@@ -10,7 +10,7 @@ import se.llbit.math.Ray;
 /**
  * A block model that is made out of textured AABBs.
  */
-public abstract class AABBModel {
+public abstract class AABBModel implements BlockModel {
 
   public enum UVMapping {
     NONE,
@@ -37,6 +37,7 @@ public abstract class AABBModel {
     return null;
   }
 
+  @Override
   public boolean intersect(Ray ray, Scene scene) {
     AABB[] boxes = getBoxes();
     Texture[][] textures = getTextures();
