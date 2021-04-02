@@ -91,6 +91,8 @@ abstract class DumpFormat {
   public void merge(DataInputStream inputStream, Scene scene, TaskTracker taskTracker)
       throws IOException, IllegalStateException {
     try (TaskTracker.Task task = taskTracker.task("Merging render dump", scene.renderWidth() * scene.renderHeight())) {
+      // attempt a merge
+      // this might break stuff when merging sample buffers of different sizes
       if (scene.getSampleBuffer().width != scene.width || scene.getSampleBuffer().height != scene.height) {
         throw new Error("Failed to merge render dump - wrong canvas size.");
       }
@@ -99,7 +101,7 @@ abstract class DumpFormat {
 
       readHeader(inputStream, scene);
       mergeSamples(inputStream, scene, progress -> {
-        if (progress%width == 0)
+        if (progress%scene.renderWidth() == 0)
           task.update((int) progress); // TODO fix task progress for long indexes
       });
       scene.spp += previousSpp;
