@@ -299,8 +299,8 @@ public class Scene implements JsonSerializable, Refreshable {
   /** Upper Y clip plane. */
   public int yClipMax = PersistentSettings.getYClipMax();
 
-  private BVH bvh = new BVH(Collections.emptyList(), new Vector3());
-  private BVH actorBvh = new BVH(Collections.emptyList(), new Vector3());
+  private BVH bvh = new BVH(Collections.emptyList(), new Vector3(), TaskTracker.Task.NONE);
+  private BVH actorBvh = new BVH(Collections.emptyList(), new Vector3(), TaskTracker.Task.NONE);
 
   /**
    * Preview frame interlacing counter.

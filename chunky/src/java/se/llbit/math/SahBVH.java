@@ -22,8 +22,10 @@ import se.llbit.chunky.main.Chunky;
 import se.llbit.log.Log;
 import se.llbit.math.primitive.MutableAABB;
 import se.llbit.math.primitive.Primitive;
+import se.llbit.util.TaskTracker;
 
 import java.util.*;
+import java.util.function.IntConsumer;
 
 import static se.llbit.math.BVH.SPLIT_LIMIT;
 
@@ -31,14 +33,23 @@ public class SahBVH extends BinaryBVH {
     public static void initImplementation() {
         BVH.factories.put("SAH", new BVH.ImplementationFactory() {
             @Override
-            public BVH.BVHImplementation create(Collection<Entity> entities, Vector3 worldOffset) {
+            public BVH.BVHImplementation create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task) {
+                task.update(1000, 0);
+                double entityScaler = 500.0 / entities.size();
+                int done = 0;
+
                 List<Primitive> primitives = new ArrayList<>();
                 for (Entity entity : entities) {
                     primitives.addAll(entity.primitives(worldOffset));
+
+                    done++;
+                    task.updateInterval((int) (done * entityScaler), 1);
                 }
                 Primitive[] allPrimitives = primitives.toArray(new Primitive[0]);
                 primitives = null; // Allow the collection to be garbage collected during construction when only the array is used
-                return new SahBVH(allPrimitives);
+
+                double primitiveScaler = 500.0 / allPrimitives.length;
+                return new SahBVH(allPrimitives, i -> task.updateInterval((int) (i * primitiveScaler) + 500, 1));
             }
 
             @Override
@@ -48,10 +59,10 @@ public class SahBVH extends BinaryBVH {
         });
     }
 
-    public SahBVH(Primitive[] primitives) {
-        Node root = constructSAH(primitives);
+    public SahBVH(Primitive[] primitives, IntConsumer task) {
+        Node root = constructSAH(primitives, task);
         pack(root);
-        Log.info("Built SAH BVH with depth: " + this.depth);
+        Log.info("Built SAH BVH with depth " + this.depth);
     }
 
     private enum Action {
@@ -62,7 +73,9 @@ public class SahBVH extends BinaryBVH {
     /**
      * Construct a BVH using Surface Area Heuristic (SAH).
      */
-    private Node constructSAH(Primitive[] primitives) {
+    private Node constructSAH(Primitive[] primitives, IntConsumer task) {
+        int progress = 0;
+
         Stack<Node> nodes = new Stack<>();
         Stack<Action> actions = new Stack<>();
         Stack<Primitive[]> chunks = new Stack<>();
@@ -76,6 +89,9 @@ public class SahBVH extends BinaryBVH {
                 Primitive[] chunk = chunks.pop();
                 if (chunk.length < SPLIT_LIMIT) {
                     nodes.push(new Leaf(chunk));
+
+                    progress += chunk.length;
+                    task.accept(progress);
                 } else {
                     splitSAH(chunk, actions, chunks);
                 }

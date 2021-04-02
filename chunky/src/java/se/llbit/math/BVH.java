@@ -20,6 +20,7 @@ package se.llbit.math;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.plugin.PluginApi;
+import se.llbit.util.TaskTracker;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ public class BVH {
   }
 
   public interface ImplementationFactory {
-    BVHImplementation create(Collection<Entity> entities, Vector3 worldOffset);
+    BVHImplementation create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task);
     String getTooltip();
   }
 
@@ -66,8 +67,8 @@ public class BVH {
    * Construct a new BVH containing the given entities. This will generate the BVH using the
    * persistent BVH method (default is SAH_MA).
    */
-  public BVH(Collection<Entity> entities, Vector3 worldOffset) {
-    implementation = getImplementationFactory(PersistentSettings.getBvhMethod()).create(entities, worldOffset);
+  public BVH(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task) {
+    implementation = getImplementationFactory(PersistentSettings.getBvhMethod()).create(entities, worldOffset, task);
   }
 
   /**

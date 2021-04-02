@@ -21,8 +21,10 @@ import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.log.Log;
 import se.llbit.math.primitive.Primitive;
+import se.llbit.util.TaskTracker;
 
 import java.util.*;
+import java.util.function.IntConsumer;
 
 import static se.llbit.math.BVH.SPLIT_LIMIT;
 
@@ -30,14 +32,23 @@ public class MidpointBVH extends BinaryBVH {
     public static void initImplementation() {
         BVH.factories.put("MIDPOINT", new BVH.ImplementationFactory() {
             @Override
-            public BVH.BVHImplementation create(Collection<Entity> entities, Vector3 worldOffset) {
+            public BVH.BVHImplementation create(Collection<Entity> entities, Vector3 worldOffset, TaskTracker.Task task) {
+                task.update(1000, 0);
+                double entityScaler = 500.0 / entities.size();
+                int done = 0;
+
                 List<Primitive> primitives = new ArrayList<>();
                 for (Entity entity : entities) {
                     primitives.addAll(entity.primitives(worldOffset));
+
+                    done++;
+                    task.updateInterval((int) (done * entityScaler), 1);
                 }
                 Primitive[] allPrimitives = primitives.toArray(new Primitive[0]);
                 primitives = null; // Allow the collection to be garbage collected during construction when only the array is used
-                return new MidpointBVH(allPrimitives);
+
+                double primitiveScaler = 500.0 / allPrimitives.length;
+                return new MidpointBVH(allPrimitives, i -> task.updateInterval((int) (i * primitiveScaler) + 500, 1));
             }
 
             @Override
@@ -47,10 +58,10 @@ public class MidpointBVH extends BinaryBVH {
         });
     }
 
-    public MidpointBVH(Primitive[] primitives) {
-        Node root = constructMidpointSplit(primitives);
+    public MidpointBVH(Primitive[] primitives, IntConsumer task) {
+        Node root = constructMidpointSplit(primitives, task);
         pack(root);
-        Log.info("Built MIDPOINT BVH with depth: " + this.depth);
+        Log.info("Built MIDPOINT BVH with depth " + this.depth);
     }
 
     private enum Action {
@@ -63,7 +74,9 @@ public class MidpointBVH extends BinaryBVH {
      *
      * @return root node of constructed BVH
      */
-    private Node constructMidpointSplit(Primitive[] primitives) {
+    private Node constructMidpointSplit(Primitive[] primitives, IntConsumer task) {
+        int progress = 0;
+
         Stack<Node> nodes = new Stack<>();
         Stack<Action> actions = new Stack<>();
         Stack<Primitive[]> chunks = new Stack<>();
@@ -77,6 +90,9 @@ public class MidpointBVH extends BinaryBVH {
                 Primitive[] chunk = chunks.pop();
                 if (chunk.length < SPLIT_LIMIT) {
                     nodes.push(new Leaf(chunk));
+
+                    progress += chunk.length;
+                    task.accept(progress);
                 } else {
                     splitMidpointMajorAxis(chunk, actions, chunks);
                 }

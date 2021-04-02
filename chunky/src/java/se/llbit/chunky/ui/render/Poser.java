@@ -42,6 +42,7 @@ import se.llbit.math.Matrix3;
 import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
+import se.llbit.util.TaskTracker;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +58,7 @@ public class Poser extends Stage implements Initializable {
   private static final WritablePixelFormat<IntBuffer> PIXEL_FORMAT =
       PixelFormat.getIntArgbInstance();
   private final EntitiesTab.EntityData player;
-  private BVH bvh = new BVH(Collections.emptyList(), new Vector3());
+  private BVH bvh = new BVH(Collections.emptyList(), new Vector3(), TaskTracker.Task.NONE);
   private int[] pixels;
   private int width = 300;
   private int height = 300;
