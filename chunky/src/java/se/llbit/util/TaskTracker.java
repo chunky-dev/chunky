@@ -25,6 +25,17 @@ package se.llbit.util;
  * current one.
  */
 public class TaskTracker {
+  public final static TaskTracker NONE = new TaskTracker(null) {
+    @Override
+    public Task task(String taskName, int taskSize) {
+      return Task.NONE;
+    }
+
+    @Override
+    public Task backgroundTask() {
+      return Task.NONE;
+    }
+  };
 
   public interface TaskBuilder {
     Task newTask(TaskTracker tracker, Task previous, String name, int size);
@@ -54,8 +65,8 @@ public class TaskTracker {
   public static class Task implements AutoCloseable {
     public static final Task NONE = new Task(null, null, "None", 1) {
       @Override protected void update() { }
+      @Override protected void updateEta() { }
       @Override public void close() { }
-      @Override public void update(String task, int target, int done, long startTime) { }
     };
 
     private String taskName;
@@ -64,7 +75,7 @@ public class TaskTracker {
     protected final TaskTracker tracker;
     protected final Task previous;
     private String eta = "";
-    protected final long startTime;
+    protected long startTime;
 
     public Task(TaskTracker tracker, Task previous, String taskName, int size) {
       this.tracker = tracker;
@@ -73,6 +84,15 @@ public class TaskTracker {
       this.done = 0;
       this.target = size;
       this.startTime = System.currentTimeMillis();
+    }
+
+    @Override public void close() {
+      tracker.currentTask = previous;
+      previous.update();
+    }
+
+    protected void update() {
+      tracker.updateProgress(taskName, target, done, eta);
     }
 
     /** Set the current progress. */
@@ -88,24 +108,12 @@ public class TaskTracker {
       update();
     }
 
-    protected void update() {
-      tracker.updateProgress(taskName, target, done, eta);
-    }
-
-    @Override public void close() {
-      tracker.currentTask = previous;
-      previous.update();
-    }
-
     /** Changes the task name and state. */
     public void update(String task, int target, int done) {
       update(task, target, done, "");
     }
 
-    /**
-     * Changes the task name and state.
-     * Reports the task state to the progress listener.
-     */
+    /** Changes the task name and state. */
     public void update(String task, int target, int done, String eta) {
       this.taskName = task;
       this.done = done;
@@ -114,8 +122,7 @@ public class TaskTracker {
       update();
     }
 
-    /** Changes the task name and state. Calculates eta. */
-    public void update(String task, int target, int done, long startTime) {
+    protected void updateEta() {
       long etaSeconds = 0;
       if (done > 0) {
         etaSeconds = ((target - done) * (System.currentTimeMillis() - startTime) / 1000) / done;
@@ -124,32 +131,41 @@ public class TaskTracker {
         int seconds = (int) ((etaSeconds) % 60);
         int minutes = (int) ((etaSeconds / 60) % 60);
         int hours = (int) (etaSeconds / 3600);
-        String eta = String.format("%d:%02d:%02d", hours, minutes, seconds);
-        update(task, target, done, eta);
+        eta = String.format("%d:%02d:%02d", hours, minutes, seconds);
       } else {
-        update(task, target, done, "");
+        eta = "N/A";
       }
+      update();
     }
 
-    /** Set the current progress and calculate eta. */
-    public void update(int target, int done, long startTime) {
-      this.update(this.taskName, target, done, startTime);
+    /** Set the current progress and calculate an ETA. */
+    public void updateEta(int done) {
+      this.done = done;
+      updateEta();
     }
 
-    public void update(int done, long startTime) {
-      this.update(this.taskName, this.target, done, startTime);
+    /** Set the current progress and calculate an ETA. */
+    public void updateEta(int target, int done) {
+      this.done = done;
+      this.target = target;
+      updateEta();
+    }
+
+    /** Reset the ETA start time. */
+    public void updateStartTime() {
+      this.startTime = System.currentTimeMillis();
     }
 
     /** Ratelimited update. Only update when the new progress is greater than the old progress + {@code interval} */
-    public void updateInterval(int target, int done, long startTime, int interval) {
+    public void updateInterval(int target, int done, int interval) {
       if (target != this.target || done > this.done + interval) {
-        this.update(target, done, startTime);
+        this.updateEta(target, done);
       }
     }
 
-    public void updateInterval(int done, long startTime, int interval) {
+    public void updateInterval(int done, int interval) {
       if (done > this.done + interval) {
-        this.update(done, startTime);
+        this.updateEta(done);
       }
     }
   }

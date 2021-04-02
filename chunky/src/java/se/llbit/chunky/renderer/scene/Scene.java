@@ -815,7 +815,7 @@ public class Scene implements JsonSerializable, Refreshable {
     Set<ChunkPosition> loadedChunks = new HashSet<>();
     int numChunks = 0;
 
-    try (TaskTracker.Task task = taskTracker.task("Loading regions")) {
+    try (TaskTracker.Task task = taskTracker.task("(1/6) Loading regions")) {
       task.update(2, 1);
 
       loadedWorld = world;
@@ -846,7 +846,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
-    try (TaskTracker.Task task = taskTracker.task("Loading entities")) {
+    try (TaskTracker.Task task = taskTracker.task("(2/6) Loading entities")) {
       entities = new LinkedList<>();
       if (actors.isEmpty() && PersistentSettings.getLoadPlayers()) {
         // We don't load actor entities if some already exists. Loading actor entities
@@ -885,10 +885,9 @@ public class Scene implements JsonSerializable, Refreshable {
       chunkData2 = new SimpleChunkData();
     }
 
-    try (TaskTracker.Task task = taskTracker.task("Loading chunks")) {
+    try (TaskTracker.Task task = taskTracker.task("(3/6) Loading chunks")) {
       int done = 1;
       int target = chunksToLoad.size();
-      long startTime = System.currentTimeMillis();
 
       boolean usingFirstChunkData = true;
 
@@ -901,7 +900,7 @@ public class Scene implements JsonSerializable, Refreshable {
       for (int i = 0; i < chunkPositions.length; i++) {
         ChunkPosition cp = chunkPositions[i];
 
-        task.update(target, done, startTime);
+        task.updateEta(target, done);
         done += 1;
 
         if (loadedChunks.contains(cp)) {
@@ -1247,14 +1246,13 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Set<ChunkPosition> chunkSet = new HashSet<>(chunksToLoad);
 
-    try (TaskTracker.Task task = taskTracker.task("Finalizing octree")) {
+    try (TaskTracker.Task task = taskTracker.task("(4/6) Finalizing octree")) {
 
       worldOctree.startFinalization();
       waterOctree.startFinalization();
 
       int done = 0;
       int target = chunksToLoad.size();
-      long startTime = System.currentTimeMillis();
       for (ChunkPosition cp : chunksToLoad) {
 
         // Finalize grass and foliage textures.
@@ -1306,7 +1304,7 @@ public class Scene implements JsonSerializable, Refreshable {
             waterTexture.set(cp.x * 16 + x - origin.x, cp.z * 16 + z - origin.z, waterMix);
           }
         }
-        task.update(target, done, startTime);
+        task.updateEta(target, done);
         done += 1;
         OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
       }
@@ -1328,32 +1326,49 @@ public class Scene implements JsonSerializable, Refreshable {
 
     chunks = loadedChunks;
     camera.setWorldSize(1 << worldOctree.getDepth());
-    try (TaskTracker.Task task = taskTracker.task("Building BVH")) {
+    try (TaskTracker.Task task = taskTracker.task("(5/6) Building world BVH")) {
       buildBvh(task);
+    }
+    try (TaskTracker.Task task = taskTracker.task("(6/6) Building actor BVH")) {
       buildActorBvh(task);
     }
     Log.info(String.format("Loaded %d chunks", numChunks));
   }
 
   private void buildBvh(TaskTracker.Task task) {
-    task.update("Building world BVH", 1, 0);
-    final List<Primitive> primitives = new LinkedList<>();
+    double entityScaler = 500.0 / entities.size();
+    int done = 0;
+    task.update(1000, 0);
 
+    final List<Primitive> primitives = new LinkedList<>();
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
     for (Entity entity : entities) {
       primitives.addAll(entity.primitives(worldOffset));
+
+      done++;
+      task.updateInterval((int) (done * entityScaler), 1);
     }
-    bvh = new BVH(primitives, task);
+
+    double primitiveScaler = 500.0 / primitives.size();
+    bvh = new BVH(primitives, i -> task.updateInterval((int) (i * primitiveScaler) + 500, 1));
   }
 
   private void buildActorBvh(TaskTracker.Task task) {
-    task.update("Building actor BVH", 1, 0);
+    double entityScaler = 500.0 / entities.size();
+    int done = 0;
+    task.update(1000, 0);
+
     final List<Primitive> actorPrimitives = new LinkedList<>();
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
     for (Entity entity : actors) {
       actorPrimitives.addAll(entity.primitives(worldOffset));
+
+      done++;
+      task.updateInterval((int) (done * entityScaler), 1);
     }
-    actorBvh = new BVH(actorPrimitives, task);
+
+    double primitiveScaler = 500.0 / actorPrimitives.size();
+    actorBvh = new BVH(actorPrimitives, i -> task.updateInterval((int) (i * primitiveScaler) + 500, 1));
   }
 
   /**
@@ -2062,37 +2077,30 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private synchronized boolean loadOctree(RenderContext context, TaskTracker taskTracker) {
     String fileName = name + ".octree2";
-    try (TaskTracker.Task task = taskTracker.task("Loading octree", 2)) {
+    try (TaskTracker.Task task = taskTracker.task("(1/3) Loading octree", 2)) {
       task.update(1);
       Log.info("Loading octree " + fileName);
 
       long length = context.getSceneFile(fileName).length();
-      long updateInterval = length / 1000;
-      final long[] nextUpdate = {0};
-      long startTime = System.currentTimeMillis();
-      task.update(1000, 1);
+      double progressScale = 1000.0 / length;
+      task.update(1000, 0);
 
       try {
         long fileTimestamp = context.fileTimestamp(fileName);
         OctreeFileFormat.OctreeData data;
         try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
-          if (pos > nextUpdate[0]) {
-            task.update((int) (nextUpdate[0] * 1000.0 / length), startTime);
-            nextUpdate[0] += updateInterval;
-          }
+          task.updateInterval((int) (pos * progressScale), 1);
         }))))) {
           data = OctreeFileFormat.load(in, octreeImplementation);
         } catch (PackedOctree.OctreeTooBigException e) {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
           DataInputStream inRetry = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
-            if (pos > nextUpdate[0]) {
-              task.update((int) (nextUpdate[0] * 1000.0 / length), startTime);
-              nextUpdate[0] += updateInterval;
-            }
+            task.updateInterval((int) (pos * progressScale), 1);
           }))));
           data = OctreeFileFormat.load(inRetry, "NODE");
         }
+
         worldOctree = data.worldTree;
         worldOctree.setTimestamp(fileTimestamp);
         waterOctree = data.waterTree;
@@ -2104,9 +2112,14 @@ public class Scene implements JsonSerializable, Refreshable {
         Log.info("Octree loaded");
         calculateOctreeOrigin(chunks);
         camera.setWorldSize(1 << worldOctree.getDepth());
-        task.update("Loading BVH", 1, 0);
-        buildBvh(task);
-        buildActorBvh(task);
+
+        try (TaskTracker.Task bvhTask = taskTracker.task("(2/3) Building world BVH")) {
+          buildBvh(bvhTask);
+        }
+        try (TaskTracker.Task bvhTask = taskTracker.task("(3/3) Building actor BVH")) {
+          buildActorBvh(bvhTask);
+        }
+
         return true;
       } catch (IOException e) {
         Log.error("Failed to load chunk data!", e);
