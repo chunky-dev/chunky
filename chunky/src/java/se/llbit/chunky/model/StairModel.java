@@ -129,6 +129,8 @@ public class StairModel extends AABBModel {
   private final boolean isCorner;
   private final int corner;
   private final int facing;
+  private final Texture[][] cornerTextures;
+  private final Texture[][] textures;
 
   public StairModel(Texture side, Texture top, Texture bottom, int flipped, boolean isCorner,
       int corner, int facing) {
@@ -139,6 +141,15 @@ public class StairModel extends AABBModel {
     this.isCorner = isCorner;
     this.corner = corner;
     this.facing = facing;
+    this.cornerTextures = new Texture[][]{
+        {side, side, side, side, top, bottom},
+        {side, side, side, side, top, bottom},
+        {side, side, side, side, top, bottom}
+    };
+    this.textures = new Texture[][]{
+        {side, side, side, side, top, bottom},
+        {side, side, side, side, top, bottom}
+    };
   }
 
   @Override
@@ -153,16 +164,9 @@ public class StairModel extends AABBModel {
   @Override
   public Texture[][] getTextures() {
     if (isCorner) {
-      return new Texture[][]{
-          {side, side, side, side, top, bottom},
-          {side, side, side, side, top, bottom},
-          {side, side, side, side, top, bottom}
-      };
+      return cornerTextures;
     } else {
-      return new Texture[][]{
-          {side, side, side, side, top, bottom},
-          {side, side, side, side, top, bottom}
-      };
+      return textures;
     }
   }
 }
