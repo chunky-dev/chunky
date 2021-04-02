@@ -22,8 +22,17 @@ import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 
 public class TallGrassModel extends SpriteModel {
-  private static final Texture[] tex = { Texture.deadBush, Texture.tallGrass, Texture.fern };
 
+  private static final TintType[] tinting = new TintType[]{
+      TintType.BIOME_GRASS, TintType.BIOME_GRASS, TintType.BIOME_GRASS, TintType.BIOME_GRASS
+  };
+  // private static final Texture[] tex = { Texture.deadBush, Texture.tallGrass, Texture.fern };
+
+  public TallGrassModel(Texture texture) {
+    super(texture);
+  }
+
+  /*
   public static boolean intersect(Ray ray, Scene scene) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
@@ -50,6 +59,12 @@ public class TallGrassModel extends SpriteModel {
       ray.o.scaleAdd(ray.t, ray.d);
     }
     return hit;
+  }
+  */
+
+  @Override
+  public TintType[] getTintedQuads() {
+    return tinting;
   }
 
   public static boolean intersect(Ray ray, Scene scene, Texture texture) {

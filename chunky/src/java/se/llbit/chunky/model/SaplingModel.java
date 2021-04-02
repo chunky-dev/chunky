@@ -21,6 +21,11 @@ import se.llbit.math.Quad;
 import se.llbit.math.Ray;
 
 public class SaplingModel extends SpriteModel {
+
+  public SaplingModel(Texture texture, String facing) {
+    super(texture, facing);
+  }
+
   public static boolean intersect(Ray ray, Texture texture) {
     boolean hit = false;
     ray.t = Double.POSITIVE_INFINITY;
