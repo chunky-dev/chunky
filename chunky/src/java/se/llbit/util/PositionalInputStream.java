@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2021 Chunky Contributors
+/* Copyright (c) 2021 Chunky Contributors
  *
  * This file is part of Chunky.
  *
@@ -21,20 +20,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.LongConsumer;
 
+/**
+ * An input stream that keeps track of it's position and calls a callback whenever a read occurs.
+ */
 public class PositionalInputStream extends InputStream {
     private InputStream stream;
     private LongConsumer update;
     private long count = 0;
-    private long mark;
-    private long markLimit;
-    private boolean canMark;
+    private long mark = -1;
+    private int readlimit;
 
+    /**
+     * Create a {@code PositionalInputStream} from an existing stream and a callback.
+     */
     public PositionalInputStream(InputStream stream, LongConsumer update) {
         this.stream = stream;
         this.update = update;
-        this.canMark = stream.markSupported();
     }
 
+    /** Get the current position of this stream */
     public long getPosition() {
         return count;
     }
@@ -51,16 +55,14 @@ public class PositionalInputStream extends InputStream {
 
     @Override
     public void mark(int readlimit) {
-        if (canMark) {
-            stream.mark(readlimit);
-            mark = count;
-            markLimit = mark + readlimit;
-        }
+        stream.mark(readlimit);
+        this.mark = count;
+        this.readlimit = readlimit;
     }
 
     @Override
     public boolean markSupported() {
-        return canMark;
+        return stream.markSupported();
     }
 
     @Override
@@ -85,12 +87,23 @@ public class PositionalInputStream extends InputStream {
         return actual;
     }
 
+    /**
+     * Reset this stream to the position when {@code mark} was last called.
+     * This adheres to the strictest conditions under the {@code InputStream.reset} contract even if the underlying
+     * stream does not.
+     * An IOException is called if:
+     *     - {@code markSupported} returns {@code false}
+     *     - {@code mark} has not been called since the stream was created
+     *     - The number of bytes read since {@code mark} was last called exceeds {@code readlimit}
+     */
     @Override
     public void reset() throws IOException {
-        if (canMark && count <= markLimit) {
-            stream.reset();
-            count = mark;
-        }
+        if (!markSupported()) throw new IOException("mark/reset not supported");
+        if (mark == -1) throw new IOException("mark must be called before reset");
+        if (count > mark + readlimit) throw new IOException("readlimit exceeded");
+
+        stream.reset();
+        count = mark;
     }
 
     @Override
