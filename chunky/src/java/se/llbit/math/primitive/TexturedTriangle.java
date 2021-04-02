@@ -117,8 +117,8 @@ public class TexturedTriangle implements Primitive {
 
     if (t > EPSILON && t < ray.t) {
       double w = 1 - u - v;
-      ray.u = t2u * u + t3u * v + t1u * w;
-      ray.v = t2v * u + t3v * v + t1v * w;
+      ray.u = t1u * u + t2u * v + t3u * w;
+      ray.v = t1v * u + t2v * v + t3v * w;
       float[] color = material.getColor(ray.u, ray.v);
       if (color[3] > 0) {
         ray.color.set(color);
