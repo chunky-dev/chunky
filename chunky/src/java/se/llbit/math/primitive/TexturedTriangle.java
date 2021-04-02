@@ -68,12 +68,12 @@ public class TexturedTriangle implements Primitive {
     o.set(c1);
     n.cross(e2, e1);
     n.normalize();
-    t1u = t1.x;
-    t1v = t1.y;
-    t2u = t2.x;
-    t2v = t2.y;
-    t3u = t3.x;
-    t3v = t3.y;
+    t1u = t2.x;
+    t1v = t2.y;
+    t2u = t3.x;
+    t2v = t3.y;
+    t3u = t1.x;
+    t3v = t1.y;
     this.material = material;
     this.doubleSided = doubleSided;
 
