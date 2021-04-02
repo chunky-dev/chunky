@@ -37,7 +37,7 @@ public class GenericChunkData implements ChunkData {
   }
 
   @Override public int maxY() {
-    return (maxSectionY << 4) + 15;
+    return ((maxSectionY+1) << 4);
   }
 
   @Override public int getBlockAt(int x, int y, int z) {

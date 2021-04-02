@@ -84,7 +84,7 @@ public class EmptyChunk extends Chunk {
     // Do nothing.
   }
 
-  @Override public synchronized void loadChunk() {
+  @Override public synchronized void loadChunk(ChunkData chunkData) {
     // Do nothing.
   }
 

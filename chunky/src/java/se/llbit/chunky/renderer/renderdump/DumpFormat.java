@@ -94,12 +94,14 @@ abstract class DumpFormat {
       if (scene.getSampleBuffer().width != scene.width || scene.getSampleBuffer().height != scene.height) {
         throw new Error("Failed to merge render dump - wrong canvas size.");
       }
-
       int previousSpp = scene.spp;
       long previousRenderTime = scene.renderTime;
 
       readHeader(inputStream, scene);
-      mergeSamples(inputStream, scene, progress -> task.update((int) progress)); // TODO fix task progress for long indexes
+      mergeSamples(inputStream, scene, progress -> {
+        if (progress%width == 0)
+          task.update((int) progress); // TODO fix task progress for long indexes
+      });
       scene.spp += previousSpp;
       scene.renderTime += previousRenderTime;
     }

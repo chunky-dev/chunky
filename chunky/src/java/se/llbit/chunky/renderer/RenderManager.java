@@ -144,10 +144,13 @@ public class RenderManager extends AbstractRenderManager implements Renderer {
             finalizeAllFrames = scene.shouldFinalizeBuffer();
             updateRenderState(scene);
             if (reason == ResetReason.SCENE_LOADED) {
+              // Make sure frame is finalized
+              bufferedScene.postProcessFrame(renderTask);
+
               // Swap buffers so the render canvas will see the current frame.
               bufferedScene.swapBuffers();
 
-              // Notify the scene listeners (this triggers a canvas repaint).
+              // Notify the scene listeners.
               sendSceneStatus(bufferedScene.sceneStatus());
               canvas.repaint();
             }

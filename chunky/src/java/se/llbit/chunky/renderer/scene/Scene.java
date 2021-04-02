@@ -1984,20 +1984,29 @@ public class Scene implements JsonSerializable, Refreshable {
    * <p>This is normally done by the render workers during rendering,
    * but in some cases an separate post processing pass is needed.
    */
+  public void postProcessFrame(TaskTracker.Task task) {
+    task.update("Finalizing frame", subareaWidth, 0);
+    AtomicInteger done = new AtomicInteger(0);
+    Chunky.getCommonThreads().submit(() -> {
+      IntStream.range(0, subareaWidth).parallel().forEach(x -> {
+        for (int y = 0; y < subareaHeight; y++) {
+          finalizePixel(x, y);
+        }
+
+        task.update(subareaWidth, done.incrementAndGet());
+      });
+    }).join();
+  }
+
+  /**
+   * Post-process all pixels in the current frame.
+   *
+   * <p>This is normally done by the render workers during rendering,
+   * but in some cases an separate post processing pass is needed.
+   */
   public void postProcessFrame(TaskTracker taskTracker) {
     try (TaskTracker.Task task = taskTracker.task("Finalizing frame")) {
-      AtomicInteger done = new AtomicInteger(0);
-      Chunky.getCommonThreads().submit(() -> {
-        IntStream.range(0, subareaWidth).parallel().forEach(x -> {
-          for (int y = 0; y < subareaHeight; y++) {
-            finalizePixel(x, y);
-          }
-
-          task.update(subareaWidth, done.incrementAndGet());
-        });
-      }).get();
-    } catch (InterruptedException | ExecutionException e) {
-      Log.error("Finalizing frame failed", e);
+      postProcessFrame(task);
     }
   }
 

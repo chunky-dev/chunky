@@ -21,7 +21,7 @@ public interface ChunkData {
   int minY();
 
   /**
-   * Maximum INCLUSIVE block Y in this chunk
+   * Maximum EXCLUSIVE block Y in this chunk
    * @return Can return a set value or adapt to blocks added
    */
   int maxY();
