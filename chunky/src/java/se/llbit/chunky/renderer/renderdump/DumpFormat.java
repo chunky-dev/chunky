@@ -72,12 +72,16 @@ abstract class DumpFormat {
 
   public void merge(DataInputStream inputStream, Scene scene, TaskTracker taskTracker)
       throws IOException, IllegalStateException {
-    try (TaskTracker.Task task = taskTracker.task("Merging render dump", scene.canvasWidth() * scene.canvasHeight())) {
+    try (TaskTracker.Task task = taskTracker.task("Merging render dump", scene.canvasHeight())) {
+      int width = scene.canvasWidth();
       int previousSpp = scene.spp;
       long previousRenderTime = scene.renderTime;
 
       readHeader(inputStream, scene);
-      mergeSamples(inputStream, previousSpp, scene, task::update);
+      mergeSamples(inputStream, previousSpp, scene, prog -> {
+        if (prog % width == 0)
+          task.update(prog/width);
+      });
       scene.spp += previousSpp;
       scene.renderTime += previousRenderTime;
     }

@@ -101,7 +101,6 @@ import se.llbit.math.QuickMath;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector3i;
-import se.llbit.math.primitive.Primitive;
 import se.llbit.nbt.CompoundTag;
 import se.llbit.nbt.ListTag;
 import se.llbit.nbt.Tag;
@@ -804,7 +803,7 @@ public class Scene implements JsonSerializable, Refreshable {
     Set<ChunkPosition> loadedChunks = new HashSet<>();
     int numChunks = 0;
 
-    try (TaskTracker.Task task = taskTracker.task("Loading regions")) {
+    try (TaskTracker.Task task = taskTracker.task("(1/6) Loading regions")) {
       task.update(2, 1);
 
       loadedWorld = world;
@@ -835,7 +834,7 @@ public class Scene implements JsonSerializable, Refreshable {
       }
     }
 
-    try (TaskTracker.Task task = taskTracker.task("Loading entities")) {
+    try (TaskTracker.Task task = taskTracker.task("(2/6) Loading entities")) {
       entities = new LinkedList<>();
       if (actors.isEmpty() && PersistentSettings.getLoadPlayers()) {
         // We don't load actor entities if some already exists. Loading actor entities
@@ -874,7 +873,7 @@ public class Scene implements JsonSerializable, Refreshable {
       chunkData2 = new SimpleChunkData();
     }
 
-    try (TaskTracker.Task task = taskTracker.task("Loading chunks")) {
+    try (TaskTracker.Task task = taskTracker.task("(3/6) Loading chunks")) {
       int done = 1;
       int target = chunksToLoad.size();
 
@@ -889,7 +888,7 @@ public class Scene implements JsonSerializable, Refreshable {
       for (int i = 0; i < chunkPositions.length; i++) {
         ChunkPosition cp = chunkPositions[i];
 
-        task.update(target, done);
+        task.updateEta(target, done);
         done += 1;
 
         if (loadedChunks.contains(cp)) {
@@ -1235,7 +1234,7 @@ public class Scene implements JsonSerializable, Refreshable {
 
     Set<ChunkPosition> chunkSet = new HashSet<>(chunksToLoad);
 
-    try (TaskTracker.Task task = taskTracker.task("Finalizing octree")) {
+    try (TaskTracker.Task task = taskTracker.task("(4/6) Finalizing octree")) {
 
       worldOctree.startFinalization();
       waterOctree.startFinalization();
@@ -1293,7 +1292,7 @@ public class Scene implements JsonSerializable, Refreshable {
             waterTexture.set(cp.x * 16 + x - origin.x, cp.z * 16 + z - origin.z, waterMix);
           }
         }
-        task.update(target, done);
+        task.updateEta(target, done);
         done += 1;
         OctreeFinalizer.finalizeChunk(worldOctree, waterOctree, palette, origin, cp, yMin, yMax);
       }
@@ -1315,27 +1314,31 @@ public class Scene implements JsonSerializable, Refreshable {
 
     chunks = loadedChunks;
     camera.setWorldSize(1 << worldOctree.getDepth());
-    buildBvh();
-    buildActorBvh();
+    try (TaskTracker.Task task = taskTracker.task("(5/6) Building world BVH")) {
+      buildBvh(task);
+    }
+    try (TaskTracker.Task task = taskTracker.task("(6/6) Building actor BVH")) {
+      buildActorBvh(task);
+    }
     Log.info(String.format("Loaded %d chunks", numChunks));
   }
 
-  private void buildBvh() {
+  private void buildBvh(TaskTracker.Task task) {
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    bvh = new BVH(entities, worldOffset);
+    bvh = new BVH(entities, worldOffset, task);
   }
 
-  private void buildActorBvh() {
+  private void buildActorBvh(TaskTracker.Task task) {
     Vector3 worldOffset = new Vector3(-origin.x, -origin.y, -origin.z);
-    actorBvh = new BVH(actors, worldOffset);
+    actorBvh = new BVH(actors, worldOffset, task);
   }
 
   /**
    * Rebuild the actors and the other blocks bounding volume hierarchy.
    */
   public void rebuildBvh() {
-    buildBvh();
-    buildActorBvh();
+    buildBvh(TaskTracker.Task.NONE);
+    buildActorBvh(TaskTracker.Task.NONE);
     refresh();
   }
 
@@ -1343,7 +1346,7 @@ public class Scene implements JsonSerializable, Refreshable {
    * Rebuild the actors bounding volume hierarchy.
    */
   public void rebuildActorBvh() {
-    buildActorBvh();
+    buildActorBvh(TaskTracker.Task.NONE);
     refresh();
   }
 
@@ -1939,20 +1942,23 @@ public class Scene implements JsonSerializable, Refreshable {
    * <p>This is normally done by the render workers during rendering,
    * but in some cases an separate post processing pass is needed.
    */
+  public void postProcessFrame(TaskTracker.Task task) {
+    task.update("Finalizing frame", width, 0);
+    AtomicInteger done = new AtomicInteger(0);
+    Chunky.getCommonThreads().submit(() -> {
+      IntStream.range(0, width).parallel().forEach(x -> {
+        for (int y = 0; y < height; y++) {
+          finalizePixel(x, y);
+        }
+
+        task.update(width, done.incrementAndGet());
+      });
+    }).join();
+  }
+
   public void postProcessFrame(TaskTracker taskTracker) {
     try (TaskTracker.Task task = taskTracker.task("Finalizing frame")) {
-      AtomicInteger done = new AtomicInteger(0);
-      Chunky.getCommonThreads().submit(() -> {
-        IntStream.range(0, width).parallel().forEach(x -> {
-          for (int y = 0; y < height; y++) {
-            finalizePixel(x, y);
-          }
-
-          task.update(width, done.incrementAndGet());
-        });
-      }).get();
-    } catch (InterruptedException | ExecutionException e) {
-      Log.error("Finalizing frame failed", e);
+      postProcessFrame(task);
     }
   }
 
@@ -2036,20 +2042,30 @@ public class Scene implements JsonSerializable, Refreshable {
 
   private synchronized boolean loadOctree(RenderContext context, TaskTracker taskTracker) {
     String fileName = name + ".octree2";
-    try (TaskTracker.Task task = taskTracker.task("Loading octree", 2)) {
+    try (TaskTracker.Task task = taskTracker.task("(1/3) Loading octree", 2)) {
       task.update(1);
       Log.info("Loading octree " + fileName);
+
+      long length = context.getSceneFile(fileName).length();
+      double progressScale = 1000.0 / length;
+      task.update(1000, 0);
+
       try {
         long fileTimestamp = context.fileTimestamp(fileName);
         OctreeFileFormat.OctreeData data;
-        try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName))))) {
+        try (DataInputStream in = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
+          task.updateInterval((int) (pos * progressScale), 1);
+        }))))) {
           data = OctreeFileFormat.load(in, octreeImplementation);
         } catch (PackedOctree.OctreeTooBigException e) {
           // Octree too big, reload file and force loading as NodeBasedOctree
           Log.warn("Octree was too big when loading dump, reloading with old (slower and bigger) implementation.");
-          DataInputStream inRetry = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(context.getSceneFileInputStream(fileName))));
+          DataInputStream inRetry = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(new PositionalInputStream(context.getSceneFileInputStream(fileName), pos -> {
+            task.updateInterval((int) (pos * progressScale), 1);
+          }))));
           data = OctreeFileFormat.load(inRetry, "NODE");
         }
+
         worldOctree = data.worldTree;
         worldOctree.setTimestamp(fileTimestamp);
         waterOctree = data.waterTree;
@@ -2058,12 +2074,17 @@ public class Scene implements JsonSerializable, Refreshable {
         waterTexture = data.waterColors;
         palette = data.palette;
         palette.applyMaterials();
-        task.update(2);
         Log.info("Octree loaded");
         calculateOctreeOrigin(chunks);
         camera.setWorldSize(1 << worldOctree.getDepth());
-        buildBvh();
-        buildActorBvh();
+
+        try (TaskTracker.Task bvhTask = taskTracker.task("(2/3) Building world BVH")) {
+          buildBvh(bvhTask);
+        }
+        try (TaskTracker.Task bvhTask = taskTracker.task("(3/3) Building actor BVH")) {
+          buildActorBvh(bvhTask);
+        }
+
         return true;
       } catch (IOException e) {
         Log.error("Failed to load chunk data!", e);
