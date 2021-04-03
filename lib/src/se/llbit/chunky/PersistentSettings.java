@@ -441,5 +441,22 @@ public final class PersistentSettings {
   public static void setDisableDefaultTextures(boolean value) {
     settings.setBool("disableDefaultTextures", value);
   }
-}
 
+  public static int getCanvasScale() {
+    return settings.getInt("canvasScale", 100);
+  }
+
+  public static void setCanvasScale(int scale) {
+    settings.setInt("canvasScale", scale);
+    save();
+  }
+
+  public static boolean getCanvasFitToScreen() {
+    return settings.getBool("canvasFitToScreen", true);
+  }
+
+  public static void setCanvasFitToScreen(boolean fitToScreen) {
+    settings.setBool("canvasFitToScreen", fitToScreen);
+    save();
+  }
+}
