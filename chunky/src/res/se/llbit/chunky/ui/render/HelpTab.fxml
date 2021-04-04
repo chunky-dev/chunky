@@ -12,7 +12,7 @@
       <padding>
          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
       </padding>
-      <Label text="Camera key bindings (standard projection):">
+      <Label text="Camera key bindings:">
          <font>
             <Font name="System Bold" size="12.0"/>
          </font>
@@ -23,8 +23,6 @@
       <Label text="D strafe right"/>
       <Label text="R move up"/>
       <Label text="F move down"/>
-      <Label text="K move forward"/>
-      <Label text="J move backward"/>
       <Label/>
       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Holding SHIFT makes the basic movement keys move 0.1 of the normal speed." wrappingWidth="251.2109375" />
       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Holding CTRL makes the basic movement keys move 100 of the normal speed." wrappingWidth="251.2109375" />
