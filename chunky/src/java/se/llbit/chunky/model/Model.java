@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import se.llbit.math.Quad;
 import se.llbit.math.Transform;
-import se.llbit.math.UVTriangle;
 import se.llbit.math.Vector3;
 
 /**
@@ -120,18 +119,6 @@ public class Model {
     Quad[] rot = new Quad[src.length];
     for (int i = 0; i < src.length; ++i) {
       rot[i] = src[i].transform(Transform.NONE.rotateNegY());
-    }
-    return rot;
-  }
-
-  /**
-   * @param src source quads
-   * @return UVTriangles rotated about the Y axis
-   */
-  public static UVTriangle[] rotateY(UVTriangle[] src) {
-    UVTriangle[] rot = new UVTriangle[src.length];
-    for (int i = 0; i < src.length; ++i) {
-      rot[i] = src[i].getYRotated();
     }
     return rot;
   }
