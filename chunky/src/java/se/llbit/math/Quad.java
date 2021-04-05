@@ -30,10 +30,11 @@ import se.llbit.math.primitive.TexturedTriangle;
  */
 public class Quad {
 
-  protected Vector3 o = new Vector3();
-  protected Vector3 xv = new Vector3();
-  protected Vector3 yv = new Vector3();
-  protected Vector4 uv = new Vector4();
+  /** Note: This is public for some plugins. Stability is not guaranteed. */
+  public Vector3 o = new Vector3();
+  public Vector3 xv = new Vector3();
+  public Vector3 yv = new Vector3();
+  public Vector4 uv = new Vector4();
 
   /**
    * Normal vector
