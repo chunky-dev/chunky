@@ -46,6 +46,7 @@ import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.resources.SettingsDirectory;
 import se.llbit.chunky.resources.TexturePackLoader;
 import se.llbit.chunky.ui.ChunkyFx;
+import se.llbit.chunky.ui.CreditsController;
 import se.llbit.chunky.ui.render.RenderControlsTabTransformer;
 import se.llbit.chunky.world.MaterialStore;
 import se.llbit.json.JsonArray;
@@ -280,6 +281,7 @@ public class Chunky {
                 }
                 Log.infof("Plugin loaded: %s %s", manifest.get("name").asString(""),
                     manifest.get("version").asString(""));
+                CreditsController.addPlugin(manifest);
               });
         } catch (Throwable t) {
           Log.error("Plugin " + jarName + " failed to load.", t);

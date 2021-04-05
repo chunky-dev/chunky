@@ -17,6 +17,7 @@
 package se.llbit.chunky.ui;
 
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -40,10 +41,13 @@ import java.io.File;
  */
 public class ChunkyFx extends Application {
 
+  private static HostServices hostServices;
   private static Chunky chunkyInstance;
 
   @Override public void start(Stage stage) {
     try {
+      ChunkyFx.hostServices = this.getHostServices();
+
       FXMLLoader loader = new FXMLLoader(getClass().getResource("Chunky.fxml"));
       ChunkyFxController controller = new ChunkyFxController(chunkyInstance);
       loader.setController(controller);
@@ -74,5 +78,9 @@ public class ChunkyFx extends Application {
   public static void startChunkyUI(Chunky chunkyInstance) {
     ChunkyFx.chunkyInstance = chunkyInstance;
     launch();
+  }
+
+  public static void launchUrl(String url) {
+    hostServices.showDocument(url);
   }
 }

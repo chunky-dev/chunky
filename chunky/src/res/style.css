@@ -34,3 +34,17 @@ Label {
 Text {
     -fx-fill: #faebd7;
 }
+
+Hyperlink {
+    -fx-text-fill: orange;
+    -fx-underline: false;
+}
+
+Hyperlink:visited {
+    -fx-text-fill: orange;
+}
+
+Hyperlink:hover {
+    -fx-text-fill: #faebd7;
+    -fx-underline: true;
+}

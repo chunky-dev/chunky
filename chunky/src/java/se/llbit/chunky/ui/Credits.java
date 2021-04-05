@@ -33,6 +33,7 @@ public class Credits extends Stage {
     CreditsController controller = loader.getController();
     setTitle("Chunky Credits");
     setScene(new Scene(root));
+    this.resizableProperty().setValue(false);
     controller.setStage(this);
   }
 }
