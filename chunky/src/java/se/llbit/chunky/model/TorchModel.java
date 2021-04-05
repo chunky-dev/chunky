@@ -22,7 +22,7 @@ import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.math.Vector4;
 
-public class TorchModel {
+public class TorchModel extends QuadModel {
 
   private static final Quad[] quadsGround = new Quad[]{
       new Quad(
@@ -111,6 +111,15 @@ public class TorchModel {
     rotatedQuadsWall[4] = Model.rotateY(rotatedQuadsWall[2]); // north
   }
 
+  private final Texture[] textures;
+
+  private final int rotation;
+
+  public TorchModel(Texture texture, int rotation) {
+    this.textures = new Texture[]{texture, texture, texture, texture, texture, texture};
+    this.rotation = rotation;
+  }
+
   public static boolean intersect(Ray ray, Texture texture) {
     int rot = ray.getBlockData() % 6;
     return intersect(ray, texture, rot);
@@ -153,5 +162,18 @@ public class TorchModel {
       }
     }
     return false;
+  }
+
+  @Override
+  public Quad[] getQuads() {
+    if (rotation < 5) {
+      return rotatedQuadsWall[rotation];
+    }
+    return quadsGround;
+  }
+
+  @Override
+  public Texture[] getTextures() {
+    return textures;
   }
 }
