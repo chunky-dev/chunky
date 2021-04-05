@@ -25,6 +25,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import se.llbit.chunky.ui.IntegerAdjuster?>
 <?import se.llbit.fx.ToolPane?>
+<?import javafx.scene.layout.FlowPane?>
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
       xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
   <MenuBar>
@@ -151,7 +152,16 @@
           <Hyperlink fx:id="discordLink" text="Discord Server" />
           <Hyperlink fx:id="guideLink" text="jackjt8's Guide to Chunky" />
           <Separator />
-          <Label text="Chunky was created by Jesper Öqvist (jesper@llbit.se)"/>
+          <Label wrapText="true" text="Chunky was created by Jesper Öqvist (jesper@llbit.se)"/>
+          <Label wrapText="true" text="Chunky is Copyright (c) 2010-2021, Jesper Öqvist and Chunky contributors." />
+          <FlowPane>
+            <Label wrapText="true" text="Permission to modify and redistribute is granted under the terms of the " />
+            <Hyperlink fx:id="gplv3" wrapText="true" text="GPLv3 license.">
+              <padding>
+                <Insets/>
+              </padding>
+            </Hyperlink>
+          </FlowPane>
           <Button fx:id="creditsBtn" mnemonicParsing="false" text="View Credits"/>
         </VBox>
       </Tab>

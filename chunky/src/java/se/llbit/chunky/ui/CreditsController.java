@@ -39,6 +39,7 @@ import java.net.URL;
 import java.util.*;
 
 public class CreditsController implements Initializable {
+  @FXML private Hyperlink markdown;
   @FXML private VBox pluginBox;
   @FXML private Hyperlink fastMath;
   @FXML private Hyperlink fastutil;
@@ -56,6 +57,9 @@ public class CreditsController implements Initializable {
     ghContributors.setBorder(Border.EMPTY);
     ghContributors.setOnAction(e -> launchAndReset(ghContributors, "https://github.com/chunky-dev/chunky/graphs/contributors"));
 
+    markdown.setBorder(Border.EMPTY);
+    markdown.setOnAction(e -> launchAndReset(markdown, "https://github.com/chunky-dev/chunky/blob/master/licenses/Markdown.txt"));
+
     apacheLicense.setBorder(Border.EMPTY);
     apacheLicense.setOnAction(e -> launchAndReset(apacheLicense, "http://www.apache.org/licenses/LICENSE-2.0.txt"));
 
@@ -68,7 +72,13 @@ public class CreditsController implements Initializable {
     if (plugins.size() > 0) {
       plugins.forEach((key, item) -> pluginBox.getChildren().addAll(buildBox(item)));
     } else {
-      pluginBox.getChildren().add(new Label("You have no plugins installed!"));
+      Label label = new Label("You have no plugins installed!");
+      label.setPadding(new Insets(0, 0, 0 ,-10.0));
+      pluginBox.getChildren().add(label);
+
+      Hyperlink pluginLink = new Hyperlink("Get some plugins here!");
+      pluginLink.setOnAction(e -> launchAndReset(pluginLink, "https://jackjt8.github.io/ChunkyGuide/docs/setup/plugins.html"));
+      pluginBox.getChildren().add(pluginLink);
     }
   }
 
