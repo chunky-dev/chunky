@@ -117,6 +117,13 @@ public abstract class QuadModel implements BlockModel {
 
     float[] color = null;
     Tint tint = Tint.NONE;
+    double emittanceValue = 0;
+    double reflectanceValue = 0;
+    double roughnessValue = 0;
+    float metalnessValue = 0;
+    Quad hitQuad = null;
+    Texture hitTexture = null;
+
     for (int i = 0; i < quads.length; ++i) {
       Quad quad = quads[i];
       if (quad.intersect(ray)) {
@@ -129,6 +136,13 @@ public abstract class QuadModel implements BlockModel {
             ray.orientNormal(quad.n);
           else
             ray.setNormal(quad.n);
+            
+          hitQuad = quad;
+          hitTexture = textures[i];
+          emittanceValue = hitTexture.getEmittanceAt(ray.u, ray.v);
+          reflectanceValue = hitTexture.getReflectanceAt(ray.u, ray.v);
+          roughnessValue = hitTexture.getRoughnessAt(ray.u, ray.v);
+          metalnessValue = hitTexture.getMetalnessAt(ray.u, ray.v);
           hit = true;
         }
       }
@@ -143,8 +157,13 @@ public abstract class QuadModel implements BlockModel {
         return false;
       }
 
+      NormalMap.apply(ray, hitQuad, hitTexture);
       ray.color.set(color);
       tint.tint(ray.color, ray, scene);
+      ray.emittanceValue = emittanceValue;
+      ray.reflectanceValue = reflectanceValue;
+      ray.roughnessValue = roughnessValue;
+      ray.metalnessValue = metalnessValue;
       ray.distance += ray.t;
       ray.o.scaleAdd(ray.t, ray.d);
     }
