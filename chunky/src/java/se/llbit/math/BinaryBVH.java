@@ -216,14 +216,14 @@ public abstract class BinaryBVH implements BVH.BVHImplementation {
                         Float.intBitsToFloat(packed[offset+5]), Float.intBitsToFloat(packed[offset+6]),
                         rx, ry, rz);
 
-                if (t1 == -1 || t1 > ray.t) {
-                    if (t2 == -1 || t2 > ray.t) {
+                if (t1 > ray.t || t1 == -1) {
+                    if (t2 > ray.t || t2 == -1) {
                         if (nodesToVisit.isEmpty()) break;
                         currentNode = nodesToVisit.popInt();
                     } else {
                         currentNode = packed[currentNode];
                     }
-                } else if (t2 == -1 || t2 > ray.t) {
+                } else if (t2 > ray.t || t2 == -1) {
                     currentNode += 7;
                 } else if (t1 < t2) {
                     nodesToVisit.push(packed[currentNode]);
