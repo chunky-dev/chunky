@@ -34,6 +34,7 @@ import javafx.stage.Stage;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.json.JsonObject;
 import se.llbit.json.JsonString;
+import se.llbit.log.Log;
 import se.llbit.util.Pair;
 
 import java.net.URL;
@@ -59,7 +60,11 @@ public class CreditsController implements Initializable {
    */
   @PluginApi
   public static void setPluginChildrenSupplier(String name, Supplier<List<Node>> supplier) {
-    plugins.get(name).thing2 = supplier;
+    if (plugins.containsKey(name)) {
+      plugins.get(name).thing2 = supplier;
+    } else {
+      Log.warn("Plugin \"" + name + "\" not loaded correctly.");
+    }
   }
 
   /**
