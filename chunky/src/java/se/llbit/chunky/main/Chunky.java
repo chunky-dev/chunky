@@ -267,6 +267,7 @@ public class Chunky {
         try {
           ChunkyPlugin
               .load(pluginsPath.resolve(jarName).toRealPath().toFile(), (plugin, manifest) -> {
+                CreditsController.addPlugin(manifest);
                 String pluginName = manifest.get("name").asString("");
                 if (loadedPlugins.contains(pluginName)) {
                   Log.warnf(
@@ -281,7 +282,6 @@ public class Chunky {
                 }
                 Log.infof("Plugin loaded: %s %s", manifest.get("name").asString(""),
                     manifest.get("version").asString(""));
-                CreditsController.addPlugin(manifest);
               });
         } catch (Throwable t) {
           Log.error("Plugin " + jarName + " failed to load.", t);
