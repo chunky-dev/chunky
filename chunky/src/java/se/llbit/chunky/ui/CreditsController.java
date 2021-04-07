@@ -23,6 +23,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -31,12 +32,14 @@ import javafx.scene.layout.Border;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import org.apache.commons.math3.util.Pair;
 import se.llbit.chunky.plugin.PluginApi;
 import se.llbit.json.JsonObject;
+import se.llbit.json.JsonString;
+import se.llbit.util.Pair;
 
 import java.net.URL;
 import java.util.*;
+import java.util.function.Supplier;
 
 public class CreditsController implements Initializable {
   @FXML private Hyperlink markdown;
@@ -47,16 +50,17 @@ public class CreditsController implements Initializable {
   @FXML private ImageView logoImage;
   @FXML private Hyperlink ghContributors;
 
-  public static final Map<String, Pair<JsonObject, List<Node>>> plugins = new HashMap<>();
+  public static final Map<String, Pair<JsonObject, Supplier<List<Node>>>> plugins = new HashMap<>();
 
   /**
-   * Get (and add to) the children of the given plugin.
+   * Set the children of a plugin.
    *
    * @param name The name of the plugin. Must be the same as declared in the plugin manifest. Is case sensitive.
+   * @param supplier A {@code List<Node>} supplier that returns the plugin's children.
    */
   @PluginApi
-  public static List<Node> getPluginChildren(String name) {
-    return plugins.get(name).getSecond();
+  public static void setPluginChildrenSupplier(String name, Supplier<List<Node>> supplier) {
+    plugins.get(name).thing2 = supplier;
   }
 
   /**
@@ -66,7 +70,20 @@ public class CreditsController implements Initializable {
    * @param manifest The manifest {@code JsonObject} of the plugin.
    */
   public static void addPlugin(JsonObject manifest) {
-    plugins.computeIfAbsent(manifest.get("name").asString(""), name -> new Pair<>(manifest, new ArrayList<>()));
+    plugins.computeIfAbsent(manifest.get("name").asString(""), name -> new Pair<>(manifest, null));
+  }
+
+  /**
+   * Add a plugin using this when running a plugin directly.
+   */
+  @PluginApi
+  public static void addPlugin(String name, String version, String author, String description) {
+    JsonObject manifest = new JsonObject();
+    manifest.set("name", new JsonString(name));
+    manifest.set("version", new JsonString(version));
+    manifest.set("author", new JsonString(author));
+    manifest.set("description", new JsonString(description));
+    addPlugin(manifest);
   }
 
   @Override
@@ -114,17 +131,19 @@ public class CreditsController implements Initializable {
     link.setVisited(false);
   }
 
-  private Collection<Node> buildBox(Pair<JsonObject, List<Node>> data) {
+  private Collection<Node> buildBox(Pair<JsonObject, Supplier<List<Node>>> data) {
     ArrayList<Node> items = new ArrayList<>();
 
-    Label name = new Label(data.getFirst().get("name").asString("") + " " + data.getFirst().get("version").asString("") + " (" + data.getFirst().get("author").asString("unknown") + ")");
+    Label name = new Label(data.thing1.get("name").asString("") + " " + data.thing1.get("version").asString("") + " (" + data.thing1.get("author").asString("unknown") + ")");
     name.setFont(new Font("System Bold", 12.0));
     name.setPadding(new Insets(4, 0, 0, -10.0));
     items.add(name);
 
-    items.add(new Label(data.getFirst().get("description").asString("")));
+    items.add(new Label(data.thing1.get("description").asString("")));
 
-    items.addAll(data.getSecond());
+    if (data.thing2 != null) {
+      items.addAll(data.thing2.get());
+    }
 
     return items;
   }
