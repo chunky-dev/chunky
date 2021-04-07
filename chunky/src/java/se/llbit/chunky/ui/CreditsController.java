@@ -47,11 +47,30 @@ public class CreditsController implements Initializable {
   @FXML private ImageView logoImage;
   @FXML private Hyperlink ghContributors;
 
-  @PluginApi
   public static final Map<String, Pair<JsonObject, List<Node>>> plugins = new HashMap<>();
 
+  /**
+   * Get (and add to) the children of the given plugin.
+   *
+   * @param name The name of the plugin. Must be the same as declared in the plugin manifest. Is case sensitive.
+   */
+  @PluginApi
+  public List<Node> getPluginChildren(String name) {
+    return plugins.get(name).getSecond();
+  }
 
-  @Override public void initialize(URL location, ResourceBundle resources) {
+  /**
+   * Add a plugin to the list of plugins.
+   * Note: multiple plugins with the same name will only be added once.
+   *
+   * @param manifest The manifest {@code JsonObject} of the plugin.
+   */
+  public static void addPlugin(JsonObject manifest) {
+    plugins.computeIfAbsent(manifest.get("name").asString(""), name -> new Pair<>(manifest, new ArrayList<>()));
+  }
+
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
     logoImage.setImage(new Image(getClass().getResourceAsStream("chunky.png")));
 
     ghContributors.setBorder(Border.EMPTY);
@@ -93,10 +112,6 @@ public class CreditsController implements Initializable {
   private void launchAndReset(Hyperlink link, String url) {
     ChunkyFx.launchUrl(url);
     link.setVisited(false);
-  }
-
-  public static void addPlugin(JsonObject manifest) {
-    plugins.computeIfAbsent(manifest.get("name").asString(""), name -> new Pair<>(manifest, new ArrayList<>()));
   }
 
   private Collection<Node> buildBox(Pair<JsonObject, List<Node>> data) {
