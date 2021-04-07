@@ -55,7 +55,7 @@ public class CreditsController implements Initializable {
    * @param name The name of the plugin. Must be the same as declared in the plugin manifest. Is case sensitive.
    */
   @PluginApi
-  public List<Node> getPluginChildren(String name) {
+  public static List<Node> getPluginChildren(String name) {
     return plugins.get(name).getSecond();
   }
 
