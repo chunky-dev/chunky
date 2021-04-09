@@ -18,42 +18,33 @@ package se.llbit.chunky.model;
 
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.AABB;
-import se.llbit.math.Ray;
 
 /**
  * Beacon block.
  *
  * @author Jesper Öqvist <jesper@llbit.se>
  */
-public class BeaconModel {
-  private static final AABB[] boxes = {new AABB(0, 1, 0, 1, 0, 1),
+public class BeaconModel extends AABBModel {
+  private static final AABB[] boxes = {
+      new AABB(0, 1, 0, 1, 0, 1),
       new AABB(3 / 16., 13 / 16., 3 / 16., 13 / 16., 3 / 16., 13 / 16.),
-      new AABB(2 / 16., 14 / 16., 0, 3 / 16., 2 / 16., 14 / 16.),};
+      new AABB(2 / 16., 14 / 16., 0, 3 / 16., 2 / 16., 14 / 16.)
+  };
 
-  private static final Texture[] tex = {Texture.glass, Texture.beacon, Texture.obsidian,};
+  private static final Texture[][] textures = {
+      {Texture.glass, Texture.glass, Texture.glass, Texture.glass, Texture.glass, Texture.glass},
+      {Texture.beacon, Texture.beacon, Texture.beacon, Texture.beacon, Texture.beacon, Texture.beacon},
+      {Texture.obsidian, Texture.obsidian,Texture.obsidian,Texture.obsidian,Texture.obsidian,Texture.obsidian}
+  };
 
-  /**
-   * Find intersection between ray and block.
-   *
-   * @return <code>true</code> if the ray intersected the block
-   */
-  public static boolean intersect(Ray ray) {
-    boolean hit = false;
-    ray.t = Double.POSITIVE_INFINITY;
-    for (int i = 0; i < boxes.length; ++i) {
-      if (boxes[i].intersect(ray)) {
-        float[] color = tex[i].getColor(ray.u, ray.v);
-        if (color[3] > Ray.EPSILON) {
-          ray.color.set(color);
-          ray.t = ray.tNext;
-          hit = true;
-        }
-      }
-    }
-    if (hit) {
-      ray.distance += ray.t;
-      ray.o.scaleAdd(ray.t, ray.d);
-    }
-    return hit;
+
+  @Override
+  public AABB[] getBoxes() {
+    return boxes;
+  }
+
+  @Override
+  public Texture[][] getTextures() {
+    return textures;
   }
 }

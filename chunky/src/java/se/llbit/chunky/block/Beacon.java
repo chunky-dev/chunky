@@ -3,13 +3,15 @@ package se.llbit.chunky.block;
 import se.llbit.chunky.entity.BeaconBeam;
 import se.llbit.chunky.entity.Entity;
 import se.llbit.chunky.model.BeaconModel;
+import se.llbit.chunky.model.BlockModel;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
 import se.llbit.math.Ray;
 import se.llbit.math.Vector3;
 import se.llbit.nbt.CompoundTag;
 
-public class Beacon extends MinecraftBlockTranslucent {
+public class Beacon extends MinecraftBlockTranslucent implements ModelBlock {
+  private static BeaconModel model = new BeaconModel();
 
   public Beacon() {
     super("beacon", Texture.beacon);
@@ -18,7 +20,7 @@ public class Beacon extends MinecraftBlockTranslucent {
   }
 
   @Override public boolean intersect(Ray ray, Scene scene) {
-    return BeaconModel.intersect(ray);
+    return model.intersect(ray, scene);
   }
 
   @Override
@@ -32,6 +34,11 @@ public class Beacon extends MinecraftBlockTranslucent {
     if (entityTag.get("Levels").intValue(0) > 0) {
       return new BeaconBeam(position);
     }
+    return null;
+  }
+
+  @Override
+  public BlockModel getModel() {
     return null;
   }
 }
