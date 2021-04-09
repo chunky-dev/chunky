@@ -12,6 +12,17 @@ import se.llbit.math.Ray;
  */
 public abstract class AABBModel implements BlockModel {
 
+  /**
+   * Different UV mapping methods.
+   *  - None: No change in mapping
+   *  - ROTATE_90: Rotate 90 degrees clockwise
+   *  - ROTATE_180: Rotate 180 degrees
+   *  - ROTATE_270: Rotate 270 degrees clockwise (90 degrees counterclockwise)
+   *  - FLIP_U: Flip along the X axis (u = 1 - u)
+   *  - FLIP_V: Flip along the Y axis (v = 1 - v)
+   *
+   * Note: a value of {@code null} is equivalent to {@code NONE}
+   */
   public enum UVMapping {
     NONE,
     ROTATE_90,
@@ -34,13 +45,15 @@ public abstract class AABBModel implements BlockModel {
 
   @PluginApi
   public UVMapping[][] getUVMapping() {
-    return null;
+    Texture[][] textureSize = this.getTextures();
+    return new UVMapping[textureSize.length][textureSize[0].length];
   }
 
   @Override
   public boolean intersect(Ray ray, Scene scene) {
     AABB[] boxes = getBoxes();
     Texture[][] textures = getTextures();
+    UVMapping[][] mapping = getUVMapping();
     TintType[][] tintedFaces = getTintedFaces();
 
     boolean hit = false;
@@ -50,24 +63,24 @@ public abstract class AABBModel implements BlockModel {
         TintType[] tintedFacesBox = tintedFaces != null ? tintedFaces[i] : null;
         if (ray.n.y > 0) { // top
           ray.v = 1 - ray.v;
-          if (intersectFace(ray, scene, textures[i][4],
+          if (intersectFace(ray, scene, textures[i][4], mapping[i][4],
               tintedFacesBox != null ? tintedFacesBox[4] : TintType.NONE)) {
             hit = true;
           }
         } else if (ray.n.y < 0) { // bottom
-          hit = intersectFace(ray, scene, textures[i][5],
+          hit = intersectFace(ray, scene, textures[i][5], mapping[i][5],
               tintedFacesBox != null ? tintedFacesBox[5] : TintType.NONE) || hit;
         } else if (ray.n.z < 0) { // north
-          hit = intersectFace(ray, scene, textures[i][0],
+          hit = intersectFace(ray, scene, textures[i][0], mapping[i][0],
               tintedFacesBox != null ? tintedFacesBox[0] : TintType.NONE) || hit;
         } else if (ray.n.z > 0) { // south
-          hit = intersectFace(ray, scene, textures[i][2],
+          hit = intersectFace(ray, scene, textures[i][2], mapping[i][2],
               tintedFacesBox != null ? tintedFacesBox[2] : TintType.NONE) || hit;
         } else if (ray.n.x < 0) { // west
-          hit = intersectFace(ray, scene, textures[i][3],
+          hit = intersectFace(ray, scene, textures[i][3], mapping[i][3],
               tintedFacesBox != null ? tintedFacesBox[3] : TintType.NONE) || hit;
         } else if (ray.n.x > 0) { // east
-          hit = intersectFace(ray, scene, textures[i][1],
+          hit = intersectFace(ray, scene, textures[i][1], mapping[i][1],
               tintedFacesBox != null ? tintedFacesBox[1] : TintType.NONE) || hit;
         }
         if (hit) {
@@ -85,14 +98,40 @@ public abstract class AABBModel implements BlockModel {
     return hit;
   }
 
-  private boolean intersectFace(Ray ray, Scene scene, Texture texture, TintType tintType) {
+  private boolean intersectFace(Ray ray, Scene scene, Texture texture, UVMapping mapping, TintType tintType) {
     // This is the method that handles intersecting faces of all AABB-based models.
     // Do normal mapping, parallax occlusion mapping, specular maps and all the good stuff here!
 
     if (texture == null) {
       return false;
     }
-    // TODO uv mapping (rotation, flipping)
+
+    double tmp;
+    if (mapping != null) {
+      switch (mapping) {
+        case ROTATE_90:
+          tmp = ray.u;
+          ray.u = 1 - ray.v;
+          ray.v = tmp;
+          break;
+        case ROTATE_180:
+          ray.u = 1 - ray.u;
+          ray.v = 1 - ray.v;
+          break;
+        case ROTATE_270:
+          tmp = ray.v;
+          ray.v = 1 - ray.u;
+          ray.u = tmp;
+          break;
+        case FLIP_U:
+          ray.u = 1 - ray.u;
+          break;
+        case FLIP_V:
+          ray.v = 1 - ray.v;
+          break;
+      }
+    }
+
     float[] color = texture.getColor(ray.u, ray.v);
     if (color[3] > Ray.EPSILON) {
       if (tintType != TintType.NONE) {
