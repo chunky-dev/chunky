@@ -154,7 +154,8 @@ public final class ImageLoader {
     DataBufferInt dataBuffer = (DataBufferInt) image.getRaster().getDataBuffer();
     int[] data = dataBuffer.getData();
     BitmapImage bitmap = new BitmapImage(width, height);
-    System.arraycopy(data, 0, bitmap.data, 0, width * height);
+    for (int i = 0; i<height; i++)
+      System.arraycopy(data, i*width, bitmap.data[i], 0, width);
     return bitmap;
   }
 }

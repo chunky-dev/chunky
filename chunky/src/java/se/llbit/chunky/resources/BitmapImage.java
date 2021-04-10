@@ -27,7 +27,7 @@ import org.apache.commons.math3.util.FastMath;
  * if concurrent modification of pixels needs to be done.
  */
 public class BitmapImage {
-  protected final int[][] data;
+  public final int[][] data;
   public final int width;
   public final int height;
 
