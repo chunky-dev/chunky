@@ -186,10 +186,10 @@ public class RenderDumpTests {
     byte[] save = outputStream.toByteArray();
 
     // CompressedFloatDumpFormat -> 5945, 0x9792E1E1
-    // UncompressedSppDump -> 11268, 0xD8D57CA6
-    // IntegratedSppDumpFormat -> 351, 0x9C379F88
-    assertEquals(351, save.length);
-    assertEquals(0x9C379F88, Arrays.hashCode(save));
+    // UncompressedSppDump -> 11268, 0xC8E95803
+    // IntegratedSppDumpFormat -> 347,
+    assertEquals(347, save.length);
+    assertEquals(0xC8E95803, Arrays.hashCode(save));
 //    assertArrayEquals(getTestDump(dumpName), save);
 
     // Generate BASE64 string for `testDumps`:
