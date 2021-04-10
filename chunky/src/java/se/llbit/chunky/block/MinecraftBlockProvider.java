@@ -865,6 +865,10 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:oxidized_cut_copper",
       "minecraft:oxidized_cut_copper_slab",
       "minecraft:oxidized_cut_copper_stairs",
+      "minecraft:waxed_oxidized_copper",
+      "minecraft:waxed_oxidized_cut_copper",
+      "minecraft:waxed_oxidized_cut_copper_slab",
+      "minecraft:waxed_oxidized_cut_copper_stairs",
       "minecraft:weeping_vines",
       "minecraft:weeping_vines_plant",
       "minecraft:wet_sponge",
@@ -2697,6 +2701,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "waxed_weathered_copper":
         return new MinecraftBlock(name, Texture.weatheredCopper);
       case "oxidized_copper":
+      case "waxed_oxidized_copper":
         return new MinecraftBlock(name, Texture.oxidizedCopper);
       case "cut_copper":
       case "waxed_cut_copper":
@@ -2708,6 +2713,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "waxed_weathered_cut_copper":
         return new MinecraftBlock(name, Texture.weatheredCutCopper);
       case "oxidized_cut_copper":
+      case "waxed_oxidized_cut_copper":
         return new MinecraftBlock(name, Texture.oxidizedCutCopper);
       case "cut_copper_stairs":
       case "waxed_cut_copper_stairs":
@@ -2719,6 +2725,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "waxed_weathered_cut_copper_stairs":
         return stairs(tag, Texture.weatheredCutCopper);
       case "oxidized_cut_copper_stairs":
+      case "waxed_oxidized_cut_copper_stairs":
         return stairs(tag, Texture.oxidizedCutCopper);
       case "cut_copper_slab":
       case "waxed_cut_copper_slab":
@@ -2730,6 +2737,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       case "waxed_weathered_cut_copper_slab":
         return slab(tag, Texture.weatheredCutCopper);
       case "oxidized_cut_copper_slab":
+      case "waxed_oxidized_cut_copper_slab":
         return slab(tag, Texture.oxidizedCutCopper);
       case "lava_cauldron":
         return new LavaCauldron();

@@ -17,6 +17,9 @@
  */
 package se.llbit.resources;
 
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.io.ByteArrayOutputStream;
 import se.llbit.chunky.resources.BitmapImage;
 import se.llbit.log.Log;
 
@@ -37,6 +40,13 @@ import java.net.URL;
 public final class ImageLoader {
   /** The missing image is a 16x16 image with black background and red border and cross. */
   public final static BitmapImage missingImage;
+
+  /**
+   * ImageIO doesn't support PNGs with RGB and a transparent color before JDK 11. Since Chunky only
+   * supports Java 8 and 11+, this is a reasonable check.
+   * https://bugs.java.com/bugdatabase/view_bug.do?bug_id=6788458
+   */
+  private static final boolean IMAGEIO_PNG_TRANSPARENT_COLOR_SUPPORTED = !System.getProperty("java.version").startsWith("1.");
 
   static {
     missingImage = new BitmapImage(16, 16);
@@ -80,6 +90,18 @@ public final class ImageLoader {
   }
 
   public static BitmapImage read(InputStream in) throws IOException {
+    // TODO remove this when java 8 support is dropped
+    if (!IMAGEIO_PNG_TRANSPARENT_COLOR_SUPPORTED) {
+      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+      int nRead;
+      byte[] data = new byte[4096];
+      while ((nRead = in.read(data, 0, data.length)) != -1) {
+        buffer.write(data, 0, nRead);
+      }
+      Image img = Toolkit.getDefaultToolkit().createImage(buffer.toByteArray());
+      return fromAwtImage(img);
+    }
+
     return fromBufferedImage(ImageIO.read(in));
   }
 
@@ -108,4 +130,31 @@ public final class ImageLoader {
     return new BitmapImage(dataBuffer.getData(), width, height);
   }
 
+  /**
+   * Converts an AWT Image to BitmapImage.
+   */
+  private static BitmapImage fromAwtImage(Image newImage) {
+    {
+      // AWT Image doesn't load until it is used so we draw it onto a 1x1 BufferedImage and wait
+      // until it is drawn
+      BufferedImage tmp = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+      Graphics g = tmp.getGraphics();
+      while (!g.drawImage(newImage, 0, 0, null)) {}
+      g.dispose();
+    }
+
+    int width = newImage.getWidth(null);
+    int height = newImage.getHeight(null);
+    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    Graphics g = image.createGraphics();
+    g.drawImage(newImage, 0, 0, null);
+    g.dispose();
+
+    // Copy the BufferedImage data into a new bitmap image.
+    DataBufferInt dataBuffer = (DataBufferInt) image.getRaster().getDataBuffer();
+    int[] data = dataBuffer.getData();
+    BitmapImage bitmap = new BitmapImage(width, height);
+    System.arraycopy(data, 0, bitmap.data, 0, width * height);
+    return bitmap;
+  }
 }
