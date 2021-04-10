@@ -270,14 +270,6 @@ public class RenderCanvasFx extends ScrollPane implements Repaintable, SceneStat
           renderScene.camera().moveDown(modifier);
           e.consume();
           break;
-        case J:
-          renderScene.camera().moveBackward(modifier);
-          e.consume();
-          break;
-        case K:
-          renderScene.camera().moveForward(modifier);
-          e.consume();
-          break;
         case SPACE:
           synchronized (renderScene) {
             if (renderScene.getMode() == RenderMode.RENDERING) {
