@@ -111,7 +111,6 @@ class IntegratedSppDumpFormat extends DumpFormat {
     }
 
     gos.write(SECTION_HEADER_EOF.getBytes());
-    gos.write(new byte[512]);
     gos.close();
   }
 
