@@ -23,10 +23,8 @@
       <Label text="D strafe right"/>
       <Label text="R move up"/>
       <Label text="F move down"/>
-      <Label text="U toggle fullscreen mode"/>
-      <Label text="K move forward x100"/>
-      <Label text="J move backward x100"/>
       <Label/>
       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Holding SHIFT makes the basic movement keys move 0.1 of the normal speed." wrappingWidth="251.2109375" />
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Holding CTRL makes the basic movement keys move 100 of the normal speed." wrappingWidth="251.2109375" />
    </VBox>
 </fx:root>
