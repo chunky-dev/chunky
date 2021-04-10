@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.nio.ByteBuffer;
 import java.util.function.LongConsumer;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * This is a dump format for chunky that should allow for storing of SPP per pixel in addition to actual sample values,
@@ -40,17 +42,15 @@ import java.util.function.LongConsumer;
  *         POSSIBLE SOLUTION: deflate SPP counts before samples, which will lead to tiny storage for SPP, which can be
  *                            pulled from as needed.
  */
-class UncompressedSppDump extends DumpFormat {
+class IntegratedSppDumpFormat extends DumpFormat {
 
-  public static final DumpFormat INSTANCE = new UncompressedSppDump();
+  public static final DumpFormat INSTANCE = new IntegratedSppDumpFormat();
 
   // These must be 3 characters each. Just because.
   public static final String SECTION_HEADER_SAMPLES = "sam";
-  // SECTION_HEADER_SPP has been joined into SECTION_HEADER_SAMPLES to make merging more memory efficient.
-  //public static final String SECTION_HEADER_SPP = "spp";
   public static final String SECTION_HEADER_EOF = "dun";
 
-  private UncompressedSppDump() {
+  private IntegratedSppDumpFormat() {
   }
 
   @Override
@@ -80,7 +80,7 @@ class UncompressedSppDump extends DumpFormat {
       outputStream.writeLong(scene.renderTime);
 
       // For future use; flags for gzip'd data / SPP interleaving or as an array?
-      long saveflags = 0x0000000000000000L;
+      long saveflags = 0x0000000000000001L;
       outputStream.writeLong(saveflags);
 
       if (pixelRange.widthX()<=0 || pixelRange.widthZ()<=0)
@@ -88,10 +88,10 @@ class UncompressedSppDump extends DumpFormat {
     }
 
     //****SAMPLES****//
-    outputStream.writeChars(SECTION_HEADER_SAMPLES);
+    GZIPOutputStream gos = new GZIPOutputStream(outputStream);
+    gos.write(SECTION_HEADER_SAMPLES.getBytes());
     int taskCoef = pixelRange.widthX();
     try (TaskTracker.Task task = taskTracker.task("Saving render dump - Samples", taskCoef * pixelRange.widthZ())) {
-
       // compile and write each row as tuples of <red, green, blue, spp> in a byte buffer.
       // Have enough space for an entire row of pixels which have 3 doubles and an integer per pixel.
       ByteBuffer bb = ByteBuffer.allocate(3*(pixelRange.xmax-pixelRange.xmin)*Double.BYTES+samples.rowSizeSpp*Integer.BYTES);
@@ -103,15 +103,16 @@ class UncompressedSppDump extends DumpFormat {
           bb.putInt(samples.getSpp(x, y));
         }
         // Write the compiled row
-        outputStream.write(bb.array());
+        gos.write(bb.array());
         // Reset buffer so it can be reused.
         bb.rewind();
         task.update(taskCoef * (y - pixelRange.zmin));
       }
     }
 
-    outputStream.writeChars(SECTION_HEADER_EOF);
-    outputStream.close();
+    gos.write(SECTION_HEADER_EOF.getBytes());
+    gos.write(new byte[512]);
+    gos.close();
   }
 
   @Override
@@ -154,29 +155,38 @@ class UncompressedSppDump extends DumpFormat {
       // For future use; flags for gzip'd data / SPP interleaving or as an array?
       long flags = inputStream.readLong();
     }
+    GZIPInputStream gis = new GZIPInputStream(inputStream);
 
-    if (!("" + inputStream.readChar() + inputStream.readChar() + inputStream.readChar()).equals(SECTION_HEADER_SAMPLES))
-      throw new StreamCorruptedException("Expected Sample Marker");
+    byte[] strRead = new byte[3];
+    gis.read(strRead);
+    if (!(new String(strRead)).equals(SECTION_HEADER_SAMPLES))
+      throw new StreamCorruptedException("Expected Sample Marker, received \"" + new String(strRead) + "\" instead");
 
-    ByteBuffer bb = ByteBuffer.allocate(width*Double.BYTES*3+width*Integer.BYTES);
+    int g = width*(Double.BYTES*3+Integer.BYTES);
+    ByteBuffer bb = ByteBuffer.allocate(g);
+
     int taskCoef = scene.renderWidth();
     try (TaskTracker.Task task = taskTracker.task("Loading render dump - Samples", taskCoef * scene.renderHeight())) {
       for (int y = 0; y < height; y++) {
-        inputStream.readFully(bb.array(), 0, bb.capacity());
+        // Read Bytes From File (in a loop cuz gzip is weird)
+        for (int v=0; v<g; v += gis.read(bb.array(), v, g - v));
+        // Move back to the beginning of buffer to process:
         bb.rewind();
         for (int x = 0; x < width; x++) {
           samples.setPixel(x, y, bb.getDouble(), bb.getDouble(), bb.getDouble());
           samples.setSpp(x, y, bb.getInt());
         }
+        // Row read; reset buffer & update progress bar.
         bb.rewind();
         task.update(taskCoef * y);
       }
     }
 
-    if (!("" + inputStream.readChar() + inputStream.readChar() + inputStream.readChar()).equals(SECTION_HEADER_EOF))
-      throw new StreamCorruptedException("Expected Done Marker");
+    gis.read(strRead);
+    if (!(new String(strRead)).equals(SECTION_HEADER_EOF))
+      throw new StreamCorruptedException("Expected Done Marker, received \""+new String(strRead)+"\" instead");
 
-    inputStream.close();
+    gis.close();
   }
 
   @Override

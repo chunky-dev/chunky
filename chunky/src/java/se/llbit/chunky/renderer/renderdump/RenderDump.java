@@ -17,7 +17,6 @@
 package se.llbit.chunky.renderer.renderdump;
 
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.util.TaskTracker;
 
@@ -46,7 +45,7 @@ public class RenderDump {
       case 1:
         return CompressedFloatDumpFormat.INSTANCE;
       case 2:
-        return UncompressedSppDump.INSTANCE;
+        return IntegratedSppDumpFormat.INSTANCE;
       default:
         return ClassicDumpFormat.INSTANCE;
     }
