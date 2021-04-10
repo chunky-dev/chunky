@@ -147,7 +147,7 @@ public class RenderDumpTests {
     Scene scene = createTestScene(7, 5, 0, 0);
     scene.width=7;scene.height=5;
 
-    RenderDump.load(UNCOMPRESSED_DUMP_WITH_SPP_A.get(), scene, taskTracker);
+    RenderDump.load(INTEGRATED_DUMP_WITH_SPP_A.get(), scene, taskTracker);
 //    ByteArrayInputStream inputStream = new ByteArrayInputStream(getTestDump("IntegratedSppFormatDump"));
 //    RenderDump.load(inputStream, scene, taskTracker);
 
@@ -160,12 +160,12 @@ public class RenderDumpTests {
     assertEquals("Read IntegratedSppDump spp 0", 0, scene.getSampleBuffer().getSpp(1,1));
     assertEquals("Read IntegratedSppDump spp", 3, scene.getSampleBuffer().getSpp(0,2));
     assertEquals("Read IntegratedSppDump spp", 15, scene.getSampleBuffer().getSpp(1,2));
-    assertArrayEquals("Read IntegratedSppDump spp", UNCOMPRESSED_SPP_A, compileSampleBufferSpp(scene.getSampleBuffer(), 4, 4));
+    assertArrayEquals("Read IntegratedSppDump spp", INTEGRATED_SPP_A, compileSampleBufferSpp(scene.getSampleBuffer(), 4, 4));
 
-    RenderDump.merge(UNCOMPRESSED_DUMP_WITH_SPP_B.get(), scene, taskTracker);
+    RenderDump.merge(INTEGRATED_DUMP_WITH_SPP_B.get(), scene, taskTracker);
 
 
-    assertArrayEquals("Merge UncompressedSppDump spp", UNCOMPRESSED_SPP_MERGED, compileSampleBufferSpp(scene.getSampleBuffer()));
+    assertArrayEquals("Merge IntegratedSppDump spp", INTEGRATED_SPP_MERGED, compileSampleBufferSpp(scene.getSampleBuffer()));
 //    assertArrayEquals(expected, compileSampleBuffer(scene.getSampleBuffer()));
   }
 
@@ -246,20 +246,20 @@ public class RenderDumpTests {
   }};
 
   // These are duplicated below where it is interleaved with sample values.
-  public static final int[] UNCOMPRESSED_SPP_A = new int[]{
+  public static final int[] INTEGRATED_SPP_A = new int[]{
       0,  0,    2,   1,
       0,  0,    0,  50,
       3, 15, 1200, 730,
       0,  7,    0,   0
   };
   // These are duplicated below where it is interleaved with sample values.
-  public static final int[] UNCOMPRESSED_SPP_B = new int[]{
+  public static final int[] INTEGRATED_SPP_B = new int[]{
         0,   0, 1,
         0,   1, 0,
         2,  50, 0,
       600, 730, 5
   };
-  public static final int[] UNCOMPRESSED_SPP_MERGED = new int[]{
+  public static final int[] INTEGRATED_SPP_MERGED = new int[]{
       0,  0,    0,    0, 1,
       0,  0,    2,    2, 0,
       0,  0,    2,  100, 0,
@@ -267,7 +267,7 @@ public class RenderDumpTests {
       0,  7,    0,    0, 0
   };
 
-  public static final TestStreamBuilder UNCOMPRESSED_DUMP_WITH_SPP_A =
+  public static final TestStreamBuilder INTEGRATED_DUMP_WITH_SPP_A =
       new TestStreamBuilder(
           RenderDump.DUMP_FORMAT_MAGIC_NUMBER,     // File Header
           2,          // Version
@@ -288,7 +288,7 @@ public class RenderDumpTests {
 
           "dun"       // Completion Marker
       );
-  public static final TestStreamBuilder UNCOMPRESSED_DUMP_WITH_SPP_B =
+  public static final TestStreamBuilder INTEGRATED_DUMP_WITH_SPP_B =
       new TestStreamBuilder(
           RenderDump.DUMP_FORMAT_MAGIC_NUMBER,     // File Header
           2,          // Version
