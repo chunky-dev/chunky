@@ -432,6 +432,7 @@ public class MinecraftBlockProvider implements BlockProvider {
       "minecraft:lava",
       "minecraft:lectern",
       "minecraft:lever",
+      "minecraft:light",
       "minecraft:light_blue_banner",
       "minecraft:light_blue_bed",
       "minecraft:light_blue_candle_cake",
@@ -2867,6 +2868,8 @@ public class MinecraftBlockProvider implements BlockProvider {
         return new MinecraftBlock(name, Texture.deepslateCopperOre);
       case "deepslate_emerald_ore":
         return new MinecraftBlock(name, Texture.deepslateEmeraldOre);
+      case "light":
+        return new LightBlock(name, BlockProvider.stringToInt(tag.get("Properties").get("level"), 15));
       case "structure_void":
       case "barrier":
         // Invisible.
