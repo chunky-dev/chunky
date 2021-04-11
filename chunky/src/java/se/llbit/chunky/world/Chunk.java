@@ -145,7 +145,7 @@ public class Chunk {
    * Parse the chunk from the region file and render the current
    * layer, surface and cave maps.
    */
-  public synchronized void loadChunk(ChunkData chunkData) {
+  public synchronized void loadChunk(ChunkData chunkData, int yMax) {
     if (!shouldReloadChunk()) {
       return;
     }
@@ -163,7 +163,7 @@ public class Chunk {
 
     surfaceTimestamp = dataTimestamp;
     version = chunkVersion(data);
-    loadSurface(data, chunkData);
+    loadSurface(data, chunkData, yMax);
     biomesTimestamp = dataTimestamp;
     if (surface == IconLayer.MC_1_12) {
       biomes = IconLayer.MC_1_12;
@@ -173,7 +173,7 @@ public class Chunk {
     world.chunkUpdated(position);
   }
 
-  private void loadSurface(Map<String, Tag> data, ChunkData chunkData) {
+  private void loadSurface(Map<String, Tag> data, ChunkData chunkData, int yMax) {
     if (data == null) {
       surface = IconLayer.CORRUPT;
       return;
@@ -188,7 +188,7 @@ public class Chunk {
         loadBlockData(data, chunkData, palette);
         int[] heightmapData = extractHeightmapData(data, chunkData);
         updateHeightmap(heightmap, position, chunkData, heightmapData, palette);
-        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette);
+        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, yMax);
         queueTopography();
       } else if (version.equals("1.12")) {
         surface = IconLayer.MC_1_12;

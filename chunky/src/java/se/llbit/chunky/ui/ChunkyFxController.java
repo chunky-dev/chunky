@@ -128,6 +128,7 @@ public class ChunkyFxController
   @FXML private ToggleButton netherBtn;
   @FXML private ToggleButton endBtn;
   @FXML private IntegerAdjuster scale;
+  @FXML private IntegerAdjuster yMax;
   @FXML private ToggleButton trackPlayerBtn;
   @FXML private ToggleButton trackCameraBtn;
   @FXML private Tab mapViewTab;
@@ -399,8 +400,7 @@ public class ChunkyFxController
         mapCanvas, mapOverlay);
 
     mapLoader.addWorldLoadListener(
-        world -> {
-          chunkSelection.clearSelection();
+        (world, reloaded) -> {
           world.addChunkDeletionListener(chunkSelection);
           Optional<Vector3> playerPos = world.playerPos();
           world.addChunkUpdateListener(map);
@@ -424,6 +424,15 @@ public class ChunkyFxController
 
           Platform.runLater(
               () -> {
+                if (!reloaded) {
+                  if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
+                    yMax.setRange(-64, 320);
+                    yMax.set(320);
+                  } else {
+                    yMax.setRange(0, 256);
+                    yMax.set(256);
+                  }
+                }
                 mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
                 map.redrawMap();
                 mapName.setText(world.levelName());
@@ -491,6 +500,10 @@ public class ChunkyFxController
     }));
     scale.valueProperty().addListener(new GroupedChangeListener<>(group,
         (observable, oldValue, newValue) -> mapView.setScale(newValue.intValue())));
+    yMax.valueProperty().addListener(new GroupedChangeListener<>(group, (observable, oldValue, newValue) -> {
+      mapView.setYMax(newValue.intValue());
+      mapLoader.reloadWorld();
+    }));
 
     // Add map view listener to control the individual value properties.
     mapView.getMapViewProperty().addListener(new GroupedChangeListener<>(group,
