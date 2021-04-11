@@ -401,6 +401,9 @@ public class ChunkyFxController
 
     mapLoader.addWorldLoadListener(
         (world, reloaded) -> {
+          if (!reloaded) {
+            chunkSelection.clearSelection();
+          }
           world.addChunkDeletionListener(chunkSelection);
           Optional<Vector3> playerPos = world.playerPos();
           world.addChunkUpdateListener(map);
@@ -424,6 +427,9 @@ public class ChunkyFxController
 
           Platform.runLater(
               () -> {
+                if (!reloaded || trackPlayer.getValue()) {
+                  mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
+                }
                 if (!reloaded) {
                   if (mapLoader.getWorld().getVersionId() >= World.VERSION_21W06A) {
                     yMax.setRange(-64, 320);
@@ -433,7 +439,6 @@ public class ChunkyFxController
                     yMax.set(256);
                   }
                 }
-                mapView.panTo(playerPos.orElse(new Vector3(0, 0, 0)));
                 map.redrawMap();
                 mapName.setText(world.levelName());
                 showWorldMap();
