@@ -63,7 +63,7 @@ public class StonecutterModel {
                     new Vector3(15 / 16.0, 16 / 16.0, 8 / 16.0),
                     new Vector3(1 / 16.0, 16 / 16.0, 8 / 16.0),
                     new Vector3(15 / 16.0, 9 / 16.0, 8 / 16.0),
-                    new Vector4(15 / 16.0, 1 / 16.0, 7 / 16.0, 0 / 16.0)
+                    new Vector4(1 / 16.0, 15 / 16.0, 7 / 16.0, 0 / 16.0)
             )
     };
 
