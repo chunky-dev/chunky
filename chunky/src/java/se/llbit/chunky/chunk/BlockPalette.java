@@ -377,6 +377,13 @@ public class BlockPalette {
     materialProperties.put("minecraft:tall_seagrass", block -> {
       block.waterlogged = true;
     });
+    materialProperties.put("minecraft:sea_pickle", block -> {
+      if (block instanceof SeaPickle) {
+        if (((SeaPickle) block).live) {
+          block.emittance = 1.0f / 15f * (3 * ((SeaPickle) block).pickles + 1);
+        }
+      }
+    });
     materialProperties.put("minecraft:campfire", block -> {
       if (block instanceof Campfire && ((Campfire)block).isLit) {
         block.emittance = 1.0f;
