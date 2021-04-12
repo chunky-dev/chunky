@@ -268,12 +268,12 @@ public class Chunk {
     }
     Tag heightmapsTag = data.get(LEVEL_HEIGHTMAPS);
     if(heightmapsTag.isCompoundTag()) {
-      Tag world_surface = heightmapsTag.asCompound().get("WORLD_SURFACE");
-      if(world_surface.isLongArray(0)) {
+      Tag oceanFloor = heightmapsTag.asCompound().get("OCEAN_FLOOR");
+      if(oceanFloor.isLongArray(0)) {
         if (data.get(DATAVERSION).intValue() >= DATAVERSION_20w17a) { //elements are not packed between longs
-          return extractHeightmapPost20w17a(world_surface.longArray());
+          return extractHeightmapPost20w17a(oceanFloor.longArray());
         } else { //elements are packed between longs
-          return extractHeightmapPre20w17a(world_surface.longArray());
+          return extractHeightmapPre20w17a(oceanFloor.longArray());
         }
       }
     }
