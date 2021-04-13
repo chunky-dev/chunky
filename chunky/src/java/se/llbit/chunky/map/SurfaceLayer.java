@@ -52,13 +52,16 @@ public class SurfaceLayer extends BitmapLayer {
   public SurfaceLayer(int dim, ChunkData chunkData, BlockPalette palette, int[] heightmapData) {
     bitmap = new int[Chunk.X_MAX * Chunk.Z_MAX];
     topo = new int[Chunk.X_MAX * Chunk.Z_MAX];
+
+    int airIdx = palette.airId;
+
     for (int x = 0; x < Chunk.X_MAX; ++x) {
       for (int z = 0; z < Chunk.Z_MAX; ++z) {
         // Find the topmost non-empty block.
         int y = heightmapData[x*Chunk.X_MAX + z]-1;
         int minY = chunkData.minY();
         while (y > minY) {
-          if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
+          if (chunkData.getBlockAt(x, y, z) != airIdx) {
             break;
           }
           --y;
@@ -66,13 +69,13 @@ public class SurfaceLayer extends BitmapLayer {
         if (dim == -1) {
           // Nether worlds have a ceiling that we want to skip.
           while (y > minY+1) {
-            if (palette.get(chunkData.getBlockAt(x, y, z)) == Air.INSTANCE) {
+            if (chunkData.getBlockAt(x, y, z) == airIdx) {
               break;
             }
             --y;
           }
           while (y > minY+1) {
-            if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
+            if (chunkData.getBlockAt(x, y, z) != airIdx) {
               break;
             }
             --y;
@@ -85,7 +88,7 @@ public class SurfaceLayer extends BitmapLayer {
           Block block = palette.get(chunkData.getBlockAt(x, y, z));
           float[] blockColor = new float[4];
           ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
-          int biomeId = 0xFF & chunkData.getBiomeAt(x, 0, z);
+          int biomeId = chunkData.getBiomeAt(x, 0, z);
 
           if (block instanceof Leaves) {
             ColorUtil.getRGBComponents(Biomes.getFoliageColor(biomeId), blockColor);
@@ -141,8 +144,8 @@ public class SurfaceLayer extends BitmapLayer {
           }
         }
 
-        bitmap[x * 16 + z] = ColorUtil.getArgb(color[0], color[1], color[2], color[3]);
-        topo[x * 16 + z] = bitmap[x * 16 + z];
+        bitmap[(x << 4) + z] = ColorUtil.getArgb(color[0], color[1], color[2], color[3]);
+        topo[(x << 4) + z] = bitmap[(x << 4) + z];
       }
     }
     avgColor = avgBitmapColor();
@@ -152,21 +155,21 @@ public class SurfaceLayer extends BitmapLayer {
    * Add topographical gradient to this chunk and calculate average color
    */
   @Override public synchronized void renderTopography(ChunkPosition position, Heightmap heightmap) {
-
     int cx = position.x * Chunk.X_MAX;
     int cz = position.z * Chunk.Z_MAX;
 
     float[] rgb = new float[3];
     for (int x = 0; x < 16; ++x) {
-
+      int offsetX = cx + x;
       for (int z = 0; z < 16; ++z) {
+        int offsetZ = cz + z;
 
-        ColorUtil.getRGBComponents(bitmap[x * 16 + z], rgb);
+        ColorUtil.getRGBComponents(bitmap[(x << 4) + z], rgb);
 
         float gradient =
-            (heightmap.get(cx + x, cz + z) + heightmap.get(cx + x + 1, cz + z) + heightmap
-                .get(cx + x, cz + z + 1) - heightmap.get(cx + x - 1, cz + z) - heightmap
-                .get(cx + x, cz + z - 1) - heightmap.get(cx + x - 1, cz + z - 1));
+        (heightmap.get(offsetX, offsetZ) + heightmap.get(offsetX + 1, offsetZ) + heightmap
+          .get(offsetX, offsetZ + 1) - heightmap.get(offsetX - 1, offsetZ) - heightmap
+          .get(offsetX, offsetZ - 1) - heightmap.get(offsetX - 1, offsetZ - 1));
         gradient = (float) ((FastMath.atan(gradient / 15) / (Math.PI / 1.7)) + 1);
 
         rgb[0] *= gradient;
@@ -181,7 +184,7 @@ public class SurfaceLayer extends BitmapLayer {
         rgb[2] = QuickMath.max(0.f, rgb[2]);
         rgb[2] = QuickMath.min(1.f, rgb[2]);
 
-        topo[x * 16 + z] = ColorUtil.getRGB(rgb[0], rgb[1], rgb[2]);
+        topo[(x << 4) + z] = ColorUtil.getRGB(rgb[0], rgb[1], rgb[2]);
       }
     }
   }
@@ -199,17 +202,14 @@ public class SurfaceLayer extends BitmapLayer {
   }
 
   private int avgBitmapColor() {
-    float[] avg = new float[3];
-    float[] frgb = new float[3];
+    byte[] avg = new byte[3];
     for (int i = 0; i < 16 * 16; ++i) {
-      ColorUtil.getRGBComponents(bitmap[i], frgb);
-      avg[0] += frgb[0];
-      avg[1] += frgb[1];
-      avg[2] += frgb[2];
+      avg[0] += (byte) (bitmap[i] >> 16);
+      avg[1] += (byte) (bitmap[i] >> 8);
+      avg[2] += (byte) bitmap[i];
     }
-    return ColorUtil.getRGB(avg[0] / (16 * 16), avg[1] / (16 * 16), avg[2] / (16 * 16));
+    return ColorUtil.getRGB(avg[0] / (16F * 16), avg[1] / (16F * 16), avg[2] / (16F * 16));
   }
-
   /**
    * Write a PNG scanline.
    *
