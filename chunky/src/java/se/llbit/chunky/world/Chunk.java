@@ -146,10 +146,11 @@ public class Chunk {
   /**
    * Parse the chunk from the region file and render the current
    * layer, surface and cave maps.
+   * @return whether the input chunkdata was modified
    */
-  public synchronized void loadChunk(ChunkData chunkData, int yMax) {
+  public synchronized boolean loadChunk(ChunkData chunkData, int yMax) {
     if (!shouldReloadChunk()) {
-      return;
+      return false;
     }
 
     Set<String> request = new HashSet<>();
@@ -160,7 +161,7 @@ public class Chunk {
     Map<String, Tag> data = getChunkData(request);
     // TODO: improve error handling here.
     if (data == null) {
-      return;
+      return false;
     }
 
     surfaceTimestamp = dataTimestamp;
@@ -173,6 +174,7 @@ public class Chunk {
       loadBiomes(data, chunkData);
     }
     world.chunkUpdated(position);
+    return true;
   }
 
   private void loadSurface(Map<String, Tag> data, ChunkData chunkData, int yMax) {
