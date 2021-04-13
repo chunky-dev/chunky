@@ -39,6 +39,7 @@
         </HBox>
         <IntegerAdjuster fx:id="gridSize" />
         <CheckBox fx:id="preventNormalEmitterWithSampling" mnemonicParsing="false" text="Prevent normal emitter when using emitter sampling" />
+        <CheckBox fx:id="useHeightmapData" mnemonicParsing="false" text="Use Heightmap Data" />
       </children>
       <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

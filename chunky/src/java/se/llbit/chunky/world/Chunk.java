@@ -16,6 +16,7 @@
  */
 package se.llbit.chunky.world;
 
+import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.block.Air;
 import se.llbit.chunky.block.Block;
 import se.llbit.chunky.block.Lava;
@@ -94,6 +95,8 @@ public class Chunk {
   private int biomesTimestamp = 0;
 
   private String version;
+
+  public static boolean useHeightmapData = PersistentSettings.getUseHeightmapData();
 
   public Chunk(ChunkPosition pos, World world) {
     this.world = world;
@@ -196,9 +199,27 @@ public class Chunk {
       if (version.equals("1.13")) {
         BlockPalette palette = new BlockPalette();
         loadBlockData(data, chunkData, palette);
-        int[] heightmapData = extractHeightmapData(data, chunkData);
-        updateHeightmap(heightmap, position, chunkData, heightmapData, palette);
-        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette);
+        int[] oceanFloor;
+        int[] worldSurface;
+        if(useHeightmapData) {
+          oceanFloor = extractHeightmapData(data, "OCEAN_FLOOR", chunkData);
+          worldSurface = extractHeightmapData(data, "MOTION_BLOCKING", chunkData);
+
+          updateHeightmapUnchecked(heightmap, position, oceanFloor);
+        } else {
+          oceanFloor = new int[X_MAX * Z_MAX];
+          for (int i = 0; i < oceanFloor.length; i++) {
+            oceanFloor[i] = chunkData.maxY()-1;
+          }
+          worldSurface = new int[X_MAX * Z_MAX];
+          for (int i = 0; i < worldSurface.length; i++) {
+            worldSurface[i] = chunkData.maxY()-1;
+          }
+
+          updateHeightmap(heightmap, position, chunkData, oceanFloor, palette);
+        }
+
+        surface = new SurfaceLayer(world.currentDimension(), chunkData, palette, worldSurface);
         queueTopography();
       } else if (version.equals("1.12")) {
         surface = IconLayer.MC_1_12;
@@ -261,19 +282,19 @@ public class Chunk {
     }
   }
 
-  private int[] extractHeightmapData(@NotNull Map<String, Tag> data, ChunkData chunkData) {
+  private int[] extractHeightmapData(@NotNull Map<String, Tag> data, String heightmapName, ChunkData chunkData) {
     Tag heightmapTag = data.get(LEVEL_HEIGHTMAP);
     if (heightmapTag.isIntArray(X_MAX * Z_MAX)) {
       return heightmapTag.intArray();
     }
     Tag heightmapsTag = data.get(LEVEL_HEIGHTMAPS);
     if(heightmapsTag.isCompoundTag()) {
-      Tag oceanFloor = heightmapsTag.asCompound().get("OCEAN_FLOOR");
-      if(oceanFloor.isLongArray(0)) {
+      Tag heightmap = heightmapsTag.asCompound().get(heightmapName);
+      if(heightmap.isLongArray(0)) {
         if (data.get(DATAVERSION).intValue() >= DATAVERSION_20w17a) { //elements are not packed between longs
-          return extractHeightmapPost20w17a(oceanFloor.longArray());
+          return extractHeightmapPost20w17a(heightmap.longArray());
         } else { //elements are packed between longs
-          return extractHeightmapPre20w17a(oceanFloor.longArray());
+          return extractHeightmapPre20w17a(heightmap.longArray());
         }
       }
     }
@@ -447,6 +468,16 @@ public class Chunk {
             break;
         }
         heightmap.set(y, pos.x * 16 + x, pos.z * 16 + z);
+      }
+    }
+  }
+
+  public static void updateHeightmapUnchecked(Heightmap heightmap, ChunkPosition pos, int[] chunkHeightmap) {
+    int chunkXPos = (pos.x << 4);
+    int chunkZPos = (pos.z << 4);
+    for (int x = 0; x < 16; ++x) {
+      for (int z = 0; z < 16; ++z) {
+        heightmap.set(Math.max(1, chunkHeightmap[(z << 4) + x] - 1), chunkXPos + x, chunkZPos + z);
       }
     }
   }
