@@ -198,6 +198,7 @@ public class Chunk {
       extractBiomeData(data.get(LEVEL_BIOMES), chunkData);
       if (version.equals("1.13")) {
         BlockPalette palette = new BlockPalette();
+        palette.unsynchronize();
         loadBlockData(data, chunkData, palette);
         int[] oceanFloor;
         int[] worldSurface;
