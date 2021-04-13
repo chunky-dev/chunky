@@ -57,22 +57,25 @@ public class SurfaceLayer extends BitmapLayer {
         // Find the topmost non-empty block.
         int y = heightmapData[x*Chunk.X_MAX + z]-1;
         int minY = chunkData.minY();
-        for (; y > minY; --y) {
+        while (y > minY) {
           if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
             break;
           }
+          --y;
         }
         if (dim == -1) {
           // Nether worlds have a ceiling that we want to skip.
-          for (; y > minY+1; --y) {
+          while (y > minY+1) {
             if (palette.get(chunkData.getBlockAt(x, y, z)) == Air.INSTANCE) {
               break;
             }
+            --y;
           }
-          for (; y > minY+1; --y) {
+          while (y > minY+1) {
             if (palette.get(chunkData.getBlockAt(x, y, z)) != Air.INSTANCE) {
               break;
             }
+            --y;
           }
         }
 
@@ -99,21 +102,23 @@ public class SurfaceLayer extends BitmapLayer {
             color = blend(color, blockColor);
             y -= 1;
 
-            for (; y >= minY; --y) {
+            while (y >= minY) {
               Block block1 = palette.get(chunkData.getBlockAt(x, y, z));
               if (block1.opaque) {
                 ColorUtil.getRGBAComponents(block.texture.getAvgColor(), blockColor);
                 break;
               }
+              --y;
             }
           } else if (block.isWater()) {
             int depth = 1;
             y -= 1;
-            for (; y >= minY; --y) {
+            while (y >= minY) {
               Block block1 = palette.get(chunkData.getBlockAt(x, y, z));
               if (!block1.isWater())
                 break;
               depth += 1;
+              --y;
             }
 
             ColorUtil.getRGBAComponents(Biomes.getWaterColor(biomeId), blockColor);

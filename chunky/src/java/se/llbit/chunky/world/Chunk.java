@@ -458,16 +458,20 @@ public class Chunk {
    */
   public static void updateHeightmap(Heightmap heightmap, ChunkPosition pos, ChunkData chunkData,
       int[] chunkHeightmap, BlockPalette palette) {
+    int chunkXPos = (pos.x << 4);
+    int chunkZPos = (pos.z << 4);
+
     for (int x = 0; x < 16; ++x) {
       for (int z = 0; z < 16; ++z) {
-        int y = chunkHeightmap[z * 16 + x];
+        int y = chunkHeightmap[(z << 4) + x]-1;
         y = Math.max(1, y - 1);
-        for (; y > 1; --y) {
+        while (y > 1) {
           Block block = palette.get(chunkData.getBlockAt(x, y, z));
           if (block != Air.INSTANCE && !block.isWater())
             break;
+          --y;
         }
-        heightmap.set(y, pos.x * 16 + x, pos.z * 16 + z);
+        heightmap.set(y, chunkXPos + x, chunkZPos + z);
       }
     }
   }
