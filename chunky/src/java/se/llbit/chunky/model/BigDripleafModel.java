@@ -22,7 +22,7 @@ public class BigDripleafModel {
               new Vector3(0 / 16.0, 15 / 16.0, 0 / 16.0),
               new Vector3(16 / 16.0, 15 / 16.0, 0 / 16.0),
               new Vector3(0 / 16.0, 15 / 16.0, 16 / 16.0),
-              new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 0 / 16.0)
+              new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 0 / 16.0)
           ),
           // tip
           new Quad(
@@ -35,7 +35,7 @@ public class BigDripleafModel {
               new Vector3(16 / 16.0, 15 / 16.0, 0.002 / 16.0),
               new Vector3(0 / 16.0, 15 / 16.0, 0.002 / 16.0),
               new Vector3(16 / 16.0, 11 / 16.0, 0.002 / 16.0),
-              new Vector4(16 / 16.0, 0 / 16.0, 16 / 16.0, 12 / 16.0)
+              new Vector4(0 / 16.0, 16 / 16.0, 16 / 16.0, 12 / 16.0)
           ),
           // side
           new Quad(

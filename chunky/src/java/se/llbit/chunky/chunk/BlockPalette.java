@@ -516,6 +516,11 @@ public class BlockPalette {
         block.emittance = 1.0f / 15f * 14;
       }
     });
+    materialProperties.put("minecraft:light", block -> {
+      if (block instanceof LightBlock) {
+        block.emittance = 1.0f / 15f * ((LightBlock) block).getLevel();
+      }
+    });
     return materialProperties;
   }
 
