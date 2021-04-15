@@ -1,5 +1,6 @@
 package se.llbit.chunky.block;
 
+import se.llbit.chunky.model.TexturedBlockModel;
 import se.llbit.chunky.renderer.RenderMode;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.resources.Texture;
@@ -22,6 +23,9 @@ public class LightBlock extends MinecraftBlockTranslucent {
 
   @Override
   public boolean intersect(Ray ray, Scene scene) {
+    if (scene.getMode() == RenderMode.PREVIEW) {
+      return TexturedBlockModel.intersect(ray, Texture.light);
+    }
     if (scene.getMode() != RenderMode.PREVIEW &&
         (!scene.getEmittersEnabled() || emittance < Ray.EPSILON
             || ray.depth >= scene.getRayDepth() - 1 || ray.specular)) {
