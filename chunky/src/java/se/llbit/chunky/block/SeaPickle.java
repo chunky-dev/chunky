@@ -708,8 +708,8 @@ public class SeaPickle extends MinecraftBlockTranslucent {
   };
 
   private final String description;
-  private final boolean live;
-  private int pickles;
+  public final boolean live;
+  public final int pickles;
 
   public SeaPickle(int pickles, boolean live) {
     super("sea_pickle", Texture.seaPickle);
