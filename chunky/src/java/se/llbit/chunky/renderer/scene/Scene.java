@@ -319,6 +319,11 @@ public class Scene implements JsonSerializable, Refreshable {
    */
   public int previewCount;
 
+  /**
+   * Current time. Increments animated textures like fire.
+   */
+  public int time = 0;
+
   private WorldTexture grassTexture = new WorldTexture();
   private WorldTexture foliageTexture = new WorldTexture();
   private WorldTexture waterTexture = new WorldTexture();
@@ -504,6 +509,7 @@ public class Scene implements JsonSerializable, Refreshable {
     }
 
     octreeImplementation = other.octreeImplementation;
+    time = other.time;
   }
 
   /**
@@ -1839,6 +1845,7 @@ public class Scene implements JsonSerializable, Refreshable {
     cameraPresets = other.cameraPresets;
     camera.copyTransients(other.camera);
     finalizeBuffer = other.finalizeBuffer;
+    time = other.time;
   }
 
   /**
@@ -3243,6 +3250,11 @@ public class Scene implements JsonSerializable, Refreshable {
 
   public void setPreventNormalEmitterWithSampling(boolean preventNormalEmitterWithSampling) {
     this.preventNormalEmitterWithSampling = preventNormalEmitterWithSampling;
+    refresh();
+  }
+
+  public void setTime(int time) {
+    this.time = time;
     refresh();
   }
 }

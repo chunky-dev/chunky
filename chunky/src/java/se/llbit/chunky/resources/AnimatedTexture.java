@@ -37,7 +37,7 @@ public class AnimatedTexture extends Texture {
    * Get color for animation frame.
    */
   public float[] getColor(double u, double v, int frame) {
-    int i = frame % numFrames;
+    int i = Math.floorMod(frame, numFrames);
     return getColor((int) (u * width - Ray.EPSILON),
         (int) ((1 - v) * frameHeight - Ray.EPSILON + i * frameHeight));
   }
@@ -49,7 +49,7 @@ public class AnimatedTexture extends Texture {
 
   private void updateNumFrames() {
     frameHeight = Math.min(height, width);
-    numFrames = (int) (frameHeight / (float) width);
+    numFrames = height / frameHeight;
     numFrames = Math.max(1, numFrames);
   }
 }

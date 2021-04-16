@@ -24,6 +24,7 @@
         <CheckBox fx:id="shutdown" mnemonicParsing="false" text="Shutdown computer when render completes" />
         <CheckBox fx:id="fastFog" mnemonicParsing="false" text="Fast fog" />
         <IntegerAdjuster fx:id="cacheResolution" />
+        <IntegerAdjuster fx:id="animationTime" />
         <HBox alignment="CENTER_LEFT" spacing="10.0">
           <children>
             <Label text="Output mode:" />

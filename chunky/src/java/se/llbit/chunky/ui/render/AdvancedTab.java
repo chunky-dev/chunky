@@ -66,6 +66,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   @FXML
   private IntegerAdjuster cacheResolution;
   @FXML
+  private IntegerAdjuster animationTime;
+  @FXML
   private ChoiceBox<PictureExportFormat> outputMode;
   @FXML
   private ChoiceBox<String> octreeImplementation;
@@ -136,6 +138,14 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     cacheResolution.set(128);
     cacheResolution.onValueChange(value -> {
       scene.sky().setSkyCacheResolution(value);
+    });
+    animationTime.setName("Current animation frame");
+    animationTime.setTooltip("Animation frame of animated textures to use.");
+    animationTime.setRange(0, 4096);
+    animationTime.clampMin();
+    animationTime.set(0);
+    animationTime.onValueChange(value -> {
+      scene.setTime(value);
     });
     renderThreads.setName("Render threads");
     renderThreads.setTooltip("Number of rendering threads.");
