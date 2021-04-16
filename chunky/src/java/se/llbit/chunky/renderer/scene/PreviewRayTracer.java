@@ -116,7 +116,7 @@ public class PreviewRayTracer implements RayTracer {
         ray.t = t;
         Water.INSTANCE.getColor(ray);
         ray.n.set(0, 1, 0);
-        ray.setCurrentMaterial(Water.OCEAN_WATER);
+        ray.setCurrentMaterial(scene.getPalette().water);
         return true;
       }
     }
