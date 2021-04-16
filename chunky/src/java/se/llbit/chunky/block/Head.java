@@ -79,7 +79,7 @@ public class Head extends MinecraftBlockTranslucent {
         .get("Value").stringValue();
     if (!textureBase64.isEmpty()) {
       try {
-        String decoded = new String(Base64.getDecoder().decode(textureBase64));
+        String decoded = new String(Base64.getDecoder().decode(fixBase64Padding(textureBase64)));
         Matcher matcher = SKIN_URL_FROM_OBJECT.matcher(decoded);
         if (matcher.find()) {
           return matcher.group(1);
@@ -92,5 +92,27 @@ public class Head extends MinecraftBlockTranslucent {
       }
     }
     return null;
+  }
+
+  /**
+   * Get the given Base64 string with proper padding. Sometimes the base64-encoded texture isn't
+   * padded properly which would cause an IllegalArgumentException (wrong 4-byte ending unit)
+   * because Java can't handle that.
+   *
+   * @param base64String Base64 string with or without proper padding
+   * @return Base64 string with proper padding
+   */
+  private static String fixBase64Padding(String base64String) {
+    // the length of a base64 string must be a multiple of 4
+    int missingPadding = (4 - (base64String.length() % 4)) % 4;
+    if (missingPadding == 0) {
+      return base64String;
+    }
+
+    StringBuilder fixedBase64 = new StringBuilder(base64String);
+    for (int i = 0; i < missingPadding; i++) {
+      fixedBase64.append("=");
+    }
+    return fixedBase64.toString();
   }
 }
