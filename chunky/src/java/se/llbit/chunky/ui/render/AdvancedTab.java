@@ -37,6 +37,7 @@ import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.ui.IntegerAdjuster;
 import se.llbit.chunky.ui.RenderControlsFxController;
 import se.llbit.chunky.ui.ShutdownAlert;
+import se.llbit.chunky.world.Chunk;
 import se.llbit.math.Octree;
 
 import java.io.File;
@@ -73,6 +74,8 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
   private IntegerAdjuster gridSize;
   @FXML
   private CheckBox preventNormalEmitterWithSampling;
+  @FXML
+  private CheckBox useHeightmapData;
 
   public AdvancedTab() throws IOException {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("AdvancedTab.fxml"));
@@ -180,6 +183,12 @@ public class AdvancedTab extends ScrollPane implements RenderControlsTab, Initia
     preventNormalEmitterWithSampling.selectedProperty().addListener((observable, oldvalue, newvalue) -> {
       scene.setPreventNormalEmitterWithSampling(newvalue);
       PersistentSettings.setPreventNormalEmitterWithSampling(newvalue);
+    });
+
+    useHeightmapData.setTooltip(new Tooltip("Use the heightmap data read from the world (can cause issues with some worlds modified with tools such as WorldEdit)"));
+    useHeightmapData.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        Chunk.useHeightmapData = newValue;
+        PersistentSettings.setUseHeightmapData(newValue);
     });
   }
 

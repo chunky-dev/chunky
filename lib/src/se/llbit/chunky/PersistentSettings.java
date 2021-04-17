@@ -441,5 +441,13 @@ public final class PersistentSettings {
   public static void setDisableDefaultTextures(boolean value) {
     settings.setBool("disableDefaultTextures", value);
   }
+
+  public static boolean getUseHeightmapData() {
+    return settings.getBool("useHeightmapData", false);
+  }
+
+  public static void setUseHeightmapData(boolean value) {
+    settings.setBool("useHeightmapData", value);
+  }
 }
 

@@ -68,6 +68,8 @@ public class BlockPalette {
     this.materialProperties = getDefaultMaterialProperties();
     CompoundTag airTag = new CompoundTag();
     airTag.add("Name", new StringTag("minecraft:air"));
+    CompoundTag cave_airTag = new CompoundTag();
+    cave_airTag.add("Name", new StringTag("minecraft:cave_air"));
     CompoundTag stoneTag = new CompoundTag();
     stoneTag.add("Name", new StringTag("minecraft:stone"));
     CompoundTag waterTag = new CompoundTag();
@@ -75,6 +77,7 @@ public class BlockPalette {
     airId = put(airTag);
     stoneId = put(stoneTag);
     waterId = put(waterTag);
+    blockMap.put(new BlockSpec(cave_airTag), airId);
     stone = get(stoneId);
     water = get(waterId);
   }

@@ -16,7 +16,8 @@
  */
 package se.llbit.chunky.world;
 
-import java.util.HashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
+
 import java.util.Map;
 
 /**
@@ -26,7 +27,7 @@ import java.util.Map;
  */
 public class Heightmap {
 
-  private Map<ChunkPosition, ChunkHeightmap> map = new HashMap<>();
+  private final Map<ChunkPosition, ChunkHeightmap> map = new Reference2ReferenceOpenHashMap<>();
 
   /**
    * Set height y at (x, z).
