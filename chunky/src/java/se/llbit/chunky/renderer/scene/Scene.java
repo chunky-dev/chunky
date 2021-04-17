@@ -826,7 +826,7 @@ public class Scene implements JsonSerializable, Refreshable {
         return;
       }
 
-      int requiredDepth = calculateOctreeOrigin(chunksToLoad);
+      int requiredDepth = calculateOctreeOrigin(chunksToLoad, false);
 
       // Create new octree to fit all chunks.
       palette = new BlockPalette();
@@ -1381,7 +1381,7 @@ public class Scene implements JsonSerializable, Refreshable {
     refresh();
   }
 
-  private int calculateOctreeOrigin(Collection<ChunkPosition> chunksToLoad) {
+  private int calculateOctreeOrigin(Collection<ChunkPosition> chunksToLoad, boolean centerOctree) {
     int xmin = Integer.MAX_VALUE;
     int xmax = Integer.MIN_VALUE;
     int zmin = Integer.MAX_VALUE;
@@ -1411,7 +1411,15 @@ public class Scene implements JsonSerializable, Refreshable {
     int maxDimension = Math.max(yMax - yMin, Math.max(xmax - xmin, zmax - zmin));
     int requiredDepth = QuickMath.log2(QuickMath.nextPow2(maxDimension));
 
-    origin.set(xmin, 0, zmin);
+    if(centerOctree) {
+      int xroom = (1 << requiredDepth) - (xmax - xmin);
+      int yroom = (1 << requiredDepth) - (yMax - yMin);
+      int zroom = (1 << requiredDepth) - (zmax - zmin);
+
+      origin.set(xmin - xroom / 2, -yroom / 2, zmin - zroom / 2);
+    } else {
+      origin.set(xmin, 0, zmin);
+    }
     return requiredDepth;
   }
 
@@ -2090,7 +2098,7 @@ public class Scene implements JsonSerializable, Refreshable {
         palette.applyMaterials();
         task.update(2);
         Log.info("Octree loaded");
-        calculateOctreeOrigin(chunks);
+        calculateOctreeOrigin(chunks, data.version < 6);
         camera.setWorldSize(1 << worldOctree.getDepth());
         buildBvh();
         buildActorBvh();
